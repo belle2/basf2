@@ -1,0 +1,389 @@
+*//////////////////////////////////////////////////////////////////////////////
+*//                                                                          //
+*//                      Default input data for KoralW                       //
+*//                                                                          //
+*//                                                                          //
+*//////////////////////////////////////////////////////////////////////////////
+BeginX
+*<-i><----data-----><-------------------comments------------------------------>
+    1          190d0 CmsEne =xpar( 1) ! CMS total energy [GeV]
+    2     1.16639d-5 GFermi =xpar( 2) ! Fermi Constant  
+    3       128.07d0 AlfWin =xpar( 3) ! alpha QED at WW tresh. scale (inverse) 
+    4      91.1888d0 amaZ   =xpar( 4) ! Z mass   
+    5       2.4974d0 gammZ  =xpar( 5) ! Z width      
+    6       80.230d0 amaW   =xpar( 6) ! W mass 
+    7       -2.085d0 gammW  =xpar( 7) ! W with, For gammW<0 it is RECALCULATED inside progr.
+    8           1d-6 vvmin  =xpar( 8) ! Photon spectrum parameter
+    9         0.99d0 vvmax  =xpar( 9) ! Photon spectrum parameter
+   10            2d0 wtmax  =xpar(10) ! max weight for reject. 
+   11         1000D0 amh    =xpar(11) ! Higgs mass  (for Grace only)
+   12          1.0D0 agh    =xpar(12) ! Higgs width (for Grace only)
+   13         0.12d0 alpha_s=xpar(13) ! QCD coupling const.
+   14       0.0001d0 arbitr =xpar(14) ! arbitr  min. vis p_t**2 (GeV**2)
+   15       0.0001d0 arbitr1=xpar(15) ! inv_mass**2 cut for e+e-xx (GeV**2)
+   16           1d-6 themin =xpar(16) ! themin  min theta (rad) with beam (0=no cut)
+   17          300d0 arbitr2=xpar(17) ! arbitr2 max p_t**2 of photons in e+e-xx (GeV**2)
+   18           -1d0 WTMAX_cc03=xpar(18) ! WTMAX_cc03  max weight for cc03 reject.
+*                                          WTMAX_cc03<0 = default setting
+   19            0d0 PReco  =xpar(19) ! WTMAX_cc03, Colour Reconnection Probability
+*=============================================================================
+*         entries 21-73 reserved for anomalous couplings
+*!----------------------------------------------------------------------!
+*! Setting up the anomalous couplings as given in the paper:            !
+*!     K. Hagiwara, R.D. Peccei, D. Zeppenfeld and K. Hikasa,           !
+*!                 Nucl. Phys. B282 (1987) 253.                         !
+*! The variables used in this routine correspond to the following       !
+*! contants defined in the above paper:                                 !
+*!           constant name     corresponding variable                   !
+*!                g_1^V                g1(2)                            !
+*!                kappa_V              kap(2)                           !
+*!                lambda_V             lam(2)                           !
+*!                g_4^V                g4(2)                            !
+*!                g_5^V                g5(2)                            !
+*!                kappa-tilde_V        kapt(2)                          !
+*!                lambda-tilde_V       lamt(2)                          !
+*!----------------------------------------------------------------------!
+* Example of wild random anomalous coupling constants (benchmark)
+* Must set KeyACC=1 in order to activate them.
+* Anomalous WWV Couplings - some test values
+* They will be activated in the matrix element only if KeyAcc >0
+* NB. Standard Model looks as follows:
+* xpar(21)=1d0, xpar(22)=1d0, xpar(41)=1d0, xpar(42)=1d0 and the other are zero
+*
+* KeyAcc=1: Set 1, the most general TGC's (cf. Hagiwara et al.)
+   21      .1191D+01      ! Re[g1(1)]
+   22     -.3060D+00      ! Re[kap(1)]
+   23      .1283D+01      ! Re[lam(1)]
+   24     -.3160D+01      ! Re[g4(1)]
+   25     -.7430D+00      ! Re[g5(1)]
+   26     -.6050D+00      ! Re[kapt(1)]
+   27      .1530D+01      ! Re[lampt(1)]
+*
+   31     -.8010D+00      ! Im[g1(1)]
+   32      .7237D+00      ! Im[kap(1)]
+   33     -.4960D+00      ! Im[lam(1)]
+   34      .8320D+00      ! Im[g4(1)]
+   35     -.1490D+01      ! Im[g5(1)]
+   36      .8380D+00      ! Im[kapt(1)]
+   37      .9920D-01      ! Im[lampt(1)]
+*
+   41     -.1960D+01      ! Re[g1(2)]
+   42     -.4970D+00      ! Re[kap(2)]
+   43      .6380D+00      ! Re[lam(2)]
+   44     -.9980D+00      ! Re[g4(2)]
+   45      .6410D+00      ! Re[g5(2)]
+   46      .1638D+00      ! Re[kapt(2)]
+   47     -.5950D+00      ! Re[lampt(2)]
+*
+   51      .5169D+00      ! Im[g1(2)]
+   52      .6489D+00      ! Im[kap(2)]
+   53      .1426D+01      ! Im[lam(2)]
+   54     -.2760D+00      ! Im[g4(2)]
+   55      .2986D+01      ! Im[g5(2)]
+   56      .4021D+00      ! Im[kapt(2)]
+   57      .7230D+00      ! Im[lampt(2)]
+*<-i><----data-----><-------------------comments------------------------------>
+* KeyAcc=2: Set 2, cf. YR CERN 96-01 "Physics at LEP2", Vol 1, p. 525
+   61        0.2D+00      ! delta_Z
+   62        0.1D+00      ! x_gamma
+   63        0.1D+00      ! x_Z
+   64        0.1D+00      ! y_gamma
+   65        0.1D+00      ! y_Z
+* KeyAcc=3: Set 3, cf. YR CERN 96-01 "Physics at LEP2", Vol 1, p. 525
+   71        0.1D+00      ! alpha_Wphi 
+   72        0.1D+00      ! alpha_Bphi
+   73       -0.1D+00      ! alpha_W
+*=============================================================================
+  100  0.51099906d-3 amel   =xpar(100) ! electron mass
+  101  137.0359895D0 AlfInv =xpar(101) ! 1/alpha_QED, Thomson limit
+  102    389.37966D6 gpicob =xpar(102) ! GeV-->picobarn translation
+*/////////////////////////////////////////////////////////////////////////
+*//      Default values of for KeyBra =2                                //
+*// Recalculate br. ratios from the CKM matrix and alpha_s according to //
+*// theoretical formula of A. Denner, Fortschr. Phys. 41 (1993) 307.    //
+*// Values of the CKM matrix elements from 1998 PDG Review:             //
+*//  http://www-pdg.lbl.gov/pdg.html (mean values of given ranges)      //
+*/////////////////////////////////////////////////////////////////////////
+  111      0.97525d0 VCKM(1,1) =xpar(111) ! V_ud  real part
+  112      0.22050d0 VCKM(1,2) =xpar(112) ! V_us  real part
+  113      0.00315d0 VCKM(1,3) =xpar(113) ! V_ub  real part
+  114     -0.22050d0 VCKM(2,1) =xpar(114) ! V_cd  real part
+  115      0.97450d0 VCKM(2,2) =xpar(115) ! V_cs  real part
+  116      0.03900d0 VCKM(2,3) =xpar(116) ! V_cb  real part
+  117      0.00850d0 VCKM(3,1) =xpar(117) ! V_td  real part
+  118     -0.03850d0 VCKM(3,2) =xpar(118) ! V_ts  real part
+  119      0.99925d0 VCKM(3,3) =xpar(119) ! V_tb  real part
+*       121-129 reserved for imaginary parts
+*/////////////////////////////////////////////////////////////////////////
+*// Values of BRanchings for W decay channels for KeyBra = 1            //
+*// Note that these br ratios correspond to alfa_s=0.12 (gamma_W->el    //
+*// constant) and to nontrivial CKM matrix simultaneously               //
+*// this is 'bullet proof' default setting                              //
+*/////////////////////////////////////////////////////////////////////////
+*<-i><----data-----><-------------------comments------------------------------>
+  131      0.32110D0 BR(1) =xpar(131) ! 1-ud
+  132      0.01630D0 BR(2) =xpar(132) ! 2-cd
+  133      0.01635D0 BR(3) =xpar(133) ! 3-us
+  134      0.32043D0 BR(4) =xpar(134) ! 4-cs
+  135      0.00002D0 BR(5) =xpar(135) ! 5-ub
+  136      0.00070D0 BR(6) =xpar(136) ! 6-cb
+  137      0.10840D0 BR(7) =xpar(137) ! 7-e
+  138      0.10840D0 BR(8) =xpar(138) ! 8-mu
+  139      0.10830D0 BR(9) =xpar(139) ! 9-tau
+*/////////////////////////////////////////////////////////////////////////
+*//               Energy dependent wtmax_cc03
+*<-i><----data-----><-------------------comments------------------------------>
+  151          7.0D0  wtmax_cc03=xpar(151)  !     0 < CMSene < 162
+  152          5.0D0  wtmax_cc03=xpar(152)  !   162 < CMSene < 175
+  153          4.0D0  wtmax_cc03=xpar(153)  !   175 < CMSene < 200
+  154          4.4D0  wtmax_cc03=xpar(154)  !   200 < CMSene < 250
+  155          4.8D0  wtmax_cc03=xpar(155)  !   250 < CMSene < 350
+  156          7.0D0  wtmax_cc03=xpar(156)  !   350 < CMSene < 700
+  157          9.0D0  wtmax_cc03=xpar(157)  !   700 < CMSene
+********************************************************************************
+*     PROPERTIES of Quarks and Leptons
+*     i-th position  in xpar(i) according to i = 500+10*KFlavour +j
+****** d-quark
+  511              1      KFlavour
+  512              3      NColor
+  513             -1      3*Q   =3*charge
+  514             -1      2*T3L =2*Isospin for Left component
+  515              0      2*helicity, 0 for unpolarized
+  516        0.010d0      mass [GeV] (5-15MeV in PDG)
+  517          3.5d0      WtMax Maximum weight for rejection d-quark
+****** u-quark
+  521              2      KFlavour
+  522              3      NColor
+  523              2      3*Q   =3*charge
+  524              1      2*T3L =2*Isospin for Left component
+  525              0      2*helicity, 0 for unpolarized
+  526        0.005d0      mass [GeV] (2-8MeV in PDG)
+  527          3.5d0      WtMax Maximum weight for rejection u-quark
+*indx+++++++++++++++ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+****** s-quark
+  531              3      KFlavour
+  532              3      NColor
+  533             -1      3*Q   =3*charge
+  534             -1      2*T3L =2*Isospin for Left component
+  535              0      2*helicity, 0 for unpolarized
+  536        0.200d0      mass [GeV] (100-300MeV in PDG)
+  537          3.5d0      WtMax Maximum weight for rejection s-quark
+****** c-quark
+  541              4      KFlavour
+  542              3      NColor
+  543              2      3*Q   =3*charge
+  544              1      2*T3L =2*Isospin for Left component
+  545              0      2*helicity, 0 for unpolarized
+  546        1.300d0      mass [GeV] (1.0-1.6 GeV in PDG)
+  547          3.5d0      WtMax Maximum weight for rejection c-quark
+*indx+++++++++++++++ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+****** b-quark
+  551              5      KFlavour
+  552              3      NColor
+  553             -1      3*Q   =3*charge
+  554             -1      2*T3L =2*Isospin for Left component
+  555              0      2*helicity, 0 for unpolarized
+  556        4.300d0      mass [GeV] (4.1-4.5 GeV in PDG)
+  557          3.5d0      WtMax Maximum weight for rejection b-quark
+****** t-quark
+  561              6      KFlavour
+  562              3      NColor
+  563              2      3*Q   =3*charge
+  564              1      2*T3L =2*Isospin for Left component
+  565              0      2*helicity, 0 for unpolarized
+  566        175.0d0      mass [GeV] (170-190GeV in PDG)
+  567          3.5d0      WtMax Maximum weight for rejection t-quark
+*indx+++++++++++++++ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+****** electron
+  611             11      KFlavour
+  612              1      NColor
+  613             -3      3*Q   =3*charge
+  614             -1      2*T3L =2*Isospin for Left component
+  615              0      2*helicity
+  616   .51099906d-3      mass [GeV]   (0.51099907 MeV)
+  617          3.5d0      WtMax Maximum weight for rejection electron
+****** neutrino electron
+  621             12      KFlavour
+  622              1      NColor
+  623              0      3*Q   =3*charge
+  624              1      2*T3L =2*Isospin for Left component
+  625              0      2*helicity
+  626           1d-3      mass [GeV]
+  627          3.5d0      WtMax Maximum weight for rejection neutrino electron
+*indx+++++++++++++++ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+****** muon
+  631             13      KFlavour
+  632              1      NColor
+  633             -3      3*Q   =3*charge
+  634             -1      2*T3L =2*Isospin for Left component
+  635              0      2*helicity
+  636   .105658389d0      mass [GeV]   (0.1056583 GeV)
+  637          3.5d0      WtMax Maximum weight for rejection muon
+****** neutrino muon
+  641             14      KFlavour
+  642              1      NColor
+  643              0      3*Q   =3*charge
+  644              1      2*T3L =2*Isospin for Left component
+  645              0      2*helicity
+  646           1d-3      mass [GeV]
+  647          3.5d0      WtMax Maximum weight for rejection neutrino muon
+*indx+++++++++++++++ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+****** tau
+  651             15      KFlavour
+  652              1      NColor
+  653             -3      3*Q   =3*charge
+  654             -1      2*T3L =2*Isospin for Left component
+  655              0      2*helicity
+  656       1.7771d0      mass [GeV]   (1.777 GeV)
+  657          3.5d0      WtMax Maximum weight for rejection tau
+****** neutrino tau
+  661             16      KFlavour
+  662              1      NColor
+  663              0      3*Q   =3*charge
+  664              1      2*T3L =2*Isospin for Left component
+  665              0      2*helicity
+  666           1d-3      mass [GeV]
+  667          3.5d0      WtMax Maximum weight for rejection neutrino tau
+********************************************************************************
+*<-i><----data-----><-------------------comments------------------------------>
+ 1011            1d0 KeyISR =xpar(1011)
+*                    =0,1  initial state radiation off/on
+ 1012            0d0 KeyFSR =xpar(1012) 
+*                    KeyFSR =final state radiation switch, INACTIVE
+ 1013            1d0 KeyNLL =xpar(1013)
+*                    =0 sets next-to leading alpha/pi terms to zero
+*                    =1 alpha/pi in yfs formfactor is kept
+ 1014            1d0 KeyCul =xpar(1014)
+*                    =0,1 Coulomb correction, off/on
+ 1021            2d0 KeyBra =xpar(1021)
+*                    = 0 born branching ratios, no mixing
+*                    = 1 branching ratios with mixing and naive QCD
+*                    = 2 branching ratios with mixing and naive QCD 
+*                       calculated in IBA from the CKM matrix (PDG '98); 
+*                       see routine filexp for more details (file filexp.f)
+ 1022            1d0 KeyMas =xpar(1022)
+*                    = 0,1 masless/massive kinematics for w decay products
+ 1023            0d0 KeyZet =xpar(1023)
+*                    = 0, Z width in z propagator: s/m_z *gamm_z
+*                    = 1, Z width in z propagator:   m_z *gamm_z
+*                    = 2, Z zero width in z propagator.
+ 1024            1d0 KeySpn =xpar(1024)
+*                    = 0,1 spin effects off/on in W decays
+ 1025            0d0 KeyRed =xpar(1025)
+*                    = reduction of massive fs to massles matr.el.
+*                    = 0 fine (recommended)
+*                    = 1 crude, 4-mom. non conserving
+*                    = 2 no reduction at all
+ 1026            0d0 KeyWu  =xpar(1026)
+*                    = 0 w width in w propagator: s/m_w *gamm_w
+*                    = 1 w width in w propagator:   m_w *gamm_w
+*                    = 2 no (0) w width in w propagator.
+ 1031            0d0 KeyWgt =xpar(1031)
+*                    =0, wtmod=1 useful for apparatus monte carlo.
+*                    =1, wtmod varying, option faster and safer
+*                    =2, wtmod=1 for internal matrix element and varying for
+*                      external matrix el. (for some special purposes)
+ 1032            1d0 KeyRnd =xpar(1032)
+*                    =1 for RANMAR random number generator (default)
+*                    =2 for ECURAN random number generator
+*                    =3 for CARRAN random number generator
+ 1033            2d0 KeySmp =xpar(1033)
+*                    =0 presampler set as in KORALW v. 1.02-1.2
+*                    =1 first presampler for all 4fermion final states
+*                    =2 second presampler for all 4fermion final states
+*                    =3 50/50 mixed (1+2) presampler 
+*                              for all 4fermion final states
+ 1041            0d0 KeyMix =xpar(1041)
+*                    KeyMix EW 'renormalisation scheme' choices. 
+*                      NOTE, this key has changed its meaning since v. 1.33 !!
+*                    =0 'LEP2 Workshop' (recommended)
+*                    =1 'G_mu' scheme
+ 1042            1d0 Key4f  =xpar(1042)
+*                    = 0, INTERNAL matrix element
+*                    = 1, EXTERNAL matrix element
+ 1043            0d0 KeyAcc =xpar(1043)
+*                    = 0, anomalous WWV couplings in internal matr. el. OFF
+*                    > 0, anomalous WWV couplings in internal matr. el. ON
+*                    = 1, set 1: the most general (complex number) TGC's 
+*                           in the notation of Ref. 
+*                           K. Hagiwara et al., Nucl. Phys. B282 (1987) 253, 
+*                           see also: YR CERN 96-01 "Physics at LEP2;
+*                    > 1, some specific parametrizations discussed in: 
+*                          YR CERN 96-01 "Physics at LEP2", Vol. 1, p. 525;
+*                          = 2, set 2: delta_Z, x_gamma, x_Z, y_gamma, y_Z   
+*                          = 3, set 3: alpha_Wphi, alpha_Bphi, alpha_W
+ 1044            1d0 KeyZon =xpar(1044)
+*                    = 1/0, ZZ type final states ON/OFF
+ 1045            1d0 KeyWon =xpar(1045)
+*                    = 1/0, WW type final states ON/OFF
+*     Exclusive W decays
+ 1055            0d0 KeyDWM =xpar(1055)    W- decay: 7=(ev), 0=all ch.   
+ 1056            0d0 KeyDWP =xpar(1056)    W+ decay: 7=(ev), 0=all ch.  
+ 1057           16d0 Nout   =xpar(1057)    Output unit number, for Nout<0, Nout=16
+*    Tauola and Photos
+ 1071            0d0 JAK1   =xpar(1071)   Decay mode tau+
+ 1072            0d0 JAK2   =xpar(1072)   Decay mode tau-
+ 1073            1d0 ITDKRC =xpar(1073)   Bremsstrahlung switch in Tauola 
+ 1074            1d0 IFPHOT =xpar(1074)   PHOTOS switch
+ 1075            1d0 IFHADM =xpar(1075)   Hadronisation W-
+ 1076            1d0 IFHADP =xpar(1076)   Hadronisation W+
+*=============================================================================
+*   Entries from 1101 to 1302 are reserved for Umask matrix,
+*   KW_ReaDataX reads default Umask for ireset=1 from the bottom of this file.
+*   User may owerwrite Umask with explicit CALL KW_ReadMask( DiskFile, 1, xpar)
+*   see example in Bdemo2.
+*=============================================================================
+*   4000-5000 reserved for user private exercises, for example:
+*-----------------------------------------------------------------------------
+* BE parameters:
+*<-i><----data-----><-------------------comments------------------------------>
+ 4061          0.2d0 range  =xpar(61) Q^2 ragne  , Epifany97!!!
+ 4062            1d0 ifun   =xpar(62) Gausian UA1, Epifany97!!!
+ 4063         0.20d0 pp     =xpar(63) Gausian UA1, Epifany97!!!
+ 4064         1.00d0 radius =xpar(64) Gausian UA1, Epifany97!!!
+* renormalizations
+ 4065       1.0675d0 lambda =xpar(65) 172GeV  2W Range=0.20,ifun=2
+ 4066       0.1751d0 avewt  =xpar(66) 172GeV  2W Range=0.20,ifun=2
+ 4067       1.0510d0 lambda2=xpar(67) 172GeV  1W Range=0.20,ifun=2
+ 4068       0.4387d0 avewt2 =xpar(68) 172GeV  1W Range=0.20,ifun=2
+* rejection parameters
+ 4069            0d0 KeyRej =xpar(69) Rejection is ON for KeyRej=0
+ 4070            3d0 WtMax  =xpar(70) maximum wight for rejection
+EndX
+*//////////////////////////////////////////////////////////////////////////////
+*//                                                                          //
+*//  This is default Umask for completely INCLUSIVE final states             //
+*//  The user may use it as a template to create its own version             //
+*//  Umask is used in program only for completely inclusive request          //
+*//  KeyDWM =0,   KeyDWP=0,   KeyWon=1, KeyZon=1                             //
+*//  Otherwise it is ignored!                                                //
+*//                                                                          //
+*//////////////////////////////////////////////////////////////////////////////
+BeginM
+* 1-81: WW Wp=1:1-9; 2:10-18..
+Wm=  1:ud 2:cd 3:us 4:cs 5:ub 6:cb 7:el 8:mu 9:ta / Wp=
+     0    0    0    0    0    0    0    0    0      1:ud 
+     0    0    0    0    0    0    0    0    0      2:cd
+     0    0    0    0    0    0    0    0    0      3:us 
+     0    0    0    0    0    0    0    0    0      4:cs 
+     0    0    0    0    0    0    0    0    0      5:ub 
+     0    0    0    0    0    0    0    0    0      6:cb 
+     0    0    0    0    0    0    0    0    0      7:el 
+     0    0    0    0    0    0    0    0    0      8:mu 
+     0    0    0    0    0    0    0    0    0      9:ta 
+* 82-202: ZZ Z1=1:82-92; 2:93-103..
+Z1=  1:d  2:u  3:s  4:c  5:b  6:el 7:mu 8:ta 9:ve 10vm 11vt / Z2=
+     0    0    0    0    0    0    0    0    0    0    0      1:d
+     0    0    0    0    0    0    0    0    0    0    0      2:u 
+     0    0    0    0    0    0    0    0    0    0    0      3:s 
+     0    0    0    0    0    0    0    0    0    0    0      4:c 
+     0    0    0    0    0    0    0    0    0    0    0      5:b 
+     0    0    0    0    0    1    0    0    0    0    0      6:el 
+     0    0    0    0    0    0    0    0    0    0    0      7:mu
+     0    0    0    0    0    0    0    0    0    0    0      8:ta
+     0    0    0    0    0    0    0    0    0    0    0      9:ve
+     0    0    0    0    0    0    0    0    0    0    0      10vm 
+     0    0    0    0    0    0    0    0    0    0    0      11vt
+EndM
+*//////////////////////////////////////////////////////////////////////////////
+

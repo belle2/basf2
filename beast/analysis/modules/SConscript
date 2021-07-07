@@ -1,0 +1,7 @@
+Import('env')
+
+#These are the libraries the awesome package has to be linked against
+env['LIBS'] = ['framework','framework_io','$ROOT_LIBS', 'mdst_dataobjects','generators_SAD_dataobjects','beast_microtpc_dataobjects',
+	       'beast_he3tube_dataobjects']
+
+Return('env')

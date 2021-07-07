@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Modules descr="definition of TOP modules">
+
+  <Module slotID="1">
+    <ConstructionNumber>1</ConstructionNumber>
+    <Prism descr="serial number">449006</Prism>
+    <BarSegment2 descr="serial number">OOW:SN-03</BarSegment2>
+    <BarSegment1 descr="serial number">OOW:SN-01</BarSegment1>
+    <Mirror descr="serial number">SN-002</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">90</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  
+  <Glue>
+    <GlueMaterial>TOPglueNOA61</GlueMaterial>
+    <Thicknes1 desc="glue thicknes quartz-wedge" unit="mm">0.05</Thicknes1>
+    <Thicknes2 desc="glue thicknes quartz-quartz" unit="mm">0.05</Thicknes2>
+    <Thicknes3 desc="glue thicknes quartz-mirror section" unit="mm">0.05</Thicknes3>
+  </Glue>
+  
+  <Surface name="QuartzSurface_1">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99905</value>
+        <value energy="2.0">0.99905</value>
+        <value energy="3.0">0.99905</value>
+        <value energy="4.0">0.99905</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+</Modules>

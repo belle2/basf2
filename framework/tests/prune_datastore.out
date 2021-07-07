@@ -1,0 +1,5 @@
+[INFO] Steering file: framework/tests/prune_datastore.py
+[FATAL] Regex '[a-b][a' cannot be compiled: Unexpected character in bracket expression.  { module: PruneDataStore }
+[INFO] ===Error Summary================================================================
+[FATAL] Regex '[a-b][a' cannot be compiled: Unexpected character in bracket expression.  { module: PruneDataStore }
+[INFO] ================================================================================

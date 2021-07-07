@@ -1,0 +1,47 @@
+# EventType: 1300000050
+# Descriptor: [Y(6S) -> Bs Bs ]cc
+# NickName: Y6S_BsBs
+# Documentation: Inclusive production of Y6S to Bs(*) Bs(*)
+# input: (all in %) PDG09 fs=19.3
+# Belle Bs->Ds pi (PRL 102,021801)
+# N_Bs*Bs*/N_Bs(*)Bs(*)=90.1
+# N_Bs*Bs/N_Bs(*)Bs(*)=7.3
+# N_BsBs/N_Bs(*)Bs(*)=2.6
+#
+# Tested: Yes
+# PhysicsWG: Quarkonium
+# Responsible: Phillip Urquijo
+# Email: purquijo@unimelb.edu.au
+# Cuts: None
+# Date: 20161101
+#
+
+Define dm_Bs 17.77e12
+
+Decay B_s0heavy
+1.000 B_s0 gamma PHSP;
+Enddecay
+
+CDecay anti-B_s0heavy
+
+Decay B_s0long
+1.0 B_s0 PHSP;
+Enddecay
+
+CDecay anti-B_s0long
+
+Decay Upsilon(6S) 
+
+# Bs SUM=0.19300-
+0.17389   B_s0heavy    anti-B_s0heavy                                       PHSP_BB_MIX  dm_Bs  -1 ;
+
+#0.00704   B_s0heavy    anti-B_s0long           anti-B_s0heavy  B_s0long     PHSP_BB_MIX  dm_Bs  +1 ;
+#0.00704   B_s0long     anti-B_s0heavy          anti-B_s0long   B_s0heavy    PHSP_BB_MIX  dm_Bs  +1 ;
+
+0.00502   B_s0long     anti-B_s0long                                        PHSP_BB_MIX  dm_Bs  -1 ;
+
+Enddecay
+
+
+End
+

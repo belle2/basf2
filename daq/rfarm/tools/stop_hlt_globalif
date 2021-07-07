@@ -1,0 +1,93 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import os
+import sys
+import signal
+import time
+
+from rfarmutil import *
+
+argvs = sys.argv
+argc = len(argvs)
+
+if argc<=1:
+    print "Usage : stop_hlt_globalif unit_name configname"
+    sys.exit()
+
+#configname = "PHASE2"
+
+unitname = argvs[1]
+configname = argvs[2]
+
+# detector hlt?
+if unitname.find ('_') != 0:
+    detector = unitname[unitname.find('_')+1:]
+else:
+    detector = unitname
+
+# Open PID file
+path = os.environ["HOME"]+"/pid." + argvs[1]
+pidfile = open ( path, mode="r" )
+
+# Stop rf_master
+mypid = int(pidfile.readline())
+try :
+    os.kill ( mypid, signal.SIGINT )
+#    os.waitpid(mypid, 0 )
+    print "rf_master killed."
+except:
+    print "rf_master : no such process"
+    pass
+
+# Stop runcontrold
+mypid = int(pidfile.readline())
+try :
+    os.kill ( mypid, signal.SIGINT )
+#    os.waitpid(mypid, 0 )
+    print "runcontrold killed."
+except:
+    print "runcontrold : no such process"
+    pass
+
+# Stop nsmbridged
+mypid = int(pidfile.readline())
+if mypid > 0 :
+    try :
+        os.kill ( mypid, signal.SIGINT )
+    #    os.waitpid(mypid, 0 )
+        print "nsmbridged killed."
+    except : 
+        print "nsmbridged : no such process"
+        pass
+
+# Stop event builder
+#cmd = "rcrequest -c eb1_" + argvs[1] + " eb1_" + argvs[1] + " abort"
+cmd = "rcrequest -c eb1_" + detector + " eb1_" + detector + " abort"
+try :
+    print "Sending ABORT to EB1RX. May take some time if not LOADed."
+    p = subprocess.Popen(cmd, shell=True)
+    p.wait()
+except:
+    pass
+
+mypid = pidfile.readline()
+cmd = "ssh hltin kill -INT " + mypid
+try :
+    p = subprocess.Popen(cmd, shell=True)
+    p.wait()
+    print "event builder killed."
+except :
+    pass
+
+# Close PID file and exit
+pidfile.close()
+

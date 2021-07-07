@@ -1,0 +1,3697 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<SVD>
+
+	<layer n="3">
+ 		<ladder n="1">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="0" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="129" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="129" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="129" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="0" FADCn="33" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="33" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="33" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="33" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="33" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="33" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="161" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="161" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="161" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="161" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="161" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="161" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+		<ladder n="2">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="6" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="129" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="129" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="129" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="6" FADCn="33" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="33" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="33" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="33" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="33" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="33" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="161" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="161" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="161" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="161" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="161" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="161" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+		<ladder n="3">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="12" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="129" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="129" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="129" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="12" FADCn="33" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="33" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="33" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="33" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="33" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="33" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="161" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="161" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="161" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="161" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="161" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="161" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+		<ladder n="4">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="18" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="129" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="129" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="129" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="18" FADCn="33" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="33" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="33" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="33" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="33" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="33" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="161" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="161" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="161" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="161" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="161" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="161" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+		<ladder n="5">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="24" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="129" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="129" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="129" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="24" FADCn="33" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="33" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="33" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="33" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="33" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="33" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="161" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="161" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="161" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="161" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="161" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="161" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+		<ladder n="6">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="30" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="129" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="129" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="129" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="30" FADCn="33" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="33" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="33" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="33" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="33" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="33" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="161" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="161" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="161" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="161" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="161" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="161" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+		<ladder n="7">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="36" FADCn="1" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="1" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="1" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="1" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="1" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="1" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="129" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="129" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="129" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="129" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="129" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="129" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="36" FADCn="33" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="33" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="33" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="33" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="33" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="33" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="161" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="161" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="161" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="161" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="161" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="161" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+	</layer>
+
+
+
+	
+
+
+
+	<layer n="4">
+ 		<ladder n="1">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="0" FADCn="8" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="8" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="8" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="8" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="8" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="8" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="136" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="136" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="136" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="136" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="0" FADCn="40" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="40" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="40" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="40" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="40" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="40" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="168" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="168" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="168" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="168" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="6" FADCn="40" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="40" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="40" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="40" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="40" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="40" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="168" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="168" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="168" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="168" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+		<ladder n="2">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="6" FADCn="8" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="8" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="8" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="8" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="8" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="8" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="136" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="136" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="136" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="136" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="12" FADCn="40" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="40" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="40" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="40" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="40" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="40" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="168" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="168" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="168" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="168" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="18" FADCn="40" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="40" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="40" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="40" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="40" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="40" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="168" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="168" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="168" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="168" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+	
+		<ladder n="3">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="12" FADCn="8" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="8" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="8" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="8" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="8" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="8" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="136" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="136" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="136" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="136" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="24" FADCn="40" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="40" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="40" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="40" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="40" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="40" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="168" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="168" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="168" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="168" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="30" FADCn="40" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="40" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="40" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="40" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="40" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="40" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="168" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="168" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="168" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="168" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+		<ladder n="4">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="18" FADCn="8" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="8" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="8" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="8" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="8" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="8" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="136" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="136" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="136" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="136" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="36" FADCn="40" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="40" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="40" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="40" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="40" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="40" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="168" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="168" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="168" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="168" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="42" FADCn="40" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="40" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="40" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="40" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="40" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="40" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="42" FADCn="168" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="168" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="168" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="168" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+
+		<ladder n="5">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="24" FADCn="8" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="8" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="8" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="8" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="8" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="8" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="136" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="136" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="136" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="136" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="0" FADCn="41" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="41" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="41" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="41" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="41" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="41" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="169" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="169" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="169" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="169" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="6" FADCn="41" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="41" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="41" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="41" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="41" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="41" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="169" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="169" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="169" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="169" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+		<ladder n="6">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="30" FADCn="8" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="8" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="8" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="8" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="8" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="8" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="136" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="136" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="136" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="136" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="12" FADCn="41" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="41" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="41" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="41" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="41" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="41" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="169" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="169" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="169" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="169" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="18" FADCn="41" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="41" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="41" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="41" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="41" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="41" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="169" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="169" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="169" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="169" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+		<ladder n="7">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="36" FADCn="8" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="8" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="8" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="8" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="8" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="8" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="136" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="136" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="136" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="136" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="24" FADCn="41" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="41" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="41" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="41" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="41" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="41" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="169" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="169" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="169" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="169" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="30" FADCn="41" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="41" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="41" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="41" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="41" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="41" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="169" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="169" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="169" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="169" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+		<ladder n="8">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="42" FADCn="8" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="8" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="8" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="8" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="8" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="8" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="42" FADCn="136" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="136" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="136" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="136" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="36" FADCn="41" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="41" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="41" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="41" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="41" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="41" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="169" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="169" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="169" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="169" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="42" FADCn="41" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="41" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="41" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="41" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="41" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="41" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="42" FADCn="169" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="169" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="169" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="169" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+		<ladder n="9">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="0" FADCn="9" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="9" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="9" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="9" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="9" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="9" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="137" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="137" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="137" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="137" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="0" FADCn="42" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="42" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="42" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="42" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="42" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="42" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="170" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="170" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="170" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="170" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="6" FADCn="42" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="42" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="42" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="42" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="42" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="42" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="170" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="170" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="170" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="170" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+
+		<ladder n="10">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="6" FADCn="9" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="9" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="9" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="9" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="9" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="9" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="137" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="137" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="137" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="137" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="12" FADCn="42" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="42" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="42" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="42" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="42" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="42" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="170" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="170" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="170" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="170" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="18" FADCn="42" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="42" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="42" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="42" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="42" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="42" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="170" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="170" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="170" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="170" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+		</ladder>
+
+	</layer>
+
+
+
+	
+
+
+
+	<layer n="5">
+ 		<ladder n="1">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="0" FADCn="16" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="16" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="16" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="16" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="16" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="16" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="144" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="144" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="144" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="144" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="0" FADCn="48" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="48" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="48" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="48" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="48" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="48" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="176" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="176" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="176" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="176" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="6" FADCn="48" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="48" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="48" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="48" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="48" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="48" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="176" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="176" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="176" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="176" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="12" FADCn="48" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="48" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="48" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="48" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="48" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="48" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="176" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="176" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="176" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="176" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>				
+				
+			</sensor>
+
+					
+		</ladder>
+
+		<ladder n="2">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="6" FADCn="16" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="16" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="16" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="16" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="16" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="16" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="144" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="144" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="144" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="144" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="2">
+
+				<side side="u">
+					<chip n="18" FADCn="48" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="48" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="48" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="48" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="48" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="48" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="176" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="176" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="176" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="176" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>				
+				
+			</sensor>
+	
+			<sensor n="3">
+
+				<side side="u">
+					<chip n="24" FADCn="48" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="48" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="48" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="48" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="48" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="48" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="176" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="176" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="176" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="176" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>			
+				
+				
+			</sensor>
+				
+			<sensor n="4">
+
+				<side side="u">
+					<chip n="30" FADCn="48" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="48" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="48" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="48" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="48" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="48" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="176" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="176" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="176" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="176" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>				
+				
+			</sensor>
+
+		</ladder>
+
+		<ladder n="3">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="12" FADCn="16" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="16" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="16" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="16" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="16" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="16" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="144" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="144" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="144" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="144" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+
+				<side side="u">
+					<chip n="36" FADCn="48" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="48" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="48" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="48" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="48" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="48" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="176" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="176" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="176" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="176" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>				
+				
+			</sensor>	
+
+			<sensor n="3">
+
+				<side side="u">
+					<chip n="42" FADCn="48" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="48" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="48" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="48" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="48" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="48" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="42" FADCn="176" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="176" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="176" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="176" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>				
+				
+			</sensor>
+
+			<sensor n="4">
+
+				<side side="u">
+					<chip n="0" FADCn="49" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="49" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="49" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="49" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="49" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="49" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="177" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="177" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="177" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="177" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>				
+				
+			</sensor>	
+
+		</ladder>
+
+
+		<ladder n="4">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="18" FADCn="16" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="16" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="16" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="16" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="16" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="16" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="144" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="144" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="144" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="144" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>	
+				
+			</sensor>
+
+			<sensor n="2">
+
+				<side side="u">
+					<chip n="6" FADCn="49" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="49" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="49" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="49" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="49" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="49" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="177" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="177" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="177" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="177" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>					
+				
+			</sensor>		
+	
+			<sensor n="3">
+
+				<side side="u">
+					<chip n="12" FADCn="49" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="49" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="49" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="49" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="49" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="49" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="177" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="177" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="177" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="177" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>	
+
+			<sensor n="4">
+
+				<side side="u">
+					<chip n="18" FADCn="49" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="49" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="49" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="49" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="49" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="49" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="177" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="177" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="177" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="177" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>					
+				
+			</sensor>	
+
+		</ladder>
+
+		
+		<ladder n="5">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="24" FADCn="16" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="16" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="16" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="16" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="16" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="16" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="144" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="144" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="144" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="144" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+
+				<side side="u">
+					<chip n="24" FADCn="49" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="49" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="49" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="49" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="49" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="49" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="177" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="177" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="177" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="177" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>				
+				
+			</sensor>		
+
+			
+			<sensor n="3">
+
+				<side side="u">
+					<chip n="30" FADCn="49" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="49" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="49" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="49" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="49" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="49" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="177" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="177" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="177" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="177" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>					
+				
+			</sensor>
+
+			<sensor n="4">
+
+				<side side="u">
+					<chip n="36" FADCn="49" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="49" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="49" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="49" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="49" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="49" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="177" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="177" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="177" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="177" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>			
+			</sensor>
+
+		</ladder>
+
+
+
+		<ladder n="6">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="30" FADCn="16" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="16" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="16" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="16" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="16" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="16" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="144" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="144" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="144" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="144" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+
+				<side side="u">
+					<chip n="42" FADCn="49" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="49" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="49" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="49" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="49" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="49" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="42" FADCn="177" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="177" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="177" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="177" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>			
+			</sensor>
+
+			<sensor n="3">
+
+				<side side="u">
+					<chip n="0" FADCn="50" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="50" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="50" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="50" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="50" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="50" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="178" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="178" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="178" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="178" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>
+		
+			<sensor n="4">
+
+				<side side="u">
+					<chip n="6" FADCn="50" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="50" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="50" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="50" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="50" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="50" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="178" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="178" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="178" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="178" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>
+
+		</ladder>
+
+
+		<ladder n="7">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="36" FADCn="16" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="16" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="16" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="16" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="16" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="16" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="144" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="144" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="144" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="144" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+
+				<side side="u">
+					<chip n="12" FADCn="50" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="50" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="50" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="50" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="50" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="50" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="178" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="178" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="178" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="178" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>	
+
+			<sensor n="3">
+
+				<side side="u">
+					<chip n="18" FADCn="50" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="50" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="50" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="50" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="50" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="50" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="178" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="178" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="178" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="178" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>	
+
+			<sensor n="4">
+
+				<side side="u">
+					<chip n="24" FADCn="50" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="50" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="50" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="50" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="50" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="50" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="178" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="178" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="178" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="178" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>	
+
+		</ladder>
+
+
+
+		<ladder n="8">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="42" FADCn="16" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="16" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="16" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="16" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="16" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="16" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+		
+				<side side="v">
+					<chip n="42" FADCn="144" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="144" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="144" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="144" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>	
+
+			<sensor n="2">
+
+				<side side="u">
+					<chip n="30" FADCn="50" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="50" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="50" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="50" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="50" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="50" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="178" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="178" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="178" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="178" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>
+
+			<sensor n="3">
+
+				<side side="u">
+					<chip n="36" FADCn="50" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="50" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="50" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="50" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="50" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="50" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="178" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="178" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="178" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="178" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>	
+
+			<sensor n="4">
+
+				<side side="u">
+					<chip n="42" FADCn="50" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="50" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="50" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="50" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="50" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="50" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="42" FADCn="178" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="178" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="178" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="178" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>	
+
+
+		</ladder>
+
+
+		<ladder n="9">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="0" FADCn="17" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="17" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="17" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="17" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="17" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="17" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="145" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="145" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="145" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="145" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>			
+
+				
+			</sensor>	
+
+			<sensor n="2">
+
+				<side side="u">
+					<chip n="0" FADCn="51" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="51" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="51" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="51" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="51" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="51" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="179" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="179" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="179" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="179" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>	
+
+			<sensor n="3">
+
+				<side side="u">
+					<chip n="6" FADCn="51" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="51" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="51" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="51" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="51" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="51" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="179" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="179" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="179" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="179" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>	
+
+			<sensor n="4">
+
+				<side side="u">
+					<chip n="12" FADCn="51" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="51" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="51" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="51" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="51" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="51" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="179" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="179" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="179" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="179" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>
+
+		</ladder>
+
+		
+
+		<ladder n="10">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="6" FADCn="17" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="17" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="17" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="17" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="17" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="17" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+			
+				<side side="v">
+					<chip n="6" FADCn="145" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="145" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="145" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="145" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+				
+			</sensor>	
+
+			<sensor n="2">
+
+				<side side="u">
+					<chip n="18" FADCn="51" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="51" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="51" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="51" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="51" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="51" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="179" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="179" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="179" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="179" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>		
+
+			<sensor n="3">
+
+				<side side="u">
+					<chip n="24" FADCn="51" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="51" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="51" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="51" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="51" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="51" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="179" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="179" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="179" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="179" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>
+
+			<sensor n="4">
+
+				<side side="u">
+					<chip n="30" FADCn="51" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="51" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="51" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="51" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="51" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="51" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="179" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="179" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="179" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="179" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>
+
+		</ladder>
+
+
+		<ladder n="11">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="12" FADCn="17" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="17" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="17" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="17" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="17" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="17" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="145" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="145" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="145" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="145" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>
+
+			<sensor n="2">
+
+				<side side="u">
+					<chip n="36" FADCn="51" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="51" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="51" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="51" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="51" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="51" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="179" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="179" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="179" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="179" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>	
+
+			<sensor n="3">
+
+				<side side="u">
+					<chip n="42" FADCn="51" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="51" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="51" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="51" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="51" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="51" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="42" FADCn="179" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="179" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="179" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="179" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>
+
+			<sensor n="4">
+
+				<side side="u">
+					<chip n="0" FADCn="52" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="52" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="52" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="52" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="52" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="52" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="180" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="180" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="180" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="180" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>	
+
+		</ladder>
+
+
+
+		<ladder n="12">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="18" FADCn="17" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="17" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="17" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="17" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="17" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="17" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="145" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="145" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="145" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="145" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+				
+			</sensor>	
+
+			<sensor n="2">
+
+				<side side="u">
+					<chip n="6" FADCn="52" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="52" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="52" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="52" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="52" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="52" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="180" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="180" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="180" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="180" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>					
+
+			<sensor n="3">
+
+				<side side="u">
+					<chip n="12" FADCn="52" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="52" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="52" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="52" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="52" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="52" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="180" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="180" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="180" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="180" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>				
+
+
+			<sensor n="4">
+
+				<side side="u">
+					<chip n="18" FADCn="52" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="52" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="52" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="52" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="52" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="52" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="180" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="180" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="180" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="180" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>		
+			</sensor>				
+		</ladder>
+		
+	</layer>
+
+
+
+	
+
+
+
+	<layer n="6">
+ 		<ladder n="1">
+
+			<sensor n="1">
+ 				<side side="u">
+					<chip n="0" FADCn="24" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="24" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="24" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="24" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="24" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="24" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="152" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="152" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="152" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="152" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+
+			</sensor>
+
+	
+			<sensor n="2">
+ 				<side side="u">
+					<chip n="0" FADCn="26" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="26" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="26" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="26" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="26" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="26" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="154" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="154" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="154" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="154" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>		
+			
+
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="0" FADCn="56" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="56" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="56" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="56" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="56" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="56" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+				<side side="v">
+					<chip n="0" FADCn="184" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="184" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="184" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="184" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="6" FADCn="56" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="56" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="56" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="56" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="56" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="56" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="184" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="184" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="184" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="184" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			
+
+			</sensor>
+
+
+
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="12" FADCn="56" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="56" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="56" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="56" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="56" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="56" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+				<side side="v">
+					<chip n="12" FADCn="184" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="184" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="184" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="184" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>				
+
+			</sensor>
+	
+
+			
+		</ladder>
+
+
+
+		<ladder n="2">
+
+
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="6" FADCn="24" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="24" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="24" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="24" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="24" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="24" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="152" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="152" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="152" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="152" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="6" FADCn="26" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="26" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="26" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="26" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="26" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="26" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="154" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="154" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="154" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="154" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="18" FADCn="56" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="56" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="56" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="56" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="56" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="56" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="184" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="184" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="184" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="184" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>	
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="24" FADCn="56" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="56" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="56" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="56" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="56" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="56" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="184" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="184" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="184" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="184" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>	
+			</sensor>
+
+			
+			
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="30" FADCn="56" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="56" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="56" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="56" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="56" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="56" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+				<side side="v">
+					<chip n="30" FADCn="184" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="184" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="184" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="184" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+			
+
+
+		</ladder>
+
+		<ladder n="3">
+
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="12" FADCn="24" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="24" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="24" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="24" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="24" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="24" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="152" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="152" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="152" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="152" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="12" FADCn="26" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="26" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="26" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="26" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="26" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="26" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="154" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="154" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="154" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="154" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+
+				
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="36" FADCn="56" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="56" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="56" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="56" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="56" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="56" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="184" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="184" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="184" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="184" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="42" FADCn="56" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="56" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="56" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="56" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="56" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="56" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="42" FADCn="184" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="184" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="184" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="184" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+						
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="0" FADCn="57" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="57" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="57" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="57" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="57" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="57" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+				<side side="v">
+					<chip n="0" FADCn="185" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="185" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="185" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="185" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+				
+
+		</ladder>
+		
+
+		<ladder n="4">
+
+
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="18" FADCn="24" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="24" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="24" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="24" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="24" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="24" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+
+				<side side="v">
+					<chip n="18" FADCn="152" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="152" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="152" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="152" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="18" FADCn="26" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="26" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="26" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="26" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="26" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="26" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+
+				<side side="v">
+					<chip n="18" FADCn="154" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="154" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="154" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="154" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="6" FADCn="57" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="57" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="57" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="57" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="57" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="57" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+				<side side="v">
+					<chip n="6" FADCn="185" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="185" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="185" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="185" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="12" FADCn="57" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="57" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="57" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="57" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="57" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="57" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="185" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="185" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="185" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="185" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			
+			
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="18" FADCn="57" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="57" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="57" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="57" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="57" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="57" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="185" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="185" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="185" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="185" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			
+		</ladder>
+
+		<ladder n="5">
+
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="24" FADCn="24" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="24" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="24" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="24" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="24" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="24" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+
+				<side side="v">
+					<chip n="24" FADCn="152" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="152" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="152" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="152" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="24" FADCn="26" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="26" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="26" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="26" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="26" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="26" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="154" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="154" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="154" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="154" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="24" FADCn="57" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="57" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="57" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="57" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="57" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="57" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="185" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="185" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="185" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="185" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="30" FADCn="57" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="57" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="57" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="57" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="57" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="57" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="185" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="185" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="185" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="185" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+			
+
+
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="36" FADCn="57" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="57" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="57" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="57" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="57" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="57" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="185" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="185" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="185" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="185" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			
+			
+		</ladder>
+
+		<ladder n="6">
+
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="30" FADCn="24" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="24" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="24" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="24" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="24" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="24" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="152" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="152" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="152" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="152" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="30" FADCn="26" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="26" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="26" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="26" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="26" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="26" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="154" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="154" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="154" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="154" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="42" FADCn="57" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="57" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="57" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="57" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="57" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="57" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+				<side side="v">
+					<chip n="42" FADCn="185" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="185" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="185" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="185" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="0" FADCn="58" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="58" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="58" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="58" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="58" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="58" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+				<side side="v">
+					<chip n="0" FADCn="186" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="186" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="186" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="186" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="6" FADCn="58" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="58" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="58" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="58" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="58" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="58" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="186" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="186" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="186" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="186" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			
+			
+			
+
+		</ladder>
+		
+
+		<ladder n="7">
+
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="36" FADCn="24" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="24" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="24" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="24" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="24" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="24" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="152" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="152" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="152" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="152" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="36" FADCn="26" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="26" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="26" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="26" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="26" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="26" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+
+				<side side="v">
+					<chip n="36" FADCn="154" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="154" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="154" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="154" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="12" FADCn="58" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="58" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="58" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="58" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="58" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="58" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="186" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="186" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="186" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="186" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="18" FADCn="58" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="58" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="58" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="58" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="58" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="58" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+				<side side="v">
+					<chip n="18" FADCn="186" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="186" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="186" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="186" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="24" FADCn="58" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="58" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="58" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="58" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="58" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="58" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 								
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="186" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="186" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="186" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="186" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+	
+
+
+		</ladder>
+
+
+		<ladder n="8">
+
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="42" FADCn="24" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="24" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="24" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="24" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="24" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="24" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+				<side side="v">
+					<chip n="42" FADCn="152" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="152" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="152" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="152" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="42" FADCn="26" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="26" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="26" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="26" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="26" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="26" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="42" FADCn="154" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="154" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="154" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="154" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="30" FADCn="58" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="58" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="58" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="58" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="58" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="58" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 													
+ 				</side>
+				<side side="v">
+					<chip n="30" FADCn="186" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="186" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="186" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="186" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="36" FADCn="58" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="58" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="58" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="58" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="58" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="58" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+				<side side="v">
+					<chip n="36" FADCn="186" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="186" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="186" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="186" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="42" FADCn="58" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="58" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="58" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="58" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="58" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="58" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="42" FADCn="186" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="186" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="186" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="186" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			
+			
+			
+		</ladder>
+
+
+		<ladder n="9">
+
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="0" FADCn="25" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="25" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="25" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="25" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="25" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="25" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="153" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="153" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="153" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="153" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="0" FADCn="27" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="27" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="27" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="27" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="27" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="27" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+
+				<side side="v">
+					<chip n="0" FADCn="155" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="155" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="155" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="155" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="0" FADCn="59" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="59" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="59" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="59" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="59" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="59" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 								
+ 				</side>
+
+
+				<side side="v">
+					<chip n="0" FADCn="187" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="187" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="187" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="187" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="6" FADCn="59" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="59" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="59" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="59" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="59" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="59" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="187" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="187" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="187" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="187" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+	
+
+
+
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="12" FADCn="59" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="59" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="59" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="59" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="59" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="59" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 								
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="187" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="187" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="187" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="187" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			
+			
+
+			
+		</ladder>
+
+		
+		<ladder n="10">
+
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="6" FADCn="25" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="25" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="25" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="25" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="25" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="25" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="153" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="153" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="153" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="153" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="6" FADCn="27" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="27" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="27" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="27" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="27" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="27" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="155" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="155" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="155" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="155" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="18" FADCn="59" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="59" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="59" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="59" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="59" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="59" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+
+				<side side="v">
+					<chip n="18" FADCn="187" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="187" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="187" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="187" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="24" FADCn="59" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="59" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="59" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="59" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="59" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="59" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+				<side side="v">
+					<chip n="24" FADCn="187" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="187" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="187" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="187" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="30" FADCn="59" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="59" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="59" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="59" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="59" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="59" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="187" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="187" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="187" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="187" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			
+		</ladder>
+
+
+
+		<ladder n="11">
+
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="12" FADCn="25" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="25" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="25" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="25" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="25" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="25" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="153" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="153" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="153" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="153" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="12" FADCn="27" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="27" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="27" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="27" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="27" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="27" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+				<side side="v">
+					<chip n="12" FADCn="155" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="155" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="155" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="155" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="36" FADCn="59" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="59" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="59" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="59" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="59" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="59" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="187" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="187" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="187" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="187" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="42" FADCn="59" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="59" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="59" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="59" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="59" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="59" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="42" FADCn="187" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="187" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="187" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="187" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+			
+
+
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="0" FADCn="60" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="60" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="60" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="60" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="60" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="60" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+				<side side="v">
+					<chip n="0" FADCn="188" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="188" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="188" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="188" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			
+			
+			
+
+
+		</ladder>
+
+
+
+		<ladder n="12">
+
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="18" FADCn="25" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="25" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="25" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="25" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="25" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="25" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="153" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="153" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="153" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="153" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="18" FADCn="27" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="27" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="27" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="27" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="27" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="27" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="155" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="155" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="155" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="155" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+			
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="6" FADCn="60" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="60" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="60" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="60" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="60" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="60" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+				<side side="v">
+					<chip n="6" FADCn="188" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="188" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="188" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="188" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="12" FADCn="60" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="60" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="60" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="60" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="60" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="60" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+				<side side="v">
+					<chip n="12" FADCn="188" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="188" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="188" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="188" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="18" FADCn="60" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="60" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="60" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="60" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="60" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="60" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="18" FADCn="188" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="188" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="188" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="188" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+		
+
+			
+
+		</ladder>
+
+
+
+
+		<ladder n="13">
+
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="24" FADCn="25" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="25" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="25" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="25" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="25" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="25" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+
+				<side side="v">
+					<chip n="24" FADCn="153" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="153" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="153" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="153" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="24" FADCn="27" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="27" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="27" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="27" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="27" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="27" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="155" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="155" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="155" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="155" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="24" FADCn="60" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="60" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="60" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="60" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="60" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="60" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+				<side side="v">
+					<chip n="24" FADCn="188" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="188" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="188" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="188" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="30" FADCn="60" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="60" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="60" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="60" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="60" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="60" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="188" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="188" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="188" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="188" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="36" FADCn="60" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="60" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="60" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="60" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="60" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="60" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="188" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="188" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="188" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="188" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			
+
+					
+		</ladder>
+
+
+
+
+		<ladder n="14">
+
+			
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="30" FADCn="25" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="25" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="25" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="25" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="25" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="25" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+
+				<side side="v">
+					<chip n="30" FADCn="153" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="153" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="153" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="153" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="30" FADCn="27" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="27" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="27" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="27" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="27" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="27" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+				<side side="v">
+					<chip n="30" FADCn="155" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="155" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="155" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="155" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="42" FADCn="60" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="60" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="60" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="60" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="60" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="60" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="42" FADCn="188" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="188" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="188" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="188" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="0" FADCn="61" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="1" FADCn="61" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="2" FADCn="61" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="3" FADCn="61" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="4" FADCn="61" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="5" FADCn="61" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="0" FADCn="189" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="1" FADCn="189" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="2" FADCn="189" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="3" FADCn="189" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="6" FADCn="61" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="7" FADCn="61" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="8" FADCn="61" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="9" FADCn="61" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="10" FADCn="61" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="11" FADCn="61" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="6" FADCn="189" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="7" FADCn="189" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="8" FADCn="189" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="9" FADCn="189" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			
+			
+
+			
+		</ladder>
+
+
+		
+		<ladder n="15">
+
+			
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="36" FADCn="25" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="25" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="25" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="25" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="25" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="25" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+
+				<side side="v">
+					<chip n="36" FADCn="153" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="153" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="153" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="153" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="36" FADCn="27" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="27" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="27" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="27" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="27" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="27" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+
+				<side side="v">
+					<chip n="36" FADCn="155" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="155" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="155" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="155" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="12" FADCn="61" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="13" FADCn="61" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="14" FADCn="61" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="15" FADCn="61" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="16" FADCn="61" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="17" FADCn="61" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="12" FADCn="189" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="13" FADCn="189" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="14" FADCn="189" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="15" FADCn="189" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="18" FADCn="61" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="19" FADCn="61" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="20" FADCn="61" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="21" FADCn="61" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="22" FADCn="61" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="23" FADCn="61" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+
+				<side side="v">
+					<chip n="18" FADCn="189" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="19" FADCn="189" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="20" FADCn="189" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="21" FADCn="189" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="24" FADCn="61" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="25" FADCn="61" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="26" FADCn="61" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="27" FADCn="61" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="28" FADCn="61" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="29" FADCn="61" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="24" FADCn="189" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="25" FADCn="189" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="26" FADCn="189" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="27" FADCn="189" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+		
+
+			
+
+		</ladder>
+
+
+		<ladder n="16">
+
+			<sensor n="1">
+ 				<side side="u">
+ 					<chip n="42" FADCn="25" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="25" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="25" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="25" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="25" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="25" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+
+				<side side="v">
+					<chip n="42" FADCn="153" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="153" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="153" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="153" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+			
+			<sensor n="2">
+ 				<side side="u">
+ 					<chip n="42" FADCn="27" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="27" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="27" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="27" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="27" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="27" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 		
+ 				</side>
+
+
+				<side side="v">
+					<chip n="42" FADCn="155" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="155" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="155" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="155" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="3">
+ 				<side side="u">
+					<chip n="30" FADCn="61" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="31" FADCn="61" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="32" FADCn="61" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="33" FADCn="61" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="34" FADCn="61" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="35" FADCn="61" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="30" FADCn="189" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="31" FADCn="189" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="32" FADCn="189" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="33" FADCn="189" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+			<sensor n="4">
+ 				<side side="u">
+					<chip n="36" FADCn="61" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="37" FADCn="61" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="38" FADCn="61" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="39" FADCn="61" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="40" FADCn="61" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="41" FADCn="61" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="36" FADCn="189" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="37" FADCn="189" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="38" FADCn="189" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="39" FADCn="189" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+ 			<sensor n="5">
+ 				<side side="u">
+					<chip n="42" FADCn="61" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+					<chip n="43" FADCn="61" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+					<chip n="44" FADCn="61" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+					<chip n="45" FADCn="61" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+					<chip n="46" FADCn="61" strip_number_of_ch0="512" strip_number_of_ch127="639"></chip>
+ 					<chip n="47" FADCn="61" strip_number_of_ch0="640" strip_number_of_ch127="767"></chip>
+ 					 									
+ 				</side>
+
+				<side side="v">
+					<chip n="42" FADCn="189" strip_number_of_ch0="000" strip_number_of_ch127="127"></chip>
+ 					<chip n="43" FADCn="189" strip_number_of_ch0="128" strip_number_of_ch127="255"></chip>
+ 					<chip n="44" FADCn="189" strip_number_of_ch0="256" strip_number_of_ch127="383"></chip>
+ 					<chip n="45" FADCn="189" strip_number_of_ch0="384" strip_number_of_ch127="511"></chip>
+  				</side>
+			</sensor>
+
+
+		</ladder>
+
+
+	</layer>
+
+
+</SVD>

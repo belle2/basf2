@@ -1,0 +1,11 @@
+Import('env')
+
+env['LIBS'] = [
+  	'tracking',
+  	'tracking_dataobjects',
+  	'tracking_trackFindingCDC',
+	'genfit2',
+	'framework'
+	]
+Return('env')
+

@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""\
+This program can be used to create a copy of a basf2 root file with a list of
+branches removed from the event tree. This can be useful to remove objects which
+have been added with a different version of the software and can no longer be
+read correctly.
+
+Warning:
+    If you remove a branch with relations please make sure to also remove
+    all relations to and from this branch to not have dangling relations in the
+    final file.
+"""
+
+import basf2
+import argparse
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+PyConfig.StartGuiThread = False
+import ROOT
+
+
+def create_argumentparser():
+    """Return a fully configured argument parser"""
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("-o", "--output", type=str, required=True, help="Name of the output file. "
+                        "If the file already exists it will be overwritten")
+    parser.add_argument("-i", "--input", type=str, required=True, help="Name of the input file.")
+    parser.add_argument("branch", nargs='+', help="Branch name to omit from the output file"
+                        "if present in the input file")
+    return parser
+
+
+if __name__ == "__main__":
+    parser = create_argumentparser()
+    args = parser.parse_args()
+    disabled_branches = set(args.branch)
+    # always keep the EventMetaData
+    try:
+        disabled_branches.remove('EventMetaData')
+    except KeyError:
+        pass
+    # Open the input file and make sure it's open
+    infile = ROOT.TFile.Open(args.input)
+    if not infile or infile.IsZombie():
+        basf2.B2FATAL(f"Cannot open input file {args.input}")
+    # Open the output file and make sure it's open
+    outfile = ROOT.TFile.Open(args.output, "RECREATE")
+    if not outfile or outfile.IsZombie():
+        basf2.B2FATAL(f"Cannot open output file {args.output}")
+    # get the trees
+    persistent = infile.Get("persistent")
+    if not persistent:
+        basf2.B2FATAL("Cannot find persistent tree in input file")
+    events = infile.Get("tree")
+    if not events:
+        basf2.B2FATAL("Cannot find event tree in input file")
+
+    # Ok, here we go
+    basf2.B2INFO(f"Copying {args.input} to {args.output} and removing the branches {', '.join(disabled_branches)}")
+    outfile.cd()
+    # clone persistent
+    persistent.CloneTree()
+    # disable ALL branches in the file
+    events.SetBranchStatus('*', 0)
+    # and reenable all branches not excluded
+    for branch in events.GetListOfBranches():
+        branch = branch.GetName()
+        if branch not in disabled_branches:
+            basf2.B2INFO(f"keeping branch {branch}")
+            events.SetBranchStatus(branch + '*', 1)
+    # And then clone the tree
+    events.CloneTree()
+    outfile.Write()
+    outfile.Close()
+    basf2.B2INFO("done")

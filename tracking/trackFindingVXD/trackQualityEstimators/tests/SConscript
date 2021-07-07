@@ -1,0 +1,7 @@
+Import('env')
+
+env['LIBS'] = [
+    'tracking',
+    ]
+
+Return('env')

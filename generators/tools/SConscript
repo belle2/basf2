@@ -1,0 +1,6 @@
+Import('env')
+
+env['TOOLS_LIBS']['BSTD_calc_R_2HDM_Type2'] = ['$ROOT_LIBS','EvtGen','generators_evtgen']
+env['TOOLS_LIBS']['BSTD_calc_dgam'] = ['$ROOT_LIBS','EvtGen','generators_evtgen']
+
+Return('env')

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+# check for help argument
+echo $@ | grep -E -- "(^|\\s)(--help|-h)($|\\s)" &>/dev/null
+if [ $? -eq 0 ]; then
+    cat <<EOT
+This script will create the sphinx documentation and check whether there are any warnings.
+All extra arguments are forwarded to b2code-sphinx-build.
+EOT
+    exit 1;
+fi
+
+# create temp dir for output
+tmpdir=`mktemp -d`
+# remove temporary directory on exit
+trap "rm -rf $tmpdir" EXIT
+# build sphinx documentation with html option
+b2code-sphinx-build --output-dir ${tmpdir} -t html -q "$@" 2>&1 | grep WARNING && exit 1 || exit 0

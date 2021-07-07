@@ -1,0 +1,44 @@
+# EventType: 1110043100
+# Descriptor: [B0 -> K*0 [ -> K_S0 [ -> pi+ pi-] pi0] gamma]cc
+# NickName: Bd_K*0gamma_KS0pi0_pi+pi-
+# Documentation: photon polarization with TDCPV analysis
+# Tested: Yes
+# Physics WG: TDCPV
+# Responsible: Sviatoslav Bilokin
+# Email:  sviatoslav.bilokin@iphc.cnrs.fr 
+# Cuts: None
+# Date: 20180327
+#
+
+Alias MyK*0 K*0
+Alias Myanti_K*0 anti-K*0
+ChargeConj Myanti_K*0 MyK*0 
+
+Alias MyB0 B0
+Alias Myanti-B0 anti-B0
+ChargeConj MyB0 Myanti-B0
+
+Alias MyK_S0 K_S0
+
+Decay Upsilon(4S)
+1.000    MyB0 Myanti-B0 B0  anti-B0  VSS_BMIX dm;
+Enddecay
+
+Decay MyB0
+1.000    MyK*0  gamma  HELAMP 1.0 0.0 1.0 0.0;
+Enddecay
+CDecay Myanti-B0
+
+Decay MyK*0
+1.00    MyK_S0 pi0 VSS;
+Enddecay
+CDecay Myanti_K*0
+
+
+
+Decay MyK_S0
+1.000    pi- pi+ PHSP;
+Enddecay
+
+
+End

@@ -1,0 +1,2986 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<AerogelTiles  desc="Individual optical parameters and thickness of the aerogel tiles">
+
+  <Tiles>
+
+    <Tile serial="B076">
+      <ring>1</ring>
+      <column>12</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0538</n>
+      <transmL unit="mm">34.3</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB076_rin1_col12</material> -->
+    </Tile>
+
+    <Tile serial="B134">
+      <ring>1</ring>
+      <column>13</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0538</n>
+      <transmL unit="mm">33.9</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB134_rin1_col13</material> -->
+    </Tile>
+
+    <Tile serial="B036">
+      <ring>1</ring>
+      <column>14</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0538</n>
+      <transmL unit="mm">36</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB036_rin1_col14</material> -->
+    </Tile>
+
+    <Tile serial="B027">
+      <ring>1</ring>
+      <column>15</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0539</n>
+      <transmL unit="mm">33.1</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB027_rin1_col15</material> -->
+    </Tile>
+
+    <Tile serial="B024">
+      <ring>1</ring>
+      <column>16</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0543</n>
+      <transmL unit="mm">34.5</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB024_rin1_col16</material> -->
+    </Tile>
+
+    <Tile serial="B077">
+      <ring>1</ring>
+      <column>17</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0543</n>
+      <transmL unit="mm">33</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB077_rin1_col17</material> -->
+    </Tile>
+
+    <Tile serial="B084">
+      <ring>1</ring>
+      <column>18</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0543</n>
+      <transmL unit="mm">31.8</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB084_rin1_col18</material> -->
+    </Tile>
+
+    <Tile serial="B073">
+      <ring>1</ring>
+      <column>19</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0543</n>
+      <transmL unit="mm">33.9</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB073_rin1_col19</material> -->
+    </Tile>
+
+    <Tile serial="B060">
+      <ring>1</ring>
+      <column>20</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0543</n>
+      <transmL unit="mm">31.2</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB060_rin1_col20</material> -->
+    </Tile>
+
+    <Tile serial="B074">
+      <ring>1</ring>
+      <column>21</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0543</n>
+      <transmL unit="mm">33.6</transmL>
+      <thick unit="mm">20</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB074_rin1_col21</material> -->
+    </Tile>
+
+    <Tile serial="B026">
+      <ring>1</ring>
+      <column>22</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0543</n>
+      <transmL unit="mm">34.7</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB026_rin1_col22</material> -->
+    </Tile>
+
+    <Tile serial="B081">
+      <ring>1</ring>
+      <column>1</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0544</n>
+      <transmL unit="mm">31.6</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB081_rin1_col1</material> -->
+    </Tile>
+
+    <Tile serial="B062">
+      <ring>1</ring>
+      <column>2</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0544</n>
+      <transmL unit="mm">33.8</transmL>
+      <thick unit="mm">20.1</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB062_rin1_col2</material> -->
+    </Tile>
+
+    <Tile serial="B071">
+      <ring>1</ring>
+      <column>3</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0544</n>
+      <transmL unit="mm">32</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB071_rin1_col3</material> -->
+    </Tile>
+
+    <Tile serial="B127">
+      <ring>1</ring>
+      <column>4</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0544</n>
+      <transmL unit="mm">35.2</transmL>
+      <thick unit="mm">20</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB127_rin1_col4</material> -->
+    </Tile>
+
+    <Tile serial="B124">
+      <ring>1</ring>
+      <column>5</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0544</n>
+      <transmL unit="mm">32.7</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB124_rin1_col5</material> -->
+    </Tile>
+
+    <Tile serial="B136">
+      <ring>1</ring>
+      <column>6</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0544</n>
+      <transmL unit="mm">34.9</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB136_rin1_col6</material> -->
+    </Tile>
+
+    <Tile serial="B146">
+      <ring>1</ring>
+      <column>7</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0544</n>
+      <transmL unit="mm">34.2</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB146_rin1_col7</material> -->
+    </Tile>
+
+    <Tile serial="B141">
+      <ring>1</ring>
+      <column>8</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0544</n>
+      <transmL unit="mm">35</transmL>
+      <thick unit="mm">20</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB141_rin1_col8</material> -->
+    </Tile>
+
+    <Tile serial="B093">
+      <ring>1</ring>
+      <column>9</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">33.6</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB093_rin1_col9</material> -->
+    </Tile>
+
+    <Tile serial="B055">
+      <ring>1</ring>
+      <column>10</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">35.1</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB055_rin1_col10</material> -->
+    </Tile>
+
+    <Tile serial="B065">
+      <ring>1</ring>
+      <column>11</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">32.5</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB065_rin1_col11</material> -->
+    </Tile>
+
+    <Tile serial="B083">
+      <ring>2</ring>
+      <column>15</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0539</n>
+      <transmL unit="mm">33.3</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB083_rin2_col15</material> -->
+    </Tile>
+
+    <Tile serial="B025">
+      <ring>2</ring>
+      <column>16</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0539</n>
+      <transmL unit="mm">33.5</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB025_rin2_col16</material> -->
+    </Tile>
+
+    <Tile serial="B142">
+      <ring>2</ring>
+      <column>17</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.054</n>
+      <transmL unit="mm">34.1</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB142_rin2_col17</material> -->
+    </Tile>
+
+    <Tile serial="B078">
+      <ring>2</ring>
+      <column>18</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.054</n>
+      <transmL unit="mm">32.6</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB078_rin2_col18</material> -->
+    </Tile>
+
+    <Tile serial="B079">
+      <ring>2</ring>
+      <column>19</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0541</n>
+      <transmL unit="mm">32.8</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB079_rin2_col19</material> -->
+    </Tile>
+
+    <Tile serial="B082">
+      <ring>2</ring>
+      <column>20</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">33.3</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB082_rin2_col20</material> -->
+    </Tile>
+
+    <Tile serial="B095">
+      <ring>2</ring>
+      <column>21</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">32.1</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB095_rin2_col21</material> -->
+    </Tile>
+
+    <Tile serial="B072">
+      <ring>2</ring>
+      <column>22</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">34.2</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB072_rin2_col22</material> -->
+    </Tile>
+
+    <Tile serial="B049">
+      <ring>2</ring>
+      <column>23</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">35.8</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB049_rin2_col23</material> -->
+    </Tile>
+
+    <Tile serial="B019">
+      <ring>2</ring>
+      <column>24</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">36.6</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB019_rin2_col24</material> -->
+    </Tile>
+
+    <Tile serial="B128">
+      <ring>2</ring>
+      <column>25</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">32.4</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB128_rin2_col25</material> -->
+    </Tile>
+
+    <Tile serial="B159">
+      <ring>2</ring>
+      <column>26</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">34.1</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB159_rin2_col26</material> -->
+    </Tile>
+
+    <Tile serial="B144">
+      <ring>2</ring>
+      <column>27</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">34.1</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB144_rin2_col27</material> -->
+    </Tile>
+
+    <Tile serial="B031">
+      <ring>2</ring>
+      <column>28</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">36.8</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB031_rin2_col28</material> -->
+    </Tile>
+
+    <Tile serial="B090">
+      <ring>2</ring>
+      <column>1</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">33.1</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB090_rin2_col1</material> -->
+    </Tile>
+
+    <Tile serial="B057">
+      <ring>2</ring>
+      <column>2</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">34.8</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB057_rin2_col2</material> -->
+    </Tile>
+
+    <Tile serial="B053">
+      <ring>2</ring>
+      <column>3</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">34.9</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB053_rin2_col3</material> -->
+    </Tile>
+
+    <Tile serial="B150">
+      <ring>2</ring>
+      <column>4</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0546</n>
+      <transmL unit="mm">33</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB150_rin2_col4</material> -->
+    </Tile>
+
+    <Tile serial="B139">
+      <ring>2</ring>
+      <column>5</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0546</n>
+      <transmL unit="mm">33.9</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB139_rin2_col5</material> -->
+    </Tile>
+
+    <Tile serial="B058">
+      <ring>2</ring>
+      <column>6</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0546</n>
+      <transmL unit="mm">32.5</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB058_rin2_col6</material> -->
+    </Tile>
+
+    <Tile serial="B118">
+      <ring>2</ring>
+      <column>7</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0546</n>
+      <transmL unit="mm">35</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB118_rin2_col7</material> -->
+    </Tile>
+
+    <Tile serial="B088">
+      <ring>2</ring>
+      <column>8</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0546</n>
+      <transmL unit="mm">35.7</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB088_rin2_col8</material> -->
+    </Tile>
+
+    <Tile serial="B080">
+      <ring>2</ring>
+      <column>9</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0546</n>
+      <transmL unit="mm">33.8</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB080_rin2_col9</material> -->
+    </Tile>
+
+    <Tile serial="B054">
+      <ring>2</ring>
+      <column>10</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0546</n>
+      <transmL unit="mm">35.8</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB054_rin2_col10</material> -->
+    </Tile>
+
+    <Tile serial="B059">
+      <ring>2</ring>
+      <column>11</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0546</n>
+      <transmL unit="mm">32.3</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB059_rin2_col11</material> -->
+    </Tile>
+
+    <Tile serial="B111">
+      <ring>2</ring>
+      <column>12</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0547</n>
+      <transmL unit="mm">34.3</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB111_rin2_col12</material> -->
+    </Tile>
+
+    <Tile serial="B091">
+      <ring>2</ring>
+      <column>13</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0547</n>
+      <transmL unit="mm">34.8</transmL>
+      <thick unit="mm">19.4</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB091_rin2_col13</material> -->
+    </Tile>
+
+    <Tile serial="B048">
+      <ring>2</ring>
+      <column>14</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0549</n>
+      <transmL unit="mm">34.1</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB048_rin2_col14</material> -->
+    </Tile>
+
+    <Tile serial="B028">
+      <ring>3</ring>
+      <column>18</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0541</n>
+      <transmL unit="mm">34.7</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB028_rin3_col18</material> -->
+    </Tile>
+
+    <Tile serial="B075">
+      <ring>3</ring>
+      <column>19</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0541</n>
+      <transmL unit="mm">32.7</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB075_rin3_col19</material> -->
+    </Tile>
+
+    <Tile serial="B029">
+      <ring>3</ring>
+      <column>20</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0541</n>
+      <transmL unit="mm">36.7</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB029_rin3_col20</material> -->
+    </Tile>
+
+    <Tile serial="B135">
+      <ring>3</ring>
+      <column>21</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0542</n>
+      <transmL unit="mm">34.5</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB135_rin3_col21</material> -->
+    </Tile>
+
+    <Tile serial="B097">
+      <ring>3</ring>
+      <column>22</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0542</n>
+      <transmL unit="mm">33.8</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB097_rin3_col22</material> -->
+    </Tile>
+
+    <Tile serial="B034">
+      <ring>3</ring>
+      <column>23</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">34.6</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB034_rin3_col23</material> -->
+    </Tile>
+
+    <Tile serial="B056">
+      <ring>3</ring>
+      <column>24</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0545</n>
+      <transmL unit="mm">31.9</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB056_rin3_col24</material> -->
+    </Tile>
+
+    <Tile serial="B022">
+      <ring>3</ring>
+      <column>25</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0547</n>
+      <transmL unit="mm">37.1</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB022_rin3_col25</material> -->
+    </Tile>
+
+    <Tile serial="B063">
+      <ring>3</ring>
+      <column>26</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0547</n>
+      <transmL unit="mm">32.8</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB063_rin3_col26</material> -->
+    </Tile>
+
+    <Tile serial="B052">
+      <ring>3</ring>
+      <column>27</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0547</n>
+      <transmL unit="mm">34.5</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB052_rin3_col27</material> -->
+    </Tile>
+
+    <Tile serial="B050">
+      <ring>3</ring>
+      <column>28</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0547</n>
+      <transmL unit="mm">35.4</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB050_rin3_col28</material> -->
+    </Tile>
+
+    <Tile serial="B047">
+      <ring>3</ring>
+      <column>29</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0547</n>
+      <transmL unit="mm">36.3</transmL>
+      <thick unit="mm">20</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB047_rin3_col29</material> -->
+    </Tile>
+
+    <Tile serial="B138">
+      <ring>3</ring>
+      <column>30</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0547</n>
+      <transmL unit="mm">34.9</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB138_rin3_col30</material> -->
+    </Tile>
+
+    <Tile serial="B068">
+      <ring>3</ring>
+      <column>31</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0547</n>
+      <transmL unit="mm">33.6</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB068_rin3_col31</material> -->
+    </Tile>
+
+    <Tile serial="B064">
+      <ring>3</ring>
+      <column>32</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0547</n>
+      <transmL unit="mm">33</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB064_rin3_col32</material> -->
+    </Tile>
+
+    <Tile serial="B129">
+      <ring>3</ring>
+      <column>33</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0548</n>
+      <transmL unit="mm">34.9</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB129_rin3_col33</material> -->
+    </Tile>
+
+    <Tile serial="B033">
+      <ring>3</ring>
+      <column>34</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0548</n>
+      <transmL unit="mm">36.5</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB033_rin3_col34</material> -->
+    </Tile>
+
+    <Tile serial="B133">
+      <ring>3</ring>
+      <column>1</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0548</n>
+      <transmL unit="mm">33.3</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB133_rin3_col1</material> -->
+    </Tile>
+
+    <Tile serial="B117">
+      <ring>3</ring>
+      <column>2</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0548</n>
+      <transmL unit="mm">34.5</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB117_rin3_col2</material> -->
+    </Tile>
+
+    <Tile serial="B123">
+      <ring>3</ring>
+      <column>3</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0548</n>
+      <transmL unit="mm">34.1</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB123_rin3_col3</material> -->
+    </Tile>
+
+    <Tile serial="B137">
+      <ring>3</ring>
+      <column>4</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0548</n>
+      <transmL unit="mm">33.8</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB137_rin3_col4</material> -->
+    </Tile>
+
+    <Tile serial="B148">
+      <ring>3</ring>
+      <column>5</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0548</n>
+      <transmL unit="mm">33.3</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB148_rin3_col5</material> -->
+    </Tile>
+
+    <Tile serial="B116">
+      <ring>3</ring>
+      <column>6</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0549</n>
+      <transmL unit="mm">33.1</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB116_rin3_col6</material> -->
+    </Tile>
+
+    <Tile serial="B143">
+      <ring>3</ring>
+      <column>7</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0549</n>
+      <transmL unit="mm">33.6</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB143_rin3_col7</material> -->
+    </Tile>
+
+    <Tile serial="B104">
+      <ring>3</ring>
+      <column>8</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0549</n>
+      <transmL unit="mm">33.1</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB104_rin3_col8</material> -->
+    </Tile>
+
+    <Tile serial="B020">
+      <ring>3</ring>
+      <column>9</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0549</n>
+      <transmL unit="mm">37.2</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB020_rin3_col9</material> -->
+    </Tile>
+
+    <Tile serial="B153">
+      <ring>3</ring>
+      <column>10</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0549</n>
+      <transmL unit="mm">35</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB153_rin3_col10</material> -->
+    </Tile>
+
+    <Tile serial="B021">
+      <ring>3</ring>
+      <column>11</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0549</n>
+      <transmL unit="mm">37.4</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB021_rin3_col11</material> -->
+    </Tile>
+
+    <Tile serial="B157">
+      <ring>3</ring>
+      <column>12</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0549</n>
+      <transmL unit="mm">33.1</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB157_rin3_col12</material> -->
+    </Tile>
+
+    <Tile serial="B023">
+      <ring>3</ring>
+      <column>13</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0549</n>
+      <transmL unit="mm">37.1</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB023_rin3_col13</material> -->
+    </Tile>
+
+    <Tile serial="B085">
+      <ring>3</ring>
+      <column>14</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0549</n>
+      <transmL unit="mm">34.1</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB085_rin3_col14</material> -->
+    </Tile>
+
+    <Tile serial="B089">
+      <ring>3</ring>
+      <column>15</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0549</n>
+      <transmL unit="mm">37</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB089_rin3_col15</material> -->
+    </Tile>
+
+    <Tile serial="B087">
+      <ring>3</ring>
+      <column>16</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0548</n>
+      <transmL unit="mm">34.4</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB087_rin3_col16</material> -->
+    </Tile>
+
+    <Tile serial="B070">
+      <ring>3</ring>
+      <column>17</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0549</n>
+      <transmL unit="mm">31.9</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB070_rin3_col17</material> -->
+    </Tile>
+
+    <Tile serial="B030">
+      <ring>4</ring>
+      <column>21</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0542</n>
+      <transmL unit="mm">35.6</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB030_rin4_col21</material> -->
+    </Tile>
+
+    <Tile serial="B140">
+      <ring>4</ring>
+      <column>22</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0542</n>
+      <transmL unit="mm">34.3</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB140_rin4_col22</material> -->
+    </Tile>
+
+    <Tile serial="B069">
+      <ring>4</ring>
+      <column>23</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0543</n>
+      <transmL unit="mm">32</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB069_rin4_col23</material> -->
+    </Tile>
+
+    <Tile serial="B032">
+      <ring>4</ring>
+      <column>24</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0542</n>
+      <transmL unit="mm">34.8</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB032_rin4_col24</material> -->
+    </Tile>
+
+    <Tile serial="B145">
+      <ring>4</ring>
+      <column>25</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0543</n>
+      <transmL unit="mm">34</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB145_rin4_col25</material> -->
+    </Tile>
+
+    <Tile serial="B114">
+      <ring>4</ring>
+      <column>26</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.055</n>
+      <transmL unit="mm">34.9</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB114_rin4_col26</material> -->
+    </Tile>
+
+    <Tile serial="B012">
+      <ring>4</ring>
+      <column>27</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.055</n>
+      <transmL unit="mm">36.5</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB012_rin4_col27</material> -->
+    </Tile>
+
+    <Tile serial="B121">
+      <ring>4</ring>
+      <column>28</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.055</n>
+      <transmL unit="mm">34.8</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB121_rin4_col28</material> -->
+    </Tile>
+
+    <Tile serial="B151">
+      <ring>4</ring>
+      <column>29</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.055</n>
+      <transmL unit="mm">32.1</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB151_rin4_col29</material> -->
+    </Tile>
+
+    <Tile serial="B113">
+      <ring>4</ring>
+      <column>30</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.055</n>
+      <transmL unit="mm">33.4</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB113_rin4_col30</material> -->
+    </Tile>
+
+    <Tile serial="B045">
+      <ring>4</ring>
+      <column>31</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.055</n>
+      <transmL unit="mm">35.1</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB045_rin4_col31</material> -->
+    </Tile>
+
+    <Tile serial="B149">
+      <ring>4</ring>
+      <column>32</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0551</n>
+      <transmL unit="mm">32.9</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB149_rin4_col32</material> -->
+    </Tile>
+
+    <Tile serial="B147">
+      <ring>4</ring>
+      <column>33</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0551</n>
+      <transmL unit="mm">33.8</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB147_rin4_col33</material> -->
+    </Tile>
+
+    <Tile serial="B067">
+      <ring>4</ring>
+      <column>34</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0551</n>
+      <transmL unit="mm">33</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB067_rin4_col34</material> -->
+    </Tile>
+
+    <Tile serial="B086">
+      <ring>4</ring>
+      <column>35</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0551</n>
+      <transmL unit="mm">32.5</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB086_rin4_col35</material> -->
+    </Tile>
+
+    <Tile serial="B132">
+      <ring>4</ring>
+      <column>36</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0551</n>
+      <transmL unit="mm">33.5</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB132_rin4_col36</material> -->
+    </Tile>
+
+    <Tile serial="B155">
+      <ring>4</ring>
+      <column>37</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0551</n>
+      <transmL unit="mm">33.2</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB155_rin4_col37</material> -->
+    </Tile>
+
+    <Tile serial="B103">
+      <ring>4</ring>
+      <column>38</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0551</n>
+      <transmL unit="mm">33</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB103_rin4_col38</material> -->
+    </Tile>
+
+    <Tile serial="B119">
+      <ring>4</ring>
+      <column>39</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0551</n>
+      <transmL unit="mm">33.9</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB119_rin4_col39</material> -->
+    </Tile>
+
+    <Tile serial="B046">
+      <ring>4</ring>
+      <column>40</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0551</n>
+      <transmL unit="mm">35.4</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB046_rin4_col40</material> -->
+    </Tile>
+
+    <Tile serial="B017">
+      <ring>4</ring>
+      <column>1</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0553</n>
+      <transmL unit="mm">35.6</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB017_rin4_col1</material> -->
+    </Tile>
+
+    <Tile serial="B061">
+      <ring>4</ring>
+      <column>2</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0552</n>
+      <transmL unit="mm">33.4</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB061_rin4_col2</material> -->
+    </Tile>
+
+    <Tile serial="B156">
+      <ring>4</ring>
+      <column>3</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0552</n>
+      <transmL unit="mm">32.6</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB156_rin4_col3</material> -->
+    </Tile>
+
+    <Tile serial="B014">
+      <ring>4</ring>
+      <column>4</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0553</n>
+      <transmL unit="mm">36.1</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB014_rin4_col4</material> -->
+    </Tile>
+
+    <Tile serial="B112">
+      <ring>4</ring>
+      <column>5</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0552</n>
+      <transmL unit="mm">33.2</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB112_rin4_col5</material> -->
+    </Tile>
+
+    <Tile serial="B158">
+      <ring>4</ring>
+      <column>6</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0553</n>
+      <transmL unit="mm">32.8</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB158_rin4_col6</material> -->
+    </Tile>
+
+    <Tile serial="B098">
+      <ring>4</ring>
+      <column>7</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0554</n>
+      <transmL unit="mm">31.7</transmL>
+      <thick unit="mm">19.3</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB098_rin4_col7</material> -->
+    </Tile>
+
+    <Tile serial="B130">
+      <ring>4</ring>
+      <column>8</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0553</n>
+      <transmL unit="mm">33.8</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB130_rin4_col8</material> -->
+    </Tile>
+
+    <Tile serial="B125">
+      <ring>4</ring>
+      <column>9</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0554</n>
+      <transmL unit="mm">33.6</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB125_rin4_col9</material> -->
+    </Tile>
+
+    <Tile serial="B152">
+      <ring>4</ring>
+      <column>10</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0554</n>
+      <transmL unit="mm">33.1</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB152_rin4_col10</material> -->
+    </Tile>
+
+    <Tile serial="B120">
+      <ring>4</ring>
+      <column>11</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0555</n>
+      <transmL unit="mm">36.6</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB120_rin4_col11</material> -->
+    </Tile>
+
+    <Tile serial="B018">
+      <ring>4</ring>
+      <column>12</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0554</n>
+      <transmL unit="mm">35.8</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB018_rin4_col12</material> -->
+    </Tile>
+
+    <Tile serial="B161">
+      <ring>4</ring>
+      <column>13</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0555</n>
+      <transmL unit="mm">35</transmL>
+      <thick unit="mm">19.4</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB161_rin4_col13</material> -->
+    </Tile>
+
+    <Tile serial="B162">
+      <ring>4</ring>
+      <column>14</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0556</n>
+      <transmL unit="mm">34</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB162_rin4_col14</material> -->
+    </Tile>
+
+    <Tile serial="B154">
+      <ring>4</ring>
+      <column>15</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0557</n>
+      <transmL unit="mm">35.4</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB154_rin4_col15</material> -->
+    </Tile>
+
+    <Tile serial="B163">
+      <ring>4</ring>
+      <column>16</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0558</n>
+      <transmL unit="mm">33.7</transmL>
+      <thick unit="mm">19.4</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB163_rin4_col16</material> -->
+    </Tile>
+
+    <Tile serial="B164">
+      <ring>4</ring>
+      <column>17</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.056</n>
+      <transmL unit="mm">34.6</transmL>
+      <thick unit="mm">19.4</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB164_rin4_col17</material> -->
+    </Tile>
+
+    <Tile serial="B165">
+      <ring>4</ring>
+      <column>18</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0561</n>
+      <transmL unit="mm">34</transmL>
+      <thick unit="mm">19.4</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB165_rin4_col18</material> -->
+    </Tile>
+
+    <Tile serial="B167">
+      <ring>4</ring>
+      <column>19</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.0561</n>
+      <transmL unit="mm">34.6</transmL>
+      <thick unit="mm">19.2</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB167_rin4_col19</material> -->
+    </Tile>
+
+    <Tile serial="B180">
+      <ring>4</ring>
+      <column>20</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>1</layer>
+      <n>1.055</n>
+      <transmL unit="mm">33.2</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel2</material>
+      <!-- <material>Aero2_serB180_rin4_col20</material> -->
+    </Tile>
+
+    <Tile serial="A004">
+      <ring>1</ring>
+      <column>12</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0434</n>
+      <transmL unit="mm">51.2</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA004_rin1_col12</material> -->
+    </Tile>
+
+    <Tile serial="A005">
+      <ring>1</ring>
+      <column>13</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0435</n>
+      <transmL unit="mm">47</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA005_rin1_col13</material> -->
+    </Tile>
+
+    <Tile serial="A001">
+      <ring>1</ring>
+      <column>14</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0435</n>
+      <transmL unit="mm">47.5</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA001_rin1_col14</material> -->
+    </Tile>
+
+    <Tile serial="A010">
+      <ring>1</ring>
+      <column>15</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0435</n>
+      <transmL unit="mm">48.7</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA010_rin1_col15</material> -->
+    </Tile>
+
+    <Tile serial="A114">
+      <ring>1</ring>
+      <column>16</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0444</n>
+      <transmL unit="mm">47.2</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA114_rin1_col16</material> -->
+    </Tile>
+
+    <Tile serial="A065">
+      <ring>1</ring>
+      <column>17</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0444</n>
+      <transmL unit="mm">45.7</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA065_rin1_col17</material> -->
+    </Tile>
+
+    <Tile serial="A066">
+      <ring>1</ring>
+      <column>18</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0444</n>
+      <transmL unit="mm">45.8</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA066_rin1_col18</material> -->
+    </Tile>
+
+    <Tile serial="A098">
+      <ring>1</ring>
+      <column>19</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0444</n>
+      <transmL unit="mm">43.8</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA098_rin1_col19</material> -->
+    </Tile>
+
+    <Tile serial="A068">
+      <ring>1</ring>
+      <column>20</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0445</n>
+      <transmL unit="mm">44.4</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA068_rin1_col20</material> -->
+    </Tile>
+
+    <Tile serial="A097">
+      <ring>1</ring>
+      <column>21</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0444</n>
+      <transmL unit="mm">43.8</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA097_rin1_col21</material> -->
+    </Tile>
+
+    <Tile serial="A157">
+      <ring>1</ring>
+      <column>22</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0445</n>
+      <transmL unit="mm">42.8</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA157_rin1_col22</material> -->
+    </Tile>
+
+    <Tile serial="A156">
+      <ring>1</ring>
+      <column>1</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0444</n>
+      <transmL unit="mm">43.5</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA156_rin1_col1</material> -->
+    </Tile>
+
+    <Tile serial="A067">
+      <ring>1</ring>
+      <column>2</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0445</n>
+      <transmL unit="mm">46.3</transmL>
+      <thick unit="mm">19.4</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA067_rin1_col2</material> -->
+    </Tile>
+
+    <Tile serial="A099">
+      <ring>1</ring>
+      <column>3</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0446</n>
+      <transmL unit="mm">43.5</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA099_rin1_col3</material> -->
+    </Tile>
+
+    <Tile serial="A017">
+      <ring>1</ring>
+      <column>4</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0446</n>
+      <transmL unit="mm">45.6</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA017_rin1_col4</material> -->
+    </Tile>
+
+    <Tile serial="A106">
+      <ring>1</ring>
+      <column>5</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0446</n>
+      <transmL unit="mm">44.4</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA106_rin1_col5</material> -->
+    </Tile>
+
+    <Tile serial="A117">
+      <ring>1</ring>
+      <column>6</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0446</n>
+      <transmL unit="mm">46.2</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA117_rin1_col6</material> -->
+    </Tile>
+
+    <Tile serial="A167">
+      <ring>1</ring>
+      <column>7</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0446</n>
+      <transmL unit="mm">46.7</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA167_rin1_col7</material> -->
+    </Tile>
+
+    <Tile serial="A022">
+      <ring>1</ring>
+      <column>8</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0446</n>
+      <transmL unit="mm">41.6</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA022_rin1_col8</material> -->
+    </Tile>
+
+    <Tile serial="A166">
+      <ring>1</ring>
+      <column>9</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">44</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA166_rin1_col9</material> -->
+    </Tile>
+
+    <Tile serial="A108">
+      <ring>1</ring>
+      <column>10</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">45.2</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA108_rin1_col10</material> -->
+    </Tile>
+
+    <Tile serial="A103">
+      <ring>1</ring>
+      <column>11</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">44.7</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA103_rin1_col11</material> -->
+    </Tile>
+
+    <Tile serial="A007">
+      <ring>2</ring>
+      <column>15</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0436</n>
+      <transmL unit="mm">49.3</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA007_rin2_col15</material> -->
+    </Tile>
+
+    <Tile serial="A002">
+      <ring>2</ring>
+      <column>16</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0437</n>
+      <transmL unit="mm">52.2</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA002_rin2_col16</material> -->
+    </Tile>
+
+    <Tile serial="A006">
+      <ring>2</ring>
+      <column>17</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0437</n>
+      <transmL unit="mm">51.2</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA006_rin2_col17</material> -->
+    </Tile>
+
+    <Tile serial="A058">
+      <ring>2</ring>
+      <column>18</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0439</n>
+      <transmL unit="mm">44.2</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA058_rin2_col18</material> -->
+    </Tile>
+
+    <Tile serial="A009">
+      <ring>2</ring>
+      <column>19</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0439</n>
+      <transmL unit="mm">45.7</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA009_rin2_col19</material> -->
+    </Tile>
+
+    <Tile serial="A154">
+      <ring>2</ring>
+      <column>20</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">43.7</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA154_rin2_col20</material> -->
+    </Tile>
+
+    <Tile serial="A070">
+      <ring>2</ring>
+      <column>21</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">45.7</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA070_rin2_col21</material> -->
+    </Tile>
+
+    <Tile serial="A100">
+      <ring>2</ring>
+      <column>22</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">44.3</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA100_rin2_col22</material> -->
+    </Tile>
+
+    <Tile serial="A107">
+      <ring>2</ring>
+      <column>23</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">44.3</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA107_rin2_col23</material> -->
+    </Tile>
+
+    <Tile serial="A020">
+      <ring>2</ring>
+      <column>24</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">45.1</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA020_rin2_col24</material> -->
+    </Tile>
+
+    <Tile serial="A161">
+      <ring>2</ring>
+      <column>25</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">44.7</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA161_rin2_col25</material> -->
+    </Tile>
+
+    <Tile serial="A087">
+      <ring>2</ring>
+      <column>26</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">43.8</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA087_rin2_col26</material> -->
+    </Tile>
+
+    <Tile serial="A101">
+      <ring>2</ring>
+      <column>27</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">43.5</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA101_rin2_col27</material> -->
+    </Tile>
+
+    <Tile serial="A104">
+      <ring>2</ring>
+      <column>28</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">45.2</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA104_rin2_col28</material> -->
+    </Tile>
+
+    <Tile serial="A021">
+      <ring>2</ring>
+      <column>1</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">46.7</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA021_rin2_col1</material> -->
+    </Tile>
+
+    <Tile serial="A019">
+      <ring>2</ring>
+      <column>2</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">48</transmL>
+      <thick unit="mm">19.4</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA019_rin2_col2</material> -->
+    </Tile>
+
+    <Tile serial="A016">
+      <ring>2</ring>
+      <column>3</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0447</n>
+      <transmL unit="mm">47.2</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA016_rin2_col3</material> -->
+    </Tile>
+
+    <Tile serial="A158">
+      <ring>2</ring>
+      <column>4</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0448</n>
+      <transmL unit="mm">42.7</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA158_rin2_col4</material> -->
+    </Tile>
+
+    <Tile serial="A042">
+      <ring>2</ring>
+      <column>5</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0448</n>
+      <transmL unit="mm">45.5</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA042_rin2_col5</material> -->
+    </Tile>
+
+    <Tile serial="A024">
+      <ring>2</ring>
+      <column>6</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0448</n>
+      <transmL unit="mm">47.4</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA024_rin2_col6</material> -->
+    </Tile>
+
+    <Tile serial="A011">
+      <ring>2</ring>
+      <column>7</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0448</n>
+      <transmL unit="mm">48.7</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA011_rin2_col7</material> -->
+    </Tile>
+
+    <Tile serial="A013">
+      <ring>2</ring>
+      <column>8</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0448</n>
+      <transmL unit="mm">49.7</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA013_rin2_col8</material> -->
+    </Tile>
+
+    <Tile serial="A018">
+      <ring>2</ring>
+      <column>9</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0449</n>
+      <transmL unit="mm">47.9</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA018_rin2_col9</material> -->
+    </Tile>
+
+    <Tile serial="A102">
+      <ring>2</ring>
+      <column>10</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0449</n>
+      <transmL unit="mm">44.4</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA102_rin2_col10</material> -->
+    </Tile>
+
+    <Tile serial="A109">
+      <ring>2</ring>
+      <column>11</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0449</n>
+      <transmL unit="mm">44.9</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA109_rin2_col11</material> -->
+    </Tile>
+
+    <Tile serial="A015">
+      <ring>2</ring>
+      <column>12</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0449</n>
+      <transmL unit="mm">48.4</transmL>
+      <thick unit="mm">19.4</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA015_rin2_col12</material> -->
+    </Tile>
+
+    <Tile serial="A012">
+      <ring>2</ring>
+      <column>13</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0449</n>
+      <transmL unit="mm">45.8</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA012_rin2_col13</material> -->
+    </Tile>
+
+    <Tile serial="A093">
+      <ring>2</ring>
+      <column>14</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">44.4</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA093_rin2_col14</material> -->
+    </Tile>
+
+    <Tile serial="A060">
+      <ring>3</ring>
+      <column>18</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.044</n>
+      <transmL unit="mm">43.5</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA060_rin3_col18</material> -->
+    </Tile>
+
+    <Tile serial="A061">
+      <ring>3</ring>
+      <column>19</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.044</n>
+      <transmL unit="mm">44.2</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA061_rin3_col19</material> -->
+    </Tile>
+
+    <Tile serial="A062">
+      <ring>3</ring>
+      <column>20</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0441</n>
+      <transmL unit="mm">44.3</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA062_rin3_col20</material> -->
+    </Tile>
+
+    <Tile serial="A059">
+      <ring>3</ring>
+      <column>21</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0441</n>
+      <transmL unit="mm">43.5</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA059_rin3_col21</material> -->
+    </Tile>
+
+    <Tile serial="A116">
+      <ring>3</ring>
+      <column>22</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0441</n>
+      <transmL unit="mm">41.9</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA116_rin3_col22</material> -->
+    </Tile>
+
+    <Tile serial="A092">
+      <ring>3</ring>
+      <column>23</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.045</n>
+      <transmL unit="mm">43</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA092_rin3_col23</material> -->
+    </Tile>
+
+    <Tile serial="A085">
+      <ring>3</ring>
+      <column>24</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.045</n>
+      <transmL unit="mm">45.3</transmL>
+      <thick unit="mm">19.9</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA085_rin3_col24</material> -->
+    </Tile>
+
+    <Tile serial="A105">
+      <ring>3</ring>
+      <column>25</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.045</n>
+      <transmL unit="mm">45.1</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA105_rin3_col25</material> -->
+    </Tile>
+
+    <Tile serial="A049">
+      <ring>3</ring>
+      <column>26</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.045</n>
+      <transmL unit="mm">45.8</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA049_rin3_col26</material> -->
+    </Tile>
+
+    <Tile serial="A014">
+      <ring>3</ring>
+      <column>27</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.045</n>
+      <transmL unit="mm">46.6</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA014_rin3_col27</material> -->
+    </Tile>
+
+    <Tile serial="A023">
+      <ring>3</ring>
+      <column>28</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.045</n>
+      <transmL unit="mm">47.4</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA023_rin3_col28</material> -->
+    </Tile>
+
+    <Tile serial="A040">
+      <ring>3</ring>
+      <column>29</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0451</n>
+      <transmL unit="mm">44</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA040_rin3_col29</material> -->
+    </Tile>
+
+    <Tile serial="A045">
+      <ring>3</ring>
+      <column>30</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0451</n>
+      <transmL unit="mm">45.5</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA045_rin3_col30</material> -->
+    </Tile>
+
+    <Tile serial="A079">
+      <ring>3</ring>
+      <column>31</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0451</n>
+      <transmL unit="mm">44.3</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA079_rin3_col31</material> -->
+    </Tile>
+
+    <Tile serial="A044">
+      <ring>3</ring>
+      <column>32</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0452</n>
+      <transmL unit="mm">44.9</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA044_rin3_col32</material> -->
+    </Tile>
+
+    <Tile serial="A083">
+      <ring>3</ring>
+      <column>33</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0452</n>
+      <transmL unit="mm">44.3</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA083_rin3_col33</material> -->
+    </Tile>
+
+    <Tile serial="A043">
+      <ring>3</ring>
+      <column>34</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0452</n>
+      <transmL unit="mm">44.6</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA043_rin3_col34</material> -->
+    </Tile>
+
+    <Tile serial="A050">
+      <ring>3</ring>
+      <column>1</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0452</n>
+      <transmL unit="mm">47.7</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA050_rin3_col1</material> -->
+    </Tile>
+
+    <Tile serial="A089">
+      <ring>3</ring>
+      <column>2</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0452</n>
+      <transmL unit="mm">42.9</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA089_rin3_col2</material> -->
+    </Tile>
+
+    <Tile serial="A077">
+      <ring>3</ring>
+      <column>3</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0452</n>
+      <transmL unit="mm">44.7</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA077_rin3_col3</material> -->
+    </Tile>
+
+    <Tile serial="A081">
+      <ring>3</ring>
+      <column>4</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0452</n>
+      <transmL unit="mm">44.1</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA081_rin3_col4</material> -->
+    </Tile>
+
+    <Tile serial="A048">
+      <ring>3</ring>
+      <column>5</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0452</n>
+      <transmL unit="mm">45.4</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA048_rin3_col5</material> -->
+    </Tile>
+
+    <Tile serial="A053">
+      <ring>3</ring>
+      <column>6</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0452</n>
+      <transmL unit="mm">48.1</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA053_rin3_col6</material> -->
+    </Tile>
+
+    <Tile serial="A091">
+      <ring>3</ring>
+      <column>7</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">41.7</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA091_rin3_col7</material> -->
+    </Tile>
+
+    <Tile serial="A072">
+      <ring>3</ring>
+      <column>8</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">44.3</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA072_rin3_col8</material> -->
+    </Tile>
+
+    <Tile serial="A112">
+      <ring>3</ring>
+      <column>9</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">39.6</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA112_rin3_col9</material> -->
+    </Tile>
+
+    <Tile serial="A095">
+      <ring>3</ring>
+      <column>10</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">42.9</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA095_rin3_col10</material> -->
+    </Tile>
+
+    <Tile serial="A046">
+      <ring>3</ring>
+      <column>11</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">46</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA046_rin3_col11</material> -->
+    </Tile>
+
+    <Tile serial="A080">
+      <ring>3</ring>
+      <column>12</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">43.7</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA080_rin3_col12</material> -->
+    </Tile>
+
+    <Tile serial="A071">
+      <ring>3</ring>
+      <column>13</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">42</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA071_rin3_col13</material> -->
+    </Tile>
+
+    <Tile serial="A074">
+      <ring>3</ring>
+      <column>14</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">46.7</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA074_rin3_col14</material> -->
+    </Tile>
+
+    <Tile serial="A088">
+      <ring>3</ring>
+      <column>15</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">43.9</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA088_rin3_col15</material> -->
+    </Tile>
+
+    <Tile serial="A076">
+      <ring>3</ring>
+      <column>16</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0452</n>
+      <transmL unit="mm">44.9</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA076_rin3_col16</material> -->
+    </Tile>
+
+    <Tile serial="A073">
+      <ring>3</ring>
+      <column>17</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">44.4</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA073_rin3_col17</material> -->
+    </Tile>
+
+    <Tile serial="A008">
+      <ring>4</ring>
+      <column>21</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0441</n>
+      <transmL unit="mm">48.5</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA008_rin4_col21</material> -->
+    </Tile>
+
+    <Tile serial="A064">
+      <ring>4</ring>
+      <column>22</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0442</n>
+      <transmL unit="mm">43.5</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA064_rin4_col22</material> -->
+    </Tile>
+
+    <Tile serial="A025">
+      <ring>4</ring>
+      <column>23</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0443</n>
+      <transmL unit="mm">44.3</transmL>
+      <thick unit="mm">19.4</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA025_rin4_col23</material> -->
+    </Tile>
+
+    <Tile serial="A063">
+      <ring>4</ring>
+      <column>24</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0443</n>
+      <transmL unit="mm">44.6</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA063_rin4_col24</material> -->
+    </Tile>
+
+    <Tile serial="A069">
+      <ring>4</ring>
+      <column>25</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0443</n>
+      <transmL unit="mm">44</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA069_rin4_col25</material> -->
+    </Tile>
+
+    <Tile serial="A090">
+      <ring>4</ring>
+      <column>26</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">41.8</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA090_rin4_col26</material> -->
+    </Tile>
+
+    <Tile serial="A075">
+      <ring>4</ring>
+      <column>27</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">43.7</transmL>
+      <thick unit="mm">19.4</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA075_rin4_col27</material> -->
+    </Tile>
+
+    <Tile serial="A082">
+      <ring>4</ring>
+      <column>28</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">42.3</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA082_rin4_col28</material> -->
+    </Tile>
+
+    <Tile serial="A078">
+      <ring>4</ring>
+      <column>29</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">45</transmL>
+      <thick unit="mm">19.4</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA078_rin4_col29</material> -->
+    </Tile>
+
+    <Tile serial="A110">
+      <ring>4</ring>
+      <column>30</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0454</n>
+      <transmL unit="mm">41.2</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA110_rin4_col30</material> -->
+    </Tile>
+
+    <Tile serial="A144">
+      <ring>4</ring>
+      <column>31</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0454</n>
+      <transmL unit="mm">40.8</transmL>
+      <thick unit="mm">19.4</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA144_rin4_col31</material> -->
+    </Tile>
+
+    <Tile serial="A139">
+      <ring>4</ring>
+      <column>32</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0454</n>
+      <transmL unit="mm">45.6</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA139_rin4_col32</material> -->
+    </Tile>
+
+    <Tile serial="A051">
+      <ring>4</ring>
+      <column>33</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0455</n>
+      <transmL unit="mm">45.5</transmL>
+      <thick unit="mm">19.2</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA051_rin4_col33</material> -->
+    </Tile>
+
+    <Tile serial="A118">
+      <ring>4</ring>
+      <column>34</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0455</n>
+      <transmL unit="mm">44.8</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA118_rin4_col34</material> -->
+    </Tile>
+
+    <Tile serial="A096">
+      <ring>4</ring>
+      <column>35</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0455</n>
+      <transmL unit="mm">44.1</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA096_rin4_col35</material> -->
+    </Tile>
+
+    <Tile serial="A047">
+      <ring>4</ring>
+      <column>36</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0454</n>
+      <transmL unit="mm">42.8</transmL>
+      <thick unit="mm">19.4</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA047_rin4_col36</material> -->
+    </Tile>
+
+    <Tile serial="A031">
+      <ring>4</ring>
+      <column>37</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0455</n>
+      <transmL unit="mm">46.8</transmL>
+      <thick unit="mm">19.8</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA031_rin4_col37</material> -->
+    </Tile>
+
+    <Tile serial="A115">
+      <ring>4</ring>
+      <column>38</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0455</n>
+      <transmL unit="mm">45.4</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA115_rin4_col38</material> -->
+    </Tile>
+
+    <Tile serial="A030">
+      <ring>4</ring>
+      <column>39</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0455</n>
+      <transmL unit="mm">47.8</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA030_rin4_col39</material> -->
+    </Tile>
+
+    <Tile serial="A113">
+      <ring>4</ring>
+      <column>40</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0456</n>
+      <transmL unit="mm">40</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA113_rin4_col40</material> -->
+    </Tile>
+
+    <Tile serial="A086">
+      <ring>4</ring>
+      <column>1</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0456</n>
+      <transmL unit="mm">40.8</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA086_rin4_col1</material> -->
+    </Tile>
+
+    <Tile serial="A128">
+      <ring>4</ring>
+      <column>2</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0456</n>
+      <transmL unit="mm">43.8</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA128_rin4_col2</material> -->
+    </Tile>
+
+    <Tile serial="A038">
+      <ring>4</ring>
+      <column>3</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0456</n>
+      <transmL unit="mm">45.4</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA038_rin4_col3</material> -->
+    </Tile>
+
+    <Tile serial="A032">
+      <ring>4</ring>
+      <column>4</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0456</n>
+      <transmL unit="mm">48.3</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA032_rin4_col4</material> -->
+    </Tile>
+
+    <Tile serial="A123">
+      <ring>4</ring>
+      <column>5</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0456</n>
+      <transmL unit="mm">43.8</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA123_rin4_col5</material> -->
+    </Tile>
+
+    <Tile serial="A168">
+      <ring>4</ring>
+      <column>6</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0456</n>
+      <transmL unit="mm">44.9</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA168_rin4_col6</material> -->
+    </Tile>
+
+    <Tile serial="A136">
+      <ring>4</ring>
+      <column>7</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0457</n>
+      <transmL unit="mm">46.9</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA136_rin4_col7</material> -->
+    </Tile>
+
+    <Tile serial="A141">
+      <ring>4</ring>
+      <column>8</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0457</n>
+      <transmL unit="mm">43.4</transmL>
+      <thick unit="mm">19.4</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA141_rin4_col8</material> -->
+    </Tile>
+
+    <Tile serial="A029">
+      <ring>4</ring>
+      <column>9</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0457</n>
+      <transmL unit="mm">45.8</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA029_rin4_col9</material> -->
+    </Tile>
+
+    <Tile serial="A137">
+      <ring>4</ring>
+      <column>10</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0458</n>
+      <transmL unit="mm">46.5</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA137_rin4_col10</material> -->
+    </Tile>
+
+    <Tile serial="A119">
+      <ring>4</ring>
+      <column>11</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0458</n>
+      <transmL unit="mm">42.1</transmL>
+      <thick unit="mm">19.3</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA119_rin4_col11</material> -->
+    </Tile>
+
+    <Tile serial="A121">
+      <ring>4</ring>
+      <column>12</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0458</n>
+      <transmL unit="mm">43.7</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA121_rin4_col12</material> -->
+    </Tile>
+
+    <Tile serial="A178">
+      <ring>4</ring>
+      <column>13</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0458</n>
+      <transmL unit="mm">45.4</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA178_rin4_col13</material> -->
+    </Tile>
+
+    <Tile serial="A124">
+      <ring>4</ring>
+      <column>14</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0458</n>
+      <transmL unit="mm">45.3</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA124_rin4_col14</material> -->
+    </Tile>
+
+    <Tile serial="A125">
+      <ring>4</ring>
+      <column>15</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0458</n>
+      <transmL unit="mm">44.4</transmL>
+      <thick unit="mm">19.3</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA125_rin4_col15</material> -->
+    </Tile>
+
+    <Tile serial="A026">
+      <ring>4</ring>
+      <column>16</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0458</n>
+      <transmL unit="mm">47.3</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA026_rin4_col16</material> -->
+    </Tile>
+
+    <Tile serial="A132">
+      <ring>4</ring>
+      <column>17</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0459</n>
+      <transmL unit="mm">44.1</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA132_rin4_col17</material> -->
+    </Tile>
+
+    <Tile serial="A130">
+      <ring>4</ring>
+      <column>18</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0459</n>
+      <transmL unit="mm">44.1</transmL>
+      <thick unit="mm">19.6</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA130_rin4_col18</material> -->
+    </Tile>
+
+    <Tile serial="A028">
+      <ring>4</ring>
+      <column>19</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0459</n>
+      <transmL unit="mm">46.8</transmL>
+      <thick unit="mm">19.5</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA028_rin4_col19</material> -->
+    </Tile>
+
+    <Tile serial="A140">
+      <ring>4</ring>
+      <column>20</column>
+      <!-- layer : 0 - up; 1 - down; -->
+      <layer>0</layer>
+      <n>1.0453</n>
+      <transmL unit="mm">45.2</transmL>
+      <thick unit="mm">19.7</thick>
+      <material>Aerogel1</material>
+      <!-- <material>Aero1_serA140_rin4_col20</material> -->
+    </Tile>
+
+  </Tiles>
+
+</AerogelTiles>
+

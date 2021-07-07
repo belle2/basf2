@@ -1,0 +1,208 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+'''Tool used to generate the KLM DQM reference plots and to mask the (very) hot channels if necessary.'''
+
+
+import basf2
+
+import argparse
+import os
+import ROOT
+
+
+def arg_parser():
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-i', '--input',
+                        required=True,
+                        nargs='+',
+                        help='input file names; it is possible to use the wildcard "*" to pass multiple files in input',
+                        metavar='FILE')
+    parser.add_argument('-n', '--events',
+                        default=-1,
+                        type=int,
+                        help='maximum number of events to be processed',
+                        metavar='EVENTS')
+    parser.add_argument('--prepend_gt',
+                        default='',
+                        type=str,
+                        nargs='*',
+                        help='Global Tags to be prepended',
+                        metavar='GT')
+    parser.add_argument('--append_gt',
+                        default='',
+                        type=str,
+                        nargs='*',
+                        help='Global Tags to be appended',
+                        metavar='GT')
+    parser.add_argument('--raw',
+                        default=False,
+                        action='store_true',
+                        help='flag for raw input files; it must be used if data must be unpacked and reconstructed from scratch')
+    parser.add_argument('--no_mask',
+                        default=False,
+                        action='store_true',
+                        help='flag for disable masking of (very) hot channels; the masking is disabled for .sroot files, please convert them to .root if this is necessary')
+    parser.add_argument('--output_dqm',
+                        default='KLMDQM_Masked.root',
+                        type=str,
+                        help='name of the output .root file containing plots with masked channels',
+                        metavar='OUTPUT_DQM')
+    return parser
+
+
+def check_file_content(file_name, input_branches):
+
+    #####################################################
+    # Check if the file contains the given branches.
+
+    basf2.B2INFO(f'Checking the input file {file_name} ...')
+    file = ROOT.TFile.Open(file_name, 'READ')
+    if file.IsZombie():
+        basf2.B2FATAL('Cannot open the input file.')
+    tree = file.Get('tree')
+    file_branches = [branch.GetName() for branch in tree.GetListOfBranches()]
+    file.Close()
+    basf2.B2INFO('... done!')
+    return set(input_branches) <= set(file_branches)
+
+
+if __name__ == "__main__":
+
+    #####################################################
+    # Part 0: setup
+
+    # Argument parsing
+    args = arg_parser().parse_args()
+    raw_data = args.raw
+    input_files = args.input
+    max_events = args.events
+    output_dqm_file = args.output_dqm
+    disable_masking = args.no_mask
+    if not disable_masking:
+        if output_dqm_file == 'KLMDQM.root':
+            basf2.B2FATAL('KLMDQM.root is not a valid name for output file with masked channels!')
+
+    # Check if we are using .sroot files or raw data files; determine the GTs to be used
+    sroot = False
+    metadata = None
+    file_globaltags = None
+    first_input_file = basf2.find_file(input_files[0])
+    if first_input_file.endswith('.sroot'):
+        # If .sroot files are used, we must disable the GT replay
+        sroot = True
+        basf2.conditions.override_globaltags(['online'])
+        basf2.B2INFO('The input files are .sroot files; base GT automatically set to "online"')
+    elif first_input_file.endswith('.root'):
+        # Disable the GT replay also if no GT is set in FileMetaData
+        metadata = basf2.get_file_metadata(first_input_file)
+        file_globaltags = metadata.getDatabaseGlobalTag()
+        if file_globaltags == '':
+            raw_data = True
+            basf2.conditions.override_globaltags(['online'])
+            basf2.B2INFO('No Global Tag is set in FileMetaData; base GT automatically set to "online"')
+        else:
+            # Check if the input file contains the relevant branches
+            klm_dataobjects = ['BKLMHit2ds', 'KLMDigits']
+            raw_data = not check_file_content(first_input_file, klm_dataobjects)
+    else:
+        basf2.B2FATAL('Please provide a valid list of .sroot or .root input files.')
+
+    # Determine experiment and run numbers
+    exp_number = None
+    run_number = None
+    if not sroot:
+        metadata = basf2.get_file_metadata(first_input_file)
+        exp_number = metadata.getExperimentLow()
+        run_number = metadata.getRunLow()
+
+    # Prepend and/or append the input GTs
+    if not (args.prepend_gt == ''):
+        for gt in reversed(args.prepend_gt):
+            basf2.conditions.prepend_globaltag(gt)
+    if not (args.append_gt == ''):
+        for gt in args.append_gt:
+            basf2.conditions.append_globaltag(gt)
+    # Store the full list of GTs, it's needed for the masking step
+    globaltags = basf2.conditions.globaltags
+    if file_globaltags is not None:
+        additional_globaltags = [globaltag.strip() for globaltag in file_globaltags.split(',')]
+        globaltags = list(set(globaltags) | set(additional_globaltags))
+
+    #####################################################
+    # Part 1: run the KLM reconstruction and the DQM module
+
+    # Set the global log level
+    basf2.set_log_level(basf2.LogLevel.INFO)
+
+    # Create path
+    main = basf2.Path()
+
+    # Input
+    if sroot:
+        main.add_module('SeqRootInput',
+                        inputFileNames=input_files)
+    else:
+        main.add_module('RootInput',
+                        inputFileNames=input_files)
+
+    # Progress
+    main.add_module('Progress')
+
+    # Histogram manager
+    main.add_module('HistoManager',
+                    histoFileName='KLMDQM.root')
+
+    # Unpacker and reconstruction.
+    if (sroot or raw_data):
+        # Gearbox
+        main.add_module('Gearbox')
+
+        # Geometry
+        main.add_module('Geometry')
+
+        # Unpacker
+        main.add_module('KLMUnpacker',
+                        WriteDigitRaws=True)
+
+        # KLM reconstruction
+        main.add_module('KLMReconstructor',
+                        EventT0Correction=False)
+
+    else:
+        basf2.B2WARNING('The DQM histograms related to the trigger bits may not be filled.')
+
+    # DQM
+    main.add_module('KLMDQM')
+
+    # Process events
+    basf2.process(path=main,
+                  max_event=max_events)
+
+    # Print the statistics
+    print(basf2.statistics)
+
+    #####################################################
+    # Part 2: run the masking of (very) hot channels if required
+
+    # Apply masking of hot channels
+    if (not disable_masking) and (not sroot):
+        globaltags_string = ' '.join(globaltags)
+        command = 'b2klm-mask-dqm '
+        command += f'--exp {exp_number} '
+        command += f'--run {run_number} '
+        command += '--input KLMDQM.root '
+        command += f'--output {output_dqm_file} '
+        command += f'--globaltags {globaltags_string} '
+        basf2.B2INFO(f'The following command will be executed: {command}')
+        if (os.system(command) != 0):
+            basf2.B2FATAL(f'The command "{command}" aborted during its execution.')

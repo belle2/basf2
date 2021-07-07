@@ -1,0 +1,46 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import os
+import sys
+import shutil
+
+from erecoutil import *
+
+argvs = sys.argv
+argc = len(argvs)
+
+conffile = argvs[1]
+
+# Install Event Processor scripts
+nodebase = get_ergetconf(conffile, 'processor', 'nodebase')
+basedir = get_ergetconf(conffile, 'system', 'execdir_base')
+nnodes = int(get_ergetconf(conffile, 'processor', 'nnodes'))
+procid = int(get_ergetconf(conffile, 'processor', 'idbase'))
+badlist = get_ergetconf(conffile, 'processor', 'badlist')
+id = int(get_ergetconf(conffile, 'processor', 'idbase'))
+
+# Belle2 library preparation
+belledir = os.environ.get("BELLE2_LOCAL_DIR")
+
+# Make basedir if not there
+if not os.path.exists(basedir):
+    os.mkdir(basedir)
+
+# Copy Event Processor scripts
+if not os.path.exists(basedir + '/evp_scripts'):
+    os.mkdir(basedir + '/evp_scripts')
+os.chdir(basedir + '/evp_scripts')
+
+for f in os.listdir(belledir + '/daq/expreco/run/processor'):
+    if f.endswith(".py"):
+        print f
+        shutil.copy(belledir + '/daq/expreco/run/processor/' + f, f)

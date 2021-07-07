@@ -1,0 +1,22 @@
+
+AC_CONFIG_AUX_DIR(${RELATIVE_TOP_DIR}/config)
+AC_CANONICAL_TARGET
+AC_PROG_F77(ifort gfortran f77 g77)
+case "$target" in
+  *-*-solaris*)
+    if [[ "$F77" = "f77" ]]
+    then
+      EXTRA_FFLAGS="$EXTRA_FFLAGS -e"
+    else
+      EXTRA_FFLAGS="$EXTRA_FFLAGS -ffixed-line-length-132"
+    fi;;
+  *-*-linux*)
+    if [[ "$F77" = "ifort" ]]
+    then
+      EXTRA_FFLAGS="$EXTRA_FFLAGS -132"
+    else
+      EXTRA_FFLAGS="$EXTRA_FFLAGS -ffixed-line-length-132"
+    fi;;
+esac
+AC_SUBST(EXTRA_FFLAGS)
+

@@ -1,0 +1,24 @@
+Import('env')
+
+env['TOOLS_LIBS']['sock2rb'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['rb2sock'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['file2rb'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['mfile2rb'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['rb2file'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['rb2rb'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['rb2mrb'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['mrb2rb'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['sock2rbr'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['rb2sockr'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['createrb'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['dumprb'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['readrb'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['readraw'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['rawfile2rb'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['rawsock2rbr'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['rawrb2sockr'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['removerb'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['dump_sendheader'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['file2sockr'] = ['daq', 'framework', '$ROOT_LIBS' ]
+
+Return('env')

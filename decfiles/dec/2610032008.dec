@@ -1,0 +1,69 @@
+# EventType: 2610032008
+# Descriptor: [ccbar Dstarm2D0barPim D0bar2KpPimPi0 PHSP]
+# NickName: DstmToD0barPim_D0barToKpPimPi0_PHSP
+# Cuts: None
+# Documentation: MC13a signal request
+# PhysicsWG: Charm
+# Tested: Yes
+# Responsible: Emma Oxford
+# Email: emma.oxford@desy.de
+# Date: 20200727 (YYYYMMDD)
+#
+# June 2021 Automated: Converted PYTHIA ids
+#   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
+
+#JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+
+#JetSetPar PARJ(25)=0.27 ---> corresponding to Pythia8 StringFlav:etaSup
+PythiaBothParam StringFlav:etaSup=0.27
+
+#JetSetPar PARJ(26)=0.12 ---> corresponding to Pythia8 StringFlav:etaPrimeSup
+PythiaBothParam StringFlav:etaPrimeSup=0.12
+
+#JetSetPar PARJ(33)=0.3 ---> corresponding to Pythia8 StringFragmentation:stopMass
+PythiaBothParam StringFragmentation:stopMass=0.3
+
+#JetSetPar PARJ(41)=0.32 ---> corresponding to Pythia8 StringZ:aLund
+PythiaBothParam StringZ:aLund=0.32
+
+#JetSetPar PARJ(42)=0.62 ---> corresponding to Pythia8 StringZ:bLund
+PythiaBothParam StringZ:bLund=0.62
+
+#JetSetPar PARJ(81)=0.38 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+#JetSetPar PARJ(82)=0.76 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+
+#JetSetPar PARP(2)=4.0 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+#JetSetPar MSTP(141)=1 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+#JetSetPar MSTP(171)=1 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+#JetSetPar MSTP(172)=1 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+
+#JetSetPar MSTJ(11)=4 is not supported. Therefore, it is changed from 4 to 5.
+#JetSetPar MSTJ(11)=5 ---> corrsponding to Pythia8 StringZ:usePeterson{C,B,H}
+PythiaBothParam StringZ:usePetersonC=off
+PythiaBothParam StringZ:usePetersonB=off
+PythiaBothParam StringZ:usePetersonH=off
+
+#JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
+PythiaBothParam StringZ:rFactC=1.0
+
+Alias pi0sig pi0
+
+Decay vpho
+# Pythia6 definition "32" for "vpho -> q qbar" should be used.
+#   (this is automatically converted to Pythia8 definition "91")
+1.000 c anti-c PYTHIA 91;
+Enddecay
+
+Decay D*-
+1.0000   anti-D0sig pi-                   VSS;
+Enddecay
+
+Decay anti-D0sig
+1.0000   K+         pi-      pi0sig       PHSP;
+Enddecay
+
+Decay pi0sig
+1.0000   gamma      gamma                 PHSP;
+Enddecay
+
+End

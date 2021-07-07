@@ -1,0 +1,167 @@
+BabaYaga README
+===============
+BabaYaga@NLO is a new event generator for Bhabha scattering, mu+mu- and
+photon pair production at flavour factories developed by G. Balossini, L.
+Barze`, C. Bignamini, C.M. Carloni Calame, G. Montagna, O. Nicrosini and
+F. Piccinini at INFN, Sezione di Pavia, the Dipartimento di Fisica Nucleare
+e Teorica of the Universita` degli Studi di Pavia (Italy) and the School of
+Physics and Astronomy of the University of Southampton. For information,
+updates and citing the code, please refer to the web page
+
+http://www.pv.infn.it/hepcomplex/babayaga.html
+
+Compiling and running the code
+------------------------------
+Just tune the file Makefile for your needs and run 'make'
+
+Vacuum polarization choice
+--------------------------
+In BabaYaga, the hadronic contribution to the vacuum polarization can be
+calculated by means of two different routines:
+-> (default) NSK, Novosibirsk parameterization by Fedor Ignatov
+   http://cmd.inp.nsk.su/~ignatov/vpl/
+-> HADR5N12, by F. Jegerlehner (see:
+   http://www-com.physik.hu-berlin.de/~fjeger/hadr5n09.f; Nucl. Phys. Proc.
+   Suppl., 2006, 162:22; Nucl. Phys. Proc. Suppl., 2008, 181-182:135);
+-> HMNT, by K. Hagiwara, A.D. Martin, D. Nomura and T. Teubner (see: Phys.
+   Rev. D, 2004, 69:093003; Phys. Lett. B, 2007, 649:173).
+
+You can choose in the interactive menu. Please notice that
+the 'HMNT' and 'HADR5N12' routines are not reliable on top of the narrow resonances,
+where the only reliable is 'NSK'.
+
+Dark matter U boson production
+------------------------------
+By setting the `darkmod` option it is possible to use BabaYaga to study the
+production of a vector boson ("massive photon"), accordingly to some dark
+matter models, described, for instance, in Nucl. Phys. B, 2004, 683:219,
+Phys. Rev. D, 2009, 79:015014, Phys. Rev. D, 2009, 79:115008.
+The tree level simulated process has a photon and a lepton pair (e+e- or
+mu+mu-) in the final state. QED radiative corrections could be taken
+into account by means of suitable structure functions.
+
+When you run BabaYaga, enter at the prompt the variable and value you want to
+change and then type 'run'. You can also type `legenda` to print a brief
+description of the input parameters and their values or `quit` to abort the
+run.
+
+Input parameters
+----------------
+fs       final state (ee/gg/mm)
+ecms     center of mass energy, in GeV
+thmin    minimum scattering angle for leptons/photons in the final state,
+         in degrees
+thmax    maximum scattering angle for leptons/photons in the final state,
+         in degrees
+zmax     maximum acollinearity angle between finale state leptons/photons,
+         in degrees
+emin     minimum energy for leptons/photons in the final state, in GeV
+nev      number of events to be generated
+path     directory where to store output files. In *nix systems, the
+         directory is automatically created.
+ntuple   if saving a ntuple file where unweighted events are saved.
+         The file is 'path'/ntuple.hbook
+sprb1    electron beam energy spread in GeV
+sprb2    positron beam energy spread in GeV
+menu2    it toggles on and off the second menu, accessing inner input
+         parameters, which are:
+arun     off 	  -> alpha running off
+	 on/hadr5 -> hadr5n12 routine
+	 hmnt 	  -> hmnt routine
+	 nsk      -> Novosibirsk parameterization by Fedor Ignatov
+mode     it sets if the requested number of events (nev) are weighted or
+         unweighted
+eps      it sets the soft/hard photon energy separator, in ecms/2 units.
+         Results are completely independent from its choice (provided it
+         is small)
+ord      it sets which photonic radiative corrections are included:
+         'born' means Born cross section, 'alpha' means cross section at order
+         alpha and 'exp' is the best, exponentiated cross section,'struct'
+         uses structure functions when 'darkmod' is set up.
+model    it sets the model for radiative corrections. 'matched' is the
+         best one and 'ps' is very similar to older BabaYaga releases.
+seed     the seed for the RANLUX random number generator
+nphot    only a fixed number of nphot (hard) photons are generated. A
+         negative value means all possible photons
+nwrite   output files in 'path' are written every nwrite events
+nsearch  nsearch events are generated to find the maximum value of the cross
+         section, after which also events unweightening is started.
+verbose  it toggles some verbose output, only for debugging
+sdmax    the starting maximum value for the cross section
+scEdhad  evaluate the hadronic contribution to VP (dahad) as 'dahad + scEdhad * err',
+	 where 'err' is the 1-sigma error on dhahad as returned by the chosen VP routine.
+	 This is to test the impact of the hadronic VP error on the calculated x-section.
+
+Dark matter input parameters
+----------------------------
+menud    it toggles on and off the dark matter menu, accessing inner input
+         parameters, which are:
+darkmod  it switch on/off the production of the U boson
+massU    mass of the U boson, in GeV
+gammaU   decay width of the U boson, in GeV. If negative, the decay width
+         into Standard Model particle is computed from the boson mass and
+         the model vectorial coupling
+k        vectorial coupling, in electric charge units
+gaxU     axial coupling, in electric charge units
+egmin    minimum energy for at least one photon in the final state, in GeV
+thgmin   minimum scattering at least one photon in the final state, in
+         degrees
+thgmax   maximum scattering angle for at least photon in the final state, in
+         degrees
+massmin  minimum invariant mass for the lepton pair in the final state, in
+         GeV
+massmax  maximum invariant mass for the lepton pair in the final state, in
+         GeV
+
+
+User modifiable routines
+------------------------
+The subroutines the user may need to modify are:
+-> 'cuts' (in the file cuts.f), used to impose event selection
+   criteria on the generated events
+-> 'initstorage' (in the file routines.f): it initializes the PAW environment
+   to store unweighted events in the ntuple file
+-> 'init_chtags' (in the file routines.f): it sets the tags appearing in the
+   ntuple file to label the saved variables
+-> 'eventstorage' (in the file ypaw.f or npaw.f, see Makefile): it stores the
+   unweighted events in the ntuple file. By default, it saves the four-momenta
+   of the final state electron, positron and the most energetic emitted photon.
+   Any other event variable can be of course saved.
+
+Output files
+------------
+The output files are saved in the 'path' directory. The files are
+-> ntuple.hbook: it is the PAW ntuple file where unweighted events are stored,
+   if 'ntuple' is set to 'yes'
+-> statistics.txt: it is the file (dumped every 'nwrite' points) where cross
+   sections, statistics information, input parameters, etc. are printed.
+   After the input parameters entered by the user, the weighted integrated
+   cross section is printed. It is subdivided by photon multiplicity: the
+   single cross sections depend on the 'eps' parameter but the sum does not.
+   After weighted cross section information, the unweighted events statistics
+   is reported. The user must pay attention to the "biases" cross sections:
+   they account for the biases due to negative weights events (highly
+   improbable, we never saw them) and unweightening failure due to an
+   under-estimated maximum of the differential cross section. The latter bias
+   is usually negligible, its size is estimated by the corresponding cross
+   section
+-> distribution files: in these files some differential distribution,
+   calculated with weighted events, are written. The file names should be
+   self-explaining and the data are in the form (e.g. to be plot easily with
+   gnuplot) lower bin edge - differential cross section - corresponding error
+   By default, the following distributions are saved
+   -> l+l- acollinearity                    ('acoll')
+   -> l+l- invariant mass                   ('e+e-m')
+   -> l- energy                             ('el_en')
+   -> l- angle                              ('el_th')
+   -> l+ energy                             ('e+_en')
+   -> l+ angle                              ('e+_th')
+   -> most energetic photon energy          ('g1_en')
+   -> most energetic photon angle           ('g2_th')
+   -> next-to-most energetic photon energy  ('g1_en')
+   -> next-to-most energetic photon angle   ('g2_th')
+
+
+Enjoy BabaYaga!
+
+        Carlo, Christopher, Fulvio, Giovanni, Guido, Luca, Oreste

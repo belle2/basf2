@@ -1,0 +1,118 @@
+[INFO] Steering file: analysis/tests/mc_roe_compatibility.py
+[INFO] The random number seed is set to "1337"
+[INFO] Starting event processing, random seed is set to '1337'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/pgun-roe-mdst.root
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: mu+:MC (mu-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:MC (K_S0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Lambda0:MC (anti-Lambda0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma:MC (gamma:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: mu+ (1+0) + mu- (1+0)
+[INFO] collection=Particles
+ PDGCode=-13 Charge=1 PDGMass=0.1057
+ flavorType=1 particleSource=5 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=0 identifier=0 daughterIndices:  (none)
+ mass=0.1057
+ momentum=(1.34, -0.52, -1.64) p=2.174
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=13 Charge=-1 PDGMass=0.1057
+ flavorType=1 particleSource=5 particleTypeUsedForFit=0
+ mdstIndex=1 arrayIndex=1 identifier=1 daughterIndices:  (none)
+ mass=0.1057
+ momentum=(-0.96, -1.94, -0.71) p=2.28
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [RestOfEventPrinterModule] START ----------------------------------------
+[INFO]  - ROE related to particle with PDG: 511
+[INFO]  - ROE related to MC particle with PDG: -1
+[INFO]  - ROE is build from generated particles
+[INFO]  - No. of generated particles in ROE: 3
+[INFO]  - |310 | 3122 | 22 | 
+[INFO]  - |3 |  4 |  5 |  
+[INFO] [RestOfEventPrinterModule] END ------------------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: mu+ (1+0) + mu- (1+0)
+[INFO] collection=Particles
+ PDGCode=-13 Charge=1 PDGMass=0.1057
+ flavorType=1 particleSource=5 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=0 identifier=0 daughterIndices:  (none)
+ mass=0.1057
+ momentum=(-0.54, -1.23, -1.77) p=2.222
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=13 Charge=-1 PDGMass=0.1057
+ flavorType=1 particleSource=5 particleTypeUsedForFit=0
+ mdstIndex=1 arrayIndex=1 identifier=1 daughterIndices:  (none)
+ mass=0.1057
+ momentum=(-0.21, 0.77, 2.00) p=2.15
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [RestOfEventPrinterModule] START ----------------------------------------
+[INFO]  - ROE related to particle with PDG: 511
+[INFO]  - ROE related to MC particle with PDG: -1
+[INFO]  - ROE is build from generated particles
+[INFO]  - No. of generated particles in ROE: 3
+[INFO]  - |310 | 3122 | 22 | 
+[INFO]  - |2 |  3 |  4 |  
+[INFO] [RestOfEventPrinterModule] END ------------------------------------------

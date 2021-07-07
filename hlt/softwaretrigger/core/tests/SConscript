@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+# vim: syntax=python
+
+Import('env')
+
+env['LIBS'] = [
+    'hlt',
+    'framework',
+    'mdst_dbobjects'
+    ]
+
+Return('env')
+

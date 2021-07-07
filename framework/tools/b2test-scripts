@@ -1,0 +1,435 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""\
+Run basf2 framework tests of the given packages.  If no argument is given all
+tests are run.
+
+For each package execute all files ending in ``*.py`` inside the ``tests/``
+directory as test cases. A return value of 0 is treaded as success, other return
+values are treated as failures. In addition if ``*.out`` or ``*.err`` files with
+the same base name are present in the tests directory they will be treated as
+expected output on stdout or stderr respectively. If the output of the script
+differes from the contents of these files the test is marked as failed as well.
+The first line from stdout will not be compared to allow executing the scripts
+from a different directory.
+
+.. note::
+
+   Tests can decide that they need to be skipped under certain conditions. To do so
+   a test script can write a line beginning with ``TEST SKIPPED:`` followed by the
+   reason for skipping on stderr and exit with a non-zero return code.
+
+.. seealso:: `b2test_utils.skip_test`
+
+--epilog--
+.. rubric:: Examples
+
+* run all tests with 8 tests being run in parallel::
+
+    $ %(prog)s -j8
+
+* run the framework tests and save the output as XML::
+
+    $ %(prog)s --xml=framework-tests.xml framework
+
+* run only tests which where the python filename contains seqroot::
+
+    $ %(prog)s --filter=seqroot
+"""
+
+import sys
+import os
+import glob
+import subprocess
+import difflib
+from concurrent.futures import ThreadPoolExecutor
+import threading
+import nbformat
+from nbconvert.preprocessors import ExecutePreprocessor
+from nbconvert.preprocessors.execute import CellExecutionError
+import argparse
+import re
+import datetime
+import timeit
+import xml.etree.cElementTree as ET
+from collections import defaultdict
+
+# allow stopping tests with Ctrl+c
+import signal
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+# avoid mixing print statements from different threads
+print_lock = threading.Lock()
+
+
+def compare_log(release, name, log, logtype, ignore_lines=0, diff_lines=10):
+    """Compare the log output to the content of a template file
+
+    Parameters:
+      release: release directory in which test is found
+      name: name of the test
+      log: output of the test
+      logtype: which type of output? should be "out" or "err"
+      ignore_lines: how many lines to ignore at the beginning when
+        comparing to the template.  Used to strip of steering file name
+      diff_lines: how many lines of the diff to print on the console
+    """
+
+    template = name[:-2] + logtype
+    template_file = os.path.join(release, template)
+    if os.path.isfile(template_file):
+        diff = list(difflib.diff_bytes(
+            difflib.unified_diff,
+            open(template_file, "rb").read().splitlines()[ignore_lines:],
+            log.splitlines()[ignore_lines:],
+            fromfile=template.encode(),
+            tofile=(f"std{logtype} of 'basf2 {name}'").encode(),
+            lineterm=b'',
+            n=0,
+            ))
+        if len(diff) > 0 and diff_lines > 0:
+            # print directly to the raw buffer object as bytes, don't
+            # decode/encode first
+            sys.stdout.buffer.write(b"\n".join(diff[2:2 + diff_lines]))
+            sys.stdout.buffer.write(b"\n")
+            sys.stdout.buffer.flush()
+
+        # return the full diff to be included in the xml report as string
+        return "\n".join(e.decode(errors="replace") for e in diff)
+
+    return None
+
+
+def format_output(name, out, err):
+    """Nicely format the stdout and stderr of testcase called name"""
+    if options.quiet:
+        return ""
+    output = []
+    if out.strip():
+        output += ["=== stdout of %s ===\n" % name, out.decode(errors="replace")]
+    if err.strip():
+        output += ["=== stderr of %s ===\n" % name, err.decode(errors="replace")]
+    if len(output):
+        output.append("=== end %s ===\n" % name)
+    return "".join(output)
+
+
+def report_test_result(result, extra, name, message):
+    """ print out the result of one test"""
+    result_message = {True: "passed", None: "skipped", False: "FAILED"}[result]
+    print(f"{extra}finished test {name}\n     -> {result_message}: {message}", flush=True)
+
+
+def run_test(argument):
+    """ run either regurlar python tests (with basf2) or as jupyter notebooks """
+
+    name, release_dir = argument
+    ext = os.path.splitext(name)[1]
+    if ext == ".ipynb":
+        return run_test_ipynb(argument)
+    elif ext == ".py":
+        return run_test_py(argument)
+    else:
+        print(f"Testfile {name} with extension {ext} not supported")
+
+
+def run_test_ipynb(argument):
+    """Run the test within a jupyter notebook
+    Currently not supported is skipping ipynb's and forwarding output of the notebook
+    """
+
+    global options
+    global print_lock
+
+    name, release_dir = argument
+    nb_filename = os.path.join(release_dir, name)
+    result = None
+    message = None
+    extra = ""
+    time_start = timeit.default_timer()
+
+    result = None
+    try:
+        with open(nb_filename) as f:
+            nb = nbformat.read(f, as_version=4)
+            # wait 30 seconds for each cell executing before timing out
+            ep = ExecutePreprocessor(timeout=30, kernel_name='python3')
+            ep.preprocess(nb, resources={})
+            result = True
+            message = "finished successfully"
+    # execution errors within the notebook will throw this exception
+    except CellExecutionError as ce:
+        result = False
+        message = f"A CellExecutionError happened. Please re-run the build if this failure happened on bamboo."
+        extra = str(ce)
+    except TimeoutError as te:
+        result = False
+        message = f"A TimeoutError happened. Please re-run the build if this failure happened on bamboo."
+        extra = str(te)
+    except RuntimeError as re:
+        result = False
+        message = f"A RuntimeError happened. Please re-run the build if this failure happened on bamboo."
+        extra = str(re)
+
+    time = timeit.default_timer() - time_start
+
+    with print_lock:
+        report_test_result(result, extra, name, message)
+
+    return (result, message, time, extra)
+
+
+def run_test_py(argument):
+    """Run the test for the given steering file"""
+
+    global options
+    global print_lock
+
+    # output on dumb terminal to avoid ESC[?1034h in output
+    # happens when loading readline https://bugzilla.redhat.com/show_bug.cgi?id=304181
+    os.putenv('TERM', 'vt100')
+
+    name, release_dir = argument
+    steering = os.path.join(release_dir, name)
+    result = None
+    message = None
+    output_diff = None
+    extra = ""
+    time_start = timeit.default_timer()
+    try:
+        process = subprocess.run(['basf2', steering], stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE, timeout=options.timeout)
+    except subprocess.TimeoutExpired as e:
+        # apparently test case took to long so format result message. Without
+        # timeout result would be None so we can distinguish later.
+        result = False
+        message = f"timeout of {options.timeout} seconds reached"
+        extra = format_output(name, e.stderr, e.stdout)
+
+    time = timeit.default_timer() - time_start
+
+    with print_lock:
+        if result is False:
+            # timeout happened, everything is already setup
+            pass
+        elif process.returncode != 0:
+            # check for skipped test
+            skipped = re.search(br"^TEST SKIPPED:\s*(.+)$", process.stderr, re.MULTILINE)
+            if skipped:
+                result = None
+                message = skipped.group(1).decode()
+            else:
+                result = False
+                message = "exited with return code %d" % process.returncode
+                extra = format_output(name, process.stdout, process.stderr)
+        else:
+            log_tests = [compare_log(release_dir, name, process.stdout, 'out', 1, options.diff_lines),
+                         compare_log(release_dir, name, process.stderr, 'err', 0, options.diff_lines)]
+            logs_failed = sum(0 if e is None else len(e) for e in log_tests)
+            if log_tests[0] is None and log_tests[1] is None:
+                result = True
+                message = "finished successfully"
+            elif logs_failed == 0:
+                result = True
+                message = "logs ok"
+            else:
+                result = False
+                message = "logs differ from expectation"
+                # Format diff of output
+                output_diff = "\n".join(e for e in log_tests if e is not None)
+
+        report_test_result(result, extra, name, message)
+
+    # we didn't want to print the diff in full but we want to return it if it
+    # exists so let's replace the extra
+    if output_diff is not None:
+        extra = output_diff
+    return (result, message, time, extra)
+
+
+def process_dir(dir, release_dir):
+    """Search a directory for test steering files"""
+
+    exclude_dirs = ['include', 'src', 'tools', 'scripts', 'data', 'doc', 'examples']
+    tests = []
+    for entry in os.listdir(dir):
+        dir_entry = os.path.join(dir, entry)
+        if entry.find('.') > -1 or not os.path.isdir(dir_entry) or entry in exclude_dirs:
+            continue
+        if entry == 'tests':
+            # search for files with .py (basf2 steering files) and .ipynb (jupyter notebooks) extensions
+            for steering in glob.glob(os.path.join(dir_entry, '*.py')) + glob.glob(os.path.join(dir_entry, '*.ipynb')):
+                name = steering[len(release_dir):]
+                name = name.lstrip('/')
+                tests.append((name, release_dir))
+        else:
+            tests += process_dir(dir_entry, release_dir)
+
+    return tests
+
+
+def process_top_dir(release_dir, directories, processed_dirs):
+    """Loop over folders in the top release directory"""
+
+    dirs = os.listdir(release_dir)
+    if len(directories) > 0:
+        dirs = directories
+
+    exclude_dirs = ['build', 'include', 'lib', 'bin', 'modules', 'data', 'externals']
+    tests = []
+    for entry in dirs:
+        if entry in processed_dirs or entry in exclude_dirs:
+            continue
+        dir_entry = os.path.join(release_dir, entry)
+        if entry.find('.') > -1 or not os.path.isdir(dir_entry):
+            continue
+        tests += process_dir(dir_entry, release_dir)
+        processed_dirs.append(entry)
+
+    return tests
+
+
+class TestSuite(list):
+    """Class to aggregate test case results by directory"""
+    def __init__(self):
+        """Init the suite with empty values"""
+        #: number of passed tests in the suite/package
+        self.passed = 0
+        #: number of failed tests in the suite/package
+        self.failed = 0
+        #: number of skippedtests in the suite/package
+        self.skipped = 0
+        #: time in seconds needed for test execution
+        self.time = 0
+
+    def add(self, name, passed, message, time, output):
+        """Add a new test to the suite. Return True if test was successful or
+        skipped, False if it failed"""
+        self.append((name, passed, message, time, output))
+        self.time += time
+        if passed is True:
+            self.passed += 1
+        elif passed is False:
+            self.failed += 1
+        else:
+            self.skipped += 1
+        return (passed is not False)
+
+
+def get_argument_parser():
+    """Return an argument parser correctly setup for all known options"""
+    description, epilog = __doc__.split("--epilog--", 1)
+    parser = argparse.ArgumentParser(description=description, epilog=epilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("-j", type=int, default=1, dest="nprocess", metavar="N",
+                        help="Number of test cases to run in parallel")
+    parser.add_argument("--xml", type=str, default=None, help="Save results into given "
+                        "file using xml format compatible with JUnit parsers")
+    parser.add_argument("-n", "--diff-lines", type=int, default=10,
+                        help="Number of lines to show if output is different from template")
+    parser.add_argument("-q", "--quiet", action="store_true", default=False,
+                        help="if given don't print output of failed tests")
+    parser.add_argument("--filter", type=str, default=None, help="Only run tests where the name "
+                        "of the steering file matches the given regular expression")
+    parser.add_argument("--exclude", type=str, default=None, help="Exclude all tests where the name "
+                        "of the steering file matches the given regular expression")
+    parser.add_argument("directories", nargs="*", help="run all tests included in this directory."
+                        "If none are specified run all tests", metavar="DIRECTORY")
+    parser.add_argument("-t", "--timeout", type=int, default=None, metavar="SECONDS",
+                        help="if given this is the maximum runtime in seconds for each "
+                        "test case before they are killed and marked as failed")
+    return parser
+
+
+if __name__ == "__main__":
+    options = get_argument_parser().parse_args()
+
+    # check whether a release is set up
+    if not ('BELLE2_LOCAL_DIR' in os.environ or 'BELLE2_RELEASE_DIR' in os.environ):
+        sys.stderr.write('Error: no release is set up.\n')
+        sys.exit(-1)
+
+    # first let's collect all tests
+    print(f"running steering file tests in {options.nprocess} processes", flush=True)
+    all_tests = []
+    processed_dirs = []
+    if "BELLE2_LOCAL_DIR" in os.environ:
+        all_tests += process_top_dir(os.environ['BELLE2_LOCAL_DIR'], options.directories, processed_dirs)
+    if "BELLE2_RELEASE_DIR" in os.environ:
+        all_tests += process_top_dir(os.environ['BELLE2_RELEASE_DIR'], options.directories, processed_dirs)
+
+    for name, invert in [("filter", False), ("exclude", True)]:
+        arg = getattr(options, name)
+        if arg is not None:
+            try:
+                re_filter = re.compile(arg)
+            except Exception as e:
+                print(f"The --{name} argument {arg:r} is not a valid regular expression: {e}")
+                sys.exit(1)
+            all_tests = [e for e in all_tests if (re_filter.search(e[0]) is not None) != invert]
+
+    all_tests.sort()
+    print(f"Collected {len(all_tests)} tests...", flush=True)
+
+    # now let's run them, either in multiprocessing or in a single process
+    if options.nprocess > 1:
+        with ThreadPoolExecutor(max_workers=options.nprocess) as pool:
+            # run tests in multiple threads but consume the iterator right away to
+            # avoid a bug in python 3.5 when zipping over a futures result iterator
+            # and then exiting using sys.exit().
+            results = list(pool.map(run_test, all_tests))
+    else:
+        results = map(run_test, all_tests)
+
+    # and present the results
+    test_results = TestSuite()
+    test_suites = defaultdict(TestSuite)
+    tests_failed = []
+    tests_skipped = []
+    for (test, release_dir), result in zip(all_tests, results):
+        if not test_results.add(test, *result):
+            tests_failed.append((test, result[1]))
+        if result[0] is None:
+            tests_skipped.append((test, result[1]))
+        suite = os.path.dirname(test)
+        if suite.endswith("/tests"):
+            suite = os.path.dirname(suite)
+        test_suites[suite].add(test, *result)
+
+    if options.xml and len(all_tests):
+        # now let's make the xml
+        root_el = ET.Element("testsuites", tests=str(len(test_results)), failures=str(test_results.failed),
+                             skipped=str(test_results.skipped), timestamp=datetime.datetime.now().isoformat(),
+                             time=str(test_results.time), name="Basf2 Tests")
+        for suite, tests in sorted(test_suites.items()):
+            suite_el = ET.SubElement(root_el, "testsuite", name=suite, tests=str(len(tests)),
+                                     failures=str(tests.failed), skipped=str(tests.skipped), time=str(tests.time))
+            for name, passed, message, time, output in tests:
+                test_el = ET.SubElement(suite_el, "testcase", name=os.path.basename(name),
+                                        classname=suite, time=str(time))
+                if passed is not True:
+                    failure = ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message,
+                                            type="FAILED" if passed is False else "SKIPPED")
+                    if output is not None:
+                        failure.text = output
+
+        tree = ET.ElementTree(root_el)
+        tree.write(options.xml, encoding="UTF-8", xml_declaration=True)
+
+    # print a list of failed tests to find them more easily
+    print(flush=True)
+    if test_results.skipped > 0:
+        print("\n    ".join(["Skipped tests: "] + ["%s (%s)" % e for e in tests_skipped]), flush=True)
+    if test_results.failed > 0:
+        print("\n    ".join(["FAILED tests: "] + ["%s (%s)" % e for e in tests_failed]), flush=True)
+    # print summary and exit
+    print(f'{test_results.failed} out of {len(test_results)} tests failed, {test_results.skipped} were skipped', flush=True)
+    sys.exit(len(tests_failed))

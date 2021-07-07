@@ -1,0 +1,6 @@
+Import('env')
+
+env['SUBLIB'] = True
+env['LIBS'] = ['framework', 'mdst_dataobjects', 'mdst_dbobjects', '$ROOT_LIBS']
+
+Return('env')

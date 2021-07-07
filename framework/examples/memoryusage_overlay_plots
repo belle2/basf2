@@ -1,0 +1,165 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
+"""\
+Overlays memory usage plots from different data files.
+"""
+
+# we want to print some stuff to sys.stderr and the print function makes this
+# much easier
+from __future__ import print_function
+
+output_file = 'overlay.pdf'
+show_nprocs = 1  # how many sub-processes to show? (might get busy)
+
+import os
+import sys
+import re
+import numpy as np
+from collections import defaultdict
+
+try:
+    import matplotlib as mpl
+    mpl.use("Agg")
+    from matplotlib import pyplot as pl
+    from matplotlib.backends.backend_pdf import PdfPages
+except ImportError:
+    print("Error: Could not find matplotlib which is required to create "
+          "the plots, please install it using\n    $ pip3 install matplotlib",
+          file=sys.stderr)
+    sys.exit(1)
+
+if len(sys.argv) <= 1:
+    print("Usage: " + sys.argv[0] + " INPUT_FILES\n")
+    print(" This programs takes the files produced by 'memoryusage -m record',")
+    print(" merging the respective graphs.")
+    sys.exit(1)
+
+process_names = None
+process_memory = None
+total_memory = None
+memory_types = None
+system_memory = None
+ntypes = None
+
+def open_file(filename):
+    global process_names
+    global process_memory
+    global total_memory
+    global memory_types
+    global system_memory
+    global ntypes
+    process_names = {}
+    process_memory = {}
+    with open(filename, "r") as datafile:
+        contents = np.load(datafile)
+        # loop over all elements in the file and assign to the correct
+        # variables
+        for key, data in contents.items():
+            if key == "total_memory":
+                total_memory = data
+            elif key == "process_names":
+                for pid, name in data:
+                    process_names[int(pid)] = name
+            elif key == "memory_types":
+                memory_types = data
+            elif key == "system_memory":
+                system_memory = data, system_memory
+            else:
+                process_memory[int(key)] = data
+
+    # number of memory types comes from file so change it
+    ntypes = len(memory_types)
+
+
+def get_color(i, n):
+    """Choose an appropriate color for line i out of n lines
+    If more than 6 lines are needed we take the colors from a rainbow colormap,
+    otherwise just use red, green, blue, cyan, magenta and yellow"""
+    if n <= 6:
+        return "rgbcmy"[i]
+    else:
+        cmap = mpl.cm.get_cmap("jet")
+        return cmap(i / (n - 1.))
+
+
+def plot_memory(data, label, color, marker=True):
+    """Plot memory usage over time"""
+    for i in range(ntypes):
+        # plot the line
+        axes[i].plot(data[:, 0], data[:, i + 1] / 1000, label=label, c=color)
+        # and add start and end marker
+        axes[i].plot(data[0, 0], data[0, i + 1] / 1000, c=color, marker=".")
+        axes[i].plot(data[-1, 0], data[-1, i + 1] / 1000, c=color, marker=".")
+
+
+
+initialised = False
+for iFile, filename in enumerate(sys.argv[1:]):
+    print("opening file " + filename + " ...")
+    open_file(filename)
+    if not initialised:
+        # start plotting
+        figures = [pl.figure(figsize=(12, 8)) for i in range(ntypes)]
+        # create axes for all memory "types"
+        axes = [f.add_subplot(1, 1, 1) for f in figures]
+        initialised = True
+
+    if not process_memory:
+        print("program exited to fast to measure memory, exiting", file=sys.stderr)
+        continue
+
+    nprocs = min(show_nprocs, len(process_memory))
+    #plot total memory if we saw more than one process
+    if len(process_memory) > 1:
+        plot_memory(total_memory, "total", get_color(iFile*(nprocs+1), (nprocs + 1 )*(len(sys.argv) - 1)))
+
+    # and plot all processes
+    for i, (pid, val) in enumerate(sorted(process_memory.items())):
+        if i >= show_nprocs:
+            break
+        label = "%s (%d)" % (process_names[pid], pid)
+        plot_memory(val, label, get_color(iFile*(nprocs+1) + i + 1, (nprocs + 1 )*(len(sys.argv) - 1)))
+
+    # finalize all plots
+    for i, (a, title) in enumerate(zip(axes, memory_types)):
+        # add max line and label it
+        maxvalue = total_memory[:, i + 1].max() / 1000
+        a.axhline(maxvalue, c="k", ls="--", zorder=-1)
+        a.annotate("%.2f MB" % maxvalue, (0, maxvalue), xytext=(5, 5),
+                   textcoords="offset points")
+
+for i, (a, title) in enumerate(zip(axes, memory_types)):
+    # plot system memory usage if recorded
+    if system_memory is not None and (title[0] != "swap"):
+        a.plot(system_memory[:, 0], system_memory[:, 1] / 1000,
+               label="system", c="k", alpha=0.5)
+    # and add title and labels
+    a.set_xlabel("Time / s")
+    a.set_ylabel("Memory / MB")
+    a.set_title(title[0])
+    a.set_ylim(ymin=0)
+    a.grid()
+    # and a legend
+    l = a.legend(loc="best")
+    l.get_frame().set_alpha(0.8)
+
+# save plots
+with PdfPages(output_file) as pdf:
+    for f in figures:
+        # select the figure
+        pl.figure(f.number)
+        # adjust the layout to fit exactly on the canvas
+        pl.tight_layout()
+        # add to pdf
+        pdf.savefig(f)
+
+    print ("Merged graphs saved to " + output_file)

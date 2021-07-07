@@ -1,0 +1,57 @@
+#!/bin/bash
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+# make sure belle2 is setup
+if [ -z ${BELLE2_LOCAL_DIR} ] && [ -z ${BELLE2_RELEASE_DIR} ]; then
+  echo "Please setup the Belle 2 Software before calling this script by sourcing b2setup"
+  exit 1
+fi
+
+# take release directory or local directory as base
+SOFTWARE_DIR=${BELLE2_RELEASE_DIR:-${BELLE2_LOCAL_DIR}}
+
+# set default argument in case of no arguments: either $BELLE2_LOCAL_DIR or the
+# local directory if that is not defined
+if [ $# -eq 0 ]; then
+  set -- ${BELLE2_LOCAL_DIR:-`pwd`}
+fi
+
+# check for help argument
+echo $@ | grep -E -- "(^|\\s)(--help|-h)($|\\s)" &>/dev/null
+if [ $? -eq 0 ]; then
+    cat <<EOT
+This script will run cppcheck with the appropriate arguments to check for
+warnings from cppcheck as shown on the development build.
+
+To run it on single files or directories just supply them as arguments:
+    `basename $0` [<directory>...] [<filename>...]
+
+To run on the full release directory run it without any arguments:
+    `basename $0`
+
+Additional options can be passed to cppcheck as well, for example -j to run
+cppcheck in parallel:
+    `basename $0` -j50 framework
+
+However in this case a directory to check has to be provided
+EOT
+    exit 1;
+fi
+
+# FIXME: to be removed when PHOKHARA is moved into externals.
+EXCLUDES="-i ${SOFTWARE_DIR}/generators/phokhara"
+
+cppcheck -q --enable=all --template=gcc --std=c++17 --suppress=unusedFunction --suppress=useStlAlgorithm --inline-suppr \
+         --force --relative-paths=${SOFTWARE_DIR} \
+         -D_PACKAGE_=PACKAGE -ULOG_NO_B2DEBUG -ULOG_NO_B2METHOD -ULOG_NO_B2INFO -ULOG_NO_B2WARNING -ULOG_NO_B2ASSERT -ULOG_NO_B2RESULT \
+         -D__GNUC__=8 -UR__DICTIONARY_FILENAME -U__CINT__ -U__ROOTCLING__ -U__APPLE__ -U__ECC -U__ICC \
+         -I ${SOFTWARE_DIR}/include/ -I ${SOFTWARE_DIR}/framework/data/cppcheck-includes/ \
+         -i ${SOFTWARE_DIR}/build/ -i ${SOFTWARE_DIR}/include/ -i ${SOFTWARE_DIR}/framework/utilities/sha3hash \
+         "$@" ${EXCLUDES} 2>&1

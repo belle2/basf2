@@ -1,0 +1,10 @@
+import os
+
+Import('env')
+
+env['SUBLIB'] = True
+env['LIBS'] = ['$ROOT_LIBS', 'mdst_dataobjects', 'framework', 'gfortran']
+
+env.Append(LINKFLAGS=["-Wl,--version-script=" + File("symbols.map").abspath])
+
+Return('env')

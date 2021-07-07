@@ -1,0 +1,7 @@
+[INFO] Steering file: trg/tests/trg_tsim_configuration.py
+[INFO] The L1 trigger simulation (TSIM) is set up with the following configuration:
+	Belle2Phase = Phase3
+	Components = CDC, ECL, KLM, GRL, GDL
+	FilterEvents = False
+	ShortTracks = False
+	SimulationMode = 1

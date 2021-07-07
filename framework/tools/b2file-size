@@ -1,0 +1,411 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""
+This tool allows to print and create bar graphs of the disk space requirements
+for basf2 events stored in root files.
+
+In it's most simple form, ``%(prog)s FILENAME``, it will just print the sizes
+of each top level branch in the file to the command line. It can however create
+a pdf showing detailed plots of the branch and member sizes using the ``-o``
+option to specify an output pdf.
+
+It can also compare the sizes in multiple files. In this case additional files
+can be specified using ``-f``.
+"""
+
+import sys
+import os
+import argparse
+from collections import defaultdict
+import numpy as np
+import textwrap
+
+# stuff for plotting
+try:
+    import matplotlib as mpl
+    mpl.use("Agg")
+except ImportError:
+    print("""\
+Could not find matplotlib which is required to create the charts. Please
+install it using
+    pip3 install matplotlib""")
+    sys.exit(1)
+
+from matplotlib import pyplot as pl
+from matplotlib.backends.backend_pdf import PdfPages
+from ROOT import PyConfig
+# why does ROOT try to parse the command line arguments? *sigh*
+PyConfig.IgnoreCommandLineOptions = True
+PyConfig.StartGuiThread = False
+import ROOT as root
+# do not show missing dictionary warnings, we don't need dictionaries just to
+# get the branch sizes
+root.gErrorIgnoreLevel = root.kWarning + 1
+
+
+def get_argument_parser():
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=textwrap.dedent("""\
+    .. rubric:: Examples
+
+    create eventsize.pdf with a bar chart showing the kb/event required for each
+    top level object in the file filename.root::
+
+        %(prog)s filename.root
+
+    in addition, create a chart for each top level object showing the disk space
+    required per event by each member. Omit the EventMetaData object and all
+    relations from the output::
+
+        %(prog)s --show-member -s EventMetaData --skip-relations filename.root
+
+    show the top level objects for three files and give them nice labels. In
+    addition, create a chart which shows the reduction factor compared to the
+    first file and save to 'compare.pdf'::
+
+        %(prog)s -o compare.pdf --show-reduction file0.root "before update" \\
+            -f file1.root "after update" -f file2.root "after second update"
+
+    show gains by using file compression. Notice the + after the filename to
+    indicate that uncompressed size should be shown. Put the legend always in the
+    upper left corner::
+
+        %(prog)s -o compare.pdf --legend='upper left' --show-reduction \\
+            file.root+ "uncompressed" -f file.root "compressed"
+
+    if you want the charts as one page per pdf file I recommend the program
+    ``pdftk`` to split the pdf after creation::
+
+        pdftk eventsize.pdf burst output eventsize-%%02d.pdf
+    """)
+    )
+    group1 = parser.add_argument_group("Visual Options", "Options influencing the "
+                                       "visual style of the created pdf")
+
+    parser.add_argument("-o", dest="output", default=None,
+                        help="the output PDF filename for the generated graphs. "
+                        "If none is given no pdf will be created.", metavar="FILENAME")
+    group1.add_argument("--width", default=10, type=float,
+                        help="page width in inches, (default: %(default).1f)")
+    group1.add_argument("--height", default=7, type=float,
+                        help="page height in inches, (default: %(default).1f)")
+    group1.add_argument("--legend", default="best", type=str,
+                        help="location for the legend. Could either be 'best' for "
+                        "automatic placement or (upper, lower) left, center or right "
+                        "e.g. 'upper left' or 'center', (default: %(default)s)")
+    group1.add_argument("--bar-gap", default=0.2, type=float,
+                        help="""fraction of empty space between bars,
+                        (default: %(default)s)""", metavar="FRACTION")
+    group2 = parser.add_argument_group("Graph Options", "Options influencing "
+                                       "what objects to show and what graphs to "
+                                       "create")
+    group2.add_argument("--show-fraction", default=False, action="store_true",
+                        help="create an additional chart showing the fraction of "
+                        "the total event size for each object")
+    group2.add_argument("--show-reduction", default=False, action='store_true',
+                        help="create an additional plot showing the size "
+                        "reduction compared to the first file in the list")
+    group2.add_argument("--skip-total", default=False, action="store_true",
+                        help="If present, the bar showing the total size will be "
+                        "omitted from the charts")
+    group2.add_argument("--show-members", default=False, action='store_true',
+                        help="if given also plots for the size of the members of "
+                        "top level objects will be created")
+    group2.add_argument("--skip-relations", default=False, action="store_true",
+                        help="if given, relations will be omitted from output")
+    group2.add_argument("--skip-mcrelations", default=False, action="store_true",
+                        help="if given, relations from or to MCParticles will be "
+                        "omitted from output")
+    group2.add_argument("-m", "--skip-member", action="append", default=[],
+                        help="member to be skipped when displaying member size "
+                        "(e.g. fBits, fUniqueID), can be supplied more than once",
+                        metavar="MEMBER_NAME")
+    group2.add_argument("-s", "--skip-object", action="append", default=[],
+                        help="object to be skipped (e.g. EventMetaData), can be "
+                        "supplied more than once. If an object is omitted then it "
+                        "will not be included in the total size calculation",
+                        metavar="OBJECT_NAME")
+    parser.add_argument("-f", nargs="+", dest="filenames", action="append", default=[],
+                        help="filename and optional label for additional file to "
+                        "be shown in the plot. If no label is given, filename "
+                        "itself will be used. If the filename ends in '+', the "
+                        "uncompressed data size will be used instead of the "
+                        "compressed.",
+                        metavar=("FILENAME", "LABEL"))
+    # allow one file to be given without -f
+    parser.add_argument("filename", help="filename to be used to show the size. "
+                        "If the filename ends in '+', the uncompressed data size "
+                        "will be used instead of the compressed.",
+                        metavar="FILENAME")
+    parser.add_argument("label", nargs="?", default=None,
+                        help="Label for the filename in the plot. If none is "
+                        "given the filename is used.", metavar="LABEL")
+    # and finally return the parser
+    return parser
+
+
+def get_size(branch, zipped=True):
+    """
+    Recursively get the size of the branch plus all it's sub branches
+    """
+    # normally GetTotBytes("*") should work but not for RelationArray ... duh,
+    # let's go recursively
+    size = zipped and branch.GetZipBytes() or branch.GetTotBytes()
+    for b in branch.GetListOfBranches():
+        size += get_size(b, zipped)
+    return size
+
+
+def get_branchsizes(tree, skip, branch=None, zipped=True):
+    """
+    Get the branch sizes (per entry/event) from the given file. skip is a list
+    of branch names to skip. If branch is not none we determine the sizes of
+    the sub branches of the branch called "branch" instead of the whole tree.
+
+    Return a dictionary with name mapped to
+    (size per event, compressed size per event)
+    """
+
+    # get entries as float
+    entries = tree.GetEntriesFast() * 1.0
+    branches = {}
+    base = tree
+    if branch is not None:
+        base = tree.GetBranch(branch)
+        if not base:
+            return branches
+
+    for b in base.GetListOfBranches():
+        name = b.GetName()
+        # show relative branch names if we are in a sub branch
+        if branch is not None:
+            name = name.replace(branch + ".", "")
+        # and skip if desired
+        if name in skip:
+            continue
+        # skip relations if requested
+        if b.GetClassName() == "Belle2::RelationContainer":
+            if args.skip_relations:
+                continue
+            if args.skip_mcrelations and name.find("MCParticles") >= 0:
+                continue
+
+        branches[name] = get_size(b, zipped) / entries
+
+    return sorted(branches.items())
+
+
+def create_plot(pdf, labels, legend, values, title, ylabel):
+    """
+    Create bar plot with given parameters.
+    """
+    # bar positions and width
+    nlabels, nbars = values.shape
+    bar_pos = np.arange(nlabels)
+    bar_width = (1. - args.bar_gap) / nbars
+
+    # create figure and axes
+    f = pl.figure(figsize=(args.width, args.height))
+    a = f.add_subplot(111)
+
+    # and plot all bars
+    for i, v in enumerate(values.T):
+        a.bar(bar_pos + i * bar_width, v, bar_width, label=legend[i], align="edge", zorder=20)
+
+    # set x axis ticks
+    a.set_xticks(bar_pos + (1. - args.bar_gap) / 2)
+    a.set_xticklabels(labels, rotation=45, ha="right")
+    if len(bar_pos):
+        a.set_xlim(0, bar_pos[-1] + 1)
+    # and y axis label and grid
+    a.set_ylabel(ylabel)
+    a.grid(axis="y")
+    # draw legend or append name to title for one file
+    if nbars > 1:
+        a.legend(loc=args.legend)
+    else:
+        title += ", " + legend[0]
+    # and add title
+    a.set_title(title)
+    # adjust figure margins to fit labels
+    f.tight_layout()
+    # add figure to pdf
+    pdf.savefig(f)
+    # and close figure
+    pl.close(f)
+
+
+def plot_sizes(pdf, files, skip, branch=None):
+    """
+    plot the branch sizes of all objects in the given files.
+    'files' is a list of (tree, label, compressed) tuples indicating which
+    root TTree objects to compare, how to label them and whether to use
+    compressed or uncompressed size. skip is a list with branch names to ignore
+    and branch is the parent branch, None if top level objects should be
+    analyzed.
+    """
+
+    Nfiles = len(files)
+    # create a list containing zeros when accessing a branch name. This makes
+    # sure that the code even works if the branch names are not the same in the
+    # different files
+    sizes = defaultdict(lambda: [0] * Nfiles)
+    # remember labels
+    legend = []
+
+    # loop over files
+    for i, (tree, label, zipped) in enumerate(files):
+        legend.append(label)
+        # and fill list of sizes for each branch name
+        for name, content in get_branchsizes(tree, skip, branch, zipped):
+            # convert to kB (not kiB, duh)
+            sizes[name][i] = content / 1000.
+
+    # convert dictionary into list of labels and numpy array of values
+    # including an extra column for the total
+    labels = []
+    values = np.zeros((len(sizes) + 1, Nfiles))
+    for i, (name, s) in enumerate(sorted(sizes.items())):
+        labels.append(name)
+        values[i, :] = s
+        # and since we know all top level objects now: plot members in turn
+        if args.show_members and branch is None:
+            plot_sizes(pdf, files, args.skip_member, name)
+
+    # add sum of sizes as last column
+    values[-1, :] = values[:-1, :].sum(0)
+    labels.append(r"$\sum$")
+
+    # use branch name or generic title
+    title = branch or "DataStore entries"
+
+    if args.skip_total:
+        create_plot(pdf, labels[:-1], legend, values[:-1], title,
+                    "kilobyte per event")
+    else:
+        create_plot(pdf, labels, legend, values, title,
+                    "kilobyte per event")
+
+    if args.show_fraction:
+        # calculate the fraction of event size per object
+        fractions = (values[:-1] / values[-1]) * 100
+        # and plot again
+        create_plot(pdf, labels[:-1], legend, fractions, title,
+                    "contribution to event size in percent")
+
+    if args.show_reduction and branch is None:
+        # calculate reduction factors
+        v0 = values[:, 0]
+        reduction = v0[:, None] / values
+        # and plot again
+        create_plot(pdf, labels, legend, reduction, title, "reduction factor")
+
+
+def convert_bytes(bytes):
+    bytes = float(bytes)
+    if bytes >= 1099511627776:
+        terabytes = bytes / 1099511627776
+        size = '\033[35m%.2fT' % terabytes
+    elif bytes >= 1073741824:
+        gigabytes = bytes / 1073741824
+        size = '\033[31m%.2fG' % gigabytes
+    elif bytes >= 1048576:
+        megabytes = bytes / 1048576
+        size = '\033[33m%.2fM' % megabytes
+    elif bytes >= 1024:
+        kilobytes = bytes / 1024
+        size = '\033[32m%.2fK' % kilobytes
+    else:
+        size = '%.2fb' % bytes
+    return size + '\033[39m'
+
+
+def print_tree(tree, filename):
+    branchesList = tree.GetListOfBranches()
+    branchesList.Sort()
+
+    tot = tree.GetTotBytes()
+    totzip = tree.GetZipBytes()
+    nentries = tree.GetEntries()
+    print("'%s' contains %d entries." % (filename, nentries))
+    print("\t{:>30}\t{:>7}\t{:>7}".format("Total", convert_bytes(tot), convert_bytes(totzip)))
+    print("\t{:>30}\t{:>7}\t{:>7}".format("Per entry", convert_bytes(tot / nentries), convert_bytes(totzip / nentries)))
+    print("{}:\t{:>30}\t{:>7}\t{:>7}".format("#", "Branch Name", "Size", "Compressed Size"))
+    print("--------------------------------------------------------------------")
+    for index, branch in enumerate(branchesList):
+        size = convert_bytes(branch.GetTotBytes('*'))
+        comp_size = convert_bytes(branch.GetZipBytes('*'))
+        print("%i:\t%30s\t%7s\t%7s" % (index + 1, branch.GetName(), size, comp_size))
+    print("====================================================================")
+
+
+if __name__ == "__main__":
+    parser = get_argument_parser()
+    args = parser.parse_args()
+    rootfiles = []
+    trees = []
+
+    # put the positional argument in as first file
+    args.filenames.insert(0, [args.filename])
+    if args.label is not None:
+        args.filenames[0].append(args.label)
+
+    for item in args.filenames:
+        # could be an empty positional argument
+        if not item:
+            continue
+
+        filename = item[0]
+        # check if we have a label
+        if len(item) > 1:
+            label = " ".join(item[1:])
+        else:
+            label = os.path.basename(filename)
+
+        # check whether the filename ends in +, if so we want uncompressed sizes
+        uncompressed = (filename[-1] == "+")
+        if uncompressed:
+            filename = filename[:-1]
+
+        if not os.path.exists(filename):
+            print(f"file '{filename}' could not be found, exiting")
+            sys.exit(1)
+
+        if label is None:
+            label = os.path.basename(filename)
+
+        rfile = root.TFile(filename)
+        rtree = rfile.Get("tree")
+        if not rtree:
+            print(f"could not find basf2 tree in '{filename}', exiting")
+            sys.exit(1)
+
+        # add TFile to list to prevent destruction
+        rootfiles.append(rfile)
+        trees.append((rtree, label, not uncompressed))
+
+    if not trees:
+        parser.error("No files given, supply at least one filename to analyze")
+
+    for (tree, filename, compressed) in trees:
+        print_tree(tree, filename)
+
+    if args.output is not None:
+        try:
+            pdf = PdfPages(args.output)
+        except OSError as e:
+            print("Could not open output file:", e)
+            sys.exit(1)
+
+        plot_sizes(pdf, trees, args.skip_object)
+        pdf.close()

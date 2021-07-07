@@ -1,0 +1,57 @@
+<span
+    id="prebuilt-select-container"
+    title="Any of the following combinations of revisions is already prebuilt (i.e. the plots have already been generated). Furthermore, the last selected setting here will be remembered and restored when the validation page is opened.">
+  <span>Popular/prebuilt/default</span>:
+  <label for="prebuilt-select"></label>
+  <select id="prebuilt-select" onchange="loadPrebuildRevisions()">
+    <option value="rbn" title="Reference and the latest (pre)release, latest build and latest nightly">R+latest rel/build/night</option>
+    <option value="r" title="Reference and the latest (pre)release">R+latest release</option>
+    <option value="b" title="Reference and the latest build">R+latest build</option>
+    <option value="n" title="Reference and the latest nightly">R+latest nightly</option>
+    <option value="nnn" title="Reference and all nightly revisions">R+all nightlies</option>
+    <option value="all" title="Reference and all revisions">R+all revisions</option>
+  </select>
+</span>
+{{#revisions}}
+<div>
+  <!-- color will be update by the java script method loadValidationPlots -->
+  <div>
+    <input  class="reference-checkbox" name="revisions"
+            id="reference-checkbox-{{label}}"
+            value="{{label}}" checked=""
+            type="checkbox"
+            title="Show this revision in the plots."
+            onchange="onRevisionSelectionChanged()"
+    >
+    <label
+        for="reference-checkbox-{{label}}"
+        class="revision-label"
+        id="revision-label-{{label}}"
+        style="color: black;">
+      {{ label }}
+    </label>
+  </div>
+  <!-- show some extra information, but not for the reference plots -->
+  {{#if label != "reference" }}
+  <div class="revision-details">{{creation_date}} {{creation_timezone}} | <a target="_blank" class="revision-details-repo-link" href="https://stash.desy.de/projects/B2/repos/software/commits/{{git_hash}}">{{git_hash}}</a></div>
+  {{/if}}
+</div>
+{{/revisions}}
+<!-- actually this should be a div, but then this will be formatted by the
+div: last-child rule, so just make it a span and give it the corresponding
+CSS properties -->
+<span id="reference-select-container" title="Manually choose which revision is compared with the newest selected revision. Only revisions that are checked in the list above can be selected.">
+  <span>Revision as custom reference:</span>
+  <label for="reference-select"></label>
+  <select id="reference-select" onchange="onReferenceSelectionChanged()">
+    <option value="auto" title="Reference (if drawn), else second newest revision.">Automatic</option>
+  </select>
+</span>
+<span id="button-revision-load-container">
+	<button
+      id="button-revision-load"
+      onclick='loadSelectedRevisions()'
+      title="Load a combination of revisions selected above. This button turns red when you change a setting that requires a reload.">
+    Load custom selection
+  </button>
+</span>

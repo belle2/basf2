@@ -1,0 +1,126 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
+import os
+from basf2 import *
+from ROOT import TFile, TTree, Belle2
+
+
+class ObjectsCreateModule(Module):
+
+    """
+    module which checks if the roy payload from HLT can be created and depacked correctly
+    """
+
+    def initialize(self):
+        """reimplementation of Module::initialize()."""
+        self.mRaw = Belle2.PyStoreArray(Belle2.RawPXD.Class(), "RawPXD")
+        self.mRaw.registerInDataStore()
+        self.mROIs = Belle2.PyStoreArray(Belle2.ROIid.Class(), "ROIs")
+        self.mROIs.registerInDataStore()
+        self.mRawROIs = Belle2.PyStoreArray(Belle2.PXDRawROIs.Class(), "PXDRawROIs")
+        self.mRawROIs.registerInDataStore()
+        self.mRawHit = Belle2.PyStoreArray(Belle2.PXDRawHit.Class(), "PXDRawHit")
+        self.mRawHit.registerInDataStore()
+        self.mDigit = Belle2.PyStoreArray(Belle2.PXDDigit.Class(), "PXDDigit")
+        self.mDigit.registerInDataStore()
+        self.mCluster = Belle2.PyStoreArray(Belle2.PXDCluster.Class(), "PXDCluster")
+        self.mCluster.registerInDataStore()
+
+    def event(self):
+        """ create some data objects for storage """
+        self.mRaw.appendNew()
+        self.mROIs.appendNew()
+        self.mRawROIs.appendNew()
+        self.mRawHit.appendNew()
+        self.mDigit.appendNew()
+        self.mCluster.appendNew()
+
+
+class ObjectsTestModule(Module):
+
+    """
+    module which checks if the roy payload from HLT can be created and depacked correctly
+    """
+
+    def event(self):
+        """ create some data objects for storage """
+
+        mRaw = Belle2.PyStoreArray('RawPXD')
+        if not mRaw:
+            B2FATAL("RawPXD not in file")
+            return
+
+        print(mRaw)
+        print(mRaw[0])
+
+        mROIs = Belle2.PyStoreArray('ROIs')
+        if not mROIs:
+            B2FATAL("ROIs not in file")
+            return
+
+        print(mROIs)
+        print(mROIs[0])
+
+        mRawROIs = Belle2.PyStoreArray('PXDRawROIs')
+        if not mRawROIs:
+            B2FATAL("PXDRawROIs not in file")
+            return
+
+        print(mRawROIs)
+        print(mRawROIs[0])
+
+        mRawHit = Belle2.PyStoreArray('PXDRawHit')
+        if not mRawHit:
+            B2FATAL("PXDRawHit not in file")
+            return
+
+        print(mRawHit)
+        print(mRawHit[0])
+
+        mDigit = Belle2.PyStoreArray('PXDDigit')
+        if not mDigit:
+            B2FATAL("PXDDigit not in file")
+            return
+
+        print(mDigit)
+        print(mDigit[0])
+
+        mCluster = Belle2.PyStoreArray('PXDCluster')
+        if not mCluster:
+            B2FATAL("PXDCluster not in file")
+            return
+
+        print(mCluster)
+        print(mCluster[0])
+
+mainwrite = create_path()
+mainwrite.add_module('EventInfoSetter', evtNumList=[1])
+
+mainwrite.add_module(ObjectsCreateModule())
+
+# output path
+mainwrite.add_module('RootOutput', outputFileName='streamer_test.root')
+
+process(mainwrite)
+
+
+mainread = create_path()
+mainread.add_module('RootInput', inputFileName='streamer_test.root')
+mainread.add_module(ObjectsTestModule())
+
+process(mainread)
+
+# load file and see if it can be read properly
+tfile = TFile('streamer_test.root')
+tree = tfile.Get('tree')
+
+os.remove('streamer_test.root')

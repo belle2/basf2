@@ -1,0 +1,7 @@
+[INFO] Steering file: framework/tests/findFile.py
+[ERROR] findFile(): Could not find file.
+	path = framework/tests/ThisFileDoesntExist
+[ERROR] findFile(): Could not find data file. You may want to use the 'b2install-data' tool to get the file.
+	path = findFile.py
+	data type = test
+[INFO] No more output from here...

@@ -1,0 +1,24 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
+
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+
+#include <tracking/trackFindingCDC/mclookup/CDCMCHitCollectionLookUp.icc.h>
+
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+
+using namespace Belle2;
+using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::CDCMCHitCollectionLookUp<CDCSegment2D>;
+
+const CDCMCSegment2DLookUp& CDCMCSegment2DLookUp::getInstance()
+{
+  return CDCMCManager::getMCSegment2DLookUp();
+}

@@ -1,0 +1,24 @@
+# EventType: 1110042101
+# Descriptor: [B0 -> Ks Ks pi0]cc
+# NickName: B0_KsKsPi0
+# Documentation: 3 Body charmless process
+# Tested: Yes
+# PhysicsWG: BTOCHARMLESS
+# Responsible: Tao Luo
+# Email: luot@pitt.edu
+# Cuts: None
+# Date: 20170903
+# Changes: use of aliases defined in DECAY.DEC; date: 20170903; author: Tao Luo
+
+
+Decay Upsilon(4S)
+1.0  B0 anti-B0 B0sig anti-B0sig  VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0  K_S0 K_S0 pi0  PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+
+End
+

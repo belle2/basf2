@@ -1,0 +1,28 @@
+# EventType: 1210032104
+# Descriptor: [B+ -> K*+[K_S0 pi+] pi0]
+# NickName: Bu_K*+pi0
+# Documentation: Study of B+ -> K*+ pi0
+# Tested: Yes
+# PhysicsWG: BTOCHARMLESS
+# Responsible: Markus Reif
+# Email: mreif@mpp.mpg.de
+# Cuts: None
+# Date: 13 May, 2020
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0 K*+ pi0 SVS; #Decay of a Scalar into a Vector and a Scalar
+Enddecay
+CDecay B-sig
+
+Decay K*+
+1.0 K_S0 pi+ VSS; #Decay of a Vector into two Scalars
+Enddecay
+CDecay K*-
+
+End
+

@@ -1,0 +1,22 @@
+# EventType: 1190710004
+# Descriptor: [B0 -> Xu l nu]cc
+# NickName: Bd_Xulnu=non-resonant-DFN
+# Documentation: Non-resonances decays of neutral b->ulv (l=e,mu) for hybrid modelling. Higher excited states are included in non-resonance (F. De Fazio (INFN Bari), M. Neubert [hep-ph/9905351])
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Lu Cao
+# Email: cao@physik.uni-bonn.de, mario.merola@na.infn.it
+# Cuts: None
+# Date: 20192011
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0                   VSS_BMIX dm;
+Enddecay
+#
+Decay anti-B0sig
+0.002050   Xu+    e-    anti-nu_e      PHOTOS   VUB 4.691 1.869 0.22 1 0.28 1; #[para. values from HFLAV summer 2016 average hep-ex/1612.07233]
+0.002050   Xu+    mu-   anti-nu_mu     PHOTOS   VUB 4.691 1.869 0.22 1 0.28 1; #[para. values from HFLAV summer 2016 average hep-ex/1612.07233]
+Enddecay
+CDecay B0sig
+#
+End

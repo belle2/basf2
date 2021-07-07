@@ -1,0 +1,29 @@
+[INFO] Steering file: analysis/tests/event_kinematics_mc_compatibility.py
+[INFO] The random number seed is set to "1337"
+[INFO] Starting event processing, random seed is set to '1337'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma:MC (gamma:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: e+:MC (e-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: mu+:MC (mu-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: pi+:MC (pi-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: K+:MC (K-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: p+:MC (anti-p-:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:MC (K_S0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO]  o) creating (anti-)ParticleList with name: Lambda0:MC (anti-Lambda0:MC)
+[INFO]    -> MDST source: MCParticles
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is release-05-01-03
+[INFO]      o) genMissingMass2OfEvent = 2.47672
+[INFO]      o) genMissingEnergyOfEventCMS = 2.03096
+[INFO]      o) genMissingMomentumOfEventCMS = 1.28377
+[INFO]      o) genTotalPhotonsEnergyOfEvent = 2.31352
+[INFO]      o) genVisibleEnergyOfEventCMS = 8.5486

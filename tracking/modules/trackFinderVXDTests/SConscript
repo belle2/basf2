@@ -1,0 +1,12 @@
+Import('env')
+
+env['LIBS'] = [
+    'boost_chrono',
+    'framework',
+    'mdst_dataobjects',
+    'svd_dataobjects',
+    'vxd',
+    'tracking'
+]
+
+Return('env')

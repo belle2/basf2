@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""Tool to calculate a md5 checksum of a root file content excluding the metadata."""
+
+import argparse
+import sys
+import hashlib
+from B2Tools.b2root import RawRootFile
+
+
+def get_argument_parser():
+    """
+    Return an ArgumentParser with all defined arguments
+    """
+
+    # Specify the possible arguments
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        usage="%(prog)s filename"
+    )
+    parser.add_argument('--ignore-names', default=False, action="store_true", help='Exclude object names and titles from md5 sum')
+    parser.add_argument('filename', help='Name of the root file')
+    return parser
+
+
+if __name__ == "__main__":
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
+    checksum = hashlib.md5()
+
+    for key in RawRootFile(args.filename):
+        if key.classname not in [b'TFile', b'FreeSegments']:
+            checksum.update(key.classname)
+            if not args.ignore_names:
+                checksum.update(key.name)
+                checksum.update(key.title)
+            checksum.update(key.data)
+
+    print(f'{checksum.digest().hex()}  {args.filename}')

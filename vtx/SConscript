@@ -1,0 +1,19 @@
+Import('env')
+
+#These are the libraries the awesome package has to be linked against
+env['LIBS'] = [
+    'framework',
+    'calibration',
+    'calibration_dataobjects',
+    'geometry',
+    'genfit2',
+    'mdst_dataobjects',
+    'simulation',
+    'vxd',
+    'vxd_dataobjects',
+    'vxd_dbobjects',
+    'vtx_dataobjects',
+    'vtx_dbobjects',
+    '$ROOT_LIBS']
+
+Return('env')

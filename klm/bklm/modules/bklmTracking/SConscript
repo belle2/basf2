@@ -1,0 +1,7 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'klm', 'klm_dataobjects',
+               '$ROOT_LIBS', '$GEANT4_LIBS', 'CLHEP', 'tracking_dataobjects',
+               'genfit2', 'svd_dataobjects', 'pxd_dataobjects', 'cdc_dataobjects', 'vtx_dataobjects']
+
+Return('env')

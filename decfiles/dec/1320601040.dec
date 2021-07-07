@@ -1,0 +1,40 @@
+# EventType: 1320601040
+# Descriptor: [Bs -> gamma gamma]cc
+# NickName: Bs_gammagamma
+# Documentation: Bs-> gamma gamma signal with PHSP model, no Bs mixing, Y5S to Bs also via excited Bs
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Sam Cunliffe
+# Email: sam.cunliffe@desy.de
+# Cuts: None, inputs from  PRD 87, 031101 (R) (2013)
+# Date: 20170722
+#
+Alias      B_s*0sig      B_s*0
+Alias      anti-B_s*0sig anti-B_s*0
+ChargeConj B_s*0sig      anti-B_s*0sig 
+#
+Decay Upsilon(5S)
+#sum=0.87+0.073+0.057
+0.43500       B_s*0sig          anti-B_s*0                  PHSP;
+0.43500       B_s*0             anti-B_s*0sig               PHSP;
+#
+0.01825       B_s*0sig          anti-B_s0	            PHSP;
+0.01825       B_s*0             anti-B_s0sig	            PHSP;
+0.01825       anti-B_s*0sig     B_s0	                    PHSP;
+0.01825       anti-B_s*0        B_s0sig	                    PHSP;
+#
+0.02850       B_s0sig           anti-B_s0	            PHSP;
+0.02850       B_s0              anti-B_s0sig	            PHSP;
+Enddecay 
+#
+Decay  B_s*0sig
+1.00000       B_s0sig           gamma                       VSP_PWAVE;
+Enddecay
+CDecay anti-B_s*0sig
+#
+Decay B_s0sig
+1.000		gamma	gamma	PHSP;
+Enddecay
+CDecay anti-B_s0sig
+#
+End

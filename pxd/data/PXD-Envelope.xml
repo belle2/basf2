@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Envelope description="Envelope Volume for PXD">
+  <OuterPoints>
+    <point><z unit="mm"> -80.000</z><x unit="mm"> 30.000</x></point>
+    <point><z unit="mm"> 119.500</z><x unit="mm"> 30.000</x></point>
+  </OuterPoints>
+  <InnerPoints>
+    <point><z unit="mm"> -62.750</z><x unit="mm"> 12.750</x></point>
+    <point><z unit="mm">  90.000</z><x unit="mm"> 12.750</x></point>
+    <point><z unit="mm"> 107.644</z><x unit="mm"> 18.144</x></point>
+  </InnerPoints>
+</Envelope>

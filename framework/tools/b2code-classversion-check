@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""
+Tool to check that all ROOT dictionary information is correct and up to date as
+expected
+
+This tool will look for all "linkdef.h" files and check if the classes mentioned
+in there are as expected, that is that the version is what we expect and that
+the checksum is unchanged. This is necessary to ensure we don't accidentally
+modify the memory layout of a class without notifying ROOT about the change so
+that schema evolution can work correctly.
+
+It looks through all linkdef files in the repository or in the directories given
+on the command line and will check if the version mentioned in the comment after
+each class link pragma matches with the generated values known to ROOT.
+
+For each class there are two values:
+
+1. The class version, usually starting at 1 and mostly determined by the number
+   given in the ``ClassDef`` macro. If the data layout of the class changes the
+   version number needs to be increased so that ROOT can realize the class is
+   different if for example reading an older version from a file.
+
+2. The class checksum, a short hexadecimal string representing a checksum over
+   the class memory layout. It can be used to spot differences between different
+   class versions: If the checksum changes the class version needs to be
+   increased. However the checksum is not enough as one might want to increase
+   the class version also for other reasons (memory layout the same but meaning
+   of members changed).
+
+Both values can be given in the comment after the class link pragma as comma
+separated key value list (for example ``// checksum=0x6eb1ad8, version=4``).
+This tool can then spot changes and warn/fail if the the version or checksum of
+the actual class changes without an update to the values in the linkdef.
+
+To simplify this procedure we have the tool ``b2code-classversion-update`` which
+can add and update this information automatically.
+
+.. versionadded:: after release-05-00-00
+"""
+
+import os
+import sys
+from pathlib import Path
+import argparse
+
+from ROOT import PyConfig
+PyConfig.DisableRootLogon = True
+PyConfig.IgnoreCommandLineOptions = True
+PyConfig.StartGuiThread = False
+from b2test_utils.classversion import check_linkdef
+from basf2 import B2ERROR
+
+def get_argument_parser():
+    """
+    Return an ArgumentParser with all defined arguments
+    """
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("directory", nargs="*", help="Name of a directory or linkdef file to check. "
+                        "If it's a directory it will be searched recursively for linkdef files")
+    parser.add_argument("--error-style", choices=["belle2", "gcc"],
+                        help="Allows to selectstyle similar to gcc instead of the normal basf2"
+                        "error to simplify parsing of errors on CI systems")
+    return parser
+
+if __name__ == "__main__":
+    parser = get_argument_parser()
+    args = parser.parse_args()
+    if not args.directory:
+        args.directory = [os.environ.get('BELLE2_LOCAL_DIR', os.environ.get('BELLE2_RELEASE_DIR', '.'))]
+
+    all_ok = True
+    for base in args.directory:
+        base = Path(base)
+        if not base.exists():
+            B2ERROR(f"File {base} doesn't exist")
+            continue
+        files = base.glob("**/linkdef.h") if base.is_dir() else [base]
+        for filename in files:
+            all_ok &= check_linkdef(filename, args.error_style)
+
+    if not all_ok:
+        B2ERROR("Error checking linkdef files. Most probably a class layout has "
+                "changed. Please run b2code-classversion-update on the corresponding "
+                "linkdef if you updated the content of a class that has a ROOT dictionary.")
+        sys.exit(1)

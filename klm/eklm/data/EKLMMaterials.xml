@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Materials>
+	<Description>EKLM material definitions</Description>
+	<Version>0</Version>
+        <Material name="EKLMPolyethylene">
+	       	<density unit="g/cm3">0.96</density>
+        	<Components>
+                	<Element fraction="0.66667">H</Element>
+                        <Element fraction="0.33333">C</Element>
+		</Components>
+	</Material>
+        <Material name="EKLMPolystyrene">
+	       	<density unit="g/cm3">1.05</density>
+        	<Components>
+                	<Element fraction="0.08333">H</Element>
+                        <Element fraction="0.91667">C</Element>
+		</Components>
+	</Material>
+        <Material name="EKLMPolystyrol">
+	       	<density unit="g/cm3">1.05</density>
+        	<Components>
+                	<Element fraction="0.08333">H</Element>
+                        <Element fraction="0.91667">C</Element>
+		</Components>
+	</Material>
+	<Material name="EKLMGel">
+                <density unit="g/cm3">1.05</density>
+                <Components>
+                	<Element fraction="0.08333">H</Element>
+                        <Element fraction="0.91667">C</Element>
+                </Components>
+	</Material>
+	<Material name="EKLMIron">
+		<density unit="g/cm3">7.874</density>
+		<Components>
+			<Element fraction="1.0">Fe</Element>
+		</Components>
+	</Material>
+	<Material name="EKLMSilicon">
+		<density unit="g/cm3">2.329</density>
+		<Components>
+			<Element fraction="1.0">Si</Element>
+		</Components>
+	</Material>
+	<Material name="EKLMDuralumin">
+		<density unit="g/cm3">2.70</density>
+		<Components>
+			<Element fraction="0.935">Al</Element>
+			<Element fraction="0.044">Cu</Element>
+			<Element fraction="0.015">Mg</Element>
+			<Element fraction="0.006">Mn</Element>
+		</Components>
+	</Material>
+</Materials>

@@ -1,0 +1,38 @@
+[INFO] Steering file: framework/tests/conditions_process2.py
+[INFO] The random number seed is set to "something important"
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltags (highest priority first) are Legacy_MagneticField_MC8_MC9_MC10, ${default_globaltag}
+[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0.290583, 0, 6.99797, 7.004), 
+   LER=(0.166035, 0, -3.99855, 4.002), 
+   CMS=(0.456618, 0, 2.99942, 11.006), 
+   VTX=(-0.05, 0.017, -0.01), 
+   CovHER=diag(2.63169e-05, 0, 0)
+   CovLER=diag(5.64063e-06, 0, 0)
+   CovVTX=[(1.79873e-06, 0, -1.08724e-05), (0, 4e-08, 0), (-1.08724e-05, 0, 0.00108889)]
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltags (highest priority first) are Legacy_MagneticField_MC8_MC9_MC10, ${default_globaltag}
+[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
+   HER=(0.290583, 0, 6.99797, 7.004), 
+   LER=(0.166035, 0, -3.99855, 4.002), 
+   CMS=(0.456618, 0, 2.99942, 11.006), 
+   VTX=(-0.05, 0.017, -0.01), 
+   CovHER=diag(2.63169e-05, 0, 0)
+   CovLER=diag(5.64063e-06, 0, 0)
+   CovVTX=[(1.79873e-06, 0, -1.08724e-05), (0, 4e-08, 0), (-1.08724e-05, 0, 0.00108889)]
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[ERROR] Cannot find payload in any of the configured global tags
+	name = BeamParameters
+	globaltags = 
+	experiment = 0
+	run = 0
+[FATAL] 1 ERROR(S) occurred! The processing of events will not be started.

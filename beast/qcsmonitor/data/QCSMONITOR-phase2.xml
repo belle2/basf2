@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="QCSMONITOR">
+  <Creator library="beast">QCSMONITORCreator</Creator>
+  <Content>
+    <!-- normally, parameters should be defined with a unit attribute. This
+         enables automatic conversion to the default framework unit --> 
+    <stepSize unit="um">200</stepSize>
+    <!--if we don't supply a unit there can be no conversion but is still valid -->
+    <divisions>32</divisions>
+    <!-- valid values for false are: "", "0", "off", "false" (case
+         insensitive), everything else will be interpreted as true -->
+    <foo>true</foo>
+    <!-- we can also have arrays as parameters which makes it easy to get a
+         number of values as vector<double>.  The numbers can be divided by
+         whitespace, comma or semi-colon -->
+    <bar unit="cm">1 
+    </bar>
+    <ScintCell>40</ScintCell>
+    <TimeStep>0.8</TimeStep>
+    <MinTime>0.0</MinTime>
+    <MaxTime>600.0</MaxTime>
+    <MIPthres>0.5</MIPthres>
+    <Ethres>0.2</Ethres>
+    <C_keV_to_MIP>242.0</C_keV_to_MIP>
+    <C_MIP_to_PE>15</C_MIP_to_PE>
+
+
+    <ConvFac>1.0</ConvFac>
+
+
+    <Active>
+      <Material>QCSMONITOR-Material</Material>
+      <phase >2</phase>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <!--Phi unit="deg">-15.,15.,75.,105,165.,195.,-75.,-105.</Phi-->
+      <Phi unit="deg">0.,90.,180.,-90.</Phi>
+      <!--
+      <dx_scint unit="cm">5.0</dx_scint>
+      <dy_scint unit="cm">2.0</dy_scint>
+      <dz_scint unit="cm">0.25</dz_scint>
+      -->
+      <dx_scint unit="cm">10.0</dx_scint>
+      <dy_scint unit="cm">4.0</dy_scint>
+      <dz_scint unit="cm">1.0</dz_scint>
+      <!--z unit="cm">300,267,240,200,135,109.99,-80.00,-160.0,-180.0,-222.39,-274.675,-318.1</z-->
+      <!--z unit="cm">300,267,240,200,135,109.99,-87.69,-160.0,-180.0,-222.39,-274.675,-318.1</z-->
+      <!--r unit="cm">31.65,30.89,34.95,26.36,26.25,22.75,21.95,25.25,25.25,32.75,41.25,55.25</r-->
+
+      <z unit="cm">-138.3,-165.0,-229.0,-277.0,-320.0,141.8,215.3,275.3,324.1,377.1</z>
+      <r unit="cm">25.5,25.5,33.0,41.5,55.5,27.0,27.0,32.4,32.4,51.8</r>
+
+
+    </Active>
+
+
+  </Content>
+</DetectorComponent>
+

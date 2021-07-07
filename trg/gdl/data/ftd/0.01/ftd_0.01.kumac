@@ -1,0 +1,1024 @@
+macro main wait=wait baseRise=197 baseFall=293
+*...FTD 0...
+*    n_t3_full[1] & n_t3_short[0] & cdc_open45 & ! veto | n_t3_full[1] & n_t3_short[1] & cdc_open45 & ! veto | n_t3_full[1] & n_t3_short[2] & cdc_open45 & ! veto | n_t3_full[2] & n_t3_short[0] & cdc_open45 & ! veto | n_t3_full[2] & n_t3_short[1] & cdc_open45 & ! veto | n_t3_full[2] & n_t3_short[2] & cdc_open45 & ! veto 
+[wait]
+    zone 1 6 1
+    title 'zzx 1/6'
+    set hcol 2
+    id=[baseRise]+1;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+1;hi/pl [id] s
+    atit 'n_t3_full[1]' ' '
+    set hcol 2
+    id=[baseRise]+3;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+3;hi/pl [id] s
+    atit 'n_t3_short[0]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'zzx 2/6'
+    set hcol 2
+    id=[baseRise]+1;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+1;hi/pl [id] s
+    atit 'n_t3_full[1]' ' '
+    set hcol 2
+    id=[baseRise]+4;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+4;hi/pl [id] s
+    atit 'n_t3_short[1]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'zzx 3/6'
+    set hcol 2
+    id=[baseRise]+1;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+1;hi/pl [id] s
+    atit 'n_t3_full[1]' ' '
+    set hcol 2
+    id=[baseRise]+5;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+5;hi/pl [id] s
+    atit 'n_t3_short[2]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'zzx 4/6'
+    set hcol 2
+    id=[baseRise]+2;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+2;hi/pl [id] s
+    atit 'n_t3_full[2]' ' '
+    set hcol 2
+    id=[baseRise]+3;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+3;hi/pl [id] s
+    atit 'n_t3_short[0]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'zzx 5/6'
+    set hcol 2
+    id=[baseRise]+2;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+2;hi/pl [id] s
+    atit 'n_t3_full[2]' ' '
+    set hcol 2
+    id=[baseRise]+4;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+4;hi/pl [id] s
+    atit 'n_t3_short[1]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'zzx 6/6'
+    set hcol 2
+    id=[baseRise]+2;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+2;hi/pl [id] s
+    atit 'n_t3_full[2]' ' '
+    set hcol 2
+    id=[baseRise]+5;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+5;hi/pl [id] s
+    atit 'n_t3_short[2]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+
+*...FTD 1...
+*    n_t2_full[1] & n_t2_short[0] & cdc_open45 & ! veto | n_t2_full[1] & n_t2_short[1] & cdc_open45 & ! veto | n_t2_full[1] & n_t2_short[2] & cdc_open45 & ! veto | n_t2_full[2] & n_t2_short[0] & cdc_open45 & ! veto | n_t2_full[2] & n_t2_short[1] & cdc_open45 & ! veto | n_t2_full[2] & n_t2_short[2] & cdc_open45 & ! veto 
+[wait]
+    zone 1 6 1
+    title 'ffs 1/6'
+    set hcol 2
+    id=[baseRise]+7;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+7;hi/pl [id] s
+    atit 'n_t2_full[1]' ' '
+    set hcol 2
+    id=[baseRise]+9;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+9;hi/pl [id] s
+    atit 'n_t2_short[0]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'ffs 2/6'
+    set hcol 2
+    id=[baseRise]+7;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+7;hi/pl [id] s
+    atit 'n_t2_full[1]' ' '
+    set hcol 2
+    id=[baseRise]+10;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+10;hi/pl [id] s
+    atit 'n_t2_short[1]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'ffs 3/6'
+    set hcol 2
+    id=[baseRise]+7;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+7;hi/pl [id] s
+    atit 'n_t2_full[1]' ' '
+    set hcol 2
+    id=[baseRise]+11;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+11;hi/pl [id] s
+    atit 'n_t2_short[2]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'ffs 4/6'
+    set hcol 2
+    id=[baseRise]+8;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+8;hi/pl [id] s
+    atit 'n_t2_full[2]' ' '
+    set hcol 2
+    id=[baseRise]+9;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+9;hi/pl [id] s
+    atit 'n_t2_short[0]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'ffs 5/6'
+    set hcol 2
+    id=[baseRise]+8;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+8;hi/pl [id] s
+    atit 'n_t2_full[2]' ' '
+    set hcol 2
+    id=[baseRise]+10;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+10;hi/pl [id] s
+    atit 'n_t2_short[1]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'ffs 6/6'
+    set hcol 2
+    id=[baseRise]+8;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+8;hi/pl [id] s
+    atit 'n_t2_full[2]' ' '
+    set hcol 2
+    id=[baseRise]+11;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+11;hi/pl [id] s
+    atit 'n_t2_short[2]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+
+*...FTD 2...
+*    n_t3_full[0] & n_t3_short[0] & cdc_open45 & ! ecl_bha & ! veto | n_t3_full[0] & n_t3_short[1] & cdc_open45 & ! ecl_bha & ! veto | n_t3_full[0] & n_t3_short[2] & cdc_open45 & ! ecl_bha & ! veto | n_t3_full[1] & n_t3_short[0] & cdc_open45 & ! ecl_bha & ! veto | n_t3_full[1] & n_t3_short[1] & cdc_open45 & ! ecl_bha & ! veto | n_t3_full[1] & n_t3_short[2] & cdc_open45 & ! ecl_bha & ! veto | n_t3_full[2] & n_t3_short[0] & cdc_open45 & ! ecl_bha & ! veto | n_t3_full[2] & n_t3_short[1] & cdc_open45 & ! ecl_bha & ! veto | n_t3_full[2] & n_t3_short[2] & cdc_open45 & ! ecl_bha & ! veto 
+[wait]
+    zone 1 6 1
+    title 'zx 1/9'
+    set hcol 2
+    id=[baseRise]+0;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+0;hi/pl [id] s
+    atit 'n_t3_full[0]' ' '
+    set hcol 2
+    id=[baseRise]+3;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+3;hi/pl [id] s
+    atit 'n_t3_short[0]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'zx 2/9'
+    set hcol 2
+    id=[baseRise]+0;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+0;hi/pl [id] s
+    atit 'n_t3_full[0]' ' '
+    set hcol 2
+    id=[baseRise]+4;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+4;hi/pl [id] s
+    atit 'n_t3_short[1]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'zx 3/9'
+    set hcol 2
+    id=[baseRise]+0;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+0;hi/pl [id] s
+    atit 'n_t3_full[0]' ' '
+    set hcol 2
+    id=[baseRise]+5;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+5;hi/pl [id] s
+    atit 'n_t3_short[2]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'zx 4/9'
+    set hcol 2
+    id=[baseRise]+1;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+1;hi/pl [id] s
+    atit 'n_t3_full[1]' ' '
+    set hcol 2
+    id=[baseRise]+3;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+3;hi/pl [id] s
+    atit 'n_t3_short[0]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'zx 5/9'
+    set hcol 2
+    id=[baseRise]+1;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+1;hi/pl [id] s
+    atit 'n_t3_full[1]' ' '
+    set hcol 2
+    id=[baseRise]+4;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+4;hi/pl [id] s
+    atit 'n_t3_short[1]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'zx 6/9'
+    set hcol 2
+    id=[baseRise]+1;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+1;hi/pl [id] s
+    atit 'n_t3_full[1]' ' '
+    set hcol 2
+    id=[baseRise]+5;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+5;hi/pl [id] s
+    atit 'n_t3_short[2]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'zx 7/9'
+    set hcol 2
+    id=[baseRise]+2;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+2;hi/pl [id] s
+    atit 'n_t3_full[2]' ' '
+    set hcol 2
+    id=[baseRise]+3;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+3;hi/pl [id] s
+    atit 'n_t3_short[0]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'zx 8/9'
+    set hcol 2
+    id=[baseRise]+2;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+2;hi/pl [id] s
+    atit 'n_t3_full[2]' ' '
+    set hcol 2
+    id=[baseRise]+4;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+4;hi/pl [id] s
+    atit 'n_t3_short[1]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'zx 9/9'
+    set hcol 2
+    id=[baseRise]+2;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+2;hi/pl [id] s
+    atit 'n_t3_full[2]' ' '
+    set hcol 2
+    id=[baseRise]+5;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+5;hi/pl [id] s
+    atit 'n_t3_short[2]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+
+*...FTD 3...
+*    n_t2_full[0] & n_t2_short[0] & cdc_open45 & ! ecl_bha & ! veto | n_t2_full[0] & n_t2_short[1] & cdc_open45 & ! ecl_bha & ! veto | n_t2_full[0] & n_t2_short[2] & cdc_open45 & ! ecl_bha & ! veto | n_t2_full[1] & n_t2_short[0] & cdc_open45 & ! ecl_bha & ! veto | n_t2_full[1] & n_t2_short[1] & cdc_open45 & ! ecl_bha & ! veto | n_t2_full[1] & n_t2_short[2] & cdc_open45 & ! ecl_bha & ! veto | n_t2_full[2] & n_t2_short[0] & cdc_open45 & ! ecl_bha & ! veto | n_t2_full[2] & n_t2_short[1] & cdc_open45 & ! ecl_bha & ! veto | n_t2_full[2] & n_t2_short[2] & cdc_open45 & ! ecl_bha & ! veto 
+[wait]
+    zone 1 6 1
+    title 'fs 1/9'
+    set hcol 2
+    id=[baseRise]+6;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+6;hi/pl [id] s
+    atit 'n_t2_full[0]' ' '
+    set hcol 2
+    id=[baseRise]+9;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+9;hi/pl [id] s
+    atit 'n_t2_short[0]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'fs 2/9'
+    set hcol 2
+    id=[baseRise]+6;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+6;hi/pl [id] s
+    atit 'n_t2_full[0]' ' '
+    set hcol 2
+    id=[baseRise]+10;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+10;hi/pl [id] s
+    atit 'n_t2_short[1]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'fs 3/9'
+    set hcol 2
+    id=[baseRise]+6;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+6;hi/pl [id] s
+    atit 'n_t2_full[0]' ' '
+    set hcol 2
+    id=[baseRise]+11;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+11;hi/pl [id] s
+    atit 'n_t2_short[2]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'fs 4/9'
+    set hcol 2
+    id=[baseRise]+7;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+7;hi/pl [id] s
+    atit 'n_t2_full[1]' ' '
+    set hcol 2
+    id=[baseRise]+9;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+9;hi/pl [id] s
+    atit 'n_t2_short[0]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'fs 5/9'
+    set hcol 2
+    id=[baseRise]+7;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+7;hi/pl [id] s
+    atit 'n_t2_full[1]' ' '
+    set hcol 2
+    id=[baseRise]+10;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+10;hi/pl [id] s
+    atit 'n_t2_short[1]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'fs 6/9'
+    set hcol 2
+    id=[baseRise]+7;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+7;hi/pl [id] s
+    atit 'n_t2_full[1]' ' '
+    set hcol 2
+    id=[baseRise]+11;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+11;hi/pl [id] s
+    atit 'n_t2_short[2]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'fs 7/9'
+    set hcol 2
+    id=[baseRise]+8;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+8;hi/pl [id] s
+    atit 'n_t2_full[2]' ' '
+    set hcol 2
+    id=[baseRise]+9;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+9;hi/pl [id] s
+    atit 'n_t2_short[0]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'fs 8/9'
+    set hcol 2
+    id=[baseRise]+8;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+8;hi/pl [id] s
+    atit 'n_t2_full[2]' ' '
+    set hcol 2
+    id=[baseRise]+10;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+10;hi/pl [id] s
+    atit 'n_t2_short[1]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'fs 9/9'
+    set hcol 2
+    id=[baseRise]+8;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+8;hi/pl [id] s
+    atit 'n_t2_full[2]' ' '
+    set hcol 2
+    id=[baseRise]+11;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+11;hi/pl [id] s
+    atit 'n_t2_short[2]' ' '
+    set hcol 2
+    id=[baseRise]+13;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+13;hi/pl [id] s
+    atit 'cdc_open45' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+
+*...FTD 4...
+*    e_high & ! ecl_bha & ! veto 
+[wait]
+    zone 1 6 1
+    title 'hie 1/1'
+    set hcol 2
+    id=[baseRise]+15;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+15;hi/pl [id] s
+    atit 'e_high' ' '
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+
+*...FTD 5...
+*    n_clus[2] & ! veto | n_clus[3] & ! veto 
+[wait]
+    zone 1 6 1
+    title 'c4 1/2'
+    set hcol 2
+    id=[baseRise]+32;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+32;hi/pl [id] s
+    atit 'n_clus[2]' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+[wait]
+    zone 1 6 1
+    title 'c4 2/2'
+    set hcol 2
+    id=[baseRise]+33;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+33;hi/pl [id] s
+    atit 'n_clus[3]' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+
+*...FTD 6...
+*    ecl_bha & ! veto 
+[wait]
+    zone 1 6 1
+    title 'bhabha 1/1'
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+51;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+51;hi/pl [id] s
+    atit 'veto' ' '
+
+*...FTD 7...
+*    ecl_bha & n_t2[1] & cdc_bb | ecl_bha & n_t2[2] & cdc_bb
+[wait]
+    zone 1 6 1
+    title 'bhabha_trk 1/2'
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+56;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+56;hi/pl [id] s
+    atit 'n_t2[1]' ' '
+    set hcol 2
+    id=[baseRise]+12;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+12;hi/pl [id] s
+    atit 'cdc_bb' ' '
+[wait]
+    zone 1 6 1
+    title 'bhabha_trk 2/2'
+    set hcol 2
+    id=[baseRise]+18;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+18;hi/pl [id] s
+    atit 'ecl_bha' ' '
+    set hcol 2
+    id=[baseRise]+57;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+57;hi/pl [id] s
+    atit 'n_t2[2]' ' '
+    set hcol 2
+    id=[baseRise]+12;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+12;hi/pl [id] s
+    atit 'cdc_bb' ' '
+
+*...FTD 8...
+*    e_high & !n_t2[0] & !n_t2[1] & !n_t2[2] & !n_t3[0] & !n_t3[1] & !n_t3[2] 
+[wait]
+    zone 1 6 1
+    title 'gg 1/1'
+    set hcol 2
+    id=[baseRise]+15;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+15;hi/pl [id] s
+    atit 'e_high' ' '
+
+*...FTD 9...
+*    n_klm[0] & n_t2[1] | n_klm[0] & n_t2[2] | n_klm[1] & n_t2[1] | n_klm[1] & n_t2[2] | n_klm[2] & n_t2[1] | n_klm[2] & n_t2[2] 
+[wait]
+    zone 1 6 1
+    title 'mu_pair 1/6'
+    set hcol 2
+    id=[baseRise]+43;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+43;hi/pl [id] s
+    atit 'n_klm[0]' ' '
+    set hcol 2
+    id=[baseRise]+56;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+56;hi/pl [id] s
+    atit 'n_t2[1]' ' '
+[wait]
+    zone 1 6 1
+    title 'mu_pair 2/6'
+    set hcol 2
+    id=[baseRise]+43;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+43;hi/pl [id] s
+    atit 'n_klm[0]' ' '
+    set hcol 2
+    id=[baseRise]+57;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+57;hi/pl [id] s
+    atit 'n_t2[2]' ' '
+[wait]
+    zone 1 6 1
+    title 'mu_pair 3/6'
+    set hcol 2
+    id=[baseRise]+44;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+44;hi/pl [id] s
+    atit 'n_klm[1]' ' '
+    set hcol 2
+    id=[baseRise]+56;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+56;hi/pl [id] s
+    atit 'n_t2[1]' ' '
+[wait]
+    zone 1 6 1
+    title 'mu_pair 4/6'
+    set hcol 2
+    id=[baseRise]+44;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+44;hi/pl [id] s
+    atit 'n_klm[1]' ' '
+    set hcol 2
+    id=[baseRise]+57;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+57;hi/pl [id] s
+    atit 'n_t2[2]' ' '
+[wait]
+    zone 1 6 1
+    title 'mu_pair 5/6'
+    set hcol 2
+    id=[baseRise]+45;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+45;hi/pl [id] s
+    atit 'n_klm[2]' ' '
+    set hcol 2
+    id=[baseRise]+56;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+56;hi/pl [id] s
+    atit 'n_t2[1]' ' '
+[wait]
+    zone 1 6 1
+    title 'mu_pair 6/6'
+    set hcol 2
+    id=[baseRise]+45;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+45;hi/pl [id] s
+    atit 'n_klm[2]' ' '
+    set hcol 2
+    id=[baseRise]+57;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+57;hi/pl [id] s
+    atit 'n_t2[2]' ' '
+
+*...FTD 10...
+*    revo
+[wait]
+    zone 1 6 1
+    title 'revolution 1/1'
+    set hcol 2
+    id=[baseRise]+46;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+46;hi/pl [id] s
+    atit 'revo' ' '
+
+*...FTD 11...
+*    pseude_rand
+[wait]
+    zone 1 6 1
+    title 'random 1/1'
+    set hcol 2
+    id=[baseRise]+50;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+50;hi/pl [id] s
+    atit 'pseude_rand' ' '
+
+*...FTD 12...
+*    bha_delay
+[wait]
+    zone 1 6 1
+    title 'bg 1/1'
+    set hcol 2
+    id=[baseRise]+49;hi/pl [id]
+    set hcol 4
+    id=[baseFall]+49;hi/pl [id] s
+    atit 'bha_delay' ' '
+
+return

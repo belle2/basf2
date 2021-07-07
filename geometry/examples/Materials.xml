@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+  <Material name="Air">
+    <density unit="g/cm3">1e-12</density>
+    <!-- (optional) State can be one of Gas, Liquid, Solid, Undefined, case insensitive  -->
+    <state>Gas</state>
+    <!-- (optional) Temperature in K, if omitted, the standard value is used (273.15) -->
+    <temperature>273.15</temperature>
+    <!-- (optional) Pressure in atm, if omitted, 1.0 is used -->
+    <pressure>1.0</pressure>
+    <!-- Components of the Material, can be any combination of Elements and Materials
+         All chemical elements are predefined as Element and Material.
+         If you combine only materials you don't have to specify the density above since it can be calculated
+         automatically -->
+    <Components>
+      <Element fraction="0.78">N</Element>
+      <Element fraction="0.21">O</Element>
+      <Material fraction="0.01">Ar</Material>
+    </Components>
+    <!-- Properties can be defined as before except that they are no longer enclosed in an Properties tag -->
+    <Property name="RINDEX" unit="eV"> 
+      <value energy="4.95937">1.45</value>
+      <value energy="4.85937">1.45</value>
+      <!-- ... -->
+      <value energy="1.75937">1.45</value>
+    </Property> 
+  </Material>
+</Materials>

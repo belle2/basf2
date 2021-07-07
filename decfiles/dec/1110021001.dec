@@ -1,0 +1,32 @@
+# EventType: 1110021001
+# Descriptor: [B0 -> K*0 gamma] cc
+# NickName: Bd_Kst0gamma,K+pi-=NoMix
+# Documentation: Rare b->s gamma process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Romulus Godang
+# Email: godang@southalabama.edu
+# Cuts: None
+# Date: 20150828
+#
+#
+Define dm_incohMix_B0 0.0
+#
+Alias K*0sig K*0
+Alias anti-K*0sig anti-K*0
+ChargeConj K*0sig anti-K*0sig
+#
+Decay Upsilon(4S)
+1.000 B0sig  anti-B0sig B0 anti-B0  VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.000 K*0sig  gamma  HELAMP 1.0 0.0 1.0 0.0; 
+Enddecay
+CDecay anti-B0sig
+#
+Decay K*0sig
+1.000   K+  pi-     VSS;
+Enddecay
+CDecay anti-K*0sig
+End

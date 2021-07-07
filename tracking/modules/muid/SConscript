@@ -1,0 +1,11 @@
+Import('env')
+
+env['LIBS'] = ['tracking_trackExtrapolateG4e',
+               'framework',
+               'simulation',
+               'CLHEP',
+               '$GEANT4_LIBS',
+               '$ROOT_LIBS'
+              ]
+
+Return('env')

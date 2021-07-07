@@ -1,0 +1,33 @@
+# EventType: 1111540101
+# Descriptor: [B0 -> psi(2S) [ -> e+ e-] K_S0 [-> pi+ pi-] ]
+# NickName: Bd_KsPsi2s_pi+pi-e+e-
+# Documentation:
+# Tested: Yes
+# Physics WG: EWP
+# Responsible: Soumen Halder
+# Email: soumen.halder@tifr.res.in
+# Cuts: None
+# Date: 20200330
+# Comments:
+
+# Define aliases
+Alias psi2S_sig psi(2S)
+Alias K_S0sig K_S0
+
+Decay Upsilon(4S)
+1.000 B0sig  anti-B0sig B0 anti-B0  VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0 psi2S_sig K_S0sig PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+
+Decay psi2S_sig
+1.0 e+ e- PHOTOS VLL;
+Enddecay
+
+Decay K_S0sig
+1.000        pi+       pi-         PHSP;
+Enddecay
+End

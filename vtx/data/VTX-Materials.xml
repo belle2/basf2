@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+  <Material name="VTX-ColdAir">
+    <state>Gas</state>
+    <temperature>263.15</temperature>
+    <Components>
+      <Material>N</Material>
+    </Components>
+  </Material>
+
+  <Material name="VTX-Support">
+    <state>Solid</state>
+    <!--
+      Density of Steel is 7.9, but since the support in the simulation is
+      smaller than the actual endflange we increase the density:
+
+      Real volume: 10047 mm^3
+      Simulation volume: 8243 mm^3
+      Density scale of 1.22
+    -->
+    <density unit="g/cm3">9.63</density>
+    <temperature>243.15</temperature>
+    <Components>
+      <Element>Fe</Element>
+    </Components>
+  </Material>
+
+  <Material name="VTX-CarbonTubes">
+    <state>Solid</state>
+    <density unit="g/cm3">1.5</density>
+    <Components>
+      <Element>C</Element>
+    </Components>
+  </Material>
+
+  <Material name="VTX-Glue">
+    <density unit="g/cm3">1.13</density>
+    <state>Solid</state>
+    <Components>
+      <Element fraction="0.4390">C</Element>
+      <Element fraction="0.0732">O</Element>
+      <Element fraction="0.4878">H</Element>
+    </Components>
+  </Material>
+
+  
+</Materials>

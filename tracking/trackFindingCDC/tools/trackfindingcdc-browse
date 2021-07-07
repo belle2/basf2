@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""Opens a TBrowser with the given object from commandline"""
+
+import os
+import sys
+import os.path
+
+import tracking.utilities as utilities
+
+from tracking.root_utils import root_browse, root_open
+
+import ROOT.TFile
+
+import logging
+
+
+def main():
+    argument_parser = utilities.DefaultHelpArgumentParser()
+
+    argument_parser.add_argument(
+        "root_file_path",
+        help="ROOT file to be browsed.",
+    )
+
+    arguments = argument_parser.parse_args()
+
+    with root_open(arguments.root_file_path, "READ") as tfile:
+        root_browse(tfile)
+        input("Close with return key.")
+
+
+if __name__ == "__main__":
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
+    main()

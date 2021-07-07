@@ -1,0 +1,10 @@
+Import('env')
+
+env['SUBLIB'] = True
+env['LIBS'] = ['framework',
+               '$ROOT_LIBS', 'EvtGen', 'pythia8', 'Photospp', 'HepMC',
+               'TauolaCxxInterface', 'TauolaFortran',
+               'EvtGenExternal', 'Geom', 'CLHEP',
+               'mdst_dataobjects']
+
+Return('env')

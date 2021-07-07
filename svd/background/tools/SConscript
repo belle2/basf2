@@ -1,0 +1,7 @@
+Import('env')
+env['TOOLS_LIBS']['make_bg_plots'] = ['svd','vxd','$ROOT_LIBS'];
+env['TOOLS_LIBS']['compare_bars'] = ['svd', 'vxd', '$ROOT_LIBS'];
+env['TOOLS_LIBS']['showbginfo'] = ['framework', 'boost_program_options', '$ROOT_LIBS']
+env['TOOLS_LIBS']['setbgtime'] = ['framework', 'boost_program_options', '$ROOT_LIBS']
+
+Return('env')

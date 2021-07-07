@@ -1,0 +1,5 @@
+Import('env')
+	
+env['LIBS'] = ['framework', 'geometry', 'geometry_dbobjects', '$ROOT_LIBS']
+
+Return('env')

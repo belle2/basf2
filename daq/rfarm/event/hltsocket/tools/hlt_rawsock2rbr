@@ -1,0 +1,10 @@
+#!/bin/bash
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+exec b2hlt_socket2rb --raw --connect-to $2 --port $3 --ring-buffer-name $1 --shm-name $4 --shm-id $5

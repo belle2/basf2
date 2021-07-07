@@ -1,0 +1,24 @@
+                    How to use these scripts:
+
+1) Fill in the config_mc/data.ini file with the parameters of the mc/data files
+you want to analyse. In case of mc read point 2) to understand what thresholdEventsNo
+is for.
+
+NOTE: Your analysis code should be in the analysisScript.py script (but don't
+        overwrite the top lines that make this script compatible with the job
+        submission mechanism of these scripts)
+
+2) Run the createLookUpTable_mc/data.py script to create a lookup table with the
+details of the files you want to analyse, as specified in the config file. 
+Each line of this table will correspond to a submitted job.
+In case of mc, this script will group together runs based on a minimum number of
+events specified in the config file (indeed thresholdEventsNo). The loop will
+only run for one stream number, given that all other stream numbers have the
+same numbers of events per run.
+In case of data this mechanism is not usable, since afaik there is no way to
+get the number of events for each run file. So this script will simply gather
+10 runs for each job.
+
+3) Run the submitJobs.py script to finally submit one job for each line of the
+lookup table. In case of mc, this script loops on all stream numbers (i.e. all
+        job parameters are repeated for each run number).

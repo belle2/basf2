@@ -1,0 +1,6 @@
+Import('env')
+
+env.AppendUnique(CCFLAGS=["-fvisibility=hidden"])
+env['LIBS'] = ['framework']
+
+Return('env')

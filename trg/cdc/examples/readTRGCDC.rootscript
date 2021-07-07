@@ -1,0 +1,301 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+#include <algorithm>
+readTRGCDC(){
+
+  // Control readTRGCDC
+  // graphFlag=-1: don't plot, 0: plot all, 1: plot fit, 2: plot multiplicity
+  int graphFlag = 0;
+
+  gROOT->Reset();
+  gROOT->SetStyle("Plain");
+  gStyle->SetOptStat(111111111);
+  gStyle->SetOptFit(1111111111);
+  gStyle->SetStatFontSize(0.05);
+
+  // Read file
+  TFile* inFile = new TFile("TRGCDC.root");
+  TTree* inTree = (TTree*)inFile->Get("m_tree");
+  TTree* inTreeAllTracks = (TTree*)inFile->Get("m_treeAllTracks");
+  // Set branches
+  TClonesArray* fitParameters = new TClonesArray("TVectorD"); 
+  TClonesArray* mcParameters = new TClonesArray("TVectorD"); 
+  TClonesArray* mcTrack4Vector = new TClonesArray("TLorentzVector");
+  TClonesArray* mcTrackVertexVector = new TClonesArray("TVector3");
+  TClonesArray* mcTrackStatus = new TClonesArray("TVectorD");
+  inTree->SetBranchAddress("fitParameters", &fitParameters);
+  inTree->SetBranchAddress("mcParameters", &mcParameters);
+  inTreeAllTracks->SetBranchAddress("mcTrack4Vector", &mcTrack4Vector);
+  inTreeAllTracks->SetBranchAddress("mcTrackVertexVector", &mcTrackVertexVector);
+  inTreeAllTracks->SetBranchAddress("mcTrackStatus", &mcTrackStatus);
+
+  // Make Histogram
+  TH1F* hpT    = new TH1F("histpT","Plot of pT",93,0,7.0);
+  TH1F* hphi0   = new TH1F("hphi00","",87,0,360);
+  TH1F* hz0     = new TH1F("histz0","Plot of z0",98,-25,25);
+  TH1F* htheta = new TH1F("htheta","",130,20,150);
+  hphi0->SetMinimum(0);
+  hpT->SetMinimum(0);
+  // MC Histograms
+  TH1F* hMCpT    = new TH1F("histMCpT","Plot of pT",93,0,7.0);
+  TH1F* hMCphi0   = new TH1F("hMCphi00","",87,0,360);
+  TH1F* hMCz0     = new TH1F("histMCz0","Plot of z0",98,-10,10);
+  TH1F* hAllMCz0     = new TH1F("histAllMCz0","Plot of z0",98,-10,10);
+  TH1F* hMCtheta = new TH1F("hMCtheta","",130,20,150);
+  hMCphi0->SetMinimum(0);
+  hMCpT->SetMinimum(0);
+
+  // Z0 in a PT range
+  TH1F* hZ0pT1    = new TH1F("histZ0pT1","Plot z0 for pT=[0,1.5]GeV",93,-20,20);
+  TH1F* hZ0pT2    = new TH1F("histZ0pT2","Plot z0 for pT=[1.5,2.5]GeV",93,-20,20);
+  TH1F* hZ0pT3    = new TH1F("histZ0pT3","Plot z0 for pT=[2.5,3.5]GeV",93,-20,20);
+  TH1F* hZ0pT4    = new TH1F("histZ0pT4","Plot z0 for pT=[3.5,inf]GeV",93,-20,20);
+  TH1F* hMCZ0pT1    = new TH1F("histMCZ0pT1","MC Plot z0 for pT=[0,1.5]GeV",93,-20,20);
+  TH1F* hMCZ0pT2    = new TH1F("histMCZ0pT2","MC Plot z0 for pT=[1.5,2.5]GeV",93,-20,20);
+  TH1F* hMCZ0pT3    = new TH1F("histMCZ0pT3","MC Plot z0 for pT=[2.5,3.5]GeV",93,-20,20);
+  TH1F* hMCZ0pT4    = new TH1F("histMCZ0pT4","MC Plot z0 for pT=[3.5,inf]GeV",93,-20,20);
+
+  // pt Resolutions
+  TH1F* hpT1    = new TH1F("histpT1","Plot Resolution pT=[0,1.5]GeV",93,-2,2);
+  TH1F* hpT2    = new TH1F("histpT2","Plot Resolution pT=[1.5,2.5]GeV",93,-2,2);
+  TH1F* hpT3    = new TH1F("histpT3","Plot Resolution pT=[2.5,3.5]GeV",93,-2,2);
+  TH1F* hpT4    = new TH1F("histpT4","Plot Resolution pT=[3.5,inf]GeV",93,-2,2);
+
+  // Multiplicity
+  TH1F* hMCMultiplicity = new TH1F("hMCMultiplicity","",12,-0.5,11.5);
+  TH1F* hMultiplicity = new TH1F("hMultiplicity","",12,-0.5,11.5);
+
+  const int nEvents = inTree->GetEntries();
+  cout<<"Number of events: "<<nEvents<<endl;
+  
+  // For MC-Fit combined graph
+  double* mcPt = new double[nEvents];
+  double* fitPt = new double[nEvents];
+  double* mcPhi0 = new double[nEvents];
+  double* fitPhi0 = new double[nEvents];
+  double* mcZ0 = new double[nEvents];
+  double* fitZ0 = new double[nEvents];
+  double* mcTheta = new double[nEvents];
+  double* fitTheta = new double[nEvents];
+
+  double Trg_PI = 3.141592653589793;
+
+  //[0]=pt, [1]=phi0, [2]=z0(cm), [3]=cot
+  TVectorD tempPar(4);
+  TVectorD tempMCPar(4);
+
+  Double_t theta;
+  Double_t mctheta;
+  for(int event=0; event<inTree->GetEntriesFast();event++){
+    //Get event
+    inTree->GetEntry(event);
+    //Number of tracks
+    //cout<<"Number of tracks: "<<fitParameters->GetEntriesFast()<<endl;
+    for(int track=0; track<fitParameters->GetEntriesFast(); track++){
+      tempPar = *(TVectorD*)fitParameters->At(track);
+      tempMCPar = *(TVectorD*)mcParameters->At(track);
+
+      hpT->Fill(tempPar[0]);
+      fitPt[event] = tempPar[0];
+      hMCpT->Fill(tempMCPar[0]);
+      mcPt[event] = tempMCPar[0];
+
+      // Divide by MC pT
+      if(tempMCPar[0]<1.5) {
+        hpT1->Fill((tempPar[0]-tempMCPar[0])/tempMCPar[0]);
+        hZ0pT1->Fill(tempPar[2]*100);
+        hMCZ0pT1->Fill(tempMCPar[2]*100);
+      }
+      if(tempMCPar[0]>1.5 && tempMCPar[0]<2.5) {
+        hpT2->Fill((tempPar[0]-tempMCPar[0])/tempMCPar[0]);
+        hZ0pT2->Fill(tempPar[2]*100);
+        hMCZ0pT2->Fill(tempMCPar[2]*100);
+      }
+      if(tempMCPar[0]>2.5 && tempMCPar[0]<3.5) {
+        hpT3->Fill((tempPar[0]-tempMCPar[0])/tempMCPar[0]);
+        hZ0pT3->Fill(tempPar[2]*100);
+        hMCZ0pT3->Fill(tempMCPar[2]*100);
+      }
+      if(tempMCPar[0]>3.5) {
+        hpT4->Fill((tempPar[0]-tempMCPar[0])/tempMCPar[0]);
+        hZ0pT4->Fill(tempPar[2]*100);
+        hMCZ0pT4->Fill(tempMCPar[2]*100);
+      }
+
+      if(tempPar[1]<0) tempPar[1] += 2*Trg_PI;
+      tempPar[1] = tempPar[1]*180/Trg_PI;
+      hphi0->Fill(tempPar[1]);
+      fitPhi0[event] = tempPar[1];
+      if(tempMCPar[1]<0) tempMCPar[1] += 2*Trg_PI;
+      tempMCPar[1] = tempMCPar[1]*180/Trg_PI;
+      hMCphi0->Fill(tempMCPar[1]);
+      mcPhi0[event] = tempMCPar[1];
+
+      hz0->Fill(tempPar[2]*100);
+      fitZ0[event] = tempPar[2]*100;
+      hMCz0->Fill(tempMCPar[2]*100);
+      mcZ0[event] = tempMCPar[2]*100;
+
+      theta = Trg_PI/2.-atan(tempPar[3]);
+      theta*=180./Trg_PI;
+      htheta->Fill(theta);
+      fitTheta[event]=theta;
+      mctheta=Trg_PI/2.-atan(tempMCPar[3]);
+      mctheta*=180./Trg_PI;
+      hMCtheta->Fill(mctheta);
+      mcTheta[event]=mctheta;
+    } // End of track loop
+    hMultiplicity->Fill(fitParameters->GetEntriesFast());
+  } // End of tree event loop
+
+  // Multiplicity and z0 for all tracks
+  // mcStatus[0]: statusbit, mcStatus[1]: pdg, mcStatus[2]: charge
+  // mcStatusBit[1] is for primary stable partciles. mcStatusBit[6] is for seen in CDC
+  TVectorD mcStatus(3);
+  TLorentzVector mc4Vector;
+  TVector3 mcVertexVector;
+  bool mcStatusBit[11];
+  int tempStatus;
+  int mcMultiplicity;
+  for(int event=0; event<inTreeAllTracks->GetEntriesFast();event++){
+    //Get event
+    inTreeAllTracks->GetEntry(event);
+    mcMultiplicity = 0;
+    //Number of tracks of status 2 or 64 of MCParticle
+    for(int track=0; track<mcTrackStatus->GetEntriesFast(); track++){
+      mcStatus = *(TVectorD*)mcTrackStatus->At(track);
+      mc4Vector = *(TLorentzVector*)mcTrack4Vector->At(track);
+      mcVertexVector = *(TVector3*)mcTrackVertexVector->At(track);
+      // Calculate the status bit.
+      tempStatus = mcStatus[0];
+      for(int n=10; n>=0; n--) mcStatusBit[n]=0;
+      for(int n=10; n>=0; n--){
+        if(tempStatus >= pow(2,n)){
+          tempStatus -= pow(2,n);
+          mcStatusBit[n] = 1;
+        }
+      }
+      // print status bit
+      //for(int n=10; n>=0; n--) cout<<mcStatusBit[n];
+      //cout<<endl;
+      // Count number of tracks and save z0 for all tracks
+      if(mcStatusBit[6] == 1 && mcStatus[2] != 0 && mc4Vector.Pt()>0.4) {
+        mcMultiplicity += 1;
+        //This is in cm scale
+        hAllMCz0->Fill(mcVertexVector.Z());
+      }
+    } // End of tracks of status 2 or 64 of MCParticle
+    hMCMultiplicity->Fill(mcMultiplicity);
+  } // End of treeMultiplicity loop
+
+  if(graphFlag!=-1){
+    if(graphFlag==1 || graphFlag==0){
+      TCanvas *c1 = new TCanvas("c1", "", 1000, 500);
+      c1->Divide(2,2);
+      c1->cd(1);
+      hpT->Draw();
+      hMCpT->SetLineColor(2);
+      hMCpT->Draw("same");
+      c1->cd(2);
+      hphi0->Draw();
+      hMCphi0->SetLineColor(2);
+      hMCphi0->Draw("same");
+      c1->cd(3);
+      //hz0->SetMaximum(max(hz0->GetMaximum(),hMCz0->GetMaximum())*1.1);
+      hz0->Draw();
+      hMCz0->SetLineColor(2);
+      hMCz0->Draw("same");
+      hAllMCz0->SetLineColor(4);
+      hAllMCz0->Draw("same");
+      c1->cd(4);
+      htheta->Draw();
+      hMCtheta->SetLineColor(2);
+      hMCtheta->Draw("same");
+
+      //c1->SaveAs("histFitter3D.pdf");
+      TCanvas *c2 = new TCanvas("c2", "", 600, 600);
+
+      gPtMCFit = new TGraph(10000,mcPt,fitPt);
+      gPhi0MCFit = new TGraph(10000,mcPhi0,fitPhi0);
+      gZ0MCFit = new TGraph(10000,mcZ0,fitZ0);
+      gThetaMCFit = new TGraph(10000,mcTheta,fitTheta);
+
+      c2->Divide(2,2);
+      c2->cd(1);
+      gPtMCFit->SetMinimum(0);
+      gPtMCFit->SetMaximum(6);
+      gPtMCFit->GetXaxis()->SetLimits(0,6);
+      gPtMCFit->SetTitle("fitPt-mcPt");
+      gPtMCFit->Draw("AP");
+      c2->cd(2);
+      gPhi0MCFit->SetMinimum(0);
+      gPhi0MCFit->SetMaximum(360);
+      gPhi0MCFit->GetXaxis()->SetLimits(0,360);
+      gPhi0MCFit->SetTitle("fitPhi0-mcPhi0");
+      gPhi0MCFit->Draw("AP");
+      c2->cd(3);
+      gZ0MCFit->SetTitle("fitZ0-mcZ0");
+      gZ0MCFit->SetMinimum(-20);
+      gZ0MCFit->SetMaximum(20);
+      gZ0MCFit->GetXaxis()->SetLimits(-20,20);
+      gZ0MCFit->Draw("AP");
+      c2->cd(4);
+      gThetaMCFit->SetMinimum(0);
+      gThetaMCFit->SetMaximum(180);
+      gThetaMCFit->GetXaxis()->SetLimits(0,180);
+      gThetaMCFit->SetTitle("fitTheta-mcTheta");
+      gThetaMCFit->Draw("AP");
+
+      TCanvas* c3 = new TCanvas("c3","",1000,500);
+      c3->Divide(2,2);
+      c3->cd(1);
+      hpT1->Fit("gaus");
+      hpT1->Draw();
+      c3->cd(2);
+      hpT2->Fit("gaus");
+      hpT2->Draw();
+      c3->cd(3);
+      hpT3->Fit("gaus");
+      hpT3->Draw();
+      c3->cd(4);
+      hpT4->Fit("gaus");
+      hpT4->Draw();
+    }
+    if(graphFlag == 0){
+      TCanvas* c4 = new TCanvas("c4","",1000,500);
+      c4->Divide(2,2);
+      c4->cd(1);
+      hZ0pT1->SetMaximum(max(hZ0pT1->GetMaximum(),hMCZ0pT1->GetMaximum())*1.1);
+      hZ0pT1->Draw();
+      hMCZ0pT1->SetLineColor(2);
+      hMCZ0pT1->Draw("same");
+      c4->cd(2);
+      hZ0pT2->SetMaximum(max(hZ0pT2->GetMaximum(),hMCZ0pT2->GetMaximum())*1.1);
+      hZ0pT2->Draw();
+      hMCZ0pT2->SetLineColor(2);
+      hMCZ0pT2->Draw("same");
+      c4->cd(3);
+      hZ0pT3->SetMaximum(max(hZ0pT3->GetMaximum(),hMCZ0pT3->GetMaximum())*1.1);
+      hZ0pT3->Draw();
+      hMCZ0pT3->SetLineColor(2);
+      hMCZ0pT3->Draw("same");
+      c4->cd(4);
+      hZ0pT4->SetMaximum(max(hZ0pT4->GetMaximum(),hMCZ0pT4->GetMaximum())*1.1);
+      hZ0pT4->Draw();
+      hMCZ0pT4->SetLineColor(2);
+      hMCZ0pT4->Draw("same");
+    }
+    if(graphFlag==2 || graphFlag==0){
+      TCanvas* c5 = new TCanvas("c5","",500,500);
+      hMultiplicity->SetMaximum(max(hMultiplicity->GetMaximum(),hMCMultiplicity->GetMaximum())*1.1);
+      hMultiplicity->Draw();
+      hMCMultiplicity->SetLineColor(2);
+      hMCMultiplicity->Draw("same");
+    }
+  }
+}

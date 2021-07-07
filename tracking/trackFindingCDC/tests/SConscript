@@ -1,0 +1,17 @@
+Import('env')
+
+# Use the common libraries of the track finder for the test compilation
+env['LIBS'] = [
+    'tracking_trackFindingCDC',
+    'cdc',
+    'cdc_dataobjects',
+    'simulation_dataobjects',
+    'genfit2',
+    'framework',
+    'geometry',
+    '$ROOT_LIBS',
+    '$PYTHON_LIBS'
+    ]
+
+
+Return('env')

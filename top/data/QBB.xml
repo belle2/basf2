@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<QBB desc="quartz bar box">
+
+  <width unit="mm">466.0</width>
+  <length unit="mm">2856.0</length>
+  <prismPosition descr="prism-bar joint wrt QBB back" unit="mm">242.0</prismPosition>
+  <material descr="material inside QBB">TOPAir</material>
+  
+  <outerPanel descr="outer honeycomb panel">
+    <width unit="mm">452.0</width>
+    <length unit="mm">2682.0</length>
+    <minThickness unit="mm">10.8</minThickness>
+    <maxThickness unit="mm">25.8</maxThickness>
+    <radius unit="mm">1238.0</radius>
+    <material>TOPQBB</material>
+    <edgeWidth unit="mm">10.0</edgeWidth>
+    <edgeMaterial>Al</edgeMaterial>
+    <y descr="position of flat surface in bar frame" unit="mm">12.0</y>
+    <N descr="number of flat surfaces to approximate round shape">8</N>
+  </outerPanel>
+
+  <innerPanel descr="inner honeycomb panel">
+    <width unit="mm">450.0</width>
+    <length unit="mm">2582.0</length>
+    <minThickness unit="mm">13.8</minThickness>
+    <maxThickness unit="mm">25.8</maxThickness>
+    <radius unit="mm">1175.0</radius>
+    <material>TOPQBB</material>
+    <edgeWidth unit="mm">10.0</edgeWidth>
+    <edgeMaterial>Al</edgeMaterial>
+    <y descr="position of flat surface in bar frame" unit="mm">-12.0</y>
+    <N descr="number of flat surfaces to approximate round shape">8</N>
+  </innerPanel>
+
+  <sideRails descr="simplified side rails">
+    <thickness unit="mm">6.0</thickness>
+    <reducedThickness unit="mm">3.0</reducedThickness>
+    <height unit="mm">45.6</height>
+    <material>Al</material>
+  </sideRails>
+
+  <forwardEndPlate descr="simplified forward end plate">
+    <thickness unit="mm">9.0</thickness>
+    <height unit="mm">45.6</height>
+    <material>Al</material>
+  </forwardEndPlate>
+
+  <prismEnclosure descr="simplified prism enclosure">
+    <length unit="mm">250.0</length>
+    <height descr="up to the side rails (changed from 43.4 mm)" unit="mm">36.4</height>
+    <angle unit="deg">11.25</angle>
+    <bottomThickness descr="TBC" unit="mm">3.0</bottomThickness>
+    <sideThickness descr="TBC" unit="mm">0.9</sideThickness>
+    <backThickness descr="TBC" unit="mm">8.0</backThickness>
+    <frontThickness descr="TBC" unit="mm">3.0</frontThickness>
+    <extensionThickness descr="TBC" unit="mm">5.0</extensionThickness>
+    <material>Al</material>
+  </prismEnclosure>
+
+  <coldPlate descr="simplified cold plate">
+    <baseThickness unit="mm">6.0</baseThickness>
+    <baseMaterial>Al</baseMaterial>
+    <coolThickness unit="mm">5.0</coolThickness>
+    <coolWidth unit="mm">290.0</coolWidth>
+    <coolMaterial>TOPColdPlate</coolMaterial>
+  </coldPlate>
+  
+</QBB>

@@ -1,0 +1,23 @@
+# EventType: 1110004000 
+# Descriptor: [B0 -> pi0 pi0]
+# NickName: Bd_pi0pi0
+# Documentation: Decay file for TDCPV analysis. Generated values:  Acp = 0.34 (PDG 2019) Scp = 0.6502 (CKMFitter prediction)
+# Tested: Yes
+# Physics WG: BToCharmless and TDCPV groups
+# Responsible: F. Abudinen
+# Email: fernando.abudinen@ts.infn.it
+# Cuts: None
+# Date: 26/05/2020
+#
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0	             	VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.000   pi0 pi0   SSS_CP 1.6  dm 1 0.566911 0.841309 0.807793 0.136323;
+Enddecay
+CDecay anti-B0sig
+#
+End
+

@@ -1,0 +1,11 @@
+Import('env')
+
+env['LIBS'] = [
+    'framework',
+    'geometry',
+    'genfit2',
+    'alignment_dbobjects',
+    ]
+
+Return('env')
+

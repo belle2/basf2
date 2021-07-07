@@ -1,0 +1,24 @@
+[INFO] Steering file: analysis/tests/test_beamspot_and_ip_variables.py
+[INFO] The random number seed is set to ":-)"
+[INFO] Starting event processing, random seed is set to ':-)'
+[INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst13.root
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltags (highest priority first) are mc_production_MC13a_rev1, release-04-00-03
+[INFO]      o) IPX = 1.47059e-05
+[INFO]      o) IPY = 7.91667e-05
+[INFO]      o) IPZ = -0.000703704
+[INFO]      o) genIPX = 0.000588823
+[INFO]      o) genIPY = -1.58771e-06
+[INFO]      o) genIPZ = -0.0355383
+[INFO] Starting event processing, random seed is set to ':-)'
+[INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst14.root
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is release-05-01-03
+[INFO]      o) IPX = -0.05
+[INFO]      o) IPY = 0.017
+[INFO]      o) IPZ = -0.01
+[INFO]      o) genIPX = -0.0502637
+[INFO]      o) genIPY = 0.017112
+[INFO]      o) genIPZ = -0.0197804

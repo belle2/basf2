@@ -1,0 +1,17 @@
+Import('env')
+
+import os
+
+# Mark this folder as a sub library
+env.Dictionary()['SUBLIB'] = True
+
+# Additional libraries
+env['LIBS'] = [
+	'tracking',
+	'framework',
+	'$ROOT_LIBS',
+	'mdst_dataobjects',
+	'tracking_dataobjects'
+    ]
+
+Return('env')

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- define our own special Materials -->
+<Materials>
+  <Material name="Example-Material">
+    <density unit="g/cm3">2.5</density>
+    <!-- (optional) State can be one of Gas, Liquid, Solid, Undefined, case insensitive  -->
+    <state>Solid</state>
+    <!-- (optional) Temperature in K, if omitted, the standard value is used (273.15) -->
+    <temperature>273.15</temperature>
+    <!-- (optional) Pressure in atm, if omitted, 1.0 is used -->
+    <pressure>1.0</pressure>
+    <!-- Components of the Material, can be any combination of Elements and Materials
+         All chemical elements are predefined as Element and Material.
+         If you combine only materials you don't have to specify the density above since it can be calculated
+         automatically -->
+    <Components>
+      <Element fraction="0.75">Si</Element>
+      <Element fraction="0.20">Ga</Element>
+      <Material fraction="0.05">Al</Material>
+    </Components>
+  </Material>
+
+  <Material name="AlTeflon">
+    <density unit="g/cm3">2.256</density>
+    <Components>
+       <Element fraction="0.1330">Al</Element>
+       <Element fraction="0.2081">C</Element>
+       <Element fraction="0.6589">F</Element>
+    </Components>
+  </Material>
+
+  <Material name="5052-Alloy">
+     <density unit="g/cm3">2.68</density>
+     <Components>
+        <Element fraction="0.9620">Al</Element>
+        <Element fraction="0.0025">Cr</Element>
+        <Element fraction="0.0010">Cu</Element>
+        <Element fraction="0.0040">Fe</Element>
+        <Element fraction="0.0260">Mg</Element>
+        <Element fraction="0.0010">Mn</Element>
+        <Element fraction="0.0025">Si</Element>
+        <Element fraction="0.0010">Zn</Element>
+     </Components>
+   </Material>
+
+  <Material name="PureCsI">
+    <density unit="g/cm3">4.510</density>
+    <Components>
+       <Element fraction="0.4885">I</Element>
+       <Element fraction="0.5115">Cs</Element>
+    </Components>
+    <!-- Yield per MeV photon -->
+    <Property name="SCINTILLATIONYIELD">
+	<value energy="1.0" unit="1./MeV">1.9E+03</value> 
+    </Property>
+    <!-- Yield ratio fast/slow components -->
+    <Property name="YIELDRATIO">
+      <value energy="1.0">0.306</value>
+    </Property>
+    <Property name="FASTTIMECONSTANT">
+      <value energy="1.0" unit="ns">6</value>
+    </Property>
+    <Property name="SLOWTIMECONSTANT">
+      <value energy="1.0" unit="ns">36</value>
+    </Property>
+  </Material>
+  
+  <Material name="CsI-Tl">
+    <density unit="g/cm3">4.510</density>
+    <Components>
+      <Element fraction="0.511307">Cs</Element>
+      <Element fraction="0.488221">I</Element>
+      <!-- doped with 0.3mol% of Thallium-->
+      <Element fraction="0.000472">Tl</Element>
+    </Components>
+    <!-- Yield per MeV photon -->
+    <Property name="SCINTILLATIONYIELD">
+      <value energy="1.0">66E+03</value>
+    </Property>
+    <!-- Yield ratio fast/slow components -->
+    <Property name="YIELDRATIO">
+      <value energy="1.0">0.0</value>
+    </Property>
+    <Property name="FASTTIMECONSTANT">
+      <value energy="1.0" unit="ns">1</value>
+    </Property>
+    <Property name="SLOWTIMECONSTANT">
+      <value energy="1.0" unit="ns">1220</value>
+    </Property>
+  </Material>
+
+  <!-- LYSO properties from Saint-Gobain PreLude 420 spec sheet -->
+  <!-- http://www.crystals.saint-gobain.com/PreLude_420_Scintillator.aspx -->
+  <Material name="LYSO">
+    <density unit="g/cm3">7.1</density>
+    <Components>
+<!--      <Element fraction="1.8">Lu</Element>
+      <Element fraction="0.2">Y</Element>
+      <Element fraction="1">Si</Element>
+      <Element fraction="5">O</Element> -->
+      <Element fraction="0.7143">Lu</Element> 
+      <Element fraction="0.0403">Y</Element>
+      <Element fraction="0.0637">Si</Element>
+      <Element fraction="0.1814">O</Element>
+      <!-- Dopant concentration pulled ou of my (AB) hat... placeholder shouldn't affect anything -->
+      <Element fraction="0.0003">Ce</Element>
+    </Components>
+    <!-- Yield per MeV photon (75% of NaI) -->
+    <Property name="SCINTILLATIONYIELD">
+      <value energy="1.0" unit="1./MeV">40E+03</value>
+    </Property>
+    <!-- Yield ratio fast/slow components -->
+    <Property name="YIELDRATIO">
+      <value energy="1.0">0.0</value>
+    </Property>
+    <Property name="FASTTIMECONSTANT">
+      <value energy="1.0" unit="ns">1</value>
+    </Property>
+    <Property name="SLOWTIMECONSTANT">
+      <value energy="1.0" unit="ns">41</value>
+    </Property>
+  </Material>
+</Materials>

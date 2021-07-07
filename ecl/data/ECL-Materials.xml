@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+  <Material name="SUS304">
+    <density unit="g/cm3">8.00</density>
+    <Components>
+      <Element fraction="0.74">Fe</Element>
+      <Element fraction="0.18">Cr</Element>
+      <Element fraction="0.08">Ni</Element>
+    </Components>
+  </Material>
+  <Material name="A5083">
+    <density unit="g/cm3">2.65</density>
+    <Components>
+      <Element fraction="0.955">Al</Element>
+      <Element fraction="0.045">Mg</Element>
+    </Components>
+  </Material>
+  <Material name="A5052">
+    <density unit="g/cm3">2.68</density>
+    <Components>
+      <Element fraction="0.975">Al</Element>
+      <Element fraction="0.025">Mg</Element>
+    </Components>
+  </Material>
+  <Material name="A6063">
+    <density unit="g/cm3">2.68</density>
+    <Components>
+      <Element fraction="0.98925">Al</Element>
+      <Element fraction="0.00675">Mg</Element>
+      <Element fraction="0.004">Si</Element>
+    </Components>
+  </Material>
+  <Material name="C1220">
+    <density unit="g/cm3">8.96</density>
+    <Components>
+      <Element fraction="1">Cu</Element>
+    </Components>
+  </Material>
+
+  <Material name="WRAP250">
+    <density unit="g/cm3">0.9384</density>
+    <Components>
+       <Material fraction="0.28483">G4_Al</Material>
+       <Material fraction="0.14935">G4_MYLAR</Material>
+       <Material fraction="0.56582">G4_TEFLON</Material>
+    </Components>
+  </Material>
+  <Material name="WRAP200">
+    <density unit="g/cm3">1.173</density>
+    <Components>
+       <Material fraction="0.28483">G4_Al</Material>
+       <Material fraction="0.14935">G4_MYLAR</Material>
+       <Material fraction="0.56582">G4_TEFLON</Material>
+    </Components>
+  </Material>
+  <Material name="WRAP170">
+    <density unit="g/cm3">1.38</density>
+    <Components>
+       <Material fraction="0.28483">G4_Al</Material>
+       <Material fraction="0.14935">G4_MYLAR</Material>
+       <Material fraction="0.56582">G4_TEFLON</Material>
+    </Components>
+  </Material>
+<!-- expanded teflon can have density from 0.2 g/cm^3 here rho(Al)=2.68, rho(mylar)=1.4 and rho(ePTFE)=0.663, thickness is 25, 25 and 200 um-->
+</Materials>

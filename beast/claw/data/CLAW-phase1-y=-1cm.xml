@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="CLAW">
+  <Creator library="beast">CLAWCreator</Creator>
+  <Content>
+    <!-- normally, parameters should be defined with a unit attribute. This
+         enables automatic conversion to the default framework unit --> 
+    <stepSize unit="um">200</stepSize>
+    <!--if we don't supply a unit there can be no conversion but is still valid -->
+    <divisions>32</divisions>
+    <!-- valid values for false are: "", "0", "off", "false" (case
+         insensitive), everything else will be interpreted as true -->
+    <foo>true</foo>
+    <!-- we can also have arrays as parameters which makes it easy to get a
+         number of values as vector<double>.  The numbers can be divided by
+         whitespace, comma or semi-colon -->
+    <bar unit="cm">1 
+    </bar>
+    <ScintCell>1</ScintCell>
+    <TimeStep>0.8</TimeStep>
+    <MinTime>0.0</MinTime>
+    <MaxTime>600.0</MaxTime>
+    <PEthres>1.0</PEthres>
+    <Ethres>0.05</Ethres>
+    <C_keV_to_MIP>805.5</C_keV_to_MIP>
+    <C_MIP_to_PE>15</C_MIP_to_PE>
+    <!--
+    <Active>
+      <Material>CLAW-Material</Material>
+
+      <x_offset unit="deg">0,0,0,0,0,0,0,0</x_offset>
+      <y_offset unit="deg">0,0,0,0,0,0,0,0</y_offset>
+      <x unit="cm">18.3,30.9,41.8,70.7,-10.6,-21.6,-32.2,-42.9</x>
+      <y unit="cm">6.3,6.6,6.7,6.6,6.2,6.1,6.1,6.3</y>
+      <z unit="cm">205.3,205.0,205.5,205.7,-112.7,-113.2,-113.4,-113.7</z>
+      <ThetaZ unit="deg">90,90,90,90,90,90,90,90</ThetaZ>
+      <Phi unit="deg">0,0,0,0,180,180,180,180</Phi>
+
+      <Nscint>1</Nscint>
+      <dx_board unit="cm">3.0</dx_board>
+      <dy_board unit="cm">3.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">3.0</dx_scint>
+      <dy_scint unit="cm">3.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+
+    </Active>
+    -->
+    <Active>
+      <Material>CLAW-Material</Material>
+      <Nscint>1</Nscint>
+      <x unit="cm">17.2</x>
+      <y unit="cm">5.3</y>
+      <z_claw unit="cm">205.3</z_claw>
+      <ThetaZ unit="deg">90.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
+      <dx_board unit="cm">3.0</dx_board>
+      <dy_board unit="cm">3.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">3.0</dx_scint>
+      <dy_scint unit="cm">3.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+   <Active>
+      <Material>CLAW-Material</Material>
+      <Nscint>1</Nscint>
+      <x unit="cm">27.8</x>
+      <y unit="cm">5.6</y>
+      <z_claw unit="cm">205.0</z_claw>
+      <ThetaZ unit="deg">90.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
+      <dx_board unit="cm">3.0</dx_board>
+      <dy_board unit="cm">3.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">3.0</dx_scint>
+      <dy_scint unit="cm">3.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+    <Active>
+      <Material>CLAW-Material</Material>
+      <Nscint>1</Nscint>
+      <x unit="cm">38.7</x>
+      <y unit="cm">5.7</y>
+      <z_claw unit="cm">205.5</z_claw>
+      <ThetaZ unit="deg">90.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
+      <dx_board unit="cm">3.0</dx_board>
+      <dy_board unit="cm">3.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">3.0</dx_scint>
+      <dy_scint unit="cm">3.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+    <Active>
+      <Material>CLAW-Material</Material>
+      <Nscint>1</Nscint>
+      <x unit="cm">67.7</x>
+      <y unit="cm">5.7</y>
+      <z_claw unit="cm">205.7</z_claw>
+      <ThetaZ unit="deg">90.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
+      <dx_board unit="cm">3.0</dx_board>
+      <dy_board unit="cm">3.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">3.0</dx_scint>
+      <dy_scint unit="cm">3.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+    <Active>
+      <Material>CLAW-Material</Material>
+      <Nscint>1</Nscint>
+      <x unit="cm">-14.4</x>
+      <y unit="cm">5.2</y>
+      <z_claw unit="cm">-112.7</z_claw>
+      <ThetaZ unit="deg">90.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
+      <dx_board unit="cm">3.0</dx_board>
+      <dy_board unit="cm">3.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">3.0</dx_scint>
+      <dy_scint unit="cm">3.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+    <Active>
+      <Material>CLAW-Material</Material>
+      <Nscint>1</Nscint>
+      <x unit="cm">-25.4</x>
+      <y unit="cm">5.1</y>
+      <z_claw unit="cm">-113.2</z_claw>
+      <ThetaZ unit="deg">90.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
+      <dx_board unit="cm">3.0</dx_board>
+      <dy_board unit="cm">3.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">3.0</dx_scint>
+      <dy_scint unit="cm">3.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+    <Active>
+      <Material>CLAW-Material</Material>
+      <Nscint>1</Nscint>
+      <x unit="cm">-36.0</x>
+      <y unit="cm">5.1</y>
+      <z_claw unit="cm">-113.4</z_claw>
+      <ThetaZ unit="deg">90.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
+      <dx_board unit="cm">3.0</dx_board>
+      <dy_board unit="cm">3.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">3.0</dx_scint>
+      <dy_scint unit="cm">3.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+ 
+    <Active>
+      <Material>CLAW-Material</Material>
+      <Nscint>1</Nscint>
+      <x unit="cm">-46.7</x>
+      <y unit="cm">5.3</y>
+      <z_claw unit="cm">-113.7</z_claw>
+      <ThetaZ unit="deg">90.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
+      <dx_board unit="cm">3.0</dx_board>
+      <dy_board unit="cm">3.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">3.0</dx_scint>
+      <dy_scint unit="cm">3.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+
+
+    <!--
+    
+    <Active>
+      <Material>CLAW-Material</Material>
+      <Nscint>1</Nscint>
+      <z_claw unit="cm">0.0</z_claw>
+      <r_claw unit="cm">15.5</r_claw>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
+      <dx_board unit="cm">3.0</dx_board>
+      <dy_board unit="cm">3.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">3.0</dx_scint>
+      <dy_scint unit="cm">3.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+    <Active>
+      <Nscint>1</Nscint>
+      <Material>CLAW-Material</Material>
+      <z_claw unit="cm">0.0</z_claw>
+      <r_claw unit="cm">15.5</r_claw>
+      <ThetaZ unit="deg">0.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
+      <dx_board unit="cm">3.0</dx_board>
+      <dy_board unit="cm">3.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">3.0</dx_scint>
+      <dy_scint unit="cm">3.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+    <Active>
+      <Nscint>1</Nscint>
+      <Material>CLAW-Material</Material>
+      <z_claw unit="cm">200.0</z_claw>
+      <r_claw unit="cm">39.6</r_claw>
+      <ThetaZ unit="deg">-45.0</ThetaZ>
+      <Phi unit="deg">0.0</Phi>
+      <dx_board unit="cm">3.0</dx_board>
+      <dy_board unit="cm">3.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">3.0</dx_scint>
+      <dy_scint unit="cm">3.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+
+    <Active>
+      <Nscint>1</Nscint>
+      <Material>CLAW-Material</Material>
+      <z_claw unit="cm">200.0</z_claw>
+      <r_claw unit="cm">39.6</r_claw>
+      <ThetaZ unit="deg">-45.0</ThetaZ>
+      <Phi unit="deg">180.0</Phi>
+      <dx_board unit="cm">3.0</dx_board>
+      <dy_board unit="cm">3.0</dy_board>
+      <dz_board unit="cm">0.1</dz_board>
+      <dz_Culayer unit="cm">0.001</dz_Culayer>
+      <dx_scint unit="cm">3.0</dx_scint>
+      <dy_scint unit="cm">3.0</dy_scint>
+      <dz_scint unit="cm">0.3</dz_scint>
+      <Al_width unit="cm">0.0001</Al_width>
+    </Active>
+    -->
+
+  </Content>
+</DetectorComponent>

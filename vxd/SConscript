@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'geometry', 'simulation', 'vxd_dbobjects',
+               'vxd_dataobjects', 'genfit2', '$ROOT_LIBS', '$GEANT4_LIBS', 'alignment_dbobjects']
+
+Return('env')

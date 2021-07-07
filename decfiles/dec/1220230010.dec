@@ -1,0 +1,24 @@
+# EventType: 1220230010
+# Descriptor: [B+ -> K*+ e+ e-]cc
+# NickName: Bu_Kst+ee
+# Documentation: Rare b->s l+ l- process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Saurabh Sandilya
+# Email: saurabhsandilya@gmail.com
+# Cuts: None 
+# Date: 20170301
+#
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0  K*+     e+      e-                              PHOTOS BTOSLLBALL;
+Enddecay
+CDecay B-sig
+
+#
+End

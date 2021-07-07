@@ -1,0 +1,15 @@
+/.light
+/.externals
+/index.rst
+/whatsnew.rst
+/COPYING
+/LICENSE.md
+/site_scons/
+/framework/
+/mdst/
+/mva/
+/analysis/
+/skim/
+/geometry/
+/b2bii/
+/online_book/

@@ -1,0 +1,70 @@
+2048 2048
+
+2D0 <=
+    dddd(15 downto 0) & unamed(15 downto 11) & revoclk(10 downto 0) &
+    cntr125M(15 downto 0) &
+    unamed(15 downto 5) & ccError(4 downto 0) &
+    -- 64
+    cc(4)(8 downto 0) & tsfs(4)(209 downto 0) &
+    cc(3)(8 downto 0) & tsfs(3)(209 downto 0) &
+    cc(2)(8 downto 0) & tsfs(2)(209 downto 0) &
+    cc(1)(8 downto 0) & tsfs(1)(209 downto 0) &
+    cc(0)(8 downto 0) & tsfs(0)(209 downto 0) &
+    -- 1159
+    old_track(5 downto 0) &
+    found(5 downto 0) &
+    charge0(1 downto 0) & r0(6 downto 0) & phi0(6 downto 0) &
+    TS0-0(7 downto 0) & info0-0(12 downto 0) &
+    TS0-2(7 downto 0) & info0-2(12 downto 0) &
+    TS0-4(7 downto 0) & info0-4(12 downto 0) &
+    TS0-6(7 downto 0) & info0-6(12 downto 0) &
+    TS0-8(7 downto 0) & info0-8(12 downto 0) &
+    charge1(1 downto 0) & r1(6 downto 0) & phi1(6 downto 0) &
+    TS1-0(7 downto 0) & info1-0(12 downto 0) &
+    TS1-2(7 downto 0) & info1-2(12 downto 0) &
+    TS1-4(7 downto 0) & info1-4(12 downto 0) &
+    TS1-6(7 downto 0) & info1-6(12 downto 0) &
+    TS1-8(7 downto 0) & info1-8(12 downto 0) &
+    charge2(1 downto 0) & r2(6 downto 0) & phi2(6 downto 0) &
+    TS2-0(7 downto 0) & info2-0(12 downto 0) &
+    TS2-2(7 downto 0) & info2-2(12 downto 0) &
+    TS2-4(7 downto 0) & info2-4(12 downto 0) &
+    TS2-6(7 downto 0) & info2-6(12 downto 0) &
+    TS2-8(7 downto 0) & info2-8(12 downto 0) &
+    charge3(1 downto 0) & r3(6 downto 0) & phi3(6 downto 0) &
+    TS3-0(7 downto 0) & info3-0(12 downto 0) &
+    TS3-2(7 downto 0) & info3-2(12 downto 0) &
+    TS3-4(7 downto 0) & info3-4(12 downto 0) &
+    TS3-6(7 downto 0) & info3-6(12 downto 0) &
+    TS3-8(7 downto 0) & info3-8(12 downto 0) &
+    unamed(242 downto 1) &
+    unamed(2047 - 1897 downto 0);
+    
+
+NN <= dddd(15 downto 0)  &  "00000"  &  revoclk(10 downto 0)  &  cntr125M(15 downto 0)  & 
+unamed(1999 downto 1640) &
+active_nnt(1639 downto 1639) &
+active_tsf1(1638 downto 1619) &
+active_tsf3(1618 downto 1599) &
+active_tsf5(1598 downto 1579) &
+active_tsf7(1578 downto 1559) &
+active_2d(1558 downto 1553) &
+active_etf(1552 downto 1552) &
+Enable_NNT(1551 downto 1551) &
+MLP_Output_1(1550 downto 1538) &
+MLP_Output_0(1537 downto 1525) &
+NetSel(1524 downto 1522) &
+MLP_Input(1521 downto 1171) &
+TSF_Selected(1170 downto 982) &
+TSF7(981 downto 772) &
+TSF5(771 downto 562) &
+TSF3(561 downto 352) &
+TSF1(351 downto 142) &
+Omega(141 downto 135) &
+Phi(134 downto 128) &
+TSF0(127 downto 107) &
+TSF2(106 downto 86) &
+TSF4(85 downto 65) &
+TSF6(64 downto 44) &
+TSF8(43 downto 23) &
+ETF(22 downto 0);

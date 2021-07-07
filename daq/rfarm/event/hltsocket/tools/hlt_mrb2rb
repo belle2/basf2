@@ -1,0 +1,14 @@
+#!/bin/bash
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+CMD_STRING="--output-ring-buffer-name ${@: -1} "
+for rb in ${@:1:${#@}-1}; do
+    CMD_STRING+="--input-ring-buffer-name ${rb} "
+done
+exec b2hlt_rb2rb ${CMD_STRING}

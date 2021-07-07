@@ -1,0 +1,11 @@
+import os
+
+Import('env')
+
+#Make sure the include files are removed from the list of header files
+env['HEADER_FILES'] = [headf for headf in env['HEADER_FILES'] if str(headf).find('.h') <= -1]
+
+#Don't create a sublib for this folder
+env['SUBLIB'] = False
+
+Return('env')

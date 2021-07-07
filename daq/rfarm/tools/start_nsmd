@@ -1,0 +1,26 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import os
+import sys
+
+from rfarmutil import *
+
+argvs = sys.argv
+argc = len(argvs)
+
+if argc<=1:
+    print "Usage : start_nsmd config_name"
+    sys.exit()
+    
+start_nsmd ( argvs[1] )
+
+

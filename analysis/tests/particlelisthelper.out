@@ -1,0 +1,416 @@
+[INFO] Steering file: analysis/tests/particlelisthelper.py
+[INFO] The random number seed is set to "something important"
+[INFO] Starting event processing, random seed is set to 'something important'
+False True
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: B0:all (2+0) + anti-B0:all (3+0)
+[INFO] collection=Particles
+ PDGCode=511 Charge=0 PDGMass=5.28
+ flavorType=1 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=2 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(1.00, 0.00, 0.00) p=1
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=511 Charge=0 PDGMass=5.28
+ flavorType=1 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=6 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(3.00, 0.00, 0.00) p=3
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=-511 Charge=0 PDGMass=5.28
+ flavorType=1 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=0 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(0.00, 0.00, 0.00) p=0
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=-511 Charge=0 PDGMass=5.28
+ flavorType=1 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=4 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(2.00, 0.00, 0.00) p=2
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=-511 Charge=0 PDGMass=5.28
+ flavorType=1 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=8 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(4.00, 0.00, 0.00) p=4
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleList : pi0:all (0+5)
+[INFO] collection=Particles
+ PDGCode=111 Charge=0 PDGMass=0.135
+ flavorType=0 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=1 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(0.00, 0.00, 0.00) p=0
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=111 Charge=0 PDGMass=0.135
+ flavorType=0 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=3 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(1.00, 0.00, 0.00) p=1
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=111 Charge=0 PDGMass=0.135
+ flavorType=0 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=5 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(2.00, 0.00, 0.00) p=2
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=111 Charge=0 PDGMass=0.135
+ flavorType=0 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=7 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(3.00, 0.00, 0.00) p=3
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=111 Charge=0 PDGMass=0.135
+ flavorType=0 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=9 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(4.00, 0.00, 0.00) p=4
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: B0:all (2+0) + anti-B0:all (3+0)
+[INFO] collection=Particles
+ PDGCode=511 Charge=0 PDGMass=5.28
+ flavorType=1 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=2 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(1.00, 0.00, 0.00) p=1
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=511 Charge=0 PDGMass=5.28
+ flavorType=1 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=6 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(3.00, 0.00, 0.00) p=3
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=-511 Charge=0 PDGMass=5.28
+ flavorType=1 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=0 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(0.00, 0.00, 0.00) p=0
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=-511 Charge=0 PDGMass=5.28
+ flavorType=1 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=4 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(2.00, 0.00, 0.00) p=2
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=-511 Charge=0 PDGMass=5.28
+ flavorType=1 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=8 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(4.00, 0.00, 0.00) p=4
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleList : pi0:all (0+5)
+[INFO] collection=Particles
+ PDGCode=111 Charge=0 PDGMass=0.135
+ flavorType=0 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=1 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(0.00, 0.00, 0.00) p=0
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=111 Charge=0 PDGMass=0.135
+ flavorType=0 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=3 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(1.00, 0.00, 0.00) p=1
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=111 Charge=0 PDGMass=0.135
+ flavorType=0 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=5 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(2.00, 0.00, 0.00) p=2
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=111 Charge=0 PDGMass=0.135
+ flavorType=0 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=7 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(3.00, 0.00, 0.00) p=3
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] collection=Particles
+ PDGCode=111 Charge=0 PDGMass=0.135
+ flavorType=0 particleSource=0 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=9 identifier=-1 daughterIndices:  (none)
+ mass=0
+ momentum=(4.00, 0.00, 0.00) p=4
+ momentum scaling factor=1
+ position=(0.00, 0.00, 0.00)
+ p-value of fit (if done): -1
+ error matrix (px, py, pz, E, x, y ,z):
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+          0          0          0          0          0          0          0
+
+ extra info=( ) 
+
+[INFO] [ParticlePrinterModule] END   ------------------------------

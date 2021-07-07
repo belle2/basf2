@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import basf2
+import logging
+
+from trackfindingcdc.run.display import CDCDisplayRun
+
+def main():
+    cdc_display_run = CDCDisplayRun()
+    cdc_display_run.show_all_drawoptions = True
+    file_name_prefix = "event_"
+    cdc_display_run.configure_and_execute_from_commandline()
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
+    main()

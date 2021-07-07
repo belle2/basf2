@@ -1,0 +1,49 @@
+# EventType: 1210032000
+# Descriptor: Y(4S) -> B+ B-
+#                     [B+ -> (eta' -> pi+ pi- pi0) K+]
+#                      B- -> anything
+# NickName: Bu_etapK_pipipi0
+# Documentation:    2 Body hadronic decay
+# Tested: Yes
+# PhysicsWG: BTOCHARMLESS
+# Reponsible: Ilya Komarov
+# Email: ilya.komarov@desy.de
+# Cuts: None
+# Date: 20170314
+# Changes: Use of aliases defined in DECAY.DEC; date: 20170314; author: Pablo Goldenzweig
+
+
+#
+# Aliases
+#
+
+Alias      Etapsig    eta'
+ChargeConj Etapsig    Etapsig
+
+#
+# Y(4S) -> B+ B- 
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B-                   VSS;
+0.5 B+ B-sig                   VSS;
+Enddecay
+
+#
+# B+ -> eta' K+
+#
+
+Decay B+sig
+1.000    Etapsig  K+ PHSP;
+Enddecay
+CDecay B-sig
+
+#
+# eta' -> pi+ pi- pi0
+#
+
+Decay Etapsig
+1.000   pi+ pi- pi0      PHSP; 
+Enddecay
+
+End

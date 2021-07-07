@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+import os
+from glob import glob
+
+import argparse
+from subprocess import check_call
+
+from validation_tools import helpers
+helpers.fix_root_command_line()
+
+
+def copy_input_files(revision, first_revision):
+    try:
+        os.mkdir(os.path.join("results", revision))
+    except FileExistsError:
+        pass
+
+    for input_file in glob(os.path.join("results", first_revision, "EvtGen*.root")):
+        link_file = os.path.join("results", revision, os.path.basename(input_file))
+        try:
+            os.link(input_file, link_file)
+        except FileExistsError:
+            pass
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(usage="""Quickly compare multiple git revisions with the validation framework.
+
+    For each git-hash given as revision, the script will:
+
+        1. Checkout the git hash
+           Attention if you have a dirty git repository. The script will not try to help you with that!
+
+        2. Compile the software with the current settings.
+           You can control the scons call with the --compile-options flag.
+
+        3. Run the validation.
+           You can control the b2validation call with the --validation-options flag.
+           While running the validation, all files which match the regex EvtGen*.root will be reused
+           from the first call to save some computing time.
+
+        In the end it will show the results of the validation in your browser.
+    """)
+
+    parser.add_argument(
+        "revision",
+        nargs="+",
+        help="Which revisions to compare. Give the git hashes here."
+    )
+    parser.add_argument(
+        "--compile-options",
+        help="Options passed to scons when compiling",
+        default=""
+    )
+    parser.add_argument(
+        "--validation-options",
+        help="Options passed to b2validation when running",
+        default="--use-cache"
+    )
+
+    args = parser.parse_args()
+    revisions = args.revision
+    compile_options = args.compile_options.split(" ")
+    validation_options = args.validation_options.split(" ")
+
+    repo = helpers.get_basf2_repo(non_dirty_check=True)
+
+    try:
+        os.mkdir("results")
+    except FileExistsError:
+        pass
+
+    for revision in revisions:
+        # Step 1 Checkout git commit
+        helpers.checkout_git_revision(revision, repo=repo)
+
+        # Step 2: compile
+        helpers.compile_basf2(compile_options)
+
+        # Step 3: Copy input files
+        first_revision = revisions[0]
+        copy_input_files(revision, first_revision)
+
+        # Step 4: run validation with tag
+        helpers.run_basf2_validation(["--tag", revision] + validation_options)
+
+    # Show results
+    check_call(["b2validation-server", "--view"])

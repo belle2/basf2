@@ -1,0 +1,25 @@
+Import('env')
+
+env['LIBS'] = ['framework',
+           'vtx_dataobjects', 
+	       'pxd_dataobjects',
+	       'svd_dataobjects',
+	       'cdc_dataobjects',
+	       'top_dataobjects',
+	       'arich_dataobjects',
+	       'ecl_dataobjects',
+	       'klm_dataobjects',
+       	       'beast_beamabort_dataobjects',
+	       'beast_claws_dataobjects',
+	       'beast_claw_dataobjects',	
+	       'beast_fangs_dataobjects',
+	       'beast_plume_dataobjects',
+	       'beast_pindiode_dataobjects',
+	       'beast_he3tube_dataobjects',
+	       'beast_microtpc_dataobjects',
+       	       'beast_qcsmonitor_dataobjects',
+	       'beast_bgo_dataobjects',
+	       'beast_csi_dataobjects',		
+               '$ROOT_LIBS']
+
+Return('env')

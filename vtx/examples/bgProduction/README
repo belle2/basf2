@@ -1,0 +1,21 @@
+This folder contains shell scripts for producing background overlay files for the uprgade Belle II detector w/o PXD+SVD and w/ VTX. 
+The scripts are intended to be run on KEKCC. 
+
+Create soft link input to SADFiles. The latest SAD samples that were used for the nominal phase3 17th background campaign are at 
+/group/belle2/BGcampaigns/SAD/forG4/*_lattest_lattice.root (as of 28/01/2020).
+
+>>ln -s /group/belle2/BGcampaigns/SAD/forG4/ input
+
+Create mixing sets with VTX detector to be used for overlay file production. Always a good idea to look into the scripts to see how many 
+sets are produced (default=1) and which upgrade geometry variant is produced (default=CMOS 7 layers).  
+
+>>bash goOther-phase3.sh
+>>bash goBBBrem-phase3.sh
+
+
+Create overlay files on KEKCC running the script goOverlay-phase3.sh. Need to set BELLE2_BACKGROUND_MIXING_DIR in the bash script to point 
+to the mixing sets produced above were put. 
+
+>>bash goOverlay-phase3.sh 
+
+

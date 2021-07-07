@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="PINDIODE">
+  <Creator library="beast">PINDIODECreator</Creator>
+  <Content>
+    <!-- normally, parameters should be defined with a unit attribute. This
+         enables automatic conversion to the default framework unit --> 
+    <stepSize unit="um">200</stepSize>
+    <!--if we don't supply a unit there can be no conversion but is still valid -->
+    <divisions>32</divisions>
+    <!-- valid values for false are: "", "0", "off", "false" (case
+         insensitive), everything else will be interpreted as true -->
+    <foo>true</foo>
+    <!-- we can also have arrays as parameters which makes it easy to get a
+         number of values as vector<double>.  The numbers can be divided by
+         whitespace, comma or semi-colon -->
+    <bar unit="mm">1 2 3 4 5 6 7 8 9 10 11 12
+    </bar>
+    <CrematGain>1.4</CrematGain>
+    <WorkFunction>3.6</WorkFunction>
+    <FanoFactor>0.1</FanoFactor>
+       
+    <Active>
+      <dx_pins unit="cm">1.0</dx_pins>
+      <dy_pins unit="cm">1.0</dy_pins>
+      <dz_pins unit="cm">0.03</dz_pins>
+
+      <phase >2</phase>
+      <Material>PINDIODE-Material</Material>
+      <ThetaZ unit="deg">0.0,0.0,0.0,0.0</ThetaZ>
+      <Phi unit="deg">10.,100.,190.,-100.</Phi>
+      <!--Phi unit="deg">0.,90.,180.,-90.</Phi-->
+      <!--z unit="cm">-141.3,-168.0,-232.0,-280.0,-323.0,144.8,218.3,278.3,327.1,380.1</z-->
+      <z unit="cm">-138.3,-165.0,-229.0,-277.0,-320.0,141.8,215.3,275.3,324.1,377.1</z>
+      <r_pin unit="cm">25.5,25.5,33.0,41.5,55.5,27.0,27.0,32.4,32.4,51.8</r_pin>
+
+      
+    </Active>
+  
+
+  </Content>
+</DetectorComponent>

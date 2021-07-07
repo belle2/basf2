@@ -1,0 +1,4 @@
+Import('env')
+env['TOOLS_LIBS']['TRGUT2Template'] = ['trg_trg']
+env['TOOLS_LIBS']['TRGSignalTest'] = ['trg_trg']
+Return('env')

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="STR" xmlns:xi="http://www.w3.org/2001/XInclude">
+    <Creator library="structure">STRCreator</Creator>
+    <Content>
+
+      <!--Pole Pieces -->
+      
+	<PolePieceL description="BWD_Pole">
+	  <Material>Fe</Material>
+	  <Plane>
+	    <posZ unit="mm">-3151</posZ>
+	    <innerRadius unit="mm">950</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-2927.5</posZ>
+	    <innerRadius unit="mm">950</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-2927.5</posZ>
+	    <innerRadius unit="mm">850</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-2730</posZ>
+	    <innerRadius unit="mm">850</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-2730</posZ>
+	    <innerRadius unit="mm">700</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-2477.5</posZ>
+	    <innerRadius unit="mm">700</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-2477.5</posZ>
+	    <innerRadius unit="mm">600</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-2237.5</posZ>
+	    <innerRadius unit="mm">360</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-1945</posZ>
+	    <innerRadius unit="mm">360</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-1855</posZ>
+	    <innerRadius unit="mm">270</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-1577.5</posZ>
+	    <innerRadius unit="mm">270</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">-1477.5</posZ>
+	    <innerRadius unit="mm">270</innerRadius>
+	    <outerRadius unit="mm">1150</outerRadius>  
+	  </Plane>
+	</PolePieceL>
+
+	<PolePieceR description="FWD_Pole">
+	  <Material>Fe</Material>
+	  <Plane>
+	    <posZ unit="mm">2417.5</posZ>
+	    <innerRadius unit="mm">367</innerRadius>
+	    <outerRadius unit="mm">1150</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">2517.5</posZ>
+	    <innerRadius unit="mm">367</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">3184.5</posZ>
+	    <innerRadius unit="mm">367</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">3417.5</posZ>
+	    <innerRadius unit="mm">600</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">3417.5</posZ>
+	    <innerRadius unit="mm">700</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">3670</posZ>
+	    <innerRadius unit="mm">700</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">3670</posZ>
+	    <innerRadius unit="mm">850</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">3867.5</posZ>
+	    <innerRadius unit="mm">850</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">3867.5</posZ>
+	    <innerRadius unit="mm">950</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	  <Plane>
+	    <posZ unit="mm">4091</posZ>
+	    <innerRadius unit="mm">950</innerRadius>
+	    <outerRadius unit="mm">1250</outerRadius>  
+	  </Plane>
+	</PolePieceR>
+
+        <Phi unit="deg">0</Phi>
+        <Dphi unit="deg">360.0</Dphi>
+
+
+	<!-- Shield D1: to be defined -->
+	<ShieldD1>
+	  <Material desc="material of the Shield of the Belle II detector">Lead</Material>
+	  <Phi unit="deg">0</Phi>
+	  <Dphi unit="deg">360.0</Dphi>
+	  <ZBoundary id="1">
+	    <Zposition unit="cm">115.5</Zposition>
+	    <InnerRadius unit="cm">31.5</InnerRadius>
+	    <OuterRadius unit="cm">31.5</OuterRadius>
+	  </ZBoundary>
+	  <ZBoundary id="2">
+	    <Zposition unit="cm">164.0</Zposition>
+	    <InnerRadius unit="cm">31.5</InnerRadius>
+	    <OuterRadius unit="cm">46.7</OuterRadius>
+	  </ZBoundary>
+	</ShieldD1>
+
+
+	<!-- ECL Shields-->
+
+	<!-- FWD-A1 -->
+	<FWD_Shield desc="Parameters of the forward shield (Concept FWD-A1)">
+	  <Layers>    
+	    <Layer id="1">
+	      <Material desc="Material for top part of the FW ECL Shield">STR-Lead</Material>
+	      <Plane id="1">
+		<posZ unit="cm">210.3</posZ>
+		<innerRadius unit="cm">42.8</innerRadius>
+		<outerRadius unit="cm">42.8</outerRadius>
+	      </Plane>
+	      <Plane id="2">
+		<posZ unit="cm">215.45</posZ>
+		<innerRadius unit="cm">42.8</innerRadius>
+		<outerRadius unit="cm">44.0</outerRadius>
+	      </Plane>
+	      <Plane id="3">
+		<posZ unit="cm">215.45</posZ>
+		<innerRadius unit="cm">40.35</innerRadius>
+		<outerRadius unit="cm">44.0</outerRadius>
+	      </Plane>	
+	      <Plane id="4">
+		<posZ unit="cm">230.45</posZ>
+		<innerRadius unit="cm">43.85</innerRadius>
+		<outerRadius unit="cm">47.5</outerRadius>
+	      </Plane>
+	      <Plane id="5">
+		<posZ unit="cm">240.25</posZ>
+		<innerRadius unit="cm">43.85</innerRadius>
+		<outerRadius unit="cm">47.5</outerRadius>
+	      </Plane>
+	    </Layer>
+
+	    <Layer id="2">
+	      <Material desc="Material for bottom part of the FW ECL Shield">STR-HDPE</Material>
+	      <Phi unit="deg">0</Phi>
+	      <Dphi unit="deg">360.0</Dphi>
+	      <Plane id="1">
+		<posZ unit="cm">215.5</posZ>
+		<innerRadius unit="cm">36.7</innerRadius>
+		<outerRadius unit="cm">40.35</outerRadius>
+	      </Plane>
+	      <Plane id="2">
+		<posZ unit="cm">230.45</posZ>
+		<innerRadius unit="cm">36.7</innerRadius>
+		<outerRadius unit="cm">43.85</outerRadius>
+	      </Plane>
+	      <Plane id="3">
+		<posZ unit="cm">240.25</posZ>
+		<innerRadius unit="cm">36.7</innerRadius>
+		<outerRadius unit="cm">43.85</outerRadius>
+	      </Plane>
+	    </Layer>
+	  </Layers>
+	</FWD_Shield>
+
+
+
+	<!-- BWD: A1 -->
+	<BWD_Shield desc="Parameters of the backward ECL shield (Concept BWD-A1)">
+	  <Layers>  
+	    <Layer id="1">
+	      <Material desc="Material for top part of the BW ECL Shield">STR-Lead</Material>
+	      <Plane id="1">
+		<posZ unit="cm">-145</posZ>
+		<innerRadius unit="cm">51.5</innerRadius>
+		<outerRadius unit="cm">55.5</outerRadius>
+	      </Plane>
+	      <Plane id="2">
+		<posZ unit="cm">-125</posZ>
+		<innerRadius unit="cm">51.5</innerRadius>
+		<outerRadius unit="cm">55.5</outerRadius>
+	      </Plane>
+	      <Plane id="3">
+		<posZ unit="cm">-115.6</posZ>
+		<innerRadius unit="cm">46.5</innerRadius>
+		<outerRadius unit="cm">50.5</outerRadius>
+	      </Plane>
+	      <Plane id="4">
+		<posZ unit="cm">-108</posZ>
+		<innerRadius unit="cm">46.5</innerRadius>
+		<outerRadius unit="cm">46.5</outerRadius>
+	      </Plane>
+	    </Layer>
+	    <Layer id="2">
+	      <Material desc="Material for bottom part of the BW ECL Shield">STR-HDPE</Material>
+	      <Plane id="1">
+		<posZ unit="cm">-145</posZ>
+		<innerRadius unit="cm">46.5</innerRadius>
+		<outerRadius unit="cm">51.5</outerRadius>
+	      </Plane>
+	      <Plane id="2">
+		<posZ unit="cm">-125</posZ>
+		<innerRadius unit="cm">46.5</innerRadius>
+		<outerRadius unit="cm">51.5</outerRadius>
+	      </Plane>
+	      <Plane id="3">
+		<posZ unit="cm">-115.6</posZ>
+		<innerRadius unit="cm">46.5</innerRadius>
+		<outerRadius unit="cm">46.5</outerRadius>
+	      </Plane>
+	    </Layer>
+	  </Layers>
+	</BWD_Shield>
+    </Content>
+</DetectorComponent>

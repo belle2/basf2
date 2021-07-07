@@ -1,0 +1,8 @@
+Import('env')
+
+env['LIBS'] = [
+    'genfit2',
+    'simulation_dataobjects'
+    ]
+
+Return('env')

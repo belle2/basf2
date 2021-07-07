@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['vxd', 'pxd', 'svd', 'pxd_dataobjects', 'svd_dataobjects', 'framework']
+
+
+Return('env')

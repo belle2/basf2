@@ -1,0 +1,2978 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="ECL" xmlns:xi="http://www.w3.org/2001/XInclude">
+   <Creator library="ecl">ECLCreator</Creator>
+   <Content>
+     <!-- include First correction xml file for 
+	  ecl/modules/eclRecShower/src/ECLReconstructorModule -->
+     <xi:include href="ECL-FirstCorrection.xml"/>
+     
+     <BeamBackgroundStudy desc="select 1 if you want to record neutron and gamma hits">0</BeamBackgroundStudy>
+     <CsI>CsI</CsI>
+     <Si>Si</Si>
+     <Al>Al</Al>
+     <AlTeflon>AlTeflon</AlTeflon>
+     <AlTeflon_thin>AlTeflon_thin</AlTeflon_thin>
+     <AlTeflon_thinpenta>AlTeflon_thinpenta</AlTeflon_thinpenta>
+     
+     <k_fin_thickness unit="cm">0.05</k_fin_thickness>
+     <k_wrap_thickness unit="cm">0.025</k_wrap_thickness>
+     <k_barrel_Nblock>72</k_barrel_Nblock>
+     <k_endcap_Nblock>16</k_endcap_Nblock>
+     <k_Crystall_HalfLength unit="cm">15.0000000</k_Crystall_HalfLength>
+     
+     <k_Zero unit="cm">0.00000001</k_Zero>
+     <k_ForwZnear unit="cm">196.0</k_ForwZnear>
+     <k_ForwZfar  unit="cm">227.0</k_ForwZfar>
+     <k_ForwRout_ang  unit="deg">31.62</k_ForwRout_ang>
+     <k_ForwRin_ang   unit="deg">12.398</k_ForwRin_ang>
+     <k_backZnear unit="cm">102.02</k_backZnear>
+     <k_backwZfar unit="cm">131.42</k_backwZfar>
+     <k_backRout_ang  unit="deg">31.62</k_backRout_ang>
+     <k_backRin_ang   unit="deg">12.398</k_backRin_ang>
+     <k_diodewidth   unit="cm">2.0</k_diodewidth>
+     <k_diodelength   unit="cm">2.0</k_diodelength>
+     <k_diodeheight   unit="cm">0.1</k_diodeheight>
+     
+     
+     <BarrelCrystals>
+       <BarrelCrystal id="1">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5868</K_Bb>
+         <K_Bh unit="cm">5.4504</K_Bh>
+         <K_BA unit="cm">6.0997</K_BA>
+         <K_BH unit="cm">6.1682</K_BH>
+         <K_z_TILTED unit="deg">33.667039</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.149806</K_phi_TILTED>
+         <K_perpC unit="cm">136.08246</K_perpC>
+         <K_phiC unit="deg">1.344548</K_phiC>
+         <K_zC unit="cm">210.1509</K_zC>
+         <K_phi_init unit="deg">0.0094779</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="2">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5835</K_Bb>
+         <K_Bh unit="cm">5.4504</K_Bh>
+         <K_BA unit="cm">6.1258</K_BA>
+         <K_BH unit="cm">6.1944</K_BH>
+         <K_z_TILTED unit="deg">35.062886</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.147486</K_phi_TILTED>
+         <K_perpC unit="cm">136.3568</K_perpC>
+         <K_phiC unit="deg">1.346858</K_phiC>
+         <K_zC unit="cm">200.1352</K_zC>
+         <K_phi_init unit="deg">0.0093314</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="3">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5799</K_Bb>
+         <K_Bh unit="cm">5.4505</K_Bh>
+         <K_BA unit="cm">6.1524</K_BA>
+         <K_BH unit="cm">6.2213</K_BH>
+         <K_z_TILTED unit="deg">36.509337</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.145152</K_phi_TILTED>
+         <K_perpC unit="cm">136.63413</K_perpC>
+         <K_phiC unit="deg">1.349183</K_phiC>
+         <K_zC unit="cm">190.44125</K_zC>
+         <K_phi_init unit="deg">0.0091685</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="4">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5761</K_Bb>
+         <K_Bh unit="cm">5.4505</K_Bh>
+         <K_BA unit="cm">6.1794</K_BA>
+         <K_BH unit="cm">6.2485</K_BH>
+         <K_z_TILTED unit="deg">38.007345</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.142808</K_phi_TILTED>
+         <K_perpC unit="cm">136.91361</K_perpC>
+         <K_phiC unit="deg">1.351517</K_phiC>
+         <K_zC unit="cm">181.05076</K_zC>
+         <K_phi_init unit="deg">0.0089954</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="5">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.572</K_Bb>
+         <K_Bh unit="cm">5.4505</K_Bh>
+         <K_BA unit="cm">6.2069</K_BA>
+         <K_BH unit="cm">6.2762</K_BH>
+         <K_z_TILTED unit="deg">39.557769</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.140464</K_phi_TILTED>
+         <K_perpC unit="cm">137.19443</K_perpC>
+         <K_phiC unit="deg">1.353851</K_phiC>
+         <K_zC unit="cm">171.94627</K_zC>
+         <K_phi_init unit="deg">0.0088082</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="6">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5677</K_Bb>
+         <K_Bh unit="cm">5.4506</K_Bh>
+         <K_BA unit="cm">6.2346</K_BA>
+         <K_BH unit="cm">6.3043</K_BH>
+         <K_z_TILTED unit="deg">41.161373</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.138123</K_phi_TILTED>
+         <K_perpC unit="cm">137.47567</K_perpC>
+         <K_phiC unit="deg">1.35618</K_phiC>
+         <K_zC unit="cm">163.03355</K_zC>
+         <K_phi_init unit="deg">0.0086097</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="7">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5631</K_Bb>
+         <K_Bh unit="cm">5.4506</K_Bh>
+         <K_BA unit="cm">6.2627</K_BA>
+         <K_BH unit="cm">6.3325</K_BH>
+         <K_z_TILTED unit="deg">42.818633</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.135799</K_phi_TILTED>
+         <K_perpC unit="cm">137.75617</K_perpC>
+         <K_phiC unit="deg">1.358492</K_phiC>
+         <K_zC unit="cm">154.45059</K_zC>
+         <K_phi_init unit="deg">0.0084015</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="8">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5581</K_Bb>
+         <K_Bh unit="cm">5.4506</K_Bh>
+         <K_BA unit="cm">6.2909</K_BA>
+         <K_BH unit="cm">6.361</K_BH>
+         <K_z_TILTED unit="deg">44.530027</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.133499</K_phi_TILTED>
+         <K_perpC unit="cm">138.03479</K_perpC>
+         <K_phiC unit="deg">1.360779</K_phiC>
+         <K_zC unit="cm">146.1044</K_zC>
+         <K_phi_init unit="deg">0.0081729</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="9">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5528</K_Bb>
+         <K_Bh unit="cm">5.4507</K_Bh>
+         <K_BA unit="cm">6.3193</K_BA>
+         <K_BH unit="cm">6.3896</K_BH>
+         <K_z_TILTED unit="deg">46.295838</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.131233</K_phi_TILTED>
+         <K_perpC unit="cm">138.3103</K_perpC>
+         <K_phiC unit="deg">1.363031</K_phiC>
+         <K_zC unit="cm">137.97964</K_zC>
+         <K_phi_init unit="deg">0.0079282</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="10">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5472</K_Bb>
+         <K_Bh unit="cm">5.4509</K_Bh>
+         <K_BA unit="cm">6.3476</K_BA>
+         <K_BH unit="cm">6.4181</K_BH>
+         <K_z_TILTED unit="deg">48.115876</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.129013</K_phi_TILTED>
+         <K_perpC unit="cm">138.58124</K_perpC>
+         <K_phiC unit="deg">1.365237</K_phiC>
+         <K_zC unit="cm">129.99329</K_zC>
+         <K_phi_init unit="deg">0.0076708</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="11">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5413</K_Bb>
+         <K_Bh unit="cm">5.4508</K_Bh>
+         <K_BA unit="cm">6.3758</K_BA>
+         <K_BH unit="cm">6.4466</K_BH>
+         <K_z_TILTED unit="deg">49.990235</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.126853</K_phi_TILTED>
+         <K_perpC unit="cm">138.84605</K_perpC>
+         <K_phiC unit="deg">1.367384</K_phiC>
+         <K_zC unit="cm">122.2673</K_zC>
+         <K_phi_init unit="deg">0.0073979</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="12">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.535</K_Bb>
+         <K_Bh unit="cm">5.4508</K_Bh>
+         <K_BA unit="cm">6.4037</K_BA>
+         <K_BH unit="cm">6.4748</K_BH>
+         <K_z_TILTED unit="deg">51.91882</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.124761</K_phi_TILTED>
+         <K_perpC unit="cm">139.1033</K_perpC>
+         <K_phiC unit="deg">1.36946</K_phiC>
+         <K_zC unit="cm">114.72001</K_zC>
+         <K_phi_init unit="deg">0.0071043</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="13">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5284</K_Bb>
+         <K_Bh unit="cm">5.4509</K_Bh>
+         <K_BA unit="cm">6.4313</K_BA>
+         <K_BH unit="cm">6.5027</K_BH>
+         <K_z_TILTED unit="deg">53.900865</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.122752</K_phi_TILTED>
+         <K_perpC unit="cm">139.35127</K_perpC>
+         <K_phiC unit="deg">1.371455</K_phiC>
+         <K_zC unit="cm">107.33807</K_zC>
+         <K_phi_init unit="deg">0.0067973</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="14">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5214</K_Bb>
+         <K_Bh unit="cm">5.4509</K_Bh>
+         <K_BA unit="cm">6.4583</K_BA>
+         <K_BH unit="cm">6.5299</K_BH>
+         <K_z_TILTED unit="deg">55.935415</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.120839</K_phi_TILTED>
+         <K_perpC unit="cm">139.58816</K_perpC>
+         <K_phiC unit="deg">1.373352</K_phiC>
+         <K_zC unit="cm">100.04758</K_zC>
+         <K_phi_init unit="deg">0.0064692</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="15">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5141</K_Bb>
+         <K_Bh unit="cm">5.4509</K_Bh>
+         <K_BA unit="cm">6.4847</K_BA>
+         <K_BH unit="cm">6.5565</K_BH>
+         <K_z_TILTED unit="deg">58.021324</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.119034</K_phi_TILTED>
+         <K_perpC unit="cm">139.81218</K_perpC>
+         <K_phiC unit="deg">1.37514</K_phiC>
+         <K_zC unit="cm">92.958566</K_zC>
+         <K_phi_init unit="deg">0.0061243</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="16">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5064</K_Bb>
+         <K_Bh unit="cm">5.451</K_Bh>
+         <K_BA unit="cm">6.5103</K_BA>
+         <K_BH unit="cm">6.5823</K_BH>
+         <K_z_TILTED unit="deg">60.157158</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.117354</K_phi_TILTED>
+         <K_perpC unit="cm">140.0215</K_perpC>
+         <K_phiC unit="deg">1.376804</K_phiC>
+         <K_zC unit="cm">85.998068</K_zC>
+         <K_phi_init unit="deg">0.0057629</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="17">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4984</K_Bb>
+         <K_Bh unit="cm">5.451</K_Bh>
+         <K_BA unit="cm">6.5349</K_BA>
+         <K_BH unit="cm">6.6071</K_BH>
+         <K_z_TILTED unit="deg">62.3412</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.115811</K_phi_TILTED>
+         <K_perpC unit="cm">140.2142</K_perpC>
+         <K_phiC unit="deg">1.378331</K_phiC>
+         <K_zC unit="cm">79.154703</K_zC>
+         <K_phi_init unit="deg">0.0053871</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="18">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4901</K_Bb>
+         <K_Bh unit="cm">5.4511</K_Bh>
+         <K_BA unit="cm">6.5583</K_BA>
+         <K_BH unit="cm">6.6308</K_BH>
+         <K_z_TILTED unit="deg">64.571442</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.114419</K_phi_TILTED>
+         <K_perpC unit="cm">140.38847</K_perpC>
+         <K_phiC unit="deg">1.379707</K_phiC>
+         <K_zC unit="cm">72.361706</K_zC>
+         <K_phi_init unit="deg">0.0049894</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="19">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4814</K_Bb>
+         <K_Bh unit="cm">5.4511</K_Bh>
+         <K_BA unit="cm">6.5804</K_BA>
+         <K_BH unit="cm">6.6531</K_BH>
+         <K_z_TILTED unit="deg">66.8455</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.113191</K_phi_TILTED>
+         <K_perpC unit="cm">140.54243</K_perpC>
+         <K_phiC unit="deg">1.380918</K_phiC>
+         <K_zC unit="cm">65.720399</K_zC>
+         <K_phi_init unit="deg">0.0045735</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="20">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4724</K_Bb>
+         <K_Bh unit="cm">5.4511</K_Bh>
+         <K_BA unit="cm">6.601</K_BA>
+         <K_BH unit="cm">6.6739</K_BH>
+         <K_z_TILTED unit="deg">69.160698</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.112142</K_phi_TILTED>
+         <K_perpC unit="cm">140.67433</K_perpC>
+         <K_phiC unit="deg">1.381951</K_phiC>
+         <K_zC unit="cm">59.164908</K_zC>
+         <K_phi_init unit="deg">0.0041429</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="21">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4631</K_Bb>
+         <K_Bh unit="cm">5.4512</K_Bh>
+         <K_BA unit="cm">6.62</K_BA>
+         <K_BH unit="cm">6.6931</K_BH>
+         <K_z_TILTED unit="deg">71.513983</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.111281</K_phi_TILTED>
+         <K_perpC unit="cm">140.78251</K_perpC>
+         <K_phiC unit="deg">1.382796</K_phiC>
+         <K_zC unit="cm">52.685555</K_zC>
+         <K_phi_init unit="deg">0.0037002</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="22">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4535</K_Bb>
+         <K_Bh unit="cm">5.4512</K_Bh>
+         <K_BA unit="cm">6.6372</K_BA>
+         <K_BH unit="cm">6.7104</K_BH>
+         <K_z_TILTED unit="deg">73.902011</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.110622</K_phi_TILTED>
+         <K_perpC unit="cm">140.86538</K_perpC>
+         <K_phiC unit="deg">1.383439</K_phiC>
+         <K_zC unit="cm">46.220681</K_zC>
+         <K_phi_init unit="deg">0.0032365</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="23">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4437</K_Bb>
+         <K_Bh unit="cm">5.4512</K_Bh>
+         <K_BA unit="cm">6.6525</K_BA>
+         <K_BH unit="cm">6.7258</K_BH>
+         <K_z_TILTED unit="deg">76.321253</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.110176</K_phi_TILTED>
+         <K_perpC unit="cm">140.92156</K_perpC>
+         <K_phiC unit="deg">1.38387</K_phiC>
+         <K_zC unit="cm">39.866112</K_zC>
+         <K_phi_init unit="deg">0.0027623</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="24">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4337</K_Bb>
+         <K_Bh unit="cm">5.4513</K_Bh>
+         <K_BA unit="cm">6.6656</K_BA>
+         <K_BH unit="cm">6.7392</K_BH>
+         <K_z_TILTED unit="deg">78.767888</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.109949</K_phi_TILTED>
+         <K_perpC unit="cm">140.94987</K_perpC>
+         <K_phiC unit="deg">1.384082</K_phiC>
+         <K_zC unit="cm">33.560753</K_zC>
+         <K_phi_init unit="deg">0.0022805</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="25">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4235</K_Bb>
+         <K_Bh unit="cm">5.4513</K_Bh>
+         <K_BA unit="cm">6.6766</K_BA>
+         <K_BH unit="cm">6.7502</K_BH>
+         <K_z_TILTED unit="deg">81.237718</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.109951</K_phi_TILTED>
+         <K_perpC unit="cm">140.94929</K_perpC>
+         <K_phiC unit="deg">1.384067</K_phiC>
+         <K_zC unit="cm">27.296208</K_zC>
+         <K_phi_init unit="deg">0.0017824</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="26">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4132</K_Bb>
+         <K_Bh unit="cm">5.4513</K_Bh>
+         <K_BA unit="cm">6.6852</K_BA>
+         <K_BH unit="cm">6.7589</K_BH>
+         <K_z_TILTED unit="deg">83.726351</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.110187</K_phi_TILTED>
+         <K_perpC unit="cm">140.91908</K_perpC>
+         <K_phiC unit="deg">1.383817</K_phiC>
+         <K_zC unit="cm">21.013891</K_zC>
+         <K_phi_init unit="deg">0.0012817</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="27">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4028</K_Bb>
+         <K_Bh unit="cm">5.4513</K_Bh>
+         <K_BA unit="cm">6.6915</K_BA>
+         <K_BH unit="cm">6.7652</K_BH>
+         <K_z_TILTED unit="deg">86.229301</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.110662</K_phi_TILTED>
+         <K_perpC unit="cm">140.85877</K_perpC>
+         <K_phiC unit="deg">1.383331</K_phiC>
+         <K_zC unit="cm">14.806585</K_zC>
+         <K_phi_init unit="deg">0.0007731</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="28">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.3922</K_Bb>
+         <K_Bh unit="cm">5.4513</K_Bh>
+         <K_BA unit="cm">6.6952</K_BA>
+         <K_BH unit="cm">6.769</K_BH>
+         <K_z_TILTED unit="deg">88.741891</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.111377</K_phi_TILTED>
+         <K_perpC unit="cm">140.76816</K_perpC>
+         <K_phiC unit="deg">1.382604</K_phiC>
+         <K_zC unit="cm">8.615872</K_zC>
+         <K_phi_init unit="deg">0.0002556</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="29">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.387</K_Bb>
+         <K_Bh unit="cm">5.45</K_Bh>
+         <K_BA unit="cm">6.6962</K_BA>
+         <K_BH unit="cm">5.45</K_BH>
+         <K_z_TILTED unit="deg">90</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.112094</K_phi_TILTED>
+         <K_perpC unit="cm">140.7115</K_perpC>
+         <K_phiC unit="deg">1.382185</K_phiC>
+         <K_zC unit="cm">2.775</K_zC>
+         <K_phi_init unit="deg">0.0000000</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="30">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.387</K_Bb>
+         <K_Bh unit="cm">5.45</K_Bh>
+         <K_BA unit="cm">6.6962</K_BA>
+         <K_BH unit="cm">5.45</K_BH>
+         <K_z_TILTED unit="deg">90</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.112094</K_phi_TILTED>
+         <K_perpC unit="cm">140.7115</K_perpC>
+         <K_phiC unit="deg">1.382185</K_phiC>
+         <K_zC unit="cm">-2.775</K_zC>
+         <K_phi_init unit="deg">0.0000000</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="31">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.3922</K_Bb>
+         <K_Bh unit="cm">5.4513</K_Bh>
+         <K_BA unit="cm">6.6952</K_BA>
+         <K_BH unit="cm">6.769</K_BH>
+         <K_z_TILTED unit="deg">91.258109</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.111914</K_phi_TILTED>
+         <K_perpC unit="cm">140.76816</K_perpC>
+         <K_phiC unit="deg">1.38266</K_phiC>
+         <K_zC unit="cm">-8.615872</K_zC>
+         <K_phi_init unit="deg">0.0002551</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="32">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4028</K_Bb>
+         <K_Bh unit="cm">5.4513</K_Bh>
+         <K_BA unit="cm">6.6915</K_BA>
+         <K_BH unit="cm">6.7652</K_BH>
+         <K_z_TILTED unit="deg">93.770699</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.111198</K_phi_TILTED>
+         <K_perpC unit="cm">140.85877</K_perpC>
+         <K_phiC unit="deg">1.383364</K_phiC>
+         <K_zC unit="cm">-14.806585</K_zC>
+         <K_phi_init unit="deg">0.0007732</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="33">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4132</K_Bb>
+         <K_Bh unit="cm">5.4513</K_Bh>
+         <K_BA unit="cm">6.6852</K_BA>
+         <K_BH unit="cm">6.7589</K_BH>
+         <K_z_TILTED unit="deg">96.273649</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.110722</K_phi_TILTED>
+         <K_perpC unit="cm">140.91908</K_perpC>
+         <K_phiC unit="deg">1.383828</K_phiC>
+         <K_zC unit="cm">-21.013891</K_zC>
+         <K_phi_init unit="deg">0.0012841</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="34">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4235</K_Bb>
+         <K_Bh unit="cm">5.4513</K_Bh>
+         <K_BA unit="cm">6.6766</K_BA>
+         <K_BH unit="cm">6.7502</K_BH>
+         <K_z_TILTED unit="deg">98.762282</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.110484</K_phi_TILTED>
+         <K_perpC unit="cm">140.94929</K_perpC>
+         <K_phiC unit="deg">1.384055</K_phiC>
+         <K_zC unit="cm">-27.296208</K_zC>
+         <K_phi_init unit="deg">0.0017823</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="35">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4337</K_Bb>
+         <K_Bh unit="cm">5.4513</K_Bh>
+         <K_BA unit="cm">6.6656</K_BA>
+         <K_BH unit="cm">6.7392</K_BH>
+         <K_z_TILTED unit="deg">101.23211</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.110476</K_phi_TILTED>
+         <K_perpC unit="cm">140.94987</K_perpC>
+         <K_phiC unit="deg">1.384049</K_phiC>
+         <K_zC unit="cm">-33.560753</K_zC>
+         <K_phi_init unit="deg">0.0022779</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="36">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4437</K_Bb>
+         <K_Bh unit="cm">5.4512</K_Bh>
+         <K_BA unit="cm">6.6525</K_BA>
+         <K_BH unit="cm">6.7258</K_BH>
+         <K_z_TILTED unit="deg">103.67875</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.110695</K_phi_TILTED>
+         <K_perpC unit="cm">140.92156</K_perpC>
+         <K_phiC unit="deg">1.383814</K_phiC>
+         <K_zC unit="cm">-39.866112</K_zC>
+         <K_phi_init unit="deg">0.0027637</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="37">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4535</K_Bb>
+         <K_Bh unit="cm">5.4512</K_Bh>
+         <K_BA unit="cm">6.6372</K_BA>
+         <K_BH unit="cm">6.7104</K_BH>
+         <K_z_TILTED unit="deg">106.09799</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.111134</K_phi_TILTED>
+         <K_perpC unit="cm">140.86538</K_perpC>
+         <K_phiC unit="deg">1.38336</K_phiC>
+         <K_zC unit="cm">-46.220681</K_zC>
+         <K_phi_init unit="deg">0.0032360</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="38">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4631</K_Bb>
+         <K_Bh unit="cm">5.4512</K_Bh>
+         <K_BA unit="cm">6.62</K_BA>
+         <K_BH unit="cm">6.6931</K_BH>
+         <K_z_TILTED unit="deg">108.48602</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.111783</K_phi_TILTED>
+         <K_perpC unit="cm">140.78251</K_perpC>
+         <K_phiC unit="deg">1.382696</K_phiC>
+         <K_zC unit="cm">-52.685555</K_zC>
+         <K_phi_init unit="deg">0.0036976</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="39">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4724</K_Bb>
+         <K_Bh unit="cm">5.4511</K_Bh>
+         <K_BA unit="cm">6.601</K_BA>
+         <K_BH unit="cm">6.6739</K_BH>
+         <K_z_TILTED unit="deg">110.8393</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.112633</K_phi_TILTED>
+         <K_perpC unit="cm">140.67434</K_perpC>
+         <K_phiC unit="deg">1.38183</K_phiC>
+         <K_zC unit="cm">-59.164908</K_zC>
+         <K_phi_init unit="deg">0.0041429</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="40">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4814</K_Bb>
+         <K_Bh unit="cm">5.4511</K_Bh>
+         <K_BA unit="cm">6.5804</K_BA>
+         <K_BH unit="cm">6.6531</K_BH>
+         <K_z_TILTED unit="deg">113.1545</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.11367</K_phi_TILTED>
+         <K_perpC unit="cm">140.54244</K_perpC>
+         <K_phiC unit="deg">1.380775</K_phiC>
+         <K_zC unit="cm">-65.720399</K_zC>
+         <K_phi_init unit="deg">0.0045760</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="41">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4901</K_Bb>
+         <K_Bh unit="cm">5.4511</K_Bh>
+         <K_BA unit="cm">6.5583</K_BA>
+         <K_BH unit="cm">6.6308</K_BH>
+         <K_z_TILTED unit="deg">115.42856</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.114885</K_phi_TILTED>
+         <K_perpC unit="cm">140.38848</K_perpC>
+         <K_phiC unit="deg">1.379544</K_phiC>
+         <K_zC unit="cm">-72.361706</K_zC>
+         <K_phi_init unit="deg">0.0049879</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="42">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.4984</K_Bb>
+         <K_Bh unit="cm">5.451</K_Bh>
+         <K_BA unit="cm">6.5349</K_BA>
+         <K_BH unit="cm">6.6071</K_BH>
+         <K_z_TILTED unit="deg">117.6588</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.116264</K_phi_TILTED>
+         <K_perpC unit="cm">140.21421</K_perpC>
+         <K_phiC unit="deg">1.378149</K_phiC>
+         <K_zC unit="cm">-79.154703</K_zC>
+         <K_phi_init unit="deg">0.0053831</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="43">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5064</K_Bb>
+         <K_Bh unit="cm">5.451</K_Bh>
+         <K_BA unit="cm">6.5103</K_BA>
+         <K_BH unit="cm">6.5823</K_BH>
+         <K_z_TILTED unit="deg">119.84284</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.117794</K_phi_TILTED>
+         <K_perpC unit="cm">140.02151</K_perpC>
+         <K_phiC unit="deg">1.376603</K_phiC>
+         <K_zC unit="cm">-85.998068</K_zC>
+         <K_phi_init unit="deg">0.0057635</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="44">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5141</K_Bb>
+         <K_Bh unit="cm">5.4509</K_Bh>
+         <K_BA unit="cm">6.4847</K_BA>
+         <K_BH unit="cm">6.5565</K_BH>
+         <K_z_TILTED unit="deg">121.97868</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.11946</K_phi_TILTED>
+         <K_perpC unit="cm">139.81219</K_perpC>
+         <K_phiC unit="deg">1.374921</K_phiC>
+         <K_zC unit="cm">-92.958566</K_zC>
+         <K_phi_init unit="deg">0.0061287</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="45">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5214</K_Bb>
+         <K_Bh unit="cm">5.4509</K_Bh>
+         <K_BA unit="cm">6.4583</K_BA>
+         <K_BH unit="cm">6.5299</K_BH>
+         <K_z_TILTED unit="deg">124.06458</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.12125</K_phi_TILTED>
+         <K_perpC unit="cm">139.58817</K_perpC>
+         <K_phiC unit="deg">1.373115</K_phiC>
+         <K_zC unit="cm">-100.04758</K_zC>
+         <K_phi_init unit="deg">0.0064684</K_phi_init>
+       </BarrelCrystal>
+       
+       <BarrelCrystal id="46">
+         <K_BLL unit="cm">30</K_BLL>
+         <K_Ba unit="cm">5.387</K_Ba>
+         <K_Bb unit="cm">5.5284</K_Bb>
+         <K_Bh unit="cm">5.4509</K_Bh>
+         <K_BA unit="cm">6.4313</K_BA>
+         <K_BH unit="cm">6.5027</K_BH>
+         <K_z_TILTED unit="deg">126.09914</K_z_TILTED>
+         <K_phi_TILTED unit="deg">1.123148</K_phi_TILTED>
+         <K_perpC unit="cm">139.35128</K_perpC>
+         <K_phiC unit="deg">1.371201</K_phiC>
+         <K_zC unit="cm">-107.27696</K_zC>
+         <K_phi_init unit="deg">0.0067926</K_phi_init>
+       </BarrelCrystal>
+       
+     </BarrelCrystals>
+     <EndCapCrystals>
+       
+       <EndCapCrystal id="1">
+         <K_h1 unit="cm">2.646800</K_h1>
+         <K_h2 unit="cm">3.066002</K_h2>
+         <K_bl1 unit="cm">3.139250</K_bl1>
+         <K_bl2 unit="cm">3.637884</K_bl2>
+         <K_tl1 unit="cm">2.802500</K_tl1>
+         <K_tl2 unit="cm">3.247800</K_tl2>
+         <K_alpha1 unit="deg">0.000002</K_alpha1>
+         <K_alpha2 unit="deg">0.000002</K_alpha2>
+         <K_Rphi1 unit="deg">-269.992514</K_Rphi1>
+         <K_Rtheta unit="deg">13.949294</K_Rtheta>
+         <K_Rphi2 unit="deg">3.742587</K_Rphi2>
+         <K_Pr unit="cm">217.249230</K_Pr>
+         <K_Ptheta unit="deg">13.180600</K_Ptheta>
+         <K_Pphi unit="deg">3.764568</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="2">
+         <K_h1 unit="cm">2.646799</K_h1>
+         <K_h2 unit="cm">3.066002</K_h2>
+         <K_bl1 unit="cm">3.151800</K_bl1>
+         <K_bl2 unit="cm">3.650442</K_bl2>
+         <K_tl1 unit="cm">2.815000</K_tl1>
+         <K_tl2 unit="cm">3.260300</K_tl2>
+         <K_alpha1 unit="deg">0.000000</K_alpha1>
+         <K_alpha2 unit="deg">-0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-269.978094</K_Rphi1>
+         <K_Rtheta unit="deg">13.948833</K_Rtheta>
+         <K_Rphi2 unit="deg">11.228194</K_Rphi2>
+         <K_Pr unit="cm">217.249634</K_Pr>
+         <K_Ptheta unit="deg">13.180591</K_Ptheta>
+         <K_Pphi unit="deg">11.250220</K_Pphi>
+       </EndCapCrystal>
+
+       <EndCapCrystal id="3">
+         <K_h1 unit="cm">2.646800</K_h1>
+         <K_h2 unit="cm">3.066003</K_h2>
+         <K_bl1 unit="cm">3.139250</K_bl1>
+         <K_bl2 unit="cm">3.637885</K_bl2>
+         <K_tl1 unit="cm">2.802500</K_tl1>
+         <K_tl2 unit="cm">3.247800</K_tl2>
+         <K_alpha1 unit="deg">0.000009</K_alpha1>
+         <K_alpha2 unit="deg">0.000008</K_alpha2>
+         <K_Rphi1 unit="deg">-269.963024</K_Rphi1>
+         <K_Rtheta unit="deg">13.947889</K_Rtheta>
+         <K_Rphi2 unit="deg">18.714230</K_Rphi2>
+         <K_Pr unit="cm">217.250430</K_Pr>
+         <K_Ptheta unit="deg">13.180557</K_Ptheta>
+         <K_Pphi unit="deg">18.735922</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="4">
+         <K_h1 unit="cm">2.657465</K_h1>
+         <K_h2 unit="cm">3.074847</K_h2>
+         <K_bl1 unit="cm">3.503806</K_bl1>
+         <K_bl2 unit="cm">4.055166</K_bl2>
+         <K_tl1 unit="cm">3.168200</K_tl1>
+         <K_tl2 unit="cm">3.666850</K_tl2>
+         <K_alpha1 unit="deg">-0.000085</K_alpha1>
+         <K_alpha2 unit="deg">-0.000084</K_alpha2>
+         <K_Rphi1 unit="deg">-269.993227</K_Rphi1>
+         <K_Rtheta unit="deg">15.486923</K_Rtheta>
+         <K_Rphi2 unit="deg">3.743465</K_Rphi2>
+         <K_Pr unit="cm">218.717577</K_Pr>
+         <K_Ptheta unit="deg">14.698987</K_Ptheta>
+         <K_Pphi unit="deg">3.763041</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="5">
+         <K_h1 unit="cm">2.658202</K_h1>
+         <K_h2 unit="cm">3.075521</K_h2>
+         <K_bl1 unit="cm">3.516391</K_bl1>
+         <K_bl2 unit="cm">4.067792</K_bl2>
+         <K_tl1 unit="cm">3.180700</K_tl1>
+         <K_tl2 unit="cm">3.679400</K_tl2>
+         <K_alpha1 unit="deg">0.000007</K_alpha1>
+         <K_alpha2 unit="deg">0.000011</K_alpha2>
+         <K_Rphi1 unit="deg">-269.979958</K_Rphi1>
+         <K_Rtheta unit="deg">15.486326</K_Rtheta>
+         <K_Rphi2 unit="deg">11.230854</K_Rphi2>
+         <K_Pr unit="cm">218.718015</K_Pr>
+         <K_Ptheta unit="deg">14.699156</K_Ptheta>
+         <K_Pphi unit="deg">11.250317</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="6">
+         <K_h1 unit="cm">2.657454</K_h1>
+         <K_h2 unit="cm">3.074772</K_h2>
+         <K_bl1 unit="cm">3.503805</K_bl1>
+         <K_bl2 unit="cm">4.055158</K_bl2>
+         <K_tl1 unit="cm">3.168200</K_tl1>
+         <K_tl2 unit="cm">3.666850</K_tl2>
+         <K_alpha1 unit="deg">-0.000096</K_alpha1>
+         <K_alpha2 unit="deg">-0.000097</K_alpha2>
+         <K_Rphi1 unit="deg">-269.967220</K_Rphi1>
+         <K_Rtheta unit="deg">15.485398</K_Rtheta>
+         <K_Rphi2 unit="deg">18.718579</K_Rphi2>
+         <K_Pr unit="cm">218.718904</K_Pr>
+         <K_Ptheta unit="deg">14.698898</K_Ptheta>
+         <K_Pphi unit="deg">18.737590</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="7">
+         <K_h1 unit="cm">2.641628</K_h1>
+         <K_h2 unit="cm">3.052853</K_h2>
+         <K_bl1 unit="cm">2.900460</K_bl1>
+         <K_bl2 unit="cm">3.353888</K_bl2>
+         <K_tl1 unit="cm">2.652000</K_tl1>
+         <K_tl2 unit="cm">3.066750</K_tl2>
+         <K_alpha1 unit="deg">2.706421</K_alpha1>
+         <K_alpha2 unit="deg">2.706418</K_alpha2>
+         <K_Rphi1 unit="deg">-267.289482</K_Rphi1>
+         <K_Rtheta unit="deg">17.111070</K_Rtheta>
+         <K_Rphi2 unit="deg">2.801418</K_Rphi2>
+         <K_Pr unit="cm">220.291326</K_Pr>
+         <K_Ptheta unit="deg">16.250909</K_Ptheta>
+         <K_Pphi unit="deg">2.818214</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="8">
+         <K_h1 unit="cm">2.641636</K_h1>
+         <K_h2 unit="cm">3.052994</K_h2>
+         <K_bl1 unit="cm">2.912994</K_bl1>
+         <K_bl2 unit="cm">3.366490</K_bl2>
+         <K_tl1 unit="cm">2.664500</K_tl1>
+         <K_tl2 unit="cm">3.079300</K_tl2>
+         <K_alpha1 unit="deg">-2.693867</K_alpha1>
+         <K_alpha2 unit="deg">-2.693871</K_alpha2>
+         <K_Rphi1 unit="deg">87.318454</K_Rphi1>
+         <K_Rtheta unit="deg">17.111095</K_Rtheta>
+         <K_Rphi2 unit="deg">8.429539</K_Rphi2>
+         <K_Pr unit="cm">220.291638</K_Pr>
+         <K_Ptheta unit="deg">16.250952</K_Ptheta>
+         <K_Pphi unit="deg">8.443726</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="9">
+         <K_h1 unit="cm">2.641031</K_h1>
+         <K_h2 unit="cm">3.052256</K_h2>
+         <K_bl1 unit="cm">2.912991</K_bl1>
+         <K_bl2 unit="cm">3.366483</K_bl2>
+         <K_tl1 unit="cm">2.664500</K_tl1>
+         <K_tl2 unit="cm">3.079300</K_tl2>
+         <K_alpha1 unit="deg">2.705473</K_alpha1>
+         <K_alpha2 unit="deg">2.705469</K_alpha2>
+         <K_Rphi1 unit="deg">-267.273506</K_Rphi1>
+         <K_Rtheta unit="deg">17.110330</K_Rtheta>
+         <K_Rphi2 unit="deg">14.033285</K_Rphi2>
+         <K_Pr unit="cm">220.292262</K_Pr>
+         <K_Ptheta unit="deg">16.250681</K_Ptheta>
+         <K_Pphi unit="deg">14.056939</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="10">
+         <K_h1 unit="cm">2.642225</K_h1>
+         <K_h2 unit="cm">3.053586</K_h2>
+         <K_bl1 unit="cm">2.900458</K_bl1>
+         <K_bl2 unit="cm">3.353889</K_bl2>
+         <K_tl1 unit="cm">2.652000</K_tl1>
+         <K_tl2 unit="cm">3.066750</K_tl2>
+         <K_alpha1 unit="deg">-2.692878</K_alpha1>
+         <K_alpha2 unit="deg">-2.692880</K_alpha2>
+         <K_Rphi1 unit="deg">87.336001</K_Rphi1>
+         <K_Rtheta unit="deg">17.109847</K_Rtheta>
+         <K_Rphi2 unit="deg">19.661724</K_Rphi2>
+         <K_Pr unit="cm">220.293143</K_Pr>
+         <K_Ptheta unit="deg">16.250748</K_Ptheta>
+         <K_Pphi unit="deg">19.682490</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="11">
+         <K_h1 unit="cm">2.649334</K_h1>
+         <K_h2 unit="cm">3.058191</K_h2>
+         <K_bl1 unit="cm">3.179800</K_bl1>
+         <K_bl2 unit="cm">3.671833</K_bl2>
+         <K_tl1 unit="cm">2.933350</K_tl1>
+         <K_tl2 unit="cm">3.387350</K_tl2>
+         <K_alpha1 unit="deg">0.000001</K_alpha1>
+         <K_alpha2 unit="deg">-0.000002</K_alpha2>
+         <K_Rphi1 unit="deg">-269.995315</K_Rphi1>
+         <K_Rtheta unit="deg">18.758168</K_Rtheta>
+         <K_Rphi2 unit="deg">2.808256</K_Rphi2>
+         <K_Pr unit="cm">222.002840</K_Pr>
+         <K_Ptheta unit="deg">17.790227</K_Ptheta>
+         <K_Pphi unit="deg">2.823132</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="12">
+         <K_h1 unit="cm">2.649338</K_h1>
+         <K_h2 unit="cm">3.058197</K_h2>
+         <K_bl1 unit="cm">3.192300</K_bl1>
+         <K_bl2 unit="cm">3.684326</K_bl2>
+         <K_tl1 unit="cm">2.945900</K_tl1>
+         <K_tl2 unit="cm">3.399900</K_tl2>
+         <K_alpha1 unit="deg">0.000006</K_alpha1>
+         <K_alpha2 unit="deg">0.000010</K_alpha2>
+         <K_Rphi1 unit="deg">-269.990242</K_Rphi1>
+         <K_Rtheta unit="deg">18.757940</K_Rtheta>
+         <K_Rphi2 unit="deg">8.425100</K_Rphi2>
+         <K_Pr unit="cm">222.003151</K_Pr>
+         <K_Ptheta unit="deg">17.790251</K_Ptheta>
+         <K_Pphi unit="deg">8.437576</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="13">
+         <K_h1 unit="cm">2.649338</K_h1>
+         <K_h2 unit="cm">3.058196</K_h2>
+         <K_bl1 unit="cm">3.192300</K_bl1>
+         <K_bl2 unit="cm">3.684326</K_bl2>
+         <K_tl1 unit="cm">2.945900</K_tl1>
+         <K_tl2 unit="cm">3.399900</K_tl2>
+         <K_alpha1 unit="deg">-0.000001</K_alpha1>
+         <K_alpha2 unit="deg">0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-269.984324</K_Rphi1>
+         <K_Rtheta unit="deg">18.757524</K_Rtheta>
+         <K_Rphi2 unit="deg">14.041990</K_Rphi2>
+         <K_Pr unit="cm">222.003765</K_Pr>
+         <K_Ptheta unit="deg">17.790341</K_Ptheta>
+         <K_Pphi unit="deg">14.062622</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="14">
+         <K_h1 unit="cm">2.649334</K_h1>
+         <K_h2 unit="cm">3.058190</K_h2>
+         <K_bl1 unit="cm">3.179800</K_bl1>
+         <K_bl2 unit="cm">3.671833</K_bl2>
+         <K_tl1 unit="cm">2.933350</K_tl1>
+         <K_tl2 unit="cm">3.387350</K_tl2>
+         <K_alpha1 unit="deg">-0.000008</K_alpha1>
+         <K_alpha2 unit="deg">-0.000008</K_alpha2>
+         <K_Rphi1 unit="deg">-269.976571</K_Rphi1>
+         <K_Rtheta unit="deg">18.756924</K_Rtheta>
+         <K_Rphi2 unit="deg">19.659029</K_Rphi2>
+         <K_Pr unit="cm">222.004677</K_Pr>
+         <K_Ptheta unit="deg">17.790459</K_Ptheta>
+         <K_Pphi unit="deg">19.677091</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="15">
+         <K_h1 unit="cm">2.611265</K_h1>
+         <K_h2 unit="cm">3.009984</K_h2>
+         <K_bl1 unit="cm">3.456503</K_bl1>
+         <K_bl2 unit="cm">3.985226</K_bl2>
+         <K_tl1 unit="cm">3.216000</K_tl1>
+         <K_tl2 unit="cm">3.708000</K_tl2>
+         <K_alpha1 unit="deg">0.000338</K_alpha1>
+         <K_alpha2 unit="deg">0.000339</K_alpha2>
+         <K_Rphi1 unit="deg">-269.996417</K_Rphi1>
+         <K_Rtheta unit="deg">20.255882</K_Rtheta>
+         <K_Rphi2 unit="deg">2.808402</K_Rphi2>
+         <K_Pr unit="cm">223.963427</K_Pr>
+         <K_Ptheta unit="deg">19.264348</K_Ptheta>
+         <K_Pphi unit="deg">2.822234</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="16">
+         <K_h1 unit="cm">2.611179</K_h1>
+         <K_h2 unit="cm">3.009956</K_h2>
+         <K_bl1 unit="cm">3.468951</K_bl1>
+         <K_bl2 unit="cm">3.997673</K_bl2>
+         <K_tl1 unit="cm">3.228500</K_tl1>
+         <K_tl2 unit="cm">3.720500</K_tl2>
+         <K_alpha1 unit="deg">0.000820</K_alpha1>
+         <K_alpha2 unit="deg">0.000822</K_alpha2>
+         <K_Rphi1 unit="deg">-269.989943</K_Rphi1>
+         <K_Rtheta unit="deg">20.255769</K_Rtheta>
+         <K_Rphi2 unit="deg">8.425221</K_Rphi2>
+         <K_Pr unit="cm">223.963792</K_Pr>
+         <K_Ptheta unit="deg">19.264365</K_Ptheta>
+         <K_Pphi unit="deg">8.437552</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="17">
+         <K_h1 unit="cm">2.611240</K_h1>
+         <K_h2 unit="cm">3.010009</K_h2>
+         <K_bl1 unit="cm">3.469013</K_bl1>
+         <K_bl2 unit="cm">3.997743</K_bl2>
+         <K_tl1 unit="cm">3.228500</K_tl1>
+         <K_tl2 unit="cm">3.720500</K_tl2>
+         <K_alpha1 unit="deg">0.000195</K_alpha1>
+         <K_alpha2 unit="deg">0.000199</K_alpha2>
+         <K_Rphi1 unit="deg">-269.984527</K_Rphi1>
+         <K_Rtheta unit="deg">20.255343</K_Rtheta>
+         <K_Rphi2 unit="deg">14.042127</K_Rphi2>
+         <K_Pr unit="cm">223.964508</K_Pr>
+         <K_Ptheta unit="deg">19.264469</K_Ptheta>
+         <K_Pphi unit="deg">14.062540</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="18">
+         <K_h1 unit="cm">2.611179</K_h1>
+         <K_h2 unit="cm">3.009955</K_h2>
+         <K_bl1 unit="cm">3.456441</K_bl1>
+         <K_bl2 unit="cm">3.985162</K_bl2>
+         <K_tl1 unit="cm">3.216000</K_tl1>
+         <K_tl2 unit="cm">3.708000</K_tl2>
+         <K_alpha1 unit="deg">0.000920</K_alpha1>
+         <K_alpha2 unit="deg">0.000926</K_alpha2>
+         <K_Rphi1 unit="deg">-269.978009</K_Rphi1>
+         <K_Rtheta unit="deg">20.254726</K_Rtheta>
+         <K_Rphi2 unit="deg">19.659165</K_Rphi2>
+         <K_Pr unit="cm">223.965572</K_Pr>
+         <K_Ptheta unit="deg">19.264594</K_Ptheta>
+         <K_Pphi unit="deg">19.677774</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="19">
+         <K_h1 unit="cm">2.642608</K_h1>
+         <K_h2 unit="cm">3.041683</K_h2>
+         <K_bl1 unit="cm">2.490029</K_bl1>
+         <K_bl2 unit="cm">2.868455</K_bl2>
+         <K_tl1 unit="cm">2.328950</K_tl1>
+         <K_tl2 unit="cm">2.683050</K_tl2>
+         <K_alpha1 unit="deg">3.504055</K_alpha1>
+         <K_alpha2 unit="deg">3.504051</K_alpha2>
+         <K_Rphi1 unit="deg">-266.494420</K_Rphi1>
+         <K_Rtheta unit="deg">21.842666</K_Rtheta>
+         <K_Rphi2 unit="deg">1.869309</K_Rphi2>
+         <K_Pr unit="cm">226.014235</K_Pr>
+         <K_Ptheta unit="deg">20.787939</K_Ptheta>
+         <K_Pphi unit="deg">1.880713</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="20">
+         <K_h1 unit="cm">2.795482</K_h1>
+         <K_h2 unit="cm">3.217641</K_h2>
+         <K_bl1 unit="cm">2.502500</K_bl1>
+         <K_bl2 unit="cm">2.880942</K_bl2>
+         <K_tl1 unit="cm">2.332700</K_tl1>
+         <K_tl2 unit="cm">2.685500</K_tl2>
+         <K_alpha1 unit="deg">-0.000001</K_alpha1>
+         <K_alpha2 unit="deg">-0.000001</K_alpha2>
+         <K_Rphi1 unit="deg">-269.994494</K_Rphi1>
+         <K_Rtheta unit="deg">21.906660</K_Rtheta>
+         <K_Rphi2 unit="deg">5.618259</K_Rphi2>
+         <K_Pr unit="cm">226.013981</K_Pr>
+         <K_Ptheta unit="deg">20.793282</K_Ptheta>
+         <K_Pphi unit="deg">5.625107</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="21">
+         <K_h1 unit="cm">2.641904</K_h1>
+         <K_h2 unit="cm">3.040899</K_h2>
+         <K_bl1 unit="cm">2.502530</K_bl1>
+         <K_bl2 unit="cm">2.880999</K_bl2>
+         <K_tl1 unit="cm">2.341500</K_tl1>
+         <K_tl2 unit="cm">2.695650</K_tl2>
+         <K_alpha1 unit="deg">-3.503329</K_alpha1>
+         <K_alpha2 unit="deg">-3.503333</K_alpha2>
+         <K_Rphi1 unit="deg">86.504572</K_Rphi1>
+         <K_Rtheta unit="deg">21.842663</K_Rtheta>
+         <K_Rphi2 unit="deg">9.367895</K_Rphi2>
+         <K_Pr unit="cm">226.014694</K_Pr>
+         <K_Ptheta unit="deg">20.788015</K_Ptheta>
+         <K_Pphi unit="deg">9.378458</K_Pphi>
+       </EndCapCrystal>
+
+       <EndCapCrystal id="22">
+         <K_h1 unit="cm">2.641866</K_h1>
+         <K_h2 unit="cm">3.040891</K_h2>
+         <K_bl1 unit="cm">2.502529</K_bl1>
+         <K_bl2 unit="cm">2.881000</K_bl2>
+         <K_tl1 unit="cm">2.341500</K_tl1>
+         <K_tl2 unit="cm">2.695650</K_tl2>
+         <K_alpha1 unit="deg">3.503110</K_alpha1>
+         <K_alpha2 unit="deg">3.503104</K_alpha2>
+         <K_Rphi1 unit="deg">-266.486552</K_Rphi1>
+         <K_Rtheta unit="deg">21.842475</K_Rtheta>
+         <K_Rphi2 unit="deg">13.107024</K_Rphi2>
+         <K_Pr unit="cm">226.015136</K_Pr>
+         <K_Ptheta unit="deg">20.788075</K_Ptheta>
+         <K_Pphi unit="deg">13.121985</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="23">
+         <K_h1 unit="cm">2.795482</K_h1>
+         <K_h2 unit="cm">3.217641</K_h2>
+         <K_bl1 unit="cm">2.502500</K_bl1>
+         <K_bl2 unit="cm">2.880942</K_bl2>
+         <K_tl1 unit="cm">2.332700</K_tl1>
+         <K_tl2 unit="cm">2.685500</K_tl2>
+         <K_alpha1 unit="deg">0.000001</K_alpha1>
+         <K_alpha2 unit="deg">0.000005</K_alpha2>
+         <K_Rphi1 unit="deg">-269.986064</K_Rphi1>
+         <K_Rtheta unit="deg">21.905973</K_Rtheta>
+         <K_Rphi2 unit="deg">16.856314</K_Rphi2>
+         <K_Pr unit="cm">226.015303</K_Pr>
+         <K_Ptheta unit="deg">20.793472</K_Ptheta>
+         <K_Pphi unit="deg">16.875296</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="24">
+         <K_h1 unit="cm">2.642667</K_h1>
+         <K_h2 unit="cm">3.041666</K_h2>
+         <K_bl1 unit="cm">2.490029</K_bl1>
+         <K_bl2 unit="cm">2.868449</K_bl2>
+         <K_tl1 unit="cm">2.328950</K_tl1>
+         <K_tl2 unit="cm">2.683050</K_tl2>
+         <K_alpha1 unit="deg">-3.503348</K_alpha1>
+         <K_alpha2 unit="deg">-3.503356</K_alpha2>
+         <K_Rphi1 unit="deg">86.513129</K_Rphi1>
+         <K_Rtheta unit="deg">21.841772</K_Rtheta>
+         <K_Rphi2 unit="deg">20.605802</K_Rphi2>
+         <K_Pr unit="cm">226.016420</K_Pr>
+         <K_Ptheta unit="deg">20.788272</K_Ptheta>
+         <K_Pphi unit="deg">20.619620</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="25">
+         <K_h1 unit="cm">2.651127</K_h1>
+         <K_h2 unit="cm">3.047102</K_h2>
+         <K_bl1 unit="cm">2.679900</K_bl1>
+         <K_bl2 unit="cm">3.082086</K_bl2>
+         <K_tl1 unit="cm">2.520650</K_tl1>
+         <K_tl2 unit="cm">2.899050</K_tl2>
+         <K_alpha1 unit="deg">0.000000</K_alpha1>
+         <K_alpha2 unit="deg">-0.000007</K_alpha2>
+         <K_Rphi1 unit="deg">-269.997659</K_Rphi1>
+         <K_Rtheta unit="deg">23.426420</K_Rtheta>
+         <K_Rphi2 unit="deg">1.872946</K_Rphi2>
+         <K_Pr unit="cm">228.205538</K_Pr>
+         <K_Ptheta unit="deg">22.291731</K_Ptheta>
+         <K_Pphi unit="deg">1.883348</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="26">
+         <K_h1 unit="cm">2.651105</K_h1>
+         <K_h2 unit="cm">3.047076</K_h2>
+         <K_bl1 unit="cm">2.692400</K_bl1>
+         <K_bl2 unit="cm">3.094578</K_bl2>
+         <K_tl1 unit="cm">2.533200</K_tl1>
+         <K_tl2 unit="cm">2.911600</K_tl2>
+         <K_alpha1 unit="deg">-0.000002</K_alpha1>
+         <K_alpha2 unit="deg">-0.000005</K_alpha2>
+         <K_Rphi1 unit="deg">-269.995057</K_Rphi1>
+         <K_Rtheta unit="deg">23.426329</K_Rtheta>
+         <K_Rphi2 unit="deg">5.618545</K_Rphi2>
+         <K_Pr unit="cm">228.205708</K_Pr>
+         <K_Ptheta unit="deg">22.291734</K_Ptheta>
+         <K_Pphi unit="deg">5.625145</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="27">
+         <K_h1 unit="cm">2.651105</K_h1>
+         <K_h2 unit="cm">3.047076</K_h2>
+         <K_bl1 unit="cm">2.692400</K_bl1>
+         <K_bl2 unit="cm">3.094578</K_bl2>
+         <K_tl1 unit="cm">2.533200</K_tl1>
+         <K_tl2 unit="cm">2.911600</K_tl2>
+         <K_alpha1 unit="deg">-0.000006</K_alpha1>
+         <K_alpha2 unit="deg">-0.000007</K_alpha2>
+         <K_Rphi1 unit="deg">-269.992494</K_Rphi1>
+         <K_Rtheta unit="deg">23.426172</K_Rtheta>
+         <K_Rphi2 unit="deg">9.364129</K_Rphi2>
+         <K_Pr unit="cm">228.206052</K_Pr>
+         <K_Ptheta unit="deg">22.291784</K_Ptheta>
+         <K_Pphi unit="deg">9.375237</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="28">
+         <K_h1 unit="cm">2.651105</K_h1>
+         <K_h2 unit="cm">3.047077</K_h2>
+         <K_bl1 unit="cm">2.692400</K_bl1>
+         <K_bl2 unit="cm">3.094579</K_bl2>
+         <K_tl1 unit="cm">2.533200</K_tl1>
+         <K_tl2 unit="cm">2.911600</K_tl2>
+         <K_alpha1 unit="deg">0.000002</K_alpha1>
+         <K_alpha2 unit="deg">0.000004</K_alpha2>
+         <K_Rphi1 unit="deg">-269.989955</K_Rphi1>
+         <K_Rtheta unit="deg">23.425950</K_Rtheta>
+         <K_Rphi2 unit="deg">13.109743</K_Rphi2>
+         <K_Pr unit="cm">228.206570</K_Pr>
+         <K_Ptheta unit="deg">22.291872</K_Ptheta>
+         <K_Pphi unit="deg">13.125310</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="29">
+         <K_h1 unit="cm">2.651105</K_h1>
+         <K_h2 unit="cm">3.047076</K_h2>
+         <K_bl1 unit="cm">2.692400</K_bl1>
+         <K_bl2 unit="cm">3.094578</K_bl2>
+         <K_tl1 unit="cm">2.533200</K_tl1>
+         <K_tl2 unit="cm">2.911600</K_tl2>
+         <K_alpha1 unit="deg">-0.000008</K_alpha1>
+         <K_alpha2 unit="deg">-0.000007</K_alpha2>
+         <K_Rphi1 unit="deg">-269.987469</K_Rphi1>
+         <K_Rtheta unit="deg">23.425661</K_Rtheta>
+         <K_Rphi2 unit="deg">16.855393</K_Rphi2>
+         <K_Pr unit="cm">228.207258</K_Pr>
+         <K_Ptheta unit="deg">22.292001</K_Ptheta>
+         <K_Pphi unit="deg">16.875356</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="30">
+         <K_h1 unit="cm">2.651127</K_h1>
+         <K_h2 unit="cm">3.047102</K_h2>
+         <K_bl1 unit="cm">2.679900</K_bl1>
+         <K_bl2 unit="cm">3.082086</K_bl2>
+         <K_tl1 unit="cm">2.520650</K_tl1>
+         <K_tl2 unit="cm">2.899050</K_tl2>
+         <K_alpha1 unit="deg">0.000001</K_alpha1>
+         <K_alpha2 unit="deg">0.000011</K_alpha2>
+         <K_Rphi1 unit="deg">-269.984023</K_Rphi1>
+         <K_Rtheta unit="deg">23.425308</K_Rtheta>
+         <K_Rphi2 unit="deg">20.601092</K_Rphi2>
+         <K_Pr unit="cm">228.208114</K_Pr>
+         <K_Ptheta unit="deg">22.292162</K_Ptheta>
+         <K_Pphi unit="deg">20.617090</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="31">
+         <K_h1 unit="cm">2.772929</K_h1>
+         <K_h2 unit="cm">3.181749</K_h2>
+         <K_bl1 unit="cm">2.880700</K_bl1>
+         <K_bl2 unit="cm">3.307168</K_bl2>
+         <K_tl1 unit="cm">2.716100</K_tl1>
+         <K_tl2 unit="cm">3.118300</K_tl2>
+         <K_alpha1 unit="deg">0.000008</K_alpha1>
+         <K_alpha2 unit="deg">0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-269.998036</K_Rphi1>
+         <K_Rtheta unit="deg">24.961865</K_Rtheta>
+         <K_Rphi2 unit="deg">1.872883</K_Rphi2>
+         <K_Pr unit="cm">230.672624</K_Pr>
+         <K_Ptheta unit="deg">23.771577</K_Ptheta>
+         <K_Pphi unit="deg">1.882749</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="32">
+         <K_h1 unit="cm">2.772929</K_h1>
+         <K_h2 unit="cm">3.181749</K_h2>
+         <K_bl1 unit="cm">2.893200</K_bl1>
+         <K_bl2 unit="cm">3.319667</K_bl2>
+         <K_tl1 unit="cm">2.728600</K_tl1>
+         <K_tl2 unit="cm">3.130800</K_tl2>
+         <K_alpha1 unit="deg">-0.000002</K_alpha1>
+         <K_alpha2 unit="deg">-0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-269.994216</K_Rphi1>
+         <K_Rtheta unit="deg">24.961757</K_Rtheta>
+         <K_Rphi2 unit="deg">5.618802</K_Rphi2>
+         <K_Pr unit="cm">230.672813</K_Pr>
+         <K_Ptheta unit="deg">23.771577</K_Ptheta>
+         <K_Pphi unit="deg">5.625133</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="33">
+         <K_h1 unit="cm">2.772929</K_h1>
+         <K_h2 unit="cm">3.181749</K_h2>
+         <K_bl1 unit="cm">2.893200</K_bl1>
+         <K_bl2 unit="cm">3.319667</K_bl2>
+         <K_tl1 unit="cm">2.728600</K_tl1>
+         <K_tl2 unit="cm">3.130800</K_tl2>
+         <K_alpha1 unit="deg">-0.000002</K_alpha1>
+         <K_alpha2 unit="deg">0.000002</K_alpha2>
+         <K_Rphi1 unit="deg">-269.990399</K_Rphi1>
+         <K_Rtheta unit="deg">24.961544</K_Rtheta>
+         <K_Rphi2 unit="deg">9.364741</K_Rphi2>
+         <K_Pr unit="cm">230.673190</K_Pr>
+         <K_Ptheta unit="deg">23.771577</K_Ptheta>
+         <K_Pphi unit="deg">9.375215</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="34">
+         <K_h1 unit="cm">2.772929</K_h1>
+         <K_h2 unit="cm">3.181749</K_h2>
+         <K_bl1 unit="cm">2.893200</K_bl1>
+         <K_bl2 unit="cm">3.319667</K_bl2>
+         <K_tl1 unit="cm">2.728600</K_tl1>
+         <K_tl2 unit="cm">3.130800</K_tl2>
+         <K_alpha1 unit="deg">-0.000001</K_alpha1>
+         <K_alpha2 unit="deg">0.000004</K_alpha2>
+         <K_Rphi1 unit="deg">-269.986632</K_Rphi1>
+         <K_Rtheta unit="deg">24.961226</K_Rtheta>
+         <K_Rphi2 unit="deg">13.110717</K_Rphi2>
+         <K_Pr unit="cm">230.673752</K_Pr>
+         <K_Ptheta unit="deg">23.771577</K_Ptheta>
+         <K_Pphi unit="deg">13.125289</K_Pphi>
+       </EndCapCrystal>
+
+       <EndCapCrystal id="35">
+         <K_h1 unit="cm">2.772929</K_h1>
+         <K_h2 unit="cm">3.181748</K_h2>
+         <K_bl1 unit="cm">2.893200</K_bl1>
+         <K_bl2 unit="cm">3.319667</K_bl2>
+         <K_tl1 unit="cm">2.728600</K_tl1>
+         <K_tl2 unit="cm">3.130800</K_tl2>
+         <K_alpha1 unit="deg">-0.000014</K_alpha1>
+         <K_alpha2 unit="deg">-0.000014</K_alpha2>
+         <K_Rphi1 unit="deg">-269.982931</K_Rphi1>
+         <K_Rtheta unit="deg">24.960805</K_Rtheta>
+         <K_Rphi2 unit="deg">16.856746</K_Rphi2>
+         <K_Pr unit="cm">230.674496</K_Pr>
+         <K_Ptheta unit="deg">23.771576</K_Ptheta>
+         <K_Pphi unit="deg">16.875353</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="36">
+         <K_h1 unit="cm">2.772929</K_h1>
+         <K_h2 unit="cm">3.181748</K_h2>
+         <K_bl1 unit="cm">2.880700</K_bl1>
+         <K_bl2 unit="cm">3.307168</K_bl2>
+         <K_tl1 unit="cm">2.716100</K_tl1>
+         <K_tl2 unit="cm">3.118300</K_tl2>
+         <K_alpha1 unit="deg">-0.000005</K_alpha1>
+         <K_alpha2 unit="deg">-0.000007</K_alpha2>
+         <K_Rphi1 unit="deg">-269.979292</K_Rphi1>
+         <K_Rtheta unit="deg">24.960283</K_Rtheta>
+         <K_Rphi2 unit="deg">20.602841</K_Rphi2>
+         <K_Pr unit="cm">230.675418</K_Pr>
+         <K_Ptheta unit="deg">23.771574</K_Ptheta>
+         <K_Pphi unit="deg">20.617701</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="37">
+         <K_h1 unit="cm">2.651238</K_h1>
+         <K_h2 unit="cm">3.037175</K_h2>
+         <K_bl1 unit="cm">3.075200</K_bl1>
+         <K_bl2 unit="cm">3.524264</K_bl2>
+         <K_tl1 unit="cm">2.919850</K_tl1>
+         <K_tl2 unit="cm">3.346300</K_tl2>
+         <K_alpha1 unit="deg">-0.000003</K_alpha1>
+         <K_alpha2 unit="deg">-0.000004</K_alpha2>
+         <K_Rphi1 unit="deg">-269.997458</K_Rphi1>
+         <K_Rtheta unit="deg">26.478229</K_Rtheta>
+         <K_Rphi2 unit="deg">1.872785</K_Rphi2>
+         <K_Pr unit="cm">233.198002</K_Pr>
+         <K_Ptheta unit="deg">25.235567</K_Ptheta>
+         <K_Pphi unit="deg">1.882273</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="38">
+         <K_h1 unit="cm">2.651213</K_h1>
+         <K_h2 unit="cm">3.037147</K_h2>
+         <K_bl1 unit="cm">3.087700</K_bl1>
+         <K_bl2 unit="cm">3.536707</K_bl2>
+         <K_tl1 unit="cm">2.932400</K_tl1>
+         <K_tl2 unit="cm">3.358800</K_tl2>
+         <K_alpha1 unit="deg">-0.000008</K_alpha1>
+         <K_alpha2 unit="deg">-0.000005</K_alpha2>
+         <K_Rphi1 unit="deg">-269.995430</K_Rphi1>
+         <K_Rtheta unit="deg">26.478136</K_Rtheta>
+         <K_Rphi2 unit="deg">5.618757</K_Rphi2>
+         <K_Pr unit="cm">233.198220</K_Pr>
+         <K_Ptheta unit="deg">25.235571</K_Ptheta>
+         <K_Pphi unit="deg">5.625175</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="39">
+         <K_h1 unit="cm">2.651213</K_h1>
+         <K_h2 unit="cm">3.037147</K_h2>
+         <K_bl1 unit="cm">3.087700</K_bl1>
+         <K_bl2 unit="cm">3.536707</K_bl2>
+         <K_tl1 unit="cm">2.932400</K_tl1>
+         <K_tl2 unit="cm">3.358800</K_tl2>
+         <K_alpha1 unit="deg">-0.000005</K_alpha1>
+         <K_alpha2 unit="deg">-0.000000</K_alpha2>
+         <K_Rphi1 unit="deg">-269.993055</K_Rphi1>
+         <K_Rtheta unit="deg">26.477979</K_Rtheta>
+         <K_Rphi2 unit="deg">9.364284</K_Rphi2>
+         <K_Pr unit="cm">233.198655</K_Pr>
+         <K_Ptheta unit="deg">25.235631</K_Ptheta>
+         <K_Pphi unit="deg">9.375268</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="40">
+         <K_h1 unit="cm">2.651213</K_h1>
+         <K_h2 unit="cm">3.037147</K_h2>
+         <K_bl1 unit="cm">3.087700</K_bl1>
+         <K_bl2 unit="cm">3.536707</K_bl2>
+         <K_tl1 unit="cm">2.932400</K_tl1>
+         <K_tl2 unit="cm">3.358800</K_tl2>
+         <K_alpha1 unit="deg">0.000003</K_alpha1>
+         <K_alpha2 unit="deg">0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-269.990706</K_Rphi1>
+         <K_Rtheta unit="deg">26.477753</K_Rtheta>
+         <K_Rphi2 unit="deg">13.109839</K_Rphi2>
+         <K_Pr unit="cm">233.199316</K_Pr>
+         <K_Ptheta unit="deg">25.235739</K_Ptheta>
+         <K_Pphi unit="deg">13.125340</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="41">
+         <K_h1 unit="cm">2.651213</K_h1>
+         <K_h2 unit="cm">3.037147</K_h2>
+         <K_bl1 unit="cm">3.087700</K_bl1>
+         <K_bl2 unit="cm">3.536707</K_bl2>
+         <K_tl1 unit="cm">2.932400</K_tl1>
+         <K_tl2 unit="cm">3.358800</K_tl2>
+         <K_alpha1 unit="deg">-0.000000</K_alpha1>
+         <K_alpha2 unit="deg">0.000001</K_alpha2>
+         <K_Rphi1 unit="deg">-269.988398</K_Rphi1>
+         <K_Rtheta unit="deg">26.477460</K_Rtheta>
+         <K_Rphi2 unit="deg">16.855428</K_Rphi2>
+         <K_Pr unit="cm">233.200200</K_Pr>
+         <K_Ptheta unit="deg">25.235896</K_Ptheta>
+         <K_Pphi unit="deg">16.875381</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="42">
+         <K_h1 unit="cm">2.651238</K_h1>
+         <K_h2 unit="cm">3.037176</K_h2>
+         <K_bl1 unit="cm">3.075200</K_bl1>
+         <K_bl2 unit="cm">3.524264</K_bl2>
+         <K_tl1 unit="cm">2.919850</K_tl1>
+         <K_tl2 unit="cm">3.346300</K_tl2>
+         <K_alpha1 unit="deg">-0.000004</K_alpha1>
+         <K_alpha2 unit="deg">0.000004</K_alpha2>
+         <K_Rphi1 unit="deg">-269.985134</K_Rphi1>
+         <K_Rtheta unit="deg">26.477098</K_Rtheta>
+         <K_Rphi2 unit="deg">20.601058</K_Rphi2>
+         <K_Pr unit="cm">233.201302</K_Pr>
+         <K_Ptheta unit="deg">25.236093</K_Ptheta>
+         <K_Pphi unit="deg">20.618175</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="43">
+         <K_h1 unit="cm">2.651192</K_h1>
+         <K_h2 unit="cm">3.032082</K_h2>
+         <K_bl1 unit="cm">3.272200</K_bl1>
+         <K_bl2 unit="cm">3.743324</K_bl2>
+         <K_tl1 unit="cm">3.118900</K_tl1>
+         <K_tl2 unit="cm">3.568001</K_tl2>
+         <K_alpha1 unit="deg">-0.000002</K_alpha1>
+         <K_alpha2 unit="deg">-0.000009</K_alpha2>
+         <K_Rphi1 unit="deg">-269.998947</K_Rphi1>
+         <K_Rtheta unit="deg">27.941104</K_Rtheta>
+         <K_Rphi2 unit="deg">1.873169</K_Rphi2>
+         <K_Pr unit="cm">235.890268</K_Pr>
+         <K_Ptheta unit="deg">26.651361</K_Ptheta>
+         <K_Pphi unit="deg">1.881843</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="44">
+         <K_h1 unit="cm">2.651192</K_h1>
+         <K_h2 unit="cm">3.032082</K_h2>
+         <K_bl1 unit="cm">3.284700</K_bl1>
+         <K_bl2 unit="cm">3.755824</K_bl2>
+         <K_tl1 unit="cm">3.131400</K_tl1>
+         <K_tl2 unit="cm">3.580500</K_tl2>
+         <K_alpha1 unit="deg">-0.000007</K_alpha1>
+         <K_alpha2 unit="deg">-0.000006</K_alpha2>
+         <K_Rphi1 unit="deg">-269.996780</K_Rphi1>
+         <K_Rtheta unit="deg">27.941036</K_Rtheta>
+         <K_Rphi2 unit="deg">5.619547</K_Rphi2>
+         <K_Pr unit="cm">235.890479</K_Pr>
+         <K_Ptheta unit="deg">26.651397</K_Ptheta>
+         <K_Pphi unit="deg">5.625209</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="45">
+         <K_h1 unit="cm">2.651192</K_h1>
+         <K_h2 unit="cm">3.032083</K_h2>
+         <K_bl1 unit="cm">3.284700</K_bl1>
+         <K_bl2 unit="cm">3.755824</K_bl2>
+         <K_tl1 unit="cm">3.131400</K_tl1>
+         <K_tl2 unit="cm">3.580500</K_tl2>
+         <K_alpha1 unit="deg">-0.000007</K_alpha1>
+         <K_alpha2 unit="deg">-0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-269.994621</K_Rphi1>
+         <K_Rtheta unit="deg">27.940903</K_Rtheta>
+         <K_Rphi2 unit="deg">9.365940</K_Rphi2>
+         <K_Pr unit="cm">235.890899</K_Pr>
+         <K_Ptheta unit="deg">26.651468</K_Ptheta>
+         <K_Pphi unit="deg">9.375332</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="46">
+         <K_h1 unit="cm">2.651192</K_h1>
+         <K_h2 unit="cm">3.032083</K_h2>
+         <K_bl1 unit="cm">3.284700</K_bl1>
+         <K_bl2 unit="cm">3.755824</K_bl2>
+         <K_tl1 unit="cm">3.131400</K_tl1>
+         <K_tl2 unit="cm">3.580500</K_tl2>
+         <K_alpha1 unit="deg">0.000001</K_alpha1>
+         <K_alpha2 unit="deg">-0.000002</K_alpha2>
+         <K_Rphi1 unit="deg">-269.992480</K_Rphi1>
+         <K_Rtheta unit="deg">27.940703</K_Rtheta>
+         <K_Rphi2 unit="deg">13.112350</K_Rphi2>
+         <K_Pr unit="cm">235.891526</K_Pr>
+         <K_Ptheta unit="deg">26.651573</K_Ptheta>
+         <K_Pphi unit="deg">13.125435</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="47">
+         <K_h1 unit="cm">2.651192</K_h1>
+         <K_h2 unit="cm">3.032084</K_h2>
+         <K_bl1 unit="cm">3.284700</K_bl1>
+         <K_bl2 unit="cm">3.755824</K_bl2>
+         <K_tl1 unit="cm">3.131400</K_tl1>
+         <K_tl2 unit="cm">3.580500</K_tl2>
+         <K_alpha1 unit="deg">0.000004</K_alpha1>
+         <K_alpha2 unit="deg">-0.000000</K_alpha2>
+         <K_Rphi1 unit="deg">-269.990375</K_Rphi1>
+         <K_Rtheta unit="deg">27.940439</K_Rtheta>
+         <K_Rphi2 unit="deg">16.858790</K_Rphi2>
+         <K_Pr unit="cm">235.892357</K_Pr>
+         <K_Ptheta unit="deg">26.651713</K_Ptheta>
+         <K_Pphi unit="deg">16.875510</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="48">
+         <K_h1 unit="cm">2.651192</K_h1>
+         <K_h2 unit="cm">3.032083</K_h2>
+         <K_bl1 unit="cm">3.272200</K_bl1>
+         <K_bl2 unit="cm">3.743324</K_bl2>
+         <K_tl1 unit="cm">3.118900</K_tl1>
+         <K_tl2 unit="cm">3.568000</K_tl2>
+         <K_alpha1 unit="deg">-0.000008</K_alpha1>
+         <K_alpha2 unit="deg">-0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-269.988322</K_Rphi1>
+         <K_Rtheta unit="deg">27.940111</K_Rtheta>
+         <K_Rphi2 unit="deg">20.605269</K_Rphi2>
+         <K_Pr unit="cm">235.893388</K_Pr>
+         <K_Ptheta unit="deg">26.651885</K_Ptheta>
+         <K_Pphi unit="deg">20.618781</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="49">
+         <K_h1 unit="cm">2.673930</K_h1>
+         <K_h2 unit="cm">3.052309</K_h2>
+         <K_bl1 unit="cm">3.475398</K_bl1>
+         <K_bl2 unit="cm">3.968078</K_bl2>
+         <K_tl1 unit="cm">3.322900</K_tl1>
+         <K_tl2 unit="cm">3.794000</K_tl2>
+         <K_alpha1 unit="deg">-0.000385</K_alpha1>
+         <K_alpha2 unit="deg">-0.000381</K_alpha2>
+         <K_Rphi1 unit="deg">-269.998775</K_Rphi1>
+         <K_Rtheta unit="deg">29.363239</K_Rtheta>
+         <K_Rphi2 unit="deg">1.873130</K_Rphi2>
+         <K_Pr unit="cm">238.887687</K_Pr>
+         <K_Ptheta unit="deg">28.055247</K_Ptheta>
+         <K_Pphi unit="deg">1.881488</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="50">
+         <K_h1 unit="cm">2.673962</K_h1>
+         <K_h2 unit="cm">3.052359</K_h2>
+         <K_bl1 unit="cm">3.487849</K_bl1>
+         <K_bl2 unit="cm">3.980522</K_bl2>
+         <K_tl1 unit="cm">3.335400</K_tl1>
+         <K_tl2 unit="cm">3.806500</K_tl2>
+         <K_alpha1 unit="deg">0.000167</K_alpha1>
+         <K_alpha2 unit="deg">0.000168</K_alpha2>
+         <K_Rphi1 unit="deg">-269.995553</K_Rphi1>
+         <K_Rtheta unit="deg">29.363173</K_Rtheta>
+         <K_Rphi2 unit="deg">5.619381</K_Rphi2>
+         <K_Pr unit="cm">238.887929</K_Pr>
+         <K_Ptheta unit="deg">28.055276</K_Ptheta>
+         <K_Pphi unit="deg">5.625309</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="51">
+         <K_h1 unit="cm">2.673988</K_h1>
+         <K_h2 unit="cm">3.052375</K_h2>
+         <K_bl1 unit="cm">3.487886</K_bl1>
+         <K_bl2 unit="cm">3.980564</K_bl2>
+         <K_tl1 unit="cm">3.335400</K_tl1>
+         <K_tl2 unit="cm">3.806500</K_tl2>
+         <K_alpha1 unit="deg">-0.000229</K_alpha1>
+         <K_alpha2 unit="deg">-0.000230</K_alpha2>
+         <K_Rphi1 unit="deg">-269.993443</K_Rphi1>
+         <K_Rtheta unit="deg">29.362985</K_Rtheta>
+         <K_Rphi2 unit="deg">9.365645</K_Rphi2>
+         <K_Pr unit="cm">238.888416</K_Pr>
+         <K_Ptheta unit="deg">28.055326</K_Ptheta>
+         <K_Pphi unit="deg">9.375491</K_Pphi>
+       </EndCapCrystal>
+
+       <EndCapCrystal id="52">
+         <K_h1 unit="cm">2.673962</K_h1>
+         <K_h2 unit="cm">3.052359</K_h2>
+         <K_bl1 unit="cm">3.487849</K_bl1>
+         <K_bl2 unit="cm">3.980522</K_bl2>
+         <K_tl1 unit="cm">3.335400</K_tl1>
+         <K_tl2 unit="cm">3.806500</K_tl2>
+         <K_alpha1 unit="deg">0.000162</K_alpha1>
+         <K_alpha2 unit="deg">0.000163</K_alpha2>
+         <K_Rphi1 unit="deg">-269.990584</K_Rphi1>
+         <K_Rtheta unit="deg">29.362742</K_Rtheta>
+         <K_Rphi2 unit="deg">13.111933</K_Rphi2>
+         <K_Pr unit="cm">238.889148</K_Pr>
+         <K_Ptheta unit="deg">28.055396</K_Ptheta>
+         <K_Pphi unit="deg">13.125656</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="53">
+         <K_h1 unit="cm">2.673988</K_h1>
+         <K_h2 unit="cm">3.052375</K_h2>
+         <K_bl1 unit="cm">3.487886</K_bl1>
+         <K_bl2 unit="cm">3.980564</K_bl2>
+         <K_tl1 unit="cm">3.335400</K_tl1>
+         <K_tl2 unit="cm">3.806500</K_tl2>
+         <K_alpha1 unit="deg">-0.000233</K_alpha1>
+         <K_alpha2 unit="deg">-0.000229</K_alpha2>
+         <K_Rphi1 unit="deg">-269.988540</K_Rphi1>
+         <K_Rtheta unit="deg">29.362396</K_Rtheta>
+         <K_Rphi2 unit="deg">16.858256</K_Rphi2>
+         <K_Pr unit="cm">238.890117</K_Pr>
+         <K_Ptheta unit="deg">28.055504</K_Ptheta>
+         <K_Pphi unit="deg">16.875797</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="54">
+         <K_h1 unit="cm">2.673963</K_h1>
+         <K_h2 unit="cm">3.052359</K_h2>
+         <K_bl1 unit="cm">3.475363</K_bl1>
+         <K_bl2 unit="cm">3.968039</K_bl2>
+         <K_tl1 unit="cm">3.322900</K_tl1>
+         <K_tl2 unit="cm">3.794000</K_tl2>
+         <K_alpha1 unit="deg">0.000009</K_alpha1>
+         <K_alpha2 unit="deg">0.000011</K_alpha2>
+         <K_Rphi1 unit="deg">-269.985766</K_Rphi1>
+         <K_Rtheta unit="deg">29.361997</K_Rtheta>
+         <K_Rphi2 unit="deg">20.604625</K_Rphi2>
+         <K_Pr unit="cm">238.891322</K_Pr>
+         <K_Ptheta unit="deg">28.055631</K_Ptheta>
+         <K_Pphi unit="deg">20.619536</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="55">
+         <K_h1 unit="cm">2.649071</K_h1>
+         <K_h2 unit="cm">3.018432</K_h2>
+         <K_bl1 unit="cm">2.443514</K_bl1>
+         <K_bl2 unit="cm">2.786362</K_bl2>
+         <K_tl1 unit="cm">2.344200</K_tl1>
+         <K_tl2 unit="cm">2.673200</K_tl2>
+         <K_alpha1 unit="deg">2.163407</K_alpha1>
+         <K_alpha2 unit="deg">2.163401</K_alpha2>
+         <K_Rphi1 unit="deg">-267.836266</K_Rphi1>
+         <K_Rtheta unit="deg">30.826369</K_Rtheta>
+         <K_Rphi2 unit="deg">1.247931</K_Rphi2>
+         <K_Pr unit="cm">241.942924</K_Pr>
+         <K_Ptheta unit="deg">29.477661</K_Ptheta>
+         <K_Pphi unit="deg">1.255291</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="56">
+         <K_h1 unit="cm">2.741770</K_h1>
+         <K_h2 unit="cm">3.124052</K_h2>
+         <K_bl1 unit="cm">2.456000</K_bl1>
+         <K_bl2 unit="cm">2.798806</K_bl2>
+         <K_tl1 unit="cm">2.353400</K_tl1>
+         <K_tl2 unit="cm">2.681900</K_tl2>
+         <K_alpha1 unit="deg">-0.000000</K_alpha1>
+         <K_alpha2 unit="deg">-0.000005</K_alpha2>
+         <K_Rphi1 unit="deg">-269.999130</K_Rphi1>
+         <K_Rtheta unit="deg">30.862345</K_Rtheta>
+         <K_Rphi2 unit="deg">3.746156</K_Rphi2>
+         <K_Pr unit="cm">241.942787</K_Pr>
+         <K_Ptheta unit="deg">29.480265</K_Ptheta>
+         <K_Pphi unit="deg">3.750187</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="57">
+         <K_h1 unit="cm">2.648651</K_h1>
+         <K_h2 unit="cm">3.018000</K_h2>
+         <K_bl1 unit="cm">2.456015</K_bl1>
+         <K_bl2 unit="cm">2.798807</K_bl2>
+         <K_tl1 unit="cm">2.356750</K_tl1>
+         <K_tl2 unit="cm">2.685700</K_tl2>
+         <K_alpha1 unit="deg">-2.162740</K_alpha1>
+         <K_alpha2 unit="deg">-2.162739</K_alpha2>
+         <K_Rphi1 unit="deg">87.838018</K_Rphi1>
+         <K_Rtheta unit="deg">30.826318</K_Rtheta>
+         <K_Rphi2 unit="deg">6.244517</K_Rphi2>
+         <K_Pr unit="cm">241.943292</K_Pr>
+         <K_Ptheta unit="deg">29.477784</K_Ptheta>
+         <K_Pphi unit="deg">6.251109</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="58">
+         <K_h1 unit="cm">2.648625</K_h1>
+         <K_h2 unit="cm">3.017986</K_h2>
+         <K_bl1 unit="cm">2.456014</K_bl1>
+         <K_bl2 unit="cm">2.798807</K_bl2>
+         <K_tl1 unit="cm">2.356750</K_tl1>
+         <K_tl2 unit="cm">2.685700</K_tl2>
+         <K_alpha1 unit="deg">2.162761</K_alpha1>
+         <K_alpha2 unit="deg">2.162759</K_alpha2>
+         <K_Rphi1 unit="deg">-267.836213</K_Rphi1>
+         <K_Rtheta unit="deg">30.826315</K_Rtheta>
+         <K_Rphi2 unit="deg">8.739994</K_Rphi2>
+         <K_Pr unit="cm">241.943660</K_Pr>
+         <K_Ptheta unit="deg">29.477911</K_Ptheta>
+         <K_Pphi unit="deg">8.749618</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="59">
+         <K_h1 unit="cm">2.741770</K_h1>
+         <K_h2 unit="cm">3.124053</K_h2>
+         <K_bl1 unit="cm">2.456000</K_bl1>
+         <K_bl2 unit="cm">2.798806</K_bl2>
+         <K_tl1 unit="cm">2.353400</K_tl1>
+         <K_tl2 unit="cm">2.681900</K_tl2>
+         <K_alpha1 unit="deg">0.000009</K_alpha1>
+         <K_alpha2 unit="deg">0.000004</K_alpha2>
+         <K_Rphi1 unit="deg">-269.998606</K_Rphi1>
+         <K_Rtheta unit="deg">30.862278</K_Rtheta>
+         <K_Rphi2 unit="deg">11.238030</K_Rphi2>
+         <K_Pr unit="cm">241.943894</K_Pr>
+         <K_Ptheta unit="deg">29.480659</K_Ptheta>
+         <K_Pphi unit="deg">11.250495</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="60">
+         <K_h1 unit="cm">2.648650</K_h1>
+         <K_h2 unit="cm">3.017999</K_h2>
+         <K_bl1 unit="cm">2.456015</K_bl1>
+         <K_bl2 unit="cm">2.798806</K_bl2>
+         <K_tl1 unit="cm">2.356750</K_tl1>
+         <K_tl2 unit="cm">2.685700</K_tl2>
+         <K_alpha1 unit="deg">-2.162755</K_alpha1>
+         <K_alpha2 unit="deg">-2.162754</K_alpha2>
+         <K_Rphi1 unit="deg">87.838508</K_Rphi1>
+         <K_Rtheta unit="deg">30.826239</K_Rtheta>
+         <K_Rphi2 unit="deg">13.736395</K_Rphi2>
+         <K_Pr unit="cm">241.944775</K_Pr>
+         <K_Ptheta unit="deg">29.478325</K_Ptheta>
+         <K_Pphi unit="deg">13.751368</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="61">
+         <K_h1 unit="cm">2.648625</K_h1>
+         <K_h2 unit="cm">3.017986</K_h2>
+         <K_bl1 unit="cm">2.456015</K_bl1>
+         <K_bl2 unit="cm">2.798807</K_bl2>
+         <K_tl1 unit="cm">2.356750</K_tl1>
+         <K_tl2 unit="cm">2.685700</K_tl2>
+         <K_alpha1 unit="deg">2.162755</K_alpha1>
+         <K_alpha2 unit="deg">2.162747</K_alpha2>
+         <K_Rphi1 unit="deg">-267.835720</K_Rphi1>
+         <K_Rtheta unit="deg">30.826225</K_Rtheta>
+         <K_Rphi2 unit="deg">16.231879</K_Rphi2>
+         <K_Pr unit="cm">241.945516</K_Pr>
+         <K_Ptheta unit="deg">29.478598</K_Ptheta>
+         <K_Pphi unit="deg">16.249812</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="62">
+         <K_h1 unit="cm">2.741770</K_h1>
+         <K_h2 unit="cm">3.124053</K_h2>
+         <K_bl1 unit="cm">2.456000</K_bl1>
+         <K_bl2 unit="cm">2.798805</K_bl2>
+         <K_tl1 unit="cm">2.353400</K_tl1>
+         <K_tl2 unit="cm">2.681900</K_tl2>
+         <K_alpha1 unit="deg">-0.000006</K_alpha1>
+         <K_alpha2 unit="deg">-0.000005</K_alpha2>
+         <K_Rphi1 unit="deg">-269.998131</K_Rphi1>
+         <K_Rtheta unit="deg">30.862177</K_Rtheta>
+         <K_Rphi2 unit="deg">18.729923</K_Rphi2>
+         <K_Pr unit="cm">241.946120</K_Pr>
+         <K_Ptheta unit="deg">29.481490</K_Ptheta>
+         <K_Pphi unit="deg">18.750608</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="63">
+         <K_h1 unit="cm">2.649122</K_h1>
+         <K_h2 unit="cm">3.018469</K_h2>
+         <K_bl1 unit="cm">2.443515</K_bl1>
+         <K_bl2 unit="cm">2.786361</K_bl2>
+         <K_tl1 unit="cm">2.344200</K_tl1>
+         <K_tl2 unit="cm">2.673200</K_tl2>
+         <K_alpha1 unit="deg">-2.163100</K_alpha1>
+         <K_alpha2 unit="deg">-2.163098</K_alpha2>
+         <K_Rphi1 unit="deg">87.838825</K_Rphi1>
+         <K_Rtheta unit="deg">30.826128</K_Rtheta>
+         <K_Rphi2 unit="deg">21.228490</K_Rphi2>
+         <K_Pr unit="cm">241.947364</K_Pr>
+         <K_Ptheta unit="deg">29.479297</K_Ptheta>
+         <K_Pphi unit="deg">21.245373</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="64">
+         <K_h1 unit="cm">2.651949</K_h1>
+         <K_h2 unit="cm">3.016137</K_h2>
+         <K_bl1 unit="cm">2.580700</K_bl1>
+         <K_bl2 unit="cm">2.937045</K_bl2>
+         <K_tl1 unit="cm">2.482800</K_tl1>
+         <K_tl2 unit="cm">2.825700</K_tl2>
+         <K_alpha1 unit="deg">0.000002</K_alpha1>
+         <K_alpha2 unit="deg">-0.000002</K_alpha2>
+         <K_Rphi1 unit="deg">-269.999303</K_Rphi1>
+         <K_Rtheta unit="deg">32.262583</K_Rtheta>
+         <K_Rphi2 unit="deg">1.249108</K_Rphi2>
+         <K_Pr unit="cm">245.155951</K_Pr>
+         <K_Ptheta unit="deg">30.866056</K_Ptheta>
+         <K_Pphi unit="deg">1.255785</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="65">
+         <K_h1 unit="cm">2.651949</K_h1>
+         <K_h2 unit="cm">3.016136</K_h2>
+         <K_bl1 unit="cm">2.593200</K_bl1>
+         <K_bl2 unit="cm">2.949544</K_bl2>
+         <K_tl1 unit="cm">2.495300</K_tl1>
+         <K_tl2 unit="cm">2.838200</K_tl2>
+         <K_alpha1 unit="deg">-0.000004</K_alpha1>
+         <K_alpha2 unit="deg">-0.000010</K_alpha2>
+         <K_Rphi1 unit="deg">-269.996923</K_Rphi1>
+         <K_Rtheta unit="deg">32.262528</K_Rtheta>
+         <K_Rphi2 unit="deg">3.747203</K_Rphi2>
+         <K_Pr unit="cm">245.156055</K_Pr>
+         <K_Ptheta unit="deg">30.866052</K_Ptheta>
+         <K_Pphi unit="deg">3.750277</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="66">
+         <K_h1 unit="cm">2.651949</K_h1>
+         <K_h2 unit="cm">3.016137</K_h2>
+         <K_bl1 unit="cm">2.593200</K_bl1>
+         <K_bl2 unit="cm">2.949544</K_bl2>
+         <K_tl1 unit="cm">2.495300</K_tl1>
+         <K_tl2 unit="cm">2.838200</K_tl2>
+         <K_alpha1 unit="deg">-0.000004</K_alpha1>
+         <K_alpha2 unit="deg">0.000004</K_alpha2>
+         <K_Rphi1 unit="deg">-269.994526</K_Rphi1>
+         <K_Rtheta unit="deg">32.262418</K_Rtheta>
+         <K_Rphi2 unit="deg">6.245305</K_Rphi2>
+         <K_Pr unit="cm">245.156268</K_Pr>
+         <K_Ptheta unit="deg">30.866034</K_Ptheta>
+         <K_Pphi unit="deg">6.250462</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="67">
+         <K_h1 unit="cm">2.651949</K_h1>
+         <K_h2 unit="cm">3.016137</K_h2>
+         <K_bl1 unit="cm">2.593200</K_bl1>
+         <K_bl2 unit="cm">2.949544</K_bl2>
+         <K_tl1 unit="cm">2.495300</K_tl1>
+         <K_tl2 unit="cm">2.838200</K_tl2>
+         <K_alpha1 unit="deg">0.000003</K_alpha1>
+         <K_alpha2 unit="deg">0.000005</K_alpha2>
+         <K_Rphi1 unit="deg">-269.992148</K_Rphi1>
+         <K_Rtheta unit="deg">32.262253</K_Rtheta>
+         <K_Rphi2 unit="deg">8.743416</K_Rphi2>
+         <K_Pr unit="cm">245.156589</K_Pr>
+         <K_Ptheta unit="deg">30.866004</K_Ptheta>
+         <K_Pphi unit="deg">8.750647</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="68">
+         <K_h1 unit="cm">2.651949</K_h1>
+         <K_h2 unit="cm">3.016137</K_h2>
+         <K_bl1 unit="cm">2.593200</K_bl1>
+         <K_bl2 unit="cm">2.949544</K_bl2>
+         <K_tl1 unit="cm">2.495300</K_tl1>
+         <K_tl2 unit="cm">2.838200</K_tl2>
+         <K_alpha1 unit="deg">0.000006</K_alpha1>
+         <K_alpha2 unit="deg">0.000005</K_alpha2>
+         <K_Rphi1 unit="deg">-269.989785</K_Rphi1>
+         <K_Rtheta unit="deg">32.262032</K_Rtheta>
+         <K_Rphi2 unit="deg">11.241540</K_Rphi2>
+         <K_Pr unit="cm">245.157016</K_Pr>
+         <K_Ptheta unit="deg">30.865960</K_Ptheta>
+         <K_Pphi unit="deg">11.250831</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="69">
+         <K_h1 unit="cm">2.651949</K_h1>
+         <K_h2 unit="cm">3.016137</K_h2>
+         <K_bl1 unit="cm">2.593200</K_bl1>
+         <K_bl2 unit="cm">2.949545</K_bl2>
+         <K_tl1 unit="cm">2.495300</K_tl1>
+         <K_tl2 unit="cm">2.838200</K_tl2>
+         <K_alpha1 unit="deg">0.000000</K_alpha1>
+         <K_alpha2 unit="deg">0.000001</K_alpha2>
+         <K_Rphi1 unit="deg">-269.987455</K_Rphi1>
+         <K_Rtheta unit="deg">32.261757</K_Rtheta>
+         <K_Rphi2 unit="deg">13.739681</K_Rphi2>
+         <K_Pr unit="cm">245.157550</K_Pr>
+         <K_Ptheta unit="deg">30.865903</K_Ptheta>
+         <K_Pphi unit="deg">13.751013</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="70">
+         <K_h1 unit="cm">2.651949</K_h1>
+         <K_h2 unit="cm">3.016137</K_h2>
+         <K_bl1 unit="cm">2.593200</K_bl1>
+         <K_bl2 unit="cm">2.949544</K_bl2>
+         <K_tl1 unit="cm">2.495300</K_tl1>
+         <K_tl2 unit="cm">2.838200</K_tl2>
+         <K_alpha1 unit="deg">0.000006</K_alpha1>
+         <K_alpha2 unit="deg">-0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-269.985139</K_Rphi1>
+         <K_Rtheta unit="deg">32.261427</K_Rtheta>
+         <K_Rphi2 unit="deg">16.237843</K_Rphi2>
+         <K_Pr unit="cm">245.158189</K_Pr>
+         <K_Ptheta unit="deg">30.865832</K_Ptheta>
+         <K_Pphi unit="deg">16.251194</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="71">
+         <K_h1 unit="cm">2.651949</K_h1>
+         <K_h2 unit="cm">3.016137</K_h2>
+         <K_bl1 unit="cm">2.593200</K_bl1>
+         <K_bl2 unit="cm">2.949544</K_bl2>
+         <K_tl1 unit="cm">2.495300</K_tl1>
+         <K_tl2 unit="cm">2.838200</K_tl2>
+         <K_alpha1 unit="deg">-0.000007</K_alpha1>
+         <K_alpha2 unit="deg">-0.000004</K_alpha2>
+         <K_Rphi1 unit="deg">-269.982857</K_Rphi1>
+         <K_Rtheta unit="deg">32.261044</K_Rtheta>
+         <K_Rphi2 unit="deg">18.736030</K_Rphi2>
+         <K_Pr unit="cm">245.158932</K_Pr>
+         <K_Ptheta unit="deg">30.865749</K_Ptheta>
+         <K_Pphi unit="deg">18.751373</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="72">
+         <K_h1 unit="cm">2.651949</K_h1>
+         <K_h2 unit="cm">3.016137</K_h2>
+         <K_bl1 unit="cm">2.580700</K_bl1>
+         <K_bl2 unit="cm">2.937044</K_bl2>
+         <K_tl1 unit="cm">2.482800</K_tl1>
+         <K_tl2 unit="cm">2.825700</K_tl2>
+         <K_alpha1 unit="deg">0.000004</K_alpha1>
+         <K_alpha2 unit="deg">0.000009</K_alpha2>
+         <K_Rphi1 unit="deg">-269.980596</K_Rphi1>
+         <K_Rtheta unit="deg">32.260608</K_Rtheta>
+         <K_Rphi2 unit="deg">21.234246</K_Rphi2>
+         <K_Pr unit="cm">245.159776</K_Pr>
+         <K_Ptheta unit="deg">30.865654</K_Ptheta>
+         <K_Pphi unit="deg">21.245857</K_Pphi>
+       </EndCapCrystal>
+       
+       
+       <EndCapCrystal id="73">
+         <K_h1 unit="cm">2.683406</K_h1>
+         <K_h2 unit="cm">3.228005</K_h2>
+         <K_bl1 unit="cm">2.558500</K_bl1>
+         <K_bl2 unit="cm">3.080594</K_bl2>
+         <K_tl1 unit="cm">2.486100</K_tl1>
+         <K_tl2 unit="cm">2.993500</K_tl2>
+         <K_alpha1 unit="deg">-0.000005</K_alpha1>
+         <K_alpha2 unit="deg">-0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-90.034749</K_Rphi1>
+         <K_Rtheta unit="deg">128.287208</K_Rtheta>
+         <K_Rphi2 unit="deg">1.241690</K_Rphi2>
+         <K_Pr unit="cm">172.058517</K_Pr>
+         <K_Ptheta unit="deg">131.373566</K_Ptheta>
+         <K_Pphi unit="deg">1.252940</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="74">
+         <K_h1 unit="cm">2.683406</K_h1>
+         <K_h2 unit="cm">3.228006</K_h2>
+         <K_bl1 unit="cm">2.571000</K_bl1>
+         <K_bl2 unit="cm">3.093094</K_bl2>
+         <K_tl1 unit="cm">2.498600</K_tl1>
+         <K_tl2 unit="cm">3.006000</K_tl2>
+         <K_alpha1 unit="deg">-0.000009</K_alpha1>
+         <K_alpha2 unit="deg">-0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-90.030808</K_Rphi1>
+         <K_Rtheta unit="deg">128.288334</K_Rtheta>
+         <K_Rphi2 unit="deg">3.742568</K_Rphi2>
+         <K_Pr unit="cm">172.059086</K_Pr>
+         <K_Ptheta unit="deg">131.374519</K_Ptheta>
+         <K_Pphi unit="deg">3.747628</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="75">
+         <K_h1 unit="cm">2.683406</K_h1>
+         <K_h2 unit="cm">3.228006</K_h2>
+         <K_bl1 unit="cm">2.571000</K_bl1>
+         <K_bl2 unit="cm">3.093094</K_bl2>
+         <K_tl1 unit="cm">2.498600</K_tl1>
+         <K_tl2 unit="cm">3.006000</K_tl2>
+         <K_alpha1 unit="deg">0.000003</K_alpha1>
+         <K_alpha2 unit="deg">0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-90.026802</K_Rphi1>
+         <K_Rtheta unit="deg">128.289326</K_Rtheta>
+         <K_Rphi2 unit="deg">6.243483</K_Rphi2>
+         <K_Pr unit="cm">172.059588</K_Pr>
+         <K_Ptheta unit="deg">131.375359</K_Ptheta>
+         <K_Pphi unit="deg">6.247889</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="76">
+         <K_h1 unit="cm">2.683406</K_h1>
+         <K_h2 unit="cm">3.228007</K_h2>
+         <K_bl1 unit="cm">2.571000</K_bl1>
+         <K_bl2 unit="cm">3.093094</K_bl2>
+         <K_tl1 unit="cm">2.498600</K_tl1>
+         <K_tl2 unit="cm">3.006000</K_tl2>
+         <K_alpha1 unit="deg">0.000006</K_alpha1>
+         <K_alpha2 unit="deg">0.000008</K_alpha2>
+         <K_Rphi1 unit="deg">-90.022748</K_Rphi1>
+         <K_Rtheta unit="deg">128.290178</K_Rtheta>
+         <K_Rphi2 unit="deg">8.744428</K_Rphi2>
+         <K_Pr unit="cm">172.060021</K_Pr>
+         <K_Ptheta unit="deg">131.376082</K_Ptheta>
+         <K_Pphi unit="deg">8.748173</K_Pphi>
+       </EndCapCrystal>
+
+       <EndCapCrystal id="77">
+         <K_h1 unit="cm">2.683406</K_h1>
+         <K_h2 unit="cm">3.228006</K_h2>
+         <K_bl1 unit="cm">2.571000</K_bl1>
+         <K_bl2 unit="cm">3.093094</K_bl2>
+         <K_tl1 unit="cm">2.498600</K_tl1>
+         <K_tl2 unit="cm">3.006000</K_tl2>
+         <K_alpha1 unit="deg">-0.000002</K_alpha1>
+         <K_alpha2 unit="deg">0.000002</K_alpha2>
+         <K_Rphi1 unit="deg">-90.018656</K_Rphi1>
+         <K_Rtheta unit="deg">128.290892</K_Rtheta>
+         <K_Rphi2 unit="deg">11.245401</K_Rphi2>
+         <K_Pr unit="cm">172.060382</K_Pr>
+         <K_Ptheta unit="deg">131.376685</K_Ptheta>
+         <K_Pphi unit="deg">11.248477</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="78">
+         <K_h1 unit="cm">2.683406</K_h1>
+         <K_h2 unit="cm">3.228006</K_h2>
+         <K_bl1 unit="cm">2.571000</K_bl1>
+         <K_bl2 unit="cm">3.093094</K_bl2>
+         <K_tl1 unit="cm">2.498600</K_tl1>
+         <K_tl2 unit="cm">3.006000</K_tl2>
+         <K_alpha1 unit="deg">-0.000002</K_alpha1>
+         <K_alpha2 unit="deg">0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-90.014530</K_Rphi1>
+         <K_Rtheta unit="deg">128.291464</K_Rtheta>
+         <K_Rphi2 unit="deg">13.746396</K_Rphi2>
+         <K_Pr unit="cm">172.060673</K_Pr>
+         <K_Ptheta unit="deg">131.377169</K_Ptheta>
+         <K_Pphi unit="deg">13.748797</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="79">
+         <K_h1 unit="cm">2.683406</K_h1>
+         <K_h2 unit="cm">3.228006</K_h2>
+         <K_bl1 unit="cm">2.571000</K_bl1>
+         <K_bl2 unit="cm">3.093094</K_bl2>
+         <K_tl1 unit="cm">2.498600</K_tl1>
+         <K_tl2 unit="cm">3.006000</K_tl2>
+         <K_alpha1 unit="deg">-0.000004</K_alpha1>
+         <K_alpha2 unit="deg">-0.000008</K_alpha2>
+         <K_Rphi1 unit="deg">-90.010373</K_Rphi1>
+         <K_Rtheta unit="deg">128.291894</K_Rtheta>
+         <K_Rphi2 unit="deg">16.247408</K_Rphi2>
+         <K_Pr unit="cm">172.060891</K_Pr>
+         <K_Ptheta unit="deg">131.377532</K_Ptheta>
+         <K_Pphi unit="deg">16.249130</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="80">
+         <K_h1 unit="cm">2.683406</K_h1>
+         <K_h2 unit="cm">3.228006</K_h2>
+         <K_bl1 unit="cm">2.571000</K_bl1>
+         <K_bl2 unit="cm">3.093093</K_bl2>
+         <K_tl1 unit="cm">2.498600</K_tl1>
+         <K_tl2 unit="cm">3.006000</K_tl2>
+         <K_alpha1 unit="deg">0.000007</K_alpha1>
+         <K_alpha2 unit="deg">0.000001</K_alpha2>
+         <K_Rphi1 unit="deg">-90.006187</K_Rphi1>
+         <K_Rtheta unit="deg">128.292181</K_Rtheta>
+         <K_Rphi2 unit="deg">18.748433</K_Rphi2>
+         <K_Pr unit="cm">172.061037</K_Pr>
+         <K_Ptheta unit="deg">131.377773</K_Ptheta>
+         <K_Pphi unit="deg">18.749472</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="81">
+         <K_h1 unit="cm">2.683406</K_h1>
+         <K_h2 unit="cm">3.228006</K_h2>
+         <K_bl1 unit="cm">2.558500</K_bl1>
+         <K_bl2 unit="cm">3.080594</K_bl2>
+         <K_tl1 unit="cm">2.486100</K_tl1>
+         <K_tl2 unit="cm">2.993500</K_tl2>
+         <K_alpha1 unit="deg">-0.000002</K_alpha1>
+         <K_alpha2 unit="deg">0.000001</K_alpha2>
+         <K_Rphi1 unit="deg">-90.002000</K_Rphi1>
+         <K_Rtheta unit="deg">128.292324</K_Rtheta>
+         <K_Rphi2 unit="deg">21.249466</K_Rphi2>
+         <K_Pr unit="cm">172.061110</K_Pr>
+         <K_Ptheta unit="deg">131.377892</K_Ptheta>
+         <K_Pphi unit="deg">21.244272</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="82">
+         <K_h1 unit="cm">2.681668</K_h1>
+         <K_h2 unit="cm">3.251544</K_h2>
+         <K_bl1 unit="cm">2.371424</K_bl1>
+         <K_bl2 unit="cm">2.878755</K_bl2>
+         <K_tl1 unit="cm">2.295750</K_tl1>
+         <K_tl2 unit="cm">2.787000</K_tl2>
+         <K_alpha1 unit="deg">-1.656002</K_alpha1>
+         <K_alpha2 unit="deg">-1.655999</K_alpha2>
+         <K_Rphi1 unit="deg">-91.705015</K_Rphi1>
+         <K_Rtheta unit="deg">130.451610</K_Rtheta>
+         <K_Rphi2 unit="deg">1.241598</K_Rphi2>
+         <K_Pr unit="cm">165.686815</K_Pr>
+         <K_Ptheta unit="deg">133.546718</K_Ptheta>
+         <K_Pphi unit="deg">1.257891</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="83">
+         <K_h1 unit="cm">2.750577</K_h1>
+         <K_h2 unit="cm">3.335119</K_h2>
+         <K_bl1 unit="cm">2.383900</K_bl1>
+         <K_bl2 unit="cm">2.891291</K_bl2>
+         <K_tl1 unit="cm">2.306300</K_tl1>
+         <K_tl2 unit="cm">2.797200</K_tl2>
+         <K_alpha1 unit="deg">-0.000002</K_alpha1>
+         <K_alpha2 unit="deg">0.000001</K_alpha2>
+         <K_Rphi1 unit="deg">-90.043654</K_Rphi1>
+         <K_Rtheta unit="deg">130.412213</K_Rtheta>
+         <K_Rphi2 unit="deg">3.742959</K_Rphi2>
+         <K_Pr unit="cm">165.687061</K_Pr>
+         <K_Ptheta unit="deg">133.544009</K_Ptheta>
+         <K_Pphi unit="deg">3.752000</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="84">
+         <K_h1 unit="cm">2.681370</K_h1>
+         <K_h2 unit="cm">3.251243</K_h2>
+         <K_bl1 unit="cm">2.383924</K_bl1>
+         <K_bl2 unit="cm">2.891257</K_bl2>
+         <K_tl1 unit="cm">2.308250</K_tl1>
+         <K_tl2 unit="cm">2.799500</K_tl2>
+         <K_alpha1 unit="deg">1.655553</K_alpha1>
+         <K_alpha2 unit="deg">1.655553</K_alpha2>
+         <K_Rphi1 unit="deg">-88.382443</K_Rphi1>
+         <K_Rtheta unit="deg">130.454500</K_Rtheta>
+         <K_Rphi2 unit="deg">6.244324</K_Rphi2>
+         <K_Pr unit="cm">165.688453</K_Pr>
+         <K_Ptheta unit="deg">133.549057</K_Ptheta>
+         <K_Pphi unit="deg">6.252096</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="85">
+         <K_h1 unit="cm">2.681349</K_h1>
+         <K_h2 unit="cm">3.251233</K_h2>
+         <K_bl1 unit="cm">2.383924</K_bl1>
+         <K_bl2 unit="cm">2.891257</K_bl2>
+         <K_tl1 unit="cm">2.308250</K_tl1>
+         <K_tl2 unit="cm">2.799500</K_tl2>
+         <K_alpha1 unit="deg">-1.655099</K_alpha1>
+         <K_alpha2 unit="deg">-1.655099</K_alpha2>
+         <K_Rphi1 unit="deg">-91.687228</K_Rphi1>
+         <K_Rtheta unit="deg">130.455654</K_Rtheta>
+         <K_Rphi2 unit="deg">8.744085</K_Rphi2>
+         <K_Pr unit="cm">165.689119</K_Pr>
+         <K_Ptheta unit="deg">133.550006</K_Ptheta>
+         <K_Pphi unit="deg">8.750899</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="86">
+         <K_h1 unit="cm">2.750577</K_h1>
+         <K_h2 unit="cm">3.335119</K_h2>
+         <K_bl1 unit="cm">2.383900</K_bl1>
+         <K_bl2 unit="cm">2.891291</K_bl2>
+         <K_tl1 unit="cm">2.306300</K_tl1>
+         <K_tl2 unit="cm">2.797200</K_tl2>
+         <K_alpha1 unit="deg">0.000004</K_alpha1>
+         <K_alpha2 unit="deg">0.000012</K_alpha2>
+         <K_Rphi1 unit="deg">-90.026643</K_Rphi1>
+         <K_Rtheta unit="deg">130.415712</K_Rtheta>
+         <K_Rphi2 unit="deg">11.245574</K_Rphi2>
+         <K_Pr unit="cm">165.689050</K_Pr>
+         <K_Ptheta unit="deg">133.546845</K_Ptheta>
+         <K_Pphi unit="deg">11.251065</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="87">
+         <K_h1 unit="cm">2.681370</K_h1>
+         <K_h2 unit="cm">3.251243</K_h2>
+         <K_bl1 unit="cm">2.383924</K_bl1>
+         <K_bl2 unit="cm">2.891257</K_bl2>
+         <K_tl1 unit="cm">2.308250</K_tl1>
+         <K_tl2 unit="cm">2.799500</K_tl2>
+         <K_alpha1 unit="deg">1.655558</K_alpha1>
+         <K_alpha2 unit="deg">1.655559</K_alpha2>
+         <K_Rphi1 unit="deg">-88.365241</K_Rphi1>
+         <K_Rtheta unit="deg">130.457431</K_Rtheta>
+         <K_Rphi2 unit="deg">13.747076</K_Rphi2>
+         <K_Pr unit="cm">165.690119</K_Pr>
+         <K_Ptheta unit="deg">133.551431</K_Ptheta>
+         <K_Pphi unit="deg">13.751244</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="88">
+         <K_h1 unit="cm">2.681349</K_h1>
+         <K_h2 unit="cm">3.251233</K_h2>
+         <K_bl1 unit="cm">2.383924</K_bl1>
+         <K_bl2 unit="cm">2.891257</K_bl2>
+         <K_tl1 unit="cm">2.308250</K_tl1>
+         <K_tl2 unit="cm">2.799500</K_tl2>
+         <K_alpha1 unit="deg">-1.655102</K_alpha1>
+         <K_alpha2 unit="deg">-1.655103</K_alpha2>
+         <K_Rphi1 unit="deg">-91.669876</K_Rphi1>
+         <K_Rtheta unit="deg">130.458012</K_Rtheta>
+         <K_Rphi2 unit="deg">16.246937</K_Rphi2>
+         <K_Pr unit="cm">165.690460</K_Pr>
+         <K_Ptheta unit="deg">133.551912</K_Ptheta>
+         <K_Pphi unit="deg">16.250113</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="89">
+         <K_h1 unit="cm">2.750576</K_h1>
+         <K_h2 unit="cm">3.335119</K_h2>
+         <K_bl1 unit="cm">2.383900</K_bl1>
+         <K_bl2 unit="cm">2.891291</K_bl2>
+         <K_tl1 unit="cm">2.306300</K_tl1>
+         <K_tl2 unit="cm">2.797200</K_tl2>
+         <K_alpha1 unit="deg">0.000002</K_alpha1>
+         <K_alpha2 unit="deg">0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-90.009186</K_Rphi1>
+         <K_Rtheta unit="deg">130.417491</K_Rtheta>
+         <K_Rphi2 unit="deg">18.748487</K_Rphi2>
+         <K_Pr unit="cm">165.690063</K_Pr>
+         <K_Ptheta unit="deg">133.548282</K_Ptheta>
+         <K_Pphi unit="deg">18.750330</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="90">
+         <K_h1 unit="cm">2.681720</K_h1>
+         <K_h2 unit="cm">3.251592</K_h2>
+         <K_bl1 unit="cm">2.371424</K_bl1>
+         <K_bl2 unit="cm">2.878755</K_bl2>
+         <K_tl1 unit="cm">2.295750</K_tl1>
+         <K_tl2 unit="cm">2.787000</K_tl2>
+         <K_alpha1 unit="deg">1.655654</K_alpha1>
+         <K_alpha2 unit="deg">1.655649</K_alpha2>
+         <K_Rphi1 unit="deg">-88.347488</K_Rphi1>
+         <K_Rtheta unit="deg">130.458628</K_Rtheta>
+         <K_Rphi2 unit="deg">21.250056</K_Rphi2>
+         <K_Pr unit="cm">165.690803</K_Pr>
+         <K_Ptheta unit="deg">133.552395</K_Ptheta>
+         <K_Pphi unit="deg">21.244583</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="91">
+         <K_h1 unit="cm">2.610611</K_h1>
+         <K_h2 unit="cm">3.191069</K_h2>
+         <K_bl1 unit="cm">3.304081</K_bl1>
+         <K_bl2 unit="cm">4.040235</K_bl2>
+         <K_tl1 unit="cm">3.188700</K_tl1>
+         <K_tl2 unit="cm">3.899200</K_tl2>
+         <K_alpha1 unit="deg">0.000056</K_alpha1>
+         <K_alpha2 unit="deg">0.000052</K_alpha2>
+         <K_Rphi1 unit="deg">-90.048164</K_Rphi1>
+         <K_Rtheta unit="deg">132.687979</K_Rtheta>
+         <K_Rphi2 unit="deg">1.867076</K_Rphi2>
+         <K_Pr unit="cm">159.776806</K_Pr>
+         <K_Ptheta unit="deg">135.786796</K_Ptheta>
+         <K_Pphi unit="deg">1.887963</K_Pphi>
+       </EndCapCrystal>
+
+       <EndCapCrystal id="92">
+         <K_h1 unit="cm">2.610561</K_h1>
+         <K_h2 unit="cm">3.191010</K_h2>
+         <K_bl1 unit="cm">3.316633</K_bl1>
+         <K_bl2 unit="cm">4.052799</K_bl2>
+         <K_tl1 unit="cm">3.201200</K_tl1>
+         <K_tl2 unit="cm">3.911700</K_tl2>
+         <K_alpha1 unit="deg">-0.000532</K_alpha1>
+         <K_alpha2 unit="deg">-0.000534</K_alpha2>
+         <K_Rphi1 unit="deg">-90.040258</K_Rphi1>
+         <K_Rtheta unit="deg">132.690104</K_Rtheta>
+         <K_Rphi2 unit="deg">5.618324</K_Rphi2>
+         <K_Pr unit="cm">159.778289</K_Pr>
+         <K_Ptheta unit="deg">135.788394</K_Ptheta>
+         <K_Pphi unit="deg">5.630237</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="93">
+         <K_h1 unit="cm">2.610611</K_h1>
+         <K_h2 unit="cm">3.191069</K_h2>
+         <K_bl1 unit="cm">3.316572</K_bl1>
+         <K_bl2 unit="cm">4.052725</K_bl2>
+         <K_tl1 unit="cm">3.201200</K_tl1>
+         <K_tl2 unit="cm">3.911700</K_tl2>
+         <K_alpha1 unit="deg">0.000145</K_alpha1>
+         <K_alpha2 unit="deg">0.000150</K_alpha2>
+         <K_Rphi1 unit="deg">-90.030817</K_Rphi1>
+         <K_Rtheta unit="deg">132.691808</K_Rtheta>
+         <K_Rphi2 unit="deg">9.369684</K_Rphi2>
+         <K_Pr unit="cm">159.779482</K_Pr>
+         <K_Ptheta unit="deg">135.789647</K_Ptheta>
+         <K_Pphi unit="deg">9.379003</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="94">
+         <K_h1 unit="cm">2.610561</K_h1>
+         <K_h2 unit="cm">3.191009</K_h2>
+         <K_bl1 unit="cm">3.316633</K_bl1>
+         <K_bl2 unit="cm">4.052799</K_bl2>
+         <K_tl1 unit="cm">3.201200</K_tl1>
+         <K_tl2 unit="cm">3.911700</K_tl2>
+         <K_alpha1 unit="deg">-0.000542</K_alpha1>
+         <K_alpha2 unit="deg">-0.000541</K_alpha2>
+         <K_Rphi1 unit="deg">-90.022614</K_Rphi1>
+         <K_Rtheta unit="deg">132.693089</K_Rtheta>
+         <K_Rphi2 unit="deg">13.121135</K_Rphi2>
+         <K_Pr unit="cm">159.780387</K_Pr>
+         <K_Ptheta unit="deg">135.790620</K_Ptheta>
+         <K_Pphi unit="deg">13.127818</K_Pphi>
+       </EndCapCrystal>
+
+       <EndCapCrystal id="95">
+         <K_h1 unit="cm">2.610611</K_h1>
+         <K_h2 unit="cm">3.191068</K_h2>
+         <K_bl1 unit="cm">3.316572</K_bl1>
+         <K_bl2 unit="cm">4.052725</K_bl2>
+         <K_tl1 unit="cm">3.201200</K_tl1>
+         <K_tl2 unit="cm">3.911700</K_tl2>
+         <K_alpha1 unit="deg">0.000148</K_alpha1>
+         <K_alpha2 unit="deg">0.000151</K_alpha2>
+         <K_Rphi1 unit="deg">-90.012939</K_Rphi1>
+         <K_Rtheta unit="deg">132.693938</K_Rtheta>
+         <K_Rphi2 unit="deg">16.872651</K_Rphi2>
+         <K_Pr unit="cm">159.780991</K_Pr>
+         <K_Ptheta unit="deg">135.791236</K_Ptheta>
+         <K_Pphi unit="deg">16.876670</K_Pphi>
+       </EndCapCrystal>
+
+       <EndCapCrystal id="96">
+         <K_h1 unit="cm">2.610639</K_h1>
+         <K_h2 unit="cm">3.191101</K_h2>
+         <K_bl1 unit="cm">3.304143</K_bl1>
+         <K_bl2 unit="cm">4.040311</K_bl2>
+         <K_tl1 unit="cm">3.188700</K_tl1>
+         <K_tl2 unit="cm">3.899200</K_tl2>
+         <K_alpha1 unit="deg">0.000398</K_alpha1>
+         <K_alpha2 unit="deg">0.000392</K_alpha2>
+         <K_Rphi1 unit="deg">-90.003721</K_Rphi1>
+         <K_Rtheta unit="deg">132.694330</K_Rtheta>
+         <K_Rphi2 unit="deg">20.624207</K_Rphi2>
+         <K_Pr unit="cm">159.781292</K_Pr>
+         <K_Ptheta unit="deg">135.791517</K_Ptheta>
+         <K_Pphi unit="deg">20.619115</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="97">
+         <K_h1 unit="cm">2.682486</K_h1>
+         <K_h2 unit="cm">3.305370</K_h2>
+         <K_bl1 unit="cm">3.050500</K_bl1>
+         <K_bl2 unit="cm">3.760985</K_bl2>
+         <K_tl1 unit="cm">2.926750</K_tl1>
+         <K_tl2 unit="cm">3.608500</K_tl2>
+         <K_alpha1 unit="deg">0.000002</K_alpha1>
+         <K_alpha2 unit="deg">0.000004</K_alpha2>
+         <K_Rphi1 unit="deg">-90.050424</K_Rphi1>
+         <K_Rtheta unit="deg">134.951316</K_Rtheta>
+         <K_Rphi2 unit="deg">1.865751</K_Rphi2>
+         <K_Pr unit="cm">154.351285</K_Pr>
+         <K_Ptheta unit="deg">138.064008</K_Ptheta>
+         <K_Pphi unit="deg">1.893016</K_Pphi>
+       </EndCapCrystal>
+
+       <EndCapCrystal id="98">
+         <K_h1 unit="cm">2.682460</K_h1>
+         <K_h2 unit="cm">3.305338</K_h2>
+         <K_bl1 unit="cm">3.063000</K_bl1>
+         <K_bl2 unit="cm">3.773424</K_bl2>
+         <K_tl1 unit="cm">2.939300</K_tl1>
+         <K_tl2 unit="cm">3.621000</K_tl2>
+         <K_alpha1 unit="deg">-0.000006</K_alpha1>
+         <K_alpha2 unit="deg">-0.000004</K_alpha2>
+         <K_Rphi1 unit="deg">-90.041873</K_Rphi1>
+         <K_Rtheta unit="deg">134.953486</K_Rtheta>
+         <K_Rphi2 unit="deg">5.617628</K_Rphi2>
+         <K_Pr unit="cm">154.353023</K_Pr>
+         <K_Ptheta unit="deg">138.065436</K_Ptheta>
+         <K_Pphi unit="deg">5.634011</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="99">
+         <K_h1 unit="cm">2.682460</K_h1>
+         <K_h2 unit="cm">3.305338</K_h2>
+         <K_bl1 unit="cm">3.062999</K_bl1>
+         <K_bl2 unit="cm">3.773424</K_bl2>
+         <K_tl1 unit="cm">2.939300</K_tl1>
+         <K_tl2 unit="cm">3.621000</K_tl2>
+         <K_alpha1 unit="deg">-0.000005</K_alpha1>
+         <K_alpha2 unit="deg">-0.000001</K_alpha2>
+         <K_Rphi1 unit="deg">-90.032516</K_Rphi1>
+         <K_Rtheta unit="deg">134.955217</K_Rtheta>
+         <K_Rphi2 unit="deg">9.369095</K_Rphi2>
+         <K_Pr unit="cm">154.354412</K_Pr>
+         <K_Ptheta unit="deg">138.066585</K_Ptheta>
+         <K_Pphi unit="deg">9.381952</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="100">
+         <K_h1 unit="cm">2.682460</K_h1>
+         <K_h2 unit="cm">3.305339</K_h2>
+         <K_bl1 unit="cm">3.063000</K_bl1>
+         <K_bl2 unit="cm">3.773424</K_bl2>
+         <K_tl1 unit="cm">2.939300</K_tl1>
+         <K_tl2 unit="cm">3.621000</K_tl2>
+         <K_alpha1 unit="deg">-0.000010</K_alpha1>
+         <K_alpha2 unit="deg">-0.000010</K_alpha2>
+         <K_Rphi1 unit="deg">-90.023023</K_Rphi1>
+         <K_Rtheta unit="deg">134.956511</K_Rtheta>
+         <K_Rphi2 unit="deg">13.120662</K_Rphi2>
+         <K_Pr unit="cm">154.355461</K_Pr>
+         <K_Ptheta unit="deg">138.067438</K_Ptheta>
+         <K_Pphi unit="deg">13.129936</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="101">
+         <K_h1 unit="cm">2.682460</K_h1>
+         <K_h2 unit="cm">3.305338</K_h2>
+         <K_bl1 unit="cm">3.063000</K_bl1>
+         <K_bl2 unit="cm">3.773424</K_bl2>
+         <K_tl1 unit="cm">2.939300</K_tl1>
+         <K_tl2 unit="cm">3.621000</K_tl2>
+         <K_alpha1 unit="deg">0.000000</K_alpha1>
+         <K_alpha2 unit="deg">-0.000002</K_alpha2>
+         <K_Rphi1 unit="deg">-90.013423</K_Rphi1>
+         <K_Rtheta unit="deg">134.957363</K_Rtheta>
+         <K_Rphi2 unit="deg">16.872299</K_Rphi2>
+         <K_Pr unit="cm">154.356166</K_Pr>
+         <K_Ptheta unit="deg">138.067992</K_Ptheta>
+         <K_Pphi unit="deg">16.877951</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="102">
+         <K_h1 unit="cm">2.682486</K_h1>
+         <K_h2 unit="cm">3.305369</K_h2>
+         <K_bl1 unit="cm">3.050499</K_bl1>
+         <K_bl2 unit="cm">3.760985</K_bl2>
+         <K_tl1 unit="cm">2.926750</K_tl1>
+         <K_tl2 unit="cm">3.608500</K_tl2>
+         <K_alpha1 unit="deg">-0.000006</K_alpha1>
+         <K_alpha2 unit="deg">-0.000005</K_alpha2>
+         <K_Rphi1 unit="deg">-90.003981</K_Rphi1>
+         <K_Rtheta unit="deg">134.957772</K_Rtheta>
+         <K_Rphi2 unit="deg">20.623739</K_Rphi2>
+         <K_Pr unit="cm">154.356530</K_Pr>
+         <K_Ptheta unit="deg">138.068234</K_Ptheta>
+         <K_Pphi unit="deg">20.618987</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="103">
+         <K_h1 unit="cm">2.682325</K_h1>
+         <K_h2 unit="cm">3.331688</K_h2>
+         <K_bl1 unit="cm">2.804300</K_bl1>
+         <K_bl2 unit="cm">3.486129</K_bl2>
+         <K_tl1 unit="cm">2.675300</K_tl1>
+         <K_tl2 unit="cm">3.325900</K_tl2>
+         <K_alpha1 unit="deg">-0.000005</K_alpha1>
+         <K_alpha2 unit="deg">-0.000001</K_alpha2>
+         <K_Rphi1 unit="deg">-90.039535</K_Rphi1>
+         <K_Rtheta unit="deg">137.378365</K_Rtheta>
+         <K_Rphi2 unit="deg">1.859507</K_Rphi2>
+         <K_Pr unit="cm">149.371908</K_Pr>
+         <K_Ptheta unit="deg">140.453428</K_Ptheta>
+         <K_Pphi unit="deg">1.897436</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="104">
+         <K_h1 unit="cm">2.682325</K_h1>
+         <K_h2 unit="cm">3.331688</K_h2>
+         <K_bl1 unit="cm">2.816800</K_bl1>
+         <K_bl2 unit="cm">3.498630</K_bl2>
+         <K_tl1 unit="cm">2.687800</K_tl1>
+         <K_tl2 unit="cm">3.338400</K_tl2>
+         <K_alpha1 unit="deg">-0.000001</K_alpha1>
+         <K_alpha2 unit="deg">0.000002</K_alpha2>
+         <K_Rphi1 unit="deg">-90.032662</K_Rphi1>
+         <K_Rtheta unit="deg">137.379945</K_Rtheta>
+         <K_Rphi2 unit="deg">5.612159</K_Rphi2>
+         <K_Pr unit="cm">149.374029</K_Pr>
+         <K_Ptheta unit="deg">140.454035</K_Ptheta>
+         <K_Pphi unit="deg">5.637204</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="105">
+         <K_h1 unit="cm">2.682325</K_h1>
+         <K_h2 unit="cm">3.331687</K_h2>
+         <K_bl1 unit="cm">2.816800</K_bl1>
+         <K_bl2 unit="cm">3.498629</K_bl2>
+         <K_tl1 unit="cm">2.687800</K_tl1>
+         <K_tl2 unit="cm">3.338400</K_tl2>
+         <K_alpha1 unit="deg">-0.000004</K_alpha1>
+         <K_alpha2 unit="deg">-0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-90.025653</K_Rphi1>
+         <K_Rtheta unit="deg">137.381217</K_Rtheta>
+         <K_Rphi2 unit="deg">9.364910</K_Rphi2>
+         <K_Pr unit="cm">149.375741</K_Pr>
+         <K_Ptheta unit="deg">140.454529</K_Ptheta>
+         <K_Pphi unit="deg">9.384497</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="106">
+         <K_h1 unit="cm">2.682325</K_h1>
+         <K_h2 unit="cm">3.331688</K_h2>
+         <K_bl1 unit="cm">2.816800</K_bl1>
+         <K_bl2 unit="cm">3.498629</K_bl2>
+         <K_tl1 unit="cm">2.687800</K_tl1>
+         <K_tl2 unit="cm">3.338400</K_tl2>
+         <K_alpha1 unit="deg">0.000008</K_alpha1>
+         <K_alpha2 unit="deg">0.000006</K_alpha2>
+         <K_Rphi1 unit="deg">-90.018529</K_Rphi1>
+         <K_Rtheta unit="deg">137.382176</K_Rtheta>
+         <K_Rphi2 unit="deg">13.117743</K_Rphi2>
+         <K_Pr unit="cm">149.377031</K_Pr>
+         <K_Ptheta unit="deg">140.454906</K_Ptheta>
+         <K_Pphi unit="deg">13.131787</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="107">
+         <K_h1 unit="cm">2.682325</K_h1>
+         <K_h2 unit="cm">3.331688</K_h2>
+         <K_bl1 unit="cm">2.816800</K_bl1>
+         <K_bl2 unit="cm">3.498629</K_bl2>
+         <K_tl1 unit="cm">2.687800</K_tl1>
+         <K_tl2 unit="cm">3.338400</K_tl2>
+         <K_alpha1 unit="deg">-0.000001</K_alpha1>
+         <K_alpha2 unit="deg">-0.000004</K_alpha2>
+         <K_Rphi1 unit="deg">-90.011342</K_Rphi1>
+         <K_Rtheta unit="deg">137.382816</K_Rtheta>
+         <K_Rphi2 unit="deg">16.870632</K_Rphi2>
+         <K_Pr unit="cm">149.377894</K_Pr>
+         <K_Ptheta unit="deg">140.455164</K_Ptheta>
+         <K_Pphi unit="deg">16.879076</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="108">
+         <K_h1 unit="cm">2.682325</K_h1>
+         <K_h2 unit="cm">3.331688</K_h2>
+         <K_bl1 unit="cm">2.804300</K_bl1>
+         <K_bl2 unit="cm">3.486129</K_bl2>
+         <K_tl1 unit="cm">2.675300</K_tl1>
+         <K_tl2 unit="cm">3.325900</K_tl2>
+         <K_alpha1 unit="deg">0.000000</K_alpha1>
+         <K_alpha2 unit="deg">0.000006</K_alpha2>
+         <K_Rphi1 unit="deg">-90.004094</K_Rphi1>
+         <K_Rtheta unit="deg">137.383137</K_Rtheta>
+         <K_Rphi2 unit="deg">20.623554</K_Rphi2>
+         <K_Pr unit="cm">149.378327</K_Pr>
+         <K_Ptheta unit="deg">140.455302</K_Ptheta>
+         <K_Pphi unit="deg">20.618833</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="109">
+         <K_h1 unit="cm">2.682062</K_h1>
+         <K_h2 unit="cm">3.357951</K_h2>
+         <K_bl1 unit="cm">2.567700</K_bl1>
+         <K_bl2 unit="cm">3.218294</K_bl2>
+         <K_tl1 unit="cm">2.433600</K_tl1>
+         <K_tl2 unit="cm">3.050400</K_tl2>
+         <K_alpha1 unit="deg">-0.000004</K_alpha1>
+         <K_alpha2 unit="deg">-0.000005</K_alpha2>
+         <K_Rphi1 unit="deg">-90.042008</K_Rphi1>
+         <K_Rtheta unit="deg">139.905120</K_Rtheta>
+         <K_Rphi2 unit="deg">1.856897</K_Rphi2>
+         <K_Pr unit="cm">144.815940</K_Pr>
+         <K_Ptheta unit="deg">142.918060</K_Ptheta>
+         <K_Pphi unit="deg">1.902649</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="110">
+         <K_h1 unit="cm">2.682062</K_h1>
+         <K_h2 unit="cm">3.357951</K_h2>
+         <K_bl1 unit="cm">2.580200</K_bl1>
+         <K_bl2 unit="cm">3.230794</K_bl2>
+         <K_tl1 unit="cm">2.446100</K_tl1>
+         <K_tl2 unit="cm">3.062900</K_tl2>
+         <K_alpha1 unit="deg">0.000001</K_alpha1>
+         <K_alpha2 unit="deg">-0.000002</K_alpha2>
+         <K_Rphi1 unit="deg">-90.034632</K_Rphi1>
+         <K_Rtheta unit="deg">139.906734</K_Rtheta>
+         <K_Rphi2 unit="deg">5.609995</K_Rphi2>
+         <K_Pr unit="cm">144.818193</K_Pr>
+         <K_Ptheta unit="deg">142.918490</K_Ptheta>
+         <K_Pphi unit="deg">5.640941</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="111">
+         <K_h1 unit="cm">2.682062</K_h1>
+         <K_h2 unit="cm">3.357951</K_h2>
+         <K_bl1 unit="cm">2.580200</K_bl1>
+         <K_bl2 unit="cm">3.230794</K_bl2>
+         <K_tl1 unit="cm">2.446100</K_tl1>
+         <K_tl2 unit="cm">3.062900</K_tl2>
+         <K_alpha1 unit="deg">-0.000000</K_alpha1>
+         <K_alpha2 unit="deg">0.000002</K_alpha2>
+         <K_Rphi1 unit="deg">-90.027104</K_Rphi1>
+         <K_Rtheta unit="deg">139.908034</K_Rtheta>
+         <K_Rphi2 unit="deg">9.363206</K_Rphi2>
+         <K_Pr unit="cm">144.820012</K_Pr>
+         <K_Ptheta unit="deg">142.918838</K_Ptheta>
+         <K_Pphi unit="deg">9.387416</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="112">
+         <K_h1 unit="cm">2.682062</K_h1>
+         <K_h2 unit="cm">3.357951</K_h2>
+         <K_bl1 unit="cm">2.580200</K_bl1>
+         <K_bl2 unit="cm">3.230794</K_bl2>
+         <K_tl1 unit="cm">2.446100</K_tl1>
+         <K_tl2 unit="cm">3.062900</K_tl2>
+         <K_alpha1 unit="deg">0.000007</K_alpha1>
+         <K_alpha2 unit="deg">0.000006</K_alpha2>
+         <K_Rphi1 unit="deg">-90.019457</K_Rphi1>
+         <K_Rtheta unit="deg">139.909014</K_Rtheta>
+         <K_Rphi2 unit="deg">13.116507</K_Rphi2>
+         <K_Pr unit="cm">144.821384</K_Pr>
+         <K_Ptheta unit="deg">142.919101</K_Ptheta>
+         <K_Pphi unit="deg">13.133877</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="113">
+         <K_h1 unit="cm">2.682062</K_h1>
+         <K_h2 unit="cm">3.357951</K_h2>
+         <K_bl1 unit="cm">2.580200</K_bl1>
+         <K_bl2 unit="cm">3.230794</K_bl2>
+         <K_tl1 unit="cm">2.446100</K_tl1>
+         <K_tl2 unit="cm">3.062900</K_tl2>
+         <K_alpha1 unit="deg">0.000001</K_alpha1>
+         <K_alpha2 unit="deg">-0.000007</K_alpha2>
+         <K_Rphi1 unit="deg">-90.011748</K_Rphi1>
+         <K_Rtheta unit="deg">139.909669</K_Rtheta>
+         <K_Rphi2 unit="deg">16.869872</K_Rphi2>
+         <K_Pr unit="cm">144.822301</K_Pr>
+         <K_Ptheta unit="deg">142.919277</K_Ptheta>
+         <K_Pphi unit="deg">16.880327</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="114">
+         <K_h1 unit="cm">2.682062</K_h1>
+         <K_h2 unit="cm">3.357951</K_h2>
+         <K_bl1 unit="cm">2.567700</K_bl1>
+         <K_bl2 unit="cm">3.218293</K_bl2>
+         <K_tl1 unit="cm">2.433600</K_tl1>
+         <K_tl2 unit="cm">3.050400</K_tl2>
+         <K_alpha1 unit="deg">0.000005</K_alpha1>
+         <K_alpha2 unit="deg">0.000004</K_alpha2>
+         <K_Rphi1 unit="deg">-90.003971</K_Rphi1>
+         <K_Rtheta unit="deg">139.909999</K_Rtheta>
+         <K_Rphi2 unit="deg">20.623274</K_Rphi2>
+         <K_Pr unit="cm">144.822762</K_Pr>
+         <K_Ptheta unit="deg">142.919367</K_Ptheta>
+         <K_Pphi unit="deg">20.618568</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="115">
+         <K_h1 unit="cm">2.675698</K_h1>
+         <K_h2 unit="cm">3.375769</K_h2>
+         <K_bl1 unit="cm">2.340064</K_bl1>
+         <K_bl2 unit="cm">2.956825</K_bl2>
+         <K_tl1 unit="cm">2.200900</K_tl1>
+         <K_tl2 unit="cm">2.781250</K_tl2>
+         <K_alpha1 unit="deg">-3.032520</K_alpha1>
+         <K_alpha2 unit="deg">-3.032526</K_alpha2>
+         <K_Rphi1 unit="deg">-93.077140</K_Rphi1>
+         <K_Rtheta unit="deg">142.622451</K_Rtheta>
+         <K_Rphi2 unit="deg">1.851820</K_Rphi2>
+         <K_Pr unit="cm">140.671908</K_Pr>
+         <K_Ptheta unit="deg">145.516593</K_Ptheta>
+         <K_Pphi unit="deg">1.905600</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="116">
+         <K_h1 unit="cm">2.800158</K_h1>
+         <K_h2 unit="cm">3.532862</K_h2>
+         <K_bl1 unit="cm">2.352500</K_bl1>
+         <K_bl2 unit="cm">2.969320</K_bl2>
+         <K_tl1 unit="cm">2.207200</K_tl1>
+         <K_tl2 unit="cm">2.786000</K_tl2>
+         <K_alpha1 unit="deg">0.000002</K_alpha1>
+         <K_alpha2 unit="deg">0.000011</K_alpha2>
+         <K_Rphi1 unit="deg">-90.036763</K_Rphi1>
+         <K_Rtheta unit="deg">142.534000</K_Rtheta>
+         <K_Rphi2 unit="deg">5.608097</K_Rphi2>
+         <K_Pr unit="cm">140.672802</K_Pr>
+         <K_Ptheta unit="deg">145.506019</K_Ptheta>
+         <K_Pphi unit="deg">5.644695</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="117">
+         <K_h1 unit="cm">2.675066</K_h1>
+         <K_h2 unit="cm">3.375184</K_h2>
+         <K_bl1 unit="cm">2.352564</K_bl1>
+         <K_bl2 unit="cm">2.969336</K_bl2>
+         <K_tl1 unit="cm">2.213400</K_tl1>
+         <K_tl2 unit="cm">2.793750</K_tl2>
+         <K_alpha1 unit="deg">3.032208</K_alpha1>
+         <K_alpha2 unit="deg">3.032209</K_alpha2>
+         <K_Rphi1 unit="deg">-86.996682</K_Rphi1>
+         <K_Rtheta unit="deg">142.625269</K_Rtheta>
+         <K_Rphi2 unit="deg">9.364278</K_Rphi2>
+         <K_Pr unit="cm">140.676022</K_Pr>
+         <K_Ptheta unit="deg">145.517059</K_Ptheta>
+         <K_Pphi unit="deg">9.392727</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="118">
+         <K_h1 unit="cm">2.675037</K_h1>
+         <K_h2 unit="cm">3.375108</K_h2>
+         <K_bl1 unit="cm">2.352564</K_bl1>
+         <K_bl2 unit="cm">2.969334</K_bl2>
+         <K_tl1 unit="cm">2.213400</K_tl1>
+         <K_tl2 unit="cm">2.793750</K_tl2>
+         <K_alpha1 unit="deg">-3.032888</K_alpha1>
+         <K_alpha2 unit="deg">-3.032888</K_alpha2>
+         <K_Rphi1 unit="deg">-93.053711</K_Rphi1>
+         <K_Rtheta unit="deg">142.626364</K_Rtheta>
+         <K_Rphi2 unit="deg">13.112735</K_Rphi2>
+         <K_Pr unit="cm">140.677415</K_Pr>
+         <K_Ptheta unit="deg">145.517259</K_Ptheta>
+         <K_Pphi unit="deg">13.133562</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="119">
+         <K_h1 unit="cm">2.800158</K_h1>
+         <K_h2 unit="cm">3.532862</K_h2>
+         <K_bl1 unit="cm">2.352500</K_bl1>
+         <K_bl2 unit="cm">2.969320</K_bl2>
+         <K_tl1 unit="cm">2.207200</K_tl1>
+         <K_tl2 unit="cm">2.786000</K_tl2>
+         <K_alpha1 unit="deg">0.000010</K_alpha1>
+         <K_alpha2 unit="deg">0.000009</K_alpha2>
+         <K_Rphi1 unit="deg">-90.013007</K_Rphi1>
+         <K_Rtheta unit="deg">142.536973</K_Rtheta>
+         <K_Rphi2 unit="deg">16.869258</K_Rphi2>
+         <K_Pr unit="cm">140.676963</K_Pr>
+         <K_Ptheta unit="deg">145.506549</K_Ptheta>
+         <K_Pphi unit="deg">16.881577</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="120">
+         <K_h1 unit="cm">2.675714</K_h1>
+         <K_h2 unit="cm">3.375833</K_h2>
+         <K_bl1 unit="cm">2.340065</K_bl1>
+         <K_bl2 unit="cm">2.956828</K_bl2>
+         <K_tl1 unit="cm">2.200900</K_tl1>
+         <K_tl2 unit="cm">2.781250</K_tl2>
+         <K_alpha1 unit="deg">3.032556</K_alpha1>
+         <K_alpha2 unit="deg">3.032559</K_alpha2>
+         <K_Rphi1 unit="deg">-86.971914</K_Rphi1>
+         <K_Rtheta unit="deg">142.627479</K_Rtheta>
+         <K_Rphi2 unit="deg">20.625712</K_Rphi2>
+         <K_Pr unit="cm">140.678813</K_Pr>
+         <K_Ptheta unit="deg">145.517464</K_Ptheta>
+         <K_Pphi unit="deg">20.620569</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="121">
+         <K_h1 unit="cm">2.552623</K_h1>
+         <K_h2 unit="cm">3.245609</K_h2>
+         <K_bl1 unit="cm">3.188038</K_bl1>
+         <K_bl2 unit="cm">4.055538</K_bl2>
+         <K_tl1 unit="cm">2.982500</K_tl1>
+         <K_tl2 unit="cm">3.794200</K_tl2>
+         <K_alpha1 unit="deg">0.001505</K_alpha1>
+         <K_alpha2 unit="deg">0.001509</K_alpha2>
+         <K_Rphi1 unit="deg">-90.047303</K_Rphi1>
+         <K_Rtheta unit="deg">145.371459</K_Rtheta>
+         <K_Rphi2 unit="deg">2.794139</K_Rphi2>
+         <K_Pr unit="cm">136.884142</K_Pr>
+         <K_Ptheta unit="deg">148.148525</K_Ptheta>
+         <K_Pphi unit="deg">2.851066</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="122">
+         <K_h1 unit="cm">2.552617</K_h1>
+         <K_h2 unit="cm">3.245471</K_h2>
+         <K_bl1 unit="cm">3.200694</K_bl1>
+         <K_bl2 unit="cm">4.068226</K_bl2>
+         <K_tl1 unit="cm">2.995000</K_tl1>
+         <K_tl2 unit="cm">3.806700</K_tl2>
+         <K_alpha1 unit="deg">-0.000250</K_alpha1>
+         <K_alpha2 unit="deg">-0.000251</K_alpha2>
+         <K_Rphi1 unit="deg">-90.035194</K_Rphi1>
+         <K_Rtheta unit="deg">145.374007</K_Rtheta>
+         <K_Rphi2 unit="deg">8.424094</K_Rphi2>
+         <K_Pr unit="cm">136.887029</K_Pr>
+         <K_Ptheta unit="deg">148.148908</K_Ptheta>
+         <K_Pphi unit="deg">8.458000</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="123">
+         <K_h1 unit="cm">2.552623</K_h1>
+         <K_h2 unit="cm">3.245609</K_h2>
+         <K_bl1 unit="cm">3.200557</K_bl1>
+         <K_bl2 unit="cm">4.068062</K_bl2>
+         <K_tl1 unit="cm">2.995000</K_tl1>
+         <K_tl2 unit="cm">3.806700</K_tl2>
+         <K_alpha1 unit="deg">0.001302</K_alpha1>
+         <K_alpha2 unit="deg">0.001307</K_alpha2>
+         <K_Rphi1 unit="deg">-90.019633</K_Rphi1>
+         <K_Rtheta unit="deg">145.375361</K_Rtheta>
+         <K_Rphi2 unit="deg">14.054342</K_Rphi2>
+         <K_Pr unit="cm">136.888971</K_Pr>
+         <K_Ptheta unit="deg">148.149109</K_Ptheta>
+         <K_Pphi unit="deg">14.074810</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="124">
+         <K_h1 unit="cm">2.552622</K_h1>
+         <K_h2 unit="cm">3.245540</K_h2>
+         <K_bl1 unit="cm">3.188179</K_bl1>
+         <K_bl2 unit="cm">4.055712</K_bl2>
+         <K_tl1 unit="cm">2.982500</K_tl1>
+         <K_tl2 unit="cm">3.794200</K_tl2>
+         <K_alpha1 unit="deg">-0.000070</K_alpha1>
+         <K_alpha2 unit="deg">-0.000069</K_alpha2>
+         <K_Rphi1 unit="deg">-90.006627</K_Rphi1>
+         <K_Rtheta unit="deg">145.376223</K_Rtheta>
+         <K_Rphi2 unit="deg">19.684744</K_Rphi2>
+         <K_Pr unit="cm">136.889945</K_Pr>
+         <K_Ptheta unit="deg">148.149203</K_Ptheta>
+         <K_Pphi unit="deg">19.681659</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="125">
+         <K_h1 unit="cm">2.588483</K_h1>
+         <K_h2 unit="cm">3.315261</K_h2>
+         <K_bl1 unit="cm">2.880100</K_bl1>
+         <K_bl2 unit="cm">3.691843</K_bl2>
+         <K_tl1 unit="cm">2.664650</K_tl1>
+         <K_tl2 unit="cm">3.415900</K_tl2>
+         <K_alpha1 unit="deg">-0.000002</K_alpha1>
+         <K_alpha2 unit="deg">-0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-90.042774</K_Rphi1>
+         <K_Rtheta unit="deg">148.016447</K_Rtheta>
+         <K_Rphi2 unit="deg">2.788818</K_Rphi2>
+         <K_Pr unit="cm">133.483908</K_Pr>
+         <K_Ptheta unit="deg">150.715008</K_Ptheta>
+         <K_Pphi unit="deg">2.857098</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="126">
+         <K_h1 unit="cm">2.588460</K_h1>
+         <K_h2 unit="cm">3.315231</K_h2>
+         <K_bl1 unit="cm">2.892600</K_bl1>
+         <K_bl2 unit="cm">3.704279</K_bl2>
+         <K_tl1 unit="cm">2.677200</K_tl1>
+         <K_tl2 unit="cm">3.428400</K_tl2>
+         <K_alpha1 unit="deg">0.000001</K_alpha1>
+         <K_alpha2 unit="deg">0.000004</K_alpha2>
+         <K_Rphi1 unit="deg">-90.031318</K_Rphi1>
+         <K_Rtheta unit="deg">148.018426</K_Rtheta>
+         <K_Rphi2 unit="deg">8.420122</K_Rphi2>
+         <K_Pr unit="cm">133.486801</K_Pr>
+         <K_Ptheta unit="deg">150.714733</K_Ptheta>
+         <K_Pphi unit="deg">8.461640</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="127">
+         <K_h1 unit="cm">2.588459</K_h1>
+         <K_h2 unit="cm">3.315230</K_h2>
+         <K_bl1 unit="cm">2.892600</K_bl1>
+         <K_bl2 unit="cm">3.704279</K_bl2>
+         <K_tl1 unit="cm">2.677200</K_tl1>
+         <K_tl2 unit="cm">3.428400</K_tl2>
+         <K_alpha1 unit="deg">-0.000004</K_alpha1>
+         <K_alpha2 unit="deg">-0.000006</K_alpha2>
+         <K_Rphi1 unit="deg">-90.018564</K_Rphi1>
+         <K_Rtheta unit="deg">148.019749</K_Rtheta>
+         <K_Rphi2 unit="deg">14.051686</K_Rphi2>
+         <K_Pr unit="cm">133.488761</K_Pr>
+         <K_Ptheta unit="deg">150.714532</K_Ptheta>
+         <K_Pphi unit="deg">14.077013</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="128">
+         <K_h1 unit="cm">2.588483</K_h1>
+         <K_h2 unit="cm">3.315260</K_h2>
+         <K_bl1 unit="cm">2.880100</K_bl1>
+         <K_bl2 unit="cm">3.691843</K_bl2>
+         <K_tl1 unit="cm">2.664650</K_tl1>
+         <K_tl2 unit="cm">3.415900</K_tl2>
+         <K_alpha1 unit="deg">-0.000003</K_alpha1>
+         <K_alpha2 unit="deg">-0.000005</K_alpha2>
+         <K_Rphi1 unit="deg">-90.005339</K_Rphi1>
+         <K_Rtheta unit="deg">148.020391</K_Rtheta>
+         <K_Rphi2 unit="deg">19.683813</K_Rphi2>
+         <K_Pr unit="cm">133.489749</K_Pr>
+         <K_Ptheta unit="deg">150.714388</K_Ptheta>
+         <K_Pphi unit="deg">19.681334</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="129">
+         <K_h1 unit="cm">2.588124</K_h1>
+         <K_h2 unit="cm">3.337336</K_h2>
+         <K_bl1 unit="cm">2.581700</K_bl1>
+         <K_bl2 unit="cm">3.332957</K_bl2>
+         <K_tl1 unit="cm">2.359900</K_tl1>
+         <K_tl2 unit="cm">3.046950</K_tl2>
+         <K_alpha1 unit="deg">-0.000008</K_alpha1>
+         <K_alpha2 unit="deg">-0.000000</K_alpha2>
+         <K_Rphi1 unit="deg">-90.045755</K_Rphi1>
+         <K_Rtheta unit="deg">150.833371</K_Rtheta>
+         <K_Rphi2 unit="deg">2.782287</K_Rphi2>
+         <K_Pr unit="cm">130.544191</K_Pr>
+         <K_Ptheta unit="deg">153.363902</K_Ptheta>
+         <K_Pphi unit="deg">2.863975</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="130">
+         <K_h1 unit="cm">2.588124</K_h1>
+         <K_h2 unit="cm">3.337336</K_h2>
+         <K_bl1 unit="cm">2.594200</K_bl1>
+         <K_bl2 unit="cm">3.345507</K_bl2>
+         <K_tl1 unit="cm">2.372400</K_tl1>
+         <K_tl2 unit="cm">3.059500</K_tl2>
+         <K_alpha1 unit="deg">0.000003</K_alpha1>
+         <K_alpha2 unit="deg">0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-90.032725</K_Rphi1>
+         <K_Rtheta unit="deg">150.835272</K_Rtheta>
+         <K_Rphi2 unit="deg">8.415826</K_Rphi2>
+         <K_Pr unit="cm">130.547038</K_Pr>
+         <K_Ptheta unit="deg">153.363284</K_Ptheta>
+         <K_Pphi unit="deg">8.465741</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="131">
+         <K_h1 unit="cm">2.588124</K_h1>
+         <K_h2 unit="cm">3.337336</K_h2>
+         <K_bl1 unit="cm">2.594200</K_bl1>
+         <K_bl2 unit="cm">3.345507</K_bl2>
+         <K_tl1 unit="cm">2.372400</K_tl1>
+         <K_tl2 unit="cm">3.059500</K_tl2>
+         <K_alpha1 unit="deg">0.000002</K_alpha1>
+         <K_alpha2 unit="deg">0.000004</K_alpha2>
+         <K_Rphi1 unit="deg">-90.019369</K_Rphi1>
+         <K_Rtheta unit="deg">150.836541</K_Rtheta>
+         <K_Rphi2 unit="deg">14.049644</K_Rphi2>
+         <K_Pr unit="cm">130.548946</K_Pr>
+         <K_Ptheta unit="deg">153.362862</K_Ptheta>
+         <K_Pphi unit="deg">14.079541</K_Pphi>
+       </EndCapCrystal>
+       
+       <EndCapCrystal id="132">
+         <K_h1 unit="cm">2.588124</K_h1>
+         <K_h2 unit="cm">3.337336</K_h2>
+         <K_bl1 unit="cm">2.581700</K_bl1>
+         <K_bl2 unit="cm">3.332957</K_bl2>
+         <K_tl1 unit="cm">2.359900</K_tl1>
+         <K_tl2 unit="cm">3.046950</K_tl2>
+         <K_alpha1 unit="deg">-0.000002</K_alpha1>
+         <K_alpha2 unit="deg">-0.000003</K_alpha2>
+         <K_Rphi1 unit="deg">-90.006179</K_Rphi1>
+         <K_Rtheta unit="deg">150.837174</K_Rtheta>
+         <K_Rphi2 unit="deg">19.683238</K_Rphi2>
+         <K_Pr unit="cm">130.549897</K_Pr>
+         <K_Ptheta unit="deg">153.362643</K_Ptheta>
+         <K_Pphi unit="deg">19.680932</K_Pphi>
+       </EndCapCrystal>
+       
+     </EndCapCrystals>
+   </Content>
+</DetectorComponent>

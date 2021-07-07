@@ -1,0 +1,26 @@
+Import('env')
+env['TOOLS_LIBS']['trg-cdc-deadch-writedb'] = ['framework', 'trg', 'trg_cdc', 'trg_cdc_dbobjects', '$ROOT_LIBS']
+env['TOOLS_LIBS']['trg-cdc-2d-writedb'] = ['framework', 'trg', 'trg_cdc', 'trg_cdc_dbobjects', '$ROOT_LIBS']
+env['TOOLS_LIBS']['trg-cdc-neurotrigger-writedb'] = ['framework', 'trg', 'trg_cdc', 'trg_cdc_dbobjects', '$ROOT_LIBS']
+env['TOOLS_LIBS']['NeuroTriggerMLPToTextfile'] = ['trg_cdc_dataobjects']
+env['TOOLS_LIBS']['TRGCDCHoughMapping'] = ['trg_cdc','trg_trg']
+env['TOOLS_LIBS']['TRGCDCConfig'] = ['trg_cdc','trg_trg']
+env['TOOLS_LIBS']['TRGCDCInterfaceBuilder'] = ['trg_cdc','trg_trg']
+env['TOOLS_LIBS']['TRGCDCFrontEndImplementation'] = ['trg_cdc','trg_trg']
+env['TOOLS_LIBS']['TRGCDCTRGPackerTB'] = ['trg_cdc','trg_trg']
+env['TOOLS_LIBS']['TRGCDCTSStreamReader'] = ['Core', 'trg_cdc','trg_trg', 'framework']
+env['TOOLS_LIBS']['TRGCDCDisplay'] = ['trg_cdc','trg_trg', 'framework']
+env['TOOLS_LIBS']['TRGCDCTrackSegmentSimulator'] = ['trg_cdc','trg_trg', 'framework']
+env['TOOLS_LIBS']['TRGCDCHoughMapConverter'] = ['trg_cdc','trg_trg', 'framework']
+env['TOOLS_LIBS']['CDCTriggerTSFFirmwareWorker'] = ['trg_cdc', 'framework']
+
+env['TOOLS_LIBS']['TRGCDCTSStreamReader'].insert(0, ['Core'])
+env['TOOLS_LIBS']['TRGCDCDisplay'].insert(0, ['Core'])
+env['TOOLS_LIBS']['TRGCDCTrackSegmentSimulator'].insert(0, ['Core'])
+
+if 'TRGCDC_DISPLAY' in env['CPPDEFINES']:
+    env['TOOLS_LIBS']['TRGCDCTSStreamReader'].insert(0, ['gtkmm-2.4', 'gdkmm-2.4', 'glibmm-2.4'])
+    env['TOOLS_LIBS']['TRGCDCDisplay'].insert(0, ['gtkmm-2.4', 'gdkmm-2.4', 'glibmm-2.4'])
+    env['TOOLS_LIBS']['TRGCDCTrackSegmentSimulator'].insert(0, ['gtkmm-2.4', 'gdkmm-2.4', 'glibmm-2.4'])
+
+Return('env')

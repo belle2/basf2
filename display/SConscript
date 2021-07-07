@@ -1,0 +1,15 @@
+Import('env')
+
+if 'HAS_TEVE' in env:
+  if not env['HAS_TEVE']:
+    print("Event display disabled, please recompile root with opengl support (on Debian/Ubuntu you'll probably only need to install libglu1-mesa-dev and rebuild)")
+
+  env['CONTINUE'] = env['HAS_TEVE']
+  env['LIBS'] = ['$ROOT_LIBS', 'GuiHtml', 'framework', 'geometry',
+                 'vxd', 'pxd_dataobjects', 'svd_dataobjects', 'svd', 'cdc_dataobjects',
+                 'cdc', 'klm', 'klm_dataobjects', 'mdst_dataobjects',
+                 'simulation_dataobjects', 'tracking_dataobjects','arich', 'top',
+                 'trg_cdc_dataobjects', 'genfit2'] + env['TEVE_LIBS']
+
+
+Return('env')

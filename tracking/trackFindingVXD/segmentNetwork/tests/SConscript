@@ -1,0 +1,17 @@
+Import('env')
+
+env['LIBS'] = [
+    'pxd_dataobjects',
+    'tracking',
+    'vxd',
+    'vxd_dataobjects',
+    'framework',
+    'Geom',
+    '$ROOT_LIBS',
+    'genfit2',
+    'svd_dataobjects',
+    'tracking_dataobjects',
+    'mdst_dataobjects',
+]
+
+Return('env')

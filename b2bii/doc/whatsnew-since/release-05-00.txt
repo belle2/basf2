@@ -1,0 +1,13 @@
+Changes in the b2bii package since release-05-00
+------------------------------------------------
+
+Conversion
+++++++++++
+
+ * Added ``first_x, _y, _z`` and ``last_x, _y, _z`` in ``Mdst_TRK_Fit`` table. 
+ * Added ``SmearTrack`` option to the ``convertBelleMdstToBelleIIMdst`` function.
+
+Objects
++++++++
+
+ * Added new ``BelleTrkExtra`` to store the information in ``Mdst_TRK_Fit``.

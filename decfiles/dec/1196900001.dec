@@ -1,0 +1,102 @@
+# EventType: 1196900001
+# Descriptor:  [B0 -> e+ tau-] cc
+# NickName: Bd_taue
+# Documentation: B0 -> e tau, LFV mode
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Priyanka Cheema
+# Email: pche3675@uni.sydney.edu.au
+# Cuts: None
+# Date: 20201207
+#
+#
+# June 2021 Automated: Converted PYTHIA ids
+#   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
+
+Alias Bsig B0
+Alias Btag B0
+Alias anti-Bsig anti-B0
+Alias anti-Btag anti-B0
+
+ChargeConj Bsig anti-Bsig
+ChargeConj Btag anti-Btag
+
+
+
+#############################
+#                           #
+#    Decay of Upsilon(4S)   #
+#                           #
+#############################
+
+
+Decay Upsilon(4S)
+1.00         Bsig  anti-Bsig  Btag  anti-Btag         VSS_BMIX dm;
+Enddecay
+
+
+
+###############################
+#                             #
+#    Decay of Bsig and Btag   #
+#                             #
+###############################
+
+
+Decay Bsig
+1.00          e+  tau-                                PHOTOS PHSP;
+Enddecay
+CDecay anti-Bsig
+
+Decay Btag
+0.0176        D*-  pi+  pi+  pi-  pi0                 PHSP;
+0.013         D*-  a_1+                               SVV_HELAMP  0.458 0.0 0.866 0.0 0.458 0.0;
+0.0057        D*-  rho0  pi+                          PHSP;
+0.0047        D*-  pi+  pi+  pi+  pi-  pi-            PHSP;
+0.0027        D*0  pi+  pi+  pi-  pi-                 PHSP;
+0.00129       D*-  K+  anti-K0                        PHSP;
+0.00129       D*-  K+  anti-K*0                       PHSP;
+0.000860770   u  anti-c  anti-s  d                    PYTHIA 23;
+0.00075       D*-  pi+  pi0                           PHSP;
+0.0003        D*-  K0  pi+                            PHSP;
+0.000214      D*-  K+                                 SVS;
+0.00017       anti-D*0  pi0                           SVS;
+0.00004       anti-D*0  K*0                           SVV_HELAMP  1. 0. 1. 0. 1. 0.;
+0.000036      anti-D*0  K0                            PHSP;
+0.00001       D*0  K*0                                SVV_HELAMP  1. 0. 1. 0. 1. 0.;
+Enddecay
+CDecay anti-Btag
+
+
+##########################
+#                        #
+#    Decay of D mesons   #
+#                        #
+##########################
+
+
+Decay D*+
+0.677         D0  pi+                                 VSS;
+0.307         D+  pi0                                 VSS;
+Enddecay
+CDecay D*-
+
+Decay D0
+0.144         K-  pi+  pi0                            D_DALITZ;
+0.0395        K-  pi+                                 PHSP;
+0.028         K_S0  pi+  pi-                          D_DALITZ;
+0.0088        K-  pi+  pi+  pi-                       PHSP;
+Enddecay
+CDecay anti-D0
+
+Decay D+
+0.0938        K-  pi+  pi+                            D_DALITZ;
+0.0736        K_S0  pi+  pi0                          D_DALITZ;
+0.01562       K_S0  pi+                               PHSP;
+0.008473      K-  pi+  pi+  pi0                       PHSP;
+0.002473      K_S0  pi+  pi+  pi-                     PHSP;
+Enddecay
+CDecay D-
+
+
+End

@@ -1,0 +1,23 @@
+# EventType: 1210110000
+# Descriptor: [B+ -> mu+ nu_mu]cc
+# NickName: Bu_munu
+# Documentation: SM B-> mu nu signal MC  
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Phillip Urquijo
+# Email: purquijo@unimelb.edu.au
+# Cuts: None
+# Date: 20151004
+#
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0 mu+  nu_mu  PHOTOS  SLN;
+Enddecay
+CDecay B-sig
+
+End

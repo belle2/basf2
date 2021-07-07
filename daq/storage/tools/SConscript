@@ -1,0 +1,24 @@
+Import('env')
+
+env['TOOLS_LIBS']['file2socket'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['file2file'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['file2check'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['file2list'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['stevtserver'] = ['daq', 'framework', '$ROOT_LIBS', 'pthread' ]
+env['TOOLS_LIBS']['storagein'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['storageout'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['storagemonitor'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['storagerecord'] = ['daq', 'framework', '$ROOT_LIBS', 'pthread', '$PGSQL_LIBS', ]
+env['TOOLS_LIBS']['storagerecord_arich'] = ['daq', 'framework', '$ROOT_LIBS', 'pthread', '$PGSQL_LIBS', ]
+env['TOOLS_LIBS']['storagetest'] = ['daq', 'framework', '$ROOT_LIBS', 'pthread' ]
+env['TOOLS_LIBS']['offbuilder'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['scp_storage'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
+env['TOOLS_LIBS']['rsync_storage'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
+env['TOOLS_LIBS']['list_storage'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
+env['TOOLS_LIBS']['submit_filejob'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
+env['TOOLS_LIBS']['update_fileinfo'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
+env['TOOLS_LIBS']['end_fileinfo'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
+env['TOOLS_LIBS']['qsub_conversion'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
+env['TOOLS_LIBS']['qsub_gzip'] = ['daq', 'framework', '$ROOT_LIBS', 'z' ]
+
+Return('env')

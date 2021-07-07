@@ -1,0 +1,102 @@
+Import('env')
+
+import os
+from SCons.Script import *
+
+# the main directory where the genfit svn is checked out into
+src_dir = 'code2'
+
+# genfit2 directories
+dirs = ['core', 'fields', 'finitePlanes', 'fitters', 'GBL', 'GFRave', 'measurements', 'trackReps', 'utilities']
+
+# libraries
+env['LIBS'] = ['$ROOT_LIBS', 'RaveBase', 'Geom', 'EG']
+
+# prevent cling c++11 warnins as genfit is c++03 compatible
+env.Append(CLINGFLAGS=["-Wno-inconsistent-missing-override"])
+
+# add genfit2 to include path in a separate environment so that the dictionary creation emits the correct paths
+genfit_env = env.Clone()
+genfit_env.Append(CPPPATH=os.path.join(env['INCDIR'], 'genfit'))
+
+
+def create_dictionaries(dirs):
+    """generate, build, and collect dictionary files"""
+    dict_files = []
+    aux_dict_files = []
+    for dir in dirs:
+        linkdef_files = Glob(os.path.join(src_dir, dir, 'src', '*LinkDef.h'))
+        for linkdef_file in linkdef_files:
+            dict_filename = str(linkdef_file).replace(os.sep, '_')[:-9] + 'Dict.cc'
+            header_files = Glob(os.path.join(src_dir, dir, 'include', '*.h'))
+            if dir == 'core':
+                header_files += Glob(os.path.join(src_dir, 'finitePlanes', 'include', '*.h'))
+            elif dir == 'GBL':
+                header_files = [
+                    os.path.join(src_dir, dir, 'include', 'GFGbl.h'),
+                    os.path.join(src_dir, dir, 'include', 'GblFitter.h'),
+                    os.path.join(src_dir, dir, 'include', 'GblFitterInfo.h'),
+                    os.path.join(src_dir, dir, 'include', 'GblFitStatus.h'),
+                    os.path.join(src_dir, dir, 'include', 'ICalibrationParametersDerivatives.h')
+                ]
+            elif dir == 'GFRave':
+                header_files = [
+                    os.path.join(src_dir, dir, 'include', 'GFRaveVertex.h'),
+                    os.path.join(src_dir, dir, 'include', 'GFRaveTrackParameters.h')
+                ]
+            header_files = [os.path.join(env['INCDIR'], 'genfit', os.path.basename(str(header_file)))
+                            for header_file in header_files]
+
+            dict_file, rootmap_file, rootpcm_file = env.RootDict(os.path.join(env['BUILDDIR'], dict_filename),
+                                                                 header_files + [linkdef_file],
+                                                                 ROOTCLING_ROOTMAP_LIB='genfit2')
+            dict_files.append(env.SharedObject(dict_file, CPPPATH=['#'] + env['CPPPATH']))
+
+            # install corresponding pcm file in lib (for cling)
+            aux_dict_files.append(env.Copy(os.path.join(env['LIBDIR'], rootpcm_file.name), rootpcm_file))
+
+            # install corresponding rootmap files to support auto-loading of libraries
+            # once used via ROOT
+            aux_dict_files.append(env.Copy(os.path.join(env['LIBDIR'], rootmap_file.name), rootmap_file))
+
+    return (dict_files, aux_dict_files)
+
+
+def build_library(name, dirs, extra_libs=[]):
+    """build library"""
+    # collect source files and install header files
+    source_files = []
+    for dir in dirs:
+        includes = genfit_env.Install(os.path.join(env['INCDIR'], 'genfit'), Glob(os.path.join(src_dir, dir, 'include', '*.h')))
+        genfit_env.Alias('genfit2', includes)
+        source_files.append([os.path.join(env['BUILDDIR'], 'genfit2', str(source_file))
+                             for source_file in Glob(os.path.join(src_dir, dir, 'src', '*.cc'))])
+
+    # see if it found source files, since this is a list of lists, we have to
+    # flatten it
+    if len(Flatten(source_files)) == 0:
+        print("No genfit sources found.  Please check if svn up fills the genfit2/$src_dir subdirectory.")
+        Exit(1)
+
+    dict_files, aux_dict_files = create_dictionaries(dirs)
+    lib = genfit_env.SharedLibrary(os.path.join(env['LIBDIR'], name), [source_files, dict_files], LIBS=extra_libs + env["LIBS"])
+    genfit_env.Alias('genfit2', lib)
+
+    # make sure pcm and rootmap files are installed before the library
+    genfit_env.Depends(lib, aux_dict_files)
+
+
+build_library("libgenfit2.so", dirs)
+
+# check for EVE (needed for eventDisplay) and if so create extra library
+if env.get('HAS_TEVE', False):
+    build_library("libgenfit2_eventDisplay.so", ["eventDisplay"], env["TEVE_LIBS"] + ["genfit2"])
+else:
+    print("Genfit's eventDisplay disabled, please recompile root with opengl "\
+        "support (on Debian/Ubuntu you'll probably only need to install "\
+        "libglu1-mesa-dev and rebuild)")
+
+
+env['CONTINUE'] = False
+
+Return('env')

@@ -1,0 +1,126 @@
+[INFO] Steering file: framework/tests/foreach.py
+[INFO] The random number seed is set to "something important"
+[EventInfoSetter -> ParticleGun -> for_each(MCParticle : MCParticles) -> PrintCollections]
+[INFO] Starting event processing, random seed is set to 'something important'
+[INFO] ========================================================================
+[INFO] >>> Start new run: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] TestModule: beginRun()
+[INFO] EXP:        0        RUN:        0        EVT:        1
+[INFO] MCPart: 1
+[INFO] EXP:        0        RUN:        0        EVT:        1
+[INFO] MCPart: 2
+[INFO] EXP:        0        RUN:        0        EVT:        1
+[INFO] MCPart: 3
+[INFO] ============================================================================
+[INFO] DataStore collections in event 1
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] MCParticle[]         MCParticles                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        0        EVT:        2
+[INFO] MCPart: 1
+[INFO] EXP:        0        RUN:        0        EVT:        2
+[INFO] MCPart: 2
+[INFO] EXP:        0        RUN:        0        EVT:        2
+[INFO] MCPart: 3
+[INFO] ============================================================================
+[INFO] DataStore collections in event 2
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] MCParticle[]         MCParticles                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        0        EVT:        3
+[INFO] MCPart: 1
+[INFO] EXP:        0        RUN:        0        EVT:        3
+[INFO] MCPart: 2
+[INFO] EXP:        0        RUN:        0        EVT:        3
+[INFO] MCPart: 3
+[INFO] ============================================================================
+[INFO] DataStore collections in event 3
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] MCParticle[]         MCParticles                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        0        EVT:        4
+[INFO] MCPart: 1
+[INFO] EXP:        0        RUN:        0        EVT:        4
+[INFO] MCPart: 2
+[INFO] EXP:        0        RUN:        0        EVT:        4
+[INFO] MCPart: 3
+[INFO] ============================================================================
+[INFO] DataStore collections in event 4
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] MCParticle[]         MCParticles                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+[INFO] EXP:        0        RUN:        0        EVT:        5
+[INFO] MCPart: 1
+[INFO] EXP:        0        RUN:        0        EVT:        5
+[INFO] MCPart: 2
+[INFO] EXP:        0        RUN:        0        EVT:        5
+[INFO] MCPart: 3
+[INFO] ============================================================================
+[INFO] DataStore collections in event 5
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] MCParticle[]         MCParticles                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 0
+[INFO] ========================================================================
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] TestModule: beginRun()
+[INFO] EXP:        1        RUN:        1        EVT:        1
+[INFO] MCPart: 1
+[INFO] EXP:        1        RUN:        1        EVT:        1
+[INFO] MCPart: 2
+[INFO] EXP:        1        RUN:        1        EVT:        1
+[INFO] MCPart: 3
+[INFO] ============================================================================
+[INFO] DataStore collections in event 1
+[INFO] ============================================================================
+[INFO] Type                 Name                       #Entries           <Event>
+[INFO] EventMetaData        EventMetaData
+[INFO] MCParticle[]         MCParticles                3
+[INFO] 
+[INFO] ----------------------------------------------------------------------------
+[INFO] Type                 Name                       #Entries      <Persistent>
+[INFO] ProcessStatistics    ProcessStatistics
+[INFO] 
+[INFO] ============================================================================
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================

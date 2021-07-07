@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="CSI">
+  <Creator library="beast">CSICreator</Creator>
+  <Content>
+    <BeamBackgroundStudy desc="select 1 if you want to record neutron and gamma hits">0</BeamBackgroundStudy>  
+    
+
+    <!-- Digitization parameters -->
+    <!--     entered by Igal     -->
+    <Ethres>0.15</Ethres>    
+    <!--Threshold>0.0005, 0.001, 0.00025, 0.0005, 0.001, 0.00025, 0.0005, 0.001, 0.00025, 0.0005, 0.001, 0.00025, 0.0005, 0.001, 0.00025, 0.0005, 0.001, 0.00025</Threshold-->
+    <Threshold>                                                                                                                                                              
+    0.0005, 0.001, 0.00025,                                                                                                                                                     
+    0.0005, 0.001, 0.00025,                                                                                                                                                     
+    0.0005, 0.001, 0.00025,                                                                                                                                                     
+    0.0005, 0.001, 0.00025,                                                                                                                                                     
+    0.0005, 0.001, 0.00025,                                                                                                                                                     
+    0.0005, 0.001, 0.00025                                                                                                                                                      
+    </Threshold>
+    <!--Threshold>                                                                                                                                                              
+    0.001, 0.002, 0.0005,                                                                                                                                                       
+    0.001, 0.002, 0.0005,                                                                                                                                                       
+    0.001, 0.002, 0.0005,                                                                                                                                                       
+    0.001, 0.002, 0.0005,                                                                                                                                                       
+    0.001, 0.002, 0.0005,                                                                                                                                                       
+    0.001, 0.002, 0.0005                                                                                                                                                        
+    </Threshold-->
+    <!--Threshold>                                                                                                                                                              
+    0.002, 0.004, 0.001,                                                                                                                                                        
+    0.002, 0.004, 0.001,                                                                                                                                                        
+    0.002, 0.004, 0.001,                                                                                                                                                        
+    0.002, 0.004, 0.001,                                                                                                                                                        
+    0.002, 0.004, 0.001,                                                                                                                                                        
+    0.002, 0.004, 0.001                                                                                                                                                         
+    </Threshold-->
+    <!--Threshold>                                                                                                                                                              
+    0.003, 0.006, 0.0015,                                                                                                                                                       
+    0.003, 0.006, 0.0015,                                                                                                                                                       
+    0.003, 0.006, 0.0015,                                                                                                                                                       
+    0.003, 0.006, 0.0015,                                                                                                                                                       
+    0.003, 0.006, 0.0015,                                                                                                                                                       
+    0.003, 0.006, 0.0015                                                                                                                                                        
+    </Threshold-->
+    <!--Threshold>                                                                                                                                                              
+    0.004, 0.008, 0.002,                                                                                                                                                        
+    0.004, 0.008, 0.002,                                                                                                                                                        
+    0.004, 0.008, 0.002,                                                                                                                                                        
+    0.004, 0.008, 0.002,                                                                                                                                                        
+    0.004, 0.008, 0.002,                                                                                                                                                        
+    0.004, 0.008, 0.002                                                                                                                                                         
+    </Threshold-->
+   <!--Threshold>                                                                                                                                                              
+    0.005, 0.01, 0.0025,                                                                                                                                                        
+    0.005, 0.01, 0.0025,                                                                                                                                                        
+    0.005, 0.01, 0.0025,                                                                                                                                                        
+    0.005, 0.01, 0.0025,                                                                                                                                                        
+    0.005, 0.01, 0.0025,                                                                                                                                                        
+    0.005, 0.01, 0.0025                                                                                                                                                         
+    </Threshold-->
+    <!--Threshold>
+    0.0075, 0.015, 0.00375,
+    0.0075, 0.015, 0.00375,
+    0.0075, 0.015, 0.00375,
+    0.0075, 0.015, 0.00375,
+    0.0075, 0.015, 0.00375,
+    0.0075, 0.015, 0.00375
+    </Threshold-->
+    <Range>0.251, 1.924, 0.664, 0.409, 3.628, 0.546, 0.316, 3.603, 0.570, 0.324, 3.641, 0.606, 0.368, 3.883, 0.694, 0.326, 7.767, 0.606</Range>
+    <EnergyResolutionFactor>0.28, 0.2, 0.07, 0.22, 0.18, 0.08, 0.33, 0.19, 0.09, 0.28, 0.19, 0.08, 0.26, 0.2, 0.18, 0.33, 0.24, 0.08</EnergyResolutionFactor>
+    <EnergyResolutionConst>0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0</EnergyResolutionConst>
+
+
+
+    <!-- Geometry parameters -->
+    <!-- - - - - - - - - - - -->
+    <Wrapping description="Wrapping around each crystals">
+      <Thickness unit="cm">0.01</Thickness>
+      <Material>AlTeflon</Material>
+    </Wrapping>
+
+    <!-- Crystal types -->
+    <EndCapCrystals>
+       <!-- CsI(Tl) Crystal from BaBar -->
+       <EndCapCrystal id="1">
+	 <Material>CsI-Tl</Material>
+	 <k_HalfLength unit="cm">15.0</k_HalfLength>
+         <K_h1 unit="cm">2.646800</K_h1>
+         <K_h2 unit="cm">3.066002</K_h2>
+         <K_bl1 unit="cm">3.139250</K_bl1>
+         <K_bl2 unit="cm">3.637884</K_bl2>
+         <K_tl1 unit="cm">2.802500</K_tl1>
+         <K_tl2 unit="cm">3.247800</K_tl2>
+         <K_alpha1 unit="deg">0.000002</K_alpha1>
+         <K_alpha2 unit="deg">0.000002</K_alpha2>
+       </EndCapCrystal>
+
+       <!-- Pure CsI crystal from INFN -->
+       <EndCapCrystal id="2">
+	 <Material>PureCsI</Material>
+	 <k_HalfLength unit="cm">15.0</k_HalfLength>
+         <K_h1 unit="cm">2.60</K_h1>
+         <K_h2 unit="cm">2.60</K_h2>
+         <K_bl1 unit="cm">2.60</K_bl1>
+         <K_bl2 unit="cm">2.60</K_bl2>
+         <K_tl1 unit="cm">2.60</K_tl1>
+         <K_tl2 unit="cm">2.60</K_tl2>
+         <K_alpha1 unit="deg">0.0</K_alpha1>
+         <K_alpha2 unit="deg">0.0</K_alpha2>
+       </EndCapCrystal>
+
+       <!-- LYSO Crystal from INFN -->
+       <EndCapCrystal id="3">
+	 <Material>LYSO</Material>
+	 <k_HalfLength unit="cm">10.0</k_HalfLength>
+         <K_h1 unit="cm">1.25</K_h1>
+         <K_h2 unit="cm">1.25</K_h2>
+         <K_bl1 unit="cm">1.25</K_bl1>
+         <K_bl2 unit="cm">1.25</K_bl2>
+         <K_tl1 unit="cm">1.25</K_tl1>
+         <K_tl2 unit="cm">1.25</K_tl2>
+         <K_alpha1 unit="deg">0.0</K_alpha1>
+         <K_alpha2 unit="deg">0.0</K_alpha2>
+       </EndCapCrystal>
+
+    </EndCapCrystals>
+
+    <!-- Description of the boxes -->
+    <Enclosures>
+
+      <Material>5052-Alloy</Material>
+      <Width unit="cm">25.4</Width>
+      <Length unit="cm">43.18</Length>
+      <Depth unit="cm">7.62</Depth>
+      <Thickness unit="cm">0.127</Thickness>
+      <Fold unit="cm">1.397</Fold>
+
+      <LidThickness unit="cm">0.127</LidThickness>
+      <LidMaterial>5052-Alloy</LidMaterial>
+
+      <Slot id="1">
+	<PosX unit="cm">+7.25 </PosX>
+	<PosY unit="cm"> 0.01 </PosY>
+	<PosZ unit="cm">+0.32 </PosZ>
+      </Slot>
+
+      <Slot id="2">
+	<PosX unit="cm">-1.80 </PosX>
+	<PosY unit="cm"> 0.11 </PosY>
+	<PosZ unit="cm">+4.07 </PosZ>
+      </Slot>
+
+      <Slot id="3">
+	<PosX unit="cm">-8.33 </PosX>
+	<PosY unit="cm">-1.48 </PosY>
+	<!-- must remove 5cm because LYSO is 10cm shorter -->
+	<PosZ unit="cm">-2.19 </PosZ>
+      </Slot>
+
+      
+      <!-- Placement of each box -->
+      <Enclosure id="1">
+        <!-- Nominal position --> 
+        <PosZ unit="cm">211.53</PosZ>
+        <PosR unit="cm">49.53</PosR>
+        <PosT unit="deg">0.00</PosT>
+
+        <!-- Nominal orientation --> 
+        <AngPhi1 unit="deg">-270</AngPhi1>
+        <AngTheta unit="deg">13.94</AngTheta>
+        <AngPhi2 unit="deg">0</AngPhi2>
+
+	<!--      Shift to positions      -->
+	<!--(e.g. to match measurements or--> 
+	<!--     systematic studies )     -->
+	<ShiftX unit="cm">-1.29</ShiftX>
+	<ShiftY unit="cm">-0.50</ShiftY>
+	<ShiftZ unit="cm">-3.00</ShiftZ>
+
+	<CrystalInSlot id="1">1</CrystalInSlot>
+	<CrystalInSlot id="2">2</CrystalInSlot>
+	<CrystalInSlot id="3">3</CrystalInSlot>
+      </Enclosure>
+
+      <Enclosure id="2">
+        <!-- Nominal position --> 
+	<PosZ unit="cm">211.53</PosZ>
+        <PosR unit="cm">49.53</PosR>
+        <PosT unit="deg">90.00</PosT>
+
+        <!-- Nominal orientation --> 
+        <AngPhi1 unit="deg">-270</AngPhi1>
+        <AngTheta unit="deg">13.94</AngTheta>
+        <AngPhi2 unit="deg">90</AngPhi2>
+
+	<!--      Shift to positions      -->
+	<!--(e.g. to match measurements or--> 
+	<!--     systematic studies )     -->
+	<ShiftX unit="cm">-2.60</ShiftX>
+	<ShiftY unit="cm"> 1.11</ShiftY>
+	<ShiftZ unit="cm">-4.10</ShiftZ>
+
+	<CrystalInSlot id="1">1</CrystalInSlot>
+	<CrystalInSlot id="2">2</CrystalInSlot>
+	<CrystalInSlot id="3">3</CrystalInSlot>
+      </Enclosure>
+
+      <Enclosure id="3">
+        <!-- Nominal position --> 
+        <PosZ unit="cm">211.53</PosZ>
+        <PosR unit="cm">49.53</PosR>
+        <PosT unit="deg">180.00</PosT>
+
+        <!-- Nominal orientation --> 
+        <AngPhi1 unit="deg">-270</AngPhi1>
+        <AngTheta unit="deg">13.94</AngTheta>
+        <AngPhi2 unit="deg">180</AngPhi2>
+
+	<!--      Shift to positions      -->
+	<!--(e.g. to match measurements or--> 
+	<!--     systematic studies )     -->
+	<ShiftX unit="cm">-2.21</ShiftX>
+	<ShiftY unit="cm">-0.40</ShiftY>
+	<ShiftZ unit="cm">-3.10</ShiftZ>
+
+	<CrystalInSlot id="1">1</CrystalInSlot>
+	<CrystalInSlot id="2">2</CrystalInSlot>
+	<CrystalInSlot id="3">3</CrystalInSlot>
+      </Enclosure>
+
+      <!-- This enclosure was not intalled -->
+      <!--
+      <Enclosure id="4">
+     
+        <PosZ unit="cm">211.53</PosZ>
+        <PosR unit="cm">49.53</PosR>
+        <PosT unit="deg">270.0</PosT>
+    
+        <AngPhi1 unit="deg">-270</AngPhi1>
+        <AngTheta unit="deg">13.94</AngTheta>
+        <AngPhi2 unit="deg">270.0</AngPhi2>
+
+	<CrystalInSlot id="1">1</CrystalInSlot>
+	<CrystalInSlot id="2">2</CrystalInSlot>
+	<CrystalInSlot id="3">3</CrystalInSlot>
+      </Enclosure>
+      -->
+
+
+      <!-- Backward enclosures -->
+
+      <Enclosure id="4">
+        <!-- Nominal position --> 
+        <PosZ unit="cm">-116.6897</PosZ>
+	<PosR unit="cm">50.5258</PosR>
+        <PosT unit="deg">0.00</PosT>
+
+	<!-- Nominal orientation --> 
+        <AngPhi1 unit="deg">-90</AngPhi1>
+        <AngTheta unit="deg">150.85</AngTheta>
+        <AngPhi2 unit="deg">0</AngPhi2>
+
+	<!--      Shift to positions      -->
+	<!--(e.g. to match measurements or--> 
+	<!--     systematic studies )     -->
+	<ShiftX unit="cm"> 5.03</ShiftX>
+	<ShiftY unit="cm">-1.20</ShiftY>
+	<ShiftZ unit="cm">-2.07</ShiftZ>
+
+	<CrystalInSlot id="1">1</CrystalInSlot>
+	<CrystalInSlot id="2">2</CrystalInSlot>
+	<CrystalInSlot id="3">3</CrystalInSlot>
+      </Enclosure>
+
+
+      <Enclosure id="5">
+        <!-- Nominal position --> 
+        <PosZ unit="cm">-116.6897</PosZ>
+        <PosR unit="cm">58.5258</PosR>
+        <PosT unit="deg">90</PosT>
+
+	<!-- Nominal orientation --> 
+        <AngPhi1 unit="deg">-90</AngPhi1>
+        <AngTheta unit="deg">150.85</AngTheta>
+        <AngPhi2 unit="deg">90</AngPhi2>
+
+	<!--      Shift to positions      -->
+	<!--(e.g. to match measurements or--> 
+	<!--     systematic studies )     -->
+	<ShiftX unit="cm">-2.70</ShiftX>
+	<ShiftY unit="cm"> 0.13</ShiftY>
+	<ShiftZ unit="cm">-2.77</ShiftZ>
+
+	<CrystalInSlot id="1">1</CrystalInSlot>
+	<CrystalInSlot id="2">2</CrystalInSlot>
+	<CrystalInSlot id="3">3</CrystalInSlot>
+      </Enclosure>
+
+
+      <Enclosure id="6">
+        <!-- Nominal position --> 
+        <PosZ unit="cm">-116.6897</PosZ>
+        <PosR unit="cm">58.5258</PosR>
+        <PosT unit="deg">180.00</PosT>
+
+	<!-- Nominal orientation --> 
+        <AngPhi1 unit="deg">-90</AngPhi1>
+        <AngTheta unit="deg">150.85</AngTheta>
+        <AngPhi2 unit="deg">180</AngPhi2>
+
+	<!--      Shift to positions      -->
+	<!--(e.g. to match measurements or--> 
+	<!--     systematic studies )     -->
+	<ShiftX unit="cm">-0.13</ShiftX>
+	<ShiftY unit="cm">-0.80</ShiftY>
+	<ShiftZ unit="cm">-3.67</ShiftZ>
+
+	<CrystalInSlot id="1">1</CrystalInSlot>
+	<CrystalInSlot id="2">2</CrystalInSlot>
+	<CrystalInSlot id="3">3</CrystalInSlot>
+      </Enclosure>
+
+
+      <!-- This enclosure was not intalled -->
+      <!--
+      <Enclosure id="8">
+        <PosZ unit="cm">-116.6897</PosZ>
+        <PosR unit="cm">58.5258</PosR>
+        <PosT unit="deg">270</PosT>
+
+        <AngPhi1 unit="deg">-90</AngPhi1>
+        <AngTheta unit="deg">150.85</AngTheta>
+        <AngPhi2 unit="deg">270</AngPhi2>
+
+	<CrystalInSlot id="1">1</CrystalInSlot>
+	<CrystalInSlot id="2">2</CrystalInSlot>
+	<CrystalInSlot id="3">3</CrystalInSlot>
+      </Enclosure>
+      -->
+    </Enclosures>
+  </Content>
+</DetectorComponent>

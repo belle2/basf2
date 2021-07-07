@@ -1,0 +1,28 @@
+# EventType: 1263700001
+# Descriptor: [B+ -> D* l nu ]cc
+# NickName: Bu_Dslnu
+# Documentation: B->D* l nu process
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Andrea Selce
+# Email: selce@pg.infn.it 
+# Cuts: None
+# Date: 20190513
+#
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+#central values from HFAG 2016 average
+
+Decay B+sig
+0.5   anti-D*0    e+ nu_e        PHOTOS        HQET3 0.912 1.205 1.15 1.404 0.854; #18.09.2018: updated to main DECAY_BELLE2.DEC
+0.5   anti-D*0    mu+ nu_mu        PHOTOS         PHOTOS  HQET3 0.912 1.205 1.15 1.404 0.854; #18.09.2018: updated to main DECAY_BELLE2.DEC
+Enddecay
+CDecay B-sig
+
+#
+End

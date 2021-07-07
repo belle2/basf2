@@ -1,0 +1,503 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+#include <map>
+#include <algorithm>
+
+using namespace RooFit;
+
+void drawLabel(TH1F* hResz0, double gauss1Mean, double gauss1Sigma, double gauss2Mean, double gauss2Sigma);
+
+void readFitter3D(string filename);
+
+void readFitter3D() {
+  readFitter3D("Fitter3D.root");
+}
+
+void readFitter3D(string filename){
+
+  // Control readFitter3D
+  // graphFlag=-1: don't plot, 0: plot all, 1: plot fit, 2: plot pdg and mcParticle Status
+  int graphFlag = 1;
+  // Choose if there is a condition in plotting fit results
+  int conditionFlag = 0;
+
+  gROOT->Reset();
+  gROOT->SetStyle("Plain");
+  gStyle->SetOptStat(111111111);
+  gStyle->SetOptFit(1111111111);
+  //gStyle->SetStatH(0.3);
+
+  //Read file
+  TFile* inFile = new TFile(filename.c_str());
+  TTree* inTreeTrack = (TTree*)inFile->Get("fitter3DeventTree");
+  TTree* inTreeConstants = (TTree*)inFile->Get("fitter3DrunTree");
+
+  // Check if float fitter3D values exist
+  int floatExists = 0;
+  if(inTreeTrack->GetBranch("fitter3DTrackDoublefloat_z0")) floatExists = 1;
+
+
+  ////Set branches
+  TClonesArray* chargeTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* ptTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* pt2DTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* phi0TrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* phi02DTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* mcPtTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* mcPhi0TrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* z0TrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* float_z0TrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* cotTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* float_cotTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* fit3DChi2TrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* float_fit3DChi2TrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* fit2DChi2TrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* mcZ0TrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* mcCotTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* pdgIdTrackFitter3D = new TClonesArray("TVectorD"); 
+  TClonesArray* mcImpactPositionFitter3D = new TClonesArray("TVectorD");
+  TClonesArray* mcVertexFitter3D = new TClonesArray("TVectorD");
+  TClonesArray* nHitsTrackFitter3D = new TClonesArray("TVectorD"); 
+  inTreeTrack->SetBranchAddress("fitter3DTrackDoublecharge", &chargeTrackFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackDoublept", &ptTrackFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackDoublephi0", &phi0TrackFitter3D);
+  //inTreeTrack->SetBranchAddress("fitter3DTrackDoublerelPhi0", &phi0TrackFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackDoublept2D", &pt2DTrackFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackDoublephi02D", &phi02DTrackFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackDoublemcPt", &mcPtTrackFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackDoublemcPhi0", &mcPhi0TrackFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackDoublez0", &z0TrackFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackDoublecot", &cotTrackFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackDoublezChi2", &fit3DChi2TrackFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackDoublefit2DChi2", &fit2DChi2TrackFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackDoublemcZ0", &mcZ0TrackFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackDoublemcCot", &mcCotTrackFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackDoublepdgId", &pdgIdTrackFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackVectorimpactPosition", &mcImpactPositionFitter3D);
+  inTreeTrack->SetBranchAddress("fitter3DTrackVectormcVertex", &mcVertexFitter3D);
+  if (floatExists) {
+    inTreeTrack->SetBranchAddress("fitter3DTrackDoublefloat_z0", &float_z0TrackFitter3D);
+    inTreeTrack->SetBranchAddress("fitter3DTrackDoublefloat_cot", &float_cotTrackFitter3D);
+    inTreeTrack->SetBranchAddress("fitter3DTrackDoublefloat_zChi2", &float_fit3DChi2TrackFitter3D);
+    inTreeTrack->SetBranchAddress("fitter3DTrackDoublenHits", &nHitsTrackFitter3D);
+  }
+
+
+  //Make Histogram
+  TH1F* hpT    = new TH1F("histpT","Plot of pT",93,0,10);
+  TH1F* hphi0   = new TH1F("hphi00","",87,0,360);
+  TH1F* hz0     = new TH1F("histz0","Plot of z0",98,-25,25);
+  TH1F* htheta = new TH1F("htheta","",130,20,150);
+  TH1F* hFit2DChi2 = new TH1F("histft2DChi2","Plot of fit2DChi2",93,0,30);
+  TH1F* hFit3DChi2 = new TH1F("histft3DChi2","Plot of fit3DChi2",93,0,30);
+  hphi0->SetMinimum(0);
+  hpT->SetMinimum(0);
+  // MC Histograms
+  TH1F* hMCpT    = new TH1F("histMCpT","Plot of pT",93,0,10);
+  TH1F* hMCphi0   = new TH1F("hMCphi00","Plot of phi0",87,0,360);
+  TH1F* hMCz0     = new TH1F("histMCz0","Plot of z0",98,-25,25);
+  TH1F* hMCtheta = new TH1F("hMCtheta","Plot of theta",130,20,150);
+  hMCphi0->SetMinimum(0);
+  hMCpT->SetMinimum(0);
+
+  // pt Resolutions
+  const float ptResRange = 1;
+  TH1F* hpT1    = new TH1F("histpT1","Plot Resolution pT=[0,1.5]GeV",93,-ptResRange,ptResRange);
+  TH1F* hpT2    = new TH1F("histpT2","Plot Resolution pT=[1.5,2.5]GeV",93,-ptResRange,ptResRange);
+  TH1F* hpT3    = new TH1F("histpT3","Plot Resolution pT=[2.5,3.5]GeV",93,-ptResRange,ptResRange);
+  TH1F* hpT4    = new TH1F("histpT4","Plot Resolution pT=[3.5,inf]GeV",93,-ptResRange,ptResRange);
+
+  // Fit Resolution
+  // When not using drift time.
+  TH1F* hRespT    = new TH1F("histRespT","Resolution plot of pT",93,-5000,5000);
+  //TH1F* hResphi0   = new TH1F("hResphi00","Resolution plot of phi0",87,-50,50);
+  //TH1F* hResz0     = new TH1F("histResz0","Resolution plot of z0",98,-30,30);
+  //TH1F* hRestheta = new TH1F("hRestheta","Resolution plot of theta",130,-50,50);
+  // When using drift time.
+  //TH1F* hRespT    = new TH1F("histRespT","Resolution plot of pT",100,-250,250);
+  TH1F* hResphi0   = new TH1F("hResphi00","Resolution plot of phi0",100,-2.5,2.5);
+  TH1F* hResz0     = new TH1F("histResz0","Resolution plot of z0",100,-25,25);
+  TH1F* hRestheta = new TH1F("hRestheta","Resolution plot of theta",100,-25,25);
+
+  TH1F* hDiffZ0 = 0, *hDiffCot = 0, *hDiffChi2 = 0;
+  if (floatExists) {
+    // Differences between float and firmware version. (cot, z0, chi2)
+    hDiffZ0 = new TH1F("histDiffz0","Plot of z0 difference btw float and firmware",98,-25,25);
+    hDiffCot = new TH1F("histDiffCot","Plot of Cot difference btw float and firmware",98,-25,-25);
+    hDiffChi2 = new TH1F("histDiffChi2","Plot of fit3DChi2 difference btw float and firmware",93,-30,30);
+  }
+
+  hResphi0->SetMinimum(0);
+  hRespT->SetMinimum(0);
+
+  // For pdg id plot
+  TH1F* hPDG = new TH1F("histPDG","Plot of pdg id",10001,-5000.5,5000.5);
+
+  // For statusbit plot
+  TH1F* hStatus = new TH1F("histStatus", "Plot of MCParticle status", 11, -0.5, 10.5);
+
+
+  // Relation plots
+  TGraph* gPtRelation = new TGraph();
+  gPtRelation->SetTitle("pt,mcPt");
+  TGraph* gPhi0Relation = new TGraph();
+  gPhi0Relation->SetTitle("phi0,mcPhi0");
+  TGraph* gZ0Relation = new TGraph();
+  gZ0Relation->SetTitle("z0,mcZ0");
+  TGraph* gThetaRelation = new TGraph();
+  gThetaRelation->SetTitle("theta,mcTheta");
+  TGraph* gPtResZ0Relation = new TGraph();
+  gPtResZ0Relation->SetTitle("pt(GeV),ResZ0(cm)");
+  TGraph* gPtResPtRelation = new TGraph();
+  gPtResPtRelation->SetTitle("pt(GeV),ResPt(%)");
+
+  double Trg_PI = 3.141592653589793;
+
+  // Initializing event
+  Int_t eventNum = 0;
+  Int_t totalInput = inTreeTrack->GetEntriesFast();
+  int totalNumberTracks=0;
+
+  cout<<"Number of events: "<<totalInput<<endl;
+
+  set<double> ptBins;
+
+  while (1) {
+
+    // Handle event number
+    eventNum += 1;
+    if (eventNum-1==totalInput) break;
+    //Get event
+    inTreeTrack->GetEntry(eventNum-1);
+    //cout<<"Event["<<eventNum<<"]"<<endl;
+    if(eventNum%1000==0) cout<<eventNum<<endl;
+
+    //Number of tracks
+    int nTracks = z0TrackFitter3D->GetEntriesFast();
+    //cout<<"Number of tracks: "<<nTracks<<endl;
+
+    // Loop over all tracks
+    for(int iTrack=0; iTrack< nTracks;iTrack++){
+
+      totalNumberTracks++;
+
+      //cout<<"Track["<<track<<"]"<<endl;
+      double pdgId = (*(TVectorD*)pdgIdTrackFitter3D->At(iTrack))[0];
+      double charge = (*(TVectorD*)chargeTrackFitter3D->At(iTrack))[0];
+      double pt = (*(TVectorD*)ptTrackFitter3D->At(iTrack))[0];
+      double pt2D = (*(TVectorD*)pt2DTrackFitter3D->At(iTrack))[0];
+      double mcPt = (*(TVectorD*)mcPtTrackFitter3D->At(iTrack))[0];
+      double phi0 = (*(TVectorD*)phi0TrackFitter3D->At(iTrack))[0];
+      double phi02D = (*(TVectorD*)phi02DTrackFitter3D->At(iTrack))[0];
+      double mcPhi0 = (*(TVectorD*)mcPhi0TrackFitter3D->At(iTrack))[0];
+      double z0 = (*(TVectorD*)z0TrackFitter3D->At(iTrack))[0];
+      double mcZ0 = (*(TVectorD*)mcZ0TrackFitter3D->At(iTrack))[0];
+      double cot = (*(TVectorD*)cotTrackFitter3D->At(iTrack))[0];
+      double mcCot = (*(TVectorD*)mcCotTrackFitter3D->At(iTrack))[0];
+      double fit3DChi2 = (*(TVectorD*)fit3DChi2TrackFitter3D->At(iTrack))[0];
+      double fit2DChi2 = (*(TVectorD*)fit2DChi2TrackFitter3D->At(iTrack))[0];
+      double float_z0 = 0, float_cot = 0, float_fit3DChi2 = 0, nHits = 0;
+      if (floatExists) {
+        float_z0 = (*(TVectorD*)float_z0TrackFitter3D->At(iTrack))[0];
+        float_cot = (*(TVectorD*)float_cotTrackFitter3D->At(iTrack))[0];
+        float_fit3DChi2 = (*(TVectorD*)float_fit3DChi2TrackFitter3D->At(iTrack))[0];
+        nHits = (*(TVectorD*)nHitsTrackFitter3D->At(iTrack))[0];
+      }
+      vector<double> mcImpactPosition(3);
+      mcImpactPosition[0] = (*(TVectorD*)mcImpactPositionFitter3D->At(iTrack))[0];
+      mcImpactPosition[1] = (*(TVectorD*)mcImpactPositionFitter3D->At(iTrack))[1];
+      mcImpactPosition[2] = (*(TVectorD*)mcImpactPositionFitter3D->At(iTrack))[2];
+      vector<double> mcVertex(3);
+      mcVertex[0] = (*(TVectorD*)mcVertexFitter3D->At(iTrack))[0];
+      mcVertex[1] = (*(TVectorD*)mcVertexFitter3D->At(iTrack))[1];
+      mcVertex[2] = (*(TVectorD*)mcVertexFitter3D->At(iTrack))[2];
+
+      // Cut depending on charge.
+      //if(charge==-1) continue;
+
+      //// Use 2D fitter values.
+      //phi0 = phi02D;
+      //pt = pt2D;
+
+      // Convert to deg
+      phi0 = phi0*180/Trg_PI;
+      mcPhi0 = mcPhi0*180/Trg_PI;
+      double theta = Trg_PI/2.-atan(cot);
+      theta*=180./Trg_PI;
+      double mcTheta = Trg_PI/2.-atan(mcCot);
+      mcTheta*=180./Trg_PI;
+
+      // Fill points.
+      ptBins.insert(pt);
+      hpT->Fill(pt);
+      hMCpT->Fill(mcPt);
+      // Change GeV to MeV
+      hRespT->Fill((pt-mcPt)*1000);
+
+      gPtRelation->SetPoint(totalNumberTracks, pt, mcPt);
+      gPtResPtRelation->SetPoint(totalNumberTracks, pt, fabs((pt-mcPt))/mcPt*100);
+
+      // Divide by MC pT
+      if(mcPt<1.5) {
+        hpT1->Fill((pt-mcPt)/mcPt);
+      }
+      if(mcPt>1.5 && mcPt<2.5) {
+        hpT2->Fill((pt-mcPt)/mcPt);
+      }
+      if(mcPt>2.5 && mcPt<3.5) {
+        hpT3->Fill((pt-mcPt)/mcPt);
+      }
+      if(mcPt>3.5) {
+        hpT4->Fill((pt-mcPt)/mcPt);
+      }
+
+      hphi0->Fill(phi0);
+      hMCphi0->Fill(mcPhi0);
+      hResphi0->Fill(phi0-mcPhi0);
+      gPhi0Relation->SetPoint(totalNumberTracks, phi0, mcPhi0);
+
+      hz0->Fill(z0);
+      hMCz0->Fill(mcZ0);
+      hResz0->Fill(z0-mcZ0);
+      gZ0Relation->SetPoint(totalNumberTracks, z0, mcZ0);
+      gPtResZ0Relation->SetPoint(totalNumberTracks, pt, fabs(z0-mcZ0));
+
+      htheta->Fill(theta);
+      hMCtheta->Fill(mcTheta);
+      hRestheta->Fill(theta-mcTheta);
+      gThetaRelation->SetPoint(totalNumberTracks, theta, mcTheta);
+
+      hFit3DChi2->Fill(fit3DChi2);
+      hFit2DChi2->Fill(fit2DChi2);
+
+      hPDG->Fill(pdgId);
+
+      if (floatExists) {
+        hDiffZ0->Fill(z0-float_z0);
+        hDiffCot->Fill(cot-float_cot);
+        hDiffChi2->Fill(fit3DChi2-float_fit3DChi2);
+      }
+
+    } // track loop
+  } // event loop
+
+  //for (set<double>::iterator it = ptBins.begin(); it != ptBins.end(); it++) { 
+  //  cout<<"pt: "<<*it<<endl;
+  //}
+
+  cout<<"Tracks: "<<totalNumberTracks<<endl;
+
+  if(graphFlag==0 || graphFlag==1){
+
+    TCanvas *c1 = new TCanvas("c1", "", 1000, 500);
+    c1->Divide(2,2);
+    c1->cd(1);
+    hpT->Draw();
+    hMCpT->SetLineColor(2);
+    hMCpT->Draw("same");
+    c1->cd(2);
+    hphi0->Draw();
+    hMCphi0->SetLineColor(2);
+    hMCphi0->Draw("same");
+    c1->cd(3);
+    //hz0->SetMaximum(max(hz0->GetMaximum(),hMCz0->GetMaximum())*1.1);
+    hz0->Draw();
+    hMCz0->SetLineColor(2);
+    hMCz0->Draw("same");
+
+    c1->cd(4);
+    htheta->SetMaximum(max(htheta->GetMaximum(),hMCtheta->GetMaximum())*1.1);
+    htheta->Draw();
+    hMCtheta->SetLineColor(2);
+    hMCtheta->Draw("same");
+
+    //c1->SaveAs("histFitter3D.pdf");
+    TCanvas *c2 = new TCanvas("c2", "", 600, 600);
+
+    c2->Divide(2,2);
+    c2->cd(1);
+    gPtRelation->GetXaxis()->SetLimits(0,10);
+    gPtRelation->SetMinimum(0);
+    gPtRelation->SetMaximum(10);
+    gPtRelation->Draw("AP");
+    c2->cd(2);
+    gPhi0Relation->Draw("AP");
+    c2->cd(3);
+    gZ0Relation->SetMaximum(20);
+    gZ0Relation->SetMinimum(-20);
+    gZ0Relation->GetXaxis()->SetLimits(-20,20);
+    gZ0Relation->Draw("AP");
+    c2->cd(4);
+    gThetaRelation->Draw("AP");
+
+    TCanvas* c3 = new TCanvas("c3","",1000,500);
+    c3->Divide(2,2);
+    c3->cd(1);
+    hpT1->Draw();
+    c3->cd(2);
+    hpT2->Draw();
+    c3->cd(3);
+    hpT3->Draw();
+    c3->cd(4);
+    hpT4->Draw();
+
+    // Fitting
+    RooWorkspace fitSpace("fitSpace", kTRUE);
+    // ResZ0
+    RooRealVar resZ0("ResZ0", "Z0-McZ0", -25, 25, "cm");
+    fitSpace.import(resZ0);
+    fitSpace.factory("Gaussian::innerResZ0(ResZ0,ResZ0InnerMean[0,-5,5],ResZ0InnerSigma[5,0,30])");
+    fitSpace.factory("Gaussian::outerResZ0(ResZ0,ResZ0OuterMean[0,-5,5],ResZ0OuterSigma[10,0,30])");
+    fitSpace.factory("SUM::modelResZ0(fResZ0[0.5,0,1] * innerResZ0, outerResZ0)");
+    RooDataHist dHresZ0("dHresZ0","Resolution z0",*fitSpace.var("ResZ0"), hResz0);
+    fitSpace.pdf("modelResZ0")->fitTo(dHresZ0);
+    // ResPt
+    RooRealVar resPt("ResPt", "Pt-McPt", -250, 250, "MeV");
+    fitSpace.import(resPt);
+    fitSpace.factory("Gaussian::innerResPt(ResPt,ResPtInnerMean[0,-250,250],ResPtInnerSigma[10,0,250])");
+    fitSpace.factory("Gaussian::outerResPt(ResPt,ResPtOuterMean[0,-250,250],ResPtOuterSigma[100,0,250])");
+    fitSpace.factory("SUM::modelResPt(fResPt[0.5,0,1] * innerResPt, outerResPt)");
+    RooDataHist dHresPt("dHresPt","Resolution pt",*fitSpace.var("ResPt"), hRespT);
+    fitSpace.pdf("modelResPt")->fitTo(dHresPt);
+
+    // Make Plot
+    // ResZ0
+    RooPlot* resZ0Frame = fitSpace.var("ResZ0")->frame();
+    dHresZ0.plotOn(resZ0Frame,MarkerSize(0.0),Name("d_z0"), DataError(RooAbsData::None), XErrorSize(0));
+    fitSpace.pdf("modelResZ0")->plotOn(resZ0Frame,Components(*fitSpace.pdf("innerResZ0")),LineColor(kBlue),Name("innerResZ0"));
+    fitSpace.pdf("modelResZ0")->plotOn(resZ0Frame,Components(*fitSpace.pdf("outerResZ0")),LineColor(kGreen),Name("outerResZ0"));
+    fitSpace.pdf("modelResZ0")->plotOn(resZ0Frame,LineColor(kRed),Name("modelResZ0"));
+    // ResPt
+    RooPlot* resPtFrame = fitSpace.var("ResPt")->frame();
+    dHresPt.plotOn(resPtFrame,MarkerSize(0.0),Name("d_pt"), DataError(RooAbsData::None), XErrorSize(0));
+    fitSpace.pdf("modelResPt")->plotOn(resPtFrame,Components(*fitSpace.pdf("innerResPt")),LineColor(kBlue),Name("innerResPt"));
+    fitSpace.pdf("modelResPt")->plotOn(resPtFrame,Components(*fitSpace.pdf("outerResPt")),LineColor(kGreen),Name("outerResPt"));
+    fitSpace.pdf("modelResPt")->plotOn(resPtFrame,LineColor(kRed),Name("modelResPt"));
+
+    TCanvas *c5 = new TCanvas("c5", "", 1000, 500);
+    c5->Divide(2,2);
+    c5->cd(1);
+    hRespT->Draw();
+    //resPtFrame->Draw();
+    //hRespT->Draw("same");
+    //drawLabel(hRespT, fitSpace::ResPtInnerMean.getVal(), fitSpace::ResPtInnerSigma.getVal(), fitSpace::ResPtOuterMean.getVal(), fitSpace::ResPtOuterSigma.getVal());
+    //TLegend* legendPt = new TLegend(0.1,0.7,0.4,0.9);
+    //legendPt->SetFillColor(0);
+    //legendPt->AddEntry(hRespT,"Pt-McPt","l");
+    //legendPt->AddEntry(innerResPt,"Gauss 1","l");
+    //legendPt->AddEntry(outerResPt,"Gauss 2","l");
+    //legendPt->AddEntry(modelResPt,"Model","l");
+    //legendPt->Draw();
+    c5->cd(2);
+    hResphi0->Draw();
+    c5->cd(3);
+    resZ0Frame->Draw();
+    hResz0->Draw("same");
+    drawLabel(hResz0, fitSpace.var("ResZ0InnerMean")->getVal(), fitSpace.var("ResZ0InnerSigma")->getVal(), fitSpace.var("ResZ0OuterMean")->getVal(), fitSpace.var("ResZ0OuterSigma")->getVal());
+    TLegend* legendZ0 = new TLegend(0.1,0.7,0.4,0.9);
+    legendZ0->SetFillColor(0);
+    legendZ0->AddEntry(hResz0,"Z0-McZ0","l");
+    legendZ0->AddEntry("innerResZ0","Gauss 1","l");
+    legendZ0->AddEntry("outerResZ0","Gauss 2","l");
+    legendZ0->AddEntry("modelResZ0","Model","l");
+    legendZ0->Draw();
+
+    c5->cd(4);
+    hRestheta->Draw();
+
+
+    //// Pt Res Z0 relation
+    //TCanvas* c6 = new TCanvas("c6","",1000,500);
+    //c6->Divide(2,1);
+    //c6->cd(1);
+    //gPtResZ0Relation->SetMaximum(25);
+    //gPtResZ0Relation->SetMinimum(-1);
+    //gPtResZ0Relation->GetXaxis()->SetLimits(0,5);
+    //gPtResZ0Relation->Draw("AP");
+    //c6->cd(2);
+    //gPtResPtRelation->SetMaximum(5);
+    //gPtResPtRelation->SetMinimum(-1);
+    //gPtResPtRelation->GetXaxis()->SetLimits(0,5);
+    //gPtResPtRelation->Draw("AP");
+
+    TCanvas *c7 = new TCanvas("c7", "", 1000, 500);
+    c7->Divide(1,2);
+    c7->cd(1);
+    hFit2DChi2->Draw();
+    c7->cd(2);
+    hFit3DChi2->Draw();
+
+
+    if (floatExists) {
+      TCanvas *c8 = new TCanvas("c8", "", 1000, 500);
+      c8->Divide(2,2);
+      c8->cd(1);
+      hDiffZ0->Draw();
+      c8->cd(2);
+      hDiffCot->Draw();
+      c8->cd(3);
+      hDiffChi2->Draw();
+    }
+
+
+  }
+
+  if(graphFlag==0 || graphFlag==2){
+    TCanvas* c4 = new TCanvas("c4","",500,500);
+    hPDG->Draw();
+  }
+
+}
+
+void drawLabel(TH1F* hResz0, double gauss1Mean, double gauss1Sigma, double gauss2Mean, double gauss2Sigma) {
+    int histEntries = hResz0->GetEntries();
+    double histRMS = hResz0->GetStdDev();
+    double fit1Mean = gauss1Mean;
+    double fit1Width = gauss1Sigma;
+    double fit2Mean = gauss2Mean;
+    double fit2Width = gauss2Sigma;
+    TPaveText* jbStats = new TPaveText(0.6,0.4,0.895,0.89,"NDC");
+    //jbStats->SetTextSize(0.03);
+    //Set white background
+    jbStats->SetFillColor(0);
+    jbStats->SetTextAlign(12);
+    //Entries
+    char jbEntries[30];
+    sprintf(jbEntries,"Entries %i", histEntries);
+    jbStatsEntry = jbStats->AddText(jbEntries);
+    //RMS
+    char jbHistRMS[30];
+    sprintf(jbHistRMS,"RMS %4.2E", histRMS);
+    jbStatsEntry = jbStats->AddText(jbHistRMS);
+    //Gaus1 mean
+    char jbGauss1Mean[30];
+    sprintf(jbGauss1Mean,"Gauss1 Mean %4.2E", fit1Mean);
+    jbStatsEntry = jbStats->AddText(jbGauss1Mean);
+    //Gaus1 sigma
+    char jbGauss1Sigma[30];
+    sprintf(jbGauss1Sigma,"Gauss1 Sigma %4.2E", fit1Width);
+    jbStatsEntry = jbStats->AddText(jbGauss1Sigma);
+    //Gaus2 mean
+    char jbGauss2Mean[30];
+    sprintf(jbGauss2Mean,"Gauss2 Mean %4.2E", fit2Mean);
+    jbStatsEntry = jbStats->AddText(jbGauss2Mean);
+    //Gaus2 sigma
+    char jbGauss2Sigma[30];
+    sprintf(jbGauss2Sigma,"Gauss2 Sigma %4.2E", fit2Width);
+    jbStatsEntry = jbStats->AddText(jbGauss2Sigma);
+    jbStats->Draw();
+    // nOverflow
+    char jbOverflow[30];
+    sprintf(jbOverflow,"Overflow %i", (int)hResz0->GetBinContent(hResz0->GetSize()-1));
+    jbStatsEntry = jbStats->AddText(jbOverflow);
+    // nUnderflow
+    char jbUnderflow[30];
+    sprintf(jbUnderflow,"Underflow %i", (int)hResz0->GetBinContent(0));
+    jbStatsEntry = jbStats->AddText(jbUnderflow);
+}
+

@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import sys
+import os
+
+import basf2
+from reconstruction import add_reconstruction
+
+main = basf2.create_path()
+main.add_module('RootInput', inputFileName='evtgen_upgrade_bbar.root')
+main.add_module('Gearbox')
+add_reconstruction(main, useVTX=True)
+main.add_module('RootOutput', outputFileName='rec_upgrade_bbar.root')
+main.add_module('Progress')
+
+basf2.process(main)

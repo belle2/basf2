@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="COIL" xmlns:xi="http://www.w3.org/2001/XInclude">
+    <Creator library="structure">COILCreator</Creator>
+    <Content>
+	<Rotation desc="Rotation of the Coil with respect to the Detector" unit="rad">0.0</Rotation>
+	<OffsetZ desc="The offset of the Coil in z with respect to the IP" unit="cm">47.0</OffsetZ>
+	<Cryostat>
+		<Rmin unit="cm">170.0</Rmin>
+		<Rmax unit="cm">200.0</Rmax>
+		<HalfLength unit="cm">220.5</HalfLength>
+		<Material desc="Starting material of Coil Vessel : Cryostat">G4_Fe</Material>
+	</Cryostat>
+
+	<Cavity1>
+		<Rmin unit="cm">170.6</Rmin>
+		<Rmax unit="cm">198.0</Rmax>
+		<HalfLength unit="cm">216.7</HalfLength>
+		<Material desc="material of Coil empty space">STR-DryAir</Material>
+	</Cavity1>
+
+	<RadShield>
+		<Rmin unit="cm">173.3</Rmin>
+		<Rmax unit="cm">194.0</Rmax>
+		<HalfLength unit="cm">212.0</HalfLength>
+		<Material desc="material of Coil Radiation Shield">G4_Al</Material>
+	</RadShield>
+
+	<Cavity2>
+		<Rmin unit="cm">173.5</Rmin>
+		<Rmax unit="cm">193.8</Rmax>
+		<HalfLength unit="cm">211.5</HalfLength>
+		<Material desc="material of Coil empty space">STR-DryAir</Material>
+	</Cavity2>
+
+	<Coil>
+		<Rmin unit="cm">178.31</Rmin>
+		<Rmax unit="cm">184.19</Rmax>
+		<HalfLength unit="cm">200.5</HalfLength>
+		<Material desc="material of Coil">G4_Al</Material>
+	</Coil>
+    </Content>
+</DetectorComponent>

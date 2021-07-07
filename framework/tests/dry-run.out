@@ -1,0 +1,19 @@
+[INFO] Steering file: framework/tests/dry-run.py
+[INFO] The random number seed is set to "something boring"
+[INFO] Starting event processing, random seed is set to 'something boring'
+INPUT FILE: in-0.root
+INPUT FILE: in-1.root
+INPUT FILE: in-2.root
+INPUT FILE: in-3.root
+INPUT FILE: in-4.root
+INPUT FILE: in-5.root
+INPUT FILE: in-6.root
+INPUT FILE: in-7.root
+INPUT FILE: in-8.root
+INPUT FILE: in-9.root
+INPUT FILE: in-normal.root
+OUTPUT FILE: out-normal.root
+INPUT FILE: in-sub_path.root
+OUTPUT FILE: out-sub_path.root
+INPUT FILE: in-conditional.root
+OUTPUT FILE: out-conditional.root

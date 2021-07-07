@@ -1,0 +1,9 @@
+Import('env')
+
+env.ParseConfig("python3 -c 'import numpy; print(\"-I%s\" % numpy.get_include())'")
+
+env['LIBS'] = ['framework', 'framework_io', 'mva_dataobjects', 'boost_program_options', '$ROOT_LIBS', 'fann', 'FastBDT_shared']
+
+env.Append(LIBS = ['TMVA','MLP','XMLIO'])
+
+Return('env')

@@ -1,0 +1,4 @@
+Import('env')
+
+env['LIBS'] = ['framework', '$ROOT_LIBS', 'genfit2', 'simulation_dataobjects', 'cdc_dataobjects', 'vxd_dataobjects', 'pxd_dataobjects', 'svd_dataobjects', 'pxd', 'svd', 'alignment_database']
+Return('env')

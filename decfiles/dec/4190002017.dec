@@ -1,0 +1,27 @@
+# EventType: 4190002017
+# Descriptor: [Upsilon6S_gamWb0prime_pi0etab]
+# NickName: Upsilon6S_gamWb0prime_pi0etab
+# Cuts: None
+# Documentation: Decay for Y(6S) physics
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Bryan Fulsom
+# Email: bryan.fulsom@pnnl.gov
+# Date: 20161101
+#
+# June 2021 Automated: Converted PYTHIA ids
+#   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
+
+Decay Upsilon(6S)
+1.0 gamma Wb0prime PHSP;
+Enddecay
+
+Decay Wb0prime
+1.0 pi0 eta_b PHSP;
+Enddecay
+
+Decay eta_b
+1.0 g g PHOTOS PYTHIA 91;
+Enddecay
+
+End

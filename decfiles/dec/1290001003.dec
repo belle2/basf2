@@ -1,0 +1,47 @@
+# EventType: 1290001003
+# Descriptor: [B+ -> Xd gamma]cc
+# NickName: Bu_Xdgamma
+# Documentation: Rare b->d gamma process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Phillip Urquijo, Justin Tan, Saurabh Sandilya
+# Comments: Modified in	MC10
+# Email: purquijo@unimelb.edu.au, saurabhsandilya@gmail.com
+# Cuts: None
+# Date: v1:20151103/v2:20180313
+#
+#
+#
+# June 2021 Automated: Converted PYTHIA ids
+#   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
+
+Particle anti-Xdu- 1.6 2.5
+LSNONRELBW anti-Xdu-
+ChangeMassMin anti-Xdu- 0.3
+
+Particle Xdu+ 1.6 2.5
+LSNONRELBW Xdu+
+ChangeMassMin Xdu+ 0.3
+
+Decay Xdd
+1.0 d anti-d PHOTOS PYTHIA 42;
+Enddecay
+#
+
+Decay Xdu+
+1.0 u anti-d PHOTOS PYTHIA 42;
+Enddecay
+CDecay anti-Xdu-
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0  Xdu+ gamma               PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+#
+End

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module name="HAPDModule" desc="Parameters of HAPD module">
+  <HAPD desc="Parameters of HAPD">
+    <wallMaterial desc="Material of HAPD wall">ARICH_Ceramics</wallMaterial>
+    <size desc="HAPD size in X (length)" unit="mm">75</size>
+    <height desc="Module size in Z (height)" unit="mm">27.6</height>
+    <wallThickness desc="Thickess of HAPD wall" unit="mm">3</wallThickness>	
+    <windowThickness desc="Thickess of HAPD window" unit="mm">3</windowThickness>	
+    <windowMaterial desc="Material of detector window">ARICH_HAPDQuartz</windowMaterial> 
+    <windowRefIndex desc="Refractive index of detector window">1.5</windowRefIndex> 
+    <padSize desc="Size of HAPD pad" unit="mm">5.1</padSize>
+    <apdSize desc="Size of HAPD pad" unit="mm">62.7</apdSize>
+    <apdThickness desc="Size of HAPD pad" unit="mm">0.6</apdThickness>
+    <chipGap desc="Gap between the APD chips" unit="mm">1.5</chipGap>
+    <padNum desc="Number of pads">144</padNum>
+    <qeScale desc="Scaling factor for quantum efficiency curve for photons internally reflected in HAPD window">1.0</qeScale>
+    <windowAbsorbtion desc="Probability that internally reflected photon in the HAPD window is absorbed (killed)">0.0</windowAbsorbtion>
+    <chipNegativeCrosstalk desc="Factor to suppress p.e. detection efficiency due to reverse polarized crosstalk between chip channels">0.2</chipNegativeCrosstalk>
+    <apdMaterial desc="Material of HAPD reflective bottom">ARICH_Silicon</apdMaterial> 
+    <fillMaterial desc="Material that fills HAPD volume">ARICH_Vacuum</fillMaterial> 
+    <apdReflectivity desc="Reflectivity of APD surface">0.05</apdReflectivity>
+    <Surface name="APDSurface">
+      <Properties>
+	<Property name="REFLECTIVITY" unit="eV">
+          <value energy="1.0">0.30</value> 
+          <value energy="2.0">0.30</value> 
+          <value energy="3.0">0.30</value> 
+          <value energy="4.0">0.30</value> 
+          <value energy="5.0">0.30</value> 
+          <value energy="6.0">0.30</value> 
+          <value energy="7.0">0.30</value>                 
+          <value energy="8.0">0.30</value>                 
+	</Property>
+      </Properties>
+      <Type>dielectric_metal</Type>
+      <Finish>polished</Finish>
+      <Model>glisur</Model>
+    </Surface>
+
+
+
+  </HAPD>
+  <FEB desc="Parameters of Front-end-board">	
+    <material desc="Material of FEB">HAPD_pcb</material>
+    <size desc="Size of pcb" unit="mm">75</size>
+    <thickness desc="Thickenss of pcb" unit="mm">2</thickness>
+  </FEB>
+  <height desc="height of HAPD module (HAPD+FEB)" unit="mm">30</height>
+</Module>

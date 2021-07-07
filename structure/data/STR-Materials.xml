@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+
+  <!-- High-Density Polyethylene -->
+  <Material name="STR-HDPE">
+    <density unit="g/cm3">0.95</density>
+    <Components>
+       <Element fraction="0.144">H</Element>
+       <Element fraction="0.856">C</Element>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 3%(w/w) natural Boron; PE + H_3BO_3 -->
+  <!--
+  <Material name="STR-PEB03">
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element fraction="0.127">H</Element>
+       <Element fraction="0.030">B</Element>
+       <Element fraction="0.710">C</Element>
+       <Element fraction="0.133">O</Element>
+    </Components>
+  </Material>
+  -->
+
+  <Material name="STR-PEB03">
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.03">B</Element>
+       <Material fraction="0.97">STR-HDPE</Material>
+    </Components>
+  </Material>
+
+
+
+  <!-- Polyethylene with 30%(w/w) natural Boron; PE + B -->
+  <!--  Grabbed from GeoARICHCreator.cc
+	Not "realist" (B should be in salt), but good enough for sims...
+  -->
+  <Material name="STR-PEB30">
+    <density unit="g/cm3">1.19</density>
+    <Components>
+       <Element  fraction="0.30">B</Element>
+       <Material fraction="0.70">STR-HDPE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 1%(w/w) natural Boron; PE + B -->
+  <Material name="STR-PEB01">
+    <density unit="g/cm3">0.95</density>
+    <Components>
+       <Element  fraction="0.01">B</Element>
+       <Material fraction="0.99">STR-HDPE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 5%(w/w) natural Boron; PE + B -->
+  <Material name="STR-PEB05">
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.05">B</Element>
+       <Material fraction="0.95">STR-HDPE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 10%(w/w) natural Boron; PE + B -->
+  <Material name="STR-PEB10">
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.10">B</Element>
+       <Material fraction="0.90">STR-HDPE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 15%(w/w) natural Boron; PE + B -->
+  <Material name="STR-PEB15">
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.15">B</Element>
+       <Material fraction="0.85">STR-HDPE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 20%(w/w) natural Boron; PE + B -->
+  <Material name="STR-PEB20">
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.20">B</Element>
+       <Material fraction="0.80">STR-HDPE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 25%(w/w) natural Boron; PE + B -->
+  <Material name="STR-PEB25">
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.25">B</Element>
+       <Material fraction="0.75">STR-HDPE</Material>
+    </Components>
+  </Material>
+
+
+  <!-- Lead Casting-->
+  <Material name="STR-Lead">
+    <density unit="g/cm3">11.34</density>
+    <Components>
+       <Element  fraction="1.0">Pb</Element>
+    </Components>
+  </Material>
+
+  <!-- JIS SUS 304 Stainless Steel -->
+  <Material name="STR-SUS304">
+    <density unit="g/cm3">8.04</density>
+    <Components>
+       <Element fraction="0.0008">C</Element>
+       <Element fraction="0.0075">Si</Element>
+       <Element fraction="0.0100">Mn</Element>
+       <Element fraction="0.1900">Cr</Element>
+       <Element fraction="0.1000">Ni</Element>
+       <Element fraction="0.0095">N</Element>
+       <Element fraction="0.6822">Fe</Element>
+    </Components>
+  </Material>
+
+  <!-- Just Dry Air, nothing fancy -->
+  <Material name="STR-DryAir">  
+    <density unit="g/cm3">1.2e-3</density>  
+    <Components>  
+      <Element fraction="0.781">N</Element>  
+      <Element fraction="0.210">O</Element>  
+      <Element fraction="0.009">Ar</Element>  
+    </Components>  
+  </Material>
+</Materials>

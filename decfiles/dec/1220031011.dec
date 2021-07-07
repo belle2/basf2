@@ -1,0 +1,24 @@
+# EventType: 1220031011 
+# Descriptor: [B+ -> K'*+ gamma]cc
+# NickName: Bu_K'*+gamma
+# Documentation: Rare b->s gamma process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Saurabh Sandilya
+# Email: saurabhsandilya@gmail.com
+# Cuts: None
+# Date: 20170228
+#
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0  K'*+  gamma HELAMP 1.0 0.0 1.0 0.0;
+Enddecay
+CDecay B-sig
+
+#
+End

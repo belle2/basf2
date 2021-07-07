@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<SupportStructure desc="Parameter of ARICH support structure">
+  <Tubes>    
+    <Tube id="1">
+      <material>Al</material>
+      <name>ARICH.InnerCylinder1</name>
+      <innerR unit="mm">420.0</innerR>
+      <outerR unit="mm">427.0</outerR>
+      <length unit="mm">278.0</length>
+      <zPosition unit="mm">1.0</zPosition>
+    </Tube>
+    <Tube id="2">
+      <material>Al</material>
+      <name>ARICH.InnerCylinder2</name>
+      <innerR unit="mm">427.0</innerR>
+      <outerR unit="mm">435.0</outerR>
+      <length unit="mm">267.0</length>
+      <zPosition unit="mm">12.0</zPosition>
+    </Tube>
+    <Tube id="3">
+      <material>Al</material>
+      <name>ARICH.OutterCover</name>
+      <innerR unit="mm">1139.0</innerR>
+      <outerR unit="mm">1140.0</outerR>
+      <length unit="mm">245.0</length>
+      <zPosition unit="mm">29.5</zPosition>
+    </Tube>
+    <Tube id="4">
+	<material>Al</material>
+	<name>ARICH.AerogelSupportRing1</name>
+	<innerR unit="mm">428.0</innerR>
+	<outerR unit="mm">435.0</outerR>
+	<length unit="mm">10.0</length>
+	<zPosition unit="mm">1.0</zPosition>
+    </Tube>
+    <Tube id="5">
+      <material>Al</material>
+	<name>ARICH.AerogelSupportRing2</name>
+	<innerR unit="mm">1114.5</innerR>
+	<outerR unit="mm">1117.5</outerR>
+	<length unit="mm">50.5</length>
+	<zPosition unit="mm">1.0</zPosition>
+    </Tube>
+    <Tube id="6">
+      <material>Al</material>
+      <name>ARICH.AerogelSupportRing3</name>
+       <innerR unit="mm">1117.5</innerR>
+      <outerR unit="mm">1139.0</outerR>
+      <length unit="mm">22.0</length>
+      <zPosition unit="mm">29.5</zPosition>
+    </Tube>
+    <Tube id="7">
+      <material>BoratedPoly</material>
+      <name>ARICH.NeutronShield1</name>
+      <innerR unit="mm">435.0</innerR>
+      <outerR unit="mm">520.0</outerR>
+      <length desc="length of neutron shield tube" unit="mm">165</length>
+      <zPosition unit="mm">71</zPosition>
+    </Tube>
+    <!--Tube id="8">
+    <material>BoratedPoly</material>
+      <name>ARICH.NeutronShield2</name>
+      <innerR unit="mm">435.0</innerR>
+      <outerR unit="mm">520.0</outerR>
+      <length desc="length of neutron shield tube" unit="mm">71</length>
+      <zPosition unit="mm">11</zPosition>
+    </Tube-->
+    <Tube id="9">
+      <material>Al</material>
+      <name>ARICH.BackwardCoverageWall</name>
+      <innerR unit="mm">435</innerR>
+      <outerR unit="mm">1139.0</outerR>
+      <length unit="mm">1.0</length>
+      <!-- 29.5 + 245.0 - 1 -->
+      <zPosition unit="mm">273.5</zPosition>
+    </Tube>
+  </Tubes>
+  
+  <material>Al</material>
+  
+  <Wedges>
+    <gap desc='gap between wedges and hapd support plate' unit='mm'>0.0</gap>
+    <n desc='number of wedges in phi'>36</n>
+    
+    <Wedge id="1">
+      <par unit='mm'>40.0</par>
+      <par unit='mm'>120.0</par>
+      <par unit='mm'>60.0</par>
+      <par unit='mm'>5.0</par>
+      <par unit='mm'>5.0</par>
+      <par unit='mm'>15.0</par>
+      <par unit='mm'>6.25</par>
+      <par unit='mm'>-32.5</par>
+    </Wedge>
+    
+    <Wedge id="2">                                                                                                                                                        
+      <par unit='mm'>40.0</par>                                                                                                                                           
+      <par unit='mm'>30.0</par>
+      <par unit='mm'>60.0</par>
+      <par unit='mm'>5.0</par>
+    </Wedge>
+    
+    <Placements>
+      <Placement>
+      <type>2</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>0.0</phi>
+      <z unit='mm'>221.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>0.174532</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>0.349064</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>2</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>0.523596</phi>
+      <z unit='mm'>221.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>0.698128</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>0.87266</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>2</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>1.047192</phi>
+      <z unit='mm'>221.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>1.221724</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>1.396256</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>2</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>1.570788</phi>
+      <z unit='mm'>221.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>1.74532</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>1.919852</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>2</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>2.094384</phi>
+      <z unit='mm'>221.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>2.268916</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>2.443448</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>2</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>2.61798</phi>
+      <z unit='mm'>221.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>2.792512</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>2.967044</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>2</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>3.141576</phi>
+      <z unit='mm'>221.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>3.316108</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>3.49064</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>2</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>3.665172</phi>
+      <z unit='mm'>221.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>3.839704</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>4.014236</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>2</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>4.188768</phi>
+      <z unit='mm'>221.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>4.3633</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>4.537832</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>2</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>4.712364</phi>
+      <z unit='mm'>221.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>4.886896</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>5.061428</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>2</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>5.23596</phi>
+      <z unit='mm'>221.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>5.410492</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>5.585024</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>2</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>5.759556</phi>
+      <z unit='mm'>221.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>5.934088</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>
+    <Placement>
+      <type>1</type>
+      <r unit='mm'>437.5</r>
+      <phi unit='rad'>6.10862</phi>
+      <z unit='mm'>176.0</z>
+    </Placement>    
+    </Placements>
+  </Wedges>
+</SupportStructure>

@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+from caf.database import CAFDB
+from caf.framework import CAF
+from caf.framework import Calibration
+
+from pathlib import Path
+
+
+def command_show(args, db_path):
+    """Prints the current CAF database, showing values such as the current *state*, *checkpoint*, and *iteration*,
+for every Calibration known to the CAF process. You may call this even while the CAF is still running in
+order to check on the status."""
+    with CAFDB(db_path, read_only=True) as db:
+        print(db.output_calibration_table())
+    return 0
+
+
+def command_update(args, db_path):
+    with CAFDB(db_path, read_only=False) as db:
+        db.update_calibration_value(args.cal_name, args.col_name, args.new_value)
+        print(db.output_calibration_table())
+    return 0
+
+__docstring = ("This allows you to modify (update) the value of a column in the SQLite3 CAF database.\n\n"
+               "**Do Not Do This While The CAF Is Running!**\n\n"
+               "The CAF will automatically restart from whichever values 'checkpoint' and 'iteration'"
+               " are set to in the DB the next time you run it. "
+               "Therefore to restart a calibration from a specific point in the processing you should use this command to "
+               "set the 'checkpoint' and 'iteration' columns to what you want. You can ignore the 'state' column"
+               " e.g.\n\n"
+               "b2caf-status --path=my_output_dir update TestCal1 checkpoint init\n"
+               "b2caf-status --path=my_output_dir update TestCal1 iteration 0\n\n"
+               "This will restart 'TestCal1' from the beginning completely, but will not affect any other Calibrations. "
+               "Use the 'b2caf-status show' command to check that everything looks how you want it. "
+               "The allowed values for the 'checkpoint' column are:\n\n")
+__docstring += str(Calibration.checkpoint_states)
+__docstring += "\n\n(Note that if you have developed your own Calibration class these allowed states may be different)"
+command_update.__doc__ = __docstring
+
+
+def get_argparser():
+    import argparse
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
+    subparsers = parser.add_subparsers(help="What do you want to do with the CAF database?")
+    parser.add_argument("--path", "-p", help="The path to the CAF output directory you want to examine. "
+                                             "By default it checks './calibration_results'")
+
+    show_parser = subparsers.add_parser("show",
+                                        help="Prints the status of the CAF process",
+                                        description=globals()["command_show"].__doc__,
+                                        formatter_class=argparse.RawDescriptionHelpFormatter)
+    show_parser.set_defaults(func=command_show)
+
+    update_parser = subparsers.add_parser("update",
+                                          help="Modifies a Calibration's column in the CAFDB",
+                                          description=globals()["command_update"].__doc__,
+                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    update_parser.add_argument("cal_name",  help="Calibration name to update")
+    update_parser.add_argument("col_name",  help="Column to change")
+    update_parser.add_argument("new_value", help="New value to update into the column")
+    update_parser.set_defaults(func=command_update)
+    return parser
+
+
+def main():
+    parser = get_argparser()
+    args = parser.parse_args()
+    if args.path == None:
+        db_path = Path("calibration_results", CAF._db_name)
+    else: db_path = Path(args.path, CAF._db_name)
+    if not db_path.exists():
+        print("No database at path: {}".format(db_path))
+        return 1
+
+    return args.func(args, db_path)
+
+if __name__ == "__main__":
+    import sys
+    sys.exit(main())

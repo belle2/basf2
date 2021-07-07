@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<TTSofPMTs descr="parameterized time transition spreads and photon detection efficiency tune factors of different PMT types">
+
+  <TTSpar name="conventional">
+    <type>1</type>
+    <PDEtuneFactor>0.963</PDEtuneFactor>
+    <Gauss>
+      <fraction>0.662241</fraction>
+      <mean unit="ps">0</mean>
+      <sigma unit="ps">35.2211</sigma>
+    </Gauss>
+    <Gauss>
+      <fraction>0.245317</fraction>
+      <mean unit="ps">95.8745</mean>
+      <sigma unit="ps">143.394</sigma>
+    </Gauss>
+    <Gauss>
+      <fraction>0.0924417</fraction>
+      <mean unit="ps">445.767</mean>
+      <sigma unit="ps">414.059</sigma>
+    </Gauss>
+  </TTSpar>
+
+  <TTSpar name="ALD">
+    <type>2</type>
+    <PDEtuneFactor>1.129</PDEtuneFactor>
+    <Gauss>
+      <fraction>0.470075</fraction>
+      <mean unit="ps">0</mean>
+      <sigma unit="ps">33.0001</sigma>
+    </Gauss>
+    <Gauss>
+      <fraction>0.324114</fraction>
+      <mean unit="ps">97.0011</mean>
+      <sigma unit="ps">113.643</sigma>
+    </Gauss>
+    <Gauss>
+      <fraction>0.141145</fraction>
+      <mean unit="ps">249.137</mean>
+      <sigma unit="ps">194.822</sigma>
+    </Gauss>
+    <Gauss>
+      <fraction>0.0646661</fraction>
+      <mean unit="ps">628.066</mean>
+      <sigma unit="ps">548.229</sigma>
+    </Gauss>
+  </TTSpar>
+
+  <TTSpar name="life extended ALD">
+    <type>3</type>
+    <PDEtuneFactor>1.129</PDEtuneFactor>
+    <Gauss>
+      <fraction>0.475963</fraction>
+      <mean unit="ps">0</mean>
+      <sigma unit="ps">39.6801</sigma>
+    </Gauss>
+    <Gauss>
+      <fraction>0.316356</fraction>
+      <mean unit="ps">107.601</mean>
+      <sigma unit="ps">140.677</sigma>
+    </Gauss>
+    <Gauss>
+      <fraction>0.125032</fraction>
+      <mean unit="ps">289.735</mean>
+      <sigma unit="ps">209.411</sigma>
+    </Gauss>
+    <Gauss>
+      <fraction>0.0826493</fraction>
+      <mean unit="ps">562.05</mean>
+      <sigma unit="ps">525.219</sigma>
+    </Gauss>
+  </TTSpar>
+
+</TTSofPMTs>

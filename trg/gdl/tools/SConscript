@@ -1,0 +1,5 @@
+Import('env')
+env['TOOLS_LIBS']['FTDConverter'] = ['trg_trg']
+env['TOOLS_LIBS']['trggdlWriteLocalDB'] = ['framework','mdst_dbobjects','trg','$ROOT_LIBS']
+env['TOOLS_LIBS']['trggdlWriteLocalDBPrescale'] = ['framework','mdst_dbobjects','trg','$ROOT_LIBS']
+Return('env')

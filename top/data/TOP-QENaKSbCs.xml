@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QE descr="nominal quantum efficiency of NaKSbCs photocathode">
+  <!-- average of Nagoya measurements, for the procedure see top/analysis/averageQE.py -->
+  <ColEffi descr="average over all PMTs for 1.5 T">0.5677</ColEffi>
+  <LambdaFirst unit="nm">280.0</LambdaFirst>
+  <LambdaStep unit="nm">20.0</LambdaStep>
+  <Qeffi>0.22</Qeffi>
+  <Qeffi>0.238</Qeffi>
+  <Qeffi>0.258</Qeffi>
+  <Qeffi>0.281</Qeffi>
+  <Qeffi>0.304</Qeffi>
+  <Qeffi>0.296</Qeffi>
+  <Qeffi>0.281</Qeffi>
+  <Qeffi>0.25</Qeffi>
+  <Qeffi>0.214</Qeffi>
+  <Qeffi>0.179</Qeffi>
+  <Qeffi>0.151</Qeffi>
+  <Qeffi>0.127</Qeffi>
+  <Qeffi>0.107</Qeffi>
+  <Qeffi>0.09</Qeffi>
+  <Qeffi>0.075</Qeffi>
+  <Qeffi>0.064</Qeffi>
+  <Qeffi>0.053</Qeffi>
+  <Qeffi>0.044</Qeffi>
+  <Qeffi>0.036</Qeffi>
+  <Qeffi>0.029</Qeffi>
+  <Qeffi>0.023</Qeffi>
+  <Qeffi>0.017</Qeffi>
+  <Qeffi>0.013</Qeffi>
+  <Qeffi>0.009</Qeffi>
+  <Qeffi>0.007</Qeffi>
+</QE>

@@ -1,0 +1,24 @@
+# EventType: 2411440000
+# Descriptor: [ee -> pi+pi-J/psi] are generated via ISR
+# NickName: ISR_pi+pi-J/psi
+# Documentation: Control channel for analysis package
+# Tested: Yes 
+# PhysicsWG: Charmonium
+# Responsible: Sen Jia
+# Email: jiasen@buaa.edu.cn
+# Cuts: None 
+# Date: 20170427
+#
+Decay vpho
+1.0   Upsilon(4S) gamma VECTORISR -1 1;
+Enddecay
+#
+Decay Upsilon(4S)
+1.0   pi+ pi- J/psi PHSP;
+Enddecay
+#
+Decay J/psi
+1.0   mu+  mu-  PHOTOS  VLL;
+Enddecay
+#
+End

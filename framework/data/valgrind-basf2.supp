@@ -1,0 +1,233 @@
+{
+  <suppression_1>
+    Memcheck:Leak
+    fun:_Znwm
+    fun:_ZN8TStorage11ObjectAllocEm
+    fun:_ZN4TMap3AddEP7TObjectS1_
+    fun:_ZN5TFile12SetCacheReadEP14TFileCacheReadP7TObjectNS_12ECacheActionE
+    fun:_ZN14TFileCacheReadC1EP5TFileiP7TObject
+    fun:_ZN10TTreeCacheC1EP5TTreei
+    fun:_ZN5TTree15SetCacheSizeAuxEbx
+    fun:_ZN5TTree4FillEv
+    fun:_ZN6Belle217NtupleMakerModule5eventEv
+    fun:_ZN6Belle214EventProcessor9callEventEPNS_6ModuleE
+    fun:_ZN6Belle214EventProcessor12processEventENS_12PathIteratorEb
+    fun:_ZN6Belle214EventProcessor11processCoreEN5boost10shared_ptrINS_4PathEEERKSt4listINS2_INS_6ModuleEEESaIS7_EElb
+}
+
+
+{
+  <suppression_2>
+    Memcheck:Leak
+    fun:_Znwm
+    fun:_ZN8TStorage11ObjectAllocEm
+    fun:_ZN10TTreeCache9AddBranchEP7TBranchb
+    fun:_ZN10TTreeCache9AddBranchEPKcb
+    fun:_ZN10TTreeCache12LearnPrefillEv
+    fun:_ZN10TTreeCache9AddBranchEP7TBranchb
+    fun:_ZN7TBranch9GetBasketEi
+    fun:_ZN7TBranch8GetEntryExi
+    fun:_ZN14TBranchElement8GetEntryExi
+    fun:_ZN5TTree8GetEntryExi
+    fun:_ZN6Belle218BeamBkgMixerModule5eventEv
+    fun:_ZN6Belle214EventProcessor9callEventEPNS_6ModuleE
+}
+
+
+
+{
+  <suppression_3>
+    Memcheck:Leak
+    fun:_Znwm
+    fun:_ZN8TStorage11ObjectAllocEm
+    fun:_ZN10TTreeCache9AddBranchEP7TBranchb
+    fun:_ZN10TTreeCache9AddBranchEPKcb
+    fun:_ZN10TTreeCache12LearnPrefillEv
+    fun:_ZN10TTreeCache9AddBranchEP7TBranchb
+    fun:_ZN7TBranch9GetBasketEi
+    fun:_ZN7TBranch8GetEntryExi
+    fun:_ZN14TBranchElement8GetEntryExi
+    fun:_ZN5TTree8GetEntryExi
+    fun:_ZN6Belle218BeamBkgMixerModule5eventEv
+    fun:_ZN6Belle214EventProcessor9callEventEPNS_6ModuleE
+}
+
+
+
+{
+  <suppression_4>
+    Memcheck:Leak
+    fun:_Znwm
+    fun:_ZN8TStorage11ObjectAllocEm
+    fun:_ZN4TMap3AddEP7TObjectS1_
+    fun:_ZN5TFile12SetCacheReadEP14TFileCacheReadP7TObjectNS_12ECacheActionE
+    fun:_ZN14TFileCacheReadC1EP5TFileiP7TObject
+    fun:_ZN10TTreeCacheC1EP5TTreei
+    fun:_ZN5TTree15SetCacheSizeAuxEbx
+    fun:_ZN5TTree4FillEv
+    fun:_ZN6Belle216RootOutputModule8fillTreeENS_9DataStore11EDurabilityE
+    fun:_ZN6Belle216RootOutputModule5eventEv
+    fun:_ZN6Belle214EventProcessor9callEventEPNS_6ModuleE
+    fun:_ZN6Belle214EventProcessor12processEventENS_12PathIteratorEb
+}
+
+
+{
+  <suppression_5>
+    Memcheck:Leak
+    fun:_Znwm
+    fun:_ZN12EvtbTosllAli4initEv
+    fun:_ZN12EvtDecayBase13saveDecayInfoE5EvtIdiPS0_iRSt6vectorISsSaISsEESsd
+    fun:_ZN13EvtDecayTable13readDecayFileESsb
+    fun:_ZN6EvtGenC1EPKcS1_P15EvtRandomEngineP13EvtAbsRadCorrPKSt4listIP12EvtDecayBaseSaIS8_EEib
+    fun:_ZN6Belle215EvtGenInterface5setupERKSsS2_S2_
+    fun:_ZN6Belle217EvtGenInputModule19initializeGeneratorEv
+    fun:_ZN6Belle217EvtGenInputModule5eventEv
+    fun:_ZN6Belle214EventProcessor9callEventEPNS_6ModuleE
+    fun:_ZN6Belle214EventProcessor12processEventENS_12PathIteratorEb
+    fun:_ZN6Belle214EventProcessor11processCoreEN5boost10shared_ptrINS_4PathEEERKSt4listINS2_INS_6ModuleEEESaIS7_EElb
+    fun:_ZN6Belle214EventProcessor7processEN5boost10shared_ptrINS_4PathEEEl
+}
+
+{
+  <suppression_6>
+    Memcheck:Leak
+    fun:_Znwm
+    fun:_ZN12EvtbTosllAli4initEv
+    fun:_ZN12EvtDecayBase13saveDecayInfoE5EvtIdiPS0_iRSt6vectorISsSaISsEESsd
+    fun:_ZN13EvtDecayTable13readDecayFileESsb
+    fun:_ZN6EvtGenC1EPKcS1_P15EvtRandomEngineP13EvtAbsRadCorrPKSt4listIP12EvtDecayBaseSaIS8_EEib
+    fun:_ZN6Belle215EvtGenInterface5setupERKSsS2_S2_
+    fun:_ZN6Belle217EvtGenInputModule19initializeGeneratorEv
+    fun:_ZN6Belle217EvtGenInputModule5eventEv
+    fun:_ZN6Belle214EventProcessor9callEventEPNS_6ModuleE
+    fun:_ZN6Belle214EventProcessor12processEventENS_12PathIteratorEb
+    fun:_ZN6Belle214EventProcessor11processCoreEN5boost10shared_ptrINS_4PathEEERKSt4listINS2_INS_6ModuleEEESaIS7_EElb
+    fun:_ZN6Belle214EventProcessor7processEN5boost10shared_ptrINS_4PathEEEl
+}
+
+
+{
+  <suppression_9>
+    Memcheck:Leak
+    fun:_Znwm
+    fun:_ZN28G4ElectroNuclearCrossSection22GetElementCrossSectionEPK17G4DynamicParticleiPK10G4Material
+    fun:_ZN23G4CrossSectionDataStore15GetCrossSectionEPK17G4DynamicParticlePK9G4ElementPK10G4Material
+    fun:_ZN23G4CrossSectionDataStore15GetCrossSectionEPK17G4DynamicParticlePK10G4Material
+    fun:_ZN17G4HadronicProcess15GetMeanFreePathERK7G4TrackdP16G4ForceCondition
+    fun:_ZN18G4VDiscreteProcess36PostStepGetPhysicalInteractionLengthERK7G4TrackdP16G4ForceCondition
+    fun:_ZN17G4SteppingManager24DefinePhysicalStepLengthEv
+    fun:_ZN17G4SteppingManager8SteppingEv
+    fun:_ZN17G4TrackingManager15ProcessOneTrackEP7G4Track
+    fun:_ZN14G4EventManager12DoProcessingEP7G4Event
+    fun:_ZN6Belle210Simulation10RunManager12processEventEi
+    fun:_ZN6Belle213FullSimModule5eventEv
+}
+
+
+{
+  <suppression_11>
+    Memcheck:Leak
+    fun:_Znwm
+    fun:_ZN5TList7NewLinkEP7TObjectP8TObjLink
+    fun:_ZN5TList7AddLastEP7TObject
+    fun:_ZN4TMVA12Configurable16DeclareOptionRefIbEEPNS_10OptionBaseERT_RK7TStringS8_
+    fun:_ZN4TMVA10MethodBase18DeclareBaseOptionsEv
+    fun:_ZN4TMVA10MethodBase11SetupMethodEv
+    fun:_ZN4TMVA6Reader7BookMVAENS_5Types4EMVAERK7TString
+    fun:_ZN4TMVA6Reader7BookMVAERK7TStringS3_
+    fun:_ZN6Belle215TrackFindingCDC6Expert16initializeReaderERKSt8functionIFvRN4TMVA6ReaderEEE
+    fun:_ZN6Belle215TrackFindingCDC6Expert16initializeReaderESt6vectorIPNS0_15NamedFloatTupleESaIS4_EE
+    fun:_ZN6Belle215TrackFindingCDC10TMVAFilterINS0_28CDCWireHitClusterBasicVarSetEE10initializeEv
+    fun:_ZN6Belle215TrackFindingCDC16ChooseableFilterINS0_13FilterFactoryINS0_6FilterINS0_17CDCWireHitClusterEEEEEE10initializeEv
+}
+
+
+{
+    TMVA leak
+    Memcheck:Leak
+    ...
+    fun:_ZN4TMVA6Reader7BookMVAERK7TStringS3_
+    fun:_ZN6Belle215TrackFindingCDC6Expert16initializeReaderERKSt8functionIFvRN4TMVA6ReaderEEE
+    ...
+}
+
+
+{
+   TGeoHMatrix::Clear
+   Memcheck:Cond
+   fun:_ZN11TGeoHMatrix5ClearEPKc
+}
+
+
+{
+   Unitialized value in TGeoHMatrix false positive
+   Memcheck:Cond
+   fun:_ZN11TGeoHMatrixaSERK10TGeoMatrix
+   fun:_ZN6Belle230SetupGenfitExtrapolationModule18updateVXDAlignmentEv
+   ...
+}
+
+
+{
+   Unitialized value in TGeoHMatrix false positive
+   Memcheck:Cond
+   ...
+   fun:_ZNK10TGeoMatrixmlERKS_
+   fun:_ZN6Belle230SetupGenfitExtrapolationModule18updateVXDAlignmentEv
+   ...
+}
+
+{
+   Suppress memory leaks in TROOT::RegisterModule (BII-2159, ROOT-7593)
+   Memcheck:Leak
+   ...
+   fun:_ZN8TStorage11ObjectAllocEm
+   fun:_ZN4ROOTL15new_TProtoClassEPv
+   fun:_ZNK6TClass3NewENS_8ENewTypeEb
+   fun:_ZN11TBufferFile13ReadObjectAnyEPK6TClass
+   fun:_ZN9TObjArray8StreamerER7TBuffer
+   fun:_ZN4TKey13ReadObjectAnyEPK6TClass
+   fun:_ZN14TDirectoryFile16GetObjectCheckedEPKcPK6TClass
+   fun:_ZNK6TCling7LoadPCME7TStringPPKcPFvvE
+   fun:_ZN6TCling14RegisterModuleEPKcPS1_S2_S1_S1_PFvvERKSt6vectorISt4pairINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEiESaISD_EES2_b
+   fun:_ZN5TROOT14RegisterModuleEPKcPS1_S2_S1_S1_PFvvERKSt6vectorISt4pairINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEiESaISD_EES2_
+   ...
+}
+
+{
+   RootOutput: Syscall param write(buf) points to uninitialized bytes in TTree::Fill
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_ZN5TFile11WriteBufferEPKci
+   fun:_ZN4TKey19WriteFileKeepBufferEP5TFile
+   fun:_ZN7TBasket11WriteBufferEv
+   fun:_ZN7TBranch11WriteBasketEP7TBasketi
+   fun:_ZN7TBranch12FlushBasketsEv
+   fun:_ZN7TBranch12FlushBasketsEv
+   fun:_ZNK5TTree12FlushBasketsEv
+   fun:_ZN5TTree4FillEv
+   ...
+}
+
+{
+   DataStore: Conditional jump or move depends on uninitialized value in TClonesArray::Delete
+   Memcheck:Cond
+   fun:_ZN12TClonesArray6DeleteEPKc
+   fun:_ZN6Belle210StoreEntry16resetForGetEntryEv
+   fun:_ZN6Belle210StoreEntry8recreateEv
+   fun:_ZN6Belle210StoreEntry10invalidateEv
+   fun:_ZN6Belle29DataStore27SwitchableDataStoreContents14invalidateDataENS0_11EDurabilityE
+   fun:_ZN6Belle29DataStore14invalidateDataENS0_11EDurabilityE
+   ...
+}
+
+{
+   "Conditional jump or move depends on uninitialised value(s)" in TGraph::Eval when called by ECLShowerShapeModule
+   Memcheck:Cond
+   fun:_ZNK6TGraph4EvalEdP7TSplinePKc
+   fun:_ZNK6Belle23ECL20ECLShowerShapeModule25getSecondMomentCorrectionEddi
+   fun:_ZNK6Belle23ECL20ECLShowerShapeModule23setShowerShapeVariablesEPNS_9ECLShowerEb
+   fun:_ZN6Belle23ECL20ECLShowerShapeModule5eventEv
+}

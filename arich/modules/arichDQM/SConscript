@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'arich_dataobjects', 'arich', 'tracking_dataobjects', 'mdst_dataobjects', 'rawdata_dataobjects','$ROOT_LIBS']
+
+Return('env')

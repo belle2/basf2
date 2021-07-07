@@ -1,0 +1,40 @@
+#------------------------------------------------------------
+# EventType:1163300004
+# Descriptor: B0 --> D*+ tau- [-> l anti-nu_l nu_tau] anti-nu_tau, generic Btag decay
+# NickName: Bd_Dsttaunu_lep
+# Documentation: B to D* tau nu study, leptonic tau decay
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Racha Cheaib
+# Email: rcheaib@olemiss.edu
+# Cuts: None
+# Date: 20170210
+#-----------------------------------------------------------
+#
+#
+#
+Decay Upsilon(4S)
+1.000 B0sig anti-B0sig B0 anti-B0     VSS_BMIX  dm; 
+Enddecay
+#
+#
+Decay B0sig
+1.00 D*- tau+sig nu_tau  ISGW2;
+Enddecay
+#
+Decay anti-B0sig
+1.00 D*+ tau-sig anti-nu_tau   ISGW2;
+Enddecay
+#
+Decay tau+sig
+0.50    e+      nu_e    anti-nu_tau     PHOTOS  TAULNUNU;
+0.50    mu+     nu_mu   anti-nu_tau     PHOTOS  TAULNUNU;
+Enddecay
+#
+Decay tau-sig
+0.50    e-      anti-nu_e       nu_tau  PHOTOS  TAULNUNU;
+0.50    mu-     anti-nu_mu      nu_tau  PHOTOS  TAULNUNU;
+Enddecay
+#
+
+End

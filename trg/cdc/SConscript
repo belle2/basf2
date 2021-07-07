@@ -1,0 +1,17 @@
+Import('env')
+
+env['SUBLIB'] = True
+env['LIBS'] = ['framework',
+               'mdst_dataobjects',
+               'rawdata_dataobjects',
+               'cdc',
+               'cdc_dataobjects',
+               'trg_cdc_dataobjects',
+               'trg_trg',
+               'trg_trg_dataobjects']
+#env.Append(CPPDEFINES = {'TRGCDC_DISPLAY':None})
+#env.Append(CPPDEFINES = {'TRGCDC_DISPLAY_HOUGH':None})
+#env.ParseConfig('pkg-config --cflags --libs gtkmm-2.4')
+#print env.Dump()
+
+Return('env')

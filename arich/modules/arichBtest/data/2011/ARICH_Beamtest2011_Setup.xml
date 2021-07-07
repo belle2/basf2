@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<setup  desc="Parameters of beamtest setup" xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<ExperimentalBox>
+      <xSize desc="xsize" unit="mm">1000</xSize>
+      <ySize desc="ysize" unit="mm">500</ySize>
+      <zSize desc="zsize" unit="mm">2000</zSize>
+      <material desc="aRICH envelope material: should be air with specified refractive index">ARICH_Vacuum</material>
+      <beamcenter desc="Position of the beam center on the hapd experimental box = reference point " ><x  unit="mm">0</x><y  unit="mm">198</y><z  unit="mm">100</z></beamcenter>
+</ExperimentalBox>
+
+<Frame>
+      <xSize desc="Starting z position of aRICH envelope" unit="mm">400</xSize>
+      <ySize desc="Ending z position of aRICH envelope" unit="mm">300</ySize>
+      <zSize desc="Ending z position of aRICH envelope" unit="mm">300</zSize>
+      <material desc="aRICH envelope material: should be air with specified refractive index">ARICH_Vacuum</material>
+      <position desc="position of the rotation point"><x  unit="mm">53</x><y  unit="mm"   desc="-180+203">23</y><z  unit="mm">210</z></position>
+</Frame>
+  
+
+<aerogel>
+<row id="1a"><aerogel type="upstream">PDR20-3a</aerogel></row>
+<row id="1b"><aerogel type="upstream">BTR9-7</aerogel></row>
+<row id="1c"><aerogel type="upstream">BTR3-2a</aerogel></row>
+<row id="1d"><aerogel type="upstream">HTP11-9</aerogel></row>
+<row id="1e"><aerogel type="upstream">BTR8-5</aerogel></row>
+<row id="1f"><aerogel type="upstream">HTP11-5</aerogel></row>
+<row id="1g"><aerogel type="upstream">HTP12-25</aerogel></row>
+<row id="1h"><aerogel type="upstream">PDR21-1b</aerogel></row>
+<row id="1i"><aerogel type="upstream">PDR19-4b</aerogel></row>
+<row id="1k"><aerogel type="upstream">PDR21-5b</aerogel></row>
+<row id="1m"><aerogel type="upstream">PDR11-4a</aerogel></row>
+<row id="2a"><aerogel type="upstream">PDR20-3a</aerogel><aerogel type="downstream">PDR11-4a</aerogel></row>
+<row id="2b"><aerogel type="upstream">BTR3-2a</aerogel><aerogel type="downstream">PDR11-4a</aerogel></row>
+<row id="2c"><aerogel type="upstream">BTR3-2a</aerogel><aerogel type="downstream">PDR21-5b</aerogel></row>
+<row id="2d"><aerogel type="upstream">HTP11-9</aerogel><aerogel type="downstream">BTR8-5</aerogel></row>
+<row id="2e"><aerogel type="upstream">HTP11-5</aerogel><aerogel type="downstream">HTP12-25</aerogel></row>
+<row id="2f"><aerogel type="upstream">PDR21-1b</aerogel><aerogel type="downstream">PDR19-4b</aerogel></row>
+<row id="2g"><aerogel type="right">PDR21-1b</aerogel><aerogel type="left">PDR19-4b</aerogel></row>
+</aerogel>
+
+
+
+<aerogelinfo>
+<row id="PDR20-3a"><refind>1.0542</refind> <trlen unit="mm">48</trlen><thickness  unit="mm">20.0</thickness></row>
+<row id="PDR11-4a"><refind>1.0649</refind> <trlen unit="mm">55</trlen><thickness  unit="mm">19.9</thickness></row>
+<row id="BTR3-2a"><refind>1.0500</refind> <trlen unit="mm">43</trlen><thickness  unit="mm">19.8</thickness></row>
+<row id="PDR11-4a"><refind>1.0649</refind> <trlen unit="mm">55</trlen><thickness  unit="mm">19.9</thickness></row>
+<row id="PDR21-1b"><refind>1.0463</refind> <trlen unit="mm">44</trlen><thickness  unit="mm">20.4</thickness></row>
+<row id="PDR19-4b"><refind>1.0564</refind> <trlen unit="mm">37</trlen><thickness  unit="mm">20.6</thickness></row>
+<row id="BTR3-2a"><refind>1.0500</refind> <trlen unit="mm">43</trlen><thickness  unit="mm">19.8</thickness></row>
+<row id="PDR21-5b"><refind>1.0607</refind> <trlen unit="mm">30</trlen><thickness  unit="mm">20.6</thickness></row>
+<row id="HTP11-9"><refind>1.0510</refind> <trlen unit="mm">40</trlen><thickness  unit="mm">20.1</thickness></row>
+<row id="BTR8-5"><refind>1.0653</refind> <trlen unit="mm">49</trlen><thickness  unit="mm">20.5</thickness></row>
+<row id="BTR9-7"><refind>1.0516</refind> <trlen unit="mm">40</trlen><thickness  unit="mm">19.9</thickness></row>
+<row id="HTP11-5"><refind>1.0449</refind> <trlen unit="mm">43</trlen><thickness  unit="mm">20.0</thickness></row>
+<row id="HTP12-25"><refind>1.0545</refind> <trlen unit="mm">32</trlen><thickness  unit="mm">20.2</thickness></row>
+</aerogelinfo>
+
+
+
+<hapd>
+<row id="1"><comment>labeled sept11</comment><setup>1</setup></row>		
+<row id="2"><comment>labeled sept14</comment><aerogeldx unit="mm">0</aerogeldx><setup>1</setup></row>		
+<row id="3"><comment>Sept15	move of aerogel - 20mm to the left of the beam regarding setup 2</comment><aerogeldx unit="mm">20</aerogeldx><setup>1</setup></row>	
+<row id="4"><comment>Sept15	move of aerogel - 40mm to the left of the beam regarding setup 2</comment><aerogeldx unit="mm">40</aerogeldx><setup>1</setup></row>	
+<row id="5"><comment>Sept15	move of aerogel - 50mm to the left of the beam regarding setup 2</comment><aerogeldx unit="mm">50</aerogeldx><setup>1</setup></row>	
+<row id="6"><comment>Sept15	move of aerogel - 70mm to the left of the beam regarding setup 2</comment><aerogeldx unit="mm">70</aerogeldx><setup>1</setup></row>	
+<row id="7"><comment>Sept15	move of aerogel - 60mm to the left of the beam regarding setup 2</comment><aerogeldx unit="mm">60</aerogeldx><setup>1</setup></row>	
+<row id="8"><comment>Sept15	move of aerogel - 100 mm to the left of the beam regarding setup2</comment><aerogeldx unit="mm">100</aerogeldx><setup>1</setup></row>	
+<row id="9"><comment>Sept16	rotating the system. sketch available from hapdSketch9 in main wikiPage. distance left edge of the box - lower board 390 mm.</comment><framedx unit="mm">-185</framedx><origframedx unit="mm">390</origframedx><rotation unit="degree">35</rotation><setup>1</setup></row>		
+<row id="10"><comment>Sept16	distance left edge of box - lower board 295 mm.	rot = 35 degrees</comment><framedx unit="mm">295</framedx><rotation unit="degree">35</rotation><setup>1</setup></row>
+<row id="11"><comment>Sept16	distance left edge of box - lower board 260 mm.	rot = 35 degrees</comment><framedx unit="mm">260</framedx><rotation unit="degree">35</rotation><setup>1</setup></row>
+<row id="12"><comment>Sept16	distance left edge of box - lower board 330 mm.	rot = 35 degrees</comment><framedx unit="mm">330</framedx><rotation unit="degree">35</rotation><setup>1</setup></row>
+<row id="13"><comment>Sept16	distance left edge of box - lower board 350 mm	rot = 35 degrees</comment><framedx unit="mm">350</framedx><rotation unit="degree">35</rotation><setup>1</setup></row>
+<row id="14"><comment>Sept17	distance left edge of box - lower board 310 mm	rot = 20 degrees</comment><framedx unit="mm">310</framedx><rotation unit="degree">20</rotation><setup>1</setup></row>
+<row id="15"><comment>Sept17	distance left edge of box - lower board 290 mm	rot = 20 degrees</comment><framedx unit="mm">290</framedx><rotation unit="degree">20</rotation><setup>1</setup></row>
+<row id="16"><comment>Sept17	distance left edge of box - lower board 280 mm	rot = 0 degrees</comment><framedx unit="mm">280</framedx><rotation unit="degree">0</rotation><setup>1</setup></row>
+<row id="17"><comment>Sept17	distance left edge of box - lower board 320 mm	rot = 0 degrees</comment><framedx unit="mm">320</framedx><rotation unit="degree">0</rotation><setup>1</setup></row>
+<row id="18"><comment>Sept17	distance left edge of box - lower board 365 mm.	rot = 0 degrees</comment><framedx unit="mm">365</framedx><rotation unit="degree">0</rotation><setup>1</setup></row>
+<row id="19"><comment>Sept17	distance left edge of box - lower board 365 mm.	rot = 30 deg</comment><framedx unit="mm">365</framedx><rotation unit="degree">30</rotation><setup>1</setup></row>
+<row id="20"><comment>Sept18	distance left edge of box - lower board 365 mm. hapd #1 removed.	rot = 0 degrees</comment><framedx unit="mm">365</framedx><setup>2</setup></row>
+<row id="21"><comment>Sept8	distance left edge of box - lower board 365 mm. hapd #1 removed. middle up: SP118. middle down: KA0003.	rot = 0 degrees.</comment><framedx unit="mm">365</framedx><setup>3</setup></row>
+</hapd>
+
+
+
+
+<xi:include href="ARICH_Beamtest2011_PhotonDetector.xml"/>
+<xi:include href="ARICH_Beamtest2011_Mirrors.xml"/>
+
+
+<Aerogel desc="Parameter of aRICH aerogel layers">
+      <tileXSize desc="Size of wedge aerogel tile (maximal size in r direction)" unit="mm">100</tileXSize>  
+      <tileYSize desc="Size of wedge aerogel tile (maximal size in phi direction)" unit="mm">100</tileYSize>        
+      <tileXPos unit="mm">-53.0</tileXPos>
+      <tileYPos unit="mm">0.0</tileYPos>
+      <tileZPos desc="Z position of aerogel plane(beginning)" unit="mm">00</tileZPos>
+    </Aerogel>
+    
+
+<!-- ++++++++++++++++++++++++++++++++  -->
+
+<xi:include href="ARICH_Beamtest2011_Tracking.xml"/>
+<xi:include href="ARICH_Beamtest2011_HapdElectronicChannelMap.xml"/>
+<xi:include href="ARICH_Beamtest2011_HapdPositions.xml"/>
+</setup>
+

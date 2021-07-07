@@ -1,0 +1,10 @@
+Import('env')
+
+env['LIBS'] = ['framework',
+               'cdc_dataobjects',
+               'cdc',
+               'trg_cdc',
+               'trg_cdc_dataobjects']
+#print env.Dump()
+
+Return('env')

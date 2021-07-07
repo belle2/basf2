@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import sys
+from tracking.validation.extract_information_from_tracking_validation_output \
+    import initialize_results, extract_information_from_file
+
+
+def main():
+    # See usage information
+    if len(sys.argv) < 2:
+        print("Usage: extract_information_from_tracking_validation_output INPUT_ROOT_FILE1 [INPUT_ROOT_FILE2...]")
+        print("")
+        print(" Read in the given root files created from the validation scripts in tracking")
+        print(" and extract the finding_efficiencies, the hit_efficiencies, the clone_rates and")
+        print(" the fake_rates as pure numbers for further processing.")
+        exit(1)
+
+    results = initialize_results()
+
+    file_names = sys.argv[1:]
+
+    for file_name in file_names:
+        results = extract_information_from_file(file_name, results)
+
+    print("\t\t" + "\t".join(file_names))
+    for key in results:
+        print(key + "\t" + "\t".join([str(value) for value in results[key]]))
+
+if __name__ == "__main__":
+    main()

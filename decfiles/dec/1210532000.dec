@@ -1,0 +1,37 @@
+# EventType: 1210532000
+# Descriptor: [B+ -> (K*+ -> K+ (pi0 -> gamma gamma)) e+ e- ]cc
+# NickName: Bu_Kst+e+e-_Kst+K+pi0_pi0gammagamma
+# Documentation: Rare b -> s ll decay, non-resonant in e+e-
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Borys Knysh
+# Email: borys.knysh@gmail.com
+# Cuts: None
+# Date: 20190909
+#
+#
+Alias K*+sig K*+
+Alias K*-sig K*-
+Alias pi0sig pi0
+ChargeConj K*+sig K*-sig
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+#
+Decay B+sig
+1.0  K*+sig     e+      e-                              PHOTOS BTOSLLBALL;
+Enddecay
+CDecay B-sig
+#
+Decay K*+sig
+1.0      K+  pi0sig              PHOTOS          VSS;
+Enddecay
+CDecay K*-sig
+#
+Decay pi0sig
+1.0 gamma     gamma              PHOTOS      PHSP;
+Enddecay
+#
+End

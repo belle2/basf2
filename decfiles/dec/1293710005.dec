@@ -1,0 +1,89 @@
+# EventType: 1293710005
+# Descriptor: [B+ -> Xc l nu]cc
+# NickName: Bu_Xclnu
+# Documentation: b->c l nu process
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Thomas Lueck
+# Email: thomas.lueck@pi.infn.it
+# Cuts: None
+# Date: 2018 April 14th
+#
+#
+
+
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+
+# copy from BELLE2_DECAY.DEC as of 14th of April 2018
+Decay B+sig
+# Updated to PDG 2017: using the isospin average between B+ and B0
+#                  b -> c semileptonic
+#
+0.0549        anti-D*0     e+   nu_e        PHOTOS  BGL 0.02596 -0.06049 0.01311 0.01713 0.00753 -0.09346; #11.02.2021: updated to main DECAY_BELLE2.DEC
+0.02310       anti-D0      e+   nu_e        PHOTOS  BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4; #[Belle measurement: 1510.03657]
+0.00757       anti-D_10    e+   nu_e        PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.00389       anti-D_0*0   e+   nu_e        PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00431       anti-D'_10   e+   nu_e        PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00373       anti-D_2*0   e+   nu_e        PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already covered by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.0010   D*-       pi+   e+   nu_e    PHOTOS  GOITY_ROBERTS; 
+0.0005   anti-D*0  pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
+0.0010   D-        pi+   e+   nu_e    PHOTOS  GOITY_ROBERTS;
+0.0005   anti-D0   pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00023  anti-D0 pi+ pi- e+   nu_e      PHOTOS  PHSP;
+0.00015  D- pi+ pi0      e+   nu_e      PHOTOS  PHSP;
+0.00015  anti-D0 pi0 pi0 e+   nu_e      PHOTOS  PHSP;
+# the B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00113  anti-D*0 pi+ pi- e+   nu_e      PHOTOS  PHSP;
+0.00075  D*- pi+ pi0      e+   nu_e      PHOTOS  PHSP;
+0.00075  anti-D*0 pi0 pi0 e+   nu_e      PHOTOS  PHSP;
+# D_s(*)K l nu taken from PDG 2017
+0.0003   D_s*-  K+  e+ nu_e      PHOTOS PHSP; 
+0.0003   D_s-   K+  e+ nu_e      PHOTOS PHSP; 
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00201  anti-D0  eta  e+   nu_e      PHOTOS  PHSP;
+0.00201  anti-D*0 eta  e+   nu_e      PHOTOS  PHSP;
+
+
+0.0549       anti-D*0     mu+  nu_mu      PHOTOS  BGL 0.02596 -0.06049 0.01311 0.01713 0.00753 -0.09346; #11.02.2021: updated to main DECAY_BELLE2.DEC
+0.02310      anti-D0      mu+  nu_mu      PHOTOS  BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4; #[Belle measurement: 1510.03657]
+0.00757      anti-D_10 	  mu+  nu_mu      PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.00389      anti-D_0*0   mu+  nu_mu      PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00431      anti-D'_10   mu+  nu_mu      PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00373      anti-D_2*0   mu+  nu_mu      PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already covered by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.0010   D*-      pi+   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
+0.0005   anti-D*0 pi0   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
+0.0010   D-       pi+   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
+0.0005   anti-D0  pi0   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00023  anti-D0 pi+ pi- mu+   nu_mu      PHOTOS  PHSP;
+0.00015  D- pi+ pi0      mu+   nu_mu      PHOTOS  PHSP;
+0.00015  anti-D0 pi0 pi0 mu+   nu_mu      PHOTOS  PHSP;
+# the B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00113  anti-D*0 pi+ pi- mu+   nu_mu      PHOTOS  PHSP;
+0.00075  D*- pi+ pi0      mu+   nu_mu      PHOTOS  PHSP;
+0.00075  anti-D*0 pi0 pi0 mu+   nu_mu      PHOTOS  PHSP;
+# D_s(*)K l nu taken from PDG 2017
+0.0003   D_s*-  K+  mu+ nu_mu      PHOTOS PHSP; 
+0.0003   D_s-   K+  mu+ nu_mu      PHOTOS PHSP; 
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00201  anti-D0  eta  mu+   nu_mu      PHOTOS  PHSP;
+0.00201  anti-D*0 eta  mu+   nu_mu      PHOTOS  PHSP;
+Enddecay
+
+CDecay B-sig
+
+
+End
+
+
+

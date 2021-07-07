@@ -1,0 +1,42 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import os
+import sys
+
+from erecoutil import *
+
+argvs = sys.argv
+argc = len(argvs)
+
+
+conffile = argvs[1]
+
+# Install Event Processor scripts
+nodebase = get_ergetconf(conffile, 'processor', 'nodebase')
+basedir = get_ergetconf(conffile, 'system', 'execdir_base')
+nnodes = int(get_ergetconf(conffile, 'processor', 'nnodes'))
+procid = int(get_ergetconf(conffile, 'processor', 'idbase'))
+badlist = get_ergetconf(conffile, 'processor', 'badlist')
+id = int(get_ergetconf(conffile, 'processor', 'idbase'))
+
+for i in range(procid, procid + nnodes):
+    nodeid = '%2.2d' % i
+    if badlist.find(nodeid) == -1:
+        nodename = nodebase + nodeid
+        if not os.path.exists(basedir + '/evp_' + nodename):
+            os.mkdir(basedir + '/evp_' + nodename)
+        os.chdir(basedir + '/evp_' + nodename)
+        for f in os.listdir(basedir + '/evp_scripts'):
+            if f.endswith(".py"):
+                if (os.path.exists(f)):
+                    os.remove(f)
+                os.symlink("../evp_scripts/" + f, f)

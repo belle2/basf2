@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Support description="Dead Material for PXD HalfShell">
+  <!-- The PXD does not have separated mechanical support per layer, instead we
+       only have one support enflange per half-shell in forward and backward
+       direction. These endlfanges can be represented by a Polycone from which
+       some material has to be cut out to make space for the ladders. First we
+       define the endflange by its boundary points in the xz plane. The solid
+       is created by rotating the created area around the z axis between the
+       start and end angle. -->
+  <Endflange name="backward" description="Endflange in backwards direction (-z)">
+    <Material>PXD-Support</Material>
+    <minPhi unit="deg">-7.125</minPhi>
+    <maxPhi unit="deg">168.049</maxPhi>
+    <Plane>
+      <posZ unit="mm">-66.580</posZ>
+      <innerRadius unit="mm"> 21.080</innerRadius>
+      <outerRadius unit="mm"> 21.080</outerRadius>
+    </Plane>
+    <Plane>
+      <posZ unit="mm">-60.520</posZ>
+      <innerRadius unit="mm"> 14.940</innerRadius>
+      <outerRadius unit="mm"> 21.080</outerRadius>
+    </Plane>
+    <Plane>
+      <posZ unit="mm">-38.933</posZ>
+      <innerRadius unit="mm"> 14.940</innerRadius>
+      <outerRadius unit="mm"> 21.080</outerRadius>
+    </Plane>
+    <Plane>
+      <posZ unit="mm">-31.000</posZ>
+      <innerRadius unit="mm"> 14.940</innerRadius>
+      <outerRadius unit="mm"> 16.420</outerRadius>
+    </Plane>
+  </Endflange>
+  <Endflange name="forward" description="Endflange in forwards direction (+z)">
+    <Material>PXD-Support</Material>
+    <minPhi unit="deg">-7.125</minPhi>
+    <maxPhi unit="deg">168.049</maxPhi>
+    <Plane>
+      <posZ unit="mm">59.000</posZ>
+      <innerRadius unit="mm">14.940</innerRadius>
+      <outerRadius unit="mm">16.420</outerRadius>
+    </Plane>
+    <Plane>
+      <posZ unit="mm">73.981</posZ>
+      <innerRadius unit="mm">14.940</innerRadius>
+      <outerRadius unit="mm">21.080</outerRadius>
+    </Plane>
+    <Plane>
+      <posZ unit="mm">89.701</posZ>
+      <innerRadius unit="mm">14.940</innerRadius>
+      <outerRadius unit="mm">21.080</outerRadius>
+    </Plane>
+    <Plane>
+      <posZ unit="mm">105.000</posZ>
+      <innerRadius unit="mm">19.617</innerRadius>
+      <outerRadius unit="mm">21.080</outerRadius>
+    </Plane>
+  </Endflange>
+  <!-- now we define the boxes we will cut out from the endlanges defined
+       above. We have 8 ladders in the inner layer but since one ladder from
+       the other half shell is very close to the endflange of the next half we
+       have to cut 5 boxes from each endflange. The dimensions in z will be
+       determined automatically from the endflanges above -->
+  <Cutout description="Boxes to be cout out of endflange cones to make space for modules">
+    <count>5</count>
+    <width unit="mm">17.073</width>
+    <height unit="mm">2.520</height>
+    <rphi unit="mm"> 13.680</rphi>
+    <shift unit="mm">-3.084</shift>
+    <startPhi unit="deg">-135.000</startPhi>
+    <deltaPhi unit="deg">45.000</deltaPhi>
+  </Cutout>
+  <!-- Finally we define the carbon tubes for air cooling. There is one tube
+       for each ladder in the first layer and they are positioned to blow
+       directly on the switcher chips of these modules -->
+  <CarbonTubes description="Carbon tubes for air cooling of Switchers">
+    <Material>PXD-CarbonTubes</Material>
+    <count>4</count>
+    <minZ unit="mm">-34.000</minZ>
+    <maxZ unit="mm"> 64.720</maxZ>
+    <innerRadius unit="mm">0.250</innerRadius>
+    <outerRadius unit="mm">0.500</outerRadius>
+    <rphi unit="mm">18.700</rphi>
+    <startPhi unit="deg">-1.748</startPhi>
+    <deltaPhi unit="deg">45.000</deltaPhi>
+  </CarbonTubes>
+</Support>

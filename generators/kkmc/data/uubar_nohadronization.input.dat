@@ -1,0 +1,39 @@
+0.08711                         * c*tau(tau life time) (mm) 
+1                               * switch for long lived (1:no decay, 0:decay)
+0                               * switch for KKMC-JETSET (1:on, 0:off)
+********** Above is for basf *********
+
+BeginX
+********************************************************************************
+*               ACTUAL DATA FOR THIS PARTICULAR RUN
+********************************************************************************
+*indx_______________ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0ccccccccc0
+*     Center-of-mass energy [GeV]
+    1        10.58D0      CMSene =xpar( 1) Average Center of mass energy [GeV]
+    2       0.0049e0      DelEne =xpar( 2) Beam energy spread [GeV]
+   16           1e-5      vvmin =xpar(16)  may  be put to  vvmin < 1e-5
+   20              1      KeyISR=xpar(20)  Default is  1, ISR
+   21              0      KeyFSR=xpar(21)  Default is  1, FSR
+   27              0      KeyINT=xpar(27)  Default is  2, Interference ISR/FSR
+   29              0      KeyQSR=xpar(29)  Photon emission from final quarks
+   50              0      Hadronization switch (in add. to KKMC-JETSET switch)
+********************************************************************************
+*   61       0.7071d0      spin1x  polarization vector beam 1
+*   62            0d0      spin1y  polarization vector beam 1
+*   63       0.7071d0      spin1z  polarization vector beam 1
+*   64            0d0      spin1x  polarization vector beam 2
+*   65      -0.7071d0      spin1y  polarization vector beam 2
+*   66       0.7071d0      spin1z  polarization vector beam 2
+********************************************************************************
+*** 2001            3d0      Jak1 =xpar(71)  First  Tau decay mask (=3 for pion)
+*** 2002            3d0      Jak2 =xpar(72)  Second Tau decay mask (=3 for pion)
+********************************************************************************
+*     Define process
+*  401              1      KFfin, d
+  402              1      KFfin, u
+*  403              1      KFfin, s
+*  404              1      KFfin, c
+********************************************************************************
+  901              4      Ihvp  ! =1,2,3,4
+********************************************************************************
+EndX

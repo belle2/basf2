@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+
+  <Material name="SUS316L">
+    <state>Solid</state>
+    <density unit="g/cm3">8.03</density>
+    <Components>
+      <Material fraction="0.7347">Fe</Material>
+      <Material fraction="0.1200">Cr</Material>
+      <Material fraction="0.1200">Ni</Material>
+      <Material fraction="0.0250">Mo</Material>
+      <Material fraction="0.0003">C </Material>
+    </Components>
+  </Material>
+
+  <Material name="SC_COIL">
+    <state>Solid</state>
+    <density unit="g/cm3">8.0</density>
+    <Components>
+      <Material fraction="0.67">Cu</Material>
+      <Material fraction="0.1584">Nb</Material>
+      <Material fraction="0.1716">Ti</Material>
+    </Components>
+  </Material>
+
+  <Material name="Cryo_Liq_He">
+    <state>Liquid</state>
+    <density unit="g/cm3">0.125</density>
+    <Components>
+      <Material fraction="1.0">He</Material>
+    </Components>
+  </Material>
+
+  <Material name="Cryo_SiO2">
+    <state>Solid</state>
+    <density unit="g/cm3">2.65</density>
+    <Components>
+      <Material fraction="0.667">Si</Material>
+      <Material fraction="0.333">O</Material>
+    </Components>
+  </Material>
+
+  <Material name="Cryo_Epoxy">
+    <state>Solid</state>
+    <density unit="g/cm3">1.3</density>
+    <Components>
+      <Material fraction="0.461">C</Material>
+      <Material fraction="0.292">H</Material>
+      <Material fraction="0.025">Cl</Material>
+      <Material fraction="0.040">O</Material>
+      <Material fraction="0.182">N</Material>
+    </Components>
+  </Material>
+
+  <Material name="Cryo_G-10">
+    <state>Solid</state>
+    <density unit="g/cm3">1.8</density>
+    <Components>
+      <Material fraction="0.773">Cryo_SiO2</Material>
+      <Material fraction="0.147">Cryo_Epoxy</Material>
+      <Material fraction="0.080">Cl</Material>
+    </Components>
+  </Material>
+
+  <Material name="Cryo_NbTi">
+    <state>Solid</state>
+    <density unit="g/cm3">7.1</density>
+    <Components>
+      <Material fraction="0.535">Nb</Material>
+      <Material fraction="0.465">Ti</Material>
+    </Components>
+  </Material>
+
+</Materials>

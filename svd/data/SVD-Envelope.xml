@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Envelope description="Envelope Volume for SVD">
+	<!-- FIXME: there is no space outside of the SVD volume to account for
+			 misalignment without causing overlaps. We should increase the envelope
+			 in each direction by a suitable amount, depending on HeavyMetalShield
+			 and BP endflange -->
+	<OuterPoints>
+		<point><z unit="mm">-400.000</z><x unit="mm">155.000</x></point>
+		<point><z unit="mm"> 525.000</z><x unit="mm">155.000</x></point>
+	</OuterPoints>
+	<InnerPoints>
+		<point><z unit="mm">-400.000</z><x unit="mm"> 91.000</x></point>
+		<point><z unit="mm">-360.182</z><x unit="mm"> 91.000</x></point>
+		<point><z unit="mm">-318.417</z><x unit="mm"> 63.000</x></point>
+		<point><z unit="mm">-299.212</z><x unit="mm"> 63.000</x></point>
+		<point><z unit="mm">-265.962</z><x unit="mm"> 49.000</x></point>
+		<point><z unit="mm">-245.805</z><x unit="mm"> 49.000</x></point>
+		<point><z unit="mm">-217.189</z><x unit="mm"> 37.000</x></point>
+		<point><z unit="mm">-199.000</z><x unit="mm"> 37.000</x></point>
+		<point><z unit="mm"> 232.000</z><x unit="mm"> 32.500</x></point>
+		<point><z unit="mm"> 247.212</z><x unit="mm"> 32.500</x></point>
+		<point><z unit="mm"> 310.500</z><x unit="mm"> 39.984</x></point>
+		<point><z unit="mm"> 331.268</z><x unit="mm"> 39.984</x></point>
+		<point><z unit="mm"> 380.578</z><x unit="mm"> 55.000</x></point>
+		<point><z unit="mm"> 402.754</z><x unit="mm"> 55.000</x></point>
+		<point><z unit="mm"> 449.860</z><x unit="mm"> 81.000</x></point>
+		<point><z unit="mm"> 459.860</z><x unit="mm"> 81.000</x></point>
+		<point><z unit="mm"> 460.000</z><x unit="mm"> 104.650</x></point>
+		<point><z unit="mm"> 525.000</z><x unit="mm"> 104.650</x></point>
+	</InnerPoints>
+</Envelope>

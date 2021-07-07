@@ -1,0 +1,74 @@
+# EventType: 2313012021
+# Descriptor: [ccbar Ds*+[Ds+[K*+[K+pi0]gamma]gamma]
+#
+# June 2021 Automated: Converted PYTHIA ids
+#   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
+
+#JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+
+#JetSetPar PARJ(25)=0.27 ---> corresponding to Pythia8 StringFlav:etaSup
+PythiaBothParam StringFlav:etaSup=0.27
+
+#JetSetPar PARJ(26)=0.12 ---> corresponding to Pythia8 StringFlav:etaPrimeSup
+PythiaBothParam StringFlav:etaPrimeSup=0.12
+
+#JetSetPar PARJ(33)=0.3 ---> corresponding to Pythia8 StringFragmentation:stopMass
+PythiaBothParam StringFragmentation:stopMass=0.3
+
+#JetSetPar PARJ(41)=0.32 ---> corresponding to Pythia8 StringZ:aLund
+PythiaBothParam StringZ:aLund=0.32
+
+#JetSetPar PARJ(42)=0.62 ---> corresponding to Pythia8 StringZ:bLund
+PythiaBothParam StringZ:bLund=0.62
+
+#JetSetPar PARJ(81)=0.38 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+#JetSetPar PARJ(82)=0.76 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+
+#JetSetPar PARP(2)=4.0 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+#JetSetPar MSTP(141)=1 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+#JetSetPar MSTP(171)=1 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+#JetSetPar MSTP(172)=1 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
+
+
+#JetSetPar MSTJ(11)=4 is not supported. Therefore, it is changed from 4 to 5.
+#JetSetPar MSTJ(11)=5 ---> corrsponding to Pythia8 StringZ:usePeterson{C,B,H}
+PythiaBothParam StringZ:usePetersonC=off
+PythiaBothParam StringZ:usePetersonB=off
+PythiaBothParam StringZ:usePetersonH=off
+
+#JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
+PythiaBothParam StringZ:rFactC=1.0
+
+Alias MyDs+ D_s+
+Alias MyDs- D_s-
+ChargeConj MyDs+ MyDs-
+
+Alias MyK*+ K*+
+Alias MyK*- K*-
+ChargeConj MyK*+ MyK*-
+
+Decay vpho
+#          d u s c b t   e   mu  tau
+#1.0 PYCONT 0 0 0 1 0 0   0 0 0 0 0 0;
+1.000 c anti-c PYTHIA 91;
+Enddecay
+
+Decay D_s*+
+1.0 MyDs+  gamma PHOTOS VSP_PWAVE;
+Enddecay
+
+Decay D_s*-
+1.0 MyDs- gamma PHOTOS VSP_PWAVE;
+Enddecay
+
+Decay MyDs+
+1.0 MyK*+ gamma PHOTOS PHSP;
+Enddecay
+CDecay MyDs-
+
+Decay MyK*+
+1.0 K+ pi0 PHOTOS VSS;
+Enddecay
+CDecay MyK*-
+
+End

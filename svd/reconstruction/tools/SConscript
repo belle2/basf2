@@ -1,0 +1,3 @@
+Import('env')
+env['TOOLS_LIBS']['fitter_test'] = ['EG','boost_serialization', 'svd', 'framework']
+Return('env')

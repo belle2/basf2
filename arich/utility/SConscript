@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'simulation_dataobjects', 'tracking_dataobjects', 'arich_dbobjects']
+
+Return('env')
+

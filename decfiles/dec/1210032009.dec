@@ -1,0 +1,55 @@
+# EventType: 1210032009
+# Descriptor: Y(4S) -> B+ B-
+#                     [B+ -> (eta' -> eta(gamma gamma) pi+pi-) K+]
+#                      B- -> anything
+# NickName: Bu_etapK+_etapi+pi-_gg
+# Documentation:    Decay mode for sensitivity studies
+# Reponsible: S. Lacaprara
+# Email: stefano.lacaprara@pd.infn.it
+# PhysicsWG: TDPCV
+# Cuts: None
+# Date: 08/01/2019
+
+
+#
+# Aliases
+#
+
+Alias      Etapsig    eta'
+ChargeConj Etapsig    Etapsig
+Alias      Etasig     eta
+ChargeConj Etasig     Etasig
+
+#
+# Y(4S) -> B+ B- 
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B-                   VSS;
+0.5 B+ B-sig                   VSS;
+Enddecay
+
+#
+# B+ -> eta' K+
+#
+
+Decay B+sig
+1.000    Etapsig  K+ PHSP;
+Enddecay
+CDecay B-sig
+
+#
+# eta' -> eta pi+ pi-
+#
+Decay Etapsig
+1.000   Etasig pi+ pi-   ETAPRIME_DALITZ -0.047 -0.069 0.0 0.073;
+Enddecay
+
+#
+# eta -> gamma gamma
+#
+Decay Etasig
+1.000  gamma  gamma                       PHSP;
+Enddecay
+#
+End

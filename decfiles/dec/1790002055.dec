@@ -1,0 +1,18 @@
+# EventType: 1790002055
+# Descriptor: [Upsilon6S_pi0pi0PHSP_Y2D]
+# NickName: Upsilon6S_pi0pi0PHSP_Y2D 
+# Cuts: None
+# Documentation: Decay for Y(6S) physics
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Bryan Fulsom
+# Email: bryan.fulsom@pnnl.gov
+# Date: 20161101
+
+#Nothing fancy here
+
+Decay Upsilon(6S)
+1.0 pi0 pi0 Upsilon_2(2D) PHSP;
+Enddecay
+
+End

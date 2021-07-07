@@ -1,0 +1,24 @@
+# EventType: 1710828030
+# Descriptor: Upsilon3S2etaY1Sll
+# NickName: Upsilon3S2etaY1Sll
+# Documentation: Upsilon3S2etaY1Sll
+# Tested: Yes
+# PhysicsWG: Bottomonium
+# Responsible: Suxian Li
+# Comments: 
+# Email: suxian.li@desy.de
+# Cuts: None
+# Date: 20170928
+#
+#
+
+Decay Upsilon(3S)
+1.0 eta Upsilon PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0 ;
+Enddecay
+
+Decay Upsilon
+0.5 e+ e- PHOTOS VLL;
+0.5 mu+ mu- PHOTOS VLL;
+Enddecay
+
+End

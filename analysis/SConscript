@@ -1,0 +1,22 @@
+Import('env')
+
+env['LIBS'] = [
+    'framework',
+    'analysis_dataobjects',
+    'mdst_dataobjects',
+    'mdst_dbobjects',
+    '$ROOT_LIBS',
+    'EG',
+    'CLHEP',
+    'RooFit',
+    'RooFitCore',
+    'RooStats',
+    'boost_program_options',
+    'fann',
+    'analysis_utility',
+    'analysis_ContinuumSuppression',
+    'analysis_ClusterUtility',
+    'b2bii_dataobjects'
+]
+
+Return('env')

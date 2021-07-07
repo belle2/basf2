@@ -1,0 +1,29 @@
+# EventType: 1213030102
+# Descriptor: [B+ -> (anti-D0 -> K_S0 K+ K-) pi+]cc
+# NickName: Bu_Dpi+_DtoKSK+K-  
+# Documentation: B to Charm [phi3 (gamma)] studies.
+# Tested: Yes
+# PhysicsWG: Hadronic B Decay to Open Charm WG
+# Responsible: Minakshi Nayak
+# Email: minakshi.nayak@wayne.edu
+# Cuts: None
+# Date: 20161108 
+#
+
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.0 anti-D0sig pi+ PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+Decay anti-D0sig
+1.0 K_S0  K+  K-   PHOTOS PHSP;
+Enddecay
+CDecay D0sig
+
+End

@@ -1,0 +1,143 @@
+##Generic Y(5S)->bbar
+#RL 2010 03 31
+#input: (all in %)
+#PDG09:
+#fs=19.3
+#
+#Belle Bs->Ds pi (PRL 102,021801)
+#N_Bs*Bs*/N_Bs(*)Bs(*)=90.1
+#N_Bs*Bs/N_Bs(*)Bs(*)=7.3
+#N_BsBs/N_Bs(*)Bs(*)=2.6
+#
+#Belle Y(5S)->B+/B0 (1003.5885)
+#f(B*B*)=37.5
+#f(B*B)=13.7
+#f(BB)=5.5
+#f(B*B*pi)=1.0
+#f(B*Bpi)=7.3
+#f(BBpi)=0.0
+#f(B(*)B(*)pi(pi))=17.5 --> f(redidual)=9.2
+#-> rescalled to
+#f(B(*)B(*)(X)) = 100 - f_s - BR(Y(5S)->Y(nS)hh)=77.9
+#
+#
+#
+#Belle Y(5S)->Y(nS)pipi (PRL 100,112001)
+#BR(Y(5S)->Y(1S)pi+pi-)=0.53
+#BBR(Y(5S)->Y(1S)K+K-)=0.06
+#BR(Y(5S)->Y(2S)pi+pi-)=0.78
+#BR(Y(5S)->Y(3S)pi+pi-)=0.48
+#
+#Isospin conservation:
+#BR(Y(5S)->Y(nS)pi0pi0)=0.5 BR(Y(5S)->Y(nS)pi+pi-)
+#BR(Y(5S)->Y(nS)K0 K0b)=BR(Y(5S)->Y(nS)K+K-)
+#
+#f(B*B*pi)= 1/3 f(B+ B0b pi-) + 1/3 f(B0 B- pi+) + 1/6 f(B+ B- pi0) + 1/6 f(B0 B0b pi0) (same for f(BBpi))
+#f(B*Bpi)= 1/3 (1/2 f(B*+ B0b pi-) + 1/2 f(B+ B0*b pi-)) + 1/3 etc...
+#
+#Asumption:
+#redidual -> ISR Y(5S)->Y(4S) gamma
+#
+#
+
+Alias myUpsilon(4S) Upsilon(4S)
+
+##mixing parameter
+
+Define dm_B0 0.508e12
+
+
+Decay B0long
+1.0 B0 PHSP;
+Enddecay
+
+CDecay anti-B0long
+
+
+Decay B*-nospin
+1.000 B*- PHSP;
+Enddecay
+
+CDecay B*+nospin
+
+Decay B0heavy
+1.000 B0 gamma PHSP;
+Enddecay
+
+CDecay anti-B0heavy
+
+
+Decay Upsilon(6S) 
+
+# B* B* SUM=0.39376--
+0.19687   B0heavy      anti-B0heavy                                         PHSP_BB_MIX  dm_B0  -1 ;
+0.19687   B*+          B*-                                                  PHSP                   ;
+
+# B* B  SUM=0.14379+
+#0.03595   B0heavy      anti-B0long	anti-B0heavy    B0long       PHSP_BB_MIX  dm_B0  +1 ; 
+#0.03595   B0long       anti-B0heavy	anti-B0long     B0heavy      PHSP_BB_MIX  dm_B0  +1 ; 
+0.03595   B*+          B-                                                   PHSP                   ;
+0.03595   B+           B*-                                                  PHSP                   ;
+
+# B B  SUM=0.05772
+0.02886  B+            B-                                                   VSS                    ;
+0.02886  B0long        anti-B0long                                          PHSP_BB_MIX  dm_B0  -1 ;
+
+# B* B* pi SUM=0.01084
+0.00181  B0heavy       anti-B0heavy  pi0                                    PHSP_BB_MIX  dm_B0  -1 ;
+0.00181  B*+           B*-           pi0                                    PHSP;
+
+0.00361  B0heavy       B*-nospin     pi+       anti-B0heavy                 PHSP_B_MIX  dm_B0   ;
+0.00361  anti-B0heavy  B*+nospin     pi-       B0heavy                      PHSP_B_MIX  dm_B0   ;
+
+# B* B pi SUM=0.07641+++
+0.00637  B*+           B-            pi0            PHSP;
+0.00637  B+            B*-           pi0            PHSP;
+
+#0.00637  B0heavy       anti-B0long   pi0	anti-B0heavy    B0long      PHSP_BB_MIX  dm_B0  +1 ;   
+#0.00637  B0long        anti-B0heavy  pi0	anti-B0long     B0heavy     PHSP_BB_MIX  dm_B0  +1 ;   
+
+0.01274  B0heavy       B-            pi+       anti-B0heavy                 PHSP_B_MIX  dm_B0   ;
+0.01274  anti-B0heavy  B+            pi-       B0heavy                      PHSP_B_MIX  dm_B0   ;
+0.01274  B0long        B*-nospin     pi+       anti-B0long                  PHSP_B_MIX  dm_B0   ;
+0.01274  anti-B0long   B*+nospin     pi-       B0long                       PHSP_B_MIX  dm_B0   ;
+
+#B B pi SUM=0.00037-
+0.00006  B0long        anti-B0long   pi0                                   PHSP_BB_MIX  dm_B0  -1 ;
+0.00006  B+            B-            pi0                                   PHSP;
+
+0.00012  B0long        B-            pi+       anti-B0long                 PHSP_B_MIX  dm_B0   ;
+0.00012  anti-B0long   B+            pi-       B0long                      PHSP_B_MIX  dm_B0   ;
+
+#higher excited B decays
+0.00100   B_2*+        B-                                                   PHSP                   ;
+0.00100   B+           B_2*-                                                PHSP                   ;
+0.00010   B_2*+        B*-                                                  PHSP                   ;
+0.00010   B*+          B_2*-                                                PHSP                   ;
+
+
+
+
+# Residual  SUM=0.09606
+#0.09606 myUpsilon(4S) gamma PHSP;
+  
+# non-BB SUM=0.02805
+#0.00530  Upsilon       pi+         pi-            PHSP;
+#0.00265  Upsilon       pi0         pi0            PHSP;
+#0.00780  Upsilon(2S)   pi+         pi-            PHSP;
+#0.00390  Upsilon(2S)   pi0         pi0            PHSP;
+#0.00480  Upsilon(3S)   pi+         pi-            PHSP;
+#0.00240  Upsilon(3S)   pi0         pi0            PHSP;
+#0.00060  Upsilon       K+          K-             PHSP;
+#0.00060  Upsilon       K0          anti-K0        PHSP;
+
+Enddecay
+
+
+#Decay myUpsilon(4S)
+#0.5  B+            B-                                                   VSS                    ;
+#0.5  B0long        anti-B0long                                          PHSP_BB_MIX  dm_B0  -1 ;
+#Enddecay
+
+
+End

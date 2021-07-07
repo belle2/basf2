@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ChannelMapping type = "IRSX" descr="Mapping of pixels to channels">
+  <!-- columns represent: pixelRow pixelColumn asicNumber asicChannel -->
+  <map> 1 1  1 0 </map>
+  <map> 1 2  1 1 </map>
+  <map> 1 3  1 2 </map>
+  <map> 1 4  1 3 </map>
+  <map> 1 5  1 4 </map>
+  <map> 1 6  1 5 </map>
+  <map> 1 7  1 6 </map>
+  <map> 1 8  1 7 </map>
+  <map> 1 9  3 0 </map>
+  <map> 1 10 3 1 </map>
+  <map> 1 11 3 2 </map>
+  <map> 1 12 3 3 </map>
+  <map> 1 13 3 4 </map>
+  <map> 1 14 3 5 </map>
+  <map> 1 15 3 6 </map>
+  <map> 1 16 3 7 </map>
+  <map> 2 1  0 7 </map>
+  <map> 2 2  0 6 </map>
+  <map> 2 3  0 5 </map>
+  <map> 2 4  0 4 </map>
+  <map> 2 5  0 3 </map>
+  <map> 2 6  0 2 </map>
+  <map> 2 7  0 1 </map>
+  <map> 2 8  0 0 </map>
+  <map> 2 9  2 7 </map>
+  <map> 2 10 2 6 </map>
+  <map> 2 11 2 5 </map>
+  <map> 2 12 2 4 </map>
+  <map> 2 13 2 3 </map>
+  <map> 2 14 2 2 </map>
+  <map> 2 15 2 1 </map>
+  <map> 2 16 2 0 </map>
+</ChannelMapping>
+

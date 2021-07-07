@@ -1,0 +1,58 @@
+#!/bin/bash
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+# Script to load/unload COPPER driver
+
+. /etc/init.d/functions
+
+doload()  {
+        action $"Loading FINESSE COPPER driver: " \
+	insmod ./drv/copper.ko
+	action $"Making nodes: " ./src/mkdevs.sh
+}
+
+dounload() {
+    action $"Unloading COPPER driver: " rmmod copper
+}
+
+dostatus() {
+    while read X Y Z
+    do
+    if [ $X = copper ] ;then
+        echo copper driver is loaded
+    fi
+    done < /proc/modules
+}
+
+# See how we were called.
+case "$1" in
+start)
+    doload
+    ;;
+
+stop)
+    dounload
+    ;;
+
+status)
+    dostatus
+    ;;
+
+restart|reload)
+    dounload
+    doload
+    ;;
+
+*)
+    echo $"Usage: $0 {start|stop|status|restart|reload}"
+    exit 1
+esac
+
+exit 0

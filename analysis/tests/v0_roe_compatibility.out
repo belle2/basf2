@@ -1,0 +1,90 @@
+[INFO] Steering file: analysis/tests/v0_roe_compatibility.py
+[INFO] The random number seed is set to "1337"
+[INFO] Starting event processing, random seed is set to '1337'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/pgun-roe-mdst.root
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: mu+:all (mu-:all)
+[INFO]    -> MDST source: Tracks
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi-:all (pi+:all)
+[INFO]    -> MDST source: Tracks
+[INFO] Number of ParticleLists to be studied: 1 
+[INFO] RestOfEventInterpreter added ROEMask with specific fractions under name 'cleanMask' with track cuts:  and eclCluster cuts: 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma:V0 (gamma:V0)
+[INFO]    -> MDST source: V0
+[INFO] ParticleSelector: gamma:conv
+[INFO]    -> With cuts  : daughter(0, isSignal) > 0 and daughter(1, isSignal) >0
+[INFO] RestOfEventUpdater updated track/eclCluster ROEMask(s) with infoList: gamma:conv and cut: 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Lambda0:V0 (anti-Lambda0:V0)
+[INFO]    -> MDST source: V0
+[INFO] ParticleSelector: Lambda0
+[INFO]    -> With cuts  : daughter(0, isSignal) > 0 and daughter(1, isSignal) >0
+[INFO] RestOfEventUpdater updated track/eclCluster ROEMask(s) with infoList: Lambda0 and cut: 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
+[INFO]    -> MDST source: V0
+[INFO] ParticleSelector: K_S0
+[INFO]    -> With cuts  : daughter(0, isSignal) > 0 and daughter(1, isSignal) >0
+[INFO] RestOfEventUpdater updated track/eclCluster ROEMask(s) with infoList: K_S0 and cut: 
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is master_2020-05-02
+[INFO] [RestOfEventPrinterModule] START ----------------------------------------
+[INFO]  - ROE related to particle with PDG: 511
+[INFO]  - ROE related to MC particle with PDG: -1
+[INFO]  - No. of Charged particles in ROE: 6
+[INFO]  - No. of Photons           in ROE: 0
+[INFO]  - No. of K_L0 and neutrons in ROE: 0
+[INFO]  - |211 | -211 | 211 | -211 | 211 | -211 | 
+[INFO]  - |8 |  9 |  10 |  11 |  13 |  14 |  
+[INFO]  - Info for ROEMask with name: 'cleanMask'
+[INFO]  - - No. of Charged particles in ROE: 0
+[INFO]  - - No. of Photons           in ROE: 0
+[INFO]  - - No. of K_L0 and neutrons in ROE: 0
+[INFO]  - - |22 | 3122 | 310 | 
+[INFO]  - - |22 |  31 |  34 |  
+[INFO] [RestOfEventPrinterModule] END ------------------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: B0 (0+1) + anti-B0 (0+1)
+[INFO]  - 16 = 511[0]
+[INFO]      o) daughter indices = 7 4
+[INFO]      o) nROE_Composites(cleanMask) = 3
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [RestOfEventPrinterModule] START ----------------------------------------
+[INFO]  - ROE related to particle with PDG: 511
+[INFO]  - ROE related to MC particle with PDG: -1
+[INFO]  - No. of Charged particles in ROE: 6
+[INFO]  - No. of Photons           in ROE: 0
+[INFO]  - No. of K_L0 and neutrons in ROE: 0
+[INFO]  - |-211 | 211 | -211 | 211 | -211 | 211 | 
+[INFO]  - |8 |  9 |  10 |  11 |  12 |  14 |  
+[INFO]  - Info for ROEMask with name: 'cleanMask'
+[INFO]  - - No. of Charged particles in ROE: 0
+[INFO]  - - No. of Photons           in ROE: 0
+[INFO]  - - No. of K_L0 and neutrons in ROE: 0
+[INFO]  - - |22 | 3122 | 310 | 
+[INFO]  - - |25 |  31 |  37 |  
+[INFO] [RestOfEventPrinterModule] END ------------------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: B0 (0+1) + anti-B0 (0+1)
+[INFO]  - 16 = 511[0]
+[INFO]      o) daughter indices = 7 5
+[INFO]      o) nROE_Composites(cleanMask) = 3
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] ParticleStats Summary:
+[INFO] 
+======================================================================
+ Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
+
+                             |   All Particles   |     Particles     |  Anti-particles   |  Self-conjugates  |
+                  | Retention|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|      ACM|    ACMPE|
+           mu+( 0)|    0.0040|   0.0080|   2.0000|   0.0040|   1.0000|   0.0040|   1.0000|   0.0000|   0.0000|
+
+[INFO] 
+======================================================================
+Total Retention: 2 events passing / 500 events processed = 0.0040
+Total Number of Particles created in the DataStore: 32
+======================================================================
+

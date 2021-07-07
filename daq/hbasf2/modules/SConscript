@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = ['$ROOT_LIBS', 'framework', 'daq_hbasf2', 'hlt_softwaretrigger_dataobjects', 'rawdata_dataobjects', 'daq_dataobjects', 'boost_program_options', 'tracking_dataobjects']
+
+Return('env')

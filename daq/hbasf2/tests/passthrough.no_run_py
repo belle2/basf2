@@ -1,0 +1,79 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import basf2
+import hbasf2
+
+from argparse import ArgumentParser
+from pathlib import Path
+import os
+
+
+class TesterModule(basf2.Module):
+    """
+    Module to create files according to which status the module is in.
+    Useful for testing from external.
+    """
+    def __init__(self, prefix, exit):
+        """Make the module parallel certified"""
+        super().__init__()
+
+        self.set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
+        #: Prefix the created file with this string
+        self.prefix = prefix
+        #: Exit if a file names "exit_request" is created in event()
+        self.exit = exit
+
+    def beginRun(self):
+        """begin run"""
+        Path(f"{self.prefix}beginrun_called").touch()
+
+    def endRun(self):
+        """end run"""
+        Path(f"{self.prefix}endrun_called").touch()
+
+    def initialize(self):
+        """initialize"""
+        Path(f"{self.prefix}initialize_called").touch()
+
+    def terminate(self):
+        """terminate"""
+        Path(f"{self.prefix}terminate_called").touch()
+
+    def event(self):
+        """if exit is set, and the test requested an exit, terminate the program here"""
+        if self.exit and os.path.exists(f"{self.prefix}exit_request"):
+            Path(f"{self.prefix}exit_called").touch()
+            exit(1)
+
+
+if __name__ == '__main__':
+    basf2.conditions.reset()
+    basf2.conditions.prepend_globaltag("data_reprocessing_prompt")
+    basf2.set_nprocesses(1)
+
+    parser = ArgumentParser()
+    parser.add_argument("--input", required=True)
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--prefix", default="")
+    parser.add_argument("--exit", action="store_true")
+
+    args = parser.parse_args()
+
+    path = basf2.Path()
+
+    input_module = path.add_module("HLTZMQ2Ds", input=args.input, bufferSize=20)
+
+    reco_path = basf2.Path()
+    reco_path.add_module(TesterModule(args.prefix, args.exit))
+
+    input_module.if_value("==0", reco_path, basf2.AfterConditionPath.CONTINUE)
+
+    path.add_module("HLTDs2ZMQ", output=args.output, raw=False)
+
+    hbasf2.process(path, [args.output], False)

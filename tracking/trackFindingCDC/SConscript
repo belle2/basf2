@@ -1,0 +1,27 @@
+Import('env')
+
+import os
+
+# Mark this folder as a sub library
+env.Dictionary()['SUBLIB'] = True
+
+# Additional libraries
+env['LIBS'] = [
+    'tracking',
+    'tracking_dataobjects',
+    'simulation_dataobjects',
+    'geometry',
+    'cdc', 'cdc_dataobjects',
+    "mva", 'mva_dataobjects',
+    'mdst_dataobjects',
+    'framework',
+    'genfit2',
+    '$ROOT_LIBS',
+    ]
+
+# Does not work well with cppcheck
+# option = os.environ['BELLE2_OPTION']
+# if option == "clang":
+#     env.Append(CCFLAGS=['-Wdocumentation'])
+
+Return('env')

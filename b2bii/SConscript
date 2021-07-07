@@ -1,0 +1,6 @@
+Import('env')
+
+env['LIBS'] = ['belle_legacy']
+env['CONTINUE'] = True
+
+Return('env')

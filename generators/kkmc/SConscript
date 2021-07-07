@@ -1,0 +1,12 @@
+Import('env')
+
+env['SUBLIB'] = True
+
+env['LIBS'] = ['$ROOT_LIBS', 'mdst_dataobjects', 'framework', 'gfortran']
+
+env.Append(FORTRANFLAGS = ['-g', '-fmerge-constants',  '-fno-second-underscore',  '-fno-automatic',  '-fno-f2c',  '-fPIC', '-ffixed-line-length-132'])
+env.Append(FORTRANPATH = ['generators/kkmc'])
+env.Append(LINKFLAGS=["-Wl,--version-script=" + File("symbols.map").abspath])
+
+Return('env')
+

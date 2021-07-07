@@ -1,0 +1,48 @@
+#! /usr/bin/env python
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import os
+import sys
+import signal
+import subprocess
+
+global proc
+
+
+# Signal Handler
+def cleanup(num, frame):
+    os.kill(proc.pid, signal.SIGKILL)
+#    os.kill(proc.pid, signal.SIGINT)
+    exit()
+
+# main
+
+
+# Signal Handler
+signal.signal(signal.SIGINT, cleanup)
+signal.signal(signal.SIGTERM, cleanup)
+
+# Obtain input/output RingBuffer names
+argvs = sys.argv
+argc = len(argvs)
+
+inputrb = argvs[1]
+outputrb = argvs[2]
+histport = argvs[3]
+# ncore = argvs[4]
+ncore = "20"
+
+script = "processor.py"
+
+# run basf2
+proc = subprocess.Popen("basf2 --no-stats " + script + " " + inputrb + " " + outputrb + " " + histport + " " + ncore, shell=True)
+
+# Just sleep
+proc.wait()

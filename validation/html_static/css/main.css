@@ -1,0 +1,1016 @@
+@charset "utf-8";
+/*! HTML5 Boilerplate v4.3.0 | MIT License | http://h5bp.com/ */
+
+/*
+ * What follows is the result of much research on cross-browser styling.
+ * Credit left inline and big thanks to Nicolas Gallagher, Jonathan Neal,
+ * Kroc Camen, and the H5BP dev community and team.
+ */
+
+/* ==========================================================================
+   Base styles: opinionated defaults
+   ========================================================================== */
+
+/* popup for the detail view of validation plots */
+.white-popup {
+  position: relative;
+  background: #FFF;
+  padding: 20px;
+  width: 70%;
+ /* max-width: 500px;*/
+  margin: 20px auto;
+}
+
+.revision-details{
+    font-size: 80%;
+}
+
+.revision_label {
+    font-weight: bold;
+    font-size: 120%;
+}
+
+.fail_count_zero {
+    display: inline-block;
+    width: 45px;
+    background-color: #33cc33;
+    border-radius: 10px !important;
+    border: 0 none !important;
+    text-align: center;
+    font-size: 14px;
+    color: white;
+}
+
+.no_reference {
+    color: #868686;
+}
+
+.fail_count_greater_zero {
+    display: inline-block;
+    width: 45px;
+    background-color: red;
+    border-radius: 10px !important;
+    border: 0 none !important;
+    text-align: center;
+    font-size: 14px;
+    color: white;
+}
+
+.fail_count_zero_rootfile {
+    display: inline-block;
+    width: 30px;
+    background-color: #33cc33;
+    border-radius: 10px !important;
+    border: 0 none !important;
+    text-align: center;
+    font-size: 14px;
+    color: white;
+}
+
+.fail_count_greater_zero_rootfile {
+    display: inline-block;
+    width: 30px;
+    background-color: red;
+    border-radius: 10px !important;
+    border: 0 none !important;
+    text-align: center;
+    font-size: 14px;
+    color: white;
+}
+
+.failed_script {
+    color: red;
+}
+
+.package_root_file {
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+    display: inline-block;    
+}
+
+html, button, input, select, textarea {
+    color: #222;
+}
+
+html {
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+/*
+ * Remove text-shadow in selection highlight: h5bp.com/i
+ * These selection rule sets have to be separate.
+ * Customize the background color to match your design.
+ */
+::-moz-selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+::selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+/*
+ * A better looking default horizontal rule
+ */
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+/*
+ * Remove the gap between images, videos, audio and canvas and the bottom of
+ * their containers: h5bp.com/i/440
+ */
+audio, canvas, img, video {
+    vertical-align: middle;
+}
+
+/*
+ * Remove default fieldset styles.
+ */
+fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/*
+ * Allow only vertical resizing of textareas.
+ */
+textarea {
+    resize: vertical;
+}
+
+/* ==========================================================================
+   Browse Happy prompt
+   ========================================================================== */
+.browsehappy {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+/*@*/
+/*-moz-keyframes rotateRight { 0%{*/
+    /*-moz-transform: rotate(0deg);*/
+    /*-moz-transform-origin: 50% 50%;*/
+/*}*/
+
+/*100%{*/
+/*-moz-transform*/
+
+
+/*:rotate(360deg)*/
+
+
+/*;*/
+/*}*/
+/*}*/
+/*@*/
+/*-webkit-keyframes rotateRight { 0%{*/
+    /*-webkit-transform: rotate(0deg);*/
+    /*-webkit-transform-origin: 50% 50%;*/
+/*}*/
+
+/*100%{*/
+/*-webkit-transform*/
+
+
+/*:rotate(360deg)*/
+
+
+/*;*/
+/*}*/
+/*}*/
+
+/* main page elements use flex-based layouting */
+
+/* setup flex reisze and 100% space used for all elements */
+#wrap, #content_scroll, #navigation_scroll {
+    flex : 1 100%;
+}
+
+/* enable flex for topmost wrap */
+#wrap {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+/* no resizing of the navigation scroll box */
+#navigation_scroll {
+    flex: 0 auto; 
+    order: 1;
+
+    /* shows scrollbar on y-axis, if required */
+    overflow-y:auto;
+    overflow-x:hidden;
+    
+    /* use all viewport space */
+    height:100vh;
+    /* fixed width for now */
+    width:320px;
+}
+
+#content_scroll {
+    flex: 1 0;
+    order: 2;
+
+    /* shows scrollbar on y-axis, if required */
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    /* use only the maximum height of the viewport */    
+    height:100vh;
+}
+
+/* two box containers for the actual items, share the same style */
+#content, #navigation {
+    margin: 8px;
+    padding: 8px;
+    background:white;
+    border: 1px solid gray;
+    border-radius: 4px;    
+}
+
+.object_wrap img {
+    min-width: 688px;
+    min-height: 491px;
+}
+
+.object_wrap:last-child {
+    border: 0;
+}
+
+#loglist {
+    background: #FFF;
+    border: 1px solid gray;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: none;
+    position: fixed;
+    width: 350px;
+    z-index: 5000;
+}
+
+#loglist_content {
+    font-size: 12px;
+    height: 500px;
+    overflow: auto;
+    padding: 10px 30px 10px 10px;
+}
+
+#loglist_handle {
+    background: #bdc3c7;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    cursor: move;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 3px;
+}
+
+#loglist_handle img, #logreader_handle img {
+    height: 18px;
+}
+
+#logreader {
+    background: #FFF;
+    border: 1px solid gray;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: none;
+    padding: 0 !important;
+    position: fixed;
+    width: 900px;
+    z-index: 5000;
+}
+
+#logreader_content {
+    margin: 0;
+    max-height: 500px;
+    overflow: auto;
+    padding: 10px;
+}
+
+#logreader_handle {
+    background: #bdc3c7;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    cursor: move;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 2px;
+}
+
+
+
+#menu>div {
+    background: #FFF;
+    border: 1px solid gray;
+    border-bottom: 0;
+    padding: 10px;
+    z-index: 0;
+}
+
+#menu div:first-child {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+#revisions div:last-child {
+    border-bottom: 1px solid gray;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+#button-revision-load-container {
+    display: block;
+    padding-top: 7px;
+}
+
+#prebuilt-select-container {
+    display: block;
+    padding-bottom: 10px;
+}
+
+#reference-select-container{
+    display: block;
+    padding-top: 7px;
+    font-size: 11px;
+}
+
+#systeminfo {
+    /* Need the important, else we'll be overwritten by #menu>div */
+    border-bottom: 1px solid gray !important;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+#menu img {
+    height: 16px;
+    width: 16px;
+}
+
+/* overwrite the general image size in menus */
+#menu_main_logo {
+    height: 48px !important;
+    width: 48px !important;
+}
+
+#menu_main_text {
+    font-weight: bold;
+    font-size: 120%;
+}
+
+
+#navigation a {
+    color: black;
+    text-decoration: none;
+}
+
+#navigation a:hover {
+    text-decoration: underline;
+}
+
+#outer {
+    background: rgba(0, 0, 0, 0.7);
+    color: #FFF !important;
+    display: none;
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
+}
+
+#outer img {
+    -moz-animation: 2s rotateRight infinite linear;
+    -webkit-animation: 2s rotateRight infinite linear;
+}
+
+#regenerate {
+    background: #f5f5f5;
+    border: 1px solid gray !important;
+    border-radius: 4px !important;
+    box-sizing: border-box;
+    cursor: pointer;
+    margin: 5px auto;
+    padding: 3px;
+    text-align: center;
+    width: 160px !important;
+}
+
+#regenerate:hover {
+    background: #e5e5e5;
+}
+
+#scriptcount {
+    background: FireBrick;
+    border: 0 !important;
+    width: 32px;
+    font-size: 10px;
+    height: 16px;
+    line-height: 16px;
+    padding: 2px;
+    color: white;
+    float: right;
+    border-radius: 5px !important;
+    text-align: center;
+    display: none;
+}
+
+#selectall {
+    float: right;
+    border: 0 !important;
+}
+
+#serverwarning {
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+#table-cell {
+    display: table-cell;
+    height: 100%;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#table-container {
+    display: table;
+    height: 100%;
+    width: 100%;
+}
+
+
+
+.alert {
+    background-color: #fcf8e3;
+    border: 1px solid #fbeed5;
+    border-radius: 4px;
+    color: #c09853;
+    padding: 10px;
+}
+
+.close-serverwarning, .close {
+    cursor: pointer;
+    float: right;
+}
+
+.floatingHeader {
+    position: fixed;
+    margin-left: -20px;
+    top: 0;
+    width: 100%;
+    visibility: hidden;
+    background: rgba(42, 42, 42, 0.95);
+    color: white;
+    padding: 10px 20px 10px 20px;
+}
+
+.lastmodified {
+    font-size: 12px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Expert validation plots are hidden by default
+*/
+.expert_plot {
+    display: none;
+}
+
+.loglink {
+    cursor: pointer;
+}
+
+/* LEGEND/PALETTE/SWATCHES */
+/* ======================================================================== */
+
+.swatch-line{
+    vertical-align: middle;
+    display: block;
+    padding: 2px 0 2px 0;
+}
+
+.swatch-line-header{
+    vertical-align: middle;
+    display: block;
+    padding: 3px 0 3px 0;
+}
+
+/* Temporary workaround the inheritance from inheritance #menu div:first-child etc:
+just use spans /klieret */
+.swatch {
+    height: 22px;
+    width: 22px;
+    border-radius: 50%;
+    border: none;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    color: white;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.swatch-text{
+    line-height: 20px;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+
+#swatch-fail-nonexpert {
+    background: #FF0000;
+    color: white;
+}
+
+#swatch-warn-nonexpert {
+    background: #FF9832;
+    color: white;
+}
+
+#swatch-pass-nonexpert {
+    background: #33CC33;
+    color: white;
+}
+
+#swatch-nocomp-nonexpert {
+    background: #3265FE;
+    color: white;
+}
+
+#swatch-fail {
+    background: #FF9999;
+}
+
+#swatch-warn {
+    background: #FFCC9A;
+}
+
+#swatch-pass {
+    background: #CCFFCC;
+}
+
+#swatch-nocomp {
+    background: #98CBFF;
+}
+
+/* NEWS */
+/* ======================================================================== */
+/* from: https://www.w3schools.com/howto/howto_js_alert.asp*/
+
+ /* The alert message box */
+.infobox {
+    padding: 20px;
+    color: white;
+    margin-bottom: 15px;
+}
+
+.info {
+    background-color: #18A739;
+    /* 46a7f5, 9446F5, */
+}
+
+.warn {
+    background-color: #ffa92a;
+}
+
+.success {
+    background-color: #6abc6d;
+}
+
+.fail {
+    background-color: #f56257;
+}
+
+.blink_me {
+  animation: blinker 2s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+.infobox a {
+    color: white;
+}
+
+/* The close button */
+.closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.closebtn:hover {
+  color: black;
+}
+
+/* ======================================================================== */
+
+.object {
+    margin-bottom: 10px;
+    order: 2;
+    width: 696px;
+    overflow-x: auto;
+}
+
+.object img {
+    border: 1px solid #f5f5f5;
+    box-sizing: border-box;
+    max-width: 690px;
+}
+
+.object_wrap {
+    /*  disabled this features, because hidden plots will still
+    be visible by the bottom line anyways
+    border-bottom:1px solid gray;
+    border-bottom:1px solid gray!important;
+    margin-bottom:25px;
+    padding-bottom:15px;*/
+    display: none;
+    width: 100%;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.show {
+    display: -webkit-box !important; /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -moz-box !important;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+    display: -ms-flexbox !important; /* TWEENER - IE 10 */
+    display: -webkit-flex !important; /* NEW - Chrome */
+    display: flex !important; /* NEW, Spec - Opera 12.1, Firefox 20+ */
+}
+
+td.show {
+    display: table-cell !important;
+}
+
+#topmost_viewselection {
+    padding: 4px;
+    text-align: right;
+}
+
+.pkg_container {
+    font-size: 13px;
+    line-height: 24px;
+    display: none;
+    margin-left: 18px;
+    padding: 4px 0 4px 0;
+    border: 0 !important;
+}
+
+.plot_matrix {
+    display: -webkit-box; /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -moz-box; /* OLD - Firefox 19- (buggy but mostly works) */
+    display: -ms-flexbox; /* TWEENER - IE 10 */
+    display: -webkit-flex; /* NEW - Chrome */
+    display: flex; /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    width: 100%;
+}
+
+.plot_matrix_item {
+    margin: 0;
+}
+
+.noplots, .hidebutton {
+    display: block;
+}
+
+.sep {
+    border-bottom: 1px solid gray;
+    width: 100%;
+}
+
+.trivial-submenu {
+    background: #f5f5f5 !important;
+    border-top: 1px solid gray;
+}
+
+.system-submenu {
+    background: #f5f5f5 !important;
+    border-top: 1px solid gray;
+    font-size: 13px;
+}
+
+.system-submenu tr {
+    line-height: 13px;
+}
+
+/* TODO: should be renamed to revision submenu */
+.submenu {
+    background: #f5f5f5 !important;
+    border-top: 1px solid gray;
+    display: none;
+}
+
+.git {
+    border-bottom: 1px dashed gray !important;
+    color: #000;
+    text-decoration: none;
+}
+
+.packages_submenu {
+    background: #f5f5f5 !important;
+    border-top: 1px solid gray;
+    display: block;
+}
+
+.submenu a {
+    border-bottom: 1px dashed;
+    color: #000;
+    text-decoration: none;
+}
+
+.wrap_boxes {
+    box-sizing: border-box;
+    /*height: intrinsic;*/
+    margin-bottom: 10px;
+    order: 3;
+    padding: 10px;
+    display: inline-block;
+
+    border-style: dashed;
+    border-color: #666666;
+    border-width: 0 0 1px 0;
+
+    width: 100%;
+    overflow-x: auto;
+}
+
+.wrap_rootfile{
+    border-style: solid;
+    border-width: 5px;
+    border-color: #ffffff #ffffff #ffffff #868686;
+    margin-bottom: 25px;
+    padding-left: 10px;
+}
+
+.wrap_boxes_descriptions {
+}
+
+h2 {
+    font-size: 22px;
+    margin: 0;
+}
+
+html, body {
+    background: #bdc3c7;
+    font-family: Droid Serif, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.428;
+}
+
+table {
+    width: 100%;
+}
+
+td, th {
+    padding: 5px;
+}
+
+th {
+    text-align: left;
+}
+
+tr:nth-child(even) td {
+    background-color: #f5f5f5;
+}
+
+.downloads {
+    font-weight: 400;
+}
+.downloads a {
+    color: inherit;
+    text-decoration: None;
+}
+.downloads a:hover {
+    text-decoration: underline;
+}
+
+.persistent-header {
+    margin: 0.3em 0;
+}
+
+.ntuple_table th{
+    border-style: solid;
+    border-color: black;
+    border-width: 0 0 1px 0;
+}
+
+.ntuple_table tr, td, th{
+    white-space: nowrap;
+}
+
+.ntuple_table tr:hover{
+    background-color: #49c7c3;
+}
+
+.ntuple_table tr:nth-child(even):hover td {
+    background-color: #49c7c3;
+}
+
+/*.ntuple_table {
+    border: none;
+}
+
+tr, td {
+    border: none;
+}
+
+table {
+    border: none;
+}
+
+tbody {
+    border: none;
+}*/
+
+/* ==========================================================================
+   Helper classes
+   ========================================================================== */
+
+/*
+ * Image replacement
+ */
+.ir {
+    background-color: transparent;
+    border: 0;
+    overflow: hidden;
+    /* IE 6/7 fallback */
+    *text-indent: -9999px;
+}
+
+.ir:before {
+    content: "";
+    display: block;
+    width: 0;
+    height: 150%;
+}
+
+/*
+ * Hide from both screenreaders and browsers: h5bp.com/u
+ */
+.p_value_leq_0_01.hlaska, .p_value_leq_1.hlaska, .hideme {
+    display: none;
+}
+
+.hidden {
+    display: none !important;
+    visibility: hidden;
+}
+
+/*
+ * Hide only visually, but have it available for screenreaders: h5bp.com/v
+ */
+.visuallyhidden {
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+/*
+ * Extends the .visuallyhidden class to allow the element to be focusable
+ * when navigated to via the keyboard: h5bp.com/p
+ */
+.visuallyhidden.focusable:active, .visuallyhidden.focusable:focus {
+    clip: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    position: static;
+    width: auto;
+}
+
+/*
+ * Hide visually and from screenreaders, but maintain layout
+ */
+.invisible {
+    visibility: hidden;
+}
+
+/*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *    `contenteditable` attribute is included anywhere else in the document.
+ *    Otherwise it causes space to appear at the top and bottom of elements
+ *    that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *    `:before` to contain the top-margins of child elements.
+ */
+.clearfix:before, .clearfix:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+/*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+.clearfix {
+    *zoom: 1;
+}
+
+/* ==========================================================================
+   EXAMPLE Media Queries for Responsive Design.
+   These examples override the primary ('mobile first') styles.
+   Modify as content requires.
+   ========================================================================== */
+@media only screen and (min-width: 35em) {
+    /* Style adjustments for viewports that meet the condition */
+}
+
+/* ==========================================================================
+   Print styles.
+   Inlined to avoid required HTTP connection: h5bp.com/r
+   ========================================================================== */
+@media print {
+    * {
+        background: transparent !important;
+        color: #000 !important; /* Black prints faster: h5bp.com/s */
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+    a, a:visited {
+        text-decoration: underline;
+    }
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    /*
+     * Don't show links for images, or javascript/internal links
+     */
+    .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after {
+        content: "";
+    }
+    pre, blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+    thead {
+        display: table-header-group; /* h5bp.com/t */
+    }
+    tr, img {
+        page-break-inside: avoid;
+    }
+    img {
+        max-width: 100% !important;
+    }
+    @page {
+        margin: 0.5cm;
+    }
+    p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+    }
+    h2, h3 {
+        page-break-after: avoid;
+    }
+}

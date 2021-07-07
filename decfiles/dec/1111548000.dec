@@ -1,0 +1,40 @@
+# EventType: 1111548000
+# Descriptor: [B0 -> (J/psi(1S) -> e+ e-) (eta -> pi+ pi- pi0)]cc
+# NickName: Bd_Jpsieta_ee_pipipi0
+# Documentation: CPV study, S=-sin(2 beta)=-0.691, A=0
+# Tested: Yes
+# Physics WG: TDCPV
+# Responsible: Bilas Pal
+# Email:  bilas.kanti.pal@desy.de 
+# Cuts: None
+# Date: 20180326
+#
+#
+Alias      pi0sig        pi0
+ChargeConj pi0sig        pi0sig
+Alias      etasig        eta
+ChargeConj etasig        etasig
+Define beta 0.3814 
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0	               VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.000   J/psisig         etasig                        SVS_CP beta dm  1 1 0 1 0;
+Enddecay
+CDecay anti-B0sig
+#
+Decay etasig
+1.000   pi+    pi-       pi0sig                        PHSP;
+Enddecay
+#
+Decay pi0sig
+1.000   gamma            gamma                         PHSP;
+Enddecay
+#
+Decay J/psisig
+1.000   e+               e-                           PHOTOS VLL;
+Enddecay
+#
+End

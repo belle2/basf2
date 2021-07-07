@@ -1,0 +1,141 @@
+# EventType: 1790001056
+# Descriptor: [Upsilon6S_etaY3S]
+# NickName: Upsilon6S_etaY3S
+# Cuts: None
+# Documentation: Decay for Y(6S) physics
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Bryan Fulsom
+# Email: bryan.fulsom@pnnl.gov
+# Date: 20161101
+#
+# June 2021 Automated: Converted PYTHIA ids
+#   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
+
+Decay Upsilon(6S)
+1.0 eta Upsilon(3S) PHSP;
+Enddecay
+
+Decay Upsilon(3S)
+0.021800000 e+ e- PHOTOS VLL; #[was 0.0181 - setting this equal to mumu]
+0.021800000 mu+ mu- PHOTOS VLL; #[Reconstructed PDG2014]
+0.022900000 tau+ tau- VLL; #[Reconstructed PDG2014]
+0.043700000 Upsilon pi+ pi- YMSTOYNSPIPICLEOBOOST -2.523 1.189; #[Reconstructed PDG2014]
+0.022000000 Upsilon pi0 pi0 YMSTOYNSPIPICLEOBOOST -2.523 1.189; #[Reconstructed PDG2014]
+0.028200000 Upsilon(2S) pi+ pi- YMSTOYNSPIPICLEOBOOST -0.395 0.001; #[Reconstructed PDG2014]
+0.018500000 Upsilon(2S) pi0 pi0 YMSTOYNSPIPICLEOBOOST -0.395 0.001; #[Reconstructed PDG2014]
+#
+0.059000000 gamma chi_b0(2P) HELAMP 1. 0. 1. 0.; #[Reconstructed PDG2014]
+0.126000000 gamma chi_b1(2P) HELAMP 1. 0. 1. 0. -1. 0. -1. 0.; #[Reconstructed PDG2014]
+0.131000000 gamma chi_b2(2P) HELAMP 2.4494897 0. 1.7320508 0. 1. 0. 1. 0. 1.7320508 0. 2.4494897 0.; #[Reconstructed PDG2014]
+#
+0.002700000 gamma chi_b0 HELAMP 1. 0. 1. 0.; #[Reconstructed PDG2014]
+0.001000000 gamma chi_b1 HELAMP 1. 0. 1. 0. -1. 0. -1. 0.; #BBR 2014 compilation
+0.009900000 gamma chi_b2 HELAMP 2.4494897 0. 1.7320508 0. 1. 0. 1. 0. 1.7320508 0. 2.4494897 0.; #BBR 2014 compilation
+#
+0.000510000 gamma eta_b HELAMP 1.0 0.0 -1.0 0.0; #[Reconstructed PDG2014] Changed from PHSP
+0.000870000 pi0 h_b PARTWAVE 1. 0. 0. 0. 0. 0.; #Derived from Y(3S)->pi0 hb->gam etab measurement Changed from PHSP
+#
+0.007700 d anti-d PYTHIA 91; #Using R=3.51 and latest B(Ups->mumu)
+0.030600 u anti-u PYTHIA 91;
+0.007700 s anti-s PYTHIA 91;
+0.030600 c anti-c PYTHIA 91;
+0.403000 g g g PYTHIA 92; #Rescaled from PDG2014 - was 0.37780
+0.011000 gamma g g PYTHIA 92; #Rescaled from PDG2014 - was 0.01
+Enddecay
+
+
+Decay Upsilon(2S)
+0.019100000 e+ e- PHOTOS VLL; #[Reconstructed PDG2011]
+0.019300000 mu+ mu- PHOTOS VLL; #[Reconstructed PDG2011]
+0.020000000 tau+ tau- VLL; #[Reconstructed PDG2011]
+0.178500000 Upsilon pi+ pi- YMSTOYNSPIPICLEOBOOST -0.753 0.000; #[Reconstructed PDG2011]
+0.086000000 Upsilon pi0 pi0 YMSTOYNSPIPICLEOBOOST -0.753 0.000; #[Reconstructed PDG2011]
+0.038000000 gamma chi_b0 HELAMP 1. 0. 1. 0.; #[Reconstructed PDG2011]
+0.069000000 gamma chi_b1 HELAMP 1. 0. 1. 0. -1. 0. -1. 0.; #[Reconstructed PDG2011]
+0.071500000 gamma chi_b2 HELAMP 2.4494897 0. 1.7320508 0. 1. 0. 1. 0. 1.7320508 0. 2.4494897 0.; #[Reconstructed PDG2011]
+0.00680 d anti-d PYTHIA 91; #Using R=3.51 and latest B(Ups->mumu)
+0.02710 u anti-u PYTHIA 91;
+0.00680 s anti-s PYTHIA 91;
+0.02710 c anti-c PYTHIA 91;
+0.41700 g g g PYTHIA 92; #PDG values had sum of ~1.2, so these were rescaled.
+0.01330 gamma g g PYTHIA 92; #PDG values had sum of ~1.2, so these were rescaled.
+0.000290000 Upsilon eta PARTWAVE 0. 0. 1. 0. 0. 0.; #[New mode added] #[Reconstructed PDG2014] Changed from PHSP
+0.000390000 gamma eta_b HELAMP 1.0 0.0 -1.0 0.0; #[Reconstructed PDG2014] Changed from PHSP
+Enddecay
+
+
+Decay Upsilon
+0.023800000 e+ e- PHOTOS VLL; #[Reconstructed PDG2011]
+0.024800000 mu+ mu- PHOTOS VLL; #[Reconstructed PDG2011]
+0.026000000 tau+ tau- VLL; #[Reconstructed PDG2011]
+0.008700000 d anti-d PYTHIA 91; #[Reconstructed PDG2011], all qqbar have been corrected to 1/4 ratio
+0.034900000 u anti-u PYTHIA 91; #[Reconstructed PDG2011]
+0.008700000 s anti-s PYTHIA 91; #[Reconstructed PDG2011]
+0.034900000 c anti-c PYTHIA 91; #[Reconstructed PDG2011]
+0.816000000 g g g PYTHIA 92; #[Reconstructed PDG2011] PDG says: 0.817
+0.022000000 gamma g g PYTHIA 92; #[Reconstructed PDG2011] PDG says: 0.022
+Enddecay
+
+#As suggested by Roman:
+Decay h_b
+0.492 gamma eta_b HELAMP 1.0 0.0 1.0 0.0;
+0.508 g g g PHOTOS PYTHIA 92;
+Enddecay
+
+Decay chi_b0
+0.0192 gamma Upsilon HELAMP 1. 0. 1. 0.; #best values from BBR 2014, using B(Y2S->gamma chib)
+0.9808 g g PYTHIA 91;
+Enddecay
+
+Decay chi_b1
+0.349 gamma Upsilon HELAMP 1. 0. 1. 0. -1. 0. -1. 0.; #best values from BBR 2014, using B(Y2S->gamma chib)
+0.16275 d anti-d PYTHIA 91;
+0.16275 u anti-u PYTHIA 91;
+0.16275 s anti-s PYTHIA 91;
+0.16275 c anti-c PYTHIA 91;
+Enddecay
+
+Decay chi_b2
+0.187 gamma Upsilon HELAMP 1. 0. 1.7320508 0. 2.4494897 0. 2.4494897 0. 1.7320508 0. 1. 0.; #best values from BBR 2014, using B(Y2S->gamma chib)
+0.813 g g PYTHIA 91;
+Enddecay
+
+Decay chi_b0(2P)
+0.0039 gamma Upsilon HELAMP 1. 0. 1. 0.; #best values from BBR 2014, using B(Y3S->gamma chib)
+0.0139 gamma Upsilon(2S) HELAMP 1. 0. 1. 0.;
+0.9822 g g PYTHIA 91;
+Enddecay
+
+Decay chi_b1(2P)
+0.0995 gamma Upsilon HELAMP 1. 0. 1. 0. -1. 0. -1. 0.; #best values from BBR 2014, using B(Y3S->gamma chib)
+0.1997 gamma Upsilon(2S) HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;
+0.0163 Upsilon omega PHSP;
+0.00910 chi_b1 pi+ pi- PHSP;
+0.00455 chi_b1 pi0 pi0 PHSP;
+0.167713 d anti-d PYTHIA 91;
+0.167713 u anti-u PYTHIA 91;
+0.167713 s anti-s PYTHIA 91;
+0.167713 c anti-c PYTHIA 91;
+Enddecay
+
+Decay chi_b2(2P)
+0.0648 gamma Upsilon HELAMP 1. 0. 1.7320508 0. 2.4494897 0. 2.4494897 0. 1.7320508 0. 1. 0.;
+0.0921 gamma Upsilon(2S) HELAMP 1. 0. 1.7320508 0. 2.4494897 0. 2.4494897 0. 1.7320508 0. 1. 0.;
+0.011 Upsilon omega PHSP;
+0.00510 chi_b2 pi+ pi- PHSP;
+0.00255 chi_b2 pi0 pi0 PHSP;
+0.82445 g g PYTHIA 91;
+Enddecay
+
+#As suggested by Roman:
+Decay eta_b
+1.0 g g PHOTOS PYTHIA 91;
+Enddecay
+
+Decay eta_b(2S)
+1.0 g g PHOTOS PYTHIA 91;
+Enddecay
+
+
+End

@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Components>
+  <!-- Generic Pixel layout with 5 layers in a windmill structure
+       the first 2 layers are composed of 2.0*12*0.03 cm sensors at current VXD radius
+       For the other 3, each ladder is conceptually composed of sensors 
+       next to each other with dimensions of 3.0*12*0.03 cm.
+  -->
+  <Ladder layer="1">
+    <!-- shift defines the shift of the sensor center along the rphi direction
+         of the ladder to create the windmill structure -->
+    <shift  unit="mm"> 3.0</shift>
+    <!-- radius (together with the phi angle specified in VTX.xml for each
+         ladder) specifies the center of the local coordinate system for the
+         ladder: x along rphi, 0 at specified phi, y going outward 0 at
+         specified radius, z = global z, 0 at global 0 -->
+
+    <!-- The nominal radius of the inner layer is 14 mm, but this is the inner
+         surface of the sensor and here we give the center of the sensor, so
+         let's add half of the thickness of supporting balcony (0.2mm) -->
+    <radius unit="mm">14.1</radius>
+    <!-- Disabled as it causes problems with TGeo conversion -->
+    <!--<Glue><oversize unit="um">20</oversize><Material>VTX-Glue</Material></Glue>-->
+    <!-- The value of Sensors is the global z position -->
+    <Sensor id="1" type="Layer1" unit="mm" flipV="true"> 11.0</Sensor>
+  </Ladder>
+
+  <Ladder layer="2">
+    <shift  unit="mm"> 3.5</shift>
+    <!-- The nominal radius of the outer layer is 22 mm, but this is the
+         outersurface of the sensor and here we give the center of the sensor,
+         so let's substract half of the thickness of supporting balcony (0.2mm) -->
+    <radius unit="mm">22.1</radius>
+    <!-- Disabled as it causes problems with TGeo conversion -->
+    <!--<Glue><oversize unit="um">20</oversize><Material>VTX-Glue</Material></Glue>-->
+    <Sensor id="1" type="Layer1" unit="mm" flipV="true"> 17.0</Sensor>
+  </Ladder>
+
+  <Ladder layer="3">
+    <shift  unit="mm"> 5.1</shift>
+    <radius unit="mm">39.1</radius>
+    <Sensor id="2" type="Layer2" unit="mm" flipV="true"> -32.0</Sensor>
+    <Sensor id="1" type="Layer2" unit="mm" flipV="true"> 88.0</Sensor>
+  </Ladder>
+
+  <Ladder layer="4">
+    <shift  unit="mm"> 7.1</shift>
+    <radius unit="mm">89.5</radius>
+    <Sensor id="3" type="Layer2" unit="mm" flipV="true"> -109.0</Sensor>
+    <Sensor id="2" type="Layer2" unit="mm" flipV="true"> 11.0</Sensor>
+    <Sensor id="1" type="Layer2" unit="mm" flipV="true"> 131.0</Sensor>
+  </Ladder>
+
+  <Ladder layer="5">
+    <shift  unit="mm"> 8.0</shift>
+    <radius unit="mm">140.0</radius>
+    <Sensor id="5" type="Layer2" unit="mm" flipV="true"> -193.0</Sensor>
+    <Sensor id="4" type="Layer2" unit="mm" flipV="true"> -73.0</Sensor>
+    <Sensor id="3" type="Layer2" unit="mm" flipV="true"> 47.0</Sensor>
+    <Sensor id="2" type="Layer2" unit="mm" flipV="true"> 167.0</Sensor>
+    <Sensor id="1" type="Layer2" unit="mm" flipV="true"> 287.0</Sensor>
+  </Ladder>
+
+  <!-- This is a ladder for Ring1_1_front. It has one sensor of type Disc that is slanted by 90 degree-->
+  <Ladder layer="6">
+    <shift  unit="mm"> 0.0</shift>
+    <radius unit="mm"> 80.000</radius>
+    <slantedAngle unit="deg"> 90</slantedAngle>
+    <slantedRadius unit="mm"> 58.682</slantedRadius>
+    <Sensor id="1" type="Disc"  unit="mm"> 165.648</Sensor> 
+  </Ladder>
+
+  <!-- This is a ladder for Ring1_1_back. It has one sensor of type Disc that is slanted by 90 degree-->
+  <Ladder layer="7">
+    <shift  unit="mm"> 0.0</shift>
+    <radius unit="mm"> 80.000</radius>
+    <slantedAngle unit="deg"> 90</slantedAngle>
+    <slantedRadius unit="mm"> 58.682</slantedRadius>
+    <Sensor id="1" type="Disc"  unit="mm"> 166.848</Sensor> 
+  </Ladder>
+
+  <!-- This is a ladder for Ring1_2_front. It has one sensor of type Disc that is slanted by 90 degree-->
+  <Ladder layer="8">
+    <shift  unit="mm"> 0.0</shift>
+    <radius unit="mm"> 80.000</radius>
+    <slantedAngle unit="deg"> 90</slantedAngle>
+    <slantedRadius unit="mm"> 77.182</slantedRadius>
+    <Sensor id="1" type="Disc"  unit="mm"> 167.648</Sensor> 
+  </Ladder>
+  
+  <!-- This is a ladder for Ring1_2_back. It has one sensor of type Disc that is slanted by 90 degree-->
+  <Ladder layer="9">
+    <shift  unit="mm"> 0.0</shift>
+    <radius unit="mm"> 80.000</radius>
+    <slantedAngle unit="deg"> 90</slantedAngle>
+    <slantedRadius unit="mm"> 77.182</slantedRadius>
+    <Sensor id="1" type="Disc"  unit="mm"> 168.848</Sensor> 
+  </Ladder>
+  
+  <!-- This is a ladder for Ring2_1_front. It has one sensor of type Disc that is slanted by 90 degree-->
+  <Ladder layer="10">
+    <shift  unit="mm"> 0.0</shift>
+    <radius unit="mm"> 80.000</radius>
+    <slantedAngle unit="deg"> 90</slantedAngle>
+    <slantedRadius unit="mm"> 87.784</slantedRadius>
+    <Sensor id="1" type="Disc"  unit="mm"> 255.678</Sensor> 
+  </Ladder>
+  
+  <!-- This is a ladder for Ring2_1_back. It has one sensor of type Disc that is slanted by 90 degree-->
+  <Ladder layer="11">
+    <shift  unit="mm"> 0.0</shift>
+    <radius unit="mm"> 80.000</radius>
+    <slantedAngle unit="deg"> 90</slantedAngle>
+    <slantedRadius unit="mm"> 87.784</slantedRadius>
+    <Sensor id="1" type="Disc"  unit="mm"> 256.678</Sensor> 
+  </Ladder>
+  
+  <!-- This is a ladder for Ring2_2_front. It has one sensor of type Disc that is slanted by 90 degree-->
+  <Ladder layer="12">
+    <shift  unit="mm"> 0.0</shift>
+    <radius unit="mm"> 80.000</radius>
+    <slantedAngle unit="deg"> 90</slantedAngle>
+    <slantedRadius unit="mm"> 106.284</slantedRadius>
+    <Sensor id="1" type="Disc"  unit="mm"> 257.678</Sensor> 
+  </Ladder> 
+  
+  <!-- This is a ladder for Ring2_2_back. It has one sensor of type Disc that is slanted by 90 degree-->
+  <Ladder layer="13">
+    <shift  unit="mm"> 0.0</shift>
+    <radius unit="mm"> 80.000</radius>
+    <slantedAngle unit="deg"> 90</slantedAngle>
+    <slantedRadius unit="mm"> 106.284</slantedRadius>
+    <Sensor id="1" type="Disc"  unit="mm"> 258.678</Sensor> 
+  </Ladder> 
+
+  <!-- This is a ladder for Ring2_3_front. It has one sensor of type Disc that is slanted by 90 degree-->
+  <Ladder layer="14">
+    <shift  unit="mm"> 0.0</shift>
+    <radius unit="mm"> 80.000</radius>
+    <slantedAngle unit="deg"> 90</slantedAngle>
+    <slantedRadius unit="mm"> 125.784</slantedRadius>
+    <Sensor id="1" type="Disc"  unit="mm"> 255.678</Sensor> 
+  </Ladder> 
+  
+  <!-- This is a ladder for Ring2_3_back. It has one sensor of type Disc that is slanted by 90 degree-->
+  <Ladder layer="15">
+    <shift  unit="mm"> 0.0</shift>
+    <radius unit="mm"> 80.000</radius>
+    <slantedAngle unit="deg"> 90</slantedAngle>
+    <slantedRadius unit="mm"> 125.784</slantedRadius>
+    <Sensor id="1" type="Disc"  unit="mm"> 256.278</Sensor> 
+  </Ladder>
+  
+  <Sensor type="Layer1">
+    <Color>#006699</Color>
+    <Material>Si</Material>
+    <width  unit="mm">20.0</width>
+    <length unit="mm">120.0</length>
+    <height unit="mm"> 0.400</height>
+    <!-- definition of the active area of the module which is a part of the
+         whole thing. The position is given relative to the lower left edge of
+         the module (the point with the most negative local coordinates). -->
+    <Active>
+      <Color>#f00</Color>
+      <u unit="mm"> 1.0</u>
+      <v unit="mm">0.0</v>
+      <w>top</w>
+      <width  unit="mm">18.0</width>
+      <length unit="mm">120.0</length>
+      <height unit="mm"> 0.030</height>
+      <!-- limit the Geant4 stepsize to get precise information on the landau fluctuation -->
+      <stepSize unit="um">5</stepSize>
+      <!-- define the number of pixels in rphi direction -->
+      <pixelsU>546</pixelsU>
+      <pixelsV>3640</pixelsV>
+      <!-- 
+           Maybe all those parameters don't make sense for Generic Pixel
+
+           Parameters describing the physical attributes of the sensor needed
+           for digitization. The voltages might be time dependent and than
+           should be placed somewhere else -->
+      <BulkDoping unit="1/um^3">10.0</BulkDoping>
+      <BackVoltage unit="V">-30.0</BackVoltage>
+      <TopVoltage unit="V">-5.0</TopVoltage>
+      <BorderU unit="um">6.0</BorderU>
+      <BorderV unit="um">4.0</BorderV>
+      <ChargeThreshold unit="ADU">1.25</ChargeThreshold>
+      <NoiseFraction>0.00000000</NoiseFraction>
+      <!-- Parameters that were in the digitizer -->
+      <!-- Apply electronic effects? -->
+      <ApplyElectronicEffects>true</ApplyElectronicEffects>
+      <!-- Noise added by the electronics, set in ENC -->
+      <ElectronicNoise unit="ENC">20.0</ElectronicNoise>
+      <!-- Apply binary readout? -->
+      <ApplyBinaryReadout>false</ApplyBinaryReadout>
+      <!-- Binary hit treshold, set in ENC -->
+      <BinaryHitThreshold unit="ENC">220</BinaryHitThreshold>
+      <!-- ENC equivalent of 1 ADU -->
+      <ElectronToADU unit="ENC">120</ElectronToADU>
+      <!-- Maximum code for analog to digital converter (clamping) -->
+      <MaxADUCode>127</MaxADUCode>
+      <!-- Apply Poisson smearing of electrons collected on pixels -->
+      <ApplyPoissonSmearing>true</ApplyPoissonSmearing>
+      <!-- Use integration window? -->
+      <ApplyIntegrationWindow>true</ApplyIntegrationWindow>
+      <!-- Maximum segment length (in mm) -->
+      <SegmentLength unit="mm">0.005</SegmentLength>
+      <!-- Split Signalpoints in smaller groups of N electrons (in e) -->
+      <ElectronGroupSize>100</ElectronGroupSize>
+      <!-- Time step for tracking electron groups in readout plane (in ns) -->
+      <ElectronStepTime unit="ns">1.0</ElectronStepTime>
+      <!-- Maximum number of steps when propagating electrons -->
+      <ElectronMaxSteps>200</ElectronMaxSteps>
+      <!-- Constant time delay between bunch crossing and switching on triggergate (in ns) -->
+      <HardwareDelay unit="ns">0.0</HardwareDelay>
+      <!-- ADC conversion factor -->
+      <ADCunit>120</ADCunit>
+      <!-- Diffusion coefficient TODO add unit? is it diffusion coeff or cloud size??-->
+      <CloudSize>0.000085</CloudSize>
+      <!-- ADC gain factor -->
+      <Gq>1.0</Gq>
+      <!-- Averaged sensors X0 (for perpendicular incidence) -->
+      <X0average>0.001</X0average>
+      <!-- Tangent of Lorentz angle -->
+      <TanLorentzAngle>0.24</TanLorentzAngle>
+      <!-- Spatial resolution coefficient for u axis -->
+      <ResolutionCoefficientU>0.6</ResolutionCoefficientU>
+      <!-- Spatial resolution coefficient for v axis -->
+      <ResolutionCoefficientV>0.6</ResolutionCoefficientV>
+      <!-- Integration time for Generic Pixel -->
+      <IntegrationStart unit="ns">-50.0</IntegrationStart>
+      <IntegrationEnd   unit="ns"> 50.0</IntegrationEnd>
+    </Active>
+    <!-- Used for thinning in the VXD sensitive area
+
+         now we place some components on the sensor by giving the name of the
+         component defined further down and the positions of all placements on
+         the sensor in local coordinates, starting at the lower left edge
+
+         possible placements for the w-coordinate are:
+          - below: place below the sensor surface
+          - bottom: place in the sensor but at the bottom
+          - center: place in the sensor center
+          - top: place in the sensor touching the top surface
+          - above place on top of the sensor surface -->
+
+     <!-- Thinning of the sensor down to the sensitive thickness by cutting out
+         a piece of the silicon -->
+    <Component type="ThinningLayer1">
+      <u unit="mm"> 10.0</u><v unit="mm">60.0</v>
+    </Component>
+  </Sensor>
+
+  <!-- The sensor in layer 2 is almost the same as for layer one except for the
+       dimensions -->
+  <Sensor type="Layer2">
+    <Material>Si</Material>
+    <Color>#006699</Color>
+    <width  unit="mm">40.0</width>
+    <length unit="mm">120.0</length>
+    <height unit="mm"> 0.300</height>
+    <Active>
+      <u unit="mm"> 1.5</u>
+      <v unit="mm"> 0.0</v>
+      <w>top</w>
+      <width  unit="mm">35.0</width>
+      <length unit="mm">120.0</length>
+      <height unit="mm"> 0.030</height>
+      <stepSize unit="um">5</stepSize>
+      <pixelsU>1060</pixelsU>
+      <pixelsV>3640</pixelsV>
+
+      <BulkDoping unit="1/um^3">10.0</BulkDoping>
+      <BackVoltage unit="V">-30.0</BackVoltage>
+      <TopVoltage unit="V">-5.0</TopVoltage>
+      <BorderU unit="um">6.0</BorderU>
+      <BorderV unit="um">4.0</BorderV>
+      <ChargeThreshold unit="ADU">1.25</ChargeThreshold>
+      <NoiseFraction>0.00000000</NoiseFraction>
+      <ApplyElectronicEffects>true</ApplyElectronicEffects>
+      <ElectronicNoise unit="ENC">20.0</ElectronicNoise>
+      <ApplyBinaryReadout>false</ApplyBinaryReadout>
+      <BinaryHitThreshold unit="ENC">220.0</BinaryHitThreshold>
+      <ElectronToADU unit="ENC">120</ElectronToADU>
+      <MaxADUCode>127</MaxADUCode>
+      <ApplyPoissonSmearing>true</ApplyPoissonSmearing>
+      <ApplyIntegrationWindow>true</ApplyIntegrationWindow>
+      <SegmentLength unit="mm">0.005</SegmentLength>
+      <ElectronGroupSize>100</ElectronGroupSize>
+      <ElectronStepTime unit="ns">1.0</ElectronStepTime>
+      <ElectronMaxSteps>200</ElectronMaxSteps>
+      <HardwareDelay unit="ns">0.0</HardwareDelay>
+      <ADCunit>120</ADCunit>
+      <CloudSize>0.000085</CloudSize>
+      <Gq>1.0</Gq>
+      <X0average>0.003</X0average>
+      <TanLorentzAngle>0.24</TanLorentzAngle>
+      <ResolutionCoefficientU>0.6</ResolutionCoefficientU>
+      <ResolutionCoefficientV>0.6</ResolutionCoefficientV>
+      <IntegrationStart unit="ns">-50.0</IntegrationStart>
+      <IntegrationEnd   unit="ns"> 50.0</IntegrationEnd>
+    </Active>
+    <!-- The sensors in the outer layer are not thinned -->
+    <!--Component type="ThinningLayer2">
+      <u unit="mm"> 15</u><v unit="mm">60</v>
+    </Component-->
+  </Sensor>
+
+  <!-- The sensor type in dics -->
+  <Sensor type="Disc" slanted="true">
+    <Material>Si</Material>
+    <Color>#006699</Color>
+    <width  unit="mm">20.0</width>
+    <!-- width2 unit="mm">20.0</width2 -->
+    <length unit="mm">20.0</length>
+    <height unit="mm"> 0.300</height>
+    <Active>
+      <u unit="mm"> 1.5</u>
+      <v unit="mm"> 0.0</v>
+      <w>top</w>
+      <width  unit="mm">18.0</width>
+      <!-- width2 unit="mm">18.0</width2 -->
+      <length unit="mm">20.0</length>
+      <height unit="mm"> 0.030</height>
+      <stepSize unit="um">5</stepSize>
+      <pixelsU>1060</pixelsU>
+      <pixelsV>3640</pixelsV>
+
+      <BulkDoping unit="1/um^3">10.0</BulkDoping>
+      <BackVoltage unit="V">-30.0</BackVoltage>
+      <TopVoltage unit="V">-5.0</TopVoltage>
+      <BorderU unit="um">6.0</BorderU>
+      <BorderV unit="um">4.0</BorderV>
+      <ChargeThreshold unit="ADU">1.25</ChargeThreshold>
+      <NoiseFraction>0.00000000</NoiseFraction>
+      <ApplyElectronicEffects>true</ApplyElectronicEffects>
+      <ElectronicNoise unit="ENC">20.0</ElectronicNoise>
+      <ApplyBinaryReadout>false</ApplyBinaryReadout>
+      <BinaryHitThreshold unit="ENC">220.0</BinaryHitThreshold>
+      <ElectronToADU unit="ENC">120</ElectronToADU>
+      <MaxADUCode>127</MaxADUCode>
+      <ApplyPoissonSmearing>true</ApplyPoissonSmearing>
+      <ApplyIntegrationWindow>true</ApplyIntegrationWindow>
+      <SegmentLength unit="mm">0.005</SegmentLength>
+      <ElectronGroupSize>100</ElectronGroupSize>
+      <ElectronStepTime unit="ns">1.0</ElectronStepTime>
+      <ElectronMaxSteps>200</ElectronMaxSteps>
+      <HardwareDelay unit="ns">0.0</HardwareDelay>
+      <ADCunit>120</ADCunit>
+      <CloudSize>0.000085</CloudSize>
+      <Gq>1.0</Gq>
+      <X0average>0.003</X0average>
+      <TanLorentzAngle>0.24</TanLorentzAngle>
+      <ResolutionCoefficientU>0.6</ResolutionCoefficientU>
+      <ResolutionCoefficientV>0.6</ResolutionCoefficientV>
+      <IntegrationStart unit="ns">-50.0</IntegrationStart>
+      <IntegrationEnd   unit="ns"> 50.0</IntegrationEnd>
+    </Active>
+    <!-- The sensors in the outer layer are not thinned -->
+    <!--Component type="ThinningLayer2">
+      <u unit="mm"> 15</u><v unit="mm">60</v>
+    </Component-->
+  </Sensor>
+  
+  <Component name="ThinningLayer1">
+    <Material>ColdAir</Material>
+    <Color>#5599BB</Color>
+    <width  unit="mm">17.000</width>
+    <length unit="mm">120</length>
+    <height unit="mm">0.360</height>
+    <angle  unit="deg">0</angle>
+  </Component>
+
+  <Component name="ThinningLayer2">
+    <Material>ColdAir</Material>
+    <Color>#5599BB</Color>
+    <width  unit="mm">32.000</width>
+    <length unit="mm">120</length>
+    <height unit="mm"> 0.260</height>
+    <angle  unit="deg">0</angle>
+  </Component>
+
+</Components>

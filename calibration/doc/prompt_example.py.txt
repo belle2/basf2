@@ -1,0 +1,53 @@
+# -*- coding: utf-8 -*-
+
+"""Docstring explaining what this calibration script does. Maybe a description of payloads?
+This can be a long as you want."""
+
+##############################
+# OPTIONAL DEPENDENCY #
+##############################
+
+# you may choose to signal that this calibration depends on others by importing their settings and
+# adding it to the 'depends_on' list in this calibration's settings variable.
+
+from prompt.calibrations.caf_vxd import settings as caf_vxd_dependency
+
+##############################
+# REQUIRED VARIABLE #
+##############################
+
+from prompt import CalibrationSettings
+
+settings = CalibrationSettings(name="Example Simple",
+                               expert_username="ddossett",
+                               description=__doc__,
+                               input_data_formats=["raw"],
+                               input_data_names=["physics"],
+                               input_data_filters={"physics":["physics","Good"]}
+                               expert_config={"events_per_file": 10000, ...},
+                               depends_on=[caf_vxd_dependency])
+
+##############################
+# REQUIRED FUNCTION #
+##############################
+def get_calibrations(input_data, **kwargs):
+    # The only function that MUST exist in this module. It should return a LIST of Calibration objects
+    # that have had their input files assigned and any configuration applied. The final output payload IoV(s)
+    # should also be set correctly to be open-ended e.g. IoV(exp_low, run_low, -1, -1)
+    #
+    # The database_chain, CAF backend_args, backend, and heartbeat of these
+    # calibrations will all be set by the b2caf-prompt-run tool.
+    # You should set the `Calibration.max_subjobs` attribute yourself, probably to ~1500. But if you have many
+    # Calibration objects running in parallel you might want to set  it lower per Calibration so that the total
+    # number of a jobs from all parallel Calibrations is ~1000 -> 2500
+    
+    # The expert_config receieved here will be the combination of your defaults in the settings variable above,
+    # with any values set in your caf_config.json taking precedence.
+    expert_config = kwargs.get("expert_config")
+
+    mycal1 = Calibration("Example1")
+    mycal2 = Calibration("Example1")
+
+    ...
+
+    return [mycal1, mycal2]

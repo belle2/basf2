@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""
+Tool to update the expected version and checksum for all ROOT classes in a
+linkdef file
+
+This tool will look for all given "linkdef.h" files and update the comments for
+the classes to contain the class version and checksum from the compiled
+dictionary.
+
+For a more detailed explanation please look at the documentation for
+``b2code-classversion-check``. But basically this tool looks for linkdef.h files
+in the given search folders and will update the class version and class checksum
+comments to reflect the actual values reported by ROOT when loading the class.
+
+It will only update the values if no comments already exist or if version and
+checksum differ from the existing values and the class version increases by one.
+Otherwise it will report detailed errors on these cases so that the differences
+can be fixed manually.
+
+.. versionadded:: after release-05-00-00
+"""
+
+from pathlib import Path
+import argparse
+
+from ROOT import PyConfig
+PyConfig.DisableRootLogon = True
+PyConfig.IgnoreCommandLineOptions = True
+PyConfig.StartGuiThread = False
+from b2test_utils.classversion import update_linkdef
+from basf2 import B2ERROR
+
+def get_argument_parser():
+    """
+    Return an ArgumentParser with all defined arguments
+    """
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("directory", nargs="+", help="Name of a directory or linkdef file to check. "
+                        "If it's a directory it will be searched recursively for linkdef files")
+    return parser
+
+if __name__ == "__main__":
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
+    for base in args.directory:
+        base = Path(base)
+        if not base.exists():
+            B2ERROR(f"File {base} doesn't exist")
+            continue
+        files = base.glob("**/linkdef.h") if base.is_dir() else [base]
+        for filename in files:
+            update_linkdef(filename)

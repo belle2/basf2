@@ -1,0 +1,45 @@
+# EventType: 1213032008
+# Descriptor: Y(4S) -> B+ B-
+#                     [B+ -> (anti-D0 -> K+ pi0 pi-) pi+]
+#                      B- -> anything
+# NickName: Bu_D0pi_Kpipi0
+# Documentation:    2 Body hadronic decay
+#                   Includes resonances in D decay (from PhsyRev D48, 56 (1993))
+# Tested: Yes
+# PhysicsWG: BTOCHARMLESS
+# Reponsible: Ilya Komarov
+# Email: ilya.komarov@desy.de
+# Cuts: None
+# Date: 20170314
+# Changes: Use of aliases defined in DECAY.DEC; date: 20170314; author: Pablo Goldenzweig
+
+
+#
+# Y(4S) -> B+ B- 
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B-                   VSS;
+0.5 B+ B-sig                   VSS;
+Enddecay
+
+#
+# B+ -> anti-D0 pi+
+#
+
+Decay B+sig
+1.000   anti-D0sig pi+ PHSP;
+Enddecay
+CDecay B-sig 
+
+#
+# anti-D0 -> K+ pi0 pi-
+#
+
+Decay anti-D0sig
+  1.000    K+        pi0    pi-          D_DALITZ;
+Enddecay
+CDecay D0sig
+
+
+End

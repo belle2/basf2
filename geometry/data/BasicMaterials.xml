@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Materials>
+  <Material name="Vacuum">
+    <state>Gas</state>
+    <density unit="g/cm3">1e-12</density>
+    <temperature>273</temperature>
+    <pressure>1.0</pressure>
+    <Components>
+      <Element fraction="0.78">N</Element>
+      <Element fraction="0.21">O</Element>
+      <Element fraction="0.01">Ar</Element>
+    </Components>
+  </Material>
+
+  <Material name="CDCGas">
+    <state>Gas</state>
+    <density unit="g/cm3">7.67e-4</density>
+    <Components>
+      <Element fraction="0.500">He</Element>
+      <Material fraction="0.500">Ethane</Material>
+    </Components>
+  </Material>
+</Materials>

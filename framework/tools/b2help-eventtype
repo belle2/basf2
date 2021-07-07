@@ -6,9 +6,9 @@ Utility to search for decfiles which include given decay string.
 NOTE : Currently this script only work on full release but not light release, since there is not the decfile directory.
        Charge conjugate modes could not be found.
        Sub-decay might not be appropriately treated.
+       Unnecessary file (match_file.txt) is created.
 """
 
-import pdg
 import sys
 import os
 import argparse
@@ -20,8 +20,8 @@ def get_argument_parser():
     """Return an argument parser to parse all arguments"""
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("decay_string", nargs='?', metavar="NAME", default=None,
-                        help="Optional name to search for in particles")
+    parser.add_argument("decay_string", nargs='?', default=None,
+                        help="Decay string to search for the EventType and a decfile")
     return parser
 
 
@@ -36,14 +36,21 @@ if __name__ == "__main__":
         sys.exit(1)
 
     import subprocess
+    import pdg
 
     mother_name = d.getMother().getName()
     if not pdg.search(mother_name):
         print("No particles matching the mother could be found")
         sys.exit(1)
 
+    release_dir = ''
+    if 'BELLE2_RELEASE_DIR' in os.environ:
+        release_dir = os.environ['BELLE2_RELEASE_DIR']
+    if 'BELLE2_LOCAL_DIR' in os.environ:
+        release_dir = os.environ['BELLE2_LOCAL_DIR']
+
     match_file = 'match_file.txt'
-    command = 'grep -rl ' + mother_name + ' ' + os.environ['BELLE2_RELEASE_DIR'] + '/decfiles/dec/ > ' + match_file
+    command = 'grep -rl ' + mother_name + ' ' + release_dir + '/decfiles/dec/ > ' + match_file
     subprocess.call(command, shell=True)
 
     matched_list = []
@@ -59,7 +66,7 @@ if __name__ == "__main__":
 
         daughter_name = d.getDaughter(i).getMother().getName()
 
-        command = 'grep -rl ' + daughter_name + ' ' + os.environ['BELLE2_RELEASE_DIR'] + '/decfiles/dec/ > ' + match_file
+        command = 'grep -rl ' + daughter_name + ' ' + release_dir + '/decfiles/dec/ > ' + match_file
         subprocess.call(command, shell=True)
 
         with open(match_file, 'r') as f:

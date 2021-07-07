@@ -19,8 +19,6 @@ import modularAnalysis as ma
 from skim import CombinedSkim
 from skim.registry import Registry
 
-__authors__ = ["Phil Grace"]
-
 # NOTE: Another way this test could have been written is to run the standalone steering
 # file for every skim:
 #

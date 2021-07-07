@@ -22,8 +22,6 @@ import subprocess as sp
 import multiprocessing as mp
 from concurrent.futures import ProcessPoolExecutor
 
-__authors__ = ['Giacomo De Pietro']
-
 
 def arg_parser():
     '''

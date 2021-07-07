@@ -24,8 +24,6 @@ from basf2 import find_file
 from skim.registry import Registry
 from skim import BaseSkim
 
-__authors__ = ["Sam Cunliffe", "Phil Grace"]
-
 
 class TestSkimRegistry(unittest.TestCase):
     """Test case for skim registry."""

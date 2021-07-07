@@ -64,7 +64,7 @@ if the default resolution of the CDC Digitizer is changed this value has to be c
 this variance is calculated by sigam_cdcHit^2 + sigma_translationError^2
 sigma_translationError is an additional (non-gaussian) smearing is introduced due to driftlength to TDC conversio  and
 can be (partially) corrected by adding sigma_translationError^2 = (40/sqrt(12) µm)^2 to sigam_cdcHit^2
-see Ozaki's mail: [belle2_tracking:0515] */
+see mail: [belle2_tracking:0515] */
 double SimpleTDCCountTranslator::getDriftLengthResolution(double,
                                                           const WireID&,
                                                           bool,

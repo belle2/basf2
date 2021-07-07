@@ -5,12 +5,9 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//
+
 //  CDCvalidation021.c 
 //    ROOT macro for validation      ver. 0.21
-//                      28 June 2013
-//                     Hiroki Kanda (Tohoku Univ.)
-//                     kanda@m.tains.tohoku.ac.jp
 //
 //    Usage: Batch mode 
 //           root -b CDCvalidation.c+O
@@ -33,8 +30,6 @@
 //                            histograms per super layer (saved in another root file)
 //  28 Jun 2013    ver. 0.21  Bug fix
 //  20 Feb 2015    ver.0.22   Common Start mode -> Common Stop mode
-//                            by Eiichi Nakano guided by Hitoshi Ozaki
-//
 
 /*
 <header>

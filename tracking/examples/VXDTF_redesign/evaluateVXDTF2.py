@@ -17,9 +17,6 @@
 # none-basf2 commandline argument --secmap.
 #
 # Usage: basf2 evaluateVXDTF2.py -i <inputFileName> [-- --secmap <secmapFile>]
-#
-#
-# Contributors: Jonas Wagner
 #####################################################################
 
 

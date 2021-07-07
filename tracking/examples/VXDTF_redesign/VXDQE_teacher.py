@@ -13,8 +13,6 @@
 # VXDTF2 Example Scripts - FastBDT weightfile training for MVA QualityEstimator
 #
 # Trains an MVA method from a TTree set of records
-#
-# Contributors: Jonas Wagner
 #####################################################################
 
 

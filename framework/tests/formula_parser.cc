@@ -73,7 +73,7 @@ namespace {
     EXPECT_FORMULA_OK("a+b*c", "('a'+('b'*'c'))");
     EXPECT_FORMULA_OK("a^b*c", "(('a'^'b')*'c')");
 
-    EXPECT_FORMULA_OK("10.58-2+4", "12.580000"); // c/o. Racha
+    EXPECT_FORMULA_OK("10.58-2+4", "12.580000");
     EXPECT_FORMULA_OK("10.58-(2+4)", "4.580000");
     EXPECT_FORMULA_OK("10.58-[2+4]", "4.580000");
   }

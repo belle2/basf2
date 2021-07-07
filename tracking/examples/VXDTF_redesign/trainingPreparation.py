@@ -19,8 +19,6 @@
 # argument '-i <inputfilename>'.
 #
 # NOTE: if you want to use PXD you set usePXD in this script!
-#
-# Contributors: Jonas Wagner, Felix Metzner
 #####################################################################
 
 

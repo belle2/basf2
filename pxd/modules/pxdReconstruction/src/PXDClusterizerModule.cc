@@ -337,7 +337,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     int clusterkind = PXDClusterPositionEstimator::getInstance().getClusterkind(cls.pixels(), sensorID);
 
     // Compute sorted set of pixel
-    // FIXME: I am not 100% sure if cls.pixels() are sorted => ask PeterQ or Martin Ritter
+    // FIXME: I am not 100% sure if cls.pixels() are sorted
     set<Pixel> pixelSet(cls.pixels().begin(), cls.pixels().end());
 
     // Compute classifier variables needed for later retrival of position correction in PXD CKF

@@ -5,6 +5,7 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 #####################################################################
 # NoKickCuts Evaluation
 #
@@ -21,8 +22,6 @@
 # the validation attach to the NoKickCuts.root file some useful histograms to
 # validate the selection, the FitMethod istead is not recommended because it has
 # not been optimized for Belle II Phase III Training Sample.
-#
-# Contributors: Valerio Bertacchi
 #####################################################################
 
 import basf2 as b2

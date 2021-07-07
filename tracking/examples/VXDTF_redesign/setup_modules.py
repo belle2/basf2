@@ -15,8 +15,6 @@
 #
 # This file contains several convenience functions to setup the
 # modules needed for the module chains of the VXDTF2.
-#
-# Contributors: Jonas Wagner, Felix Metzner
 #####################################################################
 
 

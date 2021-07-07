@@ -106,6 +106,7 @@ global_env = Environment(
     CCFLAGS=['-Wall', '-isystem$EXTINCDIR', '-Iinclude/'],
     CXXFLAGS=['-std=c++17'],
     FORTRANFLAGS=['-std=legacy'],
+    FORTRANMODDIR=os.path.join('$INCDIR', 'fortran_modules'),
     # disable warnings when compiling dictionaries, too much root problems
     # involved
     ROOTCLING_EXTRA_CCFLAGS=["-w"],

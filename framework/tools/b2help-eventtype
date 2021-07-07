@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+
+"""
+Utility to search for decfiles which include given decay string.
+
+NOTE : Currently this script only work on full release but not light release, since there is not the decfile directory.
+       Charge conjugate modes could not be found.
+       Sub-decay might not be appropriately treated.
+"""
+
+import pdg
+import sys
+import os
+import argparse
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+
+
+def get_argument_parser():
+    """Return an argument parser to parse all arguments"""
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("decay_string", nargs='?', metavar="NAME", default=None,
+                        help="Optional name to search for in particles")
+    return parser
+
+
+if __name__ == "__main__":
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
+    from ROOT import Belle2
+    d = Belle2.DecayDescriptor()
+    if not d.init(args.decay_string):
+        print("Invalid decay string")
+        sys.exit(1)
+
+    import subprocess
+
+    mother_name = d.getMother().getName()
+    if not pdg.search(mother_name):
+        print("No particles matching the mother could be found")
+        sys.exit(1)
+
+    match_file = 'match_file.txt'
+    command = 'grep -rl ' + mother_name + ' ' + os.environ['BELLE2_RELEASE_DIR'] + '/decfiles/dec/ > ' + match_file
+    subprocess.call(command, shell=True)
+
+    matched_list = []
+    with open(match_file, 'r') as f:
+        matched_list = f.read().splitlines()
+
+    n_daughters = d.getNDaughters()
+
+    for i in range(n_daughters):
+        if not pdg.search(d.getDaughter(i).getMother().getName()):
+            print("No particles matching " + str(i) + "th daughter could be found")
+            sys.exit(1)
+
+        daughter_name = d.getDaughter(i).getMother().getName()
+
+        command = 'grep -rl ' + daughter_name + ' ' + os.environ['BELLE2_RELEASE_DIR'] + '/decfiles/dec/ > ' + match_file
+        subprocess.call(command, shell=True)
+
+        with open(match_file, 'r') as f:
+            tmp_list = f.read().splitlines()
+
+        new_list = []
+        for line in matched_list:
+            if line in tmp_list:
+                new_list.append(line)
+
+        matched_list = new_list
+
+    for line in matched_list:
+        print(line)
+
+    sys.exit(1)

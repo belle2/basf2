@@ -206,7 +206,6 @@ assert feistate.stage == 7  # corresponds to stage 6, since increased by 1 after
 print(path)
 b2.process(path, max_event=10000)
 
-
 # Check avaliability of monitoring files constructed at stage 6 for validation
 assert len(glob.glob('Monitor_FSPLoader.root')) == 1
 

@@ -429,6 +429,20 @@ should be replaced with:
             else:
                 experiment_min, experiment_max, run_min, run_max = -1, -1, -1, -1
 
+* JIRA issue `BIIDCD-1408 <https://agira.desy.de/browse/BIIDCD-1408>`_. Please incorporate the changes documented further below to be able to download output files from `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ jobs in case there was a failed attempt and therefore an input file list is created for the ``gb2_ds_get`` command by `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_.
+
+Within the file ``BelleDIRAC/Client/controllers/datasetCLController.py`` in function ``get(...)``, the line
+
+.. code-block:: python
+
+                [lfns_new['Value'].append(line[:-1]) for lfn in lfns['Value'] if line[:-1] == lfn]
+
+should be replaced with:
+
+.. code-block:: python
+
+                [lfns_new['Value'].append(line.strip()) for lfn in lfns['Value'] if line.strip() == lfn]
+
 After installing all prerequisites, you would need to get the example `feiongridworkflow <https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse>`_:
 
 .. code-block:: bash
@@ -575,7 +589,7 @@ or only on a subset of events from one single file (event-based processing). The
         0: {"type": "file_based"},
         1: {"type": "file_based"},
         2: {"type": "file_based"},
-        3: {"type": "event_based", "n_events": 100000},  # usually 1/2 of a file
+        3: {"type": "event_based", "n_events": 50000},  # usually 1/4 of a file
         4: {"type": "event_based", "n_events": 50000},  # usually 1/4 of a file
         5: {"type": "event_based", "n_events": 20000},  # usually 1/10 of a file
         6: {"type": "event_based", "n_events": 10000},  # usually 1/20 of a file

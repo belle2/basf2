@@ -176,7 +176,7 @@ def process_dir(
     if len(fortran_sources) > 0:
         fortran_module_dir = env.Dir('$FORTRANMODDIR').get_abspath()
         if not os.path.isdir(fortran_module_dir):
-            os.mkdir(fortran_module_dir)
+            os.makedirs(fortran_module_dir)
 
     # install header files in the include directory
     includes = env.Install(os.path.join(env['INCDIR'], dir_name),

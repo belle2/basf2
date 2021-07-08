@@ -173,7 +173,6 @@ subprocess.call(["analysis-fei-mergefiles", "training_input.root"] + glob.glob("
 # Expect 4 different training_input*.root files now
 assert len(glob.glob('training_input*.root')) == 4
 
-
 # Construct path for stage 6 preparing evaluation (stages 4 and 5 skipped, input evaluated from stage 0 on)
 configuration = fei.config.FeiConfiguration(prefix='FEI_VALIDATION', cache=0, monitor=True)
 path = b2.create_path()
@@ -189,7 +188,6 @@ path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 assert feistate.stage == 7  # corresponds to stage 6, since increased by 1 after creating path
 print(path)
 b2.process(path, max_event=10000)
-
 
 # Check avaliability of monitoring files constructed at stage 6 for validation
 assert len(glob.glob('Monitor_FSPLoader.root')) == 1

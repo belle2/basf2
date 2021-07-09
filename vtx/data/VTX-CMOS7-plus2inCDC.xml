@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="VTX" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Creator library="vtx">VTXCreator</Creator>
+  <Content>
+    <!-- Set the default Material for the Envelope and Components which do not have a Material assigned -->
+    <DefaultMaterial>Air</DefaultMaterial>
+    <!--If this is true, all dead Material will be ignored and only the active
+        Material will be placed and the rest of the Detector will be filled
+        with DefaultMaterial -->
+    <OnlyActiveMaterial>false</OnlyActiveMaterial>
+    <!-- Set the  stepsize to be used in senistive volumes -->
+    <ActiveStepSize unit="um">5</ActiveStepSize>
+    <!-- If this is true, TrueHits will only be created for primary particles,
+         secondaries produced by Geant4 will not create TrueHits -->
+    <OnlyPrimaryTrueHits>false</OnlyPrimaryTrueHits>
+    <!--Settings for background and exposure studies -->
+    <ActiveChips desc="Set to true to make chips on sensors sensitive">false</ActiveChips>
+    <SeeNeutrons desc="Set to true to make sensitive detectors see neutrons">false</SeeNeutrons>
+    <SensitiveThreshold desc="Minimum deposited energy per geant4 step" unit="eV">1.0</SensitiveThreshold>
+    <!-- Include Alignment information -->
+    <xi:include href="VTX-Alignment-CMOS7-plus2inCDC.xml"/>
+    <!-- Include definition of logical volume encapsulating the VTX -->
+    <!--xi:include href="VTX-Envelope.xml"/-->
+    <!-- Include the definition of the mechanical support -->
+    <!--xi:include href="VTX-Support.xml"/-->
+    <!-- Include the definition of all the components like ladders, sensors and
+         chips -->
+    <xi:include href="VTX-Components-CMOS7-plus2inCDC.xml"/>
+    <!-- include radiation sensor definition -->
+    <!--xi:include href="VTX-RadiationSensors.xml"/-->
+
+    <!-- VTX is build as two half shells which will be attached to the beampipe
+         from the sides. We follow this scheme in the simulation geometry for
+         alignment purposes. Each shell consists of a number of ladders for
+         each layer. -->
+    <HalfShell name="Ying">
+      <!-- For this shell we place the support without any rotation -->
+      <shellAngle unit="deg">0</shellAngle>
+      <!-- Define the ladders in each layer with increasing phi angle -->
+      <Layer id="1">
+        <Ladder id="1"><phi unit="deg">0</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">60</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">120</phi></Ladder>
+      </Layer>
+      <Layer id="2">
+        <Ladder id="1"><phi unit="deg">0</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">36</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">72</phi></Ladder>
+        <Ladder id="4"><phi unit="deg">108</phi></Ladder>
+        <Ladder id="5"><phi unit="deg">144</phi></Ladder>
+      </Layer>
+      <Layer id="3">
+        <Ladder id="1"><phi unit="deg">25.7</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">51.4</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">77.1</phi></Ladder>
+        <Ladder id="4"><phi unit="deg">102.8</phi></Ladder>
+        <Ladder id="5"><phi unit="deg">128.5</phi></Ladder>
+        <Ladder id="6"><phi unit="deg">154.2</phi></Ladder>
+        <Ladder id="7"><phi unit="deg">179.9</phi></Ladder>
+      </Layer>
+      <Layer id="4">
+        <Ladder id="1"><phi unit="deg">0</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">30</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">60</phi></Ladder>
+        <Ladder id="4"><phi unit="deg">90</phi></Ladder>
+        <Ladder id="5"><phi unit="deg">120</phi></Ladder>
+        <Ladder id="6"><phi unit="deg">150</phi></Ladder>
+      </Layer>
+      <Layer id="5">
+        <Ladder id="1"><phi unit="deg">0</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">20</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">40</phi></Ladder>
+        <Ladder id="4"><phi unit="deg">60</phi></Ladder>
+        <Ladder id="5"><phi unit="deg">80</phi></Ladder>
+        <Ladder id="6"><phi unit="deg">100</phi></Ladder>
+        <Ladder id="7"><phi unit="deg">120</phi></Ladder>
+        <Ladder id="8"><phi unit="deg">140</phi></Ladder>
+        <Ladder id="9"><phi unit="deg">160</phi></Ladder>
+      </Layer>
+      <Layer id="6">
+        <Ladder id="1"><phi unit="deg">0.0</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">16.4</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">32.7</phi></Ladder>
+        <Ladder id="4"><phi unit="deg">49.1</phi></Ladder>
+        <Ladder id="5"><phi unit="deg">65.5</phi></Ladder>
+        <Ladder id="6"><phi unit="deg">81.9</phi></Ladder>
+        <Ladder id="7"><phi unit="deg">98.2</phi></Ladder>
+        <Ladder id="8"><phi unit="deg">114.6</phi></Ladder>
+        <Ladder id="9"><phi unit="deg">131.0</phi></Ladder>
+        <Ladder id="10"><phi unit="deg">147.3</phi></Ladder>
+        <Ladder id="11"><phi unit="deg">163.7</phi></Ladder>
+      </Layer>
+      <Layer id="7">
+        <Ladder id="1"><phi unit="deg">0.0</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">13.8</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">27.7</phi></Ladder>
+        <Ladder id="4"><phi unit="deg">41.5</phi></Ladder>
+        <Ladder id="5"><phi unit="deg">55.4</phi></Ladder>
+        <Ladder id="6"><phi unit="deg">69.2</phi></Ladder>
+        <Ladder id="7"><phi unit="deg">83.1</phi></Ladder>
+        <Ladder id="8"><phi unit="deg">97.0</phi></Ladder>
+        <Ladder id="9"><phi unit="deg">110.8</phi></Ladder>
+        <Ladder id="10"><phi unit="deg">124.6</phi></Ladder>
+        <Ladder id="11"><phi unit="deg">138.5</phi></Ladder>
+        <Ladder id="12"><phi unit="deg">152.3</phi></Ladder>
+        <Ladder id="13"><phi unit="deg">166.2</phi></Ladder>
+      </Layer>
+      <Layer id="8">
+        <Ladder id="1"><phi unit="deg">0.0</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">10.0</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">20.0</phi></Ladder>
+        <Ladder id="4"><phi unit="deg">30.0</phi></Ladder>
+        <Ladder id="5"><phi unit="deg">40.0</phi></Ladder>
+        <Ladder id="6"><phi unit="deg">50.0</phi></Ladder>
+        <Ladder id="7"><phi unit="deg">60.0</phi></Ladder>
+        <Ladder id="8"><phi unit="deg">70.0</phi></Ladder>
+        <Ladder id="9"><phi unit="deg">80.0</phi></Ladder>
+        <Ladder id="10"><phi unit="deg">90.0</phi></Ladder>
+        <Ladder id="11"><phi unit="deg">100.0</phi></Ladder>
+        <Ladder id="12"><phi unit="deg">110.0</phi></Ladder>
+        <Ladder id="13"><phi unit="deg">120.0</phi></Ladder>
+        <Ladder id="14"><phi unit="deg">130.0</phi></Ladder>
+        <Ladder id="15"><phi unit="deg">140.0</phi></Ladder>
+        <Ladder id="16"><phi unit="deg">150.0</phi></Ladder>
+        <Ladder id="17"><phi unit="deg">160.0</phi></Ladder>
+        <Ladder id="18"><phi unit="deg">170.0</phi></Ladder>
+      </Layer>
+      <Layer id="9">
+        <Ladder id="1"><phi unit="deg">0.0</phi></Ladder>
+        <Ladder id="2"><phi unit="deg">8.0</phi></Ladder>
+        <Ladder id="3"><phi unit="deg">16.0</phi></Ladder>
+        <Ladder id="4"><phi unit="deg">24.0</phi></Ladder>
+        <Ladder id="5"><phi unit="deg">32.0</phi></Ladder>
+        <Ladder id="6"><phi unit="deg">40.0</phi></Ladder>
+        <Ladder id="7"><phi unit="deg">48.0</phi></Ladder>
+        <Ladder id="8"><phi unit="deg">56.0</phi></Ladder>
+        <Ladder id="9"><phi unit="deg">64.0</phi></Ladder>
+        <Ladder id="10"><phi unit="deg">72.0</phi></Ladder>
+        <Ladder id="11"><phi unit="deg">80.0</phi></Ladder>
+        <Ladder id="12"><phi unit="deg">88.0</phi></Ladder>
+        <Ladder id="13"><phi unit="deg">96.0</phi></Ladder>
+        <Ladder id="14"><phi unit="deg">104.0</phi></Ladder>
+        <Ladder id="15"><phi unit="deg">112.0</phi></Ladder>
+        <Ladder id="16"><phi unit="deg">120.0</phi></Ladder>
+        <Ladder id="17"><phi unit="deg">128.0</phi></Ladder>
+        <Ladder id="18"><phi unit="deg">136.0</phi></Ladder>
+        <Ladder id="19"><phi unit="deg">144.0</phi></Ladder>
+        <Ladder id="20"><phi unit="deg">152.0</phi></Ladder>
+        <Ladder id="21"><phi unit="deg">160.0</phi></Ladder>
+        <Ladder id="22"><phi unit="deg">168.0</phi></Ladder>
+        <Ladder id="23"><phi unit="deg">176.0</phi></Ladder>
+      </Layer>
+    </HalfShell>
+    <HalfShell name="Yang">
+      <!-- Place the support with an rotation of 180 degree around the z-axis
+           compared to form second half -->
+      <shellAngle unit="deg">180</shellAngle>
+      <!-- Define the ladders in each layer with increasing phi angle. The
+           ladder ids are unique per layer and thus are continued from the
+           first half shell -->
+      <Layer id="1">
+        <Ladder id="4"><phi unit="deg">180</phi></Ladder>
+        <Ladder id="5"><phi unit="deg">240</phi></Ladder>
+        <Ladder id="6"><phi unit="deg">300</phi></Ladder>
+      </Layer>
+      <Layer id="2">
+        <Ladder id="6"><phi unit="deg">180</phi></Ladder>
+        <Ladder id="7"><phi unit="deg">216</phi></Ladder>
+        <Ladder id="8"><phi unit="deg">252</phi></Ladder>
+        <Ladder id="9"><phi unit="deg">288</phi></Ladder>
+        <Ladder id="10"><phi unit="deg">324</phi></Ladder>
+      </Layer>
+      <Layer id="3">
+        <Ladder id="8"><phi unit="deg">205.6</phi></Ladder>
+        <Ladder id="9"><phi unit="deg">231.3</phi></Ladder>
+        <Ladder id="10"><phi unit="deg">257.0</phi></Ladder>
+        <Ladder id="11"><phi unit="deg">282.7</phi></Ladder>
+        <Ladder id="12"><phi unit="deg">308.4</phi></Ladder>
+        <Ladder id="13"><phi unit="deg">334.1</phi></Ladder>
+        <Ladder id="14"><phi unit="deg">359.8</phi></Ladder>
+      </Layer>
+      <Layer id="4">
+        <Ladder id="7"><phi unit="deg">180</phi></Ladder>
+        <Ladder id="8"><phi unit="deg">210</phi></Ladder>
+        <Ladder id="9"><phi unit="deg">240</phi></Ladder>
+        <Ladder id="10"><phi unit="deg">270</phi></Ladder>
+        <Ladder id="11"><phi unit="deg">300</phi></Ladder>
+        <Ladder id="12"><phi unit="deg">330</phi></Ladder>
+      </Layer>
+      <Layer id="5">
+        <Ladder id="10"><phi unit="deg">180</phi></Ladder>
+        <Ladder id="11"><phi unit="deg">200</phi></Ladder>
+        <Ladder id="12"><phi unit="deg">220</phi></Ladder>
+        <Ladder id="13"><phi unit="deg">240</phi></Ladder>
+        <Ladder id="14"><phi unit="deg">260</phi></Ladder>
+        <Ladder id="15"><phi unit="deg">280</phi></Ladder>
+        <Ladder id="16"><phi unit="deg">300</phi></Ladder>
+        <Ladder id="17"><phi unit="deg">320</phi></Ladder>
+        <Ladder id="18"><phi unit="deg">340</phi></Ladder>
+      </Layer>
+      <Layer id="6">
+        <Ladder id="12"><phi unit="deg">180.1</phi></Ladder>
+        <Ladder id="13"><phi unit="deg">196.4</phi></Ladder>
+        <Ladder id="14"><phi unit="deg">212.8</phi></Ladder>
+        <Ladder id="15"><phi unit="deg">229.2</phi></Ladder>
+        <Ladder id="16"><phi unit="deg">245.6</phi></Ladder>
+        <Ladder id="17"><phi unit="deg">261.9</phi></Ladder>
+        <Ladder id="18"><phi unit="deg">278.3</phi></Ladder>
+        <Ladder id="19"><phi unit="deg">294.7</phi></Ladder>
+        <Ladder id="20"><phi unit="deg">311.0</phi></Ladder>
+        <Ladder id="21"><phi unit="deg">327.4</phi></Ladder>
+        <Ladder id="22"><phi unit="deg">343.8</phi></Ladder>
+      </Layer>
+      <Layer id="7">
+        <Ladder id="14"><phi unit="deg">180.0</phi></Ladder>
+        <Ladder id="15"><phi unit="deg">193.9</phi></Ladder>
+        <Ladder id="16"><phi unit="deg">207.8</phi></Ladder>
+        <Ladder id="17"><phi unit="deg">221.6</phi></Ladder>
+        <Ladder id="18"><phi unit="deg">235.4</phi></Ladder>
+        <Ladder id="19"><phi unit="deg">249.3</phi></Ladder>
+        <Ladder id="20"><phi unit="deg">263.1</phi></Ladder>
+        <Ladder id="21"><phi unit="deg">277.0</phi></Ladder>
+        <Ladder id="22"><phi unit="deg">290.8</phi></Ladder>
+        <Ladder id="23"><phi unit="deg">304.7</phi></Ladder>
+        <Ladder id="24"><phi unit="deg">318.6</phi></Ladder>
+        <Ladder id="25"><phi unit="deg">332.4</phi></Ladder>
+        <Ladder id="26"><phi unit="deg">346.2</phi></Ladder>
+      </Layer> 
+      <Layer id="8">
+        <Ladder id="19"><phi unit="deg">180.0</phi></Ladder>
+        <Ladder id="20"><phi unit="deg">190.0</phi></Ladder>
+        <Ladder id="21"><phi unit="deg">200.0</phi></Ladder>
+        <Ladder id="22"><phi unit="deg">210.0</phi></Ladder>
+        <Ladder id="23"><phi unit="deg">220.0</phi></Ladder>
+        <Ladder id="24"><phi unit="deg">230.0</phi></Ladder>
+        <Ladder id="25"><phi unit="deg">240.0</phi></Ladder>
+        <Ladder id="26"><phi unit="deg">250.0</phi></Ladder>
+        <Ladder id="27"><phi unit="deg">260.0</phi></Ladder>
+        <Ladder id="28"><phi unit="deg">270.0</phi></Ladder>
+        <Ladder id="29"><phi unit="deg">280.0</phi></Ladder>
+        <Ladder id="30"><phi unit="deg">290.0</phi></Ladder>
+        <Ladder id="31"><phi unit="deg">300.0</phi></Ladder>
+        <Ladder id="32"><phi unit="deg">310.0</phi></Ladder>
+        <Ladder id="33"><phi unit="deg">320.0</phi></Ladder>
+        <Ladder id="34"><phi unit="deg">330.0</phi></Ladder>
+        <Ladder id="35"><phi unit="deg">340.0</phi></Ladder>
+        <Ladder id="36"><phi unit="deg">350.0</phi></Ladder>
+      </Layer> 
+      <Layer id="9">
+        <Ladder id="24"><phi unit="deg">184.0</phi></Ladder>
+        <Ladder id="25"><phi unit="deg">192.0</phi></Ladder>
+        <Ladder id="26"><phi unit="deg">200.0</phi></Ladder>
+        <Ladder id="27"><phi unit="deg">208.0</phi></Ladder>
+        <Ladder id="28"><phi unit="deg">216.0</phi></Ladder>
+        <Ladder id="29"><phi unit="deg">224.0</phi></Ladder>
+        <Ladder id="30"><phi unit="deg">232.0</phi></Ladder>
+        <Ladder id="31"><phi unit="deg">240.0</phi></Ladder>
+        <Ladder id="32"><phi unit="deg">248.0</phi></Ladder>
+        <Ladder id="33"><phi unit="deg">256.0</phi></Ladder>
+        <Ladder id="34"><phi unit="deg">264.0</phi></Ladder>
+        <Ladder id="35"><phi unit="deg">272.0</phi></Ladder>
+        <Ladder id="36"><phi unit="deg">280.0</phi></Ladder>
+        <Ladder id="37"><phi unit="deg">288.0</phi></Ladder>
+        <Ladder id="38"><phi unit="deg">296.0</phi></Ladder>
+        <Ladder id="39"><phi unit="deg">304.0</phi></Ladder>
+        <Ladder id="40"><phi unit="deg">312.0</phi></Ladder>
+        <Ladder id="41"><phi unit="deg">320.0</phi></Ladder>
+        <Ladder id="42"><phi unit="deg">328.0</phi></Ladder>
+        <Ladder id="43"><phi unit="deg">336.0</phi></Ladder>
+        <Ladder id="44"><phi unit="deg">344.0</phi></Ladder>
+        <Ladder id="45"><phi unit="deg">352.0</phi></Ladder>
+      </Layer> 
+    </HalfShell>
+  </Content>
+</DetectorComponent>

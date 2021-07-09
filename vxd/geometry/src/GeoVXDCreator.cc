@@ -471,8 +471,8 @@ namespace Belle2 {
       string path = (boost::format("Align[@component='%1%']/") % ladder).str();
       GearDir params(GearDir(content, "Alignment/"), path);
       if (!params) {
-        B2WARNING("Could not find alignment parameters for ladder " << ladder <<
-                  " in xml file. We are using defaults. Please add alignment parameters if this is not intended.");
+        B2DEBUG(100, "Could not find alignment parameters for ladder " << ladder <<
+                " in xml file. We are using defaults. Please add alignment parameters if this is not intended.");
         vxdGeometryPar.getAlignmentMap()[ladder] = VXDAlignmentPar(0,
                                                                    0,
                                                                    0,
@@ -510,8 +510,8 @@ namespace Belle2 {
         string pathSensor = (boost::format("Align[@component='%1%']/") % sensorID).str();
         GearDir paramsSensor(GearDir(content, "Alignment/"), pathSensor);
         if (!paramsSensor) {
-          B2WARNING("Could not find alignment parameters for sensorID " << sensorID <<
-                    " in xml file. We are using defaults. Please add alignment parameters if this is not intended.");
+          B2DEBUG(100, "Could not find alignment parameters for sensorID " << sensorID <<
+                  " in xml file. We are using defaults. Please add alignment parameters if this is not intended.");
           vxdGeometryPar.getAlignmentMap()[sensorID] = VXDAlignmentPar(0,
                                                        0,
                                                        0,

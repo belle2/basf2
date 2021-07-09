@@ -163,8 +163,7 @@
     </Component>
   </Sensor>
 
-  <!-- The sensor in layer 2 is almost the same as for layer one except for the
-       dimensions -->
+  <!-- The sensor in Layer2 is almost the same as for Layer1 except for the  dimensions -->
   <Sensor type="Layer2">
     <Material>Si</Material>
     <Color>#006699</Color>

@@ -135,11 +135,32 @@
   </DetectorComponent>
 
   <!-- Vertex detector upgrade specific subdetectors -->
+  <DetectorComponent name="VTX-CMOS-5layer" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS5.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="VTX-CMOS-5layer-plus1inCDC" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS5-plus1inCDC.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="VTX-CMOS-5layer-plus2inCDC" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS5-plus2inCDC.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="VTX-CMOS-6layer" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS6.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="VTX-CMOS-6layer-plus1inCDC" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS6-plus1inCDC.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="VTX-CMOS-6layer-plus2inCDC" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS6-plus2inCDC.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
   <DetectorComponent name="VTX-CMOS-7layer" isDefault="false">
     <xi:include href="../vtx/VTX-CMOS7.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
-  <DetectorComponent name="VTX-CMOS-5layer" isDefault="false">
-    <xi:include href="../vtx/VTX-CMOS5.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  <DetectorComponent name="VTX-CMOS-7layer-plus1inCDC" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS7-plus1inCDC.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="VTX-CMOS-7layer-plus2inCDC" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS7-plus2inCDC.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
   <DetectorComponent name="VTX-CMOS-5layer-Discs" isDefault="false">
     <xi:include href="../vtx/VTX-CMOS5-Discs.xml" xpointer="xpointer(/DetectorComponent/*)" />

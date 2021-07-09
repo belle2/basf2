@@ -86,7 +86,7 @@ assert feistate.stage == 1  # corresponds to stage 0, since increased by 1 after
 print(path)
 b2.process(path, max_event=10000)
 
-# Check avaliability of training input and cache file for stage 0
+# Check availability of training input and cache file for stage 0
 assert len(glob.glob('training_input.root')) == 1
 f = ROOT.TFile.Open("training_input.root", "read")
 assert sum(['gamma' in key.GetName()[:5] for key in f.GetListOfKeys()]) == 2
@@ -122,7 +122,7 @@ assert feistate.stage == 2  # corresponds to stage 1, since increased by 1 after
 print(path)
 b2.process(path, max_event=10000)
 
-# Check avaliability of training input and cache file for stage 1
+# Check availability of training input and cache file for stage 1
 assert len(glob.glob('training_input.root')) == 1
 f = ROOT.TFile.Open("training_input.root", "read")
 assert sum(['pi0' in key.GetName()[:4] for key in f.GetListOfKeys()]) == 1
@@ -152,7 +152,7 @@ assert feistate.stage == 4  # corresponds to stage 3, since increased by 1 after
 print(path)
 b2.process(path, max_event=10000)
 
-# Check avaliability of training input and cache file for stage 3
+# Check availability of training input and cache file for stage 3
 assert len(glob.glob('training_input.root')) == 1
 f = ROOT.TFile.Open("training_input.root", "read")
 assert sum(['D' in key.GetName()[:2] for key in f.GetListOfKeys()]) == 5
@@ -189,14 +189,14 @@ assert feistate.stage == 7  # corresponds to stage 6, since increased by 1 after
 print(path)
 b2.process(path, max_event=10000)
 
-# Check avaliability of monitoring files constructed at stage 6 for validation
+# Check availability of monitoring files constructed at stage 6 for validation
 assert len(glob.glob('Monitor_FSPLoader.root')) == 1
 
 assert len(glob.glob('Monitor_ModuleStatistics.root')) == 1
 
 assert len(glob.glob('Monitor_Final.root')) == 1
 f = ROOT.TFile.Open("Monitor_Final.root", "read")
-assert len([key.GetName() for key in f.GetListOfKeys()]) == 7
+assert f.GetListOfKeys().GetEntries() == 7
 f.Close()
 
 prereconstruction_files = [
@@ -209,7 +209,7 @@ prereconstruction_files = [
 for fname in prereconstruction_files:
     assert len(glob.glob(fname)) == 1
     f = ROOT.TFile.Open(fname, "read")
-    assert len([key.GetName() for key in f.GetListOfKeys()]) == 11
+    assert f.GetListOfKeys().GetEntries() == 11
     f.Close()
 
 postreconstruction_files = [
@@ -221,7 +221,7 @@ postreconstruction_files = [
 for fname in postreconstruction_files:
     assert len(glob.glob(fname)) == 1
     f = ROOT.TFile.Open(fname, "read")
-    assert len([key.GetName() for key in f.GetListOfKeys()]) == 7
+    assert f.GetListOfKeys().GetEntries() == 7
     f.Close()
 
 shutil.rmtree(tempdir)

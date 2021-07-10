@@ -46,4 +46,5 @@
 #pragma link C++ class std::__pair_base<int,std::unordered_map<int,unordered_map<Belle2::ECLChargedPidPDFs::InputVar,TF1*>>>+; // checksum=0xe95f49d8, version=-1
 #pragma link C++ class std::__pair_base<int,std::unordered_map<Belle2::ECLChargedPidPDFs::InputVar,TF1*>>+; // checksum=0x7c760302, version=-1
 #pragma link C++ class std::__pair_base<Belle2::ECLChargedPidPDFs::InputVar,TF1*>+; // checksum=0x1b51fbdc, version=-1
+
 #endif

@@ -33,7 +33,7 @@
 #   And then call
 #   basf2 run_eclBhabhaT_collector.py
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 import glob
 import sys
@@ -101,7 +101,7 @@ CDC_T0_BIAS_CORRECTION_OFFSET = 0   # default is 0ns
 components = ['CDC', 'ECL']
 
 # == Create path
-main = create_path()
+main = b2.create_path()
 
 add_unpackers = False
 
@@ -137,7 +137,7 @@ ECLBhabhaTCollectorInfo = main.add_module('ECLBhabhaTCollector', timeAbsMax=TIME
                                           saveTree=SAVE_TREE,
                                           hadronEventT0_TO_bhabhaEventT0_correction=CDC_T0_BIAS_CORRECTION_OFFSET)
 
-ECLBhabhaTCollectorInfo.set_log_level(LogLevel.INFO)  # OR: LogLevel.DEBUG
+ECLBhabhaTCollectorInfo.set_log_level(b2.LogLevel.INFO)  # OR: b2.LogLevel.DEBUG
 ECLBhabhaTCollectorInfo.set_debug_level(36)
 
 
@@ -145,8 +145,8 @@ ECLBhabhaTCollectorInfo.set_debug_level(36)
 main.add_module('Progress')
 
 # set_log_level(LogLevel.DEBUG)
-set_log_level(LogLevel.INFO)
-set_debug_level(100)
+b2.set_log_level(b2.LogLevel.INFO)
+b2.set_debug_level(100)
 
 # == Configure database
 # reset_database()
@@ -166,11 +166,10 @@ b2conditions.prepend_globaltag("online_proc11")
 b2conditions.prepend_globaltag("data_reprocessing_proc11")
 b2conditions.prepend_globaltag("Reco_master_patch_rel5")
 
-
 # == Process events
 # process(main, max_event=350000)  # reasonable stats for one crate
 # process(main, max_event=600000)  # reasonable stats for crystal calibs for proc10
 # process(main, max_event=3000)    # reasonable stats and speed for a quick test
-process(main)                      # process all events
+b2.process(main)                   # process all events
 
-print(statistics)
+print(b2.statistics)

@@ -2,7 +2,7 @@
 
 """ECL timing calibration that performs the crate calibrations, one for each physics run."""
 
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
 from reconstruction import prepare_cdst_analysis
 
 ##############################
@@ -13,6 +13,7 @@ from reconstruction import prepare_cdst_analysis
 # Will be used to construct the calibration in the automated system, as well as set up the submission web forms.
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
+#: Tells the automated system some details of this script.
 #     Default is to read bhabha skim files.
 settings = CalibrationSettings(name="ECL crate time calibrations",
                                expert_username="ehill",

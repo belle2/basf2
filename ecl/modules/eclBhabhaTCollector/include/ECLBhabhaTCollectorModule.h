@@ -115,11 +115,11 @@ namespace Belle2 {
 
     /*** tree branches ***/
     /*** See inDefineHisto method for branches description ***/
-    int m_tree_evtNum;    /**< Event number for debug TTree output*/
-    int m_tree_cid;     /**< ECL Cell ID (1..8736) for debug TTree output */
-    int m_tree_amp;     /**< Fitting amplitude from ECL for debug TTree output */
-    double m_tree_en;     /**< Energy of crystal with maximum energy within ECL cluster, GeV for debug TTree output */
-    double m_tree_E1Etot;     /**< Energy of crystal with maximum energy within
+    int m_tree_evtNum = intNaN;    /**< Event number for debug TTree output*/
+    int m_tree_cid = intNaN;     /**< ECL Cell ID (1..8736) for debug TTree output */
+    int m_tree_amp = intNaN;     /**< Fitting amplitude from ECL for debug TTree output */
+    double m_tree_en = realNaN;     /**< Energy of crystal with maximum energy within ECL cluster, GeV for debug TTree output */
+    double m_tree_E1Etot = realNaN;     /**< Energy of crystal with maximum energy within
                                     ECL cluster divided by total cluster energy,
                                     unitless for debug TTree output */
     double m_tree_E1E2 = realNaN;     /**< Energy of crystal with maximum energy within ECL

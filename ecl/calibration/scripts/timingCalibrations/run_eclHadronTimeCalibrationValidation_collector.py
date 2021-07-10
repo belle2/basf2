@@ -1,28 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#
-# -----------------------------------------------------------
-# BASF2 (Belle Analysis Framework 2)
-# Copyright(C) 2020 Belle II Collaboration
-#
-# Author: The Belle II Collaboration
-# Contributors: Ewan Hill
-#
-# This software is provided "as is" without any warranty.
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 #
 # This script executes the hadron timing calibration collector,
 # which reads in the hadron events to perform the hadron
 # validation, where the final validation fits is performed
 # by the algorithm.
 # This script is run directly with basf2.
-# -----------------------------------------------------------
-
-# --------------------------------------------------------------------------
-# BASF2 script for the first (out of two) step of time shift calibration.
-# using bhabha events.
-# --------------------------------------------------------------------------
 #
-# There are two ways you can use it:
+# There are two ways you can use this script:
 # 1. Provide parameters from command line:
 #   basf2 run_eclHadronTimeCalibrationValidation_collector.py -i "/path/to/input/files/*.root" -o collector_output.root
 #
@@ -31,6 +25,7 @@
 #   (Multiple files can be easily added with glob.glob("/path/to/your/files/*.root"))
 #   And then call
 #   basf2 run_eclHadronTimeCalibrationValidation_collector.py
+
 
 from basf2 import *
 from ROOT import Belle2

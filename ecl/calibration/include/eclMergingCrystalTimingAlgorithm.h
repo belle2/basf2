@@ -1,6 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2021 - Belle II Collaboration                             *
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  *                                                                        *
  * Take the previously created DBObjects for ECL crystal timing from      *
  * bhabha events for crystals inside the CDC acceptance and radiative     *
@@ -8,12 +11,6 @@
  * acceptance and merge them.  Does not not explicitly check the          *
  * regions where the crystals are, it just prioritises certain            *
  * payloads over others.                                                  *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
- *   Ewan Hill   <ehill@mail.ubc.ca>                                      *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once

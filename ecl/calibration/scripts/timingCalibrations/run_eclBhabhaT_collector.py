@@ -1,29 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#
-# -----------------------------------------------------------
-# BASF2 (Belle Analysis Framework 2)
-# Copyright(C) 2021 Belle II Collaboration
-#
-# Author: The Belle II Collaboration
-# Contributors: Ewan Hill       (ehill@mail.ubc.ca)
-#               Mikhail Remnev
-#
-# This software is provided "as is" without any warranty.
-#
-# This script executes the bhabha timing calibration collector,
-# which reads in the bhabha events to perform the crystal
-# time calibration and the crate time calibration, where
-# the final calibration step is performed by the algorithm.
-# This script is run directly with basf2.
-# -----------------------------------------------------------
 
-# --------------------------------------------------------------------------
-# BASF2 script for the first (out of two) step of time shift calibration.
-# using bhabha events.
-# --------------------------------------------------------------------------
-#
-# There are two ways you can use it:
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+#                                                                        #
+# This script executes the bhabha timing calibration collector,          #
+# which reads in the bhabha events to perform the crystal                #
+# time calibration and the crate time calibration, where                 #
+# the final calibration step is performed by the algorithm.              #
+# This script is run directly with basf2.                                #
+##########################################################################
+
+
+# There are two ways you can use this script:
 # 1. Provide parameters from command line:
 #   basf2 run_eclBhabhaT_collector.py -i "/path/to/input/files/*.root" -o collector_output.root
 #

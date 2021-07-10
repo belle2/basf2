@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# -----------------------------------------------------------
-# BASF2 (Belle Analysis Framework 2)
-# Copyright(C) 2021 Belle II Collaboration
-#
-# Author: The Belle II Collaboration
-# Contributors: Ewan Hill
-#
-# This software is provided "as is" without any warranty.
-#
-# This script executes the bhabha timing calibration algorithm,
-# which is used for both the crystal time calibration and the
-# crate time calibration.  It has to run on the results of
-# the collector code.
-# This script is run directly with basf2.
-#
-# This script gives an example of how to create a new payload of
-# reference crystals:  refCrysPerCrate
-# -----------------------------------------------------------
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+#                                                                        #
+# This script executes the bhabha timing calibration algorithm,          #
+# which is used for both the crystal time calibration and the            #
+# crate time calibration.  It has to run on the results of               #
+# the collector code.                                                    #
+# This script is run directly with basf2.                                #
+#                                                                        #
+# This script gives an example of how to create a new payload of         #
+# reference crystals:  refCrysPerCrate                                   #
+# -----------------------------------------------------------            #
+# Usage: basf2 run_eclBhabhaT_algorithm.py [input_file]                  #
+# Glob expression can be passed as an input file.                        #
+# Example: basf2 run_eclBhabhaT_algorithm.py "exp_0003_run_*.root"       #
+#                                                                        #
+##########################################################################
 
-# Usage: basf2 run_eclBhabhaT_algorithm.py [input_file]
-# Glob expression can be passed as an input file.
-# Example: basf2 run_eclBhabhaT_algorithm.py "exp_0003_run_*.root"
 
 import os
 import sys

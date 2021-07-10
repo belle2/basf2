@@ -1,18 +1,18 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2020 - Belle II Collaboration                             *
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
  *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
+/**************************************************************************
+ * Description:                                                           *
  * A code to collect just the calibration constants to be then plotted    *
  * by the algorithm to see how much they jump from run to run.  This      *
  * collector does not need to look at individual events as the            *
  * calibration constants are constant over all the events in a single     *
  * file (run or bucket of data).                                          *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
- *    Ewan Hill                                                           *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once

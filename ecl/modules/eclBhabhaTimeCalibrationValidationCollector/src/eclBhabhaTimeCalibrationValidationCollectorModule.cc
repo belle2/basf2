@@ -1,11 +1,14 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2020 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
- *    Ewan Hill                                                           *
  *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
+/**************************************************************************
+ * Description:                                                           *
+ * Tool to perform validations using bhabha events.                       *
  * The selections here are very similar to the selections used to         *
  * perform the bhabha based timing calibrations; however,                 *
  * there are some small differences so that the cuts are slightly         *
@@ -18,8 +21,6 @@
  * original calibration code.  Hopefully the selection is looser          *
  * so that fewer events can be used to validate than are required         *
  * to perform the calibration itself.                                     *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 

@@ -1,7 +1,12 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2020 - Belle II Collaboration                             *
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
  *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
+/**************************************************************************
  * Title:  ECLReferenceCrystalPerCrateCalib                               *
  *                                                                        *
  * General database object to keep track of the reference crystals,       *
@@ -12,11 +17,6 @@
  * time calibration constants.                                            *
  *                                                                        *
  * 1 <= cell id <= 8736                                                   *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Ewan Hill    (ehill@mail.ubc.ca)                         *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once

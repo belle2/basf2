@@ -2,6 +2,7 @@
 import basf2 as b2
 import modularAnalysis as ma
 import stdPi0s
+from variables import variables as vm
 
 # Perform analysis.
 main = b2.create_path()
@@ -49,9 +50,11 @@ main.add_module(
     identifier="MVAFastBDT.root",  # name of the weightfile used
 )
 
+vm.addAlias("ContProb", "extraInfo(ContinuumProbability)")
+
 ma.variablesToNtuple(
     decayString="B0",
-    variables=["ContinuumProbability", "isContinuumEvent"],
+    variables=["ContProb", "isContinuumEvent"],
     filename="ContinuumSuppression_applied.root",
     treename="tree",
     path=main,

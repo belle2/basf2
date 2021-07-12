@@ -8,7 +8,7 @@ Continuum Suppression (CS)
 
     **Teaching**: 1 hour
 
-    **Exercises**: 1,5 hours
+    **Exercises**: 1.5 hours
 
     **Prerequisites**:
 
@@ -68,7 +68,7 @@ detector.
     Which of these two pictures better represents the distribution (shape) of particles you would expect in a BB event?
     Which represents a continuum event?
 
-    .. figure:: figs/continuum_without_labels.png
+    .. figure:: cs/continuum_without_labels.png
         :width: 40em
         :align: center
 
@@ -84,7 +84,7 @@ detector.
     The continuum particles are strongly collimated due to the large available momentum for the decay to light hadrons.
     In contrast, the particles from the BB event are uniformly distributed.
 
-    .. figure:: figs/continuum_with_labels.png
+    .. figure:: cs/continuum_with_labels.png
         :width: 40em
 
         (Credit: Markus Röhrken)
@@ -290,7 +290,7 @@ Now that we have created our ntuple, we can look at the data and see how well th
 
     Your plot should look similar to this:
 
-    .. figure:: figs/R2_uubar.png
+    .. figure:: cs/R2_uubar.png
         :width: 40em
         :align: center
 
@@ -309,7 +309,7 @@ Now that we have created our ntuple, we can look at the data and see how well th
 
     The separation becomes worse as the charmed hadrons are heavier and have less momentum:
 
-    .. figure:: figs/R2_ccbar.png
+    .. figure:: cs/R2_ccbar.png
         :width: 40em
         :align: center
 
@@ -319,7 +319,7 @@ Fortunately, there is a solution to this: Boosted Decision Trees!
 
 
 Continuum suppression using Boosted Decision Trees
-__________________________________________________
+--------------------------------------------------
 
 Boosted Decision Trees (BDT) are a specific type of a machine learning model
 used for classification tasks. Its goal is to predict the value of a target
@@ -350,8 +350,7 @@ non-continuum events. The target variable is the "continuum probability" - the
 probability of an event being a continuum event. The input variables can be in
 principle any varible that distinguishes between continuum and non-continuum
 events. The recommended variables and the most used are the ones introduced in
-the previous lesson as well as others from the
-:ref:`analysis/doc/ContinuumSuppression:Continuum Suppression` variable group in
+the previous lesson as well as others from the *Continuum Suppression* variable group in
 the :ref:`analysis/doc/index-01-analysis:Variables`. As BDT is a supervised
 machine learning method, there are three steps needed to put it to use:
 
@@ -386,6 +385,7 @@ continuum events, simply add a cut on the continuum probability at the end.
 
     .. literalinclude:: steering_files/091_cs.py
                :language: python
+               :linenos:
 
 
 .. admonition:: Exercise
@@ -411,6 +411,7 @@ continuum events, simply add a cut on the continuum probability at the end.
 
     .. literalinclude:: steering_files/092_cs.py
                 :language: python
+                :linenos:
 
 To use the trained weights one should put the MVA-expert module after building
 the continuum suppression in the main steering file. In our case this looks
@@ -423,7 +424,7 @@ like this:
          listNames=["B0"],
          extraInfoName="ContinuumProbability",
          identifier="MVAFastBDT.root"
-         )
+    )
 
 This would create the variable ``extraInfo(ContinuumProbability)``, which
 should be added as an output variable to the Ntuples. The actual suppression
@@ -436,7 +437,27 @@ in the very same way that we previously did a cut on R2 in previous exercise.
     Create a steering file that runs over the data and outputs the continuum
     probability into the Ntuples. Use the data files and reconstruction from the
     previous exercises.
-    
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    The steering file would be same as in the previous exercises, just with the path.add_module("MVAExpert", ...)
+    added at the end. Don't forget to replace the ``path`` to ``main`` or 
+    whatever is the name of your basf2 path.
+
+    We recommend to add aliases to your variables. For example ``ContProb`` for 
+    ``extraInfo(ContinuumProbability)``.
+
+.. admonition:: Solution 
+    :class: toggle solution
+
+    .. literalinclude:: steering_files/093_cs.py
+        :language: python
+        :linenos:
+
+.. admonition:: Exercise
+    :class: exercise stacked    
+
     Plot the distribution of the ``extraInfo(ContinuumProbability)``
     for continuum and non-continuum events, as defined by the `isContinuumEvent` 
     (similarly to what was done before with :b2:var:`R2`).
@@ -444,65 +465,25 @@ in the very same way that we previously did a cut on R2 in previous exercise.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    The steering file would be same as in the previous exercises, just with the path.add_module("MVAExpert", ...)
-    added at the end. Don't forget to replace the ``path`` to ``main`` or 
-    whatever is the name of your basf2 path
-
-.. admonition:: Hint
-    :class: toggle xhint stacked
-
     The plotting script would be the same, as for R2 in the previous exercises,
-    but with the `R2` being replaced with continuum probability. Be aware, that
-    upon writing down into the Ntuples "(" and ")" get converted into "__bo" and 
-    "__bc" respectively, so the actual name for the continuum probability variable
-    would be ``extraInfo__boContinuumProbability__bc`` and **NOT**
-    ``extraInfo(ContinuumProbability)``
+    but with the `R2` being replaced with continuum probability. 
 
     You can always check the content of the dataframe into which you import data
     from a root file by simply writing its name in a new code block of a jupyter notebook
-    or by running this code snippet:
-
-    .. code-block:: python
-
-        import pandas as pd
-        for col in <yourdataframename>.columns:
-        print(col)
+    or by running ``print(<yourdataframename>.columns)``
 
 .. admonition:: Solution 
     :class: toggle solution
-
-    The steering file:
-
-    .. literalinclude:: steering_files/093_cs.py
+        
+    .. literalinclude:: cs/plotting.py
         :language: python
-    
-    The plotting code:
+        :linenos:
 
-    .. code-block:: python
-
-        # Include this only if running in a Jupyter notebook
-        %matplotlib inline
-
-        import matplotlib.pyplot as plt
-        from root_pandas import read_root
-
-        df = read_root('ContinuumSuppression_applied.root')
-
-        fig, ax = plt.subplots()
-
-        signal_df = df.query('(isContinuumEvent == 0.0)')
-        continuum_df = df.query('(isContinuumEvent == 1.0)')
-
-        n, bins, patches = ax.hist(signal_df['extraInfo__boContinuumProbability__bc'], bins=30, range=(0, 1), label='Not Continuum', histtype='step')
-        n, bins, patches = ax.hist(continuum_df['extraInfo__boContinuumProbability__bc'], bins=30, range=(0, 1), label='Continuum', histtype='step')
-        ax.set_xlabel('ContinuumProbability')
-        ax.set_ylabel('Total number of candidates')
-        ax.legend()
-        fig.savefig('ContinuumProbability.pdf')
+        
     
     The resulting plot should look similar to this one:
 
-    .. figure:: figs/ContinuumProbability_uubar.png
+    .. figure:: cs/ContinuumProbability_uubar.png
         :width: 40em
         :align: center
 
@@ -518,7 +499,11 @@ data to be roughly the same. Once this is achieved, one would then use the train
 weightfile further on in the analysis to apply the continuum suppression.
 
 There are exceptions, when a loose R2 cut is used (e.g. in this `Belle II paper <https://arxiv.org/abs/2008.08819>`_ ).
-This might be done for practical reasons such as dealing with a low amount of data. 
+This might be done for practical reasons such as dealing with a low amount of data.
+Also with a BDT (i.e. with more selection variables) you increase the dependence on your
+MC modeling, for which you would have to give an uncertainty and possibly make corrections.
+If a cut on R2 separates continuum good enough, then you only have to make sure there is good agreement between
+data and MC, but if you use 30 variables in a BDT you will have to check all 30 at some point.
 
 .. include:: ../lesson_footer.rstinclude
 

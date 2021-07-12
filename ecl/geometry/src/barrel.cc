@@ -75,22 +75,22 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
   G4Transform3D gT = (fp == bp.end()) ? G4Translate3D(0, 0, 0) : get_transform(*fp);
   if (fp != bp.end()) bp.erase(fp); // now not needed
 
-  const bool b_crystals = 1;
-  const bool b_forward_support_legs = 1;
-  const bool b_backward_support_legs = 1;
-  const bool b_forward_support_ring = 1;
-  const bool b_backward_support_ring = 1;
-  const bool b_forward_support_wall = 1;
-  const bool b_backward_support_wall = 1;
-  const bool b_crystal_support = 1;
-  const bool b_preamplifier = 1;
-  const bool b_septum_walls = 1;
-  const bool b_inner_support_wall = 1;
-  const bool b_support_ribs = 1;
-  const bool b_outer_plates = 1;
-  const bool b_forward_part5 = 1;
-  const bool b_crystal_holder = 1;
-  const bool b_pipe = 1;
+  const bool b_crystals = true;
+  const bool b_forward_support_legs = true;
+  const bool b_backward_support_legs = true;
+  const bool b_forward_support_ring = true;
+  const bool b_backward_support_ring = true;
+  const bool b_forward_support_wall = true;
+  const bool b_backward_support_wall = true;
+  const bool b_crystal_support = true;
+  const bool b_preamplifier = true;
+  const bool b_septum_walls = true;
+  const bool b_inner_support_wall = true;
+  const bool b_support_ribs = true;
+  const bool b_outer_plates = true;
+  const bool b_forward_part5 = true;
+  const bool b_crystal_holder = true;
+  const bool b_pipe = true;
 
   const double phi0 = M_PI / 2 - M_PI / 72, dphi = 2 * M_PI; //2*2*M_PI/72;
 

@@ -265,28 +265,9 @@ Now that we have created our ntuple, we can look at the data and see how well th
 .. admonition:: Solution
     :class: toggle solution
 
-    .. code-block:: python
-
-        # Include this only if running in a Jupyter notebook
-        %matplotlib inline
-
-        import matplotlib.pyplot as plt
-        from root_pandas import read_root
-
-        df = read_root('ContinuumSuppression.root')
-
-        fig, ax = plt.subplots()
-
-        signal_df = df.query('(isContinuumEvent == 0.0)')
-        continuum_df = df.query('(isContinuumEvent == 1.0)')
-
-        n, bins, patches = ax.hist(signal_df['R2'], bins=30, range=(0, 1), label='Not Continuum', histtype='step')
-        n, bins, patches = ax.hist(continuum_df['R2'], bins=30, range=(0, 1), label='Continuum', histtype='step')
-        ax.set_xlabel('R2')
-        ax.set_ylabel('Total number of candidates')
-        ax.legend()
-        fig.savefig('R2.pdf')
-
+    .. literalinclude:: cs/plotting_R2.py
+        :language: python
+        :linenos:
 
     Your plot should look similar to this:
 

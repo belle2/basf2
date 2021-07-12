@@ -77,9 +77,12 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
 
   const double th0 = 13.12, th1 = 32.98;
   const double ZT = 437, ZI = 434, RI = 431, RIp = 532.2, RC = 1200.4, RT = 1415;
+  const double thinnerPart_translation = 1.95; // translation of the thin inner ring of the support ring
+
   // cppcheck-suppress knownConditionTrueFalse
   if (b_inner_support_ring) {
-    zr_t vc1[] = {{ZI - 487, 410}, {ZT - (RIp - 410 - 20 / cosd(th0)) / tand(th0), 410}, {ZT, RIp - 20 / cosd(th0)}, {ZT, RIp}, {3., RI}, {3., 418}, {ZI - 487, 418}};
+    // This object has a (newly) translated part to eliminate overlaps with ARICH - 2021-07.
+    zr_t vc1[] = {{ZI - 487, 410 - thinnerPart_translation}, {ZT - (RIp - 410 - 20 / cosd(th0)) / tand(th0), 410 - thinnerPart_translation}, {ZT - (RIp - 410 - 20 / cosd(th0)) / tand(th0), 410}, {ZT, RIp - 20 / cosd(th0)}, {ZT, RIp}, {3., RI}, {3., 418 - thinnerPart_translation}, {ZI - 487, 418 - thinnerPart_translation}};
     std::vector<zr_t> contour1(vc1, vc1 + sizeof(vc1) / sizeof(zr_t));
     G4VSolid* part1solid = new BelleLathe("fwd_part1solid", phi0, dphi, contour1);
     G4LogicalVolume* part1logical = new G4LogicalVolume(part1solid, Materials::get("SUS304"), "part1logical", 0, 0, 0);

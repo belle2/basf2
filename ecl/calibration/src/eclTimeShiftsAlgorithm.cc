@@ -169,7 +169,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
 
       if (m_crystalID == m_refCrystalID) {
         B2INFO("m_exp_perCrystal, m_run_perCrystal, cell ID (0..8735), m_crateID, m_crateTimeConst = " << m_exp_perCrystal << ", " <<
-               m_run_perCrystal << ", " << tree_crys_j << ", " << m_crateID << ", " << m_crateTimeConst << " ns") ;
+               m_run_perCrystal << ", " << tree_crys_j << ", " << m_crateID << ", " << m_crateTimeConst << " ticks") ;
         crystalCrate_time_ns_tree[crateID_temp - 1] = (m_crystalTimeConst + m_crateTimeConst) * TICKS_TO_NS;
 
         crystalCrate_time_unc_ns_tree[crateID_temp - 1] = TICKS_TO_NS * sqrt(
@@ -543,6 +543,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
   B2INFO("Debugging histograms written to " << fname);
 
   for (int i = 0; i < m_numCrates; i++) {
+    B2INFO("Starting to make crate time jump plots for crate " << i + 1);
     TGraphErrors* g_tcrate_vs_runNum ;
     TGraphErrors* g_crateCrystalTime_vs_runNum ;
     TCanvas* c1 = new TCanvas("c1", "");
@@ -552,6 +553,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     Double_t* single_crate_time_unc = &allCrates_time_unc[i][0] ;
     Double_t* single_crate_crystalCrate_times = &allCrates_crystalCrate_times[i][0] ;
     Double_t* single_crate_crystalCrate_times_unc = &allCrates_crystalCrate_times_unc[i][0] ;
+    B2INFO("Done setting up the arrays for the crate " << i + 1);
 
     ostringstream ss;
     ss << setw(2) << setfill('0') << i + 1 ;
@@ -595,6 +597,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     g_tcrate_vs_runNum->Write() ;
     c1->SaveAs((tgraph_name_short + string(".pdf")).c_str()) ;
 
+    B2INFO("Saved pdf: " << tgraph_name_short << ".pdf");
 
 
     // ----- crystal + crate time constants + offset vs run number ------
@@ -630,6 +633,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     g_crateCrystalTime_vs_runNum->Write() ;
     c1->SaveAs((tgraph_name_short + string(".pdf")).c_str()) ;
 
+    B2INFO("Saved pdf: " << tgraph_name_short << ".pdf");
 
     // ----- crystal + crate time constants + offset vs run counter------
     // This will remove gaps and ignore the actual run number
@@ -711,6 +715,9 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
 
       g_crateCrystalTime_vs_runCounter->Write() ;
       c1->SaveAs((tgraph_name_short + string(".pdf")).c_str()) ;
+      B2INFO("Saved pdf: " << tgraph_name_short << ".pdf");
+
+      B2INFO("Finished making crate time jump plots for crate " << i + 1);
     } else {
       B2INFO("Crate " << i + 1 << " has no entries that pass all the cuts so no crystalCrateTimeVSrunCounter_crate plot will be made.");
     }

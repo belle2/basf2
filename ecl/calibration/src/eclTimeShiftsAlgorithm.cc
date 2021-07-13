@@ -400,7 +400,6 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
 
       //------------------------------------------------------------------------
       /** Set up ECL channel mapper and determine the payload IoV and Revision */
-
       shared_ptr< ECL::ECLChannelMapper > crystalMapper(new ECL::ECLChannelMapper()) ;
       crystalMapper->initFromDB();
 
@@ -544,9 +543,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
 
   for (int i = 0; i < m_numCrates; i++) {
     B2INFO("Starting to make crate time jump plots for crate " << i + 1);
-    TGraphErrors* g_tcrate_vs_runNum ;
-    TGraphErrors* g_crateCrystalTime_vs_runNum ;
-    TCanvas* c1 = new TCanvas("c1", "");
+    shared_ptr< TCanvas > cSmart(new TCanvas);
 
     Double_t* single_crate_crate_times = &allCrates_crate_times[i][0] ;
     Double_t* single_crate_run_nums = &allCrates_run_nums[i][0] ;
@@ -560,8 +557,9 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     string paddedCrateID(ss.str());
 
     // ----- crate time constants vs run number ------
-    g_tcrate_vs_runNum = new TGraphErrors(allCrates_crate_times[i].size(), single_crate_run_nums,
-                                          single_crate_crate_times, NULL, single_crate_time_unc) ;   // NULL for run number errors = 0 for all
+    shared_ptr< TGraphErrors > g_tcrate_vs_runNum(new TGraphErrors(allCrates_crate_times[i].size(), single_crate_run_nums,
+                                                  single_crate_crate_times, NULL, single_crate_time_unc)) ;
+    // NULL for run number errors = 0 for all
 
     string tgraph_title = string("e") + to_string(minExpNum) + string("r") + to_string(minRunNum) +
                           string("-e") + to_string(maxExpNum) + string("r") + to_string(maxRunNum) ;
@@ -586,7 +584,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     g_tcrate_vs_runNum->SetMarkerSize(0.8) ;
     g_tcrate_vs_runNum->Draw("AP") ;
 
-    TLatex* Leg1 = new TLatex();
+    shared_ptr< TLatex > Leg1(new TLatex);
     Leg1->SetNDC();
     Leg1->SetTextAlign(11);
     Leg1->SetTextFont(42);
@@ -595,16 +593,15 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     Leg1->AppendPad();
 
     g_tcrate_vs_runNum->Write() ;
-    c1->SaveAs((tgraph_name_short + string(".pdf")).c_str()) ;
+    cSmart->SaveAs((tgraph_name_short + string(".pdf")).c_str()) ;
 
     B2INFO("Saved pdf: " << tgraph_name_short << ".pdf");
 
 
     // ----- crystal + crate time constants + offset vs run number ------
-
-    // NULL for run number errors = 0 for all
-    g_crateCrystalTime_vs_runNum = new TGraphErrors(allCrates_crystalCrate_times[i].size(), single_crate_run_nums,
-                                                    single_crate_crystalCrate_times, NULL, single_crate_crystalCrate_times_unc) ;
+    shared_ptr< TGraphErrors > g_crateCrystalTime_vs_runNum(new TGraphErrors(allCrates_crystalCrate_times[i].size(),
+                                                            single_crate_run_nums,
+                                                            single_crate_crystalCrate_times, NULL, single_crate_crystalCrate_times_unc)) ;
 
     tgraph_title = string("e") + to_string(minExpNum) + string("r") + to_string(minRunNum) +
                    string("-e") + to_string(maxExpNum) + string("r") + to_string(maxRunNum) ;
@@ -631,7 +628,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     g_crateCrystalTime_vs_runNum->Draw("AP") ;
 
     g_crateCrystalTime_vs_runNum->Write() ;
-    c1->SaveAs((tgraph_name_short + string(".pdf")).c_str()) ;
+    cSmart->SaveAs((tgraph_name_short + string(".pdf")).c_str()) ;
 
     B2INFO("Saved pdf: " << tgraph_name_short << ".pdf");
 
@@ -680,11 +677,8 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
 
 
     if (numRunsWithCrateTimes > 0) {
-      TGraphErrors* g_crateCrystalTime_vs_runCounter ;
-
-      // NULL for run number errors = 0 for all
-      g_crateCrystalTime_vs_runCounter = new TGraphErrors(numRunsWithCrateTimes, &counterVec[0],
-                                                          single_crate_crystalCrate_times, NULL, single_crate_crystalCrate_times_unc) ;
+      shared_ptr< TGraphErrors > g_crateCrystalTime_vs_runCounter(new TGraphErrors(numRunsWithCrateTimes, &counterVec[0],
+                                                                  single_crate_crystalCrate_times, NULL, single_crate_crystalCrate_times_unc)) ;
 
       tgraph_title = string("e") + to_string(minExpNum) + string("r") + to_string(minRunNum) +
                      string("-e") + to_string(maxExpNum) + string("r") + to_string(maxRunNum) ;
@@ -714,7 +708,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
       g_crateCrystalTime_vs_runCounter->Draw("AP") ;
 
       g_crateCrystalTime_vs_runCounter->Write() ;
-      c1->SaveAs((tgraph_name_short + string(".pdf")).c_str()) ;
+      cSmart->SaveAs((tgraph_name_short + string(".pdf")).c_str()) ;
       B2INFO("Saved pdf: " << tgraph_name_short << ".pdf");
 
       B2INFO("Finished making crate time jump plots for crate " << i + 1);

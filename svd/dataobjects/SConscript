@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'vxd_dataobjects', 'vxd', '$ROOT_LIBS']
+env['LIBS'] = ['framework', 'simulation_dataobjects', 'vxd_dataobjects', 'vxd', '$ROOT_LIBS']
 
 Return('env')

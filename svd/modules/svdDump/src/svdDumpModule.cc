@@ -39,10 +39,6 @@ svdDumpModule::svdDumpModule() : Module(), m_event(0)
 
 }
 
-svdDumpModule::~svdDumpModule()
-{
-}
-
 void svdDumpModule::initialize()
 {
   B2INFO("svdDumpModule: initialize() is called.");

@@ -45,11 +45,6 @@ SVDClusterEvaluationModule::SVDClusterEvaluationModule(): Module()
   addParam("groupNstrips", m_groupNstrips, "How many strips group together in the 2D residual VS position plot", int(128));
 }
 
-SVDClusterEvaluationModule::~SVDClusterEvaluationModule()
-{
-
-}
-
 void SVDClusterEvaluationModule::initialize()
 {
 
@@ -297,11 +292,6 @@ void SVDClusterEvaluationModule::event()
   }
 
 
-}
-
-
-void SVDClusterEvaluationModule::terminate()
-{
 }
 
 

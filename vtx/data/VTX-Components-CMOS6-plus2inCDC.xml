@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Components>
-  <!-- Generic Pixel layout with 7 layers in a windmill structure
-       the first 3 layers are composed of 2.0*12*0.03 cm sensors at current VXD radius
-       For the other 4, each ladder is conceptually composed of sensors 
+  <!-- Generic Pixel layout with 5 layers in a windmill structure
+       the first 2 layers are composed of 2.0*12*0.03 cm sensors at current VXD radius
+       For the other 3, each ladder is conceptually composed of sensors 
        next to each other with dimensions of 3.0*12*0.03 cm.
   -->
   <Ladder layer="1">
@@ -36,48 +36,87 @@
   </Ladder>
 
   <Ladder layer="3">
-    <shift  unit="mm"> 3.0</shift>
-    <radius unit="mm">35.1</radius>
-    <Sensor id="2" type="Layer1" unit="mm" flipV="true"> -32.0</Sensor>
-    <Sensor id="1" type="Layer1" unit="mm" flipV="true"> 88.0</Sensor>
+    <shift  unit="mm"> 4.5</shift>
+    <radius unit="mm">38.990</radius>
+    <Sensor id="5" type="Layer3" unit="mm" flipV="true"> -50.0</Sensor>
+    <Sensor id="4" type="Layer3" unit="mm" flipV="true"> -10.0</Sensor>
+    <Sensor id="3" type="Layer3" unit="mm" flipV="true"> 30.0</Sensor>
+    <Sensor id="2" type="Layer3" unit="mm" flipV="true"> 70.0</Sensor>
+    <Sensor id="1" type="Layer3" unit="mm" flipV="true"> 110.0</Sensor>
   </Ladder>
 
   <Ladder layer="4">
     <shift  unit="mm"> 6.0</shift>
-    <radius unit="mm">60.1</radius>
-    <Sensor id="3" type="Layer2" unit="mm" flipV="true"> -77.0</Sensor>
-    <Sensor id="2" type="Layer2" unit="mm" flipV="true"> 43.0</Sensor>
-    <Sensor id="1" type="Layer2" unit="mm" flipV="true"> 163.0</Sensor>
+    <radius unit="mm">80.0</radius>
+    <Sensor id="11" type="Layer3" unit="mm" flipV="true"> -130.0</Sensor>
+    <Sensor id="10" type="Layer3" unit="mm" flipV="true"> -90.0</Sensor>
+    <Sensor id="9" type="Layer3" unit="mm" flipV="true"> -50.0</Sensor>
+    <Sensor id="8" type="Layer3" unit="mm" flipV="true"> -10.0</Sensor>
+    <Sensor id="7" type="Layer3" unit="mm" flipV="true"> 30.0</Sensor>
+    <Sensor id="6" type="Layer3" unit="mm" flipV="true"> 70.0</Sensor>
+    <Sensor id="5" type="Layer3" unit="mm" flipV="true"> 110.0</Sensor>
+    <Sensor id="4" type="Layer3" unit="mm" flipV="true"> 150.0</Sensor>
+    <Sensor id="3" type="Layer3" unit="mm" flipV="true"> 190.0</Sensor>
+    <Sensor id="2" type="Layer3" unit="mm" flipV="true"> 230.0</Sensor>
+    <Sensor id="1" type="Layer3" unit="mm" flipV="true"> 270.0</Sensor>
   </Ladder>
 
   <Ladder layer="5">
     <shift  unit="mm"> 7.0</shift>
-    <radius unit="mm">90.1</radius>
-    <Sensor id="4" type="Layer2" unit="mm" flipV="true"> -109.0</Sensor>
-    <Sensor id="3" type="Layer2" unit="mm" flipV="true"> 11.0</Sensor>
-    <Sensor id="2" type="Layer2" unit="mm" flipV="true"> 131.0</Sensor>
-    <Sensor id="1" type="Layer2" unit="mm" flipV="true"> 251.0</Sensor>
+    <radius unit="mm">104.0</radius>
+    <Sensor id="14" type="Layer3" unit="mm" flipV="true"> -180.0</Sensor>
+    <Sensor id="13" type="Layer3" unit="mm" flipV="true"> -140.0</Sensor>
+    <Sensor id="12" type="Layer3" unit="mm" flipV="true"> -100.0</Sensor>
+    <Sensor id="11" type="Layer3" unit="mm" flipV="true"> -60.0</Sensor>
+    <Sensor id="10" type="Layer3" unit="mm" flipV="true"> -20.0</Sensor>
+    <Sensor id="9" type="Layer3" unit="mm" flipV="true"> 20.0</Sensor>
+    <Sensor id="8" type="Layer3" unit="mm" flipV="true"> 60.0</Sensor>
+    <Sensor id="7" type="Layer3" unit="mm" flipV="true"> 100.0</Sensor>
+    <Sensor id="6" type="Layer3" unit="mm" flipV="true"> 140.0</Sensor>
+    <Sensor id="5" type="Layer3" unit="mm" flipV="true"> 180.0</Sensor>
+    <Sensor id="4" type="Layer3" unit="mm" flipV="true"> 220.0</Sensor>
+    <Sensor id="3" type="Layer3" unit="mm" flipV="true"> 260.0</Sensor>
+    <Sensor id="2" type="Layer3" unit="mm" flipV="true"> 300.0</Sensor>
+    <Sensor id="1" type="Layer3" unit="mm" flipV="true"> 340.0</Sensor>
   </Ladder>
 
   <Ladder layer="6">
-    <shift  unit="mm"> 7.5</shift>
-    <radius unit="mm">115.0</radius>
-    <Sensor id="5" type="Layer2" unit="mm" flipV="true"> -150.0</Sensor>
-    <Sensor id="4" type="Layer2" unit="mm" flipV="true"> -30.0</Sensor>
-    <Sensor id="3" type="Layer2" unit="mm" flipV="true"> 90.0</Sensor>
-    <Sensor id="2" type="Layer2" unit="mm" flipV="true"> 210.0</Sensor>
-    <Sensor id="1" type="Layer2" unit="mm" flipV="true"> 330.0</Sensor>
-  </Ladder>
-
-  <Ladder layer="7">
     <shift  unit="mm"> 8.0</shift>
     <radius unit="mm">135.0</radius>
-    <Sensor id="6" type="Layer2" unit="mm" flipV="true"> -193.0</Sensor>
-    <Sensor id="5" type="Layer2" unit="mm" flipV="true"> -73.0</Sensor>
-    <Sensor id="4" type="Layer2" unit="mm" flipV="true"> 47.0</Sensor>
-    <Sensor id="3" type="Layer2" unit="mm" flipV="true"> 167.0</Sensor>
-    <Sensor id="2" type="Layer2" unit="mm" flipV="true"> 287.0</Sensor>
-    <Sensor id="1" type="Layer2" unit="mm" flipV="true"> 407.0</Sensor>
+    <Sensor id="6" type="Layer2" unit="mm" flipV="true"> -190.0</Sensor>
+    <Sensor id="5" type="Layer2" unit="mm" flipV="true"> -70.0</Sensor>
+    <Sensor id="4" type="Layer2" unit="mm" flipV="true"> 50.0</Sensor>
+    <Sensor id="3" type="Layer2" unit="mm" flipV="true"> 170.0</Sensor>
+    <Sensor id="2" type="Layer2" unit="mm" flipV="true"> 290.0</Sensor>
+    <Sensor id="1" type="Layer2" unit="mm" flipV="true"> 410.0</Sensor>
+  </Ladder>
+  
+  <Ladder layer="7">
+    <shift  unit="mm"> 8.0</shift>
+    <radius unit="mm">180.0</radius>
+    <Sensor id="8" type="LayerInCDC" unit="mm" flipV="true"> -280.0</Sensor>
+    <Sensor id="7" type="LayerInCDC" unit="mm" flipV="true"> -160.0</Sensor>
+    <Sensor id="6" type="LayerInCDC" unit="mm" flipV="true"> -40.0</Sensor>
+    <Sensor id="5" type="LayerInCDC" unit="mm" flipV="true"> 80.0</Sensor>
+    <Sensor id="4" type="LayerInCDC" unit="mm" flipV="true"> 200.0</Sensor>
+    <Sensor id="3" type="LayerInCDC" unit="mm" flipV="true"> 320.0</Sensor>
+    <Sensor id="2" type="LayerInCDC" unit="mm" flipV="true"> 440.0</Sensor>
+    <Sensor id="1" type="LayerInCDC" unit="mm" flipV="true"> 560.0</Sensor>
+  </Ladder> 
+  
+  <Ladder layer="8">
+    <shift  unit="mm"> 8.0</shift>
+    <radius unit="mm">225.0</radius>
+    <Sensor id="10" type="LayerInCDC" unit="mm" flipV="true"> -360.0</Sensor>
+    <Sensor id="9" type="LayerInCDC" unit="mm" flipV="true"> -240.0</Sensor>
+    <Sensor id="8" type="LayerInCDC" unit="mm" flipV="true"> -120.0</Sensor>
+    <Sensor id="7" type="LayerInCDC" unit="mm" flipV="true"> 0.0</Sensor>
+    <Sensor id="6" type="LayerInCDC" unit="mm" flipV="true"> 120.0</Sensor>
+    <Sensor id="5" type="LayerInCDC" unit="mm" flipV="true"> 240.0</Sensor>
+    <Sensor id="4" type="LayerInCDC" unit="mm" flipV="true"> 360.0</Sensor>
+    <Sensor id="3" type="LayerInCDC" unit="mm" flipV="true"> 480.0</Sensor>
+    <Sensor id="2" type="LayerInCDC" unit="mm" flipV="true"> 600.0</Sensor>
+    <Sensor id="1" type="LayerInCDC" unit="mm" flipV="true"> 720.0</Sensor>
   </Ladder>
 
   
@@ -151,7 +190,7 @@
       <Gq>1.0</Gq>
       <!-- Averaged sensors X0 (for perpendicular incidence) -->
       <X0average>0.001</X0average>
-      <!-- Tangent of Lorentz angle in Belle II B field -->
+      <!-- Tangent of Lorentz angle -->
       <TanLorentzAngle>0.24</TanLorentzAngle>
       <!-- Spatial resolution coefficient for u axis -->
       <ResolutionCoefficientU>0.6</ResolutionCoefficientU>
@@ -233,6 +272,112 @@
     <!--Component type="ThinningLayer2">
       <u unit="mm"> 15</u><v unit="mm">60</v>
     </Component-->
+  </Sensor>
+
+  <!-- The sensor in Layer3 is almost the same as for Layer1 except for the  dimensions -->
+  <Sensor type="Layer3">
+    <Material>Si</Material>
+    <Color>#006699</Color>
+    <width  unit="mm">40.0</width>
+    <length unit="mm">40.0</length>
+    <height unit="mm"> 0.300</height>
+    <Active>
+      <u unit="mm"> 1.5</u>
+      <v unit="mm"> 0.0</v>
+      <w>top</w>
+      <width  unit="mm">35.0</width>
+      <length unit="mm">40.0</length>
+      <height unit="mm"> 0.030</height>
+      <stepSize unit="um">5</stepSize>
+      <pixelsU>1060</pixelsU>
+      <pixelsV>1210</pixelsV>
+
+      <BulkDoping unit="1/um^3">10.0</BulkDoping>
+      <BackVoltage unit="V">-30.0</BackVoltage>
+      <TopVoltage unit="V">-5.0</TopVoltage>
+      <BorderU unit="um">6.0</BorderU>
+      <BorderV unit="um">4.0</BorderV>
+      <ChargeThreshold unit="ADU">1.25</ChargeThreshold>
+      <NoiseFraction>0.00000000</NoiseFraction>
+      <ApplyElectronicEffects>true</ApplyElectronicEffects>
+      <ElectronicNoise unit="ENC">20.0</ElectronicNoise>
+      <ApplyBinaryReadout>false</ApplyBinaryReadout>
+      <BinaryHitThreshold unit="ENC">220.0</BinaryHitThreshold>
+      <ElectronToADU unit="ENC">120</ElectronToADU>
+      <MaxADUCode>127</MaxADUCode>
+      <ApplyPoissonSmearing>true</ApplyPoissonSmearing>
+      <ApplyIntegrationWindow>true</ApplyIntegrationWindow>
+      <SegmentLength unit="mm">0.005</SegmentLength>
+      <ElectronGroupSize>100</ElectronGroupSize>
+      <ElectronStepTime unit="ns">1.0</ElectronStepTime>
+      <ElectronMaxSteps>200</ElectronMaxSteps>
+      <HardwareDelay unit="ns">0.0</HardwareDelay>
+      <ADCunit>120</ADCunit>
+      <CloudSize>0.000085</CloudSize>
+      <Gq>1.0</Gq>
+      <X0average>0.003</X0average>
+      <TanLorentzAngle>0.24</TanLorentzAngle>
+      <ResolutionCoefficientU>0.6</ResolutionCoefficientU>
+      <ResolutionCoefficientV>0.6</ResolutionCoefficientV>
+      <IntegrationStart unit="ns">-50.0</IntegrationStart>
+      <IntegrationEnd   unit="ns"> 50.0</IntegrationEnd>
+    </Active>
+    <!-- The sensors in the outer layer are not thinned -->
+    <!--Component type="ThinningLayer3">
+      <u unit="mm"> 15</u><v unit="mm">60</v>
+    </Component-->
+  </Sensor>
+
+  <!-- The sensor in LayerInCDC is almost the same as for Layer2 except for the height -->
+  <Sensor type="LayerInCDC">
+    <Material>Si</Material>
+    <Color>#006699</Color>
+    <width  unit="mm">40.0</width>
+    <length unit="mm">120.0</length>
+    <!-- These layers will consits of much more support and service material compared to the outer ones in the VXD volume.
+         Thus the thickness is increased to 1 mm, which corresponds to roughly 1% of radiation length. -->
+    <height unit="mm"> 1.0</height>
+    <Active>
+      <u unit="mm"> 1.5</u>
+      <v unit="mm"> 0.0</v>
+      <w>top</w>
+      <width  unit="mm">35.0</width>
+      <length unit="mm">120.0</length>
+      <height unit="mm"> 0.030</height>
+      <stepSize unit="um">5</stepSize>
+      <pixelsU>1060</pixelsU>
+      <pixelsV>3640</pixelsV>
+
+      <BulkDoping unit="1/um^3">10.0</BulkDoping>
+      <BackVoltage unit="V">-30.0</BackVoltage>
+      <TopVoltage unit="V">-5.0</TopVoltage>
+      <BorderU unit="um">6.0</BorderU>
+      <BorderV unit="um">4.0</BorderV>
+      <ChargeThreshold unit="ADU">1.25</ChargeThreshold>
+      <NoiseFraction>0.00000000</NoiseFraction>
+      <ApplyElectronicEffects>true</ApplyElectronicEffects>
+      <ElectronicNoise unit="ENC">20.0</ElectronicNoise>
+      <ApplyBinaryReadout>false</ApplyBinaryReadout>
+      <BinaryHitThreshold unit="ENC">220.0</BinaryHitThreshold>
+      <ElectronToADU unit="ENC">120</ElectronToADU>
+      <MaxADUCode>127</MaxADUCode>
+      <ApplyPoissonSmearing>true</ApplyPoissonSmearing>
+      <ApplyIntegrationWindow>true</ApplyIntegrationWindow>
+      <SegmentLength unit="mm">0.005</SegmentLength>
+      <ElectronGroupSize>100</ElectronGroupSize>
+      <ElectronStepTime unit="ns">1.0</ElectronStepTime>
+      <ElectronMaxSteps>200</ElectronMaxSteps>
+      <HardwareDelay unit="ns">0.0</HardwareDelay>
+      <ADCunit>120</ADCunit>
+      <CloudSize>0.000085</CloudSize>
+      <Gq>1.0</Gq>
+      <X0average>0.003</X0average>
+      <TanLorentzAngle>0.24</TanLorentzAngle>
+      <ResolutionCoefficientU>0.6</ResolutionCoefficientU>
+      <ResolutionCoefficientV>0.6</ResolutionCoefficientV>
+      <IntegrationStart unit="ns">-50.0</IntegrationStart>
+      <IntegrationEnd   unit="ns"> 50.0</IntegrationEnd>
+    </Active>
   </Sensor>
   
   <Component name="ThinningLayer1">

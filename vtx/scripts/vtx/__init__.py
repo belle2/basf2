@@ -118,10 +118,6 @@ def get_upgrade_background_files(folder=None, output_file_info=True):
         B2INFO("Background files set to None. No overlay will be done")
         return None
 
-    upgrade_gt_name = get_upgrade_globaltag()
-    if upgrade_gt_name not in folder:
-        raise RuntimeError("Upgrade GT {} not contained in path to bg files. Terminanting this script.".format(upgrade_gt_name))
-
     bg = glob.glob(folder + '/*.root')
 
     if len(bg) == 0:

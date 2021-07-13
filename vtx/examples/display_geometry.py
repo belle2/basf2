@@ -55,8 +55,9 @@ main.add_module('Geometry', excludedComponents=['PXD', 'SVD', 'CDC', 'ECL', 'ARI
 sim.add_simulation(main, components=['VTX'], useVTX=True)
 
 # Add mc reconstruction
-rec.add_mc_reconstruction(main, components=['VTX'], pruneTracks=False, useVTX=True, useVTXClusterShapes=False)
-
+# FIXME: does currently not work if CDC is not in the Geometry, simulation and reconstruction,
+# but for just showing the geometry the MC reconstruction is not needed.
+# rec.add_mc_reconstruction(main, components=['VTX'], pruneTracks=False, useVTX=True, useVTXClusterShapes=False)
 
 display = b2.register_module('Display')
 display.param('fullGeometry', True)

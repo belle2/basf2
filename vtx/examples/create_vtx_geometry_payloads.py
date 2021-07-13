@@ -8,13 +8,14 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+# @cond no_doxygen
+
 """
 Create a full set of consistent geometry payloads for upgrade geometry from XML files.
-List of (exclusive) upgrade detector options: "VTX-CMOS-7layer", "VTX-CMOS-5layer",
-"VTX-CMOS-5layer-Discs", ...
+Optionally one can give a list of payload names to keep only a subset of payloads
 
 Usage:
-basf2 create_vtx_geometry_payloads.py -- --vtx VTX-CMOS-5layer-Discs
+basf2 create_vtx_geometry_payloads.py -- --vtx VTX-CMOS-5layer
 """
 
 import basf2
@@ -56,13 +57,12 @@ basf2.process(upgrade)
 upgrade = ["GeoConfiguration", "VTXGeometryPar"]
 
 database_content = []
-line_match = re.compile(r"^dbstore/(.*?) (\d+) ([0-9\-,]*)$")
+line_match = re.compile(r"^dbstore/(.*?) ([0-9a-f]+) ([0-9\-,]*)$")
 keep = set()
 with open("localdb/database.txt") as dbfile:
     for line in dbfile:
         match = line_match.search(line)
         name, revision, iov = match.groups()
-        revision = int(revision)
         # do we want to keep that payload at all?
         if interested and name not in interested:
             continue
@@ -94,3 +94,5 @@ for filename in os.scandir('localdb/'):
     else:
         print(f"Normalizing {filename.name} as '{match.group(1)}'")
         subprocess.call(["b2file-normalize", "-i", "-n", match.group(1), filename.path])
+
+# @endcond

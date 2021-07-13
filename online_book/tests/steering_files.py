@@ -25,19 +25,7 @@ from typing import Optional, List
 
 # basf2
 from basf2 import find_file
-from b2test_utils import clean_working_directory
-
-
-def skip_expensive_tests() -> bool:
-    """ Returns true if we want to skip more expensive tests, e.g. on
-    bamboo.
-    """
-    return os.environ.get("SKIP_EXPENSIVE_TESTS", "no").lower() in [
-        "yes",
-        "1",
-        "y",
-        "on",
-    ]
+from b2test_utils import clean_working_directory, is_bamboo
 
 
 def light_release() -> bool:
@@ -94,7 +82,7 @@ class SteeringFileTest(unittest.TestCase):
             filename = os.path.basename(eg)
             if filename in broken:
                 continue
-            if skip_expensive_tests() and filename in expensive_tests:
+            if is_bamboo() and filename in expensive_tests:
                 continue
             if light_release() and filename in skip_in_light:
                 continue

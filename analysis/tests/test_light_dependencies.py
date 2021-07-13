@@ -9,7 +9,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import argparse
 import os
 import glob
 import re
@@ -24,20 +23,7 @@ Check that no light-release-breaking dependencies have been added.
 
 If you are failing this test you have managed to break light builds, please
 check with the light release manager for more information.
-
-For running this test locally, execute 'python3 test_light_dependencies.py --on',
-since the test is disabled by default.
 """
-
-
-def arg_parser():
-    """add a simple argument parser"""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--on',
-                        default=False,
-                        action='store_true',
-                        help='when the flag is added, the test is actually executed')
-    return parser
 
 
 def get_sconscripts(package):
@@ -120,10 +106,21 @@ def check_dependencies(forbidden, sconscript_files, error=""):
     return n_forbidden
 
 
-# FIXME: enable again the test as soon as the bamboo/buildbot failure is understood
-args = arg_parser().parse_args()
-if not args.on:
-    b2test_utils.skip_test("The test is currently disabled")
+def is_bamboo() -> bool:
+    """
+    Returns true if we are running this test on bamboo.
+    """
+    return os.environ.get("IS_BAMBOO", "no").lower() in [
+        "yes",
+        "1",
+        "y",
+        "on",
+    ]
+
+
+# FIXME: enable again the test on bamboo as soon as the failure is understood
+if is_bamboo():
+    b2test_utils.skip_test("This test does not work on bamboo")
 
 # grab all of the light release packages
 # (defined by the .light file for the sparse checkout)

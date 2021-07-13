@@ -15,7 +15,6 @@ import re
 import sys
 import subprocess
 import basf2
-import b2test_utils
 from time import time
 
 """
@@ -105,22 +104,6 @@ def check_dependencies(forbidden, sconscript_files, error=""):
             n_forbidden += 1
     return n_forbidden
 
-
-def is_bamboo() -> bool:
-    """
-    Returns true if we are running this test on bamboo.
-    """
-    return os.environ.get("IS_BAMBOO", "no").lower() in [
-        "yes",
-        "1",
-        "y",
-        "on",
-    ]
-
-
-# FIXME: enable again the test on bamboo as soon as the failure is understood
-if is_bamboo():
-    b2test_utils.skip_test("This test does not work on bamboo")
 
 # grab all of the light release packages
 # (defined by the .light file for the sparse checkout)

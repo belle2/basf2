@@ -18,6 +18,7 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <genfit/TrackPoint.h>
 #include <TVector3.h>
+#include <TDirectory.h>
 #include <math.h>
 #include <iostream>
 #include <algorithm>
@@ -54,6 +55,8 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   recoTracks.isOptional();
   m_clusters.isRequired();
   m_eventT0.isOptional();
+
+  TDirectory::TContext context;
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
 
@@ -222,6 +225,9 @@ void SVDEventT0PerformanceTTreeModule::terminate()
 {
 
   if (m_rootFilePtr != nullptr) {
+
+    TDirectory::TContext context;
+
     m_rootFilePtr->cd();
     m_t->Write();
     m_rootFilePtr->Close();

@@ -45,13 +45,18 @@ class CNN_PID_ECL(b2.Module):
 
     def __init__(
         self,
-        particleList
+        particleList,
+        path
     ):
         super().__init__()
         self.particleList = particleList
+        self.path = path
 
         torch.manual_seed(1234)
         self.device = torch.device('cpu')
+
+        if 'ECLFillCellIdMapping' not in self.path:
+            self.path.add_module('ECLFillCellIdMapping')
 
     def initialize(self):
         """ Initialize necessary arrays and/or objects """
@@ -74,12 +79,14 @@ class CNN_PID_ECL(b2.Module):
         """
 
         pList = Belle2.PyStoreObj(self.particleList)
+        variable_pion = 'cnn_pid_ecl_pion'
+        variable_muon = 'cnn_pid_ecl_muon'
 
         for i, particle in enumerate(pList.obj()):
 
             track = particle.getTrack()
 
-            if track:
+            if (track and self.getExtCell(track)):
                 maxCellId = self.getExtCell(track)[0]
 
                 self.pt = self.getExtCell(track)[1]
@@ -100,6 +107,7 @@ class CNN_PID_ECL(b2.Module):
                     b2.B2WARNING('maxCellId is less 0.')
                     return(np.nan, np.nan)
                 else:
+
                     if (self.extThetaId > 13 and
                         self.extThetaId < 58 and
                         self.pt >= 0.2 and
@@ -121,15 +129,12 @@ class CNN_PID_ECL(b2.Module):
                         self.energy_array = np.array(energy_list)
 
                         prob_CNN_pion, prob_CNN_muon = self.extract_cnn_value()
-                        variable_pion = 'cnn_pid_ecl_pion'
-                        variable_muon = 'cnn_pid_ecl_muon'
 
                         particle.addExtraInfo(variable_pion, prob_CNN_pion)
                         particle.addExtraInfo(variable_muon, prob_CNN_muon)
-                        b2.B2DEBUG(f'{variable_pion}: {prob_CNN_pion}')
-                        b2.B2DEBUG(f'{variable_muon}: {prob_CNN_muon}')
+                        b2.B2DEBUG(11, f'{variable_pion}: {prob_CNN_pion}, {variable_muon}: {prob_CNN_muon}')
                     else:
-                        b2.B2DEBUG('Track is either outside ECL Barrel or Pt outside [0.2, 1.0] GeV/c. No CNN value.')
+                        b2.B2DEBUG(11, 'Track is either outside ECL Barrel or Pt is outside [0.2, 1.0] GeV/c. No CNN value.')
                         return(np.nan, np.nan)
 
     def getExtCell(self, track):

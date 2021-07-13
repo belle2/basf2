@@ -1,29 +1,40 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" This scripts test CNN_PID_ECL module.
+""" This script creates 10 events with 2 particles per event
+    then extracts CNN value for each particles.
+    The CNN values represent probabilities for a track being
+    muon or pion like.
 
-CNN_PID_ECL module extracts CNN probabilities for a track being
-muon or pion like.
+INPUT:
+    No input
 
-Input:
-    cDST file
+USAGE:
+    basf2 EclCNNPID.py -- [OPTIONS]
 
-Usage:
-    basf2 -i <path_to_cdst_file> -n 10 EclCNNPID.py
+EXAMPLE:
+    basf2 EclCNNPID.py -- --pdg-code 211
 
-NOTE:
-    In order to use CNN_PID_ECL module it is essential to
-    add the following modules:
-        - Gearbox
-        - Geometry
-        - ECLFillCellIdMapping
+IMPORTANT NOTE:
+    In this example script Gearbox and Geometry modules
+    are automatically registered in add_simulation().
+
+    In order to use CNN_PID_ECL module in your script,
+    it is essential to add the following lines before
+    fillParticleList() function:
+        mainPath.add_module('Gearbox')
+        mainPath.add_module('Geometry')
 """
 
+from cnn_pid_ecl_module import CNN_PID_ECL
+import sys
+import argparse
 import basf2 as b2
 import modularAnalysis as ma
+from simulation import add_simulation
+from reconstruction import add_reconstruction
 
-from cnn_pid_ecl_module import CNN_PID_ECL
+sys.path.append('../scripts/eclCNNPID')
 
 __author__ = 'Abtin Narimani Charan'
 __copyright__ = 'Copyright 2021 - Belle II Collaboration'
@@ -31,17 +42,81 @@ __maintainer__ = 'Abtin Narimani Charan'
 __email__ = 'abtin.narimani.charan@desy.de'
 
 
+def argparser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--pdg-code', type=int, default=13,
+                        choices=[13, -211, -13, 211, 11, -11, 321, -321, 22,
+                                 2212, -2212, 1000010020, -1000010020],
+                        help='PDG code of particle')
+    return parser
+
+
+args = argparser().parse_args()
+
+pdg_dict = {
+    13: ('mu', 'minus'),
+    -13: ('mu', 'plus'),
+    211: ('pi', 'plus'),
+    -211: ('pi', 'minus'),
+    11: ('e', 'minus'),
+    -11: ('e', 'plus'),
+    321: ('K', 'plus'),
+    -321: ('K', 'minus'),
+    2212: ('p', 'plus'),
+    -2212: ('p', 'minus'),
+    1000010020: ('deuteron', 'plus'),
+    -1000010020: ('anti-deuteron', 'minus'),
+    22: ('gamma', 'neutral')
+}
+particle = pdg_dict[args.pdg_code][0]
+charge = pdg_dict[args.pdg_code][1]
+
 mainPath = b2.create_path()
-ma.inputMdstList('default', [], path=mainPath)
 
-mainPath.add_module('Gearbox')
-mainPath.add_module('Geometry')
-mainPath.add_module('ECLFillCellIdMapping',
-                    logLevel=b2.LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.WARNING)
 
-ma.fillParticleList('mu+:tracks', '', path=mainPath)
+# Register ParticleGun module
+particlegun = b2.register_module('ParticleGun')
+b2.set_random_seed(123)
+particlegun.param('pdgCodes', [args.pdg_code])
+particlegun.param('nTracks', 2)
+particlegun.param('momentumGeneration', 'uniformPt')
+particlegun.param('momentumParams', [0.3, 0.9])
+particlegun.param('thetaGeneration', 'uniform')
+particlegun.param('thetaParams', [70, 90])  # In the ECL barrel
+particlegun.param('phiGeneration', 'uniform')
+particlegun.param('phiParams', [0, 360])
+mainPath.add_module(particlegun)
 
-mainPath.add_module(CNN_PID_ECL('mu+:tracks'))
+mainPath.add_module(
+    'EventInfoSetter',
+    expList=1003,  # Exp 1003 is early phase 3
+    runList=0,
+    evtNumList=10)
+
+# Simulation
+add_simulation(mainPath)
+
+# Reconstruction
+add_reconstruction(mainPath)
+
+name = f'{particle}+:tracks'
+
+if particle in ['gamma', 'deuteron', 'anti-deuteron']:
+    name = f'{particle}:particles'
+
+ma.fillParticleList(name, '', path=mainPath)
+
+# CNN_PID_ECL module
+mainPath.add_module(CNN_PID_ECL(particleList=name, path=mainPath))
+
+ma.variablesToNtuple(
+    decayString=name,
+    variables=['cnn_pid_ecl_pion', 'cnn_pid_ecl_muon'],
+    treename='particles',
+    filename=f'test_{particle}_{charge}_cnn.root',
+    path=mainPath
+)
 
 mainPath.add_module('Progress')
 b2.process(mainPath)

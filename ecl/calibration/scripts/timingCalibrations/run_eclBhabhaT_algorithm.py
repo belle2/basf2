@@ -7,7 +7,10 @@
 #                                                                        #
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
-#                                                                        #
+##########################################################################
+
+##########################################################################
+# Description:                                                           #
 # This script executes the bhabha timing calibration algorithm,          #
 # which is used for both the crystal time calibration and the            #
 # crate time calibration.  It has to run on the results of               #

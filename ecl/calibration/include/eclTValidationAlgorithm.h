@@ -4,7 +4,10 @@
  *                                                                        *
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
- *                                                                        *
+ **************************************************************************/
+
+/**************************************************************************
+ * Description:                                                           *
  * Validate the ecl timing calibrations using a hadronic event            *
  * selection or bhabha event selection.                                   *
  **************************************************************************/

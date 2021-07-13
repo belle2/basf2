@@ -7,7 +7,10 @@
 #                                                                        #
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
-#                                                                        #
+##########################################################################
+
+##########################################################################
+# Description:                                                           #
 # This script executes the bhabha validation algoirthm.  It              #
 # has to run on the results of the bahbha validation collector.          #
 # This script is run directly with basf2.                                #

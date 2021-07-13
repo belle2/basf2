@@ -4,7 +4,10 @@
  *                                                                        *
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
- *                                                                        *
+ **************************************************************************/
+
+/**************************************************************************
+ * Description:                                                           *
  * Take the previously created DBObjects for ECL crystal timing from      *
  * bhabha events for crystals inside the CDC acceptance and radiative     *
  * bhabha and/or cosmic muons for crystal near and outside the CDC        *

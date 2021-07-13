@@ -217,7 +217,7 @@ namespace Belle2 {
    * There are 2 output formats:
    * 1. the Bitstream containing the bit content of each module
    *    This is useful for the firmware simulation
-   * 2. decoded Basf2 TSIM object
+   * 2. decoded basf2 TSIM object
    *    This is the same as the fast TSIM output
    *
    */

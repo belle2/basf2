@@ -30,7 +30,7 @@ namespace Belle2 {
    * from the ROE.
    *
    * The ContinuumSuppression object is created for given existing Particle object by the
-   * ContinuumSuppressionBuilder module and are related between each other with a BASF2 relation.
+   * ContinuumSuppressionBuilder module and are related between each other with a basf2 relation.
    *
    * Internally, the ContinuumSuppression class holds only floats and vectors of floats.
    */

@@ -105,37 +105,38 @@ def check_dependencies(forbidden, sconscript_files, error=""):
     return n_forbidden
 
 
-# grab all of the light release packages
-# (defined by the .light file for the sparse checkout)
-light_file = basf2.find_file(".light")
-with open(light_file) as fi:
-    light_packages = [li.strip().replace("/", "") for li in fi if li.strip().endswith("/")]
+if __name__ == "__main__":
 
-# we also need all packages (to compare), for this use b2code-package-list.
-# note that b2code-package-list has to be executed from the top basf2 directory,
-# since it requires the presence of the .release file: we use cwd for this.
-all_packages = subprocess.check_output(
-    ["b2code-package-list"], cwd=os.path.dirname(light_file),
-)
-all_packages = all_packages.decode("utf-8").strip().split(" ")
+    # grab all of the light release packages
+    # (defined by the .light file for the sparse checkout)
+    light_file = basf2.find_file(".light")
+    with open(light_file) as fi:
+        light_packages = [li.strip().replace("/", "") for li in fi if li.strip().endswith("/")]
 
-# the forbidden packages
-non_light_packages = set(all_packages).difference(set(light_packages))
-
-# sum up the return codes
-return_code_sum = 0
-
-# run the check over all packages - just a dumb nested loop
-start = time()
-for package in light_packages:
-    sconscript_files = get_sconscripts(package)
-    return_code_sum += check_dependencies(
-        non_light_packages, sconscript_files, "This breaks light releases! Sorry."
+    # we also need all packages (to compare), for this use b2code-package-list.
+    # note that b2code-package-list has to be executed from the top basf2 directory,
+    # since it requires the presence of the .release file: we use cwd for this.
+    all_packages = subprocess.check_output(
+        ["b2code-package-list"], cwd=os.path.dirname(light_file),
     )
+    all_packages = all_packages.decode("utf-8").strip().split(" ")
 
-# test finished, now report
-print("Test of light dependencies, the loop took:", time() - start, "seconds to run")
-print("There were", return_code_sum, "forbidden dependencies")
+    # the forbidden packages
+    non_light_packages = set(all_packages).difference(set(light_packages))
 
-if return_code_sum != 0:
-    sys.exit(1)  # fails the test
+    # sum up the return codes
+    return_code_sum = 0
+
+    # run the check over all packages - just a dumb nested loop
+    start = time()
+    for package in light_packages:
+        sconscript_files = get_sconscripts(package)
+        return_code_sum += check_dependencies(
+            non_light_packages, sconscript_files, "This breaks light releases! Sorry."
+        )
+
+    # test finished, now report
+    print("Test of light dependencies, the loop took:", time() - start, "seconds to run")
+    print("There were", return_code_sum, "forbidden dependencies")
+
+    sys.exit(return_code_sum)

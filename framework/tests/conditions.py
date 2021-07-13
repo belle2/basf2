@@ -228,6 +228,11 @@ def dbprocess(host, path, lastChangeCallback=lambda: None, *, globaltag="localte
         safe_process(path)
 
 
+def set_serverlist(serverlist):
+    """Set a list of database servers."""
+    basf2.conditions.metadata_providers = serverlist + [e for e in basf2.conditions.metadata_providers if not e.startswith("http")]
+
+
 # keep timeouts short for testing
 basf2.conditions.expert_settings(backoff_factor=1, connection_timeout=5,
                                  stalled_timeout=5, max_retries=3)
@@ -321,7 +326,7 @@ dbprocess("", main)
 basf2.B2INFO(""">>> try to have a list of servers from steering file
     We expect that it fails over to the third server, {mock_host}, but then succeeds
 """)
-dbprocess("", main, lastChangeCallback=lambda: basf2.set_central_serverlist(serverlist))
+dbprocess("", main, lastChangeCallback=lambda: set_serverlist(serverlist))
 
 if "ssl" in sys.argv:
     # ok, test SSL connectivity ... for now we just want to accept anything. This

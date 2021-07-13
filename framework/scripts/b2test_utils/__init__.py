@@ -375,3 +375,16 @@ def print_belle2_environment():
     for key, value in sorted(dict(os.environ).items()):
         if 'BELLE2' in key.upper():
             print(f'  {key}={value}')
+
+
+def is_bamboo() -> bool:
+    """
+    Returns true if we are running a test on bamboo. The 'BELLE2_IS_BAMBOO'
+    environment variable is set on bamboo only when the unit tests are run.
+    """
+    return os.environ.get("BELLE2_IS_BAMBOO", "no").lower() in [
+        "yes",
+        "1",
+        "y",
+        "on",
+    ]

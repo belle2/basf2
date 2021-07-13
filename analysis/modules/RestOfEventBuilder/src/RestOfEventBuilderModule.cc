@@ -26,7 +26,7 @@ REG_MODULE(RestOfEventBuilder)
 RestOfEventBuilderModule::RestOfEventBuilderModule() : Module()
 {
   // Set module properties
-  setDescription("Creates for each Particle in the given ParticleList a RestOfEvent dataobject and makes BASF2 relation between them.");
+  setDescription("Creates for each Particle in the given ParticleList a RestOfEvent dataobject and makes basf2 relation between them.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions

@@ -15,7 +15,7 @@ Main goals
 
 The mva package was introduced to provide:
 
-- Provides tools to integrate mva methods in BASF2
+- Provides tools to integrate mva methods in basf2
 - Collection of examples for basic and advanced mva usages
 - Backend independent evaluation and validation tools
 
@@ -78,7 +78,7 @@ Supported frameworks/backends
 FastBDT
 ^^^^^^^
 
-is the default method used in BASF2.
+is the default method used in basf2.
 It provides a good out-of-the-box performance, is robust against over-fitting and fast in training and application.
 It only supports classification and there are only a few parameters and features, hence it has less pitfalls than other methods and as a starting point this is a good choice.
 
@@ -199,7 +199,7 @@ Inference / Howto apply a trained mva method onto data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Depending on your use-case there are different possibilities.
-Most often you want to apply the training online (inside BASF2) like it is done by the FEI or the FlavourTagger: You can use the MVAExpert module if your training is based on Particle objects of the analysis package:
+Most often you want to apply the training online (inside basf2) like it is done by the FEI or the FlavourTagger: You can use the MVAExpert module if your training is based on Particle objects of the analysis package:
 
 .. code-block:: python
 
@@ -208,7 +208,7 @@ Most often you want to apply the training online (inside BASF2) like it is done 
                     extraInfoName='Test',
                     identifier='DatabaseIdentifier')
 
-If you use the mva method in another context (like tracking), you have to write your own C++ or Python module to apply the training, because the MVA package cannot know howto extract the necessary features from the BASF2 DataStore (in the above case based on Particle objects the VariableManager can be used for this task).
+If you use the mva method in another context (like tracking), you have to write your own C++ or Python module to apply the training, because the MVA package cannot know howto extract the necessary features from the basf2 DataStore (in the above case based on Particle objects the VariableManager can be used for this task).
 
 I recommend looking at the MVAPrototype Module code to learn howto correctly implement the usage of an mva classifier.
 This module can be directly be used as a template for your own classifier.

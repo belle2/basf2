@@ -14,11 +14,11 @@
  root [0] .L drawHist01.C
  root [1] draw01(-1,1,0)  // save_option = 1, interactive_option = 0
 
- It draws BASF and BASF2 distributions of a variable in a same plot,
+ It draws BASF and basf2 distributions of a variable in a same plot,
  and log scale can be used for Y axis. It also draws a little plot under
  each variable's distributions. This little plot shows the bin content
- difference between BASF and BASF2 distributions, and the difference
- is set as "BASF - BASF2". The output is saved as .gif and .eps files
+ difference between BASF and basf2 distributions, and the difference
+ is set as "BASF - basf2". The output is saved as .gif and .eps files
 
  NB: histio.C and histio.h files are taken from
 

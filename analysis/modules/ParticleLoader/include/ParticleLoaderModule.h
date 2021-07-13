@@ -54,7 +54,7 @@ namespace Belle2 {
    *   - K_S0, Lambda0, converted photons (input MDST type = V0)
    *   - K_L0, n0                         (input MDST type = KLMCluster, or ECLCluster with neutral hadron hypothesis)
    *
-   * The following BASF2 relations are set by the ParticleLoader:
+   * The following basf2 relations are set by the ParticleLoader:
    *
    * o) in the case of charged final state particles
    *   - Particle <-> MCParticle

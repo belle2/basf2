@@ -155,7 +155,7 @@ void TSF::initialize()
              to_string(nAxialMergers[i]).c_str(), nullptr);
       B2FATAL("The firmware simulation program didn't launch!");
     } else {
-      /* Parent process (BASF2) */
+      /* Parent process (basf2) */
       B2DEBUG(100, "parent " << i);
       m_pid[i] = pid;
       // Close the copy of the fds read/write end

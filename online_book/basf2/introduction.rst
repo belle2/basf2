@@ -36,13 +36,12 @@ The basics.
 
 The Belle II software is called basf2.
 It is an abbreviation for "Belle II Analysis Software Framework".
-There is no set way to write it, you will see BASF2, Basf2 and basf2.
 You might wonder why we didn't choose "b2asf", and when you get a bit further
 you will probably wonder why it has "analysis" in the name (it does much more
 than analysis)?
 Well historic reasons: Belle had BASF, we have basf2.
 
-Basf2 is used in all aspects of the data-processing chain at Belle II:
+basf2 is used in all aspects of the data-processing chain at Belle II:
 
 * generating simulated data,
 * unpacking of real raw data,
@@ -50,7 +49,7 @@ Basf2 is used in all aspects of the data-processing chain at Belle II:
 * and high-level "analysis" reconstruction (such as applying cuts,
   vertex-fitting, ...).
 
-Basf2 is not normally used for the final analysis steps (histogramming, fitting
+basf2 is not normally used for the final analysis steps (histogramming, fitting
 1D distributions, ...).
 These final steps are usually called the "offline" analysis and will be covered
 in later lessons :ref:`onlinebook_offline_analysis`.
@@ -120,7 +119,7 @@ A good place to look for Belle II-specific jargon is the **Belle II Glossary**.
 
      `Belle II Glossary <https://confluence.desy.de/display/BI/Main+Glossary>`_
 
-Basf2 modules
+basf2 modules
 ~~~~~~~~~~~~~
 
 A basf2 module is a piece of (usually) C++ code that does a specific "unit" of
@@ -553,7 +552,7 @@ Listing the basf2 variables
 
 In the next lessons, you will need to refer to physics quantities in plain
 text format.
-Basf2 defines many **variables** for you.
+basf2 defines many **variables** for you.
 These variables are collected in something called the
 :ref:`analysis_variablemanager_class`.
 
@@ -590,11 +589,11 @@ For now, you can list them all with:
 
 .. _onlinebook_basf2basics_b2help_particles:
 
-Basf2 particles
+basf2 particles
 ^^^^^^^^^^^^^^^
 
 Sometimes you will need to write particles' names in plain text format.
-Basf2 adopts the convention used by ROOT, the PDG, EvtGen, ...
+basf2 adopts the convention used by ROOT, the PDG, EvtGen, ...
 
 To show information about all the particles and properties known to basf2,
 there is a tool ``b2help-particles``.
@@ -742,7 +741,7 @@ You will meet them in the :ref:`onlinebook_offline_analysis` lessons.
     * ``b2help-releases``
     * ``b2setup <choose a release>``
     * ``b2help-particles``
-    * Basf2 has a python interface. You can use python tools to find help.
+    * basf2 has a python interface. You can use python tools to find help.
     * ``basf2`` without any tools gets you into a basf2-flavoured IPython shell.
 
 

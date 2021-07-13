@@ -30,7 +30,7 @@ Muon identification
 -------------------
 Muon identification for the extrapolated tracks in KLM uses differences in longitudinal penetration
 depth and transverse scattering of the extrapolated track. It is handles by the ``Muid`` module,
-that is part of the tracking package of ``BASF2`` and proceeds in two steps:
+that is part of the tracking package of ``basf2`` and proceeds in two steps:
 
 1. **Track extrapolation** using the muon hypothesis only;
 2. **Likelihood extraction** for each of six particle hypothesis: :math:`\mu`, :math:`\pi`, :math:`K`, :math:`p`, :math:`d`, :math:`e`.

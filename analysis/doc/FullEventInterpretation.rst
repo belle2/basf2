@@ -152,7 +152,7 @@ Code structure
 
 In my opinion the best way to use and learn about the FEI is to read the code itself. I wrote an extensive documentation. Hence I describe here the code structure. If you don't want to read code, you can just skip this part.
 
-The FEI is completely written in Python and does only use general purpose BASF2 modules. You can find the code under: ``analysis/scripts/fei/``
+The FEI is completely written in Python and does only use general purpose basf2 modules. You can find the code under: ``analysis/scripts/fei/``
 
 config.py
 *********
@@ -325,7 +325,7 @@ In general a FEI training steering file consists of
 
 * a decay channel configuration usually you can just use the default configuration in fei.get_default_channels. This configuration defines all the channels which should be reconstructed, the cuts, and the mva methods. You can write your own configuration, just take a look in ``analysis/scripts/fei/default_channels.py``
 * a FeiConfiguration object, this defines the database prefix for the weightfiles and some other things which influence the training (e.g. if you want to run with the monitoring)
-* a feistate object, which contains the BASF2 path for the current stage, you get this with the get_path function
+* a feistate object, which contains the basf2 path for the current stage, you get this with the get_path function
 
 The user is responsible for writing the input and output part of the steering file. Depending on the training mode (generic / specific) this part is different for each training (see below for examples).
 The FEI algorithm itself just assumes that the DataStore already contains a valid reconstructed event, and starts to reconstruct B mesons. During the training the steering file is executed multiple times. The first time it is called with the Monte Carlo files you provided, and the complete DataStore is written out at the end. The following calls must receive the previous output as input.

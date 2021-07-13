@@ -377,12 +377,13 @@ def print_belle2_environment():
             print(f'  {key}={value}')
 
 
-def is_bamboo() -> bool:
+def is_ci() -> bool:
     """
-    Returns true if we are running a test on bamboo. The 'BELLE2_IS_BAMBOO'
-    environment variable is set on bamboo only when the unit tests are run.
+    Returns true if we are running a test on our CI system (currently bamboo).
+    The 'BELLE2_IS_CI' environment variable is set on CI only when the unit
+    tests are run.
     """
-    return os.environ.get("BELLE2_IS_BAMBOO", "no").lower() in [
+    return os.environ.get("BELLE2_IS_CI", "no").lower() in [
         "yes",
         "1",
         "y",

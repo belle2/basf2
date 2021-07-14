@@ -31,6 +31,8 @@ from b2test_utils import clean_working_directory, is_ci
 def light_release() -> bool:
     """ Returns true if we're in a light release """
     try:
+        # pylint: disable=import-outside-toplevel
+        # pylint: disable=unused-import
         import generators  # noqa
     except ModuleNotFoundError:
         return True
@@ -47,6 +49,7 @@ class SteeringFileTest(unittest.TestCase):
         additional_arguments: Optional[List[str]] = None,
         expensive_tests: Optional[List[str]] = None,
         skip_in_light: Optional[List[str]] = None,
+        skip: Optional[List[str]] = None,
     ):
         """
         Internal function to test a directory full of example scripts with an
@@ -72,6 +75,8 @@ class SteeringFileTest(unittest.TestCase):
             expensive_tests = []
         if skip_in_light is None:
             skip_in_light = []
+        if skip is None:
+            skip = []
         # we have to copy all the steering files (plus other stuffs, like decfiles) we want to test
         # into a new directory and then cd it as working directory when subprocess.run is executed,
         # otherwise the test will fail horribly if find_file is called by one of the tested steerings.
@@ -86,7 +91,10 @@ class SteeringFileTest(unittest.TestCase):
                 continue
             if light_release() and filename in skip_in_light:
                 continue
+            if filename in skip:
+                continue
             with self.subTest(msg=filename):
+                # pylint: disable=subprocess-run-check
                 result = subprocess.run(
                     ["basf2", "-n1", eg, *additional_arguments],
                     stdout=subprocess.PIPE,

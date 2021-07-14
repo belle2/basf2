@@ -135,6 +135,11 @@ class SteeringFileTest(unittest.TestCase):
                 "085_module.py",
                 "087_module.py"
             ],
+            skip=[
+                # See https://questions.belle2.org/question/11344/
+                "092_cs.py",
+                "093_cs.py",
+            ]
         )
 
 

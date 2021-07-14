@@ -68,12 +68,12 @@ namespace Belle2 {
     std::vector<int> m_svdLayer;  /**< layer */
     std::vector<int> m_svdLadder; /**< ladder */
     std::vector<int> m_svdSensor; /**< sensor */
-    std::vector<int> m_svdSize; /**< size */
+    std::vector<int> m_svdSize; /**< cluster size */
     std::vector<int> m_svdisUside; /**< is U-cluster side */
     std::vector<int> m_trkNumber; /**< track number in the event*/
 
     float m_svdEventT0 = -99; /**< event T0 */
-    float m_svdEventT0Err = -99; /**< event T0 */
+    float m_svdEventT0Err = -99; /**< event T0 error */
     int m_nTracks = 0; /**< number of tracks in the event*/
     int m_svdTB = -1; /**< trigger bin */
   };

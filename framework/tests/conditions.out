@@ -542,7 +542,6 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 [INFO] >>> try to have a list of servers from steering file
     We expect that it fails over to the third server, {mock_host}, but then succeeds
 
-[WARNING] basf2.set_central_serverlist() is deprecated, please use basf2.conditions.metadata_providers instead
 [INFO] Starting event processing, random seed is set to 'something important'
 [INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [WARNING] Conditions data: Metadata provider not usable, trying next one ...

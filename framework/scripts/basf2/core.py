@@ -332,36 +332,3 @@ def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=None):
 
 pybasf2.Path.add_module = _add_module
 pybasf2.Path.add_independent_path = _add_independent_path
-
-
-def get_default_global_tags():
-    """
-    Return the list of default globaltags in one string separated with comma
-
-    .. deprecated:: release-04-00-00
-       Please use `basf2.conditions.default_globaltags <ConditionsConfiguration.default_globaltags>` instead
-    """
-    B2WARNING("basf2.get_default_global_tags() is deprecated, please use basf2.conditions.default_globaltags")
-    return ",".join(conditions.default_globaltags)
-
-
-def set_central_database_networkparams(**argk):
-    """
-    Set some expert database connection details
-
-    .. deprecated:: release-04-00-00
-       Please use `basf2.conditions.expert_settings <ConditionsConfiguration.expert_settings>` instead
-    """
-    B2WARNING("basf2.set_central_database_networkparams() is deprecated, please use basf2.conditions.expert_settings()")
-    return conditions.expert_settings(**argk)
-
-
-def set_central_serverlist(serverlist):
-    """
-    Set the list of database servers
-
-    .. deprecated:: release-04-00-00
-       Please use `basf2.conditions.metadata_providers <ConditionsConfiguration.metadata_providers>` instead
-    """
-    B2WARNING("basf2.set_central_serverlist() is deprecated, please use basf2.conditions.metadata_providers instead")
-    conditions.metadata_providers = serverlist + [e for e in conditions.metadata_providers if not e.startswith("http")]

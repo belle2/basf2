@@ -1216,6 +1216,7 @@ def add_vtx_track_finding_vxdtf2(
     EstimationMethod="tripletFit",
     materialBudgetFactor=1.2,
     maxPt=0.01,
+    vxdQualityEstimatarParametersFromDB=True,
 ):
     """
     Convenience function for adding all vxd track finder Version 2 modules
@@ -1334,6 +1335,7 @@ def add_vtx_track_finding_vxdtf2(
             MaterialBudgetFactor=materialBudgetFactor,
             MaxPt=maxPt,
             SpacePointTrackCandsStoreArrayName=nameSPTCs,
+            useDB=vxdQualityEstimatarParametersFromDB,
         )
 
     if min_SPTC_quality > 0.:

@@ -12,6 +12,9 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <tracking/dbobjects/VXDQualityEstimatorParameters.h>
+
 
 #include <memory>
 #include <string>
@@ -63,6 +66,8 @@ namespace Belle2 {
     float m_materialBudgetFactor;
     /** Only required for TripletFit method */
     float m_maxPt;
+    /** if set, estimator parameter settings read from DB, set false for easy tuning of parameters*/
+    bool m_useDB = true;
 
     // member variables
 
@@ -71,6 +76,9 @@ namespace Belle2 {
 
     /** pointer to the selected QualityEstimator */
     std::unique_ptr<QualityEstimatorBase> m_estimator;
+
+    /** Quality estimator parameters from DB */
+    DBObjPtr<VXDQualityEstimatorParameters> m_VXDQualityEstimatorParameters;
 
   };
 }

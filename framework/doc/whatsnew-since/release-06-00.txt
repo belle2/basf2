@@ -4,5 +4,5 @@ Changes in the framework package since release-06-00
 Conditions Database
 +++++++++++++++++++
 
-* ``b2conditionsdb-tag-publish`` and ``b2conditionsdb-tag-invalidate`` has been removed. ``b2conditionsdb-tag-state``
+* ``b2conditionsdb-tag-publish`` and ``b2conditionsdb-tag-invalidate`` have been removed. ``b2conditionsdb-tag-state``
   must be used now for publishing or invalidating a globaltag.

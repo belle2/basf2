@@ -25,7 +25,7 @@ namespace Belle2 {
     ~VXDQualityEstimatorParameters() {}
 
     /** Set estimation method */
-    void setEstimationMethod(const std::string estimationMethod)
+    void setEstimationMethod(const std::string& estimationMethod)
     {
       m_estimationMethod = estimationMethod;
     }

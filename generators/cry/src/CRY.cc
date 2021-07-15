@@ -20,6 +20,10 @@
 #include <VecGeom/volumes/UnplacedOrb.h>
 #include <VecGeom/volumes/UnplacedTube.h>
 #include <VecGeom/base/LorentzVector.h>
+#include <geometry/GeometryManager.h>
+#include "G4VPhysicalVolume.hh"
+#include "G4LogicalVolume.hh"
+#include "G4Box.hh"
 
 #include <string>
 #include <vector>
@@ -69,17 +73,34 @@ namespace Belle2 {
       B2FATAL("Acceptance bigger than world volume" << LogVar("acceptance", 2 * maxSize) << LogVar("subboxLength",
               m_subboxLength * Unit::m));
     }
-    // and the world box
-    m_world.reset(new vecgeom::UnplacedBox(m_subboxLength / 2. * Unit::m, m_subboxLength / 2. * Unit::m,
-                                           m_subboxLength / 2. * Unit::m));
+    //get information from geometry and create the world box
+    G4VPhysicalVolume* volume = geometry::GeometryManager::getInstance().getTopVolume();
+    if (!volume) {
+      B2FATAL("No geometry found -> Add the Geometry module to the path before the CRY module.");
+      return;
+    }
+    G4Box* topbox = (G4Box*) volume->GetLogicalVolume()->GetSolid();
+    if (!topbox) {
+      B2FATAL("No G4Box found -> Check the logical volume of the geometry.");
+      return;
+    }
+
+    // Wrap the world coordinates (G4 coordinates are mm, Belle 2 units are currently cm)
+    double  halfLength_x  = topbox->GetXHalfLength() * Belle2::Unit::mm;
+    double  halfLength_y  = topbox->GetYHalfLength() * Belle2::Unit::mm;
+    double halfLength_z  = topbox->GetZHalfLength() * Belle2::Unit::mm;
+
+    //    m_world.reset(new vecgeom::UnplacedBox(m_subboxLength / 2. * Unit::m, m_subboxLength / 2. * Unit::m,
+    //                                           m_subboxLength / 2. * Unit::m));
+    m_world.reset(new vecgeom::UnplacedBox(halfLength_x / Unit::cm, halfLength_y / Unit::cm,
+                                           halfLength_z / Unit::cm));
+    printf("world size %3.2f %3.2f %3.2f \n", halfLength_x / Unit::cm, halfLength_x / Unit::cm, halfLength_x / Unit::cm);
   }
 
   void CRY::generateEvent(MCParticleGraph& mcGraph)
   {
     bool eventInAcceptance = 0;
     static std::vector<CRYParticle*> ev;
-    const size_t startIndex = mcGraph.size();
-    double productionShift = std::numeric_limits<double>::infinity();
 
     //force at least particle in acceptance box
     for (int iTrial = 0; iTrial < m_maxTrials; ++iTrial) {
@@ -108,7 +129,7 @@ namespace Belle2 {
         const double vy = p->z() * Unit::m;
         const double vz = p->x() * Unit::m;
         // Time
-        double time = p->t() * Unit::s;
+        double time = 0;// p->t() * Unit::s;
 
         vecgeom::Vector3D<double> pos(vx, vy, vz);
         vecgeom::LorentzVector<double> mom(px, py, pz, etot);
@@ -150,26 +171,14 @@ namespace Belle2 {
         particle.setProductionVertex(TVector3(pos.x(), pos.y(), pos.z()));
         particle.setProductionTime(time);
         eventInAcceptance = true;
-
-        // calculate shift in time necessary to be at y=0 for t=0
-        const vecgeom::Vector3D<double> normalVector(0., 1., 0.); // normal to the global generation plane
-        const vecgeom::Vector3D<double> origin(0, 0, 0);
-        const double distance = ((origin - pos) * normalVector) / (mom.vect().Unit() * normalVector);
-        // and check which is the shift needed to have the first particle at t=0&y=0
-        productionShift = std::min(time - (distance / speed), productionShift);
       }
       // clean up CRY event
       for (auto* p : ev) delete p;
-
       // and if we have something in the acceptance then we're done
       if (eventInAcceptance) {
-        // just shift the times to have the first particle hit y=0 at t=0 (modulo magnetic field)
-        for (size_t i = startIndex; i < mcGraph.size(); ++i) {
-          mcGraph[i].setProductionTime(mcGraph[i].getProductionTime() - productionShift + m_timeOffset);
-        }
-        //everything else is done
         return;
       }
+
     }
     B2ERROR("Number of trials exceeds maxTrials increase number of maxTrials" << LogVar("maxTrials", m_maxTrials));
   }

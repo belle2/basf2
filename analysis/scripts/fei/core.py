@@ -636,44 +636,51 @@ class Teacher:
         """
         job_list = []
         filename = 'training_input.root'
-        f = ROOT.TFile.Open(filename, 'read')
-        if not f:
+        if not os.path.isfile(filename):
             B2WARNING("Training of MVC failed. Couldn't find ROOT file. "
                       "No weight files will be provided.")
         else:
-            for particle in self.particles:
-                for channel in particle.channels:
-                    weightfile = channel.label + '.xml'
-                    if not basf2_mva.available(weightfile):
-                        keys = [m for m in f.GetListOfKeys() if f"{channel.label}" in m.GetName()]
-                        if not keys:
-                            continue
-                        tree = keys[0].ReadObj()
-                        nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1.0')
-                        nBg = tree.GetEntries(channel.mvaConfig.target + ' != 1.0')
-                        if nSig < Teacher.MinimumNumberOfMVASamples:
-                            B2WARNING("Training of MVC failed. "
-                                      f"Tree contains too few signal events {nSig}. Ignoring channel {channel}.")
-                            self.create_fake_weightfile(channel.label)
-                            self.upload(channel.label)
-                            continue
-                        if nBg < Teacher.MinimumNumberOfMVASamples:
-                            B2WARNING("Training of MVC failed. "
-                                      f"Tree contains too few bckgrd events {nBg}. Ignoring channel {channel}.")
-                            self.create_fake_weightfile(channel.label)
-                            self.upload(channel.label)
-                            continue
-                        variable_str = "' '".join(channel.mvaConfig.variables)
+            f = ROOT.TFile.Open(filename, 'read')
+            if f.IsZombie():
+                B2WARNING("Training of MVC failed. ROOT file corrupt. "
+                          "No weight files will be provided.")
+            elif len([k.GetName() for k in f.GetListOfKeys()]) == 0:
+                B2WARNING("Training of MVC failed. ROOT file does not contain any trees. "
+                          "No weight files will be provided.")
+            else:
+                for particle in self.particles:
+                    for channel in particle.channels:
+                        weightfile = channel.label + '.xml'
+                        if not basf2_mva.available(weightfile):
+                            keys = [m for m in f.GetListOfKeys() if f"{channel.label}" in m.GetName()]
+                            if not keys:
+                                continue
+                            tree = keys[0].ReadObj()
+                            nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1.0')
+                            nBg = tree.GetEntries(channel.mvaConfig.target + ' != 1.0')
+                            if nSig < Teacher.MinimumNumberOfMVASamples:
+                                B2WARNING("Training of MVC failed. "
+                                          f"Tree contains too few signal events {nSig}. Ignoring channel {channel}.")
+                                self.create_fake_weightfile(channel.label)
+                                self.upload(channel.label)
+                                continue
+                            if nBg < Teacher.MinimumNumberOfMVASamples:
+                                B2WARNING("Training of MVC failed. "
+                                          f"Tree contains too few bckgrd events {nBg}. Ignoring channel {channel}.")
+                                self.create_fake_weightfile(channel.label)
+                                self.upload(channel.label)
+                                continue
+                            variable_str = "' '".join(channel.mvaConfig.variables)
 
-                        command = (f"{self.config.externTeacher}"
-                                   f" --method '{channel.mvaConfig.method}'"
-                                   f" --target_variable '{channel.mvaConfig.target}'"
-                                   f" --treename '{channel.label} variables' --datafile 'training_input.root'"
-                                   f" --signal_class 1 --variables '{variable_str}'"
-                                   f" --identifier '{channel.label}.xml'"
-                                   f" {channel.mvaConfig.config} > '{channel.label}'.log 2>&1")
-                        B2INFO(f"Used following command to invoke teacher: \n {command}")
-                        job_list.append((channel.label, command))
+                            command = (f"{self.config.externTeacher}"
+                                       f" --method '{channel.mvaConfig.method}'"
+                                       f" --target_variable '{channel.mvaConfig.target}'"
+                                       f" --treename '{channel.label} variables' --datafile 'training_input.root'"
+                                       f" --signal_class 1 --variables '{variable_str}'"
+                                       f" --identifier '{channel.label}.xml'"
+                                       f" {channel.mvaConfig.config} > '{channel.label}'.log 2>&1")
+                            B2INFO(f"Used following command to invoke teacher: \n {command}")
+                            job_list.append((channel.label, command))
             f.Close()
         p = multiprocessing.Pool(None, maxtasksperchild=1)
         func = functools.partial(subprocess.call, shell=True)

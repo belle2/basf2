@@ -10,7 +10,7 @@ from pybasf2 import B2WARNING
 
 from basf2 import register_module
 from ckf.path_functions import add_pxd_ckf, add_cosmics_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, \
-                                add_vtx_ckf,  add_ckf_based_vtx_track_merger, add_cosmics_vtx_ckf
+    add_vtx_ckf, add_ckf_based_vtx_track_merger, add_cosmics_vtx_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 from vtx import add_vtx_reconstruction
@@ -1210,7 +1210,7 @@ def add_vtx_track_finding_vxdtf2(
     useTwoStepSelection=True,
     sectormap_file=None,
     custom_setup_name=None,
-    min_SPTC_quality=0.,
+    min_SPTC_quality=0.0,
     filter_overlapping=True,
     add_mva_quality_indicator=False,
     EstimationMethod="tripletFit",
@@ -1330,7 +1330,7 @@ def add_vtx_track_finding_vxdtf2(
         )
     else:
         path.add_module(
-            'QualityEstimatorVXD',
+            'QualityEstimatorVXDFromDB',
             EstimationMethod=EstimationMethod,
             MaterialBudgetFactor=materialBudgetFactor,
             MaxPt=maxPt,

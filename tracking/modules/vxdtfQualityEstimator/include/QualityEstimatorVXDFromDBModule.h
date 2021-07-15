@@ -12,6 +12,9 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <tracking/dbobjects/VXDQualityEstimatorParameters.h>
+
 
 #include <memory>
 #include <string>
@@ -22,13 +25,15 @@ namespace Belle2 {
    * This module calculates a qualityIndicator (QI) for each SpacePointTrackCandidate.
    * Following the Strategy pattern this module can support
    * all estimation strategies that implement the interface QualityEstimatorBase.
+   * It differes from QualityEstimatorVXDModule by supporting readback of parameters
+   * from DB.
    *  */
-  class QualityEstimatorVXDModule : public Module {
+  class QualityEstimatorVXDFromDBModule : public Module {
 
   public:
 
     /** Constructor of the module. */
-    QualityEstimatorVXDModule();
+    QualityEstimatorVXDFromDBModule();
 
     /** Initializes the Module. */
     void initialize() override;
@@ -63,6 +68,8 @@ namespace Belle2 {
     float m_materialBudgetFactor;
     /** Only required for TripletFit method */
     float m_maxPt;
+    /** if set, estimator parameter settings read from DB, set false for easy tuning of parameters*/
+    bool m_useDB = true;
 
     // member variables
 
@@ -71,6 +78,9 @@ namespace Belle2 {
 
     /** pointer to the selected QualityEstimator */
     std::unique_ptr<QualityEstimatorBase> m_estimator;
+
+    /** Quality estimator parameters from DB */
+    DBObjPtr<VXDQualityEstimatorParameters> m_VXDQualityEstimatorParameters;
 
   };
 }

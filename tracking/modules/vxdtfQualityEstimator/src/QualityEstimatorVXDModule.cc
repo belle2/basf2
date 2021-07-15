@@ -45,20 +45,11 @@ QualityEstimatorVXDModule::QualityEstimatorVXDModule() : Module()
 
   addParam("MaxPt", m_maxPt,
            "Maximum pt needed for the TripletFit.", float(0.01));
-
-  addParam("useDB", m_useDB, "If set, estimator parameter settings read from DB", true);
 }
 
 void QualityEstimatorVXDModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_SpacePointTrackCandsStoreArrayName);
-
-  if (m_VXDQualityEstimatorParameters and m_useDB) {
-    B2INFO("Loading VXDQuality estimator parameters from DB");
-    m_EstimationMethod = m_VXDQualityEstimatorParameters->getEstimationMethod();
-    m_materialBudgetFactor = m_VXDQualityEstimatorParameters->getMaterialBudgetFactor();
-    m_maxPt = m_VXDQualityEstimatorParameters->getMaxPt();
-  }
 
   // create pointer to chosen estimator
   if (m_EstimationMethod == "mcInfo") {

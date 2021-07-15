@@ -29,7 +29,7 @@ from b2test_utils import clean_working_directory, is_ci
 
 
 def light_release() -> bool:
-    """ Returns true if we're in a light release """
+    """Returns true if we're in a light release"""
     try:
         # pylint: disable=import-outside-toplevel
         # pylint: disable=unused-import
@@ -40,7 +40,7 @@ def light_release() -> bool:
 
 
 class SteeringFileTest(unittest.TestCase):
-    """ Test steering files """
+    """Test steering files"""
 
     def _test_examples_dir(
         self,
@@ -88,7 +88,7 @@ class SteeringFileTest(unittest.TestCase):
         # into a new directory and then cd it as working directory when subprocess.run is executed,
         # otherwise the test will fail horribly if find_file is called by one of the tested steerings.
         original_dir = find_file(path_to_glob)
-        working_dir = find_file(shutil.copytree(original_dir, 'working_dir'))
+        working_dir = find_file(shutil.copytree(original_dir, "working_dir"))
         all_egs = sorted(glob.glob(working_dir + "/*.py"))
         for eg in all_egs:
             filename = os.path.basename(eg)
@@ -108,7 +108,7 @@ class SteeringFileTest(unittest.TestCase):
                         "-n",
                         n_events.get(filename, 1),
                         eg,
-                        *additional_arguments
+                        *additional_arguments,
                     ],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
@@ -138,20 +138,17 @@ class SteeringFileTest(unittest.TestCase):
         self._test_examples_dir(
             path_to_glob="online_book/basf2/steering_files",
             additional_arguments=["1"],
-            expensive_tests=[
-                "065_generate_mc.py",
-                "067_generate_mc.py"
-            ],
+            expensive_tests=["065_generate_mc.py", "067_generate_mc.py"],
             skip_in_light=[
                 "065_generate_mc.py",
                 "067_generate_mc.py",
                 "085_module.py",
-                "087_module.py"
+                "087_module.py",
             ],
             n_events={
                 # See https://questions.belle2.org/question/11344/
                 "091_cs.py": 3000,
-            }
+            },
         )
 
 

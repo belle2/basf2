@@ -307,7 +307,7 @@ in the documentation of `skim.registry.SkimRegistryClass`.
      :class: exercise
 
      Run the analysis script in `B2A303-MultipleDecays-Reconstruction.py
-     <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples/tutorials/B2A303-MultipleDecays-Reconstruction.py>`_
+     <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/examples/tutorials/B2A303-MultipleDecays-Reconstruction.py>`_
      on one of the LPNs for the mixed samples of the ``B0toDpi_Kspi``
      skim from the MC skim campaign ``SkimM13ax1`` on the grid.
 

@@ -199,7 +199,7 @@ You will meet this at the end of this lesson.
 .. admonition:: Solution
      :class: toggle solution
 
-     The source code is online `here <https://stash.desy.de/projects/B2/repos/software>`_.
+     The source code is online `here <https://stash.desy.de/projects/B2/repos/basf2/browse>`_.
      The list of **packages** is simply the list of directories in the software
      directory.
 

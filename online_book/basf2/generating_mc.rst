@@ -246,7 +246,7 @@ All the known decay channels of the generated :math:`B^0` and :math:`\bar{B}^0` 
 `main decay file`_. This file is automatically loaded by the function :py:func:`generators.add_evtgen_generator` and
 it is then passed to the `EvtGen generator`_.
 
-.. _main decay file: https://stash.desy.de/projects/B2/repos/software/browse/decfiles/dec/DECAY_BELLE2.DEC
+.. _main decay file: https://stash.desy.de/projects/B2/repos/basf2/browse/decfiles/dec/DECAY_BELLE2.DEC
 
 .. _EvtGen generator: https://evtgen.hepforge.org/
 
@@ -304,7 +304,7 @@ scheme is quite obvious, this is not the same for ``K_S0``). These names are def
 luckily you do not have to go through it, because we have a dedicated tool that parses the file and allows you to
 easily get all the relevant information: :ref:`b2help-particles`.
 
-.. _evt.pdl: https://stash.desy.de/projects/B2/repos/software/browse/framework/particledb/data/evt.pdl
+.. _evt.pdl: https://stash.desy.de/projects/B2/repos/basf2/browse/framework/particledb/data/evt.pdl
 
 .. admonition:: Question
      :class: exercise stacked

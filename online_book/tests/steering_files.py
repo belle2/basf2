@@ -21,7 +21,7 @@ import subprocess
 import unittest
 import glob
 import shutil
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 # basf2
 from basf2 import find_file
@@ -50,6 +50,7 @@ class SteeringFileTest(unittest.TestCase):
         expensive_tests: Optional[List[str]] = None,
         skip_in_light: Optional[List[str]] = None,
         skip: Optional[List[str]] = None,
+        n_events: Optional[Dict[str, int]] = None,
     ):
         """
         Internal function to test a directory full of example scripts with an
@@ -66,6 +67,10 @@ class SteeringFileTest(unittest.TestCase):
                 longer and should e.g. not run on bamboo
             skip_in_light (list(str)): (optional) names of scripts that have to
                 be excluded in light builds
+            skip (list(str)): (optional) names of scripts to always skip
+            n_events (dict(str, int)): mapping of name of script to number of
+                required events for it to run (`-n` argument). If a filename
+                isn't listed, we assume 1
         """
         if additional_arguments is None:
             additional_arguments = []
@@ -77,6 +82,8 @@ class SteeringFileTest(unittest.TestCase):
             skip_in_light = []
         if skip is None:
             skip = []
+        if n_events is None:
+            n_events = {}
         # we have to copy all the steering files (plus other stuffs, like decfiles) we want to test
         # into a new directory and then cd it as working directory when subprocess.run is executed,
         # otherwise the test will fail horribly if find_file is called by one of the tested steerings.
@@ -96,7 +103,13 @@ class SteeringFileTest(unittest.TestCase):
             with self.subTest(msg=filename):
                 # pylint: disable=subprocess-run-check
                 result = subprocess.run(
-                    ["basf2", "-n1", eg, *additional_arguments],
+                    [
+                        "basf2",
+                        "-n",
+                        n_events.get(filename, 1),
+                        eg,
+                        *additional_arguments
+                    ],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                     cwd=working_dir,
@@ -135,11 +148,10 @@ class SteeringFileTest(unittest.TestCase):
                 "085_module.py",
                 "087_module.py"
             ],
-            skip=[
+            n_events={
                 # See https://questions.belle2.org/question/11344/
-                "092_cs.py",
-                "093_cs.py",
-            ]
+                "091_cs.py": 3000,
+            }
         )
 
 

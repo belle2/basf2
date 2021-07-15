@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """ This script creates 10 events with 2 particles per event
     then extracts CNN value for each particles.
     The CNN values represent probabilities for a track being
@@ -35,11 +43,6 @@ from simulation import add_simulation
 from reconstruction import add_reconstruction
 
 sys.path.append('../scripts/eclCNNPID')
-
-__author__ = 'Abtin Narimani Charan'
-__copyright__ = 'Copyright 2021 - Belle II Collaboration'
-__maintainer__ = 'Abtin Narimani Charan'
-__email__ = 'abtin.narimani.charan@desy.de'
 
 
 def argparser():

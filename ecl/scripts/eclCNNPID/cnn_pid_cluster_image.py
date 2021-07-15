@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 import torch
 import numpy as np
 from torch.utils.data import Dataset
 from sklearn.preprocessing import LabelEncoder
-
-__author__ = 'Abtin Narimani Charan'
-__copyright__ = 'Copyright 2021 - Belle II Collaboration'
-__maintainer__ = 'Abtin Narimani Charan'
-__email__ = 'abtin.narimani.charan@desy.de'
 
 
 class ClusterImage(Dataset):

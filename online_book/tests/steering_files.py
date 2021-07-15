@@ -106,7 +106,7 @@ class SteeringFileTest(unittest.TestCase):
                     [
                         "basf2",
                         "-n",
-                        n_events.get(filename, 1),
+                        str(n_events.get(filename, 1)),
                         eg,
                         *additional_arguments,
                     ],

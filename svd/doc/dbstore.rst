@@ -97,6 +97,14 @@ Check `LocalConfig@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDLocalConfig
 Reconstruction Calibrations
 ---------------------------
 
+.. _svdcogonlyerr:
+
+.. cpp:class:: SVDCoGOnlyPositionError
+
+	       Stores the position error formulas for the ``CoGOnly`` algorithm, with the same granularity_ as simulation objects
+
+Check `CoGOnlyErr@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyPositionError&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** is used for experiment 0 and 1003. Revision **2** (scale factors = 1) should be used for data reconstruction. 
+
 .. _svdcogonlycal:
 
 .. cpp:class:: SVDCoGOnlyErrorScaleFactors

@@ -34,7 +34,6 @@ IMPORTANT NOTE:
         mainPath.add_module('Geometry')
 """
 
-from cnn_pid_ecl_module import CNN_PID_ECL
 import sys
 import argparse
 import basf2 as b2
@@ -43,6 +42,7 @@ from simulation import add_simulation
 from reconstruction import add_reconstruction
 
 sys.path.append('../scripts/eclCNNPID')
+from cnn_pid_ecl_module import CNN_PID_ECL  # noqa
 
 
 def argparser():
@@ -103,7 +103,7 @@ add_simulation(mainPath)
 # Reconstruction
 add_reconstruction(mainPath)
 
-name = f'{particle}+:tracks'
+name = f'{particle}+:particles'
 
 if particle in ['gamma', 'deuteron', 'anti-deuteron']:
     name = f'{particle}:particles'

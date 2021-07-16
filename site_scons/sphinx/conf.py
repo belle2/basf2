@@ -89,7 +89,7 @@ author = 'Belle2 Software Group'
 # The short X.Y version.
 version = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode().strip()
 # Used for links to the repository
-basf2_repository = "https://stash.desy.de/projects/B2/repos/software"
+basf2_repository = "https://stash.desy.de/projects/B2/repos/basf2"
 basf2_commitid = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
 basf2_jira = "https://agira.desy.de"
 

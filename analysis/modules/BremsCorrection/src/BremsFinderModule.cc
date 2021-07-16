@@ -89,8 +89,8 @@ namespace Belle2 {
     See also:
       `eclTrackBremFinder module`_
                    
-    .. _eclTrackBremFinder module: https://stash.desy.de/projects/B2/repos/software/browse/ecl/modules/eclTrackBremFinder
-    .. _here: https://stash.desy.de/projects/B2/repos/software/browse/ecl/modules/eclTrackBremFinder/src/BremFindingMatchCompute.cc)DOC");
+    .. _eclTrackBremFinder module: https://stash.desy.de/projects/B2/repos/basf2/browse/ecl/modules/eclTrackBremFinder
+    .. _here: https://stash.desy.de/projects/B2/repos/basf2/browse/ecl/modules/eclTrackBremFinder/src/BremFindingMatchCompute.cc)DOC");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters

@@ -557,7 +557,7 @@ def create_isSignal_alias(aliasName, flags):
     unmasking (setting bits to zero)
     the ``c_MissGamma`` bit (16 or 0b00010000) and ``c_MissNeutrino`` bit (8 or 0b00001000) in mcErrors.
 
-    For more information, please check this `example script <https://stash.desy.de/projects/B2/repos/software/
+    For more information, please check this `example script <https://stash.desy.de/projects/B2/repos/basf2/
     browse/analysis/examples/VariableManager/isSignalAcceptFlags.py>`_.
 
     Parameters:

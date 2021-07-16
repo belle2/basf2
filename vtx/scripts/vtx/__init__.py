@@ -14,8 +14,8 @@ from ROOT import Belle2
 
 
 # Dictionary containing global tag names for Belle II upgrade flavors with VTX
-valid_upgrade_globaltags = {"upgrade_globaltag_vtx_7layer": "upgrade_2020-09-22_vtx_7layer",
-                            "upgrade_globaltag_vtx_5layer": "upgrade_2020-09-22_vtx_5layer",
+valid_upgrade_globaltags = {"upgrade_globaltag_vtx_7layer": "upgrade_2021-07-16_vtx_7layer",
+                            "upgrade_globaltag_vtx_5layer": "upgrade_2021-07-16_vtx_5layer",
                             "upgrade_globaltag_vtx_5layer_discs": "upgrade_2020-07-13_vtx_5layer_discs",
                             "upgrade_globaltag_vtx_tb_2020-03": "upgrade_2020-07-07_VTX-CMOS-testbeam-2020-03-12",
                             }

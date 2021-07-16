@@ -29,7 +29,7 @@ Few words about how a ``KLMCluster`` is built starting from ``BKLMHit2d`` and ``
 Muon identification
 -------------------
 Muon identification for the extrapolated tracks in KLM uses differences in longitudinal penetration
-depth and transverse scattering of the extrapolated track. It is handles by the ``Muid`` module,
+depth and transverse scattering of the extrapolated track. It is handled by the ``Muid`` module,
 that is part of the tracking package of ``basf2`` and proceeds in two steps:
 
 1. **Track extrapolation** using the muon hypothesis only;

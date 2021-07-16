@@ -81,9 +81,9 @@ namespace Belle2 {
      * random
      */
     std::string m_estimationMethod;
-    /** Only materialBudget factor used only for TripletFit method */
+    /** MaterialBudget factor used only for TripletFit method */
     float m_materialBudgetFactor;
-    /** Only maxPt cutogg used only for TripletFit method */
+    /** MaxPt cutoff used only for TripletFit method */
     float m_maxPt;
     /** VXD track candidate selection criteria*/
     float m_minRequiredQuality;

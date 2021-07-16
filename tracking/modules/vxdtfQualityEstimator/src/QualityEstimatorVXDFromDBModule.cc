@@ -53,11 +53,15 @@ void QualityEstimatorVXDFromDBModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_SpacePointTrackCandsStoreArrayName);
 
-  if (m_VXDQualityEstimatorParameters and m_useDB) {
-    B2INFO("Loading VXDQuality estimator parameters from DB");
-    m_EstimationMethod = m_VXDQualityEstimatorParameters->getEstimationMethod();
-    m_materialBudgetFactor = m_VXDQualityEstimatorParameters->getMaterialBudgetFactor();
-    m_maxPt = m_VXDQualityEstimatorParameters->getMaxPt();
+  if (m_useDB) {
+    if (m_VXDQualityEstimatorParameters) {
+      B2INFO("Loading VXDQuality estimator parameters from DB");
+      m_EstimationMethod = m_VXDQualityEstimatorParameters->getEstimationMethod();
+      m_materialBudgetFactor = m_VXDQualityEstimatorParameters->getMaterialBudgetFactor();
+      m_maxPt = m_VXDQualityEstimatorParameters->getMaxPt();
+    } else {
+      B2FATAL("VXDQualityEstimatorParameters not found");
+    }
   }
 
   // create pointer to chosen estimator

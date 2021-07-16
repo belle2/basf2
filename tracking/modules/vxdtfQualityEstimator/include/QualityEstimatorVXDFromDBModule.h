@@ -25,7 +25,7 @@ namespace Belle2 {
    * This module calculates a qualityIndicator (QI) for each SpacePointTrackCandidate.
    * Following the Strategy pattern this module can support
    * all estimation strategies that implement the interface QualityEstimatorBase.
-   * It differes from QualityEstimatorVXDModule by supporting readback of parameters
+   * It differs from QualityEstimatorVXDModule by supporting readback of parameters
    * from DB.
    *  */
   class QualityEstimatorVXDFromDBModule : public Module {
@@ -38,6 +38,7 @@ namespace Belle2 {
     /** Initializes the Module. */
     void initialize() override;
 
+    /** Sets magnetic field strength and MC QualityEstimator*/
     void beginRun() override;
 
     /** Applies the selected quality estimation method for a given set of TCs */
@@ -69,7 +70,7 @@ namespace Belle2 {
     /** Only required for TripletFit method */
     float m_maxPt;
     /** if set, estimator parameter settings read from DB, set false for easy tuning of parameters*/
-    bool m_useDB = true;
+    bool m_useDB = false;
 
     // member variables
 

@@ -79,8 +79,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'basf2'
-copyright = '2010-2019, Belle II Collaboration'
-author = 'Belle2 Software Group'
+copyright = 'Belle II Collaboration'
+author = 'Belle II Software Group'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

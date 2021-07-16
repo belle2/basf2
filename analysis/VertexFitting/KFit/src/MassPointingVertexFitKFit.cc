@@ -499,8 +499,8 @@ MassPointingVertexFitKFit::makeCoreMatrix() {
 
   for (int i = 0; i < m_TrackCount; i++)
   {
-    double B, S, U;
-    double sininv, sqrtag;
+    double S, U;
+    double sininv;
 
     double px = m_al_1[i * KFitConst::kNumber7 + 0][0];
     double py = m_al_1[i * KFitConst::kNumber7 + 1][0];
@@ -531,7 +531,7 @@ MassPointingVertexFitKFit::makeCoreMatrix() {
 
     if (a != 0.) { // charged
 
-      B = a * a2 * invPt2;
+      double B = a * a2 * invPt2;
       if (fabs(B) > 1.) {
         m_ErrorCode = KFitError::kDivisionByZero;
         KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
@@ -546,15 +546,13 @@ MassPointingVertexFitKFit::makeCoreMatrix() {
         return m_ErrorCode;
       }
       // 1/sqrt(1-B^2)
-      sqrtag = 1.0 / sqrt(tmp0);
+      double sqrtag = 1.0 / sqrt(tmp0);
       S = sqrtag * invPt2;
       U = dlz - pz * sininv / a;
 
     } else { // neutral
 
-      B      = 0.0;
       sininv = 0.0;
-      sqrtag = 1.0;
       S = invPt2;
       U = dlz - pz * a2 * invPt2;
 

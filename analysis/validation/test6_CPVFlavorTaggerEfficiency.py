@@ -13,7 +13,7 @@
 <header>
   <input>CPVToolsOutput.root</input>
   <output>test6_CPVFlavorTaggerEfficiency.root</output>
-  <contact>Fernando Abudinen; abudinen@mpp.mpg.de</contact>
+  <contact>Yo Sato; yosato@post.kek.jp</contact>
   <description>This file calculates the effective efficiency of the category based flavor tagger considering the two
   standard combiners and the individual categories. Validation plots are also pruduced. </description>
 </header>
@@ -141,7 +141,7 @@ outputNtuple.SetAlias(
     'Check',
     "These values should not change drastically. Since the nightly reconstruction validation runs" +
     "on the same input file (which changes only from release to release), the values between builds should be the same.")
-outputNtuple.SetAlias('Contact', "abudinen@mpp.mpg.de")
+outputNtuple.SetAlias('Contact', "yosato@post.kek.jp")
 
 efficienciesForNtuple = []
 
@@ -431,7 +431,7 @@ for method in methods:
         ROOT.TNamed(
             'Check',
             'Shape should not change drastically. E.g. Warning if the peak at 0 increases or if the peaks at +-1 decrease.'))
-    histo_belleplotBoth.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de'))
+    histo_belleplotBoth.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'yosato@post.kek.jp'))
 
     histo_belleplotBoth.SetTitle(
         'Flavor tagger output for combiner ' +
@@ -471,7 +471,7 @@ for method in methods:
         ROOT.TNamed(
             'Check',
             'Shape should not change drastically. E.g. Warning if the peak at 0 increases or if the peak at +1 decreases.'))
-    histo_belleplotB0.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de'))
+    histo_belleplotB0.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'yosato@post.kek.jp'))
     histo_belleplotB0.Write()
 
     # Validation Plot 3
@@ -505,7 +505,7 @@ for method in methods:
             ' for true B0bars'))
     histo_belleplotB0bar.GetListOfFunctions().Add(ROOT.TNamed(
         'Check', 'Shape should not change drastically. E.g. Warning if the peak at 0 increases or if the peak at -1 decreases.'))
-    histo_belleplotB0bar.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de'))
+    histo_belleplotB0bar.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'yosato@post.kek.jp'))
     histo_belleplotB0bar.Write()
 
     # IPython.embed()
@@ -571,7 +571,7 @@ for method in methods:
             ' for true B0s'))
     histo_calib_B0.GetListOfFunctions().Add(
         ROOT.TNamed('Check', 'Shape should not change drastically. E.g. warning if the shape stops beeing linear.'))
-    histo_calib_B0.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de'))
+    histo_calib_B0.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'yosato@post.kek.jp'))
     histo_calib_B0.Write()
 
     histo_belleplotBoth.Delete()
@@ -846,7 +846,7 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
     hist_both.GetListOfFunctions().Add(ROOT.TNamed('Description', 'Output of the flavor tagger category ' + catName))
     hist_both.GetListOfFunctions().Add(
         ROOT.TNamed('Check', 'Shape should not change drastically. E.g. Warning if there is only a peak at 0.'))
-    hist_both.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'abudinen@mpp.mpg.de'))
+    hist_both.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'yosato@post.kek.jp'))
 
     hist_both.SetTitle(
         'Flavor tagger output of the category ' +

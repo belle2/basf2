@@ -36,6 +36,8 @@ The basics.
 
 The Belle II software is called basf2.
 It is an abbreviation for "Belle II Analysis Software Framework".
+You may see also "BASF2" or "Basf2" in some outdated documentation, but the
+official way for writing it is basf2, using only lower case letters.
 You might wonder why we didn't choose "b2asf", and when you get a bit further
 you will probably wonder why it has "analysis" in the name (it does much more
 than analysis)?

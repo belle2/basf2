@@ -108,7 +108,7 @@ namespace Belle2 {
                        aTrack->GetVertexPosition().y(),
                        aTrack->GetVertexPosition().z());
 
-      // convert to Basf2 units
+      // convert to basf2 units
       TPosition = TPosition * Unit::mm;
       TMomentum = TMomentum  * Unit::MeV;
       TOrigin = TOrigin * Unit::mm;

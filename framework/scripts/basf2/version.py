@@ -24,4 +24,4 @@ except AttributeError:
 release = (os.environ.get('BELLE2_RELEASE', 'unknown'))
 
 if __name__ == "__main__":
-    print(f'BASF2, Version: {version} (Release: {release})')
+    print(f'basf2 (Belle II Analysis Software Framework), Version: {version} (Release: {release})')

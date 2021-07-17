@@ -14,7 +14,7 @@ to serve a slightly changed purpose or circumstance.
 
 Note:
   A great deal of the these modules are quite general purpose helper constructs,
-  which might be helpful in other parts of the BASF2, and might therefore be better
+  which might be helpful in other parts of the basf2, and might therefore be better
   placed in the framework folder.
 """
 
@@ -309,8 +309,8 @@ class IfMCParticlesPresentModule(IfStoreArrayPresentModule):
 
 class PathModule(basf2.Module):
 
-    """Wrapper for a BASF2 path into a module such that
-    it can be passed around and added to a BASF2 path as a BASF2 module.
+    """Wrapper for a basf2 path into a module such that
+    it can be passed around and added to a basf2 path as a basf2 module.
 
     The wrapper is implement in such a way that it unconditionally executes
     the contained path by means of a positive return value.

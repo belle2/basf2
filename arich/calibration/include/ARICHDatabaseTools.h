@@ -257,7 +257,7 @@ namespace Belle2 {
 
       /**
        * Double specialization of TokenCast<T> the decimal point is set to '.'!
-       * Note: the spelication on locale is unclear need Basf2 facet defs!
+       * Note: the spelication on locale is unclear need basf2 facet defs!
        * @todo check with framework developer on set facet that defines the decimal
        * point...
        */

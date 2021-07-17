@@ -24,7 +24,7 @@ REG_MODULE(ContinuumSuppressionBuilder)
 ContinuumSuppressionBuilderModule::ContinuumSuppressionBuilderModule() : Module()
 {
   // Set module properties
-  setDescription("Creates for each Particle in the given ParticleLists a ContinuumSuppression dataobject and makes BASF2 relation between them.");
+  setDescription("Creates for each Particle in the given ParticleLists a ContinuumSuppression dataobject and makes basf2 relation between them.");
 
   // Parameter definitions
   addParam("particleList", m_particleListName, "Name of the ParticleList", std::string(""));

@@ -28,13 +28,15 @@ namespace Belle2 {
 
   protected:
 
+    /** Run algo on data */
     virtual EResult calibrate() override;
 
   private:
-    /**Identifier string */
+
+    /** Identifier string */
     std::string m_id;
 
-    /**Minimum number of required entries for collector histogram L4.1.2 u-side */
+    /** Minimum number of required entries for collector histogram L4.1.2 u-side */
     int m_minEntries = 10000;
 
   };

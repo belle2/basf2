@@ -27,7 +27,6 @@ import ROOT
 from tracking.validation.run import TrackingValidationRun
 import argparse
 import basf2
-CONTACT = 'thomas.hauth@kit.edu'
 # run at most over this amount of events
 N_EVENTS = 100
 ACTIVE = True

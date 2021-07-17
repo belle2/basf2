@@ -936,7 +936,7 @@ double CDCDigitizerModule::getDriftTime(const double driftLength, const bool add
 void CDCDigitizerModule::makeSignalsAfterShapers(const WireID& wid, double dEinGeV, double dx, double costh,
                                                  unsigned short& adcCount, double& convFactorForThreshold)
 {
-  static double conv00  = (100.0 / 3.2); //keV -> coun (original from E. Nakano from some test beam results)
+  static double conv00  = (100.0 / 3.2); //keV -> coun (original from some test beam results)
   convFactorForThreshold = conv00;
   adcCount = 0;
   if (dEinGeV <= 0. || dx <= 0.) return;

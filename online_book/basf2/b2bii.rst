@@ -266,7 +266,7 @@ subdetector systems (CDC, ACC, TOF, ECL, KLM). The combination of individual
 likelihoods from each sub detector system is in some cases (eID) combined
 with the usage of external information, such as a priori probabilities of
 each particle type that is read from the Belle DB. Due to this fact the
-Belle-like PID probabilities can not be reproduced in BASF2 from the raw
+Belle-like PID probabilities can not be reproduced in basf2 from the raw
 likelihoods.
 
 Alternatively, we can use the following predefined Belle-style PID variables to

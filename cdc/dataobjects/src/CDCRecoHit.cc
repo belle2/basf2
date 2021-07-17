@@ -141,7 +141,7 @@ std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlan
 {
   double z = state.getPos().Z();
   const TVector3& p = state.getMom();
-  // Calculate alpha and theta.  A description was given by H. Ozaki in
+  // Calculate alpha and theta.  A description was given in
   // https://indico.mpp.mpg.de/getFile.py/access?contribId=5&sessionId=3&resId=0&materialId=slides&confId=3195
 
 //Comment out the following 2 lines since they introduce dependence on cdclib (or circular dependence betw. cdc_objects and cdclib).
@@ -262,7 +262,7 @@ std::vector<double> CDCRecoHit::timeDerivativesMeasurementsOnPlane(const genfit:
 {
   double z = state.getPos().Z();
   const TVector3& p = state.getMom();
-  // Calculate alpha and theta.  A description was given by H. Ozaki in
+  // Calculate alpha and theta.  A description was given by in
   // https://indico.mpp.mpg.de/getFile.py/access?contribId=5&sessionId=3&resId=0&materialId=slides&confId=3195
 
 //Comment out the following 2 lines since they introduce dependence on cdclib (or circular dependence betw. cdc_objects and cdclib).

@@ -490,8 +490,8 @@ data and MC, but if you use 30 variables in a BDT you will have to check all 30 
 
 .. topic:: Authors of this lesson
 
-    Moritz Bauer, Yaroslav Kulii
+   Moritz Bauer, Yaroslav Kulii
 
 .. topic:: Code contributors
 
-    P. Goldenzweig, I. Komarov
+   Pablo Goldenzweig, Ilya Komarov

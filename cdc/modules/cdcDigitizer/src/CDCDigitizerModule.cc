@@ -485,11 +485,11 @@ void CDCDigitizerModule::event()
     // M. Uchida 2012.08.31
     double dEThreshold = 0.;
     if (m_useDB4FEE && m_useDB4EDepToADC) {
-      dEThreshold = m_tdcThresh[m_boardID] / convFactorForThreshold;
+      dEThreshold = m_tdcThresh[m_boardID] / convFactorForThreshold * Unit::keV;
     } else {
       dEThreshold = (m_wireID.getISuperLayer() == 0) ? m_tdcThreshold4Inner : m_tdcThreshold4Outer;
+      dEThreshold *= Unit::eV;
     }
-    dEThreshold *= Unit::eV;
     B2DEBUG(m_debugLevel, "hitdE,dEThreshold,driftLength " << hitdE << " " << dEThreshold << " " << hitDriftLength);
 
     if (hitdE < dEThreshold) {

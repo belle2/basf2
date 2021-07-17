@@ -50,16 +50,17 @@ create_validation_histograms(
             r"$B^0\to\rho^0\gamma$ candidates' beam-constrained mass",
             "Frank Meier <frank.meier@duke.edu>",
             r"The beam-constrained mass distribution of $B^0\to\rho^0\gamma$ decays",
-            "Distribution should be peaking at the nominal $B^0$ mass. Tail towards low mass."
+            "Distribution should be peaking at the nominal $B^0$ mass. Tail towards low mass.",
             "M_{bc} [GeV/c^{2}]", "Candidates",
         ),
         (
             "useRestFrame(daughter(1, E))", 50, 1.5, 4.0,
             r"The photon energy distribution for $B^0\to\rho^0\gamma$ decays",
             "Frank Meier <frank.meier@duke.edu>; Torben Ferber <torben.ferber@desy.de>",
+            r"Photon energy distribution of $B^0\to\rho^0\gamma$ decays",
             "Sharp distribution at 2.5 GeV. Look for differences in "
             "the abslute scale. This could be an indication of a loss of photon efficiency.",
-            r"E_{\gamma} [GeV]", "Candidates",
+            "E_{#gamma} [GeV]", "Candidates",
         ),
     ]
 )

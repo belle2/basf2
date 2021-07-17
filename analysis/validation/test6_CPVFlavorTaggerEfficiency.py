@@ -33,9 +33,9 @@ treeName = str("B0tree")
 workingDirectory = '.'
 
 #
-# *****************************************
-# DETERMINATION OF TOTAL EFFECTIVE EFFIENCY
-# *****************************************
+# *******************************************
+# DETERMINATION OF TOTAL EFFECTIVE EFFICIENCY
+# *******************************************
 #
 
 r_subsample = array('d', [
@@ -570,7 +570,7 @@ for method in methods:
             method +
             ' for true B0s'))
     histo_calib_B0.GetListOfFunctions().Add(
-        ROOT.TNamed('Check', 'Shape should not change drastically. E.g. warning if the shape stops beeing linear.'))
+        ROOT.TNamed('Check', 'Shape should not change drastically. E.g. warning if the shape stops being linear.'))
     histo_calib_B0.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'yosato@post.kek.jp'))
     histo_calib_B0.Write()
 
@@ -614,7 +614,7 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
     hist_both = ROOT.TH1F('qp_' + category, 'Input Background (B0bar)' +
                           category + ' (binning 50)', 100, -1, 1)
 
-    # per definiton that input is not comparable to the network output, this has to be transformed.
+    # per definition that input is not comparable to the network output, this has to be transformed.
     # probability output from 0 to 1 (corresponds to net output probability) -> calculation below
     hist_probB0 = ROOT.TH1F('ProbabilityB0_' + category,
                             'Transformed to probability (B0) (' + category + ')',
@@ -687,7 +687,7 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
             purityB0bar[i] = back[i] / (signal[i] + back[i])
             dilutionB0bar2[i] = -1 + 2 * back[i] / (signal[i] + back[i])
 
-        # filling histogram with probabilty from 0 to 1
+        # filling histogram with probability from 0 to 1
         hist_probB0.Fill(purityB0[i], signal[i])
         hist_probB0bar.Fill(purityB0bar[i], back[i])
 

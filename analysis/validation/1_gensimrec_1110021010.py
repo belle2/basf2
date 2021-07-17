@@ -12,7 +12,7 @@
 """
 <header>
   <output>../1110021010.dst.root</output>
-  <contact>sam.cunliffe@desy.de</contact>
+  <contact>Frank Meier; frank.meier@duke.edu</contact>
 </header>
 """
 # Generates and reconstructs 1000 [B0 -> rho0 gamma] decay events for nightly

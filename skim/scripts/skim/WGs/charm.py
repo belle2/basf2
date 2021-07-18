@@ -18,6 +18,14 @@ Skim list building functions for charm analyses.
     and a negative particle that could be either conjugate or non-conjugate. The Hp and Hm
     in `DstToD0Pi_D0ToHpHmPi0`, mean a positive particle and a negative particle that
     must be conjugate.
+
+.. Note::
+    Although reconstructDecay() would automatically include charged conjugate channel, and D0
+    is not distinguishable from anti-D0 in XToD0 skim, both :math:`D^0 \\to f` and :math:`D^0 \\to \\overline{f}`
+    mode should be written explicitly in XToD0 skim, because later in the DstToD0Pi skim, the D0 decay strings
+    in XToD0 skim would be directly combined with pi+. For example, if one only include D0 -> K+ pi- in XToD0_D0ToHpJm
+    skim, then in DstToD0Pi_D0ToHpJm skim, only the D*+ -> [D0 -> K+ pi-] pi+ would be included, and
+    D*+ -> [D0 -> K- pi+] pi+ would not be included.
 """
 
 from functools import lru_cache
@@ -57,6 +65,7 @@ class XToD0_D0ToHpJm(BaseSkim):
 
         * :math:`D^{0}\\to \\pi^+ \\pi^-`,
         * :math:`D^{0}\\to K^+ \\pi^-`,
+        * :math:`D^{0}\\to K^- \\pi^+`,
         * :math:`D^{0}\\to K^+ K^-`,
 
         **Additional Cuts**:
@@ -80,6 +89,7 @@ class XToD0_D0ToHpJm(BaseSkim):
         D0_Channels = [
             "pi+:mygood pi-:mygood",
             "K+:mygood pi-:mygood",
+            "K-:mygood pi+:mygood",
             "K+:mygood K-:mygood",
         ]
 
@@ -388,7 +398,7 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
     """
     **Decay Modes**:
 
-    1. :math:`D^{*+}\\to D^{0} \\pi^+`, where the D^{0} is reconstructed by `XToD0_D0ToHpJm.D0ToHpJm`
+    1. :math:`D^{*+}\\to D^{0} \\pi^+`, where :math:`D^{0}` is reconstructed by `XToD0_D0ToHpJm.D0ToHpJm`
 
     **Additional Cuts**:
 
@@ -684,7 +694,7 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
     """
     **Decay Modes**:
 
-    * :math:`D^{*+}\\to \\pi^+ D^{0}`, where the D^{0} is reconstructed by `XToD0_D0ToNeutrals.D0ToNeutrals`.
+    * :math:`D^{*+}\\to \\pi^+ D^{0}`, where the :math:`D^{0}` is reconstructed by `XToD0_D0ToNeutrals.D0ToNeutrals`.
 
     **Additional Cuts**:
 

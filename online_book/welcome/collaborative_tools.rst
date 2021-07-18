@@ -470,7 +470,7 @@ A bit more about working with stash and JIRA
      Go to https://stash.desy.de
 
      * What's displayed at the dashboard/home screen?
-     * Find the main Belle II software repository.
+     * Find the main Belle II basf2 repository.
      * Look at the commits.
 
 
@@ -480,17 +480,20 @@ A bit more about working with stash and JIRA
    Some of that is just browsing.
    We trust that you did it.
    The main software repository is:
-   https://stash.desy.de/projects/B2/repos/software , and the list of commits
-   is `here <https://stash.desy.de/projects/B2/repos/software/commits>`__.
+   https://stash.desy.de/projects/B2/repos/basf2 , and the list of commits
+   is `here <https://stash.desy.de/projects/B2/repos/basf2/commits>`__.
 
 .. seealso::
 
   In this video we will show you around stash. It will also contain the solution
   to the last exercise.
 
+
   .. raw:: html
 
       <iframe width="640" height="400" src="https://rebrand.ly/axdfhy4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+.. .. FIXME video above needs redoing to navigate around the **basf2** repository
 
 .. admonition:: Exercise
      :class: exercise stacked

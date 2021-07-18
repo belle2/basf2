@@ -32,8 +32,6 @@ cp_val_path = b2.Path()
 inputFile = b2.find_file(filename='analysis/mdst11_BGx1_b2jpsiks.root', data_type='validation')
 ma.inputMdst(environmentType='default', filename=inputFile, path=cp_val_path)
 
-# ma.inputMdst(environmentType='default', filename='../mdst11_BGx1_b2jpsiks.root', path=cp_val_path)
-
 # Reconstruction of signal side and MC match
 ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
 ma.fillParticleList(decayString='mu+:all', cut='', path=cp_val_path)

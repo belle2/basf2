@@ -16,7 +16,7 @@
   <contact>Frank Meier; frank.meier@duke.edu</contact>
 </header>
 """
-# Runs a simple analysis on signal [B0 -> rho0 gamma] events. Saves historams
+# Runs a simple analysis on signal [B0 -> rho0 gamma] events. Saves histograms
 # in a format for the validation server. There are better example analysis
 # scripts in analysis/examples and analysis/examples/tutorials.
 
@@ -59,7 +59,7 @@ create_validation_histograms(
             "Frank Meier <frank.meier@duke.edu>; Torben Ferber <torben.ferber@desy.de>",
             r"Photon energy distribution of $B^0\to\rho^0\gamma$ decays",
             "Sharp distribution at 2.5 GeV. Look for differences in "
-            "the abslute scale. This could be an indication of a loss of photon efficiency.",
+            "the absolute scale. This could be an indication of a loss of photon efficiency.",
             "E_{#gamma} [GeV]", "Candidates",
         ),
     ]

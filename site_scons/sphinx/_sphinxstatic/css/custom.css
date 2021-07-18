@@ -7,6 +7,11 @@
     margin-bottom: 0 !important;
 }
 
+/* Disable rounded borders for all boxes, because it doesn't look nice when
+ * we stack them on top of each other */
+.admonition {
+    border-radius: 0px;
+}
 
 /* Getting things to toggle, e.g. for solution boxes */
 /* ------------------------------------------------- */

@@ -13,6 +13,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+from sphinx_book_theme import setup as sphinx_book_theme_setup
 import sys
 import os
 import re
@@ -24,7 +25,10 @@ sys.path.insert(0, os.path.abspath("extensions"))
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-# sys.path.insert(0, os.path.abspath('....'))
+sys.path.insert(0, os.path.abspath('_themes/'))
+
+
+print(sys.path)
 
 # -- General configuration ------------------------------------------------
 
@@ -65,7 +69,7 @@ autosectionlabel_prefix_document = True
 suppress_warnings = ['autosectionlabel.*']
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_sphinxtemplates']
+templates_path = ['_sphinxtemplates', '_themes/sphinx_book_theme/_templates/']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -187,7 +191,7 @@ html_theme = 'sphinx_book_theme'
 # html_theme_options = {'stickysidebar': True}
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = ["_themes", ]
+html_theme_path = ['_themes']
 
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
@@ -208,7 +212,7 @@ html_logo = "b2logo.svg"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_sphinxstatic']
+html_static_path = ['_sphinxstatic', ]
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -471,6 +475,7 @@ def setup(app):
     app.connect('autodoc-process-docstring', process_docstring)
     app.connect('autodoc-skip-member', skipmember)
     app.add_css_file('css/custom.css')
+    sphinx_book_theme_setup(app)
 
 
 # Work around https://github.com/sphinx-doc/sphinx/issues/9189 by monkey patching the member function in question

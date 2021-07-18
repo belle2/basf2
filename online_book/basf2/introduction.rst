@@ -970,4 +970,4 @@ Good luck.
 
 .. rubric:: Author of this lesson
 
-    Sam Cunliffe
+Sam Cunliffe

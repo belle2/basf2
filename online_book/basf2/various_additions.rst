@@ -482,5 +482,5 @@ random seed.
 
 .. rubric:: Authors of this lesson
 
-     Alejandro Mora,
-     Kilian Lieret
+Alejandro Mora,
+Kilian Lieret

@@ -180,4 +180,4 @@ You will learn a lot about the computing system, and it is a very important serv
 
 .. rubric:: Author of this lesson
 
-    Michel Villanueva
+Michel Villanueva

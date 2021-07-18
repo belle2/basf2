@@ -708,7 +708,7 @@ and explanations on the code structure.
 
 .. rubric:: Author of this lesson
 
-    Moritz Bauer
+Moritz Bauer
 
 .. rubric:: Footnotes
 

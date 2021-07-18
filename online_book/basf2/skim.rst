@@ -369,5 +369,5 @@ documentation helpful.
 
 .. rubric:: Authors of this lesson
 
-     Phil Grace, Racha Cheaib
+Phil Grace, Racha Cheaib
 

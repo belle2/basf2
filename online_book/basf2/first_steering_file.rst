@@ -1013,4 +1013,4 @@ or `matchedMC`.
 
 .. rubric:: Authors of this lesson
 
-    Frank Meier, Kilian Lieret (minor improvements)
+Frank Meier, Kilian Lieret (minor improvements)

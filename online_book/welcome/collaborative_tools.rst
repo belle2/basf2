@@ -627,5 +627,5 @@ Help us out with documentation: as a beginner, you know best what is missing!
 
 .. rubric:: Author(s) of this lesson
 
-     Kilian Lieret,
-     Sam Cunliffe
+Kilian Lieret,
+Sam Cunliffe

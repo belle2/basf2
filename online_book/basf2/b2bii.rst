@@ -427,5 +427,5 @@ The Klongs are stored in the default ``K_L0:mdst``.
 
 .. rubric:: Author of this lesson
 
-   Chia-Ling Hsu
+Chia-Ling Hsu
 

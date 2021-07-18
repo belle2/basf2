@@ -1000,6 +1000,6 @@ also find keyboard shortcuts for most of them.
 
 .. rubric:: Author(s) of this lesson
 
-     Martin Ritter,
-     Michael Eliachevitch
+Martin Ritter,
+Michael Eliachevitch
 

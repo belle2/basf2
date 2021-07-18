@@ -321,5 +321,5 @@ to continue your training even after the StarterKit. It will not be time wasted!
 
 .. rubric:: Authors of this lesson
 
-     Kilian Lieret,
-     Martin Ritter
+Kilian Lieret,
+Martin Ritter

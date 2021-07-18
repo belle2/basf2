@@ -582,8 +582,8 @@ data and MC on this variable, but if you use 30 variables in a BDT you will have
 
 .. rubric:: Authors of this lesson
 
-   Moritz Bauer, Yaroslav Kulii
+Moritz Bauer, Yaroslav Kulii
 
-.. topic:: Code contributors
+.. rubric:: Code contributors
 
-   Pablo Goldenzweig, Ilya Komarov
+Pablo Goldenzweig, Ilya Komarov

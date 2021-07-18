@@ -381,4 +381,4 @@ for you (after some time you might be surprised with how many commands you remem
 
 .. rubric:: Author of this lesson
 
-     Martin Ritter
+Martin Ritter

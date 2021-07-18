@@ -767,4 +767,4 @@ setting items in the quick-start tutorial or the user guide we introduce in
 
 .. rubric:: Author(s) of this lesson
 
-   Xing-Yu Zhou
+Xing-Yu Zhou

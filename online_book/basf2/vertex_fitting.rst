@@ -307,4 +307,4 @@ As an exercise we will focus on the first two.
 
 .. rubric:: Authors of this lesson
 
-    Francesco Tenchini
+Francesco Tenchini

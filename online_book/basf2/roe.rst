@@ -417,5 +417,5 @@ This concludes the Rest of Event setup as a middle stage algorithm to run :ref:`
 
 .. rubric:: Authors of this lesson
 
-    Sviatoslav Bilokin,
-    Kilian Lieret
+Sviatoslav Bilokin,
+Kilian Lieret

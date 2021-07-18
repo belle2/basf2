@@ -1025,6 +1025,6 @@ However, your python journey has just begun and there's a lot to learn.
 
 .. rubric:: Authors of this lesson
 
-  Martin Ritter (Intro),
-  Hannah Wakeling (Exercises),
-  Kilian Lieret
+Martin Ritter (Intro),
+Hannah Wakeling (Exercises),
+Kilian Lieret

@@ -113,4 +113,4 @@ More advanced examples
 
 .. rubric:: Author of this lesson
 
-   Pascal Schmolz
+Pascal Schmolz

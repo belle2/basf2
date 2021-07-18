@@ -766,4 +766,4 @@ You can also ask in `questions.belle2.org <https://questions.belle2.org/question
 
 .. rubric:: Author of this lesson
 
-    Justin Guilliams
+Michel Villanueva, Justin Guilliams

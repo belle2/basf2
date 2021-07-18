@@ -181,4 +181,4 @@ it to ``FBDT_qrCombined``!
 
 .. rubric:: Authors of this lesson
 
-    Kilian Lieret
+Kilian Lieret

@@ -62,4 +62,4 @@ event display for the mdst file that you were looking at in these last lessons
 
 .. rubric:: Authors of this lesson
 
-    Sam Cunliffe and Kilian Lieret
+Sam Cunliffe and Kilian Lieret

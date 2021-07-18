@@ -90,20 +90,11 @@
 
 
 .key-points .admonition-title{
-    background: #9c9ff4;
+    background: #f7f0ff;
 }
 
 .key-points {
-    background: #f7f0ff;
-}
-
-.overview .admonition-title, .overview .sidebar-title {
-    background: #9c9ff4;
-    color: white;
-}
-
-.overview {
-    background: #f7f0ff;
+    border-left-color: #9c9ff4;
 }
 
 .overview p, .overview ul, .overview blockquote {

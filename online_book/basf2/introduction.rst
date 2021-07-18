@@ -96,10 +96,10 @@ There are some concepts we use in basf2, which you will definitely need to
 understand.
 These are:
 
-        * basf2 module,
-        * path,
-        * package,
-        * steering script / steering file.
+* basf2 module,
+* path,
+* package,
+* steering script / steering file.
 
 Most of the other jargon terms we use are generic software development terms
 (so you can search the internet).

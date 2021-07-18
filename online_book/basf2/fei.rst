@@ -49,9 +49,9 @@ involving neutrinos, referred to as B\ :sub:`sig`.
 .. admonition:: Exercise
      :class: exercise stacked
 
-      Find the documentation of the FEI and look up "hadronic tagging" and
-      "semileptonic tagging".
-      What is the difference between both analysis strategies? What are advantages and disadvantages?
+     Find the documentation of the FEI and look up "hadronic tagging" and
+     "semileptonic tagging".
+     What is the difference between both analysis strategies? What are advantages and disadvantages?
 
 .. admonition:: Hint
      :class: toggle xhint stacked

@@ -62,15 +62,15 @@ Skims are intended into reduce the overall CPU requirements of the
 collaboration, and to make your life easier. Skims can make your life easier in
 the following ways:
 
-    * Skimmed files are generally less than 10% the size of the original
-      (unskimmed) files, so your steering file will not need to process as many
-      events, and your jobs will finish quicker.
+* Skimmed files are generally less than 10% the size of the original
+  (unskimmed) files, so your steering file will not need to process as many
+  events, and your jobs will finish quicker.
 
-    * The particles reconstructed during a skim are available when you load in
-      the skimmed uDST, so you can use these in further reconstruction. For
-      example, there are skims which use the :ref:`FEI <onlinebook_fei>`, so
-      this computationally expensive reconstruction is performed during the
-      skimming step and does not need to be repeated in later reconstruction.
+* The particles reconstructed during a skim are available when you load in
+  the skimmed uDST, so you can use these in further reconstruction. For
+  example, there are skims which use the :ref:`FEI <onlinebook_fei>`, so
+  this computationally expensive reconstruction is performed during the
+  skimming step and does not need to be repeated in later reconstruction.
 
 
 Mechanics of a skim

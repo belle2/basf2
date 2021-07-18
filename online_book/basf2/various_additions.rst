@@ -156,9 +156,9 @@ with the `passesCut` function.
 
    Create a particle list, called ``gamma:brems``, with photons following the next cuts:
 
-         1. If the photons are in the forward endcap of the ECL, their energy should be at least 75 MeV
-         2. If they are in the barrel region, their energy should be larger than 50 MeV
-         3. Finally, if they are in the backward endcap, their energy should be larger than 100 MeV
+   1. If the photons are in the forward endcap of the ECL, their energy should be at least 75 MeV
+   2. If they are in the barrel region, their energy should be larger than 50 MeV
+   3. Finally, if they are in the backward endcap, their energy should be larger than 100 MeV
 
    To do this, you need the `clusterReg` and `clusterE` variable.
    To keep everything neat and

@@ -12,13 +12,13 @@ Event display
 
     **Prerequisites**:
 
-        * The :ref:`onlinebook_ssh` lesson.
-        * The previous lesson.
+    * The :ref:`onlinebook_ssh` lesson.
+    * The previous lesson.
 
     **Objectives**:
 
-        * A quick break from coding.
-        * Learn how to open the event display.
+    * A quick break from coding.
+    * Learn how to open the event display.
 
 A well-deserved pause
 ---------------------

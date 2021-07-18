@@ -12,27 +12,27 @@ The basics.
 
     **Prerequisites**:
 
-        * An internet browser
-        * DESY accounts
-        * :ref:`onlinebook_collaborative_tools` lesson.
-        * An ``ssh`` client and the :ref:`onlinebook_ssh` lesson.
-        * Basic bash
+    * An internet browser
+    * DESY accounts
+    * :ref:`onlinebook_collaborative_tools` lesson.
+    * An ``ssh`` client and the :ref:`onlinebook_ssh` lesson.
+    * Basic bash
 
     **Questions**:
 
-        * What is basf2 and what does it do?
-        * What is a basf2 module, path, steering file?
-        * How can I get help?
+    * What is basf2 and what does it do?
+    * What is a basf2 module, path, steering file?
+    * How can I get help?
 
     **Objectives**:
 
-        * Correctly set up the Belle II environment.
-        * Find the right chapters in this documentation.
-        * Run basf2 and display a list of variables
-        * Run basf2 in interactive ipython shell mode.
-        * Access the help in 3 different ways.
-        * Confidently read the source code for a `modularAnalysis` convenience
-          function.
+    * Correctly set up the Belle II environment.
+    * Find the right chapters in this documentation.
+    * Run basf2 and display a list of variables
+    * Run basf2 in interactive ipython shell mode.
+    * Access the help in 3 different ways.
+    * Confidently read the source code for a `modularAnalysis` convenience
+      function.
 
 The Belle II software is called basf2.
 It is an abbreviation for "Belle II Analysis Software Framework".

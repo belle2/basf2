@@ -24,7 +24,6 @@ Generating Monte Carlo
     * Generate 10 :math:`B^0 \bar{B}^0` events
     * Write a simple decay file and generate signal events
 
-
 Why do we need Monte Carlo simulated data?
 ------------------------------------------
 

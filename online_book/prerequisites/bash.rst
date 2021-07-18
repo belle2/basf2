@@ -14,20 +14,20 @@ Command Line Tutorial (Bash)
 
     **Prerequisites**:
 
-        * None
+    * None
 
     **Questions**:
 
-        * What is a command shell and why would I use one?
-        * How to navigate files and directories?
-        * How to create, copy, delete, edit files?
-        * How to combine commands?
-        * How can I find files and contents?
-        * What are environment variables?
+    * What is a command shell and why would I use one?
+    * How to navigate files and directories?
+    * How to create, copy, delete, edit files?
+    * How to combine commands?
+    * How can I find files and contents?
+    * What are environment variables?
 
     **Objectives**:
 
-        * Get familiar with bash
+    * Get familiar with bash
 
 In High Energy Physics we need to work a lot with the command line. This has
 multiple reasons, one is that it's a lot of work to create graphical user

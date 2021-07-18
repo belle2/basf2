@@ -14,13 +14,13 @@ Join us
 
  **Questions**:
 
-   * What is an easy way to get my first commit in the software repo?
-   * How does this documentation work internally?
+ * What is an easy way to get my first commit in the software repo?
+ * How does this documentation work internally?
 
  **Objectives**:
 
-   * Improve the life of newcomers and veterans!
-   * Profit by learning about our tools!
+ * Improve the life of newcomers and veterans!
+ * Profit by learning about our tools!
 
  ..  image:: cat_hat_angry_point.jpg
 

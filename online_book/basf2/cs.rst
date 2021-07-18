@@ -12,17 +12,17 @@ Continuum Suppression (CS)
 
     **Prerequisites**:
 
-    	* :ref:`onlinebook_basf2_introduction` lesson
-    	* :ref:`onlinebook_roe` lesson
+    * :ref:`onlinebook_basf2_introduction` lesson
+    * :ref:`onlinebook_roe` lesson
 
     **Questions**:
 
-        * What is continuum?
-        * How can I separate it from signal events?
+    * What is continuum?
+    * How can I separate it from signal events?
 
     **Objectives**:
 
-        * Suppress continuum
+    * Suppress continuum
 
 
 Introduction

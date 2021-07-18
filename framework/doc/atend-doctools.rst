@@ -424,13 +424,13 @@ Additional boxes for the online lessons
 
     **Questions**:
 
-        * What is a particle list?
-        * What are final state particles?
-        * How can I specify decays?
+    * What is a particle list?
+    * What are final state particles?
+    * How can I specify decays?
 
     **Objectives**:
 
-        * Reconstruct particles
+    * Reconstruct particles
 
 .. code:: rst
 

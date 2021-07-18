@@ -12,18 +12,18 @@ Full Event Interpretation
 
     **Prerequisites**:
 
-        * Lessons 1-2
+    * Lessons 1-2
 
     **Questions**:
 
-        * What are tagged analyses?
-        * How can I reconstruct a generic B meson?
-        * How can I use information from **both** B mesons for my analysis?
+    * What are tagged analyses?
+    * How can I reconstruct a generic B meson?
+    * How can I use information from **both** B mesons for my analysis?
 
     **Objectives**:
 
-        * Learn how to use the FEI in your steering file
-        * Understand the output from the FEI
+    * Learn how to use the FEI in your steering file
+    * Understand the output from the FEI
 
 
 Introduction

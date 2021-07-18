@@ -10,15 +10,15 @@ Fundamentals
 
     **Prerequisites**:
 
-        * What is a B factory?
+    * What is a B factory?
 
     **Objectives**:
 
-        * A first introduction to all of the basic concepts in a HEP analysis.
-        * A "big picture" overview of what the Belle II software is supposed
-          to do.
-        * Be aware of important Belle II reference documents and (at least)
-          have spend a bit of time navigating them.
+    * A first introduction to all of the basic concepts in a HEP analysis.
+    * A "big picture" overview of what the Belle II software is supposed
+      to do.
+    * Be aware of important Belle II reference documents and (at least)
+      have spend a bit of time navigating them.
 
 In this section you will learn the basic concepts underlying an analysis at
 Belle II, starting from how the data acquisition works and ending to the

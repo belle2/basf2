@@ -15,18 +15,18 @@
 
     **Prerequisites**:
 
-        * Basic bash knowledge
+    * Basic bash knowledge
 
     **Questions**:
 
-        * How to collaboratively develop software?
-        * How to keep different versions of my code?
-        * How to synchronize my code between servers?
+    * How to collaboratively develop software?
+    * How to keep different versions of my code?
+    * How to synchronize my code between servers?
 
     **Objectives**:
 
-        * Learn to use the world's most successful version control system
-        * Get ready to contribute to Belle 2 software
+    * Learn to use the world's most successful version control system
+    * Get ready to contribute to Belle 2 software
 
 Creating a physics analysis or developing a piece of software is not a straight
 forward process without errors. There will be a lot of changes to the scripts,

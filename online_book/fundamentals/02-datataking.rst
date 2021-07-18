@@ -10,12 +10,12 @@ Data Taking
 
     **Prerequisites**:
 
-        * :ref:`Fundamentals Introduction <onlinebook_fundamentals_introduction>`
+    * :ref:`Fundamentals Introduction <onlinebook_fundamentals_introduction>`
 
     **Objectives**:
 
-        * Understand the different detector systems in Belle II.
-        * Definition of triggers and their effects.
+    * Understand the different detector systems in Belle II.
+    * Definiton of triggers and their effects.
 
 One of the most important steps is of course to record the data we want to
 analyse. In this chapter we will go through the important concepts of the Belle

@@ -10,11 +10,11 @@ Simulation: The Monte Carlo
 
     **Prerequisites**:
 
-        * :ref:`Fundamentals Introduction <onlinebook_fundamentals_introduction>`
+    * :ref:`Fundamentals Introduction <onlinebook_fundamentals_introduction>`
 
     **Objectives**:
 
-        * How to simulate physics processes.
+    * How to simulate physics processes.
 
 
 We need to be able to compare data from our detector to the expectation we have.

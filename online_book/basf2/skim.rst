@@ -12,24 +12,24 @@ Skimming
 
     **Prerequisites**:
 
-        * :ref:`gbasf2 lesson <onlinebook_gbasf2>`
+    * :ref:`gbasf2 lesson <onlinebook_gbasf2>`
 
     **Questions**:
 
-        * What are skims, and why should analysts use skims?
+    * What are skims, and why should analysts use skims?
 
-        * How can I find information about what skims are available?
+    * How can I find information about what skims are available?
 
     **Objectives**:
 
-        * Find documentation about available skims.
+    * Find documentation about available skims.
 
-        * Run a skim on a file using the command-line tool :ref:`b2skim-run
-          <b2skim-run>`.
+    * Run a skim on a file using the command-line tool :ref:`b2skim-run
+      <b2skim-run>`.
 
-        * Add an existing skim to a steering file.
+    * Add an existing skim to a steering file.
 
-        * Find information about skims available on the grid.
+    * Find information about skims available on the grid.
 
 
 What is skimming?

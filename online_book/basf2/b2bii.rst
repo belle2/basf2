@@ -12,17 +12,17 @@ B2BII
 
    **Prerequisites**:
 
-       * First steering file
-       * Batch submission
+   * First steering file
+   * Batch submission
 
    **Questions**:
 
-       * Can I use basf2 to analysis Belle data?
-       * Why can't I use the same basf2 particle lists and variables in my b2bii analysis?
+   * Can I use basf2 to analysis Belle data?
+   * Why can't I use the same basf2 particle lists and variables in my b2bii analysis?
 
    **Objectives**:
 
-       * Process Belle data with basf2
+   * Process Belle data with basf2
 
 
 The ``b2bii`` package in basf2 converts Belle MDST files (basf data format) to

@@ -10,22 +10,22 @@ The computing system
 
     **Prerequisites**:
 
-        * An internet browser
-        * :ref:`onlinebook_basf2_introduction`
-        * :ref:`onlinebook_fundamentals`
+    * An internet browser
+    * :ref:`onlinebook_basf2_introduction`
+    * :ref:`onlinebook_fundamentals`
 
     **Questions**:
 
-        * What is the grid?
-        * How data is processed?
-        * Why the data is skimmed?
+    * What is the grid?
+    * How data is processed?
+    * Why the data is skimmed?
 
 
     **Objectives**:
 
-        * Understand the basic notions of the distributed computing system.
-        * Learn about the data flow and the processing scheme.
-        * Locate the relevant information for analysis on the Confluence pages.
+    * Understand the basic notions of the distributed computing system.
+    * Learn about the data flow and the processing scheme.
+    * Locate the relevant information for analysis on the Confluence pages.
 
 
 The distributed computing system

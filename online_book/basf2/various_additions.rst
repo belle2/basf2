@@ -12,22 +12,22 @@ Various additions
 
     **Prerequisites**:
 
-        * :ref:`onlinebook_first_steering_file`
+    * :ref:`onlinebook_first_steering_file`
 
     **Questions**:
 
-        * What is Bremsstrahlung radiation? Why do we care about it?
-        * How do we look for Bremsstrahlung photons?
-        * Why do we need to perform a best candidate selection?
-        * How can I correct for Bremsstrahlung?
-        * How can I perform a best candidate selection (BCS)?
+    * What is Bremsstrahlung radiation? Why do we care about it?
+    * How do we look for Bremsstrahlung photons?
+    * Why do we need to perform a best candidate selection?
+    * How can I correct for Bremsstrahlung?
+    * How can I perform a best candidate selection (BCS)?
 
     **Objectives**:
 
-        * Use the different Bremsstrahlung recovery strategies to correct the
-          momentum of the electrons in the
-          :math:`B^0 \to K_S^0 J/\psi\left(\to e^+ e^-\right)` decay
-        * Perform a Best Candidate Selection
+    * Use the different Bremsstrahlung recovery strategies to correct the
+      momentum of the electrons in the
+      :math:`B^0 \to K_S^0 J/\psi\left(\to e^+ e^-\right)` decay
+    * Perform a Best Candidate Selection
 
 What is Bremsstrahlung radiation?
 ---------------------------------

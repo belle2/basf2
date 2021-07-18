@@ -15,7 +15,7 @@
   <output>test6_CPVFlavorTaggerEfficiency.root</output>
   <contact>Yo Sato; yosato@post.kek.jp</contact>
   <description>This file calculates the effective efficiency of the category based flavor tagger considering the two
-  standard combiners and the individual categories. Validation plots are also pruduced. </description>
+  standard combiners and the individual categories. Validation plots are also produced. </description>
 </header>
 """
 
@@ -255,7 +255,7 @@ for method in methods:
     print(' ')
     print('****************** CALIBRATION CHECK FOR COMBINER USING ' + method + ' ***************************************')
     print(' ')
-    print('Fit ploynomial of first order to the calibration plot. Expected value ~0.5')
+    print('Fit polynomial of first order to the calibration plot. Expected value ~0.5')
     print(' ')
     histo_calib_B0.Fit(diag, 'TEST')
     print('       ')
@@ -290,7 +290,7 @@ for method in methods:
         rvalueB0[i] = histo_avr_rB0.GetBinContent(i)
         rvalueB0bar[i] = histo_avr_rB0bar.GetBinContent(i)
         rvalueB0Average[i] = (rvalueB0[i] + rvalueB0bar[i]) / 2
-        # calculate the wrong tag fractin (only true if MC data good)
+        # calculate the wrong tag fraction (only true if MC data good)
         wvalue[i] = (1 - rvalueB0Average[i]) / 2
         wvalueB0[i] = (1 - rvalueB0[i]) / 2
         wvalueB0bar[i] = (1 - rvalueB0bar[i]) / 2

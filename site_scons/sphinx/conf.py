@@ -13,7 +13,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-from sphinx_book_theme import setup as sphinx_book_theme_setup
 import sys
 import os
 import re
@@ -26,9 +25,8 @@ sys.path.insert(0, os.path.abspath("extensions"))
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('_themes/'))
+from sphinx_book_theme import setup as sphinx_book_theme_setup  # noqa: E402
 
-
-print(sys.path)
 
 # -- General configuration ------------------------------------------------
 
@@ -69,7 +67,7 @@ autosectionlabel_prefix_document = True
 suppress_warnings = ['autosectionlabel.*']
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_sphinxtemplates', '_themes/sphinx_book_theme/_templates/']
+templates_path = ['_themes/sphinx_book_theme/_templates/', '_sphinxtemplates']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -212,7 +210,7 @@ html_logo = "b2logo.svg"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_sphinxstatic', ]
+html_static_path = ['_themes/sphinx_book_theme/_static/', '_sphinxstatic', ]
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied

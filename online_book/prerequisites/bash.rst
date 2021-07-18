@@ -379,6 +379,6 @@ for you (after some time you might be surprised with how many commands you remem
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author of this lesson
+.. rubric:: Author of this lesson
 
      Martin Ritter

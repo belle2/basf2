@@ -998,7 +998,7 @@ also find keyboard shortcuts for most of them.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
      Martin Ritter,
      Michael Eliachevitch

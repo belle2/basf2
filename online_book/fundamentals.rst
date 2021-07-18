@@ -57,7 +57,7 @@ technical explanations about how the software works to the other chapters.
 
    fundamentals/*
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
     Umberto Tamponi,
     Martin Ritter,

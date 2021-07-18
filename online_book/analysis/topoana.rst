@@ -765,6 +765,6 @@ setting items in the quick-start tutorial or the user guide we introduce in
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
    Xing-Yu Zhou

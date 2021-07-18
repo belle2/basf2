@@ -580,7 +580,7 @@ data and MC on this variable, but if you use 30 variables in a BDT you will have
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
    Moritz Bauer, Yaroslav Kulii
 

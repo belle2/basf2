@@ -178,6 +178,6 @@ You will learn a lot about the computing system, and it is a very important serv
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author of this lesson
+.. rubric:: Author of this lesson
 
     Michel Villanueva

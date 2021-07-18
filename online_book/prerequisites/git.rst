@@ -319,7 +319,7 @@ to continue your training even after the StarterKit. It will not be time wasted!
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
      Kilian Lieret,
      Martin Ritter

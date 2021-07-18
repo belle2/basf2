@@ -60,6 +60,6 @@ event display for the mdst file that you were looking at in these last lessons
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
     Sam Cunliffe and Kilian Lieret

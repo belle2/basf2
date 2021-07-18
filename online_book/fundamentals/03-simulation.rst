@@ -188,7 +188,7 @@ that the computing resources we have are not wasted.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
     Umberto Tamponi,
     Martin Ritter,

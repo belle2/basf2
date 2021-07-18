@@ -706,7 +706,7 @@ and explanations on the code structure.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author of this lesson
+.. rubric:: Author of this lesson
 
     Moritz Bauer
 

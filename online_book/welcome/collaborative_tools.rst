@@ -625,7 +625,7 @@ Help us out with documentation: as a beginner, you know best what is missing!
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
      Kilian Lieret,
      Sam Cunliffe

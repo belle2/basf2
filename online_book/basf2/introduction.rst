@@ -968,6 +968,6 @@ Good luck.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author of this lesson
+.. rubric:: Author of this lesson
 
     Sam Cunliffe

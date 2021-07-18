@@ -203,7 +203,7 @@ You do not need to reject the whole event just because of some beam background.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
     Umberto Tamponi,
     Martin Ritter,

@@ -179,6 +179,6 @@ it to ``FBDT_qrCombined``!
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
     Kilian Lieret

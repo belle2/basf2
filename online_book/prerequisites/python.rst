@@ -1023,7 +1023,7 @@ However, your python journey has just begun and there's a lot to learn.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
   Martin Ritter (Intro),
   Hannah Wakeling (Exercises),

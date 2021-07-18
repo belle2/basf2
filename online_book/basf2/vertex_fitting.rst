@@ -305,6 +305,6 @@ As an exercise we will focus on the first two.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
     Francesco Tenchini

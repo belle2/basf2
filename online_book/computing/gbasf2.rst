@@ -764,6 +764,6 @@ You can also ask in `questions.belle2.org <https://questions.belle2.org/question
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author of this lesson
+.. rubric:: Author of this lesson
 
     Justin Guilliams

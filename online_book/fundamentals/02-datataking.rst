@@ -559,7 +559,7 @@ intended functionality is of highest importance for the success of the experimen
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
     Umberto Tamponi,
     Martin Ritter,

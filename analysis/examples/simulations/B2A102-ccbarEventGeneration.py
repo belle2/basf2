@@ -18,7 +18,7 @@
 #                                                                        #
 # e+e- -> ccbar -> D*+ anything                                          #
 #                                                                        #
-# events with EvtGen in BASF2, where the decay of D*+                    #
+# events with EvtGen in basf2, where the decay of D*+                    #
 # is specified by the given .dec file.                                   #
 #                                                                        #
 # The generated events are saved to the output ROOT file.                #

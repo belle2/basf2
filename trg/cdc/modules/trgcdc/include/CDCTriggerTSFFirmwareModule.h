@@ -41,7 +41,7 @@ namespace Belle2 {
   }
 
   /**
-   * This class is the interface between TSim/Basf2 TSF module and the firmware
+   * This class is the interface between TSim/basf2 TSF module and the firmware
    * simulation core of XSim/ISim.
    *
    */

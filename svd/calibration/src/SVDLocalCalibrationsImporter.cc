@@ -181,7 +181,7 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
                   B2FATAL("Inconsistency among maps: xml files tells \n" <<
                           "layer " << layerId << " ladder " << ladderId <<
                           " hybridID " << hybridId << "\n" <<
-                          "while the BASF2 map tells \n" <<
+                          "while the basf2 map tells \n" <<
                           "layer " << layer << " ladder " << ladder <<
                           " sensor " << sensor << "\n");
 
@@ -293,7 +293,7 @@ void SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std:
                    )
                   B2ERROR("Inconsistency among maps: xml files tels \n" <<
                           "layer " << layerId << " ladder " << ladderId << " hybridID " << hybridId << "\n" <<
-                          "while the BASF2 map tels \n" <<
+                          "while the basf2 map tels \n" <<
                           "layer " << layer << " ladder " << ladder << " sensor " << sensor << "\n");
 
                 SVDStripCalAmp stripCalAmp;

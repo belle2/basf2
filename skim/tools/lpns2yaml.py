@@ -42,9 +42,6 @@ from skim.utils.testfiles import DataSample, MCSample
 import yaml
 
 
-__author__ = "Phil Grace"
-
-
 def get_argument_parser():
     description, epilog = __doc__.split("--epilog--")
     parser = argparse.ArgumentParser(

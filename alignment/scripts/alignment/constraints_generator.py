@@ -1,8 +1,11 @@
-'''
-Created on 28 May 2018
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
-@author: kleinwrt
-'''
 import basf2 as b2
 
 import os

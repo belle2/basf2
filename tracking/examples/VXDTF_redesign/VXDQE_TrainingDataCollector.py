@@ -14,8 +14,6 @@
 #
 # Uses VXDQETrainingDataCollector module to collect data to be able to
 # train a FastBDT weightfile
-#
-# Contributors: Jonas Wagner, Sebastian Racs
 #####################################################################
 
 import basf2 as b2

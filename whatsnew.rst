@@ -70,6 +70,8 @@ No individual options have to be set in modular analysis functions.
 
 .. List of changes for the framework package
 
+.. include:: framework/doc/whatsnew-since/release-06-00.txt
+
 .. include:: framework/doc/whatsnew-since/release-05-01.txt
 
 Changes since release-04

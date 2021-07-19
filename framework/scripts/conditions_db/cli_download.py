@@ -132,10 +132,11 @@ def command_legacydownload(args, db=None):
 
        This has been renamed from ``download`` and is kept for compatibility
 
-    .. deprecated:: release-04-00-00
+    .. warning::
 
        Downloading a globaltag should be done in the new format creating sqlite
-       database files
+       database files. Please use this legacy tool only for downloading "small"
+       globaltags or very few payloads.
     """
 
     payloadfilter = ItemFilter(args)

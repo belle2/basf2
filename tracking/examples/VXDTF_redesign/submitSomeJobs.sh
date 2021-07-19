@@ -1,5 +1,13 @@
 #!/bin/bash
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # this is an expample script demonstrating on how to submit a series of jobs for different random seeds to the queue at KEK
 # NOTE: you HAVE to adjust the numbers below otherwise you will generate 2000k events!!
 

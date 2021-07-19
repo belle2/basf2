@@ -154,7 +154,7 @@ namespace Belle2 {
 
     /**
      * Check data consistency of the cooling system (v2) positions
-     * In case of failure print the BASF2 ERROR message using B2ASSERT
+     * In case of failure print the basf2 ERROR message using B2ASSERT
      */
     void checkCoolingSystemV2DataConsistency() const;
 

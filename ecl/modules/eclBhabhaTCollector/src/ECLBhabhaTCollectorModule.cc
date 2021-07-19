@@ -10,6 +10,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -44,16 +45,19 @@ ECLBhabhaTCollectorModule::ECLBhabhaTCollectorModule() : CalibrationCollectorMod
   m_ElectronicsTimeDB("ECLCrystalElectronicsTime"),
   m_FlightTimeDB("ECLCrystalFlightTime"),
   m_PreviousCrystalTimeDB("ECLCrystalTimeOffset"),
-  m_CrateTimeDB("ECLCrateTimeOffset")
+  m_CrateTimeDB("ECLCrateTimeOffset"),
+  m_RefCrystalsCalibDB("ECLReferenceCrystalPerCrateCalib")//,
+  //m_dbgTree_electrons(0),
+  //m_tree_evtNum(0)//,
 {
   setDescription("This module generates sum of all event times per crystal");
 
-  addParam("timeAbsMax", m_timeAbsMax, // (Time in ADC units)
-           "Events with abs(getTimeFit) > m_timeAbsMax "
+  addParam("timeAbsMax", m_timeAbsMax, // (Time in ns)
+           "Events with fabs(getTimeFit) > m_timeAbsMax "
            "are excluded", (short)80);
 
   addParam("minCrystal", m_minCrystal,
-           "First CellId to handle.", 1); // 1153 -- first crystal in barrel.
+           "First CellId to handle.", 1);
   addParam("maxCrystal", m_maxCrystal,
            "Last CellId to handle.", 8736);
 
@@ -67,6 +71,8 @@ ECLBhabhaTCollectorModule::ECLBhabhaTCollectorModule() : CalibrationCollectorMod
   addParam("looseTrkD0", m_looseTrkD0, "max D0 for loose tracks (cm)", 2.);
   addParam("tightTrkD0", m_tightTrkD0, "max D0 for tight tracks (cm)", 0.5);  // beam pipe radius = 1cm in 2019
 
+  addParam("hadronEventT0_TO_bhabhaEventT0_correction", m_hadronEventT0_TO_bhabhaEventT0_correction,
+           "CDC bhabha t0 bias correction (ns)", 0.);
 
   // specify this flag if you need parallel processing
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -214,61 +220,60 @@ void ECLBhabhaTCollectorModule::prepare()
 
 
   //=== Create histograms and register them in the data store
-
   int nbins = m_timeAbsMax * 8;
   int max_t = m_timeAbsMax;
   int min_t = -m_timeAbsMax;
 
 
   auto TimevsCrysPrevCrateCalibPrevCrystCalib = new TH2F("TimevsCrysPrevCrateCalibPrevCrystCalib",
-                                                         "Time t psi - ts - tcrate (previous calibs) vs crystal ID;crystal ID;Time t_psi with previous calib (ns)",
-                                                         8736, 0, 8736, nbins, min_t, max_t);
+                                                         "Time t psi - ts - tcrate (previous calibs) vs crystal cell ID;crystal cell ID;Time t_psi with previous calib (ns)",
+                                                         8736, 1, 8736 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrysPrevCrateCalibPrevCrystCalib", TimevsCrysPrevCrateCalibPrevCrystCalib);
 
   auto TimevsCratePrevCrateCalibPrevCrystCalib = new TH2F("TimevsCratePrevCrateCalibPrevCrystCalib",
                                                           "Time t psi - ts - tcrate (previous calibs) vs crate ID;crate ID;Time t_psi previous calib (ns)",
-                                                          52, 1, 53, nbins, min_t, max_t);
+                                                          52, 1, 52 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCratePrevCrateCalibPrevCrystCalib", TimevsCratePrevCrateCalibPrevCrystCalib);
 
   auto TimevsCrysNoCalibrations = new TH2F("TimevsCrysNoCalibrations",
-                                           "Time tpsi vs crystal ID;crystal ID;Time t_psi (ns)", 8736, 0, 8736, nbins, min_t, max_t);
+                                           "Time tpsi vs crystal cell ID;crystal cell ID;Time t_psi (ns)", 8736, 1, 8736 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrysNoCalibrations", TimevsCrysNoCalibrations);
 
   auto TimevsCrateNoCalibrations = new TH2F("TimevsCrateNoCalibrations",
-                                            "Time tpsi vs crate ID;crate ID;Time t_psi (ns)", 52, 1, 53, nbins, min_t, max_t);
+                                            "Time tpsi vs crate ID;crate ID;Time t_psi (ns)", 52, 1, 52 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrateNoCalibrations", TimevsCrateNoCalibrations);
 
   auto TimevsCrysPrevCrateCalibNoCrystCalib = new TH2F("TimevsCrysPrevCrateCalibNoCrystCalib",
-                                                       "Time tpsi - tcrate (previous calib) vs crystal ID;crystal ID;Time t_psi including previous crate calib (ns)",
-                                                       8736, 0, 8736, nbins, min_t, max_t);
+                                                       "Time tpsi - tcrate (previous calib) vs crystal cell ID;crystal cell ID;Time t_psi including previous crate calib (ns)",
+                                                       8736, 1, 8736 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrysPrevCrateCalibNoCrystCalib", TimevsCrysPrevCrateCalibNoCrystCalib);
 
   auto TimevsCrateNoCrateCalibPrevCrystCalib = new TH2F("TimevsCrateNoCrateCalibPrevCrystCalib",
                                                         "Time tpsi - ts (previous calib) vs crate ID;crate ID;Time t_psi including previous crystal calib (ns)",
-                                                        52, 1, 53, nbins, min_t, max_t);
+                                                        52, 1, 52 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrateNoCrateCalibPrevCrystCalib", TimevsCrateNoCrateCalibPrevCrystCalib);
 
 
-  auto TsDatabase = new TH1F("TsDatabase", ";cell id;Ts from database", 8736, 0, 8736);
+  auto TsDatabase = new TH1F("TsDatabase", ";cell id;Ts from database", 8736, 1, 8736 + 1);
   registerObject<TH1F>("TsDatabase", TsDatabase);
 
-  auto TsDatabaseUnc = new TH1F("TsDatabaseUnc", ";cell id;Ts uncertainty from database", 8736, 0, 8736);
+  auto TsDatabaseUnc = new TH1F("TsDatabaseUnc", ";cell id;Ts uncertainty from database", 8736, 1, 8736 + 1);
   registerObject<TH1F>("TsDatabaseUnc", TsDatabaseUnc);
 
-  auto TcrateDatabase = new TH1F("TcrateDatabase", ";cell id;Tcrate from database", 8736, 0, 8736);
+  auto TcrateDatabase = new TH1F("TcrateDatabase", ";cell id;Tcrate from database", 8736, 1, 8736 + 1);
   registerObject<TH1F>("TcrateDatabase", TcrateDatabase);
 
-  auto TcrateUncDatabase = new TH1F("TcrateUncDatabase", ";cell id;Tcrate uncertainty from database", 8736, 0, 8736);
+  auto TcrateUncDatabase = new TH1F("TcrateUncDatabase", ";cell id;Tcrate uncertainty from database", 8736, 1, 8736 + 1);
   registerObject<TH1F>("TcrateUncDatabase", TcrateUncDatabase);
 
 
-  auto tcrateDatabase_ns = new TH1F("tcrateDatabase_ns", ";crate id;tcrate derived from database", 52, 0, 52);
+  auto tcrateDatabase_ns = new TH1F("tcrateDatabase_ns", ";crate id;tcrate derived from database", 52, 1, 52 + 1);
   registerObject<TH1F>("tcrateDatabase_ns", tcrateDatabase_ns);
 
 
-  auto databaseCounter = new TH1F("databaseCounter",
+  auto databaseCounter = new TH1I("databaseCounter",
                                   ";A database was read in;Number of times database was saved to histogram", 1, 1, 2);
-  registerObject<TH1F>("databaseCounter", databaseCounter);
+  registerObject<TH1I>("databaseCounter", databaseCounter);
 
 
   auto numCrystalEntriesPerEvent = new TH1F("numCrystalEntriesPerEvent",
@@ -278,30 +283,15 @@ void ECLBhabhaTCollectorModule::prepare()
   auto cutflow = new TH1F("cutflow", ";Cut label number;Number of events passing cut", 20, 0, 20);
   registerObject<TH1F>("cutflow", cutflow);
 
-  auto numPhotonClustersPerTrack = new TH1F("numPhotonClustersPerTrack",
-                                            ";Number of photon clusters per track;Number", 20, 0, 20);
-  registerObject<TH1F>("numPhotonClustersPerTrack", numPhotonClustersPerTrack);
-
   auto maxEcrsytalEnergyFraction = new TH1F("maxEcrsytalEnergyFraction",
                                             ";Maximum energy crystal energy / (sum) cluster energy;Number", 22, 0, 1.1);
   registerObject<TH1F>("maxEcrsytalEnergyFraction", maxEcrsytalEnergyFraction);
 
+  auto refCrysIDzeroingCrate = new TH1F("refCrysIDzeroingCrate", ";cell id;Boolean - is reference crystal", 8736, 1, 8736 + 1);
+  registerObject<TH1F>("refCrysIDzeroingCrate", refCrysIDzeroingCrate);
 
-  auto numEntriesPerCrystal = new TH1F("numEntriesPerCrystal", ";cell id;Number", 8736, 0, 8736);
-  registerObject<TH1F>("numEntriesPerCrystal", numEntriesPerCrystal);
-
-
-  auto TimevsRunPrevCrateCalibPrevCrystCalibCID1338 = new TH2F("TimevsRunPrevCrateCalibPrevCrystCalibCID1338",
-      "Time t psi - ts - tcrate (previous calibs) vs run number cid 1338;Run number;Time t_psi with previous calib (ns)",
-      7000, 1, 7000, nbins, min_t, max_t);
-  registerObject<TH2F>("TimevsRunPrevCrateCalibPrevCrystCalibCID1338", TimevsRunPrevCrateCalibPrevCrystCalibCID1338);
-
-  auto TimevsRunPrevCrateCalibPrevCrystCalibCrate8 = new TH2F("TimevsRunPrevCrateCalibPrevCrystCalibCrate8",
-                                                              "Time t psi - ts - tcrate (previous calibs) vs run number crate 8;Run number;Time t_psi with previous calib (ns)",
-                                                              7000, 1, 7000, nbins, min_t, max_t);
-  registerObject<TH2F>("TimevsRunPrevCrateCalibPrevCrystCalibCrate8", TimevsRunPrevCrateCalibPrevCrystCalibCrate8);
-
-
+  auto CDCEventT0Correction = new TH1F("CDCEventT0Correction", ";;CDC event t0 offset correction  [ns]", 1, 1, 2);
+  registerObject<TH1F>("CDCEventT0Correction", CDCEventT0Correction);
 
 
   //=== Required data objects
@@ -311,13 +301,17 @@ void ECLBhabhaTCollectorModule::prepare()
   m_eclCalDigitArray.isRequired();
   m_eclDigitArray.isRequired();
 
+  B2INFO("hadronEventT0_TO_bhabhaEventT0_correction = " <<  m_hadronEventT0_TO_bhabhaEventT0_correction <<
+         " ns correction to CDC event t0 will be applied");
+
 }
 
 void ECLBhabhaTCollectorModule::collect()
 {
   int cutIndexPassed = 0;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: no cuts: index = " << cutIndexPassed);
+  B2DEBUG(22, "Cutflow: no cuts: index = " << cutIndexPassed);
+  B2DEBUG(22, "Event number = " << m_EventMetaData->getEvent());
 
 
   /* Use ECLChannelMapper to get other detector indices for the crystals */
@@ -346,19 +340,46 @@ void ECLBhabhaTCollectorModule::collect()
     m_PreviousCrystalTimeUnc = m_PreviousCrystalTimeDB->getCalibUncVector();
   }
 
-  B2DEBUG(35, "Finished checking if previous crystal time payload has changed");
+  B2DEBUG(29, "Finished checking if previous crystal time payload has changed");
   if (m_CrateTimeDB.hasChanged()) {
     m_CrateTime = m_CrateTimeDB->getCalibVector();
     m_CrateTimeUnc = m_CrateTimeDB->getCalibUncVector();
   }
-  B2DEBUG(35, "Finished checking if previous crate time payload has changed");
-  B2DEBUG(35, "m_CrateTime size = " << m_CrateTime.size());
-  B2DEBUG(29, "Crate time +- uncertainty [0]= " << m_CrateTime[0] << " +- " << m_CrateTimeUnc[0]);
-  B2DEBUG(29, "Crate time +- uncertainty [8735]= " << m_CrateTime[8735] << " +- " << m_CrateTimeUnc[8735]);
+  B2DEBUG(29, "Finished checking if previous crate time payload has changed");
+  B2DEBUG(29, "m_CrateTime size = " << m_CrateTime.size());
+  B2DEBUG(25, "Crate time +- uncertainty [0]= " << m_CrateTime[0] << " +- " << m_CrateTimeUnc[0]);
+  B2DEBUG(25, "Crate time +- uncertainty [8735]= " << m_CrateTime[8735] << " +- " << m_CrateTimeUnc[8735]);
+
+  B2DEBUG(29, "Finished checking if previous crate time payload has changed");
+  if (m_RefCrystalsCalibDB.hasChanged()) {
+    m_RefCrystalsCalib = m_RefCrystalsCalibDB->getReferenceCrystals();
+  }
+  B2DEBUG(29, "Finished checking if reference crystal cell ids payload has changed");
+
+
+  B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrystalTimeOffset from the database"
+          << LogVar("IoV", m_PreviousCrystalTimeDB.getIoV())
+          << LogVar("Checksum", m_PreviousCrystalTimeDB.getChecksum()));
+  B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrateTimeOffset from the database"
+          << LogVar("IoV", m_CrateTimeDB.getIoV())
+          << LogVar("Checksum", m_CrateTimeDB.getChecksum()));
+  B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrystalElectronics from the database"
+          << LogVar("IoV", m_ElectronicsDB.getIoV())
+          << LogVar("Checksum", m_ElectronicsDB.getChecksum()));
+  B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrystalElectronicsTime from the database"
+          << LogVar("IoV", m_ElectronicsTimeDB.getIoV())
+          << LogVar("Checksum", m_ElectronicsTimeDB.getChecksum()));
+  B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLCrystalFlightTime from the database"
+          << LogVar("IoV", m_FlightTimeDB.getIoV())
+          << LogVar("Checksum", m_FlightTimeDB.getChecksum()));
+  B2DEBUG(25, "ECLBhabhaTCollector:: loaded ECLReferenceCrystalPerCrateCalib from the database"
+          << LogVar("IoV", m_RefCrystalsCalibDB.getIoV())
+          << LogVar("Checksum", m_RefCrystalsCalibDB.getChecksum()));
+
 
 
   // Conversion coefficient from ADC ticks to nanoseconds
-  // TICKS_TO_NS ~ 0.4931 ns/clock tick
+  // TICKS_TO_NS ~ 0.4913 ns/clock tick
   // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz.
   const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::m_rf) * 1e3;
 
@@ -372,27 +393,52 @@ void ECLBhabhaTCollectorModule::collect()
   }
 
 
-  /** Record the input database constants for the first call */
+
+  /** Store the crystal cell id of those being used as the reference crystals for ts.
+      One crystal per crate is defined as having ts=0.  This histogram only keeps
+      track of the crystal id, not the crate id.  The talg can figure out to which
+      crate to associate the crystal.
+  */
+  for (int crateID_temp = 1; crateID_temp <= 52; crateID_temp++) {
+    getObjectPtr<TH1F>("refCrysIDzeroingCrate")->Fill(m_RefCrystalsCalib[crateID_temp - 1] + 0.001);
+  }
+
+
+  /** Record the input database constants */
+  for (int crysID = 1; crysID <= 8736; crysID++) {
+    getObjectPtr<TH1F>("TsDatabase")->SetBinContent(crysID + 0.001, m_PreviousCrystalTime[crysID - 1]);
+    getObjectPtr<TH1F>("TsDatabaseUnc")->SetBinContent(crysID + 0.001, m_PreviousCrystalTimeUnc[crysID - 1]);
+    getObjectPtr<TH1F>("TcrateDatabase")->SetBinContent(crysID + 0.001, m_CrateTime[crysID - 1]);
+    getObjectPtr<TH1F>("TcrateUncDatabase")->SetBinContent(crysID + 0.001, m_CrateTimeUnc[crysID - 1]);
+  }
   if (m_storeCalib) {
-    for (int crysID = 0; crysID < 8736; crysID++) {
-      getObjectPtr<TH1F>("TsDatabase")->Fill(crysID + 0.001, m_PreviousCrystalTime[crysID]);
-      getObjectPtr<TH1F>("TsDatabaseUnc")->Fill(crysID + 0.001, m_PreviousCrystalTimeUnc[crysID]);
-      getObjectPtr<TH1F>("TcrateDatabase")->Fill(crysID + 0.001, m_CrateTime[crysID]);
-      getObjectPtr<TH1F>("TcrateUncDatabase")->Fill(crysID + 0.001, m_CrateTimeUnc[crysID]);
-
-      B2INFO("cid = " << crysID + 1 << ", Ts previous = " << m_PreviousCrystalTime[crysID]);
+    B2INFO("ECLBhabhaTCollector:: ECLCrystalTimeOffset from the database information:"
+           << LogVar("IoV", m_PreviousCrystalTimeDB.getIoV())
+           << LogVar("Checksum", m_PreviousCrystalTimeDB.getChecksum()));
+    B2INFO("First event so print out previous ts values");
+    for (int crysID = 1; crysID <= 8736; crysID++) {
+      B2INFO("cid = " << crysID << ", Ts previous = " << m_PreviousCrystalTime[crysID - 1]);
     }
-
-    for (int crateID_temp = 1; crateID_temp <= 52; crateID_temp++) {
-      getObjectPtr<TH1F>("tcrateDatabase_ns")->Fill(crateID_temp + 0.001, Crate_time_ns[crateID_temp - 1]);
-    }
-
-    // Use a histogram with only one bin as a counter to know the number of times the database histograms were filled.
-    //    This is mostly useful for the talg when running over multiple runs and trying to read ts values.
-    getObjectPtr<TH1F>("databaseCounter")->Fill(1.001, 1);
-
     m_storeCalib = false;
   }
+
+
+
+
+  for (int crateID_temp = 1; crateID_temp <= 52; crateID_temp++) {
+    getObjectPtr<TH1F>("tcrateDatabase_ns")->SetBinContent(crateID_temp + 0.001, Crate_time_ns[crateID_temp - 1]);
+  }
+
+  // Use a histogram with only one bin as a counter to know the number of times the database histograms were filled.
+  //    This is mostly useful for the talg when running over multiple runs and trying to read ts values.
+  getObjectPtr<TH1I>("databaseCounter")->SetBinContent(1, 1);
+
+
+
+  // Save what CDC event t0 correction was applied
+  getObjectPtr<TH1F>("CDCEventT0Correction")->SetBinContent(1, m_hadronEventT0_TO_bhabhaEventT0_correction);
+
+
 
 
   /* Getting the event t0 using the full event t0 rather than from the CDC specifically */
@@ -412,7 +458,7 @@ void ECLBhabhaTCollectorModule::collect()
     // Event has a t0 from CDC
     cutIndexPassed++;
     getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-    B2DEBUG(10, "Cutflow: Event t0 exists: index = " << cutIndexPassed);
+    B2DEBUG(22, "Cutflow: Event t0 exists: index = " << cutIndexPassed);
 
 
     // Get event t0 from CDC.  We don't want event t0 from ECL as we are calibrating the ECL wrt the more accurately measured time measurements of the time.  Start with the CDC since it has an event t0 but in the future we may switch to the TOP detector.
@@ -420,6 +466,10 @@ void ECLBhabhaTCollectorModule::collect()
     vector<EventT0::EventT0Component> evt_t0_list = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
     evt_t0 = evt_t0_list.back().eventT0;   // time value
     evt_t0_unc = evt_t0_list.back().eventT0Uncertainty;   // uncertainty on event t0
+
+
+    // Correct the CDC event t0 value for the bhabha bias
+    evt_t0 = evt_t0 + m_hadronEventT0_TO_bhabhaEventT0_correction;   // Bias not yet fixed in CDC t0 reco.
 
 
     // Get the ECL event t0 for comparison - validations
@@ -438,18 +488,18 @@ void ECLBhabhaTCollectorModule::collect()
       }
 
       evt_t0_ECL_closestCDC = evt_t0_list_ECL[smallest_CDC_ECL_t0_diff_idx].eventT0;   // time value
-      B2DEBUG(30, "evt_t0_ECL_closestCDC = " << evt_t0_ECL_closestCDC);
+      B2DEBUG(26, "evt_t0_ECL_closestCDC = " << evt_t0_ECL_closestCDC);
 
 
 
       double smallest_ECL_t0_minChi2 = evt_t0_list_ECL[0].quality;
       int smallest_ECL_t0_minChi2_idx = 0;
 
-      B2DEBUG(30, "evt_t0_list_ECL[0].quality = " << evt_t0_list_ECL[0].quality
+      B2DEBUG(26, "evt_t0_list_ECL[0].quality = " << evt_t0_list_ECL[0].quality
               << ", with ECL event t0 = " << evt_t0_list_ECL[0].eventT0);
 
       for (long unsigned int ECLi = 0; ECLi < evt_t0_list_ECL.size(); ECLi++) {
-        B2DEBUG(30, "evt_t0_list_ECL[" << ECLi << "].quality = " << evt_t0_list_ECL[ECLi].quality
+        B2DEBUG(26, "evt_t0_list_ECL[" << ECLi << "].quality = " << evt_t0_list_ECL[ECLi].quality
                 << ", with ECL event t0 = " <<
                 evt_t0_list_ECL[ECLi].eventT0);
         if (evt_t0_list_ECL[ECLi].quality < smallest_ECL_t0_minChi2) {
@@ -460,8 +510,8 @@ void ECLBhabhaTCollectorModule::collect()
 
       evt_t0_ECL_minChi2 = evt_t0_list_ECL[smallest_ECL_t0_minChi2_idx].eventT0;   // time value
 
-      B2DEBUG(30, "evt_t0_ECL_minChi2 = " << evt_t0_ECL_minChi2);
-      B2DEBUG(30, "smallest_ECL_t0_minChi2_idx = " << smallest_ECL_t0_minChi2_idx);
+      B2DEBUG(26, "evt_t0_ECL_minChi2 = " << evt_t0_ECL_minChi2);
+      B2DEBUG(26, "smallest_ECL_t0_minChi2_idx = " << smallest_ECL_t0_minChi2_idx);
     }
   }
 
@@ -515,8 +565,9 @@ void ECLBhabhaTCollectorModule::collect()
      We will select events with only 2 tight tracks and no additional loose tracks.
      Tight tracks are a subset of looses tracks. */
   for (int iTrk = 0; iTrk < nTrkAll; iTrk++) {
-    // Get track and assume it is a pion for now ... because it is the only particle we can assume?
-    const TrackFitResult* tempTrackFit = tracks[iTrk]->getTrackFitResult(Const::ChargedStable(211));
+    // Get track biasing towards the particle being a pion based on what particle types
+    // are used for reconstruction at this stage.
+    const TrackFitResult* tempTrackFit = tracks[iTrk]->getTrackFitResultWithClosestMass(Const::pion);
     if (not tempTrackFit) {continue;}
 
     // Collect track info to be used for categorizing
@@ -543,10 +594,10 @@ void ECLBhabhaTCollectorModule::collect()
     /* Test if loose track  */
 
     // d0 and z0 cuts
-    if (abs(d0) > m_looseTrkD0) {
+    if (fabs(d0) > m_looseTrkD0) {
       continue;
     }
-    if (abs(z0) > m_looseTrkZ0) {
+    if (fabs(z0) > m_looseTrkZ0) {
       continue;
     }
     // Number of hits in the CDC
@@ -566,10 +617,10 @@ void ECLBhabhaTCollectorModule::collect()
 
 
     // d0 and z0 cuts
-    if (abs(d0) > m_tightTrkD0) {
+    if (fabs(d0) > m_tightTrkD0) {
       continue;
     }
-    if (abs(z0) > m_tightTrkZ0) {
+    if (fabs(z0) > m_tightTrkZ0) {
       continue;
     }
     nTrkTight++;
@@ -595,7 +646,7 @@ void ECLBhabhaTCollectorModule::collect()
   // There are exactly two tight tracks
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: Two tight tracks: index = " << cutIndexPassed);
+  B2DEBUG(22, "Cutflow: Two tight tracks: index = " << cutIndexPassed);
 
 
   if (nTrkLoose != 2) {
@@ -604,7 +655,7 @@ void ECLBhabhaTCollectorModule::collect()
   // There are exactly two loose tracks as well, i.e. no additional loose tracks
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: No additional loose tracks: index = " << cutIndexPassed);
+  B2DEBUG(22, "Cutflow: No additional loose tracks: index = " << cutIndexPassed);
 
   /* Determine if the two tracks have the opposite electric charge.
      We know this because the track indices stores the max pt track in [0] for negatively charged track
@@ -617,7 +668,7 @@ void ECLBhabhaTCollectorModule::collect()
   // The two tracks have the opposite electric charges.
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: Oppositely charged tracks: index = " << cutIndexPassed);
+  B2DEBUG(22, "Cutflow: Oppositely charged tracks: index = " << cutIndexPassed);
 
 
 
@@ -630,7 +681,6 @@ void ECLBhabhaTCollectorModule::collect()
   double trkEClustCOM[2] = {0., 0.};
   double trkpLab[2];
   double trkpCOM[2];
-  //double trkThetaLab[2];
   TLorentzVector trkp4Lab[2];
   TLorentzVector trkp4COM[2];
 
@@ -652,7 +702,7 @@ void ECLBhabhaTCollectorModule::collect()
 
   for (int icharge = 0; icharge < 2; icharge++) {
     if (maxiTrk[icharge] > -1) {
-      B2DEBUG(10, "looping over the 2 max pt tracks");
+      B2DEBUG(22, "looping over the 2 max pt tracks");
 
       const TrackFitResult* tempTrackFit = tracks[maxiTrk[icharge]]->getTrackFitResult(Const::ChargedStable(211));
       trkp4Lab[icharge] = tempTrackFit->get4Momentum();
@@ -667,7 +717,7 @@ void ECLBhabhaTCollectorModule::collect()
       auto eclClusterRelationsFromTracks = tracks[maxiTrk[icharge]]->getRelationsTo<ECLCluster>();
       for (unsigned int clusterIdx = 0; clusterIdx < eclClusterRelationsFromTracks.size(); clusterIdx++) {
 
-        B2DEBUG(10, "Looking at clusters.  index = " << clusterIdx);
+        B2DEBUG(22, "Looking at clusters.  index = " << clusterIdx);
         auto cluster = eclClusterRelationsFromTracks[clusterIdx];
         bool goodClusterType = false;
 
@@ -705,8 +755,11 @@ void ECLBhabhaTCollectorModule::collect()
               crysE2Max[icharge] = tempE;
             }
 
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // If we drop the information about the second highest energy crystal we could use
+            //    m_eclClusterArray[ic]->getMaxECellId()
 
-            B2DEBUG(30,  "calDigit(ir" << ir << ") time = " << calDigit->getTime() << "ns , with E = " << tempE << " GeV");
+            B2DEBUG(26,  "calDigit(ir" << ir << ") time = " << calDigit->getTime() << "ns , with E = " << tempE << " GeV");
             time_ECLCaldigits_bothClusters.push_back(calDigit->getTime());
             cid_ECLCaldigits_bothClusters.push_back(tempCrysID);
             E_ECLCaldigits_bothClusters.push_back(tempE);
@@ -717,10 +770,6 @@ void ECLBhabhaTCollectorModule::collect()
         }
       }
       trkEClustCOM[icharge] = trkEClustLab[icharge] * trkpCOM[icharge] / trkpLab[icharge];
-
-      // Send to the histogram the number of photon clusters associated to the track
-      getObjectPtr<TH1F>("numPhotonClustersPerTrack")->Fill(numClustersPerTrack[icharge]);
-
 
       // Check both electrons to see if their cluster energy / track momentum is good.
       // The Belle II physics book shows that this is the main way of separating electrons from other particles
@@ -774,7 +823,7 @@ void ECLBhabhaTCollectorModule::collect()
     //    The electronics calibration also accounts for crystals that have a dead pre-amp and thus half the normal amplitude.
     double energyTimeShift = m_ECLTimeUtil->energyDependentTimeOffsetElectronic(amplitude * m_Electronics[cid - 1]) * TICKS_TO_NS;
 
-    B2DEBUG(35, "cellid = " << cid << ", amplitude = " << amplitude << ", time before t(E) shift = " << time <<
+    B2DEBUG(29, "cellid = " << cid << ", amplitude = " << amplitude << ", time before t(E) shift = " << time <<
             ", t(E) shift = " << energyTimeShift << " ns");
     time -= energyTimeShift;
 
@@ -798,11 +847,11 @@ void ECLBhabhaTCollectorModule::collect()
     times_noPreviousCalibrations[iCharge] = time;
 
 
-    B2DEBUG(30, "iCharge = " << iCharge);
-    B2DEBUG(30, "crateIDs[iCharge] = " << crateIDs[iCharge]);
-    B2DEBUG(30, "times_noPreviousCalibrations[iCharge] = " << times_noPreviousCalibrations[iCharge]);
-    B2DEBUG(30, "tcrate_prevCalib[iCharge] = " << tcrate_prevCalib[iCharge]);
-    B2DEBUG(30, "ts_prevCalib[iCharge] = " << ts_prevCalib[iCharge]);
+    B2DEBUG(26, "iCharge = " << iCharge);
+    B2DEBUG(26, "crateIDs[iCharge] = " << crateIDs[iCharge]);
+    B2DEBUG(26, "times_noPreviousCalibrations[iCharge] = " << times_noPreviousCalibrations[iCharge]);
+    B2DEBUG(26, "tcrate_prevCalib[iCharge] = " << tcrate_prevCalib[iCharge]);
+    B2DEBUG(26, "ts_prevCalib[iCharge] = " << ts_prevCalib[iCharge]);
 
 
     crystalCutsPassed[iCharge] = true;
@@ -858,56 +907,7 @@ void ECLBhabhaTCollectorModule::collect()
   // E/p sufficiently large
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: E_i/p_i > " << E_DIV_p_CUT  << ": index = " << cutIndexPassed);
-
-
-
-
-
-
-  // Now find energy clusters independently of the tracks
-  //------------------------------------------------------------------------
-
-  vector<double> goodClusters_E;
-
-
-
-
-  double clusterE_minCut = 0.06;  // GeV
-  int nclust = m_eclClusterArray.getEntries();
-  int nGoodClusts = 0;
-  vector<int> goodPhotonClusterIdxs;
-  vector<int> goodECLClusterIds;
-  for (int ic = 0; ic < nclust; ic++) {
-    if (m_eclClusterArray[ic]->hasHypothesis(Belle2::ECLCluster::EHypothesisBit::c_nPhotons)) {
-      double eClust = m_eclClusterArray[ic]->getEnergy(Belle2::ECLCluster::EHypothesisBit::c_nPhotons);
-      if (eClust > clusterE_minCut) {
-        goodPhotonClusterIdxs.push_back(ic);
-        goodECLClusterIds.push_back(m_eclClusterArray[ic]->getClusterId());
-        nGoodClusts++;
-      }
-    }
-  }
-
-  int numTrackless = 0;
-  for (int clustId = 0; clustId < 2; clustId++) {
-    B2DEBUG(30, "m_eclClusterArray[goodPhotonClusterIdxs[clustId]]->isTrack() = " <<
-            m_eclClusterArray[goodPhotonClusterIdxs[clustId]]->isTrack());
-    if (!m_eclClusterArray[goodPhotonClusterIdxs[clustId]]->isTrack()) {
-      numTrackless++;
-    }
-  }
-  if (numTrackless != 0) {
-    B2DEBUG(20, "Number of trackless ECL clusters != 0");
-  }
-
-  // There are exactly three energy clusters
-  cutIndexPassed++;
-  getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: ECL cluster associated to photon does not have a track associated to it: index = " << cutIndexPassed);
-  B2DEBUG(10, "Cutflow: NEW CUT TO BHABHA CODE FROM eegamma code");
-
-
+  B2DEBUG(22, "Cutflow: E_i/p_i > " << E_DIV_p_CUT  << ": index = " << cutIndexPassed);
 
 
 
@@ -930,7 +930,7 @@ void ECLBhabhaTCollectorModule::collect()
   // Invariable mass of the two tracks are above the minimum
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-  B2DEBUG(10, "Cutflow: m(track 1+2) > " << invMass_CUT << "*E_COM = " << invMass_CUT << " * " << boostrotate.getCMSEnergy() <<
+  B2DEBUG(22, "Cutflow: m(track 1+2) > " << invMass_CUT << "*E_COM = " << invMass_CUT << " * " << boostrotate.getCMSEnergy() <<
           " : index = " << cutIndexPassed);
 
 
@@ -938,33 +938,19 @@ void ECLBhabhaTCollectorModule::collect()
   //== Fill output histogram.
   for (int iCharge = 0; iCharge < 2; iCharge++) {
     if (crystalCutsPassed[iCharge]) {
-      getObjectPtr<TH2F>("TimevsCrysPrevCrateCalibPrevCrystCalib")->Fill((crystalIDs[iCharge] - 1) + 0.001,
+      getObjectPtr<TH2F>("TimevsCrysPrevCrateCalibPrevCrystCalib")->Fill((crystalIDs[iCharge]) + 0.001,
           times_noPreviousCalibrations[iCharge] - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge] , 1);
       getObjectPtr<TH2F>("TimevsCratePrevCrateCalibPrevCrystCalib")->Fill((crateIDs[iCharge]) + 0.001,
           times_noPreviousCalibrations[iCharge]  - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge], 1);
-      getObjectPtr<TH2F>("TimevsCrysNoCalibrations")->Fill((crystalIDs[iCharge] - 1) + 0.001, times_noPreviousCalibrations[iCharge], 1);
+      getObjectPtr<TH2F>("TimevsCrysNoCalibrations")->Fill((crystalIDs[iCharge]) + 0.001, times_noPreviousCalibrations[iCharge], 1);
       getObjectPtr<TH2F>("TimevsCrateNoCalibrations")->Fill((crateIDs[iCharge]) + 0.001, times_noPreviousCalibrations[iCharge], 1);
-      getObjectPtr<TH2F>("TimevsCrysPrevCrateCalibNoCrystCalib")->Fill((crystalIDs[iCharge] - 1) + 0.001,
+      getObjectPtr<TH2F>("TimevsCrysPrevCrateCalibNoCrystCalib")->Fill((crystalIDs[iCharge]) + 0.001,
           times_noPreviousCalibrations[iCharge] - tcrate_prevCalib[iCharge], 1);
       getObjectPtr<TH2F>("TimevsCrateNoCrateCalibPrevCrystCalib")->Fill((crateIDs[iCharge]) + 0.001,
           times_noPreviousCalibrations[iCharge]  - ts_prevCalib[iCharge] , 1);
 
-      getObjectPtr<TH1F>("numEntriesPerCrystal")->Fill((crystalIDs[iCharge] - 1) + 0.001);
-
       // Record number of crystals used from the event.  Should be exactly two.
       numCrystalsPassingCuts++;
-
-
-      /* Store information about one random specific crystal and one random specific crate for
-         studies of how they vary over time.*/
-      if (crystalIDs[iCharge] == 1338) {
-        getObjectPtr<TH2F>("TimevsRunPrevCrateCalibPrevCrystCalibCID1338")->Fill(m_runNum + 0.001,
-            times_noPreviousCalibrations[iCharge] - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge] , 1);
-      }
-      if (crateIDs[iCharge] == 8) {
-        getObjectPtr<TH2F>("TimevsRunPrevCrateCalibPrevCrystCalibCrate8")->Fill(m_runNum + 0.001,
-            times_noPreviousCalibrations[iCharge] - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge] , 1);
-      }
 
     }
   }
@@ -976,7 +962,7 @@ void ECLBhabhaTCollectorModule::collect()
     // At least one ECL crystal time and quality cuts passed
     cutIndexPassed++;
     getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
-    B2DEBUG(10, "Cutflow: At least one crystal time and quality cuts passed: index = " << cutIndexPassed);
+    B2DEBUG(22, "Cutflow: At least one crystal time and quality cuts passed: index = " << cutIndexPassed);
 
     getObjectPtr<TH1F>("numCrystalEntriesPerEvent")->Fill(numCrystalsPassingCuts);
   }
@@ -1034,10 +1020,10 @@ void ECLBhabhaTCollectorModule::collect()
   }
 
 
-  B2DEBUG(30, "m_tree_maxEcrystPosClust + evt_t0 = " << m_tree_maxEcrystPosClust + evt_t0);
-  B2DEBUG(30, "m_tree_maxEcrystNegClust + evt_t0 = " << m_tree_maxEcrystNegClust + evt_t0);
-  B2DEBUG(30, "CDC evt_t0 = " << evt_t0);
-  B2DEBUG(30, "ECL min chi2 even t0, m_tree_t0_ECL_minChi2 = " << m_tree_t0_ECL_minChi2);
+  B2DEBUG(26, "m_tree_maxEcrystPosClust + evt_t0 = " << m_tree_maxEcrystPosClust + evt_t0);
+  B2DEBUG(26, "m_tree_maxEcrystNegClust + evt_t0 = " << m_tree_maxEcrystNegClust + evt_t0);
+  B2DEBUG(26, "CDC evt_t0 = " << evt_t0);
+  B2DEBUG(26, "ECL min chi2 even t0, m_tree_t0_ECL_minChi2 = " << m_tree_t0_ECL_minChi2);
 
 
 
@@ -1064,7 +1050,7 @@ void ECLBhabhaTCollectorModule::collect()
   }
 
 
-  B2DEBUG(30, "This was for event number = " << m_tree_evtNum);
+  B2DEBUG(26, "This was for event number = " << m_tree_evtNum);
 
 }
 

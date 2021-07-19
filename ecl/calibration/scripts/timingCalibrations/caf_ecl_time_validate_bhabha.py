@@ -8,10 +8,12 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-"""ECL timing calibration that performs the crate calibrations, one for each physics run."""
+"""ECL timing self-consistency check (not orthogonal events so not a great validation) with an bhabha event selection."""
 
-from prompt import CalibrationSettings, input_data_filters
-from reconstruction import prepare_cdst_analysis
+from prompt import CalibrationSettings
+from reconstruction import *
+from caf.utils import IoV
+
 
 ##############################
 # REQUIRED VARIABLE #
@@ -22,20 +24,24 @@ from reconstruction import prepare_cdst_analysis
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
 #: Tells the automated system some details of this script.
-#     Default is to read bhabha skim files.
-settings = CalibrationSettings(name="ECL crate time calibrations",
-                               expert_username="ehill",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["bhabha_all_calib"],
-                               input_data_filters={"bhabha_all_calib": [input_data_filters["Data Tag"]["bhabha_all_calib"],
-                                                                        input_data_filters["Beam Energy"]["4S"],
-                                                                        input_data_filters["Beam Energy"]["Continuum"],
-                                                                        input_data_filters["Beam Energy"]["Scan"],
-                                                                        input_data_filters["Data Quality Tag"]["Good"],
-                                                                        input_data_filters["Run Type"]["physics"],
-                                                                        input_data_filters["Magnet"]["On"]]},
-                               depends_on=[])
+#     Default is to read in "bhabha_all_calib" since we want to
+#     run over cdst bhabha_all_calib skim files.
+settings = CalibrationSettings(
+    name="ECL time validations - bhabha",
+    expert_username="ehill",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=["bhabha_all_calib"],
+    input_data_filters={
+        "bhabha_all_calib": [
+            "bhabha_all_calib",
+            "4S",
+            "Continuum",
+            "Scan",
+            "Good",
+            "physics",
+            "On"]},
+    depends_on=[])
 
 ##############################
 
@@ -72,31 +78,30 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    # The input data should be the hlt bhabha skim
+    # The input data should be the bhabha skim
     file_to_iov_physics = input_data["bhabha_all_calib"]
 
-    # We might have requested an enormous amount of data across a run range.
-    # There's a LOT more files than runs!
-    # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 26
+    max_events_per_run = 3000
 
-    # We filter addition files if there are more than [max_files_per_run] files per run.
+    # We filter addition files if there are more than [max_events_per_run] files per run.
     # The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering
-    from prompt.utils import filter_by_max_files_per_run
+    from prompt.utils import filter_by_max_events_per_run
 
-    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run)
+    reduced_file_to_iov_physics = filter_by_max_events_per_run(file_to_iov_physics, max_events_per_run)
     input_files_physics = list(reduced_file_to_iov_physics.keys())
     basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
 
     ###################################################
     import basf2
     from basf2 import register_module, create_path
+    import ROOT
     from ROOT import Belle2
+    from ROOT.Belle2 import TestCalibrationAlgorithm
     from caf.framework import Collection
 
-    ###################################################
-    # Collector setup
+    #############################################################
+    # Collector setup for ecl timing validation with bhabhas
     root_input = register_module('RootInput')
     rec_path_bhabha = create_path()
     rec_path_bhabha.add_module(root_input)
@@ -105,58 +110,50 @@ def get_calibrations(input_data, **kwargs):
     if 'Geometry' not in rec_path_bhabha:
         rec_path_bhabha.add_module('Geometry', useDB=True)
 
-    prepare_cdst_analysis(rec_path_bhabha)  # for new 2020 cdst format
+    prepare_user_cdst_analysis(rec_path_bhabha)    # for new 2020 cdst format
 
-    col_bhabha = register_module('ECLBhabhaTCollector')
-    col_bhabha.param('timeAbsMax', 250)
-    col_bhabha.param('minCrystal', 1)
-    col_bhabha.param('maxCrystal', 8736)
+    col_bhabha = register_module('eclBhabhaTimeCalibrationValidationCollector')
+    col_bhabha.param('timeAbsMax', 70)
     col_bhabha.param('saveTree', False)
 
-    eclTCol = Collection(collector=col_bhabha,
-                         input_files=input_files_physics,
-                         pre_collector_path=rec_path_bhabha,
-                         )
+    eclValTCol = Collection(collector=col_bhabha,
+                            input_files=input_files_physics,
+                            pre_collector_path=rec_path_bhabha)
 
-    ###################################################
-    # Algorithm setup
+    ##############################################################
+    # Algorithm setup for ecl timing validation with bhabhas
 
-    eclTAlg = Belle2.ECL.eclBhabhaTAlgorithm()
+    # Give the collector name to the algorithm since one algorithm
+    # is used to analyse the results from several possible collectors
+    eclValTAlgBhabha = Belle2.ECL.eclTValidationAlgorithm("eclBhabhaTimeCalibrationValidationCollector")
 
     # Define the CAF algorithm arguments
-    # Set the cellIDLo to be larger than cellIDHi so that no crystal
-    #    calibrations will be performed.
-    eclTAlg.cellIDLo = 3
-    eclTAlg.cellIDHi = 2
-    eclTAlg.debugOutput = True
-    eclTAlg.meanCleanRebinFactor = 3
-    eclTAlg.meanCleanCutMinFactor = 0.3
-    eclTAlg.debugFilenameBase = "eclBhabhaTAlgorithm"
+    # eclValTAlgBhabha.cellIDLo= 3
+    # eclValTAlgBhabha.cellIDHi = 2
+    eclValTAlgBhabha.meanCleanRebinFactor = 3
+    eclValTAlgBhabha.meanCleanCutMinFactor = 0.4
+    eclValTAlgBhabha.debugFilenameBase = "eclBhabhaTValidationAlgorithm"
 
-    ###################################################
-    # Calibration setup
+    ####################################################################
+    # Calibration setup base for ecl timing validation with bhabhas
 
     from caf.framework import Calibration
 
-    cal_test = Calibration("ECLcrateTimeCalibration_physics")
-    cal_test.add_collection(name="bhabha", collection=eclTCol)
-    cal_test.algorithms = [eclTAlg]
+    valid_cal_bhabha = Calibration("ECLcrystalTimeCalValidation_bhabhaPhysics")
+    valid_cal_bhabha.add_collection(name="bhabha", collection=eclValTCol)
+    valid_cal_bhabha.algorithms = [eclValTAlgBhabha]
 
     # Here we set the AlgorithmStrategy for our algorithm
-    from caf.strategies import SimpleRunByRun
+    from caf.strategies import SingleIOV
 
-    # The SimpleRunByRun strategy executes your algorithm over runs
-    # individually to give you payloads for each one (if successful)
-    # It will not do any merging of runs which didn't contain enough data.
-    # So failure is expected if your algorithm requires a large amount of data compared to run length.
-    # You should only use granularity='run' for the collector when using this strategy.
+    # The default value is SingleIOV, you don't have to set this, it is done automatically.
+    # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
+    # You can use granularity='run' or granularity='all' for the collector when using this strategy.
 
-    cal_test.strategies = SimpleRunByRun
+    valid_cal_bhabha.strategies = SingleIOV
 
-    # Most other options like database chain and backend args will be overwritten by b2caf-prompt-run.
-    # So we don't bother setting them.
+    ###################################################
+    # Finalize all "calibrations", i.e. validations
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
-    return [cal_test]
-
-##############################
+    return [valid_cal_bhabha]

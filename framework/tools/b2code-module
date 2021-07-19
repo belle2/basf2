@@ -84,11 +84,6 @@ if __name__ == "__main__":
         sys.stderr.write('ERROR: No analysis or local release is set up.\n')
         sys.exit(1)
 
-    # get author name
-    author = input('Your name [%s]: ' % getuser())
-    if author == '':
-        author = getuser()
-
     # get module description
     module_desc = input('Short module description: ')
 
@@ -274,14 +269,12 @@ if __name__ == "__main__":
     # write the header file
     f = open(header, 'w')
     f.write("""/**************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) %(year)d - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: %(author)-50s       *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
     #pragma once
 
@@ -307,8 +300,6 @@ if __name__ == "__main__":
     %(members)s  };
     }
     """ % {
-        'year': datetime.datetime.now().year,
-        'author': author,
         'includes': includes_header,
         'module_description': module_desc,
         'module': module,
@@ -321,14 +312,12 @@ if __name__ == "__main__":
     path = ''
     f = open(src, 'w')
     f.write("""/**************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) %(year)d - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: %(author)-50s       *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
     #include <%(module_header)s>
 
@@ -356,8 +345,6 @@ if __name__ == "__main__":
 
     %(methods)s
     """ % {
-        'year': datetime.datetime.now().year,
-        'author': author,
         'module_header': os.path.relpath(os.path.join(os.getcwd(), '%sModule.h' % module), local_dir),
         'includes': includes_src,
         'module_description': module_desc,

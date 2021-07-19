@@ -22,14 +22,14 @@ namespace Belle2 {
   public:
     //! Constructor and Destructor
     svdDumpModule();
-    virtual ~svdDumpModule();
+    virtual ~svdDumpModule() {};
 
     //! module functions
-    virtual void initialize() override;
-    virtual void beginRun() override;
-    virtual void endRun() override;
-    virtual void event() override;
-    virtual void terminate() override;
+    virtual void initialize() override; /**< requires RawSVDs adn create output file*/
+    virtual void beginRun() override; /**< print begin run*/
+    virtual void endRun() override; /**< print end run*/
+    virtual void event() override; /**< dump RawSVDs*/
+    virtual void terminate() override; /**< write output file*/
 
   private:
     StoreArray<RawSVD> m_rawSVD; /**< Array for RawSVD */

@@ -27,9 +27,6 @@
 # the argument --threshold X
 #
 # Usage: basf2 trainSecMap.py -- --train_sample traindata.root --secmap trainedSecMap.root --threshold 70
-#
-#
-# Contributors: Jonas Wagner, Felix Metzner
 #####################################################################
 
 import basf2 as b2

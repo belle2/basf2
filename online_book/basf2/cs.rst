@@ -447,6 +447,8 @@ in the very same way that we previously did a cut on R2 in previous exercise.
     probability into the Ntuples. Use the data files and reconstruction from the
     previous exercises.
 
+    Use the second half of the data from datafiles.
+
 .. admonition:: Hint
     :class: toggle xhint stacked
 
@@ -456,6 +458,14 @@ in the very same way that we previously did a cut on R2 in previous exercise.
 
     We recommend to add aliases to your variables. For example ``ContProb`` for 
     ``extraInfo(ContinuumProbability)``.
+
+ .. admonition:: Hint
+    :class: toggle xhint stacked
+
+    In case you've forgotten, the files **uubar_sample.root** and **B02ks0pi0_sample.root** 
+    consist of 2001 and 30001 events respectively. You can choose half for each 
+    by using the ``entrySequences`` option in the ``inputMdstList`` function. 
+    See the documentation at :ref:`analysis/doc/mawrappers`.
 
 .. admonition:: Solution 
     :class: toggle solution

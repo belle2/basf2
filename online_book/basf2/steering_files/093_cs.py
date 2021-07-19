@@ -15,6 +15,7 @@ ma.inputMdstList(
         ),
         b2.find_file("starterkit/2021/uubar_sample.root", data_type="examples"),
     ],
+    entrySequences=["1001:2001", "15001:30001"],
     path=main,
 )
 

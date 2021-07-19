@@ -357,12 +357,22 @@ continuum events, simply add a cut on the continuum probability at the end.
     but also include KSFW moments and CLEO cones
     into the Ntuples.
 
+    Use only the first half of the events for creating these Ntuples.
+
 .. admonition:: Hint
     :class: toggle xhint stacked
 
     Use the code from the previous exercises. Add
     the new variables to the ``simpleCSVariables`` list. See the documentation on the
     variables in :ref:`analysis/doc/ContinuumSuppression:Continuum suppression`.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    The files **uubar_sample.root** and **B02ks0pi0_sample.root** consist of 2001
+    and 30001 events respectively. You can choose half for each by using the 
+    ``entrySequences`` option in the ``inputMdstList`` function. See the 
+    documentation at :ref:`analysis/doc/mawrappers`.
 
 .. admonition:: Solution
     :class: toggle solution

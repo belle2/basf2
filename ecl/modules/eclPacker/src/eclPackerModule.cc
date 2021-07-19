@@ -392,6 +392,10 @@ void ECLPackerModule::resetBuffPosition()
 void ECLPackerModule::writeNBits(unsigned int* buff, unsigned int value, unsigned int bitsToWrite)
 {
   if (!bitsToWrite) return;
+  if (bitsToWrite > 31) {
+    B2ERROR("Error compressing ADC samples: shifting 32-bit value by 32 bits is undefined behaviour.")
+    throw Write_adc_samples_error();
+  }
 
   if (value > (unsigned int)(1 << bitsToWrite) - 1) {
     B2ERROR("Error compressing ADC samples: tying to write too long word");

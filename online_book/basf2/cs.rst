@@ -328,7 +328,7 @@ series of smaller trees of a fixed depth.
 
 The output of the BDT  is the "continuum probability" -- the
 probability of an event being a continuum event, as estimated based on the input variables. The input variables can be in
-principle any varible that looks different between continuum and non-continuum
+principle any variable that looks different between continuum and non-continuum
 events. The recommended and most commonly used variables are the ones introduced in
 the previous lesson as well as others from the *Continuum Suppression* variable group in
 the :ref:`analysis/doc/index-01-analysis:Variables`.

@@ -95,20 +95,16 @@ void InclusiveBtagReconstructionModule::event()
         const std::vector<const Particle*>& particleFinalStateDaughters = particle->getFinalStateDaughters();
 
         // check if particle shares something with bsig...
-        bool append = true;
         for (const Particle* daughter : particleFinalStateDaughters) {
           int mdstSource = daughter->getMdstSource();
           if (mdstSourcesOfBsigFinalStateDaughters.find(mdstSource) != mdstSourcesEnd) {
-            append = false;
             break;
           }
-          if (append) {
-            auto it = btagDaughtersMap.find(mdstSource);
-            if (it != btagDaughtersMap.end()) { // check for mdstSource overlaps
-              it->second.push_back(particle->getArrayIndex());
-            } else {
-              btagDaughtersMap[mdstSource] = {particle->getArrayIndex()};
-            }
+          auto it = btagDaughtersMap.find(mdstSource);
+          if (it != btagDaughtersMap.end()) { // check for mdstSource overlaps
+            it->second.push_back(particle->getArrayIndex());
+          } else {
+            btagDaughtersMap[mdstSource] = {particle->getArrayIndex()};
           }
         }
       }

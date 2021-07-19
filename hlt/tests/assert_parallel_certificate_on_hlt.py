@@ -48,8 +48,8 @@ if __name__ == "__main__":
 
     path = basf2.create_path()
     path.add_module("HistoManager")
-    add_hlt_processing(path, run_type=RunTypes.cosmic, softwaretrigger_mode=SoftwareTriggerModes.monitor,
-                       data_taking_period="phase3")
+    add_hlt_processing(path, run_type=RunTypes.cosmic, softwaretrigger_mode=SoftwareTriggerModes.monitor)
+
     test_path(path)
 
     # Add various modes of express reco
@@ -62,6 +62,5 @@ if __name__ == "__main__":
     for do_reconstruction in [True, False]:
         path = basf2.create_path()
         path.add_module("HistoManager")
-        add_expressreco_processing(path, run_type=RunTypes.cosmic, do_reconstruction=do_reconstruction,
-                                   data_taking_period="phase3")
+        add_expressreco_processing(path, run_type=RunTypes.cosmic, do_reconstruction=do_reconstruction)
         test_path(path)

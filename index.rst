@@ -23,9 +23,9 @@ information, please check `Belle 2 Questions <https://questions.belle2.org>`_.
    :maxdepth: 2
    :numbered: 3
 
-   online_book/index*
    whatsnew
    build/tools_doc/index*
+   online_book/index*
    framework/doc/index*
    */doc/index*
    framework/doc/atend*

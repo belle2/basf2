@@ -121,32 +121,37 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
       const zr_t& s0 = *it0, &s1 = *it1, &s2 = *it2;
       double dr2 = s2.r - s0.r, dz2 = s2.z - s0.z;
       double d = (s1.z - s0.z) * dr2 - (s1.r - s0.r) * dz2;
+
       if (d * d < kCarTolerance * kCarTolerance * (dr2 * dr2 + dz2 * dz2)) {
-        it1 = contour.erase(it1); it2 = it1; inc(it2); it0 = it1; dec(it0);
+        it1 = contour.erase(it1);
+        it2 = it1;
+        inc(it2);
+        it0 = it1;
+        dec(it0);
+
       } else {
-        ++it0; inc(it1); inc(it2);
+        ++it0;
+        inc(it1);
+        inc(it2);
       }
+
     }
   } while (0);
 
-  auto isClockwise = [&contour]() -> bool {
-    double sum = 0;
-    zr_t p0 = contour[0];
-    for (int i = 1, imax = contour.size(); i < imax; i++)
-    {
-      zr_t p1 = contour[i]; sum += (p1.z - p0.z) * (p1.r + p0.r);
-      p0 = p1;
-    }
-    zr_t p1 = contour[0]; sum += (p1.z - p0.z) * (p1.r + p0.r);
-    return sum > 0;
-  };
-
-  if (isClockwise()) {
-    // std::ostringstream message;
-    // message << "Polygon is not in anti-clockwise order: " << GetName() << "\nReversing order...";
-    // G4Exception("BelleLathe::BelleLathe()", "BelleLathe", JustWarning, message);
-    std::reverse(contour.begin(), contour.end());
+  double sum = 0;
+  zr_t p0 = contour[0];
+  for (int i = 1, imax = contour.size(); i < imax; i++) {
+    zr_t p1 = contour[i];
+    sum += (p1.z - p0.z) * (p1.r + p0.r);
+    p0 = p1;
   }
+  zr_t p1 = contour[0];
+  sum += (p1.z - p0.z) * (p1.r + p0.r);
+
+  // If contour is Clockwise: reverse contour
+  if (sum > 0)
+    std::reverse(contour.begin(), contour.end());
+
   fcontour = contour;
 
   auto convexside = [this](cachezr_t& s, double eps) -> void {

@@ -60,7 +60,7 @@ namespace Belle2 {
     /** Only required for MCInfo method */
     bool m_MCStrictQualityEstimator;
     /** Helper variable to determine if the mcInfo QE needs to be set up, if true set up will be run first event */
-    bool m_MCInfoNeedsSetup;
+    bool m_MCInfoNeedsSetup = false;
 
     // member variables
 

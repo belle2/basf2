@@ -110,12 +110,6 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
 
   // remove vertices on the same line
   do {
-    auto inc = [&contour](vector<zr_t>::iterator & it) -> void {
-      if (++it >= contour.end()) it = contour.begin();
-    };
-    auto dec = [&contour](vector<zr_t>::iterator & it) -> void {
-      if (--it < contour.begin()) it = (++contour.rbegin()).base();
-    };
     vector<zr_t>::iterator it0 = contour.begin(), it1 = it0 + 1, it2 = it1 + 1;
     for (; it0 != contour.end();) {
       const zr_t& s0 = *it0, &s1 = *it1, &s2 = *it2;
@@ -125,14 +119,14 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
       if (d * d < kCarTolerance * kCarTolerance * (dr2 * dr2 + dz2 * dz2)) {
         it1 = contour.erase(it1);
         it2 = it1;
-        inc(it2);
+        if (++it2 >= contour.end()) it2 = contour.begin();
         it0 = it1;
-        dec(it0);
+        if (--it0 < contour.begin()) it0 = (++contour.rbegin()).base();
 
       } else {
         ++it0;
-        inc(it1);
-        inc(it2);
+        if (++it1 >= contour.end()) it1 = contour.begin();
+        if (++it2 >= contour.end()) it2 = contour.begin();
       }
 
     }

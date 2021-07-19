@@ -18,6 +18,7 @@
 #include <svd/geometry/SensorInfo.h>
 
 #include <TMath.h>
+#include <Eigen/Dense>
 
 using namespace std;
 
@@ -228,6 +229,45 @@ namespace Belle2 {
         } else
           B2ERROR("this should not happen...");
 
+      }
+
+    }
+
+    void SVDClusterPosition::applyUnfolding(Belle2::SVD::RawCluster& rawCluster)
+    {
+
+
+      std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
+      double unfoldingCoefficient = m_ClusterCal.getUnfoldingCoeff(rawCluster.getSensorID(), rawCluster.isUSide());
+      unsigned int Size = strips.size();
+      Eigen::VectorXd Charges(Size);
+      Eigen::MatrixXd Couplings(Size, Size);
+      // Unfolding Matrix
+      for (unsigned int i = 0; i < Size; ++i) {
+        for (unsigned int j = 0; j < Size; ++j) {
+          if (i == j) {Couplings(i, j) = 1 - 2 * unfoldingCoefficient;}
+          else if (j == i + 1) {Couplings(i, j) = unfoldingCoefficient;}
+          else if (j == i - 1) {Couplings(i, j) = unfoldingCoefficient;}
+          else {Couplings(i, j) = 0;}
+        }
+      }
+      //loop on strips
+      for (unsigned int i = 0; i < Size; i++) {
+
+        Belle2::SVD::StripInRawCluster strip = strips.at(i);
+
+        RawCluster tmp(rawCluster.getSensorID(), rawCluster.isUSide(), 0, 0);
+        if (tmp.add(rawCluster.getSensorID(), rawCluster.isUSide(), strip)) {
+          //Fill a vector with strip charges
+          Charges(i) = strip.charge;
+        }
+
+      }
+      //Apply the unfolding
+      Charges = Couplings.inverse() * Charges;
+      for (unsigned i = 0; i < Size; i++) {
+        if (Charges(i) < 0) {Charges(i) = 0;} //Hard coded threshold = 0
+        rawCluster.setStripCharge(i, Charges(i));
       }
 
     }

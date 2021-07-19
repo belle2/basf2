@@ -321,7 +321,7 @@ series of smaller trees of a fixed depth.
     Tree Learning <https://en.wikipedia.org/wiki/Decision_tree_learning>`_ and 
     `Gradient Tree Boosting 
     <https://en.wikipedia.org/wiki/Gradient_boosting#Gradient_tree_boosting>`_
-    for a more detailed overview. For details on `FastBDT`, the implementation used at
+    for a more detailed overview. For details on FastBDT, the implementation used at
     at Belle II take a look at this `article
     <https://link.springer.com/article/10.1007/s41781-017-0002-8>`_. The
     source code can be found `here <https://github.com/thomaskeck/FastBDT/>`_.
@@ -369,8 +369,8 @@ continuum events, simply add a cut on the continuum probability at the end.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    The files **uubar_sample.root** and **B02ks0pi0_sample.root** consist of 2001
-    and 30001 events respectively. You can choose half for each by using the 
+    The files *uubar_sample.root* and *B02ks0pi0_sample.root* consist of 2000
+    and 30000 events respectively. You can choose half for each by using the 
     ``entrySequences`` option in the ``inputMdstList`` function. See the 
     documentation at :ref:`analysis/doc/mawrappers`.
 
@@ -459,11 +459,11 @@ in the very same way that we previously did a cut on R2 in previous exercise.
     We recommend to add aliases to your variables. For example ``ContProb`` for 
     ``extraInfo(ContinuumProbability)``.
 
- .. admonition:: Hint
+.. admonition:: Hint
     :class: toggle xhint stacked
 
-    In case you've forgotten, the files **uubar_sample.root** and **B02ks0pi0_sample.root** 
-    consist of 2001 and 30001 events respectively. You can choose half for each 
+    In case you've forgotten, the files *uubar_sample.root* and *B02ks0pi0_sample.root* 
+    consist of 2000 and 30000 events respectively. You can choose half for each 
     by using the ``entrySequences`` option in the ``inputMdstList`` function. 
     See the documentation at :ref:`analysis/doc/mawrappers`.
 
@@ -503,11 +503,51 @@ in the very same way that we previously did a cut on R2 in previous exercise.
         :width: 40em
         :align: center
 
+MVA package in basf2 has a built-in MVA evaluation instrument named ``basf2_mva_evaluate.py``. 
+In its essense it is a script that produces useful graphs that characterise the
+performance of your MVA. You can find its description at the :ref:`mva/doc/index-01-mva:mva` page.
 
-In these exercises the BDT was applied to the same files that
-were used to train the BDT. This is not allowed in practice.
-The performance of our continuum suppression BDT will probably be slightly worse
-on independent datasets.
+.. admonition:: Exercise
+    :class: exercise stacked    
+
+    Use the MVA evaluation function to create plots characterizing your MVA training.
+    
+.. admonition:: Solution 
+    :class: toggle solution
+    
+    For the evaluation one should run
+
+    .. code-block:: python
+
+        basf2_mva_evaluate.py -id MVAFastBDT.root \
+        -train ContinuumSuppression.root \
+        -data ContinuumSuppression_applied.root \
+        -o evaluate.zip
+
+    In this case you will have an *evaluate.zip* archive, that needs to be unzipped
+    and the file *latex.tex* within needs to be compiled with ``pdflatex``.
+    
+    .. code-block:: python
+
+        unzip evaluate.zip
+        pdflatex latex.tex
+
+    There is also an option to create a pdf file straight ahead. For that run:
+
+    .. code-block:: python
+
+        basf2_mva_evaluate.py -id MVAFastBDT.root \
+        -train ContinuumSuppression.root \
+        -data ContinuumSuppression_applied.root \
+        -c -o evaluate.pdf
+
+.. warning:: For the evaluation to be possible both test and training datasets 
+    have to include all the variables that were used in the BDT training.
+
+.. seealso:: The MVA package has much more different sides to it. You are welcome 
+    to read more about it at :ref:`mva/doc/index-01-mva:mva` and also consult the 
+    literature listed at the end of that page. 
+
 
 Normally in an analysis, a small subset of the dataset is used to train the BDT.
 The training dataset should be large enough for the performance on the trained data and testing
@@ -516,7 +556,7 @@ Once this is achieved, the trained
 BDT is used further on in the analysis to apply the continuum suppression.
 
 In some few exceptions, only a loose R2 cut is used rather than training a BDT
-(e.g. in this `Belle II paper <https://arxiv.org/abs/2008.08819>`_ ).
+(e.g. in this `Belle II paper <https://arxiv.org/abs/2008.08819>`_).
 This might be done for practical reasons such as dealing with a low amount of data.
 
 Also keep in mind that using a BDT (with several selection variables) increases the dependence on your

@@ -15,7 +15,7 @@ ma.inputMdstList(
         ),
         b2.find_file("starterkit/2021/uubar_sample.root", data_type="examples"),
     ],
-    entrySequences=["1001:2001", "15001:30001"],
+    entrySequences=["1001:2000", "15001:30000"],
     path=main,
 )
 
@@ -51,11 +51,48 @@ main.add_module(
     identifier="MVAFastBDT.root",  # name of the weightfile used
 )
 
+simpleCSVariables = (
+    [  # We will need these variables later to evaluate the training
+        "R2",
+        "thrustBm",
+        "thrustOm",
+        "cosTBTO",
+        "cosTBz",
+        "KSFWVariables(et)",
+        "KSFWVariables(mm2)",
+        "KSFWVariables(hso00)",
+        "KSFWVariables(hso01)",
+        "KSFWVariables(hso02)",
+        "KSFWVariables(hso03)",
+        "KSFWVariables(hso04)",
+        "KSFWVariables(hso10)",
+        "KSFWVariables(hso12)",
+        "KSFWVariables(hso14)",
+        "KSFWVariables(hso20)",
+        "KSFWVariables(hso22)",
+        "KSFWVariables(hso24)",
+        "KSFWVariables(hoo0)",
+        "KSFWVariables(hoo1)",
+        "KSFWVariables(hoo2)",
+        "KSFWVariables(hoo3)",
+        "KSFWVariables(hoo4)",
+        "CleoConeCS(1)",
+        "CleoConeCS(2)",
+        "CleoConeCS(3)",
+        "CleoConeCS(4)",
+        "CleoConeCS(5)",
+        "CleoConeCS(6)",
+        "CleoConeCS(7)",
+        "CleoConeCS(8)",
+        "CleoConeCS(9)",
+    ]
+)
+
 vm.addAlias("ContProb", "extraInfo(ContinuumProbability)")
 
 ma.variablesToNtuple(
     decayString="B0",
-    variables=["ContProb", "isContinuumEvent"],
+    variables=["ContProb", "isContinuumEvent"] + simpleCSVariables,
     filename="ContinuumSuppression_applied.root",
     treename="tree",
     path=main,

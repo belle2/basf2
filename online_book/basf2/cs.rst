@@ -321,7 +321,7 @@ series of smaller trees of a fixed depth.
     Tree Learning <https://en.wikipedia.org/wiki/Decision_tree_learning>`_ and 
     `Gradient Tree Boosting 
     <https://en.wikipedia.org/wiki/Gradient_boosting#Gradient_tree_boosting>`_
-    for a more detailed overview. For details on FastBDT, the implementation used at
+    for a more detailed overview. For details on ``FastBDT``, the implementation used at
     at Belle II take a look at this `article
     <https://link.springer.com/article/10.1007/s41781-017-0002-8>`_. The
     source code can be found `here <https://github.com/thomaskeck/FastBDT/>`_.
@@ -348,7 +348,7 @@ continuum events, simply add a cut on the continuum probability at the end.
 
 .. admonition:: Exercise
     :class: exercise stacked
-    
+
     In the three initial exercises of this chapter you've learned how to create
     Ntuples for continuum suppression. We only need some more variables
     this time.
@@ -384,7 +384,7 @@ continuum events, simply add a cut on the continuum probability at the end.
 
 .. admonition:: Exercise
     :class: exercise stacked
-    
+
     Let us now create the script to train the BDT using the Ntuples that we've just
     created. The training tools are implemented in basf2 within the
     :ref:`mva/doc/index-01-mva:MVA package`. One needs to configure the global
@@ -392,7 +392,7 @@ continuum events, simply add a cut on the continuum probability at the end.
     and :ref:`mva/doc/index-01-mva:Fitting / Howto perform a training`
     respectively). Using the examples given in the links write down the script
     to perform the training.
-    
+
 .. admonition:: Hint
     :class: toggle xhint stacked
 
@@ -438,7 +438,7 @@ like this:
 This creates the variable ``extraInfo(ContinuumProbability)``, which
 should be added as an output variable to the Ntuples. To actually suppress continuum
 we put a cut on the ``extraInfo(ContinuumProbability)``
-in the very same way that we previously did a cut on R2 in previous exercise. 
+in the very same way that we previously did a cut on R2 in previous exercise.
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -453,10 +453,10 @@ in the very same way that we previously did a cut on R2 in previous exercise.
     :class: toggle xhint stacked
 
     The steering file would be same as in the previous exercises, just with the ``path.add_module("MVAExpert", ...)``
-    added at the end. Don't forget to replace the ``path`` to ``main`` or 
+    added at the end. Don't forget to replace the ``path`` to ``main`` or
     whatever is the name of your basf2 path.
 
-    We recommend to add aliases to your variables. For example ``ContProb`` for 
+    We recommend to add aliases to your variables. For example ``ContProb`` for
     ``extraInfo(ContinuumProbability)``.
 
 .. admonition:: Hint
@@ -467,7 +467,7 @@ in the very same way that we previously did a cut on R2 in previous exercise.
     by using the ``entrySequences`` option in the ``inputMdstList`` function. 
     See the documentation at :ref:`analysis/doc/mawrappers`.
 
-.. admonition:: Solution 
+.. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/093_cs.py
@@ -475,10 +475,10 @@ in the very same way that we previously did a cut on R2 in previous exercise.
         :linenos:
 
 .. admonition:: Exercise
-    :class: exercise stacked    
+    :class: exercise stacked
 
     Plot the distribution of the ``extraInfo(ContinuumProbability)``
-    for continuum and non-continuum events, as defined by the `isContinuumEvent` 
+    for continuum and non-continuum events, as defined by the `isContinuumEvent`
     (similarly to what was done before with :b2:var:`R2`).
 
 .. admonition:: Hint
@@ -490,9 +490,9 @@ in the very same way that we previously did a cut on R2 in previous exercise.
     To find out the right column name for the continuum probability, you can
     always check ``print(<yourdataframename>.columns)``.
 
-.. admonition:: Solution 
+.. admonition:: Solution
     :class: toggle solution
-        
+
     .. literalinclude:: cs/plotting.py
         :language: python
         :linenos:

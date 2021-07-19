@@ -162,7 +162,7 @@ from typing import Iterable
 
 import matplotlib.pyplot as plt
 import numpy as np
-import root_pandas
+import uproot
 from matplotlib.backends.backend_pdf import PdfPages
 
 import basf2
@@ -2102,7 +2102,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             'phi0_truth',
         ]
         # In ``pr_df`` each row corresponds to a track from Pattern Recognition
-        pr_df = root_pandas.read_root(validation_harvest_path, key='pr_tree/pr_tree', columns=pr_columns)
+        pr_df = uproot.open(validation_harvest_path)['pr_tree/pr_tree'].arrays(pr_columns, library='pd')
         mc_columns = [  # restrict mc_df to these columns
             'experiment_number',
             'run_number',
@@ -2112,7 +2112,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             'is_primary',
         ]
         # In ``mc_df`` each row corresponds to an MC track
-        mc_df = root_pandas.read_root(validation_harvest_path, key='mc_tree/mc_tree', columns=mc_columns)
+        mc_df = uproot.open(validation_harvest_path)['mc_tree/mc_tree'].arrays(mc_columns, library='pd')
         if self.primaries_only:
             mc_df = mc_df[mc_df.is_primary.eq(True)]
 

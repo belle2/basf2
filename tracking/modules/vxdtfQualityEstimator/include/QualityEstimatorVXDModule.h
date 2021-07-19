@@ -59,6 +59,8 @@ namespace Belle2 {
     std::string m_MCRecoTracksStoreArrayName;
     /** Only required for MCInfo method */
     bool m_MCStrictQualityEstimator;
+    /** Helper variable to determine if the mcInfo QE needs to be set up, if true set up will be run first event */
+    bool m_MCInfoNeedsSetup;
 
     // member variables
 

@@ -47,6 +47,9 @@ void QualityEstimatorVXDModule::initialize()
 
   // create pointer to chosen estimator
   if (m_EstimationMethod == "mcInfo") {
+    // needs the mc Reco tracks so initialize them here
+    StoreArray<RecoTrack> mcRecoTracks;
+    mcRecoTracks.isRequired(m_MCRecoTracksStoreArrayName);
     m_estimator = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
   } else if (m_EstimationMethod == "tripletFit") {
     m_estimator = std::make_unique<QualityEstimatorTripletFit>();
@@ -67,24 +70,37 @@ void QualityEstimatorVXDModule::beginRun()
   m_estimator->setMagneticFieldStrength(bFieldZ);
 
   if (m_EstimationMethod == "mcInfo") {
-    StoreArray<RecoTrack> mcRecoTracks;
-    mcRecoTracks.isRequired(m_MCRecoTracksStoreArrayName);
-    std::string svdClustersName = ""; std::string pxdClustersName = "";
-
-    if (mcRecoTracks.getEntries() > 0) {
-      svdClustersName = mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
-      pxdClustersName = mcRecoTracks[0]->getStoreArrayNameOfPXDHits();
-    } else {
-      B2WARNING("No Entries in mcRecoTracksStoreArray: using empty cluster name for svd and pxd");
-    }
-
-    QualityEstimatorMC* MCestimator = static_cast<QualityEstimatorMC*>(m_estimator.get());
-    MCestimator->setClustersNames(svdClustersName, pxdClustersName);
+    m_MCInfoNeedsSetup = true;
   }
 }
 
 void QualityEstimatorVXDModule::event()
 {
+  // the mcInfo QE needs a special set up.
+  if (m_MCInfoNeedsSetup) {
+
+
+    StoreArray<RecoTrack> mcRecoTracks(m_MCRecoTracksStoreArrayName);
+    std::string svdClustersName = ""; std::string pxdClustersName = "";
+
+    B2INFO("Setting up the mcInfo quality estimator. Found " << mcRecoTracks.getEntries() << " MC tracks in this event");
+
+    if (mcRecoTracks.getEntries() > 0) {
+      svdClustersName = mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
+      pxdClustersName = mcRecoTracks[0]->getStoreArrayNameOfPXDHits();
+    } else {
+      B2WARNING("No Entries in mcRecoTracksStoreArray: quality estimator not set up. Skipping event");
+      // the mcEstimator is not set up so no need to run over the event
+      return;
+    }
+
+    QualityEstimatorMC* MCestimator = static_cast<QualityEstimatorMC*>(m_estimator.get());
+    MCestimator->setClustersNames(svdClustersName, pxdClustersName);
+    // it is set up now, so no need for a next time
+    m_MCInfoNeedsSetup = false;
+  }
+
+
   // assign a QI computed using the selected QualityEstimator for each given SpacePointTrackCand
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
 

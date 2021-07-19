@@ -25,7 +25,7 @@ import datetime
 clsSeedSNR = 5
 clsAdjSNR = 3
 clsMinSNR = 0
-clsUnfoldingCoeffU = 0.1
+clsUnfoldingCoeffU = 0
 clsUnfoldingCoeffV = 0
 now = datetime.datetime.now()
 

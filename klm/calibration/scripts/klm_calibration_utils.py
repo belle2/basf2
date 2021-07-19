@@ -114,7 +114,8 @@ def get_alignment_pre_collector_path_physics(entry_sequence=""):
     return main
 
 
-def get_strip_efficiency_pre_collector_path(muon_list_name, entry_sequence="", raw_format=True):
+def get_strip_efficiency_pre_collector_path(
+        muon_list_name, entry_sequence="", raw_format=True, mc=False):
     """
     Parameters:
         muon_list_name  (str): Name of the muon ParticleList to be filled.
@@ -129,7 +130,7 @@ def get_strip_efficiency_pre_collector_path(muon_list_name, entry_sequence="", r
         main.add_module('RootInput',
                         entrySequences=[entry_sequence])
     if raw_format:
-        prepare_cdst_analysis(main)
+        prepare_cdst_analysis(main, mc=mc)
         # Disable the EventT0 correction.
         basf2.set_module_parameters(main, 'KLMReconstructor', EventT0Correction=False)
     else:
@@ -144,7 +145,8 @@ def get_strip_efficiency_pre_collector_path(muon_list_name, entry_sequence="", r
     return main
 
 
-def get_time_pre_collector_path(muon_list_name, entry_sequence="", raw_format=True, ):
+def get_time_pre_collector_path(muon_list_name, entry_sequence="",
+                                raw_format=True, mc=False):
     """
     Parameters:
         muon_list_name  (str): Name of the muon ParticleList to be filled.
@@ -159,7 +161,7 @@ def get_time_pre_collector_path(muon_list_name, entry_sequence="", raw_format=Tr
         main.add_module('RootInput',
                         entrySequences=[entry_sequence])
     if raw_format:
-        prepare_cdst_analysis(main)
+        prepare_cdst_analysis(main, mc=mc)
         # Disable the EventT0 correction.
         basf2.set_module_parameters(main, 'KLMReconstructor', EventT0Correction=False)
         # Disable the time window in muid module by setting it to 1 second.

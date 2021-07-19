@@ -95,7 +95,7 @@ namespace Belle2 {
       TVector3 emiMomDir(g_emiMomDir.x(), g_emiMomDir.y(), g_emiMomDir.z());
       double emiTime = photon.GetGlobalTime() - photon.GetLocalTime();
 
-      // convert to Basf2 units
+      // convert to basf2 units
       emiPoint = emiPoint * Unit::mm;
       detPoint = detPoint * Unit::mm;
       length = length * Unit::mm;

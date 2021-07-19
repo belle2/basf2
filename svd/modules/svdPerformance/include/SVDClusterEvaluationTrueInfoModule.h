@@ -23,31 +23,32 @@
 
 namespace Belle2 {
 
-  /*
-  */
+  /**
+   * Clustering Performance, using true informations
+   */
 
   class SVDClusterEvaluationTrueInfoModule : public Module {
+
   public:
 
+    /** constructor */
     SVDClusterEvaluationTrueInfoModule();
 
     virtual ~SVDClusterEvaluationTrueInfoModule();
 
-    /** Initialize the SVDClusterEvaluationTrueInfo.
-     * This method is called only once before the actual event processing starts.   */
+    /** Initialize the SVDClusterEvaluationTrueInfo */
     virtual void initialize() override;
 
-    /** Called when entering a new run.     */
+    /** Called when entering a new run */
     virtual void beginRun() override;
 
-    /** This method is the core of the SVDClusterEvaluationTrueInfo.
-     * This method is called for each event. All processing of the event has to take place in this method.   */
+    /** This method is the core of the SVDClusterEvaluationTrueInfo */
     virtual void event() override;
 
-    /** This method is called if the current run ends. */
+    /** This method is called if the current run ends */
     virtual void endRun() override;
 
-    /** This method is called at the end of the event processing.   */
+    /** This method is called at the end of the event processing */
     virtual void terminate() override;
 
 

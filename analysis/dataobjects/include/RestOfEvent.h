@@ -44,7 +44,7 @@ namespace Belle2 {
    * should be used as an input in all these cases.
    *
    * The RestOfEvent object is created for given existing Particle object by the RestOfEventBuilder
-   * module and are related between each other with the BASF2 relation.
+   * module and are related between each other with the basf2 relation.
    *
    * Internally, the RestOfEvent class holds only StoreArray indices of all unused MDST particles.
    * Indices are stored in std::set and not std::vector, since the former ensures uniqueness of all its elements.

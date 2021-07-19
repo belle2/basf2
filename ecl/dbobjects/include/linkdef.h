@@ -17,6 +17,7 @@
 #pragma link C++ class Belle2::ECLDigitWaveformParameters; // checksum=0x1b4bedbe, version=2
 #pragma link C++ class Belle2::ECLDigitWaveformParametersForMC; // checksum=0xc16a3107, version=1
 #pragma link C++ class Belle2::ECLChargedPidPDFs+; // checksum=0x1bd4d566, version=2
+#pragma link C++ class Belle2::ECLReferenceCrystalPerCrateCalib+; // checksum=0x5c126a47, version=3
 #pragma link C++ enum Belle2::ECLChargedPidPDFs::InputVar+; //implicit
 #pragma link C++ class Belle2::ECLChargedPidPDFs::VarTransfoSettings+; // checksum=0x1a8bc0c9, implicit, version=-1
 #pragma link C++ class Belle2::PackedAutoCovariance; // checksum=0xb1a29561, implicit, version=1

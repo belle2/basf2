@@ -21,7 +21,7 @@
 namespace Belle2 {
   /**
    * Creates for each Particle in given ParticleList an ContinuumSuppression
-   * dataobject and makes BASF2 relation between them.
+   * dataobject and makes basf2 relation between them.
    */
   class ContinuumSuppressionBuilderModule : public Module {
   public:

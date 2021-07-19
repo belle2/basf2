@@ -37,8 +37,8 @@ else:
                     'Beam background is not used in the simulation')
 add_simulation(main, bkgfiles=background_files)
 
-add_reconstruction(main)
-add_cdst_output(main, filename=sys.argv[2], rawFormat=False)
+add_reconstruction(main, reconstruct_cdst='rawFormat')
+add_cdst_output(main, filename=sys.argv[2])
 main.add_module('Progress')
 
 # generate events

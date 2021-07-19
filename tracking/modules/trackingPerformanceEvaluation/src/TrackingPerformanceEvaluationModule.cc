@@ -737,7 +737,7 @@ void  TrackingPerformanceEvaluationModule::fillTrackParams1DHistograms(const Tra
 
   //track parameters residuals:
   double d0_res = fitResult->getD0() - mcParticleInfo.getD0();
-  double phi_res = TMath::ASin(TMath::Sin(fitResult->getPhi() - mcParticleInfo.getPhi()));   //giulia
+  double phi_res = TMath::ASin(TMath::Sin(fitResult->getPhi() - mcParticleInfo.getPhi()));
   double omega_res =  fitResult->getOmega() - mcParticleInfo.getOmega();
   double z0_res = fitResult->getZ0() - mcParticleInfo.getZ0();
   double cotTheta_res = fitResult->getCotTheta() - mcParticleInfo.getCotTheta();

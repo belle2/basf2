@@ -869,7 +869,7 @@ You do not need to worry about this at this stage, but keep it in mind.
 
 .. warning::
 
-  The following will only work if you have the Belle II software ``BASF2`` set up.
+  The following will only work if you have the Belle II software ``basf2`` set up.
   You will learn how to do so in the following chapters.
   You're invited to still try executing the following lines, but don't worry if
   you see an error message telling you that the style has not been found.

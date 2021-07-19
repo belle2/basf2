@@ -69,7 +69,7 @@ def hot_pixel_mask_calibration(
     if not isinstance(debug_hist, bool):
         raise ValueError("debug_hist is not a boolean!")
 
-    # Create BASF2 path
+    # Create basf2 path
 
     gearbox = register_module('Gearbox')
     geometry = register_module('Geometry')
@@ -168,7 +168,7 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
     if not isinstance(gain_method, str) or gain_method.lower() not in gain_methods:
         raise ValueError("gain_method not found in gain_methods : {}".format(gain_method))
 
-    # Create BASF2 path
+    # Create basf2 path
 
     gearbox = register_module('Gearbox')
     geometry = register_module('Geometry', useDB=True)

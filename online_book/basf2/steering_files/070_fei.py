@@ -34,7 +34,7 @@ particles = fei.get_default_channels(
 
 # Set up FEI configuration specifying the FEI prefix
 configuration = fei.FeiConfiguration(
-    prefix="FEIv4_2020_MC13_release_04_01_01", monitor=False
+    prefix="FEIv4_2021_MC14_release_05_01_12", monitor=False
 )
 
 # Get FEI path

@@ -16,7 +16,7 @@ namespace Belle2 {
   class CDCDedxTrack;
 
   /** This class performs the same function as CDCDedxPIDModule, but does so
-   * without using real objects from BASF2. Instead, it scans values of
+   * without using real objects from basf2. Instead, it scans values of
    * DOCA and entrance angle for a cell in each layer of the CDC.
    */
   class CDCDedxScanModule : public Module {

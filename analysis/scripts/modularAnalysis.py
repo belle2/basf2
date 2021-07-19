@@ -2044,7 +2044,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
                      chargedPIDPriors=None, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
-    dataobject and makes BASF2 relation between them. User can provide additional
+    dataobject and makes basf2 relation between them. User can provide additional
     particle lists with a different particle hypothesis like ['K+:good, e+:good'], etc.
 
     @param target_list_name   name of the input ParticleList
@@ -2458,7 +2458,7 @@ def printROEInfo(mask_names=None, full_print=False,
 def buildContinuumSuppression(list_name, roe_mask, path):
     """
     Creates for each Particle in the given ParticleList a ContinuumSuppression
-    dataobject and makes BASF2 relation between them.
+    dataobject and makes basf2 relation between them.
 
     :param list_name: name of the input ParticleList
     :param roe_mask: name of the ROE mask

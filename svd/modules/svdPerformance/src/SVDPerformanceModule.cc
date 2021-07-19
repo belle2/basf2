@@ -41,10 +41,6 @@ SVDPerformanceModule::SVDPerformanceModule() : Module()
   addParam("TrackFitResultListName", m_TrackFitResultName, "Name of TracksFitResult Store Array.", std::string(""));
 }
 
-SVDPerformanceModule::~SVDPerformanceModule()
-{
-
-}
 
 void SVDPerformanceModule::initialize()
 {
@@ -797,13 +793,8 @@ void SVDPerformanceModule::event()
 }
 
 
+
 void SVDPerformanceModule::endRun()
-{
-
-}
-
-
-void SVDPerformanceModule::terminate()
 {
 
   /*

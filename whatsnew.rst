@@ -14,6 +14,11 @@ be adapted when changing to the new release.
 
 .. important changes should go here. Especially things that break backwards compatibility
 
+Changes since release-06
+========================
+
+.. include:: analysis/doc/whatsnew-since/release-06-00.txt
+
 Changes since release-05
 ========================
 

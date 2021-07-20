@@ -1,0 +1,7 @@
+Changes in the analysis package since release-06-00
+---------------------------------------------------
+
+Variables
++++++++++
+
+* Removed ``R2EventLevel`` (it has been officially deprecated since release-05).

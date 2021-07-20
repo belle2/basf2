@@ -21,23 +21,24 @@ class NeutralHadron4MomentumCalculator(Module):
         '''Constructor for NeutralHadron4MomentumCalculator
 
         Parameters:
-            particleList: ParticleList to calculate the
+            particleList: ParticleList in which the neutron hadron is 1st daughter in the decay
             path: path to put the module in
-
-        Variables:
-            self.neutralDirection: Direction of the neutral particle
-            self.neutral3Momentum: Momentum of the neutral particle
-            self.neutral4Momentum: 4-momentum of the nuetral particle
-            self.toRemove: A vector to store indices of Particle in the Particle List to remove
         '''
+
         super().__init__()
+        #: ParticleList
         self._particleList = particleList
+        #: Path to put the module in
         self._path = path
         self._path.add_module(self)
 
+        #: Direction of the neutral particle
         self._neutralDirection = ROOT.TVector3()
+        #: Momentum of the neutral particle
         self._neutral3Momentum = ROOT.TVector3()
+        #: 4-momentum of the nuetral particle
         self._neutral4Momentum = ROOT.TLorentzVector()
+        #: A vector to store indices of Particle in the Particle List to remove
         self._toRemove = ROOT.std.vector('unsigned int')()
 
     def event(self):

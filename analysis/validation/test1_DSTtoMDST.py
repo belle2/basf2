@@ -13,7 +13,7 @@
 <header>
   <input>../GenericB_GENSIMRECtoDST.dst.root</input>
   <output>../DSTtoMDST.mdst.root</output>
-  <contact>Jorge Martinez-Ortega; jmartinez@fis.cinvestav.mx</contact>
+  <contact>Frank Meier; frank.meier@duke.edu</contact>
 </header>
 """
 

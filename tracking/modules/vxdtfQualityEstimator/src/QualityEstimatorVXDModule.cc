@@ -53,6 +53,9 @@ void QualityEstimatorVXDModule::initialize()
 
   // create pointer to chosen estimator
   if (m_EstimationMethod == "mcInfo") {
+    // needs the mc Reco tracks so initialize them here
+    StoreArray<RecoTrack> mcRecoTracks;
+    mcRecoTracks.isRequired(m_MCRecoTracksStoreArrayName);
     m_estimator = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
   } else if (m_EstimationMethod == "tripletFit") {
     m_estimator = std::make_unique<QualityEstimatorTripletFit>(m_materialBudgetFactor, m_maxPt);
@@ -73,25 +76,14 @@ void QualityEstimatorVXDModule::beginRun()
   m_estimator->setMagneticFieldStrength(bFieldZ);
 
   if (m_EstimationMethod == "mcInfo") {
-    StoreArray<RecoTrack> mcRecoTracks;
-    mcRecoTracks.isRequired(m_MCRecoTracksStoreArrayName);
-    std::string svdClustersName = ""; std::string pxdClustersName = ""; std::string vtxClustersName = "";
-
-    if (mcRecoTracks.getEntries() > 0) {
-      svdClustersName = mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
-      pxdClustersName = mcRecoTracks[0]->getStoreArrayNameOfPXDHits();
-      vtxClustersName = mcRecoTracks[0]->getStoreArrayNameOfVTXHits();
-    } else {
-      B2WARNING("No Entries in mcRecoTracksStoreArray: using empty cluster name for svd, pxd and vtx");
-    }
-
     QualityEstimatorMC* MCestimator = static_cast<QualityEstimatorMC*>(m_estimator.get());
-    MCestimator->setClustersNames(svdClustersName, pxdClustersName, vtxClustersName);
+    MCestimator->forceUpdateClusterNames();
   }
 }
 
 void QualityEstimatorVXDModule::event()
 {
+
   // assign a QI computed using the selected QualityEstimator for each given SpacePointTrackCand
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
 

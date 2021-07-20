@@ -372,7 +372,7 @@ continuum events, simply add a cut on the continuum probability at the end.
     The files *uubar_sample.root* and *B02ks0pi0_sample.root* consist of 2000
     and 30000 events respectively. You can choose half for each by using the 
     ``entrySequences`` option in the ``inputMdstList`` function. See the 
-    documentation at :ref:`analysis/doc/mawrappers`.
+    documentation at :ref:`analysis/doc/MAWrappers`.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -462,10 +462,10 @@ in the very same way that we previously did a cut on R2 in previous exercise.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    In case you've forgotten, the files *uubar_sample.root* and *B02ks0pi0_sample.root* 
-    consist of 2000 and 30000 events respectively. You can choose half for each 
-    by using the ``entrySequences`` option in the ``inputMdstList`` function. 
-    See the documentation at :ref:`analysis/doc/mawrappers`.
+    In case you've forgotten, the files *uubar_sample.root* and *B02ks0pi0_sample.root*
+    consist of 2000 and 30000 events respectively. You can choose half for each
+    by using the ``entrySequences`` option in the ``inputMdstList`` function.
+    See the documentation at :ref:`analysis/doc/MAWrappers`.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -505,7 +505,7 @@ in the very same way that we previously did a cut on R2 in previous exercise.
 
 MVA package in basf2 has a built-in MVA evaluation instrument named ``basf2_mva_evaluate.py``. 
 In its essense it is a script that produces useful graphs that characterise the
-performance of your MVA. You can find its description at the :ref:`mva/doc/index-01-mva:mva` page.
+performance of your MVA. You can find its description at the :ref:`mva` page.
 
 .. admonition:: Exercise
     :class: exercise stacked    
@@ -545,7 +545,7 @@ performance of your MVA. You can find its description at the :ref:`mva/doc/index
     have to include all the variables that were used in the BDT training.
 
 .. seealso:: The MVA package has much more different sides to it. You are welcome 
-    to read more about it at :ref:`mva/doc/index-01-mva:mva` and also consult the 
+    to read more about it at :ref:`mva` and also consult the 
     literature listed at the end of that page. 
 
 

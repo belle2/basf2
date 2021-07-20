@@ -8,30 +8,32 @@
 
 import ROOT
 from ROOT import Belle2
-from basf2 import Module
+from basf2 import Module, register_module
 
 
-class NeutralHadron4MomentumCalculator(Module):
+def neutralHadron4MomentumCalculator(list_name, path=None, use_prototype=False):
+    module = register_module('NeutralHadron4MomentumCalculator')
+    module.param('listName', list_name)
+    path.add_module(module if not use_prototype else NeutralHadron4MomentumCalculatorPrototype(list_name))
+
+
+class NeutralHadron4MomentumCalculatorPrototype(Module):
     '''Calculates 4-momentum of a neutral hadron in a given decay chain e.g. B0 -> J/Psi K_L0, or anti-B0 -> p+ K- anti-n0.
 
     The momenta of the neutral hadron and its mother will be updated accordingly, as in the case of vertex-fitting.
     '''
 
-    def __init__(self, particleList, path=None):
+    def __init__(self, list_name):
         '''Constructor for NeutralHadron4MomentumCalculator
 
         Parameters:
-            particleList: ParticleList in which the neutron hadron is 1st daughter in the decay
+            list_name: ParticleList in which the neutron hadron is 1st daughter in the decay
             path: path to put the module in
         '''
 
         super().__init__()
         #: ParticleList
-        self._particleList = particleList
-        #: Path to put the module in
-        self._path = path
-        self._path.add_module(self)
-
+        self._list_name = list_name
         #: Direction of the neutral particle
         self._neutralDirection = ROOT.TVector3()
         #: Momentum of the neutral particle
@@ -43,12 +45,12 @@ class NeutralHadron4MomentumCalculator(Module):
 
     def event(self):
         '''Function to execute in each event'''
-        particleList = Belle2.PyStoreObj(self._particleList).obj()
+        particleList = Belle2.PyStoreObj(self._list_name).obj()
         for particle in particleList:
             charged = particle.getDaughter(0)
             neutral = particle.getDaughter(1)
             self._neutralDirection = neutral.getECLCluster().getClusterPosition().Unit()
-            a = charged.getMomentum() * self.neutralDirection
+            a = charged.getMomentum() * self._neutralDirection
             b = (particle.getPDGMass()**2 - neutral.getMass()**2 - charged.get4Vector().Mag2()) / 2.
             c = charged.getEnergy()
             d = neutral.getMass()**2

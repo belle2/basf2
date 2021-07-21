@@ -25,6 +25,21 @@ QualityEstimatorMC::MatchInfo QualityEstimatorMC::getBestMatchToMCClusters(std::
 {
   std::map<MCRecoTrackIndex, NMatches> matches;
 
+  // if the SVD and PXD cluster names have not been set by user, try to read them from the MCRecoTracks
+  if (m_clusterNamesNeedSetting) {
+    B2INFO("Trying to read StoreArray names for Clusters from first entry of " << m_mcRecoTracksStoreArrayName);
+
+    if (m_mcRecoTracks.getEntries() > 0) {
+      m_svdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
+      m_pxdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfPXDHits();
+      m_vtxClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfVTXHits();
+      m_clusterNamesNeedSetting = false;
+    } else {
+      B2WARNING("No Entries in mcRecoTracksStoreArray: " << m_mcRecoTracksStoreArrayName <<
+                " The default names for the clusters are used");
+    }
+  }
+
   for (SpacePoint const* spacePoint : measurements) {
 
     for (SVDCluster& cluster : spacePoint->getRelationsTo<SVDCluster>(m_svdClustersName)) {

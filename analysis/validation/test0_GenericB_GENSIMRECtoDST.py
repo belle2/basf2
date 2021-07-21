@@ -12,7 +12,7 @@
 """
 <header>
   <output>../GenericB_GENSIMRECtoDST.dst.root</output>
-  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+  <contact>Frank Meier; frank.meier@duke.edu</contact>
 </header>
 """
 

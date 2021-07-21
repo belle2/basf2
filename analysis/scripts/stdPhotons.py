@@ -131,7 +131,7 @@ def loadStdSkimPhoton(path):
         path (basf2.Path): modules are added to this path
 
     """
-    stdPhotons('loose', path)
+    stdPhotons('loose', path, loadPhotonBeamBackgroundMVA=False)
     cutAndCopyList(
         'gamma:skim',
         'gamma:loose',

@@ -37,7 +37,7 @@ class SinglePhotonDark(BaseSkim):
     __category__ = "physics, dark sector"
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
 
     def build_lists(self, path):
 
@@ -117,7 +117,7 @@ class ALP3Gamma(BaseSkim):
         ma.fillParticleList(
             'gamma:cdcAndMinimumEnergy',
             'E >= 0.1 and theta >= 0.297 and theta <= 2.618',
-            True, path=path
+            True, path=path, loadPhotonBeamBackgroundMVA=False
         )
 
         # defining the decay string
@@ -303,7 +303,7 @@ class EGammaControlDark(BaseSkim):
     __category__ = "physics, dark sector, control-channel"
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
         stdE("all", path=path)
 
     def build_lists(self, path):
@@ -368,7 +368,7 @@ class GammaGammaControlKLMDark(BaseSkim):
     __category__ = "physics, dark sector, control-channel"
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
 
     TestSampleProcess = "gg"
 
@@ -499,7 +499,7 @@ class RadBhabhaV0Control(BaseSkim):
     __category__ = "physics, dark sector"
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
         stdE("all", path=path)
 
     def build_lists(self, path):
@@ -542,7 +542,7 @@ class InelasticDarkMatter(BaseSkim):
     __category__ = "physics, dark sector"
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
         stdE("all", path=path)
 
     def build_lists(self, path):

@@ -140,4 +140,4 @@ def loadStdSkimPi0(path):
         path (basf2.Path) modules are added to this path
 
     """
-    stdPi0s('skim', path)
+    stdPi0s('skim', path, loadPhotonBeamBackgroundMVA=False)

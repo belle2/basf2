@@ -120,6 +120,7 @@ class BaseSkim(ABC):
         udstOutput=True,
         validation=False,
         mc=True,
+        analysisGlobaltag=None,
     ):
         """Initialise the BaseSkim class.
 
@@ -131,6 +132,7 @@ class BaseSkim(ABC):
             validation (bool): If True, build lists and write validation histograms
                 instead of writing uDSTs.
             mc (bool): If True, include MC quantities in output.
+            analysisGlobaltag (str): Analysis globaltag.
         """
         self.name = self.__class__.__name__
         self.OutputFileName = OutputFileName
@@ -138,6 +140,7 @@ class BaseSkim(ABC):
         self._udstOutput = udstOutput
         self._validation = validation
         self.mc = mc
+        self.analysisGlobaltag = analysisGlobaltag
 
     def load_standard_lists(self, path):
         """
@@ -477,6 +480,7 @@ class CombinedSkim(BaseSkim):
             CombinedSkimName="CombinedSkim",
             OutputFileName=None,
             mc=None,
+            analysisGlobaltag=None
     ):
         """Initialise the CombinedSkim class.
 

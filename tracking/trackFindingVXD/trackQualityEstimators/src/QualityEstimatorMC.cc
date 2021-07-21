@@ -32,6 +32,7 @@ QualityEstimatorMC::MatchInfo QualityEstimatorMC::getBestMatchToMCClusters(std::
     if (m_mcRecoTracks.getEntries() > 0) {
       m_svdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
       m_pxdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfPXDHits();
+      m_vtxClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfVTXHits();
       m_clusterNamesNeedSetting = false;
     } else {
       B2WARNING("No Entries in mcRecoTracksStoreArray: " << m_mcRecoTracksStoreArrayName <<

@@ -13,7 +13,7 @@
 <header>
 <input>../DSTtoMDST.mdst.root</input>
 <output>../MDSTtoUDST.udst.root</output>
-<contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+<contact>Frank Meier; frank.meier@duke.edu</contact>
 </header>
 """
 

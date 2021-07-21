@@ -34,12 +34,13 @@ AddOption('--doxygen', dest='doxygen', nargs=1, default=False,
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
     import multiprocessing
-    num_jobs = multiprocessing.cpu_count()
+    num_cpus = multiprocessing.cpu_count()
+    num_jobs = max(int(num_cpus / (1. + os.getloadavg()[1])), 1)
     if 'BELLE2_MAX_BUILDS' in os.environ:
-        if os.environ['BELLE2_MAX_BUILDS'] == 'LOAD':
-            num_jobs = max(int(num_jobs / (1. + os.getloadavg()[1])), 1)
-        else:
-            num_jobs = min(num_jobs, int(os.environ['BELLE2_MAX_BUILDS']))
+        if os.environ['BELLE2_MAX_BUILDS'] == 'NCPUS':
+            num_jobs = num_cpus
+        elif os.environ['BELLE2_MAX_BUILDS'] != 'LOAD':
+            num_jobs = min(num_cpus, int(os.environ['BELLE2_MAX_BUILDS']))
     SetOption('num_jobs', num_jobs)
 except:
     pass
@@ -106,6 +107,7 @@ global_env = Environment(
     CCFLAGS=['-Wall', '-isystem$EXTINCDIR', '-Iinclude/'],
     CXXFLAGS=['-std=c++17'],
     FORTRANFLAGS=['-std=legacy'],
+    FORTRANMODDIR=os.path.join('$INCDIR', 'fortran_modules'),
     # disable warnings when compiling dictionaries, too much root problems
     # involved
     ROOTCLING_EXTRA_CCFLAGS=["-w"],

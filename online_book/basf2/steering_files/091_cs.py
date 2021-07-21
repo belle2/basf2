@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import basf2 as b2
 import modularAnalysis as ma
 import stdPi0s
@@ -15,6 +14,7 @@ ma.inputMdstList(
         ),
         b2.find_file("starterkit/2021/uubar_sample.root", data_type="examples"),
     ],
+    entrySequences=["1:1000", "1:15000"],
     path=main,
 )
 
@@ -49,6 +49,33 @@ simpleCSVariables = [
     "thrustOm",
     "cosTBTO",
     "cosTBz",
+    "KSFWVariables(et)",
+    "KSFWVariables(mm2)",
+    "KSFWVariables(hso00)",
+    "KSFWVariables(hso01)",
+    "KSFWVariables(hso02)",
+    "KSFWVariables(hso03)",
+    "KSFWVariables(hso04)",
+    "KSFWVariables(hso10)",
+    "KSFWVariables(hso12)",
+    "KSFWVariables(hso14)",
+    "KSFWVariables(hso20)",
+    "KSFWVariables(hso22)",
+    "KSFWVariables(hso24)",
+    "KSFWVariables(hoo0)",
+    "KSFWVariables(hoo1)",
+    "KSFWVariables(hoo2)",
+    "KSFWVariables(hoo3)",
+    "KSFWVariables(hoo4)",
+    "CleoConeCS(1)",
+    "CleoConeCS(2)",
+    "CleoConeCS(3)",
+    "CleoConeCS(4)",
+    "CleoConeCS(5)",
+    "CleoConeCS(6)",
+    "CleoConeCS(7)",
+    "CleoConeCS(8)",
+    "CleoConeCS(9)",
 ]
 
 ma.variablesToNtuple(

@@ -3588,6 +3588,13 @@ def getNbarIDMVA(particleList, path=None, ):
     variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
 
 
+def neutralHadron4MomentumCalculator(list_name, path=None):
+    module = register_module('NeutralHadron4MomentumCalculator')
+    module.set_name('NeutralHadron4MomentumCalculator_' + list_name)
+    module.param('listName', list_name)
+    path.add_module(module)
+
+
 if __name__ == '__main__':
     from basf2.utils import pretty_print_module
     pretty_print_module(__name__, "modularAnalysis")

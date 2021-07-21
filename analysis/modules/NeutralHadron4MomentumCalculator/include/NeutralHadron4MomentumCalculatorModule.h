@@ -11,12 +11,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/Particle.h>
-#include <TVector3.h>
-#include <TLorentzVector.h>
-
-#include <vector>
-
 
 namespace Belle2 {
   /**
@@ -31,19 +25,15 @@ namespace Belle2 {
      */
     NeutralHadron4MomentumCalculatorModule();
 
-    /** Iniliazation */
+    /** Initialization */
     void initialize() override;
 
     /** Action to perform for each event */
     void event() override;
 
-    /** Termination */
-    void terminate() override;
-
-
   private:
 
-    std::string m_listName;  /**< Name of the ParticleList that one wants to perform the calculation */
+    std::string m_listName;  /**< Name of the ParticleList for which one wants to perform the calculation */
     StoreObjPtr<ParticleList> m_plist;  /**< ParticleList that one wants to perform the calculation */
   };
 }

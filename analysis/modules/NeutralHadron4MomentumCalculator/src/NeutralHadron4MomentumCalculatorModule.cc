@@ -9,6 +9,11 @@
 #include <analysis/modules/NeutralHadron4MomentumCalculator/NeutralHadron4MomentumCalculatorModule.h>
 
 #include <framework/logging/Logger.h>
+#include <analysis/dataobjects/Particle.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <TVector3.h>
+#include <TLorentzVector.h>
+#include <vector>
 #include <cmath>
 
 using namespace Belle2;
@@ -22,13 +27,13 @@ NeutralHadron4MomentumCalculatorModule::NeutralHadron4MomentumCalculatorModule()
     R"DOC(Calculates 4-momentum of a neutral hadron in a given decay chain e.g. B0 -> J/Psi K_L0, or anti-B0 -> p+ K- anti-n0.)DOC");
 
   // Parameter definitions
-  addParam("listName", m_listName, "Name of the ParticleList that one wants to perform the calculation", std::string(""));
+  addParam("listName", m_listName, "Name of the ParticleList for which one wants to perform the calculation", std::string(""));
 
 }
 
 void NeutralHadron4MomentumCalculatorModule::initialize()
 {
-  B2INFO("Neutralhadron4MomentumCalculator: Use particle list: " << m_listName);
+  B2DEBUG(1, "Neutralhadron4MomentumCalculator: Use particle list: " << m_listName);
   m_plist.isRequired(m_listName);
 }
 
@@ -41,7 +46,14 @@ void NeutralHadron4MomentumCalculatorModule::event()
     std::vector<Particle*> daughters = particle->getDaughters();
     Particle* charged = daughters[0];
     Particle* neutral = daughters[1];
-    TVector3 neutralDirection = neutral->getECLCluster()->getClusterPosition().Unit();
+    TVector3 neutralDirection;
+    if (neutral->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster) {
+      neutralDirection = neutral->getECLCluster()->getClusterPosition().Unit();
+    } else if (neutral->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster) {
+      neutralDirection = neutral->getKLMCluster()->getClusterPosition().Unit();
+    } else {
+      B2ERROR("Your neutral particle doens't originate from ECLCluster nor KLMCluster.");
+    }
     double a = charged->getMomentum() * neutralDirection;
     double b = (std::pow(particle->getPDGMass(), 2) - std::pow(neutral->getMass(), 2) - charged->get4Vector().Mag2()) / 2.;
     double c = charged->getEnergy();
@@ -69,9 +81,3 @@ void NeutralHadron4MomentumCalculatorModule::event()
   }
   m_plist->removeParticles(toRemove);
 }
-
-void NeutralHadron4MomentumCalculatorModule::terminate()
-{
-  B2INFO("Neutralhadron4MomentumCalculatorModule::terminate");
-}
-

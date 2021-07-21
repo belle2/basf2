@@ -128,8 +128,16 @@ namespace Belle2 {
         const double vx = p->y() * Unit::m;
         const double vy = p->z() * Unit::m;
         const double vz = p->x() * Unit::m;
+
         // Time
-        double time = 0;// p->t() * Unit::s;
+        /* In basf2, it is assume that t = 0 when an event was produced,
+           For the cosmic event, we set t = 0 when event cross y=0 plane.
+           The output time from CRY (p->t()) is too large (order of second)
+           and increase as simulated time. Unfortunately, we are unable to
+           handle this value in basf2 framework, if one need this time for
+           a special study, you have to find a way to handle it. */
+        //        double time = p->t() * Unit::s;
+        double time = 0;
 
         vecgeom::Vector3D<double> pos(vx, vy, vz);
         vecgeom::LorentzVector<double> mom(px, py, pz, etot);

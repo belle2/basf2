@@ -503,7 +503,7 @@ in the very same way that we previously did a cut on R2 in previous exercise.
         :width: 40em
         :align: center
 
-The MVA package in alsohas a built-in tool named ``basf2_mva_evaluate.py`` that
+The MVA package also has a built-in tool named ``basf2_mva_evaluate.py`` that
 produces several useful graphs that characterise the
 performance of your MVA. You can find its description at the :ref:`mva` page.
 

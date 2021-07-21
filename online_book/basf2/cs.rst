@@ -524,16 +524,23 @@ performance of your MVA. You can find its description at the :ref:`mva` page.
         -data ContinuumSuppression_applied.root \
         -o evaluate.zip
 
-    In this case you will have an *evaluate.zip* archive, that needs to be unzipped
-    and the file *latex.tex* within needs to be compiled with ``pdflatex``.
+    In this case you will have an *evaluate.zip* archive, that you can unzip
+    with ``unzip evaluate.zip``.
+    Inside you will find the plots in the pdf format and a *latex.tex* file that 
+    can be used to compile a single pdf that would include all the plots.
     
-    .. code-block:: python
+.. admonition:: Exercise (optional)
+    :class: exercise stacked    
 
-        unzip evaluate.zip
-        pdflatex latex.tex
+    If you have a running Tex distribution on your local machine, you can also 
+    generate a PDF, but note that you might have to install some additional 
+    LaTeX packages first. To generate a PDF complile the *latex.tex* file from 
+    the *evaluate.zip* archive with a ``pdflatex``.
 
-    There is also an option to create a pdf file straight ahead. For that run:
-
+    There is also an option to create a pdf file straight ahead if you happen to
+    have a basf2 installation AND all the neccesary LaTeX packages on the same 
+    machine. For that you should add a ``-c`` option and run:
+    
     .. code-block:: python
 
         basf2_mva_evaluate.py -id MVAFastBDT.root \

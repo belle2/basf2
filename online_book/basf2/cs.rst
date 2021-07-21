@@ -318,8 +318,8 @@ boosting. Gradient boosting means, that a final tree is made by combining a
 series of smaller trees of a fixed depth.
 
 .. seealso:: The reader is welcome to consult the Wikipedia pages on `Decision
-    Tree Learning <https://en.wikipedia.org/wiki/Decision_tree_learning>`_ and 
-    `Gradient Tree Boosting 
+    Tree Learning <https://en.wikipedia.org/wiki/Decision_tree_learning>`_ and
+    `Gradient Tree Boosting
     <https://en.wikipedia.org/wiki/Gradient_boosting#Gradient_tree_boosting>`_
     for a more detailed overview. For details on ``FastBDT``, the implementation used at
     at Belle II take a look at this `article
@@ -344,7 +344,7 @@ steps are
 
 In the last step, the BDT will return the continuum
 probability, which then can be stored in the Ntuples. To actually remove
-continuum events, simply add a cut on the continuum probability at the end. 
+continuum events, simply add a cut on the continuum probability at the end.
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -370,8 +370,8 @@ continuum events, simply add a cut on the continuum probability at the end.
     :class: toggle xhint stacked
 
     The files *uubar_sample.root* and *B02ks0pi0_sample.root* consist of 2000
-    and 30000 events respectively. You can choose half for each by using the 
-    ``entrySequences`` option in the ``inputMdstList`` function. See the 
+    and 30000 events respectively. You can choose half for each by using the
+    ``entrySequences`` option in the ``inputMdstList`` function. See the
     documentation at :ref:`mawrappers`.
 
 .. admonition:: Solution
@@ -508,13 +508,13 @@ produces several useful graphs that characterise the
 performance of your MVA. You can find its description at the :ref:`mva` page.
 
 .. admonition:: Exercise
-    :class: exercise stacked    
+    :class: exercise stacked
 
     Use the MVA evaluation function to create plots characterizing your MVA training.
-    
-.. admonition:: Solution 
+
+.. admonition:: Solution
     :class: toggle solution
-    
+
     Run
 
     .. code-block:: python
@@ -532,11 +532,11 @@ performance of your MVA. You can find its description at the :ref:`mva` page.
 
 .. warning:: For the evaluation to be possible, both test and training datasets
     have to include all the variables that were used in the BDT training.
-    
-.. admonition:: Exercise (optional)
-    :class: exercise stacked    
 
-    If you have a running Tex distribution on your local machine, you can also 
+.. admonition:: Exercise (optional)
+    :class: exercise stacked
+
+    If you have a running Tex distribution on your local machine, you can also
     generate a PDF report that includes all the plots.
     Note that you might have to install some additional
     LaTeX packages first. To generate the PDF, compile the ``latex.tex`` file from
@@ -545,7 +545,7 @@ performance of your MVA. You can find its description at the :ref:`mva` page.
     There is also an option to create a pdf file straight ahead if you happen to
     have a ``basf2`` installation AND all the necessary LaTeX packages on the same
     machine. For that you can add a ``-c`` option and run:
-    
+
     .. code-block:: python
 
         basf2_mva_evaluate.py -id MVAFastBDT.root \
@@ -556,7 +556,7 @@ performance of your MVA. You can find its description at the :ref:`mva` page.
 
 .. seealso:: The MVA package has many more features. You are welcome
     to read more about them at :ref:`mva` and also consult the
-    literature listed at the end of that page. 
+    literature listed at the end of that page.
 
 
 Normally in an analysis, a small subset of the dataset is used to train the BDT.

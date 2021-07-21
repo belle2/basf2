@@ -447,13 +447,13 @@ in the very same way that we previously did a cut on R2 in previous exercise.
     probability into the Ntuples. Use the data files and reconstruction from the
     previous exercises.
 
-    Use the second half of the data from datafiles.
+    Use the second half of the data from the datafiles.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    The steering file would be same as in the previous exercises, just with the ``path.add_module("MVAExpert", ...)``
-    added at the end. Don't forget to replace the ``path`` to ``main`` or
+    Use the steering file from the previous exercises, just with the ``path.add_module("MVAExpert", ...)``
+    added at the end. Don't forget to change ``path`` to ``main`` or
     whatever is the name of your basf2 path.
 
     We recommend to add aliases to your variables. For example ``ContProb`` for
@@ -462,7 +462,7 @@ in the very same way that we previously did a cut on R2 in previous exercise.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    In case you've forgotten, the files *uubar_sample.root* and *B02ks0pi0_sample.root*
+    In case you've forgotten, the files ``uubar_sample.root`` and ``B02ks0pi0_sample.root``
     consist of 2000 and 30000 events respectively. You can choose half for each
     by using the ``entrySequences`` option in the ``inputMdstList`` function.
     See the documentation at :ref:`mawrappers`.
@@ -503,8 +503,8 @@ in the very same way that we previously did a cut on R2 in previous exercise.
         :width: 40em
         :align: center
 
-MVA package in basf2 has a built-in MVA evaluation instrument named ``basf2_mva_evaluate.py``. 
-In its essense it is a script that produces useful graphs that characterise the
+The MVA package in alsohas a built-in tool named ``basf2_mva_evaluate.py`` that
+produces several useful graphs that characterise the
 performance of your MVA. You can find its description at the :ref:`mva` page.
 
 .. admonition:: Exercise
@@ -515,44 +515,47 @@ performance of your MVA. You can find its description at the :ref:`mva` page.
 .. admonition:: Solution 
     :class: toggle solution
     
-    For the evaluation one should run
+    Run
 
     .. code-block:: python
 
         basf2_mva_evaluate.py -id MVAFastBDT.root \
-        -train ContinuumSuppression.root \
-        -data ContinuumSuppression_applied.root \
-        -o evaluate.zip
+            -train ContinuumSuppression.root \
+            -data ContinuumSuppression_applied.root \
+            -o evaluate.zip
 
-    In this case you will have an *evaluate.zip* archive, that you can unzip
+    This creates ``evaluate.zip`` that can be unzipped with
     with ``unzip evaluate.zip``.
-    Inside you will find the plots in the pdf format and a *latex.tex* file that 
-    can be used to compile a single pdf that would include all the plots.
+    Inside you will find the plots in pdf format and a ``latex.tex`` file that
+    can be used to compile a single pdf that includes all the plots (see next
+    exercise)
+
+.. warning:: For the evaluation to be possible, both test and training datasets
+    have to include all the variables that were used in the BDT training.
     
 .. admonition:: Exercise (optional)
     :class: exercise stacked    
 
     If you have a running Tex distribution on your local machine, you can also 
-    generate a PDF, but note that you might have to install some additional 
-    LaTeX packages first. To generate a PDF complile the *latex.tex* file from 
-    the *evaluate.zip* archive with a ``pdflatex``.
+    generate a PDF report that includes all the plots.
+    Note that you might have to install some additional
+    LaTeX packages first. To generate the PDF, compile the ``latex.tex`` file from
+    the ``evaluate.zip`` archive with a ``pdflatex``.
 
     There is also an option to create a pdf file straight ahead if you happen to
-    have a basf2 installation AND all the neccesary LaTeX packages on the same 
-    machine. For that you should add a ``-c`` option and run:
+    have a ``basf2`` installation AND all the necessary LaTeX packages on the same
+    machine. For that you can add a ``-c`` option and run:
     
     .. code-block:: python
 
         basf2_mva_evaluate.py -id MVAFastBDT.root \
-        -train ContinuumSuppression.root \
-        -data ContinuumSuppression_applied.root \
-        -c -o evaluate.pdf
+            -train ContinuumSuppression.root \
+            -data ContinuumSuppression_applied.root \
+            -c -o evaluate.pdf
 
-.. warning:: For the evaluation to be possible both test and training datasets 
-    have to include all the variables that were used in the BDT training.
 
-.. seealso:: The MVA package has much more different sides to it. You are welcome 
-    to read more about it at :ref:`mva` and also consult the 
+.. seealso:: The MVA package has many more features. You are welcome
+    to read more about them at :ref:`mva` and also consult the
     literature listed at the end of that page. 
 
 

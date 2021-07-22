@@ -240,6 +240,7 @@ namespace Belle2 {
       std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
       double unfoldingCoefficient = m_ClusterCal.getUnfoldingCoeff(rawCluster.getSensorID(), rawCluster.isUSide());
       unsigned int Size = strips.size();
+      double threshold = 0;
       Eigen::VectorXd Charges(Size);
       Eigen::MatrixXd Couplings(Size, Size);
       // Unfolding Matrix
@@ -250,9 +251,6 @@ namespace Belle2 {
           else if (j == i - 1) {Couplings(i, j) = unfoldingCoefficient;}
           else {Couplings(i, j) = 0;}
         }
-      }
-      //loop on strips
-      for (unsigned int i = 0; i < Size; i++) {
 
         Belle2::SVD::StripInRawCluster strip = strips.at(i);
 
@@ -266,7 +264,7 @@ namespace Belle2 {
       //Apply the unfolding
       Charges = Couplings.inverse() * Charges;
       for (unsigned i = 0; i < Size; i++) {
-        if (Charges(i) < 0) {Charges(i) = 0;} //Hard coded threshold = 0
+        if (Charges(i) < threshold) {Charges(i) = 0;}
         rawCluster.setStripCharge(i, Charges(i));
       }
 

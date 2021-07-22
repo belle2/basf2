@@ -13,7 +13,7 @@
 # Opens a .root/.sroot file and shows MCParticles,
 # SimHits and Tracks using the Display module.
 # Usage:
-#  basf2 display/example/display.py -i MyInputFile.root
+#  basf2 display/example/display.py -i MyInputFile.root [--autoplay]
 #
 # Note: this file is also used by the 'b2display' command,
 # so the following is also possible:
@@ -22,8 +22,13 @@
 # If you want custom settings for b2display, you thus only need to
 # edit this steering file.
 
+import argparse
 import basf2 as b2
 from ROOT import Belle2
+
+ap = argparse.ArgumentParser()
+ap.add_argument("--play", action='store_true', "Start event display advancing through events.")
+args = ap.parse_args()
 
 # create paths
 main = b2.create_path()
@@ -110,6 +115,10 @@ display.param('customGeometryExtractPath', '')
 # work for objects somewhere deep in the tree, only for those immediately
 # below 'Event'.
 display.param('hideObjects', [])
+
+# should events be advanced on startup?
+if args.play:
+    display.param('playOnStartup', True)
 
 main.add_module(display)
 

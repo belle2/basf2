@@ -94,6 +94,9 @@ namespace Belle2 {
     /** Show full geometry instead of simplified shapes. */
     bool m_fullGeometry;
 
+    /** Start the module advancing through events. */
+    bool m_playOnStartup;
+
     /** objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event Scene'. */
     std::vector<std::string> m_hideObjects;
 

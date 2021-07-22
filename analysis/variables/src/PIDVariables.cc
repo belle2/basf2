@@ -326,7 +326,7 @@ namespace Belle2 {
       int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
       int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
       std::vector<int> pdgIds {pdgCodeHyp, pdgCodeTest};
-      if (std::any_of(pdgIds.begin(), pdgIds.end(), [](int p) {return (p != Const::electron.getPDGCode());})) {
+      if (!std::any_of(pdgIds.begin(), pdgIds.end(), [](int p) {return (p != Const::electron.getPDGCode());})) {
         B2ERROR("The variable binaryPID_noTOP is defined only for particle hypothesis: 11.");
         return std::numeric_limits<float>::quiet_NaN();
       }
@@ -606,7 +606,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("nbarID", antineutronID, R"DOC(
 Returns MVA classifier for antineutron PID.
 
-    - 1  signal(antineutron) like 
+    - 1  signal(antineutron) like
     - 0  background like
     - -1 invalid using this PID due to some ECL variables used unavailable
 

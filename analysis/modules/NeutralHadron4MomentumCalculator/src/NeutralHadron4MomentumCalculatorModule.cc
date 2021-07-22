@@ -11,7 +11,7 @@
 #include <framework/logging/Logger.h>
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 #include <TLorentzVector.h>
 #include <vector>
 #include <cmath>
@@ -46,7 +46,7 @@ void NeutralHadron4MomentumCalculatorModule::event()
     std::vector<Particle*> daughters = particle->getDaughters();
     Particle* charged = daughters[0];
     Particle* neutral = daughters[1];
-    TVector3 neutralDirection;
+    B2Vector3D neutralDirection;
     if (neutral->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster) {
       neutralDirection = neutral->getECLCluster()->getClusterPosition().Unit();
     } else if (neutral->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster) {

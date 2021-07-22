@@ -55,7 +55,6 @@ class BtoXgamma(BaseSkim):
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
         stdPhotons("loose", path=path, loadPhotonBeamBackgroundMVA=False)
 
     def build_lists(self, path):

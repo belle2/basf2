@@ -131,11 +131,13 @@ namespace Belle2 {
 
         // Time
         /* In basf2, it is assume that t = 0 when an event was produced,
-           For the cosmic event, we set t = 0 when event cross y=0 plane.
-           The output time from CRY (p->t()) is too large (order of second)
-           and increase as simulated time. Unfortunately, we are unable to
-           handle this value in basf2 framework, if one need this time for
-           a special study, you have to find a way to handle it. */
+           For the cosmic case, we set t = 0 when particle cross y=0 plane;
+           The output time from CRY (p->t()) is too large (order of second) and  also
+        increase as simulated time, so it is impossible to handle in basf2.
+        For event which has more then one particle, the difference between their production
+        times is also to large (> microsecond) to keep in basf2. So the time relation
+        between particles in each event is also reset. Production of each particle in event is set t=0 at y=0.
+        if one need production from CRY for a special study, you have to find a way to handle it ...*/
         //        double time = p->t() * Unit::s;
         double time = 0;
 

@@ -40,16 +40,23 @@ path = b2.Path()
     skim = {{ skims[0] }}(
     {%- if not backward_compatibility -%}
     {%- if data -%}
-    mc=False
+    mc=False,
     {%- else -%}
-    mc=True
+    mc=True,
     {%- endif -%}
+    {%- endif -%}
+    {%- if analysis_globaltag != "" -%}
+    analysisGlobaltag="{{ analysis_globaltag }}",
     {%- endif -%}
 ){%- if hints %}  # pass udstOutput=False to disable udstOutput{%- endif %}
 {% else -%}
     skim = CombinedSkim(
     {% for skim in skims -%}
+        {%- if analysis_globaltag != "" -%}
+        {{ skim|indent(4, True) }}(analysisGlobaltag="{{ analysis_globaltag }}"),
+        {%- else -%}
         {{ skim|indent(4, True) }}(),
+        {%- endif -%}
     {% endfor -%}
     {%- if mdstOutput -%}
     {{ "    " }}udstOutput=False,

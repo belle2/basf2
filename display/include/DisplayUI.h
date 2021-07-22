@@ -39,6 +39,7 @@ namespace Belle2 {
     /** Constructor.
      *
      * @param automatic if true, hide window and save events using automaticEvent()
+     * @param advance if true, start advancing through the events on startup.
      */
     explicit DisplayUI(bool automatic = false, bool advance = false);
 

@@ -13,7 +13,7 @@
 # Opens a .root/.sroot file and shows MCParticles,
 # SimHits and Tracks using the Display module.
 # Usage:
-#  basf2 display/example/display.py -i MyInputFile.root [--autoplay]
+#  basf2 display/example/display.py -i MyInputFile.root [-- --play]
 #
 # Note: this file is also used by the 'b2display' command,
 # so the following is also possible:

@@ -170,7 +170,7 @@ def draw_bklmhists(file_chain):
     zstrip.SetMinimum(0.0)
     zstrip.Write()
 
-    timeRPC = TH1F('TimeRPC', 'Hit time for BKLMHit2ds in RPCs', 100, -0.5, 1.5)
+    timeRPC = TH1F('TimeRPC', 'Hit time for BKLMHit2ds in RPCs', 175, 5, 30)
     file_chain.Draw('BKLMHit2ds.getTime()>>TimeRPC', 'BKLMHit2ds.inRPC()==1')
     timeRPC.GetXaxis().SetTitle('t (ns)')
     timeRPC.GetListOfFunctions().Add(TNamed('Description', 'Time of muon hit in RPCs'))
@@ -179,12 +179,12 @@ def draw_bklmhists(file_chain):
     timeRPC.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     timeRPC.Write()
 
-    timeSci = TH1F('TimeSci', 'Hit time for BKLMHit2ds in scintillators', 150, 0, 15.0)
+    timeSci = TH1F('TimeSci', 'Hit time for BKLMHit2ds in scintillators', 100, 45, 65)
     file_chain.Draw('BKLMHit2ds.getTime()>>TimeSci', 'BKLMHit2ds.inRPC()==0')
     timeSci.GetXaxis().SetTitle('t (ns)')
     timeSci.GetListOfFunctions().Add(TNamed('Description', 'Time of muon hit in scintillators'))
     timeSci.GetListOfFunctions().Add(TNamed('Check',
-                                            'Broad peak mainly between 2 ns and 8 ns, with the mean around 3.5 ns.'))
+                                            'Peaks approximately around 0, 3, 8, 12, 15 and 20 ns.'))
     timeSci.GetListOfFunctions().Add(TNamed('Contact', contact))
     timeSci.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     timeSci.Write()

@@ -191,7 +191,7 @@ namespace Belle2 {
     std::vector<ushort> m_valmax;
     ushort m_dimsize;
     boost::array<c3index, 3> m_c3shape =  {{ 40, 384, 9 }};
-    c3array* m_houghVals;
+    c3array* m_houghVals{0};
     c3array m_houghVisit = c3array(m_c3shape);
   };
 }

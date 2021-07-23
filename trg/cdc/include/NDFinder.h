@@ -324,7 +324,7 @@ namespace Belle2 {
     std::vector<short> m_vecDstart;
 
     /** Counter for the number of hits in the current event */
-    unsigned short m_nHits;
+    unsigned short m_nHits{0};
 
     /** Configuration parameters of the 3DFinder */
     ndparameters m_params;
@@ -343,25 +343,25 @@ namespace Belle2 {
     std::vector<ushort> m_planeShape;
 
     /** Default bins */
-    unsigned short m_nPhiFull;
-    unsigned short m_nPhiOne;
-    unsigned short m_nPhiComp;
-    unsigned short m_nPhiExp;
-    unsigned short m_nPhiUse;
-    unsigned short m_nOmega;
-    unsigned short m_nTheta;
+    unsigned short m_nPhiFull{0};
+    unsigned short m_nPhiOne{0};
+    unsigned short m_nPhiComp{0};
+    unsigned short m_nPhiExp{0};
+    unsigned short m_nPhiUse{0};
+    unsigned short m_nOmega{0};
+    unsigned short m_nTheta{0};
 
-    unsigned short m_nSL;
-    unsigned short m_nTS;
-    unsigned short m_nAx;
-    unsigned short m_nSt;
-    unsigned short m_nPrio;
+    unsigned short m_nSL{0};
+    unsigned short m_nTS{0};
+    unsigned short m_nAx{0};
+    unsigned short m_nSt{0};
+    unsigned short m_nPrio{0};
 
     /** Clustering module */
     Belle2::Clusterizend m_clusterer;
 
     /** Print Hough planes and verbose output */
-    bool m_verbose;
+    bool m_verbose{false};
   };
 }
 #endif

@@ -46,7 +46,7 @@ def main():
     mdst_files.sort(reverse=True)
     ma.inputMdstList("default", require_file(mdst_files[0]), path=path)
 
-    analysisGlobaltag = "analysis_tools_light-2104-poseidon"  # ma.getAnalysisGlobaltag()
+    analysisGlobaltag = ma.getAnalysisGlobaltag()
     SkimObjects = [Registry.get_skim_function(skim)(analysisGlobaltag=analysisGlobaltag) for skim in Registry.names]
     skims = CombinedSkim(*[skim for skim in SkimObjects if not is_combined_or_fei_skim(skim)])
     skims(path)

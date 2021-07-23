@@ -19,7 +19,7 @@ namespace Belle2 {
 
     /// Constructor
     TRGGRLMATCHKLM(): m_dphi(-999.) {}
-    /// Desturctor
+    /// Destructor
     ~TRGGRLMATCHKLM() {}
 
     /**Get dphi*/

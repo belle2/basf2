@@ -17,11 +17,6 @@ be adapted when changing to the new release.
 Changes since release-06
 ========================
 
-.. include:: analysis/doc/whatsnew-since/release-06-00.txt
-
-Changes since release-05
-========================
-
 .. rubric:: Simplified arguments to :py:func:`modularAnalysis.inputMdst` and :py:func:`modularAnalysis.inputMdstList`.
 
    The arguments of :py:func:`modularAnalysis.inputMdst` and :py:func:`modularAnalysis.inputMdstList` have been changed a little.
@@ -40,7 +35,7 @@ Changes since release-05
    To:
    .. code-block:: python
 
-        # new in release-06
+        # new
         import modularAnalysis as ma
         ma.inputMdst("/path/to/your/file.root", path=mypath)
 
@@ -51,6 +46,11 @@ Changes since release-05
 
     .. warning:: We no longer support MC5-10 files.
 
+
+.. include:: analysis/doc/whatsnew-since/release-06-00.txt
+
+Changes since release-05
+========================
 
 .. only:: not light
 
@@ -76,7 +76,7 @@ Changes since release-05
    The support of the ``fullFormat`` cDSTs is discontinued. :py:func:`reconstruction.add_cdst_output` does not store
    anymore additional branches when the option ``rawFormat=False`` is selected, being simply an alias of
    :py:func:`mdst.add_mdst_output`. The users have to explicitly define the additional branches they want to store
-   using the ``additionalBranches`` paramenter.
+   using the ``additionalBranches`` parameter.
 
    The only supported format is the ``rawFormat``, that is now extended to MC. If ``rawFormat=True`` and ``mc=False`` are
    selected, the rawdata + tracking data objects are stored, while with ``rawFormat=True`` and ``mc=True`` the digits +
@@ -94,7 +94,6 @@ This was present in ``release-05-00-01`` and earlier, including MC13 files.
 
 .. rubric:: Unification of B2BII settings
 
-.. TODO: understand this for inputMdst(List) -- SC
 A single switch between Belle and Belle II settings has been implemented, which is automatically set when reading in a Belle type mdst.
 No individual options have to be set in modular analysis functions. 
 

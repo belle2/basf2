@@ -255,6 +255,7 @@ namespace Belle2 {
     static bool isSameSignal(TRGCDCJSignal const& lhs, TRGCDCJSignal const& rhs);
     /// Values => [name, value, bitwidth, min, max, clock]
     /// Changes values to signals.
+    // cppcheck-suppress constParameter
     static void valuesToMapSignals(std::vector<std::tuple<std::string, double, int, double, double, int> > const& inValues,
                                    Belle2::TRGCDCJSignalData* inCommonData, std::map<std::string, Belle2::TRGCDCJSignal>& outMap);
     /// Choose => [signalName, FpgaEffects(=1)/NoFpgaEffects(=0)]

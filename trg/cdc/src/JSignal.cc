@@ -2199,6 +2199,7 @@ namespace Belle2 {
   }
 
   void TRGCDCJSignal::valuesToMapSignals(std::vector<std::tuple<string, double, int, double, double, int> > const& inValues,
+                                         // cppcheck-suppress constParameter
                                          Belle2::TRGCDCJSignalData* inCommonData, std::map<std::string, Belle2::TRGCDCJSignal>& outMap)
   {
     for (unsigned iSignals = 0; iSignals < inValues.size(); iSignals++) {

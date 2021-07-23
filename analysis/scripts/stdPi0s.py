@@ -14,7 +14,7 @@ from vertex import kFit
 from basf2 import B2WARNING
 
 
-def stdPi0s(listtype="eff60_May2020", path=None, loadPhotonBeamBackgroundMVA=True):
+def stdPi0s(listtype="eff60_May2020", path=None, loadPhotonBeamBackgroundMVA=False):
     """
     Function to prepare one of several standardized types of pi0 lists:
 

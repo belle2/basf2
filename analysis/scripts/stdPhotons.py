@@ -11,7 +11,7 @@
 from modularAnalysis import fillParticleList, cutAndCopyList
 
 
-def stdPhotons(listtype='loose', path=None, loadPhotonBeamBackgroundMVA=True):
+def stdPhotons(listtype='loose', path=None, loadPhotonBeamBackgroundMVA=False):
     """
     Function to prepare one of several standardized types of photon lists:
 

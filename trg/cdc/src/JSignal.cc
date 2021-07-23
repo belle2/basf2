@@ -1962,6 +1962,7 @@ namespace Belle2 {
       if (t_signals.find(target.m_name) == t_signals.end()) {
         //t_signals[target.m_name] = {target.m_type, target.m_bitsize};
         // From and target should be same.
+        // cppcheck-suppress stlFindInsert
         t_signals[target.m_name] = {from.m_type, from.m_bitsize};
       }
     }

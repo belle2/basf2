@@ -177,7 +177,7 @@ class CharmoniumPsi(BaseSkim):
     def load_standard_lists(self, path):
         stdE('loosepid', path=path)
         stdMu('loosepid', path=path)
-        stdPhotons("loose", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
 
     def build_lists(self, path):
 

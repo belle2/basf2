@@ -23,7 +23,7 @@ namespace Belle2 {
   /** Store track parameters of found tracks. */
   class NDFinderTrack {
   public:
-    NDFinderTrack(std::vector<double> values, SimpleCluster cluster)
+    NDFinderTrack(std::vector<double> values, const SimpleCluster& cluster)
     {
       m_omega = values[0];
       m_phi = values[1];
@@ -152,7 +152,7 @@ namespace Belle2 {
      * */
     void init(int minweight, int minpts, bool diagonal,
               int minhits, int minhits_axial, double thresh, double minassign,
-              int mincells, bool verbose, std::string axialFile, std::string stereoFile);
+              int mincells, bool verbose, std::string& axialFile, std::string& stereoFile);
 
     /** Initialize the binnings and reserve the arrays */
     void initBins();
@@ -163,7 +163,7 @@ namespace Belle2 {
     void loadArray(const std::string& filename, ndbinning bins, c5array& hitsToTracks);
     /** Restore non-zero suppressed hit curves.
      * will make m_params.arrayAxialFile and m_params.arrayStereoFile obsolete */
-    void restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& expArray, c5array& compArray);
+    void restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& expArray, const c5array& compArray);
 
     /** Squeeze phi-axis in a 2D (omega,phi) plane
      * @param inparcels number of 1/32 sectors in input plane
@@ -229,7 +229,7 @@ namespace Belle2 {
     void addLookup(unsigned short ihit);
 
     /** In place array addition to houghmap Comp: A = A + B */
-    void addC3Comp(ushort hitr, ushort prio, c5array& hitsToTracks,
+    void addC3Comp(ushort hitr, ushort prio, const c5array& hitsToTracks,
                    short Dstart, ndbinning bins);
 
     /** Create hits to clusters confusion matrix */
@@ -237,7 +237,7 @@ namespace Belle2 {
                                             std::vector<SimpleCluster>& clusters);
 
     /** Peak cell in cluster */
-    cell_index getMax(std::vector<cell_index>&);
+    cell_index getMax(const std::vector<cell_index>&);
 
     /** Determine weight contribution of a single hit to a single cell.
      * Used to create the hitsVsClusters confusion matrix. */

@@ -1291,7 +1291,7 @@ namespace Belle2 {
     second.checkInt("TRGCDCJSignal::matchUnit()::second");
   }
 
-  void TRGCDCJSignal::setName(string name)
+  void TRGCDCJSignal::setName(const string& name)
   {
     m_name = name;
   }
@@ -1342,7 +1342,7 @@ namespace Belle2 {
     }
   }
 
-  void TRGCDCJSignal::setVhdlOutputFile(string filename)
+  void TRGCDCJSignal::setVhdlOutputFile(const string& filename)
   {
     if (m_commonData) m_commonData->m_vhdlOutputFile = filename;
     else {
@@ -1772,7 +1772,7 @@ namespace Belle2 {
 
   }
 
-  void TRGCDCJSignal::vhdlCode(TRGCDCJSignal const& first, std::string operation, TRGCDCJSignal const& second,
+  void TRGCDCJSignal::vhdlCode(TRGCDCJSignal const& first, const std::string& operation, TRGCDCJSignal const& second,
                                TRGCDCJSignal const& result, string& resultVhdlCode)
   {
     // Copy first and second for VHDL version.
@@ -1835,7 +1835,8 @@ namespace Belle2 {
     resultVhdlCode = resultCode;
   }
 
-  void TRGCDCJSignal::vhdlCode(std::string operation, TRGCDCJSignal const& first, TRGCDCJSignal const& result, string& resultVhdlCode)
+  void TRGCDCJSignal::vhdlCode(const std::string& operation, TRGCDCJSignal const& first, TRGCDCJSignal const& result,
+                               string& resultVhdlCode)
   {
     // Copy first for VHDL version.
     TRGCDCJSignal t_first(first);

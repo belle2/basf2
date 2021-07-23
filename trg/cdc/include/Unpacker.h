@@ -573,7 +573,7 @@ namespace Belle2 {
                                 std::string p_mlpin_drifttime,
                                 std::string p_mlpin_id,
                                 std::string p_netsel,
-                                const DBObjPtr<CDCTriggerNeuroConfig> neurodb,
+                                const DBObjPtr<CDCTriggerNeuroConfig>& neurodb,
                                 const std::string& p_2dcc,
                                 bool sim13dt,
                                 B2LDataField p_extendedpts)
@@ -1031,7 +1031,7 @@ namespace Belle2 {
       StoreArray<CDCTriggerSegmentHit>* tsHits,
       StoreArray<CDCTriggerSegmentHit>* tsHitsAll,
       StoreArray<CDCTriggerMLPInput>* storeNNInputs,
-      const DBObjPtr<CDCTriggerNeuroConfig> neurodb,
+      const DBObjPtr<CDCTriggerNeuroConfig>& neurodb,
       bool sim13dt)
     {
       for (unsigned iTracker = 0; iTracker < nTrackers; ++iTracker) {

@@ -143,15 +143,13 @@ former.
 .. admonition:: Solution
     :class: toggle solution
 
-    Three parameters have no default value and are therefore required:
+    Two parameters have no default value and are therefore required:
 
-    * the environment type
     * a list of root input files
     * the path
 
-    In 99 % of all cases ``default`` should be set as ``environmentType``.
-    The Belle II MC that you are reading was produced with a recent release,
-    so this also applies here.
+    The ``environmentType`` only has to be modified if you are analyzing Belle
+    data / MC.
 
 In a later lesson you'll learn how and where to find input files for your
 analysis. For the purpose of this tutorial we have prepared some local input

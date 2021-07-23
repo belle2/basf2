@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 import argparse
 import sys
 import basf2
@@ -11,9 +19,6 @@ and it creates a new payload valid for the given IoV containing the object.
 It can be used for "extending" the validity of a EventDependency payload by
 assigning to the new (extended) IoV the last object valid for the previous IoV.
 '''
-
-__author__ = 'Giacomo De Pietro'
-__copyright__ = '2021 - Belle II Collaboration'
 
 
 def arg_parser():

@@ -113,7 +113,7 @@ namespace Belle2 {
     {
     }
     virtual ~Clusterizend() {}
-    Clusterizend(clusterer_params params)
+    Clusterizend(const clusterer_params& params)
     {
       m_params = params;
     }

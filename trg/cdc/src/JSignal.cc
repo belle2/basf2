@@ -2017,7 +2017,7 @@ namespace Belle2 {
                                                         t_reference.m_commonData->m_buffers);
 
     // Storage for used values.
-    map<signed long long, bool> t_used;
+    // map<signed long long, bool> t_used;
     // Create string for choice().
     stringstream t_vhdlCode;
     //t_vhdlCode<<"case to_integer("<<t_referenceVhdlCode<<") is"<<endl;

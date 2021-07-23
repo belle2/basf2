@@ -99,7 +99,7 @@ With:
     if entrySequence is not None:
         entrySequence = [entrySequence]
 
-    inputMdstList(environmentType, [filename], path, skipNEvents, entrySequence, parentLevel=parentLevel)
+    inputMdstList([filename], path, environmentType, skipNEvents, entrySequence, parentLevel=parentLevel)
 
 
 def inputMdstList(filelist, path, environmentType='default', skipNEvents=0, entrySequences=None, *, parentLevel=0):

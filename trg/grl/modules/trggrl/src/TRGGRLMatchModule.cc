@@ -804,7 +804,7 @@ void TRGGRLMatchModule::make_eecl_map(StoreArray<TRGECLCluster> clusterlist,
   ecl_sectormap_fwd[3] = ecl_phimap_loose_fwd[26]  or ecl_phimap_loose_fwd[27] or ecl_phimap_loose_fwd[28]
                          or ecl_phimap_loose_fwd[29] or
                          ecl_phimap_loose_fwd[30] or ecl_phimap_loose_fwd[31] or ecl_phimap_loose_fwd[32] or ecl_phimap_loose_fwd[33] or
-                         ecl_phimap_loose_fwd[34] or ecl_phimap_loose_fwd[36] or ecl_phimap_loose_fwd[0];
+                         ecl_phimap_loose_fwd[34] or ecl_phimap_loose_fwd[35] or ecl_phimap_loose_fwd[0];
   //-- 36b into 4b
   ecl_sectormap_bwd[0] = ecl_phimap_loose_bwd[35] or ecl_phimap_loose_bwd[0] or ecl_phimap_loose_bwd[1] or ecl_phimap_loose_bwd[2] or
                          ecl_phimap_loose_bwd[3] or ecl_phimap_loose_bwd[4] or ecl_phimap_loose_bwd[5] or ecl_phimap_loose_bwd[6] or

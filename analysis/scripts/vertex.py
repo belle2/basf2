@@ -39,7 +39,7 @@ def fitVertex(
         decay_string (str):     select particles used for the vertex fit
         fitter (str):           Rave or KFit
         fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC)
-        constraint (str):       add aditional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
+        constraint (str):       add additional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
             Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
@@ -84,7 +84,7 @@ def _fitVertex(
         decay_string (str):     select particles used for the vertex fit
         fitter (str):           Rave or KFit
         fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC)
-        constraint (str):       add aditional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
+        constraint (str):       add additional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
             Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
@@ -178,7 +178,7 @@ def raveFit(
           * ``massvertex`` for a mass-constrained vertex fit
 
         decay_string (str): select particles used for the vertex fit
-        constraint (str):   add aditional constraint to the fit
+        constraint (str):   add additional constraint to the fit
             (valid options are ipprofile or iptube).
         daughtersUpdate (bool): make copy of the daughters and update them after the Rave vertex fit
         path (basf2.Path):  modules are added to this path
@@ -219,6 +219,7 @@ def treeFit(
     customOriginConstraint=False,
     customOriginVertex=[0.001, 0, 0.0116],
     customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
+    originDimension=3,
     path=None,
 ):
     """
@@ -242,16 +243,18 @@ def treeFit(
             Please do not mix PDG id and particle names in massConstraint list.
         ipConstraint (bool): constrain head production vertex to IP (x-y-z) constraint
         customOriginConstraint (bool): use a costum origin vertex as the production vertex of your particle.
-            This is usefull when fitting D*/D without wanting to fit a B but constraining the process to be B-decay-like.
+            This is useful when fitting D*/D without wanting to fit a B but constraining the process to be B-decay-like.
             (think of semileptonic modes and stuff with a neutrino in the B decay).
         customOriginVertex (list(float)): 3d vector of the vertex coordinates you want to use as custom origin.
             Default numbers are taken for B-mesons
         customOriginCovariance (list(float)): 3x3 covariance matrix for the custom vertex (type: vector).
-            Default numbers extracted from generator distribtuion width of B-mesons.
+            Default numbers extracted from generator distribution width of B-mesons.
         updateAllDaughters (bool): if true the entire tree will be updated with the fitted values
             for momenta and vertex position. Otherwise only the momenta of the head of the tree will be updated,
             however for all daughters we also update the vertex position with the fit results as this would
             otherwise be set to {0, 0, 0} contact us if this causes any hardship/confusion.
+        originDimension (int): If the origin or IP constraint (``customOriginVertex`` or ``ipConstraint``) are used,
+            this specifies the dimension of the constraint (3D or 2D).
         path (basf2.Path): modules are added to this path
     """
     treeFitter = register_module("TreeFitter")
@@ -268,6 +271,7 @@ def treeFit(
     treeFitter.param('customOriginConstraint', customOriginConstraint)
     treeFitter.param('customOriginVertex', customOriginVertex)
     treeFitter.param('customOriginCovariance', customOriginCovariance)
+    treeFitter.param('originDimension', originDimension)
     path.add_module(treeFitter)
 
 

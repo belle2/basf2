@@ -7,7 +7,6 @@ import stdPi0s
 main = b2.create_path()
 
 ma.inputMdstList(
-    environmentType="default",
     filelist=[
         b2.find_file(
             "starterkit/2021/B02ks0pi0_sample.root", data_type="examples"

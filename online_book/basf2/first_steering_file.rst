@@ -498,8 +498,8 @@ of the CDC (`thetaInCDCAcceptance`).
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 22-26
-        :lineno-start: 22
+        :lines: 21-25
+        :lineno-start: 21
 
 
 Combining particles
@@ -568,14 +568,14 @@ particles themselves need to be written in the decay string.
     The :math:`J/\Psi` reconstruction looks like this:
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 29-32
-        :lineno-start: 29
+        :lines: 28-31
+        :lineno-start: 28
 
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 1-40, 50-54
+        :lines: 1-39, 49-53
         :linenos:
 
 Writing out information to an ntuple
@@ -635,7 +635,7 @@ mass.
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :linenos:
-        :emphasize-lines: 44
+        :emphasize-lines: 43
 
 Although you are analyzing a signal MC sample, the reconstruction will find
 many candidates that are actually not signal, but random combinations that
@@ -746,7 +746,7 @@ definitely read it to understand at least the basics.
 
     .. literalinclude:: steering_files/014_first_steering_file.py
         :linenos:
-        :emphasize-lines: 41-42, 47
+        :emphasize-lines: 40-41, 46
 
 .. --------------
 
@@ -806,8 +806,8 @@ variable that can be used to cut away background is :math:`\Delta E` (`deltaE`).
     :class: solution toggle
 
     .. literalinclude:: steering_files/015_first_steering_file.py
-        :lines: 35-40
-        :lineno-start: 35
+        :lines: 34-39
+        :lineno-start: 34
 
 Variable collections
 --------------------
@@ -943,8 +943,8 @@ or `matchedMC`.
     This is how we add variables to the final state particles:
 
     .. literalinclude:: steering_files/019_first_steering_file.py
-        :lines: 53-59
-        :lineno-start: 53
+        :lines: 52-58
+        :lineno-start: 52
 
     Next, do the same for the :math:`J/\Psi` and the :math:`K_S^0` in a similar
     fashion.
@@ -965,8 +965,8 @@ or `matchedMC`.
     This is the code for the first part of the last hint:
 
     .. literalinclude:: steering_files/019_first_steering_file.py
-        :lines: 63-67
-        :lineno-start: 63
+        :lines: 62-66
+        :lineno-start: 62
 
 .. admonition:: Solution
     :class: toggle solution

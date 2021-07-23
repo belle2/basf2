@@ -480,7 +480,6 @@ class CombinedSkim(BaseSkim):
             CombinedSkimName="CombinedSkim",
             OutputFileName=None,
             mc=None,
-            analysisGlobaltag=None
     ):
         """Initialise the CombinedSkim class.
 

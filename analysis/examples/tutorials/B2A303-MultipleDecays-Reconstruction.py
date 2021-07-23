@@ -39,8 +39,7 @@ import variables.utils as vu
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False),
+ma.inputMdst(filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False),
              path=my_path)
 
 # create and fill final state ParticleLists

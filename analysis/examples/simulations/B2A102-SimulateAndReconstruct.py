@@ -39,8 +39,7 @@ b2.conditions.disable_globaltag_replay()
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdst(environmentType='None',
-             filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu_evtgen.root', 'examples', False),
+ma.inputMdst(filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu_evtgen.root', 'examples', False),
              path=my_path)
 
 # simulation

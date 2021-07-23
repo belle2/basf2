@@ -43,8 +43,7 @@ particles = fei.get_unittest_channels()
 # Construct path for production of mcParticlesCount.root at stage -1
 path = b2.create_path()
 
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst14.root', 'validation', False),
+ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 maxTracks = 12
@@ -187,8 +186,7 @@ assert len(glob.glob('training_input*.root')) == 4
 
 # Construct path for stage 6 preparing evaluation (stages 4 and 5 skipped, input evaluated from stage 0 on)
 path = b2.create_path()
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst14.root', 'validation', False),
+ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 maxTracks = 12

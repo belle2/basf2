@@ -23,6 +23,9 @@
 #include <top/dbobjects/TOPCalCommonT0.h>
 #include <top/dbobjects/TOPFrontEndSetting.h>
 
+#include <top/reconstruction_cpp/PDFConstructor.h>
+#include <top/utilities/Chi2MinimumFinder1D.h>
+
 
 namespace Belle2 {
 
@@ -71,6 +74,16 @@ namespace Belle2 {
      */
     Const::ChargedStable getMostProbable(const Track& track);
 
+    /**
+     * Sets finder object with chi2 values
+     * @param finder finder object
+     * @param reco reconstruction object
+     * @param timeMin lower edge of photon time window
+     * @param timeMax upper edge of photon time window
+     * @return number of photons in the time window
+     */
+    int setFinder(TOP::Chi2MinimumFinder1D& finder, const TOP::PDFConstructor& reco, double timeMin, double timeMax);
+
     // steering parameters
     int m_numBins;      /**< number of bins to which the fine search region is divided */
     double m_timeRangeFine; /**< time range in which to do fine search [ns] */
@@ -94,6 +107,7 @@ namespace Belle2 {
     bool m_subtractRunningOffset; /**< subtract running offset when running in HLT mode */
     int m_bunchesPerSSTclk; /**< number of bunches per SST clock */
     bool m_usePIDLikelihoods; /**< if true, use PIDLikelihoods (only on cdst files) */
+    double m_dedxMomentumLimit; /**< momentum limit of good dEdx particle ID */
 
     // internal variables shared between events
     double m_bunchTimeSep = 0; /**< time between two bunches */

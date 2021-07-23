@@ -768,6 +768,32 @@ namespace Belle2 {
       return LL;
     }
 
+
+    PDFConstructor::LogL PDFConstructor::getBackgroundLogL(double minTime, double maxTime) const
+    {
+      if (not m_valid) {
+        B2ERROR("TOP::PDFConstructor::getBackgroundLogL(): object status is invalid - cannot provide log likelihood");
+        return LogL(0);
+      }
+
+      double bkgPhotons = m_bkgPhotons * (maxTime - minTime) / (m_maxTime - m_minTime);
+
+      LogL LL(bkgPhotons);
+      for (const auto& hit : m_selectedHits) {
+        if (hit.time < minTime or hit.time > maxTime) continue;
+        double f = bkgPhotons * m_backgroundPDF->getPDFValue(hit.pixelID);
+        if (f <= 0) {
+          B2ERROR("TOP::PDFConstructor::getBackgroundLogL(): PDF value is zero or negative"
+                  << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          continue;
+        }
+        LL.logL += log(f);
+        LL.numPhotons++;
+      }
+      return LL;
+    }
+
+
     const std::vector<PDFConstructor::LogL>&
     PDFConstructor::getPixelLogLs(double t0, double minTime, double maxTime, double sigt) const
     {

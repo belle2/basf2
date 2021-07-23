@@ -95,6 +95,8 @@ namespace Belle2 {
     addParam("usePIDLikelihoods", m_usePIDLikelihoods,
              "use PIDLikelihoods instead of DedxLikelihoods (only if run on cdst files)",
              false);
+    addParam("dedxMomentumLimit", m_dedxMomentumLimit, "momentum limit of good dEdx particle ID", 0.7);
+
   }
 
 
@@ -246,6 +248,7 @@ namespace Belle2 {
     std::vector<PDFConstructor> pdfConstructors;
     std::vector<PDF1Dim> top1Dpdfs;
     std::vector<int> numPhotons;
+    std::vector<double> assumedMasses;
     std::vector<Chi2MinimumFinder1D> finders;
 
     // loop over reconstructed tracks, make a selection and push to containers
@@ -300,6 +303,7 @@ namespace Belle2 {
       pdfConstructors.push_back(pdfConstructor);
       top1Dpdfs.push_back(pdf1d);
       numPhotons.push_back(numPhot);
+      assumedMasses.push_back(pdfConstructors.back().getHypothesis().getMass());
     }
     m_recBunch->setNumTracks(numTrk, topTracks.size(), m_nodEdxCount);
     if (topTracks.empty()) return;
@@ -352,27 +356,45 @@ namespace Belle2 {
 
     if (m_fineSearch) {
       finders.clear();
-      numPhotons.clear();
 
       double timeMin = TOPRecoManager::getMinTime() + t0Coarse.position;
       double timeMax = TOPRecoManager::getMaxTime() + t0Coarse.position;
       double t0min = t0Coarse.position - m_timeRangeFine / 2;
       double t0max = t0Coarse.position + m_timeRangeFine / 2;
 
-      for (const auto& reco : pdfConstructors) {
+      for (size_t itrk = 0; itrk < topTracks.size(); itrk++) {
         finders.push_back(Chi2MinimumFinder1D(m_numBins, t0min, t0max));
-        numPhotons.push_back(0);
-        auto& finder = finders.back();
-        std::set<int> nfotSet; // for control only
-        const auto& binCenters = finder.getBinCenters();
-        for (unsigned i = 0; i < binCenters.size(); i++) {
-          double t0 = binCenters[i];
-          auto LL = reco.getLogL(t0, timeMin, timeMax, m_sigmaSmear);
-          finder.add(i, -2 * LL.logL);
-          if (i == 0) numPhotons.back() = LL.numPhotons;
-          nfotSet.insert(LL.numPhotons);
+        const auto& reco = pdfConstructors[itrk];
+        numPhotons[itrk] = setFinder(finders.back(), reco, timeMin, timeMax);
+        const auto& trk = topTracks[itrk];
+        if (trk.getMomentumMag() > m_dedxMomentumLimit) {
+          std::vector<Const::ChargedStable> other;
+          if (reco.getHypothesis() == Const::kaon) {
+            other.push_back(Const::pion);
+            other.push_back(Const::proton);
+          } else if (reco.getHypothesis() == Const::proton) {
+            other.push_back(Const::pion);
+            other.push_back(Const::kaon);
+          } else {
+            other.push_back(Const::kaon);
+            other.push_back(Const::proton);
+          }
+          for (const auto& chargedStable : other) {
+            PDFConstructor pdfConstructor(trk, chargedStable, PDFConstructor::c_Rough);
+            if (not pdfConstructor.isValid() or pdfConstructor.getExpectedSignalPhotons() == 0) continue;
+            pdfConstructor.switchOffDeltaRayPDF(); // to speed-up fine search
+            double expSignal = pdfConstructor.getExpectedSignalPhotons() + pdfConstructor.getExpectedDeltaPhotons();
+            if (expSignal < m_minSignal) continue;
+            Chi2MinimumFinder1D finder(m_numBins, t0min, t0max);
+            int numPhot = setFinder(finder, pdfConstructor, timeMin, timeMax);
+            if (numPhot != numPhotons[itrk])
+              B2ERROR("Different number of photons used for log likelihood of different mass hypotheses");
+            if (finder.getMinChi2() < finders.back().getMinChi2()) {
+              finders.back() = finder;
+              assumedMasses[itrk] = chargedStable.getMass();
+            }
+          }
         }
-        if (nfotSet.size() != 1) B2ERROR("Different number of photons used for log likelihood of different time shifts");
       }
 
       if (finders.size() == 0) return; // just in case
@@ -383,8 +405,7 @@ namespace Belle2 {
 
       const auto& t0Fine = finder.getMinimum();
       if (m_saveHistograms) {
-        m_recBunch->addHistogram(finder.getHistogram("chi2_fine_",
-                                                     "precise T0; t_{0} [ns]; -2 log L"));
+        m_recBunch->addHistogram(finder.getHistogram("chi2_fine_", "precise T0; t_{0} [ns]; -2 log L"));
       }
       if (t0Fine.position < t0min or t0Fine.position > t0max or not t0Fine.valid) {
         B2DEBUG(100, "Fine T0 finder: returning invalid or out of range T0");
@@ -425,6 +446,7 @@ namespace Belle2 {
     double bunchTime = bunchNo * m_bunchTimeSep;
     m_recBunch->setReconstructed(bunchNo, bunchTime, offset, error,
                                  m_runningOffset, m_runningError, m_fineSearch);
+    m_recBunch->setMinChi2(T0.chi2);
     m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(bunchTime, error,
                                                              Const::TOP, "bunchFinder"));
     m_success++;
@@ -434,14 +456,14 @@ namespace Belle2 {
     if (finders.size() == topTracks.size()) {
       for (size_t itrk = 0; itrk < topTracks.size(); itrk++) {
         const auto& trk = topTracks[itrk];
-        const auto& reco = pdfConstructors[itrk];
         auto& finder = finders[itrk];
         const auto& t0trk = finder.getMinimum();
         auto* timeZero = m_timeZeros.appendNew(trk.getModuleID(),
                                                t0trk.position - bunchTime,
                                                t0trk.error, numPhotons[itrk]);
-        timeZero->setAssumedMass(reco.getHypothesis().getMass());
+        timeZero->setAssumedMass(assumedMasses[itrk]);
         if (not t0trk.valid) timeZero->setInvalid();
+        timeZero->setMinChi2(finder.getMinChi2());
         timeZero->addRelationTo(trk.getExtHit());
 
         if (m_saveHistograms) {
@@ -542,6 +564,26 @@ namespace Belle2 {
     }
     return Const::chargedStableSet.at(i0);
 
+  }
+
+
+  int TOPBunchFinderModule::setFinder(Chi2MinimumFinder1D& finder, const PDFConstructor& reco, double timeMin, double timeMax)
+  {
+    std::set<int> nfotSet; // for control only
+    const auto& binCenters = finder.getBinCenters();
+    int numPhotons = 0;
+    double logL_bkg = reco.getBackgroundLogL(timeMin, timeMax).logL;
+    for (unsigned i = 0; i < binCenters.size(); i++) {
+      double t0 = binCenters[i];
+      auto LL = reco.getLogL(t0, timeMin, timeMax, m_sigmaSmear);
+      finder.add(i, -2 * (LL.logL - logL_bkg));
+      if (i == 0) numPhotons = LL.numPhotons;
+      nfotSet.insert(LL.numPhotons);
+    }
+
+    if (nfotSet.size() != 1) B2ERROR("Different number of photons used for log likelihood of different time shifts");
+
+    return numPhotons;
   }
 
 } // end Belle2 namespace

@@ -117,7 +117,7 @@ if feistate.stage == 0:
 else:
     # After stage 0, the training is done only on the written out rest of event.
     path = b2.create_path()
-    ma.inputMdstList('default', [], path)
+    ma.inputMdstList([], path)
     path.add_path(feistate.path)
     r1 = b2.register_module('RootOutput')
     r1.set_name('ROE_RootOutput')

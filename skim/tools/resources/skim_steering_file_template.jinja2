@@ -63,7 +63,7 @@ path = b2.Path()
     {% endif -%}
     )
 {% endif %}
-ma.inputMdstList("default", skim.TestFiles, path=path)
+ma.inputMdstList(skim.TestFiles, path=path)
 skim(path)
 
 {%- if hints %}

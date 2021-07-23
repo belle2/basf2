@@ -444,7 +444,7 @@ Lets get started with the usual steps. Nothing here should be new to you.
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 1-20
+        :lines: 1-19
 
 
 ϒ(4S) Reconstruction
@@ -474,7 +474,7 @@ Just add this flag to the end of the decay string in `modularAnalysis.reconstruc
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 22
+        :lines: 21
 
 
 So far, we have not used the FEI. Now, we will use the B\ :sub:`tag` in the udst file and combine it with the
@@ -512,7 +512,7 @@ B\ :sub:`sig` we have just created.
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 24-37
+        :lines: 23-36
 
 
 Now that we have reconstructed the full ϒ(4S), we will create a Rest of Event.
@@ -543,7 +543,7 @@ value of `dz` (``abs(dz)``) to below 4. The two other cuts (on `pt` and `thetaIn
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 39-43
+        :lines: 38-42
 
 
 Writing out the nTuple
@@ -599,7 +599,7 @@ This variable is called `nROE_Charged` in basf2. It needs the ROE mask name defi
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 45-70
+        :lines: 44-69
 
 You can now execute your steering file which should look somewhat like this:
 

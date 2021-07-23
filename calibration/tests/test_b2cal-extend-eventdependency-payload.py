@@ -1,3 +1,11 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 import glob
 import os
 import subprocess
@@ -7,9 +15,6 @@ import b2test_utils
 '''
 Test the b2cal-extend-eventdependency-tool.
 '''
-
-__author__ = 'Giacomo De Pietro'
-__copyright__ = '2021 - Belle II Collaboration'
 
 
 if __name__ == '__main__':

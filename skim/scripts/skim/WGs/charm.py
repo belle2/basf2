@@ -62,23 +62,23 @@ class XToD0_D0ToHpJm(BaseSkim):
     def D0ToHpJm(path):
         """
         **Decay Modes**:
+            * :math:`D^{0}\\to \\pi^+ \\pi^-`,
+            * :math:`D^{0}\\to K^+ \\pi^-`,
+            * :math:`D^{0}\\to K^- \\pi^+`,
+            * :math:`D^{0}\\to K^+ K^-`,
 
-        * :math:`D^{0}\\to \\pi^+ \\pi^-`,
-        * :math:`D^{0}\\to K^+ \\pi^-`,
-        * :math:`D^{0}\\to K^- \\pi^+`,
-        * :math:`D^{0}\\to K^+ K^-`,
+        **Selection Criteria**:
+            * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
+            * ``1.80 < M(D0) < 1.93``
+            * ``pcms(D0) > 2.0``
+            * For more details, please check the source code of this skim.
 
-        **Additional Cuts**:
+        **Parameters**:
+            * path (basf2.Path): Skim path to be processed.
 
-        * ``Tracks: abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
-        * ``1.80 < M(D0) < 1.93``
-        * ``pcms(D0) > 2.0``
+        **Returns**:
+            * List of D0 particle list names.
 
-        Parameters:
-            path (basf2.Path): Skim path to be processed.
-
-        Returns:
-            List of D0 particle list names.
         """
         mySel = "abs(d0) < 1 and abs(z0) < 3"
         mySel += " and 0.296706 < theta < 2.61799"
@@ -129,20 +129,22 @@ class XToD0_D0ToNeutrals(BaseSkim):
     def D0ToNeutrals(path):
         """
         **Decay Modes**:
+            * :math:`D^{0}\\to \\pi^{0} \\pi^{0}`
+            * :math:`D^{0}\\to K_{S} \\pi^{0}`
+            * :math:`D^{0}\\to K_{S} K_{S}`
 
-        * :math:`D^{0}\\to \\pi^{0} \\pi^{0}`
-        * :math:`D^{0}\\to K_{S} \\pi^{0}`
-        * :math:`D^{0}\\to K_{S} K_{S}`
+        **Selection Criteria**:
+            * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
+            * Use :math:`K_{S}` from `stdV0s.stdKshorts`
+            * ``1.78 < M(D0) < 1.94, pcms(D0) > 2.0``
+            * For more details, please check the source code of this skim.
 
-        **Additional Cuts**:
+        **Parameters**:
+            * path (basf2.Path): Skim path to be processed.
 
-        * ``1.78 < M(D0) < 1.94, pcms(D0) > 2.0``
+        **Returns**:
+            * List of D0 particle list names.
 
-        Parameters:
-            path (basf2.Path): Skim path to be processed.
-
-        Returns:
-            List of D0 particle list names.
         """
         charmcuts = "1.78 < M < 1.94 and useCMSFrame(p)>2.0"
         D0_Channels = ["pi0:skim pi0:skim",
@@ -167,18 +169,20 @@ class XToD0_D0ToNeutrals(BaseSkim):
 class DstToD0Pi_D0ToRare(BaseSkim):
     """
     **Decay Modes**:
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to ee`,
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\mu \\mu`,
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to e^+ \\mu^-`,
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to e^- \\mu^+`,
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^-`,
 
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to ee`,
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\mu \\mu`,
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to e^+ \\mu^-`,
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to e^- \\mu^+`,
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^-`,
+    **Selection Criteria**:
+        * Use photons from `stdPhotons.loadStdSkimPhoton`
+        * Use electrons, muons and pions from loose lists in `stdCharged`
+        * ``1.78 < M(D0) < 1.94``
+        * ``0 < Q < 0.02``
+        * ``pcms(D*) > 2.0``
+        * For more details, please check the source code of this skim.
 
-    **Additional Cuts**:
-
-    * ``1.78 < M(D0) < 1.94``
-    * ``0 < Q < 0.02``
-    * ``pcms(D*) > 2.0``
     """
 
     __authors__ = ["Doris Yangsoo Kim", "Jaeyeon Kim"]
@@ -218,15 +222,17 @@ class DstToD0Pi_D0ToRare(BaseSkim):
 class XToDp_DpToKsHp(BaseSkim):
     """
     **Decay Modes**:
+        * :math:`D^+_{(S)} \\to K_{S} \\pi^+`,
+        * :math:`D^+_{(S)} \\to K_{S} K^+`,
 
-    * :math:`D^+_{(S)} \\to K_{S} \\pi^+`,
-    * :math:`D^+_{(S)} \\to K_{S} K^+`,
+    **Selection Criteria**:
+        * Tracks not from :math:`K_{S}`: ``abs(d0) < 1, abs(z0) < 3,
+          0.296706 < theta < 2.61799``
+        * Use :math:`K_{S}` from `stdV0s.stdKshorts` and require
+          ``flightDistance/flightDistanceErr > 2``
+        * ``1.72 < M(D+) < 2.2, pcms(D+) > 2.0``
+        * For more details, please check the source code of this skim.
 
-    **Additional Cuts**:
-
-    * ``Tracks not from Ks: same as D0ToHpJm()``
-    * ``Ks: directly taken from stdKshort()``
-    * ``1.72 < M(D+) < 1.98, pcms(D+) > 2.0``
     """
 
     __authors__ = ["Guanda Gong"]
@@ -265,17 +271,18 @@ class XToDp_DpToKsHp(BaseSkim):
 class XToDp_DpToHpHmJp(BaseSkim):
     """
     **Decay Modes**:
+        * :math:`D^+_{(S)} \\to \\pi^+ \\pi^- \\pi^+`,
+        * :math:`D^+_{(S)} \\to \\pi^+ \\pi^- K^+`,
+        * :math:`D^+_{(S)} \\to \\pi^+ K^- K^+`,
+        * :math:`D^+_{(S)} \\to K^+ K^- K^+`,
+        * For :math:`D^+_{(S)} \\to K_{S} h^+`, which includes a :math:`K_{S}` vertex,
+          please check `XToDp_DpToKsHp`
 
-    * :math:`D^+_{(S)} \\to \\pi^+ \\pi^- \\pi^+`,
-    * :math:`D^+_{(S)} \\to \\pi^+ \\pi^- K^+`,
-    * :math:`D^+_{(S)} \\to \\pi^+ K^- K^+`,
-    * :math:`D^+_{(S)} \\to K^+ K^- K^+`,
-    * For :math:`D^+_{(S)} \\to K_{S} h^+`, which includes a :math:`K_{S}` vertex, please check `XToDp_DpToKsHp`
+    **Selection Criteria**:
+        * Use tracks from the loose lists in `stdCharged`
+        * ``1.7 < M(D+) < 2.2, pcms(D+) > 2.0``
+        * For more details, please check the source code of this skim.
 
-    **Additional Cuts**:
-
-    * ``Tracks: from the standard loose list``
-    * ``1.7 < M(D+) < 2.2, pcms(D+) > 2.0``
     """
 
     __authors__ = ["Aman Sangal"]
@@ -310,16 +317,16 @@ class XToDp_DpToHpHmJp(BaseSkim):
 class LambdacTopHpJm(BaseSkim):
     """
     **Decay Modes**:
+        * :math:`\\Lambda_c^+ \\to p \\pi^- \\pi^+`
+        * :math:`\\Lambda_c^+ \\to p K^- \\pi^+`
+        * :math:`\\Lambda_c^+ \\to p \\pi^- K^+`
+        * :math:`\\Lambda_c^+ \\to p K^- K^+`
 
-    * :math:`\\Lambda_c^+ \\to p \\pi^- \\pi^+`
-    * :math:`\\Lambda_c^+ \\to p K^- \\pi^+`
-    * :math:`\\Lambda_c^+ \\to p \\pi^- K^+`
-    * :math:`\\Lambda_c^+ \\to p K^- K^+`
+    **Selection Criteria**:
+        * Use tracks from the loose lists in `stdCharged`
+        * ``2.2 < M(Lambda_c) < 2.4, pcms(Lambda_c) > 2.0``
+        * For more details, please check the source code of this skim.
 
-    **Additional Cuts**:
-
-    * ``Tracks: from the standard loose list``
-    * ``2.2 < M(Lambda_c) < 2.4, pcms(Lambda_c) > 2.0``
     """
 
     __authors__ = ["Justin Guilliams"]
@@ -355,15 +362,15 @@ class LambdacTopHpJm(BaseSkim):
 class DstToDpPi0_DpToHpPi0(BaseSkim):
     """
     **Decay Modes**:
+        * :math:`D^{*+}\\to \\pi^{0} D^{+}, D^+ \\to \\pi^+ \\pi^0`
 
-    * :math:`D^{*+}\\to \\pi^{0} D^{+}, D^+ \\to \\pi^+ \\pi^0`
+    **Selection Criteria**:
+        * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
+        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
+        * ``1.72 < M(D+) < 1.98, pcms(D+) > 2.0``
+        * ``0 < Q < 0.018``
+        * For more details, please check the source code of this skim.
 
-    **Additional Cuts**:
-
-    * ``Tracks: same as D0ToHpJm()``
-    * ``pi0: directly taken from pi0:skim standard list``
-    * ``1.72 < M(D+) < 1.98, pcms(D+) > 2.0``
-    * ``0 < Q < 0.018``
     """
 
     __authors__ = ["Johannes Brand"]
@@ -397,12 +404,14 @@ class DstToDpPi0_DpToHpPi0(BaseSkim):
 class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
     """
     **Decay Modes**:
+        * :math:`D^{*+}\\to D^{0} \\pi^+`, where :math:`D^{0}` is reconstructed by `XToD0_D0ToHpJm.D0ToHpJm`
 
-    1. :math:`D^{*+}\\to D^{0} \\pi^+`, where :math:`D^{0}` is reconstructed by `XToD0_D0ToHpJm.D0ToHpJm`
+    **Selection Criteria**:
+        * The cuts in `XToD0_D0ToHpJm`
+        * Slow pion: same as the tracks in `XToD0_D0ToHpJm`
+        * ``0 < Q < 0.018``
+        * For more details, please check the source code of this skim.
 
-    **Additional Cuts**:
-
-    1. ``0 < Q < 0.018``
     """
 
     __authors__ = "Giulia Casarosa"
@@ -433,16 +442,16 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
 class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     """
     **Decay Modes**:
+        * :math:`RS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^- \\pi^+ \\pi^{0}`
+        * :math:`WS: D^{*-}\\to \\pi^- \\overline{D}^{0}, \\overline{D}^{0}\\to K^- \\pi^+ \\pi^{0}`
 
-    * :math:`RS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^- \\pi^+ \\pi^{0}`
-    * :math:`WS: D^{*-}\\to \\pi^- \\overline{D}^{0}, \\overline{D}^{0}\\to K^- \\pi^+ \\pi^{0}`
+    **Selection Criteria**:
+        * Use tracks from the loose lists in `stdCharged`
+        * ``1.70 < M(D0) < 2.10``
+        * ``M(D*)-M(D0) < 0.16``
+        * ``pcms(D*) > 2.0``
+        * For more details, please check the source code of this skim.
 
-
-    **Additional Cuts**:
-
-    * ``1.70 < M(D0) < 2.10``
-    * ``M(D*)-M(D0) < 0.16``
-    * ``pcms(D*) > 2.0``
     """
 
     __authors__ = ["Emma Oxford"]
@@ -481,15 +490,17 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
 class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     """
     **Decay Modes**:
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^- \\pi^{0}`
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^+ K^- \\pi^{0}`
 
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^- \\pi^{0}`
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^+ K^- \\pi^{0}`
+    **Selection Criteria**:
+        * Use tracks from the loose lists in `stdCharged`
+        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
+        * ``1.70 < M(D0) < 2.10``
+        * ``M(D*)-M(D0) < 0.16``
+        * ``pcms(D*) > 2.0``
+        * For more details, please check the source code of this skim.
 
-    **Additional Cuts**:
-
-    * ``1.70 < M(D0) < 2.10``
-    * ``M(D*)-M(D0) < 0.16``
-    * ``pcms(D*) > 2.0``
     """
 
     __authors__ = ["Emma Oxford"]
@@ -531,15 +542,15 @@ class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
 class DstToD0Pi_D0ToKsOmega(BaseSkim):
     """
     **Decay Modes**:
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} \\pi^+ \\pi^- \\pi^{0}`
 
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} \\pi^+ \\pi^- \\pi^{0}`
+    **Selection Criteria**:
+        * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
+        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`, then require ``0.11 < M(pi0) < 0.15, p(pi0) > 0.25``
+        * ``1.7< M(D0) < 2.0, pcms(D0) > 2.0``
+        * ``Q < 0.018``
+        * For more details, please check the source code of this skim.
 
-
-    **Additional Cuts**:
-
-    * ``0.11 < M(pi0) < 0.15, p(pi0) > 0.25``
-    * ``1.7< M(D0) < 2.0, pcms(D0) > 2.0``
-    * ``Q < 0.018``
     """
 
     __authors__ = []
@@ -576,19 +587,17 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
 class DstToD0Pi_D0ToHpHmHpJm(BaseSkim):
     """
     **Decay Modes**:
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^- \\pi^+ \\pi^-`
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^- \\pi^+ K^-`
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^- K^+ K^-`
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ K^- K^+ K^-`
 
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^- \\pi^+ \\pi^-`
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^- \\pi^+ K^-`
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^- K^+ K^-`
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ K^- K^+ K^-`
+    **Selection Criteria**:
+        * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
+        * ``1.7 < M(D0) < 1.95``
+        * ``Q < 0.022, pcms(D*+) > 2.0``
+        * For more details, please check the source code of this skim.
 
-
-
-    **Additional Cuts**:
-
-    * ``Tracks: same as D0ToHpJm()``
-    * ``1.7 < M(D0) < 2.0``
-    * ``Q < 0.022, pcms(D*+) > 2.0``
     """
 
     __authors__ = ["Kavita Lalwani, Chanchal Sharma"]
@@ -632,18 +641,18 @@ class DstToD0Pi_D0ToHpHmHpJm(BaseSkim):
 class DstToD0Pi_D0ToHpJmEta(BaseSkim):
     """
     **Decay Modes**:
+        * :math:`D^{*+}\\to \\pi^- D^{0}, D^{0}\\to \\pi^+ \\pi^- \\eta, \\eta\\to \\gamma \\gamma`
+        * :math:`RS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^- \\pi^+ \\eta, \\eta\\to \\gamma \\gamma`
+        * :math:`WS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^+ \\pi^- \\eta, \\eta\\to \\gamma \\gamma`
+        * :math:`D^{*+}\\to \\pi^- D^{0}, D^{0}\\to K^+ K^- \\eta, \\eta\\to \\gamma \\gamma`
 
-    * :math:`D^{*+}\\to \\pi^- D^{0}, D^{0}\\to \\pi^+ \\pi^- \\eta, \\eta\\to \\gamma \\gamma`
-    * :math:`RS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^- \\pi^+ \\eta, \\eta\\to \\gamma \\gamma`
-    * :math:`WS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^+ \\pi^- \\eta, \\eta\\to \\gamma \\gamma`
-    * :math:`D^{*+}\\to \\pi^- D^{0}, D^{0}\\to K^+ K^- \\eta, \\eta\\to \\gamma \\gamma`
+    **Selection Criteria**:
+        * Use tracks from the loose lists in `stdCharged`
+        * ``0.47 < M(eta) < 0.60, p(eta) > 0.24``
+        * ``1.72 < M(D0) < 2.0, pcms(D0) > 2.0``
+        * ``M(D*)-M(D0) < 0.16``
+        * For more details, please check the source code of this skim.
 
-
-    **Additional Cuts**:
-
-    * ``0.47 < M(eta) < 0.60, p(eta) > 0.24``
-    * ``1.72 < M(D0) < 2.0, pcms(D0) > 2.0``
-    * ``Q < 0.018``
     """
 
     __authors__ = []
@@ -691,12 +700,15 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
 class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
     """
     **Decay Modes**:
+        * :math:`D^{*+}\\to \\pi^+ D^{0}`, where the :math:`D^{0}` is reconstructed
+          by `XToD0_D0ToNeutrals.D0ToNeutrals`.
 
-    * :math:`D^{*+}\\to \\pi^+ D^{0}`, where the :math:`D^{0}` is reconstructed by `XToD0_D0ToNeutrals.D0ToNeutrals`.
+    **Selection Criteria**:
+        * Apply the cuts in `XToD0_D0ToNeutrals`
+        * Slow pion: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
+        * ``Q < 0.02``
+        * For more details, please check the source code of this skim.
 
-    **Additional Cuts**:
-
-    * ``Q < 0.02``
     """
 
     __authors__ = ["Giulia Casarosa", "Emma Oxford"]
@@ -730,19 +742,19 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
 class DstToD0Pi_D0ToHpJmKs(BaseSkim):
     """
     **Decay Modes**:
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} \\pi^+ \\pi^-`
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} \\pi^+ K^-`
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} K^+ \\pi^-`
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} K^+ K^-`
 
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} \\pi^+ \\pi^-`
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} \\pi^+ K^-`
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} K^+ \\pi^-`
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} K^+ K^-`
+    **Selection Criteria**:
+        * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
+        * Use :math:`K_{S}` from `stdV0s.stdKshorts`
+        * ``1.7 < M(D0) < 2.0``
+        * ``Q < 0.022``
+        * ``pcms(D*) > 2.0``
+        * For more details, please check the source code of this skim.
 
-    **Additional Cuts**:
-
-    * ``Tracks: same as D0ToHpJm()``
-    * ``Ks: directly taken from stdKshort()``
-    * ``1.7 < M(D0) < 2.0``
-    * ``Q < 0.022``
-    * ``pcms(D*) > 2.0``
     """
 
     __authors__ = ["Yeqi Chen"]

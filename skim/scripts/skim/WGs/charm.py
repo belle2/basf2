@@ -402,9 +402,7 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
 
     **Additional Cuts**:
 
-    1. ``loose Cuts in D0ToHpJm()``
-
-    2. ``0 < Q < 0.018``
+    1. ``0 < Q < 0.018``
     """
 
     __authors__ = "Giulia Casarosa"
@@ -539,7 +537,7 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
 
     **Additional Cuts**:
 
-    * ``0.11 < M(pi0) < 0.15, p(pi0) > 25``
+    * ``0.11 < M(pi0) < 0.15, p(pi0) > 0.25``
     * ``1.7< M(D0) < 2.0, pcms(D0) > 2.0``
     * ``Q < 0.018``
     """

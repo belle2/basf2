@@ -697,7 +697,6 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
     **Additional Cuts**:
 
     * ``Q < 0.02``
-    * ``pcms(D*) > 2.0``
     """
 
     __authors__ = ["Giulia Casarosa", "Emma Oxford"]
@@ -717,7 +716,7 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
 
         D0List = self.D0ToNeutrals(path)
 
-        Dstcuts = "0 < Q < 0.02 and useCMSFrame(p) > 2.0"
+        Dstcuts = "0 < Q < 0.02"
 
         DstList = []
         for chID, channel in enumerate(D0List):

@@ -61,6 +61,7 @@ namespace Belle2 {
     std::vector<double> m_scaleFactors;  /**< vector of five scale factors for helix parameter errors */
     std::vector<double> m_d0ResolPars; /**< parameters (a,b) to define d0 resolution = a (+) b / (p*beta*sinTheta**1.5)  */
     std::vector<double> m_z0ResolPars; /**< parameters (a,b) to define z0 resolution = a (+) b / (p*beta*sinTheta**2.5)  */
+    double m_d0MomThr; /**< d0 resolution is kept constant below this momentum. Only for V0 Kshort. */
     int m_pdgCode;                /**< PDG code of the charged particle to be scaled */
     bool m_scaleKshort; /**< Whether the input particle list is Kshort or not */
     std::string m_decayString;   /**< Input DecayString specifying the input particle */

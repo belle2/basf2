@@ -24,9 +24,12 @@ namespace Belle2 {
   /**
   * scale the error of helix parameters
   *
-  * Creates a new charged particle list whose helix errors are scaled by constant factors.
-  * Parameters (a, b) can be set to define impact parameter resolution,
-  * which limits d0 and z0 errors so that they do not shrink below the resolution.
+  * Creates a new charged particle list whose helix errors are scaled by constant factors if the particle has a PXD hit.
+  * Parameters (a, b) can be set to define the best impact parameter resolution,
+  * which limits d0 and z0 errors so that they do not shrink below the best resolution.
+  * The module also accepts a V0 Kshort particle list as input and applies the error correction to its daughters.
+  * Note the difference in impact parameter resolution between V0 daughters and tracks from IP,
+  * as V0 daughters are free from multiple scattering through the beam pipe.
   *
   */
   class HelixErrorScalerModule : public Module {

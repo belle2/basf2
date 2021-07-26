@@ -32,9 +32,12 @@ HelixErrorScalerModule::HelixErrorScalerModule() : Module(), m_pdgCode(0), m_sca
   // Set module properties
   setDescription(R"DOC(scale the error of helix parameters
 
-    Creates a new charged particle list whose helix errors are scaled by constant factors.
-    Parameters (a, b) can be set to define impact parameter resolution,
-    which limits d0 and z0 errors so that they do not shrink below the resolution.
+    Creates a new charged particle list whose helix errors are scaled by constant factors if the particle has a PXD hit.
+    Parameters (a, b) can be set to define the best impact parameter resolution,
+    which limits d0 and z0 errors so that they do not shrink below the best resolution.
+    The module also accepts a V0 Kshort particle list as input and applies the error correction to its daughters.
+    Note the difference in impact parameter resolution between V0 daughters and tracks from IP,
+    as V0 daughters are free from multiple scattering through the beam pipe.
      )DOC");
 
   // Parameter definitions
@@ -162,38 +165,45 @@ Particle* HelixErrorScalerModule::getChargedWithScaledError(const Particle* part
 const TrackFitResult* HelixErrorScalerModule::getTrackFitResultWithScaledError(const Particle* particle)
 {
   const TrackFitResult* trkfit = particle->getTrackFitResult();
-  const std::vector<float>  helix  = trkfit->getTau();
-  const std::vector<float>  cov5   = trkfit->getCov();
-  const Const::ParticleType ptype  = trkfit->getParticleType();
-  const double              pvalue = trkfit->getPValue();
-  const ULong64_t           hitCDC = trkfit->getHitPatternCDC().getInteger();
-  const ULong64_t           hitVXD = trkfit->getHitPatternVXD().getInteger();
-  const int                 ndf    = trkfit->getNDF();
 
-  // d0, z0 resolution = a (+) b / pseudo-momentum
-  TVector3 p = particle->getMomentum();
-  double sinTheta = TMath::Sin(p.Theta());
-  double pD0 = p.Mag2() / (particle->getEnergy()) * TMath::Power(sinTheta, 1.5); // p*beta*sinTheta**1.5
-  double pZ0 = pD0 * sinTheta; // p*beta*sinTheta**2.5
-  double d0Resol = TMath::Sqrt(TMath::Power(m_d0ResolPars[0], 2) + TMath::Power(m_d0ResolPars[1] / pD0, 2));
-  double z0Resol = TMath::Sqrt(TMath::Power(m_z0ResolPars[0], 2) + TMath::Power(m_z0ResolPars[1] / pZ0, 2));
-  double d0Err = TMath::Sqrt(trkfit->getCovariance5()[0][0]);
-  double z0Err = TMath::Sqrt(trkfit->getCovariance5()[3][3]);
+  // scale helix error only if the track has a PXD hit
+  if (trkfit->getHitPatternVXD().getNPXDHits() > 0) {
 
-  double scaleFactors[5] = { TMath::Max(d0Resol / d0Err, m_scaleFactors[0]),
-                             m_scaleFactors[1],
-                             m_scaleFactors[2],
-                             TMath::Max(z0Resol / z0Err, m_scaleFactors[3]),
-                             m_scaleFactors[4]
-                           };
+    const std::vector<float>  helix  = trkfit->getTau();
+    const std::vector<float>  cov5   = trkfit->getCov();
+    const Const::ParticleType ptype  = trkfit->getParticleType();
+    const double              pvalue = trkfit->getPValue();
+    const ULong64_t           hitCDC = trkfit->getHitPatternCDC().getInteger();
+    const ULong64_t           hitVXD = trkfit->getHitPatternVXD().getInteger();
+    const int                 ndf    = trkfit->getNDF();
 
-  std::vector<float> cov5_scaled;
-  unsigned int counter = 0;
-  for (unsigned int j = 0; j < 5; j++) {
-    for (unsigned int k = j; k < 5; k++) {
-      cov5_scaled.push_back(cov5[counter++] * scaleFactors[j] * scaleFactors[k]);
+    // d0, z0 resolution = a (+) b / pseudo-momentum
+    TVector3 p = particle->getMomentum();
+    double sinTheta = TMath::Sin(p.Theta());
+    double pD0 = p.Mag2() / (particle->getEnergy()) * TMath::Power(sinTheta, 1.5); // p*beta*sinTheta**1.5
+    double pZ0 = pD0 * sinTheta; // p*beta*sinTheta**2.5
+    double d0Resol = TMath::Sqrt(TMath::Power(m_d0ResolPars[0], 2) + TMath::Power(m_d0ResolPars[1] / pD0, 2));
+    double z0Resol = TMath::Sqrt(TMath::Power(m_z0ResolPars[0], 2) + TMath::Power(m_z0ResolPars[1] / pZ0, 2));
+    double d0Err = TMath::Sqrt(trkfit->getCovariance5()[0][0]);
+    double z0Err = TMath::Sqrt(trkfit->getCovariance5()[3][3]);
+
+    double scaleFactors[5] = { TMath::Max(d0Resol / d0Err, m_scaleFactors[0]),
+                               m_scaleFactors[1],
+                               m_scaleFactors[2],
+                               TMath::Max(z0Resol / z0Err, m_scaleFactors[3]),
+                               m_scaleFactors[4]
+                             };
+
+    std::vector<float> cov5_scaled;
+    unsigned int counter = 0;
+    for (unsigned int j = 0; j < 5; j++) {
+      for (unsigned int k = j; k < 5; k++) {
+        cov5_scaled.push_back(cov5[counter++] * scaleFactors[j] * scaleFactors[k]);
+      }
     }
+    TrackFitResult* new_trkfit = m_trackfitresults.appendNew(helix, cov5_scaled, ptype, pvalue, hitCDC, hitVXD, ndf);
+    return new_trkfit;
+  } else {
+    return trkfit;
   }
-  TrackFitResult* new_trkfit = m_trackfitresults.appendNew(helix, cov5_scaled, ptype, pvalue, hitCDC, hitVXD, ndf);
-  return new_trkfit;
 }

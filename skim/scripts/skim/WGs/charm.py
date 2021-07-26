@@ -69,7 +69,7 @@ class XToD0_D0ToHpJm(BaseSkim):
 
         **Selection Criteria**:
             * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
-            * ``1.80 < M(D0) < 1.93``
+            * ``1.66 < M(D0) < 2.06``
             * ``pcms(D0) > 2.0``
             * For more details, please check the source code of this skim.
 
@@ -85,7 +85,7 @@ class XToD0_D0ToHpJm(BaseSkim):
         ma.fillParticleList("pi+:mygood", mySel, path=path)
         ma.fillParticleList("K+:mygood", mySel, path=path)
 
-        charmcuts = "1.80 < M < 1.93 and useCMSFrame(p)>2.0"
+        charmcuts = "1.66 < M < 2.06 and useCMSFrame(p)>2.0"
         D0_Channels = [
             "pi+:mygood pi-:mygood",
             "K+:mygood pi-:mygood",
@@ -136,8 +136,10 @@ class XToD0_D0ToNeutrals(BaseSkim):
         **Selection Criteria**:
             * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
             * Use :math:`K_{S}` from `stdV0s.stdKshorts`
-            * ``1.78 < M(D0) < 1.94, pcms(D0) > 2.0``
+            * ``1.66 < M(D0) < 2.06, pcms(D0) > 2.0``
             * For more details, please check the source code of this skim.
+            * (Maybe in the future, we can add a loose ECL cluster timing cut
+              to :math:`\\pi^{0}` in this skim.)
 
         **Parameters**:
             * path (basf2.Path): Skim path to be processed.
@@ -146,7 +148,7 @@ class XToD0_D0ToNeutrals(BaseSkim):
             * List of D0 particle list names.
 
         """
-        charmcuts = "1.78 < M < 1.94 and useCMSFrame(p)>2.0"
+        charmcuts = "1.66 < M < 2.06 and useCMSFrame(p)>2.0"
         D0_Channels = ["pi0:skim pi0:skim",
                        "K_S0:merged pi0:skim",
                        "K_S0:merged K_S0:merged",
@@ -178,7 +180,7 @@ class DstToD0Pi_D0ToRare(BaseSkim):
     **Selection Criteria**:
         * Use photons from `stdPhotons.loadStdSkimPhoton`
         * Use electrons, muons and pions from loose lists in `stdCharged`
-        * ``1.78 < M(D0) < 1.94``
+        * ``1.66 < M(D0) < 2.06``
         * ``0 < Q < 0.02``
         * ``pcms(D*) > 2.0``
         * For more details, please check the source code of this skim.
@@ -198,7 +200,7 @@ class DstToD0Pi_D0ToRare(BaseSkim):
         loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
-        charmcuts = "1.78 < M < 1.94"
+        charmcuts = "1.66 < M < 2.06"
         Dstcuts = "0 < Q < 0.02 and 2.0 < useCMSFrame(p)"
 
         D0_Channels = ["gamma:skim gamma:skim",
@@ -230,7 +232,7 @@ class XToDp_DpToKsHp(BaseSkim):
           0.296706 < theta < 2.61799``
         * Use :math:`K_{S}` from `stdV0s.stdKshorts` and require
           ``flightDistance/flightDistanceErr > 2``
-        * ``1.72 < M(D+) < 2.2, pcms(D+) > 2.0``
+        * ``1.67 < M(D+) < 2.17, pcms(D+) > 2.0``
         * For more details, please check the source code of this skim.
 
     """
@@ -254,7 +256,7 @@ class XToDp_DpToKsHp(BaseSkim):
         ma.fillParticleList("K+:kshp", mySel, path=path)
         ma.cutAndCopyList('K_S0:kshp', 'K_S0:merged', 'formula(flightDistance/flightDistanceErr) > 2', path=path)
 
-        Dpcuts = "1.72 < M < 2.2 and useCMSFrame(p) > 2.0"
+        Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
         Dp_Channels = ["K_S0:kshp pi+:kshp",
                        "K_S0:kshp K+:kshp",
                        ]
@@ -280,7 +282,7 @@ class XToDp_DpToHpHmJp(BaseSkim):
 
     **Selection Criteria**:
         * Use tracks from the loose lists in `stdCharged`
-        * ``1.7 < M(D+) < 2.2, pcms(D+) > 2.0``
+        * ``1.67 < M(D+) < 2.17, pcms(D+) > 2.0``
         * For more details, please check the source code of this skim.
 
     """
@@ -297,7 +299,7 @@ class XToDp_DpToHpHmJp(BaseSkim):
         stdPi("loose", path=path)
 
     def build_lists(self, path):
-        Dpcuts = "1.7 < M < 2.2 and useCMSFrame(p) > 2.0"
+        Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
 
         Dp_Channels = ["pi+:loose pi-:loose pi+:loose",
                        "pi+:loose pi-:loose K+:loose",
@@ -367,7 +369,7 @@ class DstToDpPi0_DpToHpPi0(BaseSkim):
     **Selection Criteria**:
         * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
-        * ``1.72 < M(D+) < 1.98, pcms(D+) > 2.0``
+        * ``1.67 < M(D+) < 2.07, pcms(D+) > 2.0``
         * ``0 < Q < 0.018``
         * For more details, please check the source code of this skim.
 
@@ -387,7 +389,7 @@ class DstToDpPi0_DpToHpPi0(BaseSkim):
         mySel += " and 0.296706 < theta < 2.61799"
         ma.fillParticleList("pi+:hppi0", mySel, path=path)
 
-        Dpcuts = "1.72 < M < 1.98 and useCMSFrame(p) > 2.0"
+        Dpcuts = "1.67 < M < 2.07 and useCMSFrame(p) > 2.0"
         Dp_Channels = ["pi+:hppi0 pi0:skim",
                        ]
 
@@ -547,7 +549,7 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
     **Selection Criteria**:
         * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`, then require ``0.11 < M(pi0) < 0.15, p(pi0) > 0.25``
-        * ``1.7< M(D0) < 2.0, pcms(D0) > 2.0``
+        * ``1.66 < M(D0) < 2.06, pcms(D0) > 2.0``
         * ``Q < 0.018``
         * For more details, please check the source code of this skim.
 
@@ -573,7 +575,7 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
         ma.cutAndCopyList("pi0:mypi0", "pi0:skim", "0.11 < M < 0.15 and p > 0.25 ", path=path)
         ma.reconstructDecay("omega:3pi -> pi+:ksomega pi-:ksomega pi0:mypi0", "", path=path)
 
-        charmcuts = "1.7 < M < 2 and useCMSFrame(p) > 2.0"
+        charmcuts = "1.66 < M < 2.06 and useCMSFrame(p) > 2.0"
         ma.reconstructDecay("D0:KsOmega -> K_S0:merged omega:3pi", charmcuts, path=path)
 
         DstList = []
@@ -594,7 +596,7 @@ class DstToD0Pi_D0ToHpHmHpJm(BaseSkim):
 
     **Selection Criteria**:
         * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
-        * ``1.7 < M(D0) < 1.95``
+        * ``1.66 < M(D0) < 2.06``
         * ``Q < 0.022, pcms(D*+) > 2.0``
         * For more details, please check the source code of this skim.
 
@@ -624,7 +626,7 @@ class DstToD0Pi_D0ToHpHmHpJm(BaseSkim):
             "pi+:hphmhpjm K-:hphmhpjm K+:hphmhpjm K-:hphmhpjm",
         ]
 
-        D0cuts = "1.75 < M < 1.95"
+        D0cuts = "1.66 < M < 2.06"
         Dstcuts = "0 < Q < 0.022 and useCMSFrame(p) > 2.0"
 
         DstList = []
@@ -649,7 +651,7 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
     **Selection Criteria**:
         * Use tracks from the loose lists in `stdCharged`
         * ``0.47 < M(eta) < 0.60, p(eta) > 0.24``
-        * ``1.72 < M(D0) < 2.0, pcms(D0) > 2.0``
+        * ``1.66 < M(D0) < 2.06, pcms(D0) > 2.0``
         * ``M(D*)-M(D0) < 0.16``
         * For more details, please check the source code of this skim.
 
@@ -674,7 +676,7 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
 
     def build_lists(self, path):
         Dstcuts = "massDifference(0) < 0.160 and useCMSFrame(p) > 2.0"
-        charmcuts = "1.72 < M < 2.0"
+        charmcuts = "1.66 < M < 2.06"
         ma.reconstructDecay("eta:myskim -> gamma:loose gamma:loose", "0.47 < M < 0.60 and p > 0.24", path=path)
         D0_Channels = [
             "pi-:loose pi+:loose eta:myskim",
@@ -750,7 +752,7 @@ class DstToD0Pi_D0ToHpJmKs(BaseSkim):
     **Selection Criteria**:
         * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
         * Use :math:`K_{S}` from `stdV0s.stdKshorts`
-        * ``1.7 < M(D0) < 2.0``
+        * ``1.66 < M(D0) < 2.06``
         * ``Q < 0.022``
         * ``pcms(D*) > 2.0``
         * For more details, please check the source code of this skim.
@@ -773,7 +775,7 @@ class DstToD0Pi_D0ToHpJmKs(BaseSkim):
         ma.fillParticleList("pi+:hpjmks", mySel, path=path)
         ma.fillParticleList("K+:hpjmks", mySel, path=path)
 
-        D0cuts = "1.7 < M < 2.0"
+        D0cuts = "1.66 < M < 2.06"
         Dstcuts = "0 < Q < 0.022 and useCMSFrame(p) > 2.0"
 
         D0_Channels = ["pi-:hpjmks pi+:hpjmks K_S0:merged",

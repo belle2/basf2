@@ -23,12 +23,12 @@ namespace Belle2 {
   /** Store track parameters of found tracks. */
   class NDFinderTrack {
   public:
-    NDFinderTrack(std::vector<double> values, const SimpleCluster& cluster)
+    NDFinderTrack(std::vector<double> values, const SimpleCluster& cluster):
+      m_cluster(cluster)
     {
       m_omega = values[0];
       m_phi = values[1];
       m_cotTheta = values[2];
-      m_cluster = cluster;
     }
 
     /** Default destructor. */

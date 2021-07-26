@@ -971,12 +971,8 @@ namespace Belle2 {
       TRGNeuroTrack trkNN = decodeNNTrack_old(strTrack, strSelect);
       B2DEBUG(15, "make new NN track with , z:" << trkNN.z << ", theta:" << trkNN.theta <<
               ", sector:" << trkNN.sector << ", clock " << foundTime);
-      double phi0 = 0;
-      double omega = 0;
-      if (track2D) {
-        phi0 = track2D->getPhi0();
-        omega = track2D->getOmega();
-      }
+      double phi0 = track2D->getPhi0();
+      double omega = track2D->getOmega();
       std::vector<bool> tsvector(9, false);
       for (unsigned iSL = 0; iSL < 9; ++iSL) {
         if (trkNN.ts[iSL][3] > 0) {
@@ -995,9 +991,7 @@ namespace Belle2 {
       CDCTriggerMLPInput* storeInput =
         storeNNInputs->appendNew(inputVector, trkNN.sector);
       trackNN->addRelationTo(storeInput);
-      if (track2D) {
-        track2D->addRelationTo(trackNN);
-      }
+      track2D->addRelationTo(trackNN);
 
       for (unsigned iSL = 0; iSL < 9; ++iSL) {
         if (trkNN.ts[iSL][3] > 0) {

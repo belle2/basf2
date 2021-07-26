@@ -85,13 +85,14 @@ if __name__ == "__main__":
         b2.B2FATAL("the algorithm you ask for is not supported!\
         supported algorithms are: CoGOnly and OldDefault")
 
+    b2c.prepend_globaltag("svd_onlySVDinGeoConfiguration")
+    b2c.prepend_globaltag("svd_NOPosErrScaleFactors")
+
     # Prepend and/or append the input GTs
     if not (args.prepend_gt == ''):
         for gt in reversed(args.prepend_gt):
             b2c.prepend_globaltag(gt)
 
-    b2c.prepend_globaltag("svd_onlySVDinGeoConfiguration")
-    b2c.prepend_globaltag("svd_NOPosErrScaleFactors")
 
     bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
     if args.no_bkg:
@@ -149,7 +150,7 @@ if __name__ == "__main__":
     importer.param("maxPulls", args.max_pulls)
     importer.param("nBinsPulls", args.nBins_pulls)
     importer.param("noOutliers", args.no_outliers)
-    uniqueid = str(args.posAlgorithm)+"ErrorScaleFactors_default_" + str(now.isoformat()) + "_INFO:_formulas=rel05_scaleFactors=fromSimulation_exp"+str(args.exp)+"_nEvents="+str(args.events)+"_noOutliers="
+    uniqueid = str(args.posAlgorithm)+"ErrorScaleFactors_default_" + str(now.isoformat()) + "_INFO:_formulas=rel06_scaleFactors=fromSimulation_exp"+str(args.exp)+"_nEvents="+str(args.events)+"_noOutliers="
 
     if args.no_outliers:
         uniqueid += "True"

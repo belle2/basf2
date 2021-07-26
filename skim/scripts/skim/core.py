@@ -87,6 +87,11 @@ class BaseSkim(ABC):
     Include Monte Carlo quantities in skim output.
     """
 
+    analysisGlobaltag = None
+    """
+    Analysis globaltag.
+    """
+
     @property
     @abstractmethod
     def __description__(self):
@@ -480,6 +485,7 @@ class CombinedSkim(BaseSkim):
             CombinedSkimName="CombinedSkim",
             OutputFileName=None,
             mc=None,
+            analysisGlobaltag=None,
     ):
         """Initialise the CombinedSkim class.
 
@@ -496,6 +502,7 @@ class CombinedSkim(BaseSkim):
             OutputFileName (str): If mdstOutput=True, this option sets the name of the combined output file.
                 If mdstOutput=False, this option does nothing.
             mc (bool): If True, include MC quantities in output.
+            analysisGlobaltag (str): Analysis globaltag.
         """
 
         if NoisyModules is None:
@@ -526,6 +533,8 @@ class CombinedSkim(BaseSkim):
         if mc is not None:
             for skim in self:
                 skim.mc = mc
+
+        self.analysisGlobaltag = analysisGlobaltag
 
         self._mdstOutput = mdstOutput
         self.mdst_kwargs = mdst_kwargs or {}

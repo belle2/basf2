@@ -262,7 +262,7 @@ namespace Belle2 {
         else
           separateTS[i]->push_back(inputv[i - 1]);
         separateTS[i]->push_back(inputv[i]);
-        if (i == nTS)
+        if (i == 0)
           separateTS[i]->push_back(inputv[255]);
         else
           separateTS[i]->push_back(inputv[i + 1]);
@@ -282,7 +282,7 @@ namespace Belle2 {
         else
           separateTS[i]->push_back(inputv[i + 63]);
         separateTS[i]->push_back(inputv[i + 64]);
-        if (i == nTS)
+        if (i == 0)
           separateTS[i]->push_back(inputv[255]);
         else
           separateTS[i]->push_back(inputv[i + 65]);

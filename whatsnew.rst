@@ -19,33 +19,34 @@ Changes since release-06
 
 .. rubric:: Simplified arguments to :py:func:`modularAnalysis.inputMdst` and :py:func:`modularAnalysis.inputMdstList`.
 
-   The arguments of :py:func:`modularAnalysis.inputMdst` and :py:func:`modularAnalysis.inputMdstList` have been changed a little.
-   You no longer need to specify "default", it's done automatically.
+The arguments of :py:func:`modularAnalysis.inputMdst` and :py:func:`modularAnalysis.inputMdstList` have been changed a little.
+You no longer need to specify "default", it's done automatically.
 
-   The following code lines need to be changed from:
-   .. code-block:: python
+The following code lines need to be changed from:
 
-        # old
-        import modularAnalysis as ma
-        ma.inputMdst("default", "/path/to/your/file.root", path=mypath)
+.. code-block:: python
 
-        # or
-        ma.inputMdst("Belle", "/path/to/your/file.root", path=mypath)
+   # old
+   import modularAnalysis as ma
+   ma.inputMdst("default", "/path/to/your/file.root", path=mypath)
 
-   To:
-   .. code-block:: python
+   # or
+   ma.inputMdst("Belle", "/path/to/your/file.root", path=mypath)
 
-        # new
-        import modularAnalysis as ma
-        ma.inputMdst("/path/to/your/file.root", path=mypath)
+To:
 
-        # or
-        ma.inputMdst("/path/to/your/file.root", path=mypath, environmentType="Belle")
+.. code-block:: python
 
-    And similarly for :py:func:`modularAnalysis.inputMdstList`.
+     # new
+     import modularAnalysis as ma
+     ma.inputMdst("/path/to/your/file.root", path=mypath)
 
-    .. warning:: We no longer support MC5-10 files.
+     # or
+     ma.inputMdst("/path/to/your/file.root", path=mypath, environmentType="Belle")
 
+And similarly for :py:func:`modularAnalysis.inputMdstList`.
+
+.. warning:: We no longer support MC5-10 files.
 
 .. include:: analysis/doc/whatsnew-since/release-06-00.txt
 

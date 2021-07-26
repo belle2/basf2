@@ -10,7 +10,8 @@
 
 """ECL calibration to calculate photon energy leakage corrections."""
 
-from prompt import CalibrationSettings
+from prompt import CalibrationSettings, input_data_filters
+
 
 # --------------------------------------------------------------
 # ..Tell the automated script some required details

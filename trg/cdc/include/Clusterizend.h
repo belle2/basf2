@@ -34,7 +34,7 @@ namespace Belle2 {
       setParams(3);
       initClCellsNew();
     }
-    SimpleCluster(cell_index entry)
+    explicit SimpleCluster(cell_index entry)
     {
       setParams(3);
       initClCellsNew();
@@ -113,9 +113,8 @@ namespace Belle2 {
     {
     }
     virtual ~Clusterizend() {}
-    Clusterizend(const clusterer_params& params)
+    explicit Clusterizend(const clusterer_params& params): m_params(params)
     {
-      m_params = params;
     }
 
     clusterer_params getParams()

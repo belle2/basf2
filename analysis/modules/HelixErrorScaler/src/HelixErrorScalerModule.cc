@@ -27,10 +27,10 @@ REG_MODULE(HelixErrorScaler)
 //                 Implementation
 //-----------------------------------------------------------------
 
-HelixErrorScalerModule::HelixErrorScalerModule() : Module(), m_pdgCode(0)
+HelixErrorScalerModule::HelixErrorScalerModule() : Module(), m_pdgCode(0), m_scaleKshort(false)
 {
   // Set module properties
-  setDescription(R"DOC("scale the error of helix parameters
+  setDescription(R"DOC(scale the error of helix parameters
 
     Creates a new charged particle list whose helix errors are scaled by constant factors.
     Parameters (a, b) can be set to define impact parameter resolution,
@@ -38,7 +38,7 @@ HelixErrorScalerModule::HelixErrorScalerModule() : Module(), m_pdgCode(0)
      )DOC");
 
   // Parameter definitions
-  addParam("inputListName", m_inputListName, "The name of input charged particle list", std::string(""));
+  addParam("inputListName", m_inputListName, "The name of input particle list (charged stable or V0 Kshort)", std::string(""));
   addParam("outputListName", m_outputListName, "The name of output charged particle list", std::string(""));
   addParam("scaleFactors", m_scaleFactors, "vector of five scale factors for helix parameter errors", {1.0, 1.0, 1.0, 1.0, 1.0});
   addParam("d0ResolutionParameters", m_d0ResolPars, "d0 resolution parameters", {0.0, 0.0});
@@ -56,9 +56,11 @@ void HelixErrorScalerModule::initialize()
   // output particle
   const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
   m_pdgCode  = mother->getPDGCode();
-  if (Const::chargedStableSet.find(abs(m_pdgCode)) == Const::invalidParticle)
+  if (m_pdgCode == Const::Kshort.getPDGCode()) {
+    m_scaleKshort = true;
+  } else  if (Const::chargedStableSet.find(abs(m_pdgCode)) == Const::invalidParticle) {
     B2ERROR("Invalid input ParticleList PDG code (must be ChargedStable): " << m_pdgCode);
-  m_outputAntiListName = ParticleListName::antiParticleListName(m_outputListName);
+  }
 
   // get existing particle lists
   if (m_inputListName == m_outputListName) {
@@ -71,7 +73,10 @@ void HelixErrorScalerModule::initialize()
 
   // make output list
   m_outputparticleList.registerInDataStore(m_outputListName);
-  m_outputAntiparticleList.registerInDataStore(m_outputAntiListName);
+  if (! m_scaleKshort) {
+    m_outputAntiListName = ParticleListName::antiParticleListName(m_outputListName);
+    m_outputAntiparticleList.registerInDataStore(m_outputAntiListName);
+  }
 
   m_particles.registerRelationTo(m_pidlikelihoods);
   m_particles.registerRelationTo(m_trackfitresults);
@@ -84,32 +89,77 @@ void HelixErrorScalerModule::event()
   // new output particle list
   m_outputparticleList.create();
   m_outputparticleList->initialize(m_pdgCode, m_outputListName);
-  m_outputAntiparticleList.create();
-  m_outputAntiparticleList->initialize(-1 * m_pdgCode, m_outputAntiListName);
-  m_outputAntiparticleList->bindAntiParticleList(*(m_outputparticleList));
 
-  // loop over charged particles
-  const unsigned int nPar = m_inputparticleList->getListSize();
-  for (unsigned i = 0; i < nPar; i++) {
-    const Particle* charged = m_inputparticleList->getParticle(i);
-    TrackFitResult* new_trkfit = getTrackFitResultWithScaledError(charged);
+  if (! m_scaleKshort) {
+    m_outputAntiparticleList.create();
+    m_outputAntiparticleList->initialize(-1 * m_pdgCode, m_outputAntiListName);
+    m_outputAntiparticleList->bindAntiParticleList(*(m_outputparticleList));
+  }
 
-    Const::ChargedStable chargedtype(abs(charged->getPDGCode()));
+  if (m_scaleKshort) { // scale V0 Kshort
 
-    Particle new_charged(charged->getMdstArrayIndex(), new_trkfit, chargedtype);
-    Particle* newCharged = m_particles.appendNew(new_charged);
-    const PIDLikelihood* pid = charged->getPIDLikelihood();
-    const MCParticle* mcCharged = charged->getRelated<MCParticle>();
-    newCharged->addRelationTo(new_trkfit);
-    if (pid) newCharged->addRelationTo(pid);
-    if (mcCharged != nullptr) newCharged->addRelationTo(mcCharged);
+    // loop over Kshort
+    const unsigned int nPar = m_inputparticleList->getListSize();
+    for (unsigned i = 0; i < nPar; i++) {
+      const Particle* particle = m_inputparticleList->getParticle(i);
+      if (particle->getParticleSource() != Particle::EParticleSourceObject::c_V0) {
+        B2WARNING(" Input ParticleList " << m_inputListName <<
+                  " contains a particle which is not from V0. It will not be copied to output list.");
+        continue;
+      }
 
-    m_outputparticleList->addParticle(newCharged);
+      if (particle->getNDaughters() != 2)
+        B2ERROR("V0 particle should have exactly two daughters");
 
-  } // loop over the charged particles
+      const Particle* dauP = particle->getDaughter(0);
+      const Particle* dauM = particle->getDaughter(1);
+
+      Particle* newDauP = getChargedWithScaledError(dauP);
+      Particle* newDauM = getChargedWithScaledError(dauM);
+
+      TLorentzVector v0Momentum = newDauP->get4Vector() + newDauM->get4Vector();
+      Particle new_v0(v0Momentum, m_pdgCode, particle->getFlavorType(),
+                      Particle::EParticleSourceObject::c_V0, particle->getMdstArrayIndex());
+      new_v0.appendDaughter(newDauP, false);
+      new_v0.appendDaughter(newDauM, false);
+
+      Particle* newV0 = m_particles.appendNew(new_v0);
+      m_outputparticleList->addParticle(newV0);
+
+    } // loop over Kshort
+
+  } else { // scale charged particles
+
+    // loop over charged particles
+    const unsigned int nPar = m_inputparticleList->getListSize();
+    for (unsigned i = 0; i < nPar; i++) {
+      const Particle* charged = m_inputparticleList->getParticle(i);
+      Particle* newCharged = getChargedWithScaledError(charged);
+      m_outputparticleList->addParticle(newCharged);
+    }
+  }
+
 }
 
-TrackFitResult* HelixErrorScalerModule::getTrackFitResultWithScaledError(const Particle* particle)
+Particle* HelixErrorScalerModule::getChargedWithScaledError(const Particle* particle)
+{
+  const TrackFitResult* new_trkfit = getTrackFitResultWithScaledError(particle);
+
+  Const::ChargedStable chargedtype(abs(particle->getPDGCode()));
+  Particle new_charged(particle->getMdstArrayIndex(), new_trkfit, chargedtype);
+  Particle* newCharged = m_particles.appendNew(new_charged);
+
+  // add relation to PID, MCParticle (if any) and TrackFitResult
+  const PIDLikelihood* pid = particle->getPIDLikelihood();
+  const MCParticle* mcCharged = particle->getRelated<MCParticle>();
+  newCharged->addRelationTo(new_trkfit);
+  if (pid) newCharged->addRelationTo(pid);
+  if (mcCharged != nullptr) newCharged->addRelationTo(mcCharged);
+
+  return newCharged;
+}
+
+const TrackFitResult* HelixErrorScalerModule::getTrackFitResultWithScaledError(const Particle* particle)
 {
   const TrackFitResult* trkfit = particle->getTrackFitResult();
   const std::vector<float>  helix  = trkfit->getTau();

@@ -44,8 +44,11 @@ namespace Belle2 {
     /** loop over the input charged particles */
     virtual void event() override;
 
+    /** create a Particle with scaled errors */
+    Particle* getChargedWithScaledError(const Particle* particle);
+
     /** create a TrackFitResult with scaled errors */
-    TrackFitResult* getTrackFitResultWithScaledError(const Particle* particle);
+    const TrackFitResult* getTrackFitResultWithScaledError(const Particle* particle);
 
   private:
 
@@ -56,6 +59,7 @@ namespace Belle2 {
     std::vector<double> m_d0ResolPars; /**< parameters (a,b) to define d0 resolution = a (+) b / (p*beta*sinTheta**1.5)  */
     std::vector<double> m_z0ResolPars; /**< parameters (a,b) to define z0 resolution = a (+) b / (p*beta*sinTheta**2.5)  */
     int m_pdgCode;                /**< PDG code of the charged particle to be scaled */
+    bool m_scaleKshort; /**< Whether the input particle list is Kshort or not */
     std::string m_decayString;   /**< Input DecayString specifying the input particle */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the charged particle */
     StoreObjPtr<ParticleList>  m_inputparticleList; /**< StoreObjptr for input charged particlelist */

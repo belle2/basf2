@@ -34,8 +34,7 @@ NeutralHadron4MomentumCalculatorModule::NeutralHadron4MomentumCalculatorModule()
 
 void NeutralHadron4MomentumCalculatorModule::initialize()
 {
-  B2DEBUG(1, "Neutralhadron4MomentumCalculator: Use particle list: " << m_decayString);
-  m_decayDescriptor = DecayDescriptor();
+  B2DEBUG(17, "Neutralhadron4MomentumCalculator: Use particle list: " << m_decayString);
   bool valid = m_decayDescriptor.init(m_decayString);
   if (!valid)
     B2ERROR("NeutralHadron4MomentumCalculatorModule::initialize Invalid Decay Descriptor " << m_decayString);
@@ -45,7 +44,7 @@ void NeutralHadron4MomentumCalculatorModule::initialize()
     B2ERROR("NeutralHadron4MomentumCalculatorModule::initialize Only one particle can be selected in " << m_decayString);
   if (hierarchy[0].size() != 2)
     B2ERROR("NeutralHadron4MomentumCalculatorModule::initialize The selected particle must be a direct daughter " << m_decayString);
-  if (hierarchy[0][1].second  != "n0" and hierarchy[0][1].second != "K_L0")
+  if (hierarchy[0][1].second != "n0" and hierarchy[0][1].second != "K_L0")
     B2ERROR("NeutralHadron4MomentumCalculatorModule::initialize The selected particle must be a long-lived neutral hadron i.e. (anti-)n0 or K_L0 "
             << m_decayString);
 
@@ -63,7 +62,7 @@ void NeutralHadron4MomentumCalculatorModule::event()
     Particle* particle = m_plist->getParticle(i);
     std::vector<Particle*> daughters = particle->getDaughters();
     TLorentzVector others4Momentum = TLorentzVector();
-    for (int j; j < m_decayDescriptor.getNDaughters(); j++) {
+    for (int j = 0; j < m_decayDescriptor.getNDaughters(); j++) {
       if (j != m_iNeutral) {
         others4Momentum += daughters[j]->get4Vector();
       }
@@ -75,7 +74,7 @@ void NeutralHadron4MomentumCalculatorModule::event()
     } else if (neutral->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster) {
       neutralDirection = neutral->getKLMCluster()->getClusterPosition().Unit();
     } else {
-      B2ERROR("Your neutral particle doens't originate from ECLCluster nor KLMCluster.");
+      B2ERROR("Your neutral particle doesn't originate from ECLCluster nor KLMCluster.");
     }
     double a = others4Momentum.Vect() * neutralDirection;
     double b = (std::pow(particle->getPDGMass(), 2) - std::pow(neutral->getMass(), 2) - others4Momentum.Mag2()) / 2.;

@@ -3588,7 +3588,7 @@ def getNbarIDMVA(particleList, path=None, ):
     variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
 
 
-def reconstructDecayWithNeutralHadron(decayString, *args, **kwargs):
+def reconstructDecayWithNeutralHadron(decayString, cut, path=None, **kwargs):
     r"""
     Reconstructs decay with a long-lived neutral hadron e.g.
     :math:`B^0 \to J/\psi K_L^0`,
@@ -3604,16 +3604,15 @@ def reconstructDecayWithNeutralHadron(decayString, *args, **kwargs):
     * There can only be **one neutral hadron in a decay**.
     * The neutral hadron has to be a direct daughter of its mother.
 
-    .. note:: This function delegates its arguments to ``reconstructDecay``.
+    .. note:: This function forwards its arguments to ``reconstructDecay``,
+       so please check the documentation of ``reconstructDecay`` for all
+       possible arguments.
 
     @param decayString A decay string following the mentioned rules
+    @param cut Cut to apply to the particle list
     @param path The path to put in the module
     """
-    reconstructDecay(decayString, *args, **kwargs)
-    try:
-        path = kwargs['path']
-    except KeyError:
-        path = args[4]
+    reconstructDecay(decayString, cut, path=path, **kwargs)
     module = register_module('NeutralHadron4MomentumCalculator')
     module.set_name('NeutralHadron4MomentumCalculator_' + decayString)
     module.param('decayString', decayString)

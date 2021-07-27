@@ -3604,7 +3604,7 @@ def reconstructDecayWithNeutralHadron(decayString, *args, **kwargs):
     * There can only be **one neutral hadron in a decay**.
     * The neutral hadron has to be a direct daughter of its mother.
 
-    .. note:: This function delegates its arguments to :ref:`reconstructDecay`.
+    .. note:: This function delegates its arguments to ``reconstructDecay``.
 
     @param decayString A decay string following the mentioned rules
     @param path The path to put in the module

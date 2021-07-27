@@ -3588,10 +3588,10 @@ def getNbarIDMVA(particleList, path=None, ):
     variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
 
 
-def neutralHadron4MomentumCalculator(list_name, path=None):
+def neutralHadron4MomentumCalculator(decayString, path=None):
     module = register_module('NeutralHadron4MomentumCalculator')
-    module.set_name('NeutralHadron4MomentumCalculator_' + list_name)
-    module.param('listName', list_name)
+    module.set_name('NeutralHadron4MomentumCalculator' + decayString)
+    module.param('decayString', decayString)
     path.add_module(module)
 
 

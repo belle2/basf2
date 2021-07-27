@@ -11,6 +11,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 namespace Belle2 {
   /**
@@ -33,7 +34,9 @@ namespace Belle2 {
 
   private:
 
-    std::string m_listName;  /**< Name of the ParticleList for which one wants to perform the calculation */
+    std::string m_decayString;  /**< Decay string for which one wants to perform the calculation */
+    DecayDescriptor m_decayDescriptor; /**< Decay Descriptor to be initialized with m_decayString */
+    int m_iNeutral = 0; /**< Index of the neutral hadron in the decay string */
     StoreObjPtr<ParticleList> m_plist;  /**< ParticleList that one wants to perform the calculation */
   };
 }

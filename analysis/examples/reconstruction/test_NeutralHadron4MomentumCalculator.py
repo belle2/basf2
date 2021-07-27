@@ -12,7 +12,7 @@ ma.reconstructDecay('D-:sig -> K+:higheff pi-:higheff pi-:higheff', '', path=myp
 ma.fillParticleList('anti-n0:sig', 'clusterE > 0.5 and isFromECL > 0', path=mypath)
 ma.reconstructDecay('@Xsd:Dp -> D-:sig p+:higheff', '', chargeConjugation=False, path=mypath)
 ma.reconstructDecay('B0:Dpnbar -> Xsd:Dp anti-n0:sig', '', chargeConjugation=False, path=mypath)
-ma.neutralHadron4MomentumCalculator('B0:Dpnbar', path=mypath)
+ma.neutralHadron4MomentumCalculator('B0:Dpnbar -> Xsd:Dp ^anti-n0:sig', path=mypath)
 ma.applyCuts('B0:Dpnbar', 'deltaE < 0.5', path=mypath)
 ma.variablesToNtuple('B0:Dpnbar', ['deltaE', 'M'], filename='test_NeutralHadron4MomentumCalculator.root', path=mypath)
 

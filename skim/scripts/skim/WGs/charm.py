@@ -181,6 +181,7 @@ class DstToD0Pi_D0ToRare(BaseSkim):
         * Use photons from `stdPhotons.loadStdSkimPhoton`
         * Use electrons, muons and pions from loose lists in `stdCharged`
         * ``1.66 < M(D0) < 2.06``
+        * No cut on the slow pion
         * ``0 < Q < 0.02``
         * ``pcms(D*) > 2.0``
         * For more details, please check the source code of this skim.
@@ -213,7 +214,7 @@ class DstToD0Pi_D0ToRare(BaseSkim):
 
         for chID, channel in enumerate(D0_Channels):
             ma.reconstructDecay("D0:Rare" + str(chID) + " -> " + channel, charmcuts, chID, path=path)
-            ma.reconstructDecay("D*+:" + str(chID) + " -> pi+:loose D0:Rare" + str(chID),
+            ma.reconstructDecay("D*+:" + str(chID) + " -> pi+:all D0:Rare" + str(chID),
                                 Dstcuts, chID, path=path)
             DstList.append("D*+:" + str(chID))
 
@@ -409,8 +410,8 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
         * :math:`D^{*+}\\to D^{0} \\pi^+`, where :math:`D^{0}` is reconstructed by `XToD0_D0ToHpJm.D0ToHpJm`
 
     **Selection Criteria**:
-        * The cuts in `XToD0_D0ToHpJm`
-        * Slow pion: same as the tracks in `XToD0_D0ToHpJm`
+        * Apply the cuts in `XToD0_D0ToHpJm`
+        * No cut on the slow pion
         * ``0 < Q < 0.018``
         * For more details, please check the source code of this skim.
 
@@ -434,7 +435,7 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
 
         DstList = []
         for chID, channel in enumerate(D0List):
-            ma.reconstructDecay('D*+:HpJm' + str(chID) + ' -> D0:HpJm' + str(chID) + ' pi+:mygood', Dstcuts, chID, path=path)
+            ma.reconstructDecay('D*+:HpJm' + str(chID) + ' -> D0:HpJm' + str(chID) + ' pi+:all', Dstcuts, chID, path=path)
             DstList.append('D*+:HpJm' + str(chID))
 
         return DstList
@@ -448,8 +449,10 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
         * :math:`WS: D^{*-}\\to \\pi^- \\overline{D}^{0}, \\overline{D}^{0}\\to K^- \\pi^+ \\pi^{0}`
 
     **Selection Criteria**:
-        * Use tracks from the loose lists in `stdCharged`
+        * Use tracks from the loose lists in `stdCharged` to reconstruct :math:`D^{0}`
+        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
         * ``1.70 < M(D0) < 2.10``
+        * No cut on the slow pion
         * ``M(D*)-M(D0) < 0.16``
         * ``pcms(D*) > 2.0``
         * For more details, please check the source code of this skim.
@@ -480,8 +483,8 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
         DstList = []
         # NOTE: renamed to avoid particle list name clashes
         ma.reconstructDecay("D0:HpJmPi0_withPID -> K-:loose pi+:loose pi0:myskim", charmcuts, path=path)
-        ma.reconstructDecay("D*+:HpJmPi0RS_withPID -> D0:HpJmPi0_withPID pi+:loose", Dstcuts, path=path)
-        ma.reconstructDecay("D*-:HpJmPi0WS_withPID -> D0:HpJmPi0_withPID pi-:loose", Dstcuts, path=path)
+        ma.reconstructDecay("D*+:HpJmPi0RS_withPID -> D0:HpJmPi0_withPID pi+:all", Dstcuts, path=path)
+        ma.reconstructDecay("D*-:HpJmPi0WS_withPID -> D0:HpJmPi0_withPID pi-:all", Dstcuts, path=path)
         ma.copyLists("D*+:HpJmPi0_withPID", ["D*+:HpJmPi0RS_withPID", "D*+:HpJmPi0WS_withPID"], path=path)
         DstList.append("D*+:HpJmPi0_withPID")
 
@@ -496,9 +499,10 @@ class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
         * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^+ K^- \\pi^{0}`
 
     **Selection Criteria**:
-        * Use tracks from the loose lists in `stdCharged`
+        * Use tracks from the loose lists in `stdCharged` to reconstruct D^{0}
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
         * ``1.70 < M(D0) < 2.10``
+        * No cut on the slow pion
         * ``M(D*)-M(D0) < 0.16``
         * ``pcms(D*) > 2.0``
         * For more details, please check the source code of this skim.
@@ -533,7 +537,7 @@ class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
             # NOTE: renamed to avoid particle list name clashes
             ma.reconstructDecay("D0:HpHmPi0" + str(chID) + "_withPID" + " -> " + channel, charmcuts, chID, path=path)
             ma.reconstructDecay(
-                "D*+:HpHmPi0" + str(chID) + "_withPID" + " -> D0:HpHmPi0" + str(chID) + "_withPID" + " pi+:loose",
+                "D*+:HpHmPi0" + str(chID) + "_withPID" + " -> D0:HpHmPi0" + str(chID) + "_withPID" + " pi+:all",
                 Dstcuts, chID, path=path)
             DstList.append("D*+:HpHmPi0" + str(chID) + "_withPID")
 
@@ -547,7 +551,8 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
         * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} \\pi^+ \\pi^- \\pi^{0}`
 
     **Selection Criteria**:
-        * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
+        * Tracks from :math:`D^{0}`:
+          ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`, then require ``0.11 < M(pi0) < 0.15, p(pi0) > 0.25``
         * ``1.66 < M(D0) < 2.06, pcms(D0) > 2.0``
         * ``Q < 0.018``
@@ -579,7 +584,7 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
         ma.reconstructDecay("D0:KsOmega -> K_S0:merged omega:3pi", charmcuts, path=path)
 
         DstList = []
-        ma.reconstructDecay("D*+:KsOmega -> D0:KsOmega pi+:ksomega", "0 < Q < 0.018", path=path)
+        ma.reconstructDecay("D*+:KsOmega -> D0:KsOmega pi+:all", "0 < Q < 0.018", path=path)
         DstList.append("D*+:KsOmega")
 
         return DstList
@@ -595,8 +600,10 @@ class DstToD0Pi_D0ToHpHmHpJm(BaseSkim):
         * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ K^- K^+ K^-`
 
     **Selection Criteria**:
-        * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
+        * Tracks from :math:`D^{0}`:
+          ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
         * ``1.66 < M(D0) < 2.06``
+        * No cut on the slow pion
         * ``Q < 0.022, pcms(D*+) > 2.0``
         * For more details, please check the source code of this skim.
 
@@ -633,7 +640,7 @@ class DstToD0Pi_D0ToHpHmHpJm(BaseSkim):
         for chID, channel in enumerate(D0_Channels):
             ma.reconstructDecay("D0:HpHmHpJm" + str(chID) + " -> " + channel, D0cuts, chID, path=path)
 
-            ma.reconstructDecay("D*+:HpHmHpJm" + str(chID) + " -> pi+:hphmhpjm D0:HpHmHpJm" + str(chID), Dstcuts, chID, path=path)
+            ma.reconstructDecay("D*+:HpHmHpJm" + str(chID) + " -> pi+:all D0:HpHmHpJm" + str(chID), Dstcuts, chID, path=path)
             DstList.append("D*+:HpHmHpJm" + str(chID))
 
         return DstList
@@ -649,9 +656,10 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
         * :math:`D^{*+}\\to \\pi^- D^{0}, D^{0}\\to K^+ K^- \\eta, \\eta\\to \\gamma \\gamma`
 
     **Selection Criteria**:
-        * Use tracks from the loose lists in `stdCharged`
+        * Use tracks from the loose lists in `stdCharged` to reconstruct D^{0}
         * ``0.47 < M(eta) < 0.60, p(eta) > 0.24``
         * ``1.66 < M(D0) < 2.06, pcms(D0) > 2.0``
+        * No cut on the slow pion
         * ``M(D*)-M(D0) < 0.16``
         * For more details, please check the source code of this skim.
 
@@ -691,7 +699,7 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
             # NOTE: renamed to avoid particle list name clashes
             ma.reconstructDecay("D0:HpJmEta" + str(chID) + " -> " + channel, charmcuts, chID, path=path)
             ma.reconstructDecay(
-                "D*+:HpJmEta" + str(chID) + " -> D0:HpJmEta" + str(chID) + " pi+:loose",
+                "D*+:HpJmEta" + str(chID) + " -> D0:HpJmEta" + str(chID) + " pi+:all",
                 Dstcuts, chID, path=path)
             DstList.append("D*+:HpJmEta" + str(chID))
 
@@ -707,7 +715,7 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
 
     **Selection Criteria**:
         * Apply the cuts in `XToD0_D0ToNeutrals`
-        * Slow pion: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
+        * No cut on the slow pion
         * ``Q < 0.02``
         * For more details, please check the source code of this skim.
 
@@ -724,9 +732,6 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
         stdKshorts(path=path)
 
     def build_lists(self, path):
-        mySel = "abs(d0) < 1 and abs(z0) < 3"
-        mySel += " and 0.296706 < theta < 2.61799"
-        ma.fillParticleList("pi+:2Nbdy", mySel, path=path)
 
         D0List = self.D0ToNeutrals(path)
 
@@ -734,7 +739,7 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
 
         DstList = []
         for chID, channel in enumerate(D0List):
-            ma.reconstructDecay("D*+:2Nbdy" + str(chID) + " -> pi+:2Nbdy " + channel, Dstcuts, chID, path=path)
+            ma.reconstructDecay("D*+:2Nbdy" + str(chID) + " -> pi+:all " + channel, Dstcuts, chID, path=path)
             DstList.append("D*+:2Nbdy" + str(chID))
 
         return DstList
@@ -750,9 +755,11 @@ class DstToD0Pi_D0ToHpJmKs(BaseSkim):
         * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} K^+ K^-`
 
     **Selection Criteria**:
-        * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
+        * Tracks from :math:`D^{0}`:
+          ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
         * Use :math:`K_{S}` from `stdV0s.stdKshorts`
         * ``1.66 < M(D0) < 2.06``
+        * No cut on the slow pion
         * ``Q < 0.022``
         * ``pcms(D*) > 2.0``
         * For more details, please check the source code of this skim.
@@ -788,7 +795,7 @@ class DstToD0Pi_D0ToHpJmKs(BaseSkim):
         for chID, channel in enumerate(D0_Channels):
             ma.reconstructDecay("D0:HpJmKs" + str(chID) + " -> " + channel, D0cuts, chID, path=path)
 
-            ma.reconstructDecay("D*+:HpJmKs" + str(chID) + " -> pi+:hpjmks D0:HpJmKs" + str(chID), Dstcuts, chID, path=path)
+            ma.reconstructDecay("D*+:HpJmKs" + str(chID) + " -> pi+:all D0:HpJmKs" + str(chID), Dstcuts, chID, path=path)
             DstList.append("D*+:HpJmKs" + str(chID))
 
         return DstList

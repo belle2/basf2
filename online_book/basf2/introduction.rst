@@ -787,7 +787,7 @@ post-reconstruction dataobjects.
 
      * You can look at the function source code for `mdst.add_mdst_output`.
      * You can browse the mdst/dataobjects directory in the basf2 source code:
-       https://stash.desy.de/projects/B2/repos/software/browse/mdst/dataobjects/include
+       https://stash.desy.de/projects/B2/repos/basf2/browse/mdst/dataobjects/include
 
      The important mdst dataobjects are:
 
@@ -963,7 +963,7 @@ Good luck.
 
     While the next sections will help you to understand the basics of steering
     files step by step, there are also some comple examples for steering files
-    `in the main software repository <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples>`_.
+    `in the main software repository <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/examples>`_.
     You might want to take a look there after the starterkit.
 
 .. include:: ../lesson_footer.rstinclude

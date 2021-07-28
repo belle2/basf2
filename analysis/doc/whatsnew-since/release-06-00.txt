@@ -1,8 +1,9 @@
 Changes in the analysis package since release-06-00
-===================================================
+---------------------------------------------------
 
 Neutral Hadron Analysis Tool
 ++++++++++++++++++++++++++++
 
-* Added a module that modifies 4-momentum of a neutral hadron in a given decay (e.g. :math:`B^0 \to J/\psi K_L^0`, :math:`B^0 \to p \bar{n} D^*(2010)^-`).
-* Added a Python function `reconstructDecayWithNeutralHadron`, which merges the functionalities of ``ParticleCombiner`` and the above module.
+ * Added a module that modifies 4-momentum of a neutral hadron in a given decay (e.g. :math:`B^0 \to J/\psi K_L^0`, :math:`B^0 \to p \bar{n} D^*(2010)^-`).
+ * Added a Python function `reconstructDecayWithNeutralHadron`, which merges the functionalities of ``ParticleCombiner`` and the above module.
+

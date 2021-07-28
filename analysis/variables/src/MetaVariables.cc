@@ -2949,7 +2949,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       which either has to be the name of the variable used to order the candidates or the selected outputVariable name without the ending ``_rank``.
                       This means that your selected name for the rank variable has to end with ``_rank``.
 
-                      An example of this variable's usage is given in the tutorial `B2A602-BestCandidateSelection <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples/tutorials/B2A602-BestCandidateSelection.py>`_
+                      An example of this variable's usage is given in the tutorial `B2A602-BestCandidateSelection <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/examples/tutorials/B2A602-BestCandidateSelection.py>`_
                       )DOC");
     REGISTER_VARIABLE("matchedMCHasPDG(PDGCode)", matchedMCHasPDG,
                       "Returns if the absolute value of aPDGCode of a MCParticle related to a Particle matches a given PDGCode."

@@ -3598,11 +3598,11 @@ def reconstructDecayWithNeutralHadron(decayString, cut, path=None, **kwargs):
 
     The decay string passed in must satisfy the following rules:
 
-    * The neutral hadron must be **selected** in the decay string with the
+    - The neutral hadron must be **selected** in the decay string with the
       caret (``^``) e.g. ``B0:sig -> J/psi:sig ^K_L0:sig``. (Note the caret
       next to the neutral hadron.)
-    * There can only be **one neutral hadron in a decay**.
-    * The neutral hadron has to be a direct daughter of its mother.
+    - There can only be **one neutral hadron in a decay**.
+    - The neutral hadron has to be a direct daughter of its mother.
 
     .. note:: This function forwards its arguments to ``reconstructDecay``,
        so please check the documentation of ``reconstructDecay`` for all

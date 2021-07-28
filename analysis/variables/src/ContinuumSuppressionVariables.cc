@@ -34,51 +34,6 @@
 namespace Belle2 {
   namespace Variable {
 
-    double R2EventLevel(const Particle*)
-    {
-      B2WARNING("The variable R2EventLevel is deprecated. Use `foxWolframR2` and ma.buildEventShape(inputListNames=[], default_cleanup=True, allMoments=False, cleoCones=True, collisionAxis=True, foxWolfram=True, harmonicMoments=True, jets=True, sphericity=True, thrust=True, checkForDuplicates=False, path=mypath)");
-
-      std::vector<TVector3> p3_all;
-
-      StoreArray<Track> tracks;
-      for (int i = 0; i < tracks.getEntries(); ++i) {
-        // deal with multiple possible track hypotheses in the track fit: try to
-        // retrieve the most likely from PID, maybe this fit failed so then
-        // create a particle with whatever is closest with a TrackFitResult
-        Const::ParticleType mostLikely = tracks[i]->getRelated<PIDLikelihood>()->getMostLikely();
-        const TrackFitResult* iTrack = tracks[i]->getTrackFitResultWithClosestMass(mostLikely);
-        if (iTrack == nullptr) continue;
-        if (iTrack->getChargeSign() != 0) {
-          Particle particle(tracks[i], iTrack->getParticleType());
-          PCmsLabTransform T;
-          TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
-          p3_all.push_back(p_cms.Vect());
-        }
-      }
-
-      StoreArray<ECLCluster> eclClusters;
-      for (int i = 0; i < eclClusters.getEntries(); ++i) {
-        // sum only ECLClusters which have the N1 (n photons) hypothesis
-        if (!eclClusters[i]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
-          continue;
-
-        ClusterUtils C;
-        TLorentzVector momECLCluster = C.Get4MomentumFromCluster(eclClusters[i], ECLCluster::EHypothesisBit::c_nPhotons);
-        if (momECLCluster == momECLCluster) {
-          if (eclClusters[i]->isNeutral()) {
-            Particle particle(eclClusters[i]);
-            PCmsLabTransform T;
-            TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
-            p3_all.push_back(p_cms.Vect());
-          }
-        }
-      }
-
-      FoxWolfram FW(p3_all);
-      FW.calculateBasicMoments();
-      return FW.getR(2);
-    }
-
     double R2(const Particle* particle)
     {
       const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
@@ -297,10 +252,6 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("Continuum Suppression");
-    REGISTER_VARIABLE("R2EventLevel", R2EventLevel,
-                      "[Eventbased] Event-Level Reduced Fox-Wolfram moment R2.");
-    MAKE_DEPRECATED("R2EventLevel", false, "release-05-00-00", R"DOC(
-                     The same value can be calculated with the Event Shape module, see  :b2:var:`foxWolframR`.)DOC");
     REGISTER_VARIABLE("R2"          , R2          , R"DOC(
 Returns reduced Fox-Wolfram R2, defined as ratio of the i-th to the 0-th order Fox Wolfram moments.
 

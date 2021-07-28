@@ -26,8 +26,7 @@
 #                 +-> mu+ nu                                             #
 #                                                                        #
 # The original example has been modified to apply the                    #
-# event based selection, and the ntuples are filled                      #
-# also with the R2EventLevel variable.                                   #
+# event based selection, and the ntuples are filled.                     #
 # While signal/charged samples have R2 distributions below               #
 # 0.3, ccbar sample has a larger distribution and the                    #
 # initial selection reduces the processing time.                         #

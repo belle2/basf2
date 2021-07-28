@@ -146,7 +146,7 @@ Advanced Topics
 Full list of analysis modules
 =============================
 
-The Belle II physics analysis software follows the logic of the general Belle II analysis softwareframework (BASF2) where independent modules solve relatively small problems, where practically all communication between modules happens in the form of data objects. Modules are executed in a linear fashion inside a module path, and can make objects available “downstream” by saving them in the DataStore.
+The Belle II physics analysis software follows the logic of the general Belle II Analysis Software Framework (basf2) where independent modules solve relatively small problems, where practically all communication between modules happens in the form of data objects. Modules are executed in a linear fashion inside a module path, and can make objects available “downstream” by saving them in the DataStore.
 
 Typical physics analysis performed at B factories can be separated into well defined analysis actions. For example, in a measurement of time-dependent CP violation in B0 → φKS0 decays we need to execute the following actions:
 

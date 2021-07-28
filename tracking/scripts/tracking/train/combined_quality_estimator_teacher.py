@@ -141,7 +141,7 @@ Accessing the results / output files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 All output files are stored in a directory structure in the ``result_path``. The
-directory tree encodes the used b2luigi parameters. This ensures reproducability
+directory tree encodes the used b2luigi parameters. This ensures reproducibility
 and makes parameter searches easy. Sometimes, it is hard to find the relevant
 output files. You can view the whole directory structure by running ``tree
 <result_path>``. Ise the unix ``find`` command to find the files that interest
@@ -162,7 +162,7 @@ from typing import Iterable
 
 import matplotlib.pyplot as plt
 import numpy as np
-import root_pandas
+import uproot
 from matplotlib.backends.backend_pdf import PdfPages
 
 import basf2
@@ -219,7 +219,7 @@ def create_fbdt_option_string(fast_bdt_option):
 
 def createV0momenta(x, mu, beta):
     """
-    Copied from Biancas K_S0 particle gun code: Returns a realistiv V0 momentum distribution
+    Copied from Biancas K_S0 particle gun code: Returns a realistic V0 momentum distribution
     when running over x. Mu and Beta are properties of the function that define center and tails.
     Used for the particle gun simulation code for K_S0 and Lambda_0
     """
@@ -247,7 +247,7 @@ def my_basf2_mva_teacher(
     :param target_variable: Feature/variable to use as truth label in the quality estimator MVA classifier.
     :param exclude_variables: List of collected variables to not use in the training of the QE MVA classifier.
            In addition to variables containing the "truth" substring, which are excluded by default.
-    :param fast_bdt_option: specified fast BDT options, defaut: [200, 8, 3, 0.1] [nTrees, nCuts, nLevels, shrinkage]
+    :param fast_bdt_option: specified fast BDT options, default: [200, 8, 3, 0.1] [nTrees, nCuts, nLevels, shrinkage]
     """
     if exclude_variables is None:
         exclude_variables = []
@@ -280,7 +280,7 @@ def my_basf2_mva_teacher(
     else:
         weight_variable = ""
 
-    # Set options for MVA trainihng
+    # Set options for MVA training
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector(*records_files)
     general_options.m_treename = tree_name
@@ -449,7 +449,7 @@ class GenerateSimTask(Basf2PathTask):
                     beta = 0.2
                     pdgs = [310]  # Ks (has no antiparticle, Klong is different)
                 if "V0STUDYL0" in self.random_seed:
-                    # I just made the lamdba values up, such that they peak at 0.35 and are slightly shifted to lower values
+                    # I just made the lambda values up, such that they peak at 0.35 and are slightly shifted to lower values
                     mu = 0.35
                     beta = 0.15  # if this is chosen higher, one needs to make sure not to get values >0 for 0
                     pdgs = [3122, -3122]  # Lambda0
@@ -531,7 +531,7 @@ class GenerateSimTask(Basf2PathTask):
         # path.add_module("ActivatePXDGainCalibrator")
         bkg_files = background.get_background_files(self.bkgfiles_dir)
         if self.experiment_number == 1002:
-            # remove KLM because of bug in backround files with release 4
+            # remove KLM because of bug in background files with release 4
             components = ['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'TRG']
         else:
             components = None
@@ -1377,7 +1377,7 @@ class RecoTrackQETeacherTask(TrackQETeacherBaseTask):
     tree_name = "tree"
     #: Random basf2 seed used to create the training data set.
     random_seed = "train_rec"
-    #: Defines DataCollectionTask to require by tha base class to collect
+    #: Defines DataCollectionTask to require by the base class to collect
     # features for the MVA training.
     data_collection_task = RecoTrackQEDataCollectionTask
     #: Feature/variable to use as truth label for the CDC track quality estimator.
@@ -1707,7 +1707,7 @@ class RecoTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
         Add modules for reco tracking with all track quality estimators to basf2 path.
         """
 
-        # add tracking recontonstruction with quality estimator modules added
+        # add tracking reconstruction with quality estimator modules added
         tracking.add_tracking_reconstruction(
             path,
             add_cdcTrack_QI=True,
@@ -1822,7 +1822,7 @@ class TrackQEEvaluationBaseTask(Task):
         Acronym to distinguish between cdc, vxd and rec(o) MVA
         """
         raise NotImplementedError(
-            "Evalutation Tasks must define a task acronym."
+            "Evaluation Tasks must define a task acronym."
         )
 
     def requires(self):
@@ -2102,7 +2102,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             'phi0_truth',
         ]
         # In ``pr_df`` each row corresponds to a track from Pattern Recognition
-        pr_df = root_pandas.read_root(validation_harvest_path, key='pr_tree/pr_tree', columns=pr_columns)
+        pr_df = uproot.open(validation_harvest_path)['pr_tree/pr_tree'].arrays(pr_columns, library='pd')
         mc_columns = [  # restrict mc_df to these columns
             'experiment_number',
             'run_number',
@@ -2112,7 +2112,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             'is_primary',
         ]
         # In ``mc_df`` each row corresponds to an MC track
-        mc_df = root_pandas.read_root(validation_harvest_path, key='mc_tree/mc_tree', columns=mc_columns)
+        mc_df = uproot.open(validation_harvest_path)['mc_tree/mc_tree'].arrays(mc_columns, library='pd')
         if self.primaries_only:
             mc_df = mc_df[mc_df.is_primary.eq(True)]
 
@@ -2173,9 +2173,9 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             pdf.savefig(clone_fig, bbox_inches="tight")
             plt.close(clone_fig)
 
-            # Plot finding efficieny
+            # Plot finding efficiency
 
-            # The Quality Indicator is only avaiable in pr_tree and thus the
+            # The Quality Indicator is only available in pr_tree and thus the
             # PR-track dataframe. To get the QI of the related PR track for an MC
             # track, merge the PR dataframe into the MC dataframe
             pr_track_identifiers = ['experiment_number', 'run_number', 'event_number', 'pr_store_array_number']
@@ -2267,7 +2267,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
                     incut_clones = incut[incut.is_clone.eq(True)]
                     incut_fake = incut[incut.is_fake.eq(True)]
 
-                    # if any series is empty, break ouf loop and don't draw try to draw a stacked histogram
+                    # if any series is empty, break out of loop and don't draw try to draw a stacked histogram
                     if any(series.empty for series in (incut, incut_matched, incut_clones, incut_fake)):
                         ax.text(0.5, 0.5, "Not enough data in bin", ha="center", va="center", transform=ax.transAxes)
                         continue
@@ -2670,7 +2670,7 @@ class MasterTask(b2luigi.WrapperTask):
         this steering file.
         """
         cdc_training_targets = [
-            "truth",  # treats clones as backround, only best matched CDC tracks are true
+            "truth",  # treats clones as background, only best matched CDC tracks are true
             # "truth_track_is_matched" # treats clones as signal
         ]
 

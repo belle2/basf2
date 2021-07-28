@@ -759,8 +759,7 @@ Then:
 .. code:: python
 
   import basf2
-  basf2.fw.add_module_search_path(".")
-  basf2.register_module("EnableMyVariable") # now you can use it
+  basf2.register_module("EnableMyVariable") # This is the relevant line: now you can use your variable
   from variables import variables
   print(variables.getVariable("myVar").description)
 

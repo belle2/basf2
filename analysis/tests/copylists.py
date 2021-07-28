@@ -10,7 +10,7 @@
 ##########################################################################
 
 import unittest
-import root_pandas
+import uproot
 import basf2 as b2
 import b2test_utils as b2tu
 import modularAnalysis as ma
@@ -99,7 +99,7 @@ class TestCopyLists(unittest.TestCase):
 
     def _count(self, listname):
         """Open the ntuple output and count the number of entries in the list."""
-        df = root_pandas.read_root("ntuple.root", listname)
+        df = uproot.open("ntuple.root")[listname].arrays(library="pd")
         return len(df)
 
     def test_merge_two_lists_with_identical_daughters(self):

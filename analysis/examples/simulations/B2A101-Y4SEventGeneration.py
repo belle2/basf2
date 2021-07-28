@@ -18,7 +18,7 @@
 #                                                                        #
 # e+e- -> Y(4S) -> BBbar                                                 #
 #                                                                        #
-# events with EvtGen in BASF2, where the decay of Y(4S)                  #
+# events with EvtGen in basf2, where the decay of Y(4S)                  #
 # is specified by the given .dec file.                                   #
 #                                                                        #
 # The generated events are saved to the output ROOT file.                #

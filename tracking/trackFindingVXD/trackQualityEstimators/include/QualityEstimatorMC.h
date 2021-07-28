@@ -45,12 +45,22 @@ namespace Belle2 {
     /** additionally return momentum_truth if it is a perfect match to a single MCRecoTrack */
     virtual QualityEstimationResults estimateQualityAndProperties(std::vector<SpacePoint const*> const& measurements) override final;
 
-    /** Setter for StoreArray names of SVD and PXD clusters
+    /** Setter for StoreArray names of SVD and PXD clusters, if those are not set by the user it will be tried to read them from the MCRecoTracks StoreArray
      * @param svdClustersName : SVD cluster StoreArray name
      * @param pxdClustersName : PXD cluster StoreArray name
      */
     void setClustersNames(const std::string& svdClustersName, const std::string& pxdClustersName)
-    { m_svdClustersName = svdClustersName; m_pxdClustersName = pxdClustersName; };
+    {
+      m_svdClustersName = svdClustersName;
+      m_pxdClustersName = pxdClustersName;
+      m_clusterNamesNeedSetting = false;
+    };
+
+    /** Setter to force the class to update its cluster names. The cluster names have to be set either by calling
+     *  setClustersNames or will be automatically read from first entry of MCRecoTracks when calling one of
+     *  the functions doing the estimation for the first time
+     */
+    void forceUpdateClusterNames() {m_clusterNamesNeedSetting = true;}
 
   protected:
     /** Get MCRecoTrack index of best matching tracks and number of matched MC clusters
@@ -83,6 +93,8 @@ namespace Belle2 {
     std::string m_mcRecoTracksStoreArrayName; /**< MCRecoTracks StoreArray name */
     std::string m_svdClustersName = ""; /**< SVD clusters StoreArray name */
     std::string m_pxdClustersName = ""; /**< PXD clusters StoreArray name */
+    bool m_clusterNamesNeedSetting =
+      true; /**< if true cluster names need to be set, either by calling setClustersNames or read from MCRecoTracks at first call */
 
     /** stores the current match for optional return values */
     MatchInfo m_match;

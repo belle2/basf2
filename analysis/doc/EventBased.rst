@@ -51,11 +51,12 @@ Here is a simple example:
 
 .. code-block:: python
 
-    from modularAnalysis import applyEventCuts
+    from modularAnalysis import applyEventCuts, buildEventShape
     from stdCharged import stdPi
      
-    stdPi('all')
-    applyEventCuts('R2EventLevel < 0.3')
+    stdPi('all', path=mypath)
+    buildEventShape(path=mypath)
+    applyEventCuts('foxWolframR2 < 0.3', path=mypath)
 
 This builds the list of all pions but only processes events where the event-level R2 passes the cut. 
 

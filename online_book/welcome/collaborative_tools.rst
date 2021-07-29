@@ -12,7 +12,7 @@ Collaborative Tools.
 
     **Prerequisites**:
 
-    	* DESY accounts.
+        * DESY accounts.
         * An internet browser.
 
     **Questions**:

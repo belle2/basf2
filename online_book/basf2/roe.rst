@@ -12,17 +12,17 @@ The Rest of Event (ROE)
 
     **Prerequisites**:
 
-    	* The previous lesson
+    * The previous lesson
 
     **Questions**:
 
-        * I combined several particles into ``X``. How do I select everything
-          that is not "in" ``X``?
-        * How to exclude some particles from this Rest of Event / what is an ROE mask?
+    * I combined several particles into ``X``. How do I select everything
+      that is not "in" ``X``?
+    * How to exclude some particles from this Rest of Event / what is an ROE mask?
 
     **Objectives**:
 
-        * Reconstruct the ROE of a B meson
+    * Reconstruct the ROE of a B meson
 
 
 After the reconstruction of the signal particle list it is very useful

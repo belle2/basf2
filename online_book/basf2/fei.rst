@@ -12,7 +12,7 @@ Full Event Interpretation
 
     **Prerequisites**:
 
-    	* Lessons 1-2
+        * Lessons 1-2
 
     **Questions**:
 

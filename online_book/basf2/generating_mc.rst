@@ -12,17 +12,17 @@ Generating Monte Carlo
 
     **Prerequisites**:
 
-    	* The basics.
-	* First steering file.
+    * The basics.
+    * First steering file.
 
     **Questions**:
 
-        * How can I generate my own MC?
+    * How can I generate my own MC?
 
     **Objectives**:
 
-        * Generate 10 :math:`B^0 \bar{B}^0` events
-	* Write a simple decay file and generate signal events
+    * Generate 10 :math:`B^0 \bar{B}^0` events
+    * Write a simple decay file and generate signal events
 
 
 Why do we need Monte Carlo simulated data?

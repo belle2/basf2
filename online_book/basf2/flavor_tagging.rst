@@ -12,7 +12,7 @@ Flavor tagging
 
     **Prerequisites**:
 
-    	* The previous lesson
+        * The previous lesson
 
     **Questions**:
 

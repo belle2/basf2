@@ -680,7 +680,7 @@ happen to fulfill all your selection criteria.
         plt.xlim(4.3, 5.3)
         plt.savefig('Mbc_all.png')
 
-    .. figure:: figs/Mbc_all.png
+    .. figure:: first_steering_file/Mbc_all.png
         :width: 40em
         :align: center
 
@@ -780,7 +780,7 @@ definitely read it to understand at least the basics.
         plt.xlim(4.3, 5.3)
         plt.savefig('Mbc_MCsplit.png')
 
-    .. figure:: figs/Mbc_MCsplit.png
+    .. figure:: first_steering_file/Mbc_MCsplit.png
         :width: 40em
         :align: center
 

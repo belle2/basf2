@@ -257,13 +257,9 @@ int ECLCrystalData::GetCellID(int ThetaId, int PhiId)
     int backRing[10] = {0, 9, 18, 24, 30, 36, 42, 48, 52, 56} ;
     return 7776 + backRing[ThetaId - 59] * 16 + PhiId;
 
-  } else if (ThetaId > 12 && ThetaId < 59) {
-    return 1152 + 144 * (ThetaId - 13)  + PhiId;
+  }
 
-  } else
-    B2ERROR("ERROR (ECLCrystalData): CellID int ThetaId " << ThetaId << " int PhiId " << PhiId << ". Out of range.");
-
-  return -1;
+  return 1152 + 144 * (ThetaId - 13)  + PhiId;
 }
 
 void ECLCrystalData::Mapping(int cid)

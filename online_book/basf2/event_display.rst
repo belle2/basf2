@@ -24,11 +24,11 @@ A well-deserved pause
 ---------------------
 
 In the last six lessons you built up a realistic steering file step by step.
-Congratulations for making it to this point! 🍰 
+Congratulations for making it to this point! 🍰
 
 You probably already have developed quite a nice feeling for how to work with
 basf2. There is much more to learn, but the remaining topics are more
-specialized and might not apply to every analysis. 
+specialized and might not apply to every analysis.
 
 All of the following lessons (from here out) are largely self-contained and
 only have prerequisites that you have already done. You can pick and choose
@@ -50,7 +50,7 @@ event display for the mdst file that you were looking at in these last lessons
 
         Can you identify a :math:`B\to J/\psi K_S` event?
 
-.. seealso:: 
+.. seealso::
         `evdisp.belle2.org <https://evdisp.belle2.org>`_ for a live event
         display of the data-taking in real time.
 

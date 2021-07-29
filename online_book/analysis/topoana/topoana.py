@@ -9,7 +9,7 @@ import basf2
 from modularAnalysis import inputMdst
 from modularAnalysis import variablesToNtuple
 from variables.MCGenTopo import mc_gen_topo
-import os						# Newly added statement 1!
+import os  # Newly added statement 1!
 
 mypath = basf2.Path()
 
@@ -26,4 +26,4 @@ basf2.process(mypath)
 print(basf2.statistics)
 
 # Invoke the TopoAna program
-os.system('topoana.exe topoana.card')			# Newly added statement 2!
+os.system('topoana.exe topoana.card')  # Newly added statement 2!

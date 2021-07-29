@@ -15,6 +15,7 @@
 #include <vector>
 #include <functional>
 #include <memory>
+#include <variant>
 
 namespace Belle2 {
   class Particle;
@@ -101,9 +102,9 @@ namespace Belle2 {
 
     public:
       /** functions stored take a const Particle* and return double. */
-      typedef std::function<double(const Particle*)> FunctionPtr;
+      typedef std::function<std::variant<double, int, bool>(const Particle*)> FunctionPtr;
       /** parameter functions stored take a const Particle*, const std::vector<double>& and return double. */
-      typedef std::function<double(const Particle*, const std::vector<double>&)> ParameterFunctionPtr;
+      typedef std::function<std::variant<double, int, bool>(const Particle*, const std::vector<double>&)> ParameterFunctionPtr;
       /** meta functions stored take a const std::vector<std::string>& and return a FunctionPtr. */
       typedef std::function<FunctionPtr(const std::vector<std::string>&)> MetaFunctionPtr;
       /** Typedef for the cut, that we use Particles as our base objects. */

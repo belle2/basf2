@@ -10,7 +10,7 @@ Topology analysis
    in :numref:`TopologyAnalysis`.
    Please feel free to contact Xingyu Zhou (zhouxy@buaa.edu.cn) if you have any
    questions or comments on ``TopoAna`` and this online textbook.
-   
+
 Introduction
 ------------
 
@@ -203,7 +203,7 @@ Please follow the steps below to install the software.
 
         The installation succeeds if you see the following line: ``"topoana.exe"
         installed successfully!``
-     
+
   8. Set up the experiment name with ``./Setup Belle_II``
 
      .. note::
@@ -244,7 +244,7 @@ Below is an example of the python steering script.
    :language: python
 
 .. note::
-   
+
    In practice, we usually use the interface ``MCGenTopo`` together with detailed
    particle lists and variable lists for specific physics analyses.
    For the sake of simplification, we do not include the latter in this script.
@@ -258,7 +258,7 @@ After the following steps:
   3. Create a new python steering script named ``MCGenTopo.py``, and copy and
      paste the content of the script above into it.
 
-  4. ``basf2 MCGenTopo.py`` 
+  4. ``basf2 MCGenTopo.py``
 
 you get a root file ``MCGenTopo.root`` containing a ``TTree`` object ``MCGenTopo``,
 which in return contains the MC truth information for topology analysis.
@@ -271,11 +271,11 @@ and the key variables.
 
    [zhouxy@ccw04 test]$ root -l                         // Get into the interpreter
    root [0] TFile f("MCGenTopo.root")                   // Open the root file
-   (TFile &) Name: MCGenTopo.root Title: 
+   (TFile &) Name: MCGenTopo.root Title:
    root [1] f.ls()                                      // List the objects in the root file
-   TFile**         MCGenTopo.root  
-    TFile*         MCGenTopo.root  
-     KEY: TTree    MCGenTopo;1     
+   TFile**         MCGenTopo.root
+    TFile*         MCGenTopo.root
+     KEY: TTree    MCGenTopo;1
    root [2] MCGenTopo->Show(0)                          // Show the first entry of the TTree object
    ======> EVENT:0
     __experiment__  = 0
@@ -301,7 +301,7 @@ and the key variables.
     MCGenMothIndex_199 = nan
    root [3] .q                                          // Quit the interpreter
 
-.. tip:: 
+.. tip::
 
    Normally, the input data contain all the topology information of the samples.
    With the data, all kinds of topology analysis with ``TopoAna`` can be performed.
@@ -336,7 +336,7 @@ Below is an example of the card file.
    {
      MCGenTopo.root
    }
-   
+
    % TTree name
    {
      MCGenTopo
@@ -349,7 +349,7 @@ Below is an example of the card file.
 
    % Common name of output files (Default: Name of the card file)
    {
-     topoana 
+     topoana
    }
 
 In the card file, ``#``, ``%``, and the pair of ``{`` and ``}``, are used for
@@ -373,7 +373,7 @@ Below are some detailed explanations on these setting items.
   * The second item specifies the ``TTree`` name.
 
     .. note::
-       
+
        Here, the ``TTree`` object should contain the following variables:
        ``nMCGen``, ``MCGenPDG_i``, and ``MCGenMothIndex_i`` (``i = 0, 1, 2 ...``).
 
@@ -385,7 +385,7 @@ Below are some detailed explanations on these setting items.
     .. note::
 
        1. The item can be replaced or co-exist with other functionality items.
-                 
+
        2. At least one functionality item has to be specified explicitly in the
           card file, otherwise the program will terminate soon after its start
           because no topology analysis task to be performed is set up.
@@ -421,7 +421,7 @@ After the following steps:
 
   2. ``topoana.exe topoana.card``
 
-     .. tip:: 
+     .. tip::
 
         * Since the name of the card file is the default one, you can just execute
           ``topoana.exe``.
@@ -433,7 +433,7 @@ After the following steps:
              topoana.exe: error while loading shared libraries: libCore.so: cannot open shared object
              file: No such file or directory
 
-          setting up ``basf2`` before executing the command solves the problem, 
+          setting up ``basf2`` before executing the command solves the problem,
           in cases that you installed ``TopoAna`` in the ``basf2`` environment
           previously.
 
@@ -665,7 +665,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
    the changes of the output files.
 
    .. code-block:: none
-          
+
       % Process charge conjugate objects together (Two options: Y and N. Default: N)
       {
         Y

@@ -12,7 +12,7 @@
 # **************  Flavor Tagging   **************
 # *                                             *
 # * This script calculates the parameters char- *
-# * cterizing the performance of the flavor     *
+# * acterizing the performance of the flavor    *
 # * tagger. It produces plots for the qr        *
 # * distribution of the combiners and the dis-  *
 # * tributions of the combiner input variables. *

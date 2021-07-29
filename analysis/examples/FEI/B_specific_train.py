@@ -8,7 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Steering file to train the specfic FEI on Belle II MC, but it can be also easily adapted for converted Belle MC.
+# Steering file to train the specific FEI on Belle II MC, but it can be also easily adapted for converted Belle MC.
 # This steering file is called several times (so-called stages) during the training process of the FEI.
 # For reference see Confluence and Thomas Keck's PhD thesis.
 #

@@ -61,7 +61,7 @@ namespace Belle2 {
       return pxfact * totpx + pyfact * totpy + pzfact * totpz + efact * totE - value;
     }
 
-// calculate vector/array of derivatives of this contraint
+// calculate vector/array of derivatives of this constraint
 // w.r.t. to ALL parameters of all fitobjects
 // here: d sum(px) /d par(i,j)
 //                      = d sum(px) /d px(i) * d px(i) /d par(i, j)

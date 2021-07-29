@@ -218,7 +218,7 @@ int RaveKinematicVertexFitter::fit()
           m_fittedParticle = refitted[0];
 
         } else {
-          B2ERROR("[RaveKinematicVertexFitter]: VertexException saying ParentParticleFitter::error inverting covariance matrix occured");
+          B2ERROR("[RaveKinematicVertexFitter]: VertexException saying ParentParticleFitter::error inverting covariance matrix occurred");
           nOfVertices = 0;
         }
 

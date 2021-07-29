@@ -48,7 +48,7 @@ class TfDataBasf2():
         #: number of batches
         self.batches = self.train_x.shape[0] // self.batch_size
 
-        #: idices required for shuffling
+        #: indices required for shuffling
         self.train_idx = np.zeros(self.train_x.shape[0])
 
         #: np ndarray for training batch features

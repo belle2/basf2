@@ -65,7 +65,7 @@ void VariablesToEventBasedTreeModule::initialize()
   m_file =  RootFileCreationManager::getInstance().getFile(m_fileName);
   if (!m_file) {
     B2ERROR("Could not create file \"" << m_fileName <<
-            "\". Please set a vaild root output file name (\"fileName\" module parameter).");
+            "\". Please set a valid root output file name (\"fileName\" module parameter).");
     return;
   }
 
@@ -205,7 +205,7 @@ void VariablesToEventBasedTreeModule::terminate()
 
     const bool writeError = m_file->TestBit(TFile::kWriteError);
     if (writeError) {
-      B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
+      B2FATAL("A write error occurred while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
   }
 }

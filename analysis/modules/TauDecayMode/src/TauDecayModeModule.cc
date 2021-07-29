@@ -368,7 +368,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
       if (mothid == 24) isRadiationfromIntermediateWBoson = true;
 
       // check if it is a tau- -> pi- omega nu, omega -> pi0 gamma decay
-      // Note: TauolaBelle2 generator treats this a coherant production
+      // Note: TauolaBelle2 generator treats this a coherent production
       // e.g. includes omega in the form factor but not as an explicit final state particle
       bool isPiPizGam = false;
       if (isRadiationfromIntermediateWBoson) {
@@ -408,7 +408,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
       bool isRadiationfromTau = false;
       if (mothid == 15) isRadiationfromTau = true;
 
-      // check if the gamma comes from 2 body LFV decays of tau, e.g. tau- -> e-/mu- gamma with arbitary number of extra photon radiations from PHOTOS/FSR
+      // check if the gamma comes from 2 body LFV decays of tau, e.g. tau- -> e-/mu- gamma with arbitrary number of extra photon radiations from PHOTOS/FSR
       bool isLFVTau2BodyDecay = false;
       if (isRadiationfromTau) {
         bool hasNeutrinoAsSister = false;
@@ -578,7 +578,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
     // Without further analysis, it is NOT possible to separate
     // tau- ->  pi-     2pi0 omega (-> pi- pi+)     nu decays [Mode 49] from
     // tau- -> 2pi- pi+ 2pi0                        nu decays [Mode 66]
-    // Note: TauolaBelle2 treats Mode 66 is coherant production,
+    // Note: TauolaBelle2 treats Mode 66 is coherent production,
     // e.g. includes omega in the form factor but not as an explicit final state particle.
     // Note2: omega is explicitly included in following mode:
     // tau- ->  pi-      pi0 omega (-> pi- pi+ pi0) nu decays [Mode 130]

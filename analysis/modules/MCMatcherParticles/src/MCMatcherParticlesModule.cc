@@ -35,7 +35,7 @@ namespace Belle2 {
   {
     setDescription("Performs MC matching (sets relation Particle->MCParticle) for all particles\n"
                    "(and its (grand)^N-daughter particles) in the ParticleList. The relation can\n"
-                   "be used in conjuction with MCMatching::MCErrorFlags flags, e.g. using the\n"
+                   "be used in conjunction with MCMatching::MCErrorFlags flags, e.g. using the\n"
                    "isSignal or mcPDG & mcErrors variables.\n"
                    "\n"
                    "In addition to the usual mc matching algorithm the module can run also loose mc\n"
@@ -48,7 +48,7 @@ namespace Belle2 {
                    " - looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother\n"
                    " - looseMCWrongDaughterN: number of daughters that don't originate from the most\n"
                    "                          common mother\n"
-                   " - looseMCWrongDaughterPDG: PDG code of the daughter that doesn't orginate from\n"
+                   " - looseMCWrongDaughterPDG: PDG code of the daughter that doesn't originate from\n"
                    "                            the most common mother \n"
                    "                            (only if looseMCWrongDaughterN = 1)\n"
                    " - looseMCWrongDaughterBiB: 1 if the wrong daughter is Beam Induced Background\n"

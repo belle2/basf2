@@ -800,7 +800,7 @@ Particle#6:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): -0.379122
-[ERROR] No grand daughter of daugher 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
+[ERROR] No grand daughter of daughter 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
 	name = K_S0
 	iDaughter = 0
 	iGrandDaughter = 0

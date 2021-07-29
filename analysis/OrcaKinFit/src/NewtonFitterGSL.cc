@@ -777,7 +777,7 @@ namespace Belle2 {
       }
 
       // Second, all terms d^2 chi^2/dlambda dx,
-      // i.e. the first derivatives of the contraints,
+      // i.e. the first derivatives of the constraints,
       // plus the second derivatives times the lambda values
       for (auto c : constraints) {
         assert(c);
@@ -879,7 +879,7 @@ namespace Belle2 {
         debug_print(grad, "grad");
       }
 
-      // Code adapted from Numerical Recipies (3rd ed), page 479
+      // Code adapted from Numerical Recipes (3rd ed), page 479
       // routine lnsrch
 
       int nite = 0;

@@ -18,6 +18,7 @@
     double lowerEdgeThetaID[99];
     double upperEdgeThetaID[99];
     if(nThetaReg>99) {cout << "nThetaReg is greater than maximum 99 allowed: " << nThetaReg << endl; return; }
+    
     for(int it = 0; it<nThetaReg; it++) {
         lowerEdgeThetaID[it] = lowerThetaID->GetBinContent(it+1);
         upperEdgeThetaID[it] = upperThetaID->GetBinContent(it+1);

@@ -159,7 +159,7 @@ Generally, the functionalities of the program are as follows.
         (titled **Reconstruction restrictions on truth particles**) in the user
         guide we introduce in :numref:`TopologyAnalysis`.
 
-     3. In addition, there are some functionality overlaps betweeen ``TopoAna``
+     3. In addition, there are some functionality overlaps between ``TopoAna``
         and :b2:mod:`MCMatcherParticles`. If highly needed, in the future we could
         also develop some new functionalities in ``TopoAna`` for the cross-checks
         of the MC matching results obtained with :b2:mod:`MCMatcherParticles`.

@@ -229,7 +229,7 @@ Now we have to add to the steering path the relevant functions for:
 .. tip::
 
    If you need more complex steering files for your quick studies or you want to use different MC generators, you
-   can always check our `MC production repository`_ (used and mantained by the Data Production group). This
+   can always check our `MC production repository`_ (used and maintained by the Data Production group). This
    repository is useful also to check which configurations were used for a specific MC production campaign.
 
 .. _MC production repository: https://stash.desy.de/projects/B2P/repos/mc/browse

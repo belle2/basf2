@@ -159,6 +159,14 @@ namespace Belle2 {
        */
       const Var* getVariable(std::string name);
 
+      /** Get Meta and Parameter Variables for a function call which is already parsed into name and arguments
+       *
+       * Used by FunctionNode because there we already have the MetaVariable in parsed form
+       *
+       * Returns NULL if name not found
+       */
+      const Var* getVariable(const std::string& functionName, const std::vector<std::string>& functionArguments);
+
       /**
        * Get variables belonging to the given keys
        */
@@ -237,6 +245,12 @@ namespace Belle2 {
 
       /** Creates and registers a concrete variable (Var) from a MetaVar, ParameterVar or numeric constant. */
       bool createVariable(const std::string& name);
+
+      /** Creates and registers a MetaVar, ParameterVar
+        * Called by the corresponding getVariable(const std::string&, const std::vector<std::string>&) to register non-existing variables
+        * The fullname of the function call is also passed for alias resolving.
+        */
+      bool createVariable(const std::string fullname, const std::string& functionName, const std::vector<std::string>& functionArguments);
 
       /** Group last set via VARIABLE_GROUP(). */
       std::string m_currentGroup;

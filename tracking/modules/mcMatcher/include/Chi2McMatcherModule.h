@@ -39,19 +39,27 @@ namespace Belle2 {
     void event() override;
   private: //Parameters
 
-    //! Parameter : String to define Cut Off Type
-    //
-    // ->individual: each charged particle gets its own CutOff
-    //         defined by IndividualCutOffs parameter
-    // ->general:    all charged particle get the same CutOff
-    //         defined by GeneralCutOff parameter
-    std::string m_param_CutOffType;
-
-    //! Parameter : Defines the Cut Off value for general CutOffType Default->electron 99 percent border (128024)
-    double m_param_GeneralCutOff;
-
     //! Parameter : Defines the Cut Off values for each charged particle. The Cut Off values in the list for
     //        the  different pdgs have to be in the following order  [11,13,211,2212,321,1000010020]
-    std::vector<double> m_param_IndividualCutOffs;
+    std::vector<double> m_param_CutOffs;
+
+    std::string param_linalg;
+
+    // Performance test Parameter
+    //
+    // Total Track Count
+    int totalCount = 0;
+    // Hit Relation counter: counts how many Relations where set by the Hit Matching
+    int hitRelationCounter = 0;
+    // Chi2 Relation Counter: counts how many Relations where set by the chi2 Matching
+    int chi2RelationCounter = 0;
+    // both Relation Counter: counts how many Tracks got a relation by Hit Matching and chi2 Matching
+    int bothRelationCounter = 0;
+    // both Relations and Same MC Counter
+    int bothRelationAndSameMCCounter = 0;
+    // Not both Relation Counter: opposite of previous
+    int notBothRelationCounter = 0;
+    // No Relation Counter
+    int noRelationCounter = 0;
   };
 }

@@ -430,7 +430,7 @@ VertexFitKFit::doFit4() {
   m_v[2][0] = m_BeforeVertex.z();
 
   double tmp_each_chisq[KFitConst::kMaxTrackCount2];
-  double tmp_vertex_chisq = 1.e+30; // An init-value is not needed but the C++ complier requires the init-value.
+  double tmp_vertex_chisq = 1.e+30; // An init-value is not needed but the C++ compiler requires the init-value.
 
   // to avoid overestimation of vertex-z error.
   bool it_flag = false;

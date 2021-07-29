@@ -1065,7 +1065,7 @@ Photon timing is given by the fitted time of the recorded waveform of the highes
 cluster. After all calibrations and corrections (including Time-Of-Flight), photons from the interaction
 point (IP) should have a Photon timing that corresponds to the Event t0, :math:`t_{0}`.  The Event t0 is the
 time of the event and may be measured by a different sub-detector (see Event t0 documentation). For an ECL
-cluster produced at the interation point in time with the event, the cluster time should be consistent with zero
+cluster produced at the interaction point in time with the event, the cluster time should be consistent with zero
 within the uncertainties. Special values are returned if the fit for the Photon timing fails (see
 documentation for `clusterHasFailedTiming`). (For MC, the calibrations and corrections are not fully simulated).
 

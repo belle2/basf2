@@ -41,7 +41,7 @@ def mc_gen_topo(n=200):
        * Normally, the maximum of ``nMCGen`` in the MC samples at Belle II is less than 200.
          Hence, if you have no idea about the maximum of ``nMCGen`` in your own MC sample,
          it is usually a safe choice to use the default parameter value 200.
-       * However, an overlarge parameter value leads to unncessary waste of disk space and
+       * However, an overlarge parameter value leads to unnecessary waste of disk space and
          redundant variables with inelegant ``nan`` values.
          Hence, if you know the maximum of ``nMCGen`` in your own MC sample,
          it is a better choice to assign the parameter a proper value.

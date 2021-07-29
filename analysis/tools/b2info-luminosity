@@ -121,7 +121,7 @@ def argparser():
                         dest="token",
                         type=str,
                         required=False,
-                        help="Use the read-only token to automatize the script")
+                        help="Use the read-only token to automate the script")
     parser.add_argument("--username",
                         dest="username",
                         type=str,
@@ -151,7 +151,7 @@ class Luminosity:
 
     def __init__(self, args):
         """
-        initializiation 
+        initialization 
 
         :param args: command-line args.
         """

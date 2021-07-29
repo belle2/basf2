@@ -42,7 +42,7 @@ namespace Belle2 {
     /** Internally called by match(Particle*) and match(MCParticle*) function. */
     template <class T>
     int match(const T* p, int iDaughter_p);
-    /** Collection of hierarchy pathes of selected particles.
+    /** Collection of hierarchy paths of selected particles.
     Hierarchy path is vector of pairs of relative daughter numbers and particle names.
     For instance, in decay
     B+ -> [ D+ -> ^K+ pi0 ] pi0

@@ -2636,7 +2636,7 @@ Specifying the lab frame is useful in some corner-cases. For example:
 		      "When more than one Particle is present in the ParticleList, only the first Particle in the list is used for "
 		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.");
     REGISTER_VARIABLE("useRecoilParticleRestFrame(variable, particleList)", useRecoilParticleRestFrame,
-                      "Returns the value of the variable in the rest frame of recoil system againt the first Particle contained in the given ParticleList.\n"
+                      "Returns the value of the variable in the rest frame of recoil system against the first Particle contained in the given ParticleList.\n"
 		      "It is strongly recommended to pass a ParticleList that contains at most only one Particle in each event. "
 		      "When more than one Particle is present in the ParticleList, only the first Particle in the list is used for "
 		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.");

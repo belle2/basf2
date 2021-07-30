@@ -100,7 +100,7 @@ namespace Belle2 {
        "Monte carlo files containing the discriminant variable with the mc truth")
       ("splot_combined", po::value<bool>(&m_splot_combined), "Combine sPlot training with PDF classifier for discriminating variable")
       ("splot_boosted", po::value<bool>(&m_splot_boosted), "Use boosted sPlot training (aPlot)")
-      ("use_sideband_substraction", po::value<bool>(&m_use_sideband_substraction), "whether to do a sideband subtraction training")
+      ("use_sideband_subtraction", po::value<bool>(&m_use_sideband_subtraction), "whether to do a sideband subtraction training")
       ("sideband_mc_files", po::value<std::vector<std::string>>(&m_sideband_mc_files)->multitoken(),
        "Monte carlo files used to estimate the number of events in the different regions. (Must contain the same signal / background distribution as is expected in data)")
       ("sideband_variable", po::value<std::string>(&m_sideband_variable),
@@ -130,7 +130,7 @@ namespace Belle2 {
         m_splot_mc_files[i] = pt.get<std::string>(std::string("splot_mc_file") + std::to_string(i));
       }
 
-      m_use_sideband_substraction = pt.get<bool>("use_sideband_substraction");
+      m_use_sideband_subtraction = pt.get<bool>("use_sideband_subtraction");
       m_sideband_variable = pt.get<std::string>("sideband_variable");
 
       unsigned int sideband_number_of_mc_files = pt.get<unsigned int>("sideband_number_of_mc_files", 0);
@@ -169,7 +169,7 @@ namespace Belle2 {
         pt.put(std::string("splot_mc_file") + std::to_string(i), m_splot_mc_files[i]);
       }
 
-      pt.put("use_sideband_substraction", m_use_sideband_substraction);
+      pt.put("use_sideband_subtraction", m_use_sideband_subtraction);
       pt.put("sideband_variable", m_sideband_variable);
 
       pt.put("sideband_number_of_mc_files", m_sideband_mc_files.size());

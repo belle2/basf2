@@ -236,7 +236,7 @@ namespace Belle2 {
       unsigned int number_of_enabled_meta_trainings = 0;
       if (meta_options.m_use_splot)
         number_of_enabled_meta_trainings++;
-      if (meta_options.m_use_sideband_substraction)
+      if (meta_options.m_use_sideband_subtraction)
         number_of_enabled_meta_trainings++;
       if (meta_options.m_use_reweighting)
         number_of_enabled_meta_trainings++;
@@ -248,8 +248,8 @@ namespace Belle2 {
 
       if (meta_options.m_use_splot) {
         teacher_splot(general_options, specific_options, meta_options);
-      } else if (meta_options.m_use_sideband_substraction) {
-        teacher_sideband_substraction(general_options, specific_options, meta_options);
+      } else if (meta_options.m_use_sideband_subtraction) {
+        teacher_sideband_subtraction(general_options, specific_options, meta_options);
       } else if (meta_options.m_use_reweighting) {
         teacher_reweighting(general_options, specific_options, meta_options);
       } else {
@@ -452,7 +452,7 @@ namespace Belle2 {
       return expertLocal;
     }
 
-    std::unique_ptr<Belle2::MVA::Expert> teacher_sideband_substraction(const GeneralOptions& general_options,
+    std::unique_ptr<Belle2::MVA::Expert> teacher_sideband_subtraction(const GeneralOptions& general_options,
         const SpecificOptions& specific_options,
         const MetaOptions& meta_options)
     {

@@ -858,7 +858,7 @@ class Overtraining(Plotter):
     def add(self, data, column, train_mask, test_mask, signal_mask, bckgrd_mask, weight_column=None):
         """
         Add a new overtraining plot, I recommend to raw only one overtraining plot at the time,
-        otherwise there are too many curves in the plot to reconize anything in the plot.
+        otherwise there are too many curves in the plot to recognize anything in the plot.
         @param data pandas.DataFrame containing all data
         @param column which is used to calculate distribution histogram
         @param train_mask boolean numpy.array defining which events are training events

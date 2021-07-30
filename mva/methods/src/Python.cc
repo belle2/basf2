@@ -121,7 +121,7 @@ namespace Belle2 {
       }
 
       /**
-        Helper funtion which initializes array system of numpy.
+        Helper function which initializes array system of numpy.
         Since import_array is a weird macro we need this wrapper function
         to protect us from the return statement in this macro
       */

@@ -24,8 +24,8 @@ namespace Belle2 {
     {
       int version = pt.get<int>("TMVA_version");
       if (version != 1) {
-        B2ERROR("Unkown weightfile version " << std::to_string(version));
-        throw std::runtime_error("Unkown weightfile version " + std::to_string(version));
+        B2ERROR("Unknown weightfile version " << std::to_string(version));
+        throw std::runtime_error("Unknown weightfile version " + std::to_string(version));
       }
       m_method = pt.get<std::string>("TMVA_method");
       m_type = pt.get<std::string>("TMVA_type");
@@ -151,8 +151,8 @@ namespace Belle2 {
       Weightfile weightfile;
       std::string logfilename = weightfile.generateFileName(".log");
 
-      // Pipe stdout into a logfile to get TMVA output, which contains valueable information
-      // which cannot be retreived otherwise!
+      // Pipe stdout into a logfile to get TMVA output, which contains valuable information
+      // which cannot be retrieved otherwise!
       // Hence we do some black magic here
       // TODO Using ROOT_VERSION 6.08  this should be possible without this workaround
       auto logfile = open(logfilename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);

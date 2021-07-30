@@ -181,7 +181,7 @@ for ((level = 1 ; level < 5; level++))
          # bsub -q h -J ${trainID}${testID}${processID}T${level} -o ${workingDirectory}'/'TeacherLevel${BelleOrBelle2}${MCType}${level}.out \
          #      basf2 flavorTaggerVertexingValidation.py -- -bob2 ${BelleOrBelle2} -m Teacher -trc ${trainDecayChannel} \
          #      -dc ${testDecayChannel} -mct ${MCType} -wd ${workingDirectory} -sd ${savingDirectory} 
-         # A training job in the queues takes about one day (no paralellization in training). 
+         # A training job in the queues takes about one day (no parallelization in training). 
          # Running on a cx0? machine at kekcc, it takes about 4 hours.
          # A single nohup job per machine is allowed. 
          nohup basf2 flavorTaggerVertexingValidation.py -- -bob2 ${BelleOrBelle2} -m Teacher -trc ${trainDecayChannel} \

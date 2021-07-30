@@ -102,7 +102,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
      cuda_visible_devices: selection of cuda devices
      tensorboard_dir: addition directory for logging the training process
     :param train_valid_fraction: float, train-valid fraction (.92). If transform to probability is
-     enabled, train valid fraction will be splitted to a test set (.5)
+     enabled, train valid fraction will be split into a test set (.5)
     :param maskName: get ROE particles from a specified ROE mask
     :param path: basf2 path obj
     :return: None

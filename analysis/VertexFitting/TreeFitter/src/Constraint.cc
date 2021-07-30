@@ -97,7 +97,7 @@ namespace TreeFitter {
 
     /** here we project the old state and use only the change with respect to the new state
      * instead of the new state in the update . the advantage is more stable fit
-     * Downside: non-linear constraints cant be filtered multiple times anymore.
+     * Downside: non-linear constraints can't be filtered multiple times anymore.
      * */
     p.getResiduals() += p.getH() * (fitpar.getStateVector() - oldState.getStateVector());
     if (!status.failure()) {

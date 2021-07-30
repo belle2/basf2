@@ -521,7 +521,7 @@ if __name__ == '__main__':
         o += b2latex.Section("Classifiers")
         o += b2latex.String(r"""
             This section contains the GeneralOptions and SpecificOptions of all classifiers represented by an XML tree.
-            The same information can be retreived using the basf2\_mva\_info tool.
+            The same information can be retrieved using the basf2\_mva\_info tool.
         """)
 
         table = b2latex.LongTable(r"ll", "Abbreviations of identifiers", "{name} & {abbr}", r"Identifier & Abbreviation")

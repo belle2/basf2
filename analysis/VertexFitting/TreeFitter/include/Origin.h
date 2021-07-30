@@ -50,7 +50,7 @@ namespace TreeFitter {
     /* particle type */
     virtual int type() const override { return kOrigin; }
 
-    /** the actuall constraint projection  */
+    /** the actual constraint projection  */
     ErrCode projectOriginConstraint(const FitParams& fitpar, Projection&) const;
 
     /** the abstract projection  */

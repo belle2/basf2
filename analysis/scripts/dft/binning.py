@@ -52,7 +52,7 @@ def get_bins(arr, bin_count=1024):
 
 
 def get_modified_bin_limits(arr, bin_count=1024):
-    """ Feature binning: this case considers that multiple valuse can have the same value
+    """ Feature binning: this case considers that multiple values can have the same value
     bins are increased respectively and set to the mean value of the new bin
     :param arr: numpy array to get binning for
     :param bin_count: int number of bins
@@ -73,7 +73,7 @@ def get_modified_bin_limits(arr, bin_count=1024):
 
     bin_weights.append(1)
 
-    # increase bin limits slightly (make sure that all occuring values are actually binned correctly)
+    # increase bin limits slightly (make sure that all occurring values are actually binned correctly)
     new_bin_limits[-1] = np.nextafter(new_bin_limits[-1], len(new_bin_limits) * new_bin_limits[-1])
 
     total_bins = sum(bin_weights)

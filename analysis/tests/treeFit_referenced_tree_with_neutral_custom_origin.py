@@ -51,7 +51,7 @@ class TestTreeFits(unittest.TestCase):
                         ipConstraint=False,
                         updateAllDaughters=False,
                         customOriginConstraint=True,
-                        # just to test this doesnt crash
+                        # just to test this doesn't crash
                         customOriginVertex=[0, 0, 0],
                         customOriginCovariance=[1, 0, 0, 0, 1, 0, 0, 0, 1]
                         )

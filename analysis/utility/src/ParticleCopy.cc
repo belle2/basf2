@@ -25,7 +25,7 @@ Particle* ParticleCopy::copyParticle(const Particle* original)
 
   // Copy its daughters as well.
   // At this stage the copy of the particle
-  // internally stores daughter indicies of original.
+  // internally stores daughter indices of original.
   // Copy daughters as well.
   unsigned nDaughters = original->getNDaughters();
 

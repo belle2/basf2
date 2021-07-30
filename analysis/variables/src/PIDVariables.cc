@@ -125,7 +125,7 @@ namespace Belle2 {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid)
           return std::numeric_limits<float>::quiet_NaN();
-        // No informaiton form any subdetector in the list
+        // No information form any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
           return std::numeric_limits<float>::quiet_NaN();
 
@@ -164,7 +164,7 @@ namespace Belle2 {
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid) return std::numeric_limits<float>::quiet_NaN();
-        // No informaiton form any subdetector in the list
+        // No information form any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
           return std::numeric_limits<float>::quiet_NaN();
 
@@ -619,7 +619,7 @@ The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `cluste
     REGISTER_VARIABLE("pidLogLikelihoodValueExpert(pdgCode, detectorList)", pidLogLikelihoodValueExpert,
                       "returns the log likelihood value of for a specific mass hypothesis and  set of detectors.");
     REGISTER_VARIABLE("pidDeltaLogLikelihoodValueExpert(pdgCode1, pdgCode2, detectorList)", pidDeltaLogLikelihoodValueExpert,
-                      "returns LogL(hyp1) - LogL(hyp2) (aka DLL) for two mass hypoteses and a set of detectors.");
+                      "returns LogL(hyp1) - LogL(hyp2) (aka DLL) for two mass hypotheses and a set of detectors.");
     REGISTER_VARIABLE("pidPairProbabilityExpert(pdgCodeHyp, pdgCodeTest, detectorList)", pidPairProbabilityExpert,
                       "Pair (or binary) probability for the pdgCodeHyp mass hypothesis respect to the pdgCodeTest one, using an arbitrary set of detectors. :math:`\\mathcal{L}_{hyp}/(\\mathcal{L}_{test}+\\mathcal{L}_{hyp}`");
     REGISTER_VARIABLE("pidProbabilityExpert(pdgCodeHyp, detectorList)", pidProbabilityExpert,
@@ -639,7 +639,7 @@ The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `cluste
     VARIABLE_GROUP("PID_belle");
     REGISTER_VARIABLE("atcPIDBelle(i,j)", atcPIDBelle,
                       "returns Belle's PID atc variable: ``atc_pid(3,1,5,i,j).prob()``.\n"
-                      "Parameters i,j are signal and backgroud hypothesis: (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)");
+                      "Parameters i,j are signal and background hypothesis: (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)");
     REGISTER_VARIABLE("muIDBelle", muIDBelle,
                       "returns Belle's PID ``Muon_likelihood()`` variable.");
     REGISTER_VARIABLE("muIDBelleQuality", muIDBelleQuality,

@@ -62,7 +62,7 @@ class TestMbcEff(unittest.TestCase):
 
         self.assertTrue(
             allSig == sig_expected,
-            f"Mbc cut efficency has changed! n_sig expected: {sig_expected} found: {allSig}.")
+            f"Mbc cut efficiency has changed! n_sig expected: {sig_expected} found: {allSig}.")
         self.assertTrue(allBkg == bkg_expected, f"Mbc cut background has changed! n_bkg expected: {bkg_expected} found: {allBkg}.")
 
         print("Test passed, cleaning up.")

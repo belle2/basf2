@@ -1068,7 +1068,7 @@ namespace {
   {
     // see also unit tests in framework/formula_parser.cc
     //
-    // keep particle-based tests here, and operator precidence tests (etc) in
+    // keep particle-based tests here, and operator precedence tests (etc) in
     // framework with the parser itself
 
     Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
@@ -2583,8 +2583,8 @@ namespace {
       EXPECT_B2FATAL(Manager::Instance().getVariable("angleToClosestInList"));
       EXPECT_B2FATAL(Manager::Instance().getVariable("angleToClosestInList(A, B)"));
 
-      const auto* nonexistant = Manager::Instance().getVariable("angleToClosestInList(NONEXISTANTLIST)");
-      EXPECT_B2FATAL(nonexistant->function(electron));
+      const auto* nonexistent = Manager::Instance().getVariable("angleToClosestInList(NONEXISTANTLIST)");
+      EXPECT_B2FATAL(nonexistent->function(electron));
 
       const auto* empty = Manager::Instance().getVariable("angleToClosestInList(testEmptyList)");
       EXPECT_TRUE(std::isnan(empty->function(electron)));
@@ -2600,8 +2600,8 @@ namespace {
       EXPECT_B2FATAL(Manager::Instance().getVariable("closestInList"));
       EXPECT_B2FATAL(Manager::Instance().getVariable("closestInList(A, B, C)"));
 
-      const auto* nonexistant = Manager::Instance().getVariable("closestInList(NONEXISTANTLIST, E)");
-      EXPECT_B2FATAL(nonexistant->function(electron));
+      const auto* nonexistent = Manager::Instance().getVariable("closestInList(NONEXISTANTLIST, E)");
+      EXPECT_B2FATAL(nonexistent->function(electron));
 
       const auto* empty = Manager::Instance().getVariable("closestInList(testEmptyList, E)");
       EXPECT_TRUE(std::isnan(empty->function(electron)));
@@ -2620,8 +2620,8 @@ namespace {
       EXPECT_B2FATAL(Manager::Instance().getVariable("angleToMostB2BInList"));
       EXPECT_B2FATAL(Manager::Instance().getVariable("angleToMostB2BInList(A, B)"));
 
-      const auto* nonexistant = Manager::Instance().getVariable("angleToMostB2BInList(NONEXISTANTLIST)");
-      EXPECT_B2FATAL(nonexistant->function(electron));
+      const auto* nonexistent = Manager::Instance().getVariable("angleToMostB2BInList(NONEXISTANTLIST)");
+      EXPECT_B2FATAL(nonexistent->function(electron));
 
       const auto* empty = Manager::Instance().getVariable("angleToMostB2BInList(testEmptyList)");
       EXPECT_TRUE(std::isnan(empty->function(electron)));
@@ -2637,8 +2637,8 @@ namespace {
       EXPECT_B2FATAL(Manager::Instance().getVariable("mostB2BInList"));
       EXPECT_B2FATAL(Manager::Instance().getVariable("mostB2BInList(A, B, C)"));
 
-      const auto* nonexistant = Manager::Instance().getVariable("mostB2BInList(NONEXISTANTLIST, E)");
-      EXPECT_B2FATAL(nonexistant->function(electron));
+      const auto* nonexistent = Manager::Instance().getVariable("mostB2BInList(NONEXISTANTLIST, E)");
+      EXPECT_B2FATAL(nonexistent->function(electron));
 
       const auto* empty = Manager::Instance().getVariable("mostB2BInList(testEmptyList, E)");
       EXPECT_TRUE(std::isnan(empty->function(electron)));
@@ -5020,18 +5020,18 @@ namespace {
     EXPECT_B2FATAL(Manager::Instance().getVariable("transformedNetworkOutput(NONSENSE)"));
 
     // check that helpful B2FATAL is thrown if second or third argument is not a double
-    EXPECT_B2FATAL(Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTANT, 0, NOTDOUBLE)"));
-    EXPECT_B2FATAL(Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTANT, NOTDOUBLE, 1)"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTENT, 0, NOTDOUBLE)"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTENT, NOTDOUBLE, 1)"));
 
     // check for NaN if network output variable does not exist (no matter whether particle is provided or not)
     StoreArray<Particle> myParticles;
     const Particle* particle = myParticles.appendNew();
-    const Manager::Var* var = Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTANT, 0, 1)");
+    const Manager::Var* var = Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTENT, 0, 1)");
     EXPECT_TRUE(std::isnan(var->function(particle)));
     StoreObjPtr<EventExtraInfo> eventExtraInfo;
     if (not eventExtraInfo.isValid())
       eventExtraInfo.create();
-    var = Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTANT, 0, 1)");
+    var = Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTENT, 0, 1)");
     EXPECT_TRUE(std::isnan(var->function(nullptr)));
   }
 }

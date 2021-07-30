@@ -10,18 +10,14 @@
 #include <ecl/modules/eclHadronTimeCalibrationValidationCollector/eclHadronTimeCalibrationValidationCollectorModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <ecl/digitization/EclConfiguration.h>
 
-#include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/ClusterUtility/ClusterUtils.h>
 #include <boost/optional.hpp>
 
 #include <TH2F.h>

@@ -40,7 +40,7 @@ namespace Belle2 {
       } else if (boost::ends_with(filename, ".xml")) {
         Belle2::MVA::Weightfile::saveToXMLFile(weightfile, filename);
       } else {
-        std::cerr << "Unkown file extension, fallback to xml" << std::endl;
+        std::cerr << "Unknown file extension, fallback to xml" << std::endl;
         Belle2::MVA::Weightfile::saveToXMLFile(weightfile, filename);
       }
     }
@@ -54,7 +54,7 @@ namespace Belle2 {
       } else  if (boost::ends_with(filename, ".xml")) {
         weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(filename);
       } else {
-        std::cerr << "Unkown file extension, fallback to xml" << std::endl;
+        std::cerr << "Unknown file extension, fallback to xml" << std::endl;
         weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(filename);
       }
       Belle2::MVA::Weightfile::saveToDatabase(weightfile, identifier, iov);
@@ -73,7 +73,7 @@ namespace Belle2 {
         } else  if (boost::ends_with(filename, ".xml")) {
           weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(filename);
         } else {
-          std::cerr << "Unkown file extension, fallback to xml" << std::endl;
+          std::cerr << "Unknown file extension, fallback to xml" << std::endl;
           weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(filename);
         }
         weightfiles.push_back(weightfile);
@@ -330,7 +330,7 @@ namespace Belle2 {
         total_data += data_weights[iEvent];
       }
 
-      // We do a simple fit here to estimate the signal and backgrund yields
+      // We do a simple fit here to estimate the signal and background yields
       // We could use RooFit here to avoid using custom code,
       // but I found RooFit to be difficult and unstable ...
 

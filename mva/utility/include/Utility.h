@@ -130,7 +130,7 @@ namespace Belle2 {
                                                        const MetaOptions& meta_options);
 
     /**
-     * Performs a sideband substraction training, convenience function
+     * Performs a sideband subtraction training, convenience function
      * @param general_options shared options of all methods
      * @param splot_options splot options defining the splot training
      * @param specific_options of the used mva method

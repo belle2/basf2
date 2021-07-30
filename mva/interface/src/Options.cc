@@ -100,11 +100,11 @@ namespace Belle2 {
        "Monte carlo files containing the discriminant variable with the mc truth")
       ("splot_combined", po::value<bool>(&m_splot_combined), "Combine sPlot training with PDF classifier for discriminating variable")
       ("splot_boosted", po::value<bool>(&m_splot_boosted), "Use boosted sPlot training (aPlot)")
-      ("use_sideband_substraction", po::value<bool>(&m_use_sideband_substraction), "whether to do a sideband substraction training")
+      ("use_sideband_substraction", po::value<bool>(&m_use_sideband_substraction), "whether to do a sideband subtraction training")
       ("sideband_mc_files", po::value<std::vector<std::string>>(&m_sideband_mc_files)->multitoken(),
        "Monte carlo files used to estimate the number of events in the different regions. (Must contain the same signal / background distribution as is expected in data)")
       ("sideband_variable", po::value<std::string>(&m_sideband_variable),
-       "Variable defining the signal region (1) background region (2) negative signal region (3) or unused (otherwise) for the sideband substraction")
+       "Variable defining the signal region (1) background region (2) negative signal region (3) or unused (otherwise) for the sideband subtraction")
       ("use_reweighting", po::value<bool>(&m_use_reweighting), "whether to do a reweighting pre training")
       ("reweighting_variable", po::value<std::string>(&m_reweighting_variable),
        "Variable defining for which events the reweighting should be used (1) or not used (0). If empty the reweighting is applied to all events")

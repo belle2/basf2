@@ -19,8 +19,8 @@ namespace Belle2 {
 
       int version = pt.get<int>("FANN_version");
       if (version != 1) {
-        B2ERROR("Unkown weightfile version " << std::to_string(version));
-        throw std::runtime_error("Unkown weightfile version " + std::to_string(version));
+        B2ERROR("Unknown weightfile version " << std::to_string(version));
+        throw std::runtime_error("Unknown weightfile version " + std::to_string(version));
       }
       m_max_epochs = pt.get<unsigned int>("FANN_max_epochs");
       m_verbose_mode = pt.get<bool>("FANN_verbose_mode");

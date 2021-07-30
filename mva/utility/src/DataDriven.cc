@@ -85,10 +85,10 @@ namespace Belle2 {
       }
 
       if (sum_signal_br / sum_br > 0.01) {
-        B2WARNING("The background region you defined in the sideband substraction contains more than 1% signal");
+        B2WARNING("The background region you defined in the sideband subtraction contains more than 1% signal");
       }
       if (sum_signal_nr / sum_nr > 0.01) {
-        B2WARNING("The negative signal region you defined in the sideband substraction contains more than 1% signal");
+        B2WARNING("The negative signal region you defined in the sideband subtraction contains more than 1% signal");
       }
 
       if (sum_data_sr - sum_signal_sr < 0) {
@@ -115,7 +115,7 @@ namespace Belle2 {
       B2INFO("Data " << total_data << " " << sum_data_sr << " " << sum_data_br << " " << sum_data_nr);
       B2INFO("MC " << total_mc << " " << sum_sr << " " << sum_br << " " << sum_nr);
       B2INFO("MC (signal)" << total_signal_mc << " " << sum_signal_sr << " " << sum_signal_br << " " << sum_signal_nr);
-      B2INFO("Sideband Substraction: Signal Weight " << m_signal_weight << " Background Weight " << m_background_weight <<
+      B2INFO("Sideband Subtraction: Signal Weight " << m_signal_weight << " Background Weight " << m_background_weight <<
              " Negative Signal Weight " << m_negative_signal_weight);
 
     }
@@ -180,7 +180,7 @@ namespace Belle2 {
       // Instead of calculating the covariance matrix directly one could do an actual fit here,
       // this would reduce the reliance on MC even further.
       // Also it should be no problem generalize this code to more than two components.
-      // I didn't implement this, yet. Since it is not forseeable if and in which context this will be used,
+      // I didn't implement this, yet. Since it is not foreseeable if and in which context this will be used,
       // so feel free to implement the missing features here.
 
       auto discriminants = dataset.getFeature(0);

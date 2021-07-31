@@ -473,7 +473,7 @@ PID for B2BII
    These variables are to be used only when analysing converted Belle samples.
 
 .. b2-variables::
-   :group: PID_belle
+   :group: Belle PID variables
 
 
 Miscellaneous

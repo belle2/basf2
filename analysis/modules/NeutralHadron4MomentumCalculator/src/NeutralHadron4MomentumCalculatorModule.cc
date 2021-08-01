@@ -12,6 +12,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <analysis/utility/ParticleCopy.h>
 #include <framework/geometry/B2Vector3.h>
 #include <TLorentzVector.h>
 #include <vector>
@@ -68,7 +69,10 @@ void NeutralHadron4MomentumCalculatorModule::event()
         others4Momentum += daughters[j]->get4Vector();
       }
     }
-    Particle* neutral = daughters[m_iNeutral];
+    const Particle* originalNeutral = daughters[m_iNeutral];
+    Particle* neutral = ParticleCopy::copyParticle(originalNeutral);
+    particle->removeDaughter(originalNeutral);
+    particle->appendDaughter(neutral);
     B2Vector3D neutralDirection;
     if (neutral->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster) {
       neutralDirection = neutral->getECLCluster()->getClusterPosition().Unit();

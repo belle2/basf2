@@ -23,10 +23,12 @@ stdK('higheff', path=mypath)
 stdPi('higheff', path=mypath)
 stdPr('higheff', path=mypath)
 ma.reconstructDecay('D-:sig -> K+:higheff pi-:higheff pi-:higheff', 'abs(dM) < 0.05', path=mypath)
-ma.fillParticleList('anti-n0:sig', 'clusterE > 0.5 and isFromECL > 0', path=mypath)
-ma.reconstructDecayWithNeutralHadron('B0:Dpnbar -> D-:sig p+:higheff ^anti-n0:sig', '', chargeConjugation=False, path=mypath)
-ma.applyCuts('B0:Dpnbar', 'deltaE < 0.5', path=mypath)
-ma.variablesToNtuple('B0:Dpnbar', ['deltaE', 'M'], filename='neutralHadron4MomentumCalculation.root', path=mypath)
+ma.fillParticleList('anti-n0:good', 'isFromECL > 0', path=mypath)
+ma.reconstructDecayWithNeutralHadron('B0:sig -> D-:sig p+:higheff ^anti-n0:good', '', chargeConjugation=False, path=mypath)
+
+fname = 'neutralHadron4MomentumCalculation.root'
+ma.variablesToNtuple('B0:sig', ['deltaE', 'M', 'daughter(2,p)', 'daughter(2,clusterE)'], treename='B0', filename=fname, path=mypath)
+ma.variablesToNtuple('anti-n0:good', ['p'], treename='nbar', filename=fname, path=mypath)
 
 process(mypath)
 B2INFO(statistics)

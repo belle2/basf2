@@ -30,7 +30,7 @@ NeutralHadron4MomentumCalculatorModule::NeutralHadron4MomentumCalculatorModule()
 
   // Parameter definitions
   addParam("decayString", m_decayString, "Decay string for which one wants to perform the calculation", std::string(""));
-  addParam("allowNonNeutronHadron", m_fAllowNonNeutralHadron, "Whether to check the name of the selected particle", false);
+  addParam("allowGamma", m_allowGamma, "Whether allow the selected particle to be gamma", false);
 
 }
 
@@ -46,9 +46,16 @@ void NeutralHadron4MomentumCalculatorModule::initialize()
     B2ERROR("NeutralHadron4MomentumCalculatorModule::initialize Only one particle can be selected in " << m_decayString);
   if (hierarchy[0].size() != 2)
     B2ERROR("NeutralHadron4MomentumCalculatorModule::initialize The selected particle must be a direct daughter " << m_decayString);
-  if (!m_fAllowNonNeutralHadron and hierarchy[0][1].second != "n0" and hierarchy[0][1].second != "K_L0")
-    B2ERROR("NeutralHadron4MomentumCalculatorModule::initialize The selected particle must be a long-lived neutral hadron i.e. (anti-)n0 or K_L0 "
-            << m_decayString);
+
+  std::string neutralHadronName = hierarchy[0][1].second;
+  if (neutralHadronName != "n0" and neutralHadronName != "K_L0") {
+    if (m_allowGamma == true and hierarchy[0][1].second == "gamma")
+      B2WARNING("NeutralHadron4MomentumCalculatorModule::initialize The selected particle is gamma but you allowed so; be aware.");
+    else
+      B2ERROR("NeutralHadron4MomentumCalculatorModule::initialize The selected particle must be a long-lived neutral hadron "
+              "i.e. (anti-)n0 or K_L0, or at least a photon (gamma), in which case you need to set allowGamma as true."
+              "Input particle: " << m_decayString);
+  }
 
   m_iNeutral = hierarchy[0][1].first;
 

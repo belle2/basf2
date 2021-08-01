@@ -3588,7 +3588,7 @@ def getNbarIDMVA(particleList, path=None, ):
     variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
 
 
-def reconstructDecayWithNeutralHadron(decayString, cut, path=None, **kwargs):
+def reconstructDecayWithNeutralHadron(decayString, cut, allowGamma=False, path=None, **kwargs):
     r"""
     Reconstructs decay with a long-lived neutral hadron e.g.
     :math:`B^0 \to J/\psi K_L^0`,
@@ -3610,12 +3610,14 @@ def reconstructDecayWithNeutralHadron(decayString, cut, path=None, **kwargs):
 
     @param decayString A decay string following the mentioned rules
     @param cut Cut to apply to the particle list
+    @param allowGamma whether allow the selected particle to be ``gamma``
     @param path The path to put in the module
     """
     reconstructDecay(decayString, cut, path=path, **kwargs)
     module = register_module('NeutralHadron4MomentumCalculator')
     module.set_name('NeutralHadron4MomentumCalculator_' + decayString)
     module.param('decayString', decayString)
+    module.param('allowGamma', allowGamma)
     path.add_module(module)
 
 

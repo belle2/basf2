@@ -38,6 +38,6 @@ namespace Belle2 {
     DecayDescriptor m_decayDescriptor; /**< Decay Descriptor to be initialized with m_decayString */
     int m_iNeutral = 0; /**< Index of the neutral hadron in the decay string */
     StoreObjPtr<ParticleList> m_plist;  /**< ParticleList that one wants to perform the calculation */
-    bool m_allowGamma;  /** <  Whether allow the selected particle to be gamma */
+    bool m_allowGamma;  /**<  Whether allow the selected particle to be gamma */
   };
 }

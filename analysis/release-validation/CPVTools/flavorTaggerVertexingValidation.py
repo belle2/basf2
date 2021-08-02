@@ -132,7 +132,7 @@ def reconstructB2JpsiKs_mu(belleOrBelle2Flag='Belle2'):
         ma.matchMCTruth(list_name='K_S0:mdst', path=cp_val_path)
 
         # reconstruct B0 -> J/psi Ks decay
-        ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu  K_S0:mdst', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
+        ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu  K_S0:mdst', cut='Mbc > 5.2 and abs(deltaE) < 0.15', path=cp_val_path)
 
     if belleOrBelle2Flag == "Belle2":
 
@@ -141,7 +141,7 @@ def reconstructB2JpsiKs_mu(belleOrBelle2Flag='Belle2'):
         ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=cp_val_path)
 
         # reconstruct B0 -> J/psi Ks decay
-        ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
+        ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE) < 0.15', path=cp_val_path)
 
 
 def reconstructB2nunubar():

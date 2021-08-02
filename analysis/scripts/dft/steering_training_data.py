@@ -78,8 +78,8 @@ def test_expert_jpsi(working_dir, file_names, prefix, environmentType='MC5', max
 
     ma.inputMdstList(environmentType, file_names, path=main)
 
-    ma.fillParticleList('pi+:highPID', 'piid >= .1', path=main)
-    ma.fillParticleList('mu+:highPID', 'muid >= .1', path=main)
+    ma.fillParticleList('pi+:highPID', 'pionID >= .1', path=main)
+    ma.fillParticleList('mu+:highPID', 'muonID >= .1', path=main)
 
     # reconstruct Ks -> pi+ pi- decay
     # keep only candidates with dM<0.25

@@ -115,8 +115,20 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         B2FATAL('Invalid mode  %s' % mode)
 
     if variable_list is None and mode in ['sampler', 'teacher']:
-        variable_list = ['useCMSFrame(p)', 'useCMSFrame(cosTheta)', 'useCMSFrame(phi)', 'Kid', 'eid', 'muid', 'prid',
-                         'nCDCHits', 'nPXDHits', 'nSVDHits', 'dz', 'dr', 'chiProb']
+        variable_list = [
+            'useCMSFrame(p)',
+            'useCMSFrame(cosTheta)',
+            'useCMSFrame(phi)',
+            'kaonID',
+            'electronID',
+            'muonID',
+            'protonID',
+            'nCDCHits',
+            'nPXDHits',
+            'nSVDHits',
+            'dz',
+            'dr',
+            'chiProb']
 
     if variable_list is not None and mode == 'expert':
         B2ERROR('DFT: Variables from identifier file are used. Input variables will be ignored.')

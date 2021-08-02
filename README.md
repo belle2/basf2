@@ -12,13 +12,10 @@ It is used in all aspects of the data-processing chain, such as
 and high-level "analysis" reconstruction (such as applying selection criteria,
 vertex fitting, ...).
 
-In addition to the code of this repository, the Belle II tools
-([members only](https://stash.desy.de/projects/B2/repos/tools/browse))
-and the Belle II externals
-([members only](https://stash.desy.de/projects/B2/repos/externals/browse))
-are required to run the software. They will be released as open source soon.
+In addition to the code of this repository, the Belle II tools ([public repository](https://github.com/belle2/tools), [internal repository](https://github.com/belle2/tools))
+and the Belle II externals ([public repository](https://github.com/belle2/externals), [internal repository](https://github.com/belle2/externals)) are required to run the software.
 
-Note that this repository only contains part of the history of the code. Belle II
+Note that this repository currently only contains part of the history of the code. Belle II
 members can include the remaining history using `b2code-history`.
 
 Head to [our documentation](software.belle2.org/) (members only) to learn about
@@ -29,3 +26,4 @@ just starting out.
 
 More information about the core software can be found in the
 [2018 paper](https://arxiv.org/abs/1809.04299).
+

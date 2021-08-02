@@ -18,7 +18,7 @@ The content of this directory is imported code written by:
 * V. Yundin
 * D. Zhuridov
 
-For further information please contact the original author or see http://ific.uv.es/~rodrigo/phokhara/.
+For further information please contact the original authors or see http://ific.uv.es/~rodrigo/phokhara/.
 
 The relevant papers are:
 

@@ -25,7 +25,7 @@ import modularAnalysis as ma
 import os
 import sys
 
-from reconstruction import add_mdst_output
+from mdst import add_mdst_output
 
 if len(sys.argv) != 3:
     sys.exit('Must provide three input parameters: [Belle_Belle2] [output_root_file_name]'

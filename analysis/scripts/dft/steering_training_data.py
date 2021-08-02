@@ -35,9 +35,7 @@ def create_train_data(
 
     ma.inputMdstList(environmentType, filelist=file_names, path=main)
 
-    ma.findMCDecay('B0:sig', 'B0 -> nu_tau anti-nu_tau', writeOut=True, path=main)
-    ma.matchMCTruth('B0:sig', main)
-    ma.applyCuts('B0:sig', 'isSignal > 0.5', path=main)
+    ma.reconstructMCDecay('B0:sig -> nu_tau anti-nu_tau', '', writeOut=True, path=main)
 
     ma.buildRestOfEvent('B0:sig', path=main)
 
@@ -56,9 +54,7 @@ def test_expert(working_dir, file_names, identifier, output_variable='networkOut
 
     ma.inputMdstList(environmentType, file_names, path=main)
 
-    ma.findMCDecay('B0:sig', 'B0 -> nu_tau anti-nu_tau', writeOut=True, path=main)
-    ma.matchMCTruth('B0:sig', main)
-    ma.applyCuts('B0:sig', 'isSignal > 0.5', path=main)
+    ma.reconstructMCDecay('B0:sig -> nu_tau anti-nu_tau', '', writeOut=True, path=main)
 
     ma.buildRestOfEvent('B0:sig', path=main)
 

@@ -22,6 +22,8 @@ import unittest
 import glob
 import shutil
 from typing import Optional, List, Dict
+import stat
+from pathlib import Path
 
 # basf2
 from basf2 import find_file
@@ -37,6 +39,30 @@ def light_release() -> bool:
     except ModuleNotFoundError:
         return True
     return False
+
+
+def _permission_report(folder: str) -> None:
+    """Quick helper function to show permissions of folder and a selection
+    of files in it
+    """
+    folder = Path(folder)
+    print("-"*80)
+    print(f"Permissions of {folder}: {folder.stat()}")
+    content = list(folder.iterdir())
+    print(content[0].exists())
+    if content:
+        print(
+            f"Permission of one of its contents. {content[0]}: "
+            f"{content[0].stat()}"
+        )
+    test_file = folder / "test_file_123456"
+    try:
+        test_file.touch()
+    except Exception as e:
+        print(f"Cannot create a new file in the folder: {e}")
+    else:
+        print("Able to create a new file in this folder")
+    print("-"*80)
 
 
 class SteeringFileTest(unittest.TestCase):
@@ -88,7 +114,13 @@ class SteeringFileTest(unittest.TestCase):
         # into a new directory and then cd it as working directory when subprocess.run is executed,
         # otherwise the test will fail horribly if find_file is called by one of the tested steerings.
         original_dir = find_file(path_to_glob)
+        print(f"Our user id: {os.getuid()}")
+        _permission_report(original_dir)
         working_dir = find_file(shutil.copytree(original_dir, "working_dir"))
+        _permission_report(working_dir)
+        # Add write permissions for user to this directory
+        # os.chmod(working_dir, stat.S_IRUSR)
+        # _permission_report(working_dir)
         all_egs = sorted(glob.glob(working_dir + "/*.py"))
         for eg in all_egs:
             filename = os.path.basename(eg)

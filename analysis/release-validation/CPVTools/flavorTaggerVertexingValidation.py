@@ -229,7 +229,7 @@ def applyCPVTools(mode='Expert'):
 
         if doVertex:
             if decayChannel == "JPsiKs":
-                # vx.raveFit(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
+                # vx.kFit(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
                 #         constraint='', path=cp_val_path)
                 vx.treeFit(list_name='B0:sig', conf_level=-2, path=cp_val_path)
             vx.TagV(list_name='B0:sig', MCassociation='breco', path=cp_val_path)

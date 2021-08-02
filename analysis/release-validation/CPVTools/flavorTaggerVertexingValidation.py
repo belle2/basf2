@@ -212,7 +212,7 @@ def applyCPVTools(mode='Expert'):
             samplerFileId=str(fileNumber),
             path=cp_val_path)
 
-        # # Preliminar DNN Identifier has to be set by hand when validating
+        # # Preliminarily, DNN Identifier has to be set by hand when validating
         # # The standard name should be however
         # This is temporary till the DNN gets retrained.
         dnnIdentifier = "FlavorTagger_" + belleOrBelle2Flag + "_B2nunubarBGx1OptimizedForDataDNN"

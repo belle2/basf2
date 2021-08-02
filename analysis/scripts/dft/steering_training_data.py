@@ -106,7 +106,7 @@ def test_expert_jpsi(working_dir, file_names, prefix, environmentType='MC5', max
     # Fit the B0 Vertex
     raveFit('B0:jpsiks', 0., 'vertex', 'B0 -> [J/psi -> ^mu+ ^mu-] K_S0', '', path=main, silence_warning=True)
 
-    # perform MC matching (MC truth asociation). Always before TagV
+    # perform MC matching (MC truth association). Always before TagV
     ma.matchMCTruth('B0:jpsiks', path=main)
 
     # build the rest of the event associated to the B0

@@ -49,7 +49,7 @@ if belleOrBelle2Flag == "Belle":
 ma.inputMdstList(environmentType=environmentType, filelist=[], path=cp_val_path)
 
 ma.fillParticleList(decayString='mu+:all', cut='', path=cp_val_path)
-ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='dM<0.11', path=cp_val_path)
+ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='abs(dM) < 0.11', path=cp_val_path)
 ma.matchMCTruth(list_name='J/psi:mumu', path=cp_val_path)
 
 if belleOrBelle2Flag == "Belle":
@@ -64,7 +64,7 @@ if belleOrBelle2Flag == "Belle2":
 
     # reconstruct Ks from standard pi+ particle list
     ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
-    ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=cp_val_path)
+    ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='abs(dM) < 0.25', path=cp_val_path)
 
     # reconstruct B0 -> J/psi Ks decay
     ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE) < 0.15', path=cp_val_path)

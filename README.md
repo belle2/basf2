@@ -12,8 +12,11 @@ It is used in all aspects of the data-processing chain, such as
 and high-level "analysis" reconstruction (such as applying selection criteria,
 vertex fitting, ...).
 
-In addition to the code of this repository, the Belle II tools ([public repository](https://github.com/belle2/tools), [internal repository](https://github.com/belle2/tools))
-and the Belle II externals ([public repository](https://github.com/belle2/externals), [internal repository](https://github.com/belle2/externals)) are required to run the software.
+In addition to the code of this repository, the following three repositories are required:
+
+* Belle II tools ([public repository](https://github.com/belle2/tools), [internal repository](https://github.com/belle2/tools)): Scripts to install and set up basf2 
+* Belle II externals ([public repository](https://github.com/belle2/externals), [internal repository](https://github.com/belle2/externals)): Manages external dependencies of basf2
+* Belle II versioning ([public repository](https://github.com/belle2/versioning), [internal repository](https://stash.desy.de/projects/B2/repos/versioning/)): Manages the different versions of basf2 and related conditions database global tags
 
 Note that this repository currently only contains part of the history of the code. Belle II
 members can include the remaining history using `b2code-history`.

@@ -205,7 +205,7 @@ def applyCPVTools(mode='Expert'):
         dnnIdentifier = "FlavorTagger_" + belleOrBelle2Flag + "_B2nunubarBGx1OptimizedForDataDNN"
         if belleOrBelle2Flag == "Belle":
             dnnIdentifier = "FlavorTagger_" + belleOrBelle2Flag + "_B2nunubarBGx1DNN"
-        b2.conditions.append_globaltag("analysis_tools_release-03-02-00")
+        b2.conditions.append_globaltag("analysis_tools_release-04-00")
         DeepFlavorTagger.DeepFlavorTagger('B0:sig',
                                           mode='expert',
                                           working_dir='',

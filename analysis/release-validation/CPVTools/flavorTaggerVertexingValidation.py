@@ -163,20 +163,7 @@ def mcMatchAndBuildROE(belleOrBelle2Flag='Belle2'):
     ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
 
     # build the rest of the event associated to the B0
-    if belleOrBelle2Flag == "Belle":
-        target_list_name = 'B0:sig'
-        ma.fillParticleList('pi+:mdst', '', path=cp_val_path)
-        ma.fillParticleList('gamma:mdst', '', path=cp_val_path)
-        # ma.fillParticleList('K_L0:mdst', '', path=cp_val_path)
-        inputParticlelists = ['pi+:mdst', 'gamma:mdst']
-        roeBuilder = b2.register_module('RestOfEventBuilder')
-        roeBuilder.set_name('ROEBuilder_' + target_list_name)
-        roeBuilder.param('particleList', target_list_name)
-        roeBuilder.param('particleListsInput', inputParticlelists)
-        cp_val_path.add_module(roeBuilder)
-
-    if belleOrBelle2Flag == "Belle2":
-        ma.buildRestOfEvent(target_list_name='B0:sig', inputParticlelists=[], path=cp_val_path)
+    ma.buildRestOfEvent(target_list_name='B0:sig', path=cp_val_path)
 
 
 def applyCPVTools(mode='Expert'):

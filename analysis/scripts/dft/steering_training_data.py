@@ -58,7 +58,6 @@ def test_expert(working_dir, file_names, identifier, output_variable='networkOut
 
     ma.buildRestOfEvent('B0:sig', path=main)
 
-    # main.add_module('PrintCollections')
     DeepFlavorTagger('B0:sig', 'expert', working_dir, identifier, path=main)
 
     # define output variable
@@ -107,7 +106,6 @@ def test_expert_jpsi(working_dir, file_names, prefix, environmentType='MC5', max
     # build the rest of the event associated to the B0
     ma.buildRestOfEvent('B0:jpsiks', path=main)
     ma.applyCuts('B0:jpsiks', 'isSignal > 0.5', path=main)
-    # main.add_module('PrintCollections')
 
     DeepFlavorTagger('B0:jpsiks', 'Expert', working_dir, prefix, transform_to_probability=True, path=main)
     ma.variablesToNtuple('B0:jpsiks', ['extraInfo(qrCombined)', 'extraInfo(qrMC)', 'extraInfo(B0Probability)',

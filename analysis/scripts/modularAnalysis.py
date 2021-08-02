@@ -30,7 +30,6 @@ def setAnalysisConfigParams(configParametersAndValues, path):
 
     - 'mcMatchingVersion': Specifies what version of mc matching algorithm is going to be used:
 
-          - 'MC5' - analysis of BelleII MC5
           - 'Belle' - analysis of Belle MC
           - 'BelleII' (default) - all other cases
 

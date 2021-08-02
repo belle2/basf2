@@ -87,7 +87,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
     :param signal_fraction: float, (experimental) signal fraction override,
      transform to output to a probability if an uneven signal/background fraction is used in the training data,
      can only be set during training
-    :param classifier_args: dictionary, costumized arguments for the mlp
+    :param classifier_args: dictionary, customized arguments for the mlp
      possible attributes of the dictionary are:
      lr_dec_rate: learning rate decay rate
      lr_init: learning rate initial value

@@ -153,9 +153,9 @@ void FlavorTaggerInfoFillerModule::event()
               infoMapsFBDT->setProbEventLevel(category, categoryProb);
               infoMapsFBDT -> setQpCategory(category, qpCategory);
               if (m_istrueCategories and m_mcparticles.isValid()) {
-                float isTrueTarget = std::get<bool>(manager.getVariable("hasTrueTarget(" + category + ")")-> function(nullptr));
+                float isTrueTarget = std::get<double>(manager.getVariable("hasTrueTarget(" + category + ")")-> function(nullptr));
                 infoMapsFBDT -> setHasTrueTarget(category, isTrueTarget);
-                float isTrueCategory = std::get<bool>(manager.getVariable("isTrueCategory(" + category + ")")-> function(nullptr));
+                float isTrueCategory = std::get<double>(manager.getVariable("isTrueCategory(" + category + ")")-> function(nullptr));
                 infoMapsFBDT -> setIsTrueCategory(category, isTrueCategory);
               }
               if (m_trackPointers) {

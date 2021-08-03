@@ -385,29 +385,34 @@ namespace Belle2 {
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("L1 Trigger");
     REGISTER_VARIABLE("L1Trigger", L1Trigger ,
-                      "[Eventbased] Returns 1 if at least one PSNM L1 trigger bit is true.");
+                      "[Eventbased] Returns 1 if at least one PSNM L1 trigger bit is true.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("L1PSNM(name)", L1PSNM ,
-                      "[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of the trigger bit with the given name.");
+                      "[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of the trigger bit with the given name.",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("L1FTDL(name)", L1FTDL ,
-                      "[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of the trigger bit with the given name.");
+                      "[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of the trigger bit with the given name.",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("L1Input(name)", L1Input,
-                      "[Eventbased] Returns the input bit status of the trigger bit with the given name.");
+                      "[Eventbased] Returns the input bit status of the trigger bit with the given name.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("L1Prescale(name)", L1PSNMPrescale,
-                      "[Eventbased] Returns the PSNM (prescale and mask) prescale of the trigger bit with the given name.");
+                      "[Eventbased] Returns the PSNM (prescale and mask) prescale of the trigger bit with the given name.",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("L1PSNMBit(i)", L1PSNMBit,
-                      "[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of i-th trigger bit.");
+                      "[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of i-th trigger bit.",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("L1FTDLBit(i)", L1FTDLBit,
-                      "[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of i-th trigger bit.");
+                      "[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of i-th trigger bit.",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("L1InputBit(i)", L1InputBit,
-                      "[Eventbased] Returns the input bit status of the i-th input trigger bit.");
+                      "[Eventbased] Returns the input bit status of the i-th input trigger bit.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("L1PSNMBitPrescale(i)", L1PSNMBitPrescale,
-                      "[Eventbased] Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
+                      "[Eventbased] Returns the PSNM (prescale and mask) prescale of i-th trigger bit.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("L1TimeType", L1TimeType,
-                      "[Eventbased] Returns ETimingType time type.");
+                      "[Eventbased] Returns ETimingType time type.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("L1TimeQuality", L1TimeQuality,
-                      "[Eventbased] Returns ETimingQuality time quality.");
+                      "[Eventbased] Returns ETimingQuality time quality.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("isPoissonTriggerInInjectionVeto", isPoissonInInjectionVeto,
-                      "[Eventbased] Returns 1 if the poisson random trigger is within the injection veto window.");
+                      "[Eventbased] Returns 1 if the poisson random trigger is within the injection veto window.", Manager::VariableDataType::c_double);
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("Software Trigger");
     REGISTER_VARIABLE("SoftwareTriggerResult(triggerIdentifier)", softwareTriggerResult, R"DOC(
@@ -431,7 +436,7 @@ which is equivalent to
 
 .. seealso:: ``b2hlt_triggers`` for possible triggerIdentifiers.
 
-        )DOC");
+        )DOC", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("SoftwareTriggerResultNonPrescaled(triggerIdentifier)", softwareTriggerResultNonPrescaled,
                       "[Eventbased] [Expert] returns the SoftwareTriggerCutResult, "
@@ -440,14 +445,14 @@ which is equivalent to
                       "It is defined as reject (-1), accept (1), or noResult (0). Note "
                       "that the meanings of these change depending if using trigger "
                       "or the skim stage, hence expert."
-                      "If the trigger identifier is not found, returns NaN.");
+                      "If the trigger identifier is not found, returns NaN.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("HighLevelTrigger", passesAnyHighLevelTrigger,
-                      "[Eventbased] True if event passes the HLT trigger, false if not");
+                      "[Eventbased] True if event passes the HLT trigger, false if not", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("SoftwareTriggerPrescaling(triggerIdentifier)", softwareTriggerPrescaling,
                       "[Eventbased] return the prescaling for the specific software trigger identifier. "
                       "Please note, this prescaling is taken from the currently setup database. It only corresponds "
                       "to the correct HLT prescale if you are using the online database!"
-                      "If the trigger identifier is not found, returns NaN.");
+                      "If the trigger identifier is not found, returns NaN.", Manager::VariableDataType::c_double);
     //-------------------------------------------------------------------------
   }
 }

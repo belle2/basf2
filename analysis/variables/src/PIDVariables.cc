@@ -581,33 +581,46 @@ namespace Belle2 {
     // PID variables to be used for analysis
     VARIABLE_GROUP("PID");
     REGISTER_VARIABLE("particleID", particleID,
-                      "the particle identification probability under the particle's own hypothesis, using info from all available detectors, *excluding the SVD*");
+                      "the particle identification probability under the particle's own hypothesis, using info from all available detectors, *excluding the SVD*",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("electronID", electronID,
-                      "electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*");
+                      "electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muonID", muonID,
-                      "muon identification probability defined as :math:`\\mathcal{L}_\\mu/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*");
+                      "muon identification probability defined as :math:`\\mathcal{L}_\\mu/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("pionID", pionID,
-                      "pion identification probability defined as :math:`\\mathcal{L}_\\pi/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*");
+                      "pion identification probability defined as :math:`\\mathcal{L}_\\pi/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("kaonID", kaonID,
-                      "kaon identification probability defined as :math:`\\mathcal{L}_K/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*");
+                      "kaon identification probability defined as :math:`\\mathcal{L}_K/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("protonID", protonID,
-                      "proton identification probability defined as :math:`\\mathcal{L}_p/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*");
+                      "proton identification probability defined as :math:`\\mathcal{L}_p/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("deuteronID", deuteronID,
-                      "deuteron identification probability defined as :math:`\\mathcal{L}_d/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*");
+                      "deuteron identification probability defined as :math:`\\mathcal{L}_d/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors, *excluding the SVD*",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("binaryPID(pdgCode1, pdgCode2)", binaryPID,
-                      "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the SVD*");
+                      "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the SVD*",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("binaryPID_noTOP(pdgCode1, pdgCode2)", binaryPID_noTOP,
                       "(SPECIAL (TEMP) variable) Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the SVD and the TOP*. Note that either hypothesis in the pair *must be of an electron*.");
     REGISTER_VARIABLE("electronID_noTOP", electronID_noTOP,
-                      "(SPECIAL (TEMP) variable) electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors *excluding the SVD and the TOP*");
+                      "(SPECIAL (TEMP) variable) electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors *excluding the SVD and the TOP*",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("pionID_SVD", pionID_SVD,
-                      "pion identification probability defined as :math:`\\mathcal{L}_\\pi/(\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+)`, using info from all available detectors, *including the SVD*");
+                      "pion identification probability defined as :math:`\\mathcal{L}_\\pi/(\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+)`, using info from all available detectors, *including the SVD*",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("kaonID_SVD", kaonID_SVD,
-                      "kaon identification probability defined as :math:`\\mathcal{L}_K/(\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p)`, using info from all available detectors, *including the SVD*");
+                      "kaon identification probability defined as :math:`\\mathcal{L}_K/(\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p)`, using info from all available detectors, *including the SVD*",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("protonID_SVD", protonID_SVD,
-                      "proton identification probability defined as :math:`\\mathcal{L}_p/(\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p)`, using info from all available detectors, *including the SVD*");
+                      "proton identification probability defined as :math:`\\mathcal{L}_p/(\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p)`, using info from all available detectors, *including the SVD*",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("binaryPID_SVD(pdgCode1, pdgCode2)", binaryPID_SVD,
-                      "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *including the SVD*. Accepted mass hypotheses are: 211 (:math:`\\pi`), 321 (:math:`K`), 2212 (:math:`p`)");
+                      "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *including the SVD*. Accepted mass hypotheses are: 211 (:math:`\\pi`), 321 (:math:`K`), 2212 (:math:`p`)",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("nbarID", antineutronID, R"DOC(
 Returns MVA classifier for antineutron PID.
 
@@ -617,40 +630,45 @@ Returns MVA classifier for antineutron PID.
 
 This PID is only for antineutron. Neutron is also considered as background.
 The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `clusterLAT`, `clusterE1E9`, `clusterE9E21`,
-`clusterAbsZernikeMoment40`, `clusterAbsZernikeMoment51`, `clusterZernikeMVA`.)DOC");
+`clusterAbsZernikeMoment40`, `clusterAbsZernikeMoment51`, `clusterZernikeMVA`.)DOC", Manager::VariableDataType::c_double);
 
     // Metafunctions for experts to access the basic PID quantities
     VARIABLE_GROUP("PID_expert");
     REGISTER_VARIABLE("pidLogLikelihoodValueExpert(pdgCode, detectorList)", pidLogLikelihoodValueExpert,
-                      "returns the log likelihood value of for a specific mass hypothesis and  set of detectors.");
+                      "returns the log likelihood value of for a specific mass hypothesis and  set of detectors.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("pidDeltaLogLikelihoodValueExpert(pdgCode1, pdgCode2, detectorList)", pidDeltaLogLikelihoodValueExpert,
-                      "returns LogL(hyp1) - LogL(hyp2) (aka DLL) for two mass hypoteses and a set of detectors.");
+                      "returns LogL(hyp1) - LogL(hyp2) (aka DLL) for two mass hypoteses and a set of detectors.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("pidPairProbabilityExpert(pdgCodeHyp, pdgCodeTest, detectorList)", pidPairProbabilityExpert,
-                      "Pair (or binary) probability for the pdgCodeHyp mass hypothesis respect to the pdgCodeTest one, using an arbitrary set of detectors. :math:`\\mathcal{L}_{hyp}/(\\mathcal{L}_{test}+\\mathcal{L}_{hyp}`");
+                      "Pair (or binary) probability for the pdgCodeHyp mass hypothesis respect to the pdgCodeTest one, using an arbitrary set of detectors. :math:`\\mathcal{L}_{hyp}/(\\mathcal{L}_{test}+\\mathcal{L}_{hyp}`",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("pidProbabilityExpert(pdgCodeHyp, detectorList)", pidProbabilityExpert,
-                      "probability for the pdgCodeHyp mass hypothesis respect to all the other ones, using an arbitrary set of detectors :math:`\\mathcal{L}_{hyp}/(\\Sigma_{\\text{all~hyp}}\\mathcal{L}_{i}`. ");
+                      "probability for the pdgCodeHyp mass hypothesis respect to all the other ones, using an arbitrary set of detectors :math:`\\mathcal{L}_{hyp}/(\\Sigma_{\\text{all~hyp}}\\mathcal{L}_{i}`. ",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("pidMissingProbabilityExpert(detectorList)", pidMissingProbabilityExpert,
-                      "returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0. ");
+                      "returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0. ", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("pidChargedBDTScore(pdgCodeHyp, detector)", pidChargedBDTScore,
-                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses. The second argument specifies which BDT training to use: based on 'ALL' PID detectors (NB: 'SVD' is currently excluded), or 'ECL' only. The choice depends on the ChargedPidMVAMulticlassModule's configuration.");
+                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses. The second argument specifies which BDT training to use: based on 'ALL' PID detectors (NB: 'SVD' is currently excluded), or 'ECL' only. The choice depends on the ChargedPidMVAMulticlassModule's configuration.",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("pidPairChargedBDTScore(pdgCodeHyp, pdgCodeTest, detector)", pidPairChargedBDTScore,
-                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis. The second argument specifies which BDT training to use: based on 'ALL' PID detectors (NB: 'SVD' is currently excluded), or 'ECL' only. The choice depends on the ChargedPidMVAModule's configuration.");
+                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis. The second argument specifies which BDT training to use: based on 'ALL' PID detectors (NB: 'SVD' is currently excluded), or 'ECL' only. The choice depends on the ChargedPidMVAModule's configuration.",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("pidMostLikelyPDG", mostLikelyPDG,
-                      "Returns PDG code of the largest PID likelihood, or NaN if PID information is not available.");
+                      "Returns PDG code of the largest PID likelihood, or NaN if PID information is not available.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("pidIsMostLikely", isMostLikely,
-                      "Returns 1 if the PID likelihood for the particle given its PID is the largest one");
+                      "Returns 1 if the PID likelihood for the particle given its PID is the largest one", Manager::VariableDataType::c_bool);
 
     // B2BII PID
     VARIABLE_GROUP("PID_belle");
     REGISTER_VARIABLE("atcPIDBelle(i,j)", atcPIDBelle,
                       "returns Belle's PID atc variable: ``atc_pid(3,1,5,i,j).prob()``.\n"
-                      "Parameters i,j are signal and backgroud hypothesis: (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)");
+                      "Parameters i,j are signal and backgroud hypothesis: (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muIDBelle", muIDBelle,
-                      "returns Belle's PID ``Muon_likelihood()`` variable.");
+                      "returns Belle's PID ``Muon_likelihood()`` variable.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muIDBelleQuality", muIDBelleQuality,
-                      "returns true if Belle's PID ``Muon_likelihood()`` is usable (reliable).");
+                      "returns true if Belle's PID ``Muon_likelihood()`` is usable (reliable).", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eIDBelle", eIDBelle,
-                      "returns Belle's electron ID ``eid(3,-1,5).prob()`` variable.");
+                      "returns Belle's electron ID ``eid(3,-1,5).prob()`` variable.", Manager::VariableDataType::c_double);
 
   }
 }

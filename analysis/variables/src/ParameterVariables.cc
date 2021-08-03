@@ -395,12 +395,14 @@ namespace Belle2 {
 
                       Used in the FEI to determine to calculate reconstruction efficiencies.
 
-                      The variable is event-based and does not need a valid particle pointer as input.)DOC");
+                      The variable is event-based and does not need a valid particle pointer as input.)DOC",
+                      Manager::VariableDataType::c_int);
     REGISTER_VARIABLE("isAncestorOf(i, j, ...)", isAncestorOf, R"DOC(
                       Returns a positive integer if daughter at position particle->daughter(i)->daughter(j)... is an ancestor of the related MC particle, 0 otherwise.
 
                       Positive integer represents the number of steps needed to get from final MC daughter to ancestor.
-                      If any particle or MCparticle is a nullptr, NaN is returned. If MC relations of any particle doesn't exist, -1.0 is returned.)DOC");
+                      If any particle or MCparticle is a nullptr, NaN is returned. If MC relations of any particle doesn't exist, -1.0 is returned.)DOC",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("hasAncestor(PDG, abs)", hasAncestor, R"DOC(
 
                       Returns a positive integer if an ancestor with the given PDG code is found, 0 otherwise.
@@ -409,7 +411,8 @@ namespace Belle2 {
 
                       Second argument is optional, 1 means that the sign of the PDG code is taken into account, default is 0.
 
-                      If there is no MC relations found, -1 is returned. In case of nullptr particle, NaN is returned.)DOC");
+                      If there is no MC relations found, -1 is returned. In case of nullptr particle, NaN is returned.)DOC",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("daughterInvariantMass(i, j, ...)", daughterInvariantMass , R"DOC(
                       Returns invariant mass of the given daughter particles. E.g.:
 
@@ -418,14 +421,18 @@ namespace Belle2 {
 
                       Useful to identify intermediate resonances in a decay, which weren't reconstructed explicitly.
 
-                      Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).)DOC");
+                      Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).)DOC",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass ,
-                      "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.");
+                      "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,
-                      "Angle in the mother's rest frame between the reverted CMS momentum vector and the direction of the i-th daughter");
+                      "Angle in the mother's rest frame between the reverted CMS momentum vector and the direction of the i-th daughter",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("pointingAngle(i)", pointingAngle, R"DOC(
                       Angle between i-th daughter's momentum vector and vector connecting production and decay vertex of i-th daughter.
-                      This makes only sense if the i-th daughter has itself daughter particles and therefore a properly defined vertex.)DOC");
+                      This makes only sense if the i-th daughter has itself daughter particles and therefore a properly defined vertex.)DOC",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("azimuthalAngleInDecayPlane(i, j)", azimuthalAngleInDecayPlane, R"DOC(
                       Azimuthal angle of i-th daughter in decay plane towards projection of particle momentum into decay plane.
 
@@ -455,23 +462,27 @@ namespace Belle2 {
                         \cos \psi &= \frac{\vec{M} \cdot \vec{L}}{|\vec{M}| \cdot |\vec{L}|} = \frac{-M \cdot L}{|\vec{M}| \cdot \sqrt{-L^2}}\\
                         |\vec{D1}| &= \sqrt{\frac{(D1 \cdot P)^2}{m^2_P} - m^2_{D1}}
 
-                      )DOC");
+                      )DOC", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("massDifference(i)", massDifference, "Difference in invariant masses of this particle and its i-th daughter");
+    REGISTER_VARIABLE("massDifference(i)", massDifference, "Difference in invariant masses of this particle and its i-th daughter",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("massDifferenceError(i)", massDifferenceError,
-                      "Estimated uncertainty on difference in invariant masses of this particle and its i-th daughter");
+                      "Estimated uncertainty on difference in invariant masses of this particle and its i-th daughter",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("massDifferenceSignificance(i)", massDifferenceSignificance,
-                      "Signed significance of the deviation from the nominal mass difference of this particle and its i-th daughter [(massDiff - NOMINAL_MASS_DIFF)/ErrMassDiff]");
+                      "Signed significance of the deviation from the nominal mass difference of this particle and its i-th daughter [(massDiff - NOMINAL_MASS_DIFF)/ErrMassDiff]",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("constant(float i)", Constant, R"DOC(
                       Returns i.
 
-                      Useful for debugging purposes and in conjunction with the formula meta-variable.)DOC");
+                      Useful for debugging purposes and in conjunction with the formula meta-variable.)DOC",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("randomChoice(i, j, ...)", RandomChoice, R"DOC(
                       Returns random element of given numbers.
 
-                      Useful for testing purposes.)DOC");
+                      Useful for testing purposes.)DOC", Manager::VariableDataType::c_double);
 
 
   }

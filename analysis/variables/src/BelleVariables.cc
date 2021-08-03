@@ -32,7 +32,7 @@
 
 namespace Belle2 {
   namespace Variable {
-    bool goodBelleKshort(const Particle* KS)
+    double goodBelleKshort(const Particle* KS)
     {
       // check input
       if (KS->getNDaughters() != 2) {
@@ -67,9 +67,9 @@ namespace Belle2 {
       bool high = p > 1.5 && abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
 
       if (low || mid || high) {
-        return true;
+        return 1.0;
       } else
-        return false;
+        return 0.0;
     }
 
 
@@ -241,7 +241,7 @@ namespace Belle2 {
 a momentum-binned selection including requirements on impact parameter of, and
 angle between the daughter pions as well as separation from the vertex and 
 flight distance in the transverse plane.
-)DOC", Manager::VariableDataType::c_bool);
+)DOC", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("goodBelleLambda", goodBelleLambda, R"DOC(
 [Legacy] Returns 2.0, 1.0, 0.0 as an indication of goodness of :math:`\Lambda^0` candidates, 

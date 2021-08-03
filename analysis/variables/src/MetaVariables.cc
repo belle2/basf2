@@ -2813,10 +2813,11 @@ namespace Belle2 {
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
                       "[Eventbased] Returns the number of clean Clusters in the event\n"
-                      "Clean clusters are defined by the clusters which pass the given cut assuming a photon hypothesis.");
+                      "Clean clusters are defined by the clusters which pass the given cut assuming a photon hypothesis.",
+                      Manager::VariableDataType::c_int);
     REGISTER_VARIABLE("nCleanedTracks(cut)", nCleanedTracks,
                       "[Eventbased] Returns the number of clean Tracks in the event\n"
-                      "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.");
+                      "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.", Manager::VariableDataType::c_int);
     REGISTER_VARIABLE("formula(v1 + v2 * [v3 - v4] / v5^v6)", formula, R"DOCSTRING(
 Returns the result of the given formula, where v1 to vN are variables or floating
 point numbers. Currently the only supported operations are addition (``+``),
@@ -2831,13 +2832,13 @@ arguments. Operator precedence is taken into account. For example ::
    now both, ``[]`` and ``()`` can be used for grouping operations, ``**`` can
    be used for exponent and float literals are possible directly in the
    formula.
-)DOCSTRING");
+)DOCSTRING", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
                       "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"
-                      "E.g. ``useRestFrame(daughter(0, p))`` returns the total momentum of the first daughter in its mother's rest-frame");
+                      "E.g. ``useRestFrame(daughter(0, p))`` returns the total momentum of the first daughter in its mother's rest-frame", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("useCMSFrame(variable)", useCMSFrame,
                       "Returns the value of the variable using the CMS frame as current reference frame.\n"
-                      "E.g. ``useCMSFrame(E)`` returns the energy of a particle in the CMS frame.");
+                      "E.g. ``useCMSFrame(E)`` returns the energy of a particle in the CMS frame.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame, R"DOC(
 Returns the value of ``variable`` in the *lab* frame.
 
@@ -2847,43 +2848,43 @@ Returns the value of ``variable`` in the *lab* frame.
 
 Specifying the lab frame is useful in some corner-cases. For example:
 ``useRestFrame(daughter(0, formula(E - useLabFrame(E))))`` which is the difference of the first daughter's energy in the rest frame of the mother (current particle) with the same daughter's lab-frame energy.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("useTagSideRecoilRestFrame(variable, daughterIndexTagB)", useTagSideRecoilRestFrame,
                       "Returns the value of the variable in the rest frame of the recoiling particle to the tag side B meson.\n"
                       "The variable should only be applied to an Upsilon(4S) list.\n"
-                      "E.g. ``useTagSideRecoilRestFrame(daughter(1, daughter(1, p)), 0)`` applied on a Upsilon(4S) list (``Upsilon(4S)->B+:tag B-:sig``) returns the momentum of the second daughter of the signal B meson in the signal B meson rest frame.");
+                      "E.g. ``useTagSideRecoilRestFrame(daughter(1, daughter(1, p)), 0)`` applied on a Upsilon(4S) list (``Upsilon(4S)->B+:tag B-:sig``) returns the momentum of the second daughter of the signal B meson in the signal B meson rest frame.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("useParticleRestFrame(variable, particleList)", useParticleRestFrame,
                       "Returns the value of the variable in the rest frame of the first Particle contained in the given ParticleList.\n"
 		      "It is strongly recommended to pass a ParticleList that contains at most only one Particle in each event. "
 		      "When more than one Particle is present in the ParticleList, only the first Particle in the list is used for "
-		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.");
+		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("useRecoilParticleRestFrame(variable, particleList)", useRecoilParticleRestFrame,
                       "Returns the value of the variable in the rest frame of recoil system againt the first Particle contained in the given ParticleList.\n"
 		      "It is strongly recommended to pass a ParticleList that contains at most only one Particle in each event. "
 		      "When more than one Particle is present in the ParticleList, only the first Particle in the list is used for "
-		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.");
+		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
-                      "Useful if you want to write out if a particle would have passed a cut or not.");
+                      "Useful if you want to write out if a particle would have passed a cut or not.", Manager::VariableDataType::c_bool);
     REGISTER_VARIABLE("passesEventCut(cut)", passesEventCut,
                       "[Eventbased] Returns 1 if event passes the cut otherwise 0.\n"
-                      "Useful if you want to select events passing a cut without looping into particles, such as for skimming.\n");
+                      "Useful if you want to select events passing a cut without looping into particles, such as for skimming.\n", Manager::VariableDataType::c_bool);
     REGISTER_VARIABLE("countDaughters(cut)", countDaughters,
                       "Returns number of direct daughters which satisfy the cut.\n"
-                      "Used by the skimming package (for what exactly?)");
+                      "Used by the skimming package (for what exactly?)", Manager::VariableDataType::c_int);
     REGISTER_VARIABLE("varFor(pdgCode, variable)", varFor,
                       "Returns the value of the variable for the given particle if its abs(pdgCode) agrees with the given one.\n"
-                      "E.g. ``varFor(11, p)`` returns the momentum if the particle is an electron or a positron.");
+                      "E.g. ``varFor(11, p)`` returns the momentum if the particle is an electron or a positron.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("varForMCGen(variable)", varForMCGen,
                       "Returns the value of the variable for the given particle if the MC particle related to it is primary, not virtual, and not initial.\n"
                       "If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.\n"
-                      "E.g. ``varForMCGen(PDG)`` returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.");
+                      "E.g. ``varForMCGen(PDG)`` returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("nParticlesInList(particleListName)", nParticlesInList,
-                      "[Eventbased] Returns number of particles in the given particle List.");
+                      "[Eventbased] Returns number of particles in the given particle List.", Manager::VariableDataType::c_int);
     REGISTER_VARIABLE("isInList(particleListName)", isInList,
-                      "Returns 1.0 if the particle is in the list provided, 0.0 if not. Note that this only checks the particle given. For daughters of composite particles, please see :b2:var:`isDaughterOfList`.");
+                      "Returns 1 if the particle is in the list provided, 0 if not. Note that this only checks the particle given. For daughters of composite particles, please see :b2:var:`isDaughterOfList`.", Manager::VariableDataType::c_bool);
     REGISTER_VARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
-                      "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.");
+                      "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.", Manager::VariableDataType::c_bool);
     REGISTER_VARIABLE("isDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isDescendantOfList, R"DOC(
                       Returns 1 if the given particle appears in the decay chain of the particles in the given ParticleLists.
 
@@ -2893,7 +2894,7 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       * ``isDescendantOfList(<particle_list>,2)`` returns 1 if particle is a granddaughter of the list,
                       * ``isDescendantOfList(<particle_list>,3)`` returns 1 if particle is a great-granddaughter of the list, etc.
                       * Default value is ``-1`` that is inclusive for all generations.
-                      )DOC");
+                      )DOC", Manager::VariableDataType::c_bool);
     REGISTER_VARIABLE("isMCDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isMCDescendantOfList, R"DOC(
                       Returns 1 if the given particle is linked to the same MC particle as any reconstructed daughter of the decay lists.
 
@@ -2905,24 +2906,24 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       * Default value is ``-1`` that is inclusive for all generations.
 
                       It makes only sense for lists created with `fillParticleListFromMC` function with ``addDaughters=True`` argument.
-                      )DOC");
+                      )DOC", Manager::VariableDataType::c_bool);
 
     REGISTER_VARIABLE("sourceObjectIsInList(particleListName)", sourceObjectIsInList, R"DOC(
-Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to create a particle in ``particleListName``, 0.0 if not. 
+Returns 1 if the underlying mdst object (e.g. track, or cluster) was used to create a particle in ``particleListName``, 0 if not. 
 
 .. note::
   This only makes sense for particles that are not composite. Returns -1 for composite particles.
-)DOC");
+)DOC", Manager::VariableDataType::c_int);
 
     REGISTER_VARIABLE("mcParticleIsInMCList(particleListName)", mcParticleIsInMCList, R"DOC(
-Returns 1.0 if the particle's matched MC particle is also matched to a particle in ``particleListName`` 
+Returns 1 if the particle's matched MC particle is also matched to a particle in ``particleListName`` 
 (or if either of the lists were filled from generator level `modularAnalysis.fillParticleListFromMC`.)
 
 .. seealso:: :b2:var:`isMCDescendantOfList` to check daughters.
-)DOC");
+)DOC", Manager::VariableDataType::c_bool);
 
     REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
-                      "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
+                      "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.", Manager::VariableDataType::c_bool);
     REGISTER_VARIABLE("daughter(i, variable)", daughter, R"DOC(
                       Returns value of variable for the i-th daughter. E.g.
 
@@ -2930,7 +2931,7 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
                       * ``daughter(0, daughter(1, p)`` returns the total momentum of the second daughter of the first daughter.
 
                       Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).
-                      )DOC");
+                      )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter, R"DOC(
                       Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.
 
@@ -2941,7 +2942,7 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
                       particle of the reconstructed particle the function is applied to.
 
                       The meta variable can also be nested: ``mcDaughter(0, mcDaughter(1, PDG))``.
-                      )DOC");
+                      )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("mcMother(variable)", mcMother, R"DOC(
                       Returns the value of the requested variable for the Monte Carlo mother of the particle.
 
@@ -2952,7 +2953,7 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
                       particle of the reconstructed particle the function is applied to.
 
                       The meta variable can also be nested: ``mcMother(mcMother(PDG))``.
-                      )DOC");
+                      )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("genParticle(index, variable)", genParticle,  R"DOC(
 [Eventbased] Returns the ``variable`` for the ith generator particle.
 The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 
@@ -2963,7 +2964,7 @@ E.g. ``genParticle(0, p)`` returns the total momentum of the first MCParticle, w
 the Upsilon(4S) in a generic decay.
 ``genParticle(0, mcDaughter(1, p)`` returns the total momentum of the second daughter of
 the first MC Particle, which is the momentum of the second B meson in a generic decay.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("genUpsilon4S(variable)", genUpsilon4S, R"DOC(
 [Eventbased] Returns the ``variable`` evaluated for the generator-level :math:`\Upsilon(4S)`.
 If no generator level :math:`\Upsilon(4S)` exists for the event, NaN will be returned.
@@ -2971,87 +2972,87 @@ If no generator level :math:`\Upsilon(4S)` exists for the event, NaN will be ret
 E.g. ``genUpsilon4S(p)`` returns the total momentum of the :math:`\Upsilon(4S)` in a generic decay.
 ``genUpsilon4S(mcDaughter(1, p)`` returns the total momentum of the second daughter of the
 generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in a generic decay.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf,
                       "Returns product of a variable over all daughters.\n"
-                      "E.g. ``daughterProductOf(extraInfo(SignalProbability))`` returns the product of the SignalProbabilitys of all daughters.");
+                      "E.g. ``daughterProductOf(extraInfo(SignalProbability))`` returns the product of the SignalProbabilitys of all daughters.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("daughterSumOf(variable)", daughterSumOf,
                       "Returns sum of a variable over all daughters.\n"
-                      "E.g. ``daughterSumOf(nDaughters)`` returns the number of grand-daughters.");
+                      "E.g. ``daughterSumOf(nDaughters)`` returns the number of grand-daughters.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("daughterLowest(variable)", daughterLowest,
                       "Returns the lowest value of the given variable among all daughters.\n"
-                      "E.g. ``useCMSFrame(daughterLowest(p))`` returns the lowest momentum in CMS frame.");
+                      "E.g. ``useCMSFrame(daughterLowest(p))`` returns the lowest momentum in CMS frame.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("daughterHighest(variable)", daughterHighest,
                       "Returns the highest value of the given variable among all daughters.\n"
-                      "E.g. ``useCMSFrame(daughterHighest(p))`` returns the highest momentum in CMS frame.");
+                      "E.g. ``useCMSFrame(daughterHighest(p))`` returns the highest momentum in CMS frame.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("daughterDiffOf(i, j, variable)", daughterDiffOf,
                       "Returns the difference of a variable between the two given daughters.\n"
                       "E.g. ``useRestFrame(daughterDiffOf(0, 1, p))`` returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
                       "(That means that it returns :math:`p_j - p_i`)\n"
-                      "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`daughterDiffOfPhi` function.");
+                      "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`daughterDiffOfPhi` function.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("mcDaughterDiffOf(i, j, variable)", mcDaughterDiffOf,
-                      "MC matched version of the `daughterDiffOf` function."); 
+                      "MC matched version of the `daughterDiffOf` function.", Manager::VariableDataType::c_double); 
     REGISTER_VARIABLE("grandDaughterDiffOf(i, j, variable)", grandDaughterDiffOf,
                       "Returns the difference of a variable between the first daughters of the two given daughters.\n"
                       "E.g. ``useRestFrame(grandDaughterDiffOf(0, 1, p))`` returns the momentum difference between the first daughters of the first and second daughter in the rest frame of the given particle.\n"
                       "(That means that it returns :math:`p_j - p_i`)\n"
-                      "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`grandDaughterDiffOfPhi` function.");
+                      "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`grandDaughterDiffOfPhi` function.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
                       "Returns the difference in :math:`\\phi` between the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.");
+                      "The function returns :math:`\\phi_j - \\phi_i`.", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("daughterDiffOfPhi(i, j)", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_VARIABLE("mcDaughterDiffOfPhi(i, j)", mcDaughterDiffOfPhi,
-                      "MC matched version of the `daughterDiffOfPhi` function."); 
+                      "MC matched version of the `daughterDiffOfPhi` function.", Manager::VariableDataType::c_double); 
     MAKE_DEPRECATED("mcDaughterDiffOfPhi(i, j)", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
     REGISTER_VARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
                       "Returns the difference in :math:`\\phi` between the first daughters of the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.\n");
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("grandDaughterDiffOfPhi(i, j)", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
     REGISTER_VARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
                       "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n"
-                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.");
+                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("daughterDiffOfClusterPhi(i, j)", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_VARIABLE("grandDaughterDiffOfClusterPhi(i, j)", grandDaughterDiffOfClusterPhi,
                       "Returns the difference in :math:`\\phi` between the ECLClusters of the daughters of the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n"
-                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n");
+                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("grandDaughterDiffOfClusterPhi(i, j)", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
     REGISTER_VARIABLE("daughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
                       "Returns the difference in :math:`\\phi` between the two given daughters in the CMS frame.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\\phi_j - \\phi_i`.");
+                      "The function returns :math:`\\phi_j - \\phi_i`.", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("daughterDiffOfPhiCMS(i, j)", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_VARIABLE("mcDaughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
-                      "MC matched version of the `daughterDiffOfPhiCMS` function.");      
+                      "MC matched version of the `daughterDiffOfPhiCMS` function.", Manager::VariableDataType::c_double);      
     MAKE_DEPRECATED("mcDaughterDiffOfPhiCMS(i, j)", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
     REGISTER_VARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
                       "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters in the CMS frame.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i``.\n"
-                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.");
+                      "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("daughterDiffOfClusterPhiCMS(i, j)", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"
-                      "E.g. ``daughterNormDiffOf(0, 1, p)`` returns the normalized momentum difference between first and second daughter in the lab frame.");
+                      "E.g. ``daughterNormDiffOf(0, 1, p)`` returns the normalized momentum difference between first and second daughter in the lab frame.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("daughterMotherDiffOf(i, variable)", daughterMotherDiffOf,
                       "Returns the difference of a variable between the given daughter and the mother particle itself.\n"
-                      "E.g. ``useRestFrame(daughterMotherDiffOf(0, p))`` returns the momentum difference between the given particle and its first daughter in the rest frame of the mother.");
+                      "E.g. ``useRestFrame(daughterMotherDiffOf(0, p))`` returns the momentum difference between the given particle and its first daughter in the rest frame of the mother.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("daughterMotherNormDiffOf(i, variable)", daughterMotherNormDiffOf,
                       "Returns the normalized difference of a variable between the given daughter and the mother particle itself.\n"
-                      "E.g. ``daughterMotherNormDiffOf(1, p)`` returns the normalized momentum difference between the given particle and its second daughter in the lab frame.");
+                      "E.g. ``daughterMotherNormDiffOf(1, p)`` returns the normalized momentum difference between the given particle and its second daughter in the lab frame.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("daughterAngle(daughterIndex_1, daughterIndex_2[, daughterIndex_3])", daughterAngle, R"DOC(
                        Returns the angle in between any pair of particles belonging to the same decay tree.
 
@@ -3072,89 +3073,89 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                            ``daughterAngle(0:0, 3:0)`` will return the angle between the first daughter of the first daughter, and
                            the first daughter of the fourth daughter.
 
-                      )DOC");
-    REGISTER_VARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,"MC matched version of the `daughterAngle` function.");
+                      )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,"MC matched version of the `daughterAngle` function.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
                       "Returns the decay angle of the granddaughter in the daughter particle's rest frame.\n"
                       "It is calculated with respect to the reverted momentum vector of the particle.\n"
-                      "Two arguments representing the daughter and granddaughter indices have to be provided as arguments.");
+                      "Two arguments representing the daughter and granddaughter indices have to be provided as arguments.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("daughterClusterAngleInBetween(i, j)", daughterClusterAngleInBetween,
                       "Returns function which returns the angle between clusters associated to the two daughters."
                       "If two indices given: returns the angle between the momenta of the clusters associated to the two given daughters."
                       "If three indices given: returns the angle between the momentum of the third particle's cluster and a vector "
                       "which is the sum of the first two daughter's cluster momenta."
                       "Returns nan if any of the daughters specified don't have an associated cluster."
-                      "The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.");
+                      "The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("daughterInvM(i, j)", daughterInvM,
                       "Returns the invariant Mass adding the Lorentz vectors of the given daughters.\n"
-                      "E.g. ``daughterInvM(0, 1, 2)`` returns the invariant Mass :math:`m = \\sqrt{(p_0 + p_1 + p_2)^2}`` of first, second and third daughter.");
+                      "E.g. ``daughterInvM(0, 1, 2)`` returns the invariant Mass :math:`m = \\sqrt{(p_0 + p_1 + p_2)^2}`` of first, second and third daughter.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
                       "The extraInfo has to be set by a module first.\n"
                       "E.g. ``extraInfo(SignalProbability)`` returns the SignalProbability calculated by the ``MVAExpert`` module.\n"
                       "If nothing is set under the given name or if the particle is a nullptr, NaN is returned.\n"
-                      "In the latter case please use `eventExtraInfo` if you want to access an EventExtraInfo variable.");
+                      "In the latter case please use `eventExtraInfo` if you want to access an EventExtraInfo variable.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
                       "[Eventbased] Returns extra info stored under the given name in the event extra info.\n"
                       "The extraInfo has to be set first by another module like MVAExpert in event mode.\n"
-                      "If nothing is set under this name, NaN is returned.");
+                      "If nothing is set under this name, NaN is returned.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eventCached(variable)", eventCached,
                       "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
                       "The result of second call to this variable in the same event will be provided from the cache.\n"
                       "It is recommended to use this variable in order to declare custom aliases as event-based. This is "
-                      "necessary if using the eventwise mode of variablesToNtuple).");
+                      "necessary if using the eventwise mode of variablesToNtuple).", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("particleCached(variable)", particleCached,
                       "Returns value of given variable and caches this value in the ParticleExtraInfo of the provided particle.\n"
-                      "The result of second call to this variable on the same particle will be provided from the cache.");
+                      "The result of second call to this variable on the same particle will be provided from the cache.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("modulo(variable, n)", modulo,
-                      "Returns rest of division of variable by n.");
+                      "Returns rest of division of variable by n.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("abs(variable)", abs,
                       "Returns absolute value of the given variable.\n"
-                      "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.");
-    REGISTER_VARIABLE("max(var1,var2)", max, "Returns max value of two variables.\n");
-    REGISTER_VARIABLE("min(var1,var2)", min, "Returns min value of two variables.\n");
-    REGISTER_VARIABLE("sin(variable)", sin, "Returns sine value of the given variable.");
-    REGISTER_VARIABLE("asin(variable)", asin, "Returns arcsine of the given variable.");
-    REGISTER_VARIABLE("cos(variable)", cos, "Returns cosine value of the given variable.");
-    REGISTER_VARIABLE("acos(variable)", acos, "Returns arccosine value of the given variable.");
-    REGISTER_VARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.");
-    REGISTER_VARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.");
-    REGISTER_VARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.");
+                      "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("max(var1,var2)", max, "Returns max value of two variables.\n", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("min(var1,var2)", min, "Returns min value of two variables.\n", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("sin(variable)", sin, "Returns sine value of the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("asin(variable)", asin, "Returns arcsine of the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("cos(variable)", cos, "Returns cosine value of the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("acos(variable)", acos, "Returns arccosine value of the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("isNAN(variable)", isNAN,
                       "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
-                      "Useful for debugging.");
+                      "Useful for debugging.", Manager::VariableDataType::c_bool);
     REGISTER_VARIABLE("ifNANgiveX(variable, x)", ifNANgiveX,
                       "Returns x (has to be a number) if variable value is nan (determined via std::isnan(double)).\n"
-                      "Useful for technical purposes while training MVAs.");
+                      "Useful for technical purposes while training MVAs.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
-                      "Useful for debugging.");
+                      "Useful for debugging.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("unmask(variable, flag1, flag2, ...)", unmask,
                       "unmask(variable, flag1, flag2, ...) or unmask(variable, mask) sets certain bits in the variable to zero.\n"
                       "For example, if you want to set the second, fourth and fifth bits to zero, you could call \n"
                       "``unmask(variable, 2, 8, 16)`` or ``unmask(variable, 26)``.\n"
-                      "");
+                      "", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("conditionalVariableSelector(cut, variableIfTrue, variableIfFalse)", conditionalVariableSelector,
                       "Returns one of the two supplied variables, depending on whether the particle passes the supplied cut.\n"
-                      "The first variable is returned if the particle passes the cut, and the second variable is returned otherwise.");
+                      "The first variable is returned if the particle passes the cut, and the second variable is returned otherwise.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("pValueCombination(p1, p2, ...)", pValueCombination,
                       "Returns the combined p-value of the provided p-values according to the formula given in `Nucl. Instr. and Meth. A 411 (1998) 449 <https://doi.org/10.1016/S0168-9002(98)00293-9>`_ .\n"
-                      "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.");
+                      "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
                       "For instance one can apply this function on a signal Photon and provide a list of all photons in the rest of event and a cut \n"
                       "around the neutral Pion mass (e.g. ``0.130 < M < 0.140``). \n"
-                      "If a combination of the signal Photon with a ROE photon fits this criteria, hence looks like a neutral pion, the veto-Metavariable will return 1");
+                      "If a combination of the signal Photon with a ROE photon fits this criteria, hence looks like a neutral pion, the veto-Metavariable will return 1", Manager::VariableDataType::c_bool);
     REGISTER_VARIABLE("matchedMC(variable)", matchedMC,
                       "Returns variable output for the matched MCParticle by constructing a temporary Particle from it.\n"
                       "This may not work too well if your variable requires accessing daughters of the particle.\n"
                       "E.g. ``matchedMC(p)`` returns the total momentum of the related MCParticle.\n"
-                      "Returns NaN if no matched MCParticle exists.");
+                      "Returns NaN if no matched MCParticle exists.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("countInList(particleList, cut='')", countInList, "[Eventbased] "
                       "Returns number of particle which pass given in cut in the specified particle list.\n"
                       "Useful for creating statistics about the number of particles in a list.\n"
                       "E.g. ``countInList(e+, isSignal == 1)`` returns the number of correctly reconstructed electrons in the event.\n"
-                      "The variable is event-based and does not need a valid particle pointer as input.");
+                      "The variable is event-based and does not need a valid particle pointer as input.", Manager::VariableDataType::c_int);
     REGISTER_VARIABLE("getVariableByRank(particleList, rankedVariableName, variableName, rank)", getVariableByRank, R"DOC(
                       Returns the value of ``variableName`` for the candidate in the ``particleList`` with the requested ``rank``.
 
@@ -3170,43 +3171,43 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       This means that your selected name for the rank variable has to end with ``_rank``.
 
                       An example of this variable's usage is given in the tutorial `B2A602-BestCandidateSelection <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/examples/tutorials/B2A602-BestCandidateSelection.py>`_
-                      )DOC");
+                      )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("matchedMCHasPDG(PDGCode)", matchedMCHasPDG,
-                      "Returns if the absolute value of aPDGCode of a MCParticle related to a Particle matches a given PDGCode."
-                      "Returns 0/0.5/1 if PDGCode does not match/is not available/ matches");
+                      "Returns if the absolute value of a PDGCode of a MCParticle related to a Particle matches a given PDGCode."
+                      "Returns 0/NAN/1 if PDGCode does not match/is not available/ matches", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("numberOfNonOverlappingParticles(pList1, pList2, ...)", numberOfNonOverlappingParticles,
                       "Returns the number of non-overlapping particles in the given particle lists"
-                      "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S");
+                      "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S", Manager::VariableDataType::c_int);
     REGISTER_VARIABLE("totalEnergyOfParticlesInList(particleListName)", totalEnergyOfParticlesInList,
-                      "Returns the total energy of particles in the given particle List.");
+                      "Returns the total energy of particles in the given particle List.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("totalPxOfParticlesInList(particleListName)", totalPxOfParticlesInList,
-                      "Returns the total momentum Px of particles in the given particle List.");
+                      "Returns the total momentum Px of particles in the given particle List.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("totalPyOfParticlesInList(particleListName)", totalPyOfParticlesInList,
-                      "Returns the total momentum Py of particles in the given particle List.");
+                      "Returns the total momentum Py of particles in the given particle List.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("totalPzOfParticlesInList(particleListName)", totalPzOfParticlesInList,
-                      "Returns the total momentum Pz of particles in the given particle List.");
+                      "Returns the total momentum Pz of particles in the given particle List.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
-                      "Returns the invariant mass of the combination of particles in the given particle lists.");
+                      "Returns the invariant mass of the combination of particles in the given particle lists.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("totalECLEnergyOfParticlesInList(particleListName)", totalECLEnergyOfParticlesInList,
-                      "Returns the total ECL energy of particles in the given particle List.");
+                      "Returns the total ECL energy of particles in the given particle List.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("maxPtInList(particleListName)", maxPtInList,
-                      "Returns maximum transverse momentum Pt in the given particle List.");
+                      "Returns maximum transverse momentum Pt in the given particle List.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclClusterSpecialTrackMatched(cut)", eclClusterTrackMatchedWithCondition,
-                      "Returns if at least one Track that satisfies the given condition is related to the ECLCluster of the Particle.");
+                      "Returns if at least one Track that satisfies the given condition is related to the ECLCluster of the Particle.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("averageValueInList(particleListName, variable)", averageValueInList,
-                      "Returns the arithmetic mean of the given variable of the particles in the given particle list.");
+                      "Returns the arithmetic mean of the given variable of the particles in the given particle list.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("medianValueInList(particleListName, variable)", medianValueInList,
-                      "Returns the median value of the given variable of the particles in the given particle list.");
+                      "Returns the median value of the given variable of the particles in the given particle list.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("angleToClosestInList(particleListName)", angleToClosestInList,
-                      "Returns the angle between this particle and the closest particle (smallest opening angle) in the list provided.");
+                      "Returns the angle between this particle and the closest particle (smallest opening angle) in the list provided.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("closestInList(particleListName, variable)", closestInList,
-                      "Returns `variable` for the closest particle (smallest opening angle) in the list provided.");
+                      "Returns `variable` for the closest particle (smallest opening angle) in the list provided.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("angleToMostB2BInList(particleListName)", angleToMostB2BInList,
-                      "Returns the angle between this particle and the most back-to-back particle (closest opening angle to 180) in the list provided.");
+                      "Returns the angle between this particle and the most back-to-back particle (closest opening angle to 180) in the list provided.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
-                      "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.");
+                      "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("maxOpeningAngleInList(particleListName)", maxOpeningAngleInList,
-                      "Returns maximum opening angle in the given particle List.");
+                      "Returns maximum opening angle in the given particle List.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("daughterCombination(variable, daughterIndex_1, daughterIndex_2 ... daughterIndex_n)", daughterCombination,R"DOC(
 Returns a ``variable`` function only of the 4-momentum calculated on an arbitrary set of (grand)daughters. 
 
@@ -3221,7 +3222,7 @@ daughter (3) of the second daughter (1) of the first daughter (0) of the mother 
     ``daughterCombination(M, 0, 3, 4)`` will return the invariant mass of the system made of the first, fourth and fifth daughter of particle. 
     ``daughterCombination(M, 0:0, 3:0)`` will return the invariant mass of the system made of the first daughter of the first daughter and the first daughter of the fourth daughter.
 
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("useAlternativeDaughterHypothesis(variable, daughterIndex_1:newMassHyp_1, ..., daughterIndex_n:newMassHyp_n)", useAlternativeDaughterHypothesis,R"DOC(
 Returns a ``variable`` calculated using new mass hypotheses for (some of) the particle's daughers. 
 
@@ -3238,9 +3239,9 @@ Returns a ``variable`` calculated using new mass hypotheses for (some of) the pa
     ``useAlternativeDaughterHypothesis(M, 0:K+, 2:pi-)`` will return the invariant mass of the particle assuming that the first daughter is a kaon and the third is a pion, instead of whatever was used in reconstructing the decay. 
     ``useAlternativeDaughterHypothesis(mRecoil, 1:p+)`` will return the recoil mass of the particle assuming that the second daughter is a proton instead of whatever was used in reconstructing the decay. 
 
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.
-Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC")
+Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC", Manager::VariableDataType::c_double)
 
   }
 }

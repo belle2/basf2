@@ -41,8 +41,10 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("FourCKFit");
-    REGISTER_VARIABLE("FourCKFitChi2", FourCKFitChi2, "Chi2 of four momentum-constraint kinematical fit in KFit");
-    REGISTER_VARIABLE("FourCKFitProb", FourCKFitProb, "Prob of four momentum-constraint kinematical fit in KFit");
+    REGISTER_VARIABLE("FourCKFitChi2", FourCKFitChi2, "Chi2 of four momentum-constraint kinematical fit in KFit",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("FourCKFitProb", FourCKFitProb, "Prob of four momentum-constraint kinematical fit in KFit",
+                      Manager::VariableDataType::c_double);
 
 
   }

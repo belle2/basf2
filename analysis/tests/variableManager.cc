@@ -106,19 +106,22 @@ namespace {
     EXPECT_B2ERROR(Manager::Instance().addAlias("M", "daughterSumOf(daughter(1, extraInfo(signalProbability)))"));
 
     //re-registration not allowed
-    EXPECT_B2FATAL(Manager::Instance().registerVariable("p", (Manager::FunctionPtr)&dummyVar, "description"));
+    EXPECT_B2FATAL(Manager::Instance().registerVariable("p", (Manager::FunctionPtr)&dummyVar, "description",
+                                                        Manager::VariableDataType::c_double));
 
-    EXPECT_B2FATAL(Manager::Instance().registerVariable("something", (Manager::FunctionPtr)nullptr, "blah"));
+    EXPECT_B2FATAL(Manager::Instance().registerVariable("something", (Manager::FunctionPtr)nullptr, "blah",
+                                                        Manager::VariableDataType::c_double));
 
 
-    Manager::Instance().registerVariable("testingthedummyvar", (Manager::FunctionPtr)&dummyVar, "blah");
+    Manager::Instance().registerVariable("testingthedummyvar", (Manager::FunctionPtr)&dummyVar, "blah",
+                                         Manager::VariableDataType::c_double);
     const Manager::Var* dummy = Manager::Instance().getVariable("testingthedummyvar");
     ASSERT_NE(dummy, nullptr);
     EXPECT_TRUE(dummy->description == "blah");
     EXPECT_DOUBLE_EQ(std::get<double>(dummy->function(nullptr)), 42.0);
 
     //also test the macro (with other name)
-    REGISTER_VARIABLE("testingthedummyvar2", dummyVar, "something else");
+    REGISTER_VARIABLE("testingthedummyvar2", dummyVar, "something else", Manager::VariableDataType::c_double);
     dummy = Manager::Instance().getVariable("testingthedummyvar2");
     ASSERT_NE(dummy, nullptr);
     EXPECT_TRUE(dummy->description == "something else");
@@ -126,7 +129,7 @@ namespace {
 
 
     Manager::Instance().registerVariable("testingthedummyvarwithparameters(n)", (Manager::ParameterFunctionPtr)&dummyVarWithParameters,
-                                         "blah");
+                                         "blah", Manager::VariableDataType::c_double);
     dummy = Manager::Instance().getVariable("testingthedummyvarwithparameters(3)");
     ASSERT_NE(dummy, nullptr);
     EXPECT_DOUBLE_EQ(std::get<double>(dummy->function(nullptr)), 3.0);
@@ -137,7 +140,7 @@ namespace {
                      18.0);
 
     Manager::Instance().registerVariable("testingthedummymetavar(cut)", (Manager::MetaFunctionPtr)&dummyMetaVar,
-                                         "blah");
+                                         "blah", Manager::VariableDataType::c_double);
     dummy = Manager::Instance().getVariable("testingthedummymetavar(1 < 2)");
     ASSERT_NE(dummy, nullptr);
     EXPECT_DOUBLE_EQ(std::get<double>(dummy->function(nullptr)), 5.0);
@@ -145,7 +148,8 @@ namespace {
 
 
     //also test the macro (with other name)
-    REGISTER_VARIABLE("testingthedummyvarwithparameters2(n,m)", dummyVarWithParameters, "something else");
+    REGISTER_VARIABLE("testingthedummyvarwithparameters2(n,m)", dummyVarWithParameters, "something else",
+                      Manager::VariableDataType::c_double);
     dummy = Manager::Instance().getVariable("testingthedummyvarwithparameters2(4,5)");
     ASSERT_NE(dummy, nullptr);
     EXPECT_DOUBLE_EQ(std::get<double>(dummy->function(nullptr)), 9.0);
@@ -159,18 +163,23 @@ namespace {
     EXPECT_TRUE(Manager::Instance().getVariables().size() > 0);
 
     //special characters are not allowed!
-    EXPECT_B2FATAL(Manager::Instance().registerVariable(" space", (Manager::FunctionPtr)dummyVar, "blah"));
-    EXPECT_B2FATAL(Manager::Instance().registerVariable("star*", (Manager::FunctionPtr)dummyVar, "blah"));
-    EXPECT_B2FATAL(Manager::Instance().registerVariable("*", (Manager::FunctionPtr)dummyVar, "blah"));
+    EXPECT_B2FATAL(Manager::Instance().registerVariable(" space", (Manager::FunctionPtr)dummyVar, "blah",
+                                                        Manager::VariableDataType::c_double));
+    EXPECT_B2FATAL(Manager::Instance().registerVariable("star*", (Manager::FunctionPtr)dummyVar, "blah",
+                                                        Manager::VariableDataType::c_double));
+    EXPECT_B2FATAL(Manager::Instance().registerVariable("*", (Manager::FunctionPtr)dummyVar, "blah",
+                                                        Manager::VariableDataType::c_double));
 
     //this is ok, though
-    Manager::Instance().registerVariable("abcdef0123945859432689_ZEFUEONHSUTNSXA", (Manager::FunctionPtr)dummyVar, "blah");
+    Manager::Instance().registerVariable("abcdef0123945859432689_ZEFUEONHSUTNSXA", (Manager::FunctionPtr)dummyVar, "blah",
+                                         Manager::VariableDataType::c_double);
   }
 
   TEST(VariableTest, Cut)
   {
-    Manager::Instance().registerVariable("dummyvar", (Manager::FunctionPtr)&dummyVar, "blah");
-    Manager::Instance().registerVariable("dummymetavar(cut)", (Manager::MetaFunctionPtr)&dummyMetaVar, "blah");
+    Manager::Instance().registerVariable("dummyvar", (Manager::FunctionPtr)&dummyVar, "blah", Manager::VariableDataType::c_double);
+    Manager::Instance().registerVariable("dummymetavar(cut)", (Manager::MetaFunctionPtr)&dummyMetaVar, "blah",
+                                         Manager::VariableDataType::c_double);
 
     std::unique_ptr<Cut> a = Cut::compile("dummyvar > 1.0");
     EXPECT_TRUE(a->check(nullptr));

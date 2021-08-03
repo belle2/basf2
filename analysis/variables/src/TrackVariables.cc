@@ -445,64 +445,78 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("Tracking");
-    REGISTER_VARIABLE("d0Pull", getHelixD0Pull,     "(mc-meas)/err_meas for d0");
-    REGISTER_VARIABLE("phi0Pull", getHelixPhi0Pull,     "(mc-meas)/err_meas for phi0");
-    REGISTER_VARIABLE("omegaPull", getHelixOmegaPull,     "(mc-meas)/err_meas for omega");
-    REGISTER_VARIABLE("z0Pull", getHelixZ0Pull,     "(mc-meas)/err_meas for z0");
-    REGISTER_VARIABLE("tanLambdaPull", getHelixTanLambdaPull,     "(mc-meas)/err_meas for tanLambda");
+    REGISTER_VARIABLE("d0Pull", getHelixD0Pull,     "(mc-meas)/err_meas for d0", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("phi0Pull", getHelixPhi0Pull,     "(mc-meas)/err_meas for phi0", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("omegaPull", getHelixOmegaPull,     "(mc-meas)/err_meas for omega", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("z0Pull", getHelixZ0Pull,     "(mc-meas)/err_meas for z0", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("tanLambdaPull", getHelixTanLambdaPull,     "(mc-meas)/err_meas for tanLambda",
+                      Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nCDCHits", trackNCDCHits,     "Number of CDC hits associated to the track");
-    REGISTER_VARIABLE("nSVDHits", trackNSVDHits,     "Number of SVD hits associated to the track");
-    REGISTER_VARIABLE("nPXDHits", trackNPXDHits,     "Number of PXD hits associated to the track");
-    REGISTER_VARIABLE("nVXDHits", trackNVXDHits,     "Number of PXD and SVD hits associated to the track");
+    REGISTER_VARIABLE("nCDCHits", trackNCDCHits,     "Number of CDC hits associated to the track", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("nSVDHits", trackNSVDHits,     "Number of SVD hits associated to the track", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("nPXDHits", trackNPXDHits,     "Number of PXD hits associated to the track", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("nVXDHits", trackNVXDHits,     "Number of PXD and SVD hits associated to the track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("ndf",      trackNDF,
                       R"DOC(Number of degrees of freedom of the track fit. Note that it is not NHIT-5 due to outlier hit rejection.
-For mdst versions < 5.1, returns quiet_NaN().)DOC"
-                     );
+For mdst versions < 5.1, returns quiet_NaN().)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("chi2",      trackChi2,
                       R"DOC(Chi2 of the track fit.
 Computed based on pValue and ndf. Note that for pValue exactly equal to 0 it returns infinity(). 
-For mdst versions < 5.1, returns quiet_NaN().)DOC");
-    REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,     "First activated SVD layer associated to the track");
-    REGISTER_VARIABLE("firstPXDLayer", trackFirstPXDLayer,     "First activated PXD layer associated to the track");
-    REGISTER_VARIABLE("firstCDCLayer", trackFirstCDCLayer,     "First activated CDC layer associated to the track");
-    REGISTER_VARIABLE("lastCDCLayer", trackLastCDCLayer, "Last CDC layer associated to the track");
-    REGISTER_VARIABLE("d0",        trackD0,        "Signed distance to the POCA in the r-phi plane");
-    REGISTER_VARIABLE("phi0",      trackPhi0,      "Angle of the transverse momentum in the r-phi plane");
-    REGISTER_VARIABLE("omega",     trackOmega,     "Curvature of the track");
-    REGISTER_VARIABLE("z0",        trackZ0,        "z coordinate of the POCA");
-    REGISTER_VARIABLE("tanLambda", trackTanLambda, "Slope of the track in the r-z plane");
-    REGISTER_VARIABLE("d0Err",        trackD0Error,        "Error of signed distance to the POCA in the r-phi plane");
-    REGISTER_VARIABLE("phi0Err",      trackPhi0Error,      "Error of angle of the transverse momentum in the r-phi plane");
-    REGISTER_VARIABLE("omegaErr",     trackOmegaError,     "Error of curvature of the track");
-    REGISTER_VARIABLE("z0Err",        trackZ0Error,        "Error of z coordinate of the POCA");
-    REGISTER_VARIABLE("tanLambdaErr", trackTanLambdaError, "Error of slope of the track in the r-z plane");
-    REGISTER_VARIABLE("pValue", trackPValue, "chi2 probability of the track fit");
-    REGISTER_VARIABLE("trackFitHypothesisPDG", trackFitHypothesisPDG, "PDG code of the track hypothesis actually used for the fit");
+For mdst versions < 5.1, returns quiet_NaN().)DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,     "First activated SVD layer associated to the track",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("firstPXDLayer", trackFirstPXDLayer,     "First activated PXD layer associated to the track",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("firstCDCLayer", trackFirstCDCLayer,     "First activated CDC layer associated to the track",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("lastCDCLayer", trackLastCDCLayer, "Last CDC layer associated to the track", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("d0",        trackD0,        "Signed distance to the POCA in the r-phi plane",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("phi0",      trackPhi0,      "Angle of the transverse momentum in the r-phi plane",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("omega",     trackOmega,     "Curvature of the track", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("z0",        trackZ0,        "z coordinate of the POCA", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("tanLambda", trackTanLambda, "Slope of the track in the r-z plane", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("d0Err",        trackD0Error,        "Error of signed distance to the POCA in the r-phi plane",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("phi0Err",      trackPhi0Error,      "Error of angle of the transverse momentum in the r-phi plane",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("omegaErr",     trackOmegaError,     "Error of curvature of the track", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("z0Err",        trackZ0Error,        "Error of z coordinate of the POCA", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("tanLambdaErr", trackTanLambdaError, "Error of slope of the track in the r-z plane",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("pValue", trackPValue, "chi2 probability of the track fit", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("trackFitHypothesisPDG", trackFitHypothesisPDG, "PDG code of the track hypothesis actually used for the fit",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("trackNECLClusters", trackNECLClusters,
-                      "Number ecl clusters matched to the track. This is always 0 or 1 with newer versions of ECL reconstruction.");
+                      "Number ecl clusters matched to the track. This is always 0 or 1 with newer versions of ECL reconstruction.",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("helixExtTheta", trackHelixExtTheta,
-                      "Returns theta of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)");
+                      "Returns theta of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("helixExtPhi", trackHelixExtPhi,
-                      "Returns phi of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)");
+                      "Returns phi of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nExtraCDCHits", nExtraCDCHits, "[Eventbased] The number of CDC hits in the event not assigned to any track");
+    REGISTER_VARIABLE("nExtraCDCHits", nExtraCDCHits, "[Eventbased] The number of CDC hits in the event not assigned to any track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("nExtraCDCHitsPostCleaning", nExtraCDCHitsPostCleaning,
-                      "[Eventbased] The number of CDC hits in the event not assigned to any track nor very likely beam background (i.e. hits that survive a cleanup selection)");
+                      "[Eventbased] The number of CDC hits in the event not assigned to any track nor very likely beam background (i.e. hits that survive a cleanup selection)",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("hasExtraCDCHitsInLayer(i)", hasExtraCDCHitsInLayer,
-                      "[Eventbased] Returns 1 if a non-assigned hit exists in the specified CDC layer");
+                      "[Eventbased] Returns 1 if a non-assigned hit exists in the specified CDC layer", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("hasExtraCDCHitsInSuperLayer(i)", hasExtraCDCHitsInSuperLayer,
-                      "[Eventbased] Returns 1 if a non-assigned hit exists in the specified CDC SuperLayer");
-    REGISTER_VARIABLE("nExtraCDCSegments", nExtraCDCSegments, "[Eventbased] The number of CDC segments not assigned to any track");
+                      "[Eventbased] Returns 1 if a non-assigned hit exists in the specified CDC SuperLayer", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("nExtraCDCSegments", nExtraCDCSegments, "[Eventbased] The number of CDC segments not assigned to any track",
+                      Manager::VariableDataType::c_double);
     // TODO: once the Tracking group fill the dataobject these can be
     // uncommented - at the moment they are not filled, so leave out
     //REGISTER_VARIABLE("nExtraVXDHitsInLayer(i)", nExtraVXDHitsInLayer,
-    //"[Eventbased] The number VXD hits not assigned in the specified VXD layer");
-    //REGISTER_VARIABLE("nExtraVXDHits", nExtraVXDHits, "[Eventbased] The number of VXD hits not assigned to any track");
-    //REGISTER_VARIABLE("svdFirstSampleTime", svdFirstSampleTime, "[Eventbased] The time of first SVD sample relatvie to event T0");
+    //"[Eventbased] The number VXD hits not assigned in the specified VXD layer", Manager::VariableDataType::c_double);
+    //REGISTER_VARIABLE("nExtraVXDHits", nExtraVXDHits, "[Eventbased] The number of VXD hits not assigned to any track", Manager::VariableDataType::c_double);
+    //REGISTER_VARIABLE("svdFirstSampleTime", svdFirstSampleTime, "[Eventbased] The time of first SVD sample relatvie to event T0", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("trackFindingFailureFlag", trackFindingFailureFlag,
                       "[Eventbased] A flag set by the tracking if there is reason to assume there was a track in the event missed by the tracking, "
-                      "or the track finding was (partly) aborted for this event.");
+                      "or the track finding was (partly) aborted for this event.", Manager::VariableDataType::c_double);
 
 
   }

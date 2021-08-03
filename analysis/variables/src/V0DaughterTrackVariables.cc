@@ -715,173 +715,203 @@ namespace Belle2 {
 
     VARIABLE_GROUP("V0Daughter");
 
-    REGISTER_VARIABLE("v0DaughterNCDCHits(i)", v0DaughterTrackNCDCHits, "Number of CDC hits associated to the i-th daughter track");
+    REGISTER_VARIABLE("v0DaughterNCDCHits(i)", v0DaughterTrackNCDCHits, "Number of CDC hits associated to the i-th daughter track",
+                      Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterNCDCHits(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `nCDCHits`,
                      so replace the current call with ``daughter(i, nCDCHits)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterNSVDHits(i)", v0DaughterTrackNSVDHits, "Number of SVD hits associated to the i-th daughter track");
+    REGISTER_VARIABLE("v0DaughterNSVDHits(i)", v0DaughterTrackNSVDHits, "Number of SVD hits associated to the i-th daughter track",
+                      Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterNSVDHits(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `nSVDHits`,
                      so replace the current call with ``daughter(i, nSVDHits)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterNPXDHits(i)", v0DaughterTrackNPXDHits, "Number of PXD hits associated to the i-th daughter track");
+    REGISTER_VARIABLE("v0DaughterNPXDHits(i)", v0DaughterTrackNPXDHits, "Number of PXD hits associated to the i-th daughter track",
+                      Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterNPXDHits(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `nPXDHits`,
                      so replace the current call with ``daughter(i, nPXDHits)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterNVXDHits(i)", v0DaughterTrackNVXDHits, "Number of PXD+SVD hits associated to the i-th daughter track");
+    REGISTER_VARIABLE("v0DaughterNVXDHits(i)", v0DaughterTrackNVXDHits, "Number of PXD+SVD hits associated to the i-th daughter track",
+                      Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterNVXDHits(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `nVXDHits`,
                      so replace the current call with ``daughter(i, nVXDHits)``.)DOC");
     REGISTER_VARIABLE("v0DaughterFirstSVDLayer(i)", v0DaughterTrackFirstSVDLayer,
-                      "First activated SVD layer associated to the i-th daughter track");
+                      "First activated SVD layer associated to the i-th daughter track", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterFirstSVDLayer(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `firstSVDLayer`,
                      so replace the current call with ``daughter(i, firstSVDLayer)``.)DOC");
     REGISTER_VARIABLE("v0DaughterFirstPXDLayer(i)", v0DaughterTrackFirstPXDLayer,
-                      "First activated PXD layer associated to the i-th daughter track");
+                      "First activated PXD layer associated to the i-th daughter track", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterFirstPXDLayer(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `firstPXDLayer`,
                      so replace the current call with ``daughter(i, firstPXDLayer)``.)DOC");
     REGISTER_VARIABLE("v0DaughterFirstCDCLayer(i)", v0DaughterTrackFirstCDCLayer,
-                      "First activated CDC layer associated to the i-th daughter track");
+                      "First activated CDC layer associated to the i-th daughter track", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterFirstCDCLayer(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `firstCDCLayer`,
                      so replace the current call with ``daughter(i, firstCDCLayer)``.)DOC");
     REGISTER_VARIABLE("v0DaughterLastCDCLayer(i)",  v0DaughterTrackLastCDCLayer,
-                      "Last CDC layer associated to the i-th daughter track");
+                      "Last CDC layer associated to the i-th daughter track", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterLastCDCLayer(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `lastCDCLayer`,
                      so replace the current call with ``daughter(i, lastCDCLayer)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterPValue(i)",        v0DaughterTrackPValue,
-                      "chi2 probalility of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterPValue(i)", v0DaughterTrackPValue,
+                      "chi2 probalility of the i-th daughter track fit", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterPValue(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `pValue`,
                      so replace the current call with ``daughter(i, pValue)``.)DOC");
     /// helix parameters
-    REGISTER_VARIABLE("v0DaughterD0(i)",        v0DaughterTrackD0,        "d0 of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterD0(i)",        v0DaughterTrackD0,        "d0 of the i-th daughter track fit",
+                      Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterD0(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `d0`,
                      so replace the current call with ``daughter(i, d0)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterPhi0(i)",      v0DaughterTrackPhi0,      "phi0 of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterPhi0(i)",      v0DaughterTrackPhi0,      "phi0 of the i-th daughter track fit",
+                      Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterPhi0(i)", false, "light-2104-poseidon", R"DOC(
                  The same value can be calculated with the more generic variable `phi0`,
                  so replace the current call with ``daughter(i, phi0)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterOmega(i)",     v0DaughterTrackOmega,     "omega of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterOmega(i)",     v0DaughterTrackOmega,     "omega of the i-th daughter track fit",
+                      Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterOmega(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `omega`,
                      so replace the current call with ``daughter(i, omega)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterZ0(i)",        v0DaughterTrackZ0,        "z0 of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterZ0(i)",        v0DaughterTrackZ0,        "z0 of the i-th daughter track fit",
+                      Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterZ0(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `z0`,
                      so replace the current call with ``daughter(i, z0)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterTanLambda(i)", v0DaughterTrackTanLambda, "tan(lambda) of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterTanLambda(i)", v0DaughterTrackTanLambda, "tan(lambda) of the i-th daughter track fit",
+                      Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterTanLambda(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `tanLambda`,
                      so replace the current call with ``daughter(i, tanLambda)``.)DOC");
     /// error of helix parameters
-    REGISTER_VARIABLE("v0DaughterD0Error(i)",        v0DaughterTrackD0Error,        "d0 error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterD0Error(i)", v0DaughterTrackD0Error, "d0 error of the i-th daughter track fit",
+                      Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterD0Error(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `d0Err`,
                      so replace the current call with ``daughter(i, d0Err)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterPhi0Error(i)",      v0DaughterTrackPhi0Error,      "phi0 error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterPhi0Error(i)", v0DaughterTrackPhi0Error, "phi0 error of the i-th daughter track fit",
+                      Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterPhi0Error(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `phi0Err`,
                      so replace the current call with ``daughter(i, phi0Err)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterOmegaError(i)",     v0DaughterTrackOmegaError,     "omega error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterOmegaError(i)", v0DaughterTrackOmegaError, "omega error of the i-th daughter track fit",
+                      Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterOmegaError(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `omegaErr`,
                      so replace the current call with ``daughter(i, omegaErr)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterZ0Error(i)",        v0DaughterTrackZ0Error,        "z0 error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterZ0Error(i)", v0DaughterTrackZ0Error, "z0 error of the i-th daughter track fit",
+                      Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterZ0Error(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `z0Err`,
                      so replace the current call with ``daughter(i, z0Err)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterTanLambdaError(i)", v0DaughterTrackTanLambdaError, "tan(lambda) error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterTanLambdaError(i)", v0DaughterTrackTanLambdaError, "tan(lambda) error of the i-th daughter track fit",
+                      Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterTanLambdaError(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `tanLambdaErr`,
                      so replace the current call with ``daughter(i, tanLambdaErr)``.)DOC");
 
     /// V0 daughter helix parameters with V0 vertex as pivot
     REGISTER_VARIABLE("V0d0(id)", v0DaughterD0,
-                      "Return the d0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.");
+                      "Return the d0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("V0Deltad0", v0DaughterD0Diff,
-                      "Return the difference between d0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track.");
+                      "Return the difference between d0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track."),
+                      Manager::VariableDataType::c_double;
     REGISTER_VARIABLE("V0z0(id)", v0DaughterZ0,
-                      "Return the z0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.");
+                      "Return the z0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("V0Deltaz0", v0DaughterZ0Diff,
-                      "Return the difference between z0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track.");
+                      "Return the difference between z0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track.",
+                      Manager::VariableDataType::c_double);
 
     /// pull of helix parameters with the reco. vertex as the pivot
     REGISTER_VARIABLE("v0DaughterD0PullWithTrueVertexAsPivot(i)",       v0DaughterHelixWithTrueVertexAsPivotD0Pull,
-                      "d0 pull of the i-th daughter track with the true V0 vertex as the track pivot");
+                      "d0 pull of the i-th daughter track with the true V0 vertex as the track pivot", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("v0DaughterPhi0PullWithTrueVertexAsPivot(i)",     v0DaughterHelixWithTrueVertexAsPivotPhi0Pull,
-                      "phi0 pull of the i-th daughter track with the true V0 vertex as the track pivot");
+                      "phi0 pull of the i-th daughter track with the true V0 vertex as the track pivot", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("v0DaughterOmegaPullWithTrueVertexAsPivot(i)",    v0DaughterHelixWithTrueVertexAsPivotOmegaPull,
-                      "omega pull of the i-th daughter track with the true V0 vertex as the track pivot");
+                      "omega pull of the i-th daughter track with the true V0 vertex as the track pivot", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("v0DaughterZ0PullWithTrueVertexAsPivot(i)",       v0DaughterHelixWithTrueVertexAsPivotZ0Pull,
-                      "z0 pull of the i-th daughter track with the true V0 vertex as the track pivot");
+                      "z0 pull of the i-th daughter track with the true V0 vertex as the track pivot", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("v0DaughterTanLambdaPullWithTrueVertexAsPivot(i)", v0DaughterHelixWithTrueVertexAsPivotTanLambdaPull,
-                      "tan(lambda) pull of the i-th daughter track with the true V0 vertex as the track pivot");
+                      "tan(lambda) pull of the i-th daughter track with the true V0 vertex as the track pivot", Manager::VariableDataType::c_double);
     /// pull of helix parameters with the origin as the pivot
     REGISTER_VARIABLE("v0DaughterD0PullWithOriginAsPivot(i)",       v0DaughterHelixWithOriginAsPivotD0Pull,
-                      "d0 pull of the i-th daughter track with the origin as the track pivot");
+                      "d0 pull of the i-th daughter track with the origin as the track pivot", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterD0PullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `d0Pull`,
                      so replace the current call with ``daughter(i, d0Pull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterPhi0PullWithOriginAsPivot(i)",     v0DaughterHelixWithOriginAsPivotPhi0Pull,
-                      "phi0 pull of the i-th daughter track with the origin as the track pivot");
+                      "phi0 pull of the i-th daughter track with the origin as the track pivot", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterPhi0PullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `phi0Pull`,
                      so replace the current call with ``daughter(i, phi0Pull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterOmegaPullWithOriginAsPivot(i)",    v0DaughterHelixWithOriginAsPivotOmegaPull,
-                      "omega pull of the i-th daughter track with the origin as the track pivot");
+                      "omega pull of the i-th daughter track with the origin as the track pivot", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterOmegaPullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `omegaPull`,
                      so replace the current call with ``daughter(i, omegaPull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterZ0PullWithOriginAsPivot(i)",       v0DaughterHelixWithOriginAsPivotZ0Pull,
-                      "z0 pull of the i-th daughter track with the origin as the track pivot");
+                      "z0 pull of the i-th daughter track with the origin as the track pivot", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterZ0PullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `z0Pull`,
                      so replace the current call with ``daughter(i, z0Pull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterTanLambdaPullWithOriginAsPivot(i)", v0DaughterHelixWithOriginAsPivotTanLambdaPull,
-                      "tan(lambda) pull of the i-th daughter track with the origin as the track pivot");
+                      "tan(lambda) pull of the i-th daughter track with the origin as the track pivot", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("v0DaughterTanLambdaPullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `tanLambdaPull`,
                      so replace the current call with ``daughter(i, tanLambdaPull)``.)DOC");
     /// helix parameters and covariance matrix elements
     REGISTER_VARIABLE("v0DaughterTau(i,j)",        v0DaughterTrackParam5AtIPPerigee,
                       "j-th track parameter (at IP perigee) of the i-th daughter track. "
-                      "j:  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda");
+                      "j:  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("v0DaughterCov(i,j)",        v0DaughterTrackParamCov5x5AtIPPerigee,
                       "j-th element of the 15 covariance matrix elements (at IP perigee) of the i-th daughter track. "
                       "(0,0), (0,1) ... (1,1), (1,2) ... (2,2) ...");
     /// Converted photon variables
     REGISTER_VARIABLE("convertedPhotonInvariantMass(i,j)",       convertedPhotonInvariantMass,
-                      "Invariant mass of the i-j daughter system as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
+                      "Invariant mass of the i-j daughter system as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("convertedPhotonDelTanLambda(i,j)",       convertedPhotonDelTanLambda,
-                      "Discriminating variable Delta-TanLambda calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
+                      "Discriminating variable Delta-TanLambda calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("convertedPhotonDelR(i,j)",       convertedPhotonDelR,
-                      "Discriminating variable Delta-R calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
+                      "Discriminating variable Delta-R calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("convertedPhotonDelZ(i,j)",       convertedPhotonDelZ,
-                      "Discriminating variable Delta-Z calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
+                      "Discriminating variable Delta-Z calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("convertedPhotonX(i,j)",       convertedPhotonX,
-                      "Estimate of vertex X coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
+                      "Estimate of vertex X coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("convertedPhotonY(i,j)",       convertedPhotonY,
-                      "Estimate of vertex Y coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
+                      "Estimate of vertex Y coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("convertedPhotonZ(i,j)",       convertedPhotonZ,
-                      "Estimate of vertex Z coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
+                      "Estimate of vertex Z coordinate  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("convertedPhotonRho(i,j)",       convertedPhotonRho,
-                      "Estimate of vertex Rho  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
+                      "Estimate of vertex Rho  calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("convertedPhotonPx(i,j)", convertedPhotonPx,
-                      "Estimate of x-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
+                      "Estimate of x-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("convertedPhotonPy(i,j)", convertedPhotonPy,
-                      "Estimate of y-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
+                      "Estimate of y-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("convertedPhotonPz(i,j)", convertedPhotonPz,
-                      "Estimate of z-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon");
+                      "Estimate of z-component of photon momentum calculated for daughters (i,j) as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
+                      Manager::VariableDataType::c_double);
     /// check whether the innermost VXD hits are shared among daoughters
     REGISTER_VARIABLE("v0DaughtersShare1stHit", v0DaughtersShareInnermostHit,
-                      "flag for V0 daughters sharing the first(innermost) VXD hit. 0x1(0x2) bit represents V/z(U/r-phi)-hit share.");
-    REGISTER_VARIABLE("v0DaughtersShare1stUHit", v0DaughtersShareInnermostHit,
-                      "flag for V0 daughters sharing the first(innermost) VXD U-side hit.");
-    REGISTER_VARIABLE("v0DaughtersShare1stVHit", v0DaughtersShareInnermostHit,
-                      "flag for V0 daughters sharing the first(innermost) VXD V-side hit.");
+                      "flag for V0 daughters sharing the first(innermost) VXD hit. 0x1(0x2) bit represents V/z(U/r-phi)-hit share.",
+                      Manager::VariableDataType::c_int);
+    REGISTER_VARIABLE("v0DaughtersShare1stUHit", v0DaughtersShare1stUHit,
+                      "flag for V0 daughters sharing the first(innermost) VXD U-side hit.", Manager::VariableDataType::c_bool);
+    REGISTER_VARIABLE("v0DaughtersShare1stVHit", v0DaughtersShare1stVHit,
+                      "flag for V0 daughters sharing the first(innermost) VXD V-side hit.", Manager::VariableDataType::c_bool);
   }
 }

@@ -181,18 +181,20 @@ namespace Belle2 {
     REGISTER_VARIABLE("recQ2BhSimple", REC_q2BhSimple,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
                       "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1 ... H_n \\ell \\nu_\\ell`.\n"
-                      "The B meson momentum in CMS is assumed to be 0.");
+                      "The B meson momentum in CMS is assumed to be 0.", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("recQ2Bh", REC_q2Bh,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
                       "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`.\n"
                       "This calculation uses a weighted average of the B meson around the reco B cone. \n"
                       "Based on diamond frame calculation of :math:`q^2` following the idea presented in https://www.osti.gov/biblio/1442697 \n"
-                      "It will switch to use of :b2:var:`recQ2BhSimple` if absolute of :b2:var:`cosThetaBetweenParticleAndNominalB`  > 1.");
+                      "It will switch to use of :b2:var:`recQ2BhSimple` if absolute of :b2:var:`cosThetaBetweenParticleAndNominalB`  > 1.",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("recMissM2", REC_MissM2,
                       "Returns the invariant mass squared of the missing momentum calculated assumings the"
-                      "reco B is at rest and calculating the neutrino (missing) momentum from :math:`p_\\nu = p_B - p_\\mathrm{had} - p_\\mathrm{lep}`");
+                      "reco B is at rest and calculating the neutrino (missing) momentum from :math:`p_\\nu = p_B - p_\\mathrm{had} - p_\\mathrm{lep}`",
+                      Manager::VariableDataType::c_double);
 
 
 

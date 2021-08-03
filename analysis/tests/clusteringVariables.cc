@@ -316,10 +316,10 @@ namespace {
     for (int i = 0; i < eclclusters.getEntries(); ++i)
       if (!eclclusters[i]->isTrack()) {
         const Particle* p = particles.appendNew(Particle(eclclusters[i]));
-        EXPECT_TRUE(std::get<double>(vIsFromECL->function(p)));
-        EXPECT_FALSE(std::get<double>(vIsFromKLM->function(p)));
-        EXPECT_FALSE(std::get<double>(vIsFromTrack->function(p)));
-        EXPECT_FALSE(std::get<double>(vIsFromV0->function(p)));
+        EXPECT_TRUE(std::get<bool>(vIsFromECL->function(p)));
+        EXPECT_FALSE(std::get<bool>(vIsFromKLM->function(p)));
+        EXPECT_FALSE(std::get<bool>(vIsFromTrack->function(p)));
+        EXPECT_FALSE(std::get<bool>(vIsFromV0->function(p)));
       }
   }
 

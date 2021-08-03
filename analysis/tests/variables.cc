@@ -361,10 +361,10 @@ namespace {
     const Manager::Var* vIsFromTrack = Manager::Instance().getVariable("isFromTrack");
     const Manager::Var* vIsFromV0 = Manager::Instance().getVariable("isFromV0");
 
-    EXPECT_TRUE(std::get<double>(vIsFromTrack->function(part)));
-    EXPECT_FALSE(std::get<double>(vIsFromECL->function(part)));
-    EXPECT_FALSE(std::get<double>(vIsFromKLM->function(part)));
-    EXPECT_FALSE(std::get<double>(vIsFromV0->function(part)));
+    EXPECT_TRUE(std::get<bool>(vIsFromTrack->function(part)));
+    EXPECT_FALSE(std::get<bool>(vIsFromECL->function(part)));
+    EXPECT_FALSE(std::get<bool>(vIsFromKLM->function(part)));
+    EXPECT_FALSE(std::get<bool>(vIsFromV0->function(part)));
     EXPECT_FLOAT_EQ(0.5, trackPValue(part));
     EXPECT_FLOAT_EQ(position.Z(), trackZ0(part));
     EXPECT_FLOAT_EQ(sqrt(pow(position.X(), 2) + pow(position.Y(), 2)), trackD0(part));
@@ -388,13 +388,13 @@ namespace {
     v0particle->appendDaughter(1, false);
     //-----------------------------------------------------------------------
 
-    EXPECT_FALSE(std::get<double>(vIsFromTrack->function(v0particle)));
-    EXPECT_FALSE(std::get<double>(vIsFromECL->function(v0particle)));
-    EXPECT_FALSE(std::get<double>(vIsFromKLM->function(v0particle)));
-    EXPECT_TRUE(std::get<double>(vIsFromV0->function(v0particle)));
+    EXPECT_FALSE(std::get<bool>(vIsFromTrack->function(v0particle)));
+    EXPECT_FALSE(std::get<bool>(vIsFromECL->function(v0particle)));
+    EXPECT_FALSE(std::get<bool>(vIsFromKLM->function(v0particle)));
+    EXPECT_TRUE(std::get<bool>(vIsFromV0->function(v0particle)));
 
     const Manager::Var* vNDaughters = Manager::Instance().getVariable("nDaughters");
-    EXPECT_FLOAT_EQ(std::get<double>(vNDaughters->function(v0particle)), 2);
+    EXPECT_EQ(std::get<int>(vNDaughters->function(v0particle)), 2);
   }
 
   class MCTruthVariablesTest : public ::testing::Test {
@@ -668,9 +668,9 @@ namespace {
 
 
     // -
-    EXPECT_FLOAT_EQ(std::get<double>(exp->function(nullptr)), 1337.);
-    EXPECT_FLOAT_EQ(std::get<double>(run->function(nullptr)), 12345.);
-    EXPECT_FLOAT_EQ(std::get<double>(evt->function(nullptr)), 54321.);
+    EXPECT_EQ(std::get<int>(exp->function(nullptr)), 1337);
+    EXPECT_EQ(std::get<int>(run->function(nullptr)), 12345);
+    EXPECT_EQ(std::get<int>(evt->function(nullptr)), 54321);
     EXPECT_FLOAT_EQ(std::get<double>(date->function(nullptr)), 20101101.);
     EXPECT_FLOAT_EQ(std::get<double>(year->function(nullptr)), 2010.);
     EXPECT_FLOAT_EQ(std::get<double>(time->function(nullptr)), 1288569600);
@@ -680,12 +680,12 @@ namespace {
   {
     StoreArray<MCParticle> mcParticles; // empty
     const Manager::Var* var = Manager::Instance().getVariable("nMCParticles");
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(nullptr)), 0.0);
+    EXPECT_EQ(std::get<int>(var->function(nullptr)), 0);
 
     for (unsigned i = 0; i < 10; ++i)
       mcParticles.appendNew();
 
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(nullptr)), 10.0);
+    EXPECT_EQ(std::get<int>(var->function(nullptr)), 10);
 
     // TODO: add other counters nTracks etc in here
   }
@@ -712,12 +712,12 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("isContinuumEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(p1)), 1.0);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(p2)), 1.0);
+    EXPECT_TRUE(std::get<bool>(var->function(p1)));
+    EXPECT_TRUE(std::get<bool>(var->function(p2)));
     const Manager::Var* varN = Manager::Instance().getVariable("isNotContinuumEvent");
     ASSERT_NE(varN, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(varN->function(p1)), 0.0);
-    EXPECT_FLOAT_EQ(std::get<double>(varN->function(p2)), 0.0);
+    EXPECT_FALSE(std::get<bool>(varN->function(p1)));
+    EXPECT_FALSE(std::get<bool>(varN->function(p2)));
   }
 
   TEST_F(EventVariableTest, TestIfContinuumEvent_ForUpsilon4SEvent)
@@ -742,12 +742,12 @@ namespace {
 
     const Manager::Var* var2 = Manager::Instance().getVariable("isContinuumEvent");
     ASSERT_NE(var2, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var2->function(p3)), 0.0);
-    EXPECT_FLOAT_EQ(std::get<double>(var2->function(p4)), 0.0);
+    EXPECT_FALSE(std::get<bool>(var2->function(p3)));
+    EXPECT_FALSE(std::get<bool>(var2->function(p4)));
     const Manager::Var* var2N = Manager::Instance().getVariable("isNotContinuumEvent");
     ASSERT_NE(var2N, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var2N->function(p3)), 1.0);
-    EXPECT_FLOAT_EQ(std::get<double>(var2N->function(p4)), 1.0);
+    EXPECT_TRUE(std::get<bool>(var2N->function(p3)));
+    EXPECT_TRUE(std::get<bool>(var2N->function(p4)));
   }
 
   TEST_F(EventVariableTest, TestIfContinuumEvent_ForWrongReconstructedUpsilon4SEvent)
@@ -772,12 +772,12 @@ namespace {
 
     const Manager::Var* var3 = Manager::Instance().getVariable("isContinuumEvent");
     ASSERT_NE(var3, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var3->function(p5)), 0.0);
-    EXPECT_FLOAT_EQ(std::get<double>(var3->function(p6)), 0.0);
+    EXPECT_FALSE(std::get<bool>(var3->function(p5)));
+    EXPECT_FALSE(std::get<bool>(var3->function(p6)));
     const Manager::Var* var3N = Manager::Instance().getVariable("isNotContinuumEvent");
     ASSERT_NE(var3N, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var3N->function(p5)), 1.0);
-    EXPECT_FLOAT_EQ(std::get<double>(var3N->function(p6)), 1.0);
+    EXPECT_TRUE(std::get<bool>(var3N->function(p5)));
+    EXPECT_TRUE(std::get<bool>(var3N->function(p6)));
   }
 
 
@@ -1150,8 +1150,8 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("passesCut(E < 3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<bool>(var->function(&p)), 1);
-    EXPECT_FLOAT_EQ(std::get<bool>(var->function(&p2)), 0);
+    EXPECT_TRUE(std::get<bool>(var->function(&p)));
+    EXPECT_FALSE(std::get<bool>(var->function(&p2)));
     // EXPECT_TRUE(std::isnan(std::get<double>(var->function(nullptr)))); // Check that particle is present has been removed to allow change to bool as return type
 
   }
@@ -1314,7 +1314,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("NumberOfMCParticlesInEvent(11)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(nullptr)), 2);
+    EXPECT_EQ(std::get<int>(var->function(nullptr)), 2);
 
   }
 
@@ -2377,8 +2377,8 @@ namespace {
 
     // -
     EXPECT_B2FATAL(std::get<bool>(vnonsense->function(notinthelist)));
-    EXPECT_EQ(std::get<bool>(vsensible->function(inthelist)), true);
-    EXPECT_EQ(std::get<bool>(vsensible->function(notinthelist)), false);
+    EXPECT_TRUE(std::get<bool>(vsensible->function(inthelist)));
+    EXPECT_FALSE(std::get<bool>(vsensible->function(notinthelist)));
   }
 
   TEST_F(MetaVariableTest, sourceObjectIsInList)
@@ -2514,18 +2514,18 @@ namespace {
 
     // -
     EXPECT_B2FATAL(std::get<bool>(vnonsense->function(photon)));
-    EXPECT_EQ(std::get<bool>(vsensible->function(photon)), true);
-    EXPECT_EQ(std::get<bool>(vsensible->function(electron)), true);
-    EXPECT_EQ(std::get<bool>(vsensible->function(other)), false);
-    EXPECT_EQ(std::get<bool>(vsensible->function(yetanotherelectron)), false);
+    EXPECT_TRUE(std::get<bool>(vsensible->function(photon)));
+    EXPECT_TRUE(std::get<bool>(vsensible->function(electron)));
+    EXPECT_FALSE(std::get<bool>(vsensible->function(other)));
+    EXPECT_FALSE(std::get<bool>(vsensible->function(yetanotherelectron)));
 
     // now mock up some other type particles
     Particle composite({0.5 , 0.4 , 0.5 , 0.8}, 512, Particle::c_Unflavored, Particle::c_Composite, 0);
     Particle undefined({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
     auto* composite_ = particles.appendNew(undefined);
     auto* undefined_ = particles.appendNew(composite);
-    EXPECT_EQ(std::get<bool>(vsensible->function(composite_)), false);
-    EXPECT_EQ(std::get<bool>(vsensible->function(undefined_)), false);
+    EXPECT_FALSE(std::get<bool>(vsensible->function(composite_)));
+    EXPECT_FALSE(std::get<bool>(vsensible->function(undefined_)));
   }
 
   TEST_F(MetaVariableTest, mostB2BAndClosestParticles)
@@ -2937,11 +2937,11 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("veto(pList1, 0.130 < M < 0.140)");
     ASSERT_NE(var, nullptr);
-    EXPECT_EQ(std::get<bool>(var->function(p)), true);
+    EXPECT_TRUE(std::get<bool>(var->function(p)));
 
     var = Manager::Instance().getVariable("veto(pList2, 0.130 < M < 0.140)");
     ASSERT_NE(var, nullptr);
-    EXPECT_EQ(std::get<bool>(var->function(p)), false);
+    EXPECT_FALSE(std::get<bool>(var->function(p)));
 
   }
 
@@ -3713,163 +3713,163 @@ namespace {
 
     const Manager::Var* var_0 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest)");
     ASSERT_NE(var_0, nullptr);
-    EXPECT_EQ(std::get<bool>(var_0->function(D_gd_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_0->function(D_gd_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_0->function(D_gd_1_0)), true);
-    EXPECT_EQ(std::get<bool>(var_0->function(D_gd_1_1)), true);
-    EXPECT_EQ(std::get<bool>(var_0->function(D_d_0)), true);
-    EXPECT_EQ(std::get<bool>(var_0->function(D_d_1)), true);
-    EXPECT_EQ(std::get<bool>(var_0->function(B_ggd_0_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0->function(B_ggd_0_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0->function(B_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0->function(B_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0->function(B_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0->function(B_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0->function(not_child)), false);
+    EXPECT_TRUE(std::get<bool>(var_0->function(D_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(D_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(D_gd_1_0)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(D_gd_1_1)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(D_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(B_ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(B_ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(B_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(B_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(B_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(not_child)));
 
     const Manager::Var* var_0a = Manager::Instance().getVariable("isDaughterOfList(D0:vartest)");
     ASSERT_NE(var_0a, nullptr);
-    EXPECT_EQ(std::get<bool>(var_0a->function(D_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0a->function(D_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0a->function(D_gd_1_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0a->function(D_gd_1_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0a->function(D_d_0)), true);
-    EXPECT_EQ(std::get<bool>(var_0a->function(D_d_1)), true);
-    EXPECT_EQ(std::get<bool>(var_0a->function(B_ggd_0_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0a->function(B_ggd_0_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0a->function(B_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0a->function(B_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0a->function(B_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0a->function(B_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0a->function(not_child)), false);
+    EXPECT_FALSE(std::get<bool>(var_0a->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(D_gd_1_1)));
+    EXPECT_TRUE(std::get<bool>(var_0a->function(D_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_0a->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(B_ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(B_ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(B_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(B_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(B_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(not_child)));
 
     const Manager::Var* var_0b = Manager::Instance().getVariable("isGrandDaughterOfList(D0:vartest)");
     ASSERT_NE(var_0b, nullptr);
-    EXPECT_EQ(std::get<bool>(var_0b->function(D_gd_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_0b->function(D_gd_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_0b->function(D_gd_1_0)), true);
-    EXPECT_EQ(std::get<bool>(var_0b->function(D_gd_1_1)), true);
-    EXPECT_EQ(std::get<bool>(var_0b->function(D_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0b->function(D_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0b->function(B_ggd_0_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0b->function(B_ggd_0_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0b->function(B_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0b->function(B_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0b->function(B_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0b->function(B_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0b->function(not_child)), false);
+    EXPECT_TRUE(std::get<bool>(var_0b->function(D_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_0b->function(D_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_0b->function(D_gd_1_0)));
+    EXPECT_TRUE(std::get<bool>(var_0b->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(B_ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(B_ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(B_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(B_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(B_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(not_child)));
 
     const Manager::Var* var_1 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, 1)");
     ASSERT_NE(var_1, nullptr);
-    EXPECT_EQ(std::get<bool>(var_1->function(D_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(D_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(D_gd_1_0)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(D_gd_1_1)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(D_d_0)), true);
-    EXPECT_EQ(std::get<bool>(var_1->function(D_d_1)), true);
-    EXPECT_EQ(std::get<bool>(var_1->function(B_ggd_0_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(B_ggd_0_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(B_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(B_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(B_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(B_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(not_child)), false);
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_1_1)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(D_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(B_ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(B_ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(B_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(B_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(B_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(not_child)));
 
     const Manager::Var* var_2 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, 2)");
     ASSERT_NE(var_2, nullptr);
-    EXPECT_EQ(std::get<bool>(var_2->function(D_gd_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_2->function(D_gd_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_2->function(D_gd_1_0)), true);
-    EXPECT_EQ(std::get<bool>(var_2->function(D_gd_1_1)), true);
-    EXPECT_EQ(std::get<bool>(var_2->function(D_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(D_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(B_ggd_0_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(B_ggd_0_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(B_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(B_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(B_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(B_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(not_child)), false);
+    EXPECT_TRUE(std::get<bool>(var_2->function(D_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(D_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(D_gd_1_0)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(B_ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(B_ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(B_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(B_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(B_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(not_child)));
 
     const Manager::Var* var_3 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest)");
     ASSERT_NE(var_3, nullptr);
-    EXPECT_EQ(std::get<bool>(var_3->function(D_gd_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_3->function(D_gd_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_3->function(D_gd_1_0)), true);
-    EXPECT_EQ(std::get<bool>(var_3->function(D_gd_1_1)), true);
-    EXPECT_EQ(std::get<bool>(var_3->function(D_d_0)), true);
-    EXPECT_EQ(std::get<bool>(var_3->function(D_d_1)), true);
-    EXPECT_EQ(std::get<bool>(var_3->function(B_ggd_0_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_3->function(B_ggd_0_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_3->function(B_gd_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_3->function(B_gd_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_3->function(B_d_0)), true);
-    EXPECT_EQ(std::get<bool>(var_3->function(B_d_1)), true);
-    EXPECT_EQ(std::get<bool>(var_3->function(not_child)), false);
+    EXPECT_TRUE(std::get<bool>(var_3->function(D_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(D_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(D_gd_1_0)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(D_gd_1_1)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(D_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(D_d_1)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(B_ggd_0_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(B_ggd_0_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(B_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(B_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(B_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(not_child)));
 
     const Manager::Var* var_4 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest, -1)");
     ASSERT_NE(var_4, nullptr);
-    EXPECT_EQ(std::get<bool>(var_4->function(D_gd_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_4->function(D_gd_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_4->function(D_gd_1_0)), true);
-    EXPECT_EQ(std::get<bool>(var_4->function(D_gd_1_1)), true);
-    EXPECT_EQ(std::get<bool>(var_4->function(D_d_0)), true);
-    EXPECT_EQ(std::get<bool>(var_4->function(D_d_1)), true);
-    EXPECT_EQ(std::get<bool>(var_4->function(B_ggd_0_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_4->function(B_ggd_0_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_4->function(B_gd_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_4->function(B_gd_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_4->function(B_d_0)), true);
-    EXPECT_EQ(std::get<bool>(var_4->function(B_d_1)), true);
-    EXPECT_EQ(std::get<bool>(var_4->function(not_child)), false);
+    EXPECT_TRUE(std::get<bool>(var_4->function(D_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(D_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(D_gd_1_0)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(D_gd_1_1)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(D_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(D_d_1)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(B_ggd_0_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(B_ggd_0_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(B_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(B_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(B_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(not_child)));
 
     const Manager::Var* var_5 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest, 1)");
     ASSERT_NE(var_5, nullptr);
-    EXPECT_EQ(std::get<bool>(var_5->function(D_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(D_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(D_gd_1_0)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(D_gd_1_1)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(D_d_0)), true);
-    EXPECT_EQ(std::get<bool>(var_5->function(D_d_1)), true);
-    EXPECT_EQ(std::get<bool>(var_5->function(B_ggd_0_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(B_ggd_0_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(B_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(B_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(B_d_0)), true);
-    EXPECT_EQ(std::get<bool>(var_5->function(B_d_1)), true);
-    EXPECT_EQ(std::get<bool>(var_5->function(not_child)), false);
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_1_1)));
+    EXPECT_TRUE(std::get<bool>(var_5->function(D_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_5->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(B_ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(B_ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(B_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(B_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_5->function(B_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_5->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(not_child)));
 
     const Manager::Var* var_6 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest, 2)");
     ASSERT_NE(var_6, nullptr);
-    EXPECT_EQ(std::get<bool>(var_6->function(D_gd_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_6->function(D_gd_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_6->function(D_gd_1_0)), true);
-    EXPECT_EQ(std::get<bool>(var_6->function(D_gd_1_1)), true);
-    EXPECT_EQ(std::get<bool>(var_6->function(D_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_6->function(D_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_6->function(B_ggd_0_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_6->function(B_ggd_0_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_6->function(B_gd_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_6->function(B_gd_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_6->function(B_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_6->function(B_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_6->function(not_child)), false);
+    EXPECT_TRUE(std::get<bool>(var_6->function(D_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_6->function(D_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_6->function(D_gd_1_0)));
+    EXPECT_TRUE(std::get<bool>(var_6->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_6->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_6->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_6->function(B_ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_6->function(B_ggd_0_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_6->function(B_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_6->function(B_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_6->function(B_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_6->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_6->function(not_child)));
 
     const Manager::Var* var_7 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest, 3)");
     ASSERT_NE(var_7, nullptr);
-    EXPECT_EQ(std::get<bool>(var_7->function(D_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_7->function(D_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_7->function(D_gd_1_0)), false);
-    EXPECT_EQ(std::get<bool>(var_7->function(D_gd_1_1)), false);
-    EXPECT_EQ(std::get<bool>(var_7->function(D_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_7->function(D_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_7->function(B_ggd_0_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_7->function(B_ggd_0_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_7->function(B_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_7->function(B_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_7->function(B_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_7->function(B_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_7->function(not_child)), false);
+    EXPECT_FALSE(std::get<bool>(var_7->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(D_d_1)));
+    EXPECT_TRUE(std::get<bool>(var_7->function(B_ggd_0_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_7->function(B_ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(B_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(B_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(B_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(not_child)));
   }
 
 
@@ -4015,106 +4015,106 @@ namespace {
 
     const Manager::Var* var_0 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest)");
     ASSERT_NE(var_0, nullptr);
-    EXPECT_EQ(std::get<bool>(var_0->function(D_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0->function(D_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0->function(D_gd_1_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0->function(D_gd_1_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0->function(D_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_0->function(D_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_0->function(ggd_0_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_0->function(ggd_0_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_0->function(gd_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_0->function(gd_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_0->function(d_0)), true);
-    EXPECT_EQ(std::get<bool>(var_0->function(d_1)), true);
-    EXPECT_EQ(std::get<bool>(var_0->function(not_child)), false);
-    EXPECT_EQ(std::get<bool>(var_0->function(not_child_2)), false);
+    EXPECT_FALSE(std::get<bool>(var_0->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(D_d_1)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(ggd_0_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(ggd_0_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(d_0)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(d_1)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(not_child)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(not_child_2)));
 
     const Manager::Var* var_1 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, D0:vartest)");
     ASSERT_NE(var_1, nullptr);
-    EXPECT_EQ(std::get<bool>(var_1->function(D_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(D_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(D_gd_1_0)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(D_gd_1_1)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(D_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(D_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(ggd_0_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_1->function(ggd_0_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_1->function(gd_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_1->function(gd_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_1->function(d_0)), true);
-    EXPECT_EQ(std::get<bool>(var_1->function(d_1)), true);
-    EXPECT_EQ(std::get<bool>(var_1->function(not_child)), false);
-    EXPECT_EQ(std::get<bool>(var_1->function(not_child_2)), false);
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_d_1)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(ggd_0_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(ggd_0_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(d_0)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(d_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(not_child)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(not_child_2)));
 
     const Manager::Var* var_2 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, -1)");
     ASSERT_NE(var_2, nullptr);
-    EXPECT_EQ(std::get<bool>(var_2->function(D_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(D_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(D_gd_1_0)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(D_gd_1_1)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(D_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(D_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(ggd_0_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_2->function(ggd_0_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_2->function(gd_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_2->function(gd_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_2->function(d_0)), true);
-    EXPECT_EQ(std::get<bool>(var_2->function(d_1)), true);
-    EXPECT_EQ(std::get<bool>(var_2->function(not_child)), false);
-    EXPECT_EQ(std::get<bool>(var_2->function(not_child_2)), false);
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_d_1)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(ggd_0_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(ggd_0_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(d_0)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(d_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(not_child)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(not_child_2)));
 
     const Manager::Var* var_3 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, 1)");
     ASSERT_NE(var_3, nullptr);
-    EXPECT_EQ(std::get<bool>(var_3->function(D_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_3->function(D_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_3->function(D_gd_1_0)), false);
-    EXPECT_EQ(std::get<bool>(var_3->function(D_gd_1_1)), false);
-    EXPECT_EQ(std::get<bool>(var_3->function(D_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_3->function(D_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_3->function(ggd_0_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_3->function(ggd_0_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_3->function(gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_3->function(gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_3->function(d_0)), true);
-    EXPECT_EQ(std::get<bool>(var_3->function(d_1)), true);
-    EXPECT_EQ(std::get<bool>(var_3->function(not_child)), false);
-    EXPECT_EQ(std::get<bool>(var_3->function(not_child_2)), false);
+    EXPECT_FALSE(std::get<bool>(var_3->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(d_0)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(d_1)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(not_child)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(not_child_2)));
 
     const Manager::Var* var_4 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, 2)");
     ASSERT_NE(var_4, nullptr);
-    EXPECT_EQ(std::get<bool>(var_4->function(D_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_4->function(D_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_4->function(D_gd_1_0)), false);
-    EXPECT_EQ(std::get<bool>(var_4->function(D_gd_1_1)), false);
-    EXPECT_EQ(std::get<bool>(var_4->function(D_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_4->function(D_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_4->function(ggd_0_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_4->function(ggd_0_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_4->function(gd_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_4->function(gd_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_4->function(d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_4->function(d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_4->function(not_child)), false);
-    EXPECT_EQ(std::get<bool>(var_4->function(not_child_2)), false);
+    EXPECT_FALSE(std::get<bool>(var_4->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(ggd_0_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(d_0)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(d_1)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(not_child)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(not_child_2)));
 
 
     const Manager::Var* var_5 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, 3)");
     ASSERT_NE(var_5, nullptr);
-    EXPECT_EQ(std::get<bool>(var_5->function(D_gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(D_gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(D_gd_1_0)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(D_gd_1_1)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(D_d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(D_d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(ggd_0_0_0)), true);
-    EXPECT_EQ(std::get<bool>(var_5->function(ggd_0_0_1)), true);
-    EXPECT_EQ(std::get<bool>(var_5->function(gd_0_0)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(gd_0_1)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(d_0)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(d_1)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(not_child)), false);
-    EXPECT_EQ(std::get<bool>(var_5->function(not_child_2)), false);
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_d_1)));
+    EXPECT_TRUE(std::get<bool>(var_5->function(ggd_0_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_5->function(ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(d_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(d_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(not_child)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(not_child_2)));
   }
 
 

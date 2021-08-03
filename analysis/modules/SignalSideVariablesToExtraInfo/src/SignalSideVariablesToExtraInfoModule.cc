@@ -77,7 +77,7 @@ void SignalSideVariablesToExtraInfoModule::event()
       if (signalSide->hasExtraInfo(m_extraInfoNames[iVar])) {
         B2WARNING("Extra info with given name " << m_extraInfoNames[iVar] << " already set, I won't set it again.");
       } else {
-        double value;
+        double value = std::numeric_limits<double>::quiet_NaN();
         if (std::holds_alternative<double>(m_functions[iVar](plist->getParticle(0)))) {
           value = std::get<double>(m_functions[iVar](plist->getParticle(0)));
         } else if (std::holds_alternative<int>(m_functions[iVar](plist->getParticle(0)))) {

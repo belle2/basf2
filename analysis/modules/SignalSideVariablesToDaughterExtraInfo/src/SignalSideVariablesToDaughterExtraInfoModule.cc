@@ -78,7 +78,7 @@ void SignalSideVariablesToDaughterExtraInfoModule::event()
 
     const unsigned int nVars = m_functions.size();
     for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-      double value;
+      double value = std::numeric_limits<double>::quiet_NaN();
       if (std::holds_alternative<double>(m_functions[iVar](signalSide))) {
         value = std::get<double>(m_functions[iVar](signalSide));
       } else if (std::holds_alternative<int>(m_functions[iVar](signalSide))) {

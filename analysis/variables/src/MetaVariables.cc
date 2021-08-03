@@ -236,7 +236,17 @@ namespace Belle2 {
           {
             return eventExtraInfo->getExtraInfo(key);
           } else {
-            double value = std::get<double>(var->function(nullptr));
+            double value = std::numeric_limits<double>::quiet_NaN();
+            if (std::holds_alternative<double>(var->function(nullptr)))
+            {
+              value = std::get<double>(var->function(nullptr));
+            } else if (std::holds_alternative<int>(var->function(nullptr)))
+            {
+              return std::get<int>(var->function(nullptr));
+            } else if (std::holds_alternative<bool>(var->function(nullptr)))
+            {
+              return std::get<bool>(var->function(nullptr));
+            }
             eventExtraInfo->addExtraInfo(key, value);
             return value;
           }

@@ -696,71 +696,78 @@ namespace Belle2 {
 
     VARIABLE_GROUP("TOP Calibration");
     REGISTER_VARIABLE("extrapTrackToTOPimpactZ", TOPVariable::extrapTrackToTOPz,
-                      "[calibration] z coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult");
+                      "[calibration] z coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("extrapTrackToTOPimpactTheta", TOPVariable::extrapTrackToTOPtheta,
-                      "[calibration] theta coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult");
+                      "[calibration] theta coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("extrapTrackToTOPimpactPhi", TOPVariable::extrapTrackToTOPphi,
-                      "[calibration] phi coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult");
+                      "[calibration] phi coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topDigitCount", TOPVariable::topDigitCount,
-                      "[calibration] The number of TOPDigits in the module to which the track was extrapolated");
+                      "[calibration] The number of TOPDigits in the module to which the track was extrapolated", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topBackgroundDigitCount", TOPVariable::topBackgroundDigitCount,
-                      "[calibration] The number of TOPDigits in all modules except the one to which the track was extrapolated");
+                      "[calibration] The number of TOPDigits in all modules except the one to which the track was extrapolated",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topBackgroundDigitCountRaw", TOPVariable::topBackgroundDigitCountRaw,
-                      "[calibration] The number of TOPDigits in all modules except the one to which the track was extrapolated");
+                      "[calibration] The number of TOPDigits in all modules except the one to which the track was extrapolated",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topDigitCountRaw", TOPVariable::topDigitCount,
-                      "[calibration] The number of TOPDigits in the module to which the track was extrapolated, regardless of hit quality");
+                      "[calibration] The number of TOPDigits in the module to which the track was extrapolated, regardless of hit quality",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topReflectedDigitCount", TOPVariable::topReflectedDigitCount,
-                      "[calibration] The number of reflected photons in the same module");
+                      "[calibration] The number of reflected photons in the same module", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topReflectedDigitCountExpert(minGap, maxGap)", TOPVariable::topReflectedDigitCountExpert,
-                      "[calibration] The number of photons after the largest gap between minGap and maxGap");
+                      "[calibration] The number of photons after the largest gap between minGap and maxGap", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topDigitGapSize", TOPVariable::topDigitGapSize,
-                      "[calibration] The largest time difference between two consecutive hits in the same module");
+                      "[calibration] The largest time difference between two consecutive hits in the same module", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topLocalX", TOPVariable::getTOPLocalX,
-                      "[calibration] The local x coordinate of the particle's entry point to the TOP module");
+                      "[calibration] The local x coordinate of the particle's entry point to the TOP module", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topLocalY", TOPVariable::getTOPLocalY,
-                      "[calibration] The local y coordinate of the particle's entry point to the TOP module");
+                      "[calibration] The local y coordinate of the particle's entry point to the TOP module", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topLocalZ", TOPVariable::getTOPLocalZ,
-                      "[calibration] The local z coordinate of the particle's entry point to the TOP module");
+                      "[calibration] The local z coordinate of the particle's entry point to the TOP module", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topLocalXMCMatch", TOPVariable::getTOPLocalXMCMatch,
-                      "[calibration] The local x coordinate of the MC particle's entry point to the TOP module");
+                      "[calibration] The local x coordinate of the MC particle's entry point to the TOP module", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topLocalYMCMatch", TOPVariable::getTOPLocalYMCMatch,
-                      "[calibration] The local y coordinate of the MC particle's entry point to the TOP module");
+                      "[calibration] The local y coordinate of the MC particle's entry point to the TOP module", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topLocalZMCMatch", TOPVariable::getTOPLocalZMCMatch,
-                      "[calibration] The local z coordinate of the MC particle's entry point to the TOP module");
+                      "[calibration] The local z coordinate of the MC particle's entry point to the TOP module", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topLocalPhi", TOPVariable::getTOPLocalPhi,
-                      "[calibration] The local phi coordinate of the particle's momentum in the TOP module");
+                      "[calibration] The local phi coordinate of the particle's momentum in the TOP module", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topLocalTheta", TOPVariable::getTOPLocalTheta,
-                      "[calibration] The local phi coordinate of the particle's momentum in the TOP module");
+                      "[calibration] The local phi coordinate of the particle's momentum in the TOP module", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topTOF", TOPVariable::getTOF,
-                      "[calibration] The time of flight from the origin to the TOP");
+                      "[calibration] The time of flight from the origin to the TOP", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topTOFExpert(pdg)", TOPVariable::getTOFExpert,
-                      "[calibration] The time of flight from the origin to the TOP under the given hypothesis");
+                      "[calibration] The time of flight from the origin to the TOP under the given hypothesis", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topAverageTimeOfFirst5", TOPVariable::getAverageTimeOfFirst5,
-                      "[calibration] The average time of the first (up to) 5 hits in the module with the track");
+                      "[calibration] The average time of the first (up to) 5 hits in the module with the track", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topSlotID", TOPVariable::getSlotID,
-                      "[calibration] The ID of the TOP slot that was hit by the particle");
+                      "[calibration] The ID of the TOP slot that was hit by the particle", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topExpectedPhotonCount(pdg)", TOPVariable::getExpectedTOPPhotonCount,
-                      "[calibration] The expected number of photons in the TOP for the particle under the given hypothesis");
+                      "[calibration] The expected number of photons in the TOP for the particle under the given hypothesis",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topPhotonCount", TOPVariable::getTOPPhotonCount,
-                      "[calibration] The number of (bg-subtracted) TOP photons in for the given particle");
+                      "[calibration] The number of (bg-subtracted) TOP photons in for the given particle", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("countTOPHitsInInterval(tmin, tmax)", TOPVariable::countTOPHitsInInterval,
-                      "[calibration] The number of photons in the given interval");
+                      "[calibration] The number of photons in the given interval", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("countTOPHitsInFirst20ns", TOPVariable::countTOPHitsInFirst20ns,
-                      "[calibration] The number of photons in the first 20 ns after the first photon");
+                      "[calibration] The number of photons in the first 20 ns after the first photon", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("countRawTOPHitsInInterval(tmin, tmax)", TOPVariable::countRawTOPHitsInInterval,
-                      "[calibration] The number of photons in the given interval");
+                      "[calibration] The number of photons in the given interval", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topFlag", TOPVariable::getFlag,
-                      "[calibration] reconstruction flag, log likelihoods are valid if flag==1");
+                      "[calibration] reconstruction flag, log likelihoods are valid if flag==1", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topElectronLogL", TOPVariable::getElectronLogL,
-                      "[calibration] electron log likelihood");
+                      "[calibration] electron log likelihood", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topMuonLogL", TOPVariable::getMuonLogL,
-                      "[calibration] muon log likelihood");
+                      "[calibration] muon log likelihood", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topPionLogL", TOPVariable::getPionLogL,
-                      "[calibration] pion log likelihood");
+                      "[calibration] pion log likelihood", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topKaonLogL", TOPVariable::getKaonLogL,
-                      "[calibration] kaon log likelihood");
+                      "[calibration] kaon log likelihood", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topProtonLogL", TOPVariable::getProtonLogL,
-                      "[calibration] proton log likelihood");
+                      "[calibration] proton log likelihood", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("logLScanMass", TOPVariable::getLogLScanMass,
                       "[calibration] mass at the logL maximum from the LL scan");
     REGISTER_VARIABLE("logLScanMassUpperInterval", TOPVariable::getLogLScanMassUpperInterval,
@@ -772,20 +779,20 @@ namespace Belle2 {
     REGISTER_VARIABLE("logLScanExpectedSignalPhotons", TOPVariable::getLogLScanExpectedSignalPhotons,
                       "[calibration] Expected signal photon yeild at the LL maximum");
     REGISTER_VARIABLE("topRecBunchUsedTrackCount", TOPVariable::TOPRecBunchUsedTrackCount,
-                      "[calibration] The number of tracks used in the bunch reconstruction");
+                      "[calibration] The number of tracks used in the bunch reconstruction", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topRecBunchTrackCount", TOPVariable::TOPRecBunchTrackCount,
-                      "[calibration] The number of tracks in the TOP acceptance");
+                      "[calibration] The number of tracks in the TOP acceptance", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topRecBunchCurrentOffset", TOPVariable::TOPRecBunchCurrentOffset,
-                      "[calibration] The current offset");
+                      "[calibration] The current offset", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topRecBunchNumber", TOPVariable::TOPRecBunchNumber,
-                      "[calibration] The number of the bunch relative to the interaction");
+                      "[calibration] The number of the bunch relative to the interaction", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("isTopRecBunchReconstructed", TOPVariable::isTOPRecBunchReconstructed,
-                      "[calibration] Flag to indicate whether the bunch was reconstructed");
+                      "[calibration] Flag to indicate whether the bunch was reconstructed", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topRawPhotonsInSlot(id)", TOPVariable::TOPRawPhotonsInSlot,
-                      "[calibration] The number of all photons in the given slot");
+                      "[calibration] The number of all photons in the given slot", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topGoodPhotonsInSlot(id)", TOPVariable::TOPGoodPhotonsInSlot,
-                      "[calibration] The number of good photons in the given slot");
+                      "[calibration] The number of good photons in the given slot", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topTracksInSlot", TOPVariable::TOPTracksInSlot,
-                      "[calibration] The number of tracks in the same slot as the particle");
+                      "[calibration] The number of tracks in the same slot as the particle", Manager::VariableDataType::c_double);
   } // Variable
 } // Belle2

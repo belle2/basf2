@@ -261,49 +261,59 @@ namespace Belle2 {
 
     VARIABLE_GROUP("KLMMuidLikelihood calibration");
     REGISTER_VARIABLE("muidMuonProbability", muidMuonProbability,
-                      "[Calibration] Returns the muon probability stored in the KLMMuidLikelihood dataobject");
+                      "[Calibration] Returns the muon probability stored in the KLMMuidLikelihood dataobject", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidPionProbability", muidPionProbability,
-                      "[Calibration] Returns the pion probability stored in the KLMMuidLikelihood dataobject");
+                      "[Calibration] Returns the pion probability stored in the KLMMuidLikelihood dataobject", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidKaonProbability", muidKaonProbability,
-                      "[Calibration] Returns the kaon probability stored in the KLMMuidLikelihood dataobject");
+                      "[Calibration] Returns the kaon probability stored in the KLMMuidLikelihood dataobject", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidElectronProbability", muidElectronProbability,
-                      "[Calibration] Returns the electron probability stored in the KLMMuidLikelihood dataobject");
+                      "[Calibration] Returns the electron probability stored in the KLMMuidLikelihood dataobject", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidProtonProbability", muidProtonProbability,
-                      "[Calibration] Returns the proton probability stored in the KLMMuidLikelihood dataobject");
+                      "[Calibration] Returns the proton probability stored in the KLMMuidLikelihood dataobject", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidDeuteronProbability", muidDeuteronProbability,
-                      "[Calibration] Returns the deuteron probability stored in the KLMMuidLikelihood dataobject");
+                      "[Calibration] Returns the deuteron probability stored in the KLMMuidLikelihood dataobject", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidMuonLogLikelihood", muidMuonLogLikelihood,
-                      "[Calibration] Returns the muon log-likelihood stored in the KLMMuidLikelihood dataobject");
+                      "[Calibration] Returns the muon log-likelihood stored in the KLMMuidLikelihood dataobject", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidPionLogLikelihood", muidPionLogLikelihood,
-                      "[Calibration] Returns the pion log-likelihood stored in the KLMMuidLikelihood dataobject");
+                      "[Calibration] Returns the pion log-likelihood stored in the KLMMuidLikelihood dataobject", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidKaonLogLikelihood", muidKaonLogLikelihood,
-                      "[Calibration] Returns the kaon log-likelihood stored in the KLMMuidLikelihood dataobject");
+                      "[Calibration] Returns the kaon log-likelihood stored in the KLMMuidLikelihood dataobject", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidElectronLogLikelihood", muidElectronLogLikelihood,
-                      "[Calibration] Returns the electron log-likelihood stored in the KLMMuidLikelihood dataobject");
+                      "[Calibration] Returns the electron log-likelihood stored in the KLMMuidLikelihood dataobject",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidProtonLogLikelihood", muidProtonLogLikelihood,
-                      "[Calibration] Returns the proton log-likelihood stored in the KLMMuidLikelihood dataobject");
+                      "[Calibration] Returns the proton log-likelihood stored in the KLMMuidLikelihood dataobject", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidDeuteronLogLikelihood", muidDeuteronLogLikelihood,
-                      "[Calibration] Returns the deuteron log-likelihood stored in the KLMMuidLikelihood dataobject");
+                      "[Calibration] Returns the deuteron log-likelihood stored in the KLMMuidLikelihood dataobject",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidOutcomeExtTrack", muidOutcomeExtTrack,
-                      "[Calibration] Returns outcome of muon extrapolation (see MuidElementNumbers for the complete list of the outcome values)");
+                      "[Calibration] Returns outcome of muon extrapolation (see MuidElementNumbers for the complete list of the outcome values)",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidChiSquared", muidChiSquared,
-                      "[Calibration] Returns chi-squared for this extrapolation");
+                      "[Calibration] Returns chi-squared for this extrapolation", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidDegreesOfFreedom", muidDegreesOfFreedom,
-                      "[Calibration] Returns number of degrees of freedom in chi-squared calculation");
+                      "[Calibration] Returns number of degrees of freedom in chi-squared calculation", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidEndcapExtLayer", muidEndcapExtLayer,
-                      "[Calibration] Returns outermost EKLM layer crossed by track during extrapolation");
+                      "[Calibration] Returns outermost EKLM layer crossed by track during extrapolation", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidBarrelExtLayer", muidBarrelExtLayer,
-                      "[Calibration] Returns outermost BKLM layer crossed by track during extrapolation");
+                      "[Calibration] Returns outermost BKLM layer crossed by track during extrapolation", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidExtLayer", muidExtLayer,
-                      "[Calibration] Returns outermost BKLM or EKLM layer crossed by track during extrapolation");
-    REGISTER_VARIABLE("muidEndcapHitLayer", muidEndcapHitLayer, "[Calibration] Returns outermost EKLM layer with a matching hit");
-    REGISTER_VARIABLE("muidBarrelHitLayer", muidBarrelHitLayer, "[Calibration] Returns outermost BKLM layer with a matching hit");
-    REGISTER_VARIABLE("muidHitLayer", muidHitLayer, "[Calibration] Return outermost BKLM or EKLM layer with a matching hit");
+                      "[Calibration] Returns outermost BKLM or EKLM layer crossed by track during extrapolation", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("muidEndcapHitLayer", muidEndcapHitLayer, "[Calibration] Returns outermost EKLM layer with a matching hit",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("muidBarrelHitLayer", muidBarrelHitLayer, "[Calibration] Returns outermost BKLM layer with a matching hit",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("muidHitLayer", muidHitLayer, "[Calibration] Return outermost BKLM or EKLM layer with a matching hit",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("muidExtLayerPattern", muidExtLayerPattern,
-                      "[Calibration] Returns layer-crossing bit pattern during extrapolation");
-    REGISTER_VARIABLE("muidHitLayerPattern", muidHitLayerPattern, "[Calibration] Returns matching-hit bit pattern");
-    REGISTER_VARIABLE("muidTotalBarrelHits", muidTotalBarrelHits, "[Calibration] Returns total number of matching BKLM hits");
-    REGISTER_VARIABLE("muidTotalEndcapHits", muidTotalEndcapHits, "[Calibration] Returns total number of matching EKLM hits");
-    REGISTER_VARIABLE("muidTotalHits", muidTotalHits, "[Calibration] Returns total number of matching KLM hits");
+                      "[Calibration] Returns layer-crossing bit pattern during extrapolation", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("muidHitLayerPattern", muidHitLayerPattern, "[Calibration] Returns matching-hit bit pattern",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("muidTotalBarrelHits", muidTotalBarrelHits, "[Calibration] Returns total number of matching BKLM hits",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("muidTotalEndcapHits", muidTotalEndcapHits, "[Calibration] Returns total number of matching EKLM hits",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("muidTotalHits", muidTotalHits, "[Calibration] Returns total number of matching KLM hits",
+                      Manager::VariableDataType::c_double);
   }
 }

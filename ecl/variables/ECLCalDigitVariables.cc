@@ -1274,164 +1274,215 @@ namespace Belle2 {
 
     VARIABLE_GROUP("ECL Calibration (cDST)");
     REGISTER_VARIABLE("eclcaldigitEnergy(i, j)", getECLCalDigitEnergy,
-                      "[calibration] Returns the energy  of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the energy  of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitTime(i, j)", getECLCalDigitTime,
-                      "[calibration] Returns the time of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the time of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitTimeResolution(i, j)", getECLCalDigitTimeResolution,
-                      "[calibration] Returns the time resolution (dt99) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the time resolution (dt99) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2(i, j)", getTwoComponentChi2,
-                      "[calibration] Returns the two component fit chi2 of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the two component fit chi2 of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitTwoComponentTotalEnergy(i, j)", getTwoComponentTotalEnergy,
-                      "[calibration] Returns the two component total energy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the two component total energy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitTwoComponentHadronEnergy(i, j)", getTwoComponentHadronEnergy,
-                      "[calibration] Returns the two component hadron energy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the two component hadron energy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitPhi(i, j)", getPhi,
-                      "[calibration] Returns phi of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns phi of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitTheta(i, j)", getTheta,
-                      "[calibration] Returns theta of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns theta of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitR(i, j)", getR,
-                      "Returns R (from a geometry object) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "Returns R (from a geometry object) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitPhiId(i, j)", getPhiId,
-                      "[calibration] Returns the phi Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the phi Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitThetaId(i, j)", getThetaId,
-                      "[calibration] Returns the theta Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the theta Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitCellId(i, j)", getCellId,
-                      "[calibration] Returns the cell id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
+                      "[calibration] Returns the cell id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitUsedForClusterEnergy(i, j)", getUsedForClusterEnergy,
-                      " [calibration] Returns the 0 (not used) 1 (used) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
+                      " [calibration] Returns the 0 (not used) 1 (used) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)",
+                      Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("eclcaldigitCenterCellId", getCenterCellId, "[calibration] Returns the center cell id");
-    REGISTER_VARIABLE("eclcaldigitCenterCellThetaId", getCenterCellThetaId, "[calibration] Returns the center cell theta id");
-    REGISTER_VARIABLE("eclcaldigitCenterCellPhiId", getCenterCellPhiId, "[calibration] Returns the center cell phi id");
+    REGISTER_VARIABLE("eclcaldigitCenterCellId", getCenterCellId, "[calibration] Returns the center cell id",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("eclcaldigitCenterCellThetaId", getCenterCellThetaId, "[calibration] Returns the center cell theta id",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("eclcaldigitCenterCellPhiId", getCenterCellPhiId, "[calibration] Returns the center cell phi id",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitCenterCellCrystalTheta", getCenterCellCrystalTheta,
-                      "[calibration] Returns the center cell crystal theta");
+                      "[calibration] Returns the center cell crystal theta", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitCenterCellCrystalPhi", getCenterCellCrystalPhi,
-                      "[calibration] Returns the center cell crystal phi");
+                      "[calibration] Returns the center cell crystal phi", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitCenterCellIndex(i)", getCenterCellIndex,
-                      "[calibration] Returns the center cell index (within its 5x5 (i=5) or 7x7 (i=7) neighbours)");
+                      "[calibration] Returns the center cell index (within its 5x5 (i=5) or 7x7 (i=7) neighbours)", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitMCEnergy(i, j)", getMCEnergy,
-                      "[calibration] Returns the true deposited energy of all particles of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
+                      "[calibration] Returns the true deposited energy of all particles of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("clusterNHitsThreshold(i)", getClusterNHitsThreshold,
-                      "[calibration] Returns sum of crystal weights sum(w_i) with w_i<=1  associated to this cluster above threshold (in GeV)");
+                      "[calibration] Returns sum of crystal weights sum(w_i) with w_i<=1  associated to this cluster above threshold (in GeV)",
+                      Manager::VariableDataType::c_double);
 
     VARIABLE_GROUP("ECL Calibration (based on extrapolated tracks) (cDST)");
     REGISTER_VARIABLE("eclcaldigitExtEnergy(i, j)", getExtECLCalDigitEnergy,
-                      "[calibration] Returns the energy  of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the energy  of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtTime(i, j)", getExtECLCalDigitTime,
-                      "[calibration] Returns the time of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the time of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtTimeResolution(i, j)", getExtECLCalDigitTimeResolution,
-                      "[calibration] Returns the time resolution (dt99) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the time resolution (dt99) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentTotalEnergy(i, j)", getExtECLCalDigitTwoComponentTotalEnergy,
-                      "[calibration] Returns the TwoComponentTotalEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentTotalEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentHadronEnergy(i, j)", getExtECLCalDigitTwoComponentHadronEnergy,
-                      "[calibration] Returns the TwoComponentHadronEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentHadronEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2(i, j)", getExtECLCalDigitTwoComponentChi2,
-                      "[calibration] Returns the TwoComponentchi2 of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentchi2 of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtPhi(i, j)", getExtPhi,
-                      "[calibration] Returns phi of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
+                      "[calibration] Returns phi of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtTheta(i, j)", getExtTheta,
-                      "[calibration] Returns theta of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
+                      "[calibration] Returns theta of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtPhiId(i, j)", getExtPhiId,
-                      "[calibration] Returns the phi Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
+                      "[calibration] Returns the phi Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtThetaId(i, j)", getExtThetaId,
-                      "[calibration] Returns the theta Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
-    REGISTER_VARIABLE("eclcaldigitExtCellId", getExtCellId, "[calibration] Returns the extrapolated cell id");
-    REGISTER_VARIABLE("eclcaldigitExtCellThetaId", getExtCellThetaId, "[calibration] Returns the ext cell theta id");
-    REGISTER_VARIABLE("eclcaldigitExtCellPhiId", getExtCellPhiId, "[calibration] Returns the ext cell phi id");
-    REGISTER_VARIABLE("eclcaldigitExtCellCrystalTheta", getExtCellCrystalTheta, "[calibration] Returns the ext cell crystal theta");
-    REGISTER_VARIABLE("eclcaldigitExtCellCrystalPhi", getExtCellCrystalPhi, "[calibration] Returns the ext cell crystal phi");
+                      "[calibration] Returns the theta Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("eclcaldigitExtCellId", getExtCellId, "[calibration] Returns the extrapolated cell id",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("eclcaldigitExtCellThetaId", getExtCellThetaId, "[calibration] Returns the ext cell theta id",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("eclcaldigitExtCellPhiId", getExtCellPhiId, "[calibration] Returns the ext cell phi id",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("eclcaldigitExtCellCrystalTheta", getExtCellCrystalTheta, "[calibration] Returns the ext cell crystal theta",
+                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("eclcaldigitExtCellCrystalPhi", getExtCellCrystalPhi, "[calibration] Returns the ext cell crystal phi",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtCenterCellIndex(i)", getExtCenterCellIndex,
-                      "[calibration] Returns the center cell index (within its 5x5 (i=5) or 7x7 (i=7) neighbours) for an ext track");
+                      "[calibration] Returns the center cell index (within its 5x5 (i=5) or 7x7 (i=7) neighbours) for an ext track",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitExtFrontPositionPhiOffset", getExtFrontPositionPhiOffset,
                       "[calibration] Returns the difference in the azimuthal angle (in radians)"
                       "between the position where the track hit the front face of the ECL and the"
-                      "center of the struck crystal projected onto the front surface.");
+                      "center of the struck crystal projected onto the front surface.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtFrontPositionThetaOffset", getExtFrontPositionThetaOffset,
                       "[calibration] Returns the difference in the polar angle (in radians)"
                       "between the position where the track hit the front face of the ECL and the"
-                      "center of the struck crystal projected onto the front surface.");
+                      "center of the struck crystal projected onto the front surface.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtFrontPositionPhiPointing", getExtFrontPositionPhiPointing,
                       "[calibration] Returns the difference in the azimuthal angle (in radians)"
                       "between the momentum direction when the track hit the front face of the ECL and the"
-                      "orientation of the struck crystal.");
+                      "orientation of the struck crystal.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtFrontPositionThetaPointing", getExtFrontPositionThetaPointing,
                       "[calibration] Returns the difference in the polar angle (in radians)"
                       "between the momentum direction when the track hit the front face of the ECL and the"
-                      "orientation of the struck crystal.");
+                      "orientation of the struck crystal.", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentFitType(i, j)", getExtECLCalDigitTwoComponentFitType,
-                      "[calibration] Returns the TwoComponentFitType of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentFitType of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentDiodeEnergy(i, j)", getExtECLCalDigitTwoComponentDiodeEnergy,
-                      "[calibration] Returns the TwoComponentDiodeEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentDiodeEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2Saved_PhotonHadron(i, j)", getExtECLCalDigitTwoComponentChi2Saved_PhotonHadron,
-                      "[calibration] Returns the TwoComponentChi2Saved_PhotonHadron of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonHadron of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2Saved_PileUpPhoton(i, j)", getExtECLCalDigitTwoComponentChi2Saved_PileUpPhoton,
-                      "[calibration] Returns the TwoComponentChi2Saved_PileUpPhoton of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentChi2Saved_PileUpPhoton of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2Saved_PhotonDiode(i, j)", getExtECLCalDigitTwoComponentChi2Saved_PhotonDiode,
-                      "[calibration] Returns the TwoComponentChi2Saved_PhotonDiode of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonDiode of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentFitType(i, j)", getECLCalDigitTwoComponentFitType,
-                      "[calibration] Returns the TwoComponentFitType of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the TwoComponentFitType of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitTwoComponentDiodeEnergy(i, j)", getECLCalDigitTwoComponentDiodeEnergy,
-                      "[calibration] Returns the TwoComponentDiodeEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the TwoComponentDiodeEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2Saved_PhotonHadron(i, j)", getECLCalDigitTwoComponentChi2Saved_PhotonHadron,
-                      "[calibration] Returns the TwoComponentChi2Saved_PhotonHadron of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonHadron of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2Saved_PileUpPhoton(i, j)", getECLCalDigitTwoComponentChi2Saved_PileUpPhoton,
-                      "[calibration] Returns the TwoComponentChi2Saved_PileUpPhoton of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the TwoComponentChi2Saved_PileUpPhoton of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2Saved_PhotonDiode(i, j)", getECLCalDigitTwoComponentChi2Saved_PhotonDiode,
-                      "[calibration] Returns the TwoComponentChi2Saved_PhotonDiode of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonDiode of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitEnergyByEnergyRank(i)", getECLCalDigitEnergyByEnergyRank,
-                      "[calibration] Returns the caldigit energy of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "[calibration] Returns the caldigit energy of the i-th highest energy caldigit in the cluster (i>=0)",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitTimeByEnergyRank(i)", getECLCalDigitTimeByEnergyRank,
-                      "[calibration] Returns the caldigit time of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "[calibration] Returns the caldigit time of the i-th highest energy caldigit in the cluster (i>=0)",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentFitTypeByEnergyRank(i)", getTwoComponentFitTypeByEnergyRank,
-                      "[calibration] Returns the offline fit type of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "[calibration] Returns the offline fit type of the i-th highest energy caldigit in the cluster (i>=0)",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2ByEnergyRank(i)", getTwoComponentChi2ByEnergyRank,
-                      "[calibration] Returns the two component chi2 of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "[calibration] Returns the two component chi2 of the i-th highest energy caldigit in the cluster (i>=0)",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentEnergyByEnergyRank(i)", getTwoComponentTotalEnergyByEnergyRank,
-                      "[calibration] Returns the two component total energy of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "[calibration] Returns the two component total energy of the i-th highest energy caldigit in the cluster (i>=0)",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentHadronEnergyByEnergyRank(i)", getTwoComponentHadronEnergyByEnergyRank,
-                      "[calibration] Returns the two component fit Hadron Energy of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "[calibration] Returns the two component fit Hadron Energy of the i-th highest energy caldigit in the cluster (i>=0)",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentDiodeEnergyByEnergyRank(i)", getTwoComponentDiodeEnergyByEnergyRank,
-                      "[calibration] Returns the two component fit Diode Energy of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "[calibration] Returns the two component fit Diode Energy of the i-th highest energy caldigit in the cluster (i>=0)",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2SavedByEnergyRank_PhotonHadron(i)", getTwoComponentChi2SavedByEnergyRank_PhotonHadron,
-                      "[calibration] Returns the chi2 for the photo+hadron fit type of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "[calibration] Returns the chi2 for the photo+hadron fit type of the i-th highest energy caldigit in the cluster (i>=0)",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2SavedByEnergyRank_PileUpPhoton(i)", getTwoComponentChi2SavedByEnergyRank_PileUpPhoton,
-                      "[calibration] Returns the chi2 for the photo+hadron+pile-up photon fit type of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "[calibration] Returns the chi2 for the photo+hadron+pile-up photon fit type of the i-th highest energy caldigit in the cluster (i>=0)",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2SavedByEnergyRank_PhotonDiode(i)", getTwoComponentChi2SavedByEnergyRank_PhotonDiode,
-                      "[calibration] Returns the chi2 for the photo+diode fit type of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "[calibration] Returns the chi2 for the photo+diode fit type of the i-th highest energy caldigit in the cluster (i>=0)",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitWeightByEnergyRank(i)", getWeightByEnergyRank,
-                      "[calibration] Returns the weight of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "[calibration] Returns the weight of the i-th highest energy caldigit in the cluster (i>=0)", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitCellIdByEnergyRank(i)", getCellIdByEnergyRank,
-                      "[calibration] Returns the cell id of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "[calibration] Returns the cell id of the i-th highest energy caldigit in the cluster (i>=0)", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("totalECLCalDigitMCEnergy", getTotalECLCalDigitMCEnergy,
-                      "[calibration] Returns total deposited MC energy in all ECLCalDigits for the MC particle");
+                      "[calibration] Returns total deposited MC energy in all ECLCalDigits for the MC particle", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("clusterECLCalDigitMCEnergy", getClusterECLCalDigitMCEnergy,
-                      "[calibration] Returns total deposited MC energy in all ECLCalDigits for the MC particle that are used to calculate the cluster energy");
+                      "[calibration] Returns total deposited MC energy in all ECLCalDigits for the MC particle that are used to calculate the cluster energy",
+                      Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitPhiByEnergyRank(i)", getPhiByEnergyRank,
-                      "Returns phi of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "Returns phi of the i-th highest energy caldigit in the cluster (i>=0)", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitThetaByEnergyRank(i)", getThetaByEnergyRank,
-                      "Returns theta of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "Returns theta of the i-th highest energy caldigit in the cluster (i>=0)", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("eclcaldigitRByEnergyRank(i)", getRByEnergyRank,
-                      "Returns R of the i-th highest energy caldigit in the cluster (i>=0)");
+                      "Returns R of the i-th highest energy caldigit in the cluster (i>=0)", Manager::VariableDataType::c_double);
   }
 
   // Create an empty module which allows basf2 to easily find the library and load it from the steering file

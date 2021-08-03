@@ -1030,8 +1030,16 @@ namespace Belle2 {
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
           else {
-            double iValue = var->function(particle->getDaughter(iDaughterNumber));
-            double jValue = var->function(particle->getDaughter(jDaughterNumber));
+            double iValue, jValue;
+            if (std::holds_alternative<double>(var->function(particle->getDaughter(jDaughterNumber))))
+            {
+              iValue = std::get<double>(var->function(particle->getDaughter(iDaughterNumber)));
+              jValue = std::get<double>(var->function(particle->getDaughter(jDaughterNumber)));
+            } else if (std::holds_alternative<int>(var->function(particle->getDaughter(jDaughterNumber))))
+            {
+              iValue = std::get<int>(var->function(particle->getDaughter(iDaughterNumber)));
+              jValue = std::get<int>(var->function(particle->getDaughter(jDaughterNumber)));
+            } else return std::numeric_limits<double>::quiet_NaN();
             return (jValue - iValue) / (jValue + iValue);
           }
         };
@@ -1094,19 +1102,17 @@ namespace Belle2 {
           if (daughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
           else {
-            double norm = std::numeric_limits<double>::quiet_NaN();
+            double daughterValue, motherValue;
             if (std::holds_alternative<double>(var->function(particle)))
             {
-              double daughterValue = std::get<double>(var->function(particle->getDaughter(daughterNumber)));
-              double motherValue = std::get<double>(var->function(particle));
-              norm = (motherValue - daughterValue) / (motherValue + daughterValue);
+              daughterValue = std::get<double>(var->function(particle->getDaughter(daughterNumber)));
+              motherValue = std::get<double>(var->function(particle));
             } else if (std::holds_alternative<int>(var->function(particle)))
             {
-              int daughterValue = std::get<int>(var->function(particle->getDaughter(daughterNumber)));
-              int motherValue = std::get<int>(var->function(particle));
-              norm = (motherValue - daughterValue) / (motherValue + daughterValue);
+              daughterValue = std::get<int>(var->function(particle->getDaughter(daughterNumber)));
+              motherValue = std::get<int>(var->function(particle));
             }
-            return norm;
+            return (motherValue - daughterValue) / (motherValue + daughterValue);
           }
         };
         return func;

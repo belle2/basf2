@@ -18,7 +18,7 @@ namespace Belle2 {
     /**
      * returns number of particles in the event with given pdg
      */
-    double NumberOfMCParticlesInEvent(const Particle*, const std::vector<double>& pdg);
+    int NumberOfMCParticlesInEvent(const Particle*, const std::vector<double>& pdg);
 
     /**
      * Returns a positive integer if daughter at position particle->daughter(i)->daughter(j)... is an ancestor of the related MC particle, 0 otherwise.

@@ -224,9 +224,9 @@ namespace Belle2 {
           const ContinuumSuppression* qq = Bparticle->getRelatedTo<ContinuumSuppression>();
           if (!qq)
             return std::numeric_limits<double>::quiet_NaN();
-          double isinROE = isInRestOfEvent(particle);
+          bool isinROE = isInRestOfEvent(particle);
           TVector3 newZ;
-          if (modeisSignal or (modeisAuto and isinROE < 0.5))
+          if (modeisSignal or (modeisAuto and isinROE))
             newZ = qq->getThrustB();
           else
             newZ = qq->getThrustO();

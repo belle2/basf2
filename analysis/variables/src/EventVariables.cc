@@ -44,23 +44,23 @@ namespace Belle2 {
   namespace Variable {
 
     // Event ------------------------------------------------
-    double isMC(const Particle*)
+    bool isMC(const Particle*)
     {
       return Environment::Instance().isMC();
     }
 
-    double eventType(const Particle*)
+    bool eventType(const Particle*)
     {
       StoreArray<MCParticle> mcparticles;
       return (mcparticles.getEntries()) > 0 ? 0 : 1;
     }
 
-    double isContinuumEvent(const Particle*)
+    bool isContinuumEvent(const Particle*)
     {
-      return (isNotContinuumEvent(nullptr) == 1.0 ? 0.0 : 1.0);
+      return (isNotContinuumEvent(nullptr) == 1 ? 0 : 1);
     }
 
-    double isChargedBEvent(const Particle*)
+    bool isChargedBEvent(const Particle*)
     {
       StoreArray<MCParticle> mcParticles;
       for (const auto& mcp : mcParticles) {
@@ -84,8 +84,7 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
-
-    double isNotContinuumEvent(const Particle*)
+    bool isNotContinuumEvent(const Particle*)
     {
       StoreArray<MCParticle> mcParticles;
       for (const MCParticle& mcp : mcParticles) {
@@ -97,30 +96,30 @@ namespace Belle2 {
              (pdg_no == 300553) ||
              (pdg_no == 9000553) ||
              (pdg_no == 9010553)))
-          return 1.0;
+          return 1;
       }
-      return 0.0;
+      return 0;
     }
 
-    double nMCParticles(const Particle*)
+    int nMCParticles(const Particle*)
     {
       StoreArray<MCParticle> mcps;
       return mcps.getEntries();
     }
 
-    double nTracks(const Particle*)
+    int nTracks(const Particle*)
     {
       StoreArray<Track> tracks;
       return tracks.getEntries();
     }
 
-    double nChargeZeroTrackFits(const Particle*)
+    int nChargeZeroTrackFits(const Particle*)
     {
       StoreArray<TrackFitResult> tfrs;
       int out = 0;
       for (const auto& t : tfrs)
         if (t.getChargeSign() == 0) out++;
-      return double(out);
+      return out;
     }
 
     double belleECLEnergy(const Particle*)
@@ -137,34 +136,34 @@ namespace Belle2 {
       return result;
     }
 
-    double nKLMClusters(const Particle*)
+    int nKLMClusters(const Particle*)
     {
       StoreArray<KLMCluster> klmClusters;
       return klmClusters.getEntries();
     }
 
-    double expNum(const Particle*)
+    int expNum(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
       int exp_no = evtMetaData->getExperiment();
       return exp_no;
     }
 
-    double productionIdentifier(const Particle*)
+    int productionIdentifier(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
       int eventProduction = evtMetaData->getProduction();
       return eventProduction;
     }
 
-    double evtNum(const Particle*)
+    int evtNum(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
       int evt_no = evtMetaData->getEvent();
       return evt_no;
     }
 
-    double runNum(const Particle*)
+    int runNum(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
       int run_no = evtMetaData->getRun();
@@ -478,7 +477,6 @@ namespace Belle2 {
       double energyOfPhotons = evtShape->getTotalPhotonsEnergy();
       return energyOfPhotons;
     }
-
 
     double eventYearMonthDay(const Particle*)
     {

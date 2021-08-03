@@ -111,7 +111,7 @@ namespace Belle2 {
     /**
      * return particle's pdg code
      */
-    double particlePDGCode(const Particle* part);
+    int particlePDGCode(const Particle* part);
 
     /**
      * return cosine of angle between momentum and vertex vector in particle xy-plane in LAB frame (origin of vertex vector is IP)
@@ -279,12 +279,12 @@ namespace Belle2 {
     /**
      * return always zero
      */
-    double False(const Particle*);
+    bool False(const Particle*);
 
     /**
      * return always one
      */
-    double True(const Particle*);
+    bool True(const Particle*);
     /**
      * return std::numeric_limits<double>::infinity()
      */

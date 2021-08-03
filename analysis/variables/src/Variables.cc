@@ -320,7 +320,7 @@ namespace Belle2 {
       return p4CMS.P() / TMath::Sqrt(s * s / 4 - M * M);
     }
 
-    double particlePDGCode(const Particle* part)
+    int particlePDGCode(const Particle* part)
     {
       return part->getPDGCode();
     }
@@ -665,10 +665,10 @@ namespace Belle2 {
       }
     }
 
-    double printParticle(const Particle* p)
+    bool printParticle(const Particle* p)
     {
       printParticleInternal(p, 0);
-      return 0.0;
+      return 0;
     }
 
 
@@ -902,7 +902,7 @@ namespace Belle2 {
       }
     }
 
-    double nRemainingTracksInEvent(const Particle* particle)
+    int nRemainingTracksInEvent(const Particle* particle)
     {
 
       StoreArray<Track> tracks;
@@ -936,12 +936,13 @@ namespace Belle2 {
       return result;
     }
 
-    double False(const Particle*)
+
+    bool False(const Particle*)
     {
       return 0;
     }
 
-    double True(const Particle*)
+    bool True(const Particle*)
     {
       return 1;
     }

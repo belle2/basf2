@@ -179,7 +179,7 @@ namespace Belle2 {
         const Particle* part = m_particles[fsParticle];
 
         if (m_cut->check(part)) {
-          double value;
+          double value = std::numeric_limits<double>::quiet_NaN();;
           if (std::holds_alternative<double>(m_variable->function(part))) {
             value = std::get<double>(m_variable->function(part));
           } else if (std::holds_alternative<int>(m_variable->function(part))) {

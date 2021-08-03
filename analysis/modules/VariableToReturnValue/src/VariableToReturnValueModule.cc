@@ -43,7 +43,7 @@ void VariableToReturnValueModule::initialize()
 
 void VariableToReturnValueModule::event()
 {
-  int returnValue;
+  int returnValue = 0;
   if (std::holds_alternative<double>(m_function(nullptr))) {
     returnValue = std::get<double>(m_function(nullptr));
   } else if (std::holds_alternative<int>(m_function(nullptr))) {

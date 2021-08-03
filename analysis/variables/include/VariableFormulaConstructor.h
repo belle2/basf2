@@ -36,11 +36,76 @@ namespace Belle2 {
     {
       return [op, a, b](const Particle * p) {
         switch (op) {
-          case Op::c_plus: return a(p) + b(p);
-          case Op::c_minus: return a(p) - b(p);
-          case Op::c_multiply: return a(p) * b(p);
-          case Op::c_divide: return a(p) / b(p);
-          case Op::c_power: return std::pow(a(p), b(p));
+          case Op::c_plus:
+            try {
+              return std::get<double>(a(p)) + std::get<double>(b(p));
+            } catch (std::bad_variant_access&) {
+              try {
+                return std::get<double>(a(p)) + std::get<int>(b(p));
+              } catch (std::bad_variant_access&) {
+                try {
+                  return std::get<int>(a(p)) + std::get<double>(b(p));
+                } catch (std::bad_variant_access&) {
+                  return double(std::get<int>(a(p)) + std::get<int>(b(p)));
+                }
+              }
+            }
+          case Op::c_minus:
+            try {
+              return std::get<double>(a(p)) - std::get<double>(b(p));
+            } catch (std::bad_variant_access&) {
+              try {
+                return std::get<double>(a(p)) - std::get<int>(b(p));
+              } catch (std::bad_variant_access&) {
+                try {
+                  return std::get<int>(a(p)) - std::get<double>(b(p));
+                } catch (std::bad_variant_access&) {
+                  return double(std::get<int>(a(p)) - std::get<int>(b(p)));
+                }
+              }
+            }
+          case Op::c_multiply:
+            try {
+              return std::get<double>(a(p)) * std::get<double>(b(p));
+            } catch (std::bad_variant_access&) {
+              try {
+                return std::get<double>(a(p)) * std::get<int>(b(p));
+              } catch (std::bad_variant_access&) {
+                try {
+                  return std::get<int>(a(p)) * std::get<double>(b(p));
+                } catch (std::bad_variant_access&) {
+                  return double(std::get<int>(a(p)) * std::get<int>(b(p)));
+                }
+              }
+            }
+          case Op::c_divide:
+            try {
+              return std::get<double>(a(p)) / std::get<double>(b(p));
+            } catch (std::bad_variant_access&) {
+              try {
+                return std::get<double>(a(p)) / std::get<int>(b(p));
+              } catch (std::bad_variant_access&) {
+                try {
+                  return std::get<int>(a(p)) / std::get<double>(b(p));
+                } catch (std::bad_variant_access&) {
+                  return double(std::get<int>(a(p)) / std::get<int>(b(p)));
+                }
+              }
+            }
+          case Op::c_power:
+            try {
+              return std::pow(std::get<double>(a(p)), std::get<double>(b(p)));
+            } catch (std::bad_variant_access&) {
+              try {
+                return std::pow(std::get<double>(a(p)), std::get<int>(b(p)));
+              } catch (std::bad_variant_access&) {
+                try {
+                  return std::pow(std::get<int>(a(p)), std::get<double>(b(p)));
+                } catch (std::bad_variant_access&) {
+                  return std::pow(std::get<int>(a(p)), std::get<int>(b(p)));
+                }
+              }
+            }
           default: break;
         }
         throw std::runtime_error("Cannot handle operator " + std::to_string((int)op));
@@ -52,11 +117,56 @@ namespace Belle2 {
     {
       return [op, a, b](const Particle * p) {
         switch (op) {
-          case Op::c_plus: return a + b(p);
-          case Op::c_minus: return a - b(p);
-          case Op::c_multiply: return a * b(p);
-          case Op::c_divide: return a / b(p);
-          case Op::c_power: return std::pow(a, b(p));
+          case Op::c_plus:
+            try {
+              return a + std::get<double>(b(p));
+            } catch (std::bad_variant_access&) {
+              try {
+                return a + std::get<int>(b(p));
+              } catch (std::bad_variant_access&) {
+                return a + std::get<bool>(b(p));
+              }
+            }
+          case Op::c_minus:
+            try {
+              return a - std::get<double>(b(p));
+            } catch (std::bad_variant_access&) {
+              try {
+                return a - std::get<int>(b(p));
+              } catch (std::bad_variant_access&) {
+                return a - std::get<bool>(b(p));
+              }
+            }
+          case Op::c_multiply:
+            try {
+              return a * std::get<double>(b(p));
+            } catch (std::bad_variant_access&) {
+              try {
+                return a * std::get<int>(b(p));
+              } catch (std::bad_variant_access&) {
+                return a * std::get<bool>(b(p));
+              }
+            }
+          case Op::c_divide:
+            try {
+              return a / std::get<double>(b(p));
+            } catch (std::bad_variant_access&) {
+              try {
+                return a / std::get<int>(b(p));
+              } catch (std::bad_variant_access&) {
+                return a / std::get<bool>(b(p));
+              }
+            }
+          case Op::c_power:
+            try {
+              return std::pow(a, std::get<double>(b(p)));
+            } catch (std::bad_variant_access&) {
+              try {
+                return std::pow(a, std::get<int>(b(p)));
+              } catch (std::bad_variant_access&) {
+                return std::pow(a, std::get<bool>(b(p)));
+              }
+            }
           default: break;
         }
         throw std::runtime_error("Cannot handle operator " + std::to_string((int)op));
@@ -68,11 +178,56 @@ namespace Belle2 {
     {
       return [op, a, b](const Particle * p) {
         switch (op) {
-          case Op::c_plus: return a(p) + b;
-          case Op::c_minus: return a(p) - b;
-          case Op::c_multiply: return a(p) * b;
-          case Op::c_divide: return a(p) / b;
-          case Op::c_power: return std::pow(a(p), b);
+          case Op::c_plus:
+            try {
+              return std::get<double>(a(p)) + b;
+            } catch (std::bad_variant_access&) {
+              try {
+                return std::get<int>(a(p)) + b;
+              } catch (std::bad_variant_access&) {
+                return std::get<bool>(a(p)) + b;
+              }
+            }
+          case Op::c_minus:
+            try {
+              return std::get<double>(a(p)) - b;
+            } catch (std::bad_variant_access&) {
+              try {
+                return std::get<int>(a(p)) - b;
+              } catch (std::bad_variant_access&) {
+                return std::get<bool>(a(p)) - b;
+              }
+            }
+          case Op::c_multiply:
+            try {
+              return std::get<double>(a(p)) * b;
+            } catch (std::bad_variant_access&) {
+              try {
+                return std::get<int>(a(p)) * b;
+              } catch (std::bad_variant_access&) {
+                return std::get<bool>(a(p)) * b;
+              }
+            }
+          case Op::c_divide:
+            try {
+              return std::get<double>(a(p)) / b;
+            } catch (std::bad_variant_access&) {
+              try {
+                return std::get<int>(a(p)) / b;
+              } catch (std::bad_variant_access&) {
+                return std::get<bool>(a(p)) / b;
+              }
+            }
+          case Op::c_power:
+            try {
+              return std::pow(std::get<double>(a(p)), b);
+            } catch (std::bad_variant_access&) {
+              try {
+                return std::pow(std::get<int>(a(p)), b);
+              } catch (std::bad_variant_access&) {
+                return std::pow(std::get<bool>(a(p)), b);
+              }
+            }
           default: break;
         }
         throw std::runtime_error("Cannot handle operator " + std::to_string((int)op));

@@ -1870,7 +1870,7 @@ The input values of ``requestedVariable`` can be the following:  cosKaonPion, Ha
     REGISTER_VARIABLE("FSCVariables(requestedVariable)", FSCVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables for ``FastSlowCorrelated`` category.
 The input values of ``requestedVariable`` can be the following: pFastCMS, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat, R"DOC(
 [Expert] Returns 1.0 if the given Particle is classified as target track, i.e. if it has the highest target track probability in particleListName. 
 The probability is accessed via ``extraInfoName``, which can have the following input values:

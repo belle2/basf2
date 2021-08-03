@@ -199,7 +199,7 @@ Returns true if particle is within Endcap ECL angular acceptance, false otherwis
 This variable checks if the particle polar angle :math:`\theta` is within the range :math:`12.4^\circ < \theta < 31.4^\circ` 
 or :math:`130.7^\circ < \theta < 155.1^\circ`.
 The polar angle is computed using only the initial particle momentum.
-)DOC");
+)DOC", Manager::VariableDataType::c_bool);
     REGISTER_VARIABLE("thetaInKLMAcceptance",   thetaInKLMAcceptance,  R"DOC(
 Checks if particle is within KLM angular acceptance. 
 This variable checks if the particle polar angle :math:`\theta` is within certain ranges.

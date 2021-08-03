@@ -818,8 +818,8 @@ namespace Belle2 {
                       "Return the d0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.",
                       Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("V0Deltad0", v0DaughterD0Diff,
-                      "Return the difference between d0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track."),
-                      Manager::VariableDataType::c_double;
+                      "Return the difference between d0 impact parameters of V0's daughters with the V0 vertex point as a pivot for the track.",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("V0z0(id)", v0DaughterZ0,
                       "Return the z0 impact parameter of a V0's daughter with daughterID index with the V0 vertex point as a pivot for the track.",
                       Manager::VariableDataType::c_double);
@@ -870,7 +870,7 @@ namespace Belle2 {
                       "j:  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("v0DaughterCov(i,j)",        v0DaughterTrackParamCov5x5AtIPPerigee,
                       "j-th element of the 15 covariance matrix elements (at IP perigee) of the i-th daughter track. "
-                      "(0,0), (0,1) ... (1,1), (1,2) ... (2,2) ...");
+                      "(0,0), (0,1) ... (1,1), (1,2) ... (2,2) ...", Manager::VariableDataType::c_double);
     /// Converted photon variables
     REGISTER_VARIABLE("convertedPhotonInvariantMass(i,j)",       convertedPhotonInvariantMass,
                       "Invariant mass of the i-j daughter system as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",
@@ -909,9 +909,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("v0DaughtersShare1stHit", v0DaughtersShareInnermostHit,
                       "flag for V0 daughters sharing the first(innermost) VXD hit. 0x1(0x2) bit represents V/z(U/r-phi)-hit share.",
                       Manager::VariableDataType::c_int);
-    REGISTER_VARIABLE("v0DaughtersShare1stUHit", v0DaughtersShare1stUHit,
+    REGISTER_VARIABLE("v0DaughtersShare1stUHit", v0DaughtersShareInnermostUHit,
                       "flag for V0 daughters sharing the first(innermost) VXD U-side hit.", Manager::VariableDataType::c_bool);
-    REGISTER_VARIABLE("v0DaughtersShare1stVHit", v0DaughtersShare1stVHit,
+    REGISTER_VARIABLE("v0DaughtersShare1stVHit", v0DaughtersShareInnermostVHit,
                       "flag for V0 daughters sharing the first(innermost) VXD V-side hit.", Manager::VariableDataType::c_bool);
   }
 }

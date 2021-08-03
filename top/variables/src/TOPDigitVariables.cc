@@ -769,15 +769,15 @@ namespace Belle2 {
     REGISTER_VARIABLE("topProtonLogL", TOPVariable::getProtonLogL,
                       "[calibration] proton log likelihood", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("logLScanMass", TOPVariable::getLogLScanMass,
-                      "[calibration] mass at the logL maximum from the LL scan");
+                      "[calibration] mass at the logL maximum from the LL scan", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("logLScanMassUpperInterval", TOPVariable::getLogLScanMassUpperInterval,
-                      "[calibration] Upper edge of the mass interval determined by the LL scan");
+                      "[calibration] Upper edge of the mass interval determined by the LL scan", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("logLScanMassLowerInterval", TOPVariable::getLogLScanMassLowerInterval,
-                      "[calibration] Lower edge of the mass interval determined by the LL scan");
+                      "[calibration] Lower edge of the mass interval determined by the LL scan", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("logLScanThreshold", TOPVariable::getLogLScanThreshold,
-                      "[calibration] Cherenkov threshold determind by the LL scan");
+                      "[calibration] Cherenkov threshold determind by the LL scan", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("logLScanExpectedSignalPhotons", TOPVariable::getLogLScanExpectedSignalPhotons,
-                      "[calibration] Expected signal photon yeild at the LL maximum");
+                      "[calibration] Expected signal photon yeild at the LL maximum", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topRecBunchUsedTrackCount", TOPVariable::TOPRecBunchUsedTrackCount,
                       "[calibration] The number of tracks used in the bunch reconstruction", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("topRecBunchTrackCount", TOPVariable::TOPRecBunchTrackCount,

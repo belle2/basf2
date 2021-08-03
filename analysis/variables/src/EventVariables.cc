@@ -801,7 +801,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters,
                       "[Eventbased] Returns number of KLM clusters in the event.", Manager::VariableDataType::c_int);
     REGISTER_VARIABLE("nMCParticles", nMCParticles,
-                      "[Eventbased] Returns number of MCParticles in the event.",, Manager::VariableDataType::c_int);
+                      "[Eventbased] Returns number of MCParticles in the event.", Manager::VariableDataType::c_int);
 
     REGISTER_VARIABLE("expNum", expNum, "[Eventbased] Returns the experiment number.", Manager::VariableDataType::c_int);
     REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] Returns the event number.", Manager::VariableDataType::c_int);
@@ -818,7 +818,7 @@ In such cases the event numbers are sequential *only within a production*, so ex
 )DOC", Manager::VariableDataType::c_int);
 
     REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] Returns center-of-mass energy.", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Returns total beam energy in the laboratory frame.");
+    REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Returns total beam energy in the laboratory frame.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("beamPx", getBeamPx, "[Eventbased] Returns x component of total beam momentum in the laboratory frame.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Returns y component of total beam momentum in the laboratory frame.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("beamPz", getBeamPz, "[Eventbased] Returns z component of total beam momentum in the laboratory frame.", Manager::VariableDataType::c_double);
@@ -933,7 +933,7 @@ Returns NaN for data.
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("missingMomentumOfEventCMS", missingMomentumOfEventCMS, R"DOC(
 [Eventbased] The magnitude of the missing momentum in center-of-mass frame.
-)DOC"), Manager::VariableDataType::c_double;
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("genMissingMomentumOfEventCMS", genMissingMomentumOfEventCMS, R"DOC(
 [Eventbased] The magnitude of the missing momentum in center-of-mass frame from generator
 )DOC", Manager::VariableDataType::c_double);

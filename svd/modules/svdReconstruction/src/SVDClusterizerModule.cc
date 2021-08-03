@@ -46,6 +46,8 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // 1. Collections.
+  addParam("EventInfo", m_svdEventInfoName,
+           "SVDEventInfo collection name.", string("SVDEventInfo"));
   addParam("ShaperDigits", m_storeShaperDigitsName,
            "SVDShaperDigits collection name.", string(""));
   addParam("Clusters", m_storeClustersName,
@@ -332,8 +334,7 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   int size = rawCluster.getSize();
 
   //first take Event Informations:
-  StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
-  std::string m_svdEventInfoName = "SVDEventInfo";
+  StoreObjPtr<SVDEventInfo> temp_eventinfo(m_svdEventInfoName);
   if (!temp_eventinfo.isValid())
     m_svdEventInfoName = "SVDEventInfoSim";
   StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);

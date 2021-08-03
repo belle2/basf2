@@ -61,6 +61,16 @@ namespace {
       }
     }
 
+    Var* getVariable(const std::string& functionName, const std::vector<std::string>& functionArguments)
+    {
+      if (functionName == "mocking_variable") {
+        return &m_mocking_variable;
+      } else {
+        return nullptr;
+      }
+
+    }
+
     /// The only variable we have in this test.
     Var m_mocking_variable;
   };

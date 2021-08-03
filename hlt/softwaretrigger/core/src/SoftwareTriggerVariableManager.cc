@@ -27,5 +27,12 @@ namespace Belle2 {
       }
       return lowerBoundIterator->second.get();
     }
+
+    SoftwareTriggerVariableManager::SoftwareTriggerVariable* SoftwareTriggerVariableManager::getVariable(
+      const std::string& variableName, const std::vector<std::string>& arguments)
+    {
+      auto fullname = variableName + "(" + boost::algorithm::join(arguments, ", ") + ")";
+      return SoftwareTriggerVariableManager::getVariable(fullname);
+    }
   }
 }

@@ -28,7 +28,7 @@ VariableToReturnValueModule::VariableToReturnValueModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("variable", m_variable,
-           "Variable taken from Variable::Manager, see output of 'basf2 variables.py'.", std::string(""));
+           "Variable taken from Variable::Manager, see output of 'b2help-variables'.", std::string(""));
 }
 
 void VariableToReturnValueModule::initialize()

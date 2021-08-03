@@ -49,9 +49,6 @@ void TagUniqueSignalModule::initialize()
   if (m_targetVar == nullptr) {
     B2ERROR("TagUniqueSignal: Variable::Manager doesn't have variable" <<  m_targetVariable);
   }
-  if (m_targetVar->variabletype != Variable::Manager::VariableDataType::c_bool) {
-    B2ERROR("Target variable '" << m_targetVariable << "' has wrong data type! It must be a boolean.");
-  }
 }
 
 void TagUniqueSignalModule::event()
@@ -67,10 +64,14 @@ void TagUniqueSignalModule::event()
     Particle* part = inPList->getParticle(i);
     const MCParticle* mcp = part->getRelated<MCParticle>();
     float extraInfoValue = 0.0;
-    if (mcp and std::get<bool>(m_targetVar->function(part))) {
-      const bool was_inserted = foundMCParticles.insert(mcp).second;
-      if (was_inserted)
-        extraInfoValue = 1.0;
+    if (mcp) {
+      if ((m_targetVar->variabletype == Variable::Manager::VariableDataType::c_double and std::get<double>(m_targetVar->function(part)))
+          or (m_targetVar->variabletype == Variable::Manager::VariableDataType::c_int and std::get<int>(m_targetVar->function(part)))
+          or (m_targetVar->variabletype == Variable::Manager::VariableDataType::c_bool and std::get<bool>(m_targetVar->function(part)))) {
+        const bool was_inserted = foundMCParticles.insert(mcp).second;
+        if (was_inserted)
+          extraInfoValue = 1.0;
+      }
     }
     if (part->hasExtraInfo(m_extraInfoName)) {
       B2WARNING("Extra Info with given name is already set! This module can only be used once per particle.");

@@ -49,6 +49,9 @@ void TagUniqueSignalModule::initialize()
   if (m_targetVar == nullptr) {
     B2ERROR("TagUniqueSignal: Variable::Manager doesn't have variable" <<  m_targetVariable);
   }
+  if (m_targetVar->variabletype != Variable::Manager::VariableDataType::c_bool) {
+    B2ERROR("Target variable '" << m_targetVariable << "' has wrong data type! It must be a boolean.");
+  }
 }
 
 void TagUniqueSignalModule::event()
@@ -64,7 +67,7 @@ void TagUniqueSignalModule::event()
     Particle* part = inPList->getParticle(i);
     const MCParticle* mcp = part->getRelated<MCParticle>();
     float extraInfoValue = 0.0;
-    if (mcp and m_targetVar->function(part)) {
+    if (mcp and std::get<bool>(m_targetVar->function(part))) {
       const bool was_inserted = foundMCParticles.insert(mcp).second;
       if (was_inserted)
         extraInfoValue = 1.0;

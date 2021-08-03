@@ -139,7 +139,7 @@ namespace Belle2 {
             << LogVar("Number of candidates in the list", listSize));
           const Particle* p = list->getParticle(0);
           UseReferenceFrame<RestFrame> frame(p);
-          double result = var->function(particle);
+          double result = std::get<double>(var->function(particle));
           return result;
         };
         return func;
@@ -169,7 +169,7 @@ namespace Belle2 {
           Particle pRecoil(recoil, 0);
           pRecoil.setVertex(particle->getVertex());
           UseReferenceFrame<RestFrame> frame(&pRecoil);
-          double result = var->function(particle);
+          double result = std::get<double>(var->function(particle));
           return result;
         };
         return func;
@@ -858,7 +858,7 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           else {
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
+            double diff = std::get<double>(var->function(particle->getDaughter(jDaughterNumber))) - std::get<double>(var->function(particle->getDaughter(iDaughterNumber)));
             if (variablename == "phi" or variablename == "clusterPhi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")) or std::regex_match(variablename, std::regex("use.*Frame\\(clusterPhi\\)")))
             {
               if (fabs(diff) > M_PI) {
@@ -903,7 +903,7 @@ namespace Belle2 {
             Particle iTmpPart(iMcDaughter);
             Particle jTmpPart(jMcDaughter);
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
+            double diff = std::get<double>(var->function(&jTmpPart)) - std::get<double>(var->function(&iTmpPart));
             if (variablename == "phi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")))
             {
               if (fabs(diff) > M_PI) {
@@ -946,7 +946,7 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           else {
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            double diff = var->function((particle->getDaughter(jDaughterNumber))->getDaughter(bgrandDaughterNumber)) - var->function((particle->getDaughter(iDaughterNumber))->getDaughter(agrandDaughterNumber));
+            double diff = std::get<double>(var->function((particle->getDaughter(jDaughterNumber))->getDaughter(bgrandDaughterNumber))) - std::get<double>(var->function((particle->getDaughter(iDaughterNumber))->getDaughter(agrandDaughterNumber)));
             if (variablename == "phi" or variablename == "clusterPhi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")) or std::regex_match(variablename, std::regex("use.*Frame\\(clusterPhi\\)")))
             {
               if (fabs(diff) > M_PI) {
@@ -1076,7 +1076,7 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           else {
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            double diff = var->function(particle) - var->function(particle->getDaughter(daughterNumber));
+            double diff = std::get<double>(var->function(particle)) - std::get<double>(var->function(particle->getDaughter(daughterNumber)));
             if (variablename == "phi" or variablename == "useCMSFrame(phi)")
             {
               if (fabs(diff) > M_PI) {

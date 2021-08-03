@@ -141,7 +141,7 @@ namespace Belle2 {
         {
           const Particle* listParticle = particleList->getParticle(i);
           if (listParticle and listParticle->getTrack() and listParticle->getTrack()->getArrayIndex() == trackID) {
-            result = var->function(listParticle);
+            result = std::get<double>(var->function(listParticle));
             break;
           }
         }

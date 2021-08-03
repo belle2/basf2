@@ -1863,11 +1863,11 @@ namespace {
 
     var = Manager::Instance().getVariable("daughterDiffOf(1, 0, phi)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), -1.5707964);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -1.5707964);
 
     var = Manager::Instance().getVariable("daughterDiffOf(1, 0, useCMSFrame(phi))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), -1.513103);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -1.513103);
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
   }

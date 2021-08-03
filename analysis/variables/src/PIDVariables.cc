@@ -307,14 +307,15 @@ namespace Belle2 {
       }
       int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
       int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
-      return Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(pdgCodeHyp) + ", " + std::to_string(
-                                               pdgCodeTest) + ", CDC, TOP, ARICH, ECL, KLM)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(
+                                                                pdgCodeHyp) + ", " + std::to_string(
+                                                                pdgCodeTest) + ", CDC, TOP, ARICH, ECL, KLM)")->function(part));
     }
 
     double electronID_noTOP(const Particle* part)
     {
       // Excluding TOP for electron ID. This is temporary. BII-8376
-      return Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, ARICH, ECL, KLM)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, ARICH, ECL, KLM)")->function(part));
     }
 
     double binaryPID_noTOP(const Particle* part, const std::vector<double>& arguments)
@@ -331,8 +332,9 @@ namespace Belle2 {
         B2ERROR("The variable binaryPID_noTOP is defined only for particle hypothesis: 11.");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(pdgCodeHyp) + ", " + std::to_string(
-                                               pdgCodeTest) + ", CDC, ARICH, ECL, KLM)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(
+                                                                pdgCodeHyp) + ", " + std::to_string(
+                                                                pdgCodeTest) + ", CDC, ARICH, ECL, KLM)")->function(part));
     }
 
     double pionID_SVD(const Particle* part)

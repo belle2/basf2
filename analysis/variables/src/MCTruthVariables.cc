@@ -530,8 +530,6 @@ namespace Belle2 {
       return tauDecay->getTauMinusMcProng();
     }
 
-
-
     double isReconstructible(const Particle* p)
     {
       if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)

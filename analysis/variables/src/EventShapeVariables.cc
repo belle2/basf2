@@ -63,8 +63,6 @@ namespace Belle2 {
       return func;
     }
 
-
-
     Manager::FunctionPtr foxWolframH(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 1) {
@@ -97,8 +95,6 @@ namespace Belle2 {
       };
       return func;
     }
-
-
 
     Manager::FunctionPtr harmonicMoment(const std::vector<std::string>& arguments)
     {
@@ -141,7 +137,6 @@ namespace Belle2 {
       return func;
     }
 
-
     Manager::FunctionPtr cleoCone(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 2) {
@@ -182,8 +177,6 @@ namespace Belle2 {
       };
       return func;
     }
-
-
 
     double foxWolframR1(const Particle*)
     {
@@ -241,7 +234,6 @@ namespace Belle2 {
       return evtShapeCont->getFWMoment(4) / evtShapeCont->getFWMoment(0);
     }
 
-
     double harmonicMomentThrust0(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
@@ -291,7 +283,6 @@ namespace Belle2 {
       }
       return evtShapeCont->getHarmonicMomentThrust(4);
     }
-
 
     double cleoConeThrust0(const Particle*)
     {
@@ -383,7 +374,6 @@ namespace Belle2 {
       return evtShapeCont->getCleoConeThrust(8);
     }
 
-
     double sphericity(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
@@ -466,9 +456,6 @@ namespace Belle2 {
       return evtShapeCont->getForwardHemisphere4Momentum().E();
     }
 
-
-
-
     double backwardHemisphereMass(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
@@ -478,7 +465,6 @@ namespace Belle2 {
       }
       return evtShapeCont->getBackwardHemisphere4Momentum().Mag();
     }
-
 
     double backwardHemisphereX(const Particle*)
     {
@@ -530,10 +516,6 @@ namespace Belle2 {
       return evtShapeCont->getBackwardHemisphere4Momentum().E();
     }
 
-
-
-
-
     double thrust(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
@@ -543,7 +525,6 @@ namespace Belle2 {
       }
       return evtShapeCont->getThrust();
     }
-
 
     double thrustAxisX(const Particle*)
     {
@@ -575,7 +556,6 @@ namespace Belle2 {
       return evtShapeCont->getThrustAxis().Z();
     }
 
-
     double thrustAxisCosTheta(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
@@ -585,7 +565,6 @@ namespace Belle2 {
       }
       return evtShapeCont->getThrustAxis().CosTheta();
     }
-
 
     Manager::FunctionPtr useThrustFrame(const std::vector<std::string>& arguments)
     {
@@ -614,14 +593,13 @@ namespace Belle2 {
 
           UseReferenceFrame<CMSRotationFrame> signalframe(newX, newY, newZ);
 
-          return var->function(particle);
+          return std::get<double>(var->function(particle));
         };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function useThrustFrame. It only takes one argument, the variable name.");
       }
     }
-
 
     VARIABLE_GROUP("EventShape");
 

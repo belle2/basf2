@@ -19,7 +19,7 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    double nDaughterPhotons(const Particle* particle)
+    int nDaughterPhotons(const Particle* particle)
     {
       int result = 0;
       auto fspDaughters = particle->getFinalStateDaughters();
@@ -31,7 +31,7 @@ namespace Belle2 {
       return result;
     }
 
-    double nDaughterNeutralHadrons(const Particle* particle)
+    int nDaughterNeutralHadrons(const Particle* particle)
     {
       int result = 0;
       auto fspDaughters = particle->getFinalStateDaughters();
@@ -56,7 +56,7 @@ namespace Belle2 {
           return nullptr;
         }
       }
-      auto func = [pdgCode](const Particle * particle) -> double {
+      auto func = [pdgCode](const Particle * particle) -> int {
         int result = 0;
         auto fspDaughters = particle->getFinalStateDaughters();
         for (auto* daughter : fspDaughters)
@@ -74,7 +74,7 @@ namespace Belle2 {
       return func;
     }
 
-    double nCompositeDaughters(const Particle* particle)
+    int nCompositeDaughters(const Particle* particle)
     {
       int result = 0;
       auto fspDaughters = particle->getDaughters();
@@ -97,9 +97,16 @@ namespace Belle2 {
           {
             return std::numeric_limits<double>::quiet_NaN();
           }
-          for (unsigned j = 0; j < particle->getNDaughters(); ++j)
+          if (std::holds_alternative<double>(var->function(particle->getDaughter(0))))
           {
-            sum += var->function(particle->getDaughter(j));
+            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+              sum += std::get<double>(var->function(particle->getDaughter(j)));
+            }
+          } else if (std::holds_alternative<int>(var->function(particle->getDaughter(0))))
+          {
+            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+              sum += std::get<int>(var->function(particle->getDaughter(j)));
+            }
           }
           return sum / particle->getNDaughters();
         };
@@ -108,8 +115,6 @@ namespace Belle2 {
         B2FATAL("The meta variable daughterAverageOf requires only one argument!");
       }
     }
-
-
 
     // ---
 

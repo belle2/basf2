@@ -242,7 +242,7 @@ namespace Belle2 {
 
           UseReferenceFrame<CMSRotationFrame> signalframe(newX, newY, newZ);
 
-          return var->function(particle);
+          return std::get<double>(var->function(particle));
         };
         return func;
       } else {

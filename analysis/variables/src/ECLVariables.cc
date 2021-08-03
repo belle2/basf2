@@ -71,8 +71,6 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
-
-
     double eclClusterNumberOfHadronDigits(const Particle* particle)
     {
 
@@ -171,7 +169,6 @@ namespace Belle2 {
 
       return std::numeric_limits<float>::quiet_NaN();
     }
-
 
     double eclClusterErrorE(const Particle* particle)
     {

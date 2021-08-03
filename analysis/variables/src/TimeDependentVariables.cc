@@ -46,7 +46,6 @@ namespace Belle2 {
 
     //   ############################################## Time Dependent CPV Analysis Variables  ###############################################
 
-
     // TagV x, y, z
     double particleTagVx(const Particle* particle)
     {
@@ -163,7 +162,6 @@ namespace Belle2 {
       return vert->getTagVChi2IP();
     }
 
-
     // Delta t and related
 
     double particleDeltaT(const Particle* particle)
@@ -179,6 +177,7 @@ namespace Belle2 {
       if (!vert) return realNaN;
       return vert->getDeltaTErr();
     }
+
     double particleDeltaTRes(const Particle* particle)
     {
       return particleDeltaT(particle) - particleMCDeltaT(particle);
@@ -191,6 +190,7 @@ namespace Belle2 {
       double c = Const::speedOfLight / 1000.; // cm ps-1
       return particleDeltaZ(particle) / bg / c;
     }
+
     double particleMCDeltaTau(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
@@ -215,7 +215,6 @@ namespace Belle2 {
       double c = Const::speedOfLight / 1000.; // cm ps-1
       return vert->getMCDeltaT() * bg * c;
     }
-
 
     double particleDeltaZ(const Particle* particle)
     {
@@ -300,7 +299,6 @@ namespace Belle2 {
       return pos.Dot(orthBoostDir);
     }
 
-
     double vertexErrBoostDirection(const Particle* part)
     {
       TVectorD bDir = toVec(PCmsLabTransform().getBoostVector().Unit());
@@ -308,15 +306,12 @@ namespace Belle2 {
       return sqrt(part->getVertexErrorMatrix().Similarity(bDir));
     }
 
-
     double vertexErrOrthBoostDirection(const Particle* part)
     {
       TVectorD oDir = toVec(getUnitOrthogonal(PCmsLabTransform().getBoostVector()));
       // sqrt(oDir^T * Mat * oDir)
       return sqrt(part->getVertexErrorMatrix().Similarity(oDir));
     }
-
-
 
     // TagV boost direction
 
@@ -327,7 +322,6 @@ namespace Belle2 {
       return vert->getTagVl();
     }
 
-
     double tagVOrthogonalBoostDirection(const Particle* part)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
@@ -335,14 +329,12 @@ namespace Belle2 {
       return vert->getTagVol();
     }
 
-
     double tagVTruthBoostDirection(const Particle* part)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
       return vert->getTruthTagVl();
     }
-
 
     double tagVTruthOrthogonalBoostDirection(const Particle* part)
     {
@@ -358,14 +350,12 @@ namespace Belle2 {
       return vert->getTagVlErr();
     }
 
-
     double tagVErrOrthogonalBoostDirection(const Particle* part)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
       return vert->getTagVolErr();
     }
-
 
     double particleInternalTagVMCFlavor(const Particle* part)
     {
@@ -768,7 +758,6 @@ namespace Belle2 {
       return nullptr;
     }
 
-
     double cumulate(const Particle* part,  const std::vector<std::string>& variable, double start,
                     std::function<double(double, double, double)> fun)
     {
@@ -884,7 +873,6 @@ namespace Belle2 {
         return cumulate(part, variable, 0, [](double s, double f, double) {return s + f;});
       };
     }
-
 
     //**********************************
     //VARIABLE REGISTRATION

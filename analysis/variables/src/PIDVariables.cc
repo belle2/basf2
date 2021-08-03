@@ -270,32 +270,33 @@ namespace Belle2 {
 
     double electronID(const Particle* part)
     {
-      return Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, TOP, ARICH, ECL, KLM)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, TOP, ARICH, ECL, KLM)")->function(part));
     }
 
     double muonID(const Particle* part)
     {
-      return Manager::Instance().getVariable("pidProbabilityExpert(13, CDC, TOP, ARICH, ECL, KLM)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(13, CDC, TOP, ARICH, ECL, KLM)")->function(part));
     }
 
     double pionID(const Particle* part)
     {
-      return Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, TOP, ARICH, ECL, KLM)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, TOP, ARICH, ECL, KLM)")->function(part));
     }
 
     double kaonID(const Particle* part)
     {
-      return Manager::Instance().getVariable("pidProbabilityExpert(321, CDC, TOP, ARICH, ECL, KLM)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, CDC, TOP, ARICH, ECL, KLM)")->function(part));
     }
 
     double protonID(const Particle* part)
     {
-      return Manager::Instance().getVariable("pidProbabilityExpert(2212, CDC, TOP, ARICH, ECL, KLM)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(2212, CDC, TOP, ARICH, ECL, KLM)")->function(part));
     }
 
     double deuteronID(const Particle* part)
     {
-      return Manager::Instance().getVariable("pidProbabilityExpert(1000010020, CDC, TOP, ARICH, ECL, KLM)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, CDC, TOP, ARICH, ECL, KLM)")->function(
+                                part));
     }
 
     double binaryPID(const Particle* part, const std::vector<double>& arguments)
@@ -336,20 +337,23 @@ namespace Belle2 {
 
     double pionID_SVD(const Particle* part)
     {
-      return Manager::Instance().getVariable("formula(exp(pidLogLikelihoodValueExpert(211, ALL))/[exp(pidLogLikelihoodValueExpert(211, ALL))+exp(pidLogLikelihoodValueExpert(321, ALL))+exp(pidLogLikelihoodValueExpert(2212, ALL))])")->function(
-               part);
+      return std::get<double>
+             (Manager::Instance().getVariable("formula(exp(pidLogLikelihoodValueExpert(211, ALL))/[exp(pidLogLikelihoodValueExpert(211, ALL))+exp(pidLogLikelihoodValueExpert(321, ALL))+exp(pidLogLikelihoodValueExpert(2212, ALL))])")->function(
+                part));
     }
 
     double kaonID_SVD(const Particle* part)
     {
-      return Manager::Instance().getVariable("formula(exp(pidLogLikelihoodValueExpert(321, ALL))/[exp(pidLogLikelihoodValueExpert(211, ALL))+exp(pidLogLikelihoodValueExpert(321, ALL))+exp(pidLogLikelihoodValueExpert(2212, ALL))])")->function(
-               part);
+      return std::get<double>
+             (Manager::Instance().getVariable("formula(exp(pidLogLikelihoodValueExpert(321, ALL))/[exp(pidLogLikelihoodValueExpert(211, ALL))+exp(pidLogLikelihoodValueExpert(321, ALL))+exp(pidLogLikelihoodValueExpert(2212, ALL))])")->function(
+                part));
     }
 
     double protonID_SVD(const Particle* part)
     {
-      return Manager::Instance().getVariable("formula(exp(pidLogLikelihoodValueExpert(2212, ALL))/[exp(pidLogLikelihoodValueExpert(211, ALL))+exp(pidLogLikelihoodValueExpert(321, ALL))+exp(pidLogLikelihoodValueExpert(2212, ALL))])")->function(
-               part);
+      return std::get<double>
+             (Manager::Instance().getVariable("formula(exp(pidLogLikelihoodValueExpert(2212, ALL))/[exp(pidLogLikelihoodValueExpert(211, ALL))+exp(pidLogLikelihoodValueExpert(321, ALL))+exp(pidLogLikelihoodValueExpert(2212, ALL))])")->function(
+                part));
     }
 
     double binaryPID_SVD(const Particle* part, const std::vector<double>& arguments)
@@ -365,8 +369,9 @@ namespace Belle2 {
         B2ERROR("The variable binaryPID_SVD is not defined for particle hypotheses {11, 13, 1000010020}.");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(pdgCodeHyp) + ", " + std::to_string(
-                                               pdgCodeTest) + ", ALL)")->function(part);
+      return std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(
+                                                                pdgCodeHyp) + ", " + std::to_string(
+                                                                pdgCodeTest) + ", ALL)")->function(part));
     }
 
     double antineutronID(const Particle* particle)
@@ -486,8 +491,8 @@ namespace Belle2 {
         B2ERROR("Need zero or exactly " << Const::ChargedStable::c_SetSize << " arguments for pidIsMostLikely");
         return nullptr;
       }
-      auto func = [arguments](const Particle * part) -> double {
-        return mostLikelyPDG(arguments)(part) == abs(part->getPDGCode());
+      auto func = [arguments](const Particle * part) -> bool {
+        return std::get<double>(mostLikelyPDG(arguments)(part)) == abs(part->getPDGCode());
       };
       return func;
     }

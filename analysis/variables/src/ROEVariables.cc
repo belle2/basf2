@@ -40,7 +40,7 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    double isInRestOfEvent(const Particle* particle)
+    bool isInRestOfEvent(const Particle* particle)
     {
 
       StoreObjPtr<RestOfEvent> roeobjptr;
@@ -74,6 +74,7 @@ namespace Belle2 {
       }
       return 0.0;
     }
+
     double hasAncestorFromSignalSide(const Particle* particle)
     {
       StoreObjPtr<RestOfEvent> roe;
@@ -96,8 +97,6 @@ namespace Belle2 {
       }
       return 0.0;
     }
-
-
 
     Manager::FunctionPtr currentROEIsInList(const std::vector<std::string>& arguments)
     {
@@ -149,7 +148,16 @@ namespace Belle2 {
           B2ERROR("Relation between particle and ROE doesn't exist! particleRelatedToCurrentROE() variable has to be called from ROE loop");
           return std::numeric_limits<float>::quiet_NaN();
         }
-        return var->function(particle);
+        if (std::holds_alternative<double>(var->function(particle)))
+        {
+          return std::get<double>(var->function(particle));
+        } else if (std::holds_alternative<int>(var->function(particle)))
+        {
+          return std::get<int>(var->function(particle));
+        } else if (std::holds_alternative<bool>(var->function(particle)))
+        {
+          return std::get<bool>(var->function(particle));
+        } else return std::numeric_limits<double>::quiet_NaN();
 
       };
       return func;
@@ -179,8 +187,16 @@ namespace Belle2 {
           TLorentzVector pRecoil = T.getBeamFourMomentum() - roe->get4Vector();
           Particle tmp(pRecoil, 0);
           UseReferenceFrame<RestFrame> frame(&tmp);
-          double result = var->function(particle);
-          return result;
+          if (std::holds_alternative<double>(var->function(particle)))
+          {
+            return std::get<double>(var->function(particle));
+          } else if (std::holds_alternative<int>(var->function(particle)))
+          {
+            return std::get<int>(var->function(particle));
+          } else if (std::holds_alternative<bool>(var->function(particle)))
+          {
+            return std::get<bool>(var->function(particle));
+          } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
       } else {
@@ -190,11 +206,11 @@ namespace Belle2 {
     }
 
     // only the helper function
-    double nRemainingTracksInROE(const Particle* particle, const std::string& maskName)
+    int nRemainingTracksInROE(const Particle* particle, const std::string& maskName)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (not roe.isValid())
-        return 0.0;
+        return 0;
       int n_roe_tracks = roe->getNTracks(maskName);
       int n_par_tracks = 0;
       const auto& daughters = particle->getFinalStateDaughters();
@@ -217,13 +233,13 @@ namespace Belle2 {
       else
         B2FATAL("Wrong number of arguments (1 required) for meta function nROETracks");
 
-      auto func = [maskName](const Particle * particle) -> double {
+      auto func = [maskName](const Particle * particle) -> int {
         return nRemainingTracksInROE(particle, maskName);
       };
       return func;
     }
 
-    double nROE_RemainingTracks(const Particle* particle)
+    int nROE_RemainingTracks(const Particle* particle)
     {
       return nRemainingTracksInROE(particle);
     }
@@ -635,7 +651,6 @@ namespace Belle2 {
       };
       return func;
     }
-
 
     Manager::FunctionPtr nROE_ParticlesInList(const std::vector<std::string>& arguments)
     {
@@ -1701,16 +1716,15 @@ namespace Belle2 {
       return func;
     }
 
-    double printROE(const Particle* particle)
+    bool printROE(const Particle* particle)
     {
       const RestOfEvent* roe = getRelatedROEObject(particle);
 
       if (!roe) {
         B2ERROR("Relation between particle and ROE doesn't exist!");
       } else roe->print();
-      return 0.0;
+      return 0;
     }
-
 
     Manager::FunctionPtr pi0Prob(const std::vector<std::string>& arguments)
     {
@@ -1733,9 +1747,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else if (mode == "tight")
+        } else if (mode == "tight")
         {
           if (particle->hasExtraInfo("Pi0ProbTightEnergyThreshold")) {
             return particle->getExtraInfo("Pi0ProbTightEnergyThreshold");
@@ -1744,9 +1756,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else if (mode == "cluster")
+        } else if (mode == "cluster")
         {
           if (particle->hasExtraInfo("Pi0ProbLargeClusterSize")) {
             return particle->getExtraInfo("Pi0ProbLargeClusterSize");
@@ -1755,9 +1765,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else if (mode == "both")
+        } else if (mode == "both")
         {
           if (particle->hasExtraInfo("Pi0ProbTightEnergyThresholdAndLargeClusterSize")) {
             return particle->getExtraInfo("Pi0ProbTightEnergyThresholdAndLargeClusterSize");
@@ -1766,10 +1774,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else
-        {
+        } else {
           return std::numeric_limits<float>::quiet_NaN();
         }
       };
@@ -1797,9 +1802,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else if (mode == "tight")
+        } else if (mode == "tight")
         {
           if (particle->hasExtraInfo("EtaProbTightEnergyThreshold")) {
             return particle->getExtraInfo("EtaProbTightEnergyThreshold");
@@ -1808,9 +1811,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else if (mode == "cluster")
+        } else if (mode == "cluster")
         {
           if (particle->hasExtraInfo("EtaProbLargeClusterSize")) {
             return particle->getExtraInfo("EtaProbLargeClusterSize");
@@ -1819,9 +1820,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else if (mode == "both")
+        } else if (mode == "both")
         {
           if (particle->hasExtraInfo("EtaProbTightEnergyThresholdAndLargeClusterSize")) {
             return particle->getExtraInfo("EtaProbTightEnergyThresholdAndLargeClusterSize");
@@ -1830,10 +1829,7 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        }
-
-        else
-        {
+        } else {
           return std::numeric_limits<float>::quiet_NaN();
         }
       };
@@ -1999,7 +1995,7 @@ namespace Belle2 {
       }
     }
 
-    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe, const std::string& maskName)
+    bool isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe, const std::string& maskName)
     {
       if (particle->getParticleSource() == Particle::c_Composite or
           particle->getParticleSource() == Particle::c_V0) {
@@ -2008,7 +2004,7 @@ namespace Belle2 {
           if (isInThisRestOfEvent(i, roe, maskName) == 0)
             return 0;
         }
-        return 1.0;
+        return 1;
       }
       return roe->hasParticle(particle, maskName);
     }

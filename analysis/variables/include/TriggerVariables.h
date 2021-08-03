@@ -61,8 +61,8 @@ namespace Belle2 {
     Manager::FunctionPtr softwareTriggerPrescaling(const std::vector<std::string>& args);
 
     /**
-     * returns 1 if the event passes the HLT
+     * returns true if the event passes the HLT
      */
-    double passesAnyHighLevelTrigger(const Particle*);
+    bool passesAnyHighLevelTrigger(const Particle*);
   }
 }

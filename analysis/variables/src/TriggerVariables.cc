@@ -347,15 +347,15 @@ namespace Belle2 {
       return std::bind(extractSoftwareTriggerResultImplementation, true, triggerIdentifier, _1);
     }
 
-    double passesAnyHighLevelTrigger(const Particle* p)
+    bool passesAnyHighLevelTrigger(const Particle* p)
     {
       // for HLT, a c_accept is a pass and all other cases are fail
       // see mdst/dataobjects/include/SoftwareTriggerResult.h
       std::vector<std::string> hardcodedname
         = { "software_trigger_cut&filter&total_result" };
-      double swtcr = softwareTriggerResult(hardcodedname)(p);
-      if (swtcr > 0.5) return 1.0; // 1
-      else             return 0.0; // 0 or -1
+      double swtcr = std::get<double>(softwareTriggerResult(hardcodedname)(p));
+      if (swtcr > 0.5) return true; // 1
+      else             return false; // 0 or -1
     }
 
     Manager::FunctionPtr softwareTriggerPrescaling(const std::vector<std::string>& args)
@@ -442,7 +442,7 @@ which is equivalent to
                       "or the skim stage, hence expert."
                       "If the trigger identifier is not found, returns NaN.");
     REGISTER_VARIABLE("HighLevelTrigger", passesAnyHighLevelTrigger,
-                      "[Eventbased] 1.0 if event passes the HLT trigger, 0.0 if not");
+                      "[Eventbased] True if event passes the HLT trigger, false if not");
     REGISTER_VARIABLE("SoftwareTriggerPrescaling(triggerIdentifier)", softwareTriggerPrescaling,
                       "[Eventbased] return the prescaling for the specific software trigger identifier. "
                       "Please note, this prescaling is taken from the currently setup database. It only corresponds "

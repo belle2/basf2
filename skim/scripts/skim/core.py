@@ -535,6 +535,9 @@ class CombinedSkim(BaseSkim):
                 skim.mc = mc
 
         self.analysisGlobaltag = analysisGlobaltag
+        if analysisGlobaltag is not None:
+            for skim in self:
+                skim.analysisGlobaltag = analysisGlobaltag
 
         self._mdstOutput = mdstOutput
         self.mdst_kwargs = mdst_kwargs or {}

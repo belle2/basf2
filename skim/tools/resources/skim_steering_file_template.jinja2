@@ -45,28 +45,29 @@ path = b2.Path()
     mc=True,
     {%- endif -%}
     {%- endif -%}
-    {%- if analysis_globaltag != "" -%}
+    {%- if analysis_globaltag -%}
     analysisGlobaltag="{{ analysis_globaltag }}",
     {%- endif -%}
 ){%- if hints %}  # pass udstOutput=False to disable udstOutput{%- endif %}
 {% else -%}
     skim = CombinedSkim(
     {% for skim in skims -%}
-        {%- if analysis_globaltag != "" -%}
-        {{ skim|indent(4, True) }}(analysisGlobaltag="{{ analysis_globaltag }}"),
-        {%- else -%}
         {{ skim|indent(4, True) }}(),
-        {%- endif -%}
     {% endfor -%}
     {%- if mdstOutput -%}
     {{ "    " }}udstOutput=False,
     mdstOutput=True,
     mdst_kwargs=dict(),
     {% endif -%}
+    {%- if not backward_compatibility -%}
     {%- if data -%}
     {{ "    " }}mc=False,
     {% else -%}
     {{ "    " }}mc=True,
+    {% endif -%}
+    {% endif -%}
+    {%- if analysis_globaltag -%}
+    {{ "    " }}analysisGlobaltag="{{ analysis_globaltag }}",
     {% endif -%}
     )
 {% endif %}

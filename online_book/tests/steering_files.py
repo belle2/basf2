@@ -25,6 +25,9 @@ from typing import Optional, List, Dict
 import stat
 from pathlib import Path
 
+# 3rd
+from ROOT import TFile
+
 # basf2
 from basf2 import find_file
 from b2test_utils import clean_working_directory, is_ci
@@ -41,28 +44,60 @@ def light_release() -> bool:
     return False
 
 
+def _touch_file_default(path: str):
+    Path(path).touch()
+
+
+def _touch_file_with_root(path: str) -> None:
+    f = TFile(path, "NEW")
+    f.Close()
+    assert Path(path).is_file()
+
+
+def _touch_file_with_subprocess(path: str) -> None:
+    subprocess.run(["touch", path])
+
+
+def _touch_file_with_subprocess_and_root(path: str) -> None:
+    filename = Path(path).name
+    working_dir = Path(path).parent
+    cmd = ["root", "-x", "-l", "-q", "-e", f"TFile f(\"{filename}\", \"NEW\"); f.Close();"]
+    subprocess.run(cmd, cwd=working_dir)
+
+
+def _touch_file_test(method, path: str, **kwargs):
+    try:
+        method(path, **kwargs)
+    except Exception as e:
+        print(f"{method.__name__}: Tried to touch file with, but failed: {e}")
+    else:
+        print(f"{method.__name__}: Successfully touched file")
+        Path(path).unlink()
+
+
 def _permission_report(folder: str) -> None:
     """Quick helper function to show permissions of folder and a selection
     of files in it
     """
     folder = Path(folder)
-    print("-"*80)
+    print("-" * 80)
     print(f"Permissions of {folder}: {folder.stat()}")
     content = list(folder.iterdir())
-    print(content[0].exists())
     if content:
         print(
             f"Permission of one of its contents. {content[0]}: "
             f"{content[0].stat()}"
         )
-    test_file = folder / "test_file_123456"
-    try:
-        test_file.touch()
-    except Exception as e:
-        print(f"Cannot create a new file in the folder: {e}")
-    else:
-        print("Able to create a new file in this folder")
-    print("-"*80)
+    test_file = folder / "Bd2JpsiKS.root"
+    methods = [
+        _touch_file_default,
+        _touch_file_with_root,
+        _touch_file_with_subprocess,
+        _touch_file_with_subprocess_and_root
+    ]
+    for method in methods:
+        _touch_file_test(method, str(test_file))
+    print("-" * 80)
 
 
 class SteeringFileTest(unittest.TestCase):

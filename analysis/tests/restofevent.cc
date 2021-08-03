@@ -150,12 +150,16 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("useROERecoilFrame(p)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(myParticles[5]), frame.getMomentum(myParticles[5]->get4Vector()).P()); // test on D0 in ROE
-    EXPECT_FLOAT_EQ(var->function(myParticles[14]), frame.getMomentum(myParticles[14]->get4Vector()).P()); // test on B0 on signal side
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(myParticles[5])),
+                    frame.getMomentum(myParticles[5]->get4Vector()).P()); // test on D0 in ROE
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(myParticles[14])),
+                    frame.getMomentum(myParticles[14]->get4Vector()).P()); // test on B0 on signal side
     var = Manager::Instance().getVariable("useROERecoilFrame(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(myParticles[5]), frame.getMomentum(myParticles[5]->get4Vector()).E()); // test on D0 in ROE
-    EXPECT_FLOAT_EQ(var->function(myParticles[14]), frame.getMomentum(myParticles[14]->get4Vector()).E()); // test on B0 on signal side
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(myParticles[5])),
+                    frame.getMomentum(myParticles[5]->get4Vector()).E()); // test on D0 in ROE
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(myParticles[14])),
+                    frame.getMomentum(myParticles[14]->get4Vector()).E()); // test on B0 on signal side
 
     DataStore::Instance().setInitializeActive(true);
     DataStore::Instance().getEntry(myROEObject)->object = nullptr;

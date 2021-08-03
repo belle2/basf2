@@ -1606,7 +1606,13 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::sin(std::get<double>(var->function(particle))); };
+        auto func = [var](const Particle * particle) -> double {
+          if (std::holds_alternative<double>(var->function(particle)))
+            return std::sin(std::get<double>(var->function(particle)));
+          else if (std::holds_alternative<int>(var->function(particle)))
+            return std::sin(std::get<int>(var->function(particle)));
+          else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function sin");
@@ -1617,7 +1623,13 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::asin(std::get<double>(var->function(particle))); };
+        auto func = [var](const Particle * particle) -> double {
+          if (std::holds_alternative<double>(var->function(particle)))
+            return std::asin(std::get<double>(var->function(particle)));
+          else if (std::holds_alternative<int>(var->function(particle)))
+            return std::asin(std::get<int>(var->function(particle)));
+          else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function asin");
@@ -1628,7 +1640,13 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::cos(std::get<double>(var->function(particle))); };
+        auto func = [var](const Particle * particle) -> double {
+          if (std::holds_alternative<double>(var->function(particle)))
+            return std::cos(std::get<double>(var->function(particle)));
+          else if (std::holds_alternative<int>(var->function(particle)))
+            return std::cos(std::get<int>(var->function(particle)));
+          else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function cos");
@@ -1639,7 +1657,13 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::acos(std::get<double>(var->function(particle))); };
+        auto func = [var](const Particle * particle) -> double {
+          if (std::holds_alternative<double>(var->function(particle)))
+            return std::acos(std::get<double>(var->function(particle)));
+          else if (std::holds_alternative<int>(var->function(particle)))
+            return std::acos(std::get<int>(var->function(particle)));
+          else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function acos");
@@ -1650,7 +1674,13 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::exp(std::get<double>(var->function(particle))); };
+        auto func = [var](const Particle * particle) -> double {
+          if (std::holds_alternative<double>(var->function(particle)))
+            return std::exp(std::get<double>(var->function(particle)));
+          else if (std::holds_alternative<int>(var->function(particle)))
+            return std::exp(std::get<int>(var->function(particle)));
+          else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function exp");
@@ -1661,7 +1691,13 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::log(std::get<double>(var->function(particle))); };
+        auto func = [var](const Particle * particle) -> double {
+          if (std::holds_alternative<double>(var->function(particle)))
+            return std::log(std::get<double>(var->function(particle)));
+          else if (std::holds_alternative<int>(var->function(particle)))
+            return std::log(std::get<int>(var->function(particle)));
+          else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function log");
@@ -1672,7 +1708,13 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::log10(std::get<double>(var->function(particle))); };
+        auto func = [var](const Particle * particle) -> double {
+          if (std::holds_alternative<double>(var->function(particle)))
+            return std::log10(std::get<double>(var->function(particle)));
+          else if (std::holds_alternative<int>(var->function(particle)))
+            return std::log10(std::get<int>(var->function(particle)));
+          else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function log10");

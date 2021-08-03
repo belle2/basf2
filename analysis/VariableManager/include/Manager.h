@@ -240,7 +240,7 @@ namespace Belle2 {
        *
        * Throws exception if variable isn't found. Assumes 'p' is != NULL.
        */
-      std::variant<double, int, bool> evaluate(const std::string& varName, const Particle* p);
+      double evaluate(const std::string& varName, const Particle* p);
 
       /** Return list of all variable names (in order registered). */
       std::vector<std::string> getNames() const;

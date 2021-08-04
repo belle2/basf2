@@ -12,7 +12,7 @@ Full Event Interpretation
 
     **Prerequisites**:
 
-    	* Lessons 1-2
+        * Lessons 1-2
 
     **Questions**:
 
@@ -459,7 +459,7 @@ This leads to a discrepancy between the simulated decay and the reconstructed de
 causing the `isSignal` variable to always be zero.
 
 To solve this you can tell the MC matching algorithm to accept missing neutrinos by using the ``?nu`` flag,
-similiar to the ``?addbrems`` flag introduced in :ref:`onlinebook_various_additions`.
+similar to the ``?addbrems`` flag introduced in :ref:`onlinebook_various_additions`.
 Just add this flag to the end of the decay string in `modularAnalysis.reconstructDecay`. [#f1]_
 
 

@@ -369,8 +369,6 @@ ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
   //== Get first position estimate from maximum location
 
   int time_index = ped_max_pos * 4 - 8;
-  if (time_index > 47) time_index = 47;
-  if (time_index < 0)  time_index = 0;
 
   //== Run two iterations of chi2 minimization
   for (int iter = 0; iter < 2; iter++) {

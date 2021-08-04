@@ -12,8 +12,8 @@ The core of the simulation library is `Geant4`_, which is an external library.
 A simulation library module, **FullSim**, was created as a wrapper for the ``basf2`` 
 - Geant4 interface. The default input parameters for FullSim are stored in two places,
 
-* `simulation/scripts/simulation.py <https://stash.desy.de/projects/B2/repos/software/browse/simulation/scripts/simulation.py>`_ and
-* `simulation/modules/fullsim/src/FullSimModule.cc <https://stash.desy.de/projects/B2/repos/software/browse/simulation/modules/fullsim/src/FullSimModule.cc>`_.
+* `simulation/scripts/simulation.py <https://stash.desy.de/projects/B2/repos/basf2/browse/simulation/scripts/simulation.py>`_ and
+* `simulation/modules/fullsim/src/FullSimModule.cc <https://stash.desy.de/projects/B2/repos/basf2/browse/simulation/modules/fullsim/src/FullSimModule.cc>`_.
 
 Geant4 version in the externals library
 =======================================

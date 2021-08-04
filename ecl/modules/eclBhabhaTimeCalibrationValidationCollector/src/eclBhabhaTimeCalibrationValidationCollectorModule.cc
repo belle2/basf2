@@ -34,7 +34,6 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <ecl/digitization/EclConfiguration.h>
 
 #include <analysis/utility/PCmsLabTransform.h>
@@ -409,7 +408,9 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
     if (maxiTrk[icharge] > -1) {
       B2DEBUG(22, "looping over the 2 max pt tracks");
 
-      const TrackFitResult* tempTrackFit = tracks[maxiTrk[icharge]]->getTrackFitResult(Const::ChargedStable(211));
+      const TrackFitResult* tempTrackFit = tracks[maxiTrk[icharge]]->getTrackFitResultWithClosestMass(Const::pion);
+      if (not tempTrackFit) {continue ;}
+
       trkp4Lab[icharge] = tempTrackFit->get4Momentum();
       trkp4COM[icharge] = boostrotate.rotateLabToCms() * trkp4Lab[icharge];
       trkpLab[icharge] = trkp4Lab[icharge].Rho();

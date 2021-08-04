@@ -60,7 +60,7 @@ namespace TreeFitter {
                                  std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end();
 
     if (!m_automatic_vertex_constraining) {
-      // if this is a hadronically decaying resonance it is usefule to constraint the decay vertex to its mothers decay vertex.
+      // if this is a hadronically decaying resonance it is useful to constraint the decay vertex to its mothers decay vertex.
       //
       m_shares_vertex_with_mother  = std::find(config.m_fixedToMotherVertexListPDG.begin(),
                                                config.m_fixedToMotherVertexListPDG.end(),
@@ -137,7 +137,7 @@ namespace TreeFitter {
         // TODO switched off waiting for refactoring of init1 and init2 functions (does not affect performance)
       } else if (mother() && mother()->posIndex() >= 0) {
         const int posindexmother = mother()->posIndex();
-        const int dim = m_config->m_originDimension; //TODO acess mother
+        const int dim = m_config->m_originDimension; //TODO access mother
         fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmother, dim);
       } else {
         /** (0,0,0) is the best guess in any other case */
@@ -162,7 +162,7 @@ namespace TreeFitter {
         fitparams.getStateVector()(posindex + 1) == 0 && \
         fitparams.getStateVector()(posindex + 2) == 0) {
       const int posindexmom = mother()->posIndex();
-      const int dim = m_config->m_originDimension; //TODO acess mother?
+      const int dim = m_config->m_originDimension; //TODO access mother?
       fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmom, dim);
     }
     return initTau(fitparams);
@@ -215,7 +215,7 @@ namespace TreeFitter {
       const int daumomindex = daughter->momIndex();
       const Eigen::Matrix<double, 1, 3> p3_vec = fitparams.getStateVector().segment(daumomindex, 3);
 
-      // three momentum is easy just substract the vectors
+      // three momentum is easy just subtract the vectors
       p.getResiduals().segment(0, 3) -= p3_vec;
 
       // energy depends on the parametrisation!
@@ -279,7 +279,7 @@ namespace TreeFitter {
   {
     // { x, y, z, tau, px, py, pz, E }
     // the last 4 always exists for composite particles
-    // tau index conly exist with a vertex and geo constraint
+    // tau index only exist with a vertex and geo constraint
     //
     if (m_shares_vertex_with_mother) { return 4; }
     if (!m_shares_vertex_with_mother && !m_geo_constraint) { return 7; }
@@ -292,7 +292,7 @@ namespace TreeFitter {
 
   int InternalParticle::tauIndex() const
   {
-    /** only exists if particle is geo cosntraint and has a mother */
+    /** only exists if particle is geo constraint and has a mother */
     return m_geo_constraint ? index() + 3 : -1;
   }
 

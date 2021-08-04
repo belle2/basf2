@@ -40,7 +40,7 @@ pybasf2.Path.__eq__ = lambda a, b: all(x == y for x, y in zip(a.modules(), b.mod
 
 def print_path(a, b):
     """
-    Print the parts of the pathes which are different
+    Print the parts of the paths which are different
     """
     for x, y in zip(a.modules(), b.modules()):
         if x.type() != y.type():

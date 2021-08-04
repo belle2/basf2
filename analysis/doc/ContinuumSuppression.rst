@@ -35,7 +35,7 @@ The generic interface is the following:
   buildContinuumSuppression('B0', 'cleanMask', path=main)
 
 Where ``<Your selections for ROE>`` is a set of cuts on tracks and clusters of ROE
-which are in general analysis dependet. Some examples will be given below.
+which are in general analysis dependent. Some examples will be given below.
 
 .. autofunction:: modularAnalysis.buildContinuumSuppression
    :noindex:

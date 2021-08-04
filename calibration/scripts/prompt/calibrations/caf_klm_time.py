@@ -26,7 +26,7 @@ from prompt import CalibrationSettings, input_data_filters
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name='KLM time',
-                               expert_username='chilikin',
+                               expert_username='depietro',
                                description=__doc__,
                                input_data_formats=['cdst'],
                                input_data_names=['hlt_mumu'],

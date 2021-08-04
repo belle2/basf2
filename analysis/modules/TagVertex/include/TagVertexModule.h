@@ -161,7 +161,7 @@ namespace Belle2 {
     the expected BTag line of flights */
     std::pair<TVector3, TMatrixDSym> findConstraintBTube(const Particle* Breco, double cut);
 
-    /** get the vertex of the MC B particle associated to Btag. It works anly with signal MC */
+    /** get the vertex of the MC B particle associated to Btag. It works only with signal MC */
     void BtagMCVertex(const Particle* Breco);
 
     /** compare Breco with the two MC B particles */

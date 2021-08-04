@@ -346,7 +346,7 @@ let's submit the gbasf2 jobs:
            -i /belle/MC/release-04-00-03/DB00000757/MC13a/prod00009436/s00/e1003/4S/r00000/uubar/mdst/sub00 \
            ~michmx/public/tutorial2020/Reconstruct_Bd2JpsiKS_template.py
 
-A project summary and a confirmation prompt will be displayed after excecuting gbasf2
+A project summary and a confirmation prompt will be displayed after executing gbasf2
 
 .. code-block:: bash
 

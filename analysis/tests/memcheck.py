@@ -97,7 +97,7 @@ treeFit('B0:jpsiks', 0.0, path=main)
 # order candidates by chi2 probability
 rankByHighest('B0:jpsiks', 'chiProb', path=main)
 
-# build the rest of the event associated to te B0
+# build the rest of the event associated to the B0
 buildRestOfEvent('B0:jpsiks', path=main)
 
 # calculate continuum suppression variables

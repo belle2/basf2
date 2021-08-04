@@ -11,9 +11,9 @@
 
 # **************  Flavor Tagging   **************
 # *                                             *
-# * This script calculates the paramters charac-*
-# * terizing the performance of the flavor tag- *
-# * ger. It produces as well plots for the qr   *
+# * This script calculates the parameters char- *
+# * acterizing the performance of the flavor    *
+# * tagger. It produces plots for the qr        *
 # * distribution of the combiners and the dis-  *
 # * tributions of the combiner input variables. *
 # *                                             *
@@ -45,9 +45,9 @@ if len(workingFiles) < 1:
 workingDirectory = '.'
 
 #
-# *****************************************
-# DETERMINATION OF TOTAL EFFECTIVE EFFIENCY
-# *****************************************
+# *******************************************
+# DETERMINATION OF TOTAL EFFECTIVE EFFICIENCY
+# *******************************************
 #
 
 # working directory
@@ -92,7 +92,7 @@ YmaxForQrPlot = 0
 total_notTagged = 0
 
 for method in methods:
-    # Get erro with GetBinError(), set erro with SetBinError()
+    # Get error with GetBinError(), set error with SetBinError()
     # histogram contains the average r in each of 7 bins -> calculation see below
     histo_avr_r = ROOT.TH1F('Average_r', 'Average r in each of the bins (B0 and B0bar)', int(r_size - 2),
                             r_subsample)
@@ -660,12 +660,12 @@ for method in methods:
     for i in range(1, r_size):
         print('$ ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '$ & $'
               '{: 7.2f}'.format(muParam[i] * 100) + r" \pm " + '{:2.2f}'.format(muParamUncertainty[i] * 100) + r' $ & ')
-# **********************************************
+# ************************************************
 # DETERMINATION OF INDIVIDUAL EFFECTIVE EFFICIENCY
-# **********************************************
+# ************************************************
 
 # keep in mind:
-# the individual efficiency is determind on basis of the combiner training.
+# the individual efficiency is determined on basis of the combiner training.
 # Whereas the efficiency is determined on basis of the final expert output.
 # print(eventLevelParticleLists)
 # eventLevelParticleLists.append(('K+:inRoe', 'KaonNotWeighted',
@@ -722,7 +722,7 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
     hist_background = ROOT.TH1F('Background_' + category, 'Input Background (B0bar) ' +
                                 category + ' (binning)', NbinsCategories, -1.0, 1.0)
 
-    # per definiton that input is not comparable to the network output, this has to be transformed.
+    # per definition that input is not comparable to the network output, this has to be transformed.
     # probability output from 0 to 1 (corresponds to net output probability) -> calculation below
     hist_probB0 = ROOT.TH1F('Probability' + category,
                             'Transformed to probability (B0) (' + category + ')',
@@ -879,7 +879,7 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
             purityB0bar[i] = back[i] / (signal[i] + back[i])
             dilutionB0bar2[i] = -1 + 2 * back[i] / (signal[i] + back[i])
 
-        # filling histogram with probabilty from 0 to 1
+        # filling histogram with probability from 0 to 1
         hist_probB0.Fill(purityB0[i], signal[i])
         hist_probB0bar.Fill(purityB0bar[i], back[i])
 

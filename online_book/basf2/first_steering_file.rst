@@ -12,19 +12,19 @@ First steering file
 
     **Prerequisites**:
 
-    	* Creating and running scripts in the terminal
-    	* Basic python
+    * Creating and running scripts in the terminal
+    * Basic python
 
     **Questions**:
 
-        * How can I load data?
-        * How can I reconstruct a decay?
-        * How can I match MC?
-        * How can I create an ntuple to store information?
+    * How can I load data?
+    * How can I reconstruct a decay?
+    * How can I match MC?
+    * How can I create an ntuple to store information?
 
     **Objectives**:
 
-        * Reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to \pi^+\pi^+)`
+    * Reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to \pi^+\pi^+)`
 
 In this hands-on tutorial you'll be writing your first steering file. Our
 ultimate goal is to reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to
@@ -680,7 +680,7 @@ happen to fulfill all your selection criteria.
         plt.xlim(4.3, 5.3)
         plt.savefig('Mbc_all.png')
 
-    .. figure:: figs/Mbc_all.png
+    .. figure:: first_steering_file/Mbc_all.png
         :width: 40em
         :align: center
 
@@ -780,7 +780,7 @@ definitely read it to understand at least the basics.
         plt.xlim(4.3, 5.3)
         plt.savefig('Mbc_MCsplit.png')
 
-    .. figure:: figs/Mbc_MCsplit.png
+    .. figure:: first_steering_file/Mbc_MCsplit.png
         :width: 40em
         :align: center
 

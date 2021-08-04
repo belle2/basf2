@@ -41,11 +41,9 @@ class CDCCR(TrackingValidationRun):
     #: all detector components in simulation and reconstruction
     components = None
 
-    # data_taking_period has to be "gcr2017" (or one of the other cosmic runs) else the full cosmics finding (CDC+SVD)
-    # is added, or no cdc constants are defined
     def finder_module(self, path):
         """Add the CDC cosmic-ray track-finding module to the basf2 path"""
-        tracking.add_cr_track_finding(path, data_taking_period="gcr2017")
+        tracking.add_cr_track_finding(path)
 
     #: Define the user parameters for the track-finding module
     tracking_coverage = {

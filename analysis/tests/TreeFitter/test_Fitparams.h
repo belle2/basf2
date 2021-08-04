@@ -23,10 +23,10 @@ namespace {
   {
     TreeFitter::FitParams fitParDim3(3);
 
-    /** all elments of the statevector initialised to 0  */
+    /** all elements of the statevector initialised to 0  */
     EXPECT_TRUE((fitParDim3.getStateVector().array() == 0.0).all()) << "statevector not initialised to 0,0,...";
 
-    /** all covariance matrix elemtns initalised to 0 */
+    /** all covariance matrix elemtns initialised to 0 */
     EXPECT_TRUE((fitParDim3.getCovariance().array() == 0.0).all()) << "covariance not initialised to 0";
   }
 

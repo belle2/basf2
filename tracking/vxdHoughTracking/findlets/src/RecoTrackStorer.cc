@@ -65,6 +65,8 @@ void RecoTrackStorer::initialize()
 
   // create pointer to chosen estimator
   if (m_param_EstimationMethod == "mcInfo") {
+    StoreArray<RecoTrack> mcRecoTracks;
+    mcRecoTracks.isRequired(m_param_MCRecoTracksStoreArrayName);
     m_estimator = std::make_unique<QualityEstimatorMC>(m_param_MCRecoTracksStoreArrayName, m_param_MCStrictQualityEstimator);
   } else if (m_param_EstimationMethod == "tripletFit") {
     m_estimator = std::make_unique<QualityEstimatorTripletFit>();
@@ -85,20 +87,8 @@ void RecoTrackStorer::beginRun()
   m_estimator->setMagneticFieldStrength(bFieldZ);
 
   if (m_param_EstimationMethod == "mcInfo") {
-    StoreArray<RecoTrack> mcRecoTracks;
-    mcRecoTracks.isRequired(m_param_MCRecoTracksStoreArrayName);
-    std::string svdClustersName = m_param_SVDClustersStoreArrayName;
-    std::string pxdClustersName = "";
-
-    if (mcRecoTracks.getEntries() > 0) {
-      svdClustersName = mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
-      pxdClustersName = mcRecoTracks[0]->getStoreArrayNameOfPXDHits();
-    } else {
-      B2WARNING("No Entries in mcRecoTracksStoreArray: using empty cluster name for svd and pxd");
-    }
-
     QualityEstimatorMC* MCestimator = static_cast<QualityEstimatorMC*>(m_estimator.get());
-    MCestimator->setClustersNames(svdClustersName, pxdClustersName);
+    MCestimator->forceUpdateClusterNames();
   }
 }
 

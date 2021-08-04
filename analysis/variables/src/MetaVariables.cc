@@ -2636,7 +2636,7 @@ Specifying the lab frame is useful in some corner-cases. For example:
 		      "When more than one Particle is present in the ParticleList, only the first Particle in the list is used for "
 		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.");
     REGISTER_VARIABLE("useRecoilParticleRestFrame(variable, particleList)", useRecoilParticleRestFrame,
-                      "Returns the value of the variable in the rest frame of recoil system againt the first Particle contained in the given ParticleList.\n"
+                      "Returns the value of the variable in the rest frame of recoil system against the first Particle contained in the given ParticleList.\n"
 		      "It is strongly recommended to pass a ParticleList that contains at most only one Particle in each event. "
 		      "When more than one Particle is present in the ParticleList, only the first Particle in the list is used for "
 		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.");
@@ -2949,7 +2949,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       which either has to be the name of the variable used to order the candidates or the selected outputVariable name without the ending ``_rank``.
                       This means that your selected name for the rank variable has to end with ``_rank``.
 
-                      An example of this variable's usage is given in the tutorial `B2A602-BestCandidateSelection <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples/tutorials/B2A602-BestCandidateSelection.py>`_
+                      An example of this variable's usage is given in the tutorial `B2A602-BestCandidateSelection <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/examples/tutorials/B2A602-BestCandidateSelection.py>`_
                       )DOC");
     REGISTER_VARIABLE("matchedMCHasPDG(PDGCode)", matchedMCHasPDG,
                       "Returns if the absolute value of aPDGCode of a MCParticle related to a Particle matches a given PDGCode."

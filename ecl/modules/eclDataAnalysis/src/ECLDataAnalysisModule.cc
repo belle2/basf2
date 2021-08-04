@@ -2112,7 +2112,7 @@ void ECLDataAnalysisModule::event()
             no_fMatch = 1;
           no_fFMatch = 1;
         }
-      } else if (mcParticle->getSecondaryPhysicsProcess() != 0 && mcParticle->getMother()->getPDG() == Const::Klong.getPDGCode()) {
+      } else if (mcParticle->getMother()->getPDG() == Const::Klong.getPDGCode()) {
         double vtxx = mcParticle->getProductionVertex().X();
         double vtxy = mcParticle->getProductionVertex().Y();
         double vtxz = mcParticle->getProductionVertex().Z();

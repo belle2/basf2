@@ -453,7 +453,7 @@ pattern-recognition track, with respect to the MC track. That is:
 
       \frac{d_0^\textrm{MC} - d_0^\textrm{PR}}{\sigma_{d_0; \textrm{PR}}}
 
-.. seealso:: :b2:var:`d0`
+.. seealso:: :b2:var:`d0`, :b2:var:`d0Err`
 
 Returns NaN if no MC particle is related or if called on something other than a
 track-based particle.
@@ -466,7 +466,7 @@ pattern-recognition track, with respect to the MC track.  That is:
 
       \frac{\phi_0^\textrm{MC} - \phi_0^\textrm{PR}}{\sigma_{\phi_0; \textrm{PR}}}
 
-.. seealso:: :b2:var:`phi0`
+.. seealso:: :b2:var:`phi0`, :b2:var:`phi0Err`
 
 Returns NaN if no MC particle is related or if called on something other than a
 track-based particle.
@@ -479,7 +479,7 @@ pattern-recognition track, with respect to the MC track.  That is:
 
       \frac{\omega^\textrm{MC} - \omega^\textrm{PR}}{\sigma_{\omega; \textrm{PR}}}
 
-.. seealso:: :b2:var:`omega`
+.. seealso:: :b2:var:`omega`, :b2:var:`omegaErr`
 
 Returns NaN if no MC particle is related or if called on something other than a
 track-based particle.
@@ -492,7 +492,7 @@ pattern-recognition track, with respect to the MC track.  That is:
 
       \frac{z_0^\textrm{MC} - z_0^\textrm{PR}}{\sigma_{\Omega; \textrm{PR}}}
 
-.. seealso:: :b2:var:`z0`
+.. seealso:: :b2:var:`z0`, :b2:var:`z0Err`
 
 Returns NaN if no MC particle is related or if called on something other than a
 track-based particle.
@@ -505,7 +505,7 @@ pattern-recognition track, with respect to the MC track.  That is:
 
       \frac{(\tan\lambda)^\textrm{MC} - (\tan\lambda)^\textrm{PR}}{\sigma_{\tan\lambda; \textrm{PR}}}
 
-.. seealso:: :b2:var:`tanLambda`
+.. seealso:: :b2:var:`tanLambda`, :b2:var:`tanLambdaErr`
 
 Returns NaN if no MC particle is related or if called on something other than a
 track-based particle.
@@ -527,7 +527,7 @@ Returns the number of degrees of freedom of the track fit.
         rejection.
 
 Returns NaN if called for something other than a track-based particle, or for
-mdst versions older than ``release-05-01``.
+mdst files processed with basf2 versions older than ``release-05-01``.
     )DOC");
     REGISTER_VARIABLE("chi2",      trackChi2, R"DOC(
 Returns the :math:`\chi^2` of the track fit.  This is actually computed based on
@@ -536,7 +536,7 @@ Returns the :math:`\chi^2` of the track fit.  This is actually computed based on
 .. note:: Note that for :b2:var:`pValue` exactly equal to 0 it returns infinity. 
 
 Returns NaN if called for something other than a track-based particle, or for
-mdst versions older than ``release-05-01``.
+mdst files processed with basf2 versions older than ``release-05-01``.
     )DOC");
     REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,
                       "The first activated SVD layer associated to the track. Returns NaN if called for something other than a track-based particle.");
@@ -652,7 +652,7 @@ always 0 or 1 with newer versions of ECL reconstruction.
 
         For high-level analysis it is recommended to require the presence of a
         matched ECL cluster along with a minimum energy requirement.  A
-        track-based particle will have an clusterE if it is matched (NaN if
+        track-based particle will have a clusterE if it is matched (NaN if
         there is no cluster match for the track.
 
         .. code-block:: python

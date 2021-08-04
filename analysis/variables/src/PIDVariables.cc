@@ -642,13 +642,13 @@ The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `cluste
 Parameters i,j are signal and background hypothesis: (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)
 Returns 0.5 in case there is no likelihood found and a factor of 0.5 will appear in the product if any of the subdetectors don't report a likelihood (Belle behaviour).
 
-.. warning:: The behaviour is different for Belle II PID variables which typically return NaN in case of error.
+.. warning:: The behaviour is different from Belle II PID variables which typically return NaN in case of error.
     )DOC");
     REGISTER_VARIABLE("muIDBelle", muIDBelle, R"DOC(
 [Legacy] Returns Belle's PID ``Muon_likelihood()`` variable.
-Returns 0.5 in case there is no likelihood found and return zero if the muon likelihood is not usable (Belle behaviour).
+Returns 0.5 in case there is no likelihood found and returns zero if the muon likelihood is not usable (Belle behaviour).
 
-.. warning:: The behaviour is different for Belle II PID variables which typically return NaN in case of error.
+.. warning:: The behaviour is different from Belle II PID variables which typically return NaN in case of error.
     )DOC");
     REGISTER_VARIABLE("muIDBelleQuality", muIDBelleQuality, R"DOC(
 [Legacy] Returns true if Belle's PID ``Muon_likelihood()`` is usable (reliable).
@@ -658,7 +658,7 @@ Returns zero/false if not usable or if there is no PID found.
 [Legacy] Returns Belle's electron ID ``eid(3,-1,5).prob()`` variable. 
 Returns 0.5 in case there is no likelihood found (Belle behaviour).
 
-.. warning:: The behaviour is different for Belle II PID variables which typically return NaN in case of error.
+.. warning:: The behaviour is different from Belle II PID variables which typically return NaN in case of error.
     )DOC");
   }
 }

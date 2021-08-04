@@ -126,7 +126,11 @@ Helicity
 Tracking
 ~~~~~~~~
 
-Here is a list of track variables:
+Here is a list of track variables.
+In the following descriptions, PR refers to "pattern recognition" tracks (i.e. reconstructed). And MC refers to MC tracks.
+This notation follows the convention of the tracking paper.
+
+.. seealso:: For more details see: "*Track finding at Belle II*" `Comput.Phys.Commun. 259 (2021), 107610 <https://doi.org/10.1016/j.cpc.2020.107610>`_
 
 .. b2-variables::
    :group: Tracking

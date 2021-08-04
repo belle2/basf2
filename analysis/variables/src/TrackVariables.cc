@@ -490,7 +490,7 @@ pattern-recognition track, with respect to the MC track.  That is:
 
 .. math::
 
-      \frac{z_0^\textrm{MC} - z_0^\textrm{PR}}{\sigma_{\Omega; \textrm{PR}}}
+      \frac{z_0^\textrm{MC} - z_0^\textrm{PR}}{\sigma_{z_0; \textrm{PR}}}
 
 .. seealso:: :b2:var:`z0`, :b2:var:`z0Err`
 

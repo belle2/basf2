@@ -46,7 +46,8 @@ HelixErrorScalerModule::HelixErrorScalerModule() : Module(), m_pdgCode(0), m_sca
   addParam("scaleFactors", m_scaleFactors, "vector of five scale factors for helix parameter errors", {1.0, 1.0, 1.0, 1.0, 1.0});
   addParam("d0ResolutionParameters", m_d0ResolPars, "d0 resolution parameters", {0.0, 0.0});
   addParam("z0ResolutionParameters", m_z0ResolPars, "z0 resolution parameters", {0.0, 0.0});
-  addParam("d0MomentumThreshold", m_d0MomThr, "d0 resolution is kept constant below this momentum. Only for V0 Kshort.", 0.0);
+  addParam("d0MomentumThreshold", m_d0MomThr, "d0 resolution is kept constant below this momentum.", 0.0);
+  addParam("z0MomentumThreshold", m_z0MomThr, "z0 resolution is kept constant below this momentum.", 0.0);
 
 }
 
@@ -185,6 +186,7 @@ const TrackFitResult* HelixErrorScalerModule::getTrackFitResultWithScaledError(c
     double pZ0 = pD0 * sinTheta; // p*beta*sinTheta**2.5
 
     pD0 = TMath::Max(pD0, m_d0MomThr); // if pD0 is small than threshold, *overwrite* it with the threshold.
+    pZ0 = TMath::Max(pZ0, m_z0MomThr); // if pZ0 is small than threshold, *overwrite* it with the threshold.
     double d0Resol = TMath::Sqrt(TMath::Power(m_d0ResolPars[0], 2) + TMath::Power(m_d0ResolPars[1] / pD0, 2));
     double z0Resol = TMath::Sqrt(TMath::Power(m_z0ResolPars[0], 2) + TMath::Power(m_z0ResolPars[1] / pZ0, 2));
     double d0Err = TMath::Sqrt(trkfit->getCovariance5()[0][0]);

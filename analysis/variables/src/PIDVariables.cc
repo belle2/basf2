@@ -636,16 +636,29 @@ The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `cluste
                       "Returns 1 if the PID likelihood for the particle given its PID is the largest one");
 
     // B2BII PID
-    VARIABLE_GROUP("PID_belle");
-    REGISTER_VARIABLE("atcPIDBelle(i,j)", atcPIDBelle,
-                      "returns Belle's PID atc variable: ``atc_pid(3,1,5,i,j).prob()``.\n"
-                      "Parameters i,j are signal and background hypothesis: (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)");
-    REGISTER_VARIABLE("muIDBelle", muIDBelle,
-                      "returns Belle's PID ``Muon_likelihood()`` variable.");
-    REGISTER_VARIABLE("muIDBelleQuality", muIDBelleQuality,
-                      "returns true if Belle's PID ``Muon_likelihood()`` is usable (reliable).");
-    REGISTER_VARIABLE("eIDBelle", eIDBelle,
-                      "returns Belle's electron ID ``eid(3,-1,5).prob()`` variable.");
+    VARIABLE_GROUP("Belle PID variables");
+    REGISTER_VARIABLE("atcPIDBelle(i,j)", atcPIDBelle, R"DOC(
+[Legacy] Returns Belle's PID atc variable: ``atc_pid(3,1,5,i,j).prob()``.
+Parameters i,j are signal and background hypothesis: (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)
+Returns 0.5 in case there is no likelihood found and a factor of 0.5 will appear in the product if any of the subdetectors don't report a likelihood (Belle behaviour).
 
+.. warning:: The behaviour is different from Belle II PID variables which typically return NaN in case of error.
+    )DOC");
+    REGISTER_VARIABLE("muIDBelle", muIDBelle, R"DOC(
+[Legacy] Returns Belle's PID ``Muon_likelihood()`` variable.
+Returns 0.5 in case there is no likelihood found and returns zero if the muon likelihood is not usable (Belle behaviour).
+
+.. warning:: The behaviour is different from Belle II PID variables which typically return NaN in case of error.
+    )DOC");
+    REGISTER_VARIABLE("muIDBelleQuality", muIDBelleQuality, R"DOC(
+[Legacy] Returns true if Belle's PID ``Muon_likelihood()`` is usable (reliable).
+Returns zero/false if not usable or if there is no PID found.
+    )DOC");
+    REGISTER_VARIABLE("eIDBelle", eIDBelle, R"DOC(
+[Legacy] Returns Belle's electron ID ``eid(3,-1,5).prob()`` variable. 
+Returns 0.5 in case there is no likelihood found (Belle behaviour).
+
+.. warning:: The behaviour is different from Belle II PID variables which typically return NaN in case of error.
+    )DOC");
   }
 }

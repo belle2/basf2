@@ -858,7 +858,18 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           else {
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            double diff = std::get<double>(var->function(particle->getDaughter(jDaughterNumber))) - std::get<double>(var->function(particle->getDaughter(iDaughterNumber)));
+            auto result_j = var->function(particle->getDaughter(jDaughterNumber));
+            auto result_i = var->function(particle->getDaughter(iDaughterNumber));
+            double diff = std::numeric_limits<double>::quiet_NaN();
+            if (std::holds_alternative<double>(result_j) && std::holds_alternative<double>(result_i))
+            {
+              diff = std::get<double>(result_j) - std::get<double>(result_i);
+            } else if (std::holds_alternative<int>(result_j) && std::holds_alternative<int>(result_i))
+            {
+              diff = std::get<int>(result_j) - std::get<int>(result_i);
+            } else {
+              throw std::runtime_error("Bad variant access");
+            }
             if (variablename == "phi" or variablename == "clusterPhi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")) or std::regex_match(variablename, std::regex("use.*Frame\\(clusterPhi\\)")))
             {
               if (fabs(diff) > M_PI) {
@@ -903,7 +914,18 @@ namespace Belle2 {
             Particle iTmpPart(iMcDaughter);
             Particle jTmpPart(jMcDaughter);
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            double diff = std::get<double>(var->function(&jTmpPart)) - std::get<double>(var->function(&iTmpPart));
+            auto result_j = var->function(&jTmpPart);
+            auto result_i = var->function(&iTmpPart);
+            double diff = std::numeric_limits<double>::quiet_NaN();
+            if (std::holds_alternative<double>(result_j) && std::holds_alternative<double>(result_i))
+            {
+              diff = std::get<double>(result_j) - std::get<double>(result_i);
+            } else if (std::holds_alternative<int>(result_j) && std::holds_alternative<int>(result_i))
+            {
+              diff = std::get<int>(result_j) - std::get<int>(result_i);
+            } else {
+              throw std::runtime_error("Bad variant access");
+            }
             if (variablename == "phi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")))
             {
               if (fabs(diff) > M_PI) {
@@ -1076,7 +1098,19 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           else {
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            double diff = std::get<double>(var->function(particle)) - std::get<double>(var->function(particle->getDaughter(daughterNumber)));
+            auto result_mother = var->function(particle);
+            auto result_daughter = var->function(particle->getDaughter(daughterNumber));
+            double diff = std::numeric_limits<double>::quiet_NaN();
+            if (std::holds_alternative<double>(result_mother) && std::holds_alternative<double>(result_daughter))
+            {
+              diff = std::get<double>(result_mother) - std::get<double>(result_daughter);
+            } else if (std::holds_alternative<int>(result_mother) && std::holds_alternative<int>(result_daughter))
+            {
+              diff = std::get<int>(result_mother) - std::get<int>(result_daughter);
+            } else {
+              throw std::runtime_error("Bad variant access");
+            }
+
             if (variablename == "phi" or variablename == "useCMSFrame(phi)")
             {
               if (fabs(diff) > M_PI) {

@@ -209,12 +209,12 @@ std::vector<double> HelixErrorScalerModule::getScaleFactors(const Particle* part
     double d0Err = TMath::Sqrt(trkfit->getCovariance5()[0][0]);
     double z0Err = TMath::Sqrt(trkfit->getCovariance5()[3][3]);
 
-    std::vector<double> scaleFactors[5] = { TMath::Max(d0Resol / d0Err, m_scaleFactors_PXD[0]),
-                                            m_scaleFactors_PXD[1],
-                                            m_scaleFactors_PXD[2],
-                                            TMath::Max(z0Resol / z0Err, m_scaleFactors_PXD[3]),
-                                            m_scaleFactors_PXD[4]
-                                          };
+    std::vector<double> scaleFactors = { TMath::Max(d0Resol / d0Err, m_scaleFactors_PXD[0]),
+                                         m_scaleFactors_PXD[1],
+                                         m_scaleFactors_PXD[2],
+                                         TMath::Max(z0Resol / z0Err, m_scaleFactors_PXD[3]),
+                                         m_scaleFactors_PXD[4]
+                                       };
     return scaleFactors;
   } else {
     return m_scaleFactors_noPXD;
@@ -222,4 +222,4 @@ std::vector<double> HelixErrorScalerModule::getScaleFactors(const Particle* part
 }
 
 
-}
+

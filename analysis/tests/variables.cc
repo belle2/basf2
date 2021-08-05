@@ -4479,20 +4479,20 @@ namespace {
     const Manager::Var* varMissARICH = Manager::Instance().getVariable("pidMissingProbabilityExpert(ARICH)");
 
 
-    EXPECT_FLOAT_EQ(std::get<int>(varMissTOP->function(electron)), 0.0);
-    EXPECT_FLOAT_EQ(std::get<int>(varMissTOP->function(pion)), 0.0);
-    EXPECT_FLOAT_EQ(std::get<int>(varMissTOP->function(kaon)), 0.0);
-    EXPECT_FLOAT_EQ(std::get<int>(varMissTOP->function(proton)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissTOP->function(electron)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissTOP->function(pion)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissTOP->function(kaon)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissTOP->function(proton)), 1.0);
 
-    EXPECT_FLOAT_EQ(std::get<int>(varMissARICH->function(electron)), 1.0);
-    EXPECT_FLOAT_EQ(std::get<int>(varMissARICH->function(pion)), 0.0);
-    EXPECT_FLOAT_EQ(std::get<int>(varMissARICH->function(kaon)), 0.0);
-    EXPECT_FLOAT_EQ(std::get<int>(varMissARICH->function(proton)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissARICH->function(electron)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissARICH->function(pion)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissARICH->function(kaon)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissARICH->function(proton)), 0.0);
 
-    EXPECT_FLOAT_EQ(std::get<int>(varMissECL->function(electron)), 0.0);
-    EXPECT_FLOAT_EQ(std::get<int>(varMissECL->function(pion)), 0.0);
-    EXPECT_FLOAT_EQ(std::get<int>(varMissECL->function(kaon)), 1.0);
-    EXPECT_FLOAT_EQ(std::get<int>(varMissECL->function(proton)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissECL->function(electron)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissECL->function(pion)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissECL->function(kaon)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissECL->function(proton)), 0.0);
   }
 
   class FlightInfoTest : public ::testing::Test {

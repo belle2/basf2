@@ -3464,12 +3464,12 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
 
 
 def scaleError(outputListName, inputListName,
-               scaleFactors=[1.17, 1.12, 1.16, 1.15, 1.13],
-               scaleFactorsNoPXD=[1.0, 1.0, 1.0, 1.0, 1.0],
-               d0Resolution=[12.2e-4, 14.1e-4],
-               z0Resolution=[13.4e-4, 15.3e-4],
-               d0MomThr=0.0,
-               z0MomThr=0.0,
+               scaleFactors=[1.149631, 1.085547, 1.151704, 1.096434, 1.086659],
+               scaleFactorsNoPXD=[1.149631, 1.085547, 1.151704, 1.096434, 1.086659],
+               d0Resolution=[0.00115328, 0.00134704],
+               z0Resolution=[0.00124327, 0.0013272],
+               d0MomThr=0.500000,
+               z0MomThr=0.500000,
                path=None):
     '''
     This module creates a new charged particle list.
@@ -3507,14 +3507,18 @@ def scaleError(outputListName, inputListName,
 
 
 def scaleErrorKshorts(prioritiseV0=True, fitter='TreeFit',
-                      scaleFactors_V0=[1, 1, 1, 1, 1],
-                      scaleFactorsNoPXD_V0=[1, 1, 1, 1, 1],
-                      d0Resolution_V0=[0, 0], z0Resolution_V0=[0, 0],
-                      d0MomThr_V0=0.0, z0MomThr_V0=0.0,
-                      scaleFactors_RD=[1, 1, 1, 1, 1],
-                      scaleFactorsNoPXD_RD=[1, 1, 1, 1, 1],
-                      d0Resolution_RD=[0, 0], z0Resolution_RD=[0, 0],
-                      d0MomThr_RD=0.0, z0MomThr_RD=0.0,
+                      scaleFactors_V0=[1.125927, 1.058803, 1.205928, 1.066734, 1.047513],
+                      scaleFactorsNoPXD_V0=[1.125927, 1.058803, 1.205928, 1.066734, 1.047513],
+                      d0Resolution_V0=[0.001174, 0.000779],
+                      z0Resolution_V0=[0.001350, 0.000583],
+                      d0MomThr_V0=0.500000,
+                      z0MomThr_V0=0.00000,
+                      scaleFactors_RD=[1.149631, 1.085547, 1.151704, 1.096434, 1.086659],
+                      scaleFactorsNoPXD_RD=[1.149631, 1.085547, 1.151704, 1.096434, 1.086659],
+                      d0Resolution_RD=[0.00115328, 0.00134704],
+                      z0Resolution_RD=[0.00124327, 0.0013272],
+                      d0MomThr_RD=0.500000,
+                      z0MomThr_RD=0.500000,
                       path=None):
     '''
     Reconstruct K_S0 applying helix error correction to K_S0 daughters given by ``modularAnalysis.scaleError``.
@@ -3584,17 +3588,17 @@ def scaleErrorKshorts(prioritiseV0=True, fitter='TreeFit',
                z0MomThr=z0MomThr_RD,
                path=path)
 
-    reconstructDecay('K_S0:RD -> pi+:scaled pi-:scaled', '0.3 < M < 0.7', 1, True, path=path)
+    reconstructDecay('K_S0:RD_scaled -> pi+:scaled pi-:scaled', '0.3 < M < 0.7', 1, True, path=path)
     # Again perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
-        treeFit('K_S0:RD', conf_level=0.0, path=path)
+        treeFit('K_S0:RD_scaled', conf_level=0.0, path=path)
     elif fitter == 'KFit':
-        kFit('K_S0:RD', conf_level=0.0, path=path)
+        kFit('K_S0:RD_scaled', conf_level=0.0, path=path)
     elif fitter == 'Rave':
-        raveFit('K_S0:RD', conf_level=0.0, path=path, silence_warning=True)
-    applyCuts('K_S0:RD', '0.450 < M < 0.550', path=path)
+        raveFit('K_S0:RD_scaled', conf_level=0.0, path=path, silence_warning=True)
+    applyCuts('K_S0:RD_scaled', '0.450 < M < 0.550', path=path)
     # Create merged list based on provided priority
-    mergeListsWithBestDuplicate('K_S0:scaled', ['K_S0:V0_MassWindow', 'K_S0:RD'],
+    mergeListsWithBestDuplicate('K_S0:scaled', ['K_S0:V0_MassWindow', 'K_S0:RD_scaled'],
                                 variable='particleSource', preferLowest=prioritiseV0, path=path)
 
 

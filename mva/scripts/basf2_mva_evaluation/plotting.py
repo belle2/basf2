@@ -14,7 +14,6 @@ import math
 
 import pandas
 import numpy
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.artist
 import matplotlib.figure
@@ -421,13 +420,13 @@ class RejectionOverEfficiency(Plotter):
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
         rejection, rejection_error = hists.get_efficiency(['Background'])
         rejection = 1 - rejection
-        if type(efficiency) == int and type(rejection) != int:
-            efficiency = np.array([efficiency]*len(rejection))
-        elif type(rejection) == int and type(efficiency) != int:
-            rejection = np.array([rejection]*len(efficiency))
-        elif type(rejection) == int and type(efficiency) == int:
-            efficiency = np.array([efficiency])
-            rejection = np.array([rejection])
+        if isinstance(efficiency, int) and not isinstance(rejection, int):
+            efficiency = numpy.array([efficiency] * len(rejection))
+        elif isinstance(rejection, int) and not isinstance(efficiency, int):
+            rejection = numpy.array([rejection] * len(efficiency))
+        elif isinstance(rejection, int) and isinstance(efficiency, int):
+            efficiency = numpy.array([efficiency])
+            rejection = numpy.array([rejection])
 
         self.xmin, self.xmax = numpy.nanmin([efficiency.min(), self.xmin]), numpy.nanmax([efficiency.max(), self.xmax])
         self.ymin, self.ymax = numpy.nanmin([rejection.min(), self.ymin]), numpy.nanmax([rejection.max(), self.ymax])
@@ -1080,17 +1079,17 @@ class Correlation(Plotter):
             xrange = numpy.percentile(data[column][m], [5, 95])
 
             colormap = plt.get_cmap('coolwarm')
-            tmp, x = np.histogram(data[column][m], bins=100,
-                                  range=xrange, normed=True, weights=weights)
-            bin_center = ((x + np.roll(x, 1)) / 2)[1:]
+            tmp, x = numpy.histogram(data[column][m], bins=100,
+                                     range=xrange, normed=True, weights=weights)
+            bin_center = ((x + numpy.roll(x, 1)) / 2)[1:]
             axes[i].plot(bin_center, tmp, color='black', lw=1)
 
-            for quantil in np.arange(5, 100, 5):
-                cut = np.percentile(data[cut_column][m], quantil)
+            for quantil in numpy.arange(5, 100, 5):
+                cut = numpy.percentile(data[cut_column][m], quantil)
                 sel = data[cut_column][m] >= cut
-                y, x = np.histogram(data[column][m][sel], bins=100,
-                                    range=xrange, normed=True, weights=weights[sel])
-                bin_center = ((x + np.roll(x, 1)) / 2)[1:]
+                y, x = numpy.histogram(data[column][m][sel], bins=100,
+                                       range=xrange, normed=True, weights=weights[sel])
+                bin_center = ((x + numpy.roll(x, 1)) / 2)[1:]
                 axes[i].fill_between(bin_center, tmp, y, color=colormap(quantil / 100.0))
                 tmp = y
 

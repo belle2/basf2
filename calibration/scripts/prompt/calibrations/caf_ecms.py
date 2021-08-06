@@ -9,25 +9,26 @@
 ##########################################################################
 
 """
-Airflow script to perform BoostVector calibration.
+Airflow script to perform eCMS calibration.
 """
 
 from prompt import CalibrationSettings, input_data_filters
 from prompt.calibrations.caf_beamspot import settings as beamspot
 
+
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
-    name="BoostVector Calibrations",
+    name="eCMS Calibrations",
     expert_username="zlebcr",
     description=__doc__,
     input_data_formats=["cdst"],
-    input_data_names=["mumutight_calib"],
+    input_data_names=["hadron_calib"],
     input_data_filters={
-      "mumutight_calib": [
-        input_data_filters["Data Tag"]["mumutight_calib"],
-        input_data_filters["Run Type"]["physics"],
-        input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
-        input_data_filters["Magnet"]["On"]]},
+        "hadron_calib": [
+            input_data_filters["Data Tag"]["hadron_calib"],
+            input_data_filters["Run Type"]["physics"],
+            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
+            input_data_filters["Magnet"]["On"]]},
     expert_config={
         "outerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)",
         "innerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)"},
@@ -54,11 +55,14 @@ def get_calibrations(input_data, **kwargs):
       list(caf.framework.Calibration): All of the calibration objects we want to assign to the CAF process
     """
     import basf2
+    import stdCharged
+    import stdPi0s
+
     # Set up config options
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    file_to_iov_physics = input_data["mumutight_calib"]
+    file_to_iov_physics = input_data["hadron_calib"]
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
@@ -86,7 +90,7 @@ def get_calibrations(input_data, **kwargs):
 
     from ROOT.Belle2 import BoostVectorAlgorithm
     from basf2 import create_path, register_module
-    import modularAnalysis as ana
+    import modularAnalysis as ma
     import vertex
 
     ###################################################
@@ -98,37 +102,147 @@ def get_calibrations(input_data, **kwargs):
 
     # module to be run prior the collector
     rec_path_1 = create_path()
-    prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
+    # prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
 
-    muSelection = '[p>1.0]'
-    muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
-    muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
-    ana.fillParticleList('mu+:BV', muSelection, path=rec_path_1)
-    ana.reconstructDecay('Upsilon(4S):BV -> mu+:BV mu-:BV', '9.5<M<11.5', path=rec_path_1)
-    vertex.treeFit('Upsilon(4S):BV', updateAllDaughters=True, ipConstraint=True, path=rec_path_1)
+    # vertex.treeFit('Upsilon(4S):BV', updateAllDaughters=True, ipConstraint=True, path=rec_path_1)
 
-    collector_bv = register_module('BoostVectorCollector', Y4SPListName='Upsilon(4S):BV')
-    algorithm_bv = BoostVectorAlgorithm()
-    algorithm_bv.setOuterLoss(kwargs['expert_config']['outerLoss'])
-    algorithm_bv.setInnerLoss(kwargs['expert_config']['innerLoss'])
+    stdCharged.stdPi(listtype='all', path=rec_path_1)
+    stdCharged.stdK(listtype='all', path=rec_path_1)
+    stdPi0s.stdPi0s(listtype='eff30_May2020', path=rec_path_1)
 
-    calibration_bv = Calibration('BoostVector',
-                                 collector=collector_bv,
-                                 algorithms=algorithm_bv,
-                                 input_files=input_files_physics,
-                                 pre_collector_path=rec_path_1)
+    ma.cutAndCopyList("pi+:my", "pi+:all", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
+    ma.cutAndCopyList("K+:my", "K+:all", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
 
-    calibration_bv.strategies = SingleIOV
+    #####################################################
+    # Reconstructs the signal B0 candidates from Dstar
+    #####################################################
+
+    # Reconstructs D0s and sets decay mode identifiers
+    ma.reconstructDecay(decayString='D0:Kpi -> K-:my pi+:my', cut='1.7 < M < 2.1', dmID=1, path=rec_path_1)
+    ma.reconstructDecay(decayString='D0:Kpipi0 -> K-:my pi+:my pi0:eff30_May2020',
+                        cut='1.7 < M < 2.1', dmID=2, path=rec_path_1)
+    ma.reconstructDecay(decayString='D0:Kpipipi -> K-:my pi+:my pi-:my pi+:my',
+                        cut='1.7 < M < 2.1', dmID=3, path=rec_path_1)
+
+    # Performs mass constrained fit for all D0 candidates
+    # vertex.kFit(list_name='D0:Kpi',     conf_level=0.0, fit_type='mass', path=rec_path_1)
+    # vertex.kFit(list_name='D0:Kpipi0',  conf_level=0.0, fit_type='mass', path=rec_path_1)
+    # vertex.kFit(list_name='D0:Kpipipi', conf_level=0.0, fit_type='mass', path=rec_path_1)
+
+    # Reconstructs D*-s and sets decay mode identifiers
+    ma.reconstructDecay(decayString='D*+:D0pi_Kpi -> D0:Kpi pi+:my', cut='massDifference(0) < 0.16', dmID=1, path=rec_path_1)
+    ma.reconstructDecay(decayString='D*+:D0pi_Kpipi0 -> D0:Kpipi0 pi+:my',
+                        cut='massDifference(0) < 0.16', dmID=2, path=rec_path_1)
+    ma.reconstructDecay(decayString='D*+:D0pi_Kpipipi -> D0:Kpipipi pi+:my',
+                        cut='massDifference(0) < 0.16', dmID=3, path=rec_path_1)
+
+    # Reconstructs the signal B0 candidates from Dstar
+    ma.reconstructDecay(decayString='B0:Dstpi_D0pi_Kpi -> D*-:D0pi_Kpi pi+:my',
+                        cut='5.2 < Mbc < 5.3 and abs(deltaE) < 0.2',
+                        dmID=1, path=rec_path_1)
+    ma.reconstructDecay(decayString='B0:Dstpi_D0pi_Kpipi0 -> D*-:D0pi_Kpipi0 pi+:my',
+                        cut='5.2 < Mbc < 5.3 and abs(deltaE) < 0.2',
+                        dmID=2, path=rec_path_1)
+    ma.reconstructDecay(decayString='B0:Dstpi_D0pi_Kpipipi -> D*-:D0pi_Kpipipi pi+:my',
+                        cut='5.2 < Mbc < 5.3 and abs(deltaE) < 0.2',
+                        dmID=3, path=rec_path_1)
+
+    #####################################################
+    # Reconstructs the signal B0 candidates from D-
+    #####################################################
+
+    # Reconstructs charged D mesons and sets decay mode identifiers
+    ma.reconstructDecay(decayString='D-:Kpipi -> K+:my pi-:my pi-:my',
+                        cut='1.844 < M < 1.894', dmID=4, path=rec_path_1)
+
+    # vx.massKFit(list_name='D-:Kpipi', conf_level=0.0, path=rec_path_1)
+
+    # Reconstructs the signal B candidates
+    ma.reconstructDecay(decayString='B0:Dpi_Kpipi -> D-:Kpipi pi+:my',
+                        cut='5.2 < Mbc < 5.3 and abs(deltaE) < 0.2', dmID=4, path=rec_path_1)
+
+    #####################################################
+    # Reconstruct the signal B- candidates
+    #####################################################
+
+    # Reconstructs D0s and sets decay mode identifiers
+    # ma.reconstructDecay(decayString='D0:Kpi -> K-:good pi+:my', cut='1.84 < M < 1.89', dmID=1, path=main_path)
+    # ma.reconstructDecay(decayString='D0:Kpipi0 -> K-:good pi+:my pi0:looseFit', cut='1.84 < M < 1.89', dmID=2, path=main_path)
+    # ma.reconstructDecay(decayString='D0:Kpipipi -> K-:good pi+:my pi-:my pi+:my', cut='1.84 < M < 1.89', dmID=3, path=main_path)
+
+    # Performs mass constrained fit for all D0 candidates
+    # vx.massKFit(list_name='D0:Kpi', conf_level=0.0, path=main_path)
+    # vx.massKFit(list_name='D0:Kpipi0', conf_level=0.0, path=main_path)
+    # vx.massKFit(list_name='D0:Kpipipi', conf_level=0.0, path=main_path)
+
+    # Reconstructs the signal B- candidates
+    ma.reconstructDecay(decayString='B-:D0pi_Kpi -> D0:Kpi pi-:my',
+                        cut='5.2 < Mbc < 5.3 and abs(deltaE) < 0.2',
+                        dmID=5, path=rec_path_1)
+    ma.reconstructDecay(decayString='B-:D0pi_Kpipi0 -> D0:Kpipi0 pi-:my',
+                        cut='5.2 < Mbc < 5.3 and abs(deltaE) < 0.2',
+                        dmID=6, path=rec_path_1)
+    ma.reconstructDecay(decayString='B-:D0pi_Kpipipi -> D0:Kpipipi pi-:my',
+                        cut='5.2 < Mbc < 5.3 and abs(deltaE) < 0.2',
+                        dmID=7, path=rec_path_1)
+
+    ma.copyLists(
+        outputListName='B0:merged',
+        inputListNames=[
+            'B0:Dstpi_D0pi_Kpi',
+            'B0:Dstpi_D0pi_Kpipi0',
+            'B0:Dstpi_D0pi_Kpipipi',
+            'B0:Dpi_Kpipi'
+        ],
+        path=rec_path_1)
+
+    ma.copyLists(
+        outputListName='B-:merged',
+        inputListNames=[
+            'B-:D0pi_Kpi',
+            'B-:D0pi_Kpipi0',
+            'B-:D0pi_Kpipipi',
+        ],
+        path=rec_path_1)
+
+    # Builds the rest of event object, which contains all particles not used in the reconstruction of B0 candidates.
+    ma.buildRestOfEvent(target_list_name='B0:merged', path=rec_path_1)
+
+    # Calculates the continuum suppression variables
+    cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+    ma.appendROEMasks(list_name='B0:merged', mask_tuples=[cleanMask], path=rec_path_1)
+    ma.buildContinuumSuppression(list_name='B0:merged', roe_mask='cleanMask', path=rec_path_1)
+
+    # Builds the rest of event object, which contains all particles not used in the reconstruction of B- candidates.
+    ma.buildRestOfEvent(target_list_name='B-:merged', path=rec_path_1)
+
+    # Calculates the continuum suppression variables
+    cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+    ma.appendROEMasks(list_name='B-:merged', mask_tuples=[cleanMask], path=rec_path_1)
+    ma.buildContinuumSuppression(list_name='B-:merged', roe_mask='cleanMask', path=rec_path_1)
+
+    collector_ecms = register_module('eCmsCollector', Y4SPListName='B0:merged')
+    algorithm_ecms = BoostVectorAlgorithm()
+    algorithm_ecms.setOuterLoss(kwargs['expert_config']['outerLoss'])
+    algorithm_ecms.setInnerLoss(kwargs['expert_config']['innerLoss'])
+
+    calibration_ecms = Calibration('eCMS',
+                                   collector=collector_ecms,
+                                   algorithms=algorithm_ecms,
+                                   input_files=input_files_physics,
+                                   pre_collector_path=rec_path_1)
+
+    calibration_ecms.strategies = SingleIOV
 
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun
-    for algorithm in calibration_bv.algorithms:
+    for algorithm in calibration_ecms.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
 
     # Most other options like database chain and backend args will be overwritten by b2caf-prompt-run.
     # So we don't bother setting them.
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
-    return [calibration_bv]
+    return [calibration_ecms]
 
 ##############################

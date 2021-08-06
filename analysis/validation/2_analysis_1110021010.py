@@ -31,7 +31,7 @@ INPUT_FILENAME = "../%i.dst.root" % DECAY_MODE_ID
 OUTPUT_FILENAME = "%i_Validation.root" % DECAY_MODE_ID
 
 main = basf2.Path()
-inputMdst('default', INPUT_FILENAME, path=main)
+inputMdst(INPUT_FILENAME, path=main)
 
 stdPi('loose', path=main)
 stdPhotons('loose', path=main)

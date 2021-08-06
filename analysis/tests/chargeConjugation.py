@@ -29,7 +29,7 @@ class TestParticleCombiner(unittest.TestCase):
         b2test_utils.configure_logging_for_tests({testFile.name: "${testfile}"})
 
         main = basf2.create_path()
-        ma.inputMdst('default', b2test_utils.require_file('analysis/tests/mdst.root'), path=main)
+        ma.inputMdst(b2test_utils.require_file('analysis/tests/mdst.root'), path=main)
 
         ma.fillParticleList('pi+:pionlike', 'pionID > 0.5', path=main)
         ma.fillParticleList('K+:kaonlike', 'kaonID > 0.5', path=main)

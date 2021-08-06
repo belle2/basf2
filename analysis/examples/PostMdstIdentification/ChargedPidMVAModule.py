@@ -106,8 +106,7 @@ if __name__ == '__main__':
     # Add input.
     # ----------
 
-    ma.inputMdst(environmentType="default",
-                 filename=basf2.find_file("mdst13.root", "validation"),
+    ma.inputMdst(filename=basf2.find_file("mdst13.root", "validation"),
                  path=path)
 
     # ---------------------------------------

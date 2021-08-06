@@ -24,7 +24,7 @@ In order to select events of a given skim class in the combination, one has to f
     path = b2.Path()
 
     input_file = "/PATH/TO/INPUT/SKIM/FILE.root"
-    ma.inputMdst("default", filename=input_file, path=path)
+    ma.inputMdst(filename=input_file, path=path)
 
     ma.applyEventCuts("eventExtraInfo(passes_SystematicsKshort)", path=path)
 

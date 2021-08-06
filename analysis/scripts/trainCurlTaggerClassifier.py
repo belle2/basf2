@@ -32,7 +32,7 @@ identifier = 'CurlTagger_FastBDT_BelleII'
 # --- create training data set and train the classifier ---
 training_path = basf2.core.Path()
 
-inputMdst('default', input_file_name, path=training_path)
+inputMdst(input_file_name, path=training_path)
 stdPi('all', path=training_path)
 tagCurlTracks('pi+:all', train=True, selectorType='mva', path=training_path)
 

@@ -23,7 +23,7 @@ basf2.set_log_level(basf2.LogLevel.DEBUG)
 
 mypath = basf2.create_path()
 testinput = basf2.find_file('analysis/tests/mdst.root')
-inputMdst("default", testinput, path=mypath)
+inputMdst(testinput, path=mypath)
 
 fillParticleListFromMC('K+:primaryMC', 'mcPrimary', path=mypath)
 fillParticleListFromMC('pi+:primaryMC', 'mcPrimary', path=mypath)

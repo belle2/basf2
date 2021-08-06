@@ -12,6 +12,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <analysis/variables/Variables.h>
+#include <analysis/variables/ContinuumSuppressionVariables.h>
 
 #include <mdst/dataobjects/PIDLikelihood.h>
 
@@ -63,6 +64,9 @@ void eCmsCollectorModule::prepare()
   tree->Branch<int>("pdg", &m_pdg);
   tree->Branch<int>("mode", &m_mode);
   tree->Branch<double>("Kpid", &m_Kpid);
+  tree->Branch<double>("R2", &m_R2);
+  tree->Branch<double>("mD", &m_mD);
+  tree->Branch<double>("dmDstar", &m_dmDstar);
 
 
   // We register the objects so that our framework knows about them.
@@ -98,21 +102,28 @@ void eCmsCollectorModule::collect()
   m_deltaE = Variable::particleDeltaE(Bpart);
   m_pdg    = Bpart->getPDGCode();
   m_mode   = Bpart->getExtraInfo("decayModeID");
+  m_R2     = Variable::R2(Bpart);
 
-  cout << m_pdg << " " << m_mode << " " << m_mBC << " " << m_deltaE << endl;
 
-  const Particle* Kaon = nullptr;
+  const Particle* D    = nullptr;
+  m_dmDstar = -99;
 
   //if D0 or D+ meson
   if (abs(Bpart->getDaughter(0)->getPDGCode()) == 421 || abs(Bpart->getDaughter(0)->getPDGCode()) == 411) {
-    Kaon = Bpart->getDaughter(0)->getDaughter(0);
-    cout << "Should be K from D " << Kaon->getPDGCode() << endl;
+    D = Bpart->getDaughter(0);
   } else if (abs(Bpart->getDaughter(0)->getPDGCode()) == 413 || abs(Bpart->getDaughter(0)->getPDGCode()) == 423) {
-    Kaon = Bpart->getDaughter(0)->getDaughter(0)->getDaughter(0);
-    cout << "Should be K from D for D* " << Kaon->getPDGCode() << endl;
+    const Particle* Dstar = Bpart->getDaughter(0);
+    D = Dstar->getDaughter(0);
+    m_dmDstar = Dstar->getMass() - D->getMass();
   } else {
     cout << "Nothing founded" << endl;
   }
+  m_mD = D->getMass();
+  const Particle* Kaon =  D->getDaughter(0);
+
+
+  cout << m_pdg << " " << m_mode << " " << m_mBC << " " << m_deltaE <<  " " << m_dmDstar << " : " << m_R2 << endl;
+  cout << "K pdg code :  " << Kaon->getPDGCode() << endl;
 
 
   m_Kpid = -99;

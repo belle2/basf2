@@ -136,15 +136,17 @@ def get_calibrations(input_data, **kwargs):
     ma.reconstructDecay(decayString='D*+:D0pi_Kpipipi -> D0:Kpipipi pi+:my',
                         cut='massDifference(0) < 0.16', dmID=3, path=rec_path_1)
 
+    Bcut = '[5.2 < Mbc < 5.3] and [abs(deltaE) < 0.2]'
+
     # Reconstructs the signal B0 candidates from Dstar
     ma.reconstructDecay(decayString='B0:Dstpi_D0pi_Kpi -> D*-:D0pi_Kpi pi+:my',
-                        cut='5.2 < Mbc < 5.3 and abs(deltaE) < 0.2',
+                        cut=Bcut,
                         dmID=1, path=rec_path_1)
     ma.reconstructDecay(decayString='B0:Dstpi_D0pi_Kpipi0 -> D*-:D0pi_Kpipi0 pi+:my',
-                        cut='5.2 < Mbc < 5.3 and abs(deltaE) < 0.2',
+                        cut=Bcut,
                         dmID=2, path=rec_path_1)
     ma.reconstructDecay(decayString='B0:Dstpi_D0pi_Kpipipi -> D*-:D0pi_Kpipipi pi+:my',
-                        cut='5.2 < Mbc < 5.3 and abs(deltaE) < 0.2',
+                        cut=Bcut,
                         dmID=3, path=rec_path_1)
 
     #####################################################
@@ -159,7 +161,7 @@ def get_calibrations(input_data, **kwargs):
 
     # Reconstructs the signal B candidates
     ma.reconstructDecay(decayString='B0:Dpi_Kpipi -> D-:Kpipi pi+:my',
-                        cut='5.2 < Mbc < 5.3 and abs(deltaE) < 0.2', dmID=4, path=rec_path_1)
+                        cut=Bcut, dmID=4, path=rec_path_1)
 
     #####################################################
     # Reconstruct the signal B- candidates
@@ -177,13 +179,13 @@ def get_calibrations(input_data, **kwargs):
 
     # Reconstructs the signal B- candidates
     ma.reconstructDecay(decayString='B-:D0pi_Kpi -> D0:Kpi pi-:my',
-                        cut='5.2 < Mbc < 5.3 and abs(deltaE) < 0.2',
+                        cut=Bcut,
                         dmID=5, path=rec_path_1)
     ma.reconstructDecay(decayString='B-:D0pi_Kpipi0 -> D0:Kpipi0 pi-:my',
-                        cut='5.2 < Mbc < 5.3 and abs(deltaE) < 0.2',
+                        cut=Bcut,
                         dmID=6, path=rec_path_1)
     ma.reconstructDecay(decayString='B-:D0pi_Kpipipi -> D0:Kpipipi pi-:my',
-                        cut='5.2 < Mbc < 5.3 and abs(deltaE) < 0.2',
+                        cut=Bcut,
                         dmID=7, path=rec_path_1)
 
     ma.copyLists(
@@ -209,7 +211,7 @@ def get_calibrations(input_data, **kwargs):
     ma.buildRestOfEvent(target_list_name='B0:merged', path=rec_path_1)
 
     # Calculates the continuum suppression variables
-    cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+    cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
     ma.appendROEMasks(list_name='B0:merged', mask_tuples=[cleanMask], path=rec_path_1)
     ma.buildContinuumSuppression(list_name='B0:merged', roe_mask='cleanMask', path=rec_path_1)
 
@@ -217,9 +219,12 @@ def get_calibrations(input_data, **kwargs):
     ma.buildRestOfEvent(target_list_name='B-:merged', path=rec_path_1)
 
     # Calculates the continuum suppression variables
-    cleanMask = ('cleanMask', 'useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+    cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
     ma.appendROEMasks(list_name='B-:merged', mask_tuples=[cleanMask], path=rec_path_1)
     ma.buildContinuumSuppression(list_name='B-:merged', roe_mask='cleanMask', path=rec_path_1)
+
+    ma.applyCuts("B0:merged", "R2 < 0.5", path=rec_path_1)
+    ma.applyCuts("B-:merged", "R2 < 0.5", path=rec_path_1)
 
     collector_ecms = register_module('eCmsCollector', Y4SPListName='B0:merged')
     algorithm_ecms = BoostVectorAlgorithm()

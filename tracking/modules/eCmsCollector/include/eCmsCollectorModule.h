@@ -49,6 +49,9 @@ namespace Belle2 {
     int    m_pdg; ///< deltaE
     int    m_mode;
     double m_Kpid;
+    double m_R2;
+    double m_mD; ///< Dmass
+    double m_dmDstar; ///< Dmass
 
 
     /** Name of the Y4S particle list */

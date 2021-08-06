@@ -171,10 +171,11 @@ class XToD0_D0ToNeutrals(BaseSkim):
 class DstToD0Pi_D0ToRare(BaseSkim):
     """
     **Decay Modes**:
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\gamma \\gamma`,
         * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to ee`,
-        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\mu \\mu`,
         * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to e^+ \\mu^-`,
         * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to e^- \\mu^+`,
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\mu \\mu`,
         * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^-`,
 
     **Selection Criteria**:

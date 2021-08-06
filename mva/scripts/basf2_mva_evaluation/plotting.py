@@ -1077,9 +1077,7 @@ class Correlation(Plotter):
             else:
                 weights = numpy.ones(len(data[column][m]))
 
-            # The cast to float32 is a workaround for the following numpy issue:
-            # https://github.com/numpy/numpy/issues/8123
-            xrange = np.percentile(data[column][m], [5, 95]).astype(np.float32)
+            xrange = numpy.percentile(data[column][m], [5, 95])
 
             colormap = plt.get_cmap('coolwarm')
             tmp, x = np.histogram(data[column][m], bins=100,

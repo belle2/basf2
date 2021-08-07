@@ -60,7 +60,8 @@ namespace Belle2 {
     void setFitterMode(int fitterMode);
 
     /// Fit V0 with given hypothesis and store if fit was successful.
-    bool fitAndStore(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
+    bool fitAndStore(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis, bool& isForceStored,
+                     bool&  isHitRemoved);
 
     /// Get track hypotheses for a given v0 hypothesis.
     std::pair<Const::ParticleType, Const::ParticleType> getTrackHypotheses(const Const::ParticleType& v0Hypothesis) const;

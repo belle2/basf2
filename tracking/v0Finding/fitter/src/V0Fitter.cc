@@ -211,8 +211,13 @@ std::pair<Const::ParticleType, Const::ParticleType> V0Fitter::getTrackHypotheses
 
 /// remove hits inside the V0 vertex position
 bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
-                           const Const::ParticleType& v0Hypothesis)
+                           const Const::ParticleType& v0Hypothesis,
+                           bool& isForceStored, bool& isHitRemoved)
 {
+  /// Initialize status flag for counting
+  isForceStored = false;
+  isHitRemoved = false;
+
   /// Existence of corresponding RecoTrack already checked at the module level;
   RecoTrack* recoTrackPlus  =  trackPlus->getRelated<RecoTrack>(m_recoTracksName);
   RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_recoTracksName);
@@ -323,7 +328,8 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
       B2DEBUG(22, "Vertex refit failed, or rejected by invariant mass cut.");
       failflag = true;
       break;
-    }
+    } else if (hasInnerHitStatus == 0)
+      isHitRemoved = true;
     if (count_removeInnerHits >= 5) {
       B2WARNING("Inner hits remained after " << count_removeInnerHits << " times of removing inner hits!");
       failflag = true;
@@ -338,7 +344,8 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
                                     hasInnerHitStatus, vertexPos, forcestore)) {
       B2DEBUG(22, "Original vertex fit fails. Possibly rejected by invariant mass cut.");
       return false;
-    }
+    } else
+      isForceStored = true;
   }
 
   return true;
@@ -506,10 +513,11 @@ RecoTrack* V0Fitter::copyRecoTrackAndFit(RecoTrack* origRecoTrack, const int tra
   /// fit newRecoTrack
   TrackFitter fitter;
   if (not fitter.fit(*newRecoTrack, particleUsedForFitting)) {
-    B2WARNING("track fit failed for copied RecoTrack.");
+    // This is not expected, but happen sometimes.
+    B2DEBUG(20, "track fit failed for copied RecoTrack.");
     /// check fit status of original track
     if (not origRecoTrack->wasFitSuccessful(origTrackRep))
-      B2WARNING("\t original track fit was also failed.");
+      B2DEBUG(20, "\t original track fit was also failed.");
     return nullptr;
   }
 
@@ -568,12 +576,13 @@ bool V0Fitter::removeInnerHits(RecoTrack* prevRecoTrack, RecoTrack* recoTrack,
   }
 
   if (nRemoveHits == 0) {
-    B2WARNING("No hits removed in removeInnerHits, aborted. Use the original RecoTrack.");
+    // This is not expected, but can happen if the track fit is different between copied and original RecoTrack.
+    B2DEBUG(20, "No hits removed in removeInnerHits, aborted. Switching to use the original RecoTrack.");
     return false;
   }
 
   if (recoHitInformations.size() <= nRemoveHits) {/// N removed hits should not reach N hits in the track
-    B2WARNING("Removed all the RecoHits in the RecoTrack, aborted. Use the original RecoTrack.");
+    B2DEBUG(20, "Removed all the RecoHits in the RecoTrack, aborted. Switching to use the original RecoTrack.");
     return false;
   }
 
@@ -612,10 +621,10 @@ bool V0Fitter::removeInnerHits(RecoTrack* prevRecoTrack, RecoTrack* recoTrack,
   /// fit recoTrack
   TrackFitter fitter;
   if (not fitter.fit(*recoTrack, particleUsedForFitting)) {
-    B2WARNING("track fit failed after removing inner hits.");
+    B2DEBUG(20, "track fit failed after removing inner hits.");
     /// check fit status of original track
     if (not prevRecoTrack->wasFitSuccessful(prevTrackRep))
-      B2WARNING("\t previous track fit was also failed.");
+      B2DEBUG(20, "\t previous track fit was also failed.");
     return false;
   }
 

@@ -7,6 +7,9 @@
  **************************************************************************/
 #include <ecl/calibration/eclLeakageAlgorithm.h>
 #include <ecl/dbobjects/ECLLeakageCorrections.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/DataStore.h>
 
 
 #include "TH1D.h"
@@ -285,6 +288,37 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   const int treeEntries = tree->GetEntries();
   B2INFO("eclLeakageAlgorithm entries = " << treeEntries);
+
+  //-----------------------------------------------------------------------------------
+  //..Get current payload to help validate the new payload
+
+  //..Set event, run, exp number
+  const auto exprun =  getRunList();
+  const int iEvt = 1;
+  const int iRun = exprun[0].second;
+  const int iExp = exprun[0].first;
+  StoreObjPtr<EventMetaData> evtPtr;
+  DataStore::Instance().setInitializeActive(true);
+  evtPtr.registerInDataStore();
+  DataStore::Instance().setInitializeActive(false);
+  evtPtr.construct(iEvt, iRun, iExp);
+  DBStore& dbstore = DBStore::Instance();
+  dbstore.update();
+
+  //..Existing payload
+  DBObjPtr<ECLLeakageCorrections> existingCorrections("ECLLeakageCorrections");
+  TH2F existingThetaCorrection = existingCorrections->getThetaCorrections();
+  existingThetaCorrection.SetName("existingThetaCorrection");
+  TH2F existingPhiCorrection = existingCorrections->getPhiCorrections();
+  existingPhiCorrection.SetName("existingPhiCorrection");
+  TH2F existingCrysCorrection = existingCorrections->getnCrystalCorrections();
+  existingCrysCorrection.SetName("existingnCrystalCorrection");
+
+  //..Write out the correction histograms
+  histfile->cd();
+  existingThetaCorrection.Write();
+  existingPhiCorrection.Write();
+  existingCrysCorrection.Write();
 
   //====================================================================================
   //====================================================================================

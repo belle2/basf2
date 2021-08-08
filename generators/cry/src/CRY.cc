@@ -77,12 +77,10 @@ namespace Belle2 {
     G4VPhysicalVolume* volume = geometry::GeometryManager::getInstance().getTopVolume();
     if (!volume) {
       B2FATAL("No geometry found -> Add the Geometry module to the path before the CRY module.");
-      return;
     }
     G4Box* topbox = (G4Box*) volume->GetLogicalVolume()->GetSolid();
     if (!topbox) {
       B2FATAL("No G4Box found -> Check the logical volume of the geometry.");
-      return;
     }
 
     // Wrap the world coordinates (G4 coordinates are mm, Belle 2 units are currently cm)
@@ -94,7 +92,7 @@ namespace Belle2 {
     //                                           m_subboxLength / 2. * Unit::m));
     m_world.reset(new vecgeom::UnplacedBox(halfLength_x / Unit::cm, halfLength_y / Unit::cm,
                                            halfLength_z / Unit::cm));
-    printf("world size %3.2f %3.2f %3.2f \n", halfLength_x / Unit::cm, halfLength_x / Unit::cm, halfLength_x / Unit::cm);
+    B2INFO("World size [" << halfLength_x / Unit::cm << ", " << halfLength_x / Unit::cm << ",  " << halfLength_x / Unit::cm << "]");
   }
 
   void CRY::generateEvent(MCParticleGraph& mcGraph)

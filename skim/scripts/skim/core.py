@@ -443,7 +443,7 @@ class CombinedSkim(BaseSkim):
         from skim.WGs.foo import OneSkim, TwoSkim, RedSkim, BlueSkim
 
         path = b2.Path()
-        ma.inputMdstList("default", [], path=path)
+        ma.inputMdstList([], path=path)
         skims = CombinedSkim(OneSkim(), TwoSkim(), RedSkim(), BlueSkim())
         skims(path)  # load standard lists, create skim lists, and save to uDST
         path.process()

@@ -21,7 +21,7 @@ def create_train_data(
         file_names,
         identifier,
         variable_list,
-        environmentType='MC5',
+        environmentType='default',
         target='qrCombined',
         overwrite=False,
         max_events=0,
@@ -33,7 +33,7 @@ def create_train_data(
     if not os.path.exists(working_dir) and working_dir != '':
         os.makedirs(working_dir)
 
-    ma.inputMdstList(environmentType, filelist=file_names, path=main)
+    ma.inputMdstList(environmentType=environmentType, filelist=file_names, path=main)
 
     ma.fillParticleListFromMC('nu_tau:MC', '', path=main)
     ma.reconstructMCDecay('B0:sig -> nu_tau:MC anti-nu_tau:MC', '', writeOut=True, path=main)
@@ -49,11 +49,11 @@ def create_train_data(
     print(b2.statistics)
 
 
-def test_expert(working_dir, file_names, identifier, output_variable='networkOutput', environmentType='MC5',
+def test_expert(working_dir, file_names, identifier, output_variable='networkOutput', environmentType='default',
                 max_events=0):
     main = b2.create_path()
 
-    ma.inputMdstList(environmentType, file_names, path=main)
+    ma.inputMdstList(environmentType=environmentType, file_names, path=main)
 
     ma.fillParticleListFromMC('nu_tau:MC', '', path=main)
     ma.reconstructMCDecay('B0:sig -> nu_tau:MC anti-nu_tau:MC', '', writeOut=True, path=main)
@@ -75,10 +75,10 @@ def test_expert(working_dir, file_names, identifier, output_variable='networkOut
     print(b2.statistics)
 
 
-def test_expert_jpsi(working_dir, file_names, prefix, environmentType='MC5', max_events=0):
+def test_expert_jpsi(working_dir, file_names, prefix, environmentType='default', max_events=0):
     main = b2.create_path()
 
-    ma.inputMdstList(environmentType, file_names, path=main)
+    ma.inputMdstList(environmentType=environmentType, file_names, path=main)
 
     ma.fillParticleList('pi+:highPID', 'pionID >= .1', path=main)
     ma.fillParticleList('mu+:highPID', 'muonID >= .1', path=main)

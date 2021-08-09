@@ -44,8 +44,7 @@ import variables.utils as vu
 my_path = b2.create_path()
 
 # load input ROOT file
-inputMdst(environmentType='default',
-          filename=b2.find_file('Y4SEventToetaY1S-evtgen_100.root', 'examples', False),
+inputMdst(filename=b2.find_file('Y4SEventToetaY1S-evtgen_100.root', 'examples', False),
           path=my_path)
 
 

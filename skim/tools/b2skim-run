@@ -161,7 +161,7 @@ def main():
         Skim = CombinedSkim(*SkimObjects, mc=(not args.data))
 
     InputFileList = args.InputFileList or Skim.TestFiles
-    ma.inputMdstList("default", InputFileList, path=path)
+    ma.inputMdstList(InputFileList, path=path)
     Skim(path)
 
     MaxInputEvents = args.MaxInputEvents or 0

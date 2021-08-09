@@ -35,7 +35,7 @@ def main():
     path = b2.Path()
     mdst_files = glob(f'{b2.find_file("mdst/tests")}/mdst-v*.root')
     mdst_files.sort(reverse=True)
-    ma.inputMdstList("default", require_file(mdst_files[0]), path=path)
+    ma.inputMdstList(require_file(mdst_files[0]), path=path)
 
     SkimObjects = [Registry.get_skim_function(skim)() for skim in Registry.names]
     skim = CombinedSkim(*[skim for skim in SkimObjects if not isinstance(skim, CombinedSkim)])

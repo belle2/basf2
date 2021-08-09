@@ -107,6 +107,12 @@ namespace Belle2 {
       TrackBase_t(): d0(0.0), z0(0.0), phi0(0.0), pt(0.0), tanLambda(0.0),
         d0p(0.0), z0p(0.0), nPXDHits(0), nSVDHits(0), nCDCHits(0) {}
 
+      /** update track level variables from TrackFitResult
+       * @param tfrPtr a pointer of TrackFitResult
+       * @param ip The interaction point for correcting d0 and z0
+       */
+      void setTrackVariables(const TrackFitResult* tfrPtr, const TVector3& ip);
+
       /** Update values from a RecoTrack.
        * @param recoTrack A RecoTrack object.
        * @param ip The interaction point for correcting d0 and z0
@@ -141,23 +147,12 @@ namespace Belle2 {
      * Template implementation
      */
     template <typename TTrackCluster>
-    void TrackBase_t<TTrackCluster>::setValues(
-      const RecoTrack& recoTrack, const TVector3& ip,
-      const std::string& recoTracksName,
-      const std::string& pxdInterceptsName,
-      const std::string& pxdTrackClustersName
+    void TrackBase_t<TTrackCluster>::setTrackVariables(
+      const TrackFitResult* tfrPtr, const TVector3& ip
     )
     {
-      // get Track pointer
-      auto trackPtr = recoTrack.getRelated<Track>("Tracks");
-      if (!trackPtr) {
-        B2ERROR("Expect a track for fitted recotracks. Found nothing!");
-      }
-
-      // get trackFitResult pointer
-      auto tfrPtr = trackPtr->getTrackFitResultWithClosestMass(Const::pion);
       if (!tfrPtr) {
-        B2ERROR("expect a track fit result for pion. Found Nothing!");
+        B2ERROR("Expect the track fit result. Found Nothing!");
       }
       nCDCHits = tfrPtr->getHitPatternCDC().getNHits();
       nSVDHits = tfrPtr->getHitPatternVXD().getNSVDHits();
@@ -176,6 +171,26 @@ namespace Belle2 {
         d0p = uHelix.getD0();
         z0p = uHelix.getZ0();
       }
+    }
+
+    template <typename TTrackCluster>
+    void TrackBase_t<TTrackCluster>::setValues(
+      const RecoTrack& recoTrack, const TVector3& ip,
+      const std::string& recoTracksName,
+      const std::string& pxdInterceptsName,
+      const std::string& pxdTrackClustersName
+    )
+    {
+      // get Track pointer
+      auto trackPtr = recoTrack.getRelated<Track>("Tracks");
+      if (!trackPtr) {
+        B2ERROR("Expect a track for fitted recotracks. Found nothing!");
+      }
+
+      // get trackFitResult pointer
+      auto tfrPtr = trackPtr->getTrackFitResultWithClosestMass(
+                      Const::pion); // always try to use pion as electron fit doesn't work properly.
+      setTrackVariables(tfrPtr, ip);
 
       //RelationVector<PXDIntercept> pxdIntercepts = recoTrack.getRelationsTo<PXDIntercept>();
       auto pxdIntercepts = recoTrack.getRelationsTo<PXDIntercept>(pxdInterceptsName);

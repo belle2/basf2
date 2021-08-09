@@ -73,9 +73,15 @@ namespace Belle2 {
       if (!recoTrackPtr) return nullptr; // return nullptr
       // Always set cluster pxdID for saving module id of the intersection.
       cluster.pxdID = getPXDModuleID(VxdID(pxdIntercept.getSensorID()));
+      if (cluster.pxdID <= 0) {
+        B2ERROR("Unexpected cluster module id : " << cluster.pxdID);
+        return nullptr;
+      }
       RelationVector<PXDCluster> pxdClusters = DataStore::getRelationsWithObj<PXDCluster>(recoTrackPtr, pxdTrackClustersName);
-      // Return nullptr (false) as no clusters associated;
-      if (!pxdClusters.size()) return nullptr;
+      // Avoid returning nullptr (false) when no clusters associated,
+      // otherwise efficiency is overestimated!
+      // if (!pxdClusters.size()) return nullptr;
+      usedInTrack = false;
       for (auto& aCluster : pxdClusters) {
         if (aCluster.getSensorID().getID() == pxdIntercept.getSensorID()) {
           cluster.setValues(aCluster);

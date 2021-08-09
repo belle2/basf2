@@ -35,8 +35,8 @@ def create_train_data(
 
     ma.inputMdstList(environmentType, filelist=file_names, path=main)
 
-    ma.fillParticleListFromMC('nu_tau:mc', '', path=main)
-    ma.reconstructMCDecay('B0:sig -> nu_tau:mc anti-nu_tau:mc', '', writeOut=True, path=main)
+    ma.fillParticleListFromMC('nu_tau:MC', '', path=main)
+    ma.reconstructMCDecay('B0:sig -> nu_tau:MC anti-nu_tau:MC', '', writeOut=True, path=main)
 
     ma.buildRestOfEvent('B0:sig', path=main)
 
@@ -55,8 +55,8 @@ def test_expert(working_dir, file_names, identifier, output_variable='networkOut
 
     ma.inputMdstList(environmentType, file_names, path=main)
 
-    ma.fillParticleListFromMC('nu_tau:mc', '', path=main)
-    ma.reconstructMCDecay('B0:sig -> nu_tau:mc anti-nu_tau:mc', '', writeOut=True, path=main)
+    ma.fillParticleListFromMC('nu_tau:MC', '', path=main)
+    ma.reconstructMCDecay('B0:sig -> nu_tau:MC anti-nu_tau:MC', '', writeOut=True, path=main)
 
     ma.buildRestOfEvent('B0:sig', path=main)
 

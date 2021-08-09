@@ -135,7 +135,7 @@ Check `Clustering@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDClustering&p
 
 	       Stores the functions and their parameters for the selection of clusters based on the cluster time in the SpacePoint creation step, with sensor-side granularity_.
 
-Check `HitTimeSelection@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDHitTimeSelection&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** (no cuts) is used for experiment 1003 (and data), and revision **5** (u/v cluster time difference < 20 ns & u-or-v clusterabsolute time < 50 ns) is used for experiment 0.
+Check `HitTimeSelection@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDHitTimeSelection&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** (no cuts) is used for experiment 1003 (and data), and revision **5** (u/v cluster time difference < 20 ns & u-or-v cluster absolute time < 50 ns) is used for experiment 0.
 
 .. cpp:class:: SVDOccupancyCalibrations
 	       

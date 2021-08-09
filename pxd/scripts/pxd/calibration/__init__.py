@@ -154,6 +154,12 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
       validation (bool): Adding validation algorithm if True (default)
 
       **kwargs: Additional configuration to support extentions without changing scripts in calibration folder.
+        Supported options are listed below:
+
+        "collector_prefix" is a string indicating which collector to be used for gain calibration. The supported
+          collectors are:
+            PXDParticleListCollector (default),
+            PXDPerformanceCollector(using RAVE package for vertexing, obsolete)
 
     Return:
       A caf.framework.Calibration obj.
@@ -167,15 +173,15 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         gain_method = 'analytic'
     if not isinstance(gain_method, str) or gain_method.lower() not in gain_methods:
         raise ValueError("gain_method not found in gain_methods : {}".format(gain_method))
+    collector_prefix = kwargs.get("collector_prefix", "PXDParticleListCollector")
+    supported_collectors = ["PXDParticleListCollector", "PXDPerformanceCollector"]
+    if not isinstance(collector_prefix, str) or collector_prefix not in supported_collectors:
+        raise ValueError("collector_prefix not found in {}".format(supported_collectors))
 
     # Create basf2 path
 
     gearbox = register_module('Gearbox')
     geometry = register_module('Geometry', useDB=True)
-    # pxdunpacker = register_module('PXDUnpacker')
-    # pxdunpacker.param('SuppressErrorMask', 0xFFFFFFFFFFFFFFFF)
-    # checker = register_module('PXDPostErrorChecker')
-    # checker.param("CriticalErrorMask", 0)  # 0xC000000000000000)
     genFitExtrapolation = register_module('SetupGenfitExtrapolation')
     roiFinder = register_module('PXDROIFinder')
     # roiFinder.param('tolerancePhi', 0.15)  # default: 0.15
@@ -184,30 +190,55 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
     main = create_path()
     main.add_module(gearbox)
     main.add_module(geometry)
-    # main.add_module(pxdunpacker)
-    # main.add_module(checker)
-    # main.add_module("PXDRawHitSorter")
     main.add_module(genFitExtrapolation)
     main.add_module(roiFinder)  # for PXDIntercepts
-    main.add_module("PXDPerformance")
 
     # Collector setup
+    collector = register_module(collector_prefix)
+    if collector_prefix == "PXDPerformanceCollector":
+        main.add_module("PXDPerformance")
+        collector.param("fillEventTree", False)
+    else:  # the default PXDParticleListCollector
+        import modularAnalysis as ana
+        import vertex
+        from variables import variables as vm
+        # Particle list for gain calibration
+        ana.fillParticleList('e+:gain', "p > 1.0", path=main)
+        # Particle list for event selection in efficiency monitoring
+        ana.fillParticleList('e+:eff', "pt > 2.0", path=main)
+        ana.reconstructDecay('vpho:eff -> e+:eff e-:eff', '9.5<M<11.5', path=main)
+        # Particle list for studying impact parameter resolution
+        # vm.addAlias("pBetaSinTheta3o2", "formula(pt * (1./(1. + tanLambda**2)**0.5)**0.5)")
+        # vm.addAlias("absLambda", "abs(atan(tanLambda))")
+        mySelection = 'pt>1.0 and abs(dz)<1.0 and dr<0.3'
+        mySelection += ' and nCDCHits>20 and nSVDHits>=8 and nPXDHits>=1'
+        mySelection += ' and [abs(atan(tanLambda)) < 0.5]'
+        mySelection += ' and [formula(pt * (1./(1. + tanLambda**2)**0.5)**0.5) > 2.0]'
+        # mySelection += ' and [absLambda<0.5]'
+        # mySelection += ' and [pBetaSinTheta3o2>2.0]'
+        ana.fillParticleList('e+:res', mySelection, path=main)
+        ana.reconstructDecay('vpho:res -> e+:res e-:res', '9.5<M<11.5', path=main)
+        # Remove multiple candidate events
+        ana.applyCuts('vpho:res', 'nParticlesInList(vpho:res)==1', path=main)
+        vertex.kFit('vpho:res', conf_level=0.0, path=main)
 
-    collector = register_module("PXDPerformanceCollector")
+        collector.param("PList4GainName", "e+:gain")
+        collector.param("PList4EffName", "vpho:eff")
+        collector.param("PList4ResName", "vpho:res")
+
     collector.param("granularity", "run")
     collector.param("minClusterCharge", 8)
     collector.param("minClusterSize", 1)
     collector.param("maxClusterSize", 10)
     collector.param("nBinsU", 4)
     collector.param("nBinsV", 6)
-    collector.param("fillEventTree", False)
     collector.param("fillChargeRatioHistogram", True)
 
     # Algorithm setup
     algorithms = []
     if validation:
         validation_alg = PXDValidationAlgorithm()
-        validation_alg.setPrefix("PXDPerformanceCollector")
+        validation_alg.setPrefix(collector_prefix)
         validation_alg.minTrackPoints = 10     # Minimum number of track points
         validation_alg.save2DHists = True      # Flag to save 2D histogram for efficiency on layer 1 or 2 in Z-phi plane
         algorithms.append(validation_alg)
@@ -221,7 +252,7 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         algorithm.strategy = 0                 # 0: medians, 1: landau fit
         algorithm.correctForward = True        # Correct default gains in forward regions due to low statistics
         algorithm.useChargeRatioHistogram = True  # Use Charge ratio histograms for the calibration
-        algorithm.setPrefix("PXDPerformanceCollector")
+        algorithm.setPrefix(collector_prefix)
         # algorithm.setBoundaries(boundaries)  # This takes boundaries from the expert_config
         algorithms.append(algorithm)
 

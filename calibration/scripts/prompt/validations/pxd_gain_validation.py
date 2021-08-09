@@ -25,7 +25,7 @@ from glob import glob
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='PXD gain calibration',
                               description=__doc__,
-                              download_files=['PXDPerformanceCollectorValidation.root', 'stdout'],
+                              download_files=['PXDPerformanceCollectorValidation.root', 'PXDParticleListCollectorValidation.root'],
                               expert_config={})
 
 

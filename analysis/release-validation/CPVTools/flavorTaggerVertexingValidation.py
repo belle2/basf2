@@ -149,8 +149,8 @@ def reconstructB2nunubar():
     Defines the procedure to create a B0 list for the benchmark channel 'B0 -> nu_tau anti-nu_tau'
     """
 
-    ma.fillParticleListFromMC('nu_tau:mc', '', path=cp_val_path)
-    ma.reconstructMCDecay('B0:sig -> nu_tau:mc anti-nu_tau:mc', '', writeOut=True, path=cp_val_path)
+    ma.fillParticleListFromMC('nu_tau:MC', '', path=cp_val_path)
+    ma.reconstructMCDecay('B0:sig -> nu_tau:MC anti-nu_tau:MC', '', writeOut=True, path=cp_val_path)
 
 
 def mcMatchAndBuildROE(belleOrBelle2Flag='Belle2'):

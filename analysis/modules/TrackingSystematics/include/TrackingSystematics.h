@@ -6,10 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#pragma once
+//#pragma once
 
 #include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/database/DBObjPtr.h>
+#include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
+
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 
 namespace Belle2 {
   /**
@@ -53,6 +58,15 @@ namespace Belle2 {
     TrackingMomentumModule();
 
     /**
+    * Get LookUp information for the particle
+    * @param particle
+    * @return LookUp information (map: key - LookUp parameter; value - value of the parameter )
+    */
+    WeightInfo getInfo(const Particle* particle);
+
+    virtual void initialize() override;
+
+    /**
     * Function to be executed at each event
     */
     virtual void event() override;
@@ -63,6 +77,14 @@ namespace Belle2 {
     /** input momentum scale modifier */
     double m_scale;
 
+    /**< Name of the table  */
+    std::string m_tableName;
+
+    /**< Name of the table */
+    std::string m_sfName;
+
+    /**< Pointer to the table in DB */
+    std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable;
     /**
      * function to set momentum scaling factor
      */

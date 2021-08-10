@@ -1,5 +1,4 @@
 # BelleII collaboration generic DECAY.DEC
-# BelleII collaboration generic DECAY.DEC
 # Based on EvtGen DECAY.DEC and Belle DECAY.DEC
 #
 # Changes
@@ -80,7 +79,6 @@
 #
 # June 2021, U. Tamponi (tamponi@to.infn.it)
 #   Updated all the narrow bottomonia (M < Y(4S))
-#
 #
 # June 2021 Automated: Converted PYTHIA ids
 #   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
@@ -9817,7 +9815,7 @@ Enddecay
 
 Decay eta' # Edited by U. Tamponi, October 2016
 0.432000000   pi+  pi-  eta                                ETAPRIME_DALITZ  -0.047  -0.069  0.0    0.073; # New dalitz mode
-0.217000000   pi0  pi0  eta                                ETAPRIME_DALITZ  -0.047  -0.069  0.0    0.073;# New dalitz mode
+0.217000000   pi0  pi0  eta                                ETAPRIME_DALITZ  -0.047  -0.069  0.0    0.073; # New dalitz mode
 0.293511000   rho0  gamma                                  SVP_HELAMP  1.0 0.0 1.0 0.0;
 0.027500000   omega  gamma                                 SVP_HELAMP  1.0 0.0 1.0 0.0;
 0.022200000   gamma  gamma                                 PHSP;
@@ -9825,6 +9823,10 @@ Decay eta' # Edited by U. Tamponi, October 2016
 0.000109000   gamma  mu-  mu+                              PHSP;
 0.003600000   pi+  pi-  pi0                                PHSP;
 0.002400000   pi+  pi-  e+  e-                             PHSP;
+Enddecay
+
+Decay eta(1405) # Decay table entirely copied from Geant4
+1.000000000   rho+  rho-                                   PHSP;
 Enddecay
 
 Decay phi # Edited by U. Tamponi, October 2016

@@ -107,7 +107,6 @@ void TrackingMomentumModule::initialize()
   if (m_scale != -1 && !m_tableName.empty()) {
     B2FATAL("Only one of the parameters, scale and tableName, can be given given, not both!");
   } else if (!m_tableName.empty()) {
-    B2INFO("--------  reading look up table" << m_tableName);
     m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_tableName);
   }
 }
@@ -143,7 +142,6 @@ WeightInfo TrackingMomentumModule::getInfo(const Particle* particle)
     if (!var) {
       B2ERROR("Variable '" << i_variable << "' is not available in Variable::Manager!");
     }
-    B2INFO("VARIABLE " << i_variable);
     values.insert(std::make_pair(i_variable, var->function(particle)));
   }
 
@@ -174,14 +172,12 @@ void TrackingMomentumModule::setMomentumScalingFactor(Particle* particle)
     particle->set4Vector(vec);
   } else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Track) {
     if (m_scale != -1) {
-      B2INFO("Applying constant SF " << m_scale);
       particle->setMomentumScalingFactor(m_scale);
     } else {
       WeightInfo info = getInfo(particle);
       for (const auto& entry : info) {
         particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
       }
-      B2INFO("Reading SF from table, " << m_tableName << " " << m_sfName << " " << particle->getExtraInfo(m_tableName + "_" + m_sfName));
       particle->setMomentumScalingFactor(particle->getExtraInfo(m_tableName + "_" + m_sfName));
     }
   }

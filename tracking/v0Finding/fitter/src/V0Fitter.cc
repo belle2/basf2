@@ -513,7 +513,7 @@ RecoTrack* V0Fitter::copyRecoTrackAndFit(RecoTrack* origRecoTrack, const int tra
   /// fit newRecoTrack
   TrackFitter fitter;
   if (not fitter.fit(*newRecoTrack, particleUsedForFitting)) {
-    // This is not expected, but happen sometimes.
+    // This is not expected, but happens sometimes.
     B2DEBUG(20, "track fit failed for copied RecoTrack.");
     /// check fit status of original track
     if (not origRecoTrack->wasFitSuccessful(origTrackRep))

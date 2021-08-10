@@ -47,7 +47,7 @@ Chi2McMatcherModule::Chi2McMatcherModule() : Module()
   defaultCutOffs[2] = 173;
   defaultCutOffs[3] = 424;
   defaultCutOffs[4] = 90;
-  defaultCutOffs[5] = 128024;//research what coresponing 99% border
+  defaultCutOffs[5] = 424;//in first approximation take proton
   addParam("CutOffs",
            m_param_CutOffs,
            "Defines the Cut Off values for each charged particle. pdg order [11,13,211,2212,321,1000010020]",

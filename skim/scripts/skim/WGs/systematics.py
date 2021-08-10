@@ -736,7 +736,7 @@ class SystematicsKshort(BaseSkim):
 
     ApplyHLTHadronCut = True
 
-    def __init__(self, prescale=1, **kwargs):
+    def __init__(self, prescale=4, **kwargs):
         """
         Parameters:
             prescale (int): the global prescale for this skim.
@@ -843,7 +843,7 @@ class SystematicsCombinedHadronic(CombinedSkim):
 
     produces_mdst_by_default = True
 
-    def __init__(self, prescale_kshort=1, mdstOutput=True, **kwargs):
+    def __init__(self, prescale_kshort=4, mdstOutput=True, **kwargs):
         """ Initialiser.
 
         Args:
@@ -865,7 +865,7 @@ class SystematicsCombinedLowMulti(CombinedSkim):
           SystematicsFourLeptonFromHLTFlag,
           SystematicsRadmumuFromHLTFlag,
           SystematicsBhabha,
-          ThauThrust.
+          TauThrust.
 
       This is required for  technical (data production) reasons, as it keeps the number of files low.
       See the definitions of the individual skims for the details.
@@ -878,7 +878,7 @@ class SystematicsCombinedLowMulti(CombinedSkim):
 
     produces_mdst_by_default = True
 
-    def __init__(self, prescale_kshort=1, mdstOutput=True, **kwargs):
+    def __init__(self, mdstOutput=True, **kwargs):
         """ Initialiser.
 
         Args:

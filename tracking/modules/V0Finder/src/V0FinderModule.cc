@@ -215,7 +215,7 @@ void V0FinderModule::terminate()
   B2INFO("===V0Finder summary=============================================================");
   B2INFO("In total " << m_nHitRemoved + m_nForceStored << " saved V0s have inner hits.");
   B2INFO("- Inner hits successfully removed in " << m_nHitRemoved << " V0s.");
-  B2INFO("- Failed in " << m_nForceStored << " V0s, instead V0s before removing inner hits saved.");
+  B2INFO("- The hit removal failed in " << m_nForceStored << " V0s, instead V0s before removing inner hits saved.");
 }
 
 bool

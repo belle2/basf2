@@ -675,23 +675,30 @@ def removeTracksForTrackingEfficiencyCalculation(inputListNames, fraction, path=
     path.add_module(trackingefficiency)
 
 
-def scaleTrackMomenta(inputListNames, scale, path=None):
+def scaleTrackMomenta(inputListNames, scale=-1.0, table_name="", sf_name="SF", path=None):
     """
 
-    Scale momenta of the particles according to the scaling factor scale.
+    Scale momenta of the particles according to a scaling factor scale.
+    scaling facotr can either be given as constant number or as the name of the payload which contains
+    the variable scale factors.
     If the particle list contains composite particles, the momenta of the track-based daughters are scaled.
     Subsequently, the momentum of the mother particle is updated as well.
 
     Parameters:
         inputListNames (list(str)): input particle list names
         scale (float): scaling factor (1.0 -- no scaling)
+        tableName (string): name of the payload which contains the SFs
+        sfName (string): name of SF variable (SF, Up, Down)
         path (basf2.Path): module is added to this path
     """
 
-    trackingmomentum = register_module('TrackingMomentum')
-    trackingmomentum.param('particleLists', inputListNames)
-    trackingmomentum.param('scale', scale)
-    path.add_module(trackingmomentum)
+    tracking_momentum = register_module('TrackingMomentum')
+    tracking_momentum.param('particleLists', inputListNames)
+    tracking_momentum.param('scale', scale)
+    tracking_momentum.param('tableName', table_name)
+    tracking_momentum.param('sfName', sf_name)
+
+    path.add_module(tracking_momentum)
 
 
 def mergeListsWithBestDuplicate(outputListName,

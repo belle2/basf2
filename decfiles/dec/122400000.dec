@@ -1,0 +1,37 @@
+# EventType: 124400000
+# Descriptor: [B+ -> X(3872) K+ ]cc
+# NickName: ּּBu_K+_X3872
+# Documentation: for the branching fraction measurement of B+ -> X(3872) K+
+# Tested: Yes
+# PhysicsWG: Charmonium
+# Responsible: Emilie Bertholet
+# Email: emibertholet@mail.tau.ac.il
+# Cuts: None
+# Date: 16072021
+
+
+Decay Upsilon(4S)
+0.5 B+sig   B-                   VSS;
+0.5 B+      B-sig                VSS;
+Enddecay
+
+Decay B+sig
+1.000  X_1(3872) K+             PHOTOS SVS;
+Enddecay
+CDecay B-sig
+
+Decay X_1(3872) 
+0.0603  pi+ pi- J/psi             PHOTOS PHSP;
+0.7706  D*0 anti-D0               PHOTOS PHSP;
+0.0162  gamma J/psi               PHOTOS PHSP; 
+0.0353  gamma psi(2S)             PHOTOS PHSP; 
+0.0529  pi0 chi_c1                PHOTOS PHSP;
+0.0647  omega J/psi               PHOTOS PHSP;
+Enddecay
+
+End 
+
+
+
+
+     

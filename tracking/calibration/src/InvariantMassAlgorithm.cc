@@ -22,7 +22,7 @@ using Belle2::InvariantMassCalib::getEvents;
 using Belle2::InvariantMassCalib::runInvariantMassAnalysis;
 
 //Using boostVector collector for the input
-InvariantMassAlgorithm::InvariantMassAlgorithm() : CalibrationAlgorithm("BoostVectorCollector")
+InvariantMassAlgorithm::InvariantMassAlgorithm() : CalibrationAlgorithm("eCmsCollector")
 {
   setDescription("Collision invariant mass calibration algorithm");
 }

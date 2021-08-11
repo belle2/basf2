@@ -47,25 +47,24 @@ namespace Belle2 {
       tr->SetBranchAddress("run", &evt.run);
       tr->SetBranchAddress("exp", &evt.exp);
       tr->SetBranchAddress("event", &evt.evtNo);
-
-      TVector3* p0 = nullptr;
-      TVector3* p1 = nullptr;
-
-      tr->SetBranchAddress("mu0_p", &p0);
-      tr->SetBranchAddress("mu1_p", &p1);
-
-      tr->SetBranchAddress("mu0_pid", &evt.mu0.pid);
-      tr->SetBranchAddress("mu1_pid", &evt.mu1.pid);
-
-
       tr->SetBranchAddress("time", &evt.t); //time in hours
+
+
+      tr->SetBranchAddress("mBC", &evt.mBC);
+      tr->SetBranchAddress("deltaE", &evt.deltaE);
+      tr->SetBranchAddress("pdg", &evt.pdg);
+      tr->SetBranchAddress("mode", &evt.mode);
+      tr->SetBranchAddress("Kpid", &evt.Kpid);
+      tr->SetBranchAddress("R2", &evt.R2);
+      tr->SetBranchAddress("mD", &evt.mD);
+      tr->SetBranchAddress("dmDstar", &evt.dmDstar);
+
+
+
 
 
       for (int i = 0; i < tr->GetEntries(); ++i) {
         tr->GetEntry(i);
-
-        evt.mu0.p = *p0;
-        evt.mu1.p = *p1;
 
         evt.nBootStrap = 1;
         evt.isSig = true;

@@ -159,13 +159,13 @@ namespace Belle2 {
     template<typename Evt>
     std::vector<std::vector<std::map<ExpRun, std::pair<double, double>>>>  getIntervals(
       const std::map<ExpRun, std::pair<double, double>>& runs,  std::vector<Evt> evts,
-      TString lossFunctionOuter, TString lossFunctionInner)
+      TString lossFunctionOuter, TString lossFunctionInner, double atomSize = 3. / 60)
     {
       //sort events by time
       std::sort(evts.begin(), evts.end(), [](const Evt & e1, const Evt & e2) { return (e1.t > e2.t); });
 
       // Divide into small intervals
-      std::vector<std::pair<double, double>> smallRuns = splitToSmall(runs, 0.1);
+      std::vector<std::pair<double, double>> smallRuns = splitToSmall(runs, atomSize);
 
       std::vector<Atom> atoms = createAtoms(smallRuns, evts);
 

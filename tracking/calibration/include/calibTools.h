@@ -397,7 +397,8 @@ namespace Belle2 {
 
     // Get intervals based on the input loss functions
     Splitter splt;
-    auto splits = splt.getIntervals(runsInfo, evts, m_lossFunctionOuter, m_lossFunctionInner);
+    double atomSize = (calibName == "CollisionInvariantMass") ? -1 : 3. / 60;
+    auto splits = splt.getIntervals(runsInfo, evts, m_lossFunctionOuter, m_lossFunctionInner, atomSize);
 
     //Loop over all calibration intervals
     std::vector<CalibrationData> calVec;

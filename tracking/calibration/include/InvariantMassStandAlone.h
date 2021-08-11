@@ -27,11 +27,6 @@ namespace Belle2 {
     static const int intNaN     = std::numeric_limits<int>::quiet_NaN();
     static const TVector3 vecNaN(realNaN, realNaN, realNaN);
 
-    /** track parameters (neglecting curvature) */
-    struct Track {
-      TVector3 p = vecNaN; ///< momentum vector of the track
-      double pid = realNaN; ///< particle ID of mu/e separation
-    };
 
     /** Event containing two tracks */
     struct Event {
@@ -40,8 +35,15 @@ namespace Belle2 {
       int evtNo = intNaN;  ///< event number
 
 
-      Track mu0; ///< track in the event
-      Track mu1; ///< other track in the event
+      double mBC; ///< mBC mass
+      double deltaE; ///< deltaE
+      int    pdg; ///< deltaE
+      int    mode;
+      double Kpid;
+      double R2;
+      double mD; ///< Dmass
+      double dmDstar; ///< Dmass
+
 
       int nBootStrap = intNaN; ///< random bootstrap weight (n=1 -> original sample)
       bool isSig = false;      ///< is not removed by quality cuts?

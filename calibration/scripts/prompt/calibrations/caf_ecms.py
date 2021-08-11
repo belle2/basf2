@@ -13,7 +13,7 @@ Airflow script to perform eCMS calibration.
 """
 
 from prompt import CalibrationSettings, input_data_filters
-from prompt.calibrations.caf_beamspot import settings as beamspot
+from prompt.calibrations.caf_boostvector import settings as boostvector
 
 
 #: Tells the automated system some details of this script
@@ -32,7 +32,7 @@ settings = CalibrationSettings(
     expert_config={
         "outerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)",
         "innerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)"},
-    depends_on=[beamspot])
+    depends_on=[boostvector])
 
 ##############################
 
@@ -88,7 +88,7 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
-    from ROOT.Belle2 import BoostVectorAlgorithm
+    from ROOT.Belle2 import InvariantMassAlgorithm
     from basf2 import create_path, register_module
     import modularAnalysis as ma
     import vertex
@@ -223,11 +223,11 @@ def get_calibrations(input_data, **kwargs):
     ma.appendROEMasks(list_name='B-:merged', mask_tuples=[cleanMask], path=rec_path_1)
     ma.buildContinuumSuppression(list_name='B-:merged', roe_mask='cleanMask', path=rec_path_1)
 
-    ma.applyCuts("B0:merged", "R2 < 0.5", path=rec_path_1)
-    ma.applyCuts("B-:merged", "R2 < 0.5", path=rec_path_1)
+    ma.applyCuts("B0:merged", "R2 < 0.9", path=rec_path_1)
+    ma.applyCuts("B-:merged", "R2 < 0.9", path=rec_path_1)
 
     collector_ecms = register_module('eCmsCollector', Y4SPListName='B0:merged')
-    algorithm_ecms = BoostVectorAlgorithm()
+    algorithm_ecms = InvariantMassAlgorithm()
     algorithm_ecms.setOuterLoss(kwargs['expert_config']['outerLoss'])
     algorithm_ecms.setInnerLoss(kwargs['expert_config']['innerLoss'])
 

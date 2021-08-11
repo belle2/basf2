@@ -8,13 +8,11 @@
 
 // Own include
 #include <analysis/modules/TrackingSystematics/TrackingSystematics.h>
-#include <iostream>
 
 // dataobjects
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <framework/core/Environment.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/ParticleList.h>
 
@@ -96,18 +94,28 @@ The module modifies the input particleLists by scaling track momenta as given by
 		     )DOC");
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
-  addParam("scale", m_scale, "scale factor to be applied to 3-momentum", -1.0);
+  addParam("scale", m_scale, "scale factor to be applied to 3-momentum", nan(""));
   addParam("tableName", m_tableName, "ID of table used for reweighing", std::string(""));
   addParam("sfName", m_sfName, "Label for the scale factor in the look up table", std::string("SF"));
 }
 
 void TrackingMomentumModule::initialize()
 {
-
-  if (m_scale != -1 && !m_tableName.empty()) {
-    B2FATAL("Only one of the parameters, scale and tableName, can be given given, not both!");
+  if (!isnan(m_scale) && !m_tableName.empty()) {
+    B2FATAL("Exactly one of the parameters, scale or tableName, must be given given, not both!");
+  } else if (isnan(m_scale) && m_tableName.empty()) {
+    B2FATAL("Exactly one of the parameters, scale or tableName, must be given given. Neither was given!");
   } else if (!m_tableName.empty()) {
     m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_tableName);
+
+    std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
+                                            *m_ParticleWeightingLookUpTable.get())->getAxesNames());
+    for (const auto& i_variable : variables) {
+      const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(i_variable);
+      if (!var) {
+        B2FATAL("Variable '" << i_variable << "' is not available in Variable::Manager!");
+      }
+    }
   }
 }
 
@@ -132,20 +140,25 @@ void TrackingMomentumModule::event()
 
 
 // Getting LookUp info for given particle in given event
-WeightInfo TrackingMomentumModule::getInfo(const Particle* particle)
+double TrackingMomentumModule::getScale(Particle* particle)
+
 {
   std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
                                           *m_ParticleWeightingLookUpTable.get())->getAxesNames());
+
   std::map<std::string, double> values;
   for (const auto& i_variable : variables) {
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(i_variable);
-    if (!var) {
-      B2ERROR("Variable '" << i_variable << "' is not available in Variable::Manager!");
-    }
-    values.insert(std::make_pair(i_variable, var->function(particle)));
+    double value = var->function(particle);
+    values.insert(std::make_pair(i_variable, value));
   }
 
-  return (*m_ParticleWeightingLookUpTable.get())->getInfo(values);
+  WeightInfo info = (*m_ParticleWeightingLookUpTable.get())->getInfo(values);
+  for (const auto& entry : info) {
+    particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
+  }
+
+  return particle->getExtraInfo(m_tableName + "_" + m_sfName);
 }
 
 
@@ -171,15 +184,8 @@ void TrackingMomentumModule::setMomentumScalingFactor(Particle* particle)
     const TLorentzVector vec(px, py, pz, E);
     particle->set4Vector(vec);
   } else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Track) {
-    if (m_scale != -1) {
-      particle->setMomentumScalingFactor(m_scale);
-    } else {
-      WeightInfo info = getInfo(particle);
-      for (const auto& entry : info) {
-        particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
-      }
-      particle->setMomentumScalingFactor(particle->getExtraInfo(m_tableName + "_" + m_sfName));
-    }
+    double scale = (!isnan(m_scale)) ? m_scale : getScale(particle) ;
+    particle->setMomentumScalingFactor(scale);
   }
 
 

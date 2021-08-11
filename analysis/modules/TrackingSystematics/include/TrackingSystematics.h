@@ -6,15 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//#pragma once
+#pragma once
 
 #include <framework/core/Module.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/database/DBObjPtr.h>
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
 
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 
 namespace Belle2 {
   /**
@@ -58,12 +56,8 @@ namespace Belle2 {
     TrackingMomentumModule();
 
     /**
-    * Get LookUp information for the particle
-    * @param particle
-    * @return LookUp information (map: key - LookUp parameter; value - value of the parameter )
+    * Initializes the modules and checks the validity of the input parameters
     */
-    WeightInfo getInfo(const Particle* particle);
-
     virtual void initialize() override;
 
     /**
@@ -72,18 +66,24 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
+    /**
+    * Returns the needed scale factor for particle based on tableName and sfName
+    * @param particle
+    */
+    double getScale(Particle* particle);
+
     /** input particle lists */
     std::vector<std::string> m_ParticleLists;
     /** input momentum scale modifier */
     double m_scale;
 
-    /**< Name of the table  */
+    /** Name of the table  */
     std::string m_tableName;
 
-    /**< Name of the table */
+    /** Name of the table */
     std::string m_sfName;
 
-    /**< Pointer to the table in DB */
+    /** Pointer to the table in DB */
     std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable;
     /**
      * function to set momentum scaling factor

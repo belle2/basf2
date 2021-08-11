@@ -675,7 +675,7 @@ def removeTracksForTrackingEfficiencyCalculation(inputListNames, fraction, path=
     path.add_module(trackingefficiency)
 
 
-def scaleTrackMomenta(inputListNames, scale=-1.0, table_name="", sf_name="SF", path=None):
+def scaleTrackMomenta(inputListNames, scale=float('nan'), table_name="", sf_name="SF", path=None):
     """
 
     Scale momenta of the particles according to a scaling factor scale.
@@ -691,7 +691,7 @@ def scaleTrackMomenta(inputListNames, scale=-1.0, table_name="", sf_name="SF", p
         sfName (string): name of SF variable (SF, Up, Down)
         path (basf2.Path): module is added to this path
     """
-
+    print('python params', scale, table_name)
     tracking_momentum = register_module('TrackingMomentum')
     tracking_momentum.param('particleLists', inputListNames)
     tracking_momentum.param('scale', scale)

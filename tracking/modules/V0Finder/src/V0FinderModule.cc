@@ -161,8 +161,13 @@ void V0FinderModule::event()
   // Pair up each positive track with each negative track.
   for (auto& trackPlus : tracksPlus) {
     for (auto& trackMinus : tracksMinus) {
+      bool isForceStored, isHitRemoved;
       try {
-        if (preFilterTracks(trackPlus, trackMinus, Const::Kshort)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort);
+        if (preFilterTracks(trackPlus, trackMinus, Const::Kshort)) {
+          m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort, isForceStored, isHitRemoved);
+          m_nForceStored += isForceStored;
+          m_nHitRemoved += isHitRemoved;
+        }
       } catch (const genfit::Exception& e) {
         // genfit exception raised, skip this track pair for this hypothesis
         B2WARNING("Genfit exception caught. Skipping this track pair for Kshort hypothesis. " << LogVar("Genfit exception:", e.what()));
@@ -170,21 +175,31 @@ void V0FinderModule::event()
 
       try {
         // the pre-filter is not able to reject photons, so no need to apply pre filter for photons
-        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);
+        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon, isForceStored, isHitRemoved);
+        m_nForceStored += isForceStored;
+        m_nHitRemoved += isHitRemoved;
       } catch (const genfit::Exception& e) {
         // genfit exception raised, skip this track pair for this hypothesis
         B2WARNING("Genfit exception caught. Skipping this track pair for photon hypothesis. " << LogVar("Genfit exception:", e.what()));
       }
 
       try {
-        if (preFilterTracks(trackPlus, trackMinus, Const::Lambda))  m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda);
+        if (preFilterTracks(trackPlus, trackMinus, Const::Lambda)) {
+          m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda, isForceStored, isHitRemoved);
+          m_nForceStored += isForceStored;
+          m_nHitRemoved += isHitRemoved;
+        }
       } catch (const genfit::Exception& e) {
         // genfit exception raised, skip this track pair for this hypothesis
         B2WARNING("Genfit exception caught. Skipping this track pair for Lambda hypothesis. " << LogVar("Genfit exception:", e.what()));
       }
 
       try {
-        if (preFilterTracks(trackPlus, trackMinus, Const::antiLambda)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda);
+        if (preFilterTracks(trackPlus, trackMinus, Const::antiLambda)) {
+          m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda, isForceStored, isHitRemoved);
+          m_nForceStored += isForceStored;
+          m_nHitRemoved += isHitRemoved;
+        }
       } catch (const genfit::Exception& e) {
         // genfit exception raised, skip this track pair for this hypothesis
         B2WARNING("Genfit exception caught. Skipping this track pair for anti-Lambda hypothesis. " << LogVar("Genfit exception:",
@@ -195,6 +210,13 @@ void V0FinderModule::event()
 
 }
 
+void V0FinderModule::terminate()
+{
+  B2INFO("===V0Finder summary=============================================================");
+  B2INFO("In total " << m_nHitRemoved + m_nForceStored << " saved V0s have inner hits.");
+  B2INFO("- Inner hits successfully removed in " << m_nHitRemoved << " V0s.");
+  B2INFO("- The hit removal failed in " << m_nForceStored << " V0s, instead V0s before removing inner hits saved.");
+}
 
 bool
 V0FinderModule::preFilterTracks(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis)

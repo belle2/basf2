@@ -52,6 +52,7 @@ class XToD0_D0ToHpJm(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
     # Cached static method, so that its contents are only executed once for a single path.
@@ -116,6 +117,8 @@ class XToD0_D0ToNeutrals(BaseSkim):
     __description__ = "Skim list for D0 to neutral FSPs."
     __contact__ = __liaison__
     __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
 
     def load_standard_lists(self, path):
         loadStdSkimPi0(path=path)
@@ -194,6 +197,8 @@ class DstToD0Pi_D0ToRare(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
     def load_standard_lists(self, path):
         stdE("loose", path=path)
         stdMu("loose", path=path)
@@ -244,6 +249,7 @@ class XToDp_DpToKsHp(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
@@ -294,6 +300,7 @@ class XToDp_DpToHpHmJp(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
@@ -338,6 +345,7 @@ class LambdacTopHpJm(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
@@ -382,6 +390,8 @@ class DstToDpPi0_DpToHpPi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
     def load_standard_lists(self, path):
         stdPi("all", path=path)
         loadStdSkimPi0(path=path)
@@ -423,6 +433,7 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
@@ -469,6 +480,7 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
@@ -515,6 +527,7 @@ class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
@@ -566,6 +579,7 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
@@ -615,6 +629,7 @@ class DstToD0Pi_D0ToHpHmHpJm(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
@@ -675,6 +690,7 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
@@ -727,6 +743,8 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
     def load_standard_lists(self, path):
         stdPi("all", path=path)
         loadStdSkimPi0(path=path)
@@ -772,6 +790,7 @@ class DstToD0Pi_D0ToHpJmKs(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
@@ -814,6 +833,7 @@ class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
@@ -856,6 +876,7 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
+    NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):

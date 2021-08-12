@@ -98,20 +98,20 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.framework import Calibration
     from caf.strategies import SingleIOV
-    from reconstruction import prepare_cdst_analysis
+    from reconstruction import add_pid_module
 
     # module to be run prior the collector
     rec_path_1 = create_path()
-    # prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
+    add_pid_module(rec_path_1)
 
     # vertex.treeFit('Upsilon(4S):BV', updateAllDaughters=True, ipConstraint=True, path=rec_path_1)
 
-    stdCharged.stdPi(listtype='all', path=rec_path_1)
-    stdCharged.stdK(listtype='all', path=rec_path_1)
+    stdCharged.stdPi(listtype='loose', path=rec_path_1)
+    stdCharged.stdK(listtype='good', path=rec_path_1)
     stdPi0s.stdPi0s(listtype='eff30_May2020', path=rec_path_1)
 
-    ma.cutAndCopyList("pi+:my", "pi+:all", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
-    ma.cutAndCopyList("K+:my", "K+:all", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
+    ma.cutAndCopyList("pi+:my", "pi+:loose", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
+    ma.cutAndCopyList("K+:my", "K+:good", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
 
     #####################################################
     # Reconstructs the signal B0 candidates from Dstar

@@ -68,11 +68,6 @@ namespace Belle2 {
     } else {
       B2FATAL("Acceptance volume needs to have one, two or three values for sphere, cylinder and box respectively");
     }
-    const double maxSize = *std::max_element(m_acceptSize.begin(), m_acceptSize.end());
-    if ((2 * maxSize) > (m_subboxLength * Unit::m)) {
-      B2FATAL("Acceptance bigger than world volume" << LogVar("acceptance", 2 * maxSize) << LogVar("subboxLength",
-              m_subboxLength * Unit::m));
-    }
     //get information from geometry and create the world box
     G4VPhysicalVolume* volume = geometry::GeometryManager::getInstance().getTopVolume();
     if (!volume) {
@@ -93,6 +88,14 @@ namespace Belle2 {
     m_world.reset(new vecgeom::UnplacedBox(halfLength_x / Unit::cm, halfLength_y / Unit::cm,
                                            halfLength_z / Unit::cm));
     B2INFO("World size [" << halfLength_x / Unit::cm << ", " << halfLength_x / Unit::cm << ",  " << halfLength_x / Unit::cm << "]");
+
+    const double maxSize = *std::max_element(m_acceptSize.begin(), m_acceptSize.end());
+    const double minWorld = std::min({halfLength_x, halfLength_y, halfLength_z, });
+    if (maxSize > (minWorld / Unit::cm)) {
+      B2FATAL("Acceptance bigger than world volume " << LogVar("acceptance", maxSize)
+              << LogVar("World size", minWorld / Unit::cm));
+    }
+
   }
 
   void CRY::generateEvent(MCParticleGraph& mcGraph)
@@ -128,15 +131,14 @@ namespace Belle2 {
         const double vz = p->x() * Unit::m;
 
         // Time
-        /* In basf2, it is assume that t = 0 when an event was produced,
+        /* In basf2, it is assumed that t = 0 when an event was produced,
            For the cosmic case, we set t = 0 when particle cross y=0 plane;
            The output time from CRY (p->t()) is too large (order of second) and  also
         increase as simulated time, so it is impossible to handle in basf2.
         For event which has more then one particle, the difference between their production
-        times is also to large (> microsecond) to keep in basf2. So the time relation
+        times is also too large (> micro-second) to keep in basf2, so the time relation
         between particles in each event is also reset. Production of each particle in event is set t=0 at y=0.
-        if one need production from CRY for a special study, you have to find a way to handle it ...*/
-        //        double time = p->t() * Unit::s;
+        if one need production from CRY for a special study, you have to find a way to handle it...*/
         double time = 0;
 
         vecgeom::Vector3D<double> pos(vx, vy, vz);

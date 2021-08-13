@@ -12,7 +12,7 @@
 import basf2
 import tracking
 
-from tracking.metamodules import IfMCParticlesPresentModule
+from tracking.metamodules import IfMCParticlesPresentModule, IfMCRecoTracksNotPresentModule
 from tracking.run import utilities
 from tracking.run.event_generation import ReadOrGenerateEventsRun
 
@@ -109,8 +109,8 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 # Track matcher
                 mc_track_matcher_module = basf2.register_module('MCRecoTracksMatcher')
 
-                path.add_module(IfMCParticlesPresentModule(track_finder_mc_truth_module))
-                path.add_module(IfMCParticlesPresentModule(mc_track_matcher_module))
+                path.add_module(IfMCRecoTracksNotPresentModule(IfMCParticlesPresentModule(track_finder_mc_truth_module)))
+                path.add_module(IfMCRecoTracksNotPresentModule(IfMCParticlesPresentModule(mc_track_matcher_module)))
 
             # this ensures that the parameters are set in both cases (if the modules have been added or are already in the path)
             # only check for containment to also cope with the "IfMCParticlesPresentModule" cases correctly

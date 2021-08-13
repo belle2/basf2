@@ -307,6 +307,19 @@ class IfMCParticlesPresentModule(IfStoreArrayPresentModule):
         super(IfMCParticlesPresentModule, self).__init__(module, "MCParticles")
 
 
+class IfMCRecoTracksNotPresentModule(IfStoreArrayNotPresentModule):
+
+    """Conditional execution of the wrapped module based on the presence of Monte Carlo information.
+    """
+
+    def __init__(self, module):
+        """
+        Args:
+          module (basf2.Module): The module executed, if the condition is met.
+        """
+        super(IfMCRecoTracksNotPresentModule, self).__init__(module, "MCRecoTracks")
+
+
 class PathModule(basf2.Module):
 
     """Wrapper for a basf2 path into a module such that

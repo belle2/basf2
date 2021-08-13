@@ -37,25 +37,20 @@ namespace Belle2 {
 
   private:
 
-    int m_exp; ///< experiment number
-    int m_run; ///< run number
-    int m_evt; ///< event number
+    int m_exp;     ///< experiment number
+    int m_run;     ///< run number
+    int m_evt;     ///< event number
+    double m_time; ///< event time [hours]
 
-
-    double m_time; ///< event time
-
-    double m_mBC; ///< mBC mass
-    double m_deltaE; ///< deltaE
-    int    m_pdg; ///< deltaE
-    int    m_mode;
-    double m_Kpid;
+    double m_mBC;     ///< mBC mass
+    double m_deltaE;  ///< deltaE
+    int    m_pdg;     ///< B meson PDG code (can neutral or charged)
+    int    m_mode;    ///< decay mode ID
+    double m_Kpid;    ///< Kaon PID
     double m_R2;
-    double m_mD; ///< Dmass
-    double m_dmDstar; ///< Dmass
-
-
-    /** Name of the Y4S particle list */
-    std::string m_Y4SPListName = "";
+    double m_mD;      ///< D meson mass
+    double m_dmDstar; ///< D*-D0 mass
+    double m_cmsE;    ///< input CMS energy
 
   };
 

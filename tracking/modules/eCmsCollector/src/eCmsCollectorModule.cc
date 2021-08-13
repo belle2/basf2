@@ -43,8 +43,6 @@ eCmsCollectorModule::eCmsCollectorModule() : CalibrationCollectorModule(),
 
   setDescription("Collect data for eCMS calibration algorithm using the momenta of the hadronic events");
   setPropertyFlags(c_ParallelProcessingCertified);
-
-  addParam("Y4SPListName", m_Y4SPListName, "Name of the Y4S particle list", std::string("Upsilon(4S):IPDQM"));
 }
 
 void eCmsCollectorModule::prepare()
@@ -67,6 +65,7 @@ void eCmsCollectorModule::prepare()
   tree->Branch<double>("R2", &m_R2);
   tree->Branch<double>("mD", &m_mD);
   tree->Branch<double>("dmDstar", &m_dmDstar);
+  tree->Branch<double>("cmsE", &m_cmsE);
 
 
   // We register the objects so that our framework knows about them.
@@ -90,6 +89,7 @@ void eCmsCollectorModule::collect()
 
   const Particle* Bpart = nullptr;
 
+  //TODO select the best candidate
   if (B0.isValid() && B0->getParticle(0)) {
     Bpart = B0->getParticle(0);
   } else if (Bm.isValid() && Bm->getParticle(0)) {
@@ -133,30 +133,7 @@ void eCmsCollectorModule::collect()
   cout << "Kpid = " << m_Kpid << endl;
 
 
-  /*
-  if (!Y4SParticles.isValid() || abs(Y4SParticles->getPDGCode()) != 300553)
-    return;
-
-  //m_mu0_pid = part0->getPIDLikelihood()->getProbability(Const::ChargedStable(13), Const::ChargedStable(11));
-
-
-
-
-  std::vector<int> indxes =  Y4SParticles->getParticle(0)->getDaughterIndices();
-  if (indxes.size() != 2) return;
-
-  const Particle* part0 = Y4SParticles->getParticle(0)->getDaughter(0);
-  const Particle* part1 = Y4SParticles->getParticle(0)->getDaughter(1);
-
-  // Get the mu/e PID
-  m_mu0_pid = part0->getPIDLikelihood()->getProbability(Const::ChargedStable(13), Const::ChargedStable(11));
-  m_mu1_pid = part1->getPIDLikelihood()->getProbability(Const::ChargedStable(13), Const::ChargedStable(11));
-
-  // get 3-vectors of the mu/e momenta
-  m_mu0_p = part0->getMomentum();
-  m_mu1_p = part1->getMomentum();
-  */
-
+  m_cmsE = PCmsLabTransform().getCMSEnergy();
 
   getObjectPtr<TTree>("events")->Fill();
 

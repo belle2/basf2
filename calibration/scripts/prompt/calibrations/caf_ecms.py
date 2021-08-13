@@ -226,7 +226,7 @@ def get_calibrations(input_data, **kwargs):
     ma.applyCuts("B0:merged", "R2 < 0.9", path=rec_path_1)
     ma.applyCuts("B-:merged", "R2 < 0.9", path=rec_path_1)
 
-    collector_ecms = register_module('eCmsCollector', Y4SPListName='B0:merged')
+    collector_ecms = register_module('eCmsCollector')
     algorithm_ecms = InvariantMassAlgorithm()
     algorithm_ecms.setOuterLoss(kwargs['expert_config']['outerLoss'])
     algorithm_ecms.setInnerLoss(kwargs['expert_config']['innerLoss'])

@@ -13,37 +13,40 @@ Define minusTwoBeta -0.78
 Define dm 0.507e12
 
 
-Alias MyD- D-
-Alias MyD+ D+
-ChargeConj MyD+ MyD- 
+Alias D-sig D-
+Alias D+sig D+
+ChargeConj D+sig D-sig 
 
-Alias MyB0 B0
-Alias Myanti-B0 anti-B0
-ChargeConj MyB0 Myanti-B0
+Alias B0sig B0
+Alias anti-B0sig anti-B0
+ChargeConj B0sig anti-B0sig
 
-Alias MyK_S0 K_S0
+Alias K_S0sig K_S0
 
 Decay Upsilon(4S)
-1.000    MyB0 Myanti-B0 B0  anti-B0  VSS_BMIX dm;
+1.000    B0sig anti-B0sig B0  anti-B0  VSS_BMIX dm;
 Enddecay
 
-#Decay MyB0
-#1.000    MyD-  MyD+  PHSP;
+# decay w/o CP violation
+#Decay B0sig
+#1.000    D-sig  D+sig  PHSP;
 #Enddecay
-Decay MyB0
-1.000    MyD-  MyD+  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;;
+
+# decay w/ CP violation
+Decay B0sig
+1.000    D-sig  D+sig  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;;
 Enddecay
 
-CDecay Myanti-B0
+CDecay anti-B0sig
 
-Decay MyD-
-0.333    MyK_S0  pi-        PHSP;
-0.333    K+      pi-   pi-  D_DALITZ;
-0.333    MyK_S0  pi-   pi-  pi+     PHSP;
+Decay D-sig
+0.333    K_S0sig  pi-        PHSP;
+0.333    K+       pi-   pi-  D_DALITZ;
+0.333    K_S0sig  pi-   pi-  pi+     PHSP;
 Enddecay
-CDecay MyD+
+CDecay D+sig
 
-Decay MyK_S0
+Decay K_S0sig
 1.000    pi- pi+ PHSP;
 Enddecay
 

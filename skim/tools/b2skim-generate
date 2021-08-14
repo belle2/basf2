@@ -108,6 +108,16 @@ def get_argument_parser():
         ),
     )
 
+    parser.add_argument(
+        "--analysis-globaltag",
+        default="",
+        type=str,
+        metavar="AnalysisGlobaltag",
+        help=(
+            "Analysis globaltag to be passed to the skims."
+        ),
+    )
+
     return parser
 
 
@@ -153,7 +163,8 @@ def main():
         stats=(not args.no_stats),
         hints=(not args.no_user_hints),
         mdstOutput=args.skimmed_mdst_output,
-        backward_compatibility=(not args.no_backward_compatibility)
+        backward_compatibility=(not args.no_backward_compatibility),
+        analysis_globaltag=args.analysis_globaltag
     )
 
     output(CodeString, OutputFilename=args.OutputFilename, skims=skims)

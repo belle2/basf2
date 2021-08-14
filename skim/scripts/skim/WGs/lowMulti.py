@@ -84,7 +84,8 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
 
         # Reconstruct the event candidates with one track plus one cluster
         ma.fillParticleList('e+:' + skim_label_1, single_track_cut + ' and ' + nTracks_cut_1, path=path)
-        ma.fillParticleList('gamma:' + skim_label_1, single_cluster_cut + ' and ' + nTracks_cut_1, path=path)
+        ma.fillParticleList('gamma:' + skim_label_1, single_cluster_cut + ' and ' + nTracks_cut_1, path=path,
+                            loadPhotonBeamBackgroundMVA=False)
         ma.reconstructDecay(
             'vpho:' +
             skim_label_1 +
@@ -154,7 +155,7 @@ class LowMassTwoTrack(BaseSkim):
         ma.fillParticleList(f"pi+:{label}", pCut, path=path)
         ma.fillParticleList(f"K+:{label}", pCut, path=path)
         ma.fillParticleList(f"p+:{label}", pCut, path=path)
-        ma.fillParticleList(f"gamma:{label}_ISR", ISRECut, path=path)
+        ma.fillParticleList(f"gamma:{label}_ISR", ISRECut, path=path, loadPhotonBeamBackgroundMVA=False)
 
         # the mass hypothesis is different for p+, pi+ and K+ lists, so it is good to write them separately.
         ModesAndCuts = [
@@ -230,7 +231,7 @@ class SingleTagPseudoScalar(BaseSkim):
     def load_standard_lists(self, path):
         stdE("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
 
     def build_lists(self, path):
 
@@ -239,7 +240,7 @@ class SingleTagPseudoScalar(BaseSkim):
 
         ma.fillParticleList(f"e+:{label}", f"{TrackCuts} and E > 1.5 and electronID > 0.7", path=path)
         ma.fillParticleList(f"pi+:{label}", f"{TrackCuts} and electronID < 0.7", path=path)
-        ma.fillParticleList(f"gamma:{label}", "clusterE > 0.1", path=path)
+        ma.fillParticleList(f"gamma:{label}", "clusterE > 0.1", path=path, loadPhotonBeamBackgroundMVA=False)
 
         pi0MassWindow = "0.06 < InvM < 0.18"
         etaMassWindow = "0.50 < InvM < 0.60"

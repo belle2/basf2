@@ -9,20 +9,11 @@
 #pragma once
 
 #include <calibration/CalibrationCollectorModule.h>
-
+#include <framework/datastore/StoreObjPtr.h>
 #include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
-#include <pxd/reconstruction/PXDGainCalibrator.h>
-
 #include <pxd/utilities/PXDPerformanceStructs.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/database/DBObjPtr.h>
-#include <pxd/dataobjects/PXDCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
-
-//#include <pxd/dbobjects/PXDClusterChargeMapPar.h>
+#include <pxd/reconstruction/PXDGainCalibrator.h>
 #include <pxd/dbobjects/PXDGainMapPar.h>
 
 #include <string>
@@ -84,19 +75,15 @@ namespace Belle2 {
     int getBinID(const PXD::TrackCluster_t& trackCluster, int uBin, int vBin)
     {
 
-      auto cluster = trackCluster.cluster;
-      auto intersection = trackCluster.intersection;
-      auto x = intersection.x;
-      auto y = intersection.y;
-      auto z = intersection.z;
-      auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+      // Get PXD::TrackPoint_t
+      auto const& tPoint = trackCluster.intersection;
       // Get uBin and vBin from a global point.
-      VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
+      VxdID sensorID = PXD::getVxdIDFromPXDModuleID(trackCluster.cluster.pxdID);
       const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-      auto localPoint = Info.pointToLocal(TVector3(x, y, z));
+      auto localPoint = Info.pointToLocal(TVector3(tPoint.x, tPoint.y, tPoint.z));
       auto uID = Info.getUCellID(localPoint.X());
       auto vID = Info.getVCellID(localPoint.Y());
-      auto iSensor = gTools->getPXDSensorIndex(sensorID);
+      auto iSensor = VXD::GeoCache::getInstance().getGeoTools()->getPXDSensorIndex(sensorID);
       uBin = PXD::PXDGainCalibrator::getInstance().getBinU(sensorID, uID, vID, m_nBinsU);
       vBin = PXD::PXDGainCalibrator::getInstance().getBinV(sensorID, vID, m_nBinsV);
 

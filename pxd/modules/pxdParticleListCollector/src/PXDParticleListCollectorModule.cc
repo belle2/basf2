@@ -8,9 +8,11 @@
 
 #include <pxd/modules/pxdParticleListCollector/PXDParticleListCollectorModule.h>
 
+#include <framework/database/DBObjPtr.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <framework/datastore/RelationArray.h>
 #include <mdst/dbobjects/BeamSpot.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <TTree.h>
 #include <TH1I.h>

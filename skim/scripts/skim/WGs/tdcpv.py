@@ -106,12 +106,12 @@ class TDCPV_qqs(BaseSkim):
     def load_standard_lists(self, path):
         stdK("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)
         loadStdSkimPi0(path=path)
         stdKshorts(path=path)
-        stdPi0s("eff40_May2020", path=path)
+        stdPi0s("eff40_May2020", path=path, loadPhotonBeamBackgroundMVA=False)
 
         loadStdSkimHighEffPhi(path=path)
         loadStdSkimHighEffEta(path=path)
@@ -261,14 +261,14 @@ class TDCPV_ccs(BaseSkim):
         stdK("all", path=path)
         stdMu("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
 
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)
 
         loadStdSkimPi0(path=path)
         stdKshorts(path=path)
-        stdPi0s("eff40_May2020", path=path)
+        stdPi0s("eff40_May2020", path=path, loadPhotonBeamBackgroundMVA=False)
         loadStdSkimHighEffKstar0(path=path)
 
         loadStdJpsiToee(path=path)

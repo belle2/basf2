@@ -17,6 +17,7 @@ from b2test_utils import clean_working_directory, require_file
 import basf2 as b2
 import modularAnalysis as ma
 from skim import CombinedSkim
+from skim.WGs.fei import BaseFEISkim
 from skim.registry import Registry
 
 # NOTE: Another way this test could have been written is to run the standalone steering
@@ -31,15 +32,26 @@ from skim.registry import Registry
 # this test smaller.
 
 
+def is_fei_skim(skim):
+    return isinstance(skim, BaseFEISkim)
+
+
+def is_combined_or_fei_skim(skim):
+    return isinstance(skim, CombinedSkim) or is_fei_skim(skim)
+
+
 def main():
     path = b2.Path()
     mdst_files = glob(f'{b2.find_file("mdst/tests")}/mdst-v*.root')
     mdst_files.sort(reverse=True)
     ma.inputMdstList(require_file(mdst_files[0]), path=path)
 
-    SkimObjects = [Registry.get_skim_function(skim)() for skim in Registry.names]
-    skim = CombinedSkim(*[skim for skim in SkimObjects if not isinstance(skim, CombinedSkim)])
-    skim(path)
+    analysisGlobaltag = ma.getAnalysisGlobaltag()
+    SkimObjects = [Registry.get_skim_function(skim)(analysisGlobaltag=analysisGlobaltag) for skim in Registry.names]
+    skims = CombinedSkim(*[skim for skim in SkimObjects if not is_combined_or_fei_skim(skim)])
+    skims(path)
+    feiSkims = CombinedSkim(*[skim for skim in SkimObjects if is_fei_skim(skim)])
+    feiSkims(path)
 
     b2.process(path, max_event=10)
 

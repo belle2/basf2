@@ -245,15 +245,21 @@ def getJsonFile(skim, sample, TestingCombined):
     """
     LogDirectory = Path("log") / ("combined" if TestingCombined else "single")
 
+    jsonFileName = LogDirectory / skim / sample.encodeable_name / "job.json"
     try:
-        jsonFileName = LogDirectory / skim / sample.encodeable_name / "job.json"
         with open(jsonFileName) as jsonFile:
             jsonFileContents = json.load(jsonFile)
-    except FileNotFoundError:
+    except FileNotFoundError as e:
         raise SkimNotRunException(
             f"    Failed to open output JSON file for {skim} skim on {sample} sample.\n"
             "    Perhaps you forgot to run the skim with ``b2skim-stats-submit``?"
-        )
+        ) from e
+    except json.decoder.JSONDecodeError as e:
+        raise SkimNotRunException(
+            f"    Failed to parse output JSON file for {skim} skim on {sample} sample: {jsonFileName}\n"
+            "    The basf2 job may not have completed successfully. Please try "
+            "rerunning the skim with `b2skim-stats-submit`."
+        ) from e
 
     if not testJsonFile(jsonFileContents):
         raise SkimNotRunException(

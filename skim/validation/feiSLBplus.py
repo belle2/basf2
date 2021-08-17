@@ -26,7 +26,11 @@ import modularAnalysis as ma
 from skim.WGs.fei import feiSLBplus
 
 path = b2.Path()
-skim = feiSLBplus(validation=True, udstOutput=False)
+skim = feiSLBplus(
+    validation=True,
+    udstOutput=False,
+    analysis_globaltag=ma.getAnalysisGlobaltag(),
+)
 
 ma.inputMdstList(
     "default",

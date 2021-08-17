@@ -26,7 +26,11 @@ import modularAnalysis as ma
 from skim.WGs.fei import feiHadronicBplus
 
 path = b2.Path()
-skim = feiHadronicBplus(validation=True, udstOutput=False)
+skim = feiHadronicBplus(
+    validation=True,
+    udstOutput=False,
+    analysis_globaltag=ma.getAnalysisGlobaltag(),
+)
 
 ma.inputMdstList(
     b2.find_file(skim.validation_sample, data_type="validation"),

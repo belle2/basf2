@@ -3479,7 +3479,7 @@ def scaleError(outputListName, inputListName,
     For tracks with a PXD hit, in order to avoid severe underestimation of d0 and z0 errors,
     lower limits (best resolution) can be set in a momentum-dependent form.
     This module is supposed to be used only for TDCPV analysis and for low-momentum (0-3 GeV/c) tracks in BBbar events.
-    Details will be documented in a Belle II note by the Belle II Japan ICPV group.
+    Details will be documented in a Belle II note, BELLE2-NOTE-PH-2021-038.
 
     @param inputListName Name of input charged particle list to be scaled
     @param outputListName Name of output charged particle list with scaled error
@@ -3504,102 +3504,6 @@ def scaleError(outputListName, inputListName,
     scale_error.param('d0MomentumThreshold', d0MomThr)
     scale_error.param('z0MomentumThreshold', z0MomThr)
     path.add_module(scale_error)
-
-
-def scaleErrorKshorts(prioritiseV0=True, fitter='TreeFit',
-                      scaleFactors_V0=[1.125927, 1.058803, 1.205928, 1.066734, 1.047513],
-                      scaleFactorsNoPXD_V0=[1.125927, 1.058803, 1.205928, 1.066734, 1.047513],
-                      d0Resolution_V0=[0.001174, 0.000779],
-                      z0Resolution_V0=[0.001350, 0.000583],
-                      d0MomThr_V0=0.500000,
-                      z0MomThr_V0=0.00000,
-                      scaleFactors_RD=[1.149631, 1.085547, 1.151704, 1.096434, 1.086659],
-                      scaleFactorsNoPXD_RD=[1.149631, 1.085547, 1.151704, 1.096434, 1.086659],
-                      d0Resolution_RD=[0.00115328, 0.00134704],
-                      z0Resolution_RD=[0.00124327, 0.0013272],
-                      d0MomThr_RD=0.500000,
-                      z0MomThr_RD=0.500000,
-                      path=None):
-    '''
-    Reconstruct K_S0 applying helix error correction to K_S0 daughters given by ``modularAnalysis.scaleError``.
-    The ParticleList is named ``K_S0:scaled``
-
-    Considering the difference of multiple scattering through the beam pipe,
-    different parameter sets are used for K_S0 decaying outside/inside the beam pipe (``K_S0:V0/RD``).
-
-    Only for TDCPV analysis.
-
-    @param prioritiseV0         If True K_S0 from V0 object is prioritised over RD when merged.
-    @param fitter               Vertex fitter option. Choose from ``TreeFit``, ``KFit`` and ``Rave``.
-    @param scaleFactors_V0      List of five constants to be multiplied to each of helix errors (for tracks with a PXD hit)
-    @param scaleFactorsNoPXD_V0 List of five constants to be multiplied to each of helix errors (for tracks without a PXD hit)
-    @param d0Resolution_V0      List of two parameters, (a [cm], b [cm/(GeV/c)]),
-                                defining d0 best resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**1.5))**2 }
-    @param z0Resolution_V0      List of two parameters, (a [cm], b [cm/(GeV/c)]),
-                                defining z0 best resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**2.5))**2 }
-    @param d0MomThr_V0          d0 best resolution is kept constant below this momentum
-    @param z0MomThr_V0          z0 best resolution is kept constant below this momentum
-    @param scaleFactors_RD      List of five constants to be multiplied to each of helix errors (for tracks with a PXD hit)
-    @param scaleFactorsNoPXD_RD List of five constants to be multiplied to each of helix errors (for tracks without a PXD hit)
-    @param d0Resolution_RD      List of two parameters, (a [cm], b [cm/(GeV/c)]),
-                                defining d0 best resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**1.5))**2 }
-    @param z0Resolution_RD      List of two parameters, (a [cm], b [cm/(GeV/c)]),
-                                defining z0 best resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**2.5))**2 }
-    @param d0MomThr_RD          d0 best resolution is kept constant below this momentum
-    @param z0MomThr_RD          z0 best resolution is kept constant below this momentum
-
-    '''
-    from vertex import treeFit, kFit, raveFit
-    from stdCharged import stdPi
-    # Load K_S0 from V0 and apply helix error correction to V0 daughters
-    fillParticleList('K_S0:V0 -> pi+ pi-', '', True, path=path)
-    scaler_V0 = register_module("HelixErrorScaler")
-    scaler_V0.set_name('ScaleError_' + 'K_S0:V0')
-    scaler_V0.param('inputListName', 'K_S0:V0')
-    scaler_V0.param('outputListName', 'K_S0:V0_scaled')
-    scaler_V0.param('scaleFactors_PXD', scaleFactors_V0)
-    scaler_V0.param('scaleFactors_noPXD', scaleFactorsNoPXD_V0)
-    scaler_V0.param('d0ResolutionParameters', d0Resolution_V0)
-    scaler_V0.param('z0ResolutionParameters', z0Resolution_V0)
-    scaler_V0.param('d0MomentumThreshold', d0MomThr_V0)
-    scaler_V0.param('z0MomentumThreshold', z0MomThr_V0)
-    path.add_module(scaler_V0)
-
-    cutAndCopyList('K_S0:V0_MassWindow', 'K_S0:V0_scaled', '0.3 < M < 0.7', path=path)
-    # Perform vertex fit and apply tighter mass window
-    if fitter == 'TreeFit':
-        treeFit('K_S0:V0_MassWindow', conf_level=0.0, path=path)
-    elif fitter == 'KFit':
-        kFit('K_S0:V0_MassWindow', conf_level=0.0, path=path)
-    elif fitter == 'Rave':
-        raveFit('K_S0:V0_MassWindow', conf_level=0.0, path=path, silence_warning=True)
-    else:
-        B2ERROR("Valid fitter options for Kshorts are 'TreeFit', 'KFit', and 'Rave'. However, the latter is not recommended.")
-    applyCuts('K_S0:V0_MassWindow', '0.450 < M < 0.550', path=path)
-
-    # Reconstruct a second list
-    stdPi('all', path=path)
-    scaleError('pi+:scaled', 'pi+:all',
-               scaleFactors=scaleFactors_RD,
-               scaleFactorsNoPXD=scaleFactorsNoPXD_RD,
-               d0Resolution=d0Resolution_RD,
-               z0Resolution=z0Resolution_RD,
-               d0MomThr=d0MomThr_RD,
-               z0MomThr=z0MomThr_RD,
-               path=path)
-
-    reconstructDecay('K_S0:RD_scaled -> pi+:scaled pi-:scaled', '0.3 < M < 0.7', 1, True, path=path)
-    # Again perform vertex fit and apply tighter mass window
-    if fitter == 'TreeFit':
-        treeFit('K_S0:RD_scaled', conf_level=0.0, path=path)
-    elif fitter == 'KFit':
-        kFit('K_S0:RD_scaled', conf_level=0.0, path=path)
-    elif fitter == 'Rave':
-        raveFit('K_S0:RD_scaled', conf_level=0.0, path=path, silence_warning=True)
-    applyCuts('K_S0:RD_scaled', '0.450 < M < 0.550', path=path)
-    # Create merged list based on provided priority
-    mergeListsWithBestDuplicate('K_S0:scaled', ['K_S0:V0_MassWindow', 'K_S0:RD_scaled'],
-                                variable='particleSource', preferLowest=prioritiseV0, path=path)
 
 
 def correctEnergyBias(inputListNames, tableName, path=None):

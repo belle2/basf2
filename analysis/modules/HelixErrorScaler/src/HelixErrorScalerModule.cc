@@ -13,6 +13,7 @@
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <vector>
 
@@ -96,8 +97,10 @@ void HelixErrorScalerModule::event()
   RelationArray particlesToMCParticles(m_particles, m_mcparticles);
 
   // new output particle list
-  m_outputparticleList.create();
-  m_outputparticleList->initialize(m_pdgCode, m_outputListName);
+  if (! m_outputparticleList.isValid()) {
+    m_outputparticleList.create();
+    m_outputparticleList->initialize(m_pdgCode, m_outputListName);
+  }
 
   if (! m_scaleKshort) {
     m_outputAntiparticleList.create();
@@ -197,13 +200,13 @@ std::vector<double> HelixErrorScalerModule::getScaleFactors(const Particle* part
   if (trkfit->getHitPatternVXD().getNPXDHits() > 0) {
 
     // d0, z0 resolution = a (+) b / pseudo-momentum
-    TVector3 p = particle->getMomentum();
+    B2Vector3D p = particle->getMomentum();
     double sinTheta = TMath::Sin(p.Theta());
     double pD0 = p.Mag2() / (particle->getEnergy()) * TMath::Power(sinTheta, 1.5); // p*beta*sinTheta**1.5
     double pZ0 = pD0 * sinTheta; // p*beta*sinTheta**2.5
 
-    pD0 = TMath::Max(pD0, m_d0MomThr); // if pD0 is small than threshold, *overwrite* it with the threshold.
-    pZ0 = TMath::Max(pZ0, m_z0MomThr); // if pZ0 is small than threshold, *overwrite* it with the threshold.
+    pD0 = TMath::Max(pD0, m_d0MomThr); // if pD0 is smaller than the threshold, *overwrite* it with the threshold.
+    pZ0 = TMath::Max(pZ0, m_z0MomThr); // if pZ0 is smaller than the threshold, *overwrite* it with the threshold.
     double d0Resol = TMath::Sqrt(TMath::Power(m_d0ResolPars[0], 2) + TMath::Power(m_d0ResolPars[1] / pD0, 2));
     double z0Resol = TMath::Sqrt(TMath::Power(m_z0ResolPars[0], 2) + TMath::Power(m_z0ResolPars[1] / pZ0, 2));
     double d0Err = TMath::Sqrt(trkfit->getCovariance5()[0][0]);

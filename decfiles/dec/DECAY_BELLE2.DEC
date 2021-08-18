@@ -9825,8 +9825,19 @@ Decay eta' # Edited by U. Tamponi, October 2016
 0.002400000   pi+  pi-  e+  e-                             PHSP;
 Enddecay
 
-Decay eta(1405) # Decay table entirely copied from Geant4
-1.000000000   rho+  rho-                                   PHSP;
+Decay eta(1405) # Based on Amsler et al., Eur. Phys. J.C33 (2004) 23, and Adams et al., Phys. Lett. B516 (2001) 264
+0.198000000   a_00  pi0                                    PHSP;
+0.198000000   a_0+  pi-                                    PHSP;
+0.198000000   a_0-  pi+                                    PHSP;
+0.120000000   K*+  K-                                      SVS;
+0.120000000   K*-  K+                                      SVS;
+0.120000000   K*0  anti-K0                                 SVS;
+0.120000000   anti-K*0  K0                                 SVS;
+0.080000000   K+  K-  pi0                                  PHSP;
+0.080000000   K0  anti-K0  pi0                             PHSP;
+0.080000000   anti-K0  K+  pi-                             PHSP;
+0.080000000   K0  K-  pi+                                  PHSP;
+0.038000000   rho0  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;
 Enddecay
 
 Decay phi # Edited by U. Tamponi, October 2016

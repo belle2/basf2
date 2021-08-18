@@ -37,9 +37,18 @@ class BaseSkim(ABC):
     See `writing-skims` for information on how to use this to define a new skim.
     """
 
-    NoisyModules = []
-    """A list of modules which to be silenced for this skim. This may be necessary to
-    set in order to keep log file sizes small."""
+    NoisyModules = None
+    """List of module types to be silenced. This may be necessary in certain skims in
+    order to keep log file sizes small.
+
+    .. tip::
+        The elements of this list should be the module *type*, which is not necessarily
+        the same as the module name. The module type can be inspected in Python via
+        ``module.type()``.
+
+    .. seealso::
+        This attribute is used by `BaseSkim.set_skim_logging`.
+    """
 
     TestSampleProcess = "mixed"
     """MC process of test file. `BaseSkim.TestFiles` passes this property to
@@ -139,6 +148,9 @@ class BaseSkim(ABC):
         self._validation = validation
         self.mc = mc
 
+        if self.NoisyModules is None:
+            self.NoisyModules = []
+
     def load_standard_lists(self, path):
         """
         Load any standard lists. This code will be run before any
@@ -198,7 +210,6 @@ class BaseSkim(ABC):
         """
         self._MainPath = path
 
-        self.set_skim_logging(path)
         self.initialise_skim_flag(path)
         self.load_standard_lists(path)
         self.additional_setup(path)
@@ -217,6 +228,8 @@ class BaseSkim(ABC):
             if self._method_unchanged("validation_histograms"):
                 b2.B2FATAL(f"No validation histograms defined for {self} skim.")
             self.validation_histograms(self._ConditionalPath or path)
+
+        self.set_skim_logging()
 
     @property
     def postskim_path(self):
@@ -374,20 +387,29 @@ class BaseSkim(ABC):
     def __name__(self):
         return self.name
 
-    def set_skim_logging(self, path):
+    def set_skim_logging(self):
         """Turns the log level to ERROR for selected modules to decrease the total size
         of the skim log files. Additional modules can be silenced by setting the attribute
         `NoisyModules` for an individual skim.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
-        """
 
+        .. warning::
+
+            This method works by inspecting the modules added to the path, and setting
+            the log level to ERROR. This method should be called *after* all
+            skim-related modules are added to the path.
+        """
         b2.set_log_level(b2.LogLevel.INFO)
 
         NoisyModules = ["ParticleLoader", "ParticleVertexFitter"] + self.NoisyModules
 
-        for module in path.modules():
+        # Set log level of modules on both main path and conditional path
+        paths = filter(None, (self._MainPath, self._ConditionalPath))
+        modules = [module for path in paths for module in path.modules()]
+
+        for module in modules:
             if module.type() in set(NoisyModules):
                 module.set_log_level(b2.LogLevel.ERROR)
 
@@ -505,7 +527,8 @@ class CombinedSkim(BaseSkim):
 
         self.Skims = skims
         self.name = CombinedSkimName
-        self.NoisyModules = list({mod for skim in skims for mod in skim.NoisyModules}) + NoisyModules
+        for skim in self:
+            skim.NoisyModules += NoisyModules
 
         # empty but needed for functions inherited from baseSkim to work
         self.SkimLists = []
@@ -543,7 +566,6 @@ class CombinedSkim(BaseSkim):
         for skim in self:
             skim._MainPath = path
 
-        self.set_skim_logging(path)
         self.initialise_skim_flag(path)
         self.load_standard_lists(path)
         self.additional_setup(path)
@@ -553,6 +575,7 @@ class CombinedSkim(BaseSkim):
         self._check_duplicate_list_names()
         self.output_udst(path)
         self.output_mdst_if_any_flag_passes(path=path, **self.mdst_kwargs)
+        self.set_skim_logging()
 
     def __iter__(self):
         yield from self.Skims
@@ -687,6 +710,11 @@ class CombinedSkim(BaseSkim):
         """
         for skim in self:
             skim.apply_hlt_hadron_cut_if_required(skim._ConditionalPath or path)
+
+    def set_skim_logging(self):
+        """Run `BaseSkim.set_skim_logging` for each skim."""
+        for skim in self:
+            skim.set_skim_logging()
 
     @property
     def TestFiles(self):

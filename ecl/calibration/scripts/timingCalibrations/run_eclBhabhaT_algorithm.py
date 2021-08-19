@@ -30,7 +30,7 @@
 import os
 import sys
 import ROOT
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 from glob import glob
 import array as arr
@@ -91,8 +91,8 @@ algo.debugFilenameBase = "eclBhabhaTAlgorithm"
 # 643, 655, 8252, 8177, 8185, 8192, 8206, 8224, 8228, 8244])
 # 'i' is a signed integer
 
-set_debug_level(35)
-set_log_level(LogLevel.INFO)   # LogLevel.INFO or LogLevel.DEBUG
+b2.set_debug_level(35)
+b2.set_log_level(b2.LogLevel.INFO)   # b2.LogLevel.INFO or b2.LogLevel.DEBUG
 
 
 exprun_vector = algo.getRunListFromAllData()
@@ -106,14 +106,13 @@ algo.debugFilenameBase = basePathAndName
 b2conditions.reset()
 b2conditions.override_globaltags()
 
-B2INFO("Adding Local Database {} to head of chain of local databases.")
+b2.B2INFO("Adding Local Database {} to head of chain of local databases.")
 b2conditions.prepend_testing_payloads("localdb/database.txt")
-B2INFO("Using Global Tag {}")
-b2conditions.prepend_globaltag("ECL_testingNewPayload_RefCrystalPerCrate")
-b2conditions.prepend_globaltag("master_2020-05-13")
-b2conditions.prepend_globaltag("online_proc11")
-b2conditions.prepend_globaltag("data_reprocessing_proc11")
+b2.B2INFO("Using Global Tag {}")
+b2conditions.prepend_globaltag("dp_recon_release6_patch")
 b2conditions.prepend_globaltag("Reco_master_patch_rel5")
+b2conditions.prepend_globaltag("AIRFLOW_online_snapshot_20210719-124441")
+b2conditions.prepend_globaltag("data_reprocessing_prompt")
 
 
 if (combineRuns):

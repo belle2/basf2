@@ -11,7 +11,7 @@
 """ECL timing calibration that performs the crystal calibrations, one for  the whole set of runs."""
 
 from prompt import CalibrationSettings
-from reconstruction import *
+from reconstruction import prepare_cdst_analysis
 from caf.utils import IoV
 
 

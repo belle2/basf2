@@ -182,13 +182,6 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
   B2DEBUG(22, "Cutflow: no cuts: index = " << cutIndexPassed);
 
 
-  /* Use ECLChannelMapper to get other detector indices for the crystals */
-  /* For conversion from CellID to crate, shaper, and channel ids. */
-
-  // Use smart pointer to avoid memory leak when the ECLChannelMapper object needs destroying at the end of the event.
-  shared_ptr< ECL::ECLChannelMapper > crystalMapper(new ECL::ECLChannelMapper());
-  crystalMapper->initFromDB();
-
 
   // Storage crystal energies
   m_EperCrys.resize(8736);

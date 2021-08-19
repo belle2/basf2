@@ -47,6 +47,9 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
     #: By default, do not add the track fitting to the execution
     fit_tracks = False
 
+    #: By default, do MC track finding and track matching
+    mc_tracking = True
+
     def create_argument_parser(self, **kwds):
         """Convert command-line arguments to basf2 argument list"""
         argument_parser = super().create_argument_parser(**kwds)
@@ -102,15 +105,15 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 tracking_coverage.pop("MinimalPurity")
 
             # Include the mc tracks if the monte carlo data is presentx
-            if 'MCRecoTracksMatcher' not in path:
+            if self.mc_tracking and 'MCRecoTracksMatcher' not in path:
                 # Reference Monte Carlo tracks
                 track_finder_mc_truth_module = basf2.register_module('TrackFinderMCTruthRecoTracks')
 
                 # Track matcher
                 mc_track_matcher_module = basf2.register_module('MCRecoTracksMatcher')
 
-                path.add_module(IfMCRecoTracksNotPresentModule(IfMCParticlesPresentModule(track_finder_mc_truth_module)))
-                path.add_module(IfMCRecoTracksNotPresentModule(IfMCParticlesPresentModule(mc_track_matcher_module)))
+                path.add_module(IfMCParticlesPresentModule(track_finder_mc_truth_module))
+                path.add_module(IfMCParticlesPresentModule(mc_track_matcher_module))
 
             # this ensures that the parameters are set in both cases (if the modules have been added or are already in the path)
             # only check for containment to also cope with the "IfMCParticlesPresentModule" cases correctly

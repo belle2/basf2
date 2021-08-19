@@ -36,6 +36,8 @@ class Full(TrackingValidationRun):
     fit_tracks = False
     # But we need to tell the validation module to use the fit information
     use_fit_information = True
+    # MC track finding and track matching was already performed
+    mc_tracking = False
     # What should be stored in the root file?
     extended = True
     pulls = True

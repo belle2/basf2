@@ -338,7 +338,7 @@ namespace Belle2 {
       double p1 = f1->GetParameter(1);
       double f10 = f1->Eval(10);
       /****************************/
-      //int in = 0; /*how many time inner part change fit limit*/
+      int in = 0; /*how many time inner part change fit limit*/
       int out = 0; /*how many time outer part change fit limit*/
       m_fitFunc->SetParameters(p0, p1, 0, 0, 0, 0, m_XTParam[6], 0);
       double p6default = m_XTParam[6];
@@ -374,7 +374,7 @@ namespace Belle2 {
         if (fabs(par[0] - p0) > max_dif || fabs(f10 - m_fitFunc->Eval(10)) > max_dif2) {
           m_fitflag = 3;
           if (i == 9) std::cout << "ERROR XT FIT inner part" << std::endl;
-          //in += 1;
+          in += 1;
           m_fitFunc->SetParameters(p0, p1, 0, 0, 0, 0, p6default, 0);
           m_fitFunc->SetParLimits(1, 0, 0.08);
           m_tmin -= 0.5;
@@ -414,11 +414,11 @@ namespace Belle2 {
     {
 
       const double p6 = m_fitFunc->GetParameter(6);
-      if (fabs(m_fitFunc->Eval(0))  > 0.2) {
+      if (fabs(m_fitFunc->Eval(0))  > 0.3) {
         B2WARNING("Bad xt function");
         m_fitflag = 0;
         return false;
-      } else if (p6 < 100.0) {
+      } else if (p6 < 50.0) {
         B2WARNING("Unrealistic p6");
         m_fitflag = 0;
         return false;
@@ -440,7 +440,7 @@ namespace Belle2 {
       //  m_tmax = m_XTParam[6] + 100;
       //xtCheb5->SetParameters(0.0, 0.005, 0., 0., 0., 0., m_XTParam[6], 0.001);
       double par[8];
-      m_fitFunc->SetParLimits(7, 0.0001, 0.001);
+      m_fitFunc->SetParLimits(7, 0., 0.001);
       int fitresult = m_h1->Fit("chebyshev5", "QME", "", m_tmin, m_XTParam[6]);
       if (fitresult >= 0) {
         m_h1->GetFunction("chebyshev5")->GetParameters(par);

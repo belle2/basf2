@@ -9829,10 +9829,10 @@ Decay eta(1405) # Based on Amsler et al., Eur. Phys. J.C33 (2004) 23, and Adams 
 0.198000000   a_00  pi0                                    PHSP;
 0.198000000   a_0+  pi-                                    PHSP;
 0.198000000   a_0-  pi+                                    PHSP;
-0.120000000   K*+  K-                                      SVS;
-0.120000000   K*-  K+                                      SVS;
-0.120000000   K*0  anti-K0                                 SVS;
-0.120000000   anti-K*0  K0                                 SVS;
+0.012000000   K*+  K-                                      SVS;
+0.012000000   K*-  K+                                      SVS;
+0.012000000   K*0  anti-K0                                 SVS;
+0.012000000   anti-K*0  K0                                 SVS;
 0.080000000   K+  K-  pi0                                  PHSP;
 0.080000000   K0  anti-K0  pi0                             PHSP;
 0.080000000   anti-K0  K+  pi-                             PHSP;

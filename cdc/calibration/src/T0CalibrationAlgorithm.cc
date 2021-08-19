@@ -1,10 +1,10 @@
 /**************************************************************************
- * basf2 (Belle II Analysis Software Framework)                           *
- * Author: The Belle II Collaboration                                     *
- *                                                                        *
- * See git log for contributors and copyright holders.                    *
- * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
- **************************************************************************/
+- * basf2 (Belle II Analysis Software Framework)                           *
+- * Author: The Belle II Collaboration                                     *
+- *                                                                        *
+- * See git log for contributors and copyright holders.                    *
+- * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+- **************************************************************************/
 #include <cdc/calibration/T0CalibrationAlgorithm.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dbobjects/CDCTimeZeros.h>
@@ -17,6 +17,7 @@
 #include <TF1.h>
 #include <TFile.h>
 #include <TTree.h>
+#include <TStopwatch.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
@@ -93,6 +94,8 @@ void T0CalibrationAlgorithm::createHisto()
   //read data
   const Long64_t nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
+  TStopwatch timer;
+  timer.Start();
   for (Long64_t i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     double xmax = halfCSize[lay] - 0.1;
@@ -106,8 +109,10 @@ void T0CalibrationAlgorithm::createHisto()
     int boardID = cdcgeo.getBoardID(WireID(lay, IWire));
     m_hT0b[boardID]->Fill(t_mea - t_fit);
   }
-
+  timer.Stop();
   B2INFO("Finish making histogram for all channels");
+  B2INFO("Time to fill histograms: " << timer.RealTime() << "s");
+
 }
 
 CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
@@ -269,17 +274,23 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
     }
     fout->Close();
   }
-  B2INFO("Writing constants");
+  B2INFO("Writing constants...");
   write();
 
+  B2INFO("Checking conversion conditons...");
+  double n_below = hm_All->Integral(0, hm_All->GetXaxis()->FindBin(m_offsetMeanDt - 0.5));
+  double n_upper = hm_All->Integral(hm_All->GetXaxis()->FindBin(m_offsetMeanDt + 0.5), hm_All->GetXaxis()->GetNbins() - 1);
+  B2INFO("+ Number of channel which need still need to be calibrated are: " << n_below + n_upper);
+  B2INFO("+ Median of Delta_T - offset:" << hm_All->GetMean() - m_offsetMeanDt << "(requirement: " << m_maxMeanDt << ")");
+  B2INFO("+ RMS of Delta_T dist. :" << hm_All->GetRMS() << "  (Requirement: < " << m_maxRMSDt << ")");
 
-  if (fabs(hm_All->GetMean()) < m_maxMeanDt && fabs(hm_All->GetRMS()) < m_maxRMSDt) {
-    B2INFO("mean " << fabs(hm_All->GetMean()) << " " << m_maxMeanDt);
-    B2INFO("sigma " << fabs(hm_All->GetRMS()) << " " << m_maxRMSDt);
+  if (fabs(hm_All->GetMean() - m_offsetMeanDt) < m_maxMeanDt
+      && fabs(hm_All->GetRMS()) < m_maxRMSDt
+      && n_below + n_upper < m_maxBadChannel) {
+    B2INFO("T0 Calibration Finished:");
     return c_OK;
   } else {
-    B2INFO("mean " << fabs(hm_All->GetMean()) << " " << m_maxMeanDt);
-    B2INFO("sigma " << fabs(hm_All->GetRMS()) << " " << m_maxRMSDt);
+    B2INFO("Need more iteration ...");
     return c_Iterate;
   }
 }

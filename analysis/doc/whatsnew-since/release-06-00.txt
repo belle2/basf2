@@ -16,6 +16,6 @@ Modules
 +++++++
 
  * The :b2:mod:`TrackingMomentum` module has been extended. Now the module can scale track momenta based on phase-space dependent scaling 
-   factors given which are read from payloads according to parameters `tableName` and `scalingFactorName`. The corresponding wrapper function
+   factors given which are read from payloads according to parameters ``tableName`` and ``scalingFactorName``. The corresponding wrapper function
    `scaleTrackMomenta` has been also extended accordingly. 
 

@@ -12,7 +12,7 @@
 import basf2
 import tracking
 
-from tracking.metamodules import IfMCParticlesPresentModule, IfMCRecoTracksNotPresentModule
+from tracking.metamodules import IfMCParticlesPresentModule
 from tracking.run import utilities
 from tracking.run.event_generation import ReadOrGenerateEventsRun
 

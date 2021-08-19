@@ -27,7 +27,7 @@
 #   basf2 run_eclHadronTimeCalibrationValidation_collector.py
 
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 import glob
 import sys
@@ -87,7 +87,7 @@ SAVE_TREE = True
 components = ['CDC', 'ECL']
 
 # == Create path
-main = create_path()
+main = b2.create_path()
 
 add_unpackers = False
 
@@ -121,17 +121,15 @@ prepare_user_cdst_analysis(main)  # for new 2020 cdst format
 ECLtimeCalibValidationCollectorInfo = main.add_module('eclHadronTimeCalibrationValidationCollector', timeAbsMax=TIME_ABS_MAX,
                                                       saveTree=SAVE_TREE)
 
-# ECLtimeCalibValidationCollectorInfo.set_log_level(LogLevel.DEBUG)
-ECLtimeCalibValidationCollectorInfo.set_log_level(LogLevel.INFO)
+ECLtimeCalibValidationCollectorInfo.set_log_level(b2.LogLevel.INFO)     # OR: b2.LogLevel.DEBUG
 ECLtimeCalibValidationCollectorInfo.set_debug_level(36)
 
 
 # == Show progress
 main.add_module('Progress')
 
-# set_log_level(LogLevel.DEBUG)
-set_log_level(LogLevel.INFO)
-set_debug_level(100)
+b2.set_log_level(b2.LogLevel.INFO)
+b2.set_debug_level(100)
 
 # == Configure database
 # reset_database()
@@ -140,21 +138,20 @@ set_debug_level(100)
 b2conditions.reset()
 b2conditions.override_globaltags()
 
-B2INFO("Adding Local Database {} to head of chain of local databases.")
+b2.B2INFO("Adding Local Database {} to head of chain of local databases.")
 b2conditions.prepend_testing_payloads("localdb/database.txt")
-B2INFO("Using Global Tag {}")
-b2conditions.prepend_globaltag("ECL_testingNewPayload_RefCrystalPerCrate")
-b2conditions.prepend_globaltag("master_2020-05-13")
-b2conditions.prepend_globaltag("online_proc11")
-b2conditions.prepend_globaltag("data_reprocessing_proc11")
+b2.B2INFO("Using Global Tag {}")
+b2conditions.prepend_globaltag("dp_recon_release6_patch")
 b2conditions.prepend_globaltag("Reco_master_patch_rel5")
+b2conditions.prepend_globaltag("AIRFLOW_online_snapshot_20210719-124441")
+b2conditions.prepend_globaltag("data_reprocessing_prompt")
 
 
 # == Process events
-# process(main, max_event=350000)  # reasonable stats for one crate
-# process(main, max_event=600000)  # reasonable stats for crystal calibs for proc10
-# process(main, max_event=3000)    # reasonable stats and speed for a quick test
-process(main, max_event=30)        # fast test
-# process(main)                      # process all events
+# b2.process(main, max_event=350000)    # reasonable stats for one crate
+# b2.process(main, max_event=600000)    # reasonable stats for crystal calibs for proc10
+# b2.process(main, max_event=3000)      # reasonable stats and speed for a quick test
+# b2.process(main, max_event=30)        # fast test
+b2.process(main)                      # process all events
 
-print(statistics)
+print(b2.statistics)

@@ -24,7 +24,7 @@ import os
 # Will be used to construct the validation in the automated system, as well as set up the submission web forms.
 
 #: Tells the automated system some details of this script
-settings = ValidationSettings(name='ECL_timing',
+settings = ValidationSettings(name='ECL crystal and crate time calibrations and validations',
                               description=__doc__,
                               download_files=['stdout'],
                               expert_config=None)

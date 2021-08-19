@@ -67,7 +67,7 @@ namespace Belle2 {
 
   private:
     /**
-    * Returns the needed scale factor for particle based on tableName and sfName
+    * Returns the needed scale factor for particle based on tableName and scalingFactorName
     * @param particle
     */
     double getScale(Particle* particle);
@@ -81,7 +81,7 @@ namespace Belle2 {
     std::string m_tableName;
 
     /** Name of the table */
-    std::string m_sfName;
+    std::string m_scalingFactorName;
 
     /** Pointer to the table in DB */
     std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable;

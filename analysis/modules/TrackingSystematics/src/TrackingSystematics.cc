@@ -96,15 +96,15 @@ The module modifies the input particleLists by scaling track momenta as given by
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("scale", m_scale, "scale factor to be applied to 3-momentum", nan(""));
   addParam("tableName", m_tableName, "ID of table used for reweighing", std::string(""));
-  addParam("sfName", m_sfName, "Label for the scale factor in the look up table", std::string("SF"));
+  addParam("scalingFactorName", m_scalingFactorName, "Label for the scale factor in the look up table", std::string("SF"));
 }
 
 void TrackingMomentumModule::initialize()
 {
   if (!isnan(m_scale) && !m_tableName.empty()) {
-    B2FATAL("Exactly one of the parameters, scale or tableName, must be given given, not both!");
+    B2FATAL("It's not allowed to provide both a valid value for the scale parameter and a non-empty table name. Please decide for one of the two options!");
   } else if (isnan(m_scale) && m_tableName.empty()) {
-    B2FATAL("Exactly one of the parameters, scale or tableName, must be given given. Neither was given!");
+    B2FATAL("Neither a valid value for the scale parameter nor a non-empty table name was provided. Please set (exactly) one of the two options!");
   } else if (!m_tableName.empty()) {
     m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_tableName);
 
@@ -158,7 +158,7 @@ double TrackingMomentumModule::getScale(Particle* particle)
     particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
   }
 
-  return particle->getExtraInfo(m_tableName + "_" + m_sfName);
+  return particle->getExtraInfo(m_tableName + "_" + m_scalingFactorName);
 }
 
 

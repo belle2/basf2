@@ -9,9 +9,6 @@
 # Cuts: None
 # Date: 16072021
 
-Alias B+sig B+
-Alias B-sig B-
-ChargeConj B+sig B-sig
 
 Decay Upsilon(4S)
 0.5 B+sig   B-                   VSS;

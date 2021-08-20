@@ -77,6 +77,8 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
 
   const double th0 = 13.12, th1 = 32.98;
   const double ZT = 437, ZI = 434, RI = 431, RIp = 532.2, RC = 1200.4, RT = 1415;
+  const double thinnerPart_translation = 1.95; // translation of the thin inner ring of the support ring
+
   if (b_inner_support_ring) {
     // This object has a (newly) translated part to eliminate overlaps with ARICH - 2021-07.
     zr_t vc1[] = {{ZI - 487, 410 - thinnerPart_translation}, {ZT - (RIp - 410 - 20 / cosd(th0)) / tand(th0), 410 - thinnerPart_translation}, {ZT - (RIp - 410 - 20 / cosd(th0)) / tand(th0), 410}, {ZT, RIp - 20 / cosd(th0)}, {ZT, RIp}, {3., RI}, {3., 418 - thinnerPart_translation}, {ZI - 487, 418 - thinnerPart_translation}};

@@ -34,7 +34,7 @@ if len(sys.argv) == 3:
 else:
     outFile = './truth_charged.root'
 
-inputMdst('default', inFile, path=charged_path)
+inputMdst(inFile, path=charged_path)
 
 # --------------------------------------------------
 # Create and fill final state ParticleLists

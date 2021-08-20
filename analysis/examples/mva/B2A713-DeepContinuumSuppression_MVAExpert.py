@@ -63,7 +63,7 @@ outfile = 'MVAExpert_fullNTuple_' + step + '.root'
 main = basf2.create_path()
 
 # Perform analysis.
-ma.inputMdstList('default', input_file_list, path=main)
+ma.inputMdstList(input_file_list, path=main)
 
 main.add_module('ProgressBar')
 

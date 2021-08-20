@@ -25,6 +25,8 @@ import datetime
 clsSeedSNR = 5
 clsAdjSNR = 3
 clsMinSNR = 0
+clsUnfoldingCoeffU = 0
+clsUnfoldingCoeffV = 0
 now = datetime.datetime.now()
 
 
@@ -44,6 +46,7 @@ class defaultSVDClusteringImporter(b2.Module):
         clsParam.minSeedSNR = clsSeedSNR
         clsParam.minAdjSNR = clsAdjSNR
         clsParam.minClusterSNR = clsMinSNR
+        clsParam.UnfoldingCoeff = clsUnfoldingCoeffV
 
         payload = Belle2.SVDClustering.t_payload(
             clsParam,
@@ -55,7 +58,11 @@ class defaultSVDClusteringImporter(b2.Module):
             "_adj=" +
             str(clsAdjSNR) +
             "_cls=" +
-            str(clsMinSNR))
+            str(clsMinSNR) +
+            "_unfU=" +
+            str(clsUnfoldingCoeffU) +
+            "_unfV=" +
+            str(clsUnfoldingCoeffV))
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -68,7 +75,11 @@ class defaultSVDClusteringImporter(b2.Module):
                     for side in (0, 1):
                         print("setting SVD Clustering parameters for " +
                               str(layerNumber) + "." + str(ladderNumber) + "." + str(sensorNumber) + "." + str(side))
-
+                        if side == 1:
+                            clsParam.UnfoldingCoeff = clsUnfoldingCoeffU
+                        else:
+                            clsParam.UnfoldingCoeff = clsUnfoldingCoeffV
+                        print(clsParam.UnfoldingCoeff)
                         payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, clsParam)
 
         Belle2.Database.Instance().storeData(Belle2.SVDClustering.name, payload, iov)

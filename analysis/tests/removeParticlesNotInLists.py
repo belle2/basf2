@@ -16,7 +16,7 @@ import b2test_utils
 
 main = basf2.create_path()
 
-ma.inputMdst("default", b2test_utils.require_file('analysis/tests/mdst.root'), path=main)
+ma.inputMdst(b2test_utils.require_file('analysis/tests/mdst.root'), path=main)
 
 kaons = ('K-', 'kaonID > 0.05')
 pions = ('pi+', 'pionID > 0.05')

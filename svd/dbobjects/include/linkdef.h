@@ -105,3 +105,16 @@
   targetClass="Belle2::SVDGlobalConfigParameters"\
   target="m_nrFrames"          \
   code="{ m_nrFrames = 6;}" \
+
+// SVDClusterCuts
+// As of version 3, a new data member is added
+// classDef = 2 -> classDef = 3
+// x ->  float UnfoldingCoeff
+// when classDef = 1,2 UnfoldingCoeff = 0
+#pragma read \
+  sourceClass="Belle2::SVDClusterCuts"\
+  source=""\
+  version="[-2]" \
+  targetClass="Belle2::SVDClusterCuts"\
+  target="UnfoldingCoeff"          \
+  code="{ UnfoldingCoeff = 0;}" \

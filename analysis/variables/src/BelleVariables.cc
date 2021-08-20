@@ -241,6 +241,8 @@ namespace Belle2 {
 a momentum-binned selection including requirements on impact parameter of, and
 angle between the daughter pions as well as separation from the vertex and 
 flight distance in the transverse plane.
+
+.. seealso:: `BELLE2-NOTE-PH-2018-017 <https://docs.belle2.org/record/957>`_
 )DOC");
 
     REGISTER_VARIABLE("goodBelleLambda", goodBelleLambda, R"DOC(
@@ -255,7 +257,7 @@ based on:
 It reproduces the ``goodLambda()`` function in Belle.
 
 ``goodBelleLambda`` selection 1 (selected with: ``goodBelleLambda>0``) should be used with ``atcPIDBelle(4,2) > 0.6``,
-and ``goodBelleLambda`` selecton 2 (``goodBelleLambda>1``) can be used without a proton PID cut. 
+and ``goodBelleLambda`` selection 2 (``goodBelleLambda>1``) can be used without a proton PID cut. 
 The former cut is looser than the latter.". 
 
 .. warning:: ``goodBelleLambda`` is not optimized or tested on Belle II data.
@@ -269,8 +271,14 @@ See Also:
 )DOC");
 
     REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma, R"DOC(
-[Legacy] Returns 1.0 if photon candidate passes simple region dependent
-energy selection for Belle data and MC (50/100/150 MeV).
+[Legacy] Returns 1.0 if the photon candidate passes the simple region dependent
+energy selection for Belle data and MC.
+
+.. math::
+
+    E > 50 \textrm{ MeV; barrel}\\
+    E > 100 \textrm{ MeV; forward endcap}\\
+    E > 150 \textrm{ MeV; backward endcap}
 )DOC");
 
     REGISTER_VARIABLE("BelleFirstCDCHitX", BelleFirstCDCHitX, R"DOC(
@@ -298,9 +306,13 @@ energy selection for Belle data and MC (50/100/150 MeV).
 )DOC");
 
     REGISTER_VARIABLE("BellePi0SigM", BellePi0InvariantMassSignificance, R"DOC(
-      [Legacy] Returns the significance of the pi0 mass used in the FEI for B2BII.
-      The significance is calculated as the difference between the reconstructed and the nominal mass divided by the mass uncertainty.
-      Since the pi0's covariance matrix for B2BII is empty, the latter is calculated using the photon daughters' covariance matrices.
+[Legacy] Returns the significance of the :math:`\pi^0` mass used in the FEI for B2BII.
+The significance is calculated as the difference between the reconstructed and the nominal mass divided by the mass uncertainty:
+
+.. math::
+      \frac{m_{\gamma\gamma} - m_{\pi^0}^\textrm{PDG}}{\sigma_{m_{\gamma\gamma}}}
+
+Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is calculated using the photon daughters' covariance matrices.
       )DOC");
 
     // this is defined in ECLVariables.{h,cc}

@@ -6,13 +6,14 @@ Continuum Suppression (CS)
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**:
+    **Teaching**: 1 hour
 
-    **Exercises**:
+    **Exercises**: 1.5 hours
 
     **Prerequisites**:
 
-    	* None
+    	* :ref:`onlinebook_basf2_introduction` lesson
+    	* :ref:`onlinebook_roe` lesson
 
     **Questions**:
 
@@ -67,7 +68,7 @@ detector.
     Which of these two pictures better represents the distribution (shape) of particles you would expect in a BB event?
     Which represents a continuum event?
 
-    .. figure:: figs/continuum_without_labels.png
+    .. figure:: cs/continuum_without_labels.png
         :width: 40em
         :align: center
 
@@ -83,7 +84,7 @@ detector.
     The continuum particles are strongly collimated due to the large available momentum for the decay to light hadrons.
     In contrast, the particles from the BB event are uniformly distributed.
 
-    .. figure:: figs/continuum_with_labels.png
+    .. figure:: cs/continuum_with_labels.png
         :width: 40em
 
         (Credit: Markus Röhrken)
@@ -196,7 +197,7 @@ If this doesn't work you can find the files in ``/sw/belle2/examples-data/starte
 
     .. literalinclude:: steering_files/090_cs.py
         :language: python
-        :lines: -34
+        :lines: -33
 
 
 .. admonition:: Exercise
@@ -221,7 +222,7 @@ If this doesn't work you can find the files in ``/sw/belle2/examples-data/starte
 
     .. literalinclude:: steering_files/090_cs.py
         :language: python
-        :lines: 35-44
+        :lines: 34-43
 
 
 .. admonition:: Exercise
@@ -240,7 +241,7 @@ If this doesn't work you can find the files in ``/sw/belle2/examples-data/starte
 
     .. literalinclude:: steering_files/090_cs.py
         :language: python
-        :lines: 46-62
+        :lines: 45-61
 
 Now that we have created our ntuple, we can look at the data and see how well the variables suppress continuum.
 
@@ -264,32 +265,13 @@ Now that we have created our ntuple, we can look at the data and see how well th
 .. admonition:: Solution
     :class: toggle solution
 
-    .. code-block:: python
-
-        # Include this only if running in a Jupyter notebook
-        %matplotlib inline
-
-        import matplotlib.pyplot as plt
-        from root_pandas import read_root
-
-        df = read_root('ContinuumSuppression.root')
-
-        fig, ax = plt.subplots()
-
-        signal_df = df.query('(isContinuumEvent == 0.0)')
-        continuum_df = df.query('(isContinuumEvent == 1.0)')
-
-        n, bins, patches = ax.hist(signal_df['R2'], bins=30, range=(0, 1), label='Not Continuum', histtype='step')
-        n, bins, patches = ax.hist(continuum_df['R2'], bins=30, range=(0, 1), label='Continuum', histtype='step')
-        ax.set_xlabel('R2')
-        ax.set_ylabel('Total number of candidates')
-        ax.legend()
-        fig.savefig('R2.pdf')
-
+    .. literalinclude:: cs/plotting_R2.py
+        :language: python
+        :linenos:
 
     Your plot should look similar to this:
 
-    .. figure:: figs/R2_uubar.png
+    .. figure:: cs/R2_uubar.png
         :width: 40em
         :align: center
 
@@ -308,7 +290,7 @@ Now that we have created our ntuple, we can look at the data and see how well th
 
     The separation becomes worse as the charmed hadrons are heavier and have less momentum:
 
-    .. figure:: figs/R2_ccbar.png
+    .. figure:: cs/R2_ccbar.png
         :width: 40em
         :align: center
 
@@ -316,10 +298,289 @@ So how do we separate our signal component from continuum background in the pres
 have seen with the five variables we have introduced so far, none of them can provide perfect separation.
 Fortunately, there is a solution to this: Boosted Decision Trees!
 
-[To be continued...]
+
+Continuum suppression using Boosted Decision Trees
+--------------------------------------------------
+
+Boosted Decision Trees (BDTs) are a specific type of a machine learning model
+used for classification tasks. In this lesson we try to classify all candidates as
+either continuum or not continuum.
+
+The name *decision tree* refers to the general structure: the classification is
+done with a series of "decisions". Decisions are logical operations (like ">",
+"<", "=", etc.) on the input variables of each data point, by the outcome of
+which the data points are separated into groups. Each outcome has a separate
+line of decisions following it. The maximum number of such decisions is called the
+"tree depth".
+
+The word *boosted* refers to the specific way the tree is formed: gradient
+boosting. Gradient boosting means, that a final tree is made by combining a
+series of smaller trees of a fixed depth.
+
+.. seealso:: The reader is welcome to consult the Wikipedia pages on `Decision
+    Tree Learning <https://en.wikipedia.org/wiki/Decision_tree_learning>`_ and
+    `Gradient Tree Boosting
+    <https://en.wikipedia.org/wiki/Gradient_boosting#Gradient_tree_boosting>`_
+    for a more detailed overview. For details on ``FastBDT``, the implementation used at
+    at Belle II take a look at this `article
+    <https://link.springer.com/article/10.1007/s41781-017-0002-8>`_. The
+    source code can be found `here <https://github.com/thomaskeck/FastBDT/>`_.
+
+The output of the BDT  is the "continuum probability" -- the
+probability of an event being a continuum event, as estimated based on the input variables. The input variables can be in
+principle any variable that looks different between continuum and non-continuum
+events. The recommended and most commonly used variables are the ones introduced in
+the previous lesson as well as others from the *Continuum Suppression* variable group in
+the :ref:`analysis/doc/index-01-analysis:Variables`.
+
+The BDT is a supervised machine learning method, i.e. it needs to be trained on a
+dataset where we know the true class that we are trying to predict (this variable
+is called the *target variable*). Thus the
+steps are
+
+1. Create a learning dataset (Monte Carlo data)
+2. Make the algorithm "learn" and output a decision tree that we can use.
+3. Apply the trained decision tree to both Monte Carlo and real data.
+
+In the last step, the BDT will return the continuum
+probability, which then can be stored in the Ntuples. To actually remove
+continuum events, simply add a cut on the continuum probability at the end.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    In the three initial exercises of this chapter you've learned how to create
+    Ntuples for continuum suppression. We only need some more variables
+    this time.
+
+    Create the dataset following the procedure from previous exercises,
+    but also include KSFW moments and CLEO cones
+    into the Ntuples.
+
+    Use only the first half of the events for creating these Ntuples.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Use the code from the previous exercises. Add
+    the new variables to the ``simpleCSVariables`` list. See the documentation on the
+    variables in :ref:`analysis/doc/ContinuumSuppression:Continuum suppression`.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    The files *uubar_sample.root* and *B02ks0pi0_sample.root* consist of 2000
+    and 30000 events respectively. You can choose half for each by using the
+    ``entrySequences`` option in the ``inputMdstList`` function. See the
+    documentation at :ref:`mawrappers`.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    .. literalinclude:: steering_files/091_cs.py
+       :language: python
+       :linenos:
+
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Let us now create the script to train the BDT using the Ntuples that we've just
+    created. The training tools are implemented in basf2 within the
+    :ref:`mva/doc/index-01-mva:MVA package`. One needs to configure the global
+    options and then perform the training (see :ref:`mva/doc/index-01-mva:globaloptions`
+    and :ref:`mva/doc/index-01-mva:Fitting / Howto perform a training`
+    respectively). Using the examples given in the links write down the script
+    to perform the training.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    The training script does not require creating a basf2 path and hence has no
+    ``basf2.process()`` at the end. The script is sufficient when the
+    ``basf2_mva.teacher()`` is defined.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Use the general options example from the documentation. Make sure to set
+    ``m_datafiles`` (the Ntuple we created), ``m_target_variable`` (what are we trying
+    to predict?) and
+    ``m_variables`` (the training variables) to the appropriate
+    values.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    We are trying to predict ``isContinuumEvent`` using all the variables from
+    ``simpleCSVariables``.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    .. literalinclude:: steering_files/092_cs.py
+                :language: python
+                :linenos:
+
+To use the trained weights, we need to use the MVA-expert module after building
+the continuum suppression in the main steering file. In our case this looks
+like this:
+
+.. code-block:: python
+
+    path.add_module(
+         "MVAExpert",
+         listNames=["B0"],
+         extraInfoName="ContinuumProbability",
+         identifier="MVAFastBDT.root"  # <-- the BDT training that we just performed
+    )
+
+This creates the variable ``extraInfo(ContinuumProbability)``, which
+should be added as an output variable to the Ntuples. To actually suppress continuum
+we put a cut on the ``extraInfo(ContinuumProbability)``
+in the very same way that we previously did a cut on R2 in previous exercise.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Create a steering file that runs over the data and writes the continuum
+    probability into the Ntuples. Use the data files and reconstruction from the
+    previous exercises.
+
+    Use the second half of the data from the datafiles.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Use the steering file from the previous exercises, just with the ``path.add_module("MVAExpert", ...)``
+    added at the end. Don't forget to change ``path`` to ``main`` or
+    whatever is the name of your basf2 path.
+
+    We recommend to add aliases to your variables. For example ``ContProb`` for
+    ``extraInfo(ContinuumProbability)``.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    In case you've forgotten, the files ``uubar_sample.root`` and ``B02ks0pi0_sample.root``
+    consist of 2000 and 30000 events respectively. You can choose half for each
+    by using the ``entrySequences`` option in the ``inputMdstList`` function.
+    See the documentation at :ref:`mawrappers`.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    .. literalinclude:: steering_files/093_cs.py
+        :language: python
+        :linenos:
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Plot the distribution of the ``extraInfo(ContinuumProbability)``
+    for continuum and non-continuum events, as defined by the `isContinuumEvent`
+    (similarly to what was done before with :b2:var:`R2`).
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Use the plotting script from the previous exercises,
+    but with the `R2` being replaced with the continuum probability.
+
+    To find out the right column name for the continuum probability, you can
+    always check ``print(<yourdataframename>.columns)``.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    .. literalinclude:: cs/plotting.py
+        :language: python
+        :linenos:
+
+    The resulting plot should look similar to this one:
+
+    .. figure:: cs/ContinuumProbability_uubar.png
+        :width: 40em
+        :align: center
+
+The MVA package also has a built-in tool named ``basf2_mva_evaluate.py`` that
+produces several useful graphs that characterise the
+performance of your MVA. You can find its description at the :ref:`mva` page.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Use the MVA evaluation function to create plots characterizing your MVA training.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    Run
+
+    .. code-block:: python
+
+        basf2_mva_evaluate.py -id MVAFastBDT.root \
+            -train ContinuumSuppression.root \
+            -data ContinuumSuppression_applied.root \
+            -o evaluate.zip
+
+    This creates ``evaluate.zip`` that can be unzipped with
+    with ``unzip evaluate.zip``.
+    Inside you will find the plots in pdf format and a ``latex.tex`` file that
+    can be used to compile a single pdf that includes all the plots (see next
+    exercise)
+
+.. warning:: For the evaluation to be possible, both test and training datasets
+    have to include all the variables that were used in the BDT training.
+
+.. admonition:: Exercise (optional)
+    :class: exercise stacked
+
+    If you have a running Tex distribution on your local machine, you can also
+    generate a PDF report that includes all the plots.
+    Note that you might have to install some additional
+    LaTeX packages first. To generate the PDF, compile the ``latex.tex`` file from
+    the ``evaluate.zip`` archive with a ``pdflatex``.
+
+    There is also an option to create a pdf file straight ahead if you happen to
+    have a ``basf2`` installation AND all the necessary LaTeX packages on the same
+    machine. For that you can add a ``-c`` option and run:
+
+    .. code-block:: python
+
+        basf2_mva_evaluate.py -id MVAFastBDT.root \
+            -train ContinuumSuppression.root \
+            -data ContinuumSuppression_applied.root \
+            -c -o evaluate.pdf
+
+
+.. seealso:: The MVA package has many more features. You are welcome
+    to read more about them at :ref:`mva` and also consult the
+    literature listed at the end of that page.
+
+
+Normally in an analysis, a small subset of the dataset is used to train the BDT.
+The training dataset should be large enough for the performance on the trained data and testing
+data (the MC data that isn't used for training) to be roughly the same.
+Once this is achieved, the trained
+BDT is used further on in the analysis to apply the continuum suppression.
+
+In some few exceptions, only a loose R2 cut is used rather than training a BDT
+(e.g. in this `Belle II paper <https://arxiv.org/abs/2008.08819>`_).
+This might be done for practical reasons such as dealing with a low amount of data.
+
+Also keep in mind that using a BDT (with several selection variables) increases the dependence on your
+MC modeling (real data might behave differently for some of these variables than in MC simulation),
+so you might have to give an uncertainty and possibly make corrections.
+If a cut on `R2` separates continuum good enough, then you only have to make sure there is good agreement between
+data and MC on this variable, but if you use 30 variables in a BDT you will have to check all 30 at some point.
 
 .. include:: ../lesson_footer.rstinclude
 
 .. topic:: Authors of this lesson
 
-    Moritz Bauer
+   Moritz Bauer, Yaroslav Kulii
+
+.. topic:: Code contributors
+
+   Pablo Goldenzweig, Ilya Komarov

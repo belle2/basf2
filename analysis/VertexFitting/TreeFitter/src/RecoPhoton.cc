@@ -217,7 +217,7 @@ namespace TreeFitter {
     p.getH()(1, posindex + m_i2) = 0;
     p.getH()(1, posindex + m_i3) = -1.0;
 
-    // elim already devided by p_vec[m_i1]
+    // elim already divided by p_vec[m_i1]
     p.getH()(0, momindex + m_i1) = p_vec[m_i2] * elim / p_vec[m_i1];
     p.getH()(0, momindex + m_i2) = -1. * elim;
     p.getH()(0, momindex + m_i3) = 0;

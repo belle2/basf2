@@ -32,11 +32,6 @@ SVDB4CommissioningPlotsModule::SVDB4CommissioningPlotsModule() : Module()
   addParam("TrackFitResultListName", m_TrackFitResultName, "Name of TracksFitResult Store Array.", std::string("TrackFitResults"));
 }
 
-SVDB4CommissioningPlotsModule::~SVDB4CommissioningPlotsModule()
-{
-
-}
-
 void SVDB4CommissioningPlotsModule::initialize()
 {
 
@@ -336,10 +331,4 @@ void SVDB4CommissioningPlotsModule::endRun()
 
   }
 
-}
-
-
-
-void SVDB4CommissioningPlotsModule::terminate()
-{
 }

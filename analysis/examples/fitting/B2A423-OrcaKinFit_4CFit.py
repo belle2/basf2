@@ -41,8 +41,7 @@ from stdPhotons import stdPhotons
 mypath = b2.create_path()
 
 # load input ROOT file
-inputMdst(environmentType='default',
-          filename=b2.find_file('Y4SEventToetaY1S-evtgen_100.root', 'examples', False),
+inputMdst(filename=b2.find_file('Y4SEventToetaY1S-evtgen_100.root', 'examples', False),
           path=mypath)
 
 # Creates a list of good photon and mu

@@ -25,10 +25,10 @@ information, please check `Belle 2 Questions <https://questions.belle2.org>`_.
 
    whatsnew
    build/tools_doc/index*
+   online_book/index*
    framework/doc/index*
    */doc/index*
    framework/doc/atend*
-   online_book/index*
 
 .. only:: format_html
 

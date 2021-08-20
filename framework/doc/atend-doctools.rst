@@ -267,10 +267,10 @@ http://www.sphinx-doc.org/en/stable/ext/example_google.html
 
 
 
-Add Basf2 Modules Documentation to Sphinx
+Add basf2 Modules Documentation to Sphinx
 -----------------------------------------
 
-Basf2 Module documentation can be added to sphinx automatically using
+basf2 Module documentation can be added to sphinx automatically using
 
 .. rst:directive:: b2-modules
 
@@ -340,7 +340,7 @@ it to make sure it actually links to the correct thing and not a python
 function with the same name.
 
 
-Add Basf2 Variables Documentation to Sphinx
+Add basf2 Variables Documentation to Sphinx
 -------------------------------------------
 
 We can also add documentation for basf2 variables with a very similar syntax to modules:

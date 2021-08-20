@@ -35,11 +35,6 @@ SVDOccupancyAnalysisModule::SVDOccupancyAnalysisModule() : Module()
   addParam("ShaperDigitsName", m_ShaperDigitName, "Name of ShaperDigit Store Array.", std::string(""));
 }
 
-SVDOccupancyAnalysisModule::~SVDOccupancyAnalysisModule()
-{
-
-}
-
 void SVDOccupancyAnalysisModule::initialize()
 {
 
@@ -220,12 +215,6 @@ void SVDOccupancyAnalysisModule::event()
 
   (m_hit->getHistogram(0))->Reset();
   (m_hit->getHistogram(1))->Reset();
-
-}
-
-
-void SVDOccupancyAnalysisModule::terminate()
-{
 
 }
 

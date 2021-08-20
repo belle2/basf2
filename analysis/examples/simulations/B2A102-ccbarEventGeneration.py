@@ -12,13 +12,13 @@
 #                                                                        #
 # Stuck? Ask for help at questions.belle2.org                            #
 #                                                                        #
-# e+e- -> ccbar -> D*+ antyhing event generation                         #
+# e+e- -> ccbar -> D*+ anything event generation                         #
 #                                                                        #
 # This tutorial demonstrates how to generate                             #
 #                                                                        #
 # e+e- -> ccbar -> D*+ anything                                          #
 #                                                                        #
-# events with EvtGen in BASF2, where the decay of D*+                    #
+# events with EvtGen in basf2, where the decay of D*+                    #
 # is specified by the given .dec file.                                   #
 #                                                                        #
 # The generated events are saved to the output ROOT file.                #
@@ -36,7 +36,7 @@ import generators as ge
 my_path = b2.create_path()
 
 # generation of 100 events according to the specified DECAY table
-# e+e- -> ccbar -> D*+ anthing
+# e+e- -> ccbar -> D*+ anything
 # D*+ -> D0 pi+; D0 -> K- pi+
 #
 ma.setupEventInfo(100, path=my_path)

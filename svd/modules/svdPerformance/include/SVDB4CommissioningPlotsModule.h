@@ -41,14 +41,16 @@ namespace Belle2 {
 
   public:
 
+    /** constructor */
     SVDB4CommissioningPlotsModule();
 
-    virtual ~SVDB4CommissioningPlotsModule();
-    virtual void initialize() override;
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
+    /** destructor */
+    virtual ~SVDB4CommissioningPlotsModule() {};
+
+    virtual void initialize() override; /**< check StoreArrays & create rootfile */
+    virtual void beginRun() override; /**< create histograms */
+    virtual void event() override; /**< fill histograms */
+    virtual void endRun() override; /**< write histogrmas */
 
     std::string m_ShaperDigitName; /**< SVDSHaperDigit StoreArray name*/
     std::string m_RecoDigitName; /**< SVDRecoDigit StoreArray name*/

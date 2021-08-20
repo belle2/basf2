@@ -28,7 +28,7 @@ class TestTreeFits(unittest.TestCase):
 
         inputfile = b2test_utils.require_file(
             'analysis/1000_B_Jpsi_ks_pipi.root', 'validation', py_case=self)
-        ma.inputMdst('default', inputfile, path=main)
+        ma.inputMdst(inputfile, path=main)
 
         ma.fillParticleList('pi+:a', 'pidProbabilityExpert(211, ALL) > 0.5', path=main)
 

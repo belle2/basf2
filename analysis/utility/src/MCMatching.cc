@@ -86,7 +86,7 @@ int MCMatching::findCommonMother(const MCParticle* mcP, const vector<int>& first
 bool MCMatching::setMCTruth(const Particle* particle)
 {
   //if extra-info is set, we already handled this particle
-  //TODO check wether this actually speeds things up or not
+  //TODO check whether this actually speeds things up or not
   if (particle->hasExtraInfo(c_extraInfoMCErrors))
     return true;
 

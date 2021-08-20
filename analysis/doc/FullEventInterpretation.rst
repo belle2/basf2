@@ -152,7 +152,7 @@ Code structure
 
 In my opinion the best way to use and learn about the FEI is to read the code itself. I wrote an extensive documentation. Hence I describe here the code structure. If you don't want to read code, you can just skip this part.
 
-The FEI is completely written in Python and does only use general purpose BASF2 modules. You can find the code under: ``analysis/scripts/fei/``
+The FEI is completely written in Python and does only use general purpose basf2 modules. You can find the code under: ``analysis/scripts/fei/``
 
 config.py
 *********
@@ -325,7 +325,7 @@ In general a FEI training steering file consists of
 
 * a decay channel configuration usually you can just use the default configuration in fei.get_default_channels. This configuration defines all the channels which should be reconstructed, the cuts, and the mva methods. You can write your own configuration, just take a look in ``analysis/scripts/fei/default_channels.py``
 * a FeiConfiguration object, this defines the database prefix for the weightfiles and some other things which influence the training (e.g. if you want to run with the monitoring)
-* a feistate object, which contains the BASF2 path for the current stage, you get this with the get_path function
+* a feistate object, which contains the basf2 path for the current stage, you get this with the get_path function
 
 The user is responsible for writing the input and output part of the steering file. Depending on the training mode (generic / specific) this part is different for each training (see below for examples).
 The FEI algorithm itself just assumes that the DataStore already contains a valid reconstructed event, and starts to reconstruct B mesons. During the training the steering file is executed multiple times. The first time it is called with the Monte Carlo files you provided, and the complete DataStore is written out at the end. The following calls must receive the previous output as input.
@@ -428,6 +428,20 @@ should be replaced with:
                 run_min, run_max = min(run_range), max(run_range)
             else:
                 experiment_min, experiment_max, run_min, run_max = -1, -1, -1, -1
+
+* JIRA issue `BIIDCD-1408 <https://agira.desy.de/browse/BIIDCD-1408>`_. Please incorporate the changes documented further below to be able to download output files from `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ jobs in case there was a failed attempt and therefore an input file list is created for the ``gb2_ds_get`` command by `b2luigi <https://b2luigi.readthedocs.io/en/latest/>`_.
+
+Within the file ``BelleDIRAC/Client/controllers/datasetCLController.py`` in function ``get(...)``, the line
+
+.. code-block:: python
+
+                [lfns_new['Value'].append(line[:-1]) for lfn in lfns['Value'] if line[:-1] == lfn]
+
+should be replaced with:
+
+.. code-block:: python
+
+                [lfns_new['Value'].append(line.strip()) for lfn in lfns['Value'] if line.strip() == lfn]
 
 After installing all prerequisites, you would need to get the example `feiongridworkflow <https://stash.desy.de/users/aakhmets/repos/feiongridworkflow/browse>`_:
 
@@ -575,7 +589,7 @@ or only on a subset of events from one single file (event-based processing). The
         0: {"type": "file_based"},
         1: {"type": "file_based"},
         2: {"type": "file_based"},
-        3: {"type": "event_based", "n_events": 100000},  # usually 1/2 of a file
+        3: {"type": "event_based", "n_events": 50000},  # usually 1/4 of a file
         4: {"type": "event_based", "n_events": 50000},  # usually 1/4 of a file
         5: {"type": "event_based", "n_events": 20000},  # usually 1/10 of a file
         6: {"type": "event_based", "n_events": 10000},  # usually 1/20 of a file
@@ -600,7 +614,7 @@ therefore this is only done once.
 After the database ``files_database.json`` is created, the maximum number of events stored in the files is determined per dataset corresponding to a single line in the original dataset list.
 Based on these numbers, and the value of ``n_events`` in the ``processing_type`` dictionary for a considered stage, the number of instances of ``FEIAnalysisTask`` to be spawned is computed
 for each single dataset. Furthermore, the corresponding `basf2` option values for ``-n`` and ``--skip-events``, and
-a partial dataset list are constructed and then passed to the corresponding ``FEIAnalysisTask`` instance, which is extented with further properties ``process_events`` and ``skip_events`` to pass
+a partial dataset list are constructed and then passed to the corresponding ``FEIAnalysisTask`` instance, which is extended with further properties ``process_events`` and ``skip_events`` to pass
 them to `basf2`.
 
 The options ``-n`` and ``--skip-events`` of `basf2` take care automatically of cases, when the number of remaining events to be processed from a file is smaller than configured by ``-n`` or
@@ -756,7 +770,7 @@ The reason for doing it currently with ``PrepareInputsTask`` by hand, is that th
 storage elements is introduced to `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_, the option ``--input_sandboxfiles`` can then be used directly and this would make the
 module ``PrepareInputsTask`` obsolete.
 
-Another possibile improvement of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ which is currently considered by the developers is the possibility to start merging jobs on the grid.
+Another possible improvement of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ which is currently considered by the developers is the possibility to start merging jobs on the grid.
 This would allow for performing ``MergeOutputsTask`` on the grid with the potential to speed up this part of the workflow, avoiding the time spent for downloads and merging on the local machine.
 
 In general, it is good to have a look at the process of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ developments and extend the workflow and/or

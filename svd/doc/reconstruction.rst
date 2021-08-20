@@ -16,7 +16,7 @@ Clustering
 ----------
 The first step of reconstruction after unpacking (or simulation) is the clustering, i.e. grouping adjacent strips into ``RawCluster``. All acquired strips are good for clustering since the minimum value of SNR corresponds to the online zero-suppression cut: SNR > 3.
 A ``RawCluster`` is promoted to ``SVDCluster`` if there is at least one strip in the cluster with SNR > 5.
-The parameters for clustering are stored in the :ref:`SVDClusterCuts<svdclustercuts>` DBObject.
+The parameters for clustering are stored in the :ref:`SVDClustering<svdclustercuts>` DBObject.
 
 Cluster Charge Reconstruction
 -----------------------------
@@ -29,7 +29,7 @@ We have two alternative algorithms to compute the cluster charge that can be sel
 
 #. ``SumSamples``: the strip charge is evaluated as the sum of the 6 samples in ADC, converted in :math:`e^{-}` with the help of the :ref:`SVDPulseShapeCalibrations<svdpulsecal>` DBObject and then the cluster charge is the computed as the sum of the strip charges.
 
-#. ``ELS3``: first all strips in the cluster are summed sample by sample. Then the 3 best consecutive summed-samples are found with the `MaxSum`_ algorithm and the maximum :math:`A` of the theoretical CR-RC waveform (with :math:`\tau = 55\ \rm ns`):
+#. ``ELS3``: first, all strips in the cluster are summed sample by sample. Then, the 3 best consecutive summed-samples are found with the `MaxSum`_ algorithm and the maximum :math:`A` of the theoretical CR-RC waveform (with :math:`\tau = 55\ \rm ns`):
 
    .. _svdcrrc:
 
@@ -55,19 +55,18 @@ We have two alternative algorithms to compute the cluster charge that can be sel
 
 **The MaxSum Algorithm**:
 
-#. Find the two consecutive samples for which :math:`(a_{i} + a_{i+1})` represents the maximum, where :math:`a_{j}` is the amplitude of j-th sample.
-
 .. _svdff:
 
-#. The three chosen samples are: :math:`a_{i-1}, a_{i},  a_{i+1}`, with :math:`i-1 = FF`, the ``FirstFrame``.
-#. There will be cases in which :math:`i = 0`, in this case the three chosen samples are :math:`a_0 , a_1 , a_2` with :math:`FF=0`.
+#. find the two consecutive samples for which :math:`(a_{i} + a_{i+1})` represents the maximum, where :math:`a_{j}` is the amplitude of j-th sample.
+#. the three chosen samples are: :math:`a_{i-1}, a_{i},  a_{i+1}`, with :math:`i-1 = FF`, the ``FirstFrame``.
+#. in case in which :math:`i = 0`, the three chosen samples are :math:`a_0 , a_1 , a_2` with :math:`FF=0`.
 
 
 Cluster Time Reconstruction
 ---------------------------
 The cluster time is a measurement of the time of the hit (with respect to the trigger signal).
 
-The **default** algorithm used to compute cluster time is the ``CoG3``: first all strips in the cluster are summed sample by sample, and the 3 best consecutive summed-samples are determined using the `MaxSum`_ algorithm. Then, the raw cluster time is the average of the 3 best summed-samples time with the sample charge:
+The **default** algorithm used to compute cluster time is the ``CoG3``: first, all strips in the cluster are summed sample by sample, and the 3 best consecutive summed-samples are determined using the `MaxSum`_ algorithm. Then, the raw cluster time is the average of the 3 best summed-samples time with the sample charge:
 
 .. math::
 
@@ -76,7 +75,7 @@ The **default** algorithm used to compute cluster time is the ``CoG3``: first al
 where the :math:`\Delta t \simeq 31.44` ns is the sampling period of the APV readout chip and  :math:`a_{j}` is the amplitude of j-th summed-sample.
 
 
-The raw time is finally calibrated with a third order polynomial stored in the :ref:`SVDCoG3SampleTimeCalibration<svdcog3timecal>` DBObject.
+The raw time is finally calibrated with a third order polynomial stored in the :ref:`SVDCoG3SampleTimeCalibration<svdcog3timecal>` DBObject, see :ref:`svdtimecalib` for more details on the calibration.
 
 We have two alternative algorithms to compute the cluster time that can be selected by setting the :b2:mod:`SVDClusterizer` parameter ``timeAlgorithm{3/6}Samples``. 
 
@@ -125,7 +124,7 @@ For one-strip clusters the position is the position of the strip, i.e. the posit
 
 For more-than-one strip clusters we have two algorithms:
 
-* center-of-gravity ``CoG``, the cluster position is computed averaging the strip position weighted with the strip charge:
+1) center-of-gravity ``CoG``, the cluster position is computed averaging the strip position weighted with the strip charge:
 
   .. math::
 
@@ -133,7 +132,7 @@ For more-than-one strip clusters we have two algorithms:
 
   where :math:`x_i` is the strip position and :math:`S_i` is the strip charge.
 
-* analog-head-tail ``AHT``:
+2) analog-head-tail ``AHT``:
 
   .. math::
 
@@ -145,15 +144,16 @@ The available algorithms to determine the strip charge for the position computat
 
 
 In the current **default** reconstruction the ``CoG`` is used for cluster size > 1 (``AHT`` is not used).
+Indeed, the ``SVDClusterizer`` supports the following position reconstruction algorithms (that can be passed as string, see the :b2:mod:`SVDClusterizer` parameter ``positionAlgorithm{3/6}Samples`` parameter)
+
+1) ``CoGOnly`` (**current default**): the ``CoG`` is used for all cluster sizes :math:`\ge2` (``AHT`` is not used), error scale factors (= 1 for data and MC) are stored in :ref:`SVDCoGOnlyErrorScaleFactors<svdcogonlycal>`.
+
+2) ``OldDefault``: ``CoG`` for cluster size = 2 and ``AHT`` for cluster sizes > 2 (error scale factors stored in :ref:`SVDOldDefaultErrorScaleFactors<svdolddefaultcal>`
 
 .. note::
 
-   Position errors are scaled, scaling factors are stored in :ref:`SVDCoGOnlyErrorScaleFactors<svdcogonlycal>`.
+   For ``CoGOnly``, position errors are stored  :ref:`SVDCoGOnlyPositionError<svdcogonlyerr>`.
 
-The ``SVDClusterizer`` supports the following position reconstruction algorithms (that can be passed as string, see the :b2:mod:`SVDClusterizer` parameter ``positionAlgorithm{3/6}Samples`` parameter)
-
-* ``OldDefault``: ``CoG`` for cluster size = 2 and ``AHT`` for cluster sizes > 2 (scale factors stores in :ref:`SVDOldDefaultErrorScaleFactors<svdolddefaultcal>`
-* ``CoGOnly`` (**current default**): the ``CoG`` is used for all cluster sizes :math:`\ge2` (``AHT`` is not used), scale factors stored in :ref:`SVDCoGOnlyErrorScaleFactors<svdcogonlycal>`.
 
 .. seealso::
 
@@ -169,8 +169,24 @@ In case one or more APV readout chips are disabled during data taking, a *fake* 
 
 All clusters on one side of each sensor are combined with all clusters on the other side. Certain combinations of clusters can be excluded based on the hit time, the two available cuts are:
 
-#. exclude ``SpacePoints`` in which at least one cluster has hit time below a certain threshold
-#. exclude ``SpacePoints`` in which the time difference of the two clusters exceeds a certain threshold
+#. exclude ``SpacePoints`` in which at least one cluster has hit time below a certain threshold:
+
+   .. math::
+
+      t_{u/v} > t_{\rm min}
+
+#. exclude ``SpacePoints`` in which at least one cluster has hit time far in time w.r.t. trigger (t=0) above a certain threshold:
+
+   .. math::
+
+      |t_{u/v}| < t_{\rm max}
+
+
+#. exclude ``SpacePoints`` in which the time difference of the two clusters exceeds a certain threshold:
+
+   .. math::
+
+      |t_u - t_v| < \Delta t_{\rm max}
 
 The choice of the cut and of the threshold is stored in the :ref:`SVDHitTimeSelection<svdhittimeselection>`.
 

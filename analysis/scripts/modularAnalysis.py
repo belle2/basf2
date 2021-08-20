@@ -12,6 +12,7 @@
 This module defines wrapper functions around the analysis modules.
 """
 
+import b2bii
 from basf2 import register_module, create_path
 from basf2 import B2INFO, B2WARNING, B2ERROR, B2FATAL
 import basf2
@@ -29,7 +30,6 @@ def setAnalysisConfigParams(configParametersAndValues, path):
 
     - 'mcMatchingVersion': Specifies what version of mc matching algorithm is going to be used:
 
-          - 'MC5' - analysis of BelleII MC5
           - 'Belle' - analysis of Belle MC
           - 'BelleII' (default) - all other cases
 
@@ -55,60 +55,92 @@ def setAnalysisConfigParams(configParametersAndValues, path):
     path.add_module(conf)
 
 
-def inputMdst(environmentType, filename, path, skipNEvents=0, entrySequence=None, *, parentLevel=0):
+def inputMdst(filename, path, environmentType='default', skipNEvents=0, entrySequence=None, *, parentLevel=0):
     """
-    Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
+    Loads the specified :ref:`mDST <mdst>` (or :ref:`uDST <analysis_udstoutput>`) file with the RootInput module.
 
-    The correct environment (e.g. magnetic field settings) are determined from
-    the specified environment type. For the possible values please see
-    `inputMdstList()`
+    The correct environment (e.g. magnetic field settings) is determined from
+    ``environmentType``.  Options are either: 'default' (for Belle II MC and
+    data: falls back to database), 'Belle': for analysis of converted Belle 1
+    data and MC.
 
     Parameters:
-        environmentType (str): type of the environment to be loaded
         filename (str): the name of the file to be loaded
         path (basf2.Path): modules are added to this path
+        environmentType (str): type of the environment to be loaded (either 'default' or 'Belle')
         skipNEvents (int): N events of the input file are skipped
         entrySequence (str): The number sequences (e.g. 23:42,101) defining the entries which are processed.
         parentLevel (int): Number of generations of parent files (files used as input when creating a file) to be read
     """
+
+    # FIXME remove this check of "filename" at release-07
+    if filename == 'default':
+        B2FATAL("""
+We have simplified the arguments to inputMdst! If you are running on Belle II
+data or MC, you don't have to use "default" any more.
+Please replace:
+   inputMdst("default", "/your/input/file.root", path=mypath)
+With:
+   inputMdst("/your/input/file.root", path=mypath)
+                """)
+    elif filename == "Belle":
+        B2FATAL("""
+We have reordered the arguments to inputMdst! If you are running on Belle 1
+data or MC, you need to specify the 'environmentType'.
+Please replace:
+   inputMdst("Belle", "/your/input/file.root", path=mypath)
+With:
+   inputMdst("/your/input/file.root", path=mypath, environmentType='Belle')
+                """)
+    elif filename in [f"MC{i}" for i in range(5, 10)]:
+        B2FATAL(f"We no longer support the MC version {filename}. Sorry.")
+
     if entrySequence is not None:
         entrySequence = [entrySequence]
 
-    inputMdstList(environmentType, [filename], path, skipNEvents, entrySequence, parentLevel=parentLevel)
+    inputMdstList([filename], path, environmentType, skipNEvents, entrySequence, parentLevel=parentLevel)
 
 
-def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences=None, *, parentLevel=0):
+def inputMdstList(filelist, path, environmentType='default', skipNEvents=0, entrySequences=None, *, parentLevel=0):
     """
-    Loads the specified ROOT (DST/mDST/muDST) files with the RootInput module.
+    Loads the specified list of :ref:`mDST <mdst>` (or :ref:`uDST <analysis_udstoutput>`) files with the RootInput module.
 
-    The correct environment (e.g. magnetic field settings) are determined from the specified environment type.
-    The currently available environments are:
-
-    - 'MC5': for analysis of Belle II MC samples produced with releases prior to build-2016-05-01.
-      This environment sets the constant magnetic field (B = 1.5 T)
-    - 'MC6': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
-    - 'MC7': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
-    - 'MC8', for analysis of Belle II MC samples produced with release-00-08-00 or newer but prior to release-02-00-00
-    - 'MC9', for analysis of Belle II MC samples produced with release-00-08-00 or newer but prior to release-02-00-00
-    - 'MC10', for analysis of Belle II MC samples produced with release-00-08-00 or newer but prior to release-02-00-00
-    - 'default': for analysis of Belle II MC samples produced with releases with release-02-00-00 or newer.
-      This environment sets the default magnetic field (see geometry settings)
-    - 'Belle': for analysis of converted (or during of conversion of) Belle MC/DATA samples
-    - 'None': for analysis of generator level information or during simulation/reconstruction of
-      previously generated events
-
-    Note that there is no difference between MC6 and MC7. Both are given for sake of completion.
-    The same is true for MC8, MC9 and MC10
+    The correct environment (e.g. magnetic field settings) is determined from
+    ``environmentType``.  Options are either: 'default' (for Belle II MC and
+    data: falls back to database), 'Belle': for analysis of converted Belle 1
+    data and MC.
 
     Parameters:
-        environmentType (str): type of the environment to be loaded
         filelist (list(str)): the filename list of files to be loaded
         path (basf2.Path): modules are added to this path
+        environmentType (str): type of the environment to be loaded (either 'default' or 'Belle')
         skipNEvents (int): N events of the input files are skipped
         entrySequences (list(str)): The number sequences (e.g. 23:42,101) defining
             the entries which are processed for each inputFileName.
         parentLevel (int): Number of generations of parent files (files used as input when creating a file) to be read
     """
+
+    # FIXME remove this check of "filename" at release-07
+    if filelist == 'default':
+        B2FATAL("""
+We have simplified the arguments to inputMdstList! If you are running on
+Belle II data or MC, you don't have to use "default" any more.
+Please replace:
+   inputMdstList("default", list_of_your_files, path=mypath)
+With:
+   inputMdstList(list_of_your_files, path=mypath)
+                """)
+    elif filelist == "Belle":
+        B2FATAL("""
+We have reordered the arguments to inputMdstList! If you are running on
+Belle 1 data or MC, you need to specify the 'environmentType'.
+Please replace:
+   inputMdstList("Belle", list_of_your_files, path=mypath)
+With:
+   inputMdstList(list_of_your_files, path=mypath, environmentType='Belle')
+                """)
+    elif filelist in [f"MC{i}" for i in range(5, 10)]:
+        B2FATAL(f"We no longer support the MC version {filelist}. Sorry.")
 
     roinput = register_module('RootInput')
     roinput.param('inputFileNames', filelist)
@@ -120,49 +152,18 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
     path.add_module(roinput)
     path.add_module('ProgressBar')
 
-    # None means don't create custom magnetic field, use whatever comes from the
-    # DB
-    environToMagneticField = {'MC5': 'MagneticFieldConstant',
-                              'MC6': None,
-                              'MC7': None,
-                              'default': None,
-                              'Belle': 'MagneticFieldConstantBelle'}
-
-    fixECLClusters = {'MC5': True,
-                      'MC6': True,
-                      'MC7': True,
-                      'default': False,
-                      'Belle': False}
-
-    if environmentType in environToMagneticField:
-        fieldType = environToMagneticField[environmentType]
-        if fieldType is not None:
-            from ROOT import Belle2  # reduced scope of potentially-misbehaving import
-            field = Belle2.MagneticField()
-            field.addComponent(Belle2.MagneticFieldComponentConstant(Belle2.B2Vector3D(0, 0, 1.5 * Belle2.Unit.T)))
-            Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
-    elif environmentType in ["MC8", "MC9", "MC10"]:
-        # make sure the last database setup is the magnetic field for MC8-10
-        from basf2 import conditions
-        conditions.globaltags += ["Legacy_MagneticField_MC8_MC9_MC10"]
-    elif environmentType == 'None':
-        B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
-    else:
-        environments = ' '.join(list(environToMagneticField.keys()) + ["MC8", "MC9", "MC10"])
-        B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following:' + environments)
-
-    # set the correct MCMatching algorithm for MC5 and Belle MC
     if environmentType == 'Belle':
+        # Belle 1 constant magnetic field
+        # -------------------------------
+        # n.b. slightly unfortunate syntax: the MagneticField is a member of the
+        # Belle2 namespace but will be set to the Belle 1 values
+        from ROOT import Belle2  # reduced scope of potentially-misbehaving import
+        belle1_field = Belle2.MagneticField()
+        belle1_field.addComponent(Belle2.MagneticFieldComponentConstant(Belle2.B2Vector3D(0, 0, 1.5 * Belle2.Unit.T)))
+        Belle2.DBStore.Instance().addConstantOverride("MagneticField", belle1_field, False)
+        # also set the MC matching for Belle 1
         setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
-        import b2bii
         b2bii.setB2BII()
-    if environmentType == 'MC5':
-        setAnalysisConfigParams({'mcMatchingVersion': 'MC5'}, path)
-
-    # fixECLCluster for MC5/MC6/MC7
-    if fixECLClusters.get(environmentType) is True:
-        fixECL = register_module('FixECLClusters')
-        path.add_module(fixECL)
 
 
 def outputMdst(filename, path):
@@ -746,7 +747,7 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False,
-                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=True):
+                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
     loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
@@ -862,7 +863,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
 
 
 def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
-                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=True):
+                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False):
     """
     Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -2044,7 +2045,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
                      chargedPIDPriors=None, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
-    dataobject and makes BASF2 relation between them. User can provide additional
+    dataobject and makes basf2 relation between them. User can provide additional
     particle lists with a different particle hypothesis like ['K+:good, e+:good'], etc.
 
     @param target_list_name   name of the input ParticleList
@@ -2458,7 +2459,7 @@ def printROEInfo(mask_names=None, full_print=False,
 def buildContinuumSuppression(list_name, roe_mask, path):
     """
     Creates for each Particle in the given ParticleList a ContinuumSuppression
-    dataobject and makes BASF2 relation between them.
+    dataobject and makes basf2 relation between them.
 
     :param list_name: name of the input ParticleList
     :param roe_mask: name of the ROE mask
@@ -3550,13 +3551,13 @@ def getAnalysisGlobaltag(timeout=180) -> str:
         return analysis_tag
     # In case of issues with git, b2conditionsdb-recommend may take too much time.
     except subprocess.TimeoutExpired as te:
-        B2FATAL(f'A {te} exception was raised during the call of getAnalysisGlobalTag(). '
+        B2FATAL(f'A {te} exception was raised during the call of getAnalysisGlobaltag(). '
                 'The function took too much time to retrieve the requested information '
                 'from the versioning repository.\n'
                 'Plase try to re-run your job. In case of persistent failures, there may '
                 'be issues with the DESY collaborative services, so please contact the experts.')
     except subprocess.CalledProcessError as ce:
-        B2FATAL(f'A {ce} exception was raised during the call of getAnalysisGlobalTag(). '
+        B2FATAL(f'A {ce} exception was raised during the call of getAnalysisGlobaltag(). '
                 'Please try to re-run your job. In case of persistent failures, please contact '
                 'the experts.')
 
@@ -3586,6 +3587,39 @@ def getNbarIDMVA(particleList, path=None, ):
     basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module('MVAExpert', listNames=particleList, extraInfoName='nbarIDFromMVA', identifier='db_nbarIDECL')
     variablesToExtraInfo(particleList, {'nbarIDmod': 'nbarID'}, option=2, path=path)
+
+
+def reconstructDecayWithNeutralHadron(decayString, cut, allowGamma=False, path=None, **kwargs):
+    r"""
+    Reconstructs decay with a long-lived neutral hadron e.g.
+    :math:`B^0 \to J/\psi K_L^0`,
+    :math:`B^0 \to p \bar{n} D^*(2010)^-`.
+
+    The calculation is done with IP constraint and mother mass constraint.
+
+    The decay string passed in must satisfy the following rules:
+
+    - The neutral hadron must be **selected** in the decay string with the
+      caret (``^``) e.g. ``B0:sig -> J/psi:sig ^K_L0:sig``. (Note the caret
+      next to the neutral hadron.)
+    - There can only be **one neutral hadron in a decay**.
+    - The neutral hadron has to be a direct daughter of its mother.
+
+    .. note:: This function forwards its arguments to `reconstructDecay`,
+       so please check the documentation of `reconstructDecay` for all
+       possible arguments.
+
+    @param decayString A decay string following the mentioned rules
+    @param cut Cut to apply to the particle list
+    @param allowGamma whether allow the selected particle to be ``gamma``
+    @param path The path to put in the module
+    """
+    reconstructDecay(decayString, cut, path=path, **kwargs)
+    module = register_module('NeutralHadron4MomentumCalculator')
+    module.set_name('NeutralHadron4MomentumCalculator_' + decayString)
+    module.param('decayString', decayString)
+    module.param('allowGamma', allowGamma)
+    path.add_module(module)
 
 
 if __name__ == '__main__':

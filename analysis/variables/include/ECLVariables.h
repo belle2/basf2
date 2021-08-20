@@ -68,7 +68,7 @@ namespace Belle2 {
      * return DeltaL for the shower shape
      * Note: This distance is calculated on the reconstructed level and is temporarily
      * included to the ECLCLuster MDST data format for studying purposes. If it is found
-     * to be not crutial for physics analysis then this variable will be removed in future releases.
+     * to be not crucial for physics analysis then this variable will be removed in future releases.
      * Therefore, keep in mind that this variable might be removed in the future!
      */
     double eclClusterDeltaL(const Particle* particle);

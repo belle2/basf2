@@ -30,7 +30,7 @@ from modularAnalysis import variablesToEventExtraInfo
 # ..create path
 mypath = b2.create_path()
 
-inputMdst('default', '/group/belle2/dataprod/MC/MC13a_local/mumu/mumu_eph3_2295.root', path=mypath)
+inputMdst('/group/belle2/dataprod/MC/MC13a_local/mumu/mumu_eph3_2295.root', path=mypath)
 
 # ..Muon list. Require that there be two high-p tracks, and none with clusterE>1 GeV
 fillParticleList('mu-:highp', 'useCMSFrame(p) > 3.5 and abs(d0) < 0.5 and abs(z0) < 4 and nCDCHits>0 and nVXDHits>0', path=mypath)

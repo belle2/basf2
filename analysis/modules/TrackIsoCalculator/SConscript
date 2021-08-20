@@ -1,8 +1,8 @@
 Import('env')
 
-# This file specifies the dependencies of your Analyis code to parts of the
+# This file specifies the dependencies of your Analysis code to parts of the
 # Belle 2 Software. It should be fine for most analysis but if you need to link
-# against additional libraries pleas put them here.
+# against additional libraries please put them here.
 env['LIBS'] = [
     'analysis_dataobjects',
     'analysis',

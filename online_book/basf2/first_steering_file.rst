@@ -12,19 +12,19 @@ First steering file
 
     **Prerequisites**:
 
-    	* Creating and running scripts in the terminal
-    	* Basic python
+    * Creating and running scripts in the terminal
+    * Basic python
 
     **Questions**:
 
-        * How can I load data?
-        * How can I reconstruct a decay?
-        * How can I match MC?
-        * How can I create an ntuple to store information?
+    * How can I load data?
+    * How can I reconstruct a decay?
+    * How can I match MC?
+    * How can I create an ntuple to store information?
 
     **Objectives**:
 
-        * Reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to \pi^+\pi^+)`
+    * Reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to \pi^+\pi^+)`
 
 In this hands-on tutorial you'll be writing your first steering file. Our
 ultimate goal is to reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to
@@ -143,15 +143,13 @@ former.
 .. admonition:: Solution
     :class: toggle solution
 
-    Three parameters have no default value and are therefore required:
+    Two parameters have no default value and are therefore required:
 
-    * the environment type
     * a list of root input files
     * the path
 
-    In 99 % of all cases ``default`` should be set as ``environmentType``.
-    The Belle II MC that you are reading was produced with a recent release,
-    so this also applies here.
+    The ``environmentType`` only has to be modified if you are analyzing Belle
+    data / MC.
 
 In a later lesson you'll learn how and where to find input files for your
 analysis. For the purpose of this tutorial we have prepared some local input
@@ -478,7 +476,7 @@ of the CDC (`thetaInCDCAcceptance`).
 
     The polar range of the CDC acceptance is :math:`17^\circ < \theta <
     150^\circ` as written `here
-    <https://stash.desy.de/projects/B2/repos/software/browse/analysis/variables/src/AcceptanceVariables.cc#25>`_
+    <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/variables/src/AcceptanceVariables.cc#25>`_
 
 .. admonition:: Task
     :class: exercise stacked
@@ -498,8 +496,8 @@ of the CDC (`thetaInCDCAcceptance`).
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 22-26
-        :lineno-start: 22
+        :lines: 21-25
+        :lineno-start: 21
 
 
 Combining particles
@@ -568,14 +566,14 @@ particles themselves need to be written in the decay string.
     The :math:`J/\Psi` reconstruction looks like this:
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 29-32
-        :lineno-start: 29
+        :lines: 28-31
+        :lineno-start: 28
 
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 1-40, 50-54
+        :lines: 1-39, 49-53
         :linenos:
 
 Writing out information to an ntuple
@@ -635,7 +633,7 @@ mass.
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :linenos:
-        :emphasize-lines: 44
+        :emphasize-lines: 43
 
 Although you are analyzing a signal MC sample, the reconstruction will find
 many candidates that are actually not signal, but random combinations that
@@ -680,7 +678,7 @@ happen to fulfill all your selection criteria.
         plt.xlim(4.3, 5.3)
         plt.savefig('Mbc_all.png')
 
-    .. figure:: figs/Mbc_all.png
+    .. figure:: first_steering_file/Mbc_all.png
         :width: 40em
         :align: center
 
@@ -746,7 +744,7 @@ definitely read it to understand at least the basics.
 
     .. literalinclude:: steering_files/014_first_steering_file.py
         :linenos:
-        :emphasize-lines: 41-42, 47
+        :emphasize-lines: 40-41, 46
 
 .. --------------
 
@@ -780,7 +778,7 @@ definitely read it to understand at least the basics.
         plt.xlim(4.3, 5.3)
         plt.savefig('Mbc_MCsplit.png')
 
-    .. figure:: figs/Mbc_MCsplit.png
+    .. figure:: first_steering_file/Mbc_MCsplit.png
         :width: 40em
         :align: center
 
@@ -806,8 +804,8 @@ variable that can be used to cut away background is :math:`\Delta E` (`deltaE`).
     :class: solution toggle
 
     .. literalinclude:: steering_files/015_first_steering_file.py
-        :lines: 35-40
-        :lineno-start: 35
+        :lines: 34-39
+        :lineno-start: 34
 
 Variable collections
 --------------------
@@ -943,8 +941,8 @@ or `matchedMC`.
     This is how we add variables to the final state particles:
 
     .. literalinclude:: steering_files/019_first_steering_file.py
-        :lines: 53-59
-        :lineno-start: 53
+        :lines: 52-58
+        :lineno-start: 52
 
     Next, do the same for the :math:`J/\Psi` and the :math:`K_S^0` in a similar
     fashion.
@@ -965,8 +963,8 @@ or `matchedMC`.
     This is the code for the first part of the last hint:
 
     .. literalinclude:: steering_files/019_first_steering_file.py
-        :lines: 63-67
-        :lineno-start: 63
+        :lines: 62-66
+        :lineno-start: 62
 
 .. admonition:: Solution
     :class: toggle solution
@@ -983,7 +981,7 @@ or `matchedMC`.
 .. seealso::
 
     Some more example steering files that center around the `VariableManager`
-    can be found `on stash <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples/VariableManager>`_.
+    can be found `on stash <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/examples/VariableManager>`_.
 
 .. admonition:: Exercise
     :class: exercise

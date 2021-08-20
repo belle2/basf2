@@ -35,6 +35,9 @@ import matplotlib
 matplotlib.use("svg")
 matplotlib.rcParams.update({'font.size': 36})
 
+# Use the Belle II style while producing the plots
+plt.style.use("belle2")
+
 
 class Plotter(object):
     """
@@ -421,11 +424,11 @@ class RejectionOverEfficiency(Plotter):
         efficiency, efficiency_error = hists.get_efficiency(['Signal'])
         rejection, rejection_error = hists.get_efficiency(['Background'])
         rejection = 1 - rejection
-        if type(efficiency) == int and type(rejection) != int:
-            efficiency = np.array([efficiency]*len(rejection))
-        elif type(rejection) == int and type(efficiency) != int:
-            rejection = np.array([rejection]*len(efficiency))
-        elif type(rejection) == int and type(efficiency) == int:
+        if isinstance(efficiency, int) and not isinstance(rejection, int):
+            efficiency = np.array([efficiency] * len(rejection))
+        elif isinstance(rejection, int) and not isinstance(efficiency, int):
+            rejection = np.array([rejection] * len(efficiency))
+        elif isinstance(rejection, int) and isinstance(efficiency, int):
             efficiency = np.array([efficiency])
             rejection = np.array([rejection])
 
@@ -858,7 +861,7 @@ class Overtraining(Plotter):
     def add(self, data, column, train_mask, test_mask, signal_mask, bckgrd_mask, weight_column=None):
         """
         Add a new overtraining plot, I recommend to raw only one overtraining plot at the time,
-        otherwise there are too many curves in the plot to reconize anything in the plot.
+        otherwise there are too many curves in the plot to recognize anything in the plot.
         @param data pandas.DataFrame containing all data
         @param column which is used to calculate distribution histogram
         @param train_mask boolean numpy.array defining which events are training events

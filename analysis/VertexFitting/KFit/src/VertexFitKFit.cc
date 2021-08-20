@@ -430,7 +430,7 @@ VertexFitKFit::doFit4() {
   m_v[2][0] = m_BeforeVertex.z();
 
   double tmp_each_chisq[KFitConst::kMaxTrackCount2];
-  double tmp_vertex_chisq = 1.e+30; // An init-value is not needed but the C++ complier requires the init-value.
+  double tmp_vertex_chisq = 1.e+30; // An init-value is not needed but the C++ compiler requires the init-value.
 
   // to avoid overestimation of vertex-z error.
   bool it_flag = false;
@@ -764,8 +764,8 @@ VertexFitKFit::makeCoreMatrix() {
   // vertex fit
   for (int i = 0; i < m_TrackCount; i++)
   {
-    double B, S, U;
-    double sininv, sqrtag;
+    double S, U;
+    double sininv;
 
     double px = m_al_1[i * KFitConst::kNumber6 + 0][0];
     double py = m_al_1[i * KFitConst::kNumber6 + 1][0];
@@ -795,7 +795,7 @@ VertexFitKFit::makeCoreMatrix() {
 
     if (a != 0) { // charged
 
-      B = a * a2 * invPt2;
+      double B = a * a2 * invPt2;
       if (fabs(B) > 1) {
         m_ErrorCode = KFitError::kCannotGetARCSIN;
         B2DEBUG(10, "KFitError: Cannot calculate arcsin");
@@ -811,14 +811,13 @@ VertexFitKFit::makeCoreMatrix() {
         return m_ErrorCode;
       }
       // 1/sqrt(1-B^2)
-      sqrtag = 1.0 / sqrt(tmp0);
+      double sqrtag = 1.0 / sqrt(tmp0);
       S = sqrtag * invPt2;
       U = dlz - pz * sininv / a;
 
     } else { // neutral
-      B      = 0.0;
+
       sininv = 0.0;
-      sqrtag = 1.0;
       S = invPt2;
       U = dlz - pz * a2 * invPt2;
     }

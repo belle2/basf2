@@ -404,42 +404,6 @@ def command_tag_state(args, db):
     return change_state(db, args.tag, args.state, args.force)
 
 
-def command_tag_publish(args, db):
-    """
-    Publish a globaltag.
-
-    This command sets the state of a globaltag to PUBLISHED. This will make the
-    tag immutable and no more modifications are possible. A confirmation dialog
-    will be shown
-
-    .. deprecated:: release-04-00-00
-       Use ``tag state $name PUBLISHED`` instead
-    """
-    if db is None:
-        args.add_argument("tag", metavar="TAGNAME", help="globaltag to be published")
-        return
-
-    return change_state(db, args.tag, "PUBLISHED")
-
-
-def command_tag_invalidate(args, db):
-    """
-    Invalidate a globaltag.
-
-    This command sets the state of a globaltag to INVALID. This will disqualify
-    this tag from being used in user analysis.  A confirmation dialog will be
-    shown.
-
-    .. deprecated:: release-04-00-00
-       Use ``tag state $name INVALID`` instead
-    """
-    if db is None:
-        args.add_argument("tag", metavar="TAGNAME", help="globaltag to be invalidated")
-        return
-
-    return change_state(db, args.tag, "INVALID")
-
-
 def remove_repeated_values(table, columns, keep=None):
     """Strip repeated values from a table of values
 

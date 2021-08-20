@@ -38,7 +38,7 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
   addParam("CDCHitCollectionName",
            m_CDCHitCollectionName,
            "Name of the input StoreArray of CDCHits.",
-           string(""));
+           string("CDCHits4Trg"));
   addParam("TSHitCollectionName",
            m_TSHitCollectionName,
            "Name of the output StoreArray of CDCTriggerSegmentHits.",

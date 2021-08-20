@@ -20,7 +20,7 @@ namespace Belle2 {
 
   /**
    * Creates for each Particle and RestOfEvent object in the DataStore a
-   * FlavorTaggerInfo dataobject and makes BASF2 relation between them.
+   * FlavorTaggerInfo dataobject and makes basf2 relation between them.
    * NOTE: this module DOES NOT fill the FlavorTaggerInfo dataobject, but only
    * initializes it so can be filled during the run of FlavorTagger.py
    */

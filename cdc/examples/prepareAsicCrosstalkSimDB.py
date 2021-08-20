@@ -7,7 +7,7 @@
 ##########################################################################
 ''' Prepare CDC x-talk simulation  DB object '''
 
-from root_pandas import read_root
+import uproot
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import UnivariateSpline
@@ -42,7 +42,7 @@ def getEff(var, cut, n=40, limits=(0., 2500.)):
 InputFile = "cosmic.0008.03420_03427.root"
 
 #: Dataframe, containing relevant variables from the root file
-df = read_root(InputFile, columns=["Channel", "ADC", "Board", "Nhit", "Asic"])
+df = uproot.open(InputFile)["tree"].arrays(["Channel", "ADC", "Board", "Nhit", "Asic"], library="pd")
 df['asic'] = df.Channel//8
 #: auxiliary variable, split ADC range in two < 1024 and above (u1: below)
 u1 = getEff(df[(df.asic % 3 == 1)].ADC_ADC_Sig, df.Nhit > 1, 128, (0, 1024.))

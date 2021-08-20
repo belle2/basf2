@@ -12,7 +12,7 @@
 #include <sstream>
 #include <vector>
 
-// Template specialization to fix NAN sort bug of FastBDT in upto Version 3.2
+// Template specialization to fix NAN sort bug of FastBDT in up to Version 3.2
 #if FastBDT_VERSION_MAJOR <= 3 && FastBDT_VERSION_MINOR <= 2
 namespace FastBDT {
   template<>
@@ -51,13 +51,13 @@ namespace Belle2 {
       int version = pt.get<int>("FastBDT_version");
 #if FastBDT_VERSION_MAJOR >= 5
       if (version != 1 and version != 2) {
-        B2ERROR("Unkown weightfile version " << std::to_string(version));
-        throw std::runtime_error("Unkown weightfile version " + std::to_string(version));
+        B2ERROR("Unknown weightfile version " << std::to_string(version));
+        throw std::runtime_error("Unknown weightfile version " + std::to_string(version));
       }
 #else
       if (version != 1) {
-        B2ERROR("Unkown weightfile version " << std::to_string(version));
-        throw std::runtime_error("Unkown weightfile version " + std::to_string(version));
+        B2ERROR("Unknown weightfile version " << std::to_string(version));
+        throw std::runtime_error("Unknown weightfile version " + std::to_string(version));
       }
 #endif
       m_nTrees = pt.get<int>("FastBDT_nTrees");
@@ -125,7 +125,7 @@ namespace Belle2 {
       description.add_options()
       ("nTrees", po::value<unsigned int>(&m_nTrees), "Number of trees in the forest. Reasonable values are between 10 and 1000")
       ("nLevels", po::value<unsigned int>(&m_nLevels)->notifier(check_bounds<unsigned int>(0, 20, "nLevels")),
-       "Depth d of trees. The last layer of the tree will contain 2^d bins. Maximum is 20. Resonable values are 2 and 6.")
+       "Depth d of trees. The last layer of the tree will contain 2^d bins. Maximum is 20. Reasonable values are 2 and 6.")
       ("shrinkage", po::value<double>(&m_shrinkage)->notifier(check_bounds<double>(0.0, 1.0, "shrinkage")),
        "Shrinkage of the boosting algorithm. Reasonable values are between 0.01 and 1.0.")
       ("nCutLevels", po::value<unsigned int>(&m_nCuts)->notifier(check_bounds<unsigned int>(0, 20, "nCutLevels")),
@@ -332,9 +332,9 @@ namespace Belle2 {
           s << t;
         }
         int dummy;
-        // Try to read to integers, if this is sucessfull we have a old weightfile with a Feature Binning before the Tree.
+        // Try to read to integers, if this is successful we have a old weightfile with a Feature Binning before the Tree.
         if (!(s >> dummy >> dummy)) {
-          B2DEBUG(100, "FastBDT: I read a new weightfile of FastBDT using the new FastBDT version 3. Everythings fine!");
+          B2DEBUG(100, "FastBDT: I read a new weightfile of FastBDT using the new FastBDT version 3. Everything fine!");
           // New format since version 3
           m_expert_forest = FastBDT::readForestFromStream<float>(file);
         } else {

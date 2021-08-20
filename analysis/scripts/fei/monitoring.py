@@ -332,8 +332,9 @@ def MonitorCosBDLPlot(particle, filename):
     for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):
         p = plotting.VerboseDistribution(range_in_std=5.0)
         common = (np.abs(df['cosThetaBDl']) < 10) & (df['probability'] >= cut)
-        p.add(df, 'cosThetaBDl', common & (df['signal'] == 1), label="Signal")
-        p.add(df, 'cosThetaBDl', common & (df['signal'] == 0), label="Background")
+        df = df[common]
+        p.add(df, 'cosThetaBDl', (df['signal'] == 1), label="Signal")
+        p.add(df, 'cosThetaBDl', (df['signal'] == 0), label="Background")
         p.finish()
         p.axis.set_title(f"Cosine of Theta between B and Dl system for signal probability >= {cut:.2f}")
         p.axis.set_xlabel("CosThetaBDl")
@@ -351,8 +352,9 @@ def MonitorMbcPlot(particle, filename):
     for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):
         p = plotting.VerboseDistribution(range_in_std=5.0)
         common = (df['Mbc'] > 5.23) & (df['probability'] >= cut)
-        p.add(df, 'Mbc', common & (df['signal'] == 1), label="Signal")
-        p.add(df, 'Mbc', common & (df['signal'] == 0), label="Background")
+        df = df[common]
+        p.add(df, 'Mbc', (df['signal'] == 1), label="Signal")
+        p.add(df, 'Mbc', (df['signal'] == 0), label="Background")
         p.finish()
         p.axis.set_title(f"Beam constrained mass for signal probability >= {cut:.2f}")
         p.axis.set_xlabel("Mbc")

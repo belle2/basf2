@@ -12,7 +12,7 @@ Flavor tagging
 
     **Prerequisites**:
 
-    	* The previous lesson
+        * The previous lesson
 
     **Questions**:
 
@@ -77,8 +77,8 @@ start right away!
     and call the function:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 77-78
-        :lineno-start: 77
+        :lines: 76-77
+        :lineno-start: 76
 
 .. admonition:: Exercise
     :class: stacked exercise
@@ -91,8 +91,8 @@ start right away!
     :class: toggle solution
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 105
-        :lineno-start: 105
+        :lines: 104
+        :lineno-start: 104
 
 .. admonition:: Exercise
     :class: stacked exercise

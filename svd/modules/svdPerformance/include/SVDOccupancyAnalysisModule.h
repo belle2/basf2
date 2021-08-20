@@ -37,14 +37,16 @@ namespace Belle2 {
 
   public:
 
+    /** constructor */
     SVDOccupancyAnalysisModule();
 
-    virtual ~SVDOccupancyAnalysisModule();
-    virtual void initialize() override;
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
+    /** destructor */
+    virtual ~SVDOccupancyAnalysisModule() {};
+
+    virtual void initialize() override; /**< check StoreArrays & create rootfile */
+    virtual void beginRun() override; /**< create histograms */
+    virtual void event() override; /**< fill histograms */
+    virtual void endRun() override; /**< write histogrmas */
 
     /* user-defined parameters */
     std::string m_rootFileName = "";   /**< root file name */

@@ -14,7 +14,6 @@ main = b2.Path()
 
 # load input data from mdst/udst file
 ma.inputMdst(
-    environmentType="default",
     filename=b2.find_file(f"starterkit/2021/1111540100_eph3_BGx0_{filenumber}.root", "examples"),
     path=main,
 )
@@ -34,7 +33,7 @@ particles = fei.get_default_channels(
 
 # Set up FEI configuration specifying the FEI prefix
 configuration = fei.FeiConfiguration(
-    prefix="FEIv4_2020_MC13_release_04_01_01", monitor=False
+    prefix="FEIv4_2021_MC14_release_05_01_12", monitor=False
 )
 
 # Get FEI path

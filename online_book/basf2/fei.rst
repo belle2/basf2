@@ -12,7 +12,7 @@ Full Event Interpretation
 
     **Prerequisites**:
 
-    	* Lessons 1-2
+        * Lessons 1-2
 
     **Questions**:
 
@@ -99,7 +99,7 @@ In addition to the usual python packages (``basf2`` and `modularAnalysis`) we al
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: -20
+        :lines: -19
 
 Now we need the Global Tag in which the weight files for the FEI can be found. This can change once a new central
 training of the FEI is released, so please check the recommended versions.
@@ -136,7 +136,7 @@ There is also a convenience function for that!
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 24
+        :lines: 23
 
 
 Configuring the FEI
@@ -165,7 +165,7 @@ efficiency.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 28-34
+        :lines: 27-33
 
 
 The `fei.FeiConfiguration` class controls the other configuration options of the FEI.
@@ -185,7 +185,7 @@ in a single Global Tag and is ``prefix=FEIv4_2020_MC13_release_04_01_01`` for th
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 35-38
+        :lines: 34-37
 
 The configuration created above must now be turned into a ``basf2`` path which can be appended to the main path.
 This is done with the `fei.get_path` function which takes the channel configuration
@@ -209,7 +209,7 @@ to the main path with the `basf2.Path.add_path` method.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 41-45
+        :lines: 40-44
 
 
 You have now successfully added the FEI to the main path. The FEI will add a particle list
@@ -251,7 +251,7 @@ You should already be familiar with these topics from the previous exercises.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 49-50, 60-71, 73-77
+        :lines: 48-49, 59-70, 72-76
 
 The FEI returns not only one B meson candidate for each event but up to 20. Using the `modularAnalysis.rankByHighest`
 function, it is possible to rank the candidates by the B meson classifier output in the
@@ -281,7 +281,7 @@ candidate.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 51-77
+        :lines: 50-76
 
 You can now execute your steering file which should look somewhat like this:
 
@@ -444,7 +444,7 @@ Lets get started with the usual steps. Nothing here should be new to you.
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 1-20
+        :lines: 1-19
 
 
 ϒ(4S) Reconstruction
@@ -459,7 +459,7 @@ This leads to a discrepancy between the simulated decay and the reconstructed de
 causing the `isSignal` variable to always be zero.
 
 To solve this you can tell the MC matching algorithm to accept missing neutrinos by using the ``?nu`` flag,
-similiar to the ``?addbrems`` flag introduced in :ref:`onlinebook_various_additions`.
+similar to the ``?addbrems`` flag introduced in :ref:`onlinebook_various_additions`.
 Just add this flag to the end of the decay string in `modularAnalysis.reconstructDecay`. [#f1]_
 
 
@@ -474,7 +474,7 @@ Just add this flag to the end of the decay string in `modularAnalysis.reconstruc
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 22
+        :lines: 21
 
 
 So far, we have not used the FEI. Now, we will use the B\ :sub:`tag` in the udst file and combine it with the
@@ -512,7 +512,7 @@ B\ :sub:`sig` we have just created.
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 24-37
+        :lines: 23-36
 
 
 Now that we have reconstructed the full ϒ(4S), we will create a Rest of Event.
@@ -543,7 +543,7 @@ value of `dz` (``abs(dz)``) to below 4. The two other cuts (on `pt` and `thetaIn
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 39-43
+        :lines: 38-42
 
 
 Writing out the nTuple
@@ -599,7 +599,7 @@ This variable is called `nROE_Charged` in basf2. It needs the ROE mask name defi
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 45-70
+        :lines: 44-69
 
 You can now execute your steering file which should look somewhat like this:
 

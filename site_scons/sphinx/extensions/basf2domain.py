@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class Basf2Object(ObjectDescription):
     """
-    A Basf2 x-ref directive registered with Sphinx.add_object_type().
+    A basf2 x-ref directive registered with Sphinx.add_object_type().
     Basically copied together from sphinxcontrib-domaintools and sphinxcontrib-adadomain.
     """
 
@@ -80,7 +80,7 @@ class Basf2Object(ObjectDescription):
 class Basf2ModuleIndex(Index):
     """Create an alphabetic index of all modules"""
     name = "modindex"
-    localname = "Basf2 Module Index"
+    localname = "basf2 Module Index"
     shortname = "basf2 modules"
 
     def generate(self, docnames=None):
@@ -96,7 +96,7 @@ class Basf2ModuleIndex(Index):
 class Basf2VariableIndex(Index):
     """Create an alphabetic index of all variables"""
     name = "varindex"
-    localname = "Basf2 Variable Index"
+    localname = "basf2 Variable Index"
     shortname = "basf2 variables"
 
     def generate(self, docnames=None):
@@ -111,7 +111,7 @@ class Basf2VariableIndex(Index):
 
 
 class Basf2Domain(Domain):
-    """Basf2 Software Domain"""
+    """basf2 Software Domain"""
     name = "b2"
     label = "Belle 2 Software"
     object_types = {

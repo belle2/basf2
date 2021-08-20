@@ -20,7 +20,7 @@ from stdCharged import stdPi
 mypath = basf2.Path()  # create a path
 
 # add input data and ParticleLoader modules to the path
-inputMdstList('default', [basf2.find_file('analysis/tests/mdst.root')], path=mypath)
+inputMdstList([basf2.find_file('analysis/tests/mdst.root')], path=mypath)
 stdPi('95eff', path=mypath)  # grab the standard pions list
 
 # you can (and should) make this into something more sensible

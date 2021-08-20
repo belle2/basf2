@@ -50,12 +50,10 @@ int HepevtReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     MCParticleGraph::GraphParticle& p = graph[first + i];
     readParticle(p);
 
-    //boost particles to lab frame:
-    TLorentzVector p4 = p.get4Vector();
-    if (m_wrongSignPz) // this means we have to mirror Pz
+    if (m_wrongSignPz) { // this means we have to mirror Pz
+      TLorentzVector p4 = p.get4Vector();
       p4.SetPz(-1.0 * p4.Pz());
-    p4 = m_labboost * p4;
-    p.set4Vector(p4);
+    }
 
     //Check for sensible daughter indices
     int d1 = p.getFirstDaughter();

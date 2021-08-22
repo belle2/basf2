@@ -454,7 +454,7 @@ C initialize rchl_parameters first
 *     
 * IN-COMING / OUT-GOING  FERMION MASSES
       AMTAU  = xpar(656)
-      AMNUTA = 0.010
+      AMNUTA = xpar(666) ! 0.010
       AMEL   = xpar(616)
       AMNUE  = 0.0
       AMMU   = xpar(636)

@@ -158,7 +158,7 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
 
         "collector_prefix" is a string indicating which collector to be used for gain calibration. The supported
           collectors are:
-            PXDParticleListCollector (default),
+            PXDPerformanceVariablesCollector (default),
             PXDPerformanceCollector(using RAVE package for vertexing, obsolete)
 
     Return:
@@ -173,8 +173,8 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         gain_method = 'analytic'
     if not isinstance(gain_method, str) or gain_method.lower() not in gain_methods:
         raise ValueError("gain_method not found in gain_methods : {}".format(gain_method))
-    collector_prefix = kwargs.get("collector_prefix", "PXDParticleListCollector")
-    supported_collectors = ["PXDParticleListCollector", "PXDPerformanceCollector"]
+    collector_prefix = kwargs.get("collector_prefix", "PXDPerformanceVariablesCollector")
+    supported_collectors = ["PXDPerformanceVariablesCollector", "PXDPerformanceCollector"]
     if not isinstance(collector_prefix, str) or collector_prefix not in supported_collectors:
         raise ValueError("collector_prefix not found in {}".format(supported_collectors))
 
@@ -192,13 +192,14 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
     main.add_module(geometry)
     main.add_module(genFitExtrapolation)
     main.add_module(roiFinder)  # for PXDIntercepts
+    main.add_module("ActivatePXDPixelMasker")
 
     # Collector setup
     collector = register_module(collector_prefix)
     if collector_prefix == "PXDPerformanceCollector":
         main.add_module("PXDPerformance")
         collector.param("fillEventTree", False)
-    else:  # the default PXDParticleListCollector
+    else:  # the default PXDPerformanceVariablesCollector
         import modularAnalysis as ana
         import vertex
         from variables import variables as vm

@@ -87,6 +87,12 @@ namespace Belle2 {
     /// Vecotr of number of track matched clusters
     std::vector<unsigned long> m_nTrackClusters;
 
+    /// Vecotr of number of track points outside of defective pixels
+    std::vector<unsigned long> m_nSelTrackPoints;
+
+    /// Vecotr of number of track clusters outside of defective pixels
+    std::vector<unsigned long> m_nSelTrackClusters;
+
     /// Histogram of corrected d0 for each 2-track event
     TH1F* m_hD0;
 

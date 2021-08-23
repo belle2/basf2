@@ -15,6 +15,7 @@
 #include <pxd/utilities/PXDPerformanceStructs.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
 #include <pxd/dbobjects/PXDGainMapPar.h>
+#include <pxd/reconstruction/PXDPixelMasker.h>
 
 #include <string>
 
@@ -34,14 +35,14 @@ namespace Belle2 {
    * cluster charge / expected value, in the calibration algorithm.
    *
    */
-  class PXDParticleListCollectorModule : public CalibrationCollectorModule {
+  class PXDPerformanceVariablesCollectorModule : public CalibrationCollectorModule {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    PXDParticleListCollectorModule();
+    PXDPerformanceVariablesCollectorModule();
     /** Prepare */
     void prepare() override final;
     /** Collect */
@@ -88,6 +89,32 @@ namespace Belle2 {
       vBin = PXD::PXDGainCalibrator::getInstance().getBinV(sensorID, vID, m_nBinsV);
 
       return iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin;
+    }
+
+    /**
+     * Helper function to select a track point according to the status of the related pixels.
+     * @param sensorID VxdID
+     * @param uID uID of the target pixel
+     * @param vID vID of the target pixel
+     * @return true if the track point/cluster will be used for efficiency study later
+     */
+    bool isSelected(const VxdID& sensorID, const int& uID, const int& vID)
+    {
+      // Check a 3x3 pixel matrix around the track point. Skip counting If any pixel is dead/hot.
+      // TODO: Using a dedicated cluster flag (under development).
+      for (int i = -1; i < 2; i++) {
+        int tmpUID = uID + i;
+        for (int j = -1; j < 2; j++) {
+          int tmpVID = vID + j;
+          // Dead pixel checking
+          if (PXD::PXDPixelMasker::getInstance().pixelDead(sensorID, tmpUID, tmpVID))
+            return false;
+          // Masked/hot pixel checking
+          if (!PXD::PXDPixelMasker::getInstance().pixelOK(sensorID, tmpUID, tmpVID))
+            return false;
+        } // end v loop
+      } // end u loop
+      return true;
     }
 
   private:

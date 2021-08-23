@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <pxd/modules/pxdParticleListCollector/PXDParticleListCollectorModule.h>
+#include <pxd/modules/pxdPerformanceVariablesCollector/PXDPerformanceVariablesCollectorModule.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -28,13 +28,13 @@ using namespace Belle2::PXD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDParticleListCollector)
+REG_MODULE(PXDPerformanceVariablesCollector)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDParticleListCollectorModule::PXDParticleListCollectorModule() : CalibrationCollectorModule()
+PXDPerformanceVariablesCollectorModule::PXDPerformanceVariablesCollectorModule() : CalibrationCollectorModule()
   , m_selected4Eff(false)
   , m_deltaD0oSqrt2(0.0), m_deltaZ0oSqrt2(0.0)
   , m_signal(0), m_estimated(0.0)
@@ -63,7 +63,7 @@ PXDParticleListCollectorModule::PXDParticleListCollectorModule() : CalibrationCo
 
 }
 
-void PXDParticleListCollectorModule::prepare() // Do your initialise() stuff here
+void PXDPerformanceVariablesCollectorModule::prepare() // Do your initialise() stuff here
 {
 
   if (m_nBinsU == 0) {
@@ -113,7 +113,7 @@ void PXDParticleListCollectorModule::prepare() // Do your initialise() stuff her
     registerObject<TH2F>("PXDClusterChargeRatio", hPXDClusterChargeRatio);
 
   //-------------------------------------------------------------------------------------
-  // PXDTrackClusterCounter: Count the number of PXDClustersFrom tracks (the same track selection as for track points)
+  // PXDTrackClusterCounter: Count the number of PXD clusters from tracks (the same track selection as for PXDTrackPointCounter)
   //-------------------------------------------------------------------------------------
   auto hPXDTrackClusterCounter = (TH1I*)hPXDClusterCounter->Clone("hPXDTrackClusterCounter");
   hPXDTrackClusterCounter->SetTitle("Number of track clusters");
@@ -121,12 +121,28 @@ void PXDParticleListCollectorModule::prepare() // Do your initialise() stuff her
   registerObject<TH1I>("PXDTrackClusterCounter", hPXDTrackClusterCounter);
 
   //-------------------------------------------------------------------------------------
-  // PXDTrackPointCounter: Count the number of PXDClustersFrom tracks (the same track selection as for track points)
+  // PXDTrackPointCounter: Count the number of PXD track points
   //-------------------------------------------------------------------------------------
   auto hPXDTrackPointCounter = (TH1I*)hPXDClusterCounter->Clone("hPXDTrackPointCounter");
   hPXDTrackPointCounter->SetTitle("Number of track points");
   hPXDTrackPointCounter->GetYaxis()->SetTitle("Number of track points");
   registerObject<TH1I>("PXDTrackPointCounter", hPXDTrackPointCounter);
+
+  //-------------------------------------------------------------------------------------
+  // PXDSelTrackClusterCounter: Count the number of PXD clusters from tracks (the same track selection as for PXDSelTrackPointCounter)
+  //-------------------------------------------------------------------------------------
+  auto hPXDSelTrackClusterCounter = (TH1I*)hPXDClusterCounter->Clone("hPXDSelTrackClusterCounter");
+  hPXDSelTrackClusterCounter->SetTitle("Number of selected track clusters (the same selectrion as for PXDSelTrackPointCounter)");
+  hPXDSelTrackClusterCounter->GetYaxis()->SetTitle("Number of track clusters");
+  registerObject<TH1I>("PXDSelTrackClusterCounter", hPXDSelTrackClusterCounter);
+
+  //-------------------------------------------------------------------------------------
+  // PXDSelTrackPointCounter: Count the number of PXD track points if they are away from hot/dead pixels
+  //-------------------------------------------------------------------------------------
+  auto hPXDSelTrackPointCounter = (TH1I*)hPXDClusterCounter->Clone("hPXDSelTrackPointCounter");
+  hPXDSelTrackPointCounter->SetTitle("Number of selected track points excluding hot/dead regions");
+  hPXDSelTrackPointCounter->GetYaxis()->SetTitle("Number of track points");
+  registerObject<TH1I>("PXDSelTrackPointCounter", hPXDSelTrackPointCounter);
 
   //----------------------------------------------------------------------
   // PXDTrees for gain calibration: One tree to store the calibration data for each grid bin
@@ -177,7 +193,7 @@ void PXDParticleListCollectorModule::prepare() // Do your initialise() stuff her
 
 }
 
-void PXDParticleListCollectorModule::startRun() // Do your beginRun() stuff here
+void PXDPerformanceVariablesCollectorModule::startRun() // Do your beginRun() stuff here
 {
   m_run = m_evtMetaData->getRun();
   m_exp = m_evtMetaData->getExperiment();
@@ -190,7 +206,7 @@ void PXDParticleListCollectorModule::startRun() // Do your beginRun() stuff here
   getObjectPtr<TTree>("dbtree")->Fill();
 }
 
-void PXDParticleListCollectorModule::collect() // Do your event() stuff here
+void PXDPerformanceVariablesCollectorModule::collect() // Do your event() stuff here
 {
   // Update booleans for even selection
   m_selected4Eff = false;
@@ -239,7 +255,7 @@ void PXDParticleListCollectorModule::collect() // Do your event() stuff here
   } // end of particles loop
 }
 
-void PXDParticleListCollectorModule::collectDeltaIP()
+void PXDPerformanceVariablesCollectorModule::collectDeltaIP()
 {
   StoreObjPtr<ParticleList> particles(m_PList4ResName);
   // Requiring vpho -> l+l-
@@ -277,7 +293,7 @@ void PXDParticleListCollectorModule::collectDeltaIP()
   getObjectPtr<TTree>("tree_d0z0")->Fill();
 }
 
-void PXDParticleListCollectorModule::collectGainVariables(const TrackCluster_t& trackCluster)
+void PXDPerformanceVariablesCollectorModule::collectGainVariables(const TrackCluster_t& trackCluster)
 {
   auto cluster = trackCluster.cluster;
   auto intersection = trackCluster.intersection;
@@ -311,23 +327,35 @@ void PXDParticleListCollectorModule::collectGainVariables(const TrackCluster_t& 
   }
 }
 
-void PXDParticleListCollectorModule::collectEfficiencyVariables(const TrackCluster_t& trackCluster)
+void PXDPerformanceVariablesCollectorModule::collectEfficiencyVariables(const TrackCluster_t& trackCluster)
 {
-  auto cluster = trackCluster.cluster;
-  auto intersection = trackCluster.intersection;
-  auto usedInTrack = trackCluster.usedInTrack;
+  auto const& cluster = trackCluster.cluster;
+  auto const& tPoint = trackCluster.intersection;
+  auto const& usedInTrack = trackCluster.usedInTrack;
 
-  auto x = intersection.x;
-  auto y = intersection.y;
-  auto phi = atan2(y, x);
-  auto z = intersection.z;
+  auto phi = atan2(tPoint.y, tPoint.x);
+  auto z = tPoint.z;
 
-  int uBin(-1), vBin(-1);
-  auto binID = getBinID(trackCluster, uBin, vBin);
+  VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
+  const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+  auto localPoint = Info.pointToLocal(TVector3(tPoint.x, tPoint.y, tPoint.z));
+  auto uID = Info.getUCellID(localPoint.X());
+  auto vID = Info.getVCellID(localPoint.Y());
+  auto iSensor = VXD::GeoCache::getInstance().getGeoTools()->getPXDSensorIndex(sensorID);
+  auto uBin = PXD::PXDGainCalibrator::getInstance().getBinU(sensorID, uID, vID, m_nBinsU);
+  auto vBin = PXD::PXDGainCalibrator::getInstance().getBinV(sensorID, vID, m_nBinsV);
+  auto binID = iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin;
+
   // Filling counters
   getObjectPtr<TH1I>("PXDTrackPointCounter")->Fill(binID);
   if (usedInTrack)
     getObjectPtr<TH1I>("PXDTrackClusterCounter")->Fill(binID);
+
+  if (isSelected(sensorID, uID, vID)) {
+    getObjectPtr<TH1I>("PXDSelTrackPointCounter")->Fill(binID);
+    if (usedInTrack)
+      getObjectPtr<TH1I>("PXDSelTrackClusterCounter")->Fill(binID);
+  }
 
   // Filling 2D histograms
   if (cluster.pxdID < 2000) {

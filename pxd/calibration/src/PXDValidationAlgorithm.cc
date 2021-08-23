@@ -132,6 +132,8 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
   // Get counter histograms and set pointers
   auto cluster_counter = getObjectPtr<TH1I>("PXDTrackClusterCounter");
   auto point_counter = getObjectPtr<TH1I>("PXDTrackPointCounter");
+  auto selected_point_counter = getObjectPtr<TH1I>("PXDSelTrackPointCounter");  // can be empty
+  auto selected_cluster_counter = getObjectPtr<TH1I>("PXDSelTrackClusterCounter");  // can be empty
   if (!cluster_counter) return c_NotEnoughData;
   if (!point_counter) return c_NotEnoughData;
 
@@ -193,6 +195,8 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
     m_tree->Branch("vBin", &m_vBin);
     m_tree->Branch("nTrackPoints", &m_nTrackPoints);
     m_tree->Branch("nTrackClusters", &m_nTrackClusters);
+    m_tree->Branch("nSelTrackPoints", &m_nSelTrackPoints);
+    m_tree->Branch("nSelTrackClusters", &m_nSelTrackClusters);
     m_tree->Branch<TH1F>("hD0", &m_hD0, 32000, 0);
     m_tree->Branch<TH1F>("hZ0", &m_hZ0, 32000, 0);
 
@@ -227,6 +231,8 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
   m_vBin.clear();
   m_nTrackClusters.clear();
   m_nTrackPoints.clear();
+  m_nSelTrackPoints.clear();
+  m_nSelTrackClusters.clear();
 
   // Get resolution trees and create histograms
   auto tree_d0z0 = getObjectPtr<TTree>("tree_d0z0");
@@ -275,6 +281,8 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
     m_uBin.emplace_back(uBin);
     m_vBin.emplace_back(vBin);
     m_nTrackPoints.emplace_back(numberOfPoints);
+    m_nSelTrackPoints.push_back(selected_point_counter->GetBinContent(histoBin));
+    m_nSelTrackClusters.push_back(selected_cluster_counter->GetBinContent(histoBin));
     m_nTrackClusters.emplace_back(numberOfClusters);
   }
 

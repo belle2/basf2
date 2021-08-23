@@ -25,11 +25,11 @@ with TemporaryDirectory() as tmp:
 
     os.chdir(tmp)
     path = ma.create_path()
-    path.add_module("HepMCInput", inputFileList=[input_filename])
+    path.add_module("HepMCInput", inputFileList=[input_filename], expNum=0, runNum=0)
     path.add_module("HepMCOutput", OutputFilename=output_filename)
     b2.process(path)
 
-    def valid_line(l):
+    def valid_line(li):
         """
         Check only lines that contain numbers
 
@@ -39,10 +39,10 @@ with TemporaryDirectory() as tmp:
         with letters:
         E: event, V: vertex, P: particle
         """
-        return l.split()[0] in ["E", "V", "P"]
+        return li.split()[0] in ["E", "V", "P"]
 
-    def parse_line(l):
-        tokens = l.split()
+    def parse_line(li):
+        tokens = li.split()
         start_index = 1
         if tokens[0] == "E":
             # For events, the first number is the event number
@@ -51,7 +51,7 @@ with TemporaryDirectory() as tmp:
         return [float(t) for t in tokens[start_index:]]
 
     def get_nonempty_lines(f):
-        return [l for l in f if not l.isspace()]
+        return [li for li in f if not li.isspace()]
 
     with open(input_filename) as inputfile, open(output_filename) as outputfile:
         lines_input = get_nonempty_lines(inputfile)

@@ -634,7 +634,7 @@ namespace Belle2 {
       int k = 0;
       while (m_inverseRaytracer->isNymDifferent()) { // get rid of discontinuities
         if (k > 8) {
-          B2WARNING("PDFConstructor::setSignalPDF: failed to find the same Nym (dx)");
+          B2DEBUG(20, "TOP::PDFConstructor::setSignalPDF: failed to find the same Nym (dx)");
           return;
         }
         dx = - dx / 2;
@@ -651,7 +651,7 @@ namespace Belle2 {
       k = 0;
       while (m_inverseRaytracer->isNymDifferent()) { // get rid of discontinuities
         if (k > 8) {
-          B2WARNING("PDFConstructor::setSignalPDF: failed to find the same Nym (dL)");
+          B2DEBUG(20, "TOP::PDFConstructor::setSignalPDF: failed to find the same Nym (dL)");
           return;
         }
         dL = - dL / 2;
@@ -668,7 +668,7 @@ namespace Belle2 {
       k = 0;
       while (m_inverseRaytracer->isNymDifferent()) { // get rid of discontinuities
         if (k > 8) {
-          B2WARNING("PDFConstructor::setSignalPDF: failed to find the same Nym (de)");
+          B2DEBUG(20, "TOP::PDFConstructor::setSignalPDF: failed to find the same Nym (de)");
           return;
         }
         de = - de / 2;

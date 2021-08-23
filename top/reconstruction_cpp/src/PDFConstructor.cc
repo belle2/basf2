@@ -83,7 +83,7 @@ namespace Belle2 {
 
       const auto& prism = m_inverseRaytracer->getPrism();
 
-      if (m_track.getEmissionPoint(m_track.getLengthInQuartz() / 2).position.Z() > prism.zR) {
+      if (m_track.getEmissionPoint().position.Z() > prism.zR) {
         setSignalPDF_direct();
         setSignalPDF_reflected();
       } else {
@@ -689,7 +689,7 @@ namespace Belle2 {
         if (abs(sol.L - L) < 0.01) return sol;
         L = sol.L;
       }
-      B2WARNING("TOP::PDFConstructor::prismSolution: iterations not converging");
+      B2DEBUG(20, "TOP::PDFConstructor::prismSolution: iterations not converging");
       return PrismSolution();
     }
 

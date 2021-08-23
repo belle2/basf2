@@ -88,6 +88,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     if (m_wrongSignPz) { // this means we have to mirror Pz
       TLorentzVector p4 = p.get4Vector();
       p4.SetPz(-1.0 * p4.Pz());
+      p.set4Vector(p4);
     }
 
     // initial 2 (e+/e-), virtual 3 (Z/gamma*)

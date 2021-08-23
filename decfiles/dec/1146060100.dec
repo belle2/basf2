@@ -9,18 +9,6 @@
 # Cuts: None
 # Date: 20210511
 
-Define minusTwoBeta -0.78
-Define dm 0.507e12
-
-
-Alias D-sig D-
-Alias D+sig D+
-ChargeConj D+sig D-sig 
-
-Alias B0sig B0
-Alias anti-B0sig anti-B0
-ChargeConj B0sig anti-B0sig
-
 Alias K_S0sig K_S0
 
 Decay Upsilon(4S)

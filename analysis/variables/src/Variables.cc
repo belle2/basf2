@@ -27,6 +27,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/V0.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 
@@ -486,6 +487,22 @@ namespace Belle2 {
       } else {
         return part->getMass(); // !
       }
+    }
+
+    double particleInvariantMassFromDaughtersV0(const Particle* part)
+    {
+      const auto V0 = part->getV0();
+      if (!V0) return particleInvariantMassFromDaughters(part);
+      auto daughters = V0->getTrackFitResults();
+      TVector3 vertex = part->getVertex();
+      const double bField = BFieldManager::getField(vertex).Z() / Unit::T;
+      Helix helix_plus  = daughters.first ->getHelix();
+      Helix helix_minus = daughters.second->getHelix();
+      helix_plus .passiveMoveBy(vertex);
+      helix_minus.passiveMoveBy(vertex);
+      TLorentzVector mom4_plus  = TLorentzVector(helix_plus .getMomentum(bField), daughters.first ->getEnergy());
+      TLorentzVector mom4_minus = TLorentzVector(helix_minus.getMomentum(bField), daughters.second->getEnergy());
+      return (mom4_plus + mom4_minus).M();
     }
 
     double particleInvariantMassLambda(const Particle* part)
@@ -1040,8 +1057,9 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("M2", particleMassSquared,
                       "The particle's mass squared.");
 
-    REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughters,
-                      "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle has no daughters, defaults to :b2:var:`M`.");
+    REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughtersV0,
+                      "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle is V0, its daughter 4-momentum vectors at fitted vertex are taken.\n"
+                      "If this particle has no daughters, defaults to :b2:var:`M`.");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
                       "Invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
                       "If the particle has not 2 daughters, it returns just the mass value.");

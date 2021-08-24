@@ -71,10 +71,8 @@ namespace Belle2 {
         Nodetuple left_node = static_cast<const py::tuple>(tuple[1]);
         Nodetuple right_node = static_cast<const py::tuple>(tuple[2]);
         BooleanOperator boperator = static_cast<BooleanOperator>(static_cast<int>(py::extract<int>(tuple[3])));
-        bool bracketized = py::extract<bool>(tuple[4]);
         return std::unique_ptr<const AbstractBooleanNode<AVariableManager>>(new BinaryBooleanNode<AVariableManager>(left_node, right_node,
-               boperator,
-               bracketized));
+               boperator));
       } else if (node_type == NodeType::UnaryRelationalNode) {
         Nodetuple node = static_cast<const py::tuple>(tuple[1]);
         return std::unique_ptr<const AbstractBooleanNode<AVariableManager>>(new UnaryRelationalNode<AVariableManager>(node));
@@ -184,3 +182,4 @@ namespace Belle2 {
     }
   };
 }
+

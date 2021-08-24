@@ -180,37 +180,31 @@ namespace Belle2 {
 
     /**
      * Print Node
-     * brackets are added if m_bracketized is set to true.
      */
     void print() const override
     {
-      if (m_bracketized) std::cout << "[";
       m_left_bnode->print();
       injectBooleanOperatorToStream(std::cout, m_boperator);
       m_right_bnode->print();
-      if (m_bracketized) std::cout << "]";
     }
 
     /* Decompile Node back to a string.
      * Decompile(compile) should give the same result.
-     * brackets and negation keywords are added if m_bracketized.
      */
     std::string decompile() const override
     {
       std::stringstream stringstream;
-      if (m_bracketized) stringstream << "["; // Add opening bracket
       stringstream << m_left_bnode->decompile(); // decompile left AbstractBooleanNode
       injectBooleanOperatorToStream(stringstream, m_boperator);
       stringstream << m_right_bnode->decompile(); // decompile right AbstractBooleanNode
-      if (m_bracketized) stringstream << "]"; // Add enclosing bracket
 
       return stringstream.str();
     }
 
   private:
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
-    explicit BinaryBooleanNode(Nodetuple left_node, Nodetuple right_node, BooleanOperator boperator, bool bracketized)
-      : m_boperator{boperator}, m_bracketized{bracketized}
+    explicit BinaryBooleanNode(Nodetuple left_node, Nodetuple right_node, BooleanOperator boperator)
+      : m_boperator{boperator}
     {
       m_left_bnode = NodeFactory::compile_boolean_node<AVariableManager>(left_node);
       m_right_bnode = NodeFactory::compile_boolean_node<AVariableManager>(right_node);
@@ -218,8 +212,6 @@ namespace Belle2 {
     std::unique_ptr<const AbstractBooleanNode<AVariableManager>> m_left_bnode; /**< boolean subexpression of a cut */
     std::unique_ptr<const AbstractBooleanNode<AVariableManager>> m_right_bnode; /**< boolean subexpression of a cut */
     const BooleanOperator m_boperator; /**< Boolean operation to be applied to the check() results of the child nodes. */
-    const bool
-    m_bracketized; /**< if the boolean expression from which this node is compiled was in brackets, relevant in decompile to yield the original string */
   };
 
   /**

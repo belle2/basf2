@@ -225,6 +225,9 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         # fill the flavor tagger info
         # mod_ft_info_filler = register_module('FlavorTaggerInfoFiller')
 
+        flavorTaggerInfoBuilder = basf2.register_module('FlavorTaggerInfoBuilder')
+        path.add_module(flavorTaggerInfoBuilder)
+
         expert_module = basf2.register_module('MVAExpert')
         expert_module.param('listNames', particle_lists)
         expert_module.param('identifier', uniqueIdentifier)
@@ -234,7 +237,11 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
 
         roe_path.add_module(expert_module)
 
+        flavorTaggerInfoFiller = basf2.register_module('FlavorTaggerInfoFiller')
+        flavorTaggerInfoFiller.param('DNNmlp', True)
+        roe_path.add_module(flavorTaggerInfoFiller)
+
         # Create standard alias for the output of the flavor tagger
-        vu._variablemanager.addAlias('DNN_qrCombined', 'formula(2*extraInfo(dnn_output) - 1)')
+        vu._variablemanager.addAlias('DNN_qrCombined', 'qrOutput(DNN)')
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

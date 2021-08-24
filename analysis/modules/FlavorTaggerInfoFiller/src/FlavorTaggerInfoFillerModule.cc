@@ -32,6 +32,7 @@ FlavorTaggerInfoFillerModule::FlavorTaggerInfoFillerModule() : Module()
            vector<tuple<string, string, string>>());
   addParam("FANNmlp", m_FANNmlp, "Sets if FANN Combiner output will be saved or not", false);
   addParam("TMVAfbdt", m_TMVAfbdt, "Sets if FANN Combiner output will be saved or not", false);
+  addParam("DNNmlp", m_DNNmlp, "Sets if DNN Tagger output will be saved or not", false);
   addParam("qpCategories", m_qpCategories, "Sets if individual categories output will be saved or not", false);
   addParam("istrueCategories", m_istrueCategories, "Sets if individual MC truth for each category is saved or not", false);
   addParam("targetProb", m_targetProb, "Sets if individual Categories output will be saved or not", false);
@@ -62,7 +63,6 @@ void FlavorTaggerInfoFillerModule::event()
   flavorTaggerInfo -> setUseModeFlavorTagger("Expert");
 
   if (m_FANNmlp) {
-    flavorTaggerInfo -> addMethodMap("FANN");
     FlavorTaggerInfoMap* infoMapsFANN = flavorTaggerInfo -> getMethodMap("FANN");
     // float qrCombined = 2 * (eventExtraInfo->getExtraInfo("qrCombinedFANN") - 0.5);
     float qrCombined = m_eventExtraInfo->getExtraInfo("qrCombinedFANN");
@@ -75,7 +75,6 @@ void FlavorTaggerInfoFillerModule::event()
     infoMapsFANN->setB0barProbability(B0barProbability);
   }
 
-  flavorTaggerInfo -> addMethodMap("FBDT");
   FlavorTaggerInfoMap* infoMapsFBDT = flavorTaggerInfo -> getMethodMap("FBDT");
 
   if (m_TMVAfbdt) {
@@ -88,6 +87,20 @@ void FlavorTaggerInfoFillerModule::event()
     infoMapsFBDT->setB0Probability(B0Probability);
     infoMapsFBDT->setB0barProbability(B0barProbability);
   }
+
+  if (m_DNNmlp) {
+    FlavorTaggerInfoMap* infoMapsDNN = flavorTaggerInfo -> getMethodMap("DNN");
+    const Particle* particle = m_roe->getRelated<Particle>();
+    float qrCombined = 2 * (particle->getExtraInfo("dnn_output") - 0.5);
+    if (qrCombined < 1.1 && qrCombined > 1.0) qrCombined = 1.0;
+    if (qrCombined > - 1.1 && qrCombined < -1.0) qrCombined = -1.0;
+    float B0Probability = particle->getExtraInfo("dnn_output");
+    float B0barProbability = 1 - particle->getExtraInfo("dnn_output");
+    infoMapsDNN->setQrCombined(qrCombined);
+    infoMapsDNN->setB0Probability(B0Probability);
+    infoMapsDNN->setB0barProbability(B0barProbability);
+  }
+
 
   if (m_targetProb) {
     for (auto& iTuple : m_trackLevelParticleLists) {

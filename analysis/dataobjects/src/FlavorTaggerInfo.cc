@@ -25,7 +25,7 @@ void FlavorTaggerInfo::addMethodMap(const std::string& method)
     m_methodMap.insert(std::pair<std::string, FlavorTaggerInfoMap*>(method, flavTagMap));
 
   } else {
-    B2FATAL("Method  " << method << " already added. Please use another name.");
+    B2INFO("Method " << method << " already added. ");
   }
 }
 

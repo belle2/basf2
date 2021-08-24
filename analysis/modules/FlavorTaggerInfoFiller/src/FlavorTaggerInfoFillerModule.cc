@@ -64,12 +64,12 @@ void FlavorTaggerInfoFillerModule::event()
 
   if (m_FANNmlp) {
     FlavorTaggerInfoMap* infoMapsFANN = flavorTaggerInfo -> getMethodMap("FANN");
-    // float qrCombined = 2 * (eventExtraInfo->getExtraInfo("qrCombinedFANN") - 0.5);
+    // For FANN, the output is mapped to be qr
     float qrCombined = m_eventExtraInfo->getExtraInfo("qrCombinedFANN");
     if (qrCombined < 1.1 && qrCombined > 1.0) qrCombined = 1.0;
     if (qrCombined > - 1.1 && qrCombined < -1.0) qrCombined = -1.0;
-    float B0Probability = m_eventExtraInfo->getExtraInfo("qrCombinedFANN");
-    float B0barProbability = 1 - m_eventExtraInfo->getExtraInfo("qrCombinedFANN");
+    float B0Probability = qrCombined / 2 + 0.5;
+    float B0barProbability = 1 - B0Probability;
     infoMapsFANN->setQrCombined(qrCombined);
     infoMapsFANN->setB0Probability(B0Probability);
     infoMapsFANN->setB0barProbability(B0barProbability);
@@ -78,11 +78,11 @@ void FlavorTaggerInfoFillerModule::event()
   FlavorTaggerInfoMap* infoMapsFBDT = flavorTaggerInfo -> getMethodMap("FBDT");
 
   if (m_TMVAfbdt) {
-    float qrCombined = 2 * (m_eventExtraInfo->getExtraInfo("qrCombinedFBDT") - 0.5);
+    float B0Probability = m_eventExtraInfo->getExtraInfo("qrCombinedFBDT");
+    float B0barProbability = 1 - B0Probability;
+    float qrCombined = 2 * (B0Probability - 0.5);
     if (qrCombined < 1.1 && qrCombined > 1.0) qrCombined = 1.0;
     if (qrCombined > - 1.1 && qrCombined < -1.0) qrCombined = -1.0;
-    float B0Probability = m_eventExtraInfo->getExtraInfo("qrCombinedFBDT");
-    float B0barProbability = 1 - m_eventExtraInfo->getExtraInfo("qrCombinedFBDT");
     infoMapsFBDT->setQrCombined(qrCombined);
     infoMapsFBDT->setB0Probability(B0Probability);
     infoMapsFBDT->setB0barProbability(B0barProbability);
@@ -91,11 +91,11 @@ void FlavorTaggerInfoFillerModule::event()
   if (m_DNNmlp) {
     FlavorTaggerInfoMap* infoMapsDNN = flavorTaggerInfo -> getMethodMap("DNN");
     const Particle* particle = m_roe->getRelated<Particle>();
-    float qrCombined = 2 * (particle->getExtraInfo("dnn_output") - 0.5);
+    float B0Probability = particle->getExtraInfo("dnn_output");
+    float B0barProbability = 1 - B0Probability;
+    float qrCombined = 2 * (B0Probability - 0.5);
     if (qrCombined < 1.1 && qrCombined > 1.0) qrCombined = 1.0;
     if (qrCombined > - 1.1 && qrCombined < -1.0) qrCombined = -1.0;
-    float B0Probability = particle->getExtraInfo("dnn_output");
-    float B0barProbability = 1 - particle->getExtraInfo("dnn_output");
     infoMapsDNN->setQrCombined(qrCombined);
     infoMapsDNN->setB0Probability(B0Probability);
     infoMapsDNN->setB0barProbability(B0barProbability);

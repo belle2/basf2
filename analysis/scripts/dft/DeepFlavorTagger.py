@@ -228,14 +228,6 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         basf2_mva.teacher(general_options, specific_options)
 
     elif mode == 'expert':
-        # TODO: implement filling flavor tagger info in the FlavorTaggerInfoMap
-
-        # flavor tagger info
-        # mod_ft_info_builder = register_module('FlavorTaggerInfoBuilder')
-        # path.add_module(mod_ft_info_builder)
-
-        # fill the flavor tagger info
-        # mod_ft_info_filler = register_module('FlavorTaggerInfoFiller')
 
         flavorTaggerInfoBuilder = basf2.register_module('FlavorTaggerInfoBuilder')
         path.add_module(flavorTaggerInfoBuilder)

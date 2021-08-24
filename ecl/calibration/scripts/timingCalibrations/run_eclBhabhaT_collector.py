@@ -9,27 +9,37 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# --------------------------------------------------------------------------
-# BASF2 script for the first (out of two) step of time shift calibration.
-# using bhabha events.
-# --------------------------------------------------------------------------
-#
-# There are two ways you can use it:
+##########################################################################
+# Description:                                                           #
+# This script executes the bhabha timing calibration collector,          #
+# which reads in the bhabha events to perform the crystal                #
+# time calibration and the crate time calibration, where                 #
+# the final calibration step is performed by the algorithm.              #
+# This script is run directly with basf2.                                #
+##########################################################################
+
+
+# There are two ways you can use this script:
 # 1. Provide parameters from command line:
-#   basf2 EclBhabhaTCollector.py -i "/path/to/input/files/*.root" -o collector_output.root
+#   basf2 run_eclBhabhaT_collector.py -i "/path/to/input/files/*.root" -o collector_output.root
 #
 # 2. Set parameters directly in steering file.
 #   Change INPUT_LIST and OUTPUT variables.
 #   (Multiple files can be easily added with glob.glob("/path/to/your/files/*.root"))
 #   And then call
-#   basf2 EclBhabhaTCollector.py
+#   basf2 run_eclBhabhaT_collector.py
 
 import basf2 as b2
 from ROOT import Belle2
 import glob
+import sys
 import tracking
 import rawdata
 import reconstruction
+
+from basf2 import conditions as b2conditions
+from reconstruction import prepare_cdst_analysis
+
 
 env = Belle2.Environment.Instance()
 
@@ -79,6 +89,9 @@ MIN_CRYSTAL = 1
 # Last ECL CellId to calibrate
 MAX_CRYSTAL = 8736
 
+# Bias of CDC event t0 in bhabha vs hadronic events (in ns)
+CDC_T0_BIAS_CORRECTION_OFFSET = 0   # default is 0ns
+
 ###################################################################
 
 components = ['CDC', 'ECL']
@@ -100,6 +113,7 @@ main.add_module("HistoManager", histoFileName=OUTPUT)
 if 'Raw' in INPUT_LIST[0]:
     add_unpackers = True
 
+
 main.add_module('Gearbox')
 
 if add_unpackers:
@@ -111,13 +125,15 @@ if add_unpackers:
     reconstruction.add_ecl_modules(main, components)
     reconstruction.add_ecl_track_matcher_module(main, components)
 
+prepare_cdst_analysis(main)  # for new 2020 cdst format
 
 # == Generate time calibration matrix from ECLDigit
 ECLBhabhaTCollectorInfo = main.add_module('ECLBhabhaTCollector', timeAbsMax=TIME_ABS_MAX,
                                           minCrystal=MIN_CRYSTAL, maxCrystal=MAX_CRYSTAL,
-                                          saveTree=SAVE_TREE)
+                                          saveTree=SAVE_TREE,
+                                          hadronEventT0_TO_bhabhaEventT0_correction=CDC_T0_BIAS_CORRECTION_OFFSET)
 
-ECLBhabhaTCollectorInfo.set_log_level(b2.LogLevel.INFO)  # OR: LogLevel.DEBUG
+ECLBhabhaTCollectorInfo.set_log_level(b2.LogLevel.INFO)  # OR: b2.LogLevel.DEBUG
 ECLBhabhaTCollectorInfo.set_debug_level(36)
 
 
@@ -129,24 +145,27 @@ b2.set_log_level(b2.LogLevel.INFO)
 b2.set_debug_level(100)
 
 # == Configure database
-b2.reset_database()
-b2.use_database_chain()
+# reset_database()
+# use_database_chain()
 
-# Read in any required central databases
-# use_central_database("online")
+b2conditions.reset()
+b2conditions.override_globaltags()
 
-# 2 GT required for making proc 10
-b2.use_central_database("data_reprocessing_proc10")
-b2.use_central_database("data_reprocessing_prompt_rel4_patchb")
-
-# Read in any required local databases.  This may be required when doing crystal/crate iterations
-b2.use_local_database("localdb/database.txt")
+# These global tags will have to be updated for your files
+# Highest priority last
+b2.B2INFO("Adding Local Database {} to head of chain of local databases.")
+b2conditions.prepend_testing_payloads("localdb/database.txt")
+b2.B2INFO("Using Global Tag {}")
+b2conditions.prepend_globaltag("dp_recon_release6_patch")
+b2conditions.prepend_globaltag("Reco_master_patch_rel5")
+b2conditions.prepend_globaltag("AIRFLOW_online_snapshot_20210719-124441")
+b2conditions.prepend_globaltag("data_reprocessing_prompt")
 
 
 # == Process events
-# process(main, max_event=350000)  # reasonable stats for one crate
-# process(main, max_event=600000)  # reasonable stats for crystal calibs for proc10
-# process(main, max_event=3000)    # reasonable stats and speed for a quick test
-b2.process(main)                      # process all events
+# b2.process(main, max_event=350000)  # reasonable stats for one crate
+# b2.process(main, max_event=600000)  # reasonable stats for crystal calibs for proc10
+# b2.process(main, max_event=3000)    # reasonable stats and speed for a quick test
+b2.process(main)                   # process all events
 
 print(b2.statistics)

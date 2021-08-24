@@ -6,51 +6,52 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/**************************************************************************
+ * Description:                                                           *
+ * Validate the ecl timing calibrations using a hadronic event            *
+ * selection or bhabha event selection.                                   *
+ **************************************************************************/
+
 #pragma once
-#include <ecl/calibration/eclBhabhaTAlgorithm.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <string>
-
 
 namespace Belle2 {
   namespace ECL {
 
-    /** Calibrate ecl crystals using bhabha events */
-    class eclBhabhaTAlgorithm : public CalibrationAlgorithm {
+    /** Validate the ecl timing calibrations using a hadronic event selection */
+    class eclTValidationAlgorithm : public CalibrationAlgorithm {
     public:
 
       /**..Constructor */
-      eclBhabhaTAlgorithm();
+      eclTValidationAlgorithm();
+
+      /**..Constructor - main one as it allows user to choose which collector data to analyse*/
+      explicit eclTValidationAlgorithm(std::string physicsProcessCollectorName);
 
       /**..Destructor */
-      ~eclBhabhaTAlgorithm() {}
+      ~eclTValidationAlgorithm() {}
 
       /*** Parameters ***/
 
       int cellIDLo;     /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
       int cellIDHi;     /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
+      bool readPrevCrysPayload; /**< Read the previous crystal payload values for comparison */
       double meanCleanRebinFactor;  /**< Rebinning factor for mean calculation */
       double meanCleanCutMinFactor;  /**< After rebinning, create a mask for bins that have values
                                           less than meanCleanCutMinFactor times the maximum bin value.
                                           Expand mask and apply to non-rebinned histogram. */
-      int crateIDLo;    /**< Fit crates with crateID0 in the inclusive range [crateIDLo,crateIDHi] */
-      int crateIDHi;    /**< Fit crates with crateID0 in the inclusive range [crateIDLo,crateIDHi] */
-      bool savePrevCrysPayload; /**< Save the previous crystal payload values for comparison */
-      bool readPrevCrysPayload; /**< Read the previous crystal payload values for comparison */
+      double clusterTimesFractionWindow_maxtime;  /**< Maximum time for window to calculate cluster
+                                                       time fraction, in ns*/
       bool debugOutput; /**< Save every histogram and fitted function to debugFilename */
-      /** Name of file with debug output, eclBhabhaTAlgorithm.root by default */
+      /** Name of file with debug output, eclTValidationAlgorithm.root by default */
       std::string debugFilenameBase;
-      std::string collectorName;  /**< Name of the collector */
-      int refCrysPerCrate[52] ;  /**< List of crystals, one per crate, used as reference
-                                        time for crystal time calibration */
+
     protected:
 
       /**..Run algorithm on events */
       EResult calibrate() override;
 
-//    private:
-//      /** Number of processed runs */
-//      unsigned int m_runCount;
     };
   }  // namespace ECL
 } // namespace Belle2

@@ -110,12 +110,8 @@ namespace Belle2 {
       // Here we parse
       Py_Initialize();
       try {
-        py::object yacc_namespace = py::import("yacc");
-        py::object lex_namespace = py::import("lex");
-        py::object b2lexer_class = lex_namespace.attr("B2Lexer")();
-        py::object b2lexer = b2lexer_class.attr("build")();
-        py::object b2parser = yacc_namespace.attr("CutParser")();
-        py::tuple tuple = py::extract<boost::python::tuple>(b2parser.attr("parse")(cut));
+        py::object b2parser_namespace = py::import("b2parser");
+        py::tuple tuple = py::extract<boost::python::tuple>(b2parser_namespace.attr("parse")(cut));
         return std::unique_ptr<GeneralCut>(new GeneralCut(tuple));
       } catch (py::error_already_set&) {
         PyErr_Print();

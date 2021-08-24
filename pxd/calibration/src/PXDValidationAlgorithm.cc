@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #include <pxd/calibration/PXDValidationAlgorithm.h>
-//#include <pxd/dbobjects/PXDGainMapPar.h>
-//#include <calibration/dbobjects/TestCalibMean.h>
 
 #include <string>
 #include <algorithm>
@@ -240,8 +238,6 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
   float d0, z0;
   tree_d0z0->SetBranchAddress("d0", &d0);
   tree_d0z0->SetBranchAddress("z0", &z0);
-  //TH1F hD0("hD0", "Corrected d0;#Delta d0/#sqrt{2} [cm];Counts", 100, -0.03, 0.03);
-  //TH1F hZ0("hZ0", "Corrected z0;#Delta z0/#sqrt{2} [cm];Counts", 100, -0.03, 0.03);
   m_hD0->Reset();
   m_hZ0->Reset();
   string cuts = "abs(d0)<0.03&&abs(z0)<0.03";
@@ -308,11 +304,6 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
 
   }
   currentDir->cd();
-
-  // Saving dummy DBObject. Required by CAF?
-  //TestCalibMean* correction = new TestCalibMean(m_run, gRandom->Gaus());
-  //B2INFO("Saving calibration results.");
-  //saveCalibration(correction, "DummyCalibMean");
 
   // Always return ok to have run-by-run info
   return c_OK;

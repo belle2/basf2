@@ -23,16 +23,16 @@ namespace Belle2 {
   /**
    * Collector module for PXD gain calibration and PXD calibration validation
    *
-   * PXD2TrackEvent data store is required to fill TTree objects or histograms
-   * used in gain calibration or the validation algorithm.
-   *
-   * For gain calibration, track clusters are already selected in the event class.
-   * Further selections based on cluster size/charge and track properties are available.
+   * For gain calibration, tracks (particles) are selected using basf2 modular analysis.
+   * Further selection based on cluster size/charge is then applied in this module.
    * As in the ClusterChargeCollector, this collector also creates a grid of rectangular
    * regions on each sensor (granularity is steerable with nBinsU and nBinsV) and creates
    * TTree objects for each grid region. Cluster charge values and the expected ones are
    * filled into these trees. The gain is later estimated with the MPV of the ratio,
    * cluster charge / expected value, in the calibration algorithm.
+   *
+   * Performance variables for estimating PXD efficiency and impact parameter resolution
+   * are also collected using related particle lists.
    *
    */
   class PXDPerformanceVariablesCollectorModule : public CalibrationCollectorModule {

@@ -250,7 +250,7 @@ bool Variable::Manager::createVariable(const std::string& name)
   return false;
 }
 
-bool Variable::Manager::createVariable(const std::string fullname, const std::string& functionName,
+bool Variable::Manager::createVariable(const std::string& fullname, const std::string& functionName,
                                        const std::vector<std::string>& functionArguments)
 {
   // Search function name in parameter variables

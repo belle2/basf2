@@ -264,7 +264,8 @@ namespace Belle2 {
         * Called by the corresponding getVariable(const std::string&, const std::vector<std::string>&) to register non-existing variables
         * The fullname of the function call is also passed for alias resolving.
         */
-      bool createVariable(const std::string fullname, const std::string& functionName, const std::vector<std::string>& functionArguments);
+      bool createVariable(const std::string& fullname, const std::string& functionName,
+                          const std::vector<std::string>& functionArguments);
 
       /** Group last set via VARIABLE_GROUP(). */
       std::string m_currentGroup;

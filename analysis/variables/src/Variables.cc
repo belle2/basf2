@@ -491,18 +491,21 @@ namespace Belle2 {
 
     double particleInvariantMassFromDaughtersV0(const Particle* part)
     {
-      const auto V0 = part->getV0();
-      if (!V0) return particleInvariantMassFromDaughters(part);
-      auto daughters = V0->getTrackFitResults();
+      if (part->getParticleSource() != Particle::EParticleSourceObject::c_V0) return particleInvariantMassFromDaughters(part);
       TVector3 vertex = part->getVertex();
       const double bField = BFieldManager::getField(vertex).Z() / Unit::T;
-      Helix helix_plus  = daughters.first ->getHelix();
-      Helix helix_minus = daughters.second->getHelix();
-      helix_plus .passiveMoveBy(vertex);
-      helix_minus.passiveMoveBy(vertex);
-      TLorentzVector mom4_plus  = TLorentzVector(helix_plus .getMomentum(bField), daughters.first ->getEnergy());
-      TLorentzVector mom4_minus = TLorentzVector(helix_minus.getMomentum(bField), daughters.second->getEnergy());
-      return (mom4_plus + mom4_minus).M();
+      const std::vector<Particle*> daughters = part->getDaughters();
+      TLorentzVector sum;
+      for (auto daughter : daughters) {
+        TrackFitResult* tfr = daughter->getTrackFitResult();
+        Helix helix = tfr->getHelix();
+        helix.passiveMoveBy(vertex);
+        TVector3 mom3 = daughter->getMomentumScalingFactor() * helix.getMomentum(bField);
+        float mPDG = daughter->getPDGMass();
+        float E = std::sqrt(mom3.Mag2() + mPDG * mPDG);
+        sum += TLorentzVector(mom3, E);
+      }
+      return sum.M();
     }
 
     double particleInvariantMassLambda(const Particle* part)

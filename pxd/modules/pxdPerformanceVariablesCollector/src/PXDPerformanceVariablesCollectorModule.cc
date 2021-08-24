@@ -208,7 +208,7 @@ void PXDPerformanceVariablesCollectorModule::startRun() // Do your beginRun() st
 
 void PXDPerformanceVariablesCollectorModule::collect() // Do your event() stuff here
 {
-  // Update booleans for even selection
+  // Update booleans for event selection
   m_selected4Eff = false;
   StoreObjPtr<ParticleList> particles4Eff(m_PList4EffName);
   if (particles4Eff.isValid() && particles4Eff->getListSize() == 1)
@@ -297,7 +297,8 @@ void PXDPerformanceVariablesCollectorModule::collectGainVariables(const TrackClu
 {
   auto cluster = trackCluster.cluster;
   auto intersection = trackCluster.intersection;
-  // Compute variables from cluster needed for gain estimation
+
+  // Compute variables from the cluster for gain estimation
   m_signal = cluster.charge;
   m_estimated = intersection.chargeMPV;
 

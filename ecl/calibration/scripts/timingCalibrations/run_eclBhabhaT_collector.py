@@ -156,16 +156,16 @@ b2conditions.override_globaltags()
 b2.B2INFO("Adding Local Database {} to head of chain of local databases.")
 b2conditions.prepend_testing_payloads("localdb/database.txt")
 b2.B2INFO("Using Global Tag {}")
-b2conditions.prepend_globaltag("ECL_testingNewPayload_RefCrystalPerCrate")
-b2conditions.prepend_globaltag("master_2020-05-13")
-b2conditions.prepend_globaltag("online_proc11")
-b2conditions.prepend_globaltag("data_reprocessing_proc11")
+b2conditions.prepend_globaltag("dp_recon_release6_patch")
 b2conditions.prepend_globaltag("Reco_master_patch_rel5")
+b2conditions.prepend_globaltag("AIRFLOW_online_snapshot_20210719-124441")
+b2conditions.prepend_globaltag("data_reprocessing_prompt")
+
 
 # == Process events
-# process(main, max_event=350000)  # reasonable stats for one crate
-# process(main, max_event=600000)  # reasonable stats for crystal calibs for proc10
-# process(main, max_event=3000)    # reasonable stats and speed for a quick test
+# b2.process(main, max_event=350000)  # reasonable stats for one crate
+# b2.process(main, max_event=600000)  # reasonable stats for crystal calibs for proc10
+# b2.process(main, max_event=3000)    # reasonable stats and speed for a quick test
 b2.process(main)                   # process all events
 
 print(b2.statistics)

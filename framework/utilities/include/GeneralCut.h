@@ -153,10 +153,7 @@ namespace Belle2 {
      * Constructor of the cut. Call init with given string
      * @param str Cut is initalized with the specified cuts. Default are no cuts
      */
-    explicit GeneralCut(Nodetuple tuple)
-    {
-      m_root = NodeFactory::compile_boolean_node<AVariableManager>(tuple);
-    }
+    explicit GeneralCut(Nodetuple tuple) : m_root{NodeFactory::compile_boolean_node<AVariableManager>(tuple)} {}
 
     /**
      * Delete Copy constructor

@@ -129,9 +129,8 @@ namespace Belle2 {
   private:
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
     explicit UnaryBooleanNode(Nodetuple node, bool negation, bool bracketized)
-      : m_negation{negation}, m_bracketized{bracketized}
+      : m_bnode{NodeFactory::compile_boolean_node<AVariableManager>(node)}, m_negation{negation}, m_bracketized{bracketized}
     {
-      m_bnode = NodeFactory::compile_boolean_node<AVariableManager>(node);
     }
 
     const bool m_negation; /**< if the evaluation of m_bnode->check(p) should be negated in check() */
@@ -204,10 +203,9 @@ namespace Belle2 {
   private:
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
     explicit BinaryBooleanNode(Nodetuple left_node, Nodetuple right_node, BooleanOperator boperator)
-      : m_boperator{boperator}
+      : m_left_bnode{NodeFactory::compile_boolean_node<AVariableManager>(left_node)}, m_right_bnode{NodeFactory::compile_boolean_node<AVariableManager>(right_node)},
+        m_boperator{boperator}
     {
-      m_left_bnode = NodeFactory::compile_boolean_node<AVariableManager>(left_node);
-      m_right_bnode = NodeFactory::compile_boolean_node<AVariableManager>(right_node);
     }
     std::unique_ptr<const AbstractBooleanNode<AVariableManager>> m_left_bnode; /**< boolean subexpression of a cut */
     std::unique_ptr<const AbstractBooleanNode<AVariableManager>> m_right_bnode; /**< boolean subexpression of a cut */
@@ -254,9 +252,8 @@ namespace Belle2 {
 
   private:
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
-    explicit UnaryRelationalNode(Nodetuple node)
+    explicit UnaryRelationalNode(Nodetuple node) : m_enode{m_enode = NodeFactory::compile_expression_node<AVariableManager>(node)}
     {
-      m_enode = NodeFactory::compile_expression_node<AVariableManager>(node);
     }
     std::unique_ptr<const AbstractExpressionNode<AVariableManager>> m_enode; /**< subexpression of a cut */
   };
@@ -334,10 +331,9 @@ namespace Belle2 {
   private:
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
     explicit BinaryRelationalNode(Nodetuple left_node, Nodetuple right_node, ComparisonOperator coperator)
-      : m_coperator{coperator}
+      : m_left_enode{NodeFactory::compile_expression_node<AVariableManager>(left_node)}, m_right_enode{NodeFactory::compile_expression_node<AVariableManager>(right_node)},
+        m_coperator{coperator}
     {
-      m_left_enode = NodeFactory::compile_expression_node<AVariableManager>(left_node);
-      m_right_enode = NodeFactory::compile_expression_node<AVariableManager>(right_node);
     }
     std::unique_ptr<const AbstractExpressionNode<AVariableManager>> m_left_enode; /**< subexpression of a cut */
     std::unique_ptr<const AbstractExpressionNode<AVariableManager>> m_right_enode; /**< subexpression of a cut */
@@ -436,11 +432,11 @@ namespace Belle2 {
   private:
     friend class NodeFactory;
     explicit TernaryRelationalNode(Nodetuple left_node, Nodetuple center_node, Nodetuple right_node, ComparisonOperator lc_coperator,
-                                   ComparisonOperator cr_coperator) : m_lc_coperator{lc_coperator}, m_cr_coperator{cr_coperator}
+                                   ComparisonOperator cr_coperator)
+      : m_left_enode{NodeFactory::compile_expression_node<AVariableManager>(left_node)}, m_center_enode{m_center_enode = NodeFactory::compile_expression_node<AVariableManager>(center_node)},
+        m_right_enode{m_right_enode = NodeFactory::compile_expression_node<AVariableManager>(right_node)},  m_lc_coperator{lc_coperator},
+        m_cr_coperator{cr_coperator}
     {
-      m_left_enode = NodeFactory::compile_expression_node<AVariableManager>(left_node);
-      m_center_enode = NodeFactory::compile_expression_node<AVariableManager>(center_node);
-      m_right_enode = NodeFactory::compile_expression_node<AVariableManager>(right_node);
     }
     std::unique_ptr<const AbstractExpressionNode<AVariableManager>> m_left_enode;
     std::unique_ptr<const AbstractExpressionNode<AVariableManager>> m_center_enode;
@@ -478,9 +474,9 @@ namespace Belle2 {
     }
   private:
     friend class NodeFactory;
-    explicit UnaryExpressionNode(Nodetuple node, bool unary_minus) : m_unary_minus{unary_minus}
+    explicit UnaryExpressionNode(Nodetuple node, bool unary_minus) : m_enode{NodeFactory::compile_expression_node<AVariableManager>(node)},
+      m_unary_minus{unary_minus}
     {
-      m_enode = NodeFactory::compile_expression_node<AVariableManager>(node);
     }
     std::unique_ptr<const AbstractExpressionNode<AVariableManager>> m_enode;
     const bool m_unary_minus;
@@ -507,8 +503,6 @@ namespace Belle2 {
             std::cout << typeid(l_val).name() << std::endl;
             std::cout << typeid(r_val).name() << std::endl;
             throw std::runtime_error("Invalid datatypes in plus operation.");
-            ret = false;
-            return ret;
           }
           break;
         case ArithmeticOperation::MINUS:
@@ -522,8 +516,6 @@ namespace Belle2 {
             std::cout << typeid(l_val).name() << std::endl;
             std::cout << typeid(r_val).name() << std::endl;
             throw std::runtime_error("Invalid datatypes in minus operation.");
-            ret = false;
-            return ret;
           }
           break;
         case ArithmeticOperation::PRODUCT:
@@ -537,8 +529,6 @@ namespace Belle2 {
             std::cout << typeid(l_val).name() << std::endl;
             std::cout << typeid(r_val).name() << std::endl;
             throw std::runtime_error("Invalid datatypes in product operation.");
-            ret = false;
-            return ret;
           }
           break;
         case ArithmeticOperation::DIVISION:
@@ -550,8 +540,6 @@ namespace Belle2 {
             return ret;
           } else {
             throw std::runtime_error("Invalid datatypes in division operation.");
-            ret = false;
-            return ret;
           }
           break;
         case ArithmeticOperation::POWER:
@@ -563,8 +551,6 @@ namespace Belle2 {
             return ret;
           } else {
             throw std::runtime_error("Invalid datatypes in power operation.");
-            ret = false;
-            return ret;
           }
           break;
         default:
@@ -593,10 +579,9 @@ namespace Belle2 {
 
   private:
     friend class NodeFactory;
-    explicit BinaryExpressionNode(Nodetuple left_node, Nodetuple right_node, ArithmeticOperation aoperation) : m_aoperation{aoperation}
+    explicit BinaryExpressionNode(Nodetuple left_node, Nodetuple right_node, ArithmeticOperation aoperation) : m_left_enode{NodeFactory::compile_expression_node<AVariableManager>(left_node)},
+      m_right_enode{NodeFactory::compile_expression_node<AVariableManager>(right_node)},  m_aoperation{aoperation}
     {
-      m_left_enode = NodeFactory::compile_expression_node<AVariableManager>(left_node);
-      m_right_enode = NodeFactory::compile_expression_node<AVariableManager>(right_node);
     }
     std::unique_ptr<const AbstractExpressionNode<AVariableManager>> m_left_enode;
     std::unique_ptr<const AbstractExpressionNode<AVariableManager>> m_right_enode;
@@ -670,7 +655,7 @@ namespace Belle2 {
     }
   private:
     friend class NodeFactory;
-    explicit IdentifierNode(std::string name) : m_name{name}, m_var{nullptr} {processVariable(m_name);};
+    explicit IdentifierNode(const std::string& name) : m_name{name}, m_var{nullptr} {processVariable(m_name);}
     const std::string m_name;
     const Var* m_var; /**< set if there was a valid variable in this cut */
   };
@@ -699,7 +684,8 @@ namespace Belle2 {
     }
   private:
     friend class NodeFactory;
-    explicit FunctionNode(std::string functionName, std::vector<std::string> functionArguments): m_name{functionName}, m_arguments{functionArguments}
+    explicit FunctionNode(const std::string& functionName, const std::vector<std::string>& functionArguments): m_name{functionName},
+      m_arguments{functionArguments}
     {
       // Initialize Variable
       AVariableManager& manager = AVariableManager::Instance();

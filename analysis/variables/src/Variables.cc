@@ -497,7 +497,7 @@ namespace Belle2 {
       const std::vector<Particle*> daughters = part->getDaughters();
       TLorentzVector sum;
       for (auto daughter : daughters) {
-        TrackFitResult* tfr = daughter->getTrackFitResult();
+        const TrackFitResult* tfr = daughter->getTrackFitResult();
         Helix helix = tfr->getHelix();
         helix.passiveMoveBy(vertex);
         TVector3 mom3 = daughter->getMomentumScalingFactor() * helix.getMomentum(bField);

@@ -133,10 +133,10 @@ namespace Belle2 {
     {
     }
 
+    std::unique_ptr<const AbstractBooleanNode<AVariableManager>> m_bnode; /**< boolean subexpression of a cut */
     const bool m_negation; /**< if the evaluation of m_bnode->check(p) should be negated in check() */
     const bool
     m_bracketized; /**< if the boolean expression from which this node is compiled was in brackets, relevant in decompile to yield the original string */
-    std::unique_ptr<const AbstractBooleanNode<AVariableManager>> m_bnode; /**< boolean subexpression of a cut */
   };
 
 
@@ -252,7 +252,7 @@ namespace Belle2 {
 
   private:
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
-    explicit UnaryRelationalNode(Nodetuple node) : m_enode{m_enode = NodeFactory::compile_expression_node<AVariableManager>(node)}
+    explicit UnaryRelationalNode(Nodetuple node) : m_enode{NodeFactory::compile_expression_node<AVariableManager>(node)}
     {
     }
     std::unique_ptr<const AbstractExpressionNode<AVariableManager>> m_enode; /**< subexpression of a cut */
@@ -433,8 +433,8 @@ namespace Belle2 {
     friend class NodeFactory;
     explicit TernaryRelationalNode(Nodetuple left_node, Nodetuple center_node, Nodetuple right_node, ComparisonOperator lc_coperator,
                                    ComparisonOperator cr_coperator)
-      : m_left_enode{NodeFactory::compile_expression_node<AVariableManager>(left_node)}, m_center_enode{m_center_enode = NodeFactory::compile_expression_node<AVariableManager>(center_node)},
-        m_right_enode{m_right_enode = NodeFactory::compile_expression_node<AVariableManager>(right_node)},  m_lc_coperator{lc_coperator},
+      : m_left_enode{NodeFactory::compile_expression_node<AVariableManager>(left_node)}, m_center_enode{NodeFactory::compile_expression_node<AVariableManager>(center_node)},
+        m_right_enode{NodeFactory::compile_expression_node<AVariableManager>(right_node)},  m_lc_coperator{lc_coperator},
         m_cr_coperator{cr_coperator}
     {
     }
@@ -644,18 +644,18 @@ namespace Belle2 {
     {
       return m_name;
     }
-    void processVariable(const std::string& str)
+    void processVariable()
     {
       AVariableManager& manager = AVariableManager::Instance();
-      m_var = manager.getVariable(str);
+      m_var = manager.getVariable(m_name);
       if (m_var == nullptr) {
         throw std::runtime_error(
-          "Cut string has an invalid format: Variable not found: " + str);
+          "Cut string has an invalid format: Variable not found: " + m_name);
       }
     }
   private:
     friend class NodeFactory;
-    explicit IdentifierNode(const std::string& name) : m_name{name}, m_var{nullptr} {processVariable(m_name);}
+    explicit IdentifierNode(const std::string& name, bool processVariableOnCreation) : m_name{name}, m_var{nullptr} {if (processVariableOnCreation) processVariable();}
     const std::string m_name;
     const Var* m_var; /**< set if there was a valid variable in this cut */
   };
@@ -682,10 +682,7 @@ namespace Belle2 {
       std::string fullname = m_name + "(" + boost::algorithm::join(m_arguments, ", ") + ")";
       return fullname;
     }
-  private:
-    friend class NodeFactory;
-    explicit FunctionNode(const std::string& functionName, const std::vector<std::string>& functionArguments): m_name{functionName},
-      m_arguments{functionArguments}
+    void processMetaVariable()
     {
       // Initialize Variable
       AVariableManager& manager = AVariableManager::Instance();
@@ -696,8 +693,13 @@ namespace Belle2 {
         throw std::runtime_error(
           "Cut string has an invalid format: Metavariable not found: " + fullname);
       }
-
     }
+  private:
+    friend class NodeFactory;
+    explicit FunctionNode(const std::string& functionName, const std::vector<std::string>& functionArguments,
+                          bool processMetaVariableOnCreation): m_name{functionName},
+      m_arguments{functionArguments}
+    {if (processMetaVariableOnCreation) processMetaVariable();}
     const std::string m_name;
     const std::vector<std::string> m_arguments;
     const Var* m_var; /**< set if there was a valid variable in this cut */

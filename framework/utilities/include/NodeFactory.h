@@ -149,7 +149,9 @@ namespace Belle2 {
         return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new DataNode<AVariableManager, bool>(b));
       } else if (node_type == NodeType::IdentifierNode) {
         std::string identifier = py::extract<std::string>(tuple[1]);
-        return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new IdentifierNode<AVariableManager>(identifier));
+        bool processVariableOnCreation = py::extract<bool>(tuple[2]);
+        return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new IdentifierNode<AVariableManager>(identifier,
+               processVariableOnCreation));
       } else if (node_type == NodeType::FunctionNode) {
 
         // Extract functionName as second argument of the tuple
@@ -174,8 +176,10 @@ namespace Belle2 {
           if (stringArgument.size() == 0) throw std::runtime_error("Argument empty");
           functionArguments.push_back(stringArgument);
         }
+        bool processMetaVariableOnCreation = py::extract<bool>(tuple[4]);
+
         return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new FunctionNode<AVariableManager>(functionName,
-               functionArguments));
+               functionArguments, processMetaVariableOnCreation));
       } else {
         throw std::runtime_error("error NodeFactory::compile_expression_node: got invalid expression NodeType.");
       }

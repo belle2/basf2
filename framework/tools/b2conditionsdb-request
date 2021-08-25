@@ -198,13 +198,11 @@ if __name__ == "__main__":
 
     # issue and time
     if data['task'] == 'master':
-      if args.issue is not None:
-        print(f'\n{ANSIColors.fg("red")}You requested an update of the master globaltag, but you passed an existing jira issue ({args.issue}): this will be ignored and a new issue will be created and automatically assigned to the TUPPR manager{ANSIColors.reset()}')
-      data['issue'] = None
+        if args.issue is not None:
+            print(f'\n{ANSIColors.fg("red")}You requested an update of the master globaltag, but you passed an existing jira issue ({args.issue}): this will be ignored and a new issue will be created and automatically assigned to the TUPPR manager{ANSIColors.reset()}')
+        data['issue'] = None
     else:
-      data['issue'] = args.issue
-      if not args.confirm:
-        data['issue'] = input('\nIdentifier of existing jira issue, leave empty to take default: ')
+        data['issue'] = args.issue or input('\nIdentifier of existing jira issue, leave empty to take default: ')
     data['time'] = datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S')
 
     # summarize request and ask for confirmation

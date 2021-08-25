@@ -139,7 +139,7 @@ namespace Belle2 {
       int m_last_dhp_readout_frame_lo[4] { -1}; // signed because -1 means undefined
 
       /** firmware version from DB. */
-      OptionalDBObjPtr<PXDDHHFirmwareVersionPar> m_firmwareFromDB;
+      OptionalDBObjPtr<PXDDHHFirmwareVersionPar> m_firmwareFromDB{"PXDDHHFirmwareVersion"};
       /** override firmware version from DB. */
       int m_overrideFirmwareVersion{0};
 

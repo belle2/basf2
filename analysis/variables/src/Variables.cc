@@ -489,15 +489,21 @@ namespace Belle2 {
       }
     }
 
-    double particleInvariantMassFromDaughtersV0(const Particle* part)
+    double particleInvariantMassFromDaughtersDisplaced(const Particle* part)
     {
-      if (part->getParticleSource() != Particle::EParticleSourceObject::c_V0) return particleInvariantMassFromDaughters(part);
       TVector3 vertex = part->getVertex();
+      if (part->getParticleSource() != Particle::EParticleSourceObject::c_V0
+          && vertex.Perp() < 0.5) return particleInvariantMassFromDaughters(part);
+
       const double bField = BFieldManager::getField(vertex).Z() / Unit::T;
       const std::vector<Particle*> daughters = part->getDaughters();
       TLorentzVector sum;
       for (auto daughter : daughters) {
         const TrackFitResult* tfr = daughter->getTrackFitResult();
+        if (!tfr) {
+          sum += daughter->get4Vector();
+          continue;
+        }
         Helix helix = tfr->getHelix();
         helix.passiveMoveBy(vertex);
         TVector3 mom3 = daughter->getMomentumScalingFactor() * helix.getMomentum(bField);
@@ -1060,7 +1066,7 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("M2", particleMassSquared,
                       "The particle's mass squared.");
 
-    REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughtersV0,
+    REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughtersDisplaced,
                       "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle is V0, its daughter 4-momentum vectors at fitted vertex are taken.\n"
                       "If this particle has no daughters, defaults to :b2:var:`M`.");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,

@@ -11,3 +11,4 @@ Variables
 +++++++++
 
 * Removed ``R2EventLevel`` (it has been officially deprecated since release-05).
+* Modified ``InvM`` to be calculated at the decay vertex if the particle is V0 or decay at rho > 5 mm.

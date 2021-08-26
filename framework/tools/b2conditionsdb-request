@@ -28,16 +28,16 @@ from conditions_db import ConditionsDB
 def ask_new(data):
     """Request information in case of new payload classes"""
 
-    data['task'] = 'master'
+    data['task'] = 'main'
     data['request'] = 'New'
-    if input('\nIs the code for the new payload already in the master branch (y/n) [n]? ').lower() in ['n', '']:
+    if input('\nIs the code for the new payload already in the main branch (y/n) [n]? ').lower() in ['n', '']:
         data['pull-request'] = input('\nPlease give the number of the pull request that contains the new payload classes: ')
 
 
 def ask_modify(data):
     """Request information in case of modified payload classes"""
 
-    data['task'] = 'master'
+    data['task'] = 'main'
     data['request'] = 'Modification'
     data['pull-request'] = input('\nPlease give the number of the pull request that contains the modified payload classes: ')
     data['backward-compatibility'] = input('\nWhat happens if the old payload is encountered by the updated code? ')
@@ -55,7 +55,7 @@ def get_argument_parser():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument('--task', type=str, default=None,
-                        choices=['master', 'new', 'modify', 'validation', 'online', 'prompt', 'data', 'mc', 'analysis'],
+                        choices=['main', 'new', 'modify', 'validation', 'online', 'prompt', 'data', 'mc', 'analysis'],
                         help="""Type of global tag that should be updated.
                                 Use new/modify if the request contains new/modified payload classes.""")
     normalize_group = parser.add_mutually_exclusive_group()
@@ -132,19 +132,19 @@ if __name__ == "__main__":
     else:
         if input('\nDoes the request contain new or modified payloads classes (y/n) [n]? ').lower() in ['n', '']:
             data['request'] = 'Update'
-            print('\nFor which type of global tags is the request, mas[t]er, [v]alidation, [o]nline, [p]rompt, [d]ata, [m]c, or [a]nalysis?')
+            print('\nFor which type of global tags is the request, ma[i]n, [v]alidation, [o]nline, [p]rompt, [d]ata, [m]c, or [a]nalysis?')
             while True:
-                task = input('t/o/p/d/m/a: ').lower()
-                if task in ['t', 'v', 'o', 'p', 'd', 'm', 'a']:
+                task = input('i/o/p/d/m/a: ').lower()
+                if task in ['i', 'v', 'o', 'p', 'd', 'm', 'a']:
                     break
-            data['task'] = {'t': 'master', 'v': 'validation', 'o': 'online', 'p': 'prompt', 'd': 'data', 'm': 'mc', 'a': 'analysis'}[task]
+            data['task'] = {'i': 'main', 'v': 'validation', 'o': 'online', 'p': 'prompt', 'd': 'data', 'm': 'mc', 'a': 'analysis'}[task]
         else:
             if input('\nDo payloads of the given names already exist, but the class definition has changed (y/n) [n]? ').lower() in ['n', '']:
                 ask_new(data)
             else:
                 ask_modify(data)
-            # if there are new or modified payloads they first have to go to master
-            data['task'] = 'master'
+            # if there are new or modified payloads they first have to go to main
+            data['task'] = 'main'
 
     # release and reason
     data['release'] = args.release or input('\nThe new payloads require at least the following software release: ')
@@ -197,9 +197,9 @@ if __name__ == "__main__":
             data['data_taking'] = sys.stdin.readlines()
 
     # issue and time
-    if data['task'] == 'master':
+    if data['task'] == 'main':
         if args.issue is not None:
-            print(f'\n{ANSIColors.fg("red")}You requested an update of the master globaltag, but you passed an existing jira issue ({args.issue}): this will be ignored and a new issue will be created and automatically assigned to the TUPPR manager{ANSIColors.reset()}')
+            print(f'\n{ANSIColors.fg("red")}You requested an update of the main globaltag, but you passed an existing jira issue ({args.issue}): this will be ignored and a new issue will be created and automatically assigned to the TUPPR manager{ANSIColors.reset()}')
         data['issue'] = None
     else:
         data['issue'] = args.issue or input('\nIdentifier of existing jira issue, leave empty to take default: ')
@@ -207,14 +207,14 @@ if __name__ == "__main__":
 
     # summarize request and ask for confirmation
     if not args.confirm:
-        master_info = ""
+        main_info = ""
         if data['request'] != 'Update':
-            master_info = f"  -> {data['request']}: "
-            master_info += f"PR #{data['pull-request']}" if 'pull-request' in data.keys() else "already in master"
+            main_info = f"  -> {data['request']}: "
+            main_info += f"PR #{data['pull-request']}" if 'pull-request' in data.keys() else "already in main"
         print(f"""\nSUMMARY:
 Payloads file       : {payloadsFile}
 Normalize payloads  : {normalize}
-Type of global tag  : {data['task']}{master_info}
+Type of global tag  : {data['task']}{main_info}
 Required release    : {data['release']}
 Request reason      : {data['reason']}
 Details:""")

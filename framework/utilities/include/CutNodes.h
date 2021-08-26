@@ -9,11 +9,14 @@
 #pragma once
 #include <memory>
 #include <iostream>
-#include <boost/python/tuple.hpp>
+#include <functional>
+
 #include <framework/utilities/AbstractNodes.h>
 #include <framework/utilities/NodeFactory.h>
+#include <framework/logging/Logger.h>
+
 #include <boost/algorithm/string.hpp>
-#include <functional>
+#include <boost/python/tuple.hpp>
 
 namespace py = boost::python;
 typedef const py::tuple& Nodetuple;
@@ -229,6 +232,14 @@ namespace Belle2 {
       std::variant<double, int, bool> ret = m_enode->evaluate(p);
       if (std::holds_alternative<bool>(ret)) {
         return std::get<bool>(ret);
+      } else if (std::holds_alternative<int>(ret)) {
+        B2WARNING("Static casting integer value to bool in cutstring evaluation." << LogVar("Cut substring",
+                  m_enode->decompile()) << LogVar("Casted value", std::get<int>(ret)));
+        return static_cast<bool>(std::get<int>(ret));
+      } else if (std::holds_alternative<double>(ret)) {
+        B2WARNING("Static casting double value to bool in cutstring evaluation." <<  LogVar("Cut substring",
+                  m_enode->decompile()) << LogVar(" Casted value", std::get<double>(ret)));
+        return static_cast<bool>(std::get<double>(ret));
       } else {
         throw std::runtime_error("UnaryRelationalNode should evaluate to bool.");
       }

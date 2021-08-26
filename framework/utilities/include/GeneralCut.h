@@ -115,7 +115,7 @@ namespace Belle2 {
         return std::unique_ptr<GeneralCut>(new GeneralCut(tuple));
       } catch (py::error_already_set&) {
         PyErr_Print();
-        throw std::runtime_error("Boost python error");
+        throw std::runtime_error("Parsing error on cutstring:" + cut);
       }
     }
     /**

@@ -33,6 +33,7 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/gearbox/Const.h>
 
@@ -491,11 +492,11 @@ namespace Belle2 {
 
     double particleInvariantMassFromDaughtersDisplaced(const Particle* part)
     {
-      TVector3 vertex = part->getVertex();
+      B2Vector3D vertex = part->getVertex();
       if (part->getParticleSource() != Particle::EParticleSourceObject::c_V0
           && vertex.Perp() < 0.5) return particleInvariantMassFromDaughters(part);
 
-      const double bField = BFieldManager::getField(vertex).Z() / Unit::T;
+      const double bField = BFieldManager::getFieldInTesla(vertex).Z();
       const std::vector<Particle*> daughters = part->getDaughters();
       TLorentzVector sum;
       for (auto daughter : daughters) {

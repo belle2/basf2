@@ -132,8 +132,8 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "Shift of time window in 32count for synchronization (L1 timing=0)", m_shiftOfTimeWindowIn32Count);
 
   //Some FEE params.
-  addParam("TDCThresholdOffset", m_tdcThresholdOffset, "Offset for TDC (digital) threshold (mV)", 3820.);
-  addParam("AnalogGain",   m_analogGain, "Analog  gain (V/pC)", 1.1);
+  addParam("TDCThresholdOffset", m_tdcThresholdOffset, "Offset for TDC (digital) threshold (mV)", 3828.);
+  addParam("AnalogGain",   m_analogGain, "Analog  gain (V/pC)", 1.09);
   addParam("DigitalGain", m_digitalGain, "Digital gain (V/pC)", 7.);
   addParam("ADCBinWidth", m_adcBinWidth, "ADC bin width  (mV)",  2.);
 

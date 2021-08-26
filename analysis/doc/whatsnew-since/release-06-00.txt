@@ -11,3 +11,8 @@ Variables
 +++++++++
 
 * Removed ``R2EventLevel`` (it has been officially deprecated since release-05).
+
+Modules
++++++++
+
+ * The :b2:mod:`HelixErrorScaler` has been extended to K_S0 that are reconstructed from V0. A new python function `stdV0s.scaleErrorKshorts` provides an alternative of the standard list `K_S0:merged` with a correction applied to uncertainties of K_S0 daughter helix parameters.

@@ -55,7 +55,7 @@ namespace Belle2 {
       ///create histo for each channel
       void createHisto();
       /// write outut or store db
-      void write();
+      int write();
       /// calculate mean of the T0 distribution
       double getMeanT0(TH1F* h1);
     private:

@@ -9,8 +9,6 @@
 // Own include
 #include <analysis/modules/TrackingSystematics/TrackingSystematics.h>
 
-// dataobjects
-
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <analysis/VariableManager/Manager.h>
@@ -141,7 +139,6 @@ void TrackingMomentumModule::event()
 
 // Getting LookUp info for given particle in given event
 double TrackingMomentumModule::getScale(Particle* particle)
-
 {
   std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
                                           *m_ParticleWeightingLookUpTable.get())->getAxesNames());
@@ -155,7 +152,7 @@ double TrackingMomentumModule::getScale(Particle* particle)
 
   WeightInfo info = (*m_ParticleWeightingLookUpTable.get())->getInfo(values);
   for (const auto& entry : info) {
-    particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
+    particle->writeExtraInfo(m_tableName + "_" + entry.first, entry.second);
   }
 
   return particle->getExtraInfo(m_tableName + "_" + m_scalingFactorName);

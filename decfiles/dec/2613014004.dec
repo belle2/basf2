@@ -9,6 +9,7 @@
 # Email: emma.oxford@desy.de
 # Date: 20210708 (YYYYMMDD)
 #
+# Converted PYTHIA ids
 
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 

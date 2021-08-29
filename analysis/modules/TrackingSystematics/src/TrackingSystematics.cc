@@ -9,10 +9,10 @@
 // Own include
 #include <analysis/modules/TrackingSystematics/TrackingSystematics.h>
 
-// dataobjects
-#include <analysis/dataobjects/ParticleList.h>
-
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/core/ModuleParam.templateDetails.h>
+#include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/ParticleList.h>
 
 #include <map>
 #include <TRandom.h>
@@ -92,7 +92,29 @@ The module modifies the input particleLists by scaling track momenta as given by
 		     )DOC");
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
-  addParam("scale", m_scale, "scale factor to be applied to 3-momentum", 0.999);
+  addParam("scale", m_scale, "scale factor to be applied to 3-momentum", nan(""));
+  addParam("tableName", m_tableName, "ID of table used for reweighing", std::string(""));
+  addParam("scalingFactorName", m_scalingFactorName, "Label for the scale factor in the look up table", std::string("SF"));
+}
+
+void TrackingMomentumModule::initialize()
+{
+  if (!isnan(m_scale) && !m_tableName.empty()) {
+    B2FATAL("It's not allowed to provide both a valid value for the scale parameter and a non-empty table name. Please decide for one of the two options!");
+  } else if (isnan(m_scale) && m_tableName.empty()) {
+    B2FATAL("Neither a valid value for the scale parameter nor a non-empty table name was provided. Please set (exactly) one of the two options!");
+  } else if (!m_tableName.empty()) {
+    m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_tableName);
+
+    std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
+                                            *m_ParticleWeightingLookUpTable.get())->getAxesNames());
+    for (const auto& i_variable : variables) {
+      const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(i_variable);
+      if (!var) {
+        B2FATAL("Variable '" << i_variable << "' is not available in Variable::Manager!");
+      }
+    }
+  }
 }
 
 void TrackingMomentumModule::event()
@@ -114,6 +136,31 @@ void TrackingMomentumModule::event()
   }
 }
 
+
+// Getting LookUp info for given particle in given event
+double TrackingMomentumModule::getScale(Particle* particle)
+{
+  std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
+                                          *m_ParticleWeightingLookUpTable.get())->getAxesNames());
+
+  std::map<std::string, double> values;
+  for (const auto& i_variable : variables) {
+    const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(i_variable);
+    double value = var->function(particle);
+    values.insert(std::make_pair(i_variable, value));
+  }
+
+  WeightInfo info = (*m_ParticleWeightingLookUpTable.get())->getInfo(values);
+  for (const auto& entry : info) {
+    particle->writeExtraInfo(m_tableName + "_" + entry.first, entry.second);
+  }
+
+  return particle->getExtraInfo(m_tableName + "_" + m_scalingFactorName);
+}
+
+
+
+
 void TrackingMomentumModule::setMomentumScalingFactor(Particle* particle)
 {
   if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
@@ -134,6 +181,9 @@ void TrackingMomentumModule::setMomentumScalingFactor(Particle* particle)
     const TLorentzVector vec(px, py, pz, E);
     particle->set4Vector(vec);
   } else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Track) {
-    particle->setMomentumScalingFactor(m_scale);
+    double scale = (!isnan(m_scale)) ? m_scale : getScale(particle) ;
+    particle->setMomentumScalingFactor(scale);
   }
+
+
 }

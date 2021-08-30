@@ -3471,34 +3471,45 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
 
 
 def scaleError(outputListName, inputListName,
-               scaleFactors=[1.17, 1.12, 1.16, 1.15, 1.13],
-               d0Resolution=[12.2e-4, 14.1e-4],
-               z0Resolution=[13.4e-4, 15.3e-4],
+               scaleFactors=[1.149631, 1.085547, 1.151704, 1.096434, 1.086659],
+               scaleFactorsNoPXD=[1.149631, 1.085547, 1.151704, 1.096434, 1.086659],
+               d0Resolution=[0.00115328, 0.00134704],
+               z0Resolution=[0.00124327, 0.0013272],
+               d0MomThr=0.500000,
+               z0MomThr=0.500000,
                path=None):
     '''
     This module creates a new charged particle list.
     The helix errors of the new particles are scaled by constant factors.
-    These scale factors are defined for each helix parameter (d0, phi0, omega, z0, tanlambda).
-    The impact parameter resolution can be defined in a pseudo-momentum dependent form,
-    which limits the d0 and z0 errors so that they do not shrink below the resolution.
-    This module is supposed to be used for low-momentum (0-3 GeV/c) tracks in BBbar events.
-    Details will be documented in a Belle II note by the Belle II Japan ICPV group.
+    Two sets of five scale factors are defined for tracks with and without a PXD hit.
+    The scale factors are in order of (d0, phi0, omega, z0, tanlambda).
+    For tracks with a PXD hit, in order to avoid severe underestimation of d0 and z0 errors,
+    lower limits (best resolution) can be set in a momentum-dependent form.
+    This module is supposed to be used only for TDCPV analysis and for low-momentum (0-3 GeV/c) tracks in BBbar events.
+    Details will be documented in a Belle II note, BELLE2-NOTE-PH-2021-038.
 
     @param inputListName Name of input charged particle list to be scaled
     @param outputListName Name of output charged particle list with scaled error
-    @param scaleFactors List of five constants to be multiplied to each of helix errors
+    @param scaleFactors List of five constants to be multiplied to each of helix errors (for tracks with a PXD hit)
+    @param scaleFactorsNoPXD List of five constants to be multiplied to each of helix errors (for tracks without a PXD hit)
     @param d0Resolution List of two parameters, (a [cm], b [cm/(GeV/c)]),
-                        defining d0 resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**1.5))**2 }
+                        defining d0 best resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**1.5))**2 }
     @param z0Resolution List of two parameters, (a [cm], b [cm/(GeV/c)]),
-                        defining z0 resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**2.5))**2 }
+                        defining z0 best resolution as sqrt{ a**2 + (b / (p*beta*sinTheta**2.5))**2 }
+    @param d0MomThr d0 best resolution is kept constant below this momentum
+    @param z0MomThr z0 best resolution is kept constant below this momentum
+
     '''
     scale_error = register_module("HelixErrorScaler")
     scale_error.set_name('ScaleError_' + inputListName)
     scale_error.param('inputListName', inputListName)
     scale_error.param('outputListName', outputListName)
-    scale_error.param('scaleFactors', scaleFactors)
+    scale_error.param('scaleFactors_PXD', scaleFactors)
+    scale_error.param('scaleFactors_noPXD', scaleFactorsNoPXD)
     scale_error.param('d0ResolutionParameters', d0Resolution)
     scale_error.param('z0ResolutionParameters', z0Resolution)
+    scale_error.param('d0MomentumThreshold', d0MomThr)
+    scale_error.param('z0MomentumThreshold', z0MomThr)
     path.add_module(scale_error)
 
 

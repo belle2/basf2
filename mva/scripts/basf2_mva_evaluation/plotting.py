@@ -34,6 +34,9 @@ import matplotlib
 matplotlib.use("svg")
 matplotlib.rcParams.update({'font.size': 36})
 
+# Use the Belle II style while producing the plots
+plt.style.use("belle2")
+
 
 class Plotter(object):
     """

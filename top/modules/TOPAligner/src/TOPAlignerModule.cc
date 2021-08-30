@@ -234,7 +234,7 @@ namespace Belle2 {
         resMsg += " ";
         resMsg += par;
       }
-      B2DEBUG(100, resMsg);
+      B2DEBUG(20, resMsg);
 
     }
 

@@ -1,0 +1,9 @@
+Import('env')
+
+env['LIBS'] = [
+    'framework', 'vxd', 'vxd_dataobjects', 'pxd', 'pxd_dbobjects', 'pxd_utilities',
+    'mdst_dataobjects', 'mdst_dbobjects', 'analysis_dataobjects',
+    'tracking_dataobjects', 'calibration', '$ROOT_LIBS'
+]
+
+Return('env')

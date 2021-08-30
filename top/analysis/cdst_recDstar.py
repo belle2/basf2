@@ -44,7 +44,7 @@ gSystem.Load('libtop.so')
 main = basf2.create_path()
 
 # Just a dummy input file, use basf2 -i option
-ma.inputMdstList('default', 'Input.root', path=main)
+ma.inputMdstList('Input.root', path=main)
 
 # Particle lists
 ma.fillParticleList('K-:all', '-2.0 < d0 < 2.0 and -4.0 < z0 < 4.0', path=main)

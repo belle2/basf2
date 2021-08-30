@@ -646,7 +646,7 @@ class CreateLogics(b2.Module):
 
 if __name__ == "__main__":
     main = b2.create_path()
-    ma.inputMdst('default', argvs[1], main)
+    ma.inputMdst(argvs[1], main)
     main.add_module(CreateLogics())
     EffCalculation(main)
     b2.process(main)

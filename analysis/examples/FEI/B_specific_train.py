@@ -24,8 +24,7 @@ import modularAnalysis as ma
 path = b2.create_path()
 
 # Load input ROOT file
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst14.root', 'validation', False),
+ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 # Max 12 tracks per event - this avoids much computing time.
@@ -117,7 +116,7 @@ if feistate.stage == 0:
 else:
     # After stage 0, the training is done only on the written out rest of event.
     path = b2.create_path()
-    ma.inputMdstList('default', [], path)
+    ma.inputMdstList([], path)
     path.add_path(feistate.path)
     r1 = b2.register_module('RootOutput')
     r1.set_name('ROE_RootOutput')

@@ -11,7 +11,7 @@
 from modularAnalysis import fillParticleList, cutAndCopyList
 
 
-def stdPhotons(listtype='loose', path=None, loadPhotonBeamBackgroundMVA=True):
+def stdPhotons(listtype='loose', path=None, loadPhotonBeamBackgroundMVA=False):
     """
     Function to prepare one of several standardized types of photon lists:
 
@@ -53,7 +53,7 @@ def stdPhotons(listtype='loose', path=None, loadPhotonBeamBackgroundMVA=True):
     # clusterErrorTiming < 1e6 removes failed waveform fits, this is not an actual timing cut. A 99% efficiency cut
     # is already applied on mdst level for photons with E < 50 MeV.
     elif listtype == 'loose':
-        stdPhotons('cdc', path)
+        stdPhotons('cdc', path, loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA)
         cutAndCopyList(
             'gamma:loose',
             'gamma:cdc',
@@ -62,7 +62,7 @@ def stdPhotons(listtype='loose', path=None, loadPhotonBeamBackgroundMVA=True):
             path)
     # additional region dependent energy cuts
     elif listtype == 'tight':
-        stdPhotons('loose', path)
+        stdPhotons('loose', path, loadPhotonBeamBackgroundMVA=loadPhotonBeamBackgroundMVA)
         cutAndCopyList(
             'gamma:tight',
             'gamma:loose',
@@ -131,7 +131,7 @@ def loadStdSkimPhoton(path):
         path (basf2.Path): modules are added to this path
 
     """
-    stdPhotons('loose', path)
+    stdPhotons('loose', path, loadPhotonBeamBackgroundMVA=False)
     cutAndCopyList(
         'gamma:skim',
         'gamma:loose',
@@ -152,4 +152,4 @@ def loadStdGoodBellePhoton(path):
     Parameters:
         path (basf2.Path): the path to load the modules
     """
-    fillParticleList('gamma:goodBelle', '0.5 < goodBelleGamma < 1.5', True, path)
+    fillParticleList('gamma:goodBelle', '0.5 < goodBelleGamma < 1.5', True, path, loadPhotonBeamBackgroundMVA=False)

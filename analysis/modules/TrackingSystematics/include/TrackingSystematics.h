@@ -9,6 +9,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
+
 #include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
@@ -53,16 +56,35 @@ namespace Belle2 {
     TrackingMomentumModule();
 
     /**
+    * Initializes the modules and checks the validity of the input parameters
+    */
+    virtual void initialize() override;
+
+    /**
     * Function to be executed at each event
     */
     virtual void event() override;
 
   private:
+    /**
+    * Returns the needed scale factor for particle based on tableName and scalingFactorName
+    * @param particle
+    */
+    double getScale(Particle* particle);
+
     /** input particle lists */
     std::vector<std::string> m_ParticleLists;
     /** input momentum scale modifier */
     double m_scale;
 
+    /** Name of the table  */
+    std::string m_tableName;
+
+    /** Name of the table */
+    std::string m_scalingFactorName;
+
+    /** Pointer to the table in DB */
+    std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable;
     /**
      * function to set momentum scaling factor
      */

@@ -11,3 +11,14 @@ Variables
 +++++++++
 
 * Removed ``R2EventLevel`` (it has been officially deprecated since release-05).
+
+Modules
++++++++
+
+ * The :b2:mod:`TrackingMomentum` module has been extended. Now the module can scale track momenta based on phase-space dependent scaling 
+   factors given which are read from payloads according to parameters ``tableName`` and ``scalingFactorName``. The corresponding wrapper function
+   `scaleTrackMomenta` has been also extended accordingly. 
+
+ * The :b2:mod:`HelixErrorScaler` has been extended to K_S0 that are reconstructed from V0. A new python function
+   `stdV0s.scaleErrorKshorts` provides an alternative to the standard list ``K_S0:merged`` with a correction applied to the
+   uncertainties of the K_S0 daughter helix parameters.

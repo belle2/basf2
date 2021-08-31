@@ -15,7 +15,7 @@ Main goals
 
 The mva package was introduced to provide:
 
-- Provides tools to integrate mva methods in basf2
+- Tools to integrate mva methods in basf2
 - Collection of examples for basic and advanced mva usages
 - Backend independent evaluation and validation tools
 
@@ -59,21 +59,21 @@ Fitting and Inference
 - basf2_mva_expert
 
 Condition database
-"""""""""""""""""""""
+""""""""""""""""""
 
 - basf2_mva_upload
 - basf2_mva_download
 - basf2_mva_available
 
 Evaluation
-"""""""""""""""""""""
+""""""""""
 
 - basf2_mva_evaluate.py
 - basf2_mva_info
 - basf2_mva_extract
 
 Supported frameworks/backends
--------------------------------
+-----------------------------
 
 FastBDT
 ^^^^^^^
@@ -88,29 +88,29 @@ TMVA
 is part of the ROOT framework and provides a multitude of different methods including BDTs, NeuralNetworks, PDF estimators, ... Classification and Regression is supported.
 Advanced feature preprocessing like Decorrelation, PCA, Gaussianisation, ... are available.
 Each method provides a lot of configuration options.
-In my experience the methods are rather slow and there are bugs and pitfalls (e.g. TMVA crashes in case it encounters NaNs, has too few statistics, sometimes with negative weights, and other reasons).
+Often the methods are rather slow and there are bugs and pitfalls (e.g. TMVA crashes in case it encounters NaNs, has too few statistics, sometimes with negative weights, and other reasons).
 
 FANN
 ^^^^
 
 is the fast artificial neural network.
-It is used by Fernando in the Flavour Tagger and by the HLT people.
+It is used in the Flavor Tagger and by the HLT people.
 
 NeuroBayes
 ^^^^^^^^^^
 
 was the default method in Belle I and widely used for a lot of analyses.
 It provides a smart feature preprocessing, converges a lot faster and more robust than other neural network implementations.
-In addition it provides an analysis-pdf output which describes the importance of each feature.
+In addition, it provides an analysis-pdf output which describes the importance of each feature.
 However, NeuroBayes is a commercial product and is no longer supported by the company, only some minimal legacy support is available, no bug fixes, new features, ... Use it for comparison with Belle I results.
 
 Python-based
 ^^^^^^^^^^^^
 
 All frameworks which provide a python interface are supported e.g. XGBoost, SKLearn, Tensorflow, Theano.
-However, these methods are not installed by default, so you can only use them in your local installation by installing the frameworks using pip3.
-It is possible to include some of these methods in the externals i.e. to ship them with basf2, but you will have to fight for this.
-So this options mainly provides a playground to test new technologies e.g. deep-learning frameworks like Tensorflow and Theano.
+However, only TensorFlow and Theano are installed by default, the others you can only use in your local installation by installing them using pip3.
+It is possible to include these other methods in the externals as well i.e. to ship them with basf2, but you will have to give a good justification for this.
+In general, these options mainly provide a playground to test new technologies e.g. deep-learning frameworks like Tensorflow and Theano.
 
 Using the mva package
 ---------------------
@@ -189,7 +189,7 @@ The same thing can be done using the command line via::
                       --method FastBDT
 
 The given root file has to contain the variables and target as branches.
-You can write out such a file using VariablesToNtuple module of the analysis package, or a custom module if you want to train a classifier for an other package than analysis.
+You can write out such a file using VariablesToNtuple module of the analysis package, or a custom module if you want to train a classifier for another package than analysis.
 Multiple weightfiles and wildcard expansion like it is done by the RootInput module is supported.
 Look at the examples in mva/examples to learn more.
 
@@ -315,7 +315,7 @@ There is a good description howto do this in ``mva/examples/python/howto_use_arb
 
 In short, there are several hook functions which are called by the 'Python' backend of the mva package.
 There are sensible defaults for these hook functions implemented for many frameworks like tensorflow, theano, sklearn, hep_ml (see ``mva/scripts/basf2_mva_python_interface/``).
-However you can override these hook functions and ultimately have to full control:
+However, you can override these hook functions and ultimately have full control:
 
 During the fitting phase the following happens:
 

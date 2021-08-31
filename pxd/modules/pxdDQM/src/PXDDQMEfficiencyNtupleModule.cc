@@ -165,7 +165,7 @@ void PXDDQMEfficiencyNtupleModule::event()
         //Check if the intersection is inside a ROI
         //If not, even if measured the cluster was thrown away->Not PXD's fault
         for (auto& roit : m_ROIs) {
-          if (aVxdID != roit.getSensorID()) {
+          if (aVxdID != (roit.getSensorID()).getID()) {
             continue; //ROI on other sensor
           }
 

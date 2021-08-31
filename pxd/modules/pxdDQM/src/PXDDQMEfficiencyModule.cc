@@ -184,7 +184,7 @@ void PXDDQMEfficiencyModule::event()
           //If not, even if measured the cluster was thrown away->Not PXD's fault
           bool fitInsideROI = false;
           for (auto& roit : m_ROIs) {
-            if (aVxdID != roit.getSensorID()) {
+            if (aVxdID != (roit.getSensorID()).getID()) {
               continue; //ROI on other sensor
             }
 

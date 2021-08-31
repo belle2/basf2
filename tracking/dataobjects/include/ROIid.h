@@ -58,9 +58,9 @@ namespace Belle2 {
     int m_maxUid; /**< u ID of the top right pixel of the ROI */
     int m_minVid; /**< v ID of the bottom left pixel of the ROI */
     int m_maxVid; /**< v ID of the top right pixel of the ROI */
-    VxdID::baseType m_sensorID; /**< sensor ID */
+    VxdID m_sensorID; /**< sensor ID */
 
     //! Needed to make the ROOT object storable
-    ClassDef(ROIid, 1)
+    ClassDef(ROIid, 2)
   };
 }

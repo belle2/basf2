@@ -24,7 +24,7 @@ namespace Belle2 {
       // Create an empty 6-digit
       SVDRecoDigit digit;
       // Test getters
-      EXPECT_EQ(0, digit.getSensorID());
+      EXPECT_EQ(VxdID{0}, digit.getSensorID());
       EXPECT_TRUE(digit.isUStrip());
       EXPECT_EQ(0, digit.getCellID());
       EXPECT_EQ(0, digit.getAmplitude());

@@ -22,7 +22,7 @@
 #pragma link C++ class vector < pair <unsigned int, double > >+; // checksum=0x6b073150, version=6
 #pragma link C++ class pair <bool, bool>+; // checksum=0xd82e1600, version=-1
 
-#pragma link C++ class Belle2::ROIid+; // checksum=0x67e7bffd, version=1
+#pragma link C++ class Belle2::ROIid+; // checksum=0x7639d869, version=2
 #pragma link C++ class Belle2::ROIpayload+; // checksum=0x24692265, version=2
 #pragma link C++ class Belle2::VXDIntercept+; // checksum=0xbb836403, version=1
 #pragma link C++ class Belle2::PXDIntercept+; // checksum=0x756ab835, version=2

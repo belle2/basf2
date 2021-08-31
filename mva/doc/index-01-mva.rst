@@ -55,6 +55,7 @@ The mva package provides a basic interface in bash, C++ and python consisting of
 Fitting and Inference
 """""""""""""""""""""
 
+- basf2_mva_merge_mc
 - basf2_mva_teacher
 - basf2_mva_expert
 
@@ -194,6 +195,19 @@ Multiple weightfiles and wildcard expansion like it is done by the RootInput mod
 Look at the examples in mva/examples to learn more.
 
 You can create the necessary data files to execute the examples (if you have some current MC files available) using ``mva/examples/basics/create_data_sample.py``
+
+.. _basf2_mva_merge_mc:
+
+``basf2_mva_merge_mc``: Combine signal and background MC to a single file or a train and test file
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. argparse::
+    :filename: mva/tools/basf2_mva_merge_mc
+    :func: get_argument_parser
+    :prog: basf2_mva_merge_mc
+    :nodefault:
+    :nogroupsections:
+
 
 Inference / Howto apply a trained mva method onto data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

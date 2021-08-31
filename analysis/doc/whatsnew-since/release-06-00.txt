@@ -11,3 +11,4 @@ Variables
 +++++++++
 
 * Removed ``R2EventLevel`` (it has been officially deprecated since release-05).
+* Added ``clusterTotalMCMatchWeight`` which returns the sum of all deposited MC energies that can be used to identify beam background clusters.

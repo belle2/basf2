@@ -60,19 +60,19 @@ namespace Belle2 {
   {
     switch (aoperation) {
       case ArithmeticOperation::PLUS:
-        stream << "+";
+        stream << " + ";
         break;
       case ArithmeticOperation::MINUS:
-        stream << "-";
+        stream << " - ";
         break;
       case ArithmeticOperation::PRODUCT:
-        stream << "*";
+        stream << " * ";
         break;
       case ArithmeticOperation::DIVISION:
-        stream << "/";
+        stream << " / ";
         break;
       case ArithmeticOperation::POWER:
-        stream << "**";
+        stream << " ** ";
         break;
       default:
         throw std::runtime_error("Invalid ArithmeticOperator provided to injectArithmeticOperatorToStream.");

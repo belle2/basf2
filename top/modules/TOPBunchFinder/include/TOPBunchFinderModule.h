@@ -107,7 +107,7 @@ namespace Belle2 {
     bool m_subtractRunningOffset; /**< subtract running offset when running in HLT mode */
     int m_bunchesPerSSTclk; /**< number of bunches per SST clock */
     bool m_usePIDLikelihoods; /**< if true, use PIDLikelihoods (only on cdst files) */
-    double m_dedxMomentumLimit; /**< momentum limit of good dEdx particle ID */
+    unsigned m_nTrackLimit; /**< maximum number of tracks (inclusive) to use three particle hypotheses in fine search */
 
     // internal variables shared between events
     double m_bunchTimeSep = 0; /**< time between two bunches */

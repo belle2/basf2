@@ -730,7 +730,10 @@ namespace Belle2 {
         return LogL(0);
       }
 
-      LogL LL(getExpectedPhotons());
+      double expectedPhot = m_signalPhotons + m_bkgPhotons;
+      if (m_deltaPDFOn) expectedPhot += m_deltaPhotons;
+
+      LogL LL(expectedPhot);
       for (const auto& hit : m_selectedHits) {
         if (hit.time < m_minTime or hit.time > m_maxTime) continue;
         double f = pdfValue(hit.pixelID, hit.time, hit.timeErr);
@@ -827,7 +830,7 @@ namespace Belle2 {
       for (const auto& signalPDF : m_signalPDFs) {
         ps += signalPDF.getIntegral(minTime, maxTime);
       }
-      double pd = m_deltaRayPDF.getIntegral(minTime, maxTime);
+      double pd = m_deltaPDFOn ? m_deltaRayPDF.getIntegral(minTime, maxTime) : 0.0;
       double pb = (maxTime - minTime) / (m_maxTime - m_minTime);
 
       return ps * m_signalPhotons + pd * m_deltaPhotons + pb * m_bkgPhotons;
@@ -837,7 +840,7 @@ namespace Belle2 {
     {
       m_pixelLLs.clear();
 
-      double pd = m_deltaRayPDF.getIntegral(minTime, maxTime);
+      double pd = m_deltaPDFOn ? m_deltaRayPDF.getIntegral(minTime, maxTime) : 0.0;
       double pb = (maxTime - minTime) / (m_maxTime - m_minTime);
       double bfot = pd * m_deltaPhotons + pb * m_bkgPhotons;
       const auto& pixelPDF = m_backgroundPDF->getPDF();

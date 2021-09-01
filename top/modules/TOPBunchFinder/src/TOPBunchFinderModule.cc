@@ -63,7 +63,7 @@ namespace Belle2 {
     addParam("sigmaSmear", m_sigmaSmear,
              "sigma in [ns] for additional smearing of PDF", 0.0);
     addParam("minSignal", m_minSignal,
-             "minimal number of signal photons to accept track", 10.0);
+             "minimal number of signal photons to accept track", 8.0);
     addParam("minSBRatio", m_minSBRatio,
              "minimal signal-to-background ratio to accept track", 0.0);
     addParam("minDERatio", m_minDERatio,
@@ -79,7 +79,7 @@ namespace Belle2 {
              "if true, use MC truth for particle mass instead of the most probable from dEdx",
              false);
     addParam("saveHistograms", m_saveHistograms,
-             "if true, save histograms to TOPRecBunch", false);
+             "if true, save histograms to TOPRecBunch and TOPTimeZeros", false);
     addParam("tau", m_tau,
              "first order filter time constant [number of events]", 100.0);
     addParam("fineSearch", m_fineSearch,
@@ -95,7 +95,9 @@ namespace Belle2 {
     addParam("usePIDLikelihoods", m_usePIDLikelihoods,
              "use PIDLikelihoods instead of DedxLikelihoods (only if run on cdst files)",
              false);
-    addParam("dedxMomentumLimit", m_dedxMomentumLimit, "momentum limit of good dEdx particle ID", 0.7);
+    addParam("nTrackLimit", m_nTrackLimit,
+             "maximum number of tracks (inclusive) to use three particle hypotheses in fine search "
+             "(only when running in data processing mode).", unsigned(3));
 
   }
 
@@ -182,6 +184,7 @@ namespace Belle2 {
     }
 
     if (m_HLTmode) {
+      m_nTrackLimit = 0;  // use single particle hypothesis to save execution time
       B2INFO("TOPBunchFinder: running in HLT/express reco mode");
     } else {
       B2INFO("TOPBunchFinder: running in data processing mode");
@@ -277,7 +280,7 @@ namespace Belle2 {
         chargedStable = Const::chargedStableSet.find(abs(trk.getMCParticle()->getPDG()));
         if (chargedStable == Const::invalidParticle) continue;
       } else {
-        chargedStable = getMostProbable(track);
+        if (trk.getMomentumMag() < 4.0) chargedStable = getMostProbable(track);
       }
 
       // construct PDF
@@ -290,9 +293,10 @@ namespace Belle2 {
       pdfConstructor.switchOffDeltaRayPDF(); // to speed-up fine search
 
       // do further track selection
-      double expSignal = pdf1d.getExpectedSignal() + pdf1d.getExpectedDeltaPhotons();
+      double expSignal = pdf1d.getExpectedSignal();
+      double expDelta = pdf1d.getExpectedDeltaPhotons();
       double expBG = pdf1d.getExpectedBG();
-      double expPhot = expSignal + expBG;
+      double expPhot = expSignal + expDelta + expBG;
       double numPhot = pdf1d.getNumOfPhotons();
       if (expSignal < m_minSignal) continue;
       if (expSignal < m_minSBRatio * expBG) continue;
@@ -367,24 +371,24 @@ namespace Belle2 {
         const auto& reco = pdfConstructors[itrk];
         numPhotons[itrk] = setFinder(finders.back(), reco, timeMin, timeMax);
         const auto& trk = topTracks[itrk];
-        if (trk.getMomentumMag() > m_dedxMomentumLimit) {
+        double momentum = trk.getMomentumMag();
+        if (not m_useMCTruth and momentum > 0.7 and topTracks.size() <= m_nTrackLimit) {
           std::vector<Const::ChargedStable> other;
           if (reco.getHypothesis() == Const::kaon) {
             other.push_back(Const::pion);
-            other.push_back(Const::proton);
+            if (momentum < 4.0) other.push_back(Const::proton);
           } else if (reco.getHypothesis() == Const::proton) {
             other.push_back(Const::pion);
-            other.push_back(Const::kaon);
+            if (momentum < 2.0) other.push_back(Const::kaon);
           } else {
-            other.push_back(Const::kaon);
-            other.push_back(Const::proton);
+            if (momentum < 2.0) other.push_back(Const::kaon);
+            if (momentum < 4.0) other.push_back(Const::proton);
           }
           for (const auto& chargedStable : other) {
             PDFConstructor pdfConstructor(trk, chargedStable, PDFConstructor::c_Rough);
-            if (not pdfConstructor.isValid() or pdfConstructor.getExpectedSignalPhotons() == 0) continue;
+            if (not pdfConstructor.isValid()) continue;
             pdfConstructor.switchOffDeltaRayPDF(); // to speed-up fine search
-            double expSignal = pdfConstructor.getExpectedSignalPhotons() + pdfConstructor.getExpectedDeltaPhotons();
-            if (expSignal < m_minSignal) continue;
+            if (pdfConstructor.getExpectedSignalPhotons() < m_minSignal) continue;
             Chi2MinimumFinder1D finder(m_numBins, t0min, t0max);
             int numPhot = setFinder(finder, pdfConstructor, timeMin, timeMax);
             if (numPhot != numPhotons[itrk])

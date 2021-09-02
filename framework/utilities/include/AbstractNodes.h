@@ -69,9 +69,7 @@ namespace Belle2 {
   */
   enum class BooleanOperator : int {
     AND,
-    OR,
-    NAND,
-    XOR
+    OR
   };
 
   /**

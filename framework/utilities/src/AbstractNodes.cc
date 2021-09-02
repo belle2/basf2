@@ -19,12 +19,6 @@ namespace Belle2 {
       case BooleanOperator::OR:
         stream << " or ";
         break;
-      case BooleanOperator::NAND:
-        stream << " nand ";
-        break;
-      case BooleanOperator::XOR:
-        stream << " xor ";
-        break;
       default:
         throw std::runtime_error("Invalid BooleanOperator provided to injectBooleanOperatorToStream.");
     }

@@ -145,7 +145,7 @@ namespace Belle2 {
 
   /**
   * Nodeclass with a two AbstractBooleanNode as children and
-  * a Boolean Operator (AND, OR, XOR, NAND)
+  * a Boolean Operator (AND, OR)
   * Check() method evaluates the child nodes and returns
   * the result of the boolean operation.
   **/
@@ -155,7 +155,7 @@ namespace Belle2 {
   public:
     /**
       * Check if object passes this subexpression of the cut by calling check on the children nodes.
-      * Boolean results are evaluated with the BooleanOperator(AND/OR/NAND/XOR) the node object.
+      * Boolean results are evaluated with the BooleanOperator(AND/OR) the node object.
       * @param p pointer to the object, that should be checked.
       */
     bool check(const Object* p) const override
@@ -167,12 +167,6 @@ namespace Belle2 {
           break;
         case BooleanOperator::OR:
           return m_left_bnode->check(p) || m_right_bnode->check(p);
-          break;
-        case BooleanOperator::NAND:
-          return !(m_left_bnode->check(p) && m_right_bnode->check(p));
-          break;
-        case BooleanOperator::XOR:
-          return !(m_left_bnode->check(p) == m_right_bnode->check(p));
           break;
         default:
           throw std::runtime_error("BinaryBooleanNode has an invalid BooleanOperator");

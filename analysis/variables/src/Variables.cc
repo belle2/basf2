@@ -496,8 +496,10 @@ namespace Belle2 {
       if (part->getParticleSource() != Particle::EParticleSourceObject::c_V0
           && vertex.Perp() < 0.5) return particleInvariantMassFromDaughters(part);
 
-      const double bField = BFieldManager::getFieldInTesla(vertex).Z();
       const std::vector<Particle*> daughters = part->getDaughters();
+      if (daughters.size() == 0) return particleInvariantMassFromDaughters(part);
+
+      const double bField = BFieldManager::getFieldInTesla(vertex).Z();
       TLorentzVector sum;
       for (auto daughter : daughters) {
         const TrackFitResult* tfr = daughter->getTrackFitResult();
@@ -1068,7 +1070,7 @@ Note that this is context-dependent variable and can take different values depen
                       "The particle's mass squared.");
 
     REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughtersDisplaced,
-                      "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle is V0, its daughter 4-momentum vectors at fitted vertex are taken.\n"
+                      "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle is V0 or decays at rho > 5 mm, its daughter 4-momentum vectors at fitted vertex are taken.\n"
                       "If this particle has no daughters, defaults to :b2:var:`M`.");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
                       "Invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"

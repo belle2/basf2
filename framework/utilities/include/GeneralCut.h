@@ -115,7 +115,7 @@ namespace Belle2 {
         return std::unique_ptr<GeneralCut>(new GeneralCut(tuple));
       } catch (py::error_already_set&) {
         PyErr_Print();
-        B2FATAL("Parsing error on cutstring:" + cut);
+        B2FATAL("Parsing error on cutstring:\n" + cut);
       }
     }
     /**
@@ -150,8 +150,8 @@ namespace Belle2 {
 
   private:
     /**
-     * Constructor of the cut. Call init with given string
-     * @param str Cut is initalized with the specified cuts. Default are no cuts
+     * Constructor of the cut. Call init with given Nodetuple
+     * @param tuple (const boost::python::tuple&) constructed by the python parser from cut.
      */
     explicit GeneralCut(Nodetuple tuple) : m_root{NodeFactory::compile_boolean_node<AVariableManager>(tuple)} {}
 

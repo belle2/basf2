@@ -25,22 +25,58 @@ namespace Belle2 {
   template<class AVariableManager>
   class AbstractBooleanNode {
   public:
+    /**
+     * Template argument dependent Particle type definition
+    **/
     typedef typename AVariableManager::Object Object;
+    /**
+     * Template argument dependent Variable type definition
+    **/
     typedef typename AVariableManager::Var Var;
 
+    /**
+     * pure virutal check function, has to be overridden in derived class
+    **/
     virtual bool check(const Object* p) const = 0;
+    /**
+     * pure virutal print function, has to be overridden in derived class
+    **/
     virtual void print() const = 0;
+    /**
+     * pure virutal decompile function, has to be overridden in derived class
+    **/
     virtual std::string decompile() const = 0;
   };
 
+  /**
+   * AbstractExpressionNode
+   * Superclass for all nodes which host expressions.
+   * Every child class must override the evaluate member, which returns the value of
+   * its expression as a variant<double, int, bool>.
+   **/
   template<class AVariableManager>
   class AbstractExpressionNode {
   public:
+    /**
+     * Template argument dependent Particle type definition
+    **/
     typedef typename AVariableManager::Object Object;
+    /**
+     * Template argument dependent Variable type definition
+    **/
     typedef typename AVariableManager::Var Var;
 
+    /**
+     * pure virutal evaluate function, has to be overridden in derived class
+    **/
     virtual std::variant<double, int, bool> evaluate(const Object* p) const = 0;
+    /**
+     * pure virutal print function, has to be overridden in derived class
+    **/
     virtual void print() const = 0;
+    /**
+     * pure virutal decompile function, has to be overridden in derived class
+    **/
     virtual std::string decompile() const = 0;
   };
 
@@ -99,17 +135,32 @@ namespace Belle2 {
 
   /**
    * Helper functions for AbstractBooleanNode and AbstractExpressionNode print() and decompile() members
+   * Shifts the correct characters into the ostream, depending on the BooleanOperator given.
    * For decompiling/printing we want the corresponding character of the operator
-   * e.g "+" for BooleanOperator::PLUS
-   * These helper functions shift the correct characters into the ostream, which is given as a reference.
-   * print() and decompile() are doing the same and only differ in the output stream
+   * e.g " and " for BooleanOperator::AND
    * print() redirects to std::cout, decompile() should redirect to a std::stringstream
    * Both streams subclass std::ostream. This allows the use of these functions in both cases.
    */
   void injectBooleanOperatorToStream(std::ostream& stream, const BooleanOperator& boperator);
 
+  /**
+   * Helper functions for AbstractBooleanNode and AbstractExpressionNode print() and decompile() members
+   * Shifts the correct characters into the ostream, depending on the ComparisonOperator given.
+   * For decompiling/printing we want the corresponding character of the operator
+   * e.g " == " for ComparisonOperator::EQUALEQUAL
+   * print() redirects to std::cout, decompile() should redirect to a std::stringstream
+   * Both streams subclass std::ostream. This allows the use of these functions in both cases.
+   */
   void injectComparisonOperatorToStream(std::ostream& stream, const ComparisonOperator& coperator);
 
+  /**
+   * Helper functions for AbstractBooleanNode and AbstractExpressionNode print() and decompile() members
+   * Shifts the correct characters into the ostream, depending on the ComparisonOperator given.
+   * For decompiling/printing we want the corresponding character of the operator
+   * e.g " + " for ArithmeticOperator::PLUS
+   * print() redirects to std::cout, decompile() should redirect to a std::stringstream
+   * Both streams subclass std::ostream. This allows the use of these functions in both cases.
+   */
   void injectArithmeticOperatorToStream(std::ostream& stream, const ArithmeticOperation& aoperation);
 
 }

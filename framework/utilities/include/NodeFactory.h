@@ -51,8 +51,24 @@ namespace Belle2 {
   template<class AVariableManager>
   class FunctionNode;
 
+  /**
+   * Wrapper class for static node compile functions
+  **/
   class NodeFactory {
   public:
+    /**
+     * This template function creates a boolean node from a boost::python::tuple
+     * The Python Parser encodes the node type as int as the first argument of each tuple.
+     * Node types are decoded via the NodeType enum defined in framework/utilities/include/AbstractNodes.h
+     * e.g (2, (11, True)) is a UnaryRelationalNode (nodetype value 2), which has a BooleanNode(nodetype value 11) as a child.
+     * List of Nodes:
+     * - UnaryBooleanNode
+     * - BinaryBooleanNode
+     * - UnaryRelationalNode
+     * - BinaryRelationalNode
+     * - TernaryRelationalNode
+     * @param tuple (const boost::python::tuple&): python tuple generated from the parser
+     */
     template<class AVariableManager>
     static std::unique_ptr<const AbstractBooleanNode<AVariableManager>> compile_boolean_node(Nodetuple tuple)
     {

@@ -127,7 +127,7 @@ if __name__ == "__main__":
 
     python_options = basf2_mva.PythonOptions()
     python_options.m_framework = "custom"
-    python_options.m_steering_file = "mva/examples/python/howto_wrap_your_existing_training_into_a_weightfile.py"
+    python_options.m_steering_file = "mva/examples/python/how_to_wrap_your_existing_training_into_a_weightfile.py"
 
     basf2_mva.teacher(general_options, python_options)
 

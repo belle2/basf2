@@ -157,7 +157,7 @@ MetaOptions
 Change the type of the training, this is for experts only.
 You can look at the advanced examples to learn more.
 
-Fitting / Howto perform a training
+Fitting / How to perform a training
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can use the MVA package via C++, Python or the command-line.
@@ -209,7 +209,7 @@ You can create the necessary data files to execute the examples (if you have som
     :nogroupsections:
 
 
-Inference / Howto apply a trained mva method onto data
+Inference / How to apply a trained mva method onto data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Depending on your use-case there are different possibilities.
@@ -222,9 +222,9 @@ Most often you want to apply the training online (inside basf2) like it is done 
                     extraInfoName='Test',
                     identifier='DatabaseIdentifier')
 
-If you use the mva method in another context (like tracking), you have to write your own C++ or Python module to apply the training, because the MVA package cannot know howto extract the necessary features from the basf2 DataStore (in the above case based on Particle objects the VariableManager can be used for this task).
+If you use the mva method in another context (like tracking), you have to write your own C++ or Python module to apply the training, because the MVA package cannot know how to extract the necessary features from the basf2 DataStore (in the above case based on Particle objects the VariableManager can be used for this task).
 
-I recommend looking at the MVAPrototype Module code to learn howto correctly implement the usage of an mva classifier.
+It is recommended to look at the MVAPrototype Module code to learn how to correctly implement the usage of an mva classifier.
 This module can be directly be used as a template for your own classifier.
 Very roughly:
 
@@ -309,7 +309,7 @@ There are different sub-directories:
 
 - ``mva/examples/basics`` – basic usage of the mva package: ``basf2_mva_teacher``, ``basf2_mva_expert``, ``basf2_mva_upload``, ``basf2_mva_download``, ...
 - ``mva/examples/advanced`` – advanced usages of mva: hyper-parameter optimization, sPlot, using different classifiers
-- ``mva/examples/python`` – howto use arbitrary mva frameworks with a python interface
+- ``mva/examples/python`` – how to use arbitrary mva frameworks with a python interface
 - ``mva/examples/orthogonal_discriminators`` – create orthongonal discriminators with ugBoost or adversary networks
 - ``mva/examples/<backend>`` – backend specific examples e.g. for tmva and tensorflow
 
@@ -325,7 +325,7 @@ Python-based frameworks
 -----------------------
 
 You can use arbitrary mva frameworks which have a Python interface.
-There is a good description howto do this in ``mva/examples/python/howto_use_arbitrary_methods.py``
+There is a good description how to do this in ``mva/examples/python/how_to_use_arbitrary_methods.py``
 
 In short, there are several hook functions which are called by the 'Python' backend of the mva package.
 There are sensible defaults for these hook functions implemented for many frameworks like tensorflow, theano, sklearn, hep_ml (see ``mva/scripts/basf2_mva_python_interface/``).
@@ -414,7 +414,7 @@ Boosting to uniformity allows to enforce a uniform selection efficiency of the c
 Deep Learning (Neural Networks)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Deep Learning is the current revolution ongoing in the field of machine learning. Everything from self-driving cars, speech recognition and playing Go can be accomplished using Deep Learning. There is a lot of research going on in HEP, howto take advantage of Deep Learning in our analysis. 
+Deep Learning is the current revolution ongoing in the field of machine learning. Everything from self-driving cars, speech recognition and playing Go can be accomplished using Deep Learning. There is a lot of research going on in HEP, how to take advantage of Deep Learning in our analysis. 
 
 Standard textbook
 """""""""""""""""

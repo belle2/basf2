@@ -41,10 +41,9 @@ particlegun.param('yVertexParams', [0, 0])
 particlegun.param('zVertexParams', [-20.0, 20.0])
 main.add_module(particlegun)
 
+# trigger simulation is included in add_simulation
 add_simulation(main)
 
-# add trigger
-add_trigger_simulation(main, components=["CDC", "ECL", "KLM", "GRL", "GDL"])
 
 # output
 rootoutput = b2.register_module('RootOutput')
@@ -56,6 +55,7 @@ main.add_module(
         "TRGCDC3DFitterTracks",
         "TRGCDCNeuroTracks",
         "TRGECLClusters",
+        "TRGSummary",
         "MCParticles"])
 
 # main

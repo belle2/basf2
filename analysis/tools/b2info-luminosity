@@ -22,12 +22,6 @@ import os
 import basf2 as b2
 
 import pandas as pd
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-import matplotlib.dates as mdates
-from matplotlib.dates import MO
 import numpy as np
 
 import requests
@@ -106,11 +100,21 @@ def argparser():
                         action="store_true",
                         default=False,
                         help="Show also delivered lumi")
-
+    parser.add_argument("--good",
+                        dest="good",
+                        action="store_true",
+                        default=False,
+                        help="Consider only good and recoverable runs (default False)")
+    parser.add_argument("--beam-energy",
+                        dest="beam_energy",
+                        action="store",
+                        choices=[None, '4S','4S_offres','4S_scan'],
+                        default=None,
+                        help="Consider only runs with given beam energy None(default)/4S/4S_offres/4S_scan")
     parser.add_argument("--dbonline",
                         dest="dbonline",
                         action="store",
-                        default="/gpfs/group/belle2/group/detector/ECL/ecl_lom.db",
+                        default="/group/belle2/dataprod/Luminosity/ecl_lom.db",
                         help="ECL DataBase path (for developers)")
     parser.add_argument("--dboffline",
                         dest="dbofflie",
@@ -121,26 +125,12 @@ def argparser():
                         dest="token",
                         type=str,
                         required=False,
-                        help="Use the read-only token to automate the script")
+                        help="Use the read-only token to automatize the script")
     parser.add_argument("--username",
                         dest="username",
                         type=str,
                         required=False,
                         help="Provide DESY username for crediantial access")
-
-    plot_actions = {
-        "DAY"  : "Histogram of daily integrated luminosity",
-        "WEEK" : "Histogram of weekly integrated luminosity",
-        "RUN"  : "Histogram of integrated luminosity per run",
-        }
-
-    parser.add_argument("--plot",
-                        dest="plot",
-                        action="store",
-                        nargs='+',
-                        choices=list(plot_actions.keys()),
-                        default=None,
-                        help="Produce plot of integrated luminosity for each run, day, or week")
 
     return parser
 
@@ -161,7 +151,7 @@ class Luminosity:
         self.Username = args.username
         self.what=args.what
 
-        self.URL="https://rundb.belle2.org"
+        self.URL = "https://rundb.belle2.org"
         self.session = requests.Session()
         if self.Token is None:
             # If no specific username use the local system username or provide one to authenticate
@@ -174,22 +164,37 @@ class Luminosity:
             # Otherwise use the api key
             self.session.headers.update({'Authorization': f'Bearer {self.Token}'})
         
-        self.exp=args.exp
-        self.expstr="-".join(str(_) for _ in args.exp)
+        self.exp = args.exp
+        self.expstr = f"{min(args.exp)}"
+        if min(args.exp) != max(args.exp):
+            self.expstr = f"{min(args.exp)}-{max(args.exp)}"
+
         self.runs=args.runs
         if len(self.exp)>1 and self.runs:
             b2.B2FATAL(f"No run range (--runs ) allowed if multiple experiments are selected (--exp {self.exp})")
-        if args.plot == 'RUN' and len(self.exp)>1:
-            b2.B2FATAL(f"If plotting lumi per run (--plot RUN) you can select only one experiment (--exp {self.exp})")
-        self.runRangeStr="All runs"
+        self.runRangeStr = "All runs"
         if self.runs:
             self.runRangeStr=f"Runs {min(self.runs)}-{max(self.runs)}"
 
-        self.verb=args.verb
-        self.delivered=args.delivered
+        self.verb = args.verb
+        self.delivered = args.delivered
 
         # Fill df with data
-        self.df=self.getDataFrame(self.exp)
+        self.df = self.getDataFrame(self.exp)
+
+        nAllRuns = len(self.df)
+        if (args.good):
+            self.df = self.df[self.df['quality']]
+            print(f"Selecting good runs: Good/Total: {len(self.df)}/{nAllRuns}")
+        else:
+            print(f"No Selection on good runs (use --good)")
+
+        self.beam_energy = args.beam_energy
+        if (args.beam_energy):
+            self.df = self.df[self.df['beam_energy']==args.beam_energy]
+            print(f"Selecting beam-energy {args.beam_energy}/Total= {len(self.df)}/{nAllRuns}")
+        else:
+            print(f"No Selection on beam-energy (use --beam-energy XX)")
 
     def create_connection(self, what):
         """
@@ -210,7 +215,7 @@ class Luminosity:
 
         connection = None
         try:
-            connection = sqlite3.connect(DB)
+            connection = sqlite3.connect(DB, uri=True)
         except sqlite3.Error as e:
             print(e)
 
@@ -220,14 +225,12 @@ class Luminosity:
         """
         create a panda dataframe from Offline DB
         """
-        cmdexp = f"SELECT lee as lumi, exp, run, start_time as date FROM RunLumi WHERE exp IN ({', '.join(['?' for _ in self.exp])})  "
+        cmdexp = f"SELECT lee as lumi, exp, run, start_time as date, s as beam_energy FROM RunLumi WHERE exp IN ({', '.join(['?' for _ in self.exp])})  "
         if args.runs:
             cmdexp += f" AND run >= {min(self.runs)} AND run <= {max(self.runs)}"
 
         # Get the DB as a pandas.Dataframe.
-        print(cmdexp, self.conn, self.exp)
         df = pd.read_sql(cmdexp, self.conn, params=self.exp)
-        b2.B2INFO(f"Read {len(df)} runs for experiment {self.expstr}")
         df = df.sort_values(by=['date'])
         b2.B2INFO(f"Read {len(df)} runs for experiment {self.expstr}")
 
@@ -238,6 +241,9 @@ class Luminosity:
         df['intLumi'] = df['lumi'].cumsum()
 
         df['intLumiDel']= None
+
+        # No way to get run quality for old experiment
+        df["quality"] = True
 
         return df
 
@@ -286,23 +292,43 @@ class Luminosity:
 
     def get_run_info(self, **search_params):
         """Return the run information from the run registry"""
-        req = self.session.get(f'{self.URL}/rest/v1/runs/', params=search_params)
+        try:
+            req = self.session.get(f'{self.URL}/rest/v1/runs/', params=search_params)
+            req.raise_for_status()
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            b2.B2FATAL(f"Cannot access to RunDB. {e}")
+
         return self.pagination(req)
 
-    def getDataFrameFromRunRegistry(self, exp):
+    def getDataFrameFromRunRegistry(self, exp, runs=None):
         """Return a dataframe with the luminosity information form run registry"""
         import json
         import getpass
         import dateutil.parser
            
         # temporary hack to get exp 7 and 8 from online DB
-        columns=["exp", "run", "date", "date_stop", "lumi","intLumi","intLumiDel"]
+        columns=["exp", "run", "date", "date_stop", "lumi","intLumi","intLumiDel", "quality","beam_energy"]
         df=pd.DataFrame(columns=columns)
         rows=[]
 
         b2.B2INFO(f"Reading exp {exp} from rundb (this can take a while depending on the size of the query)")
         
-        for run in self.get_run_info(min_experiment={exp[0]}, max_experiment={exp[-1]}, run_type="physics", expand=True):
+        run_params = dict()
+        run_params['min_experiment'] = exp
+        run_params['max_experiment'] = exp
+        run_params['run_type'] = "physics"
+        run_params['expand'] = True
+
+        det = ["pxd", "svd", "cdc", "top", "ari", "ecl", "klm", "trg"],
+
+
+        if runs:
+            run_params['min_run'] = np.min(runs)
+            run_params['max_run'] = np.max(runs)
+
+        for run in self.get_run_info(**run_params):
+            if (run in runs):
+                continue
             if not run['time_stop']:
                 run['time_stop']=run['time_start']
             row={"exp":run['experiment'],
@@ -315,8 +341,27 @@ class Luminosity:
                 row['intLumiDel']=run['statistics']['lumi_exp_delivered']
             else:
                 row['intLumiDel']=None
+            
+            # Quality
+            qualityShift = not any(expQ == "BAD" for expQ in run['quality_shifter'].values())
+            quality = not any(expQ == "BAD" for expQ in run['quality_expert'].values())
+            noEvents = not any(expQ == "NO EVENTS" for expQ in run['quality_expert'].values())
+            
+            row["quality"] = quality & noEvents
+
+            # beam energy
+            beam_energy = "4S"
+            try:
+                if run["ler"]["momentum"] >= 4.0 and run["her"]["momentum"] >= 7.0:
+                    beam_energy = "4S"
+                else:
+                    beam_energy = "4S_offres"
+            except:
+                print("Beam energy not set in RunDB")
+            row["beam_energy"] = beam_energy
 
             rows.append(row)
+
         df = pd.DataFrame(rows,columns=columns)
         b2.B2INFO(f"Read {len(df)} runs from exp {exp}")
 
@@ -327,317 +372,130 @@ class Luminosity:
 
         return df
 
-    def getDataFrame(self,exp):
-        """ get pandas dataframe for a set of experiment, taking into account the source: DB or RR """
-
-        if self.what=='online':
-            # temporary hack to get exp 7 and 8 from online DB
-            df=pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi","intLumi","intLumiDel"])
-            if self.exp[0]<9:
-                # need to 
-                self.conn = self.create_connection(self.what)
-                if not self.conn:
-                    b2.B2FATAL(f"could not establish connection to db: {db}")
-            if 7  in self.exp:
-                df=df.append(self.getDataFrameFromDBOnline([7]),sort=False)
-            if 8  in self.exp:
-                df=df.append(self.getDataFrameFromDBOnline([8]),sort=False)
-            # experiment >10
-            exp_rr= [e for e in self.exp if e>9]
-            if len(exp_rr):
-                df=df.append(self.getDataFrameFromRunRegistry(exp_rr),sort=False)
-            # cumulative integrated luminosity
-            df['intLumi'] = df['lumi'].cumsum()
-            df['lumiDel'] = df['intLumiDel'].diff()
-        else:
-            self.conn = self.create_connection(self.what)
-            df=pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi","intLumi","intLumiDel"])
-            df=df.append(self.getDataFrameFromDBOffLine(),sort=False)
-            df['intLumi'] = df['lumi'].cumsum()
-            df['lumiDel'] = np.nan
-
+    def fixDeliveredLumi(self, df, exp_rr):
+        """
+        fix the delivered luminosity if multiple experiments are requested, as it is reset to null at the experiment change
+        """
+        cumulativeLumi = 0
+        for exp in exp_rr:
+            print(f"Fixing Lumi for exp {exp}")
+            df['intLumiDel'].loc[df['exp'] == exp] += cumulativeLumi
+            cumulativeLumi = df[df['exp']==exp]['intLumiDel'].max()
         return df
 
-    def plotLumiPerPeriod(self, period=1):
-        """
-        Make monitoring plots of luminosity.
+    def getDataFrame(self, expreq):
+        """ get pandas dataframe for a set of experiment, taking into account the source: DB or RR """
 
-        :param period: 1 for day, 2 for week (start on monday)
-        """
+        # Load from cache if any
 
-        if self.df.empty:
-            b2.B2FATAL(f"No entries for experiment/run range")
-        # protection for strange entry in the database
-        df=self.df.copy()
-        #drop runs with no date
-        df["TMP"] = df.date.values                 # date is a DateTimeIndex
-        df = df[df.TMP.notnull()]                  # remove all NaT values
-        df.drop(["TMP"], axis=1, inplace=True)     # delete TMP again
+        df = pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi", "intLumi", "intLumiDel"])
 
-        df.date_stop.fillna(df.date+10, inplace=True)
-        df['date'] = pd.to_datetime(df['date'],unit='s')
-        df['date_stop'] = pd.to_datetime(df['date_stop'],unit='s')
-
-        #drop runs with start date before actual start  of BelleII
-        df=df[~(df['date']<'2018-01-01')]
-        df = df[df['intLumi'].notnull()]
-
-        #treatment of runs across midnight
-        df_midnight = df[(df['date_stop'].dt.day-df['date'].dt.day)>0]
-        df = df.reset_index(drop=True)
-        df_midnight.index = list(df.index[df['date_stop'].dt.day-df['date'].dt.day>0].tolist())
-        df_midnight['duration'] = (df_midnight['date_stop']-df_midnight['date']).dt.total_seconds()
-        #change the day time to midnight
-        df_midnight['midnight_date'] = pd.DatetimeIndex(df_midnight.date_stop).normalize()
-        df_midnight['midnight_date'] = pd.to_datetime(df_midnight['midnight_date'],unit='s')
-        df_midnight['duration_midnight'] = (df_midnight['midnight_date'] - df_midnight['date']).dt.total_seconds()
-        #evaluation of the weights to impose on the first part of the run, before midnight
-        df_midnight['weight'] = df_midnight['duration_midnight'].div(df_midnight['duration'])
-
-        for ind in df_midnight.index:
-            #Assign the correct weights to the lumi of the runs if we have a delivered luminosity value
-            if df.loc[ind, 'intLumiDel'] is not np.nan:
-                #recorded lumi
-                df.loc[ind+1, 'lumi'] = df.loc[ind+1, 'lumi'] + df.loc[ind, 'lumi'] * (1-df_midnight.loc[ind, 'weight'])
-                df.loc[df.index==ind, 'lumi'] = df['lumi'] * df_midnight['weight']
-                #delivered lumi
-                df.loc[ind+1, 'lumiDel'] = df.loc[ind+1, 'lumiDel'] + df.loc[ind, 'lumiDel'] * (1-df_midnight.loc[ind, 'weight'])
-                df.loc[df.index==ind, 'lumiDel'] = df['lumiDel'] * df_midnight['weight']
-
-        df['intLumi'] = df['lumi'].cumsum()
-        df['intLumiDel'] = df['lumiDel'].cumsum()
-
-        # Group runs by date, and store the int lumi per date as the max cumulative lumi.
-        # This returns a pandas.Series object.
-        srs_lumi_date = []
-        if period==1: # daily
-            srs_lumi_date = df.groupby(df["date"].dt.ceil('d'))["lumi"].sum()
-            srs_lumi_del_date = df.groupby(df["date"].dt.ceil('d'))["intLumiDel"].max()
-            label="Daily"
-            freq='D'
-            width=1.0
-        if period==2: # weekly
-            df['date_week'] = df['date'].dt.to_period('W').apply(lambda r: r.start_time)
-            srs_lumi_date = df.groupby(df["date_week"].dt.ceil('7d'))["lumi"].sum()
-            srs_lumi_del_date = df.groupby(df["date_week"].dt.ceil('7d'))["intLumiDel"].max()
-            label="Weekly"
-            freq='7d'
-            width=6.5
+        # this is not working yet.
+        # try:
+        #     df = pd.read_csv("luminosity.csv")
+        # except:
+        #     print("empty cache")
+        #     pass
     
-        srs_lumi_date = srs_lumi_date.asfreq(freq, fill_value=0.0)
-        srs_lumi_del_date = srs_lumi_del_date.asfreq(freq, fill_value=0.0)
+        # print( df[df['exp'].isin(args.exp)])
+    
+        allrunsCache = dict()
+        for exp in args.exp:
+            try:
+                allrunsCache[exp] = df.groupby(['exp'])['run'].apply(list).loc[exp]
+            except:
+                pass
+        # print("Cache ",allrunsCache)
 
-        if period==1:
-            x = srs_lumi_date.index.values
-            y = srs_lumi_date.values
+        # get list of all runs in RunDB for the range required.
+        allruns = dict()
 
-        if period==2:
-        # Note that some offsets do not have a vectorized implementation. 
-        #They can still be used but will raise a PerformanceWarning
-            new_index_x = srs_lumi_date.index + pd.DateOffset(days=+4)
-            x = new_index_x.values
-            y = srs_lumi_date.values
-
-        # integrated luminosity
-        yInt = np.cumsum(srs_lumi_date.values)
-
-        # delivered integrated luminosity
-        yIntDel = fill_zeros_with_last(srs_lumi_del_date.values)
-        yIntDel = np.ma.masked_where(np.isnan(yIntDel), yIntDel)
-
-        figure, ax1 = plt.subplots()
-        
-        ax1.bar(x, y, label=f"Recorded {label}", color="blue", width=-width, alpha=0.5, align='edge')
-        ax1.set_xlabel(r"Date")
-        ax1.set_ylabel(rf"Total integrated {label} luminosity [$\mathrm{{fb}}^{{-1}}$]", color="blue")
-        ax1.set_ylim(bottom=0,top=y.max()*1.2)
-        ax1.tick_params(axis='y', labelcolor="blue")
-        ax1.yaxis.grid(which='major', color="blue", linestyle='dotted')
-        ax1.xaxis.set_major_locator(mdates.WeekdayLocator(MO))
-        #get a better separation on x-axis labels for long periods
-        start, end = ax1.get_xlim()
-        if(end-start>60.0): #in days 
-            ax1.set_xticks(ax1.get_xticks()[::2])
-            if(end-start>120.0):
-                ax1.set_xticks(ax1.get_xticks()[::2])
-
-        ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
-
-        # plot integrate lumi
-        ax2 = ax1.twinx()
-        ax2.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]", color="red")
-        if (self.delivered):
-            ax2.set_ylim(bottom=0,top=np.nan_to_num(yIntDel,0).max()*1.1)
-        else:
-            ax2.set_ylim(bottom=0,top=np.nan_to_num(yInt,0).max()*1.1)
-        ax2.tick_params(axis='y', labelcolor="red")
-        if (self.delivered):
-            ax2.plot(x, yIntDel, color="red", lw=2,linestyle="-.", label=rf"$\int\mathcal{{L}}_{{Delivered}}\,dt\,= {self.df['intLumiDel'].max():.2f}\,[\mathrm{{fb}}^{{-1}}]$")
-
-        ax2.plot(x, yInt, color="red", lw=2, label=rf"$\int\mathcal{{L}}_{{Recorded}}\,dt\,= {self.df['intLumi'].max():.2f}\,[\mathrm{{fb}}^{{-1}}]$")
-
-        ax2.xaxis.set_major_locator(mdates.WeekdayLocator(MO))
-        #get a better separation on x-axis labels for long periods
-        start, end = ax2.get_xlim()
-        if(end-start>60.0): #in days
-            ax2.set_xticks(ax2.get_xticks()[::2])
-            if(end-start>120.0):
-                ax2.set_xticks(ax2.get_xticks()[::2])
-
-
-        h1, l1 = ax1.get_legend_handles_labels()
-        h2, l2 = ax2.get_legend_handles_labels()
-
-        ax2.legend(h1+h2, l1+l2, loc="upper left",title=r"Integrated luminosity")
-
-        # Text box. Use axis coords.
-        plt.text(0., 1.02, rf"Belle II {self.what.title()} luminosity", transform=ax1.transAxes, fontsize=12)
-        plt.text(1., 1.02, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, ha='right', fontsize=12)
-
-        plt.text(1, -0.25, f"Plot on {datetime.now().strftime('%Y/%m/%d %H:%M %Z')} JST", transform=ax1.transAxes, fontsize=6, ha="right")
-
-        filename=f"Lumi{self.what.title()}_{label}_Exp{self.expstr}"
+        # if run range is defined, use it.
         if self.runs:
-            filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
-        b2.B2INFO(f"Creating {filename}.pdf|png files")
-        for fileformat in ['pdf','png']:
-            plt.savefig(f"{filename}.{fileformat}", bbox_inches="tight", dpi=150)
-
-
-        # produce plot of luminosity efficiency
-        if self.delivered:
-
-            df = df[df.date > '2020-03-07']
-            df['lumiEff']=df['intLumi']/df['intLumiDel']
-
-            yIntPeriod = srs_lumi_date.values
-
-            # delivered lumi in each period: can be zero!
-            yIntDelPeriod= yIntDel
-            yIntDelPeriod[1:] -= yIntDelPeriod[:-1].copy()
+            for exp in args.exp:
+                allruns[exp] = self.runs
+        else:
+            for exp in args.exp:
+                allruns[exp] = []
+                for info in self.get_run_info(min_experiment=exp, max_experiment=exp,  run_type='physics'):
+                    allruns[exp].append(info.get('run'))
+        # print("All  ",allruns)
             
-            # mask divide by zero error
-            with np.errstate(divide='ignore', invalid='ignore'):
-                yeff=np.divide(yIntPeriod, yIntDelPeriod)
-                yeff = np.ma.masked_where(np.isnan(yeff), yeff)
-
-            figure, ax1 = plt.subplots()
-
-            ax1.set_xlabel(r"Date")
-            ax1.set_ylim(bottom=0,top=100)
-            ax1.set_ylabel(rf"Data taking $\varepsilon$", color="blue")
-
-            ax1.xaxis.set_major_locator(mdates.WeekdayLocator(MO))
-            #get a better separation on x-axis labels for long periods
-            start, end = ax1.get_xlim()
-            if(end-start>60.0): #in days
-                ax1.set_xticks(ax1.get_xticks()[::2])
-                if(end-start>120.0):
-                    ax1.set_xticks(ax1.get_xticks()[::2])
-
-            fmt=mdates.DateFormatter('%Y/%m/%d')
-            ax1.xaxis.set_major_formatter(fmt)
-            ax1.yaxis.set_major_locator(ticker.FixedLocator([0, 10, 30, 50, 70, 80, 90, 95, 100]))
-            ax1.yaxis.grid(which='major', linestyle='dotted')
-            ax1.yaxis.set_major_formatter(ticker.PercentFormatter())
-            ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
-            plt.text(1, -0.25, f"Plot on {datetime.now().strftime('%Y/%m/%d %H:%M %Z')} JST", transform=ax1.transAxes, fontsize=6, ha="right")
-
-            df=df[df['lumiEff'].between(0,1)]
-
-            ax1.plot_date(df['date'],
-                          df['lumiEff']*100, 
-                          fmt='-', 
-                          label=rf'Cumulative $\varepsilon$ = {df["lumiEff"].iloc[-1]:2.1%}', 
-                          color='red', 
-                         )
-
-            ax1.bar(x, yeff*100,
-                    label=rf"{label} $\varepsilon$",
-                    color="blue", width=-width, alpha=0.5, align='edge')
-
-            ax1.legend(loc="lower right",title=r"Data taking $\varepsilon$")
-
-            filename=f"LumiEff{self.what.title()}_{label}_Exp{self.expstr}"
-            if self.runs:
-                filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
-            b2.B2INFO(f"Creating {filename}.pdf|png files")
-            for fileformat in ['pdf','png']:
-                plt.savefig(f"{filename}.{fileformat}", bbox_inches="tight", dpi=150)
-
-
-    
+        new_runs = dict()
+        for exp in args.exp:
+            if exp not in allrunsCache.keys():
+                new_runs[exp] = sorted(allruns[exp])
+            else:
+                new_runs[exp] = sorted(list(set(allruns[exp]).difference(allrunsCache[exp])))
+            
+        #print("New  runs: ",new_runs)
         
+        expTBU = [exp for exp,value in new_runs.items() if value != [] ]
 
-    def plotLumiPerRun(self):
-        """
-        Make lumi plot per run
-        """
+        # see if some is missing from cache
+        if all(x == [] for x in new_runs.values()):
+            print("No new runs wrt to cache")
 
-        # create a reduced dataframe with only runs selected
-        # these are the runs to be selected
-        if (self.runs):
-            dfRuns=self.df[self.df['run'].isin(self.runs)].copy()
-            dfRuns['intLumi'] = dfRuns['lumi'].cumsum()
+            # need to fix delivered lumi for al exp newer than the first one updated
+            if len(expTBU)>0:
+                firstRunTBU = expTBU[0]
+                exp_rr = [exp for exp,value in new_runs.items() if exp > expTBU[0] ]
+                if len(exp_rr)>1:
+                    df = self.fixDeliveredLumi(df, exp_rr)
         else:
-            dfRuns=self.df
-        if len(dfRuns)==0:
-            b2.B2FATAL(f"The selected run numbers do not exist. Please choose wisely the run numbers.")
 
-        figure, ax1 = plt.subplots()
+            # which exp have runs not in cache
+            print(f"Need to get some runs from RunDB for exp {expTBU}")
 
-        ax1.bar(dfRuns['run'], dfRuns['lumi'], label=f"Recorded run by run", color="blue", width=1.0, alpha=0.5)
-        ax1.set_xlabel(r"Run")
-        ax1.set_ylabel(rf"Total integrated luminosity by run [$\mathrm{{fb}}^{{-1}}$]", color="blue")
-        ax1.tick_params(axis='y', labelcolor="blue")
-        ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
-        ax1.set_xlim(left=int(dfRuns['run'].min()*0.99))
-        ax1.set_ylim(bottom=0,top=dfRuns['lumi'].max()*1.2)
-        ax1.xaxis.set_major_locator(ticker.LinearLocator(numticks=10))
-        ax1.xaxis.set_major_locator(ticker.AutoLocator())
+            if self.what=='online':
+                # temporary hack to get exp 7 and 8 from online DB
+                if expTBU[0]<9:
+                    # need to 
+                    self.conn = self.create_connection(self.what)
+                    if not self.conn:
+                        b2.B2FATAL(f"could not establish connection to db: {db}")
+                if 7  in expTBU:
+                    df=df.append(self.getDataFrameFromDBOnline([7]), sort=False, ignore_index=True)
+                if 8  in expTBU:
+                    df=df.append(self.getDataFrameFromDBOnline([8]), sort=False, ignore_index=True)
+                # experiment >10
+                exp_rr= [e for e in expTBU if e>9]
+                for exp in exp_rr:
+                    df=df.append(self.getDataFrameFromRunRegistry(exp, new_runs[exp]), sort=False, ignore_index=True)
 
-        #get a better separation on x-axis labels for long periods
-        start, end = ax1.get_xlim()
-        if(end-start>1000.0): #in run numbers
-            ax1.set_xticks(ax1.get_xticks()[::2])
-            if(end-start>2000.0):
-                ax1.set_xticks(ax1.get_xticks()[::2])
+                # in case of multiple experiment, need to fix the delivered lumi as it is reste to 0 at the exp change.
+                if len(exp_rr)>1:
+                    df = self.fixDeliveredLumi(df, exp_rr)
+                
+                # cumulative integrated luminosity
+                df = df.sort_values(by=['exp','run'])
+
+                df['intLumi'] = df['lumi'].cumsum()
+                df['lumiDel'] = df['intLumiDel'].diff()
+            else:
+                self.conn = self.create_connection(self.what)
+                df=pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi", "intLumi", "intLumiDel"])
+                df=df.append(self.getDataFrameFromDBOffLine(),sort=False)
+                df['intLumi'] = df['lumi'].cumsum()
+                df['lumiDel'] = np.nan
+
+        if len(df)==0:
+            b2.B2FATAL(f"No runs found in exp {self.exp} for range {self.runRangeStr}")
 
 
-        # plot integrate lumi
-        ax2 = ax1.twinx()
-        ax2.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]", color="red")
-        ax2.set_ylim(bottom=0,top=dfRuns['intLumiDel'].max()*1.1)
-        ax2.tick_params(axis='y', labelcolor="red")
-        ax2.xaxis.set_major_locator(ticker.LinearLocator(numticks=10))
-        ax2.xaxis.set_major_locator(ticker.AutoLocator())
+        #store luminosity values for each run in a .csv file
+        df.sort_values(by=['exp','run']).to_csv("luminosity.csv", index=False)
 
-        #get a better separation on x-axis labels for long periods
-        start, end = ax2.get_xlim()
-        if(end-start>1000.0): #in run numbers
-            ax2.set_xticks(ax2.get_xticks()[::2])
-            if(end-start>2000.0):
-                ax2.set_xticks(ax2.get_xticks()[::2])
-        if (self.delivered):
-            ax2.plot(dfRuns['run'], dfRuns['intLumiDel'], color="red",linestyle="-.",  label=rf"$\int\mathcal{{L}}_{{Delivered}}\,dt\,= {self.df['intLumiDel'].max():.2f}\,[\mathrm{{fb}}^{{-1}}]$")
-        ax2.plot(dfRuns['run'], dfRuns['intLumi'], color="red", label=rf"$\int\mathcal{{L}}_{{Recorded}}\,dt\,= {self.df['intLumi'].max():.2f}\,[\mathrm{{fb}}^{{-1}}]$")
+        # # select only the requested experiments
+        # intLumiPrevoiousExp = df[~df['exp'].isin(args.exp)]['intLumi'].max()
 
-        h1, l1 = ax1.get_legend_handles_labels()
-        h2, l2 = ax2.get_legend_handles_labels()
-        ax2.legend(h1+h2, l1+l2, loc=2, title=r"Integrated luminosity")
+        # df = df[df['exp'].isin(args.exp)]
 
-        # Text box. Use axis coords.
-        plt.text(0., 1.02, rf"Belle II {self.what.title()} luminosity", transform=ax1.transAxes, fontsize=12)
-        plt.text(1., 1.02, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, ha='right', fontsize=12)
+        # fix integreated lumi considering only requested exp
+        
+        # df['intLumi'] -= intLumiPrevoiousExp
 
-        plt.text(1, -0.25, f"Plot on {datetime.now().strftime('%Y/%m/%d %H:%M %Z')} JST", transform=ax1.transAxes, fontsize=6, ha="right")
-
-        filename=f"Lumi{self.what.title()}PerRun_Exp{self.expstr}"
-        if self.runs:
-            filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
-        b2.B2INFO(f"Creating {filename}.pdf|png files")
-        for fileformat in ['pdf','png']:
-            plt.savefig(f"{filename}.{fileformat}", bbox_inches="tight")
+        return df
 
     def printLumi(self):
         """
@@ -650,29 +508,43 @@ class Luminosity:
             dfRuns=self.df
         # create a reduced dataframe with only runs selected
 
-        cols=['exp','run','lumi','date','intLumi','intLumiDel']
+        cols=['exp','run','lumi','date','length','intLumi','intLumiDel','quality','beam_energy']
+        dfRuns['length'] = dfRuns['date_stop'] - dfRuns['date']
+        dfRuns['date'].fillna(pd.Timedelta(seconds=0))
+        dfRuns = dfRuns[dfRuns['date']>0]
         if (self.verb):
-            print('-' * 80)
-            print('-' * 30,f"{self.what} Luminosity",'-'*30)
-            print('-' * 80)
+            print('-' * 100)
+            print('-' * 40,f"{self.what} Luminosity",'-'*41)
+            print('-' * 100)
             print(dfRuns[cols]
                 .to_string(index=False,
                     col_space=3,
-                    header=['Exp','Run','Lumi [/pb]','date','int Lumi [/fb]','int Lumi Delivered [/fb]'],
+                    header=['Exp','Run','Lumi [/pb]','date','length','int Lumi [/fb]','int Lumi Delivered [/fb]',"Good","Beam Energy"],
                     formatters={
                     "exp" : "{:3d}".format,
                     "run" : "{:5d}".format,
                     "lumi" : lambda x: "{:,.3f}".format(x*1000),
-                    "data" : "".format,
+                    "date" : lambda x: "{:%Y/%m/%d %H:%M}".format(pd.to_datetime(x, unit='s')),
+                    "length" : lambda x: "{:%H:%M}".format(pd.to_datetime(x, unit='s')),
                     "intLumi" : "{:,.3f}".format,
                     "intLumiDel" : "{:,.3f}".format,
+                    "good" : "{:5s}".format,
+                    "beam_energy" : "{:8s}".format,
                     }
                                 ))
-            print('-' * 61)
+            print('-' * 100)
+
+        print(f"Num runs: {len(dfRuns)}")
+
+        LL = dfRuns.groupby(["beam_energy"])['lumi'].sum()
+        for i,L in LL.items():
+            b2.B2INFO(f"RECORDED {self.what} {i:9s} : L = {L*1E6:12.2f} /nb = {L*1E3:8.2f} /pb = {L:8.3f} /fb = {L/1E3:8.4f} /ab")
         L=dfRuns['lumi'].sum()
-        b2.B2INFO(f"RECORDED  {self.what}   : L = {L*1E6:8.2f} /nb = {L*1E3:8.2f} /pb = {L:8.3f} /fb = {L/1E3:8.4f} /ab")
-        Ld=dfRuns['lumiDel'].sum()
-        b2.B2INFO(f"DELIVERED {self.what}   : L = {Ld*1E6:8.2f} /nb = {Ld*1E3:8.2f} /pb = {Ld:8.3f} /fb = {Ld/1E3:8.4f} /ab")
+        b2.B2INFO(f"RECORDED {self.what} Total     : L = {L*1E6:12.2f} /nb = {L*1E3:8.2f} /pb = {L:8.3f} /fb = {L/1E3:8.4f} /ab")
+    
+        if self.what=='online' and self.delivered:
+            Ld=dfRuns['lumiDel'].sum()
+            b2.B2INFO(f"DELIVERED {self.what}   : L = {Ld*1E6:12.2f} /nb = {Ld*1E3:8.2f} /pb = {Ld:8.3f} /fb = {Ld/1E3:8.4f} /ab")
         
         #store luminosity values for each run in a .csv file
         dfRuns.to_csv("dfruns.csv")
@@ -682,21 +554,8 @@ class Luminosity:
 
 if __name__ == '__main__':
 
-    from pandas.plotting import register_matplotlib_converters
-    register_matplotlib_converters()
-
     args = argparser().parse_args()
     
-    lumi=Luminosity(args)
+    lumi = Luminosity(args)
 
     lumi.printLumi()
-
-
-    if args.plot:
-
-        if 'DAY' in args.plot:
-            lumi.plotLumiPerPeriod(1)
-        if 'WEEK' in args.plot:
-            lumi.plotLumiPerPeriod(2)
-        if 'RUN' in args.plot:
-            lumi.plotLumiPerRun()

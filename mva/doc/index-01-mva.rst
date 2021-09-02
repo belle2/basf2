@@ -158,7 +158,7 @@ Change the type of the training, this is for experts only.
 You can look at the advanced examples to learn more.
 
 Fitting / How to perform a training
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can use the MVA package via C++, Python or the command-line.
 All three are nearly identical (they call the same code internally).
@@ -210,7 +210,7 @@ You can create the necessary data files to execute the examples (if you have som
 
 
 Inference / How to apply a trained mva method onto data
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Depending on your use-case there are different possibilities.
 Most often you want to apply the training online (inside basf2) like it is done by the FEI or the FlavourTagger: You can use the MVAExpert module if your training is based on Particle objects of the analysis package:

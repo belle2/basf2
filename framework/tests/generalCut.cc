@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <framework/utilities/GeneralCut.h>
+#include <framework/utilities/TestHelpers.h>
 #include <gtest/gtest.h>
 
 using namespace Belle2;
@@ -199,12 +200,12 @@ namespace {
     a = MockGeneralCut::compile("15 == 0xF");
     EXPECT_TRUE(a->check(&testObject));
 
-    // Should throw an exception
-    EXPECT_THROW(a = MockGeneralCut::compile("15 == 15.0 bla"), std::runtime_error);
-    EXPECT_TRUE(a->check(&testObject));
+    // Should trigger B2FATAL
+    EXPECT_B2FATAL(a = MockGeneralCut::compile("15 == 15.0 bla"));
+    // Should throw runtime error
     EXPECT_THROW(a = MockGeneralCut::compile("15 == other_var"), std::runtime_error);
-    EXPECT_TRUE(a->check(&testObject));
-    EXPECT_THROW(a = MockGeneralCut::compile("15 == 15e1000"), std::out_of_range);
+
+    a = MockGeneralCut::compile("infinity == 15e1000");
     EXPECT_TRUE(a->check(&testObject));
 
     a = MockGeneralCut::compile("1e-3 < 1e3");
@@ -232,7 +233,7 @@ namespace {
     a = MockGeneralCut::compile("3.1415926535897931234567890 == 3.1415926535897931234567891");
     EXPECT_TRUE(a->check(&testObject));
 
-    a = MockGeneralCut::compile("3141592653589 != 3141592653588");
+    a = MockGeneralCut::compile("3141592653589. != 3141592653588.");
     EXPECT_TRUE(a->check(&testObject));
 
     a = MockGeneralCut::compile("");
@@ -241,11 +242,11 @@ namespace {
     a = MockGeneralCut::compile(" ");
     EXPECT_TRUE(a->check(&testObject));
 
-    a = MockGeneralCut::compile("[ ]");
-    EXPECT_TRUE(a->check(&testObject));
+    EXPECT_B2FATAL(a = MockGeneralCut::compile("[ ]"));
+    //EXPECT_TRUE(a->check(&testObject));
 
-    a = MockGeneralCut::compile("[ ] and []");
-    EXPECT_TRUE(a->check(&testObject));
+    EXPECT_B2FATAL(a = MockGeneralCut::compile("[ ] and []"));
+    //EXPECT_TRUE(a->check(&testObject));
   }
 
   /// Test for the general cut: Try to compile some cuts and check if decompiling gives back more or less the same string (except for [ and ]).

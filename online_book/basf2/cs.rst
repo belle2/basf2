@@ -389,7 +389,7 @@ continuum events, simply add a cut on the continuum probability at the end.
     created. The training tools are implemented in basf2 within the
     :ref:`mva/doc/index-01-mva:MVA package`. One needs to configure the global
     options and then perform the training (see :ref:`mva/doc/index-01-mva:globaloptions`
-    and :ref:`mva/doc/index-01-mva:Fitting / Howto perform a training`
+    and :ref:`mva/doc/index-01-mva:Fitting / How to perform a training`
     respectively). Using the examples given in the links write down the script
     to perform the training.
 

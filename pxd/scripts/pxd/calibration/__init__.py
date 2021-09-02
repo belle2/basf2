@@ -75,9 +75,9 @@ def hot_pixel_mask_calibration(
     geometry = register_module('Geometry')
     geometry.param('components', ['PXD'])
     pxdunpacker = register_module('PXDUnpacker')
-    pxdunpacker.param('SuppressErrorMask', 0xFFFFFFFFFFFFFFFF)
+    # pxdunpacker.param('ContinueOnError', True)
     checker = register_module('PXDPostErrorChecker')
-    checker.param("CriticalErrorMask", 0)  # 0xC000000000000000)
+    # checker.param("CriticalErrorMask", 0)
 
     main = create_path()
     main.add_module(gearbox)

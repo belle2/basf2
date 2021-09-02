@@ -185,16 +185,16 @@ class Luminosity:
         nAllRuns = len(self.df)
         if (args.good):
             self.df = self.df[self.df['quality']]
-            print(f"Selecting good runs: Good/Total: {len(self.df)}/{nAllRuns}")
+            b2.B2INFO(f"Selecting good runs: Good/Total: {len(self.df)}/{nAllRuns}")
         else:
-            print(f"No Selection on good runs (use --good)")
+            b2.B2INFO(f"No Selection on good runs (use --good)")
 
         self.beam_energy = args.beam_energy
         if (args.beam_energy):
             self.df = self.df[self.df['beam_energy']==args.beam_energy]
-            print(f"Selecting beam-energy {args.beam_energy}/Total= {len(self.df)}/{nAllRuns}")
+            b2.B2INFO(f"Selecting beam-energy {args.beam_energy}/Total= {len(self.df)}/{nAllRuns}")
         else:
-            print(f"No Selection on beam-energy (use --beam-energy XX)")
+            b2.B2INFO(f"No Selection on beam-energy (use --beam-energy XX)")
 
     def create_connection(self, what):
         """
@@ -217,7 +217,7 @@ class Luminosity:
         try:
             connection = sqlite3.connect(DB, uri=True)
         except sqlite3.Error as e:
-            print(e)
+            b2.B2FATAL(f"Cannot conntect to sql DB {DB}: {e}")
 
         return connection
 
@@ -357,7 +357,7 @@ class Luminosity:
                 else:
                     beam_energy = "4S_offres"
             except:
-                print("Beam energy not set in RunDB")
+                b2.B2WRNING("Beam energy not set in RunDB for exp/run {run['experiment'}/{run['run'}. Assuming 4S")
             row["beam_energy"] = beam_energy
 
             rows.append(row)
@@ -378,7 +378,7 @@ class Luminosity:
         """
         cumulativeLumi = 0
         for exp in exp_rr:
-            print(f"Fixing Lumi for exp {exp}")
+            b2.B2INFO(f"Fixing delivered Lumi for exp {exp}")
             df['intLumiDel'].loc[df['exp'] == exp] += cumulativeLumi
             cumulativeLumi = df[df['exp']==exp]['intLumiDel'].max()
         return df
@@ -397,7 +397,6 @@ class Luminosity:
         #     print("empty cache")
         #     pass
     
-        # print( df[df['exp'].isin(args.exp)])
     
         allrunsCache = dict()
         for exp in args.exp:
@@ -405,7 +404,6 @@ class Luminosity:
                 allrunsCache[exp] = df.groupby(['exp'])['run'].apply(list).loc[exp]
             except:
                 pass
-        # print("Cache ",allrunsCache)
 
         # get list of all runs in RunDB for the range required.
         allruns = dict()
@@ -419,7 +417,6 @@ class Luminosity:
                 allruns[exp] = []
                 for info in self.get_run_info(min_experiment=exp, max_experiment=exp,  run_type='physics'):
                     allruns[exp].append(info.get('run'))
-        # print("All  ",allruns)
             
         new_runs = dict()
         for exp in args.exp:
@@ -428,13 +425,11 @@ class Luminosity:
             else:
                 new_runs[exp] = sorted(list(set(allruns[exp]).difference(allrunsCache[exp])))
             
-        #print("New  runs: ",new_runs)
-        
         expTBU = [exp for exp,value in new_runs.items() if value != [] ]
 
         # see if some is missing from cache
         if all(x == [] for x in new_runs.values()):
-            print("No new runs wrt to cache")
+            b2.B2INFO("No new runs wrt to cache")
 
             # need to fix delivered lumi for al exp newer than the first one updated
             if len(expTBU)>0:
@@ -445,7 +440,7 @@ class Luminosity:
         else:
 
             # which exp have runs not in cache
-            print(f"Need to get some runs from RunDB for exp {expTBU}")
+            b2.B2INFO(f"Need to get some runs from RunDB for exp {expTBU}")
 
             if self.what=='online':
                 # temporary hack to get exp 7 and 8 from online DB
@@ -534,7 +529,7 @@ class Luminosity:
                                 ))
             print('-' * 100)
 
-        print(f"Num runs: {len(dfRuns)}")
+        b2.B2INFO(f"Num runs: {len(dfRuns)}")
 
         LL = dfRuns.groupby(["beam_energy"])['lumi'].sum()
         for i,L in LL.items():

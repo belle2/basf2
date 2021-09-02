@@ -165,7 +165,7 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param add_modules_for_trigger_calculation: add the modules necessary for computing the software trigger decision
-        during later stages (do not make any cut)
+        during later stages (do not make any cut), relevant only when reconstruct_cdst is not None.
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
         full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
         required PXD objects won't be added.

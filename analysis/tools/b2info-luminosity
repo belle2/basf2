@@ -260,6 +260,12 @@ class Luminosity:
         df = pd.read_sql(cmdexp, self.conn, params=exp)
         df = df.sort_values(by=['date'])
 
+        # No way to get run quality for old experiment
+        df["quality"] = True
+
+        # no beam energy for old exp in DB
+        df['beam_energy'] = "NotDef"
+
         # lumi in /fb
         df['lumi'] *= 1E-6
         b2.B2INFO(f"Read {len(df)} runs for experiment {exp}")
@@ -350,14 +356,14 @@ class Luminosity:
             row["quality"] = quality & noEvents
 
             # beam energy
-            beam_energy = "4S"
+            beam_energy = "NotDef"
             try:
                 if run["ler"]["momentum"] >= 4.0 and run["her"]["momentum"] >= 7.0:
                     beam_energy = "4S"
                 else:
                     beam_energy = "4S_offres"
             except:
-                b2.B2WARNING(f"Beam energy not set in RunDB for exp/run {run['experiment']}/{run['run']}. Assuming 4S")
+                b2.B2WARNING(f"Beam energy not set in RunDB for exp/run {run['experiment']}/{run['run']}.")
             row["beam_energy"] = beam_energy
 
             rows.append(row)

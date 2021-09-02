@@ -357,7 +357,7 @@ class Luminosity:
                 else:
                     beam_energy = "4S_offres"
             except:
-                b2.B2WRNING("Beam energy not set in RunDB for exp/run {run['experiment'}/{run['run'}. Assuming 4S")
+                b2.B2WARNING(f"Beam energy not set in RunDB for exp/run {run['experiment']}/{run['run']}. Assuming 4S")
             row["beam_energy"] = beam_energy
 
             rows.append(row)

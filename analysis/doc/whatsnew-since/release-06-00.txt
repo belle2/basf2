@@ -22,3 +22,4 @@ Modules
  * The :b2:mod:`HelixErrorScaler` has been extended to K_S0 that are reconstructed from V0. A new python function
    `stdV0s.scaleErrorKshorts` provides an alternative to the standard list ``K_S0:merged`` with a correction applied to the
    uncertainties of the K_S0 daughter helix parameters.
+* Modified ``InvM`` to be calculated at the decay vertex if the particle is V0 or decay at rho > 5 mm.

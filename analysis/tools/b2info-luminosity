@@ -542,7 +542,6 @@ class Luminosity:
         for i,L in LL.items():
             b2.B2INFO(f"RECORDED {self.what} {i:9s} : L = {L*1E6:12.2f} /nb = {L*1E3:10.2f} /pb = {L:8.3f} /fb = {L/1E3:8.4f} /ab")
 
-        print('-' * 60)
         b2.B2INFO('-' * 20 + " Luminosity by Exp and Beam Eenrgy " + '-' * 20 )
         LL = dfRuns.groupby(['exp',"beam_energy"])['lumi'].sum()
         for i,L in LL.items():

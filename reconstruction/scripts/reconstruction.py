@@ -215,7 +215,7 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
         if not components or ('SVD' in components):
             path.add_module("SVDShaperDigitsFromTracks")
 
-        # if you need to calculate the software trigger result, then you will need the full pre-filter post-tracking recostruction
+        # if you need to calculate the software trigger result, then you will need the full pre-filter post-tracking reconstruction
         if add_modules_for_trigger_calculation and (not components or (
                 "CDC" in components and "ECL" in components and "KLM" in components)):
             add_prefilter_posttracking_reconstruction(path,
@@ -223,7 +223,7 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
                                                       pruneTracks=pruneTracks,
                                                       add_muid_hits=add_muid_hits,
                                                       addClusterExpertModules=addClusterExpertModules)
-        # if you don't need the software trigger result, then you can add only
+        # if you don't need the software trigger result, it's enough to add only
         # these two modules of the pre-filter post-tracking reconstruction
         else:
             add_dedx_modules(path)

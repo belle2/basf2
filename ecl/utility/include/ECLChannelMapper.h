@@ -31,12 +31,20 @@ namespace Belle2 {
       int convertArrayBKW[ECL_BKW_CRATES * ECL_BKW_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER];
       /// convert CellId to (iCrate, iShaper, iChannel)
       int convertArrayInv[ECL_TOTAL_CHANNELS][3]; // 0 -- icrate, 1 -- iboard, 2 -- ichannel
+      /// Main instance of ECLChannelMapper
+      static ECLChannelMapper* instance;
 
     public:
       /// Default constructor
       ECLChannelMapper();
       /// Default destructor
       ~ECLChannelMapper() {}
+
+      /** Return main instance of ECLChannelMapper.
+       * @param use_db   If true, run initFromDB() at the creation of main instance
+       */
+      static ECLChannelMapper* getInstance(bool use_db = true);
+
       /// Initialize channel mapper using data stored in default location
       bool initFromFile();
       /// Initialize channel mapper using data stored in the ASCII file
@@ -63,6 +71,8 @@ namespace Belle2 {
       int getShaperPosition(int cellID);
       /// get number of DSP channel in the shaper by given number of  CellId
       int getShaperChannel(int cellID);
+      /// Return channel index in ECLChannelMap
+      int getElectronicsID(int cellID);
 
       /// get number of ShaperDSP modules in the given VME crate number
       inline int getNShapersInCrate(int iCrate)

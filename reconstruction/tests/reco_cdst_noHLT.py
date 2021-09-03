@@ -21,10 +21,11 @@ import b2test_utils as b2tu
 
 if __name__ == '__main__':
     with b2tu.clean_working_directory():
+        b2.set_random_seed('this_is_a_seed')
         main = b2.Path()
         main.add_module('EventInfoSetter')
         main.add_module('Progress')
-        ge.add_kkmc_generator(main, 'mu-mu+')
+        ge.add_evtgen_generator(main, 'mixed')
         si.add_simulation(main)
         re.add_reconstruction(main, reconstruct_cdst='rawFormat', add_trigger_calculation=False)
         re.add_cdst_output(main)

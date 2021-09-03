@@ -173,6 +173,17 @@ void ECLDQMInjectionModule::event()
   if (m_eventmetadata.isValid() && m_eventmetadata->getErrorFlag() != 0x10) {
     m_iEvent = m_eventmetadata->getEvent();
   } else m_iEvent = -1;
+
+  int amps[8736] = {};
+  unsigned int ECLDigitsAboveThr = 0; // Threshold is set to 20 MeV
+  unsigned int ECLDigitsAboveThr1MeV = 0;
+  for (const auto& aECLDigit : m_storeHits) {
+    int amp = aECLDigit.getAmp();
+    amps[aECLDigit.getCellId() - 1] = amp;
+    if (amp > m_ECLThresholdforVetoTuning) ECLDigitsAboveThr += 1;
+    if (amp > 20) ECLDigitsAboveThr1MeV += 1;
+  }
+
   int discarded_wfs = 0;
   for (auto& aECLTrig : m_ECLTrigs) {
     int crate = aECLTrig.getTrigId();
@@ -188,21 +199,14 @@ void ECLDQMInjectionModule::event()
             if (mapper.getCellId(crate, shaper_pos, channel_pos) > 0) discarded_wfs += 1;
           }
         } else {
-          for (auto& aECLDigit : m_storeHits) {
-            if (crate == mapper.getCrateID(aECLDigit.getCellId()) && shaper_pos == mapper.getShaperPosition(aECLDigit.getCellId()) &&
-                aECLDigit.getAmp() >= (v_totalthrApsd[aECLDigit.getCellId() - 1] / 4 * 4)) discarded_wfs += 1;
+          for (int channel_pos = 0; channel_pos < 16; channel_pos ++) {
+            int cid = mapper.getCellId(crate, shaper_pos, channel_pos);
+            if (cid > 0 && amps[cid - 1] >= (v_totalthrApsd[cid - 1] / 4 * 4)) discarded_wfs += 1;
           }
         }
       }
       suppress >>= 1;
     }
-  }
-
-  unsigned int ECLDigitsAboveThr = 0; // Threshold is set to 20 MeV
-  unsigned int ECLDigitsAboveThr1MeV = 0;
-  for (auto& aECLDigit : m_storeHits) {
-    if (aECLDigit.getAmp() > m_ECLThresholdforVetoTuning) ECLDigitsAboveThr += 1;
-    if (aECLDigit.getAmp() > 20) ECLDigitsAboveThr1MeV += 1;
   }
 
   for (auto& it : m_rawTTD) {

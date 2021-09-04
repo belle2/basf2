@@ -575,3 +575,20 @@ def loadStdDstarPlus_Dpi0_Kpipi(path=None):
     """
     ma.reconstructDecay(decayString='D*+:Dpi0_Kpipi -> D+:Kpipi pi0:bth_skim', cut='massDifference(0) < 0.16', dmID=4, path=path)
     return ['D*+:Dpi0_Kpipi']
+
+
+def loadCharmlessD0_Kpipi0(path=None):
+    """
+    Creates a 'D0:Kpipi0' list, with an invariant mass in the range :math:`1.7 < M < 2.0~{\\rm GeV}/c^2`,
+    from the following particles lists:
+
+      1. 'K-:SkimVeryLoose pi+:SkimVeryLoose pi0:SkimVeryLoose',
+
+    @param path     modules are added to this path
+    """
+    ma.reconstructDecay(
+        decayString='D0:Kpipi0 -> K-:SkimVeryLoose  pi+:SkimVeryLoose  pi0:charmlessFit',
+        cut='1.7 < M < 2.0',
+        path=path)
+
+    return ['D0:Kpipi0']

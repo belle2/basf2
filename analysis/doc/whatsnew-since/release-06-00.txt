@@ -23,3 +23,4 @@ Modules
  * The :b2:mod:`HelixErrorScaler` has been extended to K_S0 that are reconstructed from V0. A new python function
    `stdV0s.scaleErrorKshorts` provides an alternative to the standard list ``K_S0:merged`` with a correction applied to the
    uncertainties of the K_S0 daughter helix parameters.
+* Added ``clusterTotalMCMatchWeight`` which returns the sum of all deposited MC energies that can be used to identify beam background clusters.

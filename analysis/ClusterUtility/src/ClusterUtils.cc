@@ -10,30 +10,33 @@
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
+using namespace ROOT::Math;
 
 // -----------------------------------------------------------------------------
 ClusterUtils::ClusterUtils() = default;
 
 // -----------------------------------------------------------------------------
-const TLorentzVector ClusterUtils::GetCluster4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
+const PxPyPzEVector ClusterUtils::GetCluster4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
 {
   // Use the geometry origin (0,0,0) and *not* the IP position
-  return Get4MomentumFromCluster(cluster, TVector3(0.0, 0.0, 0.0), hypo);
+  return Get4MomentumFromCluster(cluster, XYZVector(0.0, 0.0, 0.0), hypo);
 }
 
-const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
+const PxPyPzEVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
 {
 
   // Use the default vertex from the beam parameters if none is given.
   return Get4MomentumFromCluster(cluster, GetIPPosition(), hypo);
 }
 
-const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex,
-                                                           ECLCluster::EHypothesisBit hypo)
+const PxPyPzEVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, const XYZVector& vertex,
+                                                          ECLCluster::EHypothesisBit hypo)
 {
 
   // Get particle direction from vertex and reconstructed cluster position.
-  TVector3 direction = cluster->getClusterPosition() - vertex;
+  XYZVector direction(cluster->getClusterPosition().x() - vertex.x(),
+                      cluster->getClusterPosition().y() - vertex.y(),
+                      cluster->getClusterPosition().z() - vertex.z());
 
   // Always ignore mass here (even for neutral hadrons) therefore the magnitude
   // of the momentum is equal to the cluster energy under this hypo.
@@ -42,7 +45,7 @@ const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* clu
   const double py = E * sin(direction.Theta()) * sin(direction.Phi());
   const double pz = E * cos(direction.Theta());
 
-  const TLorentzVector l(px, py, pz, E);
+  const PxPyPzEVector l(px, py, pz, E);
   return l;
 }
 
@@ -54,7 +57,7 @@ const TMatrixD ClusterUtils::GetJacobiMatrix4x6FromCluster(const ECLCluster* clu
   return GetJacobiMatrix4x6FromCluster(cluster, GetIPPosition(), hypo);
 }
 
-const TMatrixD ClusterUtils::GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, const TVector3& vertex,
+const TMatrixD ClusterUtils::GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, const XYZVector& vertex,
                                                            ECLCluster::EHypothesisBit hypo)
 {
 
@@ -190,12 +193,12 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix7x7FromCluster(const ECLClust
 
 
 // -----------------------------------------------------------------------------
-const TVector3 ClusterUtils::GetIPPosition()
+const XYZVector ClusterUtils::GetIPPosition()
 {
   if (!m_beamSpotDB) {
     B2WARNING("Beamspot not available, using (0, 0, 0) as IP position instead.");
-    return TVector3(0.0, 0.0, 0.0);
-  } else return m_beamSpotDB->getIPPosition();
+    return XYZVector(0.0, 0.0, 0.0);
+  } else return XYZVector(m_beamSpotDB->getIPPosition().x(), m_beamSpotDB->getIPPosition().y(), m_beamSpotDB->getIPPosition().z());
 }
 
 // -----------------------------------------------------------------------------

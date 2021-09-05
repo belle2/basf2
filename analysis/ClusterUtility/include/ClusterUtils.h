@@ -16,7 +16,8 @@
 #include <mdst/dataobjects/ECLCluster.h>
 
 // ROOT
-#include <TLorentzVector.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 #include <TMatrixD.h>
 
 namespace Belle2 {
@@ -40,19 +41,20 @@ namespace Belle2 {
      * Returns cluster four momentum vector
      * @return const cluster four momentum vector
      */
-    const TLorentzVector GetCluster4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
+    const ROOT::Math::PxPyPzEVector GetCluster4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns four momentum vector
      * @return const four momentum vector
      */
-    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
+    const ROOT::Math::PxPyPzEVector Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns four momentum vector
      * @return const four momentum vector
      */
-    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex, ECLCluster::EHypothesisBit hypo);
+    const ROOT::Math::PxPyPzEVector Get4MomentumFromCluster(const ECLCluster* cluster, const ROOT::Math::XYZVector& vertex,
+                                                            ECLCluster::EHypothesisBit hypo);
     /**
      * Returns 4x6 Jacobi matrix (px, py, pz, E)
      * @return const TMatrixD
@@ -63,7 +65,7 @@ namespace Belle2 {
      * Returns 4x6 Jacobi matrix (px, py, pz, E)
      * @return const TMatrixD
      */
-    const TMatrixD GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, const TVector3& vertex,
+    const TMatrixD GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, const ROOT::Math::XYZVector& vertex,
                                                  ECLCluster::EHypothesisBit hypo);
 
     /**
@@ -96,9 +98,9 @@ namespace Belle2 {
 
     /**
      * Returns default IP position from beam parameters
-     * @return const TVector3
+     * @return const XYZVector
      */
-    const TVector3 GetIPPosition();
+    const ROOT::Math::XYZVector GetIPPosition();
 
     /**
      * Returns default IP position covariance matrix from beam parameters

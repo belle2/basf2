@@ -42,11 +42,11 @@ namespace Belle2 {
 // (copied from k_sfw.cc with minimum modification)
 // ----------------------------------------------------------------------
   KsfwMoments::KsfwMoments(double Hso0_max,
-                           std::vector<std::pair<TVector3, int>> p3_cms_q_sigA,
-                           std::vector<std::pair<TVector3, int>> p3_cms_q_sigB,
-                           std::vector<std::pair<TVector3, int>> p3_cms_q_roe,
-                           const TLorentzVector& p_cms_missA,
-                           const TLorentzVector& p_cms_missB,
+                           std::vector<std::pair<ROOT::Math::XYZVector, int>> p3_cms_q_sigA,
+                           std::vector<std::pair<ROOT::Math::XYZVector, int>> p3_cms_q_sigB,
+                           std::vector<std::pair<ROOT::Math::XYZVector, int>> p3_cms_q_roe,
+                           const ROOT::Math::PxPyPzEVector& p_cms_missA,
+                           const ROOT::Math::PxPyPzEVector& p_cms_missB,
                            double et[2]
                           )
   {
@@ -57,16 +57,16 @@ namespace Belle2 {
     m_et[1] = et[1];
 
     m_mm2[0] = p_cms_missA.E() > 0
-               ? p_cms_missA.Mag2()
-               : -p_cms_missA.E() * p_cms_missA.E() - p_cms_missA.Vect().Mag2();
+               ? p_cms_missA.mag2()
+               : -p_cms_missA.E() * p_cms_missA.E() - p_cms_missA.P2();
     m_mm2[1] = p_cms_missB.E() > 0
-               ? p_cms_missB.Mag2()
-               : -p_cms_missB.E() * p_cms_missB.E() - p_cms_missB.Vect().Mag2();
+               ? p_cms_missB.mag2()
+               : -p_cms_missB.E() * p_cms_missB.E() - p_cms_missB.P2();
 
     //========================
     // Calculate discriminants
     //========================
-    std::vector<std::pair<TVector3, int>>::iterator pqi, pqj;
+    std::vector<std::pair<ROOT::Math::XYZVector, int>>::iterator pqi, pqj;
 
     // Calculate Hso components
     for (int i = 0; i < 3; i++) {
@@ -77,10 +77,10 @@ namespace Belle2 {
 
     // Signal A (use_finalstate_for_sig == 0)
     for (pqi = p3_cms_q_sigA.begin(); pqi != p3_cms_q_sigA.end(); ++pqi) {
-      const double pi_mag((pqi->first).Mag());
+      const double pi_mag((pqi->first).R());
       for (pqj = p3_cms_q_roe.begin(); pqj != p3_cms_q_roe.end(); ++pqj) {
-        const double pj_mag((pqj->first).Mag());
-        const double ij_cos((pqi->first) * (pqj->first) / pi_mag / pj_mag);
+        const double pj_mag((pqj->first).R());
+        const double ij_cos((pqi->first).Dot(pqj->first) / pi_mag / pj_mag);
         const int c_or_n(0 == (pqj->second) ? 1 : 0);  // 0: charged 1: neutral
         for (int k = 0; k < 5; k++) {
           m_Hso[0][c_or_n][k] += (k % 2)
@@ -88,8 +88,8 @@ namespace Belle2 {
                                  : pj_mag * legendre(ij_cos, k);
         }
       }
-      const double p_miss_mag(p_cms_missA.Rho());
-      const double i_miss_cos((pqi->first)*p_cms_missA.Vect() / pi_mag / p_miss_mag);
+      const double p_miss_mag(p_cms_missA.P());
+      const double i_miss_cos((pqi->first).Dot(p_cms_missA.Vect()) / pi_mag / p_miss_mag);
       for (int k = 0; k < 5; k++) {
         m_Hso[0][2][k] += (k % 2) ? 0 : p_miss_mag * legendre(i_miss_cos, k);
       }
@@ -97,10 +97,10 @@ namespace Belle2 {
 
     // Signal B (use_finalstate_for_sig == 1)
     for (pqi = p3_cms_q_sigB.begin(); pqi != p3_cms_q_sigB.end(); ++pqi) {
-      const double pi_mag((pqi->first).Mag());
+      const double pi_mag((pqi->first).R());
       for (pqj = p3_cms_q_roe.begin(); pqj != p3_cms_q_roe.end(); ++pqj) {
-        const double pj_mag((pqj->first).Mag());
-        const double ij_cos((pqi->first) * (pqj->first) / pi_mag / pj_mag);
+        const double pj_mag((pqj->first).R());
+        const double ij_cos((pqi->first).Dot(pqj->first) / pi_mag / pj_mag);
         const int c_or_n(0 == (pqj->second) ? 1 : 0);  // 0: charged 1: neutral
         for (int k = 0; k < 5; k++) {
           m_Hso[1][c_or_n][k] += (k % 2)
@@ -108,15 +108,15 @@ namespace Belle2 {
                                  : pj_mag * legendre(ij_cos, k);
         }
       }
-      const double p_miss_mag(p_cms_missB.Rho());
-      const double i_miss_cos((pqi->first)*p_cms_missB.Vect() / pi_mag / p_miss_mag);
+      const double p_miss_mag(p_cms_missB.P());
+      const double i_miss_cos((pqi->first).Dot(p_cms_missB.Vect()) / pi_mag / p_miss_mag);
       for (int k = 0; k < 5; k++) {
         m_Hso[1][2][k] += (k % 2) ? 0 : p_miss_mag * legendre(i_miss_cos, k);
       }
     }
 
     // Add missing to the lists
-    std::vector<std::pair<TVector3, int>> p3_cms_q_roeA(p3_cms_q_roe), p3_cms_q_roeB(p3_cms_q_roe);
+    std::vector<std::pair<ROOT::Math::XYZVector, int>> p3_cms_q_roeA(p3_cms_q_roe), p3_cms_q_roeB(p3_cms_q_roe);
     p3_cms_q_roeA.emplace_back(p_cms_missA.Vect(), 0);
     p3_cms_q_roeB.emplace_back(p_cms_missB.Vect(), 0);
 
@@ -125,10 +125,10 @@ namespace Belle2 {
       m_Hoo[0][k] = m_Hoo[1][k] = 0;
     }
     for (pqi = p3_cms_q_roeA.begin(); pqi != p3_cms_q_roeA.end(); ++pqi) {
-      const double pi_mag((pqi->first).Mag());
+      const double pi_mag((pqi->first).R());
       for (pqj = p3_cms_q_roeA.begin(); pqj != pqi; ++pqj) {
-        const double pj_mag((pqj->first).Mag());
-        const double ij_cos((pqi->first) * (pqj->first) / pi_mag / pj_mag);
+        const double pj_mag((pqj->first).R());
+        const double ij_cos((pqi->first).Dot(pqj->first) / pi_mag / pj_mag);
         for (int k = 0; k < 5; k++) {
           m_Hoo[0][k] += (k % 2)
                          ? (pqi->second) * (pqj->second) * pi_mag * pj_mag * legendre(ij_cos, k)
@@ -137,10 +137,10 @@ namespace Belle2 {
       }
     }
     for (pqi = p3_cms_q_roeB.begin(); pqi != p3_cms_q_roeB.end(); ++pqi) {
-      const double pi_mag((pqi->first).Mag());
+      const double pi_mag((pqi->first).R());
       for (pqj = p3_cms_q_roeB.begin(); pqj != pqi; ++pqj) {
-        const double pj_mag((pqj->first).Mag());
-        const double ij_cos((pqi->first) * (pqj->first) / pi_mag / pj_mag);
+        const double pj_mag((pqj->first).R());
+        const double ij_cos((pqi->first).Dot(pqj->first) / pi_mag / pj_mag);
         for (int k = 0; k < 5; k++) {
           m_Hoo[1][k] += (k % 2)
                          ? (pqi->second) * (pqj->second) * pi_mag * pj_mag * legendre(ij_cos, k)

@@ -18,7 +18,7 @@
 #include <framework/logging/Logger.h>
 
 #include <vector>
-
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -32,11 +32,11 @@ namespace Belle2 {
     // Create relation: Particle <-> ContinuumSuppression
     particle->addRelationTo(qqVars);
 
-    std::vector<TVector3> p3_cms_sigB, p3_cms_roe, p3_cms_all;
+    std::vector<ROOT::Math::XYZVector> p3_cms_sigB, p3_cms_roe, p3_cms_all;
 
-    std::vector<std::pair<TVector3, int>> p3_cms_q_sigA;
-    std::vector<std::pair<TVector3, int>> p3_cms_q_sigB;
-    std::vector<std::pair<TVector3, int>> p3_cms_q_roe;
+    std::vector<std::pair<ROOT::Math::XYZVector, int>> p3_cms_q_sigA;
+    std::vector<std::pair<ROOT::Math::XYZVector, int>> p3_cms_q_sigB;
+    std::vector<std::pair<ROOT::Math::XYZVector, int>> p3_cms_q_roe;
 
     std::vector<float> ksfwFS0;
     std::vector<float> ksfwFS1;
@@ -46,8 +46,8 @@ namespace Belle2 {
 
     double et[2];
 
-    TVector3 thrustB;
-    TVector3 thrustO;
+    ROOT::Math::XYZVector thrustB;
+    ROOT::Math::XYZVector thrustO;
 
     float thrustBm = -1;
     float thrustOm = -1;
@@ -60,27 +60,27 @@ namespace Belle2 {
     PCmsLabTransform T;
     double BeamEnergy = T.getCMSEnergy() / 2;
 
-    TLorentzVector p_cms_missA(0, 0, 0, 2 * BeamEnergy);
-    TLorentzVector p_cms_missB(0, 0, 0, 2 * BeamEnergy);
+    ROOT::Math::PxPyPzEVector p_cms_missA(0, 0, 0, 2 * BeamEnergy);
+    ROOT::Math::PxPyPzEVector p_cms_missB(0, 0, 0, 2 * BeamEnergy);
     et[0] = et[1] = 0;
 
     // -- SIG A --- Use B primary daughters - (Belle: use_finalstate_for_sig == 0) --------
     std::vector<Belle2::Particle*> signalDaughters = particle->getDaughters();
 
     for (const Belle2::Particle* sigFS0 : signalDaughters) {
-      TLorentzVector p_cms = T.rotateLabToCms() * sigFS0->get4Vector();
+      ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * sigFS0->get4Vector();
 
       p3_cms_q_sigA.emplace_back(p_cms.Vect(), sigFS0->getCharge());
 
       p_cms_missA -= p_cms;
-      et[0] += p_cms.Perp();
+      et[0] += p_cms.Pt();
     }
 
     // -- SIG B --- Use B final-state daughters - (Belle: use_finalstate_for_sig == 1) ----
     std::vector<const Belle2::Particle*> signalFSParticles = particle->getFinalStateDaughters();
 
     for (const Belle2::Particle* sigFS1 : signalFSParticles) {
-      TLorentzVector p_cms = T.rotateLabToCms() * sigFS1->get4Vector();
+      ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * sigFS1->get4Vector();
 
       p3_cms_all.push_back(p_cms.Vect());
       p3_cms_sigB.push_back(p_cms.Vect());
@@ -88,7 +88,7 @@ namespace Belle2 {
       p3_cms_q_sigB.emplace_back(p_cms.Vect(), sigFS1->getCharge());
 
       p_cms_missB -= p_cms;
-      et[1] += p_cms.Perp();
+      et[1] += p_cms.Pt();
     }
 
     // -- ROE -----------------------------------------------------------------------------
@@ -114,7 +114,7 @@ namespace Belle2 {
         // Allow only particles with most probable hypothesis
         if (chargedROEParticle->isMostLikely()) {
 
-          TLorentzVector p_cms = T.rotateLabToCms() * chargedROEParticle->get4Vector();
+          ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * chargedROEParticle->get4Vector();
 
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
@@ -123,8 +123,8 @@ namespace Belle2 {
 
           p_cms_missA -= p_cms;
           p_cms_missB -= p_cms;
-          et[0] += p_cms.Perp();
-          et[1] += p_cms.Perp();
+          et[0] += p_cms.Pt();
+          et[1] += p_cms.Pt();
         }
       }
 
@@ -136,7 +136,7 @@ namespace Belle2 {
 
         if (photon->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
 
-          TLorentzVector p_cms = T.rotateLabToCms() * photon->get4Vector();
+          ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * photon->get4Vector();
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
 
@@ -144,18 +144,18 @@ namespace Belle2 {
 
           p_cms_missA -= p_cms;
           p_cms_missB -= p_cms;
-          et[0] += p_cms.Perp();
-          et[1] += p_cms.Perp();
+          et[0] += p_cms.Pt();
+          et[1] += p_cms.Pt();
         }
       }
 
       // Thrust variables
       thrustB = Thrust::calculateThrust(p3_cms_sigB);
       thrustO = Thrust::calculateThrust(p3_cms_roe);
-      thrustBm = thrustB.Mag();
-      thrustOm = thrustO.Mag();
-      cosTBTO  = fabs(cos(thrustB.Angle(thrustO)));
-      cosTBz   = fabs(thrustB.CosTheta());
+      thrustBm = thrustB.R();
+      thrustOm = thrustO.R();
+      cosTBTO  = fabs(thrustB.Unit().Dot(thrustO.Unit()));
+      cosTBz   = fabs(cos(thrustB.Theta()));
 
       // Cleo Cones
       CleoCones cc(p3_cms_all, p3_cms_roe, thrustB, true, true);
@@ -168,7 +168,7 @@ namespace Belle2 {
       R2 = FW.getR(2);
 
       // KSFW moments
-      TLorentzVector p_cms_B = T.rotateLabToCms() * particle->get4Vector();
+      ROOT::Math::PxPyPzEVector p_cms_B = T.rotateLabToCms() * particle->get4Vector();
       double Hso0_max(2 * (2 * BeamEnergy - p_cms_B.E()));
       KsfwMoments KsfwM(Hso0_max,
                         p3_cms_q_sigA,

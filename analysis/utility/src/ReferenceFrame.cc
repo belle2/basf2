@@ -18,8 +18,8 @@ std::stack<const ReferenceFrame*> ReferenceFrame::m_reference_frames;
 RestFrame::RestFrame(const Particle* particle) :
   m_momentum(particle->get4Vector()),
   m_displacement(particle->getVertex()),
-  m_boost(m_momentum.BoostVector()),
-  m_lab2restframe(TLorentzRotation(-m_boost))
+  m_boost(m_momentum.BoostToCM()),
+  m_lab2restframe(m_boost)
 {
 }
 
@@ -33,18 +33,19 @@ const ReferenceFrame& ReferenceFrame::GetCurrent()
   }
 }
 
-TVector3 RestFrame::getVertex(const TVector3& vector) const
+ROOT::Math::XYZVector RestFrame::getVertex(const ROOT::Math::XYZVector& vector) const
 {
   // Transform Vertex from lab into rest frame:
   // 1. Subtract displacement of rest frame origin in the lab frame
   // 2. Use Lorentz Transformation to Boost Vertex vector into rest frame
   // 3. Subtract movement of vertex end due to the time difference between
   //    the former simultaneous measured vertex points (see derivation of Lorentz contraction)
-  TLorentzVector a = m_lab2restframe * TLorentzVector(vector - m_displacement, 0);
+  ROOT::Math::XYZVector v(vector - m_displacement);
+  ROOT::Math::PxPyPzEVector a = m_lab2restframe * ROOT::Math::PxPyPzEVector(v.x(), v.y(), v.z(), 0);
   return a.Vect() - m_boost * a.T();
 }
 
-TLorentzVector RestFrame::getMomentum(const TLorentzVector& vector) const
+ROOT::Math::PxPyPzEVector RestFrame::getMomentum(const ROOT::Math::PxPyPzEVector& vector) const
 {
   // 1. Boost momentum into rest frame
   return m_lab2restframe * vector;
@@ -52,11 +53,9 @@ TLorentzVector RestFrame::getMomentum(const TLorentzVector& vector) const
 
 TMatrixFSym RestFrame::getMomentumErrorMatrix(const TMatrixFSym& matrix) const
 {
-  TMatrixD lorentzrot(4, 4);
-
-  for (int i = 0; i < 4; ++i)
-    for (int j = 0; j < 4; ++j)
-      lorentzrot(i, j) = m_lab2restframe(i, j);
+  double lorentzrotationvalues[16];
+  m_lab2restframe.GetLorentzRotation(lorentzrotationvalues);
+  TMatrixD lorentzrot(4, 4, lorentzrotationvalues);
 
   TMatrixFSym tmp_matrix(matrix);
 
@@ -65,11 +64,13 @@ TMatrixFSym RestFrame::getMomentumErrorMatrix(const TMatrixFSym& matrix) const
 
 TMatrixFSym RestFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
 {
+  double lorentzrotationvalues[16];
+  m_lab2restframe.GetLorentzRotation(lorentzrotationvalues);
   TMatrixD lorentzrot(4, 3);
 
   for (int i = 0; i < 4; ++i)
     for (int j = 0; j < 3; ++j)
-      lorentzrot(i, j) = m_lab2restframe(i, j);
+      lorentzrot(i, j) = lorentzrotationvalues[4 * i + j];
 
   TMatrixFSym tmp_matrix(matrix);
   auto rotated_error_matrix = tmp_matrix.Similarity(lorentzrot);
@@ -79,19 +80,19 @@ TMatrixFSym RestFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
   timeshift(0, 0) = 1;
   timeshift(1, 1) = 1;
   timeshift(2, 2) = 1;
-  timeshift(0, 3) = m_boost(0);
-  timeshift(1, 3) = m_boost(1);
-  timeshift(2, 3) = m_boost(2);
+  timeshift(0, 3) = m_boost.x();
+  timeshift(1, 3) = m_boost.y();
+  timeshift(2, 3) = m_boost.z();
 
   return rotated_error_matrix.Similarity(timeshift);
 }
 
-TVector3 LabFrame::getVertex(const TVector3& vector) const
+ROOT::Math::XYZVector LabFrame::getVertex(const ROOT::Math::XYZVector& vector) const
 {
   return vector;
 }
 
-TLorentzVector LabFrame::getMomentum(const TLorentzVector& vector) const
+ROOT::Math::PxPyPzEVector LabFrame::getMomentum(const ROOT::Math::PxPyPzEVector& vector) const
 {
   return vector;
 }
@@ -106,18 +107,19 @@ TMatrixFSym LabFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
   return matrix;
 }
 
-TVector3 CMSFrame::getVertex(const TVector3& vector) const
+ROOT::Math::XYZVector CMSFrame::getVertex(const ROOT::Math::XYZVector& vector) const
 {
   // Transform Vertex from lab into cms frame:
   // TODO 0: Subtract fitted IP similar to RestFrame
   // 1. Use Lorentz Transformation to Boost Vertex vector into cms frame
   // 2. Subtract movement of vertex end due to the time difference between
   //    the former simultaneous measured vertex points (see derivation of Lorentz contraction)
-  TLorentzVector a = m_transform.rotateLabToCms() * TLorentzVector(vector, 0);
-  return a.Vect() - m_transform.getBoostVector() * a.T();
+  ROOT::Math::PxPyPzEVector a = m_transform.rotateLabToCms() * ROOT::Math::PxPyPzEVector(vector.x(), vector.y(), vector.z(), 0);
+  return a.Vect() - ROOT::Math::XYZVector(m_transform.getBoostVector().x(), m_transform.getBoostVector().y(),
+                                          m_transform.getBoostVector().z()) * a.T();
 }
 
-TLorentzVector CMSFrame::getMomentum(const TLorentzVector& vector) const
+ROOT::Math::PxPyPzEVector CMSFrame::getMomentum(const ROOT::Math::PxPyPzEVector& vector) const
 {
   // 1. Boost momentum into cms frame
   return m_transform.rotateLabToCms() * vector;
@@ -127,10 +129,7 @@ TMatrixFSym CMSFrame::getMomentumErrorMatrix(const TMatrixFSym& matrix) const
 {
   TMatrixD lorentzrot(4, 4);
 
-  auto labToCmsFrame = m_transform.rotateLabToCms();
-  for (int i = 0; i < 4; ++i)
-    for (int j = 0; j < 4; ++j)
-      lorentzrot(i, j) = labToCmsFrame(i, j);
+  m_transform.rotateLabToCms().GetRotationMatrix(lorentzrot);
 
   TMatrixFSym tmp_matrix(matrix);
   return tmp_matrix.Similarity(lorentzrot);
@@ -140,7 +139,8 @@ TMatrixFSym CMSFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
 {
   TMatrixD lorentzrot(4, 3);
 
-  auto labToCmsFrame = m_transform.rotateLabToCms();
+  TMatrixD labToCmsFrame(4, 4);
+  m_transform.rotateLabToCms().GetRotationMatrix(labToCmsFrame);
   for (int i = 0; i < 4; ++i)
     for (int j = 0; j < 3; ++j)
       lorentzrot(i, j) = labToCmsFrame(i, j);
@@ -161,31 +161,28 @@ TMatrixFSym CMSFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
   return rotated_error_matrix.Similarity(timeshift);
 }
 
-RotationFrame::RotationFrame(const TVector3& newX, const TVector3& newY, const TVector3& newZ)
+RotationFrame::RotationFrame(const ROOT::Math::XYZVector& newX, const ROOT::Math::XYZVector& newY,
+                             const ROOT::Math::XYZVector& newZ) :
+  m_rotation(newX.Unit(), newY.Unit(), newZ.Unit())
 {
-  m_rotation.RotateAxes(newX.Unit(), newY.Unit(), newZ.Unit());
   m_rotation.Invert();
 }
 
-TVector3 RotationFrame::getVertex(const TVector3& vector) const
+ROOT::Math::XYZVector RotationFrame::getVertex(const ROOT::Math::XYZVector& vector) const
 {
   return m_rotation * vector;
 }
 
-TLorentzVector RotationFrame::getMomentum(const TLorentzVector& vector) const
+ROOT::Math::PxPyPzEVector RotationFrame::getMomentum(const ROOT::Math::PxPyPzEVector& vector) const
 {
-  TVector3 rotated_vector = m_rotation * vector.Vect();
-
-  return TLorentzVector(rotated_vector, vector[3]);
+  return m_rotation * vector;
 }
 
 TMatrixFSym RotationFrame::getMomentumErrorMatrix(const TMatrixFSym& matrix) const
 {
   TMatrixD extendedrot(4, 4);
   extendedrot.Zero();
-  for (int i = 0; i < 3; ++i)
-    for (int j = 0; j < 3; ++j)
-      extendedrot(i, j) = m_rotation(i, j);
+  m_rotation.GetRotationMatrix(extendedrot);
   extendedrot(3, 3) = 1;
 
   TMatrixFSym tmp_matrix(matrix);
@@ -195,26 +192,25 @@ TMatrixFSym RotationFrame::getMomentumErrorMatrix(const TMatrixFSym& matrix) con
 TMatrixFSym RotationFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
 {
   TMatrixD rotmatrix(3, 3);
-  for (int i = 0; i < 3; ++i)
-    for (int j = 0; j < 3; ++j)
-      rotmatrix(i, j) = m_rotation(i, j);
+  m_rotation.GetRotationMatrix(rotmatrix);
 
   TMatrixFSym tmp_matrix(matrix);
   return tmp_matrix.Similarity(rotmatrix);
 }
 
-CMSRotationFrame::CMSRotationFrame(const TVector3& newX, const TVector3& newY, const TVector3& newZ) :
+CMSRotationFrame::CMSRotationFrame(const ROOT::Math::XYZVector& newX, const ROOT::Math::XYZVector& newY,
+                                   const ROOT::Math::XYZVector& newZ) :
   rotationframe(newX, newY, newZ)
 {
 
 }
 
-TVector3 CMSRotationFrame::getVertex(const TVector3& vector) const
+ROOT::Math::XYZVector CMSRotationFrame::getVertex(const ROOT::Math::XYZVector& vector) const
 {
   return rotationframe.getVertex(cmsframe.getVertex(vector));
 }
 
-TLorentzVector CMSRotationFrame::getMomentum(const TLorentzVector& vector) const
+ROOT::Math::PxPyPzEVector CMSRotationFrame::getMomentum(const ROOT::Math::PxPyPzEVector& vector) const
 {
   return rotationframe.getMomentum(cmsframe.getMomentum(vector));
 }

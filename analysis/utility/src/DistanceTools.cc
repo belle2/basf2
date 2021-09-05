@@ -14,26 +14,26 @@
 using namespace Belle2;
 
 
-TVector3 DistanceTools::poca(TVector3 const& trackPos, TVector3 const& trackP, TVector3 const& vtxPos)
+B2Vector3D DistanceTools::poca(B2Vector3D const& trackPos, B2Vector3D const& trackP, B2Vector3D const& vtxPos)
 {
-  TVector3 trackDir(trackP.Unit());
-  TVector3 r(vtxPos - trackPos);
+  B2Vector3D trackDir(trackP.Unit());
+  B2Vector3D r(vtxPos - trackPos);
   return trackPos + r.Dot(trackDir) * trackDir;
 }
 
-TVector3 DistanceTools::trackToVtxVec(TVector3 const& trackPos, TVector3 const& trackP, TVector3 const& vtxPos)
+B2Vector3D DistanceTools::trackToVtxVec(B2Vector3D const& trackPos, B2Vector3D const& trackP, B2Vector3D const& vtxPos)
 {
-  TVector3 trackDir(trackP.Unit());
-  TVector3 r(vtxPos - trackPos);
+  B2Vector3D trackDir(trackP.Unit());
+  B2Vector3D r(vtxPos - trackPos);
   return r - (r.Dot(trackDir)) * trackDir;
 }
 
-double DistanceTools::trackToVtxDist(TVector3 const& trackPos, TVector3 const& trackP, TVector3 const& vtxPos)
+double DistanceTools::trackToVtxDist(B2Vector3D const& trackPos, B2Vector3D const& trackP, B2Vector3D const& vtxPos)
 {
   return trackToVtxVec(trackPos, trackP, vtxPos).Mag();
 }
 
-TMatrixDSym DistanceTools::trackToVtxCovmat(TVector3 const& trackP,
+TMatrixDSym DistanceTools::trackToVtxCovmat(B2Vector3D const& trackP,
                                             TMatrixDSym const& trackPosCovMat, TMatrixDSym const& vtxPosCovMat)
 {
   if (trackPosCovMat.GetNcols() != 3 || vtxPosCovMat.GetNcols() != 3) {
@@ -42,7 +42,7 @@ TMatrixDSym DistanceTools::trackToVtxCovmat(TVector3 const& trackP,
   }
 
   TMatrixDSym rCovMat(trackPosCovMat + vtxPosCovMat);
-  TVector3 trackDir(trackP.Unit());
+  B2Vector3D trackDir(trackP.Unit());
   //d_j = r_j - v_j * v_k r_k
   //Jij = del_i d_j = delta_ij - v_i * v_j
   //Since the vector of closest approach is a linear function of r, its
@@ -59,13 +59,13 @@ TMatrixDSym DistanceTools::trackToVtxCovmat(TVector3 const& trackP,
 
 }
 
-double DistanceTools::trackToVtxDistErr(TVector3 const& trackPos, TVector3 const& trackP, TVector3 const& vtxPos,
+double DistanceTools::trackToVtxDistErr(B2Vector3D const& trackPos, B2Vector3D const& trackP, B2Vector3D const& vtxPos,
                                         TMatrixDSym const& trackPosCovMat, TMatrixDSym const& vtxPosCovMat)
 {
   TMatrixDSym covMat(trackToVtxCovmat(trackP, trackPosCovMat, vtxPosCovMat));
-  TVector3 dVec(trackToVtxVec(trackPos, trackP, vtxPos));
+  B2Vector3D dVec(trackToVtxVec(trackPos, trackP, vtxPos));
   // n is the normalise vector in the direction of the POCA between the track and the vtx
-  TVector3 n((1. / dVec.Mag()) * dVec);
+  B2Vector3D n((1. / dVec.Mag()) * dVec);
 
   double ret(0);
 
@@ -78,12 +78,12 @@ double DistanceTools::trackToVtxDistErr(TVector3 const& trackPos, TVector3 const
 }
 
 
-TVector3 DistanceTools::vtxToVtxVec(TVector3 const& vtx1Pos, TVector3 const& vtx2Pos)
+B2Vector3D DistanceTools::vtxToVtxVec(B2Vector3D const& vtx1Pos, B2Vector3D const& vtx2Pos)
 {
   return vtx2Pos - vtx1Pos;
 }
 
-double DistanceTools::vtxToVtxDist(TVector3 const& vtx1Pos, TVector3 const& vtx2Pos)
+double DistanceTools::vtxToVtxDist(B2Vector3D const& vtx1Pos, B2Vector3D const& vtx2Pos)
 {
   return vtxToVtxVec(vtx1Pos, vtx2Pos).Mag();
 }
@@ -98,12 +98,12 @@ TMatrixDSym DistanceTools::vtxToVtxCovMat(TMatrixDSym const& vtx1CovMat, TMatrix
   return vtx1CovMat + vtx2CovMat;
 }
 
-double DistanceTools::vtxToVtxDistErr(TVector3 const& vtx1Pos, TVector3 const& vtx2Pos,
+double DistanceTools::vtxToVtxDistErr(B2Vector3D const& vtx1Pos, B2Vector3D const& vtx2Pos,
                                       TMatrixDSym const& vtx1CovMat, TMatrixDSym const& vtx2CovMat)
 {
   TMatrixDSym covMat(vtxToVtxCovMat(vtx1CovMat, vtx2CovMat));
-  TVector3 dVec(vtxToVtxVec(vtx1Pos, vtx2Pos));
-  TVector3 n((1. / dVec.Mag()) * dVec);
+  B2Vector3D dVec(vtxToVtxVec(vtx1Pos, vtx2Pos));
+  B2Vector3D n((1. / dVec.Mag()) * dVec);
 
   double ret(0);
 

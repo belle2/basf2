@@ -43,7 +43,7 @@ default_config = {
     "hadron.max_processed_events_per_file": 1000,
     "mumu.max_processed_events_per_file": 5000,
     "offip.max_processed_events_per_file": 2000,
-    "stage2.method": "fullLAPACK"
+    "stage1.method": "fullLAPACK"
 }
 
 quality_flags = [input_data_filters["Run Type"]["physics"],
@@ -353,7 +353,7 @@ def create_stage1(files, cfg):
         fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=False)
         + alignment.parameters.beamspot(),
         commands=[
-            f"method {cfg['stage2.method']} 6 0.001",
+            f"method {cfg['stage1.method']} 6 0.001",
             "entries 1000",
             "threads 10 10"],
         params=dict(minPValue=0.00001, externalIterations=0, granularity="run"),

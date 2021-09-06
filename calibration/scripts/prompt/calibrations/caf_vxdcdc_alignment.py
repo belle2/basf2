@@ -149,7 +149,6 @@ def create_cosmics_path():
         pruneTracks=False,
         skipGeometryAdding=True,
         addClusterExpertModules=False,
-        data_taking_period='early_phase3',
         merge_tracks=True
     )
 

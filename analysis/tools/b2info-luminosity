@@ -325,9 +325,6 @@ class Luminosity:
         run_params['run_type'] = "physics"
         run_params['expand'] = True
 
-        det = ["pxd", "svd", "cdc", "top", "ari", "ecl", "klm", "trg"],
-
-
         if runs:
             run_params['min_run'] = np.min(runs)
             run_params['max_run'] = np.max(runs)
@@ -348,8 +345,7 @@ class Luminosity:
             else:
                 row['intLumiDel']=None
             
-            # Quality
-            qualityShift = not any(expQ == "BAD" for expQ in run['quality_shifter'].values())
+            # Quality: we consider only expert quality flag.
             quality = not any(expQ == "BAD" for expQ in run['quality_expert'].values())
             noEvents = not any(expQ == "NO EVENTS" for expQ in run['quality_expert'].values())
             

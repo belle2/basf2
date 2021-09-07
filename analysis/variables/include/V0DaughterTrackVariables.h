@@ -10,6 +10,7 @@
 
 #include <analysis/dataobjects/Particle.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
 
@@ -275,7 +276,7 @@ namespace Belle2 {
     /**
      * helper function that returns the estimated 3-momentum of the two-track system assuming it's a converted photon
      */
-    TVector3 convertedPhoton3Momentum(const Particle* gamma, const std::vector<double>& daughterIndices);
+    B2Vector3D convertedPhoton3Momentum(const Particle* gamma, const std::vector<double>& daughterIndices);
 
     /**
      * returns the estimated x-component of momentum of the two-track system assuming it's a converted photon

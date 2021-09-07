@@ -20,9 +20,9 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
-#include <TLorentzVector.h>
+#include <Math/Boost.h>
+#include <Math/Vector4D.h>
 #include <TVectorF.h>
-#include <TVector3.h>
 
 #include <cmath>
 
@@ -172,7 +172,7 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
-      TLorentzVector sum;
+      ROOT::Math::PxPyPzEVector sum;
       const auto& daughters = particle->getDaughters();
       int nDaughters = static_cast<int>(daughters.size());
 
@@ -192,7 +192,7 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
-      TLorentzVector sum;
+      ROOT::Math::PxPyPzEVector sum;
       const auto& daughters = particle->getDaughters();
       int nDaughters = static_cast<int>(daughters.size());
 
@@ -238,7 +238,7 @@ namespace Belle2 {
 
       float result = 0.0;
 
-      TLorentzVector thisDaughterMomentum = particle->getDaughter(daughter)->get4Vector();
+      ROOT::Math::PxPyPzEVector thisDaughterMomentum = particle->getDaughter(daughter)->get4Vector();
 
       TMatrixFSym thisDaughterCovM(Particle::c_DimMomentum);
       thisDaughterCovM = particle->getDaughter(daughter)->getMomentumErrorMatrix();
@@ -300,21 +300,21 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector m = - T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector m = - T.getBeamFourMomentum();
 
-      TLorentzVector motherMomentum = particle->get4Vector();
-      TVector3       motherBoost    = -(motherMomentum.BoostVector());
+      ROOT::Math::PxPyPzEVector motherMomentum = particle->get4Vector();
+      B2Vector3D                motherBoost    = motherMomentum.BoostToCM();
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))
         return std::numeric_limits<float>::quiet_NaN();
 
-      TLorentzVector daugMomentum = particle->getDaughter(daughter)->get4Vector();
-      daugMomentum.Boost(motherBoost);
+      ROOT::Math::PxPyPzEVector daugMomentum = particle->getDaughter(daughter)->get4Vector();
+      daugMomentum = ROOT::Math::Boost(motherBoost) * daugMomentum;
 
-      m.Boost(motherBoost);
+      m = ROOT::Math::Boost(motherBoost) * m;
 
-      return daugMomentum.Angle(m.Vect());
+      return B2Vector3D(daugMomentum.Vect()).Angle(B2Vector3D(m.Vect()));
     }
 
     double pointingAngle(const Particle* particle, const std::vector<double>& daughters)
@@ -329,13 +329,13 @@ namespace Belle2 {
       if (particle->getDaughter(daughter)->getNDaughters() < 2)
         return std::numeric_limits<float>::quiet_NaN();
 
-      TVector3 productionVertex = particle->getVertex();
-      TVector3 decayVertex = particle->getDaughter(daughter)->getVertex();
+      B2Vector3D productionVertex = particle->getVertex();
+      B2Vector3D decayVertex = particle->getDaughter(daughter)->getVertex();
 
-      TVector3 vertexDiffVector = decayVertex - productionVertex;
+      B2Vector3D vertexDiffVector = decayVertex - productionVertex;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TVector3 daughterMomentumVector = frame.getMomentum(particle->getDaughter(daughter)).Vect();
+      B2Vector3D daughterMomentumVector = frame.getMomentum(particle->getDaughter(daughter)).Vect();
 
       return daughterMomentumVector.Angle(vertexDiffVector);
     }
@@ -353,26 +353,26 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector m = T.getBeamFourMomentum();
-      TLorentzVector p = particle->get4Vector();
-      TLorentzVector d1 = particle->getDaughter(daughter1)->get4Vector();
-      TLorentzVector d2 = particle->getDaughter(daughter2)->get4Vector();
+      ROOT::Math::PxPyPzEVector m = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector p = particle->get4Vector();
+      ROOT::Math::PxPyPzEVector d1 = particle->getDaughter(daughter1)->get4Vector();
+      ROOT::Math::PxPyPzEVector d2 = particle->getDaughter(daughter2)->get4Vector();
 
-      TLorentzVector l;
-      l.SetX(p.Py() * (d1.Pz() * d2.E()  - d1.E()  * d2.Pz()) + p.Pz() * (d1.E()  * d2.Py() - d1.Py() * d2.E())
-             + p.E()  * (d1.Py() * d2.Pz() - d1.Pz() * d2.Py()));
-      l.SetY(p.Px() * (d1.E()  * d2.Pz() - d1.Pz() * d2.E())  + p.Pz() * (d1.Px() * d2.E()  - d1.E()  * d2.Px())
-             + p.E()  * (d1.Pz() * d2.Px() - d1.Px() * d2.Pz()));
-      l.SetZ(p.Px() * (d1.Py() * d2.E()  - d1.E()  * d2.Py()) + p.Py() * (d1.E()  * d2.Px() - d1.Px() * d2.E())
-             + p.E()  * (d1.Px() * d2.Py() - d1.Py() * d2.Px()));
+      ROOT::Math::PxPyPzEVector l;
+      l.SetPx(p.Py() * (d1.Pz() * d2.E()  - d1.E()  * d2.Pz()) + p.Pz() * (d1.E()  * d2.Py() - d1.Py() * d2.E())
+              + p.E()  * (d1.Py() * d2.Pz() - d1.Pz() * d2.Py()));
+      l.SetPy(p.Px() * (d1.E()  * d2.Pz() - d1.Pz() * d2.E())  + p.Pz() * (d1.Px() * d2.E()  - d1.E()  * d2.Px())
+              + p.E()  * (d1.Pz() * d2.Px() - d1.Px() * d2.Pz()));
+      l.SetPz(p.Px() * (d1.Py() * d2.E()  - d1.E()  * d2.Py()) + p.Py() * (d1.E()  * d2.Px() - d1.Px() * d2.E())
+              + p.E()  * (d1.Px() * d2.Py() - d1.Py() * d2.Px()));
       l.SetE(-(p.Px() * (d1.Pz() * d2.Py() - d1.Py() * d2.Pz()) + p.Py() * (d1.Px() * d2.Pz() - d1.Pz() * d2.Px())
                + p.Pz() * (d1.Py() * d2.Px() - d1.Px() * d2.Py())));
 
-      double m_times_p = m * p;
-      double m_times_l = m * l;
-      double m_times_d1 = m * d1;
-      double l_times_d1 = l * d1;
-      double d1_times_p = d1 * p;
+      double m_times_p = m.Dot(p);
+      double m_times_l = m.Dot(l);
+      double m_times_d1 = m.Dot(d1);
+      double l_times_d1 = l.Dot(d1);
+      double d1_times_p = d1.Dot(p);
       double m_abs = TMath::Sqrt(pow(m_times_p / p.M(), 2) - m.M2());
       double d1_abs = TMath::Sqrt(pow(d1_times_p / p.M(), 2) - d1.M2());
       double cos_phi = -m_times_l / (m_abs * TMath::Sqrt(-l.M2()));

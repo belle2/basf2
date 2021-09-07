@@ -37,9 +37,6 @@
 #include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 
-#include <TLorentzVector.h>
-#include <TVector3.h>
-
 namespace Belle2 {
   namespace Variable {
 
@@ -275,7 +272,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Mag();
+      double missing = evtShape->getMissingMomentum().R();
       return missing;
     }
 
@@ -286,7 +283,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Px();
+      double missing = evtShape->getMissingMomentum().x();
       return missing;
     }
 
@@ -297,7 +294,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Py();
+      double missing = evtShape->getMissingMomentum().y();
       return missing;
     }
 
@@ -308,7 +305,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Pz();
+      double missing = evtShape->getMissingMomentum().z();
       return missing;
     }
 
@@ -330,7 +327,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Mag();
+      double missing = evtShape->getMissingMomentumCMS().R();
       return missing;
     }
 
@@ -341,7 +338,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Mag();
+      double missing = evtShape->getMissingMomentumCMS().R();
       return missing;
     }
 
@@ -352,7 +349,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Px();
+      double missing = evtShape->getMissingMomentumCMS().x();
       return missing;
     }
 
@@ -363,7 +360,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Py();
+      double missing = evtShape->getMissingMomentumCMS().y();
       return missing;
     }
 
@@ -374,7 +371,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Pz();
+      double missing = evtShape->getMissingMomentumCMS().z();
       return missing;
     }
 

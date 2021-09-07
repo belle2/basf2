@@ -46,10 +46,10 @@ namespace Belle2::Variable {
     if (!cluster) {
       return std::numeric_limits<int>::quiet_NaN();
     }
-    const TVector3& pos = cluster->getClusterPosition();
+    const B2Vector3D& pos = cluster->getClusterPosition();
     StoreArray<TrackFitResult> tracks;
     for (const TrackFitResult& track : tracks) {
-      const TVector3& trackPos = track.getPosition();
+      const B2Vector3D& trackPos = track.getPosition();
       if (trackPos.Angle(pos) < angle) {
         return 1;
       }
@@ -64,10 +64,10 @@ namespace Belle2::Variable {
     if (!klmCluster) {
       return std::numeric_limits<int>::quiet_NaN();
     }
-    const TVector3& klmClusterPos = klmCluster->getClusterPosition();
+    const B2Vector3D& klmClusterPos = klmCluster->getClusterPosition();
     StoreArray<ECLCluster> eclClusters;
     for (const ECLCluster& eclCluster : eclClusters) {
-      const TVector3& eclClusterPos = eclCluster.getClusterPosition();
+      const B2Vector3D& eclClusterPos = eclCluster.getClusterPosition();
       if (eclClusterPos.Angle(klmClusterPos) < angle) {
         return 1;
       }
@@ -230,12 +230,12 @@ namespace Belle2::Variable {
 
     // get the input particle's vector momentum in the CMS frame
     PCmsLabTransform T;
-    const TVector3 pCms = (T.rotateLabToCms() * particle->get4Vector()).Vect();
+    const B2Vector3D pCms = (T.rotateLabToCms() * particle->get4Vector()).Vect();
 
     // find the KLM cluster with the largest angle
     double maxAngle = 0.0;
     for (int iKLM = 0; iKLM < clusters.getEntries(); iKLM++) {
-      const TVector3 clusterMomentumCms = (T.rotateLabToCms() * clusters[iKLM]->getMomentum()).Vect();
+      const B2Vector3D clusterMomentumCms = (T.rotateLabToCms() * clusters[iKLM]->getMomentum()).Vect();
       double angle = pCms.Angle(clusterMomentumCms);
       if (angle > maxAngle) maxAngle = angle;
     }

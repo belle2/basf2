@@ -35,10 +35,9 @@
 #include <framework/geometry/BFieldManager.h>
 #include <framework/gearbox/Const.h>
 
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 #include <TRandom.h>
 #include <TVectorF.h>
-#include <TVector3.h>
 
 #include <iostream>
 #include <cmath>
@@ -237,7 +236,7 @@ namespace Belle2 {
     double particleTheta(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
-      return acos(frame.getMomentum(part).CosTheta());
+      return frame.getMomentum(part).Theta();
     }
 
     double particleThetaErr(const Particle* part)
@@ -272,7 +271,7 @@ namespace Belle2 {
     double particleCosTheta(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getMomentum(part).CosTheta();
+      return cos(frame.getMomentum(part).Theta());
     }
 
     double particleCosThetaErr(const Particle* part)
@@ -313,8 +312,8 @@ namespace Belle2 {
     double particleXp(const Particle* part)
     {
       PCmsLabTransform T;
-      TLorentzVector p4 = part -> get4Vector();
-      TLorentzVector p4CMS = T.rotateLabToCms() * p4;
+      ROOT::Math::PxPyPzEVector p4 = part -> get4Vector();
+      ROOT::Math::PxPyPzEVector p4CMS = T.rotateLabToCms() * p4;
       float s = T.getCMSEnergy();
       float M = part->getMass();
       return p4CMS.P() / TMath::Sqrt(s * s / 4 - M * M);
@@ -328,11 +327,11 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
-      double px = part->getMomentum().Px();
-      double py = part->getMomentum().Py();
+      double px = part->getPx();
+      double py = part->getPy();
 
-      double xV = part->getVertex().X();
-      double yV = part->getVertex().Y();
+      double xV = part->getX();
+      double yV = part->getY();
 
       double xIP = (beamSpotDB->getIPPosition()).X();
       double yIP = (beamSpotDB->getIPPosition()).Y();
@@ -347,7 +346,7 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
-      return std::cos((part->getVertex() - beamSpotDB->getIPPosition()).Angle(part->getMomentum()));
+      return cos((B2Vector3D(part->getVertex()) - beamSpotDB->getIPPosition()).Angle(B2Vector3D(part->getMomentum())));
     }
 
     double cosThetaBetweenParticleAndNominalB(const Particle* part)
@@ -366,10 +365,10 @@ namespace Belle2 {
       }
       double p_B = std::sqrt(e_Beam * e_Beam - m_B * m_B);
 
-      TLorentzVector p = T.rotateLabToCms() * part->get4Vector();
+      ROOT::Math::PxPyPzEVector p = T.rotateLabToCms() * part->get4Vector();
       double e_d = p.E();
       double m_d = p.M();
-      double p_d = p.Rho();
+      double p_d = p.P();
 
       double theta_BY = (2 * e_Beam * e_d - m_B * m_B - m_d * m_d)
                         / (2 * p_B * p_d);
@@ -384,8 +383,8 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
       PCmsLabTransform T;
-      TVector3 th = evtShape->getThrustAxis();
-      TVector3 particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
+      B2Vector3D th = evtShape->getThrustAxis();
+      B2Vector3D particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
       return std::cos(th.Angle(particleMomentum));
     }
 
@@ -393,14 +392,14 @@ namespace Belle2 {
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
 
-      TVector3 mom = particle->getMomentum();
+      B2Vector3D mom = particle->getMomentum();
 
-      TVector3 r = particle->getVertex() - beamSpotDB->getIPPosition();
+      B2Vector3D r = B2Vector3D(particle->getVertex()) - beamSpotDB->getIPPosition();
 
-      TVector3 Bfield = BFieldManager::getInstance().getFieldInTesla(beamSpotDB->getIPPosition());
+      B2Vector3D Bfield = BFieldManager::getInstance().getFieldInTesla(beamSpotDB->getIPPosition());
 
-      TVector3 curvature = - Bfield * Const::speedOfLight * particle->getCharge(); //Curvature of the track
-      double T = TMath::Sqrt(mom.Perp2() - 2 * curvature * r.Cross(mom) + curvature.Mag2() * r.Perp2());
+      B2Vector3D curvature = - Bfield * Const::speedOfLight * particle->getCharge(); //Curvature of the track
+      double T = TMath::Sqrt(mom.Perp2() - 2.0 * curvature * r.Cross(mom) + curvature.Mag2() * r.Perp2());
 
       return TMath::Abs((-2 * r.Cross(mom).z() + curvature.Mag() * r.Perp2()) / (T + mom.Perp()));
     }
@@ -413,9 +412,9 @@ namespace Belle2 {
         B2FATAL("You are trying to use an Armenteros variable. The mother particle is required to have exactly two daughters");
 
       const auto& daughters = part -> getDaughters();
-      TVector3 motherMomentum = frame.getMomentum(part).Vect();
-      TVector3 daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
-      TVector3 daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
+      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
+      B2Vector3D daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
+      B2Vector3D daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
 
       int daughter1Charge = daughters[0] -> getCharge();
       int daughter2Charge = daughters[1] -> getCharge();
@@ -439,8 +438,8 @@ namespace Belle2 {
         B2FATAL("You are trying to use an Armenteros variable. The mother particle is required to have exactly two daughters.");
 
       const auto& daughters = part -> getDaughters();
-      TVector3 motherMomentum = frame.getMomentum(part).Vect();
-      TVector3 daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
+      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
+      B2Vector3D daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
       double qt = daughter1Momentum.Perp(motherMomentum);
 
       return qt;
@@ -454,8 +453,8 @@ namespace Belle2 {
         B2FATAL("You are trying to use an Armenteros variable. The mother particle is required to have exactly two daughters.");
 
       const auto& daughters = part -> getDaughters();
-      TVector3 motherMomentum = frame.getMomentum(part).Vect();
-      TVector3 daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
+      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
+      B2Vector3D daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
       double qt = daughter2Momentum.Perp(motherMomentum);
 
       return qt;
@@ -478,7 +477,7 @@ namespace Belle2 {
     {
       const std::vector<Particle*> daughters = part->getDaughters();
       if (daughters.size() > 0) {
-        TLorentzVector sum;
+        ROOT::Math::PxPyPzEVector sum;
         for (auto daughter : daughters)
           sum += daughter->get4Vector();
 
@@ -492,9 +491,9 @@ namespace Belle2 {
     {
       const std::vector<Particle*> daughters = part->getDaughters();
       if (daughters.size() == 2) {
-        TLorentzVector dt1;
-        TLorentzVector dt2;
-        TLorentzVector dtsum;
+        ROOT::Math::PxPyPzEVector dt1;
+        ROOT::Math::PxPyPzEVector dt2;
+        ROOT::Math::PxPyPzEVector dtsum;
         double mpi = Const::pionMass;
         double mpr = Const::protonMass;
         dt1 = daughters[0]->get4Vector();
@@ -535,25 +534,25 @@ namespace Belle2 {
 
     double particleMassSquared(const Particle* part)
     {
-      TLorentzVector p4 = part->get4Vector();
+      ROOT::Math::PxPyPzEVector p4 = part->get4Vector();
       return p4.M2();
     }
 
     double b2bTheta(const Particle* part)
     {
       PCmsLabTransform T;
-      TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
-      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
-      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      ROOT::Math::PxPyPzEVector pcms = T.rotateLabToCms() * part->get4Vector();
+      ROOT::Math::PxPyPzEVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      ROOT::Math::PxPyPzEVector b2blab = T.rotateCmsToLab() * b2bcms;
       return b2blab.Theta();
     }
 
     double b2bPhi(const Particle* part)
     {
       PCmsLabTransform T;
-      TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
-      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
-      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      ROOT::Math::PxPyPzEVector pcms = T.rotateLabToCms() * part->get4Vector();
+      ROOT::Math::PxPyPzEVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      ROOT::Math::PxPyPzEVector b2blab = T.rotateCmsToLab() * b2bcms;
       return b2blab.Phi();
     }
 
@@ -566,13 +565,13 @@ namespace Belle2 {
 
       // get 4 momentum from cluster
       ClusterUtils clutls;
-      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterHypothesis);
+      ROOT::Math::PxPyPzEVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterHypothesis);
 
       // find the vector that balances this in the CMS
       PCmsLabTransform T;
-      TLorentzVector pcms = T.rotateLabToCms() * p4Cluster;
-      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
-      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      ROOT::Math::PxPyPzEVector pcms = T.rotateLabToCms() * p4Cluster;
+      ROOT::Math::PxPyPzEVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      ROOT::Math::PxPyPzEVector b2blab = T.rotateCmsToLab() * b2bcms;
       return b2blab.Theta();
     }
 
@@ -585,13 +584,13 @@ namespace Belle2 {
 
       // get 4 momentum from cluster
       ClusterUtils clutls;
-      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterHypothesis);
+      ROOT::Math::PxPyPzEVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterHypothesis);
 
       // find the vector that balances this in the CMS
       PCmsLabTransform T;
-      TLorentzVector pcms = T.rotateLabToCms() * p4Cluster;
-      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
-      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      ROOT::Math::PxPyPzEVector pcms = T.rotateLabToCms() * p4Cluster;
+      ROOT::Math::PxPyPzEVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      ROOT::Math::PxPyPzEVector b2blab = T.rotateCmsToLab() * b2bcms;
       return b2blab.Phi();
     }
 
@@ -625,9 +624,9 @@ namespace Belle2 {
     double particleMbc(const Particle* part)
     {
       PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
+      ROOT::Math::PxPyPzEVector vec = T.rotateLabToCms() * part->get4Vector();
       double E = T.getCMSEnergy() / 2;
-      double m2 = E * E - vec.Vect().Mag2();
+      double m2 = E * E - vec.P2();
       double mbc = m2 >= 0 ? sqrt(m2) : std::numeric_limits<double>::quiet_NaN();
       return mbc;
     }
@@ -635,7 +634,7 @@ namespace Belle2 {
     double particleDeltaE(const Particle* part)
     {
       PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
+      ROOT::Math::PxPyPzEVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.E() - T.getCMSEnergy() / 2;
     }
 
@@ -680,7 +679,7 @@ namespace Belle2 {
       if (!mcB)
         return std::numeric_limits<double>::quiet_NaN();
 
-      TLorentzVector pB = mcB->get4Vector();
+      ROOT::Math::PxPyPzEVector pB = mcB->get4Vector();
 
       std::vector<MCParticle*> mcDaug = mcB->getDaughters();
 
@@ -689,7 +688,7 @@ namespace Belle2 {
 
       // B -> X l nu
       // q = pB - pX
-      TLorentzVector pX;
+      ROOT::Math::PxPyPzEVector pX;
 
       for (auto mcTemp : mcDaug) {
         if (abs(mcTemp->getPDG()) <= 16)
@@ -698,9 +697,9 @@ namespace Belle2 {
         pX += mcTemp->get4Vector();
       }
 
-      TLorentzVector q = pB - pX;
+      ROOT::Math::PxPyPzEVector q = pB - pX;
 
-      return q.Mag2();
+      return q.M2();
     }
 
 // Recoil Kinematics related ---------------------------------------------
@@ -709,7 +708,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -721,7 +720,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -733,7 +732,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -745,7 +744,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -757,7 +756,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -769,7 +768,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -781,7 +780,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -793,7 +792,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -805,7 +804,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -817,10 +816,8 @@ namespace Belle2 {
       PCmsLabTransform T;
       double beamEnergy = T.getCMSEnergy() / 2.;
       if (part->getNDaughters() != 2) return std::numeric_limits<double>::quiet_NaN();
-      TLorentzVector tagVec = T.rotateLabToCms()
-                              * part->getDaughter(0)->get4Vector();
-      TLorentzVector sigVec = T.rotateLabToCms()
-                              * part->getDaughter(1)->get4Vector();
+      ROOT::Math::PxPyPzEVector tagVec = T.rotateLabToCms() * part->getDaughter(0)->get4Vector();
+      ROOT::Math::PxPyPzEVector sigVec = T.rotateLabToCms() * part->getDaughter(1)->get4Vector();
       tagVec.SetE(-beamEnergy);
       return (-tagVec - sigVec).M2();
     }

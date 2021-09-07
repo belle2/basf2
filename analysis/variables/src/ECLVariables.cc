@@ -26,6 +26,8 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
+#include <Math/Vector4D.h>
+
 #include <cmath>
 #include <stack>
 
@@ -200,7 +202,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         ClusterUtils clutls;
-        TLorentzVector p4Cluster = clutls.GetCluster4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
+        ROOT::Math::PxPyPzEVector p4Cluster = clutls.GetCluster4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
 
         return frame.getMomentum(p4Cluster).E();
       }
@@ -310,7 +312,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         ClusterUtils clutls;
-        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
+        ROOT::Math::PxPyPzEVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
 
         return frame.getMomentum(p4Cluster).Theta();
       }
@@ -344,7 +346,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         ClusterUtils clutls;
-        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
+        ROOT::Math::PxPyPzEVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
 
         return frame.getMomentum(p4Cluster).Phi();
       }
@@ -745,7 +747,7 @@ namespace Belle2 {
     double eclClusterOnlyInvariantMass(const Particle* part)
     {
       int nDaughters = part->getNDaughters();
-      TLorentzVector sum;
+      ROOT::Math::PxPyPzEVector sum;
 
       if (nDaughters < 1) {
         return part->getMass();
@@ -762,7 +764,7 @@ namespace Belle2 {
             const ECLCluster::EHypothesisBit clusterBit = current->getECLClusterEHypothesisBit();
             nClusterDaughters ++;
             ClusterUtils clutls;
-            TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterBit);
+            ROOT::Math::PxPyPzEVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterBit);
             sum += p4Cluster;
           } else {
             const std::vector<Particle*> daughters = current->getDaughters();

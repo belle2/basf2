@@ -155,7 +155,7 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
-      TVector3 v0Vertex = particle->getVertex();
+      B2Vector3F v0Vertex = particle->getVertex();
 
       const Particle* daug = particle->getDaughter(daughterID[0]);
 
@@ -178,7 +178,7 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
-      TVector3 v0Vertex = particle->getVertex();
+      B2Vector3F v0Vertex = particle->getVertex();
 
       const Particle* daug = particle->getDaughter(daughterID[0]);
 
@@ -218,8 +218,8 @@ namespace Belle2 {
       if (!trackFit) { return std::numeric_limits<double>::quiet_NaN(); }
 
       // MC information
-      const TVector3 mcProdVertex   = mcparticle->getVertex();
-      const TVector3 mcMomentum     = mcparticle->getMomentum();
+      const B2Vector3D mcProdVertex   = mcparticle->getVertex();
+      const B2Vector3D mcMomentum     = mcparticle->getMomentum();
       const double mcParticleCharge = mcparticle->getCharge();
       const double BzAtProdVertex = BFieldManager::getFieldInTesla(mcProdVertex).Z();
       Helix mcHelix = Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
@@ -610,11 +610,11 @@ namespace Belle2 {
       return vtxXY.Mod();
     }
 
-    TVector3 convertedPhoton3Momentum(const Particle* gamma, const std::vector<double>& daughterIndices)
+    B2Vector3D convertedPhoton3Momentum(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
       //Do basic checks
       int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
-      if (errFlag == -1) {return TVector3(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());}
+      if (errFlag == -1) {return B2Vector3D(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());}
 
       //Load helix parameters
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
@@ -625,13 +625,13 @@ namespace Belle2 {
                                                TanLambda2);
       if (errFlag == -1) {
         B2ERROR("First track provided has curvature zero. Calculation of convertedPhoton3Momentum failed.");
-        return  TVector3(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
-                         std::numeric_limits<double>::quiet_NaN());
+        return  B2Vector3D(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
+                           std::numeric_limits<double>::quiet_NaN());
       }
       if (errFlag == -2) {
         B2ERROR("Second track provided has curvature zero. Calculation of convertedPhoton3Momentum failed.");
-        return  TVector3(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
-                         std::numeric_limits<double>::quiet_NaN());
+        return  B2Vector3D(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
+                           std::numeric_limits<double>::quiet_NaN());
       }
 
       //Delta-Z
@@ -658,10 +658,10 @@ namespace Belle2 {
 
       //Photon 3-momentum
       double p1  = gamma->getDaughter(daughterIndex1)->getMomentumMagnitude();
-      TVector3 e1Momentum(coslam1 * cos(phiN1), coslam1 * sin(phiN1), sinlam1);
+      B2Vector3D e1Momentum(coslam1 * cos(phiN1), coslam1 * sin(phiN1), sinlam1);
       double p2  = gamma->getDaughter(daughterIndex2)->getMomentumMagnitude();
-      TVector3 e2Momentum(coslam2 * cos(phiN2), coslam2 * sin(phiN2), sinlam2);
-      TVector3 gammaMomentum = (e1Momentum * p1) + (e2Momentum * p2);
+      B2Vector3D e2Momentum(coslam2 * cos(phiN2), coslam2 * sin(phiN2), sinlam2);
+      B2Vector3D gammaMomentum = (e1Momentum * p1) + (e2Momentum * p2);
 
       return gammaMomentum;
     }

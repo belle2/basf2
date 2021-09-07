@@ -24,10 +24,10 @@
 
 // framework aux
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <TMatrixD.h>
 #include <TVectorD.h>
-#include <TVector3.h>
 
 //#include <iostream>
 #include <cmath>
@@ -42,7 +42,7 @@ namespace Belle2 {
     using RotationTools::toVec;
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-    static const TVector3 vecNaN(realNaN, realNaN, realNaN);
+    static const B2Vector3D vecNaN(realNaN, realNaN, realNaN);
 
     //   ############################################## Time Dependent CPV Analysis Variables  ###############################################
 
@@ -263,40 +263,40 @@ namespace Belle2 {
 
     double vertexBoostDirection(const Particle* part)
     {
-      TVector3 boostDir = PCmsLabTransform().getBoostVector().Unit();
-      TVector3 pos = part->getVertex();
+      B2Vector3D boostDir = PCmsLabTransform().getBoostVector().Unit();
+      B2Vector3F pos = part->getVertex();
       return pos.Dot(boostDir);
     }
 
     double vertexOrthogonalBoostDirection(const Particle* part)
     {
-      TVector3 boost = PCmsLabTransform().getBoostVector();
-      TVector3 orthBoostDir = getUnitOrthogonal(boost);
+      B2Vector3D boost = PCmsLabTransform().getBoostVector();
+      B2Vector3D orthBoostDir = getUnitOrthogonal(boost);
 
-      TVector3 pos = part->getVertex();
+      B2Vector3F pos = part->getVertex();
       return pos.Dot(orthBoostDir);
     }
 
     double vertexTruthBoostDirection(const Particle* part)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
-      TVector3 boostDir = (beamParamsDB->getHER() + beamParamsDB->getLER()).BoostVector().Unit();
+      B2Vector3D boostDir = (beamParamsDB->getHER() + beamParamsDB->getLER()).BoostToCM().Unit();
 
       const MCParticle* mcPart = part->getMCParticle();
       if (!mcPart) return realNaN;
-      TVector3 pos = mcPart->getDecayVertex();
+      B2Vector3D pos = mcPart->getDecayVertex();
       return pos.Dot(boostDir);
     }
 
     double vertexTruthOrthogonalBoostDirection(const Particle* part)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
-      TVector3 boost = (beamParamsDB->getHER() + beamParamsDB->getLER()).BoostVector();
-      TVector3 orthBoostDir = getUnitOrthogonal(boost);
+      B2Vector3D boost = (beamParamsDB->getHER() + beamParamsDB->getLER()).BoostToCM();
+      B2Vector3D orthBoostDir = getUnitOrthogonal(boost);
 
       const MCParticle* mcPart = part->getMCParticle();
       if (!mcPart) return realNaN;
-      TVector3 pos = mcPart->getDecayVertex();
+      B2Vector3D pos = mcPart->getDecayVertex();
       return pos.Dot(orthBoostDir);
     }
 
@@ -382,7 +382,7 @@ namespace Belle2 {
       if (trackIndex.size() != 1) return realNaN;
       unsigned trackIndexInt = trackIndex.at(0);
 
-      return vert->getVtxFitTrackP(trackIndexInt).Mag();
+      return vert->getVtxFitTrackP(trackIndexInt).R();
     }
 
     double tagTrackMomentumX(const Particle* part, const std::vector<double>& trackIndex)
@@ -393,7 +393,7 @@ namespace Belle2 {
       if (trackIndex.size() != 1) return realNaN;
       unsigned trackIndexInt = trackIndex.at(0);
 
-      return vert->getVtxFitTrackPComponent(trackIndexInt, 0);
+      return vert->getVtxFitTrackP(trackIndexInt).x();
     }
 
     double tagTrackMomentumY(const Particle* part, const std::vector<double>& trackIndex)
@@ -404,7 +404,7 @@ namespace Belle2 {
       if (trackIndex.size() != 1) return realNaN;
       unsigned trackIndexInt = trackIndex.at(0);
 
-      return vert->getVtxFitTrackPComponent(trackIndexInt, 1);
+      return vert->getVtxFitTrackP(trackIndexInt).y();
     }
 
     double tagTrackMomentumZ(const Particle* part, const std::vector<double>& trackIndex)
@@ -415,7 +415,7 @@ namespace Belle2 {
       if (trackIndex.size() != 1) return realNaN;
       unsigned trackIndexInt = trackIndex.at(0);
 
-      return vert->getVtxFitTrackPComponent(trackIndexInt, 2);
+      return vert->getVtxFitTrackP(trackIndexInt).z();
     }
 
     double tagTrackZ0(const Particle* part, const std::vector<double>& trackIndex)
@@ -604,7 +604,7 @@ namespace Belle2 {
       const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
       if (!mcParticle) return realNaN;
 
-      TVector3 mcTagV = vert->getMCTagVertex();
+      B2Vector3D mcTagV = vert->getMCTagVertex();
       if (mcTagV(0)  == realNaN)                                        return realNaN;
       if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0)          return realNaN;
 
@@ -613,7 +613,7 @@ namespace Belle2 {
                                            mcTagV);
     }
 
-    TVector3 tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex)
+    B2Vector3D tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return vecNaN;
@@ -624,7 +624,7 @@ namespace Belle2 {
       const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
       if (!mcParticle) return vecNaN;
 
-      TVector3 mcTagV = vert->getMCTagVertex();
+      B2Vector3D mcTagV = vert->getMCTagVertex();
       if (mcTagV(0)  == realNaN)                                        return vecNaN;
       if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0)          return vecNaN;
 
@@ -635,23 +635,23 @@ namespace Belle2 {
 
     double tagTrackTrueVecToTagVX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result = tagTrackTrueVecToTagV(part, trackIndex);
+      B2Vector3D result = tagTrackTrueVecToTagV(part, trackIndex);
       return result(0);
     }
 
     double tagTrackTrueVecToTagVY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result = tagTrackTrueVecToTagV(part, trackIndex);
+      B2Vector3D result = tagTrackTrueVecToTagV(part, trackIndex);
       return result(1);
     }
 
     double tagTrackTrueVecToTagVZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result = tagTrackTrueVecToTagV(part, trackIndex);
+      B2Vector3D result = tagTrackTrueVecToTagV(part, trackIndex);
       return result(2);
     }
 
-    TVector3 tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex)
+    B2Vector3D tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return vecNaN;
@@ -667,23 +667,23 @@ namespace Belle2 {
 
     double tagTrackTrueMomentumX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 pTrue = tagTrackTrueMomentum(part, trackIndex);
+      B2Vector3D pTrue = tagTrackTrueMomentum(part, trackIndex);
       return pTrue(0);
     }
 
     double tagTrackTrueMomentumY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 pTrue = tagTrackTrueMomentum(part, trackIndex);
+      B2Vector3D pTrue = tagTrackTrueMomentum(part, trackIndex);
       return pTrue(1);
     }
 
     double tagTrackTrueMomentumZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 pTrue = tagTrackTrueMomentum(part, trackIndex);
+      B2Vector3D pTrue = tagTrackTrueMomentum(part, trackIndex);
       return pTrue(2);
     }
 
-    TVector3 tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex)
+    B2Vector3D tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return vecNaN;
@@ -699,19 +699,19 @@ namespace Belle2 {
 
     double tagTrackTrueOriginX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 origin = tagTrackTrueOrigin(part, trackIndex);
+      B2Vector3D origin = tagTrackTrueOrigin(part, trackIndex);
       return origin(0);
     }
 
     double tagTrackTrueOriginY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 origin = tagTrackTrueOrigin(part, trackIndex);
+      B2Vector3D origin = tagTrackTrueOrigin(part, trackIndex);
       return origin(1);
     }
 
     double tagTrackTrueOriginZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 origin = tagTrackTrueOrigin(part, trackIndex);
+      B2Vector3D origin = tagTrackTrueOrigin(part, trackIndex);
       return origin(2);
     }
 

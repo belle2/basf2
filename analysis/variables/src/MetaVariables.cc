@@ -40,6 +40,7 @@
 #include <regex>
 
 #include <TDatabasePDG.h>
+#include <Math/Vector4D.h>
 
 namespace Belle2 {
   namespace Variable {
@@ -109,7 +110,7 @@ namespace Belle2 {
           }
 
           PCmsLabTransform T;
-          TLorentzVector pSigB = T.getBeamFourMomentum() - particle->getDaughter(daughterIndexTagB)->get4Vector();
+          ROOT::Math::PxPyPzEVector pSigB = T.getBeamFourMomentum() - particle->getDaughter(daughterIndexTagB)->get4Vector();
           Particle tmp(pSigB, -particle->getDaughter(daughterIndexTagB)->getPDGCode());
 
           UseReferenceFrame<RestFrame> frame(&tmp);
@@ -164,7 +165,7 @@ namespace Belle2 {
             << LogVar("Number of candidates in the list", listSize));
           const Particle* p = list->getParticle(0);
           PCmsLabTransform T;
-          TLorentzVector recoil = T.getBeamFourMomentum() - p->get4Vector();
+          ROOT::Math::PxPyPzEVector recoil = T.getBeamFourMomentum() - p->get4Vector();
           /* Let's use 0 as PDG code to avoid wrong assumptions. */
           Particle pRecoil(recoil, 0);
           pRecoil.setVertex(particle->getVertex());
@@ -1063,7 +1064,7 @@ namespace Belle2 {
           if (particle == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
 
-          std::vector<TLorentzVector> pDaus;
+          std::vector<ROOT::Math::PxPyPzEVector> pDaus;
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
@@ -1080,9 +1081,9 @@ namespace Belle2 {
 
           // Calculates the angle between the selected particles
           if (pDaus.size() == 2)
-            return pDaus[0].Vect().Angle(pDaus[1].Vect());
+            return B2Vector3D(pDaus[0].Vect()).Angle(B2Vector3D(pDaus[1].Vect()));
           else
-            return pDaus[2].Vect().Angle(pDaus[0].Vect() + pDaus[1].Vect());
+            return B2Vector3D(pDaus[2].Vect()).Angle(B2Vector3D(pDaus[0].Vect() + pDaus[1].Vect()));
         };
         return func;
       } else {
@@ -1115,15 +1116,15 @@ namespace Belle2 {
           if (grandDaughterIndex >= daughter->getNDaughters())
             return std::numeric_limits<float>::quiet_NaN();
 
-          TVector3  boost = - (daughter->get4Vector().BoostVector());
+          B2Vector3D  boost = daughter->get4Vector().BoostToCM();
 
-          TLorentzVector motherMomentum = - particle->get4Vector();
-          motherMomentum.Boost(boost);
+          ROOT::Math::PxPyPzEVector motherMomentum = - particle->get4Vector();
+          motherMomentum = ROOT::Math::Boost(boost) * motherMomentum;
 
-          TLorentzVector grandDaughterMomentum = daughter->getDaughter(grandDaughterIndex)->get4Vector();
-          grandDaughterMomentum.Boost(boost);
+          ROOT::Math::PxPyPzEVector grandDaughterMomentum = daughter->getDaughter(grandDaughterIndex)->get4Vector();
+          grandDaughterMomentum = ROOT::Math::Boost(boost) * grandDaughterMomentum;
 
-          return motherMomentum.Angle(grandDaughterMomentum.Vect());
+          return B2Vector3D(motherMomentum.Vect()).Angle(B2Vector3D(grandDaughterMomentum.Vect()));
         };
         return func;
       } else {
@@ -1139,7 +1140,7 @@ namespace Belle2 {
           if (particle == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
 
-          std::vector<TLorentzVector> pDaus;
+          std::vector<ROOT::Math::PxPyPzEVector> pDaus;
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
@@ -1158,9 +1159,9 @@ namespace Belle2 {
 
           // Calculates the angle between the selected particles
           if (pDaus.size() == 2)
-            return pDaus[0].Vect().Angle(pDaus[1].Vect());
+            return B2Vector3D(pDaus[0].Vect()).Angle(B2Vector3D(pDaus[1].Vect()));
           else
-            return pDaus[2].Vect().Angle(pDaus[0].Vect() + pDaus[1].Vect());
+            return B2Vector3D(pDaus[2].Vect()).Angle(B2Vector3D(pDaus[0].Vect() + pDaus[1].Vect()));
         };
         return func;
       } else {
@@ -1192,8 +1193,8 @@ namespace Belle2 {
               const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndices[1]))->getECLClusterEHypothesisBit();
               if (clusteri and clusterj) {
                 ClusterUtils clusutils;
-                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
-                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
+                B2Vector3D pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
+                B2Vector3D pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
                 return pi.Angle(pj);
               }
               return std::numeric_limits<float>::quiet_NaN();
@@ -1213,9 +1214,9 @@ namespace Belle2 {
 
               if (clusteri and clusterj and clusterk) {
                 ClusterUtils clusutils;
-                TVector3 pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
-                TVector3 pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
-                TVector3 pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk, clusterkBit)).Vect();
+                B2Vector3D pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
+                B2Vector3D pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
+                B2Vector3D pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk, clusterkBit)).Vect();
                 return pk.Angle(pi + pj);
               }
               return std::numeric_limits<float>::quiet_NaN();
@@ -1243,7 +1244,7 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
           else {
             const auto& frame = ReferenceFrame::GetCurrent();
-            TLorentzVector pSum;
+            ROOT::Math::PxPyPzEVector pSum;
 
             for (auto& index : daughterIndices)
             {
@@ -1795,12 +1796,12 @@ namespace Belle2 {
           if (particle == nullptr)
             return std::numeric_limits<float>::quiet_NaN();
           StoreObjPtr<ParticleList> roeList(roeListName);
-          TLorentzVector vec = particle->get4Vector();
+          ROOT::Math::PxPyPzEVector vec = particle->get4Vector();
           for (unsigned int i = 0; i < roeList->getListSize(); i++)
           {
             const Particle* roeParticle = roeList->getParticle(i);
             if (not particle->overlapsWith(roeParticle)) {
-              TLorentzVector tempCombination = roeParticle->get4Vector() + vec;
+              ROOT::Math::PxPyPzEVector tempCombination = roeParticle->get4Vector() + vec;
               std::vector<int> indices = { particle->getArrayIndex(), roeParticle->getArrayIndex() };
               Particle tempParticle = Particle(tempCombination, pdgCode, flavourType, indices, particle->getArrayPointer());
               if (cut->check(&tempParticle)) {
@@ -2015,7 +2016,7 @@ namespace Belle2 {
 
         auto func = [arguments](const Particle * particle) -> double {
 
-          TLorentzVector total4Vector;
+          ROOT::Math::PxPyPzEVector total4Vector;
           // To make sure particles in particlesList don't overlap.
           std::vector<Particle*> particlePool;
 
@@ -2221,14 +2222,14 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = frame.getMomentum(particle).Vect();
+        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
 
         // find the particle index with the smallest opening angle
         double minAngle = 2 * M_PI;
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = frame.getMomentum(compareme).Vect();
+          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
           double angle = p_compare.Angle(p_this);
           if (minAngle > angle) minAngle = angle;
         }
@@ -2256,7 +2257,7 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = frame.getMomentum(particle).Vect();
+        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
 
         // find the particle index with the smallest opening angle
         double minAngle = 2 * M_PI;
@@ -2264,7 +2265,7 @@ namespace Belle2 {
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = frame.getMomentum(compareme).Vect();
+          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
           double angle = p_compare.Angle(p_this);
           if (minAngle > angle) {
             minAngle = angle;
@@ -2300,7 +2301,7 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = frame.getMomentum(particle).Vect();
+        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
 
         // find the most back-to-back (the largest opening angle before they
         // start getting smaller again!)
@@ -2308,7 +2309,7 @@ namespace Belle2 {
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = frame.getMomentum(compareme).Vect();
+          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
           double angle = p_compare.Angle(p_this);
           if (maxAngle < angle) maxAngle = angle;
         }
@@ -2336,7 +2337,7 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = frame.getMomentum(particle).Vect();
+        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
 
         // find the most back-to-back (the largest opening angle before they
         // start getting smaller again!)
@@ -2345,7 +2346,7 @@ namespace Belle2 {
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = frame.getMomentum(compareme).Vect();
+          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
           double angle = p_compare.Angle(p_this);
           if (maxAngle < angle) {
             maxAngle = angle;
@@ -2377,9 +2378,9 @@ namespace Belle2 {
           double maxOpeningAngle = -1;
           for (int i = 0; i < nParticles; i++)
           {
-            TVector3 v1 = frame.getMomentum(listOfParticles->getParticle(i)).Vect();
+            B2Vector3D v1 = frame.getMomentum(listOfParticles->getParticle(i)).Vect();
             for (int j = i + 1; j < nParticles; j++) {
-              TVector3 v2 = frame.getMomentum(listOfParticles->getParticle(j)).Vect();
+              B2Vector3D v2 = frame.getMomentum(listOfParticles->getParticle(j)).Vect();
               const double angle = v1.Angle(v2);
               if (angle > maxOpeningAngle) maxOpeningAngle = angle;
             }
@@ -2409,7 +2410,7 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Sum of the 4-momenta of all the selected daughters
-          TLorentzVector pSum(0, 0, 0, 0);
+          ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
 
           // Loop over the arguments. Each one of them is a generalizedIndex,
           // pointing to a particle in the decay tree.
@@ -2523,7 +2524,7 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Sum of the 4-momenta of all the daughters with the new mass assumptions
-          TLorentzVector pSum(0, 0, 0, 0);
+          ROOT::Math::PxPyPzMVector pSum(0, 0, 0, 0);
 
           for (unsigned int iDau = 0; iDau < particle->getNDaughters(); iDau++)
           {
@@ -2533,24 +2534,24 @@ namespace Belle2 {
               return std::numeric_limits<float>::quiet_NaN();
             }
 
-            TLorentzVector dauMom =  frame.getMomentum(dauPart);
+            ROOT::Math::PxPyPzMVector dauMom = ROOT::Math::PxPyPzMVector(frame.getMomentum(dauPart));
 
             // This can be improved with a faster algorithm to check if an std::vector contains a
             // certain element
             for (unsigned int iReplace = 0; iReplace < indexesToBeReplaced.size(); iReplace++) {
               if (indexesToBeReplaced[iReplace] == iDau) {
-                double p_x = dauMom.Vect().Px();
-                double p_y = dauMom.Vect().Py();
-                double p_z = dauMom.Vect().Pz();
-                dauMom.SetXYZM(p_x, p_y, p_z, massesToBeReplaced[iReplace]);
+                double p_x = dauMom.Px();
+                double p_y = dauMom.Py();
+                double p_z = dauMom.Pz();
+                dauMom.SetCoordinates(p_x, p_y, p_z, massesToBeReplaced[iReplace]);
                 break;
               }
             }
-            pSum = pSum + dauMom;
+            pSum += dauMom;
           } // End of loop over number of daughter
 
           // Make a dummy particle out of the sum of the 4-momenta of the selected daughters
-          Particle* sumOfDaughters = new Particle(pSum, 100); // 100 is one of the special numbers
+          Particle* sumOfDaughters = new Particle(ROOT::Math::PxPyPzEVector(pSum), 100); // 100 is one of the special numbers
 
           // Calculate the variable on the dummy particle
           return var->function(sumOfDaughters);

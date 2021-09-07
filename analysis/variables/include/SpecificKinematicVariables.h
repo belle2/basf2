@@ -8,7 +8,6 @@
 
 #pragma once
 #include <analysis/VariableManager/Manager.h>
-#include <TLorentzVector.h>
 #include <string>
 #include <vector>
 

@@ -11,7 +11,7 @@
 #include <vector>
 #include <string>
 #include <analysis/VariableManager/Manager.h>
-#include "TVector3.h"
+#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
   class Particle;
@@ -407,7 +407,7 @@ namespace Belle2 {
      * and the true tag B decay vertex.
      *
      */
-    TVector3 tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex);
+    B2Vector3D tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
      * Returns the X coordinate of the vector between the mc particle corresponding to the ith tag vtx track
@@ -434,7 +434,7 @@ namespace Belle2 {
      * return  the true momentum of the MC particle corresponding to the ith tag vtx track.
      *
      */
-    TVector3 tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex);
+    B2Vector3D tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
      * return the X component of the true momentum of the MC particle corresponding to the ith tag vtx track.
@@ -458,7 +458,7 @@ namespace Belle2 {
      * return the true origin of the MC particle corresponding to the ith tag vtx track.
      *
      */
-    TVector3 tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex);
+    B2Vector3D tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
      * return the X component of the true origin of the MC particle corresponding to the ith tag vtx track.

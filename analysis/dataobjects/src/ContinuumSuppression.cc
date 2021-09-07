@@ -10,12 +10,12 @@
 
 using namespace Belle2;
 
-void ContinuumSuppression::addThrustB(const TVector3& thrustB)
+void ContinuumSuppression::addThrustB(const ROOT::Math::XYZVector& thrustB)
 {
   m_thrustB = thrustB;
 }
 
-void ContinuumSuppression::addThrustO(const TVector3& thrustO)
+void ContinuumSuppression::addThrustO(const ROOT::Math::XYZVector& thrustO)
 {
   m_thrustO = thrustO;
 }

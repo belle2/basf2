@@ -10,7 +10,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -39,14 +39,14 @@ namespace Belle2 {
      *
      * @param missingMomentum missing momentum vector
      */
-    void addMissingMomentum(const TVector3& missingMomentum);
+    void addMissingMomentum(const ROOT::Math::XYZVector& missingMomentum);
 
     /**
      * Add the missing momentum vector in CMS.
      *
      * @param missingMomentumCMS missing momentum vector
      */
-    void addMissingMomentumCMS(const TVector3& missingMomentumCMS);
+    void addMissingMomentumCMS(const ROOT::Math::XYZVector& missingMomentumCMS);
 
     /**
      * Add missing energy in CMS.
@@ -82,9 +82,9 @@ namespace Belle2 {
     /**
      * Get missing momentum vector in lab.
      *
-     * @return TVector3 missing momentum
+     * @return XYZVector missing momentum
      */
-    TVector3 getMissingMomentum(void) const
+    ROOT::Math::XYZVector getMissingMomentum(void) const
     {
       return m_missingMomentum;
     }
@@ -92,9 +92,9 @@ namespace Belle2 {
     /**
      * Get missing momentum vector in CMS.
      *
-     * @return TVector3 missing momentum
+     * @return XYZVector missing momentum
      */
-    TVector3 getMissingMomentumCMS(void) const
+    ROOT::Math::XYZVector getMissingMomentumCMS(void) const
     {
       return m_missingMomentumCMS;
     }
@@ -144,8 +144,8 @@ namespace Belle2 {
   private:
 
     // persistent data members
-    TVector3 m_missingMomentum; /**< Missing momentum of the event in lab*/
-    TVector3 m_missingMomentumCMS; /**< Missing momentum of the event in CMS*/
+    ROOT::Math::XYZVector m_missingMomentum; /**< Missing momentum of the event in lab*/
+    ROOT::Math::XYZVector m_missingMomentumCMS; /**< Missing momentum of the event in CMS*/
 
     float m_missingEnergyCMS; /**< Missing energy of the event in CMS  */
     float m_missingMass2; /**< Missing mass squared computed from  m_missingMomentumCMS and m_missingEnergyCMS */
@@ -155,7 +155,7 @@ namespace Belle2 {
     float m_photonsEnergy; /**< Total energy of photons in lab */
 
     bool m_builtFromMC; /**< Is from MC switch */
-    ClassDef(EventKinematics, 2) /**< class definition */
+    ClassDef(EventKinematics, 3) /**< class definition */
 
   };
 

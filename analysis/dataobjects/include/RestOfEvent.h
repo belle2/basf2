@@ -14,11 +14,11 @@
 
 #include <framework/logging/Logger.h>
 
+#include <Math/Vector4D.h>
+
 #include <vector>
 #include <string>
 #include <set>
-
-class TLorentzVector;
 
 namespace Belle2 {
 
@@ -306,7 +306,7 @@ namespace Belle2 {
      * @param maskName Name of mask
      * @return 4-momentum of unused Tracks and ECLClusters in ROE
      */
-    TLorentzVector get4Vector(const std::string& maskName = "") const;
+    ROOT::Math::PxPyPzEVector get4Vector(const std::string& maskName = "") const;
 
     /**
      * Get 4-momentum vector all (no mask) or a subset (use mask) of all ECLClusters in ROE.
@@ -314,7 +314,7 @@ namespace Belle2 {
      * @param maskName Name of mask
      * @return 4-momentum of unused Tracks and ECLClusters in ROE
      */
-    TLorentzVector get4VectorNeutralECLClusters(const std::string& maskName = "") const;
+    ROOT::Math::PxPyPzEVector get4VectorNeutralECLClusters(const std::string& maskName = "") const;
 
     /**
      * Get number of all (no mask) or a subset (use mask) of all Tracks in ROE.

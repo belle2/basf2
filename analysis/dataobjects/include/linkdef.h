@@ -9,13 +9,13 @@
 #pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x965ad50b, version=2
 #pragma link C++ class Belle2::ParticleList+; // checksum=0x98887650, version=3
 #pragma link C++ class Belle2::RestOfEvent+; // checksum=0xe86f1658, version=7
-#pragma link C++ class Belle2::TagVertex+; // checksum=0xbc37ca67, version=5
-#pragma link C++ class Belle2::ContinuumSuppression+; // checksum=0xccdb3c88, version=1
+#pragma link C++ class Belle2::TagVertex+; // checksum=0xf7b6169c, version=6
+#pragma link C++ class Belle2::ContinuumSuppression+; // checksum=0x8f4ac744, version=2
 #pragma link C++ class Belle2::FlavorTaggerInfo+; // checksum=0xa85ce063, version=4
 #pragma link C++ class Belle2::FlavorTaggerInfoMap+; // checksum=0xcdef997a, version=3
 #pragma link C++ class Belle2::StringWrapper+; // checksum=0xf15ef1c4, version=1
-#pragma link C++ class Belle2::EventShapeContainer+; // checksum=0x57e119da, version=1
-#pragma link C++ class Belle2::EventKinematics+; // checksum=0x23d1bfc2, version=2
+#pragma link C++ class Belle2::EventShapeContainer+; // checksum=0xe048bccd, version=2
+#pragma link C++ class Belle2::EventKinematics+; // checksum=0xabfc6580, version=3
 #pragma link C++ class Belle2::TauPairDecay+; // checksum=0x15ea58a, version=1
 #pragma link C++ class Belle2::ECLEnergyCloseToTrack+; // checksum=0xeadb37d4, version=1
 #pragma link C++ class Belle2::ECLTRGInformation+; // checksum=0x744abff9, version=3
@@ -67,7 +67,7 @@
   target="m_mcDeltaT"                           \
   code="{m_mcDeltaT = onfile.m_MCdeltaT;}"      \
 
-// In version 4 the member m_MCdeltaT has been renamed to m_mcDeltaT.
+// In version 4 the member m_MCtagV has been renamed to m_mcTagV.
 #pragma read                                    \
   sourceClass="Belle2::TagVertex"               \
   source="TVector3 m_MCtagV"                    \
@@ -86,6 +86,36 @@
   target="m_tagVertexErrMatrix"                                \
   code="{m_tagVertexErrMatrix = onfile.m_tagVertexErrMatrix;}" \
 
+// In version 6 the data type of the member m_tagVertex has been
+// changed from TVector3 to XYZVector
+#pragma read                                    \
+  sourceClass="Belle2::TagVertex"               \
+  source="TVector3 m_tagVertex"                 \
+  version="[-5]"                                \
+  targetClass="Belle2::TagVertex"               \
+  target="m_tagVertex"                          \
+  code="{m_tagVertex = onfile.m_tagVertex;}"    \
+
+// In version 6 the data type of the member m_mcTagV has been
+// changed from TVector3 to XYZVector
+#pragma read                                    \
+  sourceClass="Belle2::TagVertex"               \
+  source="TVector3 m_mcTagV"                    \
+  version="[4-5]"                               \
+  targetClass="Belle2::TagVertex"               \
+  target="m_mcTagV"                             \
+  code="{m_mcTagV = onfile.m_mcTagV;}"          \
+
+// In version 6 the data type of the member m_constraintCenter
+// has been changed from TVector3 to XYZVector
+#pragma read                                                \
+  sourceClass="Belle2::TagVertex"                           \
+  source="TVector3 m_constraintCenter"                      \
+  version="[-5]"                                            \
+  targetClass="Belle2::TagVertex"                           \
+  target="m_constraintCenter"                               \
+  code="{m_constraintCenter = onfile.m_constraintCenter;}"  \
+
 // ----------------------------------------------------------------------------
 // EventKinematics evolution
 // In version 2 the new member m_builtFromMC is introduced. Since the MC
@@ -97,6 +127,26 @@
   targetClass="Belle2::EventKinematics"        \
   target="m_builtFromMC"                       \
   code="{m_builtFromMC = false;}"              \
+
+// In version 3 the data type of the member m_missingMomentum has been
+// changed from TVector3 to XYZVector
+#pragma read                                              \
+  sourceClass="Belle2::EventKinematics"                   \
+  source="TVector3 m_missingMomentum"                     \
+  version="[-2]"                                          \
+  targetClass="Belle2::EventKinematics"                   \
+  target="m_missingMomentum"                              \
+  code="{m_missingMomentum = onfile.m_missingMomentum;}"  \
+
+// In version 3 the data type of the member m_missingMomentumCMS has been
+// changed from TVector3 to XYZVector
+#pragma read                                                   \
+  sourceClass="Belle2::EventKinematics"                        \
+  source="TVector3 m_missingMomentumCMS"                       \
+  version="[-2]"                                               \
+  targetClass="Belle2::EventKinematics"                        \
+  target="m_missingMomentumCMS"                                \
+  code="{m_missingMomentumCMS = onfile.m_missingMomentumCMS;}" \
 
 // ----------------------------------------------------------------------------
 // RestOfEvent evolution
@@ -110,6 +160,58 @@
   target="m_useKLMEnergy"                      \
   code="{m_useKLMEnergy = false;}"             \
 
+// ----------------------------------------------------------------------------
+// ContinuumSuppression evolution
+// In version 2 the data type of the members m_thrustO and m_thrustB has been
+// changed from TVector3 to XYZVector
+#pragma read                                  \
+  sourceClass="Belle2::ContinuumSuppression"  \
+  source="TVector3 m_thrustO"                 \
+  version="[1]"                               \
+  targetClass="Belle2::ContinuumSuppression"  \
+  target="m_thrustO"                          \
+  code="{m_thrustO = onfile.m_thrustO;}"      \
 
+#pragma read                                  \
+  sourceClass="Belle2::ContinuumSuppression"  \
+  source="TVector3 m_thrustB"                 \
+  version="[1]"                               \
+  targetClass="Belle2::ContinuumSuppression"  \
+  target="m_thrustB"                          \
+  code="{m_thrustB = onfile.m_thrustB;}"      \
+
+// ----------------------------------------------------------------------------
+// EventShapeContainer evolution
+// In version 2 the data type of the member m_thrustAxis has been
+// changed from TVector3 to XYZVector
+#pragma read                                    \
+  sourceClass="Belle2::EventShapeContainer"     \
+  source="TVector3 m_thrustAxis"                \
+  version="[1]"                                 \
+  targetClass="Belle2::EventShapeContainer"     \
+  target="m_thrustAxis"                         \
+  code="{m_thrustAxis = onfile.m_thrustAxis;}"  \
+
+// In version 2 the data type of the member m_spherocityAxis has been
+// changed from TVector3 to XYZVector
+#pragma read                                            \
+  sourceClass="Belle2::EventShapeContainer"             \
+  source="TVector3 m_spherocityAxis"                    \
+  version="[1]"                                         \
+  targetClass="Belle2::EventShapeContainer"             \
+  target="m_spherocityAxis"                             \
+  code="{m_spherocityAxis = onfile.m_spherocityAxis;}"  \
+
+// In version 2 the data type of the member m_sphericityEigenvector
+// has been changed from array of TVector3 to array of XYZVector
+#pragma read                                                                \
+  sourceClass="Belle2::EventShapeContainer"                                 \
+  source="TVector3 m_sphericityEigenvector[3]"                              \
+  version="[1]"                                                             \
+  targetClass="Belle2::EventShapeContainer"                                 \
+  target="m_sphericityEigenvector"                                          \
+  code="{for (int i = 0; i < 3; i++)                                        \
+           m_sphericityEigenvector[i] = onfile.m_sphericityEigenvector[i];  \
+       }"                                                                   \
 
 #endif

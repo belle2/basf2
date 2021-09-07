@@ -142,4 +142,4 @@ ma.variablesToNtuple('B+:tag', common_vars,
                      filename=output_file, treename='tagtree', path=my_path)
 
 with b2test_utils.clean_working_directory():
-    b2test_utils.safe_process(my_path)
+    assert b2test_utils.safe_process(my_path) == 0

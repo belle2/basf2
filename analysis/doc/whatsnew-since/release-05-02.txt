@@ -125,6 +125,8 @@ Modules
  * Added a `PhotonEfficiencySystematics` module which adds photon detection efficiency Data/MC ratios, systematic, statistical and total uncertainties
    as variables in extrainfo to a given photon list. Ratios can only added for particles in photon lists. `addPhotonEfficiencyRatioVariables` is
    a corresponding wrapper function.
+ * Bug fixed in :b2:mod:`FlavorTaggerInfoBuilder` and :b2:mod:`FlavorTaggerInfoFiller`: FlavorTaggerInfoMap is created now in the builder to make it accessible in main paths outside the ROE loops. 
+   This permits now to save the FT outputs for every ``B``-meson candidate. 
 
 Full Event Interpretation
 +++++++++++++++++++++++++

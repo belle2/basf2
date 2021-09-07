@@ -303,7 +303,7 @@ void ECLDigitCalibratorModule::event()
     B2DEBUG(35, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
 
     //Calibrating offline fit results
-    ECLDsp* aECLDsp = aECLDigit.getRelatedFrom<ECLDsp>();
+    ECLDsp* aECLDsp = ECLDsp::getByCellID(cellid);
     aECLCalDigit->setTwoComponentChi2(-1);
     aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, -1);
     aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton, -1);

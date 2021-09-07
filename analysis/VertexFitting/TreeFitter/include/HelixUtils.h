@@ -73,8 +73,8 @@ namespace TreeFitter {
     /** helix --> vertex */
     static void vertexFromHelix(const Belle2::Helix& helix,
                                 double L, double Bz,
-                                TVector3& position,
-                                TVector3& momentum, int& charge);
+                                Belle2::B2Vector3D& position,
+                                Belle2::B2Vector3D& momentum, int& charge);
 
     /** map of the helix parameters by list index */
     static std::string helixParName(int i) ;
@@ -83,16 +83,16 @@ namespace TreeFitter {
     static std::string vertexParName(int i) ;
 
     /** Print the vertex parameters */
-    static void printVertexPar(const TVector3& position, const TVector3& momentum, int charge) ;
+    static void printVertexPar(const Belle2::B2Vector3D& position, const Belle2::B2Vector3D& momentum, int charge) ;
 
     /** POCA between two tracks */
     static double helixPoca(const Belle2::Helix& helix1,
                             const Belle2::Helix& helix2,
                             double& flt1, double& flt2,
-                            TVector3& vertex, bool parallel = false) ;
+                            Belle2::B2Vector3D& vertex, bool parallel = false) ;
 
     /** POCA between a track and a point */
-    static double helixPoca(const Belle2::Helix& helix, const TVector3& point,
+    static double helixPoca(const Belle2::Helix& helix, const Belle2::B2Vector3D& point,
                             double& flt) ;
 
     /** the domain of phi */

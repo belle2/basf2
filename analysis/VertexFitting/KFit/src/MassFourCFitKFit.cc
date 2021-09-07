@@ -14,16 +14,16 @@
 #include <analysis/VertexFitting/KFit/MassFourCFitKFit.h>
 #include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
-#include <TLorentzVector.h>
 
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::analysis;
 using namespace CLHEP;
+using namespace ROOT::Math;
 
 MassFourCFitKFit::MassFourCFitKFit() : m_AfterVertexError(HepSymMatrix(3, 0)),
-  m_FourMomentum(TLorentzVector())
+  m_FourMomentum(PxPyPzEVector())
 {
   m_FlagFitted = false;
   m_FlagTrackVertexError = false;
@@ -83,7 +83,7 @@ MassFourCFitKFit::setInvariantMass(const double m) {
 
 
 enum KFitError::ECode
-MassFourCFitKFit::setFourMomentum(const  TLorentzVector& m) {
+MassFourCFitKFit::setFourMomentum(const PxPyPzEVector& m) {
   m_FourMomentum = m;
 
   return m_ErrorCode = KFitError::kNoError;
@@ -756,8 +756,8 @@ enum KFitError::ECode MassFourCFitKFit::updateMother(Particle* mother)
   }
 
   mother->updateMomentum(
-    CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
-    CLHEPToROOT::getTVector3(kmm.getMotherPosition()),
+    CLHEPToROOT::getLorentzVector(kmm.getMotherMomentum()),
+    CLHEPToROOT::getXYZVector(kmm.getMotherPosition()),
     CLHEPToROOT::getTMatrixFSym(kmm.getMotherError()),
     prob);
   m_ErrorCode = KFitError::kNoError;

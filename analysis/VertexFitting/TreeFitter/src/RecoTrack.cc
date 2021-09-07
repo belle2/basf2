@@ -30,7 +30,7 @@ namespace TreeFitter {
     m_covariance(5, 5),
     m_momentumScalingFactor(particle->getMomentumScalingFactor())
   {
-    m_bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T; //Bz in Tesla
+    m_bfield = Belle2::BFieldManager::getFieldInTesla(Belle2::B2Vector3D(0, 0, 0)).Z(); //Bz in Tesla
     m_covariance = Eigen::Matrix<double, 5, 5>::Zero(5, 5);
   }
 
@@ -40,7 +40,7 @@ namespace TreeFitter {
     if (m_flt == 0) {
       const_cast<RecoTrack*>(this)->updFltToMother(fitparams);
     }
-    TVector3 recoP = m_trackfit->getHelix(m_momentumScalingFactor).getMomentumAtArcLength2D(m_flt, m_bfield);
+    Belle2::B2Vector3D recoP = m_trackfit->getHelix(m_momentumScalingFactor).getMomentumAtArcLength2D(m_flt, m_bfield);
     const int momindex = momIndex();
     fitparams.getStateVector()(momindex) = recoP.X();
     fitparams.getStateVector()(momindex + 1) = recoP.Y();
@@ -107,11 +107,11 @@ namespace TreeFitter {
     Eigen::Matrix<double, 5, 6> jacobian = Eigen::Matrix<double, 5, 6>::Zero(5, 6);
 
     Belle2::Helix helix = Belle2::Helix(
-                            TVector3(
+                            Belle2::B2Vector3D(
                               positionAndMom(0),
                               positionAndMom(1),
                               positionAndMom(2)),
-                            TVector3(
+                            Belle2::B2Vector3D(
                               positionAndMom(3),
                               positionAndMom(4),
                               positionAndMom(5)),

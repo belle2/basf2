@@ -13,6 +13,7 @@
 #include <analysis/VertexFitting/KFit/KFitError.h>
 #include <analysis/VertexFitting/KFit/KFitBase.h>
 
+#include <framework/geometry/B2Vector3.h>
 
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
@@ -44,7 +45,7 @@ namespace Belle2 {
        * @param v initial vertex point
        * @return error code (zero if success)
        */
-      enum KFitError::ECode       setInitialVertex(const TVector3& v);
+      enum KFitError::ECode       setInitialVertex(const B2Vector3D& v);
       /** Set an invariant mass for the mass-vertex constraint fit.
        * @param m invariant mass
        * @return error code (zero if success)

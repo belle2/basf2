@@ -10,7 +10,7 @@
 #include <analysis/VertexFitting/KFit/KFitConst.h>
 #include <analysis/VertexFitting/KFit/KFitError.h>
 #include <analysis/VertexFitting/KFit/KFitBase.h>
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
@@ -60,7 +60,7 @@ namespace Belle2 {
        * @param m four momentum
        * @return error code (zero if success)
        */
-      enum KFitError::ECode       setFourMomentum(const TLorentzVector& m);
+      enum KFitError::ECode       setFourMomentum(const ROOT::Math::PxPyPzEVector& m);
       /** Set a flag if to constraint at the decay point in the mass-four-momentum-constraint fit.
        * @param flag true for constraint, false for not
        * @return error code (zero if success)
@@ -170,7 +170,7 @@ namespace Belle2 {
       double m_InvariantMass;
 
       /** Four Momentum. */
-      TLorentzVector m_FourMomentum;
+      ROOT::Math::PxPyPzEVector m_FourMomentum;
 
       /** Array of flags whether the track property is fixed at the mass. */
       std::vector<int> m_IsFixMass;

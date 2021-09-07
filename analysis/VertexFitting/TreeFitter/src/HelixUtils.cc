@@ -12,15 +12,14 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-#include <TVector3.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 
 namespace TreeFitter {
 
   void HelixUtils::vertexFromHelix(const Belle2::Helix& helix,
                                    double L, double Bz,
-                                   TVector3& position,
-                                   TVector3& momentum, int& charge)
+                                   Belle2::B2Vector3D& position,
+                                   Belle2::B2Vector3D& momentum, int& charge)
   {
     position = helix.getPositionAtArcLength2D(L);
     momentum = helix.getMomentumAtArcLength2D(L, Bz);
@@ -35,12 +34,12 @@ namespace TreeFitter {
   {
 
 
-    TVector3 position(positionAndMomentum(0),
-                      positionAndMomentum(1),
-                      positionAndMomentum(2));
-    TVector3 momentum(positionAndMomentum(3),
-                      positionAndMomentum(4),
-                      positionAndMomentum(5));
+    Belle2::B2Vector3D position(positionAndMomentum(0),
+                                positionAndMomentum(1),
+                                positionAndMomentum(2));
+    Belle2::B2Vector3D momentum(positionAndMomentum(3),
+                                positionAndMomentum(4),
+                                positionAndMomentum(5));
 
     helix = Belle2::Helix(position, momentum, charge, Bz);
     L = helix.getArcLength2DAtXY(positionAndMomentum(0),
@@ -119,7 +118,7 @@ namespace TreeFitter {
     return rc ;
   }
 
-  void HelixUtils::printVertexPar(const TVector3& position, const TVector3& momentum, int charge)
+  void HelixUtils::printVertexPar(const Belle2::B2Vector3D& position, const Belle2::B2Vector3D& momentum, int charge)
   {
     for (int i = 0; i < 3; ++i)
       B2INFO(vertexParName(i + 1).c_str() << position[i]);
@@ -136,13 +135,13 @@ namespace TreeFitter {
                                                           Eigen::Matrix<double, 5, 6>& jacobian)
   {
 
-    TVector3 position(positionAndMom(0),
-                      positionAndMom(1),
-                      positionAndMom(2));
+    Belle2::B2Vector3D position(positionAndMom(0),
+                                positionAndMom(1),
+                                positionAndMom(2));
 
-    TVector3 momentum(positionAndMom(3),
-                      positionAndMom(4),
-                      positionAndMom(5));
+    Belle2::B2Vector3D momentum(positionAndMom(3),
+                                positionAndMom(4),
+                                positionAndMom(5));
 
     helix = Belle2::Helix(position, momentum, charge, Bz);
 
@@ -151,8 +150,8 @@ namespace TreeFitter {
 
     double delta = 1e-5;// this is arbitrary, only needs to be small
 
-    TVector3 postmp;
-    TVector3 momtmp;
+    Belle2::B2Vector3D postmp;
+    Belle2::B2Vector3D momtmp;
 
     for (int jin = 0; jin < 6; ++jin) {
       for (int i = 0; i < 3; ++i) {
@@ -188,8 +187,8 @@ namespace TreeFitter {
     // numeric calculation of the jacobian
     Belle2::Helix helixPlusDelta;
 
-    TVector3 postmp;
-    TVector3 momtmp;
+    Belle2::B2Vector3D postmp;
+    Belle2::B2Vector3D momtmp;
 
     for (int jin = 0; jin < 6; ++jin) {
       for (int i = 0; i < 3; ++i) {
@@ -227,7 +226,7 @@ namespace TreeFitter {
   double HelixUtils::helixPoca(const Belle2::Helix& helix1,
                                const Belle2::Helix& helix2,
                                double& flt1, double& flt2,
-                               TVector3& vertex, bool parallel)
+                               Belle2::B2Vector3D& vertex, bool parallel)
   {
 
     double d0_1     = helix1.getD0();
@@ -334,7 +333,7 @@ namespace TreeFitter {
 
   //POCA between a track and a point
   double HelixUtils::helixPoca(const Belle2::Helix& helix,
-                               const TVector3& point,
+                               const Belle2::B2Vector3D& point,
                                double& flt)
   {
     double d0     = helix.getD0();

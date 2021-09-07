@@ -572,7 +572,9 @@ namespace Belle2 {
     void print() const override
     {
       if (m_unary_minus) std::cout << "-";
+      if (m_parenthesized) std::cout << "( ";
       m_enode->print();
+      if (m_parenthesized) std::cout << " )";
     }
 
     /**
@@ -583,7 +585,9 @@ namespace Belle2 {
     {
       std::stringstream stringstream;
       if (m_unary_minus) stringstream << "-";
+      if (m_parenthesized) stringstream << "( ";
       stringstream << m_enode->decompile();
+      if (m_parenthesized) stringstream << " )";
       return stringstream.str();
     }
   private:
@@ -592,13 +596,16 @@ namespace Belle2 {
      * Constructor
      * @param node (const boost::python::tuple&): tuple containing a expression node
      * @param unary_minus (bool): flag indicating if evaluate result should be mulitplied by -1
+     * @param parenthesized (bool): flag indicating if expression in cut was in parenthesis
     **/
-    explicit UnaryExpressionNode(Nodetuple node, bool unary_minus) : m_enode{NodeFactory::compile_expression_node<AVariableManager>(node)},
-      m_unary_minus{unary_minus}
+    explicit UnaryExpressionNode(Nodetuple node, bool unary_minus, bool parenthesized) : m_enode{NodeFactory::compile_expression_node<AVariableManager>(node)},
+      m_unary_minus{unary_minus}, m_parenthesized{parenthesized}
     {
     }
     std::unique_ptr<const AbstractExpressionNode<AVariableManager>> m_enode; /**< pointer to single expression node **/
     const bool m_unary_minus; /**< flag if expression evaluation should be returned times -1 **/
+    const bool m_parenthesized; /**< flag if expression in cut was in parenthesis **/
+
   };
 
   /**

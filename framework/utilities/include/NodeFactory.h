@@ -132,8 +132,9 @@ namespace Belle2 {
       if (node_type == NodeType::UnaryExpressionNode) {
         Nodetuple node = static_cast<const py::tuple>(tuple[1]);
         bool unary_minus = py::extract<bool>(tuple[2]);
+        bool parenthesized = py::extract<bool>(tuple[3]);
         return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new UnaryExpressionNode<AVariableManager>(node,
-               unary_minus));
+               unary_minus, parenthesized));
       } else if (node_type == NodeType::BinaryExpressionNode) {
         Nodetuple left_node = static_cast<const py::tuple>(tuple[1]);
         Nodetuple right_node = static_cast<const py::tuple>(tuple[2]);

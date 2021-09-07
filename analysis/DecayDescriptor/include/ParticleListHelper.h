@@ -15,8 +15,6 @@
 #include <string>
 #include <optional>
 
-class TLorentzVector;
-
 namespace Belle2 {
   class Particle;
   class DecayDescriptor;
@@ -105,7 +103,7 @@ namespace Belle2 {
      * \warning particle/conjugates particle is based on what name was given when creating the list.
      *      If you created the list as 'anti-B0' than supplying 'conjugated=true' will create a 'B0'
      */
-    Particle& addParticle(const TLorentzVector& momentum, bool conjugated = false)
+    Particle& addParticle(const ROOT::Math::PxPyPzEVector& momentum, bool conjugated = false)
     {
       return add(momentum, m_pdg * ((conjugated and not isSelfConjugated()) ? -1 : 1));
     }

@@ -651,7 +651,7 @@ Step 3. Implement the function in the source file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   * Info on getters for the Particle class
-  * Info on getters for the TLorentzVector class
+  * Info on getters for the LorentzVector class
   * Pictorial definition of the helicity angle
 
 .. figure:: figs/hel_simple_model_def.jpg
@@ -686,14 +686,14 @@ Step 3. Implement the function in the source file
     const Particle *grandDaughter = daughter->getDaughter(grandDaughterIndex);
 
     // do the calculation
-    TLorentzVector particle4Vector = particle->get4Vector();
-    TLorentzVector daughter4Vector = daughter->get4Vector();
-    TLorentzVector gDaughter4Vector = grandDaughter->get4Vector();
-    TVector3 boost2daughter = -(daughter4Vector.BoostVector());
-    particle4Vector.Boost(boost2daughter);
-    gDaughter4Vector.Boost(boost2daughter);
-    TVector3 particle3Vector = particle4Vector.Vect();
-    TVector3 gDaughter3Vector = gDaughter4Vector.Vect();
+    PxPyPzEVector particle4Vector = particle->get4Vector();
+    PxPyPzEVector daughter4Vector = daughter->get4Vector();
+    PxPyPzEVector gDaughter4Vector = grandDaughter->get4Vector();
+    Boost boost2daughter(daughter4Vector.BoostToCM());
+    particle4Vector = boost2daughter * particle4Vector;
+    gDaughter4Vector = boost2daughter * gDaughter4Vector;
+    B2Vector3D particle3Vector = particle4Vector.Vect();
+    B2Vector3D gDaughter3Vector = gDaughter4Vector.Vect();
     double numerator = gDaughter3Vector.Dot(particle3Vector);
     double denominator = (gDaughter3Vector.Mag())*(particle3Vector.Mag());
     return numerator/denominator;

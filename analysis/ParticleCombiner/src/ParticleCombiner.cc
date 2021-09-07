@@ -15,6 +15,8 @@
 
 #include <mdst/dataobjects/ECLCluster.h>
 
+#include <Math/Vector4D.h>
+
 #include <algorithm>
 
 namespace Belle2 {
@@ -443,7 +445,7 @@ namespace Belle2 {
       pz += d->getPz();
       E += d->getEnergy();
     }
-    const TLorentzVector vec(px, py, pz, E);
+    const ROOT::Math::PxPyPzEVector vec(px, py, pz, E);
 
     switch (m_iParticleType) {
       case 0: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,

@@ -1204,7 +1204,7 @@ Particle#9:
   getAcoplanarity(): nan
   getCharge(): 1
   getCosHelicity(): 0.232871
-  getCosHelicityDaughter(0): -0.597174
+  getCosHelicityDaughter(0): -0.597175
   getDaughter(0): -> Particles#8
   getDaughter(1): -> Particles#1
   getDaughterIndices(): size(2)

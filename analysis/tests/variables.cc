@@ -41,13 +41,16 @@
 
 #include <TMatrixFSym.h>
 #include <TRandom3.h>
-#include <TLorentzVector.h>
+#include <Math/Cartesian2D.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 #include <TMath.h>
 #include <utility>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Variable;
+using namespace ROOT::Math;
 
 namespace {
 
@@ -138,7 +141,7 @@ namespace {
       }
 
       {
-        UseReferenceFrame<RotationFrame> dummy(TVector3(1, 0, 0), TVector3(0, 1, 0), TVector3(0, 0, 1));
+        UseReferenceFrame<RotationFrame> dummy(XYZVector(1, 0, 0), XYZVector(0, 1, 0), XYZVector(0, 0, 1));
         EXPECT_FLOAT_EQ(0.9, particleP(&p));
         EXPECT_FLOAT_EQ(1.0, particleE(&p));
         EXPECT_FLOAT_EQ(0.1, particlePx(&p));
@@ -162,7 +165,7 @@ namespace {
       }
 
       {
-        UseReferenceFrame<RotationFrame> dummy(TVector3(1, 0, 0), TVector3(0, 0, -1), TVector3(0, 1, 0));
+        UseReferenceFrame<RotationFrame> dummy(XYZVector(1, 0, 0), XYZVector(0, 0, -1), XYZVector(0, 1, 0));
         EXPECT_FLOAT_EQ(0.9, particleP(&p));
         EXPECT_FLOAT_EQ(1.0, particleE(&p));
         EXPECT_FLOAT_EQ(0.1, particlePx(&p));
@@ -180,7 +183,7 @@ namespace {
       }
 
       {
-        UseReferenceFrame<CMSRotationFrame> dummy(TVector3(1, 0, 0), TVector3(0, 1, 0), TVector3(0, 0, 1));
+        UseReferenceFrame<CMSRotationFrame> dummy(XYZVector(1, 0, 0), XYZVector(0, 1, 0), XYZVector(0, 0, 1));
         EXPECT_FLOAT_EQ(0.68176979, particleP(&p));
         EXPECT_FLOAT_EQ(0.80920333, particleE(&p));
         EXPECT_FLOAT_EQ(0.061728548, particlePx(&p));
@@ -236,9 +239,9 @@ namespace {
       particles.registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
       PCmsLabTransform T;
-      TLorentzVector vec0 = {0.0, 0.0, 0.0, T.getCMSEnergy()};
-      TLorentzVector vec1 = {0.0, +0.332174566, 0.0, T.getCMSEnergy() / 2.};
-      TLorentzVector vec2 = {0.0, -0.332174566, 0.0, T.getCMSEnergy() / 2.};
+      PxPyPzEVector vec0 = {0.0, 0.0, 0.0, T.getCMSEnergy()};
+      PxPyPzEVector vec1 = {0.0, +0.332174566, 0.0, T.getCMSEnergy() / 2.};
+      PxPyPzEVector vec2 = {0.0, -0.332174566, 0.0, T.getCMSEnergy() / 2.};
       Particle* p0 = particles.appendNew(Particle(T.rotateCmsToLab() * vec0, 22));
       Particle* p1 = particles.appendNew(Particle(T.rotateCmsToLab() * vec1, 22, Particle::c_Unflavored, Particle::c_Undefined, 1));
       Particle* p2 = particles.appendNew(Particle(T.rotateCmsToLab() * vec2, 22, Particle::c_Unflavored, Particle::c_Undefined, 2));
@@ -265,7 +268,7 @@ namespace {
 
     Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
     p.setPValue(0.5);
-    p.setVertex(TVector3(1.0, 2.0, 2.0));
+    p.setVertex(XYZVector(1.0, 2.0, 2.0));
 
     EXPECT_FLOAT_EQ(1.0, particleDX(&p));
     EXPECT_FLOAT_EQ(2.0, particleDY(&p));
@@ -287,7 +290,7 @@ namespace {
     {
       Particle p2({ 0.1 , -0.4, 0.8, 1.0 }, 11);
       p2.setPValue(0.5);
-      p2.setVertex(TVector3(1.0, 2.0, 2.0));
+      p2.setVertex(XYZVector(1.0, 2.0, 2.0));
 
       UseReferenceFrame<RestFrame> dummy(&p2);
       EXPECT_FLOAT_EQ(0.0, particleDX(&p));
@@ -304,7 +307,7 @@ namespace {
     {
       Particle p2({ 0.0 , 1.0, 0.0, 1.0 }, 11);
       p2.setPValue(0.5);
-      p2.setVertex(TVector3(1.0, 0.0, 2.0));
+      p2.setVertex(B2Vector3D(1.0, 0.0, 2.0));
 
       UseReferenceFrame<RestFrame> dummy(&p2);
       EXPECT_FLOAT_EQ(0.0, particleDX(&p));
@@ -339,13 +342,13 @@ namespace {
     TMatrixDSym cov6(6);
 
     // Generate a random put orthogonal pair of vectors in the r-phi plane
-    TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
+    ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+    ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
 
     // Add a random z component
-    TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+    B2Vector3D position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    B2Vector3D momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
@@ -381,7 +384,7 @@ namespace {
     Track* savedTrack2 = myTracks.appendNew(secondTrack);
     myParticles.appendNew(savedTrack2, Const::ChargedStable(11));
     myV0s.appendNew(V0(std::pair(savedTrack, myResults[0]), std::pair(savedTrack2, myResults[1])));
-    const TLorentzVector v0Momentum(momentum * 2, (momentum * 2).Mag());
+    const PxPyPzEVector v0Momentum(2 * momentum.x(), 2 * momentum.y(), 2 * momentum.z(), (momentum * 2).Mag());
     auto v0particle = myParticles.appendNew(v0Momentum, 22,
                                             Particle::c_Unflavored, Particle::c_V0, 0);
     v0particle->appendDaughter(0, false);
@@ -462,7 +465,7 @@ namespace {
       // create a reco track (one has to also mock up a track fit result)
       TMatrixDSym cov(6);
       trackfits.appendNew(
-        TVector3(), TVector3(), cov, -1, Const::electron, 0.5, 1.5,
+        B2Vector3D(), B2Vector3D(), cov, -1, Const::electron, 0.5, 1.5,
         static_cast<unsigned long long int>(0x300000000000000), 16777215, 0);
       auto* electron_tr = tracks.appendNew(Track());
       electron_tr->setTrackFitResultIndex(Const::electron, 0);
@@ -470,7 +473,7 @@ namespace {
 
       TMatrixDSym cov1(6);
       trackfits.appendNew(
-        TVector3(), TVector3(), cov1, -1, Const::pion, 0.51, 1.5,
+        B2Vector3D(), B2Vector3D(), cov1, -1, Const::pion, 0.51, 1.5,
         static_cast<unsigned long long int>(0x300000000000000), 16777215, 0);
       auto* pion_tr = tracks.appendNew(Track());
       pion_tr->setTrackFitResultIndex(Const::pion, 0);
@@ -542,12 +545,12 @@ namespace {
     // Create the two 4-vectors that will factor into calculation, and set a mass that corresponds
     // to the length of the 4-vector
     PCmsLabTransform T;
-    graphParticleMother.set4Vector(T.rotateCmsToLab() * TLorentzVector({ 3.0, 4.0, 5.0, 18.0 }));
-    graphParticleGranddaughter3.set4Vector(T.rotateCmsToLab() * TLorentzVector({ 0.0, 0.0, 5.0, 5.0 }));
+    graphParticleMother.set4Vector(T.rotateCmsToLab() * PxPyPzEVector(3.0, 4.0, 5.0, 18.0));
+    graphParticleGranddaughter3.set4Vector(T.rotateCmsToLab() * PxPyPzEVector(0.0, 0.0, 5.0, 5.0));
     graphParticleMother.setMass(16.55294535724685);
 
     // The following masses and momenta do not factor into the calculation, but we will set them non-zero
-    TLorentzVector dummyP4(1, 2, 1, 5);
+    PxPyPzEVector dummyP4(1, 2, 1, 5);
     double dummyM = 4.3589;
     graphParticleDaughter1.set4Vector(dummyP4);
     graphParticleDaughter1.setMass(dummyM);
@@ -574,9 +577,9 @@ namespace {
     double M_B = pMother->getPDGMass();
     double p_B = std::sqrt(E_B * E_B - M_B * M_B);
 
-    TLorentzVector p4_Y_CMS = T.rotateLabToCms() * (graphParticleMother.get4Vector() - graphParticleGranddaughter3.get4Vector());
+    PxPyPzEVector p4_Y_CMS = T.rotateLabToCms() * (graphParticleMother.get4Vector() - graphParticleGranddaughter3.get4Vector());
     double E_Y = p4_Y_CMS.E(); // E_Mother - E_Granddaughter3
-    double p_Y = p4_Y_CMS.Rho(); // |p_Mother - p_Granddaughter3|
+    double p_Y = p4_Y_CMS.P(); // |p_Mother - p_Granddaughter3|
     double M_Y = p4_Y_CMS.M(); // sqrt((p4_Mother - p4_Granddaughter3)^2)
 
     double expectedCosBY = (2 * E_B * E_Y - M_B * M_B - M_Y * M_Y) / (2 * p_B * p_Y);
@@ -701,13 +704,13 @@ namespace {
     auto* mcParticle = mcParticles.appendNew();
     mcParticle->setPDG(Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p1->addRelationTo(mcParticle);
 
     mcParticle = mcParticles.appendNew();
     mcParticle->setPDG(-Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p2 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p2 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p2->addRelationTo(mcParticle);
 
     const Manager::Var* var = Manager::Instance().getVariable("isContinuumEvent");
@@ -731,13 +734,13 @@ namespace {
     auto* mcParticle = mcParticles2.appendNew();
     mcParticle->setPDG(Const::photon.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p3 = particles2.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p3 = particles2.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p3->addRelationTo(mcParticle);
 
     mcParticle = mcParticles2.appendNew();
     mcParticle->setPDG(300553);
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p4 = particles2.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 300553);
+    auto* p4 = particles2.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 300553);
     p4->addRelationTo(mcParticle);
 
     const Manager::Var* var2 = Manager::Instance().getVariable("isContinuumEvent");
@@ -761,13 +764,13 @@ namespace {
     auto* mcParticle = mcParticles3.appendNew();
     mcParticle->setPDG(Const::photon.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p5 = particles3.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p5 = particles3.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p5->addRelationTo(mcParticle);
 
     mcParticle = mcParticles3.appendNew();
     mcParticle->setPDG(300553);
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p6 = particles3.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 15);
+    auto* p6 = particles3.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 15);
     p6->addRelationTo(mcParticle);
 
     const Manager::Var* var3 = Manager::Instance().getVariable("isContinuumEvent");
@@ -803,12 +806,12 @@ namespace {
 
   TEST_F(MetaVariableTest, countDaughters)
   {
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 6;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
+      Particle d(PxPyPzEVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -833,7 +836,7 @@ namespace {
     gearbox.open("geometry/Belle2.xml", false);
 
     Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
-    p.setVertex(TVector3(1.0, 2.0, 2.0));
+    p.setVertex(XYZVector(1.0, 2.0, 2.0));
 
     const Manager::Var* var = Manager::Instance().getVariable("p");
     ASSERT_NE(var, nullptr);
@@ -863,7 +866,7 @@ namespace {
   TEST_F(MetaVariableTest, useLabFrame)
   {
     Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
-    p.setVertex(TVector3(1.0, 2.0, 2.0));
+    p.setVertex(XYZVector(1.0, 2.0, 2.0));
 
     const Manager::Var* var = Manager::Instance().getVariable("p");
     ASSERT_NE(var, nullptr);
@@ -898,7 +901,7 @@ namespace {
     gearbox.open("geometry/Belle2.xml", false);
 
     Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
-    p.setVertex(TVector3(1.0, 2.0, 2.0));
+    p.setVertex(XYZVector(1.0, 2.0, 2.0));
 
     const Manager::Var* var = Manager::Instance().getVariable("p");
     ASSERT_NE(var, nullptr);
@@ -932,9 +935,9 @@ namespace {
     particles.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
     PCmsLabTransform T;
-    TLorentzVector vec0 = {0.0, 0.0, 0.0, T.getCMSEnergy()};
-    TLorentzVector vec1 = {0.0, +0.332174566, 0.0, T.getCMSEnergy() / 2.};
-    TLorentzVector vec2 = {0.0, -0.332174566, 0.0, T.getCMSEnergy() / 2.};
+    PxPyPzEVector vec0 = {0.0, 0.0, 0.0, T.getCMSEnergy()};
+    PxPyPzEVector vec1 = {0.0, +0.332174566, 0.0, T.getCMSEnergy() / 2.};
+    PxPyPzEVector vec2 = {0.0, -0.332174566, 0.0, T.getCMSEnergy() / 2.};
     Particle* p0 = particles.appendNew(Particle(T.rotateCmsToLab() * vec0, 300553));
     Particle* p1 = particles.appendNew(Particle(T.rotateCmsToLab() * vec1, 511, Particle::c_Unflavored, Particle::c_Undefined, 1));
     Particle* p2 = particles.appendNew(Particle(T.rotateCmsToLab() * vec2, -511, Particle::c_Unflavored, Particle::c_Undefined, 2));
@@ -1206,10 +1209,10 @@ namespace {
     auto* mcDaughter2 = mcParticles[4];
     mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
 
-    auto* pGrandMother = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), -521);
+    auto* pGrandMother = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), -521);
     pGrandMother->addRelationTo(mcGrandMother);
 
-    auto* pMother = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
+    auto* pMother = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
     pMother->addRelationTo(mcMother);
 
 
@@ -1267,13 +1270,13 @@ namespace {
     Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
     Particle p2({ 0.1 , -0.4, 0.8, 4.0 }, 11);
 
-    track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.1, 0.0, 0.0),
+    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.1, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
-    track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.15, 0.0, 0.0),
+    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.15, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
-    track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.4, 0.0, 0.0),
+    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.4, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
-    track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.6, 0.0, 0.0),
+    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.6, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
 
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 0);
@@ -1320,12 +1323,12 @@ namespace {
 
   TEST_F(MetaVariableTest, daughterInvM)
   {
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 6;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(2, 2, 2, 4.0), (i % 2) ? 211 : -211);
+      Particle d(PxPyPzEVector(2, 2, 2, 4.0), (i % 2) ? 211 : -211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1347,12 +1350,12 @@ namespace {
 
   TEST_F(MetaVariableTest, daughter)
   {
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 6;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(i * 1.0, 1, 1, 1), (i % 2) ? 211 : -211);
+      Particle d(PxPyPzEVector(i * 1.0, 1, 1, 1), (i % 2) ? 211 : -211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1425,17 +1428,17 @@ namespace {
     auto* mcDaughter2 = mcParticles[4];
     mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
 
-    auto* pGrandMother = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), -521);
+    auto* pGrandMother = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), -521);
     pGrandMother->addRelationTo(mcGrandMother);
 
-    auto* pMother = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
+    auto* pMother = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
     pMother->addRelationTo(mcMother);
 
     // Test for particle that has no MC match
-    auto* p_noMC = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
+    auto* p_noMC = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
 
     // Test for particle that has MC match, but MC match has no daughter
-    auto* p_noDaughter = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p_noDaughter = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p_noDaughter->addRelationTo(mcDaughter1);
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDaughter(0, PDG)");
@@ -1513,20 +1516,20 @@ namespace {
     auto* mcDaughter2 = mcParticles[4];
     mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
 
-    auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p1->addRelationTo(mcDaughter1);
 
-    auto* p2 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 14);
+    auto* p2 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 14);
     p2->addRelationTo(mcDaughter2);
 
-    auto* pMother = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
+    auto* pMother = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
     pMother->addRelationTo(mcMother);
 
     // For test of particle that has no MC match
-    auto* p_noMC = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p_noMC = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
 
     // For test of particle that has MC match, but MC match has no mother
-    auto* p_noMother = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), -521);
+    auto* p_noMother = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), -521);
     p_noMother->addRelationTo(mcGrandMother);
 
     const Manager::Var* var = Manager::Instance().getVariable("mcMother(PDG)");
@@ -1595,11 +1598,11 @@ namespace {
     auto* mcDaughter2 = mcParticles[4];
     mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
 
-    auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p1->addRelationTo(mcDaughter1);
 
     // For test of particle that has no MC match
-    auto* p_noMC = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 211);
+    auto* p_noMC = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 211);
 
     const Manager::Var* var = Manager::Instance().getVariable("genParticle(0, PDG)");
     ASSERT_NE(var, nullptr);
@@ -1690,11 +1693,11 @@ namespace {
     auto* mcDaughter2 = mcParticles[4];
     mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
 
-    auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p1->addRelationTo(mcDaughter1);
 
     // For test of particle that has no MC match
-    auto* p_noMC = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 211);
+    auto* p_noMC = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 211);
 
     const Manager::Var* var = Manager::Instance().getVariable("genUpsilon4S(PDG)");
     ASSERT_NE(var, nullptr);
@@ -1738,7 +1741,7 @@ namespace {
     auto* mcP2 = mcParticles[1];
     mcP2->setStatus(MCParticle::c_PrimaryParticle);
 
-    auto* someParticle = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* someParticle = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     someParticle->addRelationTo(mcP1);
 
     var = Manager::Instance().getVariable("genUpsilon4S(PDG)");
@@ -1748,12 +1751,12 @@ namespace {
 
   TEST_F(MetaVariableTest, daughterProductOf)
   {
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 4;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 211 : -211);
+      Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 2.0), (i % 2) ? 211 : -211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1762,17 +1765,17 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("daughterProductOf(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 24.0);
+    EXPECT_FLOAT_EQ(var->function(p), 120.0);
   }
 
   TEST_F(MetaVariableTest, daughterSumOf)
   {
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 4;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 211 : -211);
+      Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 2.0), (i % 2) ? 211 : -211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1781,18 +1784,18 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("daughterSumOf(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 10.0);
+    EXPECT_FLOAT_EQ(var->function(p), 14.0);
 
   }
 
   TEST_F(MetaVariableTest, daughterLowest)
   {
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 4;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 211 : -211);
+      Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 2.0), (i % 2) ? 211 : -211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1801,17 +1804,17 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("daughterLowest(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 1.0);
+    EXPECT_FLOAT_EQ(var->function(p), 2.0);
   }
 
   TEST_F(MetaVariableTest, daughterHighest)
   {
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 4;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 211 : -211);
+      Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 211 : -211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1825,12 +1828,12 @@ namespace {
 
   TEST_F(MetaVariableTest, daughterDiffOf)
   {
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 4;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(-1, 1.0 - 2 * (i % 2), 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      Particle d(PxPyPzEVector(-1, 1.0 - 2 * (i % 2), 1, i * 1.0 + 2.0), (i % 2) ? -11 : 211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1867,7 +1870,7 @@ namespace {
 
     var = Manager::Instance().getVariable("daughterDiffOf(1, 0, useCMSFrame(phi))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), -1.513103);
+    EXPECT_FLOAT_EQ(var->function(p), -1.473294);
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
   }
@@ -1876,7 +1879,7 @@ namespace {
   TEST_F(MetaVariableTest, mcDaughterDiffOf)
   {
     DataStore::Instance().setInitializeActive(true);
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 4;
     StoreArray<Particle> particles;
     StoreArray<MCParticle> mcParticles;
@@ -1885,7 +1888,7 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1944,9 +1947,9 @@ namespace {
     const float pz_CM = 3.;
     float E_CM;
     E_CM = sqrt(pow(px_CM, 2) + pow(py_CM, 2) + pow(pz_CM, 2));
-    TLorentzVector momentum, momentum_noclst;
-    TLorentzVector dau0_4vec_CM(px_CM, py_CM, pz_CM, E_CM), dau1_4vec_CM(-px_CM, -py_CM, -pz_CM, E_CM);
-    TLorentzVector dau0_4vec_Lab, dau1_4vec_Lab;
+    PxPyPzEVector momentum, momentum_noclst;
+    PxPyPzEVector dau0_4vec_CM(px_CM, py_CM, pz_CM, E_CM), dau1_4vec_CM(-px_CM, -py_CM, -pz_CM, E_CM);
+    PxPyPzEVector dau0_4vec_Lab, dau1_4vec_Lab;
     dau0_4vec_Lab = PCmsLabTransform::cmsToLab(
                       dau0_4vec_CM); //why is everybody using the extended method when there are the functions that do all the steps for us?
     dau1_4vec_Lab = PCmsLabTransform::cmsToLab(dau1_4vec_CM);
@@ -2022,8 +2025,8 @@ namespace {
     float E_0, E_1;
     E_0 = sqrt(pow(px_0, 2) + pow(py_0, 2) + pow(pz_0, 2));
     E_1 = sqrt(pow(px_1, 2) + pow(py_1, 2) + pow(pz_1, 2));
-    TLorentzVector momentum_0, momentum_1, momentum;
-    TLorentzVector dau0_4vec(px_0, py_0, pz_0, E_0), dau1_4vec(px_1, py_1, pz_1, E_1);
+    PxPyPzEVector momentum_0, momentum_1, momentum;
+    PxPyPzEVector dau0_4vec(px_0, py_0, pz_0, E_0), dau1_4vec(px_1, py_1, pz_1, E_1);
 
     // add the two photons as the two daughters of some particle and create the latter
     // Particle dau0_noclst(dau0_4vec, 22);
@@ -2074,7 +2077,7 @@ namespace {
     EXPECT_TRUE(std::isnan(var_ClusterE->function(parGranny_noclst)));
     EXPECT_FLOAT_EQ(var_Phi->function(parGranny_noclst), 0.32175055);
     EXPECT_FLOAT_EQ(var_Theta->function(parGranny_noclst), 0.06311664);
-    EXPECT_FLOAT_EQ(var_E->function(parGranny_noclst), -0.46293831);
+    EXPECT_FLOAT_EQ(var_E->function(parGranny_noclst), -0.46293807);
     EXPECT_TRUE(std::isnan(var_ClusterPhi_wrongIndexes->function(parGranny_noclst)));
     EXPECT_TRUE(std::isnan(var_Phi_wrongIndexes->function(parGranny_noclst)));
     EXPECT_TRUE(std::isnan(var_ClusterE_wrongIndexes->function(parGranny_noclst)));
@@ -2115,17 +2118,17 @@ namespace {
     EXPECT_FLOAT_EQ(var_ClusterTheta->function(parGranny), 0.06311664);
     EXPECT_FLOAT_EQ(var_Theta->function(parGranny), 0.06311664);
     EXPECT_FLOAT_EQ(var_ClusterE->function(parGranny), -0.46293831);
-    EXPECT_FLOAT_EQ(var_E->function(parGranny), -0.46293813);
+    EXPECT_FLOAT_EQ(var_E->function(parGranny), -0.46293831);
   }
 
   TEST_F(MetaVariableTest, daughterNormDiffOf)
   {
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 4;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -2160,12 +2163,12 @@ namespace {
 
   TEST_F(MetaVariableTest, daughterMotherDiffOf)
   {
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 4;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -2188,12 +2191,12 @@ namespace {
 
   TEST_F(MetaVariableTest, daughterMotherNormDiffOf)
   {
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 4;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -2281,19 +2284,19 @@ namespace {
     auto* mcParticle = mcParticles.appendNew();
     mcParticle->setPDG(Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p1 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p1->addRelationTo(mcParticle);
 
     mcParticle = mcParticles.appendNew();
     mcParticle->setPDG(-Const::electron.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p2 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p2 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p2->addRelationTo(mcParticle);
 
     mcParticle = mcParticles.appendNew();
     mcParticle->setPDG(Const::photon.getPDGCode());
     mcParticle->setStatus(MCParticle::c_PrimaryParticle);
-    auto* p3 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    auto* p3 = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
     p3->addRelationTo(mcParticle);
 
     // Test if matchedMC also works for particle which already is an MCParticle.
@@ -2492,18 +2495,18 @@ namespace {
     mcyetanotherelectron->setStatus(MCParticle::c_PrimaryParticle);
 
     // particles
-    auto* photon = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    auto* photon = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
     photon->addRelationTo(mcphoton);
     list->addParticle(photon);
 
-    auto* electron = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    auto* electron = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
     electron->addRelationTo(mcelectron);
     list->addParticle(electron);
 
-    auto* other = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    auto* other = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
     other->addRelationTo(mcanotherelectron);
 
-    auto* yetanotherelectron = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    auto* yetanotherelectron = particles.appendNew(PxPyPzEVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
     yetanotherelectron->addRelationTo(mcyetanotherelectron);
     anotherlist->addParticle(yetanotherelectron);
     // not in the list
@@ -2560,7 +2563,7 @@ namespace {
 
     // create some photons in an stdvector
     std::vector<Particle> gammavector = {
-      Particle({ -1.0 , -1.0 , 0.8, 1.2}, // this should be the most b2b to our reference particle
+      Particle({ -1.0 , -1.0 , 0.8, 1.7}, // this should be the most b2b to our reference particle
       22, Particle::c_Unflavored, Particle::c_Undefined, 0),
       Particle({0.2 , 0.7 , 0.9, 3.4},    // should be the closest
       22, Particle::c_Unflavored, Particle::c_Undefined, 1),
@@ -2575,7 +2578,7 @@ namespace {
 
     // add the reference particle (electron) to the StoreArray
     const auto* electron = particles.appendNew(
-                             Particle({1.0 , 1.0 , 0.5, 0.8},  // somewhere in the +ve quarter of the detector
+                             Particle({1.0 , 1.0 , 0.5, 1.6},  // somewhere in the +ve quarter of the detector
                                       11, Particle::c_Unflavored, Particle::c_Undefined, 2) // needs to be incremented if we add to gamma vector
                            );
 
@@ -2593,7 +2596,7 @@ namespace {
       EXPECT_FLOAT_EQ(closest->function(electron), 0.68014491);
 
       const auto* closestCMS = Manager::Instance().getVariable("useCMSFrame(angleToClosestInList(testGammaList))");
-      EXPECT_FLOAT_EQ(closestCMS->function(electron), 0.72592634);
+      EXPECT_FLOAT_EQ(closestCMS->function(electron), 0.67385018);
     }
 
     {
@@ -2630,7 +2633,7 @@ namespace {
       EXPECT_FLOAT_EQ(mostB2B->function(electron), 2.2869499);
 
       const auto* mostB2BCMS = Manager::Instance().getVariable("useCMSFrame(angleToMostB2BInList(testGammaList))");
-      EXPECT_FLOAT_EQ(mostB2BCMS->function(electron), 2.6054888);
+      EXPECT_FLOAT_EQ(mostB2BCMS->function(electron), 2.8506882);
     }
 
     {
@@ -2644,13 +2647,13 @@ namespace {
       EXPECT_TRUE(std::isnan(empty->function(electron)));
 
       const auto* mostB2B = Manager::Instance().getVariable("mostB2BInList(testGammaList, E)");
-      EXPECT_FLOAT_EQ(mostB2B->function(electron), 1.2);
+      EXPECT_FLOAT_EQ(mostB2B->function(electron), 1.7);
 
       const auto* mostB2BCMS = Manager::Instance().getVariable("useCMSFrame(mostB2BInList(testGammaList, E))");
-      EXPECT_FLOAT_EQ(mostB2BCMS->function(electron), 1.0647389); // the energy gets smeared because of boost
+      EXPECT_FLOAT_EQ(mostB2BCMS->function(electron), 1.584888); // the energy gets smeared because of boost
 
       const auto* mostB2BCMSLabE = Manager::Instance().getVariable("useCMSFrame(mostB2BInList(testGammaList, useLabFrame(E)))");
-      EXPECT_FLOAT_EQ(mostB2BCMSLabE->function(electron), 1.2); // aaand should be back to the lab frame value
+      EXPECT_FLOAT_EQ(mostB2BCMSLabE->function(electron), 1.7); // aaand should be back to the lab frame value
     }
   }
 
@@ -2670,7 +2673,7 @@ namespace {
 
     // create some photons in an stdvector
     std::vector<Particle> gammavector = {
-      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.4 , 0.4 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
       Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
       Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
       Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
@@ -2961,7 +2964,7 @@ namespace {
 
     // create some photons in an stdvector
     std::vector<Particle> gammavector = {
-      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.4 , 0.4 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
       Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
       Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
       Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
@@ -2988,7 +2991,7 @@ namespace {
 
     EXPECT_FLOAT_EQ(vmeanpx->function(nullptr), 0.44);
     EXPECT_FLOAT_EQ(vmeanpy->function(nullptr), 0.3);
-    EXPECT_FLOAT_EQ(vmeanpz->function(nullptr), 0.62);
+    EXPECT_FLOAT_EQ(vmeanpz->function(nullptr), 0.6);
     EXPECT_FLOAT_EQ(vmeanE->function(nullptr), 0.86);
 
     // wrong number of arguments (no variable provided)
@@ -3026,7 +3029,7 @@ namespace {
 
     // create some photons in an stdvector
     std::vector<Particle> gammavector = {
-      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.4 , 0.4 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
       Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
       Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
       Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
@@ -3092,15 +3095,15 @@ namespace {
 
   TEST_F(MetaVariableTest, pValueCombination)
   {
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
-    Particle KS(TLorentzVector(1.164, 1.55200, 0, 2), 310, Particle::c_Unflavored, Particle::c_Composite, 0);
+    Particle KS(PxPyPzEVector(1.164, 1.55200, 0, 2), 310, Particle::c_Unflavored, Particle::c_Composite, 0);
     KS.setPValue(0.1);
     momentum += KS.get4Vector();
     Particle* newDaughters = particles.appendNew(KS);
     daughterIndices.push_back(newDaughters->getArrayIndex());
-    Particle Jpsi(TLorentzVector(-1, 1, 1, 3.548), 443, Particle::c_Unflavored, Particle::c_Composite, 1);
+    Particle Jpsi(PxPyPzEVector(-1, 1, 1, 3.548), 443, Particle::c_Unflavored, Particle::c_Composite, 1);
     Jpsi.setPValue(0.9);
     momentum += Jpsi.get4Vector();
     newDaughters = particles.appendNew(Jpsi);
@@ -3132,13 +3135,13 @@ namespace {
   TEST_F(MetaVariableTest, daughterCombinationOneGeneration)
   {
     const int nDaughters = 5;
-    TLorentzVector momentum(0, 0, 0, 0);
+    PxPyPzEVector momentum(0, 0, 0, 0);
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
-    std::vector<TLorentzVector> daughterMomenta;
+    std::vector<PxPyPzEVector> daughterMomenta;
 
     for (int i = 0; i < nDaughters; i++) {
-      TLorentzVector mom(1, i * 0.5, 1, i * 1.0 + 2.0);
+      PxPyPzEVector mom(1, i * 0.5, 1, i * 1.0 + 2.0);
       Particle d(mom, (i % 2) ? -11 : 211);
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -3149,17 +3152,17 @@ namespace {
 
     // Test the invariant mass of several combinations
     const Manager::Var* var = Manager::Instance().getVariable("daughterCombination(M, 0,1,2)");
-    double M_test = (daughterMomenta[0] + daughterMomenta[1] + daughterMomenta[2]).Mag();
+    double M_test = (daughterMomenta[0] + daughterMomenta[1] + daughterMomenta[2]).mag();
     EXPECT_FLOAT_EQ(var->function(p), M_test);
 
     var = Manager::Instance().getVariable("daughterCombination(M, 0,4)");
-    M_test = (daughterMomenta[0] + daughterMomenta[4]).Mag();
+    M_test = (daughterMomenta[0] + daughterMomenta[4]).mag();
     EXPECT_FLOAT_EQ(var->function(p), M_test);
 
 
     // Try with a non-lorentz invariant quantity
     var = Manager::Instance().getVariable("daughterCombination(p, 1, 0, 4)");
-    double p_test = (daughterMomenta[0] + daughterMomenta[1] + daughterMomenta[4]).Vect().Mag();
+    double p_test = (daughterMomenta[0] + daughterMomenta[1] + daughterMomenta[4]).P();
     EXPECT_FLOAT_EQ(var->function(p), p_test);
 
 
@@ -3189,12 +3192,12 @@ namespace {
 
     // make a 1 -> 3 particle
 
-    TLorentzVector momentum_1(0, 0, 0, 0);
-    std::vector<TLorentzVector> daughterMomenta_1;
+    PxPyPzEVector momentum_1(0, 0, 0, 0);
+    std::vector<PxPyPzEVector> daughterMomenta_1;
     std::vector<int> daughterIndices_1;
 
     for (int i = 0; i < 3; i++) {
-      TLorentzVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
+      PxPyPzEVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
       Particle d(mom, (i % 2) ? -11 : 211);
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices_1.push_back(newDaughters->getArrayIndex());
@@ -3207,12 +3210,12 @@ namespace {
 
     // make a 1 -> 2 particle
 
-    TLorentzVector momentum_2(0, 0, 0, 0);
-    std::vector<TLorentzVector> daughterMomenta_2;
+    PxPyPzEVector momentum_2(0, 0, 0, 0);
+    std::vector<PxPyPzEVector> daughterMomenta_2;
     std::vector<int> daughterIndices_2;
 
     for (int i = 0; i < 2; i++) {
-      TLorentzVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
+      PxPyPzEVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
       Particle d(mom, (i % 2) ? -11 : 211);
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices_2.push_back(newDaughters->getArrayIndex());
@@ -3230,17 +3233,17 @@ namespace {
 
     // Test the invariant mass of several combinations
     const Manager::Var* var = Manager::Instance().getVariable("daughterCombination(M, 0,1)");
-    double M_test = (momentum_1 + momentum_2).Mag();
+    double M_test = (momentum_1 + momentum_2).mag();
     EXPECT_FLOAT_EQ(var->function(p), M_test);
 
     // this should be the mass of the first daughter
     var = Manager::Instance().getVariable("daughterCombination(M, 0:0, 0:1, 0:2)");
-    M_test = (momentum_1).Mag();
+    M_test = (momentum_1).mag();
     EXPECT_FLOAT_EQ(var->function(p), M_test);
 
     // this should be a generic combinations
     var = Manager::Instance().getVariable("daughterCombination(M, 0:0, 0:1, 1:0)");
-    M_test = (daughterMomenta_1[0] + daughterMomenta_1[1] + daughterMomenta_2[0]).Mag();
+    M_test = (daughterMomenta_1[0] + daughterMomenta_1[1] + daughterMomenta_2[0]).mag();
     EXPECT_FLOAT_EQ(var->function(p), M_test);
 
   }
@@ -3252,19 +3255,19 @@ namespace {
     StoreArray<Particle> particles;
 
     // Build a first Particle
-    TLorentzVector momentum(0, 0, 0, 0);
+    PxPyPzEVector momentum(0, 0, 0, 0);
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
       double px =  i * 0.1;
       double py =  i * 0.3;
       double pz =  -i * 0.1 - 0.2;
 
-      TLorentzVector mom(px, py, pz, 1);
+      PxPyPzEVector mom(px, py, pz, 1);
       // all pions
       int pdgCode = Const::pion.getPDGCode();
       Particle d(mom, pdgCode);
       d.updateMass(pdgCode);
-      mom.SetXYZM(px, py, pz, d.getMass());
+      mom = d.get4Vector();
 
       Particle* daughters = particles.appendNew(d);
       daughterIndices.push_back(daughters->getArrayIndex());
@@ -3274,14 +3277,14 @@ namespace {
 
 
     // Build a second Particle with same momenta, but different mass hyp.
-    TLorentzVector momentumAlt(0, 0, 0, 0);
+    PxPyPzEVector momentumAlt(0, 0, 0, 0);
     std::vector<int> daughterIndicesAlt;
     for (int i = 0; i < nDaughters; i++) {
       double px =  i * 0.1;
       double py =  i * 0.3;
       double pz =  -i * 0.1 - 0.2;
 
-      TLorentzVector mom(px, py, pz, 1);
+      PxPyPzEVector mom(px, py, pz, 1);
       // all pions but the first two
       int pdgCode = Const::pion.getPDGCode();
       if (i == 0)
@@ -3290,7 +3293,7 @@ namespace {
         pdgCode = Const::kaon.getPDGCode(); // a K
       Particle d(mom, pdgCode);
       d.updateMass(pdgCode);
-      mom.SetXYZM(px, py, pz, d.getMass());
+      mom = d.get4Vector();
 
       Particle* daughters = particles.appendNew(d);
       daughterIndicesAlt.push_back(daughters->getArrayIndex());
@@ -3328,12 +3331,12 @@ namespace {
 
     // make a 1 -> 3 particle
 
-    TLorentzVector momentum_1(0, 0, 0, 0);
-    std::vector<TLorentzVector> daughterMomenta_1;
+    PxPyPzEVector momentum_1(0, 0, 0, 0);
+    std::vector<PxPyPzEVector> daughterMomenta_1;
     std::vector<int> daughterIndices_1;
 
     for (int i = 0; i < 3; i++) {
-      TLorentzVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
+      PxPyPzEVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
       Particle d(mom, (i % 2) ? -11 : 211);
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices_1.push_back(newDaughters->getArrayIndex());
@@ -3346,12 +3349,12 @@ namespace {
 
     // make a 1 -> 2 particle
 
-    TLorentzVector momentum_2(0, 0, 0, 0);
-    std::vector<TLorentzVector> daughterMomenta_2;
+    PxPyPzEVector momentum_2(0, 0, 0, 0);
+    std::vector<PxPyPzEVector> daughterMomenta_2;
     std::vector<int> daughterIndices_2;
 
     for (int i = 0; i < 2; i++) {
-      TLorentzVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
+      PxPyPzEVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
       Particle d(mom, (i % 2) ? -11 : 211);
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices_2.push_back(newDaughters->getArrayIndex());
@@ -3369,12 +3372,12 @@ namespace {
 
     // Test the invariant mass of several combinations
     const Manager::Var* var = Manager::Instance().getVariable("daughterAngle(0, 1)");
-    double v_test = momentum_1.Vect().Angle(momentum_2.Vect());
+    double v_test = acos(momentum_1.Vect().Unit().Dot(momentum_2.Vect().Unit()));
     EXPECT_FLOAT_EQ(var->function(p), v_test);
 
     // this should be a generic combinations
     var = Manager::Instance().getVariable("daughterAngle(0:0, 1:0)");
-    v_test = daughterMomenta_1[0].Vect().Angle(daughterMomenta_2[0].Vect());
+    v_test = acos(daughterMomenta_1[0].Vect().Unit().Dot(daughterMomenta_2[0].Vect().Unit()));
     EXPECT_FLOAT_EQ(var->function(p), v_test);
 
     var = Manager::Instance().getVariable("daughterAngle( 1, -1)");
@@ -3397,12 +3400,12 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     // make a 1 -> 3 particle
 
-    TLorentzVector momentum_1(0, 0, 0, 0);
-    std::vector<TLorentzVector> daughterMomenta_1;
+    PxPyPzEVector momentum_1(0, 0, 0, 0);
+    std::vector<PxPyPzEVector> daughterMomenta_1;
     std::vector<int> daughterIndices_1;
 
     for (int i = 0; i < 3; i++) {
-      TLorentzVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
+      PxPyPzEVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
       Particle d(mom, (i % 2) ? -11 : 211);
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices_1.push_back(newDaughters->getArrayIndex());
@@ -3425,12 +3428,12 @@ namespace {
 
     // make a 1 -> 2 particle
 
-    TLorentzVector momentum_2(0, 0, 0, 0);
-    std::vector<TLorentzVector> daughterMomenta_2;
+    PxPyPzEVector momentum_2(0, 0, 0, 0);
+    std::vector<PxPyPzEVector> daughterMomenta_2;
     std::vector<int> daughterIndices_2;
 
     for (int i = 0; i < 2; i++) {
-      TLorentzVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
+      PxPyPzEVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
       Particle d(mom, (i % 2) ? -11 : 211);
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices_2.push_back(newDaughters->getArrayIndex());
@@ -3458,11 +3461,11 @@ namespace {
 
     // Test mcDaughterAngle
     const Manager::Var* var = Manager::Instance().getVariable("mcDaughterAngle(0, 1)");
-    double v_test = momentum_1.Vect().Angle(momentum_2.Vect());
+    double v_test = acos(momentum_1.Vect().Unit().Dot(momentum_2.Vect().Unit()));
     EXPECT_FLOAT_EQ(var->function(p), v_test);
 
     var = Manager::Instance().getVariable("mcDaughterAngle(0:0, 1:0)");
-    v_test = daughterMomenta_1[0].Vect().Angle(daughterMomenta_2[0].Vect());
+    v_test = acos(daughterMomenta_1[0].Vect().Unit().Dot(daughterMomenta_2[0].Vect().Unit()));
     EXPECT_FLOAT_EQ(var->function(p), v_test);
 
     var = Manager::Instance().getVariable("mcDaughterAngle( 1, -1)");
@@ -3483,7 +3486,7 @@ namespace {
     // Test azimuthal angle as well
     var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, phi)");
     ASSERT_NE(var, nullptr);
-    v_test = momentum_2.Vect().DeltaPhi(momentum_1.Vect());
+    v_test = momentum_2.Phi() - momentum_1.Phi();
     EXPECT_FLOAT_EQ(var->function(p), v_test);
 
   }
@@ -3501,9 +3504,9 @@ namespace {
     DList.create();
     DList->initialize(421, "D0:vartest");
     DataStore::Instance().setInitializeActive(false);
-    TLorentzVector momentum;
-    TLorentzVector momentum_0;
-    TLorentzVector momentum_1;
+    PxPyPzEVector momentum;
+    PxPyPzEVector momentum_0;
+    PxPyPzEVector momentum_1;
     std::vector<int> D_daughterIndices;
     std::vector<int> D_grandDaughterIndices_0;
     std::vector<int> D_grandDaughterIndices_1;
@@ -3522,21 +3525,21 @@ namespace {
     MCParticleGraph::GraphParticle& mcg_not_child = mcGraph.addParticle();
 
     mcg_m.setPDG(421);
-    mcg_m.set4Vector(TLorentzVector(7, 7, 7, 7));
+    mcg_m.set4Vector(PxPyPzEVector(7, 7, 7, 7));
     mcg_d_0.setPDG(-Const::Kshort.getPDGCode());
-    mcg_d_0.set4Vector(TLorentzVector(6, 6, 6, 6));
+    mcg_d_0.set4Vector(PxPyPzEVector(6, 6, 6, 6));
     mcg_d_1.setPDG(Const::Kshort.getPDGCode());
-    mcg_d_1.set4Vector(TLorentzVector(5, 5, 5, 5));
+    mcg_d_1.set4Vector(PxPyPzEVector(5, 5, 5, 5));
     mcg_gd_0_0.setPDG(Const::pion.getPDGCode());
-    mcg_gd_0_0.set4Vector(TLorentzVector(4, 4, 4, 4));
+    mcg_gd_0_0.set4Vector(PxPyPzEVector(4, 4, 4, 4));
     mcg_gd_0_1.setPDG(-Const::pion.getPDGCode());
-    mcg_gd_0_1.set4Vector(TLorentzVector(3, 3, 3, 3));
+    mcg_gd_0_1.set4Vector(PxPyPzEVector(3, 3, 3, 3));
     mcg_gd_1_0.setPDG(Const::pion.getPDGCode());
-    mcg_gd_1_0.set4Vector(TLorentzVector(2, 1, 2, 2));
+    mcg_gd_1_0.set4Vector(PxPyPzEVector(2, 1, 2, 2));
     mcg_gd_1_1.setPDG(-Const::pion.getPDGCode());
-    mcg_gd_1_1.set4Vector(TLorentzVector(1, 1, 1, 1));
+    mcg_gd_1_1.set4Vector(PxPyPzEVector(1, 1, 1, 1));
     mcg_not_child.setPDG(Const::pion.getPDGCode());
-    mcg_not_child.set4Vector(TLorentzVector(10, 10, 10, 10));
+    mcg_not_child.set4Vector(PxPyPzEVector(10, 10, 10, 10));
 
     mcg_d_0.comesFrom(mcg_m);
     mcg_d_1.comesFrom(mcg_m);
@@ -3569,10 +3572,10 @@ namespace {
 
     // Creation of D decay: D->K0s(->pi pi) K0s(->pi pi)
 
-    const Particle* D_gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
-    const Particle* D_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
-    const Particle* D_gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
-    const Particle* D_gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
+    const Particle* D_gd_0_0 = particles.appendNew(PxPyPzEVector(0.0, 1, 1, 1), 211);
+    const Particle* D_gd_0_1 = particles.appendNew(PxPyPzEVector(1.0, 1, 1, 1), -211);
+    const Particle* D_gd_1_0 = particles.appendNew(PxPyPzEVector(2.0, 1, 1, 1), 211);
+    const Particle* D_gd_1_1 = particles.appendNew(PxPyPzEVector(3.0, 1, 1, 1), -211);
 
     D_grandDaughterIndices_0.push_back(D_gd_0_0->getArrayIndex());
     D_grandDaughterIndices_0.push_back(D_gd_0_1->getArrayIndex());
@@ -3594,10 +3597,10 @@ namespace {
     DList->addParticle(D_m);
 
     // Particle that is not an child
-    const Particle* not_child = particles.appendNew(TLorentzVector(5.0, 1, 1, 1), 211);
+    const Particle* not_child = particles.appendNew(PxPyPzEVector(5.0, 1, 1, 1), 211);
 
     // Particle that is not an child and doesn't have MC particle
-    const Particle* not_child_2 = particles.appendNew(TLorentzVector(6.0, 1, 1, 1), 211);
+    const Particle* not_child_2 = particles.appendNew(PxPyPzEVector(6.0, 1, 1, 1), 211);
 
     // MC matching
     D_gd_0_0->addRelationTo(mc_gd_0_0);
@@ -3646,9 +3649,9 @@ namespace {
     BList->initialize(521, "B:vartest");
     DataStore::Instance().setInitializeActive(false);
 
-    TLorentzVector momentum;
-    TLorentzVector momentum_0;
-    TLorentzVector momentum_1;
+    PxPyPzEVector momentum;
+    PxPyPzEVector momentum_0;
+    PxPyPzEVector momentum_1;
     StoreArray<Particle> particles;
     std::vector<int> D_daughterIndices;
     std::vector<int> D_grandDaughterIndices_0;
@@ -3659,10 +3662,10 @@ namespace {
 
     // Creation of D decay: D->K0s(->pi pi) K0s(->pi pi)
 
-    const Particle* D_gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 0);
-    const Particle* D_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 1);
-    const Particle* D_gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 2);
-    const Particle* D_gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 3);
+    const Particle* D_gd_0_0 = particles.appendNew(PxPyPzEVector(0.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 0);
+    const Particle* D_gd_0_1 = particles.appendNew(PxPyPzEVector(1.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 1);
+    const Particle* D_gd_1_0 = particles.appendNew(PxPyPzEVector(2.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 2);
+    const Particle* D_gd_1_1 = particles.appendNew(PxPyPzEVector(3.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 3);
 
     D_grandDaughterIndices_0.push_back(D_gd_0_0->getArrayIndex());
     D_grandDaughterIndices_0.push_back(D_gd_0_1->getArrayIndex());
@@ -3685,10 +3688,10 @@ namespace {
 
     // Creation of B decay B -> D(->K0s(->pi pi) pi) pi
 
-    const Particle* B_d_1 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 4);
-    const Particle* B_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 5);
-    const Particle* B_ggd_0_0_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 6);
-    const Particle* B_ggd_0_0_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 7);
+    const Particle* B_d_1 = particles.appendNew(PxPyPzEVector(0.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 4);
+    const Particle* B_gd_0_1 = particles.appendNew(PxPyPzEVector(1.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 5);
+    const Particle* B_ggd_0_0_0 = particles.appendNew(PxPyPzEVector(2.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 6);
+    const Particle* B_ggd_0_0_1 = particles.appendNew(PxPyPzEVector(3.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 7);
 
     B_grandGrandDaughterIndices.push_back(B_ggd_0_0_0->getArrayIndex());
     B_grandGrandDaughterIndices.push_back(B_ggd_0_0_1->getArrayIndex());
@@ -3707,7 +3710,7 @@ namespace {
     BList->addParticle(B_m);
 
     // Particle that is not an child
-    const Particle* not_child = particles.appendNew(TLorentzVector(5.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 8);
+    const Particle* not_child = particles.appendNew(PxPyPzEVector(5.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 8);
 
 
     const Manager::Var* var_0 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest)");
@@ -3891,9 +3894,9 @@ namespace {
     DList.create();
     DList->initialize(421, "D0:vartest");
     DataStore::Instance().setInitializeActive(false);
-    TLorentzVector momentum;
-    TLorentzVector momentum_0;
-    TLorentzVector momentum_1;
+    PxPyPzEVector momentum;
+    PxPyPzEVector momentum_0;
+    PxPyPzEVector momentum_1;
     std::vector<int> daughterIndices;
     std::vector<int> grandDaughterIndices;
     std::vector<int> grandGrandDaughterIndices;
@@ -3953,10 +3956,10 @@ namespace {
 
     // Creation of D decay: D->K0s(->pi pi) K0s(->pi pi) (not matched)
 
-    const Particle* D_gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
-    const Particle* D_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
-    const Particle* D_gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
-    const Particle* D_gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
+    const Particle* D_gd_0_0 = particles.appendNew(PxPyPzEVector(0.0, 1, 1, 1), 211);
+    const Particle* D_gd_0_1 = particles.appendNew(PxPyPzEVector(1.0, 1, 1, 1), -211);
+    const Particle* D_gd_1_0 = particles.appendNew(PxPyPzEVector(2.0, 1, 1, 1), 211);
+    const Particle* D_gd_1_1 = particles.appendNew(PxPyPzEVector(3.0, 1, 1, 1), -211);
 
     D_grandDaughterIndices_0.push_back(D_gd_0_0->getArrayIndex());
     D_grandDaughterIndices_0.push_back(D_gd_0_1->getArrayIndex());
@@ -3978,10 +3981,10 @@ namespace {
     DList->addParticle(D_m);
 
     // Creating B decay
-    const Particle* d_1 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
-    const Particle* gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
-    const Particle* ggd_0_0_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
-    const Particle* ggd_0_0_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
+    const Particle* d_1 = particles.appendNew(PxPyPzEVector(0.0, 1, 1, 1), 211);
+    const Particle* gd_0_1 = particles.appendNew(PxPyPzEVector(1.0, 1, 1, 1), -211);
+    const Particle* ggd_0_0_0 = particles.appendNew(PxPyPzEVector(2.0, 1, 1, 1), 211);
+    const Particle* ggd_0_0_1 = particles.appendNew(PxPyPzEVector(3.0, 1, 1, 1), -211);
 
     grandGrandDaughterIndices.push_back(ggd_0_0_0->getArrayIndex());
     grandGrandDaughterIndices.push_back(ggd_0_0_1->getArrayIndex());
@@ -4000,10 +4003,10 @@ namespace {
     BList->addParticle(m);
 
     // Particle that is not an child
-    const Particle* not_child = particles.appendNew(TLorentzVector(5.0, 1, 1, 1), 211);
+    const Particle* not_child = particles.appendNew(PxPyPzEVector(5.0, 1, 1, 1), 211);
 
     // Particle that is not an child and doesn't have MC particle
-    const Particle* not_child_2 = particles.appendNew(TLorentzVector(6.0, 1, 1, 1), 211);
+    const Particle* not_child_2 = particles.appendNew(PxPyPzEVector(6.0, 1, 1, 1), 211);
 
     gd_0_0->addRelationTo(mc_gd_0_0);
     gd_0_1->addRelationTo(mc_gd_0_1);
@@ -4166,12 +4169,12 @@ namespace {
     const int charge = 1;
     TMatrixDSym cov6(6);
     // Generate a random put orthogonal pair of vectors in the r-phi plane
-    TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
+    ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+    ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
     // Add a random z component
-    TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+    B2Vector3D position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    B2Vector3D momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
@@ -4409,12 +4412,12 @@ namespace {
     const int charge = 1;
     TMatrixDSym cov6(6);
     // Generate a random put orthogonal pair of vectors in the r-phi plane
-    TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
+    ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+    ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
     // Add a random z component
-    TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+    B2Vector3D position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    B2Vector3D momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
@@ -4517,7 +4520,7 @@ namespace {
       MCParticle* newMCDp = mcParticles.appendNew(mcDp);
 
       // Insert Reco particle logic here
-      TLorentzVector momentum;
+      PxPyPzEVector momentum;
       TMatrixFSym error(7);
       error.Zero();
       error(0, 0) = 0.05;
@@ -4527,13 +4530,13 @@ namespace {
       error(4, 4) = 0.04;
       error(5, 5) = 0.00875;
       error(6, 6) = 0.01;
-      Particle pi(TLorentzVector(1.59607, 1.19705, 0, 2), 211);
+      Particle pi(PxPyPzEVector(1.59607, 1.19705, 0, 2), 211);
       momentum += pi.get4Vector();
       Particle* newpi = particles.appendNew(pi);
 
 
-      Particle Ks(TLorentzVector(1.164, 1.55200, 0, 2), 310, Particle::c_Unflavored, Particle::c_Composite, 0);
-      Ks.setVertex(TVector3(4.0, 5.0, 0.0));
+      Particle Ks(PxPyPzEVector(1.164, 1.55200, 0, 2), 310, Particle::c_Unflavored, Particle::c_Composite, 0);
+      Ks.setVertex(XYZVector(4.0, 5.0, 0.0));
       Ks.setMomentumVertexErrorMatrix(error);   // (order: px,py,pz,E,x,y,z)
       momentum += Ks.get4Vector();
       Ks.addExtraInfo("prodVertX", 1.0);
@@ -4555,7 +4558,7 @@ namespace {
       Particle Dp(momentum, 411, Particle::c_Flavored, Particle::c_Composite, 0);
       Dp.appendDaughter(newpi);
       Dp.appendDaughter(newKs);
-      TVector3 motherVtx(1.0, 1.0, 0.0);
+      XYZVector motherVtx(1.0, 1.0, 0.0);
       Dp.setVertex(motherVtx);
       Dp.setMomentumVertexErrorMatrix(error);   // (order: px,py,pz,E,x,y,z)
       Dp.addExtraInfo("prodVertX", 0.0);
@@ -4800,14 +4803,14 @@ namespace {
       MCParticle mcKs;
       mcKs.setPDG(Const::Kshort.getPDGCode());
       mcKs.setDecayVertex(4.0, 5.0, 0.0);
-      mcKs.setProductionVertex(TVector3(1.0, 2.0, 3.0));
+      mcKs.setProductionVertex(B2Vector3D(1.0, 2.0, 3.0));
       mcKs.setMassFromPDG();
       mcKs.setMomentum(1.164, 1.55200, 0);
       mcKs.setStatus(MCParticle::c_PrimaryParticle);
       MCParticle* newMCKs = mcParticles.appendNew(mcKs);
 
-      Particle Ks(TLorentzVector(1.164, 1.55200, 0, 2), 310);
-      Ks.setVertex(TVector3(4.0, 5.0, 0.0));
+      Particle Ks(PxPyPzEVector(1.164, 1.55200, 0, 2), 310);
+      Ks.setVertex(XYZVector(4.0, 5.0, 0.0));
       Ks.addExtraInfo("prodVertX", 1.0);
       Ks.addExtraInfo("prodVertY", 2.0);
       Ks.addExtraInfo("prodVertZ", 3.0);

@@ -555,7 +555,7 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     // mock up a composite Belle2::Particle
-    TLorentzVector zeroes(0, 0, 0, 0);
+    ROOT::Math::PxPyPzEVector zeroes(0, 0, 0, 0);
     Particle* Kp = particles.appendNew(Particle(zeroes, 321));    // 0
     Particle* pim1 = particles.appendNew(Particle(zeroes, -211)); // 1
     Particle* pim2 = particles.appendNew(Particle(zeroes, -211)); // 2

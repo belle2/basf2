@@ -808,7 +808,7 @@ Particle#6:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): -0.64592
-  getCosHelicityDaughter(0): -0.442572
+  getCosHelicityDaughter(0): -0.442569
   getDaughter(0): -> Particles#5
   getDaughter(1): -> Particles#3
   getDaughterIndices(): size(2)
@@ -2081,7 +2081,7 @@ Particle#7:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): -0.11513
-  getCosHelicityDaughter(0): -0.969923
+  getCosHelicityDaughter(0): -0.969922
   getDaughter(0): -> Particles#6
   getDaughter(1): -> Particles#0
   getDaughterIndices(): size(3)
@@ -4519,7 +4519,7 @@ Particle#17:
   getAcoplanarity(): nan
   getCharge(): -1
   getCosHelicity(): 0.968225
-  getCosHelicityDaughter(0): -0.991567
+  getCosHelicityDaughter(0): -0.991568
   getDaughter(0): -> Particles#13
   getDaughter(1): -> Particles#2
   getDaughterIndices(): size(2)
@@ -4792,7 +4792,7 @@ Particle#19:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): 0.864864
-  getCosHelicityDaughter(0): -0.860573
+  getCosHelicityDaughter(0): -0.860502
   getDaughter(0): -> Particles#17
   getDaughter(1): -> Particles#6
   getDaughterIndices(): size(2)
@@ -4931,7 +4931,7 @@ Particle#20:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): 0.103753
-  getCosHelicityDaughter(0): -0.990299
+  getCosHelicityDaughter(0): -0.9903
   getDaughter(0): -> Particles#13
   getDaughter(1): -> Particles#2
   getDaughterIndices(): size(3)
@@ -5071,7 +5071,7 @@ Particle#21:
 	# of daughters = 3
   getAcoplanarity(): nan
   getCharge(): 0
-  getCosHelicity(): 0.0519247
+  getCosHelicity(): 0.0519248
   getCosHelicityDaughter(0): -0.997131
   getDaughter(0): -> Particles#15
   getDaughter(1): -> Particles#2
@@ -5213,7 +5213,7 @@ Particle#22:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): -0.638687
-  getCosHelicityDaughter(0): -0.990804
+  getCosHelicityDaughter(0): -0.990805
   getDaughter(0): -> Particles#13
   getDaughter(1): -> Particles#8
   getDaughterIndices(): size(3)

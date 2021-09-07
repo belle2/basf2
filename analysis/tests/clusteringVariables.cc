@@ -11,6 +11,7 @@
 
 #include <gtest/gtest.h>
 #include <TRandom3.h>
+#include <Math/Cartesian2D.h>
 
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
@@ -79,11 +80,11 @@ namespace {
 
       for (int i = 0; i < tracks.getEntries(); ++i) {
         int charge = (i % 2 == 0) ? +1 : -1;
-        TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-        TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-        d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
-        TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
-        TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+        ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+        ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+        d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+        B2Vector3D position(d.X(), d.Y(), generator.Uniform(-1, 1));
+        B2Vector3D momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
         trackFits.appendNew(position, momentum, cov6, charge, Const::pion, 0.5, 1.5, CDCValue, 16777215, 0);
         tracks[i]->setTrackFitResultIndex(Const::pion, i);
       }
@@ -442,8 +443,8 @@ namespace {
     float E_0, E_1;
     E_0 = sqrt(pow(px_0, 2) + pow(py_0, 2) + pow(pz_0, 2));
     E_1 = sqrt(pow(px_1, 2) + pow(py_1, 2) + pow(pz_1, 2));
-    TLorentzVector momentum;
-    TLorentzVector dau0_4vec(px_0, py_0, pz_0, E_0), dau1_4vec(px_1, py_1, pz_1, E_1);
+    ROOT::Math::PxPyPzEVector momentum;
+    ROOT::Math::PxPyPzEVector dau0_4vec(px_0, py_0, pz_0, E_0), dau1_4vec(px_1, py_1, pz_1, E_1);
 
     // add the two photons as the two daughters of some particle and create the latter
     Particle dau0_noclst(dau0_4vec, 22);
@@ -686,11 +687,11 @@ namespace {
 
     for (int i = 0; i < tracks.getEntries(); ++i) {
       int charge = (i % 2 == 0) ? +1 : -1;
-      TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-      TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-      d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
-      TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
-      TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+      ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+      d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+      B2Vector3D position(d.X(), d.Y(), generator.Uniform(-1, 1));
+      B2Vector3D momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
       trackFits.appendNew(position, momentum, cov6, charge, Const::muon, 0.5, 1.5, CDCValue, 16777215, 0);
       tracks[i]->setTrackFitResultIndex(Const::muon, i);
     }
@@ -784,8 +785,8 @@ namespace {
     StoreArray<KLMCluster> klmClusters;
 
     // add a TrackFitResult
-    TVector3 position(1.0, 0, 0);
-    TVector3 momentum(0, 1.0, 0);
+    B2Vector3D position(1.0, 0, 0);
+    B2Vector3D momentum(0, 1.0, 0);
     TMatrixDSym cov6(6);
     const int charge = 1;
     const float pValue = 0.5;

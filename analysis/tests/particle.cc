@@ -26,6 +26,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::ParticleCopy;
+using namespace ROOT::Math;
 
 namespace {
   /** Test fixture. */
@@ -67,27 +68,27 @@ namespace {
     {
       Particle p;
       EXPECT_EQ(0, p.getPDGCode());
-      EXPECT_TRUE(TLorentzVector(0, 0, 0, 0) == p.get4Vector());
+      EXPECT_TRUE(PxPyPzEVector(0, 0, 0, 0) == p.get4Vector());
       EXPECT_EQ(Particle::c_Undefined, p.getParticleSource());
     }
     {
-      TLorentzVector momentum(1, 2, 3, 4);
+      PxPyPzEVector momentum(1, 2, 3, 4);
       Particle p(momentum, 421);
       EXPECT_EQ(421, p.getPDGCode());
-      EXPECT_FLOAT_EQ(0.0, momentum.DeltaPhi(p.get4Vector()));
-      EXPECT_FLOAT_EQ(0.0, momentum.DeltaR(p.get4Vector()));
-      EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
-      EXPECT_FLOAT_EQ(momentum.Energy(), p.getEnergy());
+      EXPECT_FLOAT_EQ(0.0, momentum.phi() - p.get4Vector().phi());
+      EXPECT_FLOAT_EQ(0.0, momentum.Rapidity() - p.get4Vector().Rapidity());
+      EXPECT_FLOAT_EQ(momentum.energy(), p.get4Vector().energy());
+      EXPECT_FLOAT_EQ(momentum.energy(), p.getEnergy());
       EXPECT_FLOAT_EQ(momentum.M(), p.getMass());
       EXPECT_EQ(Particle::c_Undefined, p.getParticleSource());
     }
     {
-      TLorentzVector momentum(1, 2, 3, 4);
+      PxPyPzEVector momentum(1, 2, 3, 4);
       Particle p(momentum, 22, Particle::c_Unflavored, Particle::c_MCParticle, 123);
       EXPECT_EQ(22, p.getPDGCode());
-      EXPECT_FLOAT_EQ(0.0, momentum.DeltaPhi(p.get4Vector()));
-      EXPECT_FLOAT_EQ(0.0, momentum.DeltaR(p.get4Vector()));
-      EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
+      EXPECT_FLOAT_EQ(0.0, momentum.phi() - p.get4Vector().phi());
+      EXPECT_FLOAT_EQ(0.0, momentum.Rapidity() - p.get4Vector().Rapidity());
+      EXPECT_FLOAT_EQ(momentum.energy(), p.get4Vector().energy());
       EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
       EXPECT_EQ(Particle::c_MCParticle, p.getParticleSource());
       EXPECT_EQ(123u, p.getMdstArrayIndex());
@@ -115,7 +116,7 @@ namespace {
       // construction with EParticleSourceObject::V0 and the correct getters
       StoreArray<V0> v0s;
       V0* v0 = v0s.appendNew(V0());
-      TLorentzVector momentum(1, 2, 3, 4);
+      PxPyPzEVector momentum(1, 2, 3, 4);
       Particle p(momentum, 310, Particle::c_Unflavored, Particle::c_V0, 0);
       EXPECT_EQ(310, p.getPDGCode());
       EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
@@ -127,12 +128,12 @@ namespace {
 
   TEST_F(ParticleTest, Daughters)
   {
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 6;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
+      Particle d(PxPyPzEVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -140,9 +141,9 @@ namespace {
 
     const Particle& p = *(particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices));
     EXPECT_EQ(411, p.getPDGCode());
-    EXPECT_FLOAT_EQ(0.0, momentum.DeltaPhi(p.get4Vector()));
-    EXPECT_FLOAT_EQ(0.0, momentum.DeltaR(p.get4Vector()));
-    EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
+    EXPECT_FLOAT_EQ(0.0, momentum.phi() - p.get4Vector().phi());
+    EXPECT_FLOAT_EQ(0.0, momentum.Rapidity() - p.get4Vector().Rapidity());
+    EXPECT_FLOAT_EQ(momentum.energy(), p.get4Vector().energy());
     EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
     EXPECT_EQ(Particle::c_Composite, p.getParticleSource());
     EXPECT_EQ(0u, p.getMdstArrayIndex());
@@ -165,13 +166,13 @@ namespace {
 
   TEST_F(ParticleTest, DaughterProperties)
   {
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 6;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     std::vector<int> daughterProperties;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
+      Particle d(PxPyPzEVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -180,9 +181,9 @@ namespace {
 
     const Particle& p = *(particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices));
     EXPECT_EQ(411, p.getPDGCode());
-    EXPECT_FLOAT_EQ(0.0, momentum.DeltaPhi(p.get4Vector()));
-    EXPECT_FLOAT_EQ(0.0, momentum.DeltaR(p.get4Vector()));
-    EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
+    EXPECT_FLOAT_EQ(0.0, momentum.phi() - p.get4Vector().phi());
+    EXPECT_FLOAT_EQ(0.0, momentum.Rapidity() - p.get4Vector().Rapidity());
+    EXPECT_FLOAT_EQ(momentum.energy(), p.get4Vector().energy());
     EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
     EXPECT_EQ(Particle::c_Composite, p.getParticleSource());
     EXPECT_EQ(0u, p.getMdstArrayIndex());
@@ -217,13 +218,13 @@ namespace {
   TEST_F(ParticleTest, ForEachDaughters)
   {
     // setup a particle with some daughters and grand daughters
-    TLorentzVector momentum;
+    PxPyPzEVector momentum;
     const int nDaughters = 6;
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     int nGrandDaughters = 0;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
+      Particle d(PxPyPzEVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -311,35 +312,35 @@ namespace {
 
 
     // create some particles
-    Particle* T1Pion     = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track, 1));
-    Particle* T2Pion     = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -211, Particle::c_Flavored, Particle::c_Track, 2));
+    Particle* T1Pion     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track, 1));
+    Particle* T2Pion     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), -211, Particle::c_Flavored, Particle::c_Track, 2));
 
     // T1PionCopy is a copy of T1Pion (both are created from the same Track and are pions)
-    Particle* T1PionCopy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 211, Particle::c_Flavored, Particle::c_Track, 1));
+    Particle* T1PionCopy = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 211, Particle::c_Flavored, Particle::c_Track, 1));
 
     // T1Kaon is not a coy of T1Pion (both are created from the same Track, but are of different hypothesis)
-    Particle* T1Kaon     = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track, 1));
-    Particle* T2Kaon     = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track, 2));
-    Particle* T3Kaon     = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track, 3));
-    Particle* T4Kaon     = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track, 4));
+    Particle* T1Kaon     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track, 1));
+    Particle* T2Kaon     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track, 2));
+    Particle* T3Kaon     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track, 3));
+    Particle* T4Kaon     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track, 4));
 
     // T1Gamma
-    Particle* T1Gamma    = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
+    Particle* T1Gamma    = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
                                                         0));
     // T2Gamma
-    Particle* T2Gamma    = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
+    Particle* T2Gamma    = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
                                                         1));
 
     // T3Gamma
-    Particle* T3Gamma    = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
+    Particle* T3Gamma    = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
                                                         2));
     // T4KL
-    Particle* T4KL       = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), Const::Klong.getPDGCode(), Particle::c_Unflavored,
+    Particle* T4KL       = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), Const::Klong.getPDGCode(), Particle::c_Unflavored,
                                                         Particle::c_ECLCluster,
                                                         3));
     MCParticle* MC1Pion = mcparticles. appendNew(MCParticle());
     MC1Pion->setPDG(Const::pion.getPDGCode());
-    MC1Pion->set4Vector(TLorentzVector(0, 0, 0, 0));
+    MC1Pion->set4Vector(PxPyPzEVector(0, 0, 0, 0));
     Particle* T1PionFromMC     = particles.appendNew(Particle(MC1Pion));
 
     EXPECT_TRUE(T3Gamma->overlapsWith(T4KL));
@@ -360,23 +361,23 @@ namespace {
     EXPECT_FALSE(T1PionFromMC->isCopyOf(T1Pion, true));
     EXPECT_FALSE(T1Pion->isCopyOf(T1PionFromMC, true));
     // Construct composite particles
-    Particle* D0Pi1Pi2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
+    Particle* D0Pi1Pi2 = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 421));
     D0Pi1Pi2->appendDaughter(T1Pion);
     D0Pi1Pi2->appendDaughter(T2Pion);
 
-    Particle* D0Pi1Pi2Copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
+    Particle* D0Pi1Pi2Copy = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 421));
     D0Pi1Pi2Copy->appendDaughter(T1Pion);
     D0Pi1Pi2Copy->appendDaughter(T2Pion);
 
-    Particle* D0Pi1Pi2Copy2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
+    Particle* D0Pi1Pi2Copy2 = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 421));
     D0Pi1Pi2Copy2->appendDaughter(T1PionCopy);
     D0Pi1Pi2Copy2->appendDaughter(T2Pion);
 
-    Particle* D0K1K2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
+    Particle* D0K1K2 = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 421));
     D0K1K2->appendDaughter(T1Kaon);
     D0K1K2->appendDaughter(T2Kaon);
 
-    Particle* D0K1Pi2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
+    Particle* D0K1Pi2 = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 421));
     D0K1Pi2->appendDaughter(T1Kaon);
     D0K1Pi2->appendDaughter(T2Pion);
 
@@ -387,19 +388,19 @@ namespace {
     EXPECT_TRUE(D0Pi1Pi2Copy->isCopyOf(D0Pi1Pi2Copy2));
 
     // even more composite particles
-    Particle* D0K3K4 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
+    Particle* D0K3K4 = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 421));
     D0K3K4->appendDaughter(T3Kaon);
     D0K3K4->appendDaughter(T4Kaon);
 
-    Particle* B0_1 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 511));
+    Particle* B0_1 = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 511));
     B0_1->appendDaughter(D0Pi1Pi2);
     B0_1->appendDaughter(D0K3K4);
 
-    Particle* B0_2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 511));
+    Particle* B0_2 = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 511));
     B0_2->appendDaughter(D0Pi1Pi2Copy);
     B0_2->appendDaughter(D0K3K4);
 
-    Particle* B0_3 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 511));
+    Particle* B0_3 = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 511));
     B0_3->appendDaughter(D0Pi1Pi2Copy2);
     B0_3->appendDaughter(D0K3K4);
 
@@ -407,11 +408,11 @@ namespace {
     EXPECT_TRUE(B0_1->isCopyOf(B0_3));
     EXPECT_TRUE(B0_2->isCopyOf(B0_3));
 
-    Particle* B0_4 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 511));
+    Particle* B0_4 = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 511));
     B0_4->appendDaughter(D0Pi1Pi2);
     B0_4->appendDaughter(D0K1K2);
 
-    Particle* B0_5 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 511));
+    Particle* B0_5 = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 511));
     B0_5->appendDaughter(D0Pi1Pi2);
     B0_5->appendDaughter(T1Kaon);
     B0_5->appendDaughter(T2Kaon);
@@ -523,30 +524,30 @@ namespace {
     StoreArray<RestOfEvent> roes;
 
     // create some particles
-    Particle* T1Pion     = particles.appendNew(Particle(TLorentzVector(1, 1, 1, 1),  211, Particle::c_Flavored, Particle::c_Track, 1));
+    Particle* T1Pion     = particles.appendNew(Particle(PxPyPzEVector(1, 1, 1, 1),  211, Particle::c_Flavored, Particle::c_Track, 1));
     MCParticle* MC1      = mcparticles. appendNew(MCParticle());
     MC1->setPDG(1);
     T1Pion->addExtraInfo("test_var", 1.0);
     T1Pion->addRelationTo(MC1);
-    Particle* T2Kaon     = particles.appendNew(Particle(TLorentzVector(2, 2, 2, 2), -321, Particle::c_Flavored, Particle::c_Track, 2));
+    Particle* T2Kaon     = particles.appendNew(Particle(PxPyPzEVector(2, 2, 2, 2), -321, Particle::c_Flavored, Particle::c_Track, 2));
     MCParticle* MC2      = mcparticles. appendNew(MCParticle());
     MC1->setPDG(2);
     T2Kaon->addExtraInfo("test_var", 2.0);
     T2Kaon->addRelationTo(MC2);
-    Particle* T3Kaon     = particles.appendNew(Particle(TLorentzVector(3, 3, 3, 3),  321, Particle::c_Flavored, Particle::c_Track, 3));
+    Particle* T3Kaon     = particles.appendNew(Particle(PxPyPzEVector(3, 3, 3, 3),  321, Particle::c_Flavored, Particle::c_Track, 3));
     MCParticle* MC3      = mcparticles. appendNew(MCParticle());
     MC3->setPDG(3);
     T3Kaon->addExtraInfo("test_var", 3.0);
     T3Kaon->addRelationTo(MC3);
-    Particle* ROEPion    = particles.appendNew(Particle(TLorentzVector(3.5, 3.5, 3.5, 3.5),  211, Particle::c_Flavored,
+    Particle* ROEPion    = particles.appendNew(Particle(PxPyPzEVector(3.5, 3.5, 3.5, 3.5),  211, Particle::c_Flavored,
                                                         Particle::c_Track, 4));
 
     // Construct composite particles
-    Particle* D0KK = particles.appendNew(Particle(TLorentzVector(4, 4, 4, 4), 421));
+    Particle* D0KK = particles.appendNew(Particle(PxPyPzEVector(4, 4, 4, 4), 421));
     D0KK->appendDaughter(T2Kaon);
     D0KK->appendDaughter(T3Kaon);
 
-    Particle* B0 = particles.appendNew(Particle(TLorentzVector(5, 5, 5, 5), 511));
+    Particle* B0 = particles.appendNew(Particle(PxPyPzEVector(5, 5, 5, 5), 511));
     B0->appendDaughter(D0KK);
     B0->appendDaughter(T1Pion);
 

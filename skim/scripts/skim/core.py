@@ -96,6 +96,11 @@ class BaseSkim(ABC):
     Include Monte Carlo quantities in skim output.
     """
 
+    analysisGlobaltag = None
+    """
+    Analysis globaltag.
+    """
+
     @property
     @abstractmethod
     def __description__(self):
@@ -129,6 +134,7 @@ class BaseSkim(ABC):
         udstOutput=True,
         validation=False,
         mc=True,
+        analysisGlobaltag=None,
     ):
         """Initialise the BaseSkim class.
 
@@ -140,6 +146,7 @@ class BaseSkim(ABC):
             validation (bool): If True, build lists and write validation histograms
                 instead of writing uDSTs.
             mc (bool): If True, include MC quantities in output.
+            analysisGlobaltag (str): Analysis globaltag.
         """
         self.name = self.__class__.__name__
         self.OutputFileName = OutputFileName
@@ -147,6 +154,7 @@ class BaseSkim(ABC):
         self._udstOutput = udstOutput
         self._validation = validation
         self.mc = mc
+        self.analysisGlobaltag = analysisGlobaltag
 
         if self.NoisyModules is None:
             self.NoisyModules = []
@@ -499,6 +507,7 @@ class CombinedSkim(BaseSkim):
             CombinedSkimName="CombinedSkim",
             OutputFileName=None,
             mc=None,
+            analysisGlobaltag=None,
     ):
         """Initialise the CombinedSkim class.
 
@@ -515,6 +524,7 @@ class CombinedSkim(BaseSkim):
             OutputFileName (str): If mdstOutput=True, this option sets the name of the combined output file.
                 If mdstOutput=False, this option does nothing.
             mc (bool): If True, include MC quantities in output.
+            analysisGlobaltag (str): Analysis globaltag.
         """
 
         if NoisyModules is None:
@@ -546,6 +556,11 @@ class CombinedSkim(BaseSkim):
         if mc is not None:
             for skim in self:
                 skim.mc = mc
+
+        self.analysisGlobaltag = analysisGlobaltag
+        if analysisGlobaltag is not None:
+            for skim in self:
+                skim.analysisGlobaltag = analysisGlobaltag
 
         self._mdstOutput = mdstOutput
         self.mdst_kwargs = mdst_kwargs or {}

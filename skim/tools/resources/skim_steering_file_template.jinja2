@@ -40,10 +40,13 @@ path = b2.Path()
     skim = {{ skims[0] }}(
     {%- if not backward_compatibility -%}
     {%- if data -%}
-    mc=False
+    mc=False,
     {%- else -%}
-    mc=True
+    mc=True,
     {%- endif -%}
+    {%- endif -%}
+    {%- if analysis_globaltag -%}
+    analysisGlobaltag="{{ analysis_globaltag }}",
     {%- endif -%}
 ){%- if hints %}  # pass udstOutput=False to disable udstOutput{%- endif %}
 {% else -%}
@@ -56,10 +59,15 @@ path = b2.Path()
     mdstOutput=True,
     mdst_kwargs=dict(),
     {% endif -%}
+    {%- if not backward_compatibility -%}
     {%- if data -%}
     {{ "    " }}mc=False,
     {% else -%}
     {{ "    " }}mc=True,
+    {% endif -%}
+    {% endif -%}
+    {%- if analysis_globaltag -%}
+    {{ "    " }}analysisGlobaltag="{{ analysis_globaltag }}",
     {% endif -%}
     )
 {% endif %}

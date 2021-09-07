@@ -746,7 +746,7 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False,
-                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=True):
+                      loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
     loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
@@ -862,7 +862,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
 
 
 def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
-                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=True):
+                     loadPhotonsFromKLM=False, loadPhotonBeamBackgroundMVA=False):
     """
     Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -3550,13 +3550,13 @@ def getAnalysisGlobaltag(timeout=180) -> str:
         return analysis_tag
     # In case of issues with git, b2conditionsdb-recommend may take too much time.
     except subprocess.TimeoutExpired as te:
-        B2FATAL(f'A {te} exception was raised during the call of getAnalysisGlobalTag(). '
+        B2FATAL(f'A {te} exception was raised during the call of getAnalysisGlobaltag(). '
                 'The function took too much time to retrieve the requested information '
                 'from the versioning repository.\n'
                 'Plase try to re-run your job. In case of persistent failures, there may '
                 'be issues with the DESY collaborative services, so please contact the experts.')
     except subprocess.CalledProcessError as ce:
-        B2FATAL(f'A {ce} exception was raised during the call of getAnalysisGlobalTag(). '
+        B2FATAL(f'A {ce} exception was raised during the call of getAnalysisGlobaltag(). '
                 'Please try to re-run your job. In case of persistent failures, please contact '
                 'the experts.')
 

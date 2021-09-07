@@ -109,7 +109,8 @@ ma.reconstructDecay('Upsilon(4S):sig -> B+:tag B-:sigT', '', path=my_path)
 
 mytestmodule2 = b2.register_module('BtubeCreator')
 my_path.add_module(mytestmodule2,
-                   listName='Upsilon(4S):sig')
+                   listName='Upsilon(4S):sig',
+                   decayString='Upsilon(4S) -> ^B+ B-')
 vx.raveFit('B-:sigT', 0.0, constraint='btube', path=my_path)
 
 ma.calculateDistance('B-:sigT', 'B- -> ^J/psi K- pi+ pi-', "vertexbtube", path=my_path)
@@ -143,16 +144,14 @@ distance_vars = [
     'DistanceVector_Y',
     'DistanceVector_Z',
     'DistanceCovMatrixXX',
-    'DistanceCovMatrixX\
-Y',
+    'DistanceCovMatrixXY',
     'DistanceCovMatrixXZ',
     'DistanceCovMatrixYX',
     'DistanceCovMatrixYY',
     'DistanceCovMatrixYZ',
     'DistanceCovMatrixZX',
     'DistanceCovMatrixZY',
-    'Distan\
-ceCovMatrixZZ']
+    'DistanceCovMatrixZZ']
 Distance_vars_sig = vu.create_aliases_for_selected(
     list_of_variables=distance_vars,
     decay_string='Upsilon(4S):sig -> B+:tag ^B-:sigT',

@@ -15,6 +15,8 @@
 #include <framework/core/Environment.h>
 #include <analysis/VariableManager/Manager.h>
 
+#include <Math/Vector4D.h>
+
 #include <map>
 
 using namespace Belle2;
@@ -116,7 +118,7 @@ void EnergyBiasCorrectionModule::setEnergyScalingFactor(Particle* particle)
       pz += daughter->getPz();
       E  += daughter->getEnergy();
     }
-    const TLorentzVector vec(px, py, pz, E);
+    const ROOT::Math::PxPyPzEVector vec(px, py, pz, E);
     particle->set4Vector(vec);
   } else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster
              && particle->getPDGCode() == Const::photon.getPDGCode()) {

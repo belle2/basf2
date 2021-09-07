@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 #include <framework/core/Module.h>
 
@@ -53,7 +53,7 @@ namespace Belle2 {
 
 
     /**
-     * Turns the ParticleLists provided as inputs in std::vectors of TLorentzVector and TVector3,
+     * Turns the ParticleLists provided as inputs in std::vectors of PxPyPzEVector and B2Vector3D,
      * boosting them in the CMS frame.
      */
     int parseParticleLists(std::vector<std::string>);
@@ -64,8 +64,10 @@ namespace Belle2 {
     StoreObjPtr<EventShapeContainer> m_eventShapeContainer; /**< event shape container object pointer */
 
     std::vector<std::string> m_particleListNames;  /**< Names of the ParticleLists (inputs). */
-    std::vector<TLorentzVector> m_p4List; /**< vector containing all the 4-momenta of the particles contained in the input lists. */
-    std::vector<TVector3> m_p3List; /**< vector containing all the 3-momenta of the particles contained in the input lists. */
+    std::vector<ROOT::Math::PxPyPzEVector>
+    m_p4List; /**< vector containing all the 4-momenta of the particles contained in the input lists. */
+    std::vector<ROOT::Math::XYZVector>
+    m_p3List; /**< vector containing all the 3-momenta of the particles contained in the input lists. */
 
     bool m_enableThrust = true; /**< Enables the calculation of thust-related quantities.  */
     bool m_enableCollisionAxis = true; /**< Enables the calculation of the quantities related to the collision axis.  */

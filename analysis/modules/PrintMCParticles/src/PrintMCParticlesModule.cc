@@ -10,12 +10,15 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 
+#include <framework/geometry/B2Vector3.h>
+
 #include <framework/logging/LogConnectionConsole.h>
 
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <TDatabasePDG.h>
+#include <Math/Vector3D.h>
 
 using namespace Belle2;
 
@@ -201,12 +204,12 @@ void PrintMCParticlesModule::printTree(const std::vector<MCParticle*>& particles
       if (not mc->hasStatus(MCParticle::c_LeftDetector)) m_output << boost::format(" lifetime=%.3g") % mc->getLifetime();
     }
     if (m_showMomenta) {
-      const TVector3& p = mc->getMomentum();
+      const B2Vector3F& p = mc->getMomentum();
       m_output << propIndent;
       m_output << boost::format("p=(%.3g, %.3g, %.3g) |p|=%.3g") % p.X() % p.Y() % p.Z() % p.Mag();
     }
     if (m_showVertices) {
-      const TVector3& v = mc->getVertex();
+      const ROOT::Math::XYZVector& v = mc->getVertex();
       m_output << propIndent;
       m_output << boost::format("production vertex=(%.3g, %.3g, %.3g), time=%.3g") % v.X() % v.Y() % v.Z() % mc->getProductionTime();
     }

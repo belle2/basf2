@@ -12,9 +12,6 @@
 #include <analysis/variables/MCTruthVariables.h>
 #include <analysis/variables/Variables.h>
 
-//Root includes
-#include "TVector3.h"
-
 using namespace Belle2;
 using namespace CurlTagger;
 
@@ -39,7 +36,7 @@ void SelectorMVA::updateVariables(Particle* iPart, Particle* jPart)
     m_IsCurl = (Variable::genParticleIndex(iPart) == Variable::genParticleIndex(jPart) ? 1 : 0);
   }
   m_ChargeProduct = iPart->getCharge() * jPart->getCharge();
-  m_PPhi  = iPart->getMomentum().Angle(jPart->getMomentum());
+  m_PPhi  = acos(iPart->getMomentum().Unit().Dot(jPart->getMomentum().Unit()));
   m_PtDiffEW = abs(Variable::particlePt(iPart) - Variable::particlePt(jPart)) / (Variable::particlePtErr(
                  iPart) + Variable::particlePtErr(jPart));
   m_PzDiffEW = abs(Variable::particlePz(iPart) - Variable::particlePz(jPart)) / (Variable::particlePzErr(

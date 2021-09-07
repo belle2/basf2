@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 
 #include <framework/core/Module.h>
 
@@ -51,18 +52,18 @@ namespace Belle2 {
     std::vector<std::string> m_particleLists;  /**< Name of the ParticleList */
 
     /** A vector of the particles' 4-momenta in lab*/
-    std::vector<TLorentzVector> m_particleMomentumList;
+    std::vector<ROOT::Math::PxPyPzEVector> m_particleMomentumList;
     /** A vector of the particles' 4-momenta in the CMS */
-    std::vector<TLorentzVector> m_particleMomentumListCMS;
+    std::vector<ROOT::Math::PxPyPzEVector> m_particleMomentumListCMS;
     /** A vector of the photons' 4-momenta in the lab */
-    std::vector<TLorentzVector> m_photonsMomentumList;
+    std::vector<ROOT::Math::PxPyPzEVector> m_photonsMomentumList;
     /** Fill the lists of particles' momenta */
     void getParticleMomentumLists(std::vector<std::string> particleLists);
 
     /** Calculate the missing momentum in the lab system for this event */
-    TVector3 getMissingMomentum();
+    ROOT::Math::XYZVector getMissingMomentum();
     /** Calculate the missing momentum in the CMS for this event */
-    TVector3 getMissingMomentumCMS();
+    ROOT::Math::XYZVector getMissingMomentumCMS();
     /** Calculate the missing energy in the CMS for this event */
     float getMissingEnergyCMS();
     /** Calculate the visible energy in the CMS for this event */

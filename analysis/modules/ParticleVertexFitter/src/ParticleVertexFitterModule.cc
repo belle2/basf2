@@ -79,7 +79,7 @@ namespace Belle2 {
     m_plist.isRequired(m_listName);
 
     // magnetic field
-    m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
+    m_Bfield = BFieldManager::getFieldInTesla(B2Vector3D(0, 0, 0)).Z();
 
     // RAVE setup
     if (m_vertexFitter == "Rave")
@@ -109,7 +109,7 @@ namespace Belle2 {
   void ParticleVertexFitterModule::beginRun()
   {
     //TODO: set magnetic field for each run
-    //m_Bfield = BFieldMap::Instance().getBField(TVector3(0,0,0)).Z();
+    //m_Bfield = BFieldMap::Instance().getBField(B2Vector3D(0,0,0)).Z();
     //TODO: set IP spot size for each run
   }
 
@@ -130,7 +130,7 @@ namespace Belle2 {
       }
     }
     if (m_withConstraint == "iptubecut") {  // for development purpose only
-      m_BeamSpotCenter = TVector3(0.001, 0., .013);
+      m_BeamSpotCenter = B2Vector3D(0.001, 0., .013);
       findConstraintBoost(0.03);
     }
     if ((m_vertexFitter == "Rave") && (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"
@@ -147,7 +147,7 @@ namespace Belle2 {
       }
 
       if (m_withConstraint == "mother") {
-        m_BeamSpotCenter = particle->getVertex();
+        m_BeamSpotCenter = B2Vector3D(particle->getVertex().x(), particle->getVertex().y(), particle->getVertex().z());
         m_beamSpotCov = particle->getVertexErrorMatrix();
       }
 
@@ -352,7 +352,7 @@ namespace Belle2 {
     TMatrixFSym g1ErrMatrix = g1Orig->getMomentumVertexErrorMatrix();
     TMatrixFSym g2ErrMatrix = g2Orig->getMomentumVertexErrorMatrix();
 
-    TVector3 pos(kv.getVertex().x(), kv.getVertex().y(), kv.getVertex().z());
+    ROOT::Math::XYZVector pos(kv.getVertex().x(), kv.getVertex().y(), kv.getVertex().z());
     CLHEP::HepSymMatrix posErrorMatrix = kv.getVertexError();
 
     TMatrixFSym errMatrix(3);
@@ -708,9 +708,9 @@ namespace Belle2 {
 
       for (unsigned iChild = 0; iChild < track_count; iChild++) {
         daughters[iChild]->set4Vector(
-          CLHEPToROOT::getTLorentzVector(kv.getTrackMomentum(iChild)));
+          CLHEPToROOT::getLorentzVector(kv.getTrackMomentum(iChild)));
         daughters[iChild]->setVertex(
-          CLHEPToROOT::getTVector3(kv.getTrackPosition(iChild)));
+          CLHEPToROOT::getXYZVector(kv.getTrackPosition(iChild)));
         daughters[iChild]->setMomentumVertexErrorMatrix(
           CLHEPToROOT::getTMatrixFSym(kv.getTrackError(iChild)));
       }
@@ -738,9 +738,9 @@ namespace Belle2 {
 
       for (unsigned iChild = 0; iChild < track_count; iChild++) {
         daughters[iChild]->set4Vector(
-          CLHEPToROOT::getTLorentzVector(kmv.getTrackMomentum(iChild)));
+          CLHEPToROOT::getLorentzVector(kmv.getTrackMomentum(iChild)));
         daughters[iChild]->setVertex(
-          CLHEPToROOT::getTVector3(kmv.getTrackPosition(iChild)));
+          CLHEPToROOT::getXYZVector(kmv.getTrackPosition(iChild)));
         daughters[iChild]->setMomentumVertexErrorMatrix(
           CLHEPToROOT::getTMatrixFSym(kmv.getTrackError(iChild)));
       }
@@ -770,9 +770,9 @@ namespace Belle2 {
 
       for (unsigned iChild = 0; iChild < track_count; iChild++) {
         daughters[iChild]->set4Vector(
-          CLHEPToROOT::getTLorentzVector(kmpv.getTrackMomentum(iChild)));
+          CLHEPToROOT::getLorentzVector(kmpv.getTrackMomentum(iChild)));
         daughters[iChild]->setVertex(
-          CLHEPToROOT::getTVector3(kmpv.getTrackPosition(iChild)));
+          CLHEPToROOT::getXYZVector(kmpv.getTrackPosition(iChild)));
         daughters[iChild]->setMomentumVertexErrorMatrix(
           CLHEPToROOT::getTMatrixFSym(kmpv.getTrackError(iChild)));
       }
@@ -801,9 +801,9 @@ namespace Belle2 {
 
       for (unsigned iChild = 0; iChild < track_count; iChild++) {
         daughters[iChild]->set4Vector(
-          CLHEPToROOT::getTLorentzVector(km.getTrackMomentum(iChild)));
+          CLHEPToROOT::getLorentzVector(km.getTrackMomentum(iChild)));
         daughters[iChild]->setVertex(
-          CLHEPToROOT::getTVector3(km.getTrackPosition(iChild)));
+          CLHEPToROOT::getXYZVector(km.getTrackPosition(iChild)));
         daughters[iChild]->setMomentumVertexErrorMatrix(
           CLHEPToROOT::getTMatrixFSym(km.getTrackError(iChild)));
       }
@@ -852,15 +852,15 @@ namespace Belle2 {
         return false;
 
       for (unsigned iDaug = 0; iDaug < allparticles.size(); iDaug++) {
-        TLorentzVector childMoms;
-        TVector3 childPoss;
+        ROOT::Math::PxPyPzEVector childMoms;
+        ROOT::Math::XYZVector childPoss;
         TMatrixFSym childErrMatrixs(7);
         for (unsigned int iChild : pars[iDaug]) {
           childMoms = childMoms +
-                      CLHEPToROOT::getTLorentzVector(
+                      CLHEPToROOT::getLorentzVector(
                         kf.getTrackMomentum(iChild));
           childPoss = childPoss +
-                      CLHEPToROOT::getTVector3(
+                      CLHEPToROOT::getXYZVector(
                         kf.getTrackPosition(iChild));
           TMatrixFSym childErrMatrix =
             CLHEPToROOT::getTMatrixFSym(kf.getTrackError(iChild));
@@ -914,15 +914,15 @@ namespace Belle2 {
         return false;
 
       for (unsigned iDaug = 0; iDaug < allparticles.size(); iDaug++) {
-        TLorentzVector childMoms;
-        TVector3 childPoss;
+        ROOT::Math::PxPyPzEVector childMoms;
+        ROOT::Math::XYZVector childPoss;
         TMatrixFSym childErrMatrixs(7);
         for (unsigned int iChild : pars[iDaug]) {
           childMoms = childMoms +
-                      CLHEPToROOT::getTLorentzVector(
+                      CLHEPToROOT::getLorentzVector(
                         kf.getTrackMomentum(iChild));
           childPoss = childPoss +
-                      CLHEPToROOT::getTVector3(
+                      CLHEPToROOT::getXYZVector(
                         kf.getTrackPosition(iChild));
           TMatrixFSym childErrMatrix =
             CLHEPToROOT::getTMatrixFSym(kf.getTrackError(iChild));
@@ -1010,7 +1010,7 @@ namespace Belle2 {
         }
 
 
-        TVector3 pos;
+        ROOT::Math::XYZVector pos;
         TMatrixDSym RerrMatrix(3);
         int nvert = 0;
 
@@ -1024,7 +1024,7 @@ namespace Belle2 {
               pos = rsg.getPos(0);
               RerrMatrix = rsg.getCov(0);
               double prob = rsg.getPValue(0);
-              TLorentzVector mom(mother->getMomentum(), mother->getEnergy());
+              ROOT::Math::PxPyPzEVector mom(mother->get4Vector());
               TMatrixDSym errMatrix(7);
               for (int i = 0; i < 7; i++) {
                 for (int j = 0; j < 7; j++) {
@@ -1059,7 +1059,7 @@ namespace Belle2 {
           pos = rsf.getPos();
           RerrMatrix = rsf.getVertexErrorMatrix();
           double prob = rsf.getPValue();
-          TLorentzVector mom(mother->getMomentum(), mother->getEnergy());
+          ROOT::Math::PxPyPzEVector mom(mother->get4Vector());
           TMatrixDSym errMatrix(7);
           for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 7; j++) {
@@ -1072,7 +1072,7 @@ namespace Belle2 {
 
 
         if (mothSel && nTrk > 1) {
-          analysis::RaveSetup::getInstance()->setBeamSpot(pos, RerrMatrix);
+          analysis::RaveSetup::getInstance()->setBeamSpot(B2Vector3D(pos.x(), pos.y(), pos.z()), RerrMatrix);
           rf.addMother(mother);
           int nKfit = rf.fit();
           rf.updateMother();
@@ -1201,11 +1201,11 @@ namespace Belle2 {
     }
 
     PCmsLabTransform T;
-    TLorentzVector iptube_mom = T.getBeamFourMomentum();
+    ROOT::Math::PxPyPzEVector iptube_mom = T.getBeamFourMomentum();
 
     kv.setIpTubeProfile(
       ROOTToCLHEP::getHepLorentzVector(iptube_mom),
-      ROOTToCLHEP::getPoint3D(m_BeamSpotCenter),
+      ROOTToCLHEP::getPoint3DFromB2Vector(m_BeamSpotCenter),
       err,
       0.);
   }
@@ -1214,8 +1214,8 @@ namespace Belle2 {
   {
     PCmsLabTransform T;
 
-    TVector3 boost = T.getBoostVector();
-    TVector3 boostDir = boost.Unit();
+    B2Vector3D boost = T.getBoostVector();
+    B2Vector3D boostDir = boost.Unit();
 
     TMatrixDSym beamSpotCov = m_beamSpotDB->getCovVertex();
     beamSpotCov(2, 2) = cut * cut;

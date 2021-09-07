@@ -15,6 +15,7 @@
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/B2Vector3.h>
 
+#include <Math/Vector3D.h>
 #include <vector>
 
 using namespace Belle2;
@@ -129,7 +130,7 @@ void HelixErrorScalerModule::event()
       Particle* newDauP = getChargedWithScaledError(dauP);
       Particle* newDauM = getChargedWithScaledError(dauM);
 
-      TLorentzVector v0Momentum = newDauP->get4Vector() + newDauM->get4Vector();
+      ROOT::Math::PxPyPzEVector v0Momentum = newDauP->get4Vector() + newDauM->get4Vector();
       Particle new_v0(v0Momentum, m_pdgCode, particle->getFlavorType(),
                       Particle::EParticleSourceObject::c_V0, particle->getMdstArrayIndex());
       new_v0.appendDaughter(newDauP, false);

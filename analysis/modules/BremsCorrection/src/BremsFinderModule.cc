@@ -252,7 +252,7 @@ namespace Belle2 {
       } // Closes for loop on brem clusters
 
       //The 4-momentum of the new lepton in the output particle list
-      TLorentzVector new4Vec = lepton->get4Vector();
+      ROOT::Math::PxPyPzEVector new4Vec = lepton->get4Vector();
 
       //Sort weight-particle pairs by weight. Smaller weights go first
       std::sort(selectedGammas.begin(), selectedGammas.end());

@@ -13,7 +13,6 @@
 
 #include <framework/gearbox/Const.h>
 
-#include <TVector3.h>
 #include <TDatabasePDG.h>
 
 using namespace Belle2;
@@ -111,7 +110,7 @@ void InclusiveDstarReconstructionModule::event()
 
     if (!m_cut_pion->check(pion)) continue;
 
-    TLorentzVector dstar_four_vector = estimateDstarFourMomentum(pion);
+    ROOT::Math::PxPyPzEVector dstar_four_vector = estimateDstarFourMomentum(pion);
 
     if (isnan(dstar_four_vector.P())) continue;
 
@@ -154,17 +153,18 @@ void InclusiveDstarReconstructionModule::event()
   }
 }
 
-TLorentzVector InclusiveDstarReconstructionModule::estimateDstarFourMomentum(const Particle* pion)
+ROOT::Math::PxPyPzEVector InclusiveDstarReconstructionModule::estimateDstarFourMomentum(const Particle* pion)
 {
   // estimate D* energy and absolute momentum using the slow pion energy
   double energy_dstar = pion->getEnergy() * m_dstar_pdg_mass / (m_dstar_pdg_mass - m_d_pdg_mass);
   double abs_momentum_dstar = sqrt(energy_dstar * energy_dstar - m_dstar_pdg_mass * m_dstar_pdg_mass);
 
   // dstar momentum approximated collinear to pion direction
-  TVector3 momentum_vector_pion =  pion->getMomentum();
-  TVector3 momentum_vec_dstar = abs_momentum_dstar * momentum_vector_pion.Unit();
+  ROOT::Math::PxPyPzEVector vector_pion = pion->get4Vector();
+  ROOT::Math::PxPyPzEVector vec_dstar = abs_momentum_dstar * vector_pion / vector_pion.P();
+  vec_dstar.SetE(energy_dstar);
 
-  return TLorentzVector(momentum_vec_dstar, energy_dstar);
+  return vec_dstar;
 }
 
 bool InclusiveDstarReconstructionModule::pionCompatibleWithDstar(int pion_pdg_code)

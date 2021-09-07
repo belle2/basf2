@@ -168,7 +168,7 @@ namespace Belle2 {
       //    - p(mother) = p(daughter_0) - Sum_i p(daughter_i) (where i > 0)
       if (m_recoilParticleType == 1) {
         PCmsLabTransform T;
-        TLorentzVector recoilMomentum = T.getBeamFourMomentum() - particle.get4Vector();
+        ROOT::Math::PxPyPzEVector recoilMomentum = T.getBeamFourMomentum() - particle.get4Vector();
         particle.set4Vector(recoilMomentum);
       } else if (m_recoilParticleType == 2) {
         const std::vector<Particle*> daughters = particle.getDaughters();
@@ -176,12 +176,12 @@ namespace Belle2 {
         if (daughters.size() < 2)
           B2FATAL("Reconstructing particle as a daughter of a recoil with less then 2 daughters!");
 
-        TLorentzVector pDaughters;
+        ROOT::Math::PxPyPzEVector pDaughters;
         for (unsigned i = 1; i < daughters.size(); i++) {
           pDaughters += daughters[i]->get4Vector();
         }
 
-        TLorentzVector mom = daughters[0]->get4Vector() - pDaughters;
+        ROOT::Math::PxPyPzEVector mom = daughters[0]->get4Vector() - pDaughters;
         particle.set4Vector(mom);
       }
 

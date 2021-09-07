@@ -9,6 +9,8 @@
 #include <analysis/modules/AllParticleCombiner/AllParticleCombinerModule.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
+#include <Math/Vector4D.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -111,7 +113,7 @@ void AllParticleCombinerModule::event()
     }
   }
 
-  const TLorentzVector vec(px, py, pz, E);
+  const ROOT::Math::PxPyPzEVector vec(px, py, pz, E);
 
   Particle combinedParticle = Particle(vec, m_pdgCode, m_isSelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored,
                                        daughterIndices, m_particles.getPtr());

@@ -14,7 +14,7 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <analysis/utility/ParticleCopy.h>
 #include <framework/geometry/B2Vector3.h>
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 #include <vector>
 #include <cmath>
 
@@ -70,7 +70,7 @@ void NeutralHadron4MomentumCalculatorModule::event()
   for (unsigned i = 0; i < n; i++) {
     Particle* particle = m_plist->getParticle(i);
     std::vector<Particle*> daughters = particle->getDaughters();
-    TLorentzVector others4Momentum = TLorentzVector();
+    ROOT::Math::PxPyPzEVector others4Momentum;
     for (int j = 0; j < m_decayDescriptor.getNDaughters(); j++) {
       if (j != m_iNeutral) {
         others4Momentum += daughters[j]->get4Vector();
@@ -88,8 +88,8 @@ void NeutralHadron4MomentumCalculatorModule::event()
     } else {
       B2ERROR("Your neutral particle doesn't originate from ECLCluster nor KLMCluster.");
     }
-    double a = others4Momentum.Vect() * neutralDirection;
-    double b = (std::pow(particle->getPDGMass(), 2) - std::pow(neutral->getMass(), 2) - others4Momentum.Mag2()) / 2.;
+    double a = others4Momentum.Vect().Dot(neutralDirection);
+    double b = (std::pow(particle->getPDGMass(), 2) - std::pow(neutral->getMass(), 2) - others4Momentum.mag2()) / 2.;
     double c = others4Momentum.E();
     double d = std::pow(neutral->getMass(), 2);
     double D = (a * a - c * c) * d + b * b;
@@ -99,13 +99,13 @@ void NeutralHadron4MomentumCalculatorModule::event()
       double neutralPy = neutralP * neutralDirection.y();
       double neutralPz = neutralP * neutralDirection.z();
       double neutralE = std::sqrt(neutralP * neutralP + d);
-      const TLorentzVector& newNeutral4Momentum = TLorentzVector(neutralPx, neutralPy, neutralPz, neutralE);
+      const ROOT::Math::PxPyPzEVector newNeutral4Momentum(neutralPx, neutralPy, neutralPz, neutralE);
 
       double motherPx = newNeutral4Momentum.Px() + others4Momentum.Px();
       double motherPy = newNeutral4Momentum.Py() + others4Momentum.Py();
       double motherPz = newNeutral4Momentum.Pz() + others4Momentum.Pz();
       double motherE = newNeutral4Momentum.E() + others4Momentum.E();
-      const TLorentzVector& newMother4Momentum = TLorentzVector(motherPx, motherPy, motherPz, motherE);
+      const ROOT::Math::PxPyPzEVector newMother4Momentum(motherPx, motherPy, motherPz, motherE);
 
       neutral->set4Vector(newNeutral4Momentum);
       particle->set4Vector(newMother4Momentum);

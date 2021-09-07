@@ -314,13 +314,12 @@ namespace Belle2 {
       // Create a particle from missing momentum
       auto* signalSideParticle = roe->getRelatedFrom<Particle>();
       PCmsLabTransform T;
-      TLorentzVector boost4Vector = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector boost4Vector = T.getBeamFourMomentum();
 
-      TLorentzVector signal4Vector = signalSideParticle->get4Vector();
-      TLorentzVector roe4Vector = roe->get4Vector(m_roeMaskName);
-      TLorentzVector missing4Vector;
-      missing4Vector.SetVect(boost4Vector.Vect() - (signal4Vector.Vect() + roe4Vector.Vect()));
-      missing4Vector.SetE(missing4Vector.Vect().Mag());
+      ROOT::Math::PxPyPzEVector signal4Vector = signalSideParticle->get4Vector();
+      ROOT::Math::PxPyPzEVector roe4Vector = roe->get4Vector(m_roeMaskName);
+      ROOT::Math::PxPyPzEVector missing4Vector = boost4Vector - signal4Vector - roe4Vector;
+      missing4Vector.SetE(missing4Vector.P());
       auto isFlavored = (isSelfConjugatedParticle) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
       newPart = m_particles.appendNew(missing4Vector, pdgCode, isFlavored, Particle::EParticleSourceObject::c_Undefined, mdstIndex);
 
@@ -451,7 +450,7 @@ namespace Belle2 {
         newDaugM->addRelationTo(v0TrackFitResults.second);
 
         // sum the 4-momenta of the daughters and construct a particle object
-        TLorentzVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
+        ROOT::Math::PxPyPzEVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
         Particle v0P(v0Momentum, v0Type.getPDGCode(), v0FlavorType,
                      Particle::EParticleSourceObject::c_V0, v0->getArrayIndex());
 

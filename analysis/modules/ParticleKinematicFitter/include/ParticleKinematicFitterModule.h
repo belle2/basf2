@@ -32,7 +32,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // ROOT
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 #include <TMatrixFSym.h>
 
 // CLHEOP
@@ -168,7 +168,7 @@ namespace Belle2 {
       /**
        * Get constraints (at whatever stage before/after fitting)
        */
-      TLorentzVector getTLorentzVectorConstraints();
+      ROOT::Math::PxPyPzEVector getLorentzVectorConstraints();
 
 
       /**
@@ -242,9 +242,9 @@ namespace Belle2 {
 
       /**
        * @param fitobject reference to OrcaKinFit fit object
-       * Returns particle's 4-momentum as a TLorentzVector
+       * Returns particle's 4-momentum as a PxPyPzEVector
        */
-      TLorentzVector getTLorentzVector(ParticleFitObject* fitobject);
+      ROOT::Math::PxPyPzEVector getLorentzVector(ParticleFitObject* fitobject);
 
       /**
        * Returns fit object error on the parameter ilocal

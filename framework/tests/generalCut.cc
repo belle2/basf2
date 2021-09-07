@@ -262,6 +262,9 @@ namespace {
     a = MockGeneralCut::compile("1 < 2 < 3");
     EXPECT_EQ(a->decompile(), "1 < 2 < 3");
 
+    a = MockGeneralCut::compile("( 1 + 3 ) * 2");
+    EXPECT_EQ(a->decompile(), "( 1 + 3 ) * 2");
+
     a = MockGeneralCut::compile("[1 < 2 < 3] or [[ 2 < 4] and [  mocking_variable < 4.4231 and [1 < 3 and 4 < mocking_variable]]]");
     EXPECT_EQ(a->decompile(),
               "[1 < 2 < 3] or [[2 < 4] and [mocking_variable < 4.4231 and [1 < 3 and 4 < mocking_variable]]]");

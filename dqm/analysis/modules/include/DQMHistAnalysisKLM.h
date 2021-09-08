@@ -132,6 +132,9 @@ namespace Belle2 {
     /** Threshold for hot channels. */
     int m_ThresholdForHot;
 
+    /** Threshold for log scale. */
+    int m_ThresholdForLog;
+
     /** Minimal number of hits for flagging. */
     int m_MinHitsForFlagging;
 

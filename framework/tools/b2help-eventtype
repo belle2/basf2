@@ -6,7 +6,6 @@ Utility to search for decfiles which include given decay string.
 NOTE : Currently this script only work on full release but not light release, since there is not the decfile directory.
        Charge conjugate modes could not be found.
        Sub-decay might not be appropriately treated.
-       Unnecessary file (match_file.txt) is created.
 """
 
 import sys
@@ -21,7 +20,7 @@ def get_argument_parser():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("decay_string", nargs='?', default=None,
-                        help="Decay string to search for the EventType and a decfile")
+                        help="Decay string to search for the EventType and decfiles")
     return parser
 
 
@@ -38,43 +37,32 @@ if __name__ == "__main__":
     import subprocess
     import pdg
 
-    mother_name = d.getMother().getName()
-    if not pdg.search(mother_name):
-        print("No particles matching the mother could be found")
-        sys.exit(1)
-
     release_dir = ''
     if 'BELLE2_RELEASE_DIR' in os.environ:
         release_dir = os.environ['BELLE2_RELEASE_DIR']
     if 'BELLE2_LOCAL_DIR' in os.environ:
         release_dir = os.environ['BELLE2_LOCAL_DIR']
 
-    match_file = 'match_file.txt'
-    command = 'grep -rl ' + mother_name + ' ' + release_dir + '/decfiles/dec/ > ' + match_file
-    subprocess.call(command, shell=True)
+    mother_name = d.getMother().getName()
 
-    matched_list = []
-    with open(match_file, 'r') as f:
-        matched_list = f.read().splitlines()
-
+    proc_mother = subprocess.run(['grep', '-rl', mother_name, release_dir+'/decfiles/dec/'], stdout=subprocess.PIPE)
+    output_mother = proc_mother.stdout.decode('utf8')
+    
+    matched_list = output_mother.split('\n')
+    
     n_daughters = d.getNDaughters()
-
     for i in range(n_daughters):
-        if not pdg.search(d.getDaughter(i).getMother().getName()):
-            print("No particles matching " + str(i) + "th daughter could be found")
-            sys.exit(1)
 
         daughter_name = d.getDaughter(i).getMother().getName()
 
-        command = 'grep -rl ' + daughter_name + ' ' + release_dir + '/decfiles/dec/ > ' + match_file
-        subprocess.call(command, shell=True)
+        proc_daughter = subprocess.run(['grep', '-rl', daughter_name, release_dir+'/decfiles/dec/'], stdout=subprocess.PIPE)    
+        output_daughter = proc_daughter.stdout.decode('utf8')
 
-        with open(match_file, 'r') as f:
-            tmp_list = f.read().splitlines()
+        matched_list_daughter = output_daughter.split('\n')
 
         new_list = []
         for line in matched_list:
-            if line in tmp_list:
+            if line in matched_list_daughter:
                 new_list.append(line)
 
         matched_list = new_list

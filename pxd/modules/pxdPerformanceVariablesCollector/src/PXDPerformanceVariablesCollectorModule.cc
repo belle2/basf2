@@ -165,13 +165,13 @@ void PXDPerformanceVariablesCollectorModule::prepare() // Do your initialise() s
       }
     }
 
-  auto hTotalHitsLayer1  = new TH2F("hTotalHitsLayer1",  "Total number of hits from layer 1;#phi;z [cm]",  730, -M_PI, M_PI, 400,
+  auto hTotalHitsLayer1  = new TH2F("hTotalHitsLayer1",  "Total number of hits from layer 1;#phi;z [cm]",  729, -M_PI, M_PI, 400,
                                     -3.2, 6.2);
-  auto hPassedHitsLayer1 = new TH2F("hPassedHitsLayer1", "Passed number of hits from layer 1;#phi;z [cm]", 730, -M_PI, M_PI, 400,
+  auto hPassedHitsLayer1 = new TH2F("hPassedHitsLayer1", "Passed number of hits from layer 1;#phi;z [cm]", 729, -M_PI, M_PI, 400,
                                     -3.2, 6.2);
-  auto hTotalHitsLayer2  = new TH2F("hTotalHitsLayer2",  "Total number of hits from layer 2;#phi;z [cm]",  128,   1.4,  2.5, 400,
+  auto hTotalHitsLayer2  = new TH2F("hTotalHitsLayer2",  "Total number of hits from layer 2;#phi;z [cm]",  729, -M_PI, M_PI, 400,
                                     -4.2, 8.2);
-  auto hPassedHitsLayer2 = new TH2F("hPassedHitsLayer2", "Passed number of hits from layer 2;#phi;z [cm]", 128,   1.4,  2.5, 400,
+  auto hPassedHitsLayer2 = new TH2F("hPassedHitsLayer2", "Passed number of hits from layer 2;#phi;z [cm]", 729, -M_PI, M_PI, 400,
                                     -4.2, 8.2);
   registerObject<TH2F>("hTotalHitsLayer1", hTotalHitsLayer1);
   registerObject<TH2F>("hPassedHitsLayer1", hPassedHitsLayer1);
@@ -179,7 +179,7 @@ void PXDPerformanceVariablesCollectorModule::prepare() // Do your initialise() s
   registerObject<TH2F>("hPassedHitsLayer2", hPassedHitsLayer2);
 
   // trees for correctd d0 and z0 to the IP
-  auto treeD0Z0 = new TTree("tree_d0z0", "TTree of corrected d0 and z0");
+  auto treeD0Z0 = new TTree("tree_d0z0", "TTree of delta d0 (z0) over sqrt(2)");
   treeD0Z0->Branch<float>("d0", &m_deltaD0oSqrt2);
   treeD0Z0->Branch<float>("z0", &m_deltaZ0oSqrt2);
   registerObject<TTree>("tree_d0z0", treeD0Z0);

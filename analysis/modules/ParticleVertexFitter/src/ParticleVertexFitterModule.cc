@@ -27,6 +27,10 @@
 // Magnetic field
 #include <framework/geometry/BFieldManager.h>
 
+#include <TVector.h>
+#include <TRotation.h>
+
+
 #include <TMath.h>
 
 using namespace std;
@@ -428,6 +432,17 @@ namespace Belle2 {
     int err = kv.doFit();
     if (err != 0)
       return false;
+
+    double chi2_track = getChi2TracksLBoost(kv);
+    unsigned track_count = kv.getTrackCount();
+    bool haschi2_track = mother->hasExtraInfo("chiSquared_trackL");
+    if (haschi2_track) {
+      mother->setExtraInfo("chiSquared_trackL", chi2_track);
+      mother->setExtraInfo("n_track", track_count);
+    } else {
+      mother->addExtraInfo("chiSquared_trackL", chi2_track);
+      mother->addExtraInfo("n_track", track_count);
+    }
 
     bool ok = false;
     if (twoPhotonChildren.size() == 0)
@@ -1255,4 +1270,45 @@ namespace Belle2 {
 
     m_beamSpotCov = beamSpotCov;
   }
+
+  double ParticleVertexFitterModule::getChi2TracksZ(analysis::VertexFitKFit& kv)
+  {
+    double chi2TrackZ = 0;
+    for (int iTrack = 0; iTrack < kv.getTrackCount(); iTrack++) {
+      analysis::KFitTrack trk_i = kv.getTrack(iTrack); // KFitTrack contains parameters before/after fit.
+      TMatrixFSym err = CLHEPToROOT::getTMatrixFSym(trk_i.getError(analysis::KFitConst::kBeforeFit)); // px, py, pz, E, x, y, z
+      TVector3 x_before = CLHEPToROOT::getTVector3(trk_i.getPosition(analysis::KFitConst::kBeforeFit));
+      TVector3 x_after = CLHEPToROOT::getTVector3(trk_i.getPosition());
+      TVector3 dPos = x_after - x_before;
+
+      chi2TrackZ += TMath::Power(dPos.Z(), 2) / err(6, 6);
+    }
+    return chi2TrackZ;
+  }
+
+  double ParticleVertexFitterModule::getChi2TracksLBoost(analysis::VertexFitKFit& kv)
+  {
+    double chi2TrackL = 0;
+
+    for (int iTrack = 0; iTrack < kv.getTrackCount(); iTrack++) {
+
+      analysis::KFitTrack trk_i = kv.getTrack(iTrack); // KFitTrack contains parameters before/after fit.
+
+      TMatrixFSym err = CLHEPToROOT::getTMatrixFSym(trk_i.getError(analysis::KFitConst::kBeforeFit)); // px, py, pz, E, x, y, z
+
+      TVector3 x_before = CLHEPToROOT::getTVector3(trk_i.getPosition(analysis::KFitConst::kBeforeFit));
+      TVector3 x_after = CLHEPToROOT::getTVector3(trk_i.getPosition());
+      TVector3 dPos = x_after - x_before;
+
+      PCmsLabTransform T;
+      TVector3 boost3 = T.getBoostVector().Unit();
+      TVectorD boostD(0, 6, 0., 0., 0., 0., boost3.X(), boost3.Y(), boost3.Z(), "END");
+
+      double dLBoost = dPos.Dot(boost3);
+
+      chi2TrackL += TMath::Power(dLBoost, 2) / err.Similarity(boostD);
+    }
+    return chi2TrackL;
+  }
+
 } // end Belle2 namespace

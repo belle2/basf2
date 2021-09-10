@@ -360,6 +360,18 @@ simply write the following in the file:
    :end-at: E10
    :linenos:
 
+.. note:: Marker comments in the solution code
+    :class: toggle
+
+    If you are wondering about comments like ``[S10]`` or ``[E10]`` in the code
+    snippets that we include in our tutorials: You can completely ignore them.
+    In case you are curious about their meaning: Sometimes we want to show only
+    a small part of a larger file. Copying the code or referencing the lines by
+    line numbers is a bit unstable (what if someone changes the code and
+    forgets to update the rest of the documentation?), so we use these tags to
+    mark the beginning and end of a subset of lines to be included in the
+    documentation.
+
 But more importantly we can also define "hosts" to connect to and settings that
 should only apply for these hosts
 

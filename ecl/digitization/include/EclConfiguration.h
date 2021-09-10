@@ -26,7 +26,7 @@ namespace Belle2 {
       void setBackground(bool val) { m_background = val; }
 
       static constexpr int        m_nch = 8736;  /**< total number of electronic channels (crystals) in calorimeter */
-      static constexpr double    m_rf = 508.887; /**< accelerating RF, http://ptep.oxfordjournals.org/content/2013/3/03A006.full.pdf */
+      static constexpr double    m_rf = 508.876; /**< RF clock, www-linac.kek.jp/linac-com/report/skb-tdr/, ch. 6 */
       static constexpr double    m_tick = 24.*12. / m_rf; /**< == 72/127 digitization clock tick (in microseconds ???) */
       static constexpr double    m_step = 0.5; /**< time between points in internal units t_{asrto}*m_rf/2./24./12. */
       static constexpr double    s_clock = 24.*12.; /**< digitization clock in RF units */

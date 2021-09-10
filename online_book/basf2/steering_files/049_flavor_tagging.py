@@ -4,7 +4,7 @@ import sys
 import basf2 as b2
 import modularAnalysis as ma
 import stdV0s
-import flavorTagger as ft
+import flavorTagger as ft  # [S23|E23]
 from variables import variables as vm  # shorthand for VariableManager
 import variables.collections as vc
 import variables.utils as vu
@@ -101,7 +101,7 @@ for roe_variable in roe_kinematics + roe_multiplicities:
     roe_variable_with_mask = roe_variable.replace("()", "(my_mask)")
     b_vars.append(roe_variable_with_mask)
 
-b_vars += ft.flavor_tagging
+b_vars += ft.flavor_tagging  # [S43|E43]
 
 # Variables for final states (electrons, positrons, pions)
 fs_vars = vc.pid + vc.track + vc.track_hits + standard_vars

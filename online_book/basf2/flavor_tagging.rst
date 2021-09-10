@@ -72,7 +72,8 @@ start right away!
     Remember to import the module:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 7
+        :start-at: S23
+        :end-at: E23
         :lineno-start: 7
 
     and call the function:
@@ -93,7 +94,8 @@ start right away!
     :class: toggle solution
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 104
+        :start-at: S43
+        :end-at: E43
         :lineno-start: 104
 
 .. admonition:: Exercise

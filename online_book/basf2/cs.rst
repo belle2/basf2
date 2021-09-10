@@ -197,7 +197,7 @@ If this doesn't work you can find the files in ``/sw/belle2/examples-data/starte
 
     .. literalinclude:: steering_files/090_cs.py
         :language: python
-        :lines: -33
+        :end-at: E13
 
 
 .. admonition:: Exercise

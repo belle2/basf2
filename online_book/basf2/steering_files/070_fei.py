@@ -16,11 +16,11 @@ main = b2.Path()
 ma.inputMdst(
     filename=b2.find_file(f"starterkit/2021/1111540100_eph3_BGx0_{filenumber}.root", "examples"),
     path=main,
-)
+)  # [E13]
 
 # Add the database with the classifier weight files for the FEI
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
-
+# [S23|E23]
 # Get FEI default channels.  [S10]
 # Utilise the arguments to toggle on and off certain channels
 particles = fei.get_default_channels(

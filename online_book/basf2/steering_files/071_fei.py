@@ -18,7 +18,7 @@ good_track = (
 ma.fillParticleList("mu-", "muonID > 0.9 and " + good_track, path=main)
 ma.fillParticleList("pi-", "pionID > 0.5 and " + good_track, path=main)  # [E60]
 
-ma.reconstructDecay("B0:signal -> pi- mu+ ?nu", cut="", path=main)
+ma.reconstructDecay("B0:signal -> pi- mu+ ?nu", cut="", path=main)  # [S113|E113]
 
 ma.reconstructDecay(  # [S70]
     "Upsilon(4S):opposite_cp -> B0:generic anti-B0:signal", cut="", path=main

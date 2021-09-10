@@ -30,7 +30,7 @@ ma.reconstructDecay(
     decayString="B0  -> K_S0 pi0:eff60_May2020",
     cut="5.1 < Mbc < 5.3 and abs(deltaE) < 2",
     path=main,
-)
+)  # [E13]
 
 ma.buildRestOfEvent(target_list_name="B0", path=main)  # [S10]
 cleanMask = (

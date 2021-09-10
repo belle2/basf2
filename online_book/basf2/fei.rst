@@ -99,7 +99,7 @@ In addition to the usual python packages (``basf2`` and `modularAnalysis`) we al
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: -19
+        :end-at: E13
 
 Now we need the Global Tag in which the weight files for the FEI can be found. This can change once a new central
 training of the FEI is released, so please check the recommended versions.
@@ -136,7 +136,8 @@ There is also a convenience function for that!
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 23
+        :start-at: S23
+        :end-at: E23
 
 
 Configuring the FEI
@@ -489,7 +490,8 @@ Just add this flag to the end of the decay string in `modularAnalysis.reconstruc
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 21
+        :start-at: S113
+        :end-at: E113
 
 
 So far, we have not used the FEI. Now, we will use the B\ :sub:`tag` in the udst file and combine it with the

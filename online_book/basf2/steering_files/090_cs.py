@@ -31,8 +31,8 @@ ma.reconstructDecay(
     cut="5.1 < Mbc < 5.3 and abs(deltaE) < 2",
     path=main,
 )
-#  [S10]
-ma.buildRestOfEvent(target_list_name="B0", path=main)
+
+ma.buildRestOfEvent(target_list_name="B0", path=main)  # [S10]
 cleanMask = (
     "cleanMask",
     "nCDCHits > 0 and useCMSFrame(p)<=3.2",

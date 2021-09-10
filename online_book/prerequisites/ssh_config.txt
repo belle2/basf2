@@ -26,9 +26,9 @@ Host sshcc1.kek.jp  #  [S40]
     IdentityFile ~/.ssh/id_kekccgateway
     IdentitiesOnly yes  #  [E40]
 
-# Configuration for directly connecting to specific KEKCC nodes
+# Configuration for directly connecting to specific KEKCC nodes   [S50]
 # useful for connecting to a terminal multiplexer on a specific node
-Host ccw?? ccx??  #  [S50]
+Host ccw?? ccx??
     HostName %h.cc.kek.jp
     User YOUR_KEKCC_USERNAME
     Compression yes

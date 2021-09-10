@@ -56,8 +56,8 @@ standard_vars = vc.kinematics + vc.mc_kinematics + vc.mc_truth
 b_vars += vc.deltae_mbc
 b_vars += standard_vars
 
-# ROE variables [S20]
-roe_kinematics = ["roeE()", "roeM()", "roeP()", "roeMbc()", "roeDeltae()"]  # [S50]
+# ROE variables [S20|S50]
+roe_kinematics = ["roeE()", "roeM()", "roeP()", "roeMbc()", "roeDeltae()"]
 roe_multiplicities = [
     "nROE_Charged()",
     "nROE_Photons()",

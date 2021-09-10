@@ -252,10 +252,20 @@ You should already be familiar with these topics from the previous exercises.
 .. admonition:: Solution
     :class: toggle solution
 
+    MC matching:
+
     .. literalinclude:: steering_files/070_fei.py
         :language: python
         :start-at: S40
         :end-at: E40
+
+    Alias creation and output (leave out the line with ``FEIProbRank``, this gets defined in the next
+    exercise):
+
+        .. literalinclude:: steering_files/070_fei.py
+        :language: python
+        :start-at: S41
+        :end-at: E41
 
 The FEI returns not only one B meson candidate for each event but up to 20. Using the `modularAnalysis.rankByHighest`
 function, it is possible to rank the candidates by the B meson classifier output in the

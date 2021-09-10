@@ -231,6 +231,20 @@ namespace Belle2 {
       LogL getLogL(double t0, double minTime, double maxTime, double sigt = 0) const;
 
       /**
+       * Returns extended log likelihood for background hypothesis using default time window
+       * @return log likelihood
+       */
+      LogL getBackgroundLogL() const {return getBackgroundLogL(m_minTime, m_maxTime);}
+
+      /**
+       * Returns extended log likelihood for background hypothesis
+       * @param minTime time window lower edge
+       * @param maxTime time window upper edge
+       * @return log likelihood
+       */
+      LogL getBackgroundLogL(double minTime, double maxTime) const;
+
+      /**
        * Returns extended log likelihoods in pixels for PDF shifted in time.
        * @param t0 time shift
        * @param sigt additional time smearing

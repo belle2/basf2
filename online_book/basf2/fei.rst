@@ -713,3 +713,4 @@ and explanations on the code structure.
 
 .. [#f1] Alternatively, you can also use the `isSignalAcceptMissingNeutrino` variable instead of `isSignal`
             but we will be going with the ``?nu`` flag and `isSignal` in our example.
+

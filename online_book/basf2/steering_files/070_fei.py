@@ -18,9 +18,9 @@ ma.inputMdst(
     path=main,
 )  # [E13]
 
-# Add the database with the classifier weight files for the FEI
-b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
-# [S23|E23]
+# Add the database with the classifier weight files for the FEI  [S23]
+b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())  # [E23]
+
 # Get FEI default channels.  [S10]
 # Utilise the arguments to toggle on and off certain channels
 particles = fei.get_default_channels(

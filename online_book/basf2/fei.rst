@@ -263,7 +263,7 @@ You should already be familiar with these topics from the previous exercises.
     Alias creation and output (leave out the line with ``FEIProbRank``, this gets defined in the next
     exercise):
 
-    .. literalinclude:: steering_files/070_fei.py
+        .. literalinclude:: steering_files/070_fei.py
         :language: python
         :start-at: S41
         :end-at: E41

@@ -55,7 +55,6 @@ that is, consult this page again: :ref:`conditionsdb_overview`).
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :start-at: S10
         :end-at: E10
-        :lineno-start: 15
 
 Good! Now we have the weights and we have already created the ROE, so we can
 start right away!
@@ -74,14 +73,12 @@ start right away!
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :start-at: S23
         :end-at: E23
-        :lineno-start: 7
 
     and call the function:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :start-at: S20
         :end-at: E20
-        :lineno-start: 76
 
 .. admonition:: Exercise
     :class: stacked exercise
@@ -96,7 +93,6 @@ start right away!
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :start-at: S43
         :end-at: E43
-        :lineno-start: 104
 
 .. admonition:: Exercise
     :class: stacked exercise

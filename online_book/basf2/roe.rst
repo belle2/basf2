@@ -77,7 +77,6 @@ We now want to reconstruct the Rest of Event of the :math:`B^0`.
      .. literalinclude:: steering_files/029_roe.py
          :start-at: S10
          :end-at: E10
-         :lineno-start: 45
 
 That's it, the ROE has been reconstructed!
 Behind these python curtains, a ``RestOfEvent`` object is created for each particle in the :math:`B^0`
@@ -119,7 +118,6 @@ Let's include the following lines to have a useful selection of them:
 .. literalinclude:: steering_files/029_roe.py
      :start-at: S20
      :end-at: E20
-     :lineno-start: 59
 
 .. admonition:: Exercise
      :class: exercise
@@ -150,7 +148,6 @@ For our example, let's start by defining the following selection cut strings:
 .. literalinclude:: steering_files/029_roe.py
      :start-at: S30
      :end-at: E30
-     :lineno-start: 45
 
 Here we created different cuts for charged particles, like electrons or charged pions, and for photons,
 because of different methods of measurement used to detect these particles.
@@ -180,7 +177,6 @@ because of different methods of measurement used to detect these particles.
      .. literalinclude:: steering_files/029_roe.py
          :start-at: S40
          :end-at: E40
-         :lineno-start: 45
 
 Now we have created a mask with a name ``my_mask``, that will only allow track-based
 particles that pass selection cuts ``track_based_cuts`` and ECL-based particles, that pass
@@ -232,7 +228,6 @@ loop to insert this argument.
      .. literalinclude:: steering_files/029_roe.py
          :start-at: S50
          :end-at: E50
-         :lineno-start: 60
 
 
 .. tip::

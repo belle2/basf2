@@ -497,7 +497,6 @@ of the CDC (`thetaInCDCAcceptance`).
     .. literalinclude:: steering_files/013_first_steering_file.py
         :start-at: S10
         :end-at: E10
-        :lineno-start: 21
 
 
 .. note:: Marker comments in the solution code
@@ -581,7 +580,6 @@ particles themselves need to be written in the decay string.
     .. literalinclude:: steering_files/013_first_steering_file.py
         :start-at: S20
         :end-at: E20
-        :lineno-start: 28
 
 .. admonition:: Solution
     :class: toggle solution
@@ -818,7 +816,6 @@ variable that can be used to cut away background is :math:`\Delta E` (`deltaE`).
     .. literalinclude:: steering_files/015_first_steering_file.py
         :start-at: S40
         :end-at: E40
-        :lineno-start: 34
 
 Variable collections
 --------------------
@@ -956,7 +953,6 @@ or `matchedMC`.
     .. literalinclude:: steering_files/019_first_steering_file.py
         :start-at: S50
         :end-at: E50
-        :lineno-start: 52
 
     Next, do the same for the :math:`J/\Psi` and the :math:`K_S^0` in a similar
     fashion.
@@ -979,7 +975,6 @@ or `matchedMC`.
     .. literalinclude:: steering_files/019_first_steering_file.py
         :start-at: S60
         :end-at: E60
-        :lineno-start: 62
 
 .. admonition:: Solution
     :class: toggle solution

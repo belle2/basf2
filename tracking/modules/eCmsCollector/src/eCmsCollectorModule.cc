@@ -65,7 +65,7 @@ void eCmsCollectorModule::prepare()
   tree->Branch<double>("R2", &m_R2);
   tree->Branch<double>("mD", &m_mD);
   tree->Branch<double>("dmDstar", &m_dmDstar);
-  tree->Branch<double>("cmsE", &m_cmsE);
+  //tree->Branch<double>("cmsE", &m_cmsE);
 
 
   // We register the objects so that our framework knows about them.
@@ -98,8 +98,12 @@ void eCmsCollectorModule::collect()
 
   if (!Bpart) return;
 
-  m_mBC    = Variable::particleMbc(Bpart);
-  m_deltaE = Variable::particleDeltaE(Bpart);
+  const double eBeamRef = 10579.4e-3 / 2; //PDG mass of Y4S
+  const double eBeamNow = PCmsLabTransform().getCMSEnergy() / 2;
+
+  //Convert mBC and deltaE to the Y4S reference
+  m_mBC    = sqrt(max(0.0, pow(eBeamRef, 2) - (pow(eBeamNow, 2) -  pow(Variable::particleMbc(Bpart), 2))));
+  m_deltaE = eBeamNow + Variable::particleDeltaE(Bpart) - eBeamRef;
   m_pdg    = Bpart->getPDGCode();
   m_mode   = Bpart->getExtraInfo("decayModeID");
   m_R2     = Variable::R2(Bpart);
@@ -133,7 +137,6 @@ void eCmsCollectorModule::collect()
   cout << "Kpid = " << m_Kpid << endl;
 
 
-  m_cmsE = PCmsLabTransform().getCMSEnergy();
 
   getObjectPtr<TTree>("events")->Fill();
 

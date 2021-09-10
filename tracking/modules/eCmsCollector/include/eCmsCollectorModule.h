@@ -50,7 +50,7 @@ namespace Belle2 {
     double m_R2;
     double m_mD;      ///< D meson mass
     double m_dmDstar; ///< D*-D0 mass
-    double m_cmsE;    ///< input CMS energy
+    //double m_cmsE;    ///< input CMS energy
 
   };
 

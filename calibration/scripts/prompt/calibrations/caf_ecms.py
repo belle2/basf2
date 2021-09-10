@@ -98,19 +98,28 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.framework import Calibration
     from caf.strategies import SingleIOV
-    from reconstruction import add_pid_module
+    from reconstruction import add_pid_module, add_ecl_modules, prepare_cdst_analysis
 
     # module to be run prior the collector
     rec_path_1 = create_path()
+    prepare_cdst_analysis(rec_path_1)
     add_pid_module(rec_path_1)
+    add_ecl_modules(rec_path_1)
 
     # vertex.treeFit('Upsilon(4S):BV', updateAllDaughters=True, ipConstraint=True, path=rec_path_1)
 
-    stdCharged.stdPi(listtype='loose', path=rec_path_1)
+    stdCharged.stdPi(listtype='all', path=rec_path_1)
     stdCharged.stdK(listtype='good', path=rec_path_1)
-    stdPi0s.stdPi0s(listtype='eff30_May2020', path=rec_path_1)
+    # stdPi0s.stdPi0s(listtype='all', path=rec_path_1)
 
-    ma.cutAndCopyList("pi+:my", "pi+:loose", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
+    # ma.fillParticleList('gamma:eff60_May2020',
+    # '[[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180]] and [[clusterReg==1 and E>0.0225]'
+    #  + ' or [clusterReg==2 and E>0.020] or [clusterReg==3 and E>0.020]]',
+    # path=rec_path_1)
+    ma.fillParticleList('gamma:eff60_May2020', '', path=rec_path_1)
+    ma.reconstructDecay('pi0:my -> gamma:eff60_May2020 gamma:eff60_May2020', '0.03<InvM', path=rec_path_1)
+
+    ma.cutAndCopyList("pi+:my", "pi+:all", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
     ma.cutAndCopyList("K+:my", "K+:good", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
 
     #####################################################
@@ -119,7 +128,7 @@ def get_calibrations(input_data, **kwargs):
 
     # Reconstructs D0s and sets decay mode identifiers
     ma.reconstructDecay(decayString='D0:Kpi -> K-:my pi+:my', cut='1.7 < M < 2.1', dmID=1, path=rec_path_1)
-    ma.reconstructDecay(decayString='D0:Kpipi0 -> K-:my pi+:my pi0:eff30_May2020',
+    ma.reconstructDecay(decayString='D0:Kpipi0 -> K-:my pi+:my pi0:my',
                         cut='1.7 < M < 2.1', dmID=2, path=rec_path_1)
     ma.reconstructDecay(decayString='D0:Kpipipi -> K-:my pi+:my pi-:my pi+:my',
                         cut='1.7 < M < 2.1', dmID=3, path=rec_path_1)
@@ -136,7 +145,7 @@ def get_calibrations(input_data, **kwargs):
     ma.reconstructDecay(decayString='D*+:D0pi_Kpipipi -> D0:Kpipipi pi+:my',
                         cut='massDifference(0) < 0.16', dmID=3, path=rec_path_1)
 
-    Bcut = '[5.2 < Mbc < 5.3] and [abs(deltaE) < 0.2]'
+    Bcut = '[5.15 < Mbc] and [abs(deltaE) < 0.2]'
 
     # Reconstructs the signal B0 candidates from Dstar
     ma.reconstructDecay(decayString='B0:Dstpi_D0pi_Kpi -> D*-:D0pi_Kpi pi+:my',

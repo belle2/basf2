@@ -92,8 +92,6 @@ PXDValidationAlgorithm::PXDValidationAlgorithm():
   , m_exp(-1), m_run(-1), m_hD0(nullptr), m_hZ0(nullptr)
   , m_hTrackPointsLayer1(nullptr), m_hTrackClustersLayer1(nullptr)
   , m_hTrackPointsLayer2(nullptr), m_hTrackClustersLayer2(nullptr)
-  //,m_file(nullptr), m_tree(nullptr)
-  //,minTrackPoints(1000), safetyFactor(2.0), forceContinue(false), strategy(0)
 {
   setDescription(
     " -------------------------- PXDValidationAlgorithm ---------------------------------\n"
@@ -182,8 +180,8 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
     m_tree = std::make_shared<TTree>("tree", "PXD validation data");
     // Define histograms out of m_file
     currentDir->cd();
-    m_hD0 = new TH1F("hD0", "Corrected d0;#Delta d0/#sqrt{2} [cm];Counts", 100, -0.03, 0.03);
-    m_hZ0 = new TH1F("hZ0", "Corrected z0;#Delta z0/#sqrt{2} [cm];Counts", 100, -0.03, 0.03);
+    m_hD0 = new TH1F("hD0", "Corrected d0;#Delta d0/#sqrt{2} [cm];Counts", 600, -0.03, 0.03);
+    m_hZ0 = new TH1F("hZ0", "Corrected z0;#Delta z0/#sqrt{2} [cm];Counts", 600, -0.03, 0.03);
     m_file->cd();
 
     m_tree->Branch<int>("exp", &m_exp);
@@ -240,7 +238,6 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
   tree_d0z0->SetBranchAddress("z0", &z0);
   m_hD0->Reset();
   m_hZ0->Reset();
-  string cuts = "abs(d0)<0.03&&abs(z0)<0.03";
 
   // Fill histograms from tree
   for (int i = 0; i < tree_d0z0->GetEntries(); i++) {

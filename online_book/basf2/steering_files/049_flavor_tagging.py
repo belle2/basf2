@@ -12,8 +12,8 @@ import variables.utils as vu
 # get input file number from the command line
 filenumber = sys.argv[1]
 
-# set analysis global tag (needed for flavor tagging)
-b2.conditions.prepend_globaltag("analysis_tools_release-04-02")
+# set analysis global tag (needed for flavor tagging) [S10]
+b2.conditions.prepend_globaltag("analysis_tools_release-04-02")  # [E10]
 
 # create path
 main = b2.Path()
@@ -73,8 +73,8 @@ ecl_based_cuts = "thetaInCDCAcceptance and E > 0.05"
 roe_mask = ("my_mask", track_based_cuts, ecl_based_cuts)
 ma.appendROEMasks("B0", [roe_mask], path=main)
 
-# call flavor tagging
-ft.flavorTagger(["B0"], path=main)
+# call flavor tagging [S20]
+ft.flavorTagger(["B0"], path=main)  # [E20]
 
 # perform best candidate selection
 b2.set_random_seed("Belle II StarterKit")

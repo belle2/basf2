@@ -356,14 +356,16 @@ status updates which might help keep connections from disconnecting we can
 simply write the following in the file:
 
 .. literalinclude:: ssh_config.txt
-   :lines: 10-11
+   :start-at: S10
+   :end-at: E10
    :linenos:
 
 But more importantly we can also define "hosts" to connect to and settings that
 should only apply for these hosts
 
 .. literalinclude:: ssh_config.txt
-   :lines: 13-15
+   :start-at: S20
+   :end-at: E20
    :linenos:
 
 This now allows us to just execute ``ssh desy`` and the correct username and
@@ -378,8 +380,8 @@ to copy a file from the desy login server. This now also allows us to automate
 the login to KEKCC via the gateway server
 
 .. literalinclude:: ssh_config.txt
-   :lines: 17-25
-   :emphasize-lines: 6
+   :start-at: S30
+   :end-at: E30
    :linenos:
 
 The line containing ``ProxyJump`` tells ssh to not directly connect to the host
@@ -528,8 +530,8 @@ to do this is again the configuration file. You can even tell ssh to not try to
 use the password at all but just the listed keys.
 
 .. literalinclude:: ssh_config.txt
-   :lines: 24-27
-   :emphasize-lines: 3-4
+   :start-at: S40
+   :end-at: E40
    :linenos:
 
 But if the remote server doesn't know your identity it will reject it. So we
@@ -976,7 +978,8 @@ also find keyboard shortcuts for most of them.
    gateway server for the specific nodes in the cluster, e.g. for the KEKCC:
 
    .. literalinclude:: ssh_config.txt
-      :lines: 31-35
+      :start-at: S50
+      :end-at: E50
       :linenos:
 
    Then ``ssh ccw01`` will also work from outside KEKCC.

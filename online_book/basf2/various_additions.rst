@@ -185,14 +185,16 @@ with the `passesCut` function.
    This is the first one:
 
    .. literalinclude:: steering_files/039_various_additions.py
-           :lines: 31-34
+           :start-at: S10
+           :end-at: E10
            :lineno-start: 31
 
 .. admonition:: Solution
    :class: toggle solution
 
         .. literalinclude:: steering_files/039_various_additions.py
-           :lines: 31-43
+           :start-at: S20
+           :end-at: E20
            :lineno-start: 31
 
 Next, we perform the actual recovery, using the `correctBrems` function in the
@@ -218,7 +220,8 @@ one Bremsstrahlung photon was added to this particle.
    :class: toggle solution
 
         .. literalinclude:: steering_files/039_various_additions.py
-           :lines: 45-46
+           :start-at: S30
+           :end-at: E30
            :lineno-start: 45
 
 .. admonition:: Question
@@ -270,7 +273,8 @@ variable by the `isSignalAcceptBremsPhotons` one, or add the ``?addbrems``
 marker to the decay string:
 
 .. literalinclude:: steering_files/039_various_additions.py
-   :lines: 48-53
+   :start-at: S40
+   :end-at: E40
    :lineno-start: 48
 
 Finally, let's add the invariant mass of the :math:`J/\psi` meson without any
@@ -307,7 +311,8 @@ Bremsstrahlung recovery?
     :class: toggle solution
 
     .. literalinclude:: steering_files/039_various_additions.py
-      :lines: 111-113
+      :start-at: S50
+      :end-at: E50
       :lineno-start: 111
 
 .. admonition:: Exercise
@@ -423,7 +428,8 @@ random seed.
    :class: toggle solution
 
     .. literalinclude:: steering_files/039_various_additions.py
-       :lines: 72-74
+       :start-at: S60
+       :end-at: E60
        :lineno-start: 72
 
 .. warning::

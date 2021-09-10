@@ -285,7 +285,6 @@ having to change anything in the script itself.
 
     .. literalinclude:: steering_files/011_first_steering_file.py
         :linenos:
-        :emphasize-lines: 8, 14
 
 
 .. admonition:: Tip
@@ -496,7 +495,8 @@ of the CDC (`thetaInCDCAcceptance`).
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 21-25
+        :start-at: S10
+        :end-at: E10
         :lineno-start: 21
 
 
@@ -566,14 +566,15 @@ particles themselves need to be written in the decay string.
     The :math:`J/\Psi` reconstruction looks like this:
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 28-31
+        :start-at: S20
+        :end-at: E20
         :lineno-start: 28
 
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 1-39, 49-53
+        :end-at: E30
         :linenos:
 
 Writing out information to an ntuple
@@ -633,7 +634,6 @@ mass.
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :linenos:
-        :emphasize-lines: 43
 
 Although you are analyzing a signal MC sample, the reconstruction will find
 many candidates that are actually not signal, but random combinations that
@@ -744,7 +744,6 @@ definitely read it to understand at least the basics.
 
     .. literalinclude:: steering_files/014_first_steering_file.py
         :linenos:
-        :emphasize-lines: 40-41, 46
 
 .. --------------
 
@@ -804,7 +803,8 @@ variable that can be used to cut away background is :math:`\Delta E` (`deltaE`).
     :class: solution toggle
 
     .. literalinclude:: steering_files/015_first_steering_file.py
-        :lines: 34-39
+        :start-at: S40
+        :end-at: E40
         :lineno-start: 34
 
 Variable collections
@@ -941,7 +941,8 @@ or `matchedMC`.
     This is how we add variables to the final state particles:
 
     .. literalinclude:: steering_files/019_first_steering_file.py
-        :lines: 52-58
+        :start-at: S50
+        :end-at: E50
         :lineno-start: 52
 
     Next, do the same for the :math:`J/\Psi` and the :math:`K_S^0` in a similar
@@ -963,7 +964,8 @@ or `matchedMC`.
     This is the code for the first part of the last hint:
 
     .. literalinclude:: steering_files/019_first_steering_file.py
-        :lines: 62-66
+        :start-at: S60
+        :end-at: E60
         :lineno-start: 62
 
 .. admonition:: Solution

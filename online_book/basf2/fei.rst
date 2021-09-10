@@ -165,7 +165,8 @@ efficiency.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 27-33
+        :start-at: S10
+        :end-at: E10
 
 
 The `fei.FeiConfiguration` class controls the other configuration options of the FEI.
@@ -185,7 +186,8 @@ in a single Global Tag and is ``prefix=FEIv4_2020_MC13_release_04_01_01`` for th
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 34-37
+        :start-at: S20
+        :end-at: E20
 
 The configuration created above must now be turned into a ``basf2`` path which can be appended to the main path.
 This is done with the `fei.get_path` function which takes the channel configuration
@@ -209,7 +211,8 @@ to the main path with the `basf2.Path.add_path` method.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 40-44
+        :start-at: S30
+        :end-at: E30
 
 
 You have now successfully added the FEI to the main path. The FEI will add a particle list
@@ -251,7 +254,8 @@ You should already be familiar with these topics from the previous exercises.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 48-49, 59-70, 72-76
+        :start-at: S40
+        :end-at: E40
 
 The FEI returns not only one B meson candidate for each event but up to 20. Using the `modularAnalysis.rankByHighest`
 function, it is possible to rank the candidates by the B meson classifier output in the
@@ -281,7 +285,8 @@ candidate.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 50-76
+        :start-at: S50
+        :end-at: E50
 
 You can now execute your steering file which should look somewhat like this:
 
@@ -444,7 +449,7 @@ Lets get started with the usual steps. Nothing here should be new to you.
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 1-19
+        :end-at: E60
 
 
 ϒ(4S) Reconstruction
@@ -512,7 +517,8 @@ B\ :sub:`sig` we have just created.
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 23-36
+        :start-at: S70
+        :end-at: E70
 
 
 Now that we have reconstructed the full ϒ(4S), we will create a Rest of Event.
@@ -543,7 +549,8 @@ value of `dz` (``abs(dz)``) to below 4. The two other cuts (on `pt` and `thetaIn
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 38-42
+        :start-at: S80
+        :end-at: E80
 
 
 Writing out the nTuple
@@ -599,7 +606,8 @@ This variable is called `nROE_Charged` in basf2. It needs the ROE mask name defi
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 44-69
+        :start-at: S90
+        :end-at: E90
 
 You can now execute your steering file which should look somewhat like this:
 

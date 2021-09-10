@@ -31,7 +31,7 @@ ma.reconstructDecay(
     cut="5.1 < Mbc < 5.3 and abs(deltaE) < 2",
     path=main,
 )
-
+#  [S10]
 ma.buildRestOfEvent(target_list_name="B0", path=main)
 cleanMask = (
     "cleanMask",
@@ -40,9 +40,9 @@ cleanMask = (
 )
 ma.appendROEMasks(list_name="B0", mask_tuples=[cleanMask], path=main)
 
-ma.buildContinuumSuppression(list_name="B0", roe_mask="cleanMask", path=main)
+ma.buildContinuumSuppression(list_name="B0", roe_mask="cleanMask", path=main)  # [E10]
 
-simpleCSVariables = [
+simpleCSVariables = [  # [S20]
     "R2",
     "thrustBm",
     "thrustOm",
@@ -58,4 +58,4 @@ ma.variablesToNtuple(
     path=main,
 )
 
-b2.process(main)
+b2.process(main)  # [E20]

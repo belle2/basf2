@@ -23,6 +23,7 @@ Host kekcc
 
 Host sshcc1.kek.jp
     User YOUR_SSHLOGIN_USERNAME
+    # NB: change the path to the IdentityFile to point to your own SSH key.
     IdentityFile ~/.ssh/id_kekccgateway
     IdentitiesOnly yes
 

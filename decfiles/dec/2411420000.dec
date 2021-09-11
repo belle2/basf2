@@ -1,0 +1,39 @@
+# EventType: 2411520000
+# Descriptor: [e+ e- -> J/psi [-> mu+ mu-] Xdd]
+# NickName: ee_JpsiX_mumu
+# Documentation: Double charmonium production.
+# Tested: Yes 
+# PhysicsWG: Charmonium
+# Responsible: Kirill Chilikin
+# Email: chilikin@lebedev.ru
+# Cuts: None 
+# Date: 20210911
+#
+# This decay model is intended for phase-space-dependent efficiency
+# determination. All exclusive decays have the PHSP distributuion.
+# Do not use it for one-dimensional analyses without proper reweighting.
+
+Alias MyJ/psi J/psi
+Alias MyXdd Xdd
+Alias Myanti-Xdd anti-Xdd
+ChargeConj MyXdd Myanti-Xdd
+
+# Uniform mass distribution from 1.5 to 5.5 GeV/c^2.
+Particle MyXdd 3.5 2.0
+ChangeMassMin MyXdd 1.5
+ChangeMassMax MyXdd 5.5
+LSFLAT MyXdd
+
+Decay vpho
+1.0   MyJ/psi MyXdd  PHSP;
+Enddecay
+
+Decay MyJ/psi
+1.0   mu+ mu-        PHOTOS PHSP;
+Enddecay
+
+Decay MyXdd
+1.0   g g            PYTHIA 91;
+Enddecay
+
+CDecay Myanti-Xdd

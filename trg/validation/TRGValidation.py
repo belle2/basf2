@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-################################################
-# test for module
-################################################
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 import sys
 
@@ -24,6 +27,9 @@ from reconstruction import *
 from rawdata import add_unpackers
 from modularAnalysis import applyEventCuts
 
+PI = 3.1415926
+Fac = 180.0 / PI
+
 
 class trg_read(basf2.Module):
 
@@ -33,6 +39,20 @@ class trg_read(basf2.Module):
 
     hist_inbit = ROOT.TH1F('hin', 'trigger input bits', 320, 0, 320)
     hist_outbit = ROOT.TH1F('hout', 'trigger output bits', 320, 0, 320)
+
+    h_E_ECL = ROOT.TH1F("h_E_ECL", "ECL cluster energy [5 MeV]", 2048, 0, 10.24)
+    h_E_ECL.GetXaxis().SetTitle("ECL cluster energy [5 MeV]")
+    h_Esum_ECL = ROOT.TH1F("h_Esum_ECL", "sum of ECL cluster energy [5 MeV]", 2048, 0, 10.24)
+    h_Esum_ECL.GetXaxis().SetTitle("sum of ECL cluster energy [5 MeV]")
+    h_theta_ECL = ROOT.TH1F("h_theta_ECL", "ECL cluster theta [1.4 degrees]", 128, 0, 180)
+    h_theta_ECL.GetXaxis().SetTitle("ECL cluster #theta [1.4 degrees]")
+    h_phi_ECL = ROOT.TH1F("h_phi_ECL", "ECL cluster phi [1.4 degrees]", 256, -180, 180)
+    h_phi_ECL.GetXaxis().SetTitle("ECL cluster #phi [1.4 degrees]")
+
+    h_sector_BKLM = ROOT.TH1F("h_sector_BKLM", "KLMTRG hit sector", 10, 0, 10)
+    h_sector_BKLM.GetXaxis().SetTitle("# of BKLM TRG sector")
+    h_sector_EKLM = ROOT.TH1F("h_sector_EKLM", "KLMTRG hit sector", 10, 0, 10)
+    h_sector_EKLM.GetXaxis().SetTitle("# of EKLM TRG sector")
 
     mc = "abs(MCParticles.m_pdg)==11&&MCParticles.m_status==11"
     tree = ROOT.TChain('tree')
@@ -47,16 +67,17 @@ class trg_read(basf2.Module):
     d_z0_nn = ROOT.TH1F("d_z0_nn", "#Deltaz0 of CDC Neuro", 60, -30, 30)
     d_E_ECL = ROOT.TH1F("d_E_ECL", "#DeltaE of ECL clustering", 50, -6, 0)
 
-    tree.Draw("(TRGCDC2DFinderTracks.m_omega - 0.00449) /
-              (sqrt(MCParticles.m_momentum_x * MCParticles.m_momentum_x
-                    + MCParticles.m_momentum_y * MCParticles.m_momentum_y)) >> d_w",
-              "MCParticles.m_pdg<0&&" +
-              mc)
-    tree.Draw("(TRGCDC2DFinderTracks.m_omega + 0.00449) /
-              sqrt(MCParticles.m_momentum_x * MCParticles.m_momentum_x
-                   + MCParticles.m_momentum_y * MCParticles.m_momentum_y) >> d_w_2",
-              "MCParticles.m_pdg>0 && " +
-              mc)
+    mc_px = 'MCParticles.m_momentum_x'
+    mc_py = 'MCParticles.m_momentum_y'
+    mc_pz = 'MCParticles.m_momentum_z'
+    trk2d_omega = 'TRGCDC2DFinderTracks.m_omega'
+    trk2d_phi = 'TRGCDC2DFinderTracks.m_phi0'
+
+    tree.Draw("({0} - 0.00449)/sqrt({1}*{1} + {2}*{2})>> d_w".format(trk2d_omega, mc_px, mc_py),
+              "MCParticles.m_pdg<0&&" + mc)
+
+    tree.Draw("({0} + 0.00449)/sqrt({1}*{1} + {2}*{2}) >> d_w_2".format(trk2d_omega, mc_px, mc_py),
+              "MCParticles.m_pdg>0 && " + mc)
     tree.Draw("TRGCDC2DFinderTracks.m_phi0-atan(MCParticles.m_momentum_y/MCParticles.m_momentum_x)>>d_phi",
               "MCParticles.m_status==11&&abs(MCParticles.m_pdg)==11",
               "fabs(TRGCDC2DFinderTracks.m_phi0-atan(MCParticles.m_momentum_y/MCParticles.m_momentum_x))<3.1415936&&" + mc)
@@ -142,15 +163,14 @@ class trg_read(basf2.Module):
     d_E_ECL.GetYaxis().SetLabelSize(0.020)
 
     def initialize(self):
-        print('initialize')
         m_dbinput = Belle2.PyDBObj('TRGGDLDBInputBits')
         m_dbftdl = Belle2.PyDBObj('TRGGDLDBFTDLBits')
         n_inbit = m_dbinput.getninbit()
         n_outbit = m_dbftdl.getnoutbit()
-        print(n_inbit)
-        print(n_outbit)
         trg_read.hist_inbit.GetXaxis().SetRangeUser(0, n_inbit)
+        trg_read.hist_inbit.GetXaxis().SetLabelSize(0.02)
         trg_read.hist_outbit.GetXaxis().SetRangeUser(0, n_outbit)
+        trg_read.hist_outbit.GetXaxis().SetLabelSize(0.02)
         for i in range(320):
             inbitname = m_dbinput.getinbitname(i)
             trg_read.hist_inbit.GetXaxis().SetBinLabel(trg_read.hist_inbit.GetXaxis().FindBin(i + 0.5), inbitname)
@@ -158,17 +178,19 @@ class trg_read(basf2.Module):
             trg_read.hist_outbit.GetXaxis().SetBinLabel(trg_read.hist_outbit.GetXaxis().FindBin(i + 0.5), outbitname)
 
     def beginRun(self):
-        print('beginRun')
+        trg_read.hist_inbit.Reset()
+        trg_read.hist_outbit.Reset()
+        trg_read.h_Esum_ECL.Reset()
+        trg_read.h_E_ECL.Reset()
+        trg_read.h_theta_ECL.Reset()
+        trg_read.h_phi_ECL.Reset()
 
     def event(self):
 
         event_meta = Belle2.PyStoreObj('EventMetaData')
         trg_summary = Belle2.PyStoreObj('TRGSummary')
-        m_dbinput = Belle2.PyDBObj('TRGGDLDBInputBits')
-        m_dbftdl = Belle2.PyDBObj('TRGGDLDBFTDLBits')
-
-        runno = event_meta.getRun()
-        evtno = event_meta.getEvent()
+        clusters = Belle2.PyStoreArray('TRGECLClusters')
+        klmSummary = Belle2.PyStoreObj('KLMTrgSummary')
 
         for i in range(320):
             if(trg_summary.testInput(i)):
@@ -176,14 +198,37 @@ class trg_read(basf2.Module):
             if(trg_summary.testFtdl(i)):
                 trg_read.hist_outbit.Fill(i + 0.5)
 
+        etot = 0
+        for cluster in clusters:
+            x = cluster.getPositionX()
+            y = cluster.getPositionY()
+            z = cluster.getPositionZ()
+            e = cluster.getEnergyDep()
+            trg_read.h_E_ECL.Fill(e)
+            etot += e
+            vec = ROOT.TVector3(x, y, z)
+            trg_read.h_theta_ECL.Fill(vec.Theta() * Fac)
+            trg_read.h_phi_ECL.Fill(vec.Phi() * Fac)
+
+        if etot > 0:
+            trg_read.h_Esum_ECL.Fill(etot)
+
+        trg_read.h_sector_BKLM.Fill(klmSummary.getBKLM_n_trg_sectors())
+        trg_read.h_sector_EKLM.Fill(klmSummary.getEKLM_n_trg_sectors())
+
     def endRun(self):
-        print('endRun')
+        print('end')
 
     def terminate(self):
-        print('terminate')
 
         trg_read.hist_inbit.Write()
         trg_read.hist_outbit.Write()
+        trg_read.h_Esum_ECL.Write()
+        trg_read.h_E_ECL.Write()
+        trg_read.h_theta_ECL.Write()
+        trg_read.h_phi_ECL.Write()
+        trg_read.h_sector_BKLM.Write()
+        trg_read.h_sector_EKLM.Write()
         trg_read.d_w.Write()
         trg_read.d_phi.Write()
         trg_read.d_z0_3d.Write()
@@ -196,8 +241,10 @@ main = create_path()
 
 root_input = basf2.register_module('RootInput')
 
-root_input.param('inputFileName', '../TRGValidationGen.root')
-root_input.param('branchNames', ['EventMetaData', 'TRGSummary'])
+root_input.param(
+    'inputFileName',
+    '../TRGValidationGen.root')
+root_input.param('branchNames', ['EventMetaData', 'TRGECLClusters', 'TRGSummary', 'KLMTrgSummary'])
 main.add_module(root_input)
 main.add_module(trg_read())
 

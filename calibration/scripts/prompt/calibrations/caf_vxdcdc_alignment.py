@@ -332,7 +332,7 @@ def create_stage1(files, cfg):
 
     mumu = select_files(files["mumu"], 1.5e6, cfg["mumu.max_processed_events_per_file"])
     cosmic = select_files(files["cosmic"], 0.7e6, cfg["cosmic.max_processed_events_per_file"])
-    hadron_and_offip = select_files(files["hadron"] + files["offip"], int(4.0e6 / 10.), cfg["mumu.max_processed_events_per_file"])
+    hadron_and_offip = select_files(files["hadron"] + files["offip"], int(4.0e6 / 10.), cfg["hadron.max_processed_events_per_file"])
 
     cal = mpc.create(
         name='VXDCDCalignment_stage1',

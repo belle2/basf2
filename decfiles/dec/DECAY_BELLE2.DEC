@@ -10832,9 +10832,17 @@ Decay psi(3770)
 Enddecay
 
 
-
+# change the decay BR with the fitted one. (Y.B Li, 2021/09/12)
 Decay X_1(3872)
-1.000000000   rndmflav  anti-rndmflav                      PYTHIA 42;
+0.03800000    pi+ pi- J/psi                                PHSP;
+0.17900000    D*0 anti-D0                                  PHSP;
+0.17900000    anti-D*0 D0                                  PHSP;
+0.47400000    D0 anti-D0 pi0                               PHSP;
+0.00800000    gamma J/psi                                  PHSP;
+0.04500000    gamma psi(2S)                                PHSP;
+0.03400000    pi0 chi_c1                                   PHSP;
+0.04300000    omega J/psi                                  PHSP;
+#1.000000000   rndmflav  anti-rndmflav                      PYTHIA 42;
 Enddecay
 
 

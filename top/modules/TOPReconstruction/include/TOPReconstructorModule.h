@@ -59,6 +59,8 @@ namespace Belle2 {
     double m_minTime = 0;      /**< optional lower time limit for photons */
     double m_maxTime = 0;      /**< optional upper time limit for photons */
     int m_PDGCode = 0;   /**< PDG code of hypothesis to construct pulls */
+    bool m_deltaRayModeling;  /**< include or exclude delta-ray modeling in log likelihood calculation */
+    double m_pTCut;  /**< pT cut to suppress badly extrapolated tracks that cannot reach TOP counter */
     std::string m_topDigitCollectionName; /**< name of the collection of TOPDigits */
     std::string m_topLikelihoodCollectionName; /**< name of the collection of created TOPLikelihoods */
     std::string m_topPullCollectionName; /**< name of the collection of created TOPPulls */

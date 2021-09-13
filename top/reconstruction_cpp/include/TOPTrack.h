@@ -141,10 +141,16 @@ namespace Belle2 {
       int getModuleID() const {return m_moduleID;}
 
       /**
-       * Returns momentum magnitude
+       * Returns momentum magnitude (extrapolated to TOP)
        * @return momentum magnitude
        */
       double getMomentumMag() const {return m_momentum;}
+
+      /**
+       * Returns transverse momentum (at POCA)
+       * @return transverse momentum
+       */
+      double getTransverseMomentum() const {return m_pT;}
 
       /**
        * Returns charge
@@ -281,7 +287,8 @@ namespace Belle2 {
                      const RaytracerBase::Prism& prism, const TRotation& rotation, const TVector3& translation);
 
       int m_moduleID = 0;  /**< slot ID */
-      double m_momentum = 0; /**< track momentum magnitude */
+      double m_momentum = 0; /**< track momentum magnitude at TOP */
+      double m_pT = 0; /**< transverse momentum at POCA */
       double m_charge = 0;  /**< track charge in units of elementary charge */
       double m_TOFLength = 0; /**< trajectory length corresponding to TOF of extrapolated hit */
       double m_trackLength = 0;  /**< trajectory length from IP to average photon emission point */

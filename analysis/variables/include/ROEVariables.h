@@ -44,7 +44,7 @@ namespace Belle2 {
     /**
      * Helper function for nRemainingTracksInRestOfEventWithMask and nRemainingTracksInRestOfEvent
      */
-    double nRemainingTracksInROE(const Particle* particle, const std::string& maskName = "");
+    double nRemainingTracksInROE(const Particle* particle, const std::string& maskName = RestOfEvent::DEFAULT_MASK_NAME);
 
     /**
      * Returns number of tracks in the event minus in the current RestOfEvent object accepting a mask.
@@ -363,7 +363,8 @@ namespace Belle2 {
      * Also works for composite particles, where all mdst objects of related FSP particles must be in ROE.
      * This helper function accepts a specific roe object as an argument
      */
-    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe, const std::string& maskName = "");
+    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe,
+                               const std::string& maskName = RestOfEvent::DEFAULT_MASK_NAME);
 
 
     /**

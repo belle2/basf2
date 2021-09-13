@@ -10171,6 +10171,7 @@ Enddecay
 
 
 
+# Data from PDG 2021.
 Decay eta_c
 
 # Decays involving hadronic resonances.
@@ -10281,6 +10282,7 @@ Enddecay
 
 
 
+# Data from PDG 2021.
 Decay eta_c(2S)
 
 # branching(M059, 4) / 3
@@ -10653,6 +10655,7 @@ Enddecay
 
 
 
+# Data from PDG 2021.
 Decay chi_c0
 
 # Hadronic decays.

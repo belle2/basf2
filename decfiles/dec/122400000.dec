@@ -20,21 +20,4 @@ Decay B+sig
 Enddecay
 CDecay B-sig
 
-Decay X_1(3872)
-0.0380 pi+ pi- J/psi PHOTOS PHSP;
-0.1790 D*0 anti-D0 PHOTOS PHSP;
-0.1790 anti-D*0 D0 PHOTOS PHSP;
-0.4740 D0 anti-D0 pi0 PHOTOS PHSP;
-0.0080 gamma J/psi PHOTOS PHSP;
-0.0450 gamma psi(2S) PHOTOS PHSP;
-0.0340 pi0 chi_c1 PHOTOS PHSP;
-0.0430 omega J/psi PHOTOS PHSP;
-Enddecay
-
-
 End 
-
-
-
-
-     

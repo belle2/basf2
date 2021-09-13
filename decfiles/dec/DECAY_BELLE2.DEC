@@ -10819,19 +10819,39 @@ Decay psi(3770)
 Enddecay
 
 
-# change the decay BR with the fitted one. (Y.B Li, 2021/09/12)
-Decay X_1(3872)
-0.03800000    pi+ pi- J/psi                                PHSP;
-0.17900000    D*0 anti-D0                                  PHSP;
-0.17900000    anti-D*0 D0                                  PHSP;
-0.47400000    D0 anti-D0 pi0                               PHSP;
-0.00800000    gamma J/psi                                  PHSP;
-0.04500000    gamma psi(2S)                                PHSP;
-0.03400000    pi0 chi_c1                                   PHSP;
-0.04300000    omega J/psi                                  PHSP;
-#1.000000000   rndmflav  anti-rndmflav                      PYTHIA 42;
-Enddecay
 
+# Data from PDG 2021.
+Decay X_1(3872)
+
+# branching(M176, 2)
+0.03800000    pi+  pi-  J/psi                              PHSP;
+# branching(M176, 13)
+0.04300000    omega  J/psi                                 PHSP;
+
+# Branching fractions of open-charm decays are measured with large
+# uncertainties. They are rescaled so that the sum of all branching fractions
+# equals to 1.
+# S = branching(M176, 2) + branching(M176, 13) + branching(M176, 18) +
+#     branching(M176, 9) + branching(M176, 11)
+# SD = branching(M176, 8) + branching(M176, 12)
+# branching(M176, 8) / SD * (1 - S)
+0.47404652    D0 anti-D0 pi0                               PHSP;
+# branching(M176, 12) / SD * (1 - S) / 2
+0.17897674    D*0 anti-D0                                  PHSP;
+# branching(M176, 12) / SD * (1 - S) / 2
+0.17897674    anti-D*0 D0                                  PHSP;
+
+# branching(M176, 18)
+0.03400000    pi0 chi_c1                                   PHSP;
+
+# Radiative decays.
+
+# branching(M176, 9)
+0.00800000    gamma  J/psi                                 PHSP;
+# branching(M176, 11)
+0.04500000    gamma  psi(2S)                               PHSP;
+
+Enddecay
 
 
 

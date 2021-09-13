@@ -239,3 +239,23 @@ def fancy_skim_header(SkimClass):
     SkimClass.additional_setup.__doc__ = SkimClass.additional_setup.__doc__ or ""
 
     return SkimClass
+
+
+def dry_run_steering_file(SteeringFile):
+    """
+    Check if the steering file at the given path can be run with the "--dry-run" option.
+    """
+    proc = subprocess.run(
+        ["basf2", "--dry-run", "-i", "i.root", "-o", "o.root", str(SteeringFile)],
+        stderr=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+    )
+
+    if proc.returncode != 0:
+        stdout = proc.stdout.decode("utf-8")
+        stderr = proc.stderr.decode("utf-8")
+
+        raise RuntimeError(
+            f"An error occured while dry-running steering file {SteeringFile}\n"
+            f"Script output:\n{stdout}\n{stderr}"
+        )

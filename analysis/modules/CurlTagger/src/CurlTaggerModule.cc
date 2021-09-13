@@ -50,7 +50,7 @@ CurlTaggerModule::CurlTaggerModule() : Module()
            "the name of the selector to use when deciding if two reconstructed particles are the same true particle, available : 'cut', 'mva'",
            std::string("cut"));
   addParam("mcTruth", m_McStatsFlag,
-           "additionaly bundles the particles using their genParticleIndex and tags them with extraInfo(isTruthCurl) and extraInfo(truthBundleSize).",
+           "additionally bundles the particles using their genParticleIndex and tags them with extraInfo(isTruthCurl) and extraInfo(truthBundleSize).",
            false);
   addParam("train", m_TrainFlag, "flag for training the MVA or other methods if needed", false);
 
@@ -83,7 +83,7 @@ void CurlTaggerModule::initialize()
     B2ERROR("Curl Track Tagger - Selector type does not exists.");
   }
 
-  //initialse the selector if it has an initialize function
+  //initialise the selector if it has an initialize function
   m_Selector->initialize();
 }
 

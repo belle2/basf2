@@ -11,7 +11,7 @@
 """ECL timing self-consistency check (not orthogonal events so not a great validation) with an bhabha event selection."""
 
 from prompt import CalibrationSettings
-from reconstruction import *
+from reconstruction import prepare_user_cdst_analysis
 from caf.utils import IoV
 
 

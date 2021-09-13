@@ -125,7 +125,7 @@ namespace Belle2 {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid)
           return std::numeric_limits<float>::quiet_NaN();
-        // No informaiton form any subdetector in the list
+        // No information form any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
           return std::numeric_limits<float>::quiet_NaN();
 
@@ -164,7 +164,7 @@ namespace Belle2 {
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid) return std::numeric_limits<float>::quiet_NaN();
-        // No informaiton form any subdetector in the list
+        // No information form any subdetector in the list
         if (pid->getLogL(hypType, detectorSet) == 0)
           return std::numeric_limits<float>::quiet_NaN();
 
@@ -640,7 +640,7 @@ The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `cluste
     REGISTER_VARIABLE("pidLogLikelihoodValueExpert(pdgCode, detectorList)", pidLogLikelihoodValueExpert,
                       "returns the log likelihood value of for a specific mass hypothesis and  set of detectors.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("pidDeltaLogLikelihoodValueExpert(pdgCode1, pdgCode2, detectorList)", pidDeltaLogLikelihoodValueExpert,
-                      "returns LogL(hyp1) - LogL(hyp2) (aka DLL) for two mass hypoteses and a set of detectors.", Manager::VariableDataType::c_double);
+                      "returns LogL(hyp1) - LogL(hyp2) (aka DLL) for two mass hypotheses and a set of detectors.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("pidPairProbabilityExpert(pdgCodeHyp, pdgCodeTest, detectorList)", pidPairProbabilityExpert,
                       "Pair (or binary) probability for the pdgCodeHyp mass hypothesis respect to the pdgCodeTest one, using an arbitrary set of detectors. :math:`\\mathcal{L}_{hyp}/(\\mathcal{L}_{test}+\\mathcal{L}_{hyp}`",
                       Manager::VariableDataType::c_double);
@@ -661,17 +661,29 @@ The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `cluste
                       "Returns 1 if the PID likelihood for the particle given its PID is the largest one", Manager::VariableDataType::c_bool);
 
     // B2BII PID
-    VARIABLE_GROUP("PID_belle");
-    REGISTER_VARIABLE("atcPIDBelle(i,j)", atcPIDBelle,
-                      "returns Belle's PID atc variable: ``atc_pid(3,1,5,i,j).prob()``.\n"
-                      "Parameters i,j are signal and backgroud hypothesis: (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("muIDBelle", muIDBelle,
-                      "returns Belle's PID ``Muon_likelihood()`` variable.", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("muIDBelleQuality", muIDBelleQuality,
-                      "returns true if Belle's PID ``Muon_likelihood()`` is usable (reliable).", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("eIDBelle", eIDBelle,
-                      "returns Belle's electron ID ``eid(3,-1,5).prob()`` variable.", Manager::VariableDataType::c_double);
+    VARIABLE_GROUP("Belle PID variables");
+    REGISTER_VARIABLE("atcPIDBelle(i,j)", atcPIDBelle, R"DOC(
+[Legacy] Returns Belle's PID atc variable: ``atc_pid(3,1,5,i,j).prob()``.
+Parameters i,j are signal and background hypothesis: (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)
+Returns 0.5 in case there is no likelihood found and a factor of 0.5 will appear in the product if any of the subdetectors don't report a likelihood (Belle behaviour).
 
+.. warning:: The behaviour is different from Belle II PID variables which typically return NaN in case of error.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("muIDBelle", muIDBelle, R"DOC(
+[Legacy] Returns Belle's PID ``Muon_likelihood()`` variable.
+Returns 0.5 in case there is no likelihood found and returns zero if the muon likelihood is not usable (Belle behaviour).
+
+.. warning:: The behaviour is different from Belle II PID variables which typically return NaN in case of error.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("muIDBelleQuality", muIDBelleQuality, R"DOC(
+[Legacy] Returns true if Belle's PID ``Muon_likelihood()`` is usable (reliable).
+Returns zero/false if not usable or if there is no PID found.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("eIDBelle", eIDBelle, R"DOC(
+[Legacy] Returns Belle's electron ID ``eid(3,-1,5).prob()`` variable. 
+Returns 0.5 in case there is no likelihood found (Belle behaviour).
+
+.. warning:: The behaviour is different from Belle II PID variables which typically return NaN in case of error.
+    )DOC", Manager::VariableDataType::c_double);
   }
 }

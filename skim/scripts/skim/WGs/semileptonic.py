@@ -83,7 +83,7 @@ class PRsemileptonicUntagged(BaseSkim):
         ma.fillParticleList(decayString="pi+:PRSL_eventshape",
                             cut="pt> 0.1", path=path)
         ma.fillParticleList(decayString="gamma:PRSL_eventshape",
-                            cut="E > 0.1", path=path)
+                            cut="E > 0.1", path=path, loadPhotonBeamBackgroundMVA=False)
 
         ma.buildEventShape(inputListNames=["pi+:PRSL_eventshape", "gamma:PRSL_eventshape"],
                            allMoments=False,
@@ -195,8 +195,8 @@ class SLUntagged(BaseSkim):
         stdMu("all", path=path)
         stdPi("all", path=path)
         stdPi("loose", path=path)
-        stdPhotons("loose", path=path)
-        stdPi0s("eff40_May2020", path=path)
+        stdPhotons("loose", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPi0s("eff40_May2020", path=path, loadPhotonBeamBackgroundMVA=False)
         stdKshorts(path=path)
         loadStdPi0ForBToHadrons(path=path)
         loadPiForBtoHadrons(path=path)
@@ -318,7 +318,7 @@ class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
         stdMu("all", path=path)
         stdPi("all", path=path)
         stdK("all", path=path)
-        stdPi0s("eff20_May2020", path=path)
+        stdPi0s("eff20_May2020", path=path, loadPhotonBeamBackgroundMVA=False)
         loadPiSkimHighEff(path=path)
         loadKSkimHighEff(path=path)
         loadSlowPi(path=path)

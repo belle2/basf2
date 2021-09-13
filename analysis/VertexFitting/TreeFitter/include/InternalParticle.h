@@ -13,7 +13,7 @@
 
 namespace TreeFitter {
 
-  /** another unneccessary layer of abstraction */
+  /** another unnecessary layer of abstraction */
   class InternalParticle : public ParticleBase {
 
   public:

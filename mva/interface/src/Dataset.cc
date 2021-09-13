@@ -358,9 +358,9 @@ namespace Belle2 {
       for (const auto& filename : filenames) {
         //nentries = -1 forces AddFile() to read headers
         if (!m_tree->AddFile(filename.c_str(), -1)) {
-          B2ERROR("Error during open of ROOT file named " << filename << " cannot retreive tree named " <<
+          B2ERROR("Error during open of ROOT file named " << filename << " cannot retrieve tree named " <<
                   m_general_options.m_treename);
-          throw std::runtime_error("Error during open of ROOT file named " + filename + " cannot retreive tree named " +
+          throw std::runtime_error("Error during open of ROOT file named " + filename + " cannot retrieve tree named " +
                                    m_general_options.m_treename);
         }
       }

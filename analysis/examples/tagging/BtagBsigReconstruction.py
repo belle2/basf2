@@ -20,8 +20,7 @@ myMain = basf2.create_path()
 # Y(4S) -> B0:tag B0:sig
 # anti-B0:tag -> D*+ pi-; D*+ -> D0 pi+; D0 -> K- pi+
 # B0:sig -> anti-D0 pi0; anti-D0 -> K+ pi-
-ma.inputMdst(environmentType='default',
-             filename=basf2.find_file('B02pi0D0_D2kpi_B2Dstarpi_Dstar2Dpi_D2kpi.root', 'examples', False),
+ma.inputMdst(filename=basf2.find_file('B02pi0D0_D2kpi_B2Dstarpi_Dstar2Dpi_D2kpi.root', 'examples', False),
              path=myMain)
 
 

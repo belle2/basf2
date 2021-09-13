@@ -47,12 +47,19 @@ void FlavorTaggerInfoBuilderModule::event()
     if (!roe->isBuiltWithMostLikely()) continue;
     const Particle* particle = roe->getRelated<Particle>();
 
-    // create FlavorTaggerInfo object
-    FlavorTaggerInfo* flavTag = m_flavorTaggerInfos.appendNew();
+    // create FlavorTaggerInfo object if it does not exist
+    FlavorTaggerInfo* flavTag = roe->getRelatedTo<FlavorTaggerInfo>() ? roe->getRelatedTo<FlavorTaggerInfo>() :
+                                m_flavorTaggerInfos.appendNew();
 
-    // create relations: Particle <-> FlavorTaggerInfo , RestOfEvent <-> FlavorTaggerInfo
-    particle->addRelationTo(flavTag);
-    roe->addRelationTo(flavTag);
+    flavTag -> addMethodMap("FBDT");
+    flavTag -> addMethodMap("FANN");
+    flavTag -> addMethodMap("DNN");
+
+    if (!roe->getRelatedTo<FlavorTaggerInfo>()) {
+      // create relations: Particle <-> FlavorTaggerInfo , RestOfEvent <-> FlavorTaggerInfo
+      particle->addRelationTo(flavTag);
+      roe->addRelationTo(flavTag);
+    }
 
   }
 }

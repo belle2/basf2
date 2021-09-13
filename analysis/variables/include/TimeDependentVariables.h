@@ -455,25 +455,25 @@ namespace Belle2 {
     double tagTrackTrueMomentumZ(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
-     * return the true origin of the MC particle corresonding to the ith tag vtx track.
+     * return the true origin of the MC particle corresponding to the ith tag vtx track.
      *
      */
     TVector3 tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
-     * return the X component of the true origin of the MC particle corresonding to the ith tag vtx track.
+     * return the X component of the true origin of the MC particle corresponding to the ith tag vtx track.
      *
      */
     double tagTrackTrueOriginX(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
-     * return the Y component of the true origin of the MC particle corresonding to the ith tag vtx track.
+     * return the Y component of the true origin of the MC particle corresponding to the ith tag vtx track.
      *
      */
     double tagTrackTrueOriginY(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
-     * return the Z component of the true origin of the MC particle corresonding to the ith tag vtx track.
+     * return the Z component of the true origin of the MC particle corresponding to the ith tag vtx track.
      *
      */
     double tagTrackTrueOriginZ(const Particle* part, const std::vector<double>& trackIndex);
@@ -488,7 +488,7 @@ namespace Belle2 {
     int fitTruthStatus(const Particle* part);
 
     /**
-     * return the status of the fit performed with the rolled back postion of tracks.
+     * return the status of the fit performed with the rolled back position of tracks.
      * 0 fit performed with measured parameters
      * 1 fit performed with rolled back tracks
      * 2 unable to recover truth parameters

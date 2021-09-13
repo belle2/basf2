@@ -100,16 +100,16 @@ namespace Belle2 {
     * Time since the last injection in clock ticks (127MHz=RF/4 clock)
     * Note: A value of 0x7FFFFFFF (see `c_flagNoInjection`) means no injection took place recently
     *       (value is defined by the RawFTSW)
+    * Note: This is actually the time since the injection-pre-kick signal was received
+    *       so there is some offset (different for HER/LER) that will be handled by the analysis variable
     **/
     unsigned int m_timeSinceLastInjection;
     /**
     * Time since the previous trigger in clock ticks (127MHz=RF/4 clock)
-    * Note: This is actually the time since the injection-pre-kick signal was received
-    *       so there is some offset (different for HER/LER) that will be handled by the analysis variable
     **/
     unsigned int m_timeSincePrevTrigger;
     /**
-    * Number of triggered bunch, ranging from 0-1279
+    * Number of triggered bunch, ranging from 0-1279 (in 127MHz clock ticks)
     * Note: There are a maximum of 5120 buckets, which could each carry one bunch of e+/e-,
     *       but we only have 1280 clock ticks (=5120/4) to identify the bunches
     * Note: This is the bunch number as given by the TTD. This might not be the 'global' bunch number,

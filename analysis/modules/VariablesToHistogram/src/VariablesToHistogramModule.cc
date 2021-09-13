@@ -56,7 +56,7 @@ void VariablesToHistogramModule::initialize()
   if (not m_particleList.empty())
     StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
-  // Check if we can acces the given file
+  // Check if we can access the given file
   m_file = RootFileCreationManager::getInstance().getFile(m_fileName);
   if (!m_file) return;
   // Make sure we don't disturb the global directory for other modules, friggin side effects everywhere
@@ -220,7 +220,7 @@ void VariablesToHistogramModule::terminate()
     const bool writeError = m_file->TestBit(TFile::kWriteError);
     m_file.reset();
     if (writeError) {
-      B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
+      B2FATAL("A write error occurred while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
   }
 }

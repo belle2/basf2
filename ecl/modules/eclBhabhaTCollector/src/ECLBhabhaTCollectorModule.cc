@@ -46,9 +46,8 @@ ECLBhabhaTCollectorModule::ECLBhabhaTCollectorModule() : CalibrationCollectorMod
   m_FlightTimeDB("ECLCrystalFlightTime"),
   m_PreviousCrystalTimeDB("ECLCrystalTimeOffset"),
   m_CrateTimeDB("ECLCrateTimeOffset"),
-  m_RefCrystalsCalibDB("ECLReferenceCrystalPerCrateCalib")//,
-  //m_dbgTree_electrons(0),
-  //m_tree_evtNum(0)//,
+  m_RefCrystalsCalibDB("ECLReferenceCrystalPerCrateCalib"),
+  m_channelMapDB("ECLChannelMap")//,
 {
   setDescription("This module generates sum of all event times per crystal");
 
@@ -314,12 +313,19 @@ void ECLBhabhaTCollectorModule::collect()
   B2DEBUG(22, "Event number = " << m_EventMetaData->getEvent());
 
 
-  /* Use ECLChannelMapper to get other detector indices for the crystals */
-  /* For conversion from CellID to crate, shaper, and channel ids. */
+  /* Use ECLChannelMapper to get other detector indices for the crystals
+     For conversion from CellID to crate, shaper, and channel ids.
+     The initialization function automatically checks to see if the
+     object has been initialized and ifthe payload has changed and
+     thus needs updating. */
+  bool ECLchannelMapHasChanged = m_channelMapDB.hasChanged();
+  if (ECLchannelMapHasChanged) {
+    B2INFO("ECLBhabhaTCollectorModule::collect() " << LogVar("ECLchannelMapHasChanged", ECLchannelMapHasChanged));
+    if (!m_crystalMapper->initFromDB()) {
+      B2FATAL("ECLBhabhaTCollectorModule::collect() : Can't initialize eclChannelMapper!");
+    }
+  }
 
-  // Use smart pointer to avoid memory leak when the ECLChannelMapper object needs destroying at the end of the event.
-  shared_ptr< ECL::ECLChannelMapper > crystalMapper(new ECL::ECLChannelMapper());
-  crystalMapper->initFromDB();
 
   //== Get expected energies and calibration constants from DB. Need to call
   //   hasChanged() for later comparison
@@ -388,7 +394,7 @@ void ECLBhabhaTCollectorModule::collect()
 
   // Make a crate time offset vector with an entry per crate (instead of per crystal) and convert from ADC counts to ns.
   for (int crysID = 1; crysID <= 8736; crysID++) {
-    int crateID_temp = crystalMapper->getCrateID(crysID);
+    int crateID_temp = m_crystalMapper->getCrateID(crysID);
     Crate_time_ns[crateID_temp - 1] = m_CrateTime[crysID] * TICKS_TO_NS;
   }
 
@@ -704,7 +710,8 @@ void ECLBhabhaTCollectorModule::collect()
     if (maxiTrk[icharge] > -1) {
       B2DEBUG(22, "looping over the 2 max pt tracks");
 
-      const TrackFitResult* tempTrackFit = tracks[maxiTrk[icharge]]->getTrackFitResult(Const::ChargedStable(211));
+      const TrackFitResult* tempTrackFit = tracks[maxiTrk[icharge]]->getTrackFitResultWithClosestMass(Const::pion);
+      if (not tempTrackFit) {continue;}
       trkp4Lab[icharge] = tempTrackFit->get4Momentum();
       trkp4COM[icharge] = boostrotate.rotateLabToCms() * trkp4Lab[icharge];
       trkpLab[icharge] = trkp4Lab[icharge].Rho();
@@ -839,7 +846,7 @@ void ECLBhabhaTCollectorModule::collect()
 
     //== Save time and crystal information.  Fill plot after both electrons are tested
     crystalIDs[iCharge] = cid;
-    crateIDs[iCharge] = crystalMapper->getCrateID(ecl_cal->getCellId());
+    crateIDs[iCharge] = m_crystalMapper->getCrateID(ecl_cal->getCellId());
 
 
     ts_prevCalib[iCharge] = m_PreviousCrystalTime[cid - 1] * TICKS_TO_NS;
@@ -877,7 +884,7 @@ void ECLBhabhaTCollectorModule::collect()
     m_tree_t0_unc   = evt_t0_unc;
     m_E_DIV_p       = E_DIV_p[iCharge];
     m_tree_evtNum  = m_EventMetaData->getEvent();
-    m_crystalCrate  = crystalMapper->getCrateID(ecl_cal->getCellId());
+    m_crystalCrate  = m_crystalMapper->getCrateID(ecl_cal->getCellId());
     m_runNum        = m_EventMetaData->getRun();
 
     if (m_saveTree) {

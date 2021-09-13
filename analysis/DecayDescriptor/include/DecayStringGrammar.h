@@ -70,7 +70,7 @@ namespace Belle2 {
   boost::spirit::qi::rule<Iterator> reserved;
   /** Particle in the decay string: 'selector name label'. */
   boost::spirit::qi::rule<Iterator, DecayStringParticle(), boost::spirit::unicode::space_type> particle;
-  /** Particles can be selected by preceeding '^' symbol. */
+  /** Particles can be selected by preceding '^' symbol. */
   boost::spirit::qi::rule<Iterator, std::string(), boost::spirit::unicode::space_type> selector;
   /** Label that can be attached to a particle name, separated by the '/' symbol. */
   boost::spirit::qi::rule<Iterator, std::string(), boost::spirit::unicode::space_type> label;

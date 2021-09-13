@@ -43,7 +43,7 @@ target_variable = 'isSignal'
 
 # --- create training data set ---
 training_path = basf2.core.Path()
-inputMdst('default', input_file_name, path=training_path)
+inputMdst(input_file_name, path=training_path)
 stdKshorts(path=training_path)
 matchMCTruth('K_S0:merged', path=training_path)
 

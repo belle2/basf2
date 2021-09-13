@@ -34,7 +34,6 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <ecl/digitization/EclConfiguration.h>
 
 #include <analysis/utility/PCmsLabTransform.h>
@@ -63,7 +62,8 @@ eclBhabhaTimeCalibrationValidationCollectorModule::eclBhabhaTimeCalibrationValid
   m_dbg_tree_electronClusters(0),
   m_dbg_tree_event(0),
   m_dbg_tree_run(0),
-  m_CrateTimeDB("ECLCrateTimeOffset")//,
+  m_CrateTimeDB("ECLCrateTimeOffset"),
+  m_channelMapDB("ECLChannelMap")//,
 {
   setDescription("This module validates the ECL cluster times");
 
@@ -208,13 +208,23 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
   B2DEBUG(22, "Cutflow: no cuts: index = " << cutIndexPassed);
 
+  /* Use ECLChannelMapper to get other detector indices for the crystals
+     For conversion from CellID to crate, shaper, and channel ids.
+     The initialization function automatically checks to see if the
+     object has been initialized and ifthe payload has changed and
+     thus needs updating. */
+  bool ECLchannelMapHasChanged = m_channelMapDB.hasChanged();
+  if (ECLchannelMapHasChanged) {
+    B2INFO("eclBhabhaTimeCalibrationValidationCollectorModule::collect() " << LogVar("ECLchannelMapHasChanged",
+           ECLchannelMapHasChanged));
+    if (!m_crystalMapper->initFromDB()) {
+      B2FATAL("eclBhabhaTimeCalibrationValidationCollectorModule::collect() : Can't initialize eclChannelMapper!");
+    }
+  }
 
-  /* Use ECLChannelMapper to get other detector indices for the crystals */
-  /* For conversion from CellID to crate, shaper, and channel ids. */
 
-  // Use smart pointer to avoid memory leak when the ECLChannelMapper object needs destroying at the end of the event.
-  shared_ptr< ECL::ECLChannelMapper > crystalMapper(new ECL::ECLChannelMapper());
-  crystalMapper->initFromDB();
+
+
 
   B2DEBUG(29, "Finished checking if previous crystal time payload has changed");
 
@@ -238,7 +248,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
 
   // Make a crate time offset vector with an entry per crate (instead of per crystal) and convert from ADC counts to ns.
   for (int crysID = 1; crysID <= 8736; crysID++) {
-    int crateID_temp = crystalMapper->getCrateID(crysID);
+    int crateID_temp = m_crystalMapper->getCrateID(crysID);
     Crate_time_ns[crateID_temp - 1] = m_CrateTime[crysID] * TICKS_TO_NS;
     Crate_time_unc_ns[crateID_temp - 1] = m_CrateTimeUnc[crysID] * TICKS_TO_NS;
   }
@@ -409,7 +419,9 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
     if (maxiTrk[icharge] > -1) {
       B2DEBUG(22, "looping over the 2 max pt tracks");
 
-      const TrackFitResult* tempTrackFit = tracks[maxiTrk[icharge]]->getTrackFitResult(Const::ChargedStable(211));
+      const TrackFitResult* tempTrackFit = tracks[maxiTrk[icharge]]->getTrackFitResultWithClosestMass(Const::pion);
+      if (not tempTrackFit) {continue ;}
+
       trkp4Lab[icharge] = tempTrackFit->get4Momentum();
       trkp4COM[icharge] = boostrotate.rotateLabToCms() * trkp4Lab[icharge];
       trkpLab[icharge] = trkp4Lab[icharge].Rho();

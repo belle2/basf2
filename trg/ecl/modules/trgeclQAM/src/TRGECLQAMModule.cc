@@ -205,7 +205,7 @@ namespace Belle2 {
     for (int TCId = 1; TCId < 577; TCId++) {
       if (TCId < 81) { //Forward Endcap
         mean_FWD += TCID[TCId - 1];
-      } else if (TCId > 80 && TCId < 513) { //Barrel
+      } else if (TCId < 513) { //Barrel
         mean_BAR += TCID[TCId - 1];
       } else if (TCId > 512) { //Backward Endcap
         mean_BWD += TCID[TCId - 1];
@@ -218,7 +218,7 @@ namespace Belle2 {
     for (int TCId = 1; TCId < 577; TCId++) {
       if (TCId < 81) { //Forward Endcap
         if (TCID[TCId - 1] < mean_FWD * 0.1)m_FWD++;
-      } else if (TCId > 80 && TCId < 513) { //Barrel
+      } else if (TCId < 513) { //Barrel
         if (TCID[TCId - 1] < mean_BAR * 0.1)m_BAR++;
       } else if (TCId > 512) { //Backward Endcap
         if (TCID[TCId - 1] < mean_BWD * 0.1)m_BWD++;

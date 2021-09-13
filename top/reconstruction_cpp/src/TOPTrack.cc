@@ -65,13 +65,13 @@ namespace Belle2 {
 
       const auto* track = extHit->getRelated<Track>();
       if (not track) {
-        B2ERROR("No related Track found for valid extHit");
+        B2ERROR("TOPTrack: no related Track found for valid ExtHit");
         return;
       }
 
       auto chargedStable = Const::chargedStableSet.find(abs(extHit->getPdgCode()));
       if (chargedStable == Const::invalidParticle) {
-        B2ERROR("Extrapolation hypothesis of extHit is not chargedStable particle");
+        B2ERROR("TOPTrack: extrapolation hypothesis of ExtHit is not ChargedStable");
         return;
       }
 
@@ -87,8 +87,7 @@ namespace Belle2 {
 
       const auto* fitResult = track.getTrackFitResultWithClosestMass(chargedStable);
       if (not fitResult) {
-        B2ERROR("No TrackFitResult available for: "
-                << LogVar("PDG code", chargedStable.getPDGCode()));
+        B2ERROR("TOPTrack: no TrackFitResult available for PDGCode = " << chargedStable.getPDGCode());
         return;
       }
 
@@ -146,7 +145,7 @@ namespace Belle2 {
 
       const auto* yScanner = TOPRecoManager::getYScanner(m_moduleID);
       if (not yScanner) {
-        B2ERROR("TOP::TOPTrack: YScanner for given module not found (must be a bug!)" << LogVar("slot", m_moduleID));
+        B2ERROR("TOPTrack: YScanner for given module not found (must be a bug!)" << LogVar("slot", m_moduleID));
         m_valid = false;
         return;
       }

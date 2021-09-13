@@ -226,6 +226,10 @@ def getLogFile(skim, sample, TestingCombined):
 def getJsonFile(skim, sample, TestingCombined):
     """Read in the JSON output from ``--job-information`` of a test job as a dict.
 
+    The order of the ``output_files`` section has no relation to the order of skims. So
+    to simplify things in other functions, we explicitly reorder this section to match
+    the order of the skim definition.
+
     Args:
         skim (str): The name of the skim being tested.
         sample (skim.testfiles.Sample): Sample being tested.
@@ -241,21 +245,44 @@ def getJsonFile(skim, sample, TestingCombined):
     """
     LogDirectory = Path("log") / ("combined" if TestingCombined else "single")
 
+    jsonFileName = LogDirectory / skim / sample.encodeable_name / "job.json"
     try:
-        jsonFileName = LogDirectory / skim / sample.encodeable_name / "job.json"
         with open(jsonFileName) as jsonFile:
             jsonFileContents = json.load(jsonFile)
-    except FileNotFoundError:
+    except FileNotFoundError as e:
         raise SkimNotRunException(
             f"    Failed to open output JSON file for {skim} skim on {sample} sample.\n"
             "    Perhaps you forgot to run the skim with ``b2skim-stats-submit``?"
-        )
+        ) from e
+    except json.decoder.JSONDecodeError as e:
+        raise SkimNotRunException(
+            f"    Failed to parse output JSON file for {skim} skim on {sample} sample: {jsonFileName}\n"
+            "    The basf2 job may not have completed successfully. Please try "
+            "rerunning the skim with `b2skim-stats-submit`."
+        ) from e
 
     if not testJsonFile(jsonFileContents):
         raise SkimNotRunException(
             f"    The file {jsonFileName} indicates something "
             "went wrong with the skim job, or while saving the uDST file(s)."
         )
+
+    # Reorder `output_files` section to match order of skim definition.
+    if TestingCombined:
+        definitions = get_metadata(TestingCombined=True)["CombinedSkims"]
+
+        # Creates a mapping of {skim code -> `output_file` block} and uses this mapping
+        # to reorder via the skim codes of the CombinedSkim.
+        files_dict = {
+            f["metadata"]["dataDescription"]["skimDecayMode"]: f
+            for f in jsonFileContents["output_files"]
+        }
+        definition_ordered_codes = [
+            Registry.encode_skim_name(s) for s in definitions[skim]
+        ]
+        jsonFileContents["output_files"] = [
+            files_dict[code] for code in definition_ordered_codes
+        ]
 
     return jsonFileContents
 

@@ -154,7 +154,7 @@ void PrintMCParticlesModule::filterPrimaryOnly(std::vector<MCParticle*>& particl
 void PrintMCParticlesModule::printTree(const std::vector<MCParticle*>& particles, int level, const std::string& indent)
 {
   //If we show extra content make the particle name and pdg code bold if supported
-  //And if we also show secondaries make those red to distuingish
+  //And if we also show secondaries make those red to distinguish
   const bool useColor = LogConnectionConsole::terminalSupportsColors(STDOUT_FILENO);
   const bool anyExtraInfo = m_showProperties or m_showMomenta or m_showVertices or m_showStatus;
   std::string colorStart[] = {"", ""};

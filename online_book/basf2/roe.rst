@@ -12,17 +12,17 @@ The Rest of Event (ROE)
 
     **Prerequisites**:
 
-    	* The previous lesson
+    * The previous lesson
 
     **Questions**:
 
-        * I combined several particles into ``X``. How do I select everything
-          that is not "in" ``X``?
-        * How to exclude some particles from this Rest of Event / what is an ROE mask?
+    * I combined several particles into ``X``. How do I select everything
+      that is not "in" ``X``?
+    * How to exclude some particles from this Rest of Event / what is an ROE mask?
 
     **Objectives**:
 
-        * Reconstruct the ROE of a B meson
+    * Reconstruct the ROE of a B meson
 
 
 After the reconstruction of the signal particle list it is very useful
@@ -75,9 +75,8 @@ We now want to reconstruct the Rest of Event of the :math:`B^0`.
      :class: toggle solution
 
      .. literalinclude:: steering_files/029_roe.py
-         :lines: 46-47
-         :emphasize-lines: 2
-         :lineno-start: 46
+         :start-at: S10
+         :end-at: E10
 
 That's it, the ROE has been reconstructed!
 Behind these python curtains, a ``RestOfEvent`` object is created for each particle in the :math:`B^0`
@@ -117,8 +116,8 @@ Remember that we were collecting all variables in the ``b_vars`` list.
 Let's include the following lines to have a useful selection of them:
 
 .. literalinclude:: steering_files/029_roe.py
-     :lines: 60-67
-     :lineno-start: 60
+     :start-at: S20
+     :end-at: E20
 
 .. admonition:: Exercise
      :class: exercise
@@ -147,9 +146,8 @@ to be applied on the ROE particles.
 For our example, let's start by defining the following selection cut strings:
 
 .. literalinclude:: steering_files/029_roe.py
-     :lines: 46-49
-     :emphasize-lines: 3-4
-     :lineno-start: 46
+     :start-at: S30
+     :end-at: E30
 
 Here we created different cuts for charged particles, like electrons or charged pions, and for photons,
 because of different methods of measurement used to detect these particles.
@@ -177,9 +175,8 @@ because of different methods of measurement used to detect these particles.
 
 
      .. literalinclude:: steering_files/029_roe.py
-         :lines: 46-51
-         :lineno-start: 46
-         :emphasize-lines: 5-6
+         :start-at: S40
+         :end-at: E40
 
 Now we have created a mask with a name ``my_mask``, that will only allow track-based
 particles that pass selection cuts ``track_based_cuts`` and ECL-based particles, that pass
@@ -229,9 +226,8 @@ loop to insert this argument.
      :class: solution toggle
 
      .. literalinclude:: steering_files/029_roe.py
-         :lines: 61-72
-         :lineno-start: 61
-         :emphasize-lines: 9-12
+         :start-at: S50
+         :end-at: E50
 
 
 .. tip::
@@ -252,7 +248,6 @@ loop to insert this argument.
      Your steering file should look like this:
 
      .. literalinclude:: steering_files/029_roe.py
-         :emphasize-lines: 46-51,60-72
          :linenos:
 
 

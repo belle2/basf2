@@ -17,6 +17,37 @@ be adapted when changing to the new release.
 Changes since release-06
 ========================
 
+.. rubric:: Simplified arguments to :py:func:`modularAnalysis.inputMdst` and :py:func:`modularAnalysis.inputMdstList`.
+
+The arguments of :py:func:`modularAnalysis.inputMdst` and :py:func:`modularAnalysis.inputMdstList` have been changed a little.
+You no longer need to specify "default", it's done automatically.
+
+The following code lines need to be changed from:
+
+.. code-block:: python
+
+   # old
+   import modularAnalysis as ma
+   ma.inputMdst("default", "/path/to/your/file.root", path=mypath)
+
+   # or
+   ma.inputMdst("Belle", "/path/to/your/file.root", path=mypath)
+
+To:
+
+.. code-block:: python
+
+     # new
+     import modularAnalysis as ma
+     ma.inputMdst("/path/to/your/file.root", path=mypath)
+
+     # or
+     ma.inputMdst("/path/to/your/file.root", path=mypath, environmentType="Belle")
+
+And similarly for :py:func:`modularAnalysis.inputMdstList`.
+
+.. warning:: We no longer support MC5-10 files.
+
 .. include:: analysis/doc/whatsnew-since/release-06-00.txt
 
 Changes since release-05
@@ -46,7 +77,7 @@ Changes since release-05
    The support of the ``fullFormat`` cDSTs is discontinued. :py:func:`reconstruction.add_cdst_output` does not store
    anymore additional branches when the option ``rawFormat=False`` is selected, being simply an alias of
    :py:func:`mdst.add_mdst_output`. The users have to explicitly define the additional branches they want to store
-   using the ``additionalBranches`` paramenter.
+   using the ``additionalBranches`` parameter.
 
    The only supported format is the ``rawFormat``, that is now extended to MC. If ``rawFormat=True`` and ``mc=False`` are
    selected, the rawdata + tracking data objects are stored, while with ``rawFormat=True`` and ``mc=True`` the digits +

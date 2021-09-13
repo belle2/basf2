@@ -75,17 +75,23 @@ namespace Belle2 {
     /// Vector of PXD module id (DHE id)
     std::vector<unsigned short> m_pxdid;
 
-    /// Vecotr of uBin
+    /// Vector of uBin
     std::vector<unsigned short> m_uBin;
 
-    /// Vecotr of vBin
+    /// Vector of vBin
     std::vector<unsigned short> m_vBin;
 
-    /// Vecotr of number of track points
+    /// Vector of number of track points
     std::vector<unsigned long> m_nTrackPoints;
 
-    /// Vecotr of number of track matched clusters
+    /// Vector of number of track matched clusters
     std::vector<unsigned long> m_nTrackClusters;
+
+    /// Vector of number of track points outside of defective pixels
+    std::vector<unsigned long> m_nSelTrackPoints;
+
+    /// Vector of number of track clusters outside of defective pixels
+    std::vector<unsigned long> m_nSelTrackClusters;
 
     /// Histogram of corrected d0 for each 2-track event
     TH1F* m_hD0;

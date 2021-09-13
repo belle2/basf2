@@ -229,8 +229,8 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_MaxDistSqInVariances = maxKLMTrackHitDistance * maxKLMTrackHitDistance;
 
   // Convert user cutoff values to geant4 units
-  m_MaxKLMTrackClusterDistance = std::max(0.0, maxKLMTrackClusterDistance) * CLHEP::cm;
-  m_MaxECLTrackClusterDistance = std::max(0.0, maxECLTrackClusterDistance) * CLHEP::cm;
+  m_MaxKLMTrackClusterDistance = std::max(0.0, maxKLMTrackClusterDistance) * CLHEP::cm; // mm
+  m_MaxECLTrackClusterDistance = std::max(0.0, maxECLTrackClusterDistance) * CLHEP::cm; // mm
   m_MinPt = std::max(0.0, minPt) * CLHEP::GeV;
   m_MinKE = std::max(0.0, minKE) * CLHEP::GeV;
 
@@ -737,7 +737,8 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
     }
     if (minDistance < m_MaxKLMTrackClusterDistance) {
       // set the relation Track to KLMCluster, using the distance as weight
-      extState.track->addRelationTo((*klmClusterInfo)[closestCluster].first, 1. / minDistance);
+      // but for being consistent with the basf2 conventions, store the distance in cm
+      extState.track->addRelationTo((*klmClusterInfo)[closestCluster].first, 1. / (minDistance / CLHEP::cm));
     }
   }
 

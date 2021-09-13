@@ -780,6 +780,21 @@ namespace Belle2 {
       return mcps.object(weightsAndIndices[0].second)->getPDG();
     }
 
+    double particleClusterTotalMCMatchWeight(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return realNaN;
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+
+      // if there are no relations to any MCParticles, we return 0!
+      double weightsum = 0;
+      for (unsigned int i = 0; i < mcps.size(); ++i)
+        weightsum += mcps.weight(i);
+
+      return weightsum;
+    }
+
     double isBBCrossfeed(const Particle* particle)
     {
       if (particle == nullptr)
@@ -1015,6 +1030,8 @@ namespace Belle2 {
                       "returns the weight of the ECLCluster -> MCParticle relation for the relation with the largest weight.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode,
                       "returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight,
+                      "returns the sum of all weights of the ECLCluster -> MCParticles relations.", Manager::VariableDataType::c_double);
 
   }
 }

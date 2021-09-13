@@ -445,79 +445,274 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("Tracking");
-    REGISTER_VARIABLE("d0Pull", getHelixD0Pull,     "(mc-meas)/err_meas for d0", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("phi0Pull", getHelixPhi0Pull,     "(mc-meas)/err_meas for phi0", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("omegaPull", getHelixOmegaPull,     "(mc-meas)/err_meas for omega", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("z0Pull", getHelixZ0Pull,     "(mc-meas)/err_meas for z0", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("tanLambdaPull", getHelixTanLambdaPull,     "(mc-meas)/err_meas for tanLambda",
-                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("d0Pull", getHelixD0Pull,     R"DOC(
+The pull of the tracking parameter :math:`d_0` for the reconstructed
+pattern-recognition track, with respect to the MC track. That is:
 
-    REGISTER_VARIABLE("nCDCHits", trackNCDCHits,     "Number of CDC hits associated to the track", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("nSVDHits", trackNSVDHits,     "Number of SVD hits associated to the track", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("nPXDHits", trackNPXDHits,     "Number of PXD hits associated to the track", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("nVXDHits", trackNVXDHits,     "Number of PXD and SVD hits associated to the track",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("ndf",      trackNDF,
-                      R"DOC(Number of degrees of freedom of the track fit. Note that it is not NHIT-5 due to outlier hit rejection.
-For mdst versions < 5.1, returns quiet_NaN().)DOC", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("chi2",      trackChi2,
-                      R"DOC(Chi2 of the track fit.
-Computed based on pValue and ndf. Note that for pValue exactly equal to 0 it returns infinity(). 
-For mdst versions < 5.1, returns quiet_NaN().)DOC", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,     "First activated SVD layer associated to the track",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("firstPXDLayer", trackFirstPXDLayer,     "First activated PXD layer associated to the track",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("firstCDCLayer", trackFirstCDCLayer,     "First activated CDC layer associated to the track",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("lastCDCLayer", trackLastCDCLayer, "Last CDC layer associated to the track", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("d0",        trackD0,        "Signed distance to the POCA in the r-phi plane",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("phi0",      trackPhi0,      "Angle of the transverse momentum in the r-phi plane",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("omega",     trackOmega,     "Curvature of the track", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("z0",        trackZ0,        "z coordinate of the POCA", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("tanLambda", trackTanLambda, "Slope of the track in the r-z plane", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("d0Err",        trackD0Error,        "Error of signed distance to the POCA in the r-phi plane",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("phi0Err",      trackPhi0Error,      "Error of angle of the transverse momentum in the r-phi plane",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("omegaErr",     trackOmegaError,     "Error of curvature of the track", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("z0Err",        trackZ0Error,        "Error of z coordinate of the POCA", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("tanLambdaErr", trackTanLambdaError, "Error of slope of the track in the r-z plane",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("pValue", trackPValue, "chi2 probability of the track fit", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("trackFitHypothesisPDG", trackFitHypothesisPDG, "PDG code of the track hypothesis actually used for the fit",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("trackNECLClusters", trackNECLClusters,
-                      "Number ecl clusters matched to the track. This is always 0 or 1 with newer versions of ECL reconstruction.",
-                      Manager::VariableDataType::c_double);
+.. math::
+
+      \frac{d_0^\textrm{MC} - d_0^\textrm{PR}}{\sigma_{d_0; \textrm{PR}}}
+
+.. seealso:: :b2:var:`d0`, :b2:var:`d0Err`
+
+Returns NaN if no MC particle is related or if called on something other than a
+track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("phi0Pull", getHelixPhi0Pull, R"DOC(
+The pull of the tracking parameter :math:`\phi_0` for the reconstructed
+pattern-recognition track, with respect to the MC track.  That is:
+
+.. math::
+
+      \frac{\phi_0^\textrm{MC} - \phi_0^\textrm{PR}}{\sigma_{\phi_0; \textrm{PR}}}
+
+.. seealso:: :b2:var:`phi0`, :b2:var:`phi0Err`
+
+Returns NaN if no MC particle is related or if called on something other than a
+track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("omegaPull", getHelixOmegaPull, R"DOC(
+The pull of the tracking parameter :math:`\omega` for the reconstructed
+pattern-recognition track, with respect to the MC track.  That is:
+
+.. math::
+
+      \frac{\omega^\textrm{MC} - \omega^\textrm{PR}}{\sigma_{\omega; \textrm{PR}}}
+
+.. seealso:: :b2:var:`omega`, :b2:var:`omegaErr`
+
+Returns NaN if no MC particle is related or if called on something other than a
+track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("z0Pull", getHelixZ0Pull, R"DOC(
+The pull of the tracking parameter :math:`z_0` for the reconstructed
+pattern-recognition track, with respect to the MC track.  That is:
+
+.. math::
+
+      \frac{z_0^\textrm{MC} - z_0^\textrm{PR}}{\sigma_{z_0; \textrm{PR}}}
+
+.. seealso:: :b2:var:`z0`, :b2:var:`z0Err`
+
+Returns NaN if no MC particle is related or if called on something other than a
+track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("tanLambdaPull", getHelixTanLambdaPull, R"DOC(
+The pull of the tracking parameter :math:`\tan\lambda` for the reconstructed
+pattern-recognition track, with respect to the MC track.  That is:
+
+.. math::
+
+      \frac{(\tan\lambda)^\textrm{MC} - (\tan\lambda)^\textrm{PR}}{\sigma_{\tan\lambda; \textrm{PR}}}
+
+.. seealso:: :b2:var:`tanLambda`, :b2:var:`tanLambdaErr`
+
+Returns NaN if no MC particle is related or if called on something other than a
+track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("nCDCHits", trackNCDCHits,
+                      "The number of CDC hits associated to the track. Returns NaN if called for something other than a track-based particle.");
+    REGISTER_VARIABLE("nSVDHits", trackNSVDHits,
+                      "The number of SVD hits associated to the track. Returns NaN if called for something other than a track-based particle.");
+    REGISTER_VARIABLE("nPXDHits", trackNPXDHits,
+                      "The number of PXD hits associated to the track. Returns NaN if called for something other than a track-based particle.");
+    REGISTER_VARIABLE("nVXDHits", trackNVXDHits,
+                      "The number of PXD and SVD hits associated to the track. Returns NaN if called for something other than a track-based particle.");
+    REGISTER_VARIABLE("ndf",      trackNDF, R"DOC(
+Returns the number of degrees of freedom of the track fit. 
+
+.. note:: 
+
+        Note that this is not simply the number of hits -5 due to outlier hit
+        rejection.
+
+Returns NaN if called for something other than a track-based particle, or for
+mdst files processed with basf2 versions older than ``release-05-01``.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("chi2",      trackChi2, R"DOC(
+Returns the :math:`\chi^2` of the track fit.  This is actually computed based on
+:b2:var:`pValue` and :b2:var:`ndf`. 
+
+.. note:: Note that for :b2:var:`pValue` exactly equal to 0 it returns infinity. 
+
+Returns NaN if called for something other than a track-based particle, or for
+mdst files processed with basf2 versions older than ``release-05-01``.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,
+                      "The first activated SVD layer associated to the track. Returns NaN if called for something other than a track-based particle.");
+    REGISTER_VARIABLE("firstPXDLayer", trackFirstPXDLayer,
+                      "The first activated PXD layer associated to the track. Returns NaN if called for something other than a track-based particle.");
+    REGISTER_VARIABLE("firstCDCLayer", trackFirstCDCLayer,
+                      "The first activated CDC layer associated to the track. Returns NaN if called for something other than a track-based particle.");
+    REGISTER_VARIABLE("lastCDCLayer", trackLastCDCLayer,
+                      "The last CDC layer associated to the track. Returns NaN if called for something other than a track-based particle.");
+    REGISTER_VARIABLE("d0", trackD0, R"DOC(
+Returns the tracking parameter :math:`d_0`, the signed distance to the
+point-of-closest-approach (POCA) in the :math:`r-\phi` plane. 
+
+.. note::
+
+        Tracking parameters are with respect to the origin (0,0,0).  For the
+        POCA with respect to the measured beam interaction point, see
+        :b2:var:`dr` (you probably want this unless you're doing a tracking
+        study or some debugging).
+
+Returns NaN if called for something other than a track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("phi0", trackPhi0, R"DOC(
+Returns the tracking parameter :math:`\phi_0`, the angle of the transverse
+momentum in the :math:`r-\phi` plane.
+
+Returns NaN if called for something other than a track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("omega", trackOmega, R"DOC(
+Returns the tracking parameter :math:`\omega`, the curvature of the track.
+
+Returns NaN if called for something other than a track-based particle."
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("z0", trackZ0, R"DOC(
+Returns the tracking parameter :math:`z_0`, the z-coordinate of the
+point-of-closest-approach (POCA).
+
+.. note::
+
+        Tracking parameters are with respect to the origin (0,0,0).  For the
+        POCA with respect to the measured beam interaction point, see
+        :b2:var:`dz` (you probably want this unless you're doing a tracking
+        study or some debugging).
+
+Returns NaN if called for something other than a track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("tanLambda", trackTanLambda, R"DOC(
+Returns :math:`\tan\lambda`, the slope of the track in the :math:`r-z` plane.
+
+Returns NaN if called for something other than a track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("d0Err", trackD0Error, R"DOC(
+Returns the uncertainty on :math:`d_0`, the signed distance to the
+point-of-closest-approach (POCA) in the :math:`r-\phi` plane.
+
+.. seealso:: :b2:var:`d0`, :b2:var:`d0Pull`
+
+Returns NaN if called for something other than a track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("phi0Err", trackPhi0Error, R"DOC(
+Returns the uncertainty on :math:`\phi_0`, the angle of the transverse momentum
+in the :math:`r-\phi` plane. 
+
+.. seealso:: :b2:var:`phi0`, :b2:var:`phi0Pull`
+
+Returns NaN if called for something other than a track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("omegaErr", trackOmegaError, R"DOC(
+Returns the uncertainty on :math:`\omega`, the curvature of the track. 
+
+.. seealso:: :b2:var:`omega`, :b2:var:`omegaPull`
+
+Returns NaN if called for something other than a track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("z0Err", trackZ0Error, R"DOC(
+Returns the uncertainty on :math:`z_0`, the z-coordinate of the
+point-of-closest-approach (POCA). 
+
+.. seealso:: :b2:var:`z0`, :b2:var:`z0Pull`
+
+Returns NaN if called for something other than a track-based particle."
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("tanLambdaErr", trackTanLambdaError, R"DOC(
+Returns the uncertainty on :math:`\tan\lambda`, the slope of the track in the
+:math:`r-z` plane.
+
+.. seealso:: :b2:var:`tanLambda`, :b2:var:`tanLambdaPull`
+
+Returns NaN if called for something other than a track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("pValue", trackPValue, R"DOC(
+The :math:`\chi^2` probability of the **track** fit.
+
+.. note::
+
+        This is the p-value of the track-fit. It does not get updated after
+        vertex fitting or kinematic fitting, and is meaningless for composite
+        particles.
+
+        See :b2:var:`chiProb` (you probably want this for high-level analysis).
+
+Returns NaN if called for something other than a track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("trackFitHypothesisPDG", trackFitHypothesisPDG, R"DOC(
+Returns the PDG code of the track hypothesis actually used for the fit. 
+Returns NaN if called for something other than a track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("trackNECLClusters", trackNECLClusters, R"DOC(
+Returns a count of the number of ECLClusters matched to the track.  This is
+always 0 or 1 with newer versions of ECL reconstruction.
+
+.. note::
+
+        For high-level analysis it is recommended to require the presence of a
+        matched ECL cluster along with a minimum energy requirement.  A
+        track-based particle will have a clusterE if it is matched (NaN if
+        there is no cluster match for the track.
+
+        .. code-block:: python
+
+              import modularAnalysis as ma
+              # minimum energy of 200 MeV
+              ma.fillParticleList("e+:clusters", "clusterE > 0.2", path)
+
+              # these two are equivalent
+              ma.fillParticleList("e+:unmatched", "isNAN(clusterE) == 1", path)
+              ma.fillParticleList("e+:unmatched2", "trackNECLClusters == 0", path)
+
+Returns NaN if called for something other than a track-based particle.
+    )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("helixExtTheta", trackHelixExtTheta,
                       "Returns theta of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("helixExtPhi", trackHelixExtPhi,
                       "Returns phi of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nExtraCDCHits", nExtraCDCHits, "[Eventbased] The number of CDC hits in the event not assigned to any track",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("nExtraCDCHitsPostCleaning", nExtraCDCHitsPostCleaning,
-                      "[Eventbased] The number of CDC hits in the event not assigned to any track nor very likely beam background (i.e. hits that survive a cleanup selection)",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("hasExtraCDCHitsInLayer(i)", hasExtraCDCHitsInLayer,
-                      "[Eventbased] Returns 1 if a non-assigned hit exists in the specified CDC layer", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("hasExtraCDCHitsInSuperLayer(i)", hasExtraCDCHitsInSuperLayer,
-                      "[Eventbased] Returns 1 if a non-assigned hit exists in the specified CDC SuperLayer", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("nExtraCDCSegments", nExtraCDCSegments, "[Eventbased] The number of CDC segments not assigned to any track",
-                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("nExtraCDCHits", nExtraCDCHits, R"DOC(
+[Eventbased] The number of CDC hits in the event not assigned to any track.
+
+Returns NaN if there is no event-level tracking information available.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("nExtraCDCHitsPostCleaning", nExtraCDCHitsPostCleaning, R"DOC(
+[Eventbased] Returns a count of the number of CDC hits in the event not assigned
+to any track nor very likely beam background (i.e. hits that survive a cleanup
+selection).
+
+Returns NaN if there is no event-level tracking information available.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("hasExtraCDCHitsInLayer(i)", hasExtraCDCHitsInLayer, R"DOC(
+[Eventbased] Returns 1 if a non-assigned hit exists in the specified CDC layer,
+0 otherwise.
+
+Returns NaN if there is no event-level tracking information available.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("hasExtraCDCHitsInSuperLayer(i)", hasExtraCDCHitsInSuperLayer, R"DOC(
+[Eventbased] Returns 1 if a non-assigned hit exists in the specified CDC
+SuperLayer, 0 otherwise.
+
+Returns NaN if there is no event-level tracking information available.
+    )DOC", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("nExtraCDCSegments", nExtraCDCSegments, R"DOC(
+[Eventbased] Returns the number of CDC segments not assigned to any track.
+
+Returns NaN if there is no event-level tracking information available.
+    )DOC", Manager::VariableDataType::c_double);
     // TODO: once the Tracking group fill the dataobject these can be
     // uncommented - at the moment they are not filled, so leave out
     //REGISTER_VARIABLE("nExtraVXDHitsInLayer(i)", nExtraVXDHitsInLayer,
-    //"[Eventbased] The number VXD hits not assigned in the specified VXD layer", Manager::VariableDataType::c_double);
-    //REGISTER_VARIABLE("nExtraVXDHits", nExtraVXDHits, "[Eventbased] The number of VXD hits not assigned to any track", Manager::VariableDataType::c_double);
-    //REGISTER_VARIABLE("svdFirstSampleTime", svdFirstSampleTime, "[Eventbased] The time of first SVD sample relatvie to event T0", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("trackFindingFailureFlag", trackFindingFailureFlag,
-                      "[Eventbased] A flag set by the tracking if there is reason to assume there was a track in the event missed by the tracking, "
-                      "or the track finding was (partly) aborted for this event.", Manager::VariableDataType::c_double);
+    //"[Eventbased] The number VXD hits not assigned in the specified VXD layer");
+    //REGISTER_VARIABLE("nExtraVXDHits", nExtraVXDHits, "[Eventbased] The number of VXD hits not assigned to any track");
+    //REGISTER_VARIABLE("svdFirstSampleTime", svdFirstSampleTime, "[Eventbased] The time of first SVD sample relatvie to event T0");
+    REGISTER_VARIABLE("trackFindingFailureFlag", trackFindingFailureFlag, R"DOC(
+[Eventbased] Returns a flag set by the tracking if there is reason to assume
+there was a track in the event missed by the tracking, or the track finding was
+(partly) aborted for this event.
 
-
+Returns NaN if there is no event-level tracking information available.
+    )DOC", Manager::VariableDataType::c_double);
   }
 }

@@ -1984,7 +1984,7 @@ The allowed categories are the official Flavor Tagger Category Names.
 
     REGISTER_VARIABLE("rBinBelle(combinerMethod)", rBinBelle, R"DOC(
 Returns the corresponding :math:`r` (dilution) bin according to the Belle binning for the given ``combinerMethod``. 
-The available combiner methods are 'FBDT' and 'FANN'.
+The available methods are 'FBDT' and 'FANN' (category-based combiners), and 'DNN' (DNN tagger output).
 The return values and the corresponding dilution ranges are the following:
 
 * 0: :math:`0.000 < r < 0.100`;
@@ -2000,14 +2000,14 @@ The return values and the corresponding dilution ranges are the following:
 )DOC", Manager::VariableDataType::c_int);
     REGISTER_VARIABLE("qrOutput(combinerMethod)", qrOutput, R"DOC(
 Returns the output of the flavorTagger, flavor tag :math:`q` times the dilution factor :math:`r`, for the given combiner method. 
-The available combiner methods are 'FBDT' or 'FANN'.
+The available methods are 'FBDT' and 'FANN' (category-based combiners), and 'DNN' (DNN tagger output).
 
 .. warning:: You have to run the Flavor Tagger for this variable to be meaningful.
 .. seealso:: :ref:`FlavorTagger` and :func:`flavorTagger.flavorTagger`.
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("qOutput(combinerMethod)", qOutput, R"DOC(
 Returns the flavor tag :math:`q` output of the flavorTagger for the given combinerMethod. 
-The available combiner methods are 'FBDT' or 'FANN'.
+The available methods are 'FBDT' and 'FANN' (category-based combiners), and 'DNN' (DNN tagger output).
 
 .. warning:: You have to run the Flavor Tagger for this variable to be meaningful.
 .. seealso:: :ref:`FlavorTagger` and :func:`flavorTagger.flavorTagger`.

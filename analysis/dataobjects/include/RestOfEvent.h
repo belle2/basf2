@@ -53,7 +53,7 @@ namespace Belle2 {
   class RestOfEvent : public RelationsObject {
 
   public:
-    static constexpr const char* DEFAULT_MASK_NAME = "all"; /* Default mask name */
+    static constexpr const char* c_defaultMaskName = "all"; /* Default mask name */
     /**
      * Structure of Rest of Event mask. It contains array indices of particles, which were selected and associated to this mask after some selection.
      * Host ROE object always check that masks do not contain extra particles,
@@ -69,7 +69,7 @@ namespace Belle2 {
        * @param name name of mask
        * @param origin origin of mask, for debug
        */
-      Mask(const std::string& name = DEFAULT_MASK_NAME, const std::string& origin = "unknown"): m_name(name),
+      Mask(const std::string& name = c_defaultMaskName, const std::string& origin = "unknown"): m_name(name),
         m_origin(origin)
       {
         B2DEBUG(10, "Mask " << name << " is being initialized by " << origin);
@@ -200,7 +200,7 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @param isSelfConjugated is the particle self-conjugated
      */
-    Particle* convertToParticle(const std::string& maskName = DEFAULT_MASK_NAME, int pdgCode = 0, bool isSelfConjugated = true);
+    Particle* convertToParticle(const std::string& maskName = c_defaultMaskName, int pdgCode = 0, bool isSelfConjugated = true);
     /**
      * Gets the PDG code of the rest of event.
      */
@@ -213,7 +213,7 @@ namespace Belle2 {
      * @param particle Pointer to the Particle
      * @param maskName Name of the mask to work with
      */
-    bool hasParticle(const Particle* particle, const std::string& maskName = DEFAULT_MASK_NAME) const;
+    bool hasParticle(const Particle* particle, const std::string& maskName = c_defaultMaskName) const;
     /**
      * Initialize new mask
      * @param name Name of the mask to work with
@@ -273,7 +273,7 @@ namespace Belle2 {
      * @param unpackComposite return daughters of composite particles
      * @return vector of pointers to ROE Particles
      */
-    std::vector<const Particle*> getParticles(const std::string& maskName = DEFAULT_MASK_NAME, bool unpackComposite = true) const;
+    std::vector<const Particle*> getParticles(const std::string& maskName = c_defaultMaskName, bool unpackComposite = true) const;
     /**
     * Get photons from ROE mask.
     *
@@ -281,7 +281,7 @@ namespace Belle2 {
     * @param unpackComposite return daughters of composite particles
     * @return vector of pointers to unused Particles
     */
-    std::vector<const Particle*> getPhotons(const std::string& maskName = DEFAULT_MASK_NAME, bool unpackComposite = true) const;
+    std::vector<const Particle*> getPhotons(const std::string& maskName = c_defaultMaskName, bool unpackComposite = true) const;
     /**
      * Get hadrons from ROE mask.
      *
@@ -289,7 +289,7 @@ namespace Belle2 {
      * @param unpackComposite return daughters of composite particles
      * @return vector of pointers to ROE Particles
      */
-    std::vector<const Particle*> getHadrons(const std::string& maskName = DEFAULT_MASK_NAME, bool unpackComposite = true) const;
+    std::vector<const Particle*> getHadrons(const std::string& maskName = c_defaultMaskName, bool unpackComposite = true) const;
     /**
     * Get charged particles from ROE mask.
     *
@@ -298,7 +298,7 @@ namespace Belle2 {
     * @param unpackComposite return daughters of composite particles
     * @return vector of pointers to ROE Particles
     */
-    std::vector<const Particle*> getChargedParticles(const std::string& maskName = DEFAULT_MASK_NAME, unsigned int pdg = 0,
+    std::vector<const Particle*> getChargedParticles(const std::string& maskName = c_defaultMaskName, unsigned int pdg = 0,
                                                      bool unpackComposite = true) const;
 
     /**
@@ -307,7 +307,7 @@ namespace Belle2 {
      * @param maskName Name of mask
      * @return 4-momentum of unused Tracks and ECLClusters in ROE
      */
-    TLorentzVector get4Vector(const std::string& maskName = DEFAULT_MASK_NAME) const;
+    TLorentzVector get4Vector(const std::string& maskName = c_defaultMaskName) const;
 
     /**
      * Get 4-momentum vector all (no mask) or a subset (use mask) of all ECLClusters in ROE.
@@ -315,7 +315,7 @@ namespace Belle2 {
      * @param maskName Name of mask
      * @return 4-momentum of unused Tracks and ECLClusters in ROE
      */
-    TLorentzVector get4VectorNeutralECLClusters(const std::string& maskName = DEFAULT_MASK_NAME) const;
+    TLorentzVector get4VectorNeutralECLClusters(const std::string& maskName = c_defaultMaskName) const;
 
     /**
      * Get number of all (no mask) or a subset (use mask) of all Tracks in ROE.
@@ -323,7 +323,7 @@ namespace Belle2 {
      * @param maskName Name of mask
      * @return number of all remaining tracks
      */
-    int getNTracks(const std::string& maskName = DEFAULT_MASK_NAME) const;
+    int getNTracks(const std::string& maskName = c_defaultMaskName) const;
 
     /**
      * Get number of all (no mask) or a subset (use mask) of all ECLclusters in ROE.
@@ -331,7 +331,7 @@ namespace Belle2 {
      * @param maskName Name of mask
      * @return number of all remaining ECL clusters
      */
-    int getNECLClusters(const std::string& maskName = DEFAULT_MASK_NAME) const;
+    int getNECLClusters(const std::string& maskName = c_defaultMaskName) const;
 
     /**
      * Get number of all remaining KLM clusters.
@@ -339,7 +339,7 @@ namespace Belle2 {
      * @param maskName Name of mask
      * @return number of all remaining KLM clusters
      */
-    int getNKLMClusters(const std::string& maskName = DEFAULT_MASK_NAME) const;
+    int getNKLMClusters(const std::string& maskName = c_defaultMaskName) const;
 
     /**
      * Get vector of all mask names of the ROE object
@@ -350,7 +350,7 @@ namespace Belle2 {
     /**
      * Prints the contents of a RestOfEvent object to screen
      */
-    void print(const std::string& maskName = DEFAULT_MASK_NAME, bool unpackComposite = true) const;
+    void print(const std::string& maskName = c_defaultMaskName, bool unpackComposite = true) const;
 
   private:
 
@@ -376,7 +376,7 @@ namespace Belle2 {
     /**
      * Prints indices in the given set in a single line
      */
-    void printIndices(const std::string& maskName = DEFAULT_MASK_NAME, bool unpackComposite = true,
+    void printIndices(const std::string& maskName = c_defaultMaskName, bool unpackComposite = true,
                       const std::string& tab = " - ") const;
 
     ClassDef(RestOfEvent, 8) /**< class definition */

@@ -52,7 +52,7 @@ std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskNa
     B2DEBUG(10, "ROE contains no particles, masks are empty too");
     return result;
   }
-  if (maskName == RestOfEvent::DEFAULT_MASK_NAME) {
+  if (maskName == RestOfEvent::c_defaultMaskName) {
     // if no mask provided work with internal source
     source = m_particleIndices;
   } else {
@@ -124,7 +124,7 @@ std::vector<const Particle*> RestOfEvent::getChargedParticles(const std::string&
 
 bool RestOfEvent::hasParticle(const Particle* particle, const std::string& maskName) const
 {
-  if (maskName != RestOfEvent::DEFAULT_MASK_NAME && !hasMask(maskName)) {
+  if (maskName != RestOfEvent::c_defaultMaskName && !hasMask(maskName)) {
     B2FATAL("No " << maskName << " mask defined in current ROE!");
   }
 
@@ -137,8 +137,8 @@ void RestOfEvent::initializeMask(const std::string& name, const std::string& ori
   if (name == "") {
     B2FATAL("Creation of ROE Mask with an empty name is not allowed!");
   }
-  if (name == RestOfEvent::DEFAULT_MASK_NAME) {
-    B2FATAL("Creation of ROE Mask with a name " << RestOfEvent::DEFAULT_MASK_NAME << " is not allowed!");
+  if (name == RestOfEvent::c_defaultMaskName) {
+    B2FATAL("Creation of ROE Mask with a name " << RestOfEvent::c_defaultMaskName << " is not allowed!");
   }
   if (findMask(name)) {
     B2FATAL("ROE Mask already exists!");
@@ -156,7 +156,7 @@ void RestOfEvent::excludeParticlesFromMask(const std::string& maskName, const st
   }
   std::string maskNameToGetParticles = maskName;
   if (!mask->isValid()) {
-    maskNameToGetParticles = RestOfEvent::DEFAULT_MASK_NAME;
+    maskNameToGetParticles = RestOfEvent::c_defaultMaskName;
   }
   std::vector<const Particle*> allROEParticles =  getParticles(maskNameToGetParticles);
   std::vector<const Particle*> toKeepinROE;
@@ -187,7 +187,7 @@ void RestOfEvent::updateMaskWithCuts(const std::string& maskName, const std::sha
   if (!mask) {
     B2FATAL("ROE Mask does not exist!");
   }
-  std::string sourceName = RestOfEvent::DEFAULT_MASK_NAME;
+  std::string sourceName = RestOfEvent::c_defaultMaskName;
   if (updateExisting) {
     // if mask already exists, take its particles to update
     sourceName = maskName;
@@ -371,7 +371,7 @@ std::vector<std::string> RestOfEvent::getMaskNames() const
 void RestOfEvent::print(const std::string& maskName, bool unpackComposite) const
 {
   std::string tab = " - ";
-  if (maskName != RestOfEvent::DEFAULT_MASK_NAME) {
+  if (maskName != RestOfEvent::c_defaultMaskName) {
     // Disable possible B2FATAL in printing method, might be useful for tests
     if (!hasMask(maskName)) {
       B2WARNING("No mask with the name '" << maskName << "' exists in this ROE! Nothing else to print");
@@ -424,7 +424,7 @@ Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCod
 {
   StoreArray<Particle> particles;
   std::set<int> source;
-  if (maskName == RestOfEvent::DEFAULT_MASK_NAME) {
+  if (maskName == RestOfEvent::c_defaultMaskName) {
     // if no mask provided work with internal source
     source = m_particleIndices;
   } else {

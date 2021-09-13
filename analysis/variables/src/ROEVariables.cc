@@ -211,7 +211,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -369,7 +369,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -430,7 +430,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -457,7 +457,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -484,7 +484,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -508,7 +508,7 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_Photons(const std::vector<std::string>& arguments)
     {
-      std::string maskName = RestOfEvent::DEFAULT_MASK_NAME;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
       if (arguments.size() == 1) {
         maskName = arguments[0];
@@ -542,7 +542,7 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_NeutralHadrons(const std::vector<std::string>& arguments)
     {
-      std::string maskName = RestOfEvent::DEFAULT_MASK_NAME;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
       if (arguments.size() == 1) {
         maskName = arguments[0];
@@ -568,7 +568,7 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_ChargedParticles(const std::vector<std::string>& arguments)
     {
-      std::string maskName = RestOfEvent::DEFAULT_MASK_NAME;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
       int pdgCode = 0;
       if (arguments.size() == 1) {
         maskName = arguments[0];
@@ -603,7 +603,7 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_Composites(const std::vector<std::string>& arguments)
     {
-      std::string maskName = RestOfEvent::DEFAULT_MASK_NAME;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
       if (arguments.size() == 1) {
         maskName = arguments[0];
@@ -644,7 +644,7 @@ namespace Belle2 {
 
       if (arguments.size() == 1) {
         pListName = arguments[0];
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       } else if (arguments.size() == 2) {
         pListName = arguments[0];
         maskName = arguments[1];
@@ -686,7 +686,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -722,7 +722,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -765,7 +765,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -798,7 +798,7 @@ namespace Belle2 {
     {
       std::string maskName;
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -822,7 +822,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -849,7 +849,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -878,7 +878,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -907,7 +907,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -936,7 +936,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -965,7 +965,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -994,7 +994,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -1023,7 +1023,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -1052,7 +1052,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -1086,7 +1086,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -1112,7 +1112,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1161,7 +1161,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1224,7 +1224,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1245,7 +1245,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1275,7 +1275,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1305,7 +1305,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1335,7 +1335,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1365,7 +1365,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1395,7 +1395,7 @@ namespace Belle2 {
       std::string opt;
 
       if (arguments.size() == 1) {
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
         opt = arguments[0];
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
@@ -1424,7 +1424,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -1472,7 +1472,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -1500,7 +1500,7 @@ namespace Belle2 {
 
     Manager::FunctionPtr WE_q2lnuSimple(const std::vector<std::string>& arguments)
     {
-      std::string maskName(RestOfEvent::DEFAULT_MASK_NAME);
+      std::string maskName(RestOfEvent::c_defaultMaskName);
       std::string option("1");
 
       if (arguments.size() == 1) {
@@ -1541,7 +1541,7 @@ namespace Belle2 {
 
     Manager::FunctionPtr WE_q2lnu(const std::vector<std::string>& arguments)
     {
-      std::string maskName(RestOfEvent::DEFAULT_MASK_NAME);
+      std::string maskName(RestOfEvent::c_defaultMaskName);
       std::string option("7");
 
       if (arguments.size() == 1) {
@@ -1631,7 +1631,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
@@ -1677,7 +1677,7 @@ namespace Belle2 {
       std::string maskName;
 
       if (arguments.size() == 0)
-        maskName = RestOfEvent::DEFAULT_MASK_NAME;
+        maskName = RestOfEvent::c_defaultMaskName;
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else

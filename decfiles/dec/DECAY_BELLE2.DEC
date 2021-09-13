@@ -10835,11 +10835,11 @@ Decay X_1(3872)
 #     branching(M176, 9) + branching(M176, 11)
 # SD = branching(M176, 8) + branching(M176, 12)
 # branching(M176, 8) / SD * (1 - S)
-0.47404652    D0 anti-D0 pi0                               PHSP;
+0.47404652    D0  anti-D0  pi0                             PHSP;
 # branching(M176, 12) / SD * (1 - S) / 2
-0.17897674    D*0 anti-D0                                  PHSP;
+0.17897674    D*0  anti-D0                                 PHSP;
 # branching(M176, 12) / SD * (1 - S) / 2
-0.17897674    anti-D*0 D0                                  PHSP;
+0.17897674    anti-D*0  D0                                 PHSP;
 
 # branching(M176, 18)
 0.03400000    pi0 chi_c1                                   PHSP;

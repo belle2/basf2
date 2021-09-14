@@ -112,7 +112,11 @@ namespace Belle2 {
       for (unsigned i = 0; i < n; i++) {
         const Particle* part = plist->getParticle(i);
 
-        MCMatching::setMCTruth(part);
+        bool isMCMatched =  MCMatching::setMCTruth(part);
+        if (!isMCMatched) {
+          toRemove.push_back(part->getArrayIndex());
+          continue;
+        }
         MCMatching::getMCErrors(part);
 
         if (!m_cut->check(part)) toRemove.push_back(part->getArrayIndex());

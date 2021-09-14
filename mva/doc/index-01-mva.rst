@@ -255,7 +255,7 @@ Evaluation / Validation
 You can create a zip file with a LaTeX report and evaluation plots using the ``basf2_mva_evaluate.py`` tool.
 
 .. argparse::
-    :filename: mva/tools/basf2_mva_evaluate
+    :filename: mva/tools/basf2_mva_evaluate.py
     :func: get_argument_parser
     :prog: basf2_mva_evaluate
     :nodefault:

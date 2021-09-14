@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <fstream> // only for debugging 
+
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -37,6 +39,8 @@ namespace Belle2 {
 
     // Do matching for each event
     void event() override;
+
+    void terminate() override;
   private: //Parameters
 
     //! Parameter : Defines the Cut Off values for each charged particle. The Cut Off values in the list for
@@ -61,5 +65,9 @@ namespace Belle2 {
     int notBothRelationCounter = 0;
     // No Relation Counter
     int noRelationCounter = 0;
+
+    // Variable for saving data to file
+    std::vector<std::string> fileHeader;
+    std::vector<double> fileContent;
   };
 }

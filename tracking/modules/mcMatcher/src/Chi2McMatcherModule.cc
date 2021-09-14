@@ -28,6 +28,8 @@ include directive to avoid an undefined reference on compilation.
 #include <TVectorD.h>
 #include <TMatrixD.h>
 
+#include <tracking/mcMatcher/TrackMatchLookUp.h>
+
 using namespace Belle2;
 
 REG_MODULE(Chi2McMatcher)
@@ -53,6 +55,7 @@ Chi2McMatcherModule::Chi2McMatcherModule() : Module()
            "Defines the Cut Off values for each charged particle. pdg order [11,13,211,2212,321,1000010020]",
            defaultCutOffs);
   addParam("linalg",
+
            param_linalg,
            "time_measurement_variable",
            std::string("Eigen"));
@@ -66,10 +69,18 @@ void Chi2McMatcherModule::initialize()
   storeMCParticles.isRequired();
   storeTrack.isRequired();
   storeTrack.registerRelationTo(storeMCParticles);
+
+  // Variables to save data
+  fileHeader = {"D0_track", "Phi0_track", "Omega_track", "Z0_track", "TanLambda_track",
+                "D0_mc_chi2", "Phi0_mc_chi2", "Omega_mc_chi2", "Z0_mc_chi2", "TanLambda_mc_chi2",
+                "chi2_value",
+                "hitRelation", "chi2Relation", "bothRelation", "bothRelationAndSameMC", "notbothRelation", "noRelation" // (bool)
+               };
 }
 
 void Chi2McMatcherModule::event()
 {
+
   // suppress the ROOT "matrix is singular" error message
   auto default_gErrorIgnoreLevel = gErrorIgnoreLevel;
   gErrorIgnoreLevel = 5000;
@@ -94,13 +105,16 @@ void Chi2McMatcherModule::event()
     ++totalCount;
     int hitMatch = 0;
     int chi2Match = 0;
-    //auto hitMCParticle = track->getRelated<MCParticle>();
+    double track_helix[5];// D0,Phi0,Omega,Z0,TanLambda
+    double mc_helix[5];
+    double classifiers[6] = {0, 0, 0, 0, 0, 0}; //"hitRelation","chi2Relation","bothRelation","bothRelationAndSameMC","notbothRelation","noRelation"
+    auto hitMCParticle = track->getRelated<MCParticle>();
     // test for existing relations
     if (track->getRelated<MCParticle>()) {
       //B2DEBUG(100, "relations = " << track->getRelated<MCParticle>());
       //continue;
       ++hitRelationCounter;
-
+      classifiers[0] = 1; //hitrelation
       hitMatch = 1;
     }
     // initialize minimal chi2 variables
@@ -194,6 +208,16 @@ void Chi2McMatcherModule::event()
       if (chi2Min > chi2Cur) {
         chi2Min = chi2Cur;
         ip_min = ip;
+        track_helix[0] = trackFitResult->getD0();
+        track_helix[1] = trackFitResult->getPhi0();
+        track_helix[2] = trackFitResult->getOmega();
+        track_helix[3] = trackFitResult->getZ0();
+        track_helix[4] = trackFitResult->getTanLambda();
+        mc_helix[0] = mcParticleHelix.getD0();
+        mc_helix[1] = mcParticleHelix.getPhi0();
+        mc_helix[2] = mcParticleHelix.getOmega();
+        mc_helix[3] = mcParticleHelix.getZ0();
+        mc_helix[4] = mcParticleHelix.getTanLambda();
       }
     }
 
@@ -222,31 +246,58 @@ void Chi2McMatcherModule::event()
       B2WARNING("The pdg for minimal chi2 was not in chargedstable particle list: MinPDG = " << mcMinPDG);
       continue;
     }
+    //TrackMatchLookUp trackMatchLookUp("Track");
+    //TrackMatchLookUp::PRToMCMatchInfo prMatchInfo = trackMatchLookUp.getPRToMCMatchInfo(Tracks[it]);
+    //B2DEBUG(1,"prMatchInfo = "<<prMatchInfo);
+    //TrackMatchLookup trackMatchLookUp("Track");
+    //auto matching_status = TrackMatchLookUp::extractPRToMCMatchInfo(Tracks[it]);
+    //RecoTrack::MatchingStatus matchingStatus = track->getMatchingStatus();
+    //B2DEBUG(1,"MatchingStatus = "<<track::MatchingStatus);
     B2DEBUG(100, "cutoff = " << cutOff);
     if (chi2Min < cutOff) {
       Tracks[it]->addRelationTo(MCParticles[ip_min]);
       ++chi2RelationCounter;
       chi2Match = 1;
+      classifiers[1] = 1;
     }
 
-    /*
     if ((chi2Match == 1) and (hitMatch == 1)) {
       ++bothRelationCounter;
-      if (hitMCParticle == MCParticles[ip_min]){
-    ++bothRelationAndSameMCCounter;
+      classifiers[2] = 1;
+      if (hitMCParticle == MCParticles[ip_min]) {
+        ++bothRelationAndSameMCCounter;
+        classifiers[3] = 1;
       }
     } else if ((chi2Match == 1) or (hitMatch == 1)) {
       ++notBothRelationCounter;
+      classifiers[4] = 1;
     } else {
       ++noRelationCounter;
+      classifiers[5] = 1;
     }
+
+
+
+
+    for (int i = 0; i < 5; i++) {
+      fileContent.push_back(track_helix[i]);
+    }
+    for (int i = 0; i < 5; i++) {
+      fileContent.push_back(mc_helix[i]);
+    }
+    fileContent.push_back(chi2Min);
+    for (int i = 0; i < 5; i++) {
+      fileContent.push_back(classifiers[i]);
+    }
+    /*
     B2DEBUG(1,"totalCount = "<<totalCount);
     B2DEBUG(1,"hitRelationCounter = "<<hitRelationCounter);
     B2DEBUG(1,"chi2RelationCounter = "<<chi2RelationCounter);
     B2DEBUG(1,"bothRelationCounter = "<<bothRelationCounter);
     B2DEBUG(1,"bothRelationAndSameMCCounter = "<<bothRelationAndSameMCCounter);
     B2DEBUG(1,"notbothRelationCounter = "<<notBothRelationCounter);
-    B2DEBUG(1,"noRelationCounter = "<<noRelationCounter);*/
+    B2DEBUG(1,"noRelationCounter = "<<noRelationCounter);
+    */
   }
   // reset ROOT Error Level to default
   gErrorIgnoreLevel = default_gErrorIgnoreLevel;
@@ -254,3 +305,31 @@ void Chi2McMatcherModule::event()
 
 
 
+void Chi2McMatcherModule::terminate()
+{
+  std::ofstream outfile;
+  outfile.open("hitmatch_vs_chi2match.csv");
+  if (!outfile) {  // file couldn't be opened
+    std::cerr << "Error: file could not be opened" << std::endl;
+    exit(1);
+  }
+  for (int i = 0; i < fileHeader.size(); i++) {
+    outfile << fileHeader[i];
+    if (i != (fileHeader.size() - 1)) {
+      outfile << ",";
+    }
+  }
+  outfile << std::endl;
+  int count = 0;
+  for (int index = 0; index < fileContent.size(); index++) {
+    outfile << fileContent[index];
+    count++;
+    if (count == 16) {
+      count = 0;
+      outfile << std::endl;
+      continue;
+    }
+    outfile << ",";
+  }
+  outfile.close();
+}

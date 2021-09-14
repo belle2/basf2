@@ -24,7 +24,7 @@ import ROOT
 import os
 import shutil
 import collections
-from typing import List
+from typing import List, Any
 
 
 def get_argument_parser() -> argparse.ArgumentParser:

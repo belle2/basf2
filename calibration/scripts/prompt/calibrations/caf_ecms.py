@@ -102,25 +102,28 @@ def get_calibrations(input_data, **kwargs):
 
     # module to be run prior the collector
     rec_path_1 = create_path()
-    prepare_cdst_analysis(rec_path_1)
-    add_pid_module(rec_path_1)
-    add_ecl_modules(rec_path_1)
+    # prepare_cdst_analysis(rec_path_1)
+    prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
+    # add_pid_module(rec_path_1)
+    # add_ecl_modules(rec_path_1)
 
     # vertex.treeFit('Upsilon(4S):BV', updateAllDaughters=True, ipConstraint=True, path=rec_path_1)
 
     stdCharged.stdPi(listtype='all', path=rec_path_1)
     stdCharged.stdK(listtype='good', path=rec_path_1)
-    # stdPi0s.stdPi0s(listtype='all', path=rec_path_1)
+    stdPi0s.stdPi0s(listtype='eff60_May2020', path=rec_path_1)
 
     # ma.fillParticleList('gamma:eff60_May2020',
     # '[[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180]] and [[clusterReg==1 and E>0.0225]'
     #  + ' or [clusterReg==2 and E>0.020] or [clusterReg==3 and E>0.020]]',
     # path=rec_path_1)
-    ma.fillParticleList('gamma:eff60_May2020', '', path=rec_path_1)
-    ma.reconstructDecay('pi0:my -> gamma:eff60_May2020 gamma:eff60_May2020', '0.03<InvM', path=rec_path_1)
+    # ma.fillParticleList('gamma:eff60_May2020', '', path=rec_path_1)
+    # ma.reconstructDecay('pi0:my -> gamma:eff60_May2020 gamma:eff60_May2020', '0.03<InvM', path=rec_path_1)
 
     ma.cutAndCopyList("pi+:my", "pi+:all", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
     ma.cutAndCopyList("K+:my", "K+:good", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
+
+    ma.cutAndCopyList("pi0:my", "pi0:eff60_May2020", "", path=rec_path_1)
 
     #####################################################
     # Reconstructs the signal B0 candidates from Dstar
@@ -247,6 +250,7 @@ def get_calibrations(input_data, **kwargs):
                                    pre_collector_path=rec_path_1)
 
     calibration_ecms.strategies = SingleIOV
+    # calibration_ecms.backend_args = {'extra_lines' : ["RequestRuntime = 6h"]}
 
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun

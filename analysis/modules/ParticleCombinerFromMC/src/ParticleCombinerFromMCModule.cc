@@ -236,9 +236,13 @@ namespace Belle2 {
     for (unsigned i = 0; i < n; i++) {
       const Particle* part = outputList->getParticle(i);
 
-      MCMatching::setMCTruth(part);
-      MCMatching::getMCErrors(part);
+      bool isMCMatched =  MCMatching::setMCTruth(part);
+      if (!isMCMatched) {
+        toRemove.push_back(part->getArrayIndex());
+        continue;
+      }
 
+      MCMatching::getMCErrors(part);
       if (!cutIsSignal->check(part)) toRemove.push_back(part->getArrayIndex());
     }
     outputList->removeParticles(toRemove);

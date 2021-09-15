@@ -81,7 +81,7 @@ CDCTriggerNeuroDQMModule::CDCTriggerNeuroDQMModule() : HistoModule()
            (double)(- 1.0));
   addParam("nSameTS", m_nsamets,
            "Number of identical track segments to be required for matching between HW and SW Neurotrigger",
-           (int)(9));
+           (int)(0));
 }
 
 
@@ -2498,6 +2498,7 @@ void CDCTriggerNeuroDQMModule::event()
               if (nsameTS >= m_nsamets) {
                 if (abs(neuroTrack.getZ0() - neuroSimTrack->getZ0()) > 1) {
                   neuroSimTrack->setQualityVector(2);
+                  neuroTrack.setQualityVector(2);
                 }
                 m_neuroDeltaZ->Fill(neuroTrack.getZ0() - neuroSimTrack->getZ0());
                 double nnHWtheta = neuroTrack.getDirection().Theta() * 180. / M_PI;
@@ -2514,12 +2515,32 @@ void CDCTriggerNeuroDQMModule::event()
                 unsigned simSector =
                   neuroSimTrack->getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputVectorName)->getSector();
                 m_neuroDeltaSector->Fill(unpackedSector - simSector);
-
+                bool sameInputId = true;
+                bool sameInputAlpha = true;
+                bool scaleErr = false;
+                bool missingTS = false;
+                bool timeErr = false;
                 for (unsigned ii = 0; ii < unpackedInput.size(); ii += 3) {
                   m_neuroDeltaInputID->Fill(unpackedInput[ii] - simInput[ii]);
                   m_neuroDeltaInputT->Fill(unpackedInput[ii + 1] - simInput[ii + 1]);
                   m_neuroDeltaInputAlpha->Fill(unpackedInput[ii + 2] - simInput[ii + 2]);
+                  bool hwZero = false;
+                  bool hwSimZero = false;
+                  if (unpackedInput[ii] != simInput[ii]) {sameInputId = false;}
+                  if (unpackedInput[ii + 2] != simInput[ii + 2]) {sameInputAlpha = false;}
+                  if (unpackedInput[ii + 1] != simInput[ii + 1]) {timeErr = true;}
+                  if (unpackedInput[ii + 1] == 0 && fabs(simInput[ii + 1] > 0.99)) {scaleErr = true;}
+                  if (simInput[ii + 1] == 0 && fabs(unpackedInput[ii + 1] > 0.99)) {scaleErr = true;}
+                  if (unpackedInput[ii] == 0 && unpackedInput[ii + 1] == 0 && unpackedInput[ii + 2] == 0) {hwZero = true;}
+                  if (simInput[ii] == 0 && simInput[ii + 1] == 0 && simInput[ii + 2] == 0) {hwSimZero = true;}
+                  if (hwZero != hwSimZero) {missingTS = true;}
                 }
+                if (!sameInputId) {neuroTrack.setQualityVector(4);}
+                if (!sameInputAlpha) {neuroTrack.setQualityVector(8);}
+                if (scaleErr) {neuroTrack.setQualityVector(16);}
+                if (missingTS) {neuroTrack.setQualityVector(32);}
+                if (timeErr) {neuroTrack.setQualityVector(64);}
+
               }
             }
           }

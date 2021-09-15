@@ -53,7 +53,7 @@ namespace Belle2 {
   class RestOfEvent : public RelationsObject {
 
   public:
-    static constexpr const char* c_defaultMaskName = "all"; /* Default mask name */
+    static constexpr const char* c_defaultMaskName = "all"; /**< Default mask name */
     /**
      * Structure of Rest of Event mask. It contains array indices of particles, which were selected and associated to this mask after some selection.
      * Host ROE object always check that masks do not contain extra particles,

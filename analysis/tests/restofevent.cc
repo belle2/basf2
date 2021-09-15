@@ -171,8 +171,8 @@ namespace {
     EXPECT_TRUE(roe->getPhotons().size() == 2);
     EXPECT_TRUE(roe->getHadrons().size() == 0);
     EXPECT_TRUE(roe->getChargedParticles().size() == 4);
-    EXPECT_TRUE(roe->getChargedParticles("", 321).size() == 1);
-    EXPECT_TRUE(roe->getChargedParticles("", 211).size() == 3);
+    EXPECT_TRUE(roe->getChargedParticles("all", 321).size() == 1);
+    EXPECT_TRUE(roe->getChargedParticles("all", 211).size() == 3);
   }
 
   TEST_F(ROETest, updateMaskWithCuts)

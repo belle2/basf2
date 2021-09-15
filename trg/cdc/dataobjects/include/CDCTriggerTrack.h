@@ -180,6 +180,12 @@ namespace Belle2 {
     std::vector<unsigned> m_tsvector;
     /** store bits for different quality flags.
      * 2^0 : 0 if all axial ts are contained in the related 2dfindertrack; 1 otherwise.
+     * 2^1 : 0 if hwsim nntrack is less than 1cm in z away from hwtrack; 1 otherwise.
+     * 2^2 : 0 if all input values for the ID are exactly the same in hw and hwsim; 1 otherwise.
+     * 2^3 : 0 if all input values for alpa are exactly the same in hw and hwsim; 1 otherwise.
+     * 2^4 : 1 if dt in hw/hwsim is 0 and in hwsim/hw is 1; 0 otherwise.
+     * 2^5 : 1 if all inputs in hw are 0 but at least 1 is filled in hwsim; 0 otherwise.
+     * 2^6 : 1 if all inputs in hwsim are 0 but at least 1 is filled in hw; 0 otherwise.
      */
     unsigned m_qualityvector;
     bool m_hasETFTime{0};

@@ -223,9 +223,9 @@ namespace Belle2 {
     double m_totalFudgeFactor = 1.;  /**< total fudge factor for space resol. */
 
     bool m_gasGainSmearing = false;  /**< Swtich for gas gain smearing */
-    double m_effWForGasGainSmearing = 0.0265;  /**< Effective energy (keV) for one electron prod. for gas gain smearing */
+    double m_effWForGasGainSmearing = 0.0266;  /**< Effective energy (keV) for one electron prod. for gas gain smearing */
     double m_thetaOfPolya = 0.5;     /**< theta of Polya function for gas gain smearing */
-    bool m_extraADCSmearing = true; /**< Swtich for extra ADC smearing */
+    bool m_extraADCSmearing = false; /**< Swtich for extra ADC smearing */
     //    double m_sigmaForExtraADCSmearing = 0.3;  /**< Gaussian sigma for extra ADC smearing */
     double m_runGain = 1.;  /**< run gain. */
     float m_semiTotalGain[MAX_N_SLAYERS][MAX_N_SCELLS] = {{}}; /**< total gain per wire */

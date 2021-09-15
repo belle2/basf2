@@ -65,7 +65,7 @@ std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskNa
       }
     }
     if (!maskFound) {
-      B2FATAL("No " << maskName << " mask defined in current ROE!");
+      B2FATAL("No '" << maskName << "' mask defined in current ROE!");
     }
   }
   for (const int index : source) {
@@ -125,7 +125,7 @@ std::vector<const Particle*> RestOfEvent::getChargedParticles(const std::string&
 bool RestOfEvent::hasParticle(const Particle* particle, const std::string& maskName) const
 {
   if (maskName != RestOfEvent::c_defaultMaskName && !hasMask(maskName)) {
-    B2FATAL("No " << maskName << " mask defined in current ROE!");
+    B2FATAL("No '" << maskName << "' mask defined in current ROE!");
   }
 
   std::vector<const Particle*> particlesROE = getParticles(maskName);
@@ -152,7 +152,7 @@ void RestOfEvent::excludeParticlesFromMask(const std::string& maskName, const st
 {
   Mask* mask = findMask(maskName);
   if (!mask) {
-    B2FATAL("No " << maskName << " mask defined in current ROE!");
+    B2FATAL("No '" << maskName << "' mask defined in current ROE!");
   }
   std::string maskNameToGetParticles = maskName;
   if (!mask->isValid()) {
@@ -437,7 +437,7 @@ Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCod
       }
     }
     if (!maskFound) {
-      B2FATAL("No " << maskName << " mask defined in current ROE!");
+      B2FATAL("No '" << maskName << "' mask defined in current ROE!");
     }
   }
   int particlePDG = (pdgCode == 0) ? getPDGCode() : pdgCode;

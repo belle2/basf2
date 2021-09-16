@@ -9,8 +9,8 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-""" This script creates 10 events with 2 particles per event
-    then extracts CNN value for each particles.
+""" This script creates 10 events with 12 charged stable particles
+    per event, then extracts CNN value for each particle.
     The CNN values represent probabilities for a track being
     muon or pion like.
 
@@ -18,10 +18,10 @@ INPUT:
     No input
 
 USAGE:
-    basf2 EclCNNPID.py -- [OPTIONS]
+    basf2 EclCNNPID.py -- [--beam-bkg-dir <path_to_beam_bkg_files>]
 
 EXAMPLE:
-    basf2 EclCNNPID.py -- --pdg-code 211
+    basf2 EclCNNPID.py
 
 IMPORTANT NOTE:
     In this example script Gearbox and Geometry modules
@@ -34,93 +34,104 @@ IMPORTANT NOTE:
         mainPath.add_module('Geometry')
 """
 
-import sys
-import argparse
-import basf2 as b2
-import modularAnalysis as ma
-from simulation import add_simulation
-from reconstruction import add_reconstruction
 
-sys.path.append('../scripts/eclCNNPID')
-from cnn_pid_ecl_module import CNN_PID_ECL  # noqa
+import argparse
 
 
 def argparser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--pdg-code', type=int, default=13,
-                        choices=[13, -211, -13, 211, 11, -11, 321, -321, 22,
-                                 2212, -2212, 1000010020, -1000010020],
-                        help='PDG code of particle')
+
+    parser.add_argument(
+        '--beam-bkg-dir',
+        type=str,
+        default=None,
+        help='Directory that contains beam background files'
+        'If nothing is specified, basf2 will used by default'
+        'BELLE2_BACKGROUND_DIR env variable.')
+
     return parser
 
 
-args = argparser().parse_args()
+if __name__ == '__main__':
 
-pdg_dict = {
-    13: ('mu', 'minus'),
-    -13: ('mu', 'plus'),
-    211: ('pi', 'plus'),
-    -211: ('pi', 'minus'),
-    11: ('e', 'minus'),
-    -11: ('e', 'plus'),
-    321: ('K', 'plus'),
-    -321: ('K', 'minus'),
-    2212: ('p', 'plus'),
-    -2212: ('p', 'minus'),
-    1000010020: ('deuteron', 'plus'),
-    -1000010020: ('anti-deuteron', 'minus'),
-    22: ('gamma', 'neutral')
-}
-particle = pdg_dict[args.pdg_code][0]
-charge = pdg_dict[args.pdg_code][1]
+    args = argparser().parse_args()
 
-mainPath = b2.create_path()
+    import basf2 as b2  # noqa
+    from ROOT import Belle2  # noqa
+    import modularAnalysis as ma  # noqa
+    from simulation import add_simulation  # noqa
+    from reconstruction import add_reconstruction  # noqa
+    from background import get_background_files  # noqa
+    from eclCNNPID import CNN_PID_ECL  # noqa
 
-b2.set_log_level(b2.LogLevel.WARNING)
+    chargedStable_pdg_list = []
+    for idx in range(len(Belle2.Const.chargedStableSet)):
+        particle = Belle2.Const.chargedStableSet.at(idx)
+        pdgId = particle.getPDGCode()
+        chargedStable_pdg_list.extend([pdgId, -pdgId])
 
-# Register ParticleGun module
-particlegun = b2.register_module('ParticleGun')
-b2.set_random_seed(123)
-particlegun.param('pdgCodes', [args.pdg_code])
-particlegun.param('nTracks', 2)
-particlegun.param('momentumGeneration', 'uniformPt')
-particlegun.param('momentumParams', [0.3, 0.9])
-particlegun.param('thetaGeneration', 'uniform')
-particlegun.param('thetaParams', [70, 90])  # In the ECL barrel
-particlegun.param('phiGeneration', 'uniform')
-particlegun.param('phiParams', [0, 360])
-mainPath.add_module(particlegun)
+    # Necessary global tag for CNN_PID_ECL module
+    b2.conditions.prepend_globaltag('cnn_pid_ecl')
 
-mainPath.add_module(
-    'EventInfoSetter',
-    expList=1003,  # Exp 1003 is early phase 3
-    runList=0,
-    evtNumList=10)
+    # Path
+    mainPath = b2.create_path()
 
-# Simulation
-add_simulation(mainPath)
+    b2.set_log_level(b2.LogLevel.WARNING)
 
-# Reconstruction
-add_reconstruction(mainPath)
+    # Register ParticleGun module
+    particleGun = b2.register_module('ParticleGun')
+    b2.set_random_seed(123)
+    particleGun_param = {
+        'pdgCodes': chargedStable_pdg_list,
+        'nTracks': 0,  # 0 means it generates 1 track per pdgId per event.
+        'momentumGeneration': 'uniformPt',
+        'momentumParams': [0.3, 0.9],
+        'thetaGeneration': 'uniform',
+        'thetaParams': [70, 90],  # In the ECL barrel
+        'phiGeneration': 'uniform',
+        'phiParams': [0, 360],
+        'xVertexParams': [0.0, 0.0],
+        'yVertexParams': [0.0, 0.0],
+        'zVertexParams': [0.0, 0.0],
+    }
+    particleGun.param(particleGun_param)
+    mainPath.add_module(particleGun)
 
-name = f'{particle}+:particles'
+    mainPath.add_module(
+        'EventInfoSetter',
+        expList=1003,  # Exp 1003 is early phase 3
+        runList=0,
+        evtNumList=10)
 
-if particle in ['gamma', 'deuteron', 'anti-deuteron']:
-    name = f'{particle}:particles'
+    if args.beam_bkg_dir:
+        # Simulation with beam background
+        add_simulation(
+            mainPath,
+            bkgfiles=get_background_files(
+                folder=args.beam_bkg_dir
+            )
+        )
+    else:
+        # Simulation
+        add_simulation(mainPath)
 
-ma.fillParticleList(name, '', path=mainPath)
+    # Reconstruction
+    add_reconstruction(mainPath)
 
-# CNN_PID_ECL module
-mainPath.add_module(CNN_PID_ECL(particleList=name, path=mainPath))
+    name = 'pi+:particles'
+    ma.fillParticleList(name, '', path=mainPath)
 
-ma.variablesToNtuple(
-    decayString=name,
-    variables=['cnn_pid_ecl_pion', 'cnn_pid_ecl_muon'],
-    treename='particles',
-    filename=f'test_{particle}_{charge}_cnn.root',
-    path=mainPath
-)
+    # CNN_PID_ECL module
+    mainPath.add_module(CNN_PID_ECL(particleList=name, path=mainPath))
 
-mainPath.add_module('Progress')
-b2.process(mainPath)
-print(b2.statistics)
+    ma.variablesToNtuple(
+        decayString=name,
+        variables=['cnn_pid_ecl_pion', 'cnn_pid_ecl_muon'],
+        treename='particles',
+        filename=f'test_chargedStable_particles_cnn_output.root',
+        path=mainPath
+    )
+
+    mainPath.add_module('Progress')
+    b2.process(mainPath)
+    print(b2.statistics)

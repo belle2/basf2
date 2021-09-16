@@ -20,11 +20,9 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
 import basf2 as b2
-from ROOT import Belle2
-import modularAnalysis as ma
 
-from cnn_pid_conv_net import ConvNet
-from cnn_pid_cluster_image import ClusterImage
+from .cnn_pid_conv_net import ConvNet
+from .cnn_pid_cluster_image import ClusterImage
 
 
 class CNN_PID_ECL(b2.Module):
@@ -36,7 +34,7 @@ class CNN_PID_ECL(b2.Module):
     a pretrained model which is used as inference on pions and muons
     in the particle list.
 
-    This module only works under the following conditions:
+    This module works under the following conditions:
     1. The extrapolated tracks are inside ECL Barrel based
     on ThetaId of central pixel.
     2. Transverse momentum (pt) of extrapolated tracks are
@@ -46,13 +44,28 @@ class CNN_PID_ECL(b2.Module):
     low pt tracks.
     """
 
+    from ROOT import Belle2
+    import pdg
+
     def __init__(
         self,
         particleList,
-        path
+        path,
+        image_length=7,
+        threshold=0.001,
+        thetaId_range=(13, 58),
+        pt_range=(0.2, 1.0)
     ):
         super().__init__()
+
         self.particleList = particleList
+        if self.particleList.split(':')[0] not in self.chargedStable_name_list():
+            b2.B2WARNING('Particle is not a charged stable one.')
+
+        self.image_length = image_length
+        self.threshold = threshold
+        self.thetaId_range = thetaId_range
+        self.pt_range = pt_range
         self.path = path
 
         torch.manual_seed(1234)
@@ -64,11 +77,8 @@ class CNN_PID_ECL(b2.Module):
     def initialize(self):
         """ Initialize necessary arrays and/or objects """
 
-        self.eclCalDigits = Belle2.PyStoreArray(Belle2.ECLCalDigit.Class(), 'ECLCalDigits')
-        self.eclCalDigits.registerInDataStore()
-
-        self.mapping = Belle2.PyStoreObj('ECLCellIdMapping')
-        self.mapping.registerInDataStore()
+        self.eclCalDigits = self.Belle2.PyStoreArray('ECLCalDigits')
+        self.mapping = self.Belle2.PyStoreObj('ECLCellIdMapping')
 
     def event(self):
         """ Event processing
@@ -81,7 +91,7 @@ class CNN_PID_ECL(b2.Module):
         muon- or pion-like.
         """
 
-        pList = Belle2.PyStoreObj(self.particleList)
+        pList = self.Belle2.PyStoreObj(self.particleList)
         variable_pion = 'cnn_pid_ecl_pion'
         variable_muon = 'cnn_pid_ecl_muon'
 
@@ -90,10 +100,12 @@ class CNN_PID_ECL(b2.Module):
             track = particle.getTrack()
 
             if (track and self.getExtCell(track)):
-                maxCellId = self.getExtCell(track)[0]
-
-                self.pt = self.getExtCell(track)[1]
+                extHit_dict = self.getExtCell(track)
+                print(extHit_dict)
+                maxCellId = extHit_dict['cellid']
+                self.pt = extHit_dict['pt']
                 self.pt = np.array([self.pt])
+
                 self.charge = particle.getCharge()
 
                 if self.charge == -1.0:
@@ -111,15 +123,15 @@ class CNN_PID_ECL(b2.Module):
                     return(np.nan, np.nan)
                 else:
 
-                    if (self.extThetaId > 13 and
-                        self.extThetaId < 58 and
-                        self.pt >= 0.2 and
-                            self.pt <= 1.0):
+                    if (self.extThetaId > self.thetaId_range[0] and
+                        self.extThetaId < self.thetaId_range[1] and
+                        self.pt >= self.pt_range[0] and
+                            self.pt <= self.pt_range[1]):
 
                         energy_list = []
                         neighbours = self.mapping.getCellIdToNeighbour7(maxCellId)
 
-                        for posid in range(49):
+                        for posid in range(self.image_length ** 2):
                             if posid < neighbours.size():
                                 neighbourid = neighbours[posid]
 
@@ -131,7 +143,9 @@ class CNN_PID_ECL(b2.Module):
 
                         self.energy_array = np.array(energy_list)
 
-                        prob_CNN_pion, prob_CNN_muon = self.extract_cnn_value()
+                        prob_CNN_dict = self.extract_cnn_value()
+                        prob_CNN_pion = prob_CNN_dict['cnn_pion']
+                        prob_CNN_muon = prob_CNN_dict['cnn_muon']
 
                         particle.addExtraInfo(variable_pion, prob_CNN_pion)
                         particle.addExtraInfo(variable_muon, prob_CNN_muon)
@@ -141,10 +155,13 @@ class CNN_PID_ECL(b2.Module):
                         return(np.nan, np.nan)
 
     def getExtCell(self, track):
-        """ Extract cellId of an extrapolated track """
+        """ Extract cellId and pt of an extrapolated track
 
-        myDetID = Belle2.Const.EDetector.ECL
-        hypothesis = Belle2.Const.pion
+        The output is dictionary which has cellId and pt.
+        """
+
+        myDetID = self.Belle2.Const.EDetector.ECL
+        hypothesis = self.Belle2.Const.pion
         pdgCode = abs(hypothesis.getPDGCode())
 
         extHits = track.getRelationsTo('ExtHits')
@@ -154,7 +171,7 @@ class CNN_PID_ECL(b2.Module):
                 continue
             if abs(extHit.getDetectorID()) != myDetID:
                 continue
-            if abs(extHit.getStatus()) != Belle2.ExtHitStatus.EXT_EXIT:
+            if abs(extHit.getStatus()) != self.Belle2.ExtHitStatus.EXT_EXIT:
                 continue
             if extHit.isBackwardPropagated():
                 continue
@@ -167,16 +184,23 @@ class CNN_PID_ECL(b2.Module):
             py = extHit.getMomentum().Y()
             pt = math.sqrt(px**2 + py**2)
 
-            return(cellid, pt)
+            extHit_dict = {
+                'cellid': cellid,
+                'pt': pt,
+            }
+
+            return(extHit_dict)
 
     def extract_cnn_value(self):
         """ Extract CNN values for an extrapolated track
 
-        The output of this function includes two probabilities:
-        1. Probability of an extrapolated track being pion
-        2. Probability of an extrapolated track being muon
+        The output of this function is dictionary
+        which includes two probabilities:
 
-        The output is a float.
+        cnn_pion: Probability of an extrapolated track being pion
+        cnn_muon: Probability of an extrapolated track being muon
+
+        NOTE: cnn_pion and cnn_muon are floats.
         """
 
         test_loader = self.prepare_images()
@@ -197,7 +221,12 @@ class CNN_PID_ECL(b2.Module):
         prob_CNN_pion = output[0][0].item()
         prob_CNN_muon = output[0][1].item()
 
-        return(prob_CNN_pion, prob_CNN_muon)
+        prob_dict = {
+            'cnn_pion': prob_CNN_pion,
+            'cnn_muon': prob_CNN_muon,
+        }
+
+        return(prob_dict)
 
     def prepare_images(self):
         """ Prepare images
@@ -207,12 +236,12 @@ class CNN_PID_ECL(b2.Module):
         """
 
         params_image = {
-            'image_length': 7,
+            'image_length': self.image_length,
             'energy_image': self.energy_array,
             'thetaId': self.extThetaId,
             'phiId': self.extPhiId,
             'pt': self.pt,
-            'threshold': 0.001
+            'threshold': self.threshold
         }
 
         dataset = ClusterImage(params_image)
@@ -221,7 +250,7 @@ class CNN_PID_ECL(b2.Module):
         return(infer_loader)
 
     def model_cnn_name(self):
-        """ Create model name
+        """ Create CNN model name
 
         The outputs of this function are:
         1. CNN model's name
@@ -235,7 +264,7 @@ class CNN_PID_ECL(b2.Module):
         model_name = f'CNNModelPidECL_charge_{self.charge}'
 
         params_model = {
-            'input_shape': (1, 7, 7),
+            'input_shape': (1, self.image_length, self.image_length),
             'initial_filters': 64,
             'num_emb_theta': 44,
             'dim_emb_theta': 22,
@@ -245,26 +274,47 @@ class CNN_PID_ECL(b2.Module):
             'num_fc1': 128,
             'dropout_rate': 0.1,
             'num_classes': 2,
-            'epochs': 100,
-            'lr': 0.001,
-            'patience': 20,
             'energy': True
         }
 
         return(model_name, params_model)
 
     def read_model(self):
-        """ Load the model
+        """ Load the CNN model
 
         This function receives model's name and
         CNN parameters, then reads .pt file which
         includes weights and biases for CNN.
         """
+
         model_name, params_model = self.model_cnn_name()
         model = ConvNet(params_model)
         model = model.to(self.device)
 
-        model.load_state_dict(torch.load(
-            f'/afs/desy.de/user/n/narimani/dust/{model_name}.pt'))
+        payload = f'{model_name}.pt'
+        accessor = self.Belle2.DBAccessorBase(
+            self.Belle2.DBStoreEntry.c_RawFile, payload, True)
+        checkpoint = accessor.getFilename()
+
+        model.load_state_dict(torch.load(checkpoint))
 
         return(model)
+
+    def chargedStable_name_list(self):
+        """ Create list of particle names
+
+        The output is ['e-', 'e+', 'mu-', ...] which
+        includes names of all charged stable particles
+        with their corresponding anti-particles.
+        """
+
+        chargedStable_pdg_list = []
+
+        for idx in range(len(self.Belle2.Const.chargedStableSet)):
+            particle = self.Belle2.Const.chargedStableSet.at(idx)
+            pdgId = particle.getPDGCode()
+            chargedStable_pdg_list.extend([pdgId, -pdgId])
+
+        chargedStable_name_list = self.pdg.to_names(chargedStable_pdg_list)
+
+        return(chargedStable_name_list)

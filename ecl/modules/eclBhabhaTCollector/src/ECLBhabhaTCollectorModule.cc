@@ -553,8 +553,6 @@ void ECLBhabhaTCollectorModule::collect()
 
   //---------------------------------------------------------------------
   //..Some utilities
-  ClusterUtils cUtil;
-  const TVector3 clustervertex = cUtil.GetIPPosition();
   PCmsLabTransform boostrotate;
 
   //---------------------------------------------------------------------
@@ -687,8 +685,8 @@ void ECLBhabhaTCollectorModule::collect()
   double trkEClustCOM[2] = {0., 0.};
   double trkpLab[2];
   double trkpCOM[2];
-  TLorentzVector trkp4Lab[2];
-  TLorentzVector trkp4COM[2];
+  ROOT::Math::PxPyPzEVector trkp4Lab[2];
+  ROOT::Math::PxPyPzEVector trkp4COM[2];
 
   // Index of the cluster and the crystal that has the highest energy crystal for the two tracks
   int crysIDMax[2] = { -1, -1 };

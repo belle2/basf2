@@ -10,6 +10,7 @@
 
 //Root
 #include <TH2F.h>
+#include <Math/Vector4D.h>
 
 //Analysis
 #include <analysis/utility/PCmsLabTransform.h>
@@ -266,27 +267,27 @@ void eclGammaGammaECollectorModule::collect()
 
   /** And that their invariant mass is greater than specified value */
   ClusterUtils cUtil;
-  const TVector3 clustervertex = cUtil.GetIPPosition();
+  const ROOT::Math::XYZVector clustervertex = cUtil.GetIPPosition();
 
   double phi0 = m_eclClusterArray[icMax[0]]->getPhi();
   TVector3 p30(0., 0., maxClustE[0]);
   p30.SetTheta(theta0);
   p30.SetPhi(phi0);
-  const TLorentzVector p40 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[0]], clustervertex, usePhotons);
+  const ROOT::Math::PxPyPzEVector p40 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[0]], clustervertex, usePhotons);
 
   double phi1 = m_eclClusterArray[icMax[1]]->getPhi();
   TVector3 p31(0., 0., maxClustE[1]);
   p31.SetTheta(theta1);
   p31.SetPhi(phi1);
-  const TLorentzVector p41 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[1]], clustervertex, usePhotons);
+  const ROOT::Math::PxPyPzEVector p41 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[1]], clustervertex, usePhotons);
 
   double pairmass = (p40 + p41).M();
   if (pairmass < m_minPairMass) {return;}
 
   /** And that they are back-to-back in phi */
   PCmsLabTransform boostrotate;
-  TLorentzVector p40COM = boostrotate.rotateLabToCms() * p40;
-  TLorentzVector p41COM = boostrotate.rotateLabToCms() * p41;
+  ROOT::Math::PxPyPzEVector p40COM = boostrotate.rotateLabToCms() * p40;
+  ROOT::Math::PxPyPzEVector p41COM = boostrotate.rotateLabToCms() * p41;
   double dphi = abs(p41COM.Phi() - p40COM.Phi()) * TMath::RadToDeg();
   if (dphi > 180.) {dphi = 360. - dphi;}
   if (dphi < m_mindPhi) {return;}

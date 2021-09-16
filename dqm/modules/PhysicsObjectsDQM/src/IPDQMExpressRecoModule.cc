@@ -170,7 +170,7 @@ void IPDQMExpressRecoModule::event()
     for (unsigned int i = 0; i < Y4SParticles->getListSize(); i++) {
 
       Particle* Y4S = Y4SParticles->getParticle(i);
-      TVector3 IPVertex = frame.getVertex(Y4S);
+      B2Vector3D IPVertex = frame.getVertex(Y4S);
       const auto& errMatrix = Y4S->getVertexErrorMatrix();
       m_h_x->Fill(IPVertex.X());
       m_h_y->Fill(IPVertex.Y());

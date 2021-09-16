@@ -92,7 +92,7 @@ void CDCCosmicSelectorModule::event()
     //    B2INFO("No .of prim. charged MC particles= " << nPrimChgds);
     if (nPrimChgds > 1) continue;
 
-    const TVector3 vertex = m_P->getProductionVertex();
+    const B2Vector3D vertex = m_P->getProductionVertex();
     const double vX0 = vertex.X();
     const double vY0 = vertex.Y();
     const double cosphi =  cos(m_phiOfCounter * M_PI / 180.);

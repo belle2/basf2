@@ -1118,7 +1118,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
 
   if (!m_mcparticleTracks[particle].track) {
     const TVector3& p = particle->getMomentum();
-    const TVector3& vertex = particle->getProductionVertex();
+    const B2Vector3D& vertex = particle->getProductionVertex();
     const int pdg = particle->getPDG();
     TParticle tparticle(pdg, particle->getStatus(),
                         (particle->getMother() ? particle->getMother()->getIndex() : 0), 0, particle->getFirstDaughter(), particle->getLastDaughter(),
@@ -1169,7 +1169,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
         const MCParticle* daughter = StoreArray<MCParticle>()[iDaughter - 1];
 
         TEvePathMarkD refMark(TEvePathMarkD::kDaughter);
-        refMark.fV.Set(daughter->getProductionVertex());
+        refMark.fV.Set(B2Vector3D(daughter->getProductionVertex()));
         refMark.fP.Set(daughter->getMomentum());
         refMark.fTime = daughter->getProductionTime();
         m_mcparticleTracks[particle].track->AddPathMark(refMark);

@@ -43,6 +43,7 @@ namespace Belle2 {
        */
       virtual std::vector<float> apply(Dataset& test_data) const = 0;
 
+
       /**
         * Apply this m_expert onto a dataset. Multiclass mode.
         * Not pure virtual, since not all derived classes to re-implement this.

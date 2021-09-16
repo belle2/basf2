@@ -406,7 +406,7 @@ def add_prefilter_pretracking_reconstruction(path, components=None):
 
 def add_prefilter_posttracking_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
                                               add_muid_hits=False, cosmics=False, for_cdst_analysis=False,
-                                              add_eventt0_combiner_for_cdst=False):
+                                              add_eventt0_combiner_for_cdst=False, ecl_pid_mva=False):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -460,7 +460,7 @@ def add_prefilter_posttracking_reconstruction(path, components=None, pruneTracks
 
     add_ecl_cluster_properties_modules(path, components)
 
-    add_ecl_chargedpid_module(path, components)
+    add_ecl_chargedpid_module(path, components, ecl_pid_mva)
 
     add_pid_module(path, components)
 
@@ -719,7 +719,7 @@ def add_ecl_track_brem_finder(path, components=None):
         path.add_module('ECLTrackBremFinder')
 
 
-def add_ecl_chargedpid_module(path, components=None):
+def add_ecl_chargedpid_module(path, components=None, mva=False):
     """
     Add the ECL charged PID module to the path.
 
@@ -727,7 +727,12 @@ def add_ecl_chargedpid_module(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ECL' in components:
-        path.add_module('ECLChargedPID')
+        # charged PID
+        if mva:
+            charged_pid = register_module('ECLChargedPIDMVA')
+        else:
+            charged_pid = register_module('ECLChargedPID')
+        path.add_module(charged_pid)
 
 
 def add_ecl_mc_matcher_module(path, components=None):
@@ -768,7 +773,7 @@ def add_dedx_modules(path, components=None):
         path.add_module('VXDDedxPID')
 
 
-def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=False):
+def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=False, ecl_pid_mva=False):
     """
     Adds to a (analysis) path all the modules needed to analyse a cDST file in the raw+tracking format
     for collisions/cosmics data or in the digits+tracking format for MC data.
@@ -809,7 +814,8 @@ def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=
     add_prefilter_posttracking_reconstruction(path,
                                               components=components,
                                               for_cdst_analysis=True,
-                                              add_eventt0_combiner_for_cdst=add_eventt0_combiner)
+                                              add_eventt0_combiner_for_cdst=add_eventt0_combiner,
+                                              ecl_pid_mva=ecl_pid_mva)
 
 
 def prepare_user_cdst_analysis(path, components=None, mc=False):

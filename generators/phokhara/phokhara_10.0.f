@@ -218,10 +218,6 @@ c ======================================================================== c
       real(c_double) XPAR(0:99) !TF, real parameters
       integer(c_int) NPAR(0:99) !TF, integer parameters
 
-      integer BNPHOT,BNHAD !TF
-      double precision BP1(0:3),BQ1(0:3),BP2(0:9,0:5),BPHOT(0:1,0:3) !TF
-      COMMON / MOMSET / BP1,BQ1,BP2,BPHOT,BNPHOT,BNHAD !TF
-
       real*8 qqmin,qqmax,
      &  cos1min,cos1max,cos2min,cos2max,cos3min,cos3max,
      &  dsigm1,dsigm2,sigma1,sigma2,sigma,dsigm,Ar(14),Ar_r(0:13),
@@ -1334,7 +1330,7 @@ c this part contains vacuum polarization procedures taken from
 c  http://www-com.physik.hu-berlin.de/fjeger/alphaQEDn.uu
 c look also comments in the included file:
 c
-      include 'vac_pol_hc1.inc'
+      include 'vac_pol_hc1.f'
 c
 c to change to different procedure a user should supply complex*16 function
 c dggvap(..,..) with '..' to be real*8, plus possibly also some initialization
@@ -1345,7 +1341,7 @@ c======================================================================
 c VP_HLMNT_v1_3nonr (version 1.3, no narrow resonances, 10 Mar 2010)
 c======================================================================
 c
-      include 'vp_hlmnt_v1_3nonr_hc.inc'
+      include 'vp_hlmnt_v1_3nonr_hc.f'
 c
 c =================================================
 c --- print the momenta of the generated event ----
@@ -1982,7 +1978,7 @@ c ======================================================================
       real*8 modcjp_Kp,phacjp_Kp,modcjp_K0,phacjp_K0,
      1      modcp2s_Kp,phacp2s_Kp,modcp2s_K0,phacp2s_K0
       real*8 m_rho0_P,g_rho0_P,beta_pion,beta_pion_p,ilocz_pion,
-     1       p_rho,vv_rho,GAMMA,HH_P
+     1       p_rho,vv_rho,DGAMMF,HH_P
       real*8 vprehadsp,vprehadtm,vpimhad,vprelepsp,vpreleptm,vpimlep,
      & vpretopsp,vpretoptm,g_met(4,4),sm(4)
       real*8 a_chi,b_chi
@@ -2593,9 +2589,9 @@ c
         do ii=1,2000
 c
            ilocz_pion = ilocz_pion * (1.d0 - beta_pion_p/ii)
-           c_n_pionGS(ii) = (-1.d0)**ii * GAMMA(beta_pion-0.5d0)
+           c_n_pionGS(ii) = (-1.d0)**ii * DGAMMF(beta_pion-0.5d0)
      1                    * 2.d0/sqrt(pi) / (1.d0+2.d0*ii) 
-     3                    * ilocz_pion /pi *GAMMA(2.d0-beta_pion)
+     3                    * ilocz_pion /pi *DGAMMF(2.d0-beta_pion)
      2                    * sin(pi*(beta_pion-1.d0-ii))
         if(ii.ge.6)then
            m_n_pionGS(ii) = sqrt(m_rho0_pion**2*(1.d0+2.d0*ii))
@@ -8116,7 +8112,7 @@ c **********************************************************************
       subroutine sum_FF_Kp()
       include 'phokhara_10.0.inc'       
       integer jj,ii
-      real*8 GAMMA,qq_min_Kp,qq_max_Kp
+      real*8 DGAMMF,qq_min_Kp,qq_max_Kp
       real*8 ilocz_rho_Kp,ilocz_phi_Kp,ilocz_om_Kp,beta_p_rho_Kp,
      1       beta_p_phi_Kp,beta_p_om_Kp
       complex*16 sum_rho_Kp,sum_om_Kp,sum_phi_Kp
@@ -8156,18 +8152,18 @@ c **********************************************************************
         if(FF_kaon.eq.1) ilocz_om_Kp = ilocz_om_Kp 
      1                               * ( 1.d0 - beta_p_om_Kp/jj )
 
-        coeff_rho_Kp(jj) = (-1.d0)**jj * GAMMA(beta_rho_Kp-0.5d0) 
+        coeff_rho_Kp(jj) = (-1.d0)**jj * DGAMMF(beta_rho_Kp-0.5d0) 
      1       * 2.d0 / sqrt(pi) / (1.d0+2.d0*jj) * ilocz_rho_Kp /pi 
-     2       * GAMMA(2.d0-beta_rho_Kp) * sin(pi*(beta_rho_Kp-1.d0-jj))
-        coeff_phi_Kp(jj) = (-1.d0)**jj * GAMMA(beta_phi_Kp-0.5d0) 
+     2       * DGAMMF(2.d0-beta_rho_Kp) * sin(pi*(beta_rho_Kp-1.d0-jj))
+        coeff_phi_Kp(jj) = (-1.d0)**jj * DGAMMF(beta_phi_Kp-0.5d0) 
      1       * 2.d0 / sqrt(pi) / (1.d0+2.d0*jj) * ilocz_phi_Kp /pi 
-     2       * GAMMA(2.d0-beta_phi_Kp) * sin(pi*(beta_phi_Kp-1.d0-jj))
+     2       * DGAMMF(2.d0-beta_phi_Kp) * sin(pi*(beta_phi_Kp-1.d0-jj))
         if(FF_kaon.eq.0) then 
            coeff_om_Kp(jj) = coeff_rho_Kp(jj)
         elseif(FF_kaon.eq.1) then
-           coeff_om_Kp(jj) = (-1.d0)**jj * GAMMA(beta_om_Kp-0.5d0) 
+           coeff_om_Kp(jj) = (-1.d0)**jj * DGAMMF(beta_om_Kp-0.5d0) 
      1          * 2.d0 / sqrt(pi) / (1.d0+2.d0*jj) * ilocz_om_Kp /pi 
-     2          * GAMMA(2.d0-beta_om_Kp) * sin(pi*(beta_om_Kp-1.d0-jj))
+     2          * DGAMMF(2.d0-beta_om_Kp) * sin(pi*(beta_om_Kp-1.d0-jj))
         endif
 
           mass_n_rho_Kp(jj)=sqrt( m_rho0_Kp**2 * (1.d0 + 2.d0*jj) )

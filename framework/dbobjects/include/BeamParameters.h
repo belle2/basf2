@@ -10,6 +10,7 @@
 
 #include <framework/dataobjects/MCInitialParticles.h>
 #include <TMatrixDSym.h>
+#include <Math/Vector4D.h>
 
 namespace Belle2 {
   /** This class contains the nominal beam parameters and the parameters used for
@@ -142,7 +143,7 @@ namespace Belle2 {
      * @param angleX horizontal angle wrt z-axis
      * @param angleY vertical angle wrt z-axis
      */
-    static TLorentzVector getFourVector(double energy, double angleX, double angleY);
+    static ROOT::Math::PxPyPzEVector getFourVector(double energy, double angleX, double angleY);
     /** Set covariance matrix from vector of entries.
      *
      * The vector for the covariance matrix can have either 0, 1, 3, 6 or 9 entries:
@@ -174,7 +175,7 @@ namespace Belle2 {
     /** Covariance matrix of the vertex position */
     Double32_t m_covVertex[6];
 
-    ClassDef(BeamParameters, 2); /**< nominal beam and primary vertex parameters (including smearing). */
+    ClassDef(BeamParameters, 3); /**< nominal beam and primary vertex parameters (including smearing). */
   };
 
 } //Belle2 namespace

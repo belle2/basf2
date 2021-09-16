@@ -10,7 +10,7 @@
 #pragma link C++ class Belle2::EventMetaData+; // checksum=0xb2c44743, version=4
 #pragma link C++ class Belle2::FileMetaData+; // checksum=0xccd642e4, version=10
 #pragma link C++ class Belle2::ProfileInfo+; // checksum=0xf2e3190a, version=2
-#pragma link C++ class Belle2::MCInitialParticles+; // checksum=0x661c09f3, version=3
+#pragma link C++ class Belle2::MCInitialParticles+; // checksum=0x842c5f2e, version=4
 #pragma link C++ class Belle2::DigitBase+; // checksum=0xd2fac950, version=2
 
 #pragma link C++ class Belle2::Helix+; // checksum=0xc11c13b7, version=2

@@ -28,14 +28,14 @@ namespace {
 
 void BeamParameters::setLER(double energy, double angleX, double angleY, const std::vector<double>& cov)
 {
-  TLorentzVector vec = getFourVector(energy, angleX, angleY);
+  ROOT::Math::PxPyPzEVector vec = getFourVector(energy, angleX, angleY);
   setLER(vec);
   setCovMatrix(m_covLER, cov, false);
 }
 
 void BeamParameters::setHER(double energy, double angleX, double angleY, const std::vector<double>& cov)
 {
-  TLorentzVector vec = getFourVector(energy, angleX, angleY);
+  ROOT::Math::PxPyPzEVector vec = getFourVector(energy, angleX, angleY);
   setHER(vec);
   setCovMatrix(m_covHER, cov, false);
 }
@@ -46,7 +46,7 @@ void BeamParameters::setVertex(const TVector3& vertex, const std::vector<double>
   setCovMatrix(m_covVertex, cov, true);
 }
 
-TLorentzVector BeamParameters::getFourVector(double energy, double angleX, double angleY)
+ROOT::Math::PxPyPzEVector BeamParameters::getFourVector(double energy, double angleX, double angleY)
 {
   double p = sqrt(pow(energy, 2) - pow(Const::electronMass, 2));
   if (angleX < 0) {
@@ -61,7 +61,7 @@ TLorentzVector BeamParameters::getFourVector(double energy, double angleX, doubl
 
   double pz = Sign * p * sqrt(pzTerm);
 
-  return TLorentzVector(p * sin(angleX), p * sin(angleY), pz, energy);
+  return ROOT::Math::PxPyPzEVector(p * sin(angleX), p * sin(angleY), pz, energy);
 
 }
 

@@ -9,6 +9,7 @@
 ##########################################################################
 
 from ROOT import Belle2, kIsPublic, kIsStatic, TVector3, TLorentzVector
+from ROOT.Math import XYZVector
 from basf2 import Module, B2FATAL
 
 
@@ -242,6 +243,8 @@ class DataStorePrinter:
         # or is it a TVector3 or TLorentzVector?
         elif isinstance(result, TVector3):
             print("(" + ",".join("%.6g" % result[i] for i in range(3)) + ")")
+        elif isinstance(result, XYZVector):
+            print("(" + ",".join("%.6g" % Belle2.B2Vector3D(result)[i] for i in range(3)) + ")")
         elif isinstance(result, TLorentzVector):
             print("(" + ",".join("%.6g" % result[i] for i in range(4)) + ")")
         # or, does it look like a std::pair?

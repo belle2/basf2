@@ -33,9 +33,9 @@ void PrintBeamParametersModule::event()
 {
   if (!m_beamparams || !m_beamparams.hasChanged()) return;
   std::stringstream out;
-  const TLorentzVector& her = m_beamparams->getHER();
-  const TLorentzVector& ler = m_beamparams->getLER();
-  const TLorentzVector& cms = her + ler;
+  const ROOT::Math::PxPyPzEVector& her = m_beamparams->getHER();
+  const ROOT::Math::PxPyPzEVector& ler = m_beamparams->getLER();
+  const ROOT::Math::PxPyPzEVector& cms = her + ler;
   const TVector3& vtx = m_beamparams->getVertex();
   out << "BeamParameters: cms Energy=" << m_beamparams->getMass() << " GeV, flags="
       << m_beamparams->getGenerationFlagString() << std::endl

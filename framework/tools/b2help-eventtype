@@ -20,8 +20,10 @@ def get_argument_parser():
     """Return an argument parser to parse all arguments"""
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("decay_string", nargs='?', default=None,
-                        help="Decay string to search for the EventType and decfiles")
+    parser.add_argument("decay_string", type=str,
+                        help="Decay string to search for the EventType and decfiles. \
+                              Please use single-/double-quotation to give a decay sting (e.g. 'B+ -> K+ e+ e-'). \
+			      Otherwise, an arrow (->) is recognized as redirection.")
     return parser
 
 
@@ -73,4 +75,3 @@ if __name__ == "__main__":
     for line in matched_list:
         print(line)
 
-    sys.exit(1)

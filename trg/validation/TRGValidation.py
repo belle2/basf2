@@ -46,12 +46,14 @@ class trg_read(basf2.Module):
     h_Esum_ECL.GetXaxis().SetTitle("sum of ECL cluster energy [5 MeV]")
     h_theta_ECL = ROOT.TH1F("h_theta_ECL", "ECL cluster theta [1.4 degrees]", 128, 0, 180)
     h_theta_ECL.GetXaxis().SetTitle("ECL cluster #theta [1.4 degrees]")
+    h_thetaID_ECL = ROOT.TH1F("h_thetaID_ECL", "ECL cluster theta ID", 610, 0, 610)
+    h_thetaID_ECL.GetXaxis().SetTitle("ECL cluster #theta ID [1.4 degrees]")
     h_phi_ECL = ROOT.TH1F("h_phi_ECL", "ECL cluster phi [1.4 degrees]", 256, -180, 180)
     h_phi_ECL.GetXaxis().SetTitle("ECL cluster #phi [1.4 degrees]")
 
-    h_sector_BKLM = ROOT.TH1F("h_sector_BKLM", "KLMTRG hit sector", 10, 0, 10)
+    h_sector_BKLM = ROOT.TH1F("h_sector_BKLM", "BKLM TRG hit sector", 10, 0, 10)
     h_sector_BKLM.GetXaxis().SetTitle("# of BKLM TRG sector")
-    h_sector_EKLM = ROOT.TH1F("h_sector_EKLM", "KLMTRG hit sector", 10, 0, 10)
+    h_sector_EKLM = ROOT.TH1F("h_sector_EKLM", "EKLM TRG hit sector", 10, 0, 10)
     h_sector_EKLM.GetXaxis().SetTitle("# of EKLM TRG sector")
 
     mc = "abs(MCParticles.m_pdg)==11&&MCParticles.m_status==11"
@@ -183,6 +185,7 @@ class trg_read(basf2.Module):
         trg_read.h_Esum_ECL.Reset()
         trg_read.h_E_ECL.Reset()
         trg_read.h_theta_ECL.Reset()
+        trg_read.h_thetaID_ECL.Reset()
         trg_read.h_phi_ECL.Reset()
 
     def event(self):
@@ -208,6 +211,7 @@ class trg_read(basf2.Module):
             etot += e
             vec = ROOT.TVector3(x, y, z)
             trg_read.h_theta_ECL.Fill(vec.Theta() * Fac)
+            trg_read.h_thetaID_ECL.Fill(cluster.getMaxTCId())
             trg_read.h_phi_ECL.Fill(vec.Phi() * Fac)
 
         if etot > 0:
@@ -226,6 +230,7 @@ class trg_read(basf2.Module):
         trg_read.h_Esum_ECL.Write()
         trg_read.h_E_ECL.Write()
         trg_read.h_theta_ECL.Write()
+        trg_read.h_thetaID_ECL.Write()
         trg_read.h_phi_ECL.Write()
         trg_read.h_sector_BKLM.Write()
         trg_read.h_sector_EKLM.Write()

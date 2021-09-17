@@ -250,9 +250,9 @@ HitLevelInfoWriterModule::fillTrack(const TrackFitResult* fitResult)
   const auto& frame = ReferenceFrame::GetCurrent();
   UncertainHelix helix = fitResult->getUncertainHelix();
   helix.passiveMoveBy(beamSpotDB->getIPPosition());
-  m_dr = frame.getVertex(helix.getPerigee()).Perp();
-  m_dphi = frame.getVertex(helix.getPerigee()).Phi();
-  m_dz = frame.getVertex(helix.getPerigee()).Z();
+  m_dr = frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee())).Rho();
+  m_dphi = frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee())).Phi();
+  m_dz = frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee())).Z();
 }
 
 void

@@ -185,7 +185,7 @@ void CombinedPIDPerformanceModule::event()
 
     // apply some loose cuts on track quality and production vertex
     if (trackFit->getPValue() < 0.001) continue;
-    if (mcParticle->getProductionVertex().Perp() > 1.0) continue;
+    if (mcParticle->getProductionVertex().Rho() > 1.0) continue;
     if (!(mcParticle->getStatus(MCParticle::c_PrimaryParticle))) continue;
 
     // fill the efficiencies and fake rates

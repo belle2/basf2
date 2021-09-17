@@ -10,7 +10,7 @@
 #include <framework/logging/Logger.h>
 
 #include <TDatabasePDG.h>
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 #include <TRandom3.h>
 
 using namespace std;
@@ -173,7 +173,7 @@ void Phokhara::init(const std::string& paramFile)
 }
 
 
-double Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
+double Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost)
 {
 
   //Generate event
@@ -328,8 +328,8 @@ void Phokhara::applySettings()
 }
 
 
-void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
-                             bool isVirtual, bool isInitial)
+void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex,
+                             ROOT::Math::LorentzRotation boost, bool isVirtual, bool isInitial)
 {
 
   //   Create particle
@@ -366,13 +366,13 @@ void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pd
   part.setEnergy(mom[3]);
 
   //boost
-  TLorentzVector p4 = part.get4Vector();
+  ROOT::Math::PxPyPzEVector p4 = part.get4Vector();
   p4 = boost * p4;
   part.set4Vector(p4);
 
   //set vertex
   if (!isInitial) {
-    TVector3 v3 = part.getProductionVertex();
+    B2Vector3D v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

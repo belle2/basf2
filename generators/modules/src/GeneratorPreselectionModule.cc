@@ -109,7 +109,7 @@ void GeneratorPreselectionModule::checkParticle(const MCParticle& mc)
   double theta      = p.Theta();
 
   if (m_applyInCMS) {
-    const TLorentzVector p_cms = m_initial->getLabToCMS() * mc.get4Vector();
+    const ROOT::Math::PxPyPzEVector p_cms = m_initial->getLabToCMS() * mc.get4Vector();
     energy = p_cms.E();
     mom = p_cms.P();
     theta = p_cms.Theta();

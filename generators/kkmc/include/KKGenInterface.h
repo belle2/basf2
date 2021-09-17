@@ -96,7 +96,7 @@ namespace Belle2 {
     /**
      * Setup for beams information.
      */
-    void set_beam_info(TLorentzVector P4_LER, double Espread_LER, TLorentzVector P4_HER,
+    void set_beam_info(ROOT::Math::PxPyPzEVector P4_LER, double Espread_LER, ROOT::Math::PxPyPzEVector P4_HER,
                        double Espread_HER);
 
     /**

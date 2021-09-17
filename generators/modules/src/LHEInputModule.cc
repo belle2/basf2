@@ -86,7 +86,7 @@ void LHEInputModule::initialize()
   //boost
   if (m_boost2Lab) {
     const MCInitialParticles& initial = m_initial.generate();
-    TLorentzRotation boost = initial.getCMSToLab();
+    ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
     m_lhe.m_labboost = boost;
   }
 

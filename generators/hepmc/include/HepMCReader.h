@@ -13,7 +13,7 @@
 #include <string>
 #include <fstream>
 
-#include <TLorentzRotation.h>
+#include <Math/LorentzRotation.h>
 
 #include "HepMC/GenEvent.h"
 
@@ -87,7 +87,7 @@ namespace Belle2 {
     bool m_wrongSignPz;    /**< Bool to indicate that HER and LER were swapped. */
     const int m_minEvent; /**< min event nr to process */
     const int m_maxEvent; /**< max events to process */
-    TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
+    ROOT::Math::LorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
 
     int countEvents(const std::string& filename); /**< Count events in file */
   protected:

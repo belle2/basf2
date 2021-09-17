@@ -50,7 +50,7 @@ HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_minEvent(-1), m_
 void HepMCInputModule::initialize()
 {
   m_hepmcreader.reset(new HepMCReader(m_minEvent, m_maxEvent));
-  TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
+  ROOT::Math::LorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
 
   if (m_runNum != 0 || m_expNum != 0) {
     B2WARNING("Initialising the first read events with expNr or runNr != 0. This can lead to downloading the wrong payloads from the database if you are using MC!");
@@ -79,7 +79,7 @@ void HepMCInputModule::initialize()
   //Do we need to boost?
   if (m_boost2Lab) {
     const MCInitialParticles& initial = m_initial.generate();
-    TLorentzRotation boost = initial.getCMSToLab();
+    ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
     m_hepmcreader->m_labboost = boost;
   }
 
@@ -106,7 +106,7 @@ void HepMCInputModule::event()
   if (m_beamParams.hasChanged()) {
     if (m_boost2Lab) {
       const MCInitialParticles& initial = m_initial.generate();
-      TLorentzRotation boost = initial.getCMSToLab();
+      ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
       m_hepmcreader->m_labboost = boost;
     }
     B2WARNING("HepmcInputModule::event(): BeamParameters have changed within a job!");

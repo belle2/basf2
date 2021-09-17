@@ -121,7 +121,7 @@ void RemoveMCParticlesModule::applyCuts(const MCParticle& particle, bool cut)
   //Only apply cuts if list of pdg codes is empty or pdg code of current particle is in list
   if (m_pdgCodes.empty() || std::binary_search(m_pdgCodes.begin(), m_pdgCodes.end(), particle.getPDG())) {
     cut |= optionalCut(m_minZ, m_maxZ, particle.getProductionVertex().Z());
-    cut |= optionalCut(m_minR, m_maxR, particle.getProductionVertex().Perp());
+    cut |= optionalCut(m_minR, m_maxR, particle.getProductionVertex().Rho());
     cut |= optionalCut(m_minPt, m_maxPt, particle.getMomentum().Pt());
     cut |= alwaysCut(m_minTheta, m_maxTheta, particle.getMomentum().Theta());
   }

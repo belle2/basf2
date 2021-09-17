@@ -28,8 +28,6 @@
 #include <EvtGenBase/EvtPDL.hh>
 #include <EvtGenBase/EvtRandom.hh>
 
-#include <TLorentzVector.h>
-
 using namespace std;
 using namespace Belle2;
 
@@ -108,7 +106,7 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
 }
 
 
-int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle, TVector3 pPrimaryVertex,
+int EvtGenInterface::simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVector pParentParticle, TVector3 pPrimaryVertex,
                                    int inclusiveType, const std::string& inclusiveParticle)
 {
   EvtId inclusiveParticleID, inclusiveAntiParticleID;
@@ -176,8 +174,8 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
 {
   int pdg;
   EvtId id;
-  TLorentzVector momentum = parent.get4Vector();
-  TVector3 vertex = parent.getVertex();
+  ROOT::Math::PxPyPzEVector momentum = parent.get4Vector();
+  B2Vector3D vertex = parent.getVertex();
   m_pinit.set(momentum.E(), momentum.X(), momentum.Y(), momentum.Z());
   m_logCapture.start();
   // we want to decay the particle so the decay time in the tree needs to be lower
@@ -261,7 +259,7 @@ void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGrap
   gParticle->setPDG(EvtPDL::getStdHep(eParticle->getId()));
 
   EvtVector4R EvtP4 = eParticle->getP4Lab();
-  TLorentzVector p4(EvtP4.get(1), EvtP4.get(2), EvtP4.get(3), EvtP4.get(0));
+  ROOT::Math::PxPyPzEVector p4(EvtP4.get(1), EvtP4.get(2), EvtP4.get(3), EvtP4.get(0));
   gParticle->set4Vector(p4);
 
   EvtVector4R Evtpos = eParticle->get4Pos();

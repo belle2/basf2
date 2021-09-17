@@ -9,7 +9,7 @@
 #pragma once
 
 #include <mdst/dataobjects/MCParticleGraph.h>
-#include <TLorentzRotation.h>
+#include <Math/LorentzRotation.h>
 
 namespace Belle2 {
 
@@ -157,7 +157,7 @@ namespace Belle2 {
     /** Generates one single event.
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
      */
-    void generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost);
+    void generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost);
 
     /** returns kinematic variable T.
     */
@@ -229,7 +229,7 @@ namespace Belle2 {
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
-    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
                        bool isVirtual = false, bool isInitial = false);
 
   private:

@@ -50,7 +50,7 @@ void SmearPrimaryVertexModule::event()
   if (shift == TVector3{0, 0, 0}) return;
   for (MCParticle& mcParticle : mcParticles) {
     /* Shift the production vertex. */
-    mcParticle.setProductionVertex(mcParticle.getProductionVertex() + shift);
+    mcParticle.setProductionVertex(B2Vector3D(mcParticle.getProductionVertex()) + shift);
     /* Shift also the decay vertex only if the MCParticle has a daughter. */
     if (mcParticle.getNDaughters() > 0)
       mcParticle.setDecayVertex(mcParticle.getDecayVertex() + shift);

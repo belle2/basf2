@@ -74,7 +74,7 @@ void HepMCOutputModule::event()
     }
 
     TVector3 mom = mcPart.getMomentum();
-    TVector3 vert = mcPart.getVertex();
+    B2Vector3D vert = mcPart.getVertex();
 
     int isthep = 1;
     if (mcPart.getFirstDaughter() > 0) isthep = 2;

@@ -16,7 +16,7 @@
 #include <string>
 #include <fstream>
 
-#include <TLorentzRotation.h>
+#include <Math/LorentzRotation.h>
 
 namespace Belle2 {
 
@@ -86,7 +86,7 @@ namespace Belle2 {
 
     int m_nVirtual;        /**< The number of particles in each event with a set Virtual flag. */
     bool m_wrongSignPz;    /**< Bool to indicate that HER and LER were swapped. */
-    TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
+    ROOT::Math::LorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
 
 
   protected:

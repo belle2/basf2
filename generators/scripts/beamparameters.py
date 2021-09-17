@@ -124,10 +124,11 @@ def __get_4vector(energy, angle):
     import ROOT
     m = 0.511e-3
     pz = (energy ** 2 - m ** 2) ** .5
-    v = ROOT.TLorentzVector(0, 0, pz, energy)
+    v = ROOT.Math.PxPyPzEVector(0, 0, pz, energy)
     if angle < 0:
         angle = math.pi + angle
-    v.RotateY(angle)
+    rotationY = ROOT.Math.RotationY(angle)
+    v = rotationY(v)
     return v
 
 

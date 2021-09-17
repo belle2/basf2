@@ -76,7 +76,7 @@ void EvtGenInputModule::beginRun()
 
 }
 
-TLorentzVector EvtGenInputModule::createBeamParticle(double minMass, double maxMass)
+ROOT::Math::PxPyPzEVector EvtGenInputModule::createBeamParticle(double minMass, double maxMass)
 {
   // try to generate the 4 momentum a m_maxTries amount of times before we give up
   for (int i = 0; i < m_maxTries; ++i) {
@@ -85,7 +85,7 @@ TLorentzVector EvtGenInputModule::createBeamParticle(double minMass, double maxM
     // check if we fullfill the mass window
     if (initial.getMass() >= minMass && initial.getMass() < maxMass) {
 
-      TLorentzVector beam = initial.getLER() + initial.getHER();
+      ROOT::Math::PxPyPzEVector beam = initial.getLER() + initial.getHER();
       m_PrimaryVertex = initial.getVertex();
       return beam;
     }
@@ -97,7 +97,7 @@ TLorentzVector EvtGenInputModule::createBeamParticle(double minMass, double maxM
           << "maxMass=" << maxMass << " GeV");
 
   //This will never be reached so return empty to avoid warning
-  return TLorentzVector(0, 0, 0, 0);
+  return ROOT::Math::PxPyPzEVector(0, 0, 0, 0);
 }
 
 void EvtGenInputModule::event()
@@ -113,7 +113,7 @@ void EvtGenInputModule::event()
     }
   }
 
-  TLorentzVector pParentParticle;
+  ROOT::Math::PxPyPzEVector pParentParticle;
 
   //Initialize the beam energy for each event separatly
   if (EvtPDL::getStdHep(m_parentId) == 10022) {

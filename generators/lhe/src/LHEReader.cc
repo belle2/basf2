@@ -19,7 +19,6 @@
 #include <boost/format.hpp>
 
 #include <TF1.h>
-#include <TLorentzVector.h>
 
 using namespace std;
 using namespace Belle2;
@@ -65,7 +64,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     if (m_meanDecayLength > 0) {
       if (p.getPDG() == m_pdgDisplaced) {
         TF1 fr("fr", "exp(-x/[0])", 0, 1000000);
-        TLorentzVector p4 = p.get4Vector();
+        ROOT::Math::PxPyPzEVector p4 = p.get4Vector();
         fr.SetRange(m_Rmin, m_Rmax);
         fr.SetParameter(0, m_meanDecayLength * p4.Gamma());
         r = fr.GetRandom();
@@ -88,8 +87,8 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     }
 
     // boost particles to lab frame: both momentum and vertex
-    TLorentzVector p4 = p.get4Vector();
-    TLorentzVector v4;
+    ROOT::Math::PxPyPzEVector p4 = p.get4Vector();
+    ROOT::Math::PxPyPzEVector v4;
     if (m_wrongSignPz) // this means we have to mirror Pz
       p4.SetPz(-1.0 * p4.Pz());
     p4 = m_labboost * p4;

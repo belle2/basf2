@@ -87,7 +87,8 @@ namespace Belle2 {
      * @param cov covariance of the beam momentum (E, theta_x, theta_y)
      * @param gen multivariate normal generator to be used
      */
-    TLorentzVector generateBeam(const TLorentzVector& initial, const TMatrixDSym& cov, MultivariateNormalGenerator& gen);
+    ROOT::Math::PxPyPzEVector generateBeam(const ROOT::Math::PxPyPzEVector& initial, const TMatrixDSym& cov,
+                                           MultivariateNormalGenerator& gen);
     /** Datastore object containing the nominal beam parameters */
     DBObjPtr<BeamParameters> m_beamParams;
     /** Datastore object containing the generated event */

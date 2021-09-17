@@ -77,7 +77,7 @@ void BBBrem::init(double cmsEnergy, double minPhotonEFrac, bool unweighted, doub
 }
 
 
-double BBBrem::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
+double BBBrem::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost)
 {
 
   if (m_unweighted) {
@@ -379,7 +379,7 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
 }
 
 
-void BBBrem::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+void BBBrem::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
                            bool isVirtual, bool isInitial)
 {
 
@@ -410,14 +410,14 @@ void BBBrem::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg,
 
   //set the production vertex of non initial particles
   if (!isInitial) {
-    TVector3 v3 = part.getProductionVertex();
+    B2Vector3D v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);
   }
 
   //If boosting is enable boost the particles to the lab frame
-  TLorentzVector p4 = part.get4Vector();
+  ROOT::Math::PxPyPzEVector p4 = part.get4Vector();
   p4 = boost * p4;
   part.set4Vector(p4);
 }

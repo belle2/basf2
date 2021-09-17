@@ -11,8 +11,8 @@
 
 #include <TMath.h>
 #include <TRandom3.h>
-#include <TLorentzVector.h>
-#include <TLorentzRotation.h>
+#include <Math/Vector4D.h>
+#include <Math/LorentzRotation.h>
 
 using namespace TMath;
 using namespace std;
@@ -66,7 +66,7 @@ void PairGenModule::event()
       value = gRandom->Uniform(0, 2.0);
     }
     double CMSEnergy = initial.getMass();
-    TLorentzRotation boostCMSToLab = initial.getCMSToLab();
+    ROOT::Math::LorentzRotation boostCMSToLab = initial.getCMSToLab();
 
     int nParticles = 1;
     if (m_saveBoth) {
@@ -90,11 +90,11 @@ void PairGenModule::event()
       double py = momentum * Sin(theta) * Sin(phi);
       double e  = Sqrt(momentum * momentum + m * m);
 
-      TLorentzVector vp(sign * px, sign * py, sign * pz, e);
-      vp.Transform(boostCMSToLab);
+      ROOT::Math::PxPyPzEVector vp(sign * px, sign * py, sign * pz, e);
+      vp = boostCMSToLab * vp;
 
-      p.setMomentum(vp(0), vp(1), vp(2));
-      p.setEnergy(vp(3));
+      p.setMomentum(vp.px(), vp.py(), vp.pz());
+      p.setEnergy(vp.E());
       p.setProductionVertex(initial.getVertex());
       p.addStatus(MCParticle::c_StableInGenerator);
       //Particle is stable in generator. We could use MCParticleGraph options to

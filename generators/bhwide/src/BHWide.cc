@@ -10,7 +10,7 @@
 #include <framework/gearbox/Unit.h>
 
 #include <TDatabasePDG.h>
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 #include <TRandom.h>
 
 using namespace std;
@@ -113,7 +113,7 @@ void BHWide::init()
 }
 
 
-void BHWide::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
+void BHWide::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost)
 {
   //Generate event
   int mode = 0;
@@ -184,7 +184,7 @@ void BHWide::applySettings()
 }
 
 
-void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
                            bool isVirtual, bool isInitial)
 {
   //  //Create particle
@@ -223,14 +223,14 @@ void BHWide::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg,
   part.setEnergy(mom[3]);
 
   //boost
-  TLorentzVector p4 = part.get4Vector();
+  ROOT::Math::PxPyPzEVector p4 = part.get4Vector();
   p4.SetPz(-1.0 * p4.Pz()); //BHWIDE uses other direction convention
   p4 = boost * p4;
   part.set4Vector(p4);
 
   //set vertex
   if (!isInitial) {
-    TVector3 v3 = part.getProductionVertex();
+    B2Vector3D v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

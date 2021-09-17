@@ -10,7 +10,7 @@
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <TLorentzRotation.h>
+#include <Math/LorentzRotation.h>
 
 namespace Belle2 {
 
@@ -84,7 +84,7 @@ namespace Belle2 {
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
      * @return Returns the weight of the event.
      */
-    double generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost);
+    double generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost);
 
     /** Returns the total cross section of the generated process in millibarn.
      * @return The total cross section.
@@ -159,7 +159,7 @@ namespace Belle2 {
      *
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
-    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
                        bool isVirtual = false, bool isInitial = false);
 
   private:

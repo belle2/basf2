@@ -17,7 +17,7 @@
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 
 using namespace std;
 using namespace Belle2;
@@ -51,7 +51,7 @@ int HepevtReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     readParticle(p);
 
     //boost particles to lab frame:
-    TLorentzVector p4 = p.get4Vector();
+    ROOT::Math::PxPyPzEVector p4 = p.get4Vector();
     if (m_wrongSignPz) // this means we have to mirror Pz
       p4.SetPz(-1.0 * p4.Pz());
     p4 = m_labboost * p4;

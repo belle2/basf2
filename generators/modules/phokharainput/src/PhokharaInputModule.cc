@@ -161,7 +161,7 @@ void PhokharaInputModule::event()
   const MCInitialParticles& initial = m_initial.generate();
 
   // true boost
-  TLorentzRotation boost = initial.getCMSToLab();
+  ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
   // vertex
   TVector3 vertex = initial.getVertex();

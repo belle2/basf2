@@ -15,7 +15,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <TDatabasePDG.h>
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 #include <TRandom3.h>
 
 using namespace std;
@@ -155,7 +155,7 @@ void Teegg::init()
 }
 
 
-void Teegg::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost)
+void Teegg::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost)
 {
   //Generate event
   int mode = 1;
@@ -277,7 +277,7 @@ void Teegg::applySettings()
 }
 
 
-void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
                           bool isVirtual, bool isInitial)
 {
   // Create particle
@@ -308,14 +308,14 @@ void Teegg::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, 
   part.setEnergy(mom[3]);
 
   //boost
-  TLorentzVector p4 = part.get4Vector();
+  ROOT::Math::PxPyPzEVector p4 = part.get4Vector();
   p4.SetPz(-1.0 * p4.Pz()); //TEEGG uses other direction convention
   p4 = boost * p4;
   part.set4Vector(p4);
 
   //set vertex
   if (!isInitial) {
-    TVector3 v3 = part.getProductionVertex();
+    B2Vector3D v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

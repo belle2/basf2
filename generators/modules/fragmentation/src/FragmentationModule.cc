@@ -272,8 +272,9 @@ void FragmentationModule::event()
       p->setPDG(m_Pythia->event[iPythiaPart].id());
 
       // Set four vector
-      TLorentzVector p4(m_Pythia->event[iPythiaPart].px(), m_Pythia->event[iPythiaPart].py(), m_Pythia->event[iPythiaPart].pz(),
-                        m_Pythia->event[iPythiaPart].e());
+      ROOT::Math::PxPyPzEVector p4(m_Pythia->event[iPythiaPart].px(), m_Pythia->event[iPythiaPart].py(),
+                                   m_Pythia->event[iPythiaPart].pz(),
+                                   m_Pythia->event[iPythiaPart].e());
       p->set4Vector(p4);
       p->setMass(m_Pythia->event[iPythiaPart].m());
 

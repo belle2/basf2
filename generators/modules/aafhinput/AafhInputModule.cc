@@ -107,7 +107,7 @@ void AafhInputModule::event()
   const MCInitialParticles& initial = m_initial.generate();
 
   // True boost.
-  TLorentzRotation boost = initial.getCMSToLab();
+  ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
   // vertex.
   TVector3 vertex = initial.getVertex();
@@ -121,7 +121,7 @@ void AafhInputModule::event()
   for (size_t i = 0; i < mpg.size(); ++i) {
     mpg[i].set4Vector(boost * mpg[i].get4Vector());
 
-    TVector3 v3 = mpg[i].getProductionVertex();
+    B2Vector3D v3 = mpg[i].getProductionVertex();
     v3 = v3 + vertex;
     mpg[i].setProductionVertex(v3);
     mpg[i].setValidVertex(true);

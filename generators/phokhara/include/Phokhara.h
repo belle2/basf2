@@ -10,7 +10,7 @@
 #define PHOKHARA_H
 
 #include <mdst/dataobjects/MCParticleGraph.h>
-#include <TLorentzRotation.h>
+#include <Math/LorentzRotation.h>
 #include <utility>
 
 namespace Belle2 {
@@ -187,7 +187,7 @@ namespace Belle2 {
      * @param vertex generated vertex.
      * @param boost generated boost.
      */
-    double generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentzRotation boost);
+    double generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost);
 
     /**
      * Terminates the generator.
@@ -251,7 +251,7 @@ namespace Belle2 {
      * @param isVirtual If the particle is a virtual particle, such as the incoming particles, set this to true.
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
-    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
+    void storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, ROOT::Math::LorentzRotation boost,
                        bool isVirtual = false, bool isInitial = false);
 
   private:

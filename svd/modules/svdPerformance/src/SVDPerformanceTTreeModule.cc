@@ -22,6 +22,7 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <genfit/TrackPoint.h>
 #include <TVector3.h>
+#include <Math/Boost.h>
 #include <math.h>
 #include <iostream>
 #include <algorithm>
@@ -183,8 +184,9 @@ void SVDPerformanceTTreeModule::event()
       m_svdTrkd0 = tfr->getD0();
       m_svdTrkz0 = tfr->getZ0();
       m_svdTrkpT = tfr->getMomentum().Perp();
-      TLorentzVector pStar = tfr->get4Momentum();
-      pStar.Boost(0, 0, 3. / 11);
+      ROOT::Math::PxPyPzEVector pStar = tfr->get4Momentum();
+      ROOT::Math::BoostZ boost(3. / 11);
+      pStar = boost(pStar);
       m_svdTrkpCM = pStar.P();
     }
 

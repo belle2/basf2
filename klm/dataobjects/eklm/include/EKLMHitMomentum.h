@@ -9,7 +9,8 @@
 #pragma once
 
 /* ROOT headers. */
-#include <TLorentzVector.h>
+#include <TObject.h>
+#include <Math/Vector4D.h>
 
 namespace Belle2 {
 
@@ -34,15 +35,15 @@ namespace Belle2 {
      * Set momentum.
      * @param[in] p momentum
      */
-    void setMomentum(const TLorentzVector& p);
+    void setMomentum(const ROOT::Math::PxPyPzEVector& p);
 
     /**
      * Get momentum.
      * @return Momentum.
      */
-    TLorentzVector getMomentum() const
+    ROOT::Math::PxPyPzEVector getMomentum() const
     {
-      return TLorentzVector(m_pX, m_pY, m_pZ, m_e);
+      return ROOT::Math::PxPyPzEVector(m_pX, m_pY, m_pZ, m_e);
     }
 
   protected:

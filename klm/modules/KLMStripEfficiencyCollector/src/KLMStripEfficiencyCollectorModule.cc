@@ -424,7 +424,7 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(
        * The muons with sufficiently large momentum have a very small
        * probability to get absorbed in the detector.
        */
-      if (muon->getMomentum().Mag() < m_MinimalMomentumNoOuterLayers)
+      if (muon->getP() < m_MinimalMomentumNoOuterLayers)
         continue;
     }
     allExtHitsInPlane->Fill(m_PlaneArrayIndex->getIndex(it->first));

@@ -119,9 +119,9 @@ class LeptonicUntagged(BaseSkim):
 class dilepton(BaseSkim):
     """
     Reconstructed decays
-        * :math:`BBar \\to l^+l^-`
-        * :math:`BBar \\to l^+l^+`
-        * :math:`BBar \\to l^-l^-`
+        * :math:`B\\overline{B} \\to l^+l^-`
+        * :math:`B\\overline{B} \\to l^+l^+`
+        * :math:`B\\overline{B} \\to l^-l^-`
     """
     __authors__ = ["Alessandro Gaz, Chiara La Licata"]
     __contact__ = __liaison__
@@ -129,6 +129,8 @@ class dilepton(BaseSkim):
         "Inclusive dilepton skim"
     )
     __category__ = "physics, leptonic"
+
+    NoisyModules = ["EventShapeCalculator"]
 
     def load_standard_lists(self, path):
         stdE("all", path=path)

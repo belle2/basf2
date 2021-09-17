@@ -102,7 +102,7 @@ namespace Belle2 {
       if (!barHit) continue;
 
       TMatrixDSym cov(6); // infinite precission
-      fitResults.appendNew(mcParticle.getVertex(),
+      fitResults.appendNew(B2Vector3D(mcParticle.getVertex()),
                            mcParticle.getMomentum(),
                            cov,
                            mcParticle.getCharge(),

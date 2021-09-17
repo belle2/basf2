@@ -23,7 +23,7 @@ import basf2 as b2
 from ROOT import Belle2
 from ROOT import TH1F, TH2F
 from ROOT import AddressOf, gROOT
-from ROOT import TLorentzVector
+from ROOT.Math import PxPyPzEVector
 import math
 import ROOT
 import sys
@@ -195,12 +195,11 @@ class Ntuple(b2.Module):
     def getEcms(self, tfit, chargedStable):
         ''' returns c.m.s. energy of a particle '''
         mom = tfit.getMomentum()
-        lorentzLab = TLorentzVector()
         mass = chargedStable.getMass()
-        lorentzLab.SetXYZM(mom.X(), mom.Y(), mom.Z(), mass)
+        lorentzLab = PxPyPzMVector(mom.X(), mom.Y(), mom.Z(), mass)
         T = Belle2.PCmsLabTransform()
         lorentzCms = T.labToCms(lorentzLab)
-        return [lorentzCms.Energy(), T.getCMSEnergy() / 2]
+        return [lorentzCms.energy(), T.getCMSEnergy() / 2]
 
     def trackSelected(self):
         ''' returns true if track fulfills selection criteria  '''

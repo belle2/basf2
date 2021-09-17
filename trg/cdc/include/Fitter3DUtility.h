@@ -10,7 +10,7 @@
 #define FITTER3DUTILITY_H
 
 #include <TVectorD.h>
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 #include <TVector3.h>
 #include <TVector2.h>
 #include <map>
@@ -161,7 +161,7 @@ public:
 
   /// MC calculation functions
   /// Calculates the impact position of track.
-  static void findImpactPosition(TVector3* mcPosition, TLorentzVector* mcMomentum, int charge, TVector2& helixCenter,
+  static void findImpactPosition(TVector3* mcPosition, ROOT::Math::PxPyPzEVector* mcMomentum, int charge, TVector2& helixCenter,
                                  TVector3& impactPosition);
 
   /// HelixParameters: dR, phi0, keppa, dz, tanLambda

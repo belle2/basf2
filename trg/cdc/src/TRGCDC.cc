@@ -2173,8 +2173,8 @@ namespace Belle2 {
           // Change range to [0,2pi]
           if (mcPhi0 < 0) mcPhi0 += 2 * M_PI;
           // Calculated impact position
-          TVector3 vertex = trackMCParticle.getVertex();
-          TLorentzVector vector4 = trackMCParticle.get4Vector();
+          TVector3 vertex = B2Vector3D(trackMCParticle.getVertex());
+          ROOT::Math::PxPyPzEVector vector4 = trackMCParticle.get4Vector();
           TVector2 helixCenter;
           TVector3 impactPosition;
           Fitter3DUtility::findImpactPosition(&vertex, &vector4, mcCharge, helixCenter, impactPosition);

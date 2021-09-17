@@ -23,7 +23,6 @@
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/TRGGDLDBInputBits.h>
 
-#include <TLorentzVector.h>
 #include <TMath.h>
 
 #include <iostream>
@@ -149,10 +148,10 @@ void TRGGRLProjectsModule::initialize()
 
     //..Four vector of a 1 GeV lab photon at this TC
     TVector3 CellPosition = trgecl_obj->getTCPosition(tc);
-    TLorentzVector CellLab(1., 1., 1., 1.);
-    CellLab.SetTheta(CellPosition.Theta());
-    CellLab.SetPhi(CellPosition.Phi());
-    CellLab.SetRho(1.);
+    ROOT::Math::PxPyPzEVector CellLab;
+    CellLab.SetPx(CellPosition.Px() / CellPosition.Mag());
+    CellLab.SetPy(CellPosition.Py() / CellPosition.Mag());
+    CellLab.SetPz(CellPosition.Pz() / CellPosition.Mag());
     CellLab.SetE(1.);
 
     //..cotan Theta and phi in lab
@@ -161,7 +160,7 @@ void TRGGRLProjectsModule::initialize()
     TCcotThetaLab.push_back(1. / tantheta);
 
     //..Corresponding 4 vector in the COM frame
-    TLorentzVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
+    ROOT::Math::PxPyPzEVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
     TCThetaCOM.push_back(CellCOM.Theta()*radtodeg);
     TCPhiCOM.push_back(CellCOM.Phi()*radtodeg);
 

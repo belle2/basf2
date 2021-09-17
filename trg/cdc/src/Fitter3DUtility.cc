@@ -21,7 +21,6 @@
 #include <utility>
 #include <iostream>
 #include <fstream>
-#include "TLorentzVector.h"
 #include "TVector3.h"
 #include "TVector2.h"
 
@@ -1931,7 +1930,8 @@ void Fitter3DUtility::fitter3DFirm(std::map<std::string, double>& mConstD,
   }
 }
 
-void Fitter3DUtility::findImpactPosition(TVector3* mcPosition, TLorentzVector* mcMomentum, int charge, TVector2& helixCenter,
+void Fitter3DUtility::findImpactPosition(TVector3* mcPosition, ROOT::Math::PxPyPzEVector* mcMomentum, int charge,
+                                         TVector2& helixCenter,
                                          TVector3& impactPosition)
 {
 

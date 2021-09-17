@@ -962,8 +962,8 @@ namespace Belle2 {
     const MCParticle& trackMCParticle = trackRelation.mcParticle(0);
 
     // Calculated impact position
-    TVector3 vertex = trackMCParticle.getVertex();
-    TLorentzVector vector4 = trackMCParticle.get4Vector();
+    TVector3 vertex = B2Vector3D(trackMCParticle.getVertex());
+    ROOT::Math::PxPyPzEVector vector4 = trackMCParticle.get4Vector();
     TVector2 helixCenter;
     TVector3 impactPosition;
     Fitter3DUtility::findImpactPosition(&vertex, &vector4, int(m_mDouble_in["mcCharge"]), helixCenter, impactPosition);

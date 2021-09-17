@@ -436,10 +436,9 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
     /// Before storing, apply invariant mass cut.
     const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
     const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
-    TLorentzVector lv0, lv1;
+    ROOT::Math::PxPyPzMVector lv0(tr0->getMom().Px(), tr0->getMom().Py(), tr0->getMom().Pz(), trackHypotheses.first.getMass());
+    ROOT::Math::PxPyPzMVector lv1(tr1->getMom().Px(), tr1->getMom().Py(), tr1->getMom().Pz(), trackHypotheses.second.getMass());
     /// Reconstruct invariant mass.
-    lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
-    lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
     double v0InvMass = (lv0 + lv1).M();
     if (v0Hypothesis == Const::Kshort) {
       if (v0InvMass < std::get<0>(m_invMassRangeKshort) || v0InvMass > std::get<1>(m_invMassRangeKshort)) {

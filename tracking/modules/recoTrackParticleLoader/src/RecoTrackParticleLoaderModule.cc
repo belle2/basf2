@@ -15,7 +15,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <TVector3.h>
-#include <TLorentzVector.h>
 #include <TMatrixDSym.h>
 
 #include <cmath>
@@ -87,10 +86,10 @@ void RecoTrackParticleLoaderModule::event()
     double charge = rep->getCharge(extrapolatedMSoP); // mplTrackRep returns magnetic charge
     double E = std::sqrt(mom.x() * mom.x() + mom.y() * mom.y() + mom.z() * mom.z() + mass * mass);
     double pValue = recoTrack.getTrackFitStatus(rep)->getPVal();
-    TLorentzVector lorentzMom(mom.x(), mom.y(), mom.z(), E);
+    ROOT::Math::PxPyPzEVector lorentzMom(mom.x(), mom.y(), mom.z(), E);
 
     Particle* newPart = particles.appendNew(lorentzMom, pdg);
-    newPart->setVertex(pos);
+    newPart->setVertex(ROOT::Math::XYZVector(pos));
     newPart->setPValue(pValue);
     newPart->writeExtraInfo("magCharge", charge);
     newPart->writeExtraInfo("massFromFit", mass);

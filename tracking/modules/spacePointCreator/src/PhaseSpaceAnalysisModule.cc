@@ -225,7 +225,7 @@ void PhaseSpaceAnalysisModule::getValuesForRoot(Belle2::MCParticle* mcParticle, 
   B2DEBUG(499, "TVector3 momentum: (" << momentum.X() << "," << momentum.Y() << "," << momentum.Z() << \
           "). This leads to p_T = " << momentum.Pt() << " and eta = " << momentum.Eta());
 
-  const TVector3 vertex = mcParticle->getVertex();
+  const B2Vector3D vertex = mcParticle->getVertex();
   rootVariables.VertX.push_back(vertex.Y());
   rootVariables.VertY.push_back(vertex.Y());
   rootVariables.VertZ.push_back(vertex.Z());

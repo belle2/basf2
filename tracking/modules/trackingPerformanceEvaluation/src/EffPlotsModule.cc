@@ -561,7 +561,7 @@ void EffPlotsModule::event()
     MCParticleInfo mcParticleInfo_dau0(*mc_dau0, magField);
     MCParticleInfo mcParticleInfo_dau1(*mc_dau1, magField);
 
-    TVector3 MC_prodvtx = mcParticle.getVertex();
+    B2Vector3D MC_prodvtx = mcParticle.getVertex();
     TVector3 MC_vtx = mcParticle.getDecayVertex();
     TVector3 MC_FL = MC_vtx - MC_prodvtx;
 

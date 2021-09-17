@@ -412,7 +412,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
     MCParticle* aMcParticlePtr = mcParticles[iPart];
     // Ignore particles that didn't propagate significantly, they cannot make tracks.
-    if ((aMcParticlePtr->getDecayVertex() - aMcParticlePtr->getProductionVertex()).Mag() < 1 * Unit::cm) {
+    if ((aMcParticlePtr->getDecayVertex() - B2Vector3D(aMcParticlePtr->getProductionVertex())).Mag() < 1 * Unit::cm) {
       B2DEBUG(20, "Particle that did not propagate significantly cannot make track.");
       continue;
     }
@@ -834,7 +834,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
 
     //set track parameters from MCParticle information
-    TVector3 positionTrue = aMcParticlePtr->getProductionVertex();
+    B2Vector3D positionTrue = aMcParticlePtr->getProductionVertex();
     TVector3 momentumTrue = aMcParticlePtr->getMomentum();
     double timeTrue = aMcParticlePtr->getProductionTime();
 
@@ -891,10 +891,8 @@ void TrackFinderMCTruthRecoTracksModule::event()
         // reset the time to the time of the first hit  (assumes time > production time)
         time = std::get<0>(hitInformationVector.at(0));
         const double deltaT = time - aMcParticlePtr->getProductionTime();
-        // build the 4-vector with the smeared momentum
-        TLorentzVector lorentzV;
-        lorentzV.SetVectM(momentum, aMcParticlePtr->get4Vector().M());
-        const double beta_xy = momentum.Perp() / lorentzV.E();
+        const double energy = sqrt(momentum.Mag2() + aMcParticlePtr->get4Vector().M() * aMcParticlePtr->get4Vector().M());
+        const double beta_xy = momentum.Perp() / energy;
         // calculate arclength in 2D of the track
         const double arclength2D = beta_xy * Const::speedOfLight * deltaT;
 

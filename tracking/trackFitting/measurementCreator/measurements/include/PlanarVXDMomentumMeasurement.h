@@ -139,16 +139,16 @@ namespace Belle2 {
     MCParticle* relatedMCParticle = m_hit->template getRelated<MCParticle>("MCParticles");
 
     TVector3 mcMomentum;
-    TVector3 mcPostion;
+    TVector3 mcPosition;
     short mcCharge;
 
     if (relatedMCParticle == nullptr) {
       mcMomentum = trackMomentum;
-      mcPostion = trackPosition;
+      mcPosition = trackPosition;
       mcCharge = trackCharge;
     } else {
       mcMomentum = relatedMCParticle->getMomentum();
-      mcPostion = relatedMCParticle->getProductionVertex();
+      mcPosition = B2Vector3D(relatedMCParticle->getProductionVertex());
       mcCharge = relatedMCParticle->getCharge();
     }
 
@@ -163,7 +163,7 @@ namespace Belle2 {
     } else {
       if (m_useTrackingSeeds) {
         if (m_useMCInformation) {
-          rawHitCoordinates(0) = momentumEstimator.estimateQOverP(*m_hit, mcMomentum, mcPostion, mcCharge,
+          rawHitCoordinates(0) = momentumEstimator.estimateQOverP(*m_hit, mcMomentum, mcPosition, mcCharge,
                                                                   m_fitParameters,
                                                                   m_correctionFitParameters);
 

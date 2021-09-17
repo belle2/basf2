@@ -251,7 +251,7 @@ void MCTrackCandClassifierModule::event()
 
       MCParticleInfo mcParticleInfo(mcParticle, magField);
 
-      TVector3 decayVertex = mcParticle.getProductionVertex();
+      B2Vector3D decayVertex = mcParticle.getProductionVertex();
       TVector3 mom = mcParticle.getMomentum();
       double charge = mcParticle.getCharge();
       double omega = mcParticleInfo.getOmega();

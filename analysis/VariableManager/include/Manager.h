@@ -85,8 +85,8 @@ namespace Belle2 {
         \code
         from variables import variables
 
-        from ROOT import TLorentzVector
-        someParticle = Belle2.Particle(TLorentzVector(1.0, 0, 0, 0), 321)
+        from ROOT.Math import PxPyPzEVector
+        someParticle = Belle2.Particle(PxPyPzEVector(1.0, 0, 0, 1.0), 321)
         print(variables.evaluate('E', someParticle))
         \endcode
      *

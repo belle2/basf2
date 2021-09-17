@@ -712,8 +712,8 @@ void ECLBhabhaTCollectorModule::collect()
       if (not tempTrackFit) {continue;}
       trkp4Lab[icharge] = tempTrackFit->get4Momentum();
       trkp4COM[icharge] = boostrotate.rotateLabToCms() * trkp4Lab[icharge];
-      trkpLab[icharge] = trkp4Lab[icharge].Rho();
-      trkpCOM[icharge] = trkp4COM[icharge].Rho();
+      trkpLab[icharge] = trkp4Lab[icharge].P();
+      trkpCOM[icharge] = trkp4COM[icharge].P();
 
 
       /* For each cluster associated to the current track, sum up the energies to get the total

@@ -99,7 +99,7 @@ namespace Belle2 {
         if (roePhoton->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
           ROOT::Math::PxPyPzEVector p_lab = roePhoton->get4Vector();
           if (p_lab != p_lab) continue;
-          if (p_lab.Rho() < 0.05) continue;
+          if (p_lab.P() < 0.05) continue;
           ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
           if (p_cms != p_cms) continue;
           if (p_cms.P() > P_MAX) continue;
@@ -112,7 +112,7 @@ namespace Belle2 {
         if (nKLMClusterTrackMatches(roeKlong) == 0 && !(roeKlong->getKLMCluster()->getAssociatedEclClusterFlag())) {
           ROOT::Math::PxPyPzEVector p_lab = roeKlong->get4Vector();
           if (p_lab != p_lab) continue;
-          if (p_lab.Rho() < 0.05) continue;
+          if (p_lab.P() < 0.05) continue;
           ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(p_lab);
           if (p_cms != p_cms) continue;
           if (p_cms.P() > P_MAX) continue;

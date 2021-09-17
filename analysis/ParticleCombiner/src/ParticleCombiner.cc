@@ -434,7 +434,6 @@ namespace Belle2 {
 
   Particle ParticleGenerator::createCurrentParticle() const
   {
-    //TLorentzVector performance is quite horrible, do it ourselves.
     double px = 0;
     double py = 0;
     double pz = 0;

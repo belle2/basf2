@@ -141,7 +141,7 @@ void RestOfEvent::initializeMask(const std::string& name, const std::string& ori
     B2FATAL("Creation of ROE Mask with a name " << RestOfEvent::c_defaultMaskName << " is not allowed!");
   }
   if (findMask(name)) {
-    B2FATAL("ROE Mask already exists!");
+    B2FATAL("ROE Mask '" << name << "' already exists!");
   }
   Mask elon(name, origin);
   m_masks.push_back(elon);
@@ -150,6 +150,10 @@ void RestOfEvent::initializeMask(const std::string& name, const std::string& ori
 void RestOfEvent::excludeParticlesFromMask(const std::string& maskName, const std::vector<const Particle*>& particlesToUpdate,
                                            Particle::EParticleSourceObject listType, bool discard)
 {
+  if (maskName == RestOfEvent::c_defaultMaskName) {
+    B2FATAL("ROE Mask name '" << RestOfEvent::c_defaultMaskName << "' is reserved for no mask case! " <<
+            "Please check your inputs.");
+  }
   Mask* mask = findMask(maskName);
   if (!mask) {
     B2FATAL("No '" << maskName << "' mask defined in current ROE!");
@@ -183,9 +187,13 @@ void RestOfEvent::excludeParticlesFromMask(const std::string& maskName, const st
 void RestOfEvent::updateMaskWithCuts(const std::string& maskName, const std::shared_ptr<Variable::Cut>& trackCut,
                                      const std::shared_ptr<Variable::Cut>& eclCut, const std::shared_ptr<Variable::Cut>& klmCut, bool updateExisting)
 {
+  if (maskName == RestOfEvent::c_defaultMaskName) {
+    B2FATAL("ROE Mask name '" << RestOfEvent::c_defaultMaskName << "' is reserved for no mask case! " <<
+            "Please check your inputs.");
+  }
   Mask* mask = findMask(maskName);
   if (!mask) {
-    B2FATAL("ROE Mask does not exist!");
+    B2FATAL("ROE Mask '" << maskName << "' does not exist!");
   }
   std::string sourceName = RestOfEvent::c_defaultMaskName;
   if (updateExisting) {
@@ -218,9 +226,13 @@ void RestOfEvent::updateMaskWithCuts(const std::string& maskName, const std::sha
 
 void RestOfEvent::updateMaskWithV0(const std::string& name, const Particle* particleV0)
 {
+  if (name == RestOfEvent::c_defaultMaskName) {
+    B2FATAL("ROE Mask name '" << RestOfEvent::c_defaultMaskName << "' is reserved for no mask case! " <<
+            "Please check your inputs.");
+  }
   Mask* mask = findMask(name);
   if (!mask) {
-    B2FATAL("ROE Mask does not exist!");
+    B2FATAL("ROE Mask '" << name << "' does not exist!");
   }
   std::vector<const Particle*> allROEParticles = getParticles(name, false);
   std::vector<int> indicesToErase;
@@ -251,9 +263,13 @@ void RestOfEvent::updateMaskWithV0(const std::string& name, const Particle* part
 
 bool RestOfEvent::checkCompatibilityOfMaskAndV0(const std::string& name, const Particle* particleV0)
 {
+  if (name == RestOfEvent::c_defaultMaskName) {
+    B2FATAL("ROE Mask name '" << RestOfEvent::c_defaultMaskName << "' is reserved for no mask case! " <<
+            "Please check your inputs.");
+  }
   Mask* mask = findMask(name);
   if (!mask) {
-    B2FATAL("ROE Mask does not exist!");
+    B2FATAL("ROE Mask '" << name << "' does not exist!");
   }
   if (!mask->isValid()) {
     return false; //We should have particles here!

@@ -127,9 +127,9 @@ std::string MCParticle::getInfoHTML() const
   out << "<b>pT</b>=" << getMomentum().Pt();
   out << ", <b>pZ</b>=" << m_momentum_z;
   out << "<br>";
-  std::string unitType = HTML::chooseUnitOfLength(getProductionVertex());
+  std::string unitType = HTML::chooseUnitOfLength(B2Vector3D(getProductionVertex()));
   int precision = 3;
-  out << "<b>V</b>=" << HTML::getStringConvertToUnit(getProductionVertex(), precision, unitType);
+  out << "<b>V</b>=" << HTML::getStringConvertToUnit(B2Vector3D(getProductionVertex()), precision, unitType);
 
   const MCParticle* mom = getMother();
   if (mom) {

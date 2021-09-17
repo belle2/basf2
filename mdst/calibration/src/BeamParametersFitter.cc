@@ -17,9 +17,10 @@
 #include <framework/logging/Logger.h>
 
 /* ROOT headers. */
-#include <TLorentzVector.h>
 #include <TMinuit.h>
 #include <TVectorD.h>
+#include <Math/Vector4D.h>
+#include <Math/RotationY.h>
 
 using namespace Belle2;
 
@@ -47,8 +48,8 @@ static double s_AngleError;
 /**
  * Get momentum by energy, x angle, y angle.
  */
-static TLorentzVector getMomentum(double energy, double thetaX, double thetaY,
-                                  bool ler)
+static ROOT::Math::PxPyPzEVector getMomentum(double energy, double thetaX, double thetaY,
+                                             bool ler)
 {
   const double pz = std::sqrt(energy * energy -
                               Const::electronMass * Const::electronMass);
@@ -58,9 +59,11 @@ static TLorentzVector getMomentum(double energy, double thetaX, double thetaY,
   const double cy = cos(thetaY);
   const double px = sy * cx * pz;
   const double py = -sx * pz;
-  TLorentzVector result(px, py, cx * cy * pz, energy);
-  if (ler)
-    result.RotateY(M_PI);
+  ROOT::Math::PxPyPzEVector result(px, py, cx * cy * pz, energy);
+  if (ler) {
+    ROOT::Math::RotationY rotationY(M_PI);
+    result = rotationY(result);
+  }
   return result;
 }
 
@@ -69,11 +72,11 @@ static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
   (void)npar;
   (void)grad;
   (void)iflag;
-  TLorentzVector pHER, pLER;
+  ROOT::Math::PxPyPzEVector pHER, pLER;
   pHER = getMomentum(par[0], par[1], par[2], false);
   pLER = getMomentum(par[3], par[4], par[5], true);
-  TLorentzVector pBeam = pHER + pLER;
-  TVector3 beamBoost = pBeam.BoostVector();
+  ROOT::Math::PxPyPzEVector pBeam = pHER + pLER;
+  B2Vector3D beamBoost = pBeam.BoostToCM();
   TVectorD boostDifference(3);
   boostDifference[0] = beamBoost.X() - s_BoostVector.X();
   boostDifference[1] = beamBoost.Y() - s_BoostVector.Y();
@@ -82,8 +85,8 @@ static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
   double invariantMass = pBeam.M();
   double massChi2 = pow((invariantMass - s_InvariantMass) /
                         s_InvariantMassError, 2);
-  double angleHER = pHER.Vect().Angle(s_DirectionHER);
-  double angleLER = pLER.Vect().Angle(s_DirectionLER);
+  double angleHER = B2Vector3D(pHER.Vect()).Angle(s_DirectionHER);
+  double angleLER = B2Vector3D(pLER.Vect()).Angle(s_DirectionLER);
   double angleChi2 = pow(angleHER / s_AngleError, 2) +
                      pow(angleLER / s_AngleError, 2);
   fval = boostChi2 + massChi2 + angleChi2;
@@ -243,9 +246,9 @@ void BeamParametersFitter::fit()
   minuit.GetParameter(4, lerThetaX, error);
   minuit.GetParameter(5, lerThetaY, error);
   /* Calculate error. */
-  TLorentzVector pHER = getMomentum(herMomentum, herThetaX, herThetaY, false);
-  TLorentzVector pLER = getMomentum(lerMomentum, lerThetaX, lerThetaY, true);
-  TLorentzVector pBeam = pHER + pLER;
+  ROOT::Math::PxPyPzEVector pHER = getMomentum(herMomentum, herThetaX, herThetaY, false);
+  ROOT::Math::PxPyPzEVector pLER = getMomentum(lerMomentum, lerThetaX, lerThetaY, true);
+  ROOT::Math::PxPyPzEVector pBeam = pHER + pLER;
   double fittedInvariantMass = pBeam.M();
   B2RESULT("Initial invariant mass: " << s_InvariantMass <<
            "; fitted invariant mass: " << fittedInvariantMass);
@@ -254,7 +257,7 @@ void BeamParametersFitter::fit()
   double cosThetaY = cos(herThetaY);
   double sinThetaY = sin(herThetaY);
   double herPartial =
-    (pBeam.E() - pHER.E() / pHER.Vect().Mag() *
+    (pBeam.E() - pHER.E() / pHER.P() *
      (pBeam.Px() * cosThetaX * sinThetaY - pBeam.Py() * sinThetaX +
       pBeam.Pz() * cosThetaX * cosThetaY)) / fittedInvariantMass;
   cosThetaX = cos(lerThetaX);
@@ -262,7 +265,7 @@ void BeamParametersFitter::fit()
   cosThetaY = cos(lerThetaY + M_PI);
   sinThetaY = sin(lerThetaY + M_PI);
   double lerPartial =
-    (pBeam.E() - pLER.E() / pLER.Vect().Mag() *
+    (pBeam.E() - pLER.E() / pLER.P() *
      (pBeam.Px() * cosThetaX * sinThetaY - pBeam.Py() * sinThetaX +
       pBeam.Pz() * cosThetaX * cosThetaY)) / fittedInvariantMass;
   double sigmaInvariantMass = m_CollisionInvariantMass->getMassSpread();

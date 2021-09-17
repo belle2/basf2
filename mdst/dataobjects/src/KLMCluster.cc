@@ -45,11 +45,11 @@ float KLMCluster::getEnergy() const
   return sqrt(mass * mass + m_p * m_p);
 }
 
-TLorentzVector KLMCluster::getMomentum() const
+ROOT::Math::PxPyPzEVector KLMCluster::getMomentum() const
 {
-  TVector3 p3(m_globalX, m_globalY, m_globalZ);
+  B2Vector3D p3(m_globalX, m_globalY, m_globalZ);
   p3 = p3.Unit() * m_p;
-  return TLorentzVector(p3, getEnergy());
+  return ROOT::Math::PxPyPzEVector(p3.x(), p3.y(), p3.z(), getEnergy());
 }
 
 bool KLMCluster::getAssociatedEclClusterFlag() const

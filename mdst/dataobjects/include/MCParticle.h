@@ -11,10 +11,12 @@
 #include <framework/gearbox/Const.h>
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/datastore/RelationsObject.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <TClonesArray.h>
 #include <TVector3.h>
-#include <TLorentzVector.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 
 #include <cmath>
 #include <climits>
@@ -176,15 +178,15 @@ namespace Belle2 {
      * Return production vertex position, shorthand for getProductionVertex().
      * @return The production vertex of the MonteCarlo particle in cm.
      */
-    TVector3 getVertex() const { return getProductionVertex(); }
+    ROOT::Math::XYZVector getVertex() const { return getProductionVertex(); }
 
     /**
      * Return production vertex position.
      * @return The production vertex of the MonteCarlo particle in cm.
      */
-    TVector3 getProductionVertex() const
+    ROOT::Math::XYZVector getProductionVertex() const
     {
-      return TVector3(m_productionVertex_x, m_productionVertex_y, m_productionVertex_z);
+      return ROOT::Math::XYZVector(m_productionVertex_x, m_productionVertex_y, m_productionVertex_z);
     }
 
     /**
@@ -200,9 +202,9 @@ namespace Belle2 {
      * Return 4Vector of particle.
      * @return The 4-vector of the MonteCarlo particle.
      */
-    TLorentzVector get4Vector() const
+    ROOT::Math::PxPyPzEVector get4Vector() const
     {
-      TLorentzVector vec; vec.SetXYZM(m_momentum_x, m_momentum_y, m_momentum_z, m_mass); return vec;
+      return ROOT::Math::PxPyPzEVector(m_momentum_x, m_momentum_y, m_momentum_z, m_energy);
     }
 
 
@@ -428,7 +430,7 @@ namespace Belle2 {
      * Sets the 4Vector of particle.
      * @param p4 4Vector
      */
-    void set4Vector(const TLorentzVector& p4) { setMomentum(p4.Vect()); m_energy = p4.Energy(); }
+    void set4Vector(const ROOT::Math::PxPyPzEVector& p4) { setMomentum(B2Vector3D(p4.Vect())); m_energy = p4.energy(); }
 
     /**
      * Set decay vertex.

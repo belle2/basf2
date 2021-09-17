@@ -20,6 +20,8 @@
 
 /* ROOT headers. */
 #include <TMatrixD.h>
+#include <Math/RotationY.h>
+#include <Math/Rotation3D.h>
 
 using namespace Belle2;
 
@@ -103,8 +105,8 @@ void BelleMCOutputModule::beginRun()
   runhead.RunNo(m_EventMetaData->getRun());
   runhead.Time(time(nullptr));
   runhead.Type(0);
-  TLorentzVector momentumLER = m_BeamParameters->getLER();
-  TLorentzVector momentumHER = m_BeamParameters->getHER();
+  ROOT::Math::PxPyPzEVector momentumLER = m_BeamParameters->getLER();
+  ROOT::Math::PxPyPzEVector momentumHER = m_BeamParameters->getHER();
   runhead.ELER(momentumLER.E());
   runhead.EHER(momentumHER.E());
   Belle::Belle_nominal_beam_Manager& beamManager =
@@ -130,26 +132,18 @@ void BelleMCOutputModule::beginRun()
   beam.ip_y(vertex.Y());
   beam.ip_z(vertex.Z());
   TMatrixDSym vertexCovariance = m_BeamParameters->getCovVertex();
-  beam.cang_high(momentumHER.Vect().Theta());
-  beam.cang_low(M_PI - momentumLER.Vect().Theta());
-  double angleIPZX = momentumHER.Vect().Theta() / 2;
+  beam.cang_high(momentumHER.Theta());
+  beam.cang_low(M_PI - momentumLER.Theta());
+  double angleIPZX = momentumHER.Theta() / 2;
   beam.angle_ip_zx(angleIPZX);
   /*
    * Transformation of error matrix. It is inverse to the transformation in
    * belle_legacy/ip/IpProfile.cc.
    */
-  TRotation rotationY;
-  rotationY.RotateY(-angleIPZX);
+  ROOT::Math::RotationY rotationY(-angleIPZX);
+  ROOT::Math::Rotation3D rotation(rotationY);
   TMatrixD rotationMatrix(3, 3);
-  rotationMatrix[0][0] = rotationY.XX();
-  rotationMatrix[0][1] = rotationY.XY();
-  rotationMatrix[0][2] = rotationY.XZ();
-  rotationMatrix[1][0] = rotationY.YX();
-  rotationMatrix[1][1] = rotationY.YY();
-  rotationMatrix[1][2] = rotationY.YZ();
-  rotationMatrix[2][0] = rotationY.ZX();
-  rotationMatrix[2][1] = rotationY.ZY();
-  rotationMatrix[2][2] = rotationY.ZZ();
+  rotation.GetRotationMatrix(rotationMatrix);
   TMatrixDSym vertexCovariance2 = vertexCovariance.Similarity(rotationMatrix);
   beam.sigma_ip_x(sqrt(vertexCovariance2[0][0]));
   beam.sigma_ip_y(sqrt(vertexCovariance2[1][1]));
@@ -230,13 +224,13 @@ void BelleMCOutputModule::event()
     hepevt.moLast(motherIndex);
     hepevt.daFirst(particle.getFirstDaughter());
     hepevt.daLast(particle.getLastDaughter());
-    TLorentzVector momentum = particle.get4Vector();
+    ROOT::Math::PxPyPzEVector momentum = particle.get4Vector();
     hepevt.PX(momentum.Px());
     hepevt.PY(momentum.Py());
     hepevt.PZ(momentum.Pz());
     hepevt.E(momentum.E());
     hepevt.M(particle.getMass());
-    TVector3 vertex = particle.getVertex();
+    B2Vector3D vertex = particle.getVertex();
     hepevt.VX(vertex.X() / Unit::mm);
     hepevt.VY(vertex.Y() / Unit::mm);
     hepevt.VZ(vertex.Z() / Unit::mm);

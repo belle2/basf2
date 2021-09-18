@@ -44,10 +44,10 @@ class trg_read(basf2.Module):
     h_E_ECL.GetXaxis().SetTitle("ECL cluster energy [5 MeV]")
     h_Esum_ECL = ROOT.TH1F("h_Esum_ECL", "sum of ECL cluster energy [5 MeV]", 2048, 0, 10.24)
     h_Esum_ECL.GetXaxis().SetTitle("sum of ECL cluster energy [5 MeV]")
-    h_theta_ECL = ROOT.TH1F("h_theta_ECL", "ECL cluster theta [1.4 degrees]", 128, 0, 180)
+    h_theta_ECL = ROOT.TH1F("h_theta_ECL", "ECL cluster #theta [1.4 degrees]", 128, 0, 180)
     h_theta_ECL.GetXaxis().SetTitle("ECL cluster #theta [1.4 degrees]")
-    h_thetaID_ECL = ROOT.TH1F("h_thetaID_ECL", "ECL cluster theta ID", 610, 0, 610)
-    h_thetaID_ECL.GetXaxis().SetTitle("ECL cluster #theta ID [1.4 degrees]")
+    h_thetaID_ECL = ROOT.TH1F("h_thetaID_ECL", "ECL cluster TC ID", 610, 0, 610)
+    h_thetaID_ECL.GetXaxis().SetTitle("ECL cluster TC ID")
     h_phi_ECL = ROOT.TH1F("h_phi_ECL", "ECL cluster phi [1.4 degrees]", 256, -180, 180)
     h_phi_ECL.GetXaxis().SetTitle("ECL cluster #phi [1.4 degrees]")
 

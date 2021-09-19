@@ -132,8 +132,8 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "Shift of time window in 32count for synchronization (L1 timing=0)", m_shiftOfTimeWindowIn32Count);
 
   //Some FEE params.
-  addParam("TDCThresholdOffset", m_tdcThresholdOffset, "Offset for TDC (digital) threshold (mV)", 3820.);
-  addParam("AnalogGain",   m_analogGain, "Analog  gain (V/pC)", 1.1);
+  addParam("TDCThresholdOffset", m_tdcThresholdOffset, "Offset for TDC (digital) threshold (mV)", 3828.);
+  addParam("AnalogGain",   m_analogGain, "Analog  gain (V/pC)", 1.09);
   addParam("DigitalGain", m_digitalGain, "Digital gain (V/pC)", 7.);
   addParam("ADCBinWidth", m_adcBinWidth, "ADC bin width  (mV)",  2.);
 
@@ -154,7 +154,8 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   //Gain smearing
   addParam("GasGainSmearing", m_gasGainSmearing, "Switch for gas gain smearing; true: on; false: off", m_gasGainSmearing);
   addParam("EffWForGasGainSmearing", m_effWForGasGainSmearing,
-           "Effective energy (keV) needed for one electron production for gas gain smearing", m_effWForGasGainSmearing);
+           "Effective energy (keV) needed for one electron production for gas gain smearing; average for alpha- and beta-sources.",
+           m_effWForGasGainSmearing);
   addParam("ThetaOfPolyaFunction", m_thetaOfPolya, "Theta of Polya function for gas gain smearing", m_thetaOfPolya);
   addParam("ExtraADCSmearing", m_extraADCSmearing, "Switch for extra ADC smearing; true: on; false: off", m_extraADCSmearing);
   //  addParam("SigmaForExtraADCSmearing", m_sigmaForExtraADCSmearing, "Gaussian sigma for extra ADC smearing; specify range [0,1]", m_sigmaForExtraADCSmearing);

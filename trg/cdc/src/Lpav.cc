@@ -386,7 +386,7 @@ namespace Belle2 {
 //
     move(-m_xav, -m_yav);
     if (m_yrravp < 0) neg();
-    if (lambda >= 0) m_chisq = lambda * m_wsum_temp * m_rscale * m_rscale;
+    m_chisq = lambda * m_wsum_temp * m_rscale * m_rscale;
     return lambda;
   }
 
@@ -430,7 +430,7 @@ namespace Belle2 {
 //    if (std::fabs(m_alpha)<0.01 && std::fabs(m_beta)<0.01) {
 //      std::cout << " lambda=" << lambda << " " << *this << std::endl;
 //    }
-    if (lambda >= 0) m_chisq = lambda * m_wsum_temp * m_rscale * m_rscale;
+    m_chisq = lambda * m_wsum_temp * m_rscale * m_rscale;
     return lambda;
   }
 

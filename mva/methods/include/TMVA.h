@@ -17,9 +17,7 @@
 #include <TMVA/Factory.h>
 #include <TMVA/Tools.h>
 #include <TMVA/Reader.h>
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
 #include <TMVA/DataLoader.h>
-#endif
 
 #include <memory>
 
@@ -193,7 +191,6 @@ namespace Belle2 {
        */
       TMVATeacher(const GeneralOptions& general_options, const TMVAOptions& _specific_options);
 
-#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
       /**
        * Train a mva method using the given data loader returning a Weightfile
        * @param factory used to train the method
@@ -201,14 +198,6 @@ namespace Belle2 {
        * @param jobName name of the TMVA training
        */
       Weightfile trainFactory(TMVA::Factory& factory, TMVA::DataLoader& data_loader, const std::string& jobName) const;
-#else
-      /**
-       * Train a mva method using the given factory returning a Weightfile
-       * @param factory used to train the method
-       * @param jobName name of the TMVA training
-       */
-      Weightfile trainFactory(TMVA::Factory& factory, const std::string& jobName) const;
-#endif
 
     private:
       TMVAOptions specific_options; /**< Method specific options */

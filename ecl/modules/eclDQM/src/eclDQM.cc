@@ -423,7 +423,7 @@ void ECLDQMModule::event()
     m_geom->Mapping(i);
     h_pedrms_thetaid->Fill(m_geom->GetThetaID(), m_PedestalRms[i]);
 
-    ECLDigit* aECLDigit = aECLDsp.getRelated<ECLDigit>();
+    ECLDigit* aECLDigit = ECLDigit::getByCellID(aECLDsp.getCellId());
 
     for (const auto& id : m_WaveformOption) {
       auto index = std::distance(m_WaveformOption.begin(), std::find(m_WaveformOption.begin(), m_WaveformOption.end(), id));

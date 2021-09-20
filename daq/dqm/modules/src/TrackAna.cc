@@ -79,10 +79,11 @@ void TrackAnaModule::event()
   for (int i = 0; i < ntrk; i++) {
     Track* trk = trklist[i];
     const TrackFitResult* fit = trk->getTrackFitResult(Const::pion);
-    TLorentzVector p4 = fit->get4Momentum();
-    for (int j = 0; j < 4; j++) {
-      h_p[j]->Fill(p4[j]);
-    }
+    ROOT::Math::PxPyPzEVector p4 = fit->get4Momentum();
+    h_p[0]->Fill(p4.Px());
+    h_p[1]->Fill(p4.Py());
+    h_p[2]->Fill(p4.Pz());
+    h_p[3]->Fill(p4.E());
   }
 }
 

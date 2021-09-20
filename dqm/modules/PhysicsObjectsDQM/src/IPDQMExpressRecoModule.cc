@@ -9,7 +9,6 @@
 #include <dqm/modules/PhysicsObjectsDQM/IPDQMExpressRecoModule.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/ReferenceFrame.h>
-#include <TLorentzVector.h>
 #include <TDirectory.h>
 
 using namespace Belle2;

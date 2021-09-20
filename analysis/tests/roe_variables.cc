@@ -361,7 +361,7 @@ namespace {
     StoreArray<Particle> myParticles{};
     auto part = myParticles[2];  // B0
     // Signal side 4 vector
-    PxPyPzEVector  sig4Vec = part->get4Vector();
+    // PxPyPzEVector  sig4Vec = part->get4Vector();
 
     auto* var = Manager::Instance().getVariable("bssMassDifference()");
     ASSERT_NE(var, nullptr);

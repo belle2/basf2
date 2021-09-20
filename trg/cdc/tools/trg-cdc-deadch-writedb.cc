@@ -160,7 +160,7 @@ void setdeadch()
 
   //mask merger
   for (int i = 0; i < N_config; i++) {
-    for (int j = 0; j < mgr[i].size(); j++) {
+    for (unsigned j = 0; j < mgr[i].size(); j++) {
       int mgr_sl[96];
       int mgr_layer[96];
       int mgr_ch[96];

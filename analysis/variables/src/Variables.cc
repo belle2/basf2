@@ -499,7 +499,7 @@ namespace Belle2 {
       if (daughters.size() == 0) return particleInvariantMassFromDaughters(part);
 
       const double bField = BFieldManager::getFieldInTesla(vertex).Z();
-      TLorentzVector sum;
+      ROOT::Math::PxPyPzMVector sum;
       for (auto daughter : daughters) {
         const TrackFitResult* tfr = daughter->getTrackFitResult();
         if (!tfr) {
@@ -508,10 +508,12 @@ namespace Belle2 {
         }
         Helix helix = tfr->getHelix();
         helix.passiveMoveBy(vertex);
-        TVector3 mom3 = daughter->getMomentumScalingFactor() * helix.getMomentum(bField);
+        double scalingFactor = daughter->getMomentumScalingFactor();
+        double momX = scalingFactor * helix.getMomentumX(bField);
+        double momY = scalingFactor * helix.getMomentumY(bField);
+        double momZ = scalingFactor * helix.getMomentumZ(bField);
         float mPDG = daughter->getPDGMass();
-        float E = std::sqrt(mom3.Mag2() + mPDG * mPDG);
-        sum += TLorentzVector(mom3, E);
+        sum += ROOT::Math::PxPyPzMVector(momX, momY, momZ, mPDG);
       }
       return sum.M();
     }

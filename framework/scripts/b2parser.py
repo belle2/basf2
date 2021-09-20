@@ -333,11 +333,11 @@ class B2Parser(Parser):
     <parameter> ::= <boolean_expression>
     """
     def __init__(self, verbose=False):
-        """Initialize Parser
-        Parameters:
-            verbose (bool): run parser in verbose mode. The nodetype names in
-                the parsed tuple are written out and not encoded as integer.
-                Useful for debugging parsing errors.
+        """
+        Initialize Parser
+        @param verbose  run parser in verbose mode. The nodetype names in
+                        the parsed tuple are written out and not encoded
+                        as integers. Useful for debugging parsing errors.
         """
         #: verbose setting, creates more human readable tuple output
         #: only for testing, debugging purposes, not to be used in production
@@ -871,20 +871,53 @@ class B2Parser(Parser):
 
     def error(self, p):
         """
-        Error function
+        Error function, called immediately if syntax error is detected
+        @param p (sly.token)    offending token p
+                                p is None if syntax error occurs at EOF.
         """
-        raise SyntaxError('Error in cutstring.')
+        try:
+            # Get error position of offending token in cut.
+            error_pos = p.index
+        except AttributeError:  # syntax error at EOF, p is None
+            # Set error position to length of cut minus one.
+            error_pos = len(self.cut)-1
+        try:
+            # Get error token type
+            error_token = p.type
+        except AttributeError:
+            # syntax error at EOF get last token from stack
+            error_token = self.symstack[-1].type
+
+        # Format error message
+        error_msg = f"detected at:\n{self.cut}\n{' '*error_pos}^\n"
+        error_msg += f"Unexpected token '{error_token}'"
+        raise SyntaxError(error_msg)
+
+    def parse(self, cut: str, token_generator) -> tuple:
+        """
+        Overwrite sly.Parser parse function.
+        @param cut              unparsed cut input which is used to
+                                indicate where the error occurred
+        @param token_generator  generator object which yields tokens.
+                                Produced by the lexer from the cut input.
+        """
+        # Set cut attribute needed in case of an error.
+        self.cut = cut
+        return super().parse(token_generator)
 
 
-def parse(cutstring: str) -> tuple:
+def parse(cut: str, verbose=False) -> tuple:
     """
-    Initialize a parser and lexer object and parse cutstring
+    Initialize a parser and lexer object and parse cut
+    @param cut  cut string which should be parsed
+    @param verbose  provide verbose parsing output for
+                    parser debugging purposes, not to be set true in production
     """
     lexer = B2Lexer()
-    parser = B2Parser()
-    return parser.parse(lexer.tokenize(cutstring))
+    parser = B2Parser(verbose)
+    return parser.parse(cut, lexer.tokenize(cut))
 
 
 if __name__ == "__main__":
-    cutstring = input("Bitte cutstring eingeben:\n")
-    print(parse(cutstring))
+    cut = input("Please input cut:\n")
+    print(parse(cut))

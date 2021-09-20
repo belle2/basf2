@@ -19,12 +19,15 @@ class Statistics:
         self.exercises: int = 0
         self.overview_boxes = 0
         self.key_points = 0
+        self.figures = 0
+        self.characters = 0
 
     def print_summary(self):
         pprint.pprint(self.__dict__)
 
 
 class StatisticsVisitor:
+    # Dictionary keys must mach attributes of Statistics class
     regexes = dict(
         code_inclusions=re.compile("(code-block\\s*::)|(literalinclude\\s*::)"),
         hints=re.compile(":class:.*hint"),
@@ -32,6 +35,7 @@ class StatisticsVisitor:
         exercises=re.compile(":class:.*exercise"),
         overview_boxes=re.compile(":class:.*overview"),
         key_points=re.compile(":class:.*key-points"),
+        figures=re.compile("figure\\s*::")
     )
 
     def __init__(self):
@@ -39,6 +43,7 @@ class StatisticsVisitor:
 
     def read_rst_file(self, path: Path):
         text = path.read_text()
+        self.statistics.characters += len(text)
         for line in text.split("\n"):
             for key, regex in self.regexes.items():
                 if regex.findall(line):

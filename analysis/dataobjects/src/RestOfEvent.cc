@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
+#include<regex>
 #include <analysis/dataobjects/RestOfEvent.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -139,6 +139,11 @@ void RestOfEvent::initializeMask(const std::string& name, const std::string& ori
   }
   if (name == RestOfEvent::c_defaultMaskName) {
     B2FATAL("Creation of ROE Mask with a name " << RestOfEvent::c_defaultMaskName << " is not allowed!");
+  }
+  std::regex word_regex("^[a-zA-Z][a-zA-Z0-9_]*$");
+  if (!std::regex_match(name, word_regex)) {
+    B2FATAL("Mask name '" << name << "' contains forbidden characters or it does not start with a letter. "
+            "Only alphanumeric and underscore characters are allowed in ROE mask names.");
   }
   if (findMask(name)) {
     B2FATAL("ROE Mask '" << name << "' already exists!");

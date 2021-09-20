@@ -29,7 +29,7 @@ path = b2.Path()
 skim = feiHadronicB0(
     validation=True,
     udstOutput=False,
-    analysisGlobaltag=ma.getAnalysisGlobaltag(),
+    analysis_globaltag=ma.getAnalysisGlobaltag(),
 )
 
 ma.inputMdstList(

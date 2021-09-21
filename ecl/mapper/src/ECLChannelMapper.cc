@@ -1,12 +1,5 @@
-/**************************************************************************
- * basf2 (Belle II Analysis Software Framework)                           *
- * Author: The Belle II Collaboration                                     *
- *                                                                        *
- * See git log for contributors and copyright holders.                    *
- * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
- **************************************************************************/
 //
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/utilities/FileSystem.h>
@@ -39,6 +32,17 @@ bool ECLChannelMapper::initFromFile()
 {
   std::string filePath = FileSystem::findFile("ecl/data/ecl_channels_map.txt");
   return initFromFile(filePath.c_str());
+}
+
+ECLChannelMapper* ECLChannelMapper::instance = nullptr;
+ECLChannelMapper* ECLChannelMapper::getInstance(bool use_db)
+{
+  if (!instance) {
+    instance = new ECLChannelMapper();
+    if (use_db) instance->initFromDB();
+    else instance->initFromFile();
+  }
+  return instance;
 }
 
 bool ECLChannelMapper::initFromFile(const char* eclMapFileName)
@@ -305,6 +309,36 @@ int ECLChannelMapper::getShaperChannel(int cellID)
   if (cellID > 0 && cellID <= ECL_TOTAL_CHANNELS) {
     return convertArrayInv[cellID - 1][2];
   } else  return -1;
+}
+
+int ECLChannelMapper::getElectronicsID(int cellID)
+{
+  if (cellID < 1 || cellID > ECL_TOTAL_CHANNELS) return -1;
+
+  int crate   = getCrateID(cellID);
+  int shaper  = getShaperPosition(cellID);
+  int channel = getShaperChannel(cellID);
+
+  int arrayIndex = 0;
+  // Total number of electronic IDs in barrel
+  const int bar_eid_count = ECL_BARREL_CRATES * ECL_BARREL_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER;
+  // Total number of electronic IDs in forward endcap
+  const int fwd_eid_count = ECL_FWD_CRATES    * ECL_FWD_SHAPERS_IN_CRATE    * ECL_CHANNELS_IN_SHAPER;
+
+  if (crate <= 36) {
+    arrayIndex += (crate - 1) * ECL_BARREL_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER
+                  + (shaper - 1) * ECL_CHANNELS_IN_SHAPER + (channel - 1);
+  } else if (crate <= 44) {
+    arrayIndex += bar_eid_count;
+    arrayIndex += (crate - 37) * ECL_FWD_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER
+                  + (shaper - 1) * ECL_CHANNELS_IN_SHAPER + (channel - 1);
+  } else {
+    arrayIndex += bar_eid_count + fwd_eid_count;
+    arrayIndex += (crate - 45) * ECL_BKW_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER
+                  + (shaper - 1) * ECL_CHANNELS_IN_SHAPER + (channel - 1);
+  }
+
+  return arrayIndex;
 }
 
 int ECLChannelMapper::getCOPPERNode(int iCrate)

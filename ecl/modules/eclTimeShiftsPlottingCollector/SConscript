@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = [ 'framework', 'ecl_dbobjects', 'calibration', '$ROOT_LIBS', 'ecl']
+env['LIBS'] = [ 'framework', 'ecl_dbobjects', 'calibration', '$ROOT_LIBS', 'ecl_mapper']
 
 
 Return('env')

@@ -192,6 +192,12 @@ namespace Belle2 {
       return m_DspAVector.size();
     }
 
+    /**
+     * Find ECLDsp by Cell ID using linear search.
+     * This is shown to be faster than getRelated(..) method.
+     */
+    static ECLDsp* getByCellID(int cid);
+
   private:
 
     int m_CellId{0};                      /**< Cell ID */
@@ -215,5 +221,6 @@ namespace Belle2 {
     ClassDef(ECLDsp, 6);
 
   };
+
 } // end namespace Belle2
 

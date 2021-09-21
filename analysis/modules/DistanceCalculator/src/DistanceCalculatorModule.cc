@@ -26,7 +26,7 @@ REG_MODULE(DistanceCalculator)
 //-----------------------------------------------------------------
 
 DistanceCalculatorModule::DistanceCalculatorModule() : Module(),
-  m_distanceCovMatrix(0)
+  m_distanceCovMatrix(3)
 {
   // Set module properties
   setDescription("Calculates distance between two vertices, distance of closest approach between a vertex and a track, distance of closest approach between two tracks, distance of closest approach between a vertex/track and Btube");

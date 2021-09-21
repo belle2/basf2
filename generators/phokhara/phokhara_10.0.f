@@ -218,10 +218,6 @@ c ======================================================================== c
       real(c_double) XPAR(0:99) !TF, real parameters
       integer(c_int) NPAR(0:99) !TF, integer parameters
 
-      integer BNPHOT,BNHAD !TF
-      double precision BP1(0:3),BQ1(0:3),BP2(0:9,0:5),BPHOT(0:1,0:3) !TF
-      COMMON / MOMSET / BP1,BQ1,BP2,BPHOT,BNPHOT,BNHAD !TF
-
       real*8 qqmin,qqmax,
      &  cos1min,cos1max,cos2min,cos2max,cos3min,cos3max,
      &  dsigm1,dsigm2,sigma1,sigma2,sigma,dsigm,Ar(14),Ar_r(0:13),

@@ -330,6 +330,14 @@ namespace Belle2 {
     double particleClusterBestMCPDGCode(const Particle*);
 
     /**
+     * returns the sum of weights of all MCParticle for the Particle ->
+     * ECLCluster -> MCParticles relations. For charged particles,
+     * the track from which the Particle was created, must be matched to
+     * an ECLCluster
+     */
+    double particleClusterTotalMCMatchWeight(const Particle*);
+
+    /**
      * returns 1 for crossfeed in reconstruction of a B meson, 0 for no crossfeed and
      * nan for no true B meson or failed truthmatching. Iterates over final state daughters
      * of a given B meson and searches for common identical B meson ancestor at generator level.

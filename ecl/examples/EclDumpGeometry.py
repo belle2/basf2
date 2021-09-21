@@ -41,7 +41,6 @@ if(newGeom == 2):
     b2.conditions.prepend_testing_payloads("localdb/database.txt")
 print(b2.conditions.globaltags)
 inputMdst(
-    'default',
     '/group/belle2/dataprod/Data/OfficialReco/proc11/e0010/4S/GoodRuns/r05902/skim/hlt_mumu_2trk/mdst/sub00/*.root',
     path=mypath)
 

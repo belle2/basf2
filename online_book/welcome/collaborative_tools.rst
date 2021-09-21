@@ -12,7 +12,7 @@ Collaborative Tools.
 
     **Prerequisites**:
 
-    	* DESY accounts.
+        * DESY accounts.
         * An internet browser.
 
     **Questions**:
@@ -359,7 +359,7 @@ How to ask a good question on questions.belle2
 
 Like most Q&A forums, `questions.belle2.org <https://questions.belle2.org>`_ is
 only as good as the posts.
-Even though you have a problem and you want help quickly it is worthwile to
+Even though you have a problem and you want help quickly it is worthwhile to
 take time on presentation.
 
 0. Search for existing questions.

@@ -1,5 +1,4 @@
 # BelleII collaboration generic DECAY.DEC
-# BelleII collaboration generic DECAY.DEC
 # Based on EvtGen DECAY.DEC and Belle DECAY.DEC
 #
 # Changes
@@ -80,7 +79,6 @@
 #
 # June 2021, U. Tamponi (tamponi@to.infn.it)
 #   Updated all the narrow bottomonia (M < Y(4S))
-#
 #
 # June 2021 Automated: Converted PYTHIA ids
 #   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
@@ -9817,7 +9815,7 @@ Enddecay
 
 Decay eta' # Edited by U. Tamponi, October 2016
 0.432000000   pi+  pi-  eta                                ETAPRIME_DALITZ  -0.047  -0.069  0.0    0.073; # New dalitz mode
-0.217000000   pi0  pi0  eta                                ETAPRIME_DALITZ  -0.047  -0.069  0.0    0.073;# New dalitz mode
+0.217000000   pi0  pi0  eta                                ETAPRIME_DALITZ  -0.047  -0.069  0.0    0.073; # New dalitz mode
 0.293511000   rho0  gamma                                  SVP_HELAMP  1.0 0.0 1.0 0.0;
 0.027500000   omega  gamma                                 SVP_HELAMP  1.0 0.0 1.0 0.0;
 0.022200000   gamma  gamma                                 PHSP;
@@ -9825,6 +9823,21 @@ Decay eta' # Edited by U. Tamponi, October 2016
 0.000109000   gamma  mu-  mu+                              PHSP;
 0.003600000   pi+  pi-  pi0                                PHSP;
 0.002400000   pi+  pi-  e+  e-                             PHSP;
+Enddecay
+
+Decay eta(1405) # Based on Amsler et al., Eur. Phys. J.C33 (2004) 23, and Adams et al., Phys. Lett. B516 (2001) 264
+0.198000000   a_00  pi0                                    PHSP;
+0.198000000   a_0+  pi-                                    PHSP;
+0.198000000   a_0-  pi+                                    PHSP;
+0.012000000   K*+  K-                                      SVS;
+0.012000000   K*-  K+                                      SVS;
+0.012000000   K*0  anti-K0                                 SVS;
+0.012000000   anti-K*0  K0                                 SVS;
+0.080000000   K+  K-  pi0                                  PHSP;
+0.080000000   K0  anti-K0  pi0                             PHSP;
+0.080000000   anti-K0  K+  pi-                             PHSP;
+0.080000000   K0  K-  pi+                                  PHSP;
+0.038000000   rho0  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;
 Enddecay
 
 Decay phi # Edited by U. Tamponi, October 2016
@@ -10820,10 +10833,38 @@ Enddecay
 
 
 
+# Data from PDG 2021.
 Decay X_1(3872)
-1.000000000   rndmflav  anti-rndmflav                      PYTHIA 42;
-Enddecay
 
+# branching(M176, 2)
+0.03800000    pi+  pi-  J/psi                              PHSP;
+# branching(M176, 13)
+0.04300000    omega  J/psi                                 PHSP;
+
+# Branching fractions of open-charm decays are measured with large
+# uncertainties. They are rescaled so that the sum of all branching fractions
+# equals to 1.
+# S = branching(M176, 2) + branching(M176, 13) + branching(M176, 18) +
+#     branching(M176, 9) + branching(M176, 11)
+# SD = branching(M176, 8) + branching(M176, 12)
+# branching(M176, 8) / SD * (1 - S)
+0.47404652    D0  anti-D0  pi0                             PHSP;
+# branching(M176, 12) / SD * (1 - S) / 2
+0.17897674    D*0  anti-D0                                 PHSP;
+# branching(M176, 12) / SD * (1 - S) / 2
+0.17897674    anti-D*0  D0                                 PHSP;
+
+# branching(M176, 18)
+0.03400000    pi0 chi_c1                                   PHSP;
+
+# Radiative decays.
+
+# branching(M176, 9)
+0.00800000    gamma  J/psi                                 PHSP;
+# branching(M176, 11)
+0.04500000    gamma  psi(2S)                               PHSP;
+
+Enddecay
 
 
 

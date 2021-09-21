@@ -15,7 +15,6 @@ main = b2.Path()
 
 # load input data from mdst/udst file
 ma.inputMdstList(
-    environmentType="default",
     filelist=[b2.find_file(f"starterkit/2021/1111540100_eph3_BGx0_{filenumber}.root", "examples")],
     path=main,
 )
@@ -50,21 +49,21 @@ standard_vars = vc.kinematics + vc.mc_kinematics + vc.mc_truth
 b_vars += vc.deltae_mbc
 b_vars += standard_vars
 
-# Variables for final states (electrons, positrons, pions)
+# Variables for final states (electrons, positrons, pions) [S50]
 fs_vars = vc.pid + vc.track + vc.track_hits + standard_vars
 b_vars += vu.create_aliases_for_selected(
     fs_vars,
     "B0 -> [J/psi -> ^e+ ^e-] [K_S0 -> ^pi+ ^pi-]",
     prefix=["ep", "em", "pip", "pim"],
-)
+)  # [E50]
 # Variables for J/Psi, KS
 jpsi_ks_vars = vc.inv_mass + standard_vars
 b_vars += vu.create_aliases_for_selected(jpsi_ks_vars, "B0 -> ^J/psi ^K_S0")
-# Also add kinematic variables boosted to the center of mass frame (CMS)
+# Also add kinematic variables boosted to the center of mass frame (CMS) [S60]
 # for all particles
 cmskinematics = vu.create_aliases(
     vc.kinematics, "useCMSFrame({variable})", "CMS"
-)
+)  # [E60]
 b_vars += vu.create_aliases_for_selected(
     cmskinematics, "^B0 -> [^J/psi -> ^e+ ^e-] [^K_S0 -> ^pi+ ^pi-]"
 )

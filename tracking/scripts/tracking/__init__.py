@@ -261,14 +261,12 @@ def add_time_extraction(path, components=None):
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                                    skip_geometry_adding=False, event_time_extraction=True,
-                                   data_taking_period="early_phase3", top_in_counter=False,
-                                   merge_tracks=False, use_second_cdc_hits=False, useVTX=False):
+                                   merge_tracks=True, use_second_cdc_hits=False,
+                                   useVTX=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
 
     :param path: The path to which to add the tracking reconstruction modules
-    :param data_taking_period: The cosmics generation will be added using the
-           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
 
     :param components: the list of geometry components in use or None for all components.
     :param prune_tracks: Delete all hits except the first and the last in the found tracks.
@@ -280,9 +278,8 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
     :param event_time_extraction: extract the event time
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param useVTX: If True, the VTX is used instead of the VXD
 
-    :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
-           (assuming PMT is put at -z of the counter).
     """
 
     # make sure CDC is used
@@ -300,21 +297,19 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                         energyLossBrems=False, noiseBrems=False)
 
     # track finding
-    add_cr_track_finding(path, reco_tracks="RecoTracks", components=components, data_taking_period=data_taking_period,
-                         merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits, useVTX=useVTX)
+    add_cr_track_finding(path, reco_tracks="RecoTracks", components=components,
+                         merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits,
+                         useVTX=useVTX)
 
     # track fitting
     # if tracks were merged, use the unmerged collection for time extraction
     add_cr_track_fit_and_track_creator(path, components=components, prune_tracks=prune_tracks,
-                                       event_timing_extraction=event_time_extraction,
-                                       data_taking_period=data_taking_period,
-                                       top_in_counter=top_in_counter)
+                                       event_timing_extraction=event_time_extraction)
 
     if merge_tracks:
         # Do also fit the not merged tracks
         add_cr_track_fit_and_track_creator(path, components=components, prune_tracks=prune_tracks,
                                            event_timing_extraction=False,
-                                           data_taking_period=data_taking_period, top_in_counter=top_in_counter,
                                            reco_tracks="NonMergedRecoTracks", tracks="NonMergedTracks")
 
 
@@ -476,72 +471,62 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                 path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_track_name)
 
 
-def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_taking_period='early_phase3',
-                         merge_tracks=True, use_second_cdc_hits=False, useVTX=False):
-    import cdc.cr as cosmics_setup
+def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None,
+                         merge_tracks=True, use_second_cdc_hits=False,
+                         useVTX=False):
 
     # register EventTrackingInfo
     if 'RegisterEventLevelTrackingInfo' not in path:
         path.add_module('RegisterEventLevelTrackingInfo')
 
-    if data_taking_period not in ["phase2", "early_phase3", "phase3"]:
-        cosmics_setup.set_cdc_cr_parameters(data_taking_period)
+    if not is_cdc_used(components):
+        b2.B2FATAL("CDC must be in components")
 
-        # track finding
-        add_cdc_cr_track_finding(path, merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits,
-                                 trigger_point=tuple(cosmics_setup.triggerPos))
+    reco_tracks_from_track_finding = reco_tracks
+    if merge_tracks:
+        reco_tracks_from_track_finding = "NonMergedRecoTracks"
 
-    else:
-        if not is_cdc_used(components):
-            b2.B2FATAL("CDC must be in components")
+    cdc_reco_tracks = "CDCRecoTracks"
+    if not is_pxd_used(components) and not is_svd_used(components):
+        cdc_reco_tracks = reco_tracks_from_track_finding
 
-        reco_tracks_from_track_finding = reco_tracks
-        if merge_tracks:
-            reco_tracks_from_track_finding = "NonMergedRecoTracks"
+    svd_cdc_reco_tracks = "SVDCDCRecoTracks"
+    if not is_pxd_used(components):
+        svd_cdc_reco_tracks = reco_tracks_from_track_finding
 
-        cdc_reco_tracks = "CDCRecoTracks"
-        if not is_pxd_used(components) and not is_svd_used(components) and not (is_vtx_used(components) and useVTX):
-            cdc_reco_tracks = reco_tracks_from_track_finding
+    vtx_cdc_reco_tracks = "VTXCDCRecoTracks"
+    if useVTX and not is_vtx_used(components):
+        vtx_cdc_reco_tracks = reco_tracks_from_track_finding
 
-        svd_cdc_reco_tracks = "SVDCDCRecoTracks"
-        if not is_pxd_used(components):
-            svd_cdc_reco_tracks = reco_tracks_from_track_finding
+    full_reco_tracks = reco_tracks_from_track_finding
 
-        # TODO check this. VTX can not be used in ["phase2", "early_phase3", "phase3"],
-        # so maybe it should be in the "if data_taking_period not in ["phase2", "early_phase3", "phase3"]" clause...
-        vtx_cdc_reco_tracks = "VTXCDCRecoTracks"
-        if useVTX and not is_vtx_used(components):
-            vtx_cdc_reco_tracks = reco_tracks_from_track_finding
+    # CDC track finding with default settings
+    add_cdc_cr_track_finding(path, merge_tracks=False, use_second_cdc_hits=use_second_cdc_hits,
+                             output_reco_tracks=cdc_reco_tracks)
 
-        full_reco_tracks = reco_tracks_from_track_finding
+    latest_reco_tracks = cdc_reco_tracks
 
-        # CDC track finding with default settings
-        add_cdc_cr_track_finding(path, merge_tracks=False, use_second_cdc_hits=use_second_cdc_hits,
-                                 output_reco_tracks=cdc_reco_tracks)
+    if is_svd_used(components) and not useVTX:
+        add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
+                              output_reco_tracks=svd_cdc_reco_tracks,
+                              svd_ckf_mode="cosmics", add_both_directions=True)
+        latest_reco_tracks = svd_cdc_reco_tracks
 
-        latest_reco_tracks = cdc_reco_tracks
+    if is_pxd_used(components) and not useVTX:
+        add_pxd_cr_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
+                                 output_reco_tracks=full_reco_tracks, add_both_directions=True,
+                                 filter_cut=0.01)
 
-        if is_svd_used(components) and not useVTX:
-            add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                  output_reco_tracks=svd_cdc_reco_tracks,
-                                  svd_ckf_mode="cosmics", add_both_directions=True)
-            latest_reco_tracks = svd_cdc_reco_tracks
+    if is_vtx_used(components) and useVTX:
+        add_vtx_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
+                              output_reco_tracks=vtx_cdc_reco_tracks,
+                              vtx_ckf_mode="cosmics", add_both_directions=True)
+        latest_reco_tracks = svd_cdc_reco_tracks
 
-        if is_pxd_used(components) and not useVTX:
-            add_pxd_cr_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                     output_reco_tracks=full_reco_tracks, add_both_directions=True,
-                                     filter_cut=0.01)
-
-        if is_vtx_used(components) and useVTX:
-            add_vtx_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                  output_reco_tracks=vtx_cdc_reco_tracks,
-                                  vtx_ckf_mode="cosmics", add_both_directions=True)
-            latest_reco_tracks = svd_cdc_reco_tracks
-
-        if merge_tracks:
-            # merge the tracks together
-            path.add_module("CosmicsTrackMerger", inputRecoTracks=reco_tracks_from_track_finding,
-                            outputRecoTracks=reco_tracks)
+    if merge_tracks:
+        # merge the tracks together
+        path.add_module("CosmicsTrackMerger", inputRecoTracks=reco_tracks_from_track_finding,
+                        outputRecoTracks=reco_tracks)
 
 
 def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_second_cdc_hits=False):

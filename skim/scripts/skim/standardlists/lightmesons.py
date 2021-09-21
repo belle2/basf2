@@ -25,7 +25,7 @@ def loadStdPi0ForBToHadrons(persistent=True, path=None):
     and :math:`60~{\\rm MeV}` in the backward end cap. For the :math:`\\pi^{0}`, we require the mass to be
     :math:`105 < M < 150~{\\rm MeV}/c^2` and a mass-constrained KFit to converge.
     """
-    stdPi0s('all', path)
+    stdPi0s('all', path, loadPhotonBeamBackgroundMVA=False)
     ma.cutAndCopyList(outputListName='pi0:bth_skim', inputListName='pi0:all',
                       cut='[[daughter(0, clusterReg) == 1 and daughter(0, E) > 0.080] or ' +
                       '[daughter(0, clusterReg) == 2 and daughter(0, E) > 0.030] or ' +

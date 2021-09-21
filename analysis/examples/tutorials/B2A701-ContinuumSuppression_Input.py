@@ -49,16 +49,12 @@ outfile = "B2A702_output.root"
 
 step = 'train'
 
-magnetic_field = 'default'
-
 if len(sys.argv) >= 2:
     if sys.argv[1] not in ['train', 'test', 'apply_signal', 'apply_qqbar']:
         sys.exit("usage:\n\tbasf2 B2A701-ContinuumSuppression_Input.py <train,test,apply_signal,apply_qqbar>")
     else:
         step = str(sys.argv[1])
 
-# MC11 is not ready yet, so we have to manually put MC10 as a magnetic field config.
-magnetic_field = 'MC10'
 if step == 'train':
     input_file_list = [b2.find_file('ccbar_sample_to_train.root', 'examples', False),
                        b2.find_file('Bd2K0spi0_to_train.root', 'examples', False)]
@@ -78,8 +74,7 @@ outfile = step + '.root'
 # Perform analysis.
 my_path = b2.create_path()
 
-ma.inputMdstList(environmentType=magnetic_field,
-                 filelist=input_file_list,
+ma.inputMdstList(filelist=input_file_list,
                  path=my_path)
 
 ma.fillParticleList(decayString='gamma:all',

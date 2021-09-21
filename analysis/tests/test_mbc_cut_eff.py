@@ -28,7 +28,7 @@ class TestMbcEff(unittest.TestCase):
 
         inputfile = b2test_utils.require_file(
             'analysis/1000_B_DstD0Kpi_skimmed.root', 'validation', py_case=self)
-        ma.inputMdst('default', inputfile, path=main)
+        ma.inputMdst(inputfile, path=main)
 
         ma.fillParticleList('pi+:a', 'pidProbabilityExpert(211, ALL) > 0.5', path=main)
         ma.fillParticleList('K+:a', 'pidProbabilityExpert(321, ALL) > 0.5', path=main)
@@ -62,7 +62,7 @@ class TestMbcEff(unittest.TestCase):
 
         self.assertTrue(
             allSig == sig_expected,
-            f"Mbc cut efficency has changed! n_sig expected: {sig_expected} found: {allSig}.")
+            f"Mbc cut efficiency has changed! n_sig expected: {sig_expected} found: {allSig}.")
         self.assertTrue(allBkg == bkg_expected, f"Mbc cut background has changed! n_bkg expected: {bkg_expected} found: {allBkg}.")
 
         print("Test passed, cleaning up.")

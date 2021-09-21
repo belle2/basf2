@@ -137,7 +137,7 @@ namespace Belle2 {
         } else  if (boost::ends_with(path, ".xml")) {
           weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(path);
         } else {
-          B2WARNING("Unkown file extension for file: " << path << ", fallback to xml...");
+          B2WARNING("Unknown file extension for file: " << path << ", fallback to xml...");
           weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(path);
         }
 

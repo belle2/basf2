@@ -24,9 +24,10 @@ import ROOT
 import os
 import shutil
 import collections
+from typing import List, Any
 
 
-def getCommandLineOptions():
+def get_argument_parser() -> argparse.ArgumentParser:
     """ Parses the command line options of the fei and returns the corresponding arguments. """
     parser = argparse.ArgumentParser()
     parser.add_argument('-id', '--identifiers', dest='identifiers', type=str, required=True, action='append', nargs='+',
@@ -44,18 +45,17 @@ def getCommandLineOptions():
     parser.add_argument('-n', '--fillnan', dest='fillnan', action='store_true',
                         help='Fill nan and inf values with actual numbers')
     parser.add_argument('-c', '--compile', dest='compile', action='store_true',
-                        help='Compile latex to pdf')
-    args = parser.parse_args()
-    return args
+                        help='Compile latex to pdf directly')
+    return parser
 
 
-def unique(input):
+def unique(input_list: List[Any]) -> List[Any]:
     """
     Returns a list containing only unique elements, keeps the original order of the list
-    @param input list containing the elements
+    @param input_list list containing the elements
     """
     output = []
-    for x in input:
+    for x in input_list:
         if x not in output:
             output.append(x)
     return output
@@ -87,7 +87,8 @@ if __name__ == '__main__':
     ROOT.gROOT.SetBatch(True)
 
     old_cwd = os.getcwd()
-    args = getCommandLineOptions()
+    parser = get_argument_parser()
+    args = parser.parse_args()
 
     identifiers = sum(args.identifiers, [])
     identifier_abbreviations = create_abbreviations(identifiers)
@@ -154,7 +155,7 @@ if __name__ == '__main__':
         o += b2latex.Section("Classifiers")
         o += b2latex.String(r"""
             This section contains the GeneralOptions and SpecificOptions of all classifiers represented by an XML tree.
-            The same information can be retreived using the basf2\_mva\_info tool.
+            The same information can be retrieved using the basf2\_mva\_info tool.
         """)
 
         table = b2latex.LongTable(r"ll", "Abbreviations of identifiers", "{name} & {abbr}", r"Identifier & Abbreviation")

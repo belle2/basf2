@@ -59,7 +59,7 @@ def get_dependencies(sconscript_filename):
         else:
             dependencies = ""
 
-    # clean up the list retuned from the regex: only want the names of the
+    # clean up the list returned from the regex: only want the names of the
     # basf2 libs (i.e. strings of the form: packagename_module)
     dependencies = [
         lb.replace("'", "").replace('"', "").strip()

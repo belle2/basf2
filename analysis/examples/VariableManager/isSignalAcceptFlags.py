@@ -49,7 +49,7 @@ import stdV0s
 mypath = b2.Path()
 
 # Add input file and ParticleLoader modules to the path
-ma.inputMdstList('default', [b2.find_file('analysis/tests/mdst.root')], path=mypath)
+ma.inputMdstList([b2.find_file('analysis/tests/mdst.root')], path=mypath)
 
 # Add ParticleLoader and ParticleCombiner modules to the path, reconstructing the process
 # Ds*+ -> pi+ D0

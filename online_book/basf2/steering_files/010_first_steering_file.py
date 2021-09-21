@@ -8,7 +8,6 @@ main = b2.Path()
 
 # load input data from mdst/udst file
 ma.inputMdstList(
-    environmentType="default",
     filelist=[b2.find_file("starterkit/2021/1111540100_eph3_BGx0_0.root", "examples")],
     path=main
 )

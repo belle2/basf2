@@ -163,7 +163,7 @@ from basf2 import B2ERROR, B2INFO, B2WARNING, find_file
 from conditions_db import ConditionsDB, encode_name
 from skim import CombinedSkim
 from skim.registry import Registry
-from skim.utils.misc import resolve_skim_modules
+from skim.utils.misc import dry_run_steering_file, resolve_skim_modules
 
 
 def read_registry_yaml(sampleRegistryYaml, mc):
@@ -771,7 +771,12 @@ def warn_local_script(args):
 
 
 def make_combined_steering_file(
-    SkimName, CombinedSkimDefinitions, SteeringFileDirectory, mc, LocalModule=None,
+    SkimName,
+    CombinedSkimDefinitions,
+    SteeringFileDirectory,
+    mc,
+    LocalModule=None,
+    analysis_globaltag="",
 ):
     """Construct a steering file for the requested combined skim."""
     SteeringFileDirectory = Path(SteeringFileDirectory)
@@ -802,6 +807,7 @@ def make_combined_steering_file(
         stats=False,
         hints=False,
         mdstOutput=False,
+        analysis_globaltag=analysis_globaltag,
         backward_compatibility=True,
     )
 
@@ -809,6 +815,7 @@ def make_combined_steering_file(
         f.write(CodeString)
 
     B2INFO(f"Steering file for {SkimName} combined skim written to {SteeringFile}")
+    return SteeringFile
 
 
 def make_request_dict(
@@ -918,13 +925,15 @@ def write_json_files(sampleRegistry, args, outputDirectory):
         SteeringFileDirectory = Path(
             get_base_directory(args), "skim", args.campaign, args.release, "SkimScripts"
         )
-        make_combined_steering_file(
+        SteeringFile = make_combined_steering_file(
             skimName,
             CombinedSkimDefinitions,
             SteeringFileDirectory,
             mc=args.mc,
             LocalModule=args.local_skim_script,
+            analysis_globaltag=args.analysis_globaltag,
         )
+        dry_run_steering_file(SteeringFile)
 
         for sampleLabel, sampleInfo in sampleRegistry.items():
             # Skip taupair sample if the combined skim is not to be produced on taupair
@@ -1047,6 +1056,15 @@ def get_argument_parser():
         "--local-skim-script",
         help="File name of the local skim script to use, if any. *e.g.* ``ewp_local.py``. "
         "Should not include any path before the file name.",
+    )
+    parser.add_argument(
+        "--analysis-globaltag",
+        default="",
+        type=str,
+        metavar="AnalysisGlobaltag",
+        help=(
+            "Analysis globaltag to be passed to the skims."
+        ),
     )
     parser.add_argument(
         "-N",

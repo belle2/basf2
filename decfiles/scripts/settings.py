@@ -22,11 +22,11 @@ partdictpath = os.path.dirname(os.path.abspath(sys.argv[0])) \
 
 use_url = False
 dec_url = \
-    'https://stash.desy.de/projects/B2/repos/software/decfiles/dec/'
+    'https://stash.desy.de/projects/B2/repos/basf2/decfiles/dec/'
 obs_url = \
-    'https://stash.desy.de/projects/B2/repos/software/raw/decfiles/doc/table_obsolete.sql'
+    'https://stash.desy.de/projects/B2/repos/basf2/raw/decfiles/doc/table_obsolete.sql'
 cuts_url = \
-    'https://stash.desy.de/projects/B2/repos/software/decfiles/doc/cuts'
+    'https://stash.desy.de/projects/B2/repos/basf2/decfiles/doc/cuts'
 table_url = 'http://svn.cern.ch/guest/evtgen/tags/R01-03-00/evt.pdl'
 
 groups = [

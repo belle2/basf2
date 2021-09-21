@@ -194,7 +194,6 @@ def add_pre_filter_reconstruction(path, run_type, components, **kwargs):
             path,
             skipGeometryAdding=True,
             pruneTracks=False,
-            add_trigger_calculation=False,
             components=components,
             event_abort=hlt_event_abort,
             **kwargs)

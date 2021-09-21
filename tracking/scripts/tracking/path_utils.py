@@ -145,7 +145,6 @@ def add_postfilter_track_fit(path, components=None, pruneTracks=False, reco_trac
 
 
 def add_cr_track_fit_and_track_creator(path, components=None,
-                                       data_taking_period='early_phase3', top_in_counter=False,
                                        prune_tracks=False, event_timing_extraction=True,
                                        reco_tracks="RecoTracks", tracks=""):
     """
@@ -153,57 +152,39 @@ def add_cr_track_fit_and_track_creator(path, components=None,
     and track creation to the path.
 
     :param path: The path to which to add the tracking reconstruction modules
-    :param data_taking_period: The cosmics generation will be added using the
-           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
-
     :param components: the list of geometry components in use or None for all components.
     :param reco_tracks: The name of the reco tracks to use
     :param tracks: the name of the output Belle tracks
     :param prune_tracks: Delete all hits expect the first and the last from the found tracks.
     :param event_timing_extraction: extract the event time
-    :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
-           (assuming PMT is put at -z of the counter).
     """
 
-    if data_taking_period not in ["phase2", "phase3", "early_phase3"]:
-        import cdc.cr as cosmics_setup
+    # Time seed
+    path.add_module("PlaneTriggerTrackTimeEstimator",
+                    recoTracksStoreArrayName=reco_tracks,
+                    pdgCodeToUseForEstimation=13,
+                    triggerPlanePosition=[0., 0., 0.],
+                    triggerPlaneDirection=[0., 1., 0.],
+                    useFittedInformation=False)
 
-        cosmics_setup.set_cdc_cr_parameters(data_taking_period)
-
-        # Time seed
-        path.add_module("PlaneTriggerTrackTimeEstimator",
-                        recoTracksStoreArrayName=reco_tracks,
-                        pdgCodeToUseForEstimation=13,
-                        triggerPlanePosition=cosmics_setup.triggerPos,
-                        triggerPlaneDirection=cosmics_setup.normTriggerPlaneDirection,
-                        useFittedInformation=False)
-
-        # Initial track fitting
-        path.add_module("DAFRecoFitter",
-                        recoTracksStoreArrayName=reco_tracks,
-                        probCut=0.00001,
-                        pdgCodesToUseForFitting=13,
-                        )
-
-        # Correct time seed
-        path.add_module("PlaneTriggerTrackTimeEstimator",
-                        recoTracksStoreArrayName=reco_tracks,
-                        pdgCodeToUseForEstimation=13,
-                        triggerPlanePosition=cosmics_setup.triggerPos,
-                        triggerPlaneDirection=cosmics_setup.normTriggerPlaneDirection,
-                        useFittedInformation=True,
-                        useReadoutPosition=top_in_counter,
-                        readoutPosition=cosmics_setup.readOutPos,
-                        readoutPositionPropagationSpeed=cosmics_setup.lightPropSpeed
-                        )
-    else:
-        path.add_module("IPTrackTimeEstimator",
-                        recoTracksStoreArrayName=reco_tracks, useFittedInformation=False)
-
-    # Track fitting
+    # Initial track fitting
     path.add_module("DAFRecoFitter",
                     recoTracksStoreArrayName=reco_tracks,
-                    pdgCodesToUseForFitting=13,
+                    probCut=0.00001,
+                    pdgCodesToUseForFitting=13)
+
+    # Correct time seed
+    path.add_module("PlaneTriggerTrackTimeEstimator",
+                    recoTracksStoreArrayName=reco_tracks,
+                    pdgCodeToUseForEstimation=13,
+                    triggerPlanePosition=[0., 0., 0.],
+                    triggerPlaneDirection=[0., 1., 0.],
+                    useFittedInformation=True)
+
+    # Final Track fitting
+    path.add_module("DAFRecoFitter",
+                    recoTracksStoreArrayName=reco_tracks,
+                    pdgCodesToUseForFitting=13
                     )
 
     if event_timing_extraction:
@@ -219,7 +200,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
         path.add_module("DAFRecoFitter",
                         # probCut=0.00001,
                         recoTracksStoreArrayName=reco_tracks,
-                        pdgCodesToUseForFitting=13,
+                        pdgCodesToUseForFitting=13
                         )
 
     # Create Belle2 Tracks from the genfit Tracks
@@ -734,6 +715,7 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
     path.add_module("TFCDC_WireHitPreparer",
                     useSecondHits=use_second_cdc_hits,
                     flightTimeEstimation="downwards",
+                    filter="cuts_from_DB",
                     triggerPoint=trigger_point)
 
     # Constructs clusters and reduce background hits

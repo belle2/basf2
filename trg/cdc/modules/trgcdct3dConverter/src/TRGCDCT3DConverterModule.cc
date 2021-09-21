@@ -302,10 +302,9 @@ int TRGCDCT3DConverterModule::t2DPhiTot3DPhi(int phi, int rho)
 void TRGCDCT3DConverterModule::filterTSData(multi_array<double, 4>& tsfFirmwareInfo,
                                             multi_array<double, 3>& tsfInfo)
 {
-  unsigned iTS_filter = 0;
   // iSl is stereo SL index
   for (unsigned iSL = 0; iSL < tsfFirmwareInfo.shape()[0]; iSL++) {
-    iTS_filter = 0;
+    unsigned iTS_filter = 0;
     for (unsigned iTS = 0; iTS < tsfFirmwareInfo.shape()[1]; iTS++) {
       for (unsigned iClk = 0; iClk < tsfFirmwareInfo.shape()[2]; iClk++) {
         double id = tsfFirmwareInfo[iSL][iTS][iClk][0];

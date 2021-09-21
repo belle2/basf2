@@ -144,7 +144,7 @@ namespace Belle2 {
         i++;
         if (i == 10) {
           if (abs(xmm - xm) < 0.001) break;
-          B2WARNING("PhotonState::propagateSemiLinear: not converging");
+          B2DEBUG(20, "TOP::PhotonState::propagateSemiLinear: not converging");
           return;
         }
         nx = nxx;
@@ -214,7 +214,7 @@ namespace Belle2 {
         i++;
         if (i == 10) {
           if (abs(xmm - xm) < 0.001 and abs(ymm - ym) < 0.001) break;
-          B2WARNING("PhotonState::propagateExact: not converging");
+          B2DEBUG(20, "TOP::PhotonState::propagateExact: not converging");
           return;
         }
         nx = nxx;
@@ -300,10 +300,10 @@ namespace Belle2 {
           k += step;
           ii = (ii + 1) % 2;
         }
-        B2WARNING("PhotonState::propagate: unfolded prism window not found"
-                  << LogVar("yUp", prism.yUp) << LogVar("yDown", prism.yDown)
-                  << LogVar("y", m_y) << LogVar("z", m_z)
-                  << LogVar("ky", ky_in) << LogVar("kz", kz_in));
+        B2DEBUG(20, "TOP::PhotonState::propagate: unfolded prism window not found"
+                << LogVar("yUp", prism.yUp) << LogVar("yDown", prism.yDown) << LogVar("zR", prism.zR)
+                << LogVar("y", m_y) << LogVar("z", m_z)
+                << LogVar("ky", ky_in) << LogVar("kz", kz_in));
         return;
       } else {
         m_yD = m_y;

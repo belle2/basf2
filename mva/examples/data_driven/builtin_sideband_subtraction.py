@@ -10,7 +10,7 @@
 
 # The mva package has a builtin sideband subtraction mechanism.
 # If your data and mc do not match, you can use the MetaOptions to do a meta-training.
-# Using 'm_use_sideband_substraction = True' the mva package will train
+# Using 'm_use_sideband_subtraction = True' the mva package will train
 #  * signal
 #     - from a user-defined signal region with positive weight
 #     - from a user-defined negative signal region with negative weight
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     fastbdt_options = basf2_mva.FastBDTOptions()
 
     meta_options = basf2_mva.MetaOptions()
-    meta_options.m_use_sideband_substraction = True
+    meta_options.m_use_sideband_subtraction = True
     meta_options.m_sideband_variable = 'sideband'
     meta_options.m_sideband_mc_files = basf2_mva.vector("train_mc.root")
 

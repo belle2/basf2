@@ -87,7 +87,7 @@ class BtoD0h_Kspi0(BaseSkim):
 
     def validation_histograms(self, path):
         loadStdSkimPi0(path=path)
-        stdPi0s(listtype='eff50_May2020Fit', path=path)
+        stdPi0s(listtype='eff50_May2020Fit', path=path, loadPhotonBeamBackgroundMVA=False)
 
         ma.reconstructDecay('D0 -> K_S0:merged pi0:eff50_May2020Fit', '1.84 < M < 1.89', path=path)
         ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
@@ -135,7 +135,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
     def load_standard_lists(self, path):
         stdK("all", path=path)
         stdPi("all", path=path)
-        stdPi0s("eff40_May2020Fit", path=path)
+        stdPi0s("eff40_May2020Fit", path=path, loadPhotonBeamBackgroundMVA=False)
         stdKshorts(path=path)
         loadStdPi0ForBToHadrons(path=path)
         loadPiForBtoHadrons(path=path)
@@ -159,7 +159,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
         stdK('all', path=path)
         loadStdSkimPi0(path=path)
         stdKshorts(path=path)
-        stdPi0s(listtype='eff40_May2020Fit', path=path)
+        stdPi0s(listtype='eff40_May2020Fit', path=path, loadPhotonBeamBackgroundMVA=False)
 
         ma.reconstructDecay('D0 -> K_S0:merged pi-:all pi+:all pi0:eff40_May2020Fit', '1.84 < M < 1.89', path=path)
         ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)

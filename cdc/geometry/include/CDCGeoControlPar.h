@@ -277,14 +277,6 @@ namespace Belle2 {
       }
 
       /**
-       * Set max. space resolution (cm)
-       */
-      void setMaxSpaceResolution(double input)
-      {
-        m_maxSpaceResol = input;
-      }
-
-      /**
        * Set additional fudge factor for space resol. for data
        */
       void setAddFudgeFactorForSigmaForData(double input)
@@ -566,14 +558,6 @@ namespace Belle2 {
       }
 
       /**
-       * Get max. space resolution
-       */
-      double getMaxSpaceResolution()
-      {
-        return m_maxSpaceResol;
-      }
-
-      /**
        * Get additional fudge factor for space resol for data
        */
       double getAddFudgeFactorForSigmaForData() const
@@ -636,7 +620,6 @@ namespace Belle2 {
       bool m_chMapInputType = true;  /**< Input type for channel map. */
       bool m_eDepToADCInputType = true;  /**< Input type for edep-to-adc. */
 
-      double m_maxSpaceResol = 2.5 * 0.0130; /**< Max. space resolution allowed (cm) */
       double m_addFudgeFactorForSigmaForData = 1.; /**< Additional fudge factor for space resol. for data */
       double m_addFudgeFactorForSigmaForMC = 1.; /**< Additional fudge factor for space resol. for MC */
       bool m_mapperGeometry = false;  /**< B-field mapper geometry flag. */

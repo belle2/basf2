@@ -10,7 +10,6 @@
 ##########################################################################
 
 import modularAnalysis as ma
-from stdPi0s import stdPi0s
 
 
 def loadPiForBtoHadrons(path):

@@ -267,7 +267,7 @@ superLayer(const unsigned id)
          */
 
         //...minus...
-        if (r1 >= 0 && r2 >= 0 && r1 < r2) {
+        if (r1 > 0 && r2 > 0 && r1 < r2) {
           /* positive slope:
            * crossing if f(phi1) < log(r2) and f(phi2) > log(r1)
            */
@@ -292,7 +292,7 @@ superLayer(const unsigned id)
             outcM << "SL" << SL << "_TS[" << i << "]";
             firstM = false;
           }
-        } else if (r2 < 0 && r1 >= 0) {
+        } else if (r2 < 0 && r1 > 0) {
           /* positive slope, f(phi2) = inf:
            * crossing if f(phi1) < log(r2)
            */
@@ -318,7 +318,7 @@ superLayer(const unsigned id)
         }
 
         //plus
-        if (r1 >= 0 && r2 >= 0 && r2 < r1) {
+        if (r1 > 0 && r2 > 0 && r2 < r1) {
           /* negative slope:
            * crossing if f(phi2) < log(r2) and f(phi1) > log(r1)
            */
@@ -341,7 +341,7 @@ superLayer(const unsigned id)
             outcP << "SL" << SL << "_TS[" << i << "]";
             firstP = false;
           }
-        } else if (r1 < 0 && r2 >= 0) {
+        } else if (r1 < 0 && r2 > 0) {
           /* negative slope, f(phi1) = inf:
            * crossing if f(phi2) < log(r2)
            */

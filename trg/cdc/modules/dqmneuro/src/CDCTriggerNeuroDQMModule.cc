@@ -1264,6 +1264,7 @@ void CDCTriggerNeuroDQMModule::initialize()
 {
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
+  m_eventTime.isRequired("CDCTriggerNeuroETFT0");
   if (m_showRecoTracks && m_recoTracksName == "") {
     m_recoTracksName = "RecoTracks";
   }
@@ -2959,35 +2960,48 @@ void CDCTriggerNeuroDQMModule::event()
       std::stringstream strphi;
       std::stringstream strtheta;
       std::stringstream strz;
+      std::stringstream hwomega;
+      std::stringstream hwphi;
+      std::stringstream hwtheta;
+      std::stringstream hwz;
       strpt       << std::fixed << std::setprecision(2)   << ltrack.getPt();
       stromega    << std::fixed << std::setprecision(2)   << ltrack.getOmega();
       strphi      << std::fixed << std::setprecision(2)   << (ltrack.getPhi0() * 180. / M_PI);
       strtheta    << std::fixed << std::setprecision(2)   << (ltrack.getDirection().Theta() * 180. / M_PI);
       strz        << std::fixed << std::setprecision(2)   << ltrack.getZ0();
-      std::string trs  = "    HWNeuroTrack Nr. " + std::to_string(hwntrn) + " (pt, omega, phi, theta, z) = ";
-      trs += padto(strpt.str(), 6) + ", " + padto(stromega.str(), 6) + ", " + padto(strphi.str(), 6) + ", " + padto(strtheta.str(),
-             6) + ", " + padto(strz.str(), 6) + ")";
+      hwomega     << std::fixed << std::setprecision(0)   << ltrack.getRawOmega();
+      hwphi       << std::fixed << std::setprecision(0)   << ltrack.getRawPhi0();
+      hwtheta     << std::fixed << std::setprecision(0)   << ltrack.getRawTheta();
+      hwz         << std::fixed << std::setprecision(0)   << ltrack.getRawZ();
+      std::string trs  = "    HWNeuroTrack Nr. " + std::to_string(hwntrn) + " (pt,om,phi,theta,z)=(";
+      trs += padto(strpt.str(), 4) + "," + padto(stromega.str(), 6) + "," + padto(strphi.str(), 6) + "," + padto(strtheta.str(),
+             6) + "," + padto(strz.str(), 6) + "),(x," + padto(hwomega.str(), 3) + "," + padto(hwphi.str(), 3) + "," + padto(hwtheta.str(),
+                 3) + "," + padto(hwz.str(), 3) + ")";
       B2DEBUG(15, padright(trs, 100));
-      std::string infostr = "      Found old track: ( ";
+      std::string infostr = "     ETF vld:";
+      infostr += std::to_string(m_eventTime.isValid());
+      infostr += ", ETFT0: ";
+      infostr += std::to_string(m_eventTime->getBinnedEventT0(Const::CDC));
+      infostr += ", Found old track: ( ";
       for (bool x : ltrack.getFoundOldTrack()) {
-        infostr += std::to_string(x) + " ";
+        infostr += std::to_string(x);
       }
       infostr += "), ";
       infostr = padright(infostr, 50);
       infostr += "Drift threshold: ( ";
       for (bool x : ltrack.getDriftThreshold()) {
-        infostr += std::to_string(x) + " ";
+        infostr += std::to_string(x);
       }
       infostr += ")";
       infostr += (ltrack.getValidStereoBit()) ? " valid" : " NOT valid";
       B2DEBUG(15, padright(infostr, 100));
       std::string info2str = "      Expert Network Number: " + std::to_string(ltrack.getExpert());
       info2str += ", TSVector: (";
-      for (bool x : ltrack.getTSVector()) {
+      for (unsigned x : ltrack.getTSVector()) {
         info2str += std::to_string(x) + " ";
       }
       info2str += ")";
-      info2str += ", Q=";
+      info2str += ", Quality=";
       info2str += std::to_string(ltrack.getQualityVector());
       B2DEBUG(15, padright(info2str, 100));
       CDCTriggerTrack* ftrack = ltrack.getRelatedFrom<CDCTriggerTrack>(m_unpackedNeuroInput2DTracksName);
@@ -3054,10 +3068,13 @@ void CDCTriggerNeuroDQMModule::event()
       strphi      << std::fixed << std::setprecision(2)   << (ltrack.getPhi0() * 180. / M_PI);
       strtheta    << std::fixed << std::setprecision(2)   << (ltrack.getDirection().Theta() * 180. / M_PI);
       strz        << std::fixed << std::setprecision(2)   << ltrack.getZ0();
-      strquality << std::fixed << ltrack.getQualityVector();
-      std::string trs  = "    SWNeuroTrack Nr. " + std::to_string(swntrn) + " (pt, omega, phi, theta, z) = ";
-      trs += padto(strpt.str(), 6) + ", " + padto(stromega.str(), 6) + ", " + padto(strphi.str(), 6) + ", " + padto(strtheta.str(),
-             6) + ", " + padto(strz.str(), 6) + ")" + ", Q=" + strquality.str();
+      strquality  << std::fixed << ltrack.getQualityVector();
+
+      std::string trs  = "    SWNeuroTrack Nr. " + std::to_string(swntrn) + " (pt,om,phi,theta,z)=(";
+      trs += padto(strpt.str(), 5) + "," + padto(stromega.str(), 5) + "," + padto(strphi.str(), 6) + "," + padto(strtheta.str(),
+             6) + ", " + padto(strz.str(), 6) + ")"
+             + /**,(x," + padto(intomega.str(), 2) + "," + padto(intphi.str(), 3) + "," + padto(inttheta.str(),
+                 3) + "," + padto(intz.str(), 3) + "),*/ " Q=" + strquality.str();
       B2DEBUG(15, padright(trs, 100));
     }
   }

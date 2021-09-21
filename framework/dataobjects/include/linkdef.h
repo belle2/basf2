@@ -43,4 +43,29 @@
 #pragma link C++ class std::pair<Belle2::Const::EDetector, std::map<std::string, int>>+; // checksum=0x32be0e15, version=-1
 #pragma link C++ class std::pair<Belle2::Const::EDetector, std::map<std::string, double>>+; // checksum=0x7add857, version=-1
 
+
+#pragma read                                                                                                              \
+  sourceClass="Belle2::MCInitialParticles"                                                                                \
+  source="TLorentzVector m_her"                                                                                           \
+  version="[-3]"                                                                                                          \
+  targetClass="Belle2::MCInitialParticles"                                                                                \
+  target="m_her"                                                                                                          \
+  code="{m_her = ROOT::Math::PxPyPzEVector(onfile.m_her.Px(), onfile.m_her.Py(), onfile.m_her.Pz(), onfile.m_her.E());}"  \
+
+#pragma read                                                                                                              \
+  sourceClass="Belle2::MCInitialParticles"                                                                                \
+  source="TLorentzVector m_ler"                                                                                           \
+  version="[-3]"                                                                                                          \
+  targetClass="Belle2::MCInitialParticles"                                                                                \
+  target="m_ler"                                                                                                          \
+  code="{m_ler = ROOT::Math::PxPyPzEVector(onfile.m_ler.Px(), onfile.m_ler.Py(), onfile.m_ler.Pz(), onfile.m_ler.E());}"  \
+
+#pragma read                                \
+  sourceClass="Belle2::MCInitialParticles"  \
+  source="TVector3 m_vertex"                \
+  version="[-3]"                            \
+  targetClass="Belle2::MCInitialParticles"  \
+  target="m_vertex"                         \
+  code="{m_vertex = onfile.m_vertex;}"      \
+
 #endif

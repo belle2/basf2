@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <TLorentzVector.h>
 #include <Math/AxisAngle.h>
 #include <Math/Boost.h>
 #include <Math/LorentzRotation.h>

@@ -2889,7 +2889,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                            the first daughter of the fourth daughter.
 
                       )DOC");
-    REGISTER_VARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,"MC matched version of the `daughterAngle` function.");
+    REGISTER_VARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,
+                      "MC matched version of the `daughterAngle` function. Also works if applied directly to MC particles.");
     REGISTER_VARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
                       "Returns the decay angle of the granddaughter in the daughter particle's rest frame.\n"
                       "It is calculated with respect to the reverted momentum vector of the particle.\n"

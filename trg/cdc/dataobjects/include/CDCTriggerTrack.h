@@ -19,7 +19,7 @@ namespace Belle2 {
   public:
     /** default constructor, initializing everything to 0. */
     CDCTriggerTrack(): Helix(), m_chi2D(0.), m_chi3D(0.), m_time(0), m_quadrant(-1), m_foundoldtrack(6, false), m_driftthreshold(9,
-          false), m_valstereobit(false) , m_expert(-1), m_tsvector(9, false), m_qualityvector(0) { }
+          false), m_valstereobit(false) , m_expert(-1), m_tsvector(9, 0), m_qualityvector(0) { }
 
     /** 2D constructor, initializing 3D values to 0.
      *  @param phi0      The angle between the transverse momentum and the x axis and in [-pi, pi].
@@ -45,7 +45,7 @@ namespace Belle2 {
       m_driftthreshold(driftthreshold),
       m_valstereobit(valstereobit),
       m_expert(expert),
-      m_tsvector(9, false),
+      m_tsvector(9, 0),
       m_qualityvector(0) { }
 
     CDCTriggerTrack(double phi0, double omega, double chi2,
@@ -58,7 +58,7 @@ namespace Belle2 {
       m_driftthreshold(9, false),
       m_valstereobit(false),
       m_expert(-1),
-      m_tsvector(9, false),
+      m_tsvector(9, 0),
       m_qualityvector(0) { }
 
     /** 3D constructor
@@ -77,7 +77,7 @@ namespace Belle2 {
                     const std::vector<bool>& driftthreshold = std::vector<bool>(9, false),
                     bool valstereobit = false,
                     int expert = -1,
-                    const std::vector<bool>& tsvector = std::vector<bool>(9, false),
+                    const std::vector<unsigned>& tsvector = std::vector<unsigned>(9, 0),
                     short time = 0, short quadrant = -1,
                     unsigned qualityvector = 0):
       Helix(0., phi0, omega, z0, cotTheta), m_chi2D(chi2D), m_chi3D(chi3D), m_time(time), m_quadrant(quadrant),
@@ -106,7 +106,7 @@ namespace Belle2 {
       return getTransverseMomentum(bField);
     }
     /** get the quadrant */
-    short getQuadrant()
+    short getQuadrant() const
     {
       return m_quadrant;
     }
@@ -124,7 +124,7 @@ namespace Belle2 {
 
     /** return the vector of used Track Segments.
      *  The First bit is the innermost TS, the last bit the outermost. */
-    std::vector<bool> getTSVector() const {return m_tsvector;}
+    std::vector<unsigned> getTSVector() const {return m_tsvector;}
     /** setter and getter for the quality vector. For the setter, the given
      * uint is xored with the current qualityvector, thus all bits with
      * a 1 are changed.
@@ -134,6 +134,29 @@ namespace Belle2 {
       m_qualityvector = m_qualityvector ^ newbits;
     }
     unsigned getQualityVector() const {return m_qualityvector;}
+    void setHasETFTime(bool x) {m_hasETFTime = x;}
+    bool getHasETFTime() const {return m_hasETFTime;}
+    /** setter and getter functions for raw track values */
+    void setRawPhi0(const int phi0)
+    {
+      m_rawphi0 = phi0;
+    }
+    void setRawOmega(const int omega)
+    {
+      m_rawomega = omega;
+    }
+    void setRawZ(const int z)
+    {
+      m_rawz = z;
+    }
+    void setRawTheta(const int theta)
+    {
+      m_rawtheta = theta;
+    }
+    int getRawPhi0() const {return m_rawphi0;}
+    int getRawOmega() const {return m_rawomega;}
+    int getRawZ() const {return m_rawz;}
+    int getRawTheta() const {return m_rawtheta;}
 
   protected:
     /** chi2 value from 2D fitter */
@@ -154,13 +177,20 @@ namespace Belle2 {
     int m_expert;
     /** store which track segments were used.
      *  The First bit is the innermost TS, the last bit the outermost. */
-    std::vector<bool> m_tsvector;
+    std::vector<unsigned> m_tsvector;
     /** store bits for different quality flags.
      * 2^0 : 0 if all axial ts are contained in the related 2dfindertrack; 1 otherwise.
      */
     unsigned m_qualityvector;
+    bool m_hasETFTime{0};
+    /** values to store the raw network and 2dfinder output */
+    int m_rawphi0{0};
+    int m_rawomega{0};
+    int m_rawz{0};
+    int m_rawtheta{0};
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerTrack, 9);
+    ClassDef(CDCTriggerTrack, 10);
+
   };
 }
 #endif

@@ -1143,17 +1143,31 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
-          for (auto& generalizedIndex : arguments)
+          if (particle->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle) // Check if MCParticle
           {
-            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
-            if (dauPart == nullptr)
-              return std::numeric_limits<double>::quiet_NaN();
+            for (auto& generalizedIndex : arguments) {
+              const MCParticle* mcPart = particle->getMCParticle();
+              if (mcPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
+              const MCParticle* dauMcPart = mcPart->getParticleFromGeneralizedIndexString(generalizedIndex);
+              if (dauMcPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
 
-            const MCParticle* dauMcPart = dauPart->getMCParticle();
-            if (dauMcPart == nullptr)
-              return std::numeric_limits<double>::quiet_NaN();
+              pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
+            }
+          } else{
+            for (auto& generalizedIndex : arguments)
+            {
+              const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+              if (dauPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
 
-            pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
+              const MCParticle* dauMcPart = dauPart->getMCParticle();
+              if (dauMcPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
+
+              pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
+            }
           }
 
           // Calculates the angle between the selected particles

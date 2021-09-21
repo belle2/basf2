@@ -265,6 +265,9 @@ namespace Belle2 {
     std::vector<Belle2::MCParticle*> getDaughters() const;
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
+    /** Return i-th daughter */
+    const MCParticle* getDaughter(int i) const;
+
     /** Return number of daughter MCParticles. */
     int getNDaughters() const;
 
@@ -500,6 +503,8 @@ namespace Belle2 {
     /** Return a short summary of this object's contents in HTML format. */
     virtual std::string getInfoHTML() const override;
 
+    const MCParticle* getParticleFromGeneralizedIndexString(const std::string& generalizedIndex) const;
+
   protected:
 
     /**
@@ -582,5 +587,6 @@ namespace Belle2 {
     fixParticleList();
     return static_cast<MCParticle*>(m_plist->At(m_mother - 1));
   }
+
 
 } // end namespace Belle2

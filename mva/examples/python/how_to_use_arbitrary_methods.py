@@ -201,7 +201,7 @@ if __name__ == "__main__":
     # in this case this is the same file were we setup the training itself,
     # but in principle it can be any file, this file will be saved in the weightfile
     # and it will be executed as soon as the weightfile is loaded! (so the above if __name__ == "__main__" is very important)
-    python_options.m_steering_file = "mva/examples/python/howto_use_arbitrary_methods.py"
+    python_options.m_steering_file = "mva/examples/python/how_to_use_arbitrary_methods.py"
 
     # You can pass parameters to your get_model hook, in form of a json string
     # You can use json.dumps to find out the right syntax.

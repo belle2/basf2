@@ -6,8 +6,9 @@ env['SUBLIB'] = True
 env['LIBS'] = ['$ROOT_LIBS', 'mdst_dataobjects', 'framework',
                'eemmgisr', 'eemmgisrfsr', 'eemmg5', 'qcdloop1', 'gfortran']
 
-env.Depends(target = '$FORTRANMODDIR/belle2_phokhara_interface.mod', dependency = 'belle2_phokhara_interface.f90')
-env.Depends(target = 'belle2event.f', dependency = '$FORTRANMODDIR/belle2_phokhara_interface.mod')
-env.Depends(target = 'phokhara_10.0.f', dependency = '$FORTRANMODDIR/belle2_phokhara_interface.mod')
+env.Depends(target = os.path.join(env['BUILDDIR'], 'generators', 'phokhara', 'belle2event.os'),
+    dependency = '$FORTRANMODDIR/belle2_phokhara_interface.mod')
+env.Depends(target = os.path.join(env['BUILDDIR'], 'generators', 'phokhara', 'phokhara_10.0.os'),
+    dependency = '$FORTRANMODDIR/belle2_phokhara_interface.mod')
 
 Return('env')

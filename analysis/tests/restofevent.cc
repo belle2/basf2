@@ -240,19 +240,18 @@ namespace {
 
   TEST_F(ROETest, maskNamingConventions)
   {
-    StoreArray<RestOfEvent> myROEs{};
-    RestOfEvent* roe = myROEs[0];
+    RestOfEvent roe;
 
-    EXPECT_B2FATAL(roe->initializeMask("clean-mask", "maskNamingConventionTest"));
-    EXPECT_B2FATAL(roe->initializeMask("1mask", "maskNamingConventionTest"));
-    EXPECT_B2FATAL(roe->initializeMask("", "maskNamingConventionTest"));
-    EXPECT_B2FATAL(roe->initializeMask("all", "maskNamingConventionTest"));
+    EXPECT_B2FATAL(roe.initializeMask("clean-mask", "maskNamingConventionTest"));
+    EXPECT_B2FATAL(roe.initializeMask("1mask", "maskNamingConventionTest"));
+    EXPECT_B2FATAL(roe.initializeMask("", "maskNamingConventionTest"));
+    EXPECT_B2FATAL(roe.initializeMask("all", "maskNamingConventionTest"));
 
-    roe->initializeMask("Clean_mask", "maskNamingConventionTest");
-    EXPECT_TRUE(roe->hasMask("Clean_mask"));
+    roe.initializeMask("Clean_mask", "maskNamingConventionTest");
+    EXPECT_TRUE(roe.hasMask("Clean_mask"));
 
-    roe->initializeMask("cl3an_mask", "maskNamingConventionTest");
-    EXPECT_TRUE(roe->hasMask("cl3an_mask"));
+    roe.initializeMask("cl3an_mask", "maskNamingConventionTest");
+    EXPECT_TRUE(roe.hasMask("cl3an_mask"));
   }
 
 } //

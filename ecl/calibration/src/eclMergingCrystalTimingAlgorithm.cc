@@ -101,8 +101,8 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
   }
 
 
-  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz.
-     Same for all crystals.  Proper accurate value*/
+  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency.
+     Same for all crystals.  */
   const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::m_rf) * 1e3;
 
 
@@ -217,7 +217,7 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
       Some of the conditions that define a bad fit in the bhabha
       calibrations.
 
-           (fit_mean_unc < 0.09ns)    <<--- uncertianty on mean
+           (fit_mean_unc < 0.09ns)    <<--- uncertainty on mean
            (fit_sigma < 0.1)     <<--- sigma, not uncertainty on mean
            (numEntries < 40 )
 

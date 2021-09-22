@@ -184,7 +184,7 @@ class TDCPV_qqs(BaseSkim):
         ma.buildEventKinematics(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'], path=path)
 
         EventCuts = [
-            "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3",
+            "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
             "E_ECL_TDCPV<9"
         ]
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
@@ -334,7 +334,6 @@ class TDCPV_ccs(BaseSkim):
         ma.buildEventKinematics(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'], path=path)
 
         EventCuts = [
-            "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3",
             "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
             "visibleEnergyOfEventCMS>4",
             "E_ECL_TDCPV<9"

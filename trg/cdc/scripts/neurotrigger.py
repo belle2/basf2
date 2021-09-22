@@ -6,7 +6,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import basf2 as b2
+import basf2
 from ROOT import Belle2
 
 ################################################################################
@@ -103,9 +103,9 @@ def add_neuro_unpacker(path, debug_level=4, debugout=False, **kwargs):
     #
     unpacker = b2.register_module('CDCTriggerUnpacker')
     if debugout:
-        unpacker.logging.log_level = b2.LogLevel.DEBUG
+        unpacker.logging.log_level = basf2.LogLevel.DEBUG
         unpacker.logging.debug_level = debug_level
-        unpacker.logging.set_info(b2.LogLevel.DEBUG, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
+        unpacker.logging.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
     # size (number of words) of the Belle2Link header
     unpacker.param('headerSize', 3)
     # unpack the data from the 2D tracker and save its Bitstream
@@ -143,9 +143,9 @@ def add_neuro_2d_unpackers(path, debug_level=4, debugout=False, **kwargs):
     #
     unpacker = b2.register_module('CDCTriggerUnpacker')
     if debugout:
-        unpacker.logging.log_level = b2.LogLevel.DEBUG
+        unpacker.logging.log_level = basf2.LogLevel.DEBUG
         unpacker.logging.debug_level = debug_level
-        unpacker.logging.set_info(b2.LogLevel.DEBUG, b2.LogInfo.LEVEL | b2.LogInfo.MESSAGE)
+        unpacker.logging.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
     # size (number of words) of the Belle2Link header
     unpacker.param('headerSize', 3)
     # unpack the data from the 2D tracker and save its Bitstream
@@ -210,7 +210,7 @@ def add_neurotrigger_sim(path, nntweightfile=None, debug_level=4, debugout=False
     if 'EventTimeName' in kwargs:
         nnt.param('EventTimeName', kwargs['EventTimeName'])
     if debugout:
-        nnt.logging.log_level = b2.LogLevel.DEBUG
+        nnt.logging.log_level = basf2.LogLevel.DEBUG
         nnt.logging.debug_level = debug_level
     path.add_module(nnt)
 
@@ -255,7 +255,7 @@ def add_neurotrigger_hw(path, nntweightfile=None, debug_level=4, debugout=False,
     else:
         nnt.param('EventTimeName', 'CDCTriggerNeuroETFT0')
     if debugout:
-        nnt.logging.log_level = b2.LogLevel.DEBUG
+        nnt.logging.log_level = basf2.LogLevel.DEBUG
         nnt.logging.debug_level = debug_level
     path.add_module(nnt)
 

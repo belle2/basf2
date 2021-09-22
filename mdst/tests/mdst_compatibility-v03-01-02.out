@@ -24829,7 +24829,7 @@ MCParticle#56:
   isPrimaryParticle(): True
   isVirtual(): False
 MCParticle#57:
-  get4Vector(): (-0.285416,-0.0428605,-0.0664775,0.327411)
+  get4Vector(): (-0.285416,-0.0428605,-0.0664775,0.327412)
   getArrayIndex(): 57
   getCharge(): 1
   getDaughters(): size(2)
@@ -25199,7 +25199,7 @@ MCParticle#69:
   isPrimaryParticle(): False
   isVirtual(): False
 MCParticle#70:
-  get4Vector(): (0.0112902,-0.0296924,0.0205067,0.0378105)
+  get4Vector(): (0.0112902,-0.0296924,0.0205067,0.0378104)
   getArrayIndex(): 70
   getCharge(): 0
   getDaughters(): size(0)

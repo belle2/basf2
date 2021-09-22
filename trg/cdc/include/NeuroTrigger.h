@@ -179,6 +179,8 @@ namespace Belle2 {
     /** Calculate phi position of a hit relative to 2D track
      * (scaled to number of wires). */
     double getRelId(const CDCTriggerSegmentHit& hit);
+    /** helper function to get the fastest priority time of given ts array */
+    int getLowestTime(unsigned isector, RelationVector<CDCTriggerSegmentHit> Hits, bool onlyAxials);
     /** Read out the event time and store it.
      * It can be given different options in the et_option ("EventTime option")
      * parameter.

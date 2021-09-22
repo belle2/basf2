@@ -37,14 +37,35 @@ sim2dtracks_swts = 'TRGCDC2DFinderTracks'
 ################################################################################
 
 
-class filterTRG(b2.Module):
-    def initialize(self, branchname=hwneuroinput2dfindertracks):
-        self.branchname = branchname
-        self.nullpath = b2.create_path()
+def filterTRG(path):
+    nullpath = basf2.create_path()
+    mfilter = basf2.register_module("CDCTriggerUnpacker", unpackNeuro=True)
+    path.add_module(mfilter)
+    mfilter.if_value('<1', nullpath)
+
+
+class nnt_eventfilter(basf2.Module):
+    def initialize(self):
+        self.tracksegmentsname = hwneuroinputsegmenthits,
+        self.twodtracksname = hwneuroinput2dfindertracks,
+        self.neurotracksname = hwneurotracks,
+        self.recotracksname = "RecoTracks"
+        self.nullpath = basf2.create_path()
 
     def event(self):
-        self.return_value(bool(Belle2.PyStoreArray(self.branchname).getEntries() > 0))
+        self.return_value(bool(self.neurotrack_allgoodquality()))
         self.if_false(self.nullpath)
+
+    def hastrginfo(self):
+        return bool(Belle2.PyStoreArray(self.twodtracksname).getEntries() > 0)
+
+    def neurotrack_allgoodquality(self):
+        isgoodquality = True
+        for tr in Belle2.PyStoreArray("CDCTriggerNeuroTracks"):
+            if tr.getQualityVector() > 0:
+                isgoodquality = False
+                break
+        return isgoodquality
 
 
 class nnt_eventfilter(b2.Module):
@@ -186,6 +207,8 @@ def add_neurotrigger_sim(path, nntweightfile=None, debug_level=4, debugout=False
 
     if 'et_option' in kwargs:
         nnt.param('et_option', kwargs['et_option'])
+    if 'EventTimeName' in kwargs:
+        nnt.param('EventTimeName', kwargs['EventTimeName'])
     if debugout:
         nnt.logging.log_level = b2.LogLevel.DEBUG
         nnt.logging.debug_level = debug_level
@@ -224,25 +247,41 @@ def add_neurotrigger_hw(path, nntweightfile=None, debug_level=4, debugout=False,
     nnt.param('NeuroHWTrackInputMode', True)
     if 'et_option' in kwargs:
         nnt.param('et_option', kwargs['et_option'])
+    else:
+        nnt.param('et_option', 'etf_or_fastestpriority')
+
+    if 'EventTimeName' in kwargs:
+        nnt.param('EventTimeName', kwargs['EventTimeName'])
+    else:
+        nnt.param('EventTimeName', 'CDCTriggerNeuroETFT0')
     if debugout:
         nnt.logging.log_level = b2.LogLevel.DEBUG
         nnt.logging.debug_level = debug_level
     path.add_module(nnt)
 
 
-def add_neuro_simulation(path):
-    path.add_module('CDCTriggerTSF',
-                    InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v2.2.coe"),
-                    OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v2.2.coe"),
-                    TSHitCollectionName=simsegmenthits)
+def add_neuro_simulation(path, nntweightfile=None, **kwargs):
+    nnt = basf2.register_module('CDCTriggerNeuro')
+    tsf = basf2.register_module('CDCTriggerTSF')
+    if "InnerTSLUTFile" in kwargs:
+        tsf.param("InnerTSLUTFile", kwargs["InnerTSLUTFile"])
+    else:
+        tsf.param("InnerTSLUTFile", Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v2.2.coe"))
+    if "OuterTSLUTFile" in kwargs:
+        tsf.param("OuterTSLUTFile", kwargs["OuterTSLUTFile"])
+    else:
+        tsf.param("OuterTSLUTFile", Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v2.2.coe"))
+    tsf.param("TSHitCollectionName", simsegmenthits)
+    path.add_module(tsf)
     path.add_module('CDCTrigger2DFinder',
                     minHits=4, minHitsShort=4, minPt=0.3,
                     hitCollectionName=simsegmenthits,
                     outputCollectionName=sim2dtracks_swts)
-    path.add_module('CDCTriggerNeuro',
-                    inputCollectionName=sim2dtracks_swts,
-                    outputCollectionName=simneurotracks_swtssw2d,
-                    hitCollectionName=simsegmenthits,
-                    writeMLPinput=True,
-                    fixedPoint=True,
-                    )
+    if nntweightfile is not None:
+        nnt.param('filename', Belle2.FileSystem.findFile(nntweightfile))
+    nnt.param('inputCollectionName', sim2dtracks_swts)
+    nnt.param('outputCollectionName', simneurotracks_swtssw2d)
+    nnt.param('hitCollectionName', simsegmenthits)
+    nnt.param('writeMLPinput', True)
+    nnt.param('fixedPoint', True)
+    path.add_module(nnt)

@@ -158,7 +158,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     G4VSolid* part4solid = new BelleLathe("part4solid", phi0, dphi, contour4);
     G4LogicalVolume* part4logical = new G4LogicalVolume(part4solid, Materials::get("SUS304"), "part4logical", 0, 0, 0);
     part4logical->SetVisAttributes(att("iron"));
-    new G4PVPlacement(gT * G4Translate3D(0, 0, 2290), part4logical, "part4physical", top, false, 0, overlap);
+    new G4PVPlacement(gT * G4Translate3D(0, 0, 2290), part4logical, "ECL_BarrelSupport_part4physical", top, false, 0, overlap);
   }
 
   if (b_backward_support_ring) {
@@ -176,7 +176,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     G4VSolid* part2solid = new BelleLathe("part2solid", phi0, dphi, contour2);
     G4LogicalVolume* part2logical = new G4LogicalVolume(part2solid, Materials::get("A5083"), "part2logical", 0, 0, 0);
     part2logical->SetVisAttributes(att("alum"));
-    new G4PVPlacement(gT * G4Translate3D(0, 0, 1930), part2logical, "part2physical", top, false, 0, overlap);
+    new G4PVPlacement(gT * G4Translate3D(0, 0, 1930), part2logical, "ECL_BarrelSupport_part2physical", top, false, 0, overlap);
   }
 
   if (b_backward_support_wall) {
@@ -185,14 +185,15 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     G4VSolid* part3solid = new BelleLathe("part3solid", phi0, dphi, contour3);
     G4LogicalVolume* part3logical = new G4LogicalVolume(part3solid, Materials::get("A5083"), "part3logical", 0, 0, 0);
     part3logical->SetVisAttributes(att("alum"));
-    new G4PVPlacement(gT * G4Translate3D(0, 0, -940), part3logical, "part3physical", top, false, 0, overlap);
+    new G4PVPlacement(gT * G4Translate3D(0, 0, -940), part3logical, "ECL_BarrelSupport_part3physical", top, false, 0, overlap);
   }
 
   if (b_inner_support_wall) {
     G4VSolid* part1solid = new G4Tubs("part1solid", 1250.1, 1250.1 + 1.5, (988.5 + 1972.5) / 2, phi0, dphi);
     G4LogicalVolume* part1logical = new G4LogicalVolume(part1solid, Materials::get("A5083"), "part1logical", 0, 0, 0);
     part1logical->SetVisAttributes(att("alum2"));
-    new G4PVPlacement(gT * G4Translate3D(0, 0, (-988.5 + 1972.5) / 2), part1logical, "part1physical", top, false, 0, overlap);
+    new G4PVPlacement(gT * G4Translate3D(0, 0, (-988.5 + 1972.5) / 2), part1logical, "ECL_BarrelSupport_part1physical", top, false, 0,
+                      overlap);
   }
 
   // cppcheck-suppress knownConditionTrueFalse

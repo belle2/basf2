@@ -31,12 +31,12 @@ ma.reconstructDecay(
     "J/psi:ee -> e+:uncorrected e-:uncorrected", cut="dM < 0.11", path=main
 )
 
-# combine J/psi and KS candidates to form B0 candidates
+# combine J/psi and KS candidates to form B0 candidates [S40]
 ma.reconstructDecay(
     "B0 -> J/psi:ee K_S0:merged",
     cut="Mbc > 5.2 and abs(deltaE) < 0.15",
     path=main,
-)
+)  # [E40]
 
 # match reconstructed with MC particles
 ma.matchMCTruth("B0", path=main)

@@ -1052,7 +1052,7 @@ def fillConvertedPhotonsList(decayString, cut, writeOut=False, path=None):
 
 def fillParticleListFromROE(decayString,
                             cut,
-                            maskName='',
+                            maskName='all',
                             sourceParticleListName='',
                             useMissing=False,
                             writeOut=False,
@@ -2089,7 +2089,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
     path.add_module(roeBuilder)
 
 
-def buildNestedRestOfEvent(target_list_name, maskName='', path=None):
+def buildNestedRestOfEvent(target_list_name, maskName='all', path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     @param target_list_name      name of the input ParticleList

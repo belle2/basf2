@@ -160,7 +160,15 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 1.0);
 
+    var = Manager::Instance().getVariable("nROE_Charged(all)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 2.0);
+
     var = Manager::Instance().getVariable("nROE_Charged(my_mask, 13)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 0.0);
+
+    var = Manager::Instance().getVariable("nROE_Charged(all, 13)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 
@@ -200,6 +208,10 @@ namespace {
     var = Manager::Instance().getVariable("nROE_Tracks(my_mask)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 1.0);
+
+    var = Manager::Instance().getVariable("nROE_Tracks(all)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 2.0);
 
     var = Manager::Instance().getVariable("nROE_ECLClusters()");
     ASSERT_NE(var, nullptr);
@@ -278,6 +290,10 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 
+    var = Manager::Instance().getVariable("roeCharge(all)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 0.0);
+
     var = Manager::Instance().getVariable("roeCharge(my_mask)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 1.0);
@@ -337,6 +353,10 @@ namespace {
     var = Manager::Instance().getVariable("weMbc(my_mask,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), TMath::Sqrt(E0 * E0 - mask4VecCMS.Vect().Mag2()));
+
+    var = Manager::Instance().getVariable("weMbc(all,0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), TMath::Sqrt(E0 * E0 - roe4VecCMS.Vect().Mag2()));
 
     TLorentzVector miss4VecCMS(0, 0, 0, 0);
     miss4VecCMS.SetVect(- (sig4VecCMS.Vect() + mask4VecCMS.Vect()));
@@ -431,6 +451,14 @@ namespace {
     var = Manager::Instance().getVariable("passesROEMask(my_mask)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(partROE1), 1.0);
+
+    var = Manager::Instance().getVariable("passesROEMask(all)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(partROE1), 1.0);
+
+    var = Manager::Instance().getVariable("passesROEMask(all)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(partNotROE), 0.0);
 
     var = Manager::Instance().getVariable("passesROEMask(my_mask)");
     ASSERT_NE(var, nullptr);

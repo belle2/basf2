@@ -9,6 +9,7 @@
 #pragma once
 
 #include <vector>
+#include <algorithm>
 #include <string>
 #include <memory>
 #include <TH1F.h>
@@ -120,6 +121,13 @@ namespace Belle2 {
        * @return chi^2 values
        */
       const std::vector<double>& getChi2Values() const {return m_chi2;}
+
+
+      /**
+       * Returns minimum chi2 value
+       * @return minimum chi2 value
+       */
+      double getMinChi2() const {return *std::min_element(m_chi2.begin(), m_chi2.end());}
 
       /**
        * Returns number of entries (counted for bin 0)

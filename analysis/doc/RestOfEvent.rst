@@ -224,6 +224,13 @@ which have passed a selection criteria:
   
 The mask tuples should contain a mask name and cuts for charged particles, for photons and for :math:`K_L^0` or hadrons.
 In the example above a cut is not set, therefore, all hadrons will pass the mask.
+
+.. warning::
+  Mask name ``all`` is reserved for no ROE mask case, users cannot create a ROE mask wth this name. 
+  The mask name ``all`` can be provided to the ROE metavariables and ROE-dependent modules
+  right after creation of the ROE to use all particles in the ROE with no selection cuts, although it is not advised. 
+  Moreover, mask names can only contain alphanumeric or underscore characters.
+
 Most of ROE variables accept mask name as an argument, which allows user to compare 
 variable distributions from different ROE masks. 
 For example, the :b2:var:`roeE` variable will be computed using only ROE particles from a corresponding mask.
@@ -231,7 +238,6 @@ For example, the :b2:var:`roeE` variable will be computed using only ROE particl
 .. note::
   Hard cuts on track impact parameters :math:`d_0` and :math:`z_0` are not recommended since one can throw away tracks from long lived decaying
   particles.
-
 
 After appending masks to ROE, one can perform different manipulations with masked particles.
 The methods :func:`modularAnalysis.keepInROEMasks` and :func:`modularAnalysis.discardFromROEMasks` 

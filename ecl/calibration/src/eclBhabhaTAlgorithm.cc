@@ -433,8 +433,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   B2INFO("hist_tmin = " << hist_tmin);
   B2INFO("hist_tmax = " << hist_tmax);
 
-  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz.
-     Same for all crystals.  Proper accurate value*/
+  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency.
+     Same for all crystals. */
   const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::m_rf) * 1e3;
 
   // The ts and tcrate database values are filled once per tcol instance so count the number of times that the database values

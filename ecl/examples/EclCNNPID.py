@@ -118,6 +118,9 @@ if __name__ == '__main__':
     # Reconstruction
     add_reconstruction(mainPath)
 
+    # Add ECLFillCellIdMapping module
+    mainPath.add_module('ECLFillCellIdMapping')
+
     name = 'pi+:particles'
     ma.fillParticleList(name, '', path=mainPath)
 

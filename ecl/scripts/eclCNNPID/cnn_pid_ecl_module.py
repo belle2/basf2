@@ -71,9 +71,6 @@ class CNN_PID_ECL(b2.Module):
         torch.manual_seed(1234)
         self.device = torch.device('cpu')
 
-        if 'ECLFillCellIdMapping' not in self.path:
-            self.path.add_module('ECLFillCellIdMapping')
-
     def initialize(self):
         """ Initialize necessary arrays and/or objects """
 
@@ -101,7 +98,6 @@ class CNN_PID_ECL(b2.Module):
 
             if (track and self.getExtCell(track)):
                 extHit_dict = self.getExtCell(track)
-                print(extHit_dict)
                 maxCellId = extHit_dict['cellid']
                 self.pt = extHit_dict['pt']
                 self.pt = np.array([self.pt])
@@ -261,7 +257,7 @@ class CNN_PID_ECL(b2.Module):
         which was trained.
         """
 
-        model_name = f'CNNModelPidECL_charge_{self.charge}'
+        model_name = f'ECLCNNPID_charge_{self.charge}'
 
         params_model = {
             'input_shape': (1, self.image_length, self.image_length),

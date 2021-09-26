@@ -9,6 +9,12 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+"""
+.. Note::
+    The charm standard skim lists here, are for B to charm physics skims. If you are looking
+    for charm physics skims, please check :ref:`skim_physics_charm`.
+"""
+
 import modularAnalysis as ma
 
 

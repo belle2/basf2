@@ -1,0 +1,39 @@
+#!/bin/bash
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+# make sure a local basf2 installation is setup
+#if [ -z ${BELLE2_LOCAL_DIR} ]; then
+  # do nothing
+#else
+#  echo "Please setup a local basf2 installation before calling this script by sourcing b2setup"
+#  exit 1
+#fi
+
+# check for help argument
+echo $@ | grep -E -- "(^|\\s)(--help|-h)($|\\s)" &>/dev/null
+if [ $? -eq 0 ]; then
+    cat <<EOT
+This script will update GenFit locally and then push the modifications
+upstream.
+EOT
+    exit 1;
+fi
+
+TODAY=$(date +%F)
+
+# run the update
+git remote add genfit2-on-github "https://github.com/GenFit/GenFit"
+git fetch genfit2-on-github
+git checkout -b feature/update-genfit-${TODAY}
+git rm -r genfit2/code2
+git read-tree --prefix=genfit2/code2/ -u genfit2-on-github/master
+touch genfit2/code2/.imported && git add genfit2/code2/.imported
+git commit -m "Update GenFit"
+git push --set-upstream origin feature/update-genfit-${TODAY}

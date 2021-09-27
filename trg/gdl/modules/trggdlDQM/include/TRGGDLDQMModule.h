@@ -159,7 +159,7 @@ namespace Belle2 {
     static const int n_output_pure_extra = 13;
     static const char* output_pure_extra[n_output_pure_extra];
     static const int nsample_fast = 500; //number of sample for fast efficiency monitor
-    int array_psn_extra_fast[nskim_gdldqm][nsample_fast][n_output_extra]; //array to store past nsample events
+    int array_psn_extra_fast[nskim_gdldqm][nsample_fast][n_output_extra] = {0}; //array to store past nsample events
 
     //condition database for unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;

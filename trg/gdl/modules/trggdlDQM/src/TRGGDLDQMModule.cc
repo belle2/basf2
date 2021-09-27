@@ -761,7 +761,6 @@ bool TRGGDLDQMModule::anaBitCondition(void)
             B2DEBUG(20,
                     m_bitConditionToDumpVcd.substr(begin_word, word_length).c_str()
                     << "(" << fired << ")");
-            // cppcheck-suppress knownConditionTrueFalse
             if (((!not_flag && fired) || (not_flag && !fired)) && result_the_term) {
               return true;
             }

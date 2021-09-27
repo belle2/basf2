@@ -88,7 +88,7 @@ else:
     sys.exit()
 
 if phase == 3:
-    lumi = 800  # /nb/s
+    lumi = 600  # /nb/s
 elif phase == 31:
     lumi = 10.6  # /nb/s
 elif phase == 2:

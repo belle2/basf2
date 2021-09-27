@@ -8,14 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# make sure a local basf2 installation is setup
-#if [ -z ${BELLE2_LOCAL_DIR} ]; then
-  # do nothing
-#else
-#  echo "Please setup a local basf2 installation before calling this script by sourcing b2setup"
-#  exit 1
-#fi
-
 # check for help argument
 echo $@ | grep -E -- "(^|\\s)(--help|-h)($|\\s)" &>/dev/null
 if [ $? -eq 0 ]; then

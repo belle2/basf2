@@ -45,8 +45,12 @@ EOT
     exit 1;
 fi
 
-# FIXME: to be removed when PHOKHARA is moved into externals.
-EXCLUDES="-i ${SOFTWARE_DIR}/generators/phokhara"
+# ignore all the directories containing imported code
+IMPORTED_PATHS=$(find ${SOFTWARE_DIR} -type f -name '.imported' | sed -r 's|/[^/]+$||' | sort -u)
+EXCLUDES=""
+for IMPORTED_PATH in ${IMPORTED_PATHS}; do
+    EXCLUDES+=" -i ${IMPORTED_PATH}"
+done
 
 cppcheck -q --enable=all --template=gcc --std=c++17 --suppress=unusedFunction --suppress=useStlAlgorithm --inline-suppr \
          --force --relative-paths=${SOFTWARE_DIR} \

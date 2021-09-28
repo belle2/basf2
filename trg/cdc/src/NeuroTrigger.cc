@@ -18,6 +18,12 @@
 #include <string>
 #include <cmath>
 #include <TFile.h>
+#include "boost/iostreams/filter/gzip.hpp"
+#include "boost/iostreams/filtering_streambuf.hpp"
+#include "boost/iostreams/filtering_stream.hpp"
+#include "boost/multi_array.hpp"
+#define BOOST_MULTI_ARRAY_NO_GENERATORS
+
 
 
 using namespace Belle2;

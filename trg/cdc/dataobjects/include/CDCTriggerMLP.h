@@ -66,6 +66,9 @@ namespace Belle2 {
     {
       return {relevantID[2 * iSL], relevantID[2 * iSL + 1]};
     }
+    /** set and get total relevant ID range */
+    void setRelID(std::vector<float> relid) {relevantID = relid;}
+    std::vector<float> getRelID() const {return relevantID;}
     /** get flag for event time definition */
     bool getT0fromHits() const
     {
@@ -166,7 +169,7 @@ namespace Belle2 {
     bool T0fromHits;
 
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerMLP, 7);
+    ClassDef(CDCTriggerMLP, 8);
   };
 }
 #endif

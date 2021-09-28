@@ -1,0 +1,62 @@
+#ifndef CDCTRIGGERNEUROIDHISTMODULE_H
+#define CDCTRIGGERNEUROIDHISTMODULE_H
+#pragma once
+
+#include <trg/cdc/NeuroTrainer.h>
+#include <trg/cdc/NeuroTrigger.h>
+#include <framework/core/Module.h>
+namespace Belle2 {
+  /** Description
+   *
+   */
+  class CDCTriggerNeuroIDHistModule : public Module {
+  public:
+    /** Constructor, for setting module description and parameters. */
+    CDCTriggerNeuroIDHistModule();
+    /** Destructor. */
+    virtual ~CDCTriggerNeuroIDHistModule() {}
+
+    /** Initialize the module.
+     * Initialize the networks and register datastore objects.
+     */
+    virtual void initialize() override;
+
+    /** Called once for each event.
+     * Prepare input and target for each track and store it.
+     */
+    virtual void event() override;
+
+    /** Do the training for all sectors. */
+    virtual void terminate() override;
+  private:
+    /** List of input tracks. */
+    StoreArray<CDCTriggerTrack> m_tracks;
+    /** dataset for all idhist prepare data */
+    std::vector<CDCTriggerMLPData> m_trainSets_prepare;
+    /** Instance of the NeuroTrigger. */
+    NeuroTrigger m_NeuroTrigger;
+    /** Switch to rescale out of range target values or ignore them. */
+    bool m_rescaleTarget;
+    /** Number of samples to prepare input ranges. */
+    int m_nPrepare;
+    /** Cut on the hit counters to get relevant ID ranges. */
+    double m_relevantCut;
+    /** Switch to apply cut to single hit counter or to sum over counters. */
+    bool m_cutSum;
+    /** Parameters for the NeuroTrigger. */
+    NeuroTrigger::Parameters m_parameters;
+    /** base name for idhist file and config file */
+    std::string m_idHistName;
+    /** Name of the MCParticles/RecoTracks collection used as target values. */
+    std::string m_targetCollectionName;
+    /** Switch between MCParticles or RecoTracks as targets. */
+    bool m_trainOnRecoTracks;
+    std::string m_hitCollectionName;
+    /** name of the event time StoreObjPtr */
+    std::string m_inputCollectionName;
+    /** Switch between MCParticles or RecoTracks as targets. */
+
+  };
+}
+
+#endif

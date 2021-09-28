@@ -19,6 +19,7 @@
 #include <cmath>
 #include <TFile.h>
 
+
 using namespace Belle2;
 using namespace CDC;
 using namespace std;
@@ -920,7 +921,7 @@ NeuroTrigger::getInputVector(unsigned isector, const vector<unsigned>& hitIds)
     int priot = m_segmentHits[ihit]->priorityTime();
     int t = (m_hasT0) ? priot - m_T0 : 0;
     if (t < 0) {
-      t = expert.getTMax();
+      t = 0;
     } else if (t > expert.getTMax()) {
       t = expert.getTMax();
     }

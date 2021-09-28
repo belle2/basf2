@@ -7,7 +7,8 @@
  **************************************************************************/
 #ifndef NEUROTRIGGER_H
 #define NEUROTRIGGER_H
-
+#pragma once
+#include <string>
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

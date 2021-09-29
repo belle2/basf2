@@ -357,7 +357,13 @@ Returns the number of Tracks matched to the KLMCluster associated to this Partic
   REGISTER_VARIABLE("nKLMClusterECLClusterMatches", nKLMClusterECLClusterMatches, R"DOC(
                      Returns the number of ECLClusters matched to the KLMCluster associated to this Particle.
               )DOC");
-  REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance,
-                    "Returns the distance between the Track and the KLMCluster associated to this Particle. This variable returns NaN if there is no Track-to-KLMCluster relationship.");
+  REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance, R"DOC(
+Returns the distance between the Track and the KLMCluster associated to this Particle. This variable returns NaN if there is no Track-to-KLMCluster relationship.
+
+.. note::
+
+        When used over samples (data or MC) produced with release-06 or newer releases, the variable returns values
+        in cm; otherwise, over samples produced with release-05 or older releases, the variable returns values in mm.
+              )DOC");
 
 }

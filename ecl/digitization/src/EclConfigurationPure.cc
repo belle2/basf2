@@ -15,13 +15,13 @@ using namespace Belle2;
 using namespace Belle2::ECL;
 using namespace std;
 
-double EclConfigurationPure::m_tickPure = EclConfiguration::m_tick / EclConfiguration::m_ntrg * 8;
+double EclConfigurationPure::m_tickPure = -1;
 
 void EclConfigurationPure::signalsamplepure_t::InitSample(const TH1F* sampledfun, const TH1F* sampledfunDerivative)
 {
   const int N = m_ns * m_nlPure;
   double r1 = 32 / m_ns;
-  double r2 = EclConfiguration::m_tick / EclConfiguration::m_ntrg * 8  / EclConfigurationPure::m_tickPure ;
+  double r2 = EclConfiguration::getTick() / EclConfiguration::m_ntrg * 8 / getTickPure();
 
   ECLSampledShaper dsp(sampledfun, round(r1 / r2));
   dsp.fillarray(N, m_ft);
@@ -52,7 +52,7 @@ double EclConfigurationPure::signalsamplepure_t::Accumulate(const double a, cons
   // t -- signal offset
   // output parameter
   // s -- output array with added signal
-  const double itick = 1 / m_tickPure;          // reciprocal to avoid division in usec^-1 (has to be evaluated at compile time)
+  const double itick = 1 / getTickPure();          // reciprocal to avoid division in usec^-1 (has to be evaluated at compile time)
   const double  tlen = m_nlPure - 1.0 / m_ns;   // length of the sampled signal in ADC clocks units
   const double  tmax = m_tmin + m_nsmp - 1; // upper range of the fit region
 

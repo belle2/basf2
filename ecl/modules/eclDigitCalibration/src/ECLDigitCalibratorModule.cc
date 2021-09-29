@@ -103,7 +103,7 @@ ECLDigitCalibratorModule::~ECLDigitCalibratorModule()
 void ECLDigitCalibratorModule::initializeCalibration()
 {
 
-  m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::m_rf) *
+  m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::getRF()) *
                        1e3;  // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz. Same for all crystals.
   m_pureCsIEnergyCalib = 0.00005; //conversion factor from ADC counts to GeV
   m_pureCsITimeCalib = 0.1; //conversion factor from eclPureCsIDigitizer to ns

@@ -23,12 +23,29 @@ namespace Belle2 {
       static constexpr int    m_nsmp     = EclConfiguration::m_nsmp; /**< number of ADC measurements for signal fitting */
       static constexpr double m_tmin     = -15; /**<  lower range of the signal fitting region in ADC clocks */
       static constexpr int    m_ntrg     = EclConfiguration::m_ntrg; /**< number of trigger counts per ADC clock tick */
-      static double           m_tickPure;
       static constexpr int    m_nlPure   = EclConfiguration::m_nl * 15; /**< length of samples signal in number of ADC clocks */
       static constexpr int    m_ns       = EclConfiguration::m_ns; /**< number of samples per ADC clock */
 
       static constexpr int    m_ndtPure  = m_ns; /**< number of points per ADC tick where signal fit procedure parameters are evaluated */
 
+    private:
+      /** Digitization tick for pure CsI calorimeter (microseconds) */
+      static double m_tickPure;
+
+    public:
+      /** Getter for m_tickPure */
+      static double getTickPure()
+      {
+        if (m_tickPure < 0) {
+          m_tickPure = EclConfiguration::getTick() / EclConfiguration::m_ntrg * 8;
+        }
+        return m_tickPure;
+      }
+      /** Setter for m_tickPure */
+      static void setTickPure(double newval)
+      {
+        m_tickPure = newval;
+      }
 
       /** a struct for a signal sample for the pure CsI calorimeter */
       struct signalsamplepure_t {

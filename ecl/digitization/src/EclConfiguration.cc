@@ -7,6 +7,8 @@
  **************************************************************************/
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/digitization/shaperdsp.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 #include <vector>
 #include <cmath>
 
@@ -19,8 +21,26 @@ using namespace std;
 // how to use these values by clang.
 // http://stackoverflow.com/questions/28264279/undefined-reference-when-accessing-static-constexpr-float-member
 constexpr double EclConfiguration::s_clock;
-constexpr double EclConfiguration::m_rf;
 constexpr double EclConfiguration::m_step;
+double EclConfiguration::m_rf = -1;
+double EclConfiguration::m_tick = -1;
+
+double EclConfiguration::getRF()
+{
+  /**< RF clock, www-linac.kek.jp/linac-com/report/skb-tdr/, ch. 6 */
+  double m_rf_default = 508.876;
+  if (m_rf < 0) {
+    m_rf = m_rf_default;
+    DBObjPtr<Belle2::HardwareClockSettings> clock_info("HardwareClockSettings");
+    m_rf = clock_info->getAcceleratorRF();
+  }
+  return m_rf;
+}
+
+double EclConfiguration::getTick()
+{
+  return 24.*12. / 508.876; // getRF();
+}
 
 void EclConfiguration::signalsample_t::InitSample(const double* MPd, double u)
 {
@@ -55,7 +75,7 @@ double EclConfiguration::signalsample_t::Accumulate(const double a, const double
   // t -- signal offset
   // output parameter
   // s -- output array with added signal
-  const double itick = m_rf / s_clock;  // reciprocal to avoid division in usec^-1 (has to be evaluated at compile time)
+  const double itick = getRF() / s_clock;  // reciprocal to avoid division in usec^-1 (has to be evaluated at compile time)
   const double  tlen = m_nl - 1.0 / m_ns;   // length of the sampled signal in ADC clocks units
   const double  tmax = m_tmin + m_nsmp - 1; // upper range of the fit region
 

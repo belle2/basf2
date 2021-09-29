@@ -240,7 +240,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   // Conversion coefficient from ADC ticks to nanoseconds
   // TICKS_TO_NS ~ 0.4931 ns/clock tick
   // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz.
-  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::m_rf) * 1e3;
+  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
 
 
   vector<float> Crate_time_ns(52, 0.0); /**< vector derived from DB object */

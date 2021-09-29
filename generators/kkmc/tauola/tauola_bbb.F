@@ -4051,6 +4051,7 @@ c
         IF (PRNTNU.EQ.1.AND.ABS(IDHEP(I)).eq.16)
      +   WRITE (6,'(''Mass(P4(nutau)) = '',F14.7,'' MeV'')') MS*1000.0
         CALL PYNAME(IDHEP(I),CHAP)
+        IF (IDHEP(I).EQ.53) CHAP = 'hl'
         IF (IFL.EQ.0) THEN
           WRITE (6,'(2I6,I8,1X,A10,1X,4I6,6(1X,F10.5))')
      +      I, ISTHEP(I), IDHEP(I), CHAP(1:10),

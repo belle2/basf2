@@ -45,8 +45,11 @@ EOT
     exit 1;
 fi
 
-# FIXME: to be removed when PHOKHARA is moved into externals.
-EXCLUDES="-i ${SOFTWARE_DIR}/generators/phokhara"
+# All the directories containing imported code should be listed here
+EXCLUDES="-i ${SOFTWARE_DIR}/generators/babayaganlo
+          -i ${SOFTWARE_DIR}/generators/kkmc/photospp
+          -i ${SOFTWARE_DIR}/generators/phokhara
+          -i ${SOFTWARE_DIR}/generators/teegg"          
 
 cppcheck -q --enable=all --template=gcc --std=c++17 --suppress=unusedFunction --suppress=useStlAlgorithm --inline-suppr \
          --force --relative-paths=${SOFTWARE_DIR} \

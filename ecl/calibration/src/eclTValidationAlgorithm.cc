@@ -121,8 +121,8 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
   TFile* histfile = 0;
 
-  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz.
-     Same for all crystals.  Proper accurate value*/
+  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency.
+     Same for all crystals. */
   const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
 
   // Vector of time offsets to track how far from nominal the cluster times are.

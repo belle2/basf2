@@ -67,7 +67,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
                      target='qrCombined', overwrite=False,
                      transform_to_probability=False, signal_fraction=-1.0, classifier_args=None,
                      train_valid_fraction=.92, mva_steering_file='analysis/scripts/dft/tensorflow_dnn_interface.py',
-                     maskName='',
+                     maskName='all',
                      path=None):
     """
     Interfacing for the DeepFlavorTagger. This function can be used for training (``teacher``), preparation of

@@ -557,7 +557,7 @@ def setVariables():
         variables['MaximumPstar'].append('distance')
 
 
-def FillParticleLists(mode='Expert', maskName='', path=None):
+def FillParticleLists(mode='Expert', maskName='all', path=None):
     """
     Fills the particle Lists for all categories.
     """
@@ -1053,7 +1053,7 @@ def flavorTagger(
         'FSC',
         'MaximumPstar',
         'KaonPion'],
-    maskName='',
+    maskName='all',
     saveCategoriesInfo=True,
     useOnlyLocalWeightFiles=False,
     downloadFromDatabaseIfNotFound=False,

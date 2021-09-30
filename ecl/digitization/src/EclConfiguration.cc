@@ -27,10 +27,9 @@ double EclConfiguration::m_tick = -1;
 
 double EclConfiguration::getRF()
 {
-  /**< RF clock, www-linac.kek.jp/linac-com/report/skb-tdr/, ch. 6 */
-  double m_rf_default = 508.876;
+  /**< Default RF value is 508.876 MHz,
+   *   see www-linac.kek.jp/linac-com/report/skb-tdr/, ch. 6 */
   if (m_rf < 0) {
-    m_rf = m_rf_default;
     DBObjPtr<Belle2::HardwareClockSettings> clock_info("HardwareClockSettings");
     m_rf = clock_info->getAcceleratorRF();
   }

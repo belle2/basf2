@@ -29,6 +29,7 @@ main.add_module(eventinfosetter)
 
 particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [11, -11])
+particlegun.param('pdgCodes', [11, -11, 13, -13])
 particlegun.param('nTracks', 1)
 particlegun.param('momentumGeneration', 'uniformPt')
 particlegun.param('momentumParams', [0.2, 5.0])
@@ -41,9 +42,7 @@ particlegun.param('yVertexParams', [0, 0])
 particlegun.param('zVertexParams', [-20.0, 20.0])
 main.add_module(particlegun)
 
-# trigger simulation is included in add_simulation
 add_simulation(main)
-
 
 # output
 rootoutput = b2.register_module('RootOutput')
@@ -51,6 +50,9 @@ rootoutput.param('outputFileName', "../TRGValidationGen.root")
 main.add_module(
     rootoutput,
     branchNames=[
+        "TRGKLMHits",
+        "TRGKLMTracks",
+        "KLMTrgSummary",
         "TRGCDC2DFinderTracks",
         "TRGCDC3DFitterTracks",
         "TRGCDCNeuroTracks",

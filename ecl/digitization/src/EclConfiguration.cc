@@ -39,7 +39,7 @@ double EclConfiguration::getRF()
 
 double EclConfiguration::getTick()
 {
-  return 24.*12. / 508.876; // getRF();
+  return 24.*12. / getRF();
 }
 
 void EclConfiguration::signalsample_t::InitSample(const double* MPd, double u)

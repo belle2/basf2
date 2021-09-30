@@ -24,7 +24,7 @@ Changes since release-05
    The modules ``HepMCInput``, ``HepevtInput`` and ``LHEInput`` do not anymore boost the ``MCParticles``, and the
    paramater ``boost2Lab`` is now removed from the modules. These modules can not read the ``BeamParameters``
    payloads from the conditions database, so having the particles boosted correctly and in a reproducible way was
-   untrivial.
+   non-trivial.
    A new module, ``BoostMCParticles``, is added for boosting into the laboratory frame the ``MCParticles`` using the
    information stored in the conditions database. The module must be appended to the steering path just after the
    ``HepMCInput``, ``HepevtInput`` or ``LHEInput`` module and before running the detector simulation.

@@ -28,7 +28,7 @@ eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 particlegun = b2.register_module('ParticleGun')
-particlegun.param('pdgCodes', [11, -11])
+particlegun.param('pdgCodes', [11, -11, 13, -13])
 particlegun.param('nTracks', 1)
 particlegun.param('momentumGeneration', 'uniformPt')
 particlegun.param('momentumParams', [0.2, 5.0])
@@ -43,19 +43,20 @@ main.add_module(particlegun)
 
 add_simulation(main)
 
-# add trigger
-add_trigger_simulation(main, components=["CDC", "ECL", "KLM", "GRL", "GDL"])
-
 # output
 rootoutput = b2.register_module('RootOutput')
 rootoutput.param('outputFileName', "../TRGValidationGen.root")
 main.add_module(
     rootoutput,
     branchNames=[
+        "TRGKLMHits",
+        "TRGKLMTracks",
+        "KLMTrgSummary",
         "TRGCDC2DFinderTracks",
         "TRGCDC3DFitterTracks",
         "TRGCDCNeuroTracks",
         "TRGECLClusters",
+        "TRGSummary",
         "MCParticles"])
 
 # main

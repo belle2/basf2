@@ -19,6 +19,18 @@ Changes since release-05
 
 .. only:: not light
 
+   .. rubric:: ``HepMCInput``, ``HepevtInput`` and ``LHEInput`` modules do not anymore boost the ``MCParticles``
+
+   The modules ``HepMCInput``, ``HepevtInput`` and ``LHEInput`` do not anymore boost the ``MCParticles``, and the
+   paramater ``boost2Lab`` is now removed from the modules. These modules can not read the ``BeamParameters``
+   payloads from the conditions database, so having the particles boosted correctly and in a reproducible way was
+   non-trivial.
+   A new module, ``BoostMCParticles``, is added for boosting into the laboratory frame the ``MCParticles`` using the
+   information stored in the conditions database. The module must be appended to the steering path just after the
+   ``HepMCInput``, ``HepevtInput`` or ``LHEInput`` module and before running the detector simulation.
+
+.. only:: not light
+
    .. rubric:: The jitter of the L1 trigger is included in the standard simulation
 
    The L1 trigger jitter is randomly extracted from a double gaussian whose parameters have been tuned with 2020 data.
@@ -29,9 +41,11 @@ Changes since release-05
 
    .. rubric:: The L1 trigger simulation is included in :py:func:`simulation.add_simulation`
 
-   The L1 trigger simulation (``tsim``) is now executed in the standard simulation: before SVD and PXD simulation but after the simulation of the rest of the subdetectors. For this reason, the python function ``add_tsim()`` is deprecated. If you already have a ``add_simulation`` in your path, you already get L1 trigger simulation.
-    If you do not have ``add_simulation``, and you need the L1 trigger simulation,\
-    please use :py:func:`L1trigger.add_trigger_simulation`.
+   The L1 trigger simulation (``tsim``) is now executed in the standard simulation: before SVD and PXD simulation but
+   after the simulation of the rest of the subdetectors. For this reason, the python function ``add_tsim()`` is
+   deprecated. If you already have a ``add_simulation`` in your path, you already get L1 trigger simulation.
+   If you do not have ``add_simulation``, and you need the L1 trigger simulation, please use
+   :py:func:`L1trigger.add_trigger_simulation`.
 
 
 .. only:: not light

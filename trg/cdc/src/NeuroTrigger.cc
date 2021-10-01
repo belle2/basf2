@@ -467,17 +467,19 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
       m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
       m_hasT0 = true;
     } else {
-      m_T0 = 9999;
-      // find shortest time of related and relevant axial hits
-      RelationVector<CDCTriggerSegmentHit> Hits =
-        track.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
-      m_T0 = getLowestTime(isector, Hits, false);
-      if (m_T0 < 9999) {
-        m_hasT0 = true;
-      } else {
-        m_T0 = 0;
-        m_hasT0 = false;
-      }
+      getEventTime(isector, track, "fastestpriority", neuroinputmode);
+      /**
+           m_T0 = 9999;
+           // find shortest time of related and relevant axial hits
+           RelationVector<CDCTriggerSegmentHit> Hits =
+             track.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
+           m_T0 = getLowestTime(isector, Hits, false);
+           if (m_T0 < 9999) {
+             m_hasT0 = true;
+           } else {
+             m_T0 = 0;
+             m_hasT0 = false;
+           }*/
     }
   } else if (et_option == "etf_or_fastest2d") {
     bool hasT0 = (m_eventTime.isValid()) ? m_eventTime->hasBinnedEventT0(Const::CDC) : false;
@@ -485,17 +487,19 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
       m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
       m_hasT0 = true;
     } else {
+      getEventTime(isector, track, "fastest2d", neuroinputmode);
+      /**
       m_T0 = 9999;
       // find shortest time of related and relevant axial hits
       RelationVector<CDCTriggerSegmentHit> Hits =
-        track.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
+       track.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
       m_T0 = getLowestTime(isector, Hits, true);
       if (m_T0 < 9999) {
-        m_hasT0 = true;
+       m_hasT0 = true;
       } else {
-        m_T0 = 0;
-        m_hasT0 = false;
-      }
+       m_T0 = 0;
+       m_hasT0 = false;
+      }*/
     }
   } else if (et_option == "etf_or_zero") {
     bool hasT0 = (m_eventTime.isValid()) ? m_eventTime->hasBinnedEventT0(Const::CDC) : false;
@@ -505,6 +509,48 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
     } else {
       m_hasT0 = true;
       m_T0 = 0;
+    }
+  } else if (et_option == "etfcc") {
+    if (!neuroinputmode) {
+      B2ERROR("cannot use 'etfcc' timing option without hw tracks!");
+    } else {
+      if (track.getHasETFTime()) {
+        m_T0 = track.getETF_unpacked();
+        m_hasT0 = true;
+      } else {
+        m_T0 = 0;
+        m_hasT0 = false;
+      }
+    }
+  } else if (et_option == "etfcc_or_zero") {
+    if (!neuroinputmode) {
+      B2ERROR("cannot use 'etfcc' timing option without hw tracks!");
+    } else {
+      if (track.getHasETFTime()) {
+        m_T0 = track.getETF_unpacked();
+        m_hasT0 = true;
+      } else {
+        m_T0 = 0;
+        m_hasT0 = true;
+      }
+    }
+  } else if (et_option == "etfcc_or_fastestpriority") {
+    if (!neuroinputmode) {
+      B2ERROR("cannot use 'etfcc' timing option without hw tracks!");
+    } else {
+      if (track.getHasETFTime()) {
+        m_T0 = track.getETF_unpacked();
+        m_hasT0 = true;
+      } else {
+        getEventTime(isector, track, "fastestpriority", neuroinputmode);
+      }
+    }
+  } else if (et_option == "etfhwin") {
+    if (!neuroinputmode) {
+      B2ERROR("cannot use 'etfcc' timing option without hw tracks!");
+    } else {
+      m_T0 = track.getETF_recalced();
+      m_hasT0 = true;
     }
   } else {
     B2ERROR("No valid parameter for et_option (" << et_option << " )!");

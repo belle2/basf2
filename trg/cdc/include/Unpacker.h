@@ -300,7 +300,6 @@ namespace Belle2 {
           data = "";
         }
 
-        // std::cout << "new datafield: " << b2line.name << ": " << b2line.start << ", " << b2line.end << ", " << data << std::endl;
 
         name = b2line.name;
       }
@@ -392,6 +391,51 @@ namespace Belle2 {
       // thus the signed bit is preserved (when right-shifting)
       int signal_out = (int16_t (signal_bit.to_ulong() << shift)) >> shift;
       return signal_out;
+    }
+    /** function to recalculate the event t0 used in the hardware neurotrigger
+     * by using the priority times from the track segments and subtracting the relative
+     * time from the hw network input vector.
+     */
+    int recalcETF(std::string driftinput, std::vector<unsigned> tsvector, CDCTriggerTrack* track)
+    {
+      //scale factor to get a value between -1 and 1
+      float scale = 1. / (1 << (driftinput.size() - 1) / 9);
+      int ret = 0;
+      bool stor = false;
+      // make a table, with <possible etf, how often it was calculated
+      // it is possible there are different event t0 used, if some value
+      // in the hw is kept longer than it should be
+      std::vector<std::vector<int>> table;
+      for (unsigned iSL = 0; iSL < 9; ++iSL) {
+        // getting the relative drift time in clock cycles (1cc ~ 2ns)
+        int reldt = static_cast<int>(fabs((mlp_bin_to_signed_int(driftinput.substr((8 - iSL) * driftinput.size() / 9,
+                                                                 driftinput.size() / 9)) * scale * 256)));
+        int  tstime = static_cast<int>(tsvector[iSL]);
+        // we do not want SLs with no LR info or pts outside of the time window
+        if (reldt != 0 && reldt < 255) {
+          for (std::vector<int>& x : table) {
+            stor = false;
+            if (x[0] == tstime - reldt) {
+              x[1]++;
+              stor = true;
+            }
+          }
+          if (!stor) {table.push_back({tstime - reldt, 1});}
+        }
+
+      }
+      // now get the event t0 recalculated most often and return it in the end
+      int maxi = 0;
+      for (std::vector<int>& x : table) {
+        if (x[1] > maxi) {
+          ret = x[0];
+          maxi = x[1];
+        }
+      }
+      // if there is a "wrong" input in the hardware values, the corresponding error bit is set
+      if (table.size() > 1) {track->setQualityVector(128);}
+      return ret;
+
     }
 
     /**
@@ -1270,14 +1314,13 @@ namespace Belle2 {
           }
           B2DEBUG(21, padright("      2DCC: " + std::to_string(std::stoi(p_2dcc.data, 0, 2)) + ", (" + p_2dcc.data + ")", 100));
           B2DEBUG(21, padright("      ETFCC: " + std::to_string(std::stoi(p_etfcc.data, 0, 2)) + ", (" + p_etfcc.data + ")", 100));
-          B2DEBUG(22, padright("      ETFVAL: " + std::to_string(std::stoi(p_etfval.data, 0, 2)) + ", (" + p_etfval.data + ")", 100));
-          B2DEBUG(22, padright("      ETFT0: " + std::to_string(std::stoi(p_etftime.data, 0, 2)) + ", (" + p_etftime.data + ")", 100));
-          B2DEBUG(22, padright("      ETFQuality: " + std::to_string(std::stoi(p_etfqual.data, 0, 2)) + ", (" + p_etfqual.data + ")", 100));
+          B2DEBUG(21, padright("      ETFVAL: " + std::to_string(std::stoi(p_etfval.data, 0, 2)) + ", (" + p_etfval.data + ")", 100));
+          B2DEBUG(21, padright("      ETFT0: " + std::to_string(std::stoi(p_etftime.data, 0, 2)) + ", (" + p_etftime.data + ")", 100));
+          B2DEBUG(21, padright("      ETFQuality: " + std::to_string(std::stoi(p_etfqual.data, 0, 2)) + ", (" + p_etfqual.data + ")", 100));
           bool hasETFTime = false;
           if (p_nnenable.data == "1") {
             if (p_etfval.data == "1") {
               storeETFTime->addBinnedEventT0(std::stoi(p_etftime.data, 0, 2), Const::CDC);
-              //storeETFTime->addBinnedEventT0(0, Const::CDC);
               hasETFTime = true;
             }
             std::vector<bool> foundoldtrack{false};
@@ -1352,11 +1395,13 @@ namespace Belle2 {
               double omega = track2D->getOmega();
 
               std::vector<unsigned> tsvector(9, 0);
+              std::vector<unsigned> tstimevector(9, 0);
               tsstr = "";
               // turns false, as soon as there is a ts, which is not contained in the 2dfindertrack
               bool isin2d = true;
               for (unsigned iSL = 0; iSL < 9; ++iSL) {
                 tsvector[iSL] = trkNN.ts[iSL][3];
+                tstimevector[iSL] = trkNN.ts[iSL][1];
                 if (trkNN.ts[iSL][3] > 0) {
                   unsigned iTS = TSIDInSL(trkNN.ts[iSL][0], iSL, iTracker);
                   tsstr += "(SL" + std::to_string(iSL) + ", " + std::to_string(iTS) + ", " + std::to_string(trkNN.ts[iSL][1]) + ", " + std::to_string(
@@ -1386,7 +1431,8 @@ namespace Belle2 {
               trackNN->setRawPhi0(track2D->getRawPhi0());
               trackNN->setRawTheta(trkNN.hwTheta);
               trackNN->setRawZ(trkNN.hwZ);
-
+              if (hasETFTime) {trackNN->setETF_unpacked(std::stoi(p_etftime.data, 0, 2));}
+              trackNN->setETF_recalced(recalcETF(p_mlpin_drifttime.data, tstimevector, trackNN));
 
               if (isin2d == false) {
                 trackNN->setQualityVector(1);

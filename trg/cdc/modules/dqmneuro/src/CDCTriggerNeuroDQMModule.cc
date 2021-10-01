@@ -2999,11 +2999,7 @@ void CDCTriggerNeuroDQMModule::event()
              6) + "," + padto(strz.str(), 6) + "),(x," + padto(hwomega.str(), 3) + "," + padto(hwphi.str(), 3) + "," + padto(hwtheta.str(),
                  3) + "," + padto(hwz.str(), 3) + ")";
       B2DEBUG(15, padright(trs, 100));
-      std::string infostr = "     ETF vld:";
-      infostr += std::to_string(m_eventTime.isValid());
-      infostr += ", ETFT0: ";
-      infostr += std::to_string(m_eventTime->getBinnedEventT0(Const::CDC));
-      infostr += ", Found old track: ( ";
+      std::string infostr = ", Found old track: ( ";
       for (bool x : ltrack.getFoundOldTrack()) {
         infostr += std::to_string(x);
       }
@@ -3016,6 +3012,15 @@ void CDCTriggerNeuroDQMModule::event()
       infostr += ")";
       infostr += (ltrack.getValidStereoBit()) ? " valid" : " NOT valid";
       B2DEBUG(15, padright(infostr, 100));
+      std::string infostr2 = "     std. ETF vld:";
+      infostr2 += std::to_string(m_eventTime.isValid());
+      infostr2 += ", ETFT0: ";
+      infostr2 += std::to_string(m_eventTime->getBinnedEventT0(Const::CDC));
+      infostr2 += ", ETF in CC: ";
+      infostr2 += std::to_string(ltrack.getETF_unpacked());
+      infostr2 += ", ETF recalculated: ";
+      infostr2 += std::to_string(ltrack.getETF_recalced());
+      B2DEBUG(15, padright(infostr2, 100));
       std::string info2str = "      Expert Network Number: " + std::to_string(ltrack.getExpert());
       info2str += ", TSVector: (";
       for (unsigned x : ltrack.getTSVector()) {

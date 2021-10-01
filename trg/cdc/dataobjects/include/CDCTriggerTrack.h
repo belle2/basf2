@@ -86,7 +86,9 @@ namespace Belle2 {
       m_valstereobit(valstereobit),
       m_expert(expert),
       m_tsvector(tsvector),
-      m_qualityvector(qualityvector) { }
+      m_qualityvector(qualityvector),
+      m_etf_unpacked(0),
+      m_etf_recalced(0) { }
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerTrack() { }
 
@@ -136,6 +138,11 @@ namespace Belle2 {
     unsigned getQualityVector() const {return m_qualityvector;}
     void setHasETFTime(bool x) {m_hasETFTime = x;}
     bool getHasETFTime() const {return m_hasETFTime;}
+    /** getter and setter functions for etf timing */
+    int getETF_unpacked() const {return m_etf_unpacked;}
+    int getETF_recalced() const {return m_etf_recalced;}
+    void setETF_unpacked(int x) {m_etf_unpacked = x;}
+    void setETF_recalced(int x) {m_etf_recalced = x;}
     /** setter and getter functions for raw track values */
     void setRawPhi0(const int phi0)
     {
@@ -159,6 +166,10 @@ namespace Belle2 {
     int getRawTheta() const {return m_rawtheta;}
 
   protected:
+    /** unpacked etf time from the unpacker */
+    int m_etf_unpacked;
+    /** etf time recalculated from the hw input */
+    int m_etf_recalced;
     /** chi2 value from 2D fitter */
     float m_chi2D;
     /** chi2 value from 3D fitter */
@@ -186,6 +197,8 @@ namespace Belle2 {
      * 2^4 : 1 if dt in hw/hwsim is 0 and in hwsim/hw is 1; 0 otherwise.
      * 2^5 : 1 if all inputs in hw are 0 but at least 1 is filled in hwsim; 0 otherwise.
      * 2^6 : 1 if all inputs in hwsim are 0 but at least 1 is filled in hw; 0 otherwise.
+     * 2^7 : 1 if more than 1 etf time was recalculated from hw. this indicates, that an old input
+     *       from a previous track was used in the network.
      */
     unsigned m_qualityvector;
     bool m_hasETFTime{0};
@@ -195,7 +208,7 @@ namespace Belle2 {
     int m_rawz{0};
     int m_rawtheta{0};
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerTrack, 10);
+    ClassDef(CDCTriggerTrack, 11);
 
   };
 }

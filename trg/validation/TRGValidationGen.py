@@ -28,7 +28,6 @@ eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 particlegun = b2.register_module('ParticleGun')
-particlegun.param('pdgCodes', [11, -11])
 particlegun.param('pdgCodes', [11, -11, 13, -13])
 particlegun.param('nTracks', 1)
 particlegun.param('momentumGeneration', 'uniformPt')

@@ -170,7 +170,7 @@ class nntd(basf2.Module):
             try:
                 hwneuro = reco.getRelatedTo(self.hwneurotracksname)
             except BaseException:
-                neuro = None
+                hwneuro = None
             try:
                 twod = reco.getRelatedTo(self.twodtracksname)
             except BaseException:
@@ -189,6 +189,10 @@ class nntd(basf2.Module):
             event.append([])
             try:
                 twod = reco.getRelatedTo(self.twodtracksname)
+            except BaseException:
+                twod = None
+            try:
+                hwneuro = neuro.getRelatedTo(self.hwneurotracksname)
             except BaseException:
                 twod = None
             event[-1] += self.getrecovals(None)

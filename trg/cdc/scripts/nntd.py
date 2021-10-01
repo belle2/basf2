@@ -30,6 +30,18 @@ class nntd(basf2.Module):
     varnum["twodphi"] = [16, r'$\phi_{2D}$', r'$[°]$']
     varnum["twodpt"] = [17, r'$P_{t, 2D}$', r'$[GeV]$']
     varnum["twodfot"] = [18, r'FoundOldTrack', '']
+    varnum["hwneuroz"] = [4, r'$Z_{HWNeuro}$', r'$[cm]$']
+    varnum["hwneurotheta"] = [5, r'$\theta_{HWNeuro}$', r'$[°]$']
+    varnum["hwneurophi"] = [6, r'$\phi_{HWNeuro}$', r'$[°]$']
+    varnum["hwneuropt"] = [7, r'$P_{t, HWNeuro}$', r'$[GeV]$']
+    varnum["hwNeuroval"] = [8, r'Validity', '']
+    varnum["hwNeuroqual"] = [9, r'Quality', '']
+    varnum["hwNeurots"] = [10, r'TSVector', '']
+    varnum["hwNeuroexp"] = [11, r'Expert Number', '']
+    varnum["hwNeurodriftth"] = [12, r'Driftthreshold', '']
+    varnum["hwNeuroquad"] = [13, r'Quadrant', '']
+    varnum["hwNeurofp"] = [14, r'Fastestpriority Eventtime', 'clocks']
+    varnum["hwNeuroetf"] = [15, r'ETF Eventtime', 'clocks']
     nonelist = [None for i in range(17)]
 
     def initialize(self):
@@ -45,6 +57,7 @@ class nntd(basf2.Module):
         # self.plotdict = {}
         self.recotracksname = "RecoTracks"  # recotracksname
         self.neurotracksname = "TSimNeuroTracks"  # "TRGCDCNeuroTracks"  # neurotracksname
+        self.hwneurotracksname = "CDCTriggerNeuroTracks"  # "TRGCDCNeuroTracks"  # neurotracksname
         self.twodtracksname = "CDCTriggerNNInput2DFinderTracks"  # "TRGCDC2DFinderTracks"  # twodtracksname
         self.etfname = "CDCTriggerNeuroETFT0"
         self.tsname = "CDCTriggerNNInputSegmentHits"
@@ -52,6 +65,7 @@ class nntd(basf2.Module):
         # storearrays
         self.recotracks = Belle2.PyStoreArray(self.recotracksname)
         self.neurotracks = Belle2.PyStoreArray(self.neurotracksname)
+        self.hwneurotracks = Belle2.PyStoreArray(self.hwneurotracksname)
         self.twodtracks = Belle2.PyStoreArray(self.twodtracksname)
         self.ts = Belle2.PyStoreArray(self.tsname)
         self.etf = Belle2.PyStoreObj(self.etfname)
@@ -149,12 +163,17 @@ class nntd(basf2.Module):
             except BaseException:
                 neuro = None
             try:
+                hwneuro = reco.getRelatedTo(self.hwneurotracksname)
+            except BaseException:
+                neuro = None
+            try:
                 twod = reco.getRelatedTo(self.twodtracksname)
             except BaseException:
                 twod = None
             event[-1] += self.getrecovals(fitres)
             event[-1] += self.getneurovals(neuro)
             event[-1] += self.gettwodvals(twod)
+            event[-1] += self.getneurovals(hwneuro)
         for neuro in self.neurotracks:
             # print("neuroloop")
             # print(len(neuro.getRelationsFrom(self.recotracksname)))
@@ -170,6 +189,7 @@ class nntd(basf2.Module):
             event[-1] += self.getrecovals(None)
             event[-1] += self.getneurovals(neuro)
             event[-1] += self.gettwodvals(twod)
+            event[-1] += self.getneurovals(hwneuro)
         for twod in self.twodtracks:
             # print("twodloop")
             # print(len(twod.getRelationsFrom(self.neurotracksname)))
@@ -181,13 +201,14 @@ class nntd(basf2.Module):
             event[-1] += self.getrecovals(None)
             event[-1] += self.getneurovals(None)
             event[-1] += self.gettwodvals(twod)
+            event[-1] += self.getneurovals(None)
 
         # attach an array for every event
-        if len(event) > 20:
-            event = event[0:20]
-        elif len(event) < 20:
-            for i in range(20 - len(event)):
-                event.append(self.getrecovals(None) + self.getneurovals(None) + self.gettwodvals(None))
+        if len(event) > 100:
+            event = event[0:100]
+        elif len(event) < 100:
+            for i in range(100 - len(event)):
+                event.append(self.getrecovals(None) + self.getneurovals(None) + self.gettwodvals(None) + self.getneurovals(None))
         self.eventlist.append(event)
 
     def terminate(self):

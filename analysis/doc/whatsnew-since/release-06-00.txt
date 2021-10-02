@@ -18,6 +18,7 @@ Variables
    Similarly to the ParticleLoader's ``all`` particle lists, this name is reserved, user cannot create a mask with this name. 
    If ``maskName`` argument is not specified in the ROE-related metavariables, it will default to ``all`` automatically, 
    but in case of metavariables with many arguments user will be required to call it explicitly, e.g. ``nROE_Charged(all, 321)``. 
+ * Added ``nRemovedHits`` which returns the number of track hits removed in V0Finder.
 
 
 Modules

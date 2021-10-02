@@ -134,6 +134,11 @@ namespace Belle2 {
     double trackNECLClusters(const Particle* part);
 
     /**
+     * returns the number of track hits removed in V0Finder
+     */
+    double trackNRemovedHits(const Particle* part);
+
+    /**
      * returns the number of CDC hits in the event not assigned to any track
      */
     double nExtraCDCHits(const Particle*);

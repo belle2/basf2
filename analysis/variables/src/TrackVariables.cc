@@ -248,6 +248,19 @@ namespace Belle2 {
       return count;
     }
 
+    double trackNRemovedHits(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) return realNaN;
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(
+                                         part->getPDGCode())));
+      double nHitsBeforeRemoval = trackFit->getHitPatternCDC().getNHits()
+                                  + trackFit->getHitPatternVXD().getNSVDHits()
+                                  + trackFit->getHitPatternVXD().getNPXDHits();
+      double nHitsAfterRemoval = trackNVXDHits(part) + trackNCDCHits(part);
+      return nHitsBeforeRemoval - nHitsAfterRemoval;
+    }
+
     // used in trackHelixExtTheta and trackHelixExtPhi
     TVector3 getPositionOnHelix(const Particle* part, const std::vector<double>& pars)
     {
@@ -667,6 +680,8 @@ always 0 or 1 with newer versions of ECL reconstruction.
 
 Returns NaN if called for something other than a track-based particle.
     )DOC");
+    REGISTER_VARIABLE("nRemovedHits", trackNRemovedHits,
+                      "The number of track hits removed in V0Finder. Returns NaN if called for something other than a track-based particle.");
     REGISTER_VARIABLE("helixExtTheta", trackHelixExtTheta,
                       "Returns theta of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)");
     REGISTER_VARIABLE("helixExtPhi", trackHelixExtPhi,

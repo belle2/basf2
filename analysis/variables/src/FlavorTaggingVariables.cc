@@ -63,7 +63,6 @@ namespace Belle2 {
 
       const auto& roeChargedParticles = roe->getChargedParticles();
       for (auto roeChargedParticle : roeChargedParticles) {
-        if (not roeChargedParticle->isMostLikely()) continue;
         roeCMSVec += labToCms(roeChargedParticle->get4Vector());
       }
 
@@ -85,12 +84,10 @@ namespace Belle2 {
       for (auto& roeChargedParticle : roeTracks) {
         // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
         // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
-        if (roeChargedParticle->isMostLikely()) {
-          TLorentzVector p_cms = labToCms(roeChargedParticle->get4Vector());
-          if (p_cms != p_cms) continue;
-          if (p_cms.Rho() > P_MAX) continue;
-          p3_cms_roe.push_back(p_cms.Vect());
-        }
+        TLorentzVector p_cms = labToCms(roeChargedParticle->get4Vector());
+        if (p_cms != p_cms) continue;
+        if (p_cms.Rho() > P_MAX) continue;
+        p3_cms_roe.push_back(p_cms.Vect());
       }
 
       // ECLCluster -> Gamma
@@ -191,7 +188,6 @@ namespace Belle2 {
 
       for (const auto& track : roe->getChargedParticles()) {
         if (part->isCopyOf(track, true)) continue;
-        if (!track->isMostLikely()) continue;
         sum += track->getMomentum().Perp2();
       }
 

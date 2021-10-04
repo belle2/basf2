@@ -6,7 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <framework/utilities/GeneralCut.h>
-#include <framework/utilities/TestHelpers.h>
 #include <gtest/gtest.h>
 
 using namespace Belle2;
@@ -60,16 +59,6 @@ namespace {
       } else {
         return nullptr;
       }
-    }
-
-    Var* getVariable(const std::string& functionName, const std::vector<std::string>& functionArguments)
-    {
-      if (functionName == "mocking_variable") {
-        return &m_mocking_variable;
-      } else {
-        return nullptr;
-      }
-
     }
 
     /// The only variable we have in this test.
@@ -200,12 +189,12 @@ namespace {
     a = MockGeneralCut::compile("15 == 0xF");
     EXPECT_TRUE(a->check(&testObject));
 
-    // Should trigger B2FATAL
-    EXPECT_B2FATAL(a = MockGeneralCut::compile("15 == 15.0 bla"));
-    // Should throw runtime error
+    // Should throw an exception
+    EXPECT_THROW(a = MockGeneralCut::compile("15 == 15.0 bla"), std::runtime_error);
+    EXPECT_TRUE(a->check(&testObject));
     EXPECT_THROW(a = MockGeneralCut::compile("15 == other_var"), std::runtime_error);
-
-    a = MockGeneralCut::compile("infinity == 15e1000");
+    EXPECT_TRUE(a->check(&testObject));
+    EXPECT_THROW(a = MockGeneralCut::compile("15 == 15e1000"), std::out_of_range);
     EXPECT_TRUE(a->check(&testObject));
 
     a = MockGeneralCut::compile("1e-3 < 1e3");
@@ -233,7 +222,7 @@ namespace {
     a = MockGeneralCut::compile("3.1415926535897931234567890 == 3.1415926535897931234567891");
     EXPECT_TRUE(a->check(&testObject));
 
-    a = MockGeneralCut::compile("3141592653589. != 3141592653588.");
+    a = MockGeneralCut::compile("3141592653589 != 3141592653588");
     EXPECT_TRUE(a->check(&testObject));
 
     a = MockGeneralCut::compile("");
@@ -242,11 +231,11 @@ namespace {
     a = MockGeneralCut::compile(" ");
     EXPECT_TRUE(a->check(&testObject));
 
-    EXPECT_B2FATAL(a = MockGeneralCut::compile("[ ]"));
-    //EXPECT_TRUE(a->check(&testObject));
+    a = MockGeneralCut::compile("[ ]");
+    EXPECT_TRUE(a->check(&testObject));
 
-    EXPECT_B2FATAL(a = MockGeneralCut::compile("[ ] and []"));
-    //EXPECT_TRUE(a->check(&testObject));
+    a = MockGeneralCut::compile("[ ] and []");
+    EXPECT_TRUE(a->check(&testObject));
   }
 
   /// Test for the general cut: Try to compile some cuts and check if decompiling gives back more or less the same string (except for [ and ]).
@@ -254,20 +243,17 @@ namespace {
   {
 
     std::unique_ptr<MockGeneralCut> a = MockGeneralCut::compile("1 < 2");
-    EXPECT_EQ(a->decompile(), "1 < 2");
+    EXPECT_EQ(a->decompile(), "[1 < 2]");
 
     a = MockGeneralCut::compile("[1 < 2]");
     EXPECT_EQ(a->decompile(), "[1 < 2]");
 
     a = MockGeneralCut::compile("1 < 2 < 3");
-    EXPECT_EQ(a->decompile(), "1 < 2 < 3");
-
-    a = MockGeneralCut::compile("( 1 + 3 ) * 2");
-    EXPECT_EQ(a->decompile(), "( 1 + 3 ) * 2");
+    EXPECT_EQ(a->decompile(), "[[1 < 2] and [2 < 3]]");
 
     a = MockGeneralCut::compile("[1 < 2 < 3] or [[ 2 < 4] and [  mocking_variable < 4.4231 and [1 < 3 and 4 < mocking_variable]]]");
     EXPECT_EQ(a->decompile(),
-              "[1 < 2 < 3] or [[2 < 4] and [mocking_variable < 4.4231 and [1 < 3 and 4 < mocking_variable]]]");
+              "[[[1 < 2] and [2 < 3]] or [[2 < 4] and [[mocking_variable < 4.4231] and [[1 < 3] and [4 < mocking_variable]]]]]");
   }
 
 

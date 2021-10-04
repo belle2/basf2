@@ -511,17 +511,13 @@ Returns NaN if no MC particle is related or if called on something other than a
 track-based particle.
     )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("nCDCHits", trackNCDCHits,
-                      "The number of CDC hits associated to the track. Returns NaN if called for something other than a track-based particle.",
-                      Manager::VariableDataType::c_double);
+                      "The number of CDC hits associated to the track. Returns NaN if called for something other than a track-based particle.");
     REGISTER_VARIABLE("nSVDHits", trackNSVDHits,
-                      "The number of SVD hits associated to the track. Returns NaN if called for something other than a track-based particle.",
-                      Manager::VariableDataType::c_double);
+                      "The number of SVD hits associated to the track. Returns NaN if called for something other than a track-based particle.");
     REGISTER_VARIABLE("nPXDHits", trackNPXDHits,
-                      "The number of PXD hits associated to the track. Returns NaN if called for something other than a track-based particle.",
-                      Manager::VariableDataType::c_double);
+                      "The number of PXD hits associated to the track. Returns NaN if called for something other than a track-based particle.");
     REGISTER_VARIABLE("nVXDHits", trackNVXDHits,
-                      "The number of PXD and SVD hits associated to the track. Returns NaN if called for something other than a track-based particle.",
-                      Manager::VariableDataType::c_double);
+                      "The number of PXD and SVD hits associated to the track. Returns NaN if called for something other than a track-based particle.");
     REGISTER_VARIABLE("ndf",      trackNDF, R"DOC(
 Returns the number of degrees of freedom of the track fit. 
 
@@ -543,17 +539,13 @@ Returns NaN if called for something other than a track-based particle, or for
 mdst files processed with basf2 versions older than ``release-05-01``.
     )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,
-                      "The first activated SVD layer associated to the track. Returns NaN if called for something other than a track-based particle.",
-                      Manager::VariableDataType::c_double);
+                      "The first activated SVD layer associated to the track. Returns NaN if called for something other than a track-based particle.");
     REGISTER_VARIABLE("firstPXDLayer", trackFirstPXDLayer,
-                      "The first activated PXD layer associated to the track. Returns NaN if called for something other than a track-based particle.",
-                      Manager::VariableDataType::c_double);
+                      "The first activated PXD layer associated to the track. Returns NaN if called for something other than a track-based particle.");
     REGISTER_VARIABLE("firstCDCLayer", trackFirstCDCLayer,
-                      "The first activated CDC layer associated to the track. Returns NaN if called for something other than a track-based particle.",
-                      Manager::VariableDataType::c_double);
+                      "The first activated CDC layer associated to the track. Returns NaN if called for something other than a track-based particle.");
     REGISTER_VARIABLE("lastCDCLayer", trackLastCDCLayer,
-                      "The last CDC layer associated to the track. Returns NaN if called for something other than a track-based particle.",
-                      Manager::VariableDataType::c_double);
+                      "The last CDC layer associated to the track. Returns NaN if called for something other than a track-based particle.");
     REGISTER_VARIABLE("d0", trackD0, R"DOC(
 Returns the tracking parameter :math:`d_0`, the signed distance to the
 point-of-closest-approach (POCA) in the :math:`r-\phi` plane. 

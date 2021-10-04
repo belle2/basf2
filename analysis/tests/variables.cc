@@ -4344,17 +4344,17 @@ namespace {
 
     // global probability
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(particleAll)),
-                    std::exp(3.22) / numsumexp);
+                    std::exp(3.2) / numsumexp);
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(particleAll)),
-                    std::exp(2.22) / numsumexp);
+                    std::exp(2.2) / numsumexp);
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particleAll)),
-                    std::exp(1.4) / numsumexp);
+                    std::exp(1.2) / numsumexp);
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(particleAll)),
-                    std::exp(1.9) / numsumexp);
+                    std::exp(1.7) / numsumexp);
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(particleAll)),
-                    std::exp(3.5) / numsumexp);
+                    std::exp(2.7) / numsumexp);
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(particleAll)),
-                    std::exp(0.71) / numsumexp);
+                    std::exp(0.7) / numsumexp);
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx)),
                     std::exp(0.54) / (std::exp(0.22) + std::exp(1.14) + std::exp(0.54) + std::exp(0.74) + std::exp(0.94) + std::exp(1.34)));
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx)),
@@ -4367,7 +4367,7 @@ namespace {
     // binary probability
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(
                                        particleAll)),
-                    1.0 / (1.0 + std::exp(2.22 - 1.9)));
+                    1.0 / (1.0 + std::exp(2.2 - 1.7)));
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(
                                        particledEdx)),
                     1.0 / (1.0 + std::exp(0.94 - 0.74)));

@@ -193,7 +193,7 @@ namespace {
 
     a = Cut::compile("dummymetavar(123) < 100.0");
     EXPECT_TRUE(a->check(nullptr));
-    a = Cut::compile("dummymetavar(1) <= dummymetavar(1<2) <= dummymetavar(1<23)");
+    a = Cut::compile("dummymetavar(1) <= dummymetavar(1<) <= dummymetavar(1<3)");
     EXPECT_TRUE(a->check(nullptr));
   }
 

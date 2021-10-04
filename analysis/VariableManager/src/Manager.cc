@@ -340,7 +340,7 @@ std::vector<std::string> Variable::Manager::getAliasNames() const
   return names;
 }
 
-double Variable::Manager::evaluate(const std::string& varName, const Particle* p)
+std::variant<double, int, bool> Variable::Manager::evaluate(const std::string& varName, const Particle* p)
 {
   const Var* var = getVariable(varName);
   if (!var) {

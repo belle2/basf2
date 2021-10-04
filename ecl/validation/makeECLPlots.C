@@ -218,7 +218,7 @@ void ECLClusterFWD(TTree* cluster_treeFWD)
 
   TH1F* hECorr = new TH1F("hECorr","Cluster Energy correction in FWD endcap", 50, -0.01, 0.02);
   cluster_treeFWD->Draw("(eclClusterEnergy - eclClusterEnergyDepSum)>>hECorr","eclClusterTheta<31.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHasNPhotonHypothesis==1");
-  hECorr->GetListOfFunctions()->Add(new TNamed("Description", "Energy corerction for 100 MeV/c single photons in FWD endcap"));
+  hECorr->GetListOfFunctions()->Add(new TNamed("Description", "Energy correction for 100 MeV/c single photons in FWD endcap"));
   hECorr->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
   hECorr->GetXaxis()->SetTitle("Energy correction (GeV)");
   hECorr->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
@@ -453,7 +453,7 @@ void ECLClusterFWD_1000MeV(TTree* cluster_treeFWD)
 
   TH1F* hECorr = new TH1F("hECorr","Cluster Energy correction in FWD endcap", 50, -0.01, 0.1);
   cluster_treeFWD->Draw("(eclClusterEnergy - eclClusterEnergyDepSum)>>hECorr","eclClusterTheta<31.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHasNPhotonHypothesis==1");
-  hECorr->GetListOfFunctions()->Add(new TNamed("Description", "Energy corerction for 1000 MeV/c single photons in FWD endcap"));
+  hECorr->GetListOfFunctions()->Add(new TNamed("Description", "Energy correction for 1000 MeV/c single photons in FWD endcap"));
   hECorr->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
   hECorr->GetXaxis()->SetTitle("Energy correction (GeV)");
   hECorr->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
@@ -688,7 +688,7 @@ void ECLClusterBarrel(TTree* cluster_treeBarrel)
 
   TH1F* hECorr = new TH1F("hECorr","Cluster Energy correction in Barrel", 50, -0.01, 0.02);
   cluster_treeBarrel->Draw("(eclClusterEnergy - eclClusterEnergyDepSum)>>hECorr","eclClusterTheta>31.5*3.1415/180&&eclClusterTheta<131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHasNPhotonHypothesis==1");
-  hECorr->GetListOfFunctions()->Add(new TNamed("Description", "Energy corerction for 100 MeV/c single photons in barrel"));
+  hECorr->GetListOfFunctions()->Add(new TNamed("Description", "Energy correction for 100 MeV/c single photons in barrel"));
   hECorr->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
   hECorr->GetXaxis()->SetTitle("Energy correction (GeV)");
   hECorr->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
@@ -923,7 +923,7 @@ void ECLClusterBarrel_1000MeV(TTree* cluster_treeBarrel)
 
   TH1F* hECorr = new TH1F("hECorr","Cluster Energy correction in Barrel", 50, -0.01, 0.1);
   cluster_treeBarrel->Draw("(eclClusterEnergy - eclClusterEnergyDepSum)>>hECorr","eclClusterTheta>31.5*3.1415/180&&eclClusterTheta<131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHasNPhotonHypothesis==1");
-  hECorr->GetListOfFunctions()->Add(new TNamed("Description", "Energy corerction for 1000 MeV/c single photons in barrel"));
+  hECorr->GetListOfFunctions()->Add(new TNamed("Description", "Energy correction for 1000 MeV/c single photons in barrel"));
   hECorr->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape.")); 
   hECorr->GetXaxis()->SetTitle("Energy correction (GeV)");
   hECorr->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));

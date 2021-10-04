@@ -19,6 +19,7 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <variant>
 
 namespace Belle2 {
 
@@ -112,7 +113,11 @@ namespace Belle2 {
         case EMPTY:
           return true;
         case NONE:
-          return this->get(p);
+          if (std::holds_alternative<double>(this->get(p))) {
+            return std::get<double>(this->get(p));
+          } else if (std::holds_alternative<int>(this->get(p))) {
+            return std::get<int>(this->get(p));
+          } else return std::get<bool>(this->get(p));
         case AND:
           return m_left->check(p) and m_right->check(p);
         case OR:
@@ -126,9 +131,9 @@ namespace Belle2 {
         case GE:
           return m_left->get(p) >= m_right->get(p);
         case EQ:
-          return almostEqualDouble(m_left->get(p), m_right->get(p));
+          return almostEqualDouble(std::get<double>(m_left->get(p)), std::get<double>(m_right->get(p)));
         case NE:
-          return not almostEqualDouble(m_left->get(p), m_right->get(p));
+          return not almostEqualDouble(std::get<double>(m_left->get(p)), std::get<double>(m_right->get(p)));
       }
       throw std::runtime_error("Cut string has an invalid format: Invalid operation");
       return false;
@@ -381,7 +386,7 @@ namespace Belle2 {
     /**
      * Returns stored number or Variable value for the given object.
      */
-    double get(const Object* p) const
+    std::variant<double, int, bool> get(const Object* p) const
     {
       if (m_isNumeric) {
         return m_number;

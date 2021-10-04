@@ -126,10 +126,26 @@ namespace Belle2 {
       // for every 1st priority wire there is a corresponding track segment.
       int layerId = 3;
       for (int iSL = 0; iSL < 9; ++iSL) {
+        std::cout << "wires in layer " << iSL << ": " << cdc.nWiresInLayer(layerId) << std::endl;
+
         m_trainSets_prepare[iMLP].addCounters(cdc.nWiresInLayer(layerId));
         // the first superlayer has 2 layers extra compared to the rest
         layerId += (iSL > 0 ? 6 : 7);
       }
+      m_tracks.isRequired(m_inputCollectionName);
+      if (m_trainOnRecoTracks) {
+        StoreArray<RecoTrack> targets(m_targetCollectionName);
+        targets.isRequired(m_targetCollectionName);
+      } else {
+        StoreArray<MCParticle> targets(m_targetCollectionName);
+        targets.isRequired(m_targetCollectionName);
+      }
+
+      m_NeuroTrigger.initializeCollections(m_hitCollectionName);
+
+
+
+
     }
   }
 
@@ -179,7 +195,7 @@ namespace Belle2 {
         }
         if (!m_rescaleTarget && outOfRange) continue;
         //
-        if (m_nPrepare != 0 && m_trainSets_prepare[isector].getTrackCounter() < m_nPrepare) {
+        if (m_nPrepare == 0 || m_trainSets_prepare[isector].getTrackCounter() < m_nPrepare) {
           // get relative ids for all hits related to the MCParticle / RecoTrack
           // and count them to find relevant id range
           // using only related hits suppresses background EXCEPT for curling tracks
@@ -216,18 +232,18 @@ namespace Belle2 {
     if (stop) {
       B2INFO("Training sample preparation for NeuroTrigger finished, stopping event loop.");
       // if required hit number is reached, get relevant ids
-      for (unsigned isector = 0; isector < m_trainSets_prepare.size(); ++isector) {
-        std::vector<float> reid = NeuroTrainer::getRelevantID(m_trainSets_prepare[isector], m_cutSum, m_relevantCut);
-        m_NeuroTrigger[isector].setRelID(reid);
-        StoreObjPtr<EventMetaData> eventMetaData;
-        eventMetaData->setEndOfData();
-      }
+      StoreObjPtr<EventMetaData> eventMetaData;
+      eventMetaData->setEndOfData();
     }
   }
 
   void
   CDCTriggerNeuroIDHistModule::terminate()
   {
+    for (unsigned isector = 0; isector < m_trainSets_prepare.size(); ++isector) {
+      std::vector<float> reid = NeuroTrainer::getRelevantID(m_trainSets_prepare[isector], m_cutSum, m_relevantCut);
+      m_NeuroTrigger[isector].setRelID(reid);
+    }
     std::ofstream gzipfile4(m_idHistName + ".gz", std::ios_base::app | std::ios_base::binary);
     boost::iostreams::filtering_ostream outStream;
     outStream.push(boost::iostreams::gzip_compressor());

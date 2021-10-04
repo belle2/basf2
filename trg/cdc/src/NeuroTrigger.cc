@@ -271,6 +271,12 @@ NeuroTrigger::initializeCollections(string hitCollectionName, string eventTimeNa
   m_hitCollectionName = hitCollectionName;
 }
 
+void
+NeuroTrigger::initializeCollections(string hitCollectionName)
+{
+  m_segmentHits.isRequired(hitCollectionName);
+  m_hitCollectionName = hitCollectionName;
+}
 vector<int>
 NeuroTrigger::selectMLPs(float phi0, float invpt, float theta)
 {

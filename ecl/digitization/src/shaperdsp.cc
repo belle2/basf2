@@ -323,6 +323,14 @@ void ShaperDSP_t::init(const double* s, double unitscale)
   _ccc  = s[5];
 
   if (unitscale < 0) {
+    /**
+     * Calculate unitscale from shape parameters based on an
+     * approximated formula.
+     *
+     * Slower alternative is to iterate over tabulated values
+     * of the signal shape function and set unitscale to the
+     * maximum value.
+     */
     unitscale = 1.0
                 / (-.109  + .919    * t01 - .261 * t01 * t01)
                 / (-.109  + .919    * t02 - .261 * t02 * t02)

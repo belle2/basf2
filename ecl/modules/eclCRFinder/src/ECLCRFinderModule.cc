@@ -21,6 +21,9 @@
 // MDST
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
+// C++
+#include <algorithm>
+
 // NAMESPACE(S)
 using namespace Belle2;
 
@@ -134,14 +137,14 @@ void ECLCRFinderModule::event()
   B2DEBUG(200, "ECLCRFinderModule::event()");
 
   // Reset the vector(s).
-  memset(&m_cellIdToCheckVec[0], 0, m_cellIdToCheckVec.size() * sizeof m_cellIdToCheckVec[0]);
-  memset(&m_cellIdToSeedVec[0], 0, m_cellIdToSeedVec.size() * sizeof m_cellIdToSeedVec[0]);
-  memset(&m_cellIdToGrowthVec[0], 0, m_cellIdToGrowthVec.size() * sizeof m_cellIdToGrowthVec[0]);
-  memset(&m_cellIdToDigitVec[0], 0, m_cellIdToDigitVec.size() * sizeof m_cellIdToDigitVec[0]);
-  memset(&m_cellIdToTempCRIdVec[0], 0, m_cellIdToTempCRIdVec.size() * sizeof m_cellIdToTempCRIdVec[0]);
+  std::fill(m_cellIdToCheckVec.begin(), m_cellIdToCheckVec.end(), 0);
+  std::fill(m_cellIdToSeedVec.begin(), m_cellIdToSeedVec.end(), 0);
+  std::fill(m_cellIdToGrowthVec.begin(), m_cellIdToGrowthVec.end(), 0);
+  std::fill(m_cellIdToDigitVec.begin(), m_cellIdToDigitVec.end(), 0);
+  std::fill(m_cellIdToTempCRIdVec.begin(), m_cellIdToTempCRIdVec.end(), 0);
 
   // Fill a vector that can be used to map cellid -> store array position
-  memset(&m_calDigitStoreArrPosition[0], -1, m_calDigitStoreArrPosition.size() * sizeof m_calDigitStoreArrPosition[0]);
+  std::fill(m_calDigitStoreArrPosition.begin(), m_calDigitStoreArrPosition.end(), -1);
   for (int i = 0; i < m_eclCalDigits.getEntries(); i++) {
     m_calDigitStoreArrPosition[m_eclCalDigits[i]->getCellId()] = i;
   }

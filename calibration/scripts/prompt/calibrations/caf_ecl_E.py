@@ -104,7 +104,9 @@ def get_calibrations(input_data, **kwargs):
     algo_gamma_gamma.setMinEntries(150)
     algo_gamma_gamma.setMaxIterations(10)
     algo_gamma_gamma.setTRatioMin(0.45)
-    algo_gamma_gamma.setTRatioMax(0.60)
+    algo_gamma_gamma.setTRatioMax(0.70)
+    algo_gamma_gamma.setTRatioMinHiStat(0.70)
+    algo_gamma_gamma.setTRatioMaxHiStat(0.95)
     algo_gamma_gamma.setUpperEdgeThresh(0.02)
     algo_gamma_gamma.setPerformFits(True)
     algo_gamma_gamma.setFindExpValues(False)
@@ -143,9 +145,10 @@ def get_calibrations(input_data, **kwargs):
     algo_mu_mu.cellIDLo = 1
     algo_mu_mu.cellIDHi = 8736
     algo_mu_mu.minEntries = 150
-    algo_mu_mu.maxIterations = 10
-    algo_mu_mu.tRatioMin = 0.2
-    algo_mu_mu.tRatioMax = 0.25
+    algo_mu_mu.nToRebin = 1000
+    algo_mu_mu.tRatioMin = 0.05
+    algo_mu_mu.tRatioMax = 0.40
+    algo_mu_mu.lowerEdgeThresh = 0.10
     algo_mu_mu.performFits = True
     algo_mu_mu.findExpValues = False
     algo_mu_mu.storeConst = 0

@@ -146,7 +146,7 @@ double TrackingMomentumModule::getScale(Particle* particle)
   std::map<std::string, double> values;
   for (const auto& i_variable : variables) {
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(i_variable);
-    double value = var->function(particle);
+    double value = std::get<double>(var->function(particle));
     values.insert(std::make_pair(i_variable, value));
   }
 

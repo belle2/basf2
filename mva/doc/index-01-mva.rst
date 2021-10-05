@@ -252,16 +252,18 @@ or in bash::
 Evaluation / Validation
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-You can create a zip file with a LaTeX report and evaluation plots using the ``basf2_mva_evaluate.py`` tool::
+You can create a zip file with a LaTeX report and evaluation plots using the ``basf2_mva_evaluate.py`` tool.
 
-    basf2_mva_evaluate.py -id DatabaseIdentifier \
-                          -train train.root \
-                          -data test.root \
-                          -o validation.zip
+.. argparse::
+    :filename: mva/tools/basf2_mva_evaluate.py
+    :func: get_argument_parser
+    :prog: basf2_mva_evaluate
+    :nodefault:
+    :nogroupsections:
 
 
-The LaTeX file can also be compiled directly to PDF by passing the ``-c`` command line argument.                          
-If this fails, you can transfer the ``.zip`` archive to a working LaTeX environment, unpack it there and compile 
+The LaTeX file can be compiled directly to PDF by passing the ``-c`` command line argument.
+If this fails, you can transfer the ``.zip`` archive to a working LaTeX environment, unpack it and compile
 the ``latex.tex`` with ``pdflatex`` there.
 
 Some example plots included in the resulting PDF are:

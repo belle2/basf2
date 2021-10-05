@@ -108,14 +108,20 @@ namespace Belle2 {
       bool isValid() const {return m_valid;}
 
       /**
-       * Switch off delta-ray PDF to speed-up log likelihood calculation
+       * Exclude delta-ray PDF in log likelihood calculation
        */
       void switchOffDeltaRayPDF() const {m_deltaPDFOn = false;}
 
       /**
-       * Switch on delta-ray PDF (back to default)
+       * Include delta-ray PDF in log likelihood calculation (this is default)
        */
       void switchOnDeltaRayPDF() const {m_deltaPDFOn = true;}
+
+      /**
+       * Include or exclude delta-ray PDF in log likelihood calculation
+       * @param deltaPDFOn true = include, false = exclude
+       */
+      void switchDeltaRayPDF(bool deltaPDFOn) const {m_deltaPDFOn = deltaPDFOn;}
 
       /**
        * Returns slot ID

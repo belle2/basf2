@@ -24,7 +24,7 @@ namespace Belle2 {
      * Returns 1 if a track, ecl or klmCluster associated to particle is in the related RestOfEvent object, 0 otherwise.
      * Also works for composite particles, where all mdst objects of related FSP particles must be in ROE.
      */
-    bool isInRestOfEvent(const Particle* particle);
+    double isInRestOfEvent(const Particle* particle);
     /**
      * Returns 1 if a particle is a clone of signal side final state particles, 0 otherwise.
      */
@@ -39,12 +39,12 @@ namespace Belle2 {
      * Prints the indices of all particles in the ROE and the properties of all masks appended to the ROE.
      * Intended for debugging purposes, always returns 0.
      */
-    bool printROE(const Particle* particle);
+    double printROE(const Particle* particle);
 
     /**
      * Helper function for nRemainingTracksInRestOfEventWithMask and nRemainingTracksInRestOfEvent
      */
-    int nRemainingTracksInROE(const Particle* particle, const std::string& maskName = "");
+    double nRemainingTracksInROE(const Particle* particle, const std::string& maskName = RestOfEvent::c_defaultMaskName);
 
     /**
      * Returns number of tracks in the event minus in the current RestOfEvent object accepting a mask.
@@ -59,7 +59,7 @@ namespace Belle2 {
     /**
      * Returns number of tracks in the event minus in the current RestOfEvent object
      */
-    int nROE_RemainingTracks(const Particle* particle);
+    double nROE_RemainingTracks(const Particle* particle);
 
     /**
      * Returns number of remaining KLM clusters in the related RestOfEvent object
@@ -363,7 +363,8 @@ namespace Belle2 {
      * Also works for composite particles, where all mdst objects of related FSP particles must be in ROE.
      * This helper function accepts a specific roe object as an argument
      */
-    bool isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe, const std::string& maskName = "");
+    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe,
+                               const std::string& maskName = RestOfEvent::c_defaultMaskName);
 
 
     /**

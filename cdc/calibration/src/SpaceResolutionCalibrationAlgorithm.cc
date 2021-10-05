@@ -5,7 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
 #include <iostream>
 #include <cdc/calibration/SpaceResolutionCalibrationAlgorithm.h>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -20,6 +19,7 @@
 #include "TROOT.h"
 #include "TError.h"
 #include "TMinuit.h"
+#include <TStopwatch.h>
 
 using namespace std;
 using namespace Belle2;
@@ -106,6 +106,8 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
   B2INFO("Number of entries: " << nEntries);
   int ith = -99;
   int ial = -99;
+  TStopwatch timer;
+  timer.Start();
   for (Long64_t i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     if (std::fabs(x_b) < 0.02 || std::fabs(x_u) < 0.02) continue;
@@ -140,9 +142,10 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
     m_hBiased[ilay][ilr][ial][ith]->Fill(fabs(x_b), absRes_b, w);
   }
 
+  timer.Stop();
+  B2INFO("Time to fill histograms: " << timer.RealTime() << "s");
 
-  B2INFO("Start to obtain the biased and unbiased sigmas");
-
+  B2INFO("Start to obtain the biased and unbiased sigmas...");
   TF1* gb = new TF1("gb", "gausn", -0.05, 0.05);
   TF1* gu = new TF1("gu", "gausn", -0.06, 0.06);
   TF1* g0b = new TF1("g0b", "gausn", -0.015, 0.07);

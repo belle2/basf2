@@ -50,7 +50,7 @@ deadEndPath = create_path()
 
 ma.signalSideParticleListsFilter(
             ['B0:sig'],
-            'nROE_Charged(, 0) > 0 and abs(qrCombined) == 1',
+            'nROE_Charged(all, 0) > 0 and abs(qrCombined) == 1',
             roe_path,
             deadEndPath)
 

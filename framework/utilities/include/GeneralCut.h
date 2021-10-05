@@ -18,7 +18,7 @@
 
 #include <iostream>
 #include <stdexcept>
-
+#include <cmath>
 #include <variant>
 
 namespace Belle2 {
@@ -114,7 +114,7 @@ namespace Belle2 {
           return true;
         case NONE:
           if (std::holds_alternative<double>(this->get(p))) {
-            return std::get<double>(this->get(p));
+            return std::isnan(std::get<double>(this->get(p))) ? false : std::get<double>(this->get(p));
           } else if (std::holds_alternative<int>(this->get(p))) {
             return std::get<int>(this->get(p));
           } else return std::get<bool>(this->get(p));

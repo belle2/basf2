@@ -5004,14 +5004,15 @@ namespace {
     // check that garbage input throws helpful B2FATAL
     EXPECT_B2FATAL(Manager::Instance().getVariable("CleoConeCS(NONSENSE)"));
 
-    // check that string other than ROE for second argument throws B2FATAL
-    EXPECT_B2FATAL(Manager::Instance().getVariable("CleoConeCS(0, NOTROE)"));
-
     // check for NaN if we don't have a CS object for this particle
     StoreArray<Particle> myParticles;
     const Particle* particle_with_no_cs = myParticles.appendNew();
     const Manager::Var* var = Manager::Instance().getVariable("CleoConeCS(0)");
     EXPECT_TRUE(std::isnan(var->function(particle_with_no_cs)));
+    // check that string other than ROE as second argument, which is interpreted as mask name, returns NaN
+    var = Manager::Instance().getVariable("CleoConeCS(0, NOTROE)");
+    EXPECT_TRUE(std::isnan(var->function(particle_with_no_cs)));
+
   }
 
   TEST_F(MetaVariableTest, TransformedNetworkOutput)

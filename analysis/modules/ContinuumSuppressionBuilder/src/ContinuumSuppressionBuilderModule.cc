@@ -45,12 +45,8 @@ void ContinuumSuppressionBuilderModule::initialize()
   }
 
   // Output
-  if (m_csarray.isOptional()) {
-    B2ERROR("The ContinuumSuppression is already built. Building it again will have no effect, even when providing a different ROE mask name!");
-  } else {
-    m_csarray.registerInDataStore();
-    StoreArray<Particle>().registerRelationTo(m_csarray);
-  }
+  m_csarray.registerInDataStore(m_ROEMask);
+  StoreArray<Particle>().registerRelationTo(m_csarray);
 }
 
 void ContinuumSuppressionBuilderModule::event()

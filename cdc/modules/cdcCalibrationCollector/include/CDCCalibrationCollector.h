@@ -106,7 +106,7 @@ namespace Belle2 {
       Float_t x_u;               /**< X_fit for unbiased track fit.*/
       Float_t x_b;               /**< X_fit for biased track fit.*/
       UChar_t lay;              /**< Layer ID. */
-      UShort_t IWire;    /**< Wire ID. */
+      UShort_t IWire;           /**< Wire ID. */
       Float_t Pval;              /**< P-value of fitted track.  */
       Float_t ndf;               /**< degree of freedom. */
       Float_t d0;                /**< Track Parameter, d0. */
@@ -115,6 +115,7 @@ namespace Belle2 {
       Float_t tanL;              /**< Track Parameter, tanL. */
       Float_t omega;             /**< Track Parameter, omega. */
       double m_minimumPt = 0;   /**< minimum pt required for track*/
+      double m_minimumNDF = 0;   /**< minimum NDF required for track*/
 
       bool m_calExpectedDriftTime = true;      /**< Calculate expected drift time from x_fit or not. */
       bool m_bField = true;                    /**< fit incase no magnetic Field of not, if false, NDF=4 in cal P-value */

@@ -9,6 +9,7 @@
 #include <analysis/modules/ContinuumSuppressionBuilder/ContinuumSuppressionBuilderModule.h>
 
 #include <analysis/ContinuumSuppression/ContinuumSuppression.h>
+#include <analysis/dataobjects/RestOfEvent.h>
 
 using namespace Belle2;
 
@@ -29,7 +30,7 @@ ContinuumSuppressionBuilderModule::ContinuumSuppressionBuilderModule() : Module(
   // Parameter definitions
   addParam("particleList", m_particleListName, "Name of the ParticleList", std::string(""));
 
-  addParam("ROEMask", m_ROEMask, "ROE mask", std::string(""));
+  addParam("ROEMask", m_ROEMask, "ROE mask", std::string(RestOfEvent::c_defaultMaskName));
 
 }
 
@@ -38,6 +39,10 @@ void ContinuumSuppressionBuilderModule::initialize()
   // Input
   m_plist.isRequired(m_particleListName);
   StoreArray<Particle>().isRequired();
+
+  if (m_ROEMask.empty()) {
+    m_ROEMask = RestOfEvent::c_defaultMaskName;
+  }
 
   // Output
   if (m_csarray.isOptional()) {

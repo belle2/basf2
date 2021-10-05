@@ -14,5 +14,5 @@ ${PARENT} basf2 ${PROCESSES} \
     UNUSED UNUSED 6666 \
     --input-file ${VALIDATION_RAWDATA} \
     --output-file beam_reco_monitor-out.root \
-    --histo-output-file beam_reco_monitor-dqm.root \
+    --histo-output-file ./beam_reco_monitor-dqm.root \
     --local-db-path cdb

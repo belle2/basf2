@@ -11,7 +11,7 @@
 
 namespace Belle2 {
   namespace ECL {
-    /** singleton class to hold the ECL configuration */
+    /** Singleton class to hold the ECL configuration */
     class  EclConfiguration {
     public:
       /** return this instance */
@@ -54,12 +54,25 @@ namespace Belle2 {
 
       /** a struct for a signal sample */
       struct signalsample_t {
-        void InitSample(const float*, double);
-        void InitSample(const double*, double);
-        double Accumulate(const double, const double, double*) const;
+        /** @param MP        Float array of waveform parameters
+         *  @param unitscale Normalization of template waveform
+         */
+        void InitSample(const float* MP, double unitscale = -1);
+        /** @param MPd       Double array of waveform parameters
+         *  @param unitscale Normalization of template waveform
+         */
+        void InitSample(const double* MPd, double unitscale = -1);
+        /**
+         * @param[in]  a  Signal amplitude
+         * @param[in]  t0 Signal offset
+         * @param[out] s  Output array with added signal
+         *
+         * @return Energy deposition in ADC units
+         */
+        double Accumulate(const double a, const double t0, double* s) const;
 
         double m_sumscale; /**< energy deposit in fitting window scale factor */
-        double m_ft[m_nl * m_ns];
+        double m_ft[m_nl * m_ns]; /**< Simulated signal shape */
       };
 
       /** a struct for the ADC count */
@@ -78,19 +91,22 @@ namespace Belle2 {
 
       /** a struct for the fit parameters */
       struct fitparams_t {
-        typedef int int_array_192x16_t[2 * m_ndt][16];
-        typedef int int_array_24x16_t[m_ndt / 4][16];
-        int_array_192x16_t f, f1, fg31, fg32, fg33;
-        int_array_24x16_t fg41, fg43;
+        typedef int int_array_192x16_t[2 * m_ndt][16]; /**< Array for DSP coefs in normal fit */
+        typedef int int_array_24x16_t[m_ndt / 4][16]; /**< Array for DSP coefs in fast fit */
+        int_array_192x16_t f; /**< Array with tabulated signal waveform */
+        int_array_192x16_t f1; /**< Array with tabulated derivative of signal waveform */
+        int_array_192x16_t fg31; /**< Array to estimate signal amplitude */
+        int_array_192x16_t fg32; /**< Array to estimate amp * time */
+        int_array_192x16_t fg33; /**< Array to estimate pedestal height */
+        int_array_24x16_t fg41; /**< Alternative for FG31 for low amplitude fits */
+        int_array_24x16_t fg43; /**< Alternative for FG33 for low amplitude fits */
       };
 
       /** a struct for the parameters of the algorithm */
       struct algoparams_t {
-        typedef short int shortint_array_16_t[16];
-        typedef unsigned char uchar_array_32_t[32];
         union {
-          shortint_array_16_t id;
-          uchar_array_32_t    ic;
+          short int     id[16]; /**< */
+          unsigned char ic[32]; /**< */
         };
       };
 

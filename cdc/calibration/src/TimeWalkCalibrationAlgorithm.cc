@@ -5,7 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
 #include <cdc/calibration/TimeWalkCalibrationAlgorithm.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -16,6 +15,8 @@
 #include <TDirectory.h>
 #include <TROOT.h>
 #include <TTree.h>
+#include <TStopwatch.h>
+
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>
@@ -81,6 +82,8 @@ void TimeWalkCalibrationAlgorithm::createHisto()
 
   const Long64_t nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
+  TStopwatch time;
+  time.Start();
   for (Long64_t i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     const double xmax = halfCSize[lay] - 0.12;
@@ -90,7 +93,9 @@ void TimeWalkCalibrationAlgorithm::createHisto()
 
     m_h2[cdcgeo.getBoardID(WireID(lay, IWire))]->Fill(adc, fabs(t_mea) - fabs(t_fit));
   }
-  B2INFO("Finish making histogram for all channels");
+  time.Stop();
+  B2INFO("Time to fill histograms: " << time.RealTime() << "s");
+
 }
 
 CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()

@@ -16,7 +16,7 @@ class TH1F;
 namespace Belle2 {
   namespace ECL {
 
-    /** class to hole the ECL configuration for pure CsI calorimeter */
+    /** Singleton class to hold the ECL configuration for pure CsI calorimeter */
     class EclConfigurationPure {
     public:
       static constexpr int    m_nch      = 72 * 16; /**< total number of electronic channels (crystals) in fwd endcap calorimeter */
@@ -50,17 +50,25 @@ namespace Belle2 {
       /** a struct for a signal sample for the pure CsI calorimeter */
       struct signalsamplepure_t {
         double m_sumscale; /**< energy deposit in fitting window scale factor */
-        double m_ft[m_nlPure * m_ns];
+        double m_ft[m_nlPure * m_ns]; /**< Simulated signal shape */
         double m_ft1[m_nlPure * m_ns];
 
         void InitSample(const TH1F*, const TH1F*);
-        double Accumulate(const double, const double, double*) const;
+        /**
+         * @param[in]  a  Signal amplitude
+         * @param[in]  t  Signal offset
+         * @param[out] s  Output array with added signal
+         *
+         * @return Energy deposition in ADC units
+         */
+        double Accumulate(const double a, const double t0, double* s) const;
       };
 
       /** a struct for the fit parameters for the pure CsI calorimeter */
       struct adccountspure_t {
         double total; /**< total deposition (sum of m_s array) */
         double c[m_nsmp]; /**< flash ADC measurements */
+        /** add hit method */
         void AddHit(const double a, const double t0, const signalsamplepure_t& q);
       };
 

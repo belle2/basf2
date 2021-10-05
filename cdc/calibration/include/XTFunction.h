@@ -442,7 +442,7 @@ namespace Belle2 {
       //  m_tmax = m_XTParam[6] + 100;
       //xtCheb5->SetParameters(0.0, 0.005, 0., 0., 0., 0., m_XTParam[6], 0.001);
       double par[8];
-      m_fitFunc->SetParLimits(7, 0., 0.001);
+      m_fitFunc->SetParLimits(7, 0.0001, 0.001);
       int fitresult = m_h1->Fit("chebyshev5", "QME", "", m_tmin, m_XTParam[6]);
       if (fitresult >= 0) {
         m_h1->GetFunction("chebyshev5")->GetParameters(par);

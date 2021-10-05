@@ -399,6 +399,8 @@ namespace Belle2 {
         }
 
       } //end loop of fitting
+      if (m_debug) B2INFO("Number of failures due to inner (outer) regions " << in << "(" << out << ")");
+
       if (m_draw) {
         TString hname = m_h1->GetName();
         TString name = hname + ".pdf";

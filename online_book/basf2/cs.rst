@@ -26,7 +26,7 @@ Continuum Suppression (CS)
 
 
 Introduction
-------------------------------------------------------------------
+------------
 
 Most e\ :sup:`+` e\ :sup:`-` interactions at Belle II do not result in a ϒ(4S) resonance
 which then decays to two B mesons.
@@ -300,11 +300,10 @@ So how do we separate our signal component from continuum background in the pres
 have seen with the five variables we have introduced so far, none of them can provide perfect separation.
 Fortunately, there is a solution to this: Boosted Decision Trees!
 
+.. _online_book_cs_bdt:
 
 Continuum suppression using Boosted Decision Trees
 --------------------------------------------------
-
-.. _online_book_cs_bdt:
 
 Boosted Decision Trees (BDTs) are a specific type of a machine learning model
 used for classification tasks. In this lesson we try to classify all candidates as

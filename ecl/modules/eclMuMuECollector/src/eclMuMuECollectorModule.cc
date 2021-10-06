@@ -306,13 +306,13 @@ void eclMuMuECollectorModule::collect()
 
   //------------------------------------------------------------------------
   /** Record ECL energy for each crystal */
-  memset(&EperCrys[0], 0, EperCrys.size()*sizeof EperCrys[0]); // clear array
+  std::fill(EperCrys.begin(), EperCrys.end(), 0); // clear array
 
   //..Record crystals with high energies to diagnose cable swaps
   const double highEnergyThresh = 0.18; // GeV
   std::vector<int> highECrys; // crystalIDs of crystals with high energy
 
-  //..For data, use muon pair calibration; for expected energies, use ECLCrytalEnergy
+  //..For data, use muon pair calibration; for expected energies, use ECLCrystalEnergy
   for (auto& eclDigit : m_eclDigitArray) {
     int crysID = eclDigit.getCellId() - 1;
     getObjectPtr<TH2F>("RawDigitAmpvsCrys")->Fill(crysID + 0.001, eclDigit.getAmp());

@@ -91,7 +91,9 @@ KLMDQM2Module::KLMDQM2Module() :
   m_eklmElementNumbers{&(EKLMElementNumbers::Instance())},
   m_PlaneArrayIndex(&(KLMPlaneArrayIndex::Instance())),
   m_MatchingHitData( {0, 0, 0, 0, 0, 0, 0., nullptr, nullptr}),
-                   m_MatchedStrip(0)
+                   m_MatchedStrip(0),
+                   m_MatchingFile(nullptr),
+                   m_MatchingTree(nullptr)
 {
   // Set module properties
   setDescription(R"DOC("Additional Module for KLMDQM plots after HLT filters
@@ -412,7 +414,7 @@ void KLMDQM2Module::terminate()
 bool KLMDQM2Module::triggerFlag()
 {
 
-  bool passed;
+  bool passed = false;
   if (trigResult) {
     try {
       passed = (trigResult->getResult("software_trigger_cut&skim&accept_mumutight") == SoftwareTriggerCutResult::c_accept) ? true : false;

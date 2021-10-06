@@ -50,7 +50,9 @@ namespace Belle2 {
   /**
   * Additional Module for KLMDQM plots after HLT filters
   *
-  * An additional module developed to display plane efficiencies for the KLM dduring runs (i.e. for online analyses). This module would be called after HLT filter in order to use mumu-tight skim to select reasonable events. The output histograms would be plane efficiences = MatchedDigits/AllExtits.
+  * An additional module developed to display plane efficiencies for the KLM dduring runs (i.e. for online analyses).
+  * This module would be called after HLT filter in order to use mumu-tight skim to select reasonable events.
+  * The output histograms would be plane efficiences = MatchedDigits/AllExtits.
 
   */
   class KLMDQM2Module : public HistoModule {
@@ -99,11 +101,6 @@ namespace Belle2 {
     /*******************************************/
     /*******************************************/
 
-    /** KLM channel array index. */
-    const KLMChannelArrayIndex* m_ChannelArrayIndex;
-
-    /** KLM sector array index. */
-    const KLMSectorArrayIndex* m_SectorArrayIndex;
 
     /** KLM element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
@@ -113,7 +110,6 @@ namespace Belle2 {
 
     /** Element numbers. */
     const EKLMElementNumbers* m_eklmElementNumbers;
-    const BKLMElementNumbers* m_bklmElementNumbers;
 
     /** BKLM geometry. */
     const bklm::GeometryPar* m_GeometryBKLM;
@@ -153,13 +149,11 @@ namespace Belle2 {
     int m_MinHitsForFlagging;
 
 
-    /** Input parameter for minimal number of processed events for error messages. */
-    double m_MinProcessedEventsForMessagesInput;
-
     /** Muon list name. */
     std::string m_MuonListName;
 
-
+    /** Maximal distance in the units of strip number
+     * from ExtHit to matching KLMDigit */
     double m_AllowedDistance1D;
 
     /** Minimal number of matching digits. */
@@ -203,26 +197,42 @@ namespace Belle2 {
     /*******************************************/
     /*******************************************/
 
-    /** KLM DAQ inclusion. */
-    TH1F* m_DAQInclusion;
+    /** Matched hits in plane for BKLM */
+    TH1F* m_MatchedHitsBKLM;
 
-    /* Desired Output Histograms (plane specific) */
-    TH1F* m_MatchedHitsBKLM; //For KLM General
-    TH1F* m_AllExtHitsBKLM;  //For KLM General
-    TH1F* m_PlaneEfficienciesBKLM; //For KLM General
+    /** Extrapolated hits in plane for BKLM */
+    TH1F* m_AllExtHitsBKLM;
 
-    TH1F* m_MatchedHitsEKLM; //For KLM General
-    TH1F* m_AllExtHitsEKLM;  //For KLM General
-    TH1F* m_PlaneEfficienciesEKLM; //For KLM General
+    /** Matched over Extrapolated hits in plane for BKLM */
+    TH1F* m_PlaneEfficienciesBKLM;
 
-    /* Same as above but wider bins (per sector) */
-    TH1F* m_MatchedHitsBKLMSector; //For KLM General
-    TH1F* m_AllExtHitsBKLMSector;  //For KLM General
-    TH1F* m_PlaneEfficienciesBKLMSector; //For KLM General
+    /** Matched hits in plane for EKLM */
+    TH1F* m_MatchedHitsEKLM;
 
-    TH1F* m_MatchedHitsEKLMSector; //For KLM General
-    TH1F* m_AllExtHitsEKLMSector;  //For KLM General
-    TH1F* m_PlaneEfficienciesEKLMSector; //For KLM General
+    /** Extrapolated hits in plane for EKLM */
+    TH1F* m_AllExtHitsEKLM;
+
+    /** Matched over Extrapolated hits in plane for EKLM */
+    TH1F* m_PlaneEfficienciesEKLM;
+
+
+    /** Matched hits in sector for BKLM */
+    TH1F* m_MatchedHitsBKLMSector;
+
+    /** Extrapolated hits in sector for BKLM */
+    TH1F* m_AllExtHitsBKLMSector;
+
+    /** Matched over Extrapolated hits in sector for BKLM */
+    TH1F* m_PlaneEfficienciesBKLMSector;
+
+    /** Matched hits in sector for EKLM */
+    TH1F* m_MatchedHitsEKLMSector;
+
+    /** Extrapolated hits in sector for EKLM */
+    TH1F* m_AllExtHitsEKLMSector;
+
+    /** Matched over Extrapolated hits in sector for EKLM */
+    TH1F* m_PlaneEfficienciesEKLMSector;
 
     /** Number of hits per channel. */
     TH1F** m_MatchedHitsInPlane[
@@ -248,18 +258,6 @@ namespace Belle2 {
     //is related to m_MinProcessedEventsForMessagesInput
     double m_MinProcessedEventsForMessages;
 
-    /** Vector of dead barrel modules. */
-    //std::vector<uint16_t> m_DeadBarrelModules;
-
-    /** Vector of dead endcap modules. */
-    //std::vector<uint16_t> m_DeadEndcapModules;
-
-    /** Vector of masked channels. */
-    //std::vector<uint16_t> m_MaskedChannels;
-
-    /** Number of processed events. */
-    //double m_ProcessedEvents;
-
     /** Number of channel hit histograms per sector for BKLM. */
     const int m_ChannelHitHistogramsBKLM = 2;
 
@@ -278,7 +276,6 @@ namespace Belle2 {
     int m_MatchedStrip;
 
     /** Channel status. */
-    //TODO:Get rid of me
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
 
     /** Hit data. */
@@ -331,8 +328,14 @@ namespace Belle2 {
     /**
      * Collect the data for one muon.
      * @param[in] muon                 Muon.
-     * @param[in] matchedDigitsInPlane Matched digits.
-     * @param[in] allExtHitsInPlane    Number of ExtHits.
+     * @param[in] MatchedHitsBKLM      Matched digits in BKLM
+     * @param[in] AllExtHitsBKLM       Number of ExtHits in BKLM
+     * @param[in] MatchedHitsEKLM      Matched digits in EKLM
+     * @param[in] AllExtHitsEKLM       Number of ExtHits in EKLM
+     * @param[in] MatchedHitsBKLMSec   Matched digits in BKLM per Sector
+     * @param[in] AllExtHitsBKLMSec    Number of ExtHits per Sector
+     * @param[in] MatchedHitsEKLMSec   Matched digits in EKLM per Sector
+     * @param[in] AllExtHitsEKLMSec    Number of ExtHits in EKLM per Sector
      * @return True if the muon satisfies the selection criteria.
      */
     bool collectDataTrack(const Particle* muon, TH1F* MatchedHitsBKLM,
@@ -350,6 +353,11 @@ namespace Belle2 {
     void addHit(std::map<KLMPlaneNumber, struct HitData>& hitMap,
                 KLMPlaneNumber planeGlobal, struct HitData* hitData);
 
+    /**
+     * Uses TrigResult along with desired software cut
+     * to determine whether histograms are filled or not
+     * for a given event.
+     */
     bool triggerFlag();
 
     /*******************************************/

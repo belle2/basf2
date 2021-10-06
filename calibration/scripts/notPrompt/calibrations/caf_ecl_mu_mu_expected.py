@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """Find expected energies for ECL e+e- --> gamma gamma single crystal
 energy calibration. Requires e+e- --> mu mu mc in mdst format with
 ECLDigits as additional branch."""

@@ -17,12 +17,14 @@ Proudly based on analysis/test/examples.py.
 import unittest
 import subprocess
 from pathlib import Path
+import inspect
 
 # basf2
 from b2test_utils import clean_working_directory
 
 
-this_dir = Path(__file__).resolve().parent
+src_file_path = inspect.getfile(lambda: None)
+this_dir = Path(src_file_path).resolve().parent
 statistics_script = this_dir.parent / "online_book_statistics.py"
 
 

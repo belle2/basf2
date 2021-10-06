@@ -254,6 +254,7 @@ namespace Belle2 {
       if (!track) return realNaN;
       const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(
                                          part->getPDGCode())));
+      if (!trackFit) return realNaN;
       double nHitsBeforeRemoval = trackFit->getHitPatternCDC().getNHits()
                                   + trackFit->getHitPatternVXD().getNSVDHits()
                                   + trackFit->getHitPatternVXD().getNPXDHits();

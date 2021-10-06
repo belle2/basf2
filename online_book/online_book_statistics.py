@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """This script calculates some numbers about the online book, e.g. number of
 exercises etc.
 """
@@ -27,7 +35,7 @@ class Statistics:
 
 
 class StatisticsVisitor:
-    # Dictionary keys must mach attributes of Statistics class
+    # Dictionary keys must match attributes of Statistics class
     regexes = dict(
         code_inclusions=re.compile("(code-block\\s*::)|(literalinclude\\s*::)"),
         hints=re.compile(":class:.*hint"),
@@ -52,15 +60,20 @@ class StatisticsVisitor:
                     )
 
     def walk_directory(self, path: Path):
-        for root, _, files in os.walk(Path()):
+        print(f"Walking {path}")
+        for root, _, files in os.walk(path):
             for file in files:
                 path = Path(root) / file
                 if path.suffix == ".rst":
                     self.read_rst_file(path)
 
 
-if __name__ == "__main__":
+def main():
     this_dir = Path(__file__).resolve().parent
     sv = StatisticsVisitor()
     sv.walk_directory(this_dir)
     sv.statistics.print_summary()
+
+
+if __name__ == "__main__":
+    main()

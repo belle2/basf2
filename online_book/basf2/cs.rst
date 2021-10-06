@@ -304,6 +304,8 @@ Fortunately, there is a solution to this: Boosted Decision Trees!
 Continuum suppression using Boosted Decision Trees
 --------------------------------------------------
 
+.. _online_book_cs_bdt:
+
 Boosted Decision Trees (BDTs) are a specific type of a machine learning model
 used for classification tasks. In this lesson we try to classify all candidates as
 either continuum or not continuum.

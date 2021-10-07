@@ -81,11 +81,15 @@ namespace Belle2 {
       return false;
     }
 
-    /** Offsets for storage of ECL channels (that's actually from an older comment, not quite sure this is correct). */
+    /** Indices in arrays with info on ECL channels */
     struct crystallinks_t {
+      /** Index in EclAlgo tree */
       short unsigned int idn;
+      /** Index in EclNoise tree */
       short unsigned int inoise;
+      /** Index of associated (waveform parameters, fit parameters) pair */
       short unsigned int ifunc;
+      /** Index in m_ss */
       short unsigned int iss;
     };
 

@@ -8,24 +8,21 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import sys
+"""
+<header>
+  <input>TRGValidationGen.root</input>
+  <output>TRGValidation.root</output>
+  <contact>yinjh@korea.ac.kr</contact>
+  <description>makes validation plots for TRG</description>
+</header>
+"""
+
 
 import basf2
 from basf2 import *
 
 import ROOT
 from ROOT import Belle2, gROOT
-import time
-from array import array
-import numpy as np
-import rawdata
-import tracking
-import reconstruction
-from cdc.cr import *
-from tracking import add_cdc_track_finding
-from reconstruction import *
-from rawdata import add_unpackers
-from modularAnalysis import applyEventCuts
 
 PI = 3.1415926
 Fac = 180.0 / PI

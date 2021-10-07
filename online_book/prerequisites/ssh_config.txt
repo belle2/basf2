@@ -7,14 +7,14 @@
 
 # make all locally present ssh keys available at the remote site
 ForwardAgent yes
-# try to keep the connection alive, this avoids connection timeouts
-ServerAliveInterval 60
+# try to keep the connection alive, this avoids connection timeouts [S10]
+ServerAliveInterval 60  #  [E10]
 
-Host desy
+Host desy  #  [S20]
     User YOUR_DESY_USERNAME
-    Hostname bastion.desy.de
+    Hostname bastion.desy.de  #  [E20]
 
-Host kekcc
+Host kekcc  #  [S30]
     User YOUR_KEKCC_USERNAME
     Hostname login.cc.kek.jp
     Compression yes
@@ -22,15 +22,15 @@ Host kekcc
     ProxyJump sshcc1.kek.jp
 
 Host sshcc1.kek.jp
-    User YOUR_SSHLOGIN_USERNAME
+    User YOUR_SSHLOGIN_USERNAME  #  [E30]
     # NB: change the path to the IdentityFile to point to your own SSH key.
     IdentityFile ~/.ssh/id_kekccgateway
-    IdentitiesOnly yes
+    IdentitiesOnly yes  #  [E40]
 
-# Configuration for directly connecting to specific KEKCC nodes
+# Configuration for directly connecting to specific KEKCC nodes   [S50]
 # useful for connecting to a terminal multiplexer on a specific node
 Host ccw?? ccx??
     HostName %h.cc.kek.jp
     User YOUR_KEKCC_USERNAME
     Compression yes
-    ProxyJump sshcc1.kek.jp
+    ProxyJump sshcc1.kek.jp  #  [E50]

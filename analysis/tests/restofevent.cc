@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <gtest/gtest.h>
+#include <framework/utilities/TestHelpers.h>
 #include "utilities/TestParticleFactory.h"
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
@@ -171,8 +172,8 @@ namespace {
     EXPECT_TRUE(roe->getPhotons().size() == 2);
     EXPECT_TRUE(roe->getHadrons().size() == 0);
     EXPECT_TRUE(roe->getChargedParticles().size() == 4);
-    EXPECT_TRUE(roe->getChargedParticles("", 321).size() == 1);
-    EXPECT_TRUE(roe->getChargedParticles("", 211).size() == 3);
+    EXPECT_TRUE(roe->getChargedParticles("all", 321).size() == 1);
+    EXPECT_TRUE(roe->getChargedParticles("all", 211).size() == 3);
   }
 
   TEST_F(ROETest, updateMaskWithCuts)
@@ -236,4 +237,21 @@ namespace {
     EXPECT_FLOAT_EQ(v0maskParticles.size() , 5);
     EXPECT_FLOAT_EQ(v0maskParticlesUnpacked.size() , 6);
   }
+
+  TEST_F(ROETest, maskNamingConventions)
+  {
+    RestOfEvent roe;
+
+    EXPECT_B2FATAL(roe.initializeMask("clean-mask", "maskNamingConventionTest"));
+    EXPECT_B2FATAL(roe.initializeMask("1mask", "maskNamingConventionTest"));
+    EXPECT_B2FATAL(roe.initializeMask("", "maskNamingConventionTest"));
+    EXPECT_B2FATAL(roe.initializeMask("all", "maskNamingConventionTest"));
+
+    roe.initializeMask("Clean_mask", "maskNamingConventionTest");
+    EXPECT_TRUE(roe.hasMask("Clean_mask"));
+
+    roe.initializeMask("cl3an_mask", "maskNamingConventionTest");
+    EXPECT_TRUE(roe.hasMask("cl3an_mask"));
+  }
+
 } //

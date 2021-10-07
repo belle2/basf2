@@ -879,9 +879,9 @@ namespace Belle2 {
     /// check whether the innermost VXD hits are shared among daoughters
     REGISTER_VARIABLE("v0DaughtersShare1stHit", v0DaughtersShareInnermostHit,
                       "flag for V0 daughters sharing the first(innermost) VXD hit. 0x1(0x2) bit represents V/z(U/r-phi)-hit share.");
-    REGISTER_VARIABLE("v0DaughtersShare1stUHit", v0DaughtersShareInnermostHit,
+    REGISTER_VARIABLE("v0DaughtersShare1stUHit", v0DaughtersShareInnermostUHit,
                       "flag for V0 daughters sharing the first(innermost) VXD U-side hit.");
-    REGISTER_VARIABLE("v0DaughtersShare1stVHit", v0DaughtersShareInnermostHit,
+    REGISTER_VARIABLE("v0DaughtersShare1stVHit", v0DaughtersShareInnermostVHit,
                       "flag for V0 daughters sharing the first(innermost) VXD V-side hit.");
   }
 }

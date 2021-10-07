@@ -721,7 +721,7 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
   int_array_24x16_t&  ref_fg41 = p.fg41;
   int_array_24x16_t&  ref_fg43 = p.fg43;
 
-  ShaperDSP_t dsp(MP);
+  ShaperDSP_t dsp(MP, 27.7221);
   dsp.settimestride(ec.m_step);
   dsp.setseedoffset(ec.m_step / ec.m_ndt);
   dsp.settimeseed(-(ec.m_step - (ec.m_step / ec.m_ndt)));

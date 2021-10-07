@@ -18,6 +18,9 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/EventT0.h>
 
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+
+
 class TTree;
 
 namespace Belle2 {
@@ -72,6 +75,9 @@ namespace Belle2 {
      */
     std::unique_ptr< Belle2::ECL::ECLChannelMapper> m_crystalMapper =
       std::make_unique<Belle2::ECL::ECLChannelMapper>();
+
+
+    StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
 
 
     /**
@@ -227,6 +233,8 @@ namespace Belle2 {
     /**  correction to apply to CDC event t0 values in bhabha events to correct for CDC event t0
          bias compared to CDC event t0 in hadronic events in ns*/
     double m_hadronEventT0_TO_bhabhaEventT0_correction;
+
+    bool skipTrgSel; /**< flag to skip the trigger skim selection in the module */
 
 
   };

@@ -7,14 +7,15 @@
  **************************************************************************/
 #pragma once
 
+/* Belle2 headers. */
 #include <framework/core/Module.h>
-
-#include <string>
-
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <generators/hepmc/HepMCReader.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <generators/hepmc/HepMCReader.h>
-#include <generators/utilities/InitialParticleGeneration.h>
+/* C++ headers. */
+#include <string>
 
 namespace Belle2 {
 
@@ -53,7 +54,6 @@ namespace Belle2 {
     std::unique_ptr<HepMCReader> m_hepmcreader;           /**< An instance of the HepMC reader. */
     MCParticleGraph m_mcParticleGraph;             /**< The MCParticle graph object. */
     bool m_useWeights;               /**< Parameter to switch on/off weight propagation */
-    bool m_boost2Lab;                /**< Parameter to switch on/off boost to LAB system */
     bool m_wrongSignPz;              /**< Parameter to signal that direction of LER and HER was switched*/
     bool m_ignorereadEventNr;               /**< Count event numbers 'manually' */
     int m_runNum;                    /**< The run number that should be used if the reader acts as master */
@@ -62,10 +62,7 @@ namespace Belle2 {
     int m_minEvent;                    /**< Start at event number x. */
     int m_maxEvent;                    /**< Stop after processing n events. */
     int m_totalEvents;                    /**< totla number of events to read */
-    //int m_skipNEvents;                    /**< skip events in the file */
-    DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter. */
   private:
-    InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr; /**< event meta data pointer to control event nubmer etc */
   };
 

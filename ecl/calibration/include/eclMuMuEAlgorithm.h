@@ -27,9 +27,10 @@ namespace Belle2 {
       int cellIDLo;  /**<  First cellID to be fit */
       int cellIDHi;  /**<  Last cellID to be fit */
       int minEntries;  /**<  All crystals to be fit must have at least minEntries events in the fit range */
-      int maxIterations; /**< no more than maxIteration iterations */
-      double tRatioMin;  /**< Fit range is adjusted so that fit at upper endpoint is between tRatioMin and tRatioMax of peak */
-      double tRatioMax; /**< Fit range is adjusted so that fit at upper endpoint is between tRatioMin and tRatioMax of peak */
+      int nToRebin; /**< If fewer entries than this, rebin and fix eta parameter */
+      double tRatioMin;  /**< entries/peak at low edge of fit must be greater than this  */
+      double tRatioMax; /**< entries/peak at high edge of fit must be greater than this */
+      double lowerEdgeThresh; /**< Lower edge is where the fit = lowerEdgeThresh * peak value */
       bool performFits;  /**<  if false, input histograms are copied to output, but no fits are done. */
       bool findExpValues;  /**< if true, fits are used to find expected energy deposit for each crystal instead of the calibration constant */
       int storeConst; /**< controls which values are written to the database.

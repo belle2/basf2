@@ -99,7 +99,7 @@ namespace Belle2 {
       if (arguments.size() != 1)
         B2FATAL("An empty argument is not allowed for the variable thrustOm."
                 "Either provide no argument or a valid mask name.");
-      std::string maskName = arguments.empty() ? "" : arguments[0];
+      std::string maskName = arguments[0];
       auto func = [maskName](const Particle * particle) -> double {
         const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
         if (!qq)
@@ -198,6 +198,11 @@ namespace Belle2 {
           }
           if (arguments.size() == 3) {
             maskName = arguments[2];
+            if (maskName == "FS1") {
+              B2ERROR("It looks like you provided the arguments for KSFWVariables in the wrong order."
+                      "If you want to use the KSFW moments calculated from the B final state particles, the second argument has to be 'FS1'."
+                      "The third argument would then have to be the ROE mask name.");
+            }
           }
         }
         int index = -1;
@@ -272,10 +277,15 @@ namespace Belle2 {
           if (arguments[1] == "ROE") {
             useROE = true;
           } else {
-            maskName == arguments[1];
+            maskName = arguments[1];
           }
           if (arguments.size() == 3) {
             maskName = arguments[2];
+            if (maskName == "ROE") {
+              B2ERROR("It looks like you provided the arguments for CleoConeCS in the wrong order."
+                      "If you want to use the CleoCones calculated from all final state particles, the second argument has to be 'ROE'."
+                      "The third argument would then have to be the ROE mask name.");
+            }
           }
         }
 
@@ -294,6 +304,7 @@ namespace Belle2 {
           }
           if (!qq)
             return std::numeric_limits<double>::quiet_NaN();
+
           std::vector<float> cleoCones = qq->getCleoConesALL();
           if (useROE)
             cleoCones = qq->getCleoConesROE();
@@ -363,7 +374,7 @@ namespace Belle2 {
           StoreObjPtr<RestOfEvent> roe("RestOfEvent");
           const Particle* Bparticle = roe->getRelated<Particle>();
           RelationVector<ContinuumSuppression> continuumSuppressionRelations = Bparticle->getRelationsTo<ContinuumSuppression>("ALL");
-          ContinuumSuppression* qq;
+          ContinuumSuppression* qq = nullptr;
           if (maskName.empty())
           {
             if (continuumSuppressionRelations.size() == 1) {
@@ -376,6 +387,7 @@ namespace Belle2 {
           }
           if (!qq)
             return std::numeric_limits<double>::quiet_NaN();
+
           double isinROE = isInRestOfEvent(particle);
           TVector3 newZ;
           if (modeisSignal or (modeisAuto and isinROE < 0.5))
@@ -400,7 +412,7 @@ namespace Belle2 {
       } else {
         B2FATAL("Wrong number of arguments for meta function useBThrustFrame. It only takes two or three arguments. The first argument must be the variable."
                 "The second can either be 'Signal', 'ROE', or 'Auto'."
-                "The third argument is optional and can define a specific ROE mask name.");
+                "The third argument is optional (as long as the ContinuumSuppression was built only once) and can define a specific ROE mask name.");
       }
     }
 
@@ -471,9 +483,13 @@ Returns cosine of angle between thrust axis of the signal B and z-axis.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
 :noindex:
 )DOC");
-    REGISTER_VARIABLE("KSFWVariables(variable,string)", KSFWVariables,  R"DOC(
-Returns variable et, mm2, or one of the 16 KSFW moments. If only the ``variable`` argument is specified, the KSFW moment calculated from the B primary daughters is returned. 
-If string is set to ``FS1``, the KSFW moment calculated from the B final state daughters is returned.
+    REGISTER_VARIABLE("KSFWVariables(variable[, string, string])", KSFWVariables,  R"DOC(
+Returns variable et, mm2, or one of the 16 KSFW moments.
+The second and third arguments are optional unless you have created multiple instances of the ContinuumSuppression with different ROE masks.
+In that case the desired ROE mask name must be provided as well.
+If the second argument is set to 'FS1', the KSFW moment is calculated from the B final state daughters.
+Otherwise, the KSFW moment is calculated from the B primary daughters.
+The ROE mask name is then either the second or the third argument and must not be called 'FS1'.
 Allowed input values for ``variable`` argument are the following:
 
 * mm2,   et
@@ -486,10 +502,13 @@ Allowed input values for ``variable`` argument are the following:
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
 )DOC");
 
-    REGISTER_VARIABLE("CleoConeCS(integer,string)", CleoConesCS, R"DOC(
-Returns i-th cleo cones from the continuum suppression. The allowed inputs for ``integer`` argument are integers from *1* to *9*. 
-If only the ``integer`` argument is specified, the CleoCones are calculated from all final state particles. 
-The ``string`` argument is optional and the only allowed input value is 'ROE', which sets the CleoCones to be calculated only from ROE particles.
+    REGISTER_VARIABLE("CleoConeCS(integer[, string, string])", CleoConesCS, R"DOC(
+Returns i-th cleo cones from the continuum suppression. The allowed inputs for the ``integer`` argument are integers from *1* to *9*.
+The second and third arguments are optional unless you have created multiple instances of the ContinuumSuppression with different ROE masks.
+In that case the desired ROE mask name must be provided as well.
+If the second argument is set to 'ROE', the CleoCones are calculated only from ROE particles.
+Otherwise, the CleoCones are calculated from all final state particles.
+The ROE mask name is then either the second or the third argument and must not be called 'ROE'.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.

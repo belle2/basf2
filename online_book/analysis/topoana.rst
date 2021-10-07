@@ -3,25 +3,27 @@
 Topology analysis
 =================
 
+
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: XX min
+    **Teaching**: 45 min
 
-    **Exercises**: XX min
+    **Additional Exercises**: 45 min
 
     **Prerequisites**:
 
-        * Please fill.
+        * Command Line Tutorial (Bash)
 
     **Questions**:
 
-        * Please fill?
+        * What's inside my MC?
+        * How frequently do I have certain different decay modes in my MC?
 
     **Objectives**:
 
-        * Objective 1.
-        * Objective 2.
+        * Install `TopoAna`.
+	* Generate a PDF report with a lot of information about your MC.
 
 
 .. tip::

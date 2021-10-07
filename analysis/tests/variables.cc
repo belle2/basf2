@@ -4995,6 +4995,9 @@ namespace {
     const Particle* particle_with_no_cs = myParticles.appendNew();
     const Manager::Var* var = Manager::Instance().getVariable("KSFWVariables(mm2)");
     EXPECT_TRUE(std::isnan(var->function(particle_with_no_cs)));
+
+    // check that FS1 set as third argument, throws a B2ERROR
+    EXPECT_B2ERROR(Manager::Instance().getVariable("KSFWVariables(et, mask, FS1)"));
   }
 
   TEST_F(MetaVariableTest, CleoConeCS)
@@ -5009,10 +5012,13 @@ namespace {
     const Particle* particle_with_no_cs = myParticles.appendNew();
     const Manager::Var* var = Manager::Instance().getVariable("CleoConeCS(0)");
     EXPECT_TRUE(std::isnan(var->function(particle_with_no_cs)));
+
     // check that string other than ROE as second argument, which is interpreted as mask name, returns NaN
     var = Manager::Instance().getVariable("CleoConeCS(0, NOTROE)");
     EXPECT_TRUE(std::isnan(var->function(particle_with_no_cs)));
 
+    // check that ROE set as third argument, throws a B2ERROR
+    EXPECT_B2ERROR(Manager::Instance().getVariable("CleoConeCS(0, mask, ROE)"));
   }
 
   TEST_F(MetaVariableTest, TransformedNetworkOutput)

@@ -16,8 +16,10 @@
 #include <framework/dataobjects/Helix.h>
 
 // dataobjects from the MDST
+#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
 // framework aux
@@ -31,6 +33,8 @@ using namespace std;
 
 namespace Belle2 {
   namespace Variable {
+
+    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
 
     // helper function to get the helix parameters of the V0 daughter tracks
     // Not registered in variable manager
@@ -58,6 +62,24 @@ namespace Belle2 {
     double v0DaughterTrackNVXDHits(const Particle* part, const std::vector<double>& daughterID)
     {
       return v0DaughterTrackNPXDHits(part, daughterID) + v0DaughterTrackNSVDHits(part, daughterID);
+    }
+
+    double v0DaughterTrackNRemovedHits(const Particle* part, const std::vector<double>& daughterID)
+    {
+      // returns 0 if called for non-V0 particles
+      if (part->getParticleSource() != Particle::EParticleSourceObject::c_V0)
+        return 0;
+      auto daughter = part->getDaughter(daughterID[0]);
+      const Track* track = daughter->getTrack();
+      if (!track) return realNaN;
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(
+                                         daughter->getPDGCode())));
+      if (!trackFit) return realNaN;
+      double nHitsBeforeRemoval = trackFit->getHitPatternCDC().getNHits()
+                                  + trackFit->getHitPatternVXD().getNSVDHits()
+                                  + trackFit->getHitPatternVXD().getNPXDHits();
+      double nHitsAfterRemoval = trackNVXDHits(daughter) + trackNCDCHits(daughter);
+      return nHitsBeforeRemoval - nHitsAfterRemoval;
     }
 
     double v0DaughterTrackFirstSVDLayer(const Particle* part, const std::vector<double>& daughterID)
@@ -731,6 +753,8 @@ namespace Belle2 {
     MAKE_DEPRECATED("v0DaughterNVXDHits(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `nVXDHits`,
                      so replace the current call with ``daughter(i, nVXDHits)``.)DOC");
+    REGISTER_VARIABLE("v0DaughterNRemovedHits(i)", v0DaughterTrackNRemovedHits,
+                      "The number of the i-th daughter track hits removed in V0Finder. Returns 0 if called for something other than V0 daughters.");
     REGISTER_VARIABLE("v0DaughterFirstSVDLayer(i)", v0DaughterTrackFirstSVDLayer,
                       "First activated SVD layer associated to the i-th daughter track");
     MAKE_DEPRECATED("v0DaughterFirstSVDLayer(i)", false, "light-2104-poseidon", R"DOC(

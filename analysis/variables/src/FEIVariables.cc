@@ -19,7 +19,7 @@
 namespace Belle2 {
   namespace Variable {
 
-    double mostcommonBTagIndex(const Particle* part)
+    int mostcommonBTagIndex(const Particle* part)
     {
       std::map <int, int>tag_candidates;
       const std::vector<const Particle*>& fsp_tag = part->getFinalStateDaughters();
@@ -50,7 +50,7 @@ namespace Belle2 {
       while (i_mcpart) {
         auto* i_mcpart_mother = i_mcpart->getMother();
         if (i_mcpart_mother) {
-          std::vector<double> B_PDG = {511, 521};
+          std::vector<int> B_PDG = {511, 521};
           auto result = std::find(std::begin(B_PDG), std::end(B_PDG), abs(i_mcpart_mother->getPDG()));
           if (result != std::end(B_PDG)) {
             return i_mcpart_mother->getArrayIndex();
@@ -62,10 +62,10 @@ namespace Belle2 {
       }
       return -2;
     }
-    std::vector<double> truthFSPTag(double BTag_index)
+    std::vector<int> truthFSPTag(int BTag_index)
     {
       StoreArray<MCParticle> MC_Particle_list;
-      std::vector<double> fsp_truth_index;
+      std::vector<int> fsp_truth_index;
       for (const MCParticle iMCParticle : MC_Particle_list) {
         if ((BTag_index == finddescendant(&iMCParticle)) && (iMCParticle.hasStatus(MCParticle::c_StableInGenerator) == true)
             && (iMCParticle.hasStatus(MCParticle::c_IsISRPhoton) == false) && iMCParticle.hasStatus(MCParticle::c_IsFSRPhoton) == false
@@ -80,25 +80,25 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * part)-> double{
-          double index = var->function(part);
+          int index = var->function(part);
           if (index == -1)
           {
             return -1;
           } else{
-            std::vector<double> fsp_FEI_index;
+            std::vector<int> fsp_FEI_index;
             const std::vector<const Particle*>& fsp_tag = part->getFinalStateDaughters();
             for (const Particle* fsp : fsp_tag)
             {
               const MCParticle* mc_fsp = fsp->getMCParticle();
               if (mc_fsp) {
-                double tag_index = finddescendant(mc_fsp);
+                int tag_index = finddescendant(mc_fsp);
                 if (tag_index == index) {
                   fsp_FEI_index.push_back(mc_fsp->getArrayIndex());
                 }
               }
             }
-            std::vector<double> diff;
-            std::vector<double> fsp_truth_index = truthFSPTag(index);
+            std::vector<int> diff;
+            std::vector<int> fsp_truth_index = truthFSPTag(index);
             std::sort(fsp_truth_index.begin(), fsp_truth_index.end());
             std::sort(fsp_FEI_index.begin(), fsp_FEI_index.end());
             std::set_difference(fsp_truth_index.begin(), fsp_truth_index.end(), fsp_FEI_index.begin(), fsp_FEI_index.end(), std::inserter(diff, diff.begin()));
@@ -115,24 +115,24 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * part)-> double{
-          double index = var->function(part);
+          int index = var->function(part);
           if (index == -1)
           {
             return -1;
           } else{
             const std::vector<const Particle*>& fsp_tag = part->getFinalStateDaughters();
-            double wrong_FEI = 0.0;
+            int wrong_FEI = 0;
             for (const Particle* fsp : fsp_tag)
             {
               const MCParticle* mc_fsp = fsp->getMCParticle();
               if (mc_fsp) {
-                double tag_index = finddescendant(mc_fsp);
+                int tag_index = finddescendant(mc_fsp);
                 if (tag_index != index) {
-                  wrong_FEI += 1.0;
+                  wrong_FEI ++;
                 }
               }
             }
-            return wrong_FEI / truthFSPTag(index).size();
+            return double(wrong_FEI) / double(truthFSPTag(index).size());
           }
         };
         return func;

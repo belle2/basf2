@@ -21,7 +21,7 @@ namespace Belle2 {
     * Afterwards for each FSP the index of the B meson is determined on generator level. The index of the B meson with the most occurrences is returned.
     * If no B meson found, returns -1.
     */
-    double mostcommonBTagIndex(const Particle* part);
+    int mostcommonBTagIndex(const Particle* part);
     /*
     Given a MCParticle this function returns the index of the B meson. If now B meson found, returns -1.
     */
@@ -29,7 +29,7 @@ namespace Belle2 {
     /*
     Given an index of a B meson candidate, it determines the number of FSP on generator level. These FSP must be stable in the generator and cannot be a radiative particle.
     */
-    std::vector<double> truthFSPTag(double BTag_index);
+    std::vector<int> truthFSPTag(int BTag_index);
     /*
     By giving this function an index of a B meson candidate, it will return the percentage of missing particles from this given index.
     If continuum event this will return -1.

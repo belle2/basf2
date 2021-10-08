@@ -40,14 +40,20 @@ namespace Belle2 {
     // Do matching for each event
     void event() override;
 
-    void terminate() override;
+    // only nessesary if someone whants to save matching information to an external file
+    // void terminate() override;
   private: //Parameters
 
     //! Parameter : Defines the Cut Off values for each charged particle. The Cut Off values in the list for
     //        the  different pdgs have to be in the following order  [11,13,211,2212,321,1000010020]
     std::vector<double> m_param_CutOffs;
-
+    // Parameter: Posebility to switch beween ROOT and Eigen for inversion of the covariance matrix
     std::string param_linalg;
+
+    /*
+    // only nessesary if someone whants to save matching information to an external file
+    bool m_param_savehelix;
+    std::string m_param_filename;
 
     // Performance test Parameter
     //
@@ -69,5 +75,6 @@ namespace Belle2 {
     // Variable for saving data to file
     std::vector<std::string> fileHeader;
     std::vector<double> fileContent;
+    */
   };
 }

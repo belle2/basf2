@@ -28,7 +28,6 @@ include directive to avoid an undefined reference on compilation.
 #include <TVectorD.h>
 #include <TMatrixD.h>
 
-#include <tracking/mcMatcher/TrackMatchLookUp.h>
 
 using namespace Belle2;
 
@@ -54,11 +53,22 @@ Chi2McMatcherModule::Chi2McMatcherModule() : Module()
            m_param_CutOffs,
            "Defines the Cut Off values for each charged particle. pdg order [11,13,211,2212,321,1000010020]",
            defaultCutOffs);
-  addParam("linalg",
 
+  addParam("linalg",
            param_linalg,
-           "time_measurement_variable",
-           std::string("Eigen"));
+           "Parameter to switch between ROOT and Eigen, to invert the covariance matrix",
+           std::string("ROOT"));
+  /*
+  bool save_helix_param_default = 0;
+  addParam("save_helix_param",
+           m_param_savehelix,
+           "Debug variable to save helix parameters to csv",
+     save_helix_param_default);
+  addParam("filename",
+     m_param_filename,
+     "Debug variable to give filename for saveing helix parameters",
+     std::string("savedhelixparameter"));
+  */
 }
 
 void Chi2McMatcherModule::initialize()
@@ -70,12 +80,14 @@ void Chi2McMatcherModule::initialize()
   storeTrack.isRequired();
   storeTrack.registerRelationTo(storeMCParticles);
 
+  /*
   // Variables to save data
   fileHeader = {"D0_track", "Phi0_track", "Omega_track", "Z0_track", "TanLambda_track",
                 "D0_mc_chi2", "Phi0_mc_chi2", "Omega_mc_chi2", "Z0_mc_chi2", "TanLambda_mc_chi2",
                 "chi2_value",
                 "hitRelation", "chi2Relation", "bothRelation", "bothRelationAndSameMC", "notbothRelation", "noRelation" // (bool)
                };
+  */
 }
 
 void Chi2McMatcherModule::event()
@@ -99,32 +111,37 @@ void Chi2McMatcherModule::event()
   }
 
   // compare all tracks with all mcParticles in event
-  //
   for (int it = 0 ; it < nTracks; ++it) {
     auto track = Tracks[it];
-    ++totalCount;
+
+    /*
+    // Varibles to save matching information to csv file
     int hitMatch = 0;
     int chi2Match = 0;
     double track_helix[5];// D0,Phi0,Omega,Z0,TanLambda
     double mc_helix[5];
     double classifiers[6] = {0, 0, 0, 0, 0, 0}; //"hitRelation","chi2Relation","bothRelation","bothRelationAndSameMC","notbothRelation","noRelation"
     auto hitMCParticle = track->getRelated<MCParticle>();
+    */
+
     // test for existing relations
     if (track->getRelated<MCParticle>()) {
-      //B2DEBUG(100, "relations = " << track->getRelated<MCParticle>());
-      //continue;
+      B2DEBUG(100, "Relation already set continue with next track");
+      continue;
+
+      /*
+      // Variables to save matching information to csv file
       ++hitRelationCounter;
       classifiers[0] = 1; //hitrelation
       hitMatch = 1;
+      */
     }
     // initialize minimal chi2 variables
     int ip_min = -1;
     double chi2Min = std::numeric_limits<double>::infinity();
 
-    //int det0_count = 0;
-
+    // loop over MCParticles and calculate Chi2 for each track mcparticle pair, to fine minimal chi2
     for (int ip = 0; ip < nMCParticles; ++ip) {
-      //int det0 = 0;
       auto mcParticle = MCParticles[ip];
       // Check if current particle is a charged stable particle
       const Const::ParticleType mcParticleType(std::abs(mcParticle->getPDG()));
@@ -139,26 +156,8 @@ void Chi2McMatcherModule::event()
       // check if matrix is invertable
       double det = Covariance5.Determinant();
       if (det == 0.0) {
+        B2DEBUG(100, "Covariance5 matrix is not invertable. Continue!");
         continue;
-        /*
-              B2DEBUG(1, "=============================================");
-              det0 = 1;
-              ++det0_count;
-              TMatrixD cov(5, 5);
-              cov = Covariance5;
-              for (int i = 0; i < 5; ++i) {
-                cov[2][i] = 0.000000000000001;
-                cov[i][2] = 0.000000000000001;
-              }
-              B2DEBUG(1, "cov.Determinant() = " << cov.Determinant());
-              if (cov.Determinant() == 0.0) {
-                Covariance5.Print();
-                B2DEBUG(1, "Not invertable");
-                cov.Print();
-                continue;
-              }
-              Covariance5 = cov;
-        */
       }
 
       // generate helix for current mc particle
@@ -167,67 +166,75 @@ void Chi2McMatcherModule::event()
       auto b_field = BFieldManager::getField(mcParticle->getVertex()).Z() / Belle2::Unit::T;
       auto mcParticleHelix = Helix(mcParticle->getVertex(), mcParticle->getMomentum(), charge_sign, b_field);
 
-      // initialize chi2Cur
+      // initialize variable for current chi2
       double chi2Cur = std::numeric_limits<double>::infinity();
+
+      // Check which linear algebra system should be used and calculate chi2Cur
       if (param_linalg == "Eigen") {
         // Eigen
-
+        // build difference vector
         Eigen::VectorXd delta(5);
-
         delta(0) = trackFitResult->getD0()        - mcParticleHelix.getD0();
         delta(1) = trackFitResult->getPhi0()      - mcParticleHelix.getPhi0();
         delta(2) = trackFitResult->getOmega()     - mcParticleHelix.getOmega();
         delta(3) = trackFitResult->getZ0()        - mcParticleHelix.getZ0();
         delta(4) = trackFitResult->getTanLambda() - mcParticleHelix.getTanLambda();
-
+        // build convariance5 Eigen matrix
         Eigen::MatrixXd covariance5Eigen(5, 5);
         for (int i = 0; i < 5; i++) {
           for (int j = 0; j < 5; j++) {
             covariance5Eigen(i, j) = Covariance5[i][j];
           }
         }
+        //calculate chi2Cur
         chi2Cur = ((delta.transpose()) * (covariance5Eigen.inverse() * delta))(0, 0);
       } else if (param_linalg == "ROOT") {
         // ROOT
-
+        // calculate difference vector
         TMatrixD delta(5, 1);
         delta[0][0] = trackFitResult->getD0()        - mcParticleHelix.getD0();
         delta[1][0] = trackFitResult->getPhi0()      - mcParticleHelix.getPhi0();
         delta[2][0] = trackFitResult->getOmega()     - mcParticleHelix.getOmega();
         delta[3][0] = trackFitResult->getZ0()        - mcParticleHelix.getZ0();
         delta[4][0] = trackFitResult->getTanLambda() - mcParticleHelix.getTanLambda();
-
-        //TMatrixD covariance5_inv(TMatrixD::kInverted, Covariance5);
+        // invert Covariance5 matrix
         Covariance5.InvertFast();
-
+        // transpose difference vector
         TMatrixD deltaT = delta;
         deltaT.T();
-
+        // calculate chi2Cur
         chi2Cur = ((deltaT) * (Covariance5 * delta))[0][0];
       }
+      // check if chi2Cur is smaller than the so far found minimal chi2Min
       if (chi2Min > chi2Cur) {
         chi2Min = chi2Cur;
         ip_min = ip;
-        track_helix[0] = trackFitResult->getD0();
-        track_helix[1] = trackFitResult->getPhi0();
-        track_helix[2] = trackFitResult->getOmega();
-        track_helix[3] = trackFitResult->getZ0();
-        track_helix[4] = trackFitResult->getTanLambda();
-        mc_helix[0] = mcParticleHelix.getD0();
-        mc_helix[1] = mcParticleHelix.getPhi0();
-        mc_helix[2] = mcParticleHelix.getOmega();
-        mc_helix[3] = mcParticleHelix.getZ0();
-        mc_helix[4] = mcParticleHelix.getTanLambda();
+
+        /*
+        // Variables to save matching information to file
+        if (m_param_savehelix){
+          track_helix[0] = trackFitResult->getD0();
+          track_helix[1] = trackFitResult->getPhi0();
+          track_helix[2] = trackFitResult->getOmega();
+          track_helix[3] = trackFitResult->getZ0();
+          track_helix[4] = trackFitResult->getTanLambda();
+          mc_helix[0] = mcParticleHelix.getD0();
+          mc_helix[1] = mcParticleHelix.getPhi0();
+          mc_helix[2] = mcParticleHelix.getOmega();
+          mc_helix[3] = mcParticleHelix.getZ0();
+          mc_helix[4] = mcParticleHelix.getTanLambda();
+        }
+        */
       }
     }
-
+    // check if any matching candidate was found
     if (ip_min == -1) {
       continue;
     }
     // initialize Cut Off
     double cutOff = 0;
-
     // fill cut off with value
+    // find PDG for mcParticle with minimal chi2, because this determines individual cutOff
     int mcMinPDG = abs(MCParticles[ip_min]->getPDG());
 
     if (mcMinPDG == Belle2::Const::electron.getPDGCode()) {
@@ -246,21 +253,17 @@ void Chi2McMatcherModule::event()
       B2WARNING("The pdg for minimal chi2 was not in chargedstable particle list: MinPDG = " << mcMinPDG);
       continue;
     }
-    //TrackMatchLookUp trackMatchLookUp("Track");
-    //TrackMatchLookUp::PRToMCMatchInfo prMatchInfo = trackMatchLookUp.getPRToMCMatchInfo(Tracks[it]);
-    //B2DEBUG(1,"prMatchInfo = "<<prMatchInfo);
-    //TrackMatchLookup trackMatchLookUp("Track");
-    //auto matching_status = TrackMatchLookUp::extractPRToMCMatchInfo(Tracks[it]);
-    //RecoTrack::MatchingStatus matchingStatus = track->getMatchingStatus();
-    //B2DEBUG(1,"MatchingStatus = "<<track::MatchingStatus);
-    B2DEBUG(100, "cutoff = " << cutOff);
     if (chi2Min < cutOff) {
       Tracks[it]->addRelationTo(MCParticles[ip_min]);
+      /*
+      // Variables to save matching information to file
       ++chi2RelationCounter;
       chi2Match = 1;
       classifiers[1] = 1;
+      */
     }
-
+    /*
+    // Variables to save matching information to file
     if ((chi2Match == 1) and (hitMatch == 1)) {
       ++bothRelationCounter;
       classifiers[2] = 1;
@@ -277,18 +280,21 @@ void Chi2McMatcherModule::event()
     }
 
 
+    if (m_param_savehelix) {
 
-
-    for (int i = 0; i < 5; i++) {
-      fileContent.push_back(track_helix[i]);
+      for (int i = 0; i < 5; i++) {
+        fileContent.push_back(track_helix[i]);
+      }
+      for (int i = 0; i < 5; i++) {
+        fileContent.push_back(mc_helix[i]);
+      }
+      fileContent.push_back(chi2Min);
+      for (int i = 0; i < 5; i++) {
+        fileContent.push_back(classifiers[i]);
+      }
+      fileContent.push_back(bothRelationCounter/hitRelationCounter);
     }
-    for (int i = 0; i < 5; i++) {
-      fileContent.push_back(mc_helix[i]);
-    }
-    fileContent.push_back(chi2Min);
-    for (int i = 0; i < 5; i++) {
-      fileContent.push_back(classifiers[i]);
-    }
+    */
     /*
     B2DEBUG(1,"totalCount = "<<totalCount);
     B2DEBUG(1,"hitRelationCounter = "<<hitRelationCounter);
@@ -304,27 +310,32 @@ void Chi2McMatcherModule::event()
 }
 
 
-
+/*
+// Variables to save matching information to file
 void Chi2McMatcherModule::terminate()
 {
+  B2DEBUG(1,m_param_CutOffs);
+  if (m_param_savehelix) {
   std::ofstream outfile;
-  outfile.open("hitmatch_vs_chi2match.csv");
+  outfile.open(m_param_filename);
   if (!outfile) {  // file couldn't be opened
     std::cerr << "Error: file could not be opened" << std::endl;
     exit(1);
   }
-  for (int i = 0; i < fileHeader.size(); i++) {
+  int fileHeaderSize = fileHeader.size();
+  for (int i = 0; i < fileHeaderSize; i++) {
     outfile << fileHeader[i];
-    if (i != (fileHeader.size() - 1)) {
+    if (i != (fileHeaderSize - 1)) {
       outfile << ",";
     }
   }
   outfile << std::endl;
   int count = 0;
-  for (int index = 0; index < fileContent.size(); index++) {
+  int fileContentSize = fileContent.size();
+  for (int index = 0; index < (fileContentSize); index++) {
     outfile << fileContent[index];
     count++;
-    if (count == 16) {
+    if (count == 17) {
       count = 0;
       outfile << std::endl;
       continue;
@@ -332,4 +343,6 @@ void Chi2McMatcherModule::terminate()
     outfile << ",";
   }
   outfile.close();
+  }
 }
+*/

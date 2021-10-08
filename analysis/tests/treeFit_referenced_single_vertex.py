@@ -30,7 +30,7 @@ class TestTreeFits(unittest.TestCase):
             'analysis/1000_B_Jpsi_ks_pipi.root', 'validation', py_case=self)
         ma.inputMdst('default', inputfile, path=main)
 
-        ma.fillParticleList('mu+', 'pidProbabilityExpert(13, ALL) > 0.5', path=main)
+        ma.fillParticleList('mu+', 'muonID > 0.5', path=main)
 
         ma.reconstructDecay('J/psi:all -> mu+ mu-', '', 0, path=main)
         ma.matchMCTruth('J/psi:all', path=main)

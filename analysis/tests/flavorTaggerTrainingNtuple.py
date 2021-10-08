@@ -77,8 +77,6 @@ ntuple.param('treeName', methodPrefixEventLevel + "_tree")
 
 # Call variable aliases from flavor tagger
 ft.set_FlavorTagger_pid_aliases()
-# Alias for pidProbabilityExpert(11, ALL)
-vm.addAlias("eid_ALL", "pidProbabilityExpert(11, ALL)")
 
 variablesToBeSaved = ['useCMSFrame(p)',
                       'useCMSFrame(pt)',
@@ -86,7 +84,6 @@ variablesToBeSaved = ['useCMSFrame(p)',
                       'pt',
                       'cosTheta',
                       'electronID',
-                      'eid_ALL',
                       'eid_TOP',
                       'eid_ARICH',
                       'eid_ECL',
@@ -139,7 +136,7 @@ with b2test_utils.clean_working_directory():
         assert abs(t1.p) > 0, " p should be greater than 0"
         assert abs(t1.pt) > 0, " pt should be greater than 0"
         assert abs(t1.cosTheta) > 0, " cosTheta should be greater than 0"
-        assert abs(t1.eid_ALL) > 0, " electronID should be greater than 0"
+        assert abs(t1.electronID) > 0, " electronID should be greater than 0"
         assert abs(t1.eid_TOP) > 0, " eid_TOP should be greater than 0"
         assert abs(t1.eid_ARICH) > 0, " eid_ARICH should be greater than 0"
         assert abs(t1.eid_ECL) > 0, "eid_ECL should be greater than 0"

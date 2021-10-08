@@ -4178,7 +4178,6 @@ namespace {
     mytrack.setTrackFitResultIndex(Const::electron, 0);
     Track* allTrack = tracks.appendNew(mytrack);
     Track* noSVDTrack = tracks.appendNew(mytrack);
-    Track* noSVDNoTOPTrack = tracks.appendNew(mytrack);
     Track* noPIDTrack = tracks.appendNew(mytrack);
     Track* dEdxTrack = tracks.appendNew(mytrack);
 
@@ -4230,17 +4229,12 @@ namespace {
 
     // Likelihoods for all detectors but SVD
     auto* lAllNoSVD = likelihood.appendNew();
-    // Likelihoods for all detectors but SVD and TOP
-    auto* lAllNoSVDNoTOP = likelihood.appendNew();
 
     for (unsigned int iDet(0); iDet < Const::PIDDetectors::c_size; iDet++) {
       const auto det =  Const::PIDDetectors::c_set[iDet];
       for (const auto& hypo : Const::chargedStableSet) {
         if (det != Const::SVD) {
           lAllNoSVD->setLogLikelihood(det, hypo, lAll->getLogL(hypo, det));
-          if (det != Const::TOP) {
-            lAllNoSVDNoTOP->setLogLikelihood(det, hypo, lAll->getLogL(hypo, det));
-          }
         }
       }
     }
@@ -4267,64 +4261,62 @@ namespace {
 
     allTrack->addRelationTo(lAll);
     noSVDTrack->addRelationTo(lAllNoSVD);
-    noSVDNoTOPTrack->addRelationTo(lAllNoSVDNoTOP);
     dEdxTrack->addRelationTo(ldEdx);
 
     // Table with the sum(LogL) for several cases
-    //      All   dEdx  AllNoSVD AllNoSVDNoTOP
-    // e    0.71  0.22  0.61     0.43
-    // mu   3.5   1.14  2.92     2.42
-    // pi   1.4   0.54  1.12     0.92
-    // k    1.9   0.74  1.52     1.22
-    // p    2.22  0.94  1.74     1.34
-    // d    3.22  1.34  2.54     1.94
+    //      All   dEdx  AllNoSVD
+    // e    0.71  0.22  0.61
+    // mu   3.5   1.14  2.92
+    // pi   1.4   0.54  1.12
+    // k    1.9   0.74  1.52
+    // p    2.22  0.94  1.74
+    // d    3.22  1.34  2.54
 
     auto* particleAll = particles.appendNew(allTrack, Const::pion);
     auto* particleNoSVD = particles.appendNew(noSVDTrack, Const::pion);
-    auto* particleNoSVDNoTOP = particles.appendNew(noSVDNoTOPTrack, Const::pion);
     auto* particledEdx = particles.appendNew(dEdxTrack, Const::pion);
     auto* particleNoID = particles.appendNew(noPIDTrack, Const::pion);
 
     double numsumexp = std::exp(0.71) + std::exp(3.5) + std::exp(1.4) + std::exp(1.9) + std::exp(2.22) + std::exp(3.22);
     double numsumexp_noSVD = std::exp(0.61) + std::exp(2.92) + std::exp(1.12) + std::exp(1.52) + std::exp(1.74) + std::exp(2.54);
-    double numsumexp_noSVDNoTOP = std::exp(0.43) + std::exp(2.42) + std::exp(0.92) + std::exp(1.22) + std::exp(1.34) + std::exp(1.94);
 
     // Basic PID quantities. Currently just wrappers for global probability.
-    EXPECT_FLOAT_EQ(electronID(particleNoSVD), std::exp(0.61) / numsumexp_noSVD);
-    EXPECT_FLOAT_EQ(muonID(particleNoSVD),     std::exp(2.92) / numsumexp_noSVD);
-    EXPECT_FLOAT_EQ(pionID(particleNoSVD),     std::exp(1.12) / numsumexp_noSVD);
-    EXPECT_FLOAT_EQ(kaonID(particleNoSVD),     std::exp(1.52) / numsumexp_noSVD);
-    EXPECT_FLOAT_EQ(protonID(particleNoSVD),   std::exp(1.74) / numsumexp_noSVD);
-    EXPECT_FLOAT_EQ(deuteronID(particleNoSVD), std::exp(2.54) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(electronID(particleAll), std::exp(0.71) / numsumexp);
+    EXPECT_FLOAT_EQ(muonID(particleAll),     std::exp(3.5) / numsumexp);
+    EXPECT_FLOAT_EQ(pionID(particleAll),     std::exp(1.4) / numsumexp);
+    EXPECT_FLOAT_EQ(kaonID(particleAll),     std::exp(1.9) / numsumexp);
+    EXPECT_FLOAT_EQ(protonID(particleAll),   std::exp(2.22) / numsumexp);
+    EXPECT_FLOAT_EQ(deuteronID(particleAll), std::exp(3.22) / numsumexp);
 
     // smart PID that takes the hypothesis into account
-    auto* particleElectronNoSVD = particles.appendNew(noSVDTrack, Const::electron);
-    auto* particleMuonNoSVD = particles.appendNew(noSVDTrack, Const::muon);
-    auto* particleKaonNoSVD = particles.appendNew(noSVDTrack, Const::kaon);
-    auto* particleProtonNoSVD = particles.appendNew(noSVDTrack, Const::proton);
-    auto* particleDeuteronNoSVD = particles.appendNew(noSVDTrack, Const::deuteron);
+    auto* particleElectron = particles.appendNew(allTrack, Const::electron);
+    auto* particleMuon = particles.appendNew(allTrack, Const::muon);
+    auto* particleKaon = particles.appendNew(allTrack, Const::kaon);
+    auto* particleProton = particles.appendNew(allTrack, Const::proton);
+    auto* particleDeuteron = particles.appendNew(allTrack, Const::deuteron);
 
-    EXPECT_FLOAT_EQ(particleID(particleNoSVD), std::exp(1.12) / numsumexp_noSVD); // there's already a pion
-    EXPECT_FLOAT_EQ(particleID(particleElectronNoSVD), std::exp(0.61) / numsumexp_noSVD);
-    EXPECT_FLOAT_EQ(particleID(particleMuonNoSVD), std::exp(2.92) / numsumexp_noSVD);
-    EXPECT_FLOAT_EQ(particleID(particleKaonNoSVD), std::exp(1.52) / numsumexp_noSVD);
-    EXPECT_FLOAT_EQ(particleID(particleProtonNoSVD),   std::exp(1.74) / numsumexp_noSVD);
-    EXPECT_FLOAT_EQ(particleID(particleDeuteronNoSVD), std::exp(2.54) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(particleID(particleAll), std::exp(1.4) / numsumexp); // there's already a pion
+    EXPECT_FLOAT_EQ(particleID(particleElectron), std::exp(0.71) / numsumexp);
+    EXPECT_FLOAT_EQ(particleID(particleMuon), std::exp(3.5) / numsumexp);
+    EXPECT_FLOAT_EQ(particleID(particleKaon), std::exp(1.9) / numsumexp);
+    EXPECT_FLOAT_EQ(particleID(particleProton),   std::exp(2.22) / numsumexp);
+    EXPECT_FLOAT_EQ(particleID(particleDeuteron), std::exp(3.22) / numsumexp);
 
-    // TEMP: Electron ID w/o the TOP.
-    EXPECT_FLOAT_EQ(electronID_noTOP(particleNoSVDNoTOP), std::exp(0.43) / numsumexp_noSVDNoTOP);
+    // TEMP: PID w/o the SVD.
+    EXPECT_FLOAT_EQ(electronID_noSVD(particleNoSVD), std::exp(0.61) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(muonID_noSVD(particleNoSVD), std::exp(2.92) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(pionID_noSVD(particleNoSVD), std::exp(1.12) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(kaonID_noSVD(particleNoSVD), std::exp(1.52) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(protonID_noSVD(particleNoSVD), std::exp(1.74) / numsumexp_noSVD);
+    EXPECT_FLOAT_EQ(deuteronID_noSVD(particleNoSVD), std::exp(2.54) / numsumexp_noSVD);
 
-    // Hadron ID vars w/ SVD info included. Only pi, K, p.
-    double numsumexp_had = std::exp(1.4) + std::exp(1.9) + std::exp(2.22);
-    EXPECT_FLOAT_EQ(pionID_SVD(particleAll), std::exp(1.4) / numsumexp_had);
-    EXPECT_FLOAT_EQ(kaonID_SVD(particleAll), std::exp(1.9) / numsumexp_had);
-    EXPECT_FLOAT_EQ(protonID_SVD(particleAll), std::exp(2.22) / numsumexp_had);
+    // Binary PID
     std::vector<double> v_pi_K {211., 321.};
     std::vector<double> v_pi_p {211., 2212.};
     std::vector<double> v_K_p {321., 2212.};
-    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_pi_K), std::exp(1.4) / (std::exp(1.4) + std::exp(1.9)));
-    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_pi_p), std::exp(1.4) / (std::exp(1.4) + std::exp(2.22)));
-    EXPECT_FLOAT_EQ(binaryPID_SVD(particleAll, v_K_p), std::exp(1.9) / (std::exp(1.9) + std::exp(2.22)));
+    EXPECT_FLOAT_EQ(binaryPID(particleAll, v_pi_K), std::exp(1.4) / (std::exp(1.4) + std::exp(1.9)));
+    EXPECT_FLOAT_EQ(binaryPID(particleAll, v_pi_p), std::exp(1.4) / (std::exp(1.4) + std::exp(2.22)));
+    EXPECT_FLOAT_EQ(binaryPID(particleAll, v_K_p), std::exp(1.9) / (std::exp(1.9) + std::exp(2.22)));
 
     // Check what happens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));
@@ -4338,23 +4330,23 @@ namespace {
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP)")->function(particleAll)),
                     0.18);
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ALL)")->function(particleAll)),
-                    0.70);
+                    0.71);
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(2212, TOP, CDC)")->function(
                                        particleAll)), 0.86);
 
     // global probability
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(particleAll)),
-                    std::exp(3.2) / numsumexp);
+                    std::exp(3.22) / numsumexp);
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(particleAll)),
-                    std::exp(2.2) / numsumexp);
+                    std::exp(2.22) / numsumexp);
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particleAll)),
-                    std::exp(1.2) / numsumexp);
+                    std::exp(1.4) / numsumexp);
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(particleAll)),
-                    std::exp(1.7) / numsumexp);
+                    std::exp(1.9) / numsumexp);
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(particleAll)),
-                    std::exp(2.7) / numsumexp);
+                    std::exp(3.5) / numsumexp);
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(particleAll)),
-                    std::exp(0.7) / numsumexp);
+                    std::exp(0.71) / numsumexp);
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx)),
                     std::exp(0.54) / (std::exp(0.22) + std::exp(1.14) + std::exp(0.54) + std::exp(0.74) + std::exp(0.94) + std::exp(1.34)));
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx)),
@@ -4367,7 +4359,7 @@ namespace {
     // binary probability
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(
                                        particleAll)),
-                    1.0 / (1.0 + std::exp(2.2 - 1.7)));
+                    1.0 / (1.0 + std::exp(2.22 - 1.9)));
     EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(
                                        particledEdx)),
                     1.0 / (1.0 + std::exp(0.94 - 0.74)));
@@ -5011,6 +5003,9 @@ namespace {
     const Particle* particle_with_no_cs = myParticles.appendNew();
     const Manager::Var* var = Manager::Instance().getVariable("KSFWVariables(mm2)");
     EXPECT_TRUE(std::isnan(std::get<double>(var->function(particle_with_no_cs))));
+
+    // check that FS1 set as third argument, throws a B2ERROR
+    EXPECT_B2ERROR(Manager::Instance().getVariable("KSFWVariables(et, mask, FS1)"));
   }
 
   TEST_F(MetaVariableTest, CleoConeCS)
@@ -5020,14 +5015,18 @@ namespace {
     // check that garbage input throws helpful B2FATAL
     EXPECT_B2FATAL(Manager::Instance().getVariable("CleoConeCS(NONSENSE)"));
 
-    // check that string other than ROE for second argument throws B2FATAL
-    EXPECT_B2FATAL(Manager::Instance().getVariable("CleoConeCS(0, NOTROE)"));
-
     // check for NaN if we don't have a CS object for this particle
     StoreArray<Particle> myParticles;
     const Particle* particle_with_no_cs = myParticles.appendNew();
     const Manager::Var* var = Manager::Instance().getVariable("CleoConeCS(0)");
     EXPECT_TRUE(std::isnan(std::get<double>(var->function(particle_with_no_cs))));
+
+    // check that string other than ROE as second argument, which is interpreted as mask name, returns NaN
+    var = Manager::Instance().getVariable("CleoConeCS(0, NOTROE)");
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(particle_with_no_cs))));
+
+    // check that ROE set as third argument, throws a B2ERROR
+    EXPECT_B2ERROR(Manager::Instance().getVariable("CleoConeCS(0, mask, ROE)"));
   }
 
   TEST_F(MetaVariableTest, TransformedNetworkOutput)

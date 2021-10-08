@@ -20,7 +20,6 @@
 
 import basf2
 import ROOT
-from basf2 import create_path, process
 from ROOT import Belle2, gROOT, TH1F, TFile, TNamed
 from math import pi as PI
 
@@ -32,17 +31,17 @@ class MakePlots(basf2.Module):
     Make validation histograms for trg ecl/cdc/klm
     '''
 
-    def set_descr(self, histogram, Description, Check):
+    def set_descr(self, histogram, description, check):
         '''
         Sets description, check and contact to validation histogram.
         :param h validation histogram
         :param Descr description text
         '''
 
-        descr = TNamed('Description', Description)
+        descr = TNamed('Description', description)
         histogram.GetListOfFunctions().Add(descr)
-        check = TNamed('Check', Check)
-        histogram.GetListOfFunctions().Add(check)
+        Check = TNamed('Check', check)
+        histogram.GetListOfFunctions().Add(Check)
         contact = TNamed('Contact', 'yinjh2012@korea.ac.kr')
         histogram.GetListOfFunctions().Add(contact)
         Meta = TNamed("MetaOptions", "shifter")
@@ -253,7 +252,7 @@ class MakePlots(basf2.Module):
 
 
 # Create path
-main = create_path()
+main = basf2.create_path()
 
 # INput
 root_input = basf2.register_module('RootInput')
@@ -264,4 +263,4 @@ main.add_module(root_input)
 # Make plots
 main.add_module(MakePlots())
 
-process(main)
+basf2.process(main)

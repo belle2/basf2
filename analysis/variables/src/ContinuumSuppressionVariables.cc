@@ -481,6 +481,7 @@ Returns cosine of angle between thrust axis of the signal B and z-axis.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
+:noindex:
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("KSFWVariables(variable[, string, string])", KSFWVariables,  R"DOC(
 Returns variable et, mm2, or one of the 16 KSFW moments.

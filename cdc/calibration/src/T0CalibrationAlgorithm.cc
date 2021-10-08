@@ -1,10 +1,10 @@
 /**************************************************************************
- * basf2 (Belle II Analysis Software Framework)                           *
- * Author: The Belle II Collaboration                                     *
- *                                                                        *
- * See git log for contributors and copyright holders.                    *
- * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
- **************************************************************************/
+- * basf2 (Belle II Analysis Software Framework)                           *
+- * Author: The Belle II Collaboration                                     *
+- *                                                                        *
+- * See git log for contributors and copyright holders.                    *
+- * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+- **************************************************************************/
 #include <cdc/calibration/T0CalibrationAlgorithm.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dbobjects/CDCTimeZeros.h>
@@ -17,6 +17,7 @@
 #include <TF1.h>
 #include <TFile.h>
 #include <TTree.h>
+#include <TStopwatch.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
@@ -93,6 +94,8 @@ void T0CalibrationAlgorithm::createHisto()
   //read data
   const Long64_t nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
+  TStopwatch timer;
+  timer.Start();
   for (Long64_t i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     double xmax = halfCSize[lay] - 0.1;
@@ -106,8 +109,10 @@ void T0CalibrationAlgorithm::createHisto()
     int boardID = cdcgeo.getBoardID(WireID(lay, IWire));
     m_hT0b[boardID]->Fill(t_mea - t_fit);
   }
-
+  timer.Stop();
   B2INFO("Finish making histogram for all channels");
+  B2INFO("Time to fill histograms: " << timer.RealTime() << "s");
+
 }
 
 CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
@@ -269,22 +274,31 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
     }
     fout->Close();
   }
-  B2INFO("Writing constants");
-  write();
+  B2INFO("Writing constants...");
+  int Ngood_T0 = write();
+  B2INFO("Checking conversion conditons...");
+  double rms_dT = hm_All->GetRMS();
+  double n_below = hm_All->Integral(0, hm_All->GetXaxis()->FindBin(m_offsetMeanDt - 5 * rms_dT));
+  double n_upper = hm_All->Integral(hm_All->GetXaxis()->FindBin(m_offsetMeanDt + 5 * rms_dT), hm_All->GetXaxis()->GetNbins() - 1);
+  int N_remaining = n_below + n_upper - (14112 - Ngood_T0);
+  if (N_remaining < 0) N_remaining = 0;
+  B2INFO("+ Number of channel which are properly calibrated  : " << Ngood_T0);
+  B2INFO("+ Number of channel which still need to be calibrated are: " << N_remaining << "(requirement <" << m_maxBadChannel << ")");
+  B2INFO("+ Median of Delta_T - offset:" << hm_All->GetMean() - m_offsetMeanDt << "(requirement: <" << m_maxMeanDt << ")");
+  B2INFO("+ RMS of Delta_T dist. :" << rms_dT << "  (Requirement: <" << m_maxRMSDt << ")");
 
-
-  if (fabs(hm_All->GetMean()) < m_maxMeanDt && fabs(hm_All->GetRMS()) < m_maxRMSDt) {
-    B2INFO("mean " << fabs(hm_All->GetMean()) << " " << m_maxMeanDt);
-    B2INFO("sigma " << fabs(hm_All->GetRMS()) << " " << m_maxRMSDt);
+  if (fabs(hm_All->GetMean() - m_offsetMeanDt) < m_maxMeanDt
+      && fabs(hm_All->GetRMS()) < m_maxRMSDt
+      && N_remaining < m_maxBadChannel) {
+    B2INFO("T0 Calibration Finished:");
     return c_OK;
   } else {
-    B2INFO("mean " << fabs(hm_All->GetMean()) << " " << m_maxMeanDt);
-    B2INFO("sigma " << fabs(hm_All->GetRMS()) << " " << m_maxRMSDt);
+    B2INFO("Need more iteration ...");
     return c_Iterate;
   }
 }
 
-void T0CalibrationAlgorithm::write()
+int T0CalibrationAlgorithm::write()
 {
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   CDCTimeZeros* tz = new CDCTimeZeros();
@@ -331,6 +345,7 @@ void T0CalibrationAlgorithm::write()
 
   //correct T0 and write
   double dT;
+  int N_good = 0;
   for (int ilay = 0; ilay < 56; ++ilay) {
     const unsigned int nW = cdcgeo.nWiresInLayer(ilay);
     for (unsigned int iwire = 0; iwire < nW; ++iwire) {
@@ -350,6 +365,7 @@ void T0CalibrationAlgorithm::write()
       dT = 0;
       if (abs(err_dt[ilay][iwire]) < 2 && abs(dt[ilay][iwire]) < 20) {
         dT = dt[ilay][iwire];
+        N_good += 1;
       }
 
       //export
@@ -361,6 +377,7 @@ void T0CalibrationAlgorithm::write()
     tz->outputToFile(m_outputT0FileName);
   }
   saveCalibration(tz, "CDCTimeZeros");
+  return N_good;
 }
 double T0CalibrationAlgorithm::getMeanT0(TH1F* h1)
 {

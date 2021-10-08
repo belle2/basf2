@@ -1039,8 +1039,9 @@ C      TAU-  --> ETA  PI-  PI0
        COEF=COEFrr(I,J)
       ELSE 
        JJ=J
-       IF(J.EQ.13.OR.J.EQ.14) JJ=7
        IF(J.GE.9) JJ=0
+       IF(J.EQ.13.OR.J.EQ.14) JJ=7
+       if (jj.lt.0.or.jj.ge.8) write(*,*) 'CATASTROPHY in Funct COEF(i,j) ',i,jj,COEFc(I,JJ)
        COEF=COEFc(I,JJ)
       ENDIF
       END

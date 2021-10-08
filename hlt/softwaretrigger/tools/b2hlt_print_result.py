@@ -13,7 +13,7 @@ PyConfig.StartGuiThread = False  # noqa
 
 import basf2
 from argparse import ArgumentParser
-import uproot
+from root_pandas import read_root
 import pandas as pd
 import numpy as np
 
@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
         basf2.process(path)
 
-    df = uproot.open(args.output)["software_trigger_results"].arrays(library="pd")
+    df = read_root(args.output)
 
     # Make sure to cope with strings rather than bools (which is a bit strange in pandas)
     df[["accept_or_reject", "prescaled", "cut"]] = df[["accept_or_reject", "prescaled", "cut"]].astype("str")

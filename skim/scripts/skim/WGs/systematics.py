@@ -812,9 +812,8 @@ class SystematicsBhabha(BaseSkim):
         ma.cutAndCopyList("e+:tight", "e+:all", goodtrackwithPID, path=path)
         ma.cutAndCopyList("e+:loose", "e+:all", goodtrack, path=path)
 
-        recoil = "m2Recoil < 10"
         ma.reconstructDecay(
-            "vpho:bhabha -> e+:tight e-:loose", recoil, path=path)
+            "vpho:bhabha -> e+:tight e-:loose", "", path=path)
 
         event_cuts = "[nCleanedTracks(abs(dz) < 5 and abs(dr) < 2) == 2]"\
                      f" and eventRandom < {(1/self.prescale):.6f}"

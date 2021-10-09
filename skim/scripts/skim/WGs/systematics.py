@@ -717,7 +717,7 @@ class SystematicsJpsi(BaseSkim):
         ma.correctBrems('e+:brems_corrected', 'e+:all', 'gamma:brems', path=path)
         ma.reconstructDecay(
             "J/psi:systematics_ee -> e+:brems_corrected e-:brems_corrected",
-            f'{Cuts} and [daughter(0,electronID)>0.1 or daughter(1,electronID)>0.1]',
+            f'{Cuts} and [daughter(0,electronID_noTOP)>0.1 or daughter(1,electronID_noTOP)>0.1]',
             path=path)
         return "J/psi:systematics_ee"
 
@@ -807,7 +807,7 @@ class SystematicsBhabha(BaseSkim):
 
     def build_lists(self, path):
         goodtrack = "abs(dz) < 5 and abs(dr) < 2"
-        goodtrackwithPID = f"{goodtrack} and electronID > 0.95 and clusterTheta > 0.59"\
+        goodtrackwithPID = f"{goodtrack} and electronID_noTOP > 0.95 and clusterTheta > 0.59"\
             " and clusterTheta < 2.15 and useCMSFrame(clusterE) > 2"
         ma.cutAndCopyList("e+:tight", "e+:all", goodtrackwithPID, path=path)
         ma.cutAndCopyList("e+:loose", "e+:all", goodtrack, path=path)

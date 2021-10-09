@@ -88,7 +88,7 @@ namespace {
 
 PXDValidationAlgorithm::PXDValidationAlgorithm():
   CalibrationAlgorithm("PXDCDSTCollector")
-  , minTrackPoints(1000), save2DHists(false)
+  , minTrackPoints(1000), save2DHists(false), saveD0Z0(false), binsD0Z0(600)
   , m_exp(-1), m_run(-1), m_hD0(nullptr), m_hZ0(nullptr)
   , m_hTrackPointsLayer1(nullptr), m_hTrackClustersLayer1(nullptr)
   , m_hTrackPointsLayer2(nullptr), m_hTrackClustersLayer2(nullptr)
@@ -180,8 +180,8 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
     m_tree = std::make_shared<TTree>("tree", "PXD validation data");
     // Define histograms out of m_file
     currentDir->cd();
-    m_hD0 = new TH1F("hD0", "Corrected d0;#Delta d0/#sqrt{2} [cm];Counts", 600, -0.03, 0.03);
-    m_hZ0 = new TH1F("hZ0", "Corrected z0;#Delta z0/#sqrt{2} [cm];Counts", 600, -0.03, 0.03);
+    m_hD0 = new TH1F("hD0", "Corrected d0;#Delta d0/#sqrt{2} [cm];Counts", binsD0Z0, -0.03, 0.03);
+    m_hZ0 = new TH1F("hZ0", "Corrected z0;#Delta z0/#sqrt{2} [cm];Counts", binsD0Z0, -0.03, 0.03);
     m_file->cd();
 
     m_tree->Branch<int>("exp", &m_exp);
@@ -195,6 +195,11 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
     m_tree->Branch("nSelTrackClusters", &m_nSelTrackClusters);
     m_tree->Branch<TH1F>("hD0", &m_hD0, 32000, 0);
     m_tree->Branch<TH1F>("hZ0", &m_hZ0, 32000, 0);
+
+    if (saveD0Z0) {
+      m_tree->Branch("d0", &m_d0);
+      m_tree->Branch("z0", &m_z0);
+    }
 
     if (save2DHists) {
       m_hTrackPointsLayer1   = (TH2F*)hTotalHitsLayer1->Clone();
@@ -229,6 +234,8 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
   m_nTrackPoints.clear();
   m_nSelTrackPoints.clear();
   m_nSelTrackClusters.clear();
+  m_d0.clear();
+  m_z0.clear();
 
   // Get resolution trees and create histograms
   auto tree_d0z0 = getObjectPtr<TTree>("tree_d0z0");
@@ -246,6 +253,10 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
       continue;
     m_hD0->Fill(d0);
     m_hZ0->Fill(z0);
+    if (saveD0Z0) {
+      m_d0.emplace_back(d0);
+      m_z0.emplace_back(z0);
+    }
   }
 
 

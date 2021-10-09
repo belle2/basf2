@@ -165,14 +165,14 @@ void PXDPerformanceVariablesCollectorModule::prepare() // Do your initialise() s
       }
     }
 
-  auto hTotalHitsLayer1  = new TH2F("hTotalHitsLayer1",  "Total number of hits from layer 1;#phi;z [cm]",  729, -M_PI, M_PI, 400,
+  auto hTotalHitsLayer1  = new TH2F("hTotalHitsLayer1",  "Total number of hits from layer 1;#phi;z [cm]",  720, -M_PI, M_PI, 400,
                                     -3.2, 6.2);
-  auto hPassedHitsLayer1 = new TH2F("hPassedHitsLayer1", "Passed number of hits from layer 1;#phi;z [cm]", 729, -M_PI, M_PI, 400,
+  auto hPassedHitsLayer1 = new TH2F("hPassedHitsLayer1", "Passed number of hits from layer 1;#phi;z [cm]", 720, -M_PI, M_PI, 400,
                                     -3.2, 6.2);
-  auto hTotalHitsLayer2  = new TH2F("hTotalHitsLayer2",  "Total number of hits from layer 2;#phi;z [cm]",  729, -M_PI, M_PI, 400,
-                                    -4.2, 8.2);
-  auto hPassedHitsLayer2 = new TH2F("hPassedHitsLayer2", "Passed number of hits from layer 2;#phi;z [cm]", 729, -M_PI, M_PI, 400,
-                                    -4.2, 8.2);
+  auto hTotalHitsLayer2  = new TH2F("hTotalHitsLayer2",  "Total number of hits from layer 2;#phi;z [cm]",  720, -M_PI, M_PI, 400,
+                                    -4.5, 8.5);
+  auto hPassedHitsLayer2 = new TH2F("hPassedHitsLayer2", "Passed number of hits from layer 2;#phi;z [cm]", 720, -M_PI, M_PI, 400,
+                                    -4.5, 8.5);
   registerObject<TH2F>("hTotalHitsLayer1", hTotalHitsLayer1);
   registerObject<TH2F>("hPassedHitsLayer1", hPassedHitsLayer1);
   registerObject<TH2F>("hTotalHitsLayer2", hTotalHitsLayer2);

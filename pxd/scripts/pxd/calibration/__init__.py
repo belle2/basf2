@@ -242,6 +242,7 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         validation_alg.setPrefix(collector_prefix)
         validation_alg.minTrackPoints = 10     # Minimum number of track points
         validation_alg.save2DHists = True      # Flag to save 2D histogram for efficiency on layer 1 or 2 in Z-phi plane
+        validation_alg.saveD0Z0 = kwargs.get("saveD0Z0", False)  # Flag to save corrected d0 (z0) difference
         algorithms.append(validation_alg)
 
     # validation_alg.setBoundaries(boundaries)  # This takes boundaries from the expert_config

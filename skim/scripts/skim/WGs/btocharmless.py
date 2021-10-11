@@ -35,11 +35,11 @@ class BtoPi0Pi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`\\B^0 -> \\pi^0 \\pi^0`
+    * :math:'B^{0}\\to \\pi^0 \\pi^0'
 
     Cuts applied:
 
-    * ``5.24 < Mbc < 5.29``
+    * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
 
     """
@@ -48,11 +48,14 @@ class BtoPi0Pi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charmless"
 
+    ApplyHLTHadronCut = False
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
     def load_standard_lists(self, path):
         loadStdPi0ForBToCharmless(path=path)
 
     def build_lists(self, path):
-        Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
         BsigList = []
         ma.reconstructDecay('B0:Pi0Pi0 -> pi0:charmlessFit pi0:charmlessFit', Bcuts, path=path)
         BsigList.append('B0:Pi0Pi0')
@@ -64,33 +67,33 @@ class BtoHadTracks(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`\\B^0 -> \\pi^+ \\pi^-`
-    * :math:`\\B^0 -> \\K^+ \\pi^-`
-    * :math:`\\B^0 -> \\K^+ K^-`
-    * :math:`\\B^+ -> \\pi^+ \\pi^+ \\pi^-`
-    * :math:`\\B^+ -> K_{\\rm S}^0 \\pi^+`
-    * :math:`\\B^+ -> K_{\\rm S}^0 K^+`
-    * :math:`\\B^+ -> K^+ \\pi^+ \\pi^-`
-    * :math:`\\B^+ -> K^+ K^+ \\pi^-`
-    * :math:`\\B^+ -> K^+ K^- \\pi^+`
-    * :math:`\\B^+ -> K^+ K^+ K^-`
-    * :math:`\\B^0 -> \\pi^+ \\pi^- \\pi^+ \\pi^-`
-    * :math:`\\B^0 -> K^+ \\pi^- \\pi^+ \\pi^-`
-    * :math:`\\B^0 -> K^+ K^- \\pi^+ \\pi^-`
-    * :math:`\\B^0 -> K^+ \\pi^- \\K^+ \\pi^-`
-    * :math:`\\B^0 -> K^+ K^- K^+ \\pi^-`
-    * :math:`\\B^0 -> K^+ K^- K^+ K^-`
-    * :math:`\\B^0 -> K_{\\rm S}^0 \\pi^+ \\pi^-`
-    * :math:`\\B^0 -> K_{\\rm S}^0 K^+ \\pi^-`
-    * :math:`\\B^0 -> K_{\\rm S}^0 K^+ K^-`
-    * :math:`\\B^0 -> K_{\\rm S}^0 K_{\\rm S}^0`
-    * :math:`\\B^0 -> K^{*0} K^- K^+`
-    * :math:`\\B^0 -> K^{*0} \\pi^- \\pi^+`
-    * :math:`\\B^0 -> K^{*0} K^+ \\pi^-`
-    * :math:`\\B^0 -> \\rho^0 \\rho^0`
-    * :math:`\\B^+ -> K^{*+} K^- K^+`
-    * :math:`\\B^+ -> K^{*+} \\pi^- \\pi^+`
-    * :math:`\\B^+ -> K^{*+} K^+ \\pi^-`
+    * :math:'B^{0}\\to \\pi^+ \\pi^-'
+    * :math:'B^{0}\\to \\K^+ \\pi^-'
+    * :math:'B^{0}\\to \\K^+ K^-'
+    * :math:'B^{+}\\to \\pi^+ \\pi^+ \\pi^-'
+    * :math:'B^{+}\\to K_{\\rm S}^0 \\pi^+'
+    * :math:'B^{+}\\to K_{\\rm S}^0 K^+'
+    * :math:'B^{+}\\to K^+ \\pi^+ \\pi^-'
+    * :math:'B^{+}\\to K^+ K^+ \\pi^-'
+    * :math:'B^{+}\\to K^+ K^- \\pi^+'
+    * :math:'B^{+}\\to K^+ K^+ K^-'
+    * :math:'B^{0}\\to \\pi^+ \\pi^- \\pi^+ \\pi^-'
+    * :math:'B^{0}\\to -> K^+ \\pi^- \\pi^+ \\pi^-'
+    * :math:'B^{0}\\to -> K^+ K^- \\pi^+ \\pi^-'
+    * :math:'B^{0}\\to -> K^+ \\pi^- K^+ \\pi^-'
+    * :math:'B^{0}\\to -> K^+ K^- K^+ \\pi^-'
+    * :math:'B^{0}\\to -> K^+ K^- K^+ K^-'
+    * :math:'B^{0}\\to -> K_{\\rm S}^0 \\pi^+ \\pi^-'
+    * :math:'B^{0}\\to -> K_{\\rm S}^0 K^+ \\pi^-'
+    * :math:'B^{0}\\to -> K_{\\rm S}^0 K^+ K^-'
+    * :math:'B^{0}\\to -> K_{\\rm S}^0 K_{\\rm S}^0'
+    * :math:'B^{0}\\to -> K^{*0} K^- K^+'
+    * :math:'B^{0}\\to -> K^{*0} \\pi^- \\pi^+'
+    * :math:'B^{0}\\to -> K^{*0} K^+ \\pi^-'
+    * :math:'B^{0}\\to -> \\rho^0 \\rho^0'
+    * :math:'B^{+}\\to -> K^{*+} K^- K^+'
+    * :math:'B^{+}\\to -> K^{*+} \\pi^- \\pi^+'
+    * :math:'B^{+}\\to -> K^{*+} K^+ \\pi^-'
 
     Cuts applied:
 
@@ -103,6 +106,9 @@ class BtoHadTracks(BaseSkim):
     __description__ = "Skim list definitions for all B to charmless modes with tracks only in the final state."
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charmless"
+
+    ApplyHLTHadronCut = True
+    NoisyModules = ["ParticleLoader", "RootOutput"]
 
     def load_standard_lists(self, path):
         loadStdVeryLooseTracks('K', path=path)
@@ -158,16 +164,16 @@ class BtoHad1Pi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`\\B^+ -> \\pi^+ \\pi^0`
-    * :math:`\\B^+ -> K^+ \\pi^0`
-    * :math:`\\B^0 -> \\pi^+ \\pi^- \\pi^0`
-    * :math:`\\B^0 -> K^+ \\pi^- \\pi^0`
-    * :math:`\\B^0 -> K^- \\pi^+ \\pi^0`
-    * :math:`\\B^0 -> K^+ K^- \\pi^0`
-    * :math:`\\B^0 -> K_{\\rm S}^0 \\pi^0`
-    * :math:`\\B^+ -> K_{\\rm S}^{0} pi^+ \\pi^0`
-    * :math:`\\B^+ -> K_{\\rm S}^{0} K^+ \\pi^0`
-    * :math:`\\B^+ -> rho+ rho0`
+    * :math:'B^+\\to \\pi^+ \\pi^0'
+    * :math:'B^+\\to K^+ \\pi^0'
+    * :math:'B^0\\to \\pi^+ \\pi^- \\pi^0'
+    * :math:'B^0\\to K^+ \\pi^- \\pi^0'
+    * :math:'B^0\\to K^- \\pi^+ \\pi^0'
+    * :math:'B^0\\to K^+ K^- \\pi^0'
+    * :math:'B^0\\to K_{\\rm S}^0 \\pi^0'
+    * :math:'B^+\\to K_{\\rm S}^{0} \\pi^+ \\pi^0'
+    * :math:'B^+\\to K_{\\rm S}^{0} K^+ \\pi^0'
+    * :math:'B^+\\to \\rho^{+} \\rho^{0}'
 
     Cuts applied:
 
@@ -179,6 +185,9 @@ class BtoHad1Pi0(BaseSkim):
     __description__ = "Skim list for B to charmless modes including 1 pi0 in the final state."
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charmless"
+
+    ApplyHLTHadronCut = True
+    NoisyModules = ["ParticleLoader", "RootOutput"]
 
     def load_standard_lists(self, path):
         loadStdVeryLooseTracks('K', path=path)
@@ -215,9 +224,9 @@ class BtoHad3Tracks1Pi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`\\B^+ -> K^{*+} K^+ K^-`
-    * :math:`\\B^+ -> K^{*+} K^+ \\pi^-`
-    * :math:`\\B^+ -> K^{*+} \\pi^+ \\pi^-`
+    * :math:'B^+\\to K^{*+} K^+ K^-'
+    * :math:'B^+\\to K^{*+} K^+ \\pi^-'
+    * :math:'B^+\\to K^{*+} \\pi^+ \\pi^-'
 
     Cuts applied:
 
@@ -229,6 +238,9 @@ class BtoHad3Tracks1Pi0(BaseSkim):
     __description__ = "Skim list for all charged B to charmless modes with 3 tracks and 1 Pi0."
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charmless"
+
+    ApplyHLTHadronCut = True
+    NoisyModules = ["ParticleLoader", "RootOutput"]
 
     def load_standard_lists(self, path):
         loadStdVeryLooseTracks('K', path=path)
@@ -253,3 +265,38 @@ class BtoHad3Tracks1Pi0(BaseSkim):
             BsigList.append(channel)
         path = self.skim_event_cuts("nTracks >= 2", path=path)
         return BsigList
+
+
+@fancy_skim_header
+class BtoRhopRhom(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:'B^+ \\to \\rho^{+} \\rho^{-}'
+
+    Cuts applied:
+
+    * ``5.20 < Mbc < 5.29``
+    * ``abs(deltaE) < 0.5``
+
+    """
+    __authors__ = ["Yu Nakazawa", "Benedikt Wach"]
+    __description__ = "Skim list for B to rho+ rho-."
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charmless"
+
+    ApplyHLTHadronCut = True
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
+    def load_standard_lists(self, path):
+        loadStdVeryLooseTracks('pi', path=path)
+        loadStdPi0ForBToCharmless(path=path)
+        loadStdVeryLooseRhoPlus(path=path)
+
+    def build_lists(self, path):
+        Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        BsigList = []
+        ma.reconstructDecay('B0:Charmless_b2rr -> rho+:veryLoose rho-:veryLoose', Bcuts, path=path)
+        BsigList.append('B0:Charmless_b2rr')
+        path = self.skim_event_cuts("nTracks >= 2", path=path)
+        self.SkimLists = BsigList

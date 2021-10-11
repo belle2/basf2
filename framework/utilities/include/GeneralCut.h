@@ -66,8 +66,8 @@ namespace Belle2 {
      * The datatype T is substituted in the operator() overload depending on the data type combination.
      *
      * When comparing double/int and a bool the double/int overload of the functionals are used to disable implicit conversion to bool:
-     * std::equal<bool>{}(1.2, true) ==> true; 1.2 is implicitly converted to true, because of std::equal<bool>
-     * std::equal<double>{}(1.2, true) ==> false; true is implicity converted to 1.0, because of std::equal<double>
+     * std::equal_to<bool>{}(1.2, true) ==> true; 1.2 is implicitly converted to true, because of std::equal<bool>
+     * std::equal_to<double>{}(1.2, true) ==> false; true is implicity converted to 1.0, because of std::equal<double>
      */
   template <template <typename type> class operation>
   struct Visitor {
@@ -135,6 +135,79 @@ namespace Belle2 {
       return operation<int> {}(val0, val1);
     }
   };
+
+  /**
+   * Seperate Visitor struct for equal_to comparison of variant<double, int bool>.
+   * Uses almostEqualDouble if one argument is double.
+  **/
+  struct EqualVisitor {
+    /**
+     * double double overload with double comparison.
+     **/
+    bool operator()(const double& val0, const double& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * double int overload with double comparison.
+     **/
+    bool operator()(const double& val0, const int& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * double bool  overload with double comparison.
+     **/
+    bool operator()(const double& val0, const bool& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * int int overload with int comparison.
+     **/
+    bool operator()(const int& val0, const int& val1)
+    {
+      return std::equal_to<int> {}(val0, val1);
+    }
+    /**
+     * int bool overload with int comparison.
+     **/
+    bool operator()(const int& val0, const bool& val1)
+    {
+      return std::equal_to<int> {}(val0, val1);
+    }
+    /**
+     * int double overload with double comparison.
+     **/
+    bool operator()(const int& val0, const double& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * bool bool overload with bool comparison.
+     **/
+    bool operator()(const bool& val0, const bool& val1)
+    {
+      return std::equal_to<bool> {}(val0, val1);
+    }
+    /**
+     * bool double overload with double comparison.
+     **/
+    bool operator()(const bool& val0, const double& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * bool int overload with int comparison.
+     **/
+    bool operator()(const bool& val0, const int& val1)
+    {
+      return std::equal_to<int> {}(val0, val1);
+    }
+
+  };
+
+
 
   /**
    * This class implements a common way to implement cut/selection functionality for arbitrary objects.
@@ -218,57 +291,9 @@ namespace Belle2 {
         case GE:
           return std::visit(Visitor<std::greater_equal> {}, m_left->get(p), m_right->get(p));
         case EQ:
-          if (std::holds_alternative<double>(m_left->get(p))) {
-            if (std::holds_alternative<double>(m_right->get(p))) {
-              return almostEqualDouble(std::get<double>(m_left->get(p)), std::get<double>(m_right->get(p)));
-            } else if (std::holds_alternative<int>(m_right->get(p))) {
-              return almostEqualDouble(std::get<double>(m_left->get(p)), std::get<int>(m_right->get(p)));
-            } else if (std::holds_alternative<bool>(m_right->get(p))) {
-              return almostEqualDouble(std::get<double>(m_left->get(p)), std::get<bool>(m_right->get(p)));
-            } else return false;
-          } else if (std::holds_alternative<int>(m_left->get(p))) {
-            if (std::holds_alternative<double>(m_right->get(p))) {
-              return almostEqualDouble(std::get<int>(m_left->get(p)), std::get<double>(m_right->get(p)));
-            } else if (std::holds_alternative<int>(m_right->get(p))) {
-              return std::get<int>(m_left->get(p)) == std::get<int>(m_right->get(p));
-            } else if (std::holds_alternative<bool>(m_right->get(p))) {
-              return std::get<int>(m_left->get(p)) == std::get<bool>(m_right->get(p));
-            } else return false;
-          } else if (std::holds_alternative<bool>(m_left->get(p))) {
-            if (std::holds_alternative<double>(m_right->get(p))) {
-              return almostEqualDouble(std::get<bool>(m_left->get(p)), std::get<double>(m_right->get(p)));
-            } else if (std::holds_alternative<int>(m_right->get(p))) {
-              return std::get<bool>(m_left->get(p)) == std::get<int>(m_right->get(p));
-            } else if (std::holds_alternative<bool>(m_right->get(p))) {
-              return std::get<bool>(m_left->get(p)) == std::get<bool>(m_right->get(p));
-            } else return false;
-          } else return false;
+          return std::visit(EqualVisitor {}, m_left->get(p), m_right->get(p));
         case NE:
-          if (std::holds_alternative<double>(m_left->get(p))) {
-            if (std::holds_alternative<double>(m_right->get(p))) {
-              return not almostEqualDouble(std::get<double>(m_left->get(p)), std::get<double>(m_right->get(p)));
-            } else if (std::holds_alternative<int>(m_right->get(p))) {
-              return not almostEqualDouble(std::get<double>(m_left->get(p)), std::get<int>(m_right->get(p)));
-            } else if (std::holds_alternative<bool>(m_right->get(p))) {
-              return not almostEqualDouble(std::get<double>(m_left->get(p)), std::get<bool>(m_right->get(p)));
-            } else return true;
-          } else if (std::holds_alternative<int>(m_left->get(p))) {
-            if (std::holds_alternative<double>(m_right->get(p))) {
-              return not almostEqualDouble(std::get<int>(m_left->get(p)), std::get<double>(m_right->get(p)));
-            } else if (std::holds_alternative<int>(m_right->get(p))) {
-              return std::get<int>(m_left->get(p)) != std::get<int>(m_right->get(p));
-            } else if (std::holds_alternative<bool>(m_right->get(p))) {
-              return std::get<int>(m_left->get(p)) != std::get<bool>(m_right->get(p));
-            } else return true;
-          } else if (std::holds_alternative<bool>(m_left->get(p))) {
-            if (std::holds_alternative<double>(m_right->get(p))) {
-              return not almostEqualDouble(std::get<bool>(m_left->get(p)), std::get<double>(m_right->get(p)));
-            } else if (std::holds_alternative<int>(m_right->get(p))) {
-              return std::get<bool>(m_left->get(p)) != std::get<int>(m_right->get(p));
-            } else if (std::holds_alternative<bool>(m_right->get(p))) {
-              return std::get<bool>(m_left->get(p)) != std::get<bool>(m_right->get(p));
-            } else return true;
-          } else return true;
+          return !std::visit(EqualVisitor {}, m_left->get(p), m_right->get(p));
       }
 
       throw std::runtime_error("Cut string has an invalid format: Invalid operation");

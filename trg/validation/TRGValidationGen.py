@@ -13,7 +13,7 @@
 <header>
 <output>TRGValidationGen.root</output>
 <contact>Yun-Tsung Lai, ytlai@post.kek.jp</contact>
-<description>This steering file generates 1000 e+/e- particle guns to validate the trg package.</description>
+<description>This steering file generates 1000 e+/e- mu+/mu- particle guns to validate the trg package.</description>
 </header>
 """
 

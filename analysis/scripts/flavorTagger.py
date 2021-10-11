@@ -536,8 +536,6 @@ def FillParticleLists(maskName='all', categories=None, path=None):
                 ma.matchMCTruth(particleList, path=path)
                 readyParticleLists.append(particleList)
 
-    return True
-
 
 def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=None):
     """
@@ -1134,55 +1132,67 @@ def flavorTagger(
     roe_path = basf2.create_path()
     deadEndPath = basf2.create_path()
 
-    # Events containing ROE without B-Meson (but not empty) are discarded for training
     if mode == 'Sampler':
+        # Events containing ROE without B-Meson (but not empty) are discarded for training
         ma.signalSideParticleListsFilter(
             particleLists,
             'nROE_Charged(' + maskName + ', 0) > 0 and abs(qrCombined) == 1',
             roe_path,
             deadEndPath)
 
-    # If trigger returns 1 jump into empty path skipping further modules in roe_path
-    if mode == 'Expert':
+        FillParticleLists(maskName, categories, roe_path)
+
+        if eventLevel(mode, weightFiles, categories, roe_path):
+            combinerLevel(mode, weightFiles, categories, variablesCombinerLevel, categoriesCombinationCode, roe_path)
+
+        # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
+        particleListsToRemoveExtraInfo = []
+        for category in categories:
+            particleList = AvailableCategories[category].particleList
+            if particleList not in particleListsToRemoveExtraInfo:
+                particleListsToRemoveExtraInfo.append(particleList)
+
+        ma.removeExtraInfo(particleListsToRemoveExtraInfo, False, roe_path)
+
+        path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+    elif mode == 'Expert':
+        # If trigger returns 1 jump into empty path skipping further modules in roe_path
         ma.signalSideParticleListsFilter(particleLists, 'nROE_Charged(' + maskName + ', 0) > 0', roe_path, deadEndPath)
-        # Initialation of flavorTaggerInfo dataObject needs to be done in the main path
+
+        # Initialization of flavorTaggerInfo dataObject needs to be done in the main path
         flavorTaggerInfoBuilder = basf2.register_module('FlavorTaggerInfoBuilder')
         path.add_module(flavorTaggerInfoBuilder)
 
-    # sampler or expert
-    if mode == 'Sampler' or mode == 'Expert':
-        if FillParticleLists(maskName, categories, roe_path):
-            if eventLevel(mode, weightFiles, categories, roe_path):
-                combinerLevel(mode, weightFiles, categories, variablesCombinerLevel, categoriesCombinationCode, roe_path)
-                if mode == 'Expert':
-                    flavorTaggerInfoFiller = basf2.register_module('FlavorTaggerInfoFiller')
-                    flavorTaggerInfoFiller.param('trackLevelParticleLists', trackLevelParticleLists)
-                    flavorTaggerInfoFiller.param('eventLevelParticleLists', eventLevelParticleLists)
-                    flavorTaggerInfoFiller.param('TMVAfbdt', TMVAfbdt)
-                    flavorTaggerInfoFiller.param('FANNmlp', FANNmlp)
-                    flavorTaggerInfoFiller.param('qpCategories', saveCategoriesInfo)
-                    flavorTaggerInfoFiller.param('istrueCategories', saveCategoriesInfo)
-                    flavorTaggerInfoFiller.param('targetProb', False)
-                    flavorTaggerInfoFiller.param('trackPointers', False)
-                    roe_path.add_module(flavorTaggerInfoFiller)  # Add FlavorTag Info filler to roe_path
-                    add_default_FlavorTagger_aliases()
+        FillParticleLists(maskName, categories, roe_path)
 
-    # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
-    particleListsToRemoveExtraInfo = []
-    for category in categories:
-        particleList = AvailableCategories[category].particleList
-        if particleList not in particleListsToRemoveExtraInfo:
-            particleListsToRemoveExtraInfo.append(particleList)
+        if eventLevel(mode, weightFiles, categories, roe_path):
+            combinerLevel(mode, weightFiles, categories, variablesCombinerLevel, categoriesCombinationCode, roe_path)
 
-    if mode == 'Expert':
+            flavorTaggerInfoFiller = basf2.register_module('FlavorTaggerInfoFiller')
+            flavorTaggerInfoFiller.param('trackLevelParticleLists', trackLevelParticleLists)
+            flavorTaggerInfoFiller.param('eventLevelParticleLists', eventLevelParticleLists)
+            flavorTaggerInfoFiller.param('TMVAfbdt', TMVAfbdt)
+            flavorTaggerInfoFiller.param('FANNmlp', FANNmlp)
+            flavorTaggerInfoFiller.param('qpCategories', saveCategoriesInfo)
+            flavorTaggerInfoFiller.param('istrueCategories', saveCategoriesInfo)
+            flavorTaggerInfoFiller.param('targetProb', False)
+            flavorTaggerInfoFiller.param('trackPointers', False)
+            roe_path.add_module(flavorTaggerInfoFiller)  # Add FlavorTag Info filler to roe_path
+            add_default_FlavorTagger_aliases()
+
+        # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
+        particleListsToRemoveExtraInfo = []
+        for category in categories:
+            particleList = AvailableCategories[category].particleList
+            if particleList not in particleListsToRemoveExtraInfo:
+                particleListsToRemoveExtraInfo.append(particleList)
+
         ma.removeExtraInfo(particleListsToRemoveExtraInfo, True, roe_path)
 
-    elif mode == 'Sampler':
-        ma.removeExtraInfo(particleListsToRemoveExtraInfo, False, roe_path)
+        path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
-    path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
-
-    if mode == 'Teacher':
+    elif mode == 'Teacher':
         if eventLevelTeacher(weightFiles, categories):
             combinerLevelTeacher(weightFiles, variableCombinerLevel, categoriesCombinationCode)
 

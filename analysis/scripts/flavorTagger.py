@@ -22,6 +22,7 @@ from variables import utils
 import os
 import glob
 import b2bii
+import collections
 
 
 def getBelleOrBelle2():
@@ -156,145 +157,66 @@ signalFraction = -2
 # Maximal number of events to train each method
 maxEventsNumber = 0  # 0 takes all the sampled events. The number in the past was 500000
 
+
+FTCategoryParameters = collections.namedtuple('FTCategoryParameters',
+                                              ['particleList', 'trackName', 'eventName', 'variableName', 'code'])
 # Definition of all available categories, 'standard category name':
 # ['ParticleList', 'trackLevel category name', 'eventLevel category name',
 # 'combinerLevel variable name', 'category code']
 AvailableCategories = {
-    'Electron': [
-        'e+:inRoe',
-        'Electron',
-        'Electron',
-        'QpOf(e+:inRoe, isRightCategory(Electron), isRightCategory(Electron))',
-        0],
-    'IntermediateElectron': [
-        'e+:inRoe',
-        'IntermediateElectron',
-        'IntermediateElectron',
-        'QpOf(e+:inRoe, isRightCategory(IntermediateElectron), isRightCategory(IntermediateElectron))',
-        1],
-    'Muon': [
-        'mu+:inRoe',
-        'Muon',
-        'Muon',
-        'QpOf(mu+:inRoe, isRightCategory(Muon), isRightCategory(Muon))',
-        2],
-    'IntermediateMuon': [
-        'mu+:inRoe',
-        'IntermediateMuon',
-        'IntermediateMuon',
-        'QpOf(mu+:inRoe, isRightCategory(IntermediateMuon), isRightCategory(IntermediateMuon))',
-        3],
-    'KinLepton': [
-        'mu+:inRoe',
-        'KinLepton',
-        'KinLepton',
-        'QpOf(mu+:inRoe, isRightCategory(KinLepton), isRightCategory(KinLepton))',
-        4],
-    'IntermediateKinLepton': [
-        'mu+:inRoe',
-        'IntermediateKinLepton',
-        'IntermediateKinLepton',
-        'QpOf(mu+:inRoe, isRightCategory(IntermediateKinLepton), isRightCategory(IntermediateKinLepton))',
-        5],
-    'Kaon': [
-        'K+:inRoe',
-        'Kaon',
-        'Kaon',
-        'weightedQpOf(K+:inRoe, isRightCategory(Kaon), isRightCategory(Kaon))',
-        6],
-    'SlowPion': [
-        'pi+:inRoe',
-        'SlowPion',
-        'SlowPion',
-        'QpOf(pi+:inRoe, isRightCategory(SlowPion), isRightCategory(SlowPion))',
-        7],
-    'FastHadron': [
-        'pi+:inRoe',
-        'FastHadron',
-        'FastHadron',
-        'QpOf(pi+:inRoe, isRightCategory(FastHadron), isRightCategory(FastHadron))',
-        8],
-    'Lambda': [
-        'Lambda0:inRoe',
-        'Lambda',
-        'Lambda',
-        'weightedQpOf(Lambda0:inRoe, isRightCategory(Lambda), isRightCategory(Lambda))',
-        9],
-    'FSC': [
-        'pi+:inRoe',
-        'SlowPion',
-        'FSC',
-        'QpOf(pi+:inRoe, isRightCategory(FSC), isRightCategory(SlowPion))',
-        10],
-    'MaximumPstar': [
-        'pi+:inRoe',
-        'MaximumPstar',
-        'MaximumPstar',
-        'QpOf(pi+:inRoe, isRightCategory(MaximumPstar), isRightCategory(MaximumPstar))',
-        11],
-    'KaonPion': [
-        'K+:inRoe',
-        'Kaon',
-        'KaonPion',
-        'QpOf(K+:inRoe, isRightCategory(KaonPion), isRightCategory(Kaon))',
-        12],
+    'Electron':
+    FTCategoryParameters('e+:inRoe', 'Electron', 'Electron',
+                         'QpOf(e+:inRoe, isRightCategory(Electron), isRightCategory(Electron))',
+                         0),
+    'IntermediateElectron':
+    FTCategoryParameters('e+:inRoe', 'IntermediateElectron', 'IntermediateElectron',
+                         'QpOf(e+:inRoe, isRightCategory(IntermediateElectron), isRightCategory(IntermediateElectron))',
+                         1),
+    'Muon':
+    FTCategoryParameters('mu+:inRoe', 'Muon', 'Muon',
+                         'QpOf(mu+:inRoe, isRightCategory(Muon), isRightCategory(Muon))',
+                         2),
+    'IntermediateMuon':
+    FTCategoryParameters('mu+:inRoe', 'IntermediateMuon', 'IntermediateMuon',
+                         'QpOf(mu+:inRoe, isRightCategory(IntermediateMuon), isRightCategory(IntermediateMuon))',
+                         3),
+    'KinLepton':
+    FTCategoryParameters('mu+:inRoe', 'KinLepton', 'KinLepton',
+                         'QpOf(mu+:inRoe, isRightCategory(KinLepton), isRightCategory(KinLepton))',
+                         4),
+    'IntermediateKinLepton':
+    FTCategoryParameters('mu+:inRoe', 'IntermediateKinLepton', 'IntermediateKinLepton',
+                         'QpOf(mu+:inRoe, isRightCategory(IntermediateKinLepton), isRightCategory(IntermediateKinLepton))',
+                         5),
+    'Kaon':
+    FTCategoryParameters('K+:inRoe', 'Kaon', 'Kaon',
+                         'weightedQpOf(K+:inRoe, isRightCategory(Kaon), isRightCategory(Kaon))',
+                         6),
+    'SlowPion':
+    FTCategoryParameters('pi+:inRoe', 'SlowPion', 'SlowPion',
+                         'QpOf(pi+:inRoe, isRightCategory(SlowPion), isRightCategory(SlowPion))',
+                         7),
+    'FastHadron':
+    FTCategoryParameters('pi+:inRoe', 'FastHadron', 'FastHadron',
+                         'QpOf(pi+:inRoe, isRightCategory(FastHadron), isRightCategory(FastHadron))',
+                         8),
+    'Lambda':
+    FTCategoryParameters('Lambda0:inRoe', 'Lambda', 'Lambda',
+                         'weightedQpOf(Lambda0:inRoe, isRightCategory(Lambda), isRightCategory(Lambda))',
+                         9),
+    'FSC':
+    FTCategoryParameters('pi+:inRoe', 'SlowPion', 'FSC',
+                         'QpOf(pi+:inRoe, isRightCategory(FSC), isRightCategory(SlowPion))',
+                         10),
+    'MaximumPstar':
+    FTCategoryParameters('pi+:inRoe', 'MaximumPstar', 'MaximumPstar',
+                         'QpOf(pi+:inRoe, isRightCategory(MaximumPstar), isRightCategory(MaximumPstar))',
+                         11),
+    'KaonPion':
+    FTCategoryParameters('K+:inRoe', 'Kaon', 'KaonPion',
+                         'QpOf(K+:inRoe, isRightCategory(KaonPion), isRightCategory(Kaon))',
+                         12),
 }
-
-# Lists for each Step.
-trackLevelParticleLists = []
-eventLevelParticleLists = []
-variablesCombinerLevel = []
-
-
-def WhichCategories(categories=[
-    'Electron',
-    'Muon',
-    'KinLepton',
-    'Kaon',
-    'SlowPion',
-    'FastHadron',
-    'Lambda',
-    'FSC',
-    'MaximumPstar',
-    'KaonPion',
-]):
-    """
-    Selection of the Categories that are going to be used.
-    """
-
-    if len(categories) > 13 or len(categories) < 2:
-        B2FATAL('Flavor Tagger: Invalid amount of categories. At least two are needed. No more than 13 are available'
-                )
-        B2FATAL(
-            'Flavor Tagger: Possible categories are  "Electron", "IntermediateElectron", "Muon", "IntermediateMuon", '
-            '"KinLepton", "IntermediateKinLepton", "Kaon", "SlowPion", "FastHadron",'
-            '"Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
-    categoriesCombination = []
-    for category in categories:
-        if category in AvailableCategories:
-            if category != 'MaximumPstar' and (AvailableCategories[category][0],
-                                               AvailableCategories[category][1]) \
-                    not in trackLevelParticleLists:
-                trackLevelParticleLists.append((AvailableCategories[category][0],
-                                                AvailableCategories[category][1]))
-            if (AvailableCategories[category][0],
-                    AvailableCategories[category][2], AvailableCategories[category][3]) \
-                    not in eventLevelParticleLists:
-                eventLevelParticleLists.append((AvailableCategories[category][0],
-                                                AvailableCategories[category][2], AvailableCategories[category][3]))
-                variablesCombinerLevel.append(AvailableCategories[category][3])
-                categoriesCombination.append(AvailableCategories[category][4])
-            else:
-                B2FATAL('Flavor Tagger: ' + category + ' has been already given')
-        else:
-            B2FATAL('Flavor Tagger: ' + category + ' is not a valid category name given')
-            B2FATAL('Flavor Tagger: Available categories are  "Electron", "IntermediateElectron", '
-                    '"Muon", "IntermediateMuon", "KinLepton", "IntermediateKinLepton", "Kaon", "SlowPion", "FastHadron", '
-                    '"Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
-    global categoriesCombinationCode
-    categoriesCombinationCode = 'CatCode'
-    for code in sorted(categoriesCombination):
-        categoriesCombinationCode = categoriesCombinationCode + '%02d' % code
 
 
 # Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
@@ -557,7 +479,7 @@ def setVariables():
         variables['MaximumPstar'].append('distance')
 
 
-def FillParticleLists(mode='Expert', maskName='all', path=None):
+def FillParticleLists(maskName='all', categories=None, path=None):
     """
     Fills the particle Lists for all categories.
     """
@@ -565,7 +487,11 @@ def FillParticleLists(mode='Expert', maskName='all', path=None):
     from vertex import kFit
     readyParticleLists = []
 
-    for (particleList, category) in trackLevelParticleLists:
+    if categories is None:
+        categories = []
+
+    for category in categories:
+        particleList = AvailableCategories[category].particleList
 
         if particleList in readyParticleLists:
             continue
@@ -607,14 +533,13 @@ def FillParticleLists(mode='Expert', maskName='all', path=None):
                                 'isNAN(p) !=1 and isInfinity(p) != 1', path=path)
                 ma.reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe', '1.00<=M<=1.23', False, path=path)
                 kFit(particleList, 0.01, path=path)
-                # if mode != 'Expert':
                 ma.matchMCTruth(particleList, path=path)
                 readyParticleLists.append(particleList)
 
     return True
 
 
-def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
+def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=None):
     """
     Samples data for training or tests all categories all categories at event level.
     """
@@ -630,7 +555,11 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
     identifiersExtraInfosDict = dict()
     identifiersExtraInfosKaonPion = []
 
-    for (particleList, category, combinerVariable) in eventLevelParticleLists:
+    if categories is None:
+        categories = []
+
+    for category in categories:
+        particleList = AvailableCategories[category].particleList
 
         methodPrefixEventLevel = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         identifierEventLevel = methodPrefixEventLevel
@@ -661,7 +590,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
             if os.path.isfile(identifierEventLevel):
                 B2INFO('flavorTagger: MVAExpert ' + methodPrefixEventLevel + ' ready.')
 
-                if 'KaonPion' in [row[1] for row in eventLevelParticleLists]:
+                if 'KaonPion' in categories:
                     methodPrefixEventLevelKaonPion = "FlavorTagger_" + getBelleOrBelle2() + \
                         "_" + weightFiles + 'EventLevelKaonPionFBDT'
                     identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
@@ -701,7 +630,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
         mvaMultipleExperts.param('identifiers', [row[1] for row in identifiersExtraInfosDict[particleList]])
         eventLevelPath.add_module(mvaMultipleExperts)
 
-    if 'KaonPion' in [row[1] for row in eventLevelParticleLists] and len(identifiersExtraInfosKaonPion) != 0:
+    if 'KaonPion' in categories and len(identifiersExtraInfosKaonPion) != 0:
         eventLevelKaonPionPath = create_path()
         SkipEmptyParticleList = register_module("SkimFilter")
         SkipEmptyParticleList.set_name('SkimFilter_' + 'K+:inRoe')
@@ -718,7 +647,8 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
 
         eventLevelKaonPionPath.add_module(mvaExpertKaonPion)
 
-    for (particleList, category, combinerVariable) in eventLevelParticleLists:
+    for category in categories:
+        particleList = AvailableCategories[category].particleList
 
         methodPrefixEventLevel = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
@@ -761,13 +691,13 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
             ntuple.param('particleList', particleList)
             eventLevelpath.add_module(ntuple)
 
-    if ReadyMethods != len(eventLevelParticleLists):
+    if ReadyMethods != len(categories):
         return False
     else:
         return True
 
 
-def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
+def eventLevelTeacher(weightFiles='B2JpsiKs_mu', categories=None):
     """
     Trains all categories at event level.
     """
@@ -776,7 +706,11 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
     ReadyMethods = 0
 
-    for (particleList, category, combinerVariable) in eventLevelParticleLists:
+    if categories is None:
+        categories = []
+
+    for category in categories:
+        particleList = AvailableCategories[category].particleList
 
         methodPrefixEventLevel = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         targetVariable = 'isRightCategory(' + category + ')'
@@ -810,21 +744,27 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
             ReadyMethods += 1
 
-    if ReadyMethods != len(eventLevelParticleLists):
+    if ReadyMethods != len(categories):
         return False
     else:
         return True
 
 
-def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
+def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None,
+                  variablesCombinerLevel=None, categoriesCombinationCode=None, path=None):
     """
     Samples the input data or tests the combiner according to the selected categories.
     """
 
     B2INFO('COMBINER LEVEL')
 
+    if categories is None:
+        categories = []
+    if variablesCombinerLevel is None:
+        variablesCombinerLevel = []
+
     B2INFO("Flavor Tagger: Required Combiner for Categories:")
-    for (particleList, category, combinerVariable) in eventLevelParticleLists:
+    for category in categories:
         B2INFO(category)
 
     B2INFO("Flavor Tagger: which corresponds to a weight file with categories combination code " + categoriesCombinationCode)
@@ -954,12 +894,16 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
             return True
 
 
-def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
+def combinerLevelTeacher(weightFiles='B2JpsiKs_mu', variablesCombinerLevel=None,
+                         categoriesCombinationCode=None):
     """
     Trains the combiner according to the selected categories.
     """
 
     B2INFO('COMBINER LEVEL TEACHER')
+
+    if variablesCombinerLevel is None:
+        variablesCombinerLevel = []
 
     methodPrefixCombinerLevel = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'Combiner' \
         + categoriesCombinationCode
@@ -968,9 +912,6 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
     if len(sampledFilesList) == 0:
         B2FATAL('FlavorTagger: combinerLevelTeacher did not find any ' +
                 methodPrefixCombinerLevel + 'sampled*.root file. Please run the flavorTagger in "Sampler" mode.')
-
-    # ReadyTMVAfbdt = False
-    # ReadyFANNmlp = False
 
     if TMVAfbdt:
 
@@ -1103,6 +1044,20 @@ def flavorTagger(
     if mode != 'Sampler' and mode != 'Teacher' and mode != 'Expert':
         B2FATAL('flavorTagger: Wrong mode given: The available modes are "Sampler", "Teacher" or "Expert"')
 
+    if len(categories) > 13 or len(categories) < 2:
+        B2FATAL('Flavor Tagger: Invalid amount of categories. At least two are needed. No more than 13 are available')
+        B2FATAL(
+            'Flavor Tagger: Possible categories are  "Electron", "IntermediateElectron", "Muon", "IntermediateMuon", '
+            '"KinLepton", "IntermediateKinLepton", "Kaon", "SlowPion", "FastHadron",'
+            '"Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
+
+    for category in categories:
+        if category not in AvailableCategories:
+            B2FATAL('Flavor Tagger: ' + category + ' is not a valid category name given')
+            B2FATAL('Flavor Tagger: Available categories are  "Electron", "IntermediateElectron", '
+                    '"Muon", "IntermediateMuon", "KinLepton", "IntermediateKinLepton", "Kaon", "SlowPion", "FastHadron", '
+                    '"Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
+
     # Directory where the weights of the trained Methods are saved
     # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'
 
@@ -1148,9 +1103,33 @@ def flavorTagger(
     B2INFO(' ')
 
     setInteractionWithDatabase(downloadFromDatabaseIfNotFound, uploadToDatabaseAfterTraining)
-    WhichCategories(categories)
     set_FlavorTagger_pid_aliases()
     setVariables()
+
+    trackLevelParticleLists = []
+    eventLevelParticleLists = []
+    variablesCombinerLevel = []
+    categoriesCombination = []
+    categoriesCombinationCode = 'CatCode'
+
+    for category in categories:
+        ftCategory = AvailableCategories[category]
+
+        track_tuple = (ftCategory.particleList, ftCategory.trackName)
+        event_tuple = (ftCategory.particleList, ftCategory.eventName, ftCategory.variableName)
+
+        if track_tuple not in trackLevelParticleLists and category != 'MaximumPstar':
+            trackLevelParticleLists.append(track_tuple)
+
+        if event_tuple not in eventLevelParticleLists:
+            eventLevelParticleLists.append(event_tuple)
+            variablesCombinerLevel.append(ftCategory.variableName)
+            categoriesCombination.append(ftCategory.code)
+        else:
+            B2FATAL('Flavor Tagger: ' + category + ' has been already given')
+
+    for code in sorted(categoriesCombination):
+        categoriesCombinationCode = categoriesCombinationCode + '%02d' % code
 
     roe_path = basf2.create_path()
     deadEndPath = basf2.create_path()
@@ -1172,9 +1151,9 @@ def flavorTagger(
 
     # sampler or expert
     if mode == 'Sampler' or mode == 'Expert':
-        if FillParticleLists(mode, maskName, roe_path):
-            if eventLevel(mode, weightFiles, roe_path):
-                combinerLevel(mode, weightFiles, roe_path)
+        if FillParticleLists(maskName, categories, roe_path):
+            if eventLevel(mode, weightFiles, categories, roe_path):
+                combinerLevel(mode, weightFiles, categories, variablesCombinerLevel, categoriesCombinationCode, roe_path)
                 if mode == 'Expert':
                     flavorTaggerInfoFiller = basf2.register_module('FlavorTaggerInfoFiller')
                     flavorTaggerInfoFiller.param('trackLevelParticleLists', trackLevelParticleLists)
@@ -1190,9 +1169,10 @@ def flavorTagger(
 
     # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
     particleListsToRemoveExtraInfo = []
-    for particleList in eventLevelParticleLists:
-        if particleList[0] not in particleListsToRemoveExtraInfo:
-            particleListsToRemoveExtraInfo.append(particleList[0])
+    for category in categories:
+        particleList = AvailableCategories[category].particleList
+        if particleList not in particleListsToRemoveExtraInfo:
+            particleListsToRemoveExtraInfo.append(particleList)
 
     if mode == 'Expert':
         ma.removeExtraInfo(particleListsToRemoveExtraInfo, True, roe_path)
@@ -1203,8 +1183,8 @@ def flavorTagger(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
     if mode == 'Teacher':
-        if eventLevelTeacher(weightFiles):
-            combinerLevelTeacher(weightFiles)
+        if eventLevelTeacher(weightFiles, categories):
+            combinerLevelTeacher(weightFiles, variableCombinerLevel, categoriesCombinationCode)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+# This test ensures that the files "CHARGEDRARE_BELLE2.DEC" and
+# "MIXEDRARE_BELLE2.DEC" stay in sync with "DECAY_BELLE2.DEC".
+
 import re
 import difflib
 import sys
 import basf2
+from itertools import zip_longest
 
 start = '--> Begin'
 end = '<-- End'
@@ -68,17 +83,17 @@ for particle in decay_belle2.keys():
                              [line for _, line in special_files[particle]][change[3]:change[4]]))
 
                 diffs_formatted = ['\n'.join([d.strip('\n') for d in diffs[n:n+4]]) for n in range(0, len(diffs), 4)]
-
-                linenumbers_decfile = [lineno for lineno, _ in decay_belle2[particle]][change[1]:change[2]]
-                linenumbers_specialdecfile = [lineno for lineno, _ in special_files[particle]][change[3]:change[4]]
+                lineno_decfile = [lineno for lineno, _ in decay_belle2[particle]][change[1]:change[2]]
+                lineno_specialdecfile = [lineno for lineno, _ in special_files[particle]][change[3]:change[4]]
                 if '+' in particle or '-' in particle:
                     prefix = 'CHARGEDRARE_BELLE2.DEC'
                 else:
                     prefix = 'MIXEDRARE_BELLE2.DEC'
 
-                sys.stderr.writelines(f'Line DECAY_BELLE2.DEC: {ld} \nLine {prefix}: '
+                sys.stderr.writelines(f'Line in DECAY_BELLE2.DEC: {ld} \nLine in {prefix}: '
                                       f'{lspecial} \n{d}\n\n' for ld, lspecial, d in
-                                      (zip(linenumbers_decfile, linenumbers_specialdecfile, diffs_formatted)))
+                                      (zip_longest(lineno_decfile, lineno_specialdecfile, diffs_formatted,
+                                                   fillvalue='Not found')))
 
 if diff_found:
-    raise RuntimeError("File differ, check above which lines don't match.")
+    raise RuntimeError("Files differ, check above which lines don't match.")

@@ -848,8 +848,6 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None,
             mvaMultipleExperts.param('identifiers', [identifierFBDT, identifierFANN])
             path.add_module(mvaMultipleExperts)
 
-        return
-
 
 def combinerLevelTeacher(weightFiles='B2JpsiKs_mu', variablesCombinerLevel=None,
                          categoriesCombinationCode=None):

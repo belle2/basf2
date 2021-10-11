@@ -490,6 +490,8 @@ def FillParticleLists(maskName='all', categories=None, path=None):
     if categories is None:
         categories = []
 
+    trackCut = 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' + 'isNAN(p) !=1 and isInfinity(p) != 1'
+
     for category in categories:
         particleList = AvailableCategories[category].particleList
 
@@ -497,44 +499,28 @@ def FillParticleLists(maskName='all', categories=None, path=None):
             continue
 
         # Select particles in ROE for different categories according to mass hypothesis.
-        if particleList != 'Lambda0:inRoe' and particleList != 'K+:inRoe' and particleList != 'pi+:inRoe':
+        if particleList == 'Lambda0:inRoe':
+            if 'pi+:inRoe' not in readyParticleLists:
+                ma.fillParticleList('pi+:inRoe', trackCut, path=path)
+                readyParticleLists.append('pi+:inRoe')
 
-            # Filling particle list for actual category
-            ma.fillParticleList(particleList, 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' +
-                                              'isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+            ma.fillParticleList('p+:inRoe', trackCut, path=path)
+            ma.reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe', '1.00<=M<=1.23', False, path=path)
+            kFit(particleList, 0.01, path=path)
+            ma.matchMCTruth(particleList, path=path)
             readyParticleLists.append(particleList)
 
         else:
-            if 'pi+:inRoe' not in readyParticleLists:
-                ma.fillParticleList(
-                    'pi+:inRoe', 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' +
-                                 'isNAN(p) !=1 and isInfinity(p) != 1', path=path)
-                readyParticleLists.append('pi+:inRoe')
+            # Filling particle list for actual category
+            ma.fillParticleList(particleList, trackCut, path=path)
+            readyParticleLists.append(particleList)
 
-            if 'K_S0:inRoe' not in readyParticleLists:
-                if getBelleOrBelle2() == 'Belle':
-                    ma.cutAndCopyList('K_S0:inRoe', 'K_S0:mdst', 'extraInfo(ksnbStandard) == 1 and isInRestOfEvent == 1', path=path)
-                else:
-                    ma.reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
-                    kFit('K_S0:inRoe', 0.01, path=path)
-                readyParticleLists.append('K_S0:inRoe')
-
-            if particleList == 'K+:inRoe':
-                ma.fillParticleList(
-                    particleList, 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' +
-                                  'isNAN(p) !=1 and isInfinity(p) != 1', path=path)
-                # Precut done to prevent from overtraining, found not necessary now
-                # applyCuts(particleList, '0.1<' + KId[getBelleOrBelle2()], path=path)
-                readyParticleLists.append(particleList)
-
-            if particleList == 'Lambda0:inRoe':
-                ma.fillParticleList(
-                    'p+:inRoe', 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' +
-                                'isNAN(p) !=1 and isInfinity(p) != 1', path=path)
-                ma.reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe', '1.00<=M<=1.23', False, path=path)
-                kFit(particleList, 0.01, path=path)
-                ma.matchMCTruth(particleList, path=path)
-                readyParticleLists.append(particleList)
+    # Additional particleLists for K_S0
+    if getBelleOrBelle2() == 'Belle':
+        ma.cutAndCopyList('K_S0:inRoe', 'K_S0:mdst', 'extraInfo(ksnbStandard) == 1 and isInRestOfEvent == 1', path=path)
+    else:
+        ma.reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
+        kFit('K_S0:inRoe', 0.01, path=path)
 
 
 def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=None):
@@ -568,19 +554,20 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=N
 
             if downloadFlag or useOnlyLocalFlag:
                 identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
+
+            if downloadFlag:
                 if not os.path.isfile(identifierEventLevel):
-                    if downloadFlag:
-                        basf2_mva.download(methodPrefixEventLevel, identifierEventLevel)
-                        if not os.path.isfile(identifierEventLevel):
-                            B2FATAL('Flavor Tagger: Weight file ' + identifierEventLevel +
-                                    ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
-                    else:
-                        B2FATAL(
-                            'Flavor Tagger: ' + particleList + ' Eventlevel was not trained. Weight file ' +
+                    basf2_mva.download(methodPrefixEventLevel, identifierEventLevel)
+                    if not os.path.isfile(identifierEventLevel):
+                        B2FATAL('Flavor Tagger: Weight file ' + identifierEventLevel +
+                                ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+
+            if useOnlyLocalFlag:
+                if not os.path.isfile(identifierEventLevel):
+                    B2FATAL('Flavor Tagger: ' + particleList + ' Eventlevel was not trained. Weight file ' +
                             identifierEventLevel + ' was not found. Stopped')
 
-                else:
-                    B2INFO('flavorTagger: MVAExpert ' + methodPrefixEventLevel + ' ready.')
+            B2INFO('flavorTagger: MVAExpert ' + methodPrefixEventLevel + ' ready.')
 
         elif mode == 'Sampler':
 
@@ -602,12 +589,12 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=N
 
             B2INFO('flavorTagger: Applying MVAExpert ' + methodPrefixEventLevel + '.')
 
-            if particleList not in identifiersExtraInfosDict and category != 'KaonPion':
-                identifiersExtraInfosDict[particleList] = [(extraInfoName, identifierEventLevel)]
-            elif category != 'KaonPion':
-                identifiersExtraInfosDict[particleList].append((extraInfoName, identifierEventLevel))
-            else:
+            if category == 'KaonPion':
                 identifiersExtraInfosKaonPion.append((extraInfoName, identifierEventLevel))
+            elif particleList not in identifiersExtraInfosDict:
+                identifiersExtraInfosDict[particleList] = [(extraInfoName, identifierEventLevel)]
+            else:
+                identifiersExtraInfosDict[particleList].append((extraInfoName, identifierEventLevel))
 
             ReadyMethods += 1
 
@@ -645,49 +632,51 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=N
 
         eventLevelKaonPionPath.add_module(mvaExpertKaonPion)
 
-    for category in categories:
-        particleList = AvailableCategories[category].particleList
+    if mode == 'Sampler':
 
-        methodPrefixEventLevel = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
-        identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
-        targetVariable = 'isRightCategory(' + category + ')'
+        for category in categories:
+            particleList = AvailableCategories[category].particleList
 
-        if not os.path.isfile(identifierEventLevel) and mode == 'Sampler':
+            methodPrefixEventLevel = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+            identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
+            targetVariable = 'isRightCategory(' + category + ')'
 
-            if category == 'KaonPion':
-                methodPrefixEventLevelSlowPion = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'EventLevelSlowPionFBDT'
-                identifierEventLevelSlowPion = filesDirectory + '/' + methodPrefixEventLevelSlowPion + '_1.root'
-                if not os.path.isfile(identifierEventLevelSlowPion):
-                    B2INFO("Flavor Tagger: event level weight file for the Slow Pion category is absent." +
-                           "It is required to sample the training information for the KaonPion category." +
-                           "An additional sampling step will be needed after the following training step.")
-                    continue
+            if not os.path.isfile(identifierEventLevel):
 
-            B2INFO(
-                'flavorTagger: file ' + filesDirectory + '/' +
-                methodPrefixEventLevel + "sampled" + fileId + '.root will be saved.')
+                if category == 'KaonPion':
+                    methodPrefixEventLevelSlowPion = "FlavorTagger_" + getBelleOrBelle2() + \
+                                                     "_" + weightFiles + 'EventLevelSlowPionFBDT'
+                    identifierEventLevelSlowPion = filesDirectory + '/' + methodPrefixEventLevelSlowPion + '_1.root'
+                    if not os.path.isfile(identifierEventLevelSlowPion):
+                        B2INFO("Flavor Tagger: event level weight file for the Slow Pion category is absent." +
+                               "It is required to sample the training information for the KaonPion category." +
+                               "An additional sampling step will be needed after the following training step.")
+                        continue
 
-            ma.applyCuts(particleList, 'isRightCategory(mcAssociated) > 0', path)
-            eventLevelpath = create_path()
-            SkipEmptyParticleList = register_module("SkimFilter")
-            SkipEmptyParticleList.set_name('SkimFilter_EventLevel' + category)
-            SkipEmptyParticleList.param('particleLists', particleList)
-            SkipEmptyParticleList.if_true(eventLevelpath, basf2.AfterConditionPath.CONTINUE)
-            path.add_module(SkipEmptyParticleList)
+                B2INFO('flavorTagger: file ' + filesDirectory + '/' +
+                       methodPrefixEventLevel + "sampled" + fileId + '.root will be saved.')
 
-            ntuple = register_module('VariablesToNtuple')
-            ntuple.param('fileName', filesDirectory + '/' + methodPrefixEventLevel + "sampled" + fileId + ".root")
-            ntuple.param('treeName', methodPrefixEventLevel + "_tree")
-            variablesToBeSaved = variables[category] + [targetVariable, 'ancestorHasWhichFlavor',
-                                                        'isSignal', 'mcPDG', 'mcErrors', 'genMotherPDG',
-                                                        'nMCMatches', 'B0mcErrors']
-            if category != 'KaonPion' and category != 'FSC':
-                variablesToBeSaved = variablesToBeSaved + \
-                    ['extraInfo(isRightTrack(' + category + '))',
-                     'hasHighestProbInCat(' + particleList + ', isRightTrack(' + category + '))']
-            ntuple.param('variables', variablesToBeSaved)
-            ntuple.param('particleList', particleList)
-            eventLevelpath.add_module(ntuple)
+                ma.applyCuts(particleList, 'isRightCategory(mcAssociated) > 0', path)
+                eventLevelpath = create_path()
+                SkipEmptyParticleList = register_module("SkimFilter")
+                SkipEmptyParticleList.set_name('SkimFilter_EventLevel' + category)
+                SkipEmptyParticleList.param('particleLists', particleList)
+                SkipEmptyParticleList.if_true(eventLevelpath, basf2.AfterConditionPath.CONTINUE)
+                path.add_module(SkipEmptyParticleList)
+
+                ntuple = register_module('VariablesToNtuple')
+                ntuple.param('fileName', filesDirectory + '/' + methodPrefixEventLevel + "sampled" + fileId + ".root")
+                ntuple.param('treeName', methodPrefixEventLevel + "_tree")
+                variablesToBeSaved = variables[category] + [targetVariable, 'ancestorHasWhichFlavor',
+                                                            'isSignal', 'mcPDG', 'mcErrors', 'genMotherPDG',
+                                                            'nMCMatches', 'B0mcErrors']
+                if category != 'KaonPion' and category != 'FSC':
+                    variablesToBeSaved = variablesToBeSaved + \
+                        ['extraInfo(isRightTrack(' + category + '))',
+                         'hasHighestProbInCat(' + particleList + ', isRightTrack(' + category + '))']
+                ntuple.param('variables', variablesToBeSaved)
+                ntuple.param('particleList', particleList)
+                eventLevelpath.add_module(ntuple)
 
     if ReadyMethods != len(categories):
         return False
@@ -714,33 +703,29 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu', categories=None):
         targetVariable = 'isRightCategory(' + category + ')'
         weightFile = filesDirectory + '/' + methodPrefixEventLevel + "_1.root"
 
-        if not os.path.isfile(weightFile):
+        if os.path.isfile(weightFile):
+            ReadyMethods += 1
+            continue
 
-            sampledFilesList = glob.glob(filesDirectory + '/' + methodPrefixEventLevel + 'sampled*.root')
-            if len(sampledFilesList) == 0:
-
-                B2INFO('flavorTagger: eventLevelTeacher did not find any ' + methodPrefixEventLevel +
-                       ".root" + ' file. Please run the flavorTagger in "Sampler" mode afterwards.')
-
-            else:
-
-                B2INFO('flavorTagger: MVA Teacher training' + methodPrefixEventLevel + ' .')
-                trainingOptionsEventLevel = basf2_mva.GeneralOptions()
-                trainingOptionsEventLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
-                trainingOptionsEventLevel.m_treename = methodPrefixEventLevel + "_tree"
-                trainingOptionsEventLevel.m_identifier = weightFile
-                trainingOptionsEventLevel.m_variables = basf2_mva.vector(*variables[category])
-                trainingOptionsEventLevel.m_target_variable = targetVariable
-                trainingOptionsEventLevel.m_max_events = maxEventsNumber
-
-                basf2_mva.teacher(trainingOptionsEventLevel, fastBDTCategories)
-
-                if uploadFlag:
-                    basf2_mva.upload(weightFile, methodPrefixEventLevel)
+        sampledFilesList = glob.glob(filesDirectory + '/' + methodPrefixEventLevel + 'sampled*.root')
+        if len(sampledFilesList) == 0:
+            B2INFO('flavorTagger: eventLevelTeacher did not find any ' + methodPrefixEventLevel +
+                   ".root" + ' file. Please run the flavorTagger in "Sampler" mode afterwards.')
 
         else:
+            B2INFO('flavorTagger: MVA Teacher training' + methodPrefixEventLevel + ' .')
+            trainingOptionsEventLevel = basf2_mva.GeneralOptions()
+            trainingOptionsEventLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
+            trainingOptionsEventLevel.m_treename = methodPrefixEventLevel + "_tree"
+            trainingOptionsEventLevel.m_identifier = weightFile
+            trainingOptionsEventLevel.m_variables = basf2_mva.vector(*variables[category])
+            trainingOptionsEventLevel.m_target_variable = targetVariable
+            trainingOptionsEventLevel.m_max_events = maxEventsNumber
 
-            ReadyMethods += 1
+            basf2_mva.teacher(trainingOptionsEventLevel, fastBDTCategories)
+
+            if uploadFlag:
+                basf2_mva.upload(weightFile, methodPrefixEventLevel)
 
     if ReadyMethods != len(categories):
         return False

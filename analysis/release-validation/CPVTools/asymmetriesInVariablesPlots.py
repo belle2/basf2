@@ -33,7 +33,7 @@ from ROOT import Belle2
 import sys
 import basf2 as b2
 import flavorTagger as ft
-from inputVariablesPlots import variablesPlotParamsDict
+from inputVariablesPlots import variablesPlotParamsDict, categories
 
 import numpy as np
 import matplotlib as mpl
@@ -90,7 +90,8 @@ particleConditions = {'e+:inRoe': ['e', " mcPDG > 0 ", " mcPDG < 0 "], 'mu+:inRo
 if not b2.find_file('AsymmetriesInVariablesPlots', silent=True):
     os.mkdir('./AsymmetriesInVariablesPlots')
 
-for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
+
+for (particleList, category, _) in ft.getEventLevelParticleLists(categories):
 
     # if category != "KinLepton":
     #    continue

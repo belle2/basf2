@@ -929,6 +929,25 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu', variablesCombinerLevel=None,
                     methodPrefixCombinerLevel + 'FANN' + '_1.root has been found. Please use the "Expert" mode')
 
 
+def getEventLevelParticleLists(categories=None):
+
+    if categories is None:
+        categories = []
+
+    eventLevelParticleLists = []
+
+    for category in categories:
+        ftCategory = AvailableCategories[category]
+        event_tuple = (ftCategory.particleList, ftCategory.eventName, ftCategory.variableName)
+
+        if event_tuple not in eventLevelParticleLists:
+            eventLevelParticleLists.append(event_tuple)
+        else:
+            B2FATAL('Flavor Tagger: ' + category + ' has been already given')
+
+    return eventLevelParticleLists
+
+
 def flavorTagger(
     particleLists=None,
     mode='Expert',

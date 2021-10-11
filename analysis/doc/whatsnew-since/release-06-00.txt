@@ -10,5 +10,5 @@ Neutral Hadron Analysis Tool
 Variables
 +++++++++
 
-* Removed ``R2EventLevel`` (it has been officially deprecated since release-05).
-* Variables ``nRejectedECLShowersFWDEndcap``, ``nRejectedECLShowersBarrel``, ``nRejectedECLShowersBWDEndcap``: if the values of the counters exceed uint8_t maximuum (255), it is set to 255.
+ * Removed ``R2EventLevel`` (it has been officially deprecated since release-05).
+ * Variables ``nRejectedECLShowersFWDEndcap``, ``nRejectedECLShowersBarrel``, ``nRejectedECLShowersBWDEndcap``: if the values of the counters exceed uint8_t maximuum (255), it is set to 255.

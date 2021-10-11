@@ -33,13 +33,24 @@
 
 namespace Belle2 {
   namespace Variable {
-    double beamBackgroundProbabilityMVA(const Particle* particle)
+    double beamBackgroundSuppressionMVA(const Particle* particle)
     {
-      if (particle->hasExtraInfo("beamBackgroundProbabilityMVA")) {
-        return particle->getExtraInfo("beamBackgroundProbabilityMVA");
+      if (particle->hasExtraInfo("beamBackgroundSuppressionMVA")) {
+        return particle->getExtraInfo("beamBackgroundSuppressionMVA");
       } else {
-        B2WARNING("The extraInfo beamBackgroundProbabilityMVA is not registered! \n"
+        B2WARNING("The extraInfo beamBackgroundSuppressionMVA is not registered! \n"
                   "This variable is only available for photons, and you either have to run the function getBeamBackgroundProbabilityMVA or turn the argument loadPhotonBeamBackgroundMVA to True when using fillParticleList.");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double hadronicSplitOffSuppressionMVA(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("hadronicSplitOffSuppressionMVA")) {
+        return particle->getExtraInfo("hadronicSplitOffSuppressionMVA");
+      } else {
+        B2WARNING("The extraInfo hadronicSplitOffSuppressionMVA is not registered! \n"
+                  "This variable is only available for photons, and you either have to run the function getHadronicSplitOffProbabilityMVA or turn the argument loadPhotonHadronicSplitOffMVA to True when using fillParticleList.");
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
@@ -1274,14 +1285,28 @@ Returns number of charged tracks matched to this cluster.
 Status bit to indicate if cluster has digits with waveforms that passed energy and :math:`\chi^2`
 thresholds for computing PSD variables.
 )DOC");
-    REGISTER_VARIABLE("beamBackgroundProbabilityMVA", beamBackgroundProbabilityMVA, R"DOC(
-Returns MVA classifier that uses shower shape variables to distinguish true clusters from beam background clusters. 
+    REGISTER_VARIABLE("beamBackgroundSuppressionMVA", beamBackgroundSuppressionMVA, R"DOC(
+Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from beam background clusters.
+The classes are: 
 
     - 1 for true photon clusters
     - 0 for beam background clusters
 
-The variables used in the training (in decreasing order of significance): clusterTiming, clusterE, clusterTheta, 
-clusterZernikeMVA,  clusterE1E9, clusterLat, clusterSecondMoment and clusterPhi. )DOC");
+The MVA output represents the probability that a given cluster belongs to class 1. The MVA has been trained using samples of signal photons and beam
+background photons coming from MC. The features used are (in decreasing order of significance): 
+clusterTiming, clusterPulseShapeDiscriminationMVA, clusterE, clusterTheta, clusterZernikeMVA, clusterE1E9, clusterLAT, clusterSecondMoment.
+)DOC");
+    REGISTER_VARIABLE("hadronicSplitOffSuppressionMVA", hadronicSplitOffSuppressionMVA, R"DOC(
+Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.
+The classes are: 
+
+    - 1 for true photon clusters
+    - 0 for hadronic splitoff clusters
+
+The MVA output represents the probability that a given cluster belongs to class 1. The MVA has been trained using samples of signal photons and hadronic splitoff photons 
+coming from MC. The features used are (in decreasing order of significance): 
+clusterPulseShapeDiscriminationMVA, minC2TDist, clusterZernikeMVA, clusterE, clusterLAT, clusterE1E9, clusterSecondMoment.
+)DOC");
     REGISTER_VARIABLE("clusterKlId", eclClusterKlId, R"DOC(
 Returns MVA classifier that uses ECL clusters variables to discriminate Klong clusters from em background.
     

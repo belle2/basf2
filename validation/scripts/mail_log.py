@@ -449,7 +449,8 @@ class Mails:
                         mood="happy",
                     )
 
-        print(f"Sent mails to the following people: {', '.join(recipients)}")
+        recipient_string = "\n".join([f"* {r}" for r in recipients])
+        print(f"Sent mails to the following people: {recipient_string}")
 
     def write_log(self):
         """

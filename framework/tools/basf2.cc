@@ -116,7 +116,8 @@ int main(int argc, char* argv[])
     prog::options_description generic("Generic options (to be used instead of steering file)");
     generic.add_options()
     ("help,h", "Print this help")
-    ("version,v", "Print version string")
+    ("version,v", "Print long and verbose version string")
+    ("version-short", "Print short version string")
     ("info", "Print information about basf2")
     ("license", "Print the short version of the basf2 license")
     ("modules,m", prog::value<string>()->implicit_value(""),
@@ -194,6 +195,8 @@ int main(int argc, char* argv[])
       return 0;
     } else if (varMap.count("version")) {
       pythonFile = "basf2/version.py";
+    } else if (varMap.count("version-short")) {
+      pythonFile = "basf2/version_short.py";
     } else if (varMap.count("info")) {
       pythonFile = "basf2_cli/print_info.py";
     } else if (varMap.count("license")) {

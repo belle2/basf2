@@ -53,6 +53,7 @@ PXDPerformanceVariablesCollectorModule::PXDPerformanceVariablesCollectorModule()
   addParam("fillChargeRatioHistogram", m_fillChargeRatioHistogram,
            "Flag to fill Ratio (cluster charge to the expected MPV) histograms", bool(true));
   addParam("fillChargeTree", m_fillChargeTree, "Flag to fill cluster charge with the estimated MPV to TTree", bool(false));
+  addParam("maskedDistance", m_maskedDistance, "Distance inside which no masked pixel or sensor border is allowed", int(10));
 
   // Particle list names
   addParam("PList4GainName", m_PList4GainName, "Name of the particle list for gain calibration and efficiency study",
@@ -244,7 +245,7 @@ void PXDPerformanceVariablesCollectorModule::collect() // Do your event() stuff 
 
       // Collect info for gain calibration
       // Check for valid cluster and intersection
-      if (!usedInTrack || intersection.chargeMPV <= 0)
+      if (!usedInTrack || !intersection.inside || intersection.chargeMPV <= 0)
         continue;
       // Apply cluster selection cuts
       if (cluster.charge < m_minClusterCharge || cluster.size < m_minClusterSize || cluster.size > m_maxClusterSize)
@@ -309,7 +310,7 @@ void PXDPerformanceVariablesCollectorModule::collectGainVariables(const TrackClu
   auto ladderNumber = sensorID.getLadderNumber();
   auto sensorNumber = sensorID.getSensorNumber();
 
-  // Increment the counter
+// Increment the counter
   getObjectPtr<TH1I>("PXDClusterCounter")->Fill(binID);
 
   // Fill variabels into tree
@@ -339,7 +340,7 @@ void PXDPerformanceVariablesCollectorModule::collectEfficiencyVariables(const Tr
 
   VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
   const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-  auto localPoint = Info.pointToLocal(TVector3(tPoint.x, tPoint.y, tPoint.z));
+  auto localPoint = Info.pointToLocal(TVector3(tPoint.x, tPoint.y, tPoint.z), true);
   auto uID = Info.getUCellID(localPoint.X());
   auto vID = Info.getVCellID(localPoint.Y());
   auto iSensor = VXD::GeoCache::getInstance().getGeoTools()->getPXDSensorIndex(sensorID);

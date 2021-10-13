@@ -24,7 +24,8 @@ using namespace Belle2;
 
 PXDHotPixelMaskCalibrationAlgorithm::PXDHotPixelMaskCalibrationAlgorithm(): CalibrationAlgorithm("PXDHotPixelMaskCollector"),
   forceContinueMasking(false), minEvents(10000), minHits(20), pixelMultiplier(7), maskDrains(true),
-  drainMultiplier(7), maskRows(true),  rowMultiplier(7)
+  drainMultiplier(7), maskRows(true),  rowMultiplier(7),
+  inefficientPixelMultiplier(0), minInefficientPixels(250)
 {
   setDescription(
     " -------------------------- PXDHotPixelMak Calibration Algorithm ------------------------\n"
@@ -225,7 +226,11 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       // Bookkeeping for masking of drains and rows
       vector<int> hitsAlongRow(c_nVCells, 0);
       vector<int> hitsAlongDrain(c_nDrains, 0);
+      vector<int> nDeadAlongRow(c_nVCells, 0);
 
+      // Mask all single pixels exceeding medianNumberOfHits x multiplier
+      double inefficientPixelHitThr = inefficientPixelMultiplier * medianNumberOfHits;
+      B2RESULT("Pixel hit threshold for dead rows is "  << inefficientPixelHitThr  << " for sensor " << id);
       // Accumulate hits along drains and rows
       for (auto bin = 1; bin <= nBins; bin++) {
         // Find the current pixel cell
@@ -236,6 +241,8 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
         int nhits = collector_pxdhitmap->GetBinContent(bin);
         hitsAlongDrain[drainID] += nhits;
         hitsAlongRow[vCell] += nhits;
+        if (inefficientPixelMultiplier > 0 && nhits < inefficientPixelHitThr)
+          nDeadAlongRow[vCell] += 1;
       }
 
       // Dead row masking
@@ -243,11 +250,13 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       for (auto vCell = 0; vCell < c_nVCells; vCell++) {
         // Get number of hits per row
         int nhits = hitsAlongRow[vCell];
+        int nDeadPixels = nDeadAlongRow[vCell];
         // Mask dead row
-        if (nhits == 0) {
+        if (nhits == 0 || nDeadPixels >= minInefficientPixels) {
           deadPixelsPar->maskRow(id.getID(), vCell);
           B2RESULT("Dead row with vCell=" << vCell << " on sensor " << id);
         }
+
       }
 
       // Dead drain masking

@@ -210,14 +210,15 @@ class ConditionCheckerBase(ABC):
                 gr = self.graphs[sensorID.getID()]
                 gr.SetPoint(gr.GetN(), self.run, values_dict[sensorID.getID()])
 
-    def draw_plots(self, canvas=None, cname="", ymin=0., ymax=None):
+    def draw_plots(self, canvas=None, cname="", ymin=0., ymax=None, logy=False):
         """
         Method to draw plots on a TCanvas
         Parameters:
           canvas (TCanvas): ROOT TCanvas for plotting
           canme (str): Name of the canvas
-          ymin (float): minimum value of y-axis for plotting
-          ymax (float): maximum of y-axis for plotting
+          ymin (float): Minimum value of y-axis for plotting
+          ymax (float): Maximum of y-axis for plotting
+          logy (bool): Flag to use log scale for y-axis
         """
         if not canvas:
             return
@@ -230,8 +231,10 @@ class ConditionCheckerBase(ABC):
         for i, sensorID in enumerate(sensorID_list):
             sensor_id = sensorID.getID()
             if i == 0:
-                if ymax:
-                    self.graphs[sensor_id].SetMaximum(ymax)
+                if ymax is None:
+                    ymax = np.array([np.array(gr.GetY()) for gr in list(self.graphs.values())
+                                     if isinstance(gr, ROOT.TGraph)]).max()
+                self.graphs[sensor_id].SetMaximum(ymax)
                 self.graphs[sensor_id].SetMinimum(ymin)
                 self.graphs[sensor_id].Draw("AP")
             else:
@@ -239,11 +242,15 @@ class ConditionCheckerBase(ABC):
         if self.graphs["TLegends"]:
             for leg in self.graphs["TLegends"]:
                 leg.Draw()
-        self.save_canvas(canvas, cname)
+        self.save_canvas(canvas, cname, logy=logy)
 
-    def save_canvas(self, canvas, cname, with_logy=False):
+    def save_canvas(self, canvas, cname, logy=False):
         """
-        Save TCanvas to png/pdf format and write it to the default ROOT file
+        Save TCanvas to png/pdf format and do not write it to the ROOT file by default
+        Parameters:
+          canvas (TCanvas): ROOT TCanvas for plotting
+          canme (str): Name of the canvas
+          logy (bool): Flag to use log scale for y-axis
         """
         if cname:
             canvas.SetName(cname)
@@ -251,17 +258,17 @@ class ConditionCheckerBase(ABC):
         # Draw Belle II label
         latex_r.DrawLatex(0.95, 0.92, "Belle II Experiment: " + exp_run.replace("_", " "))
         # Print and write TCanvas
-        canvas.SetLogy(0)
-        canvas.Print(f"{exp_run}_{cname}_vs_run.png")
-        canvas.Print(f"{exp_run}_{cname}_vs_run.pdf")
-        if with_logy:
+        if logy:
             canvas.SetLogy(1)
             canvas.Update()
             canvas.Modified()
             canvas.Print(f"{exp_run}_{cname}_vs_run_logy.png")
             canvas.Print(f"{exp_run}_{cname}_vs_run_logy.pdf")
+        else:
+            canvas.SetLogy(0)
+            canvas.Print(f"{exp_run}_{cname}_vs_run.png")
+            canvas.Print(f"{exp_run}_{cname}_vs_run.pdf")
         self.tfile.cd()
-        canvas.Write()
 
 
 class PXDOccupancyInfoChecker(ConditionCheckerBase):
@@ -293,7 +300,7 @@ class PXDOccupancyInfoChecker(ConditionCheckerBase):
     def get_graph_value(self, sensor_db_content):
         return sensor_db_content * 100
 
-    def draw_plots(self, canvas=None):
+    def draw_plots(self, canvas=None, **kwargs):
         """
         Method to draw plots on a TCanvas
         """
@@ -340,11 +347,11 @@ class PXDMaskedPixelsChecker(ConditionCheckerBase):
             vCell = pixelID % nVCells
             h2.SetBinContent(int(uCell + 1), int(vCell + 1), 1)
 
-    def draw_plots(self, canvas=None, cname="PXDHotPixel", ymin=0., ymax=plot_type_dict["hot"]["max"]):
+    def draw_plots(self, canvas=None, cname="PXDHotPixel", ymin=0., ymax=plot_type_dict["hot"]["max"], **kwargs):
         """
         Method to draw plots on a TCanvas
         """
-        super().draw_plots(canvas=canvas, cname=cname, ymin=ymin, ymax=ymax)
+        super().draw_plots(canvas=canvas, cname=cname, ymin=ymin, ymax=ymax, **kwargs)
 
 
 class PXDDeadPixelsChecker(ConditionCheckerBase):
@@ -437,11 +444,11 @@ class PXDDeadPixelsChecker(ConditionCheckerBase):
                 vCell = pixelID % nVCells
                 h2.SetBinContent(int(uCell + 1), int(vCell + 1), 1)
 
-    def draw_plots(self, canvas=None, cname="PXDDeadPixel", ymin=0., ymax=plot_type_dict["dead"]["max"]):
+    def draw_plots(self, canvas=None, cname="PXDDeadPixel", ymin=0., ymax=plot_type_dict["dead"]["max"], **kwargs):
         """
         Method to draw plots on a TCanvas
         """
-        super().draw_plots(canvas=canvas, cname=cname, ymin=ymin, ymax=ymax)
+        super().draw_plots(canvas=canvas, cname=cname, ymin=ymin, ymax=ymax, **kwargs)
 
 
 class PXDGainMapChecker(ConditionCheckerBase):
@@ -485,8 +492,8 @@ class PXDGainMapChecker(ConditionCheckerBase):
     def set_hist_content(self, h2, sensor_db_content):
         array2hist(sensor_db_content.reshape(h2.GetNbinsX(), h2.GetNbinsY()), h2)
 
-    def draw_plots(self, canvas=None, cname="PXDGain", ymin=0.5, ymax=2.5):
+    def draw_plots(self, canvas=None, cname="PXDGain", ymin=0.5, ymax=2.5, **kwargs):
         """
         Method to draw plots on a TCanvas
         """
-        super().draw_plots(canvas=canvas, cname=cname, ymin=ymin, ymax=ymax)
+        super().draw_plots(canvas=canvas, cname=cname, ymin=ymin, ymax=ymax, **kwargs)

@@ -14,7 +14,9 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
   /**
@@ -46,7 +48,7 @@ namespace Belle2 {
     /** Parameter: Posebility to switch beween ROOT and Eigen for inversion of the covariance matrix */
     std::string m_param_linalg;
     /** Variable: Makes MCParticles and Tracks available in whole class */
-    //StoreArray<MCParticle> MCParticles;
-    //StoreArray<Track> Tracks;
+    StoreArray<MCParticle> MCParticles;
+    StoreArray<Track> Tracks;
   };
 }

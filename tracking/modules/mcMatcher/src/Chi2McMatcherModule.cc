@@ -55,8 +55,8 @@ Chi2McMatcherModule::Chi2McMatcherModule() : Module()
 void Chi2McMatcherModule::initialize()
 {
   // Check if there are MC Particles
-  StoreArray<Track> Tracks;
-  StoreArray<MCParticle> MCParticles;
+  //StoreArray<Track> Tracks;
+  //StoreArray<MCParticle> MCParticles;
   MCParticles.isRequired();
   Tracks.isRequired();
   Tracks.registerRelationTo(MCParticles);
@@ -69,8 +69,8 @@ void Chi2McMatcherModule::event()
   auto default_gErrorIgnoreLevel = gErrorIgnoreLevel;
   gErrorIgnoreLevel = 5000;
 
-  StoreArray<Track> Tracks;
-  StoreArray<MCParticle> MCParticles;
+  //StoreArray<Track> Tracks;
+  //StoreArray<MCParticle> MCParticles;
 
   // get StoreArray length
   int nTracks = Tracks.getEntries();

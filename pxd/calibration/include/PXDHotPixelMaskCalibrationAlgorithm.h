@@ -45,6 +45,12 @@ namespace Belle2 {
     /// The occupancy threshold for masking hot rows is the median occupancy x rowMultiplier
     float rowMultiplier;
 
+    /// The occupancy threshold for inefficient (or dead) pixels is the median occupancy x inefficientPixelMultiplier
+    float inefficientPixelMultiplier;
+
+    /// The minimum number of inefficient (or dead) pixels per row to define an inefficient row
+    int minInefficientPixels;
+
     /// setter for m_debugHisto
     void setDebugHisto(bool debugHisto) {m_debugHisto = debugHisto;}
 

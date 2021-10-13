@@ -245,13 +245,19 @@ class PXDHotPixelMaskCalibrationChecker(CalibrationCheckerBase):
         checker.graphs = self.hotdead_graphs
         checker.draw_plots(
             canvas=canvas, cname="PXDHotnDeadPixel", ymin=0., ymax=plot_type_dict["hot_dead"]["max"])
+        checker.draw_plots(canvas=canvas, cname="PXDHotnDeadPixel", ymin=0., ymax=None, logy=True)
+        canvas.Write()
         # Occupancy with/without Mask
         checker.graphs = self.occupancy_masked_graphs
         checker.draw_plots(
             canvas=canvas, cname="PXDOccupancyWithMask", ymin=0., ymax=plot_type_dict["occ_masked"]["max"])
+        checker.draw_plots(canvas=canvas, cname="PXDOccupancyWithMask", ymin=0., ymax=None, logy=True)
+        canvas.Write()
         checker.graphs = self.occupancy_no_mask_graphs
         checker.draw_plots(
             canvas=canvas, cname="PXDOccupancyNoMask", ymin=0., ymax=plot_type_dict["occ_no_mask"]["max"])
+        checker.draw_plots(canvas=canvas, cname="PXDOccupancyNoMask", ymin=0., ymax=None, logy=True)
+        canvas.Write()
 
         # checker.save_canvas(canvas, "PXDHotnDeadPixel")
 
@@ -269,7 +275,9 @@ class PXDHotPixelMaskCalibrationChecker(CalibrationCheckerBase):
         leg.AddEntry(g2, 'Hot pixels', 'p')
         leg.AddEntry(g3, 'Dead pixels', 'p')
         leg.Draw()
-        checker.save_canvas(canvas, "PXDTotalHotnDeadPixel", with_logy=True)
+        checker.save_canvas(canvas, "PXDTotalHotnDeadPixel", logy=True)
+        canvas.Write()
+        checker.save_canvas(canvas, "PXDTotalHotnDeadPixel", logy=False)
         #   Average Occupancy plots
         canvas.Clear()
         g1 = self.sum_graphs["occ_no_mask"]
@@ -280,4 +288,6 @@ class PXDHotPixelMaskCalibrationChecker(CalibrationCheckerBase):
         leg.AddEntry(g1, 'No Mask', 'p')
         leg.AddEntry(g2, 'With Mask', 'p')
         leg.Draw()
-        checker.save_canvas(canvas, "PXDTotalOccupancy", with_logy=True)
+        checker.save_canvas(canvas, "PXDTotalOccupancy", logy=True)
+        canvas.Write()
+        checker.save_canvas(canvas, "PXDTotalOccupancy", logy=False)

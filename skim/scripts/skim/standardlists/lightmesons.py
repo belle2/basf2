@@ -27,12 +27,12 @@ def loadStdPi0ForBToHadrons(persistent=True, path=None):
     """
     stdPi0s('all', path, loadPhotonBeamBackgroundMVA=False)
     ma.cutAndCopyList(outputListName='pi0:bth_skim', inputListName='pi0:all',
-                      cut='[[daughter(0, clusterReg) == 1 and daughter(0, E) > 0.080] or ' +
-                      '[daughter(0, clusterReg) == 2 and daughter(0, E) > 0.030] or ' +
-                      '[daughter(0, clusterReg) == 3 and daughter(0, E) > 0.060]] and ' +
-                      '[[daughter(1, clusterReg) == 1 and daughter(1, E) > 0.080] or ' +
-                      '[daughter(1, clusterReg) == 2 and daughter(1, E) > 0.030] or ' +
-                      '[daughter(1, clusterReg) == 3 and daughter(1, E) > 0.060]] and ' +
+                      cut='[[daughter(0, clusterReg) == 1 and daughter(0, E) > 0.02250] or ' +
+                      '[daughter(0, clusterReg) == 2 and daughter(0, E) > 0.020] or ' +
+                      '[daughter(0, clusterReg) == 3 and daughter(0, E) > 0.020]] and ' +
+                      '[[daughter(1, clusterReg) == 1 and daughter(1, E) > 0.02250] or ' +
+                      '[daughter(1, clusterReg) == 2 and daughter(1, E) > 0.020] or ' +
+                      '[daughter(1, clusterReg) == 3 and daughter(1, E) > 0.020]] and ' +
                       'M > 0.105 and M < 0.150', path=path)
     kFit('pi0:bth_skim', 0.0, 'mass', path=path)
 

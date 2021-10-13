@@ -45,8 +45,11 @@ namespace Belle2 {
      *              the  different pdgs have to be in the following order  [11,13,211,2212,321,1000010020]
      */
     std::vector<double> m_param_CutOffs;
-    /** Parameter: Posebility to switch beween ROOT and Eigen for inversion of the covariance matrix */
-    std::string m_param_linalg;
+    /** Parameter: Posebility to switch beween ROOT and Eigen for inversion of the covariance matrix
+     *  0: ROOT is used for matrix inversion
+     *  1: Eigen is used for matrix inversion
+     */
+    bool m_param_linalg;
     /** Variable: Makes MCParticles and Tracks available in whole class */
     StoreArray<MCParticle> MCParticles;
     StoreArray<Track> Tracks;

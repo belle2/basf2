@@ -45,11 +45,11 @@ Chi2McMatcherModule::Chi2McMatcherModule() : Module()
            m_param_CutOffs,
            "Defines the Cut Off values for each charged particle. pdg order [11,13,211,2212,321,1000010020]",
            defaultCutOffs);
-
+  bool defaultLinalg = 0;
   addParam("linalg",
            m_param_linalg,
-           "Parameter to switch between ROOT and Eigen, to invert the covariance matrix",
-           std::string("ROOT"));
+           "Parameter to switch between ROOT and Eigen, to invert the covariance matrix. 0: ROOT is used; 1: Eigen is used",
+           defaultLinalg);
 }
 
 void Chi2McMatcherModule::initialize()
@@ -125,7 +125,7 @@ void Chi2McMatcherModule::event()
       double chi2Cur = std::numeric_limits<double>::infinity();
 
       // Check which linear algebra system should be used and calculate chi2Cur
-      if (m_param_linalg == "Eigen") {
+      if (not m_param_linalg) {
         // Eigen
         // build difference vector
         Eigen::VectorXd delta(5);
@@ -143,7 +143,7 @@ void Chi2McMatcherModule::event()
         }
         //calculate chi2Cur
         chi2Cur = ((delta.transpose()) * (covariance5Eigen.inverse() * delta))(0, 0);
-      } else if (m_param_linalg == "ROOT") {
+      } else {
         // ROOT
         // calculate difference vector
         TMatrixD delta(5, 1);
@@ -159,9 +159,6 @@ void Chi2McMatcherModule::event()
         deltaT.T();
         // calculate chi2Cur
         chi2Cur = ((deltaT) * (Covariance5 * delta))[0][0];
-      } else {
-        B2DEBUG(20, "Warning: The linalg input value has unkown value. Has to be either `ROOT` or `Eigen`! Stop execution!");
-        break;
       }
       // check if chi2Cur is smaller than the so far found minimal chi2Min
       if (chi2Min > chi2Cur) {

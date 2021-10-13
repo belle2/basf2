@@ -22,7 +22,8 @@ Topology analysis
 
     **Objectives**:
 
-        * Install `TopoAna`.
+        * Install ``TopoAna``.
+
 	* Generate a PDF report with a lot of information about your MC.
 
 

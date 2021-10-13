@@ -1,20 +1,12 @@
 /**************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2021 - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: Florian Schweiger                                        *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #include <tracking/modules/mcMatcher/Chi2McMatcherModule.h>
-
-/* --------------- WARNING ---------------------------------------------- *
-If you have more complex parameter types in your class then simple int,
-double or std::vector of those you might need to uncomment the following
-include directive to avoid an undefined reference on compilation.
-* ---------------------------------------------------------------------- */
 
 // datastore types
 #include <framework/datastore/StoreArray.h>
@@ -55,39 +47,19 @@ Chi2McMatcherModule::Chi2McMatcherModule() : Module()
            defaultCutOffs);
 
   addParam("linalg",
-           param_linalg,
+           m_param_linalg,
            "Parameter to switch between ROOT and Eigen, to invert the covariance matrix",
            std::string("ROOT"));
-  /*
-  bool save_helix_param_default = 0;
-  addParam("save_helix_param",
-           m_param_savehelix,
-           "Debug variable to save helix parameters to csv",
-     save_helix_param_default);
-  addParam("filename",
-     m_param_filename,
-     "Debug variable to give filename for saveing helix parameters",
-     std::string("savedhelixparameter"));
-  */
 }
 
 void Chi2McMatcherModule::initialize()
 {
-// Check if there are MC Particles
-  StoreArray<MCParticle> storeMCParticles;
-  StoreArray<Track> storeTrack;
-  storeMCParticles.isRequired();
-  storeTrack.isRequired();
-  storeTrack.registerRelationTo(storeMCParticles);
-
-  /*
-  // Variables to save data
-  fileHeader = {"D0_track", "Phi0_track", "Omega_track", "Z0_track", "TanLambda_track",
-                "D0_mc_chi2", "Phi0_mc_chi2", "Omega_mc_chi2", "Z0_mc_chi2", "TanLambda_mc_chi2",
-                "chi2_value",
-                "hitRelation", "chi2Relation", "bothRelation", "bothRelationAndSameMC", "notbothRelation", "noRelation" // (bool)
-               };
-  */
+  // Check if there are MC Particles
+  StoreArray<Track> Tracks;
+  StoreArray<MCParticle> MCParticles;
+  MCParticles.isRequired();
+  Tracks.isRequired();
+  Tracks.registerRelationTo(MCParticles);
 }
 
 void Chi2McMatcherModule::event()
@@ -97,8 +69,8 @@ void Chi2McMatcherModule::event()
   auto default_gErrorIgnoreLevel = gErrorIgnoreLevel;
   gErrorIgnoreLevel = 5000;
 
-  StoreArray<MCParticle> MCParticles;
   StoreArray<Track> Tracks;
+  StoreArray<MCParticle> MCParticles;
 
   // get StoreArray length
   int nTracks = Tracks.getEntries();
@@ -114,27 +86,10 @@ void Chi2McMatcherModule::event()
   for (int it = 0 ; it < nTracks; ++it) {
     auto track = Tracks[it];
 
-    /*
-    // Varibles to save matching information to csv file
-    int hitMatch = 0;
-    int chi2Match = 0;
-    double track_helix[5];// D0,Phi0,Omega,Z0,TanLambda
-    double mc_helix[5];
-    double classifiers[6] = {0, 0, 0, 0, 0, 0}; //"hitRelation","chi2Relation","bothRelation","bothRelationAndSameMC","notbothRelation","noRelation"
-    auto hitMCParticle = track->getRelated<MCParticle>();
-    */
-
     // test for existing relations
     if (track->getRelated<MCParticle>()) {
-      B2DEBUG(100, "Relation already set continue with next track");
+      B2DEBUG(27, "Relation already set continue with next track");
       continue;
-
-      /*
-      // Variables to save matching information to csv file
-      ++hitRelationCounter;
-      classifiers[0] = 1; //hitrelation
-      hitMatch = 1;
-      */
     }
     // initialize minimal chi2 variables
     int ip_min = -1;
@@ -156,7 +111,7 @@ void Chi2McMatcherModule::event()
       // check if matrix is invertable
       double det = Covariance5.Determinant();
       if (det == 0.0) {
-        B2DEBUG(100, "Covariance5 matrix is not invertable. Continue!");
+        B2DEBUG(23, "Covariance5 matrix is not invertable. Continue with next MCParticle!");
         continue;
       }
 
@@ -170,7 +125,7 @@ void Chi2McMatcherModule::event()
       double chi2Cur = std::numeric_limits<double>::infinity();
 
       // Check which linear algebra system should be used and calculate chi2Cur
-      if (param_linalg == "Eigen") {
+      if (m_param_linalg == "Eigen") {
         // Eigen
         // build difference vector
         Eigen::VectorXd delta(5);
@@ -188,7 +143,7 @@ void Chi2McMatcherModule::event()
         }
         //calculate chi2Cur
         chi2Cur = ((delta.transpose()) * (covariance5Eigen.inverse() * delta))(0, 0);
-      } else if (param_linalg == "ROOT") {
+      } else if (m_param_linalg == "ROOT") {
         // ROOT
         // calculate difference vector
         TMatrixD delta(5, 1);
@@ -204,27 +159,14 @@ void Chi2McMatcherModule::event()
         deltaT.T();
         // calculate chi2Cur
         chi2Cur = ((deltaT) * (Covariance5 * delta))[0][0];
+      } else {
+        B2DEBUG(20, "Warning: The linalg input value has unkown value. Has to be either `ROOT` or `Eigen`! Stop execution!");
+        break;
       }
       // check if chi2Cur is smaller than the so far found minimal chi2Min
       if (chi2Min > chi2Cur) {
         chi2Min = chi2Cur;
         ip_min = ip;
-
-        /*
-        // Variables to save matching information to file
-        if (m_param_savehelix){
-          track_helix[0] = trackFitResult->getD0();
-          track_helix[1] = trackFitResult->getPhi0();
-          track_helix[2] = trackFitResult->getOmega();
-          track_helix[3] = trackFitResult->getZ0();
-          track_helix[4] = trackFitResult->getTanLambda();
-          mc_helix[0] = mcParticleHelix.getD0();
-          mc_helix[1] = mcParticleHelix.getPhi0();
-          mc_helix[2] = mcParticleHelix.getOmega();
-          mc_helix[3] = mcParticleHelix.getZ0();
-          mc_helix[4] = mcParticleHelix.getTanLambda();
-        }
-        */
       }
     }
     // check if any matching candidate was found
@@ -255,94 +197,9 @@ void Chi2McMatcherModule::event()
     }
     if (chi2Min < cutOff) {
       Tracks[it]->addRelationTo(MCParticles[ip_min]);
-      /*
-      // Variables to save matching information to file
-      ++chi2RelationCounter;
-      chi2Match = 1;
-      classifiers[1] = 1;
-      */
     }
-    /*
-    // Variables to save matching information to file
-    if ((chi2Match == 1) and (hitMatch == 1)) {
-      ++bothRelationCounter;
-      classifiers[2] = 1;
-      if (hitMCParticle == MCParticles[ip_min]) {
-        ++bothRelationAndSameMCCounter;
-        classifiers[3] = 1;
-      }
-    } else if ((chi2Match == 1) or (hitMatch == 1)) {
-      ++notBothRelationCounter;
-      classifiers[4] = 1;
-    } else {
-      ++noRelationCounter;
-      classifiers[5] = 1;
-    }
-
-
-    if (m_param_savehelix) {
-
-      for (int i = 0; i < 5; i++) {
-        fileContent.push_back(track_helix[i]);
-      }
-      for (int i = 0; i < 5; i++) {
-        fileContent.push_back(mc_helix[i]);
-      }
-      fileContent.push_back(chi2Min);
-      for (int i = 0; i < 5; i++) {
-        fileContent.push_back(classifiers[i]);
-      }
-      fileContent.push_back(bothRelationCounter/hitRelationCounter);
-    }
-    */
-    /*
-    B2DEBUG(1,"totalCount = "<<totalCount);
-    B2DEBUG(1,"hitRelationCounter = "<<hitRelationCounter);
-    B2DEBUG(1,"chi2RelationCounter = "<<chi2RelationCounter);
-    B2DEBUG(1,"bothRelationCounter = "<<bothRelationCounter);
-    B2DEBUG(1,"bothRelationAndSameMCCounter = "<<bothRelationAndSameMCCounter);
-    B2DEBUG(1,"notbothRelationCounter = "<<notBothRelationCounter);
-    B2DEBUG(1,"noRelationCounter = "<<noRelationCounter);
-    */
   }
   // reset ROOT Error Level to default
   gErrorIgnoreLevel = default_gErrorIgnoreLevel;
 }
 
-
-/*
-// Variables to save matching information to file
-void Chi2McMatcherModule::terminate()
-{
-  B2DEBUG(1,m_param_CutOffs);
-  if (m_param_savehelix) {
-  std::ofstream outfile;
-  outfile.open(m_param_filename);
-  if (!outfile) {  // file couldn't be opened
-    std::cerr << "Error: file could not be opened" << std::endl;
-    exit(1);
-  }
-  int fileHeaderSize = fileHeader.size();
-  for (int i = 0; i < fileHeaderSize; i++) {
-    outfile << fileHeader[i];
-    if (i != (fileHeaderSize - 1)) {
-      outfile << ",";
-    }
-  }
-  outfile << std::endl;
-  int count = 0;
-  int fileContentSize = fileContent.size();
-  for (int index = 0; index < (fileContentSize); index++) {
-    outfile << fileContent[index];
-    count++;
-    if (count == 17) {
-      count = 0;
-      outfile << std::endl;
-      continue;
-    }
-    outfile << ",";
-  }
-  outfile.close();
-  }
-}
-*/

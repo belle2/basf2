@@ -20,9 +20,9 @@ from stdPi0s import stdPi0s
 def loadStdPi0ForBToHadrons(persistent=True, path=None):
     """
     Creates a list 'pi0:bth_skim' for :math:`B\\to {\\rm hadrons}` skims, based on recommendations of
-    the neutral group (avoiding ECL timing cuts) for winter 2020. We require the energy of the photons
-    to be larger than :math:`80~{\\rm MeV}` in the forward end cap, :math:`30~{\\rm MeV}` in the barrel,
-    and :math:`60~{\\rm MeV}` in the backward end cap. For the :math:`\\pi^{0}`, we require the mass to be
+    the neutral group (avoiding ECL timing cuts) for winter 2020 and BtoCharmless for 2021. We require the energy of the photons
+    to be larger than :math:`22.50~{\\rm MeV}` in the forward end cap, :math:`20~{\\rm MeV}` in the barrel,
+    and :math:`20~{\\rm MeV}` in the backward end cap. For the :math:`\\pi^{0}`, we require the mass to be
     :math:`105 < M < 150~{\\rm MeV}/c^2` and a mass-constrained KFit to converge.
     """
     stdPi0s('all', path, loadPhotonBeamBackgroundMVA=False)

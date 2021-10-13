@@ -450,7 +450,7 @@ class Mails:
                     )
 
         recipient_string = "\n".join([f"* {r}" for r in recipients])
-        print(f"Sent mails to the following people: {recipient_string}")
+        print(f"Sent mails to the following people: \n{recipient_string}\n")
 
     def write_log(self):
         """

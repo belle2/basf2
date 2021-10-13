@@ -22,7 +22,7 @@ fi
 # since at this stage we know that HLT works fine
 INPUT_FILE_BASENAME=`basename ${VALIDATION_RAWDATA} .root`
 INPUT_FILE=${OUTPUT_ROOT_DIR}/${INPUT_FILE_BASENAME}-expressreco.root
-b2file-mix -n 100 --keep-eventinfo -o ${INPUT_FILE} ${VALIDATION_RAWDATA}
+b2file-mix -n 1000 --keep-eventinfo -o ${INPUT_FILE} ${VALIDATION_RAWDATA}
 
 # Run the ExpressReco script
 ${PARENT} basf2 ${PROCESSES} \

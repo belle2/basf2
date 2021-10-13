@@ -21,7 +21,7 @@ fi
 # Prepare the input file: the ROIs objects must be removed for the HLT validation
 INPUT_FILE_BASENAME=`basename ${VALIDATION_RAWDATA} .root`
 INPUT_FILE=${OUTPUT_ROOT_DIR}/${INPUT_FILE_BASENAME}-hlt.root
-b2file-mix -n 100 --exclude ROIs --keep-eventinfo -o ${INPUT_FILE} ${VALIDATION_RAWDATA}
+b2file-mix -n 10000 --exclude ROIs --keep-eventinfo -o ${INPUT_FILE} ${VALIDATION_RAWDATA}
 
 # Run the HLT script
 ${PARENT} basf2 ${PROCESSES} \

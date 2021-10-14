@@ -13,7 +13,7 @@
 # * and to test the flavor tagger.           *
 # ********************************************
 
-from basf2 import B2INFO, B2FATAL
+from basf2 import B2INFO, B2FATAL, B2WARNING
 import basf2
 import basf2_mva
 import inspect
@@ -490,7 +490,7 @@ def FillParticleLists(maskName='all', categories=None, path=None):
     if categories is None:
         categories = []
 
-    trackCut = 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' + 'isNAN(p) !=1 and isInfinity(p) != 1'
+    trackCut = 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and p >= 0'
 
     for category in categories:
         particleList = AvailableCategories[category].particleList
@@ -519,6 +519,8 @@ def FillParticleLists(maskName='all', categories=None, path=None):
     if getBelleOrBelle2() == 'Belle':
         ma.cutAndCopyList('K_S0:inRoe', 'K_S0:mdst', 'extraInfo(ksnbStandard) == 1 and isInRestOfEvent == 1', path=path)
     else:
+        if 'pi+:inRoe' not in readyParticleLists:
+            ma.fillParticleList('pi+:inRoe', trackCut, path=path)
         ma.reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
         kFit('K_S0:inRoe', 0.01, path=path)
 
@@ -1003,8 +1005,14 @@ def flavorTagger(
     if mode != 'Sampler' and mode != 'Teacher' and mode != 'Expert':
         B2FATAL('flavorTagger: Wrong mode given: The available modes are "Sampler", "Teacher" or "Expert"')
 
-    if len(categories) > 13 or len(categories) < 2:
-        B2FATAL('Flavor Tagger: Invalid amount of categories. At least two are needed. No more than 13 are available')
+    if len(categories) != len(set(categories)):
+        dup = [cat for cat in set(categories) if categories.count(cat) > 1]
+        B2WARNING('Flavor Tagger: There are duplicate elements in the given categories list. '
+                  << 'The following duplicate elements are removed; ' << ', '.join(dup))
+        categories = list(set(categories))
+
+    if len(categories) < 2:
+        B2FATAL('Flavor Tagger: Invalid amount of categories. At least two are needed.')
         B2FATAL(
             'Flavor Tagger: Possible categories are  "Electron", "IntermediateElectron", "Muon", "IntermediateMuon", '
             '"KinLepton", "IntermediateKinLepton", "Kaon", "SlowPion", "FastHadron",'

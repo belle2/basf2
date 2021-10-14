@@ -864,14 +864,14 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                 applyCuts(decayString, 'isFromECL', path)
 
             # if the user asked for the beam background MVA to be added, then also provide this
-            # (populates the variable named beamBackgroundSuppressionMVA)
+            # (populates the variable named beamBackgroundSuppression)
             if loadPhotonBeamBackgroundMVA:
-                getBeamBackgroundProbabilityMVA(decayString, path)
+                getBeamBackgroundProbability(decayString, path)
 
             # if the user asked for the hadronic splitoff MVA to be added, then also provide this
-            # (populates the variable named hadronicSplitOffSuppressionMVA)
+            # (populates the variable named hadronicSplitOffSuppression)
             if loadPhotonHadronicSplitOffMVA:
-                getHadronicSplitOffProbabilityMVA(decayString, path)
+                getHadronicSplitOffProbability(decayString, path)
 
 
 def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False,
@@ -968,14 +968,14 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
             applyCuts(decayString, 'isFromECL', path)
 
         # if the user asked for the beam background MVA to be added, then also provide this
-        # (populates the variable named beamBackgroundProbabilityMVA)
+        # (populates the variable named beamBackgroundProbability)
         if loadPhotonBeamBackgroundMVA:
-            getBeamBackgroundProbabilityMVA(decayString, path)
+            getBeamBackgroundProbability(decayString, path)
 
         # if the user asked for the hadronic splitoff MVA to be added, then also provide this
-        # (populates the variable named hadronicSplitOffSuppressionMVA)
+        # (populates the variable named hadronicSplitOffSuppression)
         if loadPhotonHadronicSplitOffMVA:
-            getHadronicSplitOffProbabilityMVA(decayString, path)
+            getHadronicSplitOffProbability(decayString, path)
 
 
 def fillParticleListWithTrackHypothesis(decayString,
@@ -2864,7 +2864,7 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
-def getBeamBackgroundProbabilityMVA(particleList, path=None):
+def getBeamBackgroundProbability(particleList, path=None):
     """
     Assign a probability to each ECL cluster as being signal like (1) compared to beam background like (0)
     @param particleList     The input ParticleList, must be a photon list
@@ -2873,11 +2873,11 @@ def getBeamBackgroundProbabilityMVA(particleList, path=None):
     basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module('MVAExpert',
                     listNames=particleList,
-                    extraInfoName='beamBackgroundSuppressionMVA',
+                    extraInfoName='beamBackgroundSuppression',
                     identifier='BeamBackgroundMVA')
 
 
-def getHadronicSplitOffProbabilityMVA(particleList, path=None,):
+def getHadronicSplitOffProbability(particleList, path=None,):
     """
     Assign a probability to each ECL cluster as being signal like (1) compared to hadronic splitoff like (0)
     @param particleList     The input ParticleList, must be a photon list
@@ -2886,7 +2886,7 @@ def getHadronicSplitOffProbabilityMVA(particleList, path=None,):
     basf2.conditions.prepend_globaltag(getAnalysisGlobaltag())
     path.add_module('MVAExpert',
                     listNames=particleList,
-                    extraInfoName='hadronicSplitOffSuppressionMVA',
+                    extraInfoName='hadronicSplitOffSuppression',
                     identifier='HadronicSplitOffMVA')
 
 

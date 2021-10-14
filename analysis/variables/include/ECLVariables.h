@@ -31,12 +31,12 @@ namespace Belle2 {
     /**
      * return MVA output that uses shower-related variables to distinguish between true photon and hadronic splitoff clusters
      */
-    double hadronicSplitOffSuppressionMVA(const Particle* particle);
+    double hadronicSplitOffSuppression(const Particle* particle);
 
     /**
      * return MVA output that uses shower-related variables to distinguish between true photon and beam background clusters
      */
-    double beamBackgroundSuppressionMVA(const Particle* particle);
+    double beamBackgroundSuppression(const Particle* particle);
 
     /**
      * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component

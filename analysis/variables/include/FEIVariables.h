@@ -31,14 +31,14 @@ namespace Belle2 {
     */
     std::vector<int> truthFSPTag(int BTag_index);
     /*
-    By giving this function an index of a B meson candidate, it will return the percentage of missing particles from this given index.
+    By giving this function a B meson candidate, it will return the percentage of missing particles from the mostcommonBTagIndex.
     If continuum event this will return -1.
     */
-    Manager::FunctionPtr percentageMissingParticlesBTag(const std::vector<std::string>&  arguments);
+    double percentageMissingParticlesBTag(const Particle* part);
     /*
-    By giving this function an index of a B meson candidate, it will return the percentage of wrong particles not originating from the given index.
+    By providing this function with a B meson candidate, it will return the percentage of wrong particles not originating from the mostcommonBTagIndex.
     If continuum event this will return -1.
     */
-    Manager::FunctionPtr percentageWrongParticlesBTag(const std::vector<std::string>&  arguments);
+    double percentageWrongParticlesBTag(const Particle* part);
   } // Variable namespace
 } // Belle2 namespace

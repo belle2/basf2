@@ -75,78 +75,58 @@ namespace Belle2 {
       }
       return fsp_truth_index;
     }
-    Manager::FunctionPtr percentageMissingParticlesBTag(const std::vector<std::string>& arguments)
+    double percentageMissingParticlesBTag(const Particle* part)
     {
-      if (arguments.size() == 1) {
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * part)-> double{
-          int index = var->function(part);
-          if (index == -1)
-          {
-            return -1;
-          } else{
-            std::vector<int> fsp_FEI_index;
-            const std::vector<const Particle*>& fsp_tag = part->getFinalStateDaughters();
-            for (const Particle* fsp : fsp_tag)
-            {
-              const MCParticle* mc_fsp = fsp->getMCParticle();
-              if (mc_fsp) {
-                int tag_index = finddescendant(mc_fsp);
-                if (tag_index == index) {
-                  fsp_FEI_index.push_back(mc_fsp->getArrayIndex());
-                }
-              }
-            }
-            std::vector<int> diff;
-            std::vector<int> fsp_truth_index = truthFSPTag(index);
-            std::sort(fsp_truth_index.begin(), fsp_truth_index.end());
-            std::sort(fsp_FEI_index.begin(), fsp_FEI_index.end());
-            std::set_difference(fsp_truth_index.begin(), fsp_truth_index.end(), fsp_FEI_index.begin(), fsp_FEI_index.end(), std::inserter(diff, diff.begin()));
-            return double(diff.size()) / double(fsp_truth_index.size());
-          }
-        };
-        return func;
+      int index = mostcommonBTagIndex(part);
+      if (index == -1) {
+        return -1;
       } else {
-        B2FATAL("Wrong number of arguments for function percentageMissingParticlesBTag");
+        std::vector<int> fsp_FEI_index;
+        const std::vector<const Particle*>& fsp_tag = part->getFinalStateDaughters();
+        for (const Particle* fsp : fsp_tag) {
+          const MCParticle* mc_fsp = fsp->getMCParticle();
+          if (mc_fsp) {
+            int tag_index = finddescendant(mc_fsp);
+            if (tag_index == index) {
+              fsp_FEI_index.push_back(mc_fsp->getArrayIndex());
+            }
+          }
+        }
+        std::vector<int> diff;
+        std::vector<int> fsp_truth_index = truthFSPTag(index);
+        std::sort(fsp_truth_index.begin(), fsp_truth_index.end());
+        std::sort(fsp_FEI_index.begin(), fsp_FEI_index.end());
+        std::set_difference(fsp_truth_index.begin(), fsp_truth_index.end(), fsp_FEI_index.begin(), fsp_FEI_index.end(), std::inserter(diff,
+                            diff.begin()));
+        return double(diff.size()) / double(fsp_truth_index.size());
       }
     }
-    Manager::FunctionPtr percentageWrongParticlesBTag(const std::vector<std::string>&  arguments)
+    double percentageWrongParticlesBTag(const Particle* part)
     {
-      if (arguments.size() == 1) {
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * part)-> double{
-          int index = var->function(part);
-          if (index == -1)
-          {
-            return -1;
-          } else{
-            const std::vector<const Particle*>& fsp_tag = part->getFinalStateDaughters();
-            int wrong_FEI = 0;
-            for (const Particle* fsp : fsp_tag)
-            {
-              const MCParticle* mc_fsp = fsp->getMCParticle();
-              if (mc_fsp) {
-                int tag_index = finddescendant(mc_fsp);
-                if (tag_index != index) {
-                  wrong_FEI ++;
-                }
-              }
-            }
-            return double(wrong_FEI) / double(truthFSPTag(index).size());
-          }
-        };
-        return func;
+      int index = mostcommonBTagIndex(part);
+      if (index == -1) {
+        return -1;
       } else {
-        B2FATAL("Wrong number of arguments for function percentageWrongParticlesBTag");
+        const std::vector<const Particle*>& fsp_tag = part->getFinalStateDaughters();
+        int wrong_FEI = 0;
+        for (const Particle* fsp : fsp_tag) {
+          const MCParticle* mc_fsp = fsp->getMCParticle();
+          if (mc_fsp) {
+            int tag_index = finddescendant(mc_fsp);
+            if (tag_index != index) {
+              wrong_FEI ++;
+            }
+          }
+        }
+        return double(wrong_FEI) / double(truthFSPTag(index).size());
       }
-
     }
     VARIABLE_GROUP("FEIVariables");
     REGISTER_VARIABLE("mostcommonBTagIndex", mostcommonBTagIndex,
                       "By giving e.g. a FEI B meson candidate the B meson index on generator level is determined, where most reconstructed particles can be assigned to. If no B meson found on generator level -1 is returned.");
-    REGISTER_VARIABLE("percentageMissingParticlesBTag(BMesonIndex)", percentageMissingParticlesBTag,
-                      "Get the percentage of missing particles by providing an index of a B meson. So the number of particles not reconstructed by e.g. the FEI are determined and divided by the number of generated particles using the given index of the B meson. If no B meson found on generator level -1 is returned.");
-    REGISTER_VARIABLE("percentageWrongParticlesBTag(BMesonIndex)", percentageWrongParticlesBTag,
-                      "Get the percentage of wrong particles by providing an index of a B meson. In this context wrong means that the reconstructed particles originated from the other B meson. The absolute number is divided by the total number of generated FSP from the given B meson index. If no B meson found on generator level -1 is returned.");
+    REGISTER_VARIABLE("percentageMissingParticlesBTag", percentageMissingParticlesBTag,
+                      "Get the percentage of missing particles by using the mostcommonBTagIndex. So the number of particles not reconstructed by e.g. the FEI are determined and divided by the number of generated particles using the given index of the B meson. If no B meson found on generator level -1 is returned.");
+    REGISTER_VARIABLE("percentageWrongParticlesBTag", percentageWrongParticlesBTag,
+                      "Get the percentage of wrong particles by using the mostcommonBTagIndex. In this context wrong means that the reconstructed particles originated from the other B meson. The absolute number is divided by the total number of generated FSP from the given B meson index. If no B meson found on generator level -1 is returned.");
   }
 }

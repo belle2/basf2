@@ -511,7 +511,7 @@ As known by many analysts by using the ``isSignal`` flag for truth matching for 
 
 New variables seem to be found to address this problem.
 
-..b2-variables::
+.. b2-variables::
    :group: FEIVariables
 
 Collections and Lists

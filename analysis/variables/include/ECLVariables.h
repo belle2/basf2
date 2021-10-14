@@ -288,21 +288,21 @@ namespace Belle2 {
 
     /**
      * return the number of showers in the ECL that do not become clusters from
-     * the forward endcap, if the number exceed 255 (uint8_t maximum value)
+     * the forward endcap, if the number exceeds 255 (uint8_t maximum value)
      * it is set to 255.
      */
     double nRejectedECLShowersFWDEndcap(const Particle*);
 
     /**
      * return the number of showers in the ECL that do not become clusters from
-     * the barrel, if the number exceed 255 (uint8_t maximum value)
+     * the barrel, if the number exceeds 255 (uint8_t maximum value)
      * it is set to 255.
      */
     double nRejectedECLShowersBarrel(const Particle*);
 
     /**
      * return the number of showers in the ECL that do not become clusters from
-     * the backward endcap, if the number exceed 255 (uint8_t maximum value)
+     * the backward endcap, if the number exceeds 255 (uint8_t maximum value)
      * it is set to 255.
      */
     double nRejectedECLShowersBWDEndcap(const Particle*);

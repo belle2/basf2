@@ -1,0 +1,14 @@
+Import('env')
+# This file specifies the dependencies of your analysis code to parts of the
+# Belle 2 Software. It should be fine for most analyses but if you need to link
+# against additional libraries please put them here.
+env['LIBS'] = [
+    'mdst_dataobjects',
+    'analysis_dataobjects',
+    'analysis',
+    'framework',
+    '$ROOT_LIBS',
+    'klm_dataobjects',
+    'klm'
+]
+Return('env')

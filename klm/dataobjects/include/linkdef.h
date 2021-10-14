@@ -13,6 +13,7 @@
 #pragma link C++ class Belle2::KLMMuidHit+; // checksum=0x8eea70da, version=1
 #pragma link C++ class Belle2::KLMMuidLikelihood+; // checksum=0x22d1ff03, version=4
 #pragma link C++ class Belle2::KLMScintillatorFirmwareFitResult+; // checksum=0xb25e8edc, version=1
+#pragma link C++ class Belle2::KLMClusterShape+;
 
 /* Element numbers and indices. */
 #pragma link C++ class Belle2::KLMChannelArrayIndex-;

@@ -66,7 +66,7 @@ vector<MCParticle*> MCParticle::getDaughters() const
 
 const MCParticle* MCParticle::getDaughter(int i) const
 {
-  if (i > getNDaughters()) {
+  if (i >= getNDaughters()) {
     return nullptr;
   }
   return getDaughters().at(i);

@@ -1,6 +1,6 @@
 # Examples
 
-If you are new to ``basf2``, a good starting points are the tutorials in the
+If you are new to ``basf2``, a good starting point are the tutorials in the
 ``tutorials`` subdirectory.
 
 ## Examples data dir

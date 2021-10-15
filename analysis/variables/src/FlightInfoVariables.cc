@@ -777,61 +777,54 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Flight Information");
     REGISTER_VARIABLE("flightTime", flightTime,
-                      "Returns the flight time of particle. If a treeFit has been performed the flight time calculated by TreeFitter is returned. Otherwise if a beam constrained rave fit has been performed the production vertex set by rave and the decay vertex are used to calculate the flight time. If neither fit has been performed the i.p. is taken to be the production vertex.",
-                      Manager::VariableDataType::c_double);
+                      "Returns the flight time of particle. If a treeFit has been performed the flight time calculated by TreeFitter is returned. Otherwise if a beam constrained rave fit has been performed the production vertex set by rave and the decay vertex are used to calculate the flight time. If neither fit has been performed the i.p. is taken to be the production vertex.");
     REGISTER_VARIABLE("flightDistance", flightDistance,
-                      "Returns the flight distance of particle. If a treeFit has been performed the flight distance calculated by TreeFitter is returned. Otherwise if a beam constrained rave fit has been performed the production vertex set by rave and the decay vertex are used to calculate the flight distance. If neither fit has been performed the i.p. is taken to be the production vertex.",
-                      Manager::VariableDataType::c_double);
+                      "Returns the flight distance of particle. If a treeFit has been performed the flight distance calculated by TreeFitter is returned. Otherwise if a beam constrained rave fit has been performed the production vertex set by rave and the decay vertex are used to calculate the flight distance. If neither fit has been performed the i.p. is taken to be the production vertex.");
     REGISTER_VARIABLE("flightTimeErr", flightTimeErr,
-                      "Returns the flight time error of particle. If a treeFit has been performed the flight time error calculated by TreeFitter is returned. Otherwise if a beam constrained rave fit has been performed the production vertex set by rave and the decay vertex are used to calculate the flight time error. If neither fit has been performed the i.p. is taken to be the production vertex.",
-                      Manager::VariableDataType::c_double);
+                      "Returns the flight time error of particle. If a treeFit has been performed the flight time error calculated by TreeFitter is returned. Otherwise if a beam constrained rave fit has been performed the production vertex set by rave and the decay vertex are used to calculate the flight time error. If neither fit has been performed the i.p. is taken to be the production vertex.");
     REGISTER_VARIABLE("flightDistanceErr", flightDistanceErr,
-                      "Returns the flight distance error of particle. If a treeFit has been performed the flight distance error calculated by TreeFitter is returned. Otherwise if a beam constrained rave fit has been performed the production vertex set by rave and the decay vertex are used to calculate the flight distance error. If neither fit has been performed the i.p. is taken to be the production vertex.",
-                      Manager::VariableDataType::c_double);
+                      "Returns the flight distance error of particle. If a treeFit has been performed the flight distance error calculated by TreeFitter is returned. Otherwise if a beam constrained rave fit has been performed the production vertex set by rave and the decay vertex are used to calculate the flight distance error. If neither fit has been performed the i.p. is taken to be the production vertex.");
     // Daughters
-    REGISTER_VARIABLE("flightTimeOfDaughter(daughterN, gdaughterN = -1)", flightTimeOfDaughter,
-                      "Returns the flight time between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("flightTimeOfDaughterErr(daughterN, gdaughterN = -1)", flightTimeOfDaughterErr,
-                      "Returns the flight time error between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("flightDistanceOfDaughter(daughterN, gdaughterN = -1)", flightDistanceOfDaughter,
-                      "Returns the flight distance between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("flightDistanceOfDaughterErr(daughterN, gdaughterN = -1)", flightDistanceOfDaughterErr,
-                      "Returns the flight distance error between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("flightTimeOfDaughter(daughterN, gdaughterN = -1)", flightTimeOfDaughter,
+                          "Returns the flight time between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("flightTimeOfDaughterErr(daughterN, gdaughterN = -1)", flightTimeOfDaughterErr,
+                          "Returns the flight time error between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("flightDistanceOfDaughter(daughterN, gdaughterN = -1)", flightDistanceOfDaughter,
+                          "Returns the flight distance between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("flightDistanceOfDaughterErr(daughterN, gdaughterN = -1)", flightDistanceOfDaughterErr,
+                          "Returns the flight distance error between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).",
+                          Manager::VariableDataType::c_double);
     // MC Info
     REGISTER_VARIABLE("mcFlightDistance", mcFlightDistance,
-                      "Returns the MC flight distance of the particle", Manager::VariableDataType::c_double);
+                      "Returns the MC flight distance of the particle");
     REGISTER_VARIABLE("mcFlightTime", mcFlightTime,
-                      "Returns the MC flight time of the particle", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("mcFlightDistanceOfDaughter(daughterN, gdaughterN = -1)", mcFlightDistanceOfDaughter,
-                      "Returns the MC flight distance between mother and daughter particle using generated info", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("mcFlightTimeOfDaughter(daughterN, gdaughterN = -1)", mcFlightTimeOfDaughter,
-                      "Returns the MC flight time between mother and daughter particle using generated info", Manager::VariableDataType::c_double);
+                      "Returns the MC flight time of the particle");
+    REGISTER_METAVARIABLE("mcFlightDistanceOfDaughter(daughterN, gdaughterN = -1)", mcFlightDistanceOfDaughter,
+                          "Returns the MC flight distance between mother and daughter particle using generated info", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("mcFlightTimeOfDaughter(daughterN, gdaughterN = -1)", mcFlightTimeOfDaughter,
+                          "Returns the MC flight time between mother and daughter particle using generated info", Manager::VariableDataType::c_double);
     //Vertex Distance
     REGISTER_VARIABLE("vertexDistance", vertexDistance,
-                      "Returns the distance between the production and decay vertex of a particle. Returns NaN if particle has no production or decay vertex.",
-                      Manager::VariableDataType::c_double);
+                      "Returns the distance between the production and decay vertex of a particle. Returns NaN if particle has no production or decay vertex.");
     REGISTER_VARIABLE("vertexDistanceErr", vertexDistanceErr,
-                      "Returns the uncertainty on the distance between the production and decay vertex of a particle. Returns NaN if particle has no production or decay vertex.",
-                      Manager::VariableDataType::c_double);
+                      "Returns the uncertainty on the distance between the production and decay vertex of a particle. Returns NaN if particle has no production or decay vertex.");
     REGISTER_VARIABLE("vertexDistanceSignificance", vertexDistanceSignificance,
-                      "Returns the distance between the production and decay vertex of a particle in units of the uncertainty on this value, i.e. the significance of the vertex separation.",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("vertexDistanceOfDaughter(daughterN, option = '')", vertexDistanceOfDaughter,
-                      "If any second argument is provided it returns the distance between the decay vertices of the particle and of its daughter with index daughterN.\n"
-                      "Otherwise, it is assumed that the particle has a production vertex (typically the IP) which is used to calculate the distance to the daughter's decay vertex.\n"
-                      "Returns NaN in case anything goes wrong.", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("vertexDistanceOfDaughterErr(daughterN, option = '')", vertexDistanceOfDaughterErr,
-                      "If any second argument is provided it returns the uncertainty on the distance between the decay vertices of the particle and of its daughter with index daughterN.\n"
-                      "Otherwise, it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix to calculate the uncertainty on the distance to the daughter's decay vertex.\n"
-                      "Returns NaN in case anything goes wrong.", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("vertexDistanceOfDaughterSignificance(daughterN, option = '')", vertexDistanceOfDaughterSignificance,
-                      "If any second argument is provided it returns the distance between the decay vertices of the particle and of its daughter with index daughterN in units of the uncertainty on this value.\n"
-                      "Otherwise, it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix and the significance of the separation to this vertex is calculated.",
-                      Manager::VariableDataType::c_double);
+                      "Returns the distance between the production and decay vertex of a particle in units of the uncertainty on this value, i.e. the significance of the vertex separation.");
+    REGISTER_METAVARIABLE("vertexDistanceOfDaughter(daughterN, option = '')", vertexDistanceOfDaughter,
+                          "If any second argument is provided it returns the distance between the decay vertices of the particle and of its daughter with index daughterN.\n"
+                          "Otherwise, it is assumed that the particle has a production vertex (typically the IP) which is used to calculate the distance to the daughter's decay vertex.\n"
+                          "Returns NaN in case anything goes wrong.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("vertexDistanceOfDaughterErr(daughterN, option = '')", vertexDistanceOfDaughterErr,
+                          "If any second argument is provided it returns the uncertainty on the distance between the decay vertices of the particle and of its daughter with index daughterN.\n"
+                          "Otherwise, it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix to calculate the uncertainty on the distance to the daughter's decay vertex.\n"
+                          "Returns NaN in case anything goes wrong.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("vertexDistanceOfDaughterSignificance(daughterN, option = '')", vertexDistanceOfDaughterSignificance,
+                          "If any second argument is provided it returns the distance between the decay vertices of the particle and of its daughter with index daughterN in units of the uncertainty on this value.\n"
+                          "Otherwise, it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix and the significance of the separation to this vertex is calculated.",
+                          Manager::VariableDataType::c_double);
     // GrandDaughters
     //REGISTER_VARIABLE("flightDistanceOfGrandDaughter(daughterN)", flightDistanceOfGrandDaughter,
     //                  "Returns the flight distance between mother and daughter particle");

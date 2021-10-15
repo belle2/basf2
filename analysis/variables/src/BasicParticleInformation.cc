@@ -75,14 +75,10 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("Basic particle information");
-    REGISTER_VARIABLE("isFromECL", particleIsFromECL, "Returns true if this particle was created from an ECLCluster, false otherwise.",
-                      Manager::VariableDataType::c_bool);
-    REGISTER_VARIABLE("isFromKLM", particleIsFromKLM, "Returns true if this particle was created from a KLMCluster, false otherwise.",
-                      Manager::VariableDataType::c_bool);
-    REGISTER_VARIABLE("isFromTrack", particleIsFromTrack, "Returns true if this particle was created from a track, false otherwise.",
-                      Manager::VariableDataType::c_bool);
-    REGISTER_VARIABLE("isFromV0", particleIsFromV0, "Returns true if this particle was created from a V0, false otherwise.",
-                      Manager::VariableDataType::c_bool);
+    REGISTER_VARIABLE("isFromECL", particleIsFromECL, "Returns true if this particle was created from an ECLCluster, false otherwise.");
+    REGISTER_VARIABLE("isFromKLM", particleIsFromKLM, "Returns true if this particle was created from a KLMCluster, false otherwise.");
+    REGISTER_VARIABLE("isFromTrack", particleIsFromTrack, "Returns true if this particle was created from a track, false otherwise.");
+    REGISTER_VARIABLE("isFromV0", particleIsFromV0, "Returns true if this particle was created from a V0, false otherwise.");
     REGISTER_VARIABLE("particleSource", particleSource, R"DOC(
       Returns mdst source used to create the particle. The meaning of the values are
 
@@ -94,7 +90,7 @@ namespace Belle2 {
       * 5: MC particle
       * 6: composite particle
 
-      )DOC", Manager::VariableDataType::c_int);
+      )DOC");
     REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex, R"DOC(
 Store array index (0 - based) of the MDST object from which the Particle was created. 
 It's 0 for composite particles.
@@ -112,15 +108,13 @@ It's 0 for composite particles.
 
  .. tip::
     If you are looking for unique identifier of the particle, please use :b2:var:`uniqueParticleIdentifier`.
-    )DOC", Manager::VariableDataType::c_int);
+    )DOC");
     REGISTER_VARIABLE("uniqueParticleIdentifier", uniqueParticleIdentifier, R"DOC(
 Returns unique identifier of final state particle.
-Particles created from the same object (e.g. from the same track) have different :b2:var:`uniqueParticleIdentifier` value.)DOC",
-                      Manager::VariableDataType::c_int);
+Particles created from the same object (e.g. from the same track) have different :b2:var:`uniqueParticleIdentifier` value.)DOC");
 
     REGISTER_VARIABLE("isUnspecified", particleIsUnspecified,
-                      "Returns true if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), false otherwise",
-                      Manager::VariableDataType::c_bool);
+                      "Returns true if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), false otherwise");
     REGISTER_VARIABLE("chiProb", particlePvalue, R"DOC(
 A context-dependent :math:`\chi^2` probability for 'the fit' related to this particle.
 
@@ -132,12 +126,11 @@ A context-dependent :math:`\chi^2` probability for 'the fit' related to this par
     If multiple vertex fits are performed then the last one sets the ``chiProb`` overwriting all previous.
 
 .. seealso:: :b2:var:`pValue` for tracks
-    )DOC", Manager::VariableDataType::c_double);
+    )DOC");
     REGISTER_VARIABLE("nDaughters", particleNDaughters,
-                      "Returns number of daughter particles", Manager::VariableDataType::c_int);
+                      "Returns number of daughter particles");
     REGISTER_VARIABLE("flavor", particleFlavorType,
-                      "Returns 1 if particle is flavored type, 0 if it is unflavored.", Manager::VariableDataType::c_int);
-    REGISTER_VARIABLE("charge", particleCharge, "Returns electric charge of particle in units of :math:`e`.",
-                      Manager::VariableDataType::c_double);
+                      "Returns 1 if particle is flavored type, 0 if it is unflavored.");
+    REGISTER_VARIABLE("charge", particleCharge, "Returns electric charge of particle in units of :math:`e`.");
   }
 }

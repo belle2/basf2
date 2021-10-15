@@ -1003,59 +1003,51 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("Kinematics");
-    REGISTER_VARIABLE("p", particleP, "momentum magnitude", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("E", particleE, "energy", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("p", particleP, "momentum magnitude");
+    REGISTER_VARIABLE("E", particleE, "energy");
 
-    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy uncertainty (sqrt(sigma2))", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy uncertainty (sqrt(sigma2))");
     REGISTER_VARIABLE("ECLClusterE_uncertainty", particleClusterEUncertainty,
-                      "energy uncertainty as given by the underlying ECL cluster.", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("px", particlePx, "momentum component x", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("py", particlePy, "momentum component y", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("pz", particlePz, "momentum component z", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("pt", particlePt, "transverse momentum", Manager::VariableDataType::c_double);
+                      "energy uncertainty as given by the underlying ECL cluster.");
+    REGISTER_VARIABLE("px", particlePx, "momentum component x");
+    REGISTER_VARIABLE("py", particlePy, "momentum component y");
+    REGISTER_VARIABLE("pz", particlePz, "momentum component z");
+    REGISTER_VARIABLE("pt", particlePt, "transverse momentum");
     REGISTER_VARIABLE("xp", particleXp,
-                      "scaled momentum: the momentum of the particle in the CMS as a fraction of its maximum available momentum in the collision",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("pErr", particlePErr, "error of momentum magnitude", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("pxErr", particlePxErr, "error of momentum component x", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("pyErr", particlePyErr, "error of momentum component y", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("pzErr", particlePzErr, "error of momentum component z", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("ptErr", particlePtErr, "error of transverse momentum", Manager::VariableDataType::c_double);
+                      "scaled momentum: the momentum of the particle in the CMS as a fraction of its maximum available momentum in the collision");
+    REGISTER_VARIABLE("pErr", particlePErr, "error of momentum magnitude");
+    REGISTER_VARIABLE("pxErr", particlePxErr, "error of momentum component x");
+    REGISTER_VARIABLE("pyErr", particlePyErr, "error of momentum component y");
+    REGISTER_VARIABLE("pzErr", particlePzErr, "error of momentum component z");
+    REGISTER_VARIABLE("ptErr", particlePtErr, "error of transverse momentum");
     REGISTER_VARIABLE("momVertCovM(i,j)", covMatrixElement,
                       "returns the (i,j)-th element of the MomentumVertex Covariance Matrix (7x7).\n"
-                      "Order of elements in the covariance matrix is: px, py, pz, E, x, y, z.", Manager::VariableDataType::c_double);
+                      "Order of elements in the covariance matrix is: px, py, pz, E, x, y, z.");
     REGISTER_VARIABLE("momDevChi2", momentumDeviationChi2,
                       "momentum deviation chi^2 value calculated as"
                       "chi^2 = sum_i (p_i - mc(p_i))^2/sigma(p_i)^2, where sum runs over i = px, py, pz and"
-                      "mc(p_i) is the mc truth value and sigma(p_i) is the estimated error of i-th component of momentum vector",
-                      Manager::VariableDataType::c_double)
-    REGISTER_VARIABLE("theta", particleTheta, "polar angle in radians", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("thetaErr", particleThetaErr, "error of polar angle in radians", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("cosThetaErr", particleCosThetaErr, "error of momentum cosine of polar angle",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in radians", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle in radians", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("PDG", particlePDGCode, "PDG code", Manager::VariableDataType::c_int);
+                      "mc(p_i) is the mc truth value and sigma(p_i) is the estimated error of i-th component of momentum vector");
+    REGISTER_VARIABLE("theta", particleTheta, "polar angle in radians");
+    REGISTER_VARIABLE("thetaErr", particleThetaErr, "error of polar angle in radians");
+    REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
+    REGISTER_VARIABLE("cosThetaErr", particleCosThetaErr, "error of momentum cosine of polar angle");
+    REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in radians");
+    REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle in radians");
+    REGISTER_VARIABLE("PDG", particlePDGCode, "PDG code");
 
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVectorInXYPlane",
                       cosAngleBetweenMomentumAndVertexVectorInXYPlane,
-                      "cosine of the angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle in xy-plane",
-                      Manager::VariableDataType::c_double);
+                      "cosine of the angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle in xy-plane");
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector",
                       cosAngleBetweenMomentumAndVertexVector,
-                      "cosine of the angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle",
-                      Manager::VariableDataType::c_double);
+                      "cosine of the angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle");
     REGISTER_VARIABLE("cosThetaBetweenParticleAndNominalB",
                       cosThetaBetweenParticleAndNominalB,
-                      "cosine of the angle in CMS between momentum the particle and a nominal B particle. It is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.",
-                      Manager::VariableDataType::c_double);
+                      "cosine of the angle in CMS between momentum the particle and a nominal B particle. It is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
     REGISTER_VARIABLE("cosToThrustOfEvent", cosToThrustOfEvent,
-                      "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable",
-                      Manager::VariableDataType::c_double)
+                      "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable");
 
-    REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane",
-                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
 
     REGISTER_VARIABLE("M", particleMass, R"DOC(
 The particle's mass.
@@ -1068,106 +1060,99 @@ Note that this is context-dependent variable and can take different values depen
 - If this particle is composite and a *mass or vertex fit* has been performed then this may be updated by the fit.
 
   * You will see a difference between this mass and the :b2:var:`InvM`.
-  )DOC", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("Q", particleQ, "released energy in decay", Manager::VariableDataType::c_double);
+  )DOC");
+    REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass");
+    REGISTER_VARIABLE("Q", particleQ, "released energy in decay");
     REGISTER_VARIABLE("dQ", particleDQ,
-                      "released energy in decay minus nominal one", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference", Manager::VariableDataType::c_double);
+                      "released energy in decay minus nominal one");
+    REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass");
+    REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
     REGISTER_VARIABLE("M2", particleMassSquared,
-                      "The particle's mass squared.", Manager::VariableDataType::c_double);
+                      "The particle's mass squared.");
 
     REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughtersDisplaced,
                       "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle is V0 or decays at rho > 5 mm, its daughter 4-momentum vectors at fitted vertex are taken.\n"
-                      "If this particle has no daughters, defaults to :b2:var:`M`.", Manager::VariableDataType::c_double);
+                      "If this particle has no daughters, defaults to :b2:var:`M`.");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
                       "Invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
-                      "If the particle has not 2 daughters, it returns just the mass value.", Manager::VariableDataType::c_double);
+                      "If the particle has not 2 daughters, it returns just the mass value.");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
-                      "uncertainty of invariant mass", Manager::VariableDataType::c_double);
+                      "uncertainty of invariant mass");
     REGISTER_VARIABLE("SigM", particleInvariantMassSignificance,
-                      "signed deviation of particle's invariant mass from its nominal mass in units of the uncertainty on the invariant mass (dM/ErrM)",
-                      Manager::VariableDataType::c_double);
+                      "signed deviation of particle's invariant mass from its nominal mass in units of the uncertainty on the invariant mass (dM/ErrM)");
 
     REGISTER_VARIABLE("pxRecoil", recoilPx,
-                      "component x of 3-momentum recoiling against given Particle", Manager::VariableDataType::c_double);
+                      "component x of 3-momentum recoiling against given Particle");
     REGISTER_VARIABLE("pyRecoil", recoilPy,
-                      "component y of 3-momentum recoiling against given Particle", Manager::VariableDataType::c_double);
+                      "component y of 3-momentum recoiling against given Particle");
     REGISTER_VARIABLE("pzRecoil", recoilPz,
-                      "component z of 3-momentum recoiling against given Particle", Manager::VariableDataType::c_double);
+                      "component z of 3-momentum recoiling against given Particle");
 
     REGISTER_VARIABLE("pRecoil", recoilMomentum,
-                      "magnitude of 3 - momentum recoiling against given Particle", Manager::VariableDataType::c_double);
+                      "magnitude of 3 - momentum recoiling against given Particle");
     REGISTER_VARIABLE("pRecoilTheta", recoilMomentumTheta,
-                      "Polar angle of a particle's missing momentum", Manager::VariableDataType::c_double);
+                      "Polar angle of a particle's missing momentum");
     REGISTER_VARIABLE("pRecoilPhi", recoilMomentumPhi,
-                      "Azimuthal angle of a particle's missing momentum", Manager::VariableDataType::c_double);
+                      "Azimuthal angle of a particle's missing momentum");
     REGISTER_VARIABLE("eRecoil", recoilEnergy,
-                      "energy recoiling against given Particle", Manager::VariableDataType::c_double);
+                      "energy recoiling against given Particle");
     REGISTER_VARIABLE("mRecoil", recoilMass,
-                      "Invariant mass of the system recoiling against given Particle", Manager::VariableDataType::c_double);
+                      "Invariant mass of the system recoiling against given Particle");
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
-                      "invariant mass squared of the system recoiling against given Particle", Manager::VariableDataType::c_double);
+                      "invariant mass squared of the system recoiling against given Particle");
     REGISTER_VARIABLE("m2RecoilSignalSide", m2RecoilSignalSide,
-                      "Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter ",
-                      Manager::VariableDataType::c_double);
+                      "Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter ");
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,
-                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.",
-                      Manager::VariableDataType::c_double)
+                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.");
     REGISTER_VARIABLE("b2bPhi", b2bPhi,
-                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.",
-                      Manager::VariableDataType::c_double)
+                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.");
     REGISTER_VARIABLE("b2bClusterTheta", b2bClusterTheta,
-                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.",
-                      Manager::VariableDataType::c_double)
+                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.");
     REGISTER_VARIABLE("b2bClusterPhi", b2bClusterPhi,
-                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.",
-                      Manager::VariableDataType::c_double)
+                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.");
     REGISTER_VARIABLE("ArmenterosLongitudinalMomentumAsymmetry", ArmenterosLongitudinalMomentumAsymmetry,
                       "Longitudinal momentum asymmetry of V0's daughters.\n"
-                      "The mother (V0) is required to have exactly two daughters", Manager::VariableDataType::c_double);
+                      "The mother (V0) is required to have exactly two daughters");
     REGISTER_VARIABLE("ArmenterosDaughter1Qt", ArmenterosDaughter1Qt,
                       "Transverse momentum of the first daughter with respect to the V0 mother.\n"
-                      "The mother is required to have exactly two daughters", Manager::VariableDataType::c_double);
+                      "The mother is required to have exactly two daughters");
     REGISTER_VARIABLE("ArmenterosDaughter2Qt", ArmenterosDaughter2Qt,
                       "Transverse momentum of the second daughter with respect to the V0 mother.\n"
-                      "The mother is required to have exactly two daughters", Manager::VariableDataType::c_double);
+                      "The mother is required to have exactly two daughters");
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
-                      "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.", Manager::VariableDataType::c_int);
+                      "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
     REGISTER_VARIABLE("trackMatchType", trackMatchType, R"DOC(
 
                       * -1 particle has no ECL cluster
                       *  0 particle has no associated track
                       *  1 there is a matched track called connected - region(CR) track match
-                      )DOC", Manager::VariableDataType::c_double);
+                      )DOC");
     MAKE_DEPRECATED("trackMatchType", false, "light-minos-2012", R"DOC(
                      Use better variables like `trackNECLClusters`, `clusterTrackMatch`, and `nECLClusterTrackMatches`.)DOC");
 
     REGISTER_VARIABLE("decayTypeRecoil", recoilMCDecayType,
                       "type of the particle decay(no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2,"
-                      "lower level leptonic = 3.", Manager::VariableDataType::c_double);
+                      "lower level leptonic = 3.");
 
     REGISTER_VARIABLE("printParticle", printParticle,
-                      "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.", Manager::VariableDataType::c_bool);
+                      "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
     REGISTER_VARIABLE("mcMomTransfer2", particleMCMomentumTransfer2,
-                      "Return the true momentum transfer to lepton pair in a B(semi -) leptonic B meson decay.", Manager::VariableDataType::c_double);
+                      "Return the true momentum transfer to lepton pair in a B(semi -) leptonic B meson decay.");
     REGISTER_VARIABLE("False", False,
-                      "returns always 0, used for testing and debugging.", Manager::VariableDataType::c_bool);
+                      "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,
-                      "returns always 1, used for testing and debugging.", Manager::VariableDataType::c_bool);
+                      "returns always 1, used for testing and debugging.");
     REGISTER_VARIABLE("infinity", infinity,
-                      "returns std::numeric_limits<double>::infinity()", Manager::VariableDataType::c_double);
+                      "returns std::numeric_limits<double>::infinity()");
     REGISTER_VARIABLE("random", random,
                       "return a random number between 0 and 1 for each candidate. Can be used, e.g. for picking a random"
-                      "candidate in the best candidate selection.", Manager::VariableDataType::c_double);
+                      "candidate in the best candidate selection.");
     REGISTER_VARIABLE("eventRandom", eventRandom,
-                      "[Eventbased] Returns a random number between 0 and 1 for this event. Can be used, e.g. for applying an event prescale.",
-                      Manager::VariableDataType::c_double);
+                      "[Eventbased] Returns a random number between 0 and 1 for this event. Can be used, e.g. for applying an event prescale.");
 
   }
 }

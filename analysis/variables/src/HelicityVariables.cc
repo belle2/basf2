@@ -298,7 +298,7 @@ namespace Belle2 {
                       the momenta of the three daughters in the frame of the given particle (mother)
                       and the momentum of the given particle in the lab frame.
 
-                      Otherwise, it returns 0.)DOC", Manager::VariableDataType::c_double);
+                      Otherwise, it returns 0.)DOC");
 
     REGISTER_VARIABLE("cosHelicityAngleMomentumPi0Dalitz",
                       cosHelicityAngleMomentumPi0Dalitz,
@@ -307,17 +307,17 @@ namespace Belle2 {
                       cosine of the angle between the momentum of the gamma in the frame of the given particle (mother)
                       and the momentum of the given particle in the lab frame.
 
-                      Otherwise, it returns 0.)DOC", Manager::VariableDataType::c_double);
+                      Otherwise, it returns 0.)DOC");
 
-    REGISTER_VARIABLE("cosHelicityAngleBeamMomentum(i)", cosHelicityAngleBeamMomentum,
-                      R"DOC(
+    REGISTER_METAVARIABLE("cosHelicityAngleBeamMomentum(i)", cosHelicityAngleBeamMomentum,
+                          R"DOC(
                       Cosine of the helicity angle of the :math:`i`-th daughter of the particle provided,
                       assuming that the mother of the provided particle corresponds to the centre-of-mass system, whose parameters are
                       automatically loaded by the function, given the accelerator's conditions.)DOC",
-                      Manager::VariableDataType::c_double);
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("cosHelicityAngle(i, j)", cosHelicityAngle,
-                      R"DOC(
+    REGISTER_METAVARIABLE("cosHelicityAngle(i, j)", cosHelicityAngle,
+                          R"DOC(
                       Cosine of the helicity angle between the momentum of the provided particle and the momentum of the selected granddaughter
                       in the reference frame of the selected daughter (:math:`\theta_1` and :math:`\theta_2` in the
                       `PDG <https://journals.aps.org/prd/abstract/10.1103/PhysRevD.98.030001>`_ 2018, p. 722).
@@ -330,10 +330,10 @@ namespace Belle2 {
                       both momenta in the rest frame of the :math:`J/\psi`.
 
                       This variable is needed for angular analyses of :math:`B`-meson decays into two vector particles.)DOC",
-                      Manager::VariableDataType::c_double);
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("cosAcoplanarityAngle(i, j)", cosAcoplanarityAngle,
-                      R"DOC(
+    REGISTER_METAVARIABLE("cosAcoplanarityAngle(i, j)", cosAcoplanarityAngle,
+                          R"DOC(
                       Cosine of the acoplanarity angle (:math:`\Phi` in the `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_).
                       Given a two-body decay, the acoplanarity angle is defined as
                       the angle between the two decay planes in the reference frame of the mother. 
@@ -347,16 +347,15 @@ namespace Belle2 {
 
                       For example, in the decay :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, if the provided particle is :math:`B^0` and the selected indices are (0, 0),
                       the variable will return the acoplanarity using the :math:`\mu^+` and the :math:`K^+` granddaughters.)DOC",
-                      Manager::VariableDataType::c_double);
+                          Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("cosHelicityAnglePrimary", cosHelicityAnglePrimary,
                       R"DOC(
                       Cosine of the helicity angle (see``Particle::getCosHelicity``) assuming the center of mass system as mother rest frame.
-                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC",
-                      Manager::VariableDataType::c_double);
+                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");
 
-    REGISTER_VARIABLE("cosHelicityAngleDaughter(i [, j] )", cosHelicityAngleDaughter,
-                      R"DOC(
+    REGISTER_METAVARIABLE("cosHelicityAngleDaughter(i [, j] )", cosHelicityAngleDaughter,
+                          R"DOC(
                       Cosine of the helicity angle of the i-th daughter (see ``Particle::getCosHelicityDaughter``).
                       The optional second argument is the index of the granddaughter that defines the angle, default is 0.
 
@@ -366,13 +365,12 @@ namespace Belle2 {
                       In rare cases if one wanted the helicity angle of the second granddaughter, indices 1,1 would return the helicity angle of the :math:`\pi^-`).
 
                       See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC",
-                      Manager::VariableDataType::c_double);
+                          Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("acoplanarityAngle", acoplanarityAngle,
                       R"DOC(
                       Acoplanarity angle (see ``Particle::getAcoplanarity``) assuming a two body decay of the particle and its daughters.
-                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the acoplanarity angle.)DOC",
-                      Manager::VariableDataType::c_double);
+                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the acoplanarity angle.)DOC");
 
   }
 }

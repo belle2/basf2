@@ -429,19 +429,19 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("eclEnergy3FWDBarrel", eclEnergy3FWDBarrel, R"DOC(
 [Calibration] Returns energy sum of three crystals in forward barrel.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
     REGISTER_VARIABLE("eclEnergy3FWDEndcap", eclEnergy3FWDEndcap, R"DOC(
 [Calibration] Returns energy sum of three crystals in forward endcap.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
     REGISTER_VARIABLE("eclEnergy3BWDBarrel", eclEnergy3BWDBarrel, R"DOC(
 [Calibration] Returns energy sum of three crystals in backward barrel.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
     REGISTER_VARIABLE("eclEnergy3BWDEndcap", eclEnergy3BWDEndcap, R"DOC(
 [Calibration] Returns energy sum of three crystals in backward endcap.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
     // These variables require cDST inputs and the eclTRGInformation module run first
     VARIABLE_GROUP("ECL trigger calibration");
@@ -449,68 +449,68 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterNumberOfTCs(i, j, k, l)", eclNumberOfTCsForCluster, R"DOC(
 [Calibration] Returns the number of TCs for this ECL cluster for a given TC theta ID range
 :math:`(i, j)` and hit window :math:`(k, l)`.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("clusterTCFADC(i, j, k, l)", eclTCFADCForCluster, R"DOC(
 [Calibration] Returns the total FADC sum related to this ECL cluster for a given TC theta ID
 range :math:`(i, j)` and hit window :math:`(k, l)`.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("clusterTCIsMaximum", eclTCIsMaximumForCluster, R"DOC(
 [Calibration] Returns True if cluster is related to maximum TC.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("clusterTrigger", eclClusterTrigger, R"DOC(
 [Calibration] Returns 1.0 if ECL cluster is matched to a trigger cluster (requires to run eclTriggerClusterMatcher
 (which requires TRGECLClusters in the input file)) and 0 otherwise. Returns -1 if the matching code was not run.
 NOT FOR PHASE2 DATA!
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("eclEnergyTC(i)", getEnergyTC, R"DOC(
 [Eventbased][Calibration] Returns the energy (in FADC counts) for the :math:`i`-th trigger cell (TC), 1 based (1..576).
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("eclEnergyTCECLCalDigit(i)", getEnergyTCECLCalDigit, R"DOC(
 [Eventbased][Calibration] Returns the energy (in GeV) for the :math:`i`-th trigger cell (TC)
 based on ECLCalDigits, 1 based (1..576).
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("eclTimingTC(i)", getTimingTC, R"DOC(
 [Eventbased][Calibration] Returns the time (in ns) for the :math:`i`-th trigger cell (TC), 1 based (1..576).
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("eclHitWindowTC(i)", eclHitWindowTC, R"DOC(
 [Eventbased][Calibration] Returns the hit window for the :math:`i`-th trigger cell (TC), 1 based (1..576).
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("eclEventTimingTC", getEvtTimingTC, R"DOC(
 [Eventbased][Calibration] Returns the ECL TC event time (in ns).
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("eclMaximumTCId", getMaximumTCId, R"DOC(
 [Eventbased][Calibration] Returns the TC ID with maximum FADC value.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
     REGISTER_VARIABLE("eclTimingTCECLCalDigit(i)", getTimingTCECLCalDigit, R"DOC(
 [Eventbased][Calibration] Returns the time (in ns) for the :math:`i`-th trigger cell (TC) based
 on ECLCalDigits, 1 based (1..576)
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
     REGISTER_VARIABLE("eclNumberOfTCs(i, j, k)", getNumberOfTCs, R"DOC(
 [Eventbased][Calibration] Returns the number of TCs above threshold (i=FADC counts) for this event
 for a given theta range (j-k)
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("eclEnergySumTC(i, j)", eclEnergySumTC, R"DOC(
 [Eventbased][Calibration] Returns energy sum (in FADC counts) of all TC cells between two
 theta ids i<=thetaid<=j, 1 based (1..17)
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("eclEnergySumTCECLCalDigit(i, j, k, l)", eclEnergySumTCECLCalDigit, R"DOC(
 [Eventbased][Calibration] Returns energy sum (in GeV) of all TC cells between two theta ids i<=thetaid<=j,
 1 based (1..17). k is the sum option: 0 (all), 1 (those with actual TC entries), 2 (sum of ECLCalDigit energy
 in this TC above threshold). l is the threshold parameter for the option k 2.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("eclEnergySumTCECLCalDigitInECLCluster", eclEnergySumTCECLCalDigitInECLCluster, R"DOC(
 [Eventbased][Calibration] Returns energy sum (in GeV) of all ECLCalDigits if TC is above threshold
 that are part of an ECLCluster above eclEnergySumTCECLCalDigitInECLClusterThreshold within TC thetaid 2-15.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("eclEnergySumECLCalDigitInECLCluster", eclEnergySumECLCalDigitInECLCluster, R"DOC(
 [Eventbased][Calibration] Returns energy sum (in GeV) of all ECLCalDigits that are part of an ECL cluster
 above eclEnergySumTCECLCalDigitInECLClusterThreshold within TC thetaid 2-15.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("eclEnergySumTCECLCalDigitInECLClusterThreshold", eclEnergySumTCECLCalDigitInECLClusterThreshold, R"DOC(
 [Eventbased][Calibration] Returns threshold used to calculate eclEnergySumTCECLCalDigitInECLCluster.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
   }
 }

@@ -155,10 +155,10 @@ namespace Belle2 {
 
     VARIABLE_GROUP("DirectDaughterInfo");
     REGISTER_VARIABLE("hasCharmedDaughter(i)", hasCharmedDaughter,
-                      "Returns information regarding the charm quark presence in the decay.", Manager::VariableDataType::c_double);
+                      "Returns information regarding the charm quark presence in the decay.");
     REGISTER_VARIABLE("hasCharmoniumDaughter", hasCharmoniumDaughter,
-                      "Returns information regarding the charmonium state presence in the decay.", Manager::VariableDataType::c_double);
+                      "Returns information regarding the charmonium state presence in the decay.");
     REGISTER_VARIABLE("hasRealPhotonDaughter", hasRealPhotonDaughter,
-                      "Returns information regarding photon daughter origin for a particle.", Manager::VariableDataType::c_double);
+                      "Returns information regarding photon daughter origin for a particle.");
   }
 }

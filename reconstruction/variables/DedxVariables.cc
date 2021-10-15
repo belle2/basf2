@@ -306,45 +306,38 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Dedx");
     //CDC variables
-    REGISTER_VARIABLE("CDCdEdx", CDCdedx, "CDC dE/dx truncated mean", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("CDCdEdx", CDCdedx, "CDC dE/dx truncated mean");
     REGISTER_VARIABLE("CDCdEdxnosat", CDCdedxnosat,
-                      "CDC dE/dx truncated mean without saturation correction (NA for current track level MC)",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("pCDC", pCDC, "Momentum valid in the CDC", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("costhCDC", costhCDC, "costheta valid in the CDC", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("CDCdEdx_nhits", CDCdEdx_nhits, "total hits of dedx track", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("CDCdEdx_lnhits", CDCdEdx_lnhits, "layer hits for dedx track", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("CDCdEdx_lnhitsused", CDCdEdx_lnhitsused, "truncated hits of dedx track", Manager::VariableDataType::c_double);
+                      "CDC dE/dx truncated mean without saturation correction (NA for current track level MC)");
+    REGISTER_VARIABLE("pCDC", pCDC, "Momentum valid in the CDC");
+    REGISTER_VARIABLE("costhCDC", costhCDC, "costheta valid in the CDC");
+    REGISTER_VARIABLE("CDCdEdx_nhits", CDCdEdx_nhits, "total hits of dedx track");
+    REGISTER_VARIABLE("CDCdEdx_lnhits", CDCdEdx_lnhits, "layer hits for dedx track");
+    REGISTER_VARIABLE("CDCdEdx_lnhitsused", CDCdEdx_lnhitsused, "truncated hits of dedx track");
 
     REGISTER_VARIABLE("CDCdEdx_PIDvars(var,PDG) var (= chi or pmean or preso) and PDG is of charged particles", CDCdEdx_PIDvars,
-                      "advance CDC dEdx PID related variables for charged particle", Manager::VariableDataType::c_double);
+                      "advance CDC dEdx PID related variables for charged particle");
 
-    REGISTER_VARIABLE("CDCdEdx_chiE", CDCdEdx_chiE, "Chi value of electrons from CDC dEdx", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("CDCdEdx_chiMu", CDCdEdx_chiMu, "Chi value of muons from CDC dEdx", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("CDCdEdx_chiPi", CDCdEdx_chiPi, "Chi value of pions from CDC dEdx", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("CDCdEdx_chiK", CDCdEdx_chiK, "Chi value of kaons from CDC dEdx", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("CDCdEdx_chiP", CDCdEdx_chiP, "Chi value of protons from CDC dEdx", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("CDCdEdx_chiD", CDCdEdx_chiD, "Chi value of duetrons from CDC dEdx", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("CDCdEdx_chiE", CDCdEdx_chiE, "Chi value of electrons from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_chiMu", CDCdEdx_chiMu, "Chi value of muons from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_chiPi", CDCdEdx_chiPi, "Chi value of pions from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_chiK", CDCdEdx_chiK, "Chi value of kaons from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_chiP", CDCdEdx_chiP, "Chi value of protons from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_chiD", CDCdEdx_chiD, "Chi value of duetrons from CDC dEdx");
 
-    REGISTER_VARIABLE("CDCdEdx_llogE", CDCdEdx_llogE, "Log likelihood value of electrons from CDC dEdx",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("CDCdEdx_llogMu", CDCdEdx_llogMu, "Log likelihood value of muons from CDC dEdx",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("CDCdEdx_llogPi", CDCdEdx_llogPi, "Log likelihood value of pions from CDC dEdx",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("CDCdEdx_llogK", CDCdEdx_llogK, "Log likelihood value of kaons from CDC dEdx",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("CDCdEdx_llogP", CDCdEdx_llogP, "Log likelihood value of protons from CDC dEdx",
-                      Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("CDCdEdx_llogD", CDCdEdx_llogD, "Log likelihood value of duetrons from CDC dEdx",
-                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("CDCdEdx_llogE", CDCdEdx_llogE, "Log likelihood value of electrons from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_llogMu", CDCdEdx_llogMu, "Log likelihood value of muons from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_llogPi", CDCdEdx_llogPi, "Log likelihood value of pions from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_llogK", CDCdEdx_llogK, "Log likelihood value of kaons from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_llogP", CDCdEdx_llogP, "Log likelihood value of protons from CDC dEdx");
+    REGISTER_VARIABLE("CDCdEdx_llogD", CDCdEdx_llogD, "Log likelihood value of duetrons from CDC dEdx");
 
     //SVD variables
-    REGISTER_VARIABLE("SVDdEdx", SVDdedx, "SVD dE/dx truncated mean", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("pSVD", SVD_p, "momentum valid in the SVD", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("SVD_pTrue", SVD_pTrue, "true MC momentum valid in the SVD", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("SVD_CosTheta", SVD_CosTheta, "cos(theta) of the track valid in the SVD", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("SVD_nHits", SVD_nHits, "number of hits of the track valid in the SVD", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("SVDdEdx", SVDdedx, "SVD dE/dx truncated mean");
+    REGISTER_VARIABLE("pSVD", SVD_p, "momentum valid in the SVD");
+    REGISTER_VARIABLE("SVD_pTrue", SVD_pTrue, "true MC momentum valid in the SVD");
+    REGISTER_VARIABLE("SVD_CosTheta", SVD_CosTheta, "cos(theta) of the track valid in the SVD");
+    REGISTER_VARIABLE("SVD_nHits", SVD_nHits, "number of hits of the track valid in the SVD");
 
   }
 }

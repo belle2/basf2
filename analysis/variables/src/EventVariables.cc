@@ -747,30 +747,27 @@ namespace Belle2 {
     VARIABLE_GROUP("Event");
 
     REGISTER_VARIABLE("isMC", isMC,
-                      "[Eventbased] Returns 1 if current basf2 process is running over simulated (Monte-Carlo) dataset and 0 in case of real experimental data.",
-                      Manager::VariableDataType::c_bool);
-    REGISTER_VARIABLE("EventType", eventType, "[Eventbased] EventType (0 MC, 1 Data)", Manager::VariableDataType::c_bool);
+                      "[Eventbased] Returns 1 if current basf2 process is running over simulated (Monte-Carlo) dataset and 0 in case of real experimental data.");
+    REGISTER_VARIABLE("EventType", eventType, "[Eventbased] EventType (0 MC, 1 Data)");
     MAKE_DEPRECATED("EventType", true, "light-minos-2012", R"DOC(
                      Use `isMC` instead of this variable but keep in mind that the meaning of the outcome is reversed.)DOC");
     REGISTER_VARIABLE("isContinuumEvent", isContinuumEvent,
-                      "[Eventbased] Returns 1.0 if event doesn't contain a :math:`\\Upsilon(4S)` particle on generator level, 0.0 otherwise.",
-                      Manager::VariableDataType::c_bool);
+                      "[Eventbased] Returns 1.0 if event doesn't contain a :math:`\\Upsilon(4S)` particle on generator level, 0.0 otherwise.");
     REGISTER_VARIABLE("isNotContinuumEvent", isNotContinuumEvent,
-                      "[Eventbased] Returns 1.0 if event does contain an :math:`\\Upsilon(4S)` particle on generator level and therefore is not a continuum event, 0.0 otherwise.",
-                      Manager::VariableDataType::c_bool);
+                      "[Eventbased] Returns 1.0 if event does contain an :math:`\\Upsilon(4S)` particle on generator level and therefore is not a continuum event, 0.0 otherwise.");
 
     REGISTER_VARIABLE("isChargedBEvent", isChargedBEvent,
-                      "[Eventbased] Returns 1.0 if event contains a charged B-meson on generator level.", Manager::VariableDataType::c_bool);
+                      "[Eventbased] Returns 1.0 if event contains a charged B-meson on generator level.");
     REGISTER_VARIABLE("isUnmixedBEvent", isUnmixedBEvent,
                       R"DOC([Eventbased] Returns 1.0 if the event contains opposite flavor neutral B-mesons on generator level,
-0.0 in case of same flavor B-mesons and NaN if the event has no generated neutral B.)DOC", Manager::VariableDataType::c_double);
+0.0 in case of same flavor B-mesons and NaN if the event has no generated neutral B.)DOC");
 
     REGISTER_VARIABLE("nTracks", nTracks, R"DOC(
 [Eventbased] Returns the total number of tracks (unfiltered) in the event.
 
 .. warning:: This variable is exceedingly background-dependent and should not really be used in any selections (other than perhaps for monitoring purposes).
 .. seealso:: :b2:var:`nCleanedTracks` for a more useful variable for use in selections.
-)DOC", Manager::VariableDataType::c_int);
+)DOC");
     REGISTER_VARIABLE("nChargeZeroTrackFits", nChargeZeroTrackFits, R"DOC(
 [Eventbased] Returns number of track fits with zero charge.
 
@@ -779,7 +776,7 @@ namespace Belle2 {
   These tracks are excluded from particle lists, but a large amount of charge zero
   fits may indicate problems with whole event constraints
   or abnominally high beam backgrounds and/or noisy events.
-)DOC", Manager::VariableDataType::c_int);
+)DOC");
 
     REGISTER_VARIABLE("belleECLEnergy", belleECLEnergy, R"DOC(
 [Eventbased][Legacy] Returns total energy in ECL in the event as used in Belle 1 analyses. 
@@ -797,15 +794,15 @@ namespace Belle2 {
     vm.addAlias("myNeutralECLEnergy", "totalEnergyOfParticlesInList(gamma:cleaned)")
     vm.addAlias("myChargedECLEnergy", "totalEnergyOfParticlesInList(e+:cleaned)")
     vm.addAlias("myECLEnergy", "formula(myNeutralECLEnergy+myChargedECLEnergy)")
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters,
-                      "[Eventbased] Returns number of KLM clusters in the event.", Manager::VariableDataType::c_int);
+                      "[Eventbased] Returns number of KLM clusters in the event.");
     REGISTER_VARIABLE("nMCParticles", nMCParticles,
-                      "[Eventbased] Returns number of MCParticles in the event.", Manager::VariableDataType::c_int);
+                      "[Eventbased] Returns number of MCParticles in the event.");
 
-    REGISTER_VARIABLE("expNum", expNum, "[Eventbased] Returns the experiment number.", Manager::VariableDataType::c_int);
-    REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] Returns the event number.", Manager::VariableDataType::c_int);
-    REGISTER_VARIABLE("runNum", runNum, "[Eventbased] Returns the run number.", Manager::VariableDataType::c_int);
+    REGISTER_VARIABLE("expNum", expNum, "[Eventbased] Returns the experiment number.");
+    REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] Returns the event number.");
+    REGISTER_VARIABLE("runNum", runNum, "[Eventbased] Returns the run number.");
     REGISTER_VARIABLE("productionIdentifier", productionIdentifier, R"DOC(
 [Eventbased] Production identifier.
 Uniquely identifies an MC sample by the (grid-jargon) production ID. 
@@ -815,101 +812,101 @@ In such cases the event numbers are sequential *only within a production*, so ex
 .. tip:: Experiment/run/event/production is unique for all MC samples. Experiment/run/event is unique for data.
 
 .. seealso:: `Where can I rely on uniqueness of the ['__experiment__', '__run__', '__event__', '__candidate__'] combination? <https://questions.belle2.org/question/9704>`__
-)DOC", Manager::VariableDataType::c_int);
+)DOC");
 
-    REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] Returns center-of-mass energy.", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Returns total beam energy in the laboratory frame.", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("beamPx", getBeamPx, "[Eventbased] Returns x component of total beam momentum in the laboratory frame.", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Returns y component of total beam momentum in the laboratory frame.", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("beamPz", getBeamPz, "[Eventbased] Returns z component of total beam momentum in the laboratory frame.", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] Returns center-of-mass energy.");
+    REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Returns total beam energy in the laboratory frame.");
+    REGISTER_VARIABLE("beamPx", getBeamPx, "[Eventbased] Returns x component of total beam momentum in the laboratory frame.");
+    REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Returns y component of total beam momentum in the laboratory frame.");
+    REGISTER_VARIABLE("beamPz", getBeamPz, "[Eventbased] Returns z component of total beam momentum in the laboratory frame.");
     REGISTER_VARIABLE("IPX", getIPX, R"DOC(
 [Eventbased] Returns x coordinate of the measured interaction point.
 
 .. note:: For old data and uncalibrated MC files this will return 0.0.
 
 .. note:: You might hear tracking and calibration people refer to this as the ``BeamSpot``.
-)DOC", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] Returns y coordinate of the measured interaction point.", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] Returns z coordinate of the measured interaction point.", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] Returns (i,j)-th element of the covariance matrix of the measured interaction point.", Manager::VariableDataType::c_double);
+)DOC");
+    REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] Returns y coordinate of the measured interaction point.");
+    REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] Returns z coordinate of the measured interaction point.");
+    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] Returns (i,j)-th element of the covariance matrix of the measured interaction point.");
 
     REGISTER_VARIABLE("genIPX", getGenIPX, R"DOC(
 [Eventbased] Returns x coordinate of the interaction point used for the underlying **MC generation**.
 Returns NaN for data.
 
 .. note:: This is normally smeared from 0.0
-)DOC", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("genIPY", getGenIPY, "[Eventbased] Returns y coordinate of the interaction point used for the underlying **MC generation**. Returns NaN for data.", Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("genIPZ", getGenIPZ, "[Eventbased] Returns z coordinate of the interaction point used for the underlying **MC generation**. Returns NaN for data.", Manager::VariableDataType::c_double);
+)DOC");
+    REGISTER_VARIABLE("genIPY", getGenIPY, "[Eventbased] Returns y coordinate of the interaction point used for the underlying **MC generation**. Returns NaN for data.");
+    REGISTER_VARIABLE("genIPZ", getGenIPZ, "[Eventbased] Returns z coordinate of the interaction point used for the underlying **MC generation**. Returns NaN for data.");
 
     REGISTER_VARIABLE("date", eventYearMonthDay, R"DOC(
 [Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).
 
 .. seealso:: :b2:var:`year`, :b2:var:`eventTimeSeconds`, :b2:var:`eventTimeSecondsFractionRemainder`, provided for convenience.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("year", eventYear, R"DOC(
 [Eventbased] Returns the year when the event was recorded (in UTC).
 
 .. tip::
   For more precise event time, see :b2:var:`eventTimeSeconds` and :b2:var:`eventTimeSecondsFractionRemainder`.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
-                      "[Eventbased] Time of the event in seconds (truncated down) since 1970/1/1 (Unix epoch).", Manager::VariableDataType::c_double);
+                      "[Eventbased] Time of the event in seconds (truncated down) since 1970/1/1 (Unix epoch).");
     REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder, R"DOC(
 [Eventbased] Remainder of the event time in fractions of a second.
 
 .. tip::
   Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
     REGISTER_VARIABLE("timeSincePrevTriggerClockTicks", timeSincePrevTriggerClockTicks,
-                      "[Eventbased] Time since the previous trigger in clock ticks (127MHz=RF/4 clock).", Manager::VariableDataType::c_double);
+                      "[Eventbased] Time since the previous trigger in clock ticks (127MHz=RF/4 clock).");
 
     REGISTER_VARIABLE("timeSincePrevTriggerMicroSeconds", timeSincePrevTriggerMicroSeconds,
-                      "[Eventbased] Time since the previous trigger in micro seconds.", Manager::VariableDataType::c_double);
+                      "[Eventbased] Time since the previous trigger in micro seconds.");
 
     REGISTER_VARIABLE("triggeredBunchNumberTTD", triggeredBunchNumberTTD, R"DOC(
 [Eventbased] Number of triggered bunch ranging from 0-1279.
 
 .. warning:: This is the bunch number as provided by the TTD, which does not necessarily correspond to the 'global' SKB bunch number.
 .. note:: There are a maximum of 5120 buckets, which could each carry one bunch of e+/e-, but we only have 1280 clock ticks (=5120/4) to identify the bunches.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
     REGISTER_VARIABLE("triggeredBunchNumber", triggeredBunchNumber, R"DOC(
 [Eventbased] Number of triggered bunch ranging from 0-1279.
 
 .. note:: There are a maximum of 5120 buckets, which could each carry one bunch of e+/e-, but we only have 1280 clock ticks (=5120/4) to identify the bunches
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
     REGISTER_VARIABLE("hasRecentInjection", hasRecentInjection,
-                      "[Eventbased] Returns 1 if an injection happened recently, 0 otherwise.", Manager::VariableDataType::c_double);
+                      "[Eventbased] Returns 1 if an injection happened recently, 0 otherwise.");
 
     REGISTER_VARIABLE("timeSinceLastInjectionSignalClockTicks", timeSinceLastInjectionSignalClockTicks, R"DOC(
 [Eventbased] Time since the last injection pre-kick signal in clock ticks (127MHz=RF/4 clock)
 
 .. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
     REGISTER_VARIABLE("timeSinceLastInjectionSignalMicroSeconds", timeSinceLastInjectionSignalMicroSeconds, R"DOC(
 [Eventbased] Time since the last injection pre-kick signal in micro seconds
 
 .. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
     REGISTER_VARIABLE("timeSinceLastInjectionClockTicks", timeSinceLastInjectionClockTicks,
-      "[Eventbased] Time since the last injected bunch passed by the detector in micro seconds.", Manager::VariableDataType::c_double)
+      "[Eventbased] Time since the last injected bunch passed by the detector in micro seconds.")
 
     REGISTER_VARIABLE("timeSinceLastInjectionMicroSeconds", timeSinceLastInjectionMicroSeconds,
-      "[Eventbased] Time since the last injected bunch passed by the detector in micro seconds.", Manager::VariableDataType::c_double)
+      "[Eventbased] Time since the last injected bunch passed by the detector in micro seconds.")
 
     REGISTER_VARIABLE("injectionInHER", injectionInHER,
-                  "[Eventbased] Returns 1 if injection was in HER, 0 otherwise.", Manager::VariableDataType::c_double);
+                  "[Eventbased] Returns 1 if injection was in HER, 0 otherwise.");
 
     REGISTER_VARIABLE("revolutionCounter2", revolutionCounter2, R"DOC(
 [Eventbased] The lowest bit of revolution counter, i.e. return 0 or 1
 
 .. note:: related to PXD data acquisition; PXD needs ~2 revolutions to read out one frame
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
     VARIABLE_GROUP("EventKinematics");
 
@@ -918,61 +915,61 @@ Returns NaN for data.
 
 .. warning:: You have to run the Event Kinematics builder module for this variable to be meaningful.
 .. seealso:: `modularAnalysis.buildEventKinematics`.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("missingMomentumOfEvent_Px", missingMomentumOfEvent_Px, R"DOC(
 [Eventbased] The x component of the missing momentum in laboratory frame.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("missingMomentumOfEvent_Py", missingMomentumOfEvent_Py, R"DOC(
 [Eventbased] The y component of the missing momentum in laboratory frame.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("missingMomentumOfEvent_Pz", missingMomentumOfEvent_Pz, R"DOC(
 [Eventbased] The z component of the missing momentum in laboratory frame.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("missingMomentumOfEvent_theta", missingMomentumOfEvent_theta, R"DOC(
 [Eventbased] The theta angle of the missing momentum of the event in laboratory frame.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("missingMomentumOfEventCMS", missingMomentumOfEventCMS, R"DOC(
 [Eventbased] The magnitude of the missing momentum in center-of-mass frame.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("genMissingMomentumOfEventCMS", genMissingMomentumOfEventCMS, R"DOC(
 [Eventbased] The magnitude of the missing momentum in center-of-mass frame from generator
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Px", missingMomentumOfEventCMS_Px, R"DOC(
 [Eventbased] The x component of the missing momentum in center-of-mass frame.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Py", missingMomentumOfEventCMS_Py, R"DOC(
 [Eventbased] The y component of the missing momentum in center-of-mass frame.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Pz", missingMomentumOfEventCMS_Pz, R"DOC(
 [Eventbased] The z component of the missing momentum in center-of-mass frame.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("missingMomentumOfEventCMS_theta", missingMomentumOfEventCMS_theta, R"DOC(
 [Eventbased] The theta angle of the missing momentum in center-of-mass frame.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("missingEnergyOfEventCMS", missingEnergyOfEventCMS, R"DOC(
 [Eventbased] The missing energy in center-of-mass frame.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("genMissingEnergyOfEventCMS", genMissingEnergyOfEventCMS, R"DOC(
 [Eventbased] The missing energy in center-of-mass frame from generator.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("missingMass2OfEvent", missingMass2OfEvent, R"DOC(
 [Eventbased] The missing mass squared.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("genMissingMass2OfEvent", genMissingMass2OfEvent, R"DOC(
 [Eventbased] The missing mass squared from generator
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("visibleEnergyOfEventCMS", visibleEnergyOfEventCMS, R"DOC(
 [Eventbased] The visible energy in center-of-mass frame.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("genVisibleEnergyOfEventCMS", genVisibleEnergyOfEventCMS, R"DOC(
 [Eventbased] The visible energy in center-of-mass frame from generator.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("totalPhotonsEnergyOfEvent", totalPhotonsEnergyOfEvent, R"DOC(
 [Eventbased] The energy in laboratory frame of all the photons.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("genTotalPhotonsEnergyOfEvent", genTotalPhotonsEnergyOfEvent, R"DOC(
 [Eventbased] The energy in laboratory frame of all the photons. from generator.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0, R"DOC(
@@ -982,6 +979,6 @@ Returns NaN for data.
   The event time can be measured by several sub-detectors including the CDC, ECL, and TOP.
   This Event t0 variable is the final combined value of all the event time measurements.
   Currently only the CDC and ECL are used in this combination.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
   }
 }

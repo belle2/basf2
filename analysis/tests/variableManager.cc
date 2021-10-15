@@ -121,7 +121,7 @@ namespace {
     EXPECT_DOUBLE_EQ(std::get<double>(dummy->function(nullptr)), 42.0);
 
     //also test the macro (with other name)
-    REGISTER_VARIABLE("testingthedummyvar2", dummyVar, "something else", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("testingthedummyvar2", dummyVar, "something else");
     dummy = Manager::Instance().getVariable("testingthedummyvar2");
     ASSERT_NE(dummy, nullptr);
     EXPECT_TRUE(dummy->description == "something else");
@@ -148,8 +148,7 @@ namespace {
 
 
     //also test the macro (with other name)
-    REGISTER_VARIABLE("testingthedummyvarwithparameters2(n,m)", dummyVarWithParameters, "something else",
-                      Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("testingthedummyvarwithparameters2(n,m)", dummyVarWithParameters, "something else");
     dummy = Manager::Instance().getVariable("testingthedummyvarwithparameters2(4,5)");
     ASSERT_NE(dummy, nullptr);
     EXPECT_DOUBLE_EQ(std::get<double>(dummy->function(nullptr)), 9.0);

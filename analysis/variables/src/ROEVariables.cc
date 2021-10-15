@@ -2022,195 +2022,188 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Rest Of Event");
 
-    REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
-                      "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
-                      "Can be used inside for_each loop or outside of it if the particle has associated Rest of Event.\n"
-                      "E.g. ``useROERecoilFrame(E)`` returns the energy of a particle in the ROE recoil frame.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
+                          "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
+                          "Can be used inside for_each loop or outside of it if the particle has associated Rest of Event.\n"
+                          "E.g. ``useROERecoilFrame(E)`` returns the energy of a particle in the ROE recoil frame.", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
                       "Returns 1 if a track, ecl or klmCluster associated to particle is in the current RestOfEvent object, 0 otherwise."
-                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.", Manager::VariableDataType::c_bool);
+                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("isCloneOfSignalSide", isCloneOfSignalSide,
                       "Returns 1 if a particle is a clone of signal side final state particles, 0 otherwise. "
                       "Requires generator information and truth-matching. "
-                      "One can use this variable only in a ``for_each`` loop over the RestOfEvent StoreArray.", Manager::VariableDataType::c_double);
+                      "One can use this variable only in a ``for_each`` loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("hasAncestorFromSignalSide", hasAncestorFromSignalSide,
                       "Returns 1 if a particle has ancestor from signal side, 0 otherwise. "
                       "Requires generator information and truth-matching. "
-                      "One can use this variable only in a ``for_each`` loop over the RestOfEvent StoreArray.", Manager::VariableDataType::c_double);
+                      "One can use this variable only in a ``for_each`` loop over the RestOfEvent StoreArray.");
 
-    REGISTER_VARIABLE("currentROEIsInList(particleList)", currentROEIsInList,
-                      "[Eventbased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."
-                      "Useful to restrict the for_each loop over ROEs to ROEs of a certain ParticleList.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("currentROEIsInList(particleList)", currentROEIsInList,
+                          "[Eventbased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."
+                          "Useful to restrict the for_each loop over ROEs to ROEs of a certain ParticleList.", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("nROE_RemainingTracks", nROE_RemainingTracks,
                       "Returns number of tracks in ROE - number of tracks of given particle"
-                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.", Manager::VariableDataType::c_int);
+                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
-    REGISTER_VARIABLE("nROE_RemainingTracks(maskName)", nROE_RemainingTracksWithMask,
-                      "Returns number of remaining tracks between the ROE (specified via a mask) and the given particle. For the given particle only tracks are counted which are in the RoE."
-                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray."
-                      "Is required for the specific FEI. :noindex:", Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE("nROE_RemainingTracks(maskName)", nROE_RemainingTracksWithMask,
+                          "Returns number of remaining tracks between the ROE (specified via a mask) and the given particle. For the given particle only tracks are counted which are in the RoE."
+                          "One can use this variable only in a for_each loop over the RestOfEvent StoreArray."
+                          "Is required for the specific FEI. :noindex:", Manager::VariableDataType::c_int);
     // nROE_RemainingTracks is overloaded (two C++ functions sharing one
     // variable name) so one of the two needs to be made the indexed
     // variable in sphinx
 
     REGISTER_VARIABLE("nROE_KLMClusters", nROE_KLMClusters,
-                      "Returns number of all remaining KLM clusters in the related RestOfEvent object.", Manager::VariableDataType::c_double);
+                      "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
 
-    REGISTER_VARIABLE("nROE_Charged(maskName, PDGcode = 0)", nROE_ChargedParticles,
-                      "Returns number of all charged particles in the related RestOfEvent object. First optional argument is ROE mask name. "
-                      "Second argument is a PDG code to count only one charged particle species, independently of charge. "
-                      "For example: ``nROE_Charged(cleanMask, 321)`` will output number of kaons in Rest Of Event with ``cleanMask``. "
-                      "PDG code 0 is used to count all charged particles", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("nROE_Charged(maskName, PDGcode = 0)", nROE_ChargedParticles,
+                          "Returns number of all charged particles in the related RestOfEvent object. First optional argument is ROE mask name. "
+                          "Second argument is a PDG code to count only one charged particle species, independently of charge. "
+                          "For example: ``nROE_Charged(cleanMask, 321)`` will output number of kaons in Rest Of Event with ``cleanMask``. "
+                          "PDG code 0 is used to count all charged particles", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nROE_Photons(maskName)", nROE_Photons,
-                      "Returns number of all photons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("nROE_Photons(maskName)", nROE_Photons,
+                          "Returns number of all photons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nROE_NeutralHadrons(maskName)", nROE_NeutralHadrons,
-                      "Returns number of all neutral hadrons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("nROE_NeutralHadrons(maskName)", nROE_NeutralHadrons,
+                          "Returns number of all neutral hadrons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,
-                      "[Eventbased] Returns variable applied to the particle which is related to the current RestOfEvent object"
-                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,
+                          "[Eventbased] Returns variable applied to the particle which is related to the current RestOfEvent object"
+                          "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("roeMC_E", ROE_MC_E,
-                      "Returns true energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+                      "Returns true energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
     REGISTER_VARIABLE("roeMC_M", ROE_MC_M,
-                      "Returns true invariant mass of unused tracks and clusters in ROE", Manager::VariableDataType::c_double);
+                      "Returns true invariant mass of unused tracks and clusters in ROE");
 
     REGISTER_VARIABLE("roeMC_P", ROE_MC_P,
-                      "Returns true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+                      "Returns true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
     REGISTER_VARIABLE("roeMC_Px", ROE_MC_Px,
-                      "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+                      "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
     REGISTER_VARIABLE("roeMC_Py", ROE_MC_Py,
-                      "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+                      "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
     REGISTER_VARIABLE("roeMC_Pz", ROE_MC_Pz,
-                      "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+                      "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
     REGISTER_VARIABLE("roeMC_Pt", ROE_MC_Pt,
-                      "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+                      "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
     REGISTER_VARIABLE("roeMC_PTheta", ROE_MC_PTheta,
-                      "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+                      "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("roeMC_MissFlags(maskName)", ROE_MC_MissingFlags,
-                      "Returns flags corresponding to missing particles on ROE side.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roeMC_MissFlags(maskName)", ROE_MC_MissingFlags,
+                          "Returns flags corresponding to missing particles on ROE side.", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nROE_Tracks(maskName)",  nROE_Tracks,
-                      "Returns number of tracks in the related RestOfEvent object that pass the selection criteria.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("nROE_Tracks(maskName)",  nROE_Tracks,
+                          "Returns number of tracks in the related RestOfEvent object that pass the selection criteria.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nROE_ECLClusters(maskName)", nROE_ECLClusters,
-                      "Returns number of ECL clusters in the related RestOfEvent object that pass the selection criteria.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("nROE_ECLClusters(maskName)", nROE_ECLClusters,
+                          "Returns number of ECL clusters in the related RestOfEvent object that pass the selection criteria.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nROE_NeutralECLClusters(maskName)", nROE_NeutralECLClusters,
-                      "Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("nROE_NeutralECLClusters(maskName)", nROE_NeutralECLClusters,
+                          "Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nROE_Composites(maskName)", nROE_Composites,
-                      "Returns number of composite particles or V0s in the related RestOfEvent object that pass the selection criteria.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("nROE_Composites(maskName)", nROE_Composites,
+                          "Returns number of composite particles or V0s in the related RestOfEvent object that pass the selection criteria.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("nROE_ParticlesInList(pListName)", nROE_ParticlesInList,
-                      "Returns the number of particles in ROE from the given particle list.\n"
-                      "Use of variable aliases is advised.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("nROE_ParticlesInList(pListName)", nROE_ParticlesInList,
+                          "Returns the number of particles in ROE from the given particle list.\n"
+                          "Use of variable aliases is advised.", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeCharge(maskName)", ROE_Charge,
-                      "Returns total charge of the related RestOfEvent object.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roeCharge(maskName)", ROE_Charge,
+                          "Returns total charge of the related RestOfEvent object.", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeEextra(maskName)", ROE_ExtraEnergy,
-                      "Returns extra energy from ECLClusters in the calorimeter that is not associated to the given Particle",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roeEextra(maskName)", ROE_ExtraEnergy,
+                          "Returns extra energy from ECLClusters in the calorimeter that is not associated to the given Particle",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeNeextra(maskName)", ROE_NeutralExtraEnergy,
-                      "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roeNeextra(maskName)", ROE_NeutralExtraEnergy,
+                          "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle, can be used with ``use***Frame()`` function.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeE(maskName)", ROE_E,
-                      "Returns energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roeE(maskName)", ROE_E,
+                          "Returns energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeM(maskName)", ROE_M,
-                      "Returns invariant mass of unused tracks and clusters in ROE", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roeM(maskName)", ROE_M,
+                          "Returns invariant mass of unused tracks and clusters in ROE", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeP(maskName)", ROE_P,
-                      "Returns momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roeP(maskName)", ROE_P,
+                          "Returns momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roePt(maskName)", ROE_Pt,
-                      "Returns transverse component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roePt(maskName)", ROE_Pt,
+                          "Returns transverse component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roePx(maskName)", ROE_Px,
-                      "Returns x component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roePx(maskName)", ROE_Px,
+                          "Returns x component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roePy(maskName)", ROE_Py,
-                      "Returns y component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roePy(maskName)", ROE_Py,
+                          "Returns y component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roePz(maskName)", ROE_Pz,
-                      "Returns z component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roePz(maskName)", ROE_Pz,
+                          "Returns z component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roePTheta(maskName)", ROE_PTheta,
-                      "Returns theta angle of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roePTheta(maskName)", ROE_PTheta,
+                          "Returns theta angle of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeDeltae(maskName)", ROE_DeltaE,
-                      "Returns energy difference of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roeDeltae(maskName)", ROE_DeltaE,
+                          "Returns energy difference of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("roeMbc(maskName)", ROE_Mbc,
-                      "Returns beam constrained mass of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roeMbc(maskName)", ROE_Mbc,
+                          "Returns beam constrained mass of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weDeltae(maskName, opt)", WE_DeltaE,
-                      "Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weDeltae(maskName, opt)", WE_DeltaE,
+                          "Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMbc(maskName, opt)", WE_Mbc,
-                      "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`.",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weMbc(maskName, opt)", WE_Mbc,
+                          "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissM2(maskName, opt)", WE_MissM2,
-                      "Returns the invariant mass squared of the missing momentum (see :b2:var:`weMissE` possible options)",
-                      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weMissM2(maskName, opt)", WE_MissM2,
+                          "Returns the invariant mass squared of the missing momentum (see :b2:var:`weMissE` possible options)",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissPTheta(maskName, opt)", WE_MissPTheta,
-                      "Returns the polar angle of the missing momentum (see possible :b2:var:`weMissE` options)", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weMissPTheta(maskName, opt)", WE_MissPTheta,
+                          "Returns the polar angle of the missing momentum (see possible :b2:var:`weMissE` options)", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissP(maskName, opt)", WE_MissP,
-                      "Returns the magnitude of the missing momentum (see possible :b2:var:`weMissE` options)", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weMissP(maskName, opt)", WE_MissP,
+                          "Returns the magnitude of the missing momentum (see possible :b2:var:`weMissE` options)", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissPx(maskName, opt)", WE_MissPx,
-                      "Returns the x component of the missing momentum (see :b2:var:`weMissE` possible options)", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weMissPx(maskName, opt)", WE_MissPx,
+                          "Returns the x component of the missing momentum (see :b2:var:`weMissE` possible options)", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissPy(maskName, opt)", WE_MissPy,
-                      "Returns the y component of the missing momentum (see :b2:var:`weMissE` possible options)", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weMissPy(maskName, opt)", WE_MissPy,
+                          "Returns the y component of the missing momentum (see :b2:var:`weMissE` possible options)", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissPz(maskName, opt)", WE_MissPz,
-                      "Returns the z component of the missing momentum (see :b2:var:`weMissE` possible options)", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weMissPz(maskName, opt)", WE_MissPz,
+                          "Returns the z component of the missing momentum (see :b2:var:`weMissE` possible options)", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissE(maskName, opt)", WE_MissE,
-                      R"DOC(Returns the energy of the missing momentum, possible options ``opt`` are the following:
+    REGISTER_METAVARIABLE("weMissE(maskName, opt)", WE_MissE,
+                          R"DOC(Returns the energy of the missing momentum, possible options ``opt`` are the following:
 
 - ``0``: CMS, use energy and momentum of charged particles and photons
 - ``1``: CMS, same as ``0``, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}`
@@ -2220,15 +2213,15 @@ namespace Belle2 {
 - ``5``: LAB, use energy and momentum of charged particles and photons from whole event
 - ``6``: LAB, same as ``5``, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}``
 - ``7``: CMS, correct pmiss 3-momentum vector with factor alpha so that :math:`d_E = 0`` (used for :math:`M_\mathrm{bc}` calculation).)DOC",
-                      Manager::VariableDataType::c_double);
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weXiZ(maskName)", WE_xiZ,
-                      "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weXiZ(maskName)", WE_xiZ,
+                          "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("bssMassDifference(maskName)", bssMassDifference,
-                      "Bs* - Bs mass difference", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("bssMassDifference(maskName)", bssMassDifference,
+                          "Bs* - Bs mass difference", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weCosThetaEll(maskName)", WE_cosThetaEll, R"DOC(
+    REGISTER_METAVARIABLE("weCosThetaEll(maskName)", WE_cosThetaEll, R"DOC(
 
 Returns the angle between :math:`M` and lepton in :math:`W` rest frame in the decays of the type:
 :math:`M \to h_1 ... h_n \ell`, where W 4-momentum is given as
@@ -2243,27 +2236,27 @@ The neutrino momentum is calculated from ROE taking into account the specified m
     
 )DOC", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weQ2lnuSimple(maskName,option)", WE_q2lnuSimple,
+    REGISTER_METAVARIABLE("weQ2lnuSimple(maskName,option)", WE_q2lnuSimple,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
                       "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter. \n"
                       "By default, option is set to ``1`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value.", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weQ2lnu(maskName,option)", WE_q2lnu,
+    REGISTER_METAVARIABLE("weQ2lnu(maskName,option)", WE_q2lnu,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
                       "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter. \n"
                       "This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction. \n"
                       "By default, option is set to ``7`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value.", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("weMissM2OverMissE(maskName)", WE_MissM2OverMissE,
+    REGISTER_METAVARIABLE("weMissM2OverMissE(maskName)", WE_MissM2OverMissE,
                       "Returns missing mass squared over missing energy", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("passesROEMask(maskName)", passesROEMask,
+    REGISTER_METAVARIABLE("passesROEMask(maskName)", passesROEMask,
                       "Returns boolean value if a particle passes a certain mask or not. Only to be used in for_each path, otherwise returns quiet NaN.", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("printROE", printROE,
-                      "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.", Manager::VariableDataType::c_bool);
+                      "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.");
 
-    REGISTER_VARIABLE("pi0Prob(mode)", pi0Prob,
+    REGISTER_METAVARIABLE("pi0Prob(mode)", pi0Prob,
                       "Returns pi0 probability, where mode is used to specify the selection criteria for soft photon. \n"
                       "The following strings are available. \n\n"
                       "- ``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
@@ -2272,7 +2265,7 @@ The neutrino momentum is calculated from ROE taking into account the specified m
                       "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n\n"
                       "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("etaProb(mode)", etaProb,
+    REGISTER_METAVARIABLE("etaProb(mode)", etaProb,
                       "Returns eta probability, where mode is used to specify the selection criteria for soft photon. \n"
                       "The following strings are available. \n\n"
                       "- ``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"

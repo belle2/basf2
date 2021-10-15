@@ -9,6 +9,7 @@
 #pragma once
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <framework/logging/Logger.h>
 
 #include <string>
 #include <map>
@@ -16,6 +17,7 @@
 #include <functional>
 #include <memory>
 #include <variant>
+#include <type_traits>
 
 namespace Belle2 {
   class Particle;
@@ -318,6 +320,21 @@ namespace Belle2 {
       return { t };
     }
 
+    template<typename T>
+    Belle2::Variable::Manager::VariableDataType get_function_type(const std::string& name, T* t)
+    {
+      auto func =  std::function{t};
+      using ReturnType = typename decltype(func)::result_type;
+      if (std::is_same_v<ReturnType, double>) {
+        return Belle2::Variable::Manager::VariableDataType::c_double;
+      } else if (std::is_same_v<ReturnType, int>) {
+        return Belle2::Variable::Manager::VariableDataType::c_int;
+      } else if (std::is_same_v<ReturnType, bool>) {
+        return Belle2::Variable::Manager::VariableDataType::c_bool;
+      } else {
+        B2FATAL("Metavariables must be registered using the REGISTER_METAVARIABLE macro." << LogVar("Variablename", name));
+      }
+    }
 
     /** \def VARMANAGER_CONCATENATE_DETAIL(x, y)
      * Internal macro to generate unique name.
@@ -337,8 +354,16 @@ namespace Belle2 {
      * Register a variable under the key 'name' with given function and description.
      * \sa Manager
      */
-#define REGISTER_VARIABLE(name, function, description, variabletype) \
-  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description), Belle2::Variable::Manager::VariableDataType(variabletype));
+#define REGISTER_VARIABLE(name, function, description) \
+  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description), Belle2::Variable::get_function_type(name,function));
+
+    /** \def REGISTER_VARIABLE(name, function, description, variabletype)
+     *
+     * Register a variable under the key 'name' with given function and description.
+     * \sa Manager
+     */
+#define REGISTER_METAVARIABLE(name, function, description, variabledatatype) \
+  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description), Belle2::Variable::Manager::VariableDataType(variabledatatype));
 
     /** \def VARIABLE_GROUP(groupName)
      *

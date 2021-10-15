@@ -836,202 +836,180 @@ namespace Belle2 {
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found. \n"
-                      "It behaves according to DecayStringGrammar.", Manager::VariableDataType::c_double);
+                      "It behaves according to DecayStringGrammar.");
     REGISTER_VARIABLE("isSignalAcceptWrongFSPs", isSignalAcceptWrongFSPs,
                       "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found.\n"
-                      "Misidentification of charged FSP is allowed.", Manager::VariableDataType::c_double);
+                      "Misidentification of charged FSP is allowed.");
     REGISTER_VARIABLE("isPrimarySignal", isPrimarySignal,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL) and primary, 0.0 if not, and NaN if no related MCParticle could be found",
-                      Manager::VariableDataType::c_double);
+                      "1.0 if Particle is correctly reconstructed (SIGNAL) and primary, 0.0 if not, and NaN if no related MCParticle could be found");
     REGISTER_VARIABLE("isSignalAcceptBremsPhotons", isSignalAcceptBremsPhotons,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found.\n"
-                      "Particles with gamma daughters attached through the bremsstrahlung recovery modules are allowed.",
-                      Manager::VariableDataType::c_double);
+                      "Particles with gamma daughters attached through the bremsstrahlung recovery modules are allowed.");
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
-                      "Check the PDG code of a particles MC mother particle", Manager::VariableDataType::c_double);
+                      "Check the PDG code of a particles MC mother particle");
     REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
-                      "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.  :noindex:",
-                      Manager::VariableDataType::c_double);
+                      "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.  :noindex:");
 
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
-                      "Check the array index of a particles generated mother", Manager::VariableDataType::c_double);
+                      "Check the array index of a particles generated mother");
     REGISTER_VARIABLE("genMotherID(i)", genNthMotherIndex,
-                      "Check the array index of a particle n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc. :noindex:",
-                      Manager::VariableDataType::c_double);
+                      "Check the array index of a particle n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc. :noindex:");
     // genMotherPDG and genMotherID are overloaded (each are two C++ functions
     // sharing one variable name) so one of the two needs to be made the indexed
     // variable in sphinx
     REGISTER_VARIABLE("isBBCrossfeed", isBBCrossfeed,
-                      "Returns 1 for crossfeed in reconstruction of given B meson, 0 for no crossfeed and NaN for no true B meson or failed truthmatching.",
-                      Manager::VariableDataType::c_double);
+                      "Returns 1 for crossfeed in reconstruction of given B meson, 0 for no crossfeed and NaN for no true B meson or failed truthmatching.");
     REGISTER_VARIABLE("genMotherP", genMotherP,
-                      "Generated momentum of a particles MC mother particle", Manager::VariableDataType::c_double);
+                      "Generated momentum of a particles MC mother particle");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
-                      "Check the array index of a particle's related MCParticle", Manager::VariableDataType::c_double);
+                      "Check the array index of a particle's related MCParticle");
     REGISTER_VARIABLE("isSignalAcceptMissingNeutrino",
                       isSignalAcceptMissingNeutrino,
-                      "same as isSignal, but also accept missing neutrino", Manager::VariableDataType::c_double);
+                      "same as isSignal, but also accept missing neutrino");
     REGISTER_VARIABLE("isSignalAcceptMissingMassive",
                       isSignalAcceptMissingMassive,
-                      "same as isSignal, but also accept missing massive particle", Manager::VariableDataType::c_double);
+                      "same as isSignal, but also accept missing massive particle");
     REGISTER_VARIABLE("isSignalAcceptMissingGamma",
                       isSignalAcceptMissingGamma,
-                      "same as isSignal, but also accept missing gamma, such as B -> K* gamma, pi0 -> gamma gamma", Manager::VariableDataType::c_double);
+                      "same as isSignal, but also accept missing gamma, such as B -> K* gamma, pi0 -> gamma gamma");
     REGISTER_VARIABLE("isSignalAcceptMissing",
                       isSignalAcceptMissing,
-                      "same as isSignal, but also accept missing particle", Manager::VariableDataType::c_double);
+                      "same as isSignal, but also accept missing particle");
     REGISTER_VARIABLE("isMisidentified", isMisidentified,
-                      "return 1 if the particle is misidentified: at least one of the final state particles has the wrong PDG code assignment (including wrong charge), 0 if PDG code is fine, and NaN if no related MCParticle could be found.",
-                      Manager::VariableDataType::c_double);
+                      "return 1 if the particle is misidentified: at least one of the final state particles has the wrong PDG code assignment (including wrong charge), 0 if PDG code is fine, and NaN if no related MCParticle could be found.");
     REGISTER_VARIABLE("isWrongCharge", isWrongCharge,
-                      "return 1 if the charge of the particle is wrongly assigned, 0 if it's the correct charge, and NaN if no related MCParticle could be found.",
-                      Manager::VariableDataType::c_double);
+                      "return 1 if the charge of the particle is wrongly assigned, 0 if it's the correct charge, and NaN if no related MCParticle could be found.");
     REGISTER_VARIABLE("isCloneTrack", isCloneTrack,
-                      "Return 1 if the charged final state particle comes from a cloned track, 0 if not a clone. Returns NAN if neutral, composite, or MCParticle not found (like for data or if not MCMatched)",
-                      Manager::VariableDataType::c_double);
+                      "Return 1 if the charged final state particle comes from a cloned track, 0 if not a clone. Returns NAN if neutral, composite, or MCParticle not found (like for data or if not MCMatched)");
     REGISTER_VARIABLE("isOrHasCloneTrack", isOrHasCloneTrack,
-                      "Return 1 if the particle is a clone track or has a clone track as a daughter, 0 otherwise.", Manager::VariableDataType::c_double);
+                      "Return 1 if the particle is a clone track or has a clone track as a daughter, 0 otherwise.");
     REGISTER_VARIABLE("mcPDG", particleMCMatchPDGCode,
-                      "The PDG code of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).",
-                      Manager::VariableDataType::c_double);
+                      "The PDG code of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcErrors", particleMCErrors,
-                      "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)", Manager::VariableDataType::c_double);
+                      "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
     REGISTER_VARIABLE("mcMatchWeight", particleMCMatchWeight,
-                      "The weight of the Particle -> MCParticle relation (only for the first Relation = largest weight).",
-                      Manager::VariableDataType::c_double);
+                      "The weight of the Particle -> MCParticle relation (only for the first Relation = largest weight).");
     REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch,
-                      "The number of relations of this Particle to MCParticle.", Manager::VariableDataType::c_double);
+                      "The number of relations of this Particle to MCParticle.");
     REGISTER_VARIABLE("mcDecayTime", particleMCMatchDecayTime,
-                      "The decay time of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).",
-                      Manager::VariableDataType::c_double);
+                      "The decay time of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcLifeTime", particleMCMatchLifeTime,
-                      "The life time of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).",
-                      Manager::VariableDataType::c_double);
+                      "The life time of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPX", particleMCMatchPX,
-                      "The px of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).",
-                      Manager::VariableDataType::c_double);
+                      "The px of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPY", particleMCMatchPY,
-                      "The py of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).",
-                      Manager::VariableDataType::c_double);
+                      "The py of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPZ", particleMCMatchPZ,
-                      "The pz of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).",
-                      Manager::VariableDataType::c_double);
+                      "The pz of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPT", particleMCMatchPT,
-                      "The pt of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).",
-                      Manager::VariableDataType::c_double);
+                      "The pt of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcE", particleMCMatchE,
-                      "The energy of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).",
-                      Manager::VariableDataType::c_double);
+                      "The energy of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcP", particleMCMatchP,
-                      "The total momentum of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).",
-                      Manager::VariableDataType::c_double);
+                      "The total momentum of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPhi", particleMCMatchPhi,
-                      "The phi of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).",
-                      Manager::VariableDataType::c_double);
+                      "The phi of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcTheta", particleMCMatchTheta,
-                      "The theta of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).",
-                      Manager::VariableDataType::c_double);
+                      "The theta of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcRecoilMass", particleMCRecoilMass,
-                      "The mass recoiling against the particles attached as particle's daughters calculated using MC truth values.",
-                      Manager::VariableDataType::c_double);
+                      "The mass recoiling against the particles attached as particle's daughters calculated using MC truth values.");
     REGISTER_VARIABLE("mcCosThetaBetweenParticleAndNominalB",
                       particleMCCosThetaBetweenParticleAndNominalB,
-                      "Cosine of the angle in CMS between momentum the particle and a nominal B particle. In this calculation, the momenta of all descendant neutrinos are subtracted from the B momentum.",
-                      Manager::VariableDataType::c_double);
+                      "Cosine of the angle in CMS between momentum the particle and a nominal B particle. In this calculation, the momenta of all descendant neutrinos are subtracted from the B momentum.");
 
 
     REGISTER_VARIABLE("mcSecPhysProc", mcParticleSecondaryPhysicsProcess,
-                      "Returns the secondary physics process flag.", Manager::VariableDataType::c_double);
+                      "Returns the secondary physics process flag.");
     REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus,
-                      "Returns status bits of related MCParticle or NaN if MCParticle relation is not set.", Manager::VariableDataType::c_double);
+                      "Returns status bits of related MCParticle or NaN if MCParticle relation is not set.");
     REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle,
                       "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non - primary MCParticle, "
-                      "NaN if Particle is not related to MCParticle.", Manager::VariableDataType::c_double);
+                      "NaN if Particle is not related to MCParticle.");
     REGISTER_VARIABLE("mcVirtual", particleMCVirtualParticle,
                       "Returns 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non - virtual MCParticle, "
-                      "NaN if Particle is not related to MCParticle.", Manager::VariableDataType::c_double)
+                      "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("mcInitial", particleMCInitialParticle,
                       "Returns 1 if Particle is related to initial MCParticle, 0 if Particle is related to non - initial MCParticle, "
-                      "NaN if Particle is not related to MCParticle.", Manager::VariableDataType::c_double)
+                      "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("mcISR", particleMCISRParticle,
                       "Returns 1 if Particle is related to ISR MCParticle, 0 if Particle is related to non - ISR MCParticle, "
-                      "NaN if Particle is not related to MCParticle.", Manager::VariableDataType::c_double)
+                      "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("mcFSR", particleMCFSRParticle,
                       "Returns 1 if Particle is related to FSR MCParticle, 0 if Particle is related to non - FSR MCParticle ,"
-                      "NaN if Particle is not related to MCParticle.", Manager::VariableDataType::c_double)
+                      "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("mcPhotos", particleMCPhotosParticle,
                       "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non - Photos MCParticle, "
-                      "NaN if Particle is not related to MCParticle.", Manager::VariableDataType::c_double)
+                      "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("generatorEventWeight", generatorEventWeight,
-                      "[Eventbased] Returns the event weight produced by the event generator", Manager::VariableDataType::c_double)
+                      "[Eventbased] Returns the event weight produced by the event generator")
 
     REGISTER_VARIABLE("genNStepsToDaughter(i)", genNStepsToDaughter,
                       "Returns number of steps to i-th daughter from the particle at generator level. "
                       "NaN if no MCParticle is associated to the particle or i-th daughter. "
-                      "NaN if i-th daughter does not exist.", Manager::VariableDataType::c_int);
+                      "NaN if i-th daughter does not exist.");
     REGISTER_VARIABLE("genNMissingDaughter(PDG)", genNMissingDaughter,
                       "Returns the number of missing daughters having assigned PDG codes. "
-                      "NaN if no MCParticle is associated to the particle.", Manager::VariableDataType::c_int)
+                      "NaN if no MCParticle is associated to the particle.")
     REGISTER_VARIABLE("Eher", getHEREnergy, R"DOC(
 [Eventbased] The nominal HER energy used by the generator.
 
 .. warning:: This variable does not make sense for data.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("Eler", getLEREnergy, R"DOC(
 [Eventbased] The nominal LER energy used by the generator.
 
 .. warning:: This variable does not make sense for data.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("XAngle", getCrossingAngleX, R"DOC(
 [Eventbased] The nominal beam crossing angle in the x-z plane from generator level beam kinematics.
 
 .. warning:: This variable does not make sense for data.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_VARIABLE("YAngle", getCrossingAngleY, R"DOC(
 [Eventbased] The nominal beam crossing angle in the y-z plane from generator level beam kinematics.
 
 .. warning:: This variable does not make sense for data.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
 
     VARIABLE_GROUP("Generated tau decay information");
     REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode,
-                      "[Eventbased] Decay ID for the positive tau lepton in a tau pair generated event.", Manager::VariableDataType::c_int)
+                      "[Eventbased] Decay ID for the positive tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode,
-                      "[Eventbased] Decay ID for the negative tau lepton in a tau pair generated event.", Manager::VariableDataType::c_int)
+                      "[Eventbased] Decay ID for the negative tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("tauPlusMCProng", tauPlusMcProng,
-                      "[Eventbased] Prong for the positive tau lepton in a tau pair generated event.", Manager::VariableDataType::c_int)
+                      "[Eventbased] Prong for the positive tau lepton in a tau pair generated event.")
     REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
-                      "[Eventbased] Prong for the negative tau lepton in a tau pair generated event.", Manager::VariableDataType::c_int)
+                      "[Eventbased] Prong for the negative tau lepton in a tau pair generated event.")
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,
-                      "checks charged particles were seen in the SVD and neutrals in the ECL, returns 1.0 if so, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.", Manager::VariableDataType::c_double);
+                      "checks charged particles were seen in the SVD and neutrals in the ECL, returns 1.0 if so, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInPXD", seenInPXD,
-                      "returns 1.0 if the MC particle was seen in the PXD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.", Manager::VariableDataType::c_double);
+                      "returns 1.0 if the MC particle was seen in the PXD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInSVD", seenInSVD,
-                      "returns 1.0 if the MC particle was seen in the SVD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.", Manager::VariableDataType::c_double);
+                      "returns 1.0 if the MC particle was seen in the SVD, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInCDC", seenInCDC,
-                      "returns 1.0 if the MC particle was seen in the CDC, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.", Manager::VariableDataType::c_double);
+                      "returns 1.0 if the MC particle was seen in the CDC, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInTOP", seenInTOP,
-                      "returns 1.0 if the MC particle was seen in the TOP, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.", Manager::VariableDataType::c_double);
+                      "returns 1.0 if the MC particle was seen in the TOP, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInECL", seenInECL,
-                      "returns 1.0 if the MC particle was seen in the ECL, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.", Manager::VariableDataType::c_double);
+                      "returns 1.0 if the MC particle was seen in the ECL, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInARICH", seenInARICH,
-                      "returns 1.0 if the MC particle was seen in the ARICH, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.", Manager::VariableDataType::c_double);
+                      "returns 1.0 if the MC particle was seen in the ARICH, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInKLM", seenInKLM,
-                      "returns 1.0 if the MC particle was seen in the KLM, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.", Manager::VariableDataType::c_double);
+                      "returns 1.0 if the MC particle was seen in the KLM, 0.0 if not, NaN for composite particles or if no related MCParticle could be found. Useful for generator studies, not for reconstructed particles.");
 
     VARIABLE_GROUP("MC Matching for ECLClusters");
     REGISTER_VARIABLE("clusterMCMatchWeight", particleClusterMatchWeight,
                       "Returns the weight of the ECLCluster -> MCParticle relation for the MCParticle matched to the particle. "
                       "Returns NaN if: no cluster is related to the particle, the particle is not MC matched, or if there are no mcmatches for the cluster. "
-                      "Returns -1 if the cluster *was* matched to particles, but not the match of the particle provided.", Manager::VariableDataType::c_double);
+                      "Returns -1 if the cluster *was* matched to particles, but not the match of the particle provided.");
     REGISTER_VARIABLE("clusterBestMCMatchWeight", particleClusterBestMCMatchWeight,
-                      "returns the weight of the ECLCluster -> MCParticle relation for the relation with the largest weight.", Manager::VariableDataType::c_double);
+                      "returns the weight of the ECLCluster -> MCParticle relation for the relation with the largest weight.");
     REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode,
-                      "returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.", Manager::VariableDataType::c_double);
+                      "returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
     REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight,
-                      "returns the sum of all weights of the ECLCluster -> MCParticles relations.", Manager::VariableDataType::c_double);
+                      "returns the sum of all weights of the ECLCluster -> MCParticles relations.");
 
   }
 }

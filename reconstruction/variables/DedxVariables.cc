@@ -315,8 +315,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("CDCdEdx_lnhits", CDCdEdx_lnhits, "layer hits for dedx track");
     REGISTER_VARIABLE("CDCdEdx_lnhitsused", CDCdEdx_lnhitsused, "truncated hits of dedx track");
 
-    REGISTER_VARIABLE("CDCdEdx_PIDvars(var,PDG) var (= chi or pmean or preso) and PDG is of charged particles", CDCdEdx_PIDvars,
-                      "advance CDC dEdx PID related variables for charged particle");
+    REGISTER_METAVARIABLE("CDCdEdx_PIDvars(var,PDG) var (= chi or pmean or preso) and PDG is of charged particles", CDCdEdx_PIDvars,
+                          "advance CDC dEdx PID related variables for charged particle", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("CDCdEdx_chiE", CDCdEdx_chiE, "Chi value of electrons from CDC dEdx");
     REGISTER_VARIABLE("CDCdEdx_chiMu", CDCdEdx_chiMu, "Chi value of muons from CDC dEdx");

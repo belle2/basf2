@@ -1,24 +1,10 @@
 /**************************************************************************
-    * BASF2 (Belle Analysis Framework 2)                                     *
-    * Copyright(C) 2021 - Belle II Collaboration                             *
-    *                                                                        *
-    * Author: The Belle II Collaboration                                     *
-    * Contributors: Tommy Lam                                                *
-    *                                                                        *
-    * This software is provided "as is" without any warranty.                *
-    **************************************************************************/
-
-
-/* --------------- WARNING ---------------------------------------------- *
-Useful Links
-------------
-Trigger Results w/in module: https://confluence.desy.de/display/BI/The+HLT+Software+Trigger+and+Software+Trigger+Module
-Example of accessing trig: https://stash.desy.de/projects/B2A/repos/software/browse/dqm/modules/PhysicsObjectsMiraBelle/src/PhysicsObjectsMiraBelleDst2Module.cc
-KLMStripEffiencyCollector: https://stash.desy.de/projects/B2/repos/basf2/browse/klm/modules/KLMStripEfficiencyCollector/src/KLMStripEfficiencyCollectorModule.cc
-KLMStripEfficiencyAlgorithm: https://stash.desy.de/projects/B2/repos/basf2/browse/klm/calibration/src/KLMStripEfficiencyAlgorithm.cc
-KLMDQMModule: https://stash.desy.de/projects/B2/repos/basf2/browse/klm/modules/KLMDQM/src/KLMDQMModule.cc
-* ---------------------------------------------------------------------- */
-// #include <framework/core/ModuleParam.templateDetails.h>
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 /* Belle 2 headers. */
 #include <klm/modules/KLMDQM2/KLMDQM2Module.h>
@@ -38,9 +24,6 @@ KLMDQMModule: https://stash.desy.de/projects/B2/repos/basf2/browse/klm/modules/K
 #include <TH1.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TLatex.h>
-#include <TText.h>
-#include <TLine.h>
 #include <TClass.h>
 #include <TROOT.h>
 #include <TStyle.h>
@@ -89,11 +72,7 @@ KLMDQM2Module::KLMDQM2Module() :
   m_GeometryBKLM{nullptr},
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
   m_eklmElementNumbers{&(EKLMElementNumbers::Instance())},
-  m_PlaneArrayIndex(&(KLMPlaneArrayIndex::Instance())),
-  m_MatchingHitData( {0, 0, 0, 0, 0, 0, 0., nullptr, nullptr}),
-                   m_MatchedStrip(0),
-                   m_MatchingFile(nullptr),
-                   m_MatchingTree(nullptr)
+  m_PlaneArrayIndex(&(KLMPlaneArrayIndex::Instance()))
 {
   // Set module properties
   setDescription(R"DOC("Additional Module for KLMDQM plots after HLT filters
@@ -127,24 +106,11 @@ KLMDQM2Module::KLMDQM2Module() :
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("histogramDirectoryName", m_HistogramDirectoryName,
            "Directory for KLM DQM histograms in ROOT file.",
-           std::string("KLM"));
-  addParam("Debug", m_Debug, "Debug mode.", false);
-  addParam("DebugFileName", m_MatchingFileName, "Debug file name.", std::string("matching_short.root"));
+           std::string("KLM2"));
 
 }
 
 
-
-
-/* ************************************************* */
-/* ************************************************* */
-/* ************************************************* */
-/* ************************************************* */
-//copied from KLMDQM but will start to modify from here
-/* ************************************************* */
-/* ************************************************* */
-/* ************************************************* */
-/* ************************************************* */
 
 
 KLMDQM2Module::~KLMDQM2Module()
@@ -154,10 +120,8 @@ KLMDQM2Module::~KLMDQM2Module()
 void KLMDQM2Module::defineHisto()
 {
 
-  //to set up to set everything up
-  TDirectory* oldDirectory;
-  oldDirectory = gDirectory;
-  oldDirectory->cd(m_HistogramDirectoryName.c_str());
+  TDirectory* newDirectory{gDirectory->mkdir(m_HistogramDirectoryName.c_str())};
+  TDirectory::TContext context{gDirectory, newDirectory};
 
 
 
@@ -268,28 +232,15 @@ void KLMDQM2Module::initialize()
 {
   REG_HISTOGRAM;
   //inputs
-  trigResult.isRequired();
+  m_softwareTriggerResult.isRequired();
   m_MuonList.isRequired(m_MuonListName);
 
   m_RawFtsws.isOptional();
   m_RawKlms.isOptional();
   m_Digits.isOptional();
 
-
   m_GeometryBKLM = bklm::GeometryPar::instance();
 
-  if (m_Debug) {
-    m_MatchingFile = new TFile(m_MatchingFileName.c_str(), "recreate");
-    m_MatchingTree = new TTree("t_matching", "");
-    m_MatchingTree->Branch("subdetector", &m_MatchingHitData.subdetector,
-                           "subdetector/I");
-    m_MatchingTree->Branch("section", &m_MatchingHitData.section, "section/I");
-    m_MatchingTree->Branch("sector", &m_MatchingHitData.sector, "sector/I");
-    m_MatchingTree->Branch("layer", &m_MatchingHitData.layer, "layer/I");
-    m_MatchingTree->Branch("plane", &m_MatchingHitData.plane, "plane/I");
-    m_MatchingTree->Branch("strip", &m_MatchingHitData.strip, "strip/I");
-    m_MatchingTree->Branch("matchedStrip", &m_MatchedStrip, "matchedStrip/I");
-  }
 
 }
 
@@ -352,72 +303,22 @@ void KLMDQM2Module::event()
 
 void KLMDQM2Module::endRun()
 {
-
-
-  if (m_Debug) {
-    m_MatchingFile->cd();
-    m_MatchingTree->Write();
-
-    m_MatchedHitsEKLM->Write();
-    m_AllExtHitsEKLM->Write();
-
-    m_MatchedHitsBKLM->Write();
-    m_AllExtHitsBKLM->Write();
-
-    m_PlaneEfficienciesEKLM->Write();
-    m_PlaneEfficienciesBKLM->Write();
-
-    m_MatchedHitsEKLMSector->Write();
-    m_AllExtHitsEKLMSector->Write();
-
-    m_MatchedHitsBKLMSector->Write();
-    m_AllExtHitsBKLMSector->Write();
-
-    m_PlaneEfficienciesEKLMSector->Write();
-    m_PlaneEfficienciesBKLMSector->Write();
-
-
-  }
 }
 
 void KLMDQM2Module::terminate()
 {
 }
 
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/************** Buffer ******************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
-/****************************************/
 
 
 bool KLMDQM2Module::triggerFlag()
 {
 
   bool passed = false;
-  if (trigResult) {
+  if (m_softwareTriggerResult) {
     try {
-      passed = (trigResult->getResult("software_trigger_cut&skim&accept_mumutight") == SoftwareTriggerCutResult::c_accept) ? true : false;
+      passed = (m_softwareTriggerResult->getResult("software_trigger_cut&skim&accept_mumutight") == SoftwareTriggerCutResult::c_accept) ?
+               true : false;
     } catch (const std::out_of_range&) {
       passed = false;
     }
@@ -683,8 +584,7 @@ bool KLMDQM2Module::collectDataTrack(
         continue;
     }
     //Filling AddExtHits and MatchedHits histograms
-    //EKLM = 2, BKLM = 1
-    if (it->second.subdetector == 2) {
+    if (it->second.subdetector == KLMElementNumbers::c_EKLM) {
       int planeNum = m_eklmElementNumbers->planeNumber(it->second.section, it->second.layer, it->second.sector, it->second.plane);
       int sectorNum = (it->second.section - 1) * EKLMElementNumbers::getMaximalSectorNumber() + it->second.sector;
       AllExtHitsEKLM->Fill(planeNum);
@@ -692,16 +592,11 @@ bool KLMDQM2Module::collectDataTrack(
       if (it->second.digit) {
         MatchedHitsEKLM->Fill(planeNum);
         MatchedHitsEKLMSec->Fill(sectorNum);
-        if (m_Debug) {
-          std::memcpy(&m_MatchingHitData, &(it->second), sizeof(struct HitData));
-          m_MatchedStrip = it->second.digit->getStrip();
-          m_MatchingTree->Fill();
-        }
       }
     }//end of if loop
 
 
-    else if (it->second.subdetector == 1) {
+    else if (it->second.subdetector == KLMElementNumbers::c_BKLM) {
       int layerGlobal = BKLMElementNumbers::layerGlobalNumber(
                           it->second.section, it->second.sector, it->second.layer);
       int sectorGlobal = it->second.section * BKLMElementNumbers::getMaximalSectorNumber() + (it->second.sector);
@@ -710,15 +605,9 @@ bool KLMDQM2Module::collectDataTrack(
       if (it->second.digit) {
         MatchedHitsBKLM->Fill(layerGlobal);
         MatchedHitsBKLMSec->Fill(sectorGlobal);
-        if (m_Debug) {
-          std::memcpy(&m_MatchingHitData, &(it->second), sizeof(struct HitData));
-          m_MatchedStrip = it->second.digit->getStrip();
-          m_MatchingTree->Fill();
-        }
       }
     } else {
-      std::cout << "HitID!=1 or 2? HITID = " << it->second.subdetector << std::endl;
-      B2WARNING("Had a hit that didn't come from BKLM or EKLM?");
+      B2FATAL("Had a hit that didn't come from BKLM or EKLM?");
     }
 
 

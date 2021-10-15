@@ -1,12 +1,10 @@
 /**************************************************************************
-    * BASF2 (Belle Analysis Framework 2)                                     *
-    * Copyright(C) 2021 - Belle II Collaboration                             *
-    *                                                                        *
-    * Author: The Belle II Collaboration                                     *
-    * Contributors: Tommy Lam                                                *
-    *                                                                        *
-    * This software is provided "as is" without any warranty.                *
-    **************************************************************************/
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 #pragma once
 /* KLM headers. */
@@ -19,7 +17,6 @@
 #include <klm/dataobjects/KLMSectorArrayIndex.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
-//#include <klm/dataobjects/KLMElementNumberDefinitions.h>
 
 /* Belle 2 headers. */
 #include <analysis/dataobjects/ParticleList.h>
@@ -36,8 +33,6 @@
 /* ROOT headers. */
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TLine.h>
-#include <TText.h>
 #include <TTree.h>
 #include <TFile.h>
 
@@ -126,7 +121,7 @@ namespace Belle2 {
 
 
     /** Trigger Information */
-    StoreObjPtr<SoftwareTriggerResult> trigResult;
+    StoreObjPtr<SoftwareTriggerResult> m_softwareTriggerResult;
 
     /** ExtHits. */
     StoreArray<ExtHit> m_extHits;
@@ -134,8 +129,6 @@ namespace Belle2 {
     /** Muons. */
     StoreObjPtr<ParticleList> m_MuonList;
 
-    /** Debug mode. */
-    bool m_Debug;
 
     /*******************************************/
     /*******************************************/
@@ -174,21 +167,6 @@ namespace Belle2 {
     /** Directory for KLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryName;
 
-
-    /*******************************************/
-    /*******************************************/
-    //ROOT AESTHETIC RELATED
-    /*******************************************/
-    /*******************************************/
-
-    /** TLine for background region in 2d hits histograms. */
-    TLine m_2DHitsLine;
-
-    /** TLine for boundary in plane histograms. */
-    TLine m_PlaneLine;
-
-    /** TText for names in plane histograms. */
-    TText m_PlaneText;
 
 
     /*******************************************/
@@ -234,28 +212,13 @@ namespace Belle2 {
     /** Matched over Extrapolated hits in sector for EKLM */
     TH1F* m_PlaneEfficienciesEKLMSector;
 
-    /** Number of hits per channel. */
-    TH1F** m_MatchedHitsInPlane[
-      EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
-      BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
-    /** Number of hits per channel. */
-    TH1F** m_AllExtHitsInPlane[
-      EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
-      BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
-    /** Number of hits per channel. */
-    TH1F** m_PlaneEfficienciesSector[
-      EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
-      BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
-
     /*******************************************/
     /*******************************************/
     //OTHER USEFUL VARIABLES
     /*******************************************/
     /*******************************************/
 
-
     /** Minimal number of processed events for error messages. */
-    //is related to m_MinProcessedEventsForMessagesInput
     double m_MinProcessedEventsForMessages;
 
     /** Number of channel hit histograms per sector for BKLM. */
@@ -266,14 +229,10 @@ namespace Belle2 {
 
 
     /** Number of layers/planes for BKLM. */
-    const int m_PlaneNumBKLM = 240; //15 layers per octant, forward and backward
+    const int m_PlaneNumBKLM = BKLMElementNumbers::getMaximalLayerGlobalNumber(); //15 layers per octant, forward and backward
 
     /** Number of layers/planes for EKLM. */
-    //TODO: check if this is 13 or 14 layers per octant
-    const int m_PlaneNumEKLM = 208;//12 or 14 layers per quadrant, forward and backward
-
-    /** Matched strip. */
-    int m_MatchedStrip;
+    const int m_PlaneNumEKLM = EKLMElementNumbers::getMaximalPlaneGlobalNumber();//12 or 14 layers per quadrant, forward and backward
 
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
@@ -359,28 +318,6 @@ namespace Belle2 {
      * for a given event.
      */
     bool triggerFlag();
-
-    /*******************************************/
-    //DEBUG RELATED
-    /*******************************************/
-    /** Matching data file name */
-    std::string m_MatchingFileName;
-
-    /** Matching data file. */
-    TFile* m_MatchingFile;
-
-    /** Matching data tree. */
-    TTree* m_MatchingTree;
-
-    /** Matching hit data. */
-    struct HitData m_MatchingHitData;
-
-
-
-    /*******************************************/
-    //EFFICIENCY ALGORITHM FUNCTIONS
-    /*******************************************/
-
 
 
 

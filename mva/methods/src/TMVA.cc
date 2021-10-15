@@ -518,6 +518,7 @@ namespace Belle2 {
 
     std::vector<std::vector<float>> TMVAExpertMulticlass::applyMulticlass(Dataset& test_data) const
     {
+
       std::vector<std::vector<float>> probabilities(test_data.getNumberOfEvents());
 
       for (unsigned int iEvent = 0; iEvent < test_data.getNumberOfEvents(); ++iEvent) {

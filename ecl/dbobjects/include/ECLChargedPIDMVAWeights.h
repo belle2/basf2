@@ -131,6 +131,7 @@ namespace Belle2 {
      * store the MVA weight files (one for each category) into the payload.
      *
      * @param filepaths a vector of xml (root) file paths for all (theta, p, charge) categories.
+     * @param separate_deuteron_response a vector of bools that specifies whether 5 (no deuteron) or 6 BDT responses are expected.
      * @param transformations a vector of BDTResponseTransformMode for all (theta, p, charge) categories.
      * @param pdfs a vector of vectors of unsigned maps with TF1 pdfs for all charged hypothesis
               for all bdt response values for all (theta, p, charge) categories.
@@ -142,6 +143,7 @@ namespace Belle2 {
      *        Used to check consistency of the xml vector indexing w/ the linearised TH3 category map.
      */
     void storeMVAWeights(std::vector<std::string>& filepaths,
+                         std::vector<bool>& separate_deuteron_response,
                          std::vector<BDTResponseTransformMode>& transformations,
                          std::vector<std::vector<std::unordered_map<unsigned int, TF1>>>& pdfs,
                          std::unordered_map<unsigned int, std::vector<std::unordered_map<unsigned int, TH1F>>>& cdfs,
@@ -179,6 +181,7 @@ namespace Belle2 {
         m_weights.push_back(ss.str());
 
         m_bdtResponseTransformModes.push_back(transformations[idx]);
+        m_separate_deuteron_response.push_back(separate_deuteron_response[idx]);
         m_pdfs.push_back(pdfs[idx]);
 
         // These are optional based on which transformation mode is used.
@@ -257,6 +260,14 @@ namespace Belle2 {
     const float getLogTransformOffset() const
     {
       return m_log_transform_offset.GetVal();
+    }
+
+    /**
+    * returns true if 6 BDT response are expected, false if 5 (no deuteron).
+    */
+    const bool hasSeparateDeuteronResponse(const unsigned int linearBinIndex) const
+    {
+      return m_separate_deuteron_response.at(linearBinIndex);
     }
 
     /**
@@ -343,6 +354,11 @@ namespace Belle2 {
      * Stores which transformation mode to apply to the bdt responses.
      */
     std::vector<BDTResponseTransformMode> m_bdtResponseTransformModes;
+
+    /**
+     * Stores whether 5 (no deuteron) or 6 BDT response are expected for the particular bin;
+     */
+    std::vector<bool> m_separate_deuteron_response;
 
     /**
      * A vector of vectors of unodered maps. The outer vector corresponds to the phasespace region. The inner vector to the N return values of the BDT.

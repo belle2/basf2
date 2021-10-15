@@ -21,4 +21,7 @@
 #pragma link C++ class Belle2::MVA::TrivialOptions-;
 #pragma link C++ class Belle2::MVA::ReweighterOptions-;
 
+#pragma link C++ class Belle2::MVA::TMVAExpertMulticlass-;
+#pragma link C++ class Belle2::MVA::TMVAExpert-;
+
 #endif

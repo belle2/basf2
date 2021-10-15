@@ -58,12 +58,14 @@ DIGITS_OBJECTS = (
     'ARICHDigits',
     'CDCHits',
     'ECLDigits',
+    'ECLCalDigits',
     'ECLDsps',
     'KLMDigits',
     'PXDDigits',
     'SVDEventInfoSim',
     'SVDShaperDigits',
     'TOPDigits'
+    'TOPRawDigits',
 )
 
 

@@ -33,6 +33,9 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <ecl/dbobjects/ECLChargedPIDMVAWeights.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
 
 
 namespace Belle2 {

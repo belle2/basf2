@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: M Hohmann                                                *
+ * Contributors:                                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -41,6 +41,7 @@ namespace Belle2 {
       theta = 7,
       phi = 8,
       cosTheta = 9,
+      fractionOfShowerEnergy = 10,
     };
 
 
@@ -105,6 +106,35 @@ namespace Belle2 {
       return shower->getAbsZernikeMoment(n, m);
     }
 
+
+    double getShowerHadronIntensity(const Particle* particle)
+    {
+      ECLShower* shower = getECLShowerFromParticle(particle);
+      if (!shower) return std::numeric_limits<float>::quiet_NaN();
+      return shower->getShowerHadronIntensity();
+    }
+
+    double getShowerNumberOfHadronDigits(const Particle* particle)
+    {
+      ECLShower* shower = getECLShowerFromParticle(particle);
+      if (!shower) return std::numeric_limits<float>::quiet_NaN();
+      return shower->getNumberOfHadronDigits();
+    }
+
+    double getShowerNumberOfCrystalsForEnergy(const Particle* particle)
+    {
+      ECLShower* shower = getECLShowerFromParticle(particle);
+      if (!shower) return std::numeric_limits<float>::quiet_NaN();
+      return shower->getNumberOfCrystalsForEnergy();
+    }
+
+    double getShowerNominalNumberOfCrystalsForEnergy(const Particle* particle)
+    {
+      ECLShower* shower = getECLShowerFromParticle(particle);
+      if (!shower) return std::numeric_limits<float>::quiet_NaN();
+      return shower->getNominalNumberOfCrystalsForEnergy();
+    }
+
     double getDigitVariable(const Particle* particle, const std::vector<double>& arguments, const PSDVarType varType)
     {
       if (arguments.size() != 1) {
@@ -128,6 +158,7 @@ namespace Belle2 {
 
       if (varType == PSDVarType::hadronEnergy) return caldigit->getTwoComponentHadronEnergy();
       if (varType == PSDVarType::onlineEnergy) return caldigit->getEnergy();
+      if (varType == PSDVarType::fractionOfShowerEnergy) return caldigit-> getEnergy() / shower->getEnergy();
       if (varType == PSDVarType::hadronEnergyFraction) return caldigit->getTwoComponentHadronEnergy()  / digitEnergy;
       if (varType == PSDVarType::digitWeight) return relatedDigits.weight(next);
       if (varType == PSDVarType::digitFitType) return caldigit->getTwoComponentFitType();
@@ -199,15 +230,34 @@ namespace Belle2 {
       return getDigitVariable(particle, arguments, PSDVarType::phi);
     }
 
+    // returns the digitFitType of the ith most energetic ECL crystal
+    double getFractionOfShowerEnergy(const Particle* particle, const std::vector<double>& arguments)
+    {
+      return getDigitVariable(particle, arguments, PSDVarType::fractionOfShowerEnergy);
+    }
 
     VARIABLE_GROUP("ECL Charged PID Expert Variables (cDST)");
 
+    // Info from shower
     REGISTER_VARIABLE("absZernikeMoment(n, m)", getAbsZernikeMomentNM,
                       "[eclChargedPIDExpert] the absolute value of zernike moment nm. Requires n <= 6 and m <= n.");
+    REGISTER_VARIABLE("getShowerHadronIntensity", getShowerHadronIntensity,
+                      "[eclChargedPIDExpert] gets the hadron intensity of the shower associated with the particle.");
+    REGISTER_VARIABLE("getShowerNumberOfHadronDigits", getShowerNumberOfHadronDigits,
+                      "[eclChargedPIDExpert] gets the number of hadron digits of the shower associated with the particle.");
+    REGISTER_VARIABLE("getShowerNumberOfCrystalsForEnergy", getShowerNumberOfCrystalsForEnergy,
+                      "[eclChargedPIDExpert] gets the number of crystals used for energy of the shower associated with the particle.");
+    REGISTER_VARIABLE("getShowerNominalNumberOfCrystalsForEnergy", getShowerNominalNumberOfCrystalsForEnergy,
+                      "[eclChargedPIDExpert] gets the nominal number of crystals used for energy of the shower associated with the particle.");
+
+
+    //ECLCalDigit info
     REGISTER_VARIABLE("hadronEnergy(i)", getHadronEnergy,
                       "[eclChargedPIDExpert] the hadron energy of the ith most energetic crystal in the shower.");
     REGISTER_VARIABLE("onlineEnergy(i)", getOnlineEnergy,
                       "[eclChargedPIDExpert] the online energy of the ith most energetic crystal in the shower.");
+    REGISTER_VARIABLE("fractionOfShowerEnergy(i)", getFractionOfShowerEnergy,
+                      "[eclChargedPIDExpert] the fraction of total shower energy in the digit ith digit.");
     REGISTER_VARIABLE("hadronEnergyFraction(i)", getHadronEnergyFraction,
                       "[eclChargedPIDExpert] the hadron energy fraction of the ith most energetic crystal in the shower.");
     REGISTER_VARIABLE("digitWeight(i)", getDigitWeight,
@@ -224,4 +274,3 @@ namespace Belle2 {
                       "[eclChargedPIDExpert] phi of the vector from the ith most energetic crystal in the shower to the shower center.");
   }
 }
-

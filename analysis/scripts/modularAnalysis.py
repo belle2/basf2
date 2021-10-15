@@ -3268,6 +3268,8 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     from ROOT import Belle2
     from variables import variables as vm
 
+    import os
+
     TrainingMode = Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode
     Const = Belle2.Const
 
@@ -3324,11 +3326,6 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     vm.addAlias("__event__", "evtNum")
     iDet = 0
     for detID in Const.PIDDetectors.c_set:
-
-        # At the moment, SVD is excluded.
-        if detID == Const.EDetector.SVD:
-            B2WARNING("The ChargedPidMVA training currently does not include the SVD.")
-            continue
 
         detName = Const.parseDetectors(detID)
 

@@ -15,7 +15,12 @@
 
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/geometry/ECLNeighbours.h>
+
+#include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
+
 #include <framework/geometry/B2Vector3.h>
 #include <mva/interface/Interface.h>
 #include <mva/methods/TMVA.h>
@@ -30,7 +35,7 @@ using namespace ECL;
 
 REG_MODULE(ECLChargedPIDMVA)
 
-ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module(), m_variables(194, -999)
+ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module(), m_variables(113, -999)
 {
   setDescription("The module implements charged particle identification using ECL-related observables via a multiclass BDT. For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the BDT which is stored in a conditions database payload. The BDT output variables are then used to construct a liklihood from pdfs also stored in the payload. The liklihood is then stored in the ECLPidLikelihood object.");
 
@@ -155,16 +160,25 @@ void ECLChargedPIDMVAModule::event()
 
 
     // basic variables
-    m_dataset->m_input[0] = mostEnergeticShower->getE1oE9();
-    m_dataset->m_input[1] = mostEnergeticShower->getE9oE21();
-    m_dataset->m_input[2] = maxEnergy;
-    m_dataset->m_input[3] = maxEnergy / p;
+    m_dataset->m_input[0] = maxEnergy;
+    m_dataset->m_input[1] = maxEnergy / p;
+    m_dataset->m_input[2] = mostEnergeticShower->getE1oE9();
+    m_dataset->m_input[3] = mostEnergeticShower->getE9oE21();
     m_dataset->m_input[4] = mostEnergeticShower->getTrkDepth();
     m_dataset->m_input[5] = mostEnergeticShower->getLateralEnergy();
 
 
+    // REDUCED VARIABLE SET
+    //   m_dataset->m_input[0] = maxEnergy;
+    m_dataset->m_input[0] = maxEnergy / p;
+    m_dataset->m_input[1] = mostEnergeticShower->getE1oE9();
+    m_dataset->m_input[2] = mostEnergeticShower->getE9oE21();
+    m_dataset->m_input[3] = mostEnergeticShower->getTrkDepth();
+    m_dataset->m_input[4] = mostEnergeticShower->getLateralEnergy();
+
+
     //Zernike moments
-    int offset = 6;
+    int offset = 5;
     for (unsigned int n = 0; n <= 6; n++) {
       for (unsigned int m = 0; m <= n; m++) {
         m_dataset->m_input[(n * (n + 1)) / 2 + m + offset] =  mostEnergeticShower->getAbsZernikeMoment(n, m);
@@ -187,18 +201,36 @@ void ECLChargedPIDMVAModule::event()
 
       //exclude digits without waveforms
       const double digitChi2 = caldigit->getTwoComponentChi2();
-      if (digitChi2 < 0)  continue;
+      ECLDsp::TwoComponentFitType digitFitType = caldigit->getTwoComponentFitType();
 
-      ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
+      if (!digitChi2) {
+        std::cout << "digitChi2 evaluates to False" << std::endl;
+      }
+
+      if (!digitFitType) {
+        std::cout << "digitFitType evaluates to False" << std::endl;
+      }
+
+      std::cout << "-1 " << std::endl;
+      std::cout << "Test: " << digitChi2 << "  " << caldigit->getTwoComponentHadronEnergy() << std::endl;
+
+      if (digitChi2 < 0)  continue;
+      std::cout << "0 : " <<  caldigit->getTwoComponentSavedChi2(digitFitType) << std::endl;
+      std::cout << "1 : " <<  digitChi2 << std::endl;
+
+//       ECLDsp::TwoComponentFitType digitFitType = caldigit->getTwoComponentFitType();
 
       //exclude digits digits with poor chi2
-      if (digitFitType1 == ECLDsp::poorChi2) continue;
+      std::cout << "2" << std::endl;
+      if (digitFitType == ECLDsp::poorChi2) continue;
 
       //exclude digits with diode-crossing fits
-      if (digitFitType1 == ECLDsp::photonDiodeCrossing) continue;
+      if (digitFitType == ECLDsp::photonDiodeCrossing) continue;
+      std::cout << "3" << std::endl;
 
       EnergyToSort.emplace_back(caldigit->getTwoComponentTotalEnergy(), iRel);
     }
+    std::cout << "Finished getting energy vector" << std::endl;
 
     //sorting by energy
     std::sort(EnergyToSort.begin(), EnergyToSort.end(), std::greater<>());
@@ -212,11 +244,11 @@ void ECLChargedPIDMVAModule::event()
     showerPosition.SetMagThetaPhi(showerR, showerTheta, showerPhi);
 
 
-    for (unsigned int digit = 0; digit < 20; ++digit) {
+    for (unsigned int digit = 0; digit < 10; ++digit) {
       if (digit < EnergyToSort.size()) {
         const auto [digitEnergy, next] = EnergyToSort[digit];
         const auto caldigit = relatedDigits.object(next);
-        ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
+        ECLDsp::TwoComponentFitType digitFitType = caldigit->getTwoComponentFitType();
         const int cellId = caldigit->getCellId();
         B2Vector3D calDigitPosition = geometry->GetCrystalPos(cellId - 1);
         TVector3 tempP = showerPosition - calDigitPosition;
@@ -225,7 +257,7 @@ void ECLChargedPIDMVAModule::event()
         m_dataset->m_input[offset + 1]  = caldigit->getEnergy();
         m_dataset->m_input[offset + 2]  = m_dataset->m_input[offset] / digitEnergy;
         m_dataset->m_input[offset + 3]  = relatedDigits.weight(next);
-        m_dataset->m_input[offset + 4]  = digitFitType1;
+        m_dataset->m_input[offset + 4]  = digitFitType;
         m_dataset->m_input[offset + 5]  = tempP.Mag();
         m_dataset->m_input[offset + 6]  = tempP.CosTheta();
         m_dataset->m_input[offset + 7]  = tempP.Phi();
@@ -244,12 +276,15 @@ void ECLChargedPIDMVAModule::event()
 
     //get the MVA response values
     unsigned int linearBinIndex = (*m_mvaWeights.get())->getLinearisedBinIndex(showerTheta, p, charge);
+    B2INFO("Bin index, theta, p, charge: " << linearBinIndex << "  " << showerTheta << "  " << p << "  " << charge << " \n");
     // We deal w/ a SingleDataset, so 0 is the only existing component by construction.
     std::vector<float> scores = m_experts.at(linearBinIndex)->applyMulticlass(*m_dataset)[0];
+
     B2INFO("Scores:");
     for (auto score : scores) {
       B2INFO(score);
     }
+
     // log transform the scores
     for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
       scores[iResponse] = logTransformation(scores[iResponse]);
@@ -266,8 +301,9 @@ void ECLChargedPIDMVAModule::event()
       unsigned int hypo_idx = hypo.getIndex();
       auto absPdgId = abs(hypo.getPDGCode());
 
-      // TODO - avoid this duplication if no further transformations are booked,
-      std::vector<float> transformed_scores = scores;
+      // copy the scores so they arent transformed in place
+      std::vector<float> transformed_scores;
+      transformed_scores = scores;
 
       // perform extra transformations if they are booked
       if ((*(*m_mvaWeights.get())->getTransformMode(linearBinIndex) ==
@@ -293,19 +329,25 @@ void ECLChargedPIDMVAModule::event()
         B2INFO(score);
       }
 
-
       // get the pdf values for each response value
       float logL = 0.0;
       B2INFO("LogL");
       for (unsigned int iResponse = 0; iResponse < transformed_scores.size(); iResponse++) {
+
+
+//         //TEMP TEST
+//         if (hypo_idx != iResponse) {continue;}
+
         double xmin, xmax;
         (*m_mvaWeights.get())->getPDF(absPdgId, iResponse, linearBinIndex)->GetRange(xmin, xmax);
         // kick the response back into the range of the PDF (alternatively consider logL = std::numeric_limits<float>::min() if outside range)
-        if (transformed_scores[iResponse] < xmin) transformed_scores[iResponse] = xmin + 1e-5;
-        if (transformed_scores[iResponse] > xmax) transformed_scores[iResponse] = xmax - 1e-5;
-        float pdfval = (*m_mvaWeights.get())->getPDF(absPdgId, iResponse, linearBinIndex)->Eval(transformed_scores[iResponse]);
+        float transformed_score_copy = transformed_scores[iResponse];
+        if (transformed_score_copy < xmin) transformed_score_copy = xmin + 1e-5;
+        if (transformed_score_copy > xmax) transformed_score_copy = xmax - 1e-5;
+
+        float pdfval = (*m_mvaWeights.get())->getPDF(absPdgId, iResponse, linearBinIndex)->Eval(transformed_score_copy);
         // dont take a log of inf or 0
-        B2INFO("Raw pdfval: " << pdfval << " Max, Response, Min: " << xmin << ", " << transformed_scores[iResponse] << ", " << xmax);
+        B2INFO("Raw pdfval: " << pdfval << " Min, Response, Max: " << xmin << ", " << transformed_score_copy << ", " << xmax);
         pdfval = std::max(pdfval , std::numeric_limits<float>::min());
         logL += (std::isnormal(pdfval) && pdfval > 0) ? std::log(pdfval) : c_dummyLogL;
         B2INFO(logL << "  " << pdfval << "  " << absPdgId << "  " << iResponse);

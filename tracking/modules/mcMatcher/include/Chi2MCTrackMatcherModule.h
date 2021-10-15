@@ -22,14 +22,14 @@ namespace Belle2 {
   /**
    * Monte Carlo matcher using the helix parameters for matching by chi2-method
    */
-  class Chi2McMatcherModule : public Module {
+  class Chi2MCTrackMatcherModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    Chi2McMatcherModule();
+    Chi2MCTrackMatcherModule();
 
 
     /** Register input and output data */

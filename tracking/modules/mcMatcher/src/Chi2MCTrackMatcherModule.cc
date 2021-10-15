@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/mcMatcher/Chi2McMatcherModule.h>
+#include <tracking/modules/mcMatcher/Chi2MCTrackMatcherModule.h>
 
 // datastore types
 #include <framework/datastore/StoreArray.h>
@@ -23,12 +23,12 @@
 
 using namespace Belle2;
 
-REG_MODULE(Chi2McMatcher)
+REG_MODULE(Chi2MCTrackMatcher)
 
 
 
 // Constructor
-Chi2McMatcherModule::Chi2McMatcherModule() : Module()
+Chi2MCTrackMatcherModule::Chi2MCTrackMatcherModule() : Module()
 {
   // Set module properties
   setDescription(R"DOC(Monte Carlo matcher using the helix parameters for matching by chi2-method)DOC");
@@ -51,7 +51,7 @@ Chi2McMatcherModule::Chi2McMatcherModule() : Module()
            false);
 }
 
-void Chi2McMatcherModule::initialize()
+void Chi2MCTrackMatcherModule::initialize()
 {
   // Check if there are MC Particles
   m_MCParticles.isRequired();
@@ -59,7 +59,7 @@ void Chi2McMatcherModule::initialize()
   m_Tracks.registerRelationTo(m_MCParticles);
 }
 
-void Chi2McMatcherModule::event()
+void Chi2MCTrackMatcherModule::event()
 {
 
   // suppress the ROOT "matrix is singular" error message

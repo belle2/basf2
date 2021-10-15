@@ -19,9 +19,9 @@ Variables
    If ``maskName`` argument is not specified in the ROE-related metavariables, it will default to ``all`` automatically, 
    but in case of metavariables with many arguments user will be required to call it explicitly, e.g. ``nROE_Charged(all, 321)``. 
  * Added ``v0DaughterNRemovedHits`` which returns the number of track hits removed in V0Finder.
- * Added ``hadronicSplitOffSuppression`` which returns the output of an MVA that uses shower-related variables to distinguish
+ * Added `hadronicSplitOffSuppression` which returns the output of an MVA that uses shower-related variables to distinguish
    between true photons and hadronic split-offs.
- * The variable ``beamBackgroundProbabilityMVA`` now has a new name: ``beamBackgroundSuppression``. The weight files for this 
+ * The variable ``beamBackgroundProbabilityMVA`` now has a new name: `beamBackgroundSuppression`. The weight files for this 
    MVA have also been updated due to a change in training samples used. 
 
 

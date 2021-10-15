@@ -26,6 +26,7 @@ def loadStdDiLeptons(persistent=True, path=None):
 
     loadStdLooseJpsi2mumu(persistent, path)
     loadStdLooseJpsi2ee(persistent, path)
+    loadStdLooseJpsi2ee_noTOP(persistent, path)
     loadStdLoosePsi2s2mumu(persistent, path)
     loadStdLoosePsi2s2ee(persistent, path)
     loadStdPsi2s2lepton(persistent, path)
@@ -69,6 +70,28 @@ def loadStdJpsiToee(persistent=True, path=None):
     ma.reconstructDecay(
         'J/psi:ee -> e+:bremCorr e-:bremCorr',
         '2.8 < M < 3.4 and daughter(0, electronID) > 0.01 or daughter(1, electronID) > 0.01',
+        2,
+        persistent,
+        path)
+    return 'J/psi:ee'
+
+
+def loadStdJpsiToee_noTOP(persistent=True, path=None):
+    """
+    Load the 'J/psi:ee' list from 'e+:bremCorr e-:bremCorr', with :math:`2.8 < M < 3.4~GeV` with electronID_noTOP>0.01
+
+    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
+    @param path         modules are added to this path
+    """
+
+    ma.fillParticleList('e+:withCuts', cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance", path=path)
+    ma.fillParticleList(decayString='gamma:e+', cut="E < 1.0", path=path)
+    ma.correctBrems(outputList='e+:bremCorr', inputList='e+:withCuts', gammaList='gamma:e+', multiplePhotons=False,
+                    usePhotonOnlyOnce=True, writeOut=True, path=path)
+
+    ma.reconstructDecay(
+        'J/psi:ee -> e+:bremCorr e-:bremCorr',
+        '2.8 < M < 3.4 and daughter(0, electronID_noTOP) > 0.01 or daughter(1, electronID_noTOP) > 0.01',
         2,
         persistent,
         path)

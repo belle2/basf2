@@ -32,7 +32,7 @@ Chi2McMatcherModule::Chi2McMatcherModule() : Module()
 {
   // Set module properties
   setDescription(R"DOC(Monte Carlo matcher using the helix parameters for matching by chi2-method)DOC");
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   // set module parameters
   std::vector<double> defaultCutOffs(6);
   defaultCutOffs[0] = 128024;
@@ -45,21 +45,18 @@ Chi2McMatcherModule::Chi2McMatcherModule() : Module()
            m_param_CutOffs,
            "Defines the Cut Off values for each charged particle. pdg order [11,13,211,2212,321,1000010020]",
            defaultCutOffs);
-  bool defaultLinalg = 0;
   addParam("linalg",
            m_param_linalg,
-           "Parameter to switch between ROOT and Eigen, to invert the covariance matrix. 0: ROOT is used; 1: Eigen is used",
-           defaultLinalg);
+           "Parameter to switch between ROOT and Eigen, to invert the covariance matrix. false: ROOT is used; true: Eigen is used",
+           false);
 }
 
 void Chi2McMatcherModule::initialize()
 {
   // Check if there are MC Particles
-  //StoreArray<Track> Tracks;
-  //StoreArray<MCParticle> MCParticles;
-  MCParticles.isRequired();
-  Tracks.isRequired();
-  Tracks.registerRelationTo(MCParticles);
+  m_MCParticles.isRequired();
+  m_Tracks.isRequired();
+  m_Tracks.registerRelationTo(m_MCParticles);
 }
 
 void Chi2McMatcherModule::event()
@@ -69,14 +66,11 @@ void Chi2McMatcherModule::event()
   auto default_gErrorIgnoreLevel = gErrorIgnoreLevel;
   gErrorIgnoreLevel = 5000;
 
-  //StoreArray<Track> Tracks;
-  //StoreArray<MCParticle> MCParticles;
-
   // get StoreArray length
-  int nTracks = Tracks.getEntries();
-  int nMCParticles = MCParticles.getEntries();
+  int nTracks = m_Tracks.getEntries();
+  int nMCParticles = m_MCParticles.getEntries();
 
-  // check if there are Tracks and MCParticles to match to
+  // check if there are m_Tracks and m_MCParticles to match to
   if (not nMCParticles or not nTracks) {
     // Cannot perfom matching
     return;
@@ -84,7 +78,7 @@ void Chi2McMatcherModule::event()
 
   // compare all tracks with all mcParticles in event
   for (int it = 0 ; it < nTracks; ++it) {
-    auto track = Tracks[it];
+    auto track = m_Tracks[it];
 
     // test for existing relations
     if (track->getRelated<MCParticle>()) {
@@ -95,9 +89,9 @@ void Chi2McMatcherModule::event()
     int ip_min = -1;
     double chi2Min = std::numeric_limits<double>::infinity();
 
-    // loop over MCParticles and calculate Chi2 for each track mcparticle pair, to fine minimal chi2
+    // loop over m_MCParticles and calculate Chi2 for each track mcparticle pair, to fine minimal chi2
     for (int ip = 0; ip < nMCParticles; ++ip) {
-      auto mcParticle = MCParticles[ip];
+      auto mcParticle = m_MCParticles[ip];
       // Check if current particle is a charged stable particle
       const Const::ParticleType mcParticleType(std::abs(mcParticle->getPDG()));
       if (not Const::chargedStableSet.contains(mcParticleType)) {
@@ -175,7 +169,7 @@ void Chi2McMatcherModule::event()
     double cutOff = 0;
     // fill cut off with value
     // find PDG for mcParticle with minimal chi2, because this determines individual cutOff
-    int mcMinPDG = abs(MCParticles[ip_min]->getPDG());
+    int mcMinPDG = abs(m_MCParticles[ip_min]->getPDG());
 
     if (mcMinPDG == Belle2::Const::electron.getPDGCode()) {
       cutOff = m_param_CutOffs[0];
@@ -194,7 +188,7 @@ void Chi2McMatcherModule::event()
       continue;
     }
     if (chi2Min < cutOff) {
-      Tracks[it]->addRelationTo(MCParticles[ip_min]);
+      m_Tracks[it]->addRelationTo(m_MCParticles[ip_min]);
     }
   }
   // reset ROOT Error Level to default

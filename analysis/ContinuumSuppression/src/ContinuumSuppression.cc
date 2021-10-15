@@ -25,7 +25,7 @@ namespace Belle2 {
   void addContinuumSuppression(const Particle* particle, const std::string& maskName)
   {
     // Output
-    StoreArray<ContinuumSuppression> qqArray;
+    StoreArray<ContinuumSuppression> qqArray(maskName);
     // Create ContinuumSuppression object
     ContinuumSuppression* qqVars = qqArray.appendNew();
 
@@ -96,12 +96,6 @@ namespace Belle2 {
 
     if (roe) {
 
-      if (!roe->isBuiltWithMostLikely()) {
-        B2ERROR("The ROE was not created with the most-likely particle lists."
-                "Did you use your own input particle lists?"
-                "The continuum suppression builder does not work with this setting.");
-      }
-
       // Charged tracks
       //
       std::vector<const Particle*> chargedROEParticles = roe->getChargedParticles(maskName);
@@ -111,21 +105,15 @@ namespace Belle2 {
         // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
         // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
 
-        // Allow only particles with most probable hypothesis
-        if (chargedROEParticle->isMostLikely()) {
+        TLorentzVector p_cms = T.rotateLabToCms() * chargedROEParticle->get4Vector();
+        p3_cms_all.push_back(p_cms.Vect());
+        p3_cms_roe.push_back(p_cms.Vect());
+        p3_cms_q_roe.emplace_back(p_cms.Vect(), chargedROEParticle->getCharge());
+        p_cms_missA -= p_cms;
+        p_cms_missB -= p_cms;
+        et[0] += p_cms.Perp();
+        et[1] += p_cms.Perp();
 
-          TLorentzVector p_cms = T.rotateLabToCms() * chargedROEParticle->get4Vector();
-
-          p3_cms_all.push_back(p_cms.Vect());
-          p3_cms_roe.push_back(p_cms.Vect());
-
-          p3_cms_q_roe.emplace_back(p_cms.Vect(), chargedROEParticle->getCharge());
-
-          p_cms_missA -= p_cms;
-          p_cms_missB -= p_cms;
-          et[0] += p_cms.Perp();
-          et[1] += p_cms.Perp();
-        }
       }
 
       // ECLCluster

@@ -15,7 +15,9 @@ using namespace Belle2;
 
 float EventExtraInfo::getExtraInfo(const std::string& name) const
 {
-  return eventExtraInfo.at(name);
+  if (hasExtraInfo(name)) return eventExtraInfo.at(name);
+  else throw std::runtime_error("EventExtraInfo::getExtraInfo: You try to access the EventExtraInfo '" + name +
+                                  "', but it doesn't exist.");
 }
 
 bool EventExtraInfo::hasExtraInfo(const std::string& name) const

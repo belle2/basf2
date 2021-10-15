@@ -16,6 +16,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventT0.h>
 
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 class TTree ;
 
 namespace Belle2 {
@@ -68,6 +69,8 @@ namespace Belle2 {
     std::unique_ptr< Belle2::ECL::ECLChannelMapper> m_crystalMapper =
       std::make_unique<Belle2::ECL::ECLChannelMapper>();
 
+
+    StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
     /**
      * StoreObjPtr for T0. The event t0 class has an overall event t0 so use that as presumably some code has been run to determine what the best t0 is to use.
      */
@@ -127,6 +130,7 @@ namespace Belle2 {
     double m_looseTrkD0 ;   /**< Loose track d0 minimum cut*/
     double m_tightTrkD0 ;   /**< Tight track d0 minimum cut*/
 
+    bool skipTrgSel; /**< flag to skip the trigger skim selection in the module */
 
   } ;
 }

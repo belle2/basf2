@@ -118,11 +118,12 @@ void Chi2McMatcherModule::event()
       // generate helix for current mc particle
       double charge_sign = 1;
       if (mcParticle->getCharge() < 0) { charge_sign = -1;}
-      auto b_field = BFieldManager::getField(mcParticle->getVertex()).Z() / Belle2::Unit::T;
+      UncertainHelix helix = trackFitResult->getUncertainHelix();
+      auto b_field = BFieldManager::getField(helix.getPerigee()).Z() / Belle2::Unit::T;
       auto mcParticleHelix = Helix(mcParticle->getVertex(), mcParticle->getMomentum(), charge_sign, b_field);
 
-      // initialize variable for current chi2
-      double chi2Cur = std::numeric_limits<double>::infinity();
+      // initialize the curent chi2
+      double chi2Cur;
 
       // Check which linear algebra system should be used and calculate chi2Cur
       if (not m_param_linalg) {

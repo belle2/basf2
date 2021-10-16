@@ -38,6 +38,9 @@ namespace Belle2 {
      * Also at the end function all m_histogramParameterChanges should be processed via the ProcessHistogramParameterChange function. */
     virtual void defineHisto() override;
 
+    /** function called when the module is run on HLT */
+    void runningOnHLT() {m_hltDQM = true;};
+
     /** Function to create TH1F and add it to the vector of histograms (m_histograms).
      * All histograms in the module should be created via this function (or following Create- functions). */
     virtual TH1F* Create(std::string name, std::string title, int nbinsx, double xlow, double xup, std::string xTitle,
@@ -161,6 +164,7 @@ namespace Belle2 {
     std::vector<TH1*> m_histograms;
     /** True if the defineHisto() was called. If false, the event() function does nothing. */
     bool histogramsDefined = false;
+    bool m_hltDQM = false;
 
     /** Used for changing parameters of histograms via the ProcessHistogramParameterChange function.  */
     std::vector<std::tuple<std::string, std::string, std::string>> m_histogramParameterChanges;

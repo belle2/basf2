@@ -229,26 +229,25 @@ void DQMHistoModuleBase::DefineUBResidualsVXD()
   auto factory = Factory(this);
   factory.xAxisDefault(residualU).yAxisDefault(residualV).zTitleDefault("counts");
 
-  m_UBResidualsPXD = factory.CreateTH2F("UBResidualsPXD", "Unbiased residuals for PXD");
+  if (! m_hltDQM)
+    m_UBResidualsPXD = factory.CreateTH2F("UBResidualsPXD", "Unbiased residuals for PXD");
   m_UBResidualsSVD = factory.CreateTH2F("UBResidualsSVD", "Unbiased residuals for SVD");
 
   factory.xAxisDefault(residualU).yTitleDefault("counts");
 
-  m_UBResidualsPXDU = factory.CreateTH1F("UBResidualsPXDU", "Unbiased residuals in U for PXD");
+  if (! m_hltDQM)
+    m_UBResidualsPXDU = factory.CreateTH1F("UBResidualsPXDU", "Unbiased residuals in U for PXD");
   m_UBResidualsSVDU = factory.CreateTH1F("UBResidualsSVDU", "Unbiased residuals in U for SVD");
 
   factory.xAxisDefault(residualV);
 
-  m_UBResidualsPXDV = factory.CreateTH1F("UBResidualsPXDV", "Unbiased residuals in V for PXD");
+  if (! m_hltDQM)
+    m_UBResidualsPXDV = factory.CreateTH1F("UBResidualsPXDV", "Unbiased residuals in V for PXD");
   m_UBResidualsSVDV = factory.CreateTH1F("UBResidualsSVDV", "Unbiased residuals in V for SVD");
 }
 
 void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
 {
-  TDirectory* originalDirectory = gDirectory;
-
-  TDirectory* helixParameters = originalDirectory->mkdir("HelixPars");
-  TDirectory* helixCorrelations = originalDirectory->mkdir("HelixCorrelations");
 
   int iZ0Range = 200;
   double fZ0Range = 10.0;     // Half range in cm
@@ -272,33 +271,28 @@ void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
 
   auto factory = Factory(this);
 
-  helixParameters->cd();
-
   factory.yTitleDefault("Arb. Units");
 
-  m_Z0 =        factory.xAxis(Z0).CreateTH1F("Z0", "z0 - the z coordinate of the perigee (beam spot position)");
-  m_D0 =        factory.xAxis(D0).CreateTH1F("D0", "d0 - the signed distance to the IP in the r-phi plane");
-  m_Phi =       factory.xAxis(phi).CreateTH1F("Phi",
+  m_Z0 =        factory.xAxis(Z0).CreateTH1F("HelixZ0", "z0 - the z coordinate of the perigee (beam spot position)");
+  m_D0 =        factory.xAxis(D0).CreateTH1F("HelixD0", "d0 - the signed distance to the IP in the r-phi plane");
+  m_Phi =       factory.xAxis(phi).CreateTH1F("HelixPhi",
                                               "Phi - angle of the transverse momentum in the r-phi plane, with CDF naming convention");
-  m_Omega =     factory.xAxis(omega).CreateTH1F("Omega",
+  m_Omega =     factory.xAxis(omega).CreateTH1F("HelixOmega",
                                                 "Omega - the curvature of the track. It's sign is defined by the charge of the particle");
-  m_TanLambda = factory.xAxis(tanLambda).CreateTH1F("TanLambda", "TanLambda - the slope of the track in the r-z plane");
-  m_MomPt =     factory.xAxis(momentum).yTitle("counts").CreateTH1F("TrackMomentumPt", "Track Momentum pT");
+  m_TanLambda = factory.xAxis(tanLambda).CreateTH1F("HelixTanLambda", "TanLambda - the slope of the track in the r-z plane");
 
-  helixCorrelations->cd();
 
   factory.zTitleDefault("Arb. Units");
 
-  m_PhiD0 = factory.xAxis(phi).yAxis(D0).CreateTH2F("PhiD0", "d0 vs Phi - the signed distance to the IP in the r-phi plane");
-  m_D0Z0 =  factory.xAxis(D0).yAxis(Z0).CreateTH2F("D0Z0",
+  m_PhiD0 = factory.xAxis(phi).yAxis(D0).CreateTH2F("Helix2dPhiD0", "d0 vs Phi - the signed distance to the IP in the r-phi plane");
+  m_D0Z0 =  factory.xAxis(D0).yAxis(Z0).CreateTH2F("Helix2dD0Z0",
                                                    "z0 vs d0 - signed distance to the IP in r-phi vs. z0 of the perigee (to see primary vertex shifts along R or z)");
 
-  originalDirectory->cd();
 }
 
 void DQMHistoModuleBase::DefineMomentumCoordinates()
 {
-  int iMomRange = 600;
+  int iMomRange = 100;
   double fMomRange = 6.0;
 
   auto momentum = Axis(2 * iMomRange, -fMomRange, fMomRange, "Momentum");
@@ -307,6 +301,7 @@ void DQMHistoModuleBase::DefineMomentumCoordinates()
   m_MomX = factory.CreateTH1F("TrackMomentumX", "Track Momentum X");
   m_MomY = factory.CreateTH1F("TrackMomentumY", "Track Momentum Y");
   m_MomZ = factory.CreateTH1F("TrackMomentumZ", "Track Momentum Z");
+  m_MomPt = factory.xAxis(momentum).yTitle("counts").CreateTH1F("TrackMomentumPt", "Track Momentum pT");
   m_Mom = factory.xlow(.0).CreateTH1F("TrackMomentumMag", "Track Momentum Magnitude");
 }
 
@@ -319,7 +314,8 @@ void DQMHistoModuleBase::DefineHits()
 
   auto factory = Factory(this).xlowDefault(0).xTitleDefault("# hits").yTitleDefault("counts");
 
-  m_HitsPXD = factory.nbinsx(iHitsInPXD).xup(iHitsInPXD).CreateTH1F("NoOfHitsInTrack_PXD", "No Of Hits In Track - PXD");
+  if (! m_hltDQM)
+    m_HitsPXD = factory.nbinsx(iHitsInPXD).xup(iHitsInPXD).CreateTH1F("NoOfHitsInTrack_PXD", "No Of Hits In Track - PXD");
   m_HitsSVD = factory.nbinsx(iHitsInSVD).xup(iHitsInSVD).CreateTH1F("NoOfHitsInTrack_SVD", "No Of Hits In Track - SVD");
   m_HitsCDC = factory.nbinsx(iHitsInCDC).xup(iHitsInCDC).CreateTH1F("NoOfHitsInTrack_CDC", "No Of Hits In Track - CDC");
   m_Hits = factory.nbinsx(iHits).xup(iHits).CreateTH1F("NoOfHitsInTrack", "No Of Hits In Track");
@@ -340,30 +336,32 @@ void DQMHistoModuleBase::DefineTracks()
 
 void DQMHistoModuleBase::DefineHalfShellsVXD()
 {
-  TDirectory* originalDirectory = gDirectory;
-  TDirectory* halfShells = originalDirectory->mkdir("HalfShells");
-  halfShells->cd();
 
   double residualRange = 400;  // in um
   auto residual = Axis(200, -residualRange, residualRange, "residual [#mum]");
   auto factory = Factory(this).xAxisDefault(residual).yTitleDefault("counts");
 
-  m_UBResidualsPXDX_Yin = factory.CreateTH1F("UBResidualsPXDX_Yin", "Unbiased residuals in X for PXD for Yin");
-  m_UBResidualsPXDX_Yang = factory.CreateTH1F("UBResidualsPXDX_Yang", "Unbiased residuals in X for PXD for Yang");
+  if (! m_hltDQM) {
+    m_UBResidualsPXDX_Yin = factory.CreateTH1F("UBResidualsPXDX_Yin", "Unbiased residuals in X for PXD for Yin");
+    m_UBResidualsPXDX_Yang = factory.CreateTH1F("UBResidualsPXDX_Yang", "Unbiased residuals in X for PXD for Yang");
+  }
   m_UBResidualsSVDX_Pat = factory.CreateTH1F("UBResidualsSVDX_Pat", "Unbiased residuals in X for SVD for Pat");
   m_UBResidualsSVDX_Mat = factory.CreateTH1F("UBResidualsSVDX_Mat", "Unbiased residuals in X for SVD for Mat");
 
-  m_UBResidualsPXDY_Yin = factory.CreateTH1F("UBResidualsPXDY_Yin", "Unbiased residuals in Y for PXD for Yin");
-  m_UBResidualsPXDY_Yang = factory.CreateTH1F("UBResidualsPXDY_Yang", "Unbiased residuals in Y for PXD for Yang");
+  if (! m_hltDQM) {
+    m_UBResidualsPXDY_Yin = factory.CreateTH1F("UBResidualsPXDY_Yin", "Unbiased residuals in Y for PXD for Yin");
+    m_UBResidualsPXDY_Yang = factory.CreateTH1F("UBResidualsPXDY_Yang", "Unbiased residuals in Y for PXD for Yang");
+  }
   m_UBResidualsSVDY_Pat = factory.CreateTH1F("UBResidualsSVDY_Pat", "Unbiased residuals in Y for SVD for Pat");
   m_UBResidualsSVDY_Mat = factory.CreateTH1F("UBResidualsSVDY_Mat", "Unbiased residuals in Y for SVD for Mat");
 
-  m_UBResidualsPXDZ_Yin = factory.CreateTH1F("UBResidualsPXDZ_Yin", "Unbiased residuals in Z for PXD for Yin");
-  m_UBResidualsPXDZ_Yang = factory.CreateTH1F("UBResidualsPXDZ_Yang", "Unbiased residuals in Z for PXD for Yang");
+  if (! m_hltDQM) {
+    m_UBResidualsPXDZ_Yin = factory.CreateTH1F("UBResidualsPXDZ_Yin", "Unbiased residuals in Z for PXD for Yin");
+    m_UBResidualsPXDZ_Yang = factory.CreateTH1F("UBResidualsPXDZ_Yang", "Unbiased residuals in Z for PXD for Yang");
+  }
   m_UBResidualsSVDZ_Pat = factory.CreateTH1F("UBResidualsSVDZ_Pat", "Unbiased residuals in Z for SVD for Pat");
   m_UBResidualsSVDZ_Mat = factory.CreateTH1F("UBResidualsSVDZ_Mat", "Unbiased residuals in Z for SVD for Mat");
 
-  originalDirectory->cd();
 }
 
 void DQMHistoModuleBase::DefineTRClusters()
@@ -408,10 +406,6 @@ void DQMHistoModuleBase::DefineTRClusters()
 
 void DQMHistoModuleBase::DefineSensors()
 {
-  TDirectory* originalDirectory = gDirectory;
-
-  TDirectory* resids2D = originalDirectory->mkdir("Residuals2D");
-  TDirectory* resids1D = originalDirectory->mkdir("Residuals1D");
 
   double residualRange = 400;  // in um
 
@@ -420,19 +414,16 @@ void DQMHistoModuleBase::DefineSensors()
 
   auto factory = Factory(this);
 
-  resids2D->cd();
   m_UBResidualsSensor = factory.xAxis(residualU).yAxis(residualV).zTitle("counts").CreateSensorsTH2F(format("UBResiduals_%1%"),
                         format("PXD Unbiased residuals for sensor %1%"));
 
   factory.yTitleDefault("counts");
 
-  resids1D->cd();
   m_UBResidualsSensorU = factory.xAxis(residualU).CreateSensorsTH1F(format("UBResidualsU_%1%"),
                          format("PXD Unbiased U residuals for sensor %1%"));
   m_UBResidualsSensorV = factory.xAxis(residualV).CreateSensorsTH1F(format("UBResidualsV_%1%"),
                          format("PXD Unbiased V residuals for sensor %1%"));
 
-  originalDirectory->cd();
 }
 
 void DQMHistoModuleBase::FillTrackIndexes(int iTrack, int iTrackVXD, int iTrackCDC, int iTrackVXDCDC)
@@ -445,7 +436,9 @@ void DQMHistoModuleBase::FillTrackIndexes(int iTrack, int iTrackVXD, int iTrackC
 
 void DQMHistoModuleBase::FillHitNumbers(int nPXD, int nSVD, int nCDC)
 {
-  m_HitsPXD->Fill(nPXD);
+  if (! m_hltDQM)
+    m_HitsPXD->Fill(nPXD);
+  else nPXD = 0;
   m_HitsSVD->Fill(nSVD);
   m_HitsCDC->Fill(nCDC);
   m_Hits->Fill(nPXD + nSVD + nCDC);
@@ -472,11 +465,11 @@ void DQMHistoModuleBase::FillMomentumCoordinates(const TrackFitResult* tfr)
   m_MomY->Fill(tfr->getMomentum().Py());
   m_MomZ->Fill(tfr->getMomentum().Pz());
   m_Mom->Fill(tfr->getMomentum().Mag());
+  m_MomPt->Fill(tfr->getMomentum().Pt());
 }
 
 void DQMHistoModuleBase::FillHelixParametersAndCorrelations(const TrackFitResult* tfr)
 {
-  m_MomPt->Fill(tfr->getMomentum().Pt());
   m_D0->Fill(tfr->getD0());
   m_Z0->Fill(tfr->getZ0());
   m_Phi->Fill(tfr->getPhi() / Unit::deg);

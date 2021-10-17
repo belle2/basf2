@@ -15,6 +15,8 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
+#include <cdc/geometry/CDCGeometryParConstants.h>
+
 #include <vector>
 #include <tuple>
 #include <string>
@@ -108,8 +110,7 @@ namespace Belle2 {
       std::array<bool, ISuperLayerUtil::c_N> m_useSuperLayers{};
 
       /// Bits for the used layers
-      /// ATTENTION: hardcoded value for number of layers
-      std::array<bool, 56> m_useLayers{};
+      std::array<bool, MAX_N_SLAYERS> m_useLayers{};
 
       /// Unit vectors denoting the sector for which hits should be created
       std::array<Vector2D, 2> m_useSector{};

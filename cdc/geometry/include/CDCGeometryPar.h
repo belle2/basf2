@@ -28,6 +28,8 @@
 #include <cdc/dbobjects/CDCGeometry.h>
 #include <cdc/dbobjects/CDCEDepToADCConversions.h>
 
+#include <cdc/geometry/CDCGeometryParConstants.h>
+
 #include <vector>
 #include <string>
 #include <map>
@@ -35,32 +37,9 @@
 
 #include "TVector3.h"
 
-const unsigned MAX_N_SLAYERS   =    56;
-const unsigned MAX_N_SCELLS    =   384;
-const unsigned MAX_N_FLAYERS   =    55;
-const unsigned nSenseWires     = 14336;
-const unsigned nSuperLayers    =     9;
-const unsigned nBoards         =   300;
-//const unsigned nAlphaPoints  =    19;
-const unsigned maxNAlphaPoints =    18;
-const unsigned maxNThetaPoints =     7;
-const unsigned nXTParams       =     9; //#fit params + 1
-const unsigned nSigmaParams    =     9; //7 is used now; 2 for spare
 
 namespace Belle2 {
   namespace CDC {
-    /*
-    const unsigned MAX_N_SLAYERS   =    56;
-    const unsigned MAX_N_SCELLS    =   384;
-    const unsigned MAX_N_FLAYERS   =    55;
-    const unsigned nSenseWires     = 14336;
-    const unsigned nSuperLayers    =     9;
-    const unsigned nBoards         =   300;
-    const unsigned maxNAlphaPoints =    18;
-    const unsigned maxNThetaPoints =     7;
-    const unsigned nXTParams       =     9; //#fit params + 1
-    const unsigned nSigmaParams    =     9; //7 is used now; 2 for spare
-    */
 
     //! The Class for CDC Geometry Parameters
     /*! This class provides CDC gemetry paramters for simulation, reconstruction and so on.
@@ -466,7 +445,7 @@ namespace Belle2 {
           \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
           \return The forward position of the wire.
       */
-      const TVector3 wireForwardPosition(int layerId, int cellId, EWirePosition set = c_Base) const;
+      const TVector3 wireForwardPosition(uint layerId, int cellId, EWirePosition set = c_Base) const;
 
       /** The same function but in a different input format. */
       const TVector3 wireForwardPosition(const WireID& wireID, EWirePosition set = c_Base) const
@@ -482,7 +461,7 @@ namespace Belle2 {
       \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
       \return The virtual forward position of the wire.
       */
-      const TVector3 wireForwardPosition(int layerId, int cellId, double z, EWirePosition set = c_Base) const;
+      const TVector3 wireForwardPosition(uint layerId, int cellId, double z, EWirePosition set = c_Base) const;
       /** The same function but in a different input format. */
       const TVector3 wireForwardPosition(const WireID& wireID, double z,
                                          EWirePosition set = c_Base) const
@@ -497,7 +476,7 @@ namespace Belle2 {
           \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
           \return The backward position of the wire.
       */
-      const TVector3 wireBackwardPosition(int layerId, int cellId, EWirePosition set = c_Base) const;
+      const TVector3 wireBackwardPosition(uint layerId, int cellId, EWirePosition set = c_Base) const;
 
       /** The same function but in a different input format. */
       const TVector3 wireBackwardPosition(const WireID& wireID, EWirePosition set = c_Base) const
@@ -513,7 +492,7 @@ namespace Belle2 {
       \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
       \return The virtual backward position of the wire.
       */
-      const TVector3 wireBackwardPosition(int layerId, int cellId, double z, EWirePosition set = c_Base) const;
+      const TVector3 wireBackwardPosition(uint layerId, int cellId, double z, EWirePosition set = c_Base) const;
       /** The same function but in a different input format. */
       const TVector3 wireBackwardPosition(const WireID& wireID, double z, EWirePosition set = c_Base) const
       {
@@ -527,7 +506,7 @@ namespace Belle2 {
           \param cellId  The cell  id.
           \return Coefficient for the sense wire sag.
       */
-      double getWireSagCoef(EWirePosition set, int layerId, int cellId) const;
+      double getWireSagCoef(EWirePosition set, uint layerId, int cellId) const;
 
 
       //! Returns threshold for energy deposit in one G4 step
@@ -1057,6 +1036,47 @@ namespace Belle2 {
        */
       void setDisplacement();
 
+
+      /**
+      * Get the number of sense wires.
+      */
+      ushort getNumberOfSenseWires() const { return m_nSenseWires;}
+
+      /**
+      * Get the number of field wires.
+      */
+      ushort getNumberOfFieldWires() const { return m_nFieldWires;}
+
+      /**
+      * Get the number of sense layers.
+      */
+      ushort getNumberOfSenseLayers() const { return m_maxNSenseLayers;}
+
+      /**
+      * Get the number of field layers.
+      */
+      ushort getNumberOfFieldLayers() const { return m_maxNFieldLayers;}
+
+      /**
+      * Get the maximum number of super layers.
+      */
+      ushort getMaxNumberOfSuperLayers() const { return m_maxNSuperLayers;}
+
+      /**
+      * Get the offset of the first layer.
+      */
+      ushort getOffsetOfFirstLayer() const { return m_firstLayerOffset;}
+
+      /**
+      * Get the offset of the first super layer.
+      */
+      ushort getOffsetOfFirstSuperLayer() const { return m_firstSuperLayerOffset;}
+
+      /**
+      * Get the maximum number of cells in one layer.
+      */
+      ushort getMaxNumberOfCellsPerLayer() const { return m_maxNCellsPerLayer;}
+
     private:
       /** Singleton class */
       CDCGeometryPar(const CDCGeometry* = nullptr);
@@ -1184,6 +1204,15 @@ namespace Belle2 {
       DBObjPtr<HardwareClockSettings> m_clockSettings; /*!< hardware clock settings */
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
+
+      ushort m_nSenseWires            = 14336;  /*!< Maximum number of Sense Wire Layers */
+      ushort m_nFieldWires            = 42240;  /*!< Maximum number of Field Wire Layers */
+      ushort m_maxNSenseLayers        = 56;     /*!< Maximum number of Sense Wire Layers */
+      ushort m_maxNFieldLayers        = 55;     /*!< Maximum number of Field Wire Layers */
+      ushort m_maxNSuperLayers        = 9;      /*!< Maximum number of Super Layers */
+      ushort m_firstLayerOffset       = 0;      /*!< Offset of the first layer (for reduced CDC studies) */
+      ushort m_firstSuperLayerOffset  = 0;      /*!< Offset of the first super layer (for reduced CDC studies) */
+      ushort m_maxNCellsPerLayer      = 384;    /*!< Maximum number wires within a layer */
 
     };
 

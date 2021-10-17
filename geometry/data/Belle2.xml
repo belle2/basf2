@@ -133,6 +133,11 @@
     <xi:include href="../beast/claws/CLAWS3.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
 
+  <!-- CDC without SL0 -->
+  <DetectorComponent name="CDCReduced" isDefault="false">
+    <xi:include href="../cdc/CDCReduced.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+
 
   <!-- MUID muon identification -->
   <Muid>

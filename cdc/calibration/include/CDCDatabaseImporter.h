@@ -31,11 +31,11 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDatabaseImporter(int fexp, int frun, int lexp, int lrun):
+    CDCDatabaseImporter(int fexp, int frun, int lexp, int lrun);/*:
       m_firstExperiment(fexp), m_firstRun(frun),
       m_lastExperiment(lexp), m_lastRun(lrun)
     {
-    }
+    }*/
 
 
     /**
@@ -221,6 +221,10 @@ namespace Belle2 {
     int m_firstRun; /**< First run. */
     int m_lastExperiment; /**< Last experiment */
     int m_lastRun; /**< Last run. */
+
+    ushort m_firstLayerOffset = 0;      /**< Offset of first layer in case some CDC layers are removed */
+    ushort m_superLayerOffset = 0;      /**< Offset of first super layer in case some CDC super layers are removed */
+    ushort m_nSenseWires      = 14336;  /**< Number of sense wires in the CDC */
 
   };
 

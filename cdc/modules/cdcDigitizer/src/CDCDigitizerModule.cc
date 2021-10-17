@@ -273,7 +273,11 @@ void CDCDigitizerModule::initialize()
 #endif
 
   if (m_useDB4EDepToADC) {
-    if (m_cdcgp->getEDepToADCMainFactor(0, 0) == 0.) {
+//     if (m_cdcgp->getEDepToADCMainFactor(0, 0) == 0.) {
+//       B2FATAL("CDCEDepToADCConversion payloads are unavailable!");
+//     }
+    ushort firstLayerOffset = m_cdcgp->getOffsetOfFirstLayer();
+    if (m_cdcgp->getEDepToADCMainFactor(firstLayerOffset, 0) == 0.) {
       B2FATAL("CDCEDepToADCConversion payloads are unavailable!");
     }
   }
@@ -356,6 +360,10 @@ void CDCDigitizerModule::event()
 
     // Hit geom. info
     m_wireID = m_aCDCSimHit->getWireID();
+    ushort superLayerOffset = m_cdcgp->getOffsetOfFirstSuperLayer();
+    if (m_wireID.getISuperLayer() < superLayerOffset) {
+      B2FATAL("SimHit with wireID " << m_wireID << " is in CDC SuperLayer: " << m_wireID.getISuperLayer() << " which should not happen.");
+    }
     //    B2DEBUG(29, "Encoded wire number of current CDCSimHit: " << m_wireID);
 
     m_posFlag    = m_aCDCSimHit->getLeftRightPassageRaw();

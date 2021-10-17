@@ -21,6 +21,13 @@
     <NEMA_G10_Plate>NEMA_G10_Plate</NEMA_G10_Plate>
     <CDCGlue>CDCGlue</CDCGlue>
 
+    <MaxNSenseLayers desc="(Maximum) number of sense wire layers">56</MaxNSenseLayers>
+    <MaxNFieldLayers desc="(Maximum) number of field wire layers">55</MaxNFieldLayers>
+    <SuperLayers desc="Number of SuperLayers in the CDC">9</SuperLayers>
+    <FirstLayerOffset desc="Actual first layer of the CDC">0</FirstLayerOffset>
+    <SuperLayerOffset desc="Actual first super layer of the CDC">0</SuperLayerOffset>
+    <MaxNCells desc="Maximum number of cells within one layer">384</MaxNCells>
+
     <MomVol>
       <ZBound id="0">
         <Z unit="mm">-1000.0</Z>

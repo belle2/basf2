@@ -1,7 +1,8 @@
 # Examples
 
-If you are new to ``basf2``, a good starting point are the tutorials in the
-``tutorials`` subdirectory.
+If you are new to `basf2`, the best starting point is to look at
+[training.belle2.org](training.belle2.org). Furthermore, there are some
+useful tutorials in the `tutorials` subdirectory as well.
 
 ## Examples data dir
 
@@ -23,6 +24,6 @@ and then do
 export BELLE2_EXAMPLES_DATA_DIR="/path/to/your/example/dir"
 ```
 
-before you start basf2 or (even better) add it to your ``~/.bashrc`` so this setting
+before you start basf2 or (even better) add it to your `~/.bashrc` so this setting
 persists.
 

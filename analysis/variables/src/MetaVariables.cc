@@ -1253,17 +1253,31 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
-          for (auto& generalizedIndex : arguments)
+          if (particle->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle) // Check if MCParticle
           {
-            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
-            if (dauPart == nullptr)
-              return std::numeric_limits<double>::quiet_NaN();
+            for (auto& generalizedIndex : arguments) {
+              const MCParticle* mcPart = particle->getMCParticle();
+              if (mcPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
+              const MCParticle* dauMcPart = mcPart->getParticleFromGeneralizedIndexString(generalizedIndex);
+              if (dauMcPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
 
-            const MCParticle* dauMcPart = dauPart->getMCParticle();
-            if (dauMcPart == nullptr)
-              return std::numeric_limits<double>::quiet_NaN();
+              pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
+            }
+          } else{
+            for (auto& generalizedIndex : arguments)
+            {
+              const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+              if (dauPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
 
-            pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
+              const MCParticle* dauMcPart = dauPart->getMCParticle();
+              if (dauMcPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
+
+              pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
+            }
           }
 
           // Calculates the angle between the selected particles
@@ -3182,7 +3196,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                            the first daughter of the fourth daughter.
 
                       )DOC", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,"MC matched version of the `daughterAngle` function.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,
+                      "MC matched version of the `daughterAngle` function. Also works if applied directly to MC particles.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
                       "Returns the decay angle of the granddaughter in the daughter particle's rest frame.\n"
                       "It is calculated with respect to the reverted momentum vector of the particle.\n"

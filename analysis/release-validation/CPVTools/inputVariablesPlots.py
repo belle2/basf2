@@ -63,8 +63,6 @@ ROOT.TH1.SetDefaultSumw2()
 
 allInputVariables = []
 
-
-ft.WhichCategories(categories)
 ft.setVariables()
 
 belleOrBelle2Flag = belleOrBelle2
@@ -171,7 +169,7 @@ def plotInputVariablesOfFlavorTagger():
     and all the other (bkg.)
     """
 
-    for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
+    for (particleList, category, _) in ft.getEventLevelParticleLists(categories):
 
         # if category != "SlowPion":
         #     continue

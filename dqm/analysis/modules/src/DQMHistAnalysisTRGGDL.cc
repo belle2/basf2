@@ -653,7 +653,6 @@ void DQMHistAnalysisTRGGDLModule::event()
   m_h_eff_shifter_fast->SetMarkerColor(2);
   m_h_eff_shifter->SetTitle("TRG efficiency");
   m_h_eff_shifter_fast->SetTitle("TRG efficiency");
-  int textcolor = 1;
   m_c_eff_shifter->SetFrameLineColor(1);
   m_h_eff_shifter->GetXaxis()->SetLabelColor(1);
   m_h_eff_shifter->GetXaxis()->SetAxisColor(1);
@@ -685,7 +684,6 @@ void DQMHistAnalysisTRGGDLModule::event()
         m_c_eff_shifter_fast->SetFillColor(5);
         m_h_eff_shifter->SetTitle("Call TRG expert: bad efficiency");
         m_h_eff_shifter_fast->SetTitle("Call TRG expert: bad efficiency");
-        textcolor = 2;
         m_c_eff_shifter->SetFrameLineColor(2);
         m_h_eff_shifter->GetXaxis()->SetLabelColor(2);
         m_h_eff_shifter->GetXaxis()->SetAxisColor(2);

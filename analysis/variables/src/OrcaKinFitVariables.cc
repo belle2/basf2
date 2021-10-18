@@ -150,6 +150,5 @@ Returns NaN if Orca was not run or if the ``addUnmeasuredPhoton`` parameter was 
                       "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredTheta`.");
     REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorPhi", UnmeasuredErrorPhi, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredPhi`.");
     REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorE", UnmeasuredErrorE, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredE`.");
-
   }
 }

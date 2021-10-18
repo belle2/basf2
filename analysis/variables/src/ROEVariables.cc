@@ -206,7 +206,7 @@ namespace Belle2 {
     }
 
     // only the helper function
-    double nRemainingTracksInROE(const Particle* particle, const std::string& maskName)
+    int nRemainingTracksInROE(const Particle* particle, const std::string& maskName)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (not roe.isValid())
@@ -239,7 +239,7 @@ namespace Belle2 {
       return func;
     }
 
-    double nROE_RemainingTracks(const Particle* particle)
+    int nROE_RemainingTracks(const Particle* particle)
     {
       return nRemainingTracksInROE(particle);
     }

@@ -708,14 +708,14 @@ namespace Belle2 {
     int fitTruthStatus(const Particle* part)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
-      if (!vert) return std::numeric_limits<int>::quiet_NaN();
+      if (!vert) return -1;
       return vert->getFitTruthStatus();
     }
 
     int rollbackStatus(const Particle* part)
     {
       auto* vert = part->getRelatedTo<TagVertex>();
-      if (!vert) return std::numeric_limits<int>::quiet_NaN();
+      if (!vert) return -1;
       return vert->getRollBackStatus();
     }
 
@@ -1043,11 +1043,23 @@ namespace Belle2 {
                           "return the Z component of the true origin of the MC particle corresponding to the ith tag vtx track.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("TagVFitTruthStatus", fitTruthStatus,
-                      "Returns the status of the fit performed with the truth info. Possible values are: 0: fit performed with measured parameters, 1: fit performed with true parameters, 2: unable to recover truth parameters");
+    REGISTER_VARIABLE("TagVFitTruthStatus", fitTruthStatus, R"DOC(
+Returns the status of the fit performed with the truth info. Possible values are:
 
-    REGISTER_VARIABLE("TagVRollBackStatus", rollbackStatus,
-                      "Returns the status of the fit performed with rolled back tracks. Possible values are: 0: fit performed with measured parameters, 1: fit performed with rolled back tracks, 2: unable to recover truth parameters");
+    - -1: no related TagVertex found
+    - 0: fit performed with measured parameters
+    - 1: fit performed with true parameters
+    - 2: unable to recover truth parameters
+)DOC");
+
+    REGISTER_VARIABLE("TagVRollBackStatus", rollbackStatus, R"DOC(
+Returns the status of the fit performed with rolled back tracks. Possible values are:
+
+    - -1: no related TagVertex found
+    - 0: fit performed with measured parameters
+    - 1: fit performed with true parameters
+    - 2: unable to recover truth parameters
+)DOC");
 
     REGISTER_METAVARIABLE("TagTrackMax(var)", tagTrackMax,
                           "return the maximum value of the variable ``var`` evaluated for each tag track. ``var`` must be one of the TagTrackXXX variables, for example: ``TagTrackMax(TagTrackDistanceToConstraint)``. The tracks that are assigned a zero weight are ignored.",

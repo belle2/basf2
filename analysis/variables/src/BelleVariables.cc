@@ -32,7 +32,7 @@
 
 namespace Belle2 {
   namespace Variable {
-    double goodBelleKshort(const Particle* KS)
+    bool goodBelleKshort(const Particle* KS)
     {
       // check input
       if (KS->getNDaughters() != 2) {
@@ -50,7 +50,7 @@ namespace Belle2 {
 
       // If goodKs exists, return the value
       if (KS->hasExtraInfo("goodKs")) {
-        return KS->getExtraInfo("goodKs");
+        return bool(KS->getExtraInfo("goodKs"));
       }
 
       // Belle selection
@@ -67,9 +67,9 @@ namespace Belle2 {
       bool high = p > 1.5 && abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
 
       if (low || mid || high) {
-        return 1.0;
+        return true;
       } else
-        return 0.0;
+        return false;
     }
 
 

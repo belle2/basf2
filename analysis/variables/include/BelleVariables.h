@@ -14,7 +14,7 @@ namespace Belle2 {
   namespace Variable {
 
     /** Returns true if the particle candidate passes the Belle 'good Kshort' algorithm */
-    double goodBelleKshort(const Particle* KS);
+    bool goodBelleKshort(const Particle* KS);
 
     /** return goodLambda using Belle goodLambda selection rules */
     double goodBelleLambda(const Particle* Lambda);

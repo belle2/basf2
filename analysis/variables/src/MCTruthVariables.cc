@@ -30,7 +30,6 @@ namespace Belle2 {
   namespace Variable {
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-    static const int     intNaN = std::numeric_limits<int>::quiet_NaN();
 
 
     double isSignal(const Particle* part)
@@ -495,7 +494,7 @@ namespace Belle2 {
       StoreObjPtr<TauPairDecay> tauDecay;
       if (!tauDecay) {
         B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
-        return intNaN;
+        return 0;
       }
       return tauDecay->getTauPlusIdMode();
     }
@@ -505,7 +504,7 @@ namespace Belle2 {
       StoreObjPtr<TauPairDecay> tauDecay;
       if (!tauDecay) {
         B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
-        return intNaN;
+        return 0;
       }
       return tauDecay->getTauMinusIdMode();
     }
@@ -515,7 +514,7 @@ namespace Belle2 {
       StoreObjPtr<TauPairDecay> tauDecay;
       if (!tauDecay) {
         B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
-        return intNaN;
+        return 0;
       }
       return tauDecay->getTauPlusMcProng();
     }
@@ -525,7 +524,7 @@ namespace Belle2 {
       StoreObjPtr<TauPairDecay> tauDecay;
       if (!tauDecay) {
         B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
-        return intNaN;
+        return 0;
       }
       return tauDecay->getTauMinusMcProng();
     }
@@ -613,12 +612,12 @@ namespace Belle2 {
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) {
         B2WARNING("No MCParticle is associated to the particle");
-        return intNaN;
+        return 0;
       }
 
       int nChildren = p->getNDaughters();
       if (arguments[0] >= nChildren) {
-        return intNaN;
+        return 0;
       }
 
       const Particle*   daugP   = p->getDaughter(arguments[0]);
@@ -627,7 +626,7 @@ namespace Belle2 {
         // This is a strange case.
         // The particle, p, has the related MC particle, but i-th daughter does not have the related MC Particle.
         B2WARNING("No MCParticle is associated to the i-th daughter");
-        return intNaN;
+        return 0;
       }
 
       if (nChildren == 1) return 1;
@@ -648,7 +647,7 @@ namespace Belle2 {
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) {
         B2WARNING("No MCParticle is associated to the particle");
-        return intNaN;
+        return 0;
       }
 
       return MCMatching::countMissingParticle(p, mcp, PDGcodes);

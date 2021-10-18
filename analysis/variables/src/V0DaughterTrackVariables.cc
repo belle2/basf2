@@ -709,19 +709,19 @@ namespace Belle2 {
     int v0DaughtersShareInnermostHit(const Particle* part)
     {
       if (!part)
-        return std::numeric_limits<int>::quiet_NaN();
+        return -1;
       auto daughterPlus  = part->getDaughter(0);
       auto daughterMinus = part->getDaughter(1);
       if (!daughterPlus || !daughterMinus)
-        return std::numeric_limits<int>::quiet_NaN();
+        return -1;
       auto trackFitPlus  = daughterPlus->getTrackFitResult();
       auto trackFitMinus = daughterMinus->getTrackFitResult();
       if (!trackFitPlus || !trackFitMinus)
-        return std::numeric_limits<int>::quiet_NaN();
+        return -1;
       int flagPlus  = trackFitPlus->getHitPatternVXD().getInnermostHitShareStatus();
       int flagMinus = trackFitMinus->getHitPatternVXD().getInnermostHitShareStatus();
       if (flagPlus != flagMinus)
-        return std::numeric_limits<int>::quiet_NaN();
+        return -1;
       return flagPlus;
     }
 

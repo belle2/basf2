@@ -1360,14 +1360,17 @@ StoreArray index(0 - based) of the MDST ECLCluster (useful for track-based parti
 
     REGISTER_VARIABLE("nRejectedECLShowersFWDEndcap", nRejectedECLShowersFWDEndcap, R"DOC(
 [Eventbased] Returns the number of showers in the ECL that do not become clusters, from the forward endcap.
+If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
 )DOC");
 
     REGISTER_VARIABLE("nRejectedECLShowersBarrel", nRejectedECLShowersBarrel, R"DOC(
 [Eventbased] Returns the number of showers in the ECL that do not become clusters, from the barrel.
+If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
 )DOC");
 
     REGISTER_VARIABLE("nRejectedECLShowersBWDEndcap", nRejectedECLShowersBWDEndcap, R"DOC(
 [Eventbased] Returns the number of showers in the ECL that do not become clusters, from the backward endcap.
+If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
 )DOC");
 
     REGISTER_VARIABLE("eclClusterOnlyInvariantMass", eclClusterOnlyInvariantMass, R"DOC(

@@ -96,8 +96,8 @@ void DQMHistAnalysisTRGGDLModule::initialize()
   m_c_pure_eff = new TCanvas("TRGGDL/hGDL_ana_pure_eff");
 
 
-  rtype = findHist("DQMInfo/rtype");
-  runtype = rtype ? rtype->GetTitle() : "";
+  m_rtype = findHist("DQMInfo/rtype");
+  m_runtype = m_rtype ? m_rtype->GetTitle() : "";
 
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
@@ -130,21 +130,13 @@ void DQMHistAnalysisTRGGDLModule::event()
 
     //get histo
     char c_psn[1000];
-    sprintf(c_psn, "TRGGDL/hGDL_psn_extra_%s", skim_smap[iskim].c_str());
-    m_h_psn_extra[iskim] = (TH1D*)findHist(c_psn);/**psn bits*/
     sprintf(c_psn, "TRGGDL/hGDL_psn_extra_fast_%s", skim_smap[iskim].c_str());
     m_h_psn_extra_fast[iskim] = (TH1D*)findHist(c_psn);/**psn bits*/
 
-    if (m_h_psn_extra[iskim] == nullptr) {
-      B2WARNING("Histogram/canvas named hGDL_psn_extra is not found.");
-      continue;
-    }
     if (m_h_psn_extra_fast[iskim] == nullptr) {
-      B2WARNING("Histogram/canvas named hGDL_psn_extra is not found.");
+      B2WARNING("Histogram/canvas named TRGGDL/hGDL_psn_extra_fast is not found.");
       continue;
     }
-
-
 
     //fill efficiency values
     if (m_h_psn_extra_fast[iskim]->GetBinContent(0 + 1) == 0)continue;
@@ -355,9 +347,19 @@ void DQMHistAnalysisTRGGDLModule::event()
     m_h_eff_fast[iskim]->SetBinError(40, sqrt(m_h_psn_extra_fast[iskim]->GetBinContent(76 + 1)) /
                                      m_h_psn_extra_fast[iskim]->GetBinContent(
                                        5 + 1)); //stt with c4|hie
+  }
 
+  for (unsigned iskim = 0; iskim < nskim_gdldqm; iskim++) {
 
+    //get histo
+    char c_psn[1000];
+    sprintf(c_psn, "TRGGDL/hGDL_psn_extra_%s", skim_smap[iskim].c_str());
+    m_h_psn_extra[iskim] = (TH1D*)findHist(c_psn);/**psn bits*/
 
+    if (m_h_psn_extra[iskim] == nullptr) {
+      B2WARNING("Histogram/canvas named TRGGDL/hGDL_psn_extra is not found.");
+      continue;
+    }
 
     //fill efficiency values
     if (m_h_psn_extra[iskim]->GetBinContent(0 + 1) == 0)continue;
@@ -666,7 +668,7 @@ void DQMHistAnalysisTRGGDLModule::event()
   m_h_eff_shifter_fast->GetYaxis()->SetLabelColor(1);
   m_h_eff_shifter_fast->GetYaxis()->SetAxisColor(1);
 
-  if (runtype == "physics") {
+  if (m_runtype == "physics") {
     for (int i = 0; i < n_eff_shifter; i++) {
       double eff = m_h_eff_shifter->GetBinContent(i + 1);
       double err = m_h_eff_shifter->GetBinError(i + 1);
@@ -704,8 +706,6 @@ void DQMHistAnalysisTRGGDLModule::event()
   }
 
 
-  m_h_eff_shifter->Draw();
-  m_h_eff_shifter_fast->Draw("same");
   m_h_eff_shifter->Draw();
   m_h_eff_shifter_fast->Draw("same");
 

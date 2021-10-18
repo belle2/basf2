@@ -205,7 +205,7 @@ namespace Belle2 {
     TString m_runtype; /**< string with runtype: physics or cosmic */
 
     /** flag if to export to EPICS */
-    bool m_useEpics;
+    bool m_useEpics = true;
 
 #ifdef _BELLE2_EPICS
     chid mychid[n_eff_shifter];// hard limit max 10 parameters

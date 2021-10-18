@@ -203,7 +203,7 @@ bool Variable::Manager::createVariable(const std::string& name)
         arguments.push_back(number);
       }
       auto pfunc = parameterIter->second->function;
-      auto func = [pfunc, arguments](const Particle * particle) -> std::variant<double, int, bool> { return pfunc(particle, arguments); };
+      auto func = [pfunc, arguments](const Particle * particle) -> VarVariant { return pfunc(particle, arguments); };
       m_variables[name] = std::make_shared<Var>(name, func, parameterIter->second->description, parameterIter->second->group,
                                                 parameterIter->second->variabletype);
       return true;

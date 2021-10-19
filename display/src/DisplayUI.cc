@@ -55,8 +55,8 @@
 
 using namespace Belle2;
 
-DisplayUI::DisplayUI(bool automatic):
-  m_automatic(automatic)
+DisplayUI::DisplayUI(bool automatic, bool advance):
+  m_automatic(automatic), m_advance(advance)
 {
   //ensure GUI thread goes away when parent dies. (root UI loves deadlocks)
   prctl(PR_SET_PDEATHSIG, SIGHUP);
@@ -348,6 +348,10 @@ bool DisplayUI::startDisplay()
       t->Start(pollIntervalMs);
     }
 
+    if (m_advance) {
+      togglePlayPause();
+    }
+
     //import the geometry in the projection managers (only needs to be done once)
     TEveScene* gs = gEve->GetGlobalScene();
     TEveProjectionManager* rphiManager = getViewPane()->getRPhiMgr();
@@ -365,6 +369,7 @@ bool DisplayUI::startDisplay()
   }
 
   updateUI(); //update button state
+
   m_viewPane->getInfoWidget()->update();
 
   m_eventData->AddElement(getViewPane()->getRPhiMgr()->ImportElements(gEve->GetEventScene()));
@@ -396,6 +401,7 @@ bool DisplayUI::startDisplay()
   } else {
     automaticEvent();
   }
+
 
   return m_reshowCurrentEvent;
 }

@@ -112,7 +112,7 @@ namespace Belle2 {
       if (var == nullptr) {
         B2ERROR("ParticlePrinter: Variable::Manager doesn't have variable" << varName);
       } else {
-        std::variant<double, int, bool> result = var->function(particle);
+        Variable::Manager::VarVariant result = var->function(particle);
         if (std::holds_alternative<double>(result)) {
           double value = std::get<double>(result);
           B2INFO("     o) " << varName << " = " << value);

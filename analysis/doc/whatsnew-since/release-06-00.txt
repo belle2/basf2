@@ -25,6 +25,9 @@ Variables
    between true photons and hadronic split-offs.
  * The variable ``beamBackgroundProbabilityMVA`` now has a new name: `beamBackgroundSuppression`. The weight files for this 
    MVA have also been updated due to a change in training samples used. 
+ * Added `mostcommonBTagIndex` which returns the B meson index from which most FSP from a given reconstructed B meson candidate originated. Use case would be e.g. the FEI.
+ * Added `percentageMissingParticlesBTag` which determines the percentage of FSP missed by using the `mostcommonBTagIndex` of the B meson.
+ * Added `percentageWrongParticlesBTag` which gives the percentage of FSP reconstructed not originating from the `mostcommonBTagIndex`.
 
 Modules
 +++++++

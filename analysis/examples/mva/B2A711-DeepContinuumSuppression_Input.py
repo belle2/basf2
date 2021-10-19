@@ -67,7 +67,7 @@ outfile = 'DNN_' + step + '.root'
 # Perform analysis.
 firstpath = basf2.Path()
 
-ma.inputMdstList('MC10', input_file_list, path=firstpath)
+ma.inputMdstList(input_file_list, path=firstpath)
 
 firstpath.add_module('ProgressBar')
 

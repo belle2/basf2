@@ -103,8 +103,8 @@ ECLDigitCalibratorModule::~ECLDigitCalibratorModule()
 void ECLDigitCalibratorModule::initializeCalibration()
 {
 
-  m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::m_rf) *
-                       1e3;  // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz. Same for all crystals.
+  // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency. Same for all crystals:
+  m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::m_rf) * 1e3;
   m_pureCsIEnergyCalib = 0.00005; //conversion factor from ADC counts to GeV
   m_pureCsITimeCalib = 0.1; //conversion factor from eclPureCsIDigitizer to ns
   m_pureCsITimeOffset = 0.31; //ad-hoc offset correction for pureCsI timing
@@ -303,7 +303,7 @@ void ECLDigitCalibratorModule::event()
     B2DEBUG(35, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
 
     //Calibrating offline fit results
-    ECLDsp* aECLDsp = aECLDigit.getRelatedFrom<ECLDsp>();
+    ECLDsp* aECLDsp = ECLDsp::getByCellID(cellid);
     aECLCalDigit->setTwoComponentChi2(-1);
     aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, -1);
     aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton, -1);

@@ -111,11 +111,11 @@ namespace Belle2 {
           dt_prev = dt;
         }
         if (abs(dt_prev) < 1e-6) {
-          B2WARNING("HelixSwimmer::getDistanceToPlane: not converged"
-                    << LogVar("v", v) << LogVar("dt", dt_prev));
+          B2DEBUG(20, "TOP::HelixSwimmer::getDistanceToPlane: not converged"
+                  << LogVar("v", v) << LogVar("dt", dt_prev));
           return t;
         } else {
-          B2ERROR("HelixSwimmer::getDistanceToPlane: not converged"
+          B2DEBUG(20, "TOP::HelixSwimmer::getDistanceToPlane: not converged"
                   << LogVar("v", v) << LogVar("dt", dt_prev));
           return std::numeric_limits<double>::quiet_NaN();
         }

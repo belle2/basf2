@@ -29,9 +29,14 @@ namespace Belle2 {
     double eclPulseShapeDiscriminationMVA(const Particle* particle);
 
     /**
-     * return MVA output that uses shower shape variables to distinguish between true photon and beam background clusters
+     * return MVA output that uses shower-related variables to distinguish between true photon and hadronic splitoff clusters
      */
-    double beamBackgroundProbabilityMVA(const Particle* particle);
+    double hadronicSplitOffSuppression(const Particle* particle);
+
+    /**
+     * return MVA output that uses shower-related variables to distinguish between true photon and beam background clusters
+     */
+    double beamBackgroundSuppression(const Particle* particle);
 
     /**
      * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
@@ -68,7 +73,7 @@ namespace Belle2 {
      * return DeltaL for the shower shape
      * Note: This distance is calculated on the reconstructed level and is temporarily
      * included to the ECLCLuster MDST data format for studying purposes. If it is found
-     * to be not crutial for physics analysis then this variable will be removed in future releases.
+     * to be not crucial for physics analysis then this variable will be removed in future releases.
      * Therefore, keep in mind that this variable might be removed in the future!
      */
     double eclClusterDeltaL(const Particle* particle);
@@ -288,19 +293,22 @@ namespace Belle2 {
 
     /**
      * return the number of showers in the ECL that do not become clusters from
-     * the forward endcap
+     * the forward endcap, if the number exceeds 255 (uint8_t maximum value)
+     * it is set to 255.
      */
     double nRejectedECLShowersFWDEndcap(const Particle*);
 
     /**
      * return the number of showers in the ECL that do not become clusters from
-     * the barrel
+     * the barrel, if the number exceeds 255 (uint8_t maximum value)
+     * it is set to 255.
      */
     double nRejectedECLShowersBarrel(const Particle*);
 
     /**
      * return the number of showers in the ECL that do not become clusters from
-     * the backward endcap
+     * the backward endcap, if the number exceeds 255 (uint8_t maximum value)
+     * it is set to 255.
      */
     double nRejectedECLShowersBWDEndcap(const Particle*);
 

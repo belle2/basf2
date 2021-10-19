@@ -77,7 +77,7 @@ namespace Belle2 {
       B2INFO(" - " << "ROE related to particle with PDG: " << relatedPDG);
       B2INFO(" - " << "ROE related to MC particle with PDG: " << relatedMCPDG);
 
-      roe->print("", m_unpackComposites);
+      roe->print(RestOfEvent::c_defaultMaskName, m_unpackComposites);
 
       for (const auto& maskName : m_maskNames) {
         B2INFO(" - " << "Info for ROEMask with name: \'" << maskName << "\'");

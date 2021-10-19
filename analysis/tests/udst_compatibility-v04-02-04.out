@@ -544,7 +544,7 @@ Particle#4:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): -0.70359
-[ERROR] No grand daughter of daugher 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
+[ERROR] No grand daughter of daughter 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
 	name = D0
 	iDaughter = 0
 	iGrandDaughter = 0
@@ -1137,7 +1137,7 @@ EventExtraInfo:
 [INFO]      o) InvM = 3.35135
 [INFO]      o) deltaE = -3.92901
 [INFO]      o) daughter(1, pionID) = 1.45586e-18
-[INFO]      o) daughter(1, kaonID) = 2.34642e-33
+[INFO]      o) daughter(1, kaonID) = 2.34639e-33
 [INFO]      o) daughter(1, clusterE) = 0.196737
 [INFO]      o) daughter(1, klmClusterLayers) = 12
 [INFO] collection=Particles
@@ -1169,7 +1169,7 @@ EventExtraInfo:
 [INFO]      o) InvM = 3.38998
 [INFO]      o) deltaE = -3.92846
 [INFO]      o) daughter(1, pionID) = 0.308555
-[INFO]      o) daughter(1, kaonID) = 3.94328e-14
+[INFO]      o) daughter(1, kaonID) = 3.94327e-14
 [INFO]      o) daughter(1, clusterE) = nan
 [INFO]      o) daughter(1, klmClusterLayers) = nan
 [INFO] [ParticlePrinterModule] END   ------------------------------
@@ -1939,7 +1939,7 @@ Particle#6:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): nan
-[ERROR] No grand daughter of daugher 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
+[ERROR] No grand daughter of daughter 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
 	name = anti-D0
 	iDaughter = 0
 	iGrandDaughter = 0
@@ -3680,7 +3680,7 @@ Particle#11:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): 0.964359
-[ERROR] No grand daughter of daugher 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
+[ERROR] No grand daughter of daughter 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
 	name = K_S0
 	iDaughter = 0
 	iGrandDaughter = 0
@@ -3814,7 +3814,7 @@ Particle#12:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): nan
-[ERROR] No grand daughter of daugher 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
+[ERROR] No grand daughter of daughter 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
 	name = anti-D0
 	iDaughter = 0
 	iGrandDaughter = 0
@@ -3956,7 +3956,7 @@ Particle#13:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): nan
-[ERROR] No grand daughter of daugher 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
+[ERROR] No grand daughter of daughter 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
 	name = anti-D0
 	iDaughter = 0
 	iGrandDaughter = 0
@@ -4098,7 +4098,7 @@ Particle#14:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): nan
-[ERROR] No grand daughter of daugher 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
+[ERROR] No grand daughter of daughter 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
 	name = anti-D0
 	iDaughter = 0
 	iGrandDaughter = 0
@@ -4240,7 +4240,7 @@ Particle#15:
   getAcoplanarity(): nan
   getCharge(): 0
   getCosHelicity(): nan
-[ERROR] No grand daughter of daugher 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
+[ERROR] No grand daughter of daughter 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle
 	name = anti-D0
 	iDaughter = 0
 	iGrandDaughter = 0
@@ -5693,7 +5693,7 @@ EventExtraInfo:
 [INFO]      o) InvM = 3.02398
 [INFO]      o) deltaE = -3.6224
 [INFO]      o) daughter(1, pionID) = 1.74049e-14
-[INFO]      o) daughter(1, kaonID) = 5.99708e-27
+[INFO]      o) daughter(1, kaonID) = 5.99717e-27
 [INFO]      o) daughter(1, clusterE) = 0.202086
 [INFO]      o) daughter(1, klmClusterLayers) = 11
 [INFO] collection=Particles
@@ -5853,7 +5853,7 @@ EventExtraInfo:
 [INFO]      o) InvM = 2.67604
 [INFO]      o) deltaE = -3.80507
 [INFO]      o) daughter(1, pionID) = 1.74049e-14
-[INFO]      o) daughter(1, kaonID) = 5.99708e-27
+[INFO]      o) daughter(1, kaonID) = 5.99717e-27
 [INFO]      o) daughter(1, clusterE) = 0.202086
 [INFO]      o) daughter(1, klmClusterLayers) = 11
 [INFO] collection=Particles

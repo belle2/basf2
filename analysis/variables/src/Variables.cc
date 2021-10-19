@@ -27,11 +27,13 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/V0.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/gearbox/Const.h>
 
@@ -486,6 +488,33 @@ namespace Belle2 {
       } else {
         return part->getMass(); // !
       }
+    }
+
+    double particleInvariantMassFromDaughtersDisplaced(const Particle* part)
+    {
+      B2Vector3D vertex = part->getVertex();
+      if (part->getParticleSource() != Particle::EParticleSourceObject::c_V0
+          && vertex.Perp() < 0.5) return particleInvariantMassFromDaughters(part);
+
+      const std::vector<Particle*> daughters = part->getDaughters();
+      if (daughters.size() == 0) return particleInvariantMassFromDaughters(part);
+
+      const double bField = BFieldManager::getFieldInTesla(vertex).Z();
+      TLorentzVector sum;
+      for (auto daughter : daughters) {
+        const TrackFitResult* tfr = daughter->getTrackFitResult();
+        if (!tfr) {
+          sum += daughter->get4Vector();
+          continue;
+        }
+        Helix helix = tfr->getHelix();
+        helix.passiveMoveBy(vertex);
+        TVector3 mom3 = daughter->getMomentumScalingFactor() * helix.getMomentum(bField);
+        float mPDG = daughter->getPDGMass();
+        float E = std::sqrt(mom3.Mag2() + mPDG * mPDG);
+        sum += TLorentzVector(mom3, E);
+      }
+      return sum.M();
     }
 
     double particleInvariantMassLambda(const Particle* part)
@@ -1040,8 +1069,9 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("M2", particleMassSquared,
                       "The particle's mass squared.");
 
-    REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughters,
-                      "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle has no daughters, defaults to :b2:var:`M`.");
+    REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughtersDisplaced,
+                      "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle is V0 or decays at rho > 5 mm, its daughter 4-momentum vectors at fitted vertex are taken.\n"
+                      "If this particle has no daughters, defaults to :b2:var:`M`.");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
                       "Invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
                       "If the particle has not 2 daughters, it returns just the mass value.");

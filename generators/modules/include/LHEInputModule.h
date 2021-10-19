@@ -8,13 +8,15 @@
 
 #pragma once
 
+/* Belle2 headers. */
 #include <framework/core/Module.h>
-
-#include <string>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <generators/lhe/LHEReader.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <generators/lhe/LHEReader.h>
-#include <generators/utilities/InitialParticleGeneration.h>
+/* C++ headers. */
+#include <string>
 
 namespace Belle2 {
 
@@ -52,19 +54,19 @@ namespace Belle2 {
     LHEReader m_lhe;                 /**< An instance of the LHE reader. */
     MCParticleGraph mpg;             /**< The MCParticle graph object. */
     bool m_useWeights;               /**< Parameter to switch on/off weight propagation */
-    bool m_boost2Lab;                /**< Parameter to switch on/off boost to LAB system */
     bool m_wrongSignPz;              /**< Parameter to signal that direction of LER and HER was switched*/
     bool m_makeMaster;               /**< Parameter to signal if the modul should act as master */
-    int m_runNum;                    /**< The run number that should be used if the reader acts as master */
-    int m_expNum;                    /**< The experiment number that should be used if the reader acts as master */
-    int m_evtNum;                    /**< The event number is needed if the reader acts as master */
+    int m_runNum;                    /**< Run number */
+    int m_expNum;                    /**< Experiment number */
+    int m_evtNum;                    /**< Event number to start from if the reader acts as master */
     double m_meanDecayLength;        /**< Mean lifetime*c of displaced particle, default to be zero */
     double m_Rmin;                   /**< Minimum of distance between displaced vertex to IP. */
     double m_Rmax;                   /**< Maximum of distance between dispalced vertex to IP. */
     int m_pdg_displaced;             /**<PDG code of the displaced particle . */
 
   private:
-    InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
+
+    StoreObjPtr<EventMetaData> m_eventMetaData; /**< Event meta data. */
 
   };
 

@@ -12,7 +12,7 @@
 Simple script to create some particles in a list with a python module
 """
 
-# Go away doxygen, noone likes you
+# Go away doxygen, no one likes you
 # @cond
 
 import basf2

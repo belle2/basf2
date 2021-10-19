@@ -1143,17 +1143,31 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
-          for (auto& generalizedIndex : arguments)
+          if (particle->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle) // Check if MCParticle
           {
-            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
-            if (dauPart == nullptr)
-              return std::numeric_limits<double>::quiet_NaN();
+            for (auto& generalizedIndex : arguments) {
+              const MCParticle* mcPart = particle->getMCParticle();
+              if (mcPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
+              const MCParticle* dauMcPart = mcPart->getParticleFromGeneralizedIndexString(generalizedIndex);
+              if (dauMcPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
 
-            const MCParticle* dauMcPart = dauPart->getMCParticle();
-            if (dauMcPart == nullptr)
-              return std::numeric_limits<double>::quiet_NaN();
+              pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
+            }
+          } else{
+            for (auto& generalizedIndex : arguments)
+            {
+              const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+              if (dauPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
 
-            pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
+              const MCParticle* dauMcPart = dauPart->getMCParticle();
+              if (dauMcPart == nullptr)
+                return std::numeric_limits<double>::quiet_NaN();
+
+              pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
+            }
           }
 
           // Calculates the angle between the selected particles
@@ -1513,6 +1527,28 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function acos");
+      }
+    }
+
+    Manager::FunctionPtr tan(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double { return std::tan(var->function(particle)); };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function tan");
+      }
+    }
+
+    Manager::FunctionPtr atan(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double { return std::atan(var->function(particle)); };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function atan");
       }
     }
 
@@ -2620,7 +2656,7 @@ arguments. Operator precedence is taken into account. For example ::
 Returns the value of ``variable`` in the *lab* frame.
 
 .. tip::
-    The lab frame is the default reference frame, usually you don't need to use this meta-variable. 
+    The lab frame is the default reference frame, usually you don't need to use this meta-variable.
     E.g. ``useLabFrame(E)`` returns the energy of a particle in the Lab frame, same as just ``E``.
 
 Specifying the lab frame is useful in some corner-cases. For example:
@@ -2636,7 +2672,7 @@ Specifying the lab frame is useful in some corner-cases. For example:
 		      "When more than one Particle is present in the ParticleList, only the first Particle in the list is used for "
 		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.");
     REGISTER_VARIABLE("useRecoilParticleRestFrame(variable, particleList)", useRecoilParticleRestFrame,
-                      "Returns the value of the variable in the rest frame of recoil system againt the first Particle contained in the given ParticleList.\n"
+                      "Returns the value of the variable in the rest frame of recoil system against the first Particle contained in the given ParticleList.\n"
 		      "It is strongly recommended to pass a ParticleList that contains at most only one Particle in each event. "
 		      "When more than one Particle is present in the ParticleList, only the first Particle in the list is used for "
 		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.");
@@ -2688,14 +2724,14 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       )DOC");
 
     REGISTER_VARIABLE("sourceObjectIsInList(particleListName)", sourceObjectIsInList, R"DOC(
-Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to create a particle in ``particleListName``, 0.0 if not. 
+Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to create a particle in ``particleListName``, 0.0 if not.
 
 .. note::
   This only makes sense for particles that are not composite. Returns -1 for composite particles.
 )DOC");
 
     REGISTER_VARIABLE("mcParticleIsInMCList(particleListName)", mcParticleIsInMCList, R"DOC(
-Returns 1.0 if the particle's matched MC particle is also matched to a particle in ``particleListName`` 
+Returns 1.0 if the particle's matched MC particle is also matched to a particle in ``particleListName``
 (or if either of the lists were filled from generator level `modularAnalysis.fillParticleListFromMC`.)
 
 .. seealso:: :b2:var:`isMCDescendantOfList` to check daughters.
@@ -2735,11 +2771,11 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
                       )DOC");
     REGISTER_VARIABLE("genParticle(index, variable)", genParticle,  R"DOC(
 [Eventbased] Returns the ``variable`` for the ith generator particle.
-The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 
+The arguments of the function must be the ``index`` of the particle in the MCParticle Array,
 and ``variable``, the name of the function or variable for that generator particle.
 If ``index`` goes beyond the length of the MCParticles array, NaN will be returned.
 
-E.g. ``genParticle(0, p)`` returns the total momentum of the first MCParticle, which is 
+E.g. ``genParticle(0, p)`` returns the total momentum of the first MCParticle, which is
 the Upsilon(4S) in a generic decay.
 ``genParticle(0, mcDaughter(1, p)`` returns the total momentum of the second daughter of
 the first MC Particle, which is the momentum of the second B meson in a generic decay.
@@ -2770,7 +2806,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "(That means that it returns :math:`p_j - p_i`)\n"
                       "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`daughterDiffOfPhi` function.");
     REGISTER_VARIABLE("mcDaughterDiffOf(i, j, variable)", mcDaughterDiffOf,
-                      "MC matched version of the `daughterDiffOf` function."); 
+                      "MC matched version of the `daughterDiffOf` function.");
     REGISTER_VARIABLE("grandDaughterDiffOf(i, j, variable)", grandDaughterDiffOf,
                       "Returns the difference of a variable between the first daughters of the two given daughters.\n"
                       "E.g. ``useRestFrame(grandDaughterDiffOf(0, 1, p))`` returns the momentum difference between the first daughters of the first and second daughter in the rest frame of the given particle.\n"
@@ -2783,7 +2819,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     MAKE_DEPRECATED("daughterDiffOfPhi(i, j)", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_VARIABLE("mcDaughterDiffOfPhi(i, j)", mcDaughterDiffOfPhi,
-                      "MC matched version of the `daughterDiffOfPhi` function."); 
+                      "MC matched version of the `daughterDiffOfPhi` function.");
     MAKE_DEPRECATED("mcDaughterDiffOfPhi(i, j)", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
     REGISTER_VARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
@@ -2813,7 +2849,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     MAKE_DEPRECATED("daughterDiffOfPhiCMS(i, j)", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_VARIABLE("mcDaughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
-                      "MC matched version of the `daughterDiffOfPhiCMS` function.");      
+                      "MC matched version of the `daughterDiffOfPhiCMS` function.");
     MAKE_DEPRECATED("mcDaughterDiffOfPhiCMS(i, j)", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
     REGISTER_VARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
@@ -2853,7 +2889,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                            the first daughter of the fourth daughter.
 
                       )DOC");
-    REGISTER_VARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,"MC matched version of the `daughterAngle` function.");
+    REGISTER_VARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,
+                      "MC matched version of the `daughterAngle` function. Also works if applied directly to MC particles.");
     REGISTER_VARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
                       "Returns the decay angle of the granddaughter in the daughter particle's rest frame.\n"
                       "It is calculated with respect to the reverted momentum vector of the particle.\n"
@@ -2897,6 +2934,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("asin(variable)", asin, "Returns arcsine of the given variable.");
     REGISTER_VARIABLE("cos(variable)", cos, "Returns cosine value of the given variable.");
     REGISTER_VARIABLE("acos(variable)", acos, "Returns arccosine value of the given variable.");
+    REGISTER_VARIABLE("tan(variable)", tan, "Returns tangent value of the given variable.");
+    REGISTER_VARIABLE("atan(variable)", atan, "Returns arctangent value of the given variable.");
     REGISTER_VARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.");
     REGISTER_VARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.");
     REGISTER_VARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.");
@@ -2988,35 +3027,35 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("maxOpeningAngleInList(particleListName)", maxOpeningAngleInList,
                       "Returns maximum opening angle in the given particle List.");
     REGISTER_VARIABLE("daughterCombination(variable, daughterIndex_1, daughterIndex_2 ... daughterIndex_n)", daughterCombination,R"DOC(
-Returns a ``variable`` function only of the 4-momentum calculated on an arbitrary set of (grand)daughters. 
+Returns a ``variable`` function only of the 4-momentum calculated on an arbitrary set of (grand)daughters.
 
 .. warning::
     ``variable`` can only be a function of the daughters' 4-momenta.
 
-Daughters from different generations of the decay tree can be combined using generalized daughter indexes, which are simply colon-separated 
-the list of daughter indexes, starting from the root particle: for example, ``0:1:3``  identifies the fourth 
+Daughters from different generations of the decay tree can be combined using generalized daughter indexes, which are simply colon-separated
+the list of daughter indexes, starting from the root particle: for example, ``0:1:3``  identifies the fourth
 daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle.
 
 .. tip::
-    ``daughterCombination(M, 0, 3, 4)`` will return the invariant mass of the system made of the first, fourth and fifth daughter of particle. 
+    ``daughterCombination(M, 0, 3, 4)`` will return the invariant mass of the system made of the first, fourth and fifth daughter of particle.
     ``daughterCombination(M, 0:0, 3:0)`` will return the invariant mass of the system made of the first daughter of the first daughter and the first daughter of the fourth daughter.
 
 )DOC");
     REGISTER_VARIABLE("useAlternativeDaughterHypothesis(variable, daughterIndex_1:newMassHyp_1, ..., daughterIndex_n:newMassHyp_n)", useAlternativeDaughterHypothesis,R"DOC(
-Returns a ``variable`` calculated using new mass hypotheses for (some of) the particle's daughers. 
+Returns a ``variable`` calculated using new mass hypotheses for (some of) the particle's daughers.
 
 .. warning::
-    ``variable`` can only be a function of the particle 4-momentum, which is re-calculated as the sum of the daughters' 4-momenta. 
+    ``variable`` can only be a function of the particle 4-momentum, which is re-calculated as the sum of the daughters' 4-momenta.
     This means that if you made a kinematic fit without updating the daughters' momenta, the result of this variable will not reflect the effect of the kinematic fit.
-    Also, the track fit is not performed again: the variable only re-calculates the 4-vectors using different mass assumptions. The alternative mass assumpion is 
+    Also, the track fit is not performed again: the variable only re-calculates the 4-vectors using different mass assumptions. The alternative mass assumpion is
     used only internally by the variable, and is not stored in the datastore (i.e the daughters are not permanently changed).
 
 .. warning::
     Generalized daughter indexes are not supported (yet!): this variable can be used only on first-generation daughters.
 
 .. tip::
-    ``useAlternativeDaughterHypothesis(M, 0:K+, 2:pi-)`` will return the invariant mass of the particle assuming that the first daughter is a kaon and the third is a pion, instead of whatever was used in reconstructing the decay. 
-    ``useAlternativeDaughterHypothesis(mRecoil, 1:p+)`` will return the recoil mass of the particle assuming that the second daughter is a proton instead of whatever was used in reconstructing the decay. 
+    ``useAlternativeDaughterHypothesis(M, 0:K+, 2:pi-)`` will return the invariant mass of the particle assuming that the first daughter is a kaon and the third is a pion, instead of whatever was used in reconstructing the decay.
+    ``useAlternativeDaughterHypothesis(mRecoil, 1:p+)`` will return the recoil mass of the particle assuming that the second daughter is a proton instead of whatever was used in reconstructing the decay.
 
 )DOC");
     REGISTER_VARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.

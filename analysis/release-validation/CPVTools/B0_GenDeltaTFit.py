@@ -38,7 +38,7 @@ Xlim2 = 999
 
 validation_path = b2.Path()
 
-ma.inputMdstList("default", inputFiles, path=validation_path)
+ma.inputMdstList(inputFiles, path=validation_path)
 
 B0s = ('B0:all', '')
 ma.fillParticleListsFromMC([B0s], True, path=validation_path)

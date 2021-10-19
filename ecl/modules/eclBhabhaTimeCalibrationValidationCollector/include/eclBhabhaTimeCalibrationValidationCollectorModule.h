@@ -16,6 +16,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventT0.h>
 
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 class TTree ;
 
 namespace Belle2 {
@@ -57,16 +58,19 @@ namespace Belle2 {
     /** If true, save TTree with more detailed event info */
     bool m_saveTree ;
 
-    /****** Parameters END ******/
-
-
     StoreArray<Track> tracks ; /**< Required input array of tracks */
     StoreArray<ECLCluster> m_eclClusterArray ; /**< Required input array of ECLClusters */
-    //StoreArray<ECLDigit> m_eclDigitArray; /**< Required input array of ECLDigits */
     StoreArray<ECLCalDigit> m_eclCalDigitArray; /**< Required input array of ECLCalDigits */
 
+    /**
+     * ECL object for keeping track of mapping between crystals
+     * and crates etc.
+     */
+    std::unique_ptr< Belle2::ECL::ECLChannelMapper> m_crystalMapper =
+      std::make_unique<Belle2::ECL::ECLChannelMapper>();
 
 
+    StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
     /**
      * StoreObjPtr for T0. The event t0 class has an overall event t0 so use that as presumably some code has been run to determine what the best t0 is to use.
      */
@@ -100,6 +104,12 @@ namespace Belle2 {
     std::vector<float> m_CrateTime; /**< vector obtained from DB object */
     std::vector<float> m_CrateTimeUnc; /**< uncertainty vector obtained from DB object */
 
+    /** Mapper of ecl channels to various other objects, like crates */
+    DBObjPtr<Belle2::ECLChannelMap> m_channelMapDB; /**< database object */
+
+
+
+
     int     m_tree_crateid = -1;            /**< Crate ID for debug TTree output */
     double  m_tree_tcrate = -1;             /**< Crate time for debug TTree output */
     double  m_tree_tcrate_unc = -1;         /**< Crate time uncertainty for debug TTree output */
@@ -120,6 +130,7 @@ namespace Belle2 {
     double m_looseTrkD0 ;   /**< Loose track d0 minimum cut*/
     double m_tightTrkD0 ;   /**< Tight track d0 minimum cut*/
 
+    bool skipTrgSel; /**< flag to skip the trigger skim selection in the module */
 
   } ;
 }

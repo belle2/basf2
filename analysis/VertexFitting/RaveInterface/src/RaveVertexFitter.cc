@@ -181,7 +181,7 @@ double RaveVertexFitter::getWeight(int trackId, VecSize vertexId)const
   const std::vector < std::pair < float, rave::Track > >& weightedTracks = m_raveVertices[vertexId].weightedTracks();
   for (unsigned int i = 0; i not_eq weightedTracks.size(); ++i) {
     if (weightedTracks[i].second.id() == trackId) {
-//          B2WARNING( "returing weight for track with x coord: " <<weightedTracks[i].second.state().x() );
+//          B2WARNING( "returning weight for track with x coord: " <<weightedTracks[i].second.state().x() );
       return weightedTracks[i].first;
     }
   }
@@ -248,7 +248,7 @@ TMatrixDSym RaveVertexFitter::getCov(VecSize vertexId) const
 void RaveVertexFitter::updateDaughters()
 {
   if (m_raveVertices.size() != 1) {
-    B2ERROR("RaveVertexFitter: Daughters update works only with a sigle vertex");
+    B2ERROR("RaveVertexFitter: Daughters update works only with a single vertex");
     return;
   }
 

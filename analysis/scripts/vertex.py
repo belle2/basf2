@@ -242,7 +242,7 @@ def treeFit(
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
             Please do not mix PDG id and particle names in massConstraint list.
         ipConstraint (bool): constrain head production vertex to IP (x-y-z) constraint
-        customOriginConstraint (bool): use a costum origin vertex as the production vertex of your particle.
+        customOriginConstraint (bool): use a custom origin vertex as the production vertex of your particle.
             This is useful when fitting D*/D without wanting to fit a B but constraining the process to be B-decay-like.
             (think of semileptonic modes and stuff with a neutrino in the B decay).
         customOriginVertex (list(float)): 3d vector of the vertex coordinates you want to use as custom origin.
@@ -283,7 +283,7 @@ def TagV(
     constraintType="IP",
     askMCInfo=False,
     reqPXDHits=0,
-    maskName='',
+    maskName='all',
     fitAlgorithm='Rave',
     useTruthInFit=False,
     useRollBack=False,

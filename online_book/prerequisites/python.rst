@@ -494,7 +494,7 @@ You can also display the values of the DataFrame sorted by a specific column:
 
   df.sort_values(by='B0_M').head()
 
-Finally, everyone who works with numpy and pandas will at some point try to use a fancy funtion and get an error message that the *shapes* of some objects differ.
+Finally, everyone who works with numpy and pandas will at some point try to use a fancy function and get an error message that the *shapes* of some objects differ.
 
 .. admonition:: Exercise
   :class: exercise stacked
@@ -598,7 +598,7 @@ the different values in the ``B0_isSignal`` column by using
 
   df['B0_isSignal'].unique()
 
-we see that there are only two values. So it might make more sense to interpet
+we see that there are only two values. So it might make more sense to interpret
 this as a boolean value:
 
 .. code:: ipython3

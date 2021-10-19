@@ -28,9 +28,12 @@ from skim.standardlists.charm import (loadD0_hh_loose, loadD0_Kshh_loose,
                                       loadStdDstarPlus_D0pi_Kpi,
                                       loadStdDstarPlus_D0pi_Kpipi0,
                                       loadStdDstarPlus_D0pi_Kpipipi,
-                                      loadStdDstarPlus_Dpi0_Kpipi)
+                                      loadStdDstarPlus_Dpi0_Kpipi,
+                                      loadCharmlessD0_Kpipi0)
 from skim.standardlists.lightmesons import (loadStdAllRhoPlus,
                                             loadStdPi0ForBToHadrons)
+from skim.standardlists.charmless import (loadStdPi0ForBToCharmless)
+from skim.standardlists.charmless import (loadStdVeryLooseTracks)
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdK, stdPi
 from stdPi0s import loadStdSkimPi0, stdPi0s
@@ -87,7 +90,7 @@ class BtoD0h_Kspi0(BaseSkim):
 
     def validation_histograms(self, path):
         loadStdSkimPi0(path=path)
-        stdPi0s(listtype='eff50_May2020Fit', path=path)
+        stdPi0s(listtype='eff50_May2020Fit', path=path, loadPhotonBeamBackgroundMVA=False)
 
         ma.reconstructDecay('D0 -> K_S0:merged pi0:eff50_May2020Fit', '1.84 < M < 1.89', path=path)
         ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
@@ -135,7 +138,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
     def load_standard_lists(self, path):
         stdK("all", path=path)
         stdPi("all", path=path)
-        stdPi0s("eff40_May2020Fit", path=path)
+        stdPi0s("eff40_May2020Fit", path=path, loadPhotonBeamBackgroundMVA=False)
         stdKshorts(path=path)
         loadStdPi0ForBToHadrons(path=path)
         loadPiForBtoHadrons(path=path)
@@ -159,7 +162,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
         stdK('all', path=path)
         loadStdSkimPi0(path=path)
         stdKshorts(path=path)
-        stdPi0s(listtype='eff40_May2020Fit', path=path)
+        stdPi0s(listtype='eff40_May2020Fit', path=path, loadPhotonBeamBackgroundMVA=False)
 
         ma.reconstructDecay('D0 -> K_S0:merged pi-:all pi+:all pi0:eff40_May2020Fit', '1.84 < M < 1.89', path=path)
         ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
@@ -1009,3 +1012,42 @@ class B0toDstarD(BaseSkim):
             BsigList.append("B0:B0toDstarD" + str(chID))
 
         return BsigList
+
+
+@fancy_skim_header
+class B0toD0Kpipi0_pi0(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to \\bar{D}^{0} (\\to K^+ \\pi^- \\pi^0) \\pi^0`
+
+    Cuts applied:
+
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.5``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpipi0`, where the
+        :math:`\\bar{D}^{0}` channel is defined.
+    """
+
+    __authors__ = ["Francis Pham"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
+
+    def load_standard_lists(self, path):
+        loadStdPi0ForBToCharmless(path=path)
+        loadStdVeryLooseTracks('K', path=path)
+        loadStdVeryLooseTracks('pi', path=path)
+        loadCharmlessD0_Kpipi0(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "5.2 < Mbc and abs(deltaE) < 0.5"
+
+        ma.reconstructDecay("B0:D0Kpipi0_pi0 -> anti-D0:Kpipi0 pi0:charmlessFit", Bcuts, path=path)
+
+        return ["B0:D0Kpipi0_pi0"]

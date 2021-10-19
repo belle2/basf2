@@ -40,12 +40,10 @@ Variables
    during the calculation.
  * Added the inverse trigonometric functions: :b2:var:`acos`, :b2:var:`asin`.
  * Added new variables :b2:var:`exp` and :b2:var:`log`.
- * Added special hadron ID variables :b2:var:`pionID_SVD`, :b2:var:`kaonID_SVD`, :b2:var:`protonID_SVD`, :b2:var:`binaryPID_SVD`
-   which include SVD PDFs for pions, kaons and protons only. For hadron ID, users should **no longer** rely on the standard
-   variables :b2:var:`pionID`, :b2:var:`kaonID`, :b2:var:`protonID`, :b2:var:`binaryPID` for the time being. For lepton
-   identification instead, the :b2:var:`electronID`, :b2:var:`muonID`, :b2:var:`binaryPID` variables, which do not contain SVD PDF
-   info yet, are still recommended.
- * Added a new variable to clusters, `beamBackgroundProbabilityMVA`, which uses shower shape variables to separate between true
+ * Reinstated SVD for standard PID variables :b2:var:`electronID`, :b2:var:`muonID`, :b2:var:`pionID`, :b2:var:`kaonID`, 
+   :b2:var:`protonID`. Temporarily, special ID variables that exclude the SVD information (:b2:var:`pionID_noSVD`, 
+   :b2:var:`kaonID_noSVD`, etc.) are kept so that analysts and performance experts can easily compare the effect.
+ * Added a new variable to clusters, ``beamBackgroundProbabilityMVA``, which uses shower shape variables to separate between true
    photons and beam backgrounds.
  * Added ``b2help-variables`` which behaves identical to ``basf2 variables.py`` but more in-keeping with the ``b2help-<something>``
    theme.
@@ -63,8 +61,6 @@ Variables
  * Added new variables :b2:var:`useParticleRestFrame` and :b2:var:`useRecoilParticleRestFrame` for computing variables in the
    rest frame of a given Particle (or in the rest frame of the recoiling system of a given Particle). If the ParticleList passed
    to these variables contains more than one Particle, only the first one in the list will be considered.
- * New **temporary** convenience PID variables :b2:var:`electronID_noTOP`, :b2:var:`binaryPID_noTOP` (where any input hypothesis must be that of an electron)
-   are defined in such a way to exclude the TOP completely. These are expected to recover electron identification performance with respect to the standard PID variables, which are affected by buggy electron TOP PDFs in release 5.
  * Added new variables that are derived from the TriggerTimeDistribution (TTD), i.e. variables related to trigger and injections.
    So far, only available for actual data or if BGOverlay from data was used.
    The variables related to triggering are :b2:var:`timeSincePrevTriggerClockTicks` (in 127MHz=RF/4) and :b2:var:`timeSincePrevTriggerMicroSeconds`, :b2:var:`triggeredBunchNumberTTD` (bunch number as provided by TTD) and :b2:var:`triggeredBunchNumber` ('global' bunch number of SKB).
@@ -125,6 +121,8 @@ Modules
  * Added a `PhotonEfficiencySystematics` module which adds photon detection efficiency Data/MC ratios, systematic, statistical and total uncertainties
    as variables in extrainfo to a given photon list. Ratios can only added for particles in photon lists. `addPhotonEfficiencyRatioVariables` is
    a corresponding wrapper function.
+ * Bug fixed in :b2:mod:`FlavorTaggerInfoBuilder` and :b2:mod:`FlavorTaggerInfoFiller`: FlavorTaggerInfoMap is created now in the builder to make it accessible in main paths outside the ROE loops. 
+   This permits now to save the FT outputs for every ``B``-meson candidate. 
 
 Full Event Interpretation
 +++++++++++++++++++++++++

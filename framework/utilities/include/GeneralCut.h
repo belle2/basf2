@@ -18,7 +18,7 @@
 
 #include <iostream>
 #include <stdexcept>
-
+#include <cmath>
 
 namespace Belle2 {
 
@@ -112,7 +112,7 @@ namespace Belle2 {
         case EMPTY:
           return true;
         case NONE:
-          return this->get(p);
+          return std::isnan(this->get(p)) ? false : this->get(p);
         case AND:
           return m_left->check(p) and m_right->check(p);
         case OR:

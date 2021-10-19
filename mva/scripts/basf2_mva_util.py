@@ -135,14 +135,14 @@ class Method(object):
         elif self.general_options.m_method == "Trivial":
             self.specific_options = basf2_mva.TrivialOptions()
         else:
-            raise RuntimeError("Unkown method " + self.general_options.m_method)
+            raise RuntimeError("Unknown method " + self.general_options.m_method)
 
         self.specific_options.load(self.weightfile.getXMLTree())
 
         variables = [str(v) for v in self.general_options.m_variables]
         importances = self.weightfile.getFeatureImportance()
 
-        #: Dictionary of the variable importances calculated by the mehtod
+        #: Dictionary of the variable importances calculated by the method
         self.importances = {k: importances[k] for k in variables}
         #: List of variables sorted by their importance
         self.variables = list(sorted(variables, key=lambda v: self.importances.get(v, 0.0)))

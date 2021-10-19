@@ -42,7 +42,7 @@ You can see that implementing a minimal python module just takes 5 lines of code
       tasks this does not make a significant difference.
     - These *hacky* modules will not appear in module list (``basf2 -m``)
     - Python modules can only be used in analysis code or private scripts.
-      Only C++ modules can be added to the offical reconstruction code that is
+      Only C++ modules can be added to the official reconstruction code that is
       run for HLT or for calibration.
 
 Detailed usage
@@ -59,9 +59,9 @@ Accessing Datastore Objects
 ---------------------------
 
 Datastore objects can be accessed via the
-`PyStoreArray <https://b2-master.belle2.org/software/development/classBelle2_1_1PyStoreArray.html>`__
+`PyStoreArray <https://software.belle2.org/development/classBelle2_1_1PyStoreArray.html>`__
 class and the
-`PyStoreObj <https://b2-master.belle2.org/software/development/classBelle2_1_1PyStoreObj.html>`__ classes.
+`PyStoreObj <https://software.belle2.org/development/classBelle2_1_1PyStoreObj.html>`__ classes.
 Let's create a small module which will print the event number and information on
 MCParticles, namely the PDG code. To have tracks available, we will use the
 `ParticleGun` module, which generates very simple events.
@@ -79,7 +79,7 @@ MCParticles, namely the PDG code. To have tracks available, we will use the
    :class: toggle xhint stacked
 
    You can find information on the Particle class in
-   `doxygen <https://b2-master.belle2.org/software/development/classBelle2_1_1MCParticle.html>`__.
+   `doxygen <https://software.belle2.org/development/classBelle2_1_1MCParticle.html>`__.
    The `ParticleGun` has the option `nTracks`.
 
 .. admonition:: Solution

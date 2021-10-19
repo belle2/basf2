@@ -939,14 +939,6 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "tsf2b2b") {bit = false;}
     else if (bitname == "grlgg1") {bit = false;}
     else if (bitname == "grlgg2") {bit = false;}
-    else if (bitname == "fwdsb") {bit = false;}
-    else if (bitname == "bwdsb") {bit = false;}
-    else if (bitname == "fwdnb") {bit = false;}
-    else if (bitname == "bwdnb") {bit = false;}
-    else if (bitname == "brlfb1") {bit = false;}
-    else if (bitname == "brlfb2") {bit = false;}
-    else if (bitname == "brlnb1") {bit = false;}
-    else if (bitname == "brlnb2") {bit = false;}
 
     //KLM TOP ECL not ready
     else if (bitname == "ecl_bhauni") {bit = false;}

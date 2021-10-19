@@ -51,7 +51,7 @@ namespace Belle2 {
              "Use ROE instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
 
     addParam("roeMaskName", m_roeMaskName,
-             "ROE mask name to load", std::string(""));
+             "ROE mask name to load", std::string(RestOfEvent::c_defaultMaskName));
 
     addParam("sourceParticleListName", m_sourceParticleListName,
              "Particle list name from which we need to get ROEs", std::string(""));
@@ -404,7 +404,7 @@ namespace Belle2 {
         }
 
         // check if, given the initial user's decay descriptor, the current v0 is a particle or an anti-particle.
-        // in the V0 the order of the daughters is fixed, first the positive and then the negative; to be coherent with the decay desctiptor, when creating
+        // in the V0 the order of the daughters is fixed, first the positive and then the negative; to be coherent with the decay descriptor, when creating
         // one particle list and one anti-particle, the v0 daughters' order has to be switched only in one case
         bool correctOrder = matchingDaughtersOrder;
         if (abs(v0Type.getPDGCode()) == abs(m_decaydescriptor.getMother()->getPDGCode())

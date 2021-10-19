@@ -103,7 +103,7 @@ Reconstruction Calibrations
 
 	       Stores the position error formulas for the ``CoGOnly`` algorithm, with the same granularity_ as simulation objects
 
-Check `CoGOnlyErr@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyPositionError&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** is used for experiment 0 and 1003. Revision **2** (scale factors = 1) should be used for data reconstruction. 
+Check `CoGOnlyErr@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyPositionError&perpage=25&>`_ all revisions available in the Conditions Database.  Revision **2** is used for exp 0, 1003 and data reconstruction.
 
 .. _svdcogonlycal:
 
@@ -111,7 +111,7 @@ Check `CoGOnlyErr@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyPosit
 
 	       Stores the position error scaling factors for the ``CoGOnly`` algorithm, with the same granularity_ as simulation objects
 
-Check `CoGOnlySF@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyErrorScaleFactors&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** is used for experiment 0 and 1003. Revision **2** (scale factors = 1) should be used for data reconstruction.
+Check `CoGOnlySF@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyErrorScaleFactors&perpage=25&>`_ all revisions available in the Conditions Database. Revision **2** (scale factors = 1) is used for exp 0, 1003 and data reconstruction.
 
 .. _svdolddefaultcal:
 
@@ -119,7 +119,7 @@ Check `CoGOnlySF@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyErrorS
 
 	       Stores the position error scaling factors for the ``OldDefault`` algorithm, with the same granularity_ as simulation objects
 
-Check `OldDefaultSF@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDOldDefaultErrorScaleFactors&perpage=25&>`_ all revisions available in the Conditions Database. Revision **XX** is used for experiment 0 and 1003. Revision **YY** (scale factors = 1) should be used for data reconstruction.
+Check `OldDefaultSF@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDOldDefaultErrorScaleFactors&perpage=25&>`_ all revisions available in the Conditions Database. Revision **3** is used for experiment 0 and 1003. Revision **2** (scale factors = 1) should be used for data reconstruction.
 
 .. _svdclustercuts:
 
@@ -127,7 +127,7 @@ Check `OldDefaultSF@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDOldDefault
 
 	       Stores the parameters for the clusterization with sensor-side granularity_
 
-Check `Clustering@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDClustering&perpage=25&>`_ all revisions available in the Conditions Database. Revision **XX** is used for experiment 0 and 1003, and data.
+Check `Clustering@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDClustering&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** is used for experiment 0 and 1003, and data.
 
 .. _svdhittimeselection:
 
@@ -135,7 +135,7 @@ Check `Clustering@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDClustering&p
 
 	       Stores the functions and their parameters for the selection of clusters based on the cluster time in the SpacePoint creation step, with sensor-side granularity_.
 
-Check `HitTimeSelection@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDHitTimeSelectionFunction&perpage=25&>`_ all revisions available in the Conditions Database. Revision **26** (no cuts) is used for experiment 1003 (and data), and revision **25** (u/v cluster time difference < 10 ns) is used for experiment 0.
+Check `HitTimeSelection@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDHitTimeSelection&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** (no cuts) is used for experiment 1003 (and data), and revision **5** (u/v cluster time difference < 20 ns & u-or-v cluster absolute time < 50 ns) is used for experiment 0.
 
 .. cpp:class:: SVDOccupancyCalibrations
 	       

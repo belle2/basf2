@@ -13,23 +13,22 @@ main = b2.Path()
 
 # load input data from mdst/udst file
 ma.inputMdstList(
-    environmentType="default",
     filelist=[b2.find_file(f"starterkit/2021/1111540100_eph3_BGx0_{filenumber}.root", "examples")],
     path=main,
 )
 
 # fill final state particle lists
-ma.fillParticleList(
+ma.fillParticleList(  # [S10]
     "e+:uncorrected",
     "electronID > 0.1 and dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance",
     path=main,
-)
+)  # [E10]
 stdV0s.stdKshorts(path=main)
 
-# combine final state particles to form composite particles
+# combine final state particles to form composite particles [S20]
 ma.reconstructDecay(
     "J/psi:ee -> e+:uncorrected e-:uncorrected", cut="dM < 0.11", path=main
-)
+)  # [E20]
 
 # combine J/psi and KS candidates to form B0 candidates
 ma.reconstructDecay(
@@ -37,7 +36,7 @@ ma.reconstructDecay(
     cut="",
     path=main,
 )
-
+#  [E30]
 # Save variables to an output file (ntuple)
 ma.variablesToNtuple(
     "B0",

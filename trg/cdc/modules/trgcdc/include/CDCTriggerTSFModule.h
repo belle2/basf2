@@ -72,7 +72,7 @@ namespace Belle2 {
     /** mask Dead channel or not. True:mask False:unmask */
     bool m_deadchflag;
     /** dbobject to store deadchannel */
-    DBObjPtr<CDCTriggerDeadch> m_db_deadchannel;
+    DBObjPtr<CDCTriggerDeadch>* m_db_deadchannel = nullptr;
     /** TDC based crosstalk filtering logic on CDCFE. True:enable False:disable */
     bool m_crosstalk_tdcfilter;
 

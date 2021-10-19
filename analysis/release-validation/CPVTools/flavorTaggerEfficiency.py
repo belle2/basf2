@@ -664,38 +664,6 @@ for method in methods:
 # keep in mind:
 # the individual efficiency is determined on basis of the combiner training.
 # Whereas the efficiency is determined on basis of the final expert output.
-# print(eventLevelParticleLists)
-# eventLevelParticleLists.append(('K+:inRoe', 'KaonNotWeighted',
-#                                 'QpOf(K+:inRoe, isRightCategory(Kaon), isRightCategory(Kaon))'))
-# eventLevelParticleLists.append(('Lambda0:inRoe', 'LambdaNotWeighted',
-#                                 'weightedQpOf(Lambda0:inRoe, isRightCategory(Lambda), isRightCategory(Lambda))'))
-# eventLevelParticleLists.append(('e+:inRoe', 'Electron',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(Electron), isRightCategory(Electron))'))
-# eventLevelParticleLists.append(
-#     ('e+:inRoe',
-#      'IntermediateElectron',
-#      'weightedQpOf(e+:inRoe, isRightCategory(IntermediateElectron), isRightCategory(IntermediateElectron))'))
-# eventLevelParticleLists.append(('mu+:inRoe', 'Muon',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(Muon), isRightCategory(Muon))'))
-# eventLevelParticleLists.append(('mu+:inRoe', 'IntermediateMuon',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(IntermediateMuon), isRightCategory(IntermediateMuon))'))
-# eventLevelParticleLists.append(('mu+:inRoe', 'KinLepton',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(KinLepton), isRightCategory(KinLepton))'))
-# eventLevelParticleLists.append(
-#     ('mu+:inRoe',
-#      'IntermediateKinLepton',
-#      'weightedQpOf(e+:inRoe, isRightCategory(IntermediateKinLepton), isRightCategory(IntermediateKinLepton))'))
-# eventLevelParticleLists.append(('pi+:inRoe', 'SlowPion',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(MaximumPstar), isRightCategory(MaximumPstar))'))
-# eventLevelParticleLists.append(('pi+:inRoe', 'FSC',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(SlowPion), isRightCategory(SlowPion))'))
-# eventLevelParticleLists.append(('pi+:inRoe', 'MaximumPstar',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(FSC), isRightCategory(SlowPion))'))
-# eventLevelParticleLists.append(('pi+:inRoe', 'FastHadron',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(FastHadron), isRightCategory(FastHadron))'))
-# eventLevelParticleLists.append(('K+:inRoe', 'KaonPion',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(KaonPion), isRightCategory(Kaon))'))
-
 
 print(ft.getEventLevelParticleLists(usedCategories))
 

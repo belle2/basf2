@@ -387,7 +387,7 @@ Each one does exactly as its name indicates: they rank particles in descending
 variable provided as a parameter.
 They append to each particle an `extraInfo` field with the name
 ``${variable}_rank``, with the best candidate having the value one (1).
-Notice that *each particle/anti-particle list is sorted separately*, i.e.,if
+Notice that *each particle/anti-particle list is sorted separately*, i.e., if a
 certain event has multiple :math:`B^+` and :math:`B^-` candidates, and you apply
 the ranking function to any of the particle lists, each list will be ranked
 separately.

@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef HEPEVTREADER_H
-#define HEPEVTREADER_H
+#pragma once
 
 #include <framework/core/FrameworkExceptions.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -15,8 +14,6 @@
 
 #include <string>
 #include <fstream>
-
-#include <Math/LorentzRotation.h>
 
 namespace Belle2 {
 
@@ -86,8 +83,6 @@ namespace Belle2 {
 
     int m_nVirtual;        /**< The number of particles in each event with a set Virtual flag. */
     bool m_wrongSignPz;    /**< Bool to indicate that HER and LER were swapped. */
-    ROOT::Math::LorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
-
 
   protected:
     /** Just a typedef for simple use of the boost::tokenizer to split the lines */
@@ -123,5 +118,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif //HEPEVTREADER_H

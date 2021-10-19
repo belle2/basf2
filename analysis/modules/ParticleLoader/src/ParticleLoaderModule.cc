@@ -51,7 +51,7 @@ namespace Belle2 {
              "Use ROE instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
 
     addParam("roeMaskName", m_roeMaskName,
-             "ROE mask name to load", std::string(""));
+             "ROE mask name to load", std::string(RestOfEvent::c_defaultMaskName));
 
     addParam("sourceParticleListName", m_sourceParticleListName,
              "Particle list name from which we need to get ROEs", std::string(""));

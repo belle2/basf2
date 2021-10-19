@@ -15,8 +15,6 @@
 #include <string>
 #include <fstream>
 
-#include <Math/LorentzRotation.h>
-
 namespace Belle2 {
 
   /**
@@ -98,7 +96,6 @@ namespace Belle2 {
     void setVirtualIndex(int index) { m_indexVirtual = index; }
 
     bool m_wrongSignPz;    /**< Bool to indicate that HER and LER were swapped. */
-    ROOT::Math::LorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
     double m_meanDecayLength = 0.;        /**< Mean lifetime*c of displaced particle. */
     double m_Rmin = 0.; /**< Minimum  of vertex distance to IP.*/
     double m_Rmax = 0.; /**< Maximum of vertex distance to IP.*/

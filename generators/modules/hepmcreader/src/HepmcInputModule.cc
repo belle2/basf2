@@ -11,23 +11,14 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/Environment.h>
 
 using namespace std;
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
 REG_MODULE(HepMCInput)
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
-
-HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_minEvent(-1), m_maxEvent(INT_MAX), m_totalEvents(-1), m_initial(0)
+HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_minEvent(-1), m_maxEvent(INT_MAX), m_totalEvents(-1)
 {
   //Set module properties
   setDescription("HepMC file input. This module loads an event record from HEPMC2 format and store the content into the MCParticle collection. HEPMC format is used by for example pythia8.");
@@ -36,32 +27,30 @@ HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_minEvent(-1), m_
   //Parameter definition
   addParam("inputFileList", m_inputFileNames, "List of names of HepMC2 files");
   addParam("ignoreReadEventNr", m_ignorereadEventNr, "Parallel pythia can have dublicate event nrs.", false);
-  addParam("runNum", m_runNum, "run number to start from", 0);
-  addParam("expNum", m_expNum, "ExpNum to start from", 0);
+  addParam("runNum", m_runNum, "Run number", -1);
+  addParam("expNum", m_expNum, "Experiment number", -1);
   addParam("minEvt", m_minEvent, "Start converting at event number.", -1);
-  addParam("maxEvt", m_maxEvent, "Stop converting at Event number.", INT_MAX);
+  addParam("maxEvt", m_maxEvent, "Stop converting at event number.", INT_MAX);
   addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated.", false);
   addParam("nVirtualParticles", m_nVirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
-  addParam("boost2Lab", m_boost2Lab, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
   addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", false);
 }
 
 
 void HepMCInputModule::initialize()
 {
-  m_hepmcreader.reset(new HepMCReader(m_minEvent, m_maxEvent));
-  ROOT::Math::LorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
+  if (m_expNum < 0 or m_runNum < 0)
+    B2FATAL("The exp. and run numbers are not properly initialized: please set the 'expNum' and 'runNum' parameters of the HepMCInput module.");
 
-  if (m_runNum != 0 || m_expNum != 0) {
-    B2WARNING("Initialising the first read events with expNr or runNr != 0. This can lead to downloading the wrong payloads from the database if you are using MC!");
-  }
-  //Beam Parameters, initial particl
-  m_initial.initialize();
   m_eventMetaDataPtr.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+  B2INFO("HepMCInput acts as input module for this process. This means the exp., run and event numbers will be set by this module.");
+
+  m_hepmcreader.reset(new HepMCReader(m_minEvent, m_maxEvent));
+
   m_iFile = 0;
   if (m_inputFileNames.size() == 0) {
     //something is wrong with the file list.
-    B2FATAL("invalid list of input files. No entries found.");
+    B2FATAL("Invalid list of input files, no entries found.");
   } else {
     //let's start with the first file:
     m_inputFileName = m_inputFileNames[m_iFile];
@@ -76,19 +65,6 @@ void HepMCInputModule::initialize()
   m_hepmcreader->m_nVirtual = m_nVirtual;
   m_hepmcreader->m_wrongSignPz = m_wrongSignPz;
 
-  //Do we need to boost?
-  if (m_boost2Lab) {
-    const MCInitialParticles& initial = m_initial.generate();
-    ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
-    m_hepmcreader->m_labboost = boost;
-  }
-
-  //are we the master module? And do we have all infos?
-  B2INFO("HEPMC reader acts as master module for data processing. This means the event numbers etc will be set by this module.");
-  if (m_runNum == 0 && m_expNum == 0) {
-    B2WARNING("HEPMC reader acts as master module, but no run and experiment number set. Using defaults.");
-  }
-
   //Initialize MCParticle collection
   StoreArray<MCParticle> mcparticle;
   mcparticle.registerInDataStore();
@@ -101,17 +77,6 @@ void HepMCInputModule::initialize()
 void HepMCInputModule::event()
 {
   // we get the next event until it is invalid which we catch with that exception
-  B2DEBUG(20,
-          "Event ________________________________________________________________________________________________________________________________________________________________________________________________");
-  if (m_beamParams.hasChanged()) {
-    if (m_boost2Lab) {
-      const MCInitialParticles& initial = m_initial.generate();
-      ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
-      m_hepmcreader->m_labboost = boost;
-    }
-    B2WARNING("HepmcInputModule::event(): BeamParameters have changed within a job!");
-  }
-
   if (!m_eventMetaDataPtr) { m_eventMetaDataPtr.create(); }
   try {
     m_mcParticleGraph.clear();

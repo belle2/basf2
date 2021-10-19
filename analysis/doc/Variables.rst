@@ -7,7 +7,7 @@ The VariableManager handles all variables in ``basf2`` analysis.
 It is implemented as a `singleton <https://en.wikipedia.org/wiki/Singleton_pattern>`_
 C++ class with a python interface.
 
-The C++ documentation is `here <https://b2-master.belle2.org/software/development/classBelle2_1_1Variable_1_1Manager.html>`_.
+The C++ documentation is `here <https://software.belle2.org/development/classBelle2_1_1Variable_1_1Manager.html>`_.
 
 .. tip::
 
@@ -147,23 +147,6 @@ PID
 ~~~
 
 Here is a list of particle identification variables:
-
-.. warning ::
-  The **standard** global and binary PID variables - namely `electronID`, `pionID`... `binaryPID` - currently use information
-  from all detectors **except for the SVD**.
-  This is because at the moment "physical" SVD :math:`dE/dx` PDFs are available only for some particle hypotheses (:math:`\pi,K,p`) but not for others (:math:`e,\mu,d`), which could potentially bias the PID definition.
-
-  For **hadronID** only, a set of convenience variables have been defined that include the SVD:
-
-    * For *global* PID, :math:`\text{<Part>ID}=\mathcal{L}_{\text{<Part>}}/(\mathcal{L}_\pi+\mathcal{L}_K+\mathcal{L}_p)`, where :math:`\text{<Part>}\in[\pi,K,p]` : `pionID_SVD`, `kaonID_SVD`, `protonID_SVD`.
-    * For *binary* PID, :math:`\pi/K,\pi/p,K/p` : `binaryPID_SVD`.
-
-  Note that in the above the particle hypotheses :math:`e,\mu,d` have been excluded in the PID definition.
-
-  Please note, this distinction is meant to be only temporary: as soon as SVD PDFs are available for all particle hypotheses and thoroughly validated, the standard PID variables will include the SVD information back.
-
-.. warning ::
-   In release 5, a bug has been found in the TOP **electron** PDFs that degrades the electron identification performance. A set of two convenience PID variables where the TOP likelihoods are completely excluded - `electronID_noTOP` and `binaryPID_noTOP` - has been thus defined. These are expected to perform significantly better than the standard ones. Note that these are just temporary, and will be removed as soon as fixed TOP electron PDFs are available.
 
 .. warning ::
   The **definitions** of the default PID variables have changed between

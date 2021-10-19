@@ -98,7 +98,7 @@ namespace Belle2 {
              "Choose how to reconstruct the tracks on the tag side: standard, standard_PXD",
              string("standard_PXD"));
     addParam("maskName", m_roeMaskName,
-             "Choose ROE mask to get particles from ", string(""));
+             "Choose ROE mask to get particles from ", string(RestOfEvent::c_defaultMaskName));
     addParam("askMCInformation", m_mcInfo,
              "TRUE when requesting MC Information from the tracks performing the vertex fit", false);
     addParam("reqPXDHits", m_reqPXDHits,

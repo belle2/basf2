@@ -7162,6 +7162,7 @@ MCParticle#0:
   get4Vector(): (0.4567,-0,2.99909,11.008)
   getArrayIndex(): 0
   getCharge(): 0
+  getDaughter(0): -> MCParticles#1
   getDaughters(): size(2)
     -> MCParticles#1
     -> MCParticles#2
@@ -7178,6 +7179,7 @@ MCParticle#0:
   getNDaughters(): 2
   getName(): Upsilon(4S)
   getPDG(): 300553
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#3
   getProductionTime(): 0
   getProductionVertex(): (-0.000302327,1.54741e-06,0.0150023)
   getSecondaryPhysicsProcess(): 0
@@ -7192,6 +7194,7 @@ MCParticle#1:
   get4Vector(): (0.0640471,-0.295956,1.42323,5.47638)
   getArrayIndex(): 1
   getCharge(): 0
+  getDaughter(0): -> MCParticles#3
   getDaughters(): size(2)
     -> MCParticles#3
     -> MCParticles#4
@@ -7208,6 +7211,7 @@ MCParticle#1:
   getNDaughters(): 2
   getName(): anti-B0
   getPDG(): -511
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#13
   getProductionTime(): 0
   getProductionVertex(): (-0.000302327,1.54741e-06,0.0150023)
   getSecondaryPhysicsProcess(): 0
@@ -7222,6 +7226,7 @@ MCParticle#2:
   get4Vector(): (0.392653,0.295956,1.57586,5.53159)
   getArrayIndex(): 2
   getCharge(): 0
+  getDaughter(0): -> MCParticles#5
   getDaughters(): size(8)
     -> MCParticles#5
     -> MCParticles#6
@@ -7244,6 +7249,7 @@ MCParticle#2:
   getNDaughters(): 8
   getName(): anti-B0
   getPDG(): -511
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#17
   getProductionTime(): 0
   getProductionVertex(): (-0.000302327,1.54741e-06,0.0150023)
   getSecondaryPhysicsProcess(): 0
@@ -7258,6 +7264,7 @@ MCParticle#3:
   get4Vector(): (1.67198,0.00436111,0.777619,2.72788)
   getArrayIndex(): 3
   getCharge(): 1
+  getDaughter(0): -> MCParticles#13
   getDaughters(): size(2)
     -> MCParticles#13
     -> MCParticles#14
@@ -7274,6 +7281,7 @@ MCParticle#3:
   getNDaughters(): 2
   getName(): D*+
   getPDG(): 413
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#34
   getProductionTime(): 0.00080656
   getProductionVertex(): (-1.95375e-05,-0.0013052,0.0212863)
   getSecondaryPhysicsProcess(): 0
@@ -7288,6 +7296,7 @@ MCParticle#4:
   get4Vector(): (-1.60793,-0.300317,0.645608,2.7485)
   getArrayIndex(): 4
   getCharge(): -1
+  getDaughter(0): -> MCParticles#15
   getDaughters(): size(2)
     -> MCParticles#15
     -> MCParticles#16
@@ -7304,6 +7313,7 @@ MCParticle#4:
   getNDaughters(): 2
   getName(): D_s*-
   getPDG(): -433
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#41
   getProductionTime(): 0.00080656
   getProductionVertex(): (-1.95375e-05,-0.0013052,0.0212863)
   getSecondaryPhysicsProcess(): 0
@@ -7318,6 +7328,7 @@ MCParticle#5:
   get4Vector(): (0.626764,0.205264,0.3952,2.02154)
   getArrayIndex(): 5
   getCharge(): 1
+  getDaughter(0): -> MCParticles#17
   getDaughters(): size(3)
     -> MCParticles#17
     -> MCParticles#18
@@ -7335,6 +7346,7 @@ MCParticle#5:
   getNDaughters(): 3
   getName(): D+
   getPDG(): 411
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#45
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -7349,6 +7361,7 @@ MCParticle#6:
   get4Vector(): (-0.139561,0.147862,0.135592,0.281435)
   getArrayIndex(): 6
   getCharge(): -1
+  getDaughter(0): -> MCParticles#20
   getDaughters(): size(3)
     -> MCParticles#20
     -> MCParticles#21
@@ -7366,6 +7379,10 @@ MCParticle#6:
   getNDaughters(): 3
   getName(): pi-
   getPDG(): -211
+ ... message repeated 23 times
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -7380,6 +7397,7 @@ MCParticle#7:
   get4Vector(): (0.0470365,-0.12205,0.286246,0.58878)
   getArrayIndex(): 7
   getCharge(): 0
+  getDaughter(0): -> MCParticles#23
   getDaughters(): size(1)
     -> MCParticles#23
   getDecayTime(): 0.00375246
@@ -7395,6 +7413,9 @@ MCParticle#7:
   getNDaughters(): 1
   getName(): anti-K0
   getPDG(): -311
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -7409,6 +7430,7 @@ MCParticle#8:
   get4Vector(): (0.271681,0.123314,0.222489,0.621397)
   getArrayIndex(): 8
   getCharge(): 0
+  getDaughter(0): -> MCParticles#24
   getDaughters(): size(1)
     -> MCParticles#24
   getDecayTime(): 0.00375246
@@ -7424,6 +7446,7 @@ MCParticle#8:
   getNDaughters(): 1
   getName(): K0
   getPDG(): 311
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#49
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -7438,6 +7461,7 @@ MCParticle#9:
   get4Vector(): (-0.0832476,-0.0121345,0.0245192,0.160929)
   getArrayIndex(): 9
   getCharge(): 0
+  getDaughter(0): -> MCParticles#25
   getDaughters(): size(2)
     -> MCParticles#25
     -> MCParticles#26
@@ -7454,6 +7478,7 @@ MCParticle#9:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#51
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -7468,6 +7493,7 @@ MCParticle#10:
   get4Vector(): (-0.24597,0.0749003,0.0133983,0.825237)
   getArrayIndex(): 10
   getCharge(): 0
+  getDaughter(0): -> MCParticles#27
   getDaughters(): size(3)
     -> MCParticles#27
     -> MCParticles#28
@@ -7485,6 +7511,7 @@ MCParticle#10:
   getNDaughters(): 3
   getName(): omega
   getPDG(): 223
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#52
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -7499,6 +7526,7 @@ MCParticle#11:
   get4Vector(): (0.0417077,-0.0398718,-0.00747864,0.151212)
   getArrayIndex(): 11
   getCharge(): 1
+  getDaughter(0): -> MCParticles#30
   getDaughters(): size(2)
     -> MCParticles#30
     -> MCParticles#31
@@ -7515,6 +7543,9 @@ MCParticle#11:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -7529,6 +7560,7 @@ MCParticle#12:
   get4Vector(): (-0.120711,-0.0778675,0.484764,0.86811)
   getArrayIndex(): 12
   getCharge(): -1
+  getDaughter(0): -> MCParticles#32
   getDaughters(): size(2)
     -> MCParticles#32
     -> MCParticles#33
@@ -7545,6 +7577,9 @@ MCParticle#12:
   getNDaughters(): 2
   getName(): rho-
   getPDG(): -213
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -7559,6 +7594,7 @@ MCParticle#13:
   get4Vector(): (1.51864,0.00827758,0.690127,2.50561)
   getArrayIndex(): 13
   getCharge(): 1
+  getDaughter(0): -> MCParticles#34
   getDaughters(): size(5)
     -> MCParticles#34
     -> MCParticles#35
@@ -7578,6 +7614,7 @@ MCParticle#13:
   getNDaughters(): 5
   getName(): D+
   getPDG(): 411
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#63
   getProductionTime(): 0.000806585
   getProductionVertex(): (-1.95376e-05,-0.0013052,0.0212863)
   getSecondaryPhysicsProcess(): 0
@@ -7592,6 +7629,7 @@ MCParticle#14:
   get4Vector(): (0.153339,-0.00391647,0.0874919,0.222265)
   getArrayIndex(): 14
   getCharge(): 0
+  getDaughter(0): -> MCParticles#39
   getDaughters(): size(2)
     -> MCParticles#39
     -> MCParticles#40
@@ -7608,6 +7646,9 @@ MCParticle#14:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000806585
   getProductionVertex(): (-1.95376e-05,-0.0013052,0.0212863)
   getSecondaryPhysicsProcess(): 0
@@ -7622,6 +7663,7 @@ MCParticle#15:
   get4Vector(): (-1.46054,-0.294502,0.735203,2.57592)
   getArrayIndex(): 15
   getCharge(): -1
+  getDaughter(0): -> MCParticles#41
   getDaughters(): size(3)
     -> MCParticles#41
     -> MCParticles#42
@@ -7639,6 +7681,7 @@ MCParticle#15:
   getNDaughters(): 3
   getName(): D_s-
   getPDG(): -431
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#69
   getProductionTime(): 0.000806585
   getProductionVertex(): (-1.95376e-05,-0.0013052,0.0212863)
   getSecondaryPhysicsProcess(): 0
@@ -7653,6 +7696,7 @@ MCParticle#16:
   get4Vector(): (-0.147454,-0.00582815,-0.0895643,0.172622)
   getArrayIndex(): 16
   getCharge(): 0
+  getDaughter(0): -> MCParticles#44
   getDaughters(): size(1)
     -> MCParticles#44
   getDecayTime(): 4.69381
@@ -7668,6 +7712,9 @@ MCParticle#16:
   getNDaughters(): 1
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000806585
   getProductionVertex(): (-1.95376e-05,-0.0013052,0.0212863)
   getSecondaryPhysicsProcess(): 0
@@ -7682,6 +7729,7 @@ MCParticle#17:
   get4Vector(): (0.658539,0.177717,0.50106,0.981804)
   getArrayIndex(): 17
   getCharge(): 0
+  getDaughter(0): -> MCParticles#45
   getDaughters(): size(1)
     -> MCParticles#45
   getDecayTime(): 0.00533643
@@ -7697,6 +7745,7 @@ MCParticle#17:
   getNDaughters(): 1
   getName(): anti-K0
   getPDG(): -311
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#71
   getProductionTime(): 0.00533643
   getProductionVertex(): (0.0224054,0.010841,0.0563325)
   getSecondaryPhysicsProcess(): 0
@@ -7711,6 +7760,7 @@ MCParticle#18:
   get4Vector(): (-0.00265828,0.32692,-0.460582,0.574616)
   getArrayIndex(): 18
   getCharge(): 1
+  getDaughter(0): -> MCParticles#46
   getDaughters(): size(3)
     -> MCParticles#46
     -> MCParticles#47
@@ -7728,6 +7778,9 @@ MCParticle#18:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00533643
   getProductionVertex(): (0.0224054,0.010841,0.0563325)
   getSecondaryPhysicsProcess(): 0
@@ -7742,6 +7795,7 @@ MCParticle#19:
   get4Vector(): (-0.0290949,-0.299439,0.354722,0.465122)
   getArrayIndex(): 19
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 34.9932
   getDecayVertex(): (-65.5903,-675.263,800)
@@ -7756,6 +7810,9 @@ MCParticle#19:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00533643
   getProductionVertex(): (0.0224054,0.010841,0.0563325)
   getSecondaryPhysicsProcess(): 0
@@ -7770,6 +7827,7 @@ MCParticle#20:
   get4Vector(): (0.000340876,-4.29441e-05,0.000287955,0.000679764)
   getArrayIndex(): 20
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 6.54695
   getDecayVertex(): (-77.4077,-30.312,83.0986)
@@ -7784,6 +7842,9 @@ MCParticle#20:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.92741
   getProductionVertex(): (-77.4801,-30.1126,69.829)
   getSecondaryPhysicsProcess(): 2
@@ -7798,6 +7859,7 @@ MCParticle#21:
   get4Vector(): (0.0200444,-0.025402,0.0564055,0.0650279)
   getArrayIndex(): 21
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 33.5559
   getDecayVertex(): (183.657,-375.875,800)
@@ -7812,6 +7874,9 @@ MCParticle#21:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 6.13358
   getProductionVertex(): (-69.7494,-54.7358,86.9058)
   getSecondaryPhysicsProcess(): 201
@@ -7826,6 +7891,7 @@ MCParticle#22:
   get4Vector(): (0.0940813,-0.14022,0.0751351,0.21289)
   getArrayIndex(): 22
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 10.8203
   getDecayVertex(): (-8.08256,-18.7495,136.892)
@@ -7840,6 +7906,9 @@ MCParticle#22:
   getNDaughters(): 0
   getName(): mu-
   getPDG(): 13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 6.13358
   getProductionVertex(): (-69.7494,-54.7358,86.9058)
   getSecondaryPhysicsProcess(): 201
@@ -7854,6 +7923,7 @@ MCParticle#23:
   get4Vector(): (0.0470365,-0.12205,0.286246,0.58878)
   getArrayIndex(): 23
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 14.3416
   getDecayVertex(): (40.1389,-85.9649,209.026)
@@ -7868,6 +7938,9 @@ MCParticle#23:
   getNDaughters(): 0
   getName(): K_L0
   getPDG(): 130
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -7882,6 +7955,7 @@ MCParticle#24:
   get4Vector(): (0.271681,0.123314,0.222489,0.621397)
   getArrayIndex(): 24
   getCharge(): 0
+  getDaughter(0): -> MCParticles#49
   getDaughters(): size(2)
     -> MCParticles#49
     -> MCParticles#50
@@ -7898,6 +7972,7 @@ MCParticle#24:
   getNDaughters(): 2
   getName(): K_S0
   getPDG(): 310
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#73
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -7912,6 +7987,7 @@ MCParticle#25:
   get4Vector(): (0.00465917,-0.0564736,0.0262683,0.062458)
   getArrayIndex(): 25
   getCharge(): 0
+  getDaughter(0): -> MCParticles#51
   getDaughters(): size(1)
     -> MCParticles#51
   getDecayTime(): 4.73734
@@ -7927,6 +8003,9 @@ MCParticle#25:
   getNDaughters(): 1
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375264
   getProductionVertex(): (0.00767998,0.0060198,0.0470502)
   getSecondaryPhysicsProcess(): 0
@@ -7941,6 +8020,7 @@ MCParticle#26:
   get4Vector(): (-0.0879059,0.0443393,-0.00174938,0.0984707)
   getArrayIndex(): 26
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.2181
   getDecayVertex(): (-112.78,56.8956,-2.1975)
@@ -7955,6 +8035,9 @@ MCParticle#26:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375264
   getProductionVertex(): (0.00767998,0.0060198,0.0470502)
   getSecondaryPhysicsProcess(): 0
@@ -7969,6 +8052,7 @@ MCParticle#27:
   get4Vector(): (-0.206643,-0.175714,0.17424,0.351306)
   getArrayIndex(): 27
   getCharge(): -1
+  getDaughter(0): -> MCParticles#52
   getDaughters(): size(2)
     -> MCParticles#52
     -> MCParticles#53
@@ -7985,6 +8069,9 @@ MCParticle#27:
   getNDaughters(): 2
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -7999,6 +8086,7 @@ MCParticle#28:
   get4Vector(): (-0.131557,0.188266,-0.118698,0.293803)
   getArrayIndex(): 28
   getCharge(): 1
+  getDaughter(0): -> MCParticles#54
   getDaughters(): size(2)
     -> MCParticles#54
     -> MCParticles#55
@@ -8015,6 +8103,9 @@ MCParticle#28:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -8029,6 +8120,7 @@ MCParticle#29:
   get4Vector(): (0.0924431,0.0622831,-0.0421562,0.180058)
   getArrayIndex(): 29
   getCharge(): 0
+  getDaughter(0): -> MCParticles#56
   getDaughters(): size(2)
     -> MCParticles#56
     -> MCParticles#57
@@ -8045,6 +8137,9 @@ MCParticle#29:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -8059,6 +8154,7 @@ MCParticle#30:
   get4Vector(): (0.00872017,-0.0233116,0.0163733,0.0297918)
   getArrayIndex(): 30
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 93.8913
   getDecayVertex(): (299.038,-800,554.341)
@@ -8073,6 +8169,9 @@ MCParticle#30:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 60.2119
   getProductionVertex(): (3.5002,-9.94098,-0.569712)
   getSecondaryPhysicsProcess(): 201
@@ -8087,6 +8186,7 @@ MCParticle#31:
   get4Vector(): (-0.00872017,0.0233116,-0.0163733,0.109778)
   getArrayIndex(): 31
   getCharge(): 1
+  getDaughter(0): -> MCParticles#58
   getDaughters(): size(3)
     -> MCParticles#58
     -> MCParticles#59
@@ -8104,6 +8204,9 @@ MCParticle#31:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 60.2119
   getProductionVertex(): (3.5002,-9.94098,-0.569712)
   getSecondaryPhysicsProcess(): 201
@@ -8118,6 +8221,7 @@ MCParticle#32:
   get4Vector(): (-0.154354,-0.0932612,-0.107637,0.252167)
   getArrayIndex(): 32
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 8.98369
   getDecayVertex(): (47.2012,-12.2656,-105.064)
@@ -8132,6 +8236,9 @@ MCParticle#32:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -8146,6 +8253,7 @@ MCParticle#33:
   get4Vector(): (0.0283802,0.0119984,0.613538,0.628965)
   getArrayIndex(): 33
   getCharge(): 0
+  getDaughter(0): -> MCParticles#61
   getDaughters(): size(2)
     -> MCParticles#61
     -> MCParticles#62
@@ -8162,6 +8270,7 @@ MCParticle#33:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#78
   getProductionTime(): 0.00375246
   getProductionVertex(): (0.00768278,0.00602021,0.0470494)
   getSecondaryPhysicsProcess(): 0
@@ -8176,6 +8285,7 @@ MCParticle#34:
   get4Vector(): (0.663598,-0.0834269,0.0146927,0.831418)
   getArrayIndex(): 34
   getCharge(): -1
+  getDaughter(0): -> MCParticles#63
   getDaughters(): size(1)
     -> MCParticles#63
   getDecayTime(): 7.04045
@@ -8191,6 +8301,9 @@ MCParticle#34:
   getNDaughters(): 1
   getName(): K-
   getPDG(): -321
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00150507
   getProductionVertex(): (0.0126716,-0.00123626,0.0270537)
   getSecondaryPhysicsProcess(): 0
@@ -8205,6 +8318,7 @@ MCParticle#35:
   get4Vector(): (0.425168,0.0391045,0.441041,0.629519)
   getArrayIndex(): 35
   getCharge(): 1
+  getDaughter(0): -> MCParticles#64
   getDaughters(): size(3)
     -> MCParticles#64
     -> MCParticles#65
@@ -8222,6 +8336,9 @@ MCParticle#35:
   getNDaughters(): 3
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00150507
   getProductionVertex(): (0.0126716,-0.00123626,0.0270537)
   getSecondaryPhysicsProcess(): 0
@@ -8236,6 +8353,7 @@ MCParticle#36:
   get4Vector(): (0.0220553,0.148271,0.0878632,0.222869)
   getArrayIndex(): 36
   getCharge(): 1
+  getDaughter(0): -> MCParticles#67
   getDaughters(): size(2)
     -> MCParticles#67
     -> MCParticles#68
@@ -8252,6 +8370,9 @@ MCParticle#36:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00150507
   getProductionVertex(): (0.0126716,-0.00123626,0.0270537)
   getSecondaryPhysicsProcess(): 0
@@ -8266,6 +8387,7 @@ MCParticle#37:
   get4Vector(): (-0.0927728,0.0382575,-0.132393,0.216975)
   getArrayIndex(): 37
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.53629
   getDecayVertex(): (5.92767,43.7691,-81.3119)
@@ -8280,6 +8402,9 @@ MCParticle#37:
   getNDaughters(): 0
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00150507
   getProductionVertex(): (0.0126716,-0.00123626,0.0270537)
   getSecondaryPhysicsProcess(): 0
@@ -8294,6 +8419,7 @@ MCParticle#38:
   get4Vector(): (0.500591,-0.133985,0.278922,0.604831)
   getArrayIndex(): 38
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 7.72505
   getDecayVertex(): (140.491,101.678,95.0687)
@@ -8308,6 +8434,9 @@ MCParticle#38:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00150507
   getProductionVertex(): (0.0126716,-0.00123626,0.0270537)
   getSecondaryPhysicsProcess(): 0
@@ -8322,6 +8451,7 @@ MCParticle#39:
   get4Vector(): (0.0611903,0.0438065,-0.0146378,0.076665)
   getArrayIndex(): 39
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.42011
   getDecayVertex(): (105.745,75.7022,-25.2748)
@@ -8336,6 +8466,9 @@ MCParticle#39:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000806616
   getProductionVertex(): (-1.89137e-05,-0.00130522,0.0212867)
   getSecondaryPhysicsProcess(): 0
@@ -8350,6 +8483,7 @@ MCParticle#40:
   get4Vector(): (0.0921486,-0.047723,0.10213,0.1456)
   getArrayIndex(): 40
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 6.08976
   getDecayVertex(): (115.529,-59.8328,128.064)
@@ -8364,6 +8498,9 @@ MCParticle#40:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000806616
   getProductionVertex(): (-1.89137e-05,-0.00130522,0.0212867)
   getSecondaryPhysicsProcess(): 0
@@ -8378,6 +8515,7 @@ MCParticle#41:
   get4Vector(): (-0.331133,-0.150904,0.561286,1.22283)
   getArrayIndex(): 41
   getCharge(): 0
+  getDaughter(0): -> MCParticles#69
   getDaughters(): size(2)
     -> MCParticles#69
     -> MCParticles#70
@@ -8394,6 +8532,7 @@ MCParticle#41:
   getNDaughters(): 2
   getName(): phi
   getPDG(): 333
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#85
   getProductionTime(): 0.00111076
   getProductionVertex(): (-0.00518979,-0.00234777,0.0238889)
   getSecondaryPhysicsProcess(): 0
@@ -8408,6 +8547,7 @@ MCParticle#42:
   get4Vector(): (-0.849431,0.218661,0.132873,0.893401)
   getArrayIndex(): 42
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 9.49872
   getDecayVertex(): (-240.957,-100.852,32.7086)
@@ -8422,6 +8562,9 @@ MCParticle#42:
   getNDaughters(): 0
   getName(): mu-
   getPDG(): 13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00111076
   getProductionVertex(): (-0.00518979,-0.00234777,0.0238889)
   getSecondaryPhysicsProcess(): 0
@@ -8436,6 +8579,7 @@ MCParticle#43:
   get4Vector(): (-0.280525,-0.362551,0.0420582,0.460333)
   getArrayIndex(): 43
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 33.8833
   getDecayVertex(): (-619.007,-800,92.8288)
@@ -8450,6 +8594,9 @@ MCParticle#43:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00111076
   getProductionVertex(): (-0.00518979,-0.00234777,0.0238889)
   getSecondaryPhysicsProcess(): 0
@@ -8464,6 +8611,7 @@ MCParticle#44:
   get4Vector(): (-0.0081233,0.00578105,-0.00799167,0.939652)
   getArrayIndex(): 44
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 8154.32
   getDecayVertex(): (63.7629,2.60081,-64.149)
@@ -8478,6 +8626,9 @@ MCParticle#44:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 354.632
   getProductionVertex(): (74.1386,-118.406,41.1574)
   getSecondaryPhysicsProcess(): 121
@@ -8492,6 +8643,7 @@ MCParticle#45:
   get4Vector(): (0.658539,0.177717,0.50106,0.981804)
   getArrayIndex(): 45
   getCharge(): 0
+  getDaughter(0): -> MCParticles#71
   getDaughters(): size(2)
     -> MCParticles#71
     -> MCParticles#72
@@ -8508,6 +8660,7 @@ MCParticle#45:
   getNDaughters(): 2
   getName(): K_L0
   getPDG(): 130
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#90
   getProductionTime(): 0.00533643
   getProductionVertex(): (0.0224054,0.010841,0.0563325)
   getSecondaryPhysicsProcess(): 0
@@ -8522,6 +8675,7 @@ MCParticle#46:
   get4Vector(): (0.0379439,0.0172825,0.0134479,0.0438095)
   getArrayIndex(): 46
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 348.242
   getDecayVertex(): (800,389.666,95.6412)
@@ -8536,6 +8690,9 @@ MCParticle#46:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 320.323
   getProductionVertex(): (75.0572,59.4721,-161.29)
   getSecondaryPhysicsProcess(): 201
@@ -8550,6 +8707,7 @@ MCParticle#47:
   get4Vector(): (0.00681992,0.00466167,-0.00645872,0.0104861)
   getArrayIndex(): 47
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 354.913
   getDecayVertex(): (749.487,520.469,-800)
@@ -8564,6 +8722,9 @@ MCParticle#47:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 320.323
   getProductionVertex(): (75.0572,59.4721,-161.29)
   getSecondaryPhysicsProcess(): 201
@@ -8578,6 +8739,7 @@ MCParticle#48:
   get4Vector(): (-0.0452159,-0.0221658,-0.00705979,0.0508518)
   getArrayIndex(): 48
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 320.354
   getDecayVertex(): (74.2406,59.1878,-161.496)
@@ -8592,6 +8754,9 @@ MCParticle#48:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 320.323
   getProductionVertex(): (75.0572,59.4721,-161.29)
   getSecondaryPhysicsProcess(): 201
@@ -8606,6 +8771,7 @@ MCParticle#49:
   get4Vector(): (0.170946,-0.0394207,-0.0792604,0.237779)
   getArrayIndex(): 49
   getCharge(): 1
+  getDaughter(0): -> MCParticles#73
   getDaughters(): size(2)
     -> MCParticles#73
     -> MCParticles#74
@@ -8622,6 +8788,9 @@ MCParticle#49:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.108804
   getProductionVertex(): (1.38456,0.630975,1.17462)
   getSecondaryPhysicsProcess(): 0
@@ -8636,6 +8805,7 @@ MCParticle#50:
   get4Vector(): (0.100736,0.162735,0.301751,0.383619)
   getArrayIndex(): 50
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 9.66698
   getDecayVertex(): (-70.2227,37.5557,221.633)
@@ -8650,6 +8820,9 @@ MCParticle#50:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.108804
   getProductionVertex(): (1.38456,0.630975,1.17462)
   getSecondaryPhysicsProcess(): 0
@@ -8664,6 +8837,7 @@ MCParticle#51:
   get4Vector(): (0.00207086,-0.00391247,0.000535272,0.00445897)
   getArrayIndex(): 51
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 24.2267
   getDecayVertex(): (81.769,-55.5961,57.1168)
@@ -8678,6 +8852,9 @@ MCParticle#51:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.75694
   getProductionVertex(): (10.8984,-128.796,59.8972)
   getSecondaryPhysicsProcess(): 3
@@ -8692,6 +8869,7 @@ MCParticle#52:
   get4Vector(): (-0.0529411,0.0625465,0.0243852,0.0854954)
   getArrayIndex(): 52
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 49.031
   getDecayVertex(): (-606.549,800,492.639)
@@ -8706,6 +8884,9 @@ MCParticle#52:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 12.4498
   getProductionVertex(): (72.5443,-2.30506,179.842)
   getSecondaryPhysicsProcess(): 201
@@ -8720,6 +8901,7 @@ MCParticle#53:
   get4Vector(): (-0.143598,0.0788933,0.122347,0.230168)
   getArrayIndex(): 53
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 13.9613
   getDecayVertex(): (42.5026,-1.65778,201.524)
@@ -8734,6 +8916,9 @@ MCParticle#53:
   getNDaughters(): 0
   getName(): mu-
   getPDG(): 13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 12.4498
   getProductionVertex(): (72.5443,-2.30506,179.842)
   getSecondaryPhysicsProcess(): 201
@@ -8748,6 +8933,7 @@ MCParticle#54:
   get4Vector(): (0.0159564,-0.0170419,0.0185075,0.029792)
   getArrayIndex(): 54
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 63.8674
   getDecayVertex(): (800,-759.812,720.31)
@@ -8762,6 +8948,9 @@ MCParticle#54:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 19.0612
   getProductionVertex(): (80.5625,8.5729,-114.155)
   getSecondaryPhysicsProcess(): 201
@@ -8776,6 +8965,7 @@ MCParticle#55:
   get4Vector(): (-0.0159564,0.0170419,-0.0185075,0.109778)
   getArrayIndex(): 55
   getCharge(): 1
+  getDaughter(0): -> MCParticles#75
   getDaughters(): size(3)
     -> MCParticles#75
     -> MCParticles#76
@@ -8793,6 +8983,9 @@ MCParticle#55:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 19.0612
   getProductionVertex(): (80.5625,8.5729,-114.155)
   getSecondaryPhysicsProcess(): 201
@@ -8807,6 +9000,7 @@ MCParticle#56:
   get4Vector(): (-0.00611875,0.0745046,-0.0275607,0.0796742)
   getArrayIndex(): 56
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.5558
   getDecayVertex(): (-10.4726,127.618,-47.1593)
@@ -8821,6 +9015,9 @@ MCParticle#56:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375295
   getProductionVertex(): (0.00769034,0.0060253,0.047046)
   getSecondaryPhysicsProcess(): 0
@@ -8835,6 +9032,7 @@ MCParticle#57:
   get4Vector(): (0.0985618,-0.0122216,-0.0145954,0.100383)
   getArrayIndex(): 57
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.2745
   getDecayVertex(): (125.718,-15.5819,-18.5687)
@@ -8849,6 +9047,9 @@ MCParticle#57:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375295
   getProductionVertex(): (0.00769034,0.0060253,0.047046)
   getSecondaryPhysicsProcess(): 0
@@ -8863,6 +9064,7 @@ MCParticle#58:
   get4Vector(): (0.00164654,0.0252074,-0.0240931,0.0349085)
   getArrayIndex(): 58
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 559.758
   getDecayVertex(): (55.9522,800,-774.561)
@@ -8877,6 +9079,9 @@ MCParticle#58:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 522.403
   getProductionVertex(): (3.13133,-8.65096,-1.65726)
   getSecondaryPhysicsProcess(): 201
@@ -8891,6 +9096,7 @@ MCParticle#59:
   get4Vector(): (-0.0106741,-0.0154445,0.0428231,0.0467578)
   getArrayIndex(): 59
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 551.601
   getDecayVertex(): (-196.69,-297.776,800)
@@ -8905,6 +9111,9 @@ MCParticle#59:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 522.403
   getProductionVertex(): (3.13133,-8.65096,-1.65726)
   getSecondaryPhysicsProcess(): 201
@@ -8919,6 +9128,7 @@ MCParticle#60:
   get4Vector(): (0.00922618,-0.00997772,-0.0191422,0.0234811)
   getArrayIndex(): 60
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 523.354
   getDecayVertex(): (1.98044,-8.36552,-25.7512)
@@ -8933,6 +9143,9 @@ MCParticle#60:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 522.403
   getProductionVertex(): (3.13133,-8.65096,-1.65726)
   getSecondaryPhysicsProcess(): 201
@@ -8947,6 +9160,7 @@ MCParticle#61:
   get4Vector(): (0.0391372,0.0391005,0.586802,0.589405)
   getArrayIndex(): 61
   getCharge(): 0
+  getDaughter(0): -> MCParticles#78
   getDaughters(): size(1)
     -> MCParticles#78
   getDecayTime(): 0.479231
@@ -8962,6 +9176,9 @@ MCParticle#61:
   getNDaughters(): 1
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375272
   getProductionVertex(): (0.00768313,0.00602036,0.0470571)
   getSecondaryPhysicsProcess(): 0
@@ -8976,6 +9193,7 @@ MCParticle#62:
   get4Vector(): (-0.010757,-0.0271021,0.0267355,0.0395604)
   getArrayIndex(): 62
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 6.25273
   getDecayVertex(): (-50.5721,-129.405,120.469)
@@ -8990,6 +9208,9 @@ MCParticle#62:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00375272
   getProductionVertex(): (0.00768313,0.00602036,0.0470571)
   getSecondaryPhysicsProcess(): 0
@@ -9004,6 +9225,7 @@ MCParticle#63:
   get4Vector(): (-0.00676069,-0.0190144,0.00735486,0.939811)
   getArrayIndex(): 63
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 10022
   getDecayVertex(): (16.2356,-0.685116,-3.99175)
@@ -9018,6 +9240,9 @@ MCParticle#63:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 46.6085
   getProductionVertex(): (119.421,61.2944,3.81986)
   getSecondaryPhysicsProcess(): 121
@@ -9032,6 +9257,7 @@ MCParticle#64:
   get4Vector(): (0.000806733,1.83406e-05,0.000393819,0.00103313)
   getArrayIndex(): 64
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 12.3978
   getDecayVertex(): (91.4841,-47.6031,156.309)
@@ -9046,6 +9272,9 @@ MCParticle#64:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 5.43221
   getProductionVertex(): (91.7657,-48.7379,114.368)
   getSecondaryPhysicsProcess(): 2
@@ -9060,6 +9289,7 @@ MCParticle#65:
   get4Vector(): (0.0195485,0.00771589,0.0211159,0.029792)
   getArrayIndex(): 65
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 80.2002
   getDecayVertex(): (616.81,106.717,800)
@@ -9074,6 +9304,9 @@ MCParticle#65:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 52.5654
   getProductionVertex(): (73.194,-107.85,212.798)
   getSecondaryPhysicsProcess(): 201
@@ -9088,6 +9321,7 @@ MCParticle#66:
   get4Vector(): (-0.0195485,-0.00771589,-0.0211159,0.109778)
   getArrayIndex(): 66
   getCharge(): 1
+  getDaughter(0): -> MCParticles#79
   getDaughters(): size(3)
     -> MCParticles#79
     -> MCParticles#80
@@ -9105,6 +9339,9 @@ MCParticle#66:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 52.5654
   getProductionVertex(): (73.194,-107.85,212.798)
   getSecondaryPhysicsProcess(): 201
@@ -9119,6 +9356,7 @@ MCParticle#67:
   get4Vector(): (-0.0152326,-0.0237274,-0.00961979,0.029792)
   getArrayIndex(): 67
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 61.4337
   getDecayVertex(): (-493.047,-800,-209.993)
@@ -9133,6 +9371,9 @@ MCParticle#67:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 28.7942
   getProductionVertex(): (7.26103,-20.6821,105.966)
   getSecondaryPhysicsProcess(): 201
@@ -9147,6 +9388,7 @@ MCParticle#68:
   get4Vector(): (0.0152326,0.0237274,0.00961979,0.109778)
   getArrayIndex(): 68
   getCharge(): 1
+  getDaughter(0): -> MCParticles#82
   getDaughters(): size(3)
     -> MCParticles#82
     -> MCParticles#83
@@ -9164,6 +9406,9 @@ MCParticle#68:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 28.7942
   getProductionVertex(): (7.26103,-20.6821,105.966)
   getSecondaryPhysicsProcess(): 201
@@ -9178,6 +9423,7 @@ MCParticle#69:
   get4Vector(): (-0.264067,-0.220688,0.605915,1.0558)
   getArrayIndex(): 69
   getCharge(): 0
+  getDaughter(0): -> MCParticles#85
   getDaughters(): size(3)
     -> MCParticles#85
     -> MCParticles#86
@@ -9195,6 +9441,7 @@ MCParticle#69:
   getNDaughters(): 3
   getName(): rho0
   getPDG(): 113
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#94
   getProductionTime(): 0.00111076
   getProductionVertex(): (-0.00518979,-0.00234777,0.0238889)
   getSecondaryPhysicsProcess(): 0
@@ -9209,6 +9456,7 @@ MCParticle#70:
   get4Vector(): (-0.0690226,0.0679149,-0.0397701,0.170812)
   getArrayIndex(): 70
   getCharge(): 0
+  getDaughter(0): -> MCParticles#88
   getDaughters(): size(2)
     -> MCParticles#88
     -> MCParticles#89
@@ -9225,6 +9473,9 @@ MCParticle#70:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00111076
   getProductionVertex(): (-0.00518979,-0.00234777,0.0238889)
   getSecondaryPhysicsProcess(): 0
@@ -9239,6 +9490,7 @@ MCParticle#71:
   get4Vector(): (-0.0513409,0.218096,0.08468,0.274939)
   getArrayIndex(): 71
   getCharge(): 0
+  getDaughter(0): -> MCParticles#90
   getDaughters(): size(2)
     -> MCParticles#90
     -> MCParticles#91
@@ -9255,6 +9507,9 @@ MCParticle#71:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.9247
   getProductionVertex(): (209.782,53.9397,165.637)
   getSecondaryPhysicsProcess(): 201
@@ -9269,6 +9524,7 @@ MCParticle#72:
   get4Vector(): (-0.0659995,-0.187359,0.190136,0.306316)
   getArrayIndex(): 72
   getCharge(): 0
+  getDaughter(0): -> MCParticles#92
   getDaughters(): size(2)
     -> MCParticles#92
     -> MCParticles#93
@@ -9285,6 +9541,9 @@ MCParticle#72:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.9247
   getProductionVertex(): (209.782,53.9397,165.637)
   getSecondaryPhysicsProcess(): 201
@@ -9299,6 +9558,7 @@ MCParticle#73:
   get4Vector(): (0.00849001,0.00979365,0.00529142,0.93967)
   getArrayIndex(): 73
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 10076.1
   getDecayVertex(): (-89.2665,-85.6241,91.5355)
@@ -9313,6 +9573,9 @@ MCParticle#73:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 67.0758
   getProductionVertex(): (117.637,4.68685,190.776)
   getSecondaryPhysicsProcess(): 121
@@ -9327,6 +9590,7 @@ MCParticle#74:
   get4Vector(): (0.00385123,-0.0086744,0.000581705,0.939613)
   getArrayIndex(): 74
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 10016.6
   getDecayVertex(): (68.9548,42.709,100.324)
@@ -9341,6 +9605,9 @@ MCParticle#74:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 17.4454
   getProductionVertex(): (-29.7243,-43.1439,-113.21)
   getSecondaryPhysicsProcess(): 121
@@ -9355,6 +9622,7 @@ MCParticle#75:
   get4Vector(): (-0.039082,-0.0231347,0.00901329,0.0463018)
   getArrayIndex(): 75
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 3898.46
   getDecayVertex(): (-800,-512.621,88.8826)
@@ -9369,6 +9637,9 @@ MCParticle#75:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3863.66
   getProductionVertex(): (80.5244,8.60894,-114.189)
   getSecondaryPhysicsProcess(): 201
@@ -9383,6 +9654,7 @@ MCParticle#76:
   get4Vector(): (0.0300147,0.0110065,-0.0216512,0.0386109)
   getArrayIndex(): 76
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 3894.53
   getDecayVertex(): (800,272.443,-633.184)
@@ -9397,6 +9669,9 @@ MCParticle#76:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3863.66
   getProductionVertex(): (80.5244,8.60894,-114.189)
   getSecondaryPhysicsProcess(): 201
@@ -9411,6 +9686,7 @@ MCParticle#77:
   get4Vector(): (0.0092992,0.0124385,0.0129612,0.0202347)
   getArrayIndex(): 77
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 3863.7
   getDecayVertex(): (81.1425,8.91482,-113.83)
@@ -9425,6 +9701,9 @@ MCParticle#77:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3863.66
   getProductionVertex(): (80.5244,8.60894,-114.189)
   getSecondaryPhysicsProcess(): 201
@@ -9439,6 +9718,7 @@ MCParticle#78:
   get4Vector(): (0.000531932,-0.000445886,0.00115774,0.00134987)
   getArrayIndex(): 78
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 10.4596
   getDecayVertex(): (-49.2593,-86.8787,117.363)
@@ -9453,6 +9733,9 @@ MCParticle#78:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.540728
   getProductionVertex(): (1.40165,0.773502,15.9269)
   getSecondaryPhysicsProcess(): 3
@@ -9467,6 +9750,7 @@ MCParticle#79:
   get4Vector(): (0.0314239,-0.0290681,0.0116758,0.0443705)
   getArrayIndex(): 79
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1956.56
   getDecayVertex(): (800,-780.224,482.813)
@@ -9481,6 +9765,9 @@ MCParticle#79:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1922.32
   getProductionVertex(): (73.1646,-107.879,212.751)
   getSecondaryPhysicsProcess(): 201
@@ -9495,6 +9782,7 @@ MCParticle#80:
   get4Vector(): (0.000401979,-0.00113311,-0.0161217,0.0161664)
   getArrayIndex(): 80
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1956.2
   getDecayVertex(): (98.4166,-179.06,-800)
@@ -9509,6 +9797,9 @@ MCParticle#80:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1922.32
   getProductionVertex(): (73.1646,-107.879,212.751)
   getSecondaryPhysicsProcess(): 201
@@ -9523,6 +9814,7 @@ MCParticle#81:
   get4Vector(): (-0.0321925,0.0305491,0.00449705,0.0446105)
   getArrayIndex(): 81
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1922.36
   getDecayVertex(): (72.4075,-107.443,212.681)
@@ -9537,6 +9829,9 @@ MCParticle#81:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1922.32
   getProductionVertex(): (73.1646,-107.879,212.751)
   getSecondaryPhysicsProcess(): 201
@@ -9551,6 +9846,7 @@ MCParticle#82:
   get4Vector(): (-0.00568696,0.025621,0.0310668,0.0406685)
   getArrayIndex(): 82
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 2038.15
   getDecayVertex(): (-119.774,551.714,800)
@@ -9565,6 +9861,9 @@ MCParticle#82:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2007.84
   getProductionVertex(): (7.27214,-20.6581,105.971)
   getSecondaryPhysicsProcess(): 201
@@ -9579,6 +9878,7 @@ MCParticle#83:
   get4Vector(): (0.0211672,-0.0269588,-0.00648006,0.034883)
   getArrayIndex(): 83
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 2041.48
   getDecayVertex(): (619.187,-800,-81.3587)
@@ -9593,6 +9893,9 @@ MCParticle#83:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2007.84
   getProductionVertex(): (7.27214,-20.6581,105.971)
   getSecondaryPhysicsProcess(): 201
@@ -9607,6 +9910,7 @@ MCParticle#84:
   get4Vector(): (-0.0157499,0.00136108,-0.025015,0.029596)
   getArrayIndex(): 84
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 2007.91
   getDecayVertex(): (7.10777,-20.1082,104.706)
@@ -9621,6 +9925,9 @@ MCParticle#84:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2007.84
   getProductionVertex(): (7.27214,-20.6581,105.971)
   getSecondaryPhysicsProcess(): 201
@@ -9635,6 +9942,7 @@ MCParticle#85:
   get4Vector(): (-0.217164,0.255652,0.302018,0.472454)
   getArrayIndex(): 85
   getCharge(): 1
+  getDaughter(0): -> MCParticles#94
   getDaughters(): size(1)
     -> MCParticles#94
   getDecayTime(): 7.74324
@@ -9650,6 +9958,9 @@ MCParticle#85:
   getNDaughters(): 1
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00111076
   getProductionVertex(): (-0.00518979,-0.00234777,0.0238889)
   getSecondaryPhysicsProcess(): 0
@@ -9664,6 +9975,7 @@ MCParticle#86:
   get4Vector(): (-0.0443302,-0.474189,0.297993,0.578879)
   getArrayIndex(): 86
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 7.6639
   getDecayVertex(): (114.754,-119.246,117.107)
@@ -9678,6 +9990,9 @@ MCParticle#86:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00111076
   getProductionVertex(): (-0.00518979,-0.00234777,0.0238889)
   getSecondaryPhysicsProcess(): 0
@@ -9692,6 +10007,7 @@ MCParticle#87:
   get4Vector(): (-3.58941e-08,-2.13609e-07,5.46204e-08,2.23385e-07)
   getArrayIndex(): 87
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 0.0353675
   getDecayVertex(): (-0.17021,-0.984398,0.275002)
@@ -9706,6 +10022,9 @@ MCParticle#87:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00111076
   getProductionVertex(): (-0.00518979,-0.00234777,0.0238889)
   getSecondaryPhysicsProcess(): 0
@@ -9720,6 +10039,7 @@ MCParticle#88:
   get4Vector(): (0.00918007,0.0559547,-0.0664207,0.0873322)
   getArrayIndex(): 88
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.9823
   getDecayVertex(): (15.6921,95.6766,-113.551)
@@ -9734,6 +10054,9 @@ MCParticle#88:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00111077
   getProductionVertex(): (-0.00518984,-0.00234772,0.0238889)
   getSecondaryPhysicsProcess(): 0
@@ -9748,6 +10071,7 @@ MCParticle#89:
   get4Vector(): (-0.0782026,0.0119602,0.0266506,0.0834803)
   getArrayIndex(): 89
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.48967
   getDecayVertex(): (-126.062,19.2766,42.9826)
@@ -9762,6 +10086,9 @@ MCParticle#89:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00111077
   getProductionVertex(): (-0.00518984,-0.00234772,0.0238889)
   getSecondaryPhysicsProcess(): 0
@@ -9776,6 +10103,7 @@ MCParticle#90:
   get4Vector(): (-0.0908808,0.0932419,0.0498398,0.139418)
   getArrayIndex(): 90
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 11.3522
   getDecayVertex(): (201.427,62.5117,170.219)
@@ -9790,6 +10118,9 @@ MCParticle#90:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.9247
   getProductionVertex(): (209.782,53.9397,165.637)
   getSecondaryPhysicsProcess(): 201
@@ -9804,6 +10135,7 @@ MCParticle#91:
   get4Vector(): (0.0395398,0.124854,0.0348402,0.135521)
   getArrayIndex(): 91
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 11.7517
   getDecayVertex(): (217.015,76.7807,172.011)
@@ -9818,6 +10150,9 @@ MCParticle#91:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.9247
   getProductionVertex(): (209.782,53.9397,165.637)
   getSecondaryPhysicsProcess(): 201
@@ -9832,6 +10167,7 @@ MCParticle#92:
   get4Vector(): (-0.0731961,-0.126998,0.0522338,0.155611)
   getArrayIndex(): 92
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 10.9799
   getDecayVertex(): (209.003,52.589,166.193)
@@ -9846,6 +10182,9 @@ MCParticle#92:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.9247
   getProductionVertex(): (209.782,53.9397,165.637)
   getSecondaryPhysicsProcess(): 201
@@ -9860,6 +10199,7 @@ MCParticle#93:
   get4Vector(): (0.00719662,-0.0603602,0.137902,0.150706)
   getArrayIndex(): 93
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 11.1359
   getDecayVertex(): (210.084,51.4038,171.431)
@@ -9874,6 +10214,9 @@ MCParticle#93:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 10.9247
   getProductionVertex(): (209.782,53.9397,165.637)
   getSecondaryPhysicsProcess(): 201
@@ -9888,6 +10231,7 @@ MCParticle#94:
   get4Vector(): (0.000285094,-9.74435e-05,0.000230527,0.000636425)
   getArrayIndex(): 94
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 2264.83
   getDecayVertex(): (-55.4594,80.456,125.329)
@@ -9902,6 +10246,9 @@ MCParticle#94:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2263.65
   getProductionVertex(): (-55.463,80.3164,125.452)
   getSecondaryPhysicsProcess(): 13
@@ -9912,7 +10259,6 @@ MCParticle#94:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
- ... message repeated 23 times
 [INFO] EXP:        0        RUN:        0        EVT:        2
 EventMetaData:
   getErrorFlag(): 0
@@ -16541,6 +16887,7 @@ MCParticle#0:
   get4Vector(): (0.456348,-0,2.99976,10.9995)
   getArrayIndex(): 0
   getCharge(): 0
+  getDaughter(0): -> MCParticles#1
   getDaughters(): size(2)
     -> MCParticles#1
     -> MCParticles#2
@@ -16557,6 +16904,7 @@ MCParticle#0:
   getNDaughters(): 2
   getName(): Upsilon(4S)
   getPDG(): 300553
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#3
   getProductionTime(): 0
   getProductionVertex(): (-0.000786426,-1.78586e-06,0.0129065)
   getSecondaryPhysicsProcess(): 0
@@ -16571,6 +16919,7 @@ MCParticle#1:
   get4Vector(): (0.351753,-0.199805,1.652,5.54637)
   getArrayIndex(): 1
   getCharge(): 1
+  getDaughter(0): -> MCParticles#3
   getDaughters(): size(3)
     -> MCParticles#3
     -> MCParticles#4
@@ -16588,6 +16937,7 @@ MCParticle#1:
   getNDaughters(): 3
   getName(): B+
   getPDG(): 521
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#9
   getProductionTime(): 0
   getProductionVertex(): (-0.000786426,-1.78586e-06,0.0129065)
   getSecondaryPhysicsProcess(): 0
@@ -16602,6 +16952,7 @@ MCParticle#2:
   get4Vector(): (0.104596,0.199805,1.34775,5.45314)
   getArrayIndex(): 2
   getCharge(): -1
+  getDaughter(0): -> MCParticles#6
   getDaughters(): size(3)
     -> MCParticles#6
     -> MCParticles#7
@@ -16619,6 +16970,7 @@ MCParticle#2:
   getNDaughters(): 3
   getName(): B-
   getPDG(): -521
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#15
   getProductionTime(): 0
   getProductionVertex(): (-0.000786426,-1.78586e-06,0.0129065)
   getSecondaryPhysicsProcess(): 0
@@ -16633,6 +16985,7 @@ MCParticle#3:
   get4Vector(): (-0.505049,-0.238114,0.406431,2.1256)
   getArrayIndex(): 3
   getCharge(): -1
+  getDaughter(0): -> MCParticles#9
   getDaughters(): size(2)
     -> MCParticles#9
     -> MCParticles#10
@@ -16649,6 +17002,7 @@ MCParticle#3:
   getNDaughters(): 2
   getName(): D*-
   getPDG(): -413
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#20
   getProductionTime(): 0.00168077
   getProductionVertex(): (0.00240921,-0.001817,0.0279147)
   getSecondaryPhysicsProcess(): 0
@@ -16663,6 +17017,7 @@ MCParticle#4:
   get4Vector(): (-0.444358,-0.0566177,0.170835,1.31752)
   getArrayIndex(): 4
   getCharge(): 0
+  getDaughter(0): -> MCParticles#11
   getDaughters(): size(2)
     -> MCParticles#11
     -> MCParticles#12
@@ -16679,6 +17034,7 @@ MCParticle#4:
   getNDaughters(): 2
   getName(): anti-Delta0
   getPDG(): -2114
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#23
   getProductionTime(): 0.0016808
   getProductionVertex(): (0.00240918,-0.00181706,0.0279147)
   getSecondaryPhysicsProcess(): 0
@@ -16693,6 +17049,7 @@ MCParticle#5:
   get4Vector(): (1.30921,0.0955506,1.08037,2.11045)
   getArrayIndex(): 5
   getCharge(): 2
+  getDaughter(0): -> MCParticles#13
   getDaughters(): size(2)
     -> MCParticles#13
     -> MCParticles#14
@@ -16709,6 +17066,10 @@ MCParticle#5:
   getNDaughters(): 2
   getName(): Delta++
   getPDG(): 2224
+ ... message repeated 20 times
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0016808
   getProductionVertex(): (0.00240918,-0.00181706,0.0279147)
   getSecondaryPhysicsProcess(): 0
@@ -16723,6 +17084,7 @@ MCParticle#6:
   get4Vector(): (-1.09435,-0.0823933,0.265866,2.30284)
   getArrayIndex(): 6
   getCharge(): 0
+  getDaughter(0): -> MCParticles#15
   getDaughters(): size(2)
     -> MCParticles#15
     -> MCParticles#16
@@ -16739,6 +17101,7 @@ MCParticle#6:
   getNDaughters(): 2
   getName(): D*0
   getPDG(): 423
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#36
   getProductionTime(): 0.000257877
   getProductionVertex(): (-0.00063814,0.00028148,0.0148172)
   getSecondaryPhysicsProcess(): 0
@@ -16753,6 +17116,7 @@ MCParticle#7:
   get4Vector(): (1.09405,0.602137,-0.367445,1.54866)
   getArrayIndex(): 7
   getCharge(): -1
+  getDaughter(0): -> MCParticles#17
   getDaughters(): size(2)
     -> MCParticles#17
     -> MCParticles#18
@@ -16769,6 +17133,7 @@ MCParticle#7:
   getNDaughters(): 2
   getName(): K*-
   getPDG(): -323
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#41
   getProductionTime(): 0.000257882
   getProductionVertex(): (-0.00063814,0.00028148,0.0148172)
   getSecondaryPhysicsProcess(): 0
@@ -16783,6 +17148,7 @@ MCParticle#8:
   get4Vector(): (0.0809957,-0.333091,1.45736,1.57766)
   getArrayIndex(): 8
   getCharge(): 0
+  getDaughter(0): -> MCParticles#19
   getDaughters(): size(1)
     -> MCParticles#19
   getDecayTime(): 0.000257882
@@ -16798,6 +17164,7 @@ MCParticle#8:
   getNDaughters(): 1
   getName(): K0
   getPDG(): 311
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#43
   getProductionTime(): 0.000257882
   getProductionVertex(): (-0.00063814,0.00028148,0.0148172)
   getSecondaryPhysicsProcess(): 0
@@ -16812,6 +17179,7 @@ MCParticle#9:
   get4Vector(): (-0.47003,-0.225765,0.417104,1.98078)
   getArrayIndex(): 9
   getCharge(): 0
+  getDaughter(0): -> MCParticles#20
   getDaughters(): size(3)
     -> MCParticles#20
     -> MCParticles#21
@@ -16829,6 +17197,7 @@ MCParticle#9:
   getNDaughters(): 3
   getName(): anti-D0
   getPDG(): -421
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#45
   getProductionTime(): 0.0016808
   getProductionVertex(): (0.00240918,-0.00181706,0.0279147)
   getSecondaryPhysicsProcess(): 0
@@ -16843,6 +17212,7 @@ MCParticle#10:
   get4Vector(): (-0.035022,-0.0123544,-0.010673,0.14482)
   getArrayIndex(): 10
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 0.154343
   getDecayVertex(): (-1.04103,-0.44933,-0.286036)
@@ -16857,6 +17227,9 @@ MCParticle#10:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0016808
   getProductionVertex(): (0.00240918,-0.00181706,0.0279147)
   getSecondaryPhysicsProcess(): 0
@@ -16871,6 +17244,7 @@ MCParticle#11:
   get4Vector(): (-0.205341,0.126931,0.0763469,0.971833)
   getArrayIndex(): 11
   getCharge(): -1
+  getDaughter(0): -> MCParticles#23
   getDaughters(): size(9)
     -> MCParticles#23
     -> MCParticles#24
@@ -16894,6 +17268,9 @@ MCParticle#11:
   getNDaughters(): 9
   getName(): anti-p-
   getPDG(): -2212
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0016808
   getProductionVertex(): (0.00240918,-0.00181706,0.0279147)
   getSecondaryPhysicsProcess(): 0
@@ -16908,6 +17285,7 @@ MCParticle#12:
   get4Vector(): (-0.239854,-0.183656,0.0948098,0.346018)
   getArrayIndex(): 12
   getCharge(): 1
+  getDaughter(0): -> MCParticles#32
   getDaughters(): size(2)
     -> MCParticles#32
     -> MCParticles#33
@@ -16924,6 +17302,9 @@ MCParticle#12:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0016808
   getProductionVertex(): (0.00240918,-0.00181706,0.0279147)
   getSecondaryPhysicsProcess(): 0
@@ -16938,6 +17319,7 @@ MCParticle#13:
   get4Vector(): (1.10762,0.311699,0.870054,1.72085)
   getArrayIndex(): 13
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 8.47104
   getDecayVertex(): (165.447,-10.5747,124.643)
@@ -16952,6 +17334,9 @@ MCParticle#13:
   getNDaughters(): 0
   getName(): p+
   getPDG(): 2212
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0016808
   getProductionVertex(): (0.00240918,-0.00181706,0.0279147)
   getSecondaryPhysicsProcess(): 0
@@ -16966,6 +17351,7 @@ MCParticle#14:
   get4Vector(): (0.19437,-0.216675,0.20436,0.382061)
   getArrayIndex(): 14
   getCharge(): 1
+  getDaughter(0): -> MCParticles#34
   getDaughters(): size(2)
     -> MCParticles#34
     -> MCParticles#35
@@ -16982,6 +17368,9 @@ MCParticle#14:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0016808
   getProductionVertex(): (0.00240918,-0.00181706,0.0279147)
   getSecondaryPhysicsProcess(): 0
@@ -16996,6 +17385,7 @@ MCParticle#15:
   get4Vector(): (-0.998264,-0.104158,0.274519,2.1355)
   getArrayIndex(): 15
   getCharge(): 0
+  getDaughter(0): -> MCParticles#36
   getDaughters(): size(3)
     -> MCParticles#36
     -> MCParticles#37
@@ -17013,6 +17403,7 @@ MCParticle#15:
   getNDaughters(): 3
   getName(): D0
   getPDG(): 421
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#61
   getProductionTime(): 0.000257882
   getProductionVertex(): (-0.00063814,0.00028148,0.0148172)
   getSecondaryPhysicsProcess(): 0
@@ -17027,6 +17418,7 @@ MCParticle#16:
   get4Vector(): (-0.0960908,0.0217652,-0.00865307,0.167334)
   getArrayIndex(): 16
   getCharge(): 0
+  getDaughter(0): -> MCParticles#39
   getDaughters(): size(2)
     -> MCParticles#39
     -> MCParticles#40
@@ -17043,6 +17435,9 @@ MCParticle#16:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000257882
   getProductionVertex(): (-0.00063814,0.00028148,0.0148172)
   getSecondaryPhysicsProcess(): 0
@@ -17057,6 +17452,7 @@ MCParticle#17:
   get4Vector(): (0.602135,0.111346,-0.140455,0.801443)
   getArrayIndex(): 17
   getCharge(): 0
+  getDaughter(0): -> MCParticles#41
   getDaughters(): size(1)
     -> MCParticles#41
   getDecayTime(): 0.000257882
@@ -17072,6 +17468,7 @@ MCParticle#17:
   getNDaughters(): 1
   getName(): anti-K0
   getPDG(): -311
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#70
   getProductionTime(): 0.000257882
   getProductionVertex(): (-0.00063814,0.00028148,0.0148172)
   getSecondaryPhysicsProcess(): 0
@@ -17086,6 +17483,7 @@ MCParticle#18:
   get4Vector(): (0.515819,0.503944,-0.235017,0.771195)
   getArrayIndex(): 18
   getCharge(): -1
+  getDaughter(0): -> MCParticles#42
   getDaughters(): size(1)
     -> MCParticles#42
   getDecayTime(): 5.27705
@@ -17101,6 +17499,9 @@ MCParticle#18:
   getNDaughters(): 1
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000257882
   getProductionVertex(): (-0.00063814,0.00028148,0.0148172)
   getSecondaryPhysicsProcess(): 0
@@ -17115,6 +17516,7 @@ MCParticle#19:
   get4Vector(): (0.0809957,-0.333091,1.45736,1.57766)
   getArrayIndex(): 19
   getCharge(): 0
+  getDaughter(0): -> MCParticles#43
   getDaughters(): size(2)
     -> MCParticles#43
     -> MCParticles#44
@@ -17131,6 +17533,7 @@ MCParticle#19:
   getNDaughters(): 2
   getName(): K_S0
   getPDG(): 310
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#73
   getProductionTime(): 0.000257882
   getProductionVertex(): (-0.00063814,0.00028148,0.0148172)
   getSecondaryPhysicsProcess(): 0
@@ -17145,6 +17548,7 @@ MCParticle#20:
   get4Vector(): (-0.288164,0.522872,-0.165642,0.792205)
   getArrayIndex(): 20
   getCharge(): 1
+  getDaughter(0): -> MCParticles#45
   getDaughters(): size(2)
     -> MCParticles#45
     -> MCParticles#46
@@ -17161,6 +17565,9 @@ MCParticle#20:
   getNDaughters(): 2
   getName(): K+
   getPDG(): 321
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00287599
   getProductionVertex(): (-0.00609302,-0.00590084,0.0354596)
   getSecondaryPhysicsProcess(): 0
@@ -17175,6 +17582,7 @@ MCParticle#21:
   get4Vector(): (0.0308246,0.0336314,-0.0459431,0.153856)
   getArrayIndex(): 21
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 2.0696
   getDecayVertex(): (-1.37547,10.659,-12.1943)
@@ -17189,6 +17597,9 @@ MCParticle#21:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00287599
   getProductionVertex(): (-0.00609302,-0.00590084,0.0354596)
   getSecondaryPhysicsProcess(): 0
@@ -17203,6 +17614,7 @@ MCParticle#22:
   get4Vector(): (-0.21269,-0.782268,0.628689,1.03472)
   getArrayIndex(): 22
   getCharge(): 0
+  getDaughter(0): -> MCParticles#47
   getDaughters(): size(2)
     -> MCParticles#47
     -> MCParticles#48
@@ -17219,6 +17631,9 @@ MCParticle#22:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00287599
   getProductionVertex(): (-0.00609302,-0.00590084,0.0354596)
   getSecondaryPhysicsProcess(): 0
@@ -17233,6 +17648,7 @@ MCParticle#23:
   get4Vector(): (0.0444714,-0.153217,0.240526,0.288627)
   getArrayIndex(): 23
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 10.1985
   getDecayVertex(): (22.1769,-117.903,197.389)
@@ -17247,6 +17663,9 @@ MCParticle#23:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.50408
   getProductionVertex(): (-13.3652,4.54975,5.15836)
   getSecondaryPhysicsProcess(): 201
@@ -17261,6 +17680,7 @@ MCParticle#24:
   get4Vector(): (0.0618086,0.0117397,0.0875079,0.107776)
   getArrayIndex(): 24
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 10.5373
   getDecayVertex(): (124.748,30.7825,200.698)
@@ -17275,6 +17695,9 @@ MCParticle#24:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.50408
   getProductionVertex(): (-13.3652,4.54975,5.15836)
   getSecondaryPhysicsProcess(): 201
@@ -17289,6 +17712,7 @@ MCParticle#25:
   get4Vector(): (-0.000650212,0.0139983,0.0356752,0.0383287)
   getArrayIndex(): 25
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 31.7356
   getDecayVertex(): (-36.4605,317.823,800)
@@ -17303,6 +17727,9 @@ MCParticle#25:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.46914
   getProductionVertex(): (-22.085,8.33589,11.2615)
   getSecondaryPhysicsProcess(): 201
@@ -17317,6 +17744,7 @@ MCParticle#26:
   get4Vector(): (-0.0330753,0.0246046,-0.00484792,0.113519)
   getArrayIndex(): 26
   getCharge(): 1
+  getDaughter(0): -> MCParticles#49
   getDaughters(): size(3)
     -> MCParticles#49
     -> MCParticles#50
@@ -17334,6 +17762,9 @@ MCParticle#26:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.46914
   getProductionVertex(): (-22.085,8.33589,11.2615)
   getSecondaryPhysicsProcess(): 201
@@ -17348,6 +17779,7 @@ MCParticle#27:
   get4Vector(): (0.0402339,-0.051906,0.0309147,0.157317)
   getArrayIndex(): 27
   getCharge(): 1
+  getDaughter(0): -> MCParticles#52
   getDaughters(): size(2)
     -> MCParticles#52
     -> MCParticles#53
@@ -17364,6 +17796,9 @@ MCParticle#27:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.50408
   getProductionVertex(): (-13.3652,4.54975,5.15835)
   getSecondaryPhysicsProcess(): 151
@@ -17378,6 +17813,7 @@ MCParticle#28:
   get4Vector(): (-0.104933,-0.0158609,-0.193009,0.260758)
   getArrayIndex(): 28
   getCharge(): -1
+  getDaughter(0): -> MCParticles#54
   getDaughters(): size(1)
     -> MCParticles#54
   getDecayTime(): 5.97567
@@ -17393,6 +17829,9 @@ MCParticle#28:
   getNDaughters(): 1
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.50408
   getProductionVertex(): (-13.3652,4.54975,5.15835)
   getSecondaryPhysicsProcess(): 151
@@ -17407,6 +17846,7 @@ MCParticle#29:
   get4Vector(): (0.148067,0.462807,-0.2044,0.527156)
   getArrayIndex(): 29
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 7.13841
   getDecayVertex(): (25.6584,126.524,-48.7119)
@@ -17421,6 +17861,9 @@ MCParticle#29:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.50408
   getProductionVertex(): (-13.3652,4.54975,5.15835)
   getSecondaryPhysicsProcess(): 201
@@ -17435,6 +17878,7 @@ MCParticle#30:
   get4Vector(): (-0.00115657,0.0155984,-0.0458196,0.0484158)
   getArrayIndex(): 30
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 6.5832
   getDecayVertex(): (-16.2864,43.9485,-110.573)
@@ -17449,6 +17893,9 @@ MCParticle#30:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.50408
   getProductionVertex(): (-13.3652,4.54975,5.15835)
   getSecondaryPhysicsProcess(): 201
@@ -17463,6 +17910,7 @@ MCParticle#31:
   get4Vector(): (-0.130101,-0.266077,0.0484258,0.330981)
   getArrayIndex(): 31
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 17.0267
   getDecayVertex(): (-2.73501,7.0364,69.6567)
@@ -17477,6 +17925,9 @@ MCParticle#31:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.50408
   getProductionVertex(): (-13.3652,4.54975,5.15835)
   getSecondaryPhysicsProcess(): 151
@@ -17491,6 +17942,7 @@ MCParticle#32:
   get4Vector(): (-0.0166711,-0.0246651,-0.0011266,0.029792)
   getArrayIndex(): 32
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 55.3607
   getDecayVertex(): (-689.387,-800,21.1083)
@@ -17505,6 +17957,9 @@ MCParticle#32:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 19.0994
   getProductionVertex(): (-81.0694,100.012,62.2171)
   getSecondaryPhysicsProcess(): 201
@@ -17519,6 +17974,7 @@ MCParticle#33:
   get4Vector(): (0.0166711,0.0246651,0.0011266,0.109778)
   getArrayIndex(): 33
   getCharge(): 1
+  getDaughter(0): -> MCParticles#55
   getDaughters(): size(3)
     -> MCParticles#55
     -> MCParticles#56
@@ -17536,6 +17992,9 @@ MCParticle#33:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 19.0994
   getProductionVertex(): (-81.0694,100.012,62.2171)
   getSecondaryPhysicsProcess(): 201
@@ -17550,6 +18009,7 @@ MCParticle#34:
   get4Vector(): (-0.00884438,0.00476003,0.0280478,0.0297919)
   getArrayIndex(): 34
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 33.3765
   getDecayVertex(): (-268.817,61.8981,800)
@@ -17564,6 +18024,9 @@ MCParticle#34:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 12.232
   getProductionVertex(): (-80.6317,-39.3829,203.216)
   getSecondaryPhysicsProcess(): 201
@@ -17578,6 +18041,7 @@ MCParticle#35:
   get4Vector(): (0.00884438,-0.00476003,-0.0280478,0.109778)
   getArrayIndex(): 35
   getCharge(): 1
+  getDaughter(0): -> MCParticles#58
   getDaughters(): size(3)
     -> MCParticles#58
     -> MCParticles#59
@@ -17595,6 +18059,9 @@ MCParticle#35:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 12.232
   getProductionVertex(): (-80.6317,-39.3829,203.216)
   getSecondaryPhysicsProcess(): 201
@@ -17609,6 +18076,7 @@ MCParticle#36:
   get4Vector(): (0.00198022,-0.0721255,0.564938,0.753709)
   getArrayIndex(): 36
   getCharge(): -1
+  getDaughter(0): -> MCParticles#61
   getDaughters(): size(2)
     -> MCParticles#61
     -> MCParticles#62
@@ -17625,6 +18093,9 @@ MCParticle#36:
   getNDaughters(): 2
   getName(): K-
   getPDG(): -321
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000334329
   getProductionVertex(): (-0.00170945,0.0001697,0.0151118)
   getSecondaryPhysicsProcess(): 0
@@ -17639,6 +18110,7 @@ MCParticle#37:
   get4Vector(): (-1.00573,-0.253599,-0.370524,1.11021)
   getArrayIndex(): 37
   getCharge(): 1
+  getDaughter(0): -> MCParticles#63
   getDaughters(): size(5)
     -> MCParticles#63
     -> MCParticles#64
@@ -17658,6 +18130,9 @@ MCParticle#37:
   getNDaughters(): 5
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000334329
   getProductionVertex(): (-0.00170945,0.0001697,0.0151118)
   getSecondaryPhysicsProcess(): 0
@@ -17672,6 +18147,7 @@ MCParticle#38:
   get4Vector(): (0.00548212,0.221566,0.0801052,0.271583)
   getArrayIndex(): 38
   getCharge(): 0
+  getDaughter(0): -> MCParticles#68
   getDaughters(): size(2)
     -> MCParticles#68
     -> MCParticles#69
@@ -17688,6 +18164,7 @@ MCParticle#38:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#88
   getProductionTime(): 0.000334329
   getProductionVertex(): (-0.00170945,0.0001697,0.0151118)
   getSecondaryPhysicsProcess(): 0
@@ -17702,6 +18179,7 @@ MCParticle#39:
   get4Vector(): (-0.0258961,0.0712565,-0.0251455,0.0798774)
   getArrayIndex(): 39
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.48636
   getDecayVertex(): (-43.602,119.975,-42.3229)
@@ -17716,6 +18194,9 @@ MCParticle#39:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00025792
   getProductionVertex(): (-0.000638804,0.000281631,0.0148171)
   getSecondaryPhysicsProcess(): 0
@@ -17730,6 +18211,7 @@ MCParticle#40:
   get4Vector(): (-0.0701947,-0.0494913,0.0164925,0.0874568)
   getArrayIndex(): 40
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.34576
   getDecayVertex(): (-104.562,-73.7216,24.5819)
@@ -17744,6 +18226,9 @@ MCParticle#40:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00025792
   getProductionVertex(): (-0.000638804,0.000281631,0.0148171)
   getSecondaryPhysicsProcess(): 0
@@ -17758,6 +18243,7 @@ MCParticle#41:
   get4Vector(): (0.602135,0.111346,-0.140455,0.801443)
   getArrayIndex(): 41
   getCharge(): 0
+  getDaughter(0): -> MCParticles#70
   getDaughters(): size(3)
     -> MCParticles#70
     -> MCParticles#71
@@ -17775,6 +18261,7 @@ MCParticle#41:
   getNDaughters(): 3
   getName(): K_L0
   getPDG(): 130
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#89
   getProductionTime(): 0.000257882
   getProductionVertex(): (-0.00063814,0.00028148,0.0148172)
   getSecondaryPhysicsProcess(): 0
@@ -17789,6 +18276,7 @@ MCParticle#42:
   get4Vector(): (-0.000599287,0.000180052,-0.000238363,0.000842319)
   getArrayIndex(): 42
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 199.911
   getDecayVertex(): (8.80774,69.7481,32.6683)
@@ -17803,6 +18291,9 @@ MCParticle#42:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 195.717
   getProductionVertex(): (8.44466,69.4164,14.9955)
   getSecondaryPhysicsProcess(): 13
@@ -17817,6 +18308,7 @@ MCParticle#43:
   get4Vector(): (0.203324,-0.257897,1.1979,1.24992)
   getArrayIndex(): 43
   getCharge(): 1
+  getDaughter(0): -> MCParticles#73
   getDaughters(): size(3)
     -> MCParticles#73
     -> MCParticles#74
@@ -17834,6 +18326,7 @@ MCParticle#43:
   getNDaughters(): 3
   getName(): pi+
   getPDG(): 211
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#95
   getProductionTime(): 0.0187239
   getProductionVertex(): (0.0277825,-0.116597,0.526191)
   getSecondaryPhysicsProcess(): 0
@@ -17848,6 +18341,7 @@ MCParticle#44:
   get4Vector(): (-0.122328,-0.0751941,0.259463,0.327749)
   getArrayIndex(): 44
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 9.10268
   getDecayVertex(): (38.4469,-39.8368,213.211)
@@ -17862,6 +18356,9 @@ MCParticle#44:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0187239
   getProductionVertex(): (0.0277825,-0.116597,0.526191)
   getSecondaryPhysicsProcess(): 0
@@ -17876,6 +18373,7 @@ MCParticle#45:
   get4Vector(): (-0.21066,-0.100512,0.0315441,0.235532)
   getArrayIndex(): 45
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 44.1918
   getDecayVertex(): (-800,-255.133,73.2352)
@@ -17890,6 +18388,9 @@ MCParticle#45:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 14.3245
   getProductionVertex(): (0.845567,126.974,-46.6832)
   getSecondaryPhysicsProcess(): 201
@@ -17904,6 +18405,7 @@ MCParticle#46:
   get4Vector(): (0.21066,0.100512,-0.0315441,0.258145)
   getArrayIndex(): 46
   getCharge(): 1
+  getDaughter(0): -> MCParticles#76
   getDaughters(): size(3)
     -> MCParticles#76
     -> MCParticles#77
@@ -17921,6 +18423,9 @@ MCParticle#46:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 14.3245
   getProductionVertex(): (0.845567,126.974,-46.6832)
   getSecondaryPhysicsProcess(): 201
@@ -17935,6 +18440,7 @@ MCParticle#47:
   get4Vector(): (-0.0404499,-0.199322,0.233668,0.309784)
   getArrayIndex(): 47
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 6.53023
   getDecayVertex(): (-25.5575,-125.914,147.639)
@@ -17949,6 +18455,9 @@ MCParticle#47:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00287644
   getProductionVertex(): (-0.00609577,-0.00591097,0.0354677)
   getSecondaryPhysicsProcess(): 0
@@ -17963,6 +18472,7 @@ MCParticle#48:
   get4Vector(): (-0.172241,-0.582946,0.395021,0.724938)
   getArrayIndex(): 48
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 5.1895
   getDecayVertex(): (-36.9498,-125.041,84.763)
@@ -17977,6 +18487,9 @@ MCParticle#48:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.00287644
   getProductionVertex(): (-0.00609577,-0.00591097,0.0354677)
   getSecondaryPhysicsProcess(): 0
@@ -17991,6 +18504,7 @@ MCParticle#49:
   get4Vector(): (0.00220856,0.019366,-0.0107501,0.0222595)
   getArrayIndex(): 49
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1147.24
   getDecayVertex(): (79.7811,800,-433.655)
@@ -18005,6 +18519,9 @@ MCParticle#49:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1116.93
   getProductionVertex(): (-10.3702,9.49962,5.15171)
   getSecondaryPhysicsProcess(): 201
@@ -18019,6 +18536,7 @@ MCParticle#50:
   get4Vector(): (0.00558221,0.00914935,0.0396281,0.0410519)
   getArrayIndex(): 50
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1144.4
   getDecayVertex(): (101.596,193.015,800)
@@ -18033,6 +18551,9 @@ MCParticle#50:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1116.93
   getProductionVertex(): (-10.3702,9.49962,5.15171)
   getSecondaryPhysicsProcess(): 201
@@ -18047,6 +18568,7 @@ MCParticle#51:
   get4Vector(): (-0.00788652,-0.0288658,-0.0292329,0.041836)
   getArrayIndex(): 51
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1122.21
   getDecayVertex(): (-11.1111,16.0571,-74.9635)
@@ -18061,6 +18583,9 @@ MCParticle#51:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1116.93
   getProductionVertex(): (-10.3702,9.49962,5.15171)
   getSecondaryPhysicsProcess(): 201
@@ -18075,6 +18600,7 @@ MCParticle#52:
   get4Vector(): (0.0280087,-0.00360383,-0.00949115,0.0297919)
   getArrayIndex(): 52
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 47.03
   getDecayVertex(): (800,-103.324,-238.606)
@@ -18089,6 +18615,9 @@ MCParticle#52:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 18.1115
   getProductionVertex(): (-15.0631,1.54827,37.5892)
   getSecondaryPhysicsProcess(): 201
@@ -18103,6 +18632,7 @@ MCParticle#53:
   get4Vector(): (-0.0280087,0.00360383,0.00949115,0.109778)
   getArrayIndex(): 53
   getCharge(): 1
+  getDaughter(0): -> MCParticles#79
   getDaughters(): size(3)
     -> MCParticles#79
     -> MCParticles#80
@@ -18120,6 +18650,9 @@ MCParticle#53:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 18.1115
   getProductionVertex(): (-15.0631,1.54827,37.5892)
   getSecondaryPhysicsProcess(): 201
@@ -18134,6 +18667,7 @@ MCParticle#54:
   get4Vector(): (-0.0779393,-0.00247496,0.0321452,0.942055)
   getArrayIndex(): 54
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 39.8794
   getDecayVertex(): (-96.0284,-40.9411,-32.2028)
@@ -18148,6 +18682,9 @@ MCParticle#54:
   getNDaughters(): 0
   getName(): p+
   getPDG(): 2212
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 28.7214
   getProductionVertex(): (-83.4523,-51.7348,-40.2479)
   getSecondaryPhysicsProcess(): 111
@@ -18162,6 +18699,7 @@ MCParticle#55:
   get4Vector(): (0.0243326,0.0338322,0.0156022,0.0444985)
   getArrayIndex(): 55
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 2226.73
   getDecayVertex(): (422.371,800,385)
@@ -18176,6 +18714,9 @@ MCParticle#55:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2196.02
   getProductionVertex(): (-81.0339,100.063,62.2136)
   getSecondaryPhysicsProcess(): 201
@@ -18190,6 +18731,7 @@ MCParticle#56:
   get4Vector(): (-0.0332861,-0.0196931,-0.00227167,0.038742)
   getArrayIndex(): 56
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 2223.93
   getDecayVertex(): (-800,-325.299,13.1465)
@@ -18204,6 +18746,9 @@ MCParticle#56:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2196.02
   getProductionVertex(): (-81.0339,100.063,62.2136)
   getSecondaryPhysicsProcess(): 201
@@ -18218,6 +18763,7 @@ MCParticle#57:
   get4Vector(): (0.00916488,-0.0144728,-0.0136452,0.0219068)
   getArrayIndex(): 57
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 2196.09
   getDecayVertex(): (-80.8962,98.4913,60.9507)
@@ -18232,6 +18778,9 @@ MCParticle#57:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2196.02
   getProductionVertex(): (-81.0339,100.063,62.2136)
   getSecondaryPhysicsProcess(): 201
@@ -18246,6 +18795,7 @@ MCParticle#58:
   get4Vector(): (0.0283491,-0.0302478,-0.011588,0.0430451)
   getArrayIndex(): 58
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1982.65
   getDecayVertex(): (632.278,-800,-88.2288)
@@ -18260,6 +18810,9 @@ MCParticle#58:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1946.55
   getProductionVertex(): (-80.5959,-39.3805,203.167)
   getSecondaryPhysicsProcess(): 201
@@ -18274,6 +18827,7 @@ MCParticle#59:
   get4Vector(): (-0.00311785,-0.00515801,-0.0110406,0.0125786)
   getArrayIndex(): 59
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1984.67
   getDecayVertex(): (-363.889,-508.046,-800)
@@ -18288,6 +18842,9 @@ MCParticle#59:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1946.55
   getProductionVertex(): (-80.5959,-39.3805,203.167)
   getSecondaryPhysicsProcess(): 201
@@ -18302,6 +18859,7 @@ MCParticle#60:
   get4Vector(): (-0.0254929,0.035773,0.0228633,0.0495237)
   getArrayIndex(): 60
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1946.65
   getDecayVertex(): (-79.7987,-37.5878,204.648)
@@ -18316,6 +18874,9 @@ MCParticle#60:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1946.55
   getProductionVertex(): (-80.5959,-39.3805,203.167)
   getSecondaryPhysicsProcess(): 201
@@ -18330,6 +18891,7 @@ MCParticle#61:
   get4Vector(): (-0.0088074,0.0215388,0.0255328,0.9402)
   getArrayIndex(): 61
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4033.07
   getDecayVertex(): (113.031,-68.1486,156.245)
@@ -18344,6 +18906,9 @@ MCParticle#61:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 30.3516
   getProductionVertex(): (-33.3343,44.8263,-111.994)
   getSecondaryPhysicsProcess(): 121
@@ -18358,6 +18923,7 @@ MCParticle#62:
   get4Vector(): (0.0192356,-0.00625919,0.00311142,0.939788)
   getArrayIndex(): 62
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 9664.17
   getDecayVertex(): (136.633,-25.6385,-57.468)
@@ -18372,6 +18938,9 @@ MCParticle#62:
   getNDaughters(): 0
   getName(): n0
   getPDG(): 2112
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.38695
   getProductionVertex(): (-1.0221,-7.27397,47.2052)
   getSecondaryPhysicsProcess(): 151
@@ -18386,6 +18955,7 @@ MCParticle#63:
   get4Vector(): (-6.31223e-05,0.00032494,-0.000158995,0.000629261)
   getArrayIndex(): 63
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 3.35186
   getDecayVertex(): (-62.4289,-5.70813,-31.2767)
@@ -18400,6 +18970,9 @@ MCParticle#63:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.2119
   getProductionVertex(): (-61.3563,-6.94637,-22.1402)
   getSecondaryPhysicsProcess(): 2
@@ -18414,6 +18987,7 @@ MCParticle#64:
   get4Vector(): (-0.00666624,0.0236268,-0.0168787,0.0297919)
   getArrayIndex(): 64
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 124.046
   getDecayVertex(): (-401.879,800,-575.85)
@@ -18428,6 +19002,9 @@ MCParticle#64:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 90.723
   getProductionVertex(): (-178.344,7.73333,-9.86401)
   getSecondaryPhysicsProcess(): 201
@@ -18442,6 +19019,7 @@ MCParticle#65:
   get4Vector(): (0.00666624,-0.0236268,0.0168787,0.109778)
   getArrayIndex(): 65
   getCharge(): 1
+  getDaughter(0): -> MCParticles#82
   getDaughters(): size(3)
     -> MCParticles#82
     -> MCParticles#83
@@ -18459,6 +19037,9 @@ MCParticle#65:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 90.723
   getProductionVertex(): (-178.344,7.73333,-9.86401)
   getSecondaryPhysicsProcess(): 201
@@ -18473,6 +19054,7 @@ MCParticle#66:
   get4Vector(): (-0.0112859,0.0209379,-0.0179386,0.0297919)
   getArrayIndex(): 66
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 47.6797
   getDecayVertex(): (-567.104,800,-733.958)
@@ -18487,6 +19069,9 @@ MCParticle#66:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 9.91641
   getProductionVertex(): (-138.232,4.34553,-52.2792)
   getSecondaryPhysicsProcess(): 201
@@ -18501,6 +19086,7 @@ MCParticle#67:
   get4Vector(): (0.0112859,-0.0209379,0.0179386,0.109778)
   getArrayIndex(): 67
   getCharge(): 1
+  getDaughter(0): -> MCParticles#85
   getDaughters(): size(3)
     -> MCParticles#85
     -> MCParticles#86
@@ -18518,6 +19104,9 @@ MCParticle#67:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 9.91641
   getProductionVertex(): (-138.232,4.34553,-52.2792)
   getSecondaryPhysicsProcess(): 201
@@ -18532,6 +19121,7 @@ MCParticle#68:
   get4Vector(): (0.0625165,0.0787936,0.0584223,0.116318)
   getArrayIndex(): 68
   getCharge(): 0
+  getDaughter(0): -> MCParticles#88
   getDaughters(): size(1)
     -> MCParticles#88
   getDecayTime(): 0.0389274
@@ -18547,6 +19137,9 @@ MCParticle#68:
   getNDaughters(): 1
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000334414
   getProductionVertex(): (-0.0017094,0.000171797,0.0151126)
   getSecondaryPhysicsProcess(): 0
@@ -18561,6 +19154,7 @@ MCParticle#69:
   get4Vector(): (-0.0570344,0.142773,0.0216829,0.155265)
   getArrayIndex(): 69
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.77847
   getDecayVertex(): (-52.6208,131.72,20.0195)
@@ -18575,6 +19169,9 @@ MCParticle#69:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000334414
   getProductionVertex(): (-0.0017094,0.000171797,0.0151126)
   getSecondaryPhysicsProcess(): 0
@@ -18589,6 +19186,7 @@ MCParticle#70:
   get4Vector(): (0.184196,0.0578124,0.0582123,0.242647)
   getArrayIndex(): 70
   getCharge(): 0
+  getDaughter(0): -> MCParticles#89
   getDaughters(): size(2)
     -> MCParticles#89
     -> MCParticles#90
@@ -18605,6 +19203,9 @@ MCParticle#70:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.724033
   getProductionVertex(): (16.3009,3.01474,-3.78769)
   getSecondaryPhysicsProcess(): 0
@@ -18619,6 +19220,7 @@ MCParticle#71:
   get4Vector(): (0.2564,0.100297,-0.119221,0.328988)
   getArrayIndex(): 71
   getCharge(): 0
+  getDaughter(0): -> MCParticles#91
   getDaughters(): size(2)
     -> MCParticles#91
     -> MCParticles#92
@@ -18635,6 +19237,9 @@ MCParticle#71:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.724033
   getProductionVertex(): (16.3009,3.01474,-3.78769)
   getSecondaryPhysicsProcess(): 0
@@ -18649,6 +19254,7 @@ MCParticle#72:
   get4Vector(): (0.161538,-0.046763,-0.0794461,0.229808)
   getArrayIndex(): 72
   getCharge(): 0
+  getDaughter(0): -> MCParticles#93
   getDaughters(): size(2)
     -> MCParticles#93
     -> MCParticles#94
@@ -18665,6 +19271,9 @@ MCParticle#72:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.724033
   getProductionVertex(): (16.3009,3.01474,-3.78769)
   getSecondaryPhysicsProcess(): 0
@@ -18679,6 +19288,7 @@ MCParticle#73:
   get4Vector(): (-0.168623,-0.105174,0.741163,0.767345)
   getArrayIndex(): 73
   getCharge(): 0
+  getDaughter(0): -> MCParticles#95
   getDaughters(): size(1)
     -> MCParticles#95
   getDecayTime(): 0.33543
@@ -18694,6 +19304,9 @@ MCParticle#73:
   getNDaughters(): 1
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.138643
   getProductionVertex(): (0.607915,-0.862034,3.97165)
   getSecondaryPhysicsProcess(): 201
@@ -18708,6 +19321,7 @@ MCParticle#74:
   get4Vector(): (-0.00741942,0.0329348,0.0984092,0.104039)
   getArrayIndex(): 74
   getCharge(): 0
+  getDaughter(0): -> MCParticles#96
   getDaughters(): size(1)
     -> MCParticles#96
   getDecayTime(): 0.434246
@@ -18723,6 +19337,9 @@ MCParticle#74:
   getNDaughters(): 1
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.138643
   getProductionVertex(): (0.607915,-0.862034,3.97165)
   getSecondaryPhysicsProcess(): 201
@@ -18737,6 +19354,7 @@ MCParticle#75:
   get4Vector(): (0.326742,-0.632706,0.355038,1.23024)
   getArrayIndex(): 75
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 8.73437
   getDecayVertex(): (3.99739,-139.401,74.6636)
@@ -18751,6 +19369,9 @@ MCParticle#75:
   getNDaughters(): 0
   getName(): p+
   getPDG(): 2212
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.138642
   getProductionVertex(): (0.607917,-0.862033,3.97163)
   getSecondaryPhysicsProcess(): 121
@@ -18765,6 +19386,7 @@ MCParticle#76:
   get4Vector(): (0.014228,-0.00904909,-0.0212048,0.0270918)
   getArrayIndex(): 76
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 88.9907
   getDecayVertex(): (523.506,-189.77,-800)
@@ -18779,6 +19401,9 @@ MCParticle#76:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 57.0223
   getProductionVertex(): (20.1817,130.347,-49.8663)
   getSecondaryPhysicsProcess(): 201
@@ -18793,6 +19418,7 @@ MCParticle#77:
   get4Vector(): (0.0214366,-0.0109427,-0.0100489,0.0260816)
   getArrayIndex(): 77
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 88.6706
   getDecayVertex(): (800,-267.724,-415.423)
@@ -18807,6 +19433,9 @@ MCParticle#77:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 57.0223
   getProductionVertex(): (20.1817,130.347,-49.8663)
   getSecondaryPhysicsProcess(): 201
@@ -18821,6 +19450,7 @@ MCParticle#78:
   get4Vector(): (-0.036017,0.0201893,0.0315625,0.0519739)
   getArrayIndex(): 78
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 57.1354
   getDecayVertex(): (18.2151,130.669,-48.0623)
@@ -18835,6 +19465,9 @@ MCParticle#78:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 57.0223
   getProductionVertex(): (20.1817,130.347,-49.8663)
   getSecondaryPhysicsProcess(): 201
@@ -18849,6 +19482,7 @@ MCParticle#79:
   get4Vector(): (0.00326317,-0.0210806,0.00837397,0.0229165)
   getArrayIndex(): 79
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1565.13
   getDecayVertex(): (107.902,-800,356.543)
@@ -18863,6 +19497,9 @@ MCParticle#79:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1536.06
   getProductionVertex(): (-16.1976,1.70505,38.0772)
   getSecondaryPhysicsProcess(): 201
@@ -18877,6 +19514,7 @@ MCParticle#80:
   get4Vector(): (0.0198895,-0.0227299,-0.0108835,0.0321043)
   getArrayIndex(): 80
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1573.83
   getDecayVertex(): (685.324,-800,-345.794)
@@ -18891,6 +19529,9 @@ MCParticle#80:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1536.06
   getProductionVertex(): (-16.1976,1.70505,38.0772)
   getSecondaryPhysicsProcess(): 201
@@ -18905,6 +19546,7 @@ MCParticle#81:
   get4Vector(): (-0.0233899,0.0442594,0.00253524,0.0501266)
   getArrayIndex(): 81
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1537.59
   getDecayVertex(): (3.87238,2.74123,42.4131)
@@ -18919,6 +19561,9 @@ MCParticle#81:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1536.06
   getProductionVertex(): (-16.1976,1.70505,38.0772)
   getSecondaryPhysicsProcess(): 201
@@ -18933,6 +19578,7 @@ MCParticle#82:
   get4Vector(): (0.0335216,0.00487859,-0.0264634,0.0429862)
   getArrayIndex(): 82
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 8266.45
   getDecayVertex(): (800,150.058,-782.16)
@@ -18947,6 +19593,9 @@ MCParticle#82:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 8224.6
   getProductionVertex(): (-178.328,7.67643,-9.82635)
   getSecondaryPhysicsProcess(): 201
@@ -18961,6 +19610,7 @@ MCParticle#83:
   get4Vector(): (0.00518538,-0.00958672,-0.00456725,0.0118175)
   getArrayIndex(): 83
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 8257.81
   getDecayVertex(): (258.538,-800,-394.615)
@@ -18975,6 +19625,9 @@ MCParticle#83:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 8224.6
   getProductionVertex(): (-178.328,7.67643,-9.82635)
   getSecondaryPhysicsProcess(): 201
@@ -18989,6 +19642,7 @@ MCParticle#84:
   get4Vector(): (-0.0391019,0.00475617,0.0313472,0.0503437)
   getArrayIndex(): 84
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 8224.72
   getDecayVertex(): (-181.12,7.60361,-8.04321)
@@ -19003,6 +19657,9 @@ MCParticle#84:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 8224.6
   getProductionVertex(): (-178.328,7.67643,-9.82635)
   getSecondaryPhysicsProcess(): 201
@@ -19017,6 +19674,7 @@ MCParticle#85:
   get4Vector(): (0.0338486,-0.0131212,-0.0266806,0.0450527)
   getArrayIndex(): 85
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 3236.07
   getDecayVertex(): (800,-359.369,-791.753)
@@ -19031,6 +19689,9 @@ MCParticle#85:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3194.42
   getProductionVertex(): (-138.197,4.31835,-52.2355)
   getSecondaryPhysicsProcess(): 201
@@ -19045,6 +19706,7 @@ MCParticle#86:
   get4Vector(): (-0.0337548,-0.00498619,0.022878,0.0410811)
   getArrayIndex(): 86
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 3221.28
   getDecayVertex(): (-800,-93.4419,396.315)
@@ -19059,6 +19721,9 @@ MCParticle#86:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3194.42
   getProductionVertex(): (-138.197,4.31835,-52.2355)
   getSecondaryPhysicsProcess(): 201
@@ -19073,6 +19738,7 @@ MCParticle#87:
   get4Vector(): (-9.63105e-05,0.0186008,0.00390615,0.0190136)
   getArrayIndex(): 87
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 3194.43
   getDecayVertex(): (-138.242,4.6603,-52.2524)
@@ -19087,6 +19753,9 @@ MCParticle#87:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3194.42
   getProductionVertex(): (-138.197,4.31835,-52.2355)
   getSecondaryPhysicsProcess(): 201
@@ -19101,6 +19770,7 @@ MCParticle#88:
   get4Vector(): (0.0393789,0.0497204,0.0365423,0.0732012)
   getArrayIndex(): 88
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 3.09172
   getDecayVertex(): (-5.49791,-1.83573,45.7953)
@@ -19115,6 +19785,9 @@ MCParticle#88:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.0389274
   getProductionVertex(): (0.620127,0.783913,0.596224)
   getSecondaryPhysicsProcess(): 14
@@ -19129,6 +19802,7 @@ MCParticle#89:
   get4Vector(): (0.14566,-0.00195739,0.0826056,0.167464)
   getArrayIndex(): 89
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.77788
   getDecayVertex(): (122.008,1.59423,56.1604)
@@ -19143,6 +19817,9 @@ MCParticle#89:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.724033
   getProductionVertex(): (16.3009,3.01474,-3.78769)
   getSecondaryPhysicsProcess(): 0
@@ -19157,6 +19834,7 @@ MCParticle#90:
   get4Vector(): (0.038536,0.0597698,-0.0243933,0.075183)
   getArrayIndex(): 90
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.8712
   getDecayVertex(): (80.0273,101.855,-44.1265)
@@ -19171,6 +19849,9 @@ MCParticle#90:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.724033
   getProductionVertex(): (16.3009,3.01474,-3.78769)
   getSecondaryPhysicsProcess(): 0
@@ -19185,6 +19866,7 @@ MCParticle#91:
   get4Vector(): (-0.0125958,-0.0069569,-0.0160809,0.0215789)
   getArrayIndex(): 91
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 2.29056
   getDecayVertex(): (-11.112,-12.1259,-38.7854)
@@ -19199,6 +19881,9 @@ MCParticle#91:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.724034
   getProductionVertex(): (16.3009,3.01474,-3.7877)
   getSecondaryPhysicsProcess(): 0
@@ -19213,6 +19898,7 @@ MCParticle#92:
   get4Vector(): (0.268996,0.107254,-0.10314,0.307409)
   getArrayIndex(): 92
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.79753
   getDecayVertex(): (123.161,45.622,-44.7608)
@@ -19227,6 +19913,9 @@ MCParticle#92:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.724034
   getProductionVertex(): (16.3009,3.01474,-3.7877)
   getSecondaryPhysicsProcess(): 0
@@ -19241,6 +19930,7 @@ MCParticle#93:
   get4Vector(): (0.056774,0.00491073,-0.0961862,0.1118)
   getArrayIndex(): 93
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.78823
   getDecayVertex(): (78.1743,8.36655,-108.613)
@@ -19255,6 +19945,9 @@ MCParticle#93:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.724033
   getProductionVertex(): (16.3009,3.01474,-3.78769)
   getSecondaryPhysicsProcess(): 0
@@ -19269,6 +19962,7 @@ MCParticle#94:
   get4Vector(): (0.104764,-0.0516738,0.0167401,0.118008)
   getArrayIndex(): 94
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.56435
   getDecayVertex(): (118.51,-47.3985,12.5441)
@@ -19283,6 +19977,9 @@ MCParticle#94:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.724033
   getProductionVertex(): (16.3009,3.01474,-3.78769)
   getSecondaryPhysicsProcess(): 0
@@ -19297,6 +19994,7 @@ MCParticle#95:
   get4Vector(): (0.000178157,7.14359e-05,0.000319079,0.000372364)
   getArrayIndex(): 95
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 7.44958
   getDecayVertex(): (-15.3928,-65.9342,51.3769)
@@ -19311,6 +20009,9 @@ MCParticle#95:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1.09532
   getProductionVertex(): (-5.50404,-5.48074,31.611)
   getSecondaryPhysicsProcess(): 3
@@ -19325,6 +20026,7 @@ MCParticle#96:
   get4Vector(): (-1.96594e-05,1.15262e-06,1.789e-05,2.66059e-05)
   getArrayIndex(): 96
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 5.19763
   getDecayVertex(): (-75.5056,-0.952876,119.75)
@@ -19339,6 +20041,9 @@ MCParticle#96:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 2.54659
   getProductionVertex(): (-16.7799,-4.39593,66.3098)
   getSecondaryPhysicsProcess(): 3
@@ -19349,7 +20054,6 @@ MCParticle#96:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
- ... message repeated 20 times
 [INFO] EXP:        0        RUN:        0        EVT:        3
 EventMetaData:
   getErrorFlag(): 0
@@ -24929,6 +25633,7 @@ MCParticle#0:
   get4Vector(): (0.456523,-0,2.99693,11.0037)
   getArrayIndex(): 0
   getCharge(): 0
+  getDaughter(0): -> MCParticles#1
   getDaughters(): size(2)
     -> MCParticles#1
     -> MCParticles#2
@@ -24945,6 +25650,7 @@ MCParticle#0:
   getNDaughters(): 2
   getName(): Upsilon(4S)
   getPDG(): 300553
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#3
   getProductionTime(): 0
   getProductionVertex(): (-7.27013e-05,3.50484e-07,-0.0113704)
   getSecondaryPhysicsProcess(): 0
@@ -24959,6 +25665,7 @@ MCParticle#1:
   get4Vector(): (0.299855,-0.304456,1.45735,5.49363)
   getArrayIndex(): 1
   getCharge(): 0
+  getDaughter(0): -> MCParticles#3
   getDaughters(): size(7)
     -> MCParticles#3
     -> MCParticles#4
@@ -24980,6 +25687,7 @@ MCParticle#1:
   getNDaughters(): 7
   getName(): anti-B0
   getPDG(): -511
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#14
   getProductionTime(): 0
   getProductionVertex(): (-7.27013e-05,3.50484e-07,-0.0113704)
   getSecondaryPhysicsProcess(): 0
@@ -24994,6 +25702,7 @@ MCParticle#2:
   get4Vector(): (0.156668,0.304456,1.53958,5.51008)
   getArrayIndex(): 2
   getCharge(): 0
+  getDaughter(0): -> MCParticles#10
   getDaughters(): size(4)
     -> MCParticles#10
     -> MCParticles#11
@@ -25012,6 +25721,7 @@ MCParticle#2:
   getNDaughters(): 4
   getName(): B0
   getPDG(): 511
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#23
   getProductionTime(): 0
   getProductionVertex(): (-7.27013e-05,3.50484e-07,-0.0113704)
   getSecondaryPhysicsProcess(): 0
@@ -25026,6 +25736,7 @@ MCParticle#3:
   get4Vector(): (1.19443,0.152172,0.521669,2.40066)
   getArrayIndex(): 3
   getCharge(): 1
+  getDaughter(0): -> MCParticles#14
   getDaughters(): size(2)
     -> MCParticles#14
     -> MCParticles#15
@@ -25042,6 +25753,7 @@ MCParticle#3:
   getNDaughters(): 2
   getName(): D*+
   getPDG(): 413
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#25
   getProductionTime(): 0.0004125
   getProductionVertex(): (0.000602288,-0.000684996,-0.00808982)
   getSecondaryPhysicsProcess(): 0
@@ -25056,6 +25768,7 @@ MCParticle#4:
   get4Vector(): (0.0592997,-0.175457,-0.0111852,0.232178)
   getArrayIndex(): 4
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 10.6215
   getDecayVertex(): (0.473879,2.59658,-21.9665)
@@ -25070,6 +25783,10 @@ MCParticle#4:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
+ ... message repeated 12 times
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000412512
   getProductionVertex(): (0.000602288,-0.000684996,-0.00808982)
   getSecondaryPhysicsProcess(): 0
@@ -25084,6 +25801,7 @@ MCParticle#5:
   get4Vector(): (-0.111126,-0.124281,0.534186,0.57674)
   getArrayIndex(): 5
   getCharge(): 1
+  getDaughter(0): -> MCParticles#16
   getDaughters(): size(1)
     -> MCParticles#16
   getDecayTime(): 7.91242
@@ -25099,6 +25817,9 @@ MCParticle#5:
   getNDaughters(): 1
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000412512
   getProductionVertex(): (0.000602288,-0.000684996,-0.00808982)
   getSecondaryPhysicsProcess(): 0
@@ -25113,6 +25834,7 @@ MCParticle#6:
   get4Vector(): (0.164179,0.114884,-0.0701212,0.254066)
   getArrayIndex(): 6
   getCharge(): -1
+  getDaughter(0): -> MCParticles#17
   getDaughters(): size(1)
     -> MCParticles#17
   getDecayTime(): 8.12129
@@ -25128,6 +25850,7 @@ MCParticle#6:
   getNDaughters(): 1
   getName(): pi-
   getPDG(): -211
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#29
   getProductionTime(): 0.000412512
   getProductionVertex(): (0.000602288,-0.000684996,-0.00808982)
   getSecondaryPhysicsProcess(): 0
@@ -25142,6 +25865,7 @@ MCParticle#7:
   get4Vector(): (-0.19748,0.0369656,0.191523,0.310686)
   getArrayIndex(): 7
   getCharge(): 1
+  getDaughter(0): -> MCParticles#18
   getDaughters(): size(1)
     -> MCParticles#18
   getDecayTime(): 10.5545
@@ -25157,6 +25881,9 @@ MCParticle#7:
   getNDaughters(): 1
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000412512
   getProductionVertex(): (0.000602288,-0.000684996,-0.00808982)
   getSecondaryPhysicsProcess(): 0
@@ -25171,6 +25898,7 @@ MCParticle#8:
   get4Vector(): (-0.0346546,-0.193397,0.15013,0.910603)
   getArrayIndex(): 8
   getCharge(): -1
+  getDaughter(0): -> MCParticles#19
   getDaughters(): size(2)
     -> MCParticles#19
     -> MCParticles#20
@@ -25187,6 +25915,7 @@ MCParticle#8:
   getNDaughters(): 2
   getName(): rho-
   getPDG(): -213
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#31
   getProductionTime(): 0.000412512
   getProductionVertex(): (0.000602288,-0.000684996,-0.00808982)
   getSecondaryPhysicsProcess(): 0
@@ -25201,6 +25930,7 @@ MCParticle#9:
   get4Vector(): (-0.776807,-0.126554,0.149853,0.812478)
   getArrayIndex(): 9
   getCharge(): 0
+  getDaughter(0): -> MCParticles#21
   getDaughters(): size(2)
     -> MCParticles#21
     -> MCParticles#22
@@ -25217,6 +25947,9 @@ MCParticle#9:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000412512
   getProductionVertex(): (0.000602288,-0.000684996,-0.00808982)
   getSecondaryPhysicsProcess(): 0
@@ -25231,6 +25964,7 @@ MCParticle#10:
   get4Vector(): (1.0302,-0.237743,2.04024,3.0531)
   getArrayIndex(): 10
   getCharge(): -1
+  getDaughter(0): -> MCParticles#23
   getDaughters(): size(2)
     -> MCParticles#23
     -> MCParticles#24
@@ -25247,6 +25981,7 @@ MCParticle#10:
   getNDaughters(): 2
   getName(): D*-
   getPDG(): -413
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#35
   getProductionTime(): 0.000408157
   getProductionVertex(): (0.000275211,0.000676455,-0.00795144)
   getSecondaryPhysicsProcess(): 0
@@ -25261,6 +25996,7 @@ MCParticle#11:
   get4Vector(): (-1.13667,1.13469,-0.728748,1.76369)
   getArrayIndex(): 11
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.74351
   getDecayVertex(): (-72.9571,105.688,-58.6684)
@@ -25275,6 +26011,9 @@ MCParticle#11:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000408171
   getProductionVertex(): (0.000275211,0.000676455,-0.00795144)
   getSecondaryPhysicsProcess(): 0
@@ -25289,6 +26028,7 @@ MCParticle#12:
   get4Vector(): (0.265153,-0.594502,0.229353,0.690175)
   getArrayIndex(): 12
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 30.98
   getDecayVertex(): (356.807,-800,308.624)
@@ -25303,6 +26043,9 @@ MCParticle#12:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000408171
   getProductionVertex(): (0.000275211,0.000676455,-0.00795144)
   getSecondaryPhysicsProcess(): 0
@@ -25317,6 +26060,7 @@ MCParticle#13:
   get4Vector(): (-0.00201055,0.00201036,-0.00125827,0.00310919)
   getArrayIndex(): 13
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 5.2944
   getDecayVertex(): (-94.7907,98.4973,-66.3574)
@@ -25331,6 +26075,9 @@ MCParticle#13:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000408171
   getProductionVertex(): (0.000275211,0.000676455,-0.00795144)
   getSecondaryPhysicsProcess(): 0
@@ -25345,6 +26092,7 @@ MCParticle#14:
   get4Vector(): (1.11077,0.123857,0.447917,2.21978)
   getArrayIndex(): 14
   getCharge(): 0
+  getDaughter(0): -> MCParticles#25
   getDaughters(): size(3)
     -> MCParticles#25
     -> MCParticles#26
@@ -25362,6 +26110,7 @@ MCParticle#14:
   getNDaughters(): 3
   getName(): D0
   getPDG(): 421
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#40
   getProductionTime(): 0.000412512
   getProductionVertex(): (0.000602288,-0.000684996,-0.00808982)
   getSecondaryPhysicsProcess(): 0
@@ -25376,6 +26125,7 @@ MCParticle#15:
   get4Vector(): (0.0836602,0.0283157,0.0737516,0.180887)
   getArrayIndex(): 15
   getCharge(): 1
+  getDaughter(0): -> MCParticles#28
   getDaughters(): size(1)
     -> MCParticles#28
   getDecayTime(): 0.54964
@@ -25391,6 +26141,7 @@ MCParticle#15:
   getNDaughters(): 1
   getName(): pi+
   getPDG(): 211
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#44
   getProductionTime(): 0.000412512
   getProductionVertex(): (0.000602288,-0.000684996,-0.00808982)
   getSecondaryPhysicsProcess(): 0
@@ -25405,6 +26156,7 @@ MCParticle#16:
   get4Vector(): (-8.78214e-07,8.10578e-05,-2.56288e-05,8.50175e-05)
   getArrayIndex(): 16
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1086.25
   getDecayVertex(): (37.0625,-7.48973,94.5962)
@@ -25419,6 +26171,9 @@ MCParticle#16:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1082.31
   getProductionVertex(): (38.2834,-120.169,130.223)
   getSecondaryPhysicsProcess(): 3
@@ -25433,6 +26188,7 @@ MCParticle#17:
   get4Vector(): (0.0189612,0.077462,0.0655535,0.1736)
   getArrayIndex(): 17
   getCharge(): -1
+  getDaughter(0): -> MCParticles#29
   getDaughters(): size(2)
     -> MCParticles#29
     -> MCParticles#30
@@ -25449,6 +26205,9 @@ MCParticle#17:
   getNDaughters(): 2
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 8.12129
   getProductionVertex(): (-67.0308,21.2576,-65.3815)
   getSecondaryPhysicsProcess(): 121
@@ -25463,6 +26222,7 @@ MCParticle#18:
   get4Vector(): (0.000326065,-0.000101835,-0.000635972,0.000721906)
   getArrayIndex(): 18
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 50.3649
   getDecayVertex(): (102.288,-38.7409,98.9945)
@@ -25477,6 +26237,9 @@ MCParticle#18:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 34.6764
   getProductionVertex(): (71.9931,33.6942,199.783)
   getSecondaryPhysicsProcess(): 121
@@ -25491,6 +26254,7 @@ MCParticle#19:
   get4Vector(): (0.0359595,-0.202878,0.477038,0.53805)
   getArrayIndex(): 19
   getCharge(): -1
+  getDaughter(0): -> MCParticles#31
   getDaughters(): size(1)
     -> MCParticles#31
   getDecayTime(): 7.16326
@@ -25506,6 +26270,9 @@ MCParticle#19:
   getNDaughters(): 1
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000412512
   getProductionVertex(): (0.000602288,-0.000684996,-0.00808982)
   getSecondaryPhysicsProcess(): 0
@@ -25520,6 +26287,7 @@ MCParticle#20:
   get4Vector(): (-0.0686053,0.0206921,-0.335611,0.368766)
   getArrayIndex(): 20
   getCharge(): 0
+  getDaughter(0): -> MCParticles#32
   getDaughters(): size(3)
     -> MCParticles#32
     -> MCParticles#33
@@ -25537,6 +26305,7 @@ MCParticle#20:
   getNDaughters(): 3
   getName(): pi0
   getPDG(): 111
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#46
   getProductionTime(): 0.000412512
   getProductionVertex(): (0.000602288,-0.000684996,-0.00808982)
   getSecondaryPhysicsProcess(): 0
@@ -25551,6 +26320,7 @@ MCParticle#21:
   get4Vector(): (0.0047226,0.0019286,0.0053338,0.00738051)
   getArrayIndex(): 21
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 10.7419
   getDecayVertex(): (154.476,71.8485,191.469)
@@ -25565,6 +26335,9 @@ MCParticle#21:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000412574
   getProductionVertex(): (0.000600517,-0.000685284,-0.00808948)
   getSecondaryPhysicsProcess(): 0
@@ -25579,6 +26352,7 @@ MCParticle#22:
   get4Vector(): (-0.781527,-0.128482,0.144518,0.805094)
   getArrayIndex(): 22
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.34713
   getDecayVertex(): (-126.496,-20.7966,23.3834)
@@ -25593,6 +26367,9 @@ MCParticle#22:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000412574
   getProductionVertex(): (0.000600517,-0.000685284,-0.00808948)
   getSecondaryPhysicsProcess(): 0
@@ -25607,6 +26384,7 @@ MCParticle#23:
   get4Vector(): (0.922614,-0.205949,1.90338,2.83054)
   getArrayIndex(): 23
   getCharge(): -1
+  getDaughter(0): -> MCParticles#35
   getDaughters(): size(3)
     -> MCParticles#35
     -> MCParticles#36
@@ -25624,6 +26402,7 @@ MCParticle#23:
   getNDaughters(): 3
   getName(): D-
   getPDG(): -411
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#47
   getProductionTime(): 0.000408171
   getProductionVertex(): (0.000275211,0.000676455,-0.00795144)
   getSecondaryPhysicsProcess(): 0
@@ -25638,6 +26417,7 @@ MCParticle#24:
   get4Vector(): (0.107583,-0.0317937,0.136852,0.222558)
   getArrayIndex(): 24
   getCharge(): 0
+  getDaughter(0): -> MCParticles#38
   getDaughters(): size(2)
     -> MCParticles#38
     -> MCParticles#39
@@ -25654,6 +26434,9 @@ MCParticle#24:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000408171
   getProductionVertex(): (0.000275211,0.000676455,-0.00795144)
   getSecondaryPhysicsProcess(): 0
@@ -25668,6 +26451,7 @@ MCParticle#25:
   get4Vector(): (0.618098,0.490889,-0.216681,0.955869)
   getArrayIndex(): 25
   getCharge(): -1
+  getDaughter(0): -> MCParticles#40
   getDaughters(): size(2)
     -> MCParticles#40
     -> MCParticles#41
@@ -25684,6 +26468,9 @@ MCParticle#25:
   getNDaughters(): 2
   getName(): K-
   getPDG(): -321
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000654119
   getProductionVertex(): (0.00422664,-0.000280862,-0.0066283)
   getSecondaryPhysicsProcess(): 0
@@ -25698,6 +26485,7 @@ MCParticle#26:
   get4Vector(): (0.552294,0.0526724,0.166,0.595684)
   getArrayIndex(): 26
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.56172
   getDecayVertex(): (111.637,-48.4182,37.7711)
@@ -25712,6 +26500,9 @@ MCParticle#26:
   getNDaughters(): 0
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000654119
   getProductionVertex(): (0.00422664,-0.000280862,-0.0066283)
   getSecondaryPhysicsProcess(): 0
@@ -25726,6 +26517,7 @@ MCParticle#27:
   get4Vector(): (-0.0596207,-0.419705,0.498598,0.668225)
   getArrayIndex(): 27
   getCharge(): 0
+  getDaughter(0): -> MCParticles#42
   getDaughters(): size(2)
     -> MCParticles#42
     -> MCParticles#43
@@ -25742,6 +26534,7 @@ MCParticle#27:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#54
   getProductionTime(): 0.000654119
   getProductionVertex(): (0.00422664,-0.000280862,-0.0066283)
   getSecondaryPhysicsProcess(): 0
@@ -25756,6 +26549,7 @@ MCParticle#28:
   get4Vector(): (-0.00414552,0.0886485,0.0319106,0.168445)
   getArrayIndex(): 28
   getCharge(): 1
+  getDaughter(0): -> MCParticles#44
   getDaughters(): size(2)
     -> MCParticles#44
     -> MCParticles#45
@@ -25772,6 +26566,9 @@ MCParticle#28:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.54964
   getProductionVertex(): (7.92205,1.02046,6.48116)
   getSecondaryPhysicsProcess(): 121
@@ -25786,6 +26583,7 @@ MCParticle#29:
   get4Vector(): (0.0151129,-0.0099527,-0.0118753,0.0216444)
   getArrayIndex(): 29
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 53.5453
   getDecayVertex(): (800,-553.919,-731.368)
@@ -25800,6 +26598,9 @@ MCParticle#29:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 11.1599
   getProductionVertex(): (-87.2397,30.3781,-34.2001)
   getSecondaryPhysicsProcess(): 201
@@ -25814,6 +26615,7 @@ MCParticle#30:
   get4Vector(): (-0.0481291,-0.0309449,0.0654464,0.136824)
   getArrayIndex(): 30
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 27.793
   getDecayVertex(): (-80.067,20.3054,187.162)
@@ -25828,6 +26630,9 @@ MCParticle#30:
   getNDaughters(): 0
   getName(): mu-
   getPDG(): 13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 11.1599
   getProductionVertex(): (-87.2397,30.3781,-34.2001)
   getSecondaryPhysicsProcess(): 201
@@ -25842,6 +26647,7 @@ MCParticle#31:
   get4Vector(): (-0.000389601,-0.000123418,0.000436455,0.000786533)
   getArrayIndex(): 31
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 7.04551
   getDecayVertex(): (26.664,-35.8667,136.246)
@@ -25856,6 +26662,9 @@ MCParticle#31:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 3.93349
   getProductionVertex(): (26.5929,-34.2078,104.572)
   getSecondaryPhysicsProcess(): 2
@@ -25870,6 +26679,7 @@ MCParticle#32:
   get4Vector(): (0.0275613,0.0319383,-0.102966,0.111274)
   getArrayIndex(): 32
   getCharge(): 1
+  getDaughter(0): -> MCParticles#46
   getDaughters(): size(1)
     -> MCParticles#46
   getDecayTime(): 2.64669
@@ -25885,6 +26695,9 @@ MCParticle#32:
   getNDaughters(): 1
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000412854
   getProductionVertex(): (0.000600384,-0.000684422,-0.00809913)
   getSecondaryPhysicsProcess(): 0
@@ -25899,6 +26712,7 @@ MCParticle#33:
   get4Vector(): (0.00548709,0.00387562,-0.0237081,0.0246468)
   getArrayIndex(): 33
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 0.21627
   getDecayVertex(): (0.657851,1.58488,-6.14673)
@@ -25913,6 +26727,9 @@ MCParticle#33:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000412854
   getProductionVertex(): (0.000600384,-0.000684422,-0.00809913)
   getSecondaryPhysicsProcess(): 0
@@ -25927,6 +26744,7 @@ MCParticle#34:
   get4Vector(): (-0.101654,-0.0151219,-0.208937,0.232845)
   getArrayIndex(): 34
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 0.14377
   getDecayVertex(): (-1.87568,-0.279797,-3.86457)
@@ -25941,6 +26759,9 @@ MCParticle#34:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000412854
   getProductionVertex(): (0.000600384,-0.000684422,-0.00809913)
   getSecondaryPhysicsProcess(): 0
@@ -25955,6 +26776,7 @@ MCParticle#35:
   get4Vector(): (0.965039,0.397517,1.01295,1.53721)
   getArrayIndex(): 35
   getCharge(): 0
+  getDaughter(0): -> MCParticles#47
   getDaughters(): size(2)
     -> MCParticles#47
     -> MCParticles#48
@@ -25971,6 +26793,7 @@ MCParticle#35:
   getNDaughters(): 2
   getName(): K_S0
   getPDG(): 310
+  getParticleFromGeneralizedIndexString(0:0): -> MCParticles#58
   getProductionTime(): 0.000483566
   getProductionVertex(): (0.00101194,0.000512002,-0.00643155)
   getSecondaryPhysicsProcess(): 0
@@ -25985,6 +26808,7 @@ MCParticle#36:
   get4Vector(): (0.0568376,-0.15039,-0.0651064,0.222635)
   getArrayIndex(): 36
   getCharge(): -1
+  getDaughter(0): -> MCParticles#49
   getDaughters(): size(3)
     -> MCParticles#49
     -> MCParticles#50
@@ -26002,6 +26826,9 @@ MCParticle#36:
   getNDaughters(): 3
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000483566
   getProductionVertex(): (0.00101194,0.000512002,-0.00643155)
   getSecondaryPhysicsProcess(): 0
@@ -26016,6 +26843,7 @@ MCParticle#37:
   get4Vector(): (-0.0992612,-0.453072,0.955539,1.0707)
   getArrayIndex(): 37
   getCharge(): 0
+  getDaughter(0): -> MCParticles#52
   getDaughters(): size(2)
     -> MCParticles#52
     -> MCParticles#53
@@ -26032,6 +26860,9 @@ MCParticle#37:
   getNDaughters(): 2
   getName(): pi0
   getPDG(): 111
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000483566
   getProductionVertex(): (0.00101194,0.000512002,-0.00643155)
   getSecondaryPhysicsProcess(): 0
@@ -26046,6 +26877,7 @@ MCParticle#38:
   get4Vector(): (0.0910264,0.0401297,0.0608344,0.116606)
   getArrayIndex(): 38
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 5.26117
   getDecayVertex(): (123.116,54.2773,82.2724)
@@ -26060,6 +26892,9 @@ MCParticle#38:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000408268
   getProductionVertex(): (0.000276608,0.000676043,-0.00794967)
   getSecondaryPhysicsProcess(): 0
@@ -26074,6 +26909,7 @@ MCParticle#39:
   get4Vector(): (0.0165562,-0.0719233,0.0760171,0.105951)
   getArrayIndex(): 39
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 6.08164
   getDecayVertex(): (28.4885,-123.758,130.795)
@@ -26088,6 +26924,9 @@ MCParticle#39:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000408268
   getProductionVertex(): (0.000276608,0.000676043,-0.00794967)
   getSecondaryPhysicsProcess(): 0
@@ -26102,6 +26941,7 @@ MCParticle#40:
   get4Vector(): (0.255532,0.48938,-0.0541977,0.554732)
   getArrayIndex(): 40
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 30.3092
   getDecayVertex(): (419.344,800,-89.3458)
@@ -26116,6 +26956,9 @@ MCParticle#40:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.147068
   getProductionVertex(): (2.81431,2.28785,-1.00111)
   getSecondaryPhysicsProcess(): 201
@@ -26130,6 +26973,7 @@ MCParticle#41:
   get4Vector(): (0.350279,0.0155068,-0.16213,0.400482)
   getArrayIndex(): 41
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 7.13204
   getDecayVertex(): (63.7942,118.651,-96.0106)
@@ -26144,6 +26988,9 @@ MCParticle#41:
   getNDaughters(): 0
   getName(): mu-
   getPDG(): 13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.147068
   getProductionVertex(): (2.81431,2.28785,-1.00111)
   getSecondaryPhysicsProcess(): 201
@@ -26158,6 +27005,7 @@ MCParticle#42:
   get4Vector(): (-0.0547708,-0.0937203,0.0678571,0.128015)
   getArrayIndex(): 42
   getCharge(): 0
+  getDaughter(0): -> MCParticles#54
   getDaughters(): size(1)
     -> MCParticles#54
   getDecayTime(): 0.173109
@@ -26173,6 +27021,9 @@ MCParticle#42:
   getNDaughters(): 1
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000654142
   getProductionVertex(): (0.00422658,-0.000281299,-0.00662778)
   getSecondaryPhysicsProcess(): 0
@@ -26187,6 +27038,7 @@ MCParticle#43:
   get4Vector(): (-0.0048499,-0.325985,0.430741,0.54021)
   getArrayIndex(): 43
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 7.09013
   getDecayVertex(): (-1.90389,-128.254,169.461)
@@ -26201,6 +27053,9 @@ MCParticle#43:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000654142
   getProductionVertex(): (0.00422658,-0.000281299,-0.00662778)
   getSecondaryPhysicsProcess(): 0
@@ -26215,6 +27070,7 @@ MCParticle#44:
   get4Vector(): (-0.0050971,-0.0146898,0.0254123,0.0297919)
   getArrayIndex(): 44
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 54.9254
   getDecayVertex(): (-129.949,-422.95,800)
@@ -26229,6 +27085,9 @@ MCParticle#44:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 26.5959
   getProductionVertex(): (15.3573,-4.17762,75.5545)
   getSecondaryPhysicsProcess(): 201
@@ -26243,6 +27102,7 @@ MCParticle#45:
   get4Vector(): (0.0050971,0.0146898,-0.0254123,0.109778)
   getArrayIndex(): 45
   getCharge(): 1
+  getDaughter(0): -> MCParticles#55
   getDaughters(): size(3)
     -> MCParticles#55
     -> MCParticles#56
@@ -26260,6 +27120,9 @@ MCParticle#45:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 26.5959
   getProductionVertex(): (15.3573,-4.17762,75.5545)
   getSecondaryPhysicsProcess(): 201
@@ -26274,6 +27137,7 @@ MCParticle#46:
   get4Vector(): (5.24525e-05,2.58386e-05,-0.000116051,0.000129949)
   getArrayIndex(): 46
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 9.20977
   getDecayVertex(): (47.6634,96.8084,32.5595)
@@ -26288,6 +27152,9 @@ MCParticle#46:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.155879
   getProductionVertex(): (1.28523,1.21397,-4.31546)
   getSecondaryPhysicsProcess(): 3
@@ -26302,6 +27169,7 @@ MCParticle#47:
   get4Vector(): (0.929075,0.339118,0.844972,1.3083)
   getArrayIndex(): 47
   getCharge(): 1
+  getDaughter(0): -> MCParticles#58
   getDaughters(): size(2)
     -> MCParticles#58
     -> MCParticles#59
@@ -26318,6 +27186,9 @@ MCParticle#47:
   getNDaughters(): 2
   getName(): pi+
   getPDG(): 211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.56972
   getProductionVertex(): (10.7141,4.41344,11.2386)
   getSecondaryPhysicsProcess(): 0
@@ -26332,6 +27203,7 @@ MCParticle#48:
   get4Vector(): (0.0359636,0.0583984,0.167981,0.228913)
   getArrayIndex(): 48
   getCharge(): -1
+  getDaughter(0): -> MCParticles#60
   getDaughters(): size(1)
     -> MCParticles#60
   getDecayTime(): 4.6434
@@ -26347,6 +27219,9 @@ MCParticle#48:
   getNDaughters(): 1
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.56972
   getProductionVertex(): (10.7141,4.41344,11.2386)
   getSecondaryPhysicsProcess(): 0
@@ -26361,6 +27236,7 @@ MCParticle#49:
   get4Vector(): (0.000103052,0.00014898,-0.000574461,0.000789899)
   getArrayIndex(): 49
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 6.58401
   getDecayVertex(): (67.8837,9.12146,-64.1059)
@@ -26375,6 +27251,9 @@ MCParticle#49:
   getNDaughters(): 0
   getName(): e-
   getPDG(): 11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.37599
   getProductionVertex(): (67.4198,9.07919,-37.4753)
   getSecondaryPhysicsProcess(): 2
@@ -26389,6 +27268,7 @@ MCParticle#50:
   get4Vector(): (0.071609,-0.0558495,-0.0731071,0.116583)
   getArrayIndex(): 50
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 9.84949
   getDecayVertex(): (45.1676,14.2036,-102.907)
@@ -26403,6 +27283,9 @@ MCParticle#50:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 8.11942
   getProductionVertex(): (13.3098,39.0502,-70.3832)
   getSecondaryPhysicsProcess(): 201
@@ -26417,6 +27300,7 @@ MCParticle#51:
   get4Vector(): (-0.00387339,-0.0245888,0.0502158,0.0560467)
   getArrayIndex(): 51
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 18.1923
   getDecayVertex(): (-7.55981,-93.4328,200.177)
@@ -26431,6 +27315,9 @@ MCParticle#51:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 8.11942
   getProductionVertex(): (13.3098,39.0502,-70.3832)
   getSecondaryPhysicsProcess(): 201
@@ -26445,6 +27332,7 @@ MCParticle#52:
   get4Vector(): (-0.0754773,-0.167552,0.498382,0.531183)
   getArrayIndex(): 52
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 7.06326
   getDecayVertex(): (-30.0852,-66.788,198.655)
@@ -26459,6 +27347,9 @@ MCParticle#52:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000483619
   getProductionVertex(): (0.00101179,0.000511323,-0.00643012)
   getSecondaryPhysicsProcess(): 0
@@ -26473,6 +27364,7 @@ MCParticle#53:
   get4Vector(): (-0.0237839,-0.28552,0.457157,0.539518)
   getArrayIndex(): 53
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 6.4947
   getDecayVertex(): (-8.5817,-103.033,164.964)
@@ -26487,6 +27379,9 @@ MCParticle#53:
   getNDaughters(): 0
   getName(): gamma
   getPDG(): 22
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.000483619
   getProductionVertex(): (0.00101179,0.000511323,-0.00643012)
   getSecondaryPhysicsProcess(): 0
@@ -26501,6 +27396,7 @@ MCParticle#54:
   get4Vector(): (-0.0485698,-0.0824553,0.0577814,0.111789)
   getArrayIndex(): 54
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 4.69499
   getDecayVertex(): (-2.88798,11.7074,77.16)
@@ -26515,6 +27411,9 @@ MCParticle#54:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 0.173109
   getProductionVertex(): (-2.20776,-3.7853,2.73387)
   getSecondaryPhysicsProcess(): 14
@@ -26529,6 +27428,7 @@ MCParticle#55:
   get4Vector(): (-0.000188047,-0.0500063,-0.00356346,0.0501335)
   getArrayIndex(): 55
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 205.422
   getDecayVertex(): (12.3675,-800,18.821)
@@ -26543,6 +27443,9 @@ MCParticle#55:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 178.808
   getProductionVertex(): (15.3603,-4.16233,75.5325)
   getSecondaryPhysicsProcess(): 201
@@ -26557,6 +27460,7 @@ MCParticle#56:
   get4Vector(): (-0.00455203,0.0247299,0.0114135,0.0276145)
   getArrayIndex(): 56
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 208.761
   getDecayVertex(): (-132.662,800,446.675)
@@ -26571,6 +27475,9 @@ MCParticle#56:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 178.808
   getProductionVertex(): (15.3603,-4.16233,75.5325)
   getSecondaryPhysicsProcess(): 201
@@ -26585,6 +27492,7 @@ MCParticle#57:
   get4Vector(): (0.00482932,0.0257523,-0.00799786,0.0273994)
   getArrayIndex(): 57
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 179.305
   getDecayVertex(): (12.8584,-3.3231,66.7378)
@@ -26599,6 +27507,9 @@ MCParticle#57:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 178.808
   getProductionVertex(): (15.3603,-4.16233,75.5325)
   getSecondaryPhysicsProcess(): 201
@@ -26613,6 +27524,7 @@ MCParticle#58:
   get4Vector(): (0.0211152,-0.0190745,-0.00882461,0.0297919)
   getArrayIndex(): 58
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 45.865
   getDecayVertex(): (800,-558.336,-46.8314)
@@ -26627,6 +27539,9 @@ MCParticle#58:
   getNDaughters(): 0
   getName(): nu_mu
   getPDG(): 14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 18.1041
   getProductionVertex(): (210.139,-25.4821,199.688)
   getSecondaryPhysicsProcess(): 201
@@ -26641,6 +27556,7 @@ MCParticle#59:
   get4Vector(): (-0.0211152,0.0190745,0.00882461,0.109778)
   getArrayIndex(): 59
   getCharge(): 1
+  getDaughter(0): -> MCParticles#61
   getDaughters(): size(3)
     -> MCParticles#61
     -> MCParticles#62
@@ -26658,6 +27574,9 @@ MCParticle#59:
   getNDaughters(): 3
   getName(): mu+
   getPDG(): -13
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 18.1041
   getProductionVertex(): (210.139,-25.4821,199.688)
   getSecondaryPhysicsProcess(): 201
@@ -26672,6 +27591,7 @@ MCParticle#60:
   get4Vector(): (-0.0896804,0.0402579,-0.0750494,0.186482)
   getArrayIndex(): 60
   getCharge(): -1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 9.52135
   getDecayVertex(): (-6.28404,-10.1082,57.532)
@@ -26686,6 +27606,9 @@ MCParticle#60:
   getNDaughters(): 0
   getName(): pi-
   getPDG(): -211
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 4.6434
   getProductionVertex(): (-4.14273,27.0202,100.595)
   getSecondaryPhysicsProcess(): 121
@@ -26700,6 +27623,7 @@ MCParticle#61:
   get4Vector(): (0.00199764,0.0153768,-0.00953472,0.018203)
   getArrayIndex(): 61
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1329.95
   getDecayVertex(): (317.357,800,-312.151)
@@ -26714,6 +27638,9 @@ MCParticle#61:
   getNDaughters(): 0
   getName(): anti-nu_mu
   getPDG(): -14
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1297.35
   getProductionVertex(): (210.119,-25.4644,199.695)
   getSecondaryPhysicsProcess(): 201
@@ -26728,6 +27655,7 @@ MCParticle#62:
   get4Vector(): (0.0247383,0.000470329,-0.0282206,0.0375314)
   getArrayIndex(): 62
   getCharge(): 0
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1327.21
   getDecayVertex(): (800,-14.2495,-473.22)
@@ -26742,6 +27670,9 @@ MCParticle#62:
   getNDaughters(): 0
   getName(): nu_e
   getPDG(): 12
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1297.35
   getProductionVertex(): (210.119,-25.4644,199.695)
   getSecondaryPhysicsProcess(): 201
@@ -26756,6 +27687,7 @@ MCParticle#63:
   get4Vector(): (-0.0270139,-0.0160119,0.0381478,0.049413)
   getArrayIndex(): 63
   getCharge(): 1
+  getDaughter(0): -> NULL
   getDaughters(): size(0)
   getDecayTime(): 1297.44
   getDecayVertex(): (209.055,-26.7701,201.044)
@@ -26770,6 +27702,9 @@ MCParticle#63:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+[WARNING] Daughter index 0 out of range
+[WARNING] Trying to access non-existing particle.
+  getParticleFromGeneralizedIndexString(0:0): -> NULL
   getProductionTime(): 1297.35
   getProductionVertex(): (210.119,-25.4644,199.695)
   getSecondaryPhysicsProcess(): 201
@@ -26780,7 +27715,6 @@ MCParticle#63:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
- ... message repeated 12 times
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 0
 [INFO] ========================================================================

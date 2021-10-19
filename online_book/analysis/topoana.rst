@@ -3,6 +3,30 @@
 Topology analysis
 =================
 
+
+.. sidebar:: Overview
+    :class: overview
+
+    **Teaching**: 45 min
+
+    **Additional Exercises**: 45 min
+
+    **Prerequisites**:
+
+        * Command Line Tutorial (Bash)
+
+    **Questions**:
+
+        * What's inside my MC?
+        * How frequently do I have certain different decay modes in my MC?
+
+    **Objectives**:
+
+        * Install ``TopoAna``.
+
+	* Generate a PDF report with a lot of information about your MC.
+
+
 .. tip::
 
    This online textbook introduces ``TopoAna`` very briefly.

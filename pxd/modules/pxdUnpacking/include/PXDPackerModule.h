@@ -100,7 +100,7 @@ namespace Belle2 {
       int m_firmware{0};
 
       /** firmware version from DB. */
-      OptionalDBObjPtr<PXDDHHFirmwareVersionPar> m_firmwareFromDB;
+      OptionalDBObjPtr<PXDDHHFirmwareVersionPar> m_firmwareFromDB{"PXDDHHFirmwareVersion"};
       /** override firmware version from DB. */
       int m_overrideFirmwareVersion{0};
 

@@ -39,8 +39,12 @@ PhysicsObjectsDQMModule::PhysicsObjectsDQMModule() : HistoModule()
 
   addParam("TriggerIdentifier", m_triggerIdentifier,
            "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_hadron"));
+  addParam("TriggerIdentifierMuMu", m_triggerIdentifierMuMu,
+           "Trigger identifier string used to select events for the mumu histograms",
+           std::string("software_trigger_cut&skim&accept_mumutight"));
   addParam("PI0PListName", m_pi0PListName, "Name of the pi0 particle list", std::string("pi0:physDQM"));
   addParam("KS0PListName", m_ks0PListName, "Name of the KS0 particle list", std::string("K_S0:physDQM"));
+  addParam("UpsPListName", m_upsPListName, "Name of the Ups particle list", std::string("Upsilon:physDQM"));
 }
 
 void PhysicsObjectsDQMModule::defineHisto()
@@ -53,6 +57,9 @@ void PhysicsObjectsDQMModule::defineHisto()
 
   m_h_mPI0 = new TH1F("mPI0", "pi0 Invariant Mass", 25, 0.10, 0.15);
   m_h_mPI0->SetXTitle("M(#pi^{0}) [GeV]");
+
+  m_h_mUPS = new TH1F("mUPS", "Ups Invariant Mass", 400, 9, 11);
+  m_h_mUPS->SetXTitle("M(#mu#mu) [GeV]");
 
   m_h_R2 = new TH1F("R2", "Event Level R2", 36, 0, 1.2);
   m_h_R2->SetXTitle("R2");
@@ -74,6 +81,7 @@ void PhysicsObjectsDQMModule::beginRun()
 {
   m_h_mKS0->Reset();
   m_h_mPI0->Reset();
+  m_h_mUPS->Reset();
   m_h_R2->Reset();
 }
 
@@ -97,31 +105,51 @@ void PhysicsObjectsDQMModule::event()
   }
 
   const std::map<std::string, int>& results = result->getResults();
+
   if (results.find(m_triggerIdentifier) == results.end()) {
+    //Cannot find the m_triggerIdentifier, move on to mumu
     B2WARNING("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifier);
+  } else {
+    const bool accepted = (result->getResult(m_triggerIdentifier) == SoftwareTriggerCutResult::c_accept);
+    if (accepted != false) {
+
+      StoreObjPtr<ParticleList> pi0Particles(m_pi0PListName);
+      StoreObjPtr<ParticleList> ks0Particles(m_ks0PListName);
+
+      double R2 = Belle2::Variable::foxWolframR2(nullptr);
+      m_h_R2->Fill(R2);
+
+      if (pi0Particles.isValid() && abs(pi0Particles->getPDGCode()) == Const::pi0.getPDGCode()) {
+        for (unsigned int i = 0; i < pi0Particles->getListSize(); i++) {
+          Particle* pi0 = pi0Particles->getParticle(i);
+          m_h_mPI0->Fill(pi0->getMass());
+        }
+      }
+      if (ks0Particles.isValid() && abs(ks0Particles->getPDGCode()) == Const::Kshort.getPDGCode()) {
+        for (unsigned int i = 0; i < ks0Particles->getListSize(); i++) {
+          Particle* ks0 = ks0Particles->getParticle(i);
+          m_h_mKS0->Fill(ks0->getMass());
+        }
+      }
+    }
+  }
+  if (results.find(m_triggerIdentifierMuMu) == results.end()) {
+    //Cannot find the m_triggerIdentifierMuMu, stop now
+    B2WARNING("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifierMuMu);
     return;
-  }
-
-  const bool accepted = (result->getResult(m_triggerIdentifier) == SoftwareTriggerCutResult::c_accept);
-
-  if (accepted == false) return;
-
-  StoreObjPtr<ParticleList> pi0Particles(m_pi0PListName);
-  StoreObjPtr<ParticleList> ks0Particles(m_ks0PListName);
-
-  double R2 = Belle2::Variable::foxWolframR2(nullptr);
-  m_h_R2->Fill(R2);
-
-  if (pi0Particles.isValid() && abs(pi0Particles->getPDGCode()) == Const::pi0.getPDGCode()) {
-    for (unsigned int i = 0; i < pi0Particles->getListSize(); i++) {
-      Particle* pi0 = pi0Particles->getParticle(i);
-      m_h_mPI0->Fill(pi0->getMass());
+  } else {
+    const bool accepted = (result->getResult(m_triggerIdentifierMuMu) == SoftwareTriggerCutResult::c_accept);
+    if (accepted != false) {
+      StoreObjPtr<ParticleList> UpsParticles(m_upsPListName);
+      if (UpsParticles.isValid()) {
+        for (unsigned int i = 0; i < UpsParticles->getListSize(); i++) {
+          Particle* Ups = UpsParticles->getParticle(i);
+          m_h_mUPS->Fill(Ups->getMass());
+        }
+      }
     }
   }
-  if (ks0Particles.isValid() && abs(ks0Particles->getPDGCode()) == Const::Kshort.getPDGCode()) {
-    for (unsigned int i = 0; i < ks0Particles->getListSize(); i++) {
-      Particle* ks0 = ks0Particles->getParticle(i);
-      m_h_mKS0->Fill(ks0->getMass());
-    }
-  }
+
+
+
 }

@@ -220,7 +220,6 @@ void DQMEventProcessorBase::FillCommonHistograms()
     m_isNotFirstHit = true;
   }
 
-  //  m_histoModule->FillUBResidualsSensor(m_residual_um, m_sensorIndex);
   m_histoModule->FillTRClusterHitmap(m_phi_deg, m_theta_deg, m_layerIndex);
 }
 

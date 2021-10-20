@@ -213,10 +213,10 @@ void DQMHistoModuleBase::DefineMomentumAngles()
 
 void DQMHistoModuleBase::DefineTrackFitStatus()
 {
-  m_PValue = Create("PValue", "P value of fit", 100, 0, 1, "p value", "counts");
-  m_Chi2 = Create("Chi2", "Chi2 of fit", 200, 0, 150, "Chi2", "counts");
-  m_NDF = Create("NDF", "NDF of fit", 200, 0, 200, "NDF", "counts");
-  m_Chi2NDF = Create("Chi2NDF", "Chi2 div NDF of fit", 200, 0, 10, "Chi2NDF", "counts");
+  m_PValue = Create("PValue", "Track Fit P value", 100, 0, 1, "p-value", "counts");
+  m_Chi2 = Create("Chi2", "Track Fit Chi2", 200, 0, 150, "Chi2", "counts");
+  m_NDF = Create("NDF", "Track Fit NDF", 200, 0, 200, "NDF", "counts");
+  m_Chi2NDF = Create("Chi2NDF", "Track Fit Chi2/NDF", 200, 0, 10, "Chi2/NDF", "counts");
 }
 
 void DQMHistoModuleBase::DefineUBResidualsVXD()
@@ -252,9 +252,7 @@ void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
   int iZ0Range = 200;
   double fZ0Range = 10.0;     // Half range in cm
   int iD0Range = 200;
-  double fD0Range = 1.0;      // Half range in cm
-  int iMomRange = 600;
-  double fMomRange = 6.0;
+  double fD0Range = 2.0;      // Half range in cm
   int iPhiRange = 72;
   double fPhiRange = 180.0;   // Half range in deg
   int iLambdaRange = 400;
@@ -267,14 +265,13 @@ void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
   auto Z0 = Axis(iZ0Range, -fZ0Range, fZ0Range, "z0 [cm]");
   auto tanLambda = Axis(iLambdaRange, -fLambdaRange, fLambdaRange, "Tan Lambda");
   auto omega = Axis(iOmegaRange, -fOmegaRange, fOmegaRange, "Omega");
-  auto momentum = Axis(2 * iMomRange, 0.0, fMomRange, "Momentum");
 
   auto factory = Factory(this);
 
   factory.yTitleDefault("Arb. Units");
 
   m_Z0 =        factory.xAxis(Z0).CreateTH1F("HelixZ0", "z0 - the z coordinate of the perigee (beam spot position)");
-  m_D0 =        factory.xAxis(D0).CreateTH1F("HelixD0", "d0 - the signed distance to the IP in the r-phi plane");
+  m_D0 =        factory.xAxis(D0).CreateTH1F("HelixD0", "d0 - the signed distance to (0,0) in the r-phi plane");
   m_Phi =       factory.xAxis(phi).CreateTH1F("HelixPhi",
                                               "Phi - angle of the transverse momentum in the r-phi plane, with CDF naming convention");
   m_Omega =     factory.xAxis(omega).CreateTH1F("HelixOmega",
@@ -295,27 +292,29 @@ void DQMHistoModuleBase::DefineMomentumCoordinates()
   int iMomRange = 100;
   double fMomRange = 6.0;
 
-  auto momentum = Axis(2 * iMomRange, -fMomRange, fMomRange, "Momentum");
+  auto momentum = Axis(2 * iMomRange, -fMomRange, fMomRange, "Momentum [GeV/c]");
+  auto pt_momentum = Axis(iMomRange, 0, fMomRange, "Momentum [GeV/c]");
   auto factory = Factory(this).xAxisDefault(momentum).yTitleDefault("counts");
 
   m_MomX = factory.CreateTH1F("TrackMomentumX", "Track Momentum X");
   m_MomY = factory.CreateTH1F("TrackMomentumY", "Track Momentum Y");
   m_MomZ = factory.CreateTH1F("TrackMomentumZ", "Track Momentum Z");
-  m_MomPt = factory.xAxis(momentum).yTitle("counts").CreateTH1F("TrackMomentumPt", "Track Momentum pT");
+  m_MomPt = factory.xAxis(pt_momentum).yTitle("counts").CreateTH1F("TrackMomentumPt", "Track Momentum pT");
   m_Mom = factory.xlow(.0).CreateTH1F("TrackMomentumMag", "Track Momentum Magnitude");
 }
 
 void DQMHistoModuleBase::DefineHits()
 {
-  int iHitsInPXD = 10;
   int iHitsInSVD = 20;
   int iHitsInCDC = 200;
   int iHits = 200;
 
   auto factory = Factory(this).xlowDefault(0).xTitleDefault("# hits").yTitleDefault("counts");
 
-  if (! m_hltDQM)
+  if (! m_hltDQM) {
+    int iHitsInPXD = 10;
     m_HitsPXD = factory.nbinsx(iHitsInPXD).xup(iHitsInPXD).CreateTH1F("NoOfHitsInTrack_PXD", "No Of Hits In Track - PXD");
+  }
   m_HitsSVD = factory.nbinsx(iHitsInSVD).xup(iHitsInSVD).CreateTH1F("NoOfHitsInTrack_SVD", "No Of Hits In Track - SVD");
   m_HitsCDC = factory.nbinsx(iHitsInCDC).xup(iHitsInCDC).CreateTH1F("NoOfHitsInTrack_CDC", "No Of Hits In Track - CDC");
   m_Hits = factory.nbinsx(iHits).xup(iHits).CreateTH1F("NoOfHitsInTrack", "No Of Hits In Track");
@@ -446,9 +445,11 @@ void DQMHistoModuleBase::FillHitNumbers(int nPXD, int nSVD, int nCDC)
 
 void DQMHistoModuleBase::FillMomentumAngles(const TrackFitResult* tfr)
 {
-  float px = tfr->getMomentum().Px();
-  float py = tfr->getMomentum().Py();
-  float pz = tfr->getMomentum().Pz();
+  TVector3 mom = tfr->getMomentum();
+
+  float px = mom.Px();
+  float py = mom.Py();
+  float pz = mom.Pz();
 
   float Phi = atan2(py, px);
   float pxy = sqrt(px * px + py * py);
@@ -461,11 +462,13 @@ void DQMHistoModuleBase::FillMomentumAngles(const TrackFitResult* tfr)
 
 void DQMHistoModuleBase::FillMomentumCoordinates(const TrackFitResult* tfr)
 {
-  m_MomX->Fill(tfr->getMomentum().Px());
-  m_MomY->Fill(tfr->getMomentum().Py());
-  m_MomZ->Fill(tfr->getMomentum().Pz());
-  m_Mom->Fill(tfr->getMomentum().Mag());
-  m_MomPt->Fill(tfr->getMomentum().Pt());
+  TVector3 mom = tfr->getMomentum();
+
+  m_MomX->Fill(mom.Px());
+  m_MomY->Fill(mom.Py());
+  m_MomZ->Fill(mom.Pz());
+  m_Mom->Fill(mom.Mag());
+  m_MomPt->Fill(mom.Pt());
 }
 
 void DQMHistoModuleBase::FillHelixParametersAndCorrelations(const TrackFitResult* tfr)

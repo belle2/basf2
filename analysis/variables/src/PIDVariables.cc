@@ -362,6 +362,12 @@ namespace Belle2 {
                                                                 pdgCodeTest) + ", CDC, TOP, ARICH, ECL, KLM)")->function(part));
     }
 
+    double electronID_noTOP(const Particle* part)
+    {
+      // Excluding TOP for electron ID. This variable is temporary. BII-8444
+      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, SVD, ARICH, ECL, KLM)")->function(part));
+    }
+
     double antineutronID(const Particle* particle)
     {
       if (particle->hasExtraInfo("nbarID")) {
@@ -600,6 +606,8 @@ namespace Belle2 {
     REGISTER_METAVARIABLE("binaryPID_noSVD(pdgCode1, pdgCode2)", binaryPID_noSVD,
                           "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the SVD*.",
                           Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("electronID_noTOP", electronID_noTOP,
+                      "(SPECIAL (TEMP) variable) electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors *excluding the TOP*");
     REGISTER_VARIABLE("nbarID", antineutronID, R"DOC(
 Returns MVA classifier for antineutron PID.
 

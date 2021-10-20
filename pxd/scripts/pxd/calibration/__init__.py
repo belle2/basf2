@@ -175,6 +175,7 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
           collectors are:
             PXDPerformanceVariablesCollector (default),
             PXDPerformanceCollector(using RAVE package for vertexing, obsolete)
+        "useClusterPosition": Flag to use cluster postion rather than track point to group pixels for calibration.
 
     Return:
       A caf.framework.Calibration obj.
@@ -192,6 +193,9 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
     supported_collectors = ["PXDPerformanceVariablesCollector", "PXDPerformanceCollector"]
     if not isinstance(collector_prefix, str) or collector_prefix not in supported_collectors:
         raise ValueError("collector_prefix not found in {}".format(supported_collectors))
+    useClusterPosition = kwargs.get("useClusterPosition", False)
+    if not isinstance(useClusterPosition, bool):
+        raise ValueError("useClusterPosition has to be a boolean!")
 
     # Create basf2 path
 
@@ -249,6 +253,7 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         collector.param("PList4EffName", "vpho:eff")
         collector.param("PList4ResName", "vpho:res")
         collector.param("maskedDistance", 3)
+        collector.param("useClusterPosition", useClusterPosition)
 
     collector.param("granularity", "run")
     collector.param("minClusterCharge", 8)

@@ -206,9 +206,9 @@ TH2F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::form
 
 void DQMHistoModuleBase::DefineMomentumAngles()
 {
-  m_MomPhi = Create("MomPhi", "Momentum Phi of fit", 180, -180, 180, "Mom Phi", "counts");
-  m_MomTheta = Create("MomTheta", "Momentum Theta of fit", 90, 0, 180, "Mom Theta", "counts");
-  m_MomCosTheta = Create("MomCosTheta", "Cos of Momentum Theta of fit", 100, -1, 1, "Mom CosTheta", "counts");
+  m_MomPhi = Create("MomPhi", "Track Azimuthal Angle", 180, -180, 180, "Mom Phi", "counts");
+  m_MomTheta = Create("MomTheta", "Track Polar Angle", 90, 0, 180, "Mom Theta", "counts");
+  m_MomCosTheta = Create("MomCosTheta", "Cosin of the Track Polar Angle", 100, -1, 1, "Mom CosTheta", "counts");
 }
 
 void DQMHistoModuleBase::DefineTrackFitStatus()
@@ -230,20 +230,20 @@ void DQMHistoModuleBase::DefineUBResidualsVXD()
   factory.xAxisDefault(residualU).yAxisDefault(residualV).zTitleDefault("counts");
 
   if (! m_hltDQM)
-    m_UBResidualsPXD = factory.CreateTH2F("UBResidualsPXD", "Unbiased residuals for PXD");
-  m_UBResidualsSVD = factory.CreateTH2F("UBResidualsSVD", "Unbiased residuals for SVD");
+    m_UBResidualsPXD = factory.CreateTH2F("UBResidualsPXD", "PXD Unbiased Residuals");
+  m_UBResidualsSVD = factory.CreateTH2F("UBResidualsSVD", "SVD Unbiased Residuals");
 
   factory.xAxisDefault(residualU).yTitleDefault("counts");
 
   if (! m_hltDQM)
-    m_UBResidualsPXDU = factory.CreateTH1F("UBResidualsPXDU", "Unbiased residuals in U for PXD");
-  m_UBResidualsSVDU = factory.CreateTH1F("UBResidualsSVDU", "Unbiased residuals in U for SVD");
+    m_UBResidualsPXDU = factory.CreateTH1F("UBResidualsPXDU", "PXD Unbiased residuals in U");
+  m_UBResidualsSVDU = factory.CreateTH1F("UBResidualsSVDU", "SVD Unbiased residuals in U");
 
   factory.xAxisDefault(residualV);
 
   if (! m_hltDQM)
-    m_UBResidualsPXDV = factory.CreateTH1F("UBResidualsPXDV", "Unbiased residuals in V for PXD");
-  m_UBResidualsSVDV = factory.CreateTH1F("UBResidualsSVDV", "Unbiased residuals in V for SVD");
+    m_UBResidualsPXDV = factory.CreateTH1F("UBResidualsPXDV", "PXD Unbiased residuals in V");
+  m_UBResidualsSVDV = factory.CreateTH1F("UBResidualsSVDV", "SVD Unbiased residuals in V");
 }
 
 void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
@@ -270,20 +270,21 @@ void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
 
   factory.yTitleDefault("Arb. Units");
 
-  m_Z0 =        factory.xAxis(Z0).CreateTH1F("HelixZ0", "z0 - the z coordinate of the perigee (beam spot position)");
-  m_D0 =        factory.xAxis(D0).CreateTH1F("HelixD0", "d0 - the signed distance to (0,0) in the r-phi plane");
+  m_Z0 =        factory.xAxis(Z0).CreateTH1F("HelixZ0", "z0, the z coordinate of the perigee");
+  m_D0 =        factory.xAxis(D0).CreateTH1F("HelixD0", "d0, the signed distance to (0,0) in the r-phi plane");
   m_Phi =       factory.xAxis(phi).CreateTH1F("HelixPhi",
-                                              "Phi - angle of the transverse momentum in the r-phi plane, with CDF naming convention");
+                                              "Phi, angle of the transverse momentum in the r-phi plane");
   m_Omega =     factory.xAxis(omega).CreateTH1F("HelixOmega",
-                                                "Omega - the curvature of the track. It's sign is defined by the charge of the particle");
-  m_TanLambda = factory.xAxis(tanLambda).CreateTH1F("HelixTanLambda", "TanLambda - the slope of the track in the r-z plane");
+                                                "Omega, the curvature of the track, sign defined by the charge of the particle");
+  m_TanLambda = factory.xAxis(tanLambda).CreateTH1F("HelixTanLambda", "TanLambda, the slope of the track in the r-z plane");
 
 
   factory.zTitleDefault("Arb. Units");
 
-  m_PhiD0 = factory.xAxis(phi).yAxis(D0).CreateTH2F("Helix2dPhiD0", "d0 vs Phi - the signed distance to the IP in the r-phi plane");
+  m_PhiD0 = factory.xAxis(phi).yAxis(D0).CreateTH2F("Helix2dPhiD0",
+                                                    "d0 vs Phi the signed distance to the IP in the r-phi plane vs. phi");
   m_D0Z0 =  factory.xAxis(D0).yAxis(Z0).CreateTH2F("Helix2dD0Z0",
-                                                   "z0 vs d0 - signed distance to the IP in r-phi vs. z0 of the perigee (to see primary vertex shifts along R or z)");
+                                                   "z0 vs d0 - signed distance to the (0,0,0) in r-phi vs. z0 of the perigee");
 
 }
 
@@ -313,11 +314,11 @@ void DQMHistoModuleBase::DefineHits()
 
   if (! m_hltDQM) {
     int iHitsInPXD = 10;
-    m_HitsPXD = factory.nbinsx(iHitsInPXD).xup(iHitsInPXD).CreateTH1F("NoOfHitsInTrack_PXD", "No Of Hits In Track - PXD");
+    m_HitsPXD = factory.nbinsx(iHitsInPXD).xup(iHitsInPXD).CreateTH1F("NoOfHitsInTrack_PXD", "Number of PXD Hits per Track");
   }
-  m_HitsSVD = factory.nbinsx(iHitsInSVD).xup(iHitsInSVD).CreateTH1F("NoOfHitsInTrack_SVD", "No Of Hits In Track - SVD");
-  m_HitsCDC = factory.nbinsx(iHitsInCDC).xup(iHitsInCDC).CreateTH1F("NoOfHitsInTrack_CDC", "No Of Hits In Track - CDC");
-  m_Hits = factory.nbinsx(iHits).xup(iHits).CreateTH1F("NoOfHitsInTrack", "No Of Hits In Track");
+  m_HitsSVD = factory.nbinsx(iHitsInSVD).xup(iHitsInSVD).CreateTH1F("NoOfHitsInTrack_SVD", "Number of SVD Hits per Track");
+  m_HitsCDC = factory.nbinsx(iHitsInCDC).xup(iHitsInCDC).CreateTH1F("NoOfHitsInTrack_CDC", "Number of CDC Hits per Track");
+  m_Hits = factory.nbinsx(iHits).xup(iHits).CreateTH1F("NoOfHitsInTrack", "Number of Hits per Track");
 }
 
 void DQMHistoModuleBase::DefineTracks()
@@ -327,10 +328,10 @@ void DQMHistoModuleBase::DefineTracks()
   auto tracks = Axis(iTracks, 0, iTracks, "# tracks");
   auto factory = Factory(this).xAxisDefault(tracks).yTitleDefault("counts");
 
-  m_TracksVXD = factory.CreateTH1F("NoOfTracksInVXDOnly", "No Of Tracks Per Event, Only In VXD");
-  m_TracksCDC = factory.CreateTH1F("NoOfTracksInCDCOnly", "No Of Tracks Per Event, Only In CDC");
-  m_TracksVXDCDC = factory.CreateTH1F("NoOfTracksInVXDCDC", "No Of Tracks Per Event, In VXD+CDC");
-  m_Tracks = factory.CreateTH1F("NoOfTracks", "No Of All Tracks Per Event");
+  m_TracksVXD = factory.CreateTH1F("NoOfTracksInVXDOnly", "Number of VXD-Only Tracks per Event");
+  m_TracksCDC = factory.CreateTH1F("NoOfTracksInCDCOnly", "Number of CDC-Only Tracks per Event");
+  m_TracksVXDCDC = factory.CreateTH1F("NoOfTracksInVXDCDC", "Number of VXD+CDC Tracks per Event");
+  m_Tracks = factory.CreateTH1F("NoOfTracks", "Number of Tracks per Event");
 }
 
 void DQMHistoModuleBase::DefineHalfShellsVXD()
@@ -341,25 +342,25 @@ void DQMHistoModuleBase::DefineHalfShellsVXD()
   auto factory = Factory(this).xAxisDefault(residual).yTitleDefault("counts");
 
   if (! m_hltDQM) {
-    m_UBResidualsPXDX_Yin = factory.CreateTH1F("UBResidualsPXDX_Yin", "Unbiased residuals in X for PXD for Yin");
-    m_UBResidualsPXDX_Yang = factory.CreateTH1F("UBResidualsPXDX_Yang", "Unbiased residuals in X for PXD for Yang");
+    m_UBResidualsPXDX_Yin = factory.CreateTH1F("UBResidualsPXDX_Yin", "PXD-Yin Unbiased Residuals in X");
+    m_UBResidualsPXDX_Yang = factory.CreateTH1F("UBResidualsPXDX_Yang", "PXD-Yang Unbiased Residuals in X");
   }
-  m_UBResidualsSVDX_Pat = factory.CreateTH1F("UBResidualsSVDX_Pat", "Unbiased residuals in X for SVD for Pat");
-  m_UBResidualsSVDX_Mat = factory.CreateTH1F("UBResidualsSVDX_Mat", "Unbiased residuals in X for SVD for Mat");
+  m_UBResidualsSVDX_Pat = factory.CreateTH1F("UBResidualsSVDX_Pat", "SVD-Pat Unbiased Residuals in X");
+  m_UBResidualsSVDX_Mat = factory.CreateTH1F("UBResidualsSVDX_Mat", "SVD-Mat Unbiased Residuals in X");
 
   if (! m_hltDQM) {
-    m_UBResidualsPXDY_Yin = factory.CreateTH1F("UBResidualsPXDY_Yin", "Unbiased residuals in Y for PXD for Yin");
-    m_UBResidualsPXDY_Yang = factory.CreateTH1F("UBResidualsPXDY_Yang", "Unbiased residuals in Y for PXD for Yang");
+    m_UBResidualsPXDY_Yin = factory.CreateTH1F("UBResidualsPXDY_Yin", "PXD-Yin Unbiased Residuals in Y");
+    m_UBResidualsPXDY_Yang = factory.CreateTH1F("UBResidualsPXDY_Yang", "PXD-Yang Unbiased Residuals in Y");
   }
-  m_UBResidualsSVDY_Pat = factory.CreateTH1F("UBResidualsSVDY_Pat", "Unbiased residuals in Y for SVD for Pat");
-  m_UBResidualsSVDY_Mat = factory.CreateTH1F("UBResidualsSVDY_Mat", "Unbiased residuals in Y for SVD for Mat");
+  m_UBResidualsSVDY_Pat = factory.CreateTH1F("UBResidualsSVDY_Pat", "SVD-Pat Unbiased Residuals in Y");
+  m_UBResidualsSVDY_Mat = factory.CreateTH1F("UBResidualsSVDY_Mat", "SVD-Mat Unbiased Residuals in Y");
 
   if (! m_hltDQM) {
-    m_UBResidualsPXDZ_Yin = factory.CreateTH1F("UBResidualsPXDZ_Yin", "Unbiased residuals in Z for PXD for Yin");
-    m_UBResidualsPXDZ_Yang = factory.CreateTH1F("UBResidualsPXDZ_Yang", "Unbiased residuals in Z for PXD for Yang");
+    m_UBResidualsPXDZ_Yin = factory.CreateTH1F("UBResidualsPXDZ_Yin", "PXD-Yin Unbiased Residuals in Z");
+    m_UBResidualsPXDZ_Yang = factory.CreateTH1F("UBResidualsPXDZ_Yang", "PXD-Yang Unbiased Residuals in Z");
   }
-  m_UBResidualsSVDZ_Pat = factory.CreateTH1F("UBResidualsSVDZ_Pat", "Unbiased residuals in Z for SVD for Pat");
-  m_UBResidualsSVDZ_Mat = factory.CreateTH1F("UBResidualsSVDZ_Mat", "Unbiased residuals in Z for SVD for Mat");
+  m_UBResidualsSVDZ_Pat = factory.CreateTH1F("UBResidualsSVDZ_Pat", "SVD-Pat Unbiased Residuals in Z");
+  m_UBResidualsSVDZ_Mat = factory.CreateTH1F("UBResidualsSVDZ_Mat", "SVD-Mat Unbiased Residuals in Z");
 
 }
 
@@ -414,14 +415,14 @@ void DQMHistoModuleBase::DefineSensors()
   auto factory = Factory(this);
 
   m_UBResidualsSensor = factory.xAxis(residualU).yAxis(residualV).zTitle("counts").CreateSensorsTH2F(format("UBResiduals_%1%"),
-                        format("PXD Unbiased residuals for sensor %1%"));
+                        format("PXD Unbiased Residuals for sensor %1%"));
 
   factory.yTitleDefault("counts");
 
   m_UBResidualsSensorU = factory.xAxis(residualU).CreateSensorsTH1F(format("UBResidualsU_%1%"),
-                         format("PXD Unbiased U residuals for sensor %1%"));
+                         format("PXD Unbiased U Residuals for sensor %1%"));
   m_UBResidualsSensorV = factory.xAxis(residualV).CreateSensorsTH1F(format("UBResidualsV_%1%"),
-                         format("PXD Unbiased V residuals for sensor %1%"));
+                         format("PXD Unbiased V Residuals for sensor %1%"));
 
 }
 

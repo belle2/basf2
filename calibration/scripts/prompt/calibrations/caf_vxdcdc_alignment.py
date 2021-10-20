@@ -253,7 +253,7 @@ def create_prompt(files, cfg):
         params=dict(minPValue=0.00001, externalIterations=0, granularity="run"),
         min_entries=1000000)
 
-    cal.max_iterations = 0
+    cal.max_iterations = 5
 
     return cal
 

@@ -153,8 +153,9 @@ As only charged B mesons are reconstructed in this exercise, the ``chargedB`` ar
 and the ``neutralB`` argument to False.
 The same applies to the ``hadronic`` and ``semileptonic`` arguments, set ``hadronic=True`` and ``semileptonic=False``
 as you will only reconstruct B mesons in hadronic decay channels.
-You should also enable B meson decay channels involving baryons with the ``baryonic=True`` argument as this increases
-efficiency.
+
+B meson decay channels involving baryons are a rather new feature that increase efficiency. They are turned on by
+default and can be controlled with the argument ``baryonic``.
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -174,7 +175,7 @@ The `fei.FeiConfiguration` class controls the other configuration options of the
 Here, the FEI monitoring should be disabled with the appropriate argument (``monitor=False``) as we are not interested in
 the internal performance characteristics of the FEI stages.
 We also have to specify the FEI prefix argument here. This prefix allows distinguishing between different trainings
-in a single Global Tag and is ``prefix=FEIv4_2020_MC13_release_04_01_01`` for the current central training.
+in a single Global Tag and is ``prefix=FEIv4_2021_MC14_release_05_01_12`` for the current central training.
 
 
 .. admonition:: Exercise

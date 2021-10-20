@@ -92,7 +92,7 @@ In addition to the usual python packages (``basf2`` and `modularAnalysis`) we al
     Then create a path and
     load input data from an ``mdst`` file.
 
-    You can again use mdst files from ``/group/belle2/users/tenchini/prerelease-05-00-00a/charged/`` on KEKCC.
+    You can again use mdst files from ``${BELLE2_EXAMPLES_DATA_DIR}/starterkit/2021``.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -426,7 +426,7 @@ preprocessed datasets are called *skims*.
 We will be using a FEI-skimmed file in this exercise in which the ``B0:generic`` particle list already exists.
 If you would like to know more about skimming, you can have a look into :ref:`onlinebook_skim`.
 
-The input file we will be using, found at ``/home/belle2/mbauer/fei_tutorial/fei_skimmed_xulnu.udst.root``, only
+The input file we will be using, found at ``${BELLE2_EXAMPLES_DATA_DIR}/starterkit/2021/fei_skimmed_xulnu.udst.root``, only
 contains decays of B0 mesons to a light lepton and a charged pi or rho meson. This way we don't have to process
 as much data as we would have to for a  file containing decays in all B decay channels.
 
@@ -441,7 +441,7 @@ Lets get started with the usual steps. Nothing here should be new to you.
     Start a new steering file.
     In this file, you won't need the ``fei`` package so you can skip this import.
     Create a path and load the udst file
-    ``/home/belle2/mbauer/fei_tutorial/fei_skimmed_xulnu.udst.root``.
+    ``${BELLE2_EXAMPLES_DATA_DIR}/starterkit/2021/fei_skimmed_xulnu.udst.root``.
 
     **NOTE**: You can still use `modularAnalysis.inputMdst` to do this, even though it's a ``udst`` file.
 

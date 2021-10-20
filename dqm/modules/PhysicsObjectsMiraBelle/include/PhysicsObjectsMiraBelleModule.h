@@ -74,5 +74,8 @@ namespace Belle2 {
     /** Name of the mu+ particle list */
     std::string m_muPListName = "";
 
+    /** Name of the mu+mu- (Upsilon) particle list */
+    std::string m_mumuPListName = "";
+
   };
 }

@@ -185,6 +185,13 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   float nocdc_frac = hist_ncdc->GetBinContent(1) / (float)ntot;
   float notop_frac = hist_topdig->GetBinContent(1) / (float)ntot;
   float noarich_frac = hist_DetPhotonARICH->GetBinContent(1) / (float)ntot;
+  //Calculate M(mumu)
+  float peak_mumu = hist_inv_p->GetXaxis()->GetBinCenter(hist_inv_p->GetMaximumBin());
+  TF1* f_mumuInvM = new TF1("f_mumuInvM", "[0]*TMath::Gaus(x,[1],[2])", peak_mumu - 0.02, peak_mumu + 0.02);
+  f_mumuInvM->SetParNames("Height", "#mu", "#sigma");
+  f_mumuInvM->SetParameters(hist_inv_p->GetMaximum(), peak_mumu, 0.04);
+  hist_inv_p->Fit(f_mumuInvM, "", "", peak_mumu - 0.02, peak_mumu + 0.02);
+  float fit_mumumass = f_mumuInvM->GetParameter(1);
 
   // set values
   mon_mumu->setVariable("mean_npxd", mean_npxd);
@@ -218,7 +225,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_mumu->setVariable("nocdc_frac", nocdc_frac);
   mon_mumu->setVariable("notop_frac", notop_frac);
   mon_mumu->setVariable("noarich_frac", noarich_frac);
-
+  mon_mumu->setVariable("fit_mumumass", fit_mumumass);
 
   // ========== D*
   // get existing histograms produced by DQM modules

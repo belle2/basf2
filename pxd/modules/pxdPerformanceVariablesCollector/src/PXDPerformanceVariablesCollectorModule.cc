@@ -50,6 +50,8 @@ PXDPerformanceVariablesCollectorModule::PXDPerformanceVariablesCollectorModule()
   addParam("nBinsU", m_nBinsU, "Number of gain corrections per sensor along u side", int(4));
   addParam("nBinsV", m_nBinsV, "Number of gain corrections per sensor along v side", int(6));
   addParam("gainPayloadName", m_gainName, "Payload name for Gain to be read from DB", string(""));
+  addParam("useClusterPosition", m_useClusterPosition,
+           "Flag to use cluster position rather than track point to group pixels for gain calibration.", bool(false));
   addParam("fillChargeRatioHistogram", m_fillChargeRatioHistogram,
            "Flag to fill Ratio (cluster charge to the expected MPV) histograms", bool(true));
   addParam("fillChargeTree", m_fillChargeTree, "Flag to fill cluster charge with the estimated MPV to TTree", bool(false));
@@ -304,7 +306,7 @@ void PXDPerformanceVariablesCollectorModule::collectGainVariables(const TrackClu
   m_estimated = intersection.chargeMPV;
 
   int uBin(-1), vBin(-1);
-  auto binID = getBinID(trackCluster, uBin, vBin);
+  auto binID = getBinID(trackCluster, uBin, vBin, m_useClusterPosition);
   VxdID sensorID = getVxdIDFromPXDModuleID(cluster.pxdID);
   auto layerNumber = sensorID.getLayerNumber();
   auto ladderNumber = sensorID.getLadderNumber();

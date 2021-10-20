@@ -249,14 +249,14 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
   // Fill histograms from tree
   for (int i = 0; i < tree_d0z0->GetEntries(); i++) {
     tree_d0z0->GetEntry(i);
-    if (fabs(d0) > 0.03 || fabs(z0) > 0.03)
-      continue;
-    m_hD0->Fill(d0);
-    m_hZ0->Fill(z0);
     if (saveD0Z0) {
       m_d0.emplace_back(d0);
       m_z0.emplace_back(z0);
     }
+    if (fabs(d0) > 0.03 || fabs(z0) > 0.03)
+      continue;
+    m_hD0->Fill(d0);
+    m_hZ0->Fill(z0);
   }
 
 

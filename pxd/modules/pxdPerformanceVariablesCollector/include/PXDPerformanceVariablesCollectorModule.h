@@ -75,7 +75,7 @@ namespace Belle2 {
      * @param useCluster flag to use cluster position instead of track point
      * @return unique binID
      */
-    int getBinID(const PXD::TrackCluster_t& trackCluster, int& uBin, int& vBin, bool useCluster = true)
+    int getBinID(const PXD::TrackCluster_t& trackCluster, int& uBin, int& vBin, bool useCluster = false)
     {
 
       // Get PXD::TrackPoint_t
@@ -138,6 +138,8 @@ namespace Belle2 {
     int m_nBinsV;
     /** Payload name for Gain to be read from DB */
     std::string m_gainName;
+    /** Flag to use cluster position rather than track point to group pixels into bins for gain calibration.*/
+    bool m_useClusterPosition;
     /** Flag to fill cluster charge ratio (relative to expected MPV) histograms*/
     bool m_fillChargeRatioHistogram;
     /** Flag to fill cluster charge and its estimated MPV in TTree*/

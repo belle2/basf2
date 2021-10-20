@@ -29,6 +29,7 @@ REG_MODULE(TrackingHLTDQM)
 
 TrackingHLTDQMModule::TrackingHLTDQMModule() : DQMHistoModuleBase()
 {
+  setPropertyFlags(c_ParallelProcessingCertified);
   setDescription("Data Quality Monitoring of the tracking run on HLT. "
                 );
 }

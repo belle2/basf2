@@ -98,6 +98,7 @@ namespace Belle2 {
     /** StoreArray name where RecoTracks are written. */
     std::string m_recoTracksStoreArrayName = "";
 
+    /** true if the DQM is run on HLT */
     bool m_runningOnHLT;
 
     /** index of track (with valid TrackFitResult and related RecoTrack) */

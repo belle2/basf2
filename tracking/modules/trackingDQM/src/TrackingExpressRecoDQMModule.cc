@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/trackingDQM/TrackingERDQMModule.h>
+#include <tracking/modules/trackingDQM/TrackingExpressRecoDQMModule.h>
 #include <tracking/modules/trackingDQM/TrackDQMEventProcessor.h>
 #include <tracking/dqmUtils/HistogramFactory.h>
 
@@ -21,14 +21,16 @@ using boost::format;
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(TrackingERDQM)
+REG_MODULE(TrackingExpressRecoDQM)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-TrackingERDQMModule::TrackingERDQMModule() : DQMHistoModuleBase()
+TrackingExpressRecoDQMModule::TrackingExpressRecoDQMModule() : DQMHistoModuleBase()
 {
+  setPropertyFlags(c_ParallelProcessingCertified);
+
   setDescription("Data Quality Monitoring of the tracking run on ExpressReco. "
                 );
 }
@@ -37,12 +39,12 @@ TrackingERDQMModule::TrackingERDQMModule() : DQMHistoModuleBase()
 // Function to define histograms
 //-----------------------------------------------------------------
 
-void TrackingERDQMModule::initialize()
+void TrackingExpressRecoDQMModule::initialize()
 {
   DQMHistoModuleBase::initialize();
 }
 
-void TrackingERDQMModule::defineHisto()
+void TrackingExpressRecoDQMModule::defineHisto()
 {
   DQMHistoModuleBase::defineHisto();
 
@@ -52,7 +54,6 @@ void TrackingERDQMModule::defineHisto()
   // Create a separate histogram directories and cd into it.
   TDirectory* originalDirectory = gDirectory;
 
-  // There might be problems with nullptr if the directory with the same name already exists (but I am not sure because there isn't anything like that in AlignmentDQM)
   TDirectory* TracksDQM = originalDirectory->GetDirectory("TrackingERDQM");
   if (!TracksDQM)
     TracksDQM = originalDirectory->mkdir("TrackingERDQM");
@@ -74,7 +75,7 @@ void TrackingERDQMModule::defineHisto()
     ProcessHistogramParameterChange(get<0>(change), get<1>(change), get<2>(change));
 }
 
-void TrackingERDQMModule::event()
+void TrackingExpressRecoDQMModule::event()
 {
   DQMHistoModuleBase::event();
   if (!histogramsDefined)

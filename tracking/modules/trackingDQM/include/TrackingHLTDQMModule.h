@@ -9,8 +9,9 @@
 #pragma once
 
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
-
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
+#include <TH1.h>
 
 namespace Belle2 {
 
@@ -20,12 +21,13 @@ namespace Belle2 {
   public:
     /** Constructor */
     TrackingHLTDQMModule();
-    /* Destructor */
+    /** Destructor */
     ~TrackingHLTDQMModule() { }
 
     /** Module functions */
-    virtual void initialize() override;
-    virtual void event() override;
+    void initialize() override;
+    /** fill of the histograms happens here */
+    void event() override;
 
     /** Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed to be placed in this function.
      * Also at the end function all m_histogramParameterChanges should be processed via the ProcessHistogramParameterChange function. */

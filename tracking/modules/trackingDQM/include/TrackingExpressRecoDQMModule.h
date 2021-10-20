@@ -10,27 +10,25 @@
 
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
-#include <mdst/dataobjects/EventLevelTrackingInfo.h>
-
 namespace Belle2 {
 
   /** Tracking ExpressReco DQM. */
-  class TrackingERDQMModule : public DQMHistoModuleBase {
+  class TrackingExpressRecoDQMModule : public DQMHistoModuleBase {
 
   public:
     /** Constructor */
-    TrackingERDQMModule();
-    /* Destructor */
-    ~TrackingERDQMModule() { }
+    TrackingExpressRecoDQMModule();
+    /** Destructor */
+    ~TrackingExpressRecoDQMModule() { }
 
     /** Module functions */
-    virtual void initialize() override;
-    virtual void event() override;
+    void initialize() override;
+    /** fill of the histograms happens here */
+    void event() override;
 
     /** Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed to be placed in this function.
      * Also at the end function all m_histogramParameterChanges should be processed via the ProcessHistogramParameterChange function. */
-    virtual void defineHisto() override;
+    void defineHisto() override;
 
-  protected:
   };
 }

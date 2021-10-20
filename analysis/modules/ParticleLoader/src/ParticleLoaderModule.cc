@@ -319,7 +319,6 @@ namespace Belle2 {
       ROOT::Math::PxPyPzEVector signal4Vector = signalSideParticle->get4Vector();
       ROOT::Math::PxPyPzEVector roe4Vector = roe->get4Vector(m_roeMaskName);
       ROOT::Math::PxPyPzEVector missing4Vector = boost4Vector - signal4Vector - roe4Vector;
-      missing4Vector.SetE(missing4Vector.P());
       auto isFlavored = (isSelfConjugatedParticle) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
       newPart = m_particles.appendNew(missing4Vector, pdgCode, isFlavored, Particle::EParticleSourceObject::c_Undefined, mdstIndex);
 

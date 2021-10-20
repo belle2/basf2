@@ -231,16 +231,13 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
 
       if (denV < m_statThreshold) {
-        m_effVstatus = lowStat;
-        break; // break loop if one of sensor collected less then m_statThreshold
-      } else {
-        if ((effV - erreffV <= m_effWarning) && (effV - erreffV > m_effError)) {
-          m_effVstatus = warning;
-        } else if ((effV - erreffV <= m_effError)) {
-          m_effVstatus = error;
-        } else if (effV - erreffV > m_effWarning) {
-          m_effVstatus = good;
-        }
+        m_effVstatus = std::max(lowStat, m_effVstatus);
+      } else if (effV - erreffV > m_effWarning) {
+        m_effVstatus = std::max(good, m_effVstatus);
+      } else if ((effV - erreffV <= m_effWarning) && (effV - erreffV > m_effError)) {
+        m_effVstatus = std::max(warning, m_effVstatus);
+      } else if ((effV - erreffV <= m_effError)) {
+        m_effVstatus = std::max(error, m_effVstatus);
       }
     }
   }

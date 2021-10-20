@@ -164,6 +164,7 @@ namespace Belle2 {
     std::vector<TH1*> m_histograms;
     /** True if the defineHisto() was called. If false, the event() function does nothing. */
     bool histogramsDefined = false;
+    /** True if the DQM module is run on HLT */
     bool m_hltDQM = false;
 
     /** Used for changing parameters of histograms via the ProcessHistogramParameterChange function.  */

@@ -21,34 +21,17 @@
 #############################################################
 
 import basf2 as b2
-from basf2 import conditions as b2conditions
 import tracking as trk
 import rawdata as raw
 import daqdqm.commondqm as cdqm
 import sys
 
-b2conditions.override_globaltags()
-b2conditions.globaltags = ['online', 'dp_recon_release6_patch']
-
-# main main
+# main
 main = b2.create_path()
-
-# RAW
-files = ['/group/belle2/dataprod/Data/Raw/e' +
-         str(sys.argv[1]) +
-         '/r' +
-         str(sys.argv[2]) +
-         '/sub00/' +
-         str(sys.argv[3]) +
-         '.' +
-         str(sys.argv[1]) +
-         '.' +
-         str(sys.argv[2]) +
-         '.HLT1.f00001.root']
 
 # read input rootfile
 # -> can be overwritten with the -i option
-main.add_module("RootInput", inputFileNames=files)
+main.add_module("RootInput")
 
 # register the HistoManager and specify output file
 main.add_module("HistoManager", histoFileName="TrackingDQM_e" + str(sys.argv[1]) + "r" + str(sys.argv[2]) + ".root")
@@ -62,10 +45,12 @@ raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC'])
 
 trk.add_tracking_reconstruction(main, components=['PXD', 'SVD', 'CDC'])
 
-# add DQM
+# add DQM - official way
 # cdqm.add_common_dqm(main,components=['SVD'], dqm_environment=sys.argv[4])
+
+# add DQM - test both modules at once
 main.add_module('TrackingHLTDQM')
-main.add_module('TrackingERDQM')
+main.add_module('TrackingExpressRecoDQM')
 
 # == Show progress
 main.add_module('Progress')

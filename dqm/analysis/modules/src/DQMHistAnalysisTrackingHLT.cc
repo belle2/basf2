@@ -33,8 +33,8 @@ DQMHistAnalysisTrackingHLTModule::DQMHistAnalysisTrackingHLTModule()
   setDescription("DQM Analysis Module of the Tracking HLT Plots.");
 
   addParam("failureRateThreshold", m_failureRateThreshold,
-           "Maximum Fraction of Events in which Tracking Aborts before turning Canvas to Red", double(1.));
-  addParam("minNoEvents", m_statThreshold, "Minimum Numner of Events before scaring CR shifters", int(1000));
+           "Maximum Fraction of Events in which Tracking Aborts before turning Canvas to Red", double(0.5));
+  addParam("minNoEvents", m_statThreshold, "Minimum Number of Events before scaring CR shifters", int(1000));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
 
 }
@@ -78,6 +78,7 @@ void DQMHistAnalysisTrackingHLTModule::event()
   if (nEvents < m_statThreshold) m_cAbortRate->SetFillColor(kGray);
   else if (hasError) m_cAbortRate->SetFillColor(kRed);
   else m_cAbortRate->SetFillColor(kGreen);
+  m_cAbortRate->SetFrameFillColor(10);
 
   m_cAbortRate->cd();
   hAbort->Draw();

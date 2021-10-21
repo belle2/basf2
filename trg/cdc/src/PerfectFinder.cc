@@ -26,7 +26,7 @@
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/Circle.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/cdc/Link.h"
 
 #ifdef TRGCDC_DISPLAY

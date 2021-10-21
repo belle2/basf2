@@ -540,7 +540,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
       const double enECLTrack1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
-      const bool goodTrk1 = enECLTrack1 > 0 && enECLTrack1 < 0.4 && p1Eop < maxEoP && p1CDChits > 0
+      const bool goodTrk1 = enECLTrack1 > 0 && enECLTrack1 < 0.5 && p1CDChits > 0
                             && ((p1hasKLMid == 0 && enECLTrack1 < 0.25 && p1MomLab < 2.0) || p1hasKLMid == 1) && p1isInCDC == 1;
 
       //------------Second track variables----------------
@@ -584,7 +584,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
         const double enECLTrack2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
-        const bool goodTrk2 = enECLTrack2 > 0 && enECLTrack2 < 0.4 && p2Eop < maxEoP && p2CDChits > 0
+        const bool goodTrk2 = enECLTrack2 > 0 && enECLTrack2 < 0.5 && p2CDChits > 0
                               && ((p2hasKLMid == 0 && enECLTrack2 < 0.25 && p2MomLab < 2.0) || p2hasKLMid == 1) && p2isInCDC == 1;
 
         double eTotMumuTracks = enECLTrack1 + enECLTrack2;

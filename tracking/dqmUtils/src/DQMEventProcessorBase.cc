@@ -103,8 +103,10 @@ TString DQMEventProcessorBase::ConstructMessage(const TrackFitResult* trackFitRe
 
 void DQMEventProcessorBase::FillTrackFitResult(const TrackFitResult* trackFitResult)
 {
-  m_histoModule->FillMomentumAngles(trackFitResult);
-  m_histoModule->FillMomentumCoordinates(trackFitResult);
+  if (m_runningOnHLT) {
+    m_histoModule->FillMomentumAngles(trackFitResult);
+    m_histoModule->FillMomentumCoordinates(trackFitResult);
+  }
   m_histoModule->FillHelixParametersAndCorrelations(trackFitResult);
 }
 

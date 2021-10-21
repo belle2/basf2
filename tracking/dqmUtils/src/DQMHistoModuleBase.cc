@@ -38,6 +38,65 @@ DQMHistoModuleBase::DQMHistoModuleBase() : HistoModule()
 
 DQMHistoModuleBase::~DQMHistoModuleBase()
 {
+
+  delete m_PValue;
+  delete m_Chi2;
+  delete m_NDF;
+  delete m_Chi2NDF;
+  delete m_UBResidualsPXD;
+  delete m_UBResidualsSVD;
+  delete m_UBResidualsSensor;
+  delete m_UBResidualsPXDU;
+  delete m_UBResidualsSVDU;
+  delete m_UBResidualsSensorU;
+  delete m_UBResidualsPXDV;
+  delete m_UBResidualsSVDV;
+
+  delete m_UBResidualsPXDX_Yin;
+  delete m_UBResidualsPXDX_Yang;
+  delete m_UBResidualsSVDX_Pat;
+  delete m_UBResidualsSVDX_Mat;
+
+  delete m_UBResidualsPXDY_Yin;
+  delete m_UBResidualsPXDY_Yang;
+  delete m_UBResidualsSVDY_Pat;
+  delete m_UBResidualsSVDY_Mat;
+
+  delete m_UBResidualsPXDZ_Yin;
+  delete m_UBResidualsPXDZ_Yang;
+  delete m_UBResidualsSVDZ_Pat;
+  delete m_UBResidualsSVDZ_Mat;
+
+  delete m_UBResidualsSensorV;
+  delete m_TRClusterHitmap;
+  delete m_TRClusterCorrelationsPhi;
+  delete m_TRClusterCorrelationsTheta;
+
+  delete m_MomPhi;
+  delete m_MomTheta;
+  delete m_MomCosTheta;
+  delete m_MomX;
+  delete m_MomY;
+  delete m_MomZ;
+  delete m_MomPt;
+  delete m_Mom;
+  delete m_D0;
+  delete m_PhiD0;
+  delete m_Z0;
+  delete m_D0Z0;
+  delete m_Phi;
+  delete m_TanLambda;
+  delete m_Omega;
+
+  delete m_HitsPXD;
+  delete m_HitsSVD;
+  delete m_HitsCDC;
+  delete m_Hits;
+  delete m_TracksVXD;
+  delete m_TracksCDC;
+  delete m_TracksVXDCDC;
+  delete m_Tracks;
+
 }
 
 void DQMHistoModuleBase::initialize()

@@ -31,11 +31,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDatabaseImporter(int fexp, int frun, int lexp, int lrun);/*:
-      m_firstExperiment(fexp), m_firstRun(frun),
-      m_lastExperiment(lexp), m_lastRun(lrun)
-    {
-    }*/
+    CDCDatabaseImporter(int fexp, int frun, int lexp, int lrun);
 
 
     /**

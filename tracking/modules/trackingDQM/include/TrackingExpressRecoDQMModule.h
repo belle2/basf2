@@ -30,6 +30,7 @@ namespace Belle2 {
      * Also at the end function all m_histogramParameterChanges should be processed via the ProcessHistogramParameterChange function. */
     void defineHisto() override;
 
+  private:
     /** if True, the module produces the 1D Track Residual plot for each VXD sensor*/
     bool m_produce1Dres = true;
     /** if True, the module produces the 2D Track Residual plot for each VXD sensor*/

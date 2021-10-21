@@ -58,7 +58,7 @@ void PhysicsObjectsDQMModule::defineHisto()
   m_h_mPI0 = new TH1F("mPI0", "pi0 Invariant Mass", 25, 0.10, 0.15);
   m_h_mPI0->SetXTitle("M(#pi^{0}) [GeV]");
 
-  m_h_mUPS = new TH1F("mUPS", "Ups Invariant Mass", 400, 9, 11);
+  m_h_mUPS = new TH1F("mUPS", "Ups Invariant Mass", 500, 9, 12);
   m_h_mUPS->SetXTitle("M(#mu#mu) [GeV]");
 
   m_h_R2 = new TH1F("R2", "Event Level R2", 36, 0, 1.2);

@@ -230,7 +230,7 @@ namespace Belle2 {
     double m_runGain = 1.;  /**< run gain. */
     float m_semiTotalGain[MAX_N_SLAYERS][MAX_N_SCELLS] = {{}}; /**< total gain per wire */
     double m_overallGainFactor = 1.;  /**< Overall gain factor. */
-    double m_degOfSPEOnThreshold;     /**< Degree of space charge effect on timing threshold */
+    double m_degOfSPEOnThreshold = 0; /**< Degree of space charge effect on timing threshold */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
     bool m_addTimeWalk; /**< A switch used to control adding time-walk delay into the total drift time or not */

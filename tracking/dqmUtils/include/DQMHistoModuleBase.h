@@ -108,8 +108,10 @@ namespace Belle2 {
     virtual void FillHalfShellsPXD(TVector3 globalResidual_um, bool isNotYang);
     /** Fill histograms with unbiased residuals for half-shells for SVD sensors. */
     virtual void FillHalfShellsSVD(TVector3 globalResidual_um, bool isNotMat);
-    /** Fill histograms with unbiased residuals for individual sensors. */
-    virtual void FillUBResidualsSensor(TVector3 residual_um, int sensorIndex);
+    /** Fill 1D histograms with unbiased residuals for individual sensors. */
+    virtual void FillUB1DResidualsSensor(TVector3 residual_um, int sensorIndex);
+    /** Fill 2D histograms with unbiased residuals for individual sensors. */
+    virtual void FillUB2DResidualsSensor(TVector3 residual_um, int sensorIndex);
     /** @} */
 
   protected:
@@ -155,8 +157,10 @@ namespace Belle2 {
     virtual void DefineUBResidualsVXD();
     /** Define histograms with unbiased residuals for half-shells for PXD and SVD sensors. */
     virtual void DefineHalfShellsVXD();
-    /** Define histograms with unbiased residuals for individual sensors. */
-    virtual void DefineSensors();
+    /** Define 1D histograms with unbiased residuals for individual sensors. */
+    virtual void Define1DSensors();
+    /** Define 2D histograms with unbiased residuals for individual sensors. */
+    virtual void Define2DSensors();
     /** @} */
 
     /** All histograms created via the Create- functions are automatically added to this set.

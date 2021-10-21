@@ -404,7 +404,26 @@ void DQMHistoModuleBase::DefineTRClusters()
   }
 }
 
-void DQMHistoModuleBase::DefineSensors()
+void DQMHistoModuleBase::Define1DSensors()
+{
+
+  double residualRange = 400;  // in um
+
+  auto residualU = Axis(200, -residualRange, residualRange, "residual U [#mum]");
+  auto residualV = Axis(residualU).title("residual V [#mum]");
+
+  auto factory = Factory(this);
+
+  factory.yTitleDefault("counts");
+
+  m_UBResidualsSensorU = factory.xAxis(residualU).CreateSensorsTH1F(format("UBResidualsU_%1%"),
+                         format("PXD Unbiased U Residuals for sensor %1%"));
+  m_UBResidualsSensorV = factory.xAxis(residualV).CreateSensorsTH1F(format("UBResidualsV_%1%"),
+                         format("PXD Unbiased V Residuals for sensor %1%"));
+
+}
+
+void DQMHistoModuleBase::Define2DSensors()
 {
 
   double residualRange = 400;  // in um
@@ -416,14 +435,6 @@ void DQMHistoModuleBase::DefineSensors()
 
   m_UBResidualsSensor = factory.xAxis(residualU).yAxis(residualV).zTitle("counts").CreateSensorsTH2F(format("UBResiduals_%1%"),
                         format("PXD Unbiased Residuals for sensor %1%"));
-
-  factory.yTitleDefault("counts");
-
-  m_UBResidualsSensorU = factory.xAxis(residualU).CreateSensorsTH1F(format("UBResidualsU_%1%"),
-                         format("PXD Unbiased U Residuals for sensor %1%"));
-  m_UBResidualsSensorV = factory.xAxis(residualV).CreateSensorsTH1F(format("UBResidualsV_%1%"),
-                         format("PXD Unbiased V Residuals for sensor %1%"));
-
 }
 
 void DQMHistoModuleBase::FillTrackIndexes(int iTrack, int iTrackVXD, int iTrackCDC, int iTrackVXDCDC)
@@ -545,11 +556,15 @@ void DQMHistoModuleBase::FillHalfShellsSVD(TVector3 globalResidual_um, bool isNo
   }
 }
 
-void DQMHistoModuleBase::FillUBResidualsSensor(TVector3 residual_um, int sensorIndex)
+void DQMHistoModuleBase::FillUB1DResidualsSensor(TVector3 residual_um, int sensorIndex)
 {
-  m_UBResidualsSensor[sensorIndex]->Fill(residual_um.x(), residual_um.y());
   m_UBResidualsSensorU[sensorIndex]->Fill(residual_um.x());
   m_UBResidualsSensorV[sensorIndex]->Fill(residual_um.y());
+}
+
+void DQMHistoModuleBase::FillUB2DResidualsSensor(TVector3 residual_um, int sensorIndex)
+{
+  m_UBResidualsSensor[sensorIndex]->Fill(residual_um.x(), residual_um.y());
 }
 
 void DQMHistoModuleBase::FillTRClusterHitmap(float phi_deg, float theta_deg, int layerIndex)

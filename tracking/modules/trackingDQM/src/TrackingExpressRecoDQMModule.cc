@@ -65,8 +65,8 @@ void TrackingExpressRecoDQMModule::defineHisto()
   TracksDQM->cd();
   DefineTracks();
   DefineHits();
-  DefineMomentumAngles();
-  DefineMomentumCoordinates();
+  //  DefineMomentumAngles();
+  //  DefineMomentumCoordinates();
   DefineHelixParametersAndCorrelations();
   DefineTrackFitStatus();
   DefineTRClusters();

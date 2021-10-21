@@ -66,7 +66,7 @@ namespace Belle2 {
     {
       StoreArray<MCParticle> MC_Particle_list;
       std::vector<int> fsp_truth_index;
-      for (const MCParticle iMCParticle : MC_Particle_list) {
+      for (const MCParticle& iMCParticle : MC_Particle_list) {
         if ((BTag_index == finddescendant(&iMCParticle)) && (iMCParticle.hasStatus(MCParticle::c_StableInGenerator) == true)
             && (iMCParticle.hasStatus(MCParticle::c_IsISRPhoton) == false) && iMCParticle.hasStatus(MCParticle::c_IsFSRPhoton) == false
             && (iMCParticle.hasStatus(MCParticle::c_IsPHOTOSPhoton) == false)) {

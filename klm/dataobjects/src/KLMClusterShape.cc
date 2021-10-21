@@ -6,10 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
-/* Own header. */
-#include <klm/dataobjects/KLMClusterShape.h> //change path eventually 
-
+#include <klm/dataobjects/KLMClusterShape.h>
+#include <Math/Vector3D.h>
 
 
 using namespace Belle2;
@@ -57,32 +55,29 @@ KLMClusterShape& KLMClusterShape::operator=(const KLMClusterShape& clusterShape)
 }
 
 //GETTERS (for vectors)
-TVector3 KLMClusterShape::getPrimaryVector()
+ROOT::Math::XYZVector KLMClusterShape::getPrimaryVector()
 {
-  //TVector3 output = m_primaryVec.Vect();
-  TVector3 output(m_primaryVec[0], m_primaryVec[1], m_primaryVec[2]);
+  ROOT::Math::XYZVector output(m_primaryVec[0], m_primaryVec[1], m_primaryVec[2]);
   return output;
 
 }
 
-TVector3 KLMClusterShape::getSecondaryVector()
+ROOT::Math::XYZVector KLMClusterShape::getSecondaryVector()
 {
-  //TVector3 output = m_secondaryVec.Vect();
-  TVector3 output(m_secondaryVec[0], m_secondaryVec[1], m_secondaryVec[2]);
+  ROOT::Math::XYZVector output(m_secondaryVec[0], m_secondaryVec[1], m_secondaryVec[2]);
   return output;
 
 }
 
-TVector3 KLMClusterShape::getTertiaryVector()
+ROOT::Math::XYZVector KLMClusterShape::getTertiaryVector()
 {
-  TVector3 output(m_tertiaryVec[0], m_tertiaryVec[1], m_tertiaryVec[2]);
-  //TVector3 output = m_tertiaryVec.Vect();
+  ROOT::Math::XYZVector output(m_tertiaryVec[0], m_tertiaryVec[1], m_tertiaryVec[2]);
   return output;
 
 }
 
 //setters
-void KLMClusterShape::setEigen(TMatrixT<float> eigenList)
+void KLMClusterShape::setEigen(TMatrixT<double> eigenList)
 {
   for (int i = 0; i < 4; i++) {
     m_primaryVec[i] = eigenList[i][0];

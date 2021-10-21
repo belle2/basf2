@@ -1,6 +1,10 @@
-//#pragma once
-//useful documentation for vector--> TVector https://root-forum.cern.ch/t/vector-into-tvector/7775
-
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -58,16 +62,13 @@ namespace Belle2 {
     StoreArray<KLMCluster> m_KLMClusters;
 
     /** Output per cluster. */
-    StoreArray<KLMClusterShape> m_KLMClusterShape; /**< array of output information */
+    StoreArray<KLMClusterShape> m_KLMClusterShape;
 
     /** BKLMhits. */
-    StoreArray<BKLMHit2d> bklmHit2ds;
+    StoreArray<BKLMHit2d> m_bklmHit2ds;
 
     /** EKLMhits. */
-    StoreArray<EKLMHit2d> eklmHit2ds;
-
-    /** Running main calculations on KLMCluster  */
-    void runClusterAna(KLMCluster& klmcluster);
+    StoreArray<EKLMHit2d> m_eklmHit2ds;
 
 
   };

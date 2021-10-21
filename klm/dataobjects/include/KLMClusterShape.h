@@ -1,21 +1,17 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Belle II Collaboration                                                 *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Tommy Lam                                                *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
 
 /* Belle 2 headers. */
-#include <framework/gearbox/Const.h>
 #include <framework/datastore/RelationsObject.h>
 
-
-#include <TVectorT.h>
-#include <TVector3.h>
-#include <TLorentzVector.h>
 #include <TMatrixT.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -50,35 +46,35 @@ namespace Belle2 {
 
 
     /**Get principal axis eigenvector. */
-    float getVariance1() const
+    double getVariance1() const
     {return abs(m_primaryVec[3]);}
 
     /**Get secondary axis eigenvector. */
-    float getVariance2() const
+    double getVariance2() const
     {return abs(m_secondaryVec[3]);}
 
     /**Get tertiary axis eigenvector. */
-    float getVariance3() const
+    double getVariance3() const
     {return abs(m_tertiaryVec[3]);}
 
     /**Get eigenvectors. */
 
     /**Get principal axis eigenvector. */
-    TVector3 getPrimaryVector();
+    ROOT::Math::XYZVector getPrimaryVector();
 
     /**Get secondary axis eigenvector. */
-    TVector3 getSecondaryVector();
+    ROOT::Math::XYZVector getSecondaryVector();
 
     /**Get tertiary axis eigenvector. */
-    TVector3 getTertiaryVector();
+    ROOT::Math::XYZVector getTertiaryVector();
 
     /**Get number of hits used in a cluster */
     int getNHits() const
-    {return (int) m_nHits;}
+    {return m_nHits;}
 
 
     /**Set eigenvectors and eigenvalues. */
-    void setEigen(TMatrixT<float> eigenList);
+    void setEigen(TMatrixT<double> eigenList);
 
     /**Set number of hits */
     void setNHits(int nHits)
@@ -98,13 +94,13 @@ namespace Belle2 {
     //Indexing: 0-2 is unit eigenvector, 3 is eigenvalue.
 
     /**Principal axis eigenvector and eigenvalue. */
-    float m_primaryVec[4];
+    std::array<double, 4> m_primaryVec;
 
     /**Principal axis eigenvector and eigenvalue. */
-    float m_secondaryVec[4];
+    std::array<double, 4> m_secondaryVec;
 
     /**Principal axis eigenvector and eigenvalue. */
-    float m_tertiaryVec[4];
+    std::array<double, 4> m_tertiaryVec;
 
     /**  Needed to make the ROOT object storable */
     ClassDef(KLMClusterShape, 1)

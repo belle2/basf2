@@ -33,6 +33,10 @@ TrackingExpressRecoDQMModule::TrackingExpressRecoDQMModule() : DQMHistoModuleBas
 
   setDescription("Data Quality Monitoring of the tracking run on ExpressReco. "
                 );
+  addParam("produce1Dresiduals", m_produce1Dres, "If True, produce 1D residual plots for each VXD sensor", bool(m_produce1Dres));
+
+  addParam("produce2Dresiduals", m_produce2Dres, "If True, produce 2D residual plots for each VXD sensor", bool(m_produce2Dres));
+
 }
 
 //------------------------------------------------------------------
@@ -69,6 +73,11 @@ void TrackingExpressRecoDQMModule::defineHisto()
   DefineUBResidualsVXD();
   DefineHalfShellsVXD();
 
+  if (m_produce1Dres)
+    Define1DSensors();
+  if (m_produce2Dres)
+    Define2DSensors();
+
   originalDirectory->cd();
 
   for (auto change : m_histogramParameterChanges)
@@ -85,6 +94,11 @@ void TrackingExpressRecoDQMModule::event()
 
   TrackDQMEventProcessor eventProcessor = TrackDQMEventProcessor(this, m_recoTracksStoreArrayName, m_tracksStoreArrayName,
                                           runningOnHLT);
+
+  if (m_produce2Dres)
+    eventProcessor.produce2Dres();
+  if (m_produce1Dres)
+    eventProcessor.produce1Dres();
 
   eventProcessor.Run();
 

@@ -187,11 +187,14 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   float noarich_frac = hist_DetPhotonARICH->GetBinContent(1) / (float)ntot;
   //Calculate M(mumu)
   float peak_mumu = hist_inv_p->GetXaxis()->GetBinCenter(hist_inv_p->GetMaximumBin());
-  TF1* f_mumuInvM = new TF1("f_mumuInvM", "[0]*TMath::Gaus(x,[1],[2])", peak_mumu - 0.02, peak_mumu + 0.02);
-  f_mumuInvM->SetParNames("Height", "#mu", "#sigma");
-  f_mumuInvM->SetParameters(hist_inv_p->GetMaximum(), peak_mumu, 0.04);
-  hist_inv_p->Fit(f_mumuInvM, "", "", peak_mumu - 0.02, peak_mumu + 0.02);
+  TF1* f_mumuInvM = new TF1("f_mumuInvM", "gaus", peak_mumu - 0.04, peak_mumu + 0.04);
+  f_mumuInvM->SetParameters(hist_inv_p->GetMaximum(), peak_mumu, 0.045);
+  f_mumuInvM->SetParLimits(1, peak_mumu - 0.04, peak_mumu + 0.04);
+  f_mumuInvM->SetParLimits(2, 0.01, 0.06);
+  hist_inv_p->Fit(f_mumuInvM, "R");
   float fit_mumumass = f_mumuInvM->GetParameter(1);
+  if (fit_mumumass < 9) fit_mumumass = 9;
+  if (fit_mumumass > 12) fit_mumumass = 12;
 
   // set values
   mon_mumu->setVariable("mean_npxd", mean_npxd);

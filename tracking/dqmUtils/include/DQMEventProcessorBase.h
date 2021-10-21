@@ -30,9 +30,10 @@ namespace Belle2 {
      * @param recoTracksStoreArrayName - StoreArray name where the merged RecoTracks are written.
      * @param tracksStoreArrayName - StoreArray name where the merged Tracks are written. */
     DQMEventProcessorBase(DQMHistoModuleBase* histoModule, const std::string& recoTracksStoreArrayName,
-                          const std::string& tracksStoreArrayName) :
+                          const std::string& tracksStoreArrayName, bool runningOnHLT = false) :
       m_tracksStoreArrayName(tracksStoreArrayName),
-      m_recoTracksStoreArrayName(recoTracksStoreArrayName)
+      m_recoTracksStoreArrayName(recoTracksStoreArrayName),
+      m_runningOnHLT(runningOnHLT)
     {
       m_histoModule = histoModule;
     }
@@ -96,6 +97,9 @@ namespace Belle2 {
     std::string m_tracksStoreArrayName = "";
     /** StoreArray name where RecoTracks are written. */
     std::string m_recoTracksStoreArrayName = "";
+
+    /** true if the DQM is run on HLT */
+    bool m_runningOnHLT;
 
     /** index of track (with valid TrackFitResult and related RecoTrack) */
     int m_iTrack = 0;

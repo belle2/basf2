@@ -55,8 +55,11 @@ void DQMEventProcessorBase::ProcessTrack(const Track& track)
 
   m_recoTrack = recoTracksVector[0];
 
-  RelationVector<PXDCluster> pxdClusters = DataStore::getRelationsWithObj<PXDCluster>(m_recoTrack);
-  int nPXDClusters = (int)pxdClusters.size();
+  int nPXDClusters = 0;
+  if (!m_runningOnHLT) {
+    RelationVector<PXDCluster> pxdClusters = DataStore::getRelationsWithObj<PXDCluster>(m_recoTrack);
+    nPXDClusters = (int)pxdClusters.size();
+  }
   RelationVector<SVDCluster> svdClusters = DataStore::getRelationsWithObj<SVDCluster>(m_recoTrack);
   int nSVDClusters = (int)svdClusters.size();
   RelationVector<CDCHit> cdcHits = DataStore::getRelationsWithObj<CDCHit>(m_recoTrack);
@@ -138,9 +141,9 @@ void DQMEventProcessorBase::ProcessRecoHit(RecoHitInformation* recoHitInfo)
 
   m_rawSensorResidual = new TVectorT<double>(fitterInfo->getResidual(0, false).getState());
 
-  if (isPXD) {
+  if (isPXD && ! m_runningOnHLT) {
     ProcessPXDRecoHit(recoHitInfo);
-  } else {
+  } else if (isSVD) {
     ProcessSVDRecoHit(recoHitInfo);
   }
 
@@ -179,10 +182,12 @@ void DQMEventProcessorBase::ProcessSVDRecoHit(RecoHitInformation* recoHitInfo)
   if (m_sensorIDPrev == m_sensorID) {
     ComputeCommonVariables();
 
-    FillCommonHistograms();
+    if (! m_runningOnHLT) {
+      FillCommonHistograms();
 
-    m_histoModule->FillUBResidualsSVD(m_residual_um);
-    m_histoModule->FillHalfShellsSVD(m_globalResidual_um, IsNotMat(m_sensorID.getLadderNumber(), m_layerNumber));
+      m_histoModule->FillUBResidualsSVD(m_residual_um);
+      m_histoModule->FillHalfShellsSVD(m_globalResidual_um, IsNotMat(m_sensorID.getLadderNumber(), m_layerNumber));
+    }
 
     SetCommonPrevVariables();
   }
@@ -215,7 +220,6 @@ void DQMEventProcessorBase::FillCommonHistograms()
     m_isNotFirstHit = true;
   }
 
-  m_histoModule->FillUBResidualsSensor(m_residual_um, m_sensorIndex);
   m_histoModule->FillTRClusterHitmap(m_phi_deg, m_theta_deg, m_layerIndex);
 }
 

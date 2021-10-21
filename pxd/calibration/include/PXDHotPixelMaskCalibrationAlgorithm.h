@@ -45,6 +45,9 @@ namespace Belle2 {
     /// The occupancy threshold for masking hot rows is the median occupancy x rowMultiplier
     float rowMultiplier;
 
+    /// Payload name for PXDDeadPixelPar used for more defective pixels from damaged gates
+    std::string deadPixelPayloadName;
+
     /// The occupancy threshold for inefficient (or dead) pixels is the median occupancy x inefficientPixelMultiplier
     float inefficientPixelMultiplier;
 

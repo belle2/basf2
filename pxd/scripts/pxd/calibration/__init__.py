@@ -54,6 +54,7 @@ def hot_pixel_mask_calibration(
           A value > 0 means any pixels with occupancy below the threshold will be marked as dead.
         "minInefficientPixels" is the minimum number of pixels to define a dead or inefficient row.
           The rows with inefficient pixels >= this value will be marked as dead rows for now.
+        "deadPixelPayloadName" is the payload name used for more defective pixel types. The default is PXDDeadPixelPar.
 
     Return:
       A caf.framework.Calibration obj.
@@ -79,6 +80,9 @@ def hot_pixel_mask_calibration(
     minInefficientPixels = kwargs.get("minInefficientPixels", 250)
     if not isinstance(minInefficientPixels, int):
         raise ValueError("minInefficientPixels is not an int!")
+    deadPixelPayloadName = kwargs.get("deadPixelPayloadName", "PXDDeadPixelPar")
+    if not isinstance(deadPixelPayloadName, str):
+        raise ValueError("deadPixelPayloadName is not a str!")
 
     # Create basf2 path
 
@@ -121,6 +125,7 @@ def hot_pixel_mask_calibration(
     algorithm.inefficientPixelMultiplier = inefficientPixelMultiplier
     # Minimum number of inefficient pixels in a dead/inefficient row
     algorithm.minInefficientPixels = minInefficientPixels
+    algorithm.deadPixelPayloadName = deadPixelPayloadName
     algorithm.setDebugHisto(debug_hist)
     algorithm.setPrefix(collector_name)
     if run_type.lower() == 'cosmic':

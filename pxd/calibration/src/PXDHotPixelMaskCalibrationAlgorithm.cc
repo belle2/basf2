@@ -25,6 +25,7 @@ using namespace Belle2;
 PXDHotPixelMaskCalibrationAlgorithm::PXDHotPixelMaskCalibrationAlgorithm(): CalibrationAlgorithm("PXDHotPixelMaskCollector"),
   forceContinueMasking(false), minEvents(10000), minHits(20), pixelMultiplier(7), maskDrains(true),
   drainMultiplier(7), maskRows(true),  rowMultiplier(7),
+  deadPixelPayloadName("PXDDeadPixelPar"),
   inefficientPixelMultiplier(0), minInefficientPixels(250)
 {
   setDescription(
@@ -404,7 +405,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
   // Save the hot pixel mask to database. Note that this will set the database object name to the same as the collector but you
   // are free to change it.
   saveCalibration(maskedPixelsPar, "PXDMaskedPixelPar");
-  saveCalibration(deadPixelsPar, "PXDDeadPixelPar");
+  saveCalibration(deadPixelsPar, deadPixelPayloadName);
   saveCalibration(occupancyInfoPar, "PXDOccupancyInfoPar");
 
   // Create debugging histo if we asked for it

@@ -75,34 +75,6 @@ ma.buildRestOfEvent(target_list_name='B0:sig', path=cp_val_path)
 
 ma.applyCuts(list_name='B0:sig', cut='abs(isRelatedRestOfEventB0Flavor) == 1', path=cp_val_path)
 
-# # Get Special GT for the flavor tagger weight files
-# b2.conditions.append_globaltag("analysis_tools_release-04-00")
-#
-# # Flavor Tagger, Vertex of Signal Side and TagV
-# ft.flavorTagger(
-#     particleLists=['B0:sig'],
-#     weightFiles='B2JpsiKs_muBGx1',
-#     belleOrBelle2=belleOrBelle2Flag,
-#     path=cp_val_path)
-#
-# cutString = "qpCategory(FastPion) > 0.4 and qpCategory(FastPion) < 0.5 " + \
-#             "and hasTrueTargets(FastPion) < 1 and isRelatedRestOfEventB0Flavor == 1"
-# cutString = "qpCategory(Kaon) > -1 and qpCategory(Kaon) < -0.8 and hasTrueTargets(Kaon) == 0 "
-# cutString = "qpCategory(KinLepton) > 0.8 and qpCategory(KinLepton) < 1 and hasTrueTargets(KinLepton) == 0 "
-# cutString = "qpCategory(SlowPion)> -1 and qpCategory(SlowPion) < -0.8 and hasTrueTargets(SlowPion) == 0 "
-# cutString = "qrOutput(FBDT) > 0.4 and qrOutput(FBDT) < 0.65"
-
-# printVariablesList = []
-# for (particleList, category, combinerVariable) in eventLevelParticleLists:
-#     if category != "MaximumPstar":
-#         cutString = cutString + " and hasTrueTargets(" + category + ") == 0 "
-#    printVariablesList.append("qpCategory(" + category + ")")
-#    printVariablesList.append("hasTrueTargets(" + category + ")")
-
-# applyCuts('B0:sig', cutString)
-
-# printVariableValues('B0:sig', printVariablesList)
-
 # Skim 1
 # The new algorithm
 skimfilter = b2.register_module('SkimFilter')

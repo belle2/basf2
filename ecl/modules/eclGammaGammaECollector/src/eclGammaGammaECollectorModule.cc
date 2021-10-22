@@ -29,7 +29,6 @@
 
 //ECL
 #include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
 
@@ -145,11 +144,10 @@ void eclGammaGammaECollectorModule::prepare()
   }
 
   /**----------------------------------------------------------------------------------------*/
-  /** Required data objects */
+  /** Required data objects. We don't need digits to find expected energies. */
   m_trackArray.isRequired();
   m_eclClusterArray.isRequired();
-  m_eclCalDigitArray.isRequired();
-  m_eclDigitArray.isRequired();
+  if (!m_measureTrueEnergy) {m_eclDigitArray.isRequired();}
 
 }
 
@@ -292,42 +290,36 @@ void eclGammaGammaECollectorModule::collect()
   if (dphi < m_mindPhi) {return;}
 
   //------------------------------------------------------------------------
-  /** Record ECL digit amplitude as a function of CrysID */
-  memset(&EperCrys[0], 0, EperCrys.size()*sizeof EperCrys[0]);
-  for (auto& eclDigit : m_eclDigitArray) {
-    int crysID = eclDigit.getCellId() - 1;
-    getObjectPtr<TH2F>("RawDigitAmpvsCrys")->Fill(crysID + 0.001, eclDigit.getAmp());
-
-    /** GammaGammaECalib is negative if the previous iteration of the algorithm was unable to calculate a value. In this case, the input value has been stored with a minus sign */
-    EperCrys[crysID] = eclDigit.getAmp() * abs(GammaGammaECalib[crysID]) * ElectronicsCalib[crysID];
-    if (EperCrys[crysID] > 0.01) {
-      getObjectPtr<TH2F>("RawDigitTimevsCrys")->Fill(crysID + 0.001, eclDigit.getTimeFit());
-    }
-  }
-
-  /** Overwrite using ECLCalDigits if we are using these events to determine MC deposited energy */
-  if (m_measureTrueEnergy) {
-    for (auto& eclCalDigit : m_eclCalDigitArray) {
-      int tempCrysID = eclCalDigit.getCellId() - 1;
-      double tempE = eclCalDigit.getEnergy();
-      EperCrys[tempCrysID] = tempE;
-    }
+  //** Find the most energetic crystal in each photon cluster */
+  int crysIDMax[2] = { -1, -1};
+  for (int ic = 0; ic < 2; ic++) {
+    crysIDMax[ic] = m_eclClusterArray[icMax[ic]]->getMaxECellId() - 1;
   }
 
   //------------------------------------------------------------------------
-  //** Find the most energetic crystal in each photon cluster */
-  int crysIDMax[2] = { -1, -1};
-  double crysEMax[2] = { -1., -1.};
-  for (int imax = 0; imax < 2; imax++) {
-    auto eclClusterRelations = m_eclClusterArray[icMax[imax]]->getRelationsTo<ECLCalDigit>("ECLCalDigits");
-    for (unsigned int ir = 0; ir < eclClusterRelations.size(); ir++) {
-      const auto calDigit = eclClusterRelations.object(ir);
-      int tempCrysID = calDigit->getCellId() - 1;
-      float tempE = EperCrys[tempCrysID];
-      if (tempE > crysEMax[imax]) {
-        crysEMax[imax] = tempE;
-        crysIDMax[imax] = tempCrysID;
+  /** Record ECL digit amplitude as a function of CrysID when calibrating */
+  memset(&EperCrys[0], 0, EperCrys.size()*sizeof EperCrys[0]);
+  if (!m_measureTrueEnergy) {
+    for (auto& eclDigit : m_eclDigitArray) {
+      int crysID = eclDigit.getCellId() - 1;
+      getObjectPtr<TH2F>("RawDigitAmpvsCrys")->Fill(crysID + 0.001, eclDigit.getAmp());
+
+      /** GammaGammaECalib is negative if the previous iteration of the algorithm was unable to calculate a value. In this case, the input value has been stored with a minus sign */
+      EperCrys[crysID] = eclDigit.getAmp() * abs(GammaGammaECalib[crysID]) * ElectronicsCalib[crysID];
+      if (EperCrys[crysID] > 0.01) {
+        getObjectPtr<TH2F>("RawDigitTimevsCrys")->Fill(crysID + 0.001, eclDigit.getTimeFit());
       }
+    }
+
+    /** Expected energies, get the energy of the most energetic crystal from the cluster */
+  } else {
+
+    //..getEnergyHighestCrystal() includes the leakage correction; we want raw energy.
+    for (int ic = 0; ic < 2; ic++) {
+      float undoCorrection = m_eclClusterArray[icMax[ic]]->getEnergyRaw() / m_eclClusterArray[icMax[ic]]->getEnergy(
+                               ECLCluster::EHypothesisBit::c_nPhotons);
+      EperCrys[crysIDMax[ic]] = undoCorrection * m_eclClusterArray[icMax[ic]]->getEnergyHighestCrystal();
+
     }
   }
 

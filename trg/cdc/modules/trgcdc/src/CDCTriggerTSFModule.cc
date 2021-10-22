@@ -270,7 +270,7 @@ CDCTriggerTSFModule::initialize()
   }
 
   if (m_deadchflag) {
-    if (!m_db_deadchannel) {
+    if (!m_db_deadchannel.isValid()) {
       B2INFO("No database for CDCTRG dead channel mapping. Channel masking is skipped.");
       for (unsigned int i = 0; i < nSuperLayers; i++) { //SL
         for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer

@@ -17,7 +17,7 @@
 #include "trg/trg/Debug.h"
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/Segment.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/cdc/Link.h"
 #include <cmath>
 

@@ -1039,8 +1039,9 @@ C      TAU-  --> ETA  PI-  PI0
        COEF=COEFrr(I,J)
       ELSE 
        JJ=J
-       IF(J.EQ.13.OR.J.EQ.14) JJ=7
        IF(J.GE.9) JJ=0
+       IF(J.EQ.13.OR.J.EQ.14) JJ=7
+       if (jj.lt.0.or.jj.ge.8) write(*,*) 'CATASTROPHY in Funct COEF(i,j) ',i,jj,COEFc(I,JJ)
        COEF=COEFc(I,JJ)
       ENDIF
       END
@@ -4051,6 +4052,7 @@ c
         IF (PRNTNU.EQ.1.AND.ABS(IDHEP(I)).eq.16)
      +   WRITE (6,'(''Mass(P4(nutau)) = '',F14.7,'' MeV'')') MS*1000.0
         CALL PYNAME(IDHEP(I),CHAP)
+        IF (IDHEP(I).EQ.53) CHAP = 'hl'
         IF (IFL.EQ.0) THEN
           WRITE (6,'(2I6,I8,1X,A10,1X,4I6,6(1X,F10.5))')
      +      I, ISTHEP(I), IDHEP(I), CHAP(1:10),

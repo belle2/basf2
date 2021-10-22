@@ -1,0 +1,29 @@
+# EventType: 1253700000
+# Descriptor:  [B- -> D0 l- nu, D0 -> K+ pi-]
+# NickName: Bu_Dlnu_Kpi
+# Documentation: b->c l nu process, D mode (BGL model)
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Alina Manthei
+# Email: manthei@physik.uni-bonn.de
+# Cuts: None
+# Date: 20210920
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+0.5   anti-D0    e+ nu_e        PHOTOS        BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4;    #[Belle measurement: 1510.03657]
+0.5   anti-D0    mu+ nu_mu        PHOTOS        BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4;    #[Belle measurement: 1510.03657]
+Enddecay
+CDecay B-sig
+
+Decay D0sig
+1  K- pi+  PHOTOS PHSP;
+Enddecay
+CDecay anti-D0sig
+
+End

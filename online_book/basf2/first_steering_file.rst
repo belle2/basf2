@@ -158,7 +158,7 @@ files. They should be available in the
 other servers.
 
 .. admonition:: If you're working from an institute server
-    :class: toggle
+    :class: stacked toggle
 
     Perhaps you are working on the server of your home institute and this folder
     is not available. In this case please talk to your administrators to make
@@ -167,7 +167,7 @@ other servers.
     same level of support on other machines though.
 
 .. admonition:: If you're working on your own machine
-    :class: toggle
+    :class: stacked toggle
 
     In this case you might first need to copy the data files to your home
     directory on your local machine from kekcc or DESY via a SSH connection (cf.
@@ -285,7 +285,6 @@ having to change anything in the script itself.
 
     .. literalinclude:: steering_files/011_first_steering_file.py
         :linenos:
-        :emphasize-lines: 8, 14
 
 
 .. admonition:: Tip
@@ -496,8 +495,21 @@ of the CDC (`thetaInCDCAcceptance`).
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 21-25
-        :lineno-start: 21
+        :start-at: S10
+        :end-at: E10
+
+
+.. note:: Marker comments in the solution code
+    :class: toggle
+
+    If you are wondering about comments like ``[S10]`` or ``[E10]`` in the code
+    snippets that we include in our tutorials: You can completely ignore them.
+    In case you are curious about their meaning: Sometimes we want to show only
+    a small part of a larger file. Copying the code or referencing the lines by
+    line numbers is a bit unstable (what if someone changes the code and
+    forgets to update the rest of the documentation?), so we use these tags to
+    mark the beginning and end of a subset of lines to be included in the
+    documentation.
 
 
 Combining particles
@@ -566,14 +578,14 @@ particles themselves need to be written in the decay string.
     The :math:`J/\Psi` reconstruction looks like this:
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 28-31
-        :lineno-start: 28
+        :start-at: S20
+        :end-at: E20
 
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 1-39, 49-53
+        :end-at: E30
         :linenos:
 
 Writing out information to an ntuple
@@ -633,7 +645,6 @@ mass.
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :linenos:
-        :emphasize-lines: 43
 
 Although you are analyzing a signal MC sample, the reconstruction will find
 many candidates that are actually not signal, but random combinations that
@@ -744,7 +755,6 @@ definitely read it to understand at least the basics.
 
     .. literalinclude:: steering_files/014_first_steering_file.py
         :linenos:
-        :emphasize-lines: 40-41, 46
 
 .. --------------
 
@@ -804,8 +814,8 @@ variable that can be used to cut away background is :math:`\Delta E` (`deltaE`).
     :class: solution toggle
 
     .. literalinclude:: steering_files/015_first_steering_file.py
-        :lines: 34-39
-        :lineno-start: 34
+        :start-at: S40
+        :end-at: E40
 
 Variable collections
 --------------------
@@ -941,8 +951,8 @@ or `matchedMC`.
     This is how we add variables to the final state particles:
 
     .. literalinclude:: steering_files/019_first_steering_file.py
-        :lines: 52-58
-        :lineno-start: 52
+        :start-at: S50
+        :end-at: E50
 
     Next, do the same for the :math:`J/\Psi` and the :math:`K_S^0` in a similar
     fashion.
@@ -963,8 +973,8 @@ or `matchedMC`.
     This is the code for the first part of the last hint:
 
     .. literalinclude:: steering_files/019_first_steering_file.py
-        :lines: 62-66
-        :lineno-start: 62
+        :start-at: S60
+        :end-at: E60
 
 .. admonition:: Solution
     :class: toggle solution

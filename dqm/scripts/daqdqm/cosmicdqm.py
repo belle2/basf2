@@ -43,4 +43,4 @@ def add_cosmic_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         if components is None or 'PXD' in components:
             # need to be behind add_common_dqm as intercepts are calculated there
             # disable d0 and z0 cut for cosmics
-            path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF', z0minCut=-9999, z0maxCut=9999, d0Cut=-9999)
+            path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF', z0minCut=-9999, z0maxCut=9999, d0Cut=9999)

@@ -46,6 +46,7 @@ CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationColl
   addParam("storeTrackParams", m_storeTrackParams, "Store Track Parameter or not, it will be multicount for each hit", false);
   addParam("eventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", true);
   addParam("minimumPt", m_minimumPt, "Tracks with tranverse momentum smaller than this value will not used", 0.15);
+  addParam("minimumNDF", m_minimumNDF, "Discard tracks whose degree-of-freedom below this value", 5.);
   addParam("isCosmic", m_isCosmic, "True when we process cosmic events, else False (collision)", m_isCosmic);
   addParam("effStudy", m_effStudy, "When true module collects info only  necessary for wire eff study", false);
 }
@@ -147,36 +148,25 @@ void CDCCalibrationCollectorModule::collect()
   }
   // WireID collection finished
 
-  const int nTr = m_RecoTracks.getEntries();
-
+  const int nTr = m_Tracks.getEntries();
   // Skip events which have number of charged tracks <= 1.
   int nCTracks  = 0;
   for (int i = 0; i < nTr; ++i) {
-    RecoTrack* track = m_RecoTracks[i];
-    if (track->getDirtyFlag()) continue;
-    const genfit::FitStatus* fs = track->getTrackFitStatus();
-    if (!fs || !fs->isFitted()) continue;
-    if (!fs->isFitConverged()) continue; //not fully convergence
-
-    const Belle2::Track* b2track = track->getRelatedFrom<Belle2::Track>();
-    if (!b2track) {B2DEBUG(99, "No relation found"); continue;}
-    const Belle2::TrackFitResult* fitresult = b2track->getTrackFitResult(Const::muon);
-    if (!fitresult) {
-      B2WARNING("track was fitted but Relation not found");
-      continue;
-    }
+    const Belle2::Track* b2track = m_Tracks[i];
+    const Belle2::TrackFitResult* fitresult = b2track->getTrackFitResultWithClosestMass(Const::muon);
+    if (!fitresult) continue;
 
     short charge = fitresult->getChargeSign();
     if (fabs(charge) > 0) {
       nCTracks++;
     }
   }
+
   if (nCTracks <= 1) {
     return ;
   } else {
     getObjectPtr<TH1F>("hNTracks")->Fill(nCTracks);
   }
-
 
   const int nHits = m_CDCHits.getEntries();
   const int nWires = 14336;
@@ -184,20 +174,20 @@ void CDCCalibrationCollectorModule::collect()
   getObjectPtr<TH1F>("hOccupancy")->Fill(oc);
 
   for (int i = 0; i < nTr; ++i) {
-    RecoTrack* track = m_RecoTracks[i];
-    if (track->getDirtyFlag()) continue;
-    const genfit::FitStatus* fs = track->getTrackFitStatus();
-    if (!fs || !fs->isFitted()) continue;
-    if (!fs->isFitConverged()) continue; //not fully convergence
-
-    const Belle2::Track* b2track = track->getRelatedFrom<Belle2::Track>();
-    if (!b2track) {B2DEBUG(99, "No relation found"); continue;}
-    const Belle2::TrackFitResult* fitresult = b2track->getTrackFitResult(Const::muon);
-
+    const Belle2::Track* b2track = m_Tracks[i];
+    const Belle2::TrackFitResult* fitresult = b2track->getTrackFitResultWithClosestMass(Const::muon);
     if (!fitresult) {
-      B2WARNING("track was fitted but Relation not found");
+      B2WARNING("No track fit result found.");
       continue;
     }
+
+    Belle2::RecoTrack* recoTrack = b2track->getRelatedTo<Belle2::RecoTrack>(m_recoTrackArrayName);
+    if (!recoTrack) {
+      B2WARNING("Can not access RecoTrack of this Belle2::Track");
+      continue;
+    }
+    const genfit::FitStatus* fs = recoTrack->getTrackFitStatus();
+    if (!fs) continue;
     ndf = fs->getNdf();
     if (!m_bField) {
       ndf += 1;
@@ -208,7 +198,7 @@ void CDCCalibrationCollectorModule::collect()
     B2DEBUG(99, "ndf = " << ndf);
     B2DEBUG(99, "Pval = " << Pval);
 
-    if (ndf < 15) continue; //hard code,
+    if (ndf < m_minimumNDF) continue;
     double Chi2 = fs->getChi2();
     Pval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
     //store track parameters
@@ -227,8 +217,9 @@ void CDCCalibrationCollectorModule::collect()
     if (fitresult->getTransverseMomentum() < m_minimumPt) continue;
     if (!m_effStudy) { // all harvest to fill the tree if collecting calibration info
       try {
-        harvest(track);
-      } catch (...) {
+        harvest(recoTrack);
+      } catch (const genfit::Exception& e) {
+        B2ERROR("Exception when harvest information from recotrack: " << e.what());
       }
     }
     if (m_effStudy) { // call buildEfficiencies for efficiency study

@@ -26,7 +26,7 @@ Continuum Suppression (CS)
 
 
 Introduction
-------------------------------------------------------------------
+------------
 
 Most e\ :sup:`+` e\ :sup:`-` interactions at Belle II do not result in a ϒ(4S) resonance
 which then decays to two B mesons.
@@ -197,7 +197,7 @@ If this doesn't work you can find the files in ``/sw/belle2/examples-data/starte
 
     .. literalinclude:: steering_files/090_cs.py
         :language: python
-        :lines: -33
+        :end-at: E13
 
 
 .. admonition:: Exercise
@@ -222,7 +222,8 @@ If this doesn't work you can find the files in ``/sw/belle2/examples-data/starte
 
     .. literalinclude:: steering_files/090_cs.py
         :language: python
-        :lines: 34-43
+        :start-at: S10
+        :end-at: E10
 
 
 .. admonition:: Exercise
@@ -241,7 +242,8 @@ If this doesn't work you can find the files in ``/sw/belle2/examples-data/starte
 
     .. literalinclude:: steering_files/090_cs.py
         :language: python
-        :lines: 45-61
+        :start-at: S20
+        :end-at: E20
 
 Now that we have created our ntuple, we can look at the data and see how well the variables suppress continuum.
 
@@ -298,6 +300,7 @@ So how do we separate our signal component from continuum background in the pres
 have seen with the five variables we have introduced so far, none of them can provide perfect separation.
 Fortunately, there is a solution to this: Boosted Decision Trees!
 
+.. _online_book_cs_bdt:
 
 Continuum suppression using Boosted Decision Trees
 --------------------------------------------------

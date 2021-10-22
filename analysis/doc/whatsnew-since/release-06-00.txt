@@ -4,8 +4,10 @@ Changes in the analysis package since release-06-00
 Neutral Hadron Analysis Tool
 ++++++++++++++++++++++++++++
 
- * Added a module that modifies 4-momentum of a neutral hadron in a given decay (e.g. :math:`B^0 \to J/\psi K_L^0`, :math:`B^0 \to p \bar{n} D^*(2010)^-`).
- * Added a Python function `reconstructDecayWithNeutralHadron`, which merges the functionalities of ``ParticleCombiner`` and the above module.
+ * Added a module that modifies 4-momentum of a neutral hadron in a given decay (e.g. :math:`B^0 \to J/\psi K_L^0`, :math:`B^0 \to
+   p \bar{n} D^*(2010)^-`).
+ * Added a Python function `reconstructDecayWithNeutralHadron`, which merges the functionalities of ``ParticleCombiner`` and the
+   above module.
 
 Variables
 +++++++++
@@ -14,6 +16,18 @@ Variables
  * Modified ``InvM`` to be calculated at the decay vertex if the particle is V0 or decay at rho > 5 mm.
  * Added ``clusterTotalMCMatchWeight`` which returns the sum of all deposited MC energies that can be used to identify beam
    background clusters.
+ * The no ROE mask case in the ROE-related variables has now a different name: ``"all"`` instead of an empty string ``""``.
+   Similarly to the ParticleLoader's ``all`` particle lists, this name is reserved, user cannot create a mask with this name. 
+   If ``maskName`` argument is not specified in the ROE-related metavariables, it will default to ``all`` automatically, 
+   but in case of metavariables with many arguments user will be required to call it explicitly, e.g. ``nROE_Charged(all, 321)``. 
+ * Added ``v0DaughterNRemovedHits`` which returns the number of track hits removed in V0Finder.
+ * Added `hadronicSplitOffSuppression` which returns the output of an MVA that uses shower-related variables to distinguish
+   between true photons and hadronic split-offs.
+ * The variable ``beamBackgroundProbabilityMVA`` now has a new name: `beamBackgroundSuppression`. The weight files for this 
+   MVA have also been updated due to a change in training samples used. 
+ * Added `mostcommonBTagIndex` which returns the B meson index from which most FSP from a given reconstructed B meson candidate originated. Use case would be e.g. the FEI.
+ * Added `percentageMissingParticlesBTag` which determines the percentage of FSP missed by using the `mostcommonBTagIndex` of the B meson.
+ * Added `percentageWrongParticlesBTag` which gives the percentage of FSP reconstructed not originating from the `mostcommonBTagIndex`.
 
 Modules
 +++++++
@@ -24,3 +38,7 @@ Modules
  * The :b2:mod:`HelixErrorScaler` has been extended to K_S0 that are reconstructed from V0. A new python function
    `stdV0s.scaleErrorKshorts` provides an alternative to the standard list ``K_S0:merged`` with a correction applied to the
    uncertainties of the K_S0 daughter helix parameters.
+ * Variables `nRejectedECLShowersFWDEndcap`, `nRejectedECLShowersBarrel`, `nRejectedECLShowersBWDEndcap`: if the values of the
+   counters exceed uint8_t maximum (255), it is set to 255.
+ * The invariant mass of the particles built from the missing momentum in the event (`fillParticleListFromROE` with option
+   ``useMissing=True``) is no longer fixed to zero, but set based on the full missing 4-momentum.

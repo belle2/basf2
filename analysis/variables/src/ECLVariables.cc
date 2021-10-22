@@ -33,13 +33,24 @@
 
 namespace Belle2 {
   namespace Variable {
-    double beamBackgroundProbabilityMVA(const Particle* particle)
+    double beamBackgroundSuppression(const Particle* particle)
     {
-      if (particle->hasExtraInfo("beamBackgroundProbabilityMVA")) {
-        return particle->getExtraInfo("beamBackgroundProbabilityMVA");
+      if (particle->hasExtraInfo("beamBackgroundSuppression")) {
+        return particle->getExtraInfo("beamBackgroundSuppression");
       } else {
-        B2WARNING("The extraInfo beamBackgroundProbabilityMVA is not registered! \n"
-                  "This variable is only available for photons, and you either have to run the function getBeamBackgroundProbabilityMVA or turn the argument loadPhotonBeamBackgroundMVA to True when using fillParticleList.");
+        B2WARNING("The extraInfo beamBackgroundSuppression is not registered! \n"
+                  "This variable is only available for photons, and you either have to run the function getBeamBackgroundProbability or turn the argument loadPhotonBeamBackgroundMVA to True when using fillParticleList.");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    double hadronicSplitOffSuppression(const Particle* particle)
+    {
+      if (particle->hasExtraInfo("hadronicSplitOffSuppression")) {
+        return particle->getExtraInfo("hadronicSplitOffSuppression");
+      } else {
+        B2WARNING("The extraInfo hadronicSplitOffSuppression is not registered! \n"
+                  "This variable is only available for photons, and you either have to run the function getHadronicSplitOffProbability or turn the argument loadPhotonHadronicSplitOffMVA to True when using fillParticleList.");
         return std::numeric_limits<float>::quiet_NaN();
       }
     }
@@ -1274,14 +1285,41 @@ Returns number of charged tracks matched to this cluster.
 Status bit to indicate if cluster has digits with waveforms that passed energy and :math:`\chi^2`
 thresholds for computing PSD variables.
 )DOC");
-    REGISTER_VARIABLE("beamBackgroundProbabilityMVA", beamBackgroundProbabilityMVA, R"DOC(
-Returns MVA classifier that uses shower shape variables to distinguish true clusters from beam background clusters. 
+    REGISTER_VARIABLE("beamBackgroundSuppression", beamBackgroundSuppression, R"DOC(
+Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from beam background clusters.
+The classes are: 
 
     - 1 for true photon clusters
     - 0 for beam background clusters
 
-The variables used in the training (in decreasing order of significance): clusterTiming, clusterE, clusterTheta, 
-clusterZernikeMVA,  clusterE1E9, clusterLat, clusterSecondMoment and clusterPhi. )DOC");
+The MVA has been trained using samples of signal photons and beam background photons coming from MC. The features used are (in decreasing order of significance): 
+
+    - `clusterTiming`
+    - `clusterPulseShapeDiscriminationMVA`
+    - `clusterE`
+    - `clusterTheta`
+    - `clusterZernikeMVA`
+    - `clusterE1E9`
+    - `clusterLAT`
+    - `clusterSecondMoment`    
+)DOC");
+    REGISTER_VARIABLE("hadronicSplitOffSuppression", hadronicSplitOffSuppression, R"DOC(
+Returns the output of an MVA classifier that uses shower-related variables to distinguish true photon clusters from hadronic splitoff clusters.
+The classes are: 
+
+    - 1 for true photon clusters
+    - 0 for hadronic splitoff clusters
+
+The MVA has been trained using samples of signal photons and hadronic splitoff photons coming from MC. The features used are (in decreasing order of significance): 
+
+    - `clusterPulseShapeDiscriminationMVA`
+    - `minC2TDist`
+    - `clusterZernikeMVA`
+    - `clusterE`
+    - `clusterLAT`
+    - `clusterE1E9`
+    - `clusterSecondMoment`
+)DOC");
     REGISTER_VARIABLE("clusterKlId", eclClusterKlId, R"DOC(
 Returns MVA classifier that uses ECL clusters variables to discriminate Klong clusters from em background.
     
@@ -1360,14 +1398,17 @@ StoreArray index(0 - based) of the MDST ECLCluster (useful for track-based parti
 
     REGISTER_VARIABLE("nRejectedECLShowersFWDEndcap", nRejectedECLShowersFWDEndcap, R"DOC(
 [Eventbased] Returns the number of showers in the ECL that do not become clusters, from the forward endcap.
+If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
 )DOC");
 
     REGISTER_VARIABLE("nRejectedECLShowersBarrel", nRejectedECLShowersBarrel, R"DOC(
 [Eventbased] Returns the number of showers in the ECL that do not become clusters, from the barrel.
+If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
 )DOC");
 
     REGISTER_VARIABLE("nRejectedECLShowersBWDEndcap", nRejectedECLShowersBWDEndcap, R"DOC(
 [Eventbased] Returns the number of showers in the ECL that do not become clusters, from the backward endcap.
+If the number exceeds 255 (uint8_t maximum value) the variable is set to 255.
 )DOC");
 
     REGISTER_VARIABLE("eclClusterOnlyInvariantMass", eclClusterOnlyInvariantMass, R"DOC(

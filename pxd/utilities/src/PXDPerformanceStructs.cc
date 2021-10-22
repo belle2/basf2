@@ -44,9 +44,11 @@ namespace Belle2 {
       auto statePtr = getTrackStateOnModule(sensorInfo, *recoTracks[0]);
       if (statePtr == nullptr) return nullptr; // shouldn't happen.
       auto intersec = statePtr -> getPos();
+      auto localPoint = sensorInfo.pointToLocal(intersec, true);
       auto intersec_p = statePtr -> getMom();
       auto local_p = sensorInfo.vectorToLocal(intersec_p, true);
 
+      inside = sensorInfo.inside(localPoint.X(), localPoint.Y(), 0., 0.);
       x = intersec.X();
       y = intersec.Y();
       z = intersec.Z();

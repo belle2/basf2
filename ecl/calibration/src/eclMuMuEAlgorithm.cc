@@ -66,7 +66,7 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
   double effSigMin(0.02), effSigMax(0.2); /*< range for effective sigma of normalized energy distribution */
   double effSigTol = limitTol * (effSigMax - effSigMin); /*< fit is at limit if it is within effSigTol of min or max */
   double etaNom(-0.41); /*< Nominal tail parameter; fixed to this value for low statistics fits */
-  double etaMin(-0.7), etaMax(-0.2); /*< Novosibirsk tail parameter range */
+  double etaMin(-1.), etaMax(0.); /*< Novosibirsk tail parameter range */
   double etaTol = limitTol * (etaMax - etaMin); /*< fit is at limit if it is within etaTol of min or max */
 
   /** Put root into batch mode so that we don't try to open a graphics window */
@@ -193,6 +193,8 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
   TH1F* effSigVsCrysID = new TH1F("effSigVsCrysID", "effSigma vs crystal ID;crystal ID;sigma)", 8736, 0, 8736);
   TH1F* etaVsCrysID = new TH1F("etaVsCrysID", "eta vs crystal ID;crystal ID;Novo eta parameter", 8736, 0, 8736);
   TH1F* normVsCrysID = new TH1F("normVsCrysID", "Novosibirsk normalization vs crystal ID;crystal ID;normalization", 8736, 0, 8736);
+  TH1F* lowerLimitVsCrysID = new TH1F("lowerLimitVsCrysID", "fit range lower limit vs crystal ID;crystal ID;lower fit limit", 8736, 0,
+                                      8736);
   TH1F* fitLimitVsCrysID = new TH1F("fitLimitVsCrysID", "fit range upper limit vs crystal ID;crystal ID;upper fit limit", 8736, 0,
                                     8736);
   TH1F* StatusVsCrysID = new TH1F("StatusVsCrysID", "Fit status vs crystal ID;crystal ID;Fit status", 8736, 0, 8736);
@@ -301,13 +303,18 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
       double xLow = hEnergy->GetBinCenter(iLast - 1);
 
       /** look for the target value between these two points */
-      func->SetNpx(1000);
-      lowerEnEdge = func->GetX(targetY, xLow, xHigh);
+      if (func->Eval(xLow) < targetY and func->Eval(xHigh) > targetY) {
+        func->SetNpx(1000);
+        lowerEnEdge = func->GetX(targetY, xLow, xHigh);
+      }
     }
 
     /**-----------------------------------------------------------------------------------------*/
     /** Fit status */
     int iStatus = fitOK; // success
+
+    /** did not find lower edge */
+    if (lowerEnEdge < 0.01) {iStatus = noLowerEdge;}
 
     /** poor fit */
     if (fitProb <= minFitLimit) {iStatus = poorFit;}
@@ -332,6 +339,8 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
     etaVsCrysID->SetBinError(histbin, etaUnc);
     normVsCrysID->SetBinContent(histbin, normalization);
     normVsCrysID->SetBinError(histbin, normUnc);
+    lowerLimitVsCrysID->SetBinContent(histbin, fitlow);
+    lowerLimitVsCrysID->SetBinError(histbin, 0);
     fitLimitVsCrysID->SetBinContent(histbin, fithigh);
     fitLimitVsCrysID->SetBinError(histbin, 0);
     StatusVsCrysID->SetBinContent(histbin, iStatus);
@@ -428,6 +437,7 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
   effSigVsCrysID->Write();
   etaVsCrysID->Write();
   normVsCrysID->Write();
+  lowerLimitVsCrysID->Write();
   fitLimitVsCrysID->Write();
   StatusVsCrysID->Write();
   hPeak->Write();
@@ -449,6 +459,7 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
   dummy = (TH1F*)gROOT->FindObject("effSigVsCrysID"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("etaVsCrysID"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("normVsCrysID"); delete dummy;
+  dummy = (TH1F*)gROOT->FindObject("lowerLimitVsCrysID"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("fitLimitVsCrysID"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("StatusVsCrysID"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("fitProbSame"); delete dummy;

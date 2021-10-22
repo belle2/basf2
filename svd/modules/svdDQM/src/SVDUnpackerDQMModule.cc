@@ -332,8 +332,8 @@ void SVDUnpackerDQMModule::event()
   m_errorFraction = 100 * float(m_nBadEvents) / float(m_nEvents);
 
   if (m_DQMEventFractionHisto != nullptr) {
-    TString histoFractionTitle = Form("SVD bad events fraction: %f %%,  Exp %d Run %d", m_errorFraction, m_expNumber,
-                                      m_runNumber);
+    TString histoFractionTitle = TString::Format("SVD bad events fraction: %f %%,  Exp %d Run %d", m_errorFraction, m_expNumber,
+                                                 m_runNumber);
     m_DQMEventFractionHisto->SetTitle(histoFractionTitle.Data());
   }
 

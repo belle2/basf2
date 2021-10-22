@@ -12,12 +12,14 @@
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/logging/Logger.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/Btube.h>
+
 // utilities
 #include <analysis/utility/CLHEPToROOT.h>
 #include <analysis/utility/PCmsLabTransform.h>
@@ -29,9 +31,6 @@
 
 #include <TVector.h>
 #include <TRotation.h>
-#include <framework/geometry/B2Vector3.h>
-
-
 #include <TMath.h>
 
 using namespace std;
@@ -436,11 +435,8 @@ namespace Belle2 {
 
     double chi2_track = getChi2TracksLBoost(kv);
     unsigned track_count = kv.getTrackCount();
-    bool haschi2_track = mother->hasExtraInfo("chiSquared_trackL");
-    if (haschi2_track) {
-      mother->writeExtraInfo("chiSquared_trackL", chi2_track);
-      mother->writeExtraInfo("n_track", track_count);
-    }
+    mother->writeExtraInfo("chiSquared_trackL", chi2_track);
+    mother->writeExtraInfo("kFit_nTracks", track_count);
 
     bool ok = false;
     if (twoPhotonChildren.size() == 0)
@@ -1269,7 +1265,7 @@ namespace Belle2 {
     m_beamSpotCov = beamSpotCov;
   }
 
-  double ParticleVertexFitterModule::getChi2TracksLBoost(analysis::VertexFitKFit& kv)
+  double ParticleVertexFitterModule::getChi2TracksLBoost(const analysis::VertexFitKFit& kv)
   {
     double chi2TrackL = 0;
 

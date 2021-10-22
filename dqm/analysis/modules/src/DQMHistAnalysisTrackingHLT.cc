@@ -57,18 +57,17 @@ void DQMHistAnalysisTrackingHLTModule::event()
 
   //check Tracking Abort Rate
   int nEvents = 0;
-  double averageAbortRate = 0;
   bool hasError = false;
 
   TH1* hAbort = findHist("TrackingHLTDQM/NumberTrackingErrorFlags");
   if (hAbort != NULL) {
     nEvents = hAbort->GetEntries();
-    averageAbortRate = hAbort->GetMean();
-    hAbort->SetTitle(Form("Average Fraction of Events in which Tracking aborts = %.6f ", averageAbortRate));
+    double abortRate = hAbort->GetMean();
+    hAbort->SetTitle(Form("Fraction of Events in which Tracking aborts = %.6f ", abortRate));
 
-    m_monObj->setVariable("avgAbortRate", averageAbortRate);
+    m_monObj->setVariable("abortRate", abortRate);
     //check if number of errors is above the allowed limit
-    if (averageAbortRate > m_failureRateThreshold)
+    if (abortRate > m_failureRateThreshold)
       hasError = true;
   } else {
     hasError = true;
@@ -89,13 +88,29 @@ void DQMHistAnalysisTrackingHLTModule::event()
   if (m_printCanvas)
     m_cAbortRate->Print("c_AbortRate.pdf");
 
+
   // add average number of tracks per event to Mirabelle
   double averageNTracks = -1;
   TH1* hnTracks = findHist("TrackingHLTDQM/NoOfTracks");
   if (hnTracks != NULL)
     averageNTracks = hnTracks->GetMean();
+  double averageNVXDTracks = -1;
+  TH1* hnVXDTracks = findHist("TrackingHLTDQM/NoOfTracksInVXDOnly");
+  if (hnVXDTracks != NULL)
+    averageNVXDTracks = hnVXDTracks->GetMean();
+  double averageNCDCTracks = -1;
+  TH1* hnCDCTracks = findHist("TrackingHLTDQM/NoOfTracksInCDCOnly");
+  if (hnCDCTracks != NULL)
+    averageNCDCTracks = hnCDCTracks->GetMean();
+  double averageNVXDCDCTracks = -1;
+  TH1* hnVXDCDCTracks = findHist("TrackingHLTDQM/NoOfTracksInVXDCDCOnly");
+  if (hnVXDCDCTracks != NULL)
+    averageNVXDCDCTracks = hnVXDCDCTracks->GetMean();
 
   m_monObj->setVariable("nTracksPerEvent", averageNTracks);
+  m_monObj->setVariable("nVXDTracksPerEvent", averageNVXDTracks);
+  m_monObj->setVariable("nCDCTracksPerEvent", averageNCDCTracks);
+  m_monObj->setVariable("nVXDCDCTracksPerEvent", averageNVXDCDCTracks);
 
 }
 

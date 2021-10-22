@@ -407,6 +407,14 @@ Here is a list of production and decay vertex variables:
 .. b2-variables::
    :group: Vertex Information
 
+KFit variables
+~~~~~~~~~~~~~~
+
+Here is a list of variables that indicate the quality of a :ref:`kfit_vertex_fitter`.
+
+.. b2-variables::
+   :group: KFit variables
+
 .. _orca_kin_fit_variables:
 
 Orca Kinematic Fitter

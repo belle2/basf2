@@ -13,7 +13,7 @@
 <header>
 <output>TRGValidationGen.root</output>
 <contact>Yun-Tsung Lai, ytlai@post.kek.jp</contact>
-<description>This steering file generates 1000 e+/e- particle guns to validate the trg package.</description>
+<description>This steering file generates 1000 e+/e- mu+/mu- particle guns to validate the trg package.</description>
 </header>
 """
 
@@ -41,6 +41,8 @@ particlegun.param('yVertexParams', [0, 0])
 particlegun.param('zVertexParams', [-20.0, 20.0])
 main.add_module(particlegun)
 
+
+# trigger simulation is included in latest basf2
 add_simulation(main)
 
 # output

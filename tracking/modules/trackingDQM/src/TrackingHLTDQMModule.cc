@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/trackingDQM/TrackDQMModule.h>
+#include <tracking/modules/trackingDQM/TrackingHLTDQMModule.h>
 #include <tracking/modules/trackingDQM/TrackDQMEventProcessor.h>
 #include <tracking/dqmUtils/HistogramFactory.h>
 
@@ -21,17 +21,16 @@ using boost::format;
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(TrackDQM)
+REG_MODULE(TrackingHLTDQM)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-TrackDQMModule::TrackDQMModule() : DQMHistoModuleBase()
+TrackingHLTDQMModule::TrackingHLTDQMModule() : DQMHistoModuleBase()
 {
-  setDescription("DQM of finding tracks, their momentum, "
-                 "Number of hits in tracks, "
-                 "Number of tracks. "
+  setPropertyFlags(c_ParallelProcessingCertified);
+  setDescription("Data Quality Monitoring of the tracking run on HLT. "
                 );
 }
 
@@ -39,7 +38,7 @@ TrackDQMModule::TrackDQMModule() : DQMHistoModuleBase()
 // Function to define histograms
 //-----------------------------------------------------------------
 
-void TrackDQMModule::initialize()
+void TrackingHLTDQMModule::initialize()
 {
   DQMHistoModuleBase::initialize();
 
@@ -47,23 +46,21 @@ void TrackDQMModule::initialize()
   m_eventLevelTrackingInfo.isOptional();
 }
 
-void TrackDQMModule::defineHisto()
+void TrackingHLTDQMModule::defineHisto()
 {
   DQMHistoModuleBase::defineHisto();
+  DQMHistoModuleBase::runningOnHLT();
 
   if (VXD::GeoCache::getInstance().getGeoTools()->getNumberOfLayers() == 0)
-    B2FATAL("Missing geometry for VXD.");
+    B2WARNING("Missing geometry for VXD.");
 
   // Create a separate histogram directories and cd into it.
   TDirectory* originalDirectory = gDirectory;
 
-  TDirectory* TracksDQM = originalDirectory->GetDirectory("TracksDQM");
+  // There might be problems with nullptr if the directory with the same name already exists (but I am not sure because there isn't anything like that in AlignmentDQM)
+  TDirectory* TracksDQM = originalDirectory->GetDirectory("TrackingHLTDQM");
   if (!TracksDQM)
-    TracksDQM = originalDirectory->mkdir("TracksDQM");
-
-  TDirectory* TracksDQMAlignment = originalDirectory->GetDirectory("TracksDQMAlignment");
-  if (!TracksDQMAlignment)
-    TracksDQMAlignment = originalDirectory->mkdir("TracksDQMAlignment");
+    TracksDQM = originalDirectory->mkdir("TrackingHLTDQM");
 
   TracksDQM->cd();
   DefineTracks();
@@ -72,15 +69,8 @@ void TrackDQMModule::defineHisto()
   DefineMomentumCoordinates();
   DefineHelixParametersAndCorrelations();
   DefineTrackFitStatus();
-  DefineTRClusters();
-  DefineUBResidualsVXD();
-  DefineHalfShellsVXD();
 
   DefineFlags();
-
-  TracksDQMAlignment->cd();
-  Define1DSensors();
-  Define2DSensors();
 
   originalDirectory->cd();
 
@@ -88,13 +78,16 @@ void TrackDQMModule::defineHisto()
     ProcessHistogramParameterChange(get<0>(change), get<1>(change), get<2>(change));
 }
 
-void TrackDQMModule::event()
+void TrackingHLTDQMModule::event()
 {
   DQMHistoModuleBase::event();
   if (!histogramsDefined)
     return;
 
-  TrackDQMEventProcessor eventProcessor = TrackDQMEventProcessor(this, m_recoTracksStoreArrayName, m_tracksStoreArrayName);
+  bool runningOnHLT = true;
+
+  TrackDQMEventProcessor eventProcessor = TrackDQMEventProcessor(this, m_recoTracksStoreArrayName, m_tracksStoreArrayName,
+                                          runningOnHLT);
 
   eventProcessor.Run();
 
@@ -104,7 +97,7 @@ void TrackDQMModule::event()
     m_trackingErrorFlags->Fill(0.0);
 }
 
-void TrackDQMModule::DefineFlags()
+void TrackingHLTDQMModule::DefineFlags()
 {
   // only monitor if any flag was set so only 2 bins needed
   const char* flagTitle =

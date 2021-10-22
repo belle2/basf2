@@ -293,8 +293,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
-        trackDqm = b2.register_module('TrackDQM')
-        path.add_module(trackDqm)
+        if (dqm_environment == "hlt"):
+            path.add_module('TrackingHLTDQM')
+        else:
+            path.add_module('TrackingExpressRecoDQM')
 
     # ARICH
     if (components is None or 'ARICH' in components) and (dqm_mode in ["dont_care", "filtered"]):

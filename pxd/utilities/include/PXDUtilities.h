@@ -97,5 +97,20 @@ namespace Belle2 {
     std::shared_ptr<TrackState> getTrackStateOnModule(const VXD::SensorInfoBase& pxdSensorInfo,
                                                       RecoTrack& recoTrack, double lambda = 0.0);
 
+    /** Helper function to check if a pixel is close to the border
+     * @param u uID of the pixel of interest
+     * @param v vID of the pixel of interest
+     * @param checkDistance the distance along u/v
+     * @return true if the pixel is close to border
+     */
+    bool isCloseToBorder(int u, int v, int checkDistance);
+    /** Helper function to chheck if a defective (hot/dead) pixel is close
+     * @param u uID of the pixel of interest
+     * @param v vID of the pixel of interest
+     * @param checkDistance the distance along u/v
+     * @param moduleID VxdID of the module
+     * @return true if a defective pixel is found in matrix
+     */
+    bool isDefectivePixelClose(int u, int v, int checkDistance, const VxdID& moduleID);
   } // end namespace PXD
 } // end namespace Belle2

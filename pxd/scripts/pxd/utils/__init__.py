@@ -15,19 +15,43 @@ Utilities for PXD calibration and performance study
 
 import ROOT
 from ROOT import Belle2
+import pandas as pd
+import numpy as np
 
 
 # Helper functions for Belle2.VxdID
 def get_name(self, separator="_"):
+    """
+    Get PXD module name with a specific format
+    Parameters:
+      self: Belle2.VxdID
+      separator (str): separator between different (layer/ladder/sensor) numbers.
+    Return:
+      PXD module name, e.g., 1_1_1
+    """
     return f"{self.getLayerNumber()}{separator}{self.getLadderNumber()}{separator}{self.getSensorNumber()}"
 
 
 def get_pxdid(self):
+    """
+    Get PXD module id: layer_id * 1000 + ladder_id * 10 + sensor_id
+    Parameters:
+      self: Belle2.VxdID
+    Return:
+      PXD module id, e.g., 1011
+    """
     return self.getLayerNumber() * 1000 + self.getLadderNumber() * 10 + self.getSensorNumber()
 
 
 # Helper function for TGraph
 def graph_append(self, x, y):
+    """
+    Append a point to TGraph
+    Parameters:
+      self: ROOT.TGraph
+      x (float): x coordinate of the point
+      y (float): y coordinate of the point
+    """
     self.SetPoint(self.GetN(), x, y)
 
 
@@ -148,6 +172,96 @@ def get_sensor_maps(
     return hists
 
 
+def df_calculate_eff(df, num="nTrackClusters", den="nTrackPoints", output_var="eff"):
+    """
+    Efficiency calculation with asymmetric errors for pandas DataFrame
+    Parameters:
+      df: pandas.DataFrame
+      num (str): column used as the numerator
+      den (str): column used as the denominator
+      output_var (str): column for saving efficiency
+    """
+    nums = df[num].to_numpy()
+    dens = df[den].to_numpy()
+    from root_numpy import array2hist
+    nBins = len(nums)
+    assert len(nums) == len(dens), "len(numerators) != len(denominators)"
+    h_num = ROOT.TH1I("h_num", "h_num", nBins, 0, nBins)
+    h_den = ROOT.TH1I("h_den", "h_den", nBins, 0, nBins)
+    array2hist(nums, h_num)
+    array2hist(dens, h_den)
+    h_eff = ROOT.TEfficiency(h_num, h_den)
+    df[output_var] = df[num]/df[den]
+    df[output_var+"_err_low"] = [h_eff.GetEfficiencyErrorLow(i+1) for i in range(nBins)]
+    df[output_var+"_err_up"] = [h_eff.GetEfficiencyErrorUp(i+1) for i in range(nBins)]
+
+
+def getH1Sigma68(h1, fill_random=False):
+    """
+    Helper function to get sigma68 from TH1
+    Parameters:
+      h1 (ROOT.TH1): TH1 object from ROOT
+      fill_random (bool): Flag to call TH1.FillRandom
+    Return:
+      sigma68
+    """
+    qs = np.array([0., 0.])
+    probs = np.array([0.16, 0.84])
+    if fill_random:
+        h1tmp = h1.Clone()
+        h1tmp.Reset()
+        h1tmp.FillRandom(h1, int(h1.GetEffectiveEntries()))
+        h1tmp.GetQuantiles(2, qs, probs)
+    else:
+        h1.GetQuantiles(2, qs, probs)
+    return (qs[1]-qs[0])
+
+
+def getH1Sigma68WithError(h1, n=300):
+    """
+    Helper function to get sigma68 and its error using TH1.FillRandom
+    Parameters:
+      h1 (ROOT.TH1): TH1 object from ROOT
+      n (int): number of randomly generated histograms for the estimation
+    Return:
+      estimatd sigma68 and its standard deviation
+    """
+    results = np.array([getH1Sigma68(h1, fill_random=True) for i in range(n)])
+    # return results.mean(), results.std()
+    return getH1Sigma68(h1), results.std()
+
+
+def getSigma68(array):
+    """
+    Helper function to get sigma68 and its error using numpy.array
+    Parameters:
+      array (numpy.array): target array
+    Return:
+      estimatd sigma68
+    """
+    q1 = np.quantile(array, 0.16, axis=0)
+    q2 = np.quantile(array, 0.84, axis=0)
+    return (q2-q1)  # /2*1e4  # cm to um
+
+
+def getSigma68WithError(array, n=300):
+    """
+    Helper function to get sigma68 and its error using numpy.array
+    Parameters:
+      array (numpy.array): target array
+      n (int): number of bootstrap drawings
+    Return:
+      estimatd sigma68 and its standard deviation
+    """
+    bs = np.random.choice(array, (array.shape[0], n))  # bootstrap resampling
+    results = getSigma68(bs)
+    # return results.mean(), results.std()
+    return getSigma68(a), results.std()
+
+
+# Extend pandas.DataFrame
+pd.DataFrame.calculate_eff = df_calculate_eff
+
 # latex
 latex_l = ROOT.TLatex()  # left aligned
 latex_l.SetTextFont(43)
@@ -162,75 +276,3 @@ latex_r.SetTextFont(43)
 latex_r.SetNDC()
 latex_r.SetTextSize(24)
 latex_r.SetTextAlign(31)
-
-
-def style():
-    """
-    ROOT style
-    Author: maiko.takahashi@desy.de
-    """
-    # root style option
-
-    # canvas
-    ROOT.gStyle.SetCanvasBorderMode(0)
-    ROOT.gStyle.SetCanvasBorderSize(10)
-    ROOT.gStyle.SetCanvasColor(0)
-    ROOT.gStyle.SetCanvasDefH(450)
-    ROOT.gStyle.SetCanvasDefW(500)
-    ROOT.gStyle.SetCanvasDefX(10)
-    ROOT.gStyle.SetCanvasDefY(10)
-    # pad
-    ROOT.gStyle.SetPadBorderMode(0)
-    ROOT.gStyle.SetPadBorderSize(10)
-    ROOT.gStyle.SetPadColor(0)
-    ROOT.gStyle.SetPadBottomMargin(0.16)
-    ROOT.gStyle.SetPadTopMargin(0.10)
-    ROOT.gStyle.SetPadLeftMargin(0.17)
-    ROOT.gStyle.SetPadRightMargin(0.19)
-    ROOT.gStyle.SetPadGridX(1)
-    ROOT.gStyle.SetPadGridY(1)
-    ROOT.gStyle.SetGridStyle(2)
-    ROOT.gStyle.SetGridColor(ROOT.kGray + 1)
-    # frame
-    ROOT.gStyle.SetFrameFillStyle(0)
-    ROOT.gStyle.SetFrameFillColor(0)
-    ROOT.gStyle.SetFrameLineColor(1)
-    ROOT.gStyle.SetFrameLineStyle(0)
-    ROOT.gStyle.SetFrameLineWidth(2)
-    ROOT.gStyle.SetFrameBorderMode(0)
-    ROOT.gStyle.SetFrameBorderSize(10)
-    # axis
-    ROOT.gStyle.SetLabelFont(42, "xyz")
-    ROOT.gStyle.SetLabelOffset(0.015, "xyz")
-    ROOT.gStyle.SetLabelSize(0.048, "xyz")
-    ROOT.gStyle.SetNdivisions(505, "xyz")
-    ROOT.gStyle.SetTitleFont(42, "xyz")
-    ROOT.gStyle.SetTitleSize(0.050, "xyz")
-    ROOT.gStyle.SetTitleOffset(1.3, "x")
-    ROOT.gStyle.SetTitleOffset(1.2, "y")
-    ROOT.gStyle.SetTitleOffset(1.4, "z")
-    ROOT.gStyle.SetPadTickX(1)
-    ROOT.gStyle.SetPadTickY(1)
-    # title
-    ROOT.gStyle.SetTitleBorderSize(0)
-    ROOT.gStyle.SetTitleFillColor(10)
-    ROOT.gStyle.SetTitleAlign(12)
-    ROOT.gStyle.SetTitleFontSize(0.045)
-    ROOT.gStyle.SetTitleX(0.560)
-    ROOT.gStyle.SetTitleY(0.860)
-    ROOT.gStyle.SetTitleFont(42, "")
-    # stat
-    ROOT.gStyle.SetStatBorderSize(0)
-    ROOT.gStyle.SetStatColor(10)
-    ROOT.gStyle.SetStatFont(42)
-    ROOT.gStyle.SetStatX(0.94)
-    ROOT.gStyle.SetStatY(0.91)
-    # histo style
-    ROOT.gStyle.SetOptTitle(0)
-    ROOT.gStyle.SetOptStat(0)
-    ROOT.gStyle.SetHistLineWidth(3)
-    ROOT.TH2.SetDefaultSumw2()
-
-
-if __name__ == '__main__':
-    style()

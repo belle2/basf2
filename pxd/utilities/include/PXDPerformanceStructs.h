@@ -56,7 +56,7 @@ namespace Belle2 {
 
       /** Default constructor */
       TrackPoint_t(): x(0.0), y(0.0), z(0.0),
-        tol(0.0), chargeMPV(0.0) {}
+        tol(0.0), chargeMPV(0.0), inside(false) {}
 
       /** Update values from a PXDCluster.
        * @param pxdIntercept a PXDIntercept object.
@@ -74,6 +74,7 @@ namespace Belle2 {
        */
       float tol;       /**< cos(incident angle) = thickness/path length. */
       float chargeMPV; /**< Expected charge in ADU. */
+      bool inside; /**< True if it's inside the active region. */
     }; // end struct TrackPoint_t
 
     /** Struct to hold variables for track clusters. */

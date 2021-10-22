@@ -44,7 +44,7 @@ namespace Belle2 {
     MonitoringObject* m_monObj = nullptr;
 
     TH1* m_rtype = nullptr; /**< histogram from DQMInfo with runtype */
-    TString m_runtype = nullptr; /**< string with runtype: physics or cosmic */
+    TString m_runtype = ""; /**< string with runtype: physics or cosmic */
 
     TCanvas* m_cAbortRate = nullptr;  /**< canvas for the abort rate plot */
   };

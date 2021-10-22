@@ -103,7 +103,7 @@ void DQMHistAnalysisTrackingHLTModule::event()
   if (hnCDCTracks != NULL)
     averageNCDCTracks = hnCDCTracks->GetMean();
   double averageNVXDCDCTracks = -1;
-  TH1* hnVXDCDCTracks = findHist("TrackingHLTDQM/NoOfTracksInVXDCDCOnly");
+  TH1* hnVXDCDCTracks = findHist("TrackingHLTDQM/NoOfTracksInVXDCDC");
   if (hnVXDCDCTracks != NULL)
     averageNVXDCDCTracks = hnVXDCDCTracks->GetMean();
 

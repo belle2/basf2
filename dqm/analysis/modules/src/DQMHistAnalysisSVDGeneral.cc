@@ -53,9 +53,9 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
            float(0));
   addParam("statThreshold", m_statThreshold, "Minimal number of events to compare histograms", int(10000));
   addParam("timeThreshold", m_timeThreshold, "Acceptable difference between mean of central peak for present and reference run",
-           float(4)); // 4 ns
-  addParam("refMCTP", m_refMeanP, "Mean of the signal time peak from Physics reference run", float(-1.226)); // e14r826
-  addParam("refMCTC", m_refMeanC, "Mean of the signal time peak from Cosmic reference run", float(4.938)); // e14r1182
+           float(6)); // 6 ns
+  addParam("refMCTP", m_refMeanP, "Mean of the signal time peak from Physics reference run", float(0.0)); // Approximate, from exp 20
+  addParam("refMCTC", m_refMeanC, "Mean of the signal time peak from Cosmic reference run", float(0.0));  //
 }
 
 DQMHistAnalysisSVDGeneralModule::~DQMHistAnalysisSVDGeneralModule() { }

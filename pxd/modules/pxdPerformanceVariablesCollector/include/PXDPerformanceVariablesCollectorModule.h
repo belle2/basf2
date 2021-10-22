@@ -13,6 +13,7 @@
 #include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <pxd/utilities/PXDPerformanceStructs.h>
+#include <pxd/utilities/PXDUtilities.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
 #include <pxd/dbobjects/PXDGainMapPar.h>
 #include <pxd/reconstruction/PXDPixelMasker.h>
@@ -71,9 +72,10 @@ namespace Belle2 {
      * @param trackCluster a PXD::TrackCluster_t struct
      * @param uBin bin id along u-axis to be updated with binID
      * @param vBin bin id along v-axis to be updated with binID
+     * @param useCluster flag to use cluster position instead of track point
      * @return unique binID
      */
-    int getBinID(const PXD::TrackCluster_t& trackCluster, int uBin, int vBin)
+    int getBinID(const PXD::TrackCluster_t& trackCluster, int& uBin, int& vBin, bool useCluster = false)
     {
 
       // Get PXD::TrackPoint_t
@@ -81,12 +83,21 @@ namespace Belle2 {
       // Get uBin and vBin from a global point.
       VxdID sensorID = PXD::getVxdIDFromPXDModuleID(trackCluster.cluster.pxdID);
       const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-      auto localPoint = Info.pointToLocal(TVector3(tPoint.x, tPoint.y, tPoint.z));
-      auto uID = Info.getUCellID(localPoint.X());
-      auto vID = Info.getVCellID(localPoint.Y());
+      float posU(0.), posV(0.);
+      if (useCluster) {
+        posU = trackCluster.cluster.posU;
+        posV = trackCluster.cluster.posV;
+      } else {
+        auto localPoint = Info.pointToLocal(TVector3(tPoint.x, tPoint.y, tPoint.z), true);
+        posU = localPoint.X();
+        posV = localPoint.Y();
+      }
+      auto uID = Info.getUCellID(posU);
+      auto vID = Info.getVCellID(posV);
       auto iSensor = VXD::GeoCache::getInstance().getGeoTools()->getPXDSensorIndex(sensorID);
       uBin = PXD::PXDGainCalibrator::getInstance().getBinU(sensorID, uID, vID, m_nBinsU);
       vBin = PXD::PXDGainCalibrator::getInstance().getBinV(sensorID, vID, m_nBinsV);
+      assert(uBin < m_nBinsU && vBin < m_nBinsV);
 
       return iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin;
     }
@@ -100,20 +111,11 @@ namespace Belle2 {
      */
     bool isSelected(const VxdID& sensorID, const int& uID, const int& vID)
     {
-      // Check a 3x3 pixel matrix around the track point. Skip counting If any pixel is dead/hot.
+      // Check a pixel matrix around the track point. Skip counting If any pixel is dead/hot.
       // TODO: Using a dedicated cluster flag (under development).
-      for (int i = -1; i < 2; i++) {
-        int tmpUID = uID + i;
-        for (int j = -1; j < 2; j++) {
-          int tmpVID = vID + j;
-          // Dead pixel checking
-          if (PXD::PXDPixelMasker::getInstance().pixelDead(sensorID, tmpUID, tmpVID))
-            return false;
-          // Masked/hot pixel checking
-          if (!PXD::PXDPixelMasker::getInstance().pixelOK(sensorID, tmpUID, tmpVID))
-            return false;
-        } // end v loop
-      } // end u loop
+      if (PXD::isCloseToBorder(uID, vID, m_maskedDistance) ||
+          PXD::isDefectivePixelClose(uID, vID, m_maskedDistance, sensorID))
+        return false;
       return true;
     }
 
@@ -127,6 +129,8 @@ namespace Belle2 {
     int m_minClusterSize;
     /** Maximum cluster size cut */
     int m_maxClusterSize;
+    /** Distance inside which no dead pixel or module border is allowed */
+    int m_maskedDistance;
 
     /** Number of corrections per sensor along u side */
     int m_nBinsU;
@@ -134,6 +138,8 @@ namespace Belle2 {
     int m_nBinsV;
     /** Payload name for Gain to be read from DB */
     std::string m_gainName;
+    /** Flag to use cluster position rather than track point to group pixels into bins for gain calibration.*/
+    bool m_useClusterPosition;
     /** Flag to fill cluster charge ratio (relative to expected MPV) histograms*/
     bool m_fillChargeRatioHistogram;
     /** Flag to fill cluster charge and its estimated MPV in TTree*/

@@ -400,6 +400,10 @@ C
       PARAMETER (
      $  bxINIT ='(1x,1h*,g17.8,            16x, a31,a4,a4, 1x,1h*)'
      $ )
+      CHARACTER*80 bxINITl
+      PARAMETER (
+     $  bxINITl ='(1x,1h*,1x,I3,2x,g17.8,            10x, a31,a4,a4, 1x,1h*)'
+     $ )
       REAL*4 PI,POL1(4)
 
 C SWITCHES FOR OPTIONS IN INITIALIZATION:
@@ -1505,10 +1509,10 @@ C      CALL INIOFC ! dummy for now anyway
       WRITE(iout,bxtxt) '                      '
       WRITE(iout,bxtxt) ' Choice Probability      --     Decay Channel'
       DO K=1,NLT      
-      WRITE(iout,bxINIT) GAMPRT(K)/SUM,    OLDNAMES(K),'****','***'
+      WRITE(iout,bxINITl) K,GAMPRT(K)/SUM,    OLDNAMES(K),'****','***'
       ENDDO
       DO K=NLT+1,NLT+NMODE      
-      WRITE(iout,bxINIT) GAMPRT(K)/SUM,     NAMES(K-NLT),'****','***'
+      WRITE(iout,bxINITl) K,GAMPRT(K)/SUM,     NAMES(K-NLT),'****','***'
       ENDDO
       WRITE(iout,bxtxt) ' In addition:'
       WRITE(iout,bxINIT) GV,    'Vector W-tau-nu coupl.     ','****','***'

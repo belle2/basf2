@@ -33,7 +33,7 @@ namespace Photospp {
     i97 = i;
     j97 = j;
     cran = c;
-    for (int i = 0; i < 97; i++) uran[i] = list[i];
+    for (int ii = 0; ii < 97; ii++) uran[ii] = list[ii];
   }
 
   void PhotosDebugRandom::setSaveState(int i, int j, double c, double list[97])
@@ -41,7 +41,7 @@ namespace Photospp {
     i97_saved = i;
     j97_saved = j;
     cran_saved = c;
-    for (int i = 0; i < 97; i++) uran_saved[i] = list[i];
+    for (int ii = 0; ii < 97; ii++) uran_saved[ii] = list[ii];
   }
 
   void PhotosDebugRandom::print()

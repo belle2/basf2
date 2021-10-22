@@ -781,10 +781,10 @@ C attribute processes with/without kaons to s/ud flavours
 
 C exclusive cumulative cross-sections
       J = 1
-      XSEC(J) = DBLE(RRes_CSHADR(ROOTS,IMIN))
+      XSEC(J) = RRes_CSHADR(ROOTS,IMIN)
       DO I = IMIN+1, IMAX
         J = J + 1
-        XSEC(J) = DBLE(RRes_CSHADR(ROOTS,I)) + XSEC(J-1)
+        XSEC(J) = RRes_CSHADR(ROOTS,I) + XSEC(J-1)
       ENDDO
       
 C draw one topology

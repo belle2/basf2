@@ -51,7 +51,7 @@ namespace Belle2 {
     TGraph getCorrection() const {return m_correction; };
 
     /** Set hypothesis id
-     * @param hypothesis id
+     * @param hypothesisid hypothesis id
      */
     void setHypothesisId(int hypothesisid) {m_hypothesisId = hypothesisid; };
 

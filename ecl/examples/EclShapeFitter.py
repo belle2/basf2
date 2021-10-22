@@ -50,8 +50,9 @@ class ShapeFitterModule(b2.Module):
     def initialize(self):
         """Initialize
         """
+        #: event number
         self.eventNumber = 0
-        # Store array of ECLDigits
+        #: Store array of ECLDigits
         self.digits = Belle2.PyStoreArray('ECLDigits')
 
     def event(self):

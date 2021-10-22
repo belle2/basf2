@@ -98,6 +98,6 @@ namespace Belle2 {
      * for each cell id.
      */
     std::vector<int> m_numberOfAcceptedEvs;
-    ClassDef(ECLCrystalLocalRunCalib, 1);
+    ClassDef(ECLCrystalLocalRunCalib, 1); /**< ClassDef */
   };
 }

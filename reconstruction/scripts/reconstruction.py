@@ -61,6 +61,7 @@ DIGITS_OBJECTS = (
     'ARICHDigits',
     'CDCHits',
     'ECLDigits',
+    'ECLDsps',
     'KLMDigits',
     'PXDDigits',
     'SVDEventInfoSim',

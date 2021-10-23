@@ -406,7 +406,7 @@ void SVDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     // Number of clusters per sensor
     //----------------------------------------------------------------
-    name = TString::Format("SVDDQM_%1%_ClustersU", sensorDescr.Data());
+    name = TString::Format("SVDDQM_%s_ClustersU", sensorDescr.Data());
     title = TString::Format("SVD Sensor %s Number of U-Clusters", sensorDescr.Data());
     m_clustersU[i] = new TH1F(name.Data(), title.Data(), 20, 0, 20);
     m_clustersU[i]->GetXaxis()->SetTitle("# clusters");

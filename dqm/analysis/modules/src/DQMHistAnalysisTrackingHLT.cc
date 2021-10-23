@@ -70,22 +70,23 @@ void DQMHistAnalysisTrackingHLTModule::event()
     //check if number of errors is above the allowed limit
     if (abortRate > m_failureRateThreshold)
       hasError = true;
-  } else
-    B2WARNING("Histogram TrackingHLTDQM/NumberTrackingErrorFlags from Tracking DQM not found!");
 
+    if (nEvents < m_statThreshold) m_cAbortRate->SetFillColor(kGray);
+    else if (hasError) m_cAbortRate->SetFillColor(kRed);
+    else m_cAbortRate->SetFillColor(kGreen);
+    m_cAbortRate->SetFrameFillColor(10);
 
-  if (nEvents < m_statThreshold) m_cAbortRate->SetFillColor(kGray);
-  else if (hasError) m_cAbortRate->SetFillColor(kRed);
-  else m_cAbortRate->SetFillColor(kGreen);
-  m_cAbortRate->SetFrameFillColor(10);
-
-
-  if (hAbort != nullptr) {
     m_cAbortRate->cd();
     hAbort->Draw();
-    m_cAbortRate->Modified();
-    m_cAbortRate->Update();
+
+  } else { // histogram not found
+    B2WARNING("Histogram TrackingHLTDQM/NumberTrackingErrorFlags from Tracking DQM not found!");
+    m_cAbortRate->SetFillColor(kGray);
   }
+
+  m_cAbortRate->Modified();
+  m_cAbortRate->Update();
+
 
   if (m_printCanvas)
     m_cAbortRate->Print("c_AbortRate.pdf");

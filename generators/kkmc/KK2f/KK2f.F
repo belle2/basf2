@@ -173,8 +173,22 @@
       DOUBLE PRECISION    BornV_GetMass, BornV_GetAuxPar, MinMas
       DOUBLE PRECISION    WtMax,  amferm, xcru
       DOUBLE PRECISION    WMlist(200), Xborn(200)  ! 200 should be class parameter!!!
-      INTEGER             NBbranch,   KFlist(200), Nbin
+      INTEGER             NBbranch,   KFlist(200), Nbin,kkk
       DOUBLE PRECISION    vvmin, pol1, pol2, PolBeam1(4), PolBeam2(4)
+      INTEGER idspecial,ifspecial,normfact,normfmu,iddarkmother,iforce,iboson
+      INTEGER ifpair,ifphotons
+      DOUBLE PRECISION speciallife,mxx,gxx
+      COMMON /IDSPECIAL/ IDSPECIAL
+      COMMON /MGXX/     MXX,GXX
+      INTEGER ITAUXPAR
+      PARAMETER ( ITAUXPAR=2000)
+      INTEGER IPAIRPHOTOS
+      COMMON /IPAIRPHOTOS/ IPAIRPHOTOS
+      DATA IPAIRPHOTOS /0/
+      COMMON /IFSPECIAL/ IFSPECIAL
+      INTEGER DPARITY
+      DATA    DPARITY /0/
+      COMMON /DPARITY/ DPARITY
 *--------------------------------------------------------------------------
 *     Initialization of the internal histogramming package
       CALL GLK_Initialize
@@ -301,6 +315,10 @@
          ENDIF
       ENDDO
 *----------------------------------------------------------------------
+   !   do kkk=1,10000
+   !       WRITE(m_out,'(1x,a5,1x,i6,1x,e14.7)') 'brnV ',kkk,m_xpar(kkk)
+  !    enddo  
+
       CALL  BornV_Initialize( m_xpar)
       CALL KarLud_Initialize(m_xpar,xcru)
       CALL KarFin_Initialize(m_xpar)
@@ -351,6 +369,91 @@
 * This initialization is used in KeyISR=0 case !!!
       CALL MBrA_SetXSList(Xborn)
 *----------------------------------------------------------------------
+      IPAIRPHOTOS = INT(XPAR(ITAUXPAR+915))
+      if (IPAIRPHOTOS.EQ.0)  THEN ! Do Nothing
+         ifpair=0               ! general switch for pair emission
+         ifspecial=0            ! to switch resonance decaying to lepton pair
+         iforce=0               ! force action of photospp on every event
+         normfact=0             ! enhance with respect to QED for electron pairs.
+         normfmu=0              ! extra enhancement for muon pairs.
+         ifphotons=0            ! photons brem is treated differently
+         iddarkmother=23        ! PDGid of particle decaying with dark
+         idspecial=0            ! dark PDG identifier
+         mxx=0                  ! dark mass
+         gxx=0                  ! dark width
+         speciallife=0D0        ! dark lifetime
+         iboson=1               ! switch if pair produced through state of spin 1
+         dparity=0              ! Dark Parity: scalar=0;pseudoscalar=1 [Default:scalar]
+       else if (IPAIRPHOTOS.EQ.1)  THEN ! RADIATE E-E+ PAIR
+         ifpair=1               ! general switch for pair emission
+         ifspecial=1            ! to switch resonance decaying to lepton pair
+         iforce=1               ! force action of photospp on every event
+         normfact=100           ! enhance with respect to QED for electron pairs.
+         normfmu=0              ! extra enhancement for muon pairs.
+         ifphotons=0            ! photons brem is treated differently
+         iddarkmother=23        ! PDGid of particle decaying with dark
+         idspecial=53            ! dark PDG identifier
+         mxx = DBLE(XPAR(ITAUXPAR+916))       ! dark mass
+         CALL DARKSCALARWIDTH   ! dark width
+         speciallife=DBLE(XPAR(ITAUXPAR+917)) ! dark lifetime
+         iboson=INT(XPAR(ITAUXPAR+918))       ! switch if pair produced through state of spin 1 [Default:scalar]
+         dparity=INT(XPAR(ITAUXPAR+919))      ! Dark Parity: scalar=0;pseudoscalar=1 [Default:scalar]
+      else if (IPAIRPHOTOS.EQ.2)  THEN ! RADIATE MU-MU+ PAIR
+         ifpair=1               ! general switch for pair emission
+         ifspecial=1            ! to switch resonance decaying to lepton pair
+         iforce=1               ! force action of photospp on every event
+         normfact=0             ! enhance with respect to QED for electron pairs.
+         normfmu=100            ! extra enhancement for muon pairs.
+         ifphotons=0            ! photons brem is treated differently
+         iddarkmother=23        ! PDGid of particle decaying with dark
+         mxx = DBLE(XPAR(ITAUXPAR+916))       ! dark mass
+         speciallife=DBLE(XPAR(ITAUXPAR+917)) ! dark lifetime
+         iboson=INT(XPAR(ITAUXPAR+918))       ! switch if pair produced through state of spin 1 [Default:scalar]
+         if (iboson.eq.0) then
+            CALL DARKSCALARWIDTH ! dark width
+            idspecial=53         ! dark PDG identifier
+         else if (iboson.eq.1) then
+            CALL DARKVECTORWIDTH ! Z' width
+            idspecial=26         ! PDG identifier
+         endif
+         dparity=INT(XPAR(ITAUXPAR+919))      ! Dark Parity: scalar=0;pseudoscalar=1 [Default:scalar]
+      else if (IPAIRPHOTOS.EQ.-1)  THEN ! RADIATE SM NONE/E-E+/MU-MU+ PAIR COCKTAIL
+         ifpair=1               ! general switch for pair emission
+         ifspecial=0            ! to switch resonance decaying to lepton pair
+         iforce=0               ! force action of photospp on every event
+         normfact=1             ! enhance with respect to QED for electron pairs.
+         normfmu=1              ! extra enhancement for muon pairs.
+         ifphotons=0            ! photons brem is treated differently
+         iddarkmother=23        ! PDGid of particle decaying with dark
+         idspecial=22           ! dark PDG identifier
+         mxx=0                  ! dark mass
+         gxx=0                  ! dark width
+         speciallife=0D0        ! dark lifetime
+         iboson=1               ! switch if pair produced through state of spin 1
+         dparity=0              ! Dark Parity: scalar=0;pseudoscalar=1 [Default:scalar]
+      else if (IPAIRPHOTOS.EQ.-2.OR.IPAIRPHOTOS.EQ.-3)  THEN ! RADIATE SM PHOTON
+         ifpair=0               ! general switch for pair emission
+         ifspecial=0            ! to switch resonance decaying to lepton pair
+         iforce=0               ! force action of photospp on every event
+         normfact=0             ! enhance with respect to QED for electron pairs.
+         normfmu=0              ! extra enhancement for muon pairs.
+         ifphotons=1            ! photons brem is treated differently
+         iddarkmother=23        ! PDGid of particle decaying with dark
+         idspecial=22           ! dark PDG identifier
+         mxx=0                  ! dark mass
+         gxx=0                  ! dark width
+         speciallife=0D0        ! dark lifetime
+         iboson=1               ! switch if pair produced through state of spin 1
+         dparity=0              ! Dark Parity: scalar=0;pseudoscalar=1 [Default:scalar]
+      endif
+
+      WRITE(m_out,*) 'IFPAIR,IFSPECIAL,IFORCE,NORMFACT,NORMFMU,MXX,GXX,B,D = ',
+     c                ifpair,ifspecial,IFORCE,normfact,normfmu,mxx,gxx,iboson,DPARITY      
+
+      CALL DARK_INIT(idspecial,ifspecial,normfact,normfmu,speciallife,mxx,gxx,iddarkmother,iboson,iforce)
+      CALL DARK_SET(0,iddarkmother,iforce,iboson)
+
+      CALL PHOTOS_INIT(ifpair,ifphotons)   ! photospp initialization
       CALL TauPair_Initialize(m_xpar)
 *----------------------------------------------------------------------
       IF( m_KeyFSR .NE. 0) CALL pyGive("MSTJ(41)=1;")
@@ -361,7 +464,197 @@
 ***** CALL GLK_ListPrint(6)     ! debug
       END                       !!! KK2f_Initialize !!!
 
-
+      SUBROUTINE DARKSCALARWIDTH
+C  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      IMPLICIT NONE
+      INTEGER I, IFIRST, II
+      REAL*8 M(36),W(36)
+      DATA IFIRST/0/
+      SAVE IFIRST, M, W
+      DOUBLE PRECISION  MXX,GXX 
+      COMMON /MGXX/     MXX,GXX
+C     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      IF (IFIRST.EQ.0) THEN
+C
+C     Dark Scalar Mass
+C
+         M( 1) =   30.0D-3 ! GeV
+         M( 2) =   40.0D-3 ! GeV
+         M( 3) =   50.0D-3 ! GeV
+         M( 4) =   60.0D-3 ! GeV
+         M( 5) =   70.0D-3 ! GeV
+         M( 6) =   80.0D-3 ! GeV
+         M( 7) =   90.0D-3 ! GeV
+         M( 8) =  100.0D-3 ! GeV
+         M( 9) =  120.0D-3 ! GeV
+         M(10) =  140.0D-3 ! GeV
+         M(11) =  160.0D-3 ! GeV
+         M(12) =  180.0D-3 ! GeV
+         M(13) =  200.0D-3 ! GeV
+         M(14) =  212.0D-3 ! GeV
+         M(15) =  215.0D-3 ! GeV
+         M(16) =  220.0D-3 ! GeV
+         M(17) =  250.0D-3 ! GeV
+         M(18) =  300.0D-3 ! GeV
+         M(19) =  400.0D-3 ! GeV
+         M(20) =  500.0D-3 ! GeV
+         M(21) =  750.0D-3 ! GeV
+         M(22) = 1000.0D-3 ! GeV
+         M(23) = 1500.0D-3 ! GeV
+         M(24) = 2000.0D-3 ! GeV
+         M(25) = 2500.0D-3 ! GeV
+         M(26) = 3000.0D-3 ! GeV
+         M(27) = 3500.0D-3 ! GeV
+         M(28) = 4000.0D-3 ! GeV
+         M(29) = 4500.0D-3 ! GeV
+         M(30) = 5000.0D-3 ! GeV
+         M(31) = 5500.0D-3 ! GeV
+         M(32) = 6000.0D-3 ! GeV
+         M(33) = 6300.0D-3 ! GeV
+         M(34) = 6500.0D-3 ! GeV
+         M(35) = 6700.0D-3 ! GeV
+         M(36) = 7000.0D-3 ! GeV
+C
+C     Width
+C
+         W( 1) =  0.06D-06 ! GeV
+         W( 2) =  0.09D-06 ! GeV 
+         W( 3) =  0.11D-06 ! GeV 
+         W( 4) =  0.13D-06 ! GeV
+         W( 5) =  0.15D-06 ! GeV
+         W( 6) =  0.17D-06 ! GeV
+         W( 7) =  0.20D-06 ! GeV
+         W( 8) =  0.22D-06 ! GeV
+         W( 9) =  0.26D-06 ! GeV 
+         W(10) =  0.30D-06 ! GeV 
+         W(11) =  0.35D-06 ! GeV
+         W(12) =  0.39D-06 ! GeV
+         W(13) =  0.43D-06 ! GeV
+         W(14) =  0.46D-06 ! GeV
+         W(15) =  0.47D-06 ! GeV
+         W(16) =  0.48D-06 ! GeV
+         W(17) =  0.53D-06 ! GeV
+         W(18) =  0.64D-06 ! GeV
+         W(19) =  0.86D-06 ! GeV
+         W(20) =  1.08D-06 ! GeV
+         W(21) =  1.62D-06 ! GeV
+         W(22) =  2.18D-06 ! GeV 
+         W(23) =  3.19D-06 ! GeV
+         W(24) =  4.30D-06 ! GeV
+         W(25) =  5.40D-06 ! GeV
+         W(26) =  6.43D-06 ! GeV
+         W(27) =  7.48D-06 ! GeV
+         W(28) =  8.57D-06 ! GeV
+         W(29) =  9.43D-06 ! GeV
+         W(30) = 10.74D-06 ! GeV
+         W(31) = 11.75D-06 ! GeV
+         W(32) = 14.04D-06 ! GeV
+         W(33) = 16.03D-06 ! GeV
+         W(34) = 17.32D-06 ! GeV
+         W(35) = 18.36D-06 ! GeV
+         W(36) = 20.04D-06 ! GeV
+C     
+         IFIRST = 1
+      ENDIF
+      II=0
+      DO I = 1,36
+         IF (MXX.GT.M(I)) THEN
+            II = I
+         ELSE
+            GO TO 100
+         ENDIF
+      ENDDO
+ 100  CONTINUE
+      IF (II.EQ.0) THEN
+         GXX = W(1)
+      ELSE IF (II.GT.0.AND.II.LT.36) THEN
+         GXX = W(II)+((MXX-M(II))/(M(II+1)-M(II)))*(W(II+1)-W(II))
+      ELSE
+         GXX = W(36)
+      ENDIF
+      RETURN
+      END
+      SUBROUTINE DARKVECTORWIDTH
+C  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      IMPLICIT NONE
+      INTEGER I, IFIRST, II
+      REAL*8 M(21),W(21)
+      DATA IFIRST/0/
+      SAVE IFIRST, M, W
+      DOUBLE PRECISION  MXX,GXX 
+      COMMON /MGXX/     MXX,GXX
+C     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      IF (IFIRST.EQ.0) THEN
+C
+C     Z' Mass
+C
+         M( 1) =  225.0D-3 ! GeV
+         M( 2) =  250.0D-3 ! GeV
+         M( 3) =  300.0D-3 ! GeV
+         M( 4) =  400.0D-3 ! GeV
+         M( 5) =  500.0D-3 ! GeV
+         M( 6) =  750.0D-3 ! GeV
+         M( 7) = 1000.0D-3 ! GeV
+         M( 8) = 1500.0D-3 ! GeV
+         M( 9) = 2000.0D-3 ! GeV
+         M(10) = 2500.0D-3 ! GeV
+         M(11) = 3000.0D-3 ! GeV
+         M(12) = 3500.0D-3 ! GeV
+         M(13) = 4000.0D-3 ! GeV
+         M(14) = 4500.0D-3 ! GeV
+         M(15) = 5000.0D-3 ! GeV
+         M(16) = 5500.0D-3 ! GeV
+         M(17) = 6000.0D-3 ! GeV
+         M(18) = 6300.0D-3 ! GeV
+         M(19) = 6500.0D-3 ! GeV
+         M(20) = 6700.0D-3 ! GeV
+         M(21) = 7000.0D-3 ! GeV
+C
+C     Width
+C
+         W( 1) =    0.48D-6 ! GeV
+         W( 2) =    0.54D-6 ! GeV 
+         W( 3) =    0.64D-6 ! GeV 
+         W( 4) =    0.86D-6 ! GeV
+         W( 5) =    1.07D-6 ! GeV
+         W( 6) =    1.62D-6 ! GeV
+         W( 7) =    2.11D-6 ! GeV
+         W( 8) =    3.15D-6 ! GeV
+         W( 9) =    4.33D-6 ! GeV 
+         W(10) =    5.40D-6 ! GeV 
+         W(11) =    6.37D-6 ! GeV
+         W(12) =    7.50D-6 ! GeV
+         W(13) =    8.60D-6 ! GeV
+         W(14) =    9.53D-6 ! GeV
+         W(15) =   10.81D-6 ! GeV
+         W(16) =   11.68D-6 ! GeV
+         W(17) =   12.76D-6 ! GeV
+         W(18) =   13.36D-6 ! GeV
+         W(19) =   13.95D-6 ! GeV
+         W(20) =   14.31D-6 ! GeV
+         W(21) =   14.93D-6 ! GeV
+C     
+         IFIRST = 1
+      ENDIF
+      II=0
+      DO I = 1,21
+         IF (MXX.GT.M(I)) THEN
+            II = I
+         ELSE
+            GO TO 100
+         ENDIF
+      ENDDO
+ 100  CONTINUE
+      IF (II.EQ.0) THEN
+         GXX = W(1)
+      ELSE IF (II.GT.0.AND.II.LT.21) THEN
+         GXX = W(II)+((MXX-M(II))/(M(II+1)-M(II)))*(W(II+1)-W(II))
+      ELSE
+         GXX = W(21)
+      ENDIF
+      RETURN
+      END
+         
       SUBROUTINE KK2f_WignerIni(KFbeam,CMSene,PolBeam1,PolBeam2, Polar1,Polar2) 
 */////////////////////////////////////////////////////////////////////////////////////
 *//                                                                                 //
@@ -448,7 +741,7 @@
 *
       DOUBLE PRECISION  xxf(4)
       REAL              rvec(10)
-      INTEGER           i,j,k
+      INTEGER           i,j,k,izpos,indecay
       INTEGER           LevPri,Ie1Pri,Ie2Pri
       INTEGER           KFfin
       INTEGER           TauIsInitialized
@@ -460,6 +753,16 @@
       DOUBLE PRECISION  WtSetNew(200), WtBest, WtBest1, WtBest2
       DOUBLE PRECISION  rn
       DOUBLE PRECISION  MminCEEX
+      INTEGER iforce,iddarkmother,nhep,nhep0,nrep,nrepmax,IDSPECIAL,IBOSON,ifspecial
+      LOGICAL PASS
+      DOUBLE PRECISION MXX,GXX
+      DOUBLE PRECISION MPAIR,Z
+      COMMON /IDSPECIAL/ IDSPECIAL
+      COMMON /MGXX/     MXX,GXX
+      DATA   NREPMAX    /100/
+      INTEGER IPAIRPHOTOS
+      COMMON /IPAIRPHOTOS/ IPAIRPHOTOS
+      COMMON /IFSPECIAL/ IFSPECIAL
 *-----------------------------------------------------------
       m_nevgen   = m_nevgen +1
       m_ypar( 9) = m_nevgen
@@ -637,12 +940,222 @@
                CALL TauPair_Make1        ! tau decay generation
                CALL TauPair_ImprintSpin  ! introduction of spin effects by rejection
                CALL TauPair_Make2        ! book-keeping, Photos, and pyhepc(2) HepEvt-->Pythia
-               IF (LevPri.EQ.-1) CALL KKDUMPHEP(m_nevgen,0,0)
+C               IF (LevPri.EQ.-1) CALL KKDUMPHEP(m_nevgen,0,0)
+            ENDIF
+         ENDIF
+         CALL IZPOZI(IZPOS,INDECAY)
+         CALL DARK_SET(1,iddarkmother,iforce,IBOSON)
+         CALL NHEPDIM(NHEP0,IDSPECIAL,MPAIR)
+         NHEP=NHEP0
+         NREP=0
+ 7       CONTINUE
+
+         if(IZPOS.gt.0) THEN
+            IF (IPAIRPHOTOS.EQ.-3) THEN
+               CALL PHOTOS(IZPOS)
+            ELSE
+               CALL PHOTOS_PROCESS_PARTICLE(IZPOS) 
+            ENDIF
+         ENDIF
+
+         NREP = NREP+1
+         CALL NHEPDIM(NHEP,IDSPECIAL,MPAIR)
+         Z = 0 
+         IF (MPAIR.GT.0.0.AND.GXX.GT.0.0) Z = (MPAIR-MXX)/GXX
+         PASS = ((NHEP.EQ.NHEP0+3).AND.(ABS(Z).LE.10))
+         IF (IFORCE.EQ.1) THEN
+            IF (.NOT.PASS) THEN
+               IF (NREP.EQ.NREPMAX) GOTO 100
+               GOTO 7
+            ENDIF
+         ENDIF
+
+         IF (IFSPECIAL.EQ.1) THEN
+            IF (NHEP.GT.NHEP0.AND.IFORCE.EQ.1.AND.IBOSON.NE.1) CALL DARK_FLIP
+         ENDIF
+
+         IF (NHEP.GT.NHEP0) CALL pyhepc(2) ! HepEvt-->Pythia must be repeated if lepton pair is added
+
+         IF (LevPri.EQ.-1) THEN 
+            CALL KKDUMPHEP(m_nevgen,0,0)
+            IF (PASS) THEN
+               WRITE (*,*),'NEV,NREP,NHEP,NHEP0,MPAIR,M,G,Z: ',
+     C                      m_nevgen,NREP,NHEP,NHEP0,MPAIR,MXX,GXX,Z
             ENDIF
          ENDIF
       ENDIF
       END                       !!! end of KK2f_Make !!!
+    
+      SUBROUTINE DARK_FLIP
+      INCLUDE 'HepEvt.fi'
+      DOUBLE PRECISION R(4),PP(4),PM(4),XN(4),XN0(4),PBOOST(5),FI,TH,phoan1,phoan2
+      PARAMETER (MAXSTA=10000)
+      INTEGER STACK(MAXSTA),LAST,FIRST
+      INTEGER DPARITY
+      COMMON /DPARITY/ DPARITY
 
+
+C -- preparation of transformation parameters
+      DO K=1,NHEP
+            IF (IDHEP(K).EQ.15) THEN
+               ITM=K
+               DO L=1,4
+                  PM(L)=PHEP(L,K)
+                  PBOOST(L)=PHEP(L,K)
+               ENDDO
+               PBOOST(5)=PHEP(5,K)
+            ENDIF
+            IF (IDHEP(K).EQ.-15) THEN
+               ITP=K
+               DO L=1,4
+                  PP(L)=PHEP(L,K)
+               ENDDO
+            ENDIF
+      ENDDO
+      
+      IF (DPARITY.EQ.0) THEN ! scalar
+!        XN normal to reaction plane (x cordinate
+         CALL PHOEPS (PP, PM, XN)  
+      ELSE ! pseudoscalar
+         CALL PHOEPS (PP, PM, XN0) ! (x cordinate
+         CALL PHOEPS (XN0, PM, XN) ! (y cordinate
+      ENDIF
+
+      FI=PHOAN1(XN(1),XN(2))
+      TH=PHOAN2(XN(3),SQRT(XN(1)**2+XN(2)**2))
+      CALL PHORO3(-FI,XN(1))
+      CALL PHORO2(-TH,XN(1))
+      CALL BUST(1,PBOOST,PM)
+
+
+
+C     --  we have to go over all daughters of tau, daughters-dauughers etc.
+C     --  need improvement for cases when decendants may be separated from 
+C     --  earlier parts of cascade by particles of other sub processes
+        FIRST=JDAHEP(1,ITM)
+        LAST=JDAHEP(2,ITM)
+        IF ((LAST.EQ.0).OR.(LAST.LT.FIRST)) RETURN
+        NSTACK=0
+ 20     DO 50 I=FIRST,LAST
+                    
+         DO L=1,4
+            R(L)=PHEP(L,I)
+         ENDDO
+         CALL BUST( 1,PBOOST,R)
+         CALL PHORO3(-FI,R(1))
+         CALL PHORO2(-TH,R(1))
+         R(1)=-R(1)
+         R(2)=-R(2)
+         CALL PHORO2( TH,R(1))
+         CALL PHORO3( FI,R(1))        
+         CALL BUST(-1,PBOOST,R)
+         DO L=1,4
+            PHEP(L,I)=R(L)
+         ENDDO
+
+      IF (JDAHEP(1,I).NE.0) THEN
+         NSTACK=NSTACK+1
+         STACK(NSTACK)=I
+      ENDIF
+ 50   CONTINUE
+      
+      IF (NSTACK.NE.0) THEN
+         FIRST=JDAHEP(1,STACK(NSTACK))
+        LAST=JDAHEP(2,STACK(NSTACK))
+        IP=STACK(NSTACK)
+        NSTACK=NSTACK-1
+        GOTO 20
+      ENDIF
+      RETURN
+         
+ !        write(*,*) "  "
+ !        write(*,*) "  "
+ !        write(*,*) "  "
+
+
+
+      END
+      SUBROUTINE BUST(IFI,PBOOS,PHEP)
+      IMPLICIT NONE
+      INTEGER IFI,J
+      REAL*8 PHEP(4),PBOOS(5),BET1(3),BET2(3),GAM,PB
+      DO 10 J=1,3
+        BET1(J)=-PBOOS(J)/PBOOS(5)  
+   10 BET2(J)=PBOOS(J)/PBOOS(5)
+      GAM=PBOOS(4)/PBOOS( 5)
+
+C--
+C--   Boost vector to parent rest frame...
+      IF (IFI.EQ.1) THEN
+      PB=BET1(1)*PHEP(1)+BET1(2)*PHEP(2)+BET1(3)*PHEP(3)
+      DO 30 J=1,3
+ 30      PHEP(J)=PHEP(J)+BET1(J)*(PHEP(4)+PB/(GAM+1.D0))
+         PHEP(4)=GAM*PHEP(4)+PB
+      ELSE
+         
+C--
+C--    ...or boost back.
+         PB=BET2(1)*PHEP(1)+BET2(2)*PHEP(2)+BET2(3)*PHEP(3)
+         DO 40 J=1,3
+   40    PHEP(J)=PHEP(J)+BET2(J)*(PHEP(4)+PB/(GAM+1.D0))
+         PHEP(4)=GAM*PHEP(4)+PB
+      ENDIF
+      END
+
+      SUBROUTINE IZPOZI(IZPOS,INDECAY)
+      IMPLICIT NONE
+      INTEGER IDDARKMOTHER,IFORCE,IBOSON,IZPOS,INDECAY,ISWHO,K
+      INCLUDE 'HepEvt.fi'
+      CALL DARK_SET(1,iddarkmother,iforce,IBOSON)
+      IZPOS=0
+      ISWHO=iddarkmother
+        DO K=1,NHEP
+          if (IDHEP(K).EQ.ISWHO.AND.JDAHEP(K,1).NE.0) IZPOS=K
+        ENDDO
+      INDECAY=0
+C     WRITE (*,*) ISWHO, IDDARKMOTHER, IZPOS, INDECAY  
+      RETURN
+      END
+
+      SUBROUTINE NHEPDIM(NHP,IDSPECIAL,MPAIR)
+      INCLUDE 'HepEvt.fi'
+      INTEGER          NHP, IDSPECIAL, I, IDAU1, IDAU2
+      DOUBLE PRECISION MPAIR,PX,PY,PZ,EN
+      NHP=NHEP
+      PX = 0
+      PY = 0
+      PZ = 0
+      EN = 0
+      MPAIR = 0
+      DO I=1,NHEP
+         IF (IDHEP(I).EQ.IDSPECIAL.AND.ISTHEP(I).GT.1) THEN
+            IDAU1 = JDAHEP(1,I)
+            IDAU2 = JDAHEP(2,I)
+            PX = PHEP(1,IDAU1) + PHEP(1,IDAU2)
+            PY = PHEP(2,IDAU1) + PHEP(2,IDAU2)
+            PZ = PHEP(3,IDAU1) + PHEP(3,IDAU2)
+            EN = PHEP(4,IDAU1) + PHEP(4,IDAU2)
+            MPAIR = SQRT(MAX(EN*EN - PX*PX - PY*PY - PZ*PZ,0.0D0))
+!            WRITE (*,*),'NHEP,PX,PY,PZ,EN,MPAIR: ', nhep,px,py,pz,en,mpair
+            GOTO 10
+         ENDIF
+      ENDDO
+ 10   CONTINUE
+      END
+      
+      SUBROUTINE DARK_SET(MODE,iddarkmother,iforce,IBOSON)
+      save i,j,k
+      IF(MODE.EQ.0) THEN
+       i=iddarkmother
+       j=iforce
+       k=IBOSON
+      else
+       iddarkmother=i
+       iforce=j
+       IBOSON=k
+      endif
+      
+      END
       SUBROUTINE KK2f_ZBoostAll(exe)
 *///////////////////////////////////////////////////////////////////////////////
 *//                                                                           //

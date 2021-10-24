@@ -394,7 +394,7 @@
          iddarkmother=23        ! PDGid of particle decaying with dark
          idspecial=53            ! dark PDG identifier
          mxx = DBLE(XPAR(ITAUXPAR+916))       ! dark mass
-         CALL DARKSCALARWIDTH                 ! dark width
+         CALL DARKSCALARWIDTH   ! dark width
          speciallife=DBLE(XPAR(ITAUXPAR+917)) ! dark lifetime
          iboson=INT(XPAR(ITAUXPAR+918))       ! switch if pair produced through state of spin 1 [Default:scalar]
          dparity=INT(XPAR(ITAUXPAR+919))      ! Dark Parity: scalar=0;pseudoscalar=1 [Default:scalar]
@@ -406,11 +406,16 @@
          normfmu=100            ! extra enhancement for muon pairs.
          ifphotons=0            ! photons brem is treated differently
          iddarkmother=23        ! PDGid of particle decaying with dark
-         idspecial=53            ! dark PDG identifier
          mxx = DBLE(XPAR(ITAUXPAR+916))       ! dark mass
-         CALL DARKSCALARWIDTH                 ! dark width
          speciallife=DBLE(XPAR(ITAUXPAR+917)) ! dark lifetime
          iboson=INT(XPAR(ITAUXPAR+918))       ! switch if pair produced through state of spin 1 [Default:scalar]
+         if (iboson.eq.0) then
+            CALL DARKSCALARWIDTH ! dark width
+            idspecial=53         ! dark PDG identifier
+         else if (iboson.eq.1) then
+            CALL DARKVECTORWIDTH ! Z' width
+            idspecial=26         ! PDG identifier
+         endif
          dparity=INT(XPAR(ITAUXPAR+919))      ! Dark Parity: scalar=0;pseudoscalar=1 [Default:scalar]
       else if (IPAIRPHOTOS.EQ.-1)  THEN ! RADIATE SM NONE/E-E+/MU-MU+ PAIR COCKTAIL
          ifpair=1               ! general switch for pair emission
@@ -566,6 +571,86 @@ C
          GXX = W(II)+((MXX-M(II))/(M(II+1)-M(II)))*(W(II+1)-W(II))
       ELSE
          GXX = W(36)
+      ENDIF
+      RETURN
+      END
+      SUBROUTINE DARKVECTORWIDTH
+C  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      IMPLICIT NONE
+      INTEGER I, IFIRST, II
+      REAL*8 M(21),W(21)
+      DATA IFIRST/0/
+      SAVE IFIRST, M, W
+      DOUBLE PRECISION  MXX,GXX 
+      COMMON /MGXX/     MXX,GXX
+C     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      IF (IFIRST.EQ.0) THEN
+C
+C     Z' Mass
+C
+         M( 1) =  225.0D-3 ! GeV
+         M( 2) =  250.0D-3 ! GeV
+         M( 3) =  300.0D-3 ! GeV
+         M( 4) =  400.0D-3 ! GeV
+         M( 5) =  500.0D-3 ! GeV
+         M( 6) =  750.0D-3 ! GeV
+         M( 7) = 1000.0D-3 ! GeV
+         M( 8) = 1500.0D-3 ! GeV
+         M( 9) = 2000.0D-3 ! GeV
+         M(10) = 2500.0D-3 ! GeV
+         M(11) = 3000.0D-3 ! GeV
+         M(12) = 3500.0D-3 ! GeV
+         M(13) = 4000.0D-3 ! GeV
+         M(14) = 4500.0D-3 ! GeV
+         M(15) = 5000.0D-3 ! GeV
+         M(16) = 5500.0D-3 ! GeV
+         M(17) = 6000.0D-3 ! GeV
+         M(18) = 6300.0D-3 ! GeV
+         M(19) = 6500.0D-3 ! GeV
+         M(20) = 6700.0D-3 ! GeV
+         M(21) = 7000.0D-3 ! GeV
+C
+C     Width
+C
+         W( 1) =    0.48D-6 ! GeV
+         W( 2) =    0.54D-6 ! GeV 
+         W( 3) =    0.64D-6 ! GeV 
+         W( 4) =    0.86D-6 ! GeV
+         W( 5) =    1.07D-6 ! GeV
+         W( 6) =    1.62D-6 ! GeV
+         W( 7) =    2.11D-6 ! GeV
+         W( 8) =    3.15D-6 ! GeV
+         W( 9) =    4.33D-6 ! GeV 
+         W(10) =    5.40D-6 ! GeV 
+         W(11) =    6.37D-6 ! GeV
+         W(12) =    7.50D-6 ! GeV
+         W(13) =    8.60D-6 ! GeV
+         W(14) =    9.53D-6 ! GeV
+         W(15) =   10.81D-6 ! GeV
+         W(16) =   11.68D-6 ! GeV
+         W(17) =   12.76D-6 ! GeV
+         W(18) =   13.36D-6 ! GeV
+         W(19) =   13.95D-6 ! GeV
+         W(20) =   14.31D-6 ! GeV
+         W(21) =   14.93D-6 ! GeV
+C     
+         IFIRST = 1
+      ENDIF
+      II=0
+      DO I = 1,21
+         IF (MXX.GT.M(I)) THEN
+            II = I
+         ELSE
+            GO TO 100
+         ENDIF
+      ENDDO
+ 100  CONTINUE
+      IF (II.EQ.0) THEN
+         GXX = W(1)
+      ELSE IF (II.GT.0.AND.II.LT.21) THEN
+         GXX = W(II)+((MXX-M(II))/(M(II+1)-M(II)))*(W(II+1)-W(II))
+      ELSE
+         GXX = W(21)
       ENDIF
       RETURN
       END

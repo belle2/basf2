@@ -889,6 +889,10 @@ C
          IPKDEF=ABS(IDENT)! f00(980)
       ELSEIF  (ABS(IDENT).EQ.94144) THEN
          IPKDEF=ABS(IDENT)! invi
+      ELSEIF  (ABS(IDENT).EQ.53) THEN
+         IPKDEF=ABS(IDENT)! hl
+      ELSEIF  (ABS(IDENT).EQ.26) THEN
+         IPKDEF=ABS(IDENT)! zp
       ELSE
         PRINT *, 'STOP IN IPKDEF, WRONG IDENT=',IDENT
         STOP

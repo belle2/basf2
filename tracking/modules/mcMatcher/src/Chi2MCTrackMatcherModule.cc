@@ -32,7 +32,7 @@ Chi2MCTrackMatcherModule::Chi2MCTrackMatcherModule() : Module()
 {
   // Set module properties
   setDescription(R"DOC(Monte Carlo matcher using the helix parameters for matching by chi2-method)DOC");
-  setPropertyFlags(c_ParallelProcessingCertified);
+  // setPropertyFlags(c_ParallelProcessingCertified);
   // set module parameters
   std::vector<double> defaultCutOffs(6);
   defaultCutOffs[0] = 128024;
@@ -57,11 +57,21 @@ void Chi2MCTrackMatcherModule::initialize()
   m_MCParticles.isRequired();
   m_Tracks.isRequired();
   m_Tracks.registerRelationTo(m_MCParticles);
+
+  // Statistic variables
+  m_trackCount = 0;
+  m_notInvertableCount = 0;
+  m_noMatchCount = 0;
+  m_noMatchingCandidateCount = 0;
+  m_trackCount = 0;
+  m_covarianceMatrixCount = 0;
+  m_event = 0;
 }
 
 void Chi2MCTrackMatcherModule::event()
 {
-
+  m_event = m_event + 1;
+  B2DEBUG(1, "m_event = " << m_event);
   // suppress the ROOT "matrix is singular" error message
   auto default_gErrorIgnoreLevel = gErrorIgnoreLevel;
   gErrorIgnoreLevel = 5000;
@@ -69,7 +79,8 @@ void Chi2MCTrackMatcherModule::event()
   // get StoreArray length
   int nTracks = m_Tracks.getEntries();
   int nMCParticles = m_MCParticles.getEntries();
-
+  // tracks number of tracks for Debug statistics
+  m_trackCount = m_trackCount + nTracks;
   // check if there are m_Tracks and m_MCParticles to match to
   if (not nMCParticles or not nTracks) {
     // Cannot perfom matching
@@ -101,11 +112,14 @@ void Chi2MCTrackMatcherModule::event()
       // get trackfitresult of current track with clossest mass to current mcparticle Type
       auto trackFitResult = track->getTrackFitResultWithClosestMass(mcParticleType);
       TMatrixD Covariance5 = trackFitResult->getCovariance5();
-
+      // statistic variable counting number of covariance matricies
+      m_covarianceMatrixCount = m_covarianceMatrixCount + 1;
       // check if matrix is invertable
       double det = Covariance5.Determinant();
       if (det == 0.0) {
-        B2DEBUG(23, "Covariance5 matrix is not invertable. Continue with next MCParticle!");
+        // statistic variable counting number of not invertable covariance matricies
+        m_notInvertableCount = m_notInvertableCount + 1;
+        //Covariance5.Print();
         continue;
       }
 
@@ -163,6 +177,8 @@ void Chi2MCTrackMatcherModule::event()
     }
     // check if any matching candidate was found
     if (ip_min == -1) {
+      m_noMatchingCandidateCount = m_noMatchingCandidateCount + 1;
+      m_noMatchCount = m_noMatchCount + 1;
       continue;
     }
     // initialize Cut Off
@@ -189,9 +205,23 @@ void Chi2MCTrackMatcherModule::event()
     }
     if (chi2Min < cutOff) {
       m_Tracks[it]->addRelationTo(m_MCParticles[ip_min]);
+    } else {
+      m_noMatchCount = m_noMatchCount + 1;
     }
   }
   // reset ROOT Error Level to default
   gErrorIgnoreLevel = default_gErrorIgnoreLevel;
+}
+void Chi2MCTrackMatcherModule::terminate()
+{
+  //if (m_noMatchCount>0){
+  B2DEBUG(1, "For " << m_noMatchCount << "/" << m_trackCount << " tracks no relation was found.");
+  //}
+  //if (m_noMatchingCandidateCount>0){
+  B2DEBUG(1, "For " << m_noMatchingCandidateCount << "/" << m_trackCount << " tracks got no matching candidate");
+  //}
+  //if (m_notInvertableCount>0){
+  B2DEBUG(1, "" << m_notInvertableCount << "/" << m_covarianceMatrixCount << " covariance matrices where not invertable.");
+  //}
 }
 

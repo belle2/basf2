@@ -39,6 +39,8 @@ namespace Belle2 {
     /** Do matching for each event */
     void event() override;
 
+    /** Provides debug statistics*/
+    void terminate() override;
   private: //Parameters
 
     /** Parameter : Defines the Cut Off values for each charged particle. The Cut Off values in the list for
@@ -54,5 +56,13 @@ namespace Belle2 {
     StoreArray<MCParticle> m_MCParticles;
     /** Variable: Makes m_Tracks available in whole class */
     StoreArray<Track> m_Tracks;
+
+    /** Variables for Debug module statistics */
+    int m_notInvertableCount;
+    int m_noMatchCount;
+    int m_trackCount;
+    int m_covarianceMatrixCount;
+    int m_noMatchingCandidateCount;
+    int m_event;
   };
 }

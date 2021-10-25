@@ -235,7 +235,7 @@ namespace Belle2 {
     bool m_doSmearing; /**< A switch to control drift length smearing */
     bool m_addTimeWalk; /**< A switch used to control adding time-walk delay into the total drift time or not */
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
-    bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
+    bool m_addTimeOfFlight; /**< A switch used to control adding time of flight into the total drift time or not */
     bool m_addInWirePropagationDelay4Bg; /**< A switch used to control adding propagation delay into the total drift time or not for beam bg. */
     bool m_addTimeOfFlight4Bg;     /**< A switch used to control adding time of flight into the total drift time or not for beam bg. */
     bool m_outputNegativeDriftTime;     /**< A switch to output negative drift time to CDCHit */

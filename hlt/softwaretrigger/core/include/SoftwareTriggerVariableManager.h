@@ -8,8 +8,10 @@
 #pragma once
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
+#include <boost/algorithm/string.hpp>
 
 #include <memory>
+#include <vector>
 
 namespace Belle2 {
   namespace SoftwareTrigger {
@@ -99,6 +101,14 @@ namespace Belle2 {
        * (and if there is an entry with the same name as the variable in this object).
        */
       SoftwareTriggerVariable* getVariable(const std::string& variableName);
+
+      /**
+       * The GeneralCut parses MetaVariables into it's variable name and arguments.
+       * GeneralCut requires any VariableManager to get a variable through this parsed state.
+       * This overload combines the variableName and vector of strings to the original Metavariable call
+       * using boost::algorithm::join and passes it to getVariable(const std::string& variableName)
+       */
+      SoftwareTriggerVariable* getVariable(const std::string& variableName, const std::vector<std::string>& arguments);
 
     private:
       /// Make the constructor private: only use this class as a singleton.

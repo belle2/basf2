@@ -28,6 +28,32 @@ Variable::Manager& Variable::Manager::Instance()
   return v;
 }
 
+const Variable::Manager::Var* Variable::Manager::getVariable(const std::string& functionName,
+    const std::vector<std::string>& functionArguments)
+{
+  // Combine to full name for alias resolving
+  std::string fullname = functionName + "(" + boost::algorithm::join(functionArguments, ", ") + ")";
+
+  // resolve aliases. Aliases might point to other aliases so we need to keep a
+  // set of what we have seen so far to avoid running into infinite loops
+  std::set<std::string> aliasesSeen;
+  for (auto aliasIter = m_alias.find(fullname); aliasIter != m_alias.end(); aliasIter = m_alias.find(fullname)) {
+    const auto [it, added] = aliasesSeen.insert(fullname);
+    if (!added) {
+      B2FATAL("Encountered a loop in the alias definitions between the aliases "
+              << boost::algorithm::join(aliasesSeen, ", "));
+    }
+    fullname = aliasIter->second;
+  }
+  auto mapIter = m_variables.find(fullname);
+  if (mapIter == m_variables.end()) {
+    if (!createVariable(fullname, functionName, functionArguments)) return nullptr;
+    mapIter = m_variables.find(fullname);
+    if (mapIter == m_variables.end()) return nullptr;
+  }
+  return mapIter->second.get();
+}
+
 const Variable::Manager::Var* Variable::Manager::getVariable(std::string name)
 {
   // resolve aliases. Aliases might point to other aliases so we need to keep a
@@ -221,6 +247,40 @@ bool Variable::Manager::createVariable(const std::string& name)
   }
 
   B2FATAL("Encountered bad variable name '" << name << "'. Maybe you misspelled it?");
+  return false;
+}
+
+bool Variable::Manager::createVariable(const std::string& fullname, const std::string& functionName,
+                                       const std::vector<std::string>& functionArguments)
+{
+  // Search function name in parameter variables
+  auto parameterIter = m_parameter_variables.find(functionName);
+  if (parameterIter != m_parameter_variables.end()) {
+
+    std::vector<double> arguments;
+    for (auto& arg : functionArguments) {
+      double number = 0;
+      number = Belle2::convertString<double>(arg);
+      arguments.push_back(number);
+    }
+    auto pfunc = parameterIter->second->function;
+    auto func = [pfunc, arguments](const Particle * particle) -> std::variant<double, int, bool> { return pfunc(particle, arguments); };
+    m_variables[fullname] = std::make_shared<Var>(fullname, func, parameterIter->second->description, parameterIter->second->group,
+                                                  parameterIter->second->variabletype);
+    return true;
+
+  }
+
+  // Search function fullname in meta variables
+  auto metaIter = m_meta_variables.find(functionName);
+  if (metaIter != m_meta_variables.end()) {
+    auto func = metaIter->second->function(functionArguments);
+    m_variables[fullname] = std::make_shared<Var>(fullname, func, metaIter->second->description, metaIter->second->group,
+                                                  metaIter->second->variabletype);
+    return true;
+  }
+
+  B2FATAL("Encountered bad variable name '" << fullname << "'. Maybe you misspelled it?");
   return false;
 }
 

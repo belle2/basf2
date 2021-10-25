@@ -394,7 +394,7 @@
          iddarkmother=23        ! PDGid of particle decaying with dark
          idspecial=53            ! dark PDG identifier
          mxx = DBLE(XPAR(ITAUXPAR+916))       ! dark mass
-         CALL DARKSCALARWIDTH   ! dark width
+         CALL DARKSCALARWIDTH                 ! dark width
          speciallife=DBLE(XPAR(ITAUXPAR+917)) ! dark lifetime
          iboson=INT(XPAR(ITAUXPAR+918))       ! switch if pair produced through state of spin 1 [Default:scalar]
          dparity=INT(XPAR(ITAUXPAR+919))      ! Dark Parity: scalar=0;pseudoscalar=1 [Default:scalar]
@@ -1071,7 +1071,6 @@ C     --  earlier parts of cascade by particles of other sub processes
  !        write(*,*) "  "
  !        write(*,*) "  "
  !        write(*,*) "  "
-
 
 
       END

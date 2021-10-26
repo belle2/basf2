@@ -28,25 +28,25 @@ namespace Belle2 {
   bool almostEqualDouble(const double& a, const double& b);
 
   /**
-   * This is a class template which takes a template class operation as template argument.
-   * This allows passing the functional class templates e.g std::greater<T>,  which are templates themselves.
-   *
-   * In the Nodes we often have to compare two node evaluation results with each other.
-   * They are of type type `variant<double, int, bool>`. Variants cannot be compared to each other directly, you have to extract the values and compare them.
-   * This gives nine different combinations for two variants.
-   * C++ introduced the std::visit concept for this purpose of variant evaluation.
-   * std::visit takes a Visitor class and the variants as parameters.
-   * One way to write a Visitor is the following way, where a operator() overload is supplied for every data type combination the variants can have.
-   * The visitor has to be exhaustive (every data type combination must be covered), and every operator() overload has to have the same return type.
-   *
-   * We have to do this comparisons for all comparison operators e.g ==, !=, > ...
-   * We can do this by passing the corresponding functional class template e.g std::equal_to<T>, std::not_equal_to<T>, std::greater<T>
-   * The datatype T is substituted in the operator() overload depending on the data type combination.
-   *
-   * When comparing double/int and a bool the double/int overload of the functionals are used to disable implicit conversion to bool:
-   * std::equal<bool>{}(1.2, true) ==> true; 1.2 is implicitly converted to true, because of std::equal<bool>
-   * std::equal<double>{}(1.2, true) ==> false; true is implicity converted to 1.0, because of std::equal<double>
-   */
+    * This is a class template which takes a template class operation as template argument.
+    * This allows passing the functional class templates e.g std::greater<T>,  which are templates themselves.
+    *
+    * In the Nodes we often have to compare two node evaluation results with each other.
+    * They are of type type `variant<double, int, bool>`. Variants cannot be compared to each other directly, you have to extract the values and compare them.
+    * This gives nine different combinations for two variants.
+    * C++ introduced the std::visit concept for this purpose of variant evaluation.
+    * std::visit takes a Visitor class and the variants as parameters.
+    * One way to write a Visitor is the following way, where a operator() overload is supplied for every data type combination the variants can have.
+    * The visitor has to be exhaustive (every data type combination must be covered), and every operator() overload has to have the same return type.
+    *
+    * We have to do this comparisons for all comparison operators e.g ==, !=, > ...
+    * We can do this by passing the corresponding functional class template e.g std::equal_to<T>, std::not_equal_to<T>, std::greater<T>
+    * The datatype T is substituted in the operator() overload depending on the data type combination.
+    *
+    * When comparing double/int and a bool the double/int overload of the functionals are used to disable implicit conversion to bool:
+    * std::equal_to<bool>{}(1.2, true) ==> true; 1.2 is implicitly converted to true, because of std::equal<bool>
+    * std::equal_to<double>{}(1.2, true) ==> false; true is implicity converted to 1.0, because of std::equal<double>
+    */
   template <template <typename type> class operation>
   struct Visitor {
     /**
@@ -113,6 +113,78 @@ namespace Belle2 {
       return operation<int> {}(val0, val1);
     }
   };
+
+  /**
+   * Seperate Visitor struct for equal_to comparison of variant<double, int bool>.
+   * Uses almostEqualDouble if one argument is double.
+  **/
+  struct EqualVisitor {
+    /**
+     * double double overload with double comparison.
+     **/
+    bool operator()(const double& val0, const double& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * double int overload with double comparison.
+     **/
+    bool operator()(const double& val0, const int& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * double bool  overload with double comparison.
+     **/
+    bool operator()(const double& val0, const bool& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * int int overload with int comparison.
+     **/
+    bool operator()(const int& val0, const int& val1)
+    {
+      return std::equal_to<int> {}(val0, val1);
+    }
+    /**
+     * int bool overload with int comparison.
+     **/
+    bool operator()(const int& val0, const bool& val1)
+    {
+      return std::equal_to<int> {}(val0, val1);
+    }
+    /**
+     * int double overload with double comparison.
+     **/
+    bool operator()(const int& val0, const double& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * bool bool overload with bool comparison.
+     **/
+    bool operator()(const bool& val0, const bool& val1)
+    {
+      return std::equal_to<bool> {}(val0, val1);
+    }
+    /**
+     * bool double overload with double comparison.
+     **/
+    bool operator()(const bool& val0, const double& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * bool int overload with int comparison.
+     **/
+    bool operator()(const bool& val0, const int& val1)
+    {
+      return std::equal_to<int> {}(val0, val1);
+    }
+
+  };
+
 
   /**
   * Nodeclass with a single AbstractBooleanNode as child.
@@ -288,12 +360,27 @@ namespace Belle2 {
       if (std::holds_alternative<bool>(ret)) {
         return std::get<bool>(ret);
       } else if (std::holds_alternative<int>(ret)) {
-        B2WARNING("Static casting integer value to bool in cutstring evaluation." << LogVar("Cut substring",
-                  m_enode->decompile()) << LogVar("Casted value", std::get<int>(ret)));
+        if (static_cast<bool>(std::get<int>(ret)))  {
+          B2WARNING("Static casting of integer value to bool in cutstring evaluation." << LogVar("Cut substring",
+                    m_enode->decompile()) << LogVar("Casted value", std::get<int>(ret)) << LogVar("Casted to", "true"));
+        } else {
+          B2WARNING("Static casting of integer value to bool in cutstring evaluation." << LogVar("Cut substring",
+                    m_enode->decompile()) << LogVar("Casted value", std::get<int>(ret)) << LogVar("Casted to", "false"));
+        }
         return static_cast<bool>(std::get<int>(ret));
       } else if (std::holds_alternative<double>(ret)) {
-        B2WARNING("Static casting double value to bool in cutstring evaluation." <<  LogVar("Cut substring",
-                  m_enode->decompile()) << LogVar(" Casted value", std::get<double>(ret)));
+        if (static_cast<bool>(std::get<double>(ret))) {
+          // nan is considered false.
+          if (std::isnan(std::get<double>(ret))) {
+            return false;
+          }
+          B2WARNING("Static casting of double value to bool in cutstring evaluation." <<  LogVar("Cut substring",
+                    m_enode->decompile()) << LogVar(" Casted value", std::get<double>(ret)) << LogVar("Casted to", "true"));
+        } else {
+          B2WARNING("Static casting of double value to bool in cutstring evaluation." <<  LogVar("Cut substring",
+                    m_enode->decompile()) << LogVar(" Casted value", std::get<double>(ret)) << LogVar("Casted to", "false"));
+        }
+
         return static_cast<bool>(std::get<double>(ret));
       } else {
         throw std::runtime_error("UnaryRelationalNode should evaluate to bool.");
@@ -357,7 +444,7 @@ namespace Belle2 {
       std::variant<double, int, bool> right_eval = m_right_enode->evaluate(p);
       switch (m_coperator) {
         case ComparisonOperator::EQUALEQUAL:
-          return std::visit(Visitor<std::equal_to> {}, left_eval, right_eval);
+          return std::visit(EqualVisitor{}, left_eval, right_eval);
           break;
         case ComparisonOperator::GREATEREQUAL:
           return std::visit(Visitor<std::greater_equal> {}, left_eval, right_eval);
@@ -373,7 +460,7 @@ namespace Belle2 {
           break;
 
         case ComparisonOperator::NOTEQUAL:
-          return std::visit(Visitor<std::not_equal_to> {}, left_eval, right_eval);
+          return !std::visit(EqualVisitor{}, left_eval, right_eval);
           break;
         default:
           throw std::runtime_error("BinaryRelationalNode has an invalid ComparisonOperator.");
@@ -663,9 +750,13 @@ namespace Belle2 {
           } else if (std::holds_alternative<double>(l_val) && std::holds_alternative<double>(r_val)) {
             ret = std::get<double>(l_val) + std::get<double>(r_val);
             return ret;
+          } else if (std::holds_alternative<double>(l_val) && std::holds_alternative<int>(r_val)) {
+            ret = std::get<double>(l_val) + std::get<int>(r_val);
+            return ret;
+          } else if (std::holds_alternative<int>(l_val) && std::holds_alternative<double>(r_val)) {
+            ret = std::get<int>(l_val) + std::get<double>(r_val);
+            return ret;
           } else {
-            std::cout << typeid(l_val).name() << std::endl;
-            std::cout << typeid(r_val).name() << std::endl;
             throw std::runtime_error("Invalid datatypes in plus operation.");
           }
           break;
@@ -676,9 +767,13 @@ namespace Belle2 {
           } else if (std::holds_alternative<double>(l_val) && std::holds_alternative<double>(r_val)) {
             ret = std::get<double>(l_val) - std::get<double>(r_val);
             return ret;
+          } else if (std::holds_alternative<double>(l_val) && std::holds_alternative<int>(r_val)) {
+            ret = std::get<double>(l_val) - std::get<int>(r_val);
+            return ret;
+          } else if (std::holds_alternative<int>(l_val) && std::holds_alternative<double>(r_val)) {
+            ret = std::get<int>(l_val) - std::get<double>(r_val);
+            return ret;
           } else {
-            std::cout << typeid(l_val).name() << std::endl;
-            std::cout << typeid(r_val).name() << std::endl;
             throw std::runtime_error("Invalid datatypes in minus operation.");
           }
           break;
@@ -689,18 +784,30 @@ namespace Belle2 {
           } else if (std::holds_alternative<double>(l_val) && std::holds_alternative<double>(r_val)) {
             ret = std::get<double>(l_val) * std::get<double>(r_val);
             return ret;
+          } else if (std::holds_alternative<double>(l_val) && std::holds_alternative<int>(r_val)) {
+            ret = std::get<double>(l_val) * std::get<int>(r_val);
+            return ret;
+          } else if (std::holds_alternative<int>(l_val) && std::holds_alternative<double>(r_val)) {
+            ret = std::get<int>(l_val) * std::get<double>(r_val);
+            return ret;
           } else {
-            std::cout << typeid(l_val).name() << std::endl;
-            std::cout << typeid(r_val).name() << std::endl;
             throw std::runtime_error("Invalid datatypes in product operation.");
           }
           break;
         case ArithmeticOperation::DIVISION:
           if (std::holds_alternative<int>(l_val) && std::holds_alternative<int>(r_val)) {
-            ret = std::get<int>(l_val) / std::get<int>(r_val);
+            // Always do double division
+            double d = std::get<int>(r_val);
+            ret = std::get<int>(l_val) / d;
             return ret;
           } else if (std::holds_alternative<double>(l_val) && std::holds_alternative<double>(r_val)) {
             ret = std::get<double>(l_val) / std::get<double>(r_val);
+            return ret;
+          } else if (std::holds_alternative<double>(l_val) && std::holds_alternative<int>(r_val)) {
+            ret = std::get<double>(l_val) / std::get<int>(r_val);
+            return ret;
+          } else if (std::holds_alternative<int>(l_val) && std::holds_alternative<double>(r_val)) {
+            ret = std::get<int>(l_val) / std::get<double>(r_val);
             return ret;
           } else {
             throw std::runtime_error("Invalid datatypes in division operation.");
@@ -712,6 +819,12 @@ namespace Belle2 {
             return ret;
           } else if (std::holds_alternative<double>(l_val) && std::holds_alternative<double>(r_val)) {
             ret = std::pow(std::get<double>(l_val), std::get<double>(r_val));
+            return ret;
+          } else if (std::holds_alternative<double>(l_val) && std::holds_alternative<int>(r_val)) {
+            ret = std::pow(std::get<double>(l_val), std::get<int>(r_val));
+            return ret;
+          } else if (std::holds_alternative<int>(l_val) && std::holds_alternative<double>(r_val)) {
+            ret = std::pow(std::get<int>(l_val), std::get<double>(r_val));
             return ret;
           } else {
             throw std::runtime_error("Invalid datatypes in power operation.");

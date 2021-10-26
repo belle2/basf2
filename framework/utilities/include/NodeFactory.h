@@ -9,6 +9,7 @@
 #pragma once
 #include <memory>
 #include <framework/utilities/CutNodes.h>
+#include <framework/logging/Logger.h>
 
 #include <boost/python/tuple.hpp>
 #include <boost/python/extract.hpp>
@@ -143,8 +144,14 @@ namespace Belle2 {
                right_node,
                aoperation));
       } else if (node_type == NodeType::IntegerNode) {
-        int i = py::extract<int>(tuple[1]);
-        return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new DataNode<AVariableManager, int>(i));
+        double d = py::extract<double>(tuple[1]);
+        if (std::numeric_limits<int>::min() <= d && d <= std::numeric_limits<int>::max()) {
+          int i = py::extract<int>(tuple[1]);
+          return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new DataNode<AVariableManager, int>(i));
+        } else {
+          B2WARNING("Overflow for integer constant in cut detected. Create Double Node instead.");
+          return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new DataNode<AVariableManager, double>(d));
+        }
       } else if (node_type == NodeType::DoubleNode) {
         // We have to check for inf and nan values.
         // use python math functions to check
@@ -152,7 +159,14 @@ namespace Belle2 {
         // Get tuple item as object
         py::object data = static_cast<py::object>(tuple[1]);
         if (py::extract<bool>(math.attr("isinf")(data))) {
-          double inf = std::numeric_limits<double>::infinity();
+          // Extract sign of inf float object
+          double inf_sign = py::extract<double>(math.attr("copysign")(1.0, data));
+          double inf;
+          if (inf_sign > 0) {
+            inf = std::numeric_limits<double>::infinity();
+          } else {
+            inf = -1 * std::numeric_limits<double>::infinity();
+          }
           return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new DataNode<AVariableManager, double>(inf));
         }
         if (py::extract<bool>(math.attr("isnan")(data))) {

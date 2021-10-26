@@ -143,7 +143,7 @@ namespace Belle2 {
      */
     void print() const override
     {
-      if (m_negation) std::cout << "not";
+      if (m_negation) std::cout << "not ";
       if (m_bracketized) std::cout << "[";
       m_bnode->print();
       if (m_bracketized) std::cout << "]";
@@ -156,7 +156,7 @@ namespace Belle2 {
     std::string decompile() const override
     {
       std::stringstream stringstream;
-      if (m_negation) stringstream << "not"; // Add negation keyword
+      if (m_negation) stringstream << "not "; // Add negation keyword
 
       if (m_bracketized) stringstream << "["; // Add opening bracket
       stringstream << m_bnode->decompile();

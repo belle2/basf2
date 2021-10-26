@@ -57,12 +57,12 @@ void DQMHistAnalysisTrackingHLTModule::event()
 {
 
   //check Tracking Abort Rate
-  int nEvents = 0;
-  bool hasError = false;
 
   TH1* hAbort = findHist("TrackingHLTDQM/NumberTrackingErrorFlags");
   if (hAbort != NULL) {
-    nEvents = hAbort->GetEntries();
+
+    bool hasError = false;
+    int nEvents = hAbort->GetEntries();
     double abortRate = hAbort->GetMean();
     hAbort->SetTitle(Form("Fraction of Events in which Tracking aborts = %.6f ", abortRate));
 

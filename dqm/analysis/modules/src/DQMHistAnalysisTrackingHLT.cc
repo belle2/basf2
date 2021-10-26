@@ -44,6 +44,7 @@ void DQMHistAnalysisTrackingHLTModule::initialize()
 
   gROOT->cd();
   m_cAbortRate = new TCanvas("TrackingAnalysis/c_AbortRate");
+
   // add MonitoringObject
   m_monObj = getMonitoringObject("trackingHLT");
 
@@ -56,12 +57,12 @@ void DQMHistAnalysisTrackingHLTModule::event()
 {
 
   //check Tracking Abort Rate
-  int nEvents = 0;
-  bool hasError = false;
 
   TH1* hAbort = findHist("TrackingHLTDQM/NumberTrackingErrorFlags");
   if (hAbort != NULL) {
-    nEvents = hAbort->GetEntries();
+
+    bool hasError = false;
+    int nEvents = hAbort->GetEntries();
     double abortRate = hAbort->GetMean();
     hAbort->SetTitle(Form("Fraction of Events in which Tracking aborts = %.6f ", abortRate));
 
@@ -69,25 +70,26 @@ void DQMHistAnalysisTrackingHLTModule::event()
     //check if number of errors is above the allowed limit
     if (abortRate > m_failureRateThreshold)
       hasError = true;
-  } else {
-    hasError = true;
-    B2INFO("Histogram TrackingHLTDQM/NumberTrackingErrorFlags from Tracking DQM not found!");
+
+    if (nEvents < m_statThreshold) m_cAbortRate->SetFillColor(kGray);
+    else if (hasError) m_cAbortRate->SetFillColor(kRed);
+    else m_cAbortRate->SetFillColor(kGreen);
+    m_cAbortRate->SetFrameFillColor(10);
+
+    m_cAbortRate->cd();
+    hAbort->Draw();
+
+  } else { // histogram not found
+    B2WARNING("Histogram TrackingHLTDQM/NumberTrackingErrorFlags from Tracking DQM not found!");
+    m_cAbortRate->SetFillColor(kGray);
   }
-
-  if (nEvents < m_statThreshold) m_cAbortRate->SetFillColor(kGray);
-  else if (hasError) m_cAbortRate->SetFillColor(kRed);
-  else m_cAbortRate->SetFillColor(kGreen);
-  m_cAbortRate->SetFrameFillColor(10);
-
-  m_cAbortRate->cd();
-  hAbort->Draw();
 
   m_cAbortRate->Modified();
   m_cAbortRate->Update();
 
+
   if (m_printCanvas)
     m_cAbortRate->Print("c_AbortRate.pdf");
-
 
   // add average number of tracks per event to Mirabelle
   double averageNTracks = -1;

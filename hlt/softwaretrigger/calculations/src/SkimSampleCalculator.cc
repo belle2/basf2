@@ -485,7 +485,6 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   double eMumuTotGammas = 0.;
   int nTracks = 0;
   double radmumu = 0.;
-  const double maxEoP = 0.4;
   int nGammas = m_gammaParticles->getListSize();
 
   for (int t = 0; t < nGammas; t++) {
@@ -526,7 +525,6 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
       const double p1MomLab = V4p1.P();
       double highestP = p1MomLab;
-      const double p1Eop = Variable::eclClusterEoP(part1);
       const double p1CDChits = trackFit1->getHitPatternCDC().getNHits();
       const PIDLikelihood* p1Pid = part1->getPIDLikelihood();
       bool p1hasKLMid = 0;
@@ -567,7 +565,6 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
         const double p2MomLab = V4p2.P();
         double lowestP = p2MomLab;
-        const double p2Eop = Variable::eclClusterEoP(part2);
         const double p2CDChits = trackFit2->getHitPatternCDC().getNHits();
         const PIDLikelihood* p2Pid = part2->getPIDLikelihood();
         bool p2hasKLMid = 0;

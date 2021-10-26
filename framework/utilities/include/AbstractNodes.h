@@ -46,6 +46,10 @@ namespace Belle2 {
      * pure virutal decompile function, has to be overridden in derived class
     **/
     virtual std::string decompile() const = 0;
+    /**
+     * Virtual destructor
+    **/
+    virtual ~AbstractBooleanNode() {};
   };
 
   /**
@@ -78,6 +82,11 @@ namespace Belle2 {
      * pure virutal decompile function, has to be overridden in derived class
     **/
     virtual std::string decompile() const = 0;
+    /**
+     * Virtual destructor
+    **/
+    virtual ~AbstractExpressionNode() {}
+
   };
 
   /**

@@ -164,6 +164,10 @@ namespace Belle2 {
 
       return stringstream.str();
     }
+    /**
+     * Destructor
+    **/
+    ~UnaryBooleanNode() {}
 
   private:
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
@@ -241,6 +245,10 @@ namespace Belle2 {
 
       return stringstream.str();
     }
+    /**
+     * Destructor
+    **/
+    ~BinaryBooleanNode() {}
 
   private:
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
@@ -308,6 +316,10 @@ namespace Belle2 {
     {
       return m_enode->decompile();
     }
+    /**
+     * Destructor
+    **/
+    ~UnaryRelationalNode() {}
 
   private:
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
@@ -392,6 +404,10 @@ namespace Belle2 {
 
       return stringstream.str();
     }
+    /**
+     * Destructor
+    **/
+    ~BinaryRelationalNode() {}
 
   private:
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
@@ -510,6 +526,11 @@ namespace Belle2 {
       stringstream << m_right_enode->decompile();
       return stringstream.str();
     }
+    /**
+     * Destructor
+    **/
+    ~TernaryRelationalNode() {}
+
   private:
     friend class NodeFactory;
     /**
@@ -590,6 +611,11 @@ namespace Belle2 {
       if (m_parenthesized) stringstream << " )";
       return stringstream.str();
     }
+    /**
+     * Destructor
+    **/
+    ~UnaryExpressionNode() {}
+
   private:
     friend class NodeFactory;
     /**
@@ -720,6 +746,10 @@ namespace Belle2 {
 
       return stringstream.str();
     }
+    /**
+     * Destructor
+    **/
+    ~BinaryExpressionNode() {}
 
   private:
     friend class NodeFactory;
@@ -787,6 +817,11 @@ namespace Belle2 {
       stringstream << m_value;
       return stringstream.str();
     }
+    /**
+     * Destructor
+    **/
+    ~DataNode() {}
+
   };
 
   /** Class which stores the name of a variable.
@@ -844,6 +879,11 @@ namespace Belle2 {
           "Cut string has an invalid format: Variable not found: " + m_name);
       }
     }
+    /**
+     * Destructor
+    **/
+    ~IdentifierNode() {}
+
   private:
     friend class NodeFactory;
     /**
@@ -913,6 +953,11 @@ namespace Belle2 {
           "Cut string has an invalid format: Metavariable not found: " + fullname);
       }
     }
+    /**
+     * Destructor
+    **/
+    ~FunctionNode() {}
+
   private:
     friend class NodeFactory;
     /**

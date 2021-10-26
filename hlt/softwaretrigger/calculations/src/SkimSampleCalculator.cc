@@ -485,7 +485,6 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   double eMumuTotGammas = 0.;
   int nTracks = 0;
   double radmumu = 0.;
-  const double maxEoP = 0.4;
   int nGammas = m_gammaParticles->getListSize();
 
   for (int t = 0; t < nGammas; t++) {
@@ -526,7 +525,6 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
       const double p1MomLab = V4p1.P();
       double highestP = p1MomLab;
-      const double p1Eop = Variable::eclClusterEoP(part1);
       const double p1CDChits = trackFit1->getHitPatternCDC().getNHits();
       const PIDLikelihood* p1Pid = part1->getPIDLikelihood();
       bool p1hasKLMid = 0;
@@ -540,7 +538,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
       const double enECLTrack1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
-      const bool goodTrk1 = enECLTrack1 > 0 && enECLTrack1 < 0.4 && p1Eop < maxEoP && p1CDChits > 0
+      const bool goodTrk1 = enECLTrack1 > 0 && enECLTrack1 < 0.5 && p1CDChits > 0
                             && ((p1hasKLMid == 0 && enECLTrack1 < 0.25 && p1MomLab < 2.0) || p1hasKLMid == 1) && p1isInCDC == 1;
 
       //------------Second track variables----------------
@@ -567,7 +565,6 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
         const double p2MomLab = V4p2.P();
         double lowestP = p2MomLab;
-        const double p2Eop = Variable::eclClusterEoP(part2);
         const double p2CDChits = trackFit2->getHitPatternCDC().getNHits();
         const PIDLikelihood* p2Pid = part2->getPIDLikelihood();
         bool p2hasKLMid = 0;
@@ -584,7 +581,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
         const double enECLTrack2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
-        const bool goodTrk2 = enECLTrack2 > 0 && enECLTrack2 < 0.4 && p2Eop < maxEoP && p2CDChits > 0
+        const bool goodTrk2 = enECLTrack2 > 0 && enECLTrack2 < 0.5 && p2CDChits > 0
                               && ((p2hasKLMid == 0 && enECLTrack2 < 0.25 && p2MomLab < 2.0) || p2hasKLMid == 1) && p2isInCDC == 1;
 
         double eTotMumuTracks = enECLTrack1 + enECLTrack2;

@@ -34,20 +34,21 @@ Chi2MCTrackMatcherModule::Chi2MCTrackMatcherModule() : Module()
   setDescription(R"DOC(Monte Carlo matcher using the helix parameters for matching by chi2-method)DOC");
   // setPropertyFlags(c_ParallelProcessingCertified);
   // set module parameters
-  std::vector<double> defaultCutOffs(6);
+  /*std::vector<double> defaultCutOffs(6);
   defaultCutOffs[0] = 128024;
   defaultCutOffs[1] = 95;
   defaultCutOffs[2] = 173;
   defaultCutOffs[3] = 424;
   defaultCutOffs[4] = 90;
-  defaultCutOffs[5] = 424;//in first approximation take proton
+  defaultCutOffs[5] = 424;//in first approximation take proton*/
   addParam("CutOffs",
            m_param_CutOffs,
-           "Defines the Cut Off values for each charged particle. pdg order [11,13,211,2212,321,1000010020]",
-           defaultCutOffs);
+           "Defines the chi2-cut-off values for each charged particle. The cut-offs define the maximal size for a matching pair candidate`s chi2 value. If a matching pair candidate has a chi2 value smaller than the cut-off a relation is set. Defaults determined from small study on events with trivial matching. The pdg order is [11,13,211,2212,321,1000010020].",
+           m_param_CutOffs);
+//,defaultCutOffs);
   addParam("linalg",
            m_param_linalg,
-           "Parameter to switch between ROOT and Eigen, to invert the covariance matrix. false: ROOT is used; true: Eigen is used",
+           "Parameter to switch between ROOT and Eigen, to invert the covariance5 matrix. ROOT has shown a shorter runtime therefore its recomended. false: ROOT is used; true: Eigen is used",
            false);
 }
 
@@ -59,19 +60,19 @@ void Chi2MCTrackMatcherModule::initialize()
   m_Tracks.registerRelationTo(m_MCParticles);
 
   // Statistic variables
-  m_trackCount = 0;
+  /*m_trackCount = 0;
   m_notInvertableCount = 0;
   m_noMatchCount = 0;
   m_noMatchingCandidateCount = 0;
   m_trackCount = 0;
   m_covarianceMatrixCount = 0;
-  m_event = 0;
+  m_event = 0;*/
 }
 
 void Chi2MCTrackMatcherModule::event()
 {
-  m_event = m_event + 1;
-  B2DEBUG(1, "m_event = " << m_event);
+  m_event += 1;
+  B2DEBUG(27, "m_event = " << m_event);
   // suppress the ROOT "matrix is singular" error message
   auto default_gErrorIgnoreLevel = gErrorIgnoreLevel;
   gErrorIgnoreLevel = 5000;
@@ -80,7 +81,7 @@ void Chi2MCTrackMatcherModule::event()
   int nTracks = m_Tracks.getEntries();
   int nMCParticles = m_MCParticles.getEntries();
   // tracks number of tracks for Debug statistics
-  m_trackCount = m_trackCount + nTracks;
+  m_trackCount += nTracks;
   // check if there are m_Tracks and m_MCParticles to match to
   if (not nMCParticles or not nTracks) {
     // Cannot perfom matching
@@ -178,7 +179,7 @@ void Chi2MCTrackMatcherModule::event()
     // check if any matching candidate was found
     if (ip_min == -1) {
       m_noMatchingCandidateCount = m_noMatchingCandidateCount + 1;
-      m_noMatchCount = m_noMatchCount + 1;
+      m_noMatchCount += 1;
       continue;
     }
     // initialize Cut Off
@@ -206,7 +207,7 @@ void Chi2MCTrackMatcherModule::event()
     if (chi2Min < cutOff) {
       m_Tracks[it]->addRelationTo(m_MCParticles[ip_min]);
     } else {
-      m_noMatchCount = m_noMatchCount + 1;
+      m_noMatchCount += 1;
     }
   }
   // reset ROOT Error Level to default
@@ -214,14 +215,11 @@ void Chi2MCTrackMatcherModule::event()
 }
 void Chi2MCTrackMatcherModule::terminate()
 {
-  //if (m_noMatchCount>0){
-  B2DEBUG(1, "For " << m_noMatchCount << "/" << m_trackCount << " tracks no relation was found.");
-  //}
-  //if (m_noMatchingCandidateCount>0){
-  B2DEBUG(1, "For " << m_noMatchingCandidateCount << "/" << m_trackCount << " tracks got no matching candidate");
-  //}
-  //if (m_notInvertableCount>0){
-  B2DEBUG(1, "" << m_notInvertableCount << "/" << m_covarianceMatrixCount << " covariance matrices where not invertable.");
-  //}
+  B2DEBUG(21, "For " << m_noMatchCount << "/" << m_trackCount << "(" << m_noMatchCount * 100 / m_trackCount <<
+          "%) tracks no relation was found.");
+  B2DEBUG(21, "For " << m_noMatchingCandidateCount << "/" << m_trackCount << "(" << m_noMatchingCandidateCount * 100 / m_trackCount <<
+          "%) tracks got no matching candidate");
+  B2DEBUG(21, "" << m_notInvertableCount << "/" << m_covarianceMatrixCount << "(" << m_notInvertableCount * 100 /
+          m_covarianceMatrixCount << "%) covariance matrices where not invertable.");
 }
 

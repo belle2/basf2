@@ -18,7 +18,7 @@ b2.set_log_level(b2.LogLevel.INFO)
 main = b2.create_path()
 
 # Modules
-inroot = register_module('DQMHistAnalysisInputRootFile')
+inroot = b2.register_module('DQMHistAnalysisInputRootFile')
 inroot.param('FileList', '/group/belle2/phase3/dqm/dqmsrv1/e0017/dqmhisto/hltdqm_e0017r000060.root')
 main.add_module(inroot)
 

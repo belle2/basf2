@@ -687,8 +687,8 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), tableName="", scalingF
     Parameters:
         inputListNames (list(str)): input particle list names
         scale (float): scaling factor (1.0 -- no scaling)
-        tableName (string): name of the payload which contains the phase-space dependent scaling factors
-        scalingFactorName (string): name of scaling factor variable in the payload.
+        tableName (str): name of the payload which contains the phase-space dependent scaling factors
+        scalingFactorName (str): name of scaling factor variable in the payload.
         path (basf2.Path): module is added to this path
     """
     trackingmomentum = register_module('TrackingMomentum')

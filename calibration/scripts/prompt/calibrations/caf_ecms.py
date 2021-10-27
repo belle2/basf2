@@ -12,7 +12,7 @@
 Airflow script to perform eCMS calibration (combination of the had-B and mumu method).
 """
 
-from prompt import CalibrationSettings  # , input_data_filters
+from prompt import CalibrationSettings, input_data_filters
 from prompt.calibrations.caf_boostvector import settings as boostvector
 from reconstruction import add_pid_module, add_ecl_modules, prepare_cdst_analysis
 

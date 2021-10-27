@@ -20,13 +20,13 @@ struct par {
 struct chebFitter {
 
   Eigen::VectorXd getLogFunction(Pars pars) const;
-  double getLogLikelihoodSlow(Pars pars) const;
-  double getLogLikelihoodFast(Pars pars) const;
+  double getLogLikelihoodSlow(const Pars& pars) const;
+  double getLogLikelihoodFast(const Pars& pars) const;
   void init(int Size, double xMin, double xMax);
   Eigen::VectorXd getDataGrid() const;
   std::pair<Eigen::VectorXd, Eigen::MatrixXd> getDataGridWithCov() const;
 
-  double getFunctionFast(Pars pars, double x);
+  double getFunctionFast(const Pars& pars, double x);
 
   std::pair<Pars, Eigen::MatrixXd> fitData(Pars pars, Limits limits, bool UseCheb = true);
 

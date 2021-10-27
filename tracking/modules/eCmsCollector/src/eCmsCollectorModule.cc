@@ -126,15 +126,11 @@ void eCmsCollectorModule::collect()
   const Particle* Kaon =  D->getDaughter(0);
 
 
-  cout << "Radek " << m_pdg << " " << m_mode << " " << m_mBC << " " << m_deltaE <<  " " << m_dmDstar << " : " << m_R2 << endl;
-  cout << "Radek K pdg code :  " << Kaon->getPDGCode() << endl;
-
 
   m_Kpid = -99;
   if (Kaon && Kaon->getPIDLikelihood()) {
     m_Kpid = Kaon->getPIDLikelihood()->getProbability(Const::ChargedStable(321), Const::ChargedStable(211));
   }
-  cout << "Radek Kpid = " << m_Kpid << endl;
 
 
 

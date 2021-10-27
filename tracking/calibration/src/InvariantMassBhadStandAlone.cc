@@ -144,7 +144,7 @@ namespace Belle2 {
       mbcframe->SetTitle("");
 
 
-      Double_t chisq = mbcframe->chiSquare();
+      //Double_t chisq = mbcframe->chiSquare();
       RooHist* hpull = mbcframe->pullHist() ;
       hpull->Print();
       RooPlot* frame3 = eNow.frame(Title(".")) ;

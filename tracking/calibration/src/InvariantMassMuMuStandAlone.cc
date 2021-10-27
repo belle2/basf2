@@ -454,10 +454,7 @@ namespace Belle2 {
         double CoreE = 1. / (sqrt(2 * M_PI) * sigmaE) * exp(-1. / 2 * pow((x + t - m0 - mean) / sigmaE, 2));
         double Core = (1 - frac) * CoreC + frac * CoreE;
 
-        if (t < 0) {
-          cout << "Problem" << endl;
-          exit(0);
-        }
+        assert(t >= 0);
 
         double K = 0;
         if (t >= eps)
@@ -1027,7 +1024,6 @@ namespace Belle2 {
 
 
     // Returns tuple with the invariant mass parameters (cmsEnergy in GeV)
-    // cppcheck-suppress passedByValue
     tuple<vector<VectorXd>, vector<MatrixXd>, MatrixXd>  runMuMuInvariantMassAnalysis(vector<Event> evts,
         const vector<double>& splitPoints)
     {

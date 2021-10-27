@@ -64,7 +64,7 @@ void chebFitter::init(int Size, double xMin, double xMax)
 }
 
 //function assumed to be normalized !!!
-double chebFitter::getLogLikelihoodSlow(Pars pars) const
+double chebFitter::getLogLikelihoodSlow(const Pars& pars) const
 {
 
   double L = 0;
@@ -77,7 +77,7 @@ double chebFitter::getLogLikelihoodSlow(Pars pars) const
 }
 
 //evaluation using cheb pols
-double chebFitter::getLogLikelihoodFast(Pars pars) const
+double chebFitter::getLogLikelihoodFast(const Pars& pars) const
 {
   VectorXd funVals = getLogFunction(pars);
   double LL = funVals.dot(dataGrid);
@@ -224,7 +224,7 @@ pair<Pars, MatrixXd> chebFitter::fitData(Pars pars, Limits limits, bool UseCheb)
 }
 
 
-double chebFitter::getFunctionFast(Pars pars, double x)
+double chebFitter::getFunctionFast(const Pars& pars, double x)
 {
   static VectorXd funVals = getLogFunction(pars);
 

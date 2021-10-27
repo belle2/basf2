@@ -10,12 +10,18 @@
 #include <TVector3.h>
 
 #include <string>
+#include <limits>
 
 namespace Belle2 {
   /**
    * This collects the track parameters and momenta of the mu+mu- events for
    * calibration of the eCms using CAF and AirFlow
    */
+
+  static const double realNaN = std::numeric_limits<double>::quiet_NaN();
+  static const int intNaN     = std::numeric_limits<int>::quiet_NaN();
+
+
   class eCmsCollectorModule : public CalibrationCollectorModule {
 
   public:
@@ -37,19 +43,19 @@ namespace Belle2 {
 
   private:
 
-    int m_exp;     ///< experiment number
-    int m_run;     ///< run number
-    int m_evt;     ///< event number
-    double m_time; ///< event time [hours]
+    int m_exp = intNaN;     ///< experiment number
+    int m_run = intNaN;     ///< run number
+    int m_evt = intNaN;     ///< event number
+    double m_time = realNaN; ///< event time [hours]
 
-    double m_mBC;     ///< mBC mass
-    double m_deltaE;  ///< deltaE
-    int    m_pdg;     ///< B meson PDG code (can neutral or charged)
-    int    m_mode;    ///< decay mode ID
-    double m_Kpid;    ///< Kaon PID
-    double m_R2;
-    double m_mD;      ///< D meson mass
-    double m_dmDstar; ///< D*-D0 mass
+    double m_mBC = realNaN;     ///< mBC mass
+    double m_deltaE = realNaN;  ///< deltaE
+    int    m_pdg = intNaN;      ///< B meson PDG code (can neutral or charged)
+    int    m_mode = intNaN;     ///< decay mode ID
+    double m_Kpid = realNaN;    ///< Kaon PID
+    double m_R2 = realNaN;
+    double m_mD = realNaN;      ///< D meson mass
+    double m_dmDstar = realNaN; ///< D*-D0 mass
     //double m_cmsE;    ///< input CMS energy
 
   };

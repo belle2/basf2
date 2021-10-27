@@ -29,8 +29,8 @@ CutOffs = [128024, 95, 173, 424, 90, 424]
 chi2Matcher.param("CutOffs", CutOffs)
 # Package used for inversion of the covariance matrix:
 # ROOT is default since in general it is faster and scales better
-# True: ROOT [default]; False: eigen
-chi2Matcher.param("linalg", True)
+# False: ROOT [default]; True: eigen
+chi2Matcher.param("linalg", False)
 
 # Shows some additional Debug messages
 chi2Matcher.logging.log_level = LogLevel.DEBUG

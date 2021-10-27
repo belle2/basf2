@@ -216,7 +216,7 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                    reco_tracks="RecoTracks", use_second_cdc_hits=False,
                    split_after_delta_t=-1.0, matching_method="hit",
                    chi2_cutoffs=[128024, 95, 173, 424, 90, 424],
-                   chi2_linalg=True):
+                   chi2_linalg=False):
     """
     Match the tracks to the MC truth. The matching works based on
     the output of the TrackFinderMCTruthRecoTracks.
@@ -238,7 +238,7 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                                 values are determined from a small study investigating chi2 value distribution of
                                 trivial matching pairs.
     :param chi2_linalg:         If chi2 matching is used, this defines package used to invert the covariance5
-                                matrix. ROOT has been shown to be faster than eigen. If True ROOT is used. If False
+                                matrix. ROOT has been shown to be faster than eigen. If False ROOT is used. If True
                                 eigen is used.
     """
     if (matching_method == "hit"):

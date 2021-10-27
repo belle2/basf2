@@ -42,3 +42,6 @@ Modules
    counters exceed uint8_t maximum (255), it is set to 255.
  * The invariant mass of the particles built from the missing momentum in the event (`fillParticleListFromROE` with option
    ``useMissing=True``) is no longer fixed to zero, but set based on the full missing 4-momentum.
+ * A cut provided to the `ParticleCombiner` was always applied to the daughter particle combination, even when choosing one of the
+   two recoil options. Now it is applied to the created mother particle as written in the documentation. This changes the behavior
+   of `reconstructRecoil` and `reconstructRecoilDaughter`.

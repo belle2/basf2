@@ -258,6 +258,7 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                         UseSVDHits=is_svd_used(components),
                         UseCDCHits=is_cdc_used(components))
     elif (matching_method == "chi2"):
+        print("Warning: The Chi2MCTrackMatcherModule is currently not fully developed and tested!")
         path.add_module('Chi2MCTrackMatcherModule',
                         'CutOffs'=chi2_cutoffs,
                         'linalg'=chi2_linalg)

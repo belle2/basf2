@@ -20,8 +20,6 @@
 #include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
-#include <memory>
-
 using namespace std;
 
 namespace Belle2 {

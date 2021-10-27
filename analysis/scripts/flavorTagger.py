@@ -1163,7 +1163,7 @@ def flavorTagger(
 
     elif mode == 'Teacher':
         if eventLevelTeacher(weightFiles, categories):
-            combinerLevelTeacher(weightFiles, variableCombinerLevel, categoriesCombinationCode)
+            combinerLevelTeacher(weightFiles, variablesCombinerLevel, categoriesCombinationCode)
 
 
 if __name__ == '__main__':

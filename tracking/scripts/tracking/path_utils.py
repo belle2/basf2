@@ -214,10 +214,14 @@ def add_cr_track_fit_and_track_creator(path, components=None,
 
 def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                    reco_tracks="RecoTracks", use_second_cdc_hits=False,
-                   split_after_delta_t=-1.0):
+                   split_after_delta_t=-1.0, matching_method="hit",
+                   chi2_cutoffs=[128024, 95, 173, 424, 90, 424],
+                   chi2_linalg=True):
     """
     Match the tracks to the MC truth. The matching works based on
     the output of the TrackFinderMCTruthRecoTracks.
+    Alternativly one can use the Chi2MCTrackMatcher based on chi2 values
+    calculated from the helixparameters of Tracks and MCParticles.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
@@ -226,22 +230,37 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param split_after_delta_t: If positive, split MCRecoTrack into multiple MCRecoTracks if the time
                                 distance between two adjecent SimHits is more than the given value
+    :param matching_method:     hit: uses the hit-matching
+                                chi2: uses the chi2-matching
+    :param chi2_cutoffs:        If chi2 matching method is used, this list defines the individual cut-off values
+                                for the chi2 values. Thereby each charged stable particle gets its cut-off
+                                value. The order of the pdgs is [11,13,211,2212,321,1000010020]. The default
+                                values are determined from a small study investigating chi2 value distribution of
+                                trivial matching pairs.
+    :param chi2_linalg:         If chi2 matching is used, this defines package used to invert the covariance5
+                                matrix. ROOT has been shown to be faster than eigen. If True ROOT is used. If False
+                                eigen is used.
     """
-    path.add_module('TrackFinderMCTruthRecoTracks',
-                    RecoTracksStoreArrayName=mc_reco_tracks,
-                    WhichParticles=[],
-                    UseSecondCDCHits=use_second_cdc_hits,
-                    UsePXDHits=is_pxd_used(components),
-                    UseSVDHits=is_svd_used(components),
-                    UseCDCHits=is_cdc_used(components),
-                    SplitAfterDeltaT=split_after_delta_t)
+    if (matching_method == "hit"):
+        path.add_module('TrackFinderMCTruthRecoTracks',
+                        RecoTracksStoreArrayName=mc_reco_tracks,
+                        WhichParticles=[],
+                        UseSecondCDCHits=use_second_cdc_hits,
+                        UsePXDHits=is_pxd_used(components),
+                        UseSVDHits=is_svd_used(components),
+                        UseCDCHits=is_cdc_used(components),
+                        SplitAfterDeltaT=split_after_delta_t)
 
-    path.add_module('MCRecoTracksMatcher',
-                    mcRecoTracksStoreArrayName=mc_reco_tracks,
-                    prRecoTracksStoreArrayName=reco_tracks,
-                    UsePXDHits=is_pxd_used(components),
-                    UseSVDHits=is_svd_used(components),
-                    UseCDCHits=is_cdc_used(components))
+        path.add_module('MCRecoTracksMatcher',
+                        mcRecoTracksStoreArrayName=mc_reco_tracks,
+                        prRecoTracksStoreArrayName=reco_tracks,
+                        UsePXDHits=is_pxd_used(components),
+                        UseSVDHits=is_svd_used(components),
+                        UseCDCHits=is_cdc_used(components))
+    elif (matching_method == "chi2"):
+        path.add_module('Chi2MCTrackMatcherModule',
+                        'CutOffs'=chi2_cutoffs,
+                        'linalg'=chi2_linalg)
 
 
 def add_prune_tracks(path, components=None, reco_tracks="RecoTracks"):

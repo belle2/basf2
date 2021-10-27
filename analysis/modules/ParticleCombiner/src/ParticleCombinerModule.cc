@@ -125,7 +125,13 @@ namespace Belle2 {
                 "Processing is continued assuming that you allowed this deliberately, e.g. for systematic studies etc.");
     }
 
-    m_generator = std::make_unique<ParticleGenerator>(m_decayString, m_cutParameter);
+    if (m_recoilParticleType == 0) {
+      m_generator = std::make_unique<ParticleGenerator>(m_decayString, m_cutParameter);
+    } else {
+      string noCutInParticleCombiner = "";
+      m_generator = std::make_unique<ParticleGenerator>(m_decayString, noCutInParticleCombiner);
+      m_cut = Variable::Cut::compile(m_cutParameter);
+    }
 
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
     m_outputList.registerInDataStore(m_listName, flags);
@@ -183,6 +189,11 @@ namespace Belle2 {
 
         TLorentzVector mom = daughters[0]->get4Vector() - pDaughters;
         particle.set4Vector(mom);
+      }
+      if (m_recoilParticleType > 0) {
+        if (!m_cut->check(&particle)) {
+          continue;
+        }
       }
 
       numberOfCandidates++;

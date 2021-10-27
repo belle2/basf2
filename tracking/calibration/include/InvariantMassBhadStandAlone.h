@@ -1,9 +1,11 @@
 /**************************************************************************
- * basf2 (Belle II Analysis Software Framework)                           *
- * Author: The Belle II Collaboration                                     *
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2021 - Belle II Collaboration                             *
  *                                                                        *
- * See git log for contributors and copyright holders.                    *
- * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Radek Zlebcik                                            *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
@@ -21,38 +23,48 @@
 #endif
 
 namespace Belle2 {
-  namespace InvariantMassCalib {
+  namespace InvariantMassBhadCalib {
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
     static const int intNaN     = std::numeric_limits<int>::quiet_NaN();
     static const TVector3 vecNaN(realNaN, realNaN, realNaN);
 
 
-    /** Event containing two tracks */
+
     struct Event {
-      int exp   = intNaN;  ///< experiment number
-      int run   = intNaN;  ///< run number
-      int evtNo = intNaN;  ///< event number
 
+      int exp   = intNaN;
+      int run   = intNaN;
+      int evtNo = intNaN;
 
-      double mBC; ///< mBC mass
-      double deltaE; ///< deltaE
-      int    pdg; ///< deltaE
-      int    mode;
-      double Kpid;
-      double R2;
-      double mD; ///< Dmass
-      double dmDstar; ///< Dmass
+      double mBC = realNaN;
+      double deltaE = realNaN;
+      int pdg = intNaN;
+      int mode = intNaN;
+      double Kpid = realNaN;
+      double R2 = realNaN;
+      double mD = realNaN;
+      double dmDstar = realNaN;
+      //double cmsE0; // eCMS used to calculate mBC and deltaE
 
+      double t = realNaN;   // time of event
 
-      int nBootStrap = intNaN; ///< random bootstrap weight (n=1 -> original sample)
-      bool isSig = false;      ///< is not removed by quality cuts?
-      double t   = realNaN;    ///< time of event [hours]
-
+      bool isSig = false;
+      int nBootStrap = intNaN;
     };
 
 
+
+
+
+
     std::vector<Event> getEvents(TTree* tr);
+
+
+    std::vector<std::vector<double>> doBhadFit(const std::vector<Event>& evts, std::vector<std::pair<double, double>> limits,
+                                               std::vector<std::pair<double, double>> mumuVals);
+
+
 
     /** Run the InvariantMass analysis where splitPoints are the boundaries of the short calibration intervals
       @param evts: vector of events

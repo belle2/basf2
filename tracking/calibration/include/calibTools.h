@@ -213,9 +213,10 @@ namespace Belle2 {
 
   /** Store payloads to files */
   template<typename Evt>
-  inline void storePayloads(const std::vector<Evt>& evts, std::vector<CalibrationData>&  calVec, std::string objName,
+  inline void storePayloads(const std::vector<Evt>& evts, const std::vector<CalibrationData>&  calVecConst, std::string objName,
                             std::function<TObject*(Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd)  > getCalibObj)
   {
+    auto calVec = calVecConst;
 
     // Loop to store payloads
     ExpRun exprunLast(-1, -1); //last exprun
@@ -237,8 +238,8 @@ namespace Belle2 {
             calVec[i].pars.cntUnc.at(k)(0, 2) = calVec[i].pars.cntUnc.at(k)(2, 0) = encodeNumber(calVec[i].pars.cntUnc.at(k)(0, 2),
                                                 round(I.second.second * 3600));
           } else {
-            calVec[i].pars.cntUnc.at(k)(0, 0)    = encodeNumber(calVec[i].pars.cntUnc.at(k)(0, 0),    round(I.second.first  * 3600));
-            calVec[i].pars.spreadMat(0, 0) = encodeNumber(calVec[i].pars.spreadMat(0, 0), round(I.second.first  * 3600));
+            calVec[i].pars.cntUnc.at(k)(0, 0) = encodeNumber(calVec[i].pars.cntUnc.at(k)(0, 0), round(I.second.first  * 3600));
+            calVec[i].pars.spreadMat(0, 0)    = encodeNumber(calVec[i].pars.spreadMat(0, 0),    round(I.second.second * 3600));
           }
 
           TObject* obj = getCalibObj(calVec[i].pars.cnt.at(k), calVec[i].pars.cntUnc.at(k), calVec[i].pars.spreadMat);
@@ -273,6 +274,49 @@ namespace Belle2 {
     //Store the last entry
     auto m_iov = IntervalOfValidity(exprunLast.exp, exprunLast.run, exprunLast.exp, exprunLast.run);
     Database::Instance().storeData(objName, intraRun, m_iov);
+  }
+
+
+  /** Store payloads to files, where calib data have no intra-run dependence */
+  inline void storePayloadsNoIntraRun(const std::vector<CalibrationData>&  calVecConst, std::string objName,
+                                      std::function<TObject*(Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd)  > getCalibObj)
+  {
+    auto calVec = calVecConst;
+
+    // Check that there is no intra-run dependence
+    std::set<ExpRun> existingRuns;
+    for (unsigned i = 0; i < calVec.size(); ++i) {
+      const auto& r = calVec[i].subIntervals; //   splits[i];
+      // Loop over calibration subintervals
+      for (int k = 0; k < int(r.size()); ++k) {
+
+        for (auto I : r[k]) {
+          ExpRun exprun = I.first;
+          B2ASSERT("Intra-run dependence existed", existingRuns.count(exprun) == 0);
+          existingRuns.insert(exprun);
+        }
+      }
+    }
+
+
+    // Loop over calibration intervals
+    for (unsigned i = 0; i < calVec.size(); ++i) {
+      const auto& r = calVec[i].subIntervals; //   splits[i];
+      // Loop over calibration subintervals
+      for (int k = 0; k < int(r.size()); ++k) {
+
+        TObject* obj = getCalibObj(calVec[i].pars.cnt.at(k), calVec[i].pars.cntUnc.at(k), calVec[i].pars.spreadMat);
+
+        ExpRun start = (r[k].cbegin()->first);
+        ExpRun last  = (r[k].crbegin()->first);
+
+        auto iov = IntervalOfValidity(start.exp, start.run, last.exp, last.run);
+        Database::Instance().storeData(objName, obj, iov);
+
+
+      } //end loop over calibration subintervals
+    } //end loop over calibration intervals
+
   }
 
   /** run calibration algorithm for single calibration interval */
@@ -397,8 +441,7 @@ namespace Belle2 {
 
     // Get intervals based on the input loss functions
     Splitter splt;
-    double atomSize = (calibName == "CollisionInvariantMass") ? -1 : 3. / 60;
-    auto splits = splt.getIntervals(runsInfo, evts, m_lossFunctionOuter, m_lossFunctionInner, atomSize);
+    auto splits = splt.getIntervals(runsInfo, evts, m_lossFunctionOuter, m_lossFunctionInner);
 
     //Loop over all calibration intervals
     std::vector<CalibrationData> calVec;

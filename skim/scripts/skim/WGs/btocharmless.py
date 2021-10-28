@@ -35,7 +35,7 @@ class BtoPi0Pi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:'B^{0}\\to \\pi^0 \\pi^0'
+    * :math:`B^{0}\\to \\pi^0 \\pi^0`
 
     Cuts applied:
 
@@ -67,33 +67,33 @@ class BtoHadTracks(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:'B^{0}\\to \\pi^+ \\pi^-'
-    * :math:'B^{0}\\to \\K^+ \\pi^-'
-    * :math:'B^{0}\\to \\K^+ K^-'
-    * :math:'B^{+}\\to \\pi^+ \\pi^+ \\pi^-'
-    * :math:'B^{+}\\to K_{\\rm S}^0 \\pi^+'
-    * :math:'B^{+}\\to K_{\\rm S}^0 K^+'
-    * :math:'B^{+}\\to K^+ \\pi^+ \\pi^-'
-    * :math:'B^{+}\\to K^+ K^+ \\pi^-'
-    * :math:'B^{+}\\to K^+ K^- \\pi^+'
-    * :math:'B^{+}\\to K^+ K^+ K^-'
-    * :math:'B^{0}\\to \\pi^+ \\pi^- \\pi^+ \\pi^-'
-    * :math:'B^{0}\\to -> K^+ \\pi^- \\pi^+ \\pi^-'
-    * :math:'B^{0}\\to -> K^+ K^- \\pi^+ \\pi^-'
-    * :math:'B^{0}\\to -> K^+ \\pi^- K^+ \\pi^-'
-    * :math:'B^{0}\\to -> K^+ K^- K^+ \\pi^-'
-    * :math:'B^{0}\\to -> K^+ K^- K^+ K^-'
-    * :math:'B^{0}\\to -> K_{\\rm S}^0 \\pi^+ \\pi^-'
-    * :math:'B^{0}\\to -> K_{\\rm S}^0 K^+ \\pi^-'
-    * :math:'B^{0}\\to -> K_{\\rm S}^0 K^+ K^-'
-    * :math:'B^{0}\\to -> K_{\\rm S}^0 K_{\\rm S}^0'
-    * :math:'B^{0}\\to -> K^{*0} K^- K^+'
-    * :math:'B^{0}\\to -> K^{*0} \\pi^- \\pi^+'
-    * :math:'B^{0}\\to -> K^{*0} K^+ \\pi^-'
-    * :math:'B^{0}\\to -> \\rho^0 \\rho^0'
-    * :math:'B^{+}\\to -> K^{*+} K^- K^+'
-    * :math:'B^{+}\\to -> K^{*+} \\pi^- \\pi^+'
-    * :math:'B^{+}\\to -> K^{*+} K^+ \\pi^-'
+    * :math:`B^{0}\\to \\pi^+ \\pi^-`
+    * :math:`B^{0}\\to \\K^+ \\pi^-`
+    * :math:`B^{0}\\to \\K^+ K^-`
+    * :math:`B^{+}\\to \\pi^+ \\pi^+ \\pi^-`
+    * :math:`B^{+}\\to K_{\\rm S}^0 \\pi^+`
+    * :math:`B^{+}\\to K_{\\rm S}^0 K^+`
+    * :math:`B^{+}\\to K^+ \\pi^+ \\pi^-`
+    * :math:`B^{+}\\to K^+ K^+ \\pi^-`
+    * :math:`B^{+}\\to K^+ K^- \\pi^+`
+    * :math:`B^{+}\\to K^+ K^+ K^-`
+    * :math:`B^{0}\\to \\pi^+ \\pi^- \\pi^+ \\pi^-`
+    * :math:`B^{0}\\to -> K^+ \\pi^- \\pi^+ \\pi^-`
+    * :math:`B^{0}\\to -> K^+ K^- \\pi^+ \\pi^-`
+    * :math:`B^{0}\\to -> K^+ \\pi^- K^+ \\pi^-`
+    * :math:`B^{0}\\to -> K^+ K^- K^+ \\pi^-`
+    * :math:`B^{0}\\to -> K^+ K^- K^+ K^-`
+    * :math:`B^{0}\\to -> K_{\\rm S}^0 \\pi^+ \\pi^-`
+    * :math:`B^{0}\\to -> K_{\\rm S}^0 K^+ \\pi^-`
+    * :math:`B^{0}\\to -> K_{\\rm S}^0 K^+ K^-`
+    * :math:`B^{0}\\to -> K_{\\rm S}^0 K_{\\rm S}^0`
+    * :math:`B^{0}\\to -> K^{*0} K^- K^+`
+    * :math:`B^{0}\\to -> K^{*0} \\pi^- \\pi^+`
+    * :math:`B^{0}\\to -> K^{*0} K^+ \\pi^-`
+    * :math:`B^{0}\\to -> \\rho^0 \\rho^0`
+    * :math:`B^{+}\\to -> K^{*+} K^- K^+`
+    * :math:`B^{+}\\to -> K^{*+} \\pi^- \\pi^+`
+    * :math:`B^{+}\\to -> K^{*+} K^+ \\pi^-`
 
     Cuts applied:
 
@@ -164,16 +164,16 @@ class BtoHad1Pi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:'B^+\\to \\pi^+ \\pi^0'
-    * :math:'B^+\\to K^+ \\pi^0'
-    * :math:'B^0\\to \\pi^+ \\pi^- \\pi^0'
-    * :math:'B^0\\to K^+ \\pi^- \\pi^0'
-    * :math:'B^0\\to K^- \\pi^+ \\pi^0'
-    * :math:'B^0\\to K^+ K^- \\pi^0'
-    * :math:'B^0\\to K_{\\rm S}^0 \\pi^0'
-    * :math:'B^+\\to K_{\\rm S}^{0} \\pi^+ \\pi^0'
-    * :math:'B^+\\to K_{\\rm S}^{0} K^+ \\pi^0'
-    * :math:'B^+\\to \\rho^{+} \\rho^{0}'
+    * :math:`B^+\\to \\pi^+ \\pi^0`
+    * :math:`B^+\\to K^+ \\pi^0`
+    * :math:`B^0\\to \\pi^+ \\pi^- \\pi^0`
+    * :math:`B^0\\to K^+ \\pi^- \\pi^0`
+    * :math:`B^0\\to K^- \\pi^+ \\pi^0`
+    * :math:`B^0\\to K^+ K^- \\pi^0`
+    * :math:`B^0\\to K_{\\rm S}^0 \\pi^0`
+    * :math:`B^+\\to K_{\\rm S}^{0} \\pi^+ \\pi^0`
+    * :math:`B^+\\to K_{\\rm S}^{0} K^+ \\pi^0`
+    * :math:`B^+\\to \\rho^{+} \\rho^{0}`
 
     Cuts applied:
 
@@ -224,9 +224,9 @@ class BtoHad3Tracks1Pi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:'B^+\\to K^{*+} K^+ K^-'
-    * :math:'B^+\\to K^{*+} K^+ \\pi^-'
-    * :math:'B^+\\to K^{*+} \\pi^+ \\pi^-'
+    * :math:`B^+\\to K^{*+} K^+ K^-`
+    * :math:`B^+\\to K^{*+} K^+ \\pi^-`
+    * :math:`B^+\\to K^{*+} \\pi^+ \\pi^-`
 
     Cuts applied:
 
@@ -272,7 +272,7 @@ class BtoRhopRhom(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:'B^+ \\to \\rho^{+} \\rho^{-}'
+    * :math:`B^+ \\to \\rho^{+} \\rho^{-}`
 
     Cuts applied:
 

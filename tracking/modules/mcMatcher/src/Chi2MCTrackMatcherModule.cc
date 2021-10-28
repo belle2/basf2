@@ -34,13 +34,6 @@ Chi2MCTrackMatcherModule::Chi2MCTrackMatcherModule() : Module()
   setDescription(R"DOC(Monte Carlo matcher using the helix parameters for matching by chi2-method)DOC");
   // setPropertyFlags(c_ParallelProcessingCertified);
   // set module parameters
-  /*std::vector<double> defaultCutOffs(6);
-  defaultCutOffs[0] = 128024;
-  defaultCutOffs[1] = 95;
-  defaultCutOffs[2] = 173;
-  defaultCutOffs[3] = 424;
-  defaultCutOffs[4] = 90;
-  defaultCutOffs[5] = 424;//in first approximation take proton*/
   addParam("CutOffs",
            m_param_CutOffs,
            "Defines the chi2-cut-off values for each charged particle. The cut-offs define the maximal size for a matching pair candidate`s chi2 value. If a matching pair candidate has a chi2 value smaller than the cut-off a relation is set. Defaults determined from small study on events with trivial matching. The pdg order is [11,13,211,2212,321,1000010020].",
@@ -101,12 +94,12 @@ void Chi2MCTrackMatcherModule::event()
       auto trackFitResult = track->getTrackFitResultWithClosestMass(mcParticleType);
       TMatrixD Covariance5 = trackFitResult->getCovariance5();
       // statistic variable counting number of covariance matricies
-      m_covarianceMatrixCount = m_covarianceMatrixCount + 1;
+      m_covarianceMatrixCount += 1;
       // check if matrix is invertable
       double det = Covariance5.Determinant();
       if (det == 0.0) {
         // statistic variable counting number of not invertable covariance matricies
-        m_notInvertableCount = m_notInvertableCount + 1;
+        m_notInvertableCount = + 1;
         //Covariance5.Print();
         continue;
       }
@@ -162,7 +155,7 @@ void Chi2MCTrackMatcherModule::event()
     }
     // check if any matching candidate was found
     if (ip_min == -1) {
-      m_noMatchingCandidateCount = m_noMatchingCandidateCount + 1;
+      m_noMatchingCandidateCount += 1;
       m_noMatchCount += 1;
       continue;
     }

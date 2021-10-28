@@ -28,6 +28,8 @@ Variables
  * Added `mostcommonBTagIndex` which returns the B meson index from which most FSP from a given reconstructed B meson candidate originated. Use case would be e.g. the FEI.
  * Added `percentageMissingParticlesBTag` which determines the percentage of FSP missed by using the `mostcommonBTagIndex` of the B meson.
  * Added `percentageWrongParticlesBTag` which gives the percentage of FSP reconstructed not originating from the `mostcommonBTagIndex`.
+ * Added the variable `TracksLBoostChi2`, which returns the change of the track positions in the boost direction after a vertex KFit in terms of
+   a :math:`\chi^2` value.
 
 Modules
 +++++++

@@ -13,7 +13,6 @@ namespace Belle2 {
 
   namespace Variable {
 
-
     /**
      * return Chi2 of four momentum-constraint kinematical fit of KFit
      */
@@ -24,6 +23,15 @@ namespace Belle2 {
      */
     double FourCKFitProb(const Particle* part);
 
+    /**
+     * return Chi2 value from change of track positions in a vertex KFit
+     */
+    double KFitnTracks(const Particle* part);
+
+    /**
+     * return number of tracks used in a vertex KFit
+     */
+    double KFitnTracks(const Particle* part);
 
   }
 } // Belle2 namespace

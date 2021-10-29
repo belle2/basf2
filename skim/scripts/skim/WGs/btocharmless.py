@@ -299,4 +299,4 @@ class BtoRhopRhom(BaseSkim):
         ma.reconstructDecay('B0:Charmless_b2rr -> rho+:veryLoose rho-:veryLoose', Bcuts, path=path)
         BsigList.append('B0:Charmless_b2rr')
         path = self.skim_event_cuts("nTracks >= 2", path=path)
-        self.SkimLists = BsigList
+        return BsigList

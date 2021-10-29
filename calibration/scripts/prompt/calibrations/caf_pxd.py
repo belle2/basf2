@@ -15,7 +15,7 @@ airflow script for PXD hot/dead pixel masking.
 import basf2
 from pxd.calibration import hot_pixel_mask_calibration
 from prompt.utils import filter_by_max_files_per_run, filter_by_max_events_per_run
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from caf.utils import IoV
 from itertools import groupby
 from itertools import chain
@@ -29,17 +29,17 @@ settings = CalibrationSettings(name="PXD hot/dead pixel calibration",
                                input_data_names=["beamorphysics", "cosmic"],
                                input_data_filters={
                                    "beamorphysics": [
-                                       input_data_filters["Data Tag"]["bhabha_all_calib"],
-                                       input_data_filters["Data Tag"]["gamma_gamma_calib"],
-                                       input_data_filters["Data Tag"]["hadron_calib"],
-                                       input_data_filters["Data Tag"]["offip_calib"],
-                                       input_data_filters["Data Tag"]["cosmic_calib"],
-                                       input_data_filters["Beam Energy"]["4S"],
-                                       input_data_filters["Beam Energy"]["Continuum"],
-                                       input_data_filters["Beam Energy"]["Scan"],
-                                       input_data_filters["Run Type"]["physics"],
-                                       input_data_filters["Data Quality Tag"]["Good Or Recoverable"]],
-                                   "cosmic": [input_data_filters["Run Type"]["cosmic"]]},
+                                       INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
+                                       INPUT_DATA_FILTERS["Data Tag"]["gamma_gamma_calib"],
+                                       INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
+                                       INPUT_DATA_FILTERS["Data Tag"]["offip_calib"],
+                                       INPUT_DATA_FILTERS["Data Tag"]["cosmic_calib"],
+                                       INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+                                       INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
+                                       INPUT_DATA_FILTERS["Beam Energy"]["Scan"],
+                                       INPUT_DATA_FILTERS["Run Type"]["physics"],
+                                       INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"]],
+                                   "cosmic": [INPUT_DATA_FILTERS["Run Type"]["cosmic"]]},
                                expert_config={
                                    "max_events_per_run": 400000,
                                    "max_files_per_run": 20,  # only valid when max_events/run <= 0

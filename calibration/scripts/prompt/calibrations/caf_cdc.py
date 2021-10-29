@@ -7,7 +7,7 @@
 ##########################################################################
 
 """Full CDC tracking calibration."""
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.utils import events_in_basf2_file, ExpRun
 import basf2
 import ROOT
@@ -23,15 +23,15 @@ settings = CalibrationSettings(name="CDC Tracking",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["mumutight_calib", "hadron_calib", "cosmic_calib"],
-                               input_data_filters={"mumutight_calib": [input_data_filters["Data Tag"]["mumutight_calib"],
-                                                                       input_data_filters["Data Quality Tag"]["Good"],
-                                                                       input_data_filters["Magnet"]["On"]],
-                                                   "hadron_calib": [input_data_filters["Data Tag"]["hadron_calib"],
-                                                                    input_data_filters["Data Quality Tag"]["Good"],
-                                                                    input_data_filters["Magnet"]["On"]],
-                                                   "cosmic_calib": [input_data_filters["Data Tag"]["cosmic_calib"],
-                                                                    input_data_filters["Data Quality Tag"]["Good"],
-                                                                    input_data_filters["Magnet"]["On"]]},
+                               input_data_filters={"mumutight_calib": [INPUT_DATA_FILTERS["Data Tag"]["mumutight_calib"],
+                                                                       INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                                                       INPUT_DATA_FILTERS["Magnet"]["On"]],
+                                                   "hadron_calib": [INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
+                                                                    INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                                                    INPUT_DATA_FILTERS["Magnet"]["On"]],
+                                                   "cosmic_calib": [INPUT_DATA_FILTERS["Data Tag"]["cosmic_calib"],
+                                                                    INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                                                    INPUT_DATA_FILTERS["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
                                    "max_files_per_run": 1000,

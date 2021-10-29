@@ -11,7 +11,7 @@
 """A simple example calibration that takes one input data list from raw data and performs
 a single calibration."""
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 
 ##############################
 # REQUIRED VARIABLE #
@@ -27,11 +27,11 @@ settings = CalibrationSettings(name="Example Simple",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["physics"],
-                               input_data_filters={"physics": [f"NOT {input_data_filters['Magnet']['On']}",
-                                                               input_data_filters["Data Tag"]["hadron_calib"],
-                                                               input_data_filters["Data Quality Tag"]["Good"],
-                                                               input_data_filters["Beam Energy"]["4S"],
-                                                               input_data_filters["Run Type"]["physics"]]},
+                               input_data_filters={"physics": [f"NOT {INPUT_DATA_FILTERS['Magnet']['On']}",
+                                                               INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
+                                                               INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                                               INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+                                                               INPUT_DATA_FILTERS["Run Type"]["physics"]]},
                                depends_on=[],
                                expert_config={})
 

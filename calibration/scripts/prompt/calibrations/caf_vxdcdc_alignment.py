@@ -16,7 +16,7 @@ import basf2
 import ROOT
 from ROOT import Belle2
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_cdc import settings as cdc_calibration
 from prompt.utils import events_in_basf2_file
 from caf.utils import IoV
@@ -45,9 +45,9 @@ default_config = {
     "offip.max_processed_events_per_file": 2000
 }
 
-quality_flags = [input_data_filters["Run Type"]["physics"],
-                 input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
-                 input_data_filters["Magnet"]["On"]]
+quality_flags = [INPUT_DATA_FILTERS["Run Type"]["physics"],
+                 INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+                 INPUT_DATA_FILTERS["Magnet"]["On"]]
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="Full VXD and CDC Alignment",
@@ -56,10 +56,10 @@ settings = CalibrationSettings(name="Full VXD and CDC Alignment",
                                input_data_formats=["raw"],
                                input_data_names=collection_names,
                                input_data_filters={
-                                   "cosmic": [input_data_filters["Data Tag"]["cosmic_calib"]] + quality_flags,
-                                   "mumu": [input_data_filters["Data Tag"]["mumutight_calib"]] + quality_flags,
-                                   "hadron": [input_data_filters["Data Tag"]["hadron_calib"]] + quality_flags,
-                                   "offip": [input_data_filters["Data Tag"]["offip_calib"]] + quality_flags
+                                   "cosmic": [INPUT_DATA_FILTERS["Data Tag"]["cosmic_calib"]] + quality_flags,
+                                   "mumu": [INPUT_DATA_FILTERS["Data Tag"]["mumutight_calib"]] + quality_flags,
+                                   "hadron": [INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"]] + quality_flags,
+                                   "offip": [INPUT_DATA_FILTERS["Data Tag"]["offip_calib"]] + quality_flags
                                },
 
                                expert_config=default_config,

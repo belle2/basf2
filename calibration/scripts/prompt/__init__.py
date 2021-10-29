@@ -15,7 +15,7 @@ prompt_script_dir = "calibration/scripts/prompt/calibrations"
 prompt_validation_script_package = "prompt.validations."
 prompt_validation_script_dir = "calibration/scripts/prompt/validations"
 
-input_data_filters = {"Magnet": {"On": "On",
+INPUT_DATA_FILTERS = {"Magnet": {"On": "On",
                                  "Off": "Off",
                                  "Either": "Either"},
                       "Beam Energy": {"No Beam": "No Beam",
@@ -120,6 +120,20 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
         if not input_data_names:
             raise ValueError("You must specify at least one input data name")
         input_data_names = frozenset(input_data_names)
+
+        # The input data names in the filters MUST correspond to the input data names for the calibration.
+        if input_data_filters:
+            if set(input_data_filters.keys()) != input_data_names:
+                raise ValueError("The 'input_data_filters' keys don't match the 'input_data_names'!")
+            # Requested input data filters MUST exist in the ones we defined in the global dictionary.
+            allowed_filters = {filter_name for category in INPUT_DATA_FILTERS.values() for filter_name in category}
+            requested_filters = {filter_name.replace("NOT", "", 1).lstrip() for filters in input_data_filters.values()
+                                 for filter_name in filters}
+            if not allowed_filters.issuperset(requested_filters):
+                raise ValueError("The 'input_data_filters' contains unknown filter names:"
+                                 f"{requested_filters.difference(allowed_filters)}")
+        else:
+            input_data_filters = {}
 
         if expert_config:
             # Check that it's a dictionary and not some other valid JSON object

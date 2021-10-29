@@ -17,7 +17,7 @@ import collections
 
 import basf2
 from caf.utils import ExpRun, IoV
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.utils import events_in_basf2_file
 
 ##############################
@@ -44,12 +44,12 @@ settings = CalibrationSettings(name="KLM alignmnent",
                                input_data_formats=["raw"],
                                input_data_names=["raw_physics", "raw_cosmic"],
                                input_data_filters={
-                                   'raw_physics': [input_data_filters['Run Type']['physics'],
-                                                   input_data_filters['Data Tag']['mumutight_calib'],
-                                                   input_data_filters['Data Quality Tag']['Good Or Recoverable']],
-                                   'raw_cosmic': [input_data_filters['Run Type']['physics'],
-                                                  input_data_filters['Data Tag']['cosmic_calib'],
-                                                  input_data_filters['Data Quality Tag']['Good Or Recoverable']]
+                                   'raw_physics': [INPUT_DATA_FILTERS['Run Type']['physics'],
+                                                   INPUT_DATA_FILTERS['Data Tag']['mumutight_calib'],
+                                                   INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']],
+                                   'raw_cosmic': [INPUT_DATA_FILTERS['Run Type']['physics'],
+                                                  INPUT_DATA_FILTERS['Data Tag']['cosmic_calib'],
+                                                  INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
                                },
                                depends_on=[vxdcdc_alignment],
                                expert_config={

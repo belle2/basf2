@@ -10,7 +10,7 @@
 
 """ECL calibration to specify edges of each crystal."""
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 
 # --------------------------------------------------------------
 # ..Tell the automated script some required details
@@ -19,8 +19,8 @@ settings = CalibrationSettings(name="ecl_edge",
                                description=__doc__,
                                input_data_formats=["cdst"],
                                input_data_names=["mumutight_calib"],
-                               input_data_filters={"mumutight_calib": [input_data_filters["Data Tag"]["mumutight_calib"],
-                                                                       input_data_filters["Data Quality Tag"]["Good"]]},
+                               input_data_filters={"mumutight_calib": [INPUT_DATA_FILTERS["Data Tag"]["mumutight_calib"],
+                                                                       INPUT_DATA_FILTERS["Data Quality Tag"]["Good"]]},
                                depends_on=[])
 
 # --------------------------------------------------------------

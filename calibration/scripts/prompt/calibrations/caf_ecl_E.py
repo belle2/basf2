@@ -10,7 +10,7 @@
 
 """ECL single crystal energy calibration using three control samples."""
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 
 # --------------------------------------------------------------
 # ..Tell the automated script some required details
@@ -25,17 +25,17 @@ settings = CalibrationSettings(
         "mumutight_calib"],
     input_data_filters={
         "bhabha_all_calib": [
-            input_data_filters["Data Tag"]["bhabha_all_calib"],
-            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
-            input_data_filters["Magnet"]["On"]],
+            INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
+            INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Magnet"]["On"]],
         "gamma_gamma_calib": [
-            input_data_filters["Data Tag"]["gamma_gamma_calib"],
-            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
-            input_data_filters["Magnet"]["On"]],
+            INPUT_DATA_FILTERS["Data Tag"]["gamma_gamma_calib"],
+            INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Magnet"]["On"]],
         "mumutight_calib": [
-            input_data_filters["Data Tag"]["mumutight_calib"],
-            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
-            input_data_filters["Magnet"]["On"]]},
+            INPUT_DATA_FILTERS["Data Tag"]["mumutight_calib"],
+            INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],
     expert_config={"ee5x5_min_entries": 100})
 

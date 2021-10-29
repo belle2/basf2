@@ -14,7 +14,7 @@ database object.
 """
 
 import basf2
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 
 ##############################
 # REQUIRED VARIABLE #
@@ -32,9 +32,9 @@ settings = CalibrationSettings(
     input_data_formats=['cdst'],
     input_data_names=['hlt_mumu'],
     input_data_filters={
-        'hlt_mumu': [input_data_filters['Run Type']['physics'],
-                     input_data_filters['Data Tag']['mumutight_calib'],
-                     input_data_filters['Data Quality Tag']['Good Or Recoverable']]
+        'hlt_mumu': [INPUT_DATA_FILTERS['Run Type']['physics'],
+                     INPUT_DATA_FILTERS['Data Tag']['mumutight_calib'],
+                     INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
     },
     depends_on=[])
 

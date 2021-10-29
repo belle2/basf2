@@ -12,7 +12,7 @@
 Airflow script to perform BeamSpot calibration.
 """
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
@@ -23,10 +23,10 @@ settings = CalibrationSettings(
     input_data_names=["mumutight_calib"],
     input_data_filters={
         "mumutight_calib": [
-            input_data_filters["Data Tag"]["mumutight_calib"],
-            input_data_filters["Run Type"]["physics"],
-            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
-            input_data_filters["Magnet"]["On"]]},
+            INPUT_DATA_FILTERS["Data Tag"]["mumutight_calib"],
+            INPUT_DATA_FILTERS["Run Type"]["physics"],
+            INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Magnet"]["On"]]},
     expert_config={
         "outerLoss": "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)",
         "innerLoss": "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)"},

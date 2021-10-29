@@ -57,8 +57,8 @@ namespace Belle2 {
 
     The **eclTrackBremFinder** module uses the lepton track PXD and SVD hits and extrapolates them to the ECL; 
     then looks for ECL clusters with energies between 0.2 and 1 times the track energy and without associated 
-    tracks, and checks if the distance between each of these clusters 
-    and the extrapolated hit is smaller than 0.5 mm. If it is, a *Bremsstrahlung* weighted relation 
+    tracks, and checks if the normalized distance between each of these clusters 
+    and the extrapolated hit is smaller than 0.05. If it is, a *Bremsstrahlung* weighted relation 
     between said cluster and the track is established. The weight is determined as
 
     .. math:: 

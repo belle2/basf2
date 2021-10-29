@@ -31,7 +31,7 @@ INPUT_DATA_FILTERS = {"Magnet": {"On": "On",
                                    "cosmic_calib": "cosmic_calib",
                                    "gamma_gamma_calib": "gamma_gamma_calib",
                                    "hadron_calib": "hadron_calib",
-                                   "mumutight_calib": "mumutight_calib",
+                                   "mumutight_or_highm_calib": "mumutight_or_highm_calib",
                                    "offip_calib": "offip_calib",
                                    "radmumu_calib": "radmumu_calib",
                                    "random_calib": "random_calib",
@@ -81,7 +81,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
             input_data_filters dictionary e.g. from prompt import input_data_filters with details about data tags and run quality
             tags found at: https://calibration.belle2.org/belle2/data_tags/list/.
             To exclude specific filters, pre-append with *NOT* e.g.
-            {"all_events": ["mumutight_calib", "hadron_calib", "Good", "On"],
+            {"all_events": ["mumutight_or_highm_calib", "hadron_calib", "Good", "On"],
             "offres_photon_events": ["gamma_gamma_calib", "Good", "NOT On"]}.
             Not selecting a specfic filters (e.g. Magnet) is equivalent to not having any requirements, e.g. (Either)
 

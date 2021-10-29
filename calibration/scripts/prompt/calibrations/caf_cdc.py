@@ -22,16 +22,19 @@ settings = CalibrationSettings(name="CDC Tracking",
                                expert_username="eberthol",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["mumutight_calib", "hadron_calib", "cosmic_calib"],
-                               input_data_filters={"mumutight_calib": [INPUT_DATA_FILTERS["Data Tag"]["mumutight_calib"],
-                                                                       INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
-                                                                       INPUT_DATA_FILTERS["Magnet"]["On"]],
-                                                   "hadron_calib": [INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
-                                                                    INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
-                                                                    INPUT_DATA_FILTERS["Magnet"]["On"]],
-                                                   "cosmic_calib": [INPUT_DATA_FILTERS["Data Tag"]["cosmic_calib"],
-                                                                    INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
-                                                                    INPUT_DATA_FILTERS["Magnet"]["On"]]},
+                               input_data_names=["mumutight_or_highm_calib", "hadron_calib", "cosmic_calib"],
+                               input_data_filters={"mumutight_or_highm_calib":
+                                                   [INPUT_DATA_FILTERS["Data Tag"]["mumutight_or_highm_calib"],
+                                                    INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                                    INPUT_DATA_FILTERS["Magnet"]["On"]],
+                                                   "hadron_calib":
+                                                       [INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
+                                                        INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                                        INPUT_DATA_FILTERS["Magnet"]["On"]],
+                                                   "cosmic_calib":
+                                                       [INPUT_DATA_FILTERS["Data Tag"]["cosmic_calib"],
+                                                        INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                                        INPUT_DATA_FILTERS["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
                                    "max_files_per_run": 1000,
@@ -132,7 +135,7 @@ def get_calibrations(input_data, **kwargs):
         min_mumu_events_for_tz_tw = fracion_of_event_for_types[0] * min_events_for_tz_tw
         max_mumu_events_for_tz_tw = fracion_of_event_for_types[0] * max_events_for_tz_tw
 
-        file_to_iov_mumu = input_data["mumutight_calib"]
+        file_to_iov_mumu = input_data["mumutight_or_highm_calib"]
         # select data file for t0 and tw calibration
         basf2.B2INFO("----> For T0 and Time walk correction")
         chosen_files_mumu_for_tz_tw = select_files(
@@ -149,8 +152,8 @@ def get_calibrations(input_data, **kwargs):
                                                    max_mumu_events_for_xt_sr,
                                                    max_events_per_file)
 
-        files_for_xt_sr_dict["mumutight_calib"] = chosen_files_mumu_for_xt_sr
-        files_for_tz_tw_dict["mumutight_calib"] = chosen_files_mumu_for_tz_tw
+        files_for_xt_sr_dict["mumutight_or_highm_calib"] = chosen_files_mumu_for_xt_sr
+        files_for_tz_tw_dict["mumutight_or_highm_calib"] = chosen_files_mumu_for_tz_tw
 
     if fracion_of_event_for_types[1] > 0:
         basf2.B2INFO("*********************** Select Hadron data for calibration ****************")

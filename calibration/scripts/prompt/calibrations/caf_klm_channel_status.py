@@ -45,7 +45,7 @@ settings = CalibrationSettings(
                         INPUT_DATA_FILTERS['Data Tag']['bhabha_all_calib'],
                         INPUT_DATA_FILTERS['Data Tag']['gamma_gamma_calib'],
                         INPUT_DATA_FILTERS['Data Tag']['hadron_calib'],
-                        INPUT_DATA_FILTERS['Data Tag']['mumutight_calib'],
+                        INPUT_DATA_FILTERS['Data Tag']['mumutight_or_highm_calib'],
                         INPUT_DATA_FILTERS['Data Tag']['radmumu_calib'],
                         INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
     },

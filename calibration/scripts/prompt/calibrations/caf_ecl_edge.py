@@ -14,14 +14,17 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 
 # --------------------------------------------------------------
 # ..Tell the automated script some required details
-settings = CalibrationSettings(name="ecl_edge",
-                               expert_username="hearty",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["mumutight_calib"],
-                               input_data_filters={"mumutight_calib": [INPUT_DATA_FILTERS["Data Tag"]["mumutight_calib"],
-                                                                       INPUT_DATA_FILTERS["Data Quality Tag"]["Good"]]},
-                               depends_on=[])
+settings = CalibrationSettings(
+    name="ecl_edge",
+    expert_username="hearty",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=["mumutight_or_highm_calib"],
+    input_data_filters={
+        "mumutight_or_highm_calib": [
+            INPUT_DATA_FILTERS["Data Tag"]["mumutight_or_highm_calib"],
+            INPUT_DATA_FILTERS["Data Quality Tag"]["Good"]]},
+    depends_on=[])
 
 # --------------------------------------------------------------
 # ..The calibration functions
@@ -35,7 +38,7 @@ def get_calibrations(input_data, **kwargs):
 
     # --------------------------------------------------------------
     # ..Input data
-    file_to_iov_mu_mu = input_data["mumutight_calib"]
+    file_to_iov_mu_mu = input_data["mumutight_or_highm_calib"]
     input_files_mu_mu = list(file_to_iov_mu_mu.keys())
 
     # ..Algorithm

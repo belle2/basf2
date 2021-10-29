@@ -22,7 +22,7 @@ settings = CalibrationSettings(
     input_data_names=[
         "bhabha_all_calib",
         "gamma_gamma_calib",
-        "mumutight_calib"],
+        "mumutight_or_highm_calib"],
     input_data_filters={
         "bhabha_all_calib": [
             INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
@@ -32,8 +32,8 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Data Tag"]["gamma_gamma_calib"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
             INPUT_DATA_FILTERS["Magnet"]["On"]],
-        "mumutight_calib": [
-            INPUT_DATA_FILTERS["Data Tag"]["mumutight_calib"],
+        "mumutight_or_highm_calib": [
+            INPUT_DATA_FILTERS["Data Tag"]["mumutight_or_highm_calib"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],
@@ -137,7 +137,7 @@ def get_calibrations(input_data, **kwargs):
     # ..muon pair
 
     # ..Input data
-    file_to_iov_mu_mu = input_data["mumutight_calib"]
+    file_to_iov_mu_mu = input_data["mumutight_or_highm_calib"]
     input_files_mu_mu = list(file_to_iov_mu_mu.keys())
 
     # ..Algorithm

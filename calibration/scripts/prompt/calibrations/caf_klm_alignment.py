@@ -45,7 +45,7 @@ settings = CalibrationSettings(name="KLM alignmnent",
                                input_data_names=["raw_physics", "raw_cosmic"],
                                input_data_filters={
                                    'raw_physics': [INPUT_DATA_FILTERS['Run Type']['physics'],
-                                                   INPUT_DATA_FILTERS['Data Tag']['mumutight_calib'],
+                                                   INPUT_DATA_FILTERS['Data Tag']['mumutight_or_highm_calib'],
                                                    INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']],
                                    'raw_cosmic': [INPUT_DATA_FILTERS['Run Type']['physics'],
                                                   INPUT_DATA_FILTERS['Data Tag']['cosmic_calib'],

@@ -33,7 +33,7 @@ settings = CalibrationSettings(
     input_data_names=['hlt_mumu'],
     input_data_filters={
         'hlt_mumu': [INPUT_DATA_FILTERS['Run Type']['physics'],
-                     INPUT_DATA_FILTERS['Data Tag']['mumutight_calib'],
+                     INPUT_DATA_FILTERS['Data Tag']['mumutight_or_highm_calib'],
                      INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
     },
     depends_on=[])

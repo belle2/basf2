@@ -145,6 +145,7 @@ void DQMHistAnalysisECLModule::event()
   TH1* h_quality = findHist("ECL/quality");
   if (h_quality != NULL) {
     h_quality->SetFillColor(kPink - 4);
+    h_quality->SetDrawOption("hist");
     h_quality->SetMinimum(0.1);
     h_quality->Draw("hist");
   }

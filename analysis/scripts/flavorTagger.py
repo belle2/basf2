@@ -786,13 +786,13 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None,
                 if not os.path.isfile(identifierFBDT):
                     basf2_mva.download(methodPrefixCombinerLevel + 'FBDT', identifierFBDT)
                     if not os.path.isfile(identifierFBDT):
-                        B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FBDT' +
-                                '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                        B2FATAL('Flavor Tagger: Weight file ' + identifierFBDT +
+                                ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
 
             if useOnlyLocalFlag:
                 if not os.path.isfile(identifierFBDT):
                     B2FATAL('flavorTagger: Combinerlevel FastBDT was not trained with this combination of categories.' +
-                            ' Weight file ' + methodPrefixCombinerLevel + 'FBDT' + '_1.root not found. Stopped')
+                            ' Weight file ' + identifierFBDT + ' not found. Stopped')
 
             B2INFO('flavorTagger: Ready to be used with weightFile ' + methodPrefixCombinerLevel + 'FBDT' + '_1.root')
 
@@ -805,11 +805,12 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None,
                 if not os.path.isfile(identifierFANN):
                     basf2_mva.download(methodPrefixCombinerLevel + 'FANN', identifierFANN)
                     if not os.path.isfile(identifierFANN):
-                        B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FANN' +
-                                '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                        B2FATAL('Flavor Tagger: Weight file ' + identifierFANN +
+                                ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
             if useOnlyLocalFlag:
-                B2FATAL('flavorTagger: Combinerlevel FANNMLP was not trained with this combination of categories. ' +
-                        ' Weight file ' + methodPrefixCombinerLevel + 'FANN' + '_1.root not found. Stopped')
+                if not os.path.isfile(identifierFANN):
+                    B2FATAL('flavorTagger: Combinerlevel FANNMLP was not trained with this combination of categories. ' +
+                            ' Weight file ' + identifierFANN + ' not found. Stopped')
 
             B2INFO('flavorTagger: Ready to be used with weightFile ' + methodPrefixCombinerLevel + 'FANN' + '_1.root')
 

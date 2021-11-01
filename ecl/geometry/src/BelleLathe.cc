@@ -37,9 +37,10 @@ map<string, counter_t> counterl;
 //#define MATCHOUT(x) G4cout<<GetName()<<" "<<x<<G4endl;
 #define MATCHOUT(x)
 
+/** define plane struct */
 struct Plane_t {
-  G4ThreeVector n;// Normal unit vector (x,y,z)
-  double d;       // offset (d)
+  G4ThreeVector n; /**< Normal unit vector (x,y,z) */
+  double d;       /**< offset (d) */
   // => n.x*x + n.y*y + n.z*z + d = 0
 };
 
@@ -57,8 +58,10 @@ ostream& operator <<(ostream& o, const zr_t& v)
   return o << "{" << v.z << ",  " << v.r << "}";
 }
 
+/** curl struct */
 struct curl_t {
-  G4ThreeVector v;
+  G4ThreeVector v; /**< vector */
+  /** constructor */
   explicit curl_t(const G4ThreeVector& _v): v(_v) {}
 };
 
@@ -379,7 +382,11 @@ inline int quadsolve(double a, double b, double c, double& t0, double& t1)
   return 0;
 }
 
-struct solution_t {double t, s;};
+/** solution struct */
+struct solution_t {
+  double t; /**< t */
+  double s; /**< s */
+};
 vector<solution_t> extremum(double A, double B, double C, double D, double E, double F)
 {
   // extremum of Fun(t,s) = A*t*t + B*t*s + C*s*s + D*t + E*s + F => dFun/ds = 0

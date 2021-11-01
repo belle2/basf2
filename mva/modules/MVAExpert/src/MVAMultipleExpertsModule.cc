@@ -139,7 +139,13 @@ namespace Belle2 {
     std::vector<float> targetValues;
     targetValues.resize(m_identifiers.size());
     for (auto const& iVariable : m_feature_variables) {
-      m_feature_variables[iVariable.first] = iVariable.first ->function(particle);
+      if (iVariable.first->variabletype == Variable::Manager::VariableDataType::c_double) {
+        m_feature_variables[iVariable.first] = std::get<double>(iVariable.first->function(particle));
+      } else if (iVariable.first->variabletype == Variable::Manager::VariableDataType::c_int) {
+        m_feature_variables[iVariable.first] = std::get<int>(iVariable.first->function(particle));
+      } else if (iVariable.first->variabletype == Variable::Manager::VariableDataType::c_bool) {
+        m_feature_variables[iVariable.first] = std::get<bool>(iVariable.first->function(particle));
+      }
     }
 
     for (unsigned int i = 0; i < m_identifiers.size(); ++i) {

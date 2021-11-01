@@ -18,16 +18,16 @@ namespace Belle2 {
     /**
      * returns True if the environment is MC and False for data
      */
-    double isMC(const Particle*);
+    bool isMC(const Particle*);
 
     /**
      * returns true if event doesn't contain an Y(4S)
      */
-    double isContinuumEvent(const Particle*);
+    bool isContinuumEvent(const Particle*);
     /**
      * returns true if event contains a charged B-meson
      */
-    double isChargedBEvent(const Particle*);
+    bool isChargedBEvent(const Particle*);
     /**
      * returns true if event contains opposite flavor neutral B-mesons
      */
@@ -36,20 +36,20 @@ namespace Belle2 {
 
     /*
      * Variable used as target for Continuum Suppression Training
-     * Returns 1.0 if the Event is not a continuum event, else 0.0
+     * Returns 1 if the Event is not a continuum event, else 0
     */
-    double isNotContinuumEvent(const Particle*);
+    bool isNotContinuumEvent(const Particle*);
 
     /**
      * return number of tracks in event
      */
-    double nTracks(const Particle*);
+    int nTracks(const Particle*);
 
     /**
      * return number of problematic charge 0 tracks in event
      * (these get skipped when making particle lists)
      */
-    double nChargeZeroTrackFits(const Particle*);
+    int nChargeZeroTrackFits(const Particle*);
 
     /**
      * return legacy total energy in ECL clusters in event as used for Belle 1 analysis
@@ -59,32 +59,32 @@ namespace Belle2 {
     /**
      * return number of KLM clusters in event
      */
-    double nKLMClusters(const Particle*);
+    int nKLMClusters(const Particle*);
 
     /**
      * return number MCParticles in event
      */
-    double nMCParticles(const Particle*);
+    int nMCParticles(const Particle*);
 
     /**
     * return experiment number
     */
-    double expNum(const Particle*);
+    int expNum(const Particle*);
 
     /**
     * return event number
     */
-    double evtNum(const Particle*);
+    int evtNum(const Particle*);
 
     /**
     * return run number
     */
-    double runNum(const Particle*);
+    int runNum(const Particle*);
 
     /**
     * return productionIdentifier
     */
-    double productionIdentifier(const Particle*);
+    int productionIdentifier(const Particle*);
 
     /**
      * return CMS energy

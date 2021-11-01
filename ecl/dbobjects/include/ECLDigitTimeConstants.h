@@ -45,12 +45,12 @@ namespace Belle2 {
     int getCellID() const {return m_cellID; };
 
     /** Set calibration offset
-     * @param calibration offset
+     * @param offset calibration offset
      */
     void setOffset(float offset) {m_offset = offset; };
 
     /** Set cell ID
-     * @param cell ID
+     * @param cellid cell ID
      */
     void setCellID(int cellid) {m_cellID = cellid; };
 

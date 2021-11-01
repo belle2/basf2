@@ -19,6 +19,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
+#include <variant>
 
 namespace Belle2 {
 
@@ -47,6 +48,166 @@ namespace Belle2 {
    * Helper function to test if two doubles are almost equal.
    */
   bool almostEqualDouble(const double& a, const double& b);
+
+  /**
+     * This is a class template which takes a template class operation as template argument.
+     * This allows passing the functional class templates e.g std::greater<T>,  which are templates themselves.
+     *
+     * In the Nodes we often have to compare two node evaluation results with each other.
+     * They are of type type `variant<double, int, bool>`. Variants cannot be compared to each other directly, you have to extract the values and compare them.
+     * This gives nine different combinations for two variants.
+     * C++ introduced the std::visit concept for this purpose of variant evaluation.
+     * std::visit takes a Visitor class and the variants as parameters.
+     * One way to write a Visitor is the following way, where a operator() overload is supplied for every data type combination the variants can have.
+     * The visitor has to be exhaustive (every data type combination must be covered), and every operator() overload has to have the same return type.
+     *
+     * We have to do this comparisons for all comparison operators e.g ==, !=, > ...
+     * We can do this by passing the corresponding functional class template e.g std::equal_to<T>, std::not_equal_to<T>, std::greater<T>
+     * The datatype T is substituted in the operator() overload depending on the data type combination.
+     *
+     * When comparing double/int and a bool the double/int overload of the functionals are used to disable implicit conversion to bool:
+     * std::equal_to<bool>{}(1.2, true) ==> true; 1.2 is implicitly converted to true, because of std::equal<bool>
+     * std::equal_to<double>{}(1.2, true) ==> false; true is implicity converted to 1.0, because of std::equal<double>
+     */
+  template <template <typename type> class operation>
+  struct Visitor {
+    /**
+     * double double overload with double comparison.
+     **/
+    bool operator()(const double& val0, const double& val1)
+    {
+      return operation<double> {}(val0, val1);
+    }
+    /**
+     * double int overload with double comparison.
+     **/
+    bool operator()(const double& val0, const int& val1)
+    {
+      return operation<double> {}(val0, val1);
+    }
+    /**
+     * double bool  overload with double comparison.
+     **/
+    bool operator()(const double& val0, const bool& val1)
+    {
+      return operation<double> {}(val0, val1);
+    }
+    /**
+     * int int overload with int comparison.
+     **/
+    bool operator()(const int& val0, const int& val1)
+    {
+      return operation<int> {}(val0, val1);
+    }
+    /**
+     * int bool overload with int comparison.
+     **/
+    bool operator()(const int& val0, const bool& val1)
+    {
+      return operation<int> {}(val0, val1);
+    }
+    /**
+     * int double overload with double comparison.
+     **/
+    bool operator()(const int& val0, const double& val1)
+    {
+      return operation<double> {}(val0, val1);
+    }
+    /**
+     * bool bool overload with bool comparison.
+     **/
+    bool operator()(const bool& val0, const bool& val1)
+    {
+      return operation<bool> {}(val0, val1);
+    }
+    /**
+     * bool double overload with double comparison.
+     **/
+    bool operator()(const bool& val0, const double& val1)
+    {
+      return operation<double> {}(val0, val1);
+    }
+    /**
+     * bool int overload with int comparison.
+     **/
+    bool operator()(const bool& val0, const int& val1)
+    {
+      return operation<int> {}(val0, val1);
+    }
+  };
+
+  /**
+   * Seperate Visitor struct for equal_to comparison of variant<double, int bool>.
+   * Uses almostEqualDouble if one argument is double.
+  **/
+  struct EqualVisitor {
+    /**
+     * double double overload with double comparison.
+     **/
+    bool operator()(const double& val0, const double& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * double int overload with double comparison.
+     **/
+    bool operator()(const double& val0, const int& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * double bool  overload with double comparison.
+     **/
+    bool operator()(const double& val0, const bool& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * int int overload with int comparison.
+     **/
+    bool operator()(const int& val0, const int& val1)
+    {
+      return std::equal_to<int> {}(val0, val1);
+    }
+    /**
+     * int bool overload with int comparison.
+     **/
+    bool operator()(const int& val0, const bool& val1)
+    {
+      return std::equal_to<int> {}(val0, val1);
+    }
+    /**
+     * int double overload with double comparison.
+     **/
+    bool operator()(const int& val0, const double& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * bool bool overload with bool comparison.
+     **/
+    bool operator()(const bool& val0, const bool& val1)
+    {
+      return std::equal_to<bool> {}(val0, val1);
+    }
+    /**
+     * bool double overload with double comparison.
+     **/
+    bool operator()(const bool& val0, const double& val1)
+    {
+      return almostEqualDouble(val0, val1);
+    }
+    /**
+     * bool int overload with int comparison.
+     **/
+    bool operator()(const bool& val0, const int& val1)
+    {
+      return std::equal_to<int> {}(val0, val1);
+    }
+
+  };
+
+
 
   /**
    * This class implements a common way to implement cut/selection functionality for arbitrary objects.
@@ -112,24 +273,29 @@ namespace Belle2 {
         case EMPTY:
           return true;
         case NONE:
-          return std::isnan(this->get(p)) ? false : this->get(p);
+          if (std::holds_alternative<double>(this->get(p))) {
+            return std::isnan(std::get<double>(this->get(p))) ? false : std::get<double>(this->get(p));
+          } else if (std::holds_alternative<int>(this->get(p))) {
+            return std::get<int>(this->get(p));
+          } else return std::get<bool>(this->get(p));
         case AND:
           return m_left->check(p) and m_right->check(p);
         case OR:
           return m_left->check(p) or m_right->check(p);
         case LT:
-          return m_left->get(p) < m_right->get(p);
+          return std::visit(Visitor<std::less> {}, m_left->get(p), m_right->get(p));
         case LE:
-          return m_left->get(p) <= m_right->get(p);
+          return std::visit(Visitor<std::less_equal> {}, m_left->get(p), m_right->get(p));
         case GT:
-          return m_left->get(p) > m_right->get(p);
+          return std::visit(Visitor<std::greater> {}, m_left->get(p), m_right->get(p));
         case GE:
-          return m_left->get(p) >= m_right->get(p);
+          return std::visit(Visitor<std::greater_equal> {}, m_left->get(p), m_right->get(p));
         case EQ:
-          return almostEqualDouble(m_left->get(p), m_right->get(p));
+          return std::visit(EqualVisitor {}, m_left->get(p), m_right->get(p));
         case NE:
-          return not almostEqualDouble(m_left->get(p), m_right->get(p));
+          return !std::visit(EqualVisitor {}, m_left->get(p), m_right->get(p));
       }
+
       throw std::runtime_error("Cut string has an invalid format: Invalid operation");
       return false;
     }
@@ -381,7 +547,7 @@ namespace Belle2 {
     /**
      * Returns stored number or Variable value for the given object.
      */
-    double get(const Object* p) const
+    std::variant<double, int, bool> get(const Object* p) const
     {
       if (m_isNumeric) {
         return m_number;

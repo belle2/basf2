@@ -30,6 +30,8 @@ namespace Belle2 {
     /**
      * Add a new item with an estimator value
      *
+     * @param item item
+     * @param est estimator
      * @param estComparison The default estimator will favor items with
      *  smaller estimates
      */

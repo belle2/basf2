@@ -19,7 +19,7 @@ namespace Belle2 {
   /**
    * A module to plot the x-t images from TOP, and in general study the distribution of the digits associated to the particles in a particleList.
    * Starting from a particleList, it produces a tree containing any variable of choice available in the variableManager (ancing in the same way as the variablesToNtuple module),
-   * plus branches containing the caracteristics of the TOPDigits in the slot where the particle is extrapolated and the histograms of the expected PDF (pixelcol VS channel)
+   * plus branches containing the characteristics of the TOPDigits in the slot where the particle is extrapolated and the histograms of the expected PDF (pixelcol VS channel)
    */
   class TOPRingPlotterModule : public Module {
 
@@ -71,7 +71,7 @@ namespace Belle2 {
     /** List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
     std::vector<std::string> m_variables = {};
 
-    std::vector<short> m_pdgHyp = {11, 13, 211, 321, 2212}; /**< List of pdg codes for which the PDF is sampled ansd saved. */
+    std::vector<short> m_pdgHyp = {11, 13, 211, 321, 2212}; /**< List of pdg codes for which the PDF is sampled and saved. */
 
     float m_digitTime[m_MaxPhotons] = {0}; /**< Digit calibrated time [ns] */
     short m_digitChannel[m_MaxPhotons] = {0}; /**< SW channel (0-511) */

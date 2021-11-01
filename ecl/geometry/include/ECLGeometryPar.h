@@ -104,6 +104,7 @@ namespace Belle2 {
         return TVector3(t.x(), t.y(), t.z());
       }
 
+      /** function to calculate flight time to diode sensor */
       double time2sensor(int cid, const G4ThreeVector& hit_pos);
     private:
       /** Global transformations for the forward part*/
@@ -116,7 +117,8 @@ namespace Belle2 {
       void InitCrystal(int cid);
       /** crystal geometry */
       struct CrystalGeom_t {
-        G4ThreeVector pos, dir;
+        G4ThreeVector pos; /**< position of crystal */
+        G4ThreeVector dir; /**< direction of crystal */
       };
       /** the crystals */
       std::vector<CrystalGeom_t> m_crystals;
@@ -184,9 +186,12 @@ namespace Belle2 {
       void Mapping(int cid);
       int GetCellID(int ThetaId, int PhiId);/**< Get Cell Id */
 
-      int GetCellID() {return mNbr_cellID;};/**< Get Cell Id */
-      int GetThetaID() {return mNbr_thetaID;};/**< Get Theta Id */
-      int GetPhiID() {return mNbr_phiID;};/**< Get Phi Id */
+      /** Get Cell Id */
+      int GetCellID() {return mNbr_cellID;};
+      /** Get Theta Id */
+      int GetThetaID() {return mNbr_thetaID;};
+      /** Get Phi Id */
+      int GetPhiID() {return mNbr_phiID;};
 
     protected:
       // protected member functions

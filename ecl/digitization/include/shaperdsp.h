@@ -156,6 +156,7 @@ namespace Belle2 {
 
       ~ShaperDSP_t() {}
       /** Initialization of the parameters response function
+       *  @param s   vector of shape parameters
        *  @param u   'unitscale' of the waveform template
        *             This sets the normalization for the template amplitude to be unity.
        *             If the waveform templates are modified this needs to be adjusted as well.

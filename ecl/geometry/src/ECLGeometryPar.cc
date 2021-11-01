@@ -23,14 +23,17 @@ using namespace ECL;
 
 ECLGeometryPar* ECLGeometryPar::m_B4ECLGeometryParDB = 0;
 
+/** Mapping class */
 class Mapping_t {
 public:
+  /** Retrieving theta and phi id of crystal */
   static void Mapping(int id, int& ThetaId, int& PhiId)
   {
     ThetaId = m_Theta[((unsigned int)id) >> 4];
     PhiId = id - m_dTheta[ThetaId] * 16 - ThetaId * 128;
   }
 
+  /** Retrieving theta id, phi id, reciprocal shift and index */
   static void Mapping(int id, int& ThetaId, int& PhiId, int& nrep, int& indx)
   {
     Mapping(id, ThetaId, PhiId);
@@ -45,32 +48,39 @@ public:
     indx = off + (PhiId - nrep * d);
   }
 
+  /** return cell id as a function of theta id and phi id */
   static int CellID(int ThetaId, int PhiId)
   {
     return PhiId + m_dTheta[ThetaId] * 16 + ThetaId * 128;
   }
 
+  /** return offset based on theta id */
   static int Offset(int ThetaId)
   {
     return m_dTheta[ThetaId] + ThetaId * 8;
   }
 
+  /** getter for theta */
   static int Indx2ThetaId(int indx)
   {
     return m_Theta[indx];
   }
 
+  /** getter for number of crystals */
   static int ThetaId2NCry(int ThetaId)  // Theta Id to the number of crystals @ this Id
   {
     return m_denom[m_tbl[ThetaId]];
   }
 
 private:
-  static const char m_dTheta[69];
-  static const unsigned char m_Theta[546], m_tbl[69], m_offsets[69];
+  static const char m_dTheta[69];/**< array of theta offsets */
+  static const unsigned char m_Theta[546]; /**< array of theta */
+  static const unsigned char m_tbl[69]; /**< array of crystals per phi sector */
+  static const unsigned char m_offsets[69]; /**< array of offsets */
 
-  static const unsigned char m_RECIPROCAL_SHIFT = 16;
-  static const unsigned int m_recip[5], m_denom[5];
+  static const unsigned char m_RECIPROCAL_SHIFT = 16; /**< reciprocal shift */
+  static const unsigned int m_recip[5]; /**< array of reciprocal values */
+  static const unsigned int m_denom[5]; /**< array of denominator values */
 };
 
 const unsigned char Mapping_t::m_Theta[546] = {

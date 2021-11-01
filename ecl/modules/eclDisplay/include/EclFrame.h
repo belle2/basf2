@@ -122,7 +122,10 @@ namespace Belle2 {
 
   public:
     /**
-     * @param auto_load Display new events as soon as they are loaded.
+     * @param painter_type painter type
+     * @param data ECL data
+     * @param auto_display Display new events as soon as they are loaded.
+     * @param mapper ECL channel mapper
      */
     EclFrame(int painter_type, EclData* data, bool auto_display,
              ECL::ECLChannelMapper* mapper);

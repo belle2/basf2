@@ -50,7 +50,7 @@ namespace Belle2 {
      * from a database.
      * @param obj is object.
      * @param iov is validity interval.
-     * @oaram event is event metadata.
+     * @param event is event metadata.
      */
     void read(TObject** obj,
               IntervalOfValidity** iov,

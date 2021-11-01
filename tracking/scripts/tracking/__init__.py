@@ -35,9 +35,11 @@ from tracking.path_utils import (  # noqa
     use_local_sectormap,
 )
 
+from pxd import add_pxd_reconstruction
+
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
-                                mcTrackFinding=False, trackFitHypotheses=None,
+                                mcTrackFinding=False, trackFitHypotheses=None, pxd_filtering_offline=False,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
@@ -104,6 +106,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         skipGeometryAdding=skipGeometryAdding,
         mcTrackFinding=mcTrackFinding,
         trackFitHypotheses=trackFitHypotheses,
+        pxd_filtering_offline=pxd_filtering_offline,
         reco_tracks=reco_tracks,
         prune_temporary_tracks=prune_temporary_tracks,
         fit_tracks=fit_tracks,
@@ -125,7 +128,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
 def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdding=False,
                                           mcTrackFinding=False, trackFitHypotheses=None,
-                                          reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
+                                          pxd_filtering_offline=False, reco_tracks="RecoTracks",
+                                          prune_temporary_tracks=True, fit_tracks=True,
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                           use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                           add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False):
@@ -180,7 +184,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         add_geometry_modules(path, components=components)
 
     if not skipHitPreparerAdding:
-        add_hit_preparation_modules(path, components=components)
+        add_hit_preparation_modules(path, components=components, pxd_filtering_offline=pxd_filtering_offline)
 
     # Material effects for all track extrapolations
     if 'SetupGenfitExtrapolation' not in path:
@@ -192,6 +196,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                              use_second_cdc_hits=use_second_cdc_hits)
     else:
         add_track_finding(path, components=components, reco_tracks=reco_tracks,
+                          pxd_filtering_offline=pxd_filtering_offline,
                           prune_temporary_tracks=prune_temporary_tracks,
                           use_second_cdc_hits=use_second_cdc_hits,
                           use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
@@ -311,8 +316,8 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
                                 use_second_cdc_hits=use_second_cdc_hits)
 
 
-def add_track_finding(path, components=None, reco_tracks="RecoTracks",
-                      prune_temporary_tracks=True, use_second_cdc_hits=False,
+def add_track_finding(path, components=None, reco_tracks="RecoTracks", pxd_filtering_offline=False,
+                      use_HLT_ROIs=False, prune_temporary_tracks=True, use_second_cdc_hits=False,
                       use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True,
                       use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                       add_cdcTrack_QI=True, add_vxdTrack_QI=False):
@@ -408,6 +413,24 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         latest_reco_tracks = combined_ecl_reco_tracks
 
     if is_pxd_used(components):
+        if pxd_filtering_offline:
+            roiName = "ROIs"
+            if not use_HLT_ROIs:
+                path.add_module("DAFRecoFitter", recoTracksStoreArrayName=latest_reco_tracks)
+
+                roiName = "ROIs_offline"
+                add_roiFinder(path, reco_tracks=latest_reco_tracks, roiName=roiName)
+
+            pxd_digifilter = b2.register_module('PXDdigiFilter')
+            pxd_digifilter.param('ROIidsName', roiName)
+            pxd_digifilter.param('PXDDigitsName', 'PXDDigits')
+            pxd_digifilter.param('PXDDigitsInsideROIName', 'PXDDigits')
+            pxd_digifilter.param('overrideDB', True)
+            pxd_digifilter.param('usePXDDataReduction', True)
+            path.add_module(pxd_digifilter)
+
+            add_pxd_reconstruction(path)
+
         add_pxd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
                               use_mc_truth=use_mc_truth, output_reco_tracks=reco_tracks,
                               temporary_reco_tracks=pxd_reco_tracks,
@@ -518,6 +541,31 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
     dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)
     dafRecoFitter.param('svdHitsStoreArrayName', svd_cluster)
     path.add_module(dafRecoFitter)
+
+
+def add_roiFinder(path, reco_tracks="RecoTracks", roiName="ROIs"):
+    """
+    Add the ROI finding to the path creating ROIs out of reco tracks by extrapolating them to the PXD volume.
+    :param path: Where to add the module to.
+    :param reco_tracks: Which tracks to use in the extrapolation step.
+    """
+
+    pxdDataRed = b2.register_module('PXDROIFinder')
+    param_pxdDataRed = {
+        'recoTrackListName': reco_tracks,
+        'PXDInterceptListName': 'PXDIntercepts',
+        'ROIListName': roiName,
+        'tolerancePhi': 0.15,
+        'toleranceZ': 0.5,
+        'sigmaSystU': 0.02,
+        'sigmaSystV': 0.02,
+        'numSigmaTotU': 10,
+        'numSigmaTotV': 10,
+        'maxWidthU': 0.5,
+        'maxWidthV': 0.5,
+    }
+    pxdDataRed.param(param_pxdDataRed)
+    path.add_module(pxdDataRed)
 
 
 def add_vxd_standalone_cosmics_finder(

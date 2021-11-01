@@ -77,7 +77,8 @@ def default_event_abort(module, condition, error_flag):
     module.if_value(condition, p, basf2.AfterConditionPath.END)
 
 
-def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
+def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True,
+                       pxd_filtering_offline=False, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True):
@@ -122,6 +123,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     add_prefilter_reconstruction(path,
                                  components=components,
                                  add_modules_for_trigger_calculation=add_trigger_calculation,
+                                 pxd_filtering_offline=pxd_filtering_offline,
                                  skipGeometryAdding=skipGeometryAdding,
                                  trackFitHypotheses=trackFitHypotheses,
                                  use_second_cdc_hits=use_second_cdc_hits,
@@ -146,7 +148,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         add_skim_software_trigger(path)
 
 
-def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_calculation=True,
+def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_calculation=True, pxd_filtering_offline=False,
                                  skipGeometryAdding=False, trackFitHypotheses=None, use_second_cdc_hits=False,
                                  add_muid_hits=False, reconstruct_cdst=None, addClusterExpertModules=True,
                                  pruneTracks=True, event_abort=default_event_abort,
@@ -197,6 +199,7 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
     add_prefilter_tracking_reconstruction(path,
                                           components=components,
                                           mcTrackFinding=False,
+                                          pxd_filtering_offline=pxd_filtering_offline,
                                           skipGeometryAdding=skipGeometryAdding,
                                           trackFitHypotheses=trackFitHypotheses,
                                           use_second_cdc_hits=use_second_cdc_hits)

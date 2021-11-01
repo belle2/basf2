@@ -50,7 +50,7 @@ def add_geometry_modules(path, components=None):
                         energyLossBrems=False, noiseBrems=False)
 
 
-def add_hit_preparation_modules(path, components=None):
+def add_hit_preparation_modules(path, components=None, pxd_roi_filtering=False):
     """
     Helper fucntion to prepare the hit information to be used by tracking.
     """
@@ -60,7 +60,7 @@ def add_hit_preparation_modules(path, components=None):
         add_svd_reconstruction(path)
 
     # Preparation of the PXD clusters
-    if is_pxd_used(components):
+    if is_pxd_used(components) and not pxd_roi_filtering:
         add_pxd_reconstruction(path)
 
 

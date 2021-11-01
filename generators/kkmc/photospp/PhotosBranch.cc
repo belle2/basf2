@@ -101,15 +101,16 @@ namespace Photospp {
       std::list<PhotosParticle*>::iterator it;
       for (it = list.begin(); it != list.end(); it++) {
         PhotosBranch* branch = new PhotosBranch(*it);
-        int forcing = branch->getForcingStatus();
-        if (forcing) {
-          Log::Debug(701) << " Forced: " << (*it)->getPdgID() << " (barcode: " << (*it)->getBarcode() << ") with forcing status= " << forcing
+        int forcing_local = branch->getForcingStatus();
+        if (forcing_local) {
+          Log::Debug(701) << " Forced: " << (*it)->getPdgID() << " (barcode: " << (*it)->getBarcode() << ") with forcing status= "
+                          << forcing_local
                           << endl;
           branches.push_back(branch);
           it = list.erase(it);
           --it;
           // If forcing consecutive decays
-          if (forcing == 2) {
+          if (forcing_local == 2) {
             PhotosParticle* p = branch->getDecayingParticle();
             if (!p) {
               if (branch->getMothers().size() > 0) p = branch->getMothers().at(0);
@@ -139,18 +140,18 @@ namespace Photospp {
     if (Photos::isSuppressed) return branches;
     // Now - check if remaining decays are suppressed
     while (!list.empty()) {
-      PhotosParticle* particle = list.front();
+      PhotosParticle* particle_local = list.front();
       list.pop_front();
-      if (!particle) continue;
+      if (!particle_local) continue;
 
-      PhotosBranch* branch = new PhotosBranch(particle);
-      int suppression = branch->getSuppressionStatus();
-      if (!suppression) branches.push_back(branch);
+      PhotosBranch* branch = new PhotosBranch(particle_local);
+      int suppression_local = branch->getSuppressionStatus();
+      if (!suppression_local) branches.push_back(branch);
       else {
-        Log::Debug(702) << "  Suppressed: " << particle->getPdgID() << " (barcode: " << particle->getBarcode() <<
-                        ") with suppression status= " << suppression << endl;
+        Log::Debug(702) << "  Suppressed: " << particle_local->getPdgID() << " (barcode: " << particle_local->getBarcode() <<
+                        ") with suppression status= " << suppression_local << endl;
         //If suppressing consecutive decays
-        if (suppression == 2) {
+        if (suppression_local == 2) {
           PhotosParticle* p = branch->getDecayingParticle();
           if (!p) {
             if (branch->getMothers().size() > 0) p = branch->getMothers().at(0);
@@ -175,10 +176,10 @@ namespace Photospp {
 
       //In case we don't have mid-particle erase rest of the mothers from list
       if (!branch->getDecayingParticle()) {
-        vector<PhotosParticle*> mothers = branch->getMothers();
-        for (int i = 0; i < (int)mothers.size(); i++) {
-          PhotosParticle* m = mothers.at(i);
-          if (m->getBarcode() == particle->getBarcode()) continue;
+        vector<PhotosParticle*> mothers_local = branch->getMothers();
+        for (int i = 0; i < (int)mothers_local.size(); i++) {
+          PhotosParticle* m = mothers_local.at(i);
+          if (m->getBarcode() == particle_local->getBarcode()) continue;
           std::list<PhotosParticle*>::iterator it;
           for (it = list.begin(); it != list.end(); it++)
             if (m->getBarcode() == (*it)->getBarcode()) {

@@ -322,7 +322,7 @@ namespace Belle2 {
       return p4CMS.P() / TMath::Sqrt(s * s / 4 - M * M);
     }
 
-    double particlePDGCode(const Particle* part)
+    int particlePDGCode(const Particle* part)
     {
       return part->getPDGCode();
     }
@@ -694,10 +694,10 @@ namespace Belle2 {
       }
     }
 
-    double printParticle(const Particle* p)
+    bool printParticle(const Particle* p)
     {
       printParticleInternal(p, 0);
-      return 0.0;
+      return 0;
     }
 
 
@@ -931,7 +931,7 @@ namespace Belle2 {
       }
     }
 
-    double nRemainingTracksInEvent(const Particle* particle)
+    int nRemainingTracksInEvent(const Particle* particle)
     {
 
       StoreArray<Track> tracks;
@@ -965,12 +965,13 @@ namespace Belle2 {
       return result;
     }
 
-    double False(const Particle*)
+
+    bool False(const Particle*)
     {
       return 0;
     }
 
-    double True(const Particle*)
+    bool True(const Particle*)
     {
       return 1;
     }
@@ -1025,7 +1026,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("momDevChi2", momentumDeviationChi2,
                       "momentum deviation chi^2 value calculated as"
                       "chi^2 = sum_i (p_i - mc(p_i))^2/sigma(p_i)^2, where sum runs over i = px, py, pz and"
-                      "mc(p_i) is the mc truth value and sigma(p_i) is the estimated error of i-th component of momentum vector")
+                      "mc(p_i) is the mc truth value and sigma(p_i) is the estimated error of i-th component of momentum vector");
     REGISTER_VARIABLE("theta", particleTheta, "polar angle in radians");
     REGISTER_VARIABLE("thetaErr", particleThetaErr, "error of polar angle in radians");
     REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
@@ -1044,7 +1045,7 @@ namespace Belle2 {
                       cosThetaBetweenParticleAndNominalB,
                       "cosine of the angle in CMS between momentum the particle and a nominal B particle. It is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
     REGISTER_VARIABLE("cosToThrustOfEvent", cosToThrustOfEvent,
-                      "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable")
+                      "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable");
 
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
 
@@ -1104,13 +1105,13 @@ Note that this is context-dependent variable and can take different values depen
                       "Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter ");
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,
-                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.");
     REGISTER_VARIABLE("b2bPhi", b2bPhi,
-                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.");
     REGISTER_VARIABLE("b2bClusterTheta", b2bClusterTheta,
-                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.")
+                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.");
     REGISTER_VARIABLE("b2bClusterPhi", b2bClusterPhi,
-                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.")
+                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.");
     REGISTER_VARIABLE("ArmenterosLongitudinalMomentumAsymmetry", ArmenterosLongitudinalMomentumAsymmetry,
                       "Longitudinal momentum asymmetry of V0's daughters.\n"
                       "The mother (V0) is required to have exactly two daughters");

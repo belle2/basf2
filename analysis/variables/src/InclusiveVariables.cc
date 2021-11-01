@@ -19,7 +19,7 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    double nDaughterPhotons(const Particle* particle)
+    int nDaughterPhotons(const Particle* particle)
     {
       int result = 0;
       auto fspDaughters = particle->getFinalStateDaughters();
@@ -31,7 +31,7 @@ namespace Belle2 {
       return result;
     }
 
-    double nDaughterNeutralHadrons(const Particle* particle)
+    int nDaughterNeutralHadrons(const Particle* particle)
     {
       int result = 0;
       auto fspDaughters = particle->getFinalStateDaughters();
@@ -56,7 +56,7 @@ namespace Belle2 {
           return nullptr;
         }
       }
-      auto func = [pdgCode](const Particle * particle) -> double {
+      auto func = [pdgCode](const Particle * particle) -> int {
         int result = 0;
         auto fspDaughters = particle->getFinalStateDaughters();
         for (auto* daughter : fspDaughters)
@@ -74,7 +74,7 @@ namespace Belle2 {
       return func;
     }
 
-    double nCompositeDaughters(const Particle* particle)
+    int nCompositeDaughters(const Particle* particle)
     {
       int result = 0;
       auto fspDaughters = particle->getDaughters();
@@ -97,9 +97,16 @@ namespace Belle2 {
           {
             return std::numeric_limits<double>::quiet_NaN();
           }
-          for (unsigned j = 0; j < particle->getNDaughters(); ++j)
+          if (std::holds_alternative<double>(var->function(particle->getDaughter(0))))
           {
-            sum += var->function(particle->getDaughter(j));
+            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+              sum += std::get<double>(var->function(particle->getDaughter(j)));
+            }
+          } else if (std::holds_alternative<int>(var->function(particle->getDaughter(0))))
+          {
+            for (unsigned j = 0; j < particle->getNDaughters(); ++j) {
+              sum += std::get<int>(var->function(particle->getDaughter(j)));
+            }
           }
           return sum / particle->getNDaughters();
         };
@@ -109,8 +116,6 @@ namespace Belle2 {
       }
     }
 
-
-
     // ---
 
     VARIABLE_GROUP("For fully-inclusive particles");
@@ -119,12 +124,12 @@ namespace Belle2 {
                       "Returns the number of final state daughter photons.");
     REGISTER_VARIABLE("nDaughterNeutralHadrons",   nDaughterNeutralHadrons,
                       "Returns the number of K_L0 or neutrons among the final state daughters.");
-    REGISTER_VARIABLE("nDaughterCharged(pdg)",   nDaughterCharged,
-                      "Returns the number of charged daughters with the provided PDG code or the number "
-                      "of all charged daughters if no argument has been provided.");
+    REGISTER_METAVARIABLE("nDaughterCharged(pdg)",   nDaughterCharged,
+                          "Returns the number of charged daughters with the provided PDG code or the number "
+                          "of all charged daughters if no argument has been provided.", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("nCompositeDaughters",   nCompositeDaughters,
                       "Returns the number of final state composite daughters.");
-    REGISTER_VARIABLE("daughterAverageOf(variable)", daughterAverageOf,
-                      "Returns the mean value of a variable over all daughters.")
+    REGISTER_METAVARIABLE("daughterAverageOf(variable)", daughterAverageOf,
+                          "Returns the mean value of a variable over all daughters.", Manager::VariableDataType::c_double)
   }
 }

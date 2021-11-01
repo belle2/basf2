@@ -709,19 +709,19 @@ namespace Belle2 {
     int v0DaughtersShareInnermostHit(const Particle* part)
     {
       if (!part)
-        return std::numeric_limits<int>::quiet_NaN();
+        return -1;
       auto daughterPlus  = part->getDaughter(0);
       auto daughterMinus = part->getDaughter(1);
       if (!daughterPlus || !daughterMinus)
-        return std::numeric_limits<int>::quiet_NaN();
+        return -1;
       auto trackFitPlus  = daughterPlus->getTrackFitResult();
       auto trackFitMinus = daughterMinus->getTrackFitResult();
       if (!trackFitPlus || !trackFitMinus)
-        return std::numeric_limits<int>::quiet_NaN();
+        return -1;
       int flagPlus  = trackFitPlus->getHitPatternVXD().getInnermostHitShareStatus();
       int flagMinus = trackFitMinus->getHitPatternVXD().getInnermostHitShareStatus();
       if (flagPlus != flagMinus)
-        return std::numeric_limits<int>::quiet_NaN();
+        return -1;
       return flagPlus;
     }
 
@@ -775,7 +775,7 @@ namespace Belle2 {
     MAKE_DEPRECATED("v0DaughterLastCDCLayer(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `lastCDCLayer`,
                      so replace the current call with ``daughter(i, lastCDCLayer)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterPValue(i)",        v0DaughterTrackPValue,
+    REGISTER_VARIABLE("v0DaughterPValue(i)", v0DaughterTrackPValue,
                       "chi2 probalility of the i-th daughter track fit");
     MAKE_DEPRECATED("v0DaughterPValue(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `pValue`,
@@ -802,19 +802,19 @@ namespace Belle2 {
                      The same value can be calculated with the more generic variable `tanLambda`,
                      so replace the current call with ``daughter(i, tanLambda)``.)DOC");
     /// error of helix parameters
-    REGISTER_VARIABLE("v0DaughterD0Error(i)",        v0DaughterTrackD0Error,        "d0 error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterD0Error(i)", v0DaughterTrackD0Error, "d0 error of the i-th daughter track fit");
     MAKE_DEPRECATED("v0DaughterD0Error(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `d0Err`,
                      so replace the current call with ``daughter(i, d0Err)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterPhi0Error(i)",      v0DaughterTrackPhi0Error,      "phi0 error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterPhi0Error(i)", v0DaughterTrackPhi0Error, "phi0 error of the i-th daughter track fit");
     MAKE_DEPRECATED("v0DaughterPhi0Error(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `phi0Err`,
                      so replace the current call with ``daughter(i, phi0Err)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterOmegaError(i)",     v0DaughterTrackOmegaError,     "omega error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterOmegaError(i)", v0DaughterTrackOmegaError, "omega error of the i-th daughter track fit");
     MAKE_DEPRECATED("v0DaughterOmegaError(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `omegaErr`,
                      so replace the current call with ``daughter(i, omegaErr)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterZ0Error(i)",        v0DaughterTrackZ0Error,        "z0 error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterZ0Error(i)", v0DaughterTrackZ0Error, "z0 error of the i-th daughter track fit");
     MAKE_DEPRECATED("v0DaughterZ0Error(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `z0Err`,
                      so replace the current call with ``daughter(i, z0Err)``.)DOC");

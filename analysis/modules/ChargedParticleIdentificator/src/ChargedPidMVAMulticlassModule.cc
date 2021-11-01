@@ -138,7 +138,14 @@ void ChargedPidMVAMulticlassModule::event()
 
         auto varobj = m_variables.at(index).at(ivar);
 
-        auto var = varobj->function(particle);
+        double var;
+        if (std::holds_alternative<double>(varobj->function(particle))) {
+          var = std::get<double>(varobj->function(particle));
+        } else if (std::holds_alternative<int>(varobj->function(particle))) {
+          var = std::get<int>(varobj->function(particle));
+        } else {
+          B2ERROR("Variable '" << varobj->name << "' has wrong data type! It must be either double or integer.");
+        }
 
         // Manual imputation value of -999 for NaN (undefined) variables. Needed by TMVA.
         var = (std::isnan(var)) ? -999.0 : var;
@@ -156,7 +163,14 @@ void ChargedPidMVAMulticlassModule::event()
 
         auto specobj = m_spectators.at(index).at(ispec);
 
-        auto spec = specobj->function(particle);
+        double spec;
+        if (std::holds_alternative<double>(specobj->function(particle))) {
+          spec = std::get<double>(specobj->function(particle));
+        } else if (std::holds_alternative<int>(specobj->function(particle))) {
+          spec = std::get<int>(specobj->function(particle));
+        } else {
+          B2ERROR("Variable '" << specobj->name << "' has wrong data type! It must be either double or integer.");
+        }
 
         B2DEBUG(12, "\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
 

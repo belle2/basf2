@@ -121,6 +121,10 @@ namespace Belle2 {
     if (!m_variable) {
       B2ERROR("Variable '" << m_variableName << "' is not available in Variable::Manager!");
     }
+    if (!(m_variable->variabletype == Variable::Manager::VariableDataType::c_double
+          or m_variable->variabletype == Variable::Manager::VariableDataType::c_int)) {
+      B2ERROR("Variable '" << m_variableName << "' has wrong data type! It must be either double or integer.");
+    }
     m_cut = Variable::Cut::compile(m_cutParameter);
   }
 
@@ -175,7 +179,13 @@ namespace Belle2 {
         const Particle* part = m_particles[fsParticle];
 
         if (m_cut->check(part)) {
-          valueToIndex.emplace_back(m_variable->function(part), part->getArrayIndex());
+          double value = std::numeric_limits<double>::quiet_NaN();;
+          if (std::holds_alternative<double>(m_variable->function(part))) {
+            value = std::get<double>(m_variable->function(part));
+          } else if (std::holds_alternative<int>(m_variable->function(part))) {
+            value = std::get<int>(m_variable->function(part));
+          }
+          valueToIndex.emplace_back(value, part->getArrayIndex());
         }
       }
     }

@@ -203,8 +203,9 @@ bool Variable::Manager::createVariable(const std::string& name)
         arguments.push_back(number);
       }
       auto pfunc = parameterIter->second->function;
-      auto func = [pfunc, arguments](const Particle * particle) -> double { return pfunc(particle, arguments); };
-      m_variables[name] = std::make_shared<Var>(name, func, parameterIter->second->description, parameterIter->second->group);
+      auto func = [pfunc, arguments](const Particle * particle) -> VarVariant { return pfunc(particle, arguments); };
+      m_variables[name] = std::make_shared<Var>(name, func, parameterIter->second->description, parameterIter->second->group,
+                                                parameterIter->second->variabletype);
       return true;
 
     }
@@ -213,7 +214,8 @@ bool Variable::Manager::createVariable(const std::string& name)
     auto metaIter = m_meta_variables.find(functionName);
     if (metaIter != m_meta_variables.end()) {
       auto func = metaIter->second->function(functionArguments);
-      m_variables[name] = std::make_shared<Var>(name, func, metaIter->second->description, metaIter->second->group);
+      m_variables[name] = std::make_shared<Var>(name, func, metaIter->second->description, metaIter->second->group,
+                                                metaIter->second->variabletype);
       return true;
     }
   }
@@ -224,7 +226,7 @@ bool Variable::Manager::createVariable(const std::string& name)
 
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::FunctionPtr& f,
-                                         const std::string& description)
+                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -234,7 +236,8 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
 
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
-    auto var = std::make_shared<Var>(name, f, description, m_currentGroup);
+
+    auto var = std::make_shared<Var>(name, f, description, m_currentGroup, variabletype);
     B2DEBUG(19, "Registered Variable " << name);
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
@@ -244,7 +247,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
 }
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::ParameterFunctionPtr& f,
-                                         const std::string& description)
+                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -252,7 +255,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
 
   auto mapIter = m_parameter_variables.find(name);
   if (mapIter == m_parameter_variables.end()) {
-    auto var = std::make_shared<ParameterVar>(name, f, description, m_currentGroup);
+    auto var = std::make_shared<ParameterVar>(name, f, description, m_currentGroup, variabletype);
     std::string rawName = name.substr(0, name.find('('));
     assertValidName(rawName);
     B2DEBUG(19, "Registered parameter Variable " << rawName);
@@ -264,7 +267,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
 }
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::MetaFunctionPtr& f,
-                                         const std::string& description)
+                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -272,7 +275,7 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
 
   auto mapIter = m_meta_variables.find(name);
   if (mapIter == m_meta_variables.end()) {
-    auto var = std::make_shared<MetaVar>(name, f, description, m_currentGroup);
+    auto var = std::make_shared<MetaVar>(name, f, description, m_currentGroup, variabletype);
     std::string rawName = name.substr(0, name.find('('));
     assertValidName(rawName);
     B2DEBUG(19, "Registered meta Variable " << rawName);
@@ -295,9 +298,9 @@ void Variable::Manager::deprecateVariable(const std::string& name, bool make_fat
   auto mapIter = m_variables.find(name);
   if (mapIter != m_variables.end()) {
     if (make_fatal) {
-      mapIter->second.get()->extendDescriptionString("\n\n.. warning:: ");
+      mapIter->second.get()->extendDescriptionString("\n.. warning:: ");
     } else {
-      mapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
+      mapIter->second.get()->extendDescriptionString("\n.. note:: ");
     }
     mapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
   }
@@ -345,5 +348,11 @@ double Variable::Manager::evaluate(const std::string& varName, const Particle* p
     return 0.0; //never reached, suppresses cppcheck warning
   }
 
-  return var->function(p);
+  if (var->variabletype == Variable::Manager::VariableDataType::c_double)
+    return std::get<double>(var->function(p));
+  else if (var->variabletype == Variable::Manager::VariableDataType::c_int)
+    return (double)std::get<int>(var->function(p));
+  else if (var->variabletype == Variable::Manager::VariableDataType::c_bool)
+    return (double)std::get<bool>(var->function(p));
+  else return std::numeric_limits<double>::quiet_NaN();
 }

@@ -82,8 +82,6 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
-
-
     double eclClusterNumberOfHadronDigits(const Particle* particle)
     {
 
@@ -154,7 +152,7 @@ namespace Belle2 {
         {
           const Particle* listParticle = particleList->getParticle(i);
           if (listParticle and listParticle->getTrack() and listParticle->getTrack()->getArrayIndex() == trackID) {
-            result = var->function(listParticle);
+            result = std::get<double>(var->function(listParticle));
             break;
           }
         }
@@ -182,7 +180,6 @@ namespace Belle2 {
 
       return std::numeric_limits<float>::quiet_NaN();
     }
-
 
     double eclClusterErrorE(const Particle* particle)
     {
@@ -944,10 +941,10 @@ It is defined as the distance between this intersection and the track hit positi
     | Precision: :math:`10` bit
 )DOC");
     REGISTER_VARIABLE("minC2TDistID", eclClusterIsolationID, "Nearest track array index");
-    REGISTER_VARIABLE("minC2TDistVar(variable,particleList=pi-:all)", eclClusterIsolationVar, R"DOC(
+    REGISTER_METAVARIABLE("minC2TDistVar(variable,particleList=pi-:all)", eclClusterIsolationVar, R"DOC(
 Returns variable value for the nearest track to the given ECL cluster. First argument is a variable name, e.g. nCDCHits. 
 The second argument is the particle list name which will be used to pick up the nearest track, default is pi-:all.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("clusterE", eclClusterE, R"DOC(
 Returns ECL cluster's energy corrected for leakage and background.
 
@@ -1418,7 +1415,7 @@ cluster-matched tracks using the cluster 4-momenta.
 Used for ECL-based dark sector physics and debugging track-cluster matching.
 )DOC");
 
-    REGISTER_VARIABLE("photonHasOverlap(cutString, photonlistname, tracklistname)", photonHasOverlap, R"DOC(
+    REGISTER_METAVARIABLE("photonHasOverlap(cutString, photonlistname, tracklistname)", photonHasOverlap, R"DOC(
       Returns true if the connected ECL region of the particle's cluster is shared by another particle's cluster.
       Neutral and charged cluster are considered.
       A cut string can be provided to ignore cluster that do not satisfy the given criteria.
@@ -1427,7 +1424,7 @@ Used for ECL-based dark sector physics and debugging track-cluster matching.
       However, one can customize the name of the ParticleLists via additional arguments.
       If no argument or only a cut string is provided and ``gamma:all`` or ``e-:all`` does not exist
       or if the variable is requested for a particle that is not a photon, NaN is returned.
-      )DOC");
+      )DOC", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE, R"DOC(
 [Expert] [Calibration] Returns ECL cluster's uncorrected energy. That is, before leakage corrections.

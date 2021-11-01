@@ -96,8 +96,8 @@ void DuplicateVertexMarkerModule::event()
         }
         if (!(part->hasExtraInfo(m_extraInfoName) || cloneCand->hasExtraInfo(m_extraInfoName))) {
           //if V0s aren't being checked, or have been checked but inconclusive (should not happen) check best fit
-          B2DEBUG(10, m_targetVar->function(part) << " vs " << m_targetVar->function(cloneCand));
-          if (m_targetVar->function(part) > m_targetVar->function(cloneCand)) {
+          B2DEBUG(10, std::get<double>(m_targetVar->function(part)) << " vs " << std::get<double>(m_targetVar->function(cloneCand)));
+          if (std::get<double>(m_targetVar->function(part)) > std::get<double>(m_targetVar->function(cloneCand))) {
             cloneCand->addExtraInfo(m_extraInfoName, 0.0);
           } else {
             part->addExtraInfo(m_extraInfoName, 0.0);

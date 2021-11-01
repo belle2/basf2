@@ -187,7 +187,14 @@ float arichToNtupleModule::getInverseSamplingRateWeight(const Particle* particle
   if (m_sampling_variable == nullptr)
     return 1.0;
 
-  long target = std::lround(m_sampling_variable->function(particle));
+  long target = 0;
+  if (m_sampling_variable->variabletype == Variable::Manager::VariableDataType::c_double) {
+    target = std::lround(std::get<double>(m_sampling_variable->function(particle)));
+  } else if (m_sampling_variable->variabletype == Variable::Manager::VariableDataType::c_int) {
+    target = std::lround(std::get<int>(m_sampling_variable->function(particle)));
+  } else if (m_sampling_variable->variabletype == Variable::Manager::VariableDataType::c_bool) {
+    target = std::lround(std::get<bool>(m_sampling_variable->function(particle)));
+  }
   if (m_sampling_rates.find(target) != m_sampling_rates.end() and m_sampling_rates[target] > 0) {
     m_sampling_counts[target]++;
     if (m_sampling_counts[target] % m_sampling_rates[target] != 0)
@@ -210,7 +217,13 @@ void arichToNtupleModule::event()
     m_branchAddresses[0] = getInverseSamplingRateWeight(nullptr);
     if (m_branchAddresses[0] > 0) {
       for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
-        m_branchAddresses[iVar + 1] = m_functions[iVar](nullptr);
+        if (std::holds_alternative<double>(m_functions[iVar](nullptr))) {
+          m_branchAddresses[iVar + 1] = std::get<double>(m_functions[iVar](nullptr));
+        } else if (std::holds_alternative<int>(m_functions[iVar](nullptr))) {
+          m_branchAddresses[iVar + 1] = (double)std::get<int>(m_functions[iVar](nullptr));
+        } else if (std::holds_alternative<bool>(m_functions[iVar](nullptr))) {
+          m_branchAddresses[iVar + 1] = (double)std::get<bool>(m_functions[iVar](nullptr));
+        }
       }
       for (auto& arich : m_arich) arich->clear();
       m_tree->get().Fill();
@@ -226,7 +239,13 @@ void arichToNtupleModule::event()
       m_branchAddresses[0] = getInverseSamplingRateWeight(particle);
       if (m_branchAddresses[0] > 0) {
         for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
-          m_branchAddresses[iVar + 1] = m_functions[iVar](particle);
+          if (std::holds_alternative<double>(m_functions[iVar](particle))) {
+            m_branchAddresses[iVar + 1] = std::get<double>(m_functions[iVar](particle));
+          } else if (std::holds_alternative<int>(m_functions[iVar](particle))) {
+            m_branchAddresses[iVar + 1] = (double)std::get<int>(m_functions[iVar](particle));
+          } else if (std::holds_alternative<bool>(m_functions[iVar](particle))) {
+            m_branchAddresses[iVar + 1] = (double)std::get<bool>(m_functions[iVar](particle));
+          }
         }
         for (auto& arich : m_arich) arich->clear();
         fillARICHTree(particle);

@@ -52,7 +52,7 @@ namespace Belle2 {
       if (!var) {
         B2ERROR("Variable '" << i_variable << "' is not available in Variable::Manager!");
       }
-      values.insert(std::make_pair(i_variable, var->function(p)));
+      values.insert(std::make_pair(i_variable, std::get<double>(var->function(p))));
     }
 
     return (*m_ParticleWeightingLookUpTable.get())->getInfo(values);

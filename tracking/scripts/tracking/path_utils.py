@@ -50,9 +50,14 @@ def add_geometry_modules(path, components=None):
                         energyLossBrems=False, noiseBrems=False)
 
 
-def add_hit_preparation_modules(path, components=None, pxd_roi_filtering=False):
+def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=False):
     """
     Helper fucntion to prepare the hit information to be used by tracking.
+
+    :param path: The path to add the tracking reconstruction modules to
+    :param components: the list of geometry components in use or None for all components.
+    :param pxd_filtering_offline: PXD data reduction is performed after CDC and SVD tracking,
+            so PXD reconstruction has to wait until the ROIs are calculated.
     """
 
     # Preparation of the SVD clusters
@@ -60,7 +65,7 @@ def add_hit_preparation_modules(path, components=None, pxd_roi_filtering=False):
         add_svd_reconstruction(path)
 
     # Preparation of the PXD clusters
-    if is_pxd_used(components) and not pxd_roi_filtering:
+    if is_pxd_used(components) and not pxd_filtering_offline:
         add_pxd_reconstruction(path)
 
 

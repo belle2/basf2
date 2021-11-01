@@ -28,11 +28,13 @@ namespace Belle2 {
     /** Constructor.
      * @param histoModule - DQMHistoModuleBase or derived module on which the Fill- functions are called.
      * @param recoTracksStoreArrayName - StoreArray name where the merged RecoTracks are written.
-     * @param tracksStoreArrayName - StoreArray name where the merged Tracks are written. */
+     * @param tracksStoreArrayName - StoreArray name where the merged Tracks are written.
+     * @param runningOnHLT - true if the module runs on HLT*/
     DQMEventProcessorBase(DQMHistoModuleBase* histoModule, const std::string& recoTracksStoreArrayName,
-                          const std::string& tracksStoreArrayName) :
+                          const std::string& tracksStoreArrayName, bool runningOnHLT = false) :
       m_tracksStoreArrayName(tracksStoreArrayName),
-      m_recoTracksStoreArrayName(recoTracksStoreArrayName)
+      m_recoTracksStoreArrayName(recoTracksStoreArrayName),
+      m_runningOnHLT(runningOnHLT)
     {
       m_histoModule = histoModule;
     }
@@ -40,6 +42,11 @@ namespace Belle2 {
     /** Call this to start processing the event data and filling histograms.
     * Calls ProcessTrack function for each track in store array. */
     virtual void Run();
+
+    /**Call this if you want to produce 1D Track Residual plots for each VXD sensor */
+    void produce1Dres() {m_produce1Dres = true;};
+    /**Call this if you want to produce 2D Track Residual plots for each VXD sensor */
+    void produce2Dres() {m_produce1Dres = true;};
 
   protected:
     /** Find RecoTrack for given track. Calls ProcessSuccesfulFit if the RecoTrack has a successful fit. */
@@ -96,6 +103,15 @@ namespace Belle2 {
     std::string m_tracksStoreArrayName = "";
     /** StoreArray name where RecoTracks are written. */
     std::string m_recoTracksStoreArrayName = "";
+
+    /** true if the DQM is run on HLT */
+    bool m_runningOnHLT;
+
+    /** if true, produce 1D Track residuals plots for each VXD sensor*/
+    bool m_produce1Dres = false;
+
+    /** if true, produce 2D Track residuals plots for each VXD sensor*/
+    bool m_produce2Dres = false;
 
     /** index of track (with valid TrackFitResult and related RecoTrack) */
     int m_iTrack = 0;

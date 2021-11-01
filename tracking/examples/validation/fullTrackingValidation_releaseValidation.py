@@ -30,19 +30,23 @@ class Full(TrackingValidationRun):
     def finder_module(self, path):
         pass
 
-    # track collection to be used
+    #: track collection to be used
     recoTracksName = 'RecoTracks'
-    # tracks will be already fitted by
+    #: tracks will be already fitted by
     fit_tracks = False
-    # But we need to tell the validation module to use the fit information
+    #: But we need to tell the validation module to use the fit information
     use_fit_information = True
-    # MC track finding and track matching was already performed
+    #: MC track finding and track matching was already performed
     mc_tracking = False
-    # What should be stored in the root file?
+    #: What should be stored in the root file?
     extended = True
+    #: if true pulls will be created
     pulls = True
+    #: if true resolution plots will be created
     resolution = True
+    #: if true the full tracking information will be stored to a file for each event (Note: will create large output)
     saveFullTrees = True
+    #: name of the output file
     output_file_name = './FullTrackingValidation_validationSample.root'
 
 

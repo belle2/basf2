@@ -1,6 +1,7 @@
 Import('env')
 
 import os
+import stat
 from SCons.Script import *
 
 # the main directory where the genfit svn is checked out into
@@ -11,6 +12,14 @@ dirs = ['core', 'fields', 'finitePlanes', 'fitters', 'GBL', 'GFRave', 'measureme
 
 # libraries
 env['LIBS'] = ['$ROOT_LIBS', 'RaveBase', 'Geom', 'EG']
+
+# executables
+executables = []
+executable_mode = stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
+for tools_file in Glob(os.path.join('tools', '*')):
+    if os.stat(str(tools_file)).st_mode & executable_mode  == executable_mode:
+        executables.append(tools_file)
+env.Install(env['BINDIR'], executables)
 
 # prevent cling c++11 warnins as genfit is c++03 compatible
 env.Append(CLINGFLAGS=["-Wno-inconsistent-missing-override"])

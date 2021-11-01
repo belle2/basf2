@@ -125,7 +125,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
         from softwaretrigger import filter_categories, skim_categories
 
-        filter_cat = [method for method in dir(filter_categories) if method.startswith('__') is False if method is not 'RESULTS']
+        filter_cat = [method for method in dir(filter_categories) if method.startswith('__') is False if method != 'RESULTS']
         skim_cat = [method for method in dir(skim_categories) if method.startswith('__') is False]
 
         def read_lines(category):
@@ -293,8 +293,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
-        trackDqm = b2.register_module('TrackDQM')
-        path.add_module(trackDqm)
+        if (dqm_environment == "hlt"):
+            path.add_module('TrackingHLTDQM')
+        else:
+            path.add_module('TrackingExpressRecoDQM')
 
     # ARICH
     if (components is None or 'ARICH' in components) and (dqm_mode in ["dont_care", "filtered"]):

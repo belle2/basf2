@@ -15,6 +15,7 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TCanvas.h>
+#include <TPaveText.h>
 #include <TLine.h>
 #include <TClass.h>
 #include <TStyle.h>
@@ -42,12 +43,15 @@ DQMHistAnalysisTRGGDLModule::DQMHistAnalysisTRGGDLModule()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("debug", m_debug, "debug mode", false);
   addParam("alert", m_enableAlert, "Enable color alert", true);
+  addParam("useEpics", m_useEpics, "useEpics", true);
 }
 
 DQMHistAnalysisTRGGDLModule::~DQMHistAnalysisTRGGDLModule()
 {
 #ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
+  if (m_useEpics) {
+    if (ca_current_context()) ca_context_destroy();
+  }
 #endif
 }
 
@@ -92,20 +96,24 @@ void DQMHistAnalysisTRGGDLModule::initialize()
   m_c_pure_eff = new TCanvas("TRGGDL/hGDL_ana_pure_eff");
 
 
+  m_rtype = findHist("DQMInfo/rtype");
+  m_runtype = m_rtype ? m_rtype->GetTitle() : "";
 
 #ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  for (int i = 0; i < n_eff_shifter; i++) {
-    std::string aa = "TRGAna:eff_shift_" + std::to_string(i);
-    SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[i]), "ca_create_channel failure");
-    // Read LO and HI limits from EPICS, seems this needs additional channels?
-    // SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
+  if (m_useEpics) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    for (int i = 0; i < n_eff_shifter; i++) {
+      std::string aa = "TRGAna:eff_shift_" + std::to_string(i);
+      SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[i]), "ca_create_channel failure");
+      // Read LO and HI limits from EPICS, seems this needs additional channels?
+      // SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
+    }
+    for (int i = 0; i < nskim_gdldqm; i++) {
+      std::string aa = "TRGAna:entry_" + std::to_string(i);
+      SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid_entry[i]), "ca_create_channel failure");
+    }
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
-  for (int i = 0; i < nskim_gdldqm; i++) {
-    std::string aa = "TRGAna:entry_" + std::to_string(i);
-    SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid_entry[i]), "ca_create_channel failure");
-  }
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 
   B2DEBUG(20, "DQMHistAnalysisTRGGDL: initialized.");
@@ -122,21 +130,13 @@ void DQMHistAnalysisTRGGDLModule::event()
 
     //get histo
     char c_psn[1000];
-    sprintf(c_psn, "TRGGDL/hGDL_psn_extra_%s", skim_smap[iskim].c_str());
-    m_h_psn_extra[iskim] = (TH1D*)findHist(c_psn);/**psn bits*/
     sprintf(c_psn, "TRGGDL/hGDL_psn_extra_fast_%s", skim_smap[iskim].c_str());
     m_h_psn_extra_fast[iskim] = (TH1D*)findHist(c_psn);/**psn bits*/
 
-    if (m_h_psn_extra[iskim] == nullptr) {
-      B2WARNING("Histogram/canvas named hGDL_psn_extra is not found.");
-      continue;
-    }
     if (m_h_psn_extra_fast[iskim] == nullptr) {
-      B2WARNING("Histogram/canvas named hGDL_psn_extra is not found.");
+      B2WARNING("Histogram/canvas named TRGGDL/hGDL_psn_extra_fast is not found.");
       continue;
     }
-
-
 
     //fill efficiency values
     if (m_h_psn_extra_fast[iskim]->GetBinContent(0 + 1) == 0)continue;
@@ -347,9 +347,19 @@ void DQMHistAnalysisTRGGDLModule::event()
     m_h_eff_fast[iskim]->SetBinError(40, sqrt(m_h_psn_extra_fast[iskim]->GetBinContent(76 + 1)) /
                                      m_h_psn_extra_fast[iskim]->GetBinContent(
                                        5 + 1)); //stt with c4|hie
+  }
 
+  for (unsigned iskim = 0; iskim < nskim_gdldqm; iskim++) {
 
+    //get histo
+    char c_psn[1000];
+    sprintf(c_psn, "TRGGDL/hGDL_psn_extra_%s", skim_smap[iskim].c_str());
+    m_h_psn_extra[iskim] = (TH1D*)findHist(c_psn);/**psn bits*/
 
+    if (m_h_psn_extra[iskim] == nullptr) {
+      B2WARNING("Histogram/canvas named TRGGDL/hGDL_psn_extra is not found.");
+      continue;
+    }
 
     //fill efficiency values
     if (m_h_psn_extra[iskim]->GetBinContent(0 + 1) == 0)continue;
@@ -643,56 +653,62 @@ void DQMHistAnalysisTRGGDLModule::event()
   m_h_eff_shifter_fast->SetLineWidth(2);
   m_h_eff_shifter_fast->SetMarkerStyle(20);
   m_h_eff_shifter_fast->SetMarkerColor(2);
-
   m_h_eff_shifter->SetTitle("TRG efficiency");
   m_h_eff_shifter_fast->SetTitle("TRG efficiency");
-  gStyle->SetTitleTextColor(1);
-  gStyle->SetFrameLineColor(1);
+  m_c_eff_shifter->SetFrameLineColor(1);
   m_h_eff_shifter->GetXaxis()->SetLabelColor(1);
   m_h_eff_shifter->GetXaxis()->SetAxisColor(1);
   m_h_eff_shifter->GetYaxis()->SetTitleColor(1);
   m_h_eff_shifter->GetYaxis()->SetLabelColor(1);
   m_h_eff_shifter->GetYaxis()->SetAxisColor(1);
+  m_c_eff_shifter_fast->SetFrameLineColor(1);
   m_h_eff_shifter_fast->GetXaxis()->SetLabelColor(1);
   m_h_eff_shifter_fast->GetXaxis()->SetAxisColor(1);
   m_h_eff_shifter_fast->GetYaxis()->SetTitleColor(1);
   m_h_eff_shifter_fast->GetYaxis()->SetLabelColor(1);
   m_h_eff_shifter_fast->GetYaxis()->SetAxisColor(1);
 
-  for (int i = 0; i < n_eff_shifter; i++) {
-    double eff = m_h_eff_shifter->GetBinContent(i + 1);
-    double err = m_h_eff_shifter->GetBinError(i + 1);
-    double eff_err_min = eff - 2 * err;
-    double eff_err_max = eff + 2 * err;
-    double eff_fast = m_h_eff_shifter_fast->GetBinContent(i + 1);
-    double err_fast = m_h_eff_shifter_fast->GetBinError(i + 1);
-    double eff_err_min_fast = eff_fast - 2 * err_fast;
-    double eff_err_max_fast = eff_fast + 2 * err_fast;
-    if (
-      (eff_err_max < m_limit_low_shifter[i]) || (eff_err_min > m_limit_high_shifter[i]) ||
-      (eff_err_max_fast < m_limit_low_shifter[i]) || (eff_err_min_fast > m_limit_high_shifter[i])
-    ) {
-      m_c_eff_shifter->SetFillColor(5);
-      m_h_eff_shifter->SetTitle("Call TRG expert: bad efficiency");
-      m_h_eff_shifter_fast->SetTitle("Call TRG expert: bad efficiency");
-      gStyle->SetTitleTextColor(2);
-      gStyle->SetFrameLineColor(2);
-      m_h_eff_shifter->GetXaxis()->SetLabelColor(2);
-      m_h_eff_shifter->GetXaxis()->SetAxisColor(2);
-      m_h_eff_shifter->GetYaxis()->SetTitleColor(2);
-      m_h_eff_shifter->GetYaxis()->SetLabelColor(2);
-      m_h_eff_shifter->GetYaxis()->SetAxisColor(2);
-      m_h_eff_shifter_fast->GetXaxis()->SetLabelColor(2);
-      m_h_eff_shifter_fast->GetXaxis()->SetAxisColor(2);
-      m_h_eff_shifter_fast->GetYaxis()->SetTitleColor(2);
-      m_h_eff_shifter_fast->GetYaxis()->SetLabelColor(2);
-      m_h_eff_shifter_fast->GetYaxis()->SetAxisColor(2);
+  if (m_runtype == "physics") {
+    for (int i = 0; i < n_eff_shifter; i++) {
+      double eff = m_h_eff_shifter->GetBinContent(i + 1);
+      double err = m_h_eff_shifter->GetBinError(i + 1);
+      double eff_err_min = eff - 2 * err;
+      double eff_err_max = eff + 2 * err;
+      double eff_fast = m_h_eff_shifter_fast->GetBinContent(i + 1);
+      double err_fast = m_h_eff_shifter_fast->GetBinError(i + 1);
+      double eff_err_min_fast = eff_fast - 2 * err_fast;
+      double eff_err_max_fast = eff_fast + 2 * err_fast;
+      if (
+        (eff_err_max < m_limit_low_shifter[i]) || (eff_err_min > m_limit_high_shifter[i]) ||
+        (eff_err_max_fast < m_limit_low_shifter[i]) || (eff_err_min_fast > m_limit_high_shifter[i])
+      ) {
+        m_c_eff_shifter->SetFillColor(5);
+        m_c_eff_shifter_fast->SetFillColor(5);
+        m_h_eff_shifter->SetTitle("Call TRG expert: bad efficiency");
+        m_h_eff_shifter_fast->SetTitle("Call TRG expert: bad efficiency");
+        m_c_eff_shifter->SetFrameLineColor(2);
+        m_h_eff_shifter->GetXaxis()->SetLabelColor(2);
+        m_h_eff_shifter->GetXaxis()->SetAxisColor(2);
+        m_h_eff_shifter->GetYaxis()->SetTitleColor(2);
+        m_h_eff_shifter->GetYaxis()->SetLabelColor(2);
+        m_h_eff_shifter->GetYaxis()->SetAxisColor(2);
+        m_c_eff_shifter_fast->SetFrameLineColor(2);
+        m_h_eff_shifter_fast->GetXaxis()->SetLabelColor(2);
+        m_h_eff_shifter_fast->GetXaxis()->SetAxisColor(2);
+        m_h_eff_shifter_fast->GetYaxis()->SetTitleColor(2);
+        m_h_eff_shifter_fast->GetYaxis()->SetLabelColor(2);
+        m_h_eff_shifter_fast->GetYaxis()->SetAxisColor(2);
+      }
     }
+  } else {
+    m_h_eff_shifter->SetTitle("Ignore this plot during non-physic run");
+    m_h_eff_shifter_fast->SetTitle("Ignore this plot during non-physic run");
   }
 
 
   m_h_eff_shifter->Draw();
   m_h_eff_shifter_fast->Draw("same");
+
   for (int i = 0; i < n_eff_shifter; i++) {
     m_line_limit_low_shifter[i]-> SetLineColor(1);
     m_line_limit_low_shifter[i]-> SetLineStyle(2);
@@ -728,29 +744,31 @@ void DQMHistAnalysisTRGGDLModule::event()
 
 
 #ifdef _BELLE2_EPICS
-  for (auto i = 0; i < n_eff_shifter; i++) {
-    double data;
-    //data = m_h_eff_shifter->GetBinContent(i + 1);
-    data = m_h_eff_shifter_fast->GetBinContent(i + 1);
-    if (mychid[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid[i], (void*)&data), "ca_set failure");
-  }
-  for (auto i = 0; i < nskim_gdldqm; i++) {
-    double data = 0;
-    if (m_h_psn_extra[i] == nullptr) {
-      B2WARNING("Histogram/canvas named hGDL_psn_extra is not found.");
-    } else if (m_h_psn_extra[6] == nullptr) {
-      B2WARNING("Histogram/canvas named hGDL_psn_extra is not found.");
-    } else {
-      if (i == 0 || i == 6) {
-        data = m_h_psn_extra[i]->GetBinContent(0 + 1);
-      } else if (m_h_psn_extra[6]->GetBinContent(0 + 1) != 0) {
-        data = m_h_psn_extra[i]->GetBinContent(0 + 1) / m_h_psn_extra[6]->GetBinContent(0 + 1);
-      }
+  if (m_useEpics) {
+    for (auto i = 0; i < n_eff_shifter; i++) {
+      double data;
+      //data = m_h_eff_shifter->GetBinContent(i + 1);
+      data = m_h_eff_shifter_fast->GetBinContent(i + 1);
+      if (mychid[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid[i], (void*)&data), "ca_set failure");
     }
+    for (auto i = 0; i < nskim_gdldqm; i++) {
+      double data = 0;
+      if (m_h_psn_extra[i] == nullptr) {
+        B2WARNING("Histogram/canvas named hGDL_psn_extra is not found.");
+      } else if (m_h_psn_extra[6] == nullptr) {
+        B2WARNING("Histogram/canvas named hGDL_psn_extra is not found.");
+      } else {
+        if (i == 0 || i == 6) {
+          data = m_h_psn_extra[i]->GetBinContent(0 + 1);
+        } else if (m_h_psn_extra[6]->GetBinContent(0 + 1) != 0) {
+          data = m_h_psn_extra[i]->GetBinContent(0 + 1) / m_h_psn_extra[6]->GetBinContent(0 + 1);
+        }
+      }
 
-    if (mychid_entry[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid_entry[i], (void*)&data), "ca_set failure");
+      if (mychid_entry[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid_entry[i], (void*)&data), "ca_set failure");
+    }
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 
 }
@@ -763,13 +781,15 @@ void DQMHistAnalysisTRGGDLModule::endRun()
 void DQMHistAnalysisTRGGDLModule::terminate()
 {
 #ifdef _BELLE2_EPICS
-  for (auto i = 0; i < n_eff_shifter; i++) {
-    if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
+  if (m_useEpics) {
+    for (auto i = 0; i < n_eff_shifter; i++) {
+      if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
+    }
+    for (auto i = 0; i < nskim_gdldqm; i++) {
+      if (mychid_entry[i]) SEVCHK(ca_clear_channel(mychid_entry[i]), "ca_clear_channel failure");
+    }
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
-  for (auto i = 0; i < nskim_gdldqm; i++) {
-    if (mychid_entry[i]) SEVCHK(ca_clear_channel(mychid_entry[i]), "ca_clear_channel failure");
-  }
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
   B2DEBUG(20, "terminate called");
 }

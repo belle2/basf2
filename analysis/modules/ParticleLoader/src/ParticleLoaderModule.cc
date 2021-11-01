@@ -51,7 +51,7 @@ namespace Belle2 {
              "Use ROE instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
 
     addParam("roeMaskName", m_roeMaskName,
-             "ROE mask name to load", std::string(""));
+             "ROE mask name to load", std::string(RestOfEvent::c_defaultMaskName));
 
     addParam("sourceParticleListName", m_sourceParticleListName,
              "Particle list name from which we need to get ROEs", std::string(""));
@@ -318,9 +318,7 @@ namespace Belle2 {
 
       TLorentzVector signal4Vector = signalSideParticle->get4Vector();
       TLorentzVector roe4Vector = roe->get4Vector(m_roeMaskName);
-      TLorentzVector missing4Vector;
-      missing4Vector.SetVect(boost4Vector.Vect() - (signal4Vector.Vect() + roe4Vector.Vect()));
-      missing4Vector.SetE(missing4Vector.Vect().Mag());
+      TLorentzVector missing4Vector = boost4Vector - signal4Vector - roe4Vector;
       auto isFlavored = (isSelfConjugatedParticle) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
       newPart = m_particles.appendNew(missing4Vector, pdgCode, isFlavored, Particle::EParticleSourceObject::c_Undefined, mdstIndex);
 

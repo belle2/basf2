@@ -61,6 +61,7 @@ DIGITS_OBJECTS = (
     'ARICHDigits',
     'CDCHits',
     'ECLDigits',
+    'ECLDsps',
     'KLMDigits',
     'PXDDigits',
     'SVDEventInfoSim',
@@ -499,55 +500,49 @@ def add_cdst_output(
     path,
     mc=True,
     filename='cdst.root',
-    additionalBranches=[],
+    additionalBranches=None,
     dataDescription=None,
-    rawFormat=True,
     ignoreInputModulesCheck=False
 ):
     """
     This function adds the `RootOutput` module to a path with the settings needed to produce a cDST output.
+    The actual cDST output content depends on the value of the parameter `mc`:
+    * if `mc` is `False` (default setting), the cDST content is raw + tracking dataobjects;
+    * if `mc` is `True`, the cDST content is digits + MCParticles + tracking dataobjects.
 
     @param path Path to add modules to.
-    @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
+    @param mc Define the type of cDST output content: `False` for raw + tracking dataobjects, `True` for digits +
+           MCParticles + tracking dataobjects.
     @param filename Output file name.
     @param additionalBranches Additional objects/arrays of event durability to save
     @param dataDescription Additional key->value pairs to be added as data description
-           fields to the output FileMetaData
-    @param rawFormat Saves the cDST file in the raw+tracking format if mc=False, otherwise saves the cDST file
-           in the digits+tracking format.
+           fields to the output FileMetaData.
     @param ignoreInputModulesCheck If True, do not enforce check on missing PXD modules in the input path.
            Needed when a conditional path is passed as input.
     """
 
-    branches = []
+    branches = list(CDST_TRACKING_OBJECTS)
     persistentBranches = ['FileMetaData']
 
-    if rawFormat:
-        branches += list(CDST_TRACKING_OBJECTS)
-        if not mc:
-            branches += ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS
-        else:
-            branches += list(DIGITS_OBJECTS) + [
-                'EventLevelTriggerTimeInfo',
-                'SoftwareTriggerResult',
-                'TRGSummary']
-        if not ignoreInputModulesCheck and "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
-            basf2.B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found in the input path!")
+    if not mc:
+        branches += ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS
     else:
-        if not additionalBranches:
-            basf2.B2WARNING('You are calling add_cdst_output() using rawFormat=False and requiring no additional branches. '
-                            'This is equivalent to calling add_mdst_output().')
-        branches += list(mdst.MDST_OBJECTS)
+        branches += list(DIGITS_OBJECTS) + [
+            'MCParticles',
+            'EventLevelTriggerTimeInfo',
+            'SoftwareTriggerResult',
+            'TRGSummary']
+        persistentBranches += ['BackgroundInfo']
+
+    if not ignoreInputModulesCheck and "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
+        basf2.B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found in the input path!")
 
     if dataDescription is None:
         dataDescription = {}
-    dataDescription.setdefault("dataLevel", "cdst")
+        dataDescription.setdefault("dataLevel", "cdst")
 
-    if mc:
-        branches += ['MCParticles']
-        persistentBranches += ['BackgroundInfo']
-
-    branches += additionalBranches
+    if additionalBranches is not None:
+        branches += additionalBranches
 
     return path.add_module("RootOutput", outputFileName=filename, branchNames=branches,
                            branchNamesPersistent=persistentBranches, additionalDataDescription=dataDescription)

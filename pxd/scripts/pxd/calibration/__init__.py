@@ -49,6 +49,12 @@ def hot_pixel_mask_calibration(
           PXDHotPixelMaskCollector will be used then instead of PXDRawHotPixelMaskCollector
 
         "debug_hist" is the flag to save a ROOT file for debug histograms.
+        "inefficientPixelMultiplier" is the multiplier on median occupancy to define an inefficient pixel.
+          0 means only dead pixels are marked as dead.
+          A value > 0 means any pixels with occupancy below the threshold will be marked as dead.
+        "minInefficientPixels" is the minimum number of pixels to define a dead or inefficient row.
+          The rows with inefficient pixels >= this value will be marked as dead rows for now.
+        "deadPixelPayloadName" is the payload name used for more defective pixel types. The default is PXDDeadPixelPar.
 
     Return:
       A caf.framework.Calibration obj.
@@ -68,6 +74,15 @@ def hot_pixel_mask_calibration(
     debug_hist = kwargs.get("debug_hist", True)
     if not isinstance(debug_hist, bool):
         raise ValueError("debug_hist is not a boolean!")
+    inefficientPixelMultiplier = kwargs.get("inefficientPixelMultiplier", 0.)
+    if not isinstance(inefficientPixelMultiplier, float):
+        raise ValueError("inefficientPixelMultiplier is not a float!")
+    minInefficientPixels = kwargs.get("minInefficientPixels", 250)
+    if not isinstance(minInefficientPixels, int):
+        raise ValueError("minInefficientPixels is not an int!")
+    deadPixelPayloadName = kwargs.get("deadPixelPayloadName", "PXDDeadPixelPar")
+    if not isinstance(deadPixelPayloadName, str):
+        raise ValueError("deadPixelPayloadName is not a str!")
 
     # Create basf2 path
 
@@ -106,6 +121,11 @@ def hot_pixel_mask_calibration(
     algorithm.drainMultiplier = 7           # Occupancy threshold is median occupancy x multiplier
     algorithm.maskRows = True               # Set True to allow masking of hot rows
     algorithm.rowMultiplier = 7             # Occupancy threshold is median occupancy x multiplier
+    # Occupancy threshold is median occupancy x multiplier
+    algorithm.inefficientPixelMultiplier = inefficientPixelMultiplier
+    # Minimum number of inefficient pixels in a dead/inefficient row
+    algorithm.minInefficientPixels = minInefficientPixels
+    algorithm.deadPixelPayloadName = deadPixelPayloadName
     algorithm.setDebugHisto(debug_hist)
     algorithm.setPrefix(collector_name)
     if run_type.lower() == 'cosmic':
@@ -160,6 +180,7 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
           collectors are:
             PXDPerformanceVariablesCollector (default),
             PXDPerformanceCollector(using RAVE package for vertexing, obsolete)
+        "useClusterPosition": Flag to use cluster postion rather than track point to group pixels for calibration.
 
     Return:
       A caf.framework.Calibration obj.
@@ -177,6 +198,9 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
     supported_collectors = ["PXDPerformanceVariablesCollector", "PXDPerformanceCollector"]
     if not isinstance(collector_prefix, str) or collector_prefix not in supported_collectors:
         raise ValueError("collector_prefix not found in {}".format(supported_collectors))
+    useClusterPosition = kwargs.get("useClusterPosition", False)
+    if not isinstance(useClusterPosition, bool):
+        raise ValueError("useClusterPosition has to be a boolean!")
 
     # Create basf2 path
 
@@ -205,10 +229,17 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         from variables import variables as vm
         # Particle list for gain calibration
         ana.fillParticleList('e+:gain', "p > 1.0", path=main)
+
         # Particle list for event selection in efficiency monitoring
+        # nSVDHits > 5 doesn't help, firstSVDLayer == 3 for < 0.1% improvement?
         ana.fillParticleList('e+:eff', "pt > 2.0", path=main)
+        # Mass cut (9.5 < M < 11.5) below can improve efficiency by ~ 1%
         ana.reconstructDecay('vpho:eff -> e+:eff e-:eff', '9.5<M<11.5', path=main)
+        # < 0.1% improvement by using kfit pvalue >= 0.01 after mass cut
+        # vertex.kFit('vpho:eff', conf_level=0.01, fit_type="fourC", daughtersUpdate=False, path=main)
+
         # Particle list for studying impact parameter resolution
+        # Alias dosn't work with airflow implementation
         # vm.addAlias("pBetaSinTheta3o2", "formula(pt * (1./(1. + tanLambda**2)**0.5)**0.5)")
         # vm.addAlias("absLambda", "abs(atan(tanLambda))")
         mySelection = 'pt>1.0 and abs(dz)<1.0 and dr<0.3'
@@ -226,6 +257,8 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         collector.param("PList4GainName", "e+:gain")
         collector.param("PList4EffName", "vpho:eff")
         collector.param("PList4ResName", "vpho:res")
+        collector.param("maskedDistance", 3)
+        collector.param("useClusterPosition", useClusterPosition)
 
     collector.param("granularity", "run")
     collector.param("minClusterCharge", 8)
@@ -242,6 +275,7 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         validation_alg.setPrefix(collector_prefix)
         validation_alg.minTrackPoints = 10     # Minimum number of track points
         validation_alg.save2DHists = True      # Flag to save 2D histogram for efficiency on layer 1 or 2 in Z-phi plane
+        validation_alg.saveD0Z0 = kwargs.get("saveD0Z0", False)  # Flag to save corrected d0 (z0) difference
         algorithms.append(validation_alg)
 
     # validation_alg.setBoundaries(boundaries)  # This takes boundaries from the expert_config

@@ -12,12 +12,14 @@
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/logging/Logger.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/Btube.h>
+
 // utilities
 #include <analysis/utility/CLHEPToROOT.h>
 #include <analysis/utility/PCmsLabTransform.h>
@@ -27,6 +29,8 @@
 // Magnetic field
 #include <framework/geometry/BFieldManager.h>
 
+#include <TVector.h>
+#include <TRotation.h>
 #include <TMath.h>
 
 using namespace std;
@@ -428,6 +432,11 @@ namespace Belle2 {
     int err = kv.doFit();
     if (err != 0)
       return false;
+
+    double chi2_track = getChi2TracksLBoost(kv);
+    unsigned track_count = kv.getTrackCount();
+    mother->writeExtraInfo("chiSquared_trackL", chi2_track);
+    mother->writeExtraInfo("kFit_nTracks", track_count);
 
     bool ok = false;
     if (twoPhotonChildren.size() == 0)
@@ -1255,4 +1264,30 @@ namespace Belle2 {
 
     m_beamSpotCov = beamSpotCov;
   }
+
+  double ParticleVertexFitterModule::getChi2TracksLBoost(const analysis::VertexFitKFit& kv)
+  {
+    double chi2TrackL = 0;
+
+    for (int iTrack = 0; iTrack < kv.getTrackCount(); iTrack++) {
+
+      analysis::KFitTrack trk_i = kv.getTrack(iTrack); // KFitTrack contains parameters before/after fit.
+
+      TMatrixFSym err = CLHEPToROOT::getTMatrixFSym(trk_i.getError(analysis::KFitConst::kBeforeFit)); // px, py, pz, E, x, y, z
+
+      B2Vector3D x_before = CLHEPToROOT::getTVector3(trk_i.getPosition(analysis::KFitConst::kBeforeFit));
+      B2Vector3D x_after = CLHEPToROOT::getTVector3(trk_i.getPosition());
+      B2Vector3D dPos = x_after - x_before;
+
+      PCmsLabTransform T;
+      B2Vector3D boost3 = T.getBoostVector().Unit();
+      TVectorD boostD(0, 6, 0., 0., 0., 0., boost3.X(), boost3.Y(), boost3.Z(), "END");
+
+      double dLBoost = dPos.Dot(boost3);
+
+      chi2TrackL += TMath::Power(dLBoost, 2) / err.Similarity(boostD);
+    }
+    return chi2TrackL;
+  }
+
 } // end Belle2 namespace

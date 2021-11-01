@@ -201,6 +201,12 @@ namespace Belle2 {
       0.95, 0.95, 0.95, 0.95, 1.00, 1.00, 0.50, 0.20, 0.55, 1.00, 0.40, 0.60, 0.90, 0.90
     }; /**<upper limit value in each bin*/
 
+    TH1* m_rtype = nullptr; /**< histogram from DQMInfo with runtype */
+    TString m_runtype; /**< string with runtype: physics or cosmic */
+
+    /** flag if to export to EPICS */
+    bool m_useEpics = true;
+
 #ifdef _BELLE2_EPICS
     chid mychid[n_eff_shifter];// hard limit max 10 parameters
     chid mychid_entry[nskim_gdldqm];

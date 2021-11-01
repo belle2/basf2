@@ -250,7 +250,9 @@ namespace Belle2 {
 
     /** smear beam spot covariance */
     void smearBeamSpot(double width);
+
+    /** calculate the chi2 using only lboost information of tracks */
+    double getChi2TracksLBoost(const analysis::VertexFitKFit& kv);
   };
 
 } // Belle2 namespace
-

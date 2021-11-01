@@ -68,10 +68,10 @@ namespace Belle2 {
 
     /** efficiency status flags */
     enum effStatus {
-      lowStat = 0, /**< gray frame */
-      good = 1,    /**< green frame */
-      warning = 2, /**< orange frame */
-      error = 3    /**< red frame */
+      good = 0,    /**< green frame */
+      warning = 1, /**< orange frame */
+      error = 2,   /**< red frame */
+      lowStat = 3  /**< gray frame */
     };
     effStatus m_effUstatus; /**< number representing the status of the efficiency U side */
     effStatus m_effVstatus;/**< number representing the status of the efficiency V side */

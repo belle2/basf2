@@ -283,7 +283,7 @@ def TagV(
     constraintType="IP",
     askMCInfo=False,
     reqPXDHits=0,
-    maskName='',
+    maskName='all',
     fitAlgorithm='Rave',
     useTruthInFit=False,
     useRollBack=False,

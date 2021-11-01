@@ -71,27 +71,25 @@ void Chi2MCTrackMatcherModule::event()
     return;
   }
   // compare all tracks with all mcParticles in event
-  for (int it = 0 ; it < nTracks; ++it) {
-    auto track = m_Tracks[it];
+  for (auto& track : m_Tracks) {
     // test for existing relations
-    if (track->getRelated<MCParticle>()) {
+    if (track.getRelated<MCParticle>()) {
       B2DEBUG(27, "Relation already set continue with next track");
       continue;
     }
     // initialize minimal chi2 variables
-    int ip_min = -1;
+    MCParticle* mcPart_matched = nullptr;
     double chi2Min = std::numeric_limits<double>::infinity();
 
     // loop over m_MCParticles and calculate Chi2 for each track mcparticle pair, to fine minimal chi2
-    for (int ip = 0; ip < nMCParticles; ++ip) {
-      auto mcParticle = m_MCParticles[ip];
+    for (auto& mcParticle : m_MCParticles) {
       // Check if current particle is a charged stable particle
-      const Const::ParticleType mcParticleType(std::abs(mcParticle->getPDG()));
+      const Const::ParticleType mcParticleType(std::abs(mcParticle.getPDG()));
       if (not Const::chargedStableSet.contains(mcParticleType)) {
         continue;
       }
       // get trackfitresult of current track with clossest mass to current mcparticle Type
-      auto trackFitResult = track->getTrackFitResultWithClosestMass(mcParticleType);
+      auto trackFitResult = track.getTrackFitResultWithClosestMass(mcParticleType);
       TMatrixD Covariance5 = trackFitResult->getCovariance5();
       // statistic variable counting number of covariance matricies
       m_covarianceMatrixCount += 1;
@@ -105,10 +103,10 @@ void Chi2MCTrackMatcherModule::event()
       }
       // generate helix for current mc particle
       double charge_sign = 1;
-      if (mcParticle->getCharge() < 0) { charge_sign = -1;}
+      if (mcParticle.getCharge() < 0) { charge_sign = -1;}
       UncertainHelix helix = trackFitResult->getUncertainHelix();
       auto b_field = BFieldManager::getField(helix.getPerigee()).Z() / Belle2::Unit::T;
-      auto mcParticleHelix = Helix(mcParticle->getVertex(), mcParticle->getMomentum(), charge_sign, b_field);
+      auto mcParticleHelix = Helix(mcParticle.getVertex(), mcParticle.getMomentum(), charge_sign, b_field);
       // initialize the curent chi2
       double chi2Cur;
       // Check which linear algebra system should be used and calculate chi2Cur
@@ -150,11 +148,11 @@ void Chi2MCTrackMatcherModule::event()
       // check if chi2Cur is smaller than the so far found minimal chi2Min
       if (chi2Min > chi2Cur) {
         chi2Min = chi2Cur;
-        ip_min = ip;
+        mcPart_matched = &mcParticle;
       }
     }
     // check if any matching candidate was found
-    if (ip_min == -1) {
+    if (mcPart_matched) {
       m_noMatchingCandidateCount += 1;
       m_noMatchCount += 1;
       continue;
@@ -163,7 +161,7 @@ void Chi2MCTrackMatcherModule::event()
     double cutOff = 0;
     // fill cut off with value
     // find PDG for mcParticle with minimal chi2, because this determines individual cutOff
-    int mcMinPDG = abs(m_MCParticles[ip_min]->getPDG());
+    int mcMinPDG = abs(mcPart_matched->getPDG());
     if (mcMinPDG == Belle2::Const::electron.getPDGCode()) {
       cutOff = m_param_CutOffs[0];
     } else if (mcMinPDG == Const::muon.getPDGCode()) {
@@ -181,7 +179,7 @@ void Chi2MCTrackMatcherModule::event()
       continue;
     }
     if (chi2Min < cutOff) {
-      m_Tracks[it]->addRelationTo(m_MCParticles[ip_min]);
+      track.addRelationTo(mcPart_matched);
     } else {
       m_noMatchCount += 1;
     }

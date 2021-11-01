@@ -260,8 +260,8 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
     elif (matching_method == "chi2"):
         print("Warning: The Chi2MCTrackMatcherModule is currently not fully developed and tested!")
         path.add_module('Chi2MCTrackMatcherModule',
-                        'CutOffs'=chi2_cutoffs,
-                        'linalg'=chi2_linalg)
+                        CutOffs=chi2_cutoffs,
+                        linalg=chi2_linalg)
 
 
 def add_prune_tracks(path, components=None, reco_tracks="RecoTracks"):

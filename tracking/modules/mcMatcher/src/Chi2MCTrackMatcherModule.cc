@@ -152,7 +152,7 @@ void Chi2MCTrackMatcherModule::event()
       }
     }
     // check if any matching candidate was found
-    if (mcPart_matched) {
+    if (not mcPart_matched) {
       m_noMatchingCandidateCount += 1;
       m_noMatchCount += 1;
       continue;

@@ -118,6 +118,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         but just remove all data except for the event information.
     :param use_random_numbers_for_hlt_prescale: If True, the HLT filter prescales are applied using randomly
         generated numbers, otherwise are applied using an internal counter.
+    :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
+        The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     """
 
     add_prefilter_reconstruction(path,
@@ -181,6 +183,8 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
         reduce execution time.
     :param pruneTracks: Delete all hits except the first and last of the tracks (it must be set to False if the
         post-filter reconstruction is also run).
+    :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
+        The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     """
 
     # Check components.

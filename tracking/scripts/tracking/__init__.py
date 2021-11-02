@@ -98,6 +98,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param add_recoTrack_QI: if true, add the MVA track quality estimation
         to the path that sets the quality indicator property of all found reco tracks
         (Both other QIs needed as input.)
+    :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
+        The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     """
 
     add_prefilter_tracking_reconstruction(
@@ -163,6 +165,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
     :param add_recoTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of all found reco tracks
         (Both other QIs needed as input.)
+    :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
+        The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     """
 
     if not is_svd_used(components) and not is_cdc_used(components):
@@ -341,6 +345,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks", pxd_filte
         to the path that sets the quality indicator property of the found VXDTF2 tracks
         (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
         -> setting this option to 'True' will have some influence on the final track collection)
+    :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
+        The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return

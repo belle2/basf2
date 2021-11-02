@@ -265,9 +265,6 @@ namespace Belle2 {
     /** Return the PID (predicted reso) value */
     double getPreso(int i) const { return m_predres[i]; }
 
-    /** Return the PID (logL) value */
-    double getLogl(int i) const { return m_cdcLogl[i]; }
-
     /** Set the dE/dx value for this hit */
     void setDedx(int i, double dedx) { m_hDedx[i] = dedx; }
 

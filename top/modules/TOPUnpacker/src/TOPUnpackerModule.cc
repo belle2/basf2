@@ -185,13 +185,22 @@ namespace Belle2 {
 
         }
 
+
         if (err != 0) {
-          stringstream copperName;
-          //nodeid format is described on page7 of: https://confluence.desy.de/display/BI/DAQ+WebHome?preview=%2F34029242%2F37487394%2FSetupPocketDAQ_4p1_RawCOPPERDataFormat.pdf
-          copperName << "cpr" << ((raw.GetNodeID(0) >> 24) * 1000 + (raw.GetNodeID(0) & 0x3FF)) << char('a' + finesse);
-          B2ERROR("TOPUnpacker: error in unpacking data from frontend " << copperName.str()
-                  << LogVar("words unused", err)
-                  << LogVar("copper", copperName.str()));
+          if (raw.GetMaxNumOfCh(0) <= 4) { // COPPER
+            stringstream copperName;
+            //nodeid format is described on page7 of: https://confluence.desy.de/display/BI/DAQ+WebHome?preview=%2F34029242%2F37487394%2FSetupPocketDAQ_4p1_RawCOPPERDataFormat.pdf
+            copperName << "cpr" << ((raw.GetNodeID(0) >> 24) * 1000 + (raw.GetNodeID(0) & 0x3FF)) << char('a' + finesse);
+            B2ERROR("TOPUnpacker: error in unpacking data from frontend " << copperName.str()
+                    << LogVar("words unused", err)
+                    << LogVar("copper", copperName.str()));
+          } else { // PCIe40
+            int slot = (raw.GetNodeID(0) & 0xF) * 8 - 7 + finesse / 4;
+            std::string name = (slot < 10) ? "s0" : "s";
+            name += std::to_string(slot) + char('a' + finesse % 4);
+            B2ERROR("TOPUnpacker: error in unpacking data from boardstack " << name
+                    << LogVar("words unused", err));
+          }
         }
 
       } // finesse loop

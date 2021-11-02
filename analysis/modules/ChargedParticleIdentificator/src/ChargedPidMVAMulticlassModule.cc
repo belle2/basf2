@@ -163,7 +163,7 @@ void ChargedPidMVAMulticlassModule::event()
 
         auto specobj = m_spectators.at(index).at(ispec);
 
-        double spec;
+        double spec = std::numeric_limits<double>::quiet_NaN();
         if (std::holds_alternative<double>(specobj->function(particle))) {
           spec = std::get<double>(specobj->function(particle));
         } else if (std::holds_alternative<int>(specobj->function(particle))) {

@@ -115,6 +115,13 @@ void DQMHistAnalysisPXDEffModule::initialize()
     if (m_useEpics) {
       auto& my = mychid_eff[aPXDModule];
       SEVCHK(ca_create_channel((m_pvPrefix + buff).Data(), NULL, NULL, 10, &my), "ca_create_channel failure");
+
+      my = mychid_low[aPXDModule];
+      SEVCHK(ca_create_channel((m_pvPrefix + buff + ".LOW").Data(), NULL, NULL, 10, &my), "ca_create_channel failure");
+
+      my = mychid_lolo[aPXDModule];
+      SEVCHK(ca_create_channel((m_pvPrefix + buff + ".LOLO").Data(), NULL, NULL, 10, &my), "ca_create_channel failure");
+
       B2WARNING(m_pvPrefix + (std::string)aPXDModule);
     }
 #endif
@@ -222,19 +229,28 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     if (m_useEpics) {
       // get warn and error limit
       // as the same array as above, we assume chid exists
-      struct dbr_ctrl_double tPvData;
-      auto r = ca_get(DBR_CTRL_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData);
+//       struct dbr_ctrl_double tPvData;
+//       auto r = ca_get(DBR_CTRL_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData);
+//       if (r == ECA_NORMAL) r = ca_pend_io(5.0);
+      dbr_double_t tPvData;
+      auto r = ca_get(DBR_DOUBLE, mychid_lolo[m_PXDModules[i]], &tPvData);
       if (r == ECA_NORMAL) r = ca_pend_io(5.0);
       if (r == ECA_NORMAL) {
-        if (!std::isnan(tPvData.lower_alarm_limit)
-            && tPvData.lower_alarm_limit > 0.0) {
-          m_hErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
-          if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = tPvData.lower_alarm_limit;
+        if (!std::isnan(tPvData)
+            && tPvData > 0.0) {
+          m_hErrorLine->SetBinContent(i + 1, tPvData);
+          if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = tPvData;
         }
-        if (!std::isnan(tPvData.lower_warning_limit)
-            && tPvData.lower_warning_limit > 0.0) {
-          m_hWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
-          if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = tPvData.lower_warning_limit;
+      } else {
+        SEVCHK(r, "ca_get or ca_pend_io failure");
+      }
+      r = ca_get(DBR_DOUBLE, mychid_low[m_PXDModules[i]], &tPvData);
+      if (r == ECA_NORMAL) r = ca_pend_io(5.0);
+      if (r == ECA_NORMAL) {
+        if (!std::isnan(tPvData)
+            && tPvData > 0.0) {
+          m_hWarnLine->SetBinContent(i + 1, tPvData);
+          if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = tPvData;
         }
       } else {
         SEVCHK(r, "ca_get or ca_pend_io failure");
@@ -569,6 +585,8 @@ void DQMHistAnalysisPXDEffModule::terminate()
   if (m_useEpics) {
     for (auto& m : mychid_status) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
     for (auto& m : mychid_eff) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
+    for (auto& m : mychid_low) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
+    for (auto& m : mychid_lolo) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif

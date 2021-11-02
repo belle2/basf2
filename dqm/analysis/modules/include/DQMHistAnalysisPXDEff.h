@@ -113,6 +113,8 @@ namespace Belle2 {
     //! one EPICS PV
     std::vector <chid>  mychid_status;
     std::map <VxdID, chid> mychid_eff;
+    std::map <VxdID, chid> mychid_lo;
+    std::map <VxdID, chid> mychid_lolo;
 #endif
   };
 } // end namespace Belle2

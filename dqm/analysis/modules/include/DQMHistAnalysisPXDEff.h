@@ -110,10 +110,13 @@ namespace Belle2 {
     bool m_useEpicsRO;
 
 #ifdef _BELLE2_EPICS
-    //! one EPICS PV
+    //! EPICS PVs for Status
     std::vector <chid>  mychid_status;
+    //! EPICS PVs for Efficiency
     std::map <VxdID, chid> mychid_eff;
+    //! EPICS PVs for Efficiency, low warn limits
     std::map <VxdID, chid> mychid_low;
+    //! EPICS PVs for Efficiency, low alarm limits
     std::map <VxdID, chid> mychid_lolo;
 #endif
   };

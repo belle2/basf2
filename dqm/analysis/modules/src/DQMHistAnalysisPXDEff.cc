@@ -113,16 +113,12 @@ void DQMHistAnalysisPXDEffModule::initialize()
     buff.ReplaceAll(".", "_");
 #ifdef _BELLE2_EPICS
     if (m_useEpics) {
-      auto& my = mychid_eff[aPXDModule];
-      SEVCHK(ca_create_channel((m_pvPrefix + buff).Data(), NULL, NULL, 10, &my), "ca_create_channel failure");
-
-      my = mychid_low[aPXDModule];
-      SEVCHK(ca_create_channel((m_pvPrefix + buff + ".LOW").Data(), NULL, NULL, 10, &my), "ca_create_channel failure");
-
-      my = mychid_lolo[aPXDModule];
-      SEVCHK(ca_create_channel((m_pvPrefix + buff + ".LOLO").Data(), NULL, NULL, 10, &my), "ca_create_channel failure");
-
-      B2WARNING(m_pvPrefix + (std::string)aPXDModule);
+      B2INFO("Connect PVs for " + m_pvPrefix + (std::string)aPXDModule);
+      SEVCHK(ca_create_channel((m_pvPrefix + buff).Data(), NULL, NULL, 10, &mychid_eff[aPXDModule]), "ca_create_channel failure");
+      SEVCHK(ca_create_channel((m_pvPrefix + buff + ".LOW").Data(), NULL, NULL, 10, &mychid_low[aPXDModule]),
+             "ca_create_channel failure");
+      SEVCHK(ca_create_channel((m_pvPrefix + buff + ".LOLO").Data(), NULL, NULL, 10, &mychid_lolo[aPXDModule]),
+             "ca_create_channel failure");
     }
 #endif
     TString histTitle = "PXD Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
@@ -229,12 +225,9 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     if (m_useEpics) {
       // get warn and error limit
       // as the same array as above, we assume chid exists
-//       struct dbr_ctrl_double tPvData;
-//       auto r = ca_get(DBR_CTRL_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData);
-//       if (r == ECA_NORMAL) r = ca_pend_io(5.0);
       dbr_double_t tPvData;
       auto r = ca_get(DBR_DOUBLE, mychid_lolo[m_PXDModules[i]], &tPvData);
-      if (r == ECA_NORMAL) r = ca_pend_io(5.0);
+      if (r == ECA_NORMAL) r = ca_pend_io(5.0);// value is only updated here and valid if ECA_NORMAL
       if (r == ECA_NORMAL) {
         if (!std::isnan(tPvData)
             && tPvData > 0.0) {
@@ -245,7 +238,7 @@ void DQMHistAnalysisPXDEffModule::beginRun()
         SEVCHK(r, "ca_get or ca_pend_io failure");
       }
       r = ca_get(DBR_DOUBLE, mychid_low[m_PXDModules[i]], &tPvData);
-      if (r == ECA_NORMAL) r = ca_pend_io(5.0);
+      if (r == ECA_NORMAL) r = ca_pend_io(5.0);// value is only updated here and valid if ECA_NORMAL
       if (r == ECA_NORMAL) {
         if (!std::isnan(tPvData)
             && tPvData > 0.0) {

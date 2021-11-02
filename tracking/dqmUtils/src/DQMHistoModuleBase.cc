@@ -418,9 +418,9 @@ void DQMHistoModuleBase::Define1DSensors()
   factory.yTitleDefault("counts");
 
   m_UBResidualsSensorU = factory.xAxis(residualU).CreateSensorsTH1F(format("UBResidualsU_%1%"),
-                         format("PXD Unbiased U Residuals for sensor %1%"));
+                         format("VXD Unbiased U Residuals for sensor %1%"));
   m_UBResidualsSensorV = factory.xAxis(residualV).CreateSensorsTH1F(format("UBResidualsV_%1%"),
-                         format("PXD Unbiased V Residuals for sensor %1%"));
+                         format("VXD Unbiased V Residuals for sensor %1%"));
 
 }
 
@@ -435,7 +435,7 @@ void DQMHistoModuleBase::Define2DSensors()
   auto factory = Factory(this);
 
   m_UBResidualsSensor = factory.xAxis(residualU).yAxis(residualV).zTitle("counts").CreateSensorsTH2F(format("UBResiduals_%1%"),
-                        format("PXD Unbiased Residuals for sensor %1%"));
+                        format("VXD Unbiased Residuals for sensor %1%"));
 }
 
 void DQMHistoModuleBase::FillTrackIndexes(int iTrack, int iTrackVXD, int iTrackCDC, int iTrackVXDCDC)

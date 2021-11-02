@@ -28,7 +28,7 @@ namespace Belle2 {
     bool thetaInTOPAcceptance(const Particle* particle)
     {
       double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
-      if (theta > 34.64 && theta < 121.87) {
+      if (theta > 32.20 && theta < 123.86) {
         return true;
       } else return false;
     }

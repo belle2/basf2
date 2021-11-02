@@ -1146,7 +1146,7 @@ namespace Belle2 {
           if (daughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
           else {
-            double daughterValue, motherValue;
+            double daughterValue = 0.0, motherValue = 0.0;
             if (std::holds_alternative<double>(var->function(particle)))
             {
               daughterValue = std::get<double>(var->function(particle->getDaughter(daughterNumber)));

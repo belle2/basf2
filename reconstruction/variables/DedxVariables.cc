@@ -136,48 +136,6 @@ namespace Belle2 {
       }
     }
 
-    double CDCdEdx_llog(const Particle* part, const int index)
-    {
-      const CDCDedxTrack* dedxTrack = getDedxFromParticle(part);
-      if (!dedxTrack) {
-        return -999.0;
-      } else {
-        return dedxTrack->getLogl(index);
-      }
-    }
-
-    double CDCdEdx_llogE(const Particle* part)
-    {
-      return CDCdEdx_llog(part, 0);
-    }
-
-    double CDCdEdx_llogMu(const Particle* part)
-    {
-      return CDCdEdx_llog(part, 1);
-    }
-
-    double CDCdEdx_llogPi(const Particle* part)
-    {
-      return CDCdEdx_llog(part, 2);
-    }
-
-    double CDCdEdx_llogK(const Particle* part)
-    {
-      return CDCdEdx_llog(part, 3);
-    }
-
-    double CDCdEdx_llogP(const Particle* part)
-    {
-      return CDCdEdx_llog(part, 4);
-    }
-
-    double CDCdEdx_llogD(const Particle* part)
-    {
-      return CDCdEdx_llog(part, 5);
-    }
-
-
-
     Manager::FunctionPtr CDCdEdx_PIDvars(const std::vector<std::string>& arguments)
     {
       if (arguments.size() < 2) {
@@ -324,13 +282,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("CDCdEdx_chiK", CDCdEdx_chiK, "Chi value of kaons from CDC dEdx");
     REGISTER_VARIABLE("CDCdEdx_chiP", CDCdEdx_chiP, "Chi value of protons from CDC dEdx");
     REGISTER_VARIABLE("CDCdEdx_chiD", CDCdEdx_chiD, "Chi value of duetrons from CDC dEdx");
-
-    REGISTER_VARIABLE("CDCdEdx_llogE", CDCdEdx_llogE, "Log likelihood value of electrons from CDC dEdx");
-    REGISTER_VARIABLE("CDCdEdx_llogMu", CDCdEdx_llogMu, "Log likelihood value of muons from CDC dEdx");
-    REGISTER_VARIABLE("CDCdEdx_llogPi", CDCdEdx_llogPi, "Log likelihood value of pions from CDC dEdx");
-    REGISTER_VARIABLE("CDCdEdx_llogK", CDCdEdx_llogK, "Log likelihood value of kaons from CDC dEdx");
-    REGISTER_VARIABLE("CDCdEdx_llogP", CDCdEdx_llogP, "Log likelihood value of protons from CDC dEdx");
-    REGISTER_VARIABLE("CDCdEdx_llogD", CDCdEdx_llogD, "Log likelihood value of duetrons from CDC dEdx");
 
     //SVD variables
     REGISTER_VARIABLE("SVDdEdx", SVDdedx, "SVD dE/dx truncated mean");

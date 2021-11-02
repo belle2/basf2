@@ -169,7 +169,7 @@ void ChargedPidMVAModule::event()
 
         auto varobj = m_variables.at(index).at(ivar);
 
-        double var;
+        double var = -999.0;
         if (std::holds_alternative<double>(varobj->function(particle))) {
           var = std::get<double>(varobj->function(particle));
         } else if (std::holds_alternative<int>(varobj->function(particle))) {

@@ -75,7 +75,7 @@ namespace Belle2 {
         storeAcceptedPath(newPath, allNodePaths);
 
         if (allNodePaths.size() > pathLimit) {
-          B2ERROR("Number of collected paths to large. Aborting Event!");
+          B2ERROR("Number of collected paths to large: skipping the event and not processing it.");
           return false;
         }
       }

@@ -117,7 +117,7 @@ void TrackFinderVXDCellOMatModule::event()
   /// apply CA algorithm:
   int nRounds = m_cellularAutomaton.apply(segmentNetwork);
   if (nRounds < 0) {
-    B2ERROR("CA failed, skipping event!");
+    B2ERROR("Cellular Automaton failed, skipping event!");
     return;
   }
 
@@ -146,7 +146,7 @@ void TrackFinderVXDCellOMatModule::event()
   /// collect all Paths starting from a Seed:
   m_collectedPaths.clear();
   if (not m_pathCollector.findPaths(segmentNetwork, m_collectedPaths, m_PARAMmaxPaths, m_PARAMstoreSubsets)) {
-    B2WARNING("VXDCellOMat got signal to abort the event.");
+    B2WARNING("Received signal to skip the event and not processing it.");
     m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
     m_network->set_collectedPaths(m_collectedPaths.size());
     return;

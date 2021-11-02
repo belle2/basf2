@@ -347,6 +347,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks", pxd_filte
         -> setting this option to 'True' will have some influence on the final track collection)
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param use_HLT_ROIs: Don't calculate the ROIs here but use the ones from the HLT (does obviously not work for simulation)
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return

@@ -55,7 +55,7 @@ def setAnalysisConfigParams(configParametersAndValues, path):
     path.add_module(conf)
 
 
-def inputMdst(filename, path, environmentType='default', skipNEvents=0, entrySequence=None, *, parentLevel=0):
+def inputMdst(filename, path, environmentType='default', skipNEvents=0, entrySequence=None, *, parentLevel=0, **kwargs):
     """
     Loads the specified :ref:`mDST <mdst>` (or :ref:`uDST <analysis_udstoutput>`) file with the RootInput module.
 
@@ -98,10 +98,18 @@ With:
     if entrySequence is not None:
         entrySequence = [entrySequence]
 
-    inputMdstList([filename], path, environmentType, skipNEvents, entrySequence, parentLevel=parentLevel)
+    inputMdstList([filename], path, environmentType, skipNEvents, entrySequence, parentLevel=parentLevel, **kwargs)
 
 
-def inputMdstList(filelist, path, environmentType='default', skipNEvents=0, entrySequences=None, *, parentLevel=0):
+def inputMdstList(
+        filelist,
+        path,
+        environmentType='default',
+        skipNEvents=0,
+        entrySequences=None,
+        *,
+        parentLevel=0,
+        useB2BIIDBCache=True):
     """
     Loads the specified list of :ref:`mDST <mdst>` (or :ref:`uDST <analysis_udstoutput>`) files with the RootInput module.
 
@@ -118,6 +126,7 @@ def inputMdstList(filelist, path, environmentType='default', skipNEvents=0, entr
         entrySequences (list(str)): The number sequences (e.g. 23:42,101) defining
             the entries which are processed for each inputFileName.
         parentLevel (int): Number of generations of parent files (files used as input when creating a file) to be read
+        useB2BIIDBCache (bool): Loading of local KEKCC database (only to be deactivated in very special cases)
     """
 
     # FIXME remove this check of "filename" at release-07
@@ -164,6 +173,9 @@ With:
         # also set the MC matching for Belle 1
         setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
         b2bii.setB2BII()
+        if useB2BIIDBCache:
+            basf2.conditions.metadata_providers = ["/sw/belle/b2bii/database/conditions/b2bii.sqlite"]
+            basf2.conditions.payload_locations = ["/sw/belle/b2bii/database/conditions/"]
 
 
 def outputMdst(filename, path):

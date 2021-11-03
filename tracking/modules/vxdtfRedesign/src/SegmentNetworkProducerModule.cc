@@ -382,7 +382,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
 
           if (nLinked > m_PARAMmaxTrackNodeConnections) {
             B2WARNING("Number of TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeConnections
-                      << "! The event will be skipped and not processed. The number of connections was = " << nLinked);
+                      << "! The event will be skipped and not be processed. The number of connections was = " << nLinked);
             m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
             m_network->set_trackNodeConnections(nLinked);
             m_network->set_trackNodeAddedConnections(nAdded);
@@ -390,7 +390,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
           }
           if (nAdded > m_PARAMmaxTrackNodeAddedConnections) {
             B2WARNING("Number of added TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeAddedConnections
-                      << "! The event will be skipped and not processed. The number of connections was = " << nAdded);
+                      << "! The event will be skipped and not be processed. The number of connections was = " << nAdded);
             m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
             m_network->set_trackNodeConnections(nLinked);
             m_network->set_trackNodeAddedConnections(nAdded);

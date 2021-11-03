@@ -33,57 +33,36 @@ into the localdb and change its name to dbstore\_VTXSectorMaps.root\_rev\_1.root
 
 The concrete steps to be executed are: 
 
-1) copy vtx/example/trainVXDTF2 folder somewhere in /group/belle2/users/benjamin  where you have few hundred GB space
+1. copy vtx/example/trainVXDTF2 folder somewhere in /group/belle2/users/benjamin  where you have few hundred GB space
 
-2) cd into that new directory
+2. cd into that new directory
 
-3) Set the geometry. For example: 
+3. Set the geometry. For example: 
 
 export  BELLE2_VTX_UPGRADE_GT=upgrade_2021-07-16_vtx_7layer  
 
-4) Create folder for training events
+4. Create folder for training events
 
 mkdir datadir 
 
-5) Submit jobs via bsub to simulate events (~2TB space needed)
+5. Submit jobs via bsub to simulate events (~2TB space needed)
 
 bash submitSomeJobs.sh
 
-6) prepare training: 
+6. prepare training: 
 
 bsub -q l -o logTrainingPreparation.log  'basf2 -l WARNING trainingPreparation.py -i "./datadir/SimEvts*.root" '
 
-7) do training: 
+7. Training requires >8GB RAM and takes long (>1h). Run it with nohup in background on KEKCC worker node 
 
-bsub -q lx -o logTrainSectorMap.log basf2 trainSecMap.py -- --train VTXDefault_Belle2_VTX.root  --secmap VTXSectorMaps.root
+
+nohup basf2 trainSecMap.py -- --train VTXDefault_Belle2_VTX.root  --secmap VTXSectorMaps.root &
+
 
 8) Upload results. Do not forget to delete datadir and other big intermediate files
-
-mkdir localdb
-
-cd localdb
-
-vim database.txt
-
-```
-dbstore/VTXSectorMaps.root 1 0,0,0,-1
-```
-
-cp ../VTXSectorMaps.root  dbstore_VTXSectorMaps.root_rev_1.root
-
-
-Upload stuff to development GT:   upgrade_development_vtx_7layer  or whatever geometry was used
-
->>b2conditionsdb upload upgrade_development_vtx_7layer localdb/database.txt
-
-or 
-
->>b2conditionsdb upload upgrade_development_vtx_5layer localdb/database.txt
-
 
 
 After testing, the output sectormap can be prepared for uploading to a GT. For this, create a folder 'localdb' containing a file 'database.txt'. The content of
 the file is a single line "dbstore/VTXSectorMaps.root 1 0,0,0,-1" giving the name and IoV of the to be uploaded payload. Next you can copy the sectormap file
 into the localdb and change its name to dbstore\_VTXSectorMaps.root\_rev\_1.root.
-
-
+The localdb can be uploaded to the condDB server commond line tool b2conditionsdb.

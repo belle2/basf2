@@ -39,11 +39,12 @@ from pxd import add_pxd_reconstruction
 
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
-                                mcTrackFinding=False, trackFitHypotheses=None, pxd_filtering_offline=False,
+                                mcTrackFinding=False, trackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
-                                add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False):
+                                add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
+                                pxd_filtering_offline=False):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
@@ -108,7 +109,6 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         skipGeometryAdding=skipGeometryAdding,
         mcTrackFinding=mcTrackFinding,
         trackFitHypotheses=trackFitHypotheses,
-        pxd_filtering_offline=pxd_filtering_offline,
         reco_tracks=reco_tracks,
         prune_temporary_tracks=prune_temporary_tracks,
         fit_tracks=fit_tracks,
@@ -118,7 +118,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
         add_cdcTrack_QI=add_cdcTrack_QI,
         add_vxdTrack_QI=add_vxdTrack_QI,
-        add_recoTrack_QI=add_recoTrack_QI)
+        add_recoTrack_QI=add_recoTrack_QI,
+        pxd_filtering_offline=pxd_filtering_offline)
 
     add_postfilter_tracking_reconstruction(path,
                                            components=components,
@@ -129,12 +130,12 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
 
 def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdding=False,
-                                          mcTrackFinding=False, trackFitHypotheses=None,
-                                          pxd_filtering_offline=False, reco_tracks="RecoTracks",
+                                          mcTrackFinding=False, trackFitHypotheses=None, reco_tracks="RecoTracks",
                                           prune_temporary_tracks=True, fit_tracks=True,
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                           use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
-                                          add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False):
+                                          add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
+                                          pxd_filtering_offline=False):
     """
     This function adds the tracking reconstruction modules required to calculate HLT filter decision
     to a path.
@@ -200,12 +201,13 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                              use_second_cdc_hits=use_second_cdc_hits)
     else:
         add_track_finding(path, components=components, reco_tracks=reco_tracks,
-                          pxd_filtering_offline=pxd_filtering_offline,
                           prune_temporary_tracks=prune_temporary_tracks,
                           use_second_cdc_hits=use_second_cdc_hits,
                           use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
                           use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
-                          add_cdcTrack_QI=add_cdcTrack_QI, add_vxdTrack_QI=add_vxdTrack_QI)
+                          add_cdcTrack_QI=add_cdcTrack_QI,
+                          add_vxdTrack_QI=add_vxdTrack_QI,
+                          pxd_filtering_offline=pxd_filtering_offline)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
@@ -320,11 +322,12 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
                                 use_second_cdc_hits=use_second_cdc_hits)
 
 
-def add_track_finding(path, components=None, reco_tracks="RecoTracks", pxd_filtering_offline=False,
-                      use_HLT_ROIs=False, prune_temporary_tracks=True, use_second_cdc_hits=False,
+def add_track_finding(path, components=None, reco_tracks="RecoTracks",
+                      prune_temporary_tracks=True, use_second_cdc_hits=False,
                       use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True,
                       use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
-                      add_cdcTrack_QI=True, add_vxdTrack_QI=False):
+                      add_cdcTrack_QI=True, add_vxdTrack_QI=False,
+                      pxd_filtering_offline=False, use_HLT_ROIs=False):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
@@ -555,6 +558,7 @@ def add_roiFinder(path, reco_tracks="RecoTracks", roiName="ROIs"):
     Add the ROI finding to the path creating ROIs out of reco tracks by extrapolating them to the PXD volume.
     :param path: Where to add the module to.
     :param reco_tracks: Which tracks to use in the extrapolation step.
+    :param roiName: Name of the produced/stored ROIs.
     """
 
     pxdDataRed = b2.register_module('PXDROIFinder')

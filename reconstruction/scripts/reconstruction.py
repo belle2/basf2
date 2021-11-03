@@ -77,11 +77,11 @@ def default_event_abort(module, condition, error_flag):
     module.if_value(condition, p, basf2.AfterConditionPath.END)
 
 
-def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True,
-                       pxd_filtering_offline=False, skipGeometryAdding=False,
+def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
-                       event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True):
+                       event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
+                       pxd_filtering_offline=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -125,7 +125,6 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     add_prefilter_reconstruction(path,
                                  components=components,
                                  add_modules_for_trigger_calculation=add_trigger_calculation,
-                                 pxd_filtering_offline=pxd_filtering_offline,
                                  skipGeometryAdding=skipGeometryAdding,
                                  trackFitHypotheses=trackFitHypotheses,
                                  use_second_cdc_hits=use_second_cdc_hits,
@@ -134,7 +133,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  addClusterExpertModules=addClusterExpertModules,
                                  pruneTracks=False,
                                  event_abort=event_abort,
-                                 use_random_numbers_for_hlt_prescale=use_random_numbers_for_hlt_prescale)
+                                 use_random_numbers_for_hlt_prescale=use_random_numbers_for_hlt_prescale,
+                                 pxd_filtering_offline=pxd_filtering_offline)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
     if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
@@ -150,11 +150,11 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         add_skim_software_trigger(path)
 
 
-def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_calculation=True, pxd_filtering_offline=False,
+def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_calculation=True,
                                  skipGeometryAdding=False, trackFitHypotheses=None, use_second_cdc_hits=False,
                                  add_muid_hits=False, reconstruct_cdst=None, addClusterExpertModules=True,
                                  pruneTracks=True, event_abort=default_event_abort,
-                                 use_random_numbers_for_hlt_prescale=True):
+                                 use_random_numbers_for_hlt_prescale=True, pxd_filtering_offline=False):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
@@ -203,10 +203,10 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
     add_prefilter_tracking_reconstruction(path,
                                           components=components,
                                           mcTrackFinding=False,
-                                          pxd_filtering_offline=pxd_filtering_offline,
                                           skipGeometryAdding=skipGeometryAdding,
                                           trackFitHypotheses=trackFitHypotheses,
-                                          use_second_cdc_hits=use_second_cdc_hits)
+                                          use_second_cdc_hits=use_second_cdc_hits,
+                                          pxd_filtering_offline=pxd_filtering_offline)
 
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Prefilter_Tracking')

@@ -23,3 +23,13 @@ if __name__ == '__main__':
         mdst_files = glob.glob(f'{b2.find_file("mdst/tests")}/mdst-v*.root')
         mdst_files.sort(reverse=True)
         subprocess.check_call(['b2hlt_print_result.py', mdst_files[0]])
+
+        # Check if b2hlt_triggers works.
+        # 1: b2hlt_triggers print
+        subprocess.check_call(['b2hlt_triggers', 'print', '--database', 'online'])
+        # 2: b2hlt_triggers download
+        subprocess.check_call(['b2hlt_triggers', 'download', '--database', 'online'])
+        # 3: b2hlt_triggers add_cut
+        subprocess.check_call(['b2hlt_triggers', 'add_cut', 'filter', 'accept_goats', '"[nTrkLoose > 0]"', '10', 'False'])
+        # 4: b2hlt_triggers remove_cut
+        subprocess.check_call(['b2hlt_triggers', 'remove_cut', 'skim', 'accept_bhabha'])

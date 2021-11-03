@@ -22,6 +22,9 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dbobjects/BeamSpot.h>
+
+#include <analysis/utility/ReferenceFrame.h>
 
 #include "TMath.h"
 #include "TH1D.h"

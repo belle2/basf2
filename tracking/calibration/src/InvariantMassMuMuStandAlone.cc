@@ -393,28 +393,29 @@ namespace Belle2 {
 
 
 
-
+    /** The integrator aims to evaluate PDGgen conv ResFunction */
     struct Integrator {
 
-      double mean = 4;
-      double sigma  = 30;
-      double sigmaK = 30;
-      double bMean = 0;
-      double bDelta = 2.6;
-      double tauL = 60;
-      double tauR = 60;
+      double mean = 4;    ///< mean position of the resolution function, i.e. (Gaus+Exp tails) conv Gaus
+      double sigma  = 30; ///< sigma of the resolution function
+      double sigmaK = 30; ///< sigma of the gaus in the convolution
+      double bMean = 0;    ///< (bRight + bLeft)/2 where bLeft, bRight are the transition points between gaus and exp (in sigma)
+      double bDelta = 2.6; ///< (bRight - bLeft)/2 where bLeft, bRight are the transition points between gaus and exp (in sigma)
+      double tauL = 60;    ///< 1/slope of the left exponential tail
+      double tauR = 60;    ///< 1/slope of the right exponential tail
 
-      double sigmaE = 30;
-      double frac = 0.1;
+      double sigmaE = 30;  ///< sigma of the external gaus
+      double frac = 0.1;   ///< fraction of events in the external gaus
 
-      double m0   = 10500;
-      double eps  = 0.01;
-      double slope = 0.95;
+      double m0   = 10500; ///< invariant mass of the collisions
+      double eps  = 0.01;  ///< cut-off term for the power-spectrum caused by the ISR (in GeV)
+      double slope = 0.95; ///< power in the power-like spectrum from the ISR
 
-      double x    = 10400;
+      double x    = 10400; ///< the resulting PDF is function of this variable the actual mass
 
-      double C = 16;
+      double C = 16;       ///< the coeficient between part bellow eps and above eps cut-off
 
+      /** Init the parameters of the PDF integrator */
       void init(double Mean,
                 double Sigma,
                 double SigmaK,
@@ -447,6 +448,7 @@ namespace Belle2 {
         x      = X;
       }
 
+      /** evaluate the PDF integrand for given t - the integration variable */
       double eval(double t)
       {
         double CoreC = gausExpConv(mean, sigma, bMean, bDelta, tauL, tauR, sigmaK, x + t - m0);
@@ -467,7 +469,7 @@ namespace Belle2 {
         return Core * K;
       }
 
-      // Simple integration based on Trapezoidal rule
+      /** Simple integration of the PDF based on the Trapezoidal rule */
       double IntegralTrap(double a, double b)
       {
         const int N = 14500000;
@@ -483,7 +485,7 @@ namespace Belle2 {
         return s;
       }
 
-      // Integration which avoids steps and uses variable transformation (Trapezoidal rule as back-end)
+      /** Integration of the PDF which avoids steps and uses variable transformation (Trapezoidal rule as back-end) */
       double IntegralTrapImp(double Eps, double a)
       {
         double tMin = slope * tauL;
@@ -644,7 +646,7 @@ namespace Belle2 {
       }
 
 
-      // Integration which avoids steps and uses variable transformation (Gauss-Konrod rule as back-end)
+      /** Integration of the PDF which avoids steps and uses variable transformation (Gauss-Konrod rule as back-end) */
       double IntegralKronrod(double a)
       {
 

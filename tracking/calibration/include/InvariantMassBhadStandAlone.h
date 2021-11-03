@@ -29,27 +29,27 @@ namespace Belle2 {
     static const TVector3 vecNaN(realNaN, realNaN, realNaN);
 
 
-
+    /** structure containing variables relevant for the hadronic B decays */
     struct Event {
 
-      int exp   = intNaN;
-      int run   = intNaN;
-      int evtNo = intNaN;
+      int exp   = intNaN;  ///< experiment number
+      int run   = intNaN;  ///< run number
+      int evtNo = intNaN;  ///< event number
 
-      double mBC = realNaN;
-      double deltaE = realNaN;
-      int pdg = intNaN;
-      int mode = intNaN;
-      double Kpid = realNaN;
-      double R2 = realNaN;
-      double mD = realNaN;
-      double dmDstar = realNaN;
+      double mBC = realNaN;     ///< beam-constrained mass of B meson
+      double deltaE = realNaN;  ///< eBmeson - eCMS/2 in the centre-of-mass frame
+      int pdg = intNaN;         ///< PDG code of the signal B-meson
+      int mode = intNaN;        ///< integer code identifying the decay channel
+      double Kpid = realNaN;    ///< Kaon PID
+      double R2 = realNaN;      ///< R2 continuous suppression variable
+      double mD = realNaN;      ///< reconstructed mass of the D meson
+      double dmDstar = realNaN; ///< reconstructed mass difference between Dstar and D
       //double cmsE0; // eCMS used to calculate mBC and deltaE
 
-      double t = realNaN;   // time of event
+      double t = realNaN;       ///< time of the event
 
-      bool isSig = false;
-      int nBootStrap = intNaN;
+      bool isSig = false;       ///< isSignal flag (for applying selections)
+      int nBootStrap = intNaN;  ///< bootstap weight
     };
 
 

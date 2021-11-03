@@ -153,6 +153,7 @@ namespace Belle2 {
       * @param evts: A vector with all events
       * @param lossFunctionOuter: A formula of the outer loss function (for calib. intervals)
       * @param lossFunctionInner: A formula of the inner loss function (for calib. subintervals)
+      * @param atomSize: lenght of the small calibration interval - atom (in hours)
       * @return: Vector of the calib. intervals always containing vector of calib. subintervals.
       *          Each subinterval is defined as a map spanning in general over several runs
       **/

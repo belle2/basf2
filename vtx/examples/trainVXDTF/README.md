@@ -41,19 +41,23 @@ The concrete steps to be executed are:
 
 export  BELLE2_VTX_UPGRADE_GT=upgrade_2021-07-16_vtx_7layer  
 
-4) mkdir datadir 
+4) Create folder for training events
 
-5) bash submitSomeJobs.sh
+mkdir datadir 
+
+5) Submit jobs via bsub to simulate events (~2TB space needed)
+
+bash submitSomeJobs.sh
 
 6) prepare training: 
 
 bsub -q l -o logTrainingPreparation.log  'basf2 -l WARNING trainingPreparation.py -i "./datadir/SimEvts*.root" '
 
-7) do trainign: 
+7) do training: 
 
 bsub -q lx -o logTrainSectorMap.log basf2 trainSecMap.py -- --train VTXDefault_Belle2_VTX.root  --secmap VTXSectorMaps.root
 
-8) Upload results
+8) Upload results. Do not forget to delete datadir and other big intermediate files
 
 mkdir localdb
 

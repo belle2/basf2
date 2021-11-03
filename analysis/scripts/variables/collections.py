@@ -140,7 +140,7 @@ mc_variables = [
 ]
 
 #: PID variables
-pid = ['kaonID', 'pionID', 'protonID', 'muonID', 'electronID', 'deuteronID',
+pid = ['kaonID', 'pionID', 'protonID', 'muonID', 'electronID', 'electronID_noTOP', 'deuteronID',
        'binaryPID(211, 13)', 'binaryPID(211, 321)', 'binaryPID(211, 2212)', 'binaryPID(321, 2212)']
 
 #: Replacement for ROEMultiplicities tool

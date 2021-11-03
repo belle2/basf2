@@ -46,7 +46,7 @@ namespace Belle2 {
     /**Call this if you want to produce 1D Track Residual plots for each VXD sensor */
     void produce1Dres() {m_produce1Dres = true;};
     /**Call this if you want to produce 2D Track Residual plots for each VXD sensor */
-    void produce2Dres() {m_produce1Dres = true;};
+    void produce2Dres() {m_produce2Dres = true;};
 
   protected:
     /** Find RecoTrack for given track. Calls ProcessSuccesfulFit if the RecoTrack has a successful fit. */

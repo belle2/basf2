@@ -52,7 +52,7 @@ void TrackingHLTDQMModule::defineHisto()
   DQMHistoModuleBase::runningOnHLT();
 
   if (VXD::GeoCache::getInstance().getGeoTools()->getNumberOfLayers() == 0)
-    B2WARNING("Missing geometry for VXD.");
+    B2FATAL("Missing geometry for VXD.");
 
   // Create a separate histogram directories and cd into it.
   TDirectory* originalDirectory = gDirectory;

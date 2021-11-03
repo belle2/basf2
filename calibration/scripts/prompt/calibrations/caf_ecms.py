@@ -60,8 +60,6 @@ def getHadBpath():
     rec_path_1 = create_path()
     prepare_cdst_analysis(rec_path_1)  # for running on cdst data
 
-    # prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
-
     add_pid_module(rec_path_1)
     add_ecl_modules(rec_path_1)
 

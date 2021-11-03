@@ -47,6 +47,7 @@
 #include "RooConstVar.h"
 
 
+#include "framework/particledb/EvtGenDatabasePDG.h"
 
 
 //if compiled within BASF2
@@ -227,8 +228,10 @@ namespace Belle2 {
       TH1D* hMB      = new TH1D(rn(), "", 30, -0.15, 0.15);
 
 
+      B2ASSERT("Assert the existence of the Y4S particle data", EvtGenDatabasePDG::Instance()->GetParticle("Upsilon4S"));
+
       for (auto ev : evts) {
-        const double cmsE0 = 10579.4e-3; //Y4S mass
+        const double cmsE0 = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon4S")->Mass(); //Y4S mass
         double E = ev.deltaE + cmsE0 / 2; // energy
         double p = sqrt(pow(cmsE0 / 2, 2) - pow(ev.mBC, 2)); // energy
         double m = sqrt(E * E - p * p);

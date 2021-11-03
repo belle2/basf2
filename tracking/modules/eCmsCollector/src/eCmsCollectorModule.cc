@@ -9,14 +9,13 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/ReferenceFrame.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-
 #include <analysis/variables/Variables.h>
 #include <analysis/variables/ContinuumSuppressionVariables.h>
-
-#include <mdst/dataobjects/PIDLikelihood.h>
-
 #include <analysis/utility/PCmsLabTransform.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
+
 
 using namespace Belle2;
 using namespace std;
@@ -98,7 +97,9 @@ void eCmsCollectorModule::collect()
 
   if (!Bpart) return;
 
-  const double eBeamRef = 10579.4e-3 / 2; //PDG mass of Y4S
+  B2ASSERT("Assert the existence of the Y4S particle data", EvtGenDatabasePDG::Instance()->GetParticle("Upsilon4S"));
+
+  const double eBeamRef = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon4S")->Mass() / 2; //PDG mass of Y4S divided by two
   const double eBeamNow = PCmsLabTransform().getCMSEnergy() / 2;
 
   //Convert mBC and deltaE to the Y4S reference

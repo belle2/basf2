@@ -14,32 +14,32 @@
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
 
-//get weights to calculate the integral over the nodes
+/** Get weights to calculate the integral over the Cheb nodes */
 VectorXd GetWeights(int Size);
 
-//get Cheb nodes
+/** Get the vector with positions of the Cheb nodes */
 VectorXd GetNodes(int Size);
 
 
-//Evaluate cheb pols to Size at point x
+/** Evaluate cheb pols up to Size at point x */
 VectorXd getPols(int Size, double x);
 
-//Evaluate sum of cheb pols to Size at vector x, x els are between 0 and 1
+/** Evaluate sum of cheb pols up to Size at vector x, x range is between 0 and 1 */
 VectorXd getPolsSum(int Size, VectorXd x);
 
 
-//Transformation matrix between cheb. nodes and cheb. coeficients
+/** Transformation matrix between Cheb nodes and Cheb coefficients */
 MatrixXd GetCoefs(int oldSize, bool isInverse = false);
 
 
-//with better normalization of the borders
+/** Transformation matrix between Cheb nodes and Cheb coefficients with better normalization of the borders */
 MatrixXd GetCoefsCheb(int oldSize);
 
 
-//Get Interpolation vector at point x
+/** Get Interpolation vector at point x from the function values at points xi */
 VectorXd interpol(const VectorXd& xi, double x);
 
 
-//Get interpolated function value at point x
+/** Get interpolated function value at point x */
 double interpol(VectorXd xi, VectorXd vals, double x);
 

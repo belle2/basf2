@@ -97,7 +97,9 @@ namespace Belle2 {
       auto iSensor = VXD::GeoCache::getInstance().getGeoTools()->getPXDSensorIndex(sensorID);
       uBin = PXD::PXDGainCalibrator::getInstance().getBinU(sensorID, uID, vID, m_nBinsU);
       vBin = PXD::PXDGainCalibrator::getInstance().getBinV(sensorID, vID, m_nBinsV);
-      assert(uBin < m_nBinsU && vBin < m_nBinsV);
+      //assert(uBin < m_nBinsU && vBin < m_nBinsV);
+      if (uBin >= m_nBinsU || vBin >= m_nBinsV)
+        throw std::out_of_range("uBin or vBin is outside of valid range.");
 
       return iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin;
     }

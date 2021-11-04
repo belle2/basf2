@@ -11,6 +11,8 @@
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
+#include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 #include <TH1.h>
 
 namespace Belle2 {
@@ -39,6 +41,9 @@ namespace Belle2 {
      * For the creation of histograms the THFFactory or the Create- functions should be used. */
     virtual void DefineFlags();
 
+    /** Input array for DAQ Status. */
+    StoreArray<RawFTSW> m_rawTTD;
+
     /** Acccess to the EventLevelTrackingInfo object in the datastore. */
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
 
@@ -47,5 +52,38 @@ namespace Belle2 {
      * and UnspecifiedTrackFindingFailure.
      * The histogram records if any flag was set. */
     TH1F* m_trackingErrorFlags = nullptr;
+
+    /** abort rate as a function of time after injection and time within a bam cycle - HER*/
+    TH2F* m_abortVStimeHER = nullptr;
+
+    /** abort rate as a function of time after injection and time within a bam cycle - LER*/
+    TH2F* m_abortVStimeLER = nullptr;
+
+    /** Beam revolution time in microseconds (approximated).
+     *
+     * The exact time could be obtained as
+     * `5120 / HardwareClockSettings::getAcceleratorRF() * 1e3`
+     * but this would run after defineHisto() if used in initialize().
+     * Since defineHisto() uses this value, using a run-independent
+     * approximated constant value is the only way.
+     */
+    static constexpr double c_revolutionTime = 5120.0 / 508.0;
+
+    /** Defines the range of the x axis of the 2D time histogram */
+    static constexpr double c_noInjectionTime = 30e3;
+
+    /** Approximated global clock frequency in MHz.
+     *
+     * Used to convert TTD timing to us.
+     *
+     * The exact frequency could be obtained as
+     * `HardwareClockSettings::getGlobalClockFrequency() * 1e3`
+     * but this would produce inconsistent histograms since I am
+     * forced to use an approximated accelerator RF (508 MHz) for the
+     * beam revolution period.
+     *
+     * @sa c_revolutionTime
+     */
+    static constexpr double c_globalClock = 127.0;
   };
 }

@@ -24,7 +24,6 @@ plt.style.use('belle2')
 def root_style():
     """
     ROOT style
-    Author: maiko.takahashi@desy.de
     """
     # root style option
 

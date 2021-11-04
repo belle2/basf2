@@ -29,8 +29,6 @@ namespace Belle2 {
     void initialize() override;
     /** Module function event */
     void event() override;
-    /** Module function terminate */
-    void terminate() override;
 
     // parameters
     bool m_printCanvas = false; /**< if true print the pdf of the canvases */
@@ -42,9 +40,6 @@ namespace Belle2 {
 
     /** Monitoring Object to be produced by this module, which contain defined canvases and monitoring variables */
     MonitoringObject* m_monObj = nullptr;
-
-    TH1* m_rtype = nullptr; /**< histogram from DQMInfo with runtype */
-    TString m_runtype = ""; /**< string with runtype: physics or cosmic */
 
     TCanvas* m_cAbortRate = nullptr;  /**< canvas for the abort rate plot */
   };

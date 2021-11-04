@@ -48,10 +48,7 @@ void DQMHistAnalysisTrackingHLTModule::initialize()
   // add MonitoringObject
   m_monObj = getMonitoringObject("trackingHLT");
 
-  m_rtype = findHist("DQMInfo/rtype");
-  m_runtype = m_rtype ? m_rtype->GetTitle() : "";
 }
-
 
 void DQMHistAnalysisTrackingHLTModule::event()
 {
@@ -64,7 +61,7 @@ void DQMHistAnalysisTrackingHLTModule::event()
     bool hasError = false;
     int nEvents = hAbort->GetEntries();
     double abortRate = hAbort->GetMean();
-    hAbort->SetTitle(Form("Fraction of Events in which Tracking aborts = %.6f ", abortRate));
+    hAbort->SetTitle(Form("Fraction of Events in which Tracking aborts = %.4f %%", abortRate * 100));
 
     m_monObj->setVariable("abortRate", abortRate);
     //check if number of errors is above the allowed limit
@@ -119,11 +116,5 @@ void DQMHistAnalysisTrackingHLTModule::event()
 
 }
 
-void DQMHistAnalysisTrackingHLTModule::terminate()
-{
-
-  delete m_rtype;
-
-}
 
 

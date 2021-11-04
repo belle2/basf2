@@ -18,6 +18,7 @@ import ROOT
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+plt.style.use('belle2')
 
 
 def root_style():

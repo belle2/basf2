@@ -46,6 +46,11 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
                     "-o", f"conditions_gain_e{exp}_r{run}.root"]
         subprocess.run(cmds + cmds_add, check=True)
 
+    root_files = glob(f"{job_path}/*PXD*Gain*/*/algorithm_output/PXDPerformanceVariablesCollectorValidation.root")
+    for root_file in root_files:
+        cmds = ["b2pxd-val", "-i", root_file]
+        subprocess.run(cmds, check=True)
+
 
 if __name__ == "__main__":
     run_validation(*sys.argv[1:])

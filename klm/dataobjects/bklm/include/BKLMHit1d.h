@@ -17,6 +17,7 @@
 #include <framework/datastore/RelationsObject.h>
 
 /* C++ headers. */
+#include <utility>
 #include <vector>
 
 namespace Belle2 {
@@ -30,8 +31,9 @@ namespace Belle2 {
     BKLMHit1d();
 
     //! Constructor with initial values
-    //! @param digits vector of contiguous KLMDigits
-    explicit BKLMHit1d(const std::vector<const KLMDigit*>& digits);
+    //! @param digitsWithTime vector of pair of contiguous KLMDigits with time
+    //! @param neglectDigitTime if true, the time of KLMDigit is neglected and the time passed with digitsWithTime is instead used
+    explicit BKLMHit1d(const std::vector<std::pair<const KLMDigit*, double>>& digitsWithTime, bool neglectDigitTime = true);
 
     //! Copy constructor
     BKLMHit1d(const BKLMHit1d&);

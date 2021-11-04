@@ -24,7 +24,7 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/eklm/EKLMHit2d.h>
-#include <klm/modules/KLMClustersReconstructor/KLMHit2d.h>
+#include <klm/utility/KLMHit2d.h>
 
 /* Other Belle 2 headers. */
 #include <framework/datastore/StoreObjPtr.h>

@@ -7,7 +7,7 @@
  **************************************************************************/
 
 /* Own header. */
-#include <klm/modules/KLMClustersReconstructor/KLMHit2d.h>
+#include <klm/utility/KLMHit2d.h>
 
 using namespace Belle2;
 

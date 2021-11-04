@@ -12,7 +12,7 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
-#include <klm/modules/KLMClustersReconstructor/KLMHit2d.h>
+#include <klm/utility/KLMHit2d.h>
 
 /* C++ headers. */
 #include <algorithm>

@@ -92,27 +92,30 @@ void DQMHistAnalysisTrackingHLTModule::event()
     m_cAbortRate->Print("c_AbortRate.pdf");
 
   // add average number of tracks per event to Mirabelle
-  double averageNTracks = -1;
-  TH1* hnTracks = findHist("TrackingHLTDQM/NoOfTracks");
-  if (hnTracks != NULL)
-    averageNTracks = hnTracks->GetMean();
-  double averageNVXDTracks = -1;
-  TH1* hnVXDTracks = findHist("TrackingHLTDQM/NoOfTracksInVXDOnly");
-  if (hnVXDTracks != NULL)
-    averageNVXDTracks = hnVXDTracks->GetMean();
-  double averageNCDCTracks = -1;
-  TH1* hnCDCTracks = findHist("TrackingHLTDQM/NoOfTracksInCDCOnly");
-  if (hnCDCTracks != NULL)
-    averageNCDCTracks = hnCDCTracks->GetMean();
-  double averageNVXDCDCTracks = -1;
-  TH1* hnVXDCDCTracks = findHist("TrackingHLTDQM/NoOfTracksInVXDCDC");
-  if (hnVXDCDCTracks != NULL)
-    averageNVXDCDCTracks = hnVXDCDCTracks->GetMean();
 
-  m_monObj->setVariable("nTracksPerEvent", averageNTracks);
-  m_monObj->setVariable("nVXDTracksPerEvent", averageNVXDTracks);
-  m_monObj->setVariable("nCDCTracksPerEvent", averageNCDCTracks);
-  m_monObj->setVariable("nVXDCDCTracksPerEvent", averageNVXDCDCTracks);
+  TH1* hnTracks = findHist("TrackingHLTDQM/NoOfTracks");
+  if (hnTracks != NULL) {
+    double averageNTracks = hnTracks->GetMean();
+    m_monObj->setVariable("nTracksPerEvent", averageNTracks);
+  }
+
+  TH1* hnVXDTracks = findHist("TrackingHLTDQM/NoOfTracksInVXDOnly");
+  if (hnVXDTracks != NULL) {
+    double averageNVXDTracks = hnVXDTracks->GetMean();
+    m_monObj->setVariable("nVXDTracksPerEvent", averageNVXDTracks);
+  }
+
+  TH1* hnCDCTracks = findHist("TrackingHLTDQM/NoOfTracksInCDCOnly");
+  if (hnCDCTracks != NULL) {
+    double averageNCDCTracks = hnCDCTracks->GetMean();
+    m_monObj->setVariable("nCDCTracksPerEvent", averageNCDCTracks);
+  }
+
+  TH1* hnVXDCDCTracks = findHist("TrackingHLTDQM/NoOfTracksInVXDCDC");
+  if (hnVXDCDCTracks != NULL) {
+    double averageNVXDCDCTracks = hnVXDCDCTracks->GetMean();
+    m_monObj->setVariable("nVXDCDCTracksPerEvent", averageNVXDCDCTracks);
+  }
 
 }
 

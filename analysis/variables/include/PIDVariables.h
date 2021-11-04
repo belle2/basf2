@@ -149,6 +149,12 @@ namespace Belle2 {
     double binaryPID_noSVD(const Particle* part, const std::vector<double>& arguments);
 
     /**
+     * SPECIAL (TEMP) variable (BII-8444)
+     * @return electron ID without TOP information
+     */
+    double electronID_noTOP(const Particle* part);
+
+    /**
     * returns the MVA score for anti-neutron PID (not for neutron)
     * -1 means invalid
     *  0 background-like

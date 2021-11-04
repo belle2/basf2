@@ -97,9 +97,9 @@ void eCmsCollectorModule::collect()
 
   if (!Bpart) return;
 
-  B2ASSERT("Assert the existence of the Y4S particle data", EvtGenDatabasePDG::Instance()->GetParticle("Upsilon4S"));
+  B2ASSERT("Assert the existence of the Y4S particle data", EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)"));
 
-  const double eBeamRef = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon4S")->Mass() / 2; //PDG mass of Y4S divided by two
+  const double eBeamRef = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)")->Mass() / 2; //PDG mass of Y4S divided by two
   const double eBeamNow = PCmsLabTransform().getCMSEnergy() / 2;
 
   //Convert mBC and deltaE to the Y4S reference

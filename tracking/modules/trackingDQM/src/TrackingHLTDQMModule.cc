@@ -149,4 +149,15 @@ void TrackingHLTDQMModule::DefineFlags()
     "Tracking Abort vs LER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
     500, 0, c_noInjectionTime, 100, 0, c_revolutionTime);
 
+  //tracking all VS time after HER/LER injection and time within a beam cycle
+  m_allVStimeHER = new TH2F(
+    "allEvtsVsTimeHER",
+    "Number Of Events vs HER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
+    500, 0, c_noInjectionTime, 100, 0, c_revolutionTime);
+
+  m_allVStimeLER = new TH2F(
+    "allEvtsVsTimeLER",
+    "Number of Events vs LER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
+    500, 0, c_noInjectionTime, 100, 0, c_revolutionTime);
+
 }

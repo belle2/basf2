@@ -251,7 +251,7 @@ def getRow(a, row_count=16):
     if a >= row_count * (row_count + 1) // 2:
         return -1
     row = -1
-    for i in range(16):
+    for i in range(row_count):
         max_a_at_row = (i + 1) * (i + 2) // 2
         if a < max_a_at_row:
             row = i

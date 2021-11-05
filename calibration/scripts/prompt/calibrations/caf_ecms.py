@@ -65,12 +65,12 @@ def getHadBpath():
 
     stdCharged.stdPi(listtype='all', path=rec_path_1)
     stdCharged.stdK(listtype='good', path=rec_path_1)
-    stdPi0s.stdPi0s(listtype='eff60_Jan2020', path=rec_path_1)
+    stdPi0s.stdPi0s(listtype='eff60_May2020', path=rec_path_1)
 
     ma.cutAndCopyList("pi+:my", "pi+:all", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
     ma.cutAndCopyList("K+:my", "K+:good", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
 
-    ma.cutAndCopyList("pi0:my", "pi0:eff60_Jan2020", "", path=rec_path_1)
+    ma.cutAndCopyList("pi0:my", "pi0:eff60_May2020", "", path=rec_path_1)
 
     #####################################################
     # Reconstructs the signal B0 candidates from Dstar

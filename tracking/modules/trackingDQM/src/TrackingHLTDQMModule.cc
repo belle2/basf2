@@ -103,18 +103,25 @@ void TrackingHLTDQMModule::event()
         // get last injection time
         auto difference = it.GetTimeSinceLastInjection(0);
         // check time overflow, too long ago
-        if (difference != 0x7FFFFFFF)
-          if (m_eventLevelTrackingInfo->hasAnErrorFlag()) {
-            double timeSinceInj = it.GetTimeSinceLastInjection(0) / c_globalClock;
-            double timeInCycle = timeSinceInj - (int)(timeSinceInj / c_revolutionTime) * c_revolutionTime;
+        if (difference != 0x7FFFFFFF) {
 
+          double timeSinceInj = it.GetTimeSinceLastInjection(0) / c_globalClock;
+          double timeInCycle = timeSinceInj - (int)(timeSinceInj / c_revolutionTime) * c_revolutionTime;
+
+          if (it.GetIsHER(0))
+            m_allVStimeHER->Fill(timeSinceInj, timeInCycle);
+          else
+            m_allVStimeLER->Fill(timeSinceInj, timeInCycle);
+
+          if (m_eventLevelTrackingInfo->hasAnErrorFlag()) {
             if (it.GetIsHER(0))
               m_abortVStimeHER->Fill(timeSinceInj, timeInCycle);
             else
               m_abortVStimeLER->Fill(timeSinceInj, timeInCycle);
-          }
-      }
-    }
+          } //has error flag
+        } //time overflow
+      }// loop on RawFTSW
+    } //RawFTSW is valid
   }  else
     m_trackingErrorFlags->Fill(0.0);
 

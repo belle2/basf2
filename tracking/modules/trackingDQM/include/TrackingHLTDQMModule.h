@@ -53,11 +53,17 @@ namespace Belle2 {
      * The histogram records if any flag was set. */
     TH1F* m_trackingErrorFlags = nullptr;
 
-    /** abort rate as a function of time after injection and time within a bam cycle - HER*/
+    /** abort rate as a function of time after injection and time within a beam cycle - HER*/
     TH2F* m_abortVStimeHER = nullptr;
 
-    /** abort rate as a function of time after injection and time within a bam cycle - LER*/
+    /** number of events as a function of time after injection and time within a beam cycle - HER*/
+    TH2F* m_allVStimeHER = nullptr;
+
+    /** abort rate as a function of time after injection and time within a beam cycle - LER*/
     TH2F* m_abortVStimeLER = nullptr;
+
+    /** number of events as a function of time after injection and time within a beam cycle - LER*/
+    TH2F* m_allVStimeLER = nullptr;
 
     /** Beam revolution time in microseconds (approximated).
      *

@@ -8,40 +8,18 @@
 
 /* Belle 2 headers. */
 #include <klm/modules/KLMDQM2/KLMDQM2Module.h>
-#include <framework/database/DBObjPtr.h>
-#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
-#include <klm/dataobjects/KLMChannelArrayIndex.h>
-#include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dataobjects/KLMSectorArrayIndex.h>
-#include <klm/dbobjects/KLMElectronicsMap.h>
-#include <klm/dataobjects/KLMChannelIndex.h>
-#include <klm/dataobjects/KLMDigitRaw.h>
-#include <klm/bklm/geometry/GeometryPar.h>
-
+#include <mdst/dataobjects/Track.h>
 
 /* ROOT headers. */
-#include <TCanvas.h>
-#include <TH1.h>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TClass.h>
-#include <TROOT.h>
-#include <TStyle.h>
 #include <TDirectory.h>
-#include <TFile.h>
 
 /* CLHEP headers. */
 #include <CLHEP/Vector/ThreeVector.h>
-
 
 /* C++ headers. */
 #include <vector>
 #include <algorithm>
 #include <string>
-
-
-
-
 using namespace Belle2;
 
 
@@ -124,10 +102,8 @@ void KLMDQM2Module::defineHisto()
   TDirectory::TContext context{gDirectory, newDirectory};
 
 
-
   int BKLMMaxSectors = BKLMElementNumbers::getMaximalSectorGlobalNumber();
   int EKLMMaxSectors = EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder();
-
 
 
   /* Number of hits per channel. */
@@ -202,7 +178,6 @@ void KLMDQM2Module::defineHisto()
   m_PlaneEfficienciesBKLMSector->SetOption("HIST");
 
 
-
   m_MatchedHitsEKLMSector = new TH1F("matched_hitsEKLMSector",
                                      "Matched Hits in EKLM Sector",
                                      EKLMMaxSectors, 0.5, EKLMMaxSectors + 0.5);
@@ -241,7 +216,6 @@ void KLMDQM2Module::initialize()
 
   m_GeometryBKLM = bklm::GeometryPar::instance();
 
-
 }
 
 void KLMDQM2Module::beginRun()
@@ -264,10 +238,7 @@ void KLMDQM2Module::beginRun()
   m_AllExtHitsEKLMSector->Reset();
   m_PlaneEfficienciesEKLMSector->Reset();
 
-
 }
-
-
 
 
 void KLMDQM2Module::event()
@@ -294,11 +265,7 @@ void KLMDQM2Module::event()
     m_PlaneEfficienciesEKLMSector->Divide(m_MatchedHitsEKLMSector,
                                           m_AllExtHitsEKLMSector, 1, 1, "B");
 
-
   }
-
-
-
 }
 
 void KLMDQM2Module::endRun()
@@ -308,7 +275,6 @@ void KLMDQM2Module::endRun()
 void KLMDQM2Module::terminate()
 {
 }
-
 
 
 bool KLMDQM2Module::triggerFlag()
@@ -325,9 +291,7 @@ bool KLMDQM2Module::triggerFlag()
   }
   return passed;
 
-
 }
-
 
 void KLMDQM2Module::findMatchingDigit(
   struct HitData* hitData)
@@ -369,9 +333,9 @@ void KLMDQM2Module::addHit(
 }
 
 bool KLMDQM2Module::collectDataTrack(
-  const Particle* muon, TH1F* MatchedHitsBKLM, TH1F* AllExtHitsBKLM,
-  TH1F* MatchedHitsEKLM, TH1F* AllExtHitsEKLM, TH1F* MatchedHitsBKLMSec, TH1F* AllExtHitsBKLMSec,
-  TH1F* MatchedHitsEKLMSec, TH1F* AllExtHitsEKLMSec)
+  const Particle* muon, TH1F* matchedHitsBKLM, TH1F* allExtHitsBKLM,
+  TH1F* matchedHitsEKLM, TH1F* allExtHitsEKLM, TH1F* matchedHitsBKLMSec, TH1F* allExtHitsBKLMSec,
+  TH1F* matchedHitsEKLMSec, TH1F* allExtHitsEKLMSec)
 {
   const int nExtrapolationLayers =
     KLMElementNumbers::getMaximalExtrapolationLayer();
@@ -587,11 +551,11 @@ bool KLMDQM2Module::collectDataTrack(
     if (it->second.subdetector == KLMElementNumbers::c_EKLM) {
       int planeNum = m_eklmElementNumbers->planeNumber(it->second.section, it->second.layer, it->second.sector, it->second.plane);
       int sectorNum = (it->second.section - 1) * EKLMElementNumbers::getMaximalSectorNumber() + it->second.sector;
-      AllExtHitsEKLM->Fill(planeNum);
-      AllExtHitsEKLMSec->Fill(sectorNum);
+      allExtHitsEKLM->Fill(planeNum);
+      allExtHitsEKLMSec->Fill(sectorNum);
       if (it->second.digit) {
-        MatchedHitsEKLM->Fill(planeNum);
-        MatchedHitsEKLMSec->Fill(sectorNum);
+        matchedHitsEKLM->Fill(planeNum);
+        matchedHitsEKLMSec->Fill(sectorNum);
       }
     }//end of if loop
 
@@ -600,24 +564,18 @@ bool KLMDQM2Module::collectDataTrack(
       int layerGlobal = BKLMElementNumbers::layerGlobalNumber(
                           it->second.section, it->second.sector, it->second.layer);
       int sectorGlobal = it->second.section * BKLMElementNumbers::getMaximalSectorNumber() + (it->second.sector);
-      AllExtHitsBKLM->Fill(layerGlobal);
-      AllExtHitsBKLMSec->Fill(sectorGlobal);
+      allExtHitsBKLM->Fill(layerGlobal);
+      allExtHitsBKLMSec->Fill(sectorGlobal);
       if (it->second.digit) {
-        MatchedHitsBKLM->Fill(layerGlobal);
-        MatchedHitsBKLMSec->Fill(sectorGlobal);
+        matchedHitsBKLM->Fill(layerGlobal);
+        matchedHitsBKLMSec->Fill(sectorGlobal);
       }
     } else {
       B2FATAL("Had a hit that didn't come from BKLM or EKLM?");
     }
 
-
   } //end of selectedHits for loop
   return true;
 } //end of collectTrackData
-
-
-
-
-
 
 

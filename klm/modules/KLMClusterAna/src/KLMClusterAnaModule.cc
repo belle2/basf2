@@ -5,7 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//#pragma once
 #include <iostream>
 #include <cmath>
 #include <algorithm>
@@ -61,11 +60,8 @@ KLMClusterAnaModule::~KLMClusterAnaModule()
 void KLMClusterAnaModule::initialize()
 {
 
-
-  //We want this variable ready to register
   m_KLMClusterShape.registerInDataStore();
 
-  //Do I want to have both BKLM and EKLM hits in one module?
   m_KLMClusters.isRequired();
   m_bklmHit2ds.isOptional();
   m_eklmHit2ds.isOptional();
@@ -108,21 +104,25 @@ void KLMClusterAnaModule::event()
     std::vector<double> yHits(nHits);
     std::vector<double> zHits(nHits);
 
+    std::vector<KLMHit2d> klmHit2ds;
+    std::vector<KLMHit2d>::iterator it;
 
     for (int i = 0; i < nBKLMHits; i++) {
-      hitPosition = bHit2ds[i]->getGlobalPosition();
+      klmHit2ds.push_back(KLMHit2d(bHit2ds[i]));
+    }
+
+    for (int i = 0; i < nEKLMHits; i++) {
+      klmHit2ds.push_back(KLMHit2d(eHit2ds[i]));
+    }
+
+
+    for (int i = 0; i < nHits; i++) {
+      hitPosition = klmHit2ds[i].getPosition();
       xHits[i] = (double) hitPosition.X();
       yHits[i] = (double) hitPosition.Y();
       zHits[i] = (double) hitPosition.Z();
     }
-    hitPosition.Clear();
-    //After cycling through bklmHits, inspect eklmHits
-    for (int j = nBKLMHits; j < nHits; j++) {
-      hitPosition = eHit2ds[j - nBKLMHits]->getPosition();
-      xHits[j] = (double) hitPosition.X();
-      yHits[j] = (double) hitPosition.Y();
-      zHits[j] = (double) hitPosition.Z();
-    }
+
 
 
     KLMClusterShape* clusterShape = m_KLMClusterShape.appendNew();
@@ -137,16 +137,14 @@ void KLMClusterAnaModule::event()
       //pass: just initialize and keep empty/default values
     }
 
-
     klmcluster.addRelationTo(clusterShape);
 
-    for (int i = 0; i < nBKLMHits; i++) {
-      clusterShape->addRelationTo(bHit2ds[i]);
+    for (it = klmHit2ds.begin(); it != klmHit2ds.end(); ++it) {
+      if (it->inBKLM())
+        clusterShape->addRelationTo(it->getBKLMHit2d());
+      else
+        clusterShape->addRelationTo(it->getEKLMHit2d());
     }
-    for (int i = 0; i < nEKLMHits; i++) {
-      clusterShape->addRelationTo(eHit2ds[i]);
-    }
-
 
 
   }//klmcluster loop
@@ -166,7 +164,6 @@ std::vector<double> addition(std::vector<double> vec1, std::vector<double> vec2)
 {
 
   if (vec1.size() != vec2.size()) {
-    //replace with B2FATAL
     B2ERROR("Vector lengths don't match so error. (addition)");
   }
 
@@ -183,7 +180,6 @@ std::vector<double> product(std::vector<double> vec1, std::vector<double> vec2)
 {
 
   if (vec1.size() != vec2.size())  {
-    //replace with B2FATAL
     B2ERROR("Vector lengths don't match so error. (product)");
   }
 
@@ -199,7 +195,6 @@ std::vector<double> covariance_matrix3x3(std::vector<double> xcoord, std::vector
 {
 
   if (xcoord.size() != ycoord.size() || (ycoord.size() != zcoord.size()))  {
-    //replace with B2FATAL
     B2ERROR("Vector lengths don't match so error. (Covariance Matrix)");
   }
 
@@ -235,7 +230,6 @@ TMatrixT<double> eigenvectors3x3(std::vector<double> matrix)
   if (matrix.size() != 9) {
     B2ERROR("Error! For eigenvalue3x3 calc, invalid matrix size");
   }
-  //If I don't need a/b/c, then use a different function.
 
   TMatrixDSym covar(3);
   for (int i = 0; i < 9; i++) {
@@ -244,9 +238,6 @@ TMatrixT<double> eigenvectors3x3(std::vector<double> matrix)
   const TMatrixDSymEigen eigen(covar);
   const TVectorT<double> eigenList = eigen.GetEigenValues();
   const TMatrixT<double> eigenvecs = eigen.GetEigenVectors();
-
-  //looking at TMatrixDEigen source file, sorting based on |eigenVal|^2 is built in.
-  //TMatrixDSymEigen:https://root.cern.ch/doc/master/TMatrixDSymEigen_8cxx_source.html
 
   //[rows][columns]
   TMatrixT<double> output(4, 3);
@@ -272,7 +263,6 @@ TMatrixT<double> spatialVariances(std::vector<double> xcoord, std::vector<double
    */
 
   if (xcoord.size() != ycoord.size() || (ycoord.size() != zcoord.size())) {
-    //replace with B2FATAL
     B2ERROR("Vector lengths don't match so error.");
   }
   std::vector<double> covar = covariance_matrix3x3(xcoord, ycoord, zcoord);

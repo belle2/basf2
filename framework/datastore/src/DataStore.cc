@@ -752,6 +752,11 @@ void DataStore::createNewDataStoreID(const std::string& id)
   m_storeEntryMap.createNewDataStoreID(id);
 }
 
+void DataStore::createEmptyDataStoreID(const std::string& id)
+{
+  m_storeEntryMap.createEmptyDataStoreID(id);
+}
+
 std::string DataStore::currentID() const
 {
   return m_storeEntryMap.currentID();
@@ -768,14 +773,14 @@ void DataStore::switchID(const std::string& id)
   m_storeEntryMap.switchID(id);
 }
 
-void DataStore::copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event)
+void DataStore::copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event, bool skipIfRegistered)
 {
-  m_storeEntryMap.copyEntriesTo(id, entrylist_event);
+  m_storeEntryMap.copyEntriesTo(id, entrylist_event, skipIfRegistered);
 }
 
-void DataStore::copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event)
+void DataStore::copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event, bool replaceExisting)
 {
-  m_storeEntryMap.copyContentsTo(id, entrylist_event);
+  m_storeEntryMap.copyContentsTo(id, entrylist_event, replaceExisting);
 }
 
 
@@ -795,7 +800,21 @@ void DataStore::SwitchableDataStoreContents::createNewDataStoreID(const std::str
   //copy actual contents, fixing pointers
   copyContentsTo(id);
 }
-void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event)
+
+void DataStore::SwitchableDataStoreContents::createEmptyDataStoreID(const std::string& id)
+{
+  //does this id already exist?
+  if (m_idToIndexMap.count(id) > 0)
+    return;
+
+  int targetidx = m_entries.size();
+  m_idToIndexMap[id] = targetidx;
+
+  m_entries.push_back(DataStoreContents());
+}
+
+void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event,
+                                                           bool skipIfRegistered)
 {
   int targetidx;
   if (m_idToIndexMap.count(id) == 0) {
@@ -814,8 +833,13 @@ void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id
       if (m_entries[m_currentIdx][c_Event].count(entryname) == 0)
         continue;
       if (m_entries[targetidx][c_Event].count(entryname) != 0) {
-        B2WARNING("Independent path: entry '" << entryname << "' already exists in DataStore '" << id <<
-                  "'! This will likely break something.");
+        if (skipIfRegistered) {
+          B2INFO("Not registering " << entryname << " to " << id);
+          continue;
+        } else {
+          B2WARNING("Independent path: entry '" << entryname << "' already exists in DataStore '" << id <<
+                    "'! This will likely break something.");
+        }
       }
       m_entries[targetidx][c_Event][entryname] = m_entries[m_currentIdx][c_Event][entryname];
     }
@@ -843,7 +867,8 @@ void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id
   }
 }
 
-void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event)
+void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event,
+                                                            bool replaceExisting)
 {
   int targetidx = m_idToIndexMap.at(id);
   auto& targetMaps = m_entries[targetidx];
@@ -866,6 +891,7 @@ void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& i
           continue;
       }
 
+      B2INFO("Trying to copy " << fromEntry.name << " to " << id);
       StoreEntry& target = targetMaps[iDurability][fromEntry.name];
 
       //copy contents into target object
@@ -874,10 +900,49 @@ void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& i
           target.recoverFromNullObject();
         target.ptr = nullptr;
       } else {
-        //TODO there is some optimisation opportunity here, e.g. by only cloning the entries of a TClonesArray instead of the array itself
-        delete target.object;
-        target.object = fromEntry.object->Clone();
-        target.ptr = target.object;
+        if (replaceExisting) {
+          //TODO there is some optimization opportunity here, e.g. by only cloning the entries of a TClonesArray instead of the array itself
+          delete target.object;
+          target.object = fromEntry.object->Clone();
+          target.ptr = target.object;
+        }
+        if (target.isArray) {
+          if (!target.ptr) {
+            B2INFO("Before: " << "0" << " + " << fromEntry.getPtrAsArray()->GetEntriesFast());
+
+            target.object = fromEntry.object->Clone();
+            target.ptr = target.object;
+          } else {
+            B2INFO("Before: " << target.getPtrAsArray()->GetEntriesFast() << " + " << fromEntry.getPtrAsArray()->GetEntriesFast());
+
+            for (int i = 0; i < fromEntry.getPtrAsArray()->GetEntriesFast(); i++) {
+              int nEntries = target.getPtrAsArray()->GetEntriesFast();
+              TClass* objClass = target.objClass;
+              if (objClass != fromEntry.objClass) {
+                B2FATAL("Cannot merge StoreArrays " << target.name << "as they are of different classes.");
+              }
+              // Now append objects of TClonesArray of `fromEntry` to TClonesArray of `target`
+              // Apparently, this is how you do it
+              // (copied the code from StoreArray.h but same is explained at ROOT documentation)
+              // PROBLEM: instead of a TObject* I need it to cast to the proper class, which can be
+              // retrieved by `target.objClass`.
+              // I have no idea how to do that. Unlike the class StoreArray, which has a template class T,
+              // the class StoreEntry does not know anything about the Belle2 classes.
+              TObject* nextFreeAdress = target.getPtrAsArray()->AddrAt(nEntries);
+              TObject* newObj = new(nextFreeAdress) TObject();
+              fromEntry.getPtrAsArray()->Copy(*newObj);
+            }
+          }
+
+          B2INFO("After: " << target.getPtrAsArray()->GetEntriesFast());
+        } else {
+          if (!target.ptr) {
+            target.object = fromEntry.object->Clone();
+            target.ptr = target.object;
+          } else {
+            B2INFO("Not merging non-array objects yet (keeping original " << target.name << ").");
+          }
+        }
       }
     }
   }
@@ -910,8 +975,11 @@ void DataStore::SwitchableDataStoreContents::clear()
 void DataStore::SwitchableDataStoreContents::reset(EDurability durability)
 {
   for (auto& map : m_entries) {
-    for (auto& mapEntry : map[durability])
+    for (auto& mapEntry : map[durability]) {
+      B2INFO("Deleting " << mapEntry.first);
       delete mapEntry.second.object;
+    }
+    B2INFO("Done");
     map[durability].clear();
   }
 }

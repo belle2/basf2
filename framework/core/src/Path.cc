@@ -17,6 +17,7 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/core/SubEventModule.h>
 #include <framework/core/SwitchDataStoreModule.h>
+#include <framework/core/MergeDataStoreModule.h>
 #include <framework/core/PyObjConvUtils.h>
 
 using namespace Belle2;
@@ -116,6 +117,32 @@ void Path::addIndependentPath(const PathPtr& independent_path, std::string ds_ID
   static_cast<SwitchDataStoreModule&>(*switchEnd).init("", false, mergeBack);
   switchStart->setName("SwitchDataStore ('' -> '" + ds_ID + "')");
   switchEnd->setName("SwitchDataStore ('' <- '" + ds_ID + "')");
+
+  //set c_ParallelProcessingCertified flag if _all_ modules have it set
+  auto flag = Module::c_ParallelProcessingCertified;
+  if (ModuleManager::allModulesHaveFlag(buildModulePathList(), flag)) {
+    switchStart->setPropertyFlags(flag);
+    switchEnd->setPropertyFlags(flag);
+  }
+
+  addModule(switchStart);
+  addPath(independent_path);
+  addModule(switchEnd);
+}
+
+void Path::addIndependentMergePath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back)
+{
+  if (ds_ID.empty()) {
+    static int dscount = 1;
+    ds_ID = "DS " + std::to_string(dscount++);
+  }
+  auto mergeBack = PyObjConvUtils::convertPythonObject(merge_back, std::vector<std::string>());
+  ModulePtr switchStart = ModuleManager::Instance().registerModule("MergeDataStore");
+  static_cast<MergeDataStoreModule&>(*switchStart).init(ds_ID, true, mergeBack);
+  ModulePtr switchEnd = ModuleManager::Instance().registerModule("MergeDataStore");
+  static_cast<MergeDataStoreModule&>(*switchEnd).init("", false, mergeBack);
+  switchStart->setName("MergeDataStore ('' -> '" + ds_ID + "')");
+  switchEnd->setName("MergeDataStore ('' <- '" + ds_ID + "')");
 
   //set c_ParallelProcessingCertified flag if _all_ modules have it set
   auto flag = Module::c_ParallelProcessingCertified;
@@ -283,6 +310,7 @@ Parameters:
     the execution is aborted.
        )", (bparg("path"), bparg("condition") = "<1", bparg("max_iterations") = 10000))
   .def("_add_independent_path", &Path::addIndependentPath)
+  .def("_add_independent_merge_path", &Path::addIndependentMergePath)
   .def("__contains__", &Path::contains, R"(Does this Path contain a module of the given type?
 
     >>> path = basf2.Path()

@@ -11,7 +11,6 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
 

@@ -14,7 +14,7 @@ namespace Belle2 {
   namespace Variable {
 
     /** Returns true if the particle candidate passes the Belle 'good Kshort' algorithm */
-    double goodBelleKshort(const Particle* KS);
+    bool goodBelleKshort(const Particle* KS);
 
     /** return goodLambda using Belle goodLambda selection rules */
     double goodBelleLambda(const Particle* Lambda);
@@ -23,12 +23,12 @@ namespace Belle2 {
     bool isGoodBelleGamma(int region, double energy);
 
     /**
-     * Return 1 if ECLCluster passes the following selection criteria:
+     * Return true if ECLCluster passes the following selection criteria:
      * Forward  : E > 100 MeV
      * Barrel   : E >  50 MeV
      * Backward : E > 150 MeV
      */
-    double goodBelleGamma(const Particle* particle);
+    bool goodBelleGamma(const Particle* particle);
 
 
     /** Returns first_x from mdst_trk_fit */

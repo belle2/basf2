@@ -116,7 +116,7 @@ namespace Belle2 {
     unsigned int m_minSVDHits; ///< Required hits in SVD strips for tracks
     double m_z0minCut;/**< cut z0 minimum in cm (large negativ value eg -9999 disables)*/
     double m_z0maxCut;/**< cut z0 maximum in cm (large positiv value eg 9999 disables)*/
-    double m_d0Cut;/**< cut abs(d0) in cm (and negativ value eg -9999 disables)*/
+    double m_d0Cut;/**< cut abs(d0) in cm (large positiv value eg 9999 disables)*/
     int m_maskedDistance; ///< Distance inside which no dead pixel or module border is allowed
 
     //Histograms to later determine efficiency

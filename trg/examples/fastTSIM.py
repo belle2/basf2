@@ -34,10 +34,8 @@ babayaganlo.param('VPUncertainty', True)
 main.add_module(babayaganlo)
 
 
+# trigger simulation is included by default
 add_simulation(main, simulateT0jitter=True, usePXDDataReduction=False, forceSetPXDDataReduction=True)
-
-# add trigger
-add_trigger_simulation(main, components=["CDC", "ECL", "KLM", "GRL", "GDL"])
 
 for m in main.modules():
     if m.name() == "TRGGDL":

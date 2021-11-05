@@ -34,12 +34,13 @@ namespace Belle2 {
       struct signalsamplepure_t {
         double m_sumscale; /**< energy deposit in fitting window scale factor */
         double m_ft[m_nlPure * m_ns]; /**< Simulated signal shape */
-        double m_ft1[m_nlPure * m_ns];
+        double m_ft1[m_nlPure * m_ns]; /**< Simulated signal shape */
 
+        /** initialisation of signal sample */
         void InitSample(const TH1F*, const TH1F*);
         /**
          * @param[in]  a  Signal amplitude
-         * @param[in]  t  Signal offset
+         * @param[in]  t0 Signal offset
          * @param[out] s  Output array with added signal
          *
          * @return Energy deposition in ADC units

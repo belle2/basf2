@@ -32,25 +32,25 @@
 
 namespace Belle2 {
   namespace Variable {
-    double goodBelleKshort(const Particle* KS)
+    bool goodBelleKshort(const Particle* KS)
     {
       // check input
       if (KS->getNDaughters() != 2) {
         B2WARNING("goodBelleKshort is only defined for a particle with two daughters");
-        return 0.0;
+        return false;
       }
       const Particle* d0 = KS->getDaughter(0);
       const Particle* d1 = KS->getDaughter(1);
       if ((d0->getCharge() == 0) || (d1->getCharge() == 0)) {
         B2WARNING("goodBelleKshort is only defined for a particle with charged daughters");
-        return 0.0;
+        return false;
       }
       if (abs(KS->getPDGCode()) != Const::Kshort.getPDGCode())
         B2WARNING("goodBelleKshort is being applied to a candidate with PDG " << KS->getPDGCode());
 
       // If goodKs exists, return the value
       if (KS->hasExtraInfo("goodKs")) {
-        return KS->getExtraInfo("goodKs");
+        return bool(KS->getExtraInfo("goodKs"));
       }
 
       // Belle selection
@@ -67,9 +67,9 @@ namespace Belle2 {
       bool high = p > 1.5 && abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
 
       if (low || mid || high) {
-        return 1.0;
+        return true;
       } else
-        return 0.0;
+        return false;
     }
 
 
@@ -129,12 +129,12 @@ namespace Belle2 {
       return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
     }
 
-    double goodBelleGamma(const Particle* particle)
+    bool goodBelleGamma(const Particle* particle)
     {
       double energy = eclClusterE(particle);
       int region = eclClusterDetectionRegion(particle);
 
-      return (double) isGoodBelleGamma(region, energy);
+      return isGoodBelleGamma(region, energy);
     }
 
     BelleTrkExtra* getBelleTrkExtraInfoFromParticle(Particle const* particle)
@@ -237,7 +237,7 @@ namespace Belle2 {
     VARIABLE_GROUP("Belle Variables");
 
     REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort, R"DOC(
-[Legacy] GoodKs Returns 1.0 if a :math:`K_{S}^0\to\pi\pi` candidate passes the Belle algorithm: 
+[Legacy] GoodKs Returns true if a :math:`K_{S}^0\to\pi\pi` candidate passes the Belle algorithm: 
 a momentum-binned selection including requirements on impact parameter of, and
 angle between the daughter pions as well as separation from the vertex and 
 flight distance in the transverse plane.

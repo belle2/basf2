@@ -88,7 +88,14 @@ void VariablesToExtraInfoModule::addExtraInfo(const Particle* source, Particle* 
 {
   const unsigned int nVars = m_functions.size();
   for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-    double value = m_functions[iVar](source);
+    double value = std::numeric_limits<double>::quiet_NaN();
+    if (std::holds_alternative<double>(m_functions[iVar](source))) {
+      value = std::get<double>(m_functions[iVar](source));
+    } else if (std::holds_alternative<int>(m_functions[iVar](source))) {
+      value = std::get<int>(m_functions[iVar](source));
+    } else if (std::holds_alternative<bool>(m_functions[iVar](source))) {
+      value = std::get<bool>(m_functions[iVar](source));
+    }
     if (destination->hasExtraInfo(m_extraInfoNames[iVar])) {
       double current = destination->getExtraInfo(m_extraInfoNames[iVar]);
       if (m_overwrite == -1) {

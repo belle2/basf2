@@ -41,7 +41,7 @@
 #include "trg/cdc/WireHitMC.h"
 #include "trg/cdc/TrackMC.h"
 #include "trg/cdc/Relation.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/LUT.h"

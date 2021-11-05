@@ -67,8 +67,10 @@ namespace Belle2 {
     int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     int m_candidate{ -1};            /**< candidate counter */
     unsigned int m_ncandidates{0};   /**< total n candidates */
-    /** Variable branch addresses */
-    std::vector<double> m_branchAddresses;
+    /** Branch addresses of variables of type double */
+    std::vector<double> m_branchAddressesDouble;
+    /** Branch addresses of variables of type int (or bool) */
+    std::vector<int> m_branchAddressesInt;
     /** List of function pointers corresponding to given variables. */
     std::vector<Variable::Manager::FunctionPtr> m_functions;
 

@@ -69,10 +69,6 @@ namespace Belle2 {
       c_LAT = 11
     };
 
-
-    static const int iNaN = std::numeric_limits<int>::quiet_NaN();
-    static const int uNaN = std::numeric_limits<unsigned>::quiet_NaN();
-
     /**
      * Class to hold parameters needed to perform pre-processing of input variables
      * (e.g., gaussianisation, decorrelation) to build a multi-dimensional likelihood model.
@@ -82,21 +78,21 @@ namespace Belle2 {
     public:
 
       /** Constructor */
-      VarTransfoSettings() : nVars(iNaN), nDivisionsMax(iNaN), ip(uNaN), jth(uNaN), gbin(uNaN) {}
+      VarTransfoSettings() : nVars(0), nDivisionsMax(0), ip(0), jth(0), gbin(0) {}
       /** Destructor */
       ~VarTransfoSettings() {}
 
-      int nVars; /** Number of variables. */
-      std::string classPath; /** Path of the class used to get the variables transfo. Useful for debugging. */
-      std::vector<int> nDivisions; /** Number of steps in which each variable range is sub-divided. */
-      int nDivisionsMax; /** Maximal number of steps, across all variables */
-      std::vector<double> cumulDist; /** Cumulative density function at each step. */
-      std::vector<double> x; /** Variable value at each step. */
-      std::vector<double> covMatrix; /** Variables covariance matrix. */
+      int nVars; /**< Number of variables. */
+      std::string classPath; /**< Path of the class used to get the variables transfo. Useful for debugging. */
+      std::vector<int> nDivisions; /**< Number of steps in which each variable range is sub-divided. */
+      int nDivisionsMax; /**< Maximal number of steps, across all variables */
+      std::vector<double> cumulDist; /**< Cumulative density function at each step. */
+      std::vector<double> x; /**< Variable value at each step. */
+      std::vector<double> covMatrix; /**< Variables covariance matrix. */
 
-      unsigned int ip; /** p bin index */
-      unsigned int jth; /** theta bin index */
-      unsigned int gbin; /** Global bin corresponding to (jth,ip) */
+      unsigned int ip; /**< p bin index */
+      unsigned int jth; /**< theta bin index */
+      unsigned int gbin; /**< Global bin corresponding to (jth,ip) */
     };
 
     typedef std::unordered_map<InputVar, TF1*> PdfsByVariable; /**< Typedef */
@@ -275,11 +271,11 @@ namespace Belle2 {
      @param true_charge the particle's true charge sign (+1 or -1).
      @param i the index along the 2D grid Y axis (rows) --> p.
      @param j the index along the 2D grid X axis (cols) --> clusterTheta.
-     @param nvars the number of input variables used to build the model.
+     @param nVars the number of input variables used to build the model.
      @param classPath (for debugging) full path to the file containing the TMVA standalone class used to get the variables transformation parameters.
+     @param nDivisions the number of divisions (steps) of the variable's range.
      @param cumulDist the value of the variable's cumulative density function at each step.
      @param x the value of the variable at each step.
-     @param nDivisions the number of divisions (steps) of the variable's range.
      @param covMatrix the variables' inverse square-root covariance matrix.
     */
     void storeVarsTransfoSettings(const unsigned int pdg,
@@ -341,6 +337,7 @@ namespace Belle2 {
     /**
      * Find global bin index of a 2D histogram for the given (x, y) values.
      * This method had to be re-implemented b/c ROOT has no const version of TH1::FindBin() :(
+     * @param h 2D histogram
      * @param x value along the x axis.
      * @param y value along the y axis.
      * @return the global linearised bin index.

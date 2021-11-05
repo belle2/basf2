@@ -46,7 +46,7 @@ namespace Belle2 {
       return *it;
     }
 
-    double NumberOfMCParticlesInEvent(const Particle*, const std::vector<double>& pdgs)
+    int NumberOfMCParticlesInEvent(const Particle*, const std::vector<double>& pdgs)
     {
       StoreArray<MCParticle> mcParticles;
       int counter = 0;

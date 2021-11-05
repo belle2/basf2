@@ -168,6 +168,7 @@ namespace Belle2 {
     float getEnergyTotal();
 
     /**
+     * @param crystal crystal number
      * @param subsys ID of the ECL subsystem.
      * @return Whether crystal is in barrel or forward/backward endcap.
      */
@@ -197,6 +198,8 @@ namespace Belle2 {
     int getEventRangeMax();
     /**
      * Sets event range to (ev_min, ev_max)
+     * @param ev_min minimal event number
+     * @param ev_max maximal event number
      * @param do_update Immediately update sums of energy and event count for
      * each channel.
      */
@@ -204,6 +207,8 @@ namespace Belle2 {
 
     /**
      * Sets energy range to (en_min, en_max).
+     * @param en_min minimal energy
+     * @param en_max maximal energy
      * @param do_update Immediately update sums of energy and event count for
      * each channel.
      */

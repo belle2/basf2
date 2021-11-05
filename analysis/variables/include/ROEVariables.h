@@ -44,7 +44,7 @@ namespace Belle2 {
     /**
      * Helper function for nRemainingTracksInRestOfEventWithMask and nRemainingTracksInRestOfEvent
      */
-    double nRemainingTracksInROE(const Particle* particle, const std::string& maskName = RestOfEvent::c_defaultMaskName);
+    int nRemainingTracksInROE(const Particle* particle, const std::string& maskName = RestOfEvent::c_defaultMaskName);
 
     /**
      * Returns number of tracks in the event minus in the current RestOfEvent object accepting a mask.
@@ -59,7 +59,7 @@ namespace Belle2 {
     /**
      * Returns number of tracks in the event minus in the current RestOfEvent object
      */
-    double nROE_RemainingTracks(const Particle* particle);
+    int nROE_RemainingTracks(const Particle* particle);
 
     /**
      * Returns number of remaining KLM clusters in the related RestOfEvent object

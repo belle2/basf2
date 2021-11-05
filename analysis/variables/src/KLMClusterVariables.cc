@@ -44,7 +44,7 @@ namespace Belle2::Variable {
     const float angle = 0.24;
     const KLMCluster* cluster = particle->getKLMCluster();
     if (!cluster) {
-      return std::numeric_limits<int>::quiet_NaN();
+      return 0;
     }
     const B2Vector3D& pos = cluster->getClusterPosition();
     StoreArray<TrackFitResult> tracks;
@@ -62,7 +62,7 @@ namespace Belle2::Variable {
     const float angle = 0.24;
     const KLMCluster* klmCluster = particle->getKLMCluster();
     if (!klmCluster) {
-      return std::numeric_limits<int>::quiet_NaN();
+      return 0;
     }
     const B2Vector3D& klmClusterPos = klmCluster->getClusterPosition();
     StoreArray<ECLCluster> eclClusters;

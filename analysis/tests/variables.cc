@@ -364,10 +364,10 @@ namespace {
     const Manager::Var* vIsFromTrack = Manager::Instance().getVariable("isFromTrack");
     const Manager::Var* vIsFromV0 = Manager::Instance().getVariable("isFromV0");
 
-    EXPECT_TRUE(vIsFromTrack->function(part));
-    EXPECT_FALSE(vIsFromECL->function(part));
-    EXPECT_FALSE(vIsFromKLM->function(part));
-    EXPECT_FALSE(vIsFromV0->function(part));
+    EXPECT_TRUE(std::get<bool>(vIsFromTrack->function(part)));
+    EXPECT_FALSE(std::get<bool>(vIsFromECL->function(part)));
+    EXPECT_FALSE(std::get<bool>(vIsFromKLM->function(part)));
+    EXPECT_FALSE(std::get<bool>(vIsFromV0->function(part)));
     EXPECT_FLOAT_EQ(0.5, trackPValue(part));
     EXPECT_FLOAT_EQ(position.Z(), trackZ0(part));
     EXPECT_FLOAT_EQ(sqrt(pow(position.X(), 2) + pow(position.Y(), 2)), trackD0(part));
@@ -391,13 +391,13 @@ namespace {
     v0particle->appendDaughter(1, false);
     //-----------------------------------------------------------------------
 
-    EXPECT_FALSE(vIsFromTrack->function(v0particle));
-    EXPECT_FALSE(vIsFromECL->function(v0particle));
-    EXPECT_FALSE(vIsFromKLM->function(v0particle));
-    EXPECT_TRUE(vIsFromV0->function(v0particle));
+    EXPECT_FALSE(std::get<bool>(vIsFromTrack->function(v0particle)));
+    EXPECT_FALSE(std::get<bool>(vIsFromECL->function(v0particle)));
+    EXPECT_FALSE(std::get<bool>(vIsFromKLM->function(v0particle)));
+    EXPECT_TRUE(std::get<bool>(vIsFromV0->function(v0particle)));
 
     const Manager::Var* vNDaughters = Manager::Instance().getVariable("nDaughters");
-    EXPECT_FLOAT_EQ(vNDaughters->function(v0particle), 2);
+    EXPECT_EQ(std::get<int>(vNDaughters->function(v0particle)), 2);
   }
 
   class MCTruthVariablesTest : public ::testing::Test {
@@ -586,7 +586,7 @@ namespace {
 
     const auto* mcCosBY = Manager::Instance().getVariable("mcCosThetaBetweenParticleAndNominalB");
 
-    EXPECT_NEAR(mcCosBY->function(pMother), expectedCosBY, 1e-4);
+    EXPECT_NEAR(std::get<double>(mcCosBY->function(pMother)), expectedCosBY, 1e-4);
   }
 
   TEST_F(MCTruthVariablesTest, ECLMCMatchWeightVariable)
@@ -597,9 +597,9 @@ namespace {
     const auto* pion = particles[2];
 
     const auto* weight = Manager::Instance().getVariable("clusterMCMatchWeight");
-    EXPECT_FLOAT_EQ(weight->function(photon),   12.3);
-    EXPECT_FLOAT_EQ(weight->function(electron), 45.6);
-    EXPECT_FLOAT_EQ(weight->function(pion), 15.6);
+    EXPECT_FLOAT_EQ(std::get<double>(weight->function(photon)),   12.3);
+    EXPECT_FLOAT_EQ(std::get<double>(weight->function(electron)), 45.6);
+    EXPECT_FLOAT_EQ(std::get<double>(weight->function(pion)), 15.6);
   }
 
   TEST_F(MCTruthVariablesTest, ECLBestMCMatchVariables)
@@ -612,16 +612,16 @@ namespace {
 
 
     const auto* pdgcode = Manager::Instance().getVariable("clusterBestMCPDG");
-    EXPECT_EQ(pdgcode->function(photon),       Const::photon.getPDGCode());
-    EXPECT_EQ(pdgcode->function(electron),     Const::electron.getPDGCode());
-    EXPECT_EQ(pdgcode->function(pion),     Const::electron.getPDGCode());
-    EXPECT_EQ(pdgcode->function(misid_photon), Const::electron.getPDGCode());
+    EXPECT_EQ(std::get<double>(pdgcode->function(photon)),       Const::photon.getPDGCode());
+    EXPECT_EQ(std::get<double>(pdgcode->function(electron)),     Const::electron.getPDGCode());
+    EXPECT_EQ(std::get<double>(pdgcode->function(pion)),     Const::electron.getPDGCode());
+    EXPECT_EQ(std::get<double>(pdgcode->function(misid_photon)), Const::electron.getPDGCode());
 
     const auto* weight = Manager::Instance().getVariable("clusterBestMCMatchWeight");
-    EXPECT_FLOAT_EQ(weight->function(photon),       12.3);
-    EXPECT_FLOAT_EQ(weight->function(electron),     45.6);
-    EXPECT_FLOAT_EQ(weight->function(pion),     45.6);
-    EXPECT_FLOAT_EQ(weight->function(misid_photon), 45.6);
+    EXPECT_FLOAT_EQ(std::get<double>(weight->function(photon)),       12.3);
+    EXPECT_FLOAT_EQ(std::get<double>(weight->function(electron)),     45.6);
+    EXPECT_FLOAT_EQ(std::get<double>(weight->function(pion)),     45.6);
+    EXPECT_FLOAT_EQ(std::get<double>(weight->function(misid_photon)), 45.6);
   }
 
 
@@ -654,9 +654,9 @@ namespace {
     const Manager::Var* time = Manager::Instance().getVariable("eventTimeSeconds");
 
     // there is no EventMetaData so expect nan
-    EXPECT_FALSE(date->function(nullptr) == date->function(nullptr));
-    EXPECT_FALSE(year->function(nullptr) == year->function(nullptr));
-    EXPECT_FALSE(time->function(nullptr) == time->function(nullptr));
+    EXPECT_FALSE(std::get<double>(date->function(nullptr)) == std::get<double>(date->function(nullptr)));
+    EXPECT_FALSE(std::get<double>(year->function(nullptr)) == std::get<double>(year->function(nullptr)));
+    EXPECT_FALSE(std::get<double>(time->function(nullptr)) == std::get<double>(time->function(nullptr)));
 
     DataStore::Instance().setInitializeActive(true);
     StoreObjPtr<EventMetaData> evtMetaData;
@@ -671,24 +671,24 @@ namespace {
 
 
     // -
-    EXPECT_FLOAT_EQ(exp->function(nullptr), 1337.);
-    EXPECT_FLOAT_EQ(run->function(nullptr), 12345.);
-    EXPECT_FLOAT_EQ(evt->function(nullptr), 54321.);
-    EXPECT_FLOAT_EQ(date->function(nullptr), 20101101.);
-    EXPECT_FLOAT_EQ(year->function(nullptr), 2010.);
-    EXPECT_FLOAT_EQ(time->function(nullptr), 1288569600);
+    EXPECT_EQ(std::get<int>(exp->function(nullptr)), 1337);
+    EXPECT_EQ(std::get<int>(run->function(nullptr)), 12345);
+    EXPECT_EQ(std::get<int>(evt->function(nullptr)), 54321);
+    EXPECT_FLOAT_EQ(std::get<double>(date->function(nullptr)), 20101101.);
+    EXPECT_FLOAT_EQ(std::get<double>(year->function(nullptr)), 2010.);
+    EXPECT_FLOAT_EQ(std::get<double>(time->function(nullptr)), 1288569600);
   }
 
   TEST_F(EventVariableTest, TestGlobalCounters)
   {
     StoreArray<MCParticle> mcParticles; // empty
     const Manager::Var* var = Manager::Instance().getVariable("nMCParticles");
-    EXPECT_FLOAT_EQ(var->function(nullptr), 0.0);
+    EXPECT_EQ(std::get<int>(var->function(nullptr)), 0);
 
     for (unsigned i = 0; i < 10; ++i)
       mcParticles.appendNew();
 
-    EXPECT_FLOAT_EQ(var->function(nullptr), 10.0);
+    EXPECT_EQ(std::get<int>(var->function(nullptr)), 10);
 
     // TODO: add other counters nTracks etc in here
   }
@@ -715,12 +715,12 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("isContinuumEvent");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), 1.0);
-    EXPECT_FLOAT_EQ(var->function(p2), 1.0);
+    EXPECT_TRUE(std::get<bool>(var->function(p1)));
+    EXPECT_TRUE(std::get<bool>(var->function(p2)));
     const Manager::Var* varN = Manager::Instance().getVariable("isNotContinuumEvent");
     ASSERT_NE(varN, nullptr);
-    EXPECT_FLOAT_EQ(varN->function(p1), 0.0);
-    EXPECT_FLOAT_EQ(varN->function(p2), 0.0);
+    EXPECT_FALSE(std::get<bool>(varN->function(p1)));
+    EXPECT_FALSE(std::get<bool>(varN->function(p2)));
   }
 
   TEST_F(EventVariableTest, TestIfContinuumEvent_ForUpsilon4SEvent)
@@ -745,12 +745,12 @@ namespace {
 
     const Manager::Var* var2 = Manager::Instance().getVariable("isContinuumEvent");
     ASSERT_NE(var2, nullptr);
-    EXPECT_FLOAT_EQ(var2->function(p3), 0.0);
-    EXPECT_FLOAT_EQ(var2->function(p4), 0.0);
+    EXPECT_FALSE(std::get<bool>(var2->function(p3)));
+    EXPECT_FALSE(std::get<bool>(var2->function(p4)));
     const Manager::Var* var2N = Manager::Instance().getVariable("isNotContinuumEvent");
     ASSERT_NE(var2N, nullptr);
-    EXPECT_FLOAT_EQ(var2N->function(p3), 1.0);
-    EXPECT_FLOAT_EQ(var2N->function(p4), 1.0);
+    EXPECT_TRUE(std::get<bool>(var2N->function(p3)));
+    EXPECT_TRUE(std::get<bool>(var2N->function(p4)));
   }
 
   TEST_F(EventVariableTest, TestIfContinuumEvent_ForWrongReconstructedUpsilon4SEvent)
@@ -775,12 +775,12 @@ namespace {
 
     const Manager::Var* var3 = Manager::Instance().getVariable("isContinuumEvent");
     ASSERT_NE(var3, nullptr);
-    EXPECT_FLOAT_EQ(var3->function(p5), 0.0);
-    EXPECT_FLOAT_EQ(var3->function(p6), 0.0);
+    EXPECT_FALSE(std::get<bool>(var3->function(p5)));
+    EXPECT_FALSE(std::get<bool>(var3->function(p6)));
     const Manager::Var* var3N = Manager::Instance().getVariable("isNotContinuumEvent");
     ASSERT_NE(var3N, nullptr);
-    EXPECT_FLOAT_EQ(var3N->function(p5), 1.0);
-    EXPECT_FLOAT_EQ(var3N->function(p6), 1.0);
+    EXPECT_TRUE(std::get<bool>(var3N->function(p5)));
+    EXPECT_TRUE(std::get<bool>(var3N->function(p6)));
   }
 
 
@@ -820,11 +820,11 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("countDaughters(charge > 0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_DOUBLE_EQ(var->function(p), 3.0);
+    EXPECT_EQ(std::get<int>(var->function(p)), 3);
 
     var = Manager::Instance().getVariable("countDaughters(abs(charge) > 0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_DOUBLE_EQ(var->function(p), 6.0);
+    EXPECT_EQ(std::get<int>(var->function(p)), 6);
 
   }
 
@@ -840,27 +840,27 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("p");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.9);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.9);
 
     var = Manager::Instance().getVariable("E");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.0);
 
     var = Manager::Instance().getVariable("distance");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 3.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 3.0);
 
     var = Manager::Instance().getVariable("useRestFrame(p)");
     ASSERT_NE(var, nullptr);
-    EXPECT_ALL_NEAR(var->function(&p), 0.0, 1e-9);
+    EXPECT_NEAR(std::get<double>(var->function(&p)), 0.0, 1e-9);
 
     var = Manager::Instance().getVariable("useRestFrame(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.4358899);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.4358899);
 
     var = Manager::Instance().getVariable("useRestFrame(distance)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.0);
   }
 
   TEST_F(MetaVariableTest, useLabFrame)
@@ -870,27 +870,27 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("p");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.9);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.9);
 
     var = Manager::Instance().getVariable("E");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.0);
 
     var = Manager::Instance().getVariable("distance");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 3.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 3.0);
 
     var = Manager::Instance().getVariable("useLabFrame(p)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.9);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.9);
 
     var = Manager::Instance().getVariable("useLabFrame(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.0);
 
     var = Manager::Instance().getVariable("useLabFrame(distance)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 3.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 3.0);
   }
 
   TEST_F(MetaVariableTest, useCMSFrame)
@@ -905,27 +905,27 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("p");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.9);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.9);
 
     var = Manager::Instance().getVariable("E");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.0);
 
     var = Manager::Instance().getVariable("distance");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 3.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 3.0);
 
     var = Manager::Instance().getVariable("useCMSFrame(p)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.68176979);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.68176979);
 
     var = Manager::Instance().getVariable("useCMSFrame(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.80920333);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.80920333);
 
     var = Manager::Instance().getVariable("useCMSFrame(distance)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 3.185117);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 3.185117);
   }
 
   TEST_F(MetaVariableTest, useTagSideRecoilRestFrame)
@@ -947,23 +947,23 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, p), 0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+    EXPECT_NEAR(std::get<double>(var->function(p0)), 0., 1e-6);
 
     var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, px), 0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+    EXPECT_NEAR(std::get<double>(var->function(p0)), 0., 1e-6);
 
     var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, py), 0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+    EXPECT_NEAR(std::get<double>(var->function(p0)), 0., 1e-6);
 
     var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, pz), 0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_NEAR(var->function(p0), 0., 1e-6);
+    EXPECT_NEAR(std::get<double>(var->function(p0)), 0., 1e-6);
 
     var = Manager::Instance().getVariable("useTagSideRecoilRestFrame(daughter(1, E), 0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_NEAR(var->function(p0), p1->getMass(), 1e-6);
+    EXPECT_NEAR(std::get<double>(var->function(p0)), p1->getMass(), 1e-6);
   }
 
 
@@ -974,10 +974,10 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("extraInfo(pi)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 3.14);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 3.14);
 
     // If nullptr is given, NaN is returned
-    EXPECT_TRUE(std::isnan(var->function(nullptr)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(nullptr))));
   }
 
   TEST_F(MetaVariableTest, eventExtraInfo)
@@ -988,14 +988,14 @@ namespace {
     eventExtraInfo->addExtraInfo("pi", 3.14);
     const Manager::Var* var = Manager::Instance().getVariable("eventExtraInfo(pi)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(nullptr), 3.14);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(nullptr)), 3.14);
   }
 
   TEST_F(MetaVariableTest, eventCached)
   {
     const Manager::Var* var = Manager::Instance().getVariable("eventCached(constant(3.14))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(nullptr), 3.14);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(nullptr)), 3.14);
     StoreObjPtr<EventExtraInfo> eventExtraInfo;
     EXPECT_TRUE(eventExtraInfo.isValid());
     EXPECT_TRUE(eventExtraInfo->hasExtraInfo("__constant__bo3__pt14__bc"));
@@ -1003,7 +1003,7 @@ namespace {
     eventExtraInfo->addExtraInfo("__eventExtraInfo__bopi__bc", 3.14);
     var = Manager::Instance().getVariable("eventCached(eventExtraInfo(pi))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(nullptr), 3.14);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(nullptr)), 3.14);
   }
 
   TEST_F(MetaVariableTest, particleCached)
@@ -1011,13 +1011,13 @@ namespace {
     Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
     const Manager::Var* var = Manager::Instance().getVariable("particleCached(px)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.1);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.1);
     EXPECT_TRUE(p.hasExtraInfo("__px"));
     EXPECT_FLOAT_EQ(p.getExtraInfo("__px"), 0.1);
     p.addExtraInfo("__py", -0.5); // NOT -0.4 because we want to see if the cache is used instead of py!
     var = Manager::Instance().getVariable("particleCached(py)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), -0.5);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -0.5);
   }
 
   TEST_F(MetaVariableTest, basicMathTest)
@@ -1026,44 +1026,44 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("abs(py)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.4);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.4);
 
     var = Manager::Instance().getVariable("min(E, pz)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.8);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.8);
 
     var = Manager::Instance().getVariable("max(E, pz)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 2.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 2.0);
 
     var = Manager::Instance().getVariable("log10(px)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), -1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -1.0);
 
     // sin 30 = 0.5
     var = Manager::Instance().getVariable("sin(0.5235987755983)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.5);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.5);
 
     // sin 90 = 1
     var = Manager::Instance().getVariable("sin(1.5707963267948966)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.0);
 
     // asin 1 = 90
     var = Manager::Instance().getVariable("asin(1.0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 1.5707963267948966);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.5707963267948966);
 
     // cos 60 = 0.5
     var = Manager::Instance().getVariable("cos(1.0471975511965976)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.5);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.5);
 
     // acos 0 = 90
     var = Manager::Instance().getVariable("acos(0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 1.5707963267948966);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.5707963267948966);
 
   }
 
@@ -1078,72 +1078,72 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("formula(px + py)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), -0.3);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -0.3);
 
     var = Manager::Instance().getVariable("formula(px - py)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.5);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.5);
 
     var = Manager::Instance().getVariable("formula(px * py)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), -0.04);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -0.04);
 
     var = Manager::Instance().getVariable("formula(py / px)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), -4.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -4.0);
 
     var = Manager::Instance().getVariable("formula(px ^ E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.01);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.01);
 
     var = Manager::Instance().getVariable("formula(px * py + pz)");
     ASSERT_NE(var, nullptr);
-    EXPECT_ALL_NEAR(var->function(&p), 0.76, 1e-6);
+    EXPECT_NEAR(std::get<double>(var->function(&p)), 0.76, 1e-6);
 
     var = Manager::Instance().getVariable("formula(pz + px * py)");
     ASSERT_NE(var, nullptr);
-    EXPECT_ALL_NEAR(var->function(&p), 0.76, 1e-6);
+    EXPECT_NEAR(std::get<double>(var->function(&p)), 0.76, 1e-6);
 
     var = Manager::Instance().getVariable("formula(pt)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.41231057);
-    double pt = var->function(&p);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.41231057);
+    double pt = std::get<double>(var->function(&p));
 
     var = Manager::Instance().getVariable("formula((px**2 + py**2)**(1/2))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), pt);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), pt);
 
     var = Manager::Instance().getVariable("formula(charge)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), -1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -1.0);
 
     var = Manager::Instance().getVariable("formula(charge**2)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.0);
 
     var = Manager::Instance().getVariable("formula(charge^2)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.0);
 
     var = Manager::Instance().getVariable("formula(PDG * charge)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), -11.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -11.0);
 
     var = Manager::Instance().getVariable("formula(PDG**2 * charge)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), -121.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -121.0);
 
     var = Manager::Instance().getVariable("formula(10.58 - (px + py + pz - E)**2)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 8.33);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 8.33);
 
     var = Manager::Instance().getVariable("formula(-10.58 + (px + py + pz - E)**2)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), -8.33);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -8.33);
 
     var = Manager::Instance().getVariable("formula(-1.0 * PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), -11);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -11);
   }
 
   TEST_F(MetaVariableTest, passesCut)
@@ -1153,9 +1153,9 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("passesCut(E < 3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 1);
-    EXPECT_FLOAT_EQ(var->function(&p2), 0);
-    EXPECT_TRUE(std::isnan(var->function(nullptr)));
+    EXPECT_TRUE(std::get<bool>(var->function(&p)));
+    EXPECT_FALSE(std::get<bool>(var->function(&p2)));
+    // EXPECT_TRUE(std::isnan(std::get<double>(var->function(nullptr)))); // Check that particle is present has been removed to allow change to bool as return type
 
   }
 
@@ -1221,21 +1221,21 @@ namespace {
     const Manager::Var* var1 = Manager::Instance().getVariable("unmask(mcErrors, 8)");
     const Manager::Var* var2 = Manager::Instance().getVariable("unmask(mcErrors, 8, 16, 32, 64)");
     ASSERT_NE(var1, nullptr);
-    EXPECT_FLOAT_EQ(var1->function(pMother), 0);
-    EXPECT_FLOAT_EQ(var1->function(pGrandMother), 16);
+    EXPECT_FLOAT_EQ(std::get<double>(var1->function(pMother)), 0);
+    EXPECT_FLOAT_EQ(std::get<double>(var1->function(pGrandMother)), 16);
     ASSERT_NE(var2, nullptr);
-    EXPECT_FLOAT_EQ(var2->function(pMother), 0);
-    EXPECT_FLOAT_EQ(var2->function(pGrandMother), 0);
+    EXPECT_FLOAT_EQ(std::get<double>(var2->function(pMother)), 0);
+    EXPECT_FLOAT_EQ(std::get<double>(var2->function(pGrandMother)), 0);
 
 
     pMother->writeExtraInfo("mcErrors", 8 | 128);
     pGrandMother->writeExtraInfo("mcErrors", 8 | 16 | 512);
     ASSERT_NE(var1, nullptr);
-    EXPECT_FLOAT_EQ(var1->function(pMother), 128);
-    EXPECT_FLOAT_EQ(var1->function(pGrandMother), 16 | 512);
+    EXPECT_FLOAT_EQ(std::get<double>(var1->function(pMother)), 128);
+    EXPECT_FLOAT_EQ(std::get<double>(var1->function(pGrandMother)), 16 | 512);
     ASSERT_NE(var2, nullptr);
-    EXPECT_FLOAT_EQ(var2->function(pMother), 128);
-    EXPECT_FLOAT_EQ(var2->function(pGrandMother), 512);
+    EXPECT_FLOAT_EQ(std::get<double>(var2->function(pMother)), 128);
+    EXPECT_FLOAT_EQ(std::get<double>(var2->function(pGrandMother)), 512);
 
     // unmask variable needs at least two arguments
     EXPECT_B2FATAL(Manager::Instance().getVariable("unmask(mcErrors)"));
@@ -1250,11 +1250,11 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("conditionalVariableSelector(E>1, px, py)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.1);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.1);
 
     var = Manager::Instance().getVariable("conditionalVariableSelector(E<1, px, py)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), -0.4);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -0.4);
 
   }
 
@@ -1285,13 +1285,13 @@ namespace {
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 3);
 
     const Manager::Var* var1 = Manager::Instance().getVariable("nCleanedTracks(p > 0.5)");
-    EXPECT_FLOAT_EQ(var1->function(nullptr), 1);
+    EXPECT_FLOAT_EQ(std::get<int>(var1->function(nullptr)), 1);
 
     const Manager::Var* var2 = Manager::Instance().getVariable("nCleanedTracks(p > 0.2)");
-    EXPECT_FLOAT_EQ(var2->function(nullptr), 2);
+    EXPECT_FLOAT_EQ(std::get<int>(var2->function(nullptr)), 2);
 
     const Manager::Var* var3 = Manager::Instance().getVariable("nCleanedTracks()");
-    EXPECT_FLOAT_EQ(var3->function(nullptr), 4);
+    EXPECT_FLOAT_EQ(std::get<int>(var3->function(nullptr)), 4);
 
 
   }
@@ -1317,7 +1317,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("NumberOfMCParticlesInEvent(11)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(nullptr), 2);
+    EXPECT_EQ(std::get<int>(var->function(nullptr)), 2);
 
   }
 
@@ -1337,15 +1337,15 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("daughterInvM(6,5)");
     ASSERT_NE(var, nullptr);
-    EXPECT_TRUE(std::isnan(var->function(p)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p))));
 
     var = Manager::Instance().getVariable("daughterInvM(0, 1)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 4.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 4.0);
 
     var = Manager::Instance().getVariable("daughterInvM(0, 1, 2)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 6.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 6.0);
   }
 
   TEST_F(MetaVariableTest, daughter)
@@ -1364,19 +1364,19 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("daughter(6, px)");
     ASSERT_NE(var, nullptr);
-    EXPECT_TRUE(std::isnan(var->function(p)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p))));
 
     var = Manager::Instance().getVariable("daughter(0, px)");
     ASSERT_NE(var, nullptr);
-    EXPECT_ALL_NEAR(var->function(p), 0.0, 1e-6);
+    EXPECT_NEAR(std::get<double>(var->function(p)), 0.0, 1e-6);
 
     var = Manager::Instance().getVariable("daughter(1, px)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 1.0);
 
     var = Manager::Instance().getVariable("daughter(2, px)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 2.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 2.0);
   }
 
   TEST_F(MetaVariableTest, mcDaughter)
@@ -1443,27 +1443,27 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDaughter(0, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(pGrandMother), 13);
-    EXPECT_FLOAT_EQ(var->function(pMother), 11);
-    EXPECT_TRUE(std::isnan(var->function(p_noMC)));
-    EXPECT_TRUE(std::isnan(var->function(p_noDaughter)));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(pGrandMother)), 13);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(pMother)), 11);
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p_noMC))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p_noDaughter))));
     var = Manager::Instance().getVariable("mcDaughter(1, PDG)");
-    EXPECT_FLOAT_EQ(var->function(pGrandMother), -14);
-    EXPECT_FLOAT_EQ(var->function(pMother), 14);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(pGrandMother)), -14);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(pMother)), 14);
     // Test for particle where mc daughter index is out of range of mc daughters
     var = Manager::Instance().getVariable("mcDaughter(2, PDG)");
-    EXPECT_TRUE(std::isnan(var->function(pGrandMother)));
-    EXPECT_TRUE(std::isnan(var->function(pMother)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(pGrandMother))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(pMother))));
     // Test nested application of mcDaughter
     var = Manager::Instance().getVariable("mcDaughter(0, mcDaughter(0, PDG))");
-    EXPECT_FLOAT_EQ(var->function(pGrandMother), 11);
-    EXPECT_TRUE(std::isnan(var->function(pMother)));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(pGrandMother)), 11);
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(pMother))));
     var = Manager::Instance().getVariable("mcDaughter(0, mcDaughter(1, PDG))");
-    EXPECT_FLOAT_EQ(var->function(pGrandMother), 14);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(pGrandMother)), 14);
     var = Manager::Instance().getVariable("mcDaughter(0, mcDaughter(2, PDG))");
-    EXPECT_TRUE(std::isnan(var->function(pGrandMother)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(pGrandMother))));
     var = Manager::Instance().getVariable("mcDaughter(1, mcDaughter(0, PDG))");
-    EXPECT_TRUE(std::isnan(var->function(pGrandMother)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(pGrandMother))));
   }
 
   TEST_F(MetaVariableTest, mcMother)
@@ -1534,15 +1534,15 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("mcMother(PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), 13);
-    EXPECT_FLOAT_EQ(var->function(p2), 13);
-    EXPECT_FLOAT_EQ(var->function(pMother), -521);
-    EXPECT_TRUE(std::isnan(var->function(p_noMC)));
-    EXPECT_TRUE(std::isnan(var->function(p_noMother)));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p1)), 13);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p2)), 13);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(pMother)), -521);
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p_noMC))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p_noMother))));
 
     // Test if nested calls of mcMother work correctly
     var = Manager::Instance().getVariable("mcMother(mcMother(PDG))");
-    EXPECT_FLOAT_EQ(var->function(p1), -521);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p1)), -521);
   }
 
   TEST_F(MetaVariableTest, genParticle)
@@ -1606,38 +1606,38 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("genParticle(0, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), 300553);
-    EXPECT_FLOAT_EQ(var->function(p_noMC), 300553);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p1)), 300553);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p_noMC)), 300553);
 
     var = Manager::Instance().getVariable("genParticle(0, matchedMC(pz))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), 0.4);
-    EXPECT_FLOAT_EQ(var->function(p_noMC), 0.4);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p1)), 0.4);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p_noMC)), 0.4);
 
     var = Manager::Instance().getVariable("genParticle(0, mcDaughter(0, PDG))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), -521);
-    EXPECT_FLOAT_EQ(var->function(p_noMC), -521);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p1)), -521);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p_noMC)), -521);
 
     var = Manager::Instance().getVariable("genParticle(0, mcDaughter(0, matchedMC(px)))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), 1.1);
-    EXPECT_FLOAT_EQ(var->function(p_noMC), 1.1);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p1)), 1.1);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p_noMC)), 1.1);
 
     var = Manager::Instance().getVariable("genParticle(1, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), -521);
-    EXPECT_FLOAT_EQ(var->function(p_noMC), -521);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p1)), -521);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p_noMC)), -521);
 
     var = Manager::Instance().getVariable("genParticle(4, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), -12);
-    EXPECT_FLOAT_EQ(var->function(p_noMC), -12);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p1)), -12);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p_noMC)), -12);
 
     var = Manager::Instance().getVariable("genParticle(5, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_TRUE(std::isnan(var->function(p1)));
-    EXPECT_TRUE(std::isnan(var->function(p_noMC)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p1))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p_noMC))));
   }
 
   TEST_F(MetaVariableTest, genUpsilon4S)
@@ -1701,23 +1701,23 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("genUpsilon4S(PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), 300553);
-    EXPECT_FLOAT_EQ(var->function(p_noMC), 300553);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p1)), 300553);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p_noMC)), 300553);
 
     var = Manager::Instance().getVariable("genUpsilon4S(matchedMC(pz))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), 0.4);
-    EXPECT_FLOAT_EQ(var->function(p_noMC), 0.4);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p1)), 0.4);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p_noMC)), 0.4);
 
     var = Manager::Instance().getVariable("genUpsilon4S(mcDaughter(0, PDG))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), -521);
-    EXPECT_FLOAT_EQ(var->function(p_noMC), -521);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p1)), -521);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p_noMC)), -521);
 
     var = Manager::Instance().getVariable("genUpsilon4S(mcDaughter(0, matchedMC(px)))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), 1.1);
-    EXPECT_FLOAT_EQ(var->function(p_noMC), 1.1);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p1)), 1.1);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p_noMC)), 1.1);
 
     /// Test for event without generator level Upsilon(4S)
     mcParticles.clear();
@@ -1746,7 +1746,7 @@ namespace {
 
     var = Manager::Instance().getVariable("genUpsilon4S(PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_TRUE(std::isnan(var->function(someParticle)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(someParticle))));
   }
 
   TEST_F(MetaVariableTest, daughterProductOf)
@@ -1765,7 +1765,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("daughterProductOf(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 120.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 120.0);
   }
 
   TEST_F(MetaVariableTest, daughterSumOf)
@@ -1784,8 +1784,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("daughterSumOf(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 14.0);
-
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 14.0);
   }
 
   TEST_F(MetaVariableTest, daughterLowest)
@@ -1804,7 +1803,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("daughterLowest(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 2.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 2.0);
   }
 
   TEST_F(MetaVariableTest, daughterHighest)
@@ -1823,7 +1822,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("daughterHighest(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 4.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 4.0);
   }
 
   TEST_F(MetaVariableTest, daughterDiffOf)
@@ -1842,35 +1841,35 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("daughterDiffOf(0, 1, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), -222);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -222);
 
     var = Manager::Instance().getVariable("daughterDiffOf(1, 0, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 222);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 222);
 
     var = Manager::Instance().getVariable("daughterDiffOf(0, 1, abs(PDG))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), -200);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -200);
 
     var = Manager::Instance().getVariable("daughterDiffOf(1, 1, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0);
 
     var = Manager::Instance().getVariable("daughterDiffOf(1, 3, abs(PDG))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0);
 
     var = Manager::Instance().getVariable("daughterDiffOf(0, 2, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0);
 
     var = Manager::Instance().getVariable("daughterDiffOf(1, 0, phi)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), -1.5707964);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -1.5707964);
 
     var = Manager::Instance().getVariable("daughterDiffOf(1, 0, useCMSFrame(phi))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), -1.473294);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -1.473294);
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
   }
@@ -1901,27 +1900,27 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), -222);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -222);
 
     var = Manager::Instance().getVariable("mcDaughterDiffOf(1, 0, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 222);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 222);
 
     var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, abs(PDG))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), -200);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -200);
 
     var = Manager::Instance().getVariable("mcDaughterDiffOf(1, 1, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0);
 
     var = Manager::Instance().getVariable("mcDaughterDiffOf(1, 3, abs(PDG))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0);
 
     var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 2, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0);
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOf(0, NOTINT, PDG)"));
   }
@@ -1971,7 +1970,7 @@ namespace {
 
     // when no relations are set between the particles and the eclClusters, nan is expected to be returned
     ASSERT_NE(var, nullptr);
-    EXPECT_TRUE(std::isnan(var->function(par_noclst)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(par_noclst))));
 
     // set relations between particles and eclClusters
     ECLCluster* eclst0 = eclclusters.appendNew(ECLCluster());
@@ -1997,8 +1996,8 @@ namespace {
     const Particle* par = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices);
 
     //now we expect non-nan results
-    EXPECT_FLOAT_EQ(var->function(par), 2.8638029);
-    EXPECT_FLOAT_EQ(varCMS->function(par), M_PI);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(par)), 2.8638029);
+    EXPECT_FLOAT_EQ(std::get<double>(varCMS->function(par)), M_PI);
   }
 
   TEST_F(MetaVariableTest, grandDaughterDiffOfs)
@@ -2072,16 +2071,16 @@ namespace {
     // no problems are supposed to happen for non-Cluster- vars
     // also, we expect NaN when we pass wrong indexes
     ASSERT_NE(var_ClusterPhi, nullptr);
-    EXPECT_TRUE(std::isnan(var_ClusterPhi->function(parGranny_noclst)));
-    EXPECT_TRUE(std::isnan(var_ClusterTheta->function(parGranny_noclst)));
-    EXPECT_TRUE(std::isnan(var_ClusterE->function(parGranny_noclst)));
-    EXPECT_FLOAT_EQ(var_Phi->function(parGranny_noclst), 0.32175055);
-    EXPECT_FLOAT_EQ(var_Theta->function(parGranny_noclst), 0.06311664);
-    EXPECT_FLOAT_EQ(var_E->function(parGranny_noclst), -0.46293807);
-    EXPECT_TRUE(std::isnan(var_ClusterPhi_wrongIndexes->function(parGranny_noclst)));
-    EXPECT_TRUE(std::isnan(var_Phi_wrongIndexes->function(parGranny_noclst)));
-    EXPECT_TRUE(std::isnan(var_ClusterE_wrongIndexes->function(parGranny_noclst)));
-    EXPECT_TRUE(std::isnan(var_E_wrongIndexes->function(parGranny_noclst)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_ClusterPhi->function(parGranny_noclst))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_ClusterTheta->function(parGranny_noclst))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_ClusterE->function(parGranny_noclst))));
+    EXPECT_FLOAT_EQ(std::get<double>(var_Phi->function(parGranny_noclst)), 0.32175055);
+    EXPECT_FLOAT_EQ(std::get<double>(var_Theta->function(parGranny_noclst)), 0.06311664);
+    EXPECT_FLOAT_EQ(std::get<double>(var_E->function(parGranny_noclst)), -0.46293807);
+    EXPECT_TRUE(std::isnan(std::get<double>(var_ClusterPhi_wrongIndexes->function(parGranny_noclst))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_Phi_wrongIndexes->function(parGranny_noclst))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_ClusterE_wrongIndexes->function(parGranny_noclst))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_E_wrongIndexes->function(parGranny_noclst))));
 
     // set relations between particles and eclClusters
     ECLCluster* eclst0 = eclclusters.appendNew(ECLCluster());
@@ -2113,12 +2112,12 @@ namespace {
     //const Particle* par = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices);
 
     //now we expect non-nan results
-    EXPECT_FLOAT_EQ(var_ClusterPhi->function(parGranny), 0.32175055);
-    EXPECT_FLOAT_EQ(var_Phi->function(parGranny), 0.32175055);
-    EXPECT_FLOAT_EQ(var_ClusterTheta->function(parGranny), 0.06311664);
-    EXPECT_FLOAT_EQ(var_Theta->function(parGranny), 0.06311664);
-    EXPECT_FLOAT_EQ(var_ClusterE->function(parGranny), -0.46293831);
-    EXPECT_FLOAT_EQ(var_E->function(parGranny), -0.46293831);
+    EXPECT_FLOAT_EQ(std::get<double>(var_ClusterPhi->function(parGranny)), 0.32175055);
+    EXPECT_FLOAT_EQ(std::get<double>(var_Phi->function(parGranny)), 0.32175055);
+    EXPECT_FLOAT_EQ(std::get<double>(var_ClusterTheta->function(parGranny)), 0.06311664);
+    EXPECT_FLOAT_EQ(std::get<double>(var_Theta->function(parGranny)), 0.06311664);
+    EXPECT_FLOAT_EQ(std::get<double>(var_ClusterE->function(parGranny)), -0.46293831);
+    EXPECT_FLOAT_EQ(std::get<double>(var_E->function(parGranny)), -0.46293831);
   }
 
   TEST_F(MetaVariableTest, daughterNormDiffOf)
@@ -2137,27 +2136,27 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("daughterNormDiffOf(0, 1, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), -222 / 200.);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -222 / 200.);
 
     var = Manager::Instance().getVariable("daughterNormDiffOf(1, 0, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 222 / 200.);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 222 / 200.);
 
     var = Manager::Instance().getVariable("daughterNormDiffOf(0, 1, abs(PDG))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), -200 / 222.);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -200 / 222.);
 
     var = Manager::Instance().getVariable("daughterNormDiffOf(1, 1, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), -0 / 22.);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -0 / 22.);
 
     var = Manager::Instance().getVariable("daughterNormDiffOf(1, 3, abs(PDG))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 0 / 22.);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0 / 22.);
 
     var = Manager::Instance().getVariable("daughterNormDiffOf(0, 2, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 0 / 422.);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0 / 422.);
 
   }
 
@@ -2177,15 +2176,15 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("daughterMotherDiffOf(1, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 422);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 422);
 
     var = Manager::Instance().getVariable("daughterMotherDiffOf(1, abs(PDG))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 400);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 400);
 
     var = Manager::Instance().getVariable("daughterMotherDiffOf(0, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 200);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 200);
 
   }
 
@@ -2205,15 +2204,15 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("daughterMotherNormDiffOf(1, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 422 / 400.);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 422 / 400.);
 
     var = Manager::Instance().getVariable("daughterMotherNormDiffOf(1, abs(PDG))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 400 / 422.);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 400 / 422.);
 
     var = Manager::Instance().getVariable("daughterMotherNormDiffOf(0, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 200 / 622.);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 200 / 622.);
 
   }
 
@@ -2222,11 +2221,11 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("constant(1)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(nullptr), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(nullptr)), 1.0);
 
     var = Manager::Instance().getVariable("constant(0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(nullptr), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(nullptr)), 0.0);
 
   }
 
@@ -2237,8 +2236,8 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("abs(px)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 0.1);
-    EXPECT_FLOAT_EQ(var->function(&p2), 0.1);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.1);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p2)), 0.1);
 
   }
 
@@ -2249,8 +2248,8 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("sin(px)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(&p), 1.0);
-    EXPECT_ALL_NEAR(var->function(&p2), 0.0, 1e-6);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.0);
+    EXPECT_NEAR(std::get<double>(var->function(&p2)), 0.0, 1e-6);
 
   }
 
@@ -2261,8 +2260,8 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("cos(px)");
     ASSERT_NE(var, nullptr);
-    EXPECT_ALL_NEAR(var->function(&p), 0.0, 1e-6);
-    EXPECT_FLOAT_EQ(var->function(&p2), 1.0);
+    EXPECT_NEAR(std::get<double>(var->function(&p)), 0.0, 1e-6);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p2)), 1.0);
 
   }
 
@@ -2304,10 +2303,10 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("matchedMC(charge)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), -1);
-    EXPECT_FLOAT_EQ(var->function(p2), 1);
-    EXPECT_FLOAT_EQ(var->function(p3), 0);
-    EXPECT_FLOAT_EQ(var->function(p4), 0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p1)), -1);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p2)), 1);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p3)), 0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p4)), 0);
   }
 
   TEST_F(MetaVariableTest, countInList)
@@ -2336,19 +2335,19 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("countInList(pList1, E < 0.85)");
     ASSERT_NE(var, nullptr);
-    EXPECT_DOUBLE_EQ(var->function(nullptr), 2);
+    EXPECT_EQ(std::get<int>(var->function(nullptr)), 2);
 
     var = Manager::Instance().getVariable("countInList(pList1)");
     ASSERT_NE(var, nullptr);
-    EXPECT_DOUBLE_EQ(var->function(nullptr), 5);
+    EXPECT_EQ(std::get<int>(var->function(nullptr)), 5);
 
     var = Manager::Instance().getVariable("countInList(pList1, E > 5)");
     ASSERT_NE(var, nullptr);
-    EXPECT_DOUBLE_EQ(var->function(nullptr), 0);
+    EXPECT_EQ(std::get<int>(var->function(nullptr)), 0);
 
     var = Manager::Instance().getVariable("countInList(pList1, E < 5)");
     ASSERT_NE(var, nullptr);
-    EXPECT_DOUBLE_EQ(var->function(nullptr), 5);
+    EXPECT_EQ(std::get<int>(var->function(nullptr)), 5);
   }
 
   TEST_F(MetaVariableTest, isInList)
@@ -2379,9 +2378,9 @@ namespace {
     const Manager::Var* vsensible = Manager::Instance().getVariable("isInList(testGammaList)");
 
     // -
-    EXPECT_B2FATAL(vnonsense->function(notinthelist));
-    EXPECT_FLOAT_EQ(vsensible->function(inthelist), 1.0);
-    EXPECT_FLOAT_EQ(vsensible->function(notinthelist), 0.0);
+    EXPECT_B2FATAL(std::get<bool>(vnonsense->function(notinthelist)));
+    EXPECT_TRUE(std::get<bool>(vsensible->function(inthelist)));
+    EXPECT_FALSE(std::get<bool>(vsensible->function(notinthelist)));
   }
 
   TEST_F(MetaVariableTest, sourceObjectIsInList)
@@ -2436,17 +2435,17 @@ namespace {
     const Manager::Var* vsensible = Manager::Instance().getVariable("sourceObjectIsInList(testGammaList)");
 
     // -
-    EXPECT_B2FATAL(vnonsense->function(iscopied));
-    EXPECT_FLOAT_EQ(vsensible->function(iscopied), 1.0);
-    EXPECT_FLOAT_EQ(vsensible->function(notcopied), 0.0);
+    EXPECT_B2FATAL(std::get<int>(vnonsense->function(iscopied)));
+    EXPECT_EQ(std::get<int>(vsensible->function(iscopied)), 1);
+    EXPECT_EQ(std::get<int>(vsensible->function(notcopied)), 0);
 
     // now mock up some other type particles
     Particle composite({0.5 , 0.4 , 0.5 , 0.8}, 512, Particle::c_Unflavored, Particle::c_Composite, 0);
     Particle undefined({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
     auto* composite_ = particles.appendNew(undefined);
     auto* undefined_ = particles.appendNew(composite);
-    EXPECT_FLOAT_EQ(vsensible->function(composite_), -1.0);
-    EXPECT_FLOAT_EQ(vsensible->function(undefined_), -1.0);
+    EXPECT_EQ(std::get<int>(vsensible->function(composite_)), -1);
+    EXPECT_EQ(std::get<int>(vsensible->function(undefined_)), -1);
   }
 
   TEST_F(MetaVariableTest, mcParticleIsInMCList)
@@ -2516,19 +2515,19 @@ namespace {
     const Manager::Var* vsensible = Manager::Instance().getVariable("mcParticleIsInMCList(testList)");
 
     // -
-    EXPECT_B2FATAL(vnonsense->function(photon));
-    EXPECT_FLOAT_EQ(vsensible->function(photon), 1.0);
-    EXPECT_FLOAT_EQ(vsensible->function(electron), 1.0);
-    EXPECT_FLOAT_EQ(vsensible->function(other), 0.0);
-    EXPECT_FLOAT_EQ(vsensible->function(yetanotherelectron), 0.0);
+    EXPECT_B2FATAL(std::get<bool>(vnonsense->function(photon)));
+    EXPECT_TRUE(std::get<bool>(vsensible->function(photon)));
+    EXPECT_TRUE(std::get<bool>(vsensible->function(electron)));
+    EXPECT_FALSE(std::get<bool>(vsensible->function(other)));
+    EXPECT_FALSE(std::get<bool>(vsensible->function(yetanotherelectron)));
 
     // now mock up some other type particles
     Particle composite({0.5 , 0.4 , 0.5 , 0.8}, 512, Particle::c_Unflavored, Particle::c_Composite, 0);
     Particle undefined({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
     auto* composite_ = particles.appendNew(undefined);
     auto* undefined_ = particles.appendNew(composite);
-    EXPECT_FLOAT_EQ(vsensible->function(composite_), 0.0);
-    EXPECT_FLOAT_EQ(vsensible->function(undefined_), 0.0);
+    EXPECT_FALSE(std::get<bool>(vsensible->function(composite_)));
+    EXPECT_FALSE(std::get<bool>(vsensible->function(undefined_)));
   }
 
   TEST_F(MetaVariableTest, mostB2BAndClosestParticles)
@@ -2587,16 +2586,16 @@ namespace {
       EXPECT_B2FATAL(Manager::Instance().getVariable("angleToClosestInList(A, B)"));
 
       const auto* nonexistent = Manager::Instance().getVariable("angleToClosestInList(NONEXISTANTLIST)");
-      EXPECT_B2FATAL(nonexistent->function(electron));
+      EXPECT_B2FATAL(std::get<double>(nonexistent->function(electron)));
 
       const auto* empty = Manager::Instance().getVariable("angleToClosestInList(testEmptyList)");
-      EXPECT_TRUE(std::isnan(empty->function(electron)));
+      EXPECT_TRUE(std::isnan(std::get<double>(empty->function(electron))));
 
       const auto* closest = Manager::Instance().getVariable("angleToClosestInList(testGammaList)");
-      EXPECT_FLOAT_EQ(closest->function(electron), 0.68014491);
+      EXPECT_FLOAT_EQ(std::get<double>(closest->function(electron)), 0.68014491);
 
       const auto* closestCMS = Manager::Instance().getVariable("useCMSFrame(angleToClosestInList(testGammaList))");
-      EXPECT_FLOAT_EQ(closestCMS->function(electron), 0.67385018);
+      EXPECT_FLOAT_EQ(std::get<double>(closestCMS->function(electron)), 0.67385018);
     }
 
     {
@@ -2604,19 +2603,19 @@ namespace {
       EXPECT_B2FATAL(Manager::Instance().getVariable("closestInList(A, B, C)"));
 
       const auto* nonexistent = Manager::Instance().getVariable("closestInList(NONEXISTANTLIST, E)");
-      EXPECT_B2FATAL(nonexistent->function(electron));
+      EXPECT_B2FATAL(std::get<double>(nonexistent->function(electron)));
 
       const auto* empty = Manager::Instance().getVariable("closestInList(testEmptyList, E)");
-      EXPECT_TRUE(std::isnan(empty->function(electron)));
+      EXPECT_TRUE(std::isnan(std::get<double>(empty->function(electron))));
 
       const auto* closest = Manager::Instance().getVariable("closestInList(testGammaList, E)");
-      EXPECT_FLOAT_EQ(closest->function(electron), 3.4);
+      EXPECT_FLOAT_EQ(std::get<double>(closest->function(electron)), 3.4);
 
       const auto* closestCMS = Manager::Instance().getVariable("useCMSFrame(closestInList(testGammaList, E))");
-      EXPECT_FLOAT_EQ(closestCMS->function(electron), 3.2732551); // the energy gets smeared because of boost
+      EXPECT_FLOAT_EQ(std::get<double>(closestCMS->function(electron)), 3.2732551); // the energy gets smeared because of boost
 
       const auto* closestCMSLabE = Manager::Instance().getVariable("useCMSFrame(closestInList(testGammaList, useLabFrame(E)))");
-      EXPECT_FLOAT_EQ(closestCMSLabE->function(electron), 3.4); // aaand should be back to the lab frame value
+      EXPECT_FLOAT_EQ(std::get<double>(closestCMSLabE->function(electron)), 3.4); // aaand should be back to the lab frame value
     }
 
     {
@@ -2624,16 +2623,16 @@ namespace {
       EXPECT_B2FATAL(Manager::Instance().getVariable("angleToMostB2BInList(A, B)"));
 
       const auto* nonexistent = Manager::Instance().getVariable("angleToMostB2BInList(NONEXISTANTLIST)");
-      EXPECT_B2FATAL(nonexistent->function(electron));
+      EXPECT_B2FATAL(std::get<double>(nonexistent->function(electron)));
 
       const auto* empty = Manager::Instance().getVariable("angleToMostB2BInList(testEmptyList)");
-      EXPECT_TRUE(std::isnan(empty->function(electron)));
+      EXPECT_TRUE(std::isnan(std::get<double>(empty->function(electron))));
 
       const auto* mostB2B = Manager::Instance().getVariable("angleToMostB2BInList(testGammaList)");
-      EXPECT_FLOAT_EQ(mostB2B->function(electron), 2.2869499);
+      EXPECT_FLOAT_EQ(std::get<double>(mostB2B->function(electron)), 2.2869499);
 
       const auto* mostB2BCMS = Manager::Instance().getVariable("useCMSFrame(angleToMostB2BInList(testGammaList))");
-      EXPECT_FLOAT_EQ(mostB2BCMS->function(electron), 2.8506882);
+      EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMS->function(electron)), 2.8506882);
     }
 
     {
@@ -2641,19 +2640,19 @@ namespace {
       EXPECT_B2FATAL(Manager::Instance().getVariable("mostB2BInList(A, B, C)"));
 
       const auto* nonexistent = Manager::Instance().getVariable("mostB2BInList(NONEXISTANTLIST, E)");
-      EXPECT_B2FATAL(nonexistent->function(electron));
+      EXPECT_B2FATAL(std::get<double>(nonexistent->function(electron)));
 
       const auto* empty = Manager::Instance().getVariable("mostB2BInList(testEmptyList, E)");
-      EXPECT_TRUE(std::isnan(empty->function(electron)));
+      EXPECT_TRUE(std::isnan(std::get<double>(empty->function(electron))));
 
       const auto* mostB2B = Manager::Instance().getVariable("mostB2BInList(testGammaList, E)");
-      EXPECT_FLOAT_EQ(mostB2B->function(electron), 1.7);
+      EXPECT_FLOAT_EQ(std::get<double>(mostB2B->function(electron)), 1.7);
 
       const auto* mostB2BCMS = Manager::Instance().getVariable("useCMSFrame(mostB2BInList(testGammaList, E))");
-      EXPECT_FLOAT_EQ(mostB2BCMS->function(electron), 1.584888); // the energy gets smeared because of boost
+      EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMS->function(electron)), 1.584888); // the energy gets smeared because of boost
 
       const auto* mostB2BCMSLabE = Manager::Instance().getVariable("useCMSFrame(mostB2BInList(testGammaList, useLabFrame(E)))");
-      EXPECT_FLOAT_EQ(mostB2BCMSLabE->function(electron), 1.7); // aaand should be back to the lab frame value
+      EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMSLabE->function(electron)), 1.7); // aaand should be back to the lab frame value
     }
   }
 
@@ -2695,8 +2694,8 @@ namespace {
                                       "totalEnergyOfParticlesInList(testGammaList)");
 
     // -
-    EXPECT_B2FATAL(vnonsense->function(nullptr));
-    EXPECT_FLOAT_EQ(vsensible->function(nullptr), 4.3);
+    EXPECT_B2FATAL(std::get<double>(vnonsense->function(nullptr)));
+    EXPECT_FLOAT_EQ(std::get<double>(vsensible->function(nullptr)), 4.3);
   }
   TEST_F(MetaVariableTest, totalPxOfParticlesInList)
   {
@@ -2736,8 +2735,8 @@ namespace {
                                       "totalPxOfParticlesInList(testGammaList)");
 
     // -
-    EXPECT_B2FATAL(vnonsense->function(nullptr));
-    EXPECT_FLOAT_EQ(vsensible->function(nullptr), 2.2);
+    EXPECT_B2FATAL(std::get<double>(vnonsense->function(nullptr)));
+    EXPECT_FLOAT_EQ(std::get<double>(vsensible->function(nullptr)), 2.2);
   }
   TEST_F(MetaVariableTest, totalPyOfParticlesInList)
   {
@@ -2777,8 +2776,8 @@ namespace {
                                       "totalPyOfParticlesInList(testGammaList)");
 
     // -
-    EXPECT_B2FATAL(vnonsense->function(nullptr));
-    EXPECT_FLOAT_EQ(vsensible->function(nullptr), 1.5);
+    EXPECT_B2FATAL(std::get<double>(vnonsense->function(nullptr)));
+    EXPECT_FLOAT_EQ(std::get<double>(vsensible->function(nullptr)), 1.5);
   }
   TEST_F(MetaVariableTest, totalPzOfParticlesInList)
   {
@@ -2818,8 +2817,8 @@ namespace {
                                       "totalPzOfParticlesInList(testGammaList)");
 
     // -
-    EXPECT_B2FATAL(vnonsense->function(nullptr));
-    EXPECT_FLOAT_EQ(vsensible->function(nullptr), 3.1);
+    EXPECT_B2FATAL(std::get<double>(vnonsense->function(nullptr)));
+    EXPECT_FLOAT_EQ(std::get<double>(vsensible->function(nullptr)), 3.1);
   }
   TEST_F(MetaVariableTest, maxPtInList)
   {
@@ -2859,8 +2858,8 @@ namespace {
                                       "maxPtInList(testGammaList)");
 
     // -
-    EXPECT_B2FATAL(vnonsense->function(nullptr));
-    EXPECT_FLOAT_EQ(vsensible->function(nullptr), sqrt(0.5 * 0.5 + 0.4 * 0.4));
+    EXPECT_B2FATAL(std::get<double>(vnonsense->function(nullptr)));
+    EXPECT_FLOAT_EQ(std::get<double>(vsensible->function(nullptr)), sqrt(0.5 * 0.5 + 0.4 * 0.4));
   }
 
 
@@ -2885,9 +2884,9 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("numberOfNonOverlappingParticles(pList1)");
     ASSERT_NE(var, nullptr);
-    EXPECT_DOUBLE_EQ(var->function(p1), 1);
-    EXPECT_DOUBLE_EQ(var->function(p2), 1);
-    EXPECT_DOUBLE_EQ(var->function(p3), 2);
+    EXPECT_EQ(std::get<int>(var->function(p1)), 1);
+    EXPECT_EQ(std::get<int>(var->function(p2)), 1);
+    EXPECT_EQ(std::get<int>(var->function(p3)), 2);
 
   }
 
@@ -2940,11 +2939,11 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("veto(pList1, 0.130 < M < 0.140)");
     ASSERT_NE(var, nullptr);
-    EXPECT_DOUBLE_EQ(var->function(p), 1);
+    EXPECT_TRUE(std::get<bool>(var->function(p)));
 
     var = Manager::Instance().getVariable("veto(pList2, 0.130 < M < 0.140)");
     ASSERT_NE(var, nullptr);
-    EXPECT_DOUBLE_EQ(var->function(p), 0);
+    EXPECT_FALSE(std::get<bool>(var->function(p)));
 
   }
 
@@ -2989,10 +2988,10 @@ namespace {
     const Manager::Var* vmeanE = Manager::Instance().getVariable(
                                    "averageValueInList(testGammaList, E)");
 
-    EXPECT_FLOAT_EQ(vmeanpx->function(nullptr), 0.44);
-    EXPECT_FLOAT_EQ(vmeanpy->function(nullptr), 0.3);
-    EXPECT_FLOAT_EQ(vmeanpz->function(nullptr), 0.6);
-    EXPECT_FLOAT_EQ(vmeanE->function(nullptr), 0.86);
+    EXPECT_FLOAT_EQ(std::get<double>(vmeanpx->function(nullptr)), 0.44);
+    EXPECT_FLOAT_EQ(std::get<double>(vmeanpy->function(nullptr)), 0.3);
+    EXPECT_FLOAT_EQ(std::get<double>(vmeanpz->function(nullptr)), 0.6);
+    EXPECT_FLOAT_EQ(std::get<double>(vmeanE->function(nullptr)), 0.86);
 
     // wrong number of arguments (no variable provided)
     EXPECT_B2FATAL(Manager::Instance().getVariable("averageValueInList(testGammaList)"));
@@ -3004,7 +3003,7 @@ namespace {
     const Manager::Var* vnolist = Manager::Instance().getVariable(
                                     "averageValueInList(NONEXISTANTLIST, px)");
 
-    EXPECT_B2FATAL(vnolist->function(nullptr));
+    EXPECT_B2FATAL(std::get<double>(vnolist->function(nullptr)));
   }
 
   TEST_F(MetaVariableTest, medianValueInList)
@@ -3060,10 +3059,10 @@ namespace {
     const Manager::Var* voddmedianE = Manager::Instance().getVariable(
                                         "medianValueInList(oddGammaList, E)");
 
-    EXPECT_FLOAT_EQ(voddmedianpx->function(nullptr), 0.5);
-    EXPECT_FLOAT_EQ(voddmedianpy->function(nullptr), 0.3);
-    EXPECT_FLOAT_EQ(voddmedianpz->function(nullptr), 0.7);
-    EXPECT_FLOAT_EQ(voddmedianE->function(nullptr), 0.9);
+    EXPECT_FLOAT_EQ(std::get<double>(voddmedianpx->function(nullptr)), 0.5);
+    EXPECT_FLOAT_EQ(std::get<double>(voddmedianpy->function(nullptr)), 0.3);
+    EXPECT_FLOAT_EQ(std::get<double>(voddmedianpz->function(nullptr)), 0.7);
+    EXPECT_FLOAT_EQ(std::get<double>(voddmedianE->function(nullptr)), 0.9);
 
     // get the median px, py, pz, E of the gammas in the list with odd number of particles
     const Manager::Var* vevenmedianpx = Manager::Instance().getVariable(
@@ -3075,10 +3074,10 @@ namespace {
     const Manager::Var* vevenmedianE = Manager::Instance().getVariable(
                                          "medianValueInList(evenGammaList, E)");
 
-    EXPECT_FLOAT_EQ(vevenmedianpx->function(nullptr), 0.45);
-    EXPECT_FLOAT_EQ(vevenmedianpy->function(nullptr), 0.25);
-    EXPECT_FLOAT_EQ(vevenmedianpz->function(nullptr), 0.7);
-    EXPECT_FLOAT_EQ(vevenmedianE->function(nullptr), 0.9);
+    EXPECT_FLOAT_EQ(std::get<double>(vevenmedianpx->function(nullptr)), 0.45);
+    EXPECT_FLOAT_EQ(std::get<double>(vevenmedianpy->function(nullptr)), 0.25);
+    EXPECT_FLOAT_EQ(std::get<double>(vevenmedianpz->function(nullptr)), 0.7);
+    EXPECT_FLOAT_EQ(std::get<double>(vevenmedianE->function(nullptr)), 0.9);
 
     // wrong number of arguments (no variable provided)
     EXPECT_B2FATAL(Manager::Instance().getVariable("medianValueInList(oddGammaList)"));
@@ -3090,7 +3089,7 @@ namespace {
     const Manager::Var* vnolist = Manager::Instance().getVariable(
                                     "medianValueInList(NONEXISTANTLIST, px)");
 
-    EXPECT_B2FATAL(vnolist->function(nullptr));
+    EXPECT_B2FATAL(std::get<double>(vnolist->function(nullptr)));
   }
 
   TEST_F(MetaVariableTest, pValueCombination)
@@ -3113,16 +3112,16 @@ namespace {
 
     const Manager::Var* singlePvalue = Manager::Instance().getVariable("pValueCombination(chiProb)");
     ASSERT_NE(singlePvalue, nullptr);
-    EXPECT_FLOAT_EQ(singlePvalue->function(B), 0.5);
+    EXPECT_FLOAT_EQ(std::get<double>(singlePvalue->function(B)), 0.5);
 
     const Manager::Var* twoPvalues = Manager::Instance().getVariable("pValueCombination(chiProb, daughter(0, chiProb))");
     ASSERT_NE(twoPvalues, nullptr);
-    EXPECT_FLOAT_EQ(twoPvalues->function(B), 0.05 * (1 - log(0.05)));
+    EXPECT_FLOAT_EQ(std::get<double>(twoPvalues->function(B)), 0.05 * (1 - log(0.05)));
 
     const Manager::Var* threePvalues =
       Manager::Instance().getVariable("pValueCombination(chiProb, daughter(0, chiProb), daughter(1, chiProb))");
     ASSERT_NE(threePvalues, nullptr);
-    EXPECT_FLOAT_EQ(threePvalues->function(B), 0.045 * (1 - log(0.045) + 0.5 * log(0.045) * log(0.045)));
+    EXPECT_FLOAT_EQ(std::get<double>(threePvalues->function(B)), 0.045 * (1 - log(0.045) + 0.5 * log(0.045) * log(0.045)));
 
     // wrong number of arguments
     EXPECT_B2FATAL(Manager::Instance().getVariable("pValueCombination()"));
@@ -3153,35 +3152,35 @@ namespace {
     // Test the invariant mass of several combinations
     const Manager::Var* var = Manager::Instance().getVariable("daughterCombination(M, 0,1,2)");
     double M_test = (daughterMomenta[0] + daughterMomenta[1] + daughterMomenta[2]).mag();
-    EXPECT_FLOAT_EQ(var->function(p), M_test);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), M_test);
 
     var = Manager::Instance().getVariable("daughterCombination(M, 0,4)");
     M_test = (daughterMomenta[0] + daughterMomenta[4]).mag();
-    EXPECT_FLOAT_EQ(var->function(p), M_test);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), M_test);
 
 
     // Try with a non-lorentz invariant quantity
     var = Manager::Instance().getVariable("daughterCombination(p, 1, 0, 4)");
     double p_test = (daughterMomenta[0] + daughterMomenta[1] + daughterMomenta[4]).P();
-    EXPECT_FLOAT_EQ(var->function(p), p_test);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), p_test);
 
 
     // errors and bad stuff
     EXPECT_B2FATAL(Manager::Instance().getVariable("daughterCombination(aVeryNonExistingVariableSillyName, 1, 0, 4)"));
 
     var = Manager::Instance().getVariable("daughterCombination(M, 1, 0, 100)");
-    EXPECT_B2WARNING(var->function(p));
-    EXPECT_TRUE(std::isnan(var->function(p)));
+    EXPECT_B2WARNING(std::get<double>(var->function(p)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p))));
 
 
     var = Manager::Instance().getVariable("daughterCombination(M, 1, -1)");
-    EXPECT_B2WARNING(var->function(p));
-    EXPECT_TRUE(std::isnan(var->function(p)));
+    EXPECT_B2WARNING(std::get<double>(var->function(p)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p))));
 
 
     var = Manager::Instance().getVariable("daughterCombination(M, 1, 0:1:0:0:1)");
-    EXPECT_B2WARNING(var->function(p));
-    EXPECT_TRUE(std::isnan(var->function(p)));
+    EXPECT_B2WARNING(std::get<double>(var->function(p)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p))));
 
   }
 
@@ -3233,18 +3232,19 @@ namespace {
 
     // Test the invariant mass of several combinations
     const Manager::Var* var = Manager::Instance().getVariable("daughterCombination(M, 0,1)");
+
     double M_test = (momentum_1 + momentum_2).mag();
-    EXPECT_FLOAT_EQ(var->function(p), M_test);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), M_test);
 
     // this should be the mass of the first daughter
     var = Manager::Instance().getVariable("daughterCombination(M, 0:0, 0:1, 0:2)");
     M_test = (momentum_1).mag();
-    EXPECT_FLOAT_EQ(var->function(p), M_test);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), M_test);
 
     // this should be a generic combinations
     var = Manager::Instance().getVariable("daughterCombination(M, 0:0, 0:1, 1:0)");
     M_test = (daughterMomenta_1[0] + daughterMomenta_1[1] + daughterMomenta_2[0]).mag();
-    EXPECT_FLOAT_EQ(var->function(p), M_test);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), M_test);
 
   }
 
@@ -3306,20 +3306,20 @@ namespace {
     std::cout << "mass test" << std::endl;
     const Manager::Var* var = Manager::Instance().getVariable("useAlternativeDaughterHypothesis(M, 0:p+,1:K+)");
     const Manager::Var* varAlt = Manager::Instance().getVariable("M");
-    EXPECT_FLOAT_EQ(var->function(p), varAlt->function(pAlt));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), std::get<double>(varAlt->function(pAlt)));
 
     // check it's really charge-insensitive...
     std::cout << "charge test" << std::endl;
     var = Manager::Instance().getVariable("useAlternativeDaughterHypothesis(M, 0:p+,1:K-)");
-    EXPECT_FLOAT_EQ(var->function(p), varAlt->function(pAlt));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), std::get<double>(varAlt->function(pAlt)));
 
     // check the variable is not changing the 3-momentum
     std::cout << "momentum test" << std::endl;
     var = Manager::Instance().getVariable("useAlternativeDaughterHypothesis(p, 0:p+,1:K-)");
     varAlt = Manager::Instance().getVariable("p");
-    EXPECT_FLOAT_EQ(var->function(p), varAlt->function(pAlt));
-    EXPECT_FLOAT_EQ(var->function(p), varAlt->function(p));
-    EXPECT_FLOAT_EQ(var->function(pAlt), varAlt->function(pAlt));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), std::get<double>(varAlt->function(pAlt)));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), std::get<double>(varAlt->function(p)));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(pAlt)), std::get<double>(varAlt->function(pAlt)));
   }
 
 
@@ -3373,20 +3373,21 @@ namespace {
     // Test the invariant mass of several combinations
     const Manager::Var* var = Manager::Instance().getVariable("daughterAngle(0, 1)");
     double v_test = acos(momentum_1.Vect().Unit().Dot(momentum_2.Vect().Unit()));
-    EXPECT_FLOAT_EQ(var->function(p), v_test);
+
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), v_test);
 
     // this should be a generic combinations
     var = Manager::Instance().getVariable("daughterAngle(0:0, 1:0)");
     v_test = acos(daughterMomenta_1[0].Vect().Unit().Dot(daughterMomenta_2[0].Vect().Unit()));
-    EXPECT_FLOAT_EQ(var->function(p), v_test);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), v_test);
 
     var = Manager::Instance().getVariable("daughterAngle( 1, -1)");
-    EXPECT_B2WARNING(var->function(p));
-    EXPECT_TRUE(std::isnan(var->function(p)));
+    EXPECT_B2WARNING(std::get<double>(var->function(p)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p))));
 
     var = Manager::Instance().getVariable("daughterAngle(1, 0:1:0:0:1)");
-    EXPECT_B2WARNING(var->function(p));
-    EXPECT_TRUE(std::isnan(var->function(p)));
+    EXPECT_B2WARNING(std::get<double>(var->function(p)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p))));
 
   }
 
@@ -3462,24 +3463,24 @@ namespace {
     // Test mcDaughterAngle
     const Manager::Var* var = Manager::Instance().getVariable("mcDaughterAngle(0, 1)");
     double v_test = acos(momentum_1.Vect().Unit().Dot(momentum_2.Vect().Unit()));
-    EXPECT_FLOAT_EQ(var->function(p), v_test);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), v_test);
 
     var = Manager::Instance().getVariable("mcDaughterAngle(0:0, 1:0)");
     v_test = acos(daughterMomenta_1[0].Vect().Unit().Dot(daughterMomenta_2[0].Vect().Unit()));
-    EXPECT_FLOAT_EQ(var->function(p), v_test);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), v_test);
 
     var = Manager::Instance().getVariable("mcDaughterAngle( 1, -1)");
-    EXPECT_B2WARNING(var->function(p));
-    EXPECT_TRUE(std::isnan(var->function(p)));
+    EXPECT_B2WARNING(std::get<double>(var->function(p)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p))));
 
     var = Manager::Instance().getVariable("mcDaughterAngle(1, 0:1:0:0:1)");
-    EXPECT_B2WARNING(var->function(p));
-    EXPECT_TRUE(std::isnan(var->function(p)));
+    EXPECT_B2WARNING(std::get<double>(var->function(p)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p))));
 
     // Test mcDaughterDiffOf
     var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p), 0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0);
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOf(0, NOTINT, PDG)"));
 
@@ -3487,7 +3488,7 @@ namespace {
     var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, phi)");
     ASSERT_NE(var, nullptr);
     v_test = momentum_2.Phi() - momentum_1.Phi();
-    EXPECT_FLOAT_EQ(var->function(p), v_test);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), v_test);
 
   }
 
@@ -3615,25 +3616,26 @@ namespace {
     // All pions should have common D mother
     const Manager::Var* var_d = Manager::Instance().getVariable("varForFirstMCAncestorOfType(D0, mdstIndex)");
     ASSERT_NE(var_d, nullptr);
-    EXPECT_TRUE(var_d->function(D_gd_0_0) >= 0);
-    EXPECT_FLOAT_EQ(var_d->function(D_gd_0_0), var_d->function(D_gd_0_1));
-    EXPECT_FLOAT_EQ(var_d->function(D_gd_1_0), var_d->function(D_gd_1_1));
-    EXPECT_FLOAT_EQ(var_d->function(D_gd_0_0), var_d->function(D_gd_1_0));
-    EXPECT_FLOAT_EQ(var_d->function(D_gd_0_1), var_d->function(D_gd_1_1));
-    EXPECT_TRUE(std::isnan(var_d->function(not_child)));
-    EXPECT_TRUE(std::isnan(var_d->function(not_child_2)));
+    EXPECT_TRUE(std::get<double>(var_d->function(D_gd_0_0)) >= 0);
+    EXPECT_FLOAT_EQ(std::get<double>(var_d->function(D_gd_0_0)), std::get<double>(var_d->function(D_gd_0_1)));
+    EXPECT_FLOAT_EQ(std::get<double>(var_d->function(D_gd_1_0)), std::get<double>(var_d->function(D_gd_1_1)));
+    EXPECT_FLOAT_EQ(std::get<double>(var_d->function(D_gd_0_0)), std::get<double>(var_d->function(D_gd_1_0)));
+    EXPECT_FLOAT_EQ(std::get<double>(var_d->function(D_gd_0_1)), std::get<double>(var_d->function(D_gd_1_1)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_d->function(not_child))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_d->function(not_child_2))));
 
 
     // // All but they have different K0s mothers
     const Manager::Var* var_310 = Manager::Instance().getVariable("varForFirstMCAncestorOfType(310, mdstIndex)");
     ASSERT_NE(var_310, nullptr);
-    EXPECT_FLOAT_EQ(var_310->function(D_gd_0_0), var_310->function(D_gd_0_1));
-    EXPECT_FLOAT_EQ(var_310->function(D_gd_1_0), var_310->function(D_gd_1_1));
-    EXPECT_NE(var_310->function(D_gd_0_0), var_310->function(D_gd_1_0));
-    EXPECT_NE(var_310->function(D_gd_0_1), var_310->function(D_gd_1_1));
-    EXPECT_TRUE(std::isnan(var_310->function(not_child)));
-    EXPECT_TRUE(std::isnan(var_310->function(not_child_2)));
-    EXPECT_FLOAT_EQ(int(Manager::Instance().getVariable("varForFirstMCAncestorOfType(310, E)")->function(D_gd_0_0)), 10);
+    EXPECT_FLOAT_EQ(std::get<double>(var_310->function(D_gd_0_0)), std::get<double>(var_310->function(D_gd_0_1)));
+    EXPECT_FLOAT_EQ(std::get<double>(var_310->function(D_gd_1_0)), std::get<double>(var_310->function(D_gd_1_1)));
+    EXPECT_NE(std::get<double>(var_310->function(D_gd_0_0)), std::get<double>(var_310->function(D_gd_1_0)));
+    EXPECT_NE(std::get<double>(var_310->function(D_gd_0_1)), std::get<double>(var_310->function(D_gd_1_1)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_310->function(not_child))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_310->function(not_child_2))));
+    EXPECT_FLOAT_EQ(int(std::get<double>(Manager::Instance().getVariable("varForFirstMCAncestorOfType(310, E)")->function(D_gd_0_0))),
+                    10);
   }
 
   TEST_F(MetaVariableTest, isDescendantOfList)
@@ -3715,165 +3717,163 @@ namespace {
 
     const Manager::Var* var_0 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest)");
     ASSERT_NE(var_0, nullptr);
-    EXPECT_FLOAT_EQ(var_0->function(D_gd_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_0->function(D_gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_0->function(D_gd_1_0), 1.);
-    EXPECT_FLOAT_EQ(var_0->function(D_gd_1_1), 1.);
-    EXPECT_FLOAT_EQ(var_0->function(D_d_0), 1.);
-    EXPECT_FLOAT_EQ(var_0->function(D_d_1), 1.);
-    EXPECT_FLOAT_EQ(var_0->function(B_ggd_0_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_0->function(B_ggd_0_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_0->function(B_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_0->function(B_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_0->function(B_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_0->function(B_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_0->function(not_child), 0.);
+    EXPECT_TRUE(std::get<bool>(var_0->function(D_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(D_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(D_gd_1_0)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(D_gd_1_1)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(D_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(B_ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(B_ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(B_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(B_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(B_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(not_child)));
 
     const Manager::Var* var_0a = Manager::Instance().getVariable("isDaughterOfList(D0:vartest)");
     ASSERT_NE(var_0a, nullptr);
-    EXPECT_FLOAT_EQ(var_0a->function(D_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_0a->function(D_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_0a->function(D_gd_1_0), 0.);
-    EXPECT_FLOAT_EQ(var_0a->function(D_gd_1_1), 0.);
-    EXPECT_FLOAT_EQ(var_0a->function(D_d_0), 1.);
-    EXPECT_FLOAT_EQ(var_0a->function(D_d_1), 1.);
-    EXPECT_FLOAT_EQ(var_0a->function(B_ggd_0_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_0a->function(B_ggd_0_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_0a->function(B_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_0a->function(B_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_0a->function(B_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_0a->function(B_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_0a->function(not_child), 0.);
+    EXPECT_FALSE(std::get<bool>(var_0a->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(D_gd_1_1)));
+    EXPECT_TRUE(std::get<bool>(var_0a->function(D_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_0a->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(B_ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(B_ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(B_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(B_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(B_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_0a->function(not_child)));
 
     const Manager::Var* var_0b = Manager::Instance().getVariable("isGrandDaughterOfList(D0:vartest)");
     ASSERT_NE(var_0b, nullptr);
-    EXPECT_FLOAT_EQ(var_0b->function(D_gd_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_0b->function(D_gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_0b->function(D_gd_1_0), 1.);
-    EXPECT_FLOAT_EQ(var_0b->function(D_gd_1_1), 1.);
-    EXPECT_FLOAT_EQ(var_0b->function(D_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_0b->function(D_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_0b->function(B_ggd_0_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_0b->function(B_ggd_0_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_0b->function(B_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_0b->function(B_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_0b->function(B_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_0b->function(B_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_0b->function(not_child), 0.);
+    EXPECT_TRUE(std::get<bool>(var_0b->function(D_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_0b->function(D_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_0b->function(D_gd_1_0)));
+    EXPECT_TRUE(std::get<bool>(var_0b->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(B_ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(B_ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(B_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(B_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(B_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_0b->function(not_child)));
 
     const Manager::Var* var_1 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, 1)");
     ASSERT_NE(var_1, nullptr);
-    EXPECT_FLOAT_EQ(var_1->function(D_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(D_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(D_gd_1_0), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(D_gd_1_1), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(D_d_0), 1.);
-    EXPECT_FLOAT_EQ(var_1->function(D_d_1), 1.);
-    EXPECT_FLOAT_EQ(var_1->function(B_ggd_0_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(B_ggd_0_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(B_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(B_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(B_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(B_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(not_child), 0.);
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_1_1)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(D_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(B_ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(B_ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(B_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(B_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(B_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(not_child)));
 
     const Manager::Var* var_2 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, 2)");
     ASSERT_NE(var_2, nullptr);
-    EXPECT_FLOAT_EQ(var_2->function(D_gd_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_2->function(D_gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_2->function(D_gd_1_0), 1.);
-    EXPECT_FLOAT_EQ(var_2->function(D_gd_1_1), 1.);
-    EXPECT_FLOAT_EQ(var_2->function(D_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(D_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(B_ggd_0_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(B_ggd_0_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(B_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(B_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(B_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(B_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(not_child), 0.);
+    EXPECT_TRUE(std::get<bool>(var_2->function(D_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(D_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(D_gd_1_0)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(B_ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(B_ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(B_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(B_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(B_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(not_child)));
 
     const Manager::Var* var_3 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest)");
     ASSERT_NE(var_3, nullptr);
-    EXPECT_FLOAT_EQ(var_3->function(D_gd_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_3->function(D_gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_3->function(D_gd_1_0), 1.);
-    EXPECT_FLOAT_EQ(var_3->function(D_gd_1_1), 1.);
-    EXPECT_FLOAT_EQ(var_3->function(D_d_0), 1.);
-    EXPECT_FLOAT_EQ(var_3->function(D_d_1), 1.);
-    EXPECT_FLOAT_EQ(var_3->function(B_ggd_0_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_3->function(B_ggd_0_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_3->function(B_gd_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_3->function(B_gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_3->function(B_d_0), 1.);
-    EXPECT_FLOAT_EQ(var_3->function(B_d_1), 1.);
-    EXPECT_FLOAT_EQ(var_3->function(not_child), 0.);
+    EXPECT_TRUE(std::get<bool>(var_3->function(D_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(D_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(D_gd_1_0)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(D_gd_1_1)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(D_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(D_d_1)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(B_ggd_0_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(B_ggd_0_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(B_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(B_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(B_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(not_child)));
 
     const Manager::Var* var_4 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest, -1)");
     ASSERT_NE(var_4, nullptr);
-    EXPECT_FLOAT_EQ(var_4->function(D_gd_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_4->function(D_gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_4->function(D_gd_1_0), 1.);
-    EXPECT_FLOAT_EQ(var_4->function(D_gd_1_1), 1.);
-    EXPECT_FLOAT_EQ(var_4->function(D_d_0), 1.);
-    EXPECT_FLOAT_EQ(var_4->function(D_d_1), 1.);
-    EXPECT_FLOAT_EQ(var_4->function(B_ggd_0_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_4->function(B_ggd_0_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_4->function(B_gd_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_4->function(B_gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_4->function(B_d_0), 1.);
-    EXPECT_FLOAT_EQ(var_4->function(B_d_1), 1.);
-    EXPECT_FLOAT_EQ(var_4->function(not_child), 0.);
-
+    EXPECT_TRUE(std::get<bool>(var_4->function(D_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(D_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(D_gd_1_0)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(D_gd_1_1)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(D_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(D_d_1)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(B_ggd_0_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(B_ggd_0_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(B_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(B_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(B_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(not_child)));
 
     const Manager::Var* var_5 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest, 1)");
     ASSERT_NE(var_5, nullptr);
-    EXPECT_FLOAT_EQ(var_5->function(D_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(D_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(D_gd_1_0), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(D_gd_1_1), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(D_d_0), 1.);
-    EXPECT_FLOAT_EQ(var_5->function(D_d_1), 1.);
-    EXPECT_FLOAT_EQ(var_5->function(B_ggd_0_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(B_ggd_0_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(B_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(B_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(B_d_0), 1.);
-    EXPECT_FLOAT_EQ(var_5->function(B_d_1), 1.);
-    EXPECT_FLOAT_EQ(var_5->function(not_child), 0.);
-
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_1_1)));
+    EXPECT_TRUE(std::get<bool>(var_5->function(D_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_5->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(B_ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(B_ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(B_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(B_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_5->function(B_d_0)));
+    EXPECT_TRUE(std::get<bool>(var_5->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(not_child)));
 
     const Manager::Var* var_6 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest, 2)");
     ASSERT_NE(var_6, nullptr);
-    EXPECT_FLOAT_EQ(var_6->function(D_gd_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_6->function(D_gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_6->function(D_gd_1_0), 1.);
-    EXPECT_FLOAT_EQ(var_6->function(D_gd_1_1), 1.);
-    EXPECT_FLOAT_EQ(var_6->function(D_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_6->function(D_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_6->function(B_ggd_0_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_6->function(B_ggd_0_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_6->function(B_gd_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_6->function(B_gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_6->function(B_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_6->function(B_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_6->function(not_child), 0.);
+    EXPECT_TRUE(std::get<bool>(var_6->function(D_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_6->function(D_gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_6->function(D_gd_1_0)));
+    EXPECT_TRUE(std::get<bool>(var_6->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_6->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_6->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_6->function(B_ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_6->function(B_ggd_0_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_6->function(B_gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_6->function(B_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_6->function(B_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_6->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_6->function(not_child)));
 
     const Manager::Var* var_7 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest, B:vartest, 3)");
     ASSERT_NE(var_7, nullptr);
-    EXPECT_FLOAT_EQ(var_7->function(D_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_7->function(D_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_7->function(D_gd_1_0), 0.);
-    EXPECT_FLOAT_EQ(var_7->function(D_gd_1_1), 0.);
-    EXPECT_FLOAT_EQ(var_7->function(D_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_7->function(D_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_7->function(B_ggd_0_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_7->function(B_ggd_0_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_7->function(B_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_7->function(B_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_7->function(B_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_7->function(B_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_7->function(not_child), 0.);
+    EXPECT_FALSE(std::get<bool>(var_7->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(D_d_1)));
+    EXPECT_TRUE(std::get<bool>(var_7->function(B_ggd_0_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_7->function(B_ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(B_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(B_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(B_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(B_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_7->function(not_child)));
   }
 
 
@@ -4019,106 +4019,106 @@ namespace {
 
     const Manager::Var* var_0 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest)");
     ASSERT_NE(var_0, nullptr);
-    EXPECT_FLOAT_EQ(var_0->function(D_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_0->function(D_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_0->function(D_gd_1_0), 0.);
-    EXPECT_FLOAT_EQ(var_0->function(D_gd_1_1), 0.);
-    EXPECT_FLOAT_EQ(var_0->function(D_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_0->function(D_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_0->function(ggd_0_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_0->function(ggd_0_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_0->function(gd_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_0->function(gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_0->function(d_0), 1.);
-    EXPECT_FLOAT_EQ(var_0->function(d_1), 1.);
-    EXPECT_FLOAT_EQ(var_0->function(not_child), 0.);
-    EXPECT_FLOAT_EQ(var_0->function(not_child_2), 0.);
+    EXPECT_FALSE(std::get<bool>(var_0->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(D_d_1)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(ggd_0_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(ggd_0_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(d_0)));
+    EXPECT_TRUE(std::get<bool>(var_0->function(d_1)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(not_child)));
+    EXPECT_FALSE(std::get<bool>(var_0->function(not_child_2)));
 
     const Manager::Var* var_1 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, D0:vartest)");
     ASSERT_NE(var_1, nullptr);
-    EXPECT_FLOAT_EQ(var_1->function(D_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(D_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(D_gd_1_0), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(D_gd_1_1), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(D_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(D_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(ggd_0_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_1->function(ggd_0_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_1->function(gd_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_1->function(gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_1->function(d_0), 1.);
-    EXPECT_FLOAT_EQ(var_1->function(d_1), 1.);
-    EXPECT_FLOAT_EQ(var_1->function(not_child), 0.);
-    EXPECT_FLOAT_EQ(var_1->function(not_child_2), 0.);
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(D_d_1)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(ggd_0_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(ggd_0_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(d_0)));
+    EXPECT_TRUE(std::get<bool>(var_1->function(d_1)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(not_child)));
+    EXPECT_FALSE(std::get<bool>(var_1->function(not_child_2)));
 
     const Manager::Var* var_2 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, -1)");
     ASSERT_NE(var_2, nullptr);
-    EXPECT_FLOAT_EQ(var_2->function(D_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(D_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(D_gd_1_0), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(D_gd_1_1), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(D_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(D_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(ggd_0_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_2->function(ggd_0_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_2->function(gd_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_2->function(gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_2->function(d_0), 1.);
-    EXPECT_FLOAT_EQ(var_2->function(d_1), 1.);
-    EXPECT_FLOAT_EQ(var_2->function(not_child), 0.);
-    EXPECT_FLOAT_EQ(var_2->function(not_child_2), 0.);
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(D_d_1)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(ggd_0_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(ggd_0_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(d_0)));
+    EXPECT_TRUE(std::get<bool>(var_2->function(d_1)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(not_child)));
+    EXPECT_FALSE(std::get<bool>(var_2->function(not_child_2)));
 
     const Manager::Var* var_3 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, 1)");
     ASSERT_NE(var_3, nullptr);
-    EXPECT_FLOAT_EQ(var_3->function(D_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_3->function(D_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_3->function(D_gd_1_0), 0.);
-    EXPECT_FLOAT_EQ(var_3->function(D_gd_1_1), 0.);
-    EXPECT_FLOAT_EQ(var_3->function(D_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_3->function(D_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_3->function(ggd_0_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_3->function(ggd_0_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_3->function(gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_3->function(gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_3->function(d_0), 1.);
-    EXPECT_FLOAT_EQ(var_3->function(d_1), 1.);
-    EXPECT_FLOAT_EQ(var_3->function(not_child), 0.);
-    EXPECT_FLOAT_EQ(var_3->function(not_child_2), 0.);
+    EXPECT_FALSE(std::get<bool>(var_3->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(gd_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(d_0)));
+    EXPECT_TRUE(std::get<bool>(var_3->function(d_1)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(not_child)));
+    EXPECT_FALSE(std::get<bool>(var_3->function(not_child_2)));
 
     const Manager::Var* var_4 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, 2)");
     ASSERT_NE(var_4, nullptr);
-    EXPECT_FLOAT_EQ(var_4->function(D_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_4->function(D_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_4->function(D_gd_1_0), 0.);
-    EXPECT_FLOAT_EQ(var_4->function(D_gd_1_1), 0.);
-    EXPECT_FLOAT_EQ(var_4->function(D_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_4->function(D_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_4->function(ggd_0_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_4->function(ggd_0_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_4->function(gd_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_4->function(gd_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_4->function(d_0), 0.);
-    EXPECT_FLOAT_EQ(var_4->function(d_1), 0.);
-    EXPECT_FLOAT_EQ(var_4->function(not_child), 0.);
-    EXPECT_FLOAT_EQ(var_4->function(not_child_2), 0.);
+    EXPECT_FALSE(std::get<bool>(var_4->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(D_d_1)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(ggd_0_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(ggd_0_0_1)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(gd_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_4->function(gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(d_0)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(d_1)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(not_child)));
+    EXPECT_FALSE(std::get<bool>(var_4->function(not_child_2)));
 
 
     const Manager::Var* var_5 = Manager::Instance().getVariable("isMCDescendantOfList(B:vartest, 3)");
     ASSERT_NE(var_5, nullptr);
-    EXPECT_FLOAT_EQ(var_5->function(D_gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(D_gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(D_gd_1_0), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(D_gd_1_1), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(D_d_0), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(D_d_1), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(ggd_0_0_0), 1.);
-    EXPECT_FLOAT_EQ(var_5->function(ggd_0_0_1), 1.);
-    EXPECT_FLOAT_EQ(var_5->function(gd_0_0), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(gd_0_1), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(d_0), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(d_1), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(not_child), 0.);
-    EXPECT_FLOAT_EQ(var_5->function(not_child_2), 0.);
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_1_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_gd_1_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_d_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(D_d_1)));
+    EXPECT_TRUE(std::get<bool>(var_5->function(ggd_0_0_0)));
+    EXPECT_TRUE(std::get<bool>(var_5->function(ggd_0_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(gd_0_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(gd_0_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(d_0)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(d_1)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(not_child)));
+    EXPECT_FALSE(std::get<bool>(var_5->function(not_child_2)));
   }
 
 
@@ -4331,62 +4331,79 @@ namespace {
     EXPECT_TRUE(std::isnan(deuteronID(particleNoID)));
 
     //expert stuff: LogL values
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP)")->function(particleAll), 0.18);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ALL)")->function(particleAll), 0.71);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(2212, TOP, CDC)")->function(particleAll), 0.86);
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP)")->function(particleAll)),
+                    0.18);
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ALL)")->function(particleAll)),
+                    0.71);
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(2212, TOP, CDC)")->function(
+                                       particleAll)), 0.86);
 
     // global probability
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(particleAll),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(particleAll)),
                     std::exp(3.22) / numsumexp);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(particleAll),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(particleAll)),
                     std::exp(2.22) / numsumexp);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particleAll),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particleAll)),
                     std::exp(1.4) / numsumexp);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(particleAll),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(particleAll)),
                     std::exp(1.9) / numsumexp);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(particleAll),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(particleAll)),
                     std::exp(3.5) / numsumexp);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(particleAll),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(particleAll)),
                     std::exp(0.71) / numsumexp);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx)),
                     std::exp(0.54) / (std::exp(0.22) + std::exp(1.14) + std::exp(0.54) + std::exp(0.74) + std::exp(0.94) + std::exp(1.34)));
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx),
-                    Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, SVD)")->function(particleAll));
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, CDC)")->function(particledEdx),
-                    Manager::Instance().getVariable("pidProbabilityExpert(211, CDC)")->function(particleAll));
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(321, CDC)")->function(particleAll),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx)),
+                    std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, SVD)")->function(particleAll)));
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, CDC)")->function(particledEdx)),
+                    std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(211, CDC)")->function(particleAll)));
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(321, CDC)")->function(particleAll)),
                     std::exp(0.36) / (std::exp(0.12) + std::exp(0.26) + std::exp(0.36) + std::exp(0.46) + std::exp(0.56) + std::exp(0.66)));
 
     // binary probability
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(particleAll),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(
+                                       particleAll)),
                     1.0 / (1.0 + std::exp(2.22 - 1.9)));
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(particledEdx),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(
+                                       particledEdx)),
                     1.0 / (1.0 + std::exp(0.94 - 0.74)));
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, CDC, SVD)")->function(particleAll),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, CDC, SVD)")->function(
+                                       particleAll)),
                     1.0 / (1.0 + std::exp(0.94 - 0.74)));
 
     // No likelihood available
-    EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, KLM)")->function(particledEdx)));
-    EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP, CDC, SVD)")->function(particleNoID)));
-    EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP)")->function(particledEdx)));
-    EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, KLM)")->function(particledEdx)));
-    EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ECL, TOP, ARICH)")->function(
-                             particledEdx)));
-    EXPECT_FALSE(std::isnan(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ECL, TOP, ARICH, SVD)")->function(
-                              particledEdx)));
+    EXPECT_TRUE(std::isnan(std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, KLM)")->function(
+                                              particledEdx))));
+    EXPECT_TRUE(std::isnan(std::get<double>(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP, CDC, SVD)")->function(
+                                              particleNoID))));
+    EXPECT_TRUE(std::isnan(std::get<double>(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP)")->function(
+                                              particledEdx))));
+    EXPECT_TRUE(std::isnan(std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, KLM)")->function(
+                                              particledEdx))));
+    EXPECT_TRUE(std::isnan(std::get<double>
+                           (Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ECL, TOP, ARICH)")->function(
+                              particledEdx))));
+    EXPECT_FALSE(std::isnan(std::get<double>
+                            (Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ECL, TOP, ARICH, SVD)")->function(
+                               particledEdx))));
     //Mostlikely PDG tests:
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particledEdx), 1.00001e+09);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.5, 0.1, 0.1, 0.1, 0.1, 0.1)")->function(particledEdx),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particledEdx)), 1.00001e+09);
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidMostLikelyPDG(0.5, 0.1, 0.1, 0.1, 0.1, 0.1)")->function(
+                                       particledEdx)),
                     Const::electron.getPDGCode());
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.5, 0.1, 0.1, 0.1, 0.1)")->function(particledEdx),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.5, 0.1, 0.1, 0.1, 0.1)")->function(
+                                       particledEdx)),
                     Const::muon.getPDGCode());
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.5, 0.1, 0.1, 0.1)")->function(particledEdx),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.5, 0.1, 0.1, 0.1)")->function(
+                                       particledEdx)),
                     Const::pion.getPDGCode());
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.5, 0.1, 0.1)")->function(particledEdx),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.5, 0.1, 0.1)")->function(
+                                       particledEdx)),
                     Const::kaon.getPDGCode());
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.1, 0.5, 0.1)")->function(particledEdx),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.1, 0.5, 0.1)")->function(
+                                       particledEdx)),
                     Const::proton.getPDGCode());
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0, 1., 0, 0, 0, 0)")->function(particledEdx),
+    EXPECT_FLOAT_EQ(std::get<double>(Manager::Instance().getVariable("pidMostLikelyPDG(0, 1., 0, 0, 0, 0)")->function(particledEdx)),
                     Const::muon.getPDGCode());
   }
 
@@ -4458,20 +4475,20 @@ namespace {
     const Manager::Var* varMissARICH = Manager::Instance().getVariable("pidMissingProbabilityExpert(ARICH)");
 
 
-    EXPECT_FLOAT_EQ(varMissTOP->function(electron), 0.0);
-    EXPECT_FLOAT_EQ(varMissTOP->function(pion), 0.0);
-    EXPECT_FLOAT_EQ(varMissTOP->function(kaon), 0.0);
-    EXPECT_FLOAT_EQ(varMissTOP->function(proton), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissTOP->function(electron)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissTOP->function(pion)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissTOP->function(kaon)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissTOP->function(proton)), 1.0);
 
-    EXPECT_FLOAT_EQ(varMissARICH->function(electron), 1.0);
-    EXPECT_FLOAT_EQ(varMissARICH->function(pion), 0.0);
-    EXPECT_FLOAT_EQ(varMissARICH->function(kaon), 0.0);
-    EXPECT_FLOAT_EQ(varMissARICH->function(proton), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissARICH->function(electron)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissARICH->function(pion)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissARICH->function(kaon)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissARICH->function(proton)), 0.0);
 
-    EXPECT_FLOAT_EQ(varMissECL->function(electron), 0.0);
-    EXPECT_FLOAT_EQ(varMissECL->function(pion), 0.0);
-    EXPECT_FLOAT_EQ(varMissECL->function(kaon), 1.0);
-    EXPECT_FLOAT_EQ(varMissECL->function(proton), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissECL->function(electron)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissECL->function(pion)), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissECL->function(kaon)), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(varMissECL->function(proton)), 0.0);
   }
 
   class FlightInfoTest : public ::testing::Test {
@@ -4583,7 +4600,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("flightDistance");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), 5.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 5.0);
   }
   TEST_F(FlightInfoTest, flightDistanceErr)
   {
@@ -4592,7 +4609,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("flightDistanceErr");
     ASSERT_NE(var, nullptr);
-    EXPECT_GT(var->function(newKs), 0.0);
+    EXPECT_GT(std::get<double>(var->function(newKs)), 0.0);
   }
   TEST_F(FlightInfoTest, flightTime)
   {
@@ -4601,7 +4618,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("flightTime");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), 5.0 / Const::speedOfLight * newKs->getPDGMass() / newKs->getP());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 5.0 / Const::speedOfLight * newKs->getPDGMass() / newKs->getP());
   }
 
   TEST_F(FlightInfoTest, flightTimeErr)
@@ -4611,7 +4628,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("flightTimeErr");
     ASSERT_NE(var, nullptr);
-    EXPECT_GT(var->function(newKs), 0.0);
+    EXPECT_GT(std::get<double>(var->function(newKs)), 0.0);
   }
 
   TEST_F(FlightInfoTest, flightDistanceOfDaughter)
@@ -4621,11 +4638,11 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("flightDistanceOfDaughter(1)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), 5.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 5.0);
 
     var = Manager::Instance().getVariable("flightDistanceOfDaughter(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_TRUE(std::isnan(var->function(newDp)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(newDp))));
   }
   TEST_F(FlightInfoTest, flightDistanceOfDaughterErr)
   {
@@ -4634,11 +4651,11 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("flightDistanceOfDaughterErr(1)");
     ASSERT_NE(var, nullptr);
-    EXPECT_GT(var->function(newDp), 0.0);
+    EXPECT_GT(std::get<double>(var->function(newDp)), 0.0);
 
     var = Manager::Instance().getVariable("flightDistanceOfDaughterErr(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_TRUE(std::isnan(var->function(newDp)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(newDp))));
   }
   TEST_F(FlightInfoTest, flightTimeOfDaughter)
   {
@@ -4649,11 +4666,11 @@ namespace {
     ASSERT_NE(var, nullptr);
     const Particle* Ks = newDp->getDaughter(1);
 
-    EXPECT_FLOAT_EQ(var->function(newDp), 5.0 / Const::speedOfLight * Ks->getPDGMass() / Ks->getP());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 5.0 / Const::speedOfLight * Ks->getPDGMass() / Ks->getP());
 
     var = Manager::Instance().getVariable("flightTimeOfDaughter(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_TRUE(std::isnan(var->function(newDp)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(newDp))));
   }
   TEST_F(FlightInfoTest, flightTimeOfDaughterErr)
   {
@@ -4662,11 +4679,11 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("flightTimeOfDaughterErr(1)");
     ASSERT_NE(var, nullptr);
-    EXPECT_GT(var->function(newDp), 0.0);
+    EXPECT_GT(std::get<double>(var->function(newDp)), 0.0);
 
     var = Manager::Instance().getVariable("flightTimeOfDaughterErr(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_TRUE(std::isnan(var->function(newDp)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(newDp))));
   }
   TEST_F(FlightInfoTest, mcFlightDistanceOfDaughter)
   {
@@ -4676,11 +4693,11 @@ namespace {
     const Manager::Var* var = Manager::Instance().getVariable("mcFlightDistanceOfDaughter(1)");
     ASSERT_NE(var, nullptr);
 
-    EXPECT_FLOAT_EQ(var->function(newDp), 5.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 5.0);
 
     var = Manager::Instance().getVariable("mcFlightDistanceOfDaughter(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_TRUE(std::isnan(var->function(newDp)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(newDp))));
   }
   TEST_F(FlightInfoTest, mcFlightTimeOfDaughter)
   {
@@ -4691,13 +4708,13 @@ namespace {
     ASSERT_NE(var, nullptr);
     auto* Ks = newDp->getDaughter(1)->getRelatedTo<MCParticle>();
     //    double p = Ks->getMomentum().Mag();
-    //    EXPECT_FLOAT_EQ(var->function(newDp), 5.0 / Const::speedOfLight * Ks->getMass() / p);
+    //    EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 5.0 / Const::speedOfLight * Ks->getMass() / p);
 
-    EXPECT_FLOAT_EQ(var->function(newDp), Ks->getLifetime() / Ks->getEnergy()*Ks->getMass());
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), Ks->getLifetime() / Ks->getEnergy()*Ks->getMass());
 
     var = Manager::Instance().getVariable("mcFlightTimeOfDaughter(3)");
     ASSERT_NE(var, nullptr);
-    EXPECT_TRUE(std::isnan(var->function(newDp)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(newDp))));
   }
 
   TEST_F(FlightInfoTest, vertexDistance)
@@ -4707,7 +4724,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistance");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKS), 5.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKS)), 5.0);
   }
 
   TEST_F(FlightInfoTest, vertexDistanceError)
@@ -4717,7 +4734,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceErr");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKS), 0.2);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKS)), 0.2);
   }
 
   TEST_F(FlightInfoTest, vertexDistanceSignificance)
@@ -4727,7 +4744,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceSignificance");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKS), 25);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKS)), 25);
   }
 
   TEST_F(FlightInfoTest, vertexDistanceOfDaughter)
@@ -4737,15 +4754,15 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughter(1, noIP)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), 5.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 5.0);
 
     var = Manager::Instance().getVariable("vertexDistanceOfDaughter(1)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), 6.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 6.0);
 
     var = Manager::Instance().getVariable("vertexDistanceOfDaughter(2)");
     ASSERT_NE(var, nullptr);
-    EXPECT_TRUE(std::isnan(var->function(newDp)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(newDp))));
   }
 
   TEST_F(FlightInfoTest, vertexDistanceOfDaughterError)
@@ -4755,11 +4772,11 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterErr(1, noIP)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), 0.2);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 0.2);
 
     var = Manager::Instance().getVariable("vertexDistanceOfDaughterErr(1)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), 0.25);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 0.25);
   }
 
   TEST_F(FlightInfoTest, vertexDistanceOfDaughterSignificance)
@@ -4769,11 +4786,11 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterSignificance(1, noIP)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), 25);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 25);
 
     var = Manager::Instance().getVariable("vertexDistanceOfDaughterSignificance(1)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newDp), 24);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 24);
   }
 
   class VertexVariablesTest : public ::testing::Test {
@@ -4834,7 +4851,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexX");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), 4.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 4.0);
   }
 
   TEST_F(VertexVariablesTest, mcDecayVertexY)
@@ -4844,7 +4861,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexY");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), 5.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 5.0);
   }
 
   TEST_F(VertexVariablesTest, mcDecayVertexZ)
@@ -4854,7 +4871,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexZ");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), 0.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 0.0);
   }
 
 
@@ -4865,7 +4882,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexFromIPDistance");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), sqrt(4.0 * 4.0 + 5.0 * 5.0));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), sqrt(4.0 * 4.0 + 5.0 * 5.0));
   }
 
   TEST_F(VertexVariablesTest, mcDecayVertexRho)
@@ -4875,7 +4892,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexRho");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), sqrt(4.0 * 4.0 + 5.0 * 5.0));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), sqrt(4.0 * 4.0 + 5.0 * 5.0));
   }
 
   TEST_F(VertexVariablesTest, mcProductionVertexX)
@@ -4885,7 +4902,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexX");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 1.0);
   }
 
   TEST_F(VertexVariablesTest, mcProductionVertexY)
@@ -4895,7 +4912,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexY");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), 2.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 2.0);
   }
 
   TEST_F(VertexVariablesTest, mcProductionVertexZ)
@@ -4905,7 +4922,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexZ");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), 3.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 3.0);
   }
 
   // Production position tests
@@ -4917,7 +4934,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("prodVertexX");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), 1.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 1.0);
   }
   TEST_F(VertexVariablesTest, prodVertexY)
   {
@@ -4926,7 +4943,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("prodVertexY");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), 2.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 2.0);
   }
   TEST_F(VertexVariablesTest, prodVertexZ)
   {
@@ -4935,7 +4952,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("prodVertexZ");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), 3.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 3.0);
   }
 
   // Production Covariance tests
@@ -4948,32 +4965,32 @@ namespace {
     //const Manager::Var* var = Manager::Instance().getVariable("prodVertexCovXX");
     const Manager::Var* var = Manager::Instance().getVariable("prodVertexCov(0,0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), 0.1);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 0.1);
     var = Manager::Instance().getVariable("prodVertexCov(0,1)");
-    EXPECT_FLOAT_EQ(var->function(newKs), 0.2);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 0.2);
     var = Manager::Instance().getVariable("prodVertexCov(0,2)");
-    EXPECT_FLOAT_EQ(var->function(newKs), 0.3);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 0.3);
     var = Manager::Instance().getVariable("prodVertexCov(1,0)");
-    EXPECT_FLOAT_EQ(var->function(newKs), 0.4);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 0.4);
     var = Manager::Instance().getVariable("prodVertexCov(1,1)");
-    EXPECT_FLOAT_EQ(var->function(newKs), 0.5);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 0.5);
     var = Manager::Instance().getVariable("prodVertexCov(1,2)");
-    EXPECT_FLOAT_EQ(var->function(newKs), 0.6);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 0.6);
     var = Manager::Instance().getVariable("prodVertexCov(2,0)");
-    EXPECT_FLOAT_EQ(var->function(newKs), 0.7);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 0.7);
     var = Manager::Instance().getVariable("prodVertexCov(2,1)");
-    EXPECT_FLOAT_EQ(var->function(newKs), 0.8);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 0.8);
     var = Manager::Instance().getVariable("prodVertexCov(2,2)");
-    EXPECT_FLOAT_EQ(var->function(newKs), 0.9);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), 0.9);
     var = Manager::Instance().getVariable("prodVertexXErr");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), sqrt(0.1));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), sqrt(0.1));
     var = Manager::Instance().getVariable("prodVertexYErr");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), sqrt(0.5));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), sqrt(0.5));
     var = Manager::Instance().getVariable("prodVertexZErr");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(newKs), sqrt(0.9));
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(newKs)), sqrt(0.9));
   }
 
   // Tests of ContinuumSuppressionVariables
@@ -4989,7 +5006,7 @@ namespace {
     StoreArray<Particle> myParticles;
     const Particle* particle_with_no_cs = myParticles.appendNew();
     const Manager::Var* var = Manager::Instance().getVariable("KSFWVariables(mm2)");
-    EXPECT_TRUE(std::isnan(var->function(particle_with_no_cs)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(particle_with_no_cs))));
 
     // check that FS1 set as third argument, throws a B2ERROR
     EXPECT_B2ERROR(Manager::Instance().getVariable("KSFWVariables(et, mask, FS1)"));
@@ -5006,11 +5023,11 @@ namespace {
     StoreArray<Particle> myParticles;
     const Particle* particle_with_no_cs = myParticles.appendNew();
     const Manager::Var* var = Manager::Instance().getVariable("CleoConeCS(0)");
-    EXPECT_TRUE(std::isnan(var->function(particle_with_no_cs)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(particle_with_no_cs))));
 
     // check that string other than ROE as second argument, which is interpreted as mask name, returns NaN
     var = Manager::Instance().getVariable("CleoConeCS(0, NOTROE)");
-    EXPECT_TRUE(std::isnan(var->function(particle_with_no_cs)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(particle_with_no_cs))));
 
     // check that ROE set as third argument, throws a B2ERROR
     EXPECT_B2ERROR(Manager::Instance().getVariable("CleoConeCS(0, mask, ROE)"));
@@ -5029,11 +5046,11 @@ namespace {
     StoreArray<Particle> myParticles;
     const Particle* particle = myParticles.appendNew();
     const Manager::Var* var = Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTENT, 0, 1)");
-    EXPECT_TRUE(std::isnan(var->function(particle)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(particle))));
     StoreObjPtr<EventExtraInfo> eventExtraInfo;
     if (not eventExtraInfo.isValid())
       eventExtraInfo.create();
     var = Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTENT, 0, 1)");
-    EXPECT_TRUE(std::isnan(var->function(nullptr)));
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(nullptr))));
   }
 }

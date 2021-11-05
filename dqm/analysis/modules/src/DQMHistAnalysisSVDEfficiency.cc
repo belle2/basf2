@@ -32,8 +32,8 @@ REG_MODULE(DQMHistAnalysisSVDEfficiency)
 
 DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   : DQMHistAnalysisModule(),
-    m_effUstatus(lowStat),
-    m_effVstatus(lowStat)
+    m_effUstatus(good),
+    m_effVstatus(good)
 {
   //Parameter definition
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: Constructor done.");
@@ -171,6 +171,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_cEfficiencyU->SetFillColor(kRed);
   } else {
     B2INFO("U-side Before loop on sensors, size :" << m_SVDModules.size());
+    m_effUstatus = good;
     for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
       B2DEBUG(10, "module " << i << "," << m_SVDModules[i]);
       int bin = found_tracksU->FindBin(m_SVDModules[i].getLadderNumber(), findBinY(m_SVDModules[i].getLayerNumber(),
@@ -190,17 +191,15 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       m_hEfficiencyErr->fill(m_SVDModules[i], 1, erreffU * 100);
 
       if (denU < m_statThreshold) {
-        m_effUstatus = lowStat;
-        break; // break loop if one of sensor collected less then m_statThreshold
-      } else {
-        if ((effU - erreffU <= m_effWarning) && (effU - erreffU > m_effError)) {
-          m_effUstatus = warning;
-        } else if ((effU - erreffU <= m_effError)) {
-          m_effUstatus = error;
-        } else if (effU - erreffU > m_effWarning) {
-          m_effUstatus = good;
-        }
+        m_effUstatus = std::max(lowStat, m_effUstatus);
+      } else if (effU > m_effWarning) {
+        m_effUstatus = std::max(good, m_effUstatus);
+      } else if ((effU <= m_effWarning) && (effU > m_effError)) {
+        m_effUstatus = std::max(warning, m_effUstatus);
+      } else if ((effU <= m_effError)) {
+        m_effUstatus = std::max(error, m_effUstatus);
       }
+      B2DEBUG(10, "Status is " << m_effUstatus);
     }
   }
 
@@ -213,6 +212,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_cEfficiencyV->SetFillColor(kRed);
   } else {
     B2INFO("V-side Before loop on sensors, size :" << m_SVDModules.size());
+    m_effVstatus = good;
     for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
       B2DEBUG(10, "module " << i << "," << m_SVDModules[i]);
       int bin = found_tracksV->FindBin(m_SVDModules[i].getLadderNumber(), findBinY(m_SVDModules[i].getLayerNumber(),
@@ -234,17 +234,15 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
 
       if (denV < m_statThreshold) {
-        m_effVstatus = lowStat;
-        break; // break loop if one of sensor collected less then m_statThreshold
-      } else {
-        if ((effV - erreffV <= m_effWarning) && (effV - erreffV > m_effError)) {
-          m_effVstatus = warning;
-        } else if ((effV - erreffV <= m_effError)) {
-          m_effVstatus = error;
-        } else if (effV - erreffV > m_effWarning) {
-          m_effVstatus = good;
-        }
+        m_effVstatus = std::max(lowStat, m_effVstatus);
+      } else if (effV > m_effWarning) {
+        m_effVstatus = std::max(good, m_effVstatus);
+      } else if ((effV <= m_effWarning) && (effV > m_effError)) {
+        m_effVstatus = std::max(warning, m_effVstatus);
+      } else if ((effV <= m_effError)) {
+        m_effVstatus = std::max(error, m_effVstatus);
       }
+      B2DEBUG(10, "Status is " << m_effVstatus);
     }
   }
 

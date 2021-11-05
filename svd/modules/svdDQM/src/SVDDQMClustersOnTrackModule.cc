@@ -102,27 +102,28 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   // Charge of clusters for L3/L456 sensors
   //----------------------------------------------------------------
   TString name = "SVDTRK_ClusterChargeU3";
-  TString title = "SVD U-Cluster-on-Track Charge for layer 3 sensors";
+  TString title = TString::Format("SVD U-Cluster-on-Track Charge for layer 3 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
   m_clsTrkChargeU3 = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
   m_clsTrkChargeU3->GetXaxis()->SetTitle("cluster charge [ke-]");
   m_clsTrkChargeU3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkChargeU3);
+
   name = "SVDTRK_ClusterChargeV3";
-  title = "SVD V-Cluster-on-Track Charge for layer 3 sensors";
+  title = TString::Format("SVD V-Cluster-on-Track Charge for layer 3 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
   m_clsTrkChargeV3 = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
   m_clsTrkChargeV3->GetXaxis()->SetTitle("cluster charge [ke-]");
   m_clsTrkChargeV3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkChargeV3);
 
   name = "SVDTRK_ClusterChargeU456";
-  title = "SVD U-Cluster-on-Track Charge for layers 4,5,6 sensors";
+  title = TString::Format("SVD U-Cluster-on-Track Charge for layers 4,5,6 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
   m_clsTrkChargeU456 = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
   m_clsTrkChargeU456->GetXaxis()->SetTitle("cluster charge [ke-]");
   m_clsTrkChargeU456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkChargeU456);
 
   name = "SVDTRK_ClusterChargeV456";
-  title = "SVD V-Cluster-on-Track Charge for layers 4,5,6 sensors";
+  title = TString::Format("SVD V-Cluster-on-Track Charge for layers 4,5,6 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
   m_clsTrkChargeV456 = new TH1F(name.Data(), title.Data(), ChargeBins, 0, ChargeMax);
   m_clsTrkChargeV456->GetXaxis()->SetTitle("cluster charge [ke-]");
   m_clsTrkChargeV456->GetYaxis()->SetTitle("count");
@@ -132,26 +133,28 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   // SNR of clusters for L3/L456 sensors
   //----------------------------------------------------------------
   name = "SVDTRK_ClusterSNRU3";
-  title = "SVD U-Cluster-on-Track SNR for layer 3 sensors";
+  title = TString::Format("SVD U-Cluster-on-Track SNR for layer 3 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
   m_clsTrkSNRU3 = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
   m_clsTrkSNRU3->GetXaxis()->SetTitle("cluster SNR");
   m_clsTrkSNRU3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkSNRU3);
+
   name = "SVDTRK_ClusterSNRV3";
-  title = "SVD V-Cluster-on-Track SNR for layer 3 sensors";
+  title = TString::Format("SVD V-Cluster-on-Track SNR for layer 3 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
   m_clsTrkSNRV3 = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
   m_clsTrkSNRV3->GetXaxis()->SetTitle("cluster SNR");
   m_clsTrkSNRV3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkSNRV3);
 
   name = "SVDTRK_ClusterSNRU456";
-  title = "SVD U-Cluster-on-Track SNR for layers 4,5,6 sensors";
+  title = TString::Format("SVD U-Cluster-on-Track SNR for layers 4,5,6 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
   m_clsTrkSNRU456 = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
   m_clsTrkSNRU456->GetXaxis()->SetTitle("cluster SNR");
   m_clsTrkSNRU456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkSNRU456);
+
   name = "SVDTRK_ClusterSNRV456";
-  title = "SVD V-Cluster-on-Track SNR for layers 4,5,6 sensors";
+  title = TString::Format("SVD V-Cluster-on-Track SNR for layers 4,5,6 sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
   m_clsTrkSNRV456 = new TH1F(name.Data(), title.Data(), SNRBins, 0, SNRMax);
   m_clsTrkSNRV456->GetXaxis()->SetTitle("cluster SNR");
   m_clsTrkSNRV456->GetYaxis()->SetTitle("count");
@@ -161,26 +164,32 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   // Time of clusters for L3/L456 sensors
   //----------------------------------------------------------------
   name = "SVDTRK_ClusterTimeU3";
-  title = Form("SVD U-Cluster-on-Track Time %s for layer 3 sensors", refFrame.Data());
+  title = TString::Format("SVD U-Cluster-on-Track Time %s for layer 3 sensors ~ Exp%d Run%d", refFrame.Data(), m_expNumber,
+                          m_runNumber);
   m_clsTrkTimeU3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
   m_clsTrkTimeU3->GetXaxis()->SetTitle("cluster time (ns)");
   m_clsTrkTimeU3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkTimeU3);
+
   name = "SVDTRK_ClusterTimeV3";
-  title = Form("SVD V-Cluster-on-Track Time %s for layer 3 sensors", refFrame.Data());
+  title = TString::Format("SVD V-Cluster-on-Track Time %s for layer 3 sensors ~ Exp%d Run%d", refFrame.Data(), m_expNumber,
+                          m_runNumber);
   m_clsTrkTimeV3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
   m_clsTrkTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
   m_clsTrkTimeV3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkTimeV3);
 
   name = "SVDTRK_ClusterTimeU456";
-  title = Form("SVD U-Cluster-on-Track Time %s for layers 4,5,6 sensors", refFrame.Data());
+  title = TString::Format("SVD U-Cluster-on-Track Time %s for layers 4,5,6 sensors ~ Exp%d Run%d", refFrame.Data(), m_expNumber,
+                          m_runNumber);
   m_clsTrkTimeU456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
   m_clsTrkTimeU456->GetXaxis()->SetTitle("cluster time (ns)");
   m_clsTrkTimeU456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkTimeU456);
+
   name = "SVDTRK_ClusterTimeV456";
-  title = Form("SVD V-Cluster-on-Track Time %s for layers 4,5,6 sensors", refFrame.Data());
+  title = TString::Format("SVD V-Cluster-on-Track Time %s for layers 4,5,6 sensors ~ Exp%d Run%d", refFrame.Data(), m_expNumber,
+                          m_runNumber);
   m_clsTrkTimeV456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
   m_clsTrkTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
   m_clsTrkTimeV456->GetYaxis()->SetTitle("count");
@@ -190,13 +199,16 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   // EventT0 vs Time of clusters for U and V sides
   //----------------------------------------------------------------
   name = "SVDTRK_ClusterTimeUvsEventT0";
-  title = Form("SVD U-Cluster-on-Track Time vs EventT0 %s for layer 3 sensors", refFrame.Data());
+  title = TString::Format("SVD U-Cluster-on-Track Time vs EventT0 %s for layer 3 sensors ~ Exp%d Run%d", refFrame.Data(), m_expNumber,
+                          m_runNumber);
   m_clsTrkTimeUEvtT0 = new TH2F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax, 100, -50, 50);
   m_clsTrkTimeUEvtT0->GetXaxis()->SetTitle("clusters time (ns)");
   m_clsTrkTimeUEvtT0->GetYaxis()->SetTitle("EventT0 (ns)");
   m_histoList->Add(m_clsTrkTimeUEvtT0);
+
   name = "SVDTRK_ClusterTimeVvsEventT0";
-  title = Form("SVD V-Cluster-on-Track Time vs EventT0 %s for layer 3 sensors", refFrame.Data());
+  title = TString::Format("SVD V-Cluster-on-Track Time vs EventT0 %s for layer 3 sensors ~ Exp%d Run%d", refFrame.Data(), m_expNumber,
+                          m_runNumber);
   m_clsTrkTimeVEvtT0 = new TH2F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax, 100, -50, 50);
   m_clsTrkTimeVEvtT0->GetXaxis()->SetTitle("cluster time (ns)");
   m_clsTrkTimeVEvtT0->GetYaxis()->SetTitle("EventT0 (ns)");
@@ -206,18 +218,18 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   // MaxBin of strips for all sensors (offline ZS)
   //----------------------------------------------------------------
   name = "SVDTRK_StripMaxBinUAll";
-  title = "SVD U-Strip-on-Track MaxBin for all sensors";
+  title = TString::Format("SVD U-Strip-on-Track MaxBin for all sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
   m_stripMaxBinUAll = new TH1F(name.Data(), title.Data(), MaxBinBins, 0, MaxBinMax);
   m_stripMaxBinUAll->GetXaxis()->SetTitle("max bin");
   m_stripMaxBinUAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_stripMaxBinUAll);
+
   name = "SVDTRK_StripMaxBinVAll";
-  title = "SVD V-Strip-on-Track MaxBin for all sensors";
+  title = TString::Format("SVD V-Strip-on-Track MaxBin for all sensors ~ Exp%d Run%d", m_expNumber, m_runNumber);
   m_stripMaxBinVAll = new TH1F(name.Data(), title.Data(), MaxBinBins, 0, MaxBinMax);
   m_stripMaxBinVAll->GetXaxis()->SetTitle("max bin");
   m_stripMaxBinVAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_stripMaxBinVAll);
-
 
   oldDir->cd();
 }
@@ -248,15 +260,6 @@ void SVDDQMClustersOnTrackModule::beginRun()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
-  // Add experiment and run number to the title of selected histograms (CR shifter plots)
-  TString runID = TString::Format(" ~ Exp%d Run%d", m_expNumber, m_runNumber);
-  TObject* obj;
-  TIter nextH(m_histoList);
-  while ((obj = nextH()))
-    if (obj->InheritsFrom("TH1")) {
-      ((TH1F*)obj)->SetTitle(obj->GetTitle() + runID);
-      ((TH1F*)obj)->Reset();
-    }
 }
 
 void SVDDQMClustersOnTrackModule::event()

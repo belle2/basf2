@@ -30,10 +30,9 @@ namespace Belle2 {
     //! Empty constructor for ROOT IO (needed to make the class storable)
     BKLMHit1d();
 
-    //! Constructor with initial values
-    //! @param digitsWithTime vector of pair of contiguous KLMDigits with time
-    //! @param neglectDigitTime if true, the time of KLMDigit is neglected and the time passed with digitsWithTime is instead used
-    explicit BKLMHit1d(const std::vector<std::pair<const KLMDigit*, double>>& digitsWithTime, bool neglectDigitTime = true);
+    //! Constructor used in KLMReconstructor module
+    //! @param digitsWithTime vector of pair of contiguous KLMDigits with time; the value passed in the pair is used as digit time instead of the value returned by KLMDigit::getTime()
+    explicit BKLMHit1d(const std::vector<std::pair<const KLMDigit*, double>>& digitsWithTime);
 
     //! Copy constructor
     BKLMHit1d(const BKLMHit1d&);

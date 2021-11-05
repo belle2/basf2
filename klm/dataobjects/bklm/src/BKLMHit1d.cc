@@ -30,7 +30,7 @@ BKLMHit1d::BKLMHit1d() :
 {
 }
 
-BKLMHit1d::BKLMHit1d(const std::vector<std::pair<const KLMDigit*, double>>& digitsWithTime, bool neglectDigitTime) :
+BKLMHit1d::BKLMHit1d(const std::vector<std::pair<const KLMDigit*, double>>& digitsWithTime) :
   RelationsObject(),
   m_ModuleID(0),
   m_Time(0.0),
@@ -60,7 +60,7 @@ BKLMHit1d::BKLMHit1d(const std::vector<std::pair<const KLMDigit*, double>>& digi
       B2WARNING("Attempt to combine non-parallel or distinct-module KLMDigits");
       continue;
     }
-    m_Time += neglectDigitTime ? correctedTime : digit->getTime();
+    m_Time += correctedTime;
     m_EnergyDeposit += digit->getEnergyDeposit();
     int strip = digit->getStrip();
     stripMin = std::min(stripMin, strip);

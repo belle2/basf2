@@ -8,33 +8,28 @@
 
 #pragma once
 /* KLM headers. */
+#include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
-#include <klm/dataobjects/KLMPlaneArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dataobjects/KLMSectorArrayIndex.h>
-#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/dataobjects/KLMPlaneArrayIndex.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 
 /* Belle 2 headers. */
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/core/HistoModule.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/DBObjPtr.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawKLM.h>
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
-#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 
 /* ROOT headers. */
 #include <TH1F.h>
-#include <TH2F.h>
-#include <TTree.h>
-#include <TFile.h>
 
 /* C++ headers. */
 #include <map>
@@ -53,6 +48,38 @@ namespace Belle2 {
   class KLMDQM2Module : public HistoModule {
 
   public:
+
+    /** Hit data. */
+    struct HitData {
+
+      /** Subdetector. */
+      int subdetector;
+
+      /** Section. */
+      int section;
+
+      /** Layer. */
+      int layer;
+
+      /** Sector. */
+      int sector;
+
+      /** Plane. */
+      int plane;
+
+      /** Strip. */
+      int strip;
+
+      /** Local coordinate. */
+      double localPosition;
+
+      /** Extrapolation hit. */
+      const ExtHit* hit;
+
+      /** Digit. */
+      const KLMDigit* digit;
+
+    };
 
     /**
     * Constructor: Sets the description, the properties and the parameters of the module.
@@ -74,21 +101,71 @@ namespace Belle2 {
     /** Register input and output data */
     virtual void initialize() override;
 
-    /** Test Description */
+    /** Called when entering a new run */
     virtual void beginRun() override;
 
-    /** selection for mumu_tight_skim, then DQM plot filling  */
+    /** Selection for mumu_tight_skim, then DQM plot filling  */
     virtual void event() override;
 
-    /** empty */
+    /** Called if the current run ends */
     virtual void endRun() override;
 
-    /** empty */
+    /** Called at the end of the event processing */
     virtual void terminate() override;
 
 
 
   private:
+
+    /*******************************************/
+    /*******************************************/
+    //PRE-DEFINED FUNCTIONS
+    /*******************************************/
+    /*******************************************/
+
+
+    /**
+     * Find matching digit.
+     * @param[in] hitData Hit data.
+     */
+    void findMatchingDigit(struct HitData* hitData);
+
+    /**
+     * Collect the data for one muon.
+     * @param[in] muon                 Muon.
+     * @param[in] matchedHitsBKLM      Matched digits in BKLM
+     * @param[in] allExtHitsBKLM       Number of ExtHits in BKLM
+     * @param[in] matchedHitsEKLM      Matched digits in EKLM
+     * @param[in] allExtHitsEKLM       Number of ExtHits in EKLM
+     * @param[in] matchedHitsBKLMSec   Matched digits in BKLM per Sector
+     * @param[in] allExtHitsBKLMSec    Number of ExtHits per Sector
+     * @param[in] matchedHitsEKLMSec   Matched digits in EKLM per Sector
+     * @param[in] allExtHitsEKLMSec    Number of ExtHits in EKLM per Sector
+     * @return True if the muon satisfies the selection criteria.
+     */
+    bool collectDataTrack(const Particle* muon, TH1F* matchedHitsBKLM,
+                          TH1F* allExtHitsBKLM, TH1F* matchedHitsEKLM,
+                          TH1F* allExtHitsEKLM, TH1F* matchedHitsBKLMSec,
+                          TH1F* allExtHitsBKLMSec, TH1F* matchedHitsEKLMSec,
+                          TH1F* allExtHitsEKLMSec);
+
+    /**
+     * Add hit to map.
+     * @param[in] hitMap      Hit map.
+     * @param[in] planeGlobal Plane global number.
+     * @param[in] hitData     Hit data.
+     */
+    void addHit(std::map<KLMPlaneNumber, struct HitData>& hitMap,
+                KLMPlaneNumber planeGlobal, struct HitData* hitData);
+
+    /**
+     * Uses TrigResult along with desired software cut
+     * to determine whether histograms are filled or not
+     * for a given event.
+     */
+    bool triggerFlag();
+
+
 
     /*******************************************/
     /*******************************************/
@@ -236,89 +313,6 @@ namespace Belle2 {
 
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
-
-    /** Hit data. */
-    struct HitData {
-
-      /** Subdetector. */
-      int subdetector;
-
-      /** Section. */
-      int section;
-
-      /** Layer. */
-      int layer;
-
-      /** Sector. */
-      int sector;
-
-      /** Plane. */
-      int plane;
-
-      /** Strip. */
-      int strip;
-
-      /** Local coordinate. */
-      double localPosition;
-
-      /** Extrapolation hit. */
-      const ExtHit* hit;
-
-      /** Digit. */
-      const KLMDigit* digit;
-
-    };
-
-
-
-    /*******************************************/
-    /*******************************************/
-    //PRE-DEFINED FUNCTIONS
-    /*******************************************/
-    /*******************************************/
-
-
-    /**
-     * Find matching digit.
-     * @param[in] hitData Hit data.
-     */
-    void findMatchingDigit(struct HitData* hitData);
-
-    /**
-     * Collect the data for one muon.
-     * @param[in] muon                 Muon.
-     * @param[in] MatchedHitsBKLM      Matched digits in BKLM
-     * @param[in] AllExtHitsBKLM       Number of ExtHits in BKLM
-     * @param[in] MatchedHitsEKLM      Matched digits in EKLM
-     * @param[in] AllExtHitsEKLM       Number of ExtHits in EKLM
-     * @param[in] MatchedHitsBKLMSec   Matched digits in BKLM per Sector
-     * @param[in] AllExtHitsBKLMSec    Number of ExtHits per Sector
-     * @param[in] MatchedHitsEKLMSec   Matched digits in EKLM per Sector
-     * @param[in] AllExtHitsEKLMSec    Number of ExtHits in EKLM per Sector
-     * @return True if the muon satisfies the selection criteria.
-     */
-    bool collectDataTrack(const Particle* muon, TH1F* MatchedHitsBKLM,
-                          TH1F* AllExtHitsBKLM, TH1F* MatchedHitsEKLM,
-                          TH1F* AllExtHitsEKLM, TH1F* MatchedHitsBKLMSec,
-                          TH1F* AllExtHitsBKLMSec, TH1F* MatchedHitsEKLMSec,
-                          TH1F* AllExtHitsEKLMSec);
-
-    /**
-     * Add hit to map.
-     * @param[in] hitMap      Hit map.
-     * @param[in] planeGlobal Plane global number.
-     * @param[in] hitData     Hit data.
-     */
-    void addHit(std::map<KLMPlaneNumber, struct HitData>& hitMap,
-                KLMPlaneNumber planeGlobal, struct HitData* hitData);
-
-    /**
-     * Uses TrigResult along with desired software cut
-     * to determine whether histograms are filled or not
-     * for a given event.
-     */
-    bool triggerFlag();
-
 
 
   };

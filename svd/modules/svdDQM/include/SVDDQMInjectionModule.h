@@ -36,6 +36,11 @@ namespace Belle2 {
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
       std::string m_SVDShaperDigitsName;  /**< The name of the StoreArray of SVDShaperDigit to be generated */
 
+      /** experiment number*/
+      int m_expNumber = 0;
+      /** run number*/
+      int m_runNumber = 0;
+
       /** Input array for DAQ Status. */
       StoreArray<RawFTSW> m_rawTTD;
 

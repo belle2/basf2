@@ -125,12 +125,22 @@ class CheckData(basf2.Module):
 
         self.obj = Belle2.PyStoreObj('EMD')
         self.array = Belle2.PyStoreArray('Parts')
+        self.arrayRel = Belle2.PyStoreArray('MCParts')
 
     def event(self):
         """reimplementation"""
 
         assert self.obj.obj().getExperiment() == 500
         assert self.array.getEntries() == 5
+
+        for arr in self.array:
+            print(arr.getPValue())
+
+        for arr in self.arrayRel:
+            print(arr.getPDG())
+
+        for arr in self.array:
+            print(arr.getPValue(), '->', arr.getRelated('MCParts').getPDG())
 
 
 class CheckData2(basf2.Module):
@@ -201,6 +211,12 @@ class CheckData222(basf2.Module):
         assert self.arrayRel.getEntries() == 21
 
         for arr in self.array:
+            print(arr.getPValue())
+
+        for arr in self.arrayRel:
+            print(arr.getPDG())
+
+        for arr in self.array:
             print(arr.getPValue(), '->', arr.getRelated('MCParts2').getPDG())
 
 
@@ -250,7 +266,17 @@ indep.add_module(CheckData()).set_name("checkdata 2")
 # indep.add_module(CheckAbsence2()).set_name("checkdata2 3")
 indep.add_module(CreateData22())
 indep.add_module(CheckData22()).set_name("checkdata22 1")
-main.add_independent_merge_path(indep, merge_back_event=['EMD', 'Parts', 'MCParts', 'EMD2', 'Parts2', 'MCParts2'])
+main.add_independent_merge_path(
+    indep,
+    merge_back_event=[
+        'EMD',
+        'Parts',
+        'MCParts',
+        'EMD2',
+        'Parts2',
+        'MCParts2',
+        'PartsToMCParts',
+        'Parts2ToMCParts2'])
 main.add_module(CheckData()).set_name("checkdata 3")
 main.add_module(CheckData222()).set_name("checkdata222 1")
 

@@ -893,6 +893,7 @@ void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& i
 
       B2INFO("Trying to copy " << fromEntry.name << " to " << id);
       StoreEntry& target = targetMaps[iDurability][fromEntry.name];
+      B2INFO(not fromEntry.ptr << !target.ptr << target.isArray);
 
       //copy contents into target object
       if (not fromEntry.ptr) {
@@ -905,42 +906,34 @@ void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& i
           delete target.object;
           target.object = fromEntry.object->Clone();
           target.ptr = target.object;
-        }
-        if (target.isArray) {
-          if (!target.ptr) {
-            B2INFO("Before: " << "0" << " + " << fromEntry.getPtrAsArray()->GetEntriesFast());
+        } else {
+          if (target.isArray) {
+            if (!target.ptr) {
+              B2INFO("Before: " << "0" << " + " << fromEntry.getPtrAsArray()->GetEntriesFast());
 
-            target.object = fromEntry.object->Clone();
-            target.ptr = target.object;
-          } else {
-            B2INFO("Before: " << target.getPtrAsArray()->GetEntriesFast() << " + " << fromEntry.getPtrAsArray()->GetEntriesFast());
+              target.object = fromEntry.object->Clone();
+              target.ptr = target.object;
+            } else {
+              B2INFO("Before: " << target.getPtrAsArray()->GetEntriesFast() << " + " << fromEntry.getPtrAsArray()->GetEntriesFast());
 
-            for (int i = 0; i < fromEntry.getPtrAsArray()->GetEntriesFast(); i++) {
-              int nEntries = target.getPtrAsArray()->GetEntriesFast();
-              TClass* objClass = target.objClass;
-              if (objClass != fromEntry.objClass) {
+              if (target.objClass != fromEntry.objClass) {
                 B2FATAL("Cannot merge StoreArrays " << target.name << "as they are of different classes.");
               }
-              // Now append objects of TClonesArray of `fromEntry` to TClonesArray of `target`
-              // Apparently, this is how you do it
-              // (copied the code from StoreArray.h but same is explained at ROOT documentation)
-              // PROBLEM: instead of a TObject* I need it to cast to the proper class, which can be
-              // retrieved by `target.objClass`.
-              // I have no idea how to do that. Unlike the class StoreArray, which has a template class T,
-              // the class StoreEntry does not know anything about the Belle2 classes.
-              TObject* nextFreeAdress = target.getPtrAsArray()->AddrAt(nEntries);
-              TObject* newObj = new(nextFreeAdress) TObject();
-              fromEntry.getPtrAsArray()->Copy(*newObj);
-            }
-          }
 
-          B2INFO("After: " << target.getPtrAsArray()->GetEntriesFast());
-        } else {
-          if (!target.ptr) {
-            target.object = fromEntry.object->Clone();
-            target.ptr = target.object;
+              // TClonesArray has no easy way to add objects to it
+              // Instead work around this by cloning and absorbing the TClonesArray `fromEntry`
+              TClonesArray* fromArr = static_cast<TClonesArray*>(fromEntry.getPtrAsArray()->Clone());
+              target.getPtrAsArray()->AbsorbObjects(fromArr);
+              //target.ptr = target.object; // necessary?
+            }
+            B2INFO("After: " << target.getPtrAsArray()->GetEntriesFast());
           } else {
-            B2INFO("Not merging non-array objects yet (keeping original " << target.name << ").");
+            if (!target.ptr) {
+              target.object = fromEntry.object->Clone();
+              target.ptr = target.object;
+            } else {
+              B2INFO("Not merging non-array objects yet (keeping original " << target.name << ").");
+            }
           }
         }
       }

@@ -48,10 +48,7 @@ void DQMHistAnalysisTrackingHLTModule::initialize()
   // add MonitoringObject
   m_monObj = getMonitoringObject("trackingHLT");
 
-  m_rtype = findHist("DQMInfo/rtype");
-  m_runtype = m_rtype ? m_rtype->GetTitle() : "";
 }
-
 
 void DQMHistAnalysisTrackingHLTModule::event()
 {
@@ -64,7 +61,7 @@ void DQMHistAnalysisTrackingHLTModule::event()
     bool hasError = false;
     int nEvents = hAbort->GetEntries();
     double abortRate = hAbort->GetMean();
-    hAbort->SetTitle(Form("Fraction of Events in which Tracking aborts = %.6f ", abortRate));
+    hAbort->SetTitle(Form("Fraction of Events in which Tracking aborts = %.4f %%", abortRate * 100));
 
     m_monObj->setVariable("abortRate", abortRate);
     //check if number of errors is above the allowed limit
@@ -92,35 +89,32 @@ void DQMHistAnalysisTrackingHLTModule::event()
     m_cAbortRate->Print("c_AbortRate.pdf");
 
   // add average number of tracks per event to Mirabelle
-  double averageNTracks = -1;
+
   TH1* hnTracks = findHist("TrackingHLTDQM/NoOfTracks");
-  if (hnTracks != NULL)
-    averageNTracks = hnTracks->GetMean();
-  double averageNVXDTracks = -1;
+  if (hnTracks != NULL) {
+    double averageNTracks = hnTracks->GetMean();
+    m_monObj->setVariable("nTracksPerEvent", averageNTracks);
+  }
+
   TH1* hnVXDTracks = findHist("TrackingHLTDQM/NoOfTracksInVXDOnly");
-  if (hnVXDTracks != NULL)
-    averageNVXDTracks = hnVXDTracks->GetMean();
-  double averageNCDCTracks = -1;
+  if (hnVXDTracks != NULL) {
+    double averageNVXDTracks = hnVXDTracks->GetMean();
+    m_monObj->setVariable("nVXDTracksPerEvent", averageNVXDTracks);
+  }
+
   TH1* hnCDCTracks = findHist("TrackingHLTDQM/NoOfTracksInCDCOnly");
-  if (hnCDCTracks != NULL)
-    averageNCDCTracks = hnCDCTracks->GetMean();
-  double averageNVXDCDCTracks = -1;
+  if (hnCDCTracks != NULL) {
+    double averageNCDCTracks = hnCDCTracks->GetMean();
+    m_monObj->setVariable("nCDCTracksPerEvent", averageNCDCTracks);
+  }
+
   TH1* hnVXDCDCTracks = findHist("TrackingHLTDQM/NoOfTracksInVXDCDC");
-  if (hnVXDCDCTracks != NULL)
-    averageNVXDCDCTracks = hnVXDCDCTracks->GetMean();
-
-  m_monObj->setVariable("nTracksPerEvent", averageNTracks);
-  m_monObj->setVariable("nVXDTracksPerEvent", averageNVXDTracks);
-  m_monObj->setVariable("nCDCTracksPerEvent", averageNCDCTracks);
-  m_monObj->setVariable("nVXDCDCTracksPerEvent", averageNVXDCDCTracks);
+  if (hnVXDCDCTracks != NULL) {
+    double averageNVXDCDCTracks = hnVXDCDCTracks->GetMean();
+    m_monObj->setVariable("nVXDCDCTracksPerEvent", averageNVXDCDCTracks);
+  }
 
 }
 
-void DQMHistAnalysisTrackingHLTModule::terminate()
-{
-
-  delete m_rtype;
-
-}
 
 

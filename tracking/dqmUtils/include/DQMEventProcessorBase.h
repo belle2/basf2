@@ -46,7 +46,7 @@ namespace Belle2 {
     /**Call this if you want to produce 1D Track Residual plots for each VXD sensor */
     void produce1Dres() {m_produce1Dres = true;};
     /**Call this if you want to produce 2D Track Residual plots for each VXD sensor */
-    void produce2Dres() {m_produce1Dres = true;};
+    void produce2Dres() {m_produce2Dres = true;};
 
   protected:
     /** Find RecoTrack for given track. Calls ProcessSuccesfulFit if the RecoTrack has a successful fit. */
@@ -107,10 +107,10 @@ namespace Belle2 {
     /** true if the DQM is run on HLT */
     bool m_runningOnHLT;
 
-    /** if true, produce 1D Track residuals plots for each VXD sensor*/
+    /** if true, produce 1D Track residuals plots for each VXD sensor */
     bool m_produce1Dres = false;
 
-    /** if true, produce 2D Track residuals plots for each VXD sensor*/
+    /** if true, produce 2D Track residuals plots for each VXD sensor */
     bool m_produce2Dres = false;
 
     /** index of track (with valid TrackFitResult and related RecoTrack) */

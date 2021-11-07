@@ -44,6 +44,8 @@ void TrackingHLTDQMModule::initialize()
 
   // eventLevelTrackingInfo is currently only set by VXDTF2, if VXDTF2 is not in path the StoreObject is not there
   m_eventLevelTrackingInfo.isOptional();
+
+  m_rawTTD.isOptional();
 }
 
 void TrackingHLTDQMModule::defineHisto()
@@ -52,7 +54,7 @@ void TrackingHLTDQMModule::defineHisto()
   DQMHistoModuleBase::runningOnHLT();
 
   if (VXD::GeoCache::getInstance().getGeoTools()->getNumberOfLayers() == 0)
-    B2WARNING("Missing geometry for VXD.");
+    B2FATAL("Missing geometry for VXD.");
 
   // Create a separate histogram directories and cd into it.
   TDirectory* originalDirectory = gDirectory;
@@ -91,10 +93,38 @@ void TrackingHLTDQMModule::event()
 
   eventProcessor.Run();
 
-  if (m_eventLevelTrackingInfo.isValid())
+  if (m_eventLevelTrackingInfo.isValid()) {
     m_trackingErrorFlags->Fill((double)m_eventLevelTrackingInfo->hasAnErrorFlag());
-  else
+
+    if (m_rawTTD.isValid()) {
+
+      for (auto& it : m_rawTTD) {
+
+        // get last injection time
+        auto difference = it.GetTimeSinceLastInjection(0);
+        // check time overflow, too long ago
+        if (difference != 0x7FFFFFFF) {
+
+          double timeSinceInj = it.GetTimeSinceLastInjection(0) / c_globalClock;
+          double timeInCycle = timeSinceInj - (int)(timeSinceInj / c_revolutionTime) * c_revolutionTime;
+
+          if (it.GetIsHER(0))
+            m_allVStimeHER->Fill(timeSinceInj, timeInCycle);
+          else
+            m_allVStimeLER->Fill(timeSinceInj, timeInCycle);
+
+          if (m_eventLevelTrackingInfo->hasAnErrorFlag()) {
+            if (it.GetIsHER(0))
+              m_abortVStimeHER->Fill(timeSinceInj, timeInCycle);
+            else
+              m_abortVStimeLER->Fill(timeSinceInj, timeInCycle);
+          } //has error flag
+        } //time overflow
+      }// loop on RawFTSW
+    } //RawFTSW is valid
+  }  else
     m_trackingErrorFlags->Fill(0.0);
+
 }
 
 void TrackingHLTDQMModule::DefineFlags()
@@ -107,4 +137,27 @@ void TrackingHLTDQMModule::DefineFlags()
 
   m_trackingErrorFlags->GetXaxis()->SetBinLabel(1, "No Error");
   m_trackingErrorFlags->GetXaxis()->SetBinLabel(2, "Error occured");
+
+  //tracking abort VS time after HER/LER injection and time within a beam cycle
+  m_abortVStimeHER = new TH2F(
+    "TrkAbortVsTimeHER",
+    "Tracking Abort vs HER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
+    500, 0, c_noInjectionTime, 100, 0, c_revolutionTime);
+
+  m_abortVStimeLER = new TH2F(
+    "TrkAbortVsTimeLER",
+    "Tracking Abort vs LER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
+    500, 0, c_noInjectionTime, 100, 0, c_revolutionTime);
+
+  //tracking all VS time after HER/LER injection and time within a beam cycle
+  m_allVStimeHER = new TH2F(
+    "allEvtsVsTimeHER",
+    "Number Of Events vs HER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
+    500, 0, c_noInjectionTime, 100, 0, c_revolutionTime);
+
+  m_allVStimeLER = new TH2F(
+    "allEvtsVsTimeLER",
+    "Number of Events vs LER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
+    500, 0, c_noInjectionTime, 100, 0, c_revolutionTime);
+
 }

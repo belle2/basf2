@@ -60,6 +60,11 @@ namespace Belle2 {
     /** SVDEventInfo StoreObjPtry name */
     std::string m_storeSVDEventInfoName;
 
+    /** experiment number*/
+    int m_expNumber = 0;
+    /** run number*/
+    int m_runNumber = 0;
+
     /** if TRUE: svdTime back in SVD time reference*/
     bool m_desynchSVDTime = false;
 

@@ -84,11 +84,15 @@ void SVDUnpackerDQMModule::defineHisto()
   const unsigned short nBits = Bins_FTBFlags + Bins_FTBError + Bins_APVError + Bins_APVMatch + Bins_FADCMatch + Bins_UpsetAPV +
                                Bins_BadMapping + Bins_BadHeader + Bins_MissedTrailer + Bins_MissedHeader;
 
-  m_DQMUnpackerHisto = new TH2F("DQMUnpackerHisto", "SVD Data Format Monitor", nBits, 1, nBits + 1, 52, 1, 53);
+  m_DQMUnpackerHisto = new TH2F("DQMUnpackerHisto", Form("SVD Data Format Monitor ~ Exp%d Run%d", m_expNumber, m_runNumber), nBits, 1,
+                                nBits + 1, 52, 1, 53);
   m_DQMEventFractionHisto = new TH1F("DQMEventFractionHisto", "SVD Error Fraction Event Counter", 2, 0, 2);
-  m_DQMnSamplesHisto = new TH2F("DQMnSamplesHisto", "nAPVsamples VS DAQMode", 3, 1, 4, 2, 1, 3);
-  m_DQMnSamplesHisto2 = new TH2F("DQMnSamplesHisto2", "nAPVsamples VS DAQMode", 2, 1, 3, 2, 1, 3);
-  m_DQMtrgQuality = new TH2F("DQMtrgQuality", "nAPVsamples VS trgQuality", 4, 1, 5, 2, 1, 3);
+  m_DQMnSamplesHisto = new TH2F("DQMnSamplesHisto", Form("nAPVsamples VS DAQMode ~ Exp%d Run%d", m_expNumber, m_runNumber), 3, 1, 4,
+                                2, 1, 3);
+  m_DQMnSamplesHisto2 = new TH2F("DQMnSamplesHisto2", Form("nAPVsamples VS DAQMode ~ Exp%d Run%d", m_expNumber, m_runNumber), 2, 1, 3,
+                                 2, 1, 3);
+  m_DQMtrgQuality = new TH2F("DQMtrgQuality", Form("nAPVsamples VS trgQuality ~ Exp%d Run%d", m_expNumber, m_runNumber), 4, 1, 5, 2,
+                             1, 3);
 
   m_DQMUnpackerHisto->GetYaxis()->SetTitle("FADC board");
   m_DQMUnpackerHisto->GetYaxis()->SetTitleOffset(1.2);
@@ -148,17 +152,13 @@ void SVDUnpackerDQMModule::initialize()
 
 void SVDUnpackerDQMModule::beginRun()
 {
-
   StoreObjPtr<EventMetaData> evtMetaData;
   m_expNumber = evtMetaData->getExperiment();
   m_runNumber = evtMetaData->getRun();
   m_errorFraction = 0;
 
-  TString histoTitle = TString::Format("SVD Data Format Monitor, Exp %d Run %d", m_expNumber, m_runNumber);
-
   if (m_DQMUnpackerHisto != nullptr) {
     m_DQMUnpackerHisto->Reset();
-    m_DQMUnpackerHisto->SetTitle(histoTitle.Data());
   }
 
   if (m_DQMEventFractionHisto != nullptr) {
@@ -335,7 +335,6 @@ void SVDUnpackerDQMModule::event()
                                                  m_runNumber);
     m_DQMEventFractionHisto->SetTitle(histoFractionTitle.Data());
   }
-
 
   m_DQMEventFractionHisto->Fill(m_badEvent);
 

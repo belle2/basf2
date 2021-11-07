@@ -10,7 +10,7 @@
 ##########################################################################
 
 import modularAnalysis as ma
-from skim.standardlists.dileptons import (loadStdJpsiToee, loadStdJpsiTomumu,
+from skim.standardlists.dileptons import (loadStdJpsiToee_noTOP, loadStdJpsiTomumu,
                                           loadStdPsi2s2lepton)
 from skim.standardlists.lightmesons import (loadStdSkimHighEffTracks,
                                             loadStdSkimHighEffPhi, loadStdSkimHighEffEtaPrime,
@@ -89,9 +89,7 @@ class TDCPV_qqs(BaseSkim):
     * ``SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01``
     * ``5.2 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
-    * ``nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3``
     * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1``,
-    * ``visibleEnergyOfEventCMS>4"``,
     * ``E_ECL_TDCPV<9``
     """
 
@@ -167,7 +165,7 @@ class TDCPV_qqs(BaseSkim):
             bu_qqs_List.append('B+:TDCPV_qqs' + str(chID))
 
         ma.fillParticleList(decayString='pi+:TDCPV_eventshape',
-                            cut='pt > 0.1 and abs(d0)<0.5 and abs(z0)<2 and nCDCHits>20', path=path)
+                            cut='pt > 0.1 and abs(dr)<0.5 and abs(dz)<2 and nCDCHits>20', path=path)
         ma.fillParticleList(decayString='gamma:TDCPV_eventshape',
                             cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
@@ -186,9 +184,7 @@ class TDCPV_qqs(BaseSkim):
         ma.buildEventKinematics(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'], path=path)
 
         EventCuts = [
-            "nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3",
             "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
-            "visibleEnergyOfEventCMS>4",
             "E_ECL_TDCPV<9"
         ]
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
@@ -242,7 +238,7 @@ class TDCPV_ccs(BaseSkim):
     * ``5.2 < Mbc < 5.29 for Ks/K*``
     * ``5.05 < Mbc < 5.29 for KL``
     * ``abs(deltaE) < 0.5``
-    * ``nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3``
+    * ``nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3``
     * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1``,
     * ``visibleEnergyOfEventCMS>4"``,
     * ``E_ECL_TDCPV<9``
@@ -271,7 +267,7 @@ class TDCPV_ccs(BaseSkim):
         stdPi0s("eff40_May2020", path=path, loadPhotonBeamBackgroundMVA=False)
         loadStdSkimHighEffKstar0(path=path)
 
-        loadStdJpsiToee(path=path)
+        loadStdJpsiToee_noTOP(path=path)
         loadStdJpsiTomumu(path=path)
         loadStdPsi2s2lepton(path=path)
         stdKlongs(listtype='allklm', path=path)
@@ -319,7 +315,7 @@ class TDCPV_ccs(BaseSkim):
             b0toJPsiKL_List.append('B0:TDCPV_JPsiKL' + str(chID))
 
         ma.fillParticleList(decayString='pi+:TDCPV_eventshape',
-                            cut='pt > 0.1 and abs(d0)<0.5 and abs(z0)<2 and nCDCHits>20', path=path)
+                            cut='pt > 0.1 and abs(dr)<0.5 and abs(dz)<2 and nCDCHits>20', path=path)
         ma.fillParticleList(decayString='gamma:TDCPV_eventshape',
                             cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
@@ -338,7 +334,7 @@ class TDCPV_ccs(BaseSkim):
         ma.buildEventKinematics(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'], path=path)
 
         EventCuts = [
-            "nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3",
+            "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3",
             "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
             "visibleEnergyOfEventCMS>4",
             "E_ECL_TDCPV<9"

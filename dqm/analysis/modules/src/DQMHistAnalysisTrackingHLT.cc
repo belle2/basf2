@@ -62,7 +62,6 @@ void DQMHistAnalysisTrackingHLTModule::event()
     int nEvents = hAbort->GetEntries();
     double abortRate = hAbort->GetMean();
     hAbort->SetTitle(Form("Fraction of Events in which Tracking aborts = %.4f %%", abortRate * 100));
-
     m_monObj->setVariable("abortRate", abortRate);
     //check if number of errors is above the allowed limit
     if (abortRate > m_failureRateThreshold)
@@ -89,7 +88,6 @@ void DQMHistAnalysisTrackingHLTModule::event()
     m_cAbortRate->Print("c_AbortRate.pdf");
 
   // add average number of tracks per event to Mirabelle
-
   TH1* hnTracks = findHist("TrackingHLTDQM/NoOfTracks");
   if (hnTracks != NULL) {
     double averageNTracks = hnTracks->GetMean();
@@ -115,6 +113,3 @@ void DQMHistAnalysisTrackingHLTModule::event()
   }
 
 }
-
-
-

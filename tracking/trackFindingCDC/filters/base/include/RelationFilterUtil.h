@@ -75,14 +75,14 @@ namespace Belle2 {
             weightedRelations.emplace_back(from, weight, to);
 
             if (weightedRelations.size() == maximumNumberOfRelations) {
-              B2WARNING("Relations Creator reached maximal number of items. Aborting");
+              B2WARNING("Relations Creator reached maximal number of items: skipping the event.");
               if (m_eventLevelTrackingInfo.isValid()) {
                 if (std::is_base_of<AObject, CKFToPXDState>::value) {
                   m_eventLevelTrackingInfo->setPXDCKFAbortionFlag();
                 } else if (std::is_base_of<AObject, CKFToSVDState>::value) {
                   m_eventLevelTrackingInfo->setSVDCKFAbortionFlag();
                 } else if (std::is_base_of<AObject, vxdHoughTracking::VXDHoughState>::value) {
-                  B2INFO("Aborting processing DATCON track candidate, not setting AbortionFlag.");
+                  B2INFO("Skipping processing DATCON track candidate, not setting AbortionFlag.");
                 } else {
                   B2WARNING("Undefined class used for CKFStates. Could not set AbortionFlag.");
                 }

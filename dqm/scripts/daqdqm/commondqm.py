@@ -125,7 +125,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
         from softwaretrigger import filter_categories, skim_categories
 
-        filter_cat = [method for method in dir(filter_categories) if method.startswith('__') is False if method is not 'RESULTS']
+        filter_cat = [method for method in dir(filter_categories) if method.startswith('__') is False if method != 'RESULTS']
         skim_cat = [method for method in dir(skim_categories) if method.startswith('__') is False]
 
         def read_lines(category):

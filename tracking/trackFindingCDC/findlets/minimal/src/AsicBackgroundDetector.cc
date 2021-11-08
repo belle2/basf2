@@ -98,7 +98,7 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
   };
 
   if (wireHits.size() > 8) {
-//   Extra information:
+    /// Extra information:
     auto eWire = wireHits[0]->getWireID().getEWire();
     auto board = m_map[eWire].first;
 
@@ -118,12 +118,8 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
       (*hit)->setBackgroundFlag();
       (*hit)->setTakenFlag();
     }
-
     return;
   }
-
-  B2ASSERT("Number of hits per asic should be above 0 and can not exceed 8",
-           (wireHits.size() <= 8) && (wireHits.size() > 0));
 
   // compute median time:
   vector<short> times;
@@ -134,7 +130,6 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
   sort(times.begin(), times.end());
   int mid = times.size() / 2;
   double median = times.size() % 2 == 0 ? (times[mid] + times[mid - 1]) / 2 : times[mid];
-
 
   size_t nbg = 0;
   int adcOnMedian = 0;

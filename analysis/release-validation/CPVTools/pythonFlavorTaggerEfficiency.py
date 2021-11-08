@@ -30,7 +30,6 @@ import math
 import matplotlib.pyplot as plt
 import ROOT
 from basf2 import B2INFO
-import flavorTagger as ft
 from defaultEvaluationParameters import categories, Quiet, rbins
 from array import array
 

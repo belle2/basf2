@@ -18,7 +18,6 @@ import b2test_utils
 import basf2
 from basf2 import set_random_seed, create_path, process
 import modularAnalysis as ma
-from variables import variables as vm
 import flavorTagger as ft
 import ROOT
 import os

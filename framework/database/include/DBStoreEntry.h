@@ -132,6 +132,7 @@ namespace Belle2 {
      * @param iov new interval of validity for the payload
      * @param filename filename for the payload
      * @param checksum checksum of the payload
+     * @param globaltag globaltag name (or testing payloads path) from which the payload is picked
      * @param event EventMetaData object
      */
     void updatePayload(unsigned int revision, const IntervalOfValidity& iov, const std::string& filename, const std::string& checksum,

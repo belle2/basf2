@@ -98,12 +98,27 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
   };
 
   if (wireHits.size() > 8) {
-    B2ERROR("Number of hits per asic should not exceed 8, observe too many hits." << LogVar("nHits", wireHits.size()));
+//   Extra information:
+    auto eWire = wireHits[0]->getWireID().getEWire();
+    auto board = m_map[eWire].first;
+
+    if (m_max_asic_error_messages > 0) {
+      B2ERROR("Number of hits per asic should not exceed 8, observe too many hits."
+              << LogVar("nHits", wireHits.size())
+              << LogVar("Board ID", board));
+      m_max_asic_error_messages -= 1;
+    } else {
+      B2WARNING("Number of hits per asic should not exceed 8, observe too many hits."
+                << LogVar("nHits", wireHits.size())
+                << LogVar("Board ID", board));
+    }
+
     /// This is abnormal situation, detected for few runs, related to CDC unpacker. Hits are to be marked as background.
     for (auto& hit : wireHits) {
       (*hit)->setBackgroundFlag();
       (*hit)->setTakenFlag();
     }
+
     return;
   }
 

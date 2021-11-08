@@ -51,7 +51,6 @@ namespace {
   /** Test generation in CMS */
   TEST_F(InitialParticleGenerationTests, TestCMSGeneration)
   {
-    GTEST_SKIP();
     beamparams.setGenerationFlags(BeamParameters::c_generateCMS);
     DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
     auto initialCMS = generator.generate();

@@ -223,7 +223,7 @@ namespace Belle2 {
     ROOT::Math::XYZVector rotaxis = zaxis.Cross(electronCMS.Vect()) / electronCMS.P();
     double rotangle = TMath::ASin(rotaxis.R());
     const ROOT::Math::LorentzRotation rotation(ROOT::Math::AxisAngle(rotaxis, -rotangle));
-    *m_labToCMS *= rotation;
+    *m_labToCMS = rotation * (*m_labToCMS);
 
     //cache derived quantities
     m_CMSToLab = new ROOT::Math::LorentzRotation(m_labToCMS->Inverse());

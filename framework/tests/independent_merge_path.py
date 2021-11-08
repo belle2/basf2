@@ -130,6 +130,8 @@ class CheckData(basf2.Module):
     def event(self):
         """reimplementation"""
 
+        print(self.name())
+
         assert self.obj.obj().getExperiment() == 500
         assert self.array.getEntries() == 5
 
@@ -159,6 +161,8 @@ class CheckData2(basf2.Module):
     def event(self):
         """reimplementation"""
 
+        print(self.name())
+
         assert self.obj.obj().getExperiment() == 1000
         assert self.array.getEntries() == 10
         assert self.arrayRel.getEntries() == 10
@@ -180,6 +184,8 @@ class CheckData22(basf2.Module):
 
     def event(self):
         """reimplementation"""
+
+        print(self.name())
 
         assert self.obj.obj().getExperiment() == 1000
 
@@ -203,6 +209,8 @@ class CheckData222(basf2.Module):
 
     def event(self):
         """reimplementation"""
+
+        print(self.name())
 
         # TODO: check what happens if obj with different values is merged!
         assert self.obj.obj().getExperiment() == 1000

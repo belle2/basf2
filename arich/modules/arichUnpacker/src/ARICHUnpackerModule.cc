@@ -100,6 +100,7 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> evtMetaData;
 
     digits.clear();
+    bool m_pciedata = false;
     int trgtype = 16;
     double vth_thscan = 0.0;
 

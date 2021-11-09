@@ -447,7 +447,7 @@ class CDCWireConstraints(Constraints):
         self.cdc_radius = cdc_radius
         #: list of layer subject to hemisphere constraints
         if hemisphere is None:
-            hemispehere = []
+            hemisphere = []
         self.hemisphere = hemisphere
 
     def configure_collector(self, collector):

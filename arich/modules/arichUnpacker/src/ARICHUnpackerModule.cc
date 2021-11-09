@@ -155,8 +155,10 @@ namespace Belle2 {
         } else {
           if (raw.GetNodeID(0) == 0x4000001) {
             rawdigit->setCopperId(raw.GetNodeID(0) + (int)(finesse / 4));
-          } else {
+          } else if (raw.GetNodeID(0) == 0x4000002) {
             rawdigit->setCopperId(0x400000A + (int)(finesse / 4));
+          } else {
+            B2FATAL("ARICHUnpackerModule: Invalid Node ID from readout");
           }
 
           rawdigit->setHslbId(finesse % 4);

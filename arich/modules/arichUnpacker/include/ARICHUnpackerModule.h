@@ -84,6 +84,7 @@ namespace Belle2 {
 
     int m_rawmode; /**< Activate Raw Unpacker */
     int m_disable_unpacker; /**< Disable regular Unpacker */
+    bool m_pciedata; /**< PCIe40 readout data (true), or Copper data (false) */
 
     std::string m_outputDigitsName;   /**< name of ARICHDigit store array */
     std::string m_outputRawDigitsName;   /**< name of ARICHRawDigit store array */

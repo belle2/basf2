@@ -322,9 +322,8 @@ if not eventtype:
 newevtype = ''
 parttype = eventtype
 query('Checking general flag')
-general = parttype / 10000000
+general = int(str(parttype)[0])
 flag = 0
-parttype -= general * 10000000
 mother = ''
 for daug in decay:
     if 'sig' in daug:
@@ -365,8 +364,7 @@ if mother:
 newevtype += str(flag)
 
 query('Checking selection flag')
-selection = parttype / 1000000
-parttype -= selection * 1000000
+selection = int(str(parttype)[1])
 flag = selection
 if not mother:
     flag = 0
@@ -477,8 +475,7 @@ done()
 
 query('Checking the decay flag')
 
-decayflag = parttype / 100000
-parttype -= decayflag * 100000
+decayflag = int(str(parttype)[2])
 neutrinos = False
 nFinal = 0
 nCommon = 0
@@ -534,8 +531,7 @@ opencharm = False
 closedcharm = False
 doubleopen = False
 
-charmflag = parttype / 10000
-parttype -= charmflag * 10000
+charmflag = int(str(parttype)[3])
 
 caughtopen = False
 if not mother:
@@ -592,8 +588,7 @@ else:
 newevtype += str(flag)
 
 query('Checking track flag.')
-trackflag = parttype / 1000
-parttype -= trackflag * 1000
+trackflag = int(str(parttype)[4])
 
 maxbf = 0
 maxtracks = 0
@@ -623,8 +618,7 @@ else:
 newevtype += str(maxtracks)
 
 query('Checking neutrals flag.')
-neutrals = parttype / 100
-parttype -= neutrals * 100
+neutrals = int(str(parttype)[5])
 
 pi0eta = False
 gamma = False

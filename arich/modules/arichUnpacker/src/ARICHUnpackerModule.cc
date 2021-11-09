@@ -116,8 +116,9 @@ namespace Belle2 {
 
     for (auto& raw : rawData) {
       // Check PCIe40 data or Copper data
-      if (raw.GetMaxNumOfCh(0) > 4) { m_pciedata = true; } // Could be 36 or 48
-      else { m_pciedata = false; }
+      if (raw.GetMaxNumOfCh(0) == 48) { m_pciedata = true; } // Could be 36 or 48
+      else if (raw.GetMaxNumOfCh(0) == 4) { m_pciedata = false; }
+      else { B2FATAL("ARICHUnpackerModule: Invalid value of GetMaxNumOfCh from raw data: " << LogVar("Number of ch: ", raw.GetMaxNumOfCh(0))); }
 
       for (int finesse = 0; finesse < raw.GetMaxNumOfCh(0); finesse++) {
         const int* buffer = raw.GetDetectorBuffer(0, finesse);
@@ -159,7 +160,7 @@ namespace Belle2 {
           } else if (raw.GetNodeID(0) == 0x4000002) {
             rawdigit->setCopperId(0x400000A + (int)(finesse / 4));
           } else {
-            B2FATAL("ARICHUnpackerModule: Invalid Node ID from readout");
+            B2FATAL("ARICHUnpackerModule: Invalid Node ID from readout: " <<  LogVar("NodeID: ", raw.GetNodeID(0)));
           }
 
           rawdigit->setHslbId(finesse % 4);

@@ -12,7 +12,6 @@
 # CDC tracking validation
 # """
 
-import basf2
 from prompt import ValidationSettings
 import sys
 import os

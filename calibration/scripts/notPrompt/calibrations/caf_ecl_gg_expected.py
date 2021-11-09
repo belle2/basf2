@@ -11,7 +11,7 @@
 """Find expected energies for ECL e+e- --> gamma gamma single crystal
 energy calibration. Requires e+e- --> gamma gamma mc in mdst format."""
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings
 
 # --------------------------------------------------------------
 # ..Tell the automated script some required details
@@ -32,7 +32,6 @@ def get_calibrations(input_data, **kwargs):
     from ROOT import Belle2
     from caf.utils import IoV
     from caf.framework import Calibration
-    from reconstruction import prepare_cdst_analysis
 
     # --------------------------------------------------------------
     # ..gamma gamma

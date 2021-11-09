@@ -14,7 +14,6 @@ The input collections are:
 
 import basf2
 import ROOT
-from ROOT import Belle2
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_cdc import settings as cdc_calibration
@@ -223,10 +222,10 @@ def create_prompt(files, cfg):
     cfg : dict
       Expert config dictionary
     """
-    mumu = select_files(files["mumu"], 0.2e6, cfg["mumu.max_processed_events_per_file"])
-    cosmic = select_files(files["cosmic"], 1e6, cfg["cosmic.max_processed_events_per_file"])
-    hadron = select_files(files["hadron"], 0.5e5, cfg["hadron.max_processed_events_per_file"])
-    offip = select_files(files["offip"], 0.2e6, cfg["offip.max_processed_events_per_file"])
+    select_files(files["mumu"], 0.2e6, cfg["mumu.max_processed_events_per_file"])
+    select_files(files["cosmic"], 1e6, cfg["cosmic.max_processed_events_per_file"])
+    select_files(files["hadron"], 0.5e5, cfg["hadron.max_processed_events_per_file"])
+    select_files(files["offip"], 0.2e6, cfg["offip.max_processed_events_per_file"])
 
     cal = mpc.create(
         name='VXDCDCalignment_prompt',
@@ -380,8 +379,8 @@ def create_stage2(files, cfg):
     cfg : dict
       Expert config dictionary
     """
-    mumu = select_files(files["mumu"], 10e6, cfg["mumu.max_processed_events_per_file"])
-    cosmic = select_files(files["cosmic"], 2e6, cfg["cosmic.max_processed_events_per_file"])
+    select_files(files["mumu"], 10e6, cfg["mumu.max_processed_events_per_file"])
+    select_files(files["cosmic"], 2e6, cfg["cosmic.max_processed_events_per_file"])
 
     cal = mpc.create(
         name='VXDCDCalignment_stage2',

@@ -677,48 +677,6 @@ newevtype += str(flag)
 
 query('Checking the extra and user for duplicity .')
 
-if settings.use_url:
-    if not zippednos:
-        warning('Cannot parse decfiles webpage')
-        settings.use_url = False
-    else:
-        for (k, v) in zippednos:
-            if filename.partition('=')[0] == v.partition(
-                    '=')[0] and not eventtype / 10 == k / 10:
-                warning(
-                    'The decfile: ' +
-                    v +
-                    ':' +
-                    str(k) +
-                    ' should contain the same decay, therefore the first 7 '
-                    'digits of the eventtype should match. Please check and use the same extra flag.')
-                failed = True
-            if k == eventtype:
-                warning('Error: ' + v + ' has this eventtype already.')
-                failed = True
-            if k / 10 == eventtype / \
-                    10 and not os.path.basename(filename).partition('=')[0] == v.partition('=')[0]:
-                warning(
-                    'The decfile: ' +
-                    v +
-                    ':' +
-                    str(k) +
-                    ' uses this extra flag, but the decay seems different. '
-                    'Please check and use a unique extra flag.')
-                failed = True
-
-    if settings.obs_url:
-
-        if not obsnos:
-            warning('Cannot parse obsoletes trac file.')
-            settings.use_url = False
-        else:
-            if str(eventtype) in obsnos:
-                warning('The eventtype is obsolete on the line ' +
-                        str(obsnos.index(str(eventtype)) + 1) + ' in: ' +
-                        settings.obs_url)
-                failed = True
-
 if not settings.use_url:
     filelist = os.listdir(dkfilespath)
     newtype = 0

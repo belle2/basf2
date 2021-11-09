@@ -153,13 +153,10 @@ namespace Belle2 {
           rawdigit->setCopperId(raw.GetNodeID(0));
           rawdigit->setHslbId(finesse);
         } else {
-          // 0x4000001
-          if (raw.GetNodeID(0) == 67108865) {
+          if (raw.GetNodeID(0) == 0x4000001) {
             rawdigit->setCopperId(raw.GetNodeID(0) + (int)(finesse / 4));
-          }
-          // 0x4000002
-          else {
-            rawdigit->setCopperId(67108874 + (int)(finesse / 4));
+          } else {
+            rawdigit->setCopperId(0x400000A + (int)(finesse / 4));
           }
 
           rawdigit->setHslbId(finesse % 4);

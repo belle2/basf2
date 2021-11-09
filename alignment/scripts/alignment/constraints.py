@@ -10,7 +10,6 @@ import basf2
 from ROOT import Belle2
 
 import os
-import pickle
 import math
 
 

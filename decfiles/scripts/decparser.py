@@ -358,7 +358,7 @@ if mother:
         warning("Didn't recognise the mother particle. Check general flag manually.")
         flag = general
     if not flag == general:
-        fail(['General flag not compliant. Should be ' + str(flag) + '.Please check.'])
+        fail(['General flag not compliant. Should be ' + str(flag) + '. Please check.'])
     else:
         done()
 newevtype += str(flag)
@@ -582,7 +582,7 @@ if doubleopen:
     flag = 9
 
 if not flag == charmflag:
-    fail(['Charm flag is not compliant. Should be :' + str(flag) + '. Please check'])
+    fail(['Charm flag is not compliant. Should be ' + str(flag) + '. Please check'])
 else:
     done()
 newevtype += str(flag)
@@ -611,7 +611,7 @@ for dec in main_decay:
             maxtracks = tracks
 
 if not trackflag == maxtracks:
-    fail(['Track flag not compliant. Should be: ' +
+    fail(['Track flag not compliant. Should be ' +
           str(maxtracks) + '. Please check.'])
 else:
     done()
@@ -701,7 +701,7 @@ if not settings.use_url:
                 failed = True
 
     if settings.obsoletepath:
-        obsfile = open(settings.obsoletepath + '/table_obsolete.sql')
+        obsfile = open(dkfilespath + '/' + settings.obsoletepath + '/table_obsolete.sql')
         if obsfile:
             for line in obsfile:
                 if int(line.partition('EVTTYPEID = ')[2].partition(

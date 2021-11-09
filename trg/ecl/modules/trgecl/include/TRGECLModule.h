@@ -118,6 +118,8 @@ namespace Belle2 {
     double _mumuThreshold;
     //! mumu bit  Angle
     std::vector<double> _mumuAngle;
+    // Angle selection of additional Bhabha veto in CM frame
+    std::vector<double> m_3DBhabhaAddAngleCut;
     //! The number of Cluster exceeding 300 MeV
     int _n300MeVCluster;
     //!ECL Burst Bit Threshold

@@ -5,10 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : DQMHistAnalysisTracking.h
-// Description : DQM Tracking Analysis
-//-
 
 #pragma once
 
@@ -17,30 +13,29 @@
 #include <TCanvas.h>
 
 namespace Belle2 {
-  /*! DQM Histogram Analysis for Tracking */
 
-  class DQMHistAnalysisTrackingModule : public DQMHistAnalysisModule {
+  /** Analysis of ER Tracking DQM plots */
+  class DQMHistAnalysisTrackingERModule : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
-    //! Constructor
-    DQMHistAnalysisTrackingModule();
+    /** Constructor */
+    DQMHistAnalysisTrackingERModule();
+    /**Destructor */
+    ~DQMHistAnalysisTrackingERModule() {};
+
+    /** Module function initialize */
+    void initialize() override;
+    /** Module function event */
+    void event() override;
+
   private:
 
-    //! Module functions to be called from main process
-    void initialize(void) override final;
+    float m_onTimeHalfWidth = 50; /**< [ns], cluster is on time if within ± onTimeHalfWidth */
 
-    //! Module functions to be called from event process
-    void beginRun(void) override final;
-    void event(void) override final;
-
-    // Data members
-    //! name of histogram directory
-    std::string m_histogramDirectoryName;
-
-    //! Final Canvas
-    TCanvas* m_cTrackingError = nullptr;
+    /** Monitoring Object to be produced by this module, which contain defined canvases and monitoring variables */
+    MonitoringObject* m_monObj = nullptr;
 
   };
 } // end namespace Belle2

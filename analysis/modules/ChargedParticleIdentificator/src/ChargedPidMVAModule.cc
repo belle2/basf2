@@ -169,7 +169,7 @@ void ChargedPidMVAModule::event()
 
         auto varobj = m_variables.at(index).at(ivar);
 
-        double var;
+        double var = -999.0;
         if (std::holds_alternative<double>(varobj->function(particle))) {
           var = std::get<double>(varobj->function(particle));
         } else if (std::holds_alternative<int>(varobj->function(particle))) {
@@ -194,7 +194,7 @@ void ChargedPidMVAModule::event()
 
         auto specobj = m_spectators.at(index).at(ispec);
 
-        double spec;
+        double spec = std::numeric_limits<double>::quiet_NaN();
         if (std::holds_alternative<double>(specobj->function(particle))) {
           spec = std::get<double>(specobj->function(particle));
         } else if (std::holds_alternative<int>(specobj->function(particle))) {

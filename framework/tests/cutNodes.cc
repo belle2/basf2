@@ -885,17 +885,173 @@ namespace {
   TEST(CutNodesTest, ternaryRelationalNode)
   {
     Py_Initialize();
-    // Check double and bool that are not almost equal
+    // Get main module
+    py::object main = py::import("__main__");
+    py::object pyfloat = main.attr("__builtins__").attr("float");
+
     auto child1 = py::make_tuple(static_cast<int>(NodeType::IntegerNode), 1);
     auto child2 = py::make_tuple(static_cast<int>(NodeType::IntegerNode), 2);
     auto child3 = py::make_tuple(static_cast<int>(NodeType::IntegerNode), 3);
     auto tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child1, child2, child3,
                                 static_cast<int>(ComparisonOperator::LESS), static_cast<int>(ComparisonOperator::LESS));
+
     auto node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
     EXPECT_TRUE(node->check(nullptr));
-
-    // Check docompiling
     EXPECT_EQ(node->decompile(), "1 < 2 < 3");
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child1, child1, child1,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::EQUALEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_TRUE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "1 == 1 == 1");
+
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child1, child1, child1,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::LESSEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_TRUE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "1 == 1 <= 1");
+
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child1, child1, child2,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::LESSEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_TRUE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "1 == 1 <= 2");
+
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child1, child1, child2,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::LESS));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_TRUE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "1 == 1 < 2");
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child1, child1, child2,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::NOTEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_TRUE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "1 == 1 != 2");
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child1, child1, child1,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::GREATEREQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_TRUE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "1 == 1 >= 1");
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child1, child1, child2,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::GREATER));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_FALSE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "1 == 1 > 2");
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child1, child1, child1,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::NOTEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_FALSE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "1 == 1 != 1");
+
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child1, child1, child2,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::LESSEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_TRUE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "1 == 1 <= 2");
+
+    // Create new double tuple
+    child3 = py::make_tuple(static_cast<int>(NodeType::DoubleNode), 3.141);
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child1, child1, child3,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::LESSEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_TRUE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "1 == 1 <= 3.141");
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child1, child3, child3,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::LESSEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_FALSE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "1 == 3.141 <= 3.141");
+
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child3, child3, child3,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::LESSEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_TRUE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "3.141 == 3.141 <= 3.141");
+
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child3, child3, child3,
+                           static_cast<int>(ComparisonOperator::NOTEQUAL), static_cast<int>(ComparisonOperator::LESSEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_FALSE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "3.141 != 3.141 <= 3.141");
+
+    child3 = py::make_tuple(static_cast<int>(NodeType::DoubleNode), pyfloat("nan"));
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child3, child3, child3,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::EQUALEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_TRUE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "nan == nan == nan");
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child3, child3, child2,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::EQUALEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_FALSE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "nan == nan == 2");
+
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child3, child3, child2,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::NOTEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_TRUE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "nan == nan != 2");
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child3, child3, child3,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::NOTEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_FALSE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "nan == nan != nan");
+
+    child2 = py::make_tuple(static_cast<int>(NodeType::DoubleNode), pyfloat("inf"));
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child3, child3, child2,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::NOTEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_TRUE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "nan == nan != inf");
+
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child3, child3, child2,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::EQUALEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_FALSE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "nan == nan == inf");
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child3, child3, child2,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::LESS));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_FALSE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "nan == nan < inf");
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child3, child3, child2,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::LESSEQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_FALSE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "nan == nan <= inf");
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child3, child3, child2,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::GREATER));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_FALSE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "nan == nan > inf");
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode), child3, child3, child2,
+                           static_cast<int>(ComparisonOperator::EQUALEQUAL), static_cast<int>(ComparisonOperator::GREATEREQUAL));
+    node = NodeFactory::compile_boolean_node<MockVariableManager>(tuple);
+    EXPECT_FALSE(node->check(nullptr));
+    EXPECT_EQ(node->decompile(), "nan == nan >= inf");
+
   }
   /// Test for the UnaryExpressionNode: Create Nodes from boost::python::tuples and check functionality.
   TEST(CutNodesTest, unaryExpressionNode)
@@ -1100,6 +1256,13 @@ namespace {
     auto node = NodeFactory::compile_expression_node<MockVariableManager>(tuple);
     EXPECT_EQ(std::get<double>(node->evaluate(&part)), 7);
     EXPECT_EQ(node->decompile(), "sum(mocking_variable, 2, 1)");
+    part = MockObjectType{4.2};
+    EXPECT_EQ(std::get<double>(node->evaluate(&part)), 7.2);
+    part = MockObjectType{false};
+    EXPECT_EQ(std::get<double>(node->evaluate(&part)), 3.0);
+    part = MockObjectType{true};
+    EXPECT_EQ(std::get<double>(node->evaluate(&part)), 4.0);
+
   }
   /// Test for the DataNode: Create Nodes from boost::python::tuples and check functionality.
   TEST(CutNodesTest, integerNode)

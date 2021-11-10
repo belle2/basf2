@@ -593,9 +593,9 @@ namespace Belle2 {
     void print() const override
     {
       m_left_enode->print();
-      injectComparisonOperatorToStream(std::cout, m_cr_coperator);
-      m_center_enode->print();
       injectComparisonOperatorToStream(std::cout, m_lc_coperator);
+      m_center_enode->print();
+      injectComparisonOperatorToStream(std::cout, m_cr_coperator);
       m_left_enode->print();
     }
 
@@ -607,9 +607,9 @@ namespace Belle2 {
     {
       std::stringstream stringstream;
       stringstream << m_left_enode->decompile();
-      injectComparisonOperatorToStream(stringstream, m_cr_coperator);
-      stringstream << m_center_enode->decompile();
       injectComparisonOperatorToStream(stringstream, m_lc_coperator);
+      stringstream << m_center_enode->decompile();
+      injectComparisonOperatorToStream(stringstream, m_cr_coperator);
       stringstream << m_right_enode->decompile();
       return stringstream.str();
     }

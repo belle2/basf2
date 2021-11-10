@@ -13,7 +13,6 @@
 
 import basf2 as b2
 from simulation import add_simulation
-from L1trigger import add_trigger_simulation
 
 # b2.set_log_level(b2.LogLevel.DEBUG)
 

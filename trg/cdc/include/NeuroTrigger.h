@@ -126,6 +126,9 @@ namespace Belle2 {
      * @param arrayname name of the TObjArray holding the MLPs in the file
      */
     void save(const std::string& filename, const std::string& arrayname = "MLPs");
+    /** function to load idhist from file */
+    bool loadIDHist(const std::string& filename);
+
     /** Load MLPs from file.
      * @param filename name of the TFile to read from
      * @param arrayname name of the TObjArray holding the MLPs in the file

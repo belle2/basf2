@@ -2,9 +2,11 @@
 #define CDCTRIGGERNEUROIDHISTMODULE_H
 #pragma once
 
-#include <trg/cdc/NeuroTrainer.h>
 #include <trg/cdc/NeuroTrigger.h>
+#include <trg/cdc/NeuroTrainer.h>
 #include <framework/core/Module.h>
+#include <trg/cdc/dataobjects/CDCTriggerMLPData.h>
+
 namespace Belle2 {
   /** Description
    *

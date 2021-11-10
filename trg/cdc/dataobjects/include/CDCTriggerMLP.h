@@ -17,6 +17,7 @@ namespace Belle2 {
 
     // weights etc. are set only by the trainer
     friend class CDCTriggerNeuroTrainerModule;
+    friend class NeuroTrigger;
 
   public:
     /** default constructor. */
@@ -51,6 +52,8 @@ namespace Belle2 {
     unsigned nWeightsCal() const;
     /** get weights vector */
     std::vector<float> getWeights() const { return weights; }
+    /** set weights vector */
+    void setWeights(std::vector<float> xweights) {weights = xweights; }
     /** get maximum hit number for a single super layer */
     unsigned short getMaxHitsPerSL() const { return maxHitsPerSL; }
     /** get super layer pattern */

@@ -304,6 +304,7 @@ CDCTriggerNeuroTrainerModule::initialize()
 void
 CDCTriggerNeuroTrainerModule::event()
 {
+  StoreObjPtr<EventMetaData> evtmetadata;
   for (int itrack = 0; itrack < m_tracks.getEntries(); ++itrack) {
     // get related MCParticle/RecoTrack for target
     // and retrieve track parameters
@@ -450,7 +451,8 @@ CDCTriggerNeuroTrainerModule::event()
         } else {
           hitIds = m_NeuroTrigger.selectHits(isector, *m_tracks[itrack]);
         }
-        m_trainSets[isector].addSample(m_NeuroTrigger.getInputVector(isector, hitIds), target);
+        m_trainSets[isector].addSample(m_NeuroTrigger.getInputVector(isector, hitIds), target, evtmetadata->getExperiment(),
+                                       evtmetadata->getRun(), evtmetadata->getSubrun(), evtmetadata->getEvent(), itrack);
         if (m_saveDebug) {
           phiHistsMC[isector]->Fill(phi0Target);
           ptHistsMC[isector]->Fill(invptTarget);

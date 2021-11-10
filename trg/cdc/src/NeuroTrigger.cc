@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <framework/logging/Logger.h>
 #include <trg/cdc/NeuroTrigger.h>
-
+#include <trg/cdc/dataobjects/CDCTriggerMLPData.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
@@ -1097,6 +1097,23 @@ NeuroTrigger::save(const string& filename, const string& arrayname)
   MLPs->Clear();
   delete MLPs;
 }
+bool NeuroTrigger::loadIDHist(const std::string& filename)
+{
+  std::ifstream gzipfile(filename, ios_base::in | ios_base::binary);
+  boost::iostreams::filtering_istream arrayStream;
+  arrayStream.push(boost::iostreams::gzip_decompressor());
+  arrayStream.push(gzipfile);
+  CDCTriggerMLPData::HeaderSet hline;
+  if (gzipfile.is_open()) {
+    while (arrayStream >> hline) {
+      for (unsigned i = 0; i < 18; ++i) {
+        m_MLPs[hline.exPert].relevantID[i] = hline.relID[i];
+      }
+    }
+  } else { return false;}
+  return true;
+}
+
 
 bool
 NeuroTrigger::load(const string& filename, const string& arrayname)

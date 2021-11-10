@@ -1,3 +1,5 @@
+
+#pragma once
 #include "trg/cdc/modules/neurotrigger/CDCTriggerNeuroIDHistModule.h"
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -250,7 +252,7 @@ namespace Belle2 {
     outStream.push(gzipfile4);
     for (unsigned isector = 0; isector < m_NeuroTrigger.nSectors(); ++isector) {
       //std::vector<float> reid = m_NeuroTrigger[isector].getRelID();
-      NeuroTrainer::HeaderSet hset(isector, m_NeuroTrigger[isector].getRelID()); //, m_NeuroTrigger[isector].et_option);
+      CDCTriggerMLPData::HeaderSet hset(isector, m_NeuroTrigger[isector].getRelID()); //, m_NeuroTrigger[isector].et_option);
       std::cout << hset << std::endl;
       outStream << hset << std::endl;
     }

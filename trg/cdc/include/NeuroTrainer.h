@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <sstream>
 
@@ -8,146 +9,17 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/RecoTrack.h>
-
+#include <trg/cdc/dataobjects/CDCTriggerMLPData.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPData.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Unit.h>
-#include <iostream>
-#include <fstream>
 #include <cmath>
 #include <TFile.h>
-#include "boost/iostreams/filter/gzip.hpp"
-#include "boost/iostreams/filtering_streambuf.hpp"
-#include "boost/iostreams/filtering_stream.hpp"
-#include "boost/multi_array.hpp"
-#define BOOST_MULTI_ARRAY_NO_GENERATORS
 
 using namespace Belle2;
 namespace NeuroTrainer {
-  struct HeaderSet {
-    float relID[18];
-    unsigned exPert;
-    HeaderSet() {}
-    HeaderSet(unsigned expert, std::vector<float> relevantID)
-    {
-      if (relevantID.size() == 18) {
-        for (unsigned i = 0; i < 18; ++i) {relID[i] = relevantID[i];}
-      } else {std::cout << "ERROR! wrong length of relID vector!" << std::endl;}
-      exPert = expert;
-    }
-    friend std::ostream& operator << (std::ostream& out, const HeaderSet& hset)
-    {
-      out << hset.exPert << '\t';
-      for (unsigned i = 0; i < 18; ++i) { out << hset.relID[i] << '\t';}
-      return out;
-    }
-    friend std::istream& operator >> (std::istream& in, HeaderSet& hset)
-    {
-      std::string help;
-      std::string helpline;
-      help = "";
-      helpline = "";
-      std::getline(in, helpline, '\n');
-      if (helpline.length() < 2) {return in;}
-      std::stringstream ss(helpline);
-      std::getline(ss, help, '\t');
-
-      hset.exPert = std::stoul(help);
-      for (unsigned i = 0; i < 18; ++i) {
-        help = "";
-        std::getline(ss, help, '\t');
-        hset.relID[i] = std::stof(help);
-      }
-      return in;
-    }
-
-
-  };
-  /** Struct to keep one set of training data for either training, validation or testing.
-   * Having this struct makes it easier to save the data to an output filestream.
-   */
-  template <const unsigned inLen, const unsigned outLen>
-  struct NeuroSet {
-    float input[inLen];
-    float target[outLen];
-    int exp;
-    int run;
-    int subrun;
-    int evt;
-    int track;
-    unsigned expert;
-    NeuroSet() {}
-    NeuroSet(float xin[inLen], float xout[outLen],  int& xexp, int& xrun, int& xsubrun, int& xevt, int& xtrack, unsigned& xexpert)
-    {
-      for (unsigned i = 0; i < inLen; ++i) {
-        input[i] = xin[i];
-      }
-      for (unsigned i = 0; i < outLen; ++i) {
-        target[i] = xout[i];
-      }
-      exp = xexp;
-      run = xrun;
-      subrun = xsubrun;
-      evt = xevt;
-      track = xtrack;
-      expert = xexpert;
-    }
-    friend std::ostream& operator << (std::ostream& out, const NeuroSet& dset)
-    {
-      out << dset.exp << '\t' << dset.run << '\t' << dset.subrun << '\t' << dset.evt << '\t' << dset.track << '\t' << dset.expert << '\t'
-          << inLen << '\t' << outLen << '\t';
-      for (auto indata : dset.input) {out << indata << '\t';}
-      for (auto outdata : dset.target) {out << outdata << '\t';}
-      return out;
-    }
-    friend std::istream& operator >> (std::istream& in, NeuroSet& dset)
-    {
-      std::string help;
-      help = "";
-      std::getline(in, help, '\t');
-      if (help.length() < 2) {return in;}
-      dset.exp = std::stoi(help);
-      help = "";
-      std::getline(in, help, '\t');
-      dset.run = std::stoi(help);
-      help = "";
-      std::getline(in, help, '\t');
-      dset.subrun = std::stoi(help);
-      help = "";
-      std::getline(in, help, '\t');
-      dset.evt = std::stoi(help);
-      help = "";
-      std::getline(in, help, '\t');
-      dset.track = std::stoi(help);
-      help = "";
-      std::getline(in, help, '\t');
-      dset.expert = std::stoul(help);
-      // check if input and target size match:
-      std::string insize = "";
-      std::string outsize = "";
-      std::getline(in, insize, '\t');
-      if (std::stoul(insize) != inLen) {
-        B2ERROR("Input and output format of neurotrigger training data does not  match!");
-      }
-      std::getline(in, outsize, '\t');
-      if (std::stoul(outsize) != outLen) {
-        B2ERROR("Input and output format of neurotrigger training data does not  match!");
-      }
-      for (unsigned i = 0; i < inLen; ++i) {
-        help = "";
-        std::getline(in, help, '\t');
-        dset.input[i] = std::stof(help);
-      }
-      for (unsigned i = 0; i < outLen; ++i) {
-        help = "";
-        std::getline(in, help, '\t');
-        dset.target[i] = std::stof(help);
-      }
-      return in;
-    }
-  };
   std::vector<float> getTrainTargets(bool& trainonreco, CDCTriggerTrack* twodtrack, std::string targetcollectionname)
   {
     std::vector<float> ret;

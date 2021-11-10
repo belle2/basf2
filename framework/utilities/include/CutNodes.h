@@ -541,7 +541,7 @@ namespace Belle2 {
 
       switch (m_lc_coperator) {
         case ComparisonOperator::EQUALEQUAL:
-          if (not std::visit(Visitor<std::equal_to> {}, left_eval, center_eval)) return false;
+          if (not std::visit(EqualVisitor {}, left_eval, center_eval)) return false;
           break;
         case ComparisonOperator::GREATEREQUAL:
           if (not std::visit(Visitor<std::greater_equal> {}, left_eval, center_eval)) return false;
@@ -557,14 +557,14 @@ namespace Belle2 {
           if (not std::visit(Visitor<std::less> {}, left_eval, center_eval)) return false;
           break;
         case ComparisonOperator::NOTEQUAL:
-          if (not std::visit(Visitor<std::not_equal_to> {}, left_eval, center_eval)) return false;
+          if (std::visit(EqualVisitor {}, left_eval, center_eval)) return false;
           break;
         default:
           throw std::runtime_error("TernaryRelational has an invalid m_lc_operator");
       }
       switch (m_cr_coperator) {
         case ComparisonOperator::EQUALEQUAL:
-          if (not std::visit(Visitor<std::equal_to> {}, center_eval, right_eval)) return false;
+          if (not std::visit(EqualVisitor {}, center_eval, right_eval)) return false;
           break;
         case ComparisonOperator::GREATEREQUAL:
           if (not std::visit(Visitor<std::greater_equal> {}, center_eval, right_eval)) return false;
@@ -580,7 +580,7 @@ namespace Belle2 {
           if (not std::visit(Visitor<std::less> {}, center_eval, right_eval)) return false;
           break;
         case ComparisonOperator::NOTEQUAL:
-          if (not std::visit(Visitor<std::not_equal_to> {}, center_eval, right_eval)) return false;
+          if (std::visit(EqualVisitor {}, center_eval, right_eval)) return false;
           break;
         default:
           throw std::runtime_error("TernaryRelational has an invalid m_cr_operator");

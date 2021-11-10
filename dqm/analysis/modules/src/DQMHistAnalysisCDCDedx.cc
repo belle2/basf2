@@ -38,7 +38,7 @@ void DQMHistAnalysisCDCDedxModule::initialize()
   B2DEBUG(20, "DQMHistAnalysisCDCDedx: initialized.");
 
   //per run canvas
-  c_pr_dedx = new TCanvas("CDCDedx/c_pr_dedx", "", 700, 600);
+  c_pr_dedx = new TCanvas("CDCDedx/c_CDCdedxMean", "", 700, 600);
   c_pr_wires = new TCanvas("CDCDedx/c_pr_wires", "", 700, 700);
 
   //2D plots

@@ -12,11 +12,10 @@
 """\
 This module contains classes for plotting validation results.
 """
-import pxd.utils as utils
-from pxd.utils.plots import *
+from pxd.utils.plots import plot_in_module_efficiency, plot_efficiency_vs_run,\
+                            plot_module_efficiencies_in_DHHs, plot_efficiency_map, plot_ip_resolutions
 import uproot
 import ROOT
-import pandas as pd
 import numpy as np
 
 
@@ -71,7 +70,7 @@ def analyse_root_file(file_name, tree_name="tree"):
     # 2d efficiency map
     c1 = ROOT.TCanvas("c1", "c1", 900, 600)
     ROOT.gStyle.SetPalette(ROOT.kDarkRainBow)
-    h2eff_l1 = plot_efficiency_map(
+    plot_efficiency_map(
         tree=tree,
         exp_runs=[
             0,
@@ -80,7 +79,7 @@ def analyse_root_file(file_name, tree_name="tree"):
         den_name="hTrackPointsLayer1",
         save_to=prefix + "efficiency_l1.png",
         canvas=c1)
-    h2eff_l2 = plot_efficiency_map(
+    plot_efficiency_map(
         tree=tree,
         exp_runs=[
             0,
@@ -91,7 +90,7 @@ def analyse_root_file(file_name, tree_name="tree"):
         save_to=prefix + "efficiency_l2.png",
         canvas=c1)
     # ip resolutions
-    df_res = plot_ip_resolutions(tree=tree, save_to=prefix + "pxd_resolutions_vs_run.png")
+    plot_ip_resolutions(tree=tree, save_to=prefix + "pxd_resolutions_vs_run.png")
 
 
 if __name__ == "__main__":

@@ -14,34 +14,29 @@
 
 namespace Belle2 {
 
-  /** Analysis of HLT Tracking DQM plots */
-  class DQMHistAnalysisTrackingHLTModule : public DQMHistAnalysisModule {
+  /** Analysis of ER Tracking DQM plots */
+  class DQMHistAnalysisTrackingERModule : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
     /** Constructor */
-    DQMHistAnalysisTrackingHLTModule();
+    DQMHistAnalysisTrackingERModule();
     /**Destructor */
-    ~DQMHistAnalysisTrackingHLTModule() {};
+    ~DQMHistAnalysisTrackingERModule() {};
 
     /** Module function initialize */
     void initialize() override;
     /** Module function event */
     void event() override;
 
-    // parameters
-    bool m_printCanvas = false; /**< if true print the pdf of the canvases */
-
-    int m_statThreshold = 1000; /**< minimal number of events to judge */
-    double m_failureRateThreshold = 1; /**< above this rate, there is maybe a problem?*/
-
   private:
+
+    float m_onTimeHalfWidth = 50; /**< [ns], cluster is on time if within ± onTimeHalfWidth */
 
     /** Monitoring Object to be produced by this module, which contain defined canvases and monitoring variables */
     MonitoringObject* m_monObj = nullptr;
 
-    TCanvas* m_cAbortRate = nullptr;  /**< canvas for the abort rate plot */
   };
 } // end namespace Belle2
 

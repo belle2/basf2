@@ -226,7 +226,6 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
     else:  # the default PXDPerformanceVariablesCollector
         import modularAnalysis as ana
         import vertex
-        from variables import variables as vm
         # Particle list for gain calibration
         ana.fillParticleList('e+:gain', "p > 1.0", path=main)
 
@@ -240,6 +239,7 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
 
         # Particle list for studying impact parameter resolution
         # Alias dosn't work with airflow implementation
+        # from variables import variables as vm
         # vm.addAlias("pBetaSinTheta3o2", "formula(pt * (1./(1. + tanLambda**2)**0.5)**0.5)")
         # vm.addAlias("absLambda", "abs(atan(tanLambda))")
         mySelection = 'pt>1.0 and abs(dz)<1.0 and dr<0.3'

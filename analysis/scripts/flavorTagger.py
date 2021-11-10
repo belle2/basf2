@@ -699,8 +699,6 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu', categories=None):
         categories = []
 
     for category in categories:
-        particleList = AvailableCategories[category].particleList
-
         methodPrefixEventLevel = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         targetVariable = 'isRightCategory(' + category + ')'
         weightFile = filesDirectory + '/' + methodPrefixEventLevel + "_1.root"

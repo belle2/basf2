@@ -220,6 +220,8 @@ void PXDPerformanceVariablesCollectorModule::collect() // Do your event() stuff 
   collectDeltaIP(); // using ParticleList(m_PList4ResName)
 
   StoreObjPtr<ParticleList> particles(m_PList4GainName);
+  // This list is used to extract info for both gain calibration and efficiency monitoring
+  // as it has the loosest selection and we can reuse the for loop.
   // Do nothing if the list is empty
   if (!particles.isValid() || particles->getListSize() < 1)
     return;
@@ -242,7 +244,7 @@ void PXDPerformanceVariablesCollectorModule::collect() // Do your event() stuff 
 
 
       // Collect info for efficiency study
-      if (m_selected4Eff)
+      if (m_selected4Eff && intersection.inside)
         collectEfficiencyVariables(trackCluster);
 
       // Collect info for gain calibration
@@ -306,11 +308,21 @@ void PXDPerformanceVariablesCollectorModule::collectGainVariables(const TrackClu
   m_estimated = intersection.chargeMPV;
 
   int uBin(-1), vBin(-1);
-  auto binID = getBinID(trackCluster, uBin, vBin, m_useClusterPosition);
+  int binID = 0;
   VxdID sensorID = getVxdIDFromPXDModuleID(cluster.pxdID);
   auto layerNumber = sensorID.getLayerNumber();
   auto ladderNumber = sensorID.getLadderNumber();
   auto sensorNumber = sensorID.getSensorNumber();
+  try {
+    binID = getBinID(trackCluster, uBin, vBin, m_useClusterPosition);
+  } catch (...) {
+    // It happends very rarely (2 track clusters out of all in s-proc3 HLT bhabha skim.)
+    // One could check hit reconstruction bias and the calculation of uBin/vBin in PXDGainCalibrator
+    B2ERROR("On module " << sensorID
+            << ": Failed to get bin ID for the track cluster at (u,v) = (" << cluster.posU << "," << cluster.posV
+            << ") and (uBin, vBin) = (" << uBin << "," << vBin << ").");
+    return;
+  }
 
 // Increment the counter
   getObjectPtr<TH1I>("PXDClusterCounter")->Fill(binID);
@@ -348,6 +360,8 @@ void PXDPerformanceVariablesCollectorModule::collectEfficiencyVariables(const Tr
   auto iSensor = VXD::GeoCache::getInstance().getGeoTools()->getPXDSensorIndex(sensorID);
   auto uBin = PXD::PXDGainCalibrator::getInstance().getBinU(sensorID, uID, vID, m_nBinsU);
   auto vBin = PXD::PXDGainCalibrator::getInstance().getBinV(sensorID, vID, m_nBinsV);
+  if (uBin >= m_nBinsU || vBin >= m_nBinsV)
+    return;
   auto binID = iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin;
 
   // Filling counters

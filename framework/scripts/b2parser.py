@@ -901,7 +901,7 @@ class B2Parser(Parser):
         @param token_generator  generator object which yields tokens.
                                 Produced by the lexer from the cut input.
         """
-        # Set cut attribute needed in case of an error.
+        #: Set cut attribute needed in case of an error.
         self.cut = cut
         return super().parse(token_generator)
 

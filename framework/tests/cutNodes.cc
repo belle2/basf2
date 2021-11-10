@@ -23,9 +23,9 @@ namespace {
 /// Class to mock objects for out variable manager.
   struct MockObjectType {
     /// Stupid singlevalued object.
-    MockObjectType(const double& d) : m_value{d} {}
-    MockObjectType(const int& i) : m_value{i} {}
-    MockObjectType(const bool& b) : m_value{b} {}
+    explicit MockObjectType(const double& d) : m_value{d} {}
+    explicit MockObjectType(const int& i) : m_value{i} {}
+    explicit MockObjectType(const bool& b) : m_value{b} {}
     VarVariant m_value;
   };
 
@@ -42,7 +42,7 @@ namespace {
     {
       return m_function(object);
     }
-    MockVariableType(const std::string& name) : m_name{name}
+    explicit MockVariableType(const std::string& name) : m_name{name}
     {
       m_function = [](const MockObjectType * object) -> VarVariant {
         if (object != nullptr)

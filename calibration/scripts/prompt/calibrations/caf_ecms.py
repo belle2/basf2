@@ -12,7 +12,7 @@
 Airflow script to perform eCMS calibration (combination of the had-B and mumu method).
 """
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_boostvector import settings as boostvector
 from reconstruction import add_pid_module, add_ecl_modules, prepare_cdst_analysis
 
@@ -29,18 +29,18 @@ settings = CalibrationSettings(
     expert_username="zlebcr",
     description=__doc__,
     input_data_formats=["cdst"],
-    input_data_names=["hadron_calib", "mumutight_calib"],
+    input_data_names=["hadron_calib", "mumutight_or_highm_calib"],
     input_data_filters={
         "hadron_calib": [
-            input_data_filters["Data Tag"]["hadron_calib"],
-            input_data_filters["Run Type"]["physics"],
-            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
-            input_data_filters["Magnet"]["On"]],
-        "mumutight_calib": [
-            input_data_filters["Data Tag"]["mumutight_calib"],
-            input_data_filters["Run Type"]["physics"],
-            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
-            input_data_filters["Magnet"]["On"]]
+            INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
+            INPUT_DATA_FILTERS["Run Type"]["physics"],
+            INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Magnet"]["On"]],
+        "mumutight_or_highm_calib": [
+            INPUT_DATA_FILTERS["Data Tag"]["mumutight_or_highm_calib"],
+            INPUT_DATA_FILTERS["Run Type"]["physics"],
+            INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Magnet"]["On"]]
     },
     expert_config={
         "outerLoss": "pow(0.000020e1*rawTime, 2) +  1./nEv",
@@ -257,7 +257,7 @@ def get_calibrations(input_data, **kwargs):
     from caf.framework import Collection
 
     input_files_Had, output_iov_Had = getDataInfo(input_data["hadron_calib"], kwargs)
-    input_files_MuMu, output_iov_MuMu = getDataInfo(input_data["mumutight_calib"], kwargs)
+    input_files_MuMu, output_iov_MuMu = getDataInfo(input_data["mumutight_or_highm_calib"], kwargs)
 
     rec_path_HadB = getHadBpath()
     rec_path_MuMu = getMuMupath()

@@ -21,8 +21,12 @@
 #include <fstream>
 #include <math.h>
 
+#include <cdc/dataobjects/WireID.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+
 using namespace std;
 using namespace Belle2;
+using namespace CDC;
 
 //-----------------------------------------------------------------
 //                 Register module
@@ -56,7 +60,8 @@ void CDCDQMModule::defineHisto()
   m_hADCTOTCut = new TH2F("hADCTOTCut", "hADCTOTCut", 300, 0, 300, 1000, 0, 1000);
   m_hTDC = new TH2F("hTDC", "hTDC", 300, 0, 300, 1000, 4200, 5200);
   m_hHit = new TH2F("hHit", "hHit", 56, 0, 56, 400, 0, 400);
-
+  m_hADCTrack = new TH2F("hADCTrack", "hADCTrack", 300, 0, 300, 1000, 0, 1000);
+  m_hTDCTrack = new TH2F("hTDCTrack", "hTDCTrack", 300, 0, 300, 1000, 4200, 5200);
   oldDir->cd();
 }
 
@@ -66,6 +71,9 @@ void CDCDQMModule::initialize()
   m_cdcHits.isOptional();
   m_cdcRawHits.isOptional();
   m_trgSummary.isOptional();
+  m_Tracks.isRequired();
+  m_RecoTracks.isRequired();
+  m_TrackFitResults.isRequired();
 }
 
 void CDCDQMModule::beginRun()
@@ -77,10 +85,13 @@ void CDCDQMModule::beginRun()
   m_hTDC->Reset();
   m_hHit->Reset();
   m_hOcc->Reset();
+  m_hADCTrack->Reset();
+  m_hTDCTrack->Reset();
 }
 
 void CDCDQMModule::event()
 {
+  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   const int nWires = 14336;
   setReturnValue(1);
   if (!m_trgSummary.isValid() || (m_trgSummary->getTimType() == Belle2::TRGSummary::TTYP_RAND)) {
@@ -94,6 +105,7 @@ void CDCDQMModule::event()
   }
   m_nEvents += 1;
   m_hOcc->Fill(static_cast<float>(m_cdcHits.getEntries()) / nWires);
+
   for (const auto& raw : m_cdcRawHits) {
     int bid = raw.getBoardId();
     int adc = raw.getFADC();
@@ -108,10 +120,49 @@ void CDCDQMModule::event()
       m_hTDC->Fill(bid, tdc);
     }
   }
+
   for (const auto& hit : m_cdcHits) {
     int lay = hit.getICLayer();
     int wire = hit.getIWire();
     m_hHit->Fill(lay, wire);
+  }
+
+  // ADC vs layer 2D histogram with only good track related hits
+  for (const auto& b2track : m_Tracks) {
+    const Belle2::TrackFitResult* fitresult = b2track.getTrackFitResultWithClosestMass(Const::pion);
+    if (!fitresult) {
+      B2WARNING("No track fit result found.");
+      continue;
+    }
+
+    Belle2::RecoTrack* track = b2track.getRelatedTo<Belle2::RecoTrack>(m_recoTrackArrayName);
+    if (!track) {
+      B2WARNING("Can not access RecoTrack of this Belle2::Track");
+      continue;
+    }
+    const genfit::FitStatus* fs = track->getTrackFitStatus();
+    if (!fs) continue;
+    int ndf = fs->getNdf();
+    if (ndf < 20) continue; // require high NDF track
+
+    // Fill histograms of ADC/TDC if hits are associated with track
+    for (const RecoHitInformation::UsedCDCHit* hit : track->getCDCHitList()) {
+      const genfit::TrackPoint* tp = track->getCreatedTrackPoint(track->getRecoHitInformation(hit));
+      if (!tp) continue;
+      UChar_t lay = hit->getICLayer();
+      UShort_t IWire = hit->getIWire();
+      UShort_t adc = hit->getADCCount();
+      unsigned short tdc = hit->getTDCCount();
+      unsigned short tot = hit->getTOT();
+      WireID wireid(lay, IWire);
+      unsigned short bid = cdcgeo.getBoardID(wireid);
+      if (tot > 4) {
+        m_hADCTrack->Fill(bid, adc);
+      }
+      if (adc > 50 && tot > 1) {
+        m_hTDCTrack->Fill(bid, tdc);
+      }
+    }
   }
 }
 

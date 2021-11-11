@@ -143,6 +143,8 @@ namespace Belle2 {
     int m_nbhabhaevt{0}; /**< bhabha events */
     int m_nhadevt{0}; /**< hadron events */
 
+    std::string mmode; /**< monitoring mode all/reduced */
+
     //DQM analysis and Mirabelle
     TCanvas* c_pr_dedx = nullptr; /**< dedx dist+fit */
     TCanvas* c_pr_dedxphi = nullptr; /**< dedx vs phi  */

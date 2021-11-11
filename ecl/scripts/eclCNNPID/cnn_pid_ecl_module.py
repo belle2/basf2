@@ -165,9 +165,9 @@ class CNN_PID_ECL(b2.Module):
         for extHit in extHits:
             if abs(extHit.getPdgCode()) != pdgCode:
                 continue
-            if abs(extHit.getDetectorID()) != myDetID:
+            if extHit.getDetectorID() != myDetID:
                 continue
-            if abs(extHit.getStatus()) != self.Belle2.ExtHitStatus.EXT_EXIT:
+            if extHit.getStatus() != self.Belle2.ExtHitStatus.EXT_EXIT:
                 continue
             if extHit.isBackwardPropagated():
                 continue

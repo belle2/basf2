@@ -45,9 +45,7 @@ def argparser():
         '--beam-bkg-dir',
         type=str,
         default=None,
-        help='Directory that contains beam background files'
-        'If nothing is specified, basf2 will used by default'
-        'BELLE2_BACKGROUND_DIR env variable.')
+        help='Directory that contains beam background files')
 
     return parser
 
@@ -131,7 +129,7 @@ if __name__ == '__main__':
         decayString=name,
         variables=['cnn_pid_ecl_pion', 'cnn_pid_ecl_muon'],
         treename='particles',
-        filename=f'test_chargedStable_particles_cnn_output.root',
+        filename='test_chargedStable_particles_cnn_output.root',
         path=mainPath
     )
 

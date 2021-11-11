@@ -42,11 +42,11 @@ class ClusterImage(Dataset):
 
         self.energy = np.clip(self.energy, 0, 1.0)
 
-        theta_input = params['thetaId'].astype(dtype=np.int64)
+        theta_input = params['thetaId']
         theta_input = LabelEncoder().fit_transform(theta_input.ravel())
         self.theta_input = torch.from_numpy(theta_input)
 
-        phi_input = params['phiId'].astype(dtype=np.int64)
+        phi_input = params['phiId']
         phi_input = LabelEncoder().fit_transform(phi_input.ravel())
         self.phi_input = torch.from_numpy(phi_input)
 

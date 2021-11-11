@@ -249,21 +249,14 @@ void ECLCRFinderModule::event()
   // 'find" in a map is faster if the number of seeds is not too large, can be replaced easily once we know what seed cuts we want.
   // This is weird: if we are running online, we use behaviour that was in place until release-05,
   // otherwise we use the one implemented since release-06
-  // This is fundamental for avoiding a segfault error caused by veeery noisy ECL events.
-  if (m_isOnlineProcessing) { // release-05
-    for (unsigned int pos = 1; pos < m_cellIdToSeedVec.size(); ++pos) {
-      if (m_cellIdToSeedVec[pos] > 0)  {
-        checkNeighbours(pos, m_tempCRId, 0);
-        ++m_tempCRId; // This is just a number, will be replaced by a consecutive number later in this module
-      }
-    }
-  } else { // release-06 and newer versions
-    for (unsigned int pos = 1; pos < m_cellIdToSeedVec.size(); ++pos) {
-      if (m_cellIdToSeedVec[pos] > 0 and m_cellIdToCheckVec[pos] == 0) {
-        m_cellIdToCheckVec[pos] = 1;
-        checkNeighbours(pos, m_tempCRId, 0);
-        ++m_tempCRId; // This is just a number, will be replaced by a consecutive number later in this module
-      }
+  // This is fundamental for avoiding a segfault error caused by veeery noisy ECL events,
+  // but note it is a temporary fix.
+  for (unsigned int pos = 1; pos < m_cellIdToSeedVec.size(); ++pos) {
+    // check for m_isOnlineProcessing is for release-05 behaviour
+    if (m_cellIdToSeedVec[pos] > 0 and (m_cellIdToCheckVec[pos] == 0 or m_isOnlineProcessing)) {
+      if (!m_isOnlineProcessing) m_cellIdToCheckVec[pos] = 1; // release-06 and newer versions
+      checkNeighbours(pos, m_tempCRId, 0);
+      ++m_tempCRId; // This is just a number, will be replaced by a consecutive number later in this module
     }
   }
 
@@ -354,7 +347,8 @@ void ECLCRFinderModule::checkNeighbours(const int cellid, const int tempcrid, co
               m_cellIdToTempCRIdVec[neighbour]);
       // This is weird: if we are running online, we use behaviour that was in place until release-05,
       // otherwise we use the one implemented since release-06
-      // This is fundamental for avoiding a segfault error caused by veeery noisy ECL events.
+      // This is fundamental for avoiding a segfault error caused by veeery noisy ECL events,
+      // but note it is a temporary fix.
       if (m_isOnlineProcessing) { // release-05
         if (m_cellIdToTempCRIdVec[neighbour] == 0) { // found
           checkNeighbours(neighbour, tempcrid, 1);

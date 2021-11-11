@@ -18,7 +18,7 @@ CDCDedxDQMModule::CDCDedxDQMModule(): HistoModule()
 {
   setPropertyFlags(c_ParallelProcessingCertified); // parallel processing
   setDescription("CDC dE/dx DQM plots with bhabha/hadron events.");
-  addParam("mmode", mmode, "default monitoring mode is reduced", std::string("reduced"));
+  addParam("mmode", mmode, "default monitoring mode is basic", std::string("basic"));
 }
 
 //---------------------------------
@@ -53,7 +53,7 @@ void CDCDedxDQMModule::defineHisto()
   hdEdxvsP = new TH2D("hdEdxVsP", ";#it{p}_{CDC} (GeV/c);CDC dE/dx", 400, 0.050, 4.50, 400, 0.35, 20.35);
   hdEdxvsEvt = new TH2D("hdEdxvsEvt", ";Events(M);CDC dE/dx", 300, 0, 300, 200, 0.00, 2.5);
   hdEdxvsCosth = new TH2D("hdEdxvsCosth", ";cos#theta (e^{-}e^{+} tracks);CDC dE/dx", 100, -1.00, 1.00, 250, 0.00, 2.5);
-  if (mmode != "reduced") {
+  if (mmode != "basic") {
     hdEdxvsPhi = new TH2D("hdEdxvsPhi", ";#phi (e^{-}e^{+} tracks);CDC dE/dx", 100, -3.20, 3.20, 250, 0.00, 2.5);
     hWires = new TH2F("hWires", "All Wires;", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
     hWires->GetXaxis()->SetTitle("CDC-wire map: counter-clockwise and start from +x");
@@ -94,7 +94,7 @@ void CDCDedxDQMModule::beginRun()
   hdEdxvsP->Reset();
   hdEdxvsCosth->Reset();
   hdEdxvsEvt->Reset();
-  if (mmode != "reduced") {
+  if (mmode != "basic") {
     hdEdxvsPhi->Reset();
     hWires->Reset();
     hWireStatus->Reset();
@@ -192,7 +192,7 @@ void CDCDedxDQMModule::event()
       double phi = fitResult->getMomentum().Phi();
       hdEdxvsCosth->Fill(costh, dedxnosat);
 
-      if (mmode != "reduced" && hdEdxvsPhi->Integral() <= 75000)hdEdxvsPhi->Fill(phi, dedxnosat);
+      if (mmode != "basic" && hdEdxvsPhi->Integral() <= 75000)hdEdxvsPhi->Fill(phi, dedxnosat);
 
       if (m_event >= 150e6)m_event = 150e6 - 100;
       m_event = int(m_event / 5e5);
@@ -202,7 +202,7 @@ void CDCDedxDQMModule::event()
 
     if (IsHadronEvt && hdEdxvsP->Integral() <= 75000)hdEdxvsP->Fill(pCDC, dedx);
 
-    if (mmode != "reduced") {
+    if (mmode != "basic") {
       for (int ihit = 0; ihit < dedxTrack->size(); ++ihit) {
         int iwire = dedxTrack->getWire(ihit);
         double iadc = dedxTrack->getADCCount(ihit);
@@ -230,7 +230,7 @@ void CDCDedxDQMModule::endRun()
   }
 
   //get dead wire pattern
-  if (mmode != "reduced") {
+  if (mmode != "basic") {
     Int_t nbadwires = 0;
     for (int iwire = 0; iwire < 14336; ++iwire) {
       int nwire = getIndexVal(iwire, "nwirelayer");

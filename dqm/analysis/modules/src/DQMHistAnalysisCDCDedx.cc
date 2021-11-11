@@ -20,7 +20,7 @@ DQMHistAnalysisCDCDedxModule::DQMHistAnalysisCDCDedxModule()
 {
   //Parameter definition here
   B2DEBUG(20, "DQMHistAnalysisCDCDedx: Constructor done.");
-  addParam("mmode", mmode, "default monitoring mode is reduced", std::string("reduced"));
+  addParam("mmode", mmode, "default monitoring mode is basic", std::string("basic"));
 }
 
 //--------------------------------------------------------------
@@ -49,7 +49,7 @@ void DQMHistAnalysisCDCDedxModule::initialize()
   c_ir_mean = new TCanvas("CDCDedx/c_ir_mean", "", 700, 500);
   c_ir_reso = new TCanvas("CDCDedx/c_ir_reso", "", 700, 500);
 
-  if (mmode != "reduced") {
+  if (mmode != "basic") {
     c_pr_dedxphi = new TCanvas("CDCDedx/c_pr_dedxphi", "", 700, 500);
     c_pr_wires = new TCanvas("CDCDedx/c_pr_wires", "", 700, 700);
     c_ir_dedx = new TCanvas("CDCDedx/c_ir_dedx", "", 700, 500);
@@ -69,7 +69,7 @@ void DQMHistAnalysisCDCDedxModule::initialize()
   m_monObj->addCanvas(c_pr_dedxcos);
   m_monObj->addCanvas(c_ir_mean);
   m_monObj->addCanvas(c_ir_reso);
-  if (mmode != "reduced") {
+  if (mmode != "basic") {
     m_monObj->addCanvas(c_pr_wires);
     m_monObj->addCanvas(c_pr_dedxphi);
     m_monObj->addCanvas(c_ir_dedx);
@@ -101,7 +101,7 @@ void DQMHistAnalysisCDCDedxModule::event()
   drawDedxIR();
 
   //Plot 3 wire status
-  if (mmode != "reduced")drawWireStatus();
+  if (mmode != "basic")drawWireStatus();
 
   //Plot 4  dE/dx bands vs p
   drawBandPlot();
@@ -128,7 +128,7 @@ void DQMHistAnalysisCDCDedxModule::terminate()
   delete c_pr_bands;
   delete c_ir_mean;
   delete c_ir_reso;
-  if (mmode != "reduced") {
+  if (mmode != "basic") {
     delete c_pr_dedxphi;
     delete c_pr_wires;
     delete c_ir_dedx;
@@ -243,7 +243,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedx()
 void DQMHistAnalysisCDCDedxModule::drawDedxIR()
 {
 
-  if (mmode != "reduced") {
+  if (mmode != "basic") {
     //1. Draw Scattered plot
     c_ir_dedx->Clear();
     c_ir_dedx->cd();
@@ -458,7 +458,7 @@ void DQMHistAnalysisCDCDedxModule::drawBandPlot()
 void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
 {
 
-  if (mmode != "reduced") {
+  if (mmode != "basic") {
     c_pr_dedxphi->Clear();
     c_pr_dedxphi->cd();
     set_Pad_Style(0.143, 0.045, 0.077, 0.0);

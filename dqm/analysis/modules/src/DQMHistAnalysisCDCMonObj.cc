@@ -51,7 +51,7 @@ DQMHistAnalysisCDCMonObjModule::DQMHistAnalysisCDCMonObjModule()
   setPropertyFlags(c_ParallelProcessingCertified);
   for (int i = 0; i < 300; i++) {
     m_hADCs[i] = nullptr;
-    m_hADCTOTCuts[i] = nullptr;
+    m_hADCTracks[i] = nullptr;
     m_hTDCs[i] = nullptr;
   }
   for (int i = 0; i < 56; i++) m_hHits[i] = nullptr;
@@ -208,7 +208,8 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   B2DEBUG(20, "end run");
   m_hfastTDC = (TH1F*)findHist("CDC/fast_tdc");
   m_hADC = (TH2F*)findHist("CDC/hADC");
-  m_hADCTOTCut = (TH2F*)findHist("CDC/hADCTOTCut");
+  //  m_hADCTrack = (TH2F*)findHist("CDC/hADCTOTCut");
+  m_hADCTrack = (TH2F*)findHist("CDC/hADCTrack");
   m_hTDC = (TH2F*)findHist("CDC/hTDC");
   m_hHit = (TH2F*)findHist("CDC/hHit");
   TF1* fitFunc[300] = {};
@@ -232,8 +233,8 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
 
   std::vector<float> means = {};
   for (int i = 0; i < 300; ++i) {
-    m_hADCTOTCuts[i] = m_hADCTOTCut->ProjectionY(Form("hADCTOTCut%d", i), i + 1, i + 1, "");
-    m_hADCTOTCuts[i]->SetTitle(Form("hADCTOTCut%d", i));
+    m_hADCTracks[i] = m_hADCTrack->ProjectionY(Form("hADCTOTCut%d", i), i + 1, i + 1, "");
+    m_hADCTracks[i]->SetTitle(Form("hADCTOTCut%d", i));
     m_hADCs[i] = m_hADC->ProjectionY(Form("hADC%d", i), i + 1, i + 1, "");
     m_hADCs[i]->SetTitle(Form("hADC%d", i));
     float n = static_cast<float>(m_hADCs[i]->GetEntries());
@@ -396,11 +397,11 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
 
   for (int i = 0; i < 300; i++) {
     m_cADC->cd(i + 1);
-    m_hADCTOTCuts[i]->SetFillColor(42);
-    Double_t max = m_hADCTOTCuts[i]->GetMaximum();
+    m_hADCTracks[i]->SetFillColor(42);
+    Double_t max = m_hADCTracks[i]->GetMaximum();
     m_hADCs[i]->GetYaxis()->SetRangeUser(0, 3 * max);
     m_hADCs[i]->Draw("hist");
-    m_hADCTOTCuts[i]->Draw("hist same");
+    m_hADCTracks[i]->Draw("hist same");
 
     m_cTDC->cd(i + 1);
     m_hTDCs[i]->Draw("hist");

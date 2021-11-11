@@ -20,6 +20,7 @@ DQMHistAnalysisCDCDedxModule::DQMHistAnalysisCDCDedxModule()
 {
   //Parameter definition here
   B2DEBUG(20, "DQMHistAnalysisCDCDedx: Constructor done.");
+  addParam("mmode", mmode, "default monitoring mode is reduced", std::string("reduced"));
 }
 
 //--------------------------------------------------------------
@@ -39,17 +40,20 @@ void DQMHistAnalysisCDCDedxModule::initialize()
 
   //per run canvas
   c_pr_dedx = new TCanvas("CDCDedx/c_CDCdedxMean", "", 700, 600);
-  c_pr_wires = new TCanvas("CDCDedx/c_pr_wires", "", 700, 700);
 
   //2D plots
   c_pr_bands =  new TCanvas("CDCDedx/c_pr_bands", "", 700, 600);
-  c_pr_dedxphi = new TCanvas("CDCDedx/c_pr_dedxphi", "", 700, 500);
   c_pr_dedxcos = new TCanvas("CDCDedx/c_pr_dedxcos", "", 700, 500);
 
-  //intra-run cavnas
-  c_ir_dedx = new TCanvas("CDCDedx/c_ir_dedx", "", 700, 500);
+  //intra-run cavnas 1D
   c_ir_mean = new TCanvas("CDCDedx/c_ir_mean", "", 700, 500);
   c_ir_reso = new TCanvas("CDCDedx/c_ir_reso", "", 700, 500);
+
+  if (mmode != "reduced") {
+    c_pr_dedxphi = new TCanvas("CDCDedx/c_pr_dedxphi", "", 700, 500);
+    c_pr_wires = new TCanvas("CDCDedx/c_pr_wires", "", 700, 700);
+    c_ir_dedx = new TCanvas("CDCDedx/c_ir_dedx", "", 700, 500);
+  }
 
   f_gaus = new TF1("f_gaus", "gaus", 0.0, 2.5);
   f_gaus->SetLineColor(kRed);
@@ -61,13 +65,15 @@ void DQMHistAnalysisCDCDedxModule::initialize()
   //Monitoring object for run dependency at mirabelle
   m_monObj = getMonitoringObject("cdcdedx");
   m_monObj->addCanvas(c_pr_dedx);
-  m_monObj->addCanvas(c_pr_wires);
   m_monObj->addCanvas(c_pr_bands);
-  m_monObj->addCanvas(c_pr_dedxphi);
   m_monObj->addCanvas(c_pr_dedxcos);
-  m_monObj->addCanvas(c_ir_dedx);
   m_monObj->addCanvas(c_ir_mean);
   m_monObj->addCanvas(c_ir_reso);
+  if (mmode != "reduced") {
+    m_monObj->addCanvas(c_pr_wires);
+    m_monObj->addCanvas(c_pr_dedxphi);
+    m_monObj->addCanvas(c_ir_dedx);
+  }
 
 }
 
@@ -95,7 +101,7 @@ void DQMHistAnalysisCDCDedxModule::event()
   drawDedxIR();
 
   //Plot 3 wire status
-  drawWireStatus();
+  if (mmode != "reduced")drawWireStatus();
 
   //Plot 4  dE/dx bands vs p
   drawBandPlot();
@@ -118,13 +124,15 @@ void DQMHistAnalysisCDCDedxModule::terminate()
   B2DEBUG(20, "DQMHistAnalysisCDCDedx : terminate called");
 
   delete c_pr_dedx;
-  delete c_pr_dedxphi;
   delete c_pr_dedxcos;
   delete c_pr_bands;
-  delete c_pr_wires;
-  delete c_ir_dedx;
   delete c_ir_mean;
   delete c_ir_reso;
+  if (mmode != "reduced") {
+    delete c_pr_dedxphi;
+    delete c_pr_wires;
+    delete c_ir_dedx;
+  }
 
 }
 
@@ -235,29 +243,34 @@ void DQMHistAnalysisCDCDedxModule::drawDedx()
 void DQMHistAnalysisCDCDedxModule::drawDedxIR()
 {
 
-  //1. Draw Scattered plot
-  c_ir_dedx->Clear();
-  c_ir_dedx->cd();
-  set_Pad_Style(0.143, 0.045, 0.077, 0.0);
+  if (mmode != "reduced") {
+    //1. Draw Scattered plot
+    c_ir_dedx->Clear();
+    c_ir_dedx->cd();
+    set_Pad_Style(0.143, 0.045, 0.077, 0.0);
 
-  TH2D* hdEdxIRScat = (TH2D*)findHist("CDCDedx/hdEdxvsEvt");
-  set_Hist_Style(hdEdxIRScat);
-  hdEdxIRScat->Draw("");
-  TPaveText* pinfo = new TPaveText(0.689, 0.690, 0.942, 0.911, "brNDC");
-  set_Text_Style(pinfo);
-  pinfo->AddText("CDC-dE/dx Intra-run");
-  pinfo->AddText("Electrons (e^{+}e^{-})");
-  pinfo->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
-  if (m_nbhabhaevt > 1e5)
-    pinfo->AddText(Form("Events: %0.02fM", double(m_nbhabhaevt / 1e6)));
-  if (m_nbhabhaevt > 1e3)
-    pinfo->AddText(Form("Events: %0.02fK", double(m_nbhabhaevt / 1e3)));
-  else
-    pinfo->AddText(Form("Events: %d", m_nbhabhaevt));
-  pinfo->Draw("same");
+    TH2D* hdEdxIRScat = (TH2D*)findHist("CDCDedx/hdEdxvsEvt");
+    if (hdEdxIRScat->GetEntries() > 0) {
+      hdEdxIRScat->GetXaxis()->SetRange(hdEdxIRScat->FindFirstBinAbove(0, 1), hdEdxIRScat->FindLastBinAbove(0, 1));
+    }
+    set_Hist_Style(hdEdxIRScat);
+    hdEdxIRScat->Draw("");
+    TPaveText* pinfo = new TPaveText(0.689, 0.690, 0.942, 0.911, "brNDC");
+    set_Text_Style(pinfo);
+    pinfo->AddText("CDC-dE/dx Intra-run");
+    pinfo->AddText("Electrons (e^{+}e^{-})");
+    pinfo->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
+    if (m_nbhabhaevt > 1e5)
+      pinfo->AddText(Form("Events: %0.02fM", double(m_nbhabhaevt / 1e6)));
+    if (m_nbhabhaevt > 1e3)
+      pinfo->AddText(Form("Events: %0.02fK", double(m_nbhabhaevt / 1e3)));
+    else
+      pinfo->AddText(Form("Events: %d", m_nbhabhaevt));
+    pinfo->Draw("same");
 
-  c_ir_dedx->Modified();
-  c_ir_dedx->Update();
+    c_ir_dedx->Modified();
+    c_ir_dedx->Update();
+  }
 
 
   //Intra rungain/reso variation
@@ -422,7 +435,7 @@ void DQMHistAnalysisCDCDedxModule::drawBandPlot()
 
   set_Hist_Style(hdEdxVsP);
   hdEdxVsP->SetTitle("CDC-dEdx band plots");
-  hdEdxVsP->Draw("col");
+  hdEdxVsP->Draw("scat");
 
   TPaveText* pinfo0 = new TPaveText(0.59, 0.75, 0.80, 0.88, "brNDC");
   set_Text_Style(pinfo0);
@@ -445,29 +458,33 @@ void DQMHistAnalysisCDCDedxModule::drawBandPlot()
 void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
 {
 
-  c_pr_dedxphi->Clear();
-  c_pr_dedxphi->cd();
-  set_Pad_Style(0.143, 0.045, 0.077, 0.0);
+  if (mmode != "reduced") {
+    c_pr_dedxphi->Clear();
+    c_pr_dedxphi->cd();
+    set_Pad_Style(0.143, 0.045, 0.077, 0.0);
 
-  TH2D* hdEdxvsPhi = (TH2D*)findHist("CDCDedx/hdEdxvsPhi");
-  set_Hist_Style(hdEdxvsPhi);
-  hdEdxvsPhi->SetTitle("CDC-dEdx vs Phi");
-  hdEdxvsPhi->Draw("col");
+    TH2D* hdEdxvsPhi = (TH2D*)findHist("CDCDedx/hdEdxvsPhi");
+    set_Hist_Style(hdEdxvsPhi);
+    hdEdxvsPhi->SetTitle("CDC-dEdx vs Phi");
+    hdEdxvsPhi->Draw("scat");
 
-  TPaveText* pinfo0 = new TPaveText(0.689, 0.751, 0.942, 0.89, "brNDC");
-  set_Text_Style(pinfo0);
-  pinfo0->AddText(Form("Electrons (e^{+}e^{-})"));
-  pinfo0->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
-  if (m_nbhabhaevt > 1e5)
-    pinfo0->AddText(Form("Events: %0.02fM", double(m_nbhabhaevt / 1e6)));
-  if (m_nbhabhaevt > 1e3)
-    pinfo0->AddText(Form("Events: %0.02fK", double(m_nbhabhaevt / 1e3)));
-  else
-    pinfo0->AddText(Form("Events: %d", m_nbhabhaevt));
-  pinfo0->DrawClone("same");
+    l_line->DrawLine(-3.20, 1.0, 3.20, 1.0);
 
-  c_pr_dedxphi->Modified();
-  c_pr_dedxphi->Update();
+    TPaveText* pinfo0 = new TPaveText(0.689, 0.751, 0.942, 0.89, "brNDC");
+    set_Text_Style(pinfo0);
+    pinfo0->AddText(Form("Electrons (e^{+}e^{-})"));
+    pinfo0->AddText(Form("Exp/Run: %d/%d", m_exp, m_run));
+    if (m_nbhabhaevt > 1e5)
+      pinfo0->AddText(Form("Events: %0.02fM", double(m_nbhabhaevt / 1e6)));
+    if (m_nbhabhaevt > 1e3)
+      pinfo0->AddText(Form("Events: %0.02fK", double(m_nbhabhaevt / 1e3)));
+    else
+      pinfo0->AddText(Form("Events: %d", m_nbhabhaevt));
+    pinfo0->DrawClone("same");
+
+    c_pr_dedxphi->Modified();
+    c_pr_dedxphi->Update();
+  }
 
   //plot # 2
   c_pr_dedxcos->Clear();
@@ -477,7 +494,9 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
   TH2D* hdEdxvsCosth = (TH2D*)findHist("CDCDedx/hdEdxvsCosth");
   set_Hist_Style(hdEdxvsCosth);
   hdEdxvsCosth->SetTitle("CDC-dEdx vs Costh");
-  hdEdxvsCosth->Draw("col");
+  hdEdxvsCosth->Draw("scat");
+
+  l_line->DrawLine(-1.0, 1.0, 1.0, 1.0);
 
   TPaveText* pinfo1 = new TPaveText(0.689, 0.751, 0.942, 0.89, "brNDC");
   set_Text_Style(pinfo1);

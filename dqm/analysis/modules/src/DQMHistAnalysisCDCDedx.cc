@@ -70,9 +70,9 @@ void DQMHistAnalysisCDCDedxModule::initialize()
   m_monObj->addCanvas(c_pr_dedxcos);
   m_monObj->addCanvas(c_ir_mean);
   m_monObj->addCanvas(c_ir_reso);
+  m_monObj->addCanvas(c_pr_dedxphi);
   if (mmode != "basic") {
     m_monObj->addCanvas(c_pr_wires);
-    m_monObj->addCanvas(c_pr_dedxphi);
     m_monObj->addCanvas(c_ir_dedx);
   }
 
@@ -129,8 +129,8 @@ void DQMHistAnalysisCDCDedxModule::terminate()
   delete c_pr_bands;
   delete c_ir_mean;
   delete c_ir_reso;
+  delete c_pr_dedxphi;
   if (mmode != "basic") {
-    delete c_pr_dedxphi;
     delete c_pr_wires;
     delete c_ir_dedx;
   }
@@ -475,7 +475,6 @@ void DQMHistAnalysisCDCDedxModule::drawBandPlot()
 void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
 {
 
-  // if (mmode != "basic") {
   TH2D* hdEdxvsPhi = (TH2D*)findHist("CDCDedx/hdEdxvsPhi");
   if (hdEdxvsPhi != nullptr) {
     c_pr_dedxphi->Clear();
@@ -503,7 +502,6 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
     c_pr_dedxphi->Modified();
     c_pr_dedxphi->Update();
   }
-  // }
 
   //plot # 2
   TH2D* hdEdxvsCosth = (TH2D*)findHist("CDCDedx/hdEdxvsCosth");

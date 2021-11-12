@@ -1,5 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework', 'analysis', 'analysis_dataobjects', 'analysis_dbobjects', 'analysis_DecayDescriptor', '$ROOT_LIBS']
-
-Return('env')

@@ -21,7 +21,8 @@ import sys as _sys
 _is_ipython = hasattr(__builtins__, '__IPYTHON__') or 'IPython' in _sys.modules
 if _is_ipython:
     from IPython import get_ipython as _get_ipython
+    # check if we're in a notebook
     if hasattr(_get_ipython(), "kernel"):
-        # we're in a notebook
+        # import dedicated process function to override core version for notebooks
         from basf2._notebooksupport import enable_notebooksupport, process  # noqa
         enable_notebooksupport()

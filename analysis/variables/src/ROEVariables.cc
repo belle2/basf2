@@ -231,7 +231,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROETracks");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROETracks");
 
       auto func = [maskName](const Particle * particle) -> int {
         return nRemainingTracksInROE(particle, maskName);
@@ -389,7 +389,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROETracks");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROETracks");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -450,7 +450,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROETracks");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROETracks");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -477,7 +477,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROEECLClusters");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROEECLClusters");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -504,7 +504,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROENeutralECLClusters");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROENeutralECLClusters");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -530,7 +530,7 @@ namespace Belle2 {
         maskName = arguments[0];
       }
       if (arguments.size() > 1) {
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROE_Photons");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROE_Photons");
       }
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -564,7 +564,7 @@ namespace Belle2 {
         maskName = arguments[0];
       }
       if (arguments.size() > 1) {
-        B2FATAL("Wrong number of arguments (1 optional only) for meta function nROE_NeutralHadrons");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROE_NeutralHadrons");
       }
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -625,7 +625,7 @@ namespace Belle2 {
         maskName = arguments[0];
       }
       if (arguments.size() > 1) {
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROE_Composites");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function nROE_Composites");
       }
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -664,7 +664,7 @@ namespace Belle2 {
         pListName = arguments[0];
         maskName = arguments[1];
       } else
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROE_ParticlesInList");
+        B2FATAL("Wrong number of arguments (1 or 2 required) for meta function nROE_ParticlesInList");
 
       auto func = [pListName, maskName](const Particle * particle) -> double {
 
@@ -705,7 +705,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROECharge");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROECharge");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -741,7 +741,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function extraEnergy");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function extraEnergy");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -784,7 +784,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function extraEnergy");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function extraEnergy");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -817,7 +817,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_E");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_E");
       auto func = [maskName](const Particle * particle) -> double {
         const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
         if (!roe)
@@ -841,7 +841,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_M");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_M");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -868,7 +868,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_P");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_P");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -897,7 +897,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Px");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_Px");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -926,7 +926,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Py");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_Py");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -955,7 +955,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Pt");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_Pt");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -984,7 +984,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_Pz");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_Pz");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1013,7 +1013,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_PTheta");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_PTheta");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1042,7 +1042,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_deltae");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_deltae");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1071,7 +1071,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function ROE_mbc");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_mbc");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1105,7 +1105,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function bssMassDifference");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function bssMassDifference");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1443,7 +1443,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function xiZ");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function xiZ");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1491,7 +1491,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function WE_MissM2OverMissE");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function WE_MissM2OverMissE");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1650,7 +1650,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function cosThetaEll");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function cosThetaEll");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1696,7 +1696,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function passesROEMask");
+        B2FATAL("At most 1 argument (name of mask) accepted for meta function passesROEMask");
 
       auto func = [maskName](const Particle * particle) -> double {
 

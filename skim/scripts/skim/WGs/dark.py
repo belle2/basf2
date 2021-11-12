@@ -15,7 +15,7 @@ import basf2 as b2
 import modularAnalysis as ma
 import pdg
 from skim import BaseSkim, fancy_skim_header
-from stdCharged import stdE, stdMu
+from stdCharged import stdE, stdMu, stdPi, stdK
 from stdPhotons import stdPhotons
 import vertex as vertex
 
@@ -575,3 +575,46 @@ class InelasticDarkMatter(BaseSkim):
         path = self.skim_event_cuts(idmEventCuts, path=path)
 
         return ['gamma:ISR']
+
+
+@fancy_skim_header
+class BtoKplusLLP(BaseSkim):
+    """
+    **Physics channel**: :math:`e^{+}e^{-} \\to \\Upsilon(4s) \\to [B^{+} \\to K^{+} LLP]B^{-} `
+    Skim to select B+ decays to a K+ from the IP and a LLP with a vertex displaced from the IR decaying to two charged tracks.
+    """
+    __authors__ = ["Sascha Dreyer"]
+    __contact__ = __liaison__
+    __description__ = "B+ to K+ LLP analysis"
+    __category__ = "physics, dark sector"
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdK("all", path=path)
+
+    def build_lists(self, path):
+
+        btoksLbl = '_btoks'
+
+        minDisplacementCut = "[dr > 0.05]"
+
+        ma.reconstructDecay("vpho:LLP_pi" + btoksLbl + " -> pi+:all pi-:all", "", path=path)
+        vertex.treeFit("vpho:LLP_pi" + btoksLbl, conf_level=0, updateAllDaughters=True, path=path)
+
+        ma.reconstructDecay("vpho:LLP_K" + btoksLbl + " -> K+:all K-:all", "", path=path)
+        vertex.treeFit("vpho:LLP_K" + btoksLbl, conf_level=0, updateAllDaughters=True, path=path)
+
+        ma.copyLists(outputListName="vpho:LLP" + btoksLbl,
+                     inputListNames=["vpho:LLP_pi" + btoksLbl, "vpho:LLP_K" + btoksLbl],
+                     path=path)
+
+        ma.applyCuts("vpho:LLP" + btoksLbl, minDisplacementCut, path=path)
+
+        ipKaon = "[pt > 0.1] and [abs(dr) < 0.5] and [abs(dz) < 2.0]"
+        ma.cutAndCopyList("K+:TrackFromIP" + btoksLbl, "K+:all", ipKaon, path=path)
+
+        kinematicCuts = "[Mbc > 5.20] and [abs(deltaE) < 0.25]"
+        ma.reconstructDecay("B+:b" + btoksLbl + " -> K+:TrackFromIP" + btoksLbl + " vpho:LLP" + btoksLbl,
+                            kinematicCuts, path=path)
+
+        return ["B+:b" + btoksLbl]

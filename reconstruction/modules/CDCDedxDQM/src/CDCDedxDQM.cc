@@ -50,11 +50,11 @@ void CDCDedxDQMModule::defineHisto()
   hMeta->GetXaxis()->SetBinLabel(3, "nhadron");
 
   hdEdx = new TH1D("hdEdx", ";CDC dE/dx;Entries", 250, 0., 2.5);
-  hdEdxvsP = new TH2D("hdEdxVsP", ";#it{p}_{CDC} (GeV/c);CDC dE/dx", 400, 0.050, 4.50, 400, 0.35, 20.35);
+  hdEdxvsP = new TH2D("hdEdxVsP", ";#it{p}_{CDC} (GeV/c);CDC dE/dx", 400, 0.050, 4.50, 800, 0.35, 20.35);
   hdEdxvsEvt = new TH2D("hdEdxvsEvt", ";Events(M);CDC dE/dx", 300, 0, 300, 200, 0.00, 2.5);
   hdEdxvsCosth = new TH2D("hdEdxvsCosth", ";cos#theta (e^{-}e^{+} tracks);CDC dE/dx", 100, -1.00, 1.00, 250, 0.00, 2.5);
+  hdEdxvsPhi = new TH2D("hdEdxvsPhi", ";#phi (e^{-}e^{+} tracks);CDC dE/dx", 100, -3.20, 3.20, 250, 0.00, 2.5);
   if (mmode != "basic") {
-    hdEdxvsPhi = new TH2D("hdEdxvsPhi", ";#phi (e^{-}e^{+} tracks);CDC dE/dx", 100, -3.20, 3.20, 250, 0.00, 2.5);
     hWires = new TH2F("hWires", "All Wires;", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
     hWires->GetXaxis()->SetTitle("CDC-wire map: counter-clockwise and start from +x");
     hWireStatus = new TH2F("hWireStatus", "Wire Status", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
@@ -93,9 +93,9 @@ void CDCDedxDQMModule::beginRun()
   hdEdx->Reset();
   hdEdxvsP->Reset();
   hdEdxvsCosth->Reset();
+  hdEdxvsPhi->Reset();
   hdEdxvsEvt->Reset();
   if (mmode != "basic") {
-    hdEdxvsPhi->Reset();
     hWires->Reset();
     hWireStatus->Reset();
   }
@@ -190,9 +190,8 @@ void CDCDedxDQMModule::event()
 
       hdEdx->Fill(dedxnosat);
       double phi = fitResult->getMomentum().Phi();
-      hdEdxvsCosth->Fill(costh, dedxnosat);
-
-      if (mmode != "basic" && hdEdxvsPhi->Integral() <= 75000)hdEdxvsPhi->Fill(phi, dedxnosat);
+      if (hdEdxvsCosth->Integral() <= 80000)hdEdxvsCosth->Fill(costh, dedxnosat);
+      if (hdEdxvsPhi->Integral() <= 80000)hdEdxvsPhi->Fill(phi, dedxnosat);
 
       if (m_event >= 150e6)m_event = 150e6 - 100;
       m_event = int(m_event / 5e5);
@@ -200,7 +199,7 @@ void CDCDedxDQMModule::event()
 
     }
 
-    if (IsHadronEvt && hdEdxvsP->Integral() <= 75000)hdEdxvsP->Fill(pCDC, dedx);
+    if (IsHadronEvt && hdEdxvsP->Integral() <= 80000)hdEdxvsP->Fill(pCDC, dedx);
 
     if (mmode != "basic") {
       for (int ihit = 0; ihit < dedxTrack->size(); ++ihit) {

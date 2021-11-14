@@ -274,9 +274,9 @@ void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
   factory.yTitleDefault("Arb. Units");
 
   m_Z0 =        factory.xAxis(Z0).CreateTH1F("HelixZ0", "z0, the z coordinate of the perigee");
-  m_D0 =        factory.xAxis(D0).CreateTH1F("HelixD0", "d0, the signed distance to (0,0) in the r-phi plane");
+  m_D0 =        factory.xAxis(D0).CreateTH1F("HelixD0", "d0, the signed distance of the perigee in the r-phi plane");
   m_Phi =       factory.xAxis(phi).CreateTH1F("HelixPhi",
-                                              "Phi, angle of the transverse momentum in the r-phi plane");
+                                              "Phi0, momentum azymuthal angle at the perigee");
   m_Omega =     factory.xAxis(omega).CreateTH1F("HelixOmega",
                                                 "Omega, the curvature of the track, sign defined by the charge of the particle");
   m_TanLambda = factory.xAxis(tanLambda).CreateTH1F("HelixTanLambda", "TanLambda, the slope of the track in the r-z plane");
@@ -285,9 +285,9 @@ void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
   factory.zTitleDefault("Arb. Units");
 
   m_PhiD0 = factory.xAxis(phi).yAxis(D0_2d).CreateTH2F("Helix2dPhiD0",
-                                                       "d0 vs Phi the signed distance to the IP in the r-phi plane vs. phi");
+                                                       "d0 vs Phi0, the signed distance of the perigee in the r-phi plane vs. momentum azymuthal angle at the perigee");
   m_D0Z0 =  factory.xAxis(D0_2d).yAxis(Z0_2d).CreateTH2F("Helix2dD0Z0",
-                                                         "z0 vs d0 - signed distance to the (0,0,0) in r-phi vs. z0 of the perigee");
+                                                         "z0 vs d0, z0 of the perigee vs the signed distance of the perigee in r-phi");
 
 }
 

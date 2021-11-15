@@ -78,8 +78,7 @@ void PXDDQMEfficiencyModule::initialize()
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
   int sensor_index = 0;
   for (VxdID& avxdid : sensors) {
-    auto sensor_index = revLUT[avxdid] = i;
-    sensor_index++;
+    revLUT[avxdid] = sensor_index++;
   }
 }
 

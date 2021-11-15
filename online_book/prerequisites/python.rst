@@ -412,15 +412,27 @@ This code imports the ``pandas_tutorial_ntuple.root`` root file as a dataframe `
   :class: toggle
 
   ``root_pandas`` needs ROOT to be installed but there is an alternative called
-  `uproot <https://github.com/scikit-hep/uproot>`_ which can load root files into
+  `uproot <https://github.com/scikit-hep/uproot4>`_ which can load root files into
   pandas dataframes without requiring ROOT. This means it's a bit simpler to
   install on your personal machine.
 
-  With ``uproot``, line 2 of the above snippet becomes
+  With ``uproot`` version 4 or above, line 2 of the above snippet becomes
+
+  .. code-block::
+
+    df = uproot.open(file_path)["b0phiKs"].arrays(library="pd")
+
+  Here, ``b0phiKs`` is the branch name of the file that contains the data
+  (``root_pandas``) guessed it for us automatically, in ``uproot`` we need to
+  specify it explicitly.
+
+  With ``uproot`` version 3 or below, line 2 of the snippet reads
 
   .. code-block::
 
     df = uproot.open(file_path)["b0phiKs"].pandas.df()
+
+  but we definitely recommend you to update to ``uproot4``.
 
 Investigating your DataFrame
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

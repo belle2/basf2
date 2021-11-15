@@ -257,24 +257,9 @@ namespace Belle2 {
                 hDeltaE->Fill(ev.deltaE);
                 hMD->Fill(ev.mD);
                 hMB->Fill(m - mB);
-                /*
-                hP->Fill(p);
-                hBeta->Fill(p / E * 5.29422);
-                hMbc->Fill(ev.mBC);
-                cout << cmsE0/2 << endl;
-
-                hDeltaM->Fill(m - mB);
-                hEnow->Fill(sqrt(p*p + pow(mB,2)));
-
-                hMD->Fill(ev.mD);
-                hMDstar->Fill(ev.dmDstar);
-                */
-                //cout << E <<" " << p << endl;
               }
       }
 
-      //hMD->Draw();
-      //hMB->Draw();
 
 
       RooCategory Bcharge("sample", "sample") ;
@@ -303,9 +288,6 @@ namespace Belle2 {
       vector<RooGaussian*> gauss(limits.size());
 
 
-      //RooRealVar ref0("ref0", "", 0.000);
-      //RooRealVar one("one", "", 1);
-      //RooPolyVar sigmeanNow("sigmeanNow","shape parameter", sigmean, RooArgSet(ref0, one));
 
       for (unsigned i = 0; i < limits.size(); ++i) {
         sigmean[i] = new RooRealVar(Form("Mean_%u", i), "B^{#pm} mass", 5.29, 5.27, 5.30) ;
@@ -358,22 +340,6 @@ namespace Belle2 {
         sumBp[i] = new RooAddPdf(Form("sumBp_%u", i), "gP+aP", RooArgList(*gauss[i], argusBp), RooArgList(*nsigBp[i], *nbkgBp[i]));
 
       }
-
-
-      //RooRealVar nsigB0("nsigB0","#signal events",100,0.,100000);
-      //RooRealVar nbkgB0("nbkgB0","#background events",100,0.,500000);
-
-      //RooRealVar nsigBp("nsigBp","#signal events",100,0.,100000);
-      //RooRealVar nbkgBp("nbkgBp","#background events",100,0.,500000);
-
-
-      //RooRealVar nsig("nsig","#signal events",100,0.,100000) ;
-      //RooRealVar nbkg("nbkg","#background events",100,0.,500000) ;
-
-
-
-      //RooAddPdf sumB0("sumB0","g0+a0",RooArgList(gauss,argusB0),RooArgList(nsigB0,nbkgB0)) ;
-      //RooAddPdf sumBp("sumBp","gP+aP",RooArgList(gauss,argusBp),RooArgList(nsigBp,nbkgBp)) ;
 
 
       // Construct a simultaneous pdf using category sample as index
@@ -439,20 +405,16 @@ namespace Belle2 {
 
       vector<vector<double>> result(limits.size());
 
-      ofstream hadBtextOut("hadBcalib.txt", ios::app);
 
       for (unsigned i = 0; i < limits.size(); ++i) {
         string n  = Form("sigmean_%u", i);
         string np = Form("pull_%u", i);
 
-        hadBtextOut << limits[i].first << " " << limits[i].second << " " << i << " " << setprecision(8) << 2 * 1e3 * r.at(
-                      n).first << " +- " << 2 * 1e3 * r.at(n).second << " : " <<   r.at(np).first << " " << 2e3 * r.at("shift").first << " +- " << 2e3 *
-                    r.at("shift").second << " : " << 2e3 * r.at("sigwidth").first << " +- " << 2e3 * r.at("sigwidth").second <<  endl;
-        //convert to whole eCMS
-        result[i] = {2 * r.at(n).first,  2 * r.at(n).second,  2 * r.at("sigwidth").first};
+
+        //convert to whole eCMS (ecms, ecmsSpread, ecmsShift)
+        result[i] = {2 * r.at(n).first,  2 * r.at(n).second,  2 * r.at("sigwidth").first, 2 * r.at("sigwidth").second, 2 * r.at("shift").first, 2 * r.at("shift").second, r.at(np).first};
       }
 
-      hadBtextOut.close();
       return result;
 
     }

@@ -70,6 +70,11 @@ namespace Belle2 {
     std::vector<Eigen::VectorXd> cnt; ///< vector of means for each calib. subinterval
     std::vector<Eigen::MatrixXd> cntUnc; ///< vector of uncertainties of means for each calib. subinterval
     Eigen::MatrixXd  spreadMat; ///< spread CovMatrix
+
+    double spreadUnc; ///< spreadUnc (for eCMS)
+    double shift;     ///< (hadB - mumu) for eCMS
+    double shiftUnc;  ///< (hadB - mumu) Unc for eCMS
+    double pull;      ///< pull between mumu and hadB method
     int size() const {return cnt.size();} ///< number of the subintervals
   };
 

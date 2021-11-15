@@ -51,7 +51,7 @@ namespace Belle2 {
 
 
     /// read events from TTree to std::vector
-    vector<Event> getEvents(TTree* tr)
+    vector<Event> getEvents(TTree* tr, bool is4S)
     {
 
       vector<Event> events;
@@ -87,6 +87,7 @@ namespace Belle2 {
 
         evt.nBootStrap = 1;
         evt.isSig = true;
+        evt.is4S  = is4S;
         events.push_back(evt);
       }
 
@@ -709,7 +710,6 @@ namespace Belle2 {
             double r1 = pow(eps, -slope + 1) / (1 - slope);
             double r2 = pow(m0 - x, -slope + 1) / (1 - slope);
 
-            //cout << "I am here " << endl;
 
             s2 = integrate([&](double r) {
               double t = pow(r * (1 - slope), 1. / (1 - slope));
@@ -935,7 +935,6 @@ namespace Belle2 {
           data.push_back(d);
       }
 
-      cout << "nEv = " << data.size() << endl;
 
       chebFitter fitter;
       fitter.myFun =  mainFunction;

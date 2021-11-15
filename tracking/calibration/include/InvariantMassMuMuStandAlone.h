@@ -49,11 +49,12 @@ namespace Belle2 {
       int nBootStrap = intNaN; ///< random bootstrap weight (n=1 -> original sample)
       bool isSig = false;      ///< is not removed by quality cuts?
       double t   = realNaN;    ///< time of event [hours]
+      bool is4S = false;       ///< to distinguish between 4S and off-resonance runs
 
     };
 
 
-    std::vector<Event> getEvents(TTree* tr);
+    std::vector<Event> getEvents(TTree* tr, bool is4S);
 
     /** Run the InvariantMass analysis where splitPoints are the boundaries of the short calibration intervals
       @param evts: vector of events

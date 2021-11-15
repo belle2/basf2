@@ -29,24 +29,32 @@ settings = CalibrationSettings(
     expert_username="zlebcr",
     description=__doc__,
     input_data_formats=["cdst"],
-    input_data_names=["hadron_calib", "mumutight_or_highm_calib"],
+    input_data_names=["hadron4S", "mumu4S", "mumuOff"],
     input_data_filters={
-        "hadron_calib": [
+        "hadron4S": [
             INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
+            INPUT_DATA_FILTERS["Beam Energy"]["4S"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
             INPUT_DATA_FILTERS["Magnet"]["On"]],
-        "mumutight_or_highm_calib": [
+        "mumu4S": [
             INPUT_DATA_FILTERS["Data Tag"]["mumutight_or_highm_calib"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
+            INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+            INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Magnet"]["On"]],
+        "mumuOff": [
+            INPUT_DATA_FILTERS["Data Tag"]["mumutight_or_highm_calib"],
+            INPUT_DATA_FILTERS["Run Type"]["physics"],
+            INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
+            INPUT_DATA_FILTERS['Beam Energy']['Scan'],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
             INPUT_DATA_FILTERS["Magnet"]["On"]]
     },
     expert_config={
-        "outerLoss": "pow(0.000020e1*rawTime, 2) +  1./nEv",
-        "innerLoss": "pow(0.000120e1*rawTime, 2) +  1./nEv",
+        "outerLoss": "pow(0.000020e0*rawTime, 2) +  1./nEv",
+        "innerLoss": "pow(0.000120e0*rawTime, 2) +  1./nEv",
         "runHadB": True,
-        "runMuMu": True,
         "eCMSmumuSpread": 5.2e-3,
         "eCMSmumuShift": 10e-3},
     depends_on=[boostvector])
@@ -256,8 +264,9 @@ def get_calibrations(input_data, **kwargs):
     from ROOT.Belle2 import InvariantMassAlgorithm
     from caf.framework import Collection
 
-    input_files_Had, output_iov_Had = getDataInfo(input_data["hadron_calib"], kwargs)
-    input_files_MuMu, output_iov_MuMu = getDataInfo(input_data["mumutight_or_highm_calib"], kwargs)
+    input_files_Had, output_iov_Had = getDataInfo(input_data["hadron4S"], kwargs)
+    input_files_MuMu4S, output_iov_MuMu4S = getDataInfo(input_data["mumu4S"], kwargs)
+    input_files_MuMuOff, output_iov_MuMuOff = getDataInfo(input_data["mumuOff"], kwargs)
 
     rec_path_HadB = getHadBpath()
     rec_path_MuMu = getMuMupath()
@@ -270,7 +279,6 @@ def get_calibrations(input_data, **kwargs):
     algorithm_ecms.setInnerLoss(kwargs['expert_config']['innerLoss'])
 
     algorithm_ecms.includeHadBcalib(kwargs['expert_config']['runHadB'])
-    algorithm_ecms.includeMuMucalib(kwargs['expert_config']['runMuMu'])
     algorithm_ecms.setMuMuEcmsSpread(kwargs['expert_config']['eCMSmumuSpread'])
     algorithm_ecms.setMuMuEcmsOffset(kwargs['expert_config']['eCMSmumuShift'])
 
@@ -280,12 +288,16 @@ def get_calibrations(input_data, **kwargs):
     collection_HadB = Collection(collector=collector_HadB,
                                  input_files=input_files_Had,
                                  pre_collector_path=rec_path_HadB)
-    collection_MuMu = Collection(collector=collector_MuMu,
-                                 input_files=input_files_MuMu,
-                                 pre_collector_path=rec_path_MuMu)
+    collection_MuMu4S = Collection(collector=collector_MuMu,
+                                   input_files=input_files_MuMu4S,
+                                   pre_collector_path=rec_path_MuMu)
+    collection_MuMuOff = Collection(collector=collector_MuMu,
+                                    input_files=input_files_MuMuOff,
+                                    pre_collector_path=rec_path_MuMu)
 
-    calibration_ecms.add_collection(name='mumu', collection=collection_MuMu)
-    calibration_ecms.add_collection(name='hadB', collection=collection_HadB)
+    calibration_ecms.add_collection(name='mumu_4S', collection=collection_MuMu4S)
+    calibration_ecms.add_collection(name='mumu_Off', collection=collection_MuMuOff)
+    calibration_ecms.add_collection(name='hadB_4S', collection=collection_HadB)
 
     calibration_ecms.strategies = SingleIOV
     # calibration_ecms.backend_args = {'extra_lines' : ["RequestRuntime = 6h"]}
@@ -293,7 +305,7 @@ def get_calibrations(input_data, **kwargs):
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun
     for algorithm in calibration_ecms.algorithms:
-        algorithm.params = {"iov_coverage": output_iov_Had}
+        algorithm.params = {"iov_coverage": output_iov_Had}  # TODO merge iov?
 
     # Most other options like database chain and backend args will be overwritten by b2caf-prompt-run.
     # So we don't bother setting them.

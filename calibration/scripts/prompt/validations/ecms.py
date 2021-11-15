@@ -81,7 +81,7 @@ def getEcmsValues(path):
 
         f.Close()
 
-    arr = sorted(arr, key=lambda x: x[1])
+    arr = sorted(arr, key=lambda x: x[0])
 
     return arr
 
@@ -270,7 +270,7 @@ def getTimes(job_path):
 # Get the results from the combined calibration
 def readHadBdata(job_path):
     arr = []
-    with open(job_path + '/eCMS/0/algorithm_output/hadBcalib.txt', "r") as text_file:
+    with open(job_path + '/eCMS/0/algorithm_output/finalEcmsCalib.txt', "r") as text_file:
         for ll in text_file:
             ll = ll.strip().split(' ')
             arr.append(
@@ -312,25 +312,31 @@ def createHadBfitPlots(job_path):
         else:
             items[t] = max(items[t], i + 1)
 
-    assert sum([items[i] for i in items]) == len(arr)
-
     header = """\\documentclass[aspectratio=169]{beamer}
     \\usepackage{graphicx}
 
     \\begin{document}
     """
 
-    i = 0
     body = ""
     for t in items:
+
+        i0 = None
+        for i0Temp in range(len(arr)):
+            if int(round(arr[i0Temp][0][0], 0)) == t:
+                i0 = i0Temp
+                break
+        assert(i0 is not None)
+
         frac = 1. / (items[t] + 0.2)
         body += '\\begin{frame}[t]\n'
-        shift, shiftE = str(round(arr[i][4][0], 1)), str(round(arr[i][4][1], 1))
-        spread, spreadE = str(round(arr[i][5][0], 1)), str(round(arr[i][5][1], 1))
+        shift, shiftE = str(round(arr[i0][4][0], 1)), str(round(arr[i0][4][1], 1))
+        spread, spreadE = str(round(arr[i0][5][0], 1)), str(round(arr[i0][5][1], 1))
 
         body += '$E_\\mathrm{shift}    = (' + shift + '\\pm' + shiftE + ')$~MeV \\hspace{2cm}   \n'
         body += '$E_\\mathrm{spread}   = (' + spread + '\\pm' + spreadE + ')$~MeV    \\\\ \\vspace{0.5cm}\n'
         for iShort in range(items[t]):
+            i = i0 + iShort
             tStart, tEnd = arr[i][0][0], arr[i][0][1]
             eCMS, eCMSe = str(round(arr[i][2][0], 1)), str(round(arr[i][2][1], 1))
             pull = str(round(arr[i][3], 2))
@@ -349,7 +355,7 @@ def createHadBfitPlots(job_path):
             body += '\\includegraphics[width=1.0\\textwidth]{' + dName + '/Bp_' + str(t) + '_' + str(iShort) + '.pdf}\n'
             body += '\\end{center}\n'
             body += '\\end{minipage}\n'
-            i += 1
+
         body += '\\end{frame}\n\n'
 
     tail = '\n\\end{document}'

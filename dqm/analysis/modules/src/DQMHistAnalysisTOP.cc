@@ -265,7 +265,8 @@ void DQMHistAnalysisTOPModule::event()
     TH2F* h2Dscale_xy = (TH2F*)findHist(Form("TOP/good_hits_xy_%d", i));
     if (h2Dscale_xy != NULL && Ntotal_good_hits_xy > 0) {
       h2Dscale_xy->GetZaxis()->SetRangeUser(0, Ntotal_good_hits_xy / 2500.0);
-      h2Dscale_xy->Draw();
+      h2Dscale_xy->SetDrawOption("COLZ");
+      h2Dscale_xy->Draw("COLZ");
     }
     m_c_good_hits_xy_[i]->Modified();
   }
@@ -277,7 +278,8 @@ void DQMHistAnalysisTOPModule::event()
     TH2F* h2Dscale_xy = (TH2F*)findHist(Form("TOP/bad_hits_xy_%d", i));
     if (h2Dscale_xy != NULL && Ntotal_bad_hits_xy > 0) {
       h2Dscale_xy->GetZaxis()->SetRangeUser(0, Ntotal_bad_hits_xy / 250.0);
-      h2Dscale_xy->Draw();
+      h2Dscale_xy->SetDrawOption("COLZ");
+      h2Dscale_xy->Draw("COLZ");
     }
     m_c_bad_hits_xy_[i]->Modified();
   }
@@ -288,7 +290,8 @@ void DQMHistAnalysisTOPModule::event()
     TH2F* h2Dscale_asics = (TH2F*)findHist(Form("TOP/good_hits_asics_%d", i));
     if (h2Dscale_asics != NULL && Ntotal_good_hits_asics > 0) {
       h2Dscale_asics->GetZaxis()->SetRangeUser(0, Ntotal_good_hits_asics / 2500.0);
-      h2Dscale_asics->Draw();
+      h2Dscale_asics->SetDrawOption("COLZ");
+      h2Dscale_asics->Draw("COLZ");
     }
     m_c_good_hits_asics_[i]->Modified();
   }
@@ -299,7 +302,8 @@ void DQMHistAnalysisTOPModule::event()
     TH2F* h2Dscale_asics = (TH2F*)findHist(Form("TOP/bad_hits_asics_%d", i));
     if (h2Dscale_asics != NULL && Ntotal_bad_hits_asics > 0) {
       h2Dscale_asics->GetZaxis()->SetRangeUser(0, Ntotal_bad_hits_asics / 250.0);
-      h2Dscale_asics->Draw();
+      h2Dscale_asics->SetDrawOption("COLZ");
+      h2Dscale_asics->Draw("COLZ");
     }
     m_c_bad_hits_asics_[i]->Modified();
   }

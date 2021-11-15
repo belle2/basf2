@@ -120,7 +120,7 @@ namespace Belle2 {
     double m_d0Cut;/**< cut abs(d0) in cm (and negativ value eg -9999 disables)*/
     int m_maskedDistance; ///< Distance inside which no dead pixel or module border is allowed
 
-    std::map<VxdID, int> revLut; ///< reverse lookup sensor id -> index in histogram
+    std::map<VxdID, int> revLUT; ///< reverse lookup sensor id -> index in histogram
 
     //Histograms to later determine efficiency and crosscheck
     TH1D* m_h_combined{}; ///< combined histograms to workaround dqm glitch

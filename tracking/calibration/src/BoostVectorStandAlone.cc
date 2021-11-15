@@ -250,7 +250,7 @@ namespace Belle2 {
 
 
     /** Structure to store all bootstrap replicas */
-    struct vectorVar {
+    struct VectorVar {
       vector<Vector3d> vecs; ///< Vector of replicas
 
       /** Add replica */
@@ -303,7 +303,7 @@ namespace Belle2 {
     {
       evts = filter(evts, {151.986e-3 /*TanNomAngle*/, 0}, 0.9/*muon pid*/,  1.0 /*rap cut*/);
 
-      vectorVar var;
+      VectorVar var;
 
       const int nBoost = 10;
       for (int i = 0; i < nBoost; ++i) {

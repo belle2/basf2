@@ -74,10 +74,18 @@ void PXDDQMEfficiencyModule::initialize()
   m_tracks.isOptional(m_tracksName);
   m_ROIs.isOptional(m_ROIsName);
   m_intercepts.isOptional(m_PXDInterceptListName);
+
+  std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
+  int sensor_index = 0;
+  for (VxdID& avxdid : sensors) {
+    auto sensor_index = revLUT[avxdid] = i;
+    sensor_index++;
+  }
 }
 
 void PXDDQMEfficiencyModule::beginRun()
 {
+  if (m_h_combined) m_h_combined->Reset();
   for (auto& h : m_h_track_hits) if (h.second) h.second->Reset();
   for (auto& h : m_h_matched_cluster) if (h.second) h.second->Reset();
   for (auto& h : m_h_p) if (h.second) h.second->Reset();
@@ -202,6 +210,8 @@ void PXDDQMEfficiencyModule::event()
 
         //This track should be on the sensor
         m_h_track_hits[aVxdID]->Fill(ucell_fit, vcell_fit);
+        auto sensor_index = revLUT[aVxdID];
+        m_h_combined->Fill(sensor_index * 2);
 
         //Now check if the sensor measured a hit here
 
@@ -214,6 +224,7 @@ void PXDDQMEfficiencyModule::event()
           TVector3 dist_clus(u_fit - u_clus, v_fit - v_clus, 0);
           if (dist_clus.Mag() <= m_distcut)  {
             m_h_matched_cluster[aVxdID]->Fill(ucell_fit, vcell_fit);
+            m_h_combined->Fill(sensor_index * 2 + 1);
             if (m_verboseHistos) {
               if (m_h_p2[aVxdID]) m_h_p2[aVxdID]->Fill(trackstate.getMom().Mag());
               if (m_h_pt2[aVxdID]) m_h_pt2[aVxdID]->Fill(trackstate.getMom().Pt());
@@ -265,6 +276,7 @@ void PXDDQMEfficiencyModule::defineHisto()
       m_h_sv2[avxdid] = new TH1F("sv2_" + buff, "sv2 " + buff, 1000, 0, 1);
     }
   }
+  m_h_combined = new TH1D("PXD_Eff_combined", "Efficiency combined", sensors.size() * 2, 0, sensors.size() * 2);
   // cd back to root directory
   oldDir->cd();
 }

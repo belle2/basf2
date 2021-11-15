@@ -471,7 +471,7 @@ namespace Belle2 {
       }
 
       /** Simple integration of the PDF based on the Trapezoidal rule */
-      double IntegralTrap(double a, double b)
+      double integralTrap(double a, double b)
       {
         const int N = 14500000;
         double step = (b - a) / N;
@@ -487,7 +487,7 @@ namespace Belle2 {
       }
 
       /** Integration of the PDF which avoids steps and uses variable transformation (Trapezoidal rule as back-end) */
-      double IntegralTrapImp(double Eps, double a)
+      double integralTrapImp(double Eps, double a)
       {
         double tMin = slope * tauL;
 
@@ -648,7 +648,7 @@ namespace Belle2 {
 
 
       /** Integration of the PDF which avoids steps and uses variable transformation (Gauss-Konrod rule as back-end) */
-      double IntegralKronrod(double a)
+      double integralKronrod(double a)
       {
 
         double s0 = integrate([&](double t) {
@@ -851,10 +851,10 @@ namespace Belle2 {
                         slope,
                         xNow);
 
-        //cout << "Trap integration method " << integrator.IntegralTrap(eps, 2000, false)  + integrator.IntegralTrap(0, eps, true) << endl;
-        //cout << "Konrod integration method " << integrator.IntegralKronrod(2000) << endl;
+        //cout << "Trap integration method " << integrator.integralTrap(eps, 2000, false)  + integrator.integralTrap(0, eps, true) << endl;
+        //cout << "Konrod integration method " << integrator.integralKronrod(2000) << endl;
 
-        grM->SetPoint(grM->GetN(), xNow, integrator.IntegralKronrod(2000));
+        grM->SetPoint(grM->GetN(), xNow, integrator.integralKronrod(2000));
       }
 
       grM->Draw();
@@ -895,7 +895,7 @@ namespace Belle2 {
 
       fun.eps = 0.1;
 
-      return fun.IntegralKronrod(2000);
+      return fun.integralKronrod(2000);
     }
 
 

@@ -200,7 +200,7 @@ namespace Belle2 {
 
 
 // Analysis itself
-    map<TString, pair<double, double>> ArgusFitConstrained(const vector<Event>& evts, vector<pair<double, double>> limits,
+    map<TString, pair<double, double>> argusFitConstrained(const vector<Event>& evts, vector<pair<double, double>> limits,
                                                            vector<pair<double, double>> mumuVals)
     {
       // Calculate eCMS/2
@@ -400,7 +400,7 @@ namespace Belle2 {
                                      vector<pair<double, double>> mumuVals)
     {
 
-      auto r = ArgusFitConstrained(evts, limits, mumuVals);
+      auto r = argusFitConstrained(evts, limits, mumuVals);
       assert(limits.size() == mumuVals.size());
 
       vector<vector<double>> result(limits.size());

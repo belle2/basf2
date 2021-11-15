@@ -37,7 +37,7 @@ class VXDTF2Task(Basf2PathTask):
 
     def create_path(self):
         target_path = "./fixes/"
-        input_file = os.path.join("./sim_data/VTXEvtGenSim.root")
+        input_file = os.path.join("./results/current/VTXEvtGenSim.root")
 
         path = basf2.create_path()
 
@@ -56,6 +56,7 @@ class VXDTF2Task(Basf2PathTask):
             components=["VTX"],
             materialBudgetFactor=self.factor,
             maxPt=self.maxP,
+            vxdQualityEstimatarParametersFromDB=False,
             EstimationMethod='tripletFit')
 
         add_mc_matcher(path, components=["VTX"], reco_tracks="RecoTracks", use_second_cdc_hits=False)

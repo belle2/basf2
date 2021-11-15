@@ -62,7 +62,7 @@ settings = CalibrationSettings(
 ##############################
 
 
-def getHadBpath():
+def get_hadB_path():
 
     # module to be run prior the collector
     rec_path_1 = create_path()
@@ -194,7 +194,7 @@ def getHadBpath():
     return rec_path_1
 
 
-def getMuMupath():
+def get_mumu_path():
 
     # module to be run prior the collector
     rec_path_1 = create_path()
@@ -211,7 +211,7 @@ def getMuMupath():
     return rec_path_1
 
 
-def getDataInfo(inData, kwargs):
+def get_data_info(inData, kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
@@ -264,12 +264,12 @@ def get_calibrations(input_data, **kwargs):
     from ROOT.Belle2 import InvariantMassAlgorithm
     from caf.framework import Collection
 
-    input_files_Had, output_iov_Had = getDataInfo(input_data["hadron4S"], kwargs)
-    input_files_MuMu4S, output_iov_MuMu4S = getDataInfo(input_data["mumu4S"], kwargs)
-    input_files_MuMuOff, output_iov_MuMuOff = getDataInfo(input_data["mumuOff"], kwargs)
+    input_files_Had, output_iov_Had = get_data_info(input_data["hadron4S"], kwargs)
+    input_files_MuMu4S, output_iov_MuMu4S = get_data_info(input_data["mumu4S"], kwargs)
+    input_files_MuMuOff, output_iov_MuMuOff = get_data_info(input_data["mumuOff"], kwargs)
 
-    rec_path_HadB = getHadBpath()
-    rec_path_MuMu = getMuMupath()
+    rec_path_HadB = get_hadB_path()
+    rec_path_MuMu = get_mumu_path()
 
     collector_HadB = register_module('eCmsCollector')
     collector_MuMu = register_module('BoostVectorCollector', Y4SPListName='Upsilon(4S):BV')

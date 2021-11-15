@@ -11,35 +11,36 @@
 
 #include <vector>
 #include <Eigen/Dense>
-using Eigen::VectorXd;
-using Eigen::MatrixXd;
 
-/** Get weights to calculate the integral over the Cheb nodes */
-VectorXd GetWeights(int Size);
+namespace Belle2 {
 
-/** Get the vector with positions of the Cheb nodes */
-VectorXd GetNodes(int Size);
+  /** Get weights to calculate the integral over the Cheb nodes */
+  Eigen::VectorXd getWeights(int Size);
 
-
-/** Evaluate cheb pols up to Size at point x */
-VectorXd getPols(int Size, double x);
-
-/** Evaluate sum of cheb pols up to Size at vector x, x range is between 0 and 1 */
-VectorXd getPolsSum(int Size, VectorXd x);
+  /** Get the vector with positions of the Cheb nodes */
+  Eigen::VectorXd getNodes(int Size);
 
 
-/** Transformation matrix between Cheb nodes and Cheb coefficients */
-MatrixXd GetCoefs(int oldSize, bool isInverse = false);
+  /** Evaluate cheb pols up to Size at point x */
+  Eigen::VectorXd getPols(int Size, double x);
+
+  /** Evaluate sum of cheb pols up to Size at vector x, x range is between 0 and 1 */
+  Eigen::VectorXd getPolsSum(int Size, Eigen::VectorXd x);
 
 
-/** Transformation matrix between Cheb nodes and Cheb coefficients with better normalization of the borders */
-MatrixXd GetCoefsCheb(int oldSize);
+  /** Transformation matrix between Cheb nodes and Cheb coefficients */
+  Eigen::MatrixXd getCoefs(int oldSize, bool isInverse = false);
 
 
-/** Get Interpolation vector at point x from the function values at points xi */
-VectorXd interpol(const VectorXd& xi, double x);
+  /** Transformation matrix between Cheb nodes and Cheb coefficients with better normalization of the borders */
+  Eigen::MatrixXd getCoefsCheb(int oldSize);
 
 
-/** Get interpolated function value at point x */
-double interpol(VectorXd xi, VectorXd vals, double x);
+  /** Get Interpolation vector at point x from the function values at points xi */
+  Eigen::VectorXd interpol(const Eigen::VectorXd& xi, double x);
 
+
+  /** Get interpolated function value at point x */
+  double interpol(Eigen::VectorXd xi, Eigen::VectorXd vals, double x);
+
+}

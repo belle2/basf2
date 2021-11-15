@@ -66,7 +66,7 @@ namespace Belle2 {
   }
 
   /** The parameters related to single calibration interval */
-  struct calibPars {
+  struct CalibPars {
     std::vector<Eigen::VectorXd> cnt; ///< vector of means for each calib. subinterval
     std::vector<Eigen::MatrixXd> cntUnc; ///< vector of uncertainties of means for each calib. subinterval
     Eigen::MatrixXd  spreadMat; ///< spread CovMatrix
@@ -86,7 +86,7 @@ namespace Belle2 {
 
     std::vector<ExpRunEvt> breakPoints; ///< vector with break points positions
 
-    calibPars pars; ///< The parameters of the calibration itself
+    CalibPars pars; ///< The parameters of the calibration itself
 
     bool isCalibrated = false; ///< true if calibration run was successful
 

@@ -49,7 +49,7 @@ settings = ValidationSettings(name='eCMS Calibrations',
 
 
 # Load the values of the eCMS properties from the payloads into the list
-def getEcmsValues(path):
+def get_Ecms_values(path):
     runDict = {}
     with open(path + '/database.txt') as fDB:
         for ll in fDB:
@@ -256,7 +256,7 @@ def plotPullSpectrum(arr, vName, getterV, getterE):
 
 
 # Get times from the di-muon events results
-def getTimes(job_path):
+def get_times(job_path):
 
     times = []
     with open(job_path + '/eCMS/0/algorithm_output/mumuEcalib.txt') as fEcms:
@@ -268,7 +268,7 @@ def getTimes(job_path):
 
 
 # Get the results from the combined calibration
-def readHadBdata(job_path):
+def read_hadB_data(job_path):
     arr = []
     with open(job_path + '/eCMS/0/algorithm_output/finalEcmsCalib.txt', "r") as text_file:
         for ll in text_file:
@@ -289,11 +289,11 @@ def readHadBdata(job_path):
 
 
 # Create multi-page pdf file with the fit plots
-def createHadBfitPlots(job_path):
+def create_hadB_fit_plots(job_path):
 
     cwd = os.getcwd()
 
-    arr = readHadBdata(job_path)
+    arr = read_hadB_data(job_path)
 
     os.chdir(job_path + '/eCMS/0/algorithm_output/')
 
@@ -396,15 +396,15 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     dbFile = dbFile[0]
     inputDir = dbFile[:dbFile.rfind('/')]
 
-    times = getTimes(job_path)
-    arrNow = getEcmsValues(inputDir)
-    arrB = readHadBdata(job_path)
+    times = get_times(job_path)
+    arrNow = get_Ecms_values(inputDir)
+    arrB = read_hadB_data(job_path)
     assert(len(times) == len(arrNow))
     assert(len(times) == len(arrB))
 
     arr = [a[:1] + t + a[1:] + ab[3:] for t, a, ab in zip(times, arrNow, arrB)]
 
-    createHadBfitPlots(job_path)
+    create_hadB_fit_plots(job_path)
 
     plt.figure(figsize=(18, 9))
     rcParams['axes.formatter.useoffset'] = False

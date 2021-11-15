@@ -31,12 +31,12 @@
 #include <tracking/calibration/InvariantMassMuMuStandAlone.h>
 #include <tracking/calibration/Splitter.h>
 #include <tracking/calibration/tools.h>
-#include <tracking/calibration/chebFitter.h>
+#include <tracking/calibration/ChebFitter.h>
 #else
 #include <InvariantMassMuMuStandAlone.h>
 #include <Splitter.h>
 #include <tools.h>
-#include <chebFitter.h>
+#include <ChebFitter.h>
 #endif
 
 using Eigen::MatrixXd;
@@ -936,9 +936,8 @@ namespace Belle2 {
       }
 
 
-      chebFitter fitter;
-      fitter.myFun =  mainFunction;
-      fitter.data = data;
+      ChebFitter fitter;
+      fitter.setDataAndFunction(mainFunction, data);
       fitter.init(256 + 1, mMin, mMax);
 
 

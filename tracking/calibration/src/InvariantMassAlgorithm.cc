@@ -336,7 +336,7 @@ CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
     // only deal with off-res runs
     if (evtsMuMuBlocks[b][0].is4S) continue;
 
-    std::vector<calibPars> parsEdges;
+    std::vector<CalibPars> parsEdges;
     if (b > 0 && evtsMuMuBlocks[b - 1][0].is4S)
       parsEdges.push_back(CalResultsBlocks[b - 1].back().pars);
     if (b < int(CalResultsBlocks.size()) - 1 && evtsMuMuBlocks[b + 1][0].is4S)

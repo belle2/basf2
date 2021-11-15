@@ -422,6 +422,9 @@ This code imports the ``pandas_tutorial_ntuple.root`` root file as a dataframe `
 
     df = uproot.open(file_path)["b0phiKs"].arrays(library="pd")
 
+  If loading from the remote file path doesn't work, download the file to
+  your machine first (e.g., using `wget`).
+
   Here, ``b0phiKs`` is the branch name of the file that contains the data
   (``root_pandas``) guessed it for us automatically, in ``uproot`` we need to
   specify it explicitly.

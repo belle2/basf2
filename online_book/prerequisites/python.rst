@@ -420,7 +420,7 @@ This code imports the ``pandas_tutorial_ntuple.root`` root file as a dataframe `
 
   .. code-block::
 
-    df = uproot.open(file_path)["b0phiKs"].pandas.df
+    df = uproot.open(file_path)["b0phiKs"].pandas.df()
 
 Investigating your DataFrame
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

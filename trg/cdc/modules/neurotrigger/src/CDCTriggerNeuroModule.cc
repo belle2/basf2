@@ -206,7 +206,7 @@ CDCTriggerNeuroModule::event()
 
 
 
-    const CDCTriggerTrack* NNtrack =
+    CDCTriggerTrack* NNtrack =
       m_tracksNN.appendNew(m_tracks2D[itrack]->getPhi0(),
                            m_tracks2D[itrack]->getOmega(),
                            m_tracks2D[itrack]->getChi2D(),

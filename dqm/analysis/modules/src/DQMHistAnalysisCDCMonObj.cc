@@ -208,10 +208,16 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   B2DEBUG(20, "end run");
   m_hfastTDC = (TH1F*)findHist("CDC/fast_tdc");
   m_hADC = (TH2F*)findHist("CDC/hADC");
-  //  m_hADCTrack = (TH2F*)findHist("CDC/hADCTOTCut");
   m_hADCTrack = (TH2F*)findHist("CDC/hADCTrack");
   m_hTDC = (TH2F*)findHist("CDC/hTDC");
   m_hHit = (TH2F*)findHist("CDC/hHit");
+
+  if (m_hADCTrack == nullptr) {
+    m_monObj->setVariable("comment", "No ADC histograms of CDC in file");
+    B2INFO("Histogram named m_hADCTrack is not found.");
+    return;
+  }
+
   TF1* fitFunc[300] = {};
   for (int i = 0; i < 300; ++i) {
     fitFunc[i] = new TF1(Form("f%d", i), "[0]+[6]*x+[1]*(exp([2]*(x-[3]))/(1+exp(-([4]-x)/[5])))",

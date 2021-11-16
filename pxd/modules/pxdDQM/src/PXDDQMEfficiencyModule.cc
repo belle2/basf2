@@ -76,6 +76,7 @@ void PXDDQMEfficiencyModule::initialize()
   m_intercepts.isOptional(m_PXDInterceptListName);
 
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
+  std::sort(sensors.begin(), sensors.end());  // make sure it is our natural order
   int sensor_index = 0;
   for (VxdID& avxdid : sensors) {
     revLUT[avxdid] = sensor_index++;

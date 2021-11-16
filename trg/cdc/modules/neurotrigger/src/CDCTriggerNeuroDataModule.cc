@@ -37,9 +37,6 @@ namespace Belle2 {
     addParam("IDHistFileName", m_idHistFilename,
              "Name of the IDHist file.",
              std::string(""));
-    addParam("trainOnRecoTracks", m_trainOnRecoTracks,
-             "turn true to train on RecoTracks.",
-             true);
     addParam("inputCollectionName", m_inputCollectionName,
              "Name of the StoreArray holding the 2D input tracks.",
              std::string("CDCTriggerNNInput2DTracks"));

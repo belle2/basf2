@@ -15,6 +15,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <string>
 
 namespace Belle2 {
@@ -36,16 +37,18 @@ namespace Belle2 {
     */
     WeightInfo getInfo(const Particle* particle);
 
-    /** Nothing so far.*/
-    virtual void beginRun() override;
+    /** Initializes the module. */
+    virtual void initialize() override;
+
     /**
     * Function to be executed at each event
     */
     virtual void event() override;
 
   private:
-    std::vector<std::string> m_ParticleLists;/** input particle lists */
+    std::vector<std::string> m_ParticleLists;/**< input particle lists */
     std::string m_decayString;/**< Decay string to select primary photon */
+    DecayDescriptor m_decayDescriptor;/**< decay descriptor which specifies the primary photon */
     double m_threshold; /**< Threshold of pi0 veto */
     std::string m_mode; /**< Mode of pi0 veto */
     std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable; /**< Pointer to the table in DB */

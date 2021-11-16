@@ -1,14 +1,11 @@
 /**************************************************************************
  * basf2 (Belle II Analysis Software Framework)                           *
- * Copyright(C) 2021  Belle II Collaboration                              *
- *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Henrikas Svidras                                         *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
 #include <analysis/modules/Pi0VetoEfficiencySystematics/Pi0VetoEfficiencySystematics.h>
 #include <iostream>
 
@@ -16,8 +13,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/core/Environment.h>
 #include <analysis/VariableManager/Manager.h>
-
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 #include <map>
 
@@ -35,14 +30,7 @@ REG_MODULE(Pi0VetoEfficiencySystematics);
 
 Pi0VetoEfficiencySystematicsModule::Pi0VetoEfficiencySystematicsModule() : Module()
 {
-  setDescription(
-    R"DOC(Module to include data/MC weights for photon detection efficiency. Include in your code as
-
-    .. code:: python
-
-        mypath.add_module("Pi0VetoEfficiencySystematics", particleLists=['gamma:cut'], tableName=tableName_Weight)
-
-     )DOC");
+  setDescription("Includes data/MC weights for pi0 veto efficiency as extraInfo for a given particle list. One must call writeP0EtaVeto function in advance. Weights and its errors will be provided for given mode and threshold.");
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("decayString", m_decayString, "decay string");
@@ -67,8 +55,18 @@ WeightInfo Pi0VetoEfficiencySystematicsModule::getInfo(const Particle* particle)
   return (*m_ParticleWeightingLookUpTable.get())->getInfo(values);
 }
 
-void Pi0VetoEfficiencySystematicsModule::beginRun()
+void Pi0VetoEfficiencySystematicsModule::initialize()
 {
+  if (m_decayString != "") {
+    m_decayDescriptor.init(m_decayString);
+  } else {
+    B2ERROR("Please provide a decay string for Pi0VetoEfficiencySystematicsModule");
+  }
+
+  if (m_threshold < 0.5 || 0.99 < m_threshold) {
+    B2ERROR("Please provide pi0veto threshold from 0.50 to 0.99 for Pi0VetoEfficiencySystematicsModule");
+  }
+
   //Table is identified with mode and threshold
   std::string tableName = "pi0vetoDataMC" + m_mode + std::to_string((int)(m_threshold * 100 + 0.001));
   m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(tableName);
@@ -90,13 +88,12 @@ void Pi0VetoEfficiencySystematicsModule::event()
     size_t nPart = particleList->getListSize();
     for (size_t iPart = 0; iPart < nPart; iPart++) {
       auto particle = particleList->getParticle(iPart);
-      DecayDescriptor descriptor;
-      descriptor.init(m_decayString);
-      std::vector<const Particle*> selectedParticles = descriptor.getSelectionParticles(particle);
+      //m_decayDescriptor.init(m_decayString);
+      std::vector<const Particle*> selectedParticles = m_decayDescriptor.getSelectionParticles(particle);
       int nSelected = selectedParticles.size();
       // Hard photon must be specified by decayString
-      if (!nSelected) {
-        B2ERROR("Select a hard photon.");
+      if (nSelected != 1) {
+        B2ERROR("You selected " << nSelected << " particle(s). Select only a hard photon");
         break;
       }
       //Particle* selectedParentParticle = selectedParticles[0];
@@ -117,5 +114,7 @@ void Pi0VetoEfficiencySystematicsModule::addPi0VetoEfficiencyRatios(Particle* B,
     for (const auto& entry : info) {
       B->addExtraInfo("Pi0VetoEfficiencySystematics_" + entry.first, entry.second);
     }
+  } else {
+    B2WARNING("The given hard photon is not from ECL or not photon");
   }
 }

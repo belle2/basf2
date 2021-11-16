@@ -3587,9 +3587,6 @@ def applyPi0Veto(particleList, decayString, threshold, mode='standard', applyCut
     @param applyCut       set False if you don't want to apply veto
     """
 
-    if threshold < 0.5 or 0.99 < threshold:
-        B2ERROR(f'Threshold {threshold} is not surported. Use 0.50, 0.51, ..., 0.99.')
-
     dictPi0ExtraInfoName = {'standard': 'Pi0ProbOrigin',
                             'tight': 'Pi0ProbTightEnergyThreshold',
                             'cluster': 'Pi0ProbLargeClusterSize',

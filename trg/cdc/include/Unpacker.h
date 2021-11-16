@@ -1427,12 +1427,17 @@ namespace Belle2 {
                                                                   trkNN.z, cos(trkNN.theta) / sin(trkNN.theta), 0., track2D->getFoundOldTrack(), track2D->getDriftThreshold(),
                                                                   track2D->getValidStereoBit(), trkNN.sector, tsvector, iclock, iTracker);
               trackNN->setHasETFTime(hasETFTime);
+              track2D->setHasETFTime(hasETFTime);
               trackNN->setRawOmega(track2D->getRawOmega());
               trackNN->setRawPhi0(track2D->getRawPhi0());
               trackNN->setRawTheta(trkNN.hwTheta);
               trackNN->setRawZ(trkNN.hwZ);
-              if (hasETFTime) {trackNN->setETF_unpacked(std::stoi(p_etftime.data, 0, 2));}
+              if (hasETFTime) {
+                trackNN->setETF_unpacked(std::stoi(p_etftime.data, 0, 2));
+                track2D->setETF_unpacked(std::stoi(p_etftime.data, 0, 2));
+              }
               trackNN->setETF_recalced(recalcETF(p_mlpin_drifttime.data, tstimevector, trackNN));
+              track2D->setETF_recalced(recalcETF(p_mlpin_drifttime.data, tstimevector, trackNN));
 
               if (isin2d == false) {
                 trackNN->setQualityVector(1);

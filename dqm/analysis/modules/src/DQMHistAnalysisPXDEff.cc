@@ -332,13 +332,13 @@ void DQMHistAnalysisPXDEffModule::event()
 
   std::map <VxdID, bool> updated{}; // init to false, kep track of updated histograms
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    VxdID& aModule = m_PXDModules[i];
     int j = i + 1;
 
     if (Combined == nullptr) {
       m_hEffAll->SetPassedEvents(j, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
       m_hEffAll->SetTotalEvents(j, 0);
     } else {
+      VxdID& aModule = m_PXDModules[i];
       double nmatch = Combined->GetBinContent(i * 2 + 2);
       double nhit = Combined->GetBinContent(i * 2 + 1);
       if (nmatch > 10 && nhit > 10) { // could be zero, too

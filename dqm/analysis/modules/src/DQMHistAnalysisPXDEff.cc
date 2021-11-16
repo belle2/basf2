@@ -313,6 +313,15 @@ void DQMHistAnalysisPXDEffModule::event()
     }
   }//One-Module histos finished
 
+  // Change: We now use one histogram for hits and matches to make
+  // sute that we have an atomic update which is otherwise not
+  // guaranteed by DQM framework
+  TString locationHits = "PXD_Eff_combined";
+  if (m_histogramDirectoryName != "") {
+    locationHits = m_histogramDirectoryName + "/" + locationHits;
+  }
+  TH1* Combined = (TH1*)findHist(locationHits.Data());
+
   double stat_data = 0;
   bool error_flag = false;
   bool warn_flag = false;
@@ -321,17 +330,17 @@ void DQMHistAnalysisPXDEffModule::event()
   double imatch = 0.0, ihit = 0.0;
   int ieff = 0;
 
-  std::map <VxdID, bool> updated{}; // init to false
+  std::map <VxdID, bool> updated{}; // init to false, kep track of updated histograms
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     VxdID& aModule = m_PXDModules[i];
     int j = i + 1;
 
-    if (mapHits[aModule] == nullptr || mapMatches[aModule] == nullptr) {
+    if (Combined == nullptr) {
       m_hEffAll->SetPassedEvents(j, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
       m_hEffAll->SetTotalEvents(j, 0);
     } else {
-      double nmatch = mapMatches[aModule]->Integral(); // GetEntries()?
-      double nhit = mapHits[aModule]->Integral();
+      double nmatch = Combined->GetBinContent(i * 2 + 2);
+      double nhit = Combined->GetBinContent(i * 2 + 1);
       if (nmatch > 10 && nhit > 10) { // could be zero, too
         imatch += nmatch;
         ihit +=  nhit;

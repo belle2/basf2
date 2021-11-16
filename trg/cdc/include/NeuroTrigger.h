@@ -142,6 +142,7 @@ namespace Belle2 {
     /** set the hit collection and event time to required
      * and store the hit collection name */
     void initializeCollections(std::string hitCollectionName, std::string eventTimeName, const std::string& et_option);
+    void initializeCollections(std::string hitCollectionName);
 
     /** return reference to a neural network */
     CDCTriggerMLP& operator[](unsigned index) { return m_MLPs[index]; }

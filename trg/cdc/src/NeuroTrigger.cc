@@ -680,7 +680,7 @@ unsigned long NeuroTrigger::getCompleteHitPattern(unsigned isector, const CDCTri
 unsigned long
 NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode)
 {
-  CDCTriggerMLP& expert = m_MLPs[isector];
+  const CDCTriggerMLP& expert = m_MLPs[isector];
   unsigned long hitPattern = 0;
   vector<unsigned> nHits;
   nHits.assign(9, 0);

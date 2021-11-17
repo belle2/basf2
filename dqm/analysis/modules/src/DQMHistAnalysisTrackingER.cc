@@ -94,13 +94,15 @@ void DQMHistAnalysisTrackingERModule::event()
   TH1* hAbortReasons = findHist("TrackingERDQM/TrackingErrorFlagsReasons");
   if (hAbort != nullptr) {
     double nEvents = hAbort->GetEntries();
-    m_monObj->setVariable("abortRate", hAbort->GetMean());
-    if (hAbortReasons != nullptr) {
-      m_monObj->setVariable("abortRateUnspecifiedPR", hAbortReasons->GetBinContent(2) / nEvents);
-      m_monObj->setVariable("abortRateVXDTF2", hAbortReasons->GetBinContent(3) / nEvents);
-      m_monObj->setVariable("abortRateSVDCKF", hAbortReasons->GetBinContent(4) / nEvents);
-      m_monObj->setVariable("abortRatePXDCKF", hAbortReasons->GetBinContent(5) / nEvents);
-      m_monObj->setVariable("abortRateSpacePoint", hAbortReasons->GetBinContent(6) / nEvents);
+    if (nEvents > 0) {
+      m_monObj->setVariable("abortRate", hAbort->GetMean());
+      if (hAbortReasons != nullptr) {
+        m_monObj->setVariable("abortRateUnspecifiedPR", hAbortReasons->GetBinContent(2) / nEvents);
+        m_monObj->setVariable("abortRateVXDTF2", hAbortReasons->GetBinContent(3) / nEvents);
+        m_monObj->setVariable("abortRateSVDCKF", hAbortReasons->GetBinContent(4) / nEvents);
+        m_monObj->setVariable("abortRatePXDCKF", hAbortReasons->GetBinContent(5) / nEvents);
+        m_monObj->setVariable("abortRateSpacePoint", hAbortReasons->GetBinContent(6) / nEvents);
+      }
     }
   }
 }

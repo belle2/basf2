@@ -129,6 +129,51 @@ namespace {
     };
     return func;
   }
+  TEST(CutNodesTest, TupleLength)
+  {
+    Py_Initialize();
+    py::tuple tuple = py::tuple();
+    EXPECT_B2FATAL(NodeFactory::compile_boolean_node<MockVariableManager>(tuple));
+    EXPECT_B2FATAL(NodeFactory::compile_expression_node<MockVariableManager>(tuple));
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::UnaryBooleanNode));
+    EXPECT_B2FATAL(NodeFactory::compile_boolean_node<MockVariableManager>(tuple));
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::BinaryBooleanNode));
+    EXPECT_B2FATAL(NodeFactory::compile_boolean_node<MockVariableManager>(tuple));
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::UnaryRelationalNode));
+    EXPECT_B2FATAL(NodeFactory::compile_boolean_node<MockVariableManager>(tuple));
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::BinaryRelationalNode));
+    EXPECT_B2FATAL(NodeFactory::compile_boolean_node<MockVariableManager>(tuple));
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::TernaryRelationalNode));
+    EXPECT_B2FATAL(NodeFactory::compile_boolean_node<MockVariableManager>(tuple));
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::UnaryExpressionNode));
+    EXPECT_B2FATAL(NodeFactory::compile_expression_node<MockVariableManager>(tuple));
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::BinaryExpressionNode));
+    EXPECT_B2FATAL(NodeFactory::compile_expression_node<MockVariableManager>(tuple));
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::BooleanNode));
+    EXPECT_B2FATAL(NodeFactory::compile_expression_node<MockVariableManager>(tuple));
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::IntegerNode));
+    EXPECT_B2FATAL(NodeFactory::compile_expression_node<MockVariableManager>(tuple));
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::DoubleNode));
+    EXPECT_B2FATAL(NodeFactory::compile_expression_node<MockVariableManager>(tuple));
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::IdentifierNode));
+    EXPECT_B2FATAL(NodeFactory::compile_expression_node<MockVariableManager>(tuple));
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::FunctionNode));
+    EXPECT_B2FATAL(NodeFactory::compile_expression_node<MockVariableManager>(tuple));
+
+  }
+
 
   /// Test for the UnaryBooleanNode: Create Nodes from boost::python::tuples and check functionality.
   TEST(CutNodesTest, unaryBooleanNode)
@@ -1199,9 +1244,17 @@ namespace {
   {
     Py_Initialize();
     MockObjectType part{4.2};
-    const py::tuple idTuple = py::make_tuple(static_cast<int>(NodeType::IdentifierNode), "mocking_variable", true);
-    auto idNode = NodeFactory::compile_expression_node<MockVariableManager>(idTuple);
-    EXPECT_EQ(std::get<double>(idNode->evaluate(&part)), 4.2);
+    auto tuple = py::make_tuple(static_cast<int>(NodeType::IdentifierNode), "mocking_variable", true);
+    auto node = NodeFactory::compile_expression_node<MockVariableManager>(tuple);
+    EXPECT_EQ(std::get<double>(node->evaluate(&part)), 4.2);
+
+    tuple = py::make_tuple(static_cast<int>(NodeType::IdentifierNode), "THISDOESNOTEXIST", true);
+    EXPECT_THROW(NodeFactory::compile_expression_node<MockVariableManager>(tuple), std::runtime_error);
+
+    // Check nested runtime_error
+    tuple = py::make_tuple(static_cast<int>(NodeType::UnaryExpressionNode), tuple, false, false);
+    EXPECT_THROW(NodeFactory::compile_expression_node<MockVariableManager>(tuple), std::runtime_error);
+
   }
   /// Test for the FunctionNode: Create Nodes from boost::python::tuples and check functionality.
   TEST(CutNodesTest, functionNode)

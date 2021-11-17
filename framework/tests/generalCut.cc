@@ -233,7 +233,7 @@ namespace {
     a = MockGeneralCut::compile("3.1415926535897931234567890 == 3.1415926535897931234567891");
     EXPECT_TRUE(a->check(&testObject));
 
-    a = MockGeneralCut::compile("3141592653589. != 3141592653588.");
+    a = MockGeneralCut::compile("3141592653589 != 3141592653588");
     EXPECT_TRUE(a->check(&testObject));
 
     a = MockGeneralCut::compile("");

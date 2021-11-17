@@ -1,3 +1,4 @@
+import argparse
 from sly import Lexer, Parser
 
 
@@ -250,7 +251,8 @@ class B2Lexer(Lexer):
             "False": "BOOLEAN",
             "false": "BOOLEAN",
             "nan": "DOUBLE",
-            "infinity": "DOUBLE"
+            "infinity": "DOUBLE",
+            "inf": "DOUBLE"
         }
         # Check for reserved words
         t.type = reserved.get(t.value, "IDENTIFIER")
@@ -906,6 +908,631 @@ class B2Parser(Parser):
         return super().parse(token_generator)
 
 
+class B2ExpressionParser(Parser):
+    """
+    Parser class implementing the grammar specified below.
+
+    Full Grammar Specification:
+    <cut> ::= EMPTY
+        | <boolean_expression>
+
+    <boolean_expression> ::= <disjunction>
+
+    <disjunction> ::= <conjunction>
+        | <disjunction> OR <conjunction>
+
+    <conjunction> ::= <negation>
+        | <conjunction> AND <negation>
+
+    <negation> ::= <bracket_expression>
+        | NOT <negation>
+
+    <bracket_expression> ::= <relational_expression>
+        | LBRACK <boolean_expression> RBRACK
+
+    <relational_expression> ::= <expression>
+        | <expression> <comparison_operator> <expression>
+        | <expression> <comparison_operator> <expression> <comparison_operator>
+          <expression>
+
+    <comparison_operator> ::= EQUALEQUAL
+        | GREATER
+        | LESS
+        | GREATEREQUAL
+        | LESSEQUAL
+        | NOTEQUAL
+
+    <expression> ::= <sum>
+
+    <sum> ::= <term>
+        | <sum> PLUS <term>
+        | <sum> MINUS <term>
+
+    <term> ::= <factor>
+        | <term> TIMES <factor>
+        | <term> DIVIDE <factor>
+
+    <factor> ::= <power>
+        | PLUS <factor>
+        | MINUS <factor>
+
+    <power> ::= <primary>
+        | <primary> POWER <factor>
+
+    <primary> ::= LPAREN <expression> RPAREN
+        | <function>
+        | IDENTIFIER
+        | INTEGER
+        | BOOLEAN
+        | DOUBLE
+
+    <function> ::= IDENTIFIER LPAREN <parameters> RPAREN
+
+    <parameters> ::= EMPTY
+        | <parameter_list>
+
+    <parameter_list> ::= <parameter>
+        | <parameter_list> COMMA <parameter>
+
+    <parameter> ::= <boolean_expression>
+    """
+    def __init__(self, verbose=False):
+        """
+        Initialize Parser
+        @param verbose  run parser in verbose mode. The nodetype names in
+                        the parsed tuple are written out and not encoded
+                        as integers. Useful for debugging parsing errors.
+        """
+        #: verbose setting, creates more human readable tuple output
+        #: only for testing, debugging purposes, not to be used in production
+        self.verbose = verbose
+        #: parameter state stack
+        #: used for scope detection of variables and metavariables
+        self.parameter_stack = list()
+
+    #: startig symbol
+    start = "expression"
+
+    #: token list from B2Lexer, this is required
+    tokens = B2Lexer.tokens
+
+    #: Define precedence of operators starting with lowest precedence
+    #: first element of tuple indicates associativity of operator
+    precedence = (  # noqa: F841
+        ("left", "OR"),
+        ("left", "AND"),
+        ("nonassoc", "NOT"),
+        ("left", "EQUALEQUAL", "GREATER", "LESS",
+         "GREATEREQUAL", "LESSEQUAL", "NOTEQUAL"),
+        ("left", "PLUS", "MINUS"),
+        ("left", "TIMES", "DIVIDE"),
+        ("right", "POWER")
+    )
+
+    #: Dict for encoding nodetypes to integers
+    #: Must match enum in framework/utilities/AbstractNodes.h
+    node_types = {
+        "UnaryBooleanNode": 0,
+        "BinaryBooleanNode": 1,
+        "UnaryRelationalNode": 2,
+        "BinaryRelationalNode": 3,
+        "TernaryRelationalNode": 4,
+        "UnaryExpressionNode": 5,
+        "BinaryExpressionNode": 6,
+        "FunctionNode": 7,
+        "IdentifierNode": 8,
+        "DoubleNode": 9,
+        "IntegerNode": 10,
+        "BooleanNode": 11,
+    }
+
+    #: Dict for encoding boolean operator types to integers
+    #: Must match BooleanOperator enum in framework/utilities/AbstractNodes.h
+    b_operator_types = {
+        "and": 0,
+        "or": 1,
+    }
+
+    #: Dict for encoding comparison operator types to integers
+    #: Must match ComparisonOperator enum framework/utilities/AbstractNodes.h
+    c_operator_types = {
+        "==": 0,
+        ">=": 1,
+        "<=": 2,
+        ">": 3,
+        "<": 4,
+        "!=": 5,
+    }
+
+    #: Dict for encoding arithmetic operator types to integers
+    #: Must match ArithmeticOperator enum framework/utilities/AbstractNodes.h
+    a_operation_types = {
+        "+": 0,
+        "-": 1,
+        "*": 2,
+        "/": 3,
+        "**": 4,
+        "^": 4
+    }
+
+    def get_node_type(self, node_name: str):
+        """
+        Return the node type value or node name if verbose setting is chosen.
+        """
+        return node_name if self.verbose else self.node_types[node_name]
+
+    def get_coper_type(self, coper_name: str):
+        """
+        Return the comparison operator type value or comparison operator name
+        if verbose setting is chosen.
+        """
+        return coper_name if self.verbose else self.c_operator_types[coper_name]  # noqa: E501
+
+    def get_boper_type(self, boper_name: str):
+        """
+        Return the boolean operator type value or boolean operator name
+        if verbose setting is chosen.
+        """
+        return boper_name if self.verbose else self.b_operator_types[boper_name]  # noqa: E501
+
+    def get_a_operation_type(self, operation_name: str):
+        """
+        Return the arithmetic operator type value or arithmetic operator token
+        if verbose setting is chosen.
+        """
+        return operation_name if self.verbose else self.a_operation_types[operation_name]  # noqa: E501
+
+    @_(r"disjunction")  # noqa: F821
+    def boolean_expression(self, p):
+        """
+        Parsing function for <boolean_expression> nonterminal
+
+        Grammar rule:
+            <boolean_expression> ::= <disjunction>
+        """
+        return p.disjunction
+
+    @_(r"disjunction OR conjunction", r"conjunction")  # noqa: F821
+    def disjunction(self, p):
+        """
+        Parsing function for <disjunction> nonterminal
+
+        Grammar rules:
+            <disjunction> ::= <conjunction>
+                | <disjunction> OR <conjunction>
+        """
+        try:
+            return (
+                self.get_node_type("BinaryBooleanNode"),
+                p.disjunction,
+                p.conjunction,
+                self.get_boper_type(p.OR),
+            )
+        except AttributeError:
+            return p.conjunction
+
+    @_(r"conjunction AND negation", r"negation")  # noqa: F821
+    def conjunction(self, p):
+        """
+        Parsing function for <conjunction> nonterminal
+
+        Grammar rules:
+            <conjunction> ::= <negation>
+                | <conjunction> AND <negation>
+        """
+        try:
+            return (
+                self.get_node_type("BinaryBooleanNode"),
+                p.conjunction,
+                p.negation,
+                self.get_boper_type(p.AND)
+            )
+        except AttributeError:
+            return p.negation
+
+    @_(r"bracket_expression", r"NOT negation")  # noqa: F821
+    def negation(self, p):
+        """
+        Parsing function for <negation> nonterminal
+
+        Grammar rules:
+            <negation> ::= <bracket_expression>
+                | NOT <negation>
+        """
+        try:
+            return p.bracket_expression
+        except AttributeError:
+            return (
+                self.get_node_type("UnaryBooleanNode"),
+                p.negation,
+                True,
+                False
+            )
+
+    @_(  # noqa: F821
+        r"relational_expression",
+        r"LBRACK boolean_expression RBRACK")
+    def bracket_expression(self, p):
+        """
+        Parsing function for <bracket_expression> nonterminal
+
+        Grammar rules:
+            <bracket_expression> ::= <relational_expression>
+                | LBRACK <boolean_expression> RBRACK
+        """
+        try:
+            return p.relational_expression
+        except AttributeError:
+            return (
+                self.get_node_type("UnaryBooleanNode"),
+                p.boolean_expression,
+                False,
+                True
+            )
+
+    @_(r"expression")  # noqa: F821
+    def relational_expression(self, p):  # noqa: F811
+        """
+        Parsing function for <relational_expression> nonterminal
+
+        Grammar rule:
+            <relational_expression> ::= <expression>
+        """
+
+        return (self.get_node_type("UnaryRelationalNode"), p.expression)
+
+    @_(r"expression comparison_operator expression")  # noqa: F821
+    def relational_expression(self, p):  # noqa: F811
+        """
+        Parsing function for <relational_expression> nonterminal
+
+        Grammar rule:
+            <relational_expression> ::= <expression> <comparison_operator>
+                                        <expression>
+        """
+        return (
+            self.get_node_type("BinaryRelationalNode"),
+            p.expression0,
+            p.expression1,
+            self.get_coper_type(p.comparison_operator)
+        )
+
+    @_(r"expression comparison_operator expression comparison_operator expression")  # noqa: F821, E501
+    def relational_expression(self, p):  # noqa: F811
+        """
+        Parsing function for <relational_expression> nonterminal
+
+        Grammar rule:
+            <relational_expression> ::= expression> <comparison_operator>
+                <expression> <comparison_operator> <expression>
+        """
+        return (
+            self.get_node_type("TernaryRelationalNode"),
+            p.expression0,
+            p.expression1,
+            p.expression2,
+            self.get_coper_type(p.comparison_operator0),
+            self.get_coper_type(p.comparison_operator1)
+            )
+
+    @_(  # noqa: F821
+        r"EQUALEQUAL",
+        r"GREATER",
+        r"LESS",
+        r"GREATEREQUAL",
+        r"LESSEQUAL",
+        r"NOTEQUAL")
+    def comparison_operator(self, p):
+        """
+        Parsing function for <comparison_operator> nonterminal
+
+        Grammar rules:
+            <comparison_operator> ::= EQUALEQUAL
+                | GREATER
+                | LESS
+                | GREATEREQUAL
+                | LESSEQUAL
+                | NOTEQUAL
+        """
+        return p[0]
+
+    @_(r"sum")  # noqa: F821
+    def expression(self, p):
+        """
+        Parsing function for <expression> nonterminal
+
+        Grammar rule:
+            <expression> ::= <sum>
+        """
+        return p.sum
+
+    @_(r"sum PLUS term", r"sum MINUS term", r"term")  # noqa: F821
+    def sum(self, p):
+        """
+        Parsing function for <sum> nonterminal
+
+        Grammar rules:
+            <sum> ::= <term>
+                | <sum> PLUS <term>
+                | <sum> MINUS <term>
+        """
+        try:
+            return (
+                self.get_node_type("BinaryExpressionNode"),
+                p.sum,
+                p.term,
+                self.get_a_operation_type(p[1])
+            )
+        except AttributeError:
+            return p.term
+
+    @_(r"term TIMES factor", r"term DIVIDE factor", r"factor")  # noqa: F821
+    def term(self, p):
+        """
+        Parsing function for <term> nonterminal
+
+        Grammar rules:
+            <term> ::= <factor>
+                | <term> TIMES <factor>
+                | <term> DIVIDE <factor>
+        """
+        try:
+            return (
+                self.get_node_type("BinaryExpressionNode"),
+                p.term,
+                p.factor,
+                self.get_a_operation_type(p[1])
+            )
+        except AttributeError:
+            return p.factor
+
+    @_(r"power")  # noqa: F821
+    def factor(self, p):
+        """
+        Parsing function for <power> nonterminal
+
+        Grammar rule:
+            <factor> ::= <power>
+        """
+        return p.power
+
+    @_(r"PLUS factor")  # noqa: F821
+    def factor(self, p):  # noqa: F811
+        """
+        Parsing function for <factor> nonterminal
+
+        Grammar rules:
+            <factor> ::= PLUS <factor>
+        """
+        return (
+            self.get_node_type("UnaryExpressionNode"),
+            p.factor,
+            False,
+            False
+        )
+
+    @_(r"MINUS factor")  # noqa: F821
+    def factor(self, p):  # noqa: F811
+        """
+        Parsing function for <factor> nonterminal
+
+        Grammar rule:
+            <factor> ::= MINUS factor
+        """
+        return (
+            self.get_node_type("UnaryExpressionNode"),
+            p.factor,
+            True,
+            False
+        )
+
+    @_(r"primary")  # noqa: F821
+    def power(self, p):
+        """
+        Parsing function for <power> nonterminal
+
+        Grammar rule:
+            <power> ::= <primary>
+        """
+        return p.primary
+
+    @_(r"primary POWER factor")  # noqa: F821
+    def power(self, p):  # noqa: F811
+        """
+        Parsing function for <power> nonterminal
+
+        Grammar rule:
+            <power> ::= <primary> POWER <factor>
+        """
+        return (
+            self.get_node_type("BinaryExpressionNode"),
+            p.primary,
+            p.factor,
+            self.get_a_operation_type(p.POWER)
+        )
+
+    @_(r"function")  # noqa: F821
+    def primary(self, p):
+        """
+        Parsing function for <primary> nonterminal
+
+        Grammar rule:
+            <primary> ::= <function>
+        """
+        return p.function
+
+    @_(r"LPAREN expression RPAREN")  # noqa: F821
+    def primary(self, p):  # noqa: F811
+        """
+        Parsing function for <primary> nonterminal
+
+        Grammar rule:
+            <primary> ::= LPAREN <expression> RPAREN
+        """
+        return (
+            self.get_node_type("UnaryExpressionNode"),
+            p.expression,
+            False,
+            True
+        )
+
+    @_(r"INTEGER")  # noqa: F821
+    def primary(self, p):  # noqa: F811
+        """
+        Parsing function for <primary> nonterminal
+
+        Grammar rule:
+            <primary> ::= INTEGER
+        """
+        return (self.get_node_type("IntegerNode"), p.INTEGER)
+
+    @_(r"DOUBLE")  # noqa: F821
+    def primary(self, p):  # noqa: F811
+        """
+          Parsing function for <primary> nonterminal
+
+        Grammar rule:
+            <primary> ::= DOUBLE
+        """
+        return (self.get_node_type("DoubleNode"), p.DOUBLE)
+
+    @_(r"BOOLEAN")  # noqa: F821
+    def primary(self, p):  # noqa: F811
+        """
+        Parsing function for <primary> nonterminal
+
+        Grammar rule:
+            <primary> ::= BOOLEAN
+        """
+        return (self.get_node_type("BooleanNode"), p.BOOLEAN)
+
+    @_(r"IDENTIFIER")  # noqa: F821
+    def primary(self, p):  # noqa: F811
+        """
+        Parsing function for <primary> nonterminal
+
+        Grammar rule:
+            <primary> ::= IDENTIFIER
+        """
+        if self.parameter_stack:
+            return (self.get_node_type("IdentifierNode"), p.IDENTIFIER, False)
+        else:
+            return (self.get_node_type("IdentifierNode"), p.IDENTIFIER, True)
+
+    @_(r"IDENTIFIER LPAREN parameters RPAREN")  # noqa: F821
+    def function(self, p):
+        """
+        Parsing function for <function> nonterminal
+
+        Grammar rule:
+            <function> ::= IDENTIFIER LPAREN <parameters> RPAREN
+        """
+        if self.parameter_stack:
+            return (
+                self.get_node_type("FunctionNode"),
+                p.IDENTIFIER,
+                len(p.parameters),
+                p.parameters,
+                False
+            )
+        else:
+            return (
+                self.get_node_type("FunctionNode"),
+                p.IDENTIFIER,
+                len(p.parameters),
+                p.parameters,
+                True
+            )
+
+    @_(r"", r"parameter_list")  # noqa: F821
+    def parameters(self, p):
+        """
+        Parsing function for <parameters> nonterminal
+
+        Grammar rules:
+            <parameters> ::= EMPTY
+                | <parameter_list>
+        """
+        try:
+            return p.parameter_list
+        except AttributeError:
+            return tuple()
+
+    @_(r"parameter", r"parameter_list ',' parameter")  # noqa: F821
+    def parameter_list(self, p):
+        """
+        Parsing function for <parameter_list> nonterminal
+
+        Grammar rules:
+            <parameter_list> ::= <parameter>
+                | <parameter_list> COMMA <parameter>
+        """
+        try:
+            return p.parameter_list+(p.parameter,)
+        except AttributeError:
+            return (p.parameter,)
+
+    @_(r"parameter_begin_scope boolean_expression parameter_end_scope")  # noqa: F821, E501
+    def parameter(self, p):
+        """
+        Parsing function for <parameter> nonterminal
+
+        Grammar rules:
+            <parameter> ::= <boolean_expression>
+        """
+        return p.boolean_expression
+
+    @_('')  # noqa: F821
+    def parameter_begin_scope(self, p):
+        """
+        Parsing action to open parameter scope
+        """
+        self.parameter_stack.append(None)
+
+    @_('')  # noqa: F821
+    def parameter_end_scope(self, p):
+        """
+        Parsing action to close parameter scope
+        """
+        self.parameter_stack.pop()
+
+    def error(self, p):
+        """
+        Error function, called immediately if syntax error is detected
+        @param p (sly.token)    offending token p
+                                p is None if syntax error occurs at EOF.
+        """
+        try:
+            # Get error position of offending token in cut.
+            error_pos = p.index
+        except AttributeError:  # syntax error at EOF, p is None
+            # Set error position to length of cut minus one.
+            error_pos = len(self.cut)-1
+        try:
+            # Get error token type
+            error_token = p.type
+        except AttributeError:
+            # syntax error at EOF get last token from stack
+            error_token = self.symstack[-1].type
+
+        # Format error message
+        error_msg = f"detected at:\n{self.cut}\n{' '*error_pos}^\n"
+        error_msg += f"Unexpected token '{error_token}'"
+        raise SyntaxError(error_msg)
+
+    def parse(self, cut: str, token_generator) -> tuple:
+        """
+        Overwrite sly.Parser parse function.
+        @param cut              unparsed cut input which is used to
+                                indicate where the error occurred
+        @param token_generator  generator object which yields tokens.
+                                Produced by the lexer from the cut input.
+        """
+        #: Set cut attribute needed in case of an error.
+        self.cut = cut
+        return super().parse(token_generator)
+
+
 def parse(cut: str, verbose=False) -> tuple:
     """
     Initialize a parser and lexer object and parse cut
@@ -918,6 +1545,30 @@ def parse(cut: str, verbose=False) -> tuple:
     return parser.parse(cut, lexer.tokenize(cut))
 
 
+def parse_expression(cut: str, verbose=False) -> tuple:
+    """
+    Initialize a parser and lexer object and parse cut
+    @param cut  cut string which should be parsed
+    @param verbose  provide verbose parsing output for
+                    parser debugging purposes, not to be set true in production
+    """
+    lexer = B2Lexer()
+    parser = B2ExpressionParser(verbose)
+    return parser.parse(cut, lexer.tokenize(cut))
+
+
 if __name__ == "__main__":
-    cut = input("Please input cut:\n")
-    print(parse(cut))
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument(
+        "-e", "--expression",
+        action="store_const",
+        default=0,
+        const=1
+    )
+    args = argparser.parse_args()
+    if args.expression:
+        cut = input("Please input expression:\n")
+        print(parse_expression(cut))
+    else:
+        cut = input("Please input cut:\n")
+        print(parse(cut))

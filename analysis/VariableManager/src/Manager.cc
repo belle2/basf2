@@ -245,6 +245,33 @@ bool Variable::Manager::createVariable(const std::string& name)
       return true;
     }
   }
+  // Try Formula registration with python parser if variable is not a simple identifier (else we get a infinite loop)
+  if (not std::regex_match(name, std::regex("^[a-zA-Z]([a-zA-Z_0-9&:]|\\+:|-:|':)*$"))) {
+    Py_Initialize();
+    try {
+      // Import parser
+      py::object b2parser_namespace = py::import("b2parser");
+      // Parse Expression
+      py::tuple expression_tuple = py::extract<boost::python::tuple>(b2parser_namespace.attr("parse_expression")(name));
+      try {
+        // Compile ExpressionNode
+        std::shared_ptr<const AbstractExpressionNode<Belle2::Variable::Manager>> expression_node =
+              NodeFactory::compile_expression_node<Belle2::Variable::Manager>(expression_tuple);
+        // Create lambda capturing the ExpressionNode
+        Variable::Manager::FunctionPtr func = [expression_node](const Particle * object) -> VarVariant {
+          return expression_node->evaluate(object);
+        };
+        // Put new variable into set of variables
+        m_variables[name] = std::make_shared<Var>(name, func, std::string("Returns expression ") + name);
+        return true;
+      } catch (std::runtime_error& exception) {
+        B2FATAL("Encountered bad variable name '" << name << "'. Maybe you misspelled it?");
+      }
+    } catch (py::error_already_set&) {
+      PyErr_Print();
+      B2FATAL("Parsing Error on variable: '" << name);
+    }
+  }
 
   B2FATAL("Encountered bad variable name '" << name << "'. Maybe you misspelled it?");
   return false;

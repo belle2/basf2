@@ -74,13 +74,6 @@ void PXDDQMEfficiencyModule::initialize()
   m_tracks.isOptional(m_tracksName);
   m_ROIs.isOptional(m_ROIsName);
   m_intercepts.isOptional(m_PXDInterceptListName);
-
-  std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
-  std::sort(sensors.begin(), sensors.end());  // make sure it is our natural order
-  int sensor_index = 0;
-  for (VxdID& avxdid : sensors) {
-    revLUT[avxdid] = sensor_index++;
-  }
 }
 
 void PXDDQMEfficiencyModule::beginRun()
@@ -151,8 +144,7 @@ void PXDDQMEfficiencyModule::event()
     // Vertex cut
     if (ptr2->getZ0() < m_z0minCut || ptr2->getZ0() > m_z0maxCut || fabs(ptr2->getD0()) > m_d0Cut) continue;
 
-    //loop over all PXD sensors to get the intersections
-    std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
+    // Loop over all intercepts to sensors
     for (auto intercept : interceptList) {
       auto const aVxdID = intercept.getSensorID();
       auto&  info = m_vxdGeometry.getSensorInfo(aVxdID);
@@ -176,8 +168,9 @@ void PXDDQMEfficiencyModule::event()
         double u_fit = intercept.getCoorU();
         double v_fit = intercept.getCoorV();
 
-        int ucell_fit = info.getUCellID(u_fit); // check wie overflow!!!
-        int vcell_fit = info.getVCellID(v_fit); // Check wie overflow
+        // cell ID is not limited to sensor, can be <0 and >250,768
+        int ucell_fit = info.getUCellID(u_fit);
+        int vcell_fit = info.getVCellID(v_fit);
 
         if (m_cutBorders && isCloseToBorder(ucell_fit, vcell_fit, m_maskedDistance)) {
           continue;
@@ -248,10 +241,13 @@ void PXDDQMEfficiencyModule::defineHisto()
   }
 
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
+  std::sort(sensors.begin(), sensors.end());  // make sure it is our natural order
+  int sensor_index = 0;
   for (VxdID& avxdid : sensors) {
     VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(avxdid);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     //Only interested in PXD sensors
+    revLUT[avxdid] = sensor_index++;
 
     TString buff = (std::string)avxdid;
     buff.ReplaceAll(".", "_");
@@ -276,7 +272,7 @@ void PXDDQMEfficiencyModule::defineHisto()
       m_h_sv2[avxdid] = new TH1F("sv2_" + buff, "sv2 " + buff, 1000, 0, 1);
     }
   }
-  m_h_combined = new TH1D("PXD_Eff_combined", "Efficiency combined", sensors.size() * 2, 0, sensors.size() * 2);
+  m_h_combined = new TH1D("PXD_Eff_combined", "Efficiency combined", revLUT.size() * 2, 0, revLUT.size() * 2);
   // cd back to root directory
   oldDir->cd();
 }

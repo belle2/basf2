@@ -16,6 +16,7 @@
 
 import os
 import sys
+import glob
 import basf2 as b2
 import ROOT
 from ROOT import Belle2
@@ -30,7 +31,7 @@ clusteralgo.setPrefix("VTXClusterPositionCollector")
 
 # Can use a Python list of input files/wildcards. It will resolve the existing files
 # We have one type of pixel for VTX, that is one cluster kind.
-clusteralgo.setInputFileNames(["VTXClusterPositionCollectorOutput_kind_0.root"])
+clusteralgo.setInputFileNames(list(glob.glob("VTXClusterPositionCollectorOutput_kind_0_*.root")))
 
 # Here, we can play around with algo parameters
 # Minimum number of collected clusters for estimating shape likelyhood

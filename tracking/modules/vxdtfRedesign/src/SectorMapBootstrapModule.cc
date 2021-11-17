@@ -200,6 +200,26 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1point1.quantiles = {0., 1.};  //{0.005, 1. - 0.005};
   bootstrapSectorMap(config1point1);
 
+  // same as config1 but allows up to 7 layers
+  // default for VTX tracking
+  SectorMapConfig config1point2;
+  config1point2.pTmin = 0.02; // minimal relevant version
+  config1point2.pTmax = 6.0; // minimal relevant version // Feb18-onePass-Test
+  config1point2.pTSmear = 0.;
+  config1point2.allowedLayers = {0, 1, 2, 3, 4, 5, 6, 7};
+  config1point2.uSectorDivider = { .3, .7, 1.}; // standard relevant version
+  config1point2.vSectorDivider = { .3, .7, 1.}; // standard relevant version
+  config1point2.pdgCodesAllowed = {};
+  config1point2.seedMaxDist2IPXY = 23.5;
+  config1point2.seedMaxDist2IPZ = 23.5;
+  config1point2.nHitsMin = 3;
+  config1point2.vIP = B2Vector3D(0, 0, 0);
+  config1point2.secMapName = "VTXDefault"; // has been: "lowTestSVDPXD";
+  config1point2.mField = 1.5;
+  config1point2.rarenessThreshold = 0.; //0.001;
+  config1point2.quantiles = {0., 1.};  //{0.005, 1. - 0.005};
+  bootstrapSectorMap(config1point2);
+
 }
 
 void

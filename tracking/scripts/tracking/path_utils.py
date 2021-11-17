@@ -1245,6 +1245,7 @@ def add_vtx_track_finding_vxdtf2(
     :param EstimationMethod: Estimation method for QualityEstimatorVXD. Default: circleFit
     :param materialBudgetFactor: MaterialBudgetFactor is a hyperparameter of TripletFit QE, Default: 50
     :param maxPt: MaxPt is a hyperparameter of TripletFit QE, Default: 0.5
+    :param vxdQualityEstimatarParametersFromDB: If True, take TripletFit hyperparameters from DB, otherwise from function arguments
     """
     ##########################
     # some setting for VXDTF2

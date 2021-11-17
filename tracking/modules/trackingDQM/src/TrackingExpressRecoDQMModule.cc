@@ -72,7 +72,7 @@ void TrackingExpressRecoDQMModule::defineHisto()
   DefineUBResidualsVXD();
   DefineHalfShellsVXD();
 
-  DefineFlags();
+  DefineAbortFlagsHistograms();
   if (m_produce1Dres)
     Define1DSensors();
   if (m_produce2Dres)
@@ -123,7 +123,7 @@ void TrackingExpressRecoDQMModule::event()
     m_trackingErrorFlags->Fill(0);
 }
 
-void TrackingExpressRecoDQMModule::DefineFlags()
+void TrackingExpressRecoDQMModule::DefineAbortFlagsHistograms()
 {
   // only monitor if any flag was set so only 2 bins needed
   m_trackingErrorFlags =

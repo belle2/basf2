@@ -412,9 +412,8 @@ void DQMHistAnalysisPXDEffModule::event()
       if (j == 6) continue; // workaround for 1.3.2 module
 
       // get the errors and check for limits for each bin seperately ...
-      /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
 
-      if (nhit > 20) {
+      if (nhit > 50) {
         error_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
                        m_errorlevelmod[aModule]); // error if upper error value is below limit
         warn_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <

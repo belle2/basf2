@@ -23,7 +23,6 @@
 import basf2 as b2
 import tracking as trk
 import rawdata as raw
-import daqdqm.commondqm as cdqm
 import sys
 
 # main

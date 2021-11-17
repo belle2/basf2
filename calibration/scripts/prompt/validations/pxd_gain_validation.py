@@ -13,12 +13,9 @@ Validation of PXD gain calibration.
 '''
 
 
-import basf2
 from prompt import ValidationSettings
-import ROOT
 import sys
 import subprocess
-import math
 from glob import glob
 
 

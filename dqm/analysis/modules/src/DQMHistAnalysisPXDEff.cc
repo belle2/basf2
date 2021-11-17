@@ -129,6 +129,11 @@ void DQMHistAnalysisPXDEffModule::initialize()
     }
   }
 
+  m_cInnerMap = new TCanvas((m_histogramDirectoryName + "/c_InnerMap").data());
+  m_cOuterMap = new TCanvas((m_histogramDirectoryName + "/c_OuterMap").data());
+  m_hInnerMap = new TH2F("hEffInnerMap", "hEffInnerMap", m_u_bins * 8, 0, m_u_bins * 8,  m_v_bins * 2, 0, m_v_bins * 2);
+  m_hOuterMap = new TH2F("hEffOuterMap", "hEffOuterMap", m_u_bins * 12, 0, m_u_bins * 12,  m_v_bins * 2, 0, m_v_bins * 2);
+
   m_hErrorLine = new TH1F("hPXDErrorlimit", "Error Limit", m_PXDModules.size(), 0, m_PXDModules.size());
   m_hWarnLine = new TH1F("hPXDWarnlimit", "Warn Limit", m_PXDModules.size(), 0, m_PXDModules.size());
   for (int i = 0; i < (int)m_PXDModules.size(); i++) {
@@ -308,10 +313,40 @@ void DQMHistAnalysisPXDEffModule::event()
           m_hEffModules[aPXDModule]->Draw("colz");
           m_cEffModules[aPXDModule]->Modified();
           m_cEffModules[aPXDModule]->Update();
+
+
+          auto h = m_hEffModules[aPXDModule]->GetPaintedHistogram();
+          int s = (2 - aPXDModule.getSensorNumber()) * m_v_bins;
+          int l = (aPXDModule.getLadderNumber() - 1) * m_u_bins;
+          if (m_hInnerMap && aPXDModule.getLayerNumber() == 1) {
+            for (int u = 0; u < m_u_bins; u++) {
+              for (int v = 0; v < m_v_bins; v++) {
+                auto b = h->GetBin(u + 1, v + 1);
+                m_hInnerMap->Fill(u + l, v + s, h->GetBinContent(b));
+              }
+            }
+          }
+          if (m_hOuterMap && aPXDModule.getLayerNumber() == 2) {
+            for (int u = 0; u < m_u_bins; u++) {
+              for (int v = 0; v < m_v_bins; v++) {
+                auto b = h->GetBin(u + 1, v + 1);
+                m_hOuterMap->Fill(u + l, v + s, h->GetBinContent(b));
+              }
+            }
+          }
         }
       }
     }
   }//One-Module histos finished
+
+  m_cInnerMap->cd();
+  m_hInnerMap->Draw("colz");
+  m_cInnerMap->Modified();
+  m_cInnerMap->Update();
+  m_cOuterMap->cd();
+  m_hOuterMap->Draw("colz");
+  m_cOuterMap->Modified();
+  m_cOuterMap->Update();
 
   // Change: We now use one histogram for hits and matches to make
   // sute that we have an atomic update which is otherwise not

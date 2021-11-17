@@ -349,7 +349,7 @@ void DQMHistAnalysisPXDEffModule::event()
   m_cOuterMap->Update();
 
   // Change: We now use one histogram for hits and matches to make
-  // sute that we have an atomic update which is otherwise not
+  // sure that we have an atomic update which is otherwise not
   // guaranteed by DQM framework
   TString locationHits = "PXD_Eff_combined";
   if (m_histogramDirectoryName != "") {
@@ -365,7 +365,7 @@ void DQMHistAnalysisPXDEffModule::event()
   double imatch = 0.0, ihit = 0.0;
   int ieff = 0;
 
-  std::map <VxdID, bool> updated{}; // init to false, kep track of updated histograms
+  std::map <VxdID, bool> updated{}; // init to false, keep track of updated histograms
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     int j = i + 1;
 

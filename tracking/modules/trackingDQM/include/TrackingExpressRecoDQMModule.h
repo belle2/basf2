@@ -34,9 +34,11 @@ namespace Belle2 {
     void defineHisto() override;
 
   protected:
-    /** All the following Define- functions should be used in the defineHisto() function to define histograms. The convention is that every Define- function is responsible for creating its
+    /* All the following Define- functions should be used in the defineHisto() function to define histograms.
+     * The convention is that every Define- function is responsible for creating its
      * own TDirectory (if it's needed). In any case the function must then return to the original gDirectory.
      * For the creation of histograms the THFFactory or the Create- functions should be used. */
+    /** Defines the histograms for the tracking abort flags. */
     virtual void DefineFlags();
 
     /** Acccess to the EventLevelTrackingInfo object in the datastore. */

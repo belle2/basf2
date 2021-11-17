@@ -137,7 +137,7 @@ void TrackingExpressRecoDQMModule::DefineFlags()
   m_trackingErrorFlagsReasons =
     Create("TrackingErrorFlagsReasons",
            "Tracking errors by reason. A single event may fall in multiple bins.;Type of error occurred;Number of events",
-           6, -0.5, 6.5, "Type of error occurred", "Number of events");
+           6, -0.5, 5.5, "Type of error occurred", "Number of events");
   m_trackingErrorFlagsReasons->GetXaxis()->SetBinLabel(1, "No Error");
   m_trackingErrorFlagsReasons->GetXaxis()->SetBinLabel(2, "Unspecified PR");
   m_trackingErrorFlagsReasons->GetXaxis()->SetBinLabel(3, "VXDTF2");

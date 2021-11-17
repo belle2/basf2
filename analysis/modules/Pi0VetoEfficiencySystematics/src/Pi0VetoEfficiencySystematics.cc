@@ -13,6 +13,7 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/core/Environment.h>
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/ParticleList.h>
 
 #include <map>
 
@@ -32,10 +33,11 @@ Pi0VetoEfficiencySystematicsModule::Pi0VetoEfficiencySystematicsModule() : Modul
 {
   setDescription("Includes data/MC weights for pi0 veto efficiency as extraInfo for a given particle list. One must call writeP0EtaVeto function in advance. Weights and its errors will be provided for given mode and threshold.");
   // Parameter definitions
-  addParam("particleLists", m_ParticleLists, "input particle lists");
-  addParam("decayString", m_decayString, "decay string");
-  addParam("threshold", m_threshold, "threshold of pi0 veto");
-  addParam("mode", m_mode, "pi0 veto option name");
+  std::vector<std::string> emptylist;
+  addParam("particleLists", m_ParticleLists, "input particle lists", emptylist);
+  addParam("decayString", m_decayString, "decay string", std::string(""));
+  addParam("threshold", m_threshold, "threshold of pi0 veto", 0.);
+  addParam("mode", m_mode, "pi0 veto option name", std::string(""));
 }
 
 // Getting LookUp info for given hard photon in given event
@@ -57,10 +59,9 @@ WeightInfo Pi0VetoEfficiencySystematicsModule::getInfo(const Particle* particle)
 
 void Pi0VetoEfficiencySystematicsModule::initialize()
 {
-  if (m_decayString != "") {
-    m_decayDescriptor.init(m_decayString);
-  } else {
-    B2ERROR("Please provide a decay string for Pi0VetoEfficiencySystematicsModule");
+  bool valid = m_decayDescriptor.init(m_decayString);
+  if (!valid) {
+    B2ERROR("Invalid input decay string: " << m_decayString);
   }
 
   if (m_threshold < 0.5 || 0.99 < m_threshold) {
@@ -88,7 +89,6 @@ void Pi0VetoEfficiencySystematicsModule::event()
     size_t nPart = particleList->getListSize();
     for (size_t iPart = 0; iPart < nPart; iPart++) {
       auto particle = particleList->getParticle(iPart);
-      //m_decayDescriptor.init(m_decayString);
       std::vector<const Particle*> selectedParticles = m_decayDescriptor.getSelectionParticles(particle);
       int nSelected = selectedParticles.size();
       // Hard photon must be specified by decayString
@@ -96,9 +96,7 @@ void Pi0VetoEfficiencySystematicsModule::event()
         B2ERROR("You selected " << nSelected << " particle(s). Select only a hard photon");
         break;
       }
-      //Particle* selectedParentParticle = selectedParticles[0];
       const Particle* selectedDaughterParticle = selectedParticles[0];
-      //addPi0VetoEfficiencyRatios(selectedParentParticle, selectedDaughterParticle);
       addPi0VetoEfficiencyRatios(particle, selectedDaughterParticle);
     }
   }

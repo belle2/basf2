@@ -3576,7 +3576,7 @@ def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
     path.add_module(photon_efficiency_correction)
 
 
-def applyPi0Veto(particleList, decayString, threshold, mode='standard', applyCut=True, path=None):
+def addPi0VetoEfficiencySystematics(particleList, decayString, threshold, mode='standard', applyCut=True, path=None):
     """
     Apply pi0 veto and add pi0 veto Data/MC efficiency ratio weights to the specified particle list
 

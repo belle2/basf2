@@ -14,7 +14,6 @@
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
 #include <framework/database/DBObjPtr.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <string>
 

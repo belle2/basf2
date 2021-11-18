@@ -600,7 +600,6 @@ namespace Belle2 {
         paramFlag = true;
       } else {
         fitObjectName = "Unmeasured";
-        paramFlag = false;
       }
 
       pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, 0.0, 0.0, 0.0, 0.);

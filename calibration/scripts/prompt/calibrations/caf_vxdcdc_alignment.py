@@ -41,7 +41,8 @@ default_config = {
     "cosmic.max_processed_events_per_file": 4000,
     "hadron.max_processed_events_per_file": 1000,
     "mumu.max_processed_events_per_file": 5000,
-    "offip.max_processed_events_per_file": 2000
+    "offip.max_processed_events_per_file": 2000,
+    "stage1.method": "fullLAPACK"
 }
 
 quality_flags = [INPUT_DATA_FILTERS["Run Type"]["physics"],
@@ -237,7 +238,7 @@ def create_prompt(files, cfg):
             mpc.make_collection("offip", path=create_std_path(), tracks=["RecoTracks"])
         ],
         tags=None,
-        files=files,
+        files=dict(mumu=mumu, cosmic=cosmic, hadron=hadron, offip=offip),
         timedep=None,
         constraints=[
             alignment.constraints.VXDHierarchyConstraints(type=2, pxd=True, svd=True),
@@ -251,7 +252,7 @@ def create_prompt(files, cfg):
         params=dict(minPValue=0.00001, externalIterations=0, granularity="run"),
         min_entries=1000000)
 
-    cal.max_iterations = 0
+    cal.max_iterations = 5
 
     return cal
 
@@ -330,7 +331,7 @@ def create_stage1(files, cfg):
 
     mumu = select_files(files["mumu"], 1.5e6, cfg["mumu.max_processed_events_per_file"])
     cosmic = select_files(files["cosmic"], 0.7e6, cfg["cosmic.max_processed_events_per_file"])
-    hadron_and_offip = select_files(files["hadron"] + files["offip"], 3.0e6, cfg["mumu.max_processed_events_per_file"])
+    hadron_and_offip = select_files(files["hadron"] + files["offip"], int(4.0e6 / 10.), cfg["hadron.max_processed_events_per_file"])
 
     cal = mpc.create(
         name='VXDCDCalignment_stage1',
@@ -351,11 +352,11 @@ def create_stage1(files, cfg):
         fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=False)
         + alignment.parameters.beamspot(),
         commands=[
-            "method fullLAPACK 6 0.001",
+            f"method {cfg['stage1.method']} 6 0.001",
             "entries 1000",
             "threads 10 10"],
         params=dict(minPValue=0.00001, externalIterations=0, granularity="run"),
-        min_entries=2000000)
+        min_entries=500000)
 
     # Ignore results for BeamSpot
     std_components = ROOT.vector('string')()
@@ -389,7 +390,7 @@ def create_stage2(files, cfg):
             mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"]),
             make_mumu_collection(name="mumu")],
         tags=None,
-        files=files,
+        files=dict(mumu=mumu, cosmic=cosmic),
         timedep=None,
         constraints=[
             alignment.constraints.VXDHierarchyConstraints(type=2, pxd=True, svd=True),

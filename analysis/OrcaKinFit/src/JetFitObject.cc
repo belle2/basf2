@@ -124,37 +124,57 @@ namespace Belle2 {
     {
       invalidateCache();
 
-      int iE  = getGlobalParNum(0);
-      int ith = getGlobalParNum(1);
-      int iph = getGlobalParNum(2);
-      assert(iE  >= 0 && iE  < idim);
-      assert(ith >= 0 && ith < idim);
-      assert(iph >= 0 && iph < idim);
+      double e = par[0];
+      double th = par[1];
+      double ph = par[2];
 
-      double e  = pp[iE];
-      double th = pp[ith];
-      double ph = pp[iph];
+      bool result = false;
 
-      if (e < 0) {
-        B2INFO("JetFitObject::updateParams: mirrored E!\n");
-        e  = -e;
-        th = M_PI - th;
-        ph = M_PI + ph;
+      if (!isParamFixed(0)) {
+        int iE  = getGlobalParNum(0);
+        assert(iE  >= 0 && iE  < idim);
+        e  = pp[iE];
+
+        if (e < 0) {
+          B2INFO("JetFitObject::updateParams: mirrored E!\n");
+          e  = -e;
+        }
+
+        double massPlusEpsilon = mass * (1.0000001);
+        if (e < massPlusEpsilon) e = massPlusEpsilon;
+        result = result || ((e - par[0]) * (e - par[0]) > eps2 * cov[0][0]);
+        par[0] = e;
+        pp[iE]  = par[0];
       }
 
-      double massPlusEpsilon = mass * (1.0000001);
-      if (e < massPlusEpsilon) e = massPlusEpsilon;
+      if (!isParamFixed(1)) {
+        int ith = getGlobalParNum(1);
+        assert(ith >= 0 && ith < idim);
+        th = pp[ith];
 
-      bool result = ((e - par[0]) * (e - par[0]) > eps2 * cov[0][0]) ||
-                    ((th - par[1]) * (th - par[1]) > eps2 * cov[1][1]) ||
-                    ((ph - par[2]) * (ph - par[2]) > eps2 * cov[2][2]);
+        if (e < 0) {
+          th = M_PI - th;
+        }
 
-      par[0] = e;
-      par[1] = th;
-      par[2] = ph;
-      pp[iE]  = par[0];
-      pp[ith] = par[1];
-      pp[iph] = par[2];
+        result = result || ((th - par[1]) * (th - par[1]) > eps2 * cov[1][1]);
+        par[1] = th;
+        pp[ith] = par[1];
+      }
+
+      if (!isParamFixed(2)) {
+        int iph = getGlobalParNum(2);
+        assert(iph >= 0 && iph < idim);
+        ph = pp[iph];
+
+        if (e < 0) {
+          ph = M_PI + ph;
+        }
+
+        result = result || ((ph - par[2]) * (ph - par[2]) > eps2 * cov[2][2]);
+        par[2] = ph;
+        pp[iph] = par[2];
+      }
+
       return result;
     }
 

@@ -3576,22 +3576,22 @@ def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
     path.add_module(photon_efficiency_correction)
 
 
-def addPi0VetoEfficiencySystematics(particleList, decayString, threshold, mode='standard', applyCut=True, path=None):
+def addPi0VetoEfficiencySystematics(particleList, decayString, threshold, mode='standard', path=None):
     """
-    Apply pi0 veto and add pi0 veto Data/MC efficiency ratio weights to the specified particle list
+    Add pi0 veto Data/MC efficiency ratio weights to the specified particle list
 
     @param particleList   the input ParticleList
     @param decayString    specify hard photon to be performed pi0 veto (e.g. 'B+:sig -> rho+:sig ^gamma:hard')
     @param threshold      pi0 veto threshold (0.50, 0.51, ..., 0.99)
     @param mode           choose one mode (same as writePi0EtaVeto) out of 'standard', 'tight', 'cluster' and 'both'
-    @param applyCut       set False if you don't want to apply veto
-    """
 
-    dictPi0ExtraInfoName = {'standard': 'Pi0ProbOrigin',
-                            'tight': 'Pi0ProbTightEnergyThreshold',
-                            'cluster': 'Pi0ProbLargeClusterSize',
-                            'both': 'Pi0ProbTightEnergyThresholdAndLargeClusterSize'}
-    Pi0ExtraInfoName = dictPi0ExtraInfoName[mode]
+    The following variables are available related with the given particleList:
+    * Pi0VetoEfficiencySystematics_data_MC_ratio             : weight of Data/MC for the veto efficiency
+    * Pi0VetoEfficiencySystematics_data_MC_uncertainty_stat  : the statistical uncertainty of the weight
+    * Pi0VetoEfficiencySystematics_data_MC_uncertainty_sys   : the systematic uncertainty of the weight
+    * Pi0VetoEfficiencySystematics_data_MC_uncertainty_total : the total uncertainty of the weight
+    * Pi0VetoEfficiencySystematics_threshold                 : threshold of the pi0 veto
+    """
 
     pi0veto_efficiency_correction = register_module('Pi0VetoEfficiencySystematics')
     pi0veto_efficiency_correction.param('particleLists', particleList)
@@ -3599,8 +3599,6 @@ def addPi0VetoEfficiencySystematics(particleList, decayString, threshold, mode='
     pi0veto_efficiency_correction.param('threshold', threshold)
     pi0veto_efficiency_correction.param('mode', mode)
     path.add_module(pi0veto_efficiency_correction)
-    if applyCut:
-        applyCuts(particleList, f'extraInfo({Pi0ExtraInfoName})<{threshold}', path=path)
 
 
 def getAnalysisGlobaltag(timeout=180) -> str:

@@ -47,116 +47,123 @@ def fill(fillPatternHex, firstExp, firstRun, lastExp, lastRun):
 argvs = sys.argv
 
 
-if len(argvs) == 2:
-    minexp = argvs[1]
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description='Create bunch structure payload taking information from the RunDB')
+    parser.add_argument('minExp', metavar='minExp', type=int,
+                        help='first experiment. Use only this argument to produce filling pattern for experiment 0 or 1003')
+    parser.add_argument('minRun', metavar='minRun', type=int, nargs='?',
+                        help='first run')
+    parser.add_argument('maxExp', metavar='maxExp', type=int, nargs='?',
+                        help='last experiment')
+    parser.add_argument('maxRun', metavar='maxRun', type=int, nargs='?',
+                        help='last run')
 
-elif len(sys.argv) == 5:
-    minexp = argvs[1]
-    minrun = argvs[2]
-    maxexp = argvs[3]
-    maxrun = argvs[4]
-else:
-    basf2.B2ERROR("Wrong arguments. Options are:\n",
-                  "1 arguments usage: basf2 ", argvs[0], " <0> or <1003>\n"
-                  "4 arguments usage: basf2 ", argvs[0], " <minexp> <minrun> <maxexp> <maxrun>")
-    sys.exit()
+    args = parser.parse_args()
 
+    if(args.minExp == 0):
+        bunches = Belle2.BunchStructure()
 
-if(minexp == "0"):
-    bunches = Belle2.BunchStructure()
+        extraStep = 0
+        for b in range(0, 5120, 2):
 
-    extraStep = 0
-    for b in range(0, 5120, 2):
+            # Shift of 1 bunch every 300 bunches to simulate bunch trains
+            if((b % 300 == 0) & (b != 0)):
+                extraStep += 1
 
-        # Shift of 1 bunch every 300 bunches to simulate bunch trains
-        if((b % 300 == 0) & (b != 0)):
-            extraStep += 1
+            bunches.setBucket(b + extraStep)
 
-        bunches.setBucket(b + extraStep)
+        iov = Belle2.IntervalOfValidity(0, 0, 0, -1)
 
-    iov = Belle2.IntervalOfValidity(0, 0, 0, -1)
+        db = Belle2.Database.Instance()
+        db.storeData("BunchStructure", bunches, iov)
 
-    db = Belle2.Database.Instance()
-    db.storeData("BunchStructure", bunches, iov)
+    elif(args.minExp == 1003):
 
-elif(minexp == "1003"):
+        username = input("Enter your username: ")
+        rundb = RunDB(username=username)
 
-    username = input("Enter your username: ")
-    rundb = RunDB(username=username)
+        runInfo = rundb.get_run_info(
+            min_experiment=12,
+            max_experiment=12,
+            min_run=1859,
+            max_run=1859,
+            run_type='physics',
+            expand=True
+        )
 
-    runInfo = rundb.get_run_info(
-        min_experiment=12,
-        max_experiment=12,
-        min_run=1859,
-        max_run=1859,
-        run_type='physics',
-        expand=True
-    )
+        for it in runInfo:
+            pattern = it['ler']['fill_pattern']
+        fill(pattern, 1003, 0, 1003, -1)
 
-    for it in runInfo:
-        pattern = it['ler']['fill_pattern']
-    fill(pattern, 1003, 0, 1003, -1)
+    else:
 
+        minexp = args.minExp
+        minrun = args.minRun
+        maxexp = args.maxExp
+        maxrun = args.maxRun
 
-else:
-    username = input("Enter your username: ")
-    rundb = RunDB(username=username)
+        if(minrun is None or maxexp is None or maxexp is None or maxrun is None):
+            basf2.B2ERROR("Wrong arguments. Check usage")
+            sys.exit()
 
-    runInfo = rundb.get_run_info(
-        min_experiment=minexp,
-        max_experiment=maxexp,
-        min_run=minrun,
-        max_run=maxrun,
-        run_type='physics',
-        expand=True
-    )
+        username = input("Enter your username: ")
+        rundb = RunDB(username=username)
 
-    current_pattern = None
-    current_start = None, None
-    current_end = None, None
+        runInfo = rundb.get_run_info(
+            min_experiment=minexp,
+            max_experiment=maxexp,
+            min_run=minrun,
+            max_run=maxrun,
+            run_type='physics',
+            expand=True
+        )
 
-    lumiMax = 0
-    runExpMaxBegin = 0
-    runExpMaxEnd = 0
+        current_pattern = None
+        current_start = None, None
+        current_end = None, None
 
-    lumi = 0
-    for it in runInfo:
-        exprun = it['experiment'], it['run']
-        pattern = it['ler']['fill_pattern']
+        lumiMax = 0
+        runExpMaxBegin = 0
+        runExpMaxEnd = 0
 
-        if(pattern == ""):
-            continue
+        lumi = 0
+        for it in runInfo:
+            exprun = it['experiment'], it['run']
+            pattern = it['ler']['fill_pattern']
 
-        # pattern different to previous one or first run
-        if pattern != current_pattern:
+            if(pattern == ""):
+                continue
 
-            if(lumi > lumiMax):
-                runExpMaxBegin = current_start
-                runExpMaxEnd = current_end
-                lumiMax = lumi
+            # pattern different to previous one or first run
+            if pattern != current_pattern:
 
-            # close the iov
-            fill(current_pattern, *current_start, *current_end)
-            if current_pattern is not None:
-                print(f"Corresponding to {lumi/1000.:.2f} pb-1\n")
+                if(lumi > lumiMax):
+                    runExpMaxBegin = current_start
+                    runExpMaxEnd = current_end
+                    lumiMax = lumi
 
-            # and remember new values
-            current_pattern = pattern
-            current_start = exprun
-            current_end = exprun
+                # close the iov
+                fill(current_pattern, *current_start, *current_end)
+                if current_pattern is not None:
+                    print(f"Corresponding to {lumi/1000.:.2f} pb-1\n")
 
-            lumi = it['statistics']['lumi_recorded']
+                # and remember new values
+                current_pattern = pattern
+                current_start = exprun
+                current_end = exprun
 
-        else:
-            # pattern unchanged, extend current iov
-            current_end = exprun
-            lumi += it['statistics']['lumi_recorded']
+                lumi = it['statistics']['lumi_recorded']
 
-    # close the last iov if any
-    fill(current_pattern, *current_start, *current_end)
-    print(f"Corresponding to {lumi/1000.:.2f} pb-1\n")
+            else:
+                # pattern unchanged, extend current iov
+                current_end = exprun
+                lumi += it['statistics']['lumi_recorded']
 
-    print(
-        f"Most used filling pattern:\niov: \
-        {runExpMaxBegin[0]},{runExpMaxBegin[1]},{runExpMaxEnd[0]},{runExpMaxEnd[1]} \
-        \nIntegrated luminosity: {lumiMax/1000:.2f} pb-1")
+        # close the last iov if any
+        fill(current_pattern, *current_start, *current_end)
+        print(f"Corresponding to {lumi/1000.:.2f} pb-1\n")
+
+        print(
+            f"Most used filling pattern:\niov: {runExpMaxBegin[0]},{runExpMaxBegin[1]},{runExpMaxEnd[0]},{runExpMaxEnd[1]} \
+            \nCorresponding to the integrated luminosity: {lumiMax/1000:.2f} pb-1")

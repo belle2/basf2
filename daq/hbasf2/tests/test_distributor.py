@@ -258,7 +258,7 @@ if __name__ == '__main__':
 
     #: Exit message
     message = f'Number of failed for loops: {number_of_failures}/{ZMQ_TEST_FOR_LOOPS}'
-    if number_of_failures < ZMQ_TEST_MAX_FAILURES:
+    if number_of_failures <= ZMQ_TEST_MAX_FAILURES:
         basf2.B2INFO(message)
     else:
         basf2.B2FATAL(message)

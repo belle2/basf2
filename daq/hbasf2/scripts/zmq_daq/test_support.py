@@ -23,7 +23,7 @@ import zmq
 ZMQ_TEST_FOR_LOOPS = 5
 
 #: Maximal number of ZMQ tests failing we accept
-ZMQ_TEST_MAX_FAILURES = 2
+ZMQ_TEST_MAX_FAILURES = 1
 
 
 class HLTZMQTestCase(TestCase):

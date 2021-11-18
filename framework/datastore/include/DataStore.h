@@ -479,6 +479,14 @@ namespace Belle2 {
      */
     std::vector<std::string> getListOfObjects(const TClass* objClass, EDurability durability) const;
 
+    /** Returns a list of names of StoreObjPtr-objects whose class is (or inherits from) RelationContainer.
+     */
+    std::vector<std::string> getListOfRelations(EDurability durability) const;
+
+    /** Returns a (sorted) list of all the content of the DataStore (Objs-Arrays-Relations).
+     */
+    std::vector<std::string> getSortedListOfDataStore(EDurability durability) const;
+
 
     //------------------------------ For internal use --------------------------------------------------
     /** Setter for m_initializeActive.
@@ -524,7 +532,9 @@ namespace Belle2 {
     /** copy entries (not contents) of current DataStore to the DataStore with given ID. */
     void copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event = {}, bool skipIfRegistered = false);
     /** copy contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
-    void copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event = {}, bool replaceExisting = true);
+    void copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
+    /** merge contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
+    void mergeContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
 
   private:
     /** Hidden constructor, as it is a singleton.*/
@@ -591,7 +601,9 @@ namespace Belle2 {
       /** copy entries (not contents) of current DataStore to the DataStore with given ID. */
       void copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event = {}, bool skipIfRegistered = false);
       /** copy contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
-      void copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event = {}, bool replaceExisting = true);
+      void copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
+      /** merge contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
+      void mergeContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
       /** creates new datastore with given id, copying the registered objects/arrays from the current one. */
       void createNewDataStoreID(const std::string& id);
       /** creates empty datastore with given id. */

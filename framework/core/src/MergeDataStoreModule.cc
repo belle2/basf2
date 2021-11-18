@@ -23,7 +23,7 @@ MergeDataStoreModule::MergeDataStoreModule() : Module()
   addParam("toID", m_to, "active DataStore id after this module", std::string(""));
   addParam("createNew", m_createNew,
            "do you want to create a new (empty) DataStore 'toID'? This should be true only when toID refers to a _new_ DataStore ID", false);
-  addParam("mergeBack", m_mergeBack, "if given, copy the given objects/arrays over even if createNew is fals.",
+  addParam("mergeBack", m_mergeBack, "if given, copy the given objects/arrays over even if createNew is false.",
            std::vector<std::string> {});
 }
 
@@ -52,7 +52,7 @@ void MergeDataStoreModule::initialize()
     //if m_mergeBack is set, we need to register the objects/arrays there, too (if they are not registered yet)
     DataStore::Instance().copyEntriesTo(m_to, m_mergeBack, true);
     //then copy
-    DataStore::Instance().copyContentsTo(m_to, m_mergeBack, false);
+    //DataStore::Instance().mergeContentsTo(m_to, m_mergeBack);
   }
 
   //switch
@@ -62,7 +62,7 @@ void MergeDataStoreModule::terminate()
 {
   if (not m_createNew) {
     //copy contents over
-    DataStore::Instance().copyContentsTo(m_from, {}, false);
+    //DataStore::Instance().mergeContentsTo(m_from, {});
   }
   //nothing merged back. this is not really consistent anyway.
 
@@ -72,18 +72,18 @@ void MergeDataStoreModule::terminate()
 
 void MergeDataStoreModule::beginRun()
 {
-  event();
+  //event();
 }
 void MergeDataStoreModule::endRun()
 {
-  event();
+  //event();
 }
 void MergeDataStoreModule::event()
 {
   if (m_createNew) {
     // don't do anything
   } else if (!m_mergeBack.empty()) {
-    DataStore::Instance().copyContentsTo(m_to, m_mergeBack, false);
+    DataStore::Instance().mergeContentsTo(m_to, m_mergeBack);
   }
 
   DataStore::Instance().switchID(m_to);

@@ -683,6 +683,33 @@ std::vector<std::string> DataStore::getListOfObjects(const TClass* objClass, EDu
   return list;
 }
 
+std::vector<std::string> DataStore::getListOfRelations(EDurability durability) const
+{
+  vector<string> list;
+  const DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
+  for (const auto& entrypair : map) {
+    if (!entrypair.second.isArray) {
+      const TObject* obj = entrypair.second.object;
+      if (dynamic_cast<const RelationContainer*>(obj))
+        list.emplace_back(entrypair.first);
+
+    }
+  }
+  return list;
+}
+
+std::vector<std::string> DataStore::getSortedListOfDataStore(EDurability durability) const
+{
+  std::vector<string> list;
+  std::vector<std::string> mergeContent = getListOfObjects(TObject::Class(), durability);
+  list.insert(std::end(list), std::begin(mergeContent), std::end(mergeContent));
+  mergeContent = getListOfArrays(TObject::Class(), durability);
+  list.insert(std::end(list), std::begin(mergeContent), std::end(mergeContent));
+  mergeContent = getListOfRelations(durability);
+  list.insert(std::end(list), std::begin(mergeContent), std::end(mergeContent));
+  return list;
+}
+
 void DataStore::invalidateData(EDurability durability)
 {
   B2DEBUG(100, "Invalidating objects for durability " << durability);
@@ -767,6 +794,8 @@ void DataStore::switchID(const std::string& id)
   if (id == m_storeEntryMap.currentID())
     return;
 
+  B2INFO("--- Switching DataStore to ID " << id << " ---");
+
   //remember to clear caches
   RelationIndexManager::Instance().reset();
 
@@ -778,9 +807,14 @@ void DataStore::copyEntriesTo(const std::string& id, const std::vector<std::stri
   m_storeEntryMap.copyEntriesTo(id, entrylist_event, skipIfRegistered);
 }
 
-void DataStore::copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event, bool replaceExisting)
+void DataStore::copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event)
 {
-  m_storeEntryMap.copyContentsTo(id, entrylist_event, replaceExisting);
+  m_storeEntryMap.copyContentsTo(id, entrylist_event);
+}
+
+void DataStore::mergeContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event)
+{
+  m_storeEntryMap.mergeContentsTo(id, entrylist_event);
 }
 
 
@@ -816,25 +850,39 @@ void DataStore::SwitchableDataStoreContents::createEmptyDataStoreID(const std::s
 void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event,
                                                            bool skipIfRegistered)
 {
+  if (entrylist_event.empty()) {
+    B2FATAL("Nothing to merge. This shouldn't happen.");
+    return;
+  }
+
+  std::vector<std::string> entrylist;
+  if (entrylist_event.size() == 1 and entrylist_event.at(0) == "ALL") {
+    entrylist = DataStore::Instance().getSortedListOfDataStore(c_Event);
+  } else {
+    entrylist = entrylist_event;
+  }
+
   int targetidx;
+  std::vector<std::string> skippedEntries;
   if (m_idToIndexMap.count(id) == 0) {
     //new DataStore & full copy
-    if (!entrylist_event.empty())
+    if (!entrylist.empty())
       B2FATAL("entrlylist_event given for new DS id. This shouldn't happen, report to framework author.");
     targetidx = m_entries.size();
     m_idToIndexMap[id] = targetidx;
 
     //copy entries
     m_entries.push_back(m_entries[m_currentIdx]);
-  } else if (!entrylist_event.empty()) {
+  } else if (!entrylist.empty()) {
     //copy only given entries (in c_Event)
     targetidx = m_idToIndexMap.at(id);
-    for (const auto& entryname : entrylist_event) {
+    for (const auto& entryname : entrylist) {
       if (m_entries[m_currentIdx][c_Event].count(entryname) == 0)
         continue;
       if (m_entries[targetidx][c_Event].count(entryname) != 0) {
         if (skipIfRegistered) {
-          B2INFO("Not registering " << entryname << " to " << id);
+          skippedEntries.push_back(entryname);
+          B2INFO("Not registering " << entryname << " to " << id << ".");
           continue;
         } else {
           B2WARNING("Independent path: entry '" << entryname << "' already exists in DataStore '" << id <<
@@ -852,29 +900,30 @@ void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id
     for (auto& entrypair : m_entries[targetidx][iDurability]) {
       if (not entrypair.second.object)
         B2FATAL("createNewDataStoreID(): object '" << entrypair.first << " already null (this should never happen).");
-      if (!entrylist_event.empty()) {
+      if (!entrylist.empty()) {
         //skip all entries of other durabilities
         if (iDurability != c_Event)
           continue;
-        //skip all entries not found in entrylist_event
-        if (std::find(entrylist_event.begin(), entrylist_event.end(), entrypair.first) == entrylist_event.end())
+        //skip all entries not found in entrylist
+        if (std::find(entrylist.begin(), entrylist.end(), entrypair.first) == entrylist.end())
+          continue;
+        //skip all entries that were already registered
+        if (std::find(skippedEntries.begin(), skippedEntries.end(), entrypair.first) != skippedEntries.end())
           continue;
       }
 
+      B2INFO("Fixing duplicate ownership for " << entrypair.first);
       entrypair.second.object = nullptr; //remove duplicate ownership
       entrypair.second.ptr = nullptr;
     }
   }
 }
 
-void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event,
-                                                            bool replaceExisting)
+void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event)
 {
   int targetidx = m_idToIndexMap.at(id);
   auto& targetMaps = m_entries[targetidx];
   const auto& sourceMaps = m_entries[m_currentIdx];
-
-  std::map<std::string, int> originalArrayLength;
 
   for (int iDurability = 0; iDurability < c_NDurabilityTypes; iDurability++) {
     for (const auto& entrypair : sourceMaps[iDurability]) {
@@ -893,9 +942,7 @@ void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& i
           continue;
       }
 
-      B2INFO("Trying to copy " << fromEntry.name << " to " << id);
       StoreEntry& target = targetMaps[iDurability][fromEntry.name];
-      B2INFO(not fromEntry.ptr << !target.ptr << target.isArray);
 
       //copy contents into target object
       if (not fromEntry.ptr) {
@@ -903,18 +950,75 @@ void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& i
           target.recoverFromNullObject();
         target.ptr = nullptr;
       } else {
-        if (replaceExisting) {
-          //TODO there is some optimization opportunity here, e.g. by only cloning the entries of a TClonesArray instead of the array itself
-          delete target.object;
-          target.object = fromEntry.object->Clone();
-          target.ptr = target.object;
+        //TODO there is some optimisation opportunity here, e.g. by only cloning the entries of a TClonesArray instead of the array itself
+        delete target.object;
+        target.object = fromEntry.object->Clone();
+        target.ptr = target.object;
+      }
+    }
+  }
+
+}
+
+void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event)
+{
+  if (entrylist_event.empty()) {
+    B2FATAL("Nothing to merge. This shouldn't happen.");
+    return;
+  }
+
+  std::vector<std::string> entrylist;
+  if (entrylist_event.size() == 1 and entrylist_event.at(0) == "ALL") {
+    entrylist = DataStore::Instance().getSortedListOfDataStore(c_Event);
+  } else {
+    entrylist = entrylist_event;
+  }
+
+  int targetidx = m_idToIndexMap.at(id);
+  auto& targetMaps = m_entries[targetidx];
+  const auto& sourceMaps = m_entries[m_currentIdx];
+
+  // we need to know the length of the original StoreArrays in order to fix the Relations
+  std::map<std::string, int> originalArrayLength;
+
+  for (int iDurability = 0; iDurability < c_NDurabilityTypes; iDurability++) {
+    // we have to go through the list in this order to make sure StoreArrays are merged before their Relations
+    for (std::string nextEntry : entrylist) {
+      for (const auto& entrypair : sourceMaps[iDurability]) {
+        //skip all entries of other durabilities
+        if (iDurability != c_Event)
+          continue;
+
+        const StoreEntry& fromEntry = entrypair.second;
+        if (fromEntry.name != nextEntry) {
+          continue;
+        }
+
+        //does this exist in target?
+        if (targetMaps[iDurability].count(fromEntry.name) == 0) {
+          B2INFO("Skipping " << fromEntry.name << ". Not registered in target.");
+          continue;
+        }
+
+        B2INFO("Trying to copy " << fromEntry.name << " to " << id);
+        StoreEntry& target = targetMaps[iDurability][fromEntry.name];
+        B2INFO(!fromEntry.ptr << !target.ptr << target.isArray);
+
+        //copy contents into target object
+        if (not fromEntry.ptr) {
+          if (!target.object)
+            target.recoverFromNullObject();
+          target.ptr = nullptr;
+          B2WARNING("FromEntry not valid?");
         } else {
           if (target.isArray) {
             if (!target.ptr) {
-              B2INFO("Before: " << "0" << " + " << fromEntry.getPtrAsArray()->GetEntriesFast());
+              B2INFO("Before: " << "(0)" << " + " << fromEntry.getPtrAsArray()->GetEntriesFast());
 
               target.object = fromEntry.object->Clone();
               target.ptr = target.object;
+
+              originalArrayLength.insert({target.name, 0});
             } else {
               B2INFO("Before: " << target.getPtrAsArray()->GetEntriesFast() << " + " << fromEntry.getPtrAsArray()->GetEntriesFast());
 
@@ -931,8 +1035,11 @@ void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& i
 
               // TClonesArray has no easy way to add objects to it
               // Instead work around this by cloning and absorbing the TClonesArray `fromEntry`
+              // Also use `fixAbsorbObjects` define in this file to work around some potential memory leak
+              // TODO: check if clone makes sense? or should we rather move the whole obj to avoid memleaks?
               TClonesArray* fromArr = static_cast<TClonesArray*>(fromEntry.getPtrAsArray()->Clone());
-              target.getPtrAsArray()->AbsorbObjects(fromArr);
+              fixAbsorbObjects(fromArr, target.getPtrAsArray());
+              //target.getPtrAsArray()->AbsorbObjects(fromArr);
             }
             B2INFO("After: " << target.getPtrAsArray()->GetEntriesFast());
           } else {
@@ -948,13 +1055,13 @@ void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& i
                 if (originalArrayLength.find(fromName) == originalArrayLength.end() ||
                     originalArrayLength.find(toName) == originalArrayLength.end()) {
                   B2WARNING("Please specify arguments of 'independent_merge_path' in correct order, i.e. names of StoreArrays before the Relations: "
-                            << "add_independent_merge_path(path, merge_back_event=[" << fromName << ", " << toName << ", " << fromEntry.name << "])");
+                            << "merge_back_event=[..., " << fromName << ", " << toName << ", " << fromEntry.name << ", ...]");
                   B2FATAL("Cannot merge Relations if corresponding StoreArrays were not merged before.");
                 }
 
                 auto* targetRelContainer = static_cast<RelationContainer*>(target.ptr);
-                // Make sure everything is properly initialized in case there are no relations yet..
-                // TODO: Check if really necessary?!
+                // Make sure everything is properly initialized
+                // (is necessary if relation was not accessed before)
                 if (targetRelContainer->isDefaultConstructed()) {
                   targetRelContainer->setFromName(fromName);
                   targetRelContainer->setFromDurability(c_Event);
@@ -965,6 +1072,24 @@ void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& i
                 // add relation
                 TClonesArray& relations = targetRelContainer->elements();
                 auto* fromRelContainer = static_cast<RelationContainer*>(fromEntry.ptr);
+                // The fast way would be to add the relation also to the RelationIndexManager (this is a cache for relations)
+                // However, it seems to have some issues with the switching of the DataStore
+                // (it simply uses the name of the relation, which exists twice..)
+                // So it seems like this cannot be done. Instead, force rebuilding of the Cache later :/
+                /*// add it to index (so we avoid expensive rebuilding later)
+                std::shared_ptr<RelationIndexContainer<TObject, TObject>> relIndex = RelationIndexManager::Instance().getIndexIfExists<TObject, TObject>(target.name, c_Event);
+                if (!relIndex) {
+                  B2WARNING("RelationIndexContainer does not exist yet.");
+                }*/
+
+                /*B2INFO("BEFORE" << fromEntry.name);
+                if (relIndex) {
+                  for (auto& rs : relIndex->index()) {
+                     B2INFO(rs.indexFrom << " ->- " << rs.indexTo);
+                  }
+                }*/
+
+                bool updatedRelations = false;
                 for (int i = 0; i < fromRelContainer->getEntries(); i++) {
                   const RelationElement& rel = fromRelContainer->getElement(i);
                   unsigned int fromIndex = rel.getFromIndex() + originalArrayLength[fromName];
@@ -972,27 +1097,36 @@ void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& i
                   for (size_t rel_idx = 0; rel_idx < rel.getSize(); rel_idx++) {
                     unsigned int toIndex = rel.getToIndex(rel_idx) + originalArrayLength[toName];
                     float weight = rel.getWeight(rel_idx);
-
                     new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(fromIndex, toIndex, weight);
+                    updatedRelations = true;
 
-                    // TODO: Make sure this works if Relation with same name exists in two different DataStore IDs
-                    std::shared_ptr<RelationIndexContainer<TObject, TObject>> relIndex =
-                                                                             RelationIndexManager::Instance().getIndexIfExists<TObject, TObject>(target.name, c_Event);
-                    if (relIndex) {
-                      // add it to index (so we avoid expensive rebuilding later)
+                    /*if (relIndex) {
                       relIndex->index().emplace(fromIndex, toIndex, targetMaps[iDurability][fromName].getPtrAsArray()->At(fromIndex),
                                                 targetMaps[iDurability][toName].getPtrAsArray()->At(toIndex), weight);
                     } else {
-                      //mark for rebuilding later on
+                      B2WARNING("RelationContainer " << fromEntry.name << " did not yet exist on the RelationIndex? That should not happen (index will be rebuilt).");
                       targetRelContainer->setModified(true);
-                    }
+                    }*/
                   }
                 }
-              } else {
-                B2INFO("Not merging non-array objects yet (keeping original " << target.name << ").");
 
-                // Idea: introduce additional argument 'suffix' to copyContentsTo(...) and call this method first
-                // then copy entries
+                // as mentioned above, rebuild of cached etc.
+                if (updatedRelations) {
+                  updateRelationsObjectCache(target);
+                  targetRelContainer->setModified(true);
+                }
+
+                /*B2INFO("AFTER " << fromEntry.name);
+                if (relIndex) {
+                  for (auto& rs : relIndex->index()) {
+                     B2INFO(rs.indexFrom << " ->- " << rs.indexTo);
+                  }
+                }*/
+
+              } else {
+                // TODO: do  we want to copy the second StoreObj but with a suffix in its name?
+                // If so, we have to register this first in copyEntriesTo(..)
+                B2INFO("Not merging non-array objects yet (keeping original " << target.name << ").");
               }
             }
           }
@@ -1030,10 +1164,10 @@ void DataStore::SwitchableDataStoreContents::reset(EDurability durability)
 {
   for (auto& map : m_entries) {
     for (auto& mapEntry : map[durability]) {
-      B2INFO("Deleting " << mapEntry.first);
+      //B2INFO("Deleting " << mapEntry.first);
       delete mapEntry.second.object;
     }
-    B2INFO("Done");
+    //B2INFO("Done");
     map[durability].clear();
   }
 }

@@ -46,10 +46,6 @@ void FlavorTaggerInfoFillerModule::initialize()
 
 void FlavorTaggerInfoFillerModule::event()
 {
-  if (!m_roe->isBuiltWithMostLikely()) {
-    B2ERROR("The ROE was not created with most-likely particle lists."
-            "The flavor tagger will not work properly.");
-  }
   auto* flavorTaggerInfo = m_roe->getRelatedTo<FlavorTaggerInfo>();
 
   Variable::Manager& manager = Variable::Manager::Instance();

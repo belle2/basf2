@@ -68,7 +68,7 @@ class nnt_eventfilter(basf2.Module):
         return isgoodquality
 
 
-class nnt_eventfilter(b2.Module):
+class nnt_eventfilter(basf2.Module):
     def initialize(self,
                    tracksegmentsname=hwneuroinputsegmenthits,
                    twodtracksname=hwneuroinput2dfindertracks,
@@ -79,7 +79,7 @@ class nnt_eventfilter(b2.Module):
         self.twodtracksname = twodtracksname
         self.neurotracksname = neurotracksname
         self.recotracksname = recotracksname
-        self.nullpath = b2.create_path()
+        self.nullpath = basf2.create_path()
 
     def event(self):
         self.return_value(bool(self.hastrginfo() and
@@ -101,7 +101,7 @@ class nnt_eventfilter(b2.Module):
 
 def add_neuro_unpacker(path, debug_level=4, debugout=False, **kwargs):
     #
-    unpacker = b2.register_module('CDCTriggerUnpacker')
+    unpacker = basf2.register_module('CDCTriggerUnpacker')
     if debugout:
         unpacker.logging.log_level = basf2.LogLevel.DEBUG
         unpacker.logging.debug_level = debug_level
@@ -141,7 +141,7 @@ def add_neuro_unpacker(path, debug_level=4, debugout=False, **kwargs):
 
 def add_neuro_2d_unpackers(path, debug_level=4, debugout=False, **kwargs):
     #
-    unpacker = b2.register_module('CDCTriggerUnpacker')
+    unpacker = basf2.register_module('CDCTriggerUnpacker')
     if debugout:
         unpacker.logging.log_level = basf2.LogLevel.DEBUG
         unpacker.logging.debug_level = debug_level
@@ -181,7 +181,7 @@ def add_neuro_2d_unpackers(path, debug_level=4, debugout=False, **kwargs):
 
 
 def add_neurotrigger_sim(path, nntweightfile=None, debug_level=4, debugout=False, **kwargs):
-    nnt = b2.register_module('CDCTriggerNeuro')
+    nnt = basf2.register_module('CDCTriggerNeuro')
     if 'inputCollectionName' in kwargs:
         nnt.param('inputCollectionName', kwargs['inputCollectionName'])
     else:
@@ -216,7 +216,7 @@ def add_neurotrigger_sim(path, nntweightfile=None, debug_level=4, debugout=False
 
 
 def add_neurotrigger_hw(path, nntweightfile=None, debug_level=4, debugout=False, **kwargs):
-    nnt = b2.register_module('CDCTriggerNeuro')
+    nnt = basf2.register_module('CDCTriggerNeuro')
     if 'inputCollectionName' in kwargs:
         nnt.param('inputCollectionName', kwargs['inputCollectionName'])
     else:

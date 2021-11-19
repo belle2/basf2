@@ -125,15 +125,13 @@ namespace Belle2 {
       invalidateCache();
 
       double e = par[0];
-      double th = par[1];
-      double ph = par[2];
 
       bool result = false;
 
       if (!isParamFixed(1)) {
         int ith = getGlobalParNum(1);
         assert(ith >= 0 && ith < idim);
-        th = pp[ith];
+        double th = pp[ith];
 
         if (e < 0) {
           th = M_PI - th;
@@ -147,7 +145,7 @@ namespace Belle2 {
       if (!isParamFixed(2)) {
         int iph = getGlobalParNum(2);
         assert(iph >= 0 && iph < idim);
-        ph = pp[iph];
+        double ph = pp[iph];
 
         if (e < 0) {
           ph = M_PI + ph;

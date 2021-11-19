@@ -18,6 +18,7 @@ CDCDedxDQMModule::CDCDedxDQMModule(): HistoModule()
 {
   setPropertyFlags(c_ParallelProcessingCertified); // parallel processing
   setDescription("CDC dE/dx DQM plots with bhabha/hadron events.");
+  addParam("mmode", mmode, "default monitoring mode is basic", std::string("basic"));
 }
 
 //---------------------------------
@@ -48,16 +49,17 @@ void CDCDedxDQMModule::defineHisto()
   hMeta->GetXaxis()->SetBinLabel(2, "nbhabha");
   hMeta->GetXaxis()->SetBinLabel(3, "nhadron");
 
-  hdEdx = new TH1D("hdEdx", ";CDC dE/dx;Entries", 300, 0., 2.5);
-  hdEdxvsP = new TH2D("hdEdxVsP", ";#it{p}_{CDC} (GeV/c);CDC dE/dx", 1600, 0.050, 4.50, 2000, 0.35, 20.2);
-  hdEdxvsEvt = new TH2D("hdEdxvsEvt", ";Events(M);CDC dE/dx", 300, 0, 300, 500, 0.00, 2.5);
-  hdEdxvsPhi = new TH2D("hdEdxvsPhi", ";#phi (e^{-}e^{+} tracks);CDC dE/dx", 320, -3.20, 3.20, 500, 0.00, 2.5);
-  hdEdxvsCosth = new TH2D("hdEdxvsCosth", ";cos#theta (e^{-}e^{+} tracks);CDC dE/dx", 200, -1.00, 1.00, 500, 0.00, 2.5);
-  hWires = new TH2F("hWires", "All Wires;", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
-  hWires->GetXaxis()->SetTitle("CDC-wire map: counter-clockwise and start from +x");
-  hWireStatus = new TH2F("hWireStatus", "Wire Status", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
-  hWireStatus->GetXaxis()->SetTitle("CDC-wire map: counter-clockwise and start from +x");
-
+  hdEdx = new TH1D("hdEdx", ";CDC dE/dx;Entries", 250, 0., 2.5);
+  hdEdxvsP = new TH2D("hdEdxVsP", ";#it{p}_{CDC} (GeV/c);CDC dE/dx", 400, 0.050, 4.50, 800, 0.35, 20.35);
+  hdEdxvsEvt = new TH2D("hdEdxvsEvt", ";Events(M);CDC dE/dx", 300, 0, 300, 200, 0.00, 2.5);
+  hdEdxvsCosth = new TH2D("hdEdxvsCosth", ";cos#theta (e^{-}e^{+} tracks);CDC dE/dx", 100, -1.00, 1.00, 250, 0.00, 2.5);
+  hdEdxvsPhi = new TH2D("hdEdxvsPhi", ";#phi (e^{-}e^{+} tracks);CDC dE/dx", 100, -3.20, 3.20, 250, 0.00, 2.5);
+  if (mmode != "basic") {
+    hWires = new TH2F("hWires", "All Wires;", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
+    hWires->GetXaxis()->SetTitle("CDC-wire map: counter-clockwise and start from +x");
+    hWireStatus = new TH2F("hWireStatus", "Wire Status", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
+    hWireStatus->GetXaxis()->SetTitle("CDC-wire map: counter-clockwise and start from +x");
+  }
   oldDir->cd();
 
 }
@@ -90,12 +92,13 @@ void CDCDedxDQMModule::beginRun()
   hMeta->Reset();
   hdEdx->Reset();
   hdEdxvsP->Reset();
-  hdEdxvsPhi->Reset();
   hdEdxvsCosth->Reset();
+  hdEdxvsPhi->Reset();
   hdEdxvsEvt->Reset();
-  hWires->Reset();
-  hWireStatus->Reset();
-
+  if (mmode != "basic") {
+    hWires->Reset();
+    hWireStatus->Reset();
+  }
 }
 
 
@@ -187,21 +190,23 @@ void CDCDedxDQMModule::event()
 
       hdEdx->Fill(dedxnosat);
       double phi = fitResult->getMomentum().Phi();
-      hdEdxvsPhi->Fill(phi, dedxnosat);
-      hdEdxvsCosth->Fill(costh, dedxnosat);
+      if (hdEdxvsCosth->Integral() <= 80000)hdEdxvsCosth->Fill(costh, dedxnosat);
+      if (hdEdxvsPhi->Integral() <= 80000)hdEdxvsPhi->Fill(phi, dedxnosat);
 
-      if (m_event > 150e6)m_event = 150e6 - 100;
+      if (m_event >= 150e6)m_event = 150e6 - 100;
       m_event = int(m_event / 5e5);
       hdEdxvsEvt->Fill(m_event, dedxnosat);
 
     }
 
-    if (IsHadronEvt)hdEdxvsP->Fill(pCDC, dedx);
+    if (IsHadronEvt && hdEdxvsP->Integral() <= 80000)hdEdxvsP->Fill(pCDC, dedx);
 
-    for (int ihit = 0; ihit < dedxTrack->size(); ++ihit) {
-      int iwire = dedxTrack->getWire(ihit);
-      double iadc = dedxTrack->getADCCount(ihit);
-      if (m_adc[iwire].size() < 50)m_adc[iwire].push_back(iadc); //just contiung dead
+    if (mmode != "basic") {
+      for (int ihit = 0; ihit < dedxTrack->size(); ++ihit) {
+        int iwire = dedxTrack->getWire(ihit);
+        double iadc = dedxTrack->getADCCount(ihit);
+        if (m_adc[iwire].size() < 50)m_adc[iwire].push_back(iadc); //just contiung dead
+      }
     }
   }
 
@@ -224,21 +229,23 @@ void CDCDedxDQMModule::endRun()
   }
 
   //get dead wire pattern
-  Int_t nbadwires = 0;
-  for (int iwire = 0; iwire < 14336; ++iwire) {
-    int nwire = getIndexVal(iwire, "nwirelayer");
-    int twire = getIndexVal(iwire, "twire");
-    double radius = getIndexVal(iwire, "rwire");
-    int wire = iwire - twire ;
-    double phi = 2.*TMath::Pi() * (float(wire) / float(nwire));
-    double x = radius * cos(phi);
-    double y = radius * sin(phi);
-    hWires->Fill(x, y);
-    if (m_adc[iwire].size() > 0)continue;
-    nbadwires++;
-    hWireStatus->Fill(x, y);
+  if (mmode != "basic") {
+    Int_t nbadwires = 0;
+    for (int iwire = 0; iwire < 14336; ++iwire) {
+      int nwire = getIndexVal(iwire, "nwirelayer");
+      int twire = getIndexVal(iwire, "twire");
+      double radius = getIndexVal(iwire, "rwire");
+      int wire = iwire - twire ;
+      double phi = 2.*TMath::Pi() * (float(wire) / float(nwire));
+      double x = radius * cos(phi);
+      double y = radius * sin(phi);
+      hWires->Fill(x, y);
+      if (m_adc[iwire].size() > 0)continue;
+      nbadwires++;
+      hWireStatus->Fill(x, y);
+    }
+    hWireStatus->SetTitle(Form("%d", nbadwires));
   }
-  hWireStatus->SetTitle(Form("%d", nbadwires));
 
 }
 

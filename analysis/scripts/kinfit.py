@@ -117,7 +117,7 @@ def fitKinematic2C(
     """
     Perform 2C momentum constraint kinematic fit. The photon with unmeasured energy and theta
     has to be the first particle in the decay string. If 'addUnmeasuredPhotonAlongBeam' is set to
-    'HER' or 'LER', both phi and theta (treated as measured) of this photon is then used. Concurrently,
+    'HER' or 'LER', both phi and theta (treated as measured) of this photon are then used. Concurrently,
     an additional unmeasured photon along HER/LER will be taken into account in the fit, which means
     the momentum is only constrained in the plane perpendicular to one of the beams.
 

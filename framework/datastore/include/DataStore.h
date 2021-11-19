@@ -530,7 +530,7 @@ namespace Belle2 {
     /** switch to DataStore with given ID. */
     void switchID(const std::string& id);
     /** copy entries (not contents) of current DataStore to the DataStore with given ID. */
-    void copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event = {}, bool skipIfRegistered = false);
+    void copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event = {}, bool mergeEntries = false);
     /** copy contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
     void copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
     /** merge contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
@@ -599,7 +599,7 @@ namespace Belle2 {
       /** returns ID of current DataStore. */
       const std::string& currentID() const { return m_currentID; }
       /** copy entries (not contents) of current DataStore to the DataStore with given ID. */
-      void copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event = {}, bool skipIfRegistered = false);
+      void copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event = {}, bool mergeEntries = false);
       /** copy contents (actual array / object contents) of current DataStore to the DataStore with given ID. */
       void copyContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event = {});
       /** merge contents (actual array / object contents) of current DataStore to the DataStore with given ID. */

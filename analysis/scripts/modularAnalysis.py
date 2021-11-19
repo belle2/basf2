@@ -3584,7 +3584,7 @@ def addPi0VetoEfficiencySystematics(particleList, decayString, threshold, mode='
     @param decayString    specify hard photon to be performed pi0 veto (e.g. 'B+:sig -> rho+:sig ^gamma:hard')
     @param threshold      pi0 veto threshold (0.50, 0.51, ..., 0.99)
     @param mode           choose one mode (same as writePi0EtaVeto) out of 'standard', 'tight', 'cluster' and 'both'
-    @suffix               optional suffix to be appended to the usual extraInfo name
+    @param suffix               optional suffix to be appended to the usual extraInfo name
 
     The following extraInfo are available related with the given particleList:
     * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_ratio             : weight of Data/MC for the veto efficiency

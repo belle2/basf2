@@ -124,16 +124,33 @@ namespace Belle2 {
     {
       invalidateCache();
 
-      double e = par[0];
-
       bool result = false;
+      bool mirrored_e = false;
+
+      if (!isParamFixed(0)) {
+        int iE  = getGlobalParNum(0);
+        assert(iE  >= 0 && iE  < idim);
+        double e  = pp[iE];
+
+        if (e < 0) {
+          B2INFO("JetFitObject::updateParams: mirrored E!\n");
+          e  = -e;
+          mirrored_e = true;
+        }
+
+        double massPlusEpsilon = mass * (1.0000001);
+        if (e < massPlusEpsilon) e = massPlusEpsilon;
+        result = result || ((e - par[0]) * (e - par[0]) > eps2 * cov[0][0]);
+        par[0] = e;
+        pp[iE]  = par[0];
+      }
 
       if (!isParamFixed(1)) {
         int ith = getGlobalParNum(1);
         assert(ith >= 0 && ith < idim);
         double th = pp[ith];
 
-        if (e < 0) {
+        if (mirrored_e) {
           th = M_PI - th;
         }
 
@@ -147,7 +164,7 @@ namespace Belle2 {
         assert(iph >= 0 && iph < idim);
         double ph = pp[iph];
 
-        if (e < 0) {
+        if (mirrored_e) {
           ph = M_PI + ph;
         }
 
@@ -156,22 +173,6 @@ namespace Belle2 {
         pp[iph] = par[2];
       }
 
-      if (!isParamFixed(0)) {
-        int iE  = getGlobalParNum(0);
-        assert(iE  >= 0 && iE  < idim);
-        e  = pp[iE];
-
-        if (e < 0) {
-          B2INFO("JetFitObject::updateParams: mirrored E!\n");
-          e  = -e;
-        }
-
-        double massPlusEpsilon = mass * (1.0000001);
-        if (e < massPlusEpsilon) e = massPlusEpsilon;
-        result = result || ((e - par[0]) * (e - par[0]) > eps2 * cov[0][0]);
-        par[0] = e;
-        pp[iE]  = par[0];
-      }
 
       return result;
     }

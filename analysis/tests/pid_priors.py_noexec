@@ -14,6 +14,7 @@ from EvalPriors import Priors
 from ROOT import Belle2
 import modularAnalysis as ma
 import subprocess
+import numpy as np
 
 
 class PidPriorPrint(Module):
@@ -29,8 +30,8 @@ class PidPriorPrint(Module):
     def event(self):
         """Print PID priors for 'pi+' list"""
         for p in self.plist:
-            self.priors.calculatePriors(p.getP(), p.getMomentum().CosTheta())
-            print(priors.getPriors())
+            self.priors.calculate_priors(np.array([p.getP()]), np.array([p.getMomentum().CosTheta()]))
+            print(self.priors.get_priors())
 
 
 configure_logging_for_tests()

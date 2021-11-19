@@ -3576,7 +3576,7 @@ def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
     path.add_module(photon_efficiency_correction)
 
 
-def addPi0VetoEfficiencySystematics(particleList, decayString, threshold, mode='standard', path=None):
+def addPi0VetoEfficiencySystematics(particleList, decayString, threshold, mode='standard', suffix='', path=None):
     """
     Add pi0 veto Data/MC efficiency ratio weights to the specified particle list
 
@@ -3584,13 +3584,14 @@ def addPi0VetoEfficiencySystematics(particleList, decayString, threshold, mode='
     @param decayString    specify hard photon to be performed pi0 veto (e.g. 'B+:sig -> rho+:sig ^gamma:hard')
     @param threshold      pi0 veto threshold (0.50, 0.51, ..., 0.99)
     @param mode           choose one mode (same as writePi0EtaVeto) out of 'standard', 'tight', 'cluster' and 'both'
+    @suffix               optional suffix to be appended to the usual extraInfo name
 
-    The following variables are available related with the given particleList:
-    * Pi0VetoEfficiencySystematics_data_MC_ratio             : weight of Data/MC for the veto efficiency
-    * Pi0VetoEfficiencySystematics_data_MC_uncertainty_stat  : the statistical uncertainty of the weight
-    * Pi0VetoEfficiencySystematics_data_MC_uncertainty_sys   : the systematic uncertainty of the weight
-    * Pi0VetoEfficiencySystematics_data_MC_uncertainty_total : the total uncertainty of the weight
-    * Pi0VetoEfficiencySystematics_threshold                 : threshold of the pi0 veto
+    The following extraInfo are available related with the given particleList:
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_ratio             : weight of Data/MC for the veto efficiency
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_stat  : the statistical uncertainty of the weight
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_sys   : the systematic uncertainty of the weight
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_total : the total uncertainty of the weight
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_threshold                 : threshold of the pi0 veto
     """
 
     pi0veto_efficiency_correction = register_module('Pi0VetoEfficiencySystematics')
@@ -3598,6 +3599,7 @@ def addPi0VetoEfficiencySystematics(particleList, decayString, threshold, mode='
     pi0veto_efficiency_correction.param('decayString', decayString)
     pi0veto_efficiency_correction.param('threshold', threshold)
     pi0veto_efficiency_correction.param('mode', mode)
+    pi0veto_efficiency_correction.param('suffix', suffix)
     path.add_module(pi0veto_efficiency_correction)
 
 

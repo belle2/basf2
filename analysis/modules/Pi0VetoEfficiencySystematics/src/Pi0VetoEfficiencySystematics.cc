@@ -38,6 +38,7 @@ Pi0VetoEfficiencySystematicsModule::Pi0VetoEfficiencySystematicsModule() : Modul
   addParam("decayString", m_decayString, "decay string", std::string(""));
   addParam("threshold", m_threshold, "threshold of pi0 veto", 0.);
   addParam("mode", m_mode, "pi0 veto option name", std::string(""));
+  addParam("suffix", m_suffix, "suffix of extrainfo", std::string(""));
 }
 
 // Getting LookUp info for given hard photon in given event
@@ -110,7 +111,7 @@ void Pi0VetoEfficiencySystematicsModule::addPi0VetoEfficiencyRatios(Particle* B,
     //The selected particle is photon reconstructed from ECL cluster
     WeightInfo info = getInfo(hardPhoton);
     for (const auto& entry : info) {
-      B->addExtraInfo("Pi0VetoEfficiencySystematics_" + entry.first, entry.second);
+      B->addExtraInfo("Pi0VetoEfficiencySystematics_" + m_mode + m_suffix + "_" + entry.first, entry.second);
     }
   } else {
     B2WARNING("The given hard photon is not from ECL or not photon");

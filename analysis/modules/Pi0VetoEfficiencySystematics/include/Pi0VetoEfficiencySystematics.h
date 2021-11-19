@@ -50,6 +50,7 @@ namespace Belle2 {
     DecayDescriptor m_decayDescriptor;/**< decay descriptor which specifies the primary photon */
     double m_threshold; /**< Threshold of pi0 veto */
     std::string m_mode; /**< Mode of pi0 veto */
+    std::string m_suffix; /**< Suffix of extrainfo name */
     std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable; /**< Pointer to the table in DB */
 
     /**

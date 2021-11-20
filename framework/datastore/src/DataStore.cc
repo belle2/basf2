@@ -850,11 +850,6 @@ void DataStore::SwitchableDataStoreContents::createEmptyDataStoreID(const std::s
 void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id, const std::vector<std::string>& entrylist_event,
                                                            bool mergeEntries)
 {
-  if (entrylist_event.empty()) {
-    B2FATAL("Nothing to merge. This shouldn't happen.");
-    return;
-  }
-
   std::vector<std::string> entrylist;
   if (entrylist_event.size() == 1 and entrylist_event.at(0) == "ALL") {
     entrylist = DataStore::Instance().getSortedListOfDataStore(c_Event);

@@ -1,3 +1,11 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 #include <iostream>
 #include <ecl/modules/eclLOM/eclLOMModule.h>
 #include "trg/ecl/dataobjects/TRGECLWaveform.h"
@@ -48,40 +56,39 @@ void ECLLOMModule::initialize()
   testfile = new TFile(m_lomtestFilename.c_str(), "RECREATE");
   testtree = new TTree("lom_tree", "");
 
-  testtree->Branch("ev", &m_EvtNum); //event number
-  testtree->Branch("BE_amp[16]", BE_Amplitude, "BE_amp[16]/D"); //Amplitudes (max of the signal over event) for Backward
-  testtree->Branch("FE_amp[16]", FE_Amplitude, "FE_amp[16]/D"); //Amplitudes (max of the signal over event) for Forward
-  testtree->Branch("FESum_MaxAmp", &FESum_MaxAmp); //max amplitude in sums of Forward endcap
-  testtree->Branch("BESum_MaxAmp", &BESum_MaxAmp); //max amplitude in sums of Backward endcap
-  testtree->Branch("FESum_MaxId", &FESum_MaxId); //id of sum with max amp
-  testtree->Branch("BESum_MaxId", &BESum_MaxId); //id of sum with max amp
-  testtree->Branch("maxcoidur", &maxcoidur); // maximum duration of coincidence in opposite running sums
-  testtree->Branch("BE_Pedal[16]", BE_Pedal, "BE_Pedal[16]/D"); //Calculated pedestals for Backward sectors
-  testtree->Branch("FE_Pedal[16]", FE_Pedal, "FE_Pedal[16]/D"); //Calculated pedestals for Forward sectors
+  testtree->Branch("ev", &m_EvtNum);
+  testtree->Branch("BE_amp[16]", BE_Amplitude, "BE_amp[16]/D");
+  testtree->Branch("FE_amp[16]", FE_Amplitude, "FE_amp[16]/D");
+  testtree->Branch("FESum_MaxAmp", &FESum_MaxAmp);
+  testtree->Branch("BESum_MaxAmp", &BESum_MaxAmp);
+  testtree->Branch("FESum_MaxId", &FESum_MaxId);
+  testtree->Branch("BESum_MaxId", &BESum_MaxId);
+  testtree->Branch("BE_Pedal[16]", BE_Pedal, "BE_Pedal[16]/D");
+  testtree->Branch("FE_Pedal[16]", FE_Pedal, "FE_Pedal[16]/D");
 
-  testtree->Branch("Bhabha", &isBhabha); // True if Bha-bha detected (2-sector quality)
-  testtree->Branch("BhNum", &BhNum); // Number of back-to-back coinsidences for sums (it's fine when >1) CHANGE
+  testtree->Branch("Bhabha", &isBhabha);
+  testtree->Branch("BhNum", &BhNum);
 
-  testtree->Branch("mc_en[2]", mcen, "mc_en[2]/D"); // Monte Carlo energy of particles in main frame
-  testtree->Branch("mc_th[2]", mcth, "mc_th[2]/D"); // -||- theta angle
-  testtree->Branch("mc_ph[2]", mcph, "mc_ph[2]/D"); // -||- phi angle
+  testtree->Branch("mc_en[2]", mcen, "mc_en[2]/D");
+  testtree->Branch("mc_th[2]", mcth, "mc_th[2]/D");
+  testtree->Branch("mc_ph[2]", mcph, "mc_ph[2]/D");
 
-  testtree->Branch("com_en[2]", com_en, "com_en[2]/D"); // -||- in center of mass frame
+  testtree->Branch("com_en[2]", com_en, "com_en[2]/D");
   testtree->Branch("com_th[2]", com_th, "com_th[2]/D");
   testtree->Branch("com_ph[2]", com_ph, "com_ph[2]/D");
 
   if (saveSignal) {
-    testtree->Branch("BE_wf[16][64]", BE_Waveform_100ns, "BE_wf[16][64]/D"); //Signal waveforms
+    testtree->Branch("BE_wf[16][64]", BE_Waveform_100ns, "BE_wf[16][64]/D");
     testtree->Branch("FE_wf[16][64]", FE_Waveform_100ns, "FE_wf[16][64]/D");
   }
 
   //additional histograms. Represent data over the whole dataset:
-  h2Coin = new TH2D("Coins", "Coincidence Matrix", 16, 0, 16, 16, 0, 16); //Shows number of coincedencies in i:j sectors
-  h2SumCoin = new TH2D("SumCoins", "Sum Coincidence Matrix", 16, 0, 16, 16, 0, 16); //Shows number of coincedencies in i:j sums
+  h2Coin = new TH2D("Coins", "Coincidence Matrix", 16, 0, 16, 16, 0, 16);
+  h2SumCoin = new TH2D("SumCoins", "Sum Coincidence Matrix", 16, 0, 16, 16, 0, 16);
   h2FEAmp = new TH2D("FE_AmpId", "", 16, 0, 16, 100, 0, 8);
   h2BEAmp = new TH2D("BE_AmpId", "", 16, 0, 16, 100, 0, 8);
-  h1BEHits = new TH1D("BE_Fired", "", 16, 0, 16); //show number of events when Backward sector i has signal > bha-bha threshold
-  h1FEHits = new TH1D("FE_Fired", "", 16, 0, 16); // -||- Forward
+  h1BEHits = new TH1D("BE_Fired", "", 16, 0, 16);
+  h1FEHits = new TH1D("FE_Fired", "", 16, 0, 16);
 
   NSamples = 631;
 }
@@ -173,9 +180,10 @@ void ECLLOMModule::get_waveforms()
   // as sum of corresponding TC signals
   for (int i = 0; i < n_trg_wf; i++) {
     const TRGECLWaveform* TCWaveform = TrgEclWaveformArray[i];
-    m_tcid = TCWaveform->getTCID();
+    //int m_tcid = TCWaveform->getTCID();
     int tc_theta_id = TCWaveform->getThetaID(); //FE:1,2,3 BE:16,17  Checked for rel 4 02 08
     int tc_phi_id   = TCWaveform->getPhiID();   // 1 - 32
+    double m_wf[64];
     TCWaveform->fillWaveform(m_wf);
 
     int iSectorIndex = (tc_phi_id - 1) / 2; // from 0 to 15
@@ -283,6 +291,7 @@ void ECLLOMModule::calculate_coincidence(int iSample)
 {
   for (int iFESector = 0; iFESector < 16; iFESector++) {
     for (int iBESector = 0; iBESector < 16; iBESector++) {
+
       if (FE_Waveform_10ns[iFESector][iSample] > BhabhaHitThresholdFE && BE_Waveform_10ns[iBESector][iSample] > BhabhaHitThresholdBE) {
         if (CoincidenceMatrix[iFESector][iBESector] == 0) CoincidenceCounterMatrix[iFESector][iBESector]++;
         CoincidenceMatrix[iFESector][iBESector]++;
@@ -293,33 +302,28 @@ void ECLLOMModule::calculate_coincidence(int iSample)
       if (FESum_Discr[iFESector][iSample] && BESum_Discr[iBESector][iSample]) {
         if (SumCoincidenceMatrix[iFESector][iBESector] == 0) SumCoincidenceCounterMatrix[iFESector][iBESector]++;
         SumCoincidenceMatrix[iFESector][iBESector]++;
-      } else {
-        if (SumCoincidenceMatrix[iFESector][iBESector] > SumCoincidenceMatrixMax[iFESector][iBESector])
-          SumCoincidenceMatrixMax[iFESector][iBESector] = SumCoincidenceMatrix[iFESector][iBESector];
-        SumCoincidenceMatrix[iFESector][iBESector] = 0;
       }
+      SumCoincidenceMatrix[iFESector][iBESector] = 0;
     }
   }
-  for (int i = 0; i < 16; i++) {
-    if (SumCoincidenceMatrixMax[i][(i + 8) % 16] > maxcoidur) maxcoidur = SumCoincidenceMatrixMax[i][(i + 8) % 16];
-  }
 }
+
 
 void ECLLOMModule::clear_lom_data()
 {
   for (int isector = 0; isector < 16; isector++) {
     for (int iSample = 0; iSample < 64; iSample++) {
-      BE_Waveform_100ns[isector][iSample] = 0; //Amplitudes for sectors, 100ns
+      BE_Waveform_100ns[isector][iSample] = 0;
       FE_Waveform_100ns[isector][iSample] = 0;
     }
     for (int iSample = 0; iSample < NSamples; iSample++) {
-      BE_Waveform_10ns[isector][iSample] = 0;  //Amplitudes for sectors, 10ns
+      BE_Waveform_10ns[isector][iSample] = 0;
       FE_Waveform_10ns[isector][iSample] = 0;
-      BESum_Waveform_10ns[isector][iSample] = 0; //Amplitudes for running sums
+      BESum_Waveform_10ns[isector][iSample] = 0;
       FESum_Waveform_10ns[isector][iSample] = 0;
-      FESum_Discr[isector][iSample] = 0;  //Discriminator value for running sums
+      FESum_Discr[isector][iSample] = 0;
       BESum_Discr[isector][iSample] = 0;
-      FEQual_Discr[isector][iSample] = 0;  //Discriminator value for Quality flag
+      FEQual_Discr[isector][iSample] = 0;
       BEQual_Discr[isector][iSample] = 0;
     }
     BE_Pedal[isector] = 0;
@@ -331,7 +335,6 @@ void ECLLOMModule::clear_lom_data()
     for (int jsector = 0; jsector < 16; jsector++) {
       CoincidenceMatrix[isector][jsector] = 0;
       SumCoincidenceMatrix[isector][jsector] = 0;
-      SumCoincidenceMatrixMax[isector][jsector] = 0;
     }
   }
   isBhabha = 0;
@@ -340,7 +343,6 @@ void ECLLOMModule::clear_lom_data()
   BESum_MaxAmp = 0;
   FESum_MaxId = -1;
   BESum_MaxId = -1;
-  maxcoidur = 0;
 }
 
 void ECLLOMModule::calculate_amplitudes()

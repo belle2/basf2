@@ -51,6 +51,7 @@ void MergeDataStoreModule::initialize()
   } else if (!m_mergeBack.empty()) {
     //if m_mergeBack is set, we need to register the objects/arrays there, too (if they are not registered yet)
     DataStore::Instance().copyEntriesTo(m_to, m_mergeBack, true);
+    // Why would we need this?!
     //then copy
     //DataStore::Instance().mergeContentsTo(m_to, m_mergeBack);
   }
@@ -72,10 +73,12 @@ void MergeDataStoreModule::terminate()
 
 void MergeDataStoreModule::beginRun()
 {
+  // Why would we need this?!
   //event();
 }
 void MergeDataStoreModule::endRun()
 {
+  // Why would we need this?!
   //event();
 }
 void MergeDataStoreModule::event()

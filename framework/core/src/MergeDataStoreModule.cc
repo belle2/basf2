@@ -9,6 +9,9 @@
 #include <framework/core/MergeDataStoreModule.h>
 #include <framework/datastore/DataStore.h>
 
+#include <framework/core/Environment.h>
+#include <framework/core/InputController.h>
+
 
 using namespace Belle2;
 
@@ -45,6 +48,13 @@ void MergeDataStoreModule::initialize()
   if (not m_createNew and m_from == "")
     B2FATAL("createNew is not set ?");
 
+  // Make sure we are not processing more events than available in either of the paths
+  if (Environment::Instance().getNumberEventsOverride() == 0
+      || InputController::minNumEntries() < Environment::Instance().getNumberEventsOverride()) {
+    B2INFO("Processing " << InputController::minNumEntries() << " events (minimum of both paths).");
+    Environment::Instance().setNumberEventsOverride(InputController::minNumEntries());
+  }
+
   if (m_createNew) {
     //create DataStore ID that doesn't exist yet (copying contents)
     DataStore::Instance().createEmptyDataStoreID(m_to);
@@ -74,6 +84,7 @@ void MergeDataStoreModule::terminate()
 void MergeDataStoreModule::beginRun()
 {
   // Why would we need this?!
+  // What happens if new run starts for one of the input paths but (I guess typically) not for the other?
   //event();
 }
 void MergeDataStoreModule::endRun()

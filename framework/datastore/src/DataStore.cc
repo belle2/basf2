@@ -16,6 +16,7 @@
 #include <framework/datastore/RelationIndexManager.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/StoreAccessorBase.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <TClonesArray.h>
 #include <TClass.h>
@@ -975,10 +976,24 @@ void DataStore::SwitchableDataStoreContents::copyContentsTo(const std::string& i
 void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& id, const std::vector<std::string>& entrylist_event)
 {
   if (entrylist_event.empty()) {
-    B2FATAL("Nothing to merge. This shouldn't happen.");
+    B2WARNING("Nothing to merge. Returning.");
     return;
   }
 
+  // this is an alternative to make sure processing is stopped after one of the paths does not have any more events
+  // but the warnings etc might confuse the user, so I implemented an approach using Environment::Instance().ssetNumberEventsOverride(..)
+  /*
+    int targetidx = m_idToIndexMap.at(id);
+    // Make sure we have not reached end of second file (first file determines number of processed events)
+    if (m_entries[m_currentIdx][c_Event].count("EventMetaData") == 0 or m_entries[targetidx][c_Event].count("EventMetaData") == 0) {
+      B2FATAL("No EventMetaData found in at least one of the input paths.");
+    }
+    if (!m_entries[m_currentIdx][c_Event]["EventMetaData"].ptr) {
+      B2WARNING("Uneven number of events in the two paths. Not merging further events.");
+      static_cast<EventMetaData*>(m_entries[targetidx][c_Event]["EventMetaData"].ptr)->setEndOfData();
+      return;
+    }
+  */
   std::vector<std::string> entrylist;
   if (entrylist_event.size() == 1 and entrylist_event.at(0) == "ALL") {
     entrylist = DataStore::Instance().getSortedListOfDataStore(c_Event);

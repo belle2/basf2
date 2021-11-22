@@ -40,10 +40,8 @@ main = basf2.Path()
 indep = basf2.Path()
 
 # input
-# NOTE: This first file that defines the number of events that are being processed
-# You want to make sure that this is the file with the lower number of events (or same number)
 input1 = basf2.register_module('RootInput')
-input1.param('inputFileName', '/nfs/dust/belle2/user/kurzsimo/testSample/file1_10evts.root')
+input1.param('inputFileName', '/nfs/dust/belle2/user/kurzsimo/testSample/file1_3evts.root')
 main.add_module(input1).set_name("input1")
 
 main.add_module(CheckData()).set_name("checkdata_main")

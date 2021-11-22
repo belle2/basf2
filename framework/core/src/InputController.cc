@@ -18,7 +18,18 @@ long InputController::s_nextExperiment = -1;
 long InputController::s_nextRun = -1;
 long InputController::s_nextEvent = -1;
 long InputController::s_currentEntry = 0;
+long InputController::s_minEvtNumber = 0;
 const TChain* InputController::s_chain = nullptr;
+
+void InputController::setChain(const TChain* chain)
+{
+  s_chain = chain;
+  if (s_minEvtNumber == 0) {
+    s_minEvtNumber = (long)s_chain->GetEntries();
+  } else {
+    s_minEvtNumber = std::min(s_minEvtNumber, (long)s_chain->GetEntries());
+  }
+}
 
 void InputController::resetForChildProcess()
 {
@@ -49,4 +60,9 @@ long InputController::numEntries()
     return s_chain->GetEntries();
 
   return 0;
+}
+
+long InputController::minNumEntries()
+{
+  return s_minEvtNumber;
 }

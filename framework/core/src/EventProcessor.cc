@@ -122,12 +122,6 @@ long EventProcessor::getMaximumEventNumber(long maxEvent) const
 
 void EventProcessor::process(const PathPtr& startPath, long maxEvent)
 {
-  maxEvent = getMaximumEventNumber(maxEvent);
-  // Make sure the NumberEventsOverride reflects the actual number if
-  // process(path, N) was used instead of -n and that it's reset to what it was
-  // after we're done with processing()
-  NumberEventsOverrideGuard numberOfEventsOverrideGuard(maxEvent);
-
   //Get list of modules which could be executed during the data processing.
   ModulePtrList moduleList = startPath->buildModulePathList();
 
@@ -145,6 +139,13 @@ void EventProcessor::process(const PathPtr& startPath, long maxEvent)
 
   //Initialize modules
   processInitialize(moduleList);
+
+  // Initialize the modules first as the MergeDataStoreModule might modify the max number of events
+  maxEvent = getMaximumEventNumber(maxEvent);
+  // Make sure the NumberEventsOverride reflects the actual number if
+  // process(path, N) was used instead of -n and that it's reset to what it was
+  // after we're done with processing()
+  NumberEventsOverrideGuard numberOfEventsOverrideGuard(maxEvent);
 
   //do we want to visualize DataStore input/ouput?
   if (Environment::Instance().getVisualizeDataFlow()) {

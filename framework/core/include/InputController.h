@@ -63,6 +63,12 @@ namespace Belle2 {
      */
     static long numEntries();
 
+    /** Returns minimum number of entries in the event tree if several input modules are used.
+     *
+     * If only one module is used, provides same return value as numEntries().
+     */
+    static long minNumEntries();
+
     /** Return name of current file in loaded chain (or empty string if none loaded). */
     static std::string getCurrentFileName();
 
@@ -77,7 +83,7 @@ namespace Belle2 {
     }
 
     /** Set the loaded TChain (event durability). */
-    static void setChain(const TChain* chain) { s_chain = chain; }
+    static void setChain(const TChain* chain);
 
     /** Reset InputController (e.g. after forking a thread) */
     static void resetForChildProcess();
@@ -107,6 +113,8 @@ namespace Belle2 {
     /** Event (not entry!) to load next. */
     static long s_nextEvent;
 
+    /** min number of events in paths if several input modules are used (independent paths) */
+    static long s_minEvtNumber;
 
     /** current entry in file. */
     static long s_currentEntry;

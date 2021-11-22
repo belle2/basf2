@@ -41,7 +41,7 @@ indep = basf2.Path()
 
 # input
 input1 = basf2.register_module('RootInput')
-input1.param('inputFileName', '/nfs/dust/belle2/user/kurzsimo/testSample/file1_3evts.root')
+input1.param('inputFileName', '/nfs/dust/belle2/user/kurzsimo/testSample/file1_10evts.root')
 main.add_module(input1).set_name("input1")
 
 main.add_module(CheckData()).set_name("checkdata_main")

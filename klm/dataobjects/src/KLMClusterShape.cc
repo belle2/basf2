@@ -7,7 +7,6 @@
  **************************************************************************/
 
 #include <klm/dataobjects/KLMClusterShape.h>
-#include <Math/Vector3D.h>
 
 
 using namespace Belle2;

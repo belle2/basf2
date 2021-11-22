@@ -13,12 +13,10 @@
 #include <framework/datastore/StoreArray.h>
 
 /* KLM headers. */
-#include <mdst/dataobjects/KLMCluster.h>
 #include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/eklm/EKLMHit2d.h>
-
-
 #include <klm/dataobjects/KLMClusterShape.h>
+#include <mdst/dataobjects/KLMCluster.h>
 
 namespace Belle2 {
 

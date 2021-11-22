@@ -5,29 +5,26 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <iostream>
-#include <cmath>
 #include <algorithm>
-#include <vector>
+#include <cmath>
+#include <iostream>
 #include <numeric>
+#include <vector>
 
-#include <TVectorT.h>
-#include <TVector3.h>
 #include <TMatrixT.h>
 #include <TMatrixDSymEigen.h>
-#include <TMath.h>
+#include <TVectorT.h>
+#include <TVector3.h>
 
-#include <klm/modules/KLMClusterAna/KLMClusterAnaModule.h>
 
 /* KLM headers. */
-#include <mdst/dataobjects/KLMCluster.h>
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
-#include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/modules/KLMClusterAna/KLMClusterAnaModule.h>
 #include <klm/utility/KLMHit2d.h>
 
 /* Other Belle 2 headers. */
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 
 
 

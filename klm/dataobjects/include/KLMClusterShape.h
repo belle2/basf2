@@ -10,8 +10,8 @@
 /* Belle 2 headers. */
 #include <framework/datastore/RelationsObject.h>
 
-#include <TMatrixT.h>
 #include <Math/Vector3D.h>
+#include <TMatrixT.h>
 
 namespace Belle2 {
 

@@ -19,12 +19,16 @@ import basf2 as b2
 # set_log_level(LogLevel.ERROR)
 b2.set_log_level(b2.LogLevel.INFO)
 
-files = ["/group/belle2/dataprod/Data/Raw/e0018/r01553/sub00/physics.0018.01553.HLT8.f0000*.root"]  # might require modifying
+path = "/group/belle2/dataprod/Data/Raw/e0018/r01553/sub00/"
+files = path+"physics.0018.01553.HLT8.f0000*.root"
 
 # Create main path
 main = b2.create_path()
-b2.conditions.globaltags = ['online', 'dp_recon_release6_patch',
-                            'ecl_release06_forOnline']  # might require modifying for not release-06 tags
+
+# useful tags for release-06
+b2.conditions.globaltags = ['online',
+                            'dp_recon_release6_patch',
+                            'ecl_release06_forOnline']
 
 main.add_module("RootInput", inputFileNames=files)
 main.add_module("HistoManager", histoFileName="KLMDQMHistograms.root")
@@ -33,19 +37,20 @@ main.add_module('Geometry')
 raw.add_unpackers(main)
 re.add_reconstruction(main, add_muid_hits=True)
 
+software_trigger = "software_trigger_cut&skim&accept_mumutight"
+cut_string = 'SoftwareTriggerResult(%s)>0' % (software_trigger)
+
 add_common_dqm(main, dqm_environment='HLT', dqm_mode='dont_care')
 ma.fillParticleList('mu+:all', cut="", path=main)
-ma.cutAndCopyList("mu+:cut", "mu+:all", 'SoftwareTriggerResult(software_trigger_cut&skim&accept_mumutight)>0', path=main)
+ma.cutAndCopyList("mu+:cut", "mu+:all", cut_string, path=main)
 
 collector = b2.register_module('KLMStripEfficiencyCollector')
 collector.param('Debug', True)
 collector.param('DebugFileName', 'KLMStripEffCollector_debugFile.root')
-collector.param('MuonListName', 'mu+:cut')  # this cut is needed to be consistent with KLMDQM2
+collector.param('MuonListName', 'mu+:cut')  # to be consistent with KLMDQM2
 main.add_module(collector)
 
 klm2 = b2.register_module('KLMDQM2')
-klm2.param('Debug', True)
-klm2.param("DebugFileName", "KLMDQM2_debugFile.root")
 main.add_module(klm2)
 
 main.add_module('Progress')

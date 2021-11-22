@@ -24,8 +24,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
-#include <rawdata/dataobjects/RawFTSW.h>
-#include <rawdata/dataobjects/RawKLM.h>
 #include <tracking/dataobjects/ExtHit.h>
 
 /* ROOT headers. */
@@ -186,13 +184,6 @@ namespace Belle2 {
     /** BKLM geometry. */
     const bklm::GeometryPar* m_GeometryBKLM;
 
-
-    /** Raw FTSW. */
-    StoreArray<RawFTSW> m_RawFtsws;
-
-    /** Raw KLM. */
-    StoreArray<RawKLM> m_RawKlms;
-
     /** KLM digits. */
     StoreArray<KLMDigit> m_Digits;
 
@@ -212,12 +203,6 @@ namespace Belle2 {
     //MODULE PARAMETERS
     /*******************************************/
     /*******************************************/
-
-
-    /**< Minimal number of hits in a channel required
-     * to flag it as 'masked' or 'hot' */
-    int m_MinHitsForFlagging;
-
 
     /** Muon list name. */
     std::string m_MuonListName;
@@ -294,9 +279,6 @@ namespace Belle2 {
     //OTHER USEFUL VARIABLES
     /*******************************************/
     /*******************************************/
-
-    /** Minimal number of processed events for error messages. */
-    double m_MinProcessedEventsForMessages;
 
     /** Number of channel hit histograms per sector for BKLM. */
     const int m_ChannelHitHistogramsBKLM = 2;

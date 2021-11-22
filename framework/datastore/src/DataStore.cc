@@ -899,6 +899,8 @@ void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id
           B2WARNING("Independent path: entry '" << entryname << "' already exists in DataStore '" << id <<
                     "'! This will likely break something.");
         }
+      } else {
+        m_entries[targetidx][c_Event][entryname] = m_entries[m_currentIdx][c_Event][entryname];
       }
     }
   } else {

@@ -146,10 +146,16 @@ void EventProcessor::process(const PathPtr& startPath, long maxEvent)
   //Initialize modules
   processInitialize(moduleList);
 
-  // TODO: is there a better way?
   // MergeDataStoreModule might have changed the number of events to be processed
-  if (maxEvent != Environment::Instance().getNumberEventsOverride()) {
-    B2WARNING("Number of events to be processed was changed. Make sure this is expected.");
+  bool mergeDataStore = false;
+  for (const auto& module : moduleList) {
+    if (module->getType() == "MergeDataStore") {
+      mergeDataStore = true;
+      break;
+    }
+  }
+  if (mergeDataStore && maxEvent != Environment::Instance().getNumberEventsOverride()) {
+    B2WARNING("Module 'MergeDataStore' is controlling the number of processed events.");
     maxEvent = Environment::Instance().getNumberEventsOverride();
   }
 

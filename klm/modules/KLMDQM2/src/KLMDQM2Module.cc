@@ -61,10 +61,6 @@ KLMDQM2Module::KLMDQM2Module() :
     )DOC");
 
   // Parameter definitions
-  addParam("MinHitsForFlagging", m_MinHitsForFlagging, "Minimal number of hits in a channel required to flag it as 'masked' or 'hot'",
-           50);
-  addParam("MinProcessedEventsForMessages", m_MinProcessedEventsForMessages,
-           "Minimal number of processed events required to print error messages", 10000.);
   addParam("MuonListName", m_MuonListName, "Muon list name.",
            std::string("mu+:all"));
   addParam("AllowedDistance1D", m_AllowedDistance1D,
@@ -84,7 +80,7 @@ KLMDQM2Module::KLMDQM2Module() :
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("histogramDirectoryName", m_HistogramDirectoryName,
            "Directory for KLM DQM histograms in ROOT file.",
-           std::string("KLM2"));
+           std::string("KLMEfficiencyDQM"));
 
 }
 
@@ -209,11 +205,7 @@ void KLMDQM2Module::initialize()
   //inputs
   m_softwareTriggerResult.isRequired();
   m_MuonList.isRequired(m_MuonListName);
-
-  m_RawFtsws.isOptional();
-  m_RawKlms.isOptional();
   m_Digits.isOptional();
-
   m_GeometryBKLM = bklm::GeometryPar::instance();
 
 }

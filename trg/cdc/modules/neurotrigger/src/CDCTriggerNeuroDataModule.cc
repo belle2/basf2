@@ -75,8 +75,14 @@ namespace Belle2 {
              "Maximal drift time (for scaling, unit: trigger timing bins).", m_parameters.tMax);
     addParam("et_option", m_parameters.et_option,
              "option on how to obtain the event time. Possibilities are: "
-             "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', 'etf_or_zero', 'etf_or_fastest2d', 'fastest2d'.",
+             "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', "
+             "'etf_or_zero', 'etf_or_fastest2d', 'fastest2d'.",
              m_parameters.et_option);
+    addParam("outputScale", m_parameters.outputScale,
+             "Output scale for all networks (1 value list or nMLP value lists). "
+             "Output[i] of the MLP is scaled from [-1, 1] "
+             "to [outputScale[2*i], outputScale[2*i+1]]. "
+             "(units: z[cm] / theta[degree])", m_parameters.outputScale);
     addParam("rescaleTarget", m_rescaleTarget,
              "If true, set target values > outputScale to 1, "
              "else skip them.", true);
@@ -98,6 +104,11 @@ namespace Belle2 {
     addParam("gzipFilename", m_filename,
              "Name of the gzip file, where the test samples will be loaded from.",
              std::string("out.gz"));
+    addParam("targetZ", m_parameters.targetZ,
+             "Train one output of MLP to give z.", m_parameters.targetZ);
+    addParam("targetTheta", m_parameters.targetTheta,
+             "Train one output of MLP to give theta.", m_parameters.targetTheta);
+
 
 
 
@@ -223,6 +234,10 @@ namespace Belle2 {
       for (unsigned i = 0; i < sectors.size(); ++i) {
         int isector = sectors[i];
         std::vector<float> target = m_NeuroTrigger[isector].scaleTarget(targetRaw);
+        if (fabs(target[1]) < 0.0000000001) {
+          std::cout << "Problem, target too small!!!! target: " << target[0] << ", " << target[1] << " targetraw: " << targetRaw[0] << ", " <<
+                    targetRaw[1] << std::endl;
+        }
         // skip out of range targets or rescale them
         bool outOfRange = false;
         for (unsigned itarget = 0; itarget < target.size(); ++itarget) {

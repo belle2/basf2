@@ -36,6 +36,7 @@ Pi0VetoEfficiencySystematicsModule::Pi0VetoEfficiencySystematicsModule() : Modul
   std::vector<std::string> emptylist;
   addParam("particleLists", m_ParticleLists, "input particle lists", emptylist);
   addParam("decayString", m_decayString, "decay string", std::string(""));
+  addParam("tableName", m_tableName, "table name of the payloads", std::string(""));
   addParam("threshold", m_threshold, "threshold of pi0 veto", 0.);
   addParam("mode", m_mode, "pi0 veto option name", std::string(""));
   addParam("suffix", m_suffix, "suffix of extrainfo", std::string(""));
@@ -70,7 +71,7 @@ void Pi0VetoEfficiencySystematicsModule::initialize()
   }
 
   //Table is identified with mode and threshold
-  std::string tableName = "pi0vetoDataMC" + m_mode + std::to_string((int)(m_threshold * 100 + 0.001));
+  std::string tableName = m_tableName + "_" + m_mode + std::to_string((int)(m_threshold * 100 + 0.001));
   m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(tableName);
 }
 

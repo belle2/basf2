@@ -94,8 +94,10 @@ ma.writePi0EtaVeto(particleList='B0',
 
 # Perform addPi0VetoEfficiencySystematics
 # Data/MC ratio will be provided as extraInfo related with particleList for a given threshold.
+tableName = 'Pi0VetoEfficiencySystematics_Nov2021'
 ma.addPi0VetoEfficiencySystematics(particleList='B0',
                                    decayString='B0 -> rho0 ^gamma',
+                                   tableName=tableName,
                                    threshold=threshold,
                                    mode=mode,
                                    suffix=suffix,

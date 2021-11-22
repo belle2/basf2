@@ -48,6 +48,7 @@ namespace Belle2 {
     std::vector<std::string> m_ParticleLists;/**< input particle lists */
     std::string m_decayString;/**< Decay string to select primary photon */
     DecayDescriptor m_decayDescriptor;/**< decay descriptor which specifies the primary photon */
+    std::string m_tableName; /**< Table name of the payloads */
     double m_threshold; /**< Threshold of pi0 veto */
     std::string m_mode; /**< Mode of pi0 veto */
     std::string m_suffix; /**< Suffix of extrainfo name */

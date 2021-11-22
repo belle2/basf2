@@ -229,7 +229,7 @@ CDCTriggerNeuroModule::event()
                                                             80 /
                                                             M_PI);
     std::vector<float> recalcsw(0.);
-    recalcsw = m_cdctriggerneuroconfig->getMLPs()[0].scaleTarget({NNtrack->getZ0(), NNtrack->getDirection().Theta()});
+    recalcsw = m_cdctriggerneuroconfig->getMLPs()[0].scaleTarget({static_cast<float>(NNtrack->getZ0()), static_cast<float>(NNtrack->getDirection().Theta())});
     intz        << std::fixed << std::setprecision(0)   << recalcsw[0] * 4096;
     inttheta    << std::fixed << std::setprecision(0)   << recalcsw[1] * 4096;
 

@@ -166,11 +166,6 @@ namespace Belle2 {
     int getRawTheta() const {return m_rawtheta;}
 
   protected:
-    /** unpacked etf time from the unpacker */
-    int m_etf_unpacked;
-    /** etf time recalculated from the hw input */
-    int m_etf_recalced;
-    /** chi2 value from 2D fitter */
     float m_chi2D;
     /** chi2 value from 3D fitter */
     float m_chi3D;
@@ -201,6 +196,11 @@ namespace Belle2 {
      *       from a previous track was used in the network.
      */
     unsigned m_qualityvector;
+    /** unpacked etf time from the unpacker */
+    int m_etf_unpacked;
+    /** etf time recalculated from the hw input */
+    int m_etf_recalced;
+    /** chi2 value from 2D fitter */
     bool m_hasETFTime{0};
     /** values to store the raw network and 2dfinder output */
     int m_rawphi0{0};
@@ -208,7 +208,7 @@ namespace Belle2 {
     int m_rawz{0};
     int m_rawtheta{0};
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerTrack, 11);
+    ClassDef(CDCTriggerTrack, 12);
 
   };
 }

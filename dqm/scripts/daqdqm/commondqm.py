@@ -300,7 +300,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('TrackingHLTDQM')
         else:
             path.add_module('TrackingExpressRecoDQM')
-            path.add_module('TrackFilter', saveControNtuples=False, min_d0=-0.5, max_d0=0.5, min_z0=-1, max_z0=1,
+            path.add_module('ParallelTrackFilter', min_d0=-0.5, max_d0=0.5, min_z0=-1, max_z0=1,
                             inputArrayName="", outputINArrayName="TracksFromIP", outputOUTArrayName="TracksNotFromIP")
             path.add_module('TrackingExpressRecoDQM', histogramDirectoryName="TrackingERDQM_FromIP",
                             tracksStoreArrayName="TracksFromIP").set_name("TrackingExpressRecoDQM_FromIP")

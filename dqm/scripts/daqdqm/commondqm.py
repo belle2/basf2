@@ -299,11 +299,12 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         if (dqm_environment == "hlt"):
             path.add_module('TrackingHLTDQM')
         else:
-            path.add_module('TrackingExpressRecoDQM')
             path.add_module('ParallelTrackFilter', min_d0=-0.5, max_d0=0.5, min_z0=-1, max_z0=1,
                             inputArrayName="", outputINArrayName="TracksFromIP", outputOUTArrayName="TracksNotFromIP")
             path.add_module('TrackingExpressRecoDQM', histogramDirectoryName="TrackingERDQM_FromIP",
                             tracksStoreArrayName="TracksFromIP").set_name("TrackingExpressRecoDQM_FromIP")
+            path.add_module('TrackingExpressRecoDQM', histogramDirectoryName="TrackingERDQM_NotFromIP",
+                            tracksStoreArrayName="TracksNotFromIP").set_name("TrackingExpressRecoDQM_NotFromIP")
 
     # ARICH
     if (components is None or 'ARICH' in components) and (dqm_mode in ["dont_care", "filtered"]):

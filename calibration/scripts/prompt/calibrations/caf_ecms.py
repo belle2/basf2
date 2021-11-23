@@ -63,6 +63,7 @@ settings = CalibrationSettings(
 
 
 def get_hadB_path():
+    """ Selects the hadronic B decays, function returns corresponding path  """
 
     # module to be run prior the collector
     rec_path_1 = create_path()
@@ -195,6 +196,7 @@ def get_hadB_path():
 
 
 def get_mumu_path():
+    """ Selects the ee -> mumu events, function returns corresponding path  """
 
     # module to be run prior the collector
     rec_path_1 = create_path()
@@ -212,10 +214,11 @@ def get_mumu_path():
 
 
 def get_data_info(inData, kwargs):
+    """ Filter the input data and returns the IOVs """
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    file_to_iov_physics = inData  # input_data["hadron_calib"]
+    file_to_iov_physics = inData
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!

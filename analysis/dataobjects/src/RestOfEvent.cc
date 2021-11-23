@@ -53,7 +53,7 @@ std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskNa
     B2DEBUG(10, "ROE contains no particles, masks are empty too");
     return result;
   }
-  if (maskName == RestOfEvent::c_defaultMaskName) {
+  if (maskName == RestOfEvent::c_defaultMaskName or maskName.empty()) {
     // if no mask provided work with internal source
     source = m_particleIndices;
   } else {
@@ -125,7 +125,7 @@ std::vector<const Particle*> RestOfEvent::getChargedParticles(const std::string&
 
 bool RestOfEvent::hasParticle(const Particle* particle, const std::string& maskName) const
 {
-  if (maskName != RestOfEvent::c_defaultMaskName && !hasMask(maskName)) {
+  if (maskName != RestOfEvent::c_defaultMaskName && !hasMask(maskName) && !maskName.empty()) {
     B2FATAL("No '" << maskName << "' mask defined in current ROE!");
   }
 

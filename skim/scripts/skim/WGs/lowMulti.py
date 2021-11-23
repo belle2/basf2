@@ -31,6 +31,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
     __category__ = "physics, low multiplicity"
 
     TestSampleProcess = "mumu"
+    ApplyHLTHadronCut = False
 
     def __init__(self, prescale=1, **kwargs):
         """
@@ -131,6 +132,7 @@ class LowMassTwoTrack(BaseSkim):
 
     TestSampleProcess = "mumu"
     validation_sample = _VALIDATION_SAMPLE
+    ApplyHLTHadronCut = False
 
     def build_lists(self, path):
         label = "LowMassTwoTrack"
@@ -227,6 +229,7 @@ class SingleTagPseudoScalar(BaseSkim):
     __contact__ = "Hisaki Hayashii <hisaki.hayashii@desy.de>"
     __description__ = "A skim script to select events with one high-energy electron and one or more pi0/eta/eta mesons."
     __category__ = "physics, low multiplicity"
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)

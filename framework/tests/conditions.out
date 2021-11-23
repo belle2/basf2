@@ -109,6 +109,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=0
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 [DEBUG:30] DBEntry changed
 	name = BeamParameters
+	globaltag = localtest
 	revision = 1
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
 	filename = ${cwd}/db-cache/24/BeamParameters_r1.root
@@ -143,6 +144,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=0
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 [DEBUG:30] DBEntry changed
 	name = BeamParameters
+	globaltag = localtest
 	revision = 1
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
 	filename = ${cwd}/db-cache/24/BeamParameters_r1.root
@@ -191,6 +193,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 	globaltag = localtest
 [DEBUG:30] DBEntry changed
 	name = BeamParameters
+	globaltag = localtest
 	revision = 1
 	checksum = 00[wrong checksum]
 	filename = 
@@ -223,6 +226,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 	globaltag = localtest
 [DEBUG:30] DBEntry changed
 	name = BeamParameters
+	globaltag = localtest
 	revision = 1
 	checksum = 00[wrong checksum]
 	filename = 
@@ -253,6 +257,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
 	globaltag = localtest
 [DEBUG:30] DBEntry changed
 	name = BeamParameters
+	globaltag = localtest
 	revision = 2
 	checksum = 00[missing]
 	filename = 
@@ -284,6 +289,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
 	globaltag = localtest
 [DEBUG:30] DBEntry changed
 	name = BeamParameters
+	globaltag = localtest
 	revision = 2
 	checksum = 00[missing]
 	filename = 
@@ -302,6 +308,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=0
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_3.root HTTP/1.1" 200 -
 [DEBUG:30] DBEntry changed
 	name = BeamParameters
+	globaltag = localtest
 	revision = 3
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
 	filename = ${cwd}/db-cache/24/BeamParameters_r3.root
@@ -336,6 +343,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=0
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_3.root HTTP/1.1" 200 -
 [DEBUG:30] DBEntry changed
 	name = BeamParameters
+	globaltag = localtest
 	revision = 3
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
 	filename = ${cwd}/db-cache/24/BeamParameters_r3.root
@@ -527,6 +535,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=0
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 [DEBUG:30] DBEntry changed
 	name = BeamParameters
+	globaltag = localtest
 	revision = 1
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
 	filename = ${cwd}/db-cache/24/BeamParameters_r1.root
@@ -559,6 +568,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=0
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 [DEBUG:30] DBEntry changed
 	name = BeamParameters
+	globaltag = localtest
 	revision = 1
 	checksum = 2447fbcf76419fbbc7c6d015ef507769
 	filename = ${cwd}/db-cache/24/BeamParameters_r1.root

@@ -63,6 +63,7 @@ namespace Belle2 {
 
   void DBStoreEntry::resetPayload()
   {
+    m_globaltag = "";
     m_revision = 0;
     m_iov = IntervalOfValidity();
     m_keep = false;
@@ -76,9 +77,10 @@ namespace Belle2 {
   }
 
   void DBStoreEntry::updatePayload(unsigned int revision, const IntervalOfValidity& iov, const std::string& filename,
-                                   const std::string& checksum, const EventMetaData& event)
+                                   const std::string& checksum, const std::string& globaltag, const EventMetaData& event)
   {
     m_iov = iov;
+    m_globaltag = globaltag;
     // File is the same as before, no need to update anything else. We could
     // check all identifiers like revision, filename and checksum
     // > if (revision == m_revision && filename == m_filename && m_checksum == checksum) return;
@@ -98,6 +100,7 @@ namespace Belle2 {
     loadPayload(event);
     B2DEBUG(30, "DBEntry changed"
             << LogVar("name", m_name)
+            << LogVar("globaltag", m_globaltag)
             << LogVar("revision", m_revision)
             << LogVar("checksum", m_checksum)
             << LogVar("filename", m_filename)
@@ -153,6 +156,7 @@ namespace Belle2 {
   {
     if (!checkType(obj)) return;
 
+    m_globaltag = "";
     m_revision = 0;
     m_filename = "";
     m_iov = iov;

@@ -224,7 +224,7 @@ def get_calibrations(input_data, **kwargs):
     Calibration_CC.depends_on(Calibration_RGPre)
     if expert_config["payload_boundaries"] is not None:
         Calibration_CC.strategies = SequentialBoundaries
-        basf2.B2INFO(f"Calibration_CC: Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
+        basf2.B2INFO("Calibration_CC: Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
         Calibration_CC.algorithms[0].params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
     else:
         Calibration_CC.algorithms[0].params = {"apply_iov": output_iov}
@@ -268,7 +268,7 @@ def get_calibrations(input_data, **kwargs):
     Calibration_WG.depends_on(Calibration_CC)
     if expert_config["payload_boundaries"] is not None:
         Calibration_WG.strategies = SequentialBoundaries
-        basf2.B2INFO(f"Calibration_WG: Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
+        basf2.B2INFO("Calibration_WG: Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
         Calibration_WG.algorithms[0].params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}
     else:
         Calibration_WG.algorithms[0].params = {"apply_iov": output_iov}

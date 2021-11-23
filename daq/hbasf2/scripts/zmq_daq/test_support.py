@@ -19,6 +19,13 @@ from unittest import TestCase
 import zmq
 
 
+#: Number of for loops executing the ZMQ tests
+ZMQ_TEST_FOR_LOOPS = 5
+
+#: Maximal number of ZMQ tests failing we accept
+ZMQ_TEST_MAX_FAILURES = 1
+
+
 class HLTZMQTestCase(TestCase):
     """
     Base class for all HLT ZMQ tests helping to start the needed programs,

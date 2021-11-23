@@ -27,7 +27,7 @@ import basf2 as b2
 from ROOT import Belle2
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--play", action='store_true', "Start event display advancing through events.")
+ap.add_argument("--play", action='store_true', help="Start event display advancing through events.")
 args = ap.parse_args()
 
 # create paths

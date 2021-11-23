@@ -10,7 +10,6 @@
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.utils import events_in_basf2_file, ExpRun
 import basf2
-import ROOT
 from ROOT import Belle2
 from random import choice
 from caf.framework import Calibration
@@ -96,13 +95,10 @@ def select_files(all_input_files, min_events, max_events, max_processed_events_p
 
 def get_calibrations(input_data, **kwargs):
     import basf2
-    from prompt.utils import filter_by_max_files_per_run
     # Gets the input files and IoV objects associated with the files.
 
     # read expert_config values
     expert_config = kwargs.get("expert_config")
-    max_files_per_run = expert_config["max_files_per_run"]
-    min_events_per_file = expert_config["min_events_per_file"]
     max_events_per_file = expert_config["max_events_per_file"]
 
     min_events_for_tz_tw = expert_config["min_events_for_tz_tw_calibration"]  # for t0, tw calib.
@@ -375,7 +371,7 @@ def pre_collector(max_events=None, is_cosmic=False, use_badWires=False):
                                    posttracking=False)
     else:
         from reconstruction import default_event_abort
-        from tracking import add_tracking_reconstruction, add_prefilter_tracking_reconstruction
+        from tracking import add_prefilter_tracking_reconstruction
 
         # Do not even attempt at reconstructing events w/ abnormally large occupancy.
         doom = reco_path.add_module("EventsOfDoomBuster")

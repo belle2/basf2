@@ -112,8 +112,9 @@ void DQMHistAnalysisTrackingERModule::event()
   }
 
   // Compute tracking abort rate for Mirabelle
-  TH1* hAbort = findHist("TrackingERDQM/NumberTrackingErrorFlags");
-  TH1* hAbortReasons = findHist("TrackingERDQM/TrackingErrorFlagsReasons");
+  // Using the _FromIP suffix: these histograms are event-based, so it does not make any difference
+  TH1* hAbort = findHist("TrackingERDQM_FromIP/NumberTrackingErrorFlags");
+  TH1* hAbortReasons = findHist("TrackingERDQM_FromIP/TrackingErrorFlagsReasons");
   if (hAbort != nullptr) {
     double nEvents = hAbort->GetEntries();
     if (nEvents > 0) {

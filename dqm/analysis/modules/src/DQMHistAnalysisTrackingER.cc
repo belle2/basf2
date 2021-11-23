@@ -13,6 +13,7 @@
 
 #include <TMath.h>
 #include <iostream>
+#include <string>
 
 using namespace std;
 using namespace Belle2;
@@ -49,17 +50,20 @@ void DQMHistAnalysisTrackingERModule::initialize()
 
 void DQMHistAnalysisTrackingERModule::event()
 {
+  // Repeat this for all tracks (no suffix) and tracks from IP (_FromIP suffix)
+  for (const string& suffix : {"", "_FromIP"}) {
+    //compute fraction of tracks with no PXD hits
+    TH1* hNoPXDHits = findHist("TrackingERDQM" + suffix + "/NoOfHitsInTrack_PXD");
+    if (hNoPXDHits != nullptr) {
 
-  //compute fraction of tracks with no PXD hits
+      int nTracks = hNoPXDHits->GetEntries();
+      int nTracksNoPXD = hNoPXDHits->GetBinContent(1);
 
-  TH1* hNoPXDHits = findHist("TrackingERDQM/NoOfHitsInTrack_PXD");
-  if (hNoPXDHits != nullptr) {
 
-    int nTracks = hNoPXDHits->GetEntries();
-    int nTracksNoPXD = hNoPXDHits->GetBinContent(1);
-
-    if (nTracks > 0)
-      m_monObj->setVariable("tracksNoPXDHit", (double)nTracksNoPXD / nTracks);
+      m_monObj->setVariable("tracksCount" + suffix, nTracks);
+      if (nTracks > 0)
+        m_monObj->setVariable("tracksNoPXDHit" + suffix, (double)nTracksNoPXD / nTracks);
+    }
   }
 
   //fraction of offtime SVD hits

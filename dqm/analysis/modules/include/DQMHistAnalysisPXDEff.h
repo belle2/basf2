@@ -22,6 +22,7 @@
 
 #include <TEfficiency.h>
 #include <TCanvas.h>
+#include <TH2F.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Efficiency */
@@ -90,6 +91,14 @@ namespace Belle2 {
     //! Final Canvas for Update
     TCanvas* m_cEffAllUpdate = nullptr;
 
+    //! Full Eff Map Inner Layer
+    TH2F* m_hInnerMap{};
+    //! Full Eff Map Outer Layer
+    TH2F* m_hOuterMap{};
+    //! Full Eff Map Inner Layer
+    TCanvas* m_cInnerMap{};
+    //! Full Eff Map Outer Layer
+    TCanvas* m_cOuterMap{};
 
     /** TLine object for warning limit */
     TH1F* m_hWarnLine{};
@@ -110,9 +119,14 @@ namespace Belle2 {
     bool m_useEpicsRO;
 
 #ifdef _BELLE2_EPICS
-    //! one EPICS PV
+    //! EPICS PVs for Status
     std::vector <chid>  mychid_status;
+    //! EPICS PVs for Efficiency
     std::map <VxdID, chid> mychid_eff;
+    //! EPICS PVs for Efficiency, low warn limits
+    std::map <VxdID, chid> mychid_low;
+    //! EPICS PVs for Efficiency, low alarm limits
+    std::map <VxdID, chid> mychid_lolo;
 #endif
   };
 } // end namespace Belle2

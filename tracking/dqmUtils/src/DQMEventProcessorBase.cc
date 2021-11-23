@@ -167,6 +167,11 @@ void DQMEventProcessorBase::ProcessPXDRecoHit(RecoHitInformation* recoHitInfo)
   m_histoModule->FillUBResidualsPXD(m_residual_um);
   m_histoModule->FillHalfShellsPXD(m_globalResidual_um, IsNotYang(m_sensorID.getLadderNumber(), m_layerNumber));
 
+  if (m_produce1Dres)
+    m_histoModule->FillUB1DResidualsSensor(m_residual_um, m_sensorIndex);
+  if (m_produce2Dres)
+    m_histoModule->FillUB2DResidualsSensor(m_residual_um, m_sensorIndex);
+
   SetCommonPrevVariables();
 }
 
@@ -189,6 +194,11 @@ void DQMEventProcessorBase::ProcessSVDRecoHit(RecoHitInformation* recoHitInfo)
 
       m_histoModule->FillUBResidualsSVD(m_residual_um);
       m_histoModule->FillHalfShellsSVD(m_globalResidual_um, IsNotMat(m_sensorID.getLadderNumber(), m_layerNumber));
+
+      if (m_produce1Dres)
+        m_histoModule->FillUB1DResidualsSensor(m_residual_um, m_sensorIndex);
+      if (m_produce2Dres)
+        m_histoModule->FillUB2DResidualsSensor(m_residual_um, m_sensorIndex);
     }
 
     SetCommonPrevVariables();

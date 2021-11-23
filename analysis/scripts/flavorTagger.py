@@ -1165,6 +1165,8 @@ def flavorTagger(
 
     # If trigger returns 1 jump into empty path skipping further modules in roe_path
     if mode == 'Expert':
+        # run filter with no cut first to get rid of ROEs that are missing the mask of the signal particle
+        ma.signalSideParticleListsFilter(particleLists, '', roe_path, deadEndPath)
         ma.signalSideParticleListsFilter(particleLists, 'nROE_Charged(' + maskName + ', 0) > 0', roe_path, deadEndPath)
         # Initialation of flavorTaggerInfo dataObject needs to be done in the main path
         flavorTaggerInfoBuilder = basf2.register_module('FlavorTaggerInfoBuilder')

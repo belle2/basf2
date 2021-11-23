@@ -55,7 +55,7 @@ def setAnalysisConfigParams(configParametersAndValues, path):
     path.add_module(conf)
 
 
-def inputMdst(environmentType, filename, path, skipNEvents=0, entrySequence=None, *, parentLevel=0):
+def inputMdst(environmentType, filename, path, skipNEvents=0, entrySequence=None, *, parentLevel=0, **kwargs):
     """
     Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
 
@@ -74,10 +74,18 @@ def inputMdst(environmentType, filename, path, skipNEvents=0, entrySequence=None
     if entrySequence is not None:
         entrySequence = [entrySequence]
 
-    inputMdstList(environmentType, [filename], path, skipNEvents, entrySequence, parentLevel=parentLevel)
+    inputMdstList(environmentType, [filename], path, skipNEvents, entrySequence, parentLevel=parentLevel, **kwargs)
 
 
-def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences=None, *, parentLevel=0):
+def inputMdstList(
+        environmentType,
+        filelist,
+        path,
+        skipNEvents=0,
+        entrySequences=None,
+        *,
+        parentLevel=0,
+        useB2BIIDBCache=True):
     """
     Loads the specified ROOT (DST/mDST/muDST) files with the RootInput module.
 
@@ -108,6 +116,7 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
         entrySequences (list(str)): The number sequences (e.g. 23:42,101) defining
             the entries which are processed for each inputFileName.
         parentLevel (int): Number of generations of parent files (files used as input when creating a file) to be read
+        useB2BIIDBCache (bool): Loading of local KEKCC database (only to be deactivated in very special cases)
     """
 
     roinput = register_module('RootInput')
@@ -156,6 +165,10 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
         setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
         import b2bii
         b2bii.setB2BII()
+        if useB2BIIDBCache:
+            basf2.conditions.metadata_providers = ["/sw/belle/b2bii/database/conditions/b2bii.sqlite"]
+            basf2.conditions.payload_locations = ["/sw/belle/b2bii/database/conditions/"]
+
     if environmentType == 'MC5':
         setAnalysisConfigParams({'mcMatchingVersion': 'MC5'}, path)
 

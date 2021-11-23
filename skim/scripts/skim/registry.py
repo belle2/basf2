@@ -85,6 +85,8 @@ _RegisteredSkims = [
     ("14141001", "btocharm", "BtoD0rho_Kpipipi_Kpipi0"),
     ("14141002", "btocharm", "B0toDD_Kpipi_Kspi"),
     ("14141003", "btocharm", "B0toDstarD"),
+    ("14121300", "btocharm", "B0toD0Kpipi0_pi0"),
+
 
     # --- WG5: Quarkonium ---
     ("15410300", "quarkonium", "InclusiveLambda"),
@@ -142,6 +144,7 @@ _RegisteredSkims = [
     ("19130201", "btocharmless", "BtoHadTracks"),
     ("19130300", "btocharmless", "BtoHad1Pi0"),
     ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),
+    ("19120400", "btocharmless", "BtoRhopRhom"),
 ]
 """
 A list of all official registered skims and their skim code and parent module. Entries

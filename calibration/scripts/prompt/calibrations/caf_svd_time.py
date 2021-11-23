@@ -30,7 +30,7 @@ from tracking import add_tracking_reconstruction
 from caf.framework import Calibration
 from caf import strategies
 from caf.utils import IoV
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.utils import filter_by_max_events_per_run
 
 b2.set_log_level(b2.LogLevel.INFO)
@@ -44,11 +44,11 @@ settings = CalibrationSettings(name="caf_svd_time",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["hadron_calib"],
-                               input_data_filters={"hadron_calib": [input_data_filters["Data Tag"]["hadron_calib"],
-                                                                    input_data_filters["Beam Energy"]["4S"],
-                                                                    input_data_filters["Beam Energy"]["Continuum"],
-                                                                    input_data_filters["Run Type"]["physics"],
-                                                                    input_data_filters["Magnet"]["On"]]},
+                               input_data_filters={"hadron_calib": [INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
+                                                                    INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+                                                                    INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
+                                                                    INPUT_DATA_FILTERS["Run Type"]["physics"],
+                                                                    INPUT_DATA_FILTERS["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
                                    "max_events_per_run": 10000,

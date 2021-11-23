@@ -2426,10 +2426,10 @@ namespace Belle2 {
           }
 
           // Make a dummy particle out of the sum of the 4-momenta of the selected daughters
-          Particle* sumOfDaughters = new Particle(pSum, 100); // 100 is one of the special numbers
+          Particle sumOfDaughters(pSum, 100); // 100 is one of the special numbers
 
           // Calculate the variable on the dummy particle
-          return var->function(sumOfDaughters);
+          return var->function(&sumOfDaughters);
         };
         return func;
       } else
@@ -2550,10 +2550,10 @@ namespace Belle2 {
           } // End of loop over number of daughter
 
           // Make a dummy particle out of the sum of the 4-momenta of the selected daughters
-          Particle* sumOfDaughters = new Particle(pSum, 100); // 100 is one of the special numbers
+          Particle sumOfDaughters(pSum, 100); // 100 is one of the special numbers
 
           // Calculate the variable on the dummy particle
-          return var->function(sumOfDaughters);
+          return var->function(&sumOfDaughters);
         }; // end of lambda function
         return func;
       }// end of check on number of arguments
@@ -2597,8 +2597,8 @@ namespace Belle2 {
           {
             i_p = i_p->getMother();
           }
-          const Particle* m_p = new Particle(i_p);
-          return Manager::Instance().getVariable(variable_of_interest)->function(m_p);
+          Particle m_p(i_p);
+          return Manager::Instance().getVariable(variable_of_interest)->function(&m_p);
         };
         return func;
       } else {

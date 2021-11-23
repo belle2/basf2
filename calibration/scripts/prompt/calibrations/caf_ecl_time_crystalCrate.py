@@ -12,7 +12,7 @@
    merges the relevant crystal payloads, and makes validation plots.  It is the
    main script for executing the ECL timing calibrations."""
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from reconstruction import prepare_cdst_analysis, prepare_user_cdst_analysis
 from caf.utils import IoV, ExpRun
 import copy
@@ -35,20 +35,20 @@ settings = CalibrationSettings(
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["bhabha_all_calib", "hadron_calib"],
-    input_data_filters={"bhabha_all_calib": [input_data_filters["Data Tag"]["bhabha_all_calib"],
-                                             input_data_filters["Beam Energy"]["4S"],
-                                             input_data_filters["Beam Energy"]["Continuum"],
-                                             input_data_filters["Beam Energy"]["Scan"],
-                                             input_data_filters["Data Quality Tag"]["Good"],
-                                             input_data_filters["Run Type"]["physics"],
-                                             input_data_filters["Magnet"]["On"]],
-                        "hadron_calib": [input_data_filters["Data Tag"]["hadron_calib"],
-                                         input_data_filters["Beam Energy"]["4S"],
-                                         input_data_filters["Beam Energy"]["Continuum"],
-                                         input_data_filters["Beam Energy"]["Scan"],
-                                         input_data_filters["Data Quality Tag"]["Good"],
-                                         input_data_filters["Run Type"]["physics"],
-                                         input_data_filters["Magnet"]["On"]]},
+    input_data_filters={"bhabha_all_calib": [INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
+                                             INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+                                             INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
+                                             INPUT_DATA_FILTERS["Beam Energy"]["Scan"],
+                                             INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                             INPUT_DATA_FILTERS["Run Type"]["physics"],
+                                             INPUT_DATA_FILTERS["Magnet"]["On"]],
+                        "hadron_calib": [INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
+                                         INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+                                         INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
+                                         INPUT_DATA_FILTERS["Beam Energy"]["Scan"],
+                                         INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                         INPUT_DATA_FILTERS["Run Type"]["physics"],
+                                         INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],
     expert_config={"numCrysCrateIterations": 1,
                    "maxNumberEvents": 50000000,

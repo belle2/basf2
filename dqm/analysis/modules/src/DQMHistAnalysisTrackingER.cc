@@ -55,14 +55,32 @@ void DQMHistAnalysisTrackingERModule::event()
     //compute fraction of tracks with no PXD hits
     TH1* hNoPXDHits = findHist("TrackingERDQM" + suffix + "/NoOfHitsInTrack_PXD");
     if (hNoPXDHits != nullptr) {
-
       int nTracks = hNoPXDHits->GetEntries();
       int nTracksNoPXD = hNoPXDHits->GetBinContent(1);
-
-
-      m_monObj->setVariable("tracksCount" + suffix, nTracks);
       if (nTracks > 0)
         m_monObj->setVariable("tracksNoPXDHit" + suffix, (double)nTracksNoPXD / nTracks);
+    }
+
+    // add average number of tracks per event to Mirabelle
+    TH1* hnTracks = findHist("TrackingERDQM" + suffix + "/NoOfTracks");
+    if (hnTracks != nullptr) {
+      double averageNTracks = hnTracks->GetMean();
+      m_monObj->setVariable("nTracksPerEvent" + suffix, averageNTracks);
+    }
+    TH1* hnVXDTracks = findHist("TrackingERDQM" + suffix + "/NoOfTracksInVXDOnly");
+    if (hnVXDTracks != nullptr) {
+      double averageNVXDTracks = hnVXDTracks->GetMean();
+      m_monObj->setVariable("nVXDTracksPerEvent" + suffix, averageNVXDTracks);
+    }
+    TH1* hnCDCTracks = findHist("TrackingERDQM" + suffix + "/NoOfTracksInCDCOnly");
+    if (hnCDCTracks != nullptr) {
+      double averageNCDCTracks = hnCDCTracks->GetMean();
+      m_monObj->setVariable("nCDCTracksPerEvent" + suffix, averageNCDCTracks);
+    }
+    TH1* hnVXDCDCTracks = findHist("TrackingERDQM" + suffix + "/NoOfTracksInVXDCDC");
+    if (hnVXDCDCTracks != nullptr) {
+      double averageNVXDCDCTracks = hnVXDCDCTracks->GetMean();
+      m_monObj->setVariable("nVXDCDCTracksPerEvent" + suffix, averageNVXDCDCTracks);
     }
   }
 

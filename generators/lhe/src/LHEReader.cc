@@ -216,6 +216,7 @@ int LHEReader::readParticle(MCParticleGraph::GraphParticle& particle)
       particle.setPDG(static_cast<int>(fields[0]));
       mother = static_cast<int>(fields[2]);
       particle.setMomentum(TVector3(&fields[6]));
+      particle.setEnergy(fields[9]);
       particle.setMass(fields[10]);
       break;
     default:

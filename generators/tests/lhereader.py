@@ -94,9 +94,9 @@ with TemporaryDirectory() as tmp:
 
     assert t1.px == 0.24189484119415283, 'Boosted momenta are not as expected'
     assert t1.py == 0.0025198485236614943, 'Boosted momenta are not as expected'
-    assert t1.pz == -2.136873722076416, 'Boosted momenta are not as expected'
+    assert math.isclose(t1.pz, -2.136873722076416, rel_tol=eps), 'Boosted momenta are not as expected'
 
-    assert t2.px == 0.21474215388298035, 'Boosted momenta are not as expected'
+    assert math.isclose(t2.px, 0.21474215388298035, rel_tol=eps), 'Boosted momenta are not as expected'
     assert t2.py == -0.0025198485236614943, 'Boosted momenta are not as expected'
     assert t2.pz == 5.136414527893066, 'Boosted momenta are not as expected'
 

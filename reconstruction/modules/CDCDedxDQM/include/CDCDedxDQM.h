@@ -92,6 +92,8 @@ namespace Belle2 {
     Double_t m_rungain{ -99.0}; /**< previous rungain */
     std::vector <double> m_adc[14336]; /**< adc per wire for wire status */
 
+    std::string mmode; /**< monitoring mode all/basic */
+
     TH1D* hMeta{nullptr}; /**< metadata */
     TH1D* hdEdx{nullptr}; /**< dedx */
     TH2D* hdEdxvsP{nullptr}; /**< dedx vs p*/

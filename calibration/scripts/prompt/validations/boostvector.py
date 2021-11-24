@@ -13,22 +13,18 @@ Validation of the Boost Vector calibration
 '''
 
 
-import basf2
 from prompt import ValidationSettings
 import ROOT
 import sys
-import subprocess
 import json
 
 import numpy as np
-import scipy.linalg as la
 import scipy.stats
 import matplotlib.pyplot as plt
 
-import re
 import os
 from glob import glob
-from math import sqrt, frexp, asin, hypot, atan2
+from math import sqrt, frexp, hypot, atan2
 
 from datetime import datetime, timedelta
 from ROOT.Belle2 import Unit

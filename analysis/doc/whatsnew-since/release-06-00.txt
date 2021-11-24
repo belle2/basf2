@@ -47,3 +47,6 @@ Modules
  * A cut provided to the `ParticleCombiner` was always applied to the daughter particle combination, even when choosing one of the
    two recoil options. Now it is applied to the created mother particle as written in the documentation. This changes the behavior
    of `reconstructRecoil` and `reconstructRecoilDaughter`.
+ * The :b2:mod:`ParticleKinematicFitter` module has been extended to support the fit in which an additional unmeasured photon
+   is assumed along HER/LER. To use the feature, one has to set ``addUnmeasuredPhoton`` and ``fixUnmeasuredToHER`` (``fixUnmeasuredToLER``)
+   to ``true``.

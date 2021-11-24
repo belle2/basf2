@@ -82,7 +82,10 @@ namespace Belle2 {
       bool m_debugFitter;                /**< activate internal debugging (for New and Newton fitter only)*/
       int m_debugFitterLevel;            /**< internal debugging level (for New and Newton fitter only)*/
       bool m_addUnmeasuredPhoton;        /**< add one unmeasured photon to the fit (costs 3 constraints)*/
+      bool m_fixUnmeasuredPhotonToHER;   /**< fix the momentum of the unmeasured photon to HER*/
+      bool m_fixUnmeasuredPhotonToLER;   /**< fix the momentum of the unmeasured photon to LER*/
       bool m_add3CPhoton;                /**< add one photon with unmeasured energy to the fit (costs 1 constraints)*/
+      bool m_liftPhotonTheta;            /**< lift theta constraint of the 3CPhoton. Valid when add3CPhoton is true.*/
       bool m_updateMother;               /**< update mother kinematics*/
       bool m_updateDaughters;            /**< update daughter kinematics*/
       double m_recoilMass;               /**< Recoil mass for RecoilMass constraint */

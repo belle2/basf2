@@ -256,7 +256,7 @@ def getSigma68WithError(array, n=300):
     bs = np.random.choice(array, (array.shape[0], n))  # bootstrap resampling
     results = getSigma68(bs)
     # return results.mean(), results.std()
-    return getSigma68(a), results.std()
+    return getSigma68(array), results.std()
 
 
 # Extend pandas.DataFrame

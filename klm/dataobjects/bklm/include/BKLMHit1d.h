@@ -17,6 +17,7 @@
 #include <framework/datastore/RelationsObject.h>
 
 /* C++ headers. */
+#include <utility>
 #include <vector>
 
 namespace Belle2 {
@@ -29,9 +30,9 @@ namespace Belle2 {
     //! Empty constructor for ROOT IO (needed to make the class storable)
     BKLMHit1d();
 
-    //! Constructor with initial values
-    //! @param digits vector of contiguous KLMDigits
-    explicit BKLMHit1d(const std::vector<const KLMDigit*>& digits);
+    //! Constructor used in KLMReconstructor module
+    //! @param digitsWithTime vector of pair of contiguous KLMDigits with time; the value passed in the pair is used as digit time instead of the value returned by KLMDigit::getTime()
+    explicit BKLMHit1d(const std::vector<std::pair<const KLMDigit*, double>>& digitsWithTime);
 
     //! Copy constructor
     BKLMHit1d(const BKLMHit1d&);

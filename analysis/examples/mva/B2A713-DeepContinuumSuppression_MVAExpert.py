@@ -35,9 +35,7 @@ from stdV0s import stdKshorts
 from stdPi0s import stdPi0s
 from vertex import TagV
 import variables as v
-import glob
 import sys
-import numpy as np
 
 basf2.set_log_level(basf2.LogLevel.ERROR)
 

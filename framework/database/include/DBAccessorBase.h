@@ -129,6 +129,9 @@ namespace Belle2 {
       addCallback([ = ](const std::string&) {(*object.*callback)();});
     }
 
+    /** Return the globaltag name (or testing payloads path) this object is loaded from */
+    const std::string& getGlobaltag() const { ensureAttached(); return m_entry->getGlobaltag(); }
+
     /** Return current revision of the object */
     unsigned int getRevision() const { ensureAttached(); return m_entry->getRevision(); }
 

@@ -64,7 +64,10 @@ namespace Belle2 {
       addParam("debugFitter", m_debugFitter, "Switch on/off internal debugging output if available.", false);
       addParam("debugFitterLevel", m_debugFitterLevel, "Internal debugging output level if available.", 10);
       addParam("addUnmeasuredPhoton", m_addUnmeasuredPhoton, "Add one unmeasured photon (-3C).", false);
+      addParam("fixUnmeasuredToHER", m_fixUnmeasuredPhotonToHER, "fix the momentum of the unmeasured photon to HER (+2C).", false);
+      addParam("fixUnmeasuredToLER", m_fixUnmeasuredPhotonToLER, "fix the momentum of the unmeasured photon to LER (+2C).", false);
       addParam("add3CPhoton", m_add3CPhoton, "Add one photon with unmeasured energy (-1C).", false);
+      addParam("liftPhotonTheta", m_liftPhotonTheta, "Lift theta constraint of 3CPhoton. Valid when add3CPhoton is true.", false);
       addParam("decayString", m_decayString, "Specifies which daughter particles are included in the kinematic fit.", string(""));
       addParam("updateMother", m_updateMother, "Update the mother kinematics.", true);
       addParam("updateDaughters", m_updateDaughters, "Update the daughter kinematics.", false);
@@ -255,18 +258,18 @@ namespace Belle2 {
         std::vector <BaseFitObject*>* fitObjectContainer = fitter.getFitObjects();
         for (auto fo : *fitObjectContainer) {
           const std::string name = fo->getName();
-          if (name == "unmeasured") {
+          if (name.find("Unmeasured") != std::string::npos) {
             auto* fitobject = static_cast<ParticleFitObject*>(fo);
             ROOT::Math::PxPyPzEVector tlv = getLorentzVector(fitobject);
-            mother->addExtraInfo("OrcaKinFitUnmeasuredTheta", tlv.Theta());
-            mother->addExtraInfo("OrcaKinFitUnmeasuredPhi", tlv.Phi());
-            mother->addExtraInfo("OrcaKinFitUnmeasuredE", tlv.E());
+            mother->addExtraInfo("OrcaKinFit" + name + "Theta", tlv.Theta());
+            mother->addExtraInfo("OrcaKinFit" + name + "Phi", tlv.Phi());
+            mother->addExtraInfo("OrcaKinFit" + name + "E", tlv.E());
 
             // Uncertainty
 //           const double err0 = getFitObjectError(fitobject, 0);
-            mother->addExtraInfo("OrcaKinFitUnmeasuredErrorTheta", getFitObjectError(fitobject, 1));
-            mother->addExtraInfo("OrcaKinFitUnmeasuredErrorPhi", getFitObjectError(fitobject, 2));
-            mother->addExtraInfo("OrcaKinFitUnmeasuredErrorE", getFitObjectError(fitobject, 0));
+            mother->addExtraInfo("OrcaKinFit" + name + "ErrorTheta", getFitObjectError(fitobject, 1));
+            mother->addExtraInfo("OrcaKinFit" + name + "ErrorPhi", getFitObjectError(fitobject, 2));
+            mother->addExtraInfo("OrcaKinFit" + name + "ErrorE", getFitObjectError(fitobject, 0));
 
           }
         }
@@ -343,10 +346,13 @@ namespace Belle2 {
         ParticleFitObject* pfitobject;
         pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, startingeE, startingeTheta, startingePhi, 0.);
         pfitobject->setParam(0, startingE, false, false);
-        pfitobject->setParam(1, startingTheta, true, false);
+        if (m_liftPhotonTheta)
+          pfitobject->setParam(1, startingTheta, false, false);
+        else
+          pfitobject->setParam(1, startingTheta, true, false);
         pfitobject->setParam(2, startingPhi, true, false);
 
-        std::string fitObjectName = "unmeasured";
+        std::string fitObjectName = "Unmeasured3C";
         pfitobject->setName(fitObjectName.c_str());
         ParticleFitObject& fitobject = *pfitobject;
 
@@ -571,20 +577,36 @@ namespace Belle2 {
 
     void ParticleKinematicFitterModule::addUnmeasuredGammaToOrcaKinFit(BaseFitter& fitter)
     {
+      B2DEBUG(17, "ParticleKinematicFitterModule::addUnmeasuredGammaToOrcaKinFit: adding an unmeasured photon to the fitter!");
       // Initialize photon using the existing constraints
       ROOT::Math::PxPyPzEVector tlv = getLorentzVectorConstraints();
       double startingE = tlv.E();
       double startingPhi = tlv.Phi();
       double startingTheta = tlv.Theta();
+      bool paramFlag = false;
 
       // create a fit object
       ParticleFitObject* pfitobject;
+
+      std::string fitObjectName = "UnmeasuredAlongBeam";
+
+      if (m_fixUnmeasuredPhotonToHER) {
+        startingTheta = 41.5e-3;  // TODO: Read beam crossing angle from db if it's available
+        startingPhi = 0.0;
+        paramFlag = true;
+      } else if (m_fixUnmeasuredPhotonToLER) {
+        startingTheta = TMath::Pi() - 41.5e-3;
+        startingPhi = 0.0;
+        paramFlag = true;
+      } else {
+        fitObjectName = "Unmeasured";
+      }
+
       pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, 0.0, 0.0, 0.0, 0.);
       pfitobject->setParam(0, startingE, false, false);
-      pfitobject->setParam(1, startingTheta, false, false);
-      pfitobject->setParam(2, startingPhi, false, false);
+      pfitobject->setParam(1, startingTheta, paramFlag, paramFlag);
+      pfitobject->setParam(2, startingPhi, paramFlag, paramFlag);
 
-      std::string fitObjectName = "unmeasured";
       pfitobject->setName(fitObjectName.c_str());
       ParticleFitObject& fitobject = *pfitobject;
 

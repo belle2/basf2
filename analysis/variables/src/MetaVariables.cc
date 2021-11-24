@@ -2729,18 +2729,18 @@ namespace Belle2 {
           }
 
           // Make a dummy particle out of the sum of the 4-momenta of the selected daughters
-          Particle* sumOfDaughters = new Particle(pSum, 100); // 100 is one of the special numbers
+          Particle sumOfDaughters(pSum, 100); // 100 is one of the special numbers
 
           // Calculate the variable on the dummy particle
-          if (std::holds_alternative<double>(var->function(sumOfDaughters)))
+          if (std::holds_alternative<double>(var->function(&sumOfDaughters)))
           {
-            return std::get<double>(var->function(sumOfDaughters));
-          } else if (std::holds_alternative<int>(var->function(sumOfDaughters)))
+            return std::get<double>(var->function(&sumOfDaughters));
+          } else if (std::holds_alternative<int>(var->function(&sumOfDaughters)))
           {
-            return std::get<int>(var->function(sumOfDaughters));
-          } else if (std::holds_alternative<bool>(var->function(sumOfDaughters)))
+            return std::get<int>(var->function(&sumOfDaughters));
+          } else if (std::holds_alternative<bool>(var->function(&sumOfDaughters)))
           {
-            return std::get<bool>(var->function(sumOfDaughters));
+            return std::get<bool>(var->function(&sumOfDaughters));
           } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
@@ -2860,18 +2860,18 @@ namespace Belle2 {
           } // End of loop over number of daughter
 
           // Make a dummy particle out of the sum of the 4-momenta of the selected daughters
-          Particle* sumOfDaughters = new Particle(ROOT::Math::PxPyPzEVector(pSum), 100); // 100 is one of the special numbers
+          Particle sumOfDaughters(ROOT::Math::PxPyPzEVector(pSum), 100); // 100 is one of the special numbers
 
           // Calculate the variable on the dummy particle
-          if (std::holds_alternative<double>(var->function(sumOfDaughters)))
+          if (std::holds_alternative<double>(var->function(&sumOfDaughters)))
           {
-            return std::get<double>(var->function(sumOfDaughters));
-          } else if (std::holds_alternative<int>(var->function(sumOfDaughters)))
+            return std::get<double>(var->function(&sumOfDaughters));
+          } else if (std::holds_alternative<int>(var->function(&sumOfDaughters)))
           {
-            return std::get<int>(var->function(sumOfDaughters));
-          } else if (std::holds_alternative<bool>(var->function(sumOfDaughters)))
+            return std::get<int>(var->function(&sumOfDaughters));
+          } else if (std::holds_alternative<bool>(var->function(&sumOfDaughters)))
           {
-            return std::get<bool>(var->function(sumOfDaughters));
+            return std::get<bool>(var->function(&sumOfDaughters));
           } else return std::numeric_limits<double>::quiet_NaN();
         }; // end of lambda function
         return func;
@@ -2915,16 +2915,16 @@ namespace Belle2 {
           {
             i_p = i_p->getMother();
           }
-          const Particle* m_p = new Particle(i_p);
-          if (std::holds_alternative<double>(var->function(m_p)))
+          Particle m_p(i_p);
+          if (std::holds_alternative<double>(var->function(&m_p)))
           {
-            return std::get<double>(var->function(m_p));
-          } else if (std::holds_alternative<int>(var->function(m_p)))
+            return std::get<double>(var->function(&m_p));
+          } else if (std::holds_alternative<int>(var->function(&m_p)))
           {
-            return std::get<int>(var->function(m_p));
-          } else if (std::holds_alternative<bool>(var->function(m_p)))
+            return std::get<int>(var->function(&m_p));
+          } else if (std::holds_alternative<bool>(var->function(&m_p)))
           {
-            return std::get<bool>(var->function(m_p));
+            return std::get<bool>(var->function(&m_p));
           } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;

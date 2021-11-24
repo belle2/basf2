@@ -1802,10 +1802,6 @@ def variablesToEventExtraInfo(particleList, variables, option=0, path=None):
     For each particle in the input list the selected variables are saved in an event-extra-info field with the given name,
     Can be used to save MC truth information, for example, in a ntuple of reconstructed particles.
 
-    An existing extra info with the same name will be overwritten if the new
-    value is lower / will never be overwritten / will be overwritten if the
-    new value is higher / will always be overwritten (-1/0/1/2).
-
     @param particleList (str)         The input ParticleList
     @param variables (dict(str:str))  Dictionary of Variables (key) and extraInfo names (value).
     @param option (int)               Options for overwriting an existing extraInfo. Choose among -1, 0, 1, 2.
@@ -1831,7 +1827,7 @@ def variableToSignalSideExtraInfo(particleList, varToExtraInfo, path):
 
     @param particleList (str)              The input ParticleList
     @param varToExtraInfo (dict(str:str))  Dictionary of Variables (key) and extraInfo names (value).
-    @param path          modules are added to this path
+    @param path (basf2.Path)               modules are added to this path
     """
     mod = register_module('SignalSideVariablesToExtraInfo')
     mod.set_name('SigSideVarToExtraInfo_' + particleList)

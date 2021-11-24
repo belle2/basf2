@@ -380,14 +380,8 @@ namespace {
   {
     StoreArray<Particle> myParticles{};
     auto part = myParticles[2];  // B0
-    // Signal side 4 vector
-    // PxPyPzEVector  sig4Vec = part->get4Vector();
 
-    auto* var = Manager::Instance().getVariable("bssMassDifference()");
-    ASSERT_NE(var, nullptr);
-    // EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), sig4Vec.M()); // FIXME: Problem with cancellation of digits and negative masses of FS particles
-
-    var = Manager::Instance().getVariable("weCosThetaEll()");
+    auto* var = Manager::Instance().getVariable("weCosThetaEll()");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(part)), -0.99858648);
 

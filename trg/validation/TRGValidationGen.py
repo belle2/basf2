@@ -13,13 +13,12 @@
 <header>
 <output>TRGValidationGen.root</output>
 <contact>Yun-Tsung Lai, ytlai@post.kek.jp</contact>
-<description>This steering file generates 1000 e+/e- particle guns to validate the trg package.</description>
+<description>This steering file generates 1000 e+/e- mu+/mu- particle guns to validate the trg package.</description>
 </header>
 """
 
 import basf2 as b2
 from simulation import add_simulation
-from L1trigger import add_trigger_simulation
 
 
 main = b2.create_path()

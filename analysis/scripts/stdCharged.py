@@ -237,15 +237,15 @@ def stdLep(pdgId, listtype, method, classification, path=None):
     payload_misid_K = f"ParticleReweighting:{pid_var_stripped}_misid_K_combination_{listtype}"
 
     # Configure weighting module(s).
-    reweighter_eff = path.add_module("ParticleWeighting",
-                                     particleList=plistname,
-                                     tableName=payload_eff).set_name(f"ParticleWeighting_eff_{plistname}")
-    reweighter_misid_pi = path.add_module("ParticleWeighting",
-                                          particleList=plistname,
-                                          tableName=payload_misid_pi).set_name(f"ParticleWeighting_misid_pi_{plistname}")
-    reweighter_misid_K = path.add_module("ParticleWeighting",
-                                         particleList=plistname,
-                                         tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{plistname}")
+    path.add_module("ParticleWeighting",
+                    particleList=plistname,
+                    tableName=payload_eff).set_name(f"ParticleWeighting_eff_{plistname}")
+    path.add_module("ParticleWeighting",
+                    particleList=plistname,
+                    tableName=payload_misid_pi).set_name(f"ParticleWeighting_misid_pi_{plistname}")
+    path.add_module("ParticleWeighting",
+                    particleList=plistname,
+                    tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{plistname}")
 
     # Apply the PID selection cut, which is read from the efficiency payload.
     cut = f"{pid_var} > extraInfo({payload_eff}_threshold)"

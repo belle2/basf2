@@ -39,34 +39,23 @@ namespace Belle2 {
     virtual ~KoralWInputModule();
 
     /** Initializes the module. */
-    virtual void initialize() override;
+    void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event() override;
+    void event() override;
 
     /** Method is called at the end of the event processing. */
-    virtual void terminate() override;
-
-
-  protected:
-
-    /** Module parameters */
-    std::string m_dataPath;      /**< The path to the KoralW input data files. */
-    std::string m_userDataFile;  /**< The filename of the user KoralW input data file. */
-
-    /** Variables */
-    KoralW m_generator;        /**< The KoralW generator. */
-    MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */
+    void terminate() override;
 
   private:
 
-    /** Method is called to initialize the generator. */
-    void initializeGenerator();
-
+    std::string m_dataPath; /**< The path to the KoralW input data files. */
+    std::string m_userDataFile; /**< The filename of the user KoralW input data file. */
     bool m_initialized{false}; /**< True if generator has been initialized. */
-    DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter. */
-
-    InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
+    KoralW m_generator; /**< The KoralW generator. */
+    MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */
+    DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter database object. */
+    InitialParticleGeneration m_initial; /**< InitialParticleGeneration utility. */
 
   };
 

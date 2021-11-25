@@ -220,7 +220,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         svdTrackingEventLevelMdstInfoFiller = b2.register_module('SVDTrackingEventLevelMdstInfoFiller')
         svdTrackingEventLevelMdstInfoFiller.set_name(nameSVDTrackingEventLevelMdstInfoFiller)
         svdTrackingEventLevelMdstInfoFiller.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
-        svdTrackingEventLevelMdstInfoFiller.param('svdClustersName', clustersName)
+        svdTrackingEventLevelMdstInfoFiller.param('svdClustersName', clusterName)
         path.add_module(svdTrackingEventLevelMdstInfoFiller)
 
     # Add SVDSpacePointCreator
@@ -302,7 +302,7 @@ def add_svd_unpacker_simulate3sampleDAQ(path, latencyShift=-1, relativeShift=-1)
     else:
         emulator.param("chooseStartingSample", True)
         if latencyShift < 0 or latencyShift > 3:
-            B2FATAL("the latencyShift must be an integer >=0 and <= 3")
+            b2.B2FATAL("the latencyShift must be an integer >=0 and <= 3")
         else:
             emulator.param("StartingSample", latencyShift)
 
@@ -311,7 +311,7 @@ def add_svd_unpacker_simulate3sampleDAQ(path, latencyShift=-1, relativeShift=-1)
     else:
         emulator.param("chooseRelativeShift", True)
         if relativeShift < 0 or relativeShift > 12:
-            B2FATAL("the relativeShift must be an integer >=0 and <= 12")
+            b2.B2FATAL("the relativeShift must be an integer >=0 and <= 12")
         else:
             emulator.param("relativeShift", relativeShift)
 

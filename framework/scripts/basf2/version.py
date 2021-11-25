@@ -11,17 +11,24 @@
 import os
 import basf2
 
-version = ''
-try:
-    from ROOT import Belle2
-    import ROOT
-    ROOT.gSystem.Load('libframework_io')
-    ROOT.gROOT.LoadMacro(basf2.find_file("include/framework/io/RootIOUtilities.h"))
-    version = Belle2.RootIOUtilities.getCommitID()
-except AttributeError:
-    pass
 
-release = (os.environ.get('BELLE2_RELEASE', 'unknown'))
+def get_version():
+    version = ''
+    try:
+        from ROOT import Belle2
+        import ROOT
+        ROOT.gSystem.Load('libframework_io')
+        ROOT.gROOT.LoadMacro(basf2.find_file("include/framework/io/RootIOUtilities.h"))
+        version = Belle2.RootIOUtilities.getCommitID()
+    except AttributeError:
+        pass
+    return version
+
+
+def get_release():
+    release = (os.environ.get('BELLE2_RELEASE', 'unknown'))
+    return release
+
 
 if __name__ == "__main__":
-    print(f'basf2 (Belle II Analysis Software Framework), Version: {version} (Release: {release})')
+    print(f'basf2 (Belle II Analysis Software Framework), Version: {get_version()} (Release: {get_release()})')

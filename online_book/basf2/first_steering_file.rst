@@ -158,7 +158,7 @@ files. They should be available in the
 other servers.
 
 .. admonition:: If you're working from an institute server
-    :class: toggle
+    :class: stacked toggle
 
     Perhaps you are working on the server of your home institute and this folder
     is not available. In this case please talk to your administrators to make
@@ -167,7 +167,7 @@ other servers.
     same level of support on other machines though.
 
 .. admonition:: If you're working on your own machine
-    :class: toggle
+    :class: stacked toggle
 
     In this case you might first need to copy the data files to your home
     directory on your local machine from kekcc or DESY via a SSH connection (cf.

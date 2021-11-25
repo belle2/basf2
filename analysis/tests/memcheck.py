@@ -101,7 +101,7 @@ rankByHighest('B0:jpsiks', 'chiProb', path=main)
 buildRestOfEvent('B0:jpsiks', path=main)
 
 # calculate continuum suppression variables
-buildContinuumSuppression('B0:jpsiks', '', path=main)
+buildContinuumSuppression('B0:jpsiks', 'all', path=main)
 
 # perform MC matching (MC truth association).
 matchMCTruth('B0:jpsiks', path=main)

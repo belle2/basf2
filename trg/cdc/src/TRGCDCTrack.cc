@@ -15,7 +15,7 @@
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "trg/trg/Debug.h"
 #include "trg/trg/Constants.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/cdc/Circle.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/SegmentHit.h"

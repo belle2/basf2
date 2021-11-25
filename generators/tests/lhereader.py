@@ -36,15 +36,14 @@ lhereader.param('inputFileList', [inputfile])
 lhereader.param('useWeights', False)
 lhereader.param('nInitialParticles', 2)
 lhereader.param('nVirtualParticles', 0)
-lhereader.param('boost2Lab', True)   # generation is in centre of mass system (see steering card)
 lhereader.param('wrongSignPz', True)  # because Belle II convention is different to LEP etc
 print_params(lhereader)
 
 # prepare the path
 testpath = create_path()
 testpath.add_module('Progress')
-add_beamparameters(testpath, 'Y4S')
 testpath.add_module(lhereader)
+testpath.add_module('BoostMCParticles')
 fillParticleListsFromMC([('gamma:gen', ''), ('A:gen', '')], path=testpath)
 
 # dump information from basf2

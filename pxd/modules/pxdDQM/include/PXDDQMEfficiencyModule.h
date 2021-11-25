@@ -22,6 +22,7 @@
 #include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
 
 #include "TH1F.h"
+#include "TH1D.h"
 #include "TH2F.h"
 #include "TVector3.h"
 
@@ -116,10 +117,13 @@ namespace Belle2 {
     unsigned int m_minSVDHits; ///< Required hits in SVD strips for tracks
     double m_z0minCut;/**< cut z0 minimum in cm (large negativ value eg -9999 disables)*/
     double m_z0maxCut;/**< cut z0 maximum in cm (large positiv value eg 9999 disables)*/
-    double m_d0Cut;/**< cut abs(d0) in cm (and negativ value eg -9999 disables)*/
+    double m_d0Cut;/**< cut abs(d0) in cm (large positiv value eg 9999 disables)*/
     int m_maskedDistance; ///< Distance inside which no dead pixel or module border is allowed
 
-    //Histograms to later determine efficiency
+    std::map<VxdID, int> revLUT; ///< reverse lookup sensor id -> index in histogram
+
+    //Histograms to later determine efficiency and crosscheck
+    TH1D* m_h_combined{}; ///< combined histograms to workaround dqm glitch
     std::map<VxdID, TH2F*> m_h_track_hits; ///< histograms of track hits
     std::map<VxdID, TH2F*> m_h_matched_cluster; ///< histograms of matched clusters
     std::map<VxdID, TH1F*> m_h_p; ///< histograms of momenta

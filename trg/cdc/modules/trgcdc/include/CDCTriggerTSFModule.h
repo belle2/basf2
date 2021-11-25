@@ -41,6 +41,9 @@ namespace Belle2 {
     /** Initialize the module and register DataStore arrays. */
     virtual void initialize() override;
 
+    /** Register run-dependent DataStore arrays. */
+    virtual void beginRun() override;
+
     /** Run the TSF for an event. */
     virtual void event() override;
 
@@ -72,7 +75,7 @@ namespace Belle2 {
     /** mask Dead channel or not. True:mask False:unmask */
     bool m_deadchflag;
     /** dbobject to store deadchannel */
-    DBObjPtr<CDCTriggerDeadch> m_db_deadchannel;
+    OptionalDBObjPtr<CDCTriggerDeadch> m_db_deadchannel;
     /** TDC based crosstalk filtering logic on CDCFE. True:enable False:disable */
     bool m_crosstalk_tdcfilter;
 

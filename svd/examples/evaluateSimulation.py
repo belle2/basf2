@@ -11,7 +11,6 @@
 
 import basf2 as b2
 from basf2 import conditions as b2conditions
-from svd import add_svd_trgsummary
 from simulation import add_simulation
 
 numEvents = 2000
@@ -70,6 +69,7 @@ else:
     # including the timing module
     # main.add_module("FullSimTiming", rootFile="EvtGenTiming.root", logLevel=LogLevel.INFO)
 
+    # from svd import add_svd_trgsummary
     # add_svd_trgsummary(main)
 
     # SVD simulation

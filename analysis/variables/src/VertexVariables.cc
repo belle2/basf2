@@ -21,6 +21,11 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
+#include <vxd/geometry/GeoCache.h>
+
+#include <tuple>
+using namespace std;
+
 
 namespace Belle2 {
   class Particle;
@@ -147,6 +152,52 @@ namespace Belle2 {
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle) return realNaN;
       return getMcProductionVertexFromIP(mcparticle).Z();
+    }
+
+    tuple<TVector3, int, int, int> getLocalCoordinates(const Particle* part)
+    {
+      VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      const auto& global = frame.getVertex(part);
+      for (const auto& layer : geo.getLayers(VXD::SensorInfoBase::SVD)) {
+        for (const auto& ladder : geo.getLadders(layer)) {
+          for (const auto& sensor : geo.getSensors(ladder)) {
+            const auto& sInfo = VXD::GeoCache::get(sensor);
+            const auto& local = sInfo.pointToLocal(global, true);
+            if (sInfo.inside(local)) return make_tuple(local, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
+          }
+        }
+      }
+      return make_tuple(TVector3(realNaN, realNaN, realNaN), 0, 0, 0);
+    }
+
+    double particleU(const Particle* part)
+    {
+      return get<0>(getLocalCoordinates(part)).X();
+    }
+
+    double particleV(const Particle* part)
+    {
+      return get<0>(getLocalCoordinates(part)).Y();
+    }
+
+    double particleW(const Particle* part)
+    {
+      return get<0>(getLocalCoordinates(part)).Z();
+    }
+    double particleLayer(const Particle* part)
+    {
+      return get<1>(getLocalCoordinates(part));
+    }
+
+    double particleLadder(const Particle* part)
+    {
+      return get<2>(getLocalCoordinates(part));
+    }
+
+    double particleSensor(const Particle* part)
+    {
+      return get<3>(getLocalCoordinates(part));
     }
 
     // vertex or POCA in respect to origin ------------------------------

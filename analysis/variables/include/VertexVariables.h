@@ -110,6 +110,36 @@ namespace Belle2 {
     double particleZ(const Particle* part);
 
     /**
+     * return local position in v relative to sensor origin
+     */
+    double particleV(const Particle* part);
+
+    /**
+     * return local position in u relative to sensor origin
+     */
+    double particleU(const Particle* part);
+
+    /**
+     * return local position in w relative to sensor origin
+     */
+    double particleW(const Particle* part);
+
+    /**
+     * return SensorID relative to x, y and z position
+     */
+    double particleSensor(const Particle* part);
+
+    /**
+     * return LadderID relative to x, y and z position
+     */
+    double particleLadder(const Particle* part);
+
+    /**
+     * return LayerID relative to x, y and z position
+     */
+    double particleLayer(const Particle* part);
+
+    /**
      * return position in x relative to interaction point
      */
     double particleDX(const Particle* part);

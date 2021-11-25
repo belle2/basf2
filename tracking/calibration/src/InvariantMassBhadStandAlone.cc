@@ -280,9 +280,7 @@ namespace Belle2 {
 
       // --- Build Gaussian signal PDF ---
 
-      //RooRealVar sigmean("Mean","B^{#pm} mass",5.29,5.27,5.30) ;
-      RooRealVar sigwidth("#sigma", "B^{#pm} width", 0.00237, 0.0001, 0.030) ;
-      //sigwidth.setConstant(kTRUE);
+      RooRealVar sigwidth("#sigma", "width of B-meson energy in CMS", 0.00237, 0.0001, 0.030) ;
 
       vector<RooRealVar*> sigmean(limits.size());
       vector<RooGaussian*> gauss(limits.size());
@@ -290,7 +288,7 @@ namespace Belle2 {
 
 
       for (unsigned i = 0; i < limits.size(); ++i) {
-        sigmean[i] = new RooRealVar(Form("Mean_%u", i), "B^{#pm} mass", 5.29, 5.27, 5.30) ;
+        sigmean[i] = new RooRealVar(Form("Mean_%u", i), "mean B-meson energy in CMS", 5.29, 5.27, 5.30) ;
         gauss[i]   = new RooGaussian(Form("gauss_%u", i), "gaussian PDF", eNow, *sigmean[i], sigwidth) ;
       }
 

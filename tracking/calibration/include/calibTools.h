@@ -298,7 +298,8 @@ namespace Belle2 {
         for (auto I : r[k]) {
           ExpRun exprun = I.first;
           // make sure that the run isn't already in the list, to avoid duplicity
-          B2FATAL("Intra-run dependence existed", existingRuns.count(exprun) == 0);
+          if (existingRuns.count(exprun) != 0)
+            B2FATAL("Intra-run dependence exists");
           existingRuns.insert(exprun);
         }
       }

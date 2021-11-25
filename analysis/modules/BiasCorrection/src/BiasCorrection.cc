@@ -121,14 +121,12 @@ void EnergyBiasCorrectionModule::setEnergyScalingFactor(Particle* particle)
   } else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster
              && particle->getPDGCode() == Const::photon.getPDGCode()) {
     //particle is photon reconstructed from ECL cluster
-    if (!particle->hasExtraInfo(m_tableName + "_Weight")) {
-      WeightInfo info = getInfo(particle);
-      for (const auto& entry : info) {
-        particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
-      }
-      particle->setMomentumScalingFactor(particle->getExtraInfo(m_tableName + "_Weight"));
-      particle->updateJacobiMatrix();
+    WeightInfo info = getInfo(particle);
+    for (const auto& entry : info) {
+      particle->writeExtraInfo(m_tableName + "_" + entry.first, entry.second);
     }
+    particle->setMomentumScalingFactor(particle->getExtraInfo(m_tableName + "_Weight"));
+    particle->updateJacobiMatrix();
   }
   B2DEBUG(10, "Called setMomentumScalingFactor for an unspecified, track-based or KLM cluster-based particle");
 }

@@ -48,9 +48,16 @@ static TObject* getInvariantMassObj(VectorXd vMass, MatrixXd  vMassUnc, MatrixXd
 }
 
 
+/** Run the InvariantMass analysis using mumu method on the provided events
+  @param evts: vector of the mumu events
+  @param calibAnalysis: function calculating the calibration parameters on the single calibration interval
+  @param lossFunctionOuter: outer loss function defining the calibration intervals
+  @param lossFunctionInner: inner loss function defining the calibration intervals
+  @return A vector containing calibration data
+*/
 template<typename Fun>
 std::vector<CalibrationData>  runMuMuCalibration(const std::vector<Belle2::InvariantMassMuMuCalib::Event>& evts,  Fun calibAnalysis,
-                                                 TString m_lossFunctionOuter, TString m_lossFunctionInner)
+                                                 TString lossFunctionOuter, TString lossFunctionInner)
 {
   //Time range for each ExpRun
   std::map<ExpRun, std::pair<double, double>> runsInfoOrg = getRunInfo(evts);
@@ -65,7 +72,7 @@ std::vector<CalibrationData>  runMuMuCalibration(const std::vector<Belle2::Invar
 
   // Get intervals based on the input loss functions
   Splitter splt;
-  auto splits = splt.getIntervals(runsInfo, evts, m_lossFunctionOuter, m_lossFunctionInner, 100 /*maximal lenght of the run */);
+  auto splits = splt.getIntervals(runsInfo, evts, lossFunctionOuter, lossFunctionInner, 100 /*maximal length of the run */);
 
   //Loop over all calibration intervals
   std::vector<CalibrationData> calVec;
@@ -91,8 +98,7 @@ std::vector<CalibrationData> addSpreadAndOffset(std::vector<CalibrationData> mum
 {
   std::vector<CalibrationData> mumuCalResultsNew = mumuCalResults;
 
-  for (unsigned i = 0; i < mumuCalResults.size(); ++i) {
-    auto& calibNew = mumuCalResultsNew[i];
+  for (auto& calibNew :  mumuCalResultsNew) {
 
     for (unsigned j = 0; j < calibNew.subIntervals.size(); ++j) {
       calibNew.pars.cnt[j](0)      += offset;
@@ -115,7 +121,6 @@ std::vector<InvariantMassMuMuCalib::Event> InvariantMassAlgorithm::getDataMuMu(c
 
   setInputFileNames(files);
   fillRunToInputFilesMap();
-  //setInputFileNames(files);
 
   TTree* eventsTr = getObjectPtr<TTree>("events").get();
 
@@ -123,10 +128,12 @@ std::vector<InvariantMassMuMuCalib::Event> InvariantMassAlgorithm::getDataMuMu(c
   if (!eventsTr || eventsTr->GetEntries() < 15) {
     if (eventsTr) {
       if (is4S)
-        B2INFO("Small number of events in the 4S mumu sample, only " << eventsTr->GetEntries());
+        B2WARNING("Small number of events in the 4S mumu sample, only " << eventsTr->GetEntries());
       else
-        B2INFO("Small number of events in the off-resonance mumu sample, only " << eventsTr->GetEntries());
-    }
+        B2WARNING("Small number of events in the off-resonance mumu sample, only " << eventsTr->GetEntries());
+    } else
+      B2WARNING("Pointer to the \"events\" object not defined for the mumu sample");
+
     return {};
   }
   B2INFO("Number of mumu events: " << eventsTr->GetEntries());
@@ -148,7 +155,10 @@ std::vector<InvariantMassBhadCalib::Event> InvariantMassAlgorithm::getDataHadB(c
   // Check that there are at least some mumu data
   if (!eventsTr || eventsTr->GetEntries() < 15) {
     if (eventsTr)
-      B2WARNING("Too few data : " << eventsTr->GetEntries());
+      B2WARNING("Too few data, only " << eventsTr->GetEntries() << " events found in hadronic B decay sample");
+    else
+      B2WARNING("Pointer to the \"events\" object not defined for hadronic B decay sample");
+
     return {};
   }
   B2INFO("Number of mumu events: " << eventsTr->GetEntries());
@@ -218,7 +228,7 @@ CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
     else if (f.find("/hadB_4S/") != std::string::npos)
       filesHad4S.push_back(f);
     else {
-      B2ASSERT("Unrecognised data type", false);
+      B2FATAL("Unrecognised data type");
     }
   }
 
@@ -237,7 +247,7 @@ CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
   const auto evtsMuMu4S  = getDataMuMu(filesMuMu4S, true /*is4S*/);
 
   if (evtsMuMuOff.size() + evtsMuMu4S.size() < 50) {
-    B2WARNING("Not enough data : " << evtsMuMuOff.size() + evtsMuMu4S.size());
+    B2WARNING("Not enough data, there are only " << evtsMuMuOff.size() + evtsMuMu4S.size() << " mumu events");
     return CalibrationAlgorithm::EResult::c_NotEnoughData;
   }
 
@@ -249,7 +259,10 @@ CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
   std::vector<InvariantMassMuMuCalib::Event> evtsMuMuTemp = evtsMuMu4S;
   evtsMuMuTemp.insert(evtsMuMuTemp.end(), evtsMuMuOff.begin(), evtsMuMuOff.end());
 
-  B2ASSERT("Assert enough mumu data", evtsMuMuTemp.size() >= 50);
+  if (evtsMuMuTemp.size() < 50) {
+    B2WARNING("Not enough mumu data, there are only " << evtsMuMuTemp.size() << " mumu events");
+    return CalibrationAlgorithm::EResult::c_NotEnoughData;
+  }
 
   // sort by time
   std::sort(evtsMuMuTemp.begin(), evtsMuMuTemp.end(), [](const InvariantMassMuMuCalib::Event & evt1,
@@ -258,7 +271,7 @@ CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
   //split the mumu events into the blocks with identical run type
   std::vector<std::vector<InvariantMassMuMuCalib::Event>> evtsMuMuBlocks;
   bool is4Sold = evtsMuMuTemp[0].is4S;
-  evtsMuMuBlocks.push_back({}); // empy vec to start
+  evtsMuMuBlocks.push_back({}); // empty vec to start
   for (const auto& ev : evtsMuMuTemp) {
     if (is4Sold != ev.is4S) {
       evtsMuMuBlocks.push_back({}); // adding new entry

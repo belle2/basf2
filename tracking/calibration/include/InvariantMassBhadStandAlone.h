@@ -41,10 +41,9 @@ namespace Belle2 {
       int pdg = intNaN;         ///< PDG code of the signal B-meson
       int mode = intNaN;        ///< integer code identifying the decay channel
       double Kpid = realNaN;    ///< Kaon PID
-      double R2 = realNaN;      ///< R2 continuous suppression variable
+      double R2 = realNaN;      ///< R2 continuum suppression variable
       double mD = realNaN;      ///< reconstructed mass of the D meson
       double dmDstar = realNaN; ///< reconstructed mass difference between Dstar and D
-      //double cmsE0; // eCMS used to calculate mBC and deltaE
 
       double t = realNaN;       ///< time of the event
 

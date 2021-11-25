@@ -118,7 +118,10 @@ namespace Belle2 {
     void plotArgusFit(RooDataSet* dataE0, RooAddPdf&  sumB0, RooArgusBG& argus, RooGaussian& gauss, RooRealVar& eNow,
                       TString fName = "")
     {
+      // switch to the batch mode and store the current setup
+      bool isBatch = gROOT->IsBatch();
       gROOT->SetBatch(kTRUE);
+
       using namespace RooFit ;
 
       // --- Plot toy data and composite PDF overlaid ---
@@ -143,7 +146,6 @@ namespace Belle2 {
       mbcframe->SetTitle("");
 
 
-      //Double_t chisq = mbcframe->chiSquare();
       RooHist* hpull = mbcframe->pullHist() ;
       hpull->Print();
       RooPlot* frame3 = eNow.frame(Title(".")) ;
@@ -190,6 +192,17 @@ namespace Belle2 {
 
 
       if (fName != "") c1->SaveAs(fName);
+
+      delete mbcframe;
+      delete hpull;
+      delete frame3;
+      delete c1;
+      delete pad1;
+      delete pad2;
+      delete ll;
+      delete l;
+
+      gROOT->SetBatch(isBatch);
     }
 
 

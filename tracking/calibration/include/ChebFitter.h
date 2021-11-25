@@ -28,6 +28,7 @@ namespace Belle2 {
 
   public:
 
+    /** Set the fitted data and the fitted function, should be called before init */
     void setDataAndFunction(std::function<double(double, Pars)> fun, const std::vector<double>& data)
     {
       m_myFun = fun;

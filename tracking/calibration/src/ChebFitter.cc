@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <sstream>
 #include <cstdlib>
 #include <cassert>
 
@@ -25,9 +26,11 @@
 #ifdef _PACKAGE_
 #include <tracking/calibration/ChebFitter.h>
 #include <tracking/calibration/nodes.h>
+#include <framework/logging/Logger.h>
 #else
 #include <ChebFitter.h>
 #include <nodes.h>
+#define B2INFO(arg) { std::cout << arg << std::endl;}
 #endif
 
 
@@ -67,9 +70,7 @@ namespace Belle2 {
     // calculate the transformation matrix from pol coefs to grid points
     m_coefsMat = getCoefsCheb(Size).transpose();
 
-    //cout << "Loading data grid" << endl;
     m_dataGrid = getDataGrid();
-    //tie(m_dataGrid, m_dataGridCov) = getDataGridWithCov();
 
   }
 
@@ -118,19 +119,6 @@ namespace Belle2 {
       double xx = (x - a) / (b - a); //normalize between 0 and 1
       polSum += getPols(m_nodes.size(), xx);
     }
-    //cout << "Done " << endl;
-
-
-
-    /*
-    //new method
-    VectorXd dataNew(m_data.size());
-    for(int i = 0; i < m_data.size(); ++i)
-       dataNew[i] = (m_data[i] - a) / (b - a);
-
-    cout << "Starting " << endl;
-    VectorXd polSum = getPolsSum(m_nodes.size(), dataNew);
-    */
 
 
     //transform to the basis of the cheb m_nodes
@@ -154,7 +142,6 @@ namespace Belle2 {
       polSum  += pol;
       polSum2 += pol * pol.transpose();
     }
-    //cout << "Done " << endl;
 
 
     //transform to the basis of the cheb nodes
@@ -224,11 +211,15 @@ namespace Belle2 {
       for (unsigned j = 0; j < parsF.size(); ++j)
         covMat(i, j) = minimum->CovMatrix(i, j);
 
-    // Pars
-    cout << "Minuit status : " << minimum->Status() << ", ";
+    // print pars
+    stringstream log;
+    log << "Minuit status : " << minimum->Status() << ", ";
     for (auto p : parsF)
-      cout << "\"" << p.first << "\" : " << p.second << ", ";
-    cout << endl;
+      log << "\"" << p.first << "\" : " << p.second << ", ";
+
+    B2INFO(log.str());
+
+    delete minimum;
 
     return make_pair(parsF, covMat);
   }

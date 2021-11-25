@@ -71,10 +71,10 @@ namespace Belle2 {
     std::vector<Eigen::MatrixXd> cntUnc; ///< vector of uncertainties of means for each calib. subinterval
     Eigen::MatrixXd  spreadMat; ///< spread CovMatrix
 
-    double spreadUnc; ///< spreadUnc (for eCMS)
-    double shift;     ///< (hadB - mumu) for eCMS
-    double shiftUnc;  ///< (hadB - mumu) Unc for eCMS
-    double pull;      ///< pull between mumu and hadB method
+    double spreadUnc; ///< stat uncertainty of the spread (for eCMS)
+    double shift;     ///< difference between eCMS for hadronic B decay method and mumu method, i.e. hadB - mumu
+    double shiftUnc;  ///< stat uncertainty of the shift
+    double pull;      ///< pull between mumu and hadB methods (for eCMS)
     int size() const {return cnt.size();} ///< number of the subintervals
   };
 
@@ -291,13 +291,14 @@ namespace Belle2 {
     // Check that there is no intra-run dependence
     std::set<ExpRun> existingRuns;
     for (unsigned i = 0; i < calVec.size(); ++i) {
-      const auto& r = calVec[i].subIntervals; //   splits[i];
+      const auto& r = calVec[i].subIntervals;
       // Loop over calibration subintervals
       for (int k = 0; k < int(r.size()); ++k) {
 
         for (auto I : r[k]) {
           ExpRun exprun = I.first;
-          B2ASSERT("Intra-run dependence existed", existingRuns.count(exprun) == 0);
+          // make sure that the run isn't already in the list, to avoid duplicity
+          B2FATAL("Intra-run dependence existed", existingRuns.count(exprun) == 0);
           existingRuns.insert(exprun);
         }
       }
@@ -308,7 +309,7 @@ namespace Belle2 {
     for (unsigned i = 0; i < calVec.size(); ++i) {
       const auto& r = calVec[i].subIntervals; //   splits[i];
       // Loop over calibration subintervals
-      for (int k = 0; k < int(r.size()); ++k) {
+      for (unsigned k = 0; k < r.size(); ++k) {
 
         TObject* obj = getCalibObj(calVec[i].pars.cnt.at(k), calVec[i].pars.cntUnc.at(k), calVec[i].pars.spreadMat);
 

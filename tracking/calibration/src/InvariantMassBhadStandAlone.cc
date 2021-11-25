@@ -33,12 +33,10 @@
 
 #include "RooRealVar.h"
 #include "RooDataSet.h"
-//#include "RooDataHist.h"
 #include "RooGaussian.h"
 #include "RooPlot.h"
 #include "RooHist.h"
 #include "RooAddPdf.h"
-//#include "RooPolynomial.h"
 #include "RooPolyVar.h"
 #include "RooArgusBG.h"
 #include "RooSimultaneous.h"

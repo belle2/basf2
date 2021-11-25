@@ -56,7 +56,6 @@ namespace Belle2 {
     double m_R2 = realNaN;
     double m_mD = realNaN;      ///< D meson mass
     double m_dmDstar = realNaN; ///< D*-D0 mass
-    //double m_cmsE;    ///< input CMS energy
 
   };
 

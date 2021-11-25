@@ -233,12 +233,14 @@ namespace Belle2 {
       for (auto ev : evts) {
         const double cmsE0 = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)")->Mass(); //Y4S mass
         double E = ev.deltaE + cmsE0 / 2; // energy
-        double p = sqrt(pow(cmsE0 / 2, 2) - pow(ev.mBC, 2)); // energy
+        double p = sqrt(pow(cmsE0 / 2, 2) - pow(ev.mBC, 2)); // momentum
         double m = sqrt(E * E - p * p);
-        double mB = (abs(ev.pdg) == 511) ? 5279.65e-3 : 5279.34e-3;
+
+        //get mass of B+- or B0
+        double mB = EvtGenDatabasePDG::Instance()->GetParticle(abs(ev.pdg))->Mass();
 
 
-        //my Filler
+        // Filling the events
         if (1.830 < ev.mD && ev.mD < 1.894)
           if (abs(m - mB) < 0.05)
             if (ev.R2 < 0.3)
@@ -293,13 +295,16 @@ namespace Belle2 {
       }
 
       // --- Build Argus background PDF ---
+
+      const double cMBp = EvtGenDatabasePDG::Instance()->GetParticle("B+")->Mass();
+      const double cMB0 = EvtGenDatabasePDG::Instance()->GetParticle("B0")->Mass();
+
       RooRealVar argpar("Argus_param", "argus shape parameter", -150.7, -300., +50.0) ;
-      RooRealVar endpointBp("EndPointBp", "endPoint parameter", 5279.34e-3, 5.27, 5.291) ; //B+ value
-      RooRealVar endpointB0("EndPointB0", "endPoint parameter", 5279.65e-3, 5.27, 5.291) ; //B0 value
+      RooRealVar endpointBp("EndPointBp", "endPoint parameter", cMBp, 5.27, 5.291) ; //B+ value
+      RooRealVar endpointB0("EndPointB0", "endPoint parameter", cMB0, 5.27, 5.291) ; //B0 value
       endpointB0.setConstant(kTRUE);
       endpointBp.setConstant(kTRUE);
 
-      //argpar.setConstant(kTRUE);
 
       RooRealVar zero("zero", "", 0);
       RooRealVar two("two", "", 2);
@@ -350,7 +355,6 @@ namespace Belle2 {
       }
 
       RooRealVar shift("shift", "shift to mumu", +6e-3, -30e-3, 30e-3);
-      //shift.setConstant(kTRUE);
 
       vector<RooGaussian*> fconstraint(limits.size());
       vector<RooPolyVar*> shiftNow(limits.size());
@@ -389,6 +393,32 @@ namespace Belle2 {
         plotArgusFit(dataE0[i], *sumB0[i], argusB0, *gauss[i], eNow, Form("plotsHadB/B0_%d_%u.pdf", int(round(limits[0].first)), i));
         plotArgusFit(dataEp[i], *sumBp[i], argusBp, *gauss[i], eNow, Form("plotsHadB/Bp_%d_%u.pdf", int(round(limits[0].first)), i));
       }
+
+
+      // Delete rooFit objects
+      for (unsigned i = 0; i < limits.size(); ++i) {
+        delete dataE0[i];
+        delete dataEp[i];
+
+        delete sigmean[i];
+        delete gauss[i];
+
+        delete nsigB0[i];
+        delete nbkgB0[i];
+        delete nsigBp[i];
+        delete nbkgBp[i];
+        delete sumB0[i];
+        delete sumBp[i];
+
+        delete shiftNow[i];
+        delete fconstraint[i];
+      }
+
+      delete combData;
+
+      delete hDeltaE;
+      delete hMD;
+      delete hMB;
 
 
       return resMap;

@@ -39,21 +39,30 @@ void SelectorMVA::updateVariables(Particle* iPart, Particle* jPart)
     m_IsCurl = (Variable::genParticleIndex(iPart) == Variable::genParticleIndex(jPart) ? 1.0 : 0.0);
   }
   m_ChargeProduct = iPart->getCharge() * jPart->getCharge();
+
   m_PPhi  = iPart->getMomentum().Angle(jPart->getMomentum());
-  m_PtDiffEW = abs(Variable::particlePt(iPart) - Variable::particlePt(jPart)) / (Variable::particlePtErr(
-                 iPart) + Variable::particlePtErr(jPart));
-  m_PzDiffEW = abs(Variable::particlePz(iPart) - Variable::particlePz(jPart)) / (Variable::particlePzErr(
-                 iPart) + Variable::particlePzErr(jPart));
-  m_TrackD0DiffEW = abs(Variable::trackD0(iPart) - Variable::trackD0(jPart)) / (Variable::trackD0Error(
-                      iPart) + Variable::trackD0Error(jPart));
-  m_TrackZ0DiffEW = abs(Variable::trackZ0(iPart) - Variable::trackZ0(jPart)) / (Variable::trackZ0Error(
-                      iPart) + Variable::trackZ0Error(jPart));
-  m_TrackTanLambdaDiffEW = abs(Variable::trackTanLambda(iPart) - Variable::trackTanLambda(jPart)) / (Variable::trackTanLambdaError(
-                             iPart) + Variable::trackTanLambdaError(jPart));
-  m_TrackPhi0DiffEW = abs(Variable::trackPhi0(iPart) - Variable::trackPhi0(jPart)) / (Variable::trackPhi0Error(
-                        iPart) + Variable::trackPhi0Error(jPart));
-  m_TrackOmegaDiffEW = abs(Variable::trackOmega(iPart) - Variable::trackOmega(jPart)) / (Variable::trackOmegaError(
-                         iPart) + Variable::trackOmegaError(jPart));
+
+  m_PtDiffEW = abs(Variable::particlePt(iPart) - Variable::particlePt(jPart)) / sqrt(pow(Variable::particlePtErr(
+                 iPart), 2) + pow(Variable::particlePtErr(jPart), 2));
+
+  m_PzDiffEW = abs(Variable::particlePz(iPart) - Variable::particlePz(jPart)) / sqrt(pow(Variable::particlePzErr(
+                 iPart), 2) + pow(Variable::particlePzErr(jPart), 2));
+
+  m_TrackD0DiffEW = abs(Variable::trackD0(iPart) - Variable::trackD0(jPart)) / sqrt(pow(Variable::trackD0Error(
+                      iPart), 2) + pow(Variable::trackD0Error(jPart), 2));
+
+  m_TrackZ0DiffEW = abs(Variable::trackZ0(iPart) - Variable::trackZ0(jPart)) / sqrt(pow(Variable::trackZ0Error(
+                      iPart), 2) + pow(Variable::trackZ0Error(jPart), 2));
+
+  m_TrackTanLambdaDiffEW = abs(Variable::trackTanLambda(iPart) - Variable::trackTanLambda(jPart)) / sqrt(pow(
+                             Variable::trackTanLambdaError(
+                               iPart), 2) + pow(Variable::trackTanLambdaError(jPart), 2));
+
+  m_TrackPhi0DiffEW = abs(Variable::trackPhi0(iPart) - Variable::trackPhi0(jPart)) / sqrt(pow(Variable::trackPhi0Error(
+                        iPart), 2) + pow(Variable::trackPhi0Error(jPart), 2));
+
+  m_TrackOmegaDiffEW = abs(Variable::trackOmega(iPart) - Variable::trackOmega(jPart)) / sqrt(pow(Variable::trackOmegaError(
+                         iPart), 2) + pow(Variable::trackOmegaError(jPart), 2));
 }
 
 std::vector<float> SelectorMVA::getVariables(Particle* iPart, Particle* jPart)

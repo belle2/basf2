@@ -119,7 +119,6 @@ void DQMHistAnalysisTrackingHLTModule::event()
   if (m_printCanvas)
     m_cAbortRateHER->Print("c_AbortRateHER.pdf");
 
-  m_monObj->addCanvas(m_cAbortRateHER);
 
   // check tracking abort rate VS time after last LER injection and time within a beam cycle LER
   TH2F* hAbortLER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/TrkAbortVsTimeLER"));
@@ -146,8 +145,6 @@ void DQMHistAnalysisTrackingHLTModule::event()
   }
   if (m_printCanvas)
     m_cAbortRateLER->Print("c_AbortRateLER.pdf");
-
-  m_monObj->addCanvas(m_cAbortRateLER);
 
   // add average number of tracks per event to Mirabelle
   TH1* hnTracks = findHist("TrackingHLTDQM/NoOfTracks");

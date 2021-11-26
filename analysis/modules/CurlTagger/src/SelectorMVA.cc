@@ -15,8 +15,6 @@
 //Root includes
 #include "TVector3.h"
 
-#include <iostream>
-
 using namespace Belle2;
 using namespace CurlTagger;
 

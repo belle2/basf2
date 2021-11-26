@@ -123,7 +123,7 @@ void EnergyBiasCorrectionModule::setEnergyScalingFactor(Particle* particle)
     //particle is photon reconstructed from ECL cluster
     WeightInfo info = getInfo(particle);
     for (const auto& entry : info) {
-      particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
+      particle->writeExtraInfo(m_tableName + "_" + entry.first, entry.second);
     }
     particle->setMomentumScalingFactor(particle->getExtraInfo(m_tableName + "_Weight"));
     particle->updateJacobiMatrix();

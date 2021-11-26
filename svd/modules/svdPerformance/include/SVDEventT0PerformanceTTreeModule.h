@@ -65,6 +65,8 @@ namespace Belle2 {
     std::vector<float> m_svdTrkp;     /**< p of the track*/
     std::vector<float> m_svdTrkpT;     /**< pT of the track*/
     std::vector<float> m_svdTrkpCM;     /**< pCM of the track*/
+    std::vector<float> m_svdTrkTheta; /**< polar angle of the track*/
+    std::vector<float> m_svdTrkPhi; /**<azimuthal angle of the track*/
     std::vector<int> m_svdLayer;  /**< layer */
     std::vector<int> m_svdLadder; /**< ladder */
     std::vector<int> m_svdSensor; /**< sensor */
@@ -72,10 +74,13 @@ namespace Belle2 {
     std::vector<int> m_svdisUside; /**< is U-cluster side */
     std::vector<int> m_trkNumber; /**< track number in the event*/
 
+
+
     float m_svdEventT0 = -99; /**< event T0 */
     float m_svdEventT0Err = -99; /**< event T0 error */
     int m_nTracks = 0; /**< number of tracks in the event*/
     int m_svdTB = -1; /**< trigger bin */
+    float m_trueEventT0 = -99; /**< true event t0 */
   };
 }
 

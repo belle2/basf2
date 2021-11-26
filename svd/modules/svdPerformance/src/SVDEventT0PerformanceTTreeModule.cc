@@ -24,7 +24,8 @@
 #include <algorithm>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-
+#include <mdst/dataobjects/MCParticle.h>
+#include <framework/datastore/RelationArray.h>
 
 using namespace Belle2;
 using namespace std;
@@ -42,7 +43,7 @@ REG_MODULE(SVDEventT0PerformanceTTree)
 SVDEventT0PerformanceTTreeModule::SVDEventT0PerformanceTTreeModule() : Module()
 {
   //Set module properties
-  setDescription("The module is used to create a TTree to study SVD clusters, genfit unbiased residuals and many other properties related to the track they belong to.");
+  setDescription("This module is used to create a TTree to study SVD eventT0 using clusters associated to tracks.");
   //Parameter to take only specific RecoTracks as input
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDEventT0PerformanceTTree.root"));
   addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "StoreArray name of the input and output RecoTracks.",
@@ -63,6 +64,7 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   //Tree for SVD clusters
   //one fill per event!
   m_t = new TTree("tree", "Tree for SVD clusters related to tracks");
+  m_t->Branch("trueEventT0", &m_trueEventT0, "trueEventT0/F");
   m_t->Branch("eventT0", &m_svdEventT0, "eventT0/F");
   m_t->Branch("eventT0Err", &m_svdEventT0Err, "eventT0Err/F");
   m_t->Branch("totTracks", &m_nTracks, "totTracks/i");
@@ -73,6 +75,8 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   m_t->Branch("trkp", &m_svdTrkp);
   m_t->Branch("trkpT", &m_svdTrkpT);
   m_t->Branch("trkpCM", &m_svdTrkpCM);
+  m_t->Branch("trkTheta", &m_svdTrkTheta);
+  m_t->Branch("trkPhi", &m_svdTrkPhi);
   m_t->Branch("trkPXDHits", &m_svdTrkPXDHits);
   m_t->Branch("trkSVDHits", &m_svdTrkSVDHits);
   m_t->Branch("trkCDCHits", &m_svdTrkCDCHits);
@@ -95,7 +99,7 @@ void SVDEventT0PerformanceTTreeModule::initialize()
 
 void SVDEventT0PerformanceTTreeModule::event()
 {
-
+  m_trueEventT0 = -999;
   m_svdEventT0 = -99;
   m_svdEventT0Err = -99;
 
@@ -112,6 +116,8 @@ void SVDEventT0PerformanceTTreeModule::event()
   m_svdSensor.clear();
   m_svdLadder.clear();
   m_svdLadder.clear();
+  m_svdTrkPhi.clear();
+  m_svdTrkTheta.clear();
   m_svdTrkpCM.clear();
   m_svdTrkp.clear();
   m_svdTrkpT.clear();
@@ -167,6 +173,8 @@ void SVDEventT0PerformanceTTreeModule::event()
       const TrackFitResult*  tfr = theTK[0]->getTrackFitResultWithClosestMass(Const::pion);
 
       if (tfr) {
+        m_svdTrkTheta.push_back(tfr->getMomentum().Theta());
+        m_svdTrkPhi.push_back(tfr->getMomentum().Phi());
         m_svdTrkd0.push_back(tfr->getD0());
         m_svdTrkz0.push_back(tfr->getZ0());
         m_svdTrkp.push_back(tfr->getMomentum().Mag());
@@ -188,6 +196,9 @@ void SVDEventT0PerformanceTTreeModule::event()
       //get true hits, used only if isMC
       RelationVector<SVDTrueHit> trueHit_1 = DataStore::getRelationsWithObj<SVDTrueHit>(svd_1);
 
+
+
+
       const RecoHitInformation* infoSVD_1 = trk.getRecoHitInformation(svd_1);
       if (!infoSVD_1) {
         continue;
@@ -208,13 +219,23 @@ void SVDEventT0PerformanceTTreeModule::event()
       m_svdClCharge.push_back(svd_1->getCharge());
       m_svdClPos.push_back(svd_1->getPosition());
       m_svdClPosErr.push_back(svd_1->getPositionSigma());
-      if (isMC && trueHit_1.size() > 0)
-        m_svdTrueTime.push_back(trueHit_1[0]->getGlobalTime());
-      else
-        m_svdTrueTime.push_back(-99);
+      if (isMC && trueHit_1.size() > 0) {
 
+        m_svdTrueTime.push_back(trueHit_1[0]->getGlobalTime());
+
+        RelationVector<MCParticle> mcParticle_1 = trueHit_1[0]->getRelationsFrom<MCParticle>();
+        if (mcParticle_1.size() > 0) {
+          if (mcParticle_1[0]->isPrimaryParticle())
+            m_trueEventT0 = mcParticle_1[0]->getProductionTime();
+        } else
+          m_trueEventT0 = (-999);
+      } else {
+        m_svdTrueTime.push_back(-99);
+        m_trueEventT0 = (-999);
+      }
     }
   }
+
 
   m_t->Fill();
 

@@ -120,7 +120,7 @@ float SelectorMVA::getOptimalResponseCut()
   if (m_TrainFlag) {
     return 0.5;
   }
-  std::string elementIdentfier = "OptimalCut";
+  std::string elementIdentfier = "optimal_cut";
   if (!m_weightfile.containsElement(elementIdentfier)) {
     B2FATAL("No optimal cut stored in curlTagger MVA payload!");
   }

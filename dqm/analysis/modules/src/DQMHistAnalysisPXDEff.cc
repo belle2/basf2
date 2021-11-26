@@ -120,11 +120,9 @@ void DQMHistAnalysisPXDEffModule::initialize()
     }
 #endif
     TString histTitle = "PXD Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
-    if (m_singleHists) {
-      m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);
-      m_hEffModules[aPXDModule] = new TEfficiency("ePXDHitEff_" + buff, histTitle,
-                                                  m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
-    }
+    m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);
+    m_hEffModules[aPXDModule] = new TEfficiency("ePXDHitEff_" + buff, histTitle,
+                                                m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   }
 
   m_cInnerMap = new TCanvas((m_histogramDirectoryName + "/c_InnerMap").data());

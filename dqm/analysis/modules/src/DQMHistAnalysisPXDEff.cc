@@ -37,8 +37,8 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
 
   //Would be much more elegant to get bin numbers from the saved histograms, but would need to retrieve at least one of them before the initialize function for this
   //Or get one and clone it
-  addParam("binsU", m_u_bins, "histogram bins in u direction, needs to be the same as in PXDDQMEfficiency", int(4));
-  addParam("binsV", m_v_bins, "histogram bins in v direction, needs to be the same as in PXDDQMEfficiency", int(6));
+  addParam("binsU", m_u_bins, "histogram bins in u direction, needs to be the same as in PXDDQMEfficiency", int(16));
+  addParam("binsV", m_v_bins, "histogram bins in v direction, needs to be the same as in PXDDQMEfficiency", int(48));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDEFF"));
   addParam("singleHists", m_singleHists, "Also plot one efficiency histogram per module", bool(false));
@@ -106,7 +106,6 @@ void DQMHistAnalysisPXDEffModule::initialize()
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   }
 #endif
-
 
   for (VxdID& aPXDModule : m_PXDModules) {
     TString buff = (std::string)aPXDModule;

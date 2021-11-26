@@ -41,7 +41,6 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("binsV", m_v_bins, "histogram bins in v direction, needs to be the same as in PXDDQMEfficiency", int(48));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDEFF"));
-  addParam("singleHists", m_singleHists, "Also plot one efficiency histogram per module", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
   addParam("useEpics", m_useEpics, "useEpics", true);
   addParam("useEpicsRO", m_useEpicsRO, "useEpics ReadOnly", false);
@@ -269,13 +268,11 @@ void DQMHistAnalysisPXDEffModule::beginRun()
 
 void DQMHistAnalysisPXDEffModule::event()
 {
-
-  //Save the pointers to create the summary hists later
-  std::map<VxdID, TH1*> mapHits;
-  std::map<VxdID, TH1*> mapMatches;
-
   //Count how many of each type of histogram there are for the averaging
   //std::map<std::string, int> typeCounter;
+
+  m_hInnerMap->Reset();
+  m_hOuterMap->Reset();
 
   for (unsigned int i = 1; i <= m_PXDModules.size(); i++) {
     VxdID& aPXDModule = m_PXDModules[i - 1];
@@ -295,48 +292,41 @@ void DQMHistAnalysisPXDEffModule::event()
     }
     Matches = (TH1*)findHist(locationMatches.Data());
 
-    //Finding only one of them should only happen in very strange situations...
+    // Finding only one of them should only happen in very strange situations...
     if (Hits == nullptr || Matches == nullptr) {
       B2ERROR("Missing histogram for sensor " << aPXDModule);
-      mapHits[aPXDModule] = nullptr;
-      mapMatches[aPXDModule] = nullptr;
     } else {
-      mapHits[aPXDModule] = Hits;
-      mapMatches[aPXDModule] = Matches;
-      if (m_singleHists) {
-        if (m_cEffModules[aPXDModule] && m_hEffModules[aPXDModule]) {// this check creates them with a nullptr ..bad
-          m_hEffModules[aPXDModule]->SetTotalHistogram(*Hits, "f");
-          m_hEffModules[aPXDModule]->SetPassedHistogram(*Matches, "f");
+      if (m_cEffModules[aPXDModule] && m_hEffModules[aPXDModule]) {// this check creates them with a nullptr ..bad
+        m_hEffModules[aPXDModule]->SetTotalHistogram(*Hits, "f");
+        m_hEffModules[aPXDModule]->SetPassedHistogram(*Matches, "f");
 
-          m_cEffModules[aPXDModule]->cd();
-          m_hEffModules[aPXDModule]->Draw("colz");
-          m_cEffModules[aPXDModule]->Modified();
-          m_cEffModules[aPXDModule]->Update();
+        m_cEffModules[aPXDModule]->cd();
+        m_hEffModules[aPXDModule]->Paint("colz"); // not Draw, enforce to create GetPaintedHistogram?
+        m_cEffModules[aPXDModule]->Modified();
+        m_cEffModules[aPXDModule]->Update();
 
-
-          auto h = m_hEffModules[aPXDModule]->GetPaintedHistogram();
-          int s = (2 - aPXDModule.getSensorNumber()) * m_v_bins;
-          int l = (aPXDModule.getLadderNumber() - 1) * m_u_bins;
-          if (m_hInnerMap && aPXDModule.getLayerNumber() == 1) {
-            for (int u = 0; u < m_u_bins; u++) {
-              for (int v = 0; v < m_v_bins; v++) {
-                auto b = h->GetBin(u + 1, v + 1);
-                m_hInnerMap->Fill(u + l, v + s, h->GetBinContent(b));
-              }
+        auto h = m_hEffModules[aPXDModule]->GetPaintedHistogram();
+        int s = (2 - aPXDModule.getSensorNumber()) * m_v_bins;
+        int l = (aPXDModule.getLadderNumber() - 1) * m_u_bins;
+        if (m_hInnerMap && aPXDModule.getLayerNumber() == 1) {
+          for (int u = 0; u < m_u_bins; u++) {
+            for (int v = 0; v < m_v_bins; v++) {
+              auto b = h->GetBin(u + 1, v + 1);
+              m_hInnerMap->Fill(u + l, v + s, h->GetBinContent(b));
             }
           }
-          if (m_hOuterMap && aPXDModule.getLayerNumber() == 2) {
-            for (int u = 0; u < m_u_bins; u++) {
-              for (int v = 0; v < m_v_bins; v++) {
-                auto b = h->GetBin(u + 1, v + 1);
-                m_hOuterMap->Fill(u + l, v + s, h->GetBinContent(b));
-              }
+        }
+        if (m_hOuterMap && aPXDModule.getLayerNumber() == 2) {
+          for (int u = 0; u < m_u_bins; u++) {
+            for (int v = 0; v < m_v_bins; v++) {
+              auto b = h->GetBin(u + 1, v + 1);
+              m_hOuterMap->Fill(u + l, v + s, h->GetBinContent(b));
             }
           }
         }
       }
     }
-  }//One-Module histos finished
+  }// Single-Module histos + 2d overview finished
 
   m_cInnerMap->cd();
   m_hInnerMap->Draw("colz");

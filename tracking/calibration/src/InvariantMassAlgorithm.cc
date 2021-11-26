@@ -93,7 +93,7 @@ std::vector<CalibrationData>  runMuMuCalibration(const std::vector<Belle2::Invar
 }
 
 
-std::vector<CalibrationData> addSpreadAndOffset(std::vector<CalibrationData> mumuCalResults, double spread, double spreadUnc,
+std::vector<CalibrationData> addSpreadAndOffset(const std::vector<CalibrationData>& mumuCalResults, double spread, double spreadUnc,
                                                 double offset, double offsetUnc)
 {
   std::vector<CalibrationData> mumuCalResultsNew = mumuCalResults;

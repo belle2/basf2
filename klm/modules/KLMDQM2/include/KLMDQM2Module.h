@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #pragma once
+
 /* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
@@ -163,30 +164,26 @@ namespace Belle2 {
      */
     bool triggerFlag();
 
-
-
     /*******************************************/
     /*******************************************/
     //INPUT RELATED
     /*******************************************/
     /*******************************************/
 
-
     /** KLM element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
 
+    /** EKLM element numbers. */
+    const EKLMElementNumbers* m_eklmElementNumbers;
+
     /** Plane array index. */
     const KLMPlaneArrayIndex* m_PlaneArrayIndex;
-
-    /** Element numbers. */
-    const EKLMElementNumbers* m_eklmElementNumbers;
 
     /** BKLM geometry. */
     const bklm::GeometryPar* m_GeometryBKLM;
 
     /** KLM digits. */
     StoreArray<KLMDigit> m_Digits;
-
 
     /** Trigger Information */
     StoreObjPtr<SoftwareTriggerResult> m_softwareTriggerResult;
@@ -197,6 +194,8 @@ namespace Belle2 {
     /** Muons. */
     StoreObjPtr<ParticleList> m_MuonList;
 
+    /** Channel status. */
+    DBObjPtr<KLMChannelStatus> m_ChannelStatus;
 
     /*******************************************/
     /*******************************************/
@@ -229,8 +228,6 @@ namespace Belle2 {
     /** Directory for KLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryName;
 
-
-
     /*******************************************/
     /*******************************************/
     //OUTPUT RELATED
@@ -254,7 +251,6 @@ namespace Belle2 {
 
     /** Matched over Extrapolated hits in plane for EKLM */
     TH1F* m_PlaneEfficienciesEKLM;
-
 
     /** Matched hits in sector for BKLM */
     TH1F* m_MatchedHitsBKLMSector;
@@ -280,22 +276,11 @@ namespace Belle2 {
     /*******************************************/
     /*******************************************/
 
-    /** Number of channel hit histograms per sector for BKLM. */
-    const int m_ChannelHitHistogramsBKLM = 2;
-
-    /** Number of channel hit histograms per sector for EKLM. */
-    const int m_ChannelHitHistogramsEKLM = 3;
-
-
     /** Number of layers/planes for BKLM. */
-    const int m_PlaneNumBKLM = BKLMElementNumbers::getMaximalLayerGlobalNumber(); //15 layers per octant, forward and backward
+    const int m_PlaneNumBKLM = BKLMElementNumbers::getMaximalLayerGlobalNumber(); // 15 layers per octant, forward and backward
 
     /** Number of layers/planes for EKLM. */
-    const int m_PlaneNumEKLM = EKLMElementNumbers::getMaximalPlaneGlobalNumber();//12 or 14 layers per quadrant, forward and backward
-
-    /** Channel status. */
-    DBObjPtr<KLMChannelStatus> m_ChannelStatus;
-
+    const int m_PlaneNumEKLM = EKLMElementNumbers::getMaximalPlaneGlobalNumber(); // 12 or 14 layers per quadrant, forward and backward
 
   };
 }

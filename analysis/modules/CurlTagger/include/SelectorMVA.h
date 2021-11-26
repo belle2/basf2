@@ -74,7 +74,7 @@ namespace Belle2 {
       /**training data tree */
       TTree* m_TTree;
 
-      /**< Database pointer to the Database representation of the weightfile */
+      /** Database pointer to the Database representation of the weightfile */
       std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>> m_weightfile_representation;
 
       /** mva weightfile */

@@ -3185,7 +3185,7 @@ def tagCurlTracks(particleLists,
                           extraInfo(truthBundleSize). To calculate these particles are assigned to bundles by their
                           genParticleIndex then ranked and tagged as normal.
     @param responseCut:   float min classifier response that considers two tracks to come from the same particle.
-                          If set to ```-1``` a cut value optimised to maximise the accuracy on a BBbar sample is used.
+                          If set to ``-1`` a cut value optimised to maximise the accuracy on a BBbar sample is used.
                           Note 'cut' selector is binary 0/1.
     @param selectorType:  string name of selector to use. The available options are 'cut' and 'mva'.
                           It is strongly recommended to used the 'mva' selection. The 'cut' selection

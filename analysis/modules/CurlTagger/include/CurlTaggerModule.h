@@ -63,6 +63,9 @@ namespace Belle2 {
     /** switch between training and classifying */
     bool m_TrainFlag;
 
+    /** flag for overriding the m_responseCut with a value retrieved from the payload */
+    bool m_payloadCut;
+
     /** preselection pt cut */
     double m_PtCut;
 

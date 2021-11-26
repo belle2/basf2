@@ -15,6 +15,8 @@
 //Root includes
 #include "TVector3.h"
 
+#include <iostream>
+
 using namespace Belle2;
 using namespace CurlTagger;
 
@@ -36,7 +38,7 @@ SelectorMVA::~SelectorMVA() = default;
 void SelectorMVA::updateVariables(Particle* iPart, Particle* jPart)
 {
   if (m_TrainFlag) {
-    m_IsCurl = (Variable::genParticleIndex(iPart) == Variable::genParticleIndex(jPart) ? 1 : 0);
+    m_IsCurl = (Variable::genParticleIndex(iPart) == Variable::genParticleIndex(jPart) ? 1.0 : 0.0);
   }
   m_ChargeProduct = iPart->getCharge() * jPart->getCharge();
   m_PPhi  = iPart->getMomentum().Angle(jPart->getMomentum());
@@ -59,7 +61,9 @@ void SelectorMVA::updateVariables(Particle* iPart, Particle* jPart)
 std::vector<float> SelectorMVA::getVariables(Particle* iPart, Particle* jPart)
 {
   updateVariables(iPart, jPart);
-  return {m_PPhi, m_ChargeProduct, m_PtDiffEW, m_PzDiffEW, m_TrackD0DiffEW, m_TrackZ0DiffEW, m_TrackTanLambdaDiffEW, m_TrackPhi0DiffEW, m_TrackOmegaDiffEW};
+  return {m_PPhi, m_ChargeProduct, m_PtDiffEW,
+          m_PzDiffEW, m_TrackD0DiffEW, m_TrackZ0DiffEW,
+          m_TrackTanLambdaDiffEW, m_TrackPhi0DiffEW, m_TrackOmegaDiffEW};
 }
 
 void SelectorMVA::collectTrainingInfo(Particle* iPart, Particle* jPart)
@@ -70,7 +74,8 @@ void SelectorMVA::collectTrainingInfo(Particle* iPart, Particle* jPart)
 
 void SelectorMVA::initialize()
 {
-  if (m_TrainFlag) { //make training data
+  if (m_TrainFlag) {
+    //make training data
     m_TFile = TFile::Open(m_TFileName.c_str(), "RECREATE");
     m_TTree = new TTree("ntuple", "Training Data for the Curl Tagger MVA");
 
@@ -84,17 +89,45 @@ void SelectorMVA::initialize()
     m_TTree -> Branch("TrackPhi0DiffEW", &m_TrackPhi0DiffEW, "TrackPhi0DiffEW/F");
     m_TTree -> Branch("TrackOmegaDiffEW", &m_TrackOmegaDiffEW, "TrackOmegaDiffEW/F");
 
-    m_TTree -> Branch("IsCurl", &m_IsCurl, "IsCurl/F");
+    m_TTree -> Branch("IsCurl", &m_IsCurl, "IsCurl/D");
 
     m_target_variable = "IsCurl";
-    m_variables = {"PPhi", "ChargeProduct", "PtDiffEW", "PzDiffEW", "TrackD0DiffEW", "TrackZ0DiffEW", "TrackTanLambdaDiffEW", "TrackPhi0DiffEW", "TrackOmegaDiffEW"};
+    m_variables = {"PPhi", "ChargeProduct", "PtDiffEW",
+                   "PzDiffEW", "TrackD0DiffEW", "TrackZ0DiffEW",
+                   "TrackTanLambdaDiffEW", "TrackPhi0DiffEW", "TrackOmegaDiffEW"
+                  };
 
-  } else { // normal application
-    //load MVA
-    auto weightfile = MVA::Weightfile::loadFromDatabase(m_identifier);
-    weightfile.getOptions(m_generalOptions);
-    m_expert.load(weightfile);
+  } else {
+    // normal application
+    m_weightfile_representation = std::make_unique<DBObjPtr<DatabaseRepresentationOfWeightfile>>(
+                                    MVA::makeSaveForDatabase(m_identifier));
   }
+}
+
+void SelectorMVA::beginRun()
+{
+  if (m_TrainFlag) {
+    return;
+  }
+  if (m_weightfile_representation->hasChanged()) {
+    std::stringstream ss((*m_weightfile_representation)->m_data);
+    m_weightfile = MVA::Weightfile::loadFromStream(ss);
+    m_weightfile.getOptions(m_generalOptions);
+    m_expert.load(m_weightfile);
+  }
+}
+
+float SelectorMVA::getOptimalResponseCut()
+{
+  if (m_TrainFlag) {
+    return 0.5;
+  }
+  std::string elementIdentfier = "OptimalCut";
+  if (!m_weightfile.containsElement(elementIdentfier)) {
+    B2FATAL("No optimal cut stored in curlTagger MVA payload!");
+  }
+  // require the default value for the compiler to deduce the template class
+  return m_weightfile.getElement(elementIdentfier, 0.5);
 }
 
 void SelectorMVA::finalize()
@@ -104,28 +137,6 @@ void SelectorMVA::finalize()
     m_TTree -> Write();
     m_TFile -> Write();
     m_TFile -> Close();
-
-    //train MVA
-    MVA::GeneralOptions generalOptions;
-    generalOptions.m_datafiles = {m_TFileName};
-    generalOptions.m_identifier = m_identifier;
-    generalOptions.m_variables = m_variables;
-    generalOptions.m_target_variable = m_target_variable;
-    generalOptions.m_signal_class = 1;
-    generalOptions.m_weight_variable = ""; // sets all weights to 1 if blank
-
-    MVA::ROOTDataset dataset(generalOptions);
-
-    MVA::FastBDTOptions specificOptions;
-    specificOptions.m_nTrees = 1000;
-    //specificOptions.m_shrinkage = 0.10;
-    specificOptions.m_nCuts = 16;
-    specificOptions. m_nLevels = 4;
-
-    auto teacher = new MVA::FastBDTTeacher(generalOptions, specificOptions);
-    auto weightfile = teacher->train(dataset);
-    MVA::Weightfile::saveToDatabase(weightfile, m_identifier);
-    //MVA::Weightfile::saveToXMLFile(weightfile, "test.xml");
   }
 }
 

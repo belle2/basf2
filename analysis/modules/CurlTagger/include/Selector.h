@@ -24,14 +24,20 @@ namespace Belle2 {
       /** Destructor */
       virtual ~Selector() {};
 
-      /** returns selector response that two particles are actual from same mc/data particle */
+      /** returns selector response that two tracks are actual from same mc/data particle */
       virtual float getResponse(Particle*, Particle*) = 0;
 
       /** returns vector of variables used by the selector */
       virtual std::vector<float> getVariables(Particle*, Particle*) = 0;
 
+      /** returns optimal cut to use with selector */
+      virtual float getOptimalResponseCut() {return 0.5;};
+
       /** initialise selector if needed */
       virtual void initialize() {};
+
+      /** run specific changes for selector if needed */
+      virtual void beginRun() {};
 
       /** finalise selector if needed */
       virtual void finalize() {};

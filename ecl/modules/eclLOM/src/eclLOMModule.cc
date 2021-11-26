@@ -22,18 +22,19 @@ REG_MODULE(ECLLOM)
 ECLLOMModule::ECLLOMModule()
 {
   setDescription("module to emulate Luminosity Online Monitor");
-  addParam("ThresholdFE", BhabhaHitThresholdFE, "", 3.0); // Threshold for Forward Endcap
-  addParam("ThresholdBE", BhabhaHitThresholdBE, "", 1.0); // Threshold for Backward Endcap
-  addParam("ThresholdBkg", BackgroundThreshold, "", 0.5); // Threshold when sector considered as lighted
-  addParam("DiscrTime", DiscrTime, "", 1000.0); // Duration of "1" (positive) signal from discriminators, in ns
-  addParam("includeInnerFE", includeFEInnerTC, "", false); // Flag to include/exclude Inner part of the Forward Endcap
-  addParam("saveSignal", saveSignal, "", false); // Flag to store or not signals' waveforms
-  addParam("testFileName", m_lomtestFilename, "", std::string("lomtest.root")); //output file
-  m_EvtNum = 0;
+  addParam("thresholdFE", m_thresholdFE, "Threshold for Forward Endcap [GeV]", 3.0);
+  addParam("thresholdBE", m_thresholdBE, "Threshold for Backward Endcap [GeV]", 1.0);
+  addParam("thresholdBkg", m_thresholdBkg, "Threshold when sector considered as lighted [GeV]", 0.5);
+  addParam("discrTime", m_discrTime, "Duration of '1' (positive) signal from discriminators [ns]", 1000.0);
+  addParam("includeInnerFE", m_includeInnerFE, "Flag to include/exclude Inner part of the Forward Endcap", false);
+  addParam("saveSignal", m_saveSignal, "Flag to store or not signals' waveforms", false);
+  addParam("testFileName", m_testFileName, "output file", std::string("lomtest.root"));
+
+  m_evtNum = 0;
   for (int i = 0; i < 16; i++) {
     for (int j = 0; j < 16; j++) {
-      CoincidenceCounterMatrix[i][j] = 0;
-      SumCoincidenceCounterMatrix[i][j] = 0;
+      m_CoincidenceCounterMatrix[i][j] = 0;
+      m_SumCoincidenceCounterMatrix[i][j] = 0;
     }
   }
 }
@@ -53,44 +54,44 @@ void ECLLOMModule::initialize()
     B2FATAL("Not all collections found, exiting processing");
   }
 
-  testfile = new TFile(m_lomtestFilename.c_str(), "RECREATE");
-  testtree = new TTree("lom_tree", "");
+  m_testfile = new TFile(m_testFileName.c_str(), "RECREATE");
+  m_testtree = new TTree("lom_tree", "");
 
-  testtree->Branch("ev", &m_EvtNum);
-  testtree->Branch("BE_amp[16]", BE_Amplitude, "BE_amp[16]/D");
-  testtree->Branch("FE_amp[16]", FE_Amplitude, "FE_amp[16]/D");
-  testtree->Branch("FESum_MaxAmp", &FESum_MaxAmp);
-  testtree->Branch("BESum_MaxAmp", &BESum_MaxAmp);
-  testtree->Branch("FESum_MaxId", &FESum_MaxId);
-  testtree->Branch("BESum_MaxId", &BESum_MaxId);
-  testtree->Branch("BE_Pedal[16]", BE_Pedal, "BE_Pedal[16]/D");
-  testtree->Branch("FE_Pedal[16]", FE_Pedal, "FE_Pedal[16]/D");
+  m_testtree->Branch("ev", &m_evtNum);
+  m_testtree->Branch("BE_amp[16]", m_BE_Amplitude, "BE_amp[16]/D");
+  m_testtree->Branch("FE_amp[16]", m_FE_Amplitude, "FE_amp[16]/D");
+  m_testtree->Branch("FESum_MaxAmp", &m_FESum_MaxAmp);
+  m_testtree->Branch("BESum_MaxAmp", &m_BESum_MaxAmp);
+  m_testtree->Branch("FESum_MaxId", &m_FESum_MaxId);
+  m_testtree->Branch("BESum_MaxId", &m_BESum_MaxId);
+  m_testtree->Branch("BE_Pedal[16]", m_BE_Pedal, "BE_Pedal[16]/D");
+  m_testtree->Branch("FE_Pedal[16]", m_FE_Pedal, "FE_Pedal[16]/D");
 
-  testtree->Branch("Bhabha", &isBhabha);
-  testtree->Branch("BhNum", &BhNum);
+  m_testtree->Branch("Bhabha", &m_isBhabha);
+  m_testtree->Branch("BhNum", &m_BhNum);
 
-  testtree->Branch("mc_en[2]", mcen, "mc_en[2]/D");
-  testtree->Branch("mc_th[2]", mcth, "mc_th[2]/D");
-  testtree->Branch("mc_ph[2]", mcph, "mc_ph[2]/D");
+  m_testtree->Branch("mc_en[2]", m_mcen, "mc_en[2]/D");
+  m_testtree->Branch("mc_th[2]", m_mcth, "mc_th[2]/D");
+  m_testtree->Branch("mc_ph[2]", m_mcph, "mc_ph[2]/D");
 
-  testtree->Branch("com_en[2]", com_en, "com_en[2]/D");
-  testtree->Branch("com_th[2]", com_th, "com_th[2]/D");
-  testtree->Branch("com_ph[2]", com_ph, "com_ph[2]/D");
+  m_testtree->Branch("com_en[2]", m_com_en, "com_en[2]/D");
+  m_testtree->Branch("com_th[2]", m_com_th, "com_th[2]/D");
+  m_testtree->Branch("com_ph[2]", m_com_ph, "com_ph[2]/D");
 
-  if (saveSignal) {
-    testtree->Branch("BE_wf[16][64]", BE_Waveform_100ns, "BE_wf[16][64]/D");
-    testtree->Branch("FE_wf[16][64]", FE_Waveform_100ns, "FE_wf[16][64]/D");
+  if (m_saveSignal) {
+    m_testtree->Branch("BE_wf[16][64]", m_BE_Waveform_100ns, "BE_wf[16][64]/D");
+    m_testtree->Branch("FE_wf[16][64]", m_FE_Waveform_100ns, "FE_wf[16][64]/D");
   }
 
   //additional histograms. Represent data over the whole dataset:
-  h2Coin = new TH2D("Coins", "Coincidence Matrix", 16, 0, 16, 16, 0, 16);
-  h2SumCoin = new TH2D("SumCoins", "Sum Coincidence Matrix", 16, 0, 16, 16, 0, 16);
-  h2FEAmp = new TH2D("FE_AmpId", "", 16, 0, 16, 100, 0, 8);
-  h2BEAmp = new TH2D("BE_AmpId", "", 16, 0, 16, 100, 0, 8);
-  h1BEHits = new TH1D("BE_Fired", "", 16, 0, 16);
-  h1FEHits = new TH1D("FE_Fired", "", 16, 0, 16);
+  m_h2Coin = new TH2D("Coins", "Coincidence Matrix", 16, 0, 16, 16, 0, 16);
+  m_h2SumCoin = new TH2D("SumCoins", "Sum Coincidence Matrix", 16, 0, 16, 16, 0, 16);
+  m_h2FEAmp = new TH2D("FE_AmpId", "", 16, 0, 16, 100, 0, 8);
+  m_h2BEAmp = new TH2D("BE_AmpId", "", 16, 0, 16, 100, 0, 8);
+  m_h1BEHits = new TH1D("BE_Fired", "", 16, 0, 16);
+  m_h1FEHits = new TH1D("FE_Fired", "", 16, 0, 16);
 
-  NSamples = 631;
+  m_NSamples = 631;
 }
 
 void ECLLOMModule::beginRun()
@@ -106,22 +107,22 @@ void ECLLOMModule::event()
   calculate_amplitudes();
   // LOM logic
   for (int iSample = 300; iSample < 500; iSample++) { //300-500 window where BhaBha is expected
-    isBhabhaPatternFE = calculate_FE_quality(iSample);
-    isBhabhaPatternBE = calculate_BE_quality(iSample);
+    m_isBhabhaPatternFE = calculate_FE_quality(iSample);
+    m_isBhabhaPatternBE = calculate_BE_quality(iSample);
     calculate_coincidence(iSample);
     // generate bhabha signal
     for (int iFESector = 0; iFESector < 16; iFESector++) {
       // check opposite running sum:
       int iBESector = (iFESector + 8) % 16;
-      if (SumCoincidenceMatrix[iFESector][iBESector] == 1 && isBhabhaPatternFE && isBhabhaPatternBE) {
+      if (m_SumCoincidenceMatrix[iFESector][iBESector] == 1 && m_isBhabhaPatternFE && m_isBhabhaPatternBE) {
         //coinsidence at first tick
-        isBhabha = true;
-        BhNum++;
+        m_isBhabha = true;
+        m_BhNum++;
       }
     }
   }
-  testtree->Fill();
-  m_EvtNum++;
+  m_testtree->Fill();
+  m_evtNum++;
 }
 
 void ECLLOMModule::endRun()
@@ -133,14 +134,14 @@ void ECLLOMModule::terminate()
 
   for (int i = 0; i < 16; i++) {
     for (int j = 0; j < 16; j++) {
-      std::cout << CoincidenceCounterMatrix[i][j] << " ";
-      h2Coin->SetBinContent(i + 1, j + 1, CoincidenceCounterMatrix[i][j]);
-      h2SumCoin->SetBinContent(i + 1, j + 1, SumCoincidenceCounterMatrix[i][j]);
+      std::cout << m_CoincidenceCounterMatrix[i][j] << " ";
+      m_h2Coin->SetBinContent(i + 1, j + 1, m_CoincidenceCounterMatrix[i][j]);
+      m_h2SumCoin->SetBinContent(i + 1, j + 1, m_SumCoincidenceCounterMatrix[i][j]);
     }
     std::cout << std::endl;
   }
-  testfile->Write();
-  testfile->Close();
+  m_testfile->Write();
+  m_testfile->Close();
 }
 
 
@@ -150,9 +151,9 @@ void ECLLOMModule::get_MCparticles()
   int nMCParticles = MCParticles.getEntries();
   if (nMCParticles >= 4) {
     for (int ind = 2; ind < 4; ind++) {
-      mcen[ind - 2] = MCParticles[ind]->getEnergy();
-      mcth[ind - 2] = MCParticles[ind]->getMomentum().Theta();
-      mcph[ind - 2] = MCParticles[ind]->getMomentum().Phi();
+      m_mcen[ind - 2] = MCParticles[ind]->getEnergy();
+      m_mcth[ind - 2] = MCParticles[ind]->getMomentum().Theta();
+      m_mcph[ind - 2] = MCParticles[ind]->getMomentum().Phi();
     }
 
     TLorentzVector SummP(MCParticles[0]->get4Vector() + MCParticles[1]->get4Vector());
@@ -164,9 +165,9 @@ void ECLLOMModule::get_MCparticles()
     ComP[0].Boost(Boost_backV);
     ComP[1].Boost(Boost_backV);
     for (int ind = 0; ind < 2; ind++) {
-      com_en[ind] = ComP[ind].E();
-      com_th[ind] = ComP[ind].Vect().Theta();
-      com_ph[ind] = ComP[ind].Vect().Phi();
+      m_com_en[ind] = ComP[ind].E();
+      m_com_th[ind] = ComP[ind].Vect().Theta();
+      m_com_ph[ind] = ComP[ind].Vect().Phi();
     }
   }
 }
@@ -187,13 +188,13 @@ void ECLLOMModule::get_waveforms()
     TCWaveform->fillWaveform(m_wf);
 
     int iSectorIndex = (tc_phi_id - 1) / 2; // from 0 to 15
-    if (tc_theta_id == 1 && !includeFEInnerTC) continue;
+    if (tc_theta_id == 1 && !m_includeInnerFE) continue;
 
     for (int iSample = 0; iSample < 64; iSample++) {
       if (tc_theta_id <= 3) {   //Forward Endcap
-        FE_Waveform_100ns[iSectorIndex][iSample] += m_wf[iSample];
+        m_FE_Waveform_100ns[iSectorIndex][iSample] += m_wf[iSample];
       } else { // Backward Endcap
-        if (tc_theta_id == 16 || tc_theta_id == 17) BE_Waveform_100ns[iSectorIndex][iSample] += m_wf[iSample];
+        if (tc_theta_id == 16 || tc_theta_id == 17) m_BE_Waveform_100ns[iSectorIndex][iSample] += m_wf[iSample];
       }
     }
   }
@@ -203,52 +204,52 @@ void ECLLOMModule::calculate_discr_output()
 {
   for (int iSector = 0; iSector < 16; iSector++) { // Calculating pedestals
     for (int iSample = 15; iSample < 36; iSample++) {
-      BE_Pedal[iSector] += BE_Waveform_100ns[iSector][iSample] / 20;
-      FE_Pedal[iSector] += FE_Waveform_100ns[iSector][iSample] / 20;
+      m_BE_Pedal[iSector] += m_BE_Waveform_100ns[iSector][iSample] / 20;
+      m_FE_Pedal[iSector] += m_FE_Waveform_100ns[iSector][iSample] / 20;
     }
   }
   double dAdT = 0; // convert 100 ns signal to 10 ns
   for (int iSector = 0; iSector < 16; iSector++) { // Linear interpolation from 100ns to 10ns
     for (int iSample = 0; iSample < 63; iSample++) {
       // forward
-      dAdT = (FE_Waveform_100ns[iSector][iSample + 1] - FE_Waveform_100ns[iSector][iSample]) / 10.0;
-      FE_Waveform_100ns[iSector][iSample] -= FE_Pedal[iSector]; //remove pedestals
-      for (int j = 0; j < 10; j++) FE_Waveform_10ns[iSector][iSample * 10 + j] = FE_Waveform_100ns[iSector][iSample] + j * dAdT;
-      FE_Waveform_10ns[iSector][630] = FE_Waveform_100ns[iSector][63] - FE_Pedal[iSector];
+      dAdT = (m_FE_Waveform_100ns[iSector][iSample + 1] - m_FE_Waveform_100ns[iSector][iSample]) / 10.0;
+      m_FE_Waveform_100ns[iSector][iSample] -= m_FE_Pedal[iSector]; //remove pedestals
+      for (int j = 0; j < 10; j++) m_FE_Waveform_10ns[iSector][iSample * 10 + j] = m_FE_Waveform_100ns[iSector][iSample] + j * dAdT;
+      m_FE_Waveform_10ns[iSector][630] = m_FE_Waveform_100ns[iSector][63] - m_FE_Pedal[iSector];
       //backward
-      dAdT = (BE_Waveform_100ns[iSector][iSample + 1] - BE_Waveform_100ns[iSector][iSample]) / 10.0;
-      BE_Waveform_100ns[iSector][iSample] -= BE_Pedal[iSector];
-      for (int j = 0; j < 10; j++) BE_Waveform_10ns[iSector][iSample * 10 + j] = BE_Waveform_100ns[iSector][iSample] + j * dAdT;
-      BE_Waveform_10ns[iSector][630] = BE_Waveform_100ns[iSector][63] - BE_Pedal[iSector];
+      dAdT = (m_BE_Waveform_100ns[iSector][iSample + 1] - m_BE_Waveform_100ns[iSector][iSample]) / 10.0;
+      m_BE_Waveform_100ns[iSector][iSample] -= m_BE_Pedal[iSector];
+      for (int j = 0; j < 10; j++) m_BE_Waveform_10ns[iSector][iSample * 10 + j] = m_BE_Waveform_100ns[iSector][iSample] + j * dAdT;
+      m_BE_Waveform_10ns[iSector][630] = m_BE_Waveform_100ns[iSector][63] - m_BE_Pedal[iSector];
     }
   }
   // calculate running sums for 10ns signal
-  int TimeOfDiscr = int(DiscrTime / 10); //discriminator duration in samples
+  int TimeOfDiscr = int(m_discrTime / 10); //discriminator duration in samples
   for (int iSector = 0; iSector < 16; iSector++) {
-    for (int iSample = 1; iSample < NSamples; iSample++) {
+    for (int iSample = 1; iSample < m_NSamples; iSample++) {
       int iNextSector = (iSector + 1) % 16;
-      BESum_Waveform_10ns[iSector][iSample] = BE_Waveform_10ns[iSector][iSample] + BE_Waveform_10ns[iNextSector][iSample];
-      FESum_Waveform_10ns[iSector][iSample] = FE_Waveform_10ns[iSector][iSample] + FE_Waveform_10ns[iNextSector][iSample];
+      m_BESum_Waveform_10ns[iSector][iSample] = m_BE_Waveform_10ns[iSector][iSample] + m_BE_Waveform_10ns[iNextSector][iSample];
+      m_FESum_Waveform_10ns[iSector][iSample] = m_FE_Waveform_10ns[iSector][iSample] + m_FE_Waveform_10ns[iNextSector][iSample];
 
       //filling Discriminators' signals
-      if (FESum_Waveform_10ns[iSector][iSample] > BhabhaHitThresholdFE && FESum_Discr[iSector][iSample] == 0) {
+      if (m_FESum_Waveform_10ns[iSector][iSample] > m_thresholdFE && m_FESum_Discr[iSector][iSample] == 0) {
         for (int j = iSample; j < iSample + TimeOfDiscr; j++) {
-          if (j < NSamples) FESum_Discr[iSector][j] = 1;
+          if (j < m_NSamples) m_FESum_Discr[iSector][j] = 1;
         }
       }
-      if (BESum_Waveform_10ns[iSector][iSample] > BhabhaHitThresholdBE && BESum_Discr[iSector][iSample] == 0) {
+      if (m_BESum_Waveform_10ns[iSector][iSample] > m_thresholdBE && m_BESum_Discr[iSector][iSample] == 0) {
         for (int j = iSample; j < iSample + TimeOfDiscr; j++) {
-          if (j < NSamples) BESum_Discr[iSector][j] = 1;
+          if (j < m_NSamples) m_BESum_Discr[iSector][j] = 1;
         }
       }
-      if (FE_Waveform_10ns[iSector][iSample] > BackgroundThreshold && FEQual_Discr[iSector][iSample] == 0) {
+      if (m_FE_Waveform_10ns[iSector][iSample] > m_thresholdBkg && m_FEQual_Discr[iSector][iSample] == 0) {
         for (int j = iSample; j < iSample + TimeOfDiscr; j++) {
-          if (j < NSamples) FEQual_Discr[iSector][j] = 1;
+          if (j < m_NSamples) m_FEQual_Discr[iSector][j] = 1;
         }
       }
-      if (BE_Waveform_10ns[iSector][iSample] > BackgroundThreshold && BEQual_Discr[iSector][iSample] == 0) {
+      if (m_BE_Waveform_10ns[iSector][iSample] > m_thresholdBkg && m_BEQual_Discr[iSector][iSample] == 0) {
         for (int j = iSample; j < iSample + TimeOfDiscr; j++) {
-          if (j < NSamples) BEQual_Discr[iSector][j] = 1;
+          if (j < m_NSamples) m_BEQual_Discr[iSector][j] = 1;
         }
       }
     }
@@ -262,7 +263,7 @@ bool ECLLOMModule::calculate_BE_quality(int iSample)
   int First = 0;
   // calculate quality signal for backward endcap
   for (int iBESector = 0; iBESector < 16; iBESector++) {
-    if (BEQual_Discr[iBESector][iSample]) {
+    if (m_BEQual_Discr[iBESector][iSample]) {
       nhit++;
       if (nhit == 1) First = iBESector;
       if (nhit == 2 && !((iBESector + 1) % 16 == First || (First + 1) % 16 == iBESector)) return (false);
@@ -277,7 +278,7 @@ bool ECLLOMModule::calculate_FE_quality(int iSample)
   int nhit = 0;
   int First = 0;
   for (int iFESector = 0; iFESector < 16; iFESector++) {
-    if (FEQual_Discr[iFESector][iSample]) {
+    if (m_FEQual_Discr[iFESector][iSample]) {
       nhit++;
       if (nhit == 1) First = iFESector;
       if (nhit == 2 && !((iFESector + 1) % 16 == First || (First + 1) % 16 == iFESector)) return (false);
@@ -292,18 +293,18 @@ void ECLLOMModule::calculate_coincidence(int iSample)
   for (int iFESector = 0; iFESector < 16; iFESector++) {
     for (int iBESector = 0; iBESector < 16; iBESector++) {
 
-      if (FE_Waveform_10ns[iFESector][iSample] > BhabhaHitThresholdFE && BE_Waveform_10ns[iBESector][iSample] > BhabhaHitThresholdBE) {
-        if (CoincidenceMatrix[iFESector][iBESector] == 0) CoincidenceCounterMatrix[iFESector][iBESector]++;
-        CoincidenceMatrix[iFESector][iBESector]++;
+      if (m_FE_Waveform_10ns[iFESector][iSample] > m_thresholdFE && m_BE_Waveform_10ns[iBESector][iSample] > m_thresholdBE) {
+        if (m_CoincidenceMatrix[iFESector][iBESector] == 0) m_CoincidenceCounterMatrix[iFESector][iBESector]++;
+        m_CoincidenceMatrix[iFESector][iBESector]++;
       } else {
-        CoincidenceMatrix[iFESector][iBESector] = 0;
+        m_CoincidenceMatrix[iFESector][iBESector] = 0;
       }
 
-      if (FESum_Discr[iFESector][iSample] && BESum_Discr[iBESector][iSample]) {
-        if (SumCoincidenceMatrix[iFESector][iBESector] == 0) SumCoincidenceCounterMatrix[iFESector][iBESector]++;
-        SumCoincidenceMatrix[iFESector][iBESector]++;
+      if (m_FESum_Discr[iFESector][iSample] && m_BESum_Discr[iBESector][iSample]) {
+        if (m_SumCoincidenceMatrix[iFESector][iBESector] == 0) m_SumCoincidenceCounterMatrix[iFESector][iBESector]++;
+        m_SumCoincidenceMatrix[iFESector][iBESector]++;
       }
-      SumCoincidenceMatrix[iFESector][iBESector] = 0;
+      m_SumCoincidenceMatrix[iFESector][iBESector] = 0;
     }
   }
 }
@@ -313,63 +314,63 @@ void ECLLOMModule::clear_lom_data()
 {
   for (int isector = 0; isector < 16; isector++) {
     for (int iSample = 0; iSample < 64; iSample++) {
-      BE_Waveform_100ns[isector][iSample] = 0;
-      FE_Waveform_100ns[isector][iSample] = 0;
+      m_BE_Waveform_100ns[isector][iSample] = 0;
+      m_FE_Waveform_100ns[isector][iSample] = 0;
     }
-    for (int iSample = 0; iSample < NSamples; iSample++) {
-      BE_Waveform_10ns[isector][iSample] = 0;
-      FE_Waveform_10ns[isector][iSample] = 0;
-      BESum_Waveform_10ns[isector][iSample] = 0;
-      FESum_Waveform_10ns[isector][iSample] = 0;
-      FESum_Discr[isector][iSample] = 0;
-      BESum_Discr[isector][iSample] = 0;
-      FEQual_Discr[isector][iSample] = 0;
-      BEQual_Discr[isector][iSample] = 0;
+    for (int iSample = 0; iSample < m_NSamples; iSample++) {
+      m_BE_Waveform_10ns[isector][iSample] = 0;
+      m_FE_Waveform_10ns[isector][iSample] = 0;
+      m_BESum_Waveform_10ns[isector][iSample] = 0;
+      m_FESum_Waveform_10ns[isector][iSample] = 0;
+      m_FESum_Discr[isector][iSample] = 0;
+      m_BESum_Discr[isector][iSample] = 0;
+      m_FEQual_Discr[isector][iSample] = 0;
+      m_BEQual_Discr[isector][iSample] = 0;
     }
-    BE_Pedal[isector] = 0;
-    FE_Pedal[isector] = 0;
-    BE_Amplitude[isector] = 0;
-    FE_Amplitude[isector] = 0;
-    BESum_Amplitude[isector] = 0;
-    FESum_Amplitude[isector] = 0;
+    m_BE_Pedal[isector] = 0;
+    m_FE_Pedal[isector] = 0;
+    m_BE_Amplitude[isector] = 0;
+    m_FE_Amplitude[isector] = 0;
+    m_BESum_Amplitude[isector] = 0;
+    m_FESum_Amplitude[isector] = 0;
     for (int jsector = 0; jsector < 16; jsector++) {
-      CoincidenceMatrix[isector][jsector] = 0;
-      SumCoincidenceMatrix[isector][jsector] = 0;
+      m_CoincidenceMatrix[isector][jsector] = 0;
+      m_SumCoincidenceMatrix[isector][jsector] = 0;
     }
   }
-  isBhabha = 0;
-  BhNum = 0;
-  FESum_MaxAmp = 0;
-  BESum_MaxAmp = 0;
-  FESum_MaxId = -1;
-  BESum_MaxId = -1;
+  m_isBhabha = 0;
+  m_BhNum = 0;
+  m_FESum_MaxAmp = 0;
+  m_BESum_MaxAmp = 0;
+  m_FESum_MaxId = -1;
+  m_BESum_MaxId = -1;
 }
 
 void ECLLOMModule::calculate_amplitudes()
 {
-  for (int iSample = 0; iSample < NSamples; iSample++) {
+  for (int iSample = 0; iSample < m_NSamples; iSample++) {
     for (int isector = 0; isector < 16; isector++) {
-      if (FE_Waveform_10ns[isector][iSample] > FE_Amplitude[isector]) FE_Amplitude[isector] = FE_Waveform_10ns[isector][iSample];
-      if (FESum_Waveform_10ns[isector][iSample] > FESum_Amplitude[isector]) FESum_Amplitude[isector] =
-          FESum_Waveform_10ns[isector][iSample];
-      if (BE_Waveform_10ns[isector][iSample] > BE_Amplitude[isector]) BE_Amplitude[isector] = BE_Waveform_10ns[isector][iSample];
-      if (BESum_Waveform_10ns[isector][iSample] > BESum_Amplitude[isector]) BESum_Amplitude[isector] =
-          BESum_Waveform_10ns[isector][iSample];
+      if (m_FE_Waveform_10ns[isector][iSample] > m_FE_Amplitude[isector]) m_FE_Amplitude[isector] = m_FE_Waveform_10ns[isector][iSample];
+      if (m_FESum_Waveform_10ns[isector][iSample] > m_FESum_Amplitude[isector]) m_FESum_Amplitude[isector] =
+          m_FESum_Waveform_10ns[isector][iSample];
+      if (m_BE_Waveform_10ns[isector][iSample] > m_BE_Amplitude[isector]) m_BE_Amplitude[isector] = m_BE_Waveform_10ns[isector][iSample];
+      if (m_BESum_Waveform_10ns[isector][iSample] > m_BESum_Amplitude[isector]) m_BESum_Amplitude[isector] =
+          m_BESum_Waveform_10ns[isector][iSample];
     }
   }
   for (int i = 0; i < 16; i++) {
-    if (FESum_Amplitude[i] > FESum_MaxAmp) {
-      FESum_MaxAmp  = FESum_Amplitude[i];
-      FESum_MaxId = i;
+    if (m_FESum_Amplitude[i] > m_FESum_MaxAmp) {
+      m_FESum_MaxAmp  = m_FESum_Amplitude[i];
+      m_FESum_MaxId = i;
     }
-    if (BESum_Amplitude[i] > BESum_MaxAmp) {
-      BESum_MaxAmp = BESum_Amplitude[i];
-      BESum_MaxId  = i;
+    if (m_BESum_Amplitude[i] > m_BESum_MaxAmp) {
+      m_BESum_MaxAmp = m_BESum_Amplitude[i];
+      m_BESum_MaxId  = i;
     }
-    if (FE_Amplitude[i] > 0.5) h2FEAmp->Fill(i, FE_Amplitude[i]);
-    if (BE_Amplitude[i] > 0.5) h2BEAmp->Fill(i, BE_Amplitude[i]);
+    if (m_FE_Amplitude[i] > 0.5) m_h2FEAmp->Fill(i, m_FE_Amplitude[i]);
+    if (m_BE_Amplitude[i] > 0.5) m_h2BEAmp->Fill(i, m_BE_Amplitude[i]);
 
-    if (FE_Amplitude[i] > BhabhaHitThresholdFE) h1FEHits->Fill(i);
-    if (BE_Amplitude[i] > BhabhaHitThresholdBE) h1BEHits->Fill(i);
+    if (m_FE_Amplitude[i] > m_thresholdFE) m_h1FEHits->Fill(i);
+    if (m_BE_Amplitude[i] > m_thresholdBE) m_h1BEHits->Fill(i);
   }
 }

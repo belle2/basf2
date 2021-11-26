@@ -1092,6 +1092,11 @@ def fillParticleListFromROE(decayString,
     pload.param('useROEs', True)
     path.add_module(pload)
 
+    from ROOT import Belle2
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(decayString):
+        raise ValueError("Invalid decay string")
+
     # apply a cut if a non-empty cut string is provided
     if cut != "":
         applyCuts(decayDescriptor.getMother().getFullName(), cut, path)

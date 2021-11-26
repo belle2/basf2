@@ -69,8 +69,8 @@ namespace Belle2 {
       B2FATAL("You are trying to apply a cut on the list " << m_listName <<
               " but the label 'all' is protected for lists of final-state particles." <<
               " It could introduce *very* dangerous bugs.");
-    } else if (listLabel == "MC" or listLabel == "ROE" or listLabel == "V0") {
-      // the labels MC, ROE, and V0 are also protected
+    } else if (listLabel == "MC" or listLabel == "V0") {
+      // the labels MC and V0 are also protected
       B2FATAL("You are trying to apply a cut on the list " << m_listName <<
               " but the label " << listLabel << " is protected and can not be reduced.");
     }

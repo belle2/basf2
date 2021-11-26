@@ -118,8 +118,8 @@ namespace Belle2 {
         int pdgCode  = mother->getPDGCode();
         // The default list name is "all"
         string listName = mother->getName() + ":all";
-        // ROE particles get the label "ROE"
-        if (m_useROEs) listName = mother->getName() + ":ROE";
+        // ROE particles get the full name
+        if (m_useROEs) listName = mother->getFullName();
         // MC particles get the label "MC"
         else if (m_useMCParticles) listName = mother->getName() + ":MC";
         // V0s get the label "V0"

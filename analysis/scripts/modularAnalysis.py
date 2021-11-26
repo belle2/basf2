@@ -1109,15 +1109,6 @@ def fillParticleListFromROE(decayString,
     pload.param('useROEs', True)
     path.add_module(pload)
 
-    from ROOT import Belle2
-    decayDescriptor = Belle2.DecayDescriptor()
-    if not decayDescriptor.init(decayString):
-        raise ValueError("Invalid decay string")
-    if decayDescriptor.getMother().getLabel() != 'ROE':
-        # the particle loader automatically uses the label "ROE" for particles built from the ROE
-        # so we have to copy over the list to name/format that user wants
-        copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':ROE', writeOut, path)
-
     # apply a cut if a non-empty cut string is provided
     if cut != "":
         applyCuts(decayDescriptor.getMother().getFullName(), cut, path)

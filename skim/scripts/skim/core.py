@@ -28,6 +28,7 @@ from modularAnalysis import applyCuts, summaryOfLists
 from skim.registry import Registry
 from skim.utils.flags import InitialiseSkimFlag, UpdateSkimFlag
 from skim.utils.testfiles import get_test_file
+from skim.utils.misc import _hashable_list
 
 
 class BaseSkim(ABC):
@@ -618,7 +619,7 @@ class CombinedSkim(BaseSkim):
                 (
                     module.type(),
                     tuple(sorted(
-                        (param.name, param.values[0] if isinstance(param.values, list) else param.values)
+                        (param.name, _hashable_list(param.values) if isinstance(param.values, list) else param.values)
                         for param in module.available_params()
                         if param.values != param.default
                     )),

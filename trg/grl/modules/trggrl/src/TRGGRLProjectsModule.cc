@@ -646,6 +646,10 @@ void TRGGRLProjectsModule::event()
   bool bha_theta_1 = (ECLtoGDL[2] & (1 << (88 - 32 * 2))) != 0;
   //ecltaub2b
   bool ecltaub2b = (ECLtoGDL[2] & (1 << (89 - 32 * 2))) != 0;
+  // ehigh1-3
+  bool ehigh1 = (ECLtoGDL[2] & (1 << (90 - 32 * 2))) != 0;
+  bool ehigh2 = (ECLtoGDL[2] & (1 << (91 - 32 * 2))) != 0;
+  bool ehigh3 = (ECLtoGDL[2] & (1 << (92 - 32 * 2))) != 0;
 
   //---------------------------------------------------------------------
   //..Other input bits
@@ -923,6 +927,9 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "bha_theta_0") {bit = bha_theta_0;}
     else if (bitname == "bha_theta_1") {bit = bha_theta_1;}
     else if (bitname == "ecl_bhapur") {bit = ecl_bhapur;}
+    else if (bitname == "ehigh1") {bit = ehigh1;}
+    else if (bitname == "ehigh2") {bit = ehigh2;}
+    else if (bitname == "ehigh3") {bit = ehigh3;}
 
     //GRL related bits, not perfect. To do: judge bhabha cluster or not correctly
     else if (bitname == "trkbha1") {bit = trkbha1;}

@@ -99,6 +99,11 @@ def resolve_skim_modules(SkimsOrModules, *, LocalModule=None):
     return skims, modules
 
 
+class _hashable_list(list):
+    def __hash__(self):
+        return hash(tuple(self))
+
+
 def _sphinxify_decay(decay_string):
     """Format the given decay string by using LaTeX commands instead of plain-text.
     Output is formatted for use with Sphinx (ReStructured Text).

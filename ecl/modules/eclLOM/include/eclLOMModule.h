@@ -32,19 +32,19 @@ namespace Belle2 {
       virtual ~ECLLOMModule();
 
       /** Initialize variables. */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /** begin run.*/
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /** event per event. */
-      virtual void event();
+      virtual void event() override;
 
       /** end run. */
-      virtual void endRun();
+      virtual void endRun() override;
 
       /** terminate.*/
-      virtual void terminate();
+      virtual void terminate() override;
 
     protected:
 

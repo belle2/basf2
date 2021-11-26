@@ -208,7 +208,7 @@ void ECLLOMModule::calculate_discr_output()
       m_FE_Pedal[iSector] += m_FE_Waveform_100ns[iSector][iSample] / 20;
     }
   }
-  double dAdT = 0; // convert 100 ns signal to 10 ns
+  double dAdT; // convert 100 ns signal to 10 ns
   for (int iSector = 0; iSector < 16; iSector++) { // Linear interpolation from 100ns to 10ns
     for (int iSample = 0; iSample < 63; iSample++) {
       // forward

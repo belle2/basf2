@@ -14,17 +14,6 @@
 
 using namespace Belle2;
 
-double ParallelTrackFilterModule::m_min_d0 = -100;
-double ParallelTrackFilterModule::m_max_d0 = +100;
-double ParallelTrackFilterModule::m_min_z0 = -500;
-double ParallelTrackFilterModule::m_max_z0 = +500;
-int ParallelTrackFilterModule::m_min_NumHitsSVD = 0;
-int ParallelTrackFilterModule::m_min_NumHitsPXD = 0;
-int ParallelTrackFilterModule::m_min_NumHitsCDC = 0;
-double ParallelTrackFilterModule::m_min_pCM = 0;
-double ParallelTrackFilterModule::m_min_pT = 0;
-double ParallelTrackFilterModule::m_min_Pval = 0;
-
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -37,13 +26,13 @@ REG_MODULE(ParallelTrackFilter)
 ParallelTrackFilterModule::ParallelTrackFilterModule() : Module()
 {
   // Set module properties
-  setDescription("Generates a new StoreArray from the input StoreArray which has all specified Tracks removed.");
+  setDescription("Generates a new StoreArray from the input StoreArray which contains only tracks that meet the specified criteria.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("inputArrayName", m_inputArrayName, "StoreArray with the input tracks", std::string("Tracks"));
-  addParam("outputINArrayName", m_outputINArrayName, "StoreArray with the output tracks", std::string(""));
-  addParam("outputOUTArrayName", m_outputOUTArrayName, "StoreArray with the output tracks", std::string(""));
+  addParam("outputINArrayName", m_outputINArrayName, "StoreArray with the output tracks", std::string("TracksIN"));
+  addParam("outputOUTArrayName", m_outputOUTArrayName, "StoreArray with the output tracks", std::string("TracksOUT"));
 
   //selection parameter definition
   addParam("min_d0", m_min_d0, "minimum value of the d0", double(-100));
@@ -62,17 +51,20 @@ ParallelTrackFilterModule::ParallelTrackFilterModule() : Module()
 
 void ParallelTrackFilterModule::initialize()
 {
-  B2INFO("ParallelTrackFilterModule " + getName() + " parameters:"
-         << LogVar("inputArrayName", m_inputArrayName)
-         << LogVar("outputINArrayName", m_outputINArrayName)
-         << LogVar("outputOUTArrayName", m_outputOUTArrayName));
+  B2DEBUG(22, "ParallelTrackFilterModule " + getName() + " parameters:"
+          << LogVar("inputArrayName", m_inputArrayName)
+          << LogVar("outputINArrayName", m_outputINArrayName)
+          << LogVar("outputOUTArrayName", m_outputOUTArrayName));
 
+  // Attempt the module initialization
   initializeSelectSubset();
 }
 
 
 void ParallelTrackFilterModule::beginRun()
 {
+  // If the initialization was not done because the input StoreArray was missing, retry
+  // Otherwise, this call does nothing
   initializeSelectSubset();
 }
 
@@ -80,14 +72,17 @@ void ParallelTrackFilterModule::beginRun()
 void ParallelTrackFilterModule::initializeSelectSubset()
 {
 
-  // Attepmt SelectSubset<Track> initialization if not done already
+  // Attepmt SelectSubset<Track> initialization only if not done already
   if (m_selectedTracks.getSet())
     return;
 
   // Can't initialize if the input array is not present (may change from run to run)
   StoreArray<Track> inputArray(m_inputArrayName);
-  if (!inputArray.isOptional())
+  if (!inputArray.isOptional()) {
+    B2WARNING("Missing input tracks array, " + getName() + " is skipped for this run"
+              << LogVar("inputArrayName", m_inputArrayName));
     return;
+  }
 
   m_selectedTracks.registerSubset(inputArray, m_outputINArrayName);
   m_selectedTracks.inheritAllRelations();
@@ -107,44 +102,41 @@ void ParallelTrackFilterModule::event()
     return;
   }
 
-  m_selectedTracks.select(isSelected);
+  m_selectedTracks.select([this](const Track * track) {
+    return this->isSelected(track);
+  });
 
-  m_notSelectedTracks.select([](const Track * track) {
-    return !isSelected(track);
+  m_notSelectedTracks.select([this](const Track * track) {
+    return !this->isSelected(track);
   });
 
 }
 
 bool ParallelTrackFilterModule::isSelected(const Track* track)
 {
-
-  bool isExcluded = false;
-  int pionCode = 211;
-
-  const TrackFitResult*  tfr = track->getTrackFitResult(Const::ChargedStable(pionCode));
+  const TrackFitResult* tfr = track->getTrackFitResult(Const::ChargedStable(Const::pion.getPDGCode()));
   if (tfr == nullptr)
     return false;
 
   if (tfr->getD0() < m_min_d0 || tfr->getD0() > m_max_d0)
-    isExcluded = true;
+    return false;
 
   if (tfr->getZ0() < m_min_z0 || tfr->getZ0() > m_max_z0)
-    isExcluded = true;
+    return false;
 
   if (tfr->getPValue() < m_min_Pval)
-    isExcluded = true;
+    return false;
 
   if (tfr->getMomentum().Perp() < m_min_pT)
-    isExcluded = true;
+    return false;
 
   HitPatternVXD hitPatternVXD = tfr->getHitPatternVXD();
   if (hitPatternVXD.getNSVDHits() < m_min_NumHitsSVD ||  hitPatternVXD.getNPXDHits() < m_min_NumHitsPXD)
-    isExcluded = true;
+    return false;
 
   HitPatternCDC hitPatternCDC = tfr->getHitPatternCDC();
   if (hitPatternCDC.getNHits() < m_min_NumHitsCDC)
-    isExcluded = true;
+    return false;
 
-  return !isExcluded;
-
+  return true;
 }

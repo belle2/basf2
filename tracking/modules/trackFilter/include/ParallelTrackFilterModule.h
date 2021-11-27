@@ -13,13 +13,10 @@
 
 #include <mdst/dataobjects/Track.h>
 
-#include <TFile.h>
-#include <TNtuple.h>
-
 
 namespace Belle2 {
   /**
-   * Generates a new StoreArray from the input StoreArray which has all specified Tracks removed.
+   * Generates a new StoreArray from the input StoreArray which contains only tracks that meet the specified criteria.
    * Like TrackFilterModule, but this one does not produce NTuples and is ParallelProcessingCertified.
    */
   class ParallelTrackFilterModule : public Module {
@@ -38,20 +35,12 @@ namespace Belle2 {
     /** called at beginning of run */
     virtual void beginRun() override;
 
-    static double m_min_d0; /**< d0 miminum value*/
-    static double m_max_d0; /**< d0 maximum value*/
-    static double m_min_z0; /**< z0 miminum value*/
-    static double m_max_z0; /**< z0 maximum value*/
-    static int m_min_NumHitsPXD; /**< miminum value of PXD hits*/
-    static int m_min_NumHitsSVD; /**< miminum value of SVD hits*/
-    static int m_min_NumHitsCDC; /**< miminum value of CDC hits*/
-    static double m_min_pCM; /**< miminum value of the center of mass momentum*/
-    static double m_min_pT; /**< miminum value of the transverse momentum*/
-    static double m_min_Pval;  /**< miminum P-value of the track fit*/
 
   private:
 
     void initializeSelectSubset();
+
+    bool isSelected(const Track* track); /**< determine if the track satisfies the selection criteria */
 
     std::string m_inputArrayName;  /**< StoreArray with the input tracks */
     std::string m_outputINArrayName;  /**< StoreArray with the selected output tracks */
@@ -60,7 +49,15 @@ namespace Belle2 {
     SelectSubset<Track> m_selectedTracks; /**< selected tracks */
     SelectSubset<Track> m_notSelectedTracks; /**< not selected tracks*/
 
-    static bool isSelected(const Track* track); /**< determine if the track satisfies the selection criteria */
-
+    double m_min_d0 = -100; /**< d0 miminum value*/
+    double m_max_d0 = 100; /**< d0 maximum value*/
+    double m_min_z0 = -500; /**< z0 miminum value*/
+    double m_max_z0 = 500; /**< z0 maximum value*/
+    int m_min_NumHitsPXD = 0; /**< miminum value of PXD hits*/
+    int m_min_NumHitsSVD = 0; /**< miminum value of SVD hits*/
+    int m_min_NumHitsCDC = 0; /**< miminum value of CDC hits*/
+    double m_min_pCM = 0; /**< miminum value of the center of mass momentum*/
+    double m_min_pT = 0; /**< miminum value of the transverse momentum*/
+    double m_min_Pval = 0;  /**< miminum P-value of the track fit*/
   };
 }

@@ -1,3 +1,4 @@
+
 /**************************************************************************
  * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
@@ -164,8 +165,8 @@ namespace Belle2 {
 
   void EvtKstarnunu_REV::initProbMax()
   {
-    // obtained by brute force (18013.282)
-    setProbMax(20000.0);
+    // obtained by brute force (20000.169)
+    setProbMax(22000.0);
   }
 
 }

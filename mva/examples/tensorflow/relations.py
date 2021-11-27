@@ -300,6 +300,6 @@ if __name__ == "__main__":
         print('Apply special relational net')
         p3, t3 = method3.apply_expert(test_data, general_options.m_treename)
 
-        print('Feed Forward Net AUC: ', basf2_mva_util.calculate_roc_auc(p1, t1))
-        print('Relational Net AUC: ', basf2_mva_util.calculate_roc_auc(p2, t2))
-        print('Relational Net with pre-training AUC: ', basf2_mva_util.calculate_roc_auc(p3, t3))
+        print('Feed Forward Net AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p1, t1))
+        print('Relational Net AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p2, t2))
+        print('Relational Net with pre-training AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p3, t3))

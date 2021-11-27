@@ -116,9 +116,10 @@ if __name__ == "__main__":
         p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
         inference_stop = time.time()
         inference_time = inference_stop - inference_start
-        auc = basf2_mva_util.calculate_roc_auc(p, t)
-        print(label, training_time, inference_time, auc)
-        stats.append((label, training_time, inference_time, auc))
+        auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
+        my_auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
+        print(label, training_time, inference_time, auc, my_auc)
+        stats.append((label, training_time, inference_time, auc, my_auc))
 
     for line in stats:
         print(*line)

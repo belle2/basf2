@@ -198,5 +198,5 @@ if __name__ == "__main__":
         print('Apply feed forward net')
         p2, t2 = method2.apply_expert(test_data, general_options.m_treename)
 
-        print('Relational Net AUC: ', basf2_mva_util.calculate_roc_auc(p1, t1))
-        print('Feed Forward Net AUC: ', basf2_mva_util.calculate_roc_auc(p2, t2))
+        print('Relational Net AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p1, t1))
+        print('Feed Forward Net AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p2, t2))

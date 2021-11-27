@@ -134,5 +134,5 @@ if __name__ == "__main__":
     # Apply the training as usual
     method = basf2_mva_util.Method(general_options.m_identifier)
     p, t = method.apply_expert(basf2_mva.vector("test.root"), general_options.m_treename)
-    auc = basf2_mva_util.calculate_roc_auc(p, t)
+    auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
     print("Custom Method", auc)

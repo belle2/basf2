@@ -1,17 +1,24 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 # torch imports
 import torch
 from torch.nn.functional import one_hot
 
 # other imports
 import numpy as np
-import pandas as pd
 import uproot3 as ur
 from sklearn.preprocessing import PolynomialFeatures
 
 # Model
-from PriorDataLoaderAndModel import PriorModel
+from priorDataLoaderAndModel import PriorModel
 
 # dataloader
 

@@ -13,17 +13,10 @@ posterior probabilities which can help improve particle identification.
 Training
 --------
 
-Training requires as input an ntuple to train the model with, which must
-contain data on particle momentum and cos(:math:`\theta`) as well as 
-particle PDG values which are to be considered for training. It also
-requires the path (and filename) to store the trained model and scaling file (optional).
-There are some options to modify other paramters for training as well.
-The usage for this tool is as follows: 
-
 .. argparse::
-    :filename: analysis/tools/TrainPriors.py
+    :filename: analysis/tools/analysis-train-priors
     :func: get_parser
-    :prog: TrainPriors.py
+    :prog: analysis-train-priors
     :nodefault:
 
 .. note::
@@ -32,10 +25,14 @@ The usage for this tool is as follows:
            set includes regularization.
          - In case you notice overfitting or want to stop the training, 
            Ctrl+C will stop the training and create the required output files so in
-           case it takes a bit of time to exit out, it may be because it is writing
+           case it takes some time to exit out, it may be because it is writing
            those files.
 
 .. warning::
+         - The tool does not consider the particles with PDG values other than the ones given 
+           in ``particle_list`` (even as background) during training so it is advisable to include 
+           particles with sufficiently large proportions in the ``particle_list`` even if their 
+           priors are not required.
          - In case your ``particle_list`` contains only two particles, kindly avoid creation
            of scaling file because ``TemperatureScaling`` which is used for calibration
            of priors will give out only the output for the higher PDG value and so further 
@@ -54,7 +51,7 @@ Import
 ~~~~~~
 .. code-block:: python
 
-    from EvalPriors import Priors
+    from evalPriors import Priors
 
 Initialize
 ~~~~~~~~~~

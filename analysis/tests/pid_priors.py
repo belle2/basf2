@@ -35,7 +35,7 @@ with clean_working_directory():
 
     process(main)
 
-    assert 0 == subprocess.run(['TrainPriors.py', '-i', 'pid_priors.root', '-k', 'ntuple', '-o',
+    assert 0 == subprocess.run(['analysis-train-priors', '-i', 'pid_priors.root', '-k', 'ntuple', '-o',
                                'pid_priors.pth', '-p', '211', '321'], stdout=subprocess.DEVNULL).returncode
 
     assert 0 == subprocess.run(['basf2', find_file('analysis/tests/pid_priors.py_noexec')]).returncode

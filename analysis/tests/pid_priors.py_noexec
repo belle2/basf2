@@ -10,7 +10,7 @@
 
 from basf2 import set_random_seed, create_path, register_module, process, Module
 from b2test_utils import require_file, configure_logging_for_tests
-from EvalPriors import Priors
+from evalPriors import Priors
 from ROOT import Belle2
 import modularAnalysis as ma
 import subprocess

@@ -1,5 +1,30 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+# description
+
+"""
+This tool uses a root file containing momentum and cos(theta) (theta is the angle made by momentum vector with the beam axis)
+and trains a pytorch model by taking a second order combination of these variables along with the
+transverse momentum (thus giving 9 total features which is done by the data loader).
+The program then outputs a '.pth' model file along with a scaling file (if the path is provided and if not, this step is skipped).
+The required input is taken by the use of appropriate flags when using the program and these are listed below.
+
+Example:
+    .. code-block::
+
+        analysis-train-priors -i /path/to/datafile.root -o /path/to/model.pth -p 11 13 211 321 -k tree -v cosTheta p mcPDG
+        -t 20 -lr 1e-6 -r /path/to/alreadyTrainedModel.pth -s /path/to/scalefile.root -e 10
+"""
+
+
 # torch imports
 import torch
 from torch.optim import Adam
@@ -17,39 +42,8 @@ import sys
 
 # Model and DataLoader
 
-from PriorDataLoaderAndModel import PriorModel
-from PriorDataLoaderAndModel import PriorDataLoader
-
-# description
-
-"""
-This tool can be used to train a pytorch model to calculate prior probabilities for particle identification.
-
-This tool uses a root file containing momentum and cos(theta) (theta is the angle made by momentum vector with the beam axis)
-and trains a pytorch model (imported as PriorModel) by taking a second order combination of these variables along with the
-transverse momentum (thus giving 9 total features) which is done by the PriorDataLoader.
-The program then outputs a '.pth' model file along with a scaling file (if the path is provided and if not this step is skipped).
-The required input is taken as flags when using the program and these inputs are listed below.
-
-Parameters:
-    input_path (str): The path to the data file containing the data to train the model with.
-    output_path (str): The path to the output model file that is generated after training.
-    key (str): The key to the tree containing data within the root file.
-    particle_list (int): List of mcPDG values to train the model with.
-    variable_list (optional) (str): List of variables in the order cos(theta), momentum and PDG.
-    taylor_terms (optional) (int): Number of Taylor series terms of categorical cross entropy loss to be used for training.
-    learn_rate (optional) (float): The learning rate to be used for training the model.
-    retrain_model (optional) (str): The path to an already trained model to be used for further training.
-    scale_file (optional) (str): The path where a root file for temperature scaling must be stored for calibration purposes.
-    epochs (optional) (int): The number of epochs for training the model.
-
-Note:
-    The parameters are taken as flags through the arguments parser.
-
-Example:
-    TrainPriors.py -i /path/to/datafile.root -o /path/to/model.pth -p 11 13 211 321 -k tree -v cosTheta p mcPDG
-    -t 20 -lr 1e-6 -r /path/to/alreadyTrainedModel.pth -s /path/to/scalefile.root -e 10
-"""
+from priorDataLoaderAndModel import PriorModel
+from priorDataLoaderAndModel import PriorDataLoader
 
 # model training
 
@@ -92,9 +86,8 @@ def mod_train(
                 inputs = inputs.to("cuda")
                 targets = targets.to("cuda")
             y_out = model(inputs)
-            y = torch.hstack((y_out, targets.reshape(-1, 1)))
             tcce = TCCE(terms)
-            loss = tcce(y, targets)
+            loss = tcce(y_out, targets)
             lam1 = 0.005
             all_lin1_param = torch.cat([x.view(-1) for x in model.hidden1.parameters()])
             all_lin2_param = torch.cat([x.view(-1) for x in model.hidden3.parameters()])
@@ -135,7 +128,6 @@ def mod_train(
             model = backup_model
             break
         elif acc > chacc:
-            stp_loss = loss.item()
             t = 4
             backup_model = model
 
@@ -202,7 +194,7 @@ def get_parser() -> argparse.ArgumentParser:
     Returns:
         Argument parser.
     """
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     required_args = ap.add_argument_group("Required Arguments")
     required_args.add_argument(
         "-i", "--input_path", help="Path to ntuples conataining data for training.", required=True
@@ -261,7 +253,6 @@ def get_parser() -> argparse.ArgumentParser:
 
 
 def main():
-    description = __file__.__doc__
     args = get_parser().parse_args()
     path = args.input_path
     labels = args.variable_list

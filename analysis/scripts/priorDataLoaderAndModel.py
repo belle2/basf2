@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 from torch.nn import Linear
 from torch.nn import ReLU
 from torch.nn import BatchNorm1d
 from torch.nn.init import kaiming_uniform_
 from torch.nn.init import xavier_uniform_
-from torch.nn import Sequential
-from torch.nn import BatchNorm2d
 from torch.nn import Softmax
 import torch
 from torch.utils.data import Dataset

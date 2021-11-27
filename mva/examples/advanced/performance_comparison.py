@@ -117,9 +117,8 @@ if __name__ == "__main__":
         inference_stop = time.time()
         inference_time = inference_stop - inference_start
         auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
-        my_auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
-        print(label, training_time, inference_time, auc, my_auc)
-        stats.append((label, training_time, inference_time, auc, my_auc))
+        print(label, training_time, inference_time, auc)
+        stats.append((label, training_time, inference_time, auc))
 
     for line in stats:
         print(*line)

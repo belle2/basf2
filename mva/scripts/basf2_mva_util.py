@@ -59,32 +59,46 @@ def calculate_roc_auc(p, t):
     return calculate_auc_efficiency_vs_purity(p, t)
 
 
-def calculate_auc_efficiency_vs_purity(p, t):
+def calculate_auc_efficiency_vs_purity(p, t, w=None):
     """
     Calculates the area under the efficiency-purity curve
     @param p np.array filled with the probability output of a classifier
     @param t np.array filled with the target (0 or 1)
+    @param w None or np.array filled with weights
     """
-    N = len(t)
-    T = np.sum(t)
+    if w is None:
+        w = np.ones(t.shape)
+
+    wt = w * t
+
+    N = np.sum(w)
+    T = np.sum(wt)
+
     index = np.argsort(p)
-    efficiency = (T - np.cumsum(t[index])) / float(T)
-    purity = (T - np.cumsum(t[index])) / (N - np.cumsum(np.ones(N)))
+    efficiency = (T - np.cumsum(wt[index])) / float(T)
+    purity = (T - np.cumsum(wt[index])) / (N - np.cumsum(w))
     purity = np.where(np.isnan(purity), 0, purity)
     return np.abs(np.trapz(purity, efficiency))
 
 
-def calculate_auc_efficiency_vs_background_retention(p, t):
+def calculate_auc_efficiency_vs_background_retention(p, t, w=None):
     """
     Calculates the area under the efficiency-background_retention curve (AUC ROC)
     @param p np.array filled with the probability output of a classifier
     @param t np.array filled with the target (0 or 1)
+    @param w None or np.array filled with weights
     """
-    N = len(t)
-    T = np.sum(t)
+    if w is None:
+        w = np.ones(t.shape)
+
+    wt = w * t
+
+    N = np.sum(w)
+    T = np.sum(wt)
+
     index = np.argsort(p)
-    efficiency = (T - np.cumsum(t[index])) / float(T)
-    background_retention = (N - T - np.cumsum(np.abs(1 - t)[index])) / float(N - T)
+    efficiency = (T - np.cumsum(wt[index])) / float(T)
+    background_retention = (N - T - np.cumsum((np.abs(1 - t) * w)[index])) / float(N - T)
     return np.abs(np.trapz(efficiency, background_retention))
 
 

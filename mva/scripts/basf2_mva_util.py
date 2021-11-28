@@ -54,8 +54,10 @@ def calculate_roc_auc(p, t):
         "This change has been made as calculate_roc_auc returned the area under the efficiency-purity curve\n"
         "not the efficiency-background retention curve as expected by users.\n"
         "Please replace calculate_roc_auc with:\n\n"
-        "\033[96mcalculate_auc_efficiency_vs_purity(probability, target)\033[00m: the current definition of calculate_roc_auc\n"
-        "\033[96mcalculate_auc_efficiency_vs_background_retention(probability, target)\033[00m: commonly referred to as roc auc\n")
+        "\033[96mcalculate_auc_efficiency_vs_purity(probability, target[, weight])\033[00m:"
+        " the current definition of calculate_roc_auc\n"
+        "\033[96mcalculate_auc_efficiency_vs_background_retention(probability, target[, weight])\033[00m:"
+        \" commonly referred to as roc auc\n")
     return calculate_auc_efficiency_vs_purity(p, t)
 
 

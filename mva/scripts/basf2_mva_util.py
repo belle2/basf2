@@ -57,7 +57,7 @@ def calculate_roc_auc(p, t):
         "\033[96mcalculate_auc_efficiency_vs_purity(probability, target[, weight])\033[00m:"
         " the current definition of calculate_roc_auc\n"
         "\033[96mcalculate_auc_efficiency_vs_background_retention(probability, target[, weight])\033[00m:"
-        \" commonly referred to as roc auc\n")
+        " commonly referred to as roc auc\n")
     return calculate_auc_efficiency_vs_purity(p, t)
 
 

@@ -78,7 +78,7 @@ def calculate_auc_efficiency_vs_purity(p, t, w=None):
 
     index = np.argsort(p)
     efficiency = (T - np.cumsum(wt[index])) / float(T)
-    purity = (T - np.cumsum(wt[index])) / (N - np.cumsum(w))
+    purity = (T - np.cumsum(wt[index])) / (N - np.cumsum(w[index]))
     purity = np.where(np.isnan(purity), 0, purity)
     return np.abs(np.trapz(purity, efficiency))
 

@@ -312,7 +312,7 @@ namespace Belle2 {
     // Pick a value for the b-quark Fermi motion momentum
     // according to Ali's Gaussian model
 
-    // Power corrections in the decay rate and distributions in B->Xs l+l- 2 in the standard model
+    // reference: Ali, Ahmed, et al. "Power corrections in the decay rate and distributions in B->Xs l+l- 2 in the standard model"
     // see (eq.57)
 
     double pb, pbmax, xbox, ybox;
@@ -333,7 +333,7 @@ namespace Belle2 {
     // Compute probability according to Ali's Gaussian model
     // the function chosen has a convenient maximum value of 1 for pb = pf
 
-    // Power corrections in the decay rate and distributions in B->Xs l+l- 2 in the standard model
+    // reference: Ali, Ahmed, et al. "Power corrections in the decay rate and distributions in B->Xs l+l- 2 in the standard model"
     // see (eq.57)
 
     double prsq = (pb * pb) / (pf * pf);

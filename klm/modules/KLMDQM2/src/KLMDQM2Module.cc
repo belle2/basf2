@@ -20,9 +20,8 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+
 using namespace Belle2;
-
-
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -35,6 +34,10 @@ REG_MODULE(KLMDQM2)
 
 KLMDQM2Module::KLMDQM2Module() :
   HistoModule(),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
+  m_PlaneArrayIndex(&(KLMPlaneArrayIndex::Instance())),
+  m_GeometryBKLM{nullptr},
   m_MatchedHitsBKLM{nullptr},
   m_AllExtHitsBKLM{nullptr},
   m_PlaneEfficienciesBKLM{nullptr},
@@ -46,11 +49,7 @@ KLMDQM2Module::KLMDQM2Module() :
   m_PlaneEfficienciesBKLMSector{nullptr},
   m_MatchedHitsEKLMSector{nullptr},
   m_AllExtHitsEKLMSector{nullptr},
-  m_PlaneEfficienciesEKLMSector{nullptr},
-  m_GeometryBKLM{nullptr},
-  m_ElementNumbers(&(KLMElementNumbers::Instance())),
-  m_eklmElementNumbers{&(EKLMElementNumbers::Instance())},
-  m_PlaneArrayIndex(&(KLMPlaneArrayIndex::Instance()))
+  m_PlaneEfficienciesEKLMSector{nullptr}
 {
   // Set module properties
   setDescription(R"DOC("Additional Module for KLMDQM plots after HLT filters
@@ -83,9 +82,6 @@ KLMDQM2Module::KLMDQM2Module() :
            std::string("KLMEfficiencyDQM"));
 
 }
-
-
-
 
 KLMDQM2Module::~KLMDQM2Module()
 {
@@ -169,7 +165,7 @@ void KLMDQM2Module::defineHisto()
                                            "Plane Efficiency in BKLM Sector",
                                            BKLMMaxSectors, 0.5, 0.5 + BKLMMaxSectors);
   m_PlaneEfficienciesBKLMSector->GetXaxis()->SetTitle("Sector number");
-  m_PlaneEfficienciesBKLMSector->GetYaxis()->SetRange(0., 1.1);
+  m_PlaneEfficienciesBKLMSector->GetYaxis()->SetRangeUser(0., 1.1);
   m_PlaneEfficienciesBKLMSector->SetOption("LIVE");
   m_PlaneEfficienciesBKLMSector->SetOption("HIST");
 
@@ -190,14 +186,10 @@ void KLMDQM2Module::defineHisto()
                                            "Plane Efficiency in EKLM Sector",
                                            EKLMMaxSectors, 0.5, EKLMMaxSectors + 0.5);
   m_PlaneEfficienciesEKLMSector->GetXaxis()->SetTitle("Sector number");
+  m_PlaneEfficienciesEKLMSector->GetYaxis()->SetRangeUser(0., 1.1);
   m_PlaneEfficienciesEKLMSector->SetOption("LIVE");
   m_PlaneEfficienciesEKLMSector->SetOption("HIST");
-
-
-
 }//end of defineHisto
-
-
 
 void KLMDQM2Module::initialize()
 {
@@ -207,12 +199,10 @@ void KLMDQM2Module::initialize()
   m_MuonList.isRequired(m_MuonListName);
   m_Digits.isOptional();
   m_GeometryBKLM = bklm::GeometryPar::instance();
-
 }
 
 void KLMDQM2Module::beginRun()
 {
-
   //start by restarting histograms
 
   /* KLM General Related. */
@@ -229,9 +219,7 @@ void KLMDQM2Module::beginRun()
   m_MatchedHitsEKLMSector->Reset();
   m_AllExtHitsEKLMSector->Reset();
   m_PlaneEfficienciesEKLMSector->Reset();
-
 }
-
 
 void KLMDQM2Module::event()
 {
@@ -267,7 +255,6 @@ void KLMDQM2Module::endRun()
 void KLMDQM2Module::terminate()
 {
 }
-
 
 bool KLMDQM2Module::triggerFlag()
 {
@@ -569,5 +556,3 @@ bool KLMDQM2Module::collectDataTrack(
   } //end of selectedHits for loop
   return true;
 } //end of collectTrackData
-
-

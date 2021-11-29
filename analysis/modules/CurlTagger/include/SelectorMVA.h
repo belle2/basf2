@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /** Constructor */
-      SelectorMVA(bool belleFlag, bool trainFlag);
+      SelectorMVA(bool belleFlag, bool trainFlag, std::string tFileName);
 
       /** Destructor */
       ~SelectorMVA();

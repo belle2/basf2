@@ -56,7 +56,10 @@ CurlTaggerModule::CurlTaggerModule() : Module()
   addParam("usePayloadCut", m_payloadCut, "flag for using the optimised cut value stored in the payload.", true);
   addParam("responseCut", m_ResponseCut,
            "minimum allowed selector response for a match. If usePayloadCut is true the value will be overwritten with the cut stored in the payload.",
-           0.324);
+           0.5);
+  addParam("trainFilename", m_TrainFileName,
+           "EXPERT: the name of the output root file created when running in training mode.",
+           std::string("CurlTagger_Training.root"));
 }
 
 CurlTaggerModule::~CurlTaggerModule() = default;
@@ -80,7 +83,7 @@ void CurlTaggerModule::initialize()
     }
 
   } else if (m_SelectorType.compare("mva") == 0) {
-    m_Selector = new CurlTagger::SelectorMVA(m_BelleFlag, m_TrainFlag);
+    m_Selector = new CurlTagger::SelectorMVA(m_BelleFlag, m_TrainFlag, m_TrainFileName);
   } else {
     B2ERROR("Curl Track Tagger - Selector type does not exists.");
   }

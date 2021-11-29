@@ -3161,7 +3161,8 @@ def tagCurlTracks(particleLists,
                   responseCut=-1.0,
                   selectorType='cut',
                   ptCut=0.6,
-                  train=False,
+                  expert_train=False,
+                  expert_filename="",
                   path=None):
     """
     Warning:
@@ -3191,7 +3192,8 @@ def tagCurlTracks(particleLists,
                           It is strongly recommended to used the 'mva' selection. The 'cut' selection
                           is based on BN1079 and is only calibrated for Belle data.
     @param ptCut:         pre-selection cut on transverse momentum.
-    @param train:         flag to set training mode if selector has a training mode (mva).
+    @param expert_train:  flag to set training mode if selector has a training mode (mva).
+    @param expert_filename: set file name of produced training ntuple (mva).
     @param path:          module is added to this path.
     """
 
@@ -3214,7 +3216,8 @@ def tagCurlTracks(particleLists,
 
     curlTagger.param('selectorType', selectorType)
     curlTagger.param('ptCut', ptCut)
-    curlTagger.param('train', train)
+    curlTagger.param('train', expert_train)
+    curlTagger.param('trainFilename', expert_filename)
 
     path.add_module(curlTagger)
 

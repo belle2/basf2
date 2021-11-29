@@ -69,11 +69,14 @@ namespace Belle2 {
     /** preselection pt cut */
     double m_PtCut;
 
-    /** min classifier response to consider a match*/
+    /** min classifier response to consider a match */
     double m_ResponseCut;
 
-    /** name of selector function to use*/
+    /** name of selector function to use */
     std::string m_SelectorType;
+
+    /** expert: output file name of ntuple produced in training mode */
+    std::string m_TrainFileName;
 
     //member objects
     /** contains the selector used */

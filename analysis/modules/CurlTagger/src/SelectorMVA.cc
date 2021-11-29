@@ -18,15 +18,13 @@
 using namespace Belle2;
 using namespace CurlTagger;
 
-SelectorMVA::SelectorMVA(bool belleFlag, bool trainFlag)
+SelectorMVA::SelectorMVA(bool belleFlag, bool trainFlag, std::string tFileName)
 {
   m_TrainFlag = trainFlag;
-
+  m_TFileName = tFileName;
   if (belleFlag) {
-    m_TFileName = "CurlTagger_TrainingData_Belle.root";
     m_identifier = "CurlTagger_FastBDT_Belle";
   } else {
-    m_TFileName = "CurlTagger_TrainingData_BelleII.root";
     m_identifier = "CurlTagger_FastBDT_BelleII";
   }
 }

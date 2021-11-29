@@ -282,6 +282,8 @@ class EventInspectorLookback(basf2.Module):
                 continue
             trigCtime = (rawklm.GetTTCtime(0) & 0x7ffffff) << 3  # (ns)
             for finesse in range(0, 4):
+                dc = (finesse << 2) + (copper & 0x3)
+                sectorFB = self.dcToSectorFB[dc]  # noqa (F841) kept for completeness
                 nWords = rawklm.GetDetectorNwords(0, finesse)
                 if nWords <= 0:
                     continue
@@ -306,6 +308,7 @@ class EventInspectorLookback(basf2.Module):
                 for j in range(0, n):
                     word0 = bufSlot[j * 2]
                     word1 = bufSlot[j * 2 + 1]
+                    ctime = word0 & 0xffff  # noqa (F841) kept for completeness
                     channel = (word0 >> 16) & 0x7f
                     axis = (word0 >> 23) & 0x01
                     lane = (word0 >> 24) & 0x1f  # 1..2 for scints, 8..20 for RPCs (=readout-board slot - 7)

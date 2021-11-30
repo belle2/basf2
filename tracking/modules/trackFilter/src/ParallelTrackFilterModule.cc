@@ -56,30 +56,10 @@ void ParallelTrackFilterModule::initialize()
           << LogVar("outputINArrayName", m_outputINArrayName)
           << LogVar("outputOUTArrayName", m_outputOUTArrayName));
 
-  // Attempt the module initialization
-  initializeSelectSubset();
-}
-
-
-void ParallelTrackFilterModule::beginRun()
-{
-  // If the initialization was not done because the input StoreArray was missing, retry
-  // Otherwise, this call does nothing
-  initializeSelectSubset();
-}
-
-
-void ParallelTrackFilterModule::initializeSelectSubset()
-{
-
-  // Attepmt SelectSubset<Track> initialization only if not done already
-  if (m_selectedTracks.getSet())
-    return;
-
-  // Can't initialize if the input array is not present (may change from run to run)
+  // Can't initialize if the input array is not present
   StoreArray<Track> inputArray(m_inputArrayName);
   if (!inputArray.isOptional()) {
-    B2WARNING("Missing input tracks array, " + getName() + " is skipped for this run"
+    B2WARNING("Missing input tracks array, " + getName() + " is skipped"
               << LogVar("inputArrayName", m_inputArrayName));
     return;
   }
@@ -89,7 +69,6 @@ void ParallelTrackFilterModule::initializeSelectSubset()
 
   m_notSelectedTracks.registerSubset(inputArray, m_outputOUTArrayName);
   m_notSelectedTracks.inheritAllRelations();
-
 }
 
 

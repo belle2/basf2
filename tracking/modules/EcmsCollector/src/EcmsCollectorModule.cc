@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/modules/eCmsCollector/eCmsCollectorModule.h>
+#include <tracking/modules/EcmsCollector/EcmsCollectorModule.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/ReferenceFrame.h>
@@ -28,13 +28,13 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eCmsCollector)
+REG_MODULE(EcmsCollector)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-eCmsCollectorModule::eCmsCollectorModule() : CalibrationCollectorModule(),
+EcmsCollectorModule::EcmsCollectorModule() : CalibrationCollectorModule(),
   m_exp(-99), m_run(-99), m_evt(-99),
   m_time(-99)
 {
@@ -44,7 +44,7 @@ eCmsCollectorModule::eCmsCollectorModule() : CalibrationCollectorModule(),
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-void eCmsCollectorModule::prepare()
+void EcmsCollectorModule::prepare()
 {
   B2INFO("Init of the trees");
   TString objectName = "events";
@@ -74,7 +74,7 @@ void eCmsCollectorModule::prepare()
 }
 
 
-void eCmsCollectorModule::collect()
+void EcmsCollectorModule::collect()
 {
   // store event info
   m_evt  = m_emd->getEvent();

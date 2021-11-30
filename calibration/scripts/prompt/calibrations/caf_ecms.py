@@ -25,7 +25,7 @@ import stdPi0s
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
-    name="eCMS Calibrations",
+    name="Ecms Calibrations",
     expert_username="zlebcr",
     description=__doc__,
     input_data_formats=["cdst"],
@@ -246,6 +246,9 @@ def get_data_info(inData, kwargs):
 
 def get_calibrations(input_data, **kwargs):
     """
+    Required function used by b2caf-prompt-run tool.
+    This function return a list of Calibration objects we assign to the CAF process.
+
     Parameters:
       input_data (dict): Should contain every name from the 'input_data_names' variable as a key.
         Each value is a dictionary with {"/path/to/file_e1_r5.root": IoV(1,5,1,5), ...}. Useful for
@@ -261,6 +264,7 @@ def get_calibrations(input_data, **kwargs):
     Returns:
       list(caf.framework.Calibration): All of the calibration objects we want to assign to the CAF process
     """
+
     from caf.framework import Calibration
     from caf.strategies import SingleIOV
 
@@ -274,7 +278,7 @@ def get_calibrations(input_data, **kwargs):
     rec_path_HadB = get_hadB_path()
     rec_path_MuMu = get_mumu_path()
 
-    collector_HadB = register_module('eCmsCollector')
+    collector_HadB = register_module('EcmsCollector')
     collector_MuMu = register_module('BoostVectorCollector', Y4SPListName='Upsilon(4S):BV')
 
     algorithm_ecms = InvariantMassAlgorithm()

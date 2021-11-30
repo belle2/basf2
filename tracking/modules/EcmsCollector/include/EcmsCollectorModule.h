@@ -14,21 +14,21 @@
 
 namespace Belle2 {
   /**
-   * This collects the track parameters and momenta of the mu+mu- events for
-   * calibration of the eCms using CAF and AirFlow
+   * This collects the B-meson properties in the hadronic B-decays
+   * It is used for the Ecms calibration in AirFlow
    */
 
   static const double realNaN = std::numeric_limits<double>::quiet_NaN();
   static const int intNaN     = std::numeric_limits<int>::quiet_NaN();
 
 
-  class eCmsCollectorModule : public CalibrationCollectorModule {
+  class EcmsCollectorModule : public CalibrationCollectorModule {
 
   public:
     /**
      * Constructor
      */
-    eCmsCollectorModule();
+    EcmsCollectorModule();
 
     /**
      * Initialize the module
@@ -53,7 +53,7 @@ namespace Belle2 {
     int    m_pdg = intNaN;      ///< B meson PDG code (can neutral or charged)
     int    m_mode = intNaN;     ///< decay mode ID
     double m_Kpid = realNaN;    ///< Kaon PID
-    double m_R2 = realNaN;
+    double m_R2 = realNaN;      ///< the R2 variable used for the continuum suppression
     double m_mD = realNaN;      ///< D meson mass
     double m_dmDstar = realNaN; ///< D*-D0 mass
 

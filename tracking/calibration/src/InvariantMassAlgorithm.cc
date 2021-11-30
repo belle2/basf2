@@ -27,7 +27,7 @@ using namespace Belle2;
 
 
 //Using boostVector collector for the input
-InvariantMassAlgorithm::InvariantMassAlgorithm() : CalibrationAlgorithm("eCmsCollector")
+InvariantMassAlgorithm::InvariantMassAlgorithm() : CalibrationAlgorithm("EcmsCollector")
 {
   setDescription("Collision invariant mass calibration algorithm");
 }
@@ -146,7 +146,7 @@ std::vector<InvariantMassMuMuCalib::Event> InvariantMassAlgorithm::getDataMuMu(c
 std::vector<InvariantMassBhadCalib::Event> InvariantMassAlgorithm::getDataHadB(const std::vector<std::string>& files)
 {
   clearCalibrationData();
-  setPrefix("eCmsCollector");
+  setPrefix("EcmsCollector");
 
   setInputFileNames(files);
   fillRunToInputFilesMap();

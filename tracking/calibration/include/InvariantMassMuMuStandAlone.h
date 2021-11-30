@@ -12,7 +12,9 @@
 #include <vector>
 #include <utility>
 #include <tuple>
+#include <functional>
 #include <TVector3.h>
+#include <TTree.h>
 #include <Eigen/Dense>
 
 //If compiled within BASF2
@@ -65,5 +67,26 @@ namespace Belle2 {
       std::vector<Event> evts,
       const std::vector<double>& splitPoints);
 
+
+    /** convolution of Gaussian with exp tails with the Gaussian smearing kernel
+        the Gaus is defined by mean, sigma, the parameters defining transition between Gaus and exp tails
+        bMean = (bL + bR) / 2 and bDelta = (bR - bL)/2, where bL or bR is the left or right transition point
+        tauL and tauR is the decay parameter of the left and right exp tail
+        The smearing Gaussian kernel is defined just by its sigma=sigmaK */
+    double gausExpConv(double mean, double sigma, double bMean, double bDelta, double tauL, double tauR, double sigmaK, double x);
+
+
+    /** Numerical integration based on https://en.wikipedia.org/wiki/Gauss%E2%80%93Kronrod_quadrature_formula
+        Function is evaluated at 15 points chosen in a clever way, so that it corresponds to the interpolation
+        by a polynomial of order 29 and calculation its area
+      @param f: 1D function to integrate
+      @param a: lower limit of the integral
+      @param b: upper limit of the integral (a <= b)
+      @return An integral of f from a to b
+    */
+    double integrate(std::function<double(double)> f, double a, double b);
+
   }
+
+
 }

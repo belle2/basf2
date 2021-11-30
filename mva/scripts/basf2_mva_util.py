@@ -17,6 +17,7 @@ import numpy as np
 
 import ROOT
 from ROOT import Belle2
+from basf2 import B2WARNING
 
 
 def tree2dict(tree, tree_columns, dict_columns=None):

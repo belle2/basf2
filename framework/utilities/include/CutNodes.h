@@ -594,7 +594,7 @@ namespace Belle2 {
       injectComparisonOperatorToStream(std::cout, m_lc_coperator);
       m_center_enode->print();
       injectComparisonOperatorToStream(std::cout, m_cr_coperator);
-      m_left_enode->print();
+      m_right_enode->print();
     }
 
     /**

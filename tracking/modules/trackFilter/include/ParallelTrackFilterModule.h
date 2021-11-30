@@ -12,6 +12,7 @@
 #include <framework/datastore/SelectSubset.h>
 
 #include <mdst/dataobjects/Track.h>
+#include <string>
 
 
 namespace Belle2 {

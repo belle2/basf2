@@ -68,7 +68,7 @@ void CDCDQMModule::initialize()
   m_cdcHits.isOptional();
   m_cdcRawHits.isOptional();
   m_trgSummary.isOptional();
-  m_Tracks.isOptional();
+  m_Tracks.isRequired();
   m_RecoTracks.isRequired();
   m_TrackFitResults.isRequired();
 }

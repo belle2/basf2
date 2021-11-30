@@ -53,7 +53,7 @@ CurlTaggerModule::CurlTaggerModule() : Module()
            "additionally bundles the particles using their genParticleIndex and tags them with extraInfo(isTruthCurl) and extraInfo(truthBundleSize).",
            false);
   addParam("train", m_TrainFlag, "flag for training the MVA or other methods if needed", false);
-  addParam("usePayloadCut", m_payloadCut, "flag for using the optimised cut value stored in the payload.", true);
+  addParam("usePayloadCut", m_payloadCutFlag, "flag for using the optimised cut value stored in the payload.", true);
   addParam("responseCut", m_ResponseCut,
            "minimum allowed selector response for a match. If usePayloadCut is true the value will be overwritten with the cut stored in the payload.",
            0.5);
@@ -95,7 +95,7 @@ void CurlTaggerModule::initialize()
 void CurlTaggerModule::beginRun()
 {
   m_Selector->beginRun();
-  if (m_payloadCut) {
+  if (m_payloadCutFlag) {
     // override the responseCut with the cut stored in the payload
     m_ResponseCut = m_Selector->getOptimalResponseCut();
   }

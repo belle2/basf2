@@ -34,7 +34,7 @@ SelectorMVA::~SelectorMVA() = default;
 void SelectorMVA::updateVariables(Particle* iPart, Particle* jPart)
 {
   if (m_TrainFlag) {
-    m_IsCurl = (Variable::genParticleIndex(iPart) == Variable::genParticleIndex(jPart) ? 1.0 : 0.0);
+    m_IsCurl = (Variable::genParticleIndex(iPart) == Variable::genParticleIndex(jPart) ? true : false);
   }
   m_ChargeProduct = iPart->getCharge() * jPart->getCharge();
 
@@ -94,7 +94,7 @@ void SelectorMVA::initialize()
     m_TTree -> Branch("TrackPhi0DiffEW", &m_TrackPhi0DiffEW, "TrackPhi0DiffEW/F");
     m_TTree -> Branch("TrackOmegaDiffEW", &m_TrackOmegaDiffEW, "TrackOmegaDiffEW/F");
 
-    m_TTree -> Branch("IsCurl", &m_IsCurl, "IsCurl/D");
+    m_TTree -> Branch("IsCurl", &m_IsCurl, "IsCurl/O");
 
     m_target_variable = "IsCurl";
     m_variables = {"PPhi", "ChargeProduct", "PtDiffEW",

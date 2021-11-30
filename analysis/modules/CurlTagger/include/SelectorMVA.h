@@ -129,7 +129,8 @@ namespace Belle2 {
       Float_t m_TrackOmegaDiffEW;
 
       /** isCurl Truth */
-      Double_t m_IsCurl;
+      Bool_t m_IsCurl;
+
     }; //selectorMVA class
 
   } // curlTagger Module namespace

@@ -64,7 +64,7 @@ namespace Belle2 {
     bool m_TrainFlag;
 
     /** flag for overriding the m_responseCut with a value retrieved from the payload */
-    bool m_payloadCut;
+    bool m_payloadCutFlag;
 
     /** preselection pt cut */
     double m_PtCut;

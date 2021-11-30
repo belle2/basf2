@@ -44,7 +44,7 @@ CurlTaggerModule::CurlTaggerModule() : Module()
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists to check for curls or use for training");
   addParam("belle", m_BelleFlag, "flag to distinuguish Belle (true) from Belle II (false) data", false);
-  addParam("ptCut", m_PtCut, "preselection pt Cut", 0.6);
+  addParam("ptCut", m_PtCut, "preselection pt Cut", 0.5);
   addParam("selectorType", m_SelectorType,
            "the name of the selector to use when deciding if two reconstructed particles are the same true particle, available : 'cut', 'mva'",
            std::string("cut"));

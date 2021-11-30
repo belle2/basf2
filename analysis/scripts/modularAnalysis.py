@@ -3160,7 +3160,7 @@ def tagCurlTracks(particleLists,
                   mcTruth=False,
                   responseCut=-1.0,
                   selectorType='cut',
-                  ptCut=0.6,
+                  ptCut=0.5,
                   expert_train=False,
                   expert_filename="",
                   path=None):

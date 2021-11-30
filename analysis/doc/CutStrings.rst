@@ -45,7 +45,7 @@ Boolean literals can be written in both python ``True/False`` and c++ ``true/fal
 
 .. _doxygen documentation: https://software.belle2.org/|release|/classBelle2_1_1GeneralCut.html
 
-.. hint:: In previous versions the `formula` MetaVariable was needed to support formulas in cuts. This is still supported but not nessesary anymore.
+.. hint:: In previous versions the `formula` MetaVariable was needed to support formulas in cuts. This is still supported but not necessary anymore.
 
 This logic can become quite powerful.
 Here are some examples.

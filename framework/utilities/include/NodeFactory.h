@@ -203,7 +203,7 @@ namespace Belle2 {
         // Extract functionName as second argument of the tuple
         std::string functionName = py::extract<std::string>(tuple[1]);
 
-        // Extract number of function arguents
+        // Extract number of function arguments
         int numArguments = py::extract<int>(tuple[2]);
 
         // Extract argument tuple

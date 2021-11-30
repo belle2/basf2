@@ -72,7 +72,7 @@ namespace Belle2 {
    *
    * For example when using the analysis VariableManager for particles, valid cuts are:
    * 1.2 < M < 1.5
-   * daughter0(M) < daughter1(M)
+   * daughter(0, M) < daughter(1, M)
    * [M > 1.5 or M < 0.5] and 0.2 < getExtraInfo(SignalProbability) < 0.7
    *
    * == and != conditions are evaluated not exactly because we deal with floating point values

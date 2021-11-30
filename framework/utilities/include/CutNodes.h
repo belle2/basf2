@@ -32,7 +32,7 @@ namespace Belle2 {
     * This allows passing the functional class templates e.g std::greater<T>,  which are templates themselves.
     *
     * In the Nodes we often have to compare two node evaluation results with each other.
-    * They are of type type `variant<double, int, bool>`. Variants cannot be compared to each other directly, you have to extract the values and compare them.
+    * They are of type `variant<double, int, bool>`. Variants cannot be compared to each other directly, you have to extract the values and compare them.
     * This gives nine different combinations for two variants.
     * C++ introduced the std::visit concept for this purpose of variant evaluation.
     * std::visit takes a Visitor class and the variants as parameters.
@@ -261,7 +261,7 @@ namespace Belle2 {
 
 
   /**
-  * Nodeclass with a two AbstractBooleanNode as children and
+  * Nodeclass with two AbstractBooleanNode as children and
   * a Boolean Operator (AND, OR)
   * Check() method evaluates the child nodes and returns
   * the result of the boolean operation.
@@ -412,7 +412,7 @@ namespace Belle2 {
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
     /**
      * Constructor
-     * @param node (const boost::python::tuple&) tuple containing a expression node
+     * @param node (const boost::python::tuple&) tuple containing an expression node
     **/
     explicit UnaryRelationalNode(Nodetuple node) : m_enode{NodeFactory::compile_expression_node<AVariableManager>(node)}
     {}
@@ -500,8 +500,8 @@ namespace Belle2 {
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
     /**
      * Constructor
-     * @param left_node (const boost::python::tuple&): tuple containing a expression node
-     * @param right_node (const boost::python::tuple&): tuple containing a expression node
+     * @param left_node (const boost::python::tuple&): tuple containing an expression node
+     * @param right_node (const boost::python::tuple&): tuple containing an expression node
      * @param coperator (ComparisonOperator): comparison operator enum value
     **/
     explicit BinaryRelationalNode(Nodetuple left_node, Nodetuple right_node, ComparisonOperator coperator)
@@ -548,7 +548,6 @@ namespace Belle2 {
           break;
         case ComparisonOperator::LESSEQUAL:
           if (not std::visit(Visitor<std::less_equal> {}, left_eval, center_eval)) return false;
-
           break;
         case ComparisonOperator::GREATER:
           if (not std::visit(Visitor<std::greater> {}, left_eval, center_eval)) return false;
@@ -571,7 +570,6 @@ namespace Belle2 {
           break;
         case ComparisonOperator::LESSEQUAL:
           if (not std::visit(Visitor<std::less_equal> {}, center_eval, right_eval)) return false;
-
           break;
         case ComparisonOperator::GREATER:
           if (not std::visit(Visitor<std::greater> {}, center_eval, right_eval)) return false;
@@ -622,9 +620,9 @@ namespace Belle2 {
     friend class NodeFactory;
     /**
     * Constructor
-    * @param left_node (const boost::python::tuple&): tuple containing a expression node
-    * @param center_node (const boost::python::tuple&): tuple containing a expression node
-    * @param right_node (const boost::python::tuple&): tuple containing a expression node
+    * @param left_node (const boost::python::tuple&): tuple containing an expression node
+    * @param center_node (const boost::python::tuple&): tuple containing an expression node
+    * @param right_node (const boost::python::tuple&): tuple containing an expression node
     * @param lc_coperator (ComparisonOperator): comparison operator enum value specifying the comparison between left and center expression
     * @param cr_coperator (ComparisonOperator): comparison operator enum value specifiying the comparison between center and right expression
     **/
@@ -670,7 +668,7 @@ namespace Belle2 {
       if (m_unary_minus) {
         if (std::holds_alternative<int>(ret)) return -1 * std::get<int>(ret);
         if (std::holds_alternative<double>(ret)) return -1.0 * std::get<double>(ret);
-        throw std::runtime_error("Attemted unary sign with boolean type value.");
+        throw std::runtime_error("Attempted unary sign with boolean type value.");
       }
       return ret;
     }
@@ -707,8 +705,8 @@ namespace Belle2 {
     friend class NodeFactory;
     /**
      * Constructor
-     * @param node (const boost::python::tuple&): tuple containing a expression node
-     * @param unary_minus (bool): flag indicating if evaluate result should be mulitplied by -1
+     * @param node (const boost::python::tuple&): tuple containing an expression node
+     * @param unary_minus (bool): flag indicating if evaluate result should be multiplied by -1
      * @param parenthesized (bool): flag indicating if expression in cut was in parenthesis
     **/
     explicit UnaryExpressionNode(Nodetuple node, bool unary_minus, bool parenthesized) : m_enode{NodeFactory::compile_expression_node<AVariableManager>(node)},
@@ -723,7 +721,7 @@ namespace Belle2 {
 
   /**
    * BinaryExpressionNode
-   * Node which connects two expression nodes with a arithemtic operation
+   * Node which connects two expression nodes with an arithemtic operation
    **/
   template<class AVariableManager>
   class BinaryExpressionNode : public AbstractExpressionNode<AVariableManager> {
@@ -868,8 +866,8 @@ namespace Belle2 {
     friend class NodeFactory;
     /**
     * Constructor
-    * @param left_node (const boost::python::tuple&): tuple containing a expression node
-    * @param right_node (const boost::python::tuple&): tuple containing a expression node
+    * @param left_node (const boost::python::tuple&): tuple containing an expression node
+    * @param right_node (const boost::python::tuple&): tuple containing an expression node
     * @param aoperation (ArithmeticOperator): arithmetic operator enum value
     **/
     explicit BinaryExpressionNode(Nodetuple left_node, Nodetuple right_node, ArithmeticOperation aoperation) : m_left_enode{NodeFactory::compile_expression_node<AVariableManager>(left_node)},
@@ -1002,7 +1000,7 @@ namespace Belle2 {
     /**
     * Constructor
     * @param name (const std::string&): name of the identifier in cut
-    * @param processVariableOnCreation (bool): flag indicating if the identifier in in the outer scope of the cut and therefore is considered as a variable which should be retrieved from AVariableManager. This is nessesary because MetaVariable arguments might not be valid variables. If every IdentiferNode tried to retrieve them at creation we get lookup errors.
+    * @param processVariableOnCreation (bool): flag indicating if the identifier is in the outer scope of the cut and therefore is considered as a variable which should be retrieved from AVariableManager. This is nessesary because MetaVariable arguments might not be valid variables. If every IdentiferNode tried to retrieve them at creation we get lookup errors.
     **/
     explicit IdentifierNode(const std::string& name, bool processVariableOnCreation) : m_name{name}, m_var{nullptr} {if (processVariableOnCreation) processVariable();}
     const std::string m_name; /**< name of the variable **/

@@ -202,7 +202,7 @@ class B2Lexer(Lexer):
     @_(r"(0(x|X)[0-9A-Fa-f]+)|\d+")  # noqa: F821
     def INTEGER(self, t):
         """
-        Scaning function for integer values
+        Scanning function for integer values
         Allows normal and hex notation (case insensitive)
 
         Parameters:

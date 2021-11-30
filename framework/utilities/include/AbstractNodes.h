@@ -13,7 +13,7 @@
 namespace Belle2 {
 
   /**
-   * A parsed cut-string naturally has a tree shape which incoorporated
+   * A parsed cut-string naturally has a tree shape which incorporates
    * the infomation of operator precedence and evaluation order
    * of the statements.
    * For this application it is sufficient to derive a syntax directed translation
@@ -35,15 +35,15 @@ namespace Belle2 {
     typedef typename AVariableManager::Var Var;
 
     /**
-     * pure virutal check function, has to be overridden in derived class
+     * pure virtual check function, has to be overridden in derived class
     **/
     virtual bool check(const Object* p) const = 0;
     /**
-     * pure virutal print function, has to be overridden in derived class
+     * pure virtual print function, has to be overridden in derived class
     **/
     virtual void print() const = 0;
     /**
-     * pure virutal decompile function, has to be overridden in derived class
+     * pure virtual decompile function, has to be overridden in derived class
     **/
     virtual std::string decompile() const = 0;
     /**
@@ -71,15 +71,15 @@ namespace Belle2 {
     typedef typename AVariableManager::Var Var;
 
     /**
-     * pure virutal evaluate function, has to be overridden in derived class
+     * pure virtual evaluate function, has to be overridden in derived class
     **/
-    virtual std::variant<double, int, bool> evaluate(const Object* p) const = 0;
+    virtual AVariableManager::VarVariant evaluate(const Object* p) const = 0;
     /**
-     * pure virutal print function, has to be overridden in derived class
+     * pure virtual print function, has to be overridden in derived class
     **/
     virtual void print() const = 0;
     /**
-     * pure virutal decompile function, has to be overridden in derived class
+     * pure virtual decompile function, has to be overridden in derived class
     **/
     virtual std::string decompile() const = 0;
     /**

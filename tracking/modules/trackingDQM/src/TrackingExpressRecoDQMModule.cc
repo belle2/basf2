@@ -46,6 +46,7 @@ TrackingExpressRecoDQMModule::TrackingExpressRecoDQMModule() : DQMHistoModuleBas
 void TrackingExpressRecoDQMModule::initialize()
 {
   DQMHistoModuleBase::initialize();
+  m_eventLevelTrackingInfo.isOptional();
 }
 
 void TrackingExpressRecoDQMModule::defineHisto()
@@ -71,6 +72,7 @@ void TrackingExpressRecoDQMModule::defineHisto()
   DefineUBResidualsVXD();
   DefineHalfShellsVXD();
 
+  DefineAbortFlagsHistograms();
   if (m_produce1Dres)
     Define1DSensors();
   if (m_produce2Dres)
@@ -100,5 +102,47 @@ void TrackingExpressRecoDQMModule::event()
 
   eventProcessor.Run();
 
+  if (m_eventLevelTrackingInfo.isValid()) {
+    if (m_eventLevelTrackingInfo->hasAnErrorFlag()) {
+      m_trackingErrorFlags->Fill(1);
+      if (m_eventLevelTrackingInfo->hasUnspecifiedTrackFindingFailure())
+        m_trackingErrorFlagsReasons->Fill(1);
+      if (m_eventLevelTrackingInfo->hasVXDTF2AbortionFlag())
+        m_trackingErrorFlagsReasons->Fill(2);
+      if (m_eventLevelTrackingInfo->hasSVDCKFAbortionFlag())
+        m_trackingErrorFlagsReasons->Fill(3);
+      if (m_eventLevelTrackingInfo->hasPXDCKFAbortionFlag())
+        m_trackingErrorFlagsReasons->Fill(4);
+      if (m_eventLevelTrackingInfo->hasSVDSpacePointCreatorAbortionFlag())
+        m_trackingErrorFlagsReasons->Fill(5);
+    } else {
+      m_trackingErrorFlags->Fill(0);
+      m_trackingErrorFlagsReasons->Fill(0);
+    }
+  } else
+    m_trackingErrorFlags->Fill(0);
 }
 
+void TrackingExpressRecoDQMModule::DefineAbortFlagsHistograms()
+{
+  // only monitor if any flag was set so only 2 bins needed
+  m_trackingErrorFlags =
+    Create("NumberTrackingErrorFlags",
+           "Tracking error summary. Mean = errors/event (should be 0 or very close to 0);Error occured yes or no;Number of events",
+           2, -0.5, 1.5, "Error occured yes or no", "Number of events");
+  m_trackingErrorFlags->GetXaxis()->SetBinLabel(1, "No Error");
+  m_trackingErrorFlags->GetXaxis()->SetBinLabel(2, "Error occured");
+
+
+  m_trackingErrorFlagsReasons =
+    Create("TrackingErrorFlagsReasons",
+           "Tracking errors by reason. A single event may fall in multiple bins.;Type of error occurred;Number of events",
+           6, -0.5, 5.5, "Type of error occurred", "Number of events");
+  m_trackingErrorFlagsReasons->GetXaxis()->SetBinLabel(1, "No Error");
+  m_trackingErrorFlagsReasons->GetXaxis()->SetBinLabel(2, "Unspecified PR");
+  m_trackingErrorFlagsReasons->GetXaxis()->SetBinLabel(3, "VXDTF2");
+  m_trackingErrorFlagsReasons->GetXaxis()->SetBinLabel(4, "SVDCKF");
+  m_trackingErrorFlagsReasons->GetXaxis()->SetBinLabel(5, "PXDCKF");
+  m_trackingErrorFlagsReasons->GetXaxis()->SetBinLabel(6, "SpacePoint");
+
+}

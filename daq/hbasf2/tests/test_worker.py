@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest import main
 import basf2
 
-from zmq_daq.test_support import HLTZMQTestCase
+from zmq_daq.test_support import HLTZMQTestCase, ZMQ_TEST_FOR_LOOPS, ZMQ_TEST_MAX_FAILURES
 
 
 class WorkerTestCase(HLTZMQTestCase):
@@ -171,4 +171,18 @@ class DyingWorkerTestCase(WorkerTestCase):
 
 
 if __name__ == '__main__':
-    main()
+    #: Number of failed for loops
+    number_of_failures = 0
+
+    for i in range(ZMQ_TEST_FOR_LOOPS):
+        try:
+            main(exit=False)
+        except AssertionError:
+            number_of_failures += 1
+
+    #: Exit message
+    message = f'Number of failed for loops: {number_of_failures}/{ZMQ_TEST_FOR_LOOPS}'
+    if number_of_failures <= ZMQ_TEST_MAX_FAILURES:
+        basf2.B2INFO(message)
+    else:
+        basf2.B2FATAL(message)

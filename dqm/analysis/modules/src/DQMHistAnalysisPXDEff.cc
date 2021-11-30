@@ -129,6 +129,11 @@ void DQMHistAnalysisPXDEffModule::initialize()
     }
   }
 
+  m_cInnerMap = new TCanvas((m_histogramDirectoryName + "/c_InnerMap").data());
+  m_cOuterMap = new TCanvas((m_histogramDirectoryName + "/c_OuterMap").data());
+  m_hInnerMap = new TH2F("hEffInnerMap", "hEffInnerMap", m_u_bins * 8, 0, m_u_bins * 8,  m_v_bins * 2, 0, m_v_bins * 2);
+  m_hOuterMap = new TH2F("hEffOuterMap", "hEffOuterMap", m_u_bins * 12, 0, m_u_bins * 12,  m_v_bins * 2, 0, m_v_bins * 2);
+
   m_hErrorLine = new TH1F("hPXDErrorlimit", "Error Limit", m_PXDModules.size(), 0, m_PXDModules.size());
   m_hWarnLine = new TH1F("hPXDWarnlimit", "Warn Limit", m_PXDModules.size(), 0, m_PXDModules.size());
   for (int i = 0; i < (int)m_PXDModules.size(); i++) {
@@ -308,10 +313,49 @@ void DQMHistAnalysisPXDEffModule::event()
           m_hEffModules[aPXDModule]->Draw("colz");
           m_cEffModules[aPXDModule]->Modified();
           m_cEffModules[aPXDModule]->Update();
+
+
+          auto h = m_hEffModules[aPXDModule]->GetPaintedHistogram();
+          int s = (2 - aPXDModule.getSensorNumber()) * m_v_bins;
+          int l = (aPXDModule.getLadderNumber() - 1) * m_u_bins;
+          if (m_hInnerMap && aPXDModule.getLayerNumber() == 1) {
+            for (int u = 0; u < m_u_bins; u++) {
+              for (int v = 0; v < m_v_bins; v++) {
+                auto b = h->GetBin(u + 1, v + 1);
+                m_hInnerMap->Fill(u + l, v + s, h->GetBinContent(b));
+              }
+            }
+          }
+          if (m_hOuterMap && aPXDModule.getLayerNumber() == 2) {
+            for (int u = 0; u < m_u_bins; u++) {
+              for (int v = 0; v < m_v_bins; v++) {
+                auto b = h->GetBin(u + 1, v + 1);
+                m_hOuterMap->Fill(u + l, v + s, h->GetBinContent(b));
+              }
+            }
+          }
         }
       }
     }
   }//One-Module histos finished
+
+  m_cInnerMap->cd();
+  m_hInnerMap->Draw("colz");
+  m_cInnerMap->Modified();
+  m_cInnerMap->Update();
+  m_cOuterMap->cd();
+  m_hOuterMap->Draw("colz");
+  m_cOuterMap->Modified();
+  m_cOuterMap->Update();
+
+  // Change: We now use one histogram for hits and matches to make
+  // sure that we have an atomic update which is otherwise not
+  // guaranteed by DQM framework
+  TString locationHits = "PXD_Eff_combined";
+  if (m_histogramDirectoryName != "") {
+    locationHits = m_histogramDirectoryName + "/" + locationHits;
+  }
+  TH1* Combined = (TH1*)findHist(locationHits.Data());
 
   double stat_data = 0;
   bool error_flag = false;
@@ -321,17 +365,17 @@ void DQMHistAnalysisPXDEffModule::event()
   double imatch = 0.0, ihit = 0.0;
   int ieff = 0;
 
-  std::map <VxdID, bool> updated{}; // init to false
+  std::map <VxdID, bool> updated{}; // init to false, keep track of updated histograms
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    VxdID& aModule = m_PXDModules[i];
     int j = i + 1;
 
-    if (mapHits[aModule] == nullptr || mapMatches[aModule] == nullptr) {
+    if (Combined == nullptr) {
       m_hEffAll->SetPassedEvents(j, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
       m_hEffAll->SetTotalEvents(j, 0);
     } else {
-      double nmatch = mapMatches[aModule]->Integral(); // GetEntries()?
-      double nhit = mapHits[aModule]->Integral();
+      VxdID& aModule = m_PXDModules[i];
+      double nmatch = Combined->GetBinContent(i * 2 + 2);
+      double nhit = Combined->GetBinContent(i * 2 + 1);
       if (nmatch > 10 && nhit > 10) { // could be zero, too
         imatch += nmatch;
         ihit +=  nhit;
@@ -368,9 +412,8 @@ void DQMHistAnalysisPXDEffModule::event()
       if (j == 6) continue; // workaround for 1.3.2 module
 
       // get the errors and check for limits for each bin seperately ...
-      /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
 
-      if (nhit > 20) {
+      if (nhit > 50) {
         error_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
                        m_errorlevelmod[aModule]); // error if upper error value is below limit
         warn_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <

@@ -11,7 +11,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include <memory>
-#include <vector>
+
 
 namespace Belle2 {
   namespace SoftwareTrigger {
@@ -103,7 +103,7 @@ namespace Belle2 {
       SoftwareTriggerVariable* getVariable(const std::string& variableName);
 
       /**
-       * The GeneralCut parses MetaVariables into it's variable name and arguments.
+       * The GeneralCut parses MetaVariables into its variable name and arguments.
        * GeneralCut requires any VariableManager to get a variable through this parsed state.
        * This overload combines the variableName and vector of strings to the original Metavariable call
        * using boost::algorithm::join and passes it to getVariable(const std::string& variableName)

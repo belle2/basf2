@@ -6,8 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
-
 #include <memory>
+#include <vector>
 
 namespace Belle2 {
   namespace SoftwareTrigger {

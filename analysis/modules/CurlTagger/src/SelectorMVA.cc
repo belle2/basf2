@@ -34,7 +34,7 @@ SelectorMVA::~SelectorMVA() = default;
 void SelectorMVA::updateVariables(Particle* iPart, Particle* jPart)
 {
   if (m_TrainFlag) {
-    m_IsCurl = (Variable::genParticleIndex(iPart) == Variable::genParticleIndex(jPart) ? true : false);
+    m_IsCurl = Variable::genParticleIndex(iPart) == Variable::genParticleIndex(jPart);
   }
   m_ChargeProduct = iPart->getCharge() * jPart->getCharge();
 
@@ -106,21 +106,19 @@ void SelectorMVA::initialize()
     // normal application
     m_weightfile_representation = std::make_unique<DBObjPtr<DatabaseRepresentationOfWeightfile>>(
                                     MVA::makeSaveForDatabase(m_identifier));
+    (*m_weightfile_representation.get()).addCallback([this]() { initializeMVA();});
+    initializeMVA();
   }
 }
 
-void SelectorMVA::beginRun()
+void SelectorMVA::initializeMVA()
 {
-  if (m_TrainFlag) {
-    return;
-  }
-  if (m_weightfile_representation->hasChanged()) {
-    std::stringstream ss((*m_weightfile_representation)->m_data);
-    m_weightfile = MVA::Weightfile::loadFromStream(ss);
-    m_weightfile.getOptions(m_generalOptions);
-    m_expert.load(m_weightfile);
-  }
+  std::stringstream ss((*m_weightfile_representation)->m_data);
+  m_weightfile = MVA::Weightfile::loadFromStream(ss);
+  m_weightfile.getOptions(m_generalOptions);
+  m_expert.load(m_weightfile);
 }
+
 
 float SelectorMVA::getOptimalResponseCut()
 {

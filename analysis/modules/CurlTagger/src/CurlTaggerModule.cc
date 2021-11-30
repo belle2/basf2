@@ -24,7 +24,6 @@
 #include <analysis/modules/CurlTagger/SelectorCut.h>
 #include <analysis/modules/CurlTagger/SelectorMVA.h>
 
-
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -94,7 +93,6 @@ void CurlTaggerModule::initialize()
 
 void CurlTaggerModule::beginRun()
 {
-  m_Selector->beginRun();
   if (m_payloadCutFlag) {
     // override the responseCut with the cut stored in the payload
     m_ResponseCut = m_Selector->getOptimalResponseCut();

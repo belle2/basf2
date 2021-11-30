@@ -38,9 +38,6 @@ namespace Belle2 {
       /** initialise selector if needed */
       virtual void initialize() {};
 
-      /** run specific changes for selector if needed */
-      virtual void beginRun() {};
-
       /** finalise selector if needed */
       virtual void finalize() {};
 

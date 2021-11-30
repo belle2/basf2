@@ -48,14 +48,14 @@ namespace Belle2 {
       /** initialize whatever needs to be initialized (root file etc)  */
       virtual void initialize() override;
 
-      /** run specific changes, check for changes to the payload*/
-      virtual void beginRun() override;
-
       /** collect training data and save to a root file*/
       virtual void collectTrainingInfo(Particle* iPart, Particle* jPart) override;
 
       /** finalize whatever needs to be finalized (train the MVA) */
       virtual void finalize() override;
+
+      /** initialize the MVA Expert */
+      void initializeMVA();
 
     private:
 

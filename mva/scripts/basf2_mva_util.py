@@ -49,8 +49,8 @@ def calculate_roc_auc(p, t):
     @param p np.array filled with the probability output of a classifier
     @param t np.array filled with the target (0 or 1)
     """
-    print(
-        "\033[93mAttention: calculate_roc_auc\033[00m has been deprecated and will be removed in future.\n"
+    B2WARNING(
+        "\033[93mcalculate_roc_auc\033[00m has been deprecated and will be removed in future.\n"
         "This change has been made as calculate_roc_auc returned the area under the efficiency-purity curve\n"
         "not the efficiency-background retention curve as expected by users.\n"
         "Please replace calculate_roc_auc with:\n\n"

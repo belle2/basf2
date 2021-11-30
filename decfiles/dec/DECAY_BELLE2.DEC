@@ -82,6 +82,10 @@
 #
 # June 2021 Automated: Converted PYTHIA ids
 #   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
+#
+# Dec. 2021, H. Junkerkalefeld (h.junkerkalefeld@uni-bonn.de)
+#   Updated tau BFs to PDG values as discussed in https://agira.desy.de/browse/BII-8964
+
 
 Define qoverp_incohMix_B_s0 1.0
 Define dm_incohMix_B_s0 17.8e12
@@ -7850,66 +7854,66 @@ Enddecay
 
 # tau-
 Decay tau-
-0.154002925   e-  anti-nu_e  nu_tau                        TAULNUNU;
-0.170000000   mu-  anti-nu_mu  nu_tau                      TAULNUNU;
-0.109100000   pi-  nu_tau                                  TAUSCALARNU;
+0.178200000   e-  anti-nu_e  nu_tau                        TAULNUNU;
+0.173900000   mu-  anti-nu_mu  nu_tau                      TAULNUNU;
+0.108200000   pi-  nu_tau                                  TAUSCALARNU;
 0.006960000   K-  nu_tau                                   TAUSCALARNU;
-0.255100000   pi-  pi0  nu_tau                             TAUHADNU -0.108 0.775 0.149 1.364 0.400;
+0.254900000   pi-  pi0  nu_tau                             TAUHADNU -0.108 0.775 0.149 1.364 0.400;
 0.001124109   nu_tau  gamma  pi-  pi0                      PYTHIA 21;
-0.079301562   pi0  pi0  pi-  nu_tau                        TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
-0.000385656   nu_tau  K-  pi0  pi0                         PYTHIA 21;
-0.008508640   nu_tau  pi-  pi0  pi0  pi0                   PYTHIA 21;
-0.000864699   nu_tau  pi-  pi0  pi0  pi0  pi0              PHSP;
+0.092600000   pi0  pi0  pi-  nu_tau                        TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
+0.000650000   nu_tau  K-  pi0  pi0                         PYTHIA 21;
+0.010400000   nu_tau  pi-  pi0  pi0  pi0                   PYTHIA 21;
+0.001100000   nu_tau  pi-  pi0  pi0  pi0  pi0              PHSP;
 #0.2515         rho- nu_tau                                 TAUVECTORNU;
 #0.1790         a_1-  nu_tau                                TAUVECTORNU;
 
 # Modes with K0s
-0.000319939   nu_tau  pi-  anti-K0                         PYTHIA 21;
-0.001590000   nu_tau  K-  K0                               PYTHIA 21;
-0.001700000   nu_tau  K0  pi-  anti-K0                     PYTHIA 21;
-0.001590000   nu_tau  K-  pi0  K0                          PYTHIA 21;
-0.004000000   nu_tau  pi-  anti-K0  pi0                    PYTHIA 21;
+0.008380000   nu_tau  pi-  anti-K0                         PYTHIA 21;
+0.001486000   nu_tau  K-  K0                               PYTHIA 21;
+0.001550000   nu_tau  K0  pi-  anti-K0                     PYTHIA 21;
+0.001500000   nu_tau  K-  pi0  K0                          PYTHIA 21;
+0.003820000   nu_tau  pi-  anti-K0  pi0                    PYTHIA 21;
 
 # 3 Charged Particles
-0.093200000   pi-  pi-  pi+  nu_tau                        TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
-0.046100000   nu_tau  pi-  pi+  pi-  pi0                   PYTHIA 21;
-0.000501526   nu_tau  pi-  pi-  pi+  pi0  pi0              PHSP;
-0.000155646   nu_tau  pi-  pi-  pi+  pi0  pi0  pi0         PHSP;
-0.003420000   nu_tau  K-  pi+  pi-                         PYTHIA 21;
-0.001360000   nu_tau  K-  pi+  pi-  pi0                    PYTHIA 21;
-0.001400000   nu_tau  K-  pi-  K+                          PYTHIA 21;
-0.000015800   nu_tau  K-  K+  K-                           PYTHIA 21;
+0.090200000   pi-  pi-  pi+  nu_tau                        TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
+0.044900000   nu_tau  pi-  pi+  pi-  pi0                   PYTHIA 21;
+0.000505000   nu_tau  pi-  pi-  pi+  pi0  pi0              PHSP;
+0.000170000   nu_tau  pi-  pi-  pi+  pi0  pi0  pi0         PHSP;
+0.002930000   nu_tau  K-  pi+  pi-                         PYTHIA 21;
+0.000370000   nu_tau  K-  pi+  pi-  pi0                    PYTHIA 21;
+0.001435000   nu_tau  K-  pi-  K+                          PYTHIA 21;
+0.000022000   nu_tau  K-  K+  K-                           PYTHIA 21;
 
 # 5 Charged Particles
-0.000700406   nu_tau  pi-  pi-  pi-  pi+  pi+              PHSP;
-0.000129705   nu_tau  pi-  pi-  pi-  pi+  pi+  pi0         PHSP;
+0.000775000   nu_tau  pi-  pi-  pi-  pi+  pi+              PHSP;
+0.000111000   nu_tau  pi-  pi-  pi-  pi+  pi+  pi0         PHSP;
 
 # Misc other modes
 0.012000000   K*-  nu_tau                                  TAUVECTORNU;
 0.001390000   nu_tau  eta  pi-  pi0                        PYTHIA 21;
-0.003199387   nu_tau  pi-  omega  pi0                      PYTHIA 21;
+0.004100000   nu_tau  pi-  omega  pi0                      PYTHIA 21;
 0.000410000   nu_tau  K-  omega                            PYTHIA 21;
 0.002200000   anti-K*0  pi-  nu_tau                        PHSP;
 0.002100000   K*0  K-  nu_tau                              PHSP;
 0.000034000   phi  pi-  nu_tau                             PHSP;
-0.000037000   phi  K-  nu_tau                              PHSP;
-0.003600000   mu-  anti-nu_mu  nu_tau  gamma               PHSP;
-0.017500000   e-  anti-nu_e  nu_tau  gamma                 PHSP;
-0.004290000   K-  pi0  nu_tau                              PHSP;
-0.002200000   anti-K0  rho-  nu_tau                        PHSP;
+0.000044000   phi  K-  nu_tau                              PHSP;
+0.003670000   mu-  anti-nu_mu  nu_tau  gamma               PHSP;
+0.018300000   e-  anti-nu_e  nu_tau  gamma                 PHSP;
+0.004330000   K-  pi0  nu_tau                              PHSP;
+0.001700000   anti-K0  rho-  nu_tau                        PHSP;
 0.000260000   pi-  anti-K0  pi0  pi0  nu_tau               PHSP;
-0.000310000   pi-  K0  anti-K0  pi0  nu_tau                PHSP;
+0.000360000   pi-  K0  anti-K0  pi0  nu_tau                PHSP;
 0.000061000   K-  K+  pi-  pi0  nu_tau                     PHSP;
 0.000028000   e-  e-  e+  anti-nu_e  nu_tau                PHSP;
 0.004700000   K_1-  nu_tau                                 PHSP;
 0.001700000   K'_1-  nu_tau                                PHSP;
 0.001500000   K'*-  nu_tau                                 PHSP;
-0.000150000   eta  pi-  pi0  pi0  nu_tau                   PHSP;
-0.000161000   eta  K-  nu_tau                              PHSP;
+0.000200000   eta  pi-  pi0  pi0  nu_tau                   PHSP;
+0.000155000   eta  K-  nu_tau                              PHSP;
 0.000138000   eta  K*-  nu_tau                             PHSP;
 0.000048000   eta  K-  pi0  nu_tau                         PHSP;
-0.000093000   eta  anti-K0  pi-  nu_tau                    PHSP;
-0.000360000   f_1  pi-  nu_tau                             PHSP;
+0.000094000   eta  anti-K0  pi-  nu_tau                    PHSP;
+0.000390000   f_1  pi-  nu_tau                             PHSP;
 Enddecay
 
 CDecay tau+

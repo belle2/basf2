@@ -32,13 +32,8 @@ namespace Belle2 {
     /** init the module */
     virtual void initialize() override;
 
-    /** called at beginning of run */
-    virtual void beginRun() override;
-
 
   private:
-
-    void initializeSelectSubset();
 
     bool isSelected(const Track* track); /**< determine if the track satisfies the selection criteria */
 

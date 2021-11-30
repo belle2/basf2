@@ -31,9 +31,26 @@ class CheckData(basf2.Module):
         print("nTracks: " + str(self.tracks.getEntries()))
         print("nECLClusters: " + str(self.clusters.getEntries()))
 
-#        for track in self.tracks:
-#            for cluster in track.getRelationsTo('ECLClusters'):
-#                print(track.getArrayIndex(), '->', cluster.getArrayIndex())
+        for track in self.tracks:
+            for cluster in track.getRelationsTo('ECLClusters'):
+                print(track.getArrayIndex(), '->', cluster.getArrayIndex())
+
+
+class CheckIndices(basf2.Module):
+
+    """check output of CreateData"""
+
+    def initialize(self):
+        """reimplementation"""
+
+        self.indices = Belle2.PyStoreObj('MergedArrayIndices')
+
+    def event(self):
+        """reimplementation"""
+
+        print(self.name())
+        print("nTracks of main path: " + str(self.indices.getIndex("Tracks")))
+        print("nECLClusters of main path " + str(self.indices.getIndex("ECLClusters")))
 
 
 main = basf2.Path()
@@ -73,7 +90,9 @@ main.add_independent_merge_path(
 # 'ECLClustersToECLClusters'
 # ])
 #
+
 main.add_module(CheckData()).set_name("checkdata_merged")
+main.add_module(CheckIndices()).set_name("checkindices_merged")
 
 # output
 output = basf2.register_module('RootOutput')

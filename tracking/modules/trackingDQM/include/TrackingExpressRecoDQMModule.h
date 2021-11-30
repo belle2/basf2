@@ -12,6 +12,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <TH1.h>
+#include <string>
 
 namespace Belle2 {
 

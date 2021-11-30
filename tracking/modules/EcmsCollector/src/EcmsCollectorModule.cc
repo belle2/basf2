@@ -34,9 +34,7 @@ REG_MODULE(EcmsCollector)
 //                 Implementation
 //-----------------------------------------------------------------
 
-EcmsCollectorModule::EcmsCollectorModule() : CalibrationCollectorModule(),
-  m_exp(-99), m_run(-99), m_evt(-99),
-  m_time(-99)
+EcmsCollectorModule::EcmsCollectorModule() : CalibrationCollectorModule()
 {
   //Set module properties
 
@@ -64,7 +62,6 @@ void EcmsCollectorModule::prepare()
   tree->Branch<double>("R2", &m_R2);
   tree->Branch<double>("mD", &m_mD);
   tree->Branch<double>("dmDstar", &m_dmDstar);
-  //tree->Branch<double>("cmsE", &m_cmsE);
 
 
   // We register the objects so that our framework knows about them.
@@ -73,6 +70,25 @@ void EcmsCollectorModule::prepare()
   registerObject<TTree>(objectName.Data(), tree);
 }
 
+/** select the best candidate based on the pValue */
+static Particle* getBest(const StoreObjPtr<ParticleList>& B)
+{
+  double pValBest = -1;
+  double pValInd  = -1;
+  for (unsigned i = 0; i < B->getListSize(); ++i) {
+    const Particle* part = B->getParticle(i);
+    if (!part) continue;
+    double pVal = part->getPValue();
+    if (pVal > pValBest) {
+      pValBest = pVal;
+      pValInd  = i;
+    }
+  }
+
+  if (pValInd < 0) return nullptr;
+
+  return B->getParticle(pValInd);
+}
 
 void EcmsCollectorModule::collect()
 {
@@ -88,11 +104,10 @@ void EcmsCollectorModule::collect()
 
   const Particle* Bpart = nullptr;
 
-  //TODO select the best candidate
-  if (B0.isValid() && B0->getParticle(0)) {
-    Bpart = B0->getParticle(0);
-  } else if (Bm.isValid() && Bm->getParticle(0)) {
-    Bpart = Bm->getParticle(0);
+  if (B0.isValid()) {
+    Bpart = getBest(B0);
+  } else if (Bm.isValid()) {
+    Bpart = getBest(Bm);
   }
 
   if (!Bpart) return;

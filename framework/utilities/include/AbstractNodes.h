@@ -73,7 +73,7 @@ namespace Belle2 {
     /**
      * pure virtual evaluate function, has to be overridden in derived class
     **/
-    virtual AVariableManager::VarVariant evaluate(const Object* p) const = 0;
+    virtual typename AVariableManager::VarVariant evaluate(const Object* p) const = 0;
     /**
      * pure virtual print function, has to be overridden in derived class
     **/

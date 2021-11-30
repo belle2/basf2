@@ -74,6 +74,10 @@ namespace {
     /// Use MockvariableType as Variables.
     using Var = MockVariableType;
 
+    /** Typedef for variable return type, can either be double, int or bool in std::variant */
+    typedef std::variant<double, int, bool> VarVariant;
+
+
     /// Singleton.
     static MockVariableManager& Instance()
     {

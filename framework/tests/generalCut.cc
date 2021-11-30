@@ -44,6 +44,8 @@ namespace {
     using Object = MockObjectType;
     /// Use MockvariableType as Variables.
     using Var = MockVariableType;
+    /// Define Node evaluation type
+    typedef std::variant<double, int, bool> VarVariant;
 
     /// Singleton.
     static MockVariableManager& Instance()

@@ -11,6 +11,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include <memory>
+#include <variant>
 
 
 namespace Belle2 {
@@ -84,6 +85,9 @@ namespace Belle2 {
        * precompiled map of values.
        */
       typedef SoftwareTriggerVariable Var;
+
+      /** Typedef for variable return type, can either be double, int or bool in std::variant */
+      typedef std::variant<double, int, bool> VarVariant;
 
       /**
        * Make this variable manager a singleton and get the only single instance of the manager.

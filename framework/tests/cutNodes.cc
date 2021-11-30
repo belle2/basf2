@@ -20,7 +20,7 @@ using namespace Belle2;
 namespace {
   namespace py = boost::python;
   using VarVariant = Belle2::Variable::Manager::VarVariant;
-/// Class to mock objects for out variable manager.
+/// Class to mock objects for our variable manager.
   struct MockObjectType {
     /// Stupid singlevalued object.
     explicit MockObjectType(const double& d) : m_value{d} {}
@@ -28,10 +28,11 @@ namespace {
     explicit MockObjectType(const bool& b) : m_value{b} {}
     VarVariant m_value;
   };
-
+  /// Function forward declaration for mocking a MetaVariable
   std::function<VarVariant(const MockObjectType*)> mockMetaVariable(const std::vector<std::string>& arguments);
+
   /**
-   *  Class to mock variables for out variable manager.
+   *  Class to mock variables for our variable manager.
    *  This is also the minimal interface a variable must have,
    *  to be used in the GeneralCut.
    */
@@ -72,6 +73,8 @@ namespace {
     using Object = MockObjectType;
     /// Use MockvariableType as Variables.
     using Var = MockVariableType;
+    /// Define Node evaluation type
+    using VarVariant = Belle2::Variable::Manager::VarVariant;
 
     /// Singleton.
     static MockVariableManager& Instance()

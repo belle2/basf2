@@ -356,7 +356,7 @@ namespace Belle2 {
     */
     bool check(const Object* p) const override
     {
-      std::variant<double, int, bool> ret = m_enode->evaluate(p);
+      typename AVariableManager::VarVariant ret = m_enode->evaluate(p);
       if (std::holds_alternative<bool>(ret)) {
         return std::get<bool>(ret);
       } else if (std::holds_alternative<int>(ret)) {
@@ -440,8 +440,8 @@ namespace Belle2 {
     bool check(const Object* p) const override
     {
       // Get std::variant values of children node
-      std::variant<double, int, bool> left_eval = m_left_enode->evaluate(p);
-      std::variant<double, int, bool> right_eval = m_right_enode->evaluate(p);
+      typename AVariableManager::VarVariant left_eval = m_left_enode->evaluate(p);
+      typename AVariableManager::VarVariant right_eval = m_right_enode->evaluate(p);
       switch (m_coperator) {
         case ComparisonOperator::EQUALEQUAL:
           return std::visit(EqualVisitor{}, left_eval, right_eval);
@@ -535,9 +535,9 @@ namespace Belle2 {
      */
     bool check(const Object* p) const override
     {
-      std::variant<double, int, bool> left_eval = m_left_enode->evaluate(p);
-      std::variant<double, int, bool> center_eval = m_center_enode->evaluate(p);
-      std::variant<double, int, bool> right_eval = m_right_enode->evaluate(p);
+      typename AVariableManager::VarVariant left_eval = m_left_enode->evaluate(p);
+      typename AVariableManager::VarVariant center_eval = m_center_enode->evaluate(p);
+      typename AVariableManager::VarVariant right_eval = m_right_enode->evaluate(p);
 
       switch (m_lc_coperator) {
         case ComparisonOperator::EQUALEQUAL:
@@ -662,9 +662,9 @@ namespace Belle2 {
      * return negative result if m_unary_minus true
      * @param p pointer to the object, that should be checked.
     **/
-    std::variant<double, int, bool> evaluate(const Object* p) const override
+    typename AVariableManager::VarVariant evaluate(const Object* p) const override
     {
-      std::variant<double, int, bool> ret = m_enode->evaluate(p);
+      typename AVariableManager::VarVariant ret = m_enode->evaluate(p);
       if (m_unary_minus) {
         if (std::holds_alternative<int>(ret)) return -1 * std::get<int>(ret);
         if (std::holds_alternative<double>(ret)) return -1.0 * std::get<double>(ret);
@@ -735,9 +735,9 @@ namespace Belle2 {
     * apply arithmetic operation to the evaluations
     * @param p pointer to the object, that should be checked.
     **/
-    std::variant<double, int, bool> evaluate(const Object* p) const override
+    typename AVariableManager::VarVariant evaluate(const Object* p) const override
     {
-      std::variant<double, int, bool> l_val, r_val, ret;
+      typename AVariableManager::VarVariant l_val, r_val, ret;
       l_val = m_left_enode->evaluate(p);
       r_val = m_right_enode->evaluate(p);
       switch (m_aoperation) {
@@ -902,10 +902,10 @@ namespace Belle2 {
     * return m_value as a variant<double, int, bool>
     * @param p pointer to the object, that should be checked. Not needed here since we always return the constant m_value.
     **/
-    std::variant<double, int, bool> evaluate(const Object* p) const override
+    typename AVariableManager::VarVariant evaluate(const Object* p) const override
     {
       (void)p;
-      std::variant<double, int, bool> ret{m_value};
+      typename AVariableManager::VarVariant ret{m_value};
       return ret;
     }
     /**
@@ -953,7 +953,7 @@ namespace Belle2 {
      * evaluate m_var with p and return the result
      * @param p pointer to the object, for which m_var should be evaluated.
     **/
-    std::variant<double, int, bool> evaluate(const Object* p) const override
+    typename AVariableManager::VarVariant evaluate(const Object* p) const override
     {
       if (m_var != nullptr) {
         return m_var->function(p);
@@ -1026,7 +1026,7 @@ namespace Belle2 {
     * evaluate m_var with p and return the result
     * @param p pointer to the object, for which m_var should be evaluated.
     **/
-    std::variant<double, int, bool> evaluate(const Object* p) const override
+    typename AVariableManager::VarVariant evaluate(const Object* p) const override
     {
       return m_var->function(p);
     }

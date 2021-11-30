@@ -56,12 +56,9 @@ void CDCDQMModule::defineHisto()
   m_hNEvents = new TH1F("hNEvents", "hNEvents", 10, 0, 10);
   m_hNEvents->GetXaxis()->SetBinLabel(1, "number of events");
   m_hOcc = new TH1F("hOcc", "hOccupancy", 150, 0, 1.5);
-  m_hADC = new TH2F("hADC", "hADC", 300, 0, 300, 1000, 0, 1000);
-  m_hADCTOTCut = new TH2F("hADCTOTCut", "hADCTOTCut", 300, 0, 300, 1000, 0, 1000);
+  m_hADC = new TH2F("hADC", "hADC", 300, 0, 300, 200, 0, 1000);
   m_hTDC = new TH2F("hTDC", "hTDC", 300, 0, 300, 1000, 4200, 5200);
   m_hHit = new TH2F("hHit", "hHit", 56, 0, 56, 400, 0, 400);
-  m_hADCTrack = new TH2F("hADCTrack", "hADCTrack", 300, 0, 300, 1000, 0, 1000);
-  m_hTDCTrack = new TH2F("hTDCTrack", "hTDCTrack", 300, 0, 300, 1000, 4200, 5200);
   oldDir->cd();
 }
 
@@ -71,7 +68,7 @@ void CDCDQMModule::initialize()
   m_cdcHits.isOptional();
   m_cdcRawHits.isOptional();
   m_trgSummary.isOptional();
-  m_Tracks.isRequired();
+  m_Tracks.isOptional();
   m_RecoTracks.isRequired();
   m_TrackFitResults.isRequired();
 }
@@ -81,12 +78,9 @@ void CDCDQMModule::beginRun()
 
   m_hNEvents->Reset();
   m_hADC->Reset();
-  m_hADCTOTCut->Reset();
   m_hTDC->Reset();
   m_hHit->Reset();
   m_hOcc->Reset();
-  m_hADCTrack->Reset();
-  m_hTDCTrack->Reset();
 }
 
 void CDCDQMModule::event()
@@ -105,21 +99,6 @@ void CDCDQMModule::event()
   }
   m_nEvents += 1;
   m_hOcc->Fill(static_cast<float>(m_cdcHits.getEntries()) / nWires);
-
-  for (const auto& raw : m_cdcRawHits) {
-    int bid = raw.getBoardId();
-    int adc = raw.getFADC();
-    int tdc = raw.getTDC();
-    int tot = raw.getTOT();
-    m_hADC->Fill(bid, adc);
-    if (tot > 4) {
-      m_hADCTOTCut->Fill(bid, adc);
-    }
-
-    if (adc > 50 && tot > 1) {
-      m_hTDC->Fill(bid, tdc);
-    }
-  }
 
   for (const auto& hit : m_cdcHits) {
     int lay = hit.getICLayer();
@@ -157,10 +136,10 @@ void CDCDQMModule::event()
       WireID wireid(lay, IWire);
       unsigned short bid = cdcgeo.getBoardID(wireid);
       if (tot > 4) {
-        m_hADCTrack->Fill(bid, adc);
+        m_hADC->Fill(bid, adc);
       }
       if (adc > 50 && tot > 1) {
-        m_hTDCTrack->Fill(bid, tdc);
+        m_hTDC->Fill(bid, tdc);
       }
     }
   }

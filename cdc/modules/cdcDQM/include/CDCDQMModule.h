@@ -92,12 +92,8 @@ namespace Belle2 {
 
     Long64_t m_nEvents = 0;          /**< Number of events processed */
     TH1F* m_hNEvents = nullptr;      /**< Histogram of num. events */
-    TH2F* m_hADC  = nullptr;         /**< Histogram of ADC for all boards (0-299) */
-    TH2F* m_hADCTOTCut = nullptr;    /**< Histogram of ADC with tot cut for all boards (0-299) */
-    TH2F* m_hTDC = nullptr;          /**< Histogram of TDC for all boards (0-299) */
-    TH2F* m_hADCTrack = nullptr;     /**< Histogram of ADC with track associated hits for all boards (0-299) */
-    TH2F* m_hTDCTrack = nullptr;     /**< Histogram of TDC with track associated hits for all boards (0-299) */
-
+    TH2F* m_hADC  = nullptr;         /**< Histogram of ADC with track associated hits for all boards (0-299) */
+    TH2F* m_hTDC = nullptr;          /**< Histogram of TDC with track associated hits for all boards (0-299) */
     TH2F* m_hHit  = nullptr;         /**< Histogram of hits for all layers (0-55) */
     TH1F* m_hOcc = nullptr;          /**< Histogram of occupancy */
     int m_minHits;                   /**< Minimum hits for processing. */

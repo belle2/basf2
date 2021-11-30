@@ -111,7 +111,7 @@ namespace Belle2 {
       Py_Initialize();
       try {
         py::object b2parser_namespace = py::import("b2parser");
-        py::tuple tuple = py::extract<boost::python::tuple>(b2parser_namespace.attr("parse")(cut));
+        py::tuple tuple = py::extract<py::tuple>(b2parser_namespace.attr("parse")(cut));
         return std::unique_ptr<GeneralCut>(new GeneralCut(tuple));
       } catch (py::error_already_set&) {
         PyErr_Print();

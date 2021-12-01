@@ -101,20 +101,6 @@ void DQMHistAnalysisTOPModule::beginRun()
   //B2DEBUG(20, "DQMHistAnalysisTOP: beginRun called.");
 }
 
-TCanvas* DQMHistAnalysisTOPModule::find_canvas(TString canvas_name)
-{
-  TIter nextckey(gROOT->GetListOfCanvases());
-  TObject* cobj = NULL;
-
-  while ((cobj = (TObject*)nextckey())) {
-    if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      if (cobj->GetName() == canvas_name)
-        break;
-    }
-  }
-  return (TCanvas*)cobj;
-}
-
 TH1* DQMHistAnalysisTOPModule::find_histo_in_canvas(TString histo_name)
 {
   StringList s = StringUtil::split(histo_name.Data(), '/');

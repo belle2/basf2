@@ -4,6 +4,7 @@
 # Test LHEReader and LHEInputModule
 
 import os
+import sys
 import math
 from ROOT import TFile
 from pdg import add_particle
@@ -11,7 +12,6 @@ from basf2 import create_path, register_module, process, print_params, find_file
 from modularAnalysis import fillParticleListsFromMC
 from modularAnalysis import variablesToNtuple as v2nt
 from variables import variables as vm
-from beamparameters import add_beamparameters
 from tempfile import TemporaryDirectory
 
 # check that the file exists, if not: skip the test
@@ -19,7 +19,7 @@ inputfile = find_file('generators/tests/event.lhe')
 if len(inputfile) == 0:
     sys.stderr.write(
         'TEST SKIPPED: input file ' +
-        filepath +
+        inputfile +
         ' not found.')
     sys.exit(-1)
 

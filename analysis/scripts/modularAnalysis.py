@@ -1755,13 +1755,14 @@ def variablesToExtraInfo(particleList, variables, option=0, path=None):
     For each particle in the input list the selected variables are saved in an extra-info field with the given name.
     Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.
 
-    An existing extra info with the same name will be overwritten if the new
-    value is lower / will never be overwritten / will be overwritten if the
-    new value is higher / will always be overwritten (-1/0/1/2).
-
-    @param particleList  The input ParticleList
-    @param variables     Dictionary of Variables and extraInfo names.
-    @param path          modules are added to this path
+    Parameters:
+        particleList (str):         The input ParticleList
+        variables (dict[str,str]):  Dictionary of Variables (key) and extraInfo names (value).
+        option (int):               Option to overwrite an existing extraInfo. Choose among -1, 0, 1, 2.
+                                    An existing extra info with the same name will be overwritten if the new
+                                    value is lower / will never be overwritten / will be overwritten if the
+                                    new value is higher / will always be overwritten (option = -1/0/1/2).
+        path (basf2.Path):          modules are added to this path
     """
 
     mod = register_module('VariablesToExtraInfo')
@@ -1778,15 +1779,15 @@ def variablesToDaughterExtraInfo(particleList, decayString, variables, option=0,
     are saved in an extra-info field with the given name. In other words, the property of mother is saved as extra-info
     to specified daughter particle.
 
-    An existing extra info with the same name will be overwritten if the new
-    value is lower / will never be overwritten / will be overwritten if the
-    new value is higher / will always be overwritten (-1/0/1/2).
-
-    @param particleList  The input ParticleList
-    @param decayString   Decay string that specifies to which daughter the extra info should be appended
-    @param variables     Dictionary of Variables and extraInfo names.
-    @param option        Various options for overwriting
-    @param path          modules are added to this path
+    Parameters:
+        particleList (str):         The input ParticleList
+        decayString (str):          Decay string that specifies to which daughter the extra info should be appended
+        variables (dict[str,str]):  Dictionary of Variables (key) and extraInfo names (value).
+        option (int):               Option to overwrite an existing extraInfo. Choose among -1, 0, 1, 2.
+                                    An existing extra info with the same name will be overwritten if the new
+                                    value is lower / will never be overwritten / will be overwritten if the
+                                    new value is higher / will always be overwritten (option = -1/0/1/2).
+        path (basf2.Path):          modules are added to this path
     """
 
     mod = register_module('VariablesToExtraInfo')
@@ -1803,13 +1804,14 @@ def variablesToEventExtraInfo(particleList, variables, option=0, path=None):
     For each particle in the input list the selected variables are saved in an event-extra-info field with the given name,
     Can be used to save MC truth information, for example, in a ntuple of reconstructed particles.
 
-    An existing extra info with the same name will be overwritten if the new
-    value is lower / will never be overwritten / will be overwritten if the
-    new value is higher / will always be overwritten (-1/0/1/2).
-
-    @param particleList  The input ParticleList
-    @param variables     Dictionary of Variables and extraInfo names.
-    @param path          modules are added to this path
+    Parameters:
+        particleList (str):         The input ParticleList
+        variables (dict[str,str]):  Dictionary of Variables (key) and extraInfo names (value).
+        option (int):               Option to overwrite an existing extraInfo. Choose among -1, 0, 1, 2.
+                                    An existing extra info with the same name will be overwritten if the new
+                                    value is lower / will never be overwritten / will be overwritten if the
+                                    new value is higher / will always be overwritten (option = -1/0/1/2).
+        path (basf2.Path):          modules are added to this path
     """
 
     mod = register_module('VariablesToEventExtraInfo')
@@ -1826,9 +1828,10 @@ def variableToSignalSideExtraInfo(particleList, varToExtraInfo, path):
     particle) as an extra info to the particle related to current ROE.
     Should be used only in the for_each roe path.
 
-    @param particleList  The input ParticleList
-    @param varToExtraInfo Dictionary of Variables and extraInfo names.
-    @param path          modules are added to this path
+    Parameters:
+        particleList (str):              The input ParticleList
+        varToExtraInfo (dict[str,str]):  Dictionary of Variables (key) and extraInfo names (value).
+        path (basf2.Path):               modules are added to this path
     """
     mod = register_module('SignalSideVariablesToExtraInfo')
     mod.set_name('SigSideVarToExtraInfo_' + particleList)
@@ -3574,6 +3577,36 @@ def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
     photon_efficiency_correction.param('particleLists', inputListNames)
     photon_efficiency_correction.param('tableName', tableName)
     path.add_module(photon_efficiency_correction)
+
+
+def addPi0VetoEfficiencySystematics(particleList, decayString, tableName, threshold, mode='standard', suffix='', path=None):
+    """
+    Add pi0 veto Data/MC efficiency ratio weights to the specified particle list
+
+    @param particleList   the input ParticleList
+    @param decayString    specify hard photon to be performed pi0 veto (e.g. 'B+:sig -> rho+:sig ^gamma:hard')
+    @param tableName      table name corresponding to payload version (e.g. 'Pi0VetoEfficiencySystematics_Nov2021')
+    @param threshold      pi0 veto threshold (0.50, 0.51, ..., 0.99)
+    @param mode           choose one mode (same as writePi0EtaVeto) out of 'standard', 'tight', 'cluster' and 'both'
+    @param suffix         optional suffix to be appended to the usual extraInfo name
+    @param path           the module is added to this path
+
+    The following extraInfo are available related with the given particleList:
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_ratio             : weight of Data/MC for the veto efficiency
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_stat  : the statistical uncertainty of the weight
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_sys   : the systematic uncertainty of the weight
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_total : the total uncertainty of the weight
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_threshold                 : threshold of the pi0 veto
+    """
+
+    pi0veto_efficiency_correction = register_module('Pi0VetoEfficiencySystematics')
+    pi0veto_efficiency_correction.param('particleLists', particleList)
+    pi0veto_efficiency_correction.param('decayString', decayString)
+    pi0veto_efficiency_correction.param('tableName', tableName)
+    pi0veto_efficiency_correction.param('threshold', threshold)
+    pi0veto_efficiency_correction.param('mode', mode)
+    pi0veto_efficiency_correction.param('suffix', suffix)
+    path.add_module(pi0veto_efficiency_correction)
 
 
 def getAnalysisGlobaltag(timeout=180) -> str:

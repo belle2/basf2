@@ -31,6 +31,7 @@ in_decay = False
 # save the decay mode lines belonging to a certain particle as dictionary
 # to do some checks on these.
 decays = {}
+particle = ''
 for i in range(len(decfile_lines)):
     if in_decay:
         match = re_enddecay.match(decfile_lines[i])

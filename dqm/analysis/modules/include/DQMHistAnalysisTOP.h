@@ -40,11 +40,11 @@ namespace Belle2 {
     virtual void terminate() override;
 
     /**
-     * Find canvas by name
-     * @param cname Name of the canvas
-     * @return The pointer to the canvas, or nullptr if not found.
+     * Find histogram corresponding to canvas.
+     * @param hname Name of the histogram
+     * @return The pointer to the histogram, or nullptr if not found.
      */
-    TCanvas* find_canvas(TString cname);
+    TH1* find_histo_in_canvas(TString hname);
     //! Data members
   private:
     /** Canvas for the mean of the good hits. */

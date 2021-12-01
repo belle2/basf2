@@ -34,15 +34,15 @@ namespace Belle2 {
     double FermiMomentumProb(double pb, double pf);
 
   private:
-    double         _dGdsbProbMax;
-    double         _mb;          // b-quark mass for fermi motion
-    double         _ms;          // s-quark mass for fermi motion
-    double         _mq;          // spectator quark mass for fermi motion
-    double         _pf;          // Fermi motion parameter for fermi motion
-    double         _mxmin;
+    double         _dGdsbProbMax{0.0};
+    double         _mb{4.8};          // b-quark mass for fermi motion
+    double         _ms{0.2};          // s-quark mass for fermi motion
+    double         _mq{0.0};          // spectator quark mass for fermi motion
+    double         _pf{0.461};          // Fermi motion parameter for fermi motion
+    double         _mxmin{1.1};
 
-    double _mb_prob;          // b-quark mass for dGdsb
-    double _ms_prob;          // s-quark mass for dGdsb
+    double _mb_prob{4.8};          // b-quark mass for dGdsb
+    double _ms_prob{0.2};          // s-quark mass for dGdsb
 
   };
 

@@ -67,14 +67,15 @@ namespace Belle2 {
 
       double mb = 0.0;
 
-      double xbox, ybox;
-
-      while (mb <= 0.0) {
+      bool FailToSetmb = true; // true when an appropriate mb cannot be found
+      while (FailToSetmb) {
         pb = FermiMomentum(_pf);
 
         // effective b-quark mass
         mb = mB * mB + _mq * _mq - 2.0 * mB * sqrt(pb * pb + _mq * _mq);
-        if (mb > 0. && sqrt(mb) - _ms < 2.0 * ml) mb = -10.;
+        if (mb > 0. && sqrt(mb) - _ms < 2.0 * ml) FailToSetmb = true;
+        else if (mb <= 0.0) FailToSetmb = true;
+        else FailToSetmb = false;
       }
       mb = sqrt(mb);
 
@@ -85,12 +86,9 @@ namespace Belle2 {
       double sbmin = 0;
       double sbmax = (1 - mstilda) * (1 - mstilda);
       while (sb == 0.0) {
-        xbox = EvtRandom::Flat(sbmin, sbmax);
-        ybox = EvtRandom::Flat(_dGdsbProbMax);
+        double xbox = EvtRandom::Flat(sbmin, sbmax);
+        double ybox = EvtRandom::Flat(_dGdsbProbMax);
         double prob = dGdsbProb(xbox);
-        if (!(prob >= 0.0) && !(prob <= 0.0)) {
-          //  EvtGenReport(EVTGEN_INFO,"EvtGen") << "nan from dGdsProb " << prob << " " << mb << " " << _ms << " " << ml << " " << xbox << std::endl;
-        }
         if (ybox < prob) sb = xbox;
       }
 
@@ -232,13 +230,6 @@ namespace Belle2 {
       ::abort();
     }
 
-    _mb = 4.8;
-    _ms = 0.2;
-    _mq = 0.;
-    _pf = 0.461;
-    _mxmin = 1.1;
-    _mb_prob = 4.68;
-    _ms_prob = 0.1;
     if (getNArg() == 4) {
       // b-quark mass for fermi motion
       _mb = getArg(0);
@@ -264,14 +255,13 @@ namespace Belle2 {
     double mstilda2 = mstilda * mstilda;
 
     int nsteps = 100;
-    double sb = 0.0;
     double sbmin = 0;
     double sbmax = (1 - mstilda) * (1 - mstilda);
     double probMax = -10000.0;
     double sbProbMax = -10.0;
 
     for (int i = 0; i < nsteps; i++) {
-      sb = sbmin + (i + 0.0005) * (sbmax - sbmin) / (double)nsteps;
+      double sb = sbmin + (i + 0.0005) * (sbmax - sbmin) / (double)nsteps;
       double lambda = 1 + mstilda2 * mstilda2 + sb * sb - 2 * (mstilda2 + sb + mstilda2 * sb);
       double prob = sqrt(lambda) * (3 * sb * (1 + mstilda2 - sb) + lambda);
       if (prob > probMax) {
@@ -315,13 +305,13 @@ namespace Belle2 {
     // reference: Ali, Ahmed, et al. "Power corrections in the decay rate and distributions in B->Xs l+l- 2 in the standard model"
     // see (eq.57)
 
-    double pb, pbmax, xbox, ybox;
+    double pb, pbmax;
     pb = 0.0;
     pbmax = 5.0 * pf;
 
     while (pb == 0.0) {
-      xbox = EvtRandom::Flat(pbmax);
-      ybox = EvtRandom::Flat();
+      double xbox = EvtRandom::Flat(pbmax);
+      double ybox = EvtRandom::Flat();
       if (ybox < FermiMomentumProb(xbox, pf)) { pb = xbox; }
     }
 

@@ -43,14 +43,27 @@ class CheckIndices(basf2.Module):
     def initialize(self):
         """reimplementation"""
 
-        self.indices = Belle2.PyStoreObj('MergedArrayIndices')
+        self.tracks = Belle2.PyStoreArray('Tracks')
+        self.v0s = Belle2.PyStoreArray('V0s')
 
     def event(self):
         """reimplementation"""
 
         print(self.name())
-        print("nTracks of main path: " + str(self.indices.getIndex("Tracks")))
-        print("nECLClusters of main path " + str(self.indices.getIndex("ECLClusters")))
+        print("Tracks")
+        for track in self.tracks:
+            for tfr in track.getTrackFitResults():
+                print(track.getArrayIndex(), '->', tfr.second.getArrayIndex())
+        print("V0s")
+        for v0 in self.v0s:
+            print('t', v0.getArrayIndex(), '->', v0.getTracks().first.getArrayIndex(), '/', v0.getTracks().second.getArrayIndex())
+            print(
+                'f',
+                v0.getArrayIndex(),
+                '->',
+                v0.getTrackFitResults().first.getArrayIndex(),
+                '/',
+                v0.getTrackFitResults().second.getArrayIndex())
 
 
 main = basf2.Path()
@@ -92,7 +105,10 @@ main.add_independent_merge_path(
 #
 
 main.add_module(CheckData()).set_name("checkdata_merged")
-main.add_module(CheckIndices()).set_name("checkindices_merged")
+
+main.add_module(CheckIndices()).set_name("checkindices")
+main.add_module('FixMergedObjects')
+main.add_module(CheckIndices()).set_name("checkindices_fixed")
 
 # output
 output = basf2.register_module('RootOutput')
@@ -100,8 +116,7 @@ output.param('outputFileName', '/nfs/dust/belle2/user/kurzsimo/testSample/merged
 main.add_module(output)
 
 # progress
-progress = basf2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 basf2.print_path(main)
 basf2.process(main)

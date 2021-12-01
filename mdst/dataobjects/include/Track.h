@@ -137,5 +137,7 @@ namespace Belle2 {
     float const m_qualityIndicator;
 
     ClassDefOverride(Track, 4); /**< Class that bundles various TrackFitResults. */
+
+    friend class FixMergedObjectsModule;
   };
 }

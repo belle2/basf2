@@ -1134,7 +1134,6 @@ void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& 
               std::string nameRenamed = fromEntry.name + "_indepPath";
               if (targetMaps[c_Event].count(nameRenamed) == 0) {
                 B2FATAL("Did not find " << nameRenamed << " in target. This should not happen.");
-                continue;
               }
               StoreEntry& target_renamed = targetMaps[c_Event][nameRenamed];
               target_renamed.object = fromEntry.object->Clone();

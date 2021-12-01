@@ -15,7 +15,9 @@
 #include <utility>
 
 namespace Belle2 {
-  /** Store indices where a StoreArray has been merged
+  /** Store indices where a StoreArray has been merged.
+   *  Number i corresponds to number of elements of first StoreArray,
+   *  i.e. position [i] is where second StoreArray starts.
    */
   class MergedArrayIndices : public TObject {
   public:
@@ -39,7 +41,7 @@ namespace Belle2 {
     int getIndex(std::string name) const { return m_indices.find(name) != m_indices.end() ? m_indices.at(name) : -1; }
 
   private:
-    std::map<std::string, int> m_indices;
+    std::map<std::string, int> m_indices; /**< Index of position where second StoreArray starts. */
 
     ClassDef(MergedArrayIndices, 1); /**< Store indices of merged arrays. */
   }; //class

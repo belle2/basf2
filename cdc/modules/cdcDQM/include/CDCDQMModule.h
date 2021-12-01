@@ -87,7 +87,6 @@ namespace Belle2 {
     StoreObjPtr<TRGSummary> m_trgSummary;         /**< Trigger summary. */
     StoreArray<Track> m_Tracks;                   /**< Tracks. */
     StoreArray<RecoTrack> m_RecoTracks;           /**< RecoTracks. */
-    StoreArray<TrackFitResult> m_TrackFitResults; /**< Track fit results. */
     std::string m_recoTrackArrayName = "" ;       /**< Belle2::RecoTrack StoreArray name. */
 
     Long64_t m_nEvents = 0;          /**< Number of events processed */

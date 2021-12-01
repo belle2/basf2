@@ -68,13 +68,19 @@ void CDCDQMModule::initialize()
   m_cdcHits.isOptional();
   m_cdcRawHits.isOptional();
   m_trgSummary.isOptional();
-  m_Tracks.isRequired();
-  m_RecoTracks.isRequired();
-  m_TrackFitResults.isRequired();
+
+  if (!m_Tracks.isOptional()) {
+    B2WARNING("Missing Tracks array");
+    return;
+  }
 }
 
 void CDCDQMModule::beginRun()
 {
+  if (!m_RecoTracks.isOptional()) {
+    B2DEBUG(22, "Missing recoTracks array in beginRun() ");
+    return;
+  }
 
   m_hNEvents->Reset();
   m_hADC->Reset();

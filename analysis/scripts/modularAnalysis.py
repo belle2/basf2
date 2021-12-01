@@ -3158,10 +3158,11 @@ def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping_m
 
 def tagCurlTracks(particleLists,
                   mcTruth=False,
-                  responseCut=0.324,
+                  responseCut=-1.0,
                   selectorType='cut',
-                  ptCut=0.6,
-                  train=False,
+                  ptCut=0.5,
+                  expert_train=False,
+                  expert_filename="",
                   path=None):
     """
     Warning:
@@ -3176,7 +3177,7 @@ def tagCurlTracks(particleLists,
     The module loops over all particles in a given list that meet the preselection **ptCut** and assigns them to
     bundles based on the response of the chosen **selector** and the required minimum response set by the
     **responseCut**. Once all particles are assigned they are ranked by 25dr^2+dz^2. All but the lowest are tagged
-    with extraInfo(isCurl=1) to allow for later removal  by cutting the list or removing these from ROE as
+    with extraInfo(isCurl=1) to allow for later removal by cutting the list or removing these from ROE as
     applicable.
 
 
@@ -3185,12 +3186,14 @@ def tagCurlTracks(particleLists,
                           extraInfo(truthBundleSize). To calculate these particles are assigned to bundles by their
                           genParticleIndex then ranked and tagged as normal.
     @param responseCut:   float min classifier response that considers two tracks to come from the same particle.
+                          If set to ``-1`` a cut value optimised to maximise the accuracy on a BBbar sample is used.
                           Note 'cut' selector is binary 0/1.
     @param selectorType:  string name of selector to use. The available options are 'cut' and 'mva'.
                           It is strongly recommended to used the 'mva' selection. The 'cut' selection
                           is based on BN1079 and is only calibrated for Belle data.
     @param ptCut:         pre-selection cut on transverse momentum.
-    @param train:         flag to set training mode if selector has a training mode (mva).
+    @param expert_train:  flag to set training mode if selector has a training mode (mva).
+    @param expert_filename: set file name of produced training ntuple (mva).
     @param path:          module is added to this path.
     """
 
@@ -3206,9 +3209,15 @@ def tagCurlTracks(particleLists,
     curlTagger.param('belle', belle)
     curlTagger.param('mcTruth', mcTruth)
     curlTagger.param('responseCut', responseCut)
+    if abs(responseCut + 1) < 1e-9:
+        curlTagger.param('usePayloadCut', True)
+    else:
+        curlTagger.param('usePayloadCut', False)
+
     curlTagger.param('selectorType', selectorType)
     curlTagger.param('ptCut', ptCut)
-    curlTagger.param('train', train)
+    curlTagger.param('train', expert_train)
+    curlTagger.param('trainFilename', expert_filename)
 
     path.add_module(curlTagger)
 

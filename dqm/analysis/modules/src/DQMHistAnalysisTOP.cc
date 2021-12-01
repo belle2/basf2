@@ -114,8 +114,8 @@ TH1* DQMHistAnalysisTOPModule::find_histo_in_canvas(TString histo_name)
   if (cobj == nullptr) return nullptr;
 
   TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
-
-  while ((auto obj = dynamic_cast<TObject*>(nextkey()))) {
+  TObject* obj{};
+  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
     if (obj->IsA()->InheritsFrom("TH1")) {
       if (obj->GetName() == histo_name)
         return  dynamic_cast<TH1*>(obj);

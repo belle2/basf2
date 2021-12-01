@@ -51,8 +51,6 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
-    //! Flag to trigger creation of additional histograms
-    bool m_singleHists;
     //! u binning for 2d plots
     int m_u_bins;
     //! v binning for 2d plots

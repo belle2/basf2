@@ -27,7 +27,7 @@
 [INFO] RestOfEventUpdater updated track/eclCluster ROEMask(s) with infoList: K_S0:V0 and cut: 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO] ParticleLoaderModule: Replacing the source particle list name by J/psi:roe all other daughters will be ignored.
-[INFO]  o) creating (anti-)ParticleList with name: B+:ROE (B-:ROE)
+[INFO]  o) creating (anti-)ParticleList with name: B+:other (B-:other)
 [INFO]    -> MDST source: RestOfEvents
 [INFO] Number of ParticleLists to be studied: 1 
 [INFO] Conditions Database: found working server

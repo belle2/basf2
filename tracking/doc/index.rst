@@ -33,14 +33,15 @@ Use :ref:`add_tracking_reconstruction<tracking_addtrkreconstruction>` to append 
     :glob:
     :maxdepth: 2
 
-    trackFinding/trackFinding.rst
+    trk_parameterization
+    trackFinding/trackFinding
     trackFitting
     specials
     pxdDataReduction
     calibration
-    scripts.rst
+    MCTrackMatching
+    scripts
     tools
-    glossary
 
     
 More ?

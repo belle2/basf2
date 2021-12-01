@@ -1,4 +1,4 @@
- .. _tracking_trackFindingSVD: 
+.. _tracking_trackFindingSVD: 
 
 SVD Track Finding
 =================
@@ -26,18 +26,17 @@ The SectorMap stores the information about the friendship relations between sect
 
     .. container:: leftside
 
-       simplified view of the friendship relations
+      .. figure:: figures/sectormap.png
+	      :align: center
 
-       .. figure:: figures/sectormap.png
-	  :align: center
-
+      Simplified view of the friendship relations
 
     .. container:: rightside
-		   
-       two-hit filter example
-
-       .. figure:: figures/filter.png
-	  :align: center
+    
+      .. figure:: figures/filter.png
+	      :align: center
+    
+      Two-hit filter example
 
 Variables used in the filters are geometric (distances, slopes) or properties of the SVD clusters, like the cluster time, listed in the following tables:
 

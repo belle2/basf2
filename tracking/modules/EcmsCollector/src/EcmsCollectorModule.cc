@@ -136,7 +136,7 @@ void EcmsCollectorModule::collect()
     D = Dstar->getDaughter(0);
     m_dmDstar = Dstar->getMass() - D->getMass();
   } else {
-    cout << "Nothing founded" << endl;
+    B2INFO("No D meson found");
   }
   m_mD = D->getMass();
   const Particle* Kaon =  D->getDaughter(0);

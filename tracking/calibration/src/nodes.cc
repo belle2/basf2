@@ -22,7 +22,7 @@ namespace Belle2 {
   using Eigen::MatrixXd;
 
 
-//For points between 0 and 1
+  // to integrate function between 0 and 1 (more in nodes.h)
   VectorXd getWeights(int Size)
   {
     const int N = Size - 1;
@@ -58,7 +58,7 @@ namespace Belle2 {
     return wgt;
   }
 
-//Get vector with nodes by definition between 0 and 1
+  // vector of nodes to integrate function between 0 and 1 (more in nodes.h)
   VectorXd getNodes(int Size)
   {
     assert((Size - 1) % 2 == 0);
@@ -70,7 +70,7 @@ namespace Belle2 {
     return xi;
   }
 
-//Evaluate cheb pols to Size at point x, x is between 0 and 1
+// Evaluate Cheb pols up to Size at point x, x is between 0 and 1 (more in nodes.h)
   VectorXd getPols(int Size, double x)
   {
     VectorXd pol(Size);
@@ -84,7 +84,7 @@ namespace Belle2 {
     return pol;
   }
 
-//Evaluate sum of cheb pols to Size at vector x, x els are between 0 and 1
+// Evaluate sum of cheb pols up to Size over vector x, x elements are between 0 and 1 (more in nodes.h)
   VectorXd getPolsSum(int Size, VectorXd x)
   {
     assert(Size > 2);
@@ -115,13 +115,13 @@ namespace Belle2 {
 
 
 
-//Transformation matrix between cheb. nodes and cheb. coeficients
-  MatrixXd getCoefs(int oldSize, bool isInverse = false)
+// Transformation matrix between Cheb nodes and Cheb. Coefficients (more in nodes.h)
+  MatrixXd getCoefs(int Size, bool isInverse = false)
   {
-    const int N = oldSize - 1;
+    const int N = Size - 1;
     assert(N % 2 == 0);
 
-    MatrixXd  coef(oldSize, oldSize);
+    MatrixXd  coef(Size, Size);
 
     double mul = 1;
     double C = 1. / N;
@@ -150,7 +150,7 @@ namespace Belle2 {
 
 
 
-//with better normalization of the borders
+// getCoef with better normalization of the borders (more in nodes.h)
   MatrixXd getCoefsCheb(int oldSize)
   {
     auto coef = getCoefs(oldSize);
@@ -164,7 +164,7 @@ namespace Belle2 {
 
 
 
-//Evaluate Cheb. pol at point x
+// Evaluate Cheb. pol at point x (more in nodes.h)
   double evalPol(const VectorXd& polCoef, double x)
   {
     VectorXd pols = getPols(polCoef.size(), x);
@@ -175,7 +175,7 @@ namespace Belle2 {
   }
 
 
-//Get Interpolation vector at point x
+//Get Interpolation vector at point x (more in nodes.h)
   VectorXd interpol(const VectorXd& xi, double x)
   {
     double Norm = (xi[xi.size() - 1] - xi[0]) / 2;
@@ -193,7 +193,7 @@ namespace Belle2 {
   }
 
 
-//Get interpolated function value at point x
+//Get interpolated function value at point x (more in nodes.h)
   double interpol(VectorXd xi, VectorXd vals, double x)
   {
     VectorXd coefs = interpol(xi, x);

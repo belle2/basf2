@@ -8,9 +8,9 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-'''
+"""
 Validation of the Invariant Collision Energy calibration
-'''
+"""
 
 
 import basf2
@@ -48,8 +48,11 @@ settings = ValidationSettings(name='eCMS Calibrations',
                               expert_config={})
 
 
-# Load the values of the eCMS properties from the payloads into the list
 def get_Ecms_values(path):
+    """
+    Load the values of the Ecms properties from the payloads into the list
+    """
+
     runDict = {}
     with open(path + '/database.txt') as fDB:
         for ll in fDB:
@@ -86,8 +89,10 @@ def get_Ecms_values(path):
     return arr
 
 
-# Print the eCMS parameters to the text file
 def printToFile(arr):
+    """
+    print the Ecms parameters from arr to the text file
+    """
 
     with open('ecmsData.csv', 'w') as outFile:
         outFile.write('exp1 run1 exp2 run2  tStart tEnd  nInt idInt  '
@@ -125,8 +130,16 @@ def printToFile(arr):
         return arr
 
 
-# Create a plot with the specified variable
 def plotVar(arr, limits, vName, getterV, getterE=None):
+    """
+    Create a plot with specified variable
+    Parameters:
+        arr     : array with data
+        limits  : tuple with start and end of the plotted region
+        vName   : name of the variable which is used in the plot label
+        getterV : getter function to get plotted variable value from arr[i]
+        getterE : getter function to get plotted variable uncertainty from arr[i]
+    """
 
     tVals = []
     Vals = []
@@ -233,6 +246,10 @@ def plotVar(arr, limits, vName, getterV, getterE=None):
 
 
 def plotPullSpectrum(arr, vName, getterV, getterE):
+    """
+    Plot the pull spectrum for variable defined by functions getterV and gettterE,
+    similarly as for plotVar
+    """
 
     vals = np.array([k for k, g in groupby([getterV(v) for v in arr])])
     errs = np.array([k for k, g in groupby([getterE(v) for v in arr])])
@@ -255,8 +272,10 @@ def plotPullSpectrum(arr, vName, getterV, getterE):
     plt.clf()
 
 
-# Get times from the di-muon events results
 def get_times(job_path):
+    """
+    Read the start/end times of the calibration intervals from the di-muon events
+    """
 
     times = []
     with open(job_path + '/eCMS/0/algorithm_output/mumuEcalib.txt') as fEcms:
@@ -269,6 +288,12 @@ def get_times(job_path):
 
 # Get the results from the combined calibration
 def read_hadB_data(job_path):
+    """
+    It reads the calibration table from the text file produced by the CAF calibration.
+    This text file includes the results from the final calibration.
+    (combined or mumu-only)
+    """
+
     arr = []
     with open(job_path + '/eCMS/0/algorithm_output/finalEcmsCalib.txt', "r") as text_file:
         for ll in text_file:
@@ -290,6 +315,10 @@ def read_hadB_data(job_path):
 
 # Create multi-page pdf file with the fit plots
 def create_hadB_fit_plots(job_path):
+    """
+    Create multi-page pdf file with the fit plots for hadronic B decays.
+    The file is created using pdflatex
+    """
 
     cwd = os.getcwd()
 
@@ -375,11 +404,10 @@ def create_hadB_fit_plots(job_path):
     os.chdir(cwd)
 
 
-# Create validation plots for the eCMS calibration
 def run_validation(job_path, input_data_path, requested_iov, expert_config):
-    '''
-    Run the validation.
-    '''
+    """
+    Create validation plots related to the Ecms calibration
+    """
 
     # Expert config can contain the time ranges of the plots
     if expert_config != '':

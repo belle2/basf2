@@ -31,7 +31,7 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader
 
 # custom taylor cross entropy function
-from basf2_mva_extensions.torch_TCCE import TCCE
+from basf2_mva_extensions.torch_tcce import TCCE
 
 # other imports
 import uproot3 as ur

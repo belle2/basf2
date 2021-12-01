@@ -42,3 +42,13 @@ Modules
    counters exceed uint8_t maximum (255), it is set to 255.
  * The invariant mass of the particles built from the missing momentum in the event (`fillParticleListFromROE` with option
    ``useMissing=True``) is no longer fixed to zero, but set based on the full missing 4-momentum.
+
+PID Priors 
+++++++++++
+
+ * Added ``analysis-train-priors`` tool that trains a pytorch model for calculating PID priors using an ntuple containing momentum
+   and cos(:math:`\theta`) information. It generates a second order combination of the previously mentioned variables along with
+   transverse momentum giving a total of nine features and trains the model using a taylor series of cross entropy loss to reduce the 
+   effect of outliers on the training.
+ * For evaluating priors, ``evalPriors`` module containing the ``Priors`` class has been added to calculate these using 
+   the trained model. Additionally, posteriors can also be obtained by providing PID's from the detector signals.

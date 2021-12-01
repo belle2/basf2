@@ -433,7 +433,10 @@ namespace Belle2 {
      * Sets the 4Vector of particle.
      * @param p4 4Vector
      */
-    void set4Vector(const ROOT::Math::PxPyPzEVector& p4) { setMomentum(B2Vector3D(p4.Vect())); m_energy = p4.energy(); }
+    void set4Vector(const ROOT::Math::PxPyPzEVector& p4)
+    {
+      m_momentum_x = p4.px(); m_momentum_y = p4.py(); m_momentum_z = p4.pz(); m_energy = p4.energy();
+    }
 
     /**
      * Set decay vertex.

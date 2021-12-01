@@ -9,7 +9,6 @@
 
 #include <framework/datastore/RelationsObject.h>
 
-#include <framework/geometry/B2Vector3.h>
 #include <TVector3.h>
 #include <TMatrixDfwd.h>
 

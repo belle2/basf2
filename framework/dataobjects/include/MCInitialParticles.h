@@ -16,7 +16,6 @@
 #include <Math/Vector4D.h>
 
 #include <framework/geometry/B2Vector3.h>
-#include <iostream>
 
 namespace Belle2 {
 

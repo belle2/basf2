@@ -245,6 +245,7 @@ class DataStorePrinter:
             print("(" + ",".join("%.6g" % result[i] for i in range(3)) + ")")
         elif isinstance(result, XYZVector):
             print("(" + ",".join("%.6g" % Belle2.B2Vector3D(result)[i] for i in range(3)) + ")")
+            # print("(" + ",".join("%.6g" % x for x in [result.X(), result.Y(), result.Z()]) + ")")
         elif isinstance(result, TLorentzVector):
             print("(" + ",".join("%.6g" % result[i] for i in range(4)) + ")")
         # or, does it look like a std::pair?

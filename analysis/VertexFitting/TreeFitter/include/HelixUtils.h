@@ -11,6 +11,7 @@
 #include <string>
 
 #include <framework/dataobjects/Helix.h>
+#include <framework/geometry/B2Vector3.h>
 #include <Eigen/Core>
 namespace TreeFitter {
 

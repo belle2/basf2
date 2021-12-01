@@ -25,8 +25,8 @@ namespace Belle2 {
     int Nzoom = (N + 1) / 2;
 
 
-    double minIn  = 1e50;
-    double minOut = 1e50;
+    double minIn  = std::numeric_limits<double>::max();
+    double minOut = std::numeric_limits<double>::max();
 
     for (int i = 0; i < N; ++i)
       for (int j = 0; j < N; ++j) {
@@ -63,7 +63,7 @@ namespace Belle2 {
 
       if (k == kMax - 1) break;
 
-      double mOutMax = -1e50;
+      double mOutMax = - std::numeric_limits<double>::max();
       int iOpt = -1, jOpt = -1;
       //find optimal rectangle
       for (int i = 0; i < N - Nzoom; ++i)
@@ -96,7 +96,7 @@ namespace Belle2 {
 
 
     //get the overall minimum
-    double minTot = 1e50;
+    double minTot = std::numeric_limits<double>::max();
     int iOpt = -1, jOpt = -1;
 
     for (int i = 0; i < N; ++i)

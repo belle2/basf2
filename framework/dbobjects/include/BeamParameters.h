@@ -175,7 +175,7 @@ namespace Belle2 {
     /** Covariance matrix of the vertex position */
     Double32_t m_covVertex[6];
 
-    ClassDef(BeamParameters, 2); /**< nominal beam and primary vertex parameters (including smearing). */
+    ClassDef(BeamParameters, 3); /**< nominal beam and primary vertex parameters (including smearing). */
   };
 
 } //Belle2 namespace

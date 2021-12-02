@@ -1,7 +1,7 @@
 .. _tracking_trackFinding: 
 
 Track Finding Algorithms
-========================
+------------------------
 
 .. warning::
   This documentation is under construction!

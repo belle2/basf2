@@ -35,8 +35,8 @@ The SectorMap stores the information about the friendship relations between sect
     .. container:: rightside
     
       .. figure:: figures/filter.png
-	       :align: center
-         :width: 50%
+        :align: center
+        :width: 50%
     
       Two-hit filter example
 

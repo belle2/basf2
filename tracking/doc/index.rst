@@ -43,7 +43,7 @@ Use :ref:`add_tracking_reconstruction<tracking_addtrkreconstruction>` to append 
 
     
 More (?)
-------
+--------
 
 The tracking package includes the following sub-packages
 

@@ -5,7 +5,7 @@ Track Parameterization
 
 In empty space, the trajectory of a charged particle in an homogeneous electromagnetic field is a perfect helix:
 
-.. figure:: figures/helix_3d.png
+.. figure:: figures/helix.png
     :align: center
     :width: 70%
 
@@ -53,5 +53,5 @@ This module improves the reconstruction of the so-called long-lived particles: :
 .. note::
 
     * trajectories inside the beam pipe are perfect helices neglecting B field inhomogeneities and energy loss by radiation;
-    * during tracking reconstruction, track are extrapolated and fitted taking into account the material and the B field, with a statistical treatment of the multiple scattering and of the energy loss;
+    * during track reconstruction, tracks are extrapolated and fitted taking into account the material and the B field, with a statistical treatment of the multiple scattering and of the energy loss;
     * when tracks are used at analysis level, the material is not considered in the track extrapolation, *i.e.* the helix at the POCA is the only one available.

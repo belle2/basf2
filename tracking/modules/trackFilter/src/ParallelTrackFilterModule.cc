@@ -30,21 +30,22 @@ ParallelTrackFilterModule::ParallelTrackFilterModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
-  addParam("inputArrayName", m_inputArrayName, "StoreArray with the input tracks", std::string("Tracks"));
-  addParam("outputINArrayName", m_outputINArrayName, "StoreArray with the output tracks", std::string("TracksIN"));
-  addParam("outputOUTArrayName", m_outputOUTArrayName, "StoreArray with the output tracks", std::string("TracksOUT"));
+  addParam("inputArrayName", m_inputArrayName, "StoreArray with the input tracks", m_inputArrayName);
+  addParam("outputINArrayName", m_outputINArrayName, "Output StoreArray with the tracks that pass the cuts", m_outputINArrayName);
+  addParam("outputOUTArrayName", m_outputOUTArrayName, "Output StoreArray with the tracks that do not pass the cuts",
+           m_outputOUTArrayName);
 
   //selection parameter definition
-  addParam("min_d0", m_min_d0, "minimum value of the d0", double(-100));
-  addParam("max_d0", m_max_d0, "maximum value of the d0", double(+100));
-  addParam("min_z0", m_min_z0, "minimum value of the z0", double(-500));
-  addParam("max_z0", m_max_z0, "maximum value of the z0", double(+500));
-  addParam("min_pCM", m_min_pCM, "minimum value of the center-of-mass-momentum", double(0));
-  addParam("min_pT", m_min_pT, "minimum value of the transverse momentum", double(0));
-  addParam("min_Pvalue", m_min_Pval, "minimum value of the P-Value of the track fit", double(0));
-  addParam("min_NumHitPXD", m_min_NumHitsPXD, "minimum number of PXD hits associated to the trcak", int(0));
-  addParam("min_NumHitSVD", m_min_NumHitsSVD, "minimum number of SVD hits associated to the trcak", int(0));
-  addParam("min_NumHitCDC", m_min_NumHitsCDC, "minimum number of CDC hits associated to the trcak", int(0));
+  addParam("min_d0", m_minD0, "minimum value of the d0", m_minD0);
+  addParam("max_d0", m_maxD0, "maximum value of the d0", m_maxD0);
+  addParam("min_z0", m_minZ0, "minimum value of the z0", m_minZ0);
+  addParam("max_z0", m_maxZ0, "maximum value of the z0", m_maxZ0);
+  addParam("min_pCM", m_minPCM, "minimum value of the center-of-mass-momentum", m_minPCM);
+  addParam("min_pT", m_minPT, "minimum value of the transverse momentum", m_minPT);
+  addParam("min_Pvalue", m_minPval, "minimum value of the P-Value of the track fit", m_minPval);
+  addParam("min_NumHitPXD", m_minNumHitsPXD, "minimum number of PXD hits associated to the trcak", m_minNumHitsPXD);
+  addParam("min_NumHitSVD", m_minNumHitsSVD, "minimum number of SVD hits associated to the trcak", m_minNumHitsSVD);
+  addParam("min_NumHitCDC", m_minNumHitsCDC, "minimum number of CDC hits associated to the trcak", m_minNumHitsCDC);
 
 }
 
@@ -93,28 +94,28 @@ void ParallelTrackFilterModule::event()
 
 bool ParallelTrackFilterModule::isSelected(const Track* track)
 {
-  const TrackFitResult* tfr = track->getTrackFitResult(Const::ChargedStable(Const::pion.getPDGCode()));
+  const TrackFitResult* tfr = track->getTrackFitResultWithClosestMass(Const::pion);
   if (tfr == nullptr)
     return false;
 
-  if (tfr->getD0() < m_min_d0 || tfr->getD0() > m_max_d0)
+  if (tfr->getD0() < m_minD0 || tfr->getD0() > m_maxD0)
     return false;
 
-  if (tfr->getZ0() < m_min_z0 || tfr->getZ0() > m_max_z0)
+  if (tfr->getZ0() < m_minZ0 || tfr->getZ0() > m_maxZ0)
     return false;
 
-  if (tfr->getPValue() < m_min_Pval)
+  if (tfr->getPValue() < m_minPval)
     return false;
 
-  if (tfr->getMomentum().Perp() < m_min_pT)
+  if (tfr->getMomentum().Perp() < m_minPT)
     return false;
 
   HitPatternVXD hitPatternVXD = tfr->getHitPatternVXD();
-  if (hitPatternVXD.getNSVDHits() < m_min_NumHitsSVD ||  hitPatternVXD.getNPXDHits() < m_min_NumHitsPXD)
+  if (hitPatternVXD.getNSVDHits() < m_minNumHitsSVD ||  hitPatternVXD.getNPXDHits() < m_minNumHitsPXD)
     return false;
 
   HitPatternCDC hitPatternCDC = tfr->getHitPatternCDC();
-  if (hitPatternCDC.getNHits() < m_min_NumHitsCDC)
+  if (hitPatternCDC.getNHits() < m_minNumHitsCDC)
     return false;
 
   return true;

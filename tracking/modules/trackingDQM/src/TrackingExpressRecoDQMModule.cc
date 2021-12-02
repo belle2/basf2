@@ -31,10 +31,9 @@ TrackingExpressRecoDQMModule::TrackingExpressRecoDQMModule() : DQMHistoModuleBas
 {
   setPropertyFlags(c_ParallelProcessingCertified);
   setDescription("Data Quality Monitoring of the tracking run on ExpressReco.");
-  addParam("produce1Dresiduals", m_produce1Dres, "If True, produce 1D residual plots for each VXD sensor", bool(m_produce1Dres));
-  addParam("produce2Dresiduals", m_produce2Dres, "If True, produce 2D residual plots for each VXD sensor", bool(m_produce2Dres));
-  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory for the histograms",
-           std::string("TrackingERDQM"));
+  addParam("produce1Dresiduals", m_produce1Dres, "If True, produce 1D residual plots for each VXD sensor", m_produce1Dres);
+  addParam("produce2Dresiduals", m_produce2Dres, "If True, produce 2D residual plots for each VXD sensor", m_produce2Dres);
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory for the histograms", m_histogramDirectoryName);
 }
 
 //------------------------------------------------------------------

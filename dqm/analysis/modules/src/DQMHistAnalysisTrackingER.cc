@@ -9,10 +9,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysisTrackingER.h>
 
 #include <TROOT.h>
-#include <TString.h>
 
-#include <TMath.h>
-#include <iostream>
 #include <string>
 
 using namespace std;

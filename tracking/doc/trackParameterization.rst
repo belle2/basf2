@@ -7,7 +7,7 @@ In empty space, the trajectory of a charged particle in an homogeneous electroma
 
 .. figure:: figures/helix.png
     :align: center
-    :width: 70%
+    :width: 60%
 
     A perfect helix (black), and its projections on the :math:`xz` (blue) and :math:`yz` (red) planes. The B field is along :math:`z`.
 
@@ -40,7 +40,7 @@ Since material effects depend on the particle type, the same set of hits (patter
 See :ref:`Track Fitting<tracking_trackFitting>` for more details.
 
 2) The trajectory of a charged particle in empty space is determined by its position :math:`\vec{x}` and its momentum :math:`\vec{p}` at a given point of the helix.
-Any point of the helix is good to store the parameters: :math:`(\vec{x}(t), \vec{p}(t))` is as good as :math:`(\vec{x}(t+\Delta t), \vec{p}(t+\Delta t))`, we need to choose one, and we choose the POCA.
+Any point of the helix is good to store the parameters: :math:`(\vec{x}(t), \vec{p}(t))` is as good as :math:`(\vec{x}(t+\Delta t), \vec{p}(t+\Delta t))`, we must choose one, and we choose the POCA.
 Indeed, in the :ref:`mDST<mdst>` we only store *one* helix among the many that are needed to describe the complete particle trajectory.
 Since most of the tracks (with the exception of the daughters of long-lived particles, see point 3)) the one helix that is relevant for physics analysis is the one inside the beam pipe.
 The POCA is therefore the most convenient point to compute the 5 helix parameters for the physics analysis.

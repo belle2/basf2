@@ -76,14 +76,6 @@ namespace Belle2 {
     virtual void terminate() override;
 
     /**
-    * Find canvas by name
-    * @param cname Name of the canvas
-    * @return The pointer to the canvas, or nullptr if not found.
-    */
-    TCanvas* find_canvas(TString cname);
-
-
-    /**
      * make bad channel list.
      */
     void makeBadChannelList();

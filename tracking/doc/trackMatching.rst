@@ -1,7 +1,7 @@
 .. _trk_matching:
 
-Track MC-Matching
------------------
+Track Matching
+--------------
 
 This section describes the definition of the various status, that the matching of tracks can produce. 
 The four main figures of merit for the track finder - the finding efficiency, the hit efficiency, the clone rate and the fake rate - are defined using these matching labels as described below.
@@ -55,6 +55,7 @@ The PR track candidate can be classified into four categories, which are describ
   * The highest efficiency PR track candidate of the highest purity  MC track candidate  to this PR track candidate  is the same as this PR track candidate. 
     This means the PR track candidate contains a high contribution of only one MC track candidate and is also the best of all PR track candidates 
     describing this MC track candidate.
+
 * CLONE
 
   * The highest purity MC track candidate has a different highest efficiency PR track candidate than this track. 

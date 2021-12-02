@@ -11,11 +11,11 @@ Overview: Available Status
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 After running the TrackFinderMCTruthRecoTracksModule which creates Genfit Track Candidates from MC information (in the following called MC track candidates) 
-and the "normal" track finder algorithm which uses hit information from the detector(in the following called PR track candidates), 
+and the "normal" track finder algorithm which uses hit information from the detector (in the following called PR track candidates), 
 you can apply the MCRecoTracksMatcherModule, which creates relations between the two StoreArray s 
-of track candidates by looking on the hit content. 
+of track candidates by looking at the hit content. 
 If the hit content of two track candidates has a non-zero intersection, 
-a relation is created with the ration between the intersection number of hits to the total number of 
+a relation is created with the ratio between the intersection number of hits and the total number of 
 hits in the candidate as a weight (in both directions because the weight can be different as the total number 
 of hits in a track can be different for MC and PR track candidates). 
 The weights from PR to MC track candidates are called purity and from MC to PR track candidates efficiency. 
@@ -74,7 +74,7 @@ The PR track candidate can be classified into four categories, which are describ
   * The highest purity MC track candidate to this PR track candidate has a purity lower than the minimal purity given in 
     the parameter minimalPurity (2/3) or has an efficiency lower than the efficiency given in the parameter 
     minimalEfficiency (0.05). 
-    This means that the PRTrack does not contain a significat number of a specific MCTrack nor can it considered only made of background.
+    This means that the PRTrack does not contain a significant number of a specific MCTrack nor can it considered only made of background.
 
 
 MC track candidates are classified into three categories:
@@ -89,7 +89,7 @@ MC track candidates are classified into three categories:
 
   * The highest purity MC track candidate of the highest efficiency PR track candidate of this MC track candidate is not the same as this MC track candidate. 
     This means this MC track candidate is mostly contained in a PR track candidate, 
-    which in turn however better describes a MC track candidate different form this.
+    which in turn however better describes a MC track candidate different from this.
 
 * MISSING
 

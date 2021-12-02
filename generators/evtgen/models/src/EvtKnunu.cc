@@ -136,7 +136,8 @@ namespace Belle2 {
 
   void EvtKnunu::initProbMax()
   {
-    // obtained by brute force (71.177)
+    // Maximum probability is obtained by 10^6 MC samples
+    // I use about 10% higher values
     setProbMax(80.0);
   }
 

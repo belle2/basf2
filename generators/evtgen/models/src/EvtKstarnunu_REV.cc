@@ -165,7 +165,8 @@ namespace Belle2 {
 
   void EvtKstarnunu_REV::initProbMax()
   {
-    // obtained by brute force (20000.169)
+    // Maximum probability is obtained by 10^6 MC samples
+    // I use about 10% higher values
     setProbMax(22000.0);
   }
 

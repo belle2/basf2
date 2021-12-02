@@ -193,7 +193,7 @@ def run_eventprocessor(conffile):
     nnodes = int(get_ergetconf(conffile, 'processor', 'nnodes'))
     procid = int(get_ergetconf(conffile, 'processor', 'idbase'))
     badlist = get_ergetconf(conffile, 'processor', 'badlist')
-    id = int(get_ergetconf(conffile, 'processor', 'idbase'))
+    id = int(get_ergetconf(conffile, 'processor', 'idbase'))  # noqa
 
     for i in range(procid, procid + nnodes):
         nodeid = '%2.2d' % i
@@ -216,11 +216,11 @@ def stop_eventprocessor(conffile):
     hostbase = get_ergetconf(conffile, 'processor', 'ctlhostbase')
     nodebase = get_ergetconf(conffile, 'processor', 'nodebase')
     basedir = get_ergetconf(conffile, 'system', 'execdir_base')
-    port = get_ergetconf(conffile, 'system', 'nsmport')
+    port = get_ergetconf(conffile, 'system', 'nsmport')  # noqa
     nnodes = int(get_ergetconf(conffile, 'processor', 'nnodes'))
     procid = int(get_ergetconf(conffile, 'processor', 'idbase'))
     badlist = get_ergetconf(conffile, 'processor', 'badlist')
-    id = int(get_ergetconf(conffile, 'processor', 'idbase'))
+    id = int(get_ergetconf(conffile, 'processor', 'idbase'))  # noqa
 
     unit = get_ergetconf(conffile, 'system', 'unitname')
     rbufin = get_ergetconf(conffile, 'collector', 'ringbufin')

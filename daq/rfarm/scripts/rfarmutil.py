@@ -240,7 +240,7 @@ def run_eventprocessor(conffile):
     nnodes = int(get_rfgetconf(conffile, 'processor', 'nnodes'))
     procid = int(get_rfgetconf(conffile, 'processor', 'idbase'))
     badlist = get_rfgetconf(conffile, 'processor', 'badlist')
-    id = int(get_rfgetconf(conffile, 'processor', 'idbase'))
+    id = int(get_rfgetconf(conffile, 'processor', 'idbase'))  # noqa
 
     for i in range(procid, procid + nnodes):
         nodeid = '%2.2d' % i
@@ -263,11 +263,11 @@ def stop_eventprocessor(conffile):
     hostbase = get_rfgetconf(conffile, 'processor', 'ctlhostbase')
     nodebase = get_rfgetconf(conffile, 'processor', 'nodebase')
     basedir = get_rfgetconf(conffile, 'system', 'execdir_base')
-    port = get_rfgetconf(conffile, 'system', 'nsmport')
+    port = get_rfgetconf(conffile, 'system', 'nsmport')  # noqa
     nnodes = int(get_rfgetconf(conffile, 'processor', 'nnodes'))
     procid = int(get_rfgetconf(conffile, 'processor', 'idbase'))
     badlist = get_rfgetconf(conffile, 'processor', 'badlist')
-    id = int(get_rfgetconf(conffile, 'processor', 'idbase'))
+    id = int(get_rfgetconf(conffile, 'processor', 'idbase'))  # noqa
 
     unit = get_rfgetconf(conffile, 'system', 'unitname')
     rbufin = get_rfgetconf(conffile, 'collector', 'ringbufin')

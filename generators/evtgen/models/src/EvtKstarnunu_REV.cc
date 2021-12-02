@@ -6,6 +6,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+// Junewoo Park      December 02, 2021
 
 #include <generators/evtgen/EvtGenModelRegister.h>
 
@@ -165,8 +166,8 @@ namespace Belle2 {
 
   void EvtKstarnunu_REV::initProbMax()
   {
-    // Maximum probability is obtained by 10^6 MC samples
-    // I use about 10% higher values
+    // Maximum probability was obtained by 10^6 MC samples. It was 20000.169
+    // About 10% higher value is used.
     setProbMax(22000.0);
   }
 

@@ -38,22 +38,22 @@ namespace Belle2 {
 
     bool isSelected(const Track* track); /**< determine if the track satisfies the selection criteria */
 
-    std::string m_inputArrayName;  /**< StoreArray with the input tracks */
-    std::string m_outputINArrayName;  /**< StoreArray with the selected output tracks */
-    std::string m_outputOUTArrayName;  /**< StoreArray with the NOT selected output tracks */
+    std::string m_inputArrayName = "Tracks";  /**< StoreArray with the input tracks */
+    std::string m_outputINArrayName = "TracksIN";  /**< StoreArray with the selected output tracks */
+    std::string m_outputOUTArrayName = "TracksOUT";  /**< StoreArray with the NOT selected output tracks */
 
     SelectSubset<Track> m_selectedTracks; /**< selected tracks */
     SelectSubset<Track> m_notSelectedTracks; /**< not selected tracks*/
 
-    double m_min_d0 = -100; /**< d0 miminum value*/
-    double m_max_d0 = 100; /**< d0 maximum value*/
-    double m_min_z0 = -500; /**< z0 miminum value*/
-    double m_max_z0 = 500; /**< z0 maximum value*/
-    int m_min_NumHitsPXD = 0; /**< miminum value of PXD hits*/
-    int m_min_NumHitsSVD = 0; /**< miminum value of SVD hits*/
-    int m_min_NumHitsCDC = 0; /**< miminum value of CDC hits*/
-    double m_min_pCM = 0; /**< miminum value of the center of mass momentum*/
-    double m_min_pT = 0; /**< miminum value of the transverse momentum*/
-    double m_min_Pval = 0;  /**< miminum P-value of the track fit*/
+    double m_minD0 = -100; /**< d0 miminum value*/
+    double m_maxD0 = 100; /**< d0 maximum value*/
+    double m_minZ0 = -500; /**< z0 miminum value*/
+    double m_maxZ0 = 500; /**< z0 maximum value*/
+    int m_minNumHitsPXD = 0; /**< miminum value of PXD hits*/
+    int m_minNumHitsSVD = 0; /**< miminum value of SVD hits*/
+    int m_minNumHitsCDC = 0; /**< miminum value of CDC hits*/
+    double m_minPCM = 0; /**< miminum value of the center of mass momentum*/
+    double m_minPT = 0; /**< miminum value of the transverse momentum*/
+    double m_minPval = 0;  /**< miminum P-value of the track fit*/
   };
 }

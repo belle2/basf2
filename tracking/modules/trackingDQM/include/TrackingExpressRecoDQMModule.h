@@ -59,7 +59,7 @@ namespace Belle2 {
     /** if True, the module produces the 2D Track Residual plot for each VXD sensor*/
     bool m_produce2Dres = false;
     /** Name of the directory for the histograms. */
-    std::string m_histogramDirectoryName;
+    std::string m_histogramDirectoryName = "TrackingERDQM";
 
   };
 }

@@ -60,7 +60,7 @@ if __name__ == "__main__":
                      re.findall(ignorevalidationtools, x) or
                      re.findall(ignoreincludeproblem, x) or
                      re.findall(ignoreonlinebook, x) or
-                     re.findall(ignoretrackmatching, x)
+                     re.findall(ignoretrackmatching, x),
                      ['--light']
                      )
     if not light_build:

@@ -304,7 +304,7 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None):
     """
     Function to prepare most likely particle lists according to PID likelihood, refer to stdCharged for details
 
-    @param pidPriors    list of 6 float numbers used to reweight PID likelihoods
+    @param pidPriors    list of 6 float numbers used to reweight PID likelihoods, for e, mu, pi, K, p and d
     @param suffix       string added to the end of particle list names
     @param custom_cuts  custom selection cut string, if empty, standard track quality cuts will be applied
     @param path         modules are added to this path

@@ -640,9 +640,17 @@ The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `cluste
                           "returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis. The second argument specifies which BDT training to use: based on 'ALL' PID detectors (NB: 'SVD' is currently excluded), or 'ECL' only. The choice depends on the ChargedPidMVAModule's configuration.",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pidMostLikelyPDG(ePrior=1/6, muPrior=1/6, piPrior=1/6, KPrior=1/6, pPrior=1/6, dPrior=1/6)", mostLikelyPDG,
-                          "Returns PDG code of the largest PID likelihood, or NaN if PID information is not available.", Manager::VariableDataType::c_double);
+                          R"DOC(
+Returns PDG code of the largest PID likelihood, or NaN if PID information is not available.
+This function accepts either no arguments, or 6 floats as priors for the charged particle hypotheses 
+following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC",
+                          Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pidIsMostLikely(ePrior=1/6, muPrior=1/6, piPrior=1/6, KPrior=1/6, pPrior=1/6, dPrior=1/6)", isMostLikely,
-                          "Returns True if the PID likelihood for the particle given its PID is the largest one", Manager::VariableDataType::c_bool);
+                          R"DOC(
+Returns True if the largest PID likelihood of a given particle corresponds to its particle hypothesis.
+This function accepts either no arguments, or 6 floats as priors for the charged particle hypotheses 
+following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC",
+                          Manager::VariableDataType::c_bool);
 
     // B2BII PID
     VARIABLE_GROUP("Belle PID variables");

@@ -19,7 +19,7 @@ Square brackets ``[``, ``]`` are for grouping conditional statements.
 
 Cut strings support writing formulas in cuts directly. Operator precedences work as expected. 
 Formulas in conditions can be written freely e.g ``0.2 <= dx**2+dy**2 <= 0.7`` as one would expect in python.
-Common arithemtic operators ``+``, ``-``, ``*``, ``/`` can be used. For exponentiation operator both ``**`` and ``^`` are valid.
+Common arithmetic operators ``+``, ``-``, ``*``, ``/`` can be used. For the exponentiation operator both ``**`` and ``^`` are valid.
 You can use parenthesis ``(`` ``)`` to group expressions in formulas.
 
 Formulas as arguments for MetaVariables are also supported e.g ``abs(dx+dy) < 1`` .
@@ -28,13 +28,13 @@ Cuts supports writing numeric literals of different data types in different form
 You can also compare to special values like ``nan`` and ``inf``. Integer literals can also be given in hexadecimal notation e.g ``0xABC`` (case insensitive).
 Boolean literals can be written in both python ``True/False`` and c++ ``true/false`` style.
 
-.. warning:: You should not use square brackets ``[``, ``]`` in formulas. Use parenthesis ``(`` ``)`` only.
+.. warning:: You should not use square brackets ``[``, ``]`` for grouping expressions in formulas. Use parenthesis ``(`` ``)`` only.
 
 .. hint::
 
      Be aware of operator precedence ``not > and > or`` when combining your statements
      e.g ``condition1 and condition2 or condition3`` is evaluated equivalent to ``[condition1 and condition2] or condition3``,
-     ``not condition1 and condition2`` is evaluated equivalent to ``[not condtion1] and condition2``.
+     ``not condition1 and condition2`` is evaluated equivalent to ``[not condition1] and condition2``.
      If necessary, square brackets can be used to group conditional statements and apply operators as desired.
 
 

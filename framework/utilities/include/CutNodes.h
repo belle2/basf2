@@ -360,13 +360,6 @@ namespace Belle2 {
       if (std::holds_alternative<bool>(ret)) {
         return std::get<bool>(ret);
       } else if (std::holds_alternative<int>(ret)) {
-        if (static_cast<bool>(std::get<int>(ret)))  {
-          B2WARNING("Static casting of integer value to bool in cutstring evaluation." << LogVar("Cut substring",
-                    m_enode->decompile()) << LogVar("Casted value", std::get<int>(ret)) << LogVar("Casted to", "true"));
-        } else {
-          B2WARNING("Static casting of integer value to bool in cutstring evaluation." << LogVar("Cut substring",
-                    m_enode->decompile()) << LogVar("Casted value", std::get<int>(ret)) << LogVar("Casted to", "false"));
-        }
         return static_cast<bool>(std::get<int>(ret));
       } else if (std::holds_alternative<double>(ret)) {
         if (static_cast<bool>(std::get<double>(ret))) {

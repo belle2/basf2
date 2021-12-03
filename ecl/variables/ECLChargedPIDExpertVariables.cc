@@ -32,16 +32,18 @@ namespace Belle2 {
   namespace Variable {
 
     enum PSDVarType {
-      hadronEnergy = 1,
-      onlineEnergy = 2,
-      hadronEnergyFraction = 3,
-      digitWeight = 4,
-      digitFitType = 5,
-      radius = 6,
-      theta = 7,
-      phi = 8,
-      cosTheta = 9,
-      fractionOfShowerEnergy = 10,
+      onlineEnergy = 1,
+      fractionOfShowerEnergy = 2,
+      offlineEnergy = 3,
+      diodeEnergy = 4,
+      hadronEnergy = 5,
+      hadronEnergyFraction = 6,
+      digitWeight = 7,
+      digitFitType = 8,
+      radius = 9,
+      theta = 10,
+      cosTheta = 11,
+      phi = 12,
     };
 
 
@@ -62,30 +64,32 @@ namespace Belle2 {
     }
 
 
-    std::vector<std::tuple<double, unsigned int>> getDigitEnergyToSortVector(const ECLShower* shower)
+    std::vector<std::tuple<double, unsigned int, bool>> getDigitEnergyToSortVector(const ECLShower* shower)
     {
 
-      std::vector<std::tuple<double, unsigned int>> EnergyToSort;
+      std::vector<std::tuple<double, unsigned int, bool>> EnergyToSort;
       auto relatedDigits = shower->getRelationsTo<ECLCalDigit>();
 
       //EnergyToSort vector is used for sorting digits by offline two component energy
       for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
 
         const auto caldigit = relatedDigits.object(iRel);
+        bool goodFit = true;
 
         //exclude digits without waveforms
         const double digitChi2 = caldigit->getTwoComponentChi2();
-        if (digitChi2 < 0)  continue;
+        if (digitChi2 < 0)  goodFit = false;
 
         ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
 
         //exclude digits digits with poor chi2
-        if (digitFitType1 == ECLDsp::poorChi2) continue;
+        if (digitFitType1 == ECLDsp::poorChi2) goodFit = false;
 
         //exclude digits with diode-crossing fits
-        if (digitFitType1 == ECLDsp::photonDiodeCrossing) continue;
+        if (digitFitType1 == ECLDsp::photonDiodeCrossing)  goodFit = false;
 
-        EnergyToSort.emplace_back(caldigit->getTwoComponentTotalEnergy(), iRel);
+        // use getTwoComponentTotalEnergy instead?
+        EnergyToSort.emplace_back(caldigit->getEnergy(), iRel, goodFit);
       }
       return EnergyToSort;
     }
@@ -135,6 +139,8 @@ namespace Belle2 {
       return shower->getNominalNumberOfCrystalsForEnergy();
     }
 
+    // Large overlap with similar function in ECLCalDigitVariables. Keep this script for now as things are changing but once converged on a selection
+    // Remove overlap.
     double getDigitVariable(const Particle* particle, const std::vector<double>& arguments, const PSDVarType varType)
     {
       if (arguments.size() != 1) {
@@ -147,16 +153,29 @@ namespace Belle2 {
 
       auto relatedDigits = shower->getRelationsTo<ECLCalDigit>();
 
-      std::vector<std::tuple<double, unsigned int>> EnergyToSort = getDigitEnergyToSortVector(shower);
+      std::vector<std::tuple<double, unsigned int, bool>> EnergyToSort = getDigitEnergyToSortVector(shower);
+
       if (EnergyToSort.size() <= digit) return std::numeric_limits<float>::quiet_NaN();
 
       //sorting by energy
       std::sort(EnergyToSort.begin(), EnergyToSort.end(), std::greater<>());
 
-      const auto [digitEnergy, next] = EnergyToSort[digit];
+      const auto [digitEnergy, next, goodFit] = EnergyToSort[digit];
       const auto caldigit = relatedDigits.object(next);
 
+
+      // variables that are / rely on the fit result should only be returned if there actually was a good fit
+      // variables like position and online energy can always be returned
+      if (!goodFit and ((varType == PSDVarType::hadronEnergy) ||
+                        (varType == PSDVarType::diodeEnergy) ||
+                        (varType == PSDVarType::offlineEnergy) ||
+                        (varType == PSDVarType::hadronEnergyFraction) ||
+                        (varType == PSDVarType::digitFitType))) return std::numeric_limits<float>::quiet_NaN();
+
+
       if (varType == PSDVarType::hadronEnergy) return caldigit->getTwoComponentHadronEnergy();
+      if (varType == PSDVarType::diodeEnergy) return caldigit->getTwoComponentDiodeEnergy();
+      if (varType == PSDVarType::offlineEnergy) return caldigit->getTwoComponentTotalEnergy();
       if (varType == PSDVarType::onlineEnergy) return caldigit->getEnergy();
       if (varType == PSDVarType::fractionOfShowerEnergy) return caldigit-> getEnergy() / shower->getEnergy();
       if (varType == PSDVarType::hadronEnergyFraction) return caldigit->getTwoComponentHadronEnergy()  / digitEnergy;
@@ -172,7 +191,10 @@ namespace Belle2 {
       TVector3 tempP = showerPosition - calDigitPosition;
       if (varType == PSDVarType::radius) return tempP.Mag();
       if (varType == PSDVarType::theta) return tempP.Theta();
+      if (varType == PSDVarType::cosTheta) return tempP.CosTheta();
       if (varType == PSDVarType::phi) return tempP.Phi();
+
+      B2FATAL("variable id not found:" << digit << varType);
       return std::numeric_limits<float>::quiet_NaN();
     }
 
@@ -182,12 +204,23 @@ namespace Belle2 {
       return getDigitVariable(particle, arguments, PSDVarType::hadronEnergy);
     }
 
+    // returns the diodeEnergy of the ith ECL crystal
+    double getDiodeEnergy(const Particle* particle, const std::vector<double>& arguments)
+    {
+      return getDigitVariable(particle, arguments, PSDVarType::diodeEnergy);
+    }
+
     // returns the online energy of the ith ECL crystal
     double getOnlineEnergy(const Particle* particle, const std::vector<double>& arguments)
     {
       return getDigitVariable(particle, arguments, PSDVarType::onlineEnergy);
     }
 
+    // returns the offline energy of the ith ECL crystal
+    double getOfflineEnergy(const Particle* particle, const std::vector<double>& arguments)
+    {
+      return getDigitVariable(particle, arguments, PSDVarType::offlineEnergy);
+    }
     // returns the hadron energy fraction of the ith ECL crystal
     double getHadronEnergyFraction(const Particle* particle, const std::vector<double>& arguments)
     {
@@ -254,7 +287,11 @@ namespace Belle2 {
     //ECLCalDigit info
     REGISTER_VARIABLE("hadronEnergy(i)", getHadronEnergy,
                       "[eclChargedPIDExpert] the hadron energy of the ith most energetic crystal in the shower.");
+    REGISTER_VARIABLE("diodeEnergy(i)", getDiodeEnergy,
+                      "[eclChargedPIDExpert] the diode energy of the ith most energetic crystal in the shower.");
     REGISTER_VARIABLE("onlineEnergy(i)", getOnlineEnergy,
+                      "[eclChargedPIDExpert] the online energy of the ith most energetic crystal in the shower.");
+    REGISTER_VARIABLE("offlineEnergy(i)", getOfflineEnergy,
                       "[eclChargedPIDExpert] the online energy of the ith most energetic crystal in the shower.");
     REGISTER_VARIABLE("fractionOfShowerEnergy(i)", getFractionOfShowerEnergy,
                       "[eclChargedPIDExpert] the fraction of total shower energy in the digit ith digit.");

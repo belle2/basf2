@@ -10,8 +10,6 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
-#include <TCanvas.h>
-
 namespace Belle2 {
 
   /** Analysis of ER Tracking DQM plots */
@@ -39,4 +37,3 @@ namespace Belle2 {
 
   };
 } // end namespace Belle2
-

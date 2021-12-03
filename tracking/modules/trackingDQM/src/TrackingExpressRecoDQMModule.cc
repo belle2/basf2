@@ -30,13 +30,10 @@ REG_MODULE(TrackingExpressRecoDQM)
 TrackingExpressRecoDQMModule::TrackingExpressRecoDQMModule() : DQMHistoModuleBase()
 {
   setPropertyFlags(c_ParallelProcessingCertified);
-
-  setDescription("Data Quality Monitoring of the tracking run on ExpressReco. "
-                );
-  addParam("produce1Dresiduals", m_produce1Dres, "If True, produce 1D residual plots for each VXD sensor", bool(m_produce1Dres));
-
-  addParam("produce2Dresiduals", m_produce2Dres, "If True, produce 2D residual plots for each VXD sensor", bool(m_produce2Dres));
-
+  setDescription("Data Quality Monitoring of the tracking run on ExpressReco.");
+  addParam("produce1Dresiduals", m_produce1Dres, "If True, produce 1D residual plots for each VXD sensor", m_produce1Dres);
+  addParam("produce2Dresiduals", m_produce2Dres, "If True, produce 2D residual plots for each VXD sensor", m_produce2Dres);
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory for the histograms", m_histogramDirectoryName);
 }
 
 //------------------------------------------------------------------
@@ -59,9 +56,9 @@ void TrackingExpressRecoDQMModule::defineHisto()
   // Create a separate histogram directories and cd into it.
   TDirectory* originalDirectory = gDirectory;
 
-  TDirectory* TracksDQM = originalDirectory->GetDirectory("TrackingERDQM");
+  TDirectory* TracksDQM = originalDirectory->GetDirectory(m_histogramDirectoryName.c_str());
   if (!TracksDQM)
-    TracksDQM = originalDirectory->mkdir("TrackingERDQM");
+    TracksDQM = originalDirectory->mkdir(m_histogramDirectoryName.c_str());
 
   TracksDQM->cd();
   DefineTracks();

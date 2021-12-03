@@ -55,12 +55,6 @@ namespace Belle2 {
     virtual void endRun() override;
     virtual void terminate() override;
     /**
-     * Find canvas by name
-     * @param s Name of the canvas
-     * @return The pointer to the canvas, or nullptr if not found.
-     */
-    TCanvas* find_canvas(TString s);
-    /**
      * Clear content of SSNODE
      * @param n Pointer to the SSNODE
      */

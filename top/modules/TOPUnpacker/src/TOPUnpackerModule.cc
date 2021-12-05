@@ -198,7 +198,7 @@ namespace Belle2 {
             int slot = (raw.GetNodeID(0) & 0xF) * 8 - 7 + finesse / 4;
             std::string name = (slot < 10) ? "s0" : "s";
             name += std::to_string(slot) + char('a' + finesse % 4);
-            B2ERROR("TOPUnpacker: error in unpacking data from boardstack " << name
+            B2ERROR("TOPUnpacker: error in unpacking data from boardstack " << name << " "
                     << LogVar("words unused", err));
           }
         }

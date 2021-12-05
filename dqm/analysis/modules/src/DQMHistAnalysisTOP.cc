@@ -101,20 +101,6 @@ void DQMHistAnalysisTOPModule::beginRun()
   //B2DEBUG(20, "DQMHistAnalysisTOP: beginRun called.");
 }
 
-TCanvas* DQMHistAnalysisTOPModule::find_canvas(TString canvas_name)
-{
-  TIter nextckey(gROOT->GetListOfCanvases());
-  TObject* cobj = NULL;
-
-  while ((cobj = (TObject*)nextckey())) {
-    if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      if (cobj->GetName() == canvas_name)
-        break;
-    }
-  }
-  return (TCanvas*)cobj;
-}
-
 TH1* DQMHistAnalysisTOPModule::find_histo_in_canvas(TString histo_name)
 {
   StringList s = StringUtil::split(histo_name.Data(), '/');
@@ -123,26 +109,19 @@ TH1* DQMHistAnalysisTOPModule::find_histo_in_canvas(TString histo_name)
   std::string canvas_name = dirname + "/c_" + hname;
 
   TIter nextckey(gROOT->GetListOfCanvases());
-  TObject* cobj = NULL;
 
-  while ((cobj = (TObject*)nextckey())) {
-    if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      if (cobj->GetName() == canvas_name)
-        break;
-    }
-  }
-  if (cobj == NULL) return NULL;
+  auto cobj = find_canvas(canvas_name);
+  if (cobj == nullptr) return nullptr;
 
   TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
-  TObject* obj = NULL;
-
-  while ((obj = (TObject*)nextkey())) {
+  TObject* obj{};
+  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
     if (obj->IsA()->InheritsFrom("TH1")) {
       if (obj->GetName() == histo_name)
-        return (TH1*)obj;
+        return  dynamic_cast<TH1*>(obj);
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 void DQMHistAnalysisTOPModule::event()

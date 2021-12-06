@@ -9,6 +9,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 
 class TChain;
 
@@ -28,6 +29,12 @@ namespace Belle2 {
     /** Call this function from supported input modules. */
     static void setCanControlInput(bool on) { s_canControlInput = on; }
 
+    /** Should the events from two input paths be mixed. */
+    static bool getEventMixing() { return s_doEventMixing; }
+
+    /** Should the events from two input paths be mixed. */
+    static void enableEventMixing() { s_doEventMixing = true; };
+
     /** Set the file entry to be loaded the next time event() is called.
      *
      * This is mainly useful for interactive applications (e.g. event display).
@@ -37,7 +44,7 @@ namespace Belle2 {
     static void setNextEntry(long entry) { s_nextEntry = entry; }
 
     /** Return entry number set via setNextEntry(). */
-    static long getNextEntry() { return s_nextEntry; }
+    static long getNextEntry();
 
     /** Set the file entry to be loaded the next time event() is called, by evt/run/exp number.
      *
@@ -63,11 +70,9 @@ namespace Belle2 {
      */
     static long numEntries();
 
-    /** Returns minimum number of entries in the event tree if several input modules are used.
-     *
-     * If only one module is used, provides same return value as numEntries().
+    /** Returns number of entries in the event tree if two input modules are used.
      */
-    static long minNumEntries();
+    static std::pair<long, long> numEntriesMergePaths();
 
     /** Return name of current file in loaded chain (or empty string if none loaded). */
     static std::string getCurrentFileName();
@@ -95,11 +100,22 @@ namespace Belle2 {
     /** Is there an input module to be controlled? */
     static bool s_canControlInput;
 
+    /** Do we want to mix events from two paths? */
+    static bool s_doEventMixing;
+
     /** entry to be loaded the next time event() is called in an input module.
      *
      *  -1 indicates that execution should continue normally.
      */
     static long s_nextEntry;
+
+    /** event mixing only: events to be processed next */
+    static std::pair<long, long> s_nextEntries;
+
+    /** event mixing only: we need to know if we processed both paths already
+     * (first: main path, second: independent path)
+     */
+    static bool s_processedBothPaths;
 
     /** Experiment number to load next.
      *
@@ -113,8 +129,8 @@ namespace Belle2 {
     /** Event (not entry!) to load next. */
     static long s_nextEvent;
 
-    /** min number of events in paths if several input modules are used (independent paths) */
-    static long s_minEvtNumber;
+    /** number of events in paths if two input modules are used (independent paths) */
+    static std::pair<long, long> s_eventNumbers;
 
     /** current entry in file. */
     static long s_currentEntry;

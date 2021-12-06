@@ -12,6 +12,8 @@
 #include <framework/core/Environment.h>
 #include <framework/core/InputController.h>
 
+#include <algorithm>
+
 
 using namespace Belle2;
 
@@ -28,14 +30,16 @@ MergeDataStoreModule::MergeDataStoreModule() : Module()
            "do you want to create a new (empty) DataStore 'toID'? This should be true only when toID refers to a _new_ DataStore ID", false);
   addParam("mergeBack", m_mergeBack, "if given, copy the given objects/arrays over even if createNew is false.",
            std::vector<std::string> {});
+  addParam("doMixing", m_eventMixing, "merge each event of main path with each event of independent path", false);
 }
 
 MergeDataStoreModule::~MergeDataStoreModule() = default;
-void MergeDataStoreModule::init(const std::string& to, bool createNew, const std::vector<std::string>& mergeBack)
+void MergeDataStoreModule::init(const std::string& to, bool createNew, const std::vector<std::string>& mergeBack, bool eventMixing)
 {
   m_to = to;
   m_createNew = createNew;
   m_mergeBack = mergeBack;
+  m_eventMixing = eventMixing;
 }
 
 void MergeDataStoreModule::initialize()
@@ -48,11 +52,22 @@ void MergeDataStoreModule::initialize()
   if (not m_createNew and m_from == "")
     B2FATAL("createNew is not set ?");
 
+  // TODO: Move to independent module!
   // Make sure we are not processing more events than available in either of the paths
-  if (Environment::Instance().getNumberEventsOverride() == 0
-      || InputController::minNumEntries() < Environment::Instance().getNumberEventsOverride()) {
-    B2INFO("Processing " << InputController::minNumEntries() << " events (minimum of both paths).");
-    Environment::Instance().setNumberEventsOverride(InputController::minNumEntries());
+  if (!m_createNew) {
+    std::pair<long, long> numEntriesPair = InputController::numEntriesMergePaths();
+    if (m_eventMixing) {
+      InputController::enableEventMixing();
+      long evtsToProcess = numEntriesPair.first * numEntriesPair.second;
+      if (Environment::Instance().getNumberEventsOverride() == 0 || evtsToProcess < Environment::Instance().getNumberEventsOverride()) {
+        Environment::Instance().setNumberEventsOverride(evtsToProcess);
+      }
+    } else {
+      long evtsToProcess = std::min(numEntriesPair.first, numEntriesPair.second);
+      if (Environment::Instance().getNumberEventsOverride() == 0 || evtsToProcess < Environment::Instance().getNumberEventsOverride()) {
+        Environment::Instance().setNumberEventsOverride(evtsToProcess);
+      }
+    }
   }
 
   if (m_createNew) {

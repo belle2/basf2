@@ -114,7 +114,8 @@ namespace Belle2 {
     void addIndependentPath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back);
 
     /** See 'pydoc3 basf2.Path' */
-    void addIndependentMergePath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back);
+    void addIndependentMergePath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back,
+                                 bool event_mixing);
 
 
     /** return a string of the form [module a -> module b -> [another path]]

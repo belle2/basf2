@@ -22,7 +22,7 @@ namespace Belle2 {
      */
     MergeDataStoreModule();
     /** setter for Path. */
-    void init(const std::string& to, bool doCopy, const std::vector<std::string>& mergeBack);
+    void init(const std::string& to, bool doCopy, const std::vector<std::string>& mergeBack,  bool eventMixing);
 
     ~MergeDataStoreModule();
 
@@ -36,7 +36,9 @@ namespace Belle2 {
     std::string m_from; /**< active DataStore ID before this module. */
     std::string m_to; /**< active DataStore ID after this module. */
     bool m_createNew; /**< create new DataStore */
-    std::vector<std::string>
-    m_mergeBack; /**< list of obj/arrays (of event durability) that should be copied to m_to. */
+    bool m_eventMixing; /**< do event mixing (merge each event with each one) */
+
+    /** list of obj/arrays (of event durability) that should be merged with m_to. */
+    std::vector<std::string> m_mergeBack;
   };
 }

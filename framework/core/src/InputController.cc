@@ -18,17 +18,45 @@ long InputController::s_nextExperiment = -1;
 long InputController::s_nextRun = -1;
 long InputController::s_nextEvent = -1;
 long InputController::s_currentEntry = 0;
-long InputController::s_minEvtNumber = 0;
+std::pair<long, long> InputController::s_eventNumbers = { -1, -1};
+bool InputController::s_doEventMixing = false;
+std::pair<long, long> InputController::s_nextEntries = {0, 0};
+bool InputController::s_processedBothPaths = false;
 const TChain* InputController::s_chain = nullptr;
 
 void InputController::setChain(const TChain* chain)
 {
   s_chain = chain;
-  if (s_minEvtNumber == 0) {
-    s_minEvtNumber = (long)s_chain->GetEntries();
+  if (s_eventNumbers.first == -1) {
+    s_eventNumbers.first = (long)s_chain->GetEntries();
   } else {
-    s_minEvtNumber = std::min(s_minEvtNumber, (long)s_chain->GetEntries());
+    s_eventNumbers.second = (long)s_chain->GetEntries();
   }
+}
+
+long InputController::getNextEntry()
+{
+  if (s_doEventMixing) {
+    // Process events in order (0,0), (0,1), ..., (0,n), (1,0), (1,1), ...
+    long nextEvent = -1;
+    if (s_processedBothPaths) {
+      nextEvent = s_nextEntries.first;
+      if (s_nextEntries.first == s_eventNumbers.first) {
+        assert(!"Reached end of both files. This should not happen.");
+      }
+      s_processedBothPaths = false;
+    } else {
+      nextEvent = s_nextEntries.second;
+      ++s_nextEntries.second;
+      if (s_nextEntries.second == s_eventNumbers.second) {
+        s_nextEntries.second = 0;
+        ++s_nextEntries.first;
+      }
+      s_processedBothPaths = true;
+    }
+    return nextEvent;
+  }
+  return s_nextEntry;
 }
 
 void InputController::resetForChildProcess()
@@ -56,13 +84,16 @@ std::string InputController::getCurrentFileName()
 
 long InputController::numEntries()
 {
+  if (s_doEventMixing) {
+    return s_eventNumbers.first * s_eventNumbers.second;
+  }
   if (s_chain)
     return s_chain->GetEntries();
 
   return 0;
 }
 
-long InputController::minNumEntries()
+std::pair<long, long> InputController::numEntriesMergePaths()
 {
-  return s_minEvtNumber;
+  return s_eventNumbers;
 }

@@ -339,7 +339,9 @@ void RootInputModule::event()
   while (true) {
     const long nextEntry = InputController::getNextEntry();
     if (nextEntry >= 0 && nextEntry < InputController::numEntries()) {
-      B2INFO("RootInput: will read entry " << nextEntry << " next.");
+      if (!InputController::getEventMixing) {
+        B2INFO("RootInput: will read entry " << nextEntry << " next.");
+      }
       m_nextEntry = nextEntry;
     } else if (InputController::getNextExperiment() >= 0 && InputController::getNextRun() >= 0
                && InputController::getNextEvent() >= 0) {
@@ -423,6 +425,7 @@ void RootInputModule::readTree()
 
   // Check if there are still new entries available.
   int  localEntryNumber = m_nextEntry;
+  B2INFO(this->getName() << ": Reading file entry " << m_nextEntry);
   if (m_entrySequences.size() > 0) {
     localEntryNumber = m_tree->GetEntryNumber(localEntryNumber);
   }

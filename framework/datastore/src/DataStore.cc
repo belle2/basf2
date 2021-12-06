@@ -984,22 +984,6 @@ void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& 
     return;
   }
 
-  // this is an alternative to make sure processing is stopped after one of the paths does not have any more events
-  // but the warnings etc might confuse the user, and also the progress bar shows weird numbers
-  // instead I implemented an approach using Environment::Instance().ssetNumberEventsOverride(..)
-  /*
-    int targetidx = m_idToIndexMap.at(id);
-    // Make sure we have not reached end of second file (first file determines number of processed events)
-    if (m_entries[m_currentIdx][c_Event].count("EventMetaData") == 0 or m_entries[targetidx][c_Event].count("EventMetaData") == 0) {
-      B2FATAL("No EventMetaData found in at least one of the input paths.");
-    }
-    if (!m_entries[m_currentIdx][c_Event]["EventMetaData"].ptr) {
-      B2WARNING("Uneven number of events in the two paths. Not merging further events.");
-      static_cast<EventMetaData*>(m_entries[targetidx][c_Event]["EventMetaData"].ptr)->setEndOfData();
-      return;
-    }
-  */
-
   std::vector<std::string> entrylist;
   if (entrylist_event.size() == 1 and entrylist_event.at(0) == "ALL") {
     entrylist = DataStore::Instance().getSortedListOfDataStore(c_Event);
@@ -1070,8 +1054,7 @@ void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& 
             TClonesArray* fromArr = static_cast<TClonesArray*>(fromEntry.getPtrAsArray()->Clone());
             fixAbsorbObjects(fromArr, target.getPtrAsArray());
 
-            // update the cache (strictly speaking this is not necessary, as it will be done automatically
-            // as soon as one of the new objects is accessed but we already know it has to be sooner or later)
+            // update the cache
             updateRelationsObjectCache(target);
           }
         } else {
@@ -1093,13 +1076,15 @@ void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& 
               const std::string& fromName = fromRelContainer->getFromName();
               const std::string& toName = fromRelContainer->getToName();
 
+              auto* targetRelContainer = static_cast<RelationContainer*>(target.ptr);
               if (arrayIndices->getIndex(fromName) == -1 || arrayIndices->getIndex(toName) == -1) {
-                B2WARNING("Please specify arguments of 'independent_merge_path' in correct order, i.e. names of StoreArrays before the Relations: "
-                          << "merge_back_event=[..., " << fromName << ", " << toName << ", " << fromEntry.name << ", ...]");
-                B2FATAL("Cannot merge Relations if corresponding StoreArrays were not merged before.");
+                B2WARNING("Skipping merging of relation " << fromEntry.name
+                          << ". The StoreArrays " << fromName << " and " << toName << " have to be merged before.");
+                // clear relation just to make sure nobody actually uses it
+                targetRelContainer->Clear();
+                continue;
               }
 
-              auto* targetRelContainer = static_cast<RelationContainer*>(target.ptr);
               // Make sure everything is properly initialized
               if (targetRelContainer->isDefaultConstructed()) {
                 targetRelContainer->setFromName(fromName);

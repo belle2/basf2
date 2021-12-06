@@ -130,7 +130,8 @@ void Path::addIndependentPath(const PathPtr& independent_path, std::string ds_ID
   addModule(switchEnd);
 }
 
-void Path::addIndependentMergePath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back)
+void Path::addIndependentMergePath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back,
+                                   bool event_mixing)
 {
   if (ds_ID.empty()) {
     static int dscount = 1;
@@ -138,9 +139,9 @@ void Path::addIndependentMergePath(const PathPtr& independent_path, std::string 
   }
   auto mergeBack = PyObjConvUtils::convertPythonObject(merge_back, std::vector<std::string>());
   ModulePtr switchStart = ModuleManager::Instance().registerModule("MergeDataStore");
-  static_cast<MergeDataStoreModule&>(*switchStart).init(ds_ID, true, mergeBack);
+  static_cast<MergeDataStoreModule&>(*switchStart).init(ds_ID, true, mergeBack, event_mixing);
   ModulePtr switchEnd = ModuleManager::Instance().registerModule("MergeDataStore");
-  static_cast<MergeDataStoreModule&>(*switchEnd).init("", false, mergeBack);
+  static_cast<MergeDataStoreModule&>(*switchEnd).init("", false, mergeBack, event_mixing);
   switchStart->setName("MergeDataStore ('' -> '" + ds_ID + "')");
   switchEnd->setName("MergeDataStore ('' <- '" + ds_ID + "')");
 

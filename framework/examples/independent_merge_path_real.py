@@ -13,6 +13,9 @@
 import basf2
 from ROOT import Belle2
 
+# environment = Belle2.Environment.Instance()
+# environment.setNumberEventsOverride(10)
+
 
 class CheckData(basf2.Module):
 
@@ -72,22 +75,23 @@ indep = basf2.Path()
 # input
 input1 = basf2.register_module('RootInput')
 input1.param('inputFileName', '/nfs/dust/belle2/user/kurzsimo/testSample/file1_10evts.root')
-main.add_module(input1).set_name("input1")
+main.add_module(input1).set_name("--input_main--")
 
-main.add_module(CheckData()).set_name("checkdata_main")
+# main.add_module(CheckData()).set_name("checkdata_main")
 
 # and the other input
 input2 = basf2.register_module('RootInput')
-input2.param('inputFileName', '/nfs/dust/belle2/user/kurzsimo/testSample/file2_10evts.root')
-indep.add_module(input2).set_name("input2")
+input2.param('inputFileName', '/nfs/dust/belle2/user/kurzsimo/testSample/file2_3evts.root')
+indep.add_module(input2).set_name("input_indep")
 
-indep.add_module(CheckData()).set_name("checkdata_indep")
+# indep.add_module(CheckData()).set_name("checkdata_indep")
 
 # merge it!
 # Use merge_back_event=['ALL'] to merge everything
 # NOTE: StoreArrays have to be merged before their Relations
 main.add_independent_merge_path(
     indep,
+    event_mixing=True,
     merge_back_event=[
         'ALL'
     ])
@@ -104,11 +108,11 @@ main.add_independent_merge_path(
 # ])
 #
 
-main.add_module(CheckData()).set_name("checkdata_merged")
+# main.add_module(CheckData()).set_name("checkdata_merged")
 
-main.add_module(CheckIndices()).set_name("checkindices")
+# main.add_module(CheckIndices()).set_name("checkindices")
 main.add_module('FixMergedObjects')
-main.add_module(CheckIndices()).set_name("checkindices_fixed")
+# main.add_module(CheckIndices()).set_name("checkindices_fixed")
 
 # output
 output = basf2.register_module('RootOutput')

@@ -330,7 +330,7 @@ def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=None):
     self._add_independent_path(skim_path, ds_ID, merge_back_event)
 
 
-def _add_independent_merge_path(self, skim_path, ds_ID='', merge_back_event=None):
+def _add_independent_merge_path(self, skim_path, ds_ID='', merge_back_event=None, event_mixing=False):
     """
     Add given path at the end of this path and ensure all modules there
     do not influence the main DataStore. Then, in the end, merge back all the
@@ -344,7 +344,7 @@ def _add_independent_merge_path(self, skim_path, ds_ID='', merge_back_event=None
     """
     if merge_back_event is None:
         merge_back_event = []
-    self._add_independent_merge_path(skim_path, ds_ID, merge_back_event)
+    self._add_independent_merge_path(skim_path, ds_ID, merge_back_event, event_mixing)
 
 
 pybasf2.Path.add_module = _add_module

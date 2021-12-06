@@ -245,10 +245,8 @@ namespace {
     EXPECT_TRUE(a->check(&testObject));
 
     EXPECT_B2FATAL(a = MockGeneralCut::compile("[ ]"));
-    //EXPECT_TRUE(a->check(&testObject));
 
     EXPECT_B2FATAL(a = MockGeneralCut::compile("[ ] and []"));
-    //EXPECT_TRUE(a->check(&testObject));
   }
 
   /// Test for the general cut: Try to compile some cuts and check if decompiling gives back more or less the same string (except for [ and ]).

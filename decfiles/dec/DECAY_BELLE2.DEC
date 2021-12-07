@@ -2497,8 +2497,8 @@ Decay anti-B0
 0.003547860   D_s1-  D+                                    SVS;  #[BF update - PG 09/2020]
 0.009282570   D*+  D_s1-                                   SVV_HELAMP 0.4904 0. 0.7204 0. 0.4904 0.0; #[BF update - PG 09/2020]
 
-0.000880000   D+  K-  K*0                                  PHSP;
-0.001290000   D*+  K-  K*0                                 PHSP;
+0.000580000   D+  K-  K*0                                  PHSP; #[BF update - VB 12/2021, subtracted resonant D+ a_1- component, BR(R+NR)=0.00088]
+0.000640292   D*+  K-  K*0                                 PHSP; #[BF update - VB 12/2021, subtracted resonant D*+ a_1- component, BR(R+NR)=0.00129]
 0.000300000   D*+  K0  pi-                                 PHSP;
 0.000300000   D*-  K0  pi+                                 PHSP;
 0.000490000   D+  anti-K0  pi-                             PHSP;
@@ -5698,8 +5698,8 @@ Decay B-
 0.003091320   D_s1-  D0                                    SVS;  #[BF update - PG 09/2020]
 0.011960470   D*0  D_s1-                                   SVV_HELAMP 0.4904 0.0 0.7204 0.0 0.4904 0.0;  #[BF update - PG 09/2020]
 0.000550000   D0  K-  anti-K0                              PHSP;
-0.000750000   D0  K-  anti-K*0                             PHSP;
-0.001530000   D*0  K-  anti-K*0                            PHSP; #[BF update - PG 09/2020]
+0.000525000   D0  K-  anti-K*0                             PHSP; #[BF update - VB 12/2021, subtracted resonant anti-D0 a_1- component, BR(R+NR)=0.00075]
+0.000590000   D*0  K-  anti-K*0                            PHSP; #[BF update - VB 12/2021, subtracted resonant anti-D*0 a_1- component, BR(R+NR)=0.00153]
 0.004100000   D0  omega  pi-                               PHSP; #[BF update - PG 09/2020]
 0.004500000   D*0  omega  pi-                              PHSP;
 0.000450000   D0  D'_s1-                                   PHSP;
@@ -9905,10 +9905,10 @@ Decay a_10 #  Edited by U. Tamponi (March 2016), and V. Bertacchi (December 2021
 0.233300000   rho+  pi-                                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.233400000   rho0  pi0                                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.200000000   sigma_0  pi0                                 PHSP;
-0.025000000   K+  K*-                                      VSS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
-0.025000000   K-  K*+                                      VSS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
-0.025000000   anti-K0  K*0                                 VSS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
-0.025000000   K0  anti-K*0                                 VSS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
+0.025000000   K*-  K+                                      VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
+0.025000000   K*+  K-                                      VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
+0.025000000   K*0  anti-K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
+0.025000000   anti-K*0  K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
 Enddecay
 
 # a_1(1260)+
@@ -9918,8 +9918,8 @@ Decay a_1+ #  Edited by U. Tamponi (March 2016), and V. Bertacchi (December 2021
 0.013000000   rho(2S)0  pi+                                VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave # off mass shell, included back into the simulation on request of Pablo Goldenzweig
 0.013000000   rho(2S)+  pi0                                VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave # off mass shell, included back into the simulation on request of Pablo Goldenzweig
 0.161800000   sigma_0  pi+                                 PHSP;
-0.050000000   K+  anti-K*0                                 VSS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
-0.050000000   anti-K0  K*+                                 VSS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
+0.050000000   anti-K*0  K+                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
+0.050000000   K*+  anti-K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
 0.097300000   pi+  pi+  pi-                                PHSP; # added to fix the sum of the BF to 1. f_2(1270) and f_0(1370) contributions should be present
 Enddecay
 

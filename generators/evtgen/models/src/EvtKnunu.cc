@@ -5,8 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-// Junewoo Park      December 02, 2021
-// form factor: arXiv:1409.4557v2
 
 #include <generators/evtgen/EvtGenModelRegister.h>
 

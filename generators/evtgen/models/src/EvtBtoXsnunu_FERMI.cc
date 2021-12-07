@@ -5,7 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-// Junewoo Park      December 02, 2021
 
 #include <generators/evtgen/EvtGenModelRegister.h>
 
@@ -62,7 +61,7 @@ namespace Belle2 {
     EvtVector4R p4leptonp;
     EvtVector4R p4leptonn;
 
-    while (xhadronMass < _mxmin) {
+    while (xhadronMass < m_mxmin) {
 
       // Apply Fermi motion and determine effective b-quark mass
 
@@ -70,25 +69,25 @@ namespace Belle2 {
 
       bool FailToSetmb = true; // true when an appropriate mb cannot be found
       while (FailToSetmb) {
-        pb = FermiMomentum(_pf);
+        pb = FermiMomentum(m_pf);
 
         // effective b-quark mass
-        mb = mB * mB + _mq * _mq - 2.0 * mB * sqrt(pb * pb + _mq * _mq);
-        if (mb > 0. && sqrt(mb) - _ms < 2.0 * ml) FailToSetmb = true;
+        mb = mB * mB + m_mq * m_mq - 2.0 * mB * sqrt(pb * pb + m_mq * m_mq);
+        if (mb > 0. && sqrt(mb) - m_ms < 2.0 * ml) FailToSetmb = true;
         else if (mb <= 0.0) FailToSetmb = true;
         else FailToSetmb = false;
       }
       mb = sqrt(mb);
 
-      double mb_prob = _mb_prob; // b-quark mass for probability density
-      double ms_prob = _ms_prob; // s-quark mass for probability density
+      double mb_prob = m_mb_prob; // b-quark mass for probability density
+      double ms_prob = m_ms_prob; // s-quark mass for probability density
       double mstilda = ms_prob / mb_prob;
       double sb = 0.0;
       double sbmin = 0;
       double sbmax = (1 - mstilda) * (1 - mstilda);
       while (sb == 0.0) {
         double xbox = EvtRandom::Flat(sbmin, sbmax);
-        double ybox = EvtRandom::Flat(_dGdsbProbMax);
+        double ybox = EvtRandom::Flat(m_dGdsbProbMax);
         double prob = dGdsbProb(xbox);
         if (ybox < prob) sb = xbox;
       }
@@ -97,7 +96,7 @@ namespace Belle2 {
       EvtVector4R p4sdilep[2];
 
       double msdilep[2];
-      msdilep[0] = _ms;
+      msdilep[0] = m_ms;
       msdilep[1] = sqrt(sb * mb_prob * mb_prob);
 
       EvtGenKine::PhaseSpace(2, msdilep, p4sdilep, mb);
@@ -134,7 +133,7 @@ namespace Belle2 {
       p4leptonn = boostTo(p4ll[1], p4b);
 
       // spectator quark in B meson rest frame
-      EvtVector4R p4q(sqrt(pb * pb + _mq * _mq), -p4b.get(1), -p4b.get(2), -p4b.get(3));
+      EvtVector4R p4q(sqrt(pb * pb + m_mq * m_mq), -p4b.get(1), -p4b.get(2), -p4b.get(3));
 
       // hadron system in B meson rest frame
       p4xhadron = p4s + p4q;
@@ -166,7 +165,7 @@ namespace Belle2 {
 
     // check that there are no arguments
 
-    checkNArg(0, 4, 5, 7);
+    checkNArg(0, 3, 4, 6);
 
     checkNDaug(3);
 
@@ -231,27 +230,25 @@ namespace Belle2 {
       ::abort();
     }
 
-    if (getNArg() == 4) {
-      // b-quark mass for fermi motion
-      _mb = getArg(0);
+    if (getNArg() == 3) {
       // s-quark mass for fermi motion
-      _ms = getArg(1);
+      m_ms = getArg(0);
       // spectator quark mass for fermi motion
-      _mq = getArg(2);
+      m_mq = getArg(1);
       // Fermi motion parameter for fermi motion
-      _pf = getArg(3);
+      m_pf = getArg(2);
     }
-    if (getNArg() == 5) {
-      _mxmin = getArg(4);
+    if (getNArg() == 4) {
+      m_mxmin = getArg(3);
     }
-    if (getNArg() == 7) {
-      _mb_prob = getArg(5);
-      _ms_prob = getArg(6);
+    if (getNArg() == 6) {
+      m_mb_prob = getArg(4);
+      m_ms_prob = getArg(5);
     }
 
     // get a maximum probability
-    double mb = _mb_prob;
-    double ms = _ms_prob;
+    double mb = m_mb_prob;
+    double ms = m_ms_prob;
     double mstilda = ms / mb;
     double mstilda2 = mstilda * mstilda;
 
@@ -275,7 +272,7 @@ namespace Belle2 {
       std::cout << "dGdsbProbMax = " << probMax << " for sb = " << sbProbMax << std::endl;
     }
 
-    _dGdsbProbMax = probMax;
+    m_dGdsbProbMax = probMax;
 
   }
 
@@ -284,8 +281,8 @@ namespace Belle2 {
     // dGdsb: arXiv:1509.06248v2
     // see (eq.41)
 
-    double mb = _mb_prob; // b-quark mass for probability density
-    double ms = _ms_prob; // s-quark mass for probability density
+    double mb = m_mb_prob; // b-quark mass for probability density
+    double ms = m_ms_prob; // s-quark mass for probability density
     double mstilda = ms / mb;
 
     double sb = _sb;

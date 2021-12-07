@@ -9905,10 +9905,10 @@ Decay a_10 #  Edited by U. Tamponi (March 2016), and V. Bertacchi (December 2021
 0.233300000   rho+  pi-                                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.233400000   rho0  pi0                                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.200000000   sigma_0  pi0                                 PHSP;
-0.025000000   K*-  K+                                      VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
-0.025000000   K*+  K-                                      VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
-0.025000000   K*0  anti-K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
-0.025000000   anti-K*0  K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
+0.025000000   K*-  K+                                      VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.025000000   K*+  K-                                      VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.025000000   K*0  anti-K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.025000000   anti-K*0  K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 
 # a_1(1260)+
@@ -9918,8 +9918,8 @@ Decay a_1+ #  Edited by U. Tamponi (March 2016), and V. Bertacchi (December 2021
 0.013000000   rho(2S)0  pi+                                VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave # off mass shell, included back into the simulation on request of Pablo Goldenzweig
 0.013000000   rho(2S)+  pi0                                VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave # off mass shell, included back into the simulation on request of Pablo Goldenzweig
 0.161800000   sigma_0  pi+                                 PHSP;
-0.050000000   anti-K*0  K+                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
-0.050000000   K*+  anti-K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0
+0.050000000   anti-K*0  K+                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.050000000   K*+  anti-K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.097300000   pi+  pi+  pi-                                PHSP; # added to fix the sum of the BF to 1. f_2(1270) and f_0(1370) contributions should be present
 Enddecay
 

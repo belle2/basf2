@@ -12,7 +12,7 @@
 
 namespace Belle2 {
   /** Internal module used by Path.add_independent_merge_path(). Don't use it directly. */
-  class MergeDataStoreModule : public Module {
+  class SteerRootInputModule : public Module {
 
   public:
 
@@ -20,25 +20,23 @@ namespace Belle2 {
      * Constructor.
      * Sets the description, the properties and the parameters of the module.
      */
-    MergeDataStoreModule();
+    SteerRootInputModule();
 
     /** setter for Path. */
-    void init(const std::string& to, bool doCopy, const std::vector<std::string>& mergeBack);
+    void init(bool eventMixing);
 
-    ~MergeDataStoreModule();
+    ~SteerRootInputModule();
 
     virtual void initialize() override;
-    virtual void beginRun() override;
-    virtual void endRun() override;
     virtual void event() override;
-    virtual void terminate() override;
 
   private:
-    std::string m_from; /**< active DataStore ID before this module. */
-    std::string m_to; /**< active DataStore ID after this module. */
-    bool m_createNew; /**< create new DataStore */
 
-    /** list of obj/arrays (of event durability) that should be merged with m_to. */
-    std::vector<std::string> m_mergeBack;
+    /** do event mixing (merge each event of main path with each event of independent path) */
+    bool m_eventMixing;
+
+    /** these events should be processed next {main path, independent path} */
+    std::pair<long, long> m_nextEntries = {0, 0};
+
   };
 }

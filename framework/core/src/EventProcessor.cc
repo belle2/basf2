@@ -146,16 +146,16 @@ void EventProcessor::process(const PathPtr& startPath, long maxEvent)
   //Initialize modules
   processInitialize(moduleList);
 
-  // MergeDataStoreModule might have changed the number of events to be processed
-  bool mergeDataStore = false;
+  // SteerRootInputModule might have changed the number of events to be processed
+  bool steerInputs = false;
   for (const auto& module : moduleList) {
-    if (module->getType() == "MergeDataStore") {
-      mergeDataStore = true;
+    if (module->getType() == "SteerRootInput") {
+      steerInputs = true;
       break;
     }
   }
-  if (mergeDataStore && maxEvent != Environment::Instance().getNumberEventsOverride()) {
-    B2WARNING("Module 'MergeDataStore' is controlling the number of processed events.");
+  if (steerInputs && maxEvent != Environment::Instance().getNumberEventsOverride()) {
+    B2WARNING("Module 'SteerRootInputModule' is controlling the number of processed events.");
     maxEvent = Environment::Instance().getNumberEventsOverride();
   }
 

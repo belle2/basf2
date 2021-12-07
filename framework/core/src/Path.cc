@@ -18,6 +18,7 @@
 #include <framework/core/SubEventModule.h>
 #include <framework/core/SwitchDataStoreModule.h>
 #include <framework/core/MergeDataStoreModule.h>
+#include <framework/core/SteerRootInputModule.h>
 #include <framework/core/PyObjConvUtils.h>
 
 using namespace Belle2;
@@ -139,11 +140,14 @@ void Path::addIndependentMergePath(const PathPtr& independent_path, std::string 
   }
   auto mergeBack = PyObjConvUtils::convertPythonObject(merge_back, std::vector<std::string>());
   ModulePtr switchStart = ModuleManager::Instance().registerModule("MergeDataStore");
-  static_cast<MergeDataStoreModule&>(*switchStart).init(ds_ID, true, mergeBack, event_mixing);
+  static_cast<MergeDataStoreModule&>(*switchStart).init(ds_ID, true, mergeBack);
   ModulePtr switchEnd = ModuleManager::Instance().registerModule("MergeDataStore");
-  static_cast<MergeDataStoreModule&>(*switchEnd).init("", false, mergeBack, event_mixing);
+  static_cast<MergeDataStoreModule&>(*switchEnd).init("", false, mergeBack);
   switchStart->setName("MergeDataStore ('' -> '" + ds_ID + "')");
   switchEnd->setName("MergeDataStore ('' <- '" + ds_ID + "')");
+
+  ModulePtr steerInput = ModuleManager::Instance().registerModule("SteerRootInput");
+  static_cast<SteerRootInputModule&>(*steerInput).init(event_mixing);
 
   //set c_ParallelProcessingCertified flag if _all_ modules have it set
   auto flag = Module::c_ParallelProcessingCertified;
@@ -155,6 +159,7 @@ void Path::addIndependentMergePath(const PathPtr& independent_path, std::string 
   addModule(switchStart);
   addPath(independent_path);
   addModule(switchEnd);
+  addModule(steerInput);
 }
 
 bool Path::contains(const std::string& moduleType) const

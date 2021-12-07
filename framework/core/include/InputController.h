@@ -41,10 +41,10 @@ namespace Belle2 {
      *
      * The input module should call eventLoaded() after the entry was loaded.
      */
-    static void setNextEntry(long entry) { s_nextEntry = entry; }
+    static void setNextEntry(long entry, bool independentPath = false) { (!independentPath) ? s_nextEntry.first = entry : s_nextEntry.second = entry; }
 
     /** Return entry number set via setNextEntry(). */
-    static long getNextEntry();
+    static long getNextEntry(bool independentPath = false) { return (!independentPath) ? s_nextEntry.first : s_nextEntry.second;};
 
     /** Set the file entry to be loaded the next time event() is called, by evt/run/exp number.
      *
@@ -72,15 +72,16 @@ namespace Belle2 {
 
     /** Returns number of entries in the event tree if two input modules are used.
      */
-    static std::pair<long, long> numEntriesMergePaths();
+    static std::pair<long, long> numEntriesPair() { return s_eventNumbers; }
 
     /** Return name of current file in loaded chain (or empty string if none loaded). */
     static std::string getCurrentFileName();
 
     /** Indicate that an event (in the given entry) was loaded and reset all members related to the next entry. */
-    static void eventLoaded(long entry)
+    static void eventLoaded(long entry, bool independentPath = false)
     {
-      s_nextEntry = -1;
+      if (!independentPath) s_nextEntry.first = -1;
+      else s_nextEntry.second = -1;
       s_nextExperiment = -1;
       s_nextRun = -1;
       s_nextEvent = -1;
@@ -105,17 +106,10 @@ namespace Belle2 {
 
     /** entry to be loaded the next time event() is called in an input module.
      *
+     *  Storing two values (second one if independent path is executed)
      *  -1 indicates that execution should continue normally.
      */
-    static long s_nextEntry;
-
-    /** event mixing only: events to be processed next */
-    static std::pair<long, long> s_nextEntries;
-
-    /** event mixing only: we need to know if we processed both paths already
-     * (first: main path, second: independent path)
-     */
-    static bool s_processedBothPaths;
+    static std::pair<long, long> s_nextEntry;
 
     /** Experiment number to load next.
      *

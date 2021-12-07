@@ -82,6 +82,7 @@ main.add_module(input1).set_name("--input_main--")
 # and the other input
 input2 = basf2.register_module('RootInput')
 input2.param('inputFileName', '/nfs/dust/belle2/user/kurzsimo/testSample/file2_3evts.root')
+input2.param('isSecondaryInput', True)
 indep.add_module(input2).set_name("input_indep")
 
 # indep.add_module(CheckData()).set_name("checkdata_indep")

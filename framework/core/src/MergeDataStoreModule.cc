@@ -12,8 +12,6 @@
 #include <framework/core/Environment.h>
 #include <framework/core/InputController.h>
 
-#include <algorithm>
-
 
 using namespace Belle2;
 
@@ -23,23 +21,22 @@ REG_MODULE(MergeDataStore)
 
 MergeDataStoreModule::MergeDataStoreModule() : Module()
 {
-  setDescription("Internal module used by Path.add_independent_path(). This shouldn't appear in 'basf2 -m' output. If it does, check REG_MODULE() handling.");
+  setDescription("Internal module used by Path.add_independent_merge_path(). This shouldn't appear in 'basf2 -m' output. If it does, check REG_MODULE() handling.");
 
   addParam("toID", m_to, "active DataStore id after this module", std::string(""));
   addParam("createNew", m_createNew,
            "do you want to create a new (empty) DataStore 'toID'? This should be true only when toID refers to a _new_ DataStore ID", false);
   addParam("mergeBack", m_mergeBack, "if given, copy the given objects/arrays over even if createNew is false.",
            std::vector<std::string> {});
-  addParam("doMixing", m_eventMixing, "merge each event of main path with each event of independent path", false);
 }
 
 MergeDataStoreModule::~MergeDataStoreModule() = default;
-void MergeDataStoreModule::init(const std::string& to, bool createNew, const std::vector<std::string>& mergeBack, bool eventMixing)
+
+void MergeDataStoreModule::init(const std::string& to, bool createNew, const std::vector<std::string>& mergeBack)
 {
   m_to = to;
   m_createNew = createNew;
   m_mergeBack = mergeBack;
-  m_eventMixing = eventMixing;
 }
 
 void MergeDataStoreModule::initialize()
@@ -51,24 +48,6 @@ void MergeDataStoreModule::initialize()
     B2FATAL("createNew is set for default DataStore ID! This would likely cause corruption.");
   if (not m_createNew and m_from == "")
     B2FATAL("createNew is not set ?");
-
-  // TODO: Move to independent module!
-  // Make sure we are not processing more events than available in either of the paths
-  if (!m_createNew) {
-    std::pair<long, long> numEntriesPair = InputController::numEntriesMergePaths();
-    if (m_eventMixing) {
-      InputController::enableEventMixing();
-      long evtsToProcess = numEntriesPair.first * numEntriesPair.second;
-      if (Environment::Instance().getNumberEventsOverride() == 0 || evtsToProcess < Environment::Instance().getNumberEventsOverride()) {
-        Environment::Instance().setNumberEventsOverride(evtsToProcess);
-      }
-    } else {
-      long evtsToProcess = std::min(numEntriesPair.first, numEntriesPair.second);
-      if (Environment::Instance().getNumberEventsOverride() == 0 || evtsToProcess < Environment::Instance().getNumberEventsOverride()) {
-        Environment::Instance().setNumberEventsOverride(evtsToProcess);
-      }
-    }
-  }
 
   if (m_createNew) {
     //create DataStore ID that doesn't exist yet (copying contents)
@@ -84,6 +63,7 @@ void MergeDataStoreModule::initialize()
   //switch
   DataStore::Instance().switchID(m_to);
 }
+
 void MergeDataStoreModule::terminate()
 {
   if (not m_createNew) {

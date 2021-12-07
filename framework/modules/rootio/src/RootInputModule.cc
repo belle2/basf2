@@ -89,6 +89,11 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
            "Bitmask of error flags to silently discard without raising a WARNING. Should be a combination of the ErrorFlags defined "
            "in the EventMetaData. No Warning will be issued when discarding an event if the error flag consists exclusively of flags "
            "present in this mask", m_discardErrorMask);
+
+  addParam("isSecondaryInput", m_isSecondaryInput,
+           "When using a second RootInputModule in an independent path [usually if you are using add_independent_merge_path(...)] "
+           "this has to be set to true",
+           false);
 }
 
 RootInputModule::~RootInputModule() = default;
@@ -322,6 +327,11 @@ void RootInputModule::initialize()
     }
   }
 
+  if (m_isSecondaryInput && (m_nextEntry > 0 || !m_skipToEvent.empty())) {
+    B2FATAL("Using two RootInputModules and skipping to a certain event is currently"
+            "not supported. If needed, to be implemented in the SteerRootInputModule.");
+  }
+
   // Processing everything so forward number of MC events
   if (m_processingAllEvents) {
     Environment::Instance().setNumberOfMCEvents(sumInputMCEvents);
@@ -337,9 +347,10 @@ void RootInputModule::event()
     return;
 
   while (true) {
-    const long nextEntry = InputController::getNextEntry();
+    const long nextEntry = InputController::getNextEntry(m_isSecondaryInput);
     if (nextEntry >= 0 && nextEntry < InputController::numEntries()) {
-      if (!InputController::getEventMixing) {
+      // don't show this message if we are doing event mixing, as it will pop up twice for every event
+      if (!InputController::getEventMixing()) {
         B2INFO("RootInput: will read entry " << nextEntry << " next.");
       }
       m_nextEntry = nextEntry;
@@ -356,7 +367,7 @@ void RootInputModule::event()
                 InputController::getNextExperiment() << ") in file! Loading entry " << m_nextEntry << " instead.");
       }
     }
-    InputController::eventLoaded(m_nextEntry);
+    InputController::eventLoaded(m_nextEntry, m_isSecondaryInput);
 
     readTree();
     m_nextEntry++;
@@ -425,7 +436,6 @@ void RootInputModule::readTree()
 
   // Check if there are still new entries available.
   int  localEntryNumber = m_nextEntry;
-  B2INFO(this->getName() << ": Reading file entry " << m_nextEntry);
   if (m_entrySequences.size() > 0) {
     localEntryNumber = m_tree->GetEntryNumber(localEntryNumber);
   }

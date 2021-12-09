@@ -7849,70 +7849,67 @@ Enddecay
 ##########                                                              ##########
 ##################################################################################
 #
-# Updated to PDG 2011
+# Updated to https://docs.belle2.org/record/1982/files/BELLE2-NOTE-PH-2020-055_v2.pdf Table IV
 #
 
 # tau-
 Decay tau-
-0.173900000   mu-  anti-nu_mu  nu_tau                      TAULNUNU;
-0.003670000   mu-  anti-nu_mu  nu_tau  gamma               PHSP;
-0.178200000   e-  anti-nu_e  nu_tau                        TAULNUNU;
-0.018300000   e-  anti-nu_e  nu_tau  gamma                 PHSP;
-0.108200000   pi-  nu_tau                                  TAUSCALARNU;
-0.006960000   K-  nu_tau                                   TAUSCALARNU;
-0.254900000   pi-  pi0  nu_tau                             TAUHADNU -0.108 0.775 0.149 1.364 0.400;
-0.001124109   pi-  pi0  nu_tau  gamma                      PYTHIA 21;
-0.004330000   K-  pi0  nu_tau                              PHSP;
-0.092600000   pi-  pi0  pi0  nu_tau                        TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
-0.000650000   K-  pi0  pi0  nu_tau                         PYTHIA 21;
-0.010400000   pi-  pi0  pi0  pi0  nu_tau                   PYTHIA 21;
-0.001100000   pi-  pi0  pi0  pi0  pi0  nu_tau              PHSP;
-#0.2515         rho- nu_tau                                 TAUVECTORNU;
-#0.1790         a_1-  nu_tau                                TAUVECTORNU;
+0.178104000   e-  anti-nu_e  nu_tau                        TAULNUNU; # Tauola TauDecayMode: 1
+0.173214000   mu-  anti-nu_mu  nu_tau                      TAULNUNU; # Tauola TauDecayMode: 2
+0.108857000   pi-  nu_tau                                  TAUSCALARNU; # Tauola TauDecayMode: 3
+0.254532000   rho-  nu_tau                                 TAUVECTORNU; # Tauola TauDecayMode: 4 COMMENTED OUT BEFORE!
+0.182792000   a_1-  nu_tau                                 TAUVECTORNU; # Tauola TauDecayMode: 5 COMMENTED OUT BEFORE!
+0.006945000   K-  nu_tau                                   TAUSCALARNU; # Tauola TauDecayMode: 6
+0.012662000   K*-  nu_tau                                  TAUVECTORNU; # Tauola TauDecayMode: 7
+0.044700000   pi-  pi-  pi+  pi0  nu_tau                   PYTHIA 21; # Tauola TauDecayMode: 8
+0.010377000   pi-  pi0  pi0  pi0  nu_tau                   PYTHIA 21; # Tauola TauDecayMode: 9
+0.000998000   pi-  pi-  pi+  pi0  pi0  nu_tau              PHSP; # Tauola TauDecayMode: 10
+0.000837000   pi-  pi-  pi-  pi+  pi+  nu_tau              PHSP; # Tauola TauDecayMode: 11
+0.000178000   pi-  pi-  pi-  pi+  pi+  pi0  nu_tau         PHSP; # Tauola TauDecayMode: 12
+0.000229000   pi-  pi-  pi+  pi0  pi0  pi0  nu_tau         PHSP; # Tauola TauDecayMode: 13
+0.001397000   K-  K+  pi-  nu_tau                          PYTHIA 21; # Tauola TauDecayMode: 14
+0.001696000   K0  anti-K0  pi-  nu_tau                     PYTHIA 21; # Tauola TauDecayMode: 15
+0.001586000   K-  K0  pi0  nu_tau                          PYTHIA 21; # Tauola TauDecayMode: 16
+0.000649000   K-  pi0  pi0  nu_tau                         PYTHIA 21; # Tauola TauDecayMode: 17
+0.003412000   K-  pi-  pi+  nu_tau                         PYTHIA 21; # Tauola TauDecayMode: 18
+0.003991000   anti-K0  pi-  pi0  nu_tau                    PYTHIA 21; # Tauola TauDecayMode: 19
+0.001387000   eta  pi-  pi0  nu_tau                        PYTHIA 21; # Tauola TauDecayMode: 20
+0.001297000   pi-  pi0  nu_tau  gamma                      PYTHIA 21; # Tauola TauDecayMode: 21
+0.001586000   K-  K0  nu_tau                               PYTHIA 21; # Tauola TauDecayMode: 22
+0.001098000   pi-  pi0  pi0  pi0  pi0  nu_tau              PHSP; # Tauola TauDecayMode: 23
+0.004091000   omega  pi-  pi0  nu_tau                      PYTHIA 21; # Tauola TauDecayMode: 24
+0.000164000   eta  pi-  pi-  pi+  nu_tau                   PHSP; # Tauola TauDecayMode: 25 NOT PRESENT BEFORE!
+0.000150000   eta  pi-  pi0  pi0  nu_tau                   PHSP; # Tauola TauDecayMode: 26
+0.000161000   eta  K-  nu_tau                              PHSP; # Tauola TauDecayMode: 27
+0.000138000   eta  K*-  nu_tau                             PHSP; # Tauola TauDecayMode: 28
+0.000369000   K-  pi-  pi+  pi0  nu_tau                    PYTHIA 21; # Tauola TauDecayMode: 29
+0.000489000   K-  pi0  pi0  pi0  nu_tau                    PYTHIA 21; # Tauola TauDecayMode: 30 NOT PRESENT BEFORE!
+0.000229000   anti-K0  pi-  pi-  pi+  nu_tau               PHSP; # Tauola TauDecayMode: 31  NOT PRESENT BEFORE!
+0.000259000   anti-K0  pi-  pi0  pi0  nu_tau               PHSP; # Tauola TauDecayMode: 32
+0.000061000   K-  K+  pi-  pi0  nu_tau                     PHSP; # Tauola TauDecayMode: 33
+0.000309000   K0  anti-K0  pi-  pi0  nu_tau                PHSP; # Tauola TauDecayMode: 34
+0.000120000   omega  pi-  pi- pi+  nu_tau                  PYTHIA 21; # Tauola TauDecayMode: 35 NOT PRESENT BEFORE!
+0.000140000   omega  pi-  pi0 pi0  nu_tau                  PYTHIA 21; # Tauola TauDecayMode: 36 NOT PRESENT BEFORE!
+0.000028000   e-  e-  e+  anti-nu_e  nu_tau                PHSP; # Tauola TauDecayMode: 37
+0.000359000   f_1  pi-  nu_tau                             PHSP; # Tauola TauDecayMode: 38
+0.000409000   omega  K-  nu_tau                            PYTHIA 21; # Tauola TauDecayMode: 39
 
-# Modes with K0s
-0.000540000   anti-K0  pi-  nu_tau                         PYTHIA 21;
-0.001486000   K-  K0  nu_tau                               PYTHIA 21;
-0.003820000   anti-K0  pi-  pi0  nu_tau                    PYTHIA 21;
-0.002200000   anti-K0  rho-  nu_tau                        PHSP;
-0.001500000   K-  K0  pi0  nu_tau                          PYTHIA 21;
-0.000260000   anti-K0  pi-  pi0  pi0  nu_tau               PHSP;
-0.001550000   K0  anti-K0  pi-  nu_tau                     PYTHIA 21;
-0.000360000   K0  anti-K0  pi-  pi0  nu_tau                PHSP;
-
-# 3 Charged Particles
-0.090200000   pi-  pi-  pi+  nu_tau                        TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
-0.044900000   pi-  pi-  pi+  pi0  nu_tau                   PYTHIA 21;
-0.000505000   pi-  pi-  pi+  pi0  pi0  nu_tau              PHSP;
-0.000170000   pi-  pi-  pi+  pi0  pi0  pi0  nu_tau         PHSP;
-0.002930000   K-  pi-  pi+  nu_tau                         PYTHIA 21;
-0.000370000   K-  pi-  pi+  pi0  nu_tau                    PYTHIA 21;
-0.001435000   K-  K+  pi-  nu_tau                          PYTHIA 21;
-0.000061000   K-  K+  pi-  pi0  nu_tau                     PHSP;
-0.000022000   K-  K-  K+  nu_tau                           PYTHIA 21;
-0.000028000   e-  e-  e+  anti-nu_e  nu_tau                PHSP;
-
-# 5 Charged Particles
-0.000775000   pi-  pi-  pi-  pi+  pi+  nu_tau              PHSP;
-0.000111000   pi-  pi-  pi-  pi+  pi+  pi0  nu_tau         PHSP;
-
-# Misc other modes
-0.012000000   K*-  nu_tau                                  TAUVECTORNU;
-0.002100000   K*0  K-  nu_tau                              PHSP;
-0.002200000   anti-K*0  pi-  nu_tau                        PHSP;
-0.004700000   K_1-  nu_tau                                 PHSP;
-0.001700000   K'_1-  nu_tau                                PHSP;
-0.001500000   K'*-  nu_tau                                 PHSP;
-0.001390000   eta  pi-  pi0  nu_tau                        PYTHIA 21;
-0.000200000   eta  pi-  pi0  pi0  nu_tau                   PHSP;
-0.000155000   eta  K-  nu_tau                              PHSP;
-0.000138000   eta  K*-  nu_tau                             PHSP;
-0.000094000   eta  anti-K0  pi-  nu_tau                    PHSP;
-0.000034000   phi  pi-  nu_tau                             PHSP;
-0.000044000   phi  K-  nu_tau                              PHSP;
-0.000390000   f_1  pi-  nu_tau                             PHSP;
-0.004100000   omega  pi-  pi0  nu_tau                      PYTHIA 21;
-0.000410000   omega  K-  nu_tau                            PYTHIA 21;
+# absent modes in Taola table:
+#0.254532000   pi- pi0  nu_tau                              TAUHADNU -0.108 0.775 0.149 1.364 0.400; # fully absorbed by rho-  nu_tau
+#0.090200000   pi-  pi-  pi+  nu_tau                        TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4; # fully absorbed by a_1-  nu_tau
+#0.092600000   pi-  pi0  pi0  nu_tau                        TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4; # fully absorbed by a_1-  nu_tau
+#0.004330000   K-  pi0  nu_tau                              PHSP; # fully absorbed by K*- nu_tau ??
+#0.000540000   anti-K0  pi-  nu_tau                         PYTHIA 21; # fully absorbed by K*- nu_tau ??
+#0.002200000   anti-K0  rho-  nu_tau                        PHSP; # ??
+#0.000022000   K-  K-  K+  nu_tau                           PYTHIA 21; # ??
+#0.002100000   K*0  K-  nu_tau                              PHSP; # probably saturated by K0 K- modes with more pions?
+#0.002200000   anti-K*0  pi-  nu_tau                        PHSP; # probably saturated by anti-K0 modes with more pions?
+#0.004700000   K_1-  nu_tau                                 PHSP; # ??
+#0.001700000   K'_1-  nu_tau                                PHSP; # ??
+#0.001500000   K'*-  nu_tau                                 PHSP; # ??
+#0.000094000   eta  anti-K0  pi-  nu_tau                    PHSP; # fully absorbed by eta  K*-  nu_tau
+#0.000034000   phi  pi-  nu_tau                             PHSP; # ??
+#0.000044000   phi  K-  nu_tau                              PHSP; # ??
 Enddecay
 
 CDecay tau+

@@ -510,7 +510,10 @@ MassFourCFitKFit::prepareOutputMatrix() {
     h3v.setX(m_al_1[index * KFitConst::kNumber7 + 0][0]);
     h3v.setY(m_al_1[index * KFitConst::kNumber7 + 1][0]);
     h3v.setZ(m_al_1[index * KFitConst::kNumber7 + 2][0]);
-    pdata.setMomentum(HepLorentzVector(h3v, m_al_1[index * KFitConst::kNumber7 + 3][0]), KFitConst::kAfterFit);
+    if (m_IsFixMass[index])
+      pdata.setMomentum(HepLorentzVector(h3v, sqrt(h3v.mag2() + pdata.getMass()*pdata.getMass())), KFitConst::kAfterFit);
+    else
+      pdata.setMomentum(HepLorentzVector(h3v, m_al_1[index * KFitConst::kNumber7 + 3][0]), KFitConst::kAfterFit);
     // position
     pdata.setPosition(HepPoint3D(
       m_al_1[index * KFitConst::kNumber7 + 4][0],
@@ -579,13 +582,20 @@ MassFourCFitKFit::makeCoreMatrix() {
     }
 
     for (int i = 0; i < m_TrackCount; i++) {
-      // 3->4
-      for (int j = 0; j < 4; j++) Sum_al_1[j][0] += al_1_prime[i * KFitConst::kNumber7 + j][0];
+      if (m_IsFixMass[i])
+        Sum_al_1[3][0] += energy[i];
+      else
+        Sum_al_1[3][0] += al_1_prime[i * KFitConst::kNumber7 + 3][0];
+      for (int j = 0; j < 3; j++) Sum_al_1[j][0] += al_1_prime[i * KFitConst::kNumber7 + j][0];
     }
 
     for (int i = 0; i < m_ConstraintMassCount; i++) {
       for (int k = m_ConstraintMassChildLists[i].first; k <= m_ConstraintMassChildLists[i].second; k++) {
-        for (int j = 0; j < 4; j++) Sum_child_al_1[i * 4 + j][0] += al_1_prime[k * KFitConst::kNumber7 + j][0];
+        if (m_IsFixMass[i])
+          Sum_child_al_1[3][0] += energy[i];
+        else
+          Sum_child_al_1[3][0] += al_1_prime[i * KFitConst::kNumber7 + 3][0];
+        for (int j = 0; j < 3; j++) Sum_child_al_1[i * 4 + j][0] += al_1_prime[k * KFitConst::kNumber7 + j][0];
       }
     }
 

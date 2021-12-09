@@ -9,6 +9,12 @@ Neutral Hadron Analysis Tool
  * Added a Python function `reconstructDecayWithNeutralHadron`, which merges the functionalities of ``ParticleCombiner`` and the
    above module.
 
+Vertex Fitting
+++++++++++++++
+ * Added a new fit-type option ``recoilmass`` to function :func:`vertex.kFit`. The kinematic fit is performed with a constraint 
+   of a recoil mass specified by the option ``recoilMass``.
+ * Fixed a bug in ``fourC`` and ``massfourC`` kfit. The mass of final-state partcile were not fixed in old version.
+
 Variables
 +++++++++
 

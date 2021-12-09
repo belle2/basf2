@@ -59,9 +59,9 @@ Accessing Datastore Objects
 ---------------------------
 
 Datastore objects can be accessed via the
-`PyStoreArray <https://b2-master.belle2.org/software/development/classBelle2_1_1PyStoreArray.html>`__
+`PyStoreArray <https://software.belle2.org/development/classBelle2_1_1PyStoreArray.html>`__
 class and the
-`PyStoreObj <https://b2-master.belle2.org/software/development/classBelle2_1_1PyStoreObj.html>`__ classes.
+`PyStoreObj <https://software.belle2.org/development/classBelle2_1_1PyStoreObj.html>`__ classes.
 Let's create a small module which will print the event number and information on
 MCParticles, namely the PDG code. To have tracks available, we will use the
 `ParticleGun` module, which generates very simple events.
@@ -79,7 +79,7 @@ MCParticles, namely the PDG code. To have tracks available, we will use the
    :class: toggle xhint stacked
 
    You can find information on the Particle class in
-   `doxygen <https://b2-master.belle2.org/software/development/classBelle2_1_1MCParticle.html>`__.
+   `doxygen <https://software.belle2.org/development/classBelle2_1_1MCParticle.html>`__.
    The `ParticleGun` has the option `nTracks`.
 
 .. admonition:: Solution

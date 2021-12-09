@@ -9,7 +9,7 @@ There are some minor differences with respect to  `ROOT <https://root.cern.ch>`_
 Cut strings are used to manipulate candidates (i.e. `ParticleList`_ s) with `modularAnalysis.applyCuts`, and `modularAnalysis.cutAndCopyList`.
 Events selections are applied with `modularAnalysis.applyEventCuts`.
 
-.. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
+.. _ParticleList: https://software.belle2.org/development/classBelle2_1_1ParticleList.html
 
 Allowed comparisons are ``<``, ``<=``, ``>``, ``>=``, ``==`` and ``!=``.
 Two-sided inequalities like ``1.2 < M < 1.5`` also work as expected.
@@ -22,7 +22,7 @@ Use the logical operators ``and`` and ``or`` to combine your cuts.
    For a more in-depth documentation of cut strings for developers, you can refer to the `doxygen documentation`_
    for the ``GeneralCut`` class.
 
-.. _doxygen documentation: https://b2-master.belle2.org/software/|release|/classBelle2_1_1GeneralCut.html
+.. _doxygen documentation: https://software.belle2.org/|release|/classBelle2_1_1GeneralCut.html
 
 This logic can become quite powerful, particularly in combination with the :b2:var:`formula` MetaVariable.
 Here are some examples:

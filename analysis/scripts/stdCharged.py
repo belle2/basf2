@@ -237,15 +237,15 @@ def stdLep(pdgId, listtype, method, classification, path=None):
     payload_misid_K = f"ParticleReweighting:{pid_var_stripped}_misid_K_combination_{listtype}"
 
     # Configure weighting module(s).
-    reweighter_eff = path.add_module("ParticleWeighting",
-                                     particleList=plistname,
-                                     tableName=payload_eff).set_name(f"ParticleWeighting_eff_{plistname}")
-    reweighter_misid_pi = path.add_module("ParticleWeighting",
-                                          particleList=plistname,
-                                          tableName=payload_misid_pi).set_name(f"ParticleWeighting_misid_pi_{plistname}")
-    reweighter_misid_K = path.add_module("ParticleWeighting",
-                                         particleList=plistname,
-                                         tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{plistname}")
+    path.add_module("ParticleWeighting",
+                    particleList=plistname,
+                    tableName=payload_eff).set_name(f"ParticleWeighting_eff_{plistname}")
+    path.add_module("ParticleWeighting",
+                    particleList=plistname,
+                    tableName=payload_misid_pi).set_name(f"ParticleWeighting_misid_pi_{plistname}")
+    path.add_module("ParticleWeighting",
+                    particleList=plistname,
+                    tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{plistname}")
 
     # Apply the PID selection cut, which is read from the efficiency payload.
     cut = f"{pid_var} > extraInfo({payload_eff}_threshold)"
@@ -304,7 +304,7 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None):
     """
     Function to prepare most likely particle lists according to PID likelihood, refer to stdCharged for details
 
-    @param pidPriors    list of 6 float numbers used to reweight PID likelihoods
+    @param pidPriors    list of 6 float numbers used to reweight PID likelihoods, for e, mu, pi, K, p and d
     @param suffix       string added to the end of particle list names
     @param custom_cuts  custom selection cut string, if empty, standard track quality cuts will be applied
     @param path         modules are added to this path

@@ -530,6 +530,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
       int badStat = statusELabUncorr[ibad];
       B2ERROR(" histogram " << failedELabUncorr[ibad].Data() << " status " << badStat << " " << statusString[badStat].Data());
     }
+    histfile->Close();
     return c_Failure;
   }
 
@@ -997,6 +998,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
       int highestN = maxNCry[ie][thID];
       if (nCrysCorrection[ie][thID][highestN] <= 0) {
         B2ERROR("eclLeakageAlgorithm: no nCrys correction for ie " << ie << " thetaID " << thID);
+        histfile->Close();
         return c_Failure;
       }
 
@@ -1348,6 +1350,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
                                      nresBins, 0, nEnergies);
 
   B2INFO("Resolution divided by peak for each energy bin and region " << nResType << " ways");
+  for (int ires = 0; ires < nResType; ires++) {B2INFO(" " << resName[ires]);}
   ix = 0;
   for (int ie = 0; ie < nEnergies; ie++) {
     B2INFO("  energy point " << ie);

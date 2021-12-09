@@ -185,15 +185,15 @@ with the `passesCut` function.
    This is the first one:
 
    .. literalinclude:: steering_files/039_various_additions.py
-           :lines: 31-34
-           :lineno-start: 31
+           :start-at: S10
+           :end-at: E10
 
 .. admonition:: Solution
    :class: toggle solution
 
         .. literalinclude:: steering_files/039_various_additions.py
-           :lines: 31-43
-           :lineno-start: 31
+           :start-at: S20
+           :end-at: E20
 
 Next, we perform the actual recovery, using the `correctBrems` function in the
 Modular Analysis package.
@@ -218,8 +218,8 @@ one Bremsstrahlung photon was added to this particle.
    :class: toggle solution
 
         .. literalinclude:: steering_files/039_various_additions.py
-           :lines: 45-46
-           :lineno-start: 45
+           :start-at: S30
+           :end-at: E30
 
 .. admonition:: Question
    :class: exercise stacked
@@ -270,8 +270,8 @@ variable by the `isSignalAcceptBremsPhotons` one, or add the ``?addbrems``
 marker to the decay string:
 
 .. literalinclude:: steering_files/039_various_additions.py
-   :lines: 48-53
-   :lineno-start: 48
+   :start-at: S40
+   :end-at: E40
 
 Finally, let's add the invariant mass of the :math:`J/\psi` meson without any
 Bremsstrahlung recovery applied. Then, after running your steering file, compare
@@ -307,8 +307,8 @@ Bremsstrahlung recovery?
     :class: toggle solution
 
     .. literalinclude:: steering_files/039_various_additions.py
-      :lines: 111-113
-      :lineno-start: 111
+      :start-at: S50
+      :end-at: E50
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -387,7 +387,7 @@ Each one does exactly as its name indicates: they rank particles in descending
 variable provided as a parameter.
 They append to each particle an `extraInfo` field with the name
 ``${variable}_rank``, with the best candidate having the value one (1).
-Notice that *each particle/anti-particle list is sorted separately*, i.e.,if
+Notice that *each particle/anti-particle list is sorted separately*, i.e., if a
 certain event has multiple :math:`B^+` and :math:`B^-` candidates, and you apply
 the ranking function to any of the particle lists, each list will be ranked
 separately.
@@ -423,8 +423,8 @@ random seed.
    :class: toggle solution
 
     .. literalinclude:: steering_files/039_various_additions.py
-       :lines: 72-74
-       :lineno-start: 72
+       :start-at: S60
+       :end-at: E60
 
 .. warning::
 

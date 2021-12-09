@@ -38,6 +38,9 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   addParam("ThresholdForHot", m_ThresholdForHot,
            "Threshold Y for hot channels: if a channel has an occupancy Y times larger than the average, it will be marked as hot (but not masked).",
            10);
+  addParam("ThresholdForLog", m_ThresholdForLog,
+           "Threshold Z for log scale view: if a channel has an occupancy Z times larger than the average, canvas shifts to log scale.",
+           20);
   addParam("MinHitsForFlagging", m_MinHitsForFlagging, "Minimal number of hits in a channel required to flag it as 'Masked' or 'Hot'",
            50);
   addParam("MinProcessedEventsForMessages", m_MinProcessedEventsForMessagesInput,
@@ -224,6 +227,9 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       latex.DrawLatexNDC(x, y, str.c_str());
       y -= 0.05;
     }
+  }
+  if (histogram->GetMaximum()*n > histogram->Integral()*m_ThresholdForLog && average * activeModuleChannels > m_MinHitsForFlagging) {
+    canvas->SetLogy();
   }
   canvas->Modified();
 }

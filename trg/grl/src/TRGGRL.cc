@@ -14,7 +14,7 @@
 #include "trg/trg/Utilities.h"
 #include "trg/grl/TRGGRL.h"
 #include "trg/cdc/TRGCDC.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include "trg/ecl/TrgEclCluster.h"
 #include <math.h>

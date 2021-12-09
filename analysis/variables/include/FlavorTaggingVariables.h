@@ -30,17 +30,17 @@ namespace Belle2 {
     double cosTPTO(const Particle* part);
 
     /**
-     * 1.0 if pdg-code for Lambda0, -1.0 if Anti-Lambda0, 0.0 else
+     * 1 if pdg-code for Lambda0, -1 if Anti-Lambda0, 0 else
      *
      * requires that RestOfEvent <-> Particle relation exists (returns -1 if it doesn't)
      */
-    double lambdaFlavor(const Particle* particle);
+    int lambdaFlavor(const Particle* particle);
 
     /**
-     * 0.0 if pdg-code for MCParticle is Lambda0, 0.0 if MCAnti-Lambda0, 1.0 else
+     * True if related MCParticle is a Lambda, false if not or if no related MCParticle found
      *
      */
-    double isLambda(const Particle* particle);
+    bool isLambda(const Particle* particle);
 
     /**
      * Returns the Matrixelement[2][2] of the PositionErrorMatrix of the Vertex fit.
@@ -74,57 +74,57 @@ namespace Belle2 {
      *
      * requires that StoreObjPtr<ParticleList> KShorts("K_S0:inRoe") exists.
      */
-    double NumberOfKShortsInRoe(const Particle* particle);
+    int NumberOfKShortsInRoe(const Particle* particle);
 
     /**
-     * returns 1.0 if the particle has been selected as target in the muon or electron flavor tagging category, 0.0 else.
+     * returns true if the particle has been selected as target in the muon or electron flavor tagging category, false else.
      */
-    double isInElectronOrMuonCat(const Particle* particle);
+    bool isInElectronOrMuonCat(const Particle* particle);
 
     /**
-      * return 1 if (dummy)
+      * return 1 if majority of tracks in ROE are from B0
       */
-    double isMajorityInRestOfEventFromB0(const Particle*);
+    bool isMajorityInRestOfEventFromB0(const Particle*);
 
     /**
-     * return 1 if (dummy)
+     * return 1 if majority of tracks in ROE are from B0bar
      */
-    double isMajorityInRestOfEventFromB0bar(const Particle*);
+    bool isMajorityInRestOfEventFromB0bar(const Particle*);
 
     /**
-     * -1 (1) if current RestOfEvent is related to a B0bar (B0) has tracks. Used for cuts
+     * return whether current RestOfEvent contains tracks. Used for cuts
      */
-    double hasRestOfEventTracks(const Particle* part);
+    bool hasRestOfEventTracks(const Particle* part);
 
     /**
      * -1 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the CP side.
      */
-    double isRelatedRestOfEventB0Flavor(const Particle* part);
+    int isRelatedRestOfEventB0Flavor(const Particle* part);
 
     /**
      * -1 (1) if current RestOfEvent is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the CP side.
      */
-    double isRestOfEventB0Flavor(const Particle*);
+    int isRestOfEventB0Flavor(const Particle*);
 
     /**
      * checks the decay chain upwards up to the Y(4S) resonance.Output is 0 (1) if an ancestor is found to be a B0bar (B0), if not -2.
      */
-    double ancestorHasWhichFlavor(const Particle* particle);
+    int ancestorHasWhichFlavor(const Particle* particle);
 
     /**
      * mcErrors MCMatching Flag on the reconstructed B0_cp.
      */
-    double B0mcErrors(const Particle* particle);
+    int B0mcErrors(const Particle* particle);
 
     /**
      * 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).
      */
-    double isRelatedRestOfEventMajorityB0Flavor(const Particle* part);
+    int isRelatedRestOfEventMajorityB0Flavor(const Particle* part);
 
     /**
      * 0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a B0bar (B0).
      */
-    double isRestOfEventMajorityB0Flavor(const Particle*);
+    int isRestOfEventMajorityB0Flavor(const Particle*);
 
     /**
      * Returns the MC flavor (+-1) of the accompanying tag-side B meson if the given particle is a correctly MC-matched B candidate.

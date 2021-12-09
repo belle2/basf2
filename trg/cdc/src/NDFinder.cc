@@ -25,7 +25,7 @@ void NDFinder::init(int minweight, int minpts,
                     double thresh,
                     double minassign,
                     int mincells, bool verbose,
-                    string axialFile, string stereoFile)
+                    string& axialFile, string& stereoFile)
 {
   m_params.minhits = (long unsigned int) minhits;
   m_params.minhits_axial = (long unsigned int) minhits_axial;
@@ -253,7 +253,7 @@ void NDFinder::squeezeAll(ndbinning writebins, c5array& writeArray, c5array& rea
 }
 
 
-void NDFinder::restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& expArray, c5array& compArray)
+void NDFinder::restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& expArray, const c5array& compArray)
 {
   B2DEBUG(55, "restoreZeros: zerobins.theta " << zerobins.theta << ", combins.theta " << compbins.theta);
   for (c5index ihit = 0; ihit < compbins.hitid; ihit++) {
@@ -358,7 +358,7 @@ void NDFinder::addLookup(unsigned short ihit)
 
 
 void NDFinder::addC3Comp(ushort hitr,
-                         ushort prio, c5array& hitsToTracks,
+                         ushort prio, const c5array& hitsToTracks,
                          short Dstart, ndbinning bins)
 {
   ushort ntheta = 0;
@@ -605,13 +605,13 @@ int NDFinder::hitToCluster(std::vector<std::vector<unsigned short>>& hitsVsClust
 }
 
 
-cell_index NDFinder::getMax(std::vector<cell_index>& entries)
+cell_index NDFinder::getMax(const std::vector<cell_index>& entries)
 {
   ushort cur_weight = 0;
   cell_index cur_max_index = {0, 0, 0};
-  c3array& houghPlane = *m_phoughPlane;
+  const c3array& houghPlane = *m_phoughPlane;
 
-  for (cell_index& entry : entries) {
+  for (const cell_index& entry : entries) {
     if (houghPlane[entry[0]][entry[1]][entry[2]] > cur_weight) {
       cur_weight = houghPlane[entry[0]][entry[1]][entry[2]];
       cur_max_index = entry;
@@ -624,7 +624,7 @@ cell_index NDFinder::getMax(std::vector<cell_index>& entries)
 vector<cellweight> NDFinder::getHighWeight(std::vector<cell_index> entries, float cutoff)
 {
   vector<cellweight> cellsAndWeight;
-  c3array& houghPlane = *m_phoughPlane;
+  const c3array& houghPlane = *m_phoughPlane;
   for (cell_index& entry : entries) {
     ushort cellWeight = houghPlane[entry[0]][entry[1]][entry[2]];
     if (cellWeight > cutoff) {
@@ -651,7 +651,7 @@ ushort NDFinder::hitContrib(cell_index peak, ushort ihit)
   ushort itheta = peak[2];
   ushort orient = m_hitOrients[ihit];
 
-  c2array& arrayHitMod = *m_parrayHitMod;
+  const c2array& arrayHitMod = *m_parrayHitMod;
   c2elem hitr = arrayHitMod[m_hitIds[ihit]][1];
   unsigned short prio = m_prioPos[ ihit ];
   if (Dstart > m_nPhiFull) {

@@ -83,9 +83,12 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
   B2INFO("cellIDLo = " << m_cellIDLo);
   B2INFO("cellIDHi = " << m_cellIDHi);
   B2INFO("minEntries = " << m_minEntries);
+  B2INFO("highStatEntries = " << m_highStatEntries);
   B2INFO("maxIterations = " << m_maxIterations);
-  B2INFO("tRatioMin = " << m_tRatioMin);
-  B2INFO("tRatioMax = " << m_tRatioMax);
+  B2INFO("tRatioMinNom = " << m_tRatioMinNom);
+  B2INFO("tRatioMaxNom = " << m_tRatioMaxNom);
+  B2INFO("tRatioMinHiStat = " << m_tRatioMinHiStat);
+  B2INFO("tRatioMaxHiStat = " << m_tRatioMaxHiStat);
   B2INFO("upperEdgeThresh = " << m_upperEdgeThresh);
   B2INFO("performFits = " << m_performFits);
   B2INFO("findExpValues = " << m_findExpValues);
@@ -253,7 +256,16 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
     double lowold(0.), lowoldold(0.);
     bool fixConst = false;
     int nIter = 0;
-    bool fitHist = IntegralVsCrysID->GetBinContent(crysID + 1) >= m_minEntries; /* fit only if enough events */
+    double histIntegral = IntegralVsCrysID->GetBinContent(crysID + 1);
+    bool fitHist =  histIntegral >= m_minEntries; /* fit only if enough events */
+
+    /** Use a smaller fit range for high statistics histograms */
+    double m_tRatioMin = m_tRatioMinNom;
+    double m_tRatioMax = m_tRatioMaxNom;
+    if (histIntegral > m_highStatEntries) {
+      m_tRatioMin = m_tRatioMinHiStat;
+      m_tRatioMax = m_tRatioMaxHiStat;
+    }
 
     /**---------------------------------------------------------------------------------------*/
     /** Iterate from this point */
@@ -391,7 +403,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
         thisBin = hEnergy->GetBinContent(ibin);
         if (thisBin > 0 && thisBin + prevBin >= 2) {iLast = ibin;}
       }
-      if (iLast > 0) {upperEdge = hEnergy->GetBinCenter(iLast);}
+      if (iLast > 0) {upperEdge = hEnergy->GetBinLowEdge(iLast);} // lower edge is a better estimate than center
     }
 
     /**-----------------------------------------------------------------------------------------*/

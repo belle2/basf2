@@ -24,8 +24,6 @@ except ModuleNotFoundError:
     light_build = True
 
 if __name__ == "__main__":
-    #: ignore environment variables
-    ignoreenvironmentvariables = 'envvar'
     #: ignore the warnings about class references not found in python
     ignorepythonclass = 'py:class reference target not found'
     #: ignore the warnings about duplicated labels in whatsnew part
@@ -47,10 +45,11 @@ if __name__ == "__main__":
     ignorevalidationtools = 'validation_tools'
     #: ignore missing include directives
     ignoreincludeproblem = 'Problems with "include" directive path'
+    #: ignore missing track matching link
+    ignoretrackmatching = 'trk_matching'
 
     check_error_free("b2code-sphinx-warnings", "sphinx", None,
                      lambda x:
-                     re.findall(ignoreenvironmentvariables, x) or
                      re.findall(ignorepythonclass, x) or
                      re.findall(ignoreduplicatewhatsnewlabel, x) or
                      re.findall(ignoreduplicatedescriptionofrole, x) or
@@ -60,13 +59,13 @@ if __name__ == "__main__":
                      re.findall(ignoreaddcdstoutput, x) or
                      re.findall(ignorevalidationtools, x) or
                      re.findall(ignoreincludeproblem, x) or
-                     re.findall(ignoreonlinebook, x),
+                     re.findall(ignoreonlinebook, x) or
+                     re.findall(ignoretrackmatching, x),
                      ['--light']
                      )
     if not light_build:
         check_error_free("b2code-sphinx-warnings", "sphinx", None,
                          lambda x:
-                         re.findall(ignoreenvironmentvariables, x) or
                          re.findall(ignorepythonclass, x) or
                          re.findall(ignoreduplicatewhatsnewlabel, x) or
                          re.findall(ignoreduplicatedescriptionofrole, x)

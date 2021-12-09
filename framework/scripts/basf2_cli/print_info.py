@@ -9,7 +9,7 @@
 ##########################################################################
 
 from basf2.core import basf2label, basf2copyright, basf2license, list_module_search_paths, LogPythonInterface
-from basf2.version import version, release
+from basf2.version import get_version, get_release
 from basf2 import conditions
 
 import os
@@ -64,8 +64,8 @@ print('')
 print(basf2label.center(48))
 print(basf2copyright.center(48))
 print(basf2license.center(48))
-print(('Release ' + release).center(48))
-print(('Version ' + version).center(48))
+print(('Release ' + get_release()).center(48))
+print(('Version ' + get_version()).center(48))
 print('')
 print('-' * 48)
 for var in ["RELEASE", "RELEASE_DIR", "LOCAL_DIR", "SUBDIR", "EXTERNALS_VERSION", "ARCH"]:

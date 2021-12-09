@@ -40,6 +40,7 @@ PhysicsObjectsMiraBelleModule::PhysicsObjectsMiraBelleModule() : HistoModule()
   addParam("TriggerIdentifier", m_triggerIdentifier,
            "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_mumutight"));
   addParam("MuPListName", m_muPListName, "Name of the muon particle list", std::string("mu+:physMiraBelle"));
+  addParam("MuMuPListName", m_mumuPListName, "Name of the di-muon particle list", std::string("Upsilon:physMiraBelle"));
 }
 
 void PhysicsObjectsMiraBelleModule::defineHisto()
@@ -73,7 +74,7 @@ void PhysicsObjectsMiraBelleModule::defineHisto()
   m_h_nECLClusters->SetXTitle("hist_nECLClusters");
   m_h_muid = new TH1F("hist_muid", "hist_muid", 20, 0, 1);
   m_h_muid->SetXTitle("hist_muid");
-  m_h_inv_p = new TH1F("hist_inv_p", "hist_inv_p", 100, 8, 12);
+  m_h_inv_p = new TH1F("hist_inv_p", "hist_inv_p", 400, 8, 12);
   m_h_inv_p->SetXTitle("hist_inv_p");
   m_h_ndf = new TH1F("hist_ndf", "hist_ndf", 100, 0, 80);
   m_h_ndf->SetXTitle("hist_ndf");
@@ -163,6 +164,15 @@ void PhysicsObjectsMiraBelleModule::event()
   double z0[2] = {};
   double ptcms[2] = {};
   double phicms[2] = {};
+
+  //get the di-muons for beam energy check
+  StoreObjPtr<ParticleList> UpsParticles(m_mumuPListName);
+  if (UpsParticles.isValid()) {
+    for (unsigned int i = 0; i < UpsParticles->getListSize(); i++) {
+      Particle* Ups = UpsParticles->getParticle(i);
+      m_h_inv_p->Fill(Ups->getMass());
+    }
+  }
 
   // get muons
   StoreObjPtr<ParticleList> muParticles(m_muPListName);

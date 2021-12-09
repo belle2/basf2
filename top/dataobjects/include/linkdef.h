@@ -11,11 +11,11 @@
 #pragma link C++ class Belle2::TOPDigit+; // checksum=0x43b82094, version=15
 #pragma link C++ class Belle2::TOPBarHit+; // checksum=0x88bd7661, version=3
 #pragma link C++ class Belle2::TOPLikelihood+; // checksum=0xd7c618b7, version=2
-#pragma link C++ class Belle2::TOPRecBunch+; // checksum=0xa16167cd, version=3
+#pragma link C++ class Belle2::TOPRecBunch+; // checksum=0x8881e1f, version=4
 #pragma link C++ class Belle2::TOPRawWaveform+; // checksum=0x581d60d9, version=9
 #pragma link C++ class Belle2::TOPProductionEventDebug+; // checksum=0xfbeb4b5d, version=1
 #pragma link C++ class Belle2::TOPProductionHitDebug+; // checksum=0x32688835, version=1
-#pragma link C++ class Belle2::TOPTimeZero+; // checksum=0xb02c2f5a, version=3
+#pragma link C++ class Belle2::TOPTimeZero+; // checksum=0xf7afaec4, version=4
 #pragma link C++ class Belle2::TOPRawDigit+; // checksum=0xd13d975f, version=6
 #pragma link C++ class Belle2::TOPSlowData+; // checksum=0x879d972e, version=1
 #pragma link C++ class Belle2::TOPInterimFEInfo+; // checksum=0x740da743, version=1

@@ -7,7 +7,7 @@
  **************************************************************************/
 
 #include "trg/trg/Signal.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/cdc/Helix.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include "trg/grl/TRGGRLMatch.h"

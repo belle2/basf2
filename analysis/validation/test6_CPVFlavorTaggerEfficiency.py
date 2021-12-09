@@ -19,8 +19,6 @@
 </header>
 """
 
-
-import flavorTagger as ft
 import ROOT
 from array import array
 
@@ -49,11 +47,6 @@ r_subsample = array('d', [
     1.0])
 r_size = len(r_subsample)
 average_eff = 0
-
-# working directory
-# needs the B0_B0bar_final.root-file
-# treeName = 'B0tree'
-
 
 # All possible Categories
 categories = [
@@ -118,11 +111,8 @@ for cat in categories:
     if catBranch in totalBranches:
         usedCategories.append(cat)
 
-if len(usedCategories) > 1:
-    ft.WhichCategories(usedCategories)
-
 categoriesNtupleList = str()
-for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
+for category in usedCategories:
     categoriesNtupleList = categoriesNtupleList + "Eff_%s:" % category
 
 
@@ -185,7 +175,7 @@ for method in methods:
     histo_belleplotBoth = ROOT.TH1F('qr_' + method + '_B0Both',
                                     'qr-tagger output (binning 50)',
                                     50, -1.0, 1.0)
-    # calibration plot for B0. If we get a linaer line our MC is fine, than the assumption r ~ 1- 2w is reasonable
+    # calibration plot for B0. If we get a linear line our MC is fine, than the assumption r ~ 1- 2w is reasonable
     # expectation is, that for B0 calibration plot:  qr=0  half B0 and half B0bar, qr = 1 only B0 and qr = -1
     # no B0. Inverse for B0bar calibration plot
     histo_calib_B0 = ROOT.TH1F('Calibration_' + method + '_B0', 'CalibrationPlot for true B0', 100, -1.0, 1.0)
@@ -604,7 +594,7 @@ print('*                                                                        
 # input: Classifier input from event-level. Output of event-level is recalculated for input on combiner-level.
 # but is re-evaluated under combiner target. Signal is B0, background is B0Bar.
 
-for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
+for category in usedCategories:
     # histogram of input variable (only signal) - not yet a probability! It's a classifier plot!
     hist_signal = ROOT.TH1F('Signal_' + category, 'Input Signal (B0)' +
                             category + ' (binning 50)', 50, -1.0, 1.0)

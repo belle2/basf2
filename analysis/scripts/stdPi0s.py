@@ -36,8 +36,9 @@ def stdPi0s(listtype="eff60_May2020", path=None, loadPhotonBeamBackgroundMVA=Fal
         loadPhotonBeamBackgroundMVA (bool): If true, photon candidates will be assigned a beam background probability.
     """
 
-    B2WARNING("stdPi0s is loading \"May2020\" pi0 recommendations. Please check Neutrals Performance Confluence"
-              " page for most up-to-date pi0 recommendations.")
+    if listtype != 'all':
+        B2WARNING("stdPi0s is loading \"May2020\" pi0 recommendations. Please check Neutrals Performance Confluence"
+                  " page for most up-to-date pi0 recommendations.")
 
     if listtype == 'all':
         stdPhotons('all', path, loadPhotonBeamBackgroundMVA)

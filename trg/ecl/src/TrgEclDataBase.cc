@@ -156,12 +156,8 @@ void TrgEclDataBase::MakeFitterCoefficient(const std::vector<int>& SignalPDF, st
     for (int jjj = 0; jjj < NFitBin; jjj++) {
       double SigPDFj0 = f0[jjj][kkk];
       double SigPDFj1 = f1[jjj][kkk];
-      double NoiseICM = 0.0; // Noise Inverse Covariance Matrix
       for (int iii = 0; iii < NFitBin; iii++) {
-        //
-        if (jjj >= NFitBin || iii >= NFitBin) {NoiseICM = 0.0; }
-        else                            {NoiseICM = noise_cm1(jjj, iii);}
-        //
+        double NoiseICM = noise_cm1(jjj, iii); // Noise Inverse Covariance Matrix
         double SigPDFi0 = f0[iii][kkk];
         double SigPDFi1 = f1[iii][kkk];
         //

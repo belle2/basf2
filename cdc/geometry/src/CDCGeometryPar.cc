@@ -341,9 +341,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_nominalPropSpeed = 27.25;  //in cm/nsec (Belle's result, provided by iwasaki san)
 
   m_nominalSpaceResol = geom.getNominalSpaceResolution();
-  //  m_maxSpaceResol = 2.5 * m_nominalSpaceResol;
   CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
-  m_maxSpaceResol = gcp.getMaxSpaceResolution();
 
   //Set displacement params. (from input data)
   m_displacement = CDCGeoControlPar::getInstance().getDisplacement();
@@ -945,6 +943,8 @@ void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
 
   if (np > nSigmaParams) B2FATAL("CDCGeometryPar: no. of sigma-params. outside limits !");
 
+  ifs >> m_maxSpaceResol;
+
   const double epsi = 0.1;
 
   while (ifs >> iCL) {
@@ -1452,6 +1452,8 @@ void CDCGeometryPar::setSResol()
   //  std::cout << "m_nThetaPoints4Sgm= " << m_nThetaPoints4Sgm << std::endl;
 
   m_sigmaParamMode = (*m_sResolFromDB)->getSigmaParamMode();
+
+  m_maxSpaceResol = (*m_sResolFromDB)->getMaxSpaceResol();
 
   for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
     for (unsigned short iLR = 0; iLR < 2; ++iLR) {

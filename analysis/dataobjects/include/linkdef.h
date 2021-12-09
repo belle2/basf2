@@ -8,7 +8,7 @@
 #pragma link C++ class Belle2::Particle+; // checksum=0xd7cf258f, version=14
 #pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x965ad50b, version=2
 #pragma link C++ class Belle2::ParticleList+; // checksum=0x98887650, version=3
-#pragma link C++ class Belle2::RestOfEvent+; // checksum=0xe86f1658, version=7
+#pragma link C++ class Belle2::RestOfEvent+; // checksum=0xe86f1658, version=8
 #pragma link C++ class Belle2::TagVertex+; // checksum=0xbc37ca67, version=5
 #pragma link C++ class Belle2::ContinuumSuppression+; // checksum=0xccdb3c88, version=1
 #pragma link C++ class Belle2::FlavorTaggerInfo+; // checksum=0xa85ce063, version=4

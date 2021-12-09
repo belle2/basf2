@@ -519,6 +519,10 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
 
   sg->setSigmaParamMode(sgParamMode);
 
+  float maxSigma;
+  ifs >> maxSigma;
+  sg->setMaxSpaceResol(maxSigma);
+
   const double epsi = 0.1;
 
   while (ifs >> iCL) {

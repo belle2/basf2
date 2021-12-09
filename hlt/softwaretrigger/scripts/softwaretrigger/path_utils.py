@@ -29,7 +29,7 @@ def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode, create
                           dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
     elif run_type == constants.RunTypes.cosmic:
         add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment,
-                       dqm_mode=dqm_mode)
+                       dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
     else:
         basf2.B2FATAL("Run type {} not supported.".format(run_type))
 
@@ -194,7 +194,6 @@ def add_pre_filter_reconstruction(path, run_type, components, **kwargs):
             path,
             skipGeometryAdding=True,
             pruneTracks=False,
-            add_trigger_calculation=False,
             components=components,
             event_abort=hlt_event_abort,
             **kwargs)

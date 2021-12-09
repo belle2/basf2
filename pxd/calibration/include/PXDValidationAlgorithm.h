@@ -34,6 +34,12 @@ namespace Belle2 {
     /// Flag to save 2D histograms for efficiency;
     bool save2DHists;
 
+    /// Flag to save delta d0 (z0) over sqrt(2) to TTree;
+    bool saveD0Z0;
+
+    /// Bin size for d0/z0 histogram
+    int binsD0Z0;
+
     /// Setter for boundaries
     void setBoundaries(const std::vector<Calibration::ExpRun>& boundaries) {m_requestedBoundaries = boundaries;}
 
@@ -92,6 +98,12 @@ namespace Belle2 {
 
     /// Vector of number of track clusters outside of defective pixels
     std::vector<unsigned long> m_nSelTrackClusters;
+
+    /// Vector of delta d0 over sqrt(2)
+    std::vector<float> m_d0;
+
+    /// Vector of delta z0 over sqrt(2)
+    std::vector<float> m_z0;
 
     /// Histogram of corrected d0 for each 2-track event
     TH1F* m_hD0;

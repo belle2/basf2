@@ -52,6 +52,9 @@ namespace Belle2 {
      */
     static void setNextEntry(long exp, long run, long event) { s_nextExperiment = exp; s_nextRun = run; s_nextEvent = event; }
 
+    /** set the number of entries skipped by the RootInputModule. */
+    static void setSkippedEntries(long entries, bool independentPath = false) { (!independentPath) ? s_skippedEntries.first = entries : s_skippedEntries.second = entries; }
+
     /** Return experiment number set via setNextEntry(). */
     static long getNextExperiment() { return s_nextExperiment; }
 
@@ -62,37 +65,31 @@ namespace Belle2 {
     static long getNextEvent() { return s_nextEvent; }
 
     /** returns the entry number currently loaded. */
-    static long getCurrentEntry() { return s_currentEntry; }
+    static long getCurrentEntry(bool independentPath = false) { return (!independentPath) ? s_currentEntry.first : s_currentEntry.second; }
+
+    /** returns the number of entries skipped by the RootInputModule. */
+    static long getSkippedEntries(bool independentPath = false) { return (!independentPath) ? s_skippedEntries.first : s_skippedEntries.second; }
 
     /** Returns total number of entries in the event tree.
      *
      * If no file is opened, zero is returned.
      */
-    static long numEntries();
-
-    /** Returns number of entries in the event tree if two input modules are used.
-     */
-    static std::pair<long, long> numEntriesPair() { return s_eventNumbers; }
+    static long numEntries(bool independentPath = false);
 
     /** Return name of current file in loaded chain (or empty string if none loaded). */
-    static std::string getCurrentFileName();
+    static std::string getCurrentFileName(bool independentPath = false);
 
     /** Indicate that an event (in the given entry) was loaded and reset all members related to the next entry. */
-    static void eventLoaded(long entry, bool independentPath = false)
-    {
-      if (!independentPath) s_nextEntry.first = -1;
-      else s_nextEntry.second = -1;
-      s_nextExperiment = -1;
-      s_nextRun = -1;
-      s_nextEvent = -1;
-      s_currentEntry = entry;
-    }
+    static void eventLoaded(long entry, bool independentPath = false);
 
     /** Set the loaded TChain (event durability). */
-    static void setChain(const TChain* chain);
+    static void setChain(const TChain* chain, bool independentPath = false);
 
     /** Reset InputController (e.g. after forking a thread) */
     static void resetForChildProcess();
+
+    /** You do not always want to process all the entries in the file */
+    static long getNumEntriesToProcess();
 
   private:
     InputController() { }
@@ -126,10 +123,19 @@ namespace Belle2 {
     /** number of events in paths if two input modules are used (independent paths) */
     static std::pair<long, long> s_eventNumbers;
 
-    /** current entry in file. */
-    static long s_currentEntry;
+    /** current entry in file.
+     *  Storing two values (second one if independent path is executed)
+     */
+    static std::pair<long, long> s_currentEntry;
 
-    /** Opened TChain (event durability). */
-    static const TChain* s_chain;
+    /** entries skipped by RootInputModule (if any)
+     *  Storing two values (second one if independent path is executed)
+     */
+    static std::pair<long, long> s_skippedEntries;
+
+    /** Opened TChain (event durability).
+     *  Storing two values (second one if independent path is executed)
+     */
+    static std::pair<const TChain*, const TChain*> s_chain;
   };
 }

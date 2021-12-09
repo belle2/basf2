@@ -290,7 +290,7 @@ void RootInputModule::initialize()
     m_tree = nullptr; //don't try to read from there
   } else {
     InputController::setCanControlInput(true);
-    InputController::setChain(m_tree);
+    InputController::setChain(m_tree, m_isSecondaryInput);
   }
 
   if (m_parentLevel > 0) {
@@ -306,7 +306,7 @@ void RootInputModule::initialize()
   //   * no -n or process(path, N) with N <= the number of entries in our files
   unsigned int maxEvent = Environment::Instance().getNumberEventsOverride();
   m_processingAllEvents &= m_skipNEvents == 0 && m_entrySequences.size() == 0;
-  m_processingAllEvents &= (maxEvent == 0 || maxEvent >= InputController::numEntries());
+  m_processingAllEvents &= (maxEvent == 0 || maxEvent >= InputController::numEntries(m_isSecondaryInput));
 
   if (!m_skipToEvent.empty()) {
     // Skipping to some specific event is also not processing all events ...
@@ -327,9 +327,10 @@ void RootInputModule::initialize()
     }
   }
 
-  if (m_isSecondaryInput && (m_nextEntry > 0 || !m_skipToEvent.empty())) {
-    B2FATAL("Using two RootInputModules and skipping to a certain event is currently"
-            "not supported. If needed, to be implemented in the SteerRootInputModule.");
+  // Tell the InputController which event will be processed first
+  // (important if we want to do event mixing and skip some events in the input)
+  if (m_nextEntry > 0) {
+    InputController::setSkippedEntries(m_nextEntry, m_isSecondaryInput);
   }
 
   // Processing everything so forward number of MC events
@@ -348,7 +349,7 @@ void RootInputModule::event()
 
   while (true) {
     const long nextEntry = InputController::getNextEntry(m_isSecondaryInput);
-    if (nextEntry >= 0 && nextEntry < InputController::numEntries()) {
+    if (nextEntry >= 0 && nextEntry < InputController::numEntries(m_isSecondaryInput)) {
       // don't show this message if we are doing event mixing, as it will pop up twice for every event
       if (!InputController::getEventMixing()) {
         B2INFO("RootInput: will read entry " << nextEntry << " next.");
@@ -449,6 +450,7 @@ void RootInputModule::readTree()
             localEntryNumber << ")");
   }
   B2DEBUG(39, "Reading file entry " << m_nextEntry);
+  B2INFO(this->getName() << ": Reading file entry " << m_nextEntry);
 
   //Make sure transient members of objects are reinitialised
   for (auto entry : m_storeEntries) {

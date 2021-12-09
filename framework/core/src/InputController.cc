@@ -17,19 +17,29 @@ std::pair<long, long> InputController::s_nextEntry = { -1, -1};
 long InputController::s_nextExperiment = -1;
 long InputController::s_nextRun = -1;
 long InputController::s_nextEvent = -1;
-long InputController::s_currentEntry = 0;
-std::pair<long, long> InputController::s_eventNumbers = { -1, -1};
+std::pair<long, long> InputController::s_currentEntry = { 0, 0};
+std::pair<long, long> InputController::s_skippedEntries = { 0, 0};
 bool InputController::s_doEventMixing = false;
-const TChain* InputController::s_chain = nullptr;
+std::pair<const TChain*, const TChain*> InputController::s_chain = { nullptr, nullptr};
 
-void InputController::setChain(const TChain* chain)
+void InputController::setChain(const TChain* chain, bool independentPath)
 {
-  s_chain = chain;
-  if (s_eventNumbers.first == -1) {
-    s_eventNumbers.first = (long)s_chain->GetEntries();
+  if (!independentPath) {
+    s_chain.first = chain;
   } else {
-    s_eventNumbers.second = (long)s_chain->GetEntries();
+    s_chain.second = chain;
   }
+}
+
+void InputController::eventLoaded(long entry, bool independentPath)
+{
+  if (!independentPath) s_nextEntry.first = -1;
+  else s_nextEntry.second = -1;
+  s_nextExperiment = -1;
+  s_nextRun = -1;
+  s_nextEvent = -1;
+  if (!independentPath) s_currentEntry.first = entry;
+  else s_currentEntry.second = entry;
 }
 
 void InputController::resetForChildProcess()
@@ -39,33 +49,45 @@ void InputController::resetForChildProcess()
   s_nextExperiment = -1;
   s_nextRun = -1;
   s_nextEvent = -1;
-  s_currentEntry = 0;
+  s_currentEntry = { 0, 0};
   //s_chain is not touched, so numEntries() still works
 }
 
-std::string InputController::getCurrentFileName()
+std::string InputController::getCurrentFileName(bool independentPath)
 {
-  if (!s_chain)
+  const TChain* chain = !independentPath ? s_chain.first : s_chain.second;
+  if (!chain)
     return "";
 
-  const TFile* f = s_chain->GetFile();
+  const TFile* f = chain->GetFile();
   if (!f)
     return "";
 
   return f->GetName();
 }
 
-long InputController::numEntries()
+long InputController::numEntries(bool independentPath)
 {
-  if (s_eventNumbers.first == -1 && s_eventNumbers.second == -1) {
-    return 0;
-  } else if (s_eventNumbers.second == -1) {
-    return s_eventNumbers.first;
+  if (!independentPath) {
+    if (s_chain.first)
+      return s_chain.first->GetEntries();
+  } else {
+    if (s_chain.second)
+      return s_chain.second->GetEntries();
+  }
+
+  return 0;
+}
+
+long InputController::getNumEntriesToProcess()
+{
+  if (!s_chain.second) {
+    return numEntries();
   } else {
     if (s_doEventMixing) {
-      return s_eventNumbers.first * s_eventNumbers.second;
+      return numEntries(true) * numEntries(false);
     } else {
-      return std::min(s_eventNumbers.first, s_eventNumbers.second);
+      return std::min(numEntries(true), numEntries(false));
     }
   }
 }

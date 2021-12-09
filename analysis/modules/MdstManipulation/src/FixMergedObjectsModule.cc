@@ -24,7 +24,7 @@ namespace Belle2 {
 
   FixMergedObjectsModule::FixMergedObjectsModule() : Module()
   {
-    setDescription("Fix indices of mdst objects (Tracks, V0s, MCParticles) after DataStores were merged using and indepentent_path.");
+    setDescription("Fix indices of mdst objects (Tracks, V0s, MCParticles) after DataStores were merged using an indepentent path.");
 
     setPropertyFlags(c_ParallelProcessingCertified);
   }
@@ -39,6 +39,8 @@ namespace Belle2 {
 
   void FixMergedObjectsModule::event()
   {
+    // This is quite easy, it is all just constant offsets (corresponding to length of StoreArray before Merge)
+
     if (m_tracks.isValid() && m_mergedArrayIndices->getIndex("Tracks") != -1) {
       for (int t_idx = m_mergedArrayIndices->getIndex("Tracks"); t_idx < m_tracks.getEntries(); t_idx++) {
         for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
@@ -62,8 +64,15 @@ namespace Belle2 {
       }
     }
 
-    // MCParticles not yet implemented - clear them for now
-    m_mcParticles.clear();
+    if (m_mcParticles.isValid() && m_mergedArrayIndices->getIndex("MCParticles") != -1) {
+      for (int p_idx = m_mergedArrayIndices->getIndex("MCParticles"); p_idx < m_mcParticles.getEntries(); p_idx++) {
+        // declared friends class, so this can be done
+        m_mcParticles[p_idx]->m_index += m_mergedArrayIndices->getIndex("MCParticles");
+        m_mcParticles[p_idx]->m_mother += m_mergedArrayIndices->getIndex("MCParticles");
+        m_mcParticles[p_idx]->m_firstDaughter += m_mergedArrayIndices->getIndex("MCParticles");
+        m_mcParticles[p_idx]->m_lastDaughter += m_mergedArrayIndices->getIndex("MCParticles");
+      }
+    }
   }
 } // end Belle2 namespace
 

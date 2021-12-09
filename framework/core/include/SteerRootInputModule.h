@@ -35,8 +35,5 @@ namespace Belle2 {
     /** do event mixing (merge each event of main path with each event of independent path) */
     bool m_eventMixing;
 
-    /** these events should be processed next {main path, independent path} */
-    std::pair<long, long> m_nextEntries = {0, 0};
-
   };
 }

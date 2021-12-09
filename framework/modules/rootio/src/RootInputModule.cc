@@ -450,7 +450,6 @@ void RootInputModule::readTree()
             localEntryNumber << ")");
   }
   B2DEBUG(39, "Reading file entry " << m_nextEntry);
-  B2INFO(this->getName() << ": Reading file entry " << m_nextEntry);
 
   //Make sure transient members of objects are reinitialised
   for (auto entry : m_storeEntries) {

@@ -159,13 +159,6 @@ namespace Belle2 {
     /** Get the covariance matrix of the vertex position */
     TMatrixDSym getCovVertex() const { return getCovMatrix(m_covVertex); }
 
-    /** Return energy smearing of LER */
-    //double getEnergySmearingLER() const;
-    /** Return energy smearing of LER */
-    //double getEnergySmearingHER() const;
-    /** Return energy smearing of the CMS */
-    //double getEnergySmearingCMS() const;
-
   private:
 
     /** Calculate FourVector of a beam from energy and angle wrt the z-axis.

@@ -1,0 +1,364 @@
+.. _b2bii:
+
+=====
+B2BII
+=====
+
+The b2bii package in basf2 converts Belle MDST files (BASF data format) to
+Belle II MDST (basf2 data format). This enables performing physics analysis
+using data collected with Belle detector with the analysis software and algorithms
+developed for the analysis of data collected with the Belle II detector.
+The B2BII converter allows for estimation and validation of performances of
+various advanced algorithms being developed for Belle II.
+
+Overview
+========
+
+The B2BII converter reads and converts Belle MDST within basf2. The converted
+data is to be analysed within the same job, without any intermediate conversion
+to output ROOT file (Belle II MDST format). The B2BII conversion plus analysis
+workflow is illustrated in this figure:
+
+.. figure:: figs/B2BIIWorkflow.png
+
+and is divided between
+
+Conversion modules:
+
+- **B2BIIMdstInput**: opens and reads Belle MDST file,
+- **B2BIIFixMdst**: performs correction to Belle MDST data before the
+  conversion is performed,
+- **B2BIIConvertMdst**: performs Belle mdst to Belle II mdst conversion.
+  After this final step the DataStore is filled with Belle II-type MDST
+  dataobjects (Tracks, ECLClusters, PIDLikelihhoods,...).
+
+basf2 analysis:
+
+- This part contains the usual sequence of basf2 physics analysis modules.
+
+.. hint:: For an introductory lesson, take a look at :numref:`onlinebook_b2bii`.
+
+
+B2BII Analysis
+==============
+
+Prerequisites
+-------------
+The recommended versions to be used are ``release-06-00-03`` or the latest light release
+``light-2112-uraus``.
+
+
+B2BII Converter
+---------------
+The most straightforward way to perform the analysis is to execute the B2BII
+Converter on-the-fly, meaning in the same job as the physics analysis is performed
+(reconstruction of specific decay, ..., producing flat ntuples for offline analysis).
+Note that it's also possible (and is as well more convenient) first to produce the
+converted ROOT files in the Belle II MDST format and then run the analysis script
+over converted ROOT files.
+
+Global tags
+~~~~~~~~~~~
+As all basf2 analysis, the necessary payloads are handled by basf2 and are stored
+in the corresponding global tags in the conditions database at BNL.
+
+To avoid creating excess load to the BNL server, we have prepared a local database
+cache at KEKCC, which includes ``B2BII``, ``B2BII_MC``, ``BellePID``,
+``b2bii_beamParameters_with_smearing``, and ``analysis_tools_light-2012-minos``
+global tags.
+
+If you use an older release than ``release-05-02`` or ``light-2103-oceanos``, the
+following two lines **must** be added in the beginning of your b2bii analysis script:
+
+.. code-block:: python3
+
+   basf2.conditions.metadata_providers = ["/sw/belle/b2bii/database/conditions/b2bii.sqlite"]
+   basf2.conditions.payload_locations = ["/sw/belle/b2bii/database/conditions/"]
+
+.. warning::
+   When doing the two-step procedure (1. convert and 2. analyse), please be sure
+   these two lines are also added in the script for step 2, if you are using a
+   release older than the recommended ones.
+
+
+It is very easy to run any existing basf2 analysis python script over the Belle MC
+or data. If you already have a working basf2 physics analysis python script that
+performs some kind of reconstruction, you simply need to replace the loading of
+Belle II MDST files with the Belle MDST files and executing the conversion.
+
+
+To load Belle MDST file(s) and to convert them use ``convertBelleMdstToBelleIIMdst``.
+This function has input parameters to specify the input MDST files to be converted,
+flag to specify whether or not the fix_mdst should be applied or not (it should!)
+and path.
+
+.. code-block:: python3
+
+   convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True, path=my_path)
+
+- inputBelleMDSTFile : a BASF mdst file name or an url of the mdst file location.
+- applySkim=True : the fix_mdst of BASF will be applied (default).
+- pathe=my_path : your basf2 steering process path.
+
+Examples of analysis steering files can be found in example directory of b2bii package:
+
+.. code-block:: csh
+
+   ls $BELLE2_RELEASE_DIR/b2bii/examples
+
+
+.. toctree:: ConvertedObjects
+
+
+Converted data objects and other information
+============================================
+This section briefly describes what is converted, in what way, and how the
+converted objects should be used in the analysis.
+
+.. toctree:: ConvertedObjects
+
+Charged Final State Particles
+-----------------------------
+BASF and BASF2 use different Helix parameterisations, however there exist a
+well defined transformation from one parameterisation to another. Belle MDST
+format stores in addition to the five helix parameters also the reference point
+(or pivot point), which is assumed to be always point ``(0,0,0)`` in the case of
+Belle II MDST format. Therefore in the conversion process any charged track
+found in Belle MDST with pivot point different from ``(0,0,0)`` is first transformed
+in way so that its pivot point becomes ``(0,0,0)``. This is especially important
+in the case of conversion of ``V0``'s daughter tracks.
+
+.. note::
+   There is nothing special to note regarding the usage of converted charged
+   tracks in BASF2. Use the usuall ``fillParticleList(...)`` or
+   ``fillParticleLists(...)`` analysis functions to create and fill charged
+   kaon, pion, electron, muon and proton `ParticleList`_ s.
+
+.. _ParticleList: https://software.belle2.org/|release|/classBelle2_1_1ParticleList.html
+
+Particle Identification
+~~~~~~~~~~~~~~~~~~~~~~~
+Despite the different parameterisations, charged final state particles can still
+be reconstructed using `fillParticleList` function in basf2.
+But due to the different definition, as well as detector, it is not
+recommended to use Belle II style PID in b2bii.
+
+basf provided three different packages for PID:
+* atc_pid (KID) to separate kaons and pions, but also used for proton id
+* eID (electron ID) to separate electrons from hadrons
+* muid (muon ID) to separate muons from hadrons
+
+Each of them in its own way combined information collected from various sub detector
+systems (CDC, ACC, TOF, ECL, KLM). The combination of individual likelihoods from
+each sub detector system is in some cases (eID) combined with the usage of external
+information, such as a priori probabilities of each particle type that is read from
+the Belle DB.
+Due to this fact the Belle-like PID probabilities can not be reproduced in BASF2 from
+the raw likelihoods and special Belle-legacy Variables that reproduce them are
+introduced.
+
+Alternatively, we can use the following predefined Belle-style PID variables to
+reproduce them:
+
+   +------------------------------+------------------------------+------------------+
+   | Separation                   | basf                         | basf2            |
+   +==============================+==============================+==================+
+   | :math:`K` vs :math:`\pi`     | atc_pid(3,1,5,3,2).prob(...) | atcPIDBelle(3,2) |
+   +------------------------------+------------------------------+------------------+
+   | :math:`p` vs :math:`\pi`     | atc_pid(3,1,5,4,2).prob(...) | atcPIDBelle(4,2) |
+   +------------------------------+------------------------------+------------------+
+   | :math:`p` vs :math:`K`       | atc_pid(3,1,5,4,3).prob(...) | atcPIDBelle(4,3) |
+   +------------------------------+------------------------------+------------------+
+   | electron vs hadron           | eid.prob(3,-1,5)             | eIDBelle         |
+   +------------------------------+------------------------------+------------------+
+   | muon likelihood              | Muid_mdst.Muon_likelihood()  | muIDBelle        |
+   +------------------------------+------------------------------+------------------+
+   | muon likelihood quality flag | Muid_mdst.Prerejection()     | muIDBelleQuality |
+   +------------------------------+------------------------------+------------------+
+
+
+Neutral Final State Particles
+-----------------------------
+When it comes to ECL related objects the BASF and basf2 MDST data formats differ
+substantially which makes one-to-one conversion impossible. The reconstructed
+``ECL clusters``, both charged (with matched charged track) and neutral
+(without matched charged track), are in BASF stored as ``Mdst_ecl`` (and ``Mdst_ecl_aux``)
+and in BASF2 as ECLCLusters. These two datatypes match quite good.
+However, BASF MDST format has two additional data types: ``Mdst_Gamma`` and ``Mdst_Pi0``,
+for which there exist no equivalent data type in the BASF2 MDST format.
+Instead, the B2BII converter by default creates ``gamma:mdst`` and ``pi0:mdst``
+ParticleLists, which are filled with particle objects created for each
+``Mdst_Gamma`` and ``Mdst_Pi0`` entry.
+
+.. warning::
+   Use ``gamma:mdst`` and ``pi0:mdst`` ParticleLists.
+   Don't use ``fillParticleList(...)`` to create photon candidates or don't
+   reconstruct ``pi0`` candidate from pairs of two photons by yourself.
+
+.. note::
+   Mass-constraint fit has been applied to ``pi0`` candidates in ``Mdst_Pi0``.
+   However, covariance matrix is not stored in panther tables. If you need
+   this information in the analysis, you can redo the mass constraint fit in basf2.
+
+V0 Particles
+------------
+As mentioned above (section on charged final state particles) all charged
+tracks are parametrised with helix with the reference point set to (0,0,0)
+in BASF2. This is not optimal in the case of ``V0s`` whose decay vertices can
+be far away from the origin. Therefore all ``V0`` candidates from the ``Mdst_Vee2``
+table in BASF are converted to Particles and collected in the ``K_S0:mdst``,
+``Lambda0:mdst``, and ``gamma:v0mdst`` ParticleLists.
+The created particles have momentum and decay vertex position set to values
+given in Belle's ``Mdst_Vee2`` table and their daughters particles with
+momentum and position at the pivot equal to ``V0`` decay vertex. In addition,
+The Belle's quality indicators for :math:`K_S^0` and :math:`\Lambda` are
+converted as well and attached as ``extraInfo`` variables.
+
+The quality indicators for :math:`K_S^0` and :math:`\Lambda` as estimated by the
+`findKs`_ and `nisKsFinder`_ (for :math:`K_S^0`), and `FindLambda`_ (for
+:math:`\Lambda^0`) are available as
+
+   +-------------------------+-------------------------+
+   | basf                    | basf2                   |
+   +-------------------------+-------------------------+
+   | findKs.goodKs()         | extraInfo(goodKs)       |
+   +-------------------------+-------------------------+
+   | nisKsFinder.nb_vlike()  | extraInfo(ksnbVLike)    |
+   +-------------------------+-------------------------+
+   | nisKsFinder.nb_nolam()  | extraInfo(ksnbNoLam)    |
+   +-------------------------+-------------------------+
+   | nisKsFinder.standard()  | extraInfo(ksnbStandard) |
+   +-------------------------+-------------------------+
+   | findLambda.goodLambda() | extraInfo(goodLambda)   |
+   +-------------------------+-------------------------+
+
+.. _findKs: http://belle.kek.jp/secured/belle_note/gn323/note323.ps.gz
+
+.. _nisKsFinder: http://belle.kek.jp/secured/belle_note/gn1253/bn_1253v1.pdf
+
+.. _FindLambda: https://belle.kek.jp/secured/belle_note/gn684/bn684.ps.gz
+
+
+The vertex fit information of ``V0`` particles is also attached as ``extraInfo`` variables.
+
+:math:`K_L^0` Particles
+-----------------------
+:math:`K_L^0` candidates are stored in the default ``K_L0:mdst`` ParticleList.
+
+.. note::
+   Use K_L0:mdst ParticleList. Don't use ``fillParticleList(...)``.
+
+In Belle there was no explicit MC Matching for :math:`K_L^0`. Instead, people
+used a hack. If a (MC) :math:`K_L^0` in ``Gen_HEPEVT`` panther table is found,
+we set a relation to the (best) reconstructed :math:`K_L^0` with no
+associated ``ECLCluster`` and within 15 degrees in :math:`\phi` and :math:`\theta`.
+The cluster position for ``KLMClusters`` is only available if a :math:`K_L^0` was
+associated to it, since this information is extracted from the :math:`K_L^0`.
+
+
+Event Classification flags
+--------------------------
+Event classification is a sort of Data-mining process, which separates the Belle
+data sample into several skims based on the underlying physics process. 
+As an event-based flag, event classification flags are converted and attached
+as ``eventExtraInfo``.
+
+Use the following Belle II variables to get the corresponding event classification
+flags:
+
+
+   +-------------------------+---------------------------------------+
+   | basf                    | basf2                                 |
+   +-------------------------+---------------------------------------+
+   | evtcls_flag(N)          | eventExtraInfo(evtcls_flagN)          |
+   +-------------------------+---------------------------------------+
+   | evtcls_flag2(N)         | eventExtraInfo(evtcls_flag1N)         |
+   +-------------------------+---------------------------------------+
+   | evtcls_hadronic_flag(N) | eventExtraInfo(evtcls_hadronic_flagN) |
+   +-------------------------+---------------------------------------+
+
+.. note::
+   Explanation of the event type can be found at 
+   `here <https://belle.kek.jp/secured/wiki/doku.php?id=software:event_classification>`__.
+   Please refer to `bn390`_ for the details of Hadronic Event Selection.
+
+.. _bn390: http://belle.kek.jp/secured/belle_note/gn390/bn390_012901.ps.gz
+
+
+Belle MDST samples
+==================
+The most important argument in `convertBelleMdstToBelleIIMdst` function is the first
+one, specifying the input Belle MDST sample to be converted and analysed. You can
+either specify the location of the input Belle MDST file (e.g. when running over
+your privately produced signal MC):
+
+.. code-block:: python3
+
+   convertBelleMdstToBelleIIMdst('/location_to_my_mdst_files/myMDSTFile.mdst', path=mypath)
+
+or specify the url of real data or generic MC samples. For example:
+
+.. code-block:: python3
+
+   convertBelleMdstToBelleIIMdst('http://bweb3/montecarlo.php?ex=37&rs=100&re=200&ty=evtgen-mixed&dt=on_resonance&bl=caseB&st=0', path=mypath)
+
+The form of the url is the same as used in BASF. More information is available
+at `the Belle analysis software page`_.
+Belle index files cannot be used in the conversion, please use HadronB(J) skim files, or convert your index files to mdst files first and then perform b2bii conversion.
+
+.. _the Belle analysis software page: https://belle.kek.jp/secured/wiki/doku.php?id=software:data_search
+
+Belle Data
+----------
+
+
+
+Generic MC
+----------
+Generic MC is the official MC samples at Belle, which was generated with
+run-dependent beam background. There are multiple ``streams`` of these samples,
+and each ``stream`` contains the same amount of events as present in the real
+Belle data.
+
+There are several different categories of Belle MC:
+* Generic :math:`B` samples : charged (:math:`B^+ B^-`) and mixed (:math:`B^{0}\overline{B}^{0}`)
+* Continuum samples  : uds, charm
+* Y(5S) samples      : bsbs, nonbsbs
+
+Generic :math:`B` samples only contain decay modes with :math:`b \to c` quark
+transitions, and have been generated based on the decay tables at
+
+.. code-block::
+
+   /sw/belle/belle/b20090127_0910/share/data-files/evtgenutil/DECAY.DEC.
+
+
+
+
+Signal MC
+---------
+Generating signal MC with BASF
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+Generating signal MC with B2BII
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+b2biiConversion
+===============
+.. automodule:: b2biiConversion
+   :members:
+   :undoc-members:
+
+
+b2biiMonitors
+=============
+.. automodule:: b2biiMonitors
+   :members:
+   :undoc-members:
+

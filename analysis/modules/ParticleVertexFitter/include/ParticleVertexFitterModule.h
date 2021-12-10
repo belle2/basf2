@@ -197,7 +197,7 @@ namespace Belle2 {
 
     /**
      * Update mother particle after RecoilMass fit using KFit
-     * @param kv reference to KFit MassFit object
+     * @param kf reference to KFit MassFit object
      * @param p pointer to particle
      * @return true for successful construction of mother
      */

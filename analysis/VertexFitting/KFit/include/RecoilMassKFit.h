@@ -90,10 +90,6 @@ namespace Belle2 {
        * @return vertex error matrix
        */
       const CLHEP::HepSymMatrix          getVertexError(const int flag = KFitConst::kAfterFit) const;
-      /** Get a recoil mass.
-       * @return recoil mass
-      */
-      double                      getRecoilMass(void) const;
       /** Get a flag if to constraint at the decay point in the four momentum-constraint fit.
        * @return flag value
        */

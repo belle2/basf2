@@ -142,7 +142,8 @@ def kFit(list_name,
           * ``massvertex`` for a vertex fit with a mass constraint on the mother particle
           * ``fourC`` for a vertex fit in which the mother particle's four-momentum is constrained to the beam four-momentum
           * ``massfourC`` for a vertex fit with a 4-momentum constraint and mass constraints on the specified daughter particles
-          * ``recoilmass`` for kinematic fit with a invariant mass constraint
+          * ``recoilmass`` for kinematic fit in which the mass of the mother particle's recoil four-momentum with respect
+            to the beam four-momentum is constrained
 
         constraint (str):       add an additional constraint to the fit (valid options are ipprofile or iptube)
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained

@@ -13,7 +13,6 @@
 #include <analysis/VertexFitting/KFit/RecoilMassKFit.h>
 #include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
-#include <TLorentzVector.h>
 
 
 using namespace std;
@@ -172,13 +171,6 @@ RecoilMassKFit::getVertexError(const int flag) const
     KFitError::displayError(__FILE__, __LINE__, __func__, KFitError::kOutOfRange);
     return HepSymMatrix(3, 0);
   }
-}
-
-
-double
-RecoilMassKFit::getRecoilMass() const
-{
-  return m_recoilMass;
 }
 
 
@@ -358,55 +350,6 @@ RecoilMassKFit::prepareInputMatrix() {
   } else {
     //TODO: Not Implemented
     return m_ErrorCode = KFitError::kUnimplemented;
-    // m_FlagFitIncludingVertex == true
-    int index = 0;
-    m_al_0     = HepMatrix(KFitConst::kNumber7 * m_TrackCount + 3, 1, 0);
-    m_property = HepMatrix(m_TrackCount, 3, 0);
-    m_V_al_0   = HepSymMatrix(KFitConst::kNumber7 * m_TrackCount + 3, 0);
-
-    for (auto& track : m_Tracks)
-    {
-      // momentum x,y,z and position x,y,z
-      m_al_0[index * KFitConst::kNumber7 + 0][0] = track.getMomentum(KFitConst::kBeforeFit).x();
-      m_al_0[index * KFitConst::kNumber7 + 1][0] = track.getMomentum(KFitConst::kBeforeFit).y();
-      m_al_0[index * KFitConst::kNumber7 + 2][0] = track.getMomentum(KFitConst::kBeforeFit).z();
-      m_al_0[index * KFitConst::kNumber7 + 3][0] = track.getMomentum(KFitConst::kBeforeFit).t();
-      m_al_0[index * KFitConst::kNumber7 + 4][0] = track.getPosition(KFitConst::kBeforeFit).x();
-      m_al_0[index * KFitConst::kNumber7 + 5][0] = track.getPosition(KFitConst::kBeforeFit).y();
-      m_al_0[index * KFitConst::kNumber7 + 6][0] = track.getPosition(KFitConst::kBeforeFit).z();
-      // these error
-      m_V_al_0.sub(index * KFitConst::kNumber7 + 1, track.getError(KFitConst::kBeforeFit));
-      // charge, mass, a
-      m_property[index][0] =  track.getCharge();
-      m_property[index][1] =  track.getMass();
-      const double c = KFitConst::kLightSpeed; // C++ bug?
-      // m_property[index][2] = -KFitConst::kLightSpeed * m_MagneticField * it->getCharge();
-      m_property[index][2] = -c * m_MagneticField * track.getCharge();
-      index++;
-    }
-
-    // vertex
-    m_al_0[KFitConst::kNumber7 * m_TrackCount + 0][0] = m_BeforeVertex.x();
-    m_al_0[KFitConst::kNumber7 * m_TrackCount + 1][0] = m_BeforeVertex.y();
-    m_al_0[KFitConst::kNumber7 * m_TrackCount + 2][0] = m_BeforeVertex.z();
-    m_V_al_0.sub(KFitConst::kNumber7 * m_TrackCount + 1, m_BeforeVertexError);
-
-    // error between track and track
-    if (m_FlagCorrelation)
-    {
-      this->prepareCorrelation();
-      if (m_ErrorCode != KFitError::kNoError) {
-        KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
-        return m_ErrorCode;
-      }
-    }
-
-    // set member matrix
-    m_al_1   = m_al_0;
-
-    // define size of matrix
-    m_V_al_1 = HepMatrix(KFitConst::kNumber7 * m_TrackCount + 3, KFitConst::kNumber7 * m_TrackCount + 3, 0);
-    m_D      = m_V_al_1.sub(1, 1, 1, KFitConst::kNumber7 * m_TrackCount + 3);
   }
 
   return m_ErrorCode = KFitError::kNoError;
@@ -521,25 +464,6 @@ RecoilMassKFit::prepareOutputMatrix() {
   {
     //TODO: Not Implemented
     return m_ErrorCode = KFitError::kUnimplemented;
-    // vertex
-    m_AfterVertex.setX(m_al_1[KFitConst::kNumber7 * m_TrackCount + 0][0]);
-    m_AfterVertex.setY(m_al_1[KFitConst::kNumber7 * m_TrackCount + 1][0]);
-    m_AfterVertex.setZ(m_al_1[KFitConst::kNumber7 * m_TrackCount + 2][0]);
-    // error of the vertex
-    for (int i = 0; i < 3; i++) for (int j = i; j < 3; j++) {
-        m_AfterVertexError[i][j] = m_V_al_1[KFitConst::kNumber7 * m_TrackCount + i][KFitConst::kNumber7 * m_TrackCount + j];
-      }
-    // error between vertex and tracks
-    for (int i = 0; i < m_TrackCount; i++) {
-      HepMatrix hm(3, KFitConst::kNumber7, 0);
-      for (int j = 0; j < 3; j++) for (int k = 0; k < KFitConst::kNumber7; k++) {
-          hm[j][k] = m_V_al_1[KFitConst::kNumber7 * m_TrackCount + j][KFitConst::kNumber7 * i + k];
-        }
-      if (m_IsFixMass[i])
-        m_AfterTrackVertexError.push_back(this->makeError4(m_Tracks[i].getMomentum(), hm));
-      else
-        m_AfterTrackVertexError.push_back(hm);
-    }
   } else {
     // not fit
     m_AfterVertex = m_BeforeVertex;
@@ -579,10 +503,10 @@ RecoilMassKFit::makeCoreMatrix() {
       for (int j = 0; j < 3; j++) Sum_al_1[j][0] += al_1_prime[i * KFitConst::kNumber7 + j][0];
     }
 
-    Sum_al_1[3][0] -= m_FourMomentum.E();
     Sum_al_1[0][0] -= m_FourMomentum.Px();
     Sum_al_1[1][0] -= m_FourMomentum.Py();
     Sum_al_1[2][0] -= m_FourMomentum.Pz();
+    Sum_al_1[3][0] -= m_FourMomentum.E();
 
     m_d[0][0] =
       + Sum_al_1[3][0] * Sum_al_1[3][0] - Sum_al_1[0][0] * Sum_al_1[0][0]
@@ -622,89 +546,6 @@ RecoilMassKFit::makeCoreMatrix() {
   } else {
     //TODO: Not Implemented
     return m_ErrorCode = KFitError::kUnimplemented;
-
-    // m_FlagFitIncludingVertex == true
-    HepMatrix al_1_prime(m_al_1);
-    HepMatrix Sum_al_1(7, 1, 0);
-    double energy[KFitConst::kMaxTrackCount2];
-
-    for (int i = 0; i < m_TrackCount; i++)
-    {
-      const double a = m_property[i][2];
-      al_1_prime[i * KFitConst::kNumber7 + 0][0] -= a * (al_1_prime[KFitConst::kNumber7 * m_TrackCount + 1][0] - al_1_prime[i *
-      KFitConst::kNumber7 + 5][0]);
-      al_1_prime[i * KFitConst::kNumber7 + 1][0] += a * (al_1_prime[KFitConst::kNumber7 * m_TrackCount + 0][0] - al_1_prime[i *
-      KFitConst::kNumber7 + 4][0]);
-      energy[i] = sqrt(al_1_prime[i * KFitConst::kNumber7 + 0][0] * al_1_prime[i * KFitConst::kNumber7 + 0][0] +
-      al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
-      al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
-      m_property[i][1] * m_property[i][1]);
-      Sum_al_1[6][0] = + a;
-    }
-
-    for (int i = 0; i < m_TrackCount; i++)
-    {
-      if (energy[i] == 0) {
-        m_ErrorCode = KFitError::kDivisionByZero;
-        KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
-        break;
-      }
-
-      if (m_IsFixMass[i]) {
-        double invE = 1. / energy[i];
-        Sum_al_1[3][0] += energy[i];
-        Sum_al_1[4][0] += al_1_prime[i * KFitConst::kNumber7 + 1][0] * m_property[i][2] * invE;
-        Sum_al_1[5][0] += al_1_prime[i * KFitConst::kNumber7 + 0][0] * m_property[i][2] * invE;
-      } else {
-        Sum_al_1[3][0] += al_1_prime[i * KFitConst::kNumber7 + 3][0];
-      }
-
-      for (int j = 0; j < 3; j++) Sum_al_1[j][0] += al_1_prime[i * KFitConst::kNumber7 + j][0];
-    }
-
-    Sum_al_1[3][0] -= m_FourMomentum.E();
-    Sum_al_1[0][0] -= m_FourMomentum.Px();
-    Sum_al_1[1][0] -= m_FourMomentum.Py();
-    Sum_al_1[2][0] -= m_FourMomentum.Pz();
-
-    m_d[0][0] =
-      + Sum_al_1[3][0] * Sum_al_1[3][0] - Sum_al_1[0][0] * Sum_al_1[0][0]
-      - Sum_al_1[1][0] * Sum_al_1[1][0] - Sum_al_1[2][0] * Sum_al_1[2][0]
-      - m_recoilMass * m_recoilMass;
-
-    for (int i = 0; i < m_TrackCount; i++)
-    {
-      if (energy[i] == 0) {
-        m_ErrorCode = KFitError::kDivisionByZero;
-        KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
-        break;
-      }
-
-      const double a = m_property[i][2];
-
-      if (m_IsFixMass[i]) {
-        double invE = 1. / energy[i];
-        m_D[0][i * KFitConst::kNumber7 + 0] = 2.*(Sum_al_1[3][0] * al_1_prime[i * KFitConst::kNumber7 + 0][0] * invE - Sum_al_1[0][0]);
-        m_D[0][i * KFitConst::kNumber7 + 1] = 2.*(Sum_al_1[3][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] * invE - Sum_al_1[1][0]);
-        m_D[0][i * KFitConst::kNumber7 + 2] = 2.*(Sum_al_1[3][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] * invE - Sum_al_1[2][0]);
-        m_D[0][i * KFitConst::kNumber7 + 3] = 0.;
-        m_D[0][i * KFitConst::kNumber7 + 4] = -2.*(Sum_al_1[3][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] * invE - Sum_al_1[1][0]) * a;
-        m_D[0][i * KFitConst::kNumber7 + 5] = 2.*(Sum_al_1[3][0] * al_1_prime[i * KFitConst::kNumber7 + 0][0] * invE - Sum_al_1[0][0]) * a;
-        m_D[0][i * KFitConst::kNumber7 + 6] = 0.;
-      } else {
-        m_D[0][i * KFitConst::kNumber7 + 0] = -2.*Sum_al_1[0][0];
-        m_D[0][i * KFitConst::kNumber7 + 1] = -2.*Sum_al_1[1][0];
-        m_D[0][i * KFitConst::kNumber7 + 2] = -2.*Sum_al_1[2][0];
-        m_D[0][i * KFitConst::kNumber7 + 3] =  2.*Sum_al_1[3][0];
-        m_D[0][i * KFitConst::kNumber7 + 4] =  2.*Sum_al_1[1][0] * a;
-        m_D[0][i * KFitConst::kNumber7 + 5] = -2.*Sum_al_1[0][0] * a;
-        m_D[0][i * KFitConst::kNumber7 + 6] =  0.;
-      }
-    }
-
-    m_D[0][KFitConst::kNumber7 * m_TrackCount + 0] = 2.*(Sum_al_1[3][0] * Sum_al_1[4][0] - Sum_al_1[1][0] * Sum_al_1[6][0]);
-    m_D[0][KFitConst::kNumber7 * m_TrackCount + 1] = -2.*(Sum_al_1[3][0] * Sum_al_1[5][0] - Sum_al_1[0][0] * Sum_al_1[6][0]);
-    m_D[0][KFitConst::kNumber7 * m_TrackCount + 2] = 0.;
   }
 
   return m_ErrorCode = KFitError::kNoError;
@@ -742,14 +583,8 @@ enum KFitError::ECode RecoilMassKFit::updateMother(Particle* mother)
   int ndf = getNDF();
   double prob = TMath::Prob(chi2, ndf);
   //
-  bool haschi2 = mother->hasExtraInfo("chiSquared");
-  if (haschi2) {
-    mother->setExtraInfo("chiSquared", chi2);
-    mother->setExtraInfo("ndf", ndf);
-  } else {
-    mother->addExtraInfo("chiSquared", chi2);
-    mother->addExtraInfo("ndf", ndf);
-  }
+  mother->writeExtraInfo("chiSquared", chi2);
+  mother->writeExtraInfo("ndf", ndf);
 
   mother->updateMomentum(
     CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),

@@ -51,3 +51,13 @@ Modules
    is assumed along HER/LER. To use the feature, one has to set ``addUnmeasuredPhoton`` and ``fixUnmeasuredToHER`` (``fixUnmeasuredToLER``)
    to ``true``.
  * Added a `Pi0VetoEfficiencySystematics` module to obtain pi0 veto efficiency Data/MC weights, their statistical and systematic errors as extrainfo variables for a given hard photon and the veto threshold. `addPi0VetoEfficiencySystematics` is a corresponding wrapper function.
+
+PID Priors 
+++++++++++
+
+ * Added ``analysis-train-priors`` tool that trains a pytorch model for calculating PID priors using an ntuple containing momentum
+   and cos(:math:`\theta`) information. It generates a second order combination of the previously mentioned variables along with
+   transverse momentum giving a total of nine features and trains the model using a taylor series of cross entropy loss to reduce the 
+   effect of outliers on the training.
+ * For evaluating priors, ``evalPriors`` module containing the ``Priors`` class has been added to calculate these using 
+   the trained model. Additionally, posteriors can also be obtained by providing PID's from the detector signals.

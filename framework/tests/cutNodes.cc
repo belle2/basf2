@@ -132,6 +132,10 @@ namespace {
     };
     return func;
   }
+
+  /// Each boost::python::tuple has to be of the correct length for every CutNode.
+  /// Otherwise, we get an index error when we try to extract the values.
+  /// These simple test cases check that exceptions are thrown if the lengths are incorrect.
   TEST(CutNodesTest, TupleLength)
   {
     Py_Initialize();

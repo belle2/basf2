@@ -350,8 +350,8 @@ void RootInputModule::event()
   while (true) {
     const long nextEntry = InputController::getNextEntry(m_isSecondaryInput);
     if (nextEntry >= 0 && nextEntry < InputController::numEntries(m_isSecondaryInput)) {
-      // don't show this message if we are doing event mixing, as it will pop up twice for every event
-      if (!InputController::getEventMixing()) {
+      // don't show this message if we are doing event merging, as it will pop up twice for every event
+      if (!InputController::getEventMerging()) {
         B2INFO("RootInput: will read entry " << nextEntry << " next.");
       }
       m_nextEntry = nextEntry;

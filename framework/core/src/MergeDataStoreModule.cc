@@ -26,8 +26,8 @@ MergeDataStoreModule::MergeDataStoreModule() : Module()
   addParam("toID", m_to, "active DataStore id after this module", std::string(""));
   addParam("createNew", m_createNew,
            "do you want to create a new (empty) DataStore 'toID'? This should be true only when toID refers to a _new_ DataStore ID", false);
-  addParam("mergeBack", m_mergeBack, "if given, copy the given objects/arrays over even if createNew is false.",
-           std::vector<std::string> {});
+  addParam("mergeBack", m_mergeBack, "copy the given objects/arrays over even if createNew is false.",
+           std::vector<std::string> {"EventMetaData"});
 }
 
 MergeDataStoreModule::~MergeDataStoreModule() = default;
@@ -79,7 +79,9 @@ void MergeDataStoreModule::terminate()
 void MergeDataStoreModule::beginRun()
 {
   // Why would we need this?!
-  // What happens if new run starts for one of the input paths but (I guess typically) not for the other?
+  // The main path decides when beginRun() is called but I don't think it is executed in case
+  // a new run starts for the independent path?
+  // TODO: Make sure this cannot cause any problems...
   //event();
 }
 void MergeDataStoreModule::endRun()

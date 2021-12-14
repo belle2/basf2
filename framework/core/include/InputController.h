@@ -29,11 +29,11 @@ namespace Belle2 {
     /** Call this function from supported input modules. */
     static void setCanControlInput(bool on) { s_canControlInput = on; }
 
-    /** Should the events from two input paths be mixed. */
-    static bool getEventMixing() { return s_doEventMixing; }
+    /** Get if we are merging events from two paths. */
+    static bool getEventMerging() { return s_doEventMerging; }
 
-    /** Should the events from two input paths be mixed. */
-    static void enableEventMixing() { s_doEventMixing = true; };
+    /** Set that we are merging events from two paths. */
+    static void enableEventMerging() { s_doEventMerging = true; };
 
     /** Set the file entry to be loaded the next time event() is called.
      *
@@ -88,7 +88,7 @@ namespace Belle2 {
     /** Reset InputController (e.g. after forking a thread) */
     static void resetForChildProcess();
 
-    /** You do not always want to process all the entries in the file */
+    /** Necessary to make sure the ProgressModule shows reasonable output.. */
     static long getNumEntriesToProcess();
 
   private:
@@ -98,8 +98,8 @@ namespace Belle2 {
     /** Is there an input module to be controlled? */
     static bool s_canControlInput;
 
-    /** Do we want to mix events from two paths? */
-    static bool s_doEventMixing;
+    /** Are we merging events from two paths? */
+    static bool s_doEventMerging;
 
     /** entry to be loaded the next time event() is called in an input module.
      *

@@ -856,6 +856,13 @@ void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id
     entrylist = entrylist_event;
   }
 
+  if (mergeEntries) {
+    // Make sure that EventMetaData is always merged
+    if (std::find(entrylist.begin(), entrylist.end(), "EventMetaData") == entrylist.end()) {
+      B2ERROR("It is required to merge the 'EventMetaData' for consistency.");
+    }
+  }
+
   //collect the entries for which we do not have to fix duplicate pointers
   std::vector<std::string> skipEntries;
 
@@ -1019,11 +1026,16 @@ void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& 
       StoreEntry& target = targetMaps[c_Event][fromEntry.name];
 
       //copy contents into target object
-      if (not fromEntry.ptr) {
-        if (!target.object)
+      if (!fromEntry.ptr) {
+        if (!target.object) {
           target.recoverFromNullObject();
-        target.ptr = nullptr;
-        B2WARNING("FromEntry not valid?");
+          target.ptr = nullptr;
+        } else {
+          // keep the content as it is before merging and indicate this by the index
+          if (target.isArray) {
+            arrayIndices->addIndex({target.name, target.getPtrAsArray()->GetEntriesFast()});
+          }
+        }
       } else {
         // array-type object
         if (target.isArray) {
@@ -1031,17 +1043,13 @@ void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& 
             target.object = fromEntry.object->Clone();
             target.ptr = target.object;
 
-            arrayIndices->setIndex({target.name, 0});
+            arrayIndices->addIndex({target.name, 0});
           } else {
             if (target.objClass != fromEntry.objClass) {
               B2FATAL("Cannot merge StoreArrays " << target.name << "as they are of different classes.");
             }
 
-            if (arrayIndices->getIndex(target.name) != -1) {
-              B2FATAL("Cannot merge the same StoreArray twice.");
-            }
-
-            arrayIndices->setIndex({target.name, target.getPtrAsArray()->GetEntriesFast()});
+            arrayIndices->addIndex({target.name, target.getPtrAsArray()->GetEntriesFast()});
 
             if (fromEntry.getPtrAsArray()->GetEntriesFast() == 0) {
               continue;

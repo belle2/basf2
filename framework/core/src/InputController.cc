@@ -19,8 +19,8 @@ long InputController::s_nextRun = -1;
 long InputController::s_nextEvent = -1;
 std::pair<long, long> InputController::s_currentEntry = { 0, 0};
 std::pair<long, long> InputController::s_skippedEntries = { 0, 0};
-bool InputController::s_doEventMixing = false;
 std::pair<const TChain*, const TChain*> InputController::s_chain = { nullptr, nullptr};
+bool InputController::s_doEventMerging = false;
 
 void InputController::setChain(const TChain* chain, bool independentPath)
 {
@@ -81,13 +81,9 @@ long InputController::numEntries(bool independentPath)
 
 long InputController::getNumEntriesToProcess()
 {
-  if (!s_chain.second) {
+  if (!s_doEventMerging) {
     return numEntries();
   } else {
-    if (s_doEventMixing) {
-      return numEntries(true) * numEntries(false);
-    } else {
-      return std::min(numEntries(true), numEntries(false));
-    }
+    return numEntries(true) * numEntries(false);
   }
 }

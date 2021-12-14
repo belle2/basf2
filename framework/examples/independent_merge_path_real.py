@@ -13,107 +13,41 @@
 import basf2
 from ROOT import Belle2
 
-# environment = Belle2.Environment.Instance()
-# environment.setNumberEventsOverride(10)
-
-
-class CheckData(basf2.Module):
-
-    """check output of CreateData"""
-
-    def initialize(self):
-        """reimplementation"""
-
-        self.tracks = Belle2.PyStoreArray('Tracks')
-        self.clusters = Belle2.PyStoreArray('ECLClusters')
-
-    def event(self):
-        """reimplementation"""
-
-        print(self.name())
-        print("nTracks: " + str(self.tracks.getEntries()))
-        print("nECLClusters: " + str(self.clusters.getEntries()))
-
-        for track in self.tracks:
-            for cluster in track.getRelationsTo('ECLClusters'):
-                print(track.getArrayIndex(), '->', cluster.getArrayIndex())
-
-
-class CheckIndices(basf2.Module):
-
-    """check output of CreateData"""
-
-    def initialize(self):
-        """reimplementation"""
-
-        self.tracks = Belle2.PyStoreArray('Tracks')
-        self.v0s = Belle2.PyStoreArray('V0s')
-
-    def event(self):
-        """reimplementation"""
-
-        print(self.name())
-        print("Tracks")
-        for track in self.tracks:
-            for tfr in track.getTrackFitResults():
-                print(track.getArrayIndex(), '->', tfr.second.getArrayIndex())
-        print("V0s")
-        for v0 in self.v0s:
-            print('t', v0.getArrayIndex(), '->', v0.getTracks().first.getArrayIndex(), '/', v0.getTracks().second.getArrayIndex())
-            print(
-                'f',
-                v0.getArrayIndex(),
-                '->',
-                v0.getTrackFitResults().first.getArrayIndex(),
-                '/',
-                v0.getTrackFitResults().second.getArrayIndex())
-
 
 main = basf2.Path()
 indep = basf2.Path()
 
-# input
+# input (if you're doing signal embedding, this should be the ROE from data)
 input1 = basf2.register_module('RootInput')
-input1.param('inputFileName', '/nfs/dust/belle2/user/kurzsimo/testSample/file1_10evts.root')
+input1.param('inputFileName', '/nfs/dust/belle2/user/glazov/test_embedding/jpsiExp12_skim.root')
 main.add_module(input1).set_name("--input_main--")
 
-# main.add_module(CheckData()).set_name("checkdata_main")
-
-# and the other input
+# and the other input (if you're doing signal embedding, this should be the signal from MC)
 input2 = basf2.register_module('RootInput')
-input2.param('inputFileName', '/nfs/dust/belle2/user/kurzsimo/testSample/file2_3evts.root')
-input2.param('isSecondaryInput', True)
+input2.param('inputFileName', '/nfs/dust/belle2/user/glazov/test_embedding/mcsig_skim_166.root')
+input2.param('isSecondaryInput', True)  # <- set flag for secondary input module
 indep.add_module(input2).set_name("input_indep")
 
-# indep.add_module(CheckData()).set_name("checkdata_indep")
+# convert the EventExtraInfo to a framework kind of object (temporary fix?)
+conversion1 = basf2.register_module('EventExtraInfoConverter')
+main.add_module(conversion1).set_name("conversion_main")
+conversion2 = basf2.register_module('EventExtraInfoConverter')
+indep.add_module(conversion2).set_name("conversion_indep")
 
 # merge it!
 # Use merge_back_event=['ALL'] to merge everything
-# NOTE: StoreArrays have to be merged before their Relations
+# or specify explicitly merge_back_event=['EventMetaData', 'ECLClusters', 'Tracks', 'TracksToECLClusters']
+# NOTE: StoreArrays have to be merged before their Relations (and EventMetaData is strictly required!)
 main.add_independent_merge_path(
     indep,
-    event_mixing=True,
-    merge_back_event=[
-        'ALL'
-    ])
-# main.add_independent_merge_path(
-# indep,
-# merge_back_event=[
-# 'ECLClusters',
-# 'Tracks',
-# 'MCParticles',
-# 'TracksToECLClusters',
-# 'TracksToMCParticles',
-# 'ECLClustersToMCParticles',
-# 'ECLClustersToECLClusters'
-# ])
-#
+    consistency_check="charge",  # <- skip event if charge of ROE/sig (or ROE/ROE) does not match
+    # [None or empty string if you don't want to do this]
+    merge_back_event=['ALL'],  # <- list of content to be merged
+    event_mixing=False,  # <- signal embedding or event mixing
+    merge_same_file=False  # <- for event mixing, you can mix a file with itself
+)
 
-# main.add_module(CheckData()).set_name("checkdata_merged")
-
-# main.add_module(CheckIndices()).set_name("checkindices")
 main.add_module('FixMergedObjects')
-# main.add_module(CheckIndices()).set_name("checkindices_fixed")
 
 # output
 output = basf2.register_module('RootOutput')

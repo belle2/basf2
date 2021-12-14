@@ -19,6 +19,7 @@
 #include <framework/core/SwitchDataStoreModule.h>
 #include <framework/core/MergeDataStoreModule.h>
 #include <framework/core/SteerRootInputModule.h>
+#include <framework/core/CheckMergingConsistencyModule.h>
 #include <framework/core/PyObjConvUtils.h>
 
 using namespace Belle2;
@@ -132,7 +133,7 @@ void Path::addIndependentPath(const PathPtr& independent_path, std::string ds_ID
 }
 
 void Path::addIndependentMergePath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back,
-                                   bool event_mixing)
+                                   std::string consistency_check, bool event_mixing, bool merge_same_file)
 {
   if (ds_ID.empty()) {
     static int dscount = 1;
@@ -146,8 +147,11 @@ void Path::addIndependentMergePath(const PathPtr& independent_path, std::string 
   switchStart->setName("MergeDataStore ('' -> '" + ds_ID + "')");
   switchEnd->setName("MergeDataStore ('' <- '" + ds_ID + "')");
 
+  ModulePtr checkConsistency = ModuleManager::Instance().registerModule("CheckMergingConsistency");
+  static_cast<CheckMergingConsistencyModule&>(*checkConsistency).init(consistency_check, event_mixing);
+
   ModulePtr steerInput = ModuleManager::Instance().registerModule("SteerRootInput");
-  static_cast<SteerRootInputModule&>(*steerInput).init(event_mixing);
+  static_cast<SteerRootInputModule&>(*steerInput).init(event_mixing, merge_same_file);
 
   //set c_ParallelProcessingCertified flag if _all_ modules have it set
   auto flag = Module::c_ParallelProcessingCertified;
@@ -156,10 +160,19 @@ void Path::addIndependentMergePath(const PathPtr& independent_path, std::string 
     switchEnd->setPropertyFlags(flag);
   }
 
+  // switch to the second (empty) data store
   addModule(switchStart);
+  // execute independent path
   addPath(independent_path);
+  // do the merging
   addModule(switchEnd);
+  // check events to be merged is consistent (typically charge)
+  addModule(checkConsistency);
+  // decide which events have to be processed next
   addModule(steerInput);
+  // the current combination of events might not be sensible or unphysical
+  // in this case end path and try next combination
+  steerInput->if_value("==0", std::make_shared<Path>());
 }
 
 bool Path::contains(const std::string& moduleType) const

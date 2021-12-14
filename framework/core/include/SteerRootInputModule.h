@@ -10,6 +10,10 @@
 
 #include <framework/core/Module.h>
 
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/MergedEventConsistency.h>
+
 namespace Belle2 {
   /** Internal module used by Path.add_independent_merge_path(). Don't use it directly. */
   class SteerRootInputModule : public Module {
@@ -23,7 +27,7 @@ namespace Belle2 {
     SteerRootInputModule();
 
     /** setter for Path. */
-    void init(bool eventMixing);
+    void init(bool eventMixing, bool mergeSameFile);
 
     ~SteerRootInputModule();
 
@@ -33,7 +37,22 @@ namespace Belle2 {
   private:
 
     /** do event mixing (merge each event of main path with each event of independent path) */
-    bool m_eventMixing;
+    bool m_eventMixing = false;
+
+    /** if you want to merge a file with itself, mixing evts (1,3) is the same as (3,1) */
+    bool m_mergeSameFile = false;
+
+    /** set if current event is the last one to be processed  */
+    bool m_processedLastEvent = false;
+
+    /** We want to use the EventMetaData for some basic checks */
+    StoreObjPtr<EventMetaData> m_eventMetaData_main = StoreObjPtr<EventMetaData>("EventMetaData");
+
+    /** We want to use the EventMetaData for some basic checks */
+    StoreObjPtr<EventMetaData> m_eventMetaData_indep = StoreObjPtr<EventMetaData>("EventMetaData_indepPath");
+
+    /** Check if charge of both events is consistent (otherwise skip) */
+    StoreObjPtr<MergedEventConsistency> m_mergedEventConsistency;
 
   };
 }

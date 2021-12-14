@@ -624,7 +624,7 @@ FourCFitKFit::makeCoreMatrix() {
 
     for (int i = 0; i < m_TrackCount; i++)
     {
-      const double a = m_property[i][2];
+      a = m_property[i][2];
       al_1_prime[i * KFitConst::kNumber7 + 0][0] -= a * (al_1_prime[KFitConst::kNumber7 * m_TrackCount + 1][0] - al_1_prime[i *
       KFitConst::kNumber7 + 5][0]);
       al_1_prime[i * KFitConst::kNumber7 + 1][0] += a * (al_1_prime[KFitConst::kNumber7 * m_TrackCount + 0][0] - al_1_prime[i *

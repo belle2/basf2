@@ -147,9 +147,6 @@ CDCTriggerNeuroModule::event()
     // get the hit pattern (depends on phase space sector)
     unsigned long hitPattern =
       m_NeuroTrigger.getInputPattern(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
-    // get the complete hit pattern for debug purposes
-    unsigned long chitPattern =
-      m_NeuroTrigger.getCompleteHitPattern(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
     // get the pure driftthreshold vector
     unsigned long puredriftth =
       m_NeuroTrigger.getPureDriftThreshold(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);

@@ -292,7 +292,7 @@ void ECLPackerModule::event()
 
         for (int i = 0; i < ECL_CHANNELS_IN_SHAPER; i++) adcBuffer_temp[i] = 0;
         resetBuffPosition();
-        setBuffLength(ECL_ADC_SAMPLES_PER_CHANNEL * ECL_CHANNELS_IN_SHAPER);
+        setBuffLength(static_cast<int>(ECL_ADC_SAMPLES_PER_CHANNEL) * static_cast<int>(ECL_CHANNELS_IN_SHAPER));
         for (iChannel = 1; iChannel <= ECL_CHANNELS_IN_SHAPER; iChannel++) {
           int cid = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
           if (cid < 1) continue;

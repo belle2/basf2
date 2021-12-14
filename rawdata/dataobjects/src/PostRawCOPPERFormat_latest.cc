@@ -306,8 +306,7 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
   for (int i = 0; i < MAX_PCIE40_CH; i++) {
     if (detector_buf_ch[ i ] == NULL || nwords_ch[ i ] <= 0) continue;    // for an empty FINESSE slot
     length_nwords += nwords_ch[ i ];
-    length_nwords += static_cast<int>(SIZE_B2LHSLB_HEADER) + static_cast<int>(SIZE_B2LFEE_HEADER)
-                     + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+    length_nwords += static_cast<int>(SIZE_B2LHSLB_HEADER) + SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
   }
 
   // allocate buffer

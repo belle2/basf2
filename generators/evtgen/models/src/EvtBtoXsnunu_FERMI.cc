@@ -230,7 +230,7 @@ namespace Belle2 {
       ::abort();
     }
 
-    if (getNArg() == 3) {
+    if (getNArg() >= 3) {
       // s-quark mass for fermi motion
       m_ms = getArg(0);
       // spectator quark mass for fermi motion
@@ -238,7 +238,7 @@ namespace Belle2 {
       // Fermi motion parameter for fermi motion
       m_pf = getArg(2);
     }
-    if (getNArg() == 4) {
+    if (getNArg() >= 4) {
       m_mxmin = getArg(3);
     }
     if (getNArg() == 6) {

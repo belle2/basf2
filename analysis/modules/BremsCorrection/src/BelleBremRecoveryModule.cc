@@ -146,7 +146,7 @@ namespace Belle2 {
         bremsGammaEnergySum += Variable::eclClusterE(fsrgamma);
         if (!m_isMultiPho) break;
       }
-      Particle correctedLepton(new4Vec, lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
+      Particle correctedLepton(new4Vec.Vect(), lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
                                lepton->getTrack()->getArrayIndex());
       correctedLepton.appendDaughter(lepton, false);
 

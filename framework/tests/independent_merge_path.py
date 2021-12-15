@@ -14,7 +14,7 @@ import basf2
 from ROOT import Belle2
 
 
-class CreateData(basf2.Module):
+class CreateDataMain(basf2.Module):
 
     """create some data"""
 
@@ -22,13 +22,22 @@ class CreateData(basf2.Module):
         """reimplementation"""
 
         self.obj = Belle2.PyStoreObj(Belle2.EventMetaData.Class())
-        self.obj.registerInDataStore('EMD')
+        self.obj.registerInDataStore('EventMetaData')
         self.array = Belle2.PyStoreArray(Belle2.Particle.Class())
-        self.array.registerInDataStore('Parts')
+        self.array.registerInDataStore('Particles')
         self.arrayRel = Belle2.PyStoreArray(Belle2.MCParticle.Class())
-        self.arrayRel.registerInDataStore('MCParts')
+        self.arrayRel.registerInDataStore('MCParticles')
 
         self.array.registerRelationTo(self.arrayRel)
+
+        self.objFirst = Belle2.PyStoreObj(Belle2.EventMetaData.Class())
+        self.objFirst.registerInDataStore('EventMetaDataFirst')
+        self.arrayFirst = Belle2.PyStoreArray(Belle2.Particle.Class())
+        self.arrayFirst.registerInDataStore('ParticlesFirst')
+        self.arrayRelFirst = Belle2.PyStoreArray(Belle2.MCParticle.Class())
+        self.arrayRelFirst.registerInDataStore('MCParticlesFirst')
+
+        self.arrayFirst.registerRelationTo(self.arrayRelFirst)
 
     def event(self):
         """reimplementation"""
@@ -47,8 +56,22 @@ class CreateData(basf2.Module):
         for i in range(5):
             self.array[i].addRelationTo(self.arrayRel[i])
 
+        self.objFirst.create()
+        self.objFirst.obj().setExperiment(600)
 
-class CreateData2(basf2.Module):
+        for i in range(6):
+            newptr = self.arrayFirst.appendNew()
+            newptr.setPValue(i)
+
+        for i in range(6):
+            newptr = self.arrayRelFirst.appendNew()
+            newptr.setPDG(i)
+
+        for i in range(6):
+            self.arrayFirst[i].addRelationTo(self.arrayRelFirst[i])
+
+
+class CreateDataIndep(basf2.Module):
 
     """create some data"""
 
@@ -56,64 +79,53 @@ class CreateData2(basf2.Module):
         """reimplementation"""
 
         self.obj = Belle2.PyStoreObj(Belle2.EventMetaData.Class())
-        self.obj.registerInDataStore('EMD2')
+        self.obj.registerInDataStore('EventMetaData')
         self.array = Belle2.PyStoreArray(Belle2.Particle.Class())
-        self.array.registerInDataStore('Parts2')
+        self.array.registerInDataStore('Particles')
         self.arrayRel = Belle2.PyStoreArray(Belle2.MCParticle.Class())
-        self.arrayRel.registerInDataStore('MCParts2')
+        self.arrayRel.registerInDataStore('MCParticles')
 
         self.array.registerRelationTo(self.arrayRel)
+
+        self.objSecond = Belle2.PyStoreObj(Belle2.EventMetaData.Class())
+        self.objSecond.registerInDataStore('EventMetaDataSecond')
+        self.arraySecond = Belle2.PyStoreArray(Belle2.Particle.Class())
+        self.arraySecond.registerInDataStore('ParticlesSecond')
+        self.arrayRelSecond = Belle2.PyStoreArray(Belle2.MCParticle.Class())
+        self.arrayRelSecond.registerInDataStore('MCParticlesSecond')
+
+        self.arraySecond.registerRelationTo(self.arrayRelSecond)
 
     def event(self):
         """reimplementation"""
 
         self.obj.create()
-        self.obj.obj().setExperiment(1000)
+        self.obj.obj().setExperiment(700)
 
-        for i in range(10):
+        for i in range(7):
             newptr = self.array.appendNew()
             newptr.setPValue(i)
 
-        for i in range(10):
+        for i in range(7):
             newptr = self.arrayRel.appendNew()
             newptr.setPDG(i)
 
-        for i in range(10):
+        for i in range(7):
             self.array[i].addRelationTo(self.arrayRel[i])
 
+        self.objSecond.create()
+        self.objSecond.obj().setExperiment(800)
 
-class CreateData22(basf2.Module):
+        for i in range(8):
+            newptr = self.arraySecond.appendNew()
+            newptr.setPValue(i)
 
-    """create some data"""
+        for i in range(8):
+            newptr = self.arrayRelSecond.appendNew()
+            newptr.setPDG(i)
 
-    def initialize(self):
-        """reimplementation"""
-
-        self.obj = Belle2.PyStoreObj(Belle2.EventMetaData.Class())
-        self.obj.registerInDataStore('EMD2')
-        self.array = Belle2.PyStoreArray(Belle2.Particle.Class())
-        self.array.registerInDataStore('Parts2')
-        self.arrayRel = Belle2.PyStoreArray(Belle2.MCParticle.Class())
-        self.arrayRel.registerInDataStore('MCParts2')
-
-        self.array.registerRelationTo(self.arrayRel)
-
-    def event(self):
-        """reimplementation"""
-
-        self.obj.create()
-        self.obj.obj().setExperiment(1000)
-
-        for i in range(11):
-            newptr = self.array.appendNew()
-            newptr.setPValue(i + 100)
-
-        for i in range(11):
-            newptr = self.arrayRel.appendNew()
-            newptr.setPDG(i + 100)
-
-        for i in range(11):
-            self.array[i].addRelationTo(self.arrayRel[i])
+        for i in range(8):
+            self.arraySecond[i].addRelationTo(self.arrayRelSecond[i])
 
 
 class CheckData(basf2.Module):
@@ -123,9 +135,16 @@ class CheckData(basf2.Module):
     def initialize(self):
         """reimplementation"""
 
-        self.obj = Belle2.PyStoreObj('EMD')
-        self.array = Belle2.PyStoreArray('Parts')
-        self.arrayRel = Belle2.PyStoreArray('MCParts')
+        self.obj = Belle2.PyStoreObj('EventMetaData')
+        self.obj_indepPath = Belle2.PyStoreObj('EventMetaData_indepPath')
+        self.objFirst = Belle2.PyStoreObj('EventMetaDataFirst')
+        self.objSecond = Belle2.PyStoreObj('EventMetaDataSecond')
+        self.array = Belle2.PyStoreArray('Particles')
+        self.arrayRel = Belle2.PyStoreArray('MCParticles')
+        self.arrayFirst = Belle2.PyStoreArray('ParticlesFirst')
+        self.arrayRelFirst = Belle2.PyStoreArray('MCParticlesFirst')
+        self.arraySecond = Belle2.PyStoreArray('ParticlesSecond')
+        self.arrayRelSecond = Belle2.PyStoreArray('MCParticlesSecond')
 
     def event(self):
         """reimplementation"""
@@ -133,7 +152,12 @@ class CheckData(basf2.Module):
         print(self.name())
 
         assert self.obj.obj().getExperiment() == 500
-        assert self.array.getEntries() == 5
+        assert self.obj_indepPath.obj().getExperiment() == 700
+        assert self.objFirst.obj().getExperiment() == 600
+        assert self.objSecond.obj().getExperiment() == 800
+        assert self.array.getEntries() == 5 + 7
+        assert self.arrayFirst.getEntries() == 6
+        assert self.arraySecond.getEntries() == 8
 
         for arr in self.array:
             print(arr.getPValue())
@@ -142,151 +166,22 @@ class CheckData(basf2.Module):
             print(arr.getPDG())
 
         for arr in self.array:
-            print(arr.getPValue(), '->', arr.getRelated('MCParts').getPDG())
-
-
-class CheckData2(basf2.Module):
-
-    """check output of CreateData"""
-
-    def initialize(self):
-        """reimplementation"""
-
-        self.obj = Belle2.PyStoreObj('EMD2')
-        self.array = Belle2.PyStoreArray('Parts2')
-        self.arrayRel = Belle2.PyStoreArray('MCParts2')
-
-        self.array.requireRelationTo(self.arrayRel)
-
-    def event(self):
-        """reimplementation"""
-
-        print(self.name())
-
-        assert self.obj.obj().getExperiment() == 1000
-        assert self.array.getEntries() == 10
-        assert self.arrayRel.getEntries() == 10
-
-        for arr in self.array:
-            print(arr.getPValue(), '->', arr.getRelated('MCParts2').getPDG())
-
-
-class CheckData22(basf2.Module):
-
-    """check output of CreateData"""
-
-    def initialize(self):
-        """reimplementation"""
-
-        self.obj = Belle2.PyStoreObj('EMD2')
-        self.array = Belle2.PyStoreArray('Parts2')
-        self.arrayRel = Belle2.PyStoreArray('MCParts2')
-
-    def event(self):
-        """reimplementation"""
-
-        print(self.name())
-
-        assert self.obj.obj().getExperiment() == 1000
-
-        assert self.array.getEntries() == 11
-        assert self.arrayRel.getEntries() == 11
-
-        for arr in self.array:
-            print(arr.getPValue(), '->', arr.getRelated('MCParts2').getPDG())
-
-
-class CheckData222(basf2.Module):
-
-    """check output of CreateData"""
-
-    def initialize(self):
-        """reimplementation"""
-
-        self.obj = Belle2.PyStoreObj('EMD2')
-        self.array = Belle2.PyStoreArray('Parts2')
-        self.arrayRel = Belle2.PyStoreArray('MCParts2')
-
-    def event(self):
-        """reimplementation"""
-
-        print(self.name())
-
-        # TODO: check what happens if obj with different values is merged!
-        assert self.obj.obj().getExperiment() == 1000
-
-        assert self.array.getEntries() == 21
-        assert self.arrayRel.getEntries() == 21
-
-        for arr in self.array:
-            print(arr.getPValue())
-
-        for arr in self.arrayRel:
-            print(arr.getPDG())
-
-        for arr in self.array:
-            print(arr.getPValue(), '->', arr.getRelated('MCParts2').getPDG())
-
-
-class CheckAbsence(basf2.Module):
-
-    """check output of CreateData"""
-
-    def initialize(self):
-        """reimplementation"""
-
-        assert not Belle2.PyStoreObj('EMD').isOptional()
-        assert not Belle2.PyStoreArray('Parts').isOptional()
-
-    def event(self):
-        """reimplementation"""
-
-        assert not Belle2.PyStoreObj('EMD').obj()
-
-
-class CheckAbsence2(basf2.Module):
-
-    """check output of CreateData"""
-
-    def initialize(self):
-        """reimplementation"""
-
-        assert not Belle2.PyStoreObj('EMD2').isOptional()
-        assert not Belle2.PyStoreArray('Parts2').isOptional()
-
-    def event(self):
-        """reimplementation"""
-
-        assert not Belle2.PyStoreObj('EMD2').obj()
+            print(arr.getPValue(), '->', arr.getRelated('MCParticles').getPDG())
 
 
 main = basf2.Path()
 main.add_module('EventInfoSetter')
-# main.add_module(CheckAbsence()).set_name("checkabsence 1")
 
-main.add_module(CreateData2())
-main.add_module(CheckData2()).set_name("checkdata2 1")
+main.add_module(CreateDataMain())
 
 indep = basf2.Path()
-# indep.add_module(CheckAbsence()).set_name("checkabsence 3")
-indep.add_module(CreateData())
-indep.add_module(CheckData()).set_name("checkdata 2")
-# indep.add_module(CheckAbsence2()).set_name("checkdata2 3")
-indep.add_module(CreateData22())
-indep.add_module(CheckData22()).set_name("checkdata22 1")
+indep.add_module(CreateDataIndep())
+
 main.add_independent_merge_path(
     indep,
-    merge_back_event=[
-        'EMD',
-        'Parts',
-        'MCParts',
-        'EMD2',
-        'Parts2',
-        'MCParts2',
-        'PartsToMCParts',
-        'Parts2ToMCParts2'])
-main.add_module(CheckData()).set_name("checkdata 3")
-main.add_module(CheckData222()).set_name("checkdata222 1")
+    merge_back_event=['ALL'])
+
+main.add_module(CheckData())
 
 basf2.print_path(main)
 basf2.process(main)

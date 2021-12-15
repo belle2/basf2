@@ -109,20 +109,22 @@ void SteerRootInputModule::event()
   // But the module has to be run in any case to set events, which should be processed next
   bool goodMerge = true;
   // And this will be set to the events to be processed next
-  std::pair <long, long> nextEntries = { -1, -1};
+  std::pair <long, long> nextEntries;
 
   std::pair<long, long> numEntries = { InputController::numEntries(false), InputController::numEntries(true)};
   std::pair <long, long> currEntries = { InputController::getCurrentEntry(false), InputController::getCurrentEntry(true)};
 
-  // Make sure charge is consistent (if this was checked before)
+  // Make sure charge is consistent (if this option is enabled)
   if (m_mergedEventConsistency.isValid()) {
-    goodMerge = goodMerge && m_mergedEventConsistency->getConsistent();
+    goodMerge = m_mergedEventConsistency->getConsistent();
   }
 
   // Make sure an event is not merged with itself (not physical)
-  goodMerge = goodMerge && (m_eventMetaData_main->getEvent() != m_eventMetaData_indep->getEvent() ||
-                            m_eventMetaData_main->getRun() != m_eventMetaData_indep->getRun() ||
-                            m_eventMetaData_main->getExperiment() != m_eventMetaData_indep->getExperiment());
+  if (goodMerge) {
+    goodMerge = (m_eventMetaData_main->getEvent() != m_eventMetaData_indep->getEvent() ||
+                 m_eventMetaData_main->getRun() != m_eventMetaData_indep->getRun() ||
+                 m_eventMetaData_main->getExperiment() != m_eventMetaData_indep->getExperiment());
+  }
 
   if (m_eventMixing) {
     // Process events in order (0,0), (0,1), ..., (0,n), (1,0), (1,1), ...

@@ -15,8 +15,9 @@
 
 namespace Belle2 {
   /** Mark if we want to merge the DataStore of a combination of events or not.
-   *  This object is necessary as usually the decision is made using analysis level
-   *  objects, which we do not want to import in the framework package.
+   *  This is required since it makes sense to leave the decision if the merge is consistent
+   *  to a separate module (CheckMergingConsistencyModule) and the actual steering of the RootInputModules
+   *  to a different module (SteerRootInputModule) but they have to communicate in a way
    */
   class MergedEventConsistency : public TObject {
   public:

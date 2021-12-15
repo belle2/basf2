@@ -29,7 +29,7 @@ namespace Belle2 {
 
   CheckMergingConsistencyModule::~CheckMergingConsistencyModule() = default;
 
-  void CheckMergingConsistencyModule::init(std::string option, bool eventMixing)
+  void CheckMergingConsistencyModule::init(const std::string& option, bool eventMixing)
   {
     m_option = option;
     m_eventMixing = eventMixing;

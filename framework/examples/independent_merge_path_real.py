@@ -37,11 +37,12 @@ indep.add_module(conversion2).set_name("conversion_indep")
 # merge it!
 # Use merge_back_event=['ALL'] to merge everything
 # or specify explicitly merge_back_event=['EventMetaData', 'ECLClusters', 'Tracks', 'TracksToECLClusters']
-# NOTE: StoreArrays have to be merged before their Relations (and EventMetaData is strictly required!)
+# NOTE: StoreArrays have to be merged before their Relations (and 'EventMetaData' is strictly required!)
+# NOTE: Also merge 'MergedEventExtraInfo' if you want to do a consistency_check
 main.add_independent_merge_path(
     indep,
-    consistency_check="charge",  # <- skip event if charge of ROE/sig (or ROE/ROE) does not match
-    # [None or empty string if you don't want to do this]
+    # <- skip event if charge of ROE/sig (or ROE/ROE) does not match [None or "" if you don't want to do this]
+    consistency_check="charge",
     merge_back_event=['ALL'],  # <- list of content to be merged
     event_mixing=False,  # <- signal embedding or event mixing
     merge_same_file=False  # <- for event mixing, you can mix a file with itself

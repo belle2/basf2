@@ -32,7 +32,7 @@ namespace Belle2 {
     CheckMergingConsistencyModule();
 
     /** setter for Path. */
-    void init(std::string option, bool eventMixing);
+    void init(const std::string& option, bool eventMixing);
 
     ~CheckMergingConsistencyModule();
 
@@ -47,12 +47,12 @@ namespace Belle2 {
     /** do event mixing (merge each event of main path with each event of independent path) */
     bool m_eventMixing = false;
 
-    /**< object that stores whether events are consistent */
+    /** object that stores whether events are consistent */
     StoreObjPtr<MergedEventConsistency> m_mergedEventConsistency;
 
-    /**< MergedEventExtraInfo from main path */
+    /** MergedEventExtraInfo from main path */
     StoreObjPtr<MergedEventExtraInfo> m_mergedEventExtraInfo_main = StoreObjPtr<MergedEventExtraInfo>("MergedEventExtraInfo");
-    /**< MergedEventExtraInfo from independent path */
+    /** MergedEventExtraInfo from independent path */
     StoreObjPtr<MergedEventExtraInfo> m_mergedEventExtraInfo_indep =
       StoreObjPtr<MergedEventExtraInfo>("MergedEventExtraInfo_indepPath");
 

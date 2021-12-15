@@ -108,6 +108,8 @@ namespace Belle2 {
              "Train one output of MLP to give z.", m_parameters.targetZ);
     addParam("targetTheta", m_parameters.targetTheta,
              "Train one output of MLP to give theta.", m_parameters.targetTheta);
+    addParam("singleUse", m_singleUse,
+             "Only use a track for a single expert", true);
 
 
 
@@ -253,8 +255,12 @@ namespace Belle2 {
         // check hit pattern
         unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector, *m_tracks[itrack], m_neuroTrackInputMode);
         unsigned long sectorPattern = m_NeuroTrigger[isector].getSLpattern();
+        unsigned long sectorPatternMask = m_NeuroTrigger[isector].getSLpatternMask();
         B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
-        if (sectorPattern > 0 && (sectorPattern & hitPattern) != sectorPattern) {
+        if (!m_singleUse && sectorPattern > 0 && (sectorPattern & hitPattern) != sectorPattern) {
+          B2DEBUG(250, "hitPattern not matching " << (sectorPattern & hitPattern));
+          continue;
+        } else if (m_singleUse && sectorPattern > 0 && (sectorPattern & hitPattern) != (hitPattern & sectorPatternMask)) {
           B2DEBUG(250, "hitPattern not matching " << (sectorPattern & hitPattern));
           continue;
         }

@@ -73,6 +73,8 @@ namespace Belle2 {
 
     /** List of input tracks. */
     StoreArray<CDCTriggerTrack> m_tracks;
+    /** use a track only once and not for every expert */
+    bool m_singleUse;
   };
 }
 #endif

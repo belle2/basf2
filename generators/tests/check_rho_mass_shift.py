@@ -64,4 +64,4 @@ class CheckRhoMass(b2.Module):
 
 main.add_module(CheckRhoMass()).set_log_level(b2.LogLevel.INFO)
 
-b2.process(main)
+b2.process(main, 10000)

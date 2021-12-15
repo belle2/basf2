@@ -30,6 +30,7 @@
 #include <TClonesArray.h>
 #include <TDatabasePDG.h>
 #include <TMatrixFSym.h>
+#include <math.h>
 
 #include <iostream>
 #include <iomanip>
@@ -72,6 +73,32 @@ Particle::Particle(const TLorentzVector& momentum,
 
   setMdstArrayIndex(mdstIndex);
   set4Vector(momentum);
+  resetErrorMatrix();
+}
+
+
+Particle::Particle(const TVector3& momentum,
+                   const int pdgCode,
+                   EFlavorType flavorType,
+                   const EParticleSourceObject source,
+                   const unsigned mdstIndex) :
+  m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_pValue(-1), m_flavorType(flavorType), m_particleSource(source), m_properties(0), m_arrayPointer(nullptr)
+{
+  if (flavorType == c_Unflavored and pdgCode < 0)
+    m_pdgCode = -pdgCode;
+
+  // set mass
+  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr)
+    B2FATAL("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
+  m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
+
+  setMdstArrayIndex(mdstIndex);
+
+  double energy = sqrt(pow(m_mass, 2) + momentum.Mag2());
+  TLorentzVector four_momentum = TLorentzVector(momentum.Px(), momentum.Py(), momentum.Pz(), energy);
+  set4Vector(four_momentum);
+
   resetErrorMatrix();
 }
 

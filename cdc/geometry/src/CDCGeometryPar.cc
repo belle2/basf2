@@ -186,7 +186,7 @@ void CDCGeometryPar::clear()
     for (unsigned j = 0; j < 2; ++j)
       m_zWall[i][j] = 0;
   }
-  for (unsigned i = 0; i < MAX_N_SLAYERS; ++i) {
+  for (unsigned i = 0; i < c_maxNSenseLayers; ++i) {
     m_rSLayer[i] = 0;
     m_zSForwardLayer[i] = 0;
     m_dzSForwardLayer[i] = 0;
@@ -198,14 +198,14 @@ void CDCGeometryPar::clear()
     m_nShifts[i] = 0;
     m_propSpeedInv[i] = 0.;
   }
-  for (unsigned i = 0; i < MAX_N_FLAYERS; ++i) {
+  for (unsigned i = 0; i < c_maxNFieldLayers; ++i) {
     m_rFLayer[i] = 0;
     m_zFForwardLayer[i] = 0;
     m_zFBackwardLayer[i] = 0;
   }
 
-  for (unsigned L = 0; L < MAX_N_SLAYERS; ++L) {
-    for (unsigned C = 0; C < MAX_N_SCELLS; ++C) {
+  for (unsigned L = 0; L < c_maxNSenseLayers; ++L) {
+    for (unsigned C = 0; C < c_maxNDriftCells; ++C) {
       for (unsigned i = 0; i < 3; ++i) {
         m_FWirPos        [L][C][i] = 0.;
         m_BWirPos        [L][C][i] = 0.;
@@ -224,15 +224,15 @@ void CDCGeometryPar::clear()
     }
   }
 
-  for (unsigned L = 0; L < MAX_N_SLAYERS; ++L) {
+  for (unsigned L = 0; L < c_maxNSenseLayers; ++L) {
     for (unsigned i = 0; i < 2; ++i) {
-      for (unsigned alpha = 0; alpha < maxNAlphaPoints; ++alpha) {
-        for (unsigned theta = 0; theta < maxNThetaPoints; ++theta) {
-          for (unsigned xtparam = 0; xtparam < nXTParams; ++xtparam) {
+      for (unsigned alpha = 0; alpha < c_maxNAlphaPoints; ++alpha) {
+        for (unsigned theta = 0; theta < c_maxNThetaPoints; ++theta) {
+          for (unsigned xtparam = 0; xtparam < c_nXTParams; ++xtparam) {
             m_XT[L][i][alpha][theta][xtparam] = 0.;
           }
 
-          for (unsigned sigmaparam = 0; sigmaparam < nSigmaParams; ++sigmaparam) {
+          for (unsigned sigmaparam = 0; sigmaparam < c_nSigmaParams; ++sigmaparam) {
             m_Sigma[L][i][alpha][theta][sigmaparam] = 0.;
           }
         }
@@ -240,7 +240,7 @@ void CDCGeometryPar::clear()
     }
   }
 
-  for (unsigned board = 0; board < nBoards; ++board) {
+  for (unsigned board = 0; board < c_nBoards; ++board) {
     for (unsigned i = 0; i < 2; ++i) {
       m_timeWalkCoef[board][i] = 0.;
     }
@@ -249,7 +249,7 @@ void CDCGeometryPar::clear()
     }
   }
 
-  for (unsigned superLayer = 0; superLayer < nSuperLayers; ++superLayer) {
+  for (unsigned superLayer = 0; superLayer < c_nSuperLayers; ++superLayer) {
     for (unsigned layer = 0; layer < 8; ++layer) {
       m_shiftInSuperLayer[superLayer][layer] = 0;
     }
@@ -681,7 +681,7 @@ void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometr
 void CDCGeometryPar::setWirPosAlignParams()
 {
   // Layer alignment
-  for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
+  for (unsigned iL = 0; iL < c_maxNSenseLayers; ++iL) {
 
     if (iL < m_firstLayerOffset) {
       continue;
@@ -724,7 +724,7 @@ void CDCGeometryPar::setWirPosAlignParams()
   const int np = 3;
   double back[np], fwrd[np];
 
-  for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
+  for (unsigned iL = 0; iL < c_maxNSenseLayers; ++iL) {
 
     if (iL < m_firstLayerOffset) {
       continue;
@@ -767,7 +767,7 @@ void CDCGeometryPar::setWirPosMisalignParams()
   const int np = 3;
   double back[np], fwrd[np];
 
-  for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
+  for (unsigned iL = 0; iL < c_maxNSenseLayers; ++iL) {
 
     if (iL < m_firstLayerOffset) {
       continue;
@@ -848,7 +848,7 @@ void CDCGeometryPar::newReadXT(const GearDir& gbxParams, const int mode)
   //read alpha bin info.
   unsigned short nAlphaBins = 0;
   if (ifs >> nAlphaBins) {
-    if (nAlphaBins == 0 || nAlphaBins > maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
+    if (nAlphaBins == 0 || nAlphaBins > c_maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
   } else {
     B2FATAL("Fail to read alpha bins !");
   }
@@ -862,7 +862,7 @@ void CDCGeometryPar::newReadXT(const GearDir& gbxParams, const int mode)
   //read theta bin info.
   unsigned short nThetaBins = 0;
   if (ifs >> nThetaBins) {
-    if (nThetaBins == 0 || nThetaBins > maxNThetaPoints) B2FATAL("CDCGeometryPar: fail to read theta bins !");
+    if (nThetaBins == 0 || nThetaBins > c_maxNThetaPoints) B2FATAL("CDCGeometryPar: fail to read theta bins !");
   } else {
     B2FATAL("CDCGeometryPar: fail to read theta bins !");
   }
@@ -876,7 +876,7 @@ void CDCGeometryPar::newReadXT(const GearDir& gbxParams, const int mode)
 
   short np = 0;
   unsigned short iCL, iLR;
-  const unsigned short npx = nXTParams - 1;
+  const unsigned short npx = c_nXTParams - 1;
   double xtc[npx];
   double theta, alpha, dummy1;
   unsigned nRead = 0;
@@ -977,7 +977,7 @@ void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
   //read alpha bin info.
   unsigned short nAlphaBins = 0;
   if (ifs >> nAlphaBins) {
-    if (nAlphaBins == 0 || nAlphaBins > maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
+    if (nAlphaBins == 0 || nAlphaBins > c_maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
   } else {
     B2FATAL("Fail to read alpha bins !");
   }
@@ -993,7 +993,7 @@ void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
   //read theta bin info.
   unsigned short nThetaBins = 0;
   if (ifs >> nThetaBins) {
-    if (nThetaBins == 0 || nThetaBins > maxNThetaPoints) B2FATAL("CDCGeometryPar: fail to read theta bins !");
+    if (nThetaBins == 0 || nThetaBins > c_maxNThetaPoints) B2FATAL("CDCGeometryPar: fail to read theta bins !");
   } else {
     B2FATAL("CDCGeometryPar: fail to read theta bins !");
   }
@@ -1009,7 +1009,7 @@ void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
 
   unsigned short np = 0;
   unsigned short iCL, iLR;
-  double sigma[nSigmaParams];
+  double sigma[c_nSigmaParams];
   double theta, alpha;
   unsigned nRead = 0;
 
@@ -1017,7 +1017,7 @@ void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
   //  std:: cout << m_sigmaParamMode <<" "<< np << std::endl;
   if (m_sigmaParamMode < 0 || m_sigmaParamMode > 4) B2FATAL("CDCGeometryPar: invalid sigma-parameterization mode read !");
 
-  if (np > nSigmaParams) B2FATAL("CDCGeometryPar: no. of sigma-params. outside limits !");
+  if (np > c_nSigmaParams) B2FATAL("CDCGeometryPar: no. of sigma-params. outside limits !");
 
   ifs >> m_maxSpaceResol;
 
@@ -1113,8 +1113,8 @@ void CDCGeometryPar::readPropSpeed(const GearDir& gbxParams, const int mode)
     if (m_debug) B2DEBUG(150, iL << " " << speed);
   }
 
-  if (nRead != MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readPropSpeed: #lines read-in (=" << nRead <<
-                                        ") is inconsistent with total #layers (=" << MAX_N_SLAYERS << ") !");
+  if (nRead != c_maxNSenseLayers) B2FATAL("CDCGeometryPar::readPropSpeed: #lines read-in (=" << nRead <<
+                                            ") is inconsistent with total #layers (=" << c_maxNSenseLayers << ") !");
 
   ifs.close();
 }
@@ -1146,8 +1146,8 @@ void CDCGeometryPar::readDeltaz(const GearDir gbxParams)
     if (m_debug) cout << iL << " " << m_bwdDz[iL] << " " << m_fwdDz[iL] << endl;
   }
 
-  if (nRead != MAX_N_SLAYERS) B2FATAL("CDCGeometryPar::readDeltaz: #lines read-in (=" << nRead <<
-                                        ") is inconsistent with total #layers (=" << MAX_N_SLAYERS << ") !");
+  if (nRead != c_maxNSenseLayers) B2FATAL("CDCGeometryPar::readDeltaz: #lines read-in (=" << nRead <<
+                                        ") is inconsistent with total #layers (=" << c_maxNSenseLayers << ") !");
 
   ifs.close();
 }
@@ -1266,8 +1266,9 @@ void CDCGeometryPar::readTW(const GearDir& gbxParams, const int mode)
     ++nRead;
   }
 
-  if (nRead != nBoards) B2FATAL("CDCGeometryPar::readTW: #lines read-in (=" << nRead << ") is inconsistent with #boards (=" << nBoards
-                                  << ") !");
+  if (nRead != c_nBoards) B2FATAL("CDCGeometryPar::readTW: #lines read-in (=" << nRead << ") is inconsistent with #boards (=" <<
+                                    c_nBoards
+                                    << ") !");
 
   ifs.close();
 }
@@ -1290,7 +1291,7 @@ void CDCGeometryPar::readChMap()
     // Read a relation
     ifs >> iSL >> iL >> iW >> iB >> iC;
     if (ifs.eof()) break;
-    if (iSL >= nSuperLayers or iSL < m_firstSuperLayerOffset) continue;
+    if (iSL >= c_nSuperLayers or iSL < m_firstSuperLayerOffset) continue;
 
     ++nRead;
     WireID wID(iSL, iL, iW);
@@ -1342,10 +1343,10 @@ void CDCGeometryPar::readEDepToADC(const GearDir& gbxParams, const int mode)
   if (groupId > 0) B2FATAL("GgroupId > 0!");
 
 
-  unsigned short cLMin[nSuperLayers], cLMax[nSuperLayers]; //min and max clayer per super-layer
+  unsigned short cLMin[c_nSuperLayers], cLMax[c_nSuperLayers]; //min and max clayer per super-layer
   cLMin[0] = 0;
   cLMax[0] = 7;
-  for (unsigned int sl = 1; sl < nSuperLayers; ++sl) {
+  for (unsigned int sl = 1; sl < c_nSuperLayers; ++sl) {
     cLMin[sl] = cLMax[0] + 6 * sl - 5;
     cLMax[sl] = cLMax[0] + 6 * sl;
   }
@@ -1364,7 +1365,7 @@ void CDCGeometryPar::readEDepToADC(const GearDir& gbxParams, const int mode)
       }
     }
     ++nRead;
-    if (nRead > nSuperLayers) B2FATAL("No. of read in lines > " << nSuperLayers << " !");
+    if (nRead > c_nSuperLayers) B2FATAL("No. of read in lines > " << c_nSuperLayers << " !");
   }
 
   ifs.close();
@@ -1374,8 +1375,8 @@ void CDCGeometryPar::readEDepToADC(const GearDir& gbxParams, const int mode)
 // Set t0 (from DB)
 void CDCGeometryPar::setT0()
 {
-  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
-    for (unsigned short iW = 0; iW < MAX_N_SCELLS; ++iW) {
+  for (unsigned short iCL = 0; iCL < c_maxNSenseLayers; ++iCL) {
+    for (unsigned short iW = 0; iW < c_maxNDriftCells; ++iW) {
       m_t0[iCL][iW] = 0.;
     }
   }
@@ -1401,7 +1402,7 @@ void CDCGeometryPar::calcMeanT0(double minT0, double maxT0, int maxIt, double nS
     double effiSum = 0.;
     m_meanT0 = 0.;
     double stdvT0 = 0;
-    for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+    for (unsigned short iCL = 0; iCL < c_maxNSenseLayers; ++iCL) {
       for (unsigned short iW = 0; iW < m_nWires[iCL]; ++iW) {
         if (m_t0[iCL][iW] < minT0 || m_t0[iCL][iW] > maxT0) continue;
         const WireID wid = WireID(iCL, iW);
@@ -1483,7 +1484,7 @@ void CDCGeometryPar::setXtRel()
 
   m_xtParamMode = (*m_xtRelFromDB)->getXtParamMode();
 
-  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+  for (unsigned short iCL = 0; iCL < c_maxNSenseLayers; ++iCL) {
     for (unsigned short iLR = 0; iLR < 2; ++iLR) {
       for (unsigned short iA = 0; iA < m_nAlphaPoints; ++iA) {
         for (unsigned short iT = 0; iT < m_nThetaPoints; ++iT) {
@@ -1540,7 +1541,7 @@ void CDCGeometryPar::setSResol()
 
   m_maxSpaceResol = (*m_sResolFromDB)->getMaxSpaceResol();
 
-  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+  for (unsigned short iCL = 0; iCL < c_maxNSenseLayers; ++iCL) {
     for (unsigned short iLR = 0; iLR < 2; ++iLR) {
       for (unsigned short iA = 0; iA < m_nAlphaPoints4Sgm; ++iA) {
         for (unsigned short iT = 0; iT < m_nThetaPoints4Sgm; ++iT) {
@@ -1593,7 +1594,7 @@ void CDCGeometryPar::setChMap()
 {
   for (const auto& cm : (*m_chMapFromDB)) {
     const unsigned short isl = cm.getISuperLayer();
-    if (isl >= nSuperLayers or isl < m_firstSuperLayerOffset) continue;
+    if (isl >= c_nSuperLayers or isl < m_firstSuperLayerOffset) continue;
     const uint il  = cm.getILayer();
     const int iw  = cm.getIWire();
     const int iBd = cm.getBoardID();
@@ -1611,17 +1612,17 @@ void CDCGeometryPar::setEDepToADCConversions()
   unsigned short groupId = (*m_eDepToADCConversionsFromDB)->getGroupID();
   unsigned short nEnt    = (*m_eDepToADCConversionsFromDB)->getEntries();
   if (groupId == 0) { //per super-layer mode
-    if (nEnt > nSuperLayers) B2FATAL("CDCGeometryPar:: group-id " << groupId << " and #entries " << nEnt << " are inconsistent!");
+    if (nEnt > c_nSuperLayers) B2FATAL("CDCGeometryPar:: group-id " << groupId << " and #entries " << nEnt << " are inconsistent!");
   } else if (groupId == 1) { //per layer mode
-    if (nEnt > MAX_N_SLAYERS) B2FATAL("CDCGeometryPar:: group-id " << groupId << " and #entries " << nEnt << " are inconsistent!");
+    if (nEnt > c_maxNSenseLayers) B2FATAL("CDCGeometryPar:: group-id " << groupId << " and #entries " << nEnt << " are inconsistent!");
   } else {
     B2FATAL("CDCGeometryPar:: Invalid group-id " << groupId << " specified !");
   }
 
-  unsigned short cLMin[nSuperLayers], cLMax[nSuperLayers]; //min and max clayer per super-layer
+  unsigned short cLMin[c_nSuperLayers], cLMax[c_nSuperLayers]; //min and max clayer per super-layer
   cLMin[0] = 0;
   cLMax[0] = 7;
-  for (unsigned int sl = 1; sl < nSuperLayers; ++sl) {
+  for (unsigned int sl = 1; sl < c_nSuperLayers; ++sl) {
     cLMin[sl] = cLMax[0] + 6 * sl - 5;
     cLMax[sl] = cLMax[0] + 6 * sl;
   }
@@ -1806,7 +1807,7 @@ double CDCGeometryPar::getWireSagCoef(EWirePosition set, uint layerID, int cellI
 
 const double* CDCGeometryPar::innerRadiusWireLayer() const
 {
-  static double IRWL[MAX_N_SLAYERS] = {0};
+  static double IRWL[c_maxNSenseLayers] = {0};
 
   IRWL[0] = outerRadiusInnerWall();
   for (unsigned i = 1; i < nWireLayers(); i++)
@@ -1818,7 +1819,7 @@ const double* CDCGeometryPar::innerRadiusWireLayer() const
 
 const double* CDCGeometryPar::outerRadiusWireLayer() const
 {
-  static double ORWL[MAX_N_SLAYERS] = {0};
+  static double ORWL[c_maxNSenseLayers] = {0};
 
   ORWL[nWireLayers() - 1] = innerRadiusOuterWall();
   for (unsigned i = 0; i < nWireLayers() - 1; i++)
@@ -2986,9 +2987,9 @@ void CDCGeometryPar::setDisplacement()
 
 void CDCGeometryPar::setShiftInSuperLayer()
 {
-  const unsigned short nLayers[nSuperLayers] = {8, 6, 6, 6, 6, 6, 6, 6, 6}; //tentaive
+  const unsigned short nLayers[c_nSuperLayers] = {8, 6, 6, 6, 6, 6, 6, 6, 6}; //tentaive
 
-  for (unsigned short SLayer = 0; SLayer < nSuperLayers; ++SLayer) {
+  for (unsigned short SLayer = 0; SLayer < c_nSuperLayers; ++SLayer) {
     unsigned short firstCLayer = 0;
     for (unsigned short i = 0; i < SLayer; ++i) {
       firstCLayer += nLayers[i];

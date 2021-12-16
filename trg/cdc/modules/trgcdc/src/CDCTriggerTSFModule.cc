@@ -272,17 +272,17 @@ CDCTriggerTSFModule::initialize()
   if (m_deadchflag) {
     if (!m_db_deadchannel) {
       B2INFO("No database for CDCTRG dead channel mapping. Channel masking is skipped.");
-      for (unsigned int i = 0; i < nSuperLayers; i++) { //SL
+      for (unsigned int i = 0; i < c_nSuperLayers; i++) { //SL
         for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
-          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) { //
+          for (unsigned int k = 0; k < c_maxNDriftCells; k++) { //
             deadch_map[i][j][k] = true;
           }
         }
       }
     } else {
-      for (unsigned int i = 0; i < nSuperLayers; i++) { //SL
+      for (unsigned int i = 0; i < c_nSuperLayers; i++) { //SL
         for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
-          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) { //
+          for (unsigned int k = 0; k < c_maxNDriftCells; k++) { //
             deadch_map[i][j][k] = m_db_deadchannel->getdeadch(i, j, k);
           }
         }

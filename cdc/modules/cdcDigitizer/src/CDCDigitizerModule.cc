@@ -273,9 +273,6 @@ void CDCDigitizerModule::initialize()
 #endif
 
   if (m_useDB4EDepToADC) {
-//     if (m_cdcgp->getEDepToADCMainFactor(0, 0) == 0.) {
-//       B2FATAL("CDCEDepToADCConversion payloads are unavailable!");
-//     }
     ushort firstLayerOffset = m_cdcgp->getOffsetOfFirstLayer();
     if (m_cdcgp->getEDepToADCMainFactor(firstLayerOffset, 0) == 0.) {
       B2FATAL("CDCEDepToADCConversion payloads are unavailable!");
@@ -339,7 +336,7 @@ void CDCDigitizerModule::event()
     B2DEBUG(m_debugLevel, "tSimMode,trigBin,offs= " << m_tSimMode << " " << trigBin << " " << offs);
 
     //TODO: simplify the following 7 lines and setFEElectronics()
-    for (unsigned short bd = 1; bd < nBoards; ++bd) {
+    for (unsigned short bd = 1; bd < c_nBoards; ++bd) {
       const short tMaxInCount = 32 * (m_shiftOfTimeWindowIn32Count - m_trgDelayInCount[bd]) - offs;
       const short tMinInCount = tMaxInCount - 32 * m_widthOfTimeWindowInCount[bd];
       B2DEBUG(m_debugLevel, bd << " " << tMinInCount << " " << tMaxInCount);
@@ -1032,7 +1029,7 @@ void CDCDigitizerModule::setFEElectronics()
   if (!m_fEElectronicsFromDB) B2FATAL("No FEEElectronics dbobject!");
   const CDCFEElectronics& fp = *((*m_fEElectronicsFromDB)[0]);
   int mode = (fp.getBoardID() == -1) ? 1 : 0;
-  int iNBoards = static_cast<int>(nBoards);
+  int iNBoards = static_cast<int>(c_nBoards);
 
   //set typical values for all channels first if mode=1
   if (mode == 1) {
@@ -1080,12 +1077,12 @@ void CDCDigitizerModule::setSemiTotalGain()
   B2DEBUG(m_debugLevel, " ");
 
   //read individual wire gains
-  const int nLyrs = MAX_N_SLAYERS;
+  const int nLyrs = c_maxNSenseLayers;
   B2DEBUG(m_debugLevel, "nLyrs= " << nLyrs);
   int nGoodL[nLyrs] = {};
   float  wgL[nLyrs] = {};
-  int nGoodSL[nSuperLayers] = {};
-  float  wgSL[nSuperLayers] = {};
+  int nGoodSL[c_nSuperLayers] = {};
+  float  wgSL[c_nSuperLayers] = {};
   int nGoodAll = 0;
   float  wgAll = 0;
   int iw = -1;
@@ -1113,7 +1110,7 @@ void CDCDigitizerModule::setSemiTotalGain()
     B2DEBUG(m_debugLevel, "lyr,ngood,gain= " << lyr << " " << nGoodL[lyr] << " " << wgL[lyr]);
   }
   //calculate mean gain per superlayer
-  for (unsigned int sl = 0; sl < nSuperLayers; ++sl) {
+  for (unsigned int sl = 0; sl < c_nSuperLayers; ++sl) {
     if (nGoodSL[sl] > 0) wgSL[sl] /= nGoodSL[sl];
     B2DEBUG(m_debugLevel, "slyr,ngood,gain= " << sl << " " << nGoodSL[sl] << " " << wgSL[sl]);
   }

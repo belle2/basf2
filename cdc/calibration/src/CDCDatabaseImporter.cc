@@ -229,9 +229,9 @@ void CDCDatabaseImporter::importEDepToADC(std::string fileName)
   }
   stream.close();
 
-  unsigned short nId = nSuperLayers;
+  unsigned short nId = c_nSuperLayers;
   if (groupId == 0) {
-    nId = MAX_N_SLAYERS;
+    nId = c_maxNSenseLayers;
   } else if (groupId == 1) {
     nId = m_nSenseWires;
   }
@@ -320,7 +320,8 @@ void CDCDatabaseImporter::importPropSpeed(std::string fileName)
   }
   stream.close();
 
-  if (nRead != MAX_N_SLAYERS) B2FATAL("#lines read-in (=" << nRead << ") is no equal #sense layers (=" << MAX_N_SLAYERS << ") !");
+  if (nRead != c_maxNSenseLayers) B2FATAL("#lines read-in (=" << nRead << ") is no equal #sense layers (=" << c_maxNSenseLayers <<
+                                            ") !");
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
@@ -362,7 +363,7 @@ void CDCDatabaseImporter::importTimeWalk(std::string fileName)
   }
   stream.close();
 
-  if (nRead != nBoards) B2FATAL("#lines read-in (=" << nRead << ") is not equal #boards (=" << nBoards << ") !");
+  if (nRead != c_nBoards) B2FATAL("#lines read-in (=" << nRead << ") is not equal #boards (=" << c_nBoards << ") !");
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
@@ -394,7 +395,7 @@ void CDCDatabaseImporter::importXT(std::string fileName)
 
   unsigned short nAlphaBins = 0;
   if (ifs >> nAlphaBins) {
-    if (nAlphaBins == 0 || nAlphaBins > maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
+    if (nAlphaBins == 0 || nAlphaBins > c_maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
   } else {
     B2FATAL("Fail to read alpha bins !");
   }
@@ -410,7 +411,7 @@ void CDCDatabaseImporter::importXT(std::string fileName)
   //read theta bins
   unsigned short nThetaBins = 0;
   if (ifs >> nThetaBins) {
-    if (nThetaBins == 0 || nThetaBins > maxNThetaPoints) B2FATAL("Fail to read theta bins !");
+    if (nThetaBins == 0 || nThetaBins > c_maxNThetaPoints) B2FATAL("Fail to read theta bins !");
   } else {
     B2FATAL("Fail to read theta bins !");
   }
@@ -436,7 +437,7 @@ void CDCDatabaseImporter::importXT(std::string fileName)
   */
   short xtParamMode, np;
   unsigned short iCL, iLR;
-  const unsigned short npx = nXTParams - 1;
+  const unsigned short npx = c_nXTParams - 1;
   double xtc[npx];
   double theta, alpha, dummy1;
   unsigned nRead = 0;
@@ -517,7 +518,7 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
 
   unsigned short nAlphaBins = 0;
   if (ifs >> nAlphaBins) {
-    if (nAlphaBins == 0 || nAlphaBins > maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
+    if (nAlphaBins == 0 || nAlphaBins > c_maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
   } else {
     B2FATAL("Fail to read alpha bins !");
   }
@@ -533,7 +534,7 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
   //read theta bins
   unsigned short nThetaBins = 0;
   if (ifs >> nThetaBins) {
-    if (nThetaBins == 0 || nThetaBins > maxNThetaPoints) B2FATAL("Fail to read theta bins !");
+    if (nThetaBins == 0 || nThetaBins > c_maxNThetaPoints) B2FATAL("Fail to read theta bins !");
   } else {
     B2FATAL("Fail to read theta bins !");
   }
@@ -551,7 +552,7 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
   //read sigma params.
   short sgParamMode, np;
   unsigned short iCL, iLR;
-  const unsigned short npx = nSigmaParams;
+  const unsigned short npx = c_nSigmaParams;
   double sgm[npx];
   double theta, alpha;
   unsigned nRead = 0;

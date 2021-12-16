@@ -110,7 +110,7 @@ namespace Belle2 {
       std::array<bool, ISuperLayerUtil::c_N> m_useSuperLayers{};
 
       /// Bits for the used layers
-      std::array<bool, MAX_N_SLAYERS> m_useLayers{};
+      std::array<bool, c_maxNSenseLayers> m_useLayers{};
 
       /// Unit vectors denoting the sector for which hits should be created
       std::array<Vector2D, 2> m_useSector{};

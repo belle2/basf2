@@ -92,7 +92,7 @@ namespace Belle2 {
     //** number of layers in Super layer**/
     const static int MAX_N_LAYERS = 8;
     /** bad channel mapping */
-    bool deadch_map[nSuperLayers][MAX_N_LAYERS][MAX_N_SCELLS] = {};
+    bool deadch_map[c_nSuperLayers][MAX_N_LAYERS][c_maxNDriftCells] = {};
 
     /** list of input CDC hits */
     StoreArray<CDCHit> m_cdcHits;

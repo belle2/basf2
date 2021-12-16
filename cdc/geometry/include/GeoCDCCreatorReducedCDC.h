@@ -171,10 +171,10 @@ namespace Belle2 {
       void createMapper(G4LogicalVolume& topVolume);
 
       //! CDC G4 logical volume.
-      G4LogicalVolume* logical_cdc;
+      G4LogicalVolume* m_logical_cdc;
 
       //! CDC G4 physical volume.
-      G4VPhysicalVolume* physical_cdc;
+      G4VPhysicalVolume* m_physical_cdc;
 
       //! Sensitive detector
       CDCSensitiveDetector* m_sensitive = nullptr;

@@ -138,9 +138,9 @@ void setdeadch()
 
   bool badch_map[N_config][9][8][384]; //sl layer ch
   for (int i = 0; i < N_config; i++) {
-    for (unsigned int j = 0; j < nSuperLayers; j++) {
+    for (unsigned int j = 0; j < c_nSuperLayers; j++) {
       for (unsigned int k = 0; k < MAX_N_LAYERS; k++) {
-        for (unsigned int l = 0; l < MAX_N_SCELLS; l++) {
+        for (unsigned int l = 0; l < c_maxNDriftCells; l++) {
           badch_map[i][j][k][l] = true;
         }
       }
@@ -151,7 +151,7 @@ void setdeadch()
   for (int i = 0; i < N_config; i++) {
     for (unsigned int j = 8; j < 9; j++) {
       for (unsigned int k = 4; k < 5; k++) {
-        for (unsigned int l = 0; l < MAX_N_SCELLS; l++) {
+        for (unsigned int l = 0; l < c_maxNDriftCells; l++) {
           badch_map[i][j][k][l] = false;
         }
       }
@@ -180,9 +180,9 @@ void setdeadch()
       //std::cout << i << " " << run[i][0] << " " << run[i][1] << " " << run[i][2] << " " << run[i][3] << std::endl;
       //for(int j=0;j<mgr[i].size();j++)std::cout << mgr[i][j] << std::endl;
       IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
-      for (unsigned int j = 0; j < nSuperLayers; j++) {
+      for (unsigned int j = 0; j < c_nSuperLayers; j++) {
         for (unsigned int k = 0; k < MAX_N_LAYERS; k++) {
-          for (unsigned int l = 0; l < MAX_N_SCELLS; l++) {
+          for (unsigned int l = 0; l < c_maxNDriftCells; l++) {
             if (!badch_map[i][j][k][l]) {
               //std::cout << j << " " << k << " " << l << std::endl;
               db_dead->setdeadch(j, k, l, false);
@@ -195,9 +195,9 @@ void setdeadch()
   } else if (ONLINE == 1) {
     for (int i = 0; i < 1; i++) { //no merger dead channel for run-independent MC. L54 is masked.
       IntervalOfValidity iov(0, 0, -1, -1);
-      for (unsigned int j = 0; j < nSuperLayers; j++) {
+      for (unsigned int j = 0; j < c_nSuperLayers; j++) {
         for (unsigned int k = 0; k < MAX_N_LAYERS; k++) {
-          for (unsigned int l = 0; l < MAX_N_SCELLS; l++) {
+          for (unsigned int l = 0; l < c_maxNDriftCells; l++) {
             if (!badch_map[i][j][k][l]) {
               //std::cout << j << " " << k << " " << l << std::endl;
               db_dead->setdeadch(j, k, l, false);

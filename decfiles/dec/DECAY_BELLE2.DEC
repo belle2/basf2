@@ -7860,7 +7860,7 @@ Decay tau-
 0.108164 pi-                         nu_tau PHOTOS TAUSCALARNU;
 0.000353 pi- gamma                   nu_tau PHOTOS PYTHIA 41;
 0.254941 rho-                        nu_tau PHOTOS TAUVECTORNU;
-0.092595 pi- pi0  pi0                TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
+0.092595 pi- pi0  pi0                nu_tau PHOTOS TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
 0.010429 pi- pi0  pi0 pi0            nu_tau PHOTOS PYTHIA 41;
 0.001118 pi- pi0  pi0 pi0 pi0        nu_tau PHOTOS PYTHIA 41;
 0.003817 pi- K0   pi0                nu_tau PHOTOS PYTHIA 41;
@@ -7871,7 +7871,7 @@ Decay tau-
 0.000018 pi- pi0  K_S0 K_S0          nu_tau PHOTOS PYTHIA 41;
 0.000018 pi- pi0  K_L0 K_L0          nu_tau PHOTOS PYTHIA 41;
 0.000325 pi- pi0  K_S0 K_L0          nu_tau PHOTOS PYTHIA 41;
-0.089868 pi- pi-  pi+                TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
+0.089868 pi- pi-  pi+                nu_tau PHOTOS TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
 0.027404 pi- pi-  pi+  pi0           nu_tau PHOTOS PYTHIA 41;
 0.000981 pi- pi-  pi+  pi0  pi0      nu_tau PHOTOS PYTHIA 41;
 0.000014 pi- pi-  pi+  pi0  pi0 pi0  nu_tau PHOTOS PYTHIA 41;

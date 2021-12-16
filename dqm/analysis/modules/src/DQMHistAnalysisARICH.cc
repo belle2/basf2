@@ -192,17 +192,3 @@ void DQMHistAnalysisARICHModule::terminate()
 
   B2DEBUG(20, "terminate called");
 }
-
-TCanvas* DQMHistAnalysisARICHModule::find_canvas(TString canvas_name)
-{
-  TIter nextckey(gROOT->GetListOfCanvases());
-  TObject* cobj = NULL;
-
-  while ((cobj = (TObject*)nextckey())) {
-    if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      if (cobj->GetName() == canvas_name)
-        break;
-    }
-  }
-  return (TCanvas*)cobj;
-}

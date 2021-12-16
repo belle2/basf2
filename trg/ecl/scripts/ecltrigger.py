@@ -31,6 +31,7 @@ def add_ecl_trigger(path):
     trgecl.param('Clustering', 1)
     # The limit # of cluster in clustering logic
     trgecl.param('ClusterLimit', 6)
+
     # Theta ID region(low and high) of 3DBhabhaVetoInTrack
     trgecl.param('3DBhabhaVetoInTrackThetaRegion', [3, 15])
     # taub2b 2 cluster angle selection in CM (degree)
@@ -41,5 +42,7 @@ def add_ecl_trigger(path):
     # taub2b cluster energy selection in lab (GeV) : E(CL1) and E(CL2)
     trgecl.param('Taub2bClusterECut1', 1.9)
     trgecl.param('Taub2bClusterECut2', 999.0)
+    # angle selection for addition Bhabha veto
+    trgecl.param('3DBhabhaAddAngleCut', [150, 210, 160, 200])
     #
     path.add_module(trgecl)

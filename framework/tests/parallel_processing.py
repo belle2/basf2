@@ -11,7 +11,6 @@
 # Test the parallel processing functionality by simulating a few events
 # using 2 processes (so nothing too taxing)
 
-import os
 import basf2
 from ROOT import TFile, Belle2
 from b2test_utils import skip_test_if_light, clean_working_directory

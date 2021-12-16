@@ -7,10 +7,9 @@
 ##########################################################################
 
 """Full CDC tracking calibration."""
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.utils import events_in_basf2_file, ExpRun
 import basf2
-import ROOT
 from ROOT import Belle2
 from random import choice
 from caf.framework import Calibration
@@ -22,16 +21,19 @@ settings = CalibrationSettings(name="CDC Tracking",
                                expert_username="eberthol",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["mumutight_calib", "hadron_calib", "cosmic_calib"],
-                               input_data_filters={"mumutight_calib": [input_data_filters["Data Tag"]["mumutight_calib"],
-                                                                       input_data_filters["Data Quality Tag"]["Good"],
-                                                                       input_data_filters["Magnet"]["On"]],
-                                                   "hadron_calib": [input_data_filters["Data Tag"]["hadron_calib"],
-                                                                    input_data_filters["Data Quality Tag"]["Good"],
-                                                                    input_data_filters["Magnet"]["On"]],
-                                                   "cosmic_calib": [input_data_filters["Data Tag"]["cosmic_calib"],
-                                                                    input_data_filters["Data Quality Tag"]["Good"],
-                                                                    input_data_filters["Magnet"]["On"]]},
+                               input_data_names=["mumutight_or_highm_calib", "hadron_calib", "cosmic_calib"],
+                               input_data_filters={"mumutight_or_highm_calib":
+                                                   [INPUT_DATA_FILTERS["Data Tag"]["mumutight_or_highm_calib"],
+                                                    INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                                    INPUT_DATA_FILTERS["Magnet"]["On"]],
+                                                   "hadron_calib":
+                                                       [INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
+                                                        INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                                        INPUT_DATA_FILTERS["Magnet"]["On"]],
+                                                   "cosmic_calib":
+                                                       [INPUT_DATA_FILTERS["Data Tag"]["cosmic_calib"],
+                                                        INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                                        INPUT_DATA_FILTERS["Magnet"]["On"]]},
                                depends_on=[],
                                expert_config={
                                    "max_files_per_run": 1000,
@@ -93,13 +95,10 @@ def select_files(all_input_files, min_events, max_events, max_processed_events_p
 
 def get_calibrations(input_data, **kwargs):
     import basf2
-    from prompt.utils import filter_by_max_files_per_run
     # Gets the input files and IoV objects associated with the files.
 
     # read expert_config values
     expert_config = kwargs.get("expert_config")
-    max_files_per_run = expert_config["max_files_per_run"]
-    min_events_per_file = expert_config["min_events_per_file"]
     max_events_per_file = expert_config["max_events_per_file"]
 
     min_events_for_tz_tw = expert_config["min_events_for_tz_tw_calibration"]  # for t0, tw calib.
@@ -132,7 +131,7 @@ def get_calibrations(input_data, **kwargs):
         min_mumu_events_for_tz_tw = fracion_of_event_for_types[0] * min_events_for_tz_tw
         max_mumu_events_for_tz_tw = fracion_of_event_for_types[0] * max_events_for_tz_tw
 
-        file_to_iov_mumu = input_data["mumutight_calib"]
+        file_to_iov_mumu = input_data["mumutight_or_highm_calib"]
         # select data file for t0 and tw calibration
         basf2.B2INFO("----> For T0 and Time walk correction")
         chosen_files_mumu_for_tz_tw = select_files(
@@ -149,8 +148,8 @@ def get_calibrations(input_data, **kwargs):
                                                    max_mumu_events_for_xt_sr,
                                                    max_events_per_file)
 
-        files_for_xt_sr_dict["mumutight_calib"] = chosen_files_mumu_for_xt_sr
-        files_for_tz_tw_dict["mumutight_calib"] = chosen_files_mumu_for_tz_tw
+        files_for_xt_sr_dict["mumutight_or_highm_calib"] = chosen_files_mumu_for_xt_sr
+        files_for_tz_tw_dict["mumutight_or_highm_calib"] = chosen_files_mumu_for_tz_tw
 
     if fracion_of_event_for_types[1] > 0:
         basf2.B2INFO("*********************** Select Hadron data for calibration ****************")
@@ -372,7 +371,7 @@ def pre_collector(max_events=None, is_cosmic=False, use_badWires=False):
                                    posttracking=False)
     else:
         from reconstruction import default_event_abort
-        from tracking import add_tracking_reconstruction, add_prefilter_tracking_reconstruction
+        from tracking import add_prefilter_tracking_reconstruction
 
         # Do not even attempt at reconstructing events w/ abnormally large occupancy.
         doom = reco_path.add_module("EventsOfDoomBuster")

@@ -58,6 +58,8 @@ Rave is a Kalman-based vertex fitter implemented as an external library (CMS ver
   * rave is available at github `github <https://github.com/rave-package/rave/>`_
   * building/testing environment at `RAVE page <https://travis-ci.org/rave-package/rave>`_
 
+.. _kfit_vertex_fitter:
+
 KFit
 ----
 

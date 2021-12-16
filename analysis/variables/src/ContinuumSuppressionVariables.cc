@@ -388,9 +388,9 @@ namespace Belle2 {
           if (!qq)
             return std::numeric_limits<double>::quiet_NaN();
 
-          double isinROE = isInRestOfEvent(particle);
+          bool isinROE = isInRestOfEvent(particle);
           TVector3 newZ;
-          if (modeisSignal or (modeisAuto and isinROE < 0.5))
+          if (modeisSignal or (modeisAuto and isinROE))
             newZ = qq->getThrustB();
           else
             newZ = qq->getThrustO();
@@ -406,7 +406,7 @@ namespace Belle2 {
 
           UseReferenceFrame<CMSRotationFrame> signalframe(newX, newY, newZ);
 
-          return var->function(particle);
+          return std::get<double>(var->function(particle));
         };
         return func;
       } else {
@@ -418,12 +418,12 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("Continuum Suppression");
-    REGISTER_VARIABLE("R2(maskname)", R2WithMask, R"DOC(
+    REGISTER_METAVARIABLE("R2(maskname)", R2WithMask, R"DOC(
 Returns reduced Fox-Wolfram R2, defined as ratio of the i-th to the 0-th order Fox Wolfram moments.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("R2", R2 , R"DOC(
 Returns reduced Fox-Wolfram R2, defined as ratio of the i-th to the 0-th order Fox Wolfram moments.
 
@@ -431,12 +431,12 @@ Returns reduced Fox-Wolfram R2, defined as ratio of the i-th to the 0-th order F
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
 :noindex:
 )DOC");
-    REGISTER_VARIABLE("thrustBm(maskname)", thrustBmWithMask, R"DOC(
+    REGISTER_METAVARIABLE("thrustBm(maskname)", thrustBmWithMask, R"DOC(
 Returns magnitude of the signal B thrust axis.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("thrustBm", thrustBm, R"DOC(
 Returns magnitude of the signal B thrust axis.
 
@@ -444,12 +444,12 @@ Returns magnitude of the signal B thrust axis.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
 :noindex:
 )DOC");
-    REGISTER_VARIABLE("thrustOm(maskname)", thrustOmWithMask, R"DOC(
+    REGISTER_METAVARIABLE("thrustOm(maskname)", thrustOmWithMask, R"DOC(
 Returns magnitude of the ROE thrust axis.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("thrustOm", thrustOm, R"DOC(
 Returns magnitude of the ROE thrust axis.
 
@@ -457,12 +457,12 @@ Returns magnitude of the ROE thrust axis.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
 :noindex:
 )DOC");
-    REGISTER_VARIABLE("cosTBTO(maskname)", cosTBTOWithMask, R"DOC(
+    REGISTER_METAVARIABLE("cosTBTO(maskname)", cosTBTOWithMask, R"DOC(
 Returns cosine of angle between thrust axis of the signal B and thrust axis of ROE.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("cosTBTO", cosTBTO, R"DOC(
 Returns cosine of angle between thrust axis of the signal B and thrust axis of ROE.
 
@@ -470,12 +470,12 @@ Returns cosine of angle between thrust axis of the signal B and thrust axis of R
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
 :noindex:
 )DOC");
-    REGISTER_VARIABLE("cosTBz(maskname)", cosTBzWithMask, R"DOC(
+    REGISTER_METAVARIABLE("cosTBz(maskname)", cosTBzWithMask, R"DOC(
 Returns cosine of angle between thrust axis of the signal B and z-axis.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("cosTBz", cosTBz, R"DOC(
 Returns cosine of angle between thrust axis of the signal B and z-axis.
 
@@ -483,7 +483,7 @@ Returns cosine of angle between thrust axis of the signal B and z-axis.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
 :noindex:
 )DOC");
-    REGISTER_VARIABLE("KSFWVariables(variable[, string, string])", KSFWVariables,  R"DOC(
+    REGISTER_METAVARIABLE("KSFWVariables(variable[, string, string])", KSFWVariables,  R"DOC(
 Returns variable et, mm2, or one of the 16 KSFW moments.
 The second and third arguments are optional unless you have created multiple instances of the ContinuumSuppression with different ROE masks.
 In that case the desired ROE mask name must be provided as well.
@@ -500,9 +500,9 @@ Allowed input values for ``variable`` argument are the following:
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("CleoConeCS(integer[, string, string])", CleoConesCS, R"DOC(
+    REGISTER_METAVARIABLE("CleoConeCS(integer[, string, string])", CleoConesCS, R"DOC(
 Returns i-th cleo cones from the continuum suppression. The allowed inputs for the ``integer`` argument are integers from *1* to *9*.
 The second and third arguments are optional unless you have created multiple instances of the ContinuumSuppression with different ROE masks.
 In that case the desired ROE mask name must be provided as well.
@@ -512,9 +512,9 @@ The ROE mask name is then either the second or the third argument and must not b
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput, R"DOC(
+    REGISTER_METAVARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput, R"DOC(
 Transforms the network output :math:`C \to C'` via: :math:`C'=\operatorname{log}((C-\mathrm{low})/(\mathrm{high}-C))`.
 The arguments of the metavariable are the following:
 
@@ -522,9 +522,9 @@ The arguments of the metavariable are the following:
 * ``low``, ``high`` are floating point numbers.
 
 Returns NaN, if the `extraInfo` has not been found.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("useBThrustFrame(variable, mode)", useBThrustFrame,  R"DOC(
+    REGISTER_METAVARIABLE("useBThrustFrame(variable, mode)", useBThrustFrame,  R"DOC(
 Returns the variable with respect to rotated coordinates, in which z lies on the specified thrust axis.
 If mode is set to ``Signal`` it will use the thrust axis of the reconstructed B candidate, if mode is set to ROE it will use the ROE thrust axis.
 If mode is set to ``Auto`` the function use the thrust axis based on Rest Of Event (ROE) particles.
@@ -532,7 +532,7 @@ Like :b2:var:`isInRestOfEvent`, one has to use this metavariable in ROE loop.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
 
   }
 }

@@ -699,8 +699,6 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu', categories=None):
         categories = []
 
     for category in categories:
-        particleList = AvailableCategories[category].particleList
-
         methodPrefixEventLevel = "FlavorTagger_" + getBelleOrBelle2() + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         targetVariable = 'isRightCategory(' + category + ')'
         weightFile = filesDirectory + '/' + methodPrefixEventLevel + "_1.root"
@@ -786,13 +784,13 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None,
                 if not os.path.isfile(identifierFBDT):
                     basf2_mva.download(methodPrefixCombinerLevel + 'FBDT', identifierFBDT)
                     if not os.path.isfile(identifierFBDT):
-                        B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FBDT' +
-                                '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                        B2FATAL('Flavor Tagger: Weight file ' + identifierFBDT +
+                                ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
 
             if useOnlyLocalFlag:
                 if not os.path.isfile(identifierFBDT):
                     B2FATAL('flavorTagger: Combinerlevel FastBDT was not trained with this combination of categories.' +
-                            ' Weight file ' + methodPrefixCombinerLevel + 'FBDT' + '_1.root not found. Stopped')
+                            ' Weight file ' + identifierFBDT + ' not found. Stopped')
 
             B2INFO('flavorTagger: Ready to be used with weightFile ' + methodPrefixCombinerLevel + 'FBDT' + '_1.root')
 
@@ -805,11 +803,12 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None,
                 if not os.path.isfile(identifierFANN):
                     basf2_mva.download(methodPrefixCombinerLevel + 'FANN', identifierFANN)
                     if not os.path.isfile(identifierFANN):
-                        B2FATAL('Flavor Tagger: Weight file ' + methodPrefixCombinerLevel + 'FANN' +
-                                '_1.root was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                        B2FATAL('Flavor Tagger: Weight file ' + identifierFANN +
+                                ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
             if useOnlyLocalFlag:
-                B2FATAL('flavorTagger: Combinerlevel FANNMLP was not trained with this combination of categories. ' +
-                        ' Weight file ' + methodPrefixCombinerLevel + 'FANN' + '_1.root not found. Stopped')
+                if not os.path.isfile(identifierFANN):
+                    B2FATAL('flavorTagger: Combinerlevel FANNMLP was not trained with this combination of categories. ' +
+                            ' Weight file ' + identifierFANN + ' not found. Stopped')
 
             B2INFO('flavorTagger: Ready to be used with weightFile ' + methodPrefixCombinerLevel + 'FANN' + '_1.root')
 
@@ -1127,6 +1126,8 @@ def flavorTagger(
 
     elif mode == 'Expert':
         # If trigger returns 1 jump into empty path skipping further modules in roe_path
+        # run filter with no cut first to get rid of ROEs that are missing the mask of the signal particle
+        ma.signalSideParticleListsFilter(particleLists, '', roe_path, deadEndPath)
         ma.signalSideParticleListsFilter(particleLists, 'nROE_Charged(' + maskName + ', 0) > 0', roe_path, deadEndPath)
 
         # Initialization of flavorTaggerInfo dataObject needs to be done in the main path
@@ -1163,7 +1164,7 @@ def flavorTagger(
 
     elif mode == 'Teacher':
         if eventLevelTeacher(weightFiles, categories):
-            combinerLevelTeacher(weightFiles, variableCombinerLevel, categoriesCombinationCode)
+            combinerLevelTeacher(weightFiles, variablesCombinerLevel, categoriesCombinationCode)
 
 
 if __name__ == '__main__':

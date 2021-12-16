@@ -133,7 +133,7 @@ if __name__ == '__main__':
     if args.matchTruth:
         for plistname, _ in plists:
             ma.matchMCTruth(plistname, path=path)
-            applyCuts(plistname, "isSignal == 1", path=path)
+            ma.applyCuts(plistname, "isSignal == 1", path=path)
 
     # -------------------
     # Global/Binary PID ?

@@ -13,7 +13,7 @@ Airflow script for TOP pre-tracking calibration:
    channel masks
 """
 import basf2
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from caf.utils import IoV
 from caf.strategies import SequentialBoundaries
 from top_calibration import channel_mask_calibration
@@ -28,9 +28,9 @@ settings = CalibrationSettings(
     input_data_names=["hadron_calib"],
     input_data_filters={
         "hadron_calib": [
-            input_data_filters["Data Tag"]["hadron_calib"],
-            input_data_filters["Run Type"]["physics"],
-            input_data_filters["Data Quality Tag"]["Good Or Recoverable"]]},
+            INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
+            INPUT_DATA_FILTERS["Run Type"]["physics"],
+            INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"]]},
     depends_on=[],
     expert_config={
         "max_files_per_run": 20,

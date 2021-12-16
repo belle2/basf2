@@ -166,7 +166,7 @@ class dilepton(BaseSkim):
             checkForDuplicates=False,
             path=path)
 
-        path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks > 3', path=path)
+        path = self.skim_event_cuts('sphericity > 0.18 and nTracks > 3', path=path)
 
         ma.reconstructDecay('Upsilon(4S):ee   -> e+:pid e-:pid', 'M < 15', path=path)
         ma.reconstructDecay('Upsilon(4S):emu  -> e+:pid mu-:pid', 'M < 15', path=path)

@@ -63,19 +63,6 @@ DQMHistSnapshotsModule::SSNODE* DQMHistSnapshotsModule::find_snapshot(TString a)
   return NULL;
 }
 
-TCanvas* DQMHistSnapshotsModule::find_canvas(TString canvas_name)
-{
-  TIter nextkey(gROOT->GetListOfCanvases());
-  TObject* obj = NULL;
-
-  while ((obj = (TObject*)nextkey())) {
-    if (obj->IsA()->InheritsFrom("TCanvas")) {
-      if (obj->GetName() == canvas_name)
-        return (TCanvas*)obj;
-    }
-  }
-  return NULL;
-}
 
 void DQMHistSnapshotsModule::event()
 {

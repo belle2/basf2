@@ -1866,7 +1866,7 @@ ccc      DATA BBS2 /1H\ /    ! HP  f77 with standard options
          DO i=1,m_idmax
             IF(m_index(i,1) .EQ. 0) GOTO 44
          ENDDO
-         CALL GLK_Stop1('+++GLK_hadres: Too short m_index=',m_index)
+         CALL GLK_Stop1('+++GLK_hadres: Too short m_index=',i)!m_index)
  44      CONTINUE
          jadres = i
          RETURN

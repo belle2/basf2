@@ -7,7 +7,7 @@ The VariableManager handles all variables in ``basf2`` analysis.
 It is implemented as a `singleton <https://en.wikipedia.org/wiki/Singleton_pattern>`_
 C++ class with a python interface.
 
-The C++ documentation is `here <https://b2-master.belle2.org/software/development/classBelle2_1_1Variable_1_1Manager.html>`_.
+The C++ documentation is `here <https://software.belle2.org/development/classBelle2_1_1Variable_1_1Manager.html>`_.
 
 .. tip::
 
@@ -407,6 +407,14 @@ Here is a list of production and decay vertex variables:
 .. b2-variables::
    :group: Vertex Information
 
+KFit variables
+~~~~~~~~~~~~~~
+
+Here is a list of variables that indicate the quality of a :ref:`kfit_vertex_fitter`.
+
+.. b2-variables::
+   :group: KFit variables
+
 .. _orca_kin_fit_variables:
 
 Orca Kinematic Fitter
@@ -487,6 +495,15 @@ They have a **[Calibration]** pretag.
 .. b2-variables::
    :group: ECL trigger calibration
 
+FEIVariables
+~~~~~~~~~~~~
+
+As known by many analysts by using the ``isSignal`` flag for truth matching for the  tagging B meson from the FEI there is still a peak visible for the background in e.g. the :math:M_{bc}` distribution making it hard to determine e.g. a yield there.
+
+New variables seem to be found to address this problem.
+
+.. b2-variables::
+   :group: FEIVariables
 
 Collections and Lists
 =====================

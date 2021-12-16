@@ -7,7 +7,6 @@ The mDST file contains 3 B0 -> [ J/psi -> mu+ mu- ] [ K_S0 -> pi+ pi- ] events, 
 """
 
 import b2test_utils
-from glob import glob
 import basf2 as b2
 
 # make logging more reproducible by replacing some strings

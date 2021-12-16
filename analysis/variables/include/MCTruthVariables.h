@@ -274,14 +274,14 @@ namespace Belle2 {
 
     /**
      * return number of steps to i-th daughter from the particle at generator level.
-     * return NaN, if no MCParticle is associated to the particle or the i-th daughter.
-     * return NaN, if i-th daughter does not exist.
+     * return 0, if no MCParticle is associated to the particle or the i-th daughter.
+     * return 0, if i-th daughter does not exist.
      */
     int genNStepsToDaughter(const Particle* particle, const std::vector<double>& arguments);
 
     /**
      * return number of missing daughters having assigned PDG codes
-     * return NaN, if the particle does not have related MC Particle
+     * return 0, if the particle does not have related MC Particle
      */
     int genNMissingDaughter(const Particle* particle, const std::vector<double>& arguments);
 

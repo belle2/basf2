@@ -59,12 +59,6 @@ namespace Belle2 {
      * @return The node struct for the snapshot, or nullptr if not found.
      */
     SSNODE* find_snapshot(TString a);
-    /**
-     * Find canvas by name
-     * @param cname Name of the canvas
-     * @return The pointer to the canvas, or nullptr if not found.
-     */
-    TCanvas* find_canvas(TString cname);
 
     // Data members
   private:

@@ -11,7 +11,6 @@
 import basf2 as b2
 import modularAnalysis as ma
 import variables as va
-import os
 
 # define scale tests
 sys_tests = ['def', 'scale']

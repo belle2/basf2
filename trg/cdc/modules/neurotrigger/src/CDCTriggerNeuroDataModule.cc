@@ -21,7 +21,6 @@
 #include "boost/multi_array.hpp"
 #define BOOST_MULTI_ARRAY_NO_GENERATORS
 
-
 namespace Belle2 {
   REG_MODULE(CDCTriggerNeuroData)
 
@@ -153,6 +152,11 @@ namespace Belle2 {
       B2ERROR("Number of ID sets (" << m_trainSet.size() << ") should match " <<
               "number of sectors (" << m_NeuroTrigger.nSectors() << ")");
     }
+    // overwrite previous file with empty file, in case it already exists
+    std::ofstream gzipfile4(m_filename, std::ios_base::trunc | std::ios_base::binary);
+    boost::iostreams::filtering_ostream outStream;
+    outStream.push(boost::iostreams::gzip_compressor());
+    outStream.push(gzipfile4);
   }
   void
   CDCTriggerNeuroDataModule::event()
@@ -260,10 +264,11 @@ namespace Belle2 {
         if (!m_singleUse && sectorPattern > 0 && (sectorPattern & hitPattern) != sectorPattern) {
           B2DEBUG(250, "hitPattern not matching " << (sectorPattern & hitPattern));
           continue;
-        } else if (m_singleUse && sectorPattern > 0 && (sectorPattern & hitPattern) != (hitPattern & sectorPatternMask)) {
-          B2DEBUG(250, "hitPattern not matching " << (sectorPattern & hitPattern));
+        } else if (m_singleUse && sectorPattern > 0 && (sectorPattern) != (hitPattern & sectorPatternMask)) {
+          B2DEBUG(250, "hitPattern not matching " << (sectorPatternMask & hitPattern));
           continue;
         }
+
         // get training data
         std::vector<unsigned> hitIds;
         if (m_neuroTrackInputMode) {

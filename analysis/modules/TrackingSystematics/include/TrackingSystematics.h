@@ -72,6 +72,12 @@ namespace Belle2 {
     */
     double getScale(Particle* particle);
 
+    /**
+    * Returns the needed smearing factor for particle based on tableName and smearingFactorName
+    * @param particle
+    */
+    double getSmearing(Particle* particle);
+
     /** input particle lists */
     std::vector<std::string> m_ParticleLists;
     /** input momentum scale modifier */
@@ -80,8 +86,11 @@ namespace Belle2 {
     /** Name of the table  */
     std::string m_tableName;
 
-    /** Name of the table */
+    /** Name of the scale factor from table */
     std::string m_scalingFactorName;
+
+    /** Name of the smear factor from table */
+    std::string m_smearingFactorName;
 
     /** Pointer to the table in DB */
     std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable;

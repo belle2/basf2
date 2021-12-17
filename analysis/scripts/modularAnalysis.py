@@ -712,6 +712,29 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), tableName="", scalingF
     path.add_module(trackingmomentum)
 
 
+def smearTrackMomenta(inputListNames, tableName="", smearingFactorName="smear", path=None):
+    """
+    Scale momenta of the particles according to a scaling factor scale.
+    This scaling factor can either be given as constant number or as the name of the payload which contains
+    the variable scale factors.
+    If the particle list contains composite particles, the momenta of the track-based daughters are scaled.
+    Subsequently, the momentum of the mother particle is updated as well.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        scale (float): scaling factor (1.0 -- no scaling)
+        tableName (str): name of the payload which contains the phase-space dependent scaling factors
+        scalingFactorName (str): name of scaling factor variable in the payload.
+        path (basf2.Path): module is added to this path
+    """
+    trackingmomentum = register_module('TrackingMomentum')
+    trackingmomentum.param('particleLists', inputListNames)
+    trackingmomentum.param('tableName', tableName)
+    trackingmomentum.param('smearingFactorName',  smearingFactorName)
+
+    path.add_module(trackingmomentum)
+
+
 def mergeListsWithBestDuplicate(outputListName,
                                 inputListNames,
                                 variable,

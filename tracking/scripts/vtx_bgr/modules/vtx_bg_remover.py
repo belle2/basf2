@@ -1,0 +1,219 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import math
+from pybasf2 import B2ERROR
+from ROOT import TVector3
+from ROOT import Belle2
+import basf2 as b2
+
+
+import numpy as np
+
+
+class VTXBgRemover(b2.Module):
+    """
+    Module to remove background tracks from store array using an MVA classifier.
+    """
+
+    def __init__(self, trackCandidatesColumnName="RecoTracks"):
+        """Create a member to weighfiles for classifier from DB"""
+        super().__init__()  # don't forget to call parent constructor
+
+        #: cached name of the RecoTracks StoreArray
+        self.trackCandidatesColumnName = trackCandidatesColumnName
+
+        #: cached name of the database identifier for weightfile
+        self.m_identifier = 'DatabaseIdentifier'
+
+        #: cached serialized weightfile representation
+        self.m_weightfile_representation = Belle2.PyDBObj(self.m_identifier)
+
+    def initialize(self):
+        """
+        Initialize the module.
+        """
+
+        Belle2.MVA.AbstractInterface.initSupportedInterfaces()
+
+    def beginRun(self):
+        """
+        Called at the beginning of a new run.
+        """
+
+        if self.m_weightfile_representation:
+            if self.m_weightfile_representation.hasChanged():
+                weightfile = Belle2.MVA.Weightfile.loadFromDatabase(self.m_identifier)
+                self.init_mva(weightfile)
+        else:
+            weightfile = Belle2.MVA.Weightfile.loadFromFile(self.m_identifier)
+            self.init_mva(weightfile)
+
+    def init_mva(self, weightfile):
+        """
+        Initialize mva expert, dataset and features
+        Called everytime the weightfile in the database changes in begin run
+        """
+
+        supported_interfaces = Belle2.MVA.AbstractInterface.getSupportedInterfaces()
+        general_options = Belle2.MVA.GeneralOptions()
+        weightfile.getOptions(general_options)
+
+        self.m_expert = supported_interfaces[general_options.m_method].getExpert()
+        self.m_expert.load(weightfile)
+
+        self.m_feature_variables = general_options.m_variables
+
+        dummy = np.zeros((self.m_feature_variables.size(),))
+        self.m_dataset = Belle2.MVA.SingleDataset(general_options, dummy, 0)
+
+    def extract_features(self, trackCand):
+        """
+        Returns input feature vector to classifier for given trackCand.
+        """
+
+        # qi = trackCand.getQualityIndicator()
+        momentum = trackCand.getMomentumSeed()
+        pt = momentum.Perp()
+        tan_lambda = np.divide(1.0, math.tan(momentum.Theta()))
+
+        # List of VTXClusters associated with track
+        vtx_hits = []
+
+        # Loop over all hits
+        for hit_info in trackCand.getRelationsWith("RecoHitInformations"):
+
+            if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_VTX:
+                hit = hit_info.getRelated("VTXClusters")
+                vtx_hits.append(hit)
+
+        data = np.zeros((self.m_feature_variables.size(),))
+
+        # Hit 0
+        hit = vtx_hits[0]
+        sensor_info = Belle2.VXD.GeoCache.get(hit.getSensorID())
+        position = sensor_info.pointToGlobal(TVector3(hit.getU(), hit.getV(), 0), True)
+
+        data[0] = position.X()
+        data[1] = position.Y()
+        data[2] = position.Z()
+        data[3] = hit.getSensorID().getLayerNumber()
+        data[4] = hit.getSize()
+        data[5] = hit.getUSize()
+        data[6] = hit.getVSize()
+        data[7] = hit.getSeedCharge()
+        data[8] = hit.getCharge()
+
+        # Hit 1
+        hit = vtx_hits[1]
+        sensor_info = Belle2.VXD.GeoCache.get(hit.getSensorID())
+        position = sensor_info.pointToGlobal(TVector3(hit.getU(), hit.getV(), 0), True)
+
+        data[9] = position.X()
+        data[10] = position.Y()
+        data[11] = position.Z()
+        data[12] = hit.getSensorID().getLayerNumber()
+        data[13] = hit.getSize()
+        data[14] = hit.getUSize()
+        data[15] = hit.getVSize()
+        data[16] = hit.getSeedCharge()
+        data[17] = hit.getCharge()
+
+        # Hit 2
+        hit = vtx_hits[2]
+        sensor_info = Belle2.VXD.GeoCache.get(hit.getSensorID())
+        position = sensor_info.pointToGlobal(TVector3(hit.getU(), hit.getV(), 0), True)
+
+        data[18] = position.X()
+        data[19] = position.Y()
+        data[20] = position.Z()
+        data[21] = hit.getSensorID().getLayerNumber()
+        data[22] = hit.getSize()
+        data[23] = hit.getUSize()
+        data[24] = hit.getVSize()
+        data[25] = hit.getSeedCharge()
+        data[26] = hit.getCharge()
+
+        # Hit 3
+        if len(vtx_hits) <= 3:
+            data[27] = 0
+            data[28] = 0
+            data[29] = 0
+            data[30] = 0
+            data[31] = 0
+            data[32] = 0
+            data[33] = 0
+            data[34] = 0
+            data[35] = 0
+        else:
+            hit = vtx_hits[3]
+            sensor_info = Belle2.VXD.GeoCache.get(hit.getSensorID())
+            position = sensor_info.pointToGlobal(TVector3(hit.getU(), hit.getV(), 0), True)
+
+            data[27] = position.X()
+            data[28] = position.Y()
+            data[29] = position.Z()
+            data[30] = hit.getSensorID().getLayerNumber()
+            data[31] = hit.getSize()
+            data[32] = hit.getUSize()
+            data[33] = hit.getVSize()
+            data[34] = hit.getSeedCharge()
+            data[35] = hit.getCharge()
+
+        layers = [hit.getSensorID().getLayerNumber() for hit in vtx_hits]
+
+        data[36] = min(layers)
+        data[37] = max(layers)
+        data[38] = pt
+        data[39] = tan_lambda
+
+        return data
+
+    def analyse(self, trackCand):
+        """
+        Calculates expert output for given candidate track
+        """
+
+        if not self.m_expert:
+            B2ERROR("MVA Expert is not loaded! I will return 0")
+            return 0.0
+
+        if trackCand.getNumberOfVTXHits() < 3:
+            return 0.0
+        elif trackCand.getNumberOfVTXHits() > 3:
+            return 1.0
+        else:
+            data = self.extract_features(trackCand)
+
+            # TODO: not 100% sure this is safe
+            # self.m_dataset.m_input = data
+
+            # TODO: this is safe, but rather slow.
+            # May not be problem for demonstrator purpose.
+            for i in range(self.m_feature_variables.size()):
+                self.m_dataset.m_input[i] = data[i]
+
+            return self.m_expert.apply(self.m_dataset)[0]
+
+    def event(self):
+        """
+        Called for each event.
+        """
+
+        trackCands = Belle2.PyStoreArray(self.trackCandidatesColumnName)
+
+        for trackCand in trackCands:
+
+            qiValue = self.analyse(trackCand)
+            print('Calling analyze gives QI=', qiValue)
+
+            # Override QualityIndicator with qiValue for later use
+            trackCand.setQualityIndicator(qiValue)

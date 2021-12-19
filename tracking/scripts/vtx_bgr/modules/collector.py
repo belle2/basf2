@@ -1,0 +1,233 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+
+import basf2 as b2
+import ROOT
+from ROOT import Belle2, TVector3
+
+import numpy as np
+import math
+from ROOT import addressof
+
+ROOT.gInterpreter.Declare("struct TrackData {\
+    float x_pos_0;\
+    float y_pos_0;\
+    float z_pos_0;\
+    float layer_0;\
+    float size_0;\
+    float sizeU_0;\
+    float sizeV_0;\
+    float seedCharge_0;\
+    float clusterCharge_0;\
+    float x_pos_1;\
+    float y_pos_1;\
+    float z_pos_1;\
+    float layer_1;\
+    float size_1;\
+    float sizeU_1;\
+    float sizeV_1;\
+    float seedCharge_1;\
+    float clusterCharge_1;\
+    float x_pos_2;\
+    float y_pos_2;\
+    float z_pos_2;\
+    float layer_2;\
+    float size_2;\
+    float sizeU_2;\
+    float sizeV_2;\
+    float seedCharge_2;\
+    float clusterCharge_2;\
+    float x_pos_3;\
+    float y_pos_3;\
+    float z_pos_3;\
+    float layer_3;\
+    float size_3;\
+    float sizeU_3;\
+    float sizeV_3;\
+    float seedCharge_3;\
+    float clusterCharge_3;\
+    float first_vtx_layer;\
+    float last_vtx_layer;\
+    float seed_pT;\
+    float seed_tanLambda;\
+    float isSignal; };"
+                          )
+
+
+class VTXTrackCollector(b2.Module):
+    """Module to collect tracking information per event and write it to an output directory. The set of
+    tracking events will later be used to train tracking algorithms."""
+
+    def __init__(
+        self,
+        output_file_name="train.root",
+        trackCandidatesColumnName="VTXRecoTracks",
+    ):
+        """Constructor"""
+
+        super(VTXTrackCollector, self).__init__()
+
+        #: cached value of the output file
+        self.output_file_name = output_file_name
+        #: cached name of the RecoTracks StoreArray
+        self.trackCandidatesColumnName = trackCandidatesColumnName
+        #: cached probability to sample background
+        self.bg_sample_fraction = 0.3
+
+    def initialize(self):
+        """Receive signal at the start of event processing"""
+
+        #: Output file to store output tre
+        self.rfile = ROOT.TFile(self.output_file_name, "RECREATE")
+        self.rfile.cd()
+
+        #: TTree for output data
+        self.tree = ROOT.TTree('tree', 'tree')
+        #: Instance of TrackData class
+        self.trackData = ROOT.TrackData()
+
+        for key in ROOT.TrackData.__dict__:
+            if '__' not in key:
+                formstring = '/F'
+                if isinstance(self.trackData.__getattribute__(key), int):
+                    formstring = '/I'
+                self.tree.Branch(key, addressof(self.trackData, key), key + formstring)
+
+    def event(self):
+        """Event method"""
+
+        trackCands = Belle2.PyStoreArray(self.trackCandidatesColumnName)
+
+        self.examine_event(trackCands)
+
+    def examine_event(self, trackCands):
+
+        for i, trackCand in enumerate(trackCands):
+
+            momentum = trackCand.getMomentumSeed()
+            pt = momentum.Perp()
+            tan_lambda = np.divide(1.0, math.tan(momentum.Theta()))
+
+            # Track is Signal, if all hits have related simhit (from same MCParticle)
+            isSignal = True
+
+            # List of VTXClusters associated with track
+            vtx_hits = []
+
+            # Loop over all hits
+            for hit_info in trackCand.getRelationsWith("RecoHitInformations"):
+
+                if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_VTX:
+                    hit = hit_info.getRelated("VTXClusters")
+                    vtx_hits.append(hit)
+
+                    simHit = hit.getRelated('VTXTrueHits')
+                    if not simHit:
+                        isSignal = False
+
+            self.harvest_track(vtx_hits, isSignal, pt, tan_lambda)
+
+    def harvest_track(self, vtx_hits, target, pt, tan_lambda):
+
+        if not len(vtx_hits) == 3:
+            return
+
+        # Hit 0
+        hit = vtx_hits[0]
+        sensor_info = Belle2.VXD.GeoCache.get(hit.getSensorID())
+        position = sensor_info.pointToGlobal(TVector3(hit.getU(), hit.getV(), 0), True)
+
+        self.trackData.x_pos_0 = position.X()
+        self.trackData.y_pos_0 = position.Y()
+        self.trackData.z_pos_0 = position.Z()
+        self.trackData.layer_0 = hit.getSensorID().getLayerNumber()
+        self.trackData.size_0 = hit.getSize()
+        self.trackData.sizeU_0 = hit.getUSize()
+        self.trackData.sizeV_0 = hit.getVSize()
+        self.trackData.seedCharge_0 = hit.getSeedCharge()
+        self.trackData.clusterCharge_0 = hit.getCharge()
+
+        # Hit 1
+        hit = vtx_hits[1]
+        sensor_info = Belle2.VXD.GeoCache.get(hit.getSensorID())
+        position = sensor_info.pointToGlobal(TVector3(hit.getU(), hit.getV(), 0), True)
+
+        self.trackData.x_pos_1 = position.X()
+        self.trackData.y_pos_1 = position.Y()
+        self.trackData.z_pos_1 = position.Z()
+        self.trackData.layer_1 = hit.getSensorID().getLayerNumber()
+        self.trackData.size_1 = hit.getSize()
+        self.trackData.sizeU_1 = hit.getUSize()
+        self.trackData.sizeV_1 = hit.getVSize()
+        self.trackData.seedCharge_1 = hit.getSeedCharge()
+        self.trackData.clusterCharge_1 = hit.getCharge()
+
+        # Hit 2
+        hit = vtx_hits[2]
+        sensor_info = Belle2.VXD.GeoCache.get(hit.getSensorID())
+        position = sensor_info.pointToGlobal(TVector3(hit.getU(), hit.getV(), 0), True)
+
+        self.trackData.x_pos_2 = position.X()
+        self.trackData.y_pos_2 = position.Y()
+        self.trackData.z_pos_2 = position.Z()
+        self.trackData.layer_2 = hit.getSensorID().getLayerNumber()
+        self.trackData.size_2 = hit.getSize()
+        self.trackData.sizeU_2 = hit.getUSize()
+        self.trackData.sizeV_2 = hit.getVSize()
+        self.trackData.seedCharge_2 = hit.getSeedCharge()
+        self.trackData.clusterCharge_2 = hit.getCharge()
+
+        # Hit 3
+        if len(vtx_hits) <= 3:
+            self.trackData.x_pos_3 = 0
+            self.trackData.y_pos_3 = 0
+            self.trackData.z_pos_3 = 0
+            self.trackData.layer_3 = 0
+            self.trackData.size_3 = 0
+            self.trackData.sizeU_3 = 0
+            self.trackData.sizeV_3 = 0
+            self.trackData.seedCharge_3 = 0
+            self.trackData.clusterCharge_3 = 0
+        else:
+            hit = vtx_hits[3]
+            sensor_info = Belle2.VXD.GeoCache.get(hit.getSensorID())
+            position = sensor_info.pointToGlobal(TVector3(hit.getU(), hit.getV(), 0), True)
+
+            self.trackData.x_pos_3 = position.X()
+            self.trackData.y_pos_3 = position.Y()
+            self.trackData.z_pos_3 = position.Z()
+            self.trackData.layer_3 = hit.getSensorID().getLayerNumber()
+            self.trackData.size_3 = hit.getSize()
+            self.trackData.sizeU_3 = hit.getUSize()
+            self.trackData.sizeV_3 = hit.getVSize()
+            self.trackData.seedCharge_3 = hit.getSeedCharge()
+            self.trackData.clusterCharge_3 = hit.getCharge()
+
+        layers = [hit.getSensorID().getLayerNumber() for hit in vtx_hits]
+
+        self.trackData.first_vtx_layer = min(layers)
+        self.trackData.last_vtx_layer = max(layers)
+        self.trackData.seed_pT = pt
+        self.trackData.seed_tanLambda = tan_lambda
+        self.trackData.isSignal = target
+
+        if target == 0:
+            if np.random.uniform() < self.bg_sample_fraction:
+                self.rfile.cd()
+                self.tree.Fill()
+        else:
+            self.rfile.cd()
+            self.tree.Fill()
+
+    def terminate(self):
+        """ Close the output file."""
+
+        self.rfile.cd()
+        self.rfile.Write()
+        self.rfile.Close()

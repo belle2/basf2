@@ -6,7 +6,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from pybasf2 import B2WARNING
+from pybasf2 import B2WARNING, B2ERROR
 
 from basf2 import register_module
 from ckf.path_functions import add_pxd_ckf, add_cosmics_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, \
@@ -15,6 +15,7 @@ from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 from vtx import add_vtx_reconstruction
 from tracking.adjustments import adjust_module
+from . import add_mc_track_finding, add_time_extraction
 
 
 def use_local_sectormap(path, pathToLocalSM):
@@ -1217,6 +1218,7 @@ def add_vtx_track_finding_vxdtf2(
     materialBudgetFactor=1.2,
     maxPt=0.01,
     vxdQualityEstimatarParametersFromDB=True,
+    vtx_bg_cut=0.1
 ):
     """
     Convenience function for adding all vxd track finder Version 2 modules
@@ -1245,7 +1247,6 @@ def add_vtx_track_finding_vxdtf2(
     :param EstimationMethod: Estimation method for QualityEstimatorVXD. Default: circleFit
     :param materialBudgetFactor: MaterialBudgetFactor is a hyperparameter of TripletFit QE, Default: 50
     :param maxPt: MaxPt is a hyperparameter of TripletFit QE, Default: 0.5
-    :param vxdQualityEstimatarParametersFromDB: If True, take TripletFit hyperparameters from DB, otherwise from function arguments
     """
     ##########################
     # some setting for VXDTF2
@@ -1380,12 +1381,33 @@ def add_vtx_track_finding_vxdtf2(
     momSeedRetriever.param('tcArrayName', nameSPTCs)
     path.add_module(momSeedRetriever)
 
-    converter = register_module('SPTC2RTConverter')
-    converter.param('recoTracksStoreArrayName', reco_tracks)
-    converter.param('spacePointsTCsStoreArrayName', nameSPTCs)
-    converter.param('vtxClustersName', vtx_clusters)
-    converter.param('vtxHitsStoreArrayName', vtx_clusters)
-    path.add_module(converter)
+    if vtx_bg_cut == 0:
+        converter = register_module('SPTC2RTConverter')
+        converter.param('recoTracksStoreArrayName', reco_tracks)
+        converter.param('spacePointsTCsStoreArrayName', nameSPTCs)
+        converter.param('vtxClustersName', vtx_clusters)
+        converter.param('vtxHitsStoreArrayName', vtx_clusters)
+        path.add_module(converter)
+
+    else:
+        B2WARNING("Experimental VTX Background Remover used!")
+        from vtx_bgr.path_utils import add_vtx_bg_remover
+
+        reco_tracks_raw = reco_tracks + 'Raw'
+
+        converter = register_module('SPTC2RTConverter')
+        converter.param('recoTracksStoreArrayName', reco_tracks_raw)
+        converter.param('spacePointsTCsStoreArrayName', nameSPTCs)
+        converter.param('vtxClustersName', vtx_clusters)
+        converter.param('vtxHitsStoreArrayName', vtx_clusters)
+        path.add_module(converter)
+
+        add_vtx_bg_remover(
+            path,
+            vtx_bg_cut=vtx_bg_cut,
+            inputStoreArrayName=reco_tracks_raw,
+            outputStoreArrayName=reco_tracks,
+        )
 
 
 def add_simple_vtx_tracking_reconstruction(path, components=['VTX', 'CDC'], pruneTracks=False, skipGeometryAdding=False,

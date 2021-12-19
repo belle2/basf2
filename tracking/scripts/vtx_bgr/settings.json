@@ -1,0 +1,19 @@
+{
+    "result_path": "output/",
+    "process_type": "BBBAR",
+    "n_events_training": 10000,
+    "n_events_testing": 1000,
+    "n_events_per_task": 100,
+    "n_events_test_on_data": -1,
+    "workers": 2,
+    "basf2_processes_per_worker": 0,
+    "test_selected_task": false,
+    "run_mva_evaluate": true,
+    "run_validation_tasks": true,
+    "globaltags": ["upgrade_2021-07-16_vtx_5layer"],
+    "experiment_numbers": [0],
+    "datafiles": [],
+    "bkgfiles_by_exp": {
+        "0": "/home/benjamin/b2/bgtest/vtx_5layer/"
+    }
+}

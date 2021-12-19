@@ -15,7 +15,6 @@ from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 from vtx import add_vtx_reconstruction
 from tracking.adjustments import adjust_module
-from . import add_mc_track_finding, add_time_extraction
 
 
 def use_local_sectormap(path, pathToLocalSM):
@@ -1466,9 +1465,6 @@ def add_simple_vtx_tracking_reconstruction(path, components=['VTX', 'CDC'], prun
     if 'SetupGenfitExtrapolation' not in path:
         path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
 
-    if mcTrackFinding:
-        add_mc_track_finding(path, components=components, reco_tracks=reco_tracks,
-                             use_second_cdc_hits=use_second_cdc_hits)
     else:
         add_vtx_track_finding_vxdtf2(path, reco_tracks="RecoTracksVTX", components=["VTX"])
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracksVTX")
@@ -1498,10 +1494,6 @@ def add_simple_vtx_tracking_reconstruction(path, components=['VTX', 'CDC'], prun
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")
 
         path.add_module('TrackCreator', recoTrackColName='RecoTracks')
-
-    # Only run the track time extraction on the full reconstruction chain for now. Later, we may
-    # consider to do the CDC-hit based method already during the fast reconstruction stage
-    add_time_extraction(path, components=components)
 
     add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
                    use_second_cdc_hits=use_second_cdc_hits)

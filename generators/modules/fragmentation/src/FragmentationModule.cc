@@ -400,7 +400,7 @@ void FragmentationModule::loadEvtGenParticleData(Pythia8::Pythia* pythia)
                            EvtPDL::chg3(evtgenParticle),
                            // colType == 0 for uncolored particles.
                            0,
-                           EvtPDL::getMass(evtgenParticle),
+                           EvtPDL::getMeanMass(evtgenParticle),
                            EvtPDL::getWidth(evtgenParticle),
                            EvtPDL::getMinMass(evtgenParticle),
                            EvtPDL::getMaxMass(evtgenParticle),

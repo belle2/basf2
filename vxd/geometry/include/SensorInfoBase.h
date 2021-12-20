@@ -220,7 +220,7 @@ namespace Belle2 {
        * @param u u coordinate to check, supply 0 if not interested
        * @param v v coordinate to check, supply 0 if not interested
        * @param uTolerance tolerance to be added on each side of the sensor in u direction
-       * @param vTolerance tolerance to be added on each side of the sensor in u direction
+       * @param vTolerance tolerance to be added on each side of the sensor in v direction
        * @return true if inside active area, false otherwise
        */
       bool inside(double u, double v, double uTolerance = DBL_EPSILON, double vTolerance = DBL_EPSILON) const
@@ -232,12 +232,16 @@ namespace Belle2 {
 
       /** Check wether a given point is inside the active area
        * @param local point in local coordinates
+       * @param uTolerance tolerance to be added on each side of the sensor in u direction
+       * @param vTolerance tolerance to be added on each side of the sensor in v direction
+       * @param wTolerance tolerance to be added on each side of the sensor in w direction
        * @return true if inside active area, false otherwise
        */
-      bool inside(const TVector3& local) const
+      bool inside(const TVector3& local, double uTolerance = DBL_EPSILON, double vTolerance = DBL_EPSILON,
+                  double wTolerance = DBL_EPSILON) const
       {
-        double nw = local.z() / getThickness() + 0.5;
-        return inside(local.x(), local.y()) && 0 <= nw && nw <= 1;
+        double nw = local.z() / (getThickness() + 2 * wTolerance) + 0.5;
+        return inside(local.x(), local.y(), uTolerance, vTolerance) && 0 <= nw && nw <= 1;
       }
 
       /** Force a position to be inside the active area

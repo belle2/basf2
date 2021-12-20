@@ -20,6 +20,35 @@ namespace Belle2 {
   namespace Variable {
     // Generated vertex information
     /**
+     * return local position in v relative to sensor origin of matched generated particle
+     */
+    double mcDecayVertexV(const Particle* part);
+
+    /**
+     * return local position in u relative to sensor origin of matched generated particle
+     */
+    double mcDecayVertexU(const Particle* part);
+
+    /**
+     * return local position in w relative to sensor origin of matched generated particle
+     */
+    double mcDecayVertexW(const Particle* part);
+
+    /**
+     * return SensorID relative to x, y and z position of matched generated particle
+     */
+    double mcDecayVertexSensor(const Particle* part);
+
+    /**
+     * return LadderID relative to x, y and z position of matched generated particle
+     */
+    double mcDecayVertexLadder(const Particle* part);
+
+    /**
+     * return LayerID relative to x, y and z position of matched generated particle
+     */
+    double mcDecayVertexLayer(const Particle* part);
+    /**
      * return x decay vertex coordinate of matched generated particle
      */
     double mcDecayVertexX(const Particle* part);

@@ -16,8 +16,8 @@ Outputs a root file train.root with training data.
 
 Usage:
 export BELLE2_VTX_UPGRADE_GT=upgrade_2021-07-16_vtx_5layer
-export BELLE2_VTX_BACKGROUND_DIR=/home/benjamin/b2/bgtest/vtx_5layer/
-basf2 collect_data.py -n 1000
+export BELLE2_VTX_BACKGROUND_DIR=/path/to/your/overlay/files/
+basf2 collect_data.py -n 2000
 """
 
 
@@ -43,24 +43,20 @@ def main():
     # ---------------------------------------------------------------------------------------
     path = b2.create_path()
 
-    eventinfosetter = b2.register_module('EventInfoSetter')
+    eventinfosetter = path.add_module('EventInfoSetter')
     # default phase3
     exp_number = 0
     eventinfosetter.param("expList", [exp_number])
-    path.add_module(eventinfosetter)
 
-    eventinfoprinter = b2.register_module('EventInfoPrinter')
-    path.add_module(eventinfoprinter)
+    path.add_module('EventInfoPrinter')
 
-    progress = b2.register_module('Progress')
-    path.add_module(progress)
+    path.add_module('Progress')
 
     # ---------------------------------------------------------------------------------------
     # Simulation Settings:
 
-    evtgenInput = b2.register_module('EvtGenInput')
+    evtgenInput = path.add_module('EvtGenInput')
     evtgenInput.logging.log_level = b2.LogLevel.WARNING
-    path.add_module(evtgenInput)
 
     # ---------------------------------------------------------------------------------------
 
@@ -77,9 +73,11 @@ def main():
         useVTXClusterShapes=True
     )
 
+    trackCandidatesColumnName = "VTXRecoTracks"
+
     add_vtx_track_finding_vxdtf2(
         path, components=["VTX"],
-        reco_tracks="VTXRecoTracks",
+        reco_tracks=trackCandidatesColumnName,
         add_mva_quality_indicator=False,
         vtx_bg_cut=0,
     )
@@ -88,7 +86,7 @@ def main():
     add_vtx_bg_collector(
         path,
         output_file_name="train.root",
-        trackCandidatesColumnName="VTXRecoTracks",
+        trackCandidatesColumnName=trackCandidatesColumnName,
     )
 
     b2.print_path(path)

@@ -1217,7 +1217,7 @@ def add_vtx_track_finding_vxdtf2(
     materialBudgetFactor=1.2,
     maxPt=0.01,
     vxdQualityEstimatarParametersFromDB=True,
-    vtx_bg_cut=0.1
+    vtx_bg_cut=0.0
 ):
     """
     Convenience function for adding all vxd track finder Version 2 modules
@@ -1246,6 +1246,8 @@ def add_vtx_track_finding_vxdtf2(
     :param EstimationMethod: Estimation method for QualityEstimatorVXD. Default: circleFit
     :param materialBudgetFactor: MaterialBudgetFactor is a hyperparameter of TripletFit QE, Default: 50
     :param maxPt: MaxPt is a hyperparameter of TripletFit QE, Default: 0.5
+    :param vxdQualityEstimatarParametersFromDB: If True, take TripletFit hyperparameters from DB, otherwise from function arguments
+    :param vtx_bg_cut: If positive, VTX background remover gets applied. Valid values in range [0,1].
     """
     ##########################
     # some setting for VXDTF2

@@ -52,6 +52,7 @@ namespace Belle2 {
     std::string m_dataPath; /**< The path to the KoralW input data files. */
     std::string m_userDataFile; /**< The filename of the user KoralW input data file. */
     bool m_initialized{false}; /**< True if generator has been initialized. */
+    bool m_firstEvent{true}; /**< Flag for keeping track of the first call of the event() method. */
     KoralW m_generator; /**< The KoralW generator. */
     MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */
     DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter database object. */

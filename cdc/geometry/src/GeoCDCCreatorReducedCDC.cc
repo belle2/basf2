@@ -65,8 +65,8 @@ namespace Belle2 {
       CDCSimControlPar::getInstance();
       CDCGeoControlPar::getInstance();
 
-      m_logical_cdc = 0;
-      m_physical_cdc = 0;
+      m_logicalCDC = 0;
+      m_physicalCDC = 0;
       m_VisAttributes.clear();
       m_VisAttributes.push_back(new G4VisAttributes(false)); // for "invisible"
       m_userLimits.clear();
@@ -168,16 +168,16 @@ namespace Belle2 {
         new G4Polycone("solidCDC", 0 * CLHEP::deg, 360.* CLHEP::deg,
                        mother.getNNodes(), motherZ.data(),
                        motherRmin.data(), motherRmax.data());
-      m_logical_cdc = new G4LogicalVolume(solid_cdc, medAir, "logicalCDC", 0, 0, 0);
-      m_physical_cdc = new G4PVPlacement(0, G4ThreeVector(geo.getGlobalOffsetX() * CLHEP::cm,
-                                                          geo.getGlobalOffsetY() * CLHEP::cm,
-                                                          geo.getGlobalOffsetZ() * CLHEP::cm), m_logical_cdc,
-                                         "physicalCDC", &topVolume, false, 0);
+      m_logicalCDC = new G4LogicalVolume(solid_cdc, medAir, "logicalCDC", 0, 0, 0);
+      m_physicalCDC = new G4PVPlacement(0, G4ThreeVector(geo.getGlobalOffsetX() * CLHEP::cm,
+                                                         geo.getGlobalOffsetY() * CLHEP::cm,
+                                                         geo.getGlobalOffsetZ() * CLHEP::cm), m_logicalCDC,
+                                        "physicalCDC", &topVolume, false, 0);
 
       // Set up region for production cuts
       G4Region* aRegion = new G4Region("CDCEnvelope");
-      m_logical_cdc->SetRegion(aRegion);
-      aRegion->AddRootLogicalVolume(m_logical_cdc);
+      m_logicalCDC->SetRegion(aRegion);
+      aRegion->AddRootLogicalVolume(m_logicalCDC);
 
       m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0., 1., 0.)));
       for (const auto& wall : geo.getOuterWalls()) {
@@ -203,7 +203,7 @@ namespace Belle2 {
         G4LogicalVolume* outerWallTube = new G4LogicalVolume(outerWallTubeShape, medWall, "solid" + wallName, 0, 0, 0);
         outerWallTube->SetVisAttributes(m_VisAttributes.back());
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + wallZbwd)*CLHEP::cm), outerWallTube, "logical" + wallName,
-                          m_logical_cdc, false, iOuterWall);
+                          m_logicalCDC, false, iOuterWall);
       }
 
 
@@ -232,7 +232,7 @@ namespace Belle2 {
         G4LogicalVolume* innerWallTube = new G4LogicalVolume(innerWallTubeShape, medWall, "logical" + wallName, 0, 0, 0);
         innerWallTube->SetVisAttributes(m_VisAttributes.back());
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length + wallZbwd)*CLHEP::cm), innerWallTube, "physical" + wallName,
-                          m_logical_cdc, false, iInnerWall);
+                          m_logicalCDC, false, iInnerWall);
 
 
       }
@@ -393,7 +393,7 @@ namespace Belle2 {
           G4LogicalVolume* leftTube = new G4LogicalVolume(leftTubeShape, cdcMed,
                                                           (format("logicalCDCLayer_%1%_leftTube") % iSLayer).str().c_str(), 0, 0, 0);
           new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zback_sensitive_left + length_feedthrough / 2.0)*CLHEP::cm), leftTube,
-                            (format("physicalCDCLayer_%1%_leftTube") % iSLayer).str().c_str(), m_logical_cdc, false, iSLayer);
+                            (format("physicalCDCLayer_%1%_leftTube") % iSLayer).str().c_str(), m_logicalCDC, false, iSLayer);
           // Build left sensitive tube (area 2)
           G4Tubs* leftSensitiveTubeShape = new G4Tubs((format("solidSD_CDCLayer_%1%_left") % iSLayer).str().c_str(),
                                                       rmin_sensitive_left * CLHEP::cm, rmax_sensitive_left * CLHEP::cm,
@@ -402,7 +402,7 @@ namespace Belle2 {
                                                                    (format("logicalSD_CDCLayer_%1%_left") % iSLayer).str().c_str(), 0, 0, 0);
           leftSensitiveTube->SetSensitiveDetector(m_sensitive);
           new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_left + zback_sensitive_left + length_feedthrough)*CLHEP::cm / 2.0),
-                            leftSensitiveTube, (format("physicalSD_CDCLayer_%1%_left") % iSLayer).str().c_str(), m_logical_cdc, false, iSLayer);
+                            leftSensitiveTube, (format("physicalSD_CDCLayer_%1%_left") % iSLayer).str().c_str(), m_logicalCDC, false, iSLayer);
         } else {
           //    std::cout <<"left doelse " << iSLayer << std::endl;
           //==========================================================
@@ -425,7 +425,7 @@ namespace Belle2 {
           G4LogicalVolume* leftTube = new G4LogicalVolume(leftTubeShape, cdcMed,
                                                           (format("logicalCDCLayer_%1%_leftTube") % iSLayer).str().c_str(), 0, 0, 0);
           new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_left + zback_sensitive_left)*CLHEP::cm / 2.0), leftTube,
-                            (format("physicalCDCLayer_%1%_leftTube") % iSLayer).str().c_str(), m_logical_cdc, false, iSLayer);
+                            (format("physicalCDCLayer_%1%_leftTube") % iSLayer).str().c_str(), m_logicalCDC, false, iSLayer);
 
 
           // Build a tube with metarial cdcMed for area 2
@@ -436,7 +436,7 @@ namespace Belle2 {
                                                              (format("logicalCDCLayer_%1%_leftMidTube") % iSLayer).str().c_str(), 0, 0, 0);
 
           new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (length_feedthrough + zfor_sensitive_left + zback_sensitive_left)*CLHEP::cm / 2.0),
-                            leftMidTube, (format("physicalCDCLayer_%1%_leftMidTube") % iSLayer).str().c_str(), m_logical_cdc, false, iSLayer);
+                            leftMidTube, (format("physicalCDCLayer_%1%_leftMidTube") % iSLayer).str().c_str(), m_logicalCDC, false, iSLayer);
 
           // Reset zback_sensitive_middle
           zback_sensitive_middle = length_feedthrough + zback_sensitive_left;
@@ -467,7 +467,7 @@ namespace Belle2 {
                                                            (format("logicalCDCLayer_%1%_rightTube") % iSLayer).str().c_str(), 0, 0, 0);
 
           new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_right - length_feedthrough / 2.0)*CLHEP::cm), rightTube,
-                            (format("physicalCDCLayer_%1%_rightTube") % iSLayer).str().c_str(), m_logical_cdc, false, iSLayer);
+                            (format("physicalCDCLayer_%1%_rightTube") % iSLayer).str().c_str(), m_logicalCDC, false, iSLayer);
 
 
           // Build right sensitive tube (area 2)
@@ -479,7 +479,7 @@ namespace Belle2 {
           rightSensitiveTube->SetSensitiveDetector(m_sensitive);
 
           new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_right + zback_sensitive_right - length_feedthrough)*CLHEP::cm / 2.0),
-                            rightSensitiveTube, (format("physicalSD_CDCLayer_%1%_right") % iSLayer).str().c_str(), m_logical_cdc, false, iSLayer);
+                            rightSensitiveTube, (format("physicalSD_CDCLayer_%1%_right") % iSLayer).str().c_str(), m_logicalCDC, false, iSLayer);
 
         } else {
           //    std::cout <<"right doelse" << iSLayer << std::endl;
@@ -505,7 +505,7 @@ namespace Belle2 {
                                                            (format("logicalCDCLayer_%1%_rightTube") % iSLayer).str().c_str(), 0, 0, 0);
 
           new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_right + zback_sensitive_right)*CLHEP::cm / 2.0), rightTube,
-                            (format("physicalCDCLayer_%1%_rightTube") % iSLayer).str().c_str(), m_logical_cdc, false, iSLayer);
+                            (format("physicalCDCLayer_%1%_rightTube") % iSLayer).str().c_str(), m_logicalCDC, false, iSLayer);
 
 
           // Build a tube with metarial cdcMed for area 2
@@ -515,7 +515,7 @@ namespace Belle2 {
           G4LogicalVolume* rightMidTube = new G4LogicalVolume(rightMidTubeShape, cdcMed,
                                                               (format("logicalCDCLayer_%1%_rightMidTube") % iSLayer).str().c_str(), 0, 0, 0);
           new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zback_sensitive_right - length_feedthrough + zfor_sensitive_right)*CLHEP::cm / 2.0),
-                            rightMidTube, (format("physicalCDCLayer_%1%_rightMidTube") % iSLayer).str().c_str(), m_logical_cdc, false, iSLayer);
+                            rightMidTube, (format("physicalCDCLayer_%1%_rightMidTube") % iSLayer).str().c_str(), m_logicalCDC, false, iSLayer);
 
           // Reset zback_sensitive_middle
           zfor_sensitive_middle = zfor_sensitive_right - length_feedthrough;
@@ -536,7 +536,7 @@ namespace Belle2 {
         middleSensitiveTube->SetSensitiveDetector(m_sensitive);
 
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_middle + zback_sensitive_middle)*CLHEP::cm / 2.0), middleSensitiveTube,
-                          (format("physicalSD_CDCLayer_%1%_middle") % iSLayer).str().c_str(), m_logical_cdc, false, iSLayer);
+                          (format("physicalSD_CDCLayer_%1%_middle") % iSLayer).str().c_str(), m_logicalCDC, false, iSLayer);
 
         //        if (cdcgp.getMaterialDefinitionMode() == 2) {
         if (gcp.getMaterialDefinitionMode() == 2) {
@@ -719,7 +719,7 @@ namespace Belle2 {
                                                          "logicalCDCEndplate" + name, 0, 0);
           logical->SetVisAttributes(m_VisAttributes.back());
           new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfwd + zbwd)*CLHEP::cm / 2.0), logical,
-                            "physicalCDCEndplate" + name, m_logical_cdc, false, iEPLayer);
+                            "physicalCDCEndplate" + name, m_logicalCDC, false, iEPLayer);
 
         }
       }
@@ -743,7 +743,7 @@ namespace Belle2 {
         ebTube->SetSensitiveDetector(m_bkgsensitive);
         ebTube->SetVisAttributes(m_VisAttributes.back());
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (ebFZ + ebBZ)*CLHEP::cm / 2.0), ebTube,
-                          (format("physicalSD_ElectronicsBoard_Layer%1%") % iEB).str().c_str(), m_logical_cdc, false, iEB);
+                          (format("physicalSD_ElectronicsBoard_Layer%1%") % iEB).str().c_str(), m_logicalCDC, false, iEB);
       }
 
       //
@@ -834,7 +834,7 @@ namespace Belle2 {
         for (int i = 0; i < ndiv; ++i) {
           const string physicalName = "physicalRib_" + to_string(id) + " " + to_string(i);
           new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), m_logical_cdc, false, id);
+                            physicalName.c_str(), m_logicalCDC, false, id);
           rot.rotateZ(phi * CLHEP::deg);
           arm.rotateZ(phi * CLHEP::deg);
         }
@@ -887,7 +887,7 @@ namespace Belle2 {
         for (int i = 0; i < ndiv; ++i) {
           const string physicalName = "physicalRib2_" + to_string(id) + " " + to_string(i);
           new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), m_logical_cdc, false, id);
+                            physicalName.c_str(), m_logicalCDC, false, id);
           rot.rotateZ(phi * CLHEP::deg);
           arm.rotateZ(phi * CLHEP::deg);
         }
@@ -951,7 +951,7 @@ namespace Belle2 {
         for (int i = 0; i < ndiv; ++i) {
           const string physicalName = "physicalRib3_" + to_string(id) + " " + to_string(i);
           new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), m_logical_cdc, false, id);
+                            physicalName.c_str(), m_logicalCDC, false, id);
           rot.rotateZ(phi * CLHEP::deg);
           arm.rotateZ(phi * CLHEP::deg);
         }
@@ -1021,7 +1021,7 @@ namespace Belle2 {
         for (int i = 0; i < ndiv; ++i) {
           const string physicalName = "physicalRib4_" + to_string(id) + " " + to_string(i);
           new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), m_logical_cdc, false, id);
+                            physicalName.c_str(), m_logicalCDC, false, id);
           rot.rotateZ(phi * CLHEP::deg);
           arm.rotateZ(phi * CLHEP::deg);
         }
@@ -1083,7 +1083,7 @@ namespace Belle2 {
         for (int i = 0; i < ndiv; ++i) {
           const string physicalName = "physicalRib5_" + to_string(id) + " " + to_string(i);
           new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), m_logical_cdc, false, id);
+                            physicalName.c_str(), m_logicalCDC, false, id);
           rot.rotateZ(phi * CLHEP::deg);
           arm.rotateZ(phi * CLHEP::deg);
         }
@@ -1138,7 +1138,7 @@ namespace Belle2 {
                                                           0, 0, 0);
         shieldCons->SetVisAttributes(m_VisAttributes.back());
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (shieldPosZ - shieldThick / 2.0) * CLHEP::cm), shieldCons,
-                          (format("physicalShield%1%") % shieldID).str().c_str(), m_logical_cdc, false, 0);
+                          (format("physicalShield%1%") % shieldID).str().c_str(), m_logicalCDC, false, 0);
 
       }
 
@@ -1170,7 +1170,7 @@ namespace Belle2 {
                                                           0, 0, 0);
         shieldCons->SetVisAttributes(m_VisAttributes.back());
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (shieldPosZ - shieldThick / 2.0) * CLHEP::cm), shieldCons,
-                          "physicalShield" + to_string(shieldID), m_logical_cdc, false, 0);
+                          "physicalShield" + to_string(shieldID), m_logicalCDC, false, 0);
 
       }
 
@@ -1348,7 +1348,7 @@ namespace Belle2 {
         for (int i = 0; i < number; ++i) {
           const string physicalName = "physicalRib_" + to_string(ribID) + " " + to_string(i);
           new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), m_logical_cdc, false, ribID);
+                            physicalName.c_str(), m_logicalCDC, false, ribID);
           rot.rotateZ(phi * CLHEP::deg);
           arm.rotateZ(phi * CLHEP::deg);
         }
@@ -1401,7 +1401,7 @@ namespace Belle2 {
         for (int i = 0; i < number; ++i) {
           const string physicalName = "physicalRib2_" + to_string(rib2ID) + " " + to_string(i);
           new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), m_logical_cdc, false, rib2ID);
+                            physicalName.c_str(), m_logicalCDC, false, rib2ID);
           rot.rotateZ(phi * CLHEP::deg);
           arm.rotateZ(phi * CLHEP::deg);
         }
@@ -1464,7 +1464,7 @@ namespace Belle2 {
         for (int i = 0; i < number; ++i) {
           const string physicalName = "physicalRib3_" + to_string(rib3ID) + " " + to_string(i);
           new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), m_logical_cdc, false, rib3ID);
+                            physicalName.c_str(), m_logicalCDC, false, rib3ID);
           rot.rotateZ(phi * CLHEP::deg);
           arm.rotateZ(phi * CLHEP::deg);
         }
@@ -1532,7 +1532,7 @@ namespace Belle2 {
         for (int i = 0; i < number; ++i) {
           const string physicalName = "physicalRib4_" + to_string(rib4ID) + " " + to_string(i);
           new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), m_logical_cdc, false, rib4ID);
+                            physicalName.c_str(), m_logicalCDC, false, rib4ID);
           rot.rotateZ(phi * CLHEP::deg);
           arm.rotateZ(phi * CLHEP::deg);
         }
@@ -1596,7 +1596,7 @@ namespace Belle2 {
         for (int i = 0; i < number; ++i) {
           const string physicalName = "physicalRib5_" + to_string(rib5ID) + " " + to_string(i);
           new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), m_logical_cdc, false, rib5ID);
+                            physicalName.c_str(), m_logicalCDC, false, rib5ID);
           rot.rotateZ(phi * CLHEP::deg);
           arm.rotateZ(phi * CLHEP::deg);
         }
@@ -1711,7 +1711,7 @@ namespace Belle2 {
                                                        logicalName.c_str(), 0, 0, 0);
       coverCone->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, posZ * CLHEP::cm - thick * CLHEP::cm / 2.0), coverCone,
-                        physicalName.c_str(), m_logical_cdc, false, id);
+                        physicalName.c_str(), m_logicalCDC, false, id);
 
     }
 
@@ -1733,7 +1733,7 @@ namespace Belle2 {
                                                       logicalName.c_str(), 0, 0, 0);
       logicalV->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, posZ * CLHEP::cm - thick * CLHEP::cm / 2.0), logicalV,
-                        physicalName.c_str(), m_logical_cdc, false, id);
+                        physicalName.c_str(), m_logicalCDC, false, id);
 
     }
 
@@ -1753,7 +1753,7 @@ namespace Belle2 {
                                                       logicalName.c_str(), 0, 0, 0);
       logicalV->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(0, G4ThreeVector(x * CLHEP::cm, y * CLHEP::cm, z * CLHEP::cm - thick * CLHEP::cm / 2.0), logicalV,
-                        physicalName.c_str(), m_logical_cdc, false, id);
+                        physicalName.c_str(), m_logicalCDC, false, id);
 
     }
 
@@ -1779,7 +1779,7 @@ namespace Belle2 {
                                                       logicalName.c_str(), 0, 0, 0);
       logicalV->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, posZ * CLHEP::cm), logicalV,
-                        physicalName.c_str(), m_logical_cdc, false, id);
+                        physicalName.c_str(), m_logicalCDC, false, id);
 
     }
 
@@ -1802,7 +1802,7 @@ namespace Belle2 {
                                                       logicalName.c_str(), 0, 0, 0);
       logicalV->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, posZ * CLHEP::cm - thick * CLHEP::cm / 2.0), logicalV,
-                        physicalName.c_str(), m_logical_cdc, false, id);
+                        physicalName.c_str(), m_logicalCDC, false, id);
 
     }
 

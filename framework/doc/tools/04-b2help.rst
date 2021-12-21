@@ -46,7 +46,7 @@ Tools which will provide you help
 ---------------------------------------------------------------
 
 .. argparse::
-    :filename: framework/tools/b2help-eventtype
+    :filename: decfiles/tools/b2help-eventtype
     :func: get_argument_parser
     :prog: b2help-eventtype
     :nodefault:

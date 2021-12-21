@@ -13,20 +13,18 @@ namespace Belle2 {
   void TrackStoreArrayHelper::registerArray(const std::string& arrayName, bool errorIfAlreadyRegistered)
   {
     m_recoTracksStoreArrayName = arrayName;
-    StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
 
     if (errorIfAlreadyRegistered) {
-      recoTracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+      m_recoTracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
     } else {
-      recoTracks.registerInDataStore();
+      m_recoTracks.registerInDataStore();
     }
-    RecoTrack::registerRequiredRelations(recoTracks);
+    RecoTrack::registerRequiredRelations(m_recoTracks);
   }
 
   void TrackStoreArrayHelper::copyTrackWithHitsAndRelations(const RecoTrack& recoTrack)
   {
-    StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
-    RecoTrack* newRecoTrack = recoTrack.copyToStoreArray(recoTracks);
+    RecoTrack* newRecoTrack = recoTrack.copyToStoreArray(m_recoTracks);
     newRecoTrack->addHitsFromRecoTrack(&recoTrack);
     newRecoTrack->addRelationTo(&recoTrack);
   }

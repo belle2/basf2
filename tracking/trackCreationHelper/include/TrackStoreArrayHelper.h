@@ -18,6 +18,8 @@ namespace Belle2 {
 
   /** Class to help managing the creation of RecoTrack StoreArray and adding of RecoTracks.
    *
+   * The implementation follows the design pattern of the class `ParticleListHelper`.
+   *
    * There's a bit of management involved when trying to create a new tracks store array
    *
    * - the tracks store array needs to be registered in the datastore
@@ -67,9 +69,7 @@ namespace Belle2 {
       //
       // cppcheck-suppress redundantAssignment
       // cppcheck-suppress redundantInitialization
-      StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
-
-      auto track = recoTracks.appendNew(std::forward<Args>(args)...);
+      auto track = m_recoTracks.appendNew(std::forward<Args>(args)...);
       return *track;
     }
 
@@ -87,5 +87,7 @@ namespace Belle2 {
   private:
     /** RecoTracks StoreArray name */
     std::string m_recoTracksStoreArrayName;
+    /** Store array for the reco tracks */
+    StoreArray<RecoTrack>  m_recoTracks;
   };
 }

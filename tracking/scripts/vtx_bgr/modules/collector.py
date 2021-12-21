@@ -160,7 +160,7 @@ class VTXTrackCollector(b2.Module):
             return True
 
     def harvest_track(self, vtx_hits, target, pt, tan_lambda):
-        """Extracks feature variables from track and fills them into TTree"""
+        """Extracts feature variables from track and fills them into TTree"""
 
         # Hit 0
         hit = vtx_hits[0]

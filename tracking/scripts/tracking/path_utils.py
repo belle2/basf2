@@ -1467,35 +1467,34 @@ def add_simple_vtx_tracking_reconstruction(path, components=['VTX', 'CDC'], prun
     if 'SetupGenfitExtrapolation' not in path:
         path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
 
-    else:
-        add_vtx_track_finding_vxdtf2(path, reco_tracks="RecoTracksVTX", components=["VTX"])
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracksVTX")
+    add_vtx_track_finding_vxdtf2(path, reco_tracks="RecoTracksVTX", components=["VTX"])
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracksVTX")
 
-        path.add_module("TFCDC_WireHitPreparer",
-                        wirePosition="aligned",
-                        useSecondHits=False,
-                        flightTimeEstimation="outwards")
-        path.add_module("ToCDCCKF",
-                        inputWireHits="CDCWireHitVector",
-                        inputRecoTrackStoreArrayName="RecoTracksVTX",
-                        relatedRecoTrackStoreArrayName="CKFCDCRecoTracks",
-                        relationCheckForDirection="backward",
-                        outputRecoTrackStoreArrayName="CKFCDCRecoTracks",
-                        outputRelationRecoTrackStoreArrayName="RecoTracksVTX",
-                        writeOutDirection="backward",
-                        stateBasicFilterParameters={"maximalHitDistance": 0.2},
-                        stateExtrapolationFilterParameters={"direction": "forward"},
-                        pathFilter="arc_length",
-                        seedComponent="VTX")
+    path.add_module("TFCDC_WireHitPreparer",
+                    wirePosition="aligned",
+                    useSecondHits=False,
+                    flightTimeEstimation="outwards")
+    path.add_module("ToCDCCKF",
+                    inputWireHits="CDCWireHitVector",
+                    inputRecoTrackStoreArrayName="RecoTracksVTX",
+                    relatedRecoTrackStoreArrayName="CKFCDCRecoTracks",
+                    relationCheckForDirection="backward",
+                    outputRecoTrackStoreArrayName="CKFCDCRecoTracks",
+                    outputRelationRecoTrackStoreArrayName="RecoTracksVTX",
+                    writeOutDirection="backward",
+                    stateBasicFilterParameters={"maximalHitDistance": 0.2},
+                    stateExtrapolationFilterParameters={"direction": "forward"},
+                    pathFilter="arc_length",
+                    seedComponent="VTX")
 
-        path.add_module("RelatedTracksCombiner",
-                        CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
-                        VXDRecoTracksStoreArrayName="RecoTracksVTX",
-                        recoTracksStoreArrayName="RecoTracks")
+    path.add_module("RelatedTracksCombiner",
+                    CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
+                    VXDRecoTracksStoreArrayName="RecoTracksVTX",
+                    recoTracksStoreArrayName="RecoTracks")
 
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")
 
-        path.add_module('TrackCreator', recoTrackColName='RecoTracks')
+    path.add_module('TrackCreator', recoTrackColName='RecoTracks')
 
     add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
                    use_second_cdc_hits=use_second_cdc_hits)

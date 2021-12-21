@@ -3,8 +3,8 @@
 """
 Utility to search for decfiles which include given decay string.
 
-NOTE : Currently this script only work on full release but not light release, since there is not the decfile directory.
-       Charge conjugate mode could not be found if it is not explicitly written.
+NOTE : Currently this script only works on full releases but not on light releases, since it requires the decfile directory.
+       Charge conjugate mode cannot be found if it is not explicitly written.
        Sub-decay is not supported.
 """
 
@@ -21,7 +21,7 @@ def get_argument_parser():
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("decay_string", type=str,
                         help="Decay string to search for the EventType and decfiles. \
-                              Please use single-/double-quotation to give a decay sting (e.g. 'B+ -> K+ e+ e-'). \
+                              Please use single-/double-quotation to give a decay string (e.g. 'B+ -> K+ e+ e-'). \
                               Otherwise, an arrow (->) is recognized as redirection.")
     return parser
 

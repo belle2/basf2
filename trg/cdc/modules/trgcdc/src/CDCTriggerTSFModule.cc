@@ -159,7 +159,7 @@ CDCTriggerTSFModule::initialize()
 
     //...New layer...
     TRGCDCLayer* layer = new TRGCDCLayer(i,
-                                         superLayerId + cdc.getOffsetOfFirstSuperLayer(),
+                                         superLayerId,
                                          superLayers[superLayerId].size(),
                                          axialStereoLayerId,
                                          axialStereoSuperLayerId,

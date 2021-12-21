@@ -116,7 +116,7 @@ Proceed to the post-installation configuration:
 .. code-block:: bash
 
         source bashrc && dirac-proxy-init -x
-        dirac-configure defaults-Belle-KEK.cfg
+        dirac-configure --cfg defaults-Belle-KEK.cfg
 
 Setting your gbasf2 environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -144,7 +144,7 @@ The most common task as user of the grid is the submission of jobs with input fi
 * From the official data reprocessing and skims.
 
 Files are stored around the world in the different storage elements.
-Fortunately, as user you don't have to worry about the physical location.
+Fortunately, as users, you don't have to worry about the physical location.
 A file catalog keeps the record of where the files are located, and you just need to provide a logical identifier
 of the interesting samples for your analysis.
 
@@ -170,6 +170,9 @@ Examples of LFNs for datasets are:
         # A mdst dataset of data from exp 10
         /belle/Data/proc/release-04-02-02/DB00000938/proc11/prod00013368/e0010/4S/r03774/mdst
 
+        # A udst dataset of data from exp 10
+        /belle/Data/release-05-01-03/DB00001363/SkimP11x1/prod00016031/e0010/4S/r04275/18530200/udst
+
         # A MC sample of charged B mesons
         /belle/MC/release-04-00-03/DB00000757/MC13a/prod00009435/s00/e1003/4S/r00000/charged/mdst
 
@@ -181,10 +184,11 @@ is introduced. Each dataset is subdivided by directories with name ``subXX``, wh
     :class: key-points
 
     * By design, each datablock contains a maximum of 1000 files.
-    * If a dataset contains more than 1000 files, at least it will be subdivided in two datablocks.
+    * If a dataset contains more than 1000 files, it will be subdivided into at least two datablocks.
 
 The command-line tool for listing the content of a directory on the grid is ``gb2_ds_list``
-(it is equivalent to ``ls`` on your local system). You can use it to see how many datablock contains each dataset.
+(it is equivalent to ``ls`` on your local system). You can use it to see how many datablock(s) is/are contained
+in each dataset.
 
 .. tip::
 
@@ -194,9 +198,9 @@ The command-line tool for listing the content of a directory on the grid is ``gb
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Use ``gb2_ds_list`` to see how datablocks contain the dataset
+     Use ``gb2_ds_list`` to see how many datablock(s) is/are contained in the skimmed dataset
 
-     ``/belle/MC/release-04-00-03/DB00000757/MC13a/prod00012386/s00/e1003/4S/r00000/eeee/mdst``
+     ``/belle/Data/release-05-01-03/DB00001363/SkimP11x1/prod00016031/e0010/4S/r04275/18530200/udst``
 
 .. admonition:: Hint
      :class: toggle xhint stacked
@@ -206,14 +210,14 @@ The command-line tool for listing the content of a directory on the grid is ``gb
 .. admonition:: Solution
      :class: toggle solution
 
-     ``gb2_ds_list /belle/MC/release-04-00-03/DB00000757/MC13a/prod00012386/s00/e1003/4S/r00000/eeee/mdst``
-     will show you that the dataset contains 3 datablocks.
+     Executing ``gb2_ds_list /belle/Data/release-05-01-03/DB00001363/SkimP11x1/prod00016031/e0010/4S/r04275/18530200/udst``
+     will show you that the dataset contains 1 datablock, ``sub00``.
 
 
 .. note::
 
-    Sometimes, in the documentation (such as Confluence pages) we refer to the **logical path name** (LPN)
-    of datasets and datablocks, while for files we keep LFN. In practice, LFN and LPN are the same thing.
+    Sometimes, in the documentation (such as in the Confluence pages) we refer to the **logical path name** (LPN)
+    of datasets and datablocks, while for files we use LFN. In practice, LFN and LPN are the same thing.
 
 The Dataset Searcher
 ^^^^^^^^^^^^^^^^^^^^
@@ -223,8 +227,8 @@ Go to the `DIRAC webportal <https://dirac.cc.kek.jp:8443/DIRAC/>`_ and then open
 Menu (the icon at the left-bottom) -> BelleDIRACApps -> Dataset Searcher.
 
 You have the option of searching between data or MC, samples
-with beam background (BGx1) or without (BGx0), and several fields to refine your search. Play with all the available
-options and get familiar with them.
+with beam background (BGx1) or without (BGx0), and several other fields to refine your search. Play with all the
+available options and get familiar with them.
 
 .. figure:: DatasetSearcher.png
     :align: center
@@ -239,30 +243,49 @@ options and get familiar with them.
     `computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_ for details.
 
 
-The ``MC Event types`` box show by default the generic samples available (charged, mixed, uubar, etc.).
+The ``MC Event types`` box show, by default, the generic samples available (charged, mixed, uubar, etc.).
 If you want to search
 signal samples, you need to specify the `signal event type <https://confluence.desy.de/display/BI/Signal+EventType>`_.
+Also, if you want to search uDST skim samples - which are what we will be using in the examples - you can find them at
+:ref:`skim/doc/04-experts:Skim Registry` section in the basf2 software documentation.
+
+.. note::
+
+    Here, and in some of the exercises/examples to follow, we will be using the data-level format known as **uDST**.
+    uDSTs (short for **user Data Summary Table**) is a format type that results from performing analysis skims on an
+    input dataset (usually of mDST format) that reduces the size of the input dataset to a more manageable size by
+    applying certain selection cuts. By doing this, the uDST contains a select amount of events from the input dataset
+    that can be useful for a certain type of analysis.
+
+.. note::
+
+    For further information about uDST skims, including the skim code and the decay name associated with that code,
+    see the basf2
+    `skim registry <https://stash.desy.de/projects/B2/repos/software/browse/skim/scripts/skim/registry.py>`_.
 
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Open the Dataset Searcher and obtain the LFN of of the MC13a
-     signal sample ``B0 -> [J/psi -> e+e-][Ks -> pi+ pi-]``, with beam background (BGx1) in the simulation.
+     Open the Dataset Searcher and obtain the first LFN you see with an ``MC Event type`` of ``mixed`` from the
+     uDST skim sample for the decay mode ``B0 -> [D- -> K_S0 pi-]pi+``, with beam background (BGx1) in the simulation.
 
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Search the `signal event type <https://confluence.desy.de/display/BI/Signal+EventType>`_ of the decay.
+     Search the basf2
+     `skim registry <https://stash.desy.de/projects/B2/repos/software/browse/skim/scripts/skim/registry.py>`_ and look
+     at the skim codes and names.
 
 .. admonition:: Another hint
      :class: toggle xhint stacked
 
-     The event type is ``1111540100``.
+     The skim code is ``14120601``.
 
 .. admonition:: Solution
      :class: toggle solution
 
-     /belle/MC/release-04-00-03/DB00000757/MC13a/prod00012867/s00/e1003/4S/r00000/1111540100/mdst
+     The first LFN shown with an ``MC Event type`` of ``mixed`` for skim code ``14120601`` is
+     ``/belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013006/e1003/4S/r00000/mixed/14120601/udst``.
 
 
 .. tip::
@@ -275,8 +298,9 @@ Another way to interact with the dataset searcher is using the command line tool
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Set your gbasf2 environment and try to get the LFNs of MC uubar samples from MC13a, with beam energy of 4S
-     and background level BGx1 using ``gb2_ds_search``.
+     Set your gbasf2 environment and try to get the LFNs of MC uubar samples using the same skim code from the
+     decay mode above (``14120601``), and using campaign ``SkimM13ax1`` along with beam energy of 4S and background
+     level BGx1 using ``gb2_ds_search``.
 
 .. admonition:: Hint
      :class: toggle xhint stacked
@@ -286,7 +310,23 @@ Another way to interact with the dataset searcher is using the command line tool
 .. admonition:: Solution
      :class: toggle solution
 
-     ``gb2_ds_search dataset --data_type mc --campaign MC13a --beam_energy 4S --mc_event uubar --bkg_level BGx1``
+     The execution and result from the command line are as follows:
+
+     .. code-block:: bash
+
+         gb2_ds_search dataset --data_type mc --skim_decay 14120601 --campaign SkimM13ax1 --beam_energy 4S --mc_event uubar --bkg_level BGx1
+
+         Matching datasets found:
+         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013046/e1003/4S/r00000/uubar/14120601/udst
+         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013047/e1003/4S/r00000/uubar/14120601/udst
+         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013048/e1003/4S/r00000/uubar/14120601/udst
+         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013049/e1003/4S/r00000/uubar/14120601/udst
+         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013050/e1003/4S/r00000/uubar/14120601/udst
+         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013051/e1003/4S/r00000/uubar/14120601/udst
+         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013052/e1003/4S/r00000/uubar/14120601/udst
+         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013053/e1003/4S/r00000/uubar/14120601/udst
+         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013054/e1003/4S/r00000/uubar/14120601/udst
+         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013055/e1003/4S/r00000/uubar/14120601/udst
 
 
 
@@ -314,14 +354,21 @@ version to use.
     (we allow only ``[^a-zA-Z0-9+-_]``).
 
 
-Once you located the dataset to use for your analysis, you can specify the LFN of the **datablock** to use as input
+Once you located the dataset to use for your analysis, you can specify the LPN of the **dataset** to use as input
 with the flag ``-i``.
 
 .. note::
 
-    While the Dataset Searcher provides the LFN for datasets, gbasf2 uses for now datablocks as input. You need to append
-    ``sub00, sub01, ...`` to the LFNs provided by the Dataset Searcher (this will be fixed in the near future, sorry for
-    the inconvenience).
+    The Dataset Searcher provides the LPN for datasets which gbasf2 can use as input when submitting jobs.
+    Prior to the latest releases of BelleDIRAC, there was a need to append ``sub00, sub01, ...`` to the LPNs provided
+    by the Dataset Searcher, but datablocks are now automatically appended to the dataset LPN when jobs are submitted.
+    You can, if you wish to use only one datablock, append to the end of the dataset LPN the datablock of your
+    choosing, but this is no longer strictly required.
+
+.. note::
+
+    You may hit the 1000 job limit with certain datasets. In those cases, your project should be divided by
+    specifying the datablock(s) during the submission.
 
 Everything clear? Ok, let's submit your first jobs.
 
@@ -342,11 +389,11 @@ let's submit the gbasf2 jobs:
 
 .. code-block:: bash
 
-    gbasf2 -p gb2Tutorial_Bd2JpsiKs -s light-2002-ichep \
+    gbasf2 -p gb2Tutorial_Bd2JpsiKs -s light-2106-rhea \
            -i /belle/MC/release-04-00-03/DB00000757/MC13a/prod00009436/s00/e1003/4S/r00000/uubar/mdst/sub00 \
            ~michmx/public/tutorial2020/Reconstruct_Bd2JpsiKS_template.py
 
-A project summary and a confirmation prompt will be displayed after executing gbasf2
+A project summary and a confirmation prompt will be displayed after excecuting gbasf2
 
 .. code-block:: bash
 
@@ -378,7 +425,7 @@ After verifying that everything is correct, you can confirm the submission.
 .. admonition:: Solution
      :class: toggle solution
 
-     The basf2 light release is ``light-2002-ichep``.
+     The basf2 light release is ``light-2106-rhea``.
 
 
 .. tip::
@@ -388,9 +435,9 @@ After verifying that everything is correct, you can confirm the submission.
 .. admonition:: Key points
     :class: key-points
 
-    * A gbasf2 project can be submitted **per datablock**, NOT per dataset.
+    * A gbasf2 project can be submitted **per dataset** or **per datablock**.
 
-        * We will fix this in coming gbasf2 releases.
+      * If submitted **per dataset**, all datablocks within the specified dataset will be resolved.
 
     * Inside the project, gbasf2 will produce file-by-file jobs.
 
@@ -403,12 +450,12 @@ After verifying that everything is correct, you can confirm the submission.
 
      Submit a gbasf2 job with an steering file built by you in previous chapters of the book, for analyzing
      a datablock of MC13a, MC Event Types ``charged`` with energy ``4S`` and without beam background.
-     Use ``light-2008-kronos`` of basf2.
+     Use ``light-2106-rhea`` of basf2.
 
      Remember:
 
      * Prepare your steering file.
-     * Search the input datablock.
+     * Search the input dataset.
      * Submit using gbasf2.
 
 .. admonition:: Hint
@@ -419,38 +466,55 @@ After verifying that everything is correct, you can confirm the submission.
 .. admonition:: Additional hint
      :class: toggle xhint stacked
 
-     The input datablock may be obtained using
+     The input dataset may be obtained using
 
      .. code-block:: bash
 
         gb2_ds_search dataset --data_type mc --campaign MC13a --beam_energy 4S --mc_event charged --bkg_level BGx0
 
-     and adding ``sub00`` at the end.
+     Next, choose one of the datasets listed after executing the command above and use that dataset with the command
+     ``gb2_ds_list <dataset_LPN>`` to see what datablock(s) are available in your chose dataset.
+     Recall that, if you wish to run over one specific datablock from a dataset, you can add ``sub00, sub01, ...``
+     at the end of the dataset LPN. For the datasets listed from search done above, there is only one datablock
+     (``sub00``) available for each dataset. So, for this exercise, we will submit our gbasf2 job using the dataset LPN
+     as our input.
 
 .. admonition:: Solution
      :class: toggle solution
 
      .. code-block:: bash
 
-        gbasf2 -i /belle/MC/release-04-00-03/DB00000757/MC13a/prod00009551/s00/e1003/4S/r00000/charged/mdst/sub00
-        -s light-2008-kronos -p myFirstProject <your steering file>
+        gbasf2 -i /belle/MC/release-04-00-03/DB00000757/MC13a/prod00009551/s00/e1003/4S/r00000/charged/mdst
+        -s light-2106-rhea -p myFirstProject <your steering file>
 
 
 Submit jobs with multiple LFNs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you want to submit a project with several datablocks, prepare a list of LFNs on a file and provide it to gbasf2 using
-``--input_dslist``.
+As we have already stated, with the newest releases of BelleDIRAC, there is no longer a need to append the datablock
+``(sub00, sub01, ...)`` to the end of the dataset LPN. But, with certain datasets, you may hit the 1000 job limit.
+In those instances, you should specify a datablock (or, datablocks). If you want (or need) to submit a project
+with several datablocks, you can prepare a list of LFNs on a file and provide it to gbasf2 using ``--input_dslist``.
 
 .. tip::
 
-    A quick way of appending ``sub00`` to a list of LFNs obtained from the Dataset Searcher is using ``sed``:
+    If necessary for the dataset you are using, a quick way of appending ``/sub00`` to a list of LFNs obtained from the
+    Dataset Searcher is using ``sed``:
 
     .. code-block:: bash
 
         sed -i 's/mdst/mdst\/sub00/g' listOfLFNs.list
 
+    .. note::
 
+        In the example above, we are using the ``s/search/replace/g`` syntax of ``sed``. Note that, when applicable,
+        we must escape additional slashes. That is, like in the example above, we want to replace ``mdst`` with
+        ``mdst/sub00``, so to do this we must use ``\`` before ``/sub00``. In addition, we use the flag ``-i`` which
+        allows us to edit files in-place.
+
+.. note::
+
+    For more information on using ``sed``, see the GNU `sed manual <https://www.gnu.org/software/sed/manual/sed.html>`_.
 
 Monitoring jobs
 ---------------
@@ -460,7 +524,7 @@ There are two ways to monitor your jobs on the grid: command-line tools and the 
 Monitoring in the terminal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In with command-line tools, you can use ``gb2_project_summary``
+For the command-line tools, you can use ``gb2_project_summary``
 to have an overview of your project (The flag ``-p`` will specify the project name):
 
 .. code-block:: bash
@@ -477,7 +541,7 @@ to have an overview of your project (The flag ``-p`` will specify the project na
     If no project name is specified, the tool will display information of your projects in the last month.
 
 
-The gb2 tool ``gb2_job_status`` list all the jobs running in a project, including the status and minor status:
+The gb2 tool ``gb2_job_status`` lists all the jobs running in a project, including the status and minor status:
 
 .. code-block:: bash
 
@@ -702,4 +766,4 @@ You can also ask in `questions.belle2.org <https://questions.belle2.org/question
 
 .. topic:: Author of this lesson
 
-    Michel Villanueva
+    Justin Guilliams

@@ -73,7 +73,8 @@ void KlongValidationModule::initialize()
   m_fakeMom_Pass   = new TH1F("Momentum Fake Passed", "Momentum Fake Passed;Momentum;Count", 25, 0, 5);
   m_fakeMom     = new TH1F("Momentum Fake Rate", "Momentum Fake Rate;Momentum;Fake Rate", 25, 0, 5);
 
-  m_time     = new TH1F("KLM Cluster Time", "Cluster Timing;Cluster time;Count", 125, -5, 20);
+//  m_time     = new TH1F("KLM Cluster Time", "Cluster Timing;Cluster time;Count", 125, -5, 20);
+  m_time     = new TH1F("KLM Cluster Time", "Cluster Timing;Cluster time;Count", 1000, -50, 150);
   m_trackSep     = new TH1F("KLM trackSeperation Distance", "KLM trackSeperation Distance;Distance;Count", 100, 0, 4000);
   m_energy     = new TH1F("KLM Energy", "KLM Energy;Energy;count", 25, 0, 5);
   m_nLayer     = new TH1F("KLM N-Layer", "N-layer;N-layer;count", 20, 0, 20);

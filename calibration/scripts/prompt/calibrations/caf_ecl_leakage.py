@@ -10,7 +10,7 @@
 
 """ECL calibration to calculate photon energy leakage corrections."""
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 
 
 # --------------------------------------------------------------
@@ -22,7 +22,7 @@ settings = CalibrationSettings(name="ecl_leakage",
                                input_data_names=["single_gamma_mc"],
                                input_data_filters={
                                    "single_gamma_mc": [
-                                       input_data_filters["Data Tag"]["single_gamma_mc"]
+                                       INPUT_DATA_FILTERS["Data Tag"]["single_gamma_mc"]
                                    ]
                                },
                                depends_on=[],

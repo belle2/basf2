@@ -13,7 +13,7 @@ Airflow script for TOP post-tracking calibration:
    BS13d carrier shifts, module T0 and common T0
 """
 import basf2
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from caf.utils import IoV
 from caf.strategies import SequentialBoundaries
 from top_calibration import BS13d_calibration_cdst
@@ -31,9 +31,9 @@ settings = CalibrationSettings(
     input_data_names=["bhabha_all_calib"],
     input_data_filters={
         "bhabha_all_calib": [
-            input_data_filters["Data Tag"]["bhabha_all_calib"],
-            input_data_filters["Run Type"]["physics"],
-            input_data_filters["Data Quality Tag"]["Good Or Recoverable"]]},
+            INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
+            INPUT_DATA_FILTERS["Run Type"]["physics"],
+            INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"]]},
     depends_on=[top_pretracking],
     expert_config={
         "max_files_per_run": 20,

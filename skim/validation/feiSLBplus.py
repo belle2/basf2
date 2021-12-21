@@ -29,7 +29,7 @@ path = b2.Path()
 skim = feiSLBplus(
     validation=True,
     udstOutput=False,
-    analysis_globaltag=ma.getAnalysisGlobaltag(),
+    analysisGlobaltag=ma.getAnalysisGlobaltag(),
 )
 
 ma.inputMdstList(

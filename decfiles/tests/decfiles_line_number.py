@@ -27,6 +27,8 @@ re_enddecay = re.compile('Enddecay *')
 
 in_decay = False
 decays = []
+particle = ''
+decay_line = 0
 for i in range(len(decfile_lines)):
     if in_decay:
         match = re_enddecay.match(decfile_lines[i])

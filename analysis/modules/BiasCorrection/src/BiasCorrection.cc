@@ -57,7 +57,7 @@ WeightInfo EnergyBiasCorrectionModule::getInfo(const Particle* particle)
     if (!var) {
       B2ERROR("Variable '" << i_variable << "' is not available in Variable::Manager!");
     }
-    values.insert(std::make_pair(i_variable, var->function(particle)));
+    values.insert(std::make_pair(i_variable, std::get<double>(var->function(particle))));
   }
 
   return (*m_ParticleWeightingLookUpTable.get())->getInfo(values);
@@ -123,7 +123,7 @@ void EnergyBiasCorrectionModule::setEnergyScalingFactor(Particle* particle)
     //particle is photon reconstructed from ECL cluster
     WeightInfo info = getInfo(particle);
     for (const auto& entry : info) {
-      particle->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
+      particle->writeExtraInfo(m_tableName + "_" + entry.first, entry.second);
     }
     particle->setMomentumScalingFactor(particle->getExtraInfo(m_tableName + "_Weight"));
     particle->updateJacobiMatrix();

@@ -125,12 +125,12 @@ double TrackIsoCalculatorModule::get3DDistAtDetSurface(Particle* iParticle, Part
   const auto zbwd = m_detSurfBoundaries[m_detInnerSurface].m_zbwd;
 
   std::string nameExtTheta = "helixExtTheta(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
-  const auto iExtTheta = Variable::Manager::Instance().getVariable(nameExtTheta)->function(iParticle);
-  const auto jExtTheta = Variable::Manager::Instance().getVariable(nameExtTheta)->function(jParticle);
+  const auto iExtTheta = std::get<double>(Variable::Manager::Instance().getVariable(nameExtTheta)->function(iParticle));
+  const auto jExtTheta = std::get<double>(Variable::Manager::Instance().getVariable(nameExtTheta)->function(jParticle));
 
   std::string nameExtPhi = "helixExtPhi(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
-  const auto iExtPhi = Variable::Manager::Instance().getVariable(nameExtPhi)->function(iParticle);
-  const auto jExtPhi = Variable::Manager::Instance().getVariable(nameExtPhi)->function(jParticle);
+  const auto iExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(nameExtPhi)->function(iParticle));
+  const auto jExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(nameExtPhi)->function(jParticle));
 
   // Ok, we know theta and phi.
   // Let's extract (spherical) R by using the transformation:
@@ -178,8 +178,8 @@ double TrackIsoCalculatorModule::get2DRhoPhiDistAsChordLength(Particle* iParticl
   const auto zbwd = m_detSurfBoundaries[m_detInnerSurface].m_zbwd;
 
   std::string nameExtPhi = "helixExtPhi(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
-  const auto iExtPhi = Variable::Manager::Instance().getVariable(nameExtPhi)->function(iParticle);
-  const auto jExtPhi = Variable::Manager::Instance().getVariable(nameExtPhi)->function(jParticle);
+  const auto iExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(nameExtPhi)->function(iParticle));
+  const auto jExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(nameExtPhi)->function(jParticle));
 
   auto diffPhi = jExtPhi - iExtPhi;
   if (std::abs(diffPhi) > M_PI) {

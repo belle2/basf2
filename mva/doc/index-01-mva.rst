@@ -3,6 +3,8 @@
 MVA package
 ===========
 
+.. tip:: For a hands-on introductory lesson with the MVA package, see :ref:`online_book_cs_bdt`.
+
 Overview
 --------
 

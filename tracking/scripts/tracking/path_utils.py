@@ -6,7 +6,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from pybasf2 import B2WARNING
+from pybasf2 import B2WARNING, B2ERROR
 
 from basf2 import register_module
 from ckf.path_functions import add_pxd_ckf, add_cosmics_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, \
@@ -52,9 +52,14 @@ def add_geometry_modules(path, components=None):
                         energyLossBrems=False, noiseBrems=False)
 
 
-def add_hit_preparation_modules(path, components=None, useVTX=False, useVTXClusterShapes=True):
+def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=False, useVTX=False, useVTXClusterShapes=True):
     """
     Helper fucntion to prepare the hit information to be used by tracking.
+
+    :param path: The path to add the tracking reconstruction modules to
+    :param components: the list of geometry components in use or None for all components.
+    :param pxd_filtering_offline: PXD data reduction is performed after CDC and SVD tracking,
+            so PXD reconstruction has to wait until the ROIs are calculated.
     """
 
     # Preparation of the SVD clusters
@@ -62,7 +67,7 @@ def add_hit_preparation_modules(path, components=None, useVTX=False, useVTXClust
         add_svd_reconstruction(path)
 
     # Preparation of the PXD clusters
-    if is_pxd_used(components) and not useVTX:
+    if is_pxd_used(components) and not pxd_filtering_offline and not useVTX:
         add_pxd_reconstruction(path)
 
     # Preparation of the VTX clusters
@@ -220,10 +225,14 @@ def add_cr_track_fit_and_track_creator(path, components=None,
 
 def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                    reco_tracks="RecoTracks", use_second_cdc_hits=False,
-                   split_after_delta_t=-1.0):
+                   split_after_delta_t=-1.0, matching_method="hit",
+                   chi2_cutoffs=[128024, 95, 173, 424, 90, 424],
+                   chi2_linalg=False):
     """
     Match the tracks to the MC truth. The matching works based on
     the output of the TrackFinderMCTruthRecoTracks.
+    Alternativly one can use the Chi2MCTrackMatcher based on chi2 values
+    calculated from the helixparameters of Tracks and MCParticles.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
@@ -232,24 +241,40 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param split_after_delta_t: If positive, split MCRecoTrack into multiple MCRecoTracks if the time
                                 distance between two adjecent SimHits is more than the given value
+    :param matching_method:     hit: uses the hit-matching
+                                chi2: uses the chi2-matching
+    :param chi2_cutoffs:        If chi2 matching method is used, this list defines the individual cut-off values
+                                for the chi2 values. Thereby each charged stable particle gets its cut-off
+                                value. The order of the pdgs is [11,13,211,2212,321,1000010020]. The default
+                                values are determined from a small study investigating chi2 value distribution of
+                                trivial matching pairs.
+    :param chi2_linalg:         If chi2 matching is used, this defines package used to invert the covariance5
+                                matrix. ROOT has been shown to be faster than eigen. If False ROOT is used. If True
+                                eigen is used.
     """
-    path.add_module('TrackFinderMCTruthRecoTracks',
-                    RecoTracksStoreArrayName=mc_reco_tracks,
-                    WhichParticles=[],
-                    UseSecondCDCHits=use_second_cdc_hits,
-                    UsePXDHits=is_pxd_used(components),
-                    UseSVDHits=is_svd_used(components),
-                    UseVTXHits=is_vtx_used(components),
-                    UseCDCHits=is_cdc_used(components),
-                    SplitAfterDeltaT=split_after_delta_t)
+    if (matching_method == "hit"):
+        path.add_module('TrackFinderMCTruthRecoTracks',
+                        RecoTracksStoreArrayName=mc_reco_tracks,
+                        WhichParticles=[],
+                        UseSecondCDCHits=use_second_cdc_hits,
+                        UsePXDHits=is_pxd_used(components),
+                        UseSVDHits=is_svd_used(components),
+                        UseVTXHits=is_vtx_used(components),
+                        UseCDCHits=is_cdc_used(components),
+                        SplitAfterDeltaT=split_after_delta_t)
 
-    path.add_module('MCRecoTracksMatcher',
-                    mcRecoTracksStoreArrayName=mc_reco_tracks,
-                    prRecoTracksStoreArrayName=reco_tracks,
-                    UsePXDHits=is_pxd_used(components),
-                    UseSVDHits=is_svd_used(components),
-                    UseVTXHits=is_vtx_used(components),
-                    UseCDCHits=is_cdc_used(components))
+        path.add_module('MCRecoTracksMatcher',
+                        mcRecoTracksStoreArrayName=mc_reco_tracks,
+                        prRecoTracksStoreArrayName=reco_tracks,
+                        UsePXDHits=is_pxd_used(components),
+                        UseSVDHits=is_svd_used(components),
+                        UseVTXHits=is_vtx_used(components),
+                        UseCDCHits=is_cdc_used(components))
+    elif (matching_method == "chi2"):
+        print("Warning: The Chi2MCTrackMatcherModule is currently not fully developed and tested!")
+        path.add_module('Chi2MCTrackMatcherModule',
+                        CutOffs=chi2_cutoffs,
+                        linalg=chi2_linalg)
 
 
 def add_prune_tracks(path, components=None, reco_tracks="RecoTracks"):
@@ -1425,42 +1450,34 @@ def add_simple_vtx_tracking_reconstruction(path, components=['VTX', 'CDC'], prun
     if 'SetupGenfitExtrapolation' not in path:
         path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
 
-    if mcTrackFinding:
-        add_mc_track_finding(path, components=components, reco_tracks=reco_tracks,
-                             use_second_cdc_hits=use_second_cdc_hits)
-    else:
-        add_vtx_track_finding_vxdtf2(path, reco_tracks="RecoTracksVTX", components=["VTX"])
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracksVTX")
+    add_vtx_track_finding_vxdtf2(path, reco_tracks="RecoTracksVTX", components=["VTX"])
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracksVTX")
 
-        path.add_module("TFCDC_WireHitPreparer",
-                        wirePosition="aligned",
-                        useSecondHits=False,
-                        flightTimeEstimation="outwards")
-        path.add_module("ToCDCCKF",
-                        inputWireHits="CDCWireHitVector",
-                        inputRecoTrackStoreArrayName="RecoTracksVTX",
-                        relatedRecoTrackStoreArrayName="CKFCDCRecoTracks",
-                        relationCheckForDirection="backward",
-                        outputRecoTrackStoreArrayName="CKFCDCRecoTracks",
-                        outputRelationRecoTrackStoreArrayName="RecoTracksVTX",
-                        writeOutDirection="backward",
-                        stateBasicFilterParameters={"maximalHitDistance": 0.2},
-                        stateExtrapolationFilterParameters={"direction": "forward"},
-                        pathFilter="arc_length",
-                        seedComponent="VTX")
+    path.add_module("TFCDC_WireHitPreparer",
+                    wirePosition="aligned",
+                    useSecondHits=False,
+                    flightTimeEstimation="outwards")
+    path.add_module("ToCDCCKF",
+                    inputWireHits="CDCWireHitVector",
+                    inputRecoTrackStoreArrayName="RecoTracksVTX",
+                    relatedRecoTrackStoreArrayName="CKFCDCRecoTracks",
+                    relationCheckForDirection="backward",
+                    outputRecoTrackStoreArrayName="CKFCDCRecoTracks",
+                    outputRelationRecoTrackStoreArrayName="RecoTracksVTX",
+                    writeOutDirection="backward",
+                    stateBasicFilterParameters={"maximalHitDistance": 0.2},
+                    stateExtrapolationFilterParameters={"direction": "forward"},
+                    pathFilter="arc_length",
+                    seedComponent="VTX")
 
-        path.add_module("RelatedTracksCombiner",
-                        CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
-                        VXDRecoTracksStoreArrayName="RecoTracksVTX",
-                        recoTracksStoreArrayName="RecoTracks")
+    path.add_module("RelatedTracksCombiner",
+                    CDCRecoTracksStoreArrayName="CKFCDCRecoTracks",
+                    VXDRecoTracksStoreArrayName="RecoTracksVTX",
+                    recoTracksStoreArrayName="RecoTracks")
 
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName="RecoTracks")
 
-        path.add_module('TrackCreator', recoTrackColName='RecoTracks')
-
-    # Only run the track time extraction on the full reconstruction chain for now. Later, we may
-    # consider to do the CDC-hit based method already during the fast reconstruction stage
-    add_time_extraction(path, components=components)
+    path.add_module('TrackCreator', recoTrackColName='RecoTracks')
 
     add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
                    use_second_cdc_hits=use_second_cdc_hits)

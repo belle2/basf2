@@ -31,9 +31,7 @@ import modularAnalysis as ma
 from stdV0s import stdKshorts
 from stdPi0s import stdPi0s
 from vertex import TagV
-import glob
 import sys
-import numpy as np
 import variables as v
 from root_pandas import read_root
 

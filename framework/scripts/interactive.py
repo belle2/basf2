@@ -25,7 +25,7 @@ See framework/examples/interactive_python.py for an example.
 
 from traitlets.config.loader import Config
 from IPython.terminal.prompts import Prompts, Token
-from IPython import embed
+from IPython import embed  # noqa
 
 
 class Basf2IPythonPrompt(Prompts):

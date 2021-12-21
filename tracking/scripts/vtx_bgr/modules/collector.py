@@ -6,7 +6,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-
+from pybasf2 import B2ERROR
 import basf2 as b2
 import ROOT
 from ROOT import Belle2, TVector3
@@ -61,13 +61,16 @@ ROOT.gInterpreter.Declare("struct TrackData {\
 
 
 class VTXTrackCollector(b2.Module):
-    """Module to collect tracking information per event and write it to an output directory. The set of
-    tracking events will later be used to train tracking algorithms."""
+    """
+    Module to extract input features from RecoTracks and collect them in a root file for training
+    of the VTX background remover expert.
+    """
 
     def __init__(
         self,
         output_file_name="train.root",
         trackCandidatesColumnName="VTXRecoTracks",
+        max_vtx_hits=3
     ):
         """Constructor"""
 
@@ -77,7 +80,9 @@ class VTXTrackCollector(b2.Module):
         self.output_file_name = output_file_name
         #: cached name of the RecoTracks StoreArray
         self.trackCandidatesColumnName = trackCandidatesColumnName
-        #: cached probability to sample background
+        #: Collect training data from tracks with this maximum number of hits
+        self.max_vtx_hits = max_vtx_hits
+        #: cached probability to sample background (value depends on BG level)
         self.bg_sample_fraction = 0.3
 
     def initialize(self):
@@ -114,7 +119,8 @@ class VTXTrackCollector(b2.Module):
             pt = momentum.Perp()
             tan_lambda = np.divide(1.0, math.tan(momentum.Theta()))
 
-            # Track is Signal, if all hits have related simhit (from same MCParticle)
+            # Track is Signal, if all hits have a related VTXTrueHit.
+            # Tracks from background overlay do not have VTXTrueHits.
             isSignal = True
 
             # List of VTXClusters associated with track
@@ -127,16 +133,32 @@ class VTXTrackCollector(b2.Module):
                     hit = hit_info.getRelated("VTXClusters")
                     vtx_hits.append(hit)
 
-                    simHit = hit.getRelated('VTXTrueHits')
-                    if not simHit:
+                    trueHit = hit.getRelated('VTXTrueHits')
+                    if not trueHit:
                         isSignal = False
 
-            self.harvest_track(vtx_hits, isSignal, pt, tan_lambda)
+            if self.select_track(vtx_hits, isSignal):
+                self.harvest_track(vtx_hits, isSignal, pt, tan_lambda)
+
+    def select_track(self, vtx_hits, target):
+        """Selects which tracks should be used to produce training data"""
+
+        if len(vtx_hits) < 3:
+            B2ERROR("VXDTF2 cannot create tracks with less than 3 vertex detector hits. This is funny")
+
+        # Currently we do not want to apply BG remover to tracks with more than 3 hits, we pass them through.
+        # We should not collect training data from them.
+        if len(vtx_hits) > self.max_vtx_hits:
+            return False
+
+        # We have more bg tracks than signal tracks. One option to handle this is to downsample the bg tracks.
+        if target == 0:
+            return np.random.uniform() < self.bg_sample_fraction
+        else:
+            return True
 
     def harvest_track(self, vtx_hits, target, pt, tan_lambda):
-
-        if not len(vtx_hits) == 3:
-            return
+        """Extracks feature variables from track and fills them into TTree"""
 
         # Hit 0
         hit = vtx_hits[0]
@@ -217,13 +239,8 @@ class VTXTrackCollector(b2.Module):
         self.trackData.seed_tanLambda = tan_lambda
         self.trackData.isSignal = target
 
-        if target == 0:
-            if np.random.uniform() < self.bg_sample_fraction:
-                self.rfile.cd()
-                self.tree.Fill()
-        else:
-            self.rfile.cd()
-            self.tree.Fill()
+        self.rfile.cd()
+        self.tree.Fill()
 
     def terminate(self):
         """ Close the output file."""

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -8,6 +7,9 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
+# Doxygen should skip this script
+# @cond
 
 import basf2
 from ROOT import Belle2
@@ -178,3 +180,5 @@ main_path.add_module(printCrystals)
 
 basf2.process(main_path)
 print(basf2.statistics)
+
+# @endcond

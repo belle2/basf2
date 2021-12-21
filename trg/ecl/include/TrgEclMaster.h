@@ -89,7 +89,7 @@ namespace Belle2 {
     /** make Trigger bit except for Low Multiplicity related bit **/
     void makeTriggerBit(int, int, int, int, double, int, int,
                         std::vector<int>, int, int, int, int,
-                        int, int, int, int, int, int, int, int, int);
+                        int, int, int, int, int, int, int, int, int, int);
     /** Set Total Energy*/
     double setTotalEnergy(std::vector<double>);
     //! Get ECL Trigger bit
@@ -130,6 +130,11 @@ namespace Belle2 {
     void setmumuAngle(const std::vector<double>& imumuAngle)
     {
       _mumuAngle = imumuAngle;
+    }
+    //! set 3D Bhabha addtion Angle selection
+    void set3DBhabhaAddAngleCut(const std::vector<double>&  i3DBhabhaAddAngleCut)
+    {
+      m_3DBhabhaAddAngleCut = i3DBhabhaAddAngleCut;
     }
     //! set tau b2b 2 cluster angle cut
     void setTaub2bAngleCut(const std::vector<int>& itaub2bAngleCut)
@@ -247,6 +252,8 @@ namespace Belle2 {
     double _mumuThreshold;
     //! mumu bit  Angle
     std::vector<double> _mumuAngle;
+    // Angle selection of additional Bhabha addition in CM frame
+    std::vector<double> m_3DBhabhaAddAngleCut;
     //! tau b2b 2 cluster angle cut (degree)
     // (dphi low, dphi high, theta_sum low, theta_sum high)
     std::vector<int> m_taub2bAngleCut;

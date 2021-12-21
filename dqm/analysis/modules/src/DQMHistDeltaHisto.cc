@@ -66,20 +66,6 @@ void DQMHistDeltaHistoModule::beginRun()
   }
 }
 
-TCanvas* DQMHistDeltaHistoModule::find_canvas(TString canvas_name)
-{
-  TIter nextkey(gROOT->GetListOfCanvases());
-  TObject* obj = nullptr;
-
-  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
-    if (obj->IsA()->InheritsFrom("TCanvas")) {
-      if (obj->GetName() == canvas_name)
-        return dynamic_cast<TCanvas*>(obj);
-    }
-  }
-  return nullptr;
-}
-
 void DQMHistDeltaHistoModule::clear_node(SSNODE* n)
 {
   delete n->histo;

@@ -53,8 +53,8 @@ that is, consult this page again: :ref:`conditionsdb_overview`).
     Simply add this to the top of your steering file:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 15-16
-        :lineno-start: 15
+        :start-at: S10
+        :end-at: E10
 
 Good! Now we have the weights and we have already created the ROE, so we can
 start right away!
@@ -71,14 +71,14 @@ start right away!
     Remember to import the module:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 7
-        :lineno-start: 7
+        :start-at: S23
+        :end-at: E23
 
     and call the function:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 76-77
-        :lineno-start: 76
+        :start-at: S20
+        :end-at: E20
 
 .. admonition:: Exercise
     :class: stacked exercise
@@ -91,8 +91,8 @@ start right away!
     :class: toggle solution
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 104
-        :lineno-start: 104
+        :start-at: S43
+        :end-at: E43
 
 .. admonition:: Exercise
     :class: stacked exercise

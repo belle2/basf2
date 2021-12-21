@@ -17,7 +17,6 @@
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
-#include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/MCMatching.h>
 
 #include <memory>
@@ -57,18 +56,12 @@ namespace Belle2 {
              "If true, the charge-conjugated mode will be reconstructed as well", true);
 
     // initializing the rest of private members
-    m_pdgCode   = 0;
-    m_isSelfConjugatedParticle = false;
     m_generator = nullptr;
     m_cut = nullptr;
   }
 
   void ParticleCombinerFromMCModule::initialize()
   {
-    // clear everything
-    m_pdgCode = 0;
-    m_listName = "";
-
     // obtain the input and output particle lists from the decay string
     bool valid = m_decaydescriptor.init(m_decayString);
     if (!valid)
@@ -77,11 +70,7 @@ namespace Belle2 {
     // Mother particle
     const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
 
-    m_pdgCode = mother->getPDGCode();
     m_listName = mother->getFullName();
-
-    m_antiListName = ParticleListName::antiParticleListName(m_listName);
-    m_isSelfConjugatedParticle = (m_listName == m_antiListName);
 
     m_cut = Variable::Cut::compile(m_cutParameter);
 

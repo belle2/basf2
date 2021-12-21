@@ -108,14 +108,20 @@ namespace Belle2 {
       bool isValid() const {return m_valid;}
 
       /**
-       * Switch off delta-ray PDF to speed-up log likelihood calculation
+       * Exclude delta-ray PDF in log likelihood calculation
        */
       void switchOffDeltaRayPDF() const {m_deltaPDFOn = false;}
 
       /**
-       * Switch on delta-ray PDF (back to default)
+       * Include delta-ray PDF in log likelihood calculation (this is default)
        */
       void switchOnDeltaRayPDF() const {m_deltaPDFOn = true;}
+
+      /**
+       * Include or exclude delta-ray PDF in log likelihood calculation
+       * @param deltaPDFOn true = include, false = exclude
+       */
+      void switchDeltaRayPDF(bool deltaPDFOn) const {m_deltaPDFOn = deltaPDFOn;}
 
       /**
        * Returns slot ID
@@ -229,6 +235,20 @@ namespace Belle2 {
        * @return log likelihood
        */
       LogL getLogL(double t0, double minTime, double maxTime, double sigt = 0) const;
+
+      /**
+       * Returns extended log likelihood for background hypothesis using default time window
+       * @return log likelihood
+       */
+      LogL getBackgroundLogL() const {return getBackgroundLogL(m_minTime, m_maxTime);}
+
+      /**
+       * Returns extended log likelihood for background hypothesis
+       * @param minTime time window lower edge
+       * @param maxTime time window upper edge
+       * @return log likelihood
+       */
+      LogL getBackgroundLogL(double minTime, double maxTime) const;
 
       /**
        * Returns extended log likelihoods in pixels for PDF shifted in time.

@@ -53,7 +53,7 @@ def test_expert(working_dir, file_names, identifier, output_variable='networkOut
                 max_events=0):
     main = b2.create_path()
 
-    ma.inputMdstList(environmentType=environmentType, file_names, path=main)
+    ma.inputMdstList(file_names, environmentType=environmentType, path=main)
 
     ma.fillParticleListFromMC('nu_tau:MC', '', path=main)
     ma.reconstructMCDecay('B0:sig -> nu_tau:MC anti-nu_tau:MC', '', writeOut=True, path=main)
@@ -78,7 +78,7 @@ def test_expert(working_dir, file_names, identifier, output_variable='networkOut
 def test_expert_jpsi(working_dir, file_names, prefix, environmentType='default', max_events=0):
     main = b2.create_path()
 
-    ma.inputMdstList(environmentType=environmentType, file_names, path=main)
+    ma.inputMdstList(file_names, environmentType=environmentType, path=main)
 
     ma.fillParticleList('pi+:highPID', 'pionID >= .1', path=main)
     ma.fillParticleList('mu+:highPID', 'muonID >= .1', path=main)

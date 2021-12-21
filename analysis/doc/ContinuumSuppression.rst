@@ -4,9 +4,18 @@ Continuum suppression
 =====================
 
 This page contains instructions on how to use the continuum suppression
-framework, with a focus on recent modifications. For a detailed description of
-the variables, please refer to Chapter 9 (Background suppression for B decays)
-of `The Physics of the B Factories book <https://arxiv.org/abs/1406.6311>`_
+framework, with a focus on recent modifications. 
+
+.. seealso::
+
+  For a detailed description of
+  the variables, please refer to Chapter 9 (Background suppression for B decays)
+  of `The Physics of the B Factories book <https://arxiv.org/abs/1406.6311>`_
+
+.. seealso::
+
+  For a beginner friendly tutorial on continuum suppression, head over to
+  :ref:`onlinebook_cs`.
 
 Example usage
 -------------

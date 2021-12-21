@@ -28,10 +28,10 @@ ma.fillParticleList(
 )
 stdV0s.stdKshorts(path=main)
 
-# apply Bremsstrahlung correction to electrons
+# apply Bremsstrahlung correction to electrons [S10|S20]
 vm.addAlias(
     "goodFWDGamma", "passesCut(clusterReg == 1 and clusterE > 0.075)"
-)
+)  # [E10]
 vm.addAlias(
     "goodBRLGamma", "passesCut(clusterReg == 2 and clusterE > 0.05)"
 )
@@ -40,17 +40,17 @@ vm.addAlias(
 )
 vm.addAlias(
     "goodGamma", "passesCut(goodFWDGamma or goodBRLGamma or goodBWDGamma)"
-)
+)  # [E20]
 ma.fillParticleList("gamma:brems", "goodGamma", path=main)
-ma.correctBrems("e+:corrected", "e+:uncorrected", "gamma:brems", path=main)
-vm.addAlias("isBremsCorrected", "extraInfo(bremsCorrected)")
+ma.correctBrems("e+:corrected", "e+:uncorrected", "gamma:brems", path=main)  # [S30]
+vm.addAlias("isBremsCorrected", "extraInfo(bremsCorrected)")  # [E30]
 
-# combine final state particles to form composite particles
+# combine final state particles to form composite particles [S40]
 ma.reconstructDecay(
     "J/psi:ee -> e+:corrected e-:corrected ?addbrems",
     cut="dM < 0.11",
     path=main,
-)
+)  # [E40]
 
 # combine J/psi and KS candidates to form B0 candidates
 ma.reconstructDecay(
@@ -69,9 +69,9 @@ ecl_based_cuts = "thetaInCDCAcceptance and E > 0.05"
 roe_mask = ("my_mask", track_based_cuts, ecl_based_cuts)
 ma.appendROEMasks("B0", [roe_mask], path=main)
 
-# perform best candidate selection
+# perform best candidate selection [S60]
 b2.set_random_seed("Belle II StarterKit")
-ma.rankByHighest("B0", variable="random", numBest=1, path=main)
+ma.rankByHighest("B0", variable="random", numBest=1, path=main)  # [E60]
 
 # Create list of variables to save into the output file
 b_vars = []
@@ -108,9 +108,9 @@ b_vars += vu.create_aliases_for_selected(
 jpsi_ks_vars = vc.inv_mass + standard_vars
 b_vars += vu.create_aliases_for_selected(jpsi_ks_vars, "B0 -> ^J/psi ^K_S0")
 # Add the J/Psi mass calculated with uncorrected electrons:
-vm.addAlias(
+vm.addAlias(  # [S50]
     "Jpsi_M_uncorrected", "daughter(0, daughterCombination(M,0:0,1:0))"
-)
+)  # [E50]
 b_vars += ["Jpsi_M_uncorrected"]
 # Also add kinematic variables boosted to the center of mass frame (CMS)
 # for all particles

@@ -3,6 +3,8 @@
 MVA package
 ===========
 
+.. tip:: For a hands-on introductory lesson with the MVA package, see :ref:`online_book_cs_bdt`.
+
 Overview
 --------
 
@@ -15,7 +17,7 @@ Main goals
 
 The mva package was introduced to provide:
 
-- Provides tools to integrate mva methods in basf2
+- Tools to integrate mva methods in basf2
 - Collection of examples for basic and advanced mva usages
 - Backend independent evaluation and validation tools
 
@@ -55,25 +57,26 @@ The mva package provides a basic interface in bash, C++ and python consisting of
 Fitting and Inference
 """""""""""""""""""""
 
+- basf2_mva_merge_mc
 - basf2_mva_teacher
 - basf2_mva_expert
 
 Condition database
-"""""""""""""""""""""
+""""""""""""""""""
 
 - basf2_mva_upload
 - basf2_mva_download
 - basf2_mva_available
 
 Evaluation
-"""""""""""""""""""""
+""""""""""
 
 - basf2_mva_evaluate.py
 - basf2_mva_info
 - basf2_mva_extract
 
 Supported frameworks/backends
--------------------------------
+-----------------------------
 
 FastBDT
 ^^^^^^^
@@ -88,29 +91,29 @@ TMVA
 is part of the ROOT framework and provides a multitude of different methods including BDTs, NeuralNetworks, PDF estimators, ... Classification and Regression is supported.
 Advanced feature preprocessing like Decorrelation, PCA, Gaussianisation, ... are available.
 Each method provides a lot of configuration options.
-In my experience the methods are rather slow and there are bugs and pitfalls (e.g. TMVA crashes in case it encounters NaNs, has too few statistics, sometimes with negative weights, and other reasons).
+Often the methods are rather slow and there are bugs and pitfalls (e.g. TMVA crashes in case it encounters NaNs, has too few statistics, sometimes with negative weights, and other reasons).
 
 FANN
 ^^^^
 
 is the fast artificial neural network.
-It is used by Fernando in the Flavour Tagger and by the HLT people.
+It is used in the Flavor Tagger and by the HLT people.
 
 NeuroBayes
 ^^^^^^^^^^
 
 was the default method in Belle I and widely used for a lot of analyses.
 It provides a smart feature preprocessing, converges a lot faster and more robust than other neural network implementations.
-In addition it provides an analysis-pdf output which describes the importance of each feature.
+In addition, it provides an analysis-pdf output which describes the importance of each feature.
 However, NeuroBayes is a commercial product and is no longer supported by the company, only some minimal legacy support is available, no bug fixes, new features, ... Use it for comparison with Belle I results.
 
 Python-based
 ^^^^^^^^^^^^
 
 All frameworks which provide a python interface are supported e.g. XGBoost, SKLearn, Tensorflow, Theano.
-However, these methods are not installed by default, so you can only use them in your local installation by installing the frameworks using pip3.
-It is possible to include some of these methods in the externals i.e. to ship them with basf2, but you will have to fight for this.
-So this options mainly provides a playground to test new technologies e.g. deep-learning frameworks like Tensorflow and Theano.
+However, only TensorFlow and Theano are installed by default, the others you can only use in your local installation by installing them using pip3.
+It is possible to include these other methods in the externals as well i.e. to ship them with basf2, but you will have to give a good justification for this.
+In general, these options mainly provide a playground to test new technologies e.g. deep-learning frameworks like Tensorflow and Theano.
 
 Using the mva package
 ---------------------
@@ -156,8 +159,8 @@ MetaOptions
 Change the type of the training, this is for experts only.
 You can look at the advanced examples to learn more.
 
-Fitting / Howto perform a training
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Fitting / How to perform a training
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can use the MVA package via C++, Python or the command-line.
 All three are nearly identical (they call the same code internally).
@@ -189,14 +192,27 @@ The same thing can be done using the command line via::
                       --method FastBDT
 
 The given root file has to contain the variables and target as branches.
-You can write out such a file using VariablesToNtuple module of the analysis package, or a custom module if you want to train a classifier for an other package than analysis.
+You can write out such a file using VariablesToNtuple module of the analysis package, or a custom module if you want to train a classifier for another package than analysis.
 Multiple weightfiles and wildcard expansion like it is done by the RootInput module is supported.
 Look at the examples in mva/examples to learn more.
 
 You can create the necessary data files to execute the examples (if you have some current MC files available) using ``mva/examples/basics/create_data_sample.py``
 
-Inference / Howto apply a trained mva method onto data
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _basf2_mva_merge_mc:
+
+``basf2_mva_merge_mc``: Combine signal and background MC to a single file or a train and test file
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. argparse::
+    :filename: mva/tools/basf2_mva_merge_mc
+    :func: get_argument_parser
+    :prog: basf2_mva_merge_mc
+    :nodefault:
+    :nogroupsections:
+
+
+Inference / How to apply a trained mva method onto data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Depending on your use-case there are different possibilities.
 Most often you want to apply the training online (inside basf2) like it is done by the FEI or the FlavourTagger: You can use the MVAExpert module if your training is based on Particle objects of the analysis package:
@@ -208,9 +224,9 @@ Most often you want to apply the training online (inside basf2) like it is done 
                     extraInfoName='Test',
                     identifier='DatabaseIdentifier')
 
-If you use the mva method in another context (like tracking), you have to write your own C++ or Python module to apply the training, because the MVA package cannot know howto extract the necessary features from the basf2 DataStore (in the above case based on Particle objects the VariableManager can be used for this task).
+If you use the mva method in another context (like tracking), you have to write your own C++ or Python module to apply the training, because the MVA package cannot know how to extract the necessary features from the basf2 DataStore (in the above case based on Particle objects the VariableManager can be used for this task).
 
-I recommend looking at the MVAPrototype Module code to learn howto correctly implement the usage of an mva classifier.
+It is recommended to look at the MVAPrototype Module code to learn how to correctly implement the usage of an mva classifier.
 This module can be directly be used as a template for your own classifier.
 Very roughly:
 
@@ -238,16 +254,18 @@ or in bash::
 Evaluation / Validation
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-You can create a zip file with a LaTeX report and evaluation plots using the ``basf2_mva_evaluate.py`` tool::
+You can create a zip file with a LaTeX report and evaluation plots using the ``basf2_mva_evaluate.py`` tool.
 
-    basf2_mva_evaluate.py -id DatabaseIdentifier \
-                          -train train.root \
-                          -data test.root \
-                          -o validation.zip
+.. argparse::
+    :filename: mva/tools/basf2_mva_evaluate.py
+    :func: get_argument_parser
+    :prog: basf2_mva_evaluate
+    :nodefault:
+    :nogroupsections:
 
 
-The LaTeX file can also be compiled directly to PDF by passing the ``-c`` command line argument.                          
-If this fails, you can transfer the ``.zip`` archive to a working LaTeX environment, unpack it there and compile 
+The LaTeX file can be compiled directly to PDF by passing the ``-c`` command line argument.
+If this fails, you can transfer the ``.zip`` archive to a working LaTeX environment, unpack it and compile
 the ``latex.tex`` with ``pdflatex`` there.
 
 Some example plots included in the resulting PDF are:
@@ -295,7 +313,7 @@ There are different sub-directories:
 
 - ``mva/examples/basics`` – basic usage of the mva package: ``basf2_mva_teacher``, ``basf2_mva_expert``, ``basf2_mva_upload``, ``basf2_mva_download``, ...
 - ``mva/examples/advanced`` – advanced usages of mva: hyper-parameter optimization, sPlot, using different classifiers
-- ``mva/examples/python`` – howto use arbitrary mva frameworks with a python interface
+- ``mva/examples/python`` – how to use arbitrary mva frameworks with a python interface
 - ``mva/examples/orthogonal_discriminators`` – create orthongonal discriminators with ugBoost or adversary networks
 - ``mva/examples/<backend>`` – backend specific examples e.g. for tmva and tensorflow
 
@@ -311,11 +329,11 @@ Python-based frameworks
 -----------------------
 
 You can use arbitrary mva frameworks which have a Python interface.
-There is a good description howto do this in ``mva/examples/python/howto_use_arbitrary_methods.py``
+There is a good description how to do this in ``mva/examples/python/how_to_use_arbitrary_methods.py``
 
 In short, there are several hook functions which are called by the 'Python' backend of the mva package.
 There are sensible defaults for these hook functions implemented for many frameworks like tensorflow, theano, sklearn, hep_ml (see ``mva/scripts/basf2_mva_python_interface/``).
-However you can override these hook functions and ultimately have to full control:
+However, you can override these hook functions and ultimately have full control:
 
 During the fitting phase the following happens:
 
@@ -400,7 +418,7 @@ Boosting to uniformity allows to enforce a uniform selection efficiency of the c
 Deep Learning (Neural Networks)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Deep Learning is the current revolution ongoing in the field of machine learning. Everything from self-driving cars, speech recognition and playing Go can be accomplished using Deep Learning. There is a lot of research going on in HEP, howto take advantage of Deep Learning in our analysis. 
+Deep Learning is the current revolution ongoing in the field of machine learning. Everything from self-driving cars, speech recognition and playing Go can be accomplished using Deep Learning. There is a lot of research going on in HEP, how to take advantage of Deep Learning in our analysis. 
 
 Standard textbook
 """""""""""""""""

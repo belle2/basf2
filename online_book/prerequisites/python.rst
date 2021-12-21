@@ -403,7 +403,7 @@ You can load in an example dataframe using the ``read_root`` function from the `
 .. code:: ipython3
   :linenos:
 
-  file_path = "https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"
+  file_path = "https://rebrand.ly/00vvyzg"
   df = root_pandas.read_root(file_path)
 
 This code imports the ``pandas_tutorial_ntuple.root`` root file as a dataframe ``df``. You are welcome to import your own root files, but be aware that the variables and outputs will appear differently to this tutorial.
@@ -412,15 +412,30 @@ This code imports the ``pandas_tutorial_ntuple.root`` root file as a dataframe `
   :class: toggle
 
   ``root_pandas`` needs ROOT to be installed but there is an alternative called
-  `uproot <https://github.com/scikit-hep/uproot>`_ which can load root files into
+  `uproot <https://github.com/scikit-hep/uproot4>`_ which can load root files into
   pandas dataframes without requiring ROOT. This means it's a bit simpler to
   install on your personal machine.
 
-  With ``uproot``, line 2 of the above snippet becomes
+  With ``uproot`` version 4 or above, line 2 of the above snippet becomes
 
   .. code-block::
 
-    df = uproot.open(file_path)["b0phiKs"].pandas.df
+    df = uproot.open(file_path)["b0phiKs"].arrays(library="pd")
+
+  If loading from the remote file path doesn't work, download the file to
+  your machine first (e.g., using ``wget``).
+
+  Here, ``b0phiKs`` is the branch name of the file that contains the data
+  (``root_pandas``) guessed it for us automatically, in ``uproot`` we need to
+  specify it explicitly.
+
+  With ``uproot`` version 3 or below, line 2 of the snippet reads
+
+  .. code-block::
+
+    df = uproot.open(file_path)["b0phiKs"].pandas.df()
+
+  but we definitely recommend you to update to ``uproot4``.
 
 Investigating your DataFrame
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -680,7 +695,7 @@ distributions. This time we use the ``root_pandas`` package to read the data
 
   import root_pandas
 
-  file_path = "https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"
+  file_path = "https://rebrand.ly/00vvyzg"
   df = root_pandas.read_root(file_path).astype(float)
   df.B0_isSignal = df.B0_isSignal.astype(bool)
   df.describe()
@@ -935,7 +950,7 @@ Here I have defined which columns I wish to be included in the following string:
 
   .. code:: ipython3
 
-    files = ["https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"]
+    files = ["https://rebrand.ly/00vvyzg"]
     df_chunk=root_pandas.read_root(files, columns=Y4S_columns, chunksize=100000)
 
 Now the data is loaded as chunks, we "loop" over or run through all the chunks

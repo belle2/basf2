@@ -14,7 +14,7 @@ import tempfile
 import subprocess
 import json
 import basf2
-from basf2.version import version
+from basf2.version import get_version
 
 basf2.set_random_seed("something important")
 
@@ -54,7 +54,7 @@ assert 0 == metadata.getNParents()
 # print (metadata.getUser()) #different env variables, not checked
 assert "something important" == metadata.getRandomSeed()
 
-assert version == metadata.getRelease()
+assert get_version() == metadata.getRelease()
 assert metadata.getSteering().startswith('#!/usr/bin/env python3')
 assert metadata.getSteering().strip().endswith('dummystring')
 assert 10 == metadata.getMcEvents()

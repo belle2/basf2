@@ -94,8 +94,6 @@ class EventDisplayer(basf2.Module):
     def initialize(self):
         """Handle job initialization: fill the mapping database, create histograms, open the event-display file"""
 
-        expRun = 'e{0:02d}r{1}: '.format(int(self.exp), int(self.run))
-
         # Open the output PDF file for event displays
 
         #: TCanvas on which event displays will be drawn
@@ -368,12 +366,12 @@ class EventDisplayer(basf2.Module):
                     n = n >> 1
                     for j in range(0, n):
                         word0 = bufSlot[j * 2]
-                        word1 = bufSlot[j * 2 + 1]
+                        word1 = bufSlot[j * 2 + 1]  # noqa (F841) kept for completeness
                         ctime = word0 & 0xffff
                         channel = (word0 >> 16) & 0x7f
                         axis = (word0 >> 23) & 0x01
                         lane = (word0 >> 24) & 0x1f  # crate's slot number
-                        flag = (word0 >> 30) & 0x03
+                        flag = (word0 >> 30) & 0x03  # noqa (F841) kept for completeness
                         fb = -1
                         sector = -1
                         layer = -1

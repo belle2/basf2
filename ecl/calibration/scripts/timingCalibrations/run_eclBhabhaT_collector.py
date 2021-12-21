@@ -32,7 +32,6 @@
 import basf2 as b2
 from ROOT import Belle2
 import glob
-import sys
 import tracking
 import rawdata
 import reconstruction

@@ -119,6 +119,9 @@ CDCTriggerTSFModule::initialize()
   unsigned axialStereoSuperLayerId = 0;
   unsigned nWires = 0;
   for (unsigned i = 0; i < nLayers; i++) {
+    if (i < cdc.getOffsetOfFirstLayer()) {
+      continue;
+    }
     const unsigned nWiresInLayer = cdc.nWiresInLayer(i);
 
     //...Axial or stereo?...
@@ -127,6 +130,14 @@ CDCTriggerTSFModule::initialize()
     if (axial) ++ia;
     else ++is;
     axialStereoLayerId = (axial) ? ia : is;
+
+    // Add empty TRGCDCLayer in case a superlayer is not present
+    if (superLayers.size() == 0 and cdc.getOffsetOfFirstSuperLayer() != 0) {
+      for (uint superLayerOffset = 0; superLayerOffset < cdc.getOffsetOfFirstSuperLayer(); superLayerOffset++) {
+        superLayers.push_back(vector<TRGCDCLayer*>());
+        superLayerId++;
+      }
+    }
 
     //...Is this in a new super layer?...
     if ((lastNWires != nWiresInLayer) || (lastShifts != nShifts)) {
@@ -148,7 +159,7 @@ CDCTriggerTSFModule::initialize()
 
     //...New layer...
     TRGCDCLayer* layer = new TRGCDCLayer(i,
-                                         superLayerId,
+                                         superLayerId + cdc.getOffsetOfFirstSuperLayer(),
                                          superLayers[superLayerId].size(),
                                          axialStereoLayerId,
                                          axialStereoSuperLayerId,
@@ -215,6 +226,11 @@ CDCTriggerTSFModule::initialize()
   unsigned id = 0;
   unsigned idTS = 0;
   for (unsigned i = 0; i < superLayers.size(); i++) {
+    if (i < cdc.getOffsetOfFirstSuperLayer()) {
+      TRGCDCLayer* emptylayer = new TRGCDCLayer();
+      tsLayers.push_back(emptylayer);
+      continue;
+    }
     unsigned tsType = (i) ? 1 : 0;
 
     //...TS layer... w is a central wire
@@ -522,7 +538,11 @@ CDCTriggerTSFModule::terminate()
 void
 CDCTriggerTSFModule::clear()
 {
+  const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
   for (unsigned isl = 0; isl < superLayers.size(); ++isl) {
+    if (isl < cdc.getOffsetOfFirstSuperLayer()) {
+      continue;
+    }
     for (unsigned il = 0; il < superLayers[isl].size(); ++il) {
       for (unsigned iw = 0; iw < superLayers[isl][il]->nCells(); ++iw) {
         TRGCDCWire& w = (TRGCDCWire&) superLayers[isl][il]->cell(iw);
@@ -535,4 +555,5 @@ CDCTriggerTSFModule::clear()
       s.clear();
     }
   }
+
 }

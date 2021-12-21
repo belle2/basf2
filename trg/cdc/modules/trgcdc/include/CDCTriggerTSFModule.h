@@ -93,7 +93,7 @@ namespace Belle2 {
      *  for the outer super layers */
     std::vector<std::vector<unsigned>> outerTrueLRTable = {};
     //** number of layers in Super layer**/
-    const static int MAX_N_LAYERS = 8;
+    const static int MAX_N_LAYERS = c_maxWireLayersPerSuperLayer;
     /** bad channel mapping */
     bool deadch_map[c_nSuperLayers][MAX_N_LAYERS][c_maxNDriftCells] = {};
 

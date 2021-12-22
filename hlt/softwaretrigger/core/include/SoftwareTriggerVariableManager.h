@@ -6,12 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #pragma once
-
 #include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
-#include <boost/algorithm/string.hpp>
-
 #include <memory>
 #include <variant>
+#include <vector>
 
 
 namespace Belle2 {

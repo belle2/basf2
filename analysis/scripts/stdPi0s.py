@@ -83,9 +83,17 @@ def stdPi0s(listtype="eff60_May2020", path=None, loadPhotonBeamBackgroundMVA=Fal
         stdPi0s('eff50_May2020_nomcmatch', path, loadPhotonBeamBackgroundMVA)
         ma.cutAndCopyList('pi0:eff50_May2020', 'pi0:eff50_May2020_nomcmatch', '', True, path)
         ma.matchMCTruth('pi0:eff50_May2020', path)
-    elif 'eff60_May2020' == listtype:
+    elif 'eff60_May2020_nomcmatch' == listtype:
         stdPhotons('pi0eff60_May2020', path, loadPhotonBeamBackgroundMVA)
-        ma.reconstructDecay('pi0:eff60_May2020 -> gamma:pi0eff60_May2020 gamma:pi0eff60_May2020', '0.03<InvM', 1, True, path)
+        ma.reconstructDecay(
+            'pi0:eff60_May2020_nomcmatch -> gamma:pi0eff60_May2020 gamma:pi0eff60_May2020',
+            '0.03<InvM',
+            1,
+            True,
+            path)
+    elif 'eff60_May2020' == listtype:
+        stdPi0s('eff60_May2020_nomcmatch', path, loadPhotonBeamBackgroundMVA)
+        ma.cutAndCopyList('pi0:eff60_May2020', 'pi0:eff60_May2020_nomcmatch', '', True, path)
         ma.matchMCTruth('pi0:eff60_May2020', path)
 
     # skim list(s)

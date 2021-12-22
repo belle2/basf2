@@ -1,11 +1,23 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 Utility to search for decfiles which include given decay string.
 
-NOTE : Currently this script only works on full releases but not on light releases, since it requires the decfile directory.
+.. note::
+       Currently this script only works on full releases but not on light releases, since it requires the decfile directory.
        Charge conjugate mode cannot be found if it is not explicitly written.
        Sub-decay is not supported.
+
+.. warning::
+       Particle name including a prime (e.g. `eta'`) induces an error and it cannot be found. This is a known issue.
 """
 
 import sys

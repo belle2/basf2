@@ -17,7 +17,7 @@ Utility to search for decfiles which include given decay string.
        Sub-decay is not supported.
 
 .. warning::
-       Particle name including a prime (e.g. `eta'`) induces an error and it cannot be found. This is a known issue.
+       Particle name including a prime (e.g. ``eta'``) induces an error and it cannot be found. This is a known issue.
 """
 
 import sys

@@ -11,7 +11,7 @@ Neutral Hadron Analysis Tool
 
 Vertex Fitting
 ++++++++++++++
- * Fixed a bug in ``fourC`` and ``massfourC`` kfit. The mass of final-state partcile were not fixed in old version.
+ * Fixed a bug in ``fourC`` and ``massfourC`` kfit. The mass of final-state particles were not fixed in old version.
 
 Variables
 +++++++++

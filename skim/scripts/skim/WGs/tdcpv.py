@@ -112,6 +112,7 @@ class TDCPV_qqs(BaseSkim):
         loadStdSkimPi0(path=path)
         loadStdSkimHighEffPi0(path=path)
         stdKshorts(path=path)
+        stdPi0s("eff40_May2020", path=path, loadPhotonBeamBackgroundMVA=False)
 
         loadStdSkimHighEffPhi(path=path)
         loadStdSkimHighEffEta(path=path)

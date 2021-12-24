@@ -24,7 +24,7 @@ namespace Belle2 {
 
   FixMergedObjectsModule::FixMergedObjectsModule() : Module()
   {
-    setDescription("Fix indices of mdst objects (Tracks, V0s, MCParticles) after DataStores were merged using an indepentent path.");
+    setDescription("Fix indices of mdst objects (Tracks, V0s, MCParticles) after DataStores were merged using an independent path.");
 
     setPropertyFlags(c_ParallelProcessingCertified);
   }

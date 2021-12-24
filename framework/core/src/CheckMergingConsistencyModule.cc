@@ -50,7 +50,7 @@ namespace Belle2 {
   void CheckMergingConsistencyModule::event()
   {
     m_mergedEventConsistency.create();
-    m_mergedEventConsistency->setConsistent(false);
+    m_mergedEventConsistency->setConsistent(true);
 
     if (m_option == "charge") {
       if (m_EventExtraInfo_main.isValid() && m_EventExtraInfo_indep.isValid()) {
@@ -58,29 +58,21 @@ namespace Belle2 {
           B2ERROR("No EventExtraInfo 'charge' found.");
           return;
         }
-
         int charge_main = m_EventExtraInfo_main->getExtraInfo("charge");
         int charge_indep = m_EventExtraInfo_indep->getExtraInfo("charge");
         if (m_eventMixing) {
           // charge of both removed tags has to be opposite
-          if (charge_main == -charge_indep) {
-            m_mergedEventConsistency->setConsistent(true);
+          if (charge_main == charge_indep) {
+            m_mergedEventConsistency->setConsistent(false);
           }
         } else {
           // charge of embedded object has to correspond to charge of removed tag
-          if (charge_main == charge_indep) {
-            m_mergedEventConsistency->setConsistent(true);
+          if (charge_main != charge_indep) {
+            m_mergedEventConsistency->setConsistent(false);
           }
         }
-      } else {
-        // if the information is not there, we issued a warning in the initialization that we will just go on
-        m_mergedEventConsistency->setConsistent(true);
       }
-    } else {
-      // default behavior: just set flag to true
-      m_mergedEventConsistency->setConsistent(true);
     }
-
   }
 } // end Belle2 namespace
 

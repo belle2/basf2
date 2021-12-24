@@ -24,7 +24,11 @@ class VTXBgRemover(b2.Module):
     Module to remove background tracks from store array using an MVA classifier.
     """
 
-    def __init__(self, trackCandidatesColumnName="RecoTracks"):
+    def __init__(
+            self,
+            trackCandidatesColumnName="RecoTracks",
+            weightFileIdentifier='vxdtf2_mva_bgr',
+            ):
         """Create a member to weighfiles for classifier from DB"""
         super().__init__()  # don't forget to call parent constructor
 
@@ -32,15 +36,20 @@ class VTXBgRemover(b2.Module):
         self.trackCandidatesColumnName = trackCandidatesColumnName
 
         #: cached name of the database identifier for weightfile
-        self.m_identifier = 'DatabaseIdentifier'
+        self.m_identifier = weightFileIdentifier
 
-        #: cached serialized weightfile representation
-        self.m_weightfile_representation = Belle2.PyDBObj(self.m_identifier)
+        #: cached serialized weightfile representation from condDB
+        self.m_weightfile_representation = None
 
     def initialize(self):
         """
         Initialize the module.
         """
+
+        if self.m_identifier.endswith(".root") or self.m_identifier.endswith(".xml"):
+            self.m_weightfile_representation = None
+        else:
+            self.m_weightfile_representation = Belle2.PyDBObj(self.m_identifier)
 
         Belle2.MVA.AbstractInterface.initSupportedInterfaces()
 
@@ -215,7 +224,6 @@ class VTXBgRemover(b2.Module):
         for trackCand in trackCands:
 
             qiValue = self.analyse(trackCand)
-            print('Calling analyze gives QI=', qiValue)
 
             # Override QualityIndicator with qiValue for later use
             trackCand.setQualityIndicator(qiValue)

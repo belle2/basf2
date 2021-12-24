@@ -2,6 +2,8 @@
 basf2_mva_evaluate.py  -id weightfile.root \
                     -train train.root \
                     -data test.root \
+                    -c \
+                    --outputfile output.pdf
                     
                     
                     

@@ -17,4 +17,4 @@ conditions.testing_payloads = [
 ]
 
 # Download the weightfile from the database and store it on disk in a root file
-basf2_mva.download('DatabaseIdentifier', 'weightfile.root')
+basf2_mva.download('vxdtf2_mva_bgr', 'weightfile.root')

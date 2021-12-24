@@ -73,7 +73,7 @@ def main():
         useVTXClusterShapes=True
     )
 
-    trackCandidatesColumnName = "VTXRecoTracks"
+    trackCandidatesColumnName = "RecoTracks"
 
     add_vtx_track_finding_vxdtf2(
         path, components=["VTX"],
@@ -85,7 +85,7 @@ def main():
     # Data collection for training
     add_vtx_bg_collector(
         path,
-        output_file_name="train.root",
+        trainingDataOutputName="train.root",
         trackCandidatesColumnName=trackCandidatesColumnName,
     )
 

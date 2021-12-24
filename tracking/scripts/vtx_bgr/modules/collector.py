@@ -68,7 +68,7 @@ class VTXTrackCollector(b2.Module):
 
     def __init__(
         self,
-        output_file_name="train.root",
+        trainingDataOutputName="train.root",
         trackCandidatesColumnName="VTXRecoTracks",
         max_vtx_hits=3
     ):
@@ -77,7 +77,7 @@ class VTXTrackCollector(b2.Module):
         super(VTXTrackCollector, self).__init__()
 
         #: cached value of the output file
-        self.output_file_name = output_file_name
+        self.output_file_name = trainingDataOutputName
         #: cached name of the RecoTracks StoreArray
         self.trackCandidatesColumnName = trackCandidatesColumnName
         #: Collect training data from tracks with this maximum number of hits

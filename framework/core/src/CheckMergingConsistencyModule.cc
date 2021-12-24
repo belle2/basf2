@@ -38,8 +38,8 @@ namespace Belle2 {
   void CheckMergingConsistencyModule::initialize()
   {
     m_mergedEventConsistency.registerInDataStore(DataStore::c_DontWriteOut);
-    if (!m_mergedEventExtraInfo_main.isOptional() or !m_mergedEventExtraInfo_indep.isOptional()) {
-      B2WARNING("MergedEventExtraInfo does not exist in both paths. Cannot check events for consistency.");
+    if (!m_EventExtraInfo_main.isOptional() or !m_EventExtraInfo_indep.isOptional()) {
+      B2WARNING("EventExtraInfo does not exist in both paths. Cannot check events for consistency.");
     }
 
     if (!m_option.empty() && m_option != "charge") {
@@ -53,14 +53,14 @@ namespace Belle2 {
     m_mergedEventConsistency->setConsistent(false);
 
     if (m_option == "charge") {
-      if (m_mergedEventExtraInfo_main.isValid() && m_mergedEventExtraInfo_indep.isValid()) {
-        if (!m_mergedEventExtraInfo_main->hasExtraInfo("charge") || !m_mergedEventExtraInfo_indep->hasExtraInfo("charge")) {
-          B2ERROR("No MergedEventExtraInfo 'charge' found.");
+      if (m_EventExtraInfo_main.isValid() && m_EventExtraInfo_indep.isValid()) {
+        if (!m_EventExtraInfo_main->hasExtraInfo("charge") || !m_EventExtraInfo_indep->hasExtraInfo("charge")) {
+          B2ERROR("No EventExtraInfo 'charge' found.");
           return;
         }
 
-        int charge_main = m_mergedEventExtraInfo_main->getExtraInfo("charge");
-        int charge_indep = m_mergedEventExtraInfo_indep->getExtraInfo("charge");
+        int charge_main = m_EventExtraInfo_main->getExtraInfo("charge");
+        int charge_indep = m_EventExtraInfo_indep->getExtraInfo("charge");
         if (m_eventMixing) {
           // charge of both removed tags has to be opposite
           if (charge_main == -charge_indep) {

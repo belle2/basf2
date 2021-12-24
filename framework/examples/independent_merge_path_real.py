@@ -11,8 +11,6 @@
 # @cond
 
 import basf2
-from ROOT import Belle2
-
 
 main = basf2.Path()
 indep = basf2.Path()
@@ -28,17 +26,11 @@ input2.param('inputFileName', '/nfs/dust/belle2/user/glazov/test_embedding/mcsig
 input2.param('isSecondaryInput', True)  # <- set flag for secondary input module
 indep.add_module(input2).set_name("input_indep")
 
-# convert the EventExtraInfo to a framework kind of object (temporary fix?)
-conversion1 = basf2.register_module('EventExtraInfoConverter')
-main.add_module(conversion1).set_name("conversion_main")
-conversion2 = basf2.register_module('EventExtraInfoConverter')
-indep.add_module(conversion2).set_name("conversion_indep")
-
 # merge it!
 # Use merge_back_event=['ALL'] to merge everything
 # or specify explicitly merge_back_event=['EventMetaData', 'ECLClusters', 'Tracks', 'TracksToECLClusters']
 # NOTE: StoreArrays have to be merged before their Relations (and 'EventMetaData' is strictly required!)
-# NOTE: Also merge 'MergedEventExtraInfo' if you want to do a consistency_check
+# NOTE: Also merge 'EventExtraInfo' if you want to do a consistency_check
 main.add_independent_merge_path(
     indep,
     # <- skip event if charge of ROE/sig (or ROE/ROE) does not match [None or "" if you don't want to do this]
@@ -52,7 +44,7 @@ main.add_module('FixMergedObjects')
 
 # output
 output = basf2.register_module('RootOutput')
-output.param('outputFileName', '/nfs/dust/belle2/user/kurzsimo/testSample/merged_10evts.root')
+output.param('outputFileName', 'merged_10evts.root')
 main.add_module(output)
 
 # progress

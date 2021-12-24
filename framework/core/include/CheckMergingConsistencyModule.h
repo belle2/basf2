@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <framework/dataobjects/MergedEventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/dataobjects/MergedEventConsistency.h>
 
 #include <framework/core/Module.h>
@@ -50,11 +50,11 @@ namespace Belle2 {
     /** object that stores whether events are consistent */
     StoreObjPtr<MergedEventConsistency> m_mergedEventConsistency;
 
-    /** MergedEventExtraInfo from main path */
-    StoreObjPtr<MergedEventExtraInfo> m_mergedEventExtraInfo_main = StoreObjPtr<MergedEventExtraInfo>("MergedEventExtraInfo");
-    /** MergedEventExtraInfo from independent path */
-    StoreObjPtr<MergedEventExtraInfo> m_mergedEventExtraInfo_indep =
-      StoreObjPtr<MergedEventExtraInfo>("MergedEventExtraInfo_indepPath");
+    /** EventExtraInfo from main path */
+    StoreObjPtr<EventExtraInfo> m_EventExtraInfo_main = StoreObjPtr<EventExtraInfo>("EventExtraInfo");
+    /** EventExtraInfo from independent path */
+    StoreObjPtr<EventExtraInfo> m_EventExtraInfo_indep =
+      StoreObjPtr<EventExtraInfo>("EventExtraInfo_indepPath");
 
   };
 

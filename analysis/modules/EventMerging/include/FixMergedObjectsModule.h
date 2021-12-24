@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <framework/dataobjects/MergedArrayIndices.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/V0.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -51,7 +51,7 @@ namespace Belle2 {
 
   private:
 
-    StoreObjPtr<MergedArrayIndices> m_mergedArrayIndices; /**< indices where the StoreArrays were merged */
+    StoreObjPtr<EventExtraInfo> m_mergedArrayIndices; /**< indices where the StoreArrays were merged */
     StoreArray<Track> m_tracks; /**< tracks */
     StoreArray<V0> m_v0s; /**< v0s */
     StoreArray<MCParticle> m_mcParticles; /**< mcparticles */

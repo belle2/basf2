@@ -16,7 +16,7 @@
 #include <framework/datastore/RelationIndexManager.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/StoreAccessorBase.h>
-#include <framework/dataobjects/MergedArrayIndices.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <TClonesArray.h>
 #include <TClass.h>
@@ -24,6 +24,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <cstdlib>
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -883,7 +884,7 @@ void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id
       if (m_entries[targetidx][c_Event].count("MergedArrayIndices") != 0) {
         B2FATAL("MergedArrayIndices already exists. This should not happen.");
       }
-      m_entries[targetidx][c_Event]["MergedArrayIndices"] = StoreEntry(false, MergedArrayIndices::Class(), "MergedArrayIndices", false);
+      m_entries[targetidx][c_Event]["MergedArrayIndices"] = StoreEntry(false, EventExtraInfo::Class(), "MergedArrayIndices", false);
     }
     for (std::string& entryname : entrylist) {
       //copy only given entries (in c_Event)
@@ -1008,7 +1009,7 @@ void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& 
   }
   StoreEntry& target_arrayIndices = targetMaps[c_Event]["MergedArrayIndices"];
   target_arrayIndices.recreate();
-  MergedArrayIndices* arrayIndices = static_cast<MergedArrayIndices*>(target_arrayIndices.ptr);
+  EventExtraInfo* arrayIndices = static_cast<EventExtraInfo*>(target_arrayIndices.ptr);
 
   // we have to go through the list in this order to make sure StoreArrays are merged before their Relations
   for (std::string nextEntry : entrylist) {
@@ -1033,7 +1034,7 @@ void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& 
         } else {
           // keep the content as it is before merging and indicate this by the index
           if (target.isArray) {
-            arrayIndices->addIndex({target.name, target.getPtrAsArray()->GetEntriesFast()});
+            arrayIndices->addExtraInfo(target.name, target.getPtrAsArray()->GetEntriesFast());
           }
         }
       } else {
@@ -1043,13 +1044,13 @@ void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& 
             target.object = fromEntry.object->Clone();
             target.ptr = target.object;
 
-            arrayIndices->addIndex({target.name, 0});
+            arrayIndices->addExtraInfo(target.name, 0);
           } else {
             if (target.objClass != fromEntry.objClass) {
               B2FATAL("Cannot merge StoreArrays " << target.name << "as they are of different classes.");
             }
 
-            arrayIndices->addIndex({target.name, target.getPtrAsArray()->GetEntriesFast()});
+            arrayIndices->addExtraInfo(target.name, target.getPtrAsArray()->GetEntriesFast());
 
             if (fromEntry.getPtrAsArray()->GetEntriesFast() == 0) {
               continue;
@@ -1085,7 +1086,7 @@ void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& 
               const std::string& toName = fromRelContainer->getToName();
 
               auto* targetRelContainer = static_cast<RelationContainer*>(target.ptr);
-              if (arrayIndices->getIndex(fromName) == -1 || arrayIndices->getIndex(toName) == -1) {
+              if (not arrayIndices->hasExtraInfo(fromName)  || not arrayIndices->hasExtraInfo(toName)) {
                 B2WARNING("Skipping merging of relation " << fromEntry.name
                           << ". The StoreArrays " << fromName << " and " << toName << " have to be merged before.");
                 // clear relation just to make sure nobody actually uses it
@@ -1110,10 +1111,10 @@ void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& 
 
               for (int i = 0; i < fromRelContainer->getEntries(); i++) {
                 const RelationElement& rel = fromRelContainer->getElement(i);
-                unsigned int fromIndex = rel.getFromIndex() + arrayIndices->getIndex(fromName);
+                unsigned int fromIndex = arrayIndices->hasExtraInfo(fromName) ? rel.getFromIndex() + arrayIndices->getExtraInfo(fromName) : -1;
 
                 for (size_t rel_idx = 0; rel_idx < rel.getSize(); rel_idx++) {
-                  unsigned int toIndex = rel.getToIndex(rel_idx) + arrayIndices->getIndex(toName);
+                  unsigned int toIndex = arrayIndices->hasExtraInfo(toName) ? rel.getToIndex(rel_idx) + arrayIndices->getExtraInfo(toName) : -1;
                   float weight = rel.getWeight(rel_idx);
                   new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(fromIndex, toIndex, weight);
                 }

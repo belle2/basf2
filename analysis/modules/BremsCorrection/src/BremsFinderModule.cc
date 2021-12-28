@@ -264,8 +264,8 @@ namespace Belle2 {
         if (! m_addMultiplePhotons) break; //stop after adding the first photon
       }
 
-      //Create the new particle with the 3-momentum calculated before
-      Particle correctedLepton(new4Vec.Vect(), lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
+      //Create the new particle with the 4-momentum calculated before
+      Particle correctedLepton(new4Vec, lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
                                track->getArrayIndex());
 
       //And add the original lepton as its daughter

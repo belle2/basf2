@@ -150,21 +150,6 @@ namespace Belle2 {
              const unsigned mdstIndex);
 
     /**
-     * Constructor for particles based on momentum.
-     * All other private members are set to their default values (0).
-     * @param momentum 3-momentum of particles
-     * @param pdgCode PDG code
-     * @param flavorType flavor type
-     * @param particleType particle source
-     * @param mdstIndex mdst index
-     */
-    Particle(const TVector3& momentum,
-             const int pdgCode,
-             EFlavorType flavorType,
-             const EParticleSourceObject particleType,
-             const unsigned mdstIndex);
-
-    /**
      * Constructor for composite particles.
      * All other private members are set to their default values (0).
      * @param momentum Lorentz vector

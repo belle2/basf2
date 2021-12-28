@@ -54,13 +54,13 @@ void TTDDQMModule::defineHisto()
                              "#delta Trigger Time since previous trigger;#delta t in #mus;Triggers/Time (0.5 #mus bins)", 100000, 0, 50000);
   hTriggersPerBunch = new TH1I("hTTDTriggerBunch", "Triggers per Bunch;Bunch(rel);Triggers per 4 Bunches)", 1280, 0, 1280 * 4);
 
-  hBunchInjHER = new TH1I("hTTDBunchInjHER", "Last Injected Bunch HER;Bunch(rel);Counts per 4 Bunches", 1280, 0, 1280 * 4);
   hBunchInjLER = new TH1I("hTTDBunchInjLER", "Last Injected Bunch LER;Bunch(rel);Counts per 4 Bunches", 1280, 0, 1280 * 4);
+  hBunchInjHER = new TH1I("hTTDBunchInjHER", "Last Injected Bunch HER;Bunch(rel);Counts per 4 Bunches", 1280, 0, 1280 * 4);
 
   hTrigBunchInjLER =  new TH2I("hTTDTrigBunchInjLER",
                                "Correlation between triggered bunch and injected bunch in LER;Injected Bunch(rel);Triggered Bunch(rel)", 256, 0, 1280 * 4, 256, 0,
                                1280 * 4);
-  hTrigBunchInjHER =  new TH2I("hTTDTrigBunchInjHer",
+  hTrigBunchInjHER =  new TH2I("hTTDTrigBunchInjHER",
                                "Correlation between triggered bunch and injected bunch in HER;Injected Bunch(rel);Triggered Bunch(rel)", 256, 0, 1280 * 4, 256, 0,
                                1280 * 4);
 

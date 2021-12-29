@@ -12,10 +12,13 @@ import re
 
 import basf2 as b2
 import modularAnalysis as ma
+from variables import variables
 import pdg
 
 from ROOT import Belle2
 Const = Belle2.Const
+TrainingMode = Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode
+
 
 # define arrays to interpret cut matrix
 _chargednames = ['pi', 'K', 'p', 'e', 'mu']
@@ -153,30 +156,56 @@ def stdPr(listtype=_defaultlist, path=None):
     stdCharged('p', listtype, path)
 
 
-def stdLep(pdgId, listtype, method, classification, path=None):
+def stdLep(
+        pdgId,
+        working_point,
+        method,
+        classification,
+        listname=None,
+        trainingModeMulticlass=TrainingMode.c_Multiclass,
+        trainingModeBinary=TrainingMode.c_Classification,
+        path=None):
     """
-    Function to prepare one of several standardized types of lepton (:math:`e,\\mu`) lists:
+    Function to prepare one of several standardized types of lepton (:math:`e,\\mu`) lists, with the following working points:
 
+    * 'FixedThresh05', PID cut of > 0.5 for each particle in the list.
+    * 'FixedThresh09', PID cut of > 0.9 for each particle in the list.
+    * 'FixedThresh095', PID cut of > 0.95 for each particle in the list.
     * 'UniformEff60' 60% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff70' 70% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff80' 80% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff90' 90% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff95' 95% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
 
-
-    The function will select particles according to the chosen ``listtype``, and decorate each candidate
+    The function will select particles according to the chosen ``working_point``, and decorate each candidate
     with the nominal Data/MC :math:`\\ell` ID efficiency and :math:`\\pi,K` fake rate
     correction factors and their stat, syst uncertainty, reading the info from the Conditions Database.
 
+    .. note::
+        Particles will *not* be selected if they are outside the Data/MC efficiency corrections' phase space coverage
+        for the given working point.
+        In fact, the threshold value for the PID cut in such cases is set to NaN.
+
     Parameters:
         pdgId (int): the lepton pdg code.
-        listtype (str): name of standard list. Choose among the above values.
+        working_point (str): name of the chosen working point that defines the content of the list. Choose among the above values.
         method (str): the PID method: 'likelihood' or 'bdt'.
         classification (str): the type of classifier: 'binary' (one-vs-pion) or 'global' (one-vs-all).
+        listname (Optional[str]): the name of the lepton list.
+                 By default, it is assigned as: '{lepton}-:{method}_{classification}_{working_point}'
+        trainingModeMulticlass (Optional[``Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode``]): enum identifier
+                               of the multi-class (global PID) training mode.
+                               See `modularAnalysis.applyChargedPidMVA` docs for available options.
+        trainingModeBinary (Optional[``Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode``]): enum identifier
+                           of the classification (binary PID) training mode.
+                           See `modularAnalysis.applyChargedPidMVA` docs for available options.
         path (basf2.Path): modules are added to this path.
     """
 
-    std_lepton_list_names = (
+    working_points = (
+        "FixedThresh05",
+        "FixedThresh09",
+        "FixedThresh095",
         "UniformEff60",
         "UniformEff70",
         "UniformEff80",
@@ -191,17 +220,23 @@ def stdLep(pdgId, listtype, method, classification, path=None):
     # Anyway, the particle list will be filled for anti-particles too.
     pdgId = abs(pdgId)
 
-    if listtype not in std_lepton_list_names:
-        b2.B2ERROR("The requested lepton list is not defined. Please refer to the stdLep and stdCharged documentation.")
+    electron = Const.electron.getPDGCode()
+    muon = Const.muon.getPDGCode()
+    pion = Const.pion.getPDGCode()
+
+    if working_point not in working_points:
+        b2.B2ERROR("The requested lepton list working point is not defined. \
+                   Please refer to the stdLep and stdCharged documentation.")
         return
 
-    if pdgId not in (Const.electron.getPDGCode(), Const.muon.getPDGCode()):
+    if pdgId not in (electron, muon):
         b2.B2ERROR(f"{pdgId} is not that of a light charged lepton.")
         return
 
     if method not in available_methods:
         b2.B2ERROR(f"method: {method}. Must be any of: {available_methods}.")
         return
+
     if classification not in available_classificators:
         b2.B2ERROR(f"classification: {classification}. Must be any of: {available_classificators}.")
         return
@@ -209,32 +244,58 @@ def stdLep(pdgId, listtype, method, classification, path=None):
     pid_variables = {
         "likelihood": {
             # TEMP: use 'electronID_noTOP' for electrons to circumvent bug in TOP electron PDFs in release 5.
-            "global": "electronID_noTOP" if pdgId == Const.electron.getPDGCode() else "muonID",
+            "global": {
+                "var": "electronID_noTOP" if pdgId == electron else "muonID",
+                "alias": "electronID_noTOP" if pdgId == electron else "muonID"
+            },
             # TEMP: use 'binaryPID_noTOP' for electrons to circumvent bug in TOP electron PDFs in release 5.
-            "binary": f"binaryPID_noTOP({pdgId}, {Const.pion.getPDGCode()})" if pdgId == Const.electron.getPDGCode() \
-                      else f"binaryPID({pdgId}, {Const.pion.getPDGCode()})"
+            "binary": {
+                "var": f"binaryPID_noTOP({pdgId}, {pion})" if pdgId == electron else f"binaryPID({pdgId}, {pion})",
+                "alias": re.sub(r"\W+", "", f"binaryPID_noTOP_{pdg.to_name(pdgId)}_pi") if pdgId == electron \
+                else re.sub(r"\W+", "", f"binaryPID_{pdg.to_name(pdgId)}_pi")
+            }
         },
         "bdt": {
-            "global": f"pidChargedBDTScore({pdgId}, ALL)",
-            "binary": f"pidPairChargedBDTScore({pdgId}, 211, ALL)"
+            "global": {
+                "var": f"pidChargedBDTScore({pdgId}, ALL)",
+                "alias": re.sub(r"\W+", "", f"pidChargedBDTScore_{pdg.to_name(pdgId)}")
+            },
+            "binary": {
+                "var": f"pidPairChargedBDTScore({pdgId}, {pion}, ALL)",
+                "alias": re.sub(r"\W+", "", f"pidPairChargedBDTScore_{pdg.to_name(pdgId)}_pi")
+            }
         }
     }
 
+    # Create an alias for the variable (as in the VariableManager) to match the naming scheme used in the payloads.
+    pid_alias = pid_variables[method][classification]["alias"]
+    pid_var = pid_variables[method][classification]["var"]
+    if pid_alias != pid_var:
+        variables.addAlias(pid_alias, pid_var)
+
     # Start creating the particle list, w/o any selection.
-    plistname = f"{pdg.to_name(pdgId)}:{listtype}"
+    plistname = f"{pdg.to_name(pdgId)}:{method}_{classification}_{working_point}"
+    if listname is not None:
+        plistname = f"{pdg.to_name(pdgId)}:{listname}"
+
     ma.fillParticleList(plistname, "", path=path)
 
-    # The PID variable name, as it appears in the VariableManager.
-    pid_var = pid_variables[method][classification]
-
-    # Remove non-alphanumeric chars from the variable name, and strip last "_" if present.
-    # This is needed to match the name of the payload in the CDB.
-    pid_var_stripped = re.sub(r"[\W]+", "_", pid_var).rstrip("_")
+    # Here we must run the BDT if requested...
+    if method == "bdt":
+        if classification == "multiclass":
+            ma.applyChargedPidMVA(particleLists=[plistname],
+                                  path=path,
+                                  trainingMode=trainingModeMulticlass)
+        elif classification == "binary":
+            ma.applyChargedPidMVA(particleLists=[plistname],
+                                  path=path,
+                                  binaryHypoPDGCodes=(pdgId, pion),
+                                  trainingMode=trainingModeBinary)
 
     # The names of the payloads w/ efficiency and mis-id corrections.
-    payload_eff = f"ParticleReweighting:{pid_var_stripped}_eff_combination_{listtype}"
-    payload_misid_pi = f"ParticleReweighting:{pid_var_stripped}_misid_pi_combination_{listtype}"
-    payload_misid_K = f"ParticleReweighting:{pid_var_stripped}_misid_K_combination_{listtype}"
+    payload_eff = f"ParticleReweighting:{pid_alias}_eff_combination_{working_point}"
+    payload_misid_pi = f"ParticleReweighting:{pid_alias}_misid_pi_combination_{working_point}"
+    payload_misid_K = f"ParticleReweighting:{pid_alias}_misid_K_combination_{working_point}"
 
     # Configure weighting module(s).
     path.add_module("ParticleWeighting",
@@ -248,8 +309,51 @@ def stdLep(pdgId, listtype, method, classification, path=None):
                     tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{plistname}")
 
     # Apply the PID selection cut, which is read from the efficiency payload.
-    cut = f"{pid_var} > extraInfo({payload_eff}_threshold)"
+    # The '>=' handles extreme cases in which the variable and the threshold value are at a boundary of the PID variable range.
+    cut = f"[{pid_alias} >= extraInfo({payload_eff}_threshold)]"
     ma.applyCuts(plistname, cut, path=path)
+
+    # Define convenience aliases for the nominal weight and up/dn variations.
+    aliases_to_var = {
+        f"weight_{pid_alias}_eff_{working_point}": f"extraInfo({payload_eff}_data_MC_ratio)",
+        f"weight_{pid_alias}_misid_pi_{working_point}": f"extraInfo({payload_misid_pi}_data_MC_ratio)",
+        f"weight_{pid_alias}_misid_K_{working_point}": f"extraInfo({payload_misid_K}_data_MC_ratio)",
+        # These aliases are *relative* variations, so they can be multiplied to the nominal
+        # to get the varied value:
+        #
+        # w_rel_var_up = (1 + w_up/w_nominal)
+        # w_rel_var_dn = (1 - w_dn/w_nominal)
+        #
+        # w_var_up = w_nominal * w_rel_var_up
+        # w_var_dn = w_nominal * w_rel_var_dn
+        f"weight_{pid_alias}_eff_{working_point}_rel_stat_up":
+        f"formula(1+[extraInfo({payload_eff}_data_MC_uncertainty_stat_up)/extraInfo({payload_eff}_data_MC_ratio)])",
+        f"weight_{pid_alias}_eff_{working_point}_rel_stat_dn":
+        f"formula(1-[extraInfo({payload_eff}_data_MC_uncertainty_stat_dn)/extraInfo({payload_eff}_data_MC_ratio)])",
+        f"weight_{pid_alias}_eff_{working_point}_rel_sys_up":
+        f"formula(1+[extraInfo({payload_eff}_data_MC_uncertainty_sys_up)/extraInfo({payload_eff}_data_MC_ratio)])",
+        f"weight_{pid_alias}_eff_{working_point}_rel_sys_dn":
+        f"formula(1-[extraInfo({payload_eff}_data_MC_uncertainty_sys_dn)/extraInfo({payload_eff}_data_MC_ratio)])",
+        f"weight_{pid_alias}_misid_pi_{working_point}_rel_stat_up":
+        f"formula(1+[extraInfo({payload_misid_pi}_data_MC_uncertainty_stat_up)/extraInfo({payload_misid_pi}_data_MC_ratio)])",
+        f"weight_{pid_alias}_misid_pi_{working_point}_rel_stat_dn":
+        f"formula(1-[extraInfo({payload_misid_pi}_data_MC_uncertainty_stat_dn)/extraInfo({payload_misid_pi}_data_MC_ratio)])",
+        f"weight_{pid_alias}_misid_pi_{working_point}_rel_sys_up":
+        f"formula(1+[extraInfo({payload_misid_pi}_data_MC_uncertainty_sys_up)/extraInfo({payload_misid_pi}_data_MC_ratio)])",
+        f"weight_{pid_alias}_misid_pi_{working_point}_rel_sys_dn":
+        f"formula(1-[extraInfo({payload_misid_pi}_data_MC_uncertainty_sys_dn)/extraInfo({payload_misid_pi}_data_MC_ratio)])",
+        f"weight_{pid_alias}_misid_K_{working_point}_rel_stat_up":
+        f"formula(1+[extraInfo({payload_misid_K}_data_MC_uncertainty_stat_up)/extraInfo({payload_misid_K}_data_MC_ratio)])",
+        f"weight_{pid_alias}_misid_K_{working_point}_rel_stat_dn":
+        f"formula(1-[extraInfo({payload_misid_K}_data_MC_uncertainty_stat_dn)/extraInfo({payload_misid_K}_data_MC_ratio)])",
+        f"weight_{pid_alias}_misid_K_{working_point}_rel_sys_up":
+        f"formula(1+[extraInfo({payload_misid_K}_data_MC_uncertainty_sys_up)/extraInfo({payload_misid_K}_data_MC_ratio)])",
+        f"weight_{pid_alias}_misid_K_{working_point}_rel_sys_dn":
+        f"formula(1-[extraInfo({payload_misid_K}_data_MC_uncertainty_sys_dn)/extraInfo({payload_misid_K}_data_MC_ratio)])",
+    }
+
+    for alias, var in aliases_to_var.items():
+        variables.addAlias(alias, var)
 
 
 def stdE(listtype=_defaultlist, method=None, classification=None, path=None):

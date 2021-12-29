@@ -120,11 +120,11 @@ def get_calibrations(input_data, **kwargs):
     Max_events_per_file_for_tz_tw = [max_events_per_file, max_events_per_file_hadron_for_tz_tw, max_events_per_file]
     Max_events_per_file_for_xt_sr = [max_events_per_file, max_events_per_file_hadron_for_xt_sr, max_events_per_file]
 
-    fracion_of_event_for_types = expert_config["fractions_for_each_type"]
+    fraction_of_event_for_types = expert_config["fractions_for_each_type"]
     max_jobs = expert_config["max_job_for_each_type"]
     basf2.B2INFO(f"Number of job for each type are limitted at [di-muon, hadron, cosmic]: {max_jobs}")
-    basf2.B2INFO(f"Fraction for [di-muon, hadron, cosmic]: {fracion_of_event_for_types}")
-    if len(fracion_of_event_for_types) != 3:
+    basf2.B2INFO(f"Fraction for [di-muon, hadron, cosmic]: {fraction_of_event_for_types}")
+    if len(fraction_of_event_for_types) != 3:
         basf2.B2FATAL("fraction of event must be an array with the size of 3, with order [mumu, hadron, cosmic]")
 
     payload_boundaries = []
@@ -135,12 +135,12 @@ def get_calibrations(input_data, **kwargs):
     files_for_tz_tw_dict = {}
 
     # select data file for t0 and tw calibration
-    if fracion_of_event_for_types[1] > 0:
+    if fraction_of_event_for_types[1] > 0:
         basf2.B2INFO("*********************** Select Hadron data for calibration ****************")
-        min_hadron_events_for_tz_tw = fracion_of_event_for_types[1] * min_events_for_tz_tw
-        max_hadron_events_for_tz_tw = fracion_of_event_for_types[1] * max_events_for_tz_tw
-        min_hadron_events_for_xt_sr = fracion_of_event_for_types[1] * min_events_for_xt_sr
-        max_hadron_events_for_xt_sr = fracion_of_event_for_types[1] * max_events_for_xt_sr
+        min_hadron_events_for_tz_tw = fraction_of_event_for_types[1] * min_events_for_tz_tw
+        max_hadron_events_for_tz_tw = fraction_of_event_for_types[1] * max_events_for_tz_tw
+        min_hadron_events_for_xt_sr = fraction_of_event_for_types[1] * min_events_for_xt_sr
+        max_hadron_events_for_xt_sr = fraction_of_event_for_types[1] * max_events_for_xt_sr
 
         file_to_iov_hadron = input_data["hadron_calib"]
         # select data file for tw, t0
@@ -163,12 +163,12 @@ def get_calibrations(input_data, **kwargs):
         files_for_xt_sr_dict["hadron_calib"] = chosen_files_hadron_for_xt_sr
         files_for_tz_tw_dict["hadron_calib"] = chosen_files_hadron_for_tz_tw
 
-    if fracion_of_event_for_types[0] > 0:
+    if fraction_of_event_for_types[0] > 0:
         basf2.B2INFO("***********************Select di-muon data for calibration ***************")
-        min_mumu_events_for_xt_sr = fracion_of_event_for_types[0] * min_events_for_xt_sr
-        max_mumu_events_for_xt_sr = fracion_of_event_for_types[0] * max_events_for_xt_sr
-        min_mumu_events_for_tz_tw = fracion_of_event_for_types[0] * min_events_for_tz_tw
-        max_mumu_events_for_tz_tw = fracion_of_event_for_types[0] * max_events_for_tz_tw
+        min_mumu_events_for_xt_sr = fraction_of_event_for_types[0] * min_events_for_xt_sr
+        max_mumu_events_for_xt_sr = fraction_of_event_for_types[0] * max_events_for_xt_sr
+        min_mumu_events_for_tz_tw = fraction_of_event_for_types[0] * min_events_for_tz_tw
+        max_mumu_events_for_tz_tw = fraction_of_event_for_types[0] * max_events_for_tz_tw
         file_to_iov_mumu = input_data["mumutight_or_highm_calib"]
         basf2.B2INFO("----> For T0 and Time walk correction")
         chosen_files_mumu_for_tz_tw = select_files(list(file_to_iov_mumu.keys()),
@@ -192,12 +192,12 @@ def get_calibrations(input_data, **kwargs):
         files_for_tz_tw_dict["mumutight_or_highm_calib"] = chosen_files_mumu_for_tz_tw
 
         '''    For cosmic data '''
-    if fracion_of_event_for_types[2] > 0:
+    if fraction_of_event_for_types[2] > 0:
         basf2.B2INFO("********************* Select cosmic data for calibration *******************")
-        min_cosmic_events_for_tz_tw = fracion_of_event_for_types[2] * min_events_for_tz_tw
-        max_cosmic_events_for_tz_tw = fracion_of_event_for_types[2] * max_events_for_tz_tw
-        min_cosmic_events_for_xt_sr = fracion_of_event_for_types[2] * min_events_for_xt_sr
-        max_cosmic_events_for_xt_sr = fracion_of_event_for_types[2] * max_events_for_xt_sr
+        min_cosmic_events_for_tz_tw = fraction_of_event_for_types[2] * min_events_for_tz_tw
+        max_cosmic_events_for_tz_tw = fraction_of_event_for_types[2] * max_events_for_tz_tw
+        min_cosmic_events_for_xt_sr = fraction_of_event_for_types[2] * min_events_for_xt_sr
+        max_cosmic_events_for_xt_sr = fraction_of_event_for_types[2] * max_events_for_xt_sr
 
         file_to_iov_cosmic = input_data["cosmic_calib"]
 
@@ -296,6 +296,7 @@ def get_calibrations(input_data, **kwargs):
                                  max_events=max_event,
                                  use_badWires=True if calib_keys[i] == "tz" else False,
                                  collector_granularity=collector_granularity,
+                                 backend_args=expert_config["backend_args"],
                                  dependencies=[cals[i-1]] if i > 1 else None
                                  )
     if payload_boundaries:
@@ -480,7 +481,8 @@ class CDCCalibration(Calibration):
                  dependencies=None,
                  max_events=[20000, 10000, 20000],
                  use_badWires=False,
-                 collector_granularity='All'):
+                 collector_granularity='All',
+                 backend_args=None):
         for algo in algorithms:
             algo.setHistFileName(name)
 
@@ -497,17 +499,20 @@ class CDCCalibration(Calibration):
                                         input_files=file_list,
                                         pre_collector_path=pre_collector(max_events=max_events[2],
                                                                          is_cosmic=True,
-                                                                         use_badWires=use_badWires))
+                                                                         use_badWires=use_badWires),
+                                        backend_args=backend_args)
             elif skim_type == "hadron_calib":
                 collection = Collection(collector=collector(granularity=collector_granularity),
                                         input_files=file_list,
                                         pre_collector_path=pre_collector(max_events=max_events[1],
-                                                                         use_badWires=use_badWires))
+                                                                         use_badWires=use_badWires),
+                                        backend_args=backend_args)
             else:
                 collection = Collection(collector=collector(granularity=collector_granularity),
                                         input_files=file_list,
                                         pre_collector_path=pre_collector(max_events=max_events[0],
-                                                                         use_badWires=use_badWires))
+                                                                         use_badWires=use_badWires),
+                                        backend_args=backend_args)
 
             self.add_collection(name=skim_type, collection=collection)
 

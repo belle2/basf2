@@ -17,7 +17,7 @@ import pdg
 
 from ROOT import Belle2
 Const = Belle2.Const
-TrainingMode = Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode
+_TrainingMode = Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode
 
 
 # define arrays to interpret cut matrix
@@ -162,8 +162,8 @@ def stdLep(
         method,
         classification,
         listname=None,
-        trainingModeMulticlass=TrainingMode.c_Multiclass,
-        trainingModeBinary=TrainingMode.c_Classification,
+        trainingModeMulticlass=_TrainingMode.c_Multiclass,
+        trainingModeBinary=_TrainingMode.c_Classification,
         path=None):
     """
     Function to prepare one of several standardized types of lepton (:math:`e,\\mu`) lists, with the following working points:
@@ -216,21 +216,9 @@ def stdLep(
     available_methods = ("likelihood", "bdt")
     available_classificators = ("global", "binary")
 
-    # We stick to positive pdgId by convention.
-    # Anyway, the particle list will be filled for anti-particles too.
-    pdgId = abs(pdgId)
-
-    electron = Const.electron.getPDGCode()
-    muon = Const.muon.getPDGCode()
-    pion = Const.pion.getPDGCode()
-
     if working_point not in working_points:
         b2.B2ERROR("The requested lepton list working point is not defined. \
                    Please refer to the stdLep and stdCharged documentation.")
-        return
-
-    if pdgId not in (electron, muon):
-        b2.B2ERROR(f"{pdgId} is not that of a light charged lepton.")
         return
 
     if method not in available_methods:
@@ -241,28 +229,40 @@ def stdLep(
         b2.B2ERROR(f"classification: {classification}. Must be any of: {available_classificators}.")
         return
 
+    # We stick to positive pdgId by convention.
+    # Anyway, the particle list will be filled for anti-particles too.
+    lepton = abs(pdgId)
+    lepton_name = pdg.to_name(lepton)
+    electron = Const.electron.getPDGCode()
+    muon = Const.muon.getPDGCode()
+    pion = Const.pion.getPDGCode()
+
+    if lepton not in (electron, muon):
+        b2.B2ERROR(f"{pdgId} is not that of a light charged lepton.")
+        return
+
     pid_variables = {
         "likelihood": {
             # TEMP: use 'electronID_noTOP' for electrons to circumvent bug in TOP electron PDFs in release 5.
             "global": {
-                "var": "electronID_noTOP" if pdgId == electron else "muonID",
-                "alias": "electronID_noTOP" if pdgId == electron else "muonID"
+                "var": "electronID_noTOP" if lepton == electron else "muonID",
+                "alias": "electronID_noTOP" if lepton == electron else "muonID"
             },
             # TEMP: use 'binaryPID_noTOP' for electrons to circumvent bug in TOP electron PDFs in release 5.
             "binary": {
-                "var": f"binaryPID_noTOP({pdgId}, {pion})" if pdgId == electron else f"binaryPID({pdgId}, {pion})",
-                "alias": re.sub(r"\W+", "", f"binaryPID_noTOP_{pdg.to_name(pdgId)}_pi") if pdgId == electron \
-                else re.sub(r"\W+", "", f"binaryPID_{pdg.to_name(pdgId)}_pi")
+                "var": f"binaryPID_noTOP({electron}, {pion})" if lepton == electron \
+                else f"binaryPID({muon}, {pion})",
+                "alias": "binaryPID_noTOP_e_pi" if lepton == electron else "binaryPID_mu_pi"
             }
         },
         "bdt": {
             "global": {
-                "var": f"pidChargedBDTScore({pdgId}, ALL)",
-                "alias": re.sub(r"\W+", "", f"pidChargedBDTScore_{pdg.to_name(pdgId)}")
+                "var": f"pidChargedBDTScore({lepton}, ALL)",
+                "alias": re.sub(r"\W+", "", f"pidChargedBDTScore_{lepton_name}")
             },
             "binary": {
-                "var": f"pidPairChargedBDTScore({pdgId}, {pion}, ALL)",
-                "alias": re.sub(r"\W+", "", f"pidPairChargedBDTScore_{pdg.to_name(pdgId)}_pi")
+                "var": f"pidPairChargedBDTScore({lepton}, {pion}, ALL)",
+                "alias": re.sub(r"\W+", "", f"pidPairChargedBDTScore_{lepton_name}_pi")
             }
         }
     }
@@ -274,13 +274,13 @@ def stdLep(
         variables.addAlias(pid_alias, pid_var)
 
     # Start creating the particle list, w/o any selection.
-    plistname = f"{pdg.to_name(pdgId)}:{method}_{classification}_{working_point}"
+    plistname = f"{lepton_name}:{method}_{classification}_{working_point}"
     if listname is not None:
-        plistname = f"{pdg.to_name(pdgId)}:{listname}"
+        plistname = f"{lepton_name}:{listname}"
 
     ma.fillParticleList(plistname, "", path=path)
 
-    # Here we must run the BDT if requested...
+    # Here we must run the BDT if requested.
     if method == "bdt":
         if classification == "multiclass":
             ma.applyChargedPidMVA(particleLists=[plistname],
@@ -289,7 +289,7 @@ def stdLep(
         elif classification == "binary":
             ma.applyChargedPidMVA(particleLists=[plistname],
                                   path=path,
-                                  binaryHypoPDGCodes=(pdgId, pion),
+                                  binaryHypoPDGCodes=(lepton, pion),
                                   trainingMode=trainingModeBinary)
 
     # The names of the payloads w/ efficiency and mis-id corrections.

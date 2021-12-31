@@ -1161,13 +1161,11 @@ namespace Belle2 {
         }
 
         if (index == 0 // Electron
-            && mcPDG == Const::electron.getPDGCode()
-            && mothersPDG[0] == 511)
+            && mcPDG == Const::electron.getPDGCode() && mothersPDG[0] == 511)
         {
           return 1;
         } else if (index == 1 // IntermediateElectron
-                   && mcPDG == Const::electron.getPDGCode() && mothersPDG.size() > 1
-                   && isQQbarMesonInChain == false)
+                   && mcPDG == Const::electron.getPDGCode() && mothersPDG.size() > 1 && isQQbarMesonInChain == false)
         {
           return 1;
         } else if (index == 2 // Muon
@@ -1175,8 +1173,7 @@ namespace Belle2 {
         {
           return 1;
         } else if (index == 3 // IntermediateMuon
-                   && mcPDG == Const::muon.getPDGCode() && mothersPDG.size() > 1
-                   && isQQbarMesonInChain == false)
+                   && mcPDG == Const::muon.getPDGCode() && mothersPDG.size() > 1 && isQQbarMesonInChain == false)
         {
           return 1;
         } else if (index == 4 // KinLepton
@@ -1199,8 +1196,9 @@ namespace Belle2 {
           return 1;
         } else if (index == 8 // FastHadron
                    && (mcPDG == Const::pion.getPDGCode() || mcPDG == Const::kaon.getPDGCode())
-                   && isQQbarMesonInChain == false && (mothersPDG[0] == 511
-                                                       || (mothersPDG.rbegin()[0] == 511 && (isB0DaughterConservingFlavor == true || isHadronSingleTauDaughter == true))))
+                   && isQQbarMesonInChain == false
+                   && (mothersPDG[0] == 511
+                       || (mothersPDG.rbegin()[0] == 511 && (isB0DaughterConservingFlavor == true || isHadronSingleTauDaughter == true))))
         {
           return 1;
         } else if (index == 9 // Lambda
@@ -1219,7 +1217,6 @@ namespace Belle2 {
       if (arguments.size() != 1) {
         B2FATAL("Wrong number of arguments (1 required) for meta function isRightCategory");
       }
-
 
       auto particleName = arguments[0];
 
@@ -1423,7 +1420,8 @@ namespace Belle2 {
         {
           return 1;
         } else if (index == 8 // FastHadron
-                   && qTarget == qMC && (mcPDG == Const::pion.getPDGCode() || mcPDG == Const::kaon.getPDGCode()) && isQQbarMesonInChain == false
+                   && qTarget == qMC && (mcPDG == Const::pion.getPDGCode() || mcPDG == Const::kaon.getPDGCode())
+                   && isQQbarMesonInChain == false
                    && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
                                                 && (isB0DaughterConservingFlavor == true || isHadronSingleTauDaughter == true))))
         {
@@ -1480,11 +1478,16 @@ namespace Belle2 {
 
 
       if (!isAvailable) {
+        string strAvailableForIsRightTrack;
+        for (const auto& name : availableForIsRightTrack)
+          strAvailableForIsRightTrack += name + " ";
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory)
+          strAvailableForIsRightCategory += name + " ";
+
         B2FATAL("hasHighestProbInCat: Not available category" << extraInfoName <<
-                ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda."
-                << endl <<
-                "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
-        return 0;
+                ". The possibilities for isRightTrack() are " << endl << strAvailableForIsRightTrack << " MaximumPstar" << endl <<
+                "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
       }
 
       auto func = [particleListName, extraInfoName](const Particle * particle) -> bool {
@@ -1555,10 +1558,16 @@ namespace Belle2 {
 
 
       if (!isAvailable) {
+        string strAvailableForIsRightTrack;
+        for (const auto& name : availableForIsRightTrack)
+          strAvailableForIsRightTrack += name + " ";
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory)
+          strAvailableForIsRightCategory += name + " ";
+
         B2FATAL("HighestProbInCat: Not available category" << extraInfoName <<
-                ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda."
-                << endl <<
-                "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
+                ". The possibilities for isRightTrack() are " << endl << strAvailableForIsRightTrack << " MaximumPstar" << endl <<
+                "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
       }
 
       auto func = [particleListName, extraInfoName](const Particle*) -> double {
@@ -1624,7 +1633,6 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments (3 required) for meta function QpOf");
       }
 
-
       auto particleListName = arguments[0];
       auto outputExtraInfo = arguments[1];
       auto rankingExtraInfo = arguments[2];
@@ -1634,20 +1642,18 @@ namespace Belle2 {
       unsigned indexOutput  = find(availableExtraInfos.begin(), availableExtraInfos.end(),
                                    outputExtraInfo)  - availableExtraInfos.begin();
 
-      if (indexRanking == availableExtraInfos.size()) {
+      if (indexRanking == availableExtraInfos.size() or indexOutput == availableExtraInfos.size()) {
+        string strAvailableForIsRightTrack;
+        for (const auto& name : availableForIsRightTrack)
+          strAvailableForIsRightTrack += name + " ";
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory)
+          strAvailableForIsRightCategory += name + " ";
+
         B2FATAL("QpOf: Not available category " << rankingExtraInfo <<
-                ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
-                <<
-                ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
+                ". The possibilities for isRightTrack() are " << endl << strAvailableForIsRightTrack << " MaximumPstar" << endl <<
+                "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
       }
-
-      if (indexOutput == availableExtraInfos.size()) {
-        B2FATAL("QpOf: Not available category " << outputExtraInfo <<
-                ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
-                <<
-                ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
-      }
-
 
       auto func = [particleListName, indexOutput, indexRanking](const Particle*) -> double {
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
@@ -1724,19 +1730,19 @@ namespace Belle2 {
                                    outputExtraInfo)  - availableExtraInfos.begin();
 
 
-      if (indexRanking == availableExtraInfos.size()) {
+      if (indexRanking == availableExtraInfos.size() or indexOutput == availableExtraInfos.size()) {
+        string strAvailableForIsRightTrack;
+        for (const auto& name : availableForIsRightTrack)
+          strAvailableForIsRightTrack += name + " ";
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory)
+          strAvailableForIsRightCategory += name + " ";
+
         B2FATAL("weightedQpOf: Not available category " << rankingExtraInfo <<
-                ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
-                <<
-                ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
+                ". The possibilities for isRightTrack() are " << endl << strAvailableForIsRightTrack << " MaximumPstar" << endl <<
+                "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
       }
 
-      if (indexOutput == availableExtraInfos.size()) {
-        B2FATAL("weightedQpOf: Not available category " << outputExtraInfo <<
-                ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
-                <<
-                ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
-      }
 
       auto func = [particleListName, indexOutput, indexRanking, rankingExtraInfo](const Particle*) -> double {
 
@@ -1824,10 +1830,16 @@ namespace Belle2 {
       }
 
       if (indexRanking == -1) {
-        B2FATAL("variableOfTarget: category " << rankingExtraInfo << "not available" <<
-                ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
-                <<
-                ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
+        string strAvailableForIsRightTrack;
+        for (const auto& name : availableForIsRightTrack)
+          strAvailableForIsRightTrack += name + " ";
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory)
+          strAvailableForIsRightCategory += name + " ";
+
+        B2FATAL("variableOfTarget: Not available category " << rankingExtraInfo <<
+                ". The possibilities for isRightTrack() are " << endl << strAvailableForIsRightTrack << " MaximumPstar" << endl <<
+                "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
       }
 
       const Variable::Manager::Var* var = Manager::Instance().getVariable(inputVariable);
@@ -1884,15 +1896,28 @@ namespace Belle2 {
       }
 
       auto categoryName = arguments[0];
-      auto func = [categoryName](const Particle*) -> double {
-        if (!(categoryName == "Electron" || categoryName == "IntermediateElectron" || categoryName == "Muon" ||  categoryName == "IntermediateMuon" || categoryName == "KinLepton" || categoryName == "IntermediateKinLepton" || categoryName == "Kaon"
-        || categoryName == "SlowPion" ||  categoryName == "FastHadron" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
-        {
-          B2FATAL("hasTrueTarget: Not available category" << categoryName <<
-          ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
-          return 0.0;
-        }
 
+      bool isAvailable = false;
+      for (const auto& name : availableForIsRightCategory) {
+        if (categoryName == name) {
+          isAvailable = true;
+          break;
+        }
+      }
+      if (categoryName == "mcAssociated")
+        isAvailable = false;
+
+      if (!isAvailable) {
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory) {
+          if (name == "mcAssociated") continue;
+          strAvailableForIsRightCategory += name + " ";
+        }
+        B2FATAL("hasTrueTarget: Not available category" << categoryName <<
+                ". The possibilities for the category name are " << endl << strAvailableForIsRightCategory);
+      }
+
+      auto func = [categoryName](const Particle*) -> double {
         std::string particleListName;
         std::string trackTargetName = categoryName;
 
@@ -1941,17 +1966,29 @@ namespace Belle2 {
       if (arguments.size() != 1) {
         B2FATAL("Wrong number of arguments (1 required) for meta function isTrueCategory");
       }
-
       auto categoryName = arguments[0];
-      auto func = [categoryName](const Particle*) -> double {
-        if (!(categoryName == "Electron" || categoryName == "IntermediateElectron" || categoryName == "Muon" ||  categoryName == "IntermediateMuon" || categoryName == "KinLepton" || categoryName == "IntermediateKinLepton" || categoryName == "Kaon"
-        || categoryName == "SlowPion" ||  categoryName == "FastHadron" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
-        {
-          B2FATAL("isTrueCategory: Not available category" << categoryName <<
-          ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
-          return 0.0;
-        }
 
+      bool isAvailable = false;
+      for (const auto& name : availableForIsRightCategory) {
+        if (categoryName == name) {
+          isAvailable = true;
+          break;
+        }
+      }
+      if (categoryName == "mcAssociated")
+        isAvailable = false;
+
+      if (!isAvailable) {
+        string strAvailableForIsRightCategory;
+        for (const auto& name : availableForIsRightCategory) {
+          if (name == "mcAssociated") continue;
+          strAvailableForIsRightCategory += name + " ";
+        }
+        B2FATAL("isTrueCategory: Not available category" << categoryName <<
+                ". The possibilities for the category name are " << endl << strAvailableForIsRightCategory);
+      }
+
+      auto func = [categoryName](const Particle*) -> double {
         std::string particleListName;
         std::string trackTargetName = categoryName;
 

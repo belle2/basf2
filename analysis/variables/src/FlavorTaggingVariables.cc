@@ -70,6 +70,33 @@ namespace Belle2 {
       return missMom ;
     }
 
+    Manager::FunctionPtr momentumMissingTagSideNew(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle * particle) -> double {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        TLorentzVector roeCMSVec;
+
+        const auto& roeChargedParticles = roe->getChargedParticles(maskName);
+        for (auto roeChargedParticle : roeChargedParticles)
+        {
+          roeCMSVec += labToCms(roeChargedParticle->get4Vector());
+        }
+        double missMom = -roeCMSVec.P();
+        return missMom ;
+      };
+      return func;
+    }
+
     double cosTPTO(const Particle* part)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
@@ -124,6 +151,78 @@ namespace Belle2 {
       if (pAxis == pAxis) result = abs(cos(pAxis.Angle(thrustO)));
 
       return result;
+    }
+
+    Manager::FunctionPtr cosTPTONew(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle * particle) -> double {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        std::vector<TVector3> p3_cms_roe;
+        static const double P_MAX(3.2);
+
+        // Charged tracks
+        const auto& roeTracks = roe->getChargedParticles(maskName);
+        for (auto& roeChargedParticle : roeTracks)
+        {
+          // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
+          // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
+          TLorentzVector p_cms = labToCms(roeChargedParticle->get4Vector());
+          if (p_cms != p_cms) continue;
+          if (p_cms.Rho() > P_MAX) continue;
+          p3_cms_roe.push_back(p_cms.Vect());
+        }
+
+        // ECLCluster -> Gamma
+        const auto& roePhotons = roe->getPhotons(maskName);
+        for (auto& roePhoton : roePhotons)
+        {
+          if (roePhoton->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
+            TLorentzVector p_lab = roePhoton->get4Vector();
+            if (p_lab != p_lab) continue;
+            // if (p_lab.Rho() < 0.05) continue; // Should not be added without any description.
+            TLorentzVector p_cms = labToCms(p_lab);
+            if (p_cms != p_cms) continue;
+            if (p_cms.Rho() > P_MAX) continue;
+            p3_cms_roe.push_back(p_cms.Vect());
+          }
+        }
+
+        // KLMCluster
+        const auto& roeKlongs = roe->getHadrons(maskName);
+        for (auto& roeKlong : roeKlongs)
+        {
+          if (nKLMClusterTrackMatches(roeKlong) == 0 && !(roeKlong->getKLMCluster()->getAssociatedEclClusterFlag())) {
+            TLorentzVector p_lab = roeKlong->get4Vector();
+            if (p_lab != p_lab) continue;
+            // if (p_lab.Rho() < 0.05) continue; // Should not be added without any description.
+            TLorentzVector p_cms = labToCms(p_lab);
+            if (p_cms != p_cms) continue;
+            if (p_cms.Rho() > P_MAX) continue;
+            p3_cms_roe.push_back(p_cms.Vect());
+          }
+        }
+
+        const TVector3 thrustO  = Thrust::calculateThrust(p3_cms_roe);
+        const TVector3 pAxis = labToCms(particle->get4Vector()).Vect();
+
+        double result = 0 ;
+        if (pAxis == pAxis)
+          result = abs(cos(pAxis.Angle(thrustO))); // abs??
+
+        return result;
+
+      };
+      return func;
     }
 
     int lambdaFlavor(const Particle* particle)
@@ -193,6 +292,60 @@ namespace Belle2 {
 
       return sum;
 
+    }
+
+    Manager::FunctionPtr transverseMomentumOfChargeTracksInRoeNew(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle * particle) -> double {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        double sum = 0.0;
+
+        for (const auto& track : roe->getChargedParticles(maskName))
+        {
+          if (particle->isCopyOf(track, true)) continue;
+          sum += track->getMomentum().Perp();
+        }
+
+        return sum;
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr transverseMomentumSquaredOfChargeTracksInRoeNew(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle * particle) -> double {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        double sum = 0.0;
+
+        for (const auto& track : roe->getChargedParticles(maskName))
+        {
+          if (particle->isCopyOf(track, true)) continue;
+          sum += track->getMomentum().Perp2();
+        }
+
+        return sum;
+      };
+      return func;
     }
 
     int NumberOfKShortsInRoe(const Particle* particle)
@@ -281,6 +434,33 @@ namespace Belle2 {
       return vote > 0;
     }
 
+    Manager::FunctionPtr isMajorityInRestOfEventFromB0New(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle * particle) -> bool {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        int vote = 0;
+        for (auto& track : roe->getChargedParticles(maskName))
+        {
+          const MCParticle* mcParticle = track->getMCParticle();
+          vote += getB0flavourMC(mcParticle);
+        }
+
+        return vote > 0;
+
+      };
+      return func;
+    }
+
     bool isMajorityInRestOfEventFromB0bar(const Particle*)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
@@ -295,10 +475,56 @@ namespace Belle2 {
       return vote < 0;
     }
 
+    Manager::FunctionPtr isMajorityInRestOfEventFromB0barNew(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle * particle) -> bool {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        int vote = 0;
+        for (auto& track : roe->getChargedParticles(maskName))
+        {
+          const MCParticle* mcParticle = track->getMCParticle();
+          vote += getB0flavourMC(mcParticle);
+        }
+
+        return vote < 0;
+
+      };
+      return func;
+    }
+
     bool hasRestOfEventTracks(const Particle* part)
     {
       const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
       return (roe && roe-> getNTracks() > 0);
+    }
+
+    Manager::FunctionPtr hasRestOfEventTracksNew(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle * particle) -> bool {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        return roe->getNTracks(maskName) > 0;
+      };
+      return func;
     }
 
     int isRelatedRestOfEventB0Flavor(const Particle* particle)
@@ -338,6 +564,65 @@ namespace Belle2 {
 
 
       return (BcpFlavor != 0) ? BcpFlavor : BtagFlavor;
+    }
+
+    Manager::FunctionPtr isRelatedRestOfEventB0FlavorNew(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle * particle) -> int {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        const MCParticle* BcpMC = particle->getMCParticle();
+        if (!BcpMC) return 0;
+        if (Variable::isSignal(particle) <= 0) return 0;
+
+        const MCParticle* Y4S = BcpMC->getMother();
+        if (!Y4S) return 0;
+
+        int BtagFlavor = 0;
+        int BcpFlavor = 0;
+
+        for (auto& roeChargedParticle : roe->getChargedParticles(maskName))
+        {
+          const MCParticle* mcParticle = roeChargedParticle->getMCParticle();
+          while (mcParticle) {
+            if (mcParticle->getMother() != Y4S) {
+              mcParticle = mcParticle->getMother();
+              continue;
+            }
+
+            if (mcParticle == BcpMC) { // if mcParticle is associated with CP-side unfortunately
+              if (mcParticle->getPDG() > 0)
+                BcpFlavor = 2;
+              else
+                BcpFlavor = -2;
+            } else if (BtagFlavor == 0) { // only first mcParticle is checked.
+              if (abs(mcParticle->getPDG()) == 511 || abs(mcParticle->getPDG()) == 521) {
+                if (mcParticle->getPDG() > 0)
+                  BtagFlavor = 1;
+                else
+                  BtagFlavor = -1;
+              } else {
+                BtagFlavor = 5;
+              }
+            }
+            break;
+          }
+          if (BcpFlavor != 0 || BtagFlavor == 5) break;
+        }
+
+        return (BcpFlavor != 0) ? BcpFlavor : BtagFlavor;
+      };
+      return func;
+
     }
 
     int isRestOfEventB0Flavor(const Particle*)
@@ -417,6 +702,52 @@ namespace Belle2 {
         return (q_MC > 0);
     }
 
+    Manager::FunctionPtr isRelatedRestOfEventMajorityB0FlavorNew(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+      if (arguments.size() == 0)
+        maskName = RestOfEvent::c_defaultMaskName;
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("At most 1 argument (name of mask) accepted.");
+
+      auto func = [maskName](const Particle * particle) -> int {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid()) return 0;
+
+        int q_MC = 0; //Flavor of B
+
+        if (roe->getNTracks(maskName) > 0)
+        {
+          for (auto& track : roe->getChargedParticles(maskName)) {
+            const MCParticle* mcParticle = track->getMCParticle();
+            q_MC += getB0flavourMC(mcParticle);
+          }
+        } else if (roe->getNECLClusters(maskName) > 0)   // only if there are no tracks
+        {
+          for (auto& cluster : roe->getPhotons(maskName)) {
+            if (cluster->getECLClusterEHypothesisBit() != ECLCluster::EHypothesisBit::c_nPhotons) continue;
+            const MCParticle* mcParticle = cluster->getMCParticle();
+            q_MC += getB0flavourMC(mcParticle);
+          }
+        } else if (roe->getNKLMClusters(maskName) > 0)   // only if there are no tracks nor ecl-clusters
+        {
+          for (auto& klmcluster : roe->getHadrons(maskName)) {
+            const MCParticle* mcParticle = klmcluster->getMCParticle();
+            q_MC += getB0flavourMC(mcParticle);
+          }
+        }
+
+        if (q_MC == 0)
+          return -2;
+        else
+          return int(q_MC > 0);
+
+      };
+      return func;
+    }
+
     int isRestOfEventMajorityB0Flavor(const Particle*)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
@@ -459,80 +790,97 @@ namespace Belle2 {
 
     Manager::FunctionPtr BtagToWBosonVariables(const std::vector<std::string>& arguments)
     {
+
+      std::string requestedVariable;
+      std::string maskName;
       if (arguments.size() == 1) {
-        auto requestedVariable = arguments[0];
-        auto func = [requestedVariable](const Particle * particle) -> double {
-          StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-          if (!roe.isValid()) return 0;
-
-          TLorentzVector momXChargedTracks; //Momentum of charged X tracks in CMS-System
-
-          const auto& roeChargedParticles = roe->getChargedParticles();
-          for (auto& roeChargedParticle : roeChargedParticles)
-          {
-            if (roeChargedParticle->isCopyOf(particle, true)) continue;
-            momXChargedTracks += roeChargedParticle->get4Vector();
-          }
-
-          TLorentzVector momXNeutralClusters = roe->get4VectorNeutralECLClusters(); //Momentum of neutral X clusters in CMS-System
-
-          const auto& klongs = roe->getHadrons();
-          for (auto& klong : klongs)
-          {
-            if (nKLMClusterTrackMatches(klong) == 0 && !(klong->getKLMCluster()->getAssociatedEclClusterFlag())) {
-              momXNeutralClusters += klong->get4Vector();
-            }
-          }
-
-          TLorentzVector momX = PCmsLabTransform::labToCms(momXChargedTracks + momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
-          TLorentzVector momTarget = PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Mu in CMS-System
-          TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
-
-          double output = 0.0;
-          if (requestedVariable == "recoilMass") output = momX.M();
-          else if (requestedVariable == "recoilMassSqrd") output = momX.M2();
-          else if (requestedVariable == "pMissCMS") output = momMiss.Vect().Mag();
-          else if (requestedVariable == "cosThetaMissCMS") output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
-          else if (requestedVariable == "EW90")
-          {
-
-            TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
-            float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
-
-            const auto& photons = roe->getPhotons();
-            for (auto& photon : photons) {
-              if (PCmsLabTransform::labToCms(photon->get4Vector()).Vect().Dot(momW.Vect()) > 0) {
-                E_W_90 += photon->getECLClusterEnergy();
-              }
-            }
-            for (auto& roeChargedParticle : roeChargedParticles) {
-              if (!roeChargedParticle->isCopyOf(particle, true)) {
-                for (const ECLCluster& chargedCluster : roeChargedParticle->getTrack()->getRelationsWith<ECLCluster>()) {
-                  // ignore everything except the nPhotons hypothesis
-                  if (!chargedCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
-                    continue;
-                  float iEnergy = chargedCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
-                  if (iEnergy == iEnergy) {
-                    if (PCmsLabTransform::labToCms(ClusterUtils().Get4MomentumFromCluster(&chargedCluster,
-                                                   ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0)
-                      E_W_90 += iEnergy;
-                  }
-                }
-              }
-            }
-
-            output = E_W_90;
-          } else {
-            B2FATAL("Wrong variable " << requestedVariable <<
-            " requested. The possibilities are recoilMass, recoilMassSqrd, pMissCMS, cosThetaMissCMS or EW90");
-          }
-
-          return output;
-        };
-        return func;
+        requestedVariable = arguments[0];
+        maskName = RestOfEvent::c_defaultMaskName;
+      } else if (arguments.size() == 2) {
+        requestedVariable = arguments[0];
+        maskName = arguments[1];
       } else {
-        B2FATAL("Wrong number of arguments (1 required) for meta function BtagToWBosonVariables");
+        B2FATAL("Number of arguments must be 1 (requatedVariable) or 2 (requestedVariable, maskName).");
       }
+
+      const std::vector<string> availableVarialbes = {"recoilMass",
+                                                      "recoilMassSqrd",
+                                                      "pMissCMS",
+                                                      "cosThetaMissCMS",
+                                                      "EW90"
+                                                     };
+
+      if (std::find(availableVarialbes.begin(), availableVarialbes.end(), requestedVariable) == availableVarialbes.end()) {
+        B2FATAL("Wrong variable " << requestedVariable <<
+                " requested. The possibilities are recoilMass, recoilMassSqrd, pMissCMS, cosThetaMissCMS or EW90");
+      }
+
+      auto func = [requestedVariable, maskName](const Particle * particle) -> double {
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+        if (!roe.isValid())
+          return 0;
+
+        TLorentzVector momXChargedTracks; //Momentum of charged X tracks in lab-System
+        const auto& roeChargedParticles = roe->getChargedParticles(maskName);
+        for (auto& roeChargedParticle : roeChargedParticles)
+        {
+          if (roeChargedParticle->isCopyOf(particle, true)) continue;
+          momXChargedTracks += roeChargedParticle->get4Vector();
+        }
+
+        TLorentzVector momXNeutralClusters = roe->get4VectorNeutralECLClusters(maskName); //Momentum of neutral X clusters in lab-System
+        const auto& klongs = roe->getHadrons(maskName);
+        for (auto& klong : klongs)
+        {
+          if (nKLMClusterTrackMatches(klong) == 0 && !(klong->getKLMCluster()->getAssociatedEclClusterFlag())) {
+            momXNeutralClusters += klong->get4Vector();
+          }
+        }
+
+        TLorentzVector momX = PCmsLabTransform::labToCms(momXChargedTracks + momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
+        TLorentzVector momTarget = PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Mu in CMS-System
+        TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
+
+        double output = 0.0;
+        if (requestedVariable == "recoilMass") output = momX.M();
+        if (requestedVariable == "recoilMassSqrd") output = momX.M2();
+        if (requestedVariable == "pMissCMS") output = momMiss.Vect().Mag();
+        if (requestedVariable == "cosThetaMissCMS") output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
+        if (requestedVariable == "EW90")
+        {
+
+          TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
+          float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
+
+          const auto& photons = roe->getPhotons(maskName);
+          for (auto& photon : photons) {
+            if (PCmsLabTransform::labToCms(photon->get4Vector()).Vect().Dot(momW.Vect()) > 0) {
+              E_W_90 += photon->getECLClusterEnergy();
+            }
+          }
+          for (auto& roeChargedParticle : roeChargedParticles) {
+            if (roeChargedParticle->isCopyOf(particle, true))
+              continue;
+
+            for (const ECLCluster& chargedCluster : roeChargedParticle->getTrack()->getRelationsWith<ECLCluster>()) {
+              // ignore everything except the nPhotons hypothesis
+              if (!chargedCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+                continue;
+              float iEnergy = chargedCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+              if (iEnergy == iEnergy) {
+                if (PCmsLabTransform::labToCms(ClusterUtils().Get4MomentumFromCluster(&chargedCluster,
+                                               ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0)
+                  E_W_90 += iEnergy;
+              }
+            }
+          }
+
+          output = E_W_90;
+        }
+
+        return output;
+      };
+      return func;
     }
 
     Manager::FunctionPtr KaonPionVariables(const std::vector<std::string>& arguments)
@@ -1798,8 +2146,14 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("pMissTag", momentumMissingTagSide,
                       "[Expert] Calculates the missing momentum for a given particle on the tag side.");
+    REGISTER_METAVARIABLE("pMissTag(maskName)", momentumMissingTagSideNew,
+                          "[Expert] Calculates the missing momentum for a given particle on the tag side.",
+                          Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("cosTPTO"  , cosTPTO ,
                       "[Expert] Returns cosine of angle between thrust axis of given particle and thrust axis of ROE.");
+    REGISTER_METAVARIABLE("cosTPTO(maskName)"  , cosTPTONew,
+                          "[Expert] Returns cosine of angle between thrust axis of given particle and thrust axis of ROE.",
+                          Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,
                       "[Expert] Returns 1.0 if particle is ``Lambda0``, -1.0 in case of ``anti-Lambda0``, 0.0 otherwise.");
     REGISTER_VARIABLE("isLambda", isLambda,  "[Expert] Returns 1.0 if particle is truth-matched to ``Lambda0``, 0.0 otherwise.");
@@ -1812,6 +2166,12 @@ namespace Belle2 {
                       "[Expert] Returns ``q*(highest PID_Likelihood for Kaons)``, 0. otherwise.");
     REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe,
                       "[Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.");
+    REGISTER_METAVARIABLE("ptTracksRoe(maskName)", transverseMomentumOfChargeTracksInRoeNew,
+                          "[Exepert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.",
+                          Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("pt2TracksRoe(maskName)", transverseMomentumSquaredOfChargeTracksInRoeNew,
+                          "[Expert] Returns the transverse momentum squared of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.",
+                          Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("NumberOfKShortsInRoe", NumberOfKShortsInRoe,
                       "[Expert] Returns the number of ``K_S0`` in the rest of event. The particle list ``K_S0:inRoe`` has to be filled beforehand.");
 
@@ -1820,10 +2180,19 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("isMajorityInRestOfEventFromB0", isMajorityInRestOfEventFromB0,
                       "[Eventbased][Expert] Checks if the majority of the tracks in the current RestOfEvent are from a ``B0``.");
+    REGISTER_METAVARIABLE("isMajorityInRestOfEventFromB0(maskName)", isMajorityInRestOfEventFromB0New,
+                          "[Eventbased][Expert] Checks if the majority of the tracks in the current RestOfEvent are from a ``B0``.",
+                          Manager::VariableDataType::c_bool);
     REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar,
                       "[Eventbased][Expert] Check if the majority of the tracks in the current RestOfEvent are from a ``anti-B0``.");
+    REGISTER_METAVARIABLE("isMajorityInRestOfEventFromB0bar(maskName)", isMajorityInRestOfEventFromB0barNew,
+                          "[Eventbased][Expert] Check if the majority of the tracks in the current RestOfEvent are from a ``anti-B0``.",
+                          Manager::VariableDataType::c_bool);
     REGISTER_VARIABLE("hasRestOfEventTracks", hasRestOfEventTracks,
                       "[Expert] Returns the amount of tracks in the RestOfEvent related to the given Particle. -2 if the RestOfEvent is empty.");
+    REGISTER_METAVARIABLE("hasRestOfEventTracks(maskName)", hasRestOfEventTracksNew,
+                          "[Expert] Returns the amount of tracks in the RestOfEvent related to the given Particle. -2 if the RestOfEvent is empty.",
+                          Manager::VariableDataType::c_bool);
 
     REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor, R"DOC(
 [Eventbased][Expert] Returns -1 (1) if current RestOfEvent is related to a ``anti-B0`` (``B0``). 
@@ -1836,6 +2205,9 @@ If one particle in the RestOfEvent is found to belong to the reconstructed ``B0`
     REGISTER_VARIABLE("B0mcErrors", B0mcErrors, "[Expert] Returns MC-matching flag, see :b2:var:`mcErrors` for the particle, e.g. ``B0`` .");
     REGISTER_VARIABLE("isRelatedRestOfEventMajorityB0Flavor", isRelatedRestOfEventMajorityB0Flavor,
                       "[Expert] Returns 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a ``anti-B0`` (``B0``).");
+    REGISTER_METAVARIABLE("isRelatedRestOfEventMajorityB0Flavor(maskName)", isRelatedRestOfEventMajorityB0FlavorNew,
+                      "[Expert] Returns 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a ``anti-B0`` (``B0``).",
+                      Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,
                       "[Expert] Returns 0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a ``anti-B0`` (``B0``).");
     REGISTER_VARIABLE("mcFlavorOfOtherB", mcFlavorOfOtherB,  R"DOC(
@@ -1844,11 +2216,11 @@ In other words, this variable checks the generated flavor of the other generated
 )DOC");
 
 
-    REGISTER_METAVARIABLE("BtagToWBosonVariables(requestedVariable)", BtagToWBosonVariables, R"DOC(
+    REGISTER_METAVARIABLE("BtagToWBosonVariables(requestedVariable, maskName)", BtagToWBosonVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables assuming a semileptonic decay with the given particle as target.
 The input values of ``requestedVariable`` can be the following:  recoilMass, pMissCMS, cosThetaMissCMS and EW90.
 )DOC", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables , R"DOC(
+  REGISTER_METAVARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables , R"DOC(
 [Expert] Returns values of FlavorTagging-specific kinematical variables for ``KaonPion`` category.
 The input values of ``requestedVariable`` can be the following:  cosKaonPion, HaveOpositeCharges.
 )DOC", Manager::VariableDataType::c_double);

@@ -55,9 +55,11 @@ void KoralWInputModule::event()
   // Check if KoralW is properly initialized.
   if (not m_initialized)
     B2FATAL("KorlalW is not properly initialized.");
-  // Check if the BeamParameters have changed: if they do, abort the job, otherwise cross section calculation is a nightmare.
-  if (m_beamParams.hasChanged())
+  // Check if the BeamParameters have changed: if they do, abort the job, otherwise cross section calculation is a nightmare,
+  // but be lenient with the first event: BeamParameters may be changed because of some basf2 black magic.
+  if (m_beamParams.hasChanged() and not m_firstEvent)
     B2FATAL("BeamParameters have changed within a job, this is not supported for KoralW.");
+  m_firstEvent = false;
   const MCInitialParticles& initial = m_initial.generate();
 
   // true boost

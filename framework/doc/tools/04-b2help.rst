@@ -27,6 +27,8 @@ Tools which will provide you help
     :nogroupsections:
 
 
+.. _b2help-variables:
+
 ``b2help-variables``: List available variables in the analysis package
 ----------------------------------------------------------------------
 
@@ -34,5 +36,18 @@ Tools which will provide you help
     :filename: analysis/tools/b2help-variables
     :func: get_argument_parser
     :prog: b2help-variables
+    :nodefault:
+    :nogroupsections:
+
+
+.. _b2help-eventtype:
+
+``b2help-eventtype``: List decfiles used in the event generator
+---------------------------------------------------------------
+
+.. argparse::
+    :filename: decfiles/tools/b2help-eventtype
+    :func: get_argument_parser
+    :prog: b2help-eventtype
     :nodefault:
     :nogroupsections:

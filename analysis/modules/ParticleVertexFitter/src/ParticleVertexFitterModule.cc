@@ -71,6 +71,7 @@ namespace Belle2 {
     addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
     addParam("updateDaughters", m_updateDaughters, "true: update the daughters after the vertex fit", false);
     addParam("smearing", m_smearing, "smear IP tube width by given length", 0.002);
+    addParam("recoilMass", m_recoilMass, "recoil invariant mass (GeV)", 0.);
     addParam("massConstraintList", m_massConstraintList,
              "Type::[int]. List of daughter particles to mass constrain with int = pdg code. (only for MassFourCKFit)", {});
     addParam("massConstraintListParticlename", m_massConstraintListParticlename,
@@ -261,12 +262,22 @@ namespace Belle2 {
         }
       }
 
+      // recoil mass C fit
+      if (m_fitType == "recoilmass") {
+        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut") {
+          B2FATAL("ParticleVertexFitter: Invalid options - recoil mass fit using KFit does not work with iptube or ipprofile constraint.");
+        } else {
+          ok = doKRecoilMassFit(mother);
+        }
+      }
+
       // invalid KFit fit type
       if (m_fitType != "vertex"
           && m_fitType != "massvertex"
           && m_fitType != "mass"
           && m_fitType != "fourC"
-          && m_fitType != "massfourC")
+          && m_fitType != "massfourC"
+          && m_fitType != "recoilmass")
         B2FATAL("ParticleVertexFitter: " << m_fitType << " ***invalid fit type for the vertex fitter ");
     }
 
@@ -698,6 +709,35 @@ namespace Belle2 {
     return ok;
   }
 
+  bool ParticleVertexFitterModule::doKRecoilMassFit(Particle* mother)
+  {
+    analysis::RecoilMassKFit kf;
+    kf.setMagneticField(m_Bfield);
+
+    for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
+      const Particle* child = mother->getDaughter(ichild);
+
+      if (child->getPValue() < 0) return false; // error matrix not valid
+
+      kf.addParticle(child);
+    }
+
+    // apply four momentum constraint
+    PCmsLabTransform T;
+    kf.setFourMomentum(T.getBeamFourMomentum());
+
+    // apply recoil mass constraint
+    kf.setRecoilMass(m_recoilMass);
+
+    int err = kf.doFit();
+
+    if (err != 0) return false;
+
+    bool ok = makeKRecoilMassMother(kf, mother);
+
+    return ok;
+  }
+
   bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
                                                      Particle* mother)
   {
@@ -940,6 +980,38 @@ namespace Belle2 {
         allparticles[iDaug]->set4Vector(childMoms);
         allparticles[iDaug]->setVertex(childPoss);
         allparticles[iDaug]->setMomentumVertexErrorMatrix(childErrMatrixs);
+      }
+    }
+
+    return true;
+  }
+
+  bool ParticleVertexFitterModule::makeKRecoilMassMother(analysis::RecoilMassKFit& kf, Particle* mother)
+  {
+    enum analysis::KFitError::ECode fitError;
+    fitError = kf.updateMother(mother);
+    if (fitError != analysis::KFitError::kNoError)
+      return false;
+    mother->addExtraInfo("RecoilMassFitProb", TMath::Prob(kf.getCHIsq(), kf.getNDF()));
+    mother->addExtraInfo("RecoilMassFitChi2", kf.getCHIsq());
+    mother->addExtraInfo("RecoilMassFitNDF", kf.getNDF());
+    if (m_decayString.empty() && m_updateDaughters == true) {
+      // update daughter momenta as well
+      // the order of daughters in the *fitter is the same as in the mother Particle
+
+      std::vector<Particle*> daughters = mother->getDaughters();
+
+      unsigned track_count = kf.getTrackCount();
+      if (daughters.size() != track_count)
+        return false;
+
+      for (unsigned iChild = 0; iChild < track_count; iChild++) {
+        daughters[iChild]->set4Vector(
+          CLHEPToROOT::getTLorentzVector(kf.getTrackMomentum(iChild)));
+        daughters[iChild]->setVertex(
+          CLHEPToROOT::getTVector3(kf.getTrackPosition(iChild)));
+        daughters[iChild]->setMomentumVertexErrorMatrix(
+          CLHEPToROOT::getTMatrixFSym(kf.getTrackError(iChild)));
       }
     }
 

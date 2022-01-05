@@ -6,3 +6,26 @@ Conditions Database
 
 * ``b2conditionsdb-tag-publish`` and ``b2conditionsdb-tag-invalidate`` have been removed. ``b2conditionsdb-tag-state``
   must be used now for publishing or invalidating a globaltag.
+
+GeneralCut rework
++++++++++++++++++
+
+* Expanded the cut functionality by introducing a grammar based parser. 
+
+* ``formula`` keyword is no longer necessary for writing formulas in cuts and metavariable arguments
+
+.. code-block:: python
+
+  # old
+  variables.addAlias('medianDzFromPV', 'extraInfo(medianDZ)')
+  variables.addAlias('dzFromMedianDz', 'formula(dz - medianDzFromPV)')
+  ma.applyCuts('pi+:fromPV', 'abs(dzFromMedianDz) < 0.05', path=main)
+
+  # new, input formula directly as metavariable argument
+  ma.applyCuts('pi+:fromPV', 'abs(dz - extraInfo(medianDZ)) < 0.05', path=main)
+
+  # new, variable alias without formula metavariable 
+  variables.addAlias('dzFromMedianDz', 'dz - extraInfo(medianDZ)')
+  ma.applyCuts('pi+:fromPV', 'abs(dzFromMedianDz) < 0.05', path=main)
+
+More details can be found in the :ref:`cut_strings_selections` section.

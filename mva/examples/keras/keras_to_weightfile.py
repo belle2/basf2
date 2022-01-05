@@ -105,4 +105,4 @@ if __name__ == "__main__":
         # ########################Apply weightfile####################################
         method = basf2_mva_util.Method(general_options.m_identifier)
         p, t = method.apply_expert(general_options.m_datafiles, general_options.m_treename)
-        print('Overtraining AUC: ', basf2_mva_util.calculate_roc_auc(p, t))
+        print('Overtraining AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t))

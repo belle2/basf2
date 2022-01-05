@@ -45,6 +45,8 @@ if __name__ == "__main__":
     ignorevalidationtools = 'validation_tools'
     #: ignore missing include directives
     ignoreincludeproblem = 'Problems with "include" directive path'
+    #: ignore missing track matching link
+    ignoretrackmatching = 'trk_matching'
 
     check_error_free("b2code-sphinx-warnings", "sphinx", None,
                      lambda x:
@@ -57,7 +59,8 @@ if __name__ == "__main__":
                      re.findall(ignoreaddcdstoutput, x) or
                      re.findall(ignorevalidationtools, x) or
                      re.findall(ignoreincludeproblem, x) or
-                     re.findall(ignoreonlinebook, x),
+                     re.findall(ignoreonlinebook, x) or
+                     re.findall(ignoretrackmatching, x),
                      ['--light']
                      )
     if not light_build:

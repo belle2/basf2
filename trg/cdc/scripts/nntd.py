@@ -1,11 +1,6 @@
 import basf2
 from ROOT import Belle2
 import numpy as np
-import glob
-import os
-import sys
-import matplotlib.pyplot as plt
-import matplotlib as mpl
 import pickle
 
 

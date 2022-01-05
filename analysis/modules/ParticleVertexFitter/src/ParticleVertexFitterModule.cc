@@ -1007,9 +1007,9 @@ namespace Belle2 {
 
       for (unsigned iChild = 0; iChild < track_count; iChild++) {
         daughters[iChild]->set4Vector(
-          CLHEPToROOT::getTLorentzVector(kf.getTrackMomentum(iChild)));
+          CLHEPToROOT::getLorentzVector(kf.getTrackMomentum(iChild)));
         daughters[iChild]->setVertex(
-          CLHEPToROOT::getTVector3(kf.getTrackPosition(iChild)));
+          CLHEPToROOT::getXYZVector(kf.getTrackPosition(iChild)));
         daughters[iChild]->setMomentumVertexErrorMatrix(
           CLHEPToROOT::getTMatrixFSym(kf.getTrackError(iChild)));
       }

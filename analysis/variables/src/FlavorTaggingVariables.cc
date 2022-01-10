@@ -113,7 +113,7 @@ namespace Belle2 {
         // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
         TLorentzVector p_cms = labToCms(roeChargedParticle->get4Vector());
         if (p_cms != p_cms) continue;
-        if (p_cms.Rho() > P_MAX) continue;
+        if (p_cms.P() > P_MAX) continue;
         p3_cms_roe.push_back(p_cms.Vect());
       }
 
@@ -123,10 +123,10 @@ namespace Belle2 {
         if (roePhoton->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
           TLorentzVector p_lab = roePhoton->get4Vector();
           if (p_lab != p_lab) continue;
-          if (p_lab.Rho() < 0.05) continue;
+          if (p_lab.P() < 0.05) continue;
           TLorentzVector p_cms = labToCms(p_lab);
           if (p_cms != p_cms) continue;
-          if (p_cms.Rho() > P_MAX) continue;
+          if (p_cms.P() > P_MAX) continue;
           p3_cms_roe.push_back(p_cms.Vect());
         }
       }
@@ -136,10 +136,10 @@ namespace Belle2 {
         if (nKLMClusterTrackMatches(roeKlong) == 0 && !(roeKlong->getKLMCluster()->getAssociatedEclClusterFlag())) {
           TLorentzVector p_lab = roeKlong->get4Vector();
           if (p_lab != p_lab) continue;
-          if (p_lab.Rho() < 0.05) continue;
+          if (p_lab.P() < 0.05) continue;
           TLorentzVector p_cms = labToCms(p_lab);
           if (p_cms != p_cms) continue;
-          if (p_cms.Rho() > P_MAX) continue;
+          if (p_cms.P() > P_MAX) continue;
           p3_cms_roe.push_back(p_cms.Vect());
         }
       }
@@ -178,7 +178,7 @@ namespace Belle2 {
           // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
           TLorentzVector p_cms = labToCms(roeChargedParticle->get4Vector());
           if (p_cms != p_cms) continue;
-          // if (p_cms.Rho() > P_MAX) continue; // Should not be added without any description.
+          // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
           p3_cms_roe.push_back(p_cms.Vect());
         }
 
@@ -189,10 +189,10 @@ namespace Belle2 {
           if (roePhoton->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
             TLorentzVector p_lab = roePhoton->get4Vector();
             if (p_lab != p_lab) continue;
-            // if (p_lab.Rho() < 0.05) continue; // Should not be added without any description.
+            // if (p_lab.P() < 0.05) continue; // Should not be added without any description.
             TLorentzVector p_cms = labToCms(p_lab);
             if (p_cms != p_cms) continue;
-            // if (p_cms.Rho() > P_MAX) continue; // Should not be added without any description.
+            // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
             p3_cms_roe.push_back(p_cms.Vect());
           }
         }
@@ -204,10 +204,10 @@ namespace Belle2 {
           if (nKLMClusterTrackMatches(roeKlong) == 0 && !(roeKlong->getKLMCluster()->getAssociatedEclClusterFlag())) {
             TLorentzVector p_lab = roeKlong->get4Vector();
             if (p_lab != p_lab) continue;
-            // if (p_lab.Rho() < 0.05) continue; // Should not be added without any description.
+            // if (p_lab.P() < 0.05) continue; // Should not be added without any description.
             TLorentzVector p_cms = labToCms(p_lab);
             if (p_cms != p_cms) continue;
-            // if (p_cms.Rho() > P_MAX) continue; // Should not be added without any description.
+            // if (p_cms.P() > P_MAX) continue; // Should not be added without any description.
             p3_cms_roe.push_back(p_cms.Vect());
           }
         }
@@ -313,7 +313,7 @@ namespace Belle2 {
         for (const auto& track : roe->getChargedParticles(maskName))
         {
           if (particle->isCopyOf(track, true)) continue;
-          sum += track->getMomentum().Perp();
+          sum += track->getMomentum().Pt();
         }
 
         return sum;

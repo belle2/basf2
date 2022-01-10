@@ -168,7 +168,7 @@ namespace Belle2 {
         if (!roe.isValid()) return 0;
 
         std::vector<TVector3> p3_cms_roe;
-        static const double P_MAX(3.2);
+        // static const double P_MAX(3.2);
 
         // Charged tracks
         const auto& roeTracks = roe->getChargedParticles(maskName);
@@ -178,7 +178,7 @@ namespace Belle2 {
           // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
           TLorentzVector p_cms = labToCms(roeChargedParticle->get4Vector());
           if (p_cms != p_cms) continue;
-          if (p_cms.Rho() > P_MAX) continue;
+          // if (p_cms.Rho() > P_MAX) continue; // Should not be added without any description.
           p3_cms_roe.push_back(p_cms.Vect());
         }
 
@@ -192,7 +192,7 @@ namespace Belle2 {
             // if (p_lab.Rho() < 0.05) continue; // Should not be added without any description.
             TLorentzVector p_cms = labToCms(p_lab);
             if (p_cms != p_cms) continue;
-            if (p_cms.Rho() > P_MAX) continue;
+            // if (p_cms.Rho() > P_MAX) continue; // Should not be added without any description.
             p3_cms_roe.push_back(p_cms.Vect());
           }
         }
@@ -207,7 +207,7 @@ namespace Belle2 {
             // if (p_lab.Rho() < 0.05) continue; // Should not be added without any description.
             TLorentzVector p_cms = labToCms(p_lab);
             if (p_cms != p_cms) continue;
-            if (p_cms.Rho() > P_MAX) continue;
+            // if (p_cms.Rho() > P_MAX) continue; // Should not be added without any description.
             p3_cms_roe.push_back(p_cms.Vect());
           }
         }

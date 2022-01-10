@@ -30,7 +30,6 @@ namespace Belle2 {
   namespace Variable {
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-    static const int     intNaN = std::numeric_limits<int>::quiet_NaN();
 
 
     double isSignal(const Particle* part)
@@ -495,7 +494,7 @@ namespace Belle2 {
       StoreObjPtr<TauPairDecay> tauDecay;
       if (!tauDecay) {
         B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
-        return intNaN;
+        return 0;
       }
       return tauDecay->getTauPlusIdMode();
     }
@@ -505,7 +504,7 @@ namespace Belle2 {
       StoreObjPtr<TauPairDecay> tauDecay;
       if (!tauDecay) {
         B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
-        return intNaN;
+        return 0;
       }
       return tauDecay->getTauMinusIdMode();
     }
@@ -515,7 +514,7 @@ namespace Belle2 {
       StoreObjPtr<TauPairDecay> tauDecay;
       if (!tauDecay) {
         B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
-        return intNaN;
+        return 0;
       }
       return tauDecay->getTauPlusMcProng();
     }
@@ -525,12 +524,10 @@ namespace Belle2 {
       StoreObjPtr<TauPairDecay> tauDecay;
       if (!tauDecay) {
         B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
-        return intNaN;
+        return 0;
       }
       return tauDecay->getTauMinusMcProng();
     }
-
-
 
     double isReconstructible(const Particle* p)
     {
@@ -625,12 +622,12 @@ namespace Belle2 {
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) {
         B2WARNING("No MCParticle is associated to the particle");
-        return intNaN;
+        return 0;
       }
 
       int nChildren = p->getNDaughters();
       if (arguments[0] >= nChildren) {
-        return intNaN;
+        return 0;
       }
 
       const Particle*   daugP   = p->getDaughter(arguments[0]);
@@ -639,7 +636,7 @@ namespace Belle2 {
         // This is a strange case.
         // The particle, p, has the related MC particle, but i-th daughter does not have the related MC Particle.
         B2WARNING("No MCParticle is associated to the i-th daughter");
-        return intNaN;
+        return 0;
       }
 
       if (nChildren == 1) return 1;
@@ -660,7 +657,7 @@ namespace Belle2 {
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) {
         B2WARNING("No MCParticle is associated to the particle");
-        return intNaN;
+        return 0;
       }
 
       return MCMatching::countMissingParticle(p, mcp, PDGcodes);
@@ -790,6 +787,21 @@ namespace Belle2 {
         return l.first > r.first;
       });
       return mcps.object(weightsAndIndices[0].second)->getPDG();
+    }
+
+    double particleClusterTotalMCMatchWeight(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return realNaN;
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+
+      // if there are no relations to any MCParticles, we return 0!
+      double weightsum = 0;
+      for (unsigned int i = 0; i < mcps.size(); ++i)
+        weightsum += mcps.weight(i);
+
+      return weightsum;
     }
 
     double isBBCrossfeed(const Particle* particle)
@@ -1007,6 +1019,8 @@ namespace Belle2 {
                       "returns the weight of the ECLCluster -> MCParticle relation for the relation with the largest weight.");
     REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode,
                       "returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
+    REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight,
+                      "returns the sum of all weights of the ECLCluster -> MCParticles relations.");
 
   }
 }

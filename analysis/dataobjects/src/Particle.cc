@@ -529,7 +529,7 @@ float Particle::getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaught
 
   // check existence of grand daughter
   if (daughter->getNDaughters() <= iGrandDaughter) {
-    B2ERROR("No grand daughter of daugher 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle"
+    B2ERROR("No grand daughter of daughter 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle"
             << LogVar("name", getName()) << LogVar("iDaughter", iDaughter) << LogVar("iGrandDaughter", iGrandDaughter));
     return std::numeric_limits<float>::quiet_NaN();
   }
@@ -988,7 +988,7 @@ void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
   for (int i = 0; i < 6; i++) {
     for (int j = i; j < 6; j++) {
       // although it seems to make no sense to fill all elements of the
-      // symetric matrix, it has to be (do not touch this code)
+      // symmetric matrix, it has to be (do not touch this code)
       errMatrix(order[j], order[i]) = errMatrix(order[i], order[j]) = cov6(i, j);
     }
   }
@@ -1228,7 +1228,7 @@ bool Particle::hasExtraInfo(const std::string& name) const
     B2FATAL("ParticleExtraInfoMap not available, but needed for storing extra info in Particle!");
   }
   unsigned int index = extraInfoMap->getIndex(mapID, name);
-  if (index == 0 or index >= m_extraInfo.size()) //actualy indices start at 1
+  if (index == 0 or index >= m_extraInfo.size()) //actually indices start at 1
     return false;
 
   return true;
@@ -1251,7 +1251,7 @@ float Particle::getExtraInfo(const std::string& name) const
     B2FATAL("ParticleExtraInfoMap not available, but needed for storing extra info in Particle!");
   }
   unsigned int index = extraInfoMap->getIndex(mapID, name);
-  if (index == 0 or index >= m_extraInfo.size()) //actualy indices start at 1
+  if (index == 0 or index >= m_extraInfo.size()) //actually indices start at 1
     throw std::runtime_error(std::string("getExtraInfo: Value '") + name + "' not found in Particle!");
 
   return m_extraInfo[index];
@@ -1279,7 +1279,7 @@ void Particle::setExtraInfo(const std::string& name, float value)
     B2FATAL("ParticleExtraInfoMap not available, but needed for storing extra info in Particle!");
   }
   unsigned int index = extraInfoMap->getIndex(mapID, name);
-  if (index == 0 or index >= m_extraInfo.size()) //actualy indices start at 1
+  if (index == 0 or index >= m_extraInfo.size()) //actually indices start at 1
     throw std::runtime_error(std::string("setExtraInfo: Value '") + name + "' not found in Particle!");
 
   m_extraInfo[index] = value;

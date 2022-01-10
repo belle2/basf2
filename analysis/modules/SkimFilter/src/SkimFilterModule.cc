@@ -30,7 +30,7 @@ SkimFilterModule::SkimFilterModule() : Module()
   //Parameter definition
   addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
 
-  // initializing the rest of private memebers
+  // initializing the rest of private members
   m_nPass   = 0;
 }
 

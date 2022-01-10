@@ -86,7 +86,7 @@ void KLMDQMModule::defineHisto()
   m_DAQInclusion->GetXaxis()->SetBinLabel(2, "Yes");
   m_DAQInclusion->SetOption("LIVE");
   /* Time histograms. */
-  m_TimeRPC = new TH1F("time_rpc", "RPC hit time", 128, -1023.5, 0.5);
+  m_TimeRPC = new TH1F("time_rpc", "RPC hit time", 128, -1223.5, -199.5);
   m_TimeRPC->GetXaxis()->SetTitle("Time, ns");
   m_TimeRPC->SetOption("LIVE");
   m_TimeScintillatorBKLM =
@@ -96,7 +96,7 @@ void KLMDQMModule::defineHisto()
   m_TimeScintillatorBKLM->SetOption("LIVE");
   m_TimeScintillatorEKLM =
     new TH1F("time_scintillator_eklm", "Scintillator hit time (EKLM)",
-             100, -5000, -4000);
+             100, -5100, -4100);
   m_TimeScintillatorEKLM->GetXaxis()->SetTitle("Time, ns");
   m_TimeScintillatorEKLM->SetOption("LIVE");
   /* Number of hits per plane. */

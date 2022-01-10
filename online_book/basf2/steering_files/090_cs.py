@@ -8,12 +8,11 @@ import stdPi0s
 main = b2.create_path()
 
 ma.inputMdstList(
-    environmentType="default",
     filelist=[
-        b2.find_file("starterkit/2021/B02ks0pi0_sample.root",
-                     data_type="examples"),
-        b2.find_file("starterkit/2021/uubar_sample.root",
-                     data_type="examples"),
+        b2.find_file(
+            "starterkit/2021/B02ks0pi0_sample.root", data_type="examples"
+        ),
+        b2.find_file("starterkit/2021/uubar_sample.root", data_type="examples"),
     ],
     path=main,
 )
@@ -31,9 +30,9 @@ ma.reconstructDecay(
     decayString="B0  -> K_S0 pi0:eff60_May2020",
     cut="5.1 < Mbc < 5.3 and abs(deltaE) < 2",
     path=main,
-)
+)  # [E13]
 
-ma.buildRestOfEvent(target_list_name="B0", path=main)
+ma.buildRestOfEvent(target_list_name="B0", path=main)  # [S10]
 cleanMask = (
     "cleanMask",
     "nCDCHits > 0 and useCMSFrame(p)<=3.2",
@@ -41,9 +40,9 @@ cleanMask = (
 )
 ma.appendROEMasks(list_name="B0", mask_tuples=[cleanMask], path=main)
 
-ma.buildContinuumSuppression(list_name="B0", roe_mask="cleanMask", path=main)
+ma.buildContinuumSuppression(list_name="B0", roe_mask="cleanMask", path=main)  # [E10]
 
-simpleCSVariables = [
+simpleCSVariables = [  # [S20]
     "R2",
     "thrustBm",
     "thrustOm",
@@ -59,4 +58,4 @@ ma.variablesToNtuple(
     path=main,
 )
 
-b2.process(main)
+b2.process(main)  # [E20]

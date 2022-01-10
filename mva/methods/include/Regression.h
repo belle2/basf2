@@ -61,7 +61,7 @@ namespace Belle2 {
      * Dataset needed during the training of a regression method.
      *
      * It basically wraps another dataset it receives as pointer and every call to
-     * this dataset is forewarded to the other dataset.
+     * this dataset is forwarded to the other dataset.
      *
      * The only difference is, that the isSignal variable is set dependent on the cut value
      * given in the constructor to

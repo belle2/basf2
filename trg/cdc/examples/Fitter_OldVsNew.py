@@ -128,7 +128,6 @@ class TestModule(basf2.Module):
         """
         give info for both output lists and warnings in the case of mismatches
         """
-        phiMC = Belle2.PyStoreArray("MCParticles")[0].getMomentum().Phi()
         oldTracks = Belle2.PyStoreArray("Trg3DFitterTracks")
         newTracks = Belle2.PyStoreArray("Fitter3DTracks")
         if oldTracks.getEntries() == newTracks.getEntries():

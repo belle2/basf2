@@ -94,7 +94,7 @@ namespace Belle2 {
     };
 
     /**
-     * Dataset for Sideband Substraction
+     * Dataset for Sideband Subtraction
      * Wraps a dataset and provides each data-point with a new weight
      */
     class SidebandDataset : public Dataset {

@@ -6,8 +6,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import basf2
-from iov_conditional import make_conditional_at
 from vtx import add_vtx_SPcreation
 
 

@@ -7,13 +7,14 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True  # noqa
 PyConfig.StartGuiThread = False  # noqa
 
 import basf2
 from argparse import ArgumentParser
-from root_pandas import read_root
+import uproot
 import pandas as pd
 import numpy as np
 
@@ -67,7 +68,7 @@ if __name__ == "__main__":
 
         basf2.process(path)
 
-    df = read_root(args.output)
+    df = uproot.open(args.output)["software_trigger_results"].arrays(library="pd")
 
     # Make sure to cope with strings rather than bools (which is a bit strange in pandas)
     df[["accept_or_reject", "prescaled", "cut"]] = df[["accept_or_reject", "prescaled", "cut"]].astype("str")

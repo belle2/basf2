@@ -107,9 +107,7 @@ outRootFileName = sys.argv[1]
 # create path
 cp_val_path = b2.create_path()
 
-environmentType = "default"
-
-ma.inputMdstList(environmentType=environmentType, filelist=[], path=cp_val_path)
+ma.inputMdstList(filelist=[], path=cp_val_path)
 
 Upsilon4S = ('Upsilon(4S):all', '')
 ma.fillParticleListsFromMC([Upsilon4S], True, path=cp_val_path)

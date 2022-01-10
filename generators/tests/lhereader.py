@@ -4,6 +4,7 @@
 # Test LHEReader and LHEInputModule
 
 import os
+import sys
 import math
 from ROOT import TFile
 from pdg import add_particle
@@ -11,7 +12,6 @@ from basf2 import create_path, register_module, process, print_params, find_file
 from modularAnalysis import fillParticleListsFromMC
 from modularAnalysis import variablesToNtuple as v2nt
 from variables import variables as vm
-from beamparameters import add_beamparameters
 from tempfile import TemporaryDirectory
 
 # check that the file exists, if not: skip the test
@@ -19,7 +19,7 @@ inputfile = find_file('generators/tests/event.lhe')
 if len(inputfile) == 0:
     sys.stderr.write(
         'TEST SKIPPED: input file ' +
-        filepath +
+        inputfile +
         ' not found.')
     sys.exit(-1)
 
@@ -36,15 +36,14 @@ lhereader.param('inputFileList', [inputfile])
 lhereader.param('useWeights', False)
 lhereader.param('nInitialParticles', 2)
 lhereader.param('nVirtualParticles', 0)
-lhereader.param('boost2Lab', True)   # generation is in centre of mass system (see steering card)
 lhereader.param('wrongSignPz', True)  # because Belle II convention is different to LEP etc
 print_params(lhereader)
 
 # prepare the path
 testpath = create_path()
 testpath.add_module('Progress')
-add_beamparameters(testpath, 'Y4S')
 testpath.add_module(lhereader)
+testpath.add_module('BoostMCParticles')
 fillParticleListsFromMC([('gamma:gen', ''), ('A:gen', '')], path=testpath)
 
 # dump information from basf2

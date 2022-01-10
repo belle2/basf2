@@ -2,7 +2,7 @@ Belle2 Physics List
 ===================
 
 .. _Geant4-provided reference physics lists : https://geant4.web.cern.ch/node/155
-.. _Belle2PhysicsList : https://stash.desy.de/projects/B2/repos/software/browse/simulation/physicslist/src/Belle2PhysicsList.cc
+.. _Belle2PhysicsList : https://stash.desy.de/projects/B2/repos/basf2/browse/simulation/physicslist/src/Belle2PhysicsList.cc
 .. _geant4/source/physics_lists/constructors : https://geant4.kek.jp/lxr/source/physics_lists/constructors/
 
 `Belle2PhysicsList`_ is a Geant4 modular physics list designed to fit the requirements of
@@ -173,7 +173,7 @@ lines are commented out.
 
 .. note::
     
-  Above example is part of test script, `Belle2PhyslistTestBrems.py <https://stash.desy.de/projects/B2/repos/software/browse/simulation/examples/Belle2PhyslistTestBrems.py>`_, which is identical to `BremsstralungPhotons.py <https://stash.desy.de/projects/B2/repos/software/browse/simulation/examples/BremsstralungPhotons.py>`_,:: 
+  Above example is part of test script, `Belle2PhyslistTestBrems.py <https://stash.desy.de/projects/B2/repos/basf2/browse/simulation/examples/Belle2PhyslistTestBrems.py>`_, which is identical to `BremsstralungPhotons.py <https://stash.desy.de/projects/B2/repos/basf2/browse/simulation/examples/BremsstralungPhotons.py>`_,:: 
 
    main.add_module("FullSim", StoreBremsstrahlungPhotons=True, BremsstrahlungPhotonsEnergyCut=10.0)
 

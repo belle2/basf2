@@ -178,7 +178,7 @@ Now you should have both repositories on your local machine.
    * Ask a more experienced ``git`` user for help (don't forget to include the
      output of ``git status`` and a clear description of your problem)
    * Familiarize yourself with ``git stash`` (shelves work that wasn't
-     commited yet) and ``git reset`` ("undo" ``git commit``)
+     committed yet) and ``git reset`` ("undo" ``git commit``)
 
 Unfortunately for you, ``b2-git-training-space-2`` has stricter rules and you
 cannot just push changes there directly. Instead, you have to open a pull request (PR).

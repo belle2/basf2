@@ -87,7 +87,6 @@ class MinModule(b2.Module):
         trgary = Belle2.PyStoreArray("RawTRGs")
 
         evtmeta = Belle2.PyStoreObj("EventMetaData")
-        trgs = []
 
         # integrity check
         if integrity_check:
@@ -95,7 +94,6 @@ class MinModule(b2.Module):
             for evt in trgary:
                 for entry in range(evt.GetNumEntries()):  # flattened. Usually only 1 entry
                     print('{:0x}'.format(GetNodeID(evt, entry)))
-                    entrylist = []
                     for bid in range(4):
                         if (GetNodeID(evt, entry), bid) in hslb:
                             count = GetDetectorNwords(evt, entry, bid)
@@ -106,7 +104,6 @@ class MinModule(b2.Module):
             # assuming smaller Copper ID comes first
             for entry in range(evt.GetNumEntries()):  # flattened. Usually only 1 entry
                 # print('{:0x}'.format(GetNodeID(evt, entry)))
-                entrylist = []
                 for bid in range(4):
                     if (GetNodeID(evt, entry), bid) not in hslb:
                         continue

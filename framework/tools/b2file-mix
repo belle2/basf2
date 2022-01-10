@@ -193,7 +193,7 @@ if __name__ == "__main__":
     def progress(evt):
         """Show progress so user knows how long to wait till it's done"""
         global last_time
-        curr_time = time.clock()
+        curr_time = time.process_time()
         # show at most one update per second and let it run for a few events to
         # get buffers warmed up
         if (curr_time-last_time) > 2 and evt >= 10:
@@ -231,11 +231,11 @@ if __name__ == "__main__":
         output_tree.Fill()
         # finally let's have some progress
         if evtNr == 0:
-            start = time.clock()
+            start = time.process_time()
         progress(evtNr)
 
     # done, print final timing
-    end = time.clock()
+    end = time.process_time()
     elapsed = end - start
     basf2.B2INFO("Finished in {:.2f} seconds, {:.3f} milliseconds per event".format(elapsed, elapsed*1000/len(indexlist)))
 

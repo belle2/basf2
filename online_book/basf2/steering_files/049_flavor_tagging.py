@@ -4,7 +4,7 @@ import sys
 import basf2 as b2
 import modularAnalysis as ma
 import stdV0s
-import flavorTagger as ft
+import flavorTagger as ft  # [S23|E23]
 from variables import variables as vm  # shorthand for VariableManager
 import variables.collections as vc
 import variables.utils as vu
@@ -12,15 +12,14 @@ import variables.utils as vu
 # get input file number from the command line
 filenumber = sys.argv[1]
 
-# set analysis global tag (needed for flavor tagging)
-b2.conditions.prepend_globaltag("analysis_tools_release-04-02")
+# set analysis global tag (needed for flavor tagging) [S10]
+b2.conditions.prepend_globaltag("analysis_tools_release-04-02")  # [E10]
 
 # create path
 main = b2.Path()
 
 # load input data from mdst/udst file
 ma.inputMdstList(
-    environmentType="default",
     filelist=[b2.find_file(f"starterkit/2021/1111540100_eph3_BGx0_{filenumber}.root", "examples")],
     path=main,
 )
@@ -74,8 +73,8 @@ ecl_based_cuts = "thetaInCDCAcceptance and E > 0.05"
 roe_mask = ("my_mask", track_based_cuts, ecl_based_cuts)
 ma.appendROEMasks("B0", [roe_mask], path=main)
 
-# call flavor tagging
-ft.flavorTagger(["B0"], path=main)
+# call flavor tagging [S20]
+ft.flavorTagger(["B0"], path=main)  # [E20]
 
 # perform best candidate selection
 b2.set_random_seed("Belle II StarterKit")
@@ -102,7 +101,7 @@ for roe_variable in roe_kinematics + roe_multiplicities:
     roe_variable_with_mask = roe_variable.replace("()", "(my_mask)")
     b_vars.append(roe_variable_with_mask)
 
-b_vars += ft.flavor_tagging
+b_vars += ft.flavor_tagging  # [S43|E43]
 
 # Variables for final states (electrons, positrons, pions)
 fs_vars = vc.pid + vc.track + vc.track_hits + standard_vars

@@ -135,7 +135,7 @@ void SVDDQMEfficiencyModule::event()
         }
 
 
-        if (resid < maxResid) {
+        if (abs(resid) < maxResid) {
           if (m_svdClusters[cls]->isUCluster()) {
             foundU = true;
           } else

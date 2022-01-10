@@ -56,9 +56,9 @@ namespace Belle2 {
     in the analysis scripts.
 
     The **eclTrackBremFinder** module uses the lepton track PXD and SVD hits and extrapolates them to the ECL; 
-    then looks for ECL clusters with energies between 0.2 and 1 times the track energy and without associated 
-    tracks, and checks if the distance between each of these clusters 
-    and the extrapolated hit is smaller than 0.5 mm. If it is, a *Bremsstrahlung* weighted relation 
+    then looks for ECL clusters with energies between 0.02 and 1 times the track energy and without associated 
+    tracks, and checks if the normalized distance between each of these clusters 
+    and the extrapolated hit is smaller than 0.05. If it is, a *Bremsstrahlung* weighted relation 
     between said cluster and the track is established. The weight is determined as
 
     .. math:: 
@@ -89,8 +89,8 @@ namespace Belle2 {
     See also:
       `eclTrackBremFinder module`_
                    
-    .. _eclTrackBremFinder module: https://stash.desy.de/projects/B2/repos/software/browse/ecl/modules/eclTrackBremFinder
-    .. _here: https://stash.desy.de/projects/B2/repos/software/browse/ecl/modules/eclTrackBremFinder/src/BremFindingMatchCompute.cc)DOC");
+    .. _eclTrackBremFinder module: https://stash.desy.de/projects/B2/repos/basf2/browse/ecl/modules/eclTrackBremFinder
+    .. _here: https://stash.desy.de/projects/B2/repos/basf2/browse/ecl/modules/eclTrackBremFinder/src/BremFindingMatchCompute.cc)DOC");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
@@ -180,7 +180,7 @@ namespace Belle2 {
     if (m_usePhotonOnlyOnce) {
       for (unsigned n = 0; n < nGamma; n++) {
         Particle* gamma = m_gammaList->getParticle(n);
-        //Skip this if it the best match has already been asigned (pathological case: happens only if you use the same gamma list
+        //Skip this if it the best match has already been assigned (pathological case: happens only if you use the same gamma list
         //to correct more than once. Performance studies, in which the same list is used with different options, are an example
         if (gamma->hasExtraInfo("bestMatchIndex")) continue;
 

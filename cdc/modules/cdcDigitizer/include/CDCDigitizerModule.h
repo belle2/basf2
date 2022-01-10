@@ -223,21 +223,21 @@ namespace Belle2 {
     double m_totalFudgeFactor = 1.;  /**< total fudge factor for space resol. */
 
     bool m_gasGainSmearing = false;  /**< Swtich for gas gain smearing */
-    double m_effWForGasGainSmearing = 0.0265;  /**< Effective energy (keV) for one electron prod. for gas gain smearing */
+    double m_effWForGasGainSmearing = 0.0266;  /**< Effective energy (keV) for one electron prod. for gas gain smearing */
     double m_thetaOfPolya = 0.5;     /**< theta of Polya function for gas gain smearing */
-    bool m_extraADCSmearing = true; /**< Swtich for extra ADC smearing */
+    bool m_extraADCSmearing = false; /**< Swtich for extra ADC smearing */
     //    double m_sigmaForExtraADCSmearing = 0.3;  /**< Gaussian sigma for extra ADC smearing */
     double m_runGain = 1.;  /**< run gain. */
     float m_semiTotalGain[MAX_N_SLAYERS][MAX_N_SCELLS] = {{}}; /**< total gain per wire */
     double m_overallGainFactor = 1.;  /**< Overall gain factor. */
-    double m_degOfSPEOnThreshold;     /**< Degree of space charge effect on timing threshold */
+    double m_degOfSPEOnThreshold = 0; /**< Degree of space charge effect on timing threshold */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
     bool m_addTimeWalk; /**< A switch used to control adding time-walk delay into the total drift time or not */
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
-    bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
+    bool m_addTimeOfFlight; /**< A switch used to control adding time of flight into the total drift time or not */
     bool m_addInWirePropagationDelay4Bg; /**< A switch used to control adding propagation delay into the total drift time or not for beam bg. */
-    bool m_addTimeOfFlight4Bg;     /**< A switch used to control adding time of flight into the total drift time or not for beam bg. */
+    bool m_addTimeOfFlight4Bg; /**< A switch used to control adding time of flight into the total drift time or not for beam bg. */
     bool m_outputNegativeDriftTime;     /**< A switch to output negative drift time to CDCHit */
     bool m_output2ndHit;         /**< A switch to output 2nd hit */
     bool m_align;             /**< A switch to control alignment */

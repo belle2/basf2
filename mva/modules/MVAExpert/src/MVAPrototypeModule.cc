@@ -116,7 +116,7 @@ namespace Belle2 {
 
     // All what is left to do is applying the expert to the dataset
     // it will return an std::vector with the results, with one entry per sample.
-    // The MVA::SingleDataset only containts one entry, so we are interested only in the first entry here.
+    // The MVA::SingleDataset only contains one entry, so we are interested only in the first entry here.
     // The MVA::MultiDataset on the other hand would have more than one entry in the returned vector of apply.
     float probability = m_expert->apply(*m_dataset)[0];
     B2INFO("The probability is " << probability);

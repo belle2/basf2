@@ -13,45 +13,45 @@
 namespace Belle2 {
   namespace Variable {
 
-    double particleIsFromECL(const Particle* part)
+    bool particleIsFromECL(const Particle* part)
     {
       return (part->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster);
     }
 
-    double particleIsFromKLM(const Particle* part)
+    bool particleIsFromKLM(const Particle* part)
     {
       return (part->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster);
     }
 
-    double particleIsFromTrack(const Particle* part)
+    bool particleIsFromTrack(const Particle* part)
     {
       return (part->getParticleSource() == Particle::EParticleSourceObject::c_Track);
     }
 
-    double particleIsFromV0(const Particle* part)
+    bool particleIsFromV0(const Particle* part)
     {
       return (part->getParticleSource() == Particle::EParticleSourceObject::c_V0);
     }
 
-    double particleSource(const Particle* part)
+    int particleSource(const Particle* part)
     {
       return part->getParticleSource();
     }
 
-    double particleMdstArrayIndex(const Particle* part)
+    int particleMdstArrayIndex(const Particle* part)
     {
       return part->getMdstArrayIndex();
     }
 
-    double uniqueParticleIdentifier(const Particle* part)
+    int uniqueParticleIdentifier(const Particle* part)
     {
       return part->getMdstSource();
     }
 
-    double particleIsUnspecified(const Particle* part)
+    bool particleIsUnspecified(const Particle* part)
     {
       int properties = part->getProperty();
-      return (properties & Particle::PropertyFlags::c_IsUnspecified) ? 1.0 : 0.0;
+      return (properties & Particle::PropertyFlags::c_IsUnspecified) ? true : false;
     }
 
     double particlePvalue(const Particle* part)
@@ -59,12 +59,12 @@ namespace Belle2 {
       return part->getPValue();
     }
 
-    double particleNDaughters(const Particle* part)
+    int particleNDaughters(const Particle* part)
     {
       return part->getNDaughters();
     }
 
-    double particleFlavorType(const Particle* part)
+    int particleFlavorType(const Particle* part)
     {
       return part->getFlavorType();
     }
@@ -75,10 +75,10 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("Basic particle information");
-    REGISTER_VARIABLE("isFromECL", particleIsFromECL, "Returns 1.0 if this particle was created from an ECLCluster, 0 otherwise.");
-    REGISTER_VARIABLE("isFromKLM", particleIsFromKLM, "Returns 1.0 if this particle was created from a KLMCluster, 0 otherwise.");
-    REGISTER_VARIABLE("isFromTrack", particleIsFromTrack, "Returns 1.0 if this particle was created from a track, 0 otherwise.");
-    REGISTER_VARIABLE("isFromV0", particleIsFromV0, "Returns 1.0 if this particle was created from a V0, 0 otherwise.");
+    REGISTER_VARIABLE("isFromECL", particleIsFromECL, "Returns true if this particle was created from an ECLCluster, false otherwise.");
+    REGISTER_VARIABLE("isFromKLM", particleIsFromKLM, "Returns true if this particle was created from a KLMCluster, false otherwise.");
+    REGISTER_VARIABLE("isFromTrack", particleIsFromTrack, "Returns true if this particle was created from a track, false otherwise.");
+    REGISTER_VARIABLE("isFromV0", particleIsFromV0, "Returns true if this particle was created from a V0, false otherwise.");
     REGISTER_VARIABLE("particleSource", particleSource, R"DOC(
       Returns mdst source used to create the particle. The meaning of the values are
 
@@ -114,7 +114,7 @@ Returns unique identifier of final state particle.
 Particles created from the same object (e.g. from the same track) have different :b2:var:`uniqueParticleIdentifier` value.)DOC");
 
     REGISTER_VARIABLE("isUnspecified", particleIsUnspecified,
-                      "Returns 1 if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), 0 otherwise");
+                      "Returns true if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), false otherwise");
     REGISTER_VARIABLE("chiProb", particlePvalue, R"DOC(
 A context-dependent :math:`\chi^2` probability for 'the fit' related to this particle.
 
@@ -130,7 +130,7 @@ A context-dependent :math:`\chi^2` probability for 'the fit' related to this par
     REGISTER_VARIABLE("nDaughters", particleNDaughters,
                       "Returns number of daughter particles");
     REGISTER_VARIABLE("flavor", particleFlavorType,
-                      "Returns 1.0 if particle is flavored type, 0.0 if it is unflavored.");
+                      "Returns 1 if particle is flavored type, 0 if it is unflavored.");
     REGISTER_VARIABLE("charge", particleCharge, "Returns electric charge of particle in units of :math:`e`.");
   }
 }

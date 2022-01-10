@@ -1165,7 +1165,7 @@ namespace Belle2 {
       double m_nominalDriftVInv;   /*!< Inverse of the nominal drift velocity. */
       double m_nominalPropSpeed;   /*!< Nominal propagation speed of the sense wire (27.25 cm/nsec). */
       double m_nominalSpaceResol;  /*!< Nominal spacial resolution (0.0130 cm). */
-      double m_maxSpaceResol;      /*!< 10 times Nominal spacial resolution. */
+      double m_maxSpaceResol;      /*!< max space resolution allowed (cm). */
       double m_fudgeFactorForSigma[3];     /*!< Fuge factor for space resol. */
 
       DBObjPtr<CDCTimeZeros>* m_t0FromDB; /*!< t0s retrieved from DB. */

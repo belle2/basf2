@@ -8,7 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Steering file to apply the specfic FEI on Belle II MC, but it can be also easily adapted for converted Belle MC.
+# Steering file to apply the specific FEI on Belle II MC, but it can be also easily adapted for converted Belle MC.
 # For reference see Confluence and Thomas Keck's PhD thesis.
 #
 # Please adapt for your signal channel.
@@ -23,8 +23,7 @@ import modularAnalysis as ma
 path = b2.create_path()
 
 # Load input ROOT file
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst14.root', 'validation', False),
+ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 # Max 12 tracks per event - this avoids much computing time.

@@ -19,7 +19,7 @@ namespace Belle2 {
     void SVDCoGOnlyPosition::computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError)
     {
       reconstructStrips(rawCluster);
-
+      applyUnfolding(rawCluster);
       applyCoGPosition(rawCluster, position, positionError);
 
       //apply scale factors for the position errors

@@ -99,7 +99,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             # Loop over every combination of input groups.
             for counter, track1 in enumerate(tracks):
                 for track2 in tracks[counter + 1:]:
-                    # Build the net wit pre-build variables.
+                    # Build the net with pre-build variables.
                     relations.append(relation_net(tf.concat([track1, track2], 1), relational_variables))
 
             if parameters['pre_training_epochs'] > 0:

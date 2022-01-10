@@ -49,6 +49,10 @@ namespace Belle2 {
              "upper limit for photon time [ns] (if minTime >= maxTime use the default from DB)", 0.0);
     addParam("PDGCode", m_PDGCode,
              "PDG code of hypothesis to construct pulls (0 means: use MC truth)", 211);
+    addParam("deltaRayModeling", m_deltaRayModeling,
+             "include (True) or exclude (False) delta-ray modeling in log likelihood calculation", false);
+    addParam("pTCut", m_pTCut,
+             "pT cut to suppress badly extrapolated tracks that cannot reach TOP counter", 0.27);
     addParam("TOPDigitCollectionName", m_topDigitCollectionName,
              "Name of the collection of TOPDigits", string(""));
     addParam("TOPLikelihoodCollectionName", m_topLikelihoodCollectionName,
@@ -104,6 +108,7 @@ namespace Belle2 {
 
       const TOPTrack trk(track, m_topDigitCollectionName);
       if (not trk.isValid()) continue; // track missed the bars
+      if (trk.getTransverseMomentum() < m_pTCut) continue; // badly extrapolated
 
       auto* topLL = m_likelihoods.appendNew();
       track.addRelationTo(topLL);
@@ -116,6 +121,7 @@ namespace Belle2 {
       int flag = 1;
       for (const auto& chargedStable : Const::chargedStableSet) {
         const PDFConstructor pdfConstructor(trk, chargedStable);
+        pdfConstructor.switchDeltaRayPDF(m_deltaRayModeling);
         if (not pdfConstructor.isValid()) {
           flag = -1;
           continue;

@@ -32,14 +32,14 @@
 #                                                                        #
 ##########################################################################
 
-import root_pandas
+import uproot
 import decayHash
 import basf2 as b2
 from decayHash import DecayHashMap
 import sys
 
 # read in root-file as a pandas dataframe
-data = root_pandas.read_root(b2.find_file('Jpsi_from_B2A502.root', 'examples', False))
+data = uproot.open(b2.find_file('Jpsi_from_B2A502.root', 'examples', False))["variables"].arrays(library="pd")
 hashmap = DecayHashMap(b2.find_file('hashmap_Jpsi_from_B2A502.root', 'examples', False), removeRadiativeGammaFlag=False)
 hashmap2 = DecayHashMap(b2.find_file('hashmap_Jpsi_from_B2A502.root', 'examples', False), removeRadiativeGammaFlag=True)
 

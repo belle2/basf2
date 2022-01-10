@@ -122,7 +122,7 @@ Calling an instance of a skim class will run the particle list loaders, setup fu
     from skim.WGs.foo import MySkim
 
     path = b2.Path()
-    ma.inputMdstList("default", [], path=path)
+    ma.inputMdstList([], path=path)
     skim = MySkim()
     skim(path)  # __call__ method loads standard lists, creates skim lists, and saves to uDST
     b2.process(path)

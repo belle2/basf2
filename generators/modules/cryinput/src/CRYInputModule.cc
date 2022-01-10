@@ -36,8 +36,7 @@ CRYInputModule::CRYInputModule() : Module()
 
 The showers will be generated in the xz plane in a square plane of n bt n meters
 centered at the IP (n can be choosen with the boxLength parameter). Then the
-cosmics will be propagated from there to the corner of of a n times n times n
-cube centered around the IP.
+cosmics will be propagated from there to the boundary of the detector world volume.
 
 Finally, if the track would intersect with the acceptance volume the track is
 kept. The acceptance volume can be either a sphere, a cylinder or a box centered

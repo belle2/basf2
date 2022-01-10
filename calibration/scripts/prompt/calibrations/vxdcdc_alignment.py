@@ -34,33 +34,33 @@ from prompt.calibrations.caf_cdc import settings as cdc_calibration
 collection_names = ["physics", "cosmic", "hadron", "mumu", "offip"]
 
 default_config = {
-  'max_iterations': 3,
-  'min_entries': 1000000,
+    'max_iterations': 3,
+    'min_entries': 1000000,
 
-  'method': 'diagonalization 3 0.1',
-  'scaleerrors': 1.,
-  'entries': 100,
+    'method': 'diagonalization 3 0.1',
+    'scaleerrors': 1.,
+    'entries': 100,
 
-  'minPValue':  0.00001,
+    'minPValue': 0.00001,
 
-  "physics.min_events": 400000,
-  "physics.max_processed_events_per_file": 2000,
+    "physics.min_events": 400000,
+    "physics.max_processed_events_per_file": 2000,
 
-  "cosmic.min_events": 1000000,
-  "cosmic.max_processed_events_per_file": 5000,
+    "cosmic.min_events": 1000000,
+    "cosmic.max_processed_events_per_file": 5000,
 
-  "hadron.min_events": 100000,
-  "hadron.max_processed_events_per_file": 1000,
+    "hadron.min_events": 100000,
+    "hadron.max_processed_events_per_file": 1000,
 
-  "mumu.min_events": 400000,
-  "mumu.max_processed_events_per_file": 3000,
+    "mumu.min_events": 400000,
+    "mumu.max_processed_events_per_file": 3000,
 
-  "offip.min_events": 400000,
-  "offip.max_processed_events_per_file": 2000,
+    "offip.min_events": 400000,
+    "offip.max_processed_events_per_file": 2000,
 
-  "timedep_vxd": [],
-  "timedep_cdc": []
-  }
+    "timedep_vxd": [],
+    "timedep_cdc": []
+}
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="VXD and CDC Alignment",
@@ -154,7 +154,6 @@ def create_cosmics_path():
         pruneTracks=False,
         skipGeometryAdding=True,
         addClusterExpertModules=False,
-        data_taking_period='early_phase3',
         merge_tracks=True
     )
 
@@ -221,7 +220,7 @@ def get_calibrations(input_data, **kwargs):
     if len(timedep_vxd):
         slices = [(erx[0], erx[1], erx[2]) for erx in timedep_vxd] + [(0, requested_iov.run_low, requested_iov.exp_low)]
         timedep.append(
-          (alignment.parameters.vxd_halfshells(), slices))
+            (alignment.parameters.vxd_halfshells(), slices))
     if len(timedep_cdc):
         slices = [(erx[0], erx[1], erx[2]) for erx in timedep_cdc] + [(0, requested_iov.run_low, requested_iov.exp_low)]
         timedep.append((alignment.parameters.cdc_layers(), slices))
@@ -230,12 +229,12 @@ def get_calibrations(input_data, **kwargs):
         name='VXDCDCalignment',
         dbobjects=['VXDAlignment', 'CDCAlignment'],
         collections=[
-          mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"]),
-          mpc.make_collection("physics", path=create_std_path(), tracks=["RecoTracks"]),
-          mpc.make_collection("hadron", path=create_std_path(), tracks=["RecoTracks"]),
-          mpc.make_collection("mumu", path=create_std_path(), tracks=["RecoTracks"]),
-          mpc.make_collection("offip", path=create_std_path(), tracks=["RecoTracks"])
-          ],
+            mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"]),
+            mpc.make_collection("physics", path=create_std_path(), tracks=["RecoTracks"]),
+            mpc.make_collection("hadron", path=create_std_path(), tracks=["RecoTracks"]),
+            mpc.make_collection("mumu", path=create_std_path(), tracks=["RecoTracks"]),
+            mpc.make_collection("offip", path=create_std_path(), tracks=["RecoTracks"])
+        ],
         tags=None,
         files=files,
         timedep=timedep,

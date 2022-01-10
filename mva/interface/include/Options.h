@@ -88,7 +88,7 @@ namespace Belle2 {
     };
 
     /**
-     * Specific Options, all mehtod Options have to inherit from this class
+     * Specific Options, all method Options have to inherit from this class
      */
     class SpecificOptions : public Options {
 
@@ -129,10 +129,10 @@ namespace Belle2 {
       bool m_splot_combined = false; /**< Combine sPlot training with PDF classifier for discriminating variable */
       bool m_splot_boosted = false; /**< Use boosted sPlot training (aPlot) */
 
-      bool m_use_sideband_substraction = false; /**< Use sideband substraction */
+      bool m_use_sideband_subtraction = false; /**< Use sideband subtraction */
       std::vector<std::string> m_sideband_mc_files; /**< used to estimate the number of events in the different regions */
       std::string m_sideband_variable =
-        ""; /**< Variable defining the signal region (1) background region (2) negative signal region (3) or unused (otherwise) for the sideband substraction */
+        ""; /**< Variable defining the signal region (1) background region (2) negative signal region (3) or unused (otherwise) for the sideband subtraction */
 
       bool m_use_reweighting = false; /**< Use a pretraining of data against mc and weight the mc afterwards */
       std::string m_reweighting_identifier = ""; /**< Identifier used to save the reweighting expert */

@@ -27,7 +27,7 @@ vm.addCollection('MyCollection', variables.std_vector('daughter(0, kaonID)', 'da
 mypath = basf2.Path()  # create a new path
 
 # add input data and ParticleLoader modules to the path
-ma.inputMdstList('default', [basf2.find_file('analysis/tests/mdst.root')], path=mypath)
+ma.inputMdstList([basf2.find_file('analysis/tests/mdst.root')], path=mypath)
 ma.fillParticleLists([('K-', 'kaonID > 0.2'), ('pi+', 'pionID > 0.2')], path=mypath)
 ma.reconstructDecay('D0 -> K- pi+', '1.750 < M < 1.95', path=mypath)
 ma.matchMCTruth('D0', path=mypath)

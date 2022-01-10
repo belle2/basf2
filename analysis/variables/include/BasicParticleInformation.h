@@ -15,44 +15,44 @@ namespace Belle2 {
 
   namespace Variable {
     /**
-     * return 1 if this particle was created from an ECLCluster, 0 otherwise
+     * returns true if this particle was created from an ECLCluster, false otherwise
      */
-    double particleIsFromECL(const Particle* part);
+    bool particleIsFromECL(const Particle* part);
 
     /**
-     * return 1 if this particle was created from a KLMCluster, 0 otherwise
+     * returns true if this particle was created from a KLMCluster, false otherwise
      */
-    double particleIsFromKLM(const Particle* part);
+    bool particleIsFromKLM(const Particle* part);
 
     /**
-     * return 1 if this particle was created from a track, 0 otherwise
+     * returns true if this particle was created from a track, false otherwise
      */
-    double particleIsFromTrack(const Particle* part);
+    bool particleIsFromTrack(const Particle* part);
 
     /**
-     * return 1 if this particle was created from a V0, 0 otherwise
+     * returns true if this particle was created from a V0, false otherwise
      */
-    double particleIsFromV0(const Particle* part);
+    bool particleIsFromV0(const Particle* part);
 
     /**
      * returns the mdst source used to create the particle
      */
-    double particleSource(const Particle* part);
+    int particleSource(const Particle* part);
 
     /**
      * returns StoreArray index (0-based) of the MDST object from which the Particle was created
      */
-    double particleMdstArrayIndex(const Particle* part);
+    int particleMdstArrayIndex(const Particle* part);
 
     /**
      * returns unique identifier for identification of the final state particle
      */
-    double uniqueParticleIdentifier(const Particle* part);
+    int uniqueParticleIdentifier(const Particle* part);
 
     /**
-     * returns 1 if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), 0 if not
+     * returns true if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), false otherwise
      */
-    double particleIsUnspecified(const Particle* part);
+    bool particleIsUnspecified(const Particle* part);
 
     /**
      * return prob(chi^2,ndf) of fit
@@ -62,12 +62,12 @@ namespace Belle2 {
     /**
      * return number of daughter particles
      */
-    double particleNDaughters(const Particle* part);
+    int particleNDaughters(const Particle* part);
 
     /**
      * return flavor type
      */
-    double particleFlavorType(const Particle* part);
+    int particleFlavorType(const Particle* part);
 
     /**
      * return charge

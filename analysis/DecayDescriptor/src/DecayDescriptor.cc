@@ -227,7 +227,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
 
   // In case that there are DecayDescriptor daughters with multiple matches, try to solve the problem
   // by removing the daughter candidates which are already used in other unambiguous relations.
-  // This is done iteratively. We limit the maximum number of attempts to 20 to avoid an infinit loop.
+  // This is done iteratively. We limit the maximum number of attempts to 20 to avoid an infinite loop.
   bool isModified = true;
   for (int iTry = 0; iTry < 20; iTry++) {
     if (int(singlematch.size()) == getNDaughters()) break;
@@ -237,7 +237,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
       for (auto& itSingle : singlematch) {
         // try to remove particle from the multimatch list
         if (itMulti.second.erase(itSingle.second)) {
-          B2FATAL("Trying to excute part of the code with known bug, which is not fixed yet! Send email to anze.zupanc@ijs.si with notification that this happens!");
+          B2FATAL("Trying to execute part of the code with known bug, which is not fixed yet! Send email to anze.zupanc@ijs.si with notification that this happens!");
           /*
             This part of the code is commented, because of the following error:
             Iterator 'itMulti' used after element has been erased.
@@ -369,13 +369,13 @@ vector<string> DecayDescriptor::getSelectionNames()
     auto itOccurrence = strNames.begin();
     int iOccurrence = 0;
     while (iOccurrence <= 10) {
-      // find next occurence of the identical particle name defined in DecayDescriptor
+      // find next occurrence of the identical particle name defined in DecayDescriptor
       itOccurrence = find(itOccurrence, strNames.end(), strNameOld);
       // stop, if nothing found
       if (itOccurrence == strNames.end()) break;
       // create new particle name by attaching a number
       string strNameNew = strNameOld + std::to_string(iOccurrence);
-      // ceck if the new particle name exists already, if not, then it is OK to use it
+      // check if the new particle name exists already, if not, then it is OK to use it
       if (count(strNames.begin(), strNames.end(), strNameNew) == 0) {
         *itOccurrence = strNameNew;
         ++itOccurrence;

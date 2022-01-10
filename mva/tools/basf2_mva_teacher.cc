@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
         if (specific_options.find(method) != specific_options.end()) {
           std::cout << specific_options[method]->getDescription() << std::endl;
         } else {
-          std::cerr << "Provided method is unkown" << std::endl;
+          std::cerr << "Provided method is unknown" << std::endl;
         }
       } else {
         std::cout << general_description << std::endl;
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
         po::store(specific_parsed, vm);
         po::notify(vm);
       } else {
-        std::cerr << "Provided method is unkown" << std::endl;
+        std::cerr << "Provided method is unknown" << std::endl;
         return 1;
       }
     } else {
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
 
   //Check if method is available
   if (specific_options.find(general_options.m_method) == specific_options.end()) {
-    std::cerr << "Unkown method " << general_options.m_method << std::endl;
+    std::cerr << "Unknown method " << general_options.m_method << std::endl;
   }
 
   Belle2::MVA::teacher(general_options, *specific_options[general_options.m_method], meta_options);

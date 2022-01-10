@@ -57,6 +57,8 @@ namespace Belle2 {
     protected:
 
       //1. Collections and relations Names
+      /** Name of the collection to use for the SVDEventInfo */
+      std::string m_svdEventInfoName;
       /** Name of the collection to use for the SVDShaperDigits */
       std::string m_storeShaperDigitsName;
       /** Name of the collection to use for the SVDClusters */

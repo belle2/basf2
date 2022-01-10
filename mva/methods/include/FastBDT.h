@@ -26,7 +26,7 @@
 #include <Classifier.h>
 #endif
 
-// Template specialization to fix NAN sort bug of FastBDT in upto Version 3.2
+// Template specialization to fix NAN sort bug of FastBDT in up to Version 3.2
 #if FastBDT_VERSION_MAJOR <= 3 && FastBDT_VERSION_MINOR <= 2
 namespace FastBDT {
   template<>

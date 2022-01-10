@@ -27,6 +27,7 @@ from basf2 import _override_print  # noqa
 # import the C++ library with the exported functions
 import pybasf2  # noqa
 # and also import all of them in current scope for ease of use
+from pybasf2 import logging
 from pybasf2 import *  # noqa
 
 # make sure conditions objects are read only

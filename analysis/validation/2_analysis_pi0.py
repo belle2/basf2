@@ -32,7 +32,7 @@ INPUT_FILENAME = "../GenericB_GENSIMRECtoDST.dst.root"
 OUTPUT_FILENAME = "Pi0_Validation.root"
 
 main = basf2.Path()
-inputMdst('default', INPUT_FILENAME, path=main)
+inputMdst(INPUT_FILENAME, path=main)
 
 stdPi0s('all', path=main)
 matchMCTruth('pi0:all', path=main)

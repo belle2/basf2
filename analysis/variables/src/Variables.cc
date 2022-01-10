@@ -27,11 +27,13 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/V0.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/gearbox/Const.h>
 
@@ -320,7 +322,7 @@ namespace Belle2 {
       return p4CMS.P() / TMath::Sqrt(s * s / 4 - M * M);
     }
 
-    double particlePDGCode(const Particle* part)
+    int particlePDGCode(const Particle* part)
     {
       return part->getPDGCode();
     }
@@ -486,6 +488,33 @@ namespace Belle2 {
       } else {
         return part->getMass(); // !
       }
+    }
+
+    double particleInvariantMassFromDaughtersDisplaced(const Particle* part)
+    {
+      B2Vector3D vertex = part->getVertex();
+      if (part->getParticleSource() != Particle::EParticleSourceObject::c_V0
+          && vertex.Perp() < 0.5) return particleInvariantMassFromDaughters(part);
+
+      const std::vector<Particle*> daughters = part->getDaughters();
+      if (daughters.size() == 0) return particleInvariantMassFromDaughters(part);
+
+      const double bField = BFieldManager::getFieldInTesla(vertex).Z();
+      TLorentzVector sum;
+      for (auto daughter : daughters) {
+        const TrackFitResult* tfr = daughter->getTrackFitResult();
+        if (!tfr) {
+          sum += daughter->get4Vector();
+          continue;
+        }
+        Helix helix = tfr->getHelix();
+        helix.passiveMoveBy(vertex);
+        TVector3 mom3 = daughter->getMomentumScalingFactor() * helix.getMomentum(bField);
+        float mPDG = daughter->getPDGMass();
+        float E = std::sqrt(mom3.Mag2() + mPDG * mPDG);
+        sum += TLorentzVector(mom3, E);
+      }
+      return sum.M();
     }
 
     double particleInvariantMassLambda(const Particle* part)
@@ -665,10 +694,10 @@ namespace Belle2 {
       }
     }
 
-    double printParticle(const Particle* p)
+    bool printParticle(const Particle* p)
     {
       printParticleInternal(p, 0);
-      return 0.0;
+      return 0;
     }
 
 
@@ -902,7 +931,7 @@ namespace Belle2 {
       }
     }
 
-    double nRemainingTracksInEvent(const Particle* particle)
+    int nRemainingTracksInEvent(const Particle* particle)
     {
 
       StoreArray<Track> tracks;
@@ -936,12 +965,13 @@ namespace Belle2 {
       return result;
     }
 
-    double False(const Particle*)
+
+    bool False(const Particle*)
     {
       return 0;
     }
 
-    double True(const Particle*)
+    bool True(const Particle*)
     {
       return 1;
     }
@@ -996,7 +1026,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("momDevChi2", momentumDeviationChi2,
                       "momentum deviation chi^2 value calculated as"
                       "chi^2 = sum_i (p_i - mc(p_i))^2/sigma(p_i)^2, where sum runs over i = px, py, pz and"
-                      "mc(p_i) is the mc truth value and sigma(p_i) is the estimated error of i-th component of momentum vector")
+                      "mc(p_i) is the mc truth value and sigma(p_i) is the estimated error of i-th component of momentum vector");
     REGISTER_VARIABLE("theta", particleTheta, "polar angle in radians");
     REGISTER_VARIABLE("thetaErr", particleThetaErr, "error of polar angle in radians");
     REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
@@ -1015,7 +1045,7 @@ namespace Belle2 {
                       cosThetaBetweenParticleAndNominalB,
                       "cosine of the angle in CMS between momentum the particle and a nominal B particle. It is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
     REGISTER_VARIABLE("cosToThrustOfEvent", cosToThrustOfEvent,
-                      "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable")
+                      "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable");
 
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
 
@@ -1040,8 +1070,9 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("M2", particleMassSquared,
                       "The particle's mass squared.");
 
-    REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughters,
-                      "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle has no daughters, defaults to :b2:var:`M`.");
+    REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughtersDisplaced,
+                      "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle is V0 or decays at rho > 5 mm, its daughter 4-momentum vectors at fitted vertex are taken.\n"
+                      "If this particle has no daughters, defaults to :b2:var:`M`.");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
                       "Invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
                       "If the particle has not 2 daughters, it returns just the mass value.");
@@ -1074,13 +1105,13 @@ Note that this is context-dependent variable and can take different values depen
                       "Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter ");
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,
-                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.");
     REGISTER_VARIABLE("b2bPhi", b2bPhi,
-                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.");
     REGISTER_VARIABLE("b2bClusterTheta", b2bClusterTheta,
-                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.")
+                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.");
     REGISTER_VARIABLE("b2bClusterPhi", b2bClusterPhi,
-                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.")
+                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.");
     REGISTER_VARIABLE("ArmenterosLongitudinalMomentumAsymmetry", ArmenterosLongitudinalMomentumAsymmetry,
                       "Longitudinal momentum asymmetry of V0's daughters.\n"
                       "The mother (V0) is required to have exactly two daughters");

@@ -82,6 +82,9 @@ void BestCandidateSelectionModule::initialize()
   if (!m_variable) {
     B2ERROR("Variable '" << m_variableName << "' is not available in Variable::Manager!");
   }
+  if (!(m_variable->variabletype == Variable::Manager::VariableDataType::c_double or m_variable->variabletype == Variable::Manager::VariableDataType::c_int)) {
+    B2ERROR("Variable '" << m_variableName << "' has wrong data type! It must be either double or integer.");
+  }
   if (m_numBest < 0) {
     B2ERROR("value of numBest must be >= 0!");
   }
@@ -108,7 +111,12 @@ void BestCandidateSelectionModule::event()
   const unsigned int numParticles = m_inputList->getListSize();
   valueToIndex.reserve(numParticles);
   for (const Particle& p : *m_inputList) {
-    double value = m_variable->function(&p);
+    double value = 0;
+    if (std::holds_alternative<double>(m_variable->function(&p))) {
+      value = std::get<double>(m_variable->function(&p));
+    } else if (std::holds_alternative<int>(m_variable->function(&p))) {
+      value = std::get<int>(m_variable->function(&p));
+    }
     valueToIndex.emplace_back(value, p.getArrayIndex());
   }
 

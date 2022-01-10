@@ -14,7 +14,7 @@ from vertex import kFit
 from basf2 import B2WARNING
 
 
-def stdPi0s(listtype="eff60_May2020", path=None, loadPhotonBeamBackgroundMVA=True):
+def stdPi0s(listtype="eff60_May2020", path=None, loadPhotonBeamBackgroundMVA=False):
     """
     Function to prepare one of several standardized types of pi0 lists:
 
@@ -36,8 +36,9 @@ def stdPi0s(listtype="eff60_May2020", path=None, loadPhotonBeamBackgroundMVA=Tru
         loadPhotonBeamBackgroundMVA (bool): If true, photon candidates will be assigned a beam background probability.
     """
 
-    B2WARNING("stdPi0s is loading \"May2020\" pi0 recommendations. Please check Neutrals Performance Confluence"
-              " page for most up-to-date pi0 recommendations.")
+    if listtype != 'all':
+        B2WARNING("stdPi0s is loading \"May2020\" pi0 recommendations. Please check Neutrals Performance Confluence"
+                  " page for most up-to-date pi0 recommendations.")
 
     if listtype == 'all':
         stdPhotons('all', path, loadPhotonBeamBackgroundMVA)
@@ -68,7 +69,7 @@ def stdPi0s(listtype="eff60_May2020", path=None, loadPhotonBeamBackgroundMVA=Tru
                             path)
         ma.matchMCTruth('pi0:eff30_May2020', path)
     elif 'eff40_May2020' == listtype:
-        stdPhotons('pi0eff40_May2020', path)
+        stdPhotons('pi0eff40_May2020', path, loadPhotonBeamBackgroundMVA)
         ma.reconstructDecay('pi0:eff40_May2020 -> gamma:pi0eff40_May2020 gamma:pi0eff40_May2020', '0.120<InvM<0.145', 1, True, path)
         ma.matchMCTruth('pi0:eff40_May2020', path)
     elif 'eff50_May2020_nomcmatch' == listtype:
@@ -140,4 +141,4 @@ def loadStdSkimPi0(path):
         path (basf2.Path) modules are added to this path
 
     """
-    stdPi0s('skim', path)
+    stdPi0s('skim', path, loadPhotonBeamBackgroundMVA=False)

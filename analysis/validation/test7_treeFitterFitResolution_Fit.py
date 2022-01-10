@@ -34,7 +34,7 @@ set_random_seed('#BAADF00D')
 if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
     sys.exit(0)
 inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/prerel04_eph3_BGx1_b2jpsiks.root')
-inputMdst('default', inputFile, path=path)
+inputMdst(inputFile, path=path)
 
 
 fillParticleList('pi+:all', '', path=path)

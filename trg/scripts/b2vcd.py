@@ -206,7 +206,7 @@ def literalVCD(triggers, atlas, writer):
                             fout.write(
                                 '[Warning] non-uniform dummy value detected at {}ns: {}'.format(
                                     timestamp, sig[3] % sum(evtsize)))
-                            fout.write(values[i])
+                            fout.write(value[i])
                     continue
                 if not lastvalue or sigvalue != lastsigvalue:
                     writer.change(vcdVars[i], timestamp, sigvalue.bin)

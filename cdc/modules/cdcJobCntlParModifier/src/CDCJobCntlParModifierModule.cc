@@ -17,7 +17,7 @@ using namespace CDC;
 REG_MODULE(CDCJobCntlParModifier)
 CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDCSimControlPar::getInstance()),
   m_gcp(CDCGeoControlPar::getInstance()), m_timeWalk(), m_wireSag(), m_modLeftRightFlag(), m_debug4Sim(), m_thresholdEnergyDeposit(),
-  m_minTrackLength(), m_maxSpaceResol(), m_addFudgeFactorForSigmaForData(), m_addFudgeFactorForSigmaForMC(),
+  m_minTrackLength(), m_addFudgeFactorForSigmaForData(), m_addFudgeFactorForSigmaForMC(),
   m_mapperGeometry(), m_mapperPhiAngle(), m_debug4Geo(), m_printMaterialTable(),
   m_materialDefinitionMode(), m_senseWireZposMode(),
   m_displacement(),
@@ -131,11 +131,6 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   addParam("ChannelMapFile", m_chMapFile, "Input file name (on cdc/data) for channel map.",  string("ch_map.dat"));
   //edep-to-adc
   addParam("EDepToADCFile", m_eDepToADCFile, "Input file name (on cdc/data) for edep-to-adc.",  string("edeptoadc.dat"));
-
-  //max. space resolution
-  addParam("MaxSpaceResol", m_maxSpaceResol,
-           "Maximum space resolution (cm) in CDCGeometryPar::getSigma() to avoid a too large value; from 2011 beam test; a bit larger value may be better...",
-           double(2.5 * 0.0130));
 
   //additional fudge factor for data
   addParam("AddFudgeFactorForSigmaForData", m_addFudgeFactorForSigmaForData,
@@ -339,11 +334,6 @@ void CDCJobCntlParModifierModule::initialize()
   if (m_gcp.getEDepToADCFile() != m_eDepToADCFile) {
     B2INFO("CDCJobCntlParModifier: edep-to-adcFile modified: " << m_gcp.getEDepToADCFile() << " to " << m_eDepToADCFile);
     m_gcp.setEDepToADCFile(m_eDepToADCFile);
-  }
-
-  if (m_gcp.getMaxSpaceResolution() != m_maxSpaceResol) {
-    B2INFO("CDCJobCntlParModifier: maxSpaceResol modified: " << m_gcp.getMaxSpaceResolution() << " to " << m_maxSpaceResol);
-    m_gcp.setMaxSpaceResolution(m_maxSpaceResol);
   }
 
   if (m_gcp.getAddFudgeFactorForSigmaForData() != m_addFudgeFactorForSigmaForData) {

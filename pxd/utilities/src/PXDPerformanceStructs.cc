@@ -44,9 +44,12 @@ namespace Belle2 {
       auto statePtr = getTrackStateOnModule(sensorInfo, *recoTracks[0]);
       if (statePtr == nullptr) return nullptr; // shouldn't happen.
       auto intersec = statePtr -> getPos();
+      auto localPoint = sensorInfo.pointToLocal(intersec, true);
       auto intersec_p = statePtr -> getMom();
       auto local_p = sensorInfo.vectorToLocal(intersec_p, true);
 
+      //inside = sensorInfo.inside(localPoint.X(), localPoint.Y(), 0., 0.);
+      inside = sensorInfo.inside(localPoint.X(), localPoint.Y());
       x = intersec.X();
       y = intersec.Y();
       z = intersec.Z();
@@ -74,8 +77,10 @@ namespace Belle2 {
       // Always set cluster pxdID for saving module id of the intersection.
       cluster.pxdID = getPXDModuleID(VxdID(pxdIntercept.getSensorID()));
       RelationVector<PXDCluster> pxdClusters = DataStore::getRelationsWithObj<PXDCluster>(recoTrackPtr, pxdTrackClustersName);
-      // Return nullptr (false) as no clusters associated;
-      if (!pxdClusters.size()) return nullptr;
+      // Avoid returning nullptr (false) when no clusters associated,
+      // otherwise efficiency is overestimated!
+      // if (!pxdClusters.size()) return nullptr;
+      usedInTrack = false;
       for (auto& aCluster : pxdClusters) {
         if (aCluster.getSensorID().getID() == pxdIntercept.getSensorID()) {
           cluster.setValues(aCluster);

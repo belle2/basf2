@@ -7,6 +7,9 @@
  **************************************************************************/
 #include <ecl/calibration/eclLeakageAlgorithm.h>
 #include <ecl/dbobjects/ECLLeakageCorrections.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/DataStore.h>
 
 
 #include "TH1D.h"
@@ -286,6 +289,37 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   const int treeEntries = tree->GetEntries();
   B2INFO("eclLeakageAlgorithm entries = " << treeEntries);
 
+  //-----------------------------------------------------------------------------------
+  //..Get current payload to help validate the new payload
+
+  //..Set event, run, exp number
+  const auto exprun =  getRunList();
+  const int iEvt = 1;
+  const int iRun = exprun[0].second;
+  const int iExp = exprun[0].first;
+  StoreObjPtr<EventMetaData> evtPtr;
+  DataStore::Instance().setInitializeActive(true);
+  evtPtr.registerInDataStore();
+  DataStore::Instance().setInitializeActive(false);
+  evtPtr.construct(iEvt, iRun, iExp);
+  DBStore& dbstore = DBStore::Instance();
+  dbstore.update();
+
+  //..Existing payload
+  DBObjPtr<ECLLeakageCorrections> existingCorrections("ECLLeakageCorrections");
+  TH2F existingThetaCorrection = existingCorrections->getThetaCorrections();
+  existingThetaCorrection.SetName("existingThetaCorrection");
+  TH2F existingPhiCorrection = existingCorrections->getPhiCorrections();
+  existingPhiCorrection.SetName("existingPhiCorrection");
+  TH2F existingCrysCorrection = existingCorrections->getnCrystalCorrections();
+  existingCrysCorrection.SetName("existingnCrystalCorrection");
+
+  //..Write out the correction histograms
+  histfile->cd();
+  existingThetaCorrection.Write();
+  existingPhiCorrection.Write();
+  existingCrysCorrection.Write();
+
   //====================================================================================
   //====================================================================================
   //..Step 2. First loop. Derive location cut for each energy and thetaID
@@ -496,6 +530,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
       int badStat = statusELabUncorr[ibad];
       B2ERROR(" histogram " << failedELabUncorr[ibad].Data() << " status " << badStat << " " << statusString[badStat].Data());
     }
+    histfile->Close();
     return c_Failure;
   }
 
@@ -963,6 +998,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
       int highestN = maxNCry[ie][thID];
       if (nCrysCorrection[ie][thID][highestN] <= 0) {
         B2ERROR("eclLeakageAlgorithm: no nCrys correction for ie " << ie << " thetaID " << thID);
+        histfile->Close();
         return c_Failure;
       }
 
@@ -1314,6 +1350,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
                                      nresBins, 0, nEnergies);
 
   B2INFO("Resolution divided by peak for each energy bin and region " << nResType << " ways");
+  for (int ires = 0; ires < nResType; ires++) {B2INFO(" " << resName[ires]);}
   ix = 0;
   for (int ie = 0; ie < nEnergies; ie++) {
     B2INFO("  energy point " << ie);

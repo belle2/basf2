@@ -109,7 +109,7 @@ TMatrixFSym LabFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
 TVector3 CMSFrame::getVertex(const TVector3& vector) const
 {
   // Transform Vertex from lab into cms frame:
-  // TODO 0: Substract fitted IP similar to RestFrame
+  // TODO 0: Subtract fitted IP similar to RestFrame
   // 1. Use Lorentz Transformation to Boost Vertex vector into cms frame
   // 2. Subtract movement of vertex end due to the time difference between
   //    the former simultaneous measured vertex points (see derivation of Lorentz contraction)

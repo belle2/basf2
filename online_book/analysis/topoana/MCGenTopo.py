@@ -13,7 +13,7 @@ from variables.MCGenTopo import mc_gen_topo
 mypath = basf2.Path()
 
 # load input ROOT file
-inputMdst('default', basf2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False), mypath)
+inputMdst(basf2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False), mypath)
 
 # Output the variables to a ntuple
 variablesToNtuple('', mc_gen_topo(200), 'MCGenTopo', 'MCGenTopo.root', path=mypath)

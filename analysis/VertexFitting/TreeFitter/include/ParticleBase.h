@@ -119,7 +119,7 @@ namespace TreeFitter {
     /** project constraint.   */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
 
-    /**  force p4 sum conservation all allong the tree */
+    /**  force p4 sum conservation all along the tree */
     virtual void forceP4Sum(FitParams&) const {} ;
 
     /**  get particle type */

@@ -96,7 +96,7 @@ namespace {
     EXPECT_EQ(meta_options.m_splot_mc_files.size(), 0);
     EXPECT_EQ(meta_options.m_splot_combined, false);
     EXPECT_EQ(meta_options.m_splot_boosted, false);
-    EXPECT_EQ(meta_options.m_use_sideband_substraction, false);
+    EXPECT_EQ(meta_options.m_use_sideband_subtraction, false);
     EXPECT_EQ(meta_options.m_sideband_variable, "");
     EXPECT_EQ(meta_options.m_sideband_mc_files.size(), 0u);
     EXPECT_EQ(meta_options.m_use_reweighting, false);
@@ -110,7 +110,7 @@ namespace {
     meta_options.m_reweighting_variable = "A";
     meta_options.m_reweighting_mc_files = {"reweighting_mc.root"};
     meta_options.m_reweighting_data_files = {"reweighting_data.root"};
-    meta_options.m_use_sideband_substraction = true;
+    meta_options.m_use_sideband_subtraction = true;
     meta_options.m_sideband_variable = "B";
     meta_options.m_sideband_mc_files = {"sideband_mc.root"};
     meta_options.m_use_splot = true;
@@ -127,7 +127,7 @@ namespace {
     EXPECT_EQ(pt.get<unsigned int>("splot_number_of_mc_files"), 1);
     EXPECT_EQ(pt.get<std::string>("splot_mc_file0"), "splot_mc.root");
     EXPECT_EQ(pt.get<std::string>("splot_variable"), "Q");
-    EXPECT_EQ(pt.get<bool>("use_sideband_substraction"), true);
+    EXPECT_EQ(pt.get<bool>("use_sideband_subtraction"), true);
     EXPECT_EQ(pt.get<std::string>("sideband_variable"), "B");
     EXPECT_EQ(pt.get<bool>("use_reweighting"), true);
     EXPECT_EQ(pt.get<std::string>("reweighting_identifier"), "test");
@@ -148,7 +148,7 @@ namespace {
     EXPECT_EQ(meta_options2.m_splot_mc_files[0], "splot_mc.root");
     EXPECT_EQ(meta_options2.m_splot_combined, true);
     EXPECT_EQ(meta_options2.m_splot_boosted, true);
-    EXPECT_EQ(meta_options2.m_use_sideband_substraction, true);
+    EXPECT_EQ(meta_options2.m_use_sideband_subtraction, true);
     EXPECT_EQ(meta_options2.m_sideband_variable, "B");
     EXPECT_EQ(meta_options2.m_sideband_mc_files.size(), 1);
     EXPECT_EQ(meta_options2.m_sideband_mc_files[0], "sideband_mc.root");

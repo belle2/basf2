@@ -800,17 +800,17 @@ namespace Belle2 {
         requestedVariable = arguments[0];
         maskName = arguments[1];
       } else {
-        B2FATAL("Number of arguments must be 1 (requatedVariable) or 2 (requestedVariable, maskName).");
+        B2FATAL("Number of arguments must be 1 (requestedVariable) or 2 (requestedVariable, maskName).");
       }
 
-      const std::vector<string> availableVarialbes = {"recoilMass",
+      const std::vector<string> availableVariables = {"recoilMass",
                                                       "recoilMassSqrd",
                                                       "pMissCMS",
                                                       "cosThetaMissCMS",
                                                       "EW90"
                                                      };
 
-      if (std::find(availableVarialbes.begin(), availableVarialbes.end(), requestedVariable) == availableVarialbes.end()) {
+      if (std::find(availableVariables.begin(), availableVariables.end(), requestedVariable) == availableVariables.end()) {
         B2FATAL("Wrong variable " << requestedVariable <<
                 " requested. The possibilities are recoilMass, recoilMassSqrd, pMissCMS, cosThetaMissCMS or EW90");
       }
@@ -1292,10 +1292,12 @@ namespace Belle2 {
         // --------------  Is the Hadron a descendant of a Meson that conserves flavor  --------------------------
 
         bool isB0DaughterConservingFlavor = false;
-        if (std::find(flavorConservingMesons.begin(), flavorConservingMesons.end(),
-                      mothersPDG.rbegin()[1]) != flavorConservingMesons.end())
+        if (mothersPDG.size() > 1)
         {
-          isB0DaughterConservingFlavor = true;
+          if (std::find(flavorConservingMesons.begin(), flavorConservingMesons.end(),
+                        mothersPDG.rbegin()[1]) != flavorConservingMesons.end()) {
+            isB0DaughterConservingFlavor = true;
+          }
         }
 
         // -----------------------------  Is the Hadron a single daughter of a tau ----- --------------------------
@@ -2244,10 +2246,10 @@ namespace Belle2 {
                           "[Eventbased][Expert] Check if the majority of the tracks in the current RestOfEvent are from a ``anti-B0``.",
                           Manager::VariableDataType::c_bool);
     REGISTER_VARIABLE("hasRestOfEventTracks", hasRestOfEventTracks,
-                      "[Expert] Returns the amount of tracks in the RestOfEvent related to the given Particle. -2 if the RestOfEvent is empty."
+                      "[Expert] Returns the number of tracks in the RestOfEvent related to the given Particle. -2 if the RestOfEvent is empty."
                       "\n This variable is going to be deprecated in release-07. Please consider to use `hasRestOfEventTracks(maskName)`");
     REGISTER_METAVARIABLE("hasRestOfEventTracks(maskName)", hasRestOfEventTracksNew,
-                          "[Expert] Returns the amount of tracks in the RestOfEvent related to the given Particle. -2 if the RestOfEvent is empty.",
+                          "[Expert] Returns the number of tracks in the RestOfEvent related to the given Particle. -2 if the RestOfEvent is empty.",
                           Manager::VariableDataType::c_bool);
 
     REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor, R"DOC(
@@ -2273,7 +2275,7 @@ In other words, this variable checks the generated flavor of the other generated
 )DOC");
 
 
-    REGISTER_METAVARIABLE("BtagToWBosonVariables(requestedVariable, maskName)", BtagToWBosonVariables, R"DOC(
+    REGISTER_METAVARIABLE("BtagToWBosonVariables(requestedVariable[, maskName])", BtagToWBosonVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables assuming a semileptonic decay with the given particle as target.
 The input values of ``requestedVariable`` can be the following:  recoilMass, pMissCMS, cosThetaMissCMS and EW90.
 )DOC", Manager::VariableDataType::c_double);

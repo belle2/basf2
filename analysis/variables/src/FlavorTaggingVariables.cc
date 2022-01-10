@@ -70,7 +70,7 @@ namespace Belle2 {
       return missMom ;
     }
 
-    Manager::FunctionPtr momentumMissingTagSideNew(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr momentumMissingTagSideWithMask(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       if (arguments.size() == 0)
@@ -153,7 +153,7 @@ namespace Belle2 {
       return result;
     }
 
-    Manager::FunctionPtr cosTPTONew(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr cosTPTOWithMask(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       if (arguments.size() == 0)
@@ -294,7 +294,7 @@ namespace Belle2 {
 
     }
 
-    Manager::FunctionPtr transverseMomentumOfChargeTracksInRoeNew(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr transverseMomentumOfChargeTracksInRoeWithMask(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       if (arguments.size() == 0)
@@ -321,7 +321,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr transverseMomentumSquaredOfChargeTracksInRoeNew(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr transverseMomentumSquaredOfChargeTracksInRoeWithMask(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       if (arguments.size() == 0)
@@ -434,7 +434,7 @@ namespace Belle2 {
       return vote > 0;
     }
 
-    Manager::FunctionPtr isMajorityInRestOfEventFromB0New(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr isMajorityInRestOfEventFromB0WithMask(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       if (arguments.size() == 0)
@@ -475,7 +475,7 @@ namespace Belle2 {
       return vote < 0;
     }
 
-    Manager::FunctionPtr isMajorityInRestOfEventFromB0barNew(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr isMajorityInRestOfEventFromB0barWithMask(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       if (arguments.size() == 0)
@@ -508,7 +508,7 @@ namespace Belle2 {
       return (roe && roe-> getNTracks() > 0);
     }
 
-    Manager::FunctionPtr hasRestOfEventTracksNew(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr hasRestOfEventTracksWithMask(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       if (arguments.size() == 0)
@@ -566,7 +566,7 @@ namespace Belle2 {
       return (BcpFlavor != 0) ? BcpFlavor : BtagFlavor;
     }
 
-    Manager::FunctionPtr isRelatedRestOfEventB0FlavorNew(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr isRelatedRestOfEventB0FlavorWithMask(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       if (arguments.size() == 0)
@@ -702,7 +702,7 @@ namespace Belle2 {
         return (q_MC > 0);
     }
 
-    Manager::FunctionPtr isRelatedRestOfEventMajorityB0FlavorNew(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr isRelatedRestOfEventMajorityB0FlavorWithMask(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       if (arguments.size() == 0)
@@ -2196,16 +2196,18 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Flavor Tagger Expert Variables");
 
-    REGISTER_VARIABLE("pMissTag", momentumMissingTagSide,
-                      "[Expert] Calculates the missing momentum for a given particle on the tag side."
-                      "\n This variable is going to be deprecated in release-07. Please consider to use `pMissTag(maskName)`");
-    REGISTER_METAVARIABLE("pMissTag(maskName)", momentumMissingTagSideNew,
+    REGISTER_VARIABLE("pMissTag", momentumMissingTagSide, R"DOC(
+[Expert] Calculates the missing momentum for a given particle on the tag side. 
+:noindex:
+)DOC");
+    REGISTER_METAVARIABLE("pMissTag(maskName)", momentumMissingTagSideWithMask,
                           "[Expert] Calculates the missing momentum for a given particle on the tag side.",
                           Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("cosTPTO"  , cosTPTO ,
-                      "[Expert] Returns cosine of angle between thrust axis of given particle and thrust axis of ROE."
-                      "\n This variable is going to be deprecated in release-07. Please consider to use `cosTPTO(maskName)`");
-    REGISTER_METAVARIABLE("cosTPTO(maskName)"  , cosTPTONew,
+    REGISTER_VARIABLE("cosTPTO"  , cosTPTO, R"DOC(
+[Expert] Returns cosine of angle between thrust axis of given particle and thrust axis of ROE.
+:noindex:
+)DOC");
+    REGISTER_METAVARIABLE("cosTPTO(maskName)", cosTPTOWithMask,
                           "[Expert] Returns cosine of angle between thrust axis of given particle and thrust axis of ROE.",
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,
@@ -2218,13 +2220,14 @@ namespace Belle2 {
                       "[Expert] Returns the momentum of the second daughter in the centre-of-mass system, 0. if this daughter doesn't exist.");
     REGISTER_VARIABLE("chargeTimesKaonLiklihood", chargeTimesKaonLiklihood,
                       "[Expert] Returns ``q*(highest PID_Likelihood for Kaons)``, 0. otherwise.");
-    REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe,
-                      "[Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE."
-                      "\n This variable is going to be deprecated in release-07. Please consider to use `ptTrackRoe(maskName)`");
-    REGISTER_METAVARIABLE("ptTracksRoe(maskName)", transverseMomentumOfChargeTracksInRoeNew,
+    REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe, R"DOC(
+[Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.
+:noindex:
+)DOC");
+    REGISTER_METAVARIABLE("ptTracksRoe(maskName)", transverseMomentumOfChargeTracksInRoeWithMask,
                           "[Exepert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.",
                           Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("pt2TracksRoe(maskName)", transverseMomentumSquaredOfChargeTracksInRoeNew,
+    REGISTER_METAVARIABLE("pt2TracksRoe(maskName)", transverseMomentumSquaredOfChargeTracksInRoeWithMask,
                           "[Expert] Returns the transverse momentum squared of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE.",
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("NumberOfKShortsInRoe", NumberOfKShortsInRoe,
@@ -2233,22 +2236,25 @@ namespace Belle2 {
     REGISTER_VARIABLE("isInElectronOrMuonCat", isInElectronOrMuonCat,
                       "[Expert] Returns 1.0 if the particle has been selected as target in the Muon or Electron Category, 0.0 otherwise.");
 
-    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0", isMajorityInRestOfEventFromB0,
-                      "[Eventbased][Expert] Checks if the majority of the tracks in the current RestOfEvent are from a ``B0``."
-                      "\n This variable is going to be deprecated in release-07. Please consider to use `isMajorityInRestOfEventFromB0(maskName)`");
-    REGISTER_METAVARIABLE("isMajorityInRestOfEventFromB0(maskName)", isMajorityInRestOfEventFromB0New,
+    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0", isMajorityInRestOfEventFromB0, R"DOC(
+[Eventbased][Expert] Checks if the majority of the tracks in the current RestOfEvent are from a ``B0``.
+:noindex:
+)DOC");
+    REGISTER_METAVARIABLE("isMajorityInRestOfEventFromB0(maskName)", isMajorityInRestOfEventFromB0WithMask,
                           "[Eventbased][Expert] Checks if the majority of the tracks in the current RestOfEvent are from a ``B0``.",
                           Manager::VariableDataType::c_bool);
-    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar,
-                      "[Eventbased][Expert] Check if the majority of the tracks in the current RestOfEvent are from a ``anti-B0``."
-                      "\n This variable is going to be deprecated in release-07. Please consider to use `isMajorityInRestOfEventFromB0bar(maskName)`");
-    REGISTER_METAVARIABLE("isMajorityInRestOfEventFromB0bar(maskName)", isMajorityInRestOfEventFromB0barNew,
+    REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar, R"DOC(
+[Eventbased][Expert] Check if the majority of the tracks in the current RestOfEvent are from a ``anti-B0``.
+:noindex:
+)DOC");
+    REGISTER_METAVARIABLE("isMajorityInRestOfEventFromB0bar(maskName)", isMajorityInRestOfEventFromB0barWithMask,
                           "[Eventbased][Expert] Check if the majority of the tracks in the current RestOfEvent are from a ``anti-B0``.",
                           Manager::VariableDataType::c_bool);
-    REGISTER_VARIABLE("hasRestOfEventTracks", hasRestOfEventTracks,
-                      "[Expert] Returns the number of tracks in the RestOfEvent related to the given Particle. -2 if the RestOfEvent is empty."
-                      "\n This variable is going to be deprecated in release-07. Please consider to use `hasRestOfEventTracks(maskName)`");
-    REGISTER_METAVARIABLE("hasRestOfEventTracks(maskName)", hasRestOfEventTracksNew,
+    REGISTER_VARIABLE("hasRestOfEventTracks", hasRestOfEventTracks, R"DOC(
+[Expert] Returns the number of tracks in the RestOfEvent related to the given Particle. -2 if the RestOfEvent is empty.
+:noindex:
+)DOC");
+    REGISTER_METAVARIABLE("hasRestOfEventTracks(maskName)", hasRestOfEventTracksWithMask,
                           "[Expert] Returns the number of tracks in the RestOfEvent related to the given Particle. -2 if the RestOfEvent is empty.",
                           Manager::VariableDataType::c_bool);
 
@@ -2256,22 +2262,23 @@ namespace Belle2 {
 [Eventbased][Expert] Returns -1 (1) if current RestOfEvent is related to a ``anti-B0`` (``B0``). 
 The ``MCError`` bit of Breco has to be 0, 1, 2, 16 or 1024. 
 The output of the variable is 0 otherwise. 
-If one particle in the RestOfEvent is found to belong to the reconstructed ``B0``, the output is -2(2) for a ``anti-B0`` (``B0``) on the reconstructed side.");
+If one particle in the RestOfEvent is found to belong to the reconstructed ``B0``, the output is -2(2) for a ``anti-B0`` (``B0``) on the reconstructed side.
 )DOC");
     REGISTER_VARIABLE("ancestorHasWhichFlavor", ancestorHasWhichFlavor,
                       "[Expert] Checks the decay chain of the given particle upwards up to the ``Upsilon(4S)`` resonance and outputs 0 (1) if an ancestor is found to be a ``anti-B0`` (``B0``), if not -2.");
     REGISTER_VARIABLE("B0mcErrors", B0mcErrors, "[Expert] Returns MC-matching flag, see :b2:var:`mcErrors` for the particle, e.g. ``B0`` .");
-    REGISTER_VARIABLE("isRelatedRestOfEventMajorityB0Flavor", isRelatedRestOfEventMajorityB0Flavor,
-                      "[Expert] Returns 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a ``anti-B0`` (``B0``)."
-		      "\n This variable is going to be deprecated in release-07. Please consider to use `isRelatedRestOfEventMajorityB0Flavor(maskName)`");
-    REGISTER_METAVARIABLE("isRelatedRestOfEventMajorityB0Flavor(maskName)", isRelatedRestOfEventMajorityB0FlavorNew,
+    REGISTER_VARIABLE("isRelatedRestOfEventMajorityB0Flavor", isRelatedRestOfEventMajorityB0Flavor, R"DOC(
+[Expert] Returns 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a ``anti-B0`` (``B0``).
+:noindex:
+)DOC");
+    REGISTER_METAVARIABLE("isRelatedRestOfEventMajorityB0Flavor(maskName)", isRelatedRestOfEventMajorityB0FlavorWithMask,
                       "[Expert] Returns 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a ``anti-B0`` (``B0``).",
                       Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,
                       "[Expert] Returns 0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a ``anti-B0`` (``B0``).");
     REGISTER_VARIABLE("mcFlavorOfOtherB", mcFlavorOfOtherB,  R"DOC(
 [Expert] Returns the MC flavor (+1 or -1) of the accompanying tag-side B meson if the given particle is a correctly truth-matched B candidate, 0 otherwise.
-In other words, this variable checks the generated flavor of the other generated ``Upsilon(4S)`` daughter.");
+In other words, this variable checks the generated flavor of the other generated ``Upsilon(4S)`` daughter.
 )DOC");
 
 

@@ -714,7 +714,7 @@ namespace Belle2 {
 
       auto func = [maskName](const Particle * particle) -> int {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-        if (!roe.isValid()) return 0;
+        if (!roe.isValid()) return -2;
 
         int q_MC = 0; //Flavor of B
 

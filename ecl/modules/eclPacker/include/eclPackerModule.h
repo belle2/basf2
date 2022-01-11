@@ -10,6 +10,8 @@
 //Framework
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
 //ECL

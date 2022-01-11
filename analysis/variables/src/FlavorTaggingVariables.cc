@@ -1093,8 +1093,7 @@ namespace Belle2 {
         while (mcMother)
         {
           mothersPDG.push_back(abs(mcMother->getPDG()));
-          if (index == 8) // FastHadron
-            mothersPointers.push_back(mcMother);
+          mothersPointers.push_back(mcMother);
           if (abs(mcMother->getPDG()) == 511) break;
           mcMother = mcMother -> getMother();
         }
@@ -1246,8 +1245,7 @@ namespace Belle2 {
         while (mcMother)
         {
           mothersPDG.push_back(abs(mcMother->getPDG()));
-          if (index == 8 || index == 9) // FastHadron, KaonPion
-            mothersPointers.push_back(mcMother);
+          mothersPointers.push_back(mcMother);
           if (abs(mcMother->getPDG()) == 511) break;
           mcMother = mcMother->getMother();
         }
@@ -1492,7 +1490,7 @@ namespace Belle2 {
                 "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
       }
 
-      auto func = [particleListName, extraInfoName](const Particle * particle) -> bool {
+      auto func = [particleListName, extraInfoName](const Particle * particle) -> double {
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
         if (!ListOfParticles.isValid()) return 0;
 
@@ -1519,13 +1517,13 @@ namespace Belle2 {
 
         }
 
-        bool output = false;
+        double output = 0.0;
         if ((extraInfoName == "isRightTrack(MaximumPstar)") && (labToCms(particle->get4Vector()).P() == maximumProb))
         {
-          output = true;
+          output = 1.0;
         } else if (extraInfoName != "isRightTrack(MaximumPstar)" && particle->hasExtraInfo(extraInfoName))
         {
-          if (particle->getExtraInfo(extraInfoName) == maximumProb) output = true;
+          if (particle->getExtraInfo(extraInfoName) == maximumProb) output = 1.0;
         }
 
         return output;

@@ -51,7 +51,7 @@ namespace Belle2 {
 
   private:
     /** Event number */
-    int m_EvtNum;
+    int m_EvtNum = 0;
 
     /** position in the  data array */
     int m_bufPos;
@@ -110,6 +110,8 @@ namespace Belle2 {
     //DataStore variables
     StoreArray<ECLDigit> m_eclDigits; /**< ECLDigit dataStore object*/
     StoreArray<ECLDsp> m_eclDsps; /**< ECLDSP dataStore object*/
+    /** store objptr for EventMetaData **/
+    StoreObjPtr<EventMetaData> m_eventMetaData;
 
     /** write N bits to the collector buffer */
     void writeNBits(unsigned int* buff, unsigned int value, unsigned int bitsToWrite);

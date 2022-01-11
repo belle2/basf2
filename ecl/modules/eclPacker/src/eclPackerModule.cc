@@ -50,8 +50,6 @@ ECLPackerModule::ECLPackerModule() :
   addParam("CompressMode", m_compressMode, "compress mode for ADC samples", true);
   addParam("AmpThreshold", m_ampThreshold, "Amplitude threshold", -50);
   addParam("PackWfRareFactor", m_WaveformRareFactor, "Pack ADC samples for one of N events. No waveform is packed if 0", 100);
-
-  m_EvtNum = 0;
 }
 
 ECLPackerModule::~ECLPackerModule()
@@ -83,6 +81,11 @@ void ECLPackerModule::beginRun()
 
 void ECLPackerModule::event()
 {
+  if (m_eventMetaData.isValid()) {
+    m_EvtNum = m_eventMetaData->getEvent();
+  } else {
+    m_EvtNum = -1;
+  }
 
   B2DEBUG(50, "EclPacker:: event called ");
   // output data
@@ -366,7 +369,6 @@ void ECLPackerModule::event()
     newRawECL->PackDetectorBuf((int*)buff[0].data(), nwords[0], (int*)buff[1].data(), nwords[1],
                                nullptr, 0, nullptr, 0, rawcprpacker_info);
   }
-  m_EvtNum++;
 }
 
 void ECLPackerModule::endRun()

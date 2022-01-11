@@ -1490,7 +1490,7 @@ namespace Belle2 {
                 "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
       }
 
-      auto func = [particleListName, extraInfoName](const Particle * particle) -> double {
+      auto func = [particleListName, extraInfoName](const Particle * particle) -> bool {
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
         if (!ListOfParticles.isValid()) return 0;
 
@@ -1517,13 +1517,13 @@ namespace Belle2 {
 
         }
 
-        double output = 0.0;
+        bool output = false;
         if ((extraInfoName == "isRightTrack(MaximumPstar)") && (labToCms(particle->get4Vector()).P() == maximumProb))
         {
-          output = 1.0;
+          output = true;
         } else if (extraInfoName != "isRightTrack(MaximumPstar)" && particle->hasExtraInfo(extraInfoName))
         {
-          if (particle->getExtraInfo(extraInfoName) == maximumProb) output = 1.0;
+          if (particle->getExtraInfo(extraInfoName) == maximumProb) output = true;
         }
 
         return output;

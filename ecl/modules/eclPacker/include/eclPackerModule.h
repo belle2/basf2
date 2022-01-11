@@ -70,6 +70,9 @@ namespace Belle2 {
     /** eneble/disable compression of waveform data */
     bool m_compressMode;
 
+    /** true-pack data in PCIe40 format, false-pack data in COPPER format */
+    bool m_pcie40Data;
+
     /** the rate of writing of the ADC samples*/
     int m_WaveformRareFactor;
 

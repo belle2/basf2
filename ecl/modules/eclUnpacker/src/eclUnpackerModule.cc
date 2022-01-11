@@ -21,7 +21,6 @@
 //ECL
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/utility/ECLChannelMapper.h>
 #include <ecl/utility/ECLDspUtilities.h>
 
 using namespace std;
@@ -105,11 +104,6 @@ ECLUnpackerModule::ECLUnpackerModule() :
            "exist in ECL mapping", false);
   addParam("useUnpackingParameters", m_useUnpackingParameters,
            "Use ECLUnpackingParameters payload", true);
-}
-
-ECLUnpackerModule::~ECLUnpackerModule()
-{
-
 }
 
 void ECLUnpackerModule::initialize()

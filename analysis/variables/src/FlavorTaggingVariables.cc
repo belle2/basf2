@@ -1149,7 +1149,7 @@ namespace Belle2 {
         // -----------------------------  Is the Hadron a single daughter of a tau ----- --------------------------
 
         bool isHadronSingleTauDaughter = false;
-        if (mothersPDG.rbegin()[1] == 15)
+        if (mothersPDG.size() > 1 && mothersPDG.rbegin()[1] == 15)
         {
           int numberOfChargedDaughters = 0;
           for (auto& tauDaughter : mothersPointers.rbegin()[1] -> getDaughters()) {
@@ -1303,7 +1303,7 @@ namespace Belle2 {
         // -----------------------------  Is the Hadron a single daughter of a tau ----- --------------------------
 
         bool isHadronSingleTauDaughter = false;
-        if (mothersPDG.rbegin()[1] == 15)
+        if (mothersPDG.size() > 1 && mothersPDG.rbegin()[1] == 15)
         {
           int numberOfChargedDaughters = 0;
           for (auto& tauDaughter : mothersPointers.rbegin()[1] -> getDaughters()) {

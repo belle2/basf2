@@ -55,8 +55,9 @@ namespace Belle2 {
       ECLChannelMap getDBObject();
 
       /** Get crate number by given COPPER node number and FINESSE number
-       * @param iFINESSE   0 (FINESSE A) or 1 (FINESSE B)
-       * @param pcie40     Set to true if unpacking PCIe40 data
+       * @param iCOPPERNode  Node ID (26 nodes in COPPER case, 3 nodes in PCIe40 case)
+       * @param iFINESSE     Channel number (0 or 1 in COPPER case, 0-17 in PCIe40 case)
+       * @param pcie40       Set to true if unpacking PCIe40 data
        */
       int getCrateID(int iCOPPERNode, int iFINESSE, bool pcie40 = false);
       /// Get CellId by given crate number, shaper position in the crate and DSP channel number in the shaper

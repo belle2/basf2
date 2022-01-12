@@ -1061,11 +1061,26 @@ Note that this is context-dependent variable and can take different values depen
 
   * You will see a difference between this mass and the :b2:var:`InvM`.
   )DOC");
-    REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass");
-    REGISTER_VARIABLE("Q", particleQ, "released energy in decay");
-    REGISTER_VARIABLE("dQ", particleDQ,
-                      "released energy in decay minus nominal one");
-    REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass");
+    REGISTER_VARIABLE("dM", particleDMass, R"DOC(
+                      mass minus nominal mass
+
+		      :Unit: GeV/:math:`c^2`
+                      )DOC");
+    REGISTER_VARIABLE("Q", particleQ, R"DOC(
+                      energy releasedin decay
+
+                      :Unit: GeV
+                      )DOC");
+    REGISTER_VARIABLE("dQ", particleDQ, R"DOC(
+                      released energy in decay minus nominal one
+
+                      :Unit: GeV
+                      )DOC");
+    REGISTER_VARIABLE("Mbc", particleMbc, R"DOC(
+                      beam constrained mass
+
+                      :Unit: GeV/:math:`c^2`
+                      )DOC");
     REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
     REGISTER_VARIABLE("M2", particleMassSquared,
                       "The particle's mass squared.");

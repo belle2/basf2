@@ -95,7 +95,7 @@ void DAQMonitorModule::event()
     // (which is the main purpose of this histogram)
     h_runNr->GetXaxis()->SetCanExtend(kTRUE);
   }
-  h_runNr->(runNr);
+  h_runNr->Fill(runNr);
 
   // Since sizeof returns the size in bytes (B),
   // if we divide it by 1000 we obtain kilobytes (kB).

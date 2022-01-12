@@ -86,6 +86,9 @@ namespace Belle2 {
         if (ECL_BARREL_CRATES + ECL_FWD_CRATES < iCrate && iCrate <= ECL_CRATES) return ECL_BKW_SHAPERS_IN_CRATE;
         return 0;
       }
+
+      ClassDef(ECLChannelMapper, 1);
+
     };
   }
 }

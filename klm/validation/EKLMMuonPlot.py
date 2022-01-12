@@ -71,7 +71,7 @@ functions.Add(TNamed('Check', 'Number of events decreases with number of layer.'
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
-time = ROOT.TH1F('Time', 'Hit time for EKLMHit2ds', 150, -5.0, 55.0)
+time = ROOT.TH1F('Time', 'Hit time for EKLMHit2ds', 80, -5.0, 35.0)
 time.GetXaxis().SetTitle('t (ns)')
 time.GetYaxis().SetTitle('Events')
 tree.Draw('EKLMHit2ds.getTime()>>Time', '')

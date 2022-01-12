@@ -179,7 +179,7 @@ def draw_bklmhists(file_chain):
     timeRPC.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     timeRPC.Write()
 
-    timeSci = TH1F('TimeSci', 'Hit time for BKLMHit2ds in scintillators', 100, 45, 65)
+    timeSci = TH1F('TimeSci', 'Hit time for BKLMHit2ds in scintillators', 80, -5, 35)
     file_chain.Draw('BKLMHit2ds.getTime()>>TimeSci', 'BKLMHit2ds.inRPC()==0')
     timeSci.GetXaxis().SetTitle('t (ns)')
     timeSci.GetListOfFunctions().Add(TNamed('Description', 'Time of muon hit in scintillators'))

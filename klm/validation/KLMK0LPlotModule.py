@@ -85,7 +85,7 @@ class KLMK0LPlotModule(basf2.Module):
         #: Time resolution histogram.
         self.hist_tres = ROOT.TH1F('k0l_tres',
                                    'KLM K0L decay time resolution',
-                                   100, -20., 10.)
+                                   100, -15., 15.)
         self.hist_tres.SetXTitle('ns')
         self.hist_tres.SetYTitle('Events')
         functions = self.hist_tres.GetListOfFunctions()

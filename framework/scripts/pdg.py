@@ -32,10 +32,16 @@ particles to generate. See `from_name`, `from_names`, `to_name` and `to_names`
 
 import re
 import basf2
-from ROOT.Belle2 import EvtGenDatabasePDG
 
-#: the particle database (filled from evt.pdl by framework)
-_database = EvtGenDatabasePDG.Instance()
+
+def _get_instance():
+    """
+    Function to return an instance of the EvtGenDatabasePDG class.
+    """
+
+    from ROOT import Belle2  # Avoid to import ROOT when pdg is imported.
+    instance = Belle2.EvtGenDatabasePDG.Instance()
+    return instance
 
 
 def get(name):
@@ -46,7 +52,7 @@ def get(name):
     Will throw an LookupError of no such particle exists.
     """
 
-    p = _database.GetParticle(name)
+    p = _get_instance().GetParticle(name)
     if not p:
         raise LookupError("No particle with name '%s'" % name)
 
@@ -116,12 +122,12 @@ def load(filename):
     """
     Read particle database from given evtgen pdl file
     """
-    _database.ReadEvtGenTable(filename)
+    _get_instance().ReadEvtGenTable(filename)
 
 
 def load_default():
     """Read default evt.pdl file"""
-    _database.ReadEvtGenTable()
+    _get_instance().ReadEvtGenTable()
 
 
 def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifetime=0, pythiaID=0):
@@ -148,8 +154,8 @@ def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifet
         # FIXME: is 3 a good default?
         max_width = width * 3
 
-    particle = _database.AddParticle(name, name, mass, False, width, charge * 3, "userdefined",
-                                     pdgCode, 0, 0, lifetime, spin, max_width, pythiaID)
+    particle = _get_instance().AddParticle(name, name, mass, False, width, charge * 3, "userdefined",
+                                           pdgCode, 0, 0, lifetime, spin, max_width, pythiaID)
     if particle:
         basf2.B2INFO("Adding new particle '%s' (pdg=%d, mass=%.3g GeV, width=%.3g GeV, charge=%d, spin=%d)" %
                      (name, pdgCode, mass, width, charge, spin))
@@ -256,7 +262,7 @@ def search(name=None, min_mass=None, max_mass=None, name_regex=False, include_wi
         include_width = 0
 
     result = []
-    for p in _database.ParticleList():
+    for p in _get_instance().ParticleList():
         if pattern is not None and not pattern.match(p.GetName()):
             continue
         m = p.Mass()

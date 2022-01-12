@@ -38,7 +38,7 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
   addParam("CDCHitCollectionName",
            m_CDCHitCollectionName,
            "Name of the input StoreArray of CDCHits.",
-           string(""));
+           string("CDCHits4Trg"));
   addParam("TSHitCollectionName",
            m_TSHitCollectionName,
            "Name of the output StoreArray of CDCTriggerSegmentHits.",
@@ -269,9 +269,16 @@ CDCTriggerTSFModule::initialize()
     }
   }
 
+}
+
+void
+CDCTriggerTSFModule::beginRun()
+{
   if (m_deadchflag) {
-    if (!m_db_deadchannel) {
-      B2INFO("No database for CDCTRG dead channel mapping. Channel masking is skipped.");
+    if (not m_db_deadchannel.isValid()) {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      B2ERROR("No database for CDCTRG dead channel mapping. Channel masking is skipped. exp " << evtMetaData->getExperiment() << " run "
+              << evtMetaData->getRun());
       for (unsigned int i = 0; i < nSuperLayers; i++) { //SL
         for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
           for (unsigned int k = 0; k < MAX_N_SCELLS; k++) { //
@@ -289,7 +296,6 @@ CDCTriggerTSFModule::initialize()
       }
     }
   }
-
 }
 
 void

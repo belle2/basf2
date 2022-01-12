@@ -12,17 +12,17 @@ Generating Monte Carlo
 
     **Prerequisites**:
 
-    	* The basics.
-	* First steering file.
+    * The basics.
+    * First steering file.
 
     **Questions**:
 
-        * How can I generate my own MC?
+    * How can I generate my own MC?
 
     **Objectives**:
 
-        * Generate 10 :math:`B^0 \bar{B}^0` events
-	* Write a simple decay file and generate signal events
+    * Generate 10 :math:`B^0 \bar{B}^0` events
+    * Write a simple decay file and generate signal events
 
 
 Why do we need Monte Carlo simulated data?
@@ -229,7 +229,7 @@ Now we have to add to the steering path the relevant functions for:
 .. tip::
 
    If you need more complex steering files for your quick studies or you want to use different MC generators, you
-   can always check our `MC production repository`_ (used and mantained by the Data Production group). This
+   can always check our `MC production repository`_ (used and maintained by the Data Production group). This
    repository is useful also to check which configurations were used for a specific MC production campaign.
 
 .. _MC production repository: https://stash.desy.de/projects/B2P/repos/mc/browse
@@ -337,7 +337,6 @@ easily get all the relevant information: :ref:`b2help-particles`.
      .. literalinclude:: steering_files/067_generate_mc.py
         :language: python
         :linenos:
-        :emphasize-lines: 17-21
 
 
 .. admonition:: Question

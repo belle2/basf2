@@ -24,12 +24,9 @@ from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
 
 from tracking import (
     add_mc_tracking_reconstruction,
-    add_tracking_reconstruction,
     add_prefilter_tracking_reconstruction,
     add_postfilter_tracking_reconstruction,
     add_cr_tracking_reconstruction,
-    add_mc_track_finding,
-    add_track_finding,
     add_prune_tracks,
 )
 
@@ -61,6 +58,7 @@ DIGITS_OBJECTS = (
     'ARICHDigits',
     'CDCHits',
     'ECLDigits',
+    'ECLDsps',
     'KLMDigits',
     'PXDDigits',
     'SVDEventInfoSim',
@@ -79,7 +77,8 @@ def default_event_abort(module, condition, error_flag):
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
-                       event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True):
+                       event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
+                       pxd_filtering_offline=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -116,11 +115,13 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         but just remove all data except for the event information.
     :param use_random_numbers_for_hlt_prescale: If True, the HLT filter prescales are applied using randomly
         generated numbers, otherwise are applied using an internal counter.
+    :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
+        The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     """
 
     add_prefilter_reconstruction(path,
                                  components=components,
-                                 add_trigger_calculation=add_trigger_calculation,
+                                 add_modules_for_trigger_calculation=add_trigger_calculation,
                                  skipGeometryAdding=skipGeometryAdding,
                                  trackFitHypotheses=trackFitHypotheses,
                                  use_second_cdc_hits=use_second_cdc_hits,
@@ -129,7 +130,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  addClusterExpertModules=addClusterExpertModules,
                                  pruneTracks=False,
                                  event_abort=event_abort,
-                                 use_random_numbers_for_hlt_prescale=use_random_numbers_for_hlt_prescale)
+                                 use_random_numbers_for_hlt_prescale=use_random_numbers_for_hlt_prescale,
+                                 pxd_filtering_offline=pxd_filtering_offline)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
     if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
@@ -145,10 +147,11 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         add_skim_software_trigger(path)
 
 
-def add_prefilter_reconstruction(path, components=None, add_trigger_calculation=True, skipGeometryAdding=False,
-                                 trackFitHypotheses=None, use_second_cdc_hits=False, add_muid_hits=False,
-                                 reconstruct_cdst=None, addClusterExpertModules=True, pruneTracks=True,
-                                 event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True):
+def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_calculation=True,
+                                 skipGeometryAdding=False, trackFitHypotheses=None, use_second_cdc_hits=False,
+                                 add_muid_hits=False, reconstruct_cdst=None, addClusterExpertModules=True,
+                                 pruneTracks=True, event_abort=default_event_abort,
+                                 use_random_numbers_for_hlt_prescale=True, pxd_filtering_offline=False):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
@@ -163,7 +166,8 @@ def add_prefilter_reconstruction(path, components=None, add_trigger_calculation=
         the fitted hypotheses are pion, muon and proton, i.e. [211, 321, 2212].
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
-    :param add_trigger_calculation: add the software trigger modules for monitoring (do not make any cut)
+    :param add_modules_for_trigger_calculation: add the modules necessary for computing the software trigger decision
+        during later stages (do not make any cut), relevant only when reconstruct_cdst is not None.
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
         full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
         required PXD objects won't be added.
@@ -174,7 +178,10 @@ def add_prefilter_reconstruction(path, components=None, add_trigger_calculation=
         generated numbers, otherwise are applied using an internal counter.
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to
         reduce execution time.
-    :param pruneTracks: Delete all hits except the first and last of the tracks after the dEdX modules.
+    :param pruneTracks: Delete all hits except the first and last of the tracks (it must be set to False if the
+        post-filter reconstruction is also run).
+    :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
+        The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     """
 
     # Check components.
@@ -195,7 +202,8 @@ def add_prefilter_reconstruction(path, components=None, add_trigger_calculation=
                                           mcTrackFinding=False,
                                           skipGeometryAdding=skipGeometryAdding,
                                           trackFitHypotheses=trackFitHypotheses,
-                                          use_second_cdc_hits=use_second_cdc_hits)
+                                          use_second_cdc_hits=use_second_cdc_hits,
+                                          pxd_filtering_offline=pxd_filtering_offline)
 
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Prefilter_Tracking')
@@ -212,17 +220,20 @@ def add_prefilter_reconstruction(path, components=None, add_trigger_calculation=
         if not components or ('SVD' in components):
             path.add_module("SVDShaperDigitsFromTracks")
 
-        # if you need to calculate the triggerResult, then you will need the full post-tracking recostruction
-        if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
+        # if you need to calculate the software trigger result, then you will need the full pre-filter post-tracking reconstruction
+        if add_modules_for_trigger_calculation and (not components or (
+                "CDC" in components and "ECL" in components and "KLM" in components)):
             add_prefilter_posttracking_reconstruction(path,
                                                       components=components,
                                                       pruneTracks=pruneTracks,
                                                       add_muid_hits=add_muid_hits,
                                                       addClusterExpertModules=addClusterExpertModules)
-        # if you don't need the softwareTrigger result, then you can add only these two modules of the post-tracking reconstruction
+        # if you don't need the software trigger result, it's enough to add only
+        # these two modules of the pre-filter post-tracking reconstruction
         else:
             add_dedx_modules(path)
-            add_prune_tracks(path, components=components)
+            if pruneTracks:
+                add_prune_tracks(path, components=components)
 
     #
     # FULL (aka old) CDST CASE
@@ -493,55 +504,49 @@ def add_cdst_output(
     path,
     mc=True,
     filename='cdst.root',
-    additionalBranches=[],
+    additionalBranches=None,
     dataDescription=None,
-    rawFormat=True,
     ignoreInputModulesCheck=False
 ):
     """
     This function adds the `RootOutput` module to a path with the settings needed to produce a cDST output.
+    The actual cDST output content depends on the value of the parameter `mc`:
+    * if `mc` is `False` (default setting), the cDST content is raw + tracking dataobjects;
+    * if `mc` is `True`, the cDST content is digits + MCParticles + tracking dataobjects.
 
     @param path Path to add modules to.
-    @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
+    @param mc Define the type of cDST output content: `False` for raw + tracking dataobjects, `True` for digits +
+           MCParticles + tracking dataobjects.
     @param filename Output file name.
     @param additionalBranches Additional objects/arrays of event durability to save
     @param dataDescription Additional key->value pairs to be added as data description
-           fields to the output FileMetaData
-    @param rawFormat Saves the cDST file in the raw+tracking format if mc=False, otherwise saves the cDST file
-           in the digits+tracking format.
+           fields to the output FileMetaData.
     @param ignoreInputModulesCheck If True, do not enforce check on missing PXD modules in the input path.
            Needed when a conditional path is passed as input.
     """
 
-    branches = []
+    branches = list(CDST_TRACKING_OBJECTS)
     persistentBranches = ['FileMetaData']
 
-    if rawFormat:
-        branches += list(CDST_TRACKING_OBJECTS)
-        if not mc:
-            branches += ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS
-        else:
-            branches += list(DIGITS_OBJECTS) + [
-                'EventLevelTriggerTimeInfo',
-                'SoftwareTriggerResult',
-                'TRGSummary']
-        if not ignoreInputModulesCheck and "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
-            basf2.B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found in the input path!")
+    if not mc:
+        branches += ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS
     else:
-        if not additionalBranches:
-            basf2.B2WARNING('You are calling add_cdst_output() using rawFormat=False and requiring no additional branches. '
-                            'This is equivalent to calling add_mdst_output().')
-        branches += list(mdst.MDST_OBJECTS)
+        branches += list(DIGITS_OBJECTS) + [
+            'MCParticles',
+            'EventLevelTriggerTimeInfo',
+            'SoftwareTriggerResult',
+            'TRGSummary']
+        persistentBranches += ['BackgroundInfo']
+
+    if not ignoreInputModulesCheck and "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
+        basf2.B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found in the input path!")
 
     if dataDescription is None:
         dataDescription = {}
-    dataDescription.setdefault("dataLevel", "cdst")
+        dataDescription.setdefault("dataLevel", "cdst")
 
-    if mc:
-        branches += ['MCParticles']
-        persistentBranches += ['BackgroundInfo']
-
-    branches += additionalBranches
+    if additionalBranches is not None:
+        branches += additionalBranches
 
     return path.add_module("RootOutput", outputFileName=filename, branchNames=branches,
                            branchNamesPersistent=persistentBranches, additionalDataDescription=dataDescription)

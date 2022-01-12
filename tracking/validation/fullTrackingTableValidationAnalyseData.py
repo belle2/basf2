@@ -142,7 +142,7 @@ if __name__ == '__main__':
         ("cdc_was_found", lambda x: x["cdc_was_found"] == 1),
     ]
 
-    df = uproot.open("../matching_validation.root")
+    df = uproot.open("../matching_validation.root")['VxdCdcPartFinderHarvester_tree'].arrays(library='pd')
     html = get_html(df, test)
 
     tfile = TFile(VALIDATION_OUTPUT_FILE, "RECREATE")

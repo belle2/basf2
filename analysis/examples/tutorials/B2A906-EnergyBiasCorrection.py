@@ -11,7 +11,6 @@
 import basf2 as b2
 import modularAnalysis as ma
 import variables as va
-import os
 
 # define scale tests
 sys_tests = ['def', 'scale']
@@ -27,8 +26,7 @@ if test not in sys_tests:
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
+ma.inputMdst(filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
              path=my_path)
 
 # ID of weight table

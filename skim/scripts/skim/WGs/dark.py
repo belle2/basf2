@@ -15,7 +15,7 @@ import basf2 as b2
 import modularAnalysis as ma
 import pdg
 from skim import BaseSkim, fancy_skim_header
-from stdCharged import stdE, stdMu
+from stdCharged import stdE, stdMu, stdPi, stdK
 from stdPhotons import stdPhotons
 import vertex as vertex
 
@@ -35,9 +35,10 @@ class SinglePhotonDark(BaseSkim):
     __contact__ = __liaison__
     __description__ = "Single photon skim list for the dark photon analysis."
     __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
 
     def build_lists(self, path):
 
@@ -94,6 +95,7 @@ class ALP3Gamma(BaseSkim):
     )
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
 
     def addALPToPDG(self):
         """Adds the ALP codes to the basf2 pdg instance """
@@ -117,7 +119,7 @@ class ALP3Gamma(BaseSkim):
         ma.fillParticleList(
             'gamma:cdcAndMinimumEnergy',
             'E >= 0.1 and theta >= 0.297 and theta <= 2.618',
-            True, path=path
+            True, path=path, loadPhotonBeamBackgroundMVA=False
         )
 
         # defining the decay string
@@ -170,6 +172,7 @@ class DimuonPlusMissingEnergy(BaseSkim):
     )
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdMu("all", path=path)
@@ -206,6 +209,7 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
     )
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -246,6 +250,7 @@ class LFVZpVisible(BaseSkim):
     __description__ = "Lepton flavour violating Z' skim, Z' to visible FS."
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -301,9 +306,10 @@ class EGammaControlDark(BaseSkim):
     )
     __contact__ = __liaison__
     __category__ = "physics, dark sector, control-channel"
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
         stdE("all", path=path)
 
     def build_lists(self, path):
@@ -366,9 +372,10 @@ class GammaGammaControlKLMDark(BaseSkim):
     )
     __contact__ = __liaison__
     __category__ = "physics, dark sector, control-channel"
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
 
     TestSampleProcess = "gg"
 
@@ -453,6 +460,7 @@ class DielectronPlusMissingEnergy(BaseSkim):
     )
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -497,9 +505,10 @@ class RadBhabhaV0Control(BaseSkim):
     )
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
         stdE("all", path=path)
 
     def build_lists(self, path):
@@ -540,9 +549,10 @@ class InelasticDarkMatter(BaseSkim):
     __contact__ = __liaison__
     __description__ = "iDM list for the iDM analysis."
     __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
         stdE("all", path=path)
 
     def build_lists(self, path):
@@ -575,3 +585,52 @@ class InelasticDarkMatter(BaseSkim):
         path = self.skim_event_cuts(idmEventCuts, path=path)
 
         return ['gamma:ISR']
+
+
+@fancy_skim_header
+class BtoKplusLLP(BaseSkim):
+    """
+    Skim to select B+ decays to a K+ from the IP and a LLP with a vertex displaced from the IR decaying to two charged tracks.
+    """
+    __authors__ = ["Sascha Dreyer"]
+    __contact__ = __liaison__
+    __description__ = (
+        "B+ to K+ LLP analysis skim :math:`e^{+}e^{-} \\to \\Upsilon(4s) \\to [B^{+} \\to K^{+} LLP]B^{-}`"
+    )
+    __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdK("all", path=path)
+        stdE("all", path=path)
+        stdMu("all", path=path)
+
+    def build_lists(self, path):
+
+        btoksLbl = '_btoks'
+
+        minDisplacementCut = "[dr > 0.05]"
+
+        ma.reconstructDecay("vpho:LLP_e" + btoksLbl + " -> e+:all e-:all", "", path=path)
+        ma.reconstructDecay("vpho:LLP_mu" + btoksLbl + " -> mu+:all mu-:all", "", path=path)
+        ma.reconstructDecay("vpho:LLP_pi" + btoksLbl + " -> pi+:all pi-:all", "", path=path)
+        ma.reconstructDecay("vpho:LLP_K" + btoksLbl + " -> K+:all K-:all", "", path=path)
+
+        ma.copyLists(outputListName="vpho:LLP" + btoksLbl,
+                     inputListNames=["vpho:LLP_e" + btoksLbl, "vpho:LLP_mu" + btoksLbl,
+                                     "vpho:LLP_pi" + btoksLbl, "vpho:LLP_K" + btoksLbl],
+                     path=path)
+
+        vertex.treeFit("vpho:LLP" + btoksLbl, conf_level=0, updateAllDaughters=True, path=path)
+
+        ma.applyCuts("vpho:LLP" + btoksLbl, minDisplacementCut, path=path)
+
+        ipKaon = "[pt > 0.1] and [abs(dr) < 0.5] and [abs(dz) < 2.0]"
+        ma.cutAndCopyList("K+:TrackFromIP" + btoksLbl, "K+:all", ipKaon, path=path)
+
+        kinematicCuts = "[Mbc > 5.20] and [abs(deltaE) < 0.25]"
+        ma.reconstructDecay("B+:b" + btoksLbl + " -> K+:TrackFromIP" + btoksLbl + " vpho:LLP" + btoksLbl,
+                            kinematicCuts, path=path)
+
+        return ["B+:b" + btoksLbl]

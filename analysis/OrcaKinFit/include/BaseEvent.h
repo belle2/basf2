@@ -25,7 +25,7 @@
 /// Abstract base class for different kinds of events
 /**
  * This class defines the minimal functionality of a class describing
- * an event hypothesis that is ment to be tested by a kinematic fit.
+ * an event hypothesis that is meant to be tested by a kinematic fit.
  * It is an optional class - the event hypothesis can also be defined
  * directly in the main program.
  *

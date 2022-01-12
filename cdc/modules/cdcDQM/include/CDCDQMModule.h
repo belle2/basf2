@@ -18,6 +18,11 @@
 #include <cdc/dataobjects/CDCRawHit.h>
 #include <mdst/dataobjects/TRGSummary.h>
 
+
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <tracking/dataobjects/RecoTrack.h>
+
 #include <TH1F.h>
 #include <TH2F.h>
 
@@ -77,24 +82,20 @@ namespace Belle2 {
 
 
   protected:
-
-    /** CDC hits. */
-    StoreArray<CDCHit> m_cdcHits;
-
-    /** CDC raw hits. */
-    StoreArray<CDCRawHit> m_cdcRawHits;
-
-    /** Trigger summary. */
-    StoreObjPtr<TRGSummary> m_trgSummary;
+    StoreArray<CDCHit> m_cdcHits;                 /**< CDC hits. */
+    StoreArray<CDCRawHit> m_cdcRawHits;           /**< CDC raw hits. */
+    StoreObjPtr<TRGSummary> m_trgSummary;         /**< Trigger summary. */
+    StoreArray<Track> m_Tracks;                   /**< Tracks. */
+    StoreArray<RecoTrack> m_RecoTracks;           /**< RecoTracks. */
+    std::string m_recoTrackArrayName = "" ;       /**< Belle2::RecoTrack StoreArray name. */
 
     Long64_t m_nEvents = 0;          /**< Number of events processed */
     TH1F* m_hNEvents = nullptr;      /**< Histogram of num. events */
-    TH2F* m_hADC  = nullptr;              /**< Histogram of ADC for all boards (0-299) */
-    TH2F* m_hADCTOTCut = nullptr;    /**< Histogram of ADC with tot cut for all boards (0-299) */
-    TH2F* m_hTDC = nullptr;          /**< Histogram of TDC for all boards (0-299) */
-    TH2F* m_hHit  = nullptr;          /**< Histogram of hits for all layers (0-55) */
+    TH2F* m_hADC  = nullptr;         /**< Histogram of ADC with track associated hits for all boards (0-299) */
+    TH2F* m_hTDC = nullptr;          /**< Histogram of TDC with track associated hits for all boards (0-299) */
+    TH2F* m_hHit  = nullptr;         /**< Histogram of hits for all layers (0-55) */
     TH1F* m_hOcc = nullptr;          /**< Histogram of occupancy */
-    int m_minHits;         /**< Minimum hits for processing. */
+    int m_minHits;                   /**< Minimum hits for processing. */
   };
 
 } // Belle2 namespace

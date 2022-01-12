@@ -28,7 +28,7 @@ from vertex import TagV
 
 main = basf2.create_path()
 
-ma.inputMdstList('default', [basf2.find_file('B02JpsiKL_Jpsi2mumu.root', 'examples', False)], path=main)
+ma.inputMdstList([basf2.find_file('B02JpsiKL_Jpsi2mumu.root', 'examples', False)], path=main)
 
 # Show progress of processing
 main.add_module('ProgressBar')

@@ -99,7 +99,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             # Loop over every combination of input groups.
             for counter, track1 in enumerate(tracks):
                 for track2 in tracks[counter + 1:]:
-                    # Build the net wit pre-build variables.
+                    # Build the net with pre-build variables.
                     relations.append(relation_net(tf.concat([track1, track2], 1), relational_variables))
 
             if parameters['pre_training_epochs'] > 0:
@@ -300,6 +300,6 @@ if __name__ == "__main__":
         print('Apply special relational net')
         p3, t3 = method3.apply_expert(test_data, general_options.m_treename)
 
-        print('Feed Forward Net AUC: ', basf2_mva_util.calculate_roc_auc(p1, t1))
-        print('Relational Net AUC: ', basf2_mva_util.calculate_roc_auc(p2, t2))
-        print('Relational Net with pre-training AUC: ', basf2_mva_util.calculate_roc_auc(p3, t3))
+        print('Feed Forward Net AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p1, t1))
+        print('Relational Net AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p2, t2))
+        print('Relational Net with pre-training AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p3, t3))

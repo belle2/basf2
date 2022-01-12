@@ -51,7 +51,7 @@ namespace Belle2 {
              "Use ROE instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
 
     addParam("roeMaskName", m_roeMaskName,
-             "ROE mask name to load", std::string(""));
+             "ROE mask name to load", std::string(RestOfEvent::c_defaultMaskName));
 
     addParam("sourceParticleListName", m_sourceParticleListName,
              "Particle list name from which we need to get ROEs", std::string(""));
@@ -118,8 +118,8 @@ namespace Belle2 {
         int pdgCode  = mother->getPDGCode();
         // The default list name is "all"
         string listName = mother->getName() + ":all";
-        // ROE particles get the label "ROE"
-        if (m_useROEs) listName = mother->getName() + ":ROE";
+        // ROE particles get the full name
+        if (m_useROEs) listName = mother->getFullName();
         // MC particles get the label "MC"
         else if (m_useMCParticles) listName = mother->getName() + ":MC";
         // V0s get the label "V0"
@@ -318,9 +318,7 @@ namespace Belle2 {
 
       TLorentzVector signal4Vector = signalSideParticle->get4Vector();
       TLorentzVector roe4Vector = roe->get4Vector(m_roeMaskName);
-      TLorentzVector missing4Vector;
-      missing4Vector.SetVect(boost4Vector.Vect() - (signal4Vector.Vect() + roe4Vector.Vect()));
-      missing4Vector.SetE(missing4Vector.Vect().Mag());
+      TLorentzVector missing4Vector = boost4Vector - signal4Vector - roe4Vector;
       auto isFlavored = (isSelfConjugatedParticle) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
       newPart = m_particles.appendNew(missing4Vector, pdgCode, isFlavored, Particle::EParticleSourceObject::c_Undefined, mdstIndex);
 
@@ -406,7 +404,7 @@ namespace Belle2 {
         }
 
         // check if, given the initial user's decay descriptor, the current v0 is a particle or an anti-particle.
-        // in the V0 the order of the daughters is fixed, first the positive and then the negative; to be coherent with the decay desctiptor, when creating
+        // in the V0 the order of the daughters is fixed, first the positive and then the negative; to be coherent with the decay descriptor, when creating
         // one particle list and one anti-particle, the v0 daughters' order has to be switched only in one case
         bool correctOrder = matchingDaughtersOrder;
         if (abs(v0Type.getPDGCode()) == abs(m_decaydescriptor.getMother()->getPDGCode())

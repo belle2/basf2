@@ -1,8 +1,8 @@
 .. _onlinebook:
 
-===============
-Online textbook
-===============
+====================
+Beginners' tutorials
+====================
 
 This online textbook aims to help new Belle II members to get started with
 the software by following through a series of hands-on lessons.

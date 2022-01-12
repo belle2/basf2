@@ -1,0 +1,24 @@
+# EventType: 1260000001
+# Descriptor: [B+ -> K*+ nu anti-nu]cc
+# NickName: Bu_Kstarnunubar
+# Documentation: Rare b->s nu anti-nu process
+# Tested: Yes 
+# PhysicsWG: EWP 
+# Responsible: Junewoo Park
+# Email: purol@yonsei.ac.kr
+# Cuts: None
+# Date: 20211213
+
+Decay Upsilon(4S)
+0.5 B+sig B-         VSS;
+0.5 B-sig B+         VSS;
+Enddecay
+
+Decay B+sig
+1.0 K*+ nu_e anti-nu_e                    PHOTOS KSTARNUNU_REV;
+Enddecay
+CDecay B-sig
+
+End
+
+

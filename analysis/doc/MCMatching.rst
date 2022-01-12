@@ -360,8 +360,12 @@ MC mode       Decay channel                                    MC mode       Dec
  23           :math:`\tau^- \to \pi^- 4\pi^0 \nu`
 ============  ===============================================  ============  ==================================================
 
+--------------
+Track matching
+--------------
 
-.. include:: ../../tracking/doc/MCTrackMatching.rst
+Details on the track matching can be found in the :ref:`trk_matching` section of the Tracking chapter.
+
 
 ---------------
 Photon matching

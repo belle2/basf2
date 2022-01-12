@@ -28,7 +28,7 @@ class TestNewMCDecayFinder(unittest.TestCase):
 
         inputfile = b2test_utils.require_file(
             'analysis/1000_B_DstD0Kpi_skimmed.root', 'validation', py_case=self)
-        inputMdst('default', inputfile, path=main)
+        inputMdst(inputfile, path=main)
 
         fillParticleListFromMC('gamma:primaryMC', 'mcPrimary', path=main)
         fillParticleListFromMC('K+:primaryMC', 'mcPrimary', path=main)

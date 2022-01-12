@@ -215,7 +215,7 @@ namespace Belle2 {
       static void saveToStream(Weightfile& weightfile, std::ostream& stream);
 
       /**
-       * Static function which loads a Weightfile from a file or fomr the database
+       * Static function which loads a Weightfile from a file or from the database
        * @param filename of the file containing our serialized Weightfile
        * @param emd EventMetaData
        */

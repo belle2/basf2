@@ -117,7 +117,7 @@ namespace Belle2 {
     }
 
     /**
-     * Get a vector orthogonal to v of the unit lenght
+     * Get a vector orthogonal to v of the unit length
      *
      */
     TVector3 getUnitOrthogonal(TVector3 v)

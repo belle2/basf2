@@ -56,7 +56,7 @@ void VariablesToHistogramModule::initialize()
   if (not m_particleList.empty())
     StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
-  // Check if we can acces the given file
+  // Check if we can access the given file
   m_file = RootFileCreationManager::getInstance().getFile(m_fileName);
   if (!m_file) return;
   // Make sure we don't disturb the global directory for other modules, friggin side effects everywhere
@@ -137,12 +137,30 @@ void VariablesToHistogramModule::event()
 
   if (m_particleList.empty()) {
     for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-      vars[iVar] = m_functions[iVar](nullptr);
+      if (std::holds_alternative<double>(m_functions[iVar](nullptr))) {
+        vars[iVar] = std::get<double>(m_functions[iVar](nullptr));
+      } else if (std::holds_alternative<int>(m_functions[iVar](nullptr))) {
+        vars[iVar] = std::get<int>(m_functions[iVar](nullptr));
+      } else if (std::holds_alternative<bool>(m_functions[iVar](nullptr))) {
+        vars[iVar] = std::get<bool>(m_functions[iVar](nullptr));
+      }
       (*m_hists[iVar])->get().Fill(vars[iVar]);
     }
     for (unsigned int iVar = 0; iVar < nVars_2d; iVar++) {
-      vars_2d_1[iVar] = m_functions_2d_1[iVar](nullptr);
-      vars_2d_2[iVar] = m_functions_2d_2[iVar](nullptr);
+      if (std::holds_alternative<double>(m_functions_2d_1[iVar](nullptr))) {
+        vars_2d_1[iVar] = std::get<double>(m_functions_2d_1[iVar](nullptr));
+      } else if (std::holds_alternative<int>(m_functions_2d_1[iVar](nullptr))) {
+        vars_2d_1[iVar] = std::get<int>(m_functions_2d_1[iVar](nullptr));
+      } else if (std::holds_alternative<bool>(m_functions_2d_1[iVar](nullptr))) {
+        vars_2d_1[iVar] = std::get<bool>(m_functions_2d_1[iVar](nullptr));
+      }
+      if (std::holds_alternative<double>(m_functions_2d_2[iVar](nullptr))) {
+        vars_2d_2[iVar] = std::get<double>(m_functions_2d_2[iVar](nullptr));
+      } else if (std::holds_alternative<int>(m_functions_2d_2[iVar](nullptr))) {
+        vars_2d_2[iVar] = std::get<int>(m_functions_2d_2[iVar](nullptr));
+      } else if (std::holds_alternative<bool>(m_functions_2d_2[iVar](nullptr))) {
+        vars_2d_2[iVar] = std::get<bool>(m_functions_2d_2[iVar](nullptr));
+      }
       (*m_2d_hists[iVar])->get().Fill(vars_2d_1[iVar], vars_2d_2[iVar]);
     }
 
@@ -152,12 +170,30 @@ void VariablesToHistogramModule::event()
     for (unsigned int iPart = 0; iPart < nPart; iPart++) {
       const Particle* particle = particlelist->getParticle(iPart);
       for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-        vars[iVar] = m_functions[iVar](particle);
+        if (std::holds_alternative<double>(m_functions[iVar](particle))) {
+          vars[iVar] = std::get<double>(m_functions[iVar](particle));
+        } else if (std::holds_alternative<int>(m_functions[iVar](particle))) {
+          vars[iVar] = std::get<int>(m_functions[iVar](particle));
+        } else if (std::holds_alternative<bool>(m_functions[iVar](particle))) {
+          vars[iVar] = std::get<bool>(m_functions[iVar](particle));
+        }
         (*m_hists[iVar])->get().Fill(vars[iVar]);
       }
       for (unsigned int iVar = 0; iVar < nVars_2d; iVar++) {
-        vars_2d_1[iVar] = m_functions_2d_1[iVar](particle);
-        vars_2d_2[iVar] = m_functions_2d_2[iVar](particle);
+        if (std::holds_alternative<double>(m_functions_2d_1[iVar](particle))) {
+          vars_2d_1[iVar] = std::get<double>(m_functions_2d_1[iVar](particle));
+        } else if (std::holds_alternative<int>(m_functions_2d_1[iVar](particle))) {
+          vars_2d_1[iVar] = std::get<int>(m_functions_2d_1[iVar](particle));
+        } else if (std::holds_alternative<bool>(m_functions_2d_1[iVar](particle))) {
+          vars_2d_1[iVar] = std::get<bool>(m_functions_2d_1[iVar](particle));
+        }
+        if (std::holds_alternative<double>(m_functions_2d_2[iVar](particle))) {
+          vars_2d_2[iVar] = std::get<double>(m_functions_2d_2[iVar](particle));
+        } else if (std::holds_alternative<int>(m_functions_2d_2[iVar](particle))) {
+          vars_2d_2[iVar] = std::get<int>(m_functions_2d_2[iVar](particle));
+        } else if (std::holds_alternative<bool>(m_functions_2d_2[iVar](particle))) {
+          vars_2d_2[iVar] = std::get<bool>(m_functions_2d_2[iVar](particle));
+        }
         (*m_2d_hists[iVar])->get().Fill(vars_2d_1[iVar], vars_2d_2[iVar]);
       }
     }
@@ -184,7 +220,7 @@ void VariablesToHistogramModule::terminate()
     const bool writeError = m_file->TestBit(TFile::kWriteError);
     m_file.reset();
     if (writeError) {
-      B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
+      B2FATAL("A write error occurred while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
   }
 }

@@ -88,9 +88,9 @@ namespace Belle2 {
       B2FATAL("You have tried to create the list " << m_outputListName <<
               " but the label 'all' is forbidden for user-defined lists of final-state particles." <<
               " It could introduce *very* dangerous bugs.");
-    } else if ((listLabel == "MC") or (listLabel == "ROE") or (listLabel == "V0" and not(("K_S0:mdst" == m_inputListNames[0])
-                                                               or ("Lambda0:mdst" == m_inputListNames[0]) or ("gamma:v0mdst" == m_inputListNames[0])))) {
-      // the labels MC, ROE, and V0 are also protected
+    } else if ((listLabel == "MC") or (listLabel == "V0" and not(("K_S0:mdst" == m_inputListNames[0])
+                                       or ("Lambda0:mdst" == m_inputListNames[0]) or ("gamma:v0mdst" == m_inputListNames[0])))) {
+      // the labels MC, and V0 are also protected
       // copying of some B2BII V0 lists has to be allowed to not break the FEI
       B2FATAL("You have tried to create the list " << m_outputListName <<
               " but the label " << listLabel << " is not allowed for merged or copied particle lists.");
@@ -120,6 +120,10 @@ namespace Belle2 {
     m_variable = Variable::Manager::Instance().getVariable(m_variableName);
     if (!m_variable) {
       B2ERROR("Variable '" << m_variableName << "' is not available in Variable::Manager!");
+    }
+    if (!(m_variable->variabletype == Variable::Manager::VariableDataType::c_double
+          or m_variable->variabletype == Variable::Manager::VariableDataType::c_int)) {
+      B2ERROR("Variable '" << m_variableName << "' has wrong data type! It must be either double or integer.");
     }
     m_cut = Variable::Cut::compile(m_cutParameter);
   }
@@ -175,7 +179,13 @@ namespace Belle2 {
         const Particle* part = m_particles[fsParticle];
 
         if (m_cut->check(part)) {
-          valueToIndex.emplace_back(m_variable->function(part), part->getArrayIndex());
+          double value = std::numeric_limits<double>::quiet_NaN();;
+          if (std::holds_alternative<double>(m_variable->function(part))) {
+            value = std::get<double>(m_variable->function(part));
+          } else if (std::holds_alternative<int>(m_variable->function(part))) {
+            value = std::get<int>(m_variable->function(part));
+          }
+          valueToIndex.emplace_back(value, part->getArrayIndex());
         }
       }
     }

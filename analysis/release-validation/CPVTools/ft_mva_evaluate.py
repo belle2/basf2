@@ -24,6 +24,7 @@ import collections
 import ROOT
 from ROOT import Belle2
 from flavorTagger import KId, muId, eId
+import flavorTagger as ft
 
 
 def getCommandLineOptions():
@@ -243,218 +244,67 @@ if __name__ == '__main__':
             variables = list(reversed(variables))
 
         if identifiers[0].find('Electron') != -1:
-
-            variables = [
-                'useCMSFrame(p)',
-                'useCMSFrame(pt)',
-                'p',
-                'pt',
-                'cosTheta',
-                'ImpactXY',
-                'distance',
-                'BtagToWBosonVariables(recoilMassSqrd)',
-                'BtagToWBosonVariables(EW90)',
-                'BtagToWBosonVariables(pMissCMS)',
-                'BtagToWBosonVariables(cosThetaMissCMS)',
-                'cosTPTO',
-                'eid_dEdx',
-                'eid_TOP',
-                'eid_ARICH',
-                'eid_ECL',
-                eId[args.BelleOrBelle2],
-                'chiProb']
+            ft.setVariables()
+            if identifiers[0].find('Intermediate') != -1:
+                variables = ft.variables['IntermediateElectron']
+            else:
+                variables = ft.variables['Electron']
 
         if identifiers[0].find('Muon') != -1:
-
-            variables = [
-                'useCMSFrame(p)',
-                'useCMSFrame(pt)',
-                'p',
-                'pt',
-                'cosTheta',
-                'ImpactXY',
-                'distance',
-                'BtagToWBosonVariables(recoilMassSqrd)',
-                'BtagToWBosonVariables(EW90)',
-                'BtagToWBosonVariables(pMissCMS)',
-                'BtagToWBosonVariables(cosThetaMissCMS)',
-                'cosTPTO',
-                'muid_dEdx',
-                'muid_TOP',
-                'muid_ARICH',
-                'muid_KLM',
-                muId[args.BelleOrBelle2],
-                'chiProb']
+            ft.setVariables()
+            if identifiers[0].find('Intermediate') != -1:
+                variables = ft.variables['IntermediateMuon']
+            else:
+                variables = ft.variables['Muon']
 
         if identifiers[0].find('Lepton') != -1:
-
-            variables = [
-                'useCMSFrame(p)',
-                'useCMSFrame(pt)',
-                'p',
-                'pt',
-                'cosTheta',
-                'ImpactXY',
-                'distance',
-                'BtagToWBosonVariables(recoilMassSqrd)',
-                'BtagToWBosonVariables(EW90)',
-                'BtagToWBosonVariables(pMissCMS)',
-                'BtagToWBosonVariables(cosThetaMissCMS)',
-                'cosTPTO',
-                'eid_dEdx',
-                'eid_TOP',
-                'eid_ARICH',
-                'eid_ECL',
-                eId[args.BelleOrBelle2],
-                'muid_dEdx',
-                'muid_TOP',
-                'muid_ARICH',
-                'muid_KLM',
-                muId[args.BelleOrBelle2],
-                'chiProb']
+            ft.setVariables()
+            if identifiers[0].find('Intermediate') != -1:
+                variables = ft.variables['IntermediateKinLepton']
+            else:
+                variables = ft.variables['KinLepton']
 
         if identifiers[0].find('KaonFBDT') != -1:
             displayHeatMap = True
-            variables = ['useCMSFrame(p)', 'useCMSFrame(pt)', 'pt', 'ptTracksRoe', 'cosTheta', 'ImpactXY', 'distance',
-                         'BtagToWBosonVariables(recoilMassSqrd)', 'BtagToWBosonVariables(EW90)',
-                         'BtagToWBosonVariables(pMissCMS)', 'BtagToWBosonVariables(cosThetaMissCMS)',
-                         'cosTPTO', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH', KId[args.BelleOrBelle2],
-                         'NumberOfKShortsInRoe', 'chiProb']
+            ft.setVariables()
+            variables = ft.variables['Kaon']
 
-        if identifiers[0].find('SlowPion') != -1 or identifiers[0].find('FastHadron') != -1:
+        if identifiers[0].find('SlowPion') != -1:
+            ft.setVariables()
+            variables = ft.variables['SlowPion']
 
-            variables = [
-                'useCMSFrame(p)',
-                'useCMSFrame(pt)',
-                'p',
-                'pt',
-                'cosTheta',
-                'ImpactXY',
-                'distance',
-                'BtagToWBosonVariables(recoilMassSqrd)',
-                'BtagToWBosonVariables(EW90)',
-                'BtagToWBosonVariables(pMissCMS)',
-                'BtagToWBosonVariables(cosThetaMissCMS)',
-                'cosTPTO',
-                'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH', KId[args.BelleOrBelle2],
-                'piid_dEdx',
-                'piid_TOP',
-                'piid_ARICH',
-                'pionID',
-                'pi_vs_edEdxid',
-                eId[args.BelleOrBelle2],
-                'ptTracksRoe',
-                'NumberOfKShortsInRoe',
-                'chiProb']
+        if identifiers[0].find('FastHadron') != -1:
+            ft.setVariables()
+            variables = ft.variables['FastHadron']
 
         if identifiers[0].find('KaonPion') != -1:
-
-            variables = [KId[args.BelleOrBelle2], 'extraInfo(isRightCategory(Kaon))',
-                         'HighestProbInCat(pi+:inRoe, isRightCategory(SlowPion))',
-                         'KaonPionVariables(cosKaonPion)',
-                         'KaonPionVariables(HaveOpositeCharges)'
-                         ]
+            ft.setVariables()
+            variables = ft.variables['KaonPion']
 
         if identifiers[0].find('FSC') != -1:
-
-            variables = [KId[args.BelleOrBelle2], 'useCMSFrame(p)',
-                         'FSCVariables(pFastCMS)',
-                         'FSCVariables(SlowFastHaveOpositeCharges)',
-                         'cosTPTO',
-                         'FSCVariables(cosTPTOFast)',
-                         'FSCVariables(cosSlowFast)']
+            ft.setVariables()
+            variables = ft.variables['FSC']
 
         if identifiers[0].find('MaximumPstar') != -1:
-
-            variables = ['useCMSFrame(p)',
-                         'useCMSFrame(pt)',
-                         'p',
-                         'pt',
-                         'ImpactXY',
-                         'distance', 'cosTPTO']
+            ft.setVariables()
+            variables = ft.variables['MaximumPstar']
 
         if identifiers[0].find('Lambda') != -1:
             displayHeatMap = True
-            if args.BelleOrBelle2 == 'Belle':
-                variables = [
-                    'useCMSFrame(p)',
-                    'p',
-                    'daughter(0,useCMSFrame(p))',
-                    'daughter(0,p)',
-                    'daughter(1,useCMSFrame(p))',
-                    'daughter(1,p)',
-                    'lambdaFlavor',
-                    'M',
-                    'NumberOfKShortsInRoe',
-                    'cosAngleBetweenMomentumAndVertexVector',
-                    'distance',
-                    'lambdaZError',
-                    'chiProb']
-            else:
-                variables = [
-                    'daughter(0,pionID)',
-                    'daughter(1,protonID)',
-                    'useCMSFrame(p)',
-                    'p',
-                    'daughter(0,useCMSFrame(p))',
-                    'daughter(0,p)',
-                    'daughter(1,useCMSFrame(p))',
-                    'daughter(1,p)',
-                    'lambdaFlavor',
-                    'M',
-                    'NumberOfKShortsInRoe',
-                    'cosAngleBetweenMomentumAndVertexVector',
-                    'distance',
-                    'lambdaZError',
-                    'chiProb']
+            ft.setVariables()
+            variables = ft.variables['Lambda']
 
         variables = list(reversed(variables))
         for iVarPosition in range(len(variables)):
             root_variables[iVarPosition] = Belle2.makeROOTCompatible(variables[iVarPosition])
 
+        # Set special name
         if identifiers[0].find('FSC') != -1:
-
-            variables = [KId[args.BelleOrBelle2], 'useCMSFrame(p)FSC',
-                         'FSCVariables(pFastCMS)',
-                         'FSCVariables(SlowFastHaveOpositeCharges)',
-                         'cosTPTOFSC',
-                         'FSCVariables(cosTPTOFast)',
-                         'FSCVariables(cosSlowFast)']
+            variables = ['useCMSFrame(p)FSC' if v == 'useCMSFrame(p)' else v for v in variables]
 
         if identifiers[0].find('Lambda') != -1:
             displayHeatMap = True
-            if args.BelleOrBelle2 == 'Belle':
-                variables = [
-                    'useCMSFrame(p)Lambda',
-                    'pLambda',
-                    'daughter(0,useCMSFrame(p))',
-                    'daughter(0,p)',
-                    'daughter(1,useCMSFrame(p))',
-                    'daughter(1,p)',
-                    'lambdaFlavor',
-                    'M',
-                    'NumberOfKShortsInRoe',
-                    'cosAngleBetweenMomentumAndVertexVector',
-                    'distance',
-                    'lambdaZError',
-                    'chiProb']
-            else:
-                variables = [
-                    'daughter(0,pionID)',
-                    'daughter(1,protonID)',
-                    'useCMSFrame(p)Lambda',
-                    'pLambda',
-                    'daughter(0,useCMSFrame(p))',
-                    'daughter(0,p)',
-                    'daughter(1,useCMSFrame(p))',
-                    'daughter(1,p)',
-                    'lambdaFlavor',
-                    'M',
-                    'NumberOfKShortsInRoe',
-                    'cosAngleBetweenMomentumAndVertexVector',
-                    'distance',
-                    'lambdaZError',
-                    'chiProb']
+            variables = ['useCMSFrame(p)Lambda' if v == 'useCMSFrame(p)' else v for v in variables]
 
     if identifiers[0].find('Combiner') != -1:
         if identifiers[0].find('FANN') != -1:
@@ -505,7 +355,7 @@ if __name__ == '__main__':
 
     print("Create latex file")
     # Change working directory after experts run, because they might want to access
-    # a locadb in the current working directory
+    # a localdb in the current working directory
     with tempfile.TemporaryDirectory() as tempdir:
         if args.working_directory == '':
             os.chdir(tempdir)
@@ -521,7 +371,7 @@ if __name__ == '__main__':
         o += b2latex.Section("Classifiers")
         o += b2latex.String(r"""
             This section contains the GeneralOptions and SpecificOptions of all classifiers represented by an XML tree.
-            The same information can be retreived using the basf2\_mva\_info tool.
+            The same information can be retrieved using the basf2\_mva\_info tool.
         """)
 
         table = b2latex.LongTable(r"ll", "Abbreviations of identifiers", "{name} & {abbr}", r"Identifier & Abbreviation")

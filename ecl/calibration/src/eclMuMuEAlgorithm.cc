@@ -48,7 +48,7 @@ double eclNovoConst(double* x, double* par)
 
 
 eclMuMuEAlgorithm::eclMuMuEAlgorithm(): CalibrationAlgorithm("eclMuMuECollector"), cellIDLo(1), cellIDHi(8736), minEntries(150),
-  maxIterations(10), tRatioMin(0.2), tRatioMax(0.25), performFits(true), findExpValues(false), storeConst(0)
+  nToRebin(1000), tRatioMin(0.05), tRatioMax(0.40), lowerEdgeThresh(0.10), performFits(true), findExpValues(false), storeConst(0)
 {
   setDescription(
     "Perform energy calibration of ecl crystals by fitting a Novosibirsk function to energy deposited by muons"
@@ -61,20 +61,29 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
   /** ranges of various fit parameters, and tolerance to determine that fit is at the limit */
   double limitTol = 0.0005; /*< tolerance for checking if a parameter is at the limit */
   double minFitLimit = 1e-25; /*< cut off for labeling a fit as poor */
-  double minFitProbIter = 1e-8; /*< cut off for labeling a fit as poor if it also has many iterations */
-  double constRatio = 0.5; /*< Novosibirsk normalization must be greater than constRatio x constant term */
   double peakMin(0.4), peakMax(2.2); /*< range for peak of normalized energy distribution */
   double peakTol = limitTol * (peakMax - peakMin); /*< fit is at limit if it is within peakTol of min or max */
   double effSigMin(0.02), effSigMax(0.2); /*< range for effective sigma of normalized energy distribution */
   double effSigTol = limitTol * (effSigMax - effSigMin); /*< fit is at limit if it is within effSigTol of min or max */
-  double etaNom(-0.41); /*< Nominal tail parameter; fixed to this value for endcap and when findExValues=false */
-  double etaMin(-0.7), etaMax(-0.2); /*< Novosibirsk tail parameter range */
+  double etaNom(-0.41); /*< Nominal tail parameter; fixed to this value for low statistics fits */
+  double etaMin(-1.), etaMax(0.); /*< Novosibirsk tail parameter range */
   double etaTol = limitTol * (etaMax - etaMin); /*< fit is at limit if it is within etaTol of min or max */
-  double constMin(0.), constMax(10.); /*< constant term in normalized energy distribution */
-  double constTol = limitTol * constMax; /*< if constant is less than constTol, it will be fixed to 0 */
 
   /** Put root into batch mode so that we don't try to open a graphics window */
   gROOT->SetBatch();
+
+  /**-----------------------------------------------------------------------------------------------*/
+  /** Write out the job parameters */
+  B2INFO("eclMuMuEAlgorithm parameters:");
+  B2INFO("cellIDLo = " << cellIDLo);
+  B2INFO("cellIDHi = " << cellIDHi);
+  B2INFO("minEntries = " << minEntries);
+  B2INFO("tRatioMin = " << tRatioMin);
+  B2INFO("tRatioMax = " << tRatioMax);
+  B2INFO("lowerEdgeThresh = " << lowerEdgeThresh);
+  B2INFO("performFits = " << performFits);
+  B2INFO("findExpValues = " << findExpValues);
+  B2INFO("storeConst = " << storeConst);
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Clean up existing histograms if necessary */
@@ -179,10 +188,13 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
   /** Diagnostic histograms */
   TH1F* PeakVsCrysID = new TH1F("PeakVsCrysID", "Peak of Novo fit vs crystal ID;crystal ID;Peak normalized energy", 8736, 0,
                                 8736);
+  TH1F* EdgeVsCrysID = new TH1F("EdgeVsCrysID", "Lower edge of Novo fit vs crystal ID;crystal ID", 8736, 0,
+                                8736);
   TH1F* effSigVsCrysID = new TH1F("effSigVsCrysID", "effSigma vs crystal ID;crystal ID;sigma)", 8736, 0, 8736);
   TH1F* etaVsCrysID = new TH1F("etaVsCrysID", "eta vs crystal ID;crystal ID;Novo eta parameter", 8736, 0, 8736);
-  TH1F* constVsCrysID = new TH1F("constVsCrysID", "fit constant vs crystal ID;crystal ID;fit constant", 8736, 0, 8736);
   TH1F* normVsCrysID = new TH1F("normVsCrysID", "Novosibirsk normalization vs crystal ID;crystal ID;normalization", 8736, 0, 8736);
+  TH1F* lowerLimitVsCrysID = new TH1F("lowerLimitVsCrysID", "fit range lower limit vs crystal ID;crystal ID;lower fit limit", 8736, 0,
+                                      8736);
   TH1F* fitLimitVsCrysID = new TH1F("fitLimitVsCrysID", "fit range upper limit vs crystal ID;crystal ID;upper fit limit", 8736, 0,
                                     8736);
   TH1F* StatusVsCrysID = new TH1F("StatusVsCrysID", "Fit status vs crystal ID;crystal ID;Fit status", 8736, 0, 8736);
@@ -192,7 +204,6 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
   TH1F* hPeak = new TH1F("hPeak", "Peaks of normalized energy distributions, successful fits;Peak of Novosibirsk fit", 200, 0.8, 1.2);
   TH1F* fracPeakUnc = new TH1F("fracPeakUnc", "Fractional uncertainty on peak uncertainty, successful fits;Uncertainty on peak", 100,
                                0, 0.1);
-  TH1F* nIterations = new TH1F("nIterations", "Number of times histogram was fit;Number of iterations", 20, -0.5, 19.5);
 
 
   /**-----------------------------------------------------------------------------------------------*/
@@ -213,10 +224,20 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
     func->SetParLimits(1, peakMin, peakMax);
     func->SetParLimits(2, effSigMin, effSigMax);
     func->SetParLimits(3, etaMin, etaMax);
-    func->SetParLimits(4, constMin, constMax);
+
+    //..Currently not using the constant term
+    double constant = 0.;
+    func->FixParameter(4, constant);
+
+    //..If low statistics, rebin, and fix eta
+    if (hEnergy->GetEntries() < nToRebin) {
+      hEnergy->Rebin(2);
+      func->FixParameter(3, etaNom);
+    }
 
     /** Estimate initial parameters from the histogram. For peak, use maximum bin  in the allowed range */
     hEnergy->GetXaxis()->SetRangeUser(peakMin, peakMax);
+    double peak = hEnergy->GetMaximum();
     int maxBin = hEnergy->GetMaximumBin();
     double peakE = hEnergy->GetBinLowEdge(maxBin);
     double peakEUnc = 0.;
@@ -225,45 +246,36 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
     double effSigma = hEnergy->GetRMS();
     double sigmaUnc = 0.;
     hEnergy->GetXaxis()->SetRangeUser(histMin, histMax);
+    double fitProb = 0.;
 
-    /** Fit range is histogram low edge plus a few bins to peak + 2.5*effective sigma */
-    double fitlow = 0.25;
-    double fithigh = peakE + 2.5 * effSigma;
-
-    /** eta and constant are nominal values */
+    /** eta is nominal values */
     double eta = etaNom;
     double etaUnc = 0.;
 
-    /** Constant from lower edge of plot */
-    int il0 = hEnergy->GetXaxis()->FindBin(fitlow);
-    int il1 = hEnergy->GetXaxis()->FindBin(fitlow + 0.1);
-    double constant = hEnergy->Integral(il0, il1) / (1 + il1 - il0);
-    if (constant < 0.01 * normalization) {constant = 0.01 * normalization;}
-    double constUnc = 0.;
+    //..Will find the lower edge of normalized energy at the end of the fit
+    double lowerEnEdge = 0.;
 
-    /** Parameters to control iterations. dIter checks if we are stuck in a loop */
-    double dIter = 0.1 * (histMax - histMin) / hEnergy->GetNbinsX();
-    double fitProb(0.);
-    double highold(0.), higholdold(0.);
-    bool fixConst = false;
-    int nIter = 0;
-    bool fitHist = IntegralVsCrysID->GetBinContent(crysID + 1) >= minEntries; /* fit only if enough events */
+    //..Fit range from set of bins with sufficient entries.
+    double targetY = tRatioMin * peak;
+    int iLow = maxBin;
+    while (hEnergy->GetBinContent(iLow) > targetY) {iLow--;}
+    double fitlow = hEnergy->GetBinLowEdge(iLow);
+
+    targetY = tRatioMax * peak;
+    int iHigh = maxBin;
+    while (hEnergy->GetBinContent(iHigh) > targetY) {iHigh++;}
+    double fithigh = hEnergy->GetBinLowEdge(iHigh + 1);
 
     /**---------------------------------------------------------------------------------------*/
-    /** Iterate from this point */
-    while (fitHist) {
+    /** Fit */
+    bool fitHist = IntegralVsCrysID->GetBinContent(crysID + 1) >= minEntries; /* fit only if enough events */
+    if (fitHist) {
 
       /** Set the initial parameters */
       func->SetParameters(normalization, peakE, effSigma, eta, constant);
-      if (fixConst) { func->FixParameter(4, 0); }
-
-      /** Fix eta if this is an endcap crystal, or if findExpValues==false */
-      if (crysID < 1152 || crysID > 7775 || !findExpValues) {func->FixParameter(3, etaNom);}
 
       /** Fit */
       hEnergy->Fit(func, "LIQ", "", fitlow, fithigh);
-      nIter++;
-      fitHist = false;
       normalization = func->GetParameter(0);
       normUnc = func->GetParError(0);
       peakE = func->GetParameter(1);
@@ -272,71 +284,63 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
       sigmaUnc = func->GetParError(2);
       eta = func->GetParameter(3);
       etaUnc = func->GetParError(3);
-      constant = func->GetParameter(4);
-      constUnc = func->GetParError(4);
       fitProb = func->GetProb();
 
-      /** The upper fit range should correspond to 20-25% of the peak. Iterate if necessary. */
-      double peak = func->Eval(peakE) - constant;
-      double tRatio = (func->Eval(fithigh) - constant) / peak;
-      if (tRatio < tRatioMin || tRatio > tRatioMax) {
-        double targetY = constant + 0.5 * (tRatioMin + tRatioMax) * peak;
-        higholdold = highold;
-        highold = fithigh;
-        fithigh = func->GetX(targetY, peakE, histMax);
-        fitHist = true;
+      //..Lower edge of the fit function is used to find the calibration constant.
+      //  Can now use the peak of the fit, instead of the bin content.
+      peak = func->Eval(peakE);
+      targetY = lowerEdgeThresh * peak;
 
-        /** Check if we are oscillating between two end points */
-        if (abs(fithigh - higholdold) < dIter) {fithigh = 0.5 * (highold + higholdold); }
-
-        /** Many iterations may mean we are stuck in a loop. Try a different end point. */
-        if (nIter > maxIterations - 3) {fithigh = 0.33333 * (fithigh + highold + higholdold); }
+      /** bins on either side of this value */
+      iHigh = hEnergy->GetXaxis()->FindBin(peakE) + 1;
+      iLow = hEnergy->GetXaxis()->FindBin(fitlow);
+      int iLast = iHigh;
+      for (int ibin = iHigh; ibin > iLow; ibin--) {
+        double xc = hEnergy->GetBinCenter(ibin);
+        if (func->Eval(xc) > targetY) {iLast = ibin;}
       }
+      double xHigh = hEnergy->GetBinCenter(iLast);
+      double xLow = hEnergy->GetBinCenter(iLast - 1);
 
-      /** Set the constant term to 0 if we are close to the limit */
-      if (constant < constTol && !fixConst) {
-        constant = 0;
-        fixConst = true;
-        fitHist = true;
+      /** look for the target value between these two points */
+      if (func->Eval(xLow) < targetY and func->Eval(xHigh) > targetY) {
+        func->SetNpx(1000);
+        lowerEnEdge = func->GetX(targetY, xLow, xHigh);
       }
-
-      /** No more than specified number of iterations */
-      if (nIter == maxIterations) {fitHist = false;}
-      B2DEBUG(200, crysID << " " << nIter << " " << peakE << " " << constant << " " << tRatio << " " << fithigh);
     }
 
     /**-----------------------------------------------------------------------------------------*/
     /** Fit status */
     int iStatus = fitOK; // success
-    if (nIter == maxIterations) {iStatus = iterations;} // too many iterations
 
-    /** No peak; normalization of Novo component is too small */
-    if (normalization < constRatio * constant) {iStatus = noPeak;}
+    /** did not find lower edge */
+    if (lowerEnEdge < 0.01) {iStatus = noLowerEdge;}
 
-    /** poor fit, or relatively poor fit with too many iterations */
-    if (fitProb <= minFitLimit || (fitProb < minFitProbIter && iStatus == iterations)) {iStatus = poorFit;}
+    /** poor fit */
+    if (fitProb <= minFitLimit) {iStatus = poorFit;}
 
     /** parameter at limit */
     if ((peakE < peakMin + peakTol) || (peakE > peakMax - peakTol)) {iStatus = atLimit;}
     if ((effSigma < effSigMin + effSigTol) || (effSigma > effSigMax - effSigTol)) {iStatus = atLimit;}
     if ((eta < etaMin + etaTol) || (eta > etaMax - etaTol)) {iStatus = atLimit;}
-    if (constant > constMax - constTol) {iStatus = atLimit;}
 
     //** No fit
-    if (nIter == 0) {iStatus = notFit;} // not fit
+    if (!fitHist) {iStatus = notFit;} // not fit
 
     /** fill diagnostic histograms */
     int histbin = crysID + 1;
     PeakVsCrysID->SetBinContent(histbin, peakE);
     PeakVsCrysID->SetBinError(histbin, peakEUnc);
+    EdgeVsCrysID->SetBinContent(histbin, lowerEnEdge);
+    EdgeVsCrysID->SetBinError(histbin, peakEUnc); // approximate
     effSigVsCrysID->SetBinContent(histbin, effSigma);
     effSigVsCrysID->SetBinError(histbin, sigmaUnc);
     etaVsCrysID->SetBinContent(histbin, eta);
     etaVsCrysID->SetBinError(histbin, etaUnc);
-    constVsCrysID->SetBinContent(histbin, constant);
-    constVsCrysID->SetBinError(histbin, constUnc);
     normVsCrysID->SetBinContent(histbin, normalization);
     normVsCrysID->SetBinError(histbin, normUnc);
+    lowerLimitVsCrysID->SetBinContent(histbin, fitlow);
+    lowerLimitVsCrysID->SetBinError(histbin, 0);
     fitLimitVsCrysID->SetBinContent(histbin, fithigh);
     fitLimitVsCrysID->SetBinError(histbin, 0);
     StatusVsCrysID->SetBinContent(histbin, iStatus);
@@ -344,7 +348,6 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
 
     /** 1D summary histograms */
     hStatus->Fill(iStatus);
-    nIterations->Fill(nIter);
     if (iStatus >= iterations) {
       hPeak->Fill(peakE);
       fracPeakUnc->Fill(peakEUnc / peakE);
@@ -363,11 +366,13 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
     int histbin = crysID + 1;
     double fitstatus = StatusVsCrysID->GetBinContent(histbin);
     double peakE = PeakVsCrysID->GetBinContent(histbin);
+    double edge = EdgeVsCrysID->GetBinContent(histbin);
     double fracpeakEUnc = PeakVsCrysID->GetBinError(histbin) / peakE;
 
-    /** if the fit is not successful, set peakE to -1, so that output calib = -1 * abs(input calib) */
+    /** if the fit is not successful, set peakE and edge to -1, so that output calib = -1 * abs(input calib) */
     if (fitstatus < iterations) {
       peakE = -1.;
+      edge = -1.;
       fracpeakEUnc = 0.;
       if (histbin >= cellIDLo && histbin <= cellIDHi) {
         B2RESULT("eclMuMuEAlgorithm: cellID " << histbin << " is not a successful fit. Status = " << fitstatus);
@@ -378,13 +383,13 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
     /** Find expected energies from MC, if requested */
     if (findExpValues) {
       double inputExpE = abs(AverageExpECrys->GetBinContent(histbin));
-      ExpEnergyperCrys->SetBinContent(histbin, inputExpE * peakE);
+      ExpEnergyperCrys->SetBinContent(histbin, inputExpE * edge);
       ExpEnergyperCrys->SetBinError(histbin, fracpeakEUnc * inputExpE * peakE);
     } else {
 
       /** Otherwise, calibration constant */
       double inputCalib = abs(AverageInitCalib->GetBinContent(histbin));
-      CalibVsCrysID->SetBinContent(histbin, inputCalib / peakE);
+      CalibVsCrysID->SetBinContent(histbin, inputCalib / edge);
       CalibVsCrysID->SetBinError(histbin, fracpeakEUnc * inputCalib / peakE);
     }
   }
@@ -428,15 +433,15 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
 
   /** Write out diagnostic histograms */
   PeakVsCrysID->Write();
+  EdgeVsCrysID->Write();
   effSigVsCrysID->Write();
   etaVsCrysID->Write();
-  constVsCrysID->Write();
   normVsCrysID->Write();
+  lowerLimitVsCrysID->Write();
   fitLimitVsCrysID->Write();
   StatusVsCrysID->Write();
   hPeak->Write();
   fracPeakUnc->Write();
-  nIterations->Write();
   hStatus->Write();
 
   /** Histograms containing values written to DB */
@@ -450,15 +455,15 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /** Clean up histograms in case Algorithm is called again */
   dummy = (TH1F*)gROOT->FindObject("PeakVsCrysID"); delete dummy;
+  dummy = (TH1F*)gROOT->FindObject("EdgeVsCrysID"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("effSigVsCrysID"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("etaVsCrysID"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("constVsCrysID"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("normVsCrysID"); delete dummy;
+  dummy = (TH1F*)gROOT->FindObject("lowerLimitVsCrysID"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("fitLimitVsCrysID"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("StatusVsCrysID"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("fitProbSame"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("fracPeakUnc"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("nIterations"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("hStatus"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("ExpEnergyperCrys"); delete dummy;
   dummy = (TH1F*)gROOT->FindObject("CalibVsCrysID"); delete dummy;

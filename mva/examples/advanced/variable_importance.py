@@ -60,11 +60,11 @@ if __name__ == "__main__":
         options.m_variables = basf2_mva.vector(*variables)
         m = method.train_teacher(training_data, general_options.m_treename, general_options=options)
         p, t = m.apply_expert(test_data, general_options.m_treename)
-        return basf2_mva_util.calculate_roc_auc(p, t)
+        return basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
 
     method = basf2_mva_util.Method(general_options.m_identifier)
     p, t = method.apply_expert(test_data, general_options.m_treename)
-    global_auc = basf2_mva_util.calculate_roc_auc(p, t)
+    global_auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
 
     # Approach 1: Read out the importance calculated by the method itself
     print("Variable importances returned my method")

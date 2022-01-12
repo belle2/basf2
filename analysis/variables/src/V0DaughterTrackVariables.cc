@@ -16,8 +16,10 @@
 #include <framework/dataobjects/Helix.h>
 
 // dataobjects from the MDST
+#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
 // framework aux
@@ -31,6 +33,8 @@ using namespace std;
 
 namespace Belle2 {
   namespace Variable {
+
+    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
 
     // helper function to get the helix parameters of the V0 daughter tracks
     // Not registered in variable manager
@@ -58,6 +62,24 @@ namespace Belle2 {
     double v0DaughterTrackNVXDHits(const Particle* part, const std::vector<double>& daughterID)
     {
       return v0DaughterTrackNPXDHits(part, daughterID) + v0DaughterTrackNSVDHits(part, daughterID);
+    }
+
+    double v0DaughterTrackNRemovedHits(const Particle* part, const std::vector<double>& daughterID)
+    {
+      // returns 0 if called for non-V0 particles
+      if (part->getParticleSource() != Particle::EParticleSourceObject::c_V0)
+        return 0;
+      auto daughter = part->getDaughter(daughterID[0]);
+      const Track* track = daughter->getTrack();
+      if (!track) return realNaN;
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(
+                                         daughter->getPDGCode())));
+      if (!trackFit) return realNaN;
+      double nHitsBeforeRemoval = trackFit->getHitPatternCDC().getNHits()
+                                  + trackFit->getHitPatternVXD().getNSVDHits()
+                                  + trackFit->getHitPatternVXD().getNPXDHits();
+      double nHitsAfterRemoval = trackNVXDHits(daughter) + trackNCDCHits(daughter);
+      return nHitsBeforeRemoval - nHitsAfterRemoval;
     }
 
     double v0DaughterTrackFirstSVDLayer(const Particle* part, const std::vector<double>& daughterID)
@@ -687,19 +709,19 @@ namespace Belle2 {
     int v0DaughtersShareInnermostHit(const Particle* part)
     {
       if (!part)
-        return std::numeric_limits<int>::quiet_NaN();
+        return -1;
       auto daughterPlus  = part->getDaughter(0);
       auto daughterMinus = part->getDaughter(1);
       if (!daughterPlus || !daughterMinus)
-        return std::numeric_limits<int>::quiet_NaN();
+        return -1;
       auto trackFitPlus  = daughterPlus->getTrackFitResult();
       auto trackFitMinus = daughterMinus->getTrackFitResult();
       if (!trackFitPlus || !trackFitMinus)
-        return std::numeric_limits<int>::quiet_NaN();
+        return -1;
       int flagPlus  = trackFitPlus->getHitPatternVXD().getInnermostHitShareStatus();
       int flagMinus = trackFitMinus->getHitPatternVXD().getInnermostHitShareStatus();
       if (flagPlus != flagMinus)
-        return std::numeric_limits<int>::quiet_NaN();
+        return -1;
       return flagPlus;
     }
 
@@ -731,6 +753,8 @@ namespace Belle2 {
     MAKE_DEPRECATED("v0DaughterNVXDHits(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `nVXDHits`,
                      so replace the current call with ``daughter(i, nVXDHits)``.)DOC");
+    REGISTER_VARIABLE("v0DaughterNRemovedHits(i)", v0DaughterTrackNRemovedHits,
+                      "The number of the i-th daughter track hits removed in V0Finder. Returns 0 if called for something other than V0 daughters.");
     REGISTER_VARIABLE("v0DaughterFirstSVDLayer(i)", v0DaughterTrackFirstSVDLayer,
                       "First activated SVD layer associated to the i-th daughter track");
     MAKE_DEPRECATED("v0DaughterFirstSVDLayer(i)", false, "light-2104-poseidon", R"DOC(
@@ -751,7 +775,7 @@ namespace Belle2 {
     MAKE_DEPRECATED("v0DaughterLastCDCLayer(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `lastCDCLayer`,
                      so replace the current call with ``daughter(i, lastCDCLayer)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterPValue(i)",        v0DaughterTrackPValue,
+    REGISTER_VARIABLE("v0DaughterPValue(i)", v0DaughterTrackPValue,
                       "chi2 probalility of the i-th daughter track fit");
     MAKE_DEPRECATED("v0DaughterPValue(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `pValue`,
@@ -778,19 +802,19 @@ namespace Belle2 {
                      The same value can be calculated with the more generic variable `tanLambda`,
                      so replace the current call with ``daughter(i, tanLambda)``.)DOC");
     /// error of helix parameters
-    REGISTER_VARIABLE("v0DaughterD0Error(i)",        v0DaughterTrackD0Error,        "d0 error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterD0Error(i)", v0DaughterTrackD0Error, "d0 error of the i-th daughter track fit");
     MAKE_DEPRECATED("v0DaughterD0Error(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `d0Err`,
                      so replace the current call with ``daughter(i, d0Err)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterPhi0Error(i)",      v0DaughterTrackPhi0Error,      "phi0 error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterPhi0Error(i)", v0DaughterTrackPhi0Error, "phi0 error of the i-th daughter track fit");
     MAKE_DEPRECATED("v0DaughterPhi0Error(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `phi0Err`,
                      so replace the current call with ``daughter(i, phi0Err)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterOmegaError(i)",     v0DaughterTrackOmegaError,     "omega error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterOmegaError(i)", v0DaughterTrackOmegaError, "omega error of the i-th daughter track fit");
     MAKE_DEPRECATED("v0DaughterOmegaError(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `omegaErr`,
                      so replace the current call with ``daughter(i, omegaErr)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterZ0Error(i)",        v0DaughterTrackZ0Error,        "z0 error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterZ0Error(i)", v0DaughterTrackZ0Error, "z0 error of the i-th daughter track fit");
     MAKE_DEPRECATED("v0DaughterZ0Error(i)", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `z0Err`,
                      so replace the current call with ``daughter(i, z0Err)``.)DOC");
@@ -879,9 +903,9 @@ namespace Belle2 {
     /// check whether the innermost VXD hits are shared among daoughters
     REGISTER_VARIABLE("v0DaughtersShare1stHit", v0DaughtersShareInnermostHit,
                       "flag for V0 daughters sharing the first(innermost) VXD hit. 0x1(0x2) bit represents V/z(U/r-phi)-hit share.");
-    REGISTER_VARIABLE("v0DaughtersShare1stUHit", v0DaughtersShareInnermostHit,
+    REGISTER_VARIABLE("v0DaughtersShare1stUHit", v0DaughtersShareInnermostUHit,
                       "flag for V0 daughters sharing the first(innermost) VXD U-side hit.");
-    REGISTER_VARIABLE("v0DaughtersShare1stVHit", v0DaughtersShareInnermostHit,
+    REGISTER_VARIABLE("v0DaughtersShare1stVHit", v0DaughtersShareInnermostVHit,
                       "flag for V0 daughters sharing the first(innermost) VXD V-side hit.");
   }
 }

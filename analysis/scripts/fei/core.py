@@ -264,7 +264,7 @@ class TrainingData:
                     hist_variables = ['mcErrors', 'mcParticleStatus'] + channel.mvaConfig.variables + spectators
                     hist_variables_2d = [(x, channel.mvaConfig.target)
                                          for x in channel.mvaConfig.variables + spectators if x is not channel.mvaConfig.target]
-                    hist_filename = f'Monitor_TrainingData.root'
+                    hist_filename = 'Monitor_TrainingData.root'
                     ma.variablesToHistogram(channel.name, variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
                                             filename=config.removeJPsiSlash(hist_filename),
@@ -332,7 +332,7 @@ class PreReconstruction:
                     hist_variables_2d = [(bc_variable, channel.mvaConfig.target),
                                          (bc_variable, 'mcErrors'),
                                          (bc_variable, 'mcParticleStatus')]
-                    filename = f'Monitor_PreReconstruction_BeforeRanking.root'
+                    filename = 'Monitor_PreReconstruction_BeforeRanking.root'
                     ma.variablesToHistogram(channel.name,
                                             variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
@@ -354,7 +354,7 @@ class PreReconstruction:
                     raise RuntimeError("Unknown bestCandidateMode " + repr(channel.preCutConfig.bestCandidateMode))
 
                 if self.config.monitor:
-                    filename = f'Monitor_PreReconstruction_AfterRanking.root'
+                    filename = 'Monitor_PreReconstruction_AfterRanking.root'
                     hist_variables += ['extraInfo(preCut_rank)']
                     hist_variables_2d += [('extraInfo(preCut_rank)', channel.mvaConfig.target),
                                           ('extraInfo(preCut_rank)', 'mcErrors'),
@@ -394,7 +394,7 @@ class PreReconstruction:
                     hist_variables_2d = [('chiProb', channel.mvaConfig.target),
                                          ('chiProb', 'mcErrors'),
                                          ('chiProb', 'mcParticleStatus')]
-                    filename = f'Monitor_PreReconstruction_AfterVertex.root'
+                    filename = 'Monitor_PreReconstruction_AfterVertex.root'
                     ma.variablesToHistogram(channel.name,
                                             variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
@@ -481,7 +481,7 @@ class PostReconstruction:
                                          ('extraInfo(decayModeID)', 'mcErrors'),
                                          ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                          ('extraInfo(decayModeID)', 'mcParticleStatus')]
-                    filename = f'Monitor_PostReconstruction_AfterMVA.root'
+                    filename = 'Monitor_PostReconstruction_AfterMVA.root'
                     ma.variablesToHistogram(channel.name,
                                             variables=config.variables2binnings(hist_variables),
                                             variables_2d=config.variables2binnings_2d(hist_variables_2d),
@@ -500,7 +500,7 @@ class PostReconstruction:
                 hist_variables_2d = [('extraInfo(decayModeID)', particle.mvaConfig.target),
                                      ('extraInfo(decayModeID)', 'mcErrors'),
                                      ('extraInfo(decayModeID)', 'mcParticleStatus')]
-                filename = f'Monitor_PostReconstruction_BeforePostCut.root'
+                filename = 'Monitor_PostReconstruction_BeforePostCut.root'
                 ma.variablesToHistogram(
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
@@ -512,7 +512,7 @@ class PostReconstruction:
             ma.applyCuts(particle.identifier, cutstring, path=path)
 
             if self.config.monitor:
-                filename = f'Monitor_PostReconstruction_BeforeRanking.root'
+                filename = 'Monitor_PostReconstruction_BeforeRanking.root'
                 ma.variablesToHistogram(
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
@@ -530,7 +530,7 @@ class PostReconstruction:
                                       (particle.mvaConfig.target, 'extraInfo(postCut_rank)'),
                                       ('mcErrors', 'extraInfo(postCut_rank)'),
                                       ('mcParticleStatus', 'extraInfo(postCut_rank)')]
-                filename = f'Monitor_PostReconstruction_AfterRanking.root'
+                filename = 'Monitor_PostReconstruction_AfterRanking.root'
                 ma.variablesToHistogram(
                     particle.identifier,
                     variables=config.variables2binnings(hist_variables),
@@ -547,7 +547,7 @@ class PostReconstruction:
                 elif 'B' in particle.name:
                     variables += ['Mbc', 'cosThetaBetweenParticleAndNominalB']
 
-                filename = f'Monitor_Final.root'
+                filename = 'Monitor_Final.root'
                 ma.variablesToNtuple(particle.identifier, variables, treename=config.removeJPsiSlash(
                     f'{particle.identifier} variables'), filename=config.removeJPsiSlash(filename), path=path)
         return path

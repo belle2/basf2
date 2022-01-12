@@ -646,6 +646,10 @@ void TRGGRLProjectsModule::event()
   bool bha_theta_1 = (ECLtoGDL[2] & (1 << (88 - 32 * 2))) != 0;
   //ecltaub2b
   bool ecltaub2b = (ECLtoGDL[2] & (1 << (89 - 32 * 2))) != 0;
+  // ehigh1-3
+  bool ehigh1 = (ECLtoGDL[2] & (1 << (90 - 32 * 2))) != 0;
+  bool ehigh2 = (ECLtoGDL[2] & (1 << (91 - 32 * 2))) != 0;
+  bool ehigh3 = (ECLtoGDL[2] & (1 << (92 - 32 * 2))) != 0;
 
   //---------------------------------------------------------------------
   //..Other input bits
@@ -864,6 +868,10 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ecl_mumu") {bit = ecl_mumu;}
     else if (bitname == "ecl_bst") {bit = ecl_bst;}
     else if (bitname == "ecl_taub2b") {bit = ecltaub2b;}
+    else if (bitname == "ehigh1") {bit = ehigh1;}
+    else if (bitname == "ehigh2") {bit = ehigh2;}
+    else if (bitname == "ehigh3") {bit = ehigh3;}
+
     else if (bitname == "klm_hit") {bit = klm_hit;}
     else if (bitname == "klm_0") {bit = klm_0;}
     else if (bitname == "klm_1") {bit = klm_1;}
@@ -939,14 +947,6 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "tsf2b2b") {bit = false;}
     else if (bitname == "grlgg1") {bit = false;}
     else if (bitname == "grlgg2") {bit = false;}
-    else if (bitname == "fwdsb") {bit = false;}
-    else if (bitname == "bwdsb") {bit = false;}
-    else if (bitname == "fwdnb") {bit = false;}
-    else if (bitname == "bwdnb") {bit = false;}
-    else if (bitname == "brlfb1") {bit = false;}
-    else if (bitname == "brlfb2") {bit = false;}
-    else if (bitname == "brlnb1") {bit = false;}
-    else if (bitname == "brlnb2") {bit = false;}
 
     //KLM TOP ECL not ready
     else if (bitname == "ecl_bhauni") {bit = false;}

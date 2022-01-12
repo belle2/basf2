@@ -40,7 +40,7 @@ class TestVariableUtilities(unittest.TestCase):
 
     ###########################################################################
     # to add to the tests here, please add a test_something_something for you
-    # favourite compicated decay string
+    # favourite complicated decay string
 
     def test_wrong_decaystring(self):
         """Make sure we get an error if the decaystring is not valid"""

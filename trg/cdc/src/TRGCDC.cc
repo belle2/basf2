@@ -41,7 +41,7 @@
 #include "trg/cdc/WireHitMC.h"
 #include "trg/cdc/TrackMC.h"
 #include "trg/cdc/Relation.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/LUT.h"
@@ -1537,9 +1537,9 @@ namespace Belle2 {
       TRGState t_trgState(t_trgData, 1);
       trgData->set(t_trgState, iWindow);
     }
-    allTrgData->push_back(trgData);
-    // Clean up memory
     if (allTrgData) {
+      allTrgData->push_back(trgData);
+      // Clean up memory
       for (unsigned i = 0; i < allTrgData->size(); i++) delete(*allTrgData)[i];
       delete allTrgData;
     }

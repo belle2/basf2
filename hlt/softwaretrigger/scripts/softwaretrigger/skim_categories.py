@@ -28,6 +28,8 @@ Calibration = [
     "skim accept gamma gamma",
     "skim accept hadron",
     "skim accept mumutight",
+    "skim accept mumu highmass",
+    "skim accept mumu tight or highm",
     "skim accept offip",
     "skim accept radmumu",
 ]

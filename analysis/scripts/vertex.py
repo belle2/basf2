@@ -20,6 +20,7 @@ def fitVertex(
     fit_type='vertex',
     constraint='',
     massConstraint=[],
+    recoilMass=0,
     daughtersUpdate=False,
     smearing=0,
     path=None,
@@ -38,10 +39,11 @@ def fitVertex(
             The value of 0 rejects the particle candidates with failed fit.
         decay_string (str):     select particles used for the vertex fit
         fitter (str):           Rave or KFit
-        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC)
-        constraint (str):       add aditional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
+        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC/recoilmass)
+        constraint (str):       add additional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
             Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
+        recoilMass (float):     invariant mass of recoil in GeV (valid only for recoilmass)
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'KFit/vertex/iptube' option.
         path (basf2.Path):      modules are added to this path
@@ -55,7 +57,9 @@ def fitVertex(
 
     B2WARNING(warning)
 
-    _fitVertex(list_name, conf_level, decay_string, fitter, fit_type, constraint, massConstraint, daughtersUpdate, smearing, path)
+    _fitVertex(
+        list_name, conf_level, decay_string, fitter, fit_type, constraint,
+        massConstraint, recoilMass, daughtersUpdate, smearing, path)
 
 
 def _fitVertex(
@@ -66,6 +70,7 @@ def _fitVertex(
     fit_type='vertex',
     constraint='',
     massConstraint=[],
+    recoilMass=0,
     daughtersUpdate=False,
     smearing=0,
     path=None,
@@ -83,10 +88,11 @@ def _fitVertex(
             The value of 0 rejects the particle candidates with failed fit.
         decay_string (str):     select particles used for the vertex fit
         fitter (str):           Rave or KFit
-        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC)
-        constraint (str):       add aditional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
+        fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC/massfourC/recoilmass)
+        constraint (str):       add additional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
             Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
+        recoilMass (float):     invariant mass of recoil in GeV (valid only for recoilmass)
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'KFit/vertex/iptube' option.
         path (basf2.Path):      modules are added to this path
@@ -101,6 +107,7 @@ def _fitVertex(
     pvfit.param('withConstraint', constraint)
     pvfit.param('updateDaughters', daughtersUpdate)
     pvfit.param('decayString', decay_string)
+    pvfit.param('recoilMass', recoilMass)
     pvfit.param('smearing', smearing)
     if massConstraint:
         if isinstance(massConstraint[0], str):
@@ -117,6 +124,7 @@ def kFit(list_name,
          daughtersUpdate=False,
          decay_string='',
          massConstraint=[],
+         recoilMass=0,
          smearing=0,
          path=None):
     """
@@ -134,17 +142,22 @@ def kFit(list_name,
           * ``massvertex`` for a vertex fit with a mass constraint on the mother particle
           * ``fourC`` for a vertex fit in which the mother particle's four-momentum is constrained to the beam four-momentum
           * ``massfourC`` for a vertex fit with a 4-momentum constraint and mass constraints on the specified daughter particles
+          * ``recoilmass`` for kinematic fit in which the mass of the mother particle's recoil four-momentum with respect
+            to the beam four-momentum is constrained
 
         constraint (str):       add an additional constraint to the fit (valid options are ipprofile or iptube)
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
             Please do not mix PDG id and particle names in massConstraint list (valid only for massfourC).
+        recoilMass (float):     invariant mass of recoil in GeV (valid only for recoilmass)
         daughtersUpdate (bool): make copy of the daughters and update them after the KFit
         decay_string (str):     select particles used for the KFit
         smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'iptube' constraint.
         path (basf2.Path):      modules are added to this path
     """
 
-    _fitVertex(list_name, conf_level, decay_string, 'KFit', fit_type, constraint, massConstraint, daughtersUpdate, smearing, path)
+    _fitVertex(
+        list_name, conf_level, decay_string, 'KFit', fit_type, constraint,
+        massConstraint, recoilMass, daughtersUpdate, smearing, path)
 
 
 def raveFit(
@@ -178,7 +191,7 @@ def raveFit(
           * ``massvertex`` for a mass-constrained vertex fit
 
         decay_string (str): select particles used for the vertex fit
-        constraint (str):   add aditional constraint to the fit
+        constraint (str):   add additional constraint to the fit
             (valid options are ipprofile or iptube).
         daughtersUpdate (bool): make copy of the daughters and update them after the Rave vertex fit
         path (basf2.Path):  modules are added to this path
@@ -207,7 +220,7 @@ def raveFit(
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
 
-    _fitVertex(list_name, conf_level, decay_string, 'Rave', fit_type, constraint, None, daughtersUpdate, 0, path)
+    _fitVertex(list_name, conf_level, decay_string, 'Rave', fit_type, constraint, None, 0, daughtersUpdate, 0, path)
 
 
 def treeFit(
@@ -219,6 +232,7 @@ def treeFit(
     customOriginConstraint=False,
     customOriginVertex=[0.001, 0, 0.0116],
     customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
+    originDimension=3,
     path=None,
 ):
     """
@@ -241,17 +255,19 @@ def treeFit(
         massConstraint (list(int) or list(str)): list of PDG ids or Names of the particles which are mass-constrained
             Please do not mix PDG id and particle names in massConstraint list.
         ipConstraint (bool): constrain head production vertex to IP (x-y-z) constraint
-        customOriginConstraint (bool): use a costum origin vertex as the production vertex of your particle.
-            This is usefull when fitting D*/D without wanting to fit a B but constraining the process to be B-decay-like.
+        customOriginConstraint (bool): use a custom origin vertex as the production vertex of your particle.
+            This is useful when fitting D*/D without wanting to fit a B but constraining the process to be B-decay-like.
             (think of semileptonic modes and stuff with a neutrino in the B decay).
         customOriginVertex (list(float)): 3d vector of the vertex coordinates you want to use as custom origin.
             Default numbers are taken for B-mesons
         customOriginCovariance (list(float)): 3x3 covariance matrix for the custom vertex (type: vector).
-            Default numbers extracted from generator distribtuion width of B-mesons.
+            Default numbers extracted from generator distribution width of B-mesons.
         updateAllDaughters (bool): if true the entire tree will be updated with the fitted values
             for momenta and vertex position. Otherwise only the momenta of the head of the tree will be updated,
             however for all daughters we also update the vertex position with the fit results as this would
             otherwise be set to {0, 0, 0} contact us if this causes any hardship/confusion.
+        originDimension (int): If the origin or IP constraint (``customOriginVertex`` or ``ipConstraint``) are used,
+            this specifies the dimension of the constraint (3D or 2D).
         path (basf2.Path): modules are added to this path
     """
     treeFitter = register_module("TreeFitter")
@@ -268,6 +284,7 @@ def treeFit(
     treeFitter.param('customOriginConstraint', customOriginConstraint)
     treeFitter.param('customOriginVertex', customOriginVertex)
     treeFitter.param('customOriginCovariance', customOriginCovariance)
+    treeFitter.param('originDimension', originDimension)
     path.add_module(treeFitter)
 
 
@@ -279,7 +296,7 @@ def TagV(
     constraintType="IP",
     askMCInfo=False,
     reqPXDHits=0,
-    maskName='',
+    maskName='all',
     fitAlgorithm='Rave',
     useTruthInFit=False,
     useRollBack=False,

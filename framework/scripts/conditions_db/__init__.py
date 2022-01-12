@@ -759,11 +759,11 @@ class ConditionsDB:
             metadata will be set to it
           data (dict): a dictionary with the information provided by the user:
 
-            * task: category of globaltag, either master, online, prompt, data, mc, or analysis
+            * task: category of globaltag, either main, online, prompt, data, mc, or analysis
             * tag: the globaltage name
-            * request: type of request, either Update, New, or Modification. The latter two imply task == master because
+            * request: type of request, either Update, New, or Modification. The latter two imply task == main because
               if new payload classes are introduced or payload classes are modified then they will first be included in
-              the master globaltag. Here a synchronization of code and payload changes has to be managed.
+              the main globaltag. Here a synchronization of code and payload changes has to be managed.
               If new or modified payload classes should be included in other globaltags they must already be in a release.
             * pull-request: number of the pull request containing new or modified payload classes,
               only for request == New or Modified
@@ -845,7 +845,7 @@ class ConditionsDB:
                 issue["project"] = {"key": "BII"}
             if "issuetype" not in issue.keys():
                 issue["issuetype"] = {"name": "Task"}
-            if data["task"] == "master":
+            if data["task"] == "main":
                 issue["labels"] = ["TUPPR"]
 
             B2INFO(f"Creating jira issue for {data['task']} globaltag request")

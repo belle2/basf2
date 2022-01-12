@@ -43,7 +43,7 @@ void AnalysisConfigurationModule::initialize()
 
   if (m_mcMatchingVersion == "BelleII")
     AnalysisConfiguration::instance()->useLegacyMCMatching(false);
-  else if (m_mcMatchingVersion == "Belle" or m_mcMatchingVersion == "MC5")
+  else if (m_mcMatchingVersion == "Belle")
     AnalysisConfiguration::instance()->useLegacyMCMatching(true);
   else
     B2ERROR("Invalid mcMatchingVersion specified to AnalysisConfiguration: " << m_mcMatchingVersion << "\n"

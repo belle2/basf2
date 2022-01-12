@@ -52,7 +52,7 @@ namespace Belle2 {
   private:
     /**
      * Initialize mva expert, dataset and features
-     * Called everytime the weightfile in the database changes in begin run
+     * Called every time the weightfile in the database changes in begin run
      */
     void init_mva(MVA::Weightfile& weightfile);
 

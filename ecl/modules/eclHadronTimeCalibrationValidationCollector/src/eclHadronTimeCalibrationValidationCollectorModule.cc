@@ -10,18 +10,14 @@
 #include <ecl/modules/eclHadronTimeCalibrationValidationCollector/eclHadronTimeCalibrationValidationCollectorModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <ecl/digitization/EclConfiguration.h>
 
-#include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/ClusterUtility/ClusterUtils.h>
 #include <boost/optional.hpp>
 
 #include <TH2F.h>
@@ -185,13 +181,6 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
   B2DEBUG(22, "Cutflow: no cuts: index = " << cutIndexPassed);
 
-
-  /* Use ECLChannelMapper to get other detector indices for the crystals */
-  /* For conversion from CellID to crate, shaper, and channel ids. */
-
-  // Use smart pointer to avoid memory leak when the ECLChannelMapper object needs destroying at the end of the event.
-  shared_ptr< ECL::ECLChannelMapper > crystalMapper(new ECL::ECLChannelMapper());
-  crystalMapper->initFromDB();
 
 
   // Storage crystal energies

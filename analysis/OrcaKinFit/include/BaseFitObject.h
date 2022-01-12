@@ -317,7 +317,7 @@ namespace Belle2 {
       bool measured[BaseDefs::MAXPAR];
       /// fixed flag
       bool fixed[BaseDefs::MAXPAR];
-      /// global paramter number for each parameter
+      /// global parameter number for each parameter
       int globalParNum [BaseDefs::MAXPAR];
       /// local covariance matrix
       double cov [BaseDefs::MAXPAR][BaseDefs::MAXPAR];

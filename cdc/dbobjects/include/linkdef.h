@@ -11,7 +11,7 @@
 #pragma link C++ class Belle2::CDCPropSpeeds+; // checksum=0x24873426, version=1
 #pragma link C++ class Belle2::CDCTimeWalks+; // checksum=0xa0bbe541, version=2
 #pragma link C++ class Belle2::CDCXtRelations+; // checksum=0x4c48166, version=2
-#pragma link C++ class Belle2::CDCSpaceResols+; // checksum=0x9afaab02, version=1
+#pragma link C++ class Belle2::CDCSpaceResols+; // checksum=0xbbc7719, version=2
 #pragma link C++ class Belle2::CDCDisplacement+; // checksum=0xfde3a407, version=3
 #pragma link C++ class Belle2::CDCAlignment+; // checksum=0x93495a07, version=2
 #pragma link C++ class Belle2::CDCLayerAlignment+; // checksum=0x84c87874, version=1
@@ -74,5 +74,14 @@
     for (int i=0; i < onfile.m_wires.size(); ++i) { \
       m_wires.insert(std::pair<unsigned short,float>(onfile.m_wires[i], effi)); \
     }\
+  }"
+
+#pragma read sourceClass="Belle2::CDCSpaceResols" version="[-1]" \
+  source="unsigned short m_sigmaParamMode" \
+  targetClass="Belle2::CDCSpaceResols" \
+  target="m_maxSpaceResol" \
+  code="{ \
+    /* set 325um for an old object */ \
+    m_maxSpaceResol = 0.0325; \
   }"
 #endif

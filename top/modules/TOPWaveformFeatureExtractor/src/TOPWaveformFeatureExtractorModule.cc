@@ -127,7 +127,7 @@ namespace Belle2 {
     }
 
     int finalSize = rawDigits.getEntries();
-    B2DEBUG(100, "TOPWaveformFeatureExtractor: appended " << finalSize - initSize
+    B2DEBUG(20, "TOPWaveformFeatureExtractor: appended " << finalSize - initSize
             << " raw digits to initial " << initSize);
 
   }

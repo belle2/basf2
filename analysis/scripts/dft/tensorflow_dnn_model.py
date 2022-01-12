@@ -507,7 +507,7 @@ class Trainer:
         :param model: DefaultModel obj
         :param data_set: TFData obj
         :param sess: tensorflow.Session obj
-        :param log_dir: str, directory name of tensorboard loging
+        :param log_dir: str, directory name of tensorboard logging
         :param save_name: str, path and name for saving the weightfiles
         :param monitoring_size: int, number of events of training fraction used for monitoring
         :param input_placeholders: list of tf.placeholders, [features, targets]

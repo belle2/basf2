@@ -16,8 +16,8 @@ namespace Belle2 {
     {
       int version = pt.get<int>("PDF_version");
       if (version != 1) {
-        B2ERROR("Unkown weightfile version " << std::to_string(version));
-        throw std::runtime_error("Unkown weightfile version " + std::to_string(version));
+        B2ERROR("Unknown weightfile version " << std::to_string(version));
+        throw std::runtime_error("Unknown weightfile version " + std::to_string(version));
       }
       m_binning = pt.get<std::string>("PDF_binning");
       m_mode = pt.get<std::string>("PDF_mode");
@@ -75,8 +75,8 @@ namespace Belle2 {
       else if (m_specific_options.m_binning == "equidistant")
         binning = Binning::CreateEquidistant(data, weights, isSignal, nBins);
       else {
-        B2ERROR("Unkown binning in PDF Teacher named " << m_specific_options.m_binning);
-        throw std::runtime_error("Unkown binning in PDF Teacher named " + m_specific_options.m_binning);
+        B2ERROR("Unknown binning in PDF Teacher named " << m_specific_options.m_binning);
+        throw std::runtime_error("Unknown binning in PDF Teacher named " + m_specific_options.m_binning);
       }
 
       Weightfile weightfile;
@@ -90,8 +90,8 @@ namespace Belle2 {
             value[iBin] = binning.m_signal_pdf[iBin] / (binning.m_signal_pdf[iBin] + binning.m_bckgrd_pdf[iBin]);
         }
       } else {
-        B2ERROR("Unkown mode in PDF Teacher named " << m_specific_options.m_mode);
-        throw std::runtime_error("Unkown mode in PDF Teacher named " + m_specific_options.m_mode);
+        B2ERROR("Unknown mode in PDF Teacher named " << m_specific_options.m_mode);
+        throw std::runtime_error("Unknown mode in PDF Teacher named " + m_specific_options.m_mode);
       }
 
       file << nBins << std::endl;

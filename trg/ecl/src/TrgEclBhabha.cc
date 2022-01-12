@@ -83,6 +83,7 @@ TrgEclBhabha::TrgEclBhabha():
   _3DBhabhaSelectionAngle.clear();
   _3DBhabhaVetoAngle.clear();
   _mumuAngle.clear();
+  m_3DBhabhaAddAngleCut.clear();
 
   _2DBhabhaThresholdFWD = {40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 30, 35}; //  (100 MeV)
   _2DBhabhaThresholdBWD = {25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 30, 30}; // (100 MeV)
@@ -91,6 +92,7 @@ TrgEclBhabha::TrgEclBhabha():
   _3DBhabhaVetoAngle      = {160, 200, 165, 190}; // (phi_low, phi_high, theta_low, theta_high) (degree)
   _3DBhabhaSelectionAngle = {140, 220, 160, 200}; // (phi_low, phi_high, theta_low, theta_high) (degree)
   _mumuAngle              = {160, 200, 165, 190}; // (phi_low, phi_high, theta_low, theta_high) (degree)
+  m_3DBhabhaAddAngleCut   = {150, 210, 160, 200}; // (phi_low, phi_high, theta_low, theta_high) (degree)
 
   m_3DBhabhaVetoInTrackFlag = -10;
   m_3DBhabhaVetoClusterTCIds.clear();
@@ -351,22 +353,17 @@ bool TrgEclBhabha::GetBhabha01()
       bool BtoBFlag = false;
 
       if (icluster == jcluster) {continue;}
-      int lut1 = _database->Get3DBhabhaLUT(MaxTCId[icluster]);
-      int lut2 = _database->Get3DBhabhaLUT(MaxTCId[jcluster]);
-      int energy1 = 15 & lut1;
-      int energy2 = 15 & lut2;
-      lut1 >>= 4;
-      lut2 >>= 4;
-      int phi1 = 511 & lut1;
-      int phi2 = 511 & lut2;
-      lut1 >>= 9;
-      lut2 >>= 9;
-      int theta1 = lut1;
-      int theta2 = lut2;
 
-      int dphi = abs(phi1 - phi2);
-      if (dphi > 180) {dphi = 360 - dphi;}
-      int thetaSum = theta1 + theta2;
+      int energy1 = 0;
+      int energy2 = 0;
+      int dphi = 0;
+      int thetaSum = 0;
+      get2CLETP(MaxTCId[icluster],
+                MaxTCId[jcluster],
+                energy1,
+                energy2,
+                dphi,
+                thetaSum);
 
       if (dphi > _3DBhabhaVetoAngle[0] &&
           thetaSum > _3DBhabhaVetoAngle[2] &&
@@ -451,22 +448,17 @@ bool TrgEclBhabha::GetBhabha02()
       bool BtoBFlag = false;
 
       if (icluster == jcluster) {continue;}
-      int lut1 = _database->Get3DBhabhaLUT(MaxTCId[icluster]);
-      int lut2 = _database->Get3DBhabhaLUT(MaxTCId[jcluster]);
-      int energy1 = 15 & lut1;
-      int energy2 = 15 & lut2;
-      lut1 >>= 4;
-      lut2 >>= 4;
-      int phi1 = 511 & lut1;
-      int phi2 = 511 & lut2;
-      lut1 >>= 9;
-      lut2 >>= 9;
-      int theta1 = lut1;
-      int theta2 = lut2;
 
-      int dphi = abs(phi1 - phi2);
-      if (dphi > 180) {dphi = 360 - dphi;}
-      int thetaSum = theta1 + theta2;
+      int energy1 = 0;
+      int energy2 = 0;
+      int dphi = 0;
+      int thetaSum = 0;
+      get2CLETP(MaxTCId[icluster],
+                MaxTCId[jcluster],
+                energy1,
+                energy2,
+                dphi,
+                thetaSum);
 
       if (dphi > _3DBhabhaSelectionAngle[0] &&
           dphi < _3DBhabhaSelectionAngle[1] &&
@@ -552,20 +544,17 @@ bool TrgEclBhabha::Getmumu()
     for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
 
       if (icluster == jcluster) {continue;}
-      int lut1 = _database->Get3DBhabhaLUT(MaxTCId[icluster]);
-      int lut2 = _database->Get3DBhabhaLUT(MaxTCId[jcluster]);
-      lut1 >>= 4;
-      lut2 >>= 4;
-      int phi1 = 511 & lut1;
-      int phi2 = 511 & lut2;
-      lut1 >>= 9;
-      lut2 >>= 9;
-      int theta1 = lut1;
-      int theta2 = lut2;
 
-      int dphi = abs(phi1 - phi2);
-      if (dphi > 180) {dphi = 360 - dphi;}
-      int thetaSum = theta1 + theta2;
+      int energy1 = 0;
+      int energy2 = 0;
+      int dphi = 0;
+      int thetaSum = 0;
+      get2CLETP(MaxTCId[icluster],
+                MaxTCId[jcluster],
+                energy1,
+                energy2,
+                dphi,
+                thetaSum);
 
       if (dphi > _mumuAngle[0] &&
           dphi < _mumuAngle[1] &&
@@ -615,20 +604,17 @@ bool TrgEclBhabha::GetTaub2b(double E_total1to17)
     for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
 
       if (icluster == jcluster) {continue;}
-      int lut1 = _database->Get3DBhabhaLUT(MaxTCId[icluster]);
-      int lut2 = _database->Get3DBhabhaLUT(MaxTCId[jcluster]);
-      lut1 >>= 4;
-      lut2 >>= 4;
-      int phi1 = 511 & lut1;
-      int phi2 = 511 & lut2;
-      lut1 >>= 9;
-      lut2 >>= 9;
-      int theta1 = lut1;
-      int theta2 = lut2;
 
-      int dphi = abs(phi1 - phi2);
-      if (dphi > 180) {dphi = 360 - dphi;}
-      int thetaSum = theta1 + theta2;
+      int energy1 = 0;
+      int energy2 = 0;
+      int dphi = 0;
+      int thetaSum = 0;
+      get2CLETP(MaxTCId[icluster],
+                MaxTCId[jcluster],
+                energy1,
+                energy2,
+                dphi,
+                thetaSum);
 
       if (dphi     > m_Taub2bAngleCut[0] &&
           dphi     < m_Taub2bAngleCut[1] &&
@@ -654,6 +640,99 @@ bool TrgEclBhabha::GetTaub2b(double E_total1to17)
   }
 
   return Taub2bFlag;
+}
+//========================================================
+// additional Bhabha veto
+//========================================================
+int TrgEclBhabha::GetBhabhaAddition(void)
+{
+
+  std::vector<int> MaxThetaId;
+  MaxThetaId.clear();
+  int bit_bhabha_addition = 0;
+
+  StoreArray<TRGECLCluster> trgeclClusterArray;
+  for (int ii = 0; ii < trgeclClusterArray.getEntries(); ii++) {
+    TRGECLCluster* aTRGECLCluster = trgeclClusterArray[ii];
+    int maxTCId = aTRGECLCluster->getMaxTCId();
+    MaxTCId.push_back(maxTCId);
+    int maxThetaId = aTRGECLCluster->getMaxThetaId();
+    MaxThetaId.push_back(maxThetaId);
+  }
+  int NofCluster1to17 = MaxThetaId.size();
+
+  if (NofCluster1to17 == 1) {
+    if (MaxThetaId[0] <= 3) {
+      bit_bhabha_addition |= 0x01;
+    }
+  } else if (NofCluster1to17 == 2) {
+
+    int energy1 = 0;
+    int energy2 = 0;
+    int dphi = 0;
+    int thetaSum = 0;
+    get2CLETP(MaxTCId[0],
+              MaxTCId[1],
+              energy1,
+              energy2,
+              dphi,
+              thetaSum);
+
+    if ((dphi     > m_3DBhabhaAddAngleCut[0] &&
+         dphi     < m_3DBhabhaAddAngleCut[1]) &&
+        (thetaSum > m_3DBhabhaAddAngleCut[2] &&
+         thetaSum < m_3DBhabhaAddAngleCut[3])) {
+      bit_bhabha_addition |= 0x02;
+    }
+    if ((dphi     > m_3DBhabhaAddAngleCut[0] &&
+         dphi     < m_3DBhabhaAddAngleCut[1]) ||
+        (thetaSum > m_3DBhabhaAddAngleCut[2] &&
+         thetaSum < m_3DBhabhaAddAngleCut[3])) {
+      bit_bhabha_addition |= 0x04;
+    }
+
+    int lowe_MaxThetaId = 0;
+    if (energy1 < energy2) {
+      lowe_MaxThetaId = MaxThetaId[0];
+    } else {
+      lowe_MaxThetaId = MaxThetaId[1];
+    }
+    if (lowe_MaxThetaId <= 3 ||
+        lowe_MaxThetaId >= 16) {
+      bit_bhabha_addition |= 0x08;
+    }
+
+  }
+
+  return bit_bhabha_addition;
+}
+//========================================================
+// get cluster energy and angles(dphi and theta_sum) from LUT
+//========================================================
+void TrgEclBhabha::get2CLETP(int TCId1,
+                             int TCId2,
+                             int& energy1,
+                             int& energy2,
+                             int& dphi,
+                             int& thetaSum)
+{
+  int lut1 = _database->Get3DBhabhaLUT(TCId1);
+  int lut2 = _database->Get3DBhabhaLUT(TCId2);
+  energy1 = 15 & lut1;
+  energy2 = 15 & lut2;
+  lut1 >>= 4;
+  lut2 >>= 4;
+  int phi1 = 511 & lut1;
+  int phi2 = 511 & lut2;
+  lut1 >>= 9;
+  lut2 >>= 9;
+  int theta1 = lut1;
+  int theta2 = lut2;
+  dphi = abs(phi1 - phi2);
+  if (dphi > 180) {dphi = 360 - dphi;}
+  thetaSum = theta1 + theta2;
+
+  return;
 }
 //========================================================
 //

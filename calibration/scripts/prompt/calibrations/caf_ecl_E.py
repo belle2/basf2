@@ -10,7 +10,7 @@
 
 """ECL single crystal energy calibration using three control samples."""
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 
 # --------------------------------------------------------------
 # ..Tell the automated script some required details
@@ -22,20 +22,20 @@ settings = CalibrationSettings(
     input_data_names=[
         "bhabha_all_calib",
         "gamma_gamma_calib",
-        "mumutight_calib"],
+        "mumutight_or_highm_calib"],
     input_data_filters={
         "bhabha_all_calib": [
-            input_data_filters["Data Tag"]["bhabha_all_calib"],
-            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
-            input_data_filters["Magnet"]["On"]],
+            INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
+            INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Magnet"]["On"]],
         "gamma_gamma_calib": [
-            input_data_filters["Data Tag"]["gamma_gamma_calib"],
-            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
-            input_data_filters["Magnet"]["On"]],
-        "mumutight_calib": [
-            input_data_filters["Data Tag"]["mumutight_calib"],
-            input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
-            input_data_filters["Magnet"]["On"]]},
+            INPUT_DATA_FILTERS["Data Tag"]["gamma_gamma_calib"],
+            INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Magnet"]["On"]],
+        "mumutight_or_highm_calib": [
+            INPUT_DATA_FILTERS["Data Tag"]["mumutight_or_highm_calib"],
+            INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],
     expert_config={"ee5x5_min_entries": 100})
 
@@ -104,7 +104,9 @@ def get_calibrations(input_data, **kwargs):
     algo_gamma_gamma.setMinEntries(150)
     algo_gamma_gamma.setMaxIterations(10)
     algo_gamma_gamma.setTRatioMin(0.45)
-    algo_gamma_gamma.setTRatioMax(0.60)
+    algo_gamma_gamma.setTRatioMax(0.70)
+    algo_gamma_gamma.setTRatioMinHiStat(0.70)
+    algo_gamma_gamma.setTRatioMaxHiStat(0.95)
     algo_gamma_gamma.setUpperEdgeThresh(0.02)
     algo_gamma_gamma.setPerformFits(True)
     algo_gamma_gamma.setFindExpValues(False)
@@ -135,7 +137,7 @@ def get_calibrations(input_data, **kwargs):
     # ..muon pair
 
     # ..Input data
-    file_to_iov_mu_mu = input_data["mumutight_calib"]
+    file_to_iov_mu_mu = input_data["mumutight_or_highm_calib"]
     input_files_mu_mu = list(file_to_iov_mu_mu.keys())
 
     # ..Algorithm
@@ -143,9 +145,10 @@ def get_calibrations(input_data, **kwargs):
     algo_mu_mu.cellIDLo = 1
     algo_mu_mu.cellIDHi = 8736
     algo_mu_mu.minEntries = 150
-    algo_mu_mu.maxIterations = 10
-    algo_mu_mu.tRatioMin = 0.2
-    algo_mu_mu.tRatioMax = 0.25
+    algo_mu_mu.nToRebin = 1000
+    algo_mu_mu.tRatioMin = 0.05
+    algo_mu_mu.tRatioMax = 0.40
+    algo_mu_mu.lowerEdgeThresh = 0.10
     algo_mu_mu.performFits = True
     algo_mu_mu.findExpValues = False
     algo_mu_mu.storeConst = 0

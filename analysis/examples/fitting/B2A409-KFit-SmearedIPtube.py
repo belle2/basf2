@@ -41,8 +41,7 @@ import variables.collections as vc
 my_path = b2.create_path()
 
 # load input ROOT file
-inputMdst(environmentType='default',
-          filename=b2.find_file('B02JpsiKs_Jpsi2mumu_Ks2pipi.root', 'examples', False),
+inputMdst(filename=b2.find_file('B02JpsiKs_Jpsi2mumu_Ks2pipi.root', 'examples', False),
           path=my_path)
 
 # creates "mu+:all" ParticleList (and c.c.)

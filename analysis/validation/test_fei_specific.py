@@ -42,8 +42,7 @@ particles = fei.get_unittest_channels(specific=True)
 
 # Construct path for reconstruction of signal side B-meson
 sig_path = b2.create_path()
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst14.root', 'validation', False),
+ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False),
              path=sig_path)
 ma.fillParticleList('mu+:sig', 'muonID > 0.5 and dr < 1 and abs(dz) < 2', writeOut=True, path=sig_path)
 ma.reconstructDecay('tau+:sig -> mu+:sig', '', 1, writeOut=True, path=sig_path)

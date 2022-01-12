@@ -33,7 +33,7 @@ spectators = ['isSignal', 'M']
 
 def reconstruction_path(inputfiles):
     path = b2.create_path()
-    ma.inputMdstList('default', inputfiles, path=path)
+    ma.inputMdstList(inputfiles, path=path)
     ma.fillParticleLists([('K-', 'kaonID > 0.5'), ('pi+', 'pionID > 0.5'),
                           ('gamma', '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09] or '
                            '[clusterReg == 3 and E > 0.16]] and abs(clusterTiming) < 20 and clusterE9E25 > 0.7'

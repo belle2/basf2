@@ -196,7 +196,7 @@ class DecayParticleNode:
         [ ("", None), ("D0_pi", (0, 0)), ("pi0", (1,)) ]
 
         and to create aliases from these one would use the indices as arguments for
-        te b2:var:`daughter` meta variable.
+        the b2:var:`daughter` meta variable.
 
         This function will make sure that prefix names are unique: If there are
         multiple siblings of one node with the same particle name they will be
@@ -248,7 +248,7 @@ class DecayParticleNode:
             full_path = current_path + (index,)
             # and prepare the prefix
             prefix = current_prefix + c.name
-            # is this particle name ambigious or are all indices requested? add index
+            # is this particle name ambiguous or are all indices requested? add index
             if always_include_indices or names[c.name] > 1:
                 prefix += "_{}".format(relative_indices[c.name] if use_relative_indices else index)
                 # always increase the relative indices
@@ -557,7 +557,7 @@ def create_isSignal_alias(aliasName, flags):
     unmasking (setting bits to zero)
     the ``c_MissGamma`` bit (16 or 0b00010000) and ``c_MissNeutrino`` bit (8 or 0b00001000) in mcErrors.
 
-    For more information, please check this `example script <https://stash.desy.de/projects/B2/repos/software/
+    For more information, please check this `example script <https://stash.desy.de/projects/B2/repos/basf2/
     browse/analysis/examples/VariableManager/isSignalAcceptFlags.py>`_.
 
     Parameters:

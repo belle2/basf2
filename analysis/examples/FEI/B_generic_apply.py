@@ -16,8 +16,7 @@ import modularAnalysis as ma
 path = b2.create_path()
 
 # Load input ROOT file
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('mdst14.root', 'validation', False),
+ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False),
              path=path)
 
 # Add the necessary database

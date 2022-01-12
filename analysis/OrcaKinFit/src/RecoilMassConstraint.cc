@@ -29,7 +29,7 @@ namespace Belle2 {
       ;
     }
 
-// calulate current value of constraint function
+// calculate current value of constraint function
     double RecoilMassConstraint::getValue() const
     {
       double totE = 0.;
@@ -60,7 +60,7 @@ namespace Belle2 {
       return result;
     }
 
-// calculate vector/array of derivatives of this contraint
+// calculate vector/array of derivatives of this constraint
 // w.r.t. to ALL parameters of all fitobjects
 // here: d RM /d par(j)
 //          = d RM /d p(i) * d p(i) /d par(j)

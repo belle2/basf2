@@ -45,7 +45,7 @@ if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdst('default', 'B2A101-Y4SEventGeneration-evtgen.root', path=my_path)
+ma.inputMdst('B2A101-Y4SEventGeneration-evtgen.root', path=my_path)
 
 # background files
 # location of the files is obtained from a shell variable - check first if it is set

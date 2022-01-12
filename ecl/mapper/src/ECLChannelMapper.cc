@@ -244,13 +244,6 @@ int ECLChannelMapper::getCrateID(int iCOPPERNode, int iFINESSE, bool pcie40)
     const int ECL_BARREL_FEE_IN_PCIE40 = 18;
     const int ECL_ENDCAP_FEE_IN_PCIE40 = 16;
 
-    // Checking for ECL_ENDCAP_FEE_IN_PCIE40 is not necessary,
-    // it will be done in later check for iCrate value
-    if (iFINESSE >= ECL_BARREL_FEE_IN_PCIE40) {
-      B2ERROR("ECLChannelMapper:: slot id must be less than 18, got slot id " << iFINESSE);
-      return -1;
-    }
-
     // crates  1..18 -> PCIe40, #1
     // crates 19..36 -> PCIe40, #2
     // crates 37,45,38,46,..,44,52 -> PCIe40, #3
@@ -258,8 +251,17 @@ int ECLChannelMapper::getCrateID(int iCOPPERNode, int iFINESSE, bool pcie40)
     if (iCOPPERNode == BECL_ID + 1 || iCOPPERNode == BECL_ID + 2) {
       // Barrel crates
       iCrate = (iCOPPERNode - BECL_ID - 1) * ECL_BARREL_FEE_IN_PCIE40 + iFINESSE + 1;
+      if (iFINESSE >= ECL_BARREL_FEE_IN_PCIE40) {
+        B2ERROR("ECLChannelMapper:: slot id must be less than 18, got slot id " << iFINESSE);
+        return -1;
+      }
     } else if (iCOPPERNode == BECL_ID + 3) {
+      // Endcap crates
       iCrate = 2 * ECL_BARREL_FEE_IN_PCIE40 + iFINESSE + 1;
+      if (iFINESSE >= ECL_ENDCAP_FEE_IN_PCIE40) {
+        B2ERROR("ECLChannelMapper:: slot id must be less than 16, got slot id " << iFINESSE);
+        return -1;
+      }
     } else {
       B2ERROR("ECLChannelMapper:: wrong COPPER NodeID 0x" << std::hex << iCOPPERNode << " expected BECL_ID 0x" << BECL_ID);
       return -1;

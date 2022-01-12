@@ -89,9 +89,10 @@ void DAQMonitorModule::event()
     h_runNr->SetBins(10, runNr - 5, runNr + 5); // just easy readable
     // for the case that we have some histogram bleeding from another run
     // we must set CanExtend or we can not merge histograms
-    // because of different axis. if teh histogram is rebinned,
-    // we may lose the lowest bits of teh run nr, but we still
+    // because of different axis. if th1 histogram is rebinned,
+    // we may lose the lowest bits of th1 run nr, but we still
     // would know that we have more than one run in it!
+    // (which is the main purpose of this histogram)
     h_runNr->GetXaxis()->SetCanExtend(kTRUE);
   }
   h_runNr->(runNr);

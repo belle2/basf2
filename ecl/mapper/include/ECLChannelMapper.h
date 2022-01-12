@@ -87,7 +87,7 @@ namespace Belle2 {
         return 0;
       }
 
-      ClassDef(ECLChannelMapper, 1);
+      ClassDef(ECLChannelMapper, 1); /**< ClassDef */
 
     };
   }

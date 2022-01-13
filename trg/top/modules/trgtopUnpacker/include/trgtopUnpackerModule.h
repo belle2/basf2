@@ -60,7 +60,7 @@ namespace Belle2 {
     std::string version() const;
 
     /** Read data from TRG copper.*/
-    virtual void readCOPPEREvent(RawTRG*, int);
+    virtual void readCOPPEREvent(RawTRG*, int, int);
 
     /** Unpacker main function.*/
     virtual void fillTreeTRGTOP(int*);
@@ -71,6 +71,7 @@ namespace Belle2 {
     int m_trigType;       /**Trigger type */
     int m_nodeId;         /**Our read-out ID */
     int m_nWords;         /**N words in raw data */
+    bool m_pciedata;         /**PCIe40 data or copper data */
 
   private:
 

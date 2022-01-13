@@ -69,13 +69,29 @@ void TRGTOPUnpackerModule::event()
   StoreArray<RawTRG> raw_trgarray;
 
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
+
+    // Check PCIe40 data or Copper data
+    if (raw_trgarray[i]->GetMaxNumOfCh(0) == 48) { m_pciedata = true; }
+    else if (raw_trgarray[i]->GetMaxNumOfCh(0) == 4) { m_pciedata = false; }
+    else { B2FATAL("TRGTOPUnpackerModule: Invalid value of GetMaxNumOfCh from raw data: " << LogVar("Number of ch: ", raw_trgarray[i]->GetMaxNumOfCh(0))); }
+
+    int node_id = 0;
+    int ch_id = 0;
+    if (m_pciedata) {
+      node_id = 0x11000001;
+      ch_id = 23;
+    } else {
+      node_id = 0x12000001;
+      ch_id = 0;
+    }
+
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
 
       m_nodeId = raw_trgarray[i]->GetNodeID(j);
 
-      if (m_nodeId == 0x12000001) {               ////// TRGTOP NodeID is 0x12000001, verified (tp & vs)
+      if (m_nodeId == node_id) {               ////// TRGTOP NodeID is 0x12000001, verified (tp & vs)
 
-        m_nWords       = raw_trgarray[i]->GetDetectorNwords(j, 0);
+        m_nWords       = raw_trgarray[i]->GetDetectorNwords(j, ch_id);
         m_eventNumber  = raw_trgarray[i]->GetEveNo(j);
         m_trigType     = raw_trgarray[i]->GetTRGType(j);
 
@@ -88,7 +104,7 @@ void TRGTOPUnpackerModule::event()
           //    B2INFO("raw_trgarray[]->GetNodeID(j) = " << std::hex << raw_trgarray[i]->GetNodeID(j) << std::dec);
           //    B2INFO("raw_trgarray[]->GetDetectorNwords(j,0) = " << m_nWords);
 
-          readCOPPEREvent(raw_trgarray[i] , j);
+          readCOPPEREvent(raw_trgarray[i] , j , ch_id);
 
         }
       }
@@ -96,11 +112,11 @@ void TRGTOPUnpackerModule::event()
   }
 }
 
-void TRGTOPUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i)
+void TRGTOPUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i, int ch_id)
 {
-  //  if (raw_copper->GetDetectorNwords(i, 0) > 3) {                ///general header is 3 words long
-  if (raw_copper->GetDetectorNwords(i, 0) > 0) {                ///general header is 3 words long
-    fillTreeTRGTOP(raw_copper->GetDetectorBuffer(i, 0));
+  //  if (raw_copper->GetDetectorNwords(i, ch_id) > 3) {                ///general header is 3 words long
+  if (raw_copper->GetDetectorNwords(i, ch_id) > 0) {                ///general header is 3 words long
+    fillTreeTRGTOP(raw_copper->GetDetectorBuffer(i, ch_id));
   }
 }
 

@@ -8,7 +8,7 @@
 
 '''
 In the past we had issues with some wide resonances (e.g. rho) generated with a wrong mass value by PYTHIA.
-This test checks that the mass of the rho is generated with a shift w.r.t. the evt.pdl value within 15 MeV.
+This test generaets 2000 uubar events and prints the shift of the rho mass peak position w.r.t. the evt.pdl value.
 '''
 
 import statistics

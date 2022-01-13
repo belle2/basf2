@@ -5,39 +5,32 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <algorithm>
-#include <cmath>
-#include <iostream>
-#include <numeric>
-#include <vector>
 
-#include <TMatrixT.h>
-#include <TMatrixDSymEigen.h>
-#include <TVectorT.h>
-#include <TVector3.h>
-
+/* Own header. */
+#include <klm/modules/KLMClusterAna/KLMClusterAnaModule.h>
 
 /* KLM headers. */
-#include <klm/modules/KLMClusterAna/KLMClusterAnaModule.h>
 #include <klm/utility/KLMHit2d.h>
 
 /* Other Belle 2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+/* ROOT headers. */
+#include <TMatrixT.h>
+#include <TMatrixDSymEigen.h>
+#include <TVectorT.h>
+#include <TVector3.h>
 
+/* C++ headers. */
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+#include <numeric>
+#include <vector>
 
 
 using namespace Belle2;
-
-//foward declarations here
-
-double expectation(std::vector<double> vec);
-std::vector<double> addition(std::vector<double> vec1, std::vector<double> vec2);
-std::vector<double> product(std::vector<double> vec1, std::vector<double> vec2);
-std::vector<double> covariance_matrix3x3(std::vector<double> xcoord, std::vector<double> ycoord, std::vector<double> zcoord);
-TMatrixT<double> eigenvectors3x3(std::vector<double> matrix);
-TMatrixT<double> spatialVariances(std::vector<double> xcoord, std::vector<double> ycoord, std::vector<double> zcoord);
 
 
 //Code for Module

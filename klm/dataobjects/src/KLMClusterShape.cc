@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/dataobjects/KLMClusterShape.h>
 
 
@@ -15,13 +16,11 @@ using namespace Belle2;
 
 KLMClusterShape::KLMClusterShape() :
   RelationsObject(),
-  m_nHits(0)
+  m_nHits(0),
+  m_primaryVec{0., 0., 0., 0.},
+  m_secondaryVec{0., 0., 0., 0.},
+  m_tertiaryVec{0., 0., 0., 0.}
 {
-  for (int i = 0; i < 4; i++) {
-    m_primaryVec[i] = 0.;
-    m_secondaryVec[i] = 0.;
-    m_tertiaryVec[i] = 0.;
-  }
 }
 
 
@@ -29,15 +28,12 @@ KLMClusterShape::KLMClusterShape() :
 //! Copy constructor
 KLMClusterShape::KLMClusterShape(const KLMClusterShape& clusterShape) :
   RelationsObject(clusterShape),
-  m_nHits(clusterShape.m_nHits)
+  m_nHits(clusterShape.m_nHits),
+  m_primaryVec(clusterShape.m_primaryVec),
+  m_secondaryVec(clusterShape.m_secondaryVec),
+  m_tertiaryVec(clusterShape.m_tertiaryVec)
 {
-  for (int i = 0; i < 4; i++) {
-    m_primaryVec[i] = clusterShape.m_primaryVec[i];
-    m_secondaryVec[i] = clusterShape.m_secondaryVec[i];
-    m_tertiaryVec[i] = clusterShape.m_tertiaryVec[i];
-  }
 }
-
 
 
 //! Assignment operator

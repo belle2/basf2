@@ -47,15 +47,21 @@ namespace Belle2 {
 
     /**Get principal axis eigenvector. */
     double getVariance1() const
-    {return abs(m_primaryVec[3]);}
+    {
+      return abs(m_primaryVec[3]);
+    }
 
     /**Get secondary axis eigenvector. */
     double getVariance2() const
-    {return abs(m_secondaryVec[3]);}
+    {
+      return abs(m_secondaryVec[3]);
+    }
 
     /**Get tertiary axis eigenvector. */
     double getVariance3() const
-    {return abs(m_tertiaryVec[3]);}
+    {
+      return abs(m_tertiaryVec[3]);
+    }
 
     /**Get eigenvectors. */
 
@@ -70,7 +76,9 @@ namespace Belle2 {
 
     /**Get number of hits used in a cluster */
     int getNHits() const
-    {return m_nHits;}
+    {
+      return m_nHits;
+    }
 
 
     /**Set eigenvectors and eigenvalues. */
@@ -102,7 +110,7 @@ namespace Belle2 {
     /**Principal axis eigenvector and eigenvalue. */
     std::array<double, 4> m_tertiaryVec;
 
-    /**  Needed to make the ROOT object storable */
+    /**Class version */
     ClassDef(KLMClusterShape, 1)
 
   }; // end of public RelationsObject

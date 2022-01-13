@@ -25,6 +25,7 @@ import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import Database
 from array import array
+import basf2 as b2
 
 def printUsageInfo():
     """
@@ -48,16 +49,24 @@ def main():
         printUsageInfo()
         exit(2)
 
+    exp = 20
+    run = 2000
+
+    #=== Configure ConditionsDB
+    # TODO: Load ECLChannelMapper from DB
+    b2.conditions.reset()
+    b2.conditions.prepend_globaltag('online')
+    setExpRun(exp, run)
     #=== Load ECL channel mapper
     mapper = Belle2.ECL.ECLChannelMapper()
-    mapper.initFromFile()
+    mapper.initFromDB()
     #=== Load mapping to 217 groups of Cell IDs with similar covariance matrices
-    f = open(Belle2.FileSystem.findFile('/data/ecl/CIdToEclData.txt'), 'r')
     groups = []
-    USE_8736_PARAMETERS = True
+    USE_8736_PARAMETERS = False
     if USE_8736_PARAMETERS:
         groups = [[x + 1] for x in range(8736)]
     else:
+        f = open(Belle2.FileSystem.findFile('/data/ecl/CIdToEclData.txt'), 'r')
         for line in f.readlines():
             if len(line.strip()) == 0: continue
             cid0, group = [int(x) for x in line.split()]
@@ -106,7 +115,6 @@ def main():
 
     #=== Data saving
 
-    f_out = ROOT.TFile('ECL-WF.root', 'recreate')
     t1 = ROOT.TTree("EclWF", "Waveform and covariance matrix")
     t2 = ROOT.TTree("EclAlgo", "Fitting algorithm parameters")
     t3 = ROOT.TTree("EclNoise", "Electronic noise matrix")
@@ -162,17 +170,11 @@ def main():
     t3.SetBranchAddress("NoiseM", ROOT.AddressOf(noise_data))
     t3.Fill()
 
-    arr1 = ROOT.TClonesArray('Belle2::ECLWaveformData', 8736)
-    for cid0, wf_data in enumerate(wf_data_by_cid):
-        arr1[cid0] = wf_data_by_cid[cid0]
-    arr2 = ROOT.TClonesArray('Belle2::ECLWFAlgoParams', 8736)
-    for cid0, wf_data in enumerate(algo_params_by_cid):
-        arr2[cid0] = algo_params_by_cid[cid0]
-
     db = Database.Instance()
-    db.storeData('ECLWaveformData', arr1, Belle2.IntervalOfValidity(0, 0, -1, -1))
-    db.storeData('ECLWFAlgoParams', arr2, Belle2.IntervalOfValidity(0, 0, -1, -1))
+    db.storeData('ECLWaveformData', t1, Belle2.IntervalOfValidity(0, 0, -1, -1))
+    db.storeData('ECLWFAlgoParams', t2, Belle2.IntervalOfValidity(0, 0, -1, -1))
 
+    f_out = ROOT.TFile('ECL-WF.root', 'recreate')
     t1.Write()
     t2.Write()
     t3.Write()
@@ -351,6 +353,28 @@ def copperIDToCrateID(cpr_id):
     """
     if cpr_id <= 18: return [cpr_id * 2 - 1, cpr_id * 2]
     return [cpr_id + 18, cpr_id + 26]
+
+################################################
+# DATABASE CONFIGURATION
+
+def setExpRun(exp, run):
+    """Configure ConditionDB for the specific exp and run number
+    """
+    Belle2.DataStore.Instance().setInitializeActive(True)
+    evtPtr = Belle2.PyStoreObj('EventMetaData')
+    evtPtr.registerInDataStore()
+    evtPtr.assign(Belle2.EventMetaData(1, run, exp), True)
+    Belle2.DataStore.Instance().setInitializeActive(False)
+    Belle2.DBStore.Instance().update()
+
+def iovToString(iov):
+    """Convert IntervalOfValidity to string
+    """
+    exp_min = iov.getExperimentLow()
+    exp_max = iov.getExperimentHigh()
+    run_min = iov.getRunLow()
+    run_max = iov.getRunHigh()
+    return '(%d, %d, %d, %d)' % (exp_min, run_min, exp_max, run_max)
 
 ################################################
 # ECL NOISE DATA

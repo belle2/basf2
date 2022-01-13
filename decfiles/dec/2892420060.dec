@@ -1,6 +1,6 @@
-# EventType: 2891420060
-# Descriptor: [e+ e- -> J/psi [-> e+ e-] eta_c(2S)]
-# NickName: ee_Jpsietac2s_ee
+# EventType: 2892420060
+# Descriptor: [e+ e- -> J/psi [-> mu+ mu-] eta_c]
+# NickName: ee_Jpsietac_mumu
 # Documentation: Double charmonium production.
 # Tested: Yes
 # PhysicsWG: Charmonium
@@ -16,9 +16,9 @@
 Alias MyJ/psi J/psi
 
 Decay vpho
-1.0   MyJ/psi eta_c(2S)  PHSP;
+1.0   MyJ/psi eta_c  PHSP;
 Enddecay
 
 Decay MyJ/psi
-1.0   mu+ mu-            PHOTOS PHSP;
+1.0   mu+ mu-        PHOTOS PHSP;
 Enddecay

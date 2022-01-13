@@ -767,6 +767,11 @@ namespace Belle2 {
       /** Unpacker main function.*/
       virtual void fillTreeTRGGRLUnpacker(int* buf, int evt);
 
+    private:
+
+      /** PCIe40 data or copper data **/
+      bool m_pciedata;
+
     };
   }
 } // end namespace Belle2

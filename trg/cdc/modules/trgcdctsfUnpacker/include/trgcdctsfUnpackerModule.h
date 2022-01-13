@@ -1872,6 +1872,12 @@ namespace Belle2 {
       unsigned int m_copper_address;
       //! address of copper module
       unsigned int m_copper_ab;
+      //! address of PCIe40 module
+      unsigned int m_pcie40_address;
+      //! channel ID of PCIe40 module
+      unsigned int m_pcie40_ch;
+      //! PCIe40 data or copper data
+      bool m_pciedata;
 
       //! TSF module number
       int m_TSFMOD;

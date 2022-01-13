@@ -7,7 +7,7 @@
 # Responsible: Kirill Chilikin
 # Email: chilikin@lebedev.ru
 # Cuts: None 
-# Date: 20210911
+# Date: 20220113
 #
 # This decay model is intended for phase-space-dependent efficiency
 # determination. All exclusive decays have the PHSP distributuion.

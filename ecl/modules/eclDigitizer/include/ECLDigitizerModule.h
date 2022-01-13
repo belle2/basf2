@@ -24,6 +24,8 @@
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/utility/ECLChannelMapper.h>
 
+class TTree;
+
 namespace Belle2 {
 
   class ECLWaveformData;
@@ -150,7 +152,15 @@ namespace Belle2 {
 
     /** dbobject for hadron signal shapes*/
     DBObjPtr<ECLDigitWaveformParametersForMC> m_waveformParametersMC;
-    DBArray<ECLWaveformData> m_waveformParameters;
+    /** dbobject for CellID-specific signal shapes */
+    OptionalDBObjPtr<TTree> m_waveformParameters;
+    /** dbobject for shape fitting algo parameters */
+    OptionalDBObjPtr<TTree> m_algoParameters;
+
+    /** If true, use m_waveformParameters and m_algoParameters.
+     *  If false, use the data from ecl/data/ECL-WF.root and ECL-WF-BG.root
+     */
+    bool m_useWaveformParameters;
 
     /** callback hadron signal shapes from database*/
     void callbackHadronSignalShapes();

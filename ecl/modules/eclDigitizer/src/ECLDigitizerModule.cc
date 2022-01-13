@@ -48,7 +48,8 @@ REG_MODULE(ECLDigitizer)
 //-----------------------------------------------------------------
 
 ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECLDigitWaveformParametersForMC"),
-  m_waveformParameters("ECLWaveformData")
+  m_waveformParameters("ECLWaveformData"),
+  m_algoParameters("ECLWFAlgoParams")
 {
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");
@@ -77,6 +78,8 @@ ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECL
            "Use DSP coefficients from the database for the processing. This "
            "will significantly reduce performance so this option is to be "
            "used for testing only.", false);
+  addParam("useWaveformParameters", m_useWaveformParameters,
+           "Use ECLWaveformData and ECLWFAlgoParams payloads", true);
 
 }
 
@@ -550,6 +553,12 @@ void ECLDigitizerModule::readDSPDB()
   TTree* tree  = (TTree*) rootfile.Get("EclWF");
   TTree* tree2 = (TTree*) rootfile.Get("EclAlgo");
   TTree* tree3 = (TTree*) rootfile.Get("EclNoise");
+
+  if (m_useWaveformParameters) {
+    // TODO: tree3 as well
+    tree  = const_cast<TTree*>(&*m_waveformParameters);
+    tree2 = const_cast<TTree*>(&*m_algoParameters);
+  }
 
   if (tree == 0 || tree2 == 0 || tree3 == 0) B2FATAL("Data not found");
 

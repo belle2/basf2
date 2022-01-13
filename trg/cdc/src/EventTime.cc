@@ -15,7 +15,7 @@
 
 #include "trg/trg/Debug.h"
 #include "trg/cdc/Segment.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/cdc/EventTime.h"
 #include <iostream>
 #include <iomanip>

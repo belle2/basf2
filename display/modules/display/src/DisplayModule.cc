@@ -79,6 +79,8 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
            "List of volumes to be hidden (can be re-enabled in Eve panel / Geometry scene. The volume and all its daughters will be hidden.", {});
   addParam("deleteVolumes", m_deleteVolumes,
            "List of volumes to be deleted. The volume and all its daughters will be deleted completely. Uses Regular Expressions (RE)! If the expression starts with '#', only daughters are removed (# is removed for RE)", {});
+  addParam("playOnStartup", m_playOnStartup,
+           "When launching the event display, immediately start advancing through events. Useful for control room uses etc.", false);
 
 
   //create gApplication so we can use graphics support. Needs to be done before ROOT has a chance to do it for us.
@@ -118,7 +120,7 @@ void DisplayModule::initialize()
   StoreArray<RecoHitInformation::UsedSVDHit> UsedSVDHits; UsedSVDHits.isOptional();
   StoreArray<RecoHitInformation::UsedCDCHit> UsedCDCHits; UsedCDCHits.isOptional();
 
-  m_display = new DisplayUI(m_automatic);
+  m_display = new DisplayUI(m_automatic, m_playOnStartup);
   if (hasCondition())
     m_display->allowFlaggingEvents(getCondition()->getPath()->getPathString());
   m_display->addParameter("Show MC info", getParam<bool>("showMCInfo"), 0);
@@ -155,6 +157,7 @@ void DisplayModule::initialize()
   m_visualizer->setOptions(m_options);
   m_display->hideObjects(m_hideObjects);
 }
+
 
 
 void DisplayModule::event()

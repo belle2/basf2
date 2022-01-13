@@ -52,12 +52,11 @@ void TrackDQMModule::defineHisto()
   DQMHistoModuleBase::defineHisto();
 
   if (VXD::GeoCache::getInstance().getGeoTools()->getNumberOfLayers() == 0)
-    B2WARNING("Missing geometry for VXD.");
+    B2FATAL("Missing geometry for VXD.");
 
   // Create a separate histogram directories and cd into it.
   TDirectory* originalDirectory = gDirectory;
 
-  // There might be problems with nullptr if the directory with the same name already exists (but I am not sure because there isn't anything like that in AlignmentDQM)
   TDirectory* TracksDQM = originalDirectory->GetDirectory("TracksDQM");
   if (!TracksDQM)
     TracksDQM = originalDirectory->mkdir("TracksDQM");
@@ -80,7 +79,8 @@ void TrackDQMModule::defineHisto()
   DefineFlags();
 
   TracksDQMAlignment->cd();
-  DefineSensors();
+  Define1DSensors();
+  Define2DSensors();
 
   originalDirectory->cd();
 

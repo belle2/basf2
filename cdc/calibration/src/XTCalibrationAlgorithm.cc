@@ -11,11 +11,13 @@
 #include <cdc/dbobjects/CDCXtRelations.h>
 
 #include <TError.h>
+#include <TStopwatch.h>
 #include <TROOT.h>
 #include <TProfile.h>
 #include <TF1.h>
 #include <TFile.h>
 #include <TTree.h>
+
 #include <iostream>
 #include <memory>
 
@@ -37,7 +39,6 @@ void XTCalibrationAlgorithm::createHisto()
 {
 
   B2INFO("create and fill histo");
-
   /*Create histogram*/
   for (int i = 0; i < 56; ++i) {
     for (int lr = 0; lr < 2; ++lr) {
@@ -87,15 +88,12 @@ void XTCalibrationAlgorithm::createHisto()
 
   int al = 0;
   int th = 0;
+  TStopwatch time;
+  time.Start();
   const Long64_t nEntries = tree->GetEntries();
   B2INFO("Number of entries " << nEntries);
   for (Long64_t i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
-    /* protect in case |alpha|>90 */
-    if (fabs(alpha) > 90) {
-      if (alpha < 0) alpha += 180;
-      if (alpha > 0) alpha -= 180;
-    }
 
     if (Pval < m_minPval || ndf < m_minNdf) continue;
 
@@ -123,6 +121,9 @@ void XTCalibrationAlgorithm::createHisto()
     }
     m_hist2dDraw[lay][al][th]->Fill(dt, dx);
   }
+  time.Stop();
+  B2INFO("Time to fill histograms: " << time.RealTime() << "s");
+  //  time.Print();
 }
 
 CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()

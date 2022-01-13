@@ -20,6 +20,9 @@
 /* CLHEP headers. */
 #include <CLHEP/Vector/ThreeVector.h>
 
+/* C++ headers. */
+#include <utility>
+
 using namespace Belle2;
 using namespace Belle2::bklm;
 
@@ -224,7 +227,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
   }
   if (channelDigitMap.empty())
     return;
-  std::vector<const KLMDigit*> digitCluster;
+  std::vector<std::pair<const KLMDigit*, double>> digitCluster;
   KLMChannelNumber previousChannel = channelDigitMap.begin()->first;
   double averageTime = m_Digits[channelDigitMap.begin()->second]->getTime();
   if (m_TimeCableDelayCorrection)
@@ -241,7 +244,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
     previousChannel = it->first;
     double n = (double)(digitCluster.size());
     averageTime = (n * averageTime + digitTime) / (n + 1.0);
-    digitCluster.push_back(digit);
+    digitCluster.emplace_back(std::make_pair(digit, digitTime));
   }
   m_bklmHit1ds.appendNew(digitCluster); // Also sets relation BKLMHit1d -> KLMDigit
 

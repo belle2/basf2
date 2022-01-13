@@ -26,4 +26,4 @@ if __name__ == "__main__":
     # but at least the test will correctly check if there are cppcheck warnings affecting this package.
     ignoreme = r"^((?!trg\/).)*$"
     check_error_free("b2code-cppcheck", "cppcheck", "trg",
-                     lambda x: re.findall(ignoreme, x) or x is "'", ["-j4"])
+                     lambda x: re.findall(ignoreme, x) or x == "'", ["-j4"])

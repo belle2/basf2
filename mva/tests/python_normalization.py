@@ -14,7 +14,6 @@ import basf2_mva
 import numpy as np
 import os
 import tempfile
-import sys
 from b2test_utils import skip_test
 
 variables = ['M', 'p', 'pt', 'pz',

@@ -80,6 +80,7 @@ eclBhabhaTimeCalibrationValidationCollectorModule::eclBhabhaTimeCalibrationValid
   addParam("tightTrkZ0", m_tightTrkZ0, "max Z0 for tight tracks (cm)", 2.);
   addParam("looseTrkD0", m_looseTrkD0, "max D0 for loose tracks (cm)", 2.);
   addParam("tightTrkD0", m_tightTrkD0, "max D0 for tight tracks (cm)", 0.5);  // beam pipe radius = 1cm in 2019
+  addParam("skipTrgSel", skipTrgSel, "boolean to skip the trigger skim selection", false);
 
 
   // specify this flag if you need parallel processing
@@ -200,6 +201,9 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
   m_eclClusterArray.isRequired() ;
   m_eclCalDigitArray.isRequired() ;
 
+
+  B2INFO("skipTrgSel = " << skipTrgSel);
+
 }
 
 void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
@@ -207,6 +211,44 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   int cutIndexPassed = 0;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
   B2DEBUG(22, "Cutflow: no cuts: index = " << cutIndexPassed);
+
+
+  // --- Check the trigger skim is the type that has two tracks
+
+  /* If we skip the trigger skim selection then still fill the cutflow histogram
+     just so that the positions don't change. */
+  if (!skipTrgSel) {
+    if (!m_TrgResult.isValid()) {
+      B2WARNING("SoftwareTriggerResult required to select bhabha event is not found");
+      return;
+    }
+
+    /* Release05: bhabha_all is grand skim = bhabha+bhabhaecl+radee.  We only want
+       to look at the 2 track bhabha events. */
+    const std::map<std::string, int>& fresults = m_TrgResult->getResults();
+    if (fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end()) {
+      B2WARNING("Can't find required bhabha trigger identifier");
+      return;
+    }
+
+    const bool eBhabha = (m_TrgResult->getResult("software_trigger_cut&skim&accept_bhabha") ==
+                          SoftwareTriggerCutResult::c_accept);
+    B2DEBUG(22, "eBhabha (trigger passed) = " << eBhabha);
+
+    if (!eBhabha) {
+      return;
+    }
+  }
+
+  /*  Fill the histgram showing that the trigger skim cut passed OR that we
+      are skipping this selection. */
+  cutIndexPassed++;
+  getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
+  B2DEBUG(22, "Cutflow: Trigger cut passed: index = " << cutIndexPassed);
+
+
+
+
 
   /* Use ECLChannelMapper to get other detector indices for the crystals
      For conversion from CellID to crate, shaper, and channel ids.
@@ -239,7 +281,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
 
   // Conversion coefficient from ADC ticks to nanoseconds
   // TICKS_TO_NS ~ 0.4931 ns/clock tick
-  // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz.
+  // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency
   const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::m_rf) * 1e3;
 
 

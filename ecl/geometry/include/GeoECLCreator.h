@@ -78,7 +78,9 @@ namespace Belle2 {
        * @param n Attribute name
        */
       const G4VisAttributes* att(const std::string& n) const;
+      /** Get Logical volume of preamplifier */
       G4LogicalVolume* get_preamp() const ;
+      /** Getter for preamplifier box height (hard-coded to be 2) */
       double get_pa_box_height() const {return 2;}
 
       /** pointer to a storage with crystal shapes and positions */

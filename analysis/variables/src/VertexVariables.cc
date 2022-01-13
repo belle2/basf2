@@ -402,8 +402,9 @@ If the particle is created from a KLM cluster, the distance is calculated betwee
     REGISTER_VARIABLE("prodVertexZ", particleProductionZ,
                       "Returns the z position of particle production vertex.");
     // Production vertex covariance matrix
-    REGISTER_VARIABLE("prodVertexCov(i,j)", particleProductionCovElement,
-                      "Returns the ij covariance matrix component of particle production vertex, arguments i,j should be 0, 1 or 2. Returns NaN if particle has no production covariance matrix.");
+    REGISTER_METAVARIABLE("prodVertexCov(i,j)", particleProductionCovElement,
+                          "Returns the ij covariance matrix component of particle production vertex, arguments i,j should be 0, 1 or 2. Returns NaN if particle has no production covariance matrix.",
+                          Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("prodVertexXErr", particleProductionXErr,
                       "Returns the x position uncertainty of particle production vertex. Returns NaN if particle has no production vertex.");
     REGISTER_VARIABLE("prodVertexYErr", particleProductionYErr,

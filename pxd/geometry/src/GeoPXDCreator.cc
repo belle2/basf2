@@ -620,7 +620,8 @@ namespace Belle2 {
         for (int i = 0; i < nCutouts; ++i) {
           G4Box* box = new G4Box("Cutout", sizeX, sizeY, sizeZ);
           G4Transform3D placement = G4RotateZ3D(phi0 + i * dphi) * G4Translate3D(origin);
-          supportCone = new G4SubtractionSolid("PXD Support endflange", supportCone, box, placement);
+          G4VSolid* supportConeOld = supportCone;
+          supportCone = new G4SubtractionSolid("PXD Support endflange", supportConeOld, box, placement);
         }
 
 

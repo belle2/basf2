@@ -101,19 +101,24 @@ namespace Belle2 {
       fitparams_t::int_array_24x16_t;  /**<  weighting coefficients amplitude calculation. Time is fixed by trigger */
     using uint_pair_t        = std::pair<unsigned int, unsigned int>; /**< a pair of unsigned ints */
 
-    /** ffsets for storages of ECL channels */
+    /** Indices in arrays with info on ECL channels */
     struct crystallinks_t {
+      /** Index in EclAlgo tree */
       short unsigned int idn;
+      /** Index in EclNoise tree */
       short unsigned int inoise;
+      /** Index of associated (waveform parameters, fit parameters) pair */
       short unsigned int ifunc;
+      /** Index in m_ss */
       short unsigned int iss;
     };
 
+    /** Lookup table for ECL channels. */
     std::vector<crystallinks_t> m_tbl;
 
     /** Fit algorihtm parameters shared by group of crystals */
     std::vector<algoparams_t> m_idn; /**< parameters that needs for waveform fit */
-    std::vector<fitparams_t> m_fitparams; /**<  */
+    std::vector<fitparams_t> m_fitparams; /**< Pairs of (waveform parameters, fit parameters) */
     std::vector<ECLNoiseData> m_noise; /**< parameters for correlated noise simulation */
     std::vector<signalsample_t> m_ss; /**< tabulated shape line */
     std::vector<signalsample_t> m_ss_HadronShapeSimulations; /**< tabulated shape line for hadron shape simulations */

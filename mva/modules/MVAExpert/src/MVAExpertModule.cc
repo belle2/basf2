@@ -115,7 +115,13 @@ namespace Belle2 {
       return 0.0;
     }
     for (unsigned int i = 0; i < m_feature_variables.size(); ++i) {
-      m_dataset->m_input[i] = m_feature_variables[i]->function(particle);
+      if (std::holds_alternative<double>(m_feature_variables[i]->function(particle))) {
+        m_dataset->m_input[i] = std::get<double>(m_feature_variables[i]->function(particle));
+      } else if (std::holds_alternative<int>(m_feature_variables[i]->function(particle))) {
+        m_dataset->m_input[i] = std::get<int>(m_feature_variables[i]->function(particle));
+      } else if (std::holds_alternative<bool>(m_feature_variables[i]->function(particle))) {
+        m_dataset->m_input[i] = std::get<bool>(m_feature_variables[i]->function(particle));
+      }
     }
     return m_expert->apply(*m_dataset)[0];
   }

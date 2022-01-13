@@ -42,12 +42,12 @@ ma.reconstructDecay(
 # match reconstructed with MC particles
 ma.matchMCTruth("B0", path=main)
 
-# build the rest of the event
-ma.buildRestOfEvent("B0", fillWithMostLikely=True, path=main)
+# build the rest of the event [S10|S30|S40]
+ma.buildRestOfEvent("B0", fillWithMostLikely=True, path=main)  # [E10]
 track_based_cuts = "thetaInCDCAcceptance and pt > 0.075 and dr < 5 and abs(dz) < 10"
-ecl_based_cuts = "thetaInCDCAcceptance and E > 0.05"
+ecl_based_cuts = "thetaInCDCAcceptance and E > 0.05"  # [E30]
 roe_mask = ("my_mask", track_based_cuts, ecl_based_cuts)
-ma.appendROEMasks("B0", [roe_mask], path=main)
+ma.appendROEMasks("B0", [roe_mask], path=main)  # [E40]
 
 # Create list of variables to save into the output file
 b_vars = []
@@ -56,19 +56,19 @@ standard_vars = vc.kinematics + vc.mc_kinematics + vc.mc_truth
 b_vars += vc.deltae_mbc
 b_vars += standard_vars
 
-# ROE variables
+# ROE variables [S20|S50]
 roe_kinematics = ["roeE()", "roeM()", "roeP()", "roeMbc()", "roeDeltae()"]
 roe_multiplicities = [
     "nROE_Charged()",
     "nROE_Photons()",
     "nROE_NeutralHadrons()",
 ]
-b_vars += roe_kinematics + roe_multiplicities
+b_vars += roe_kinematics + roe_multiplicities  # [E20]
 # Let's also add a version of the ROE variables that includes the mask:
 for roe_variable in roe_kinematics + roe_multiplicities:
     # e.g. instead of 'roeE()' (no mask) we want 'roeE(my_mask)'
     roe_variable_with_mask = roe_variable.replace("()", "(my_mask)")
-    b_vars.append(roe_variable_with_mask)
+    b_vars.append(roe_variable_with_mask)  # [E50]
 
 # Variables for final states (electrons, positrons, pions)
 fs_vars = vc.pid + vc.track + vc.track_hits + standard_vars

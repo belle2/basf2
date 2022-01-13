@@ -101,20 +101,6 @@ void DQMHistAnalysisTOPModule::beginRun()
   //B2DEBUG(20, "DQMHistAnalysisTOP: beginRun called.");
 }
 
-TCanvas* DQMHistAnalysisTOPModule::find_canvas(TString canvas_name)
-{
-  TIter nextckey(gROOT->GetListOfCanvases());
-  TObject* cobj = NULL;
-
-  while ((cobj = (TObject*)nextckey())) {
-    if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      if (cobj->GetName() == canvas_name)
-        break;
-    }
-  }
-  return (TCanvas*)cobj;
-}
-
 TH1* DQMHistAnalysisTOPModule::find_histo_in_canvas(TString histo_name)
 {
   StringList s = StringUtil::split(histo_name.Data(), '/');
@@ -123,26 +109,19 @@ TH1* DQMHistAnalysisTOPModule::find_histo_in_canvas(TString histo_name)
   std::string canvas_name = dirname + "/c_" + hname;
 
   TIter nextckey(gROOT->GetListOfCanvases());
-  TObject* cobj = NULL;
 
-  while ((cobj = (TObject*)nextckey())) {
-    if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      if (cobj->GetName() == canvas_name)
-        break;
-    }
-  }
-  if (cobj == NULL) return NULL;
+  auto cobj = find_canvas(canvas_name);
+  if (cobj == nullptr) return nullptr;
 
   TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
-  TObject* obj = NULL;
-
-  while ((obj = (TObject*)nextkey())) {
+  TObject* obj{};
+  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
     if (obj->IsA()->InheritsFrom("TH1")) {
       if (obj->GetName() == histo_name)
-        return (TH1*)obj;
+        return  dynamic_cast<TH1*>(obj);
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 void DQMHistAnalysisTOPModule::event()
@@ -265,7 +244,8 @@ void DQMHistAnalysisTOPModule::event()
     TH2F* h2Dscale_xy = (TH2F*)findHist(Form("TOP/good_hits_xy_%d", i));
     if (h2Dscale_xy != NULL && Ntotal_good_hits_xy > 0) {
       h2Dscale_xy->GetZaxis()->SetRangeUser(0, Ntotal_good_hits_xy / 2500.0);
-      h2Dscale_xy->Draw();
+      h2Dscale_xy->SetDrawOption("COLZ");
+      h2Dscale_xy->Draw("COLZ");
     }
     m_c_good_hits_xy_[i]->Modified();
   }
@@ -277,7 +257,8 @@ void DQMHistAnalysisTOPModule::event()
     TH2F* h2Dscale_xy = (TH2F*)findHist(Form("TOP/bad_hits_xy_%d", i));
     if (h2Dscale_xy != NULL && Ntotal_bad_hits_xy > 0) {
       h2Dscale_xy->GetZaxis()->SetRangeUser(0, Ntotal_bad_hits_xy / 250.0);
-      h2Dscale_xy->Draw();
+      h2Dscale_xy->SetDrawOption("COLZ");
+      h2Dscale_xy->Draw("COLZ");
     }
     m_c_bad_hits_xy_[i]->Modified();
   }
@@ -288,7 +269,8 @@ void DQMHistAnalysisTOPModule::event()
     TH2F* h2Dscale_asics = (TH2F*)findHist(Form("TOP/good_hits_asics_%d", i));
     if (h2Dscale_asics != NULL && Ntotal_good_hits_asics > 0) {
       h2Dscale_asics->GetZaxis()->SetRangeUser(0, Ntotal_good_hits_asics / 2500.0);
-      h2Dscale_asics->Draw();
+      h2Dscale_asics->SetDrawOption("COLZ");
+      h2Dscale_asics->Draw("COLZ");
     }
     m_c_good_hits_asics_[i]->Modified();
   }
@@ -299,7 +281,8 @@ void DQMHistAnalysisTOPModule::event()
     TH2F* h2Dscale_asics = (TH2F*)findHist(Form("TOP/bad_hits_asics_%d", i));
     if (h2Dscale_asics != NULL && Ntotal_bad_hits_asics > 0) {
       h2Dscale_asics->GetZaxis()->SetRangeUser(0, Ntotal_bad_hits_asics / 250.0);
-      h2Dscale_asics->Draw();
+      h2Dscale_asics->SetDrawOption("COLZ");
+      h2Dscale_asics->Draw("COLZ");
     }
     m_c_bad_hits_asics_[i]->Modified();
   }

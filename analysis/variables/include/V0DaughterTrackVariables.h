@@ -36,6 +36,11 @@ namespace Belle2 {
     double v0DaughterTrackNVXDHits(const Particle* part, const std::vector<double>& daughterID);
 
     /**
+     * returns the number of track hits removed in V0Finder
+     */
+    double v0DaughterTrackNRemovedHits(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
      * returns the first activated SVD layer associated to the track
      */
     double v0DaughterTrackFirstSVDLayer(const Particle* part, const std::vector<double>& daughterID);

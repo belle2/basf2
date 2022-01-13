@@ -397,7 +397,7 @@ def improve_docstring(obj):
     # if tclass:
     #    pyclass.__doc__ += '\n' + tclass.GetTitle()
 
-    doxygen_url = 'https://b2-master.belle2.org/software/development/class'
+    doxygen_url = 'https://software.belle2.org/development/class'
     doxygen_url += '_1_1'.join(classname.split('::'))
     doxygen_url += '.html'
     pyclass.__doc__ += '\n`Doxygen page for %s <%s>`_' % (classname, doxygen_url)

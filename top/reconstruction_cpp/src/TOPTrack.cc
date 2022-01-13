@@ -90,6 +90,7 @@ namespace Belle2 {
         B2ERROR("TOPTrack: no TrackFitResult available for PDGCode = " << chargedStable.getPDGCode());
         return;
       }
+      m_pT = fitResult->getTransverseMomentum();
 
       // require hits in CDC
 

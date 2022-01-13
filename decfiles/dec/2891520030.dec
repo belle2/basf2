@@ -2,11 +2,11 @@
 # Descriptor: [e+ e- -> J/psi [-> e+ e-] chi_c0]
 # NickName: ee_Jpsichic0_ee
 # Documentation: Double charmonium production.
-# Tested: Yes 
+# Tested: Yes
 # PhysicsWG: Charmonium
 # Responsible: Kirill Chilikin
 # Email: chilikin@lebedev.ru
-# Cuts: None 
+# Cuts: None
 # Date: 20220113
 #
 # This decay model is intended for phase-space-dependent efficiency

@@ -1,6 +1,6 @@
-# EventType: 2411520000
-# Descriptor: [e+ e- -> J/psi [-> e+ e-] Xdd]
-# NickName: ee_JpsiX_mumu
+# EventType: 2891420060
+# Descriptor: [e+ e- -> J/psi [-> e+ e-] chi_c0]
+# NickName: ee_Jpsichic0_ee
 # Documentation: Double charmonium production.
 # Tested: Yes 
 # PhysicsWG: Charmonium
@@ -14,26 +14,11 @@
 # Do not use it for one-dimensional analyses without proper reweighting.
 
 Alias MyJ/psi J/psi
-Alias MyXdd Xdd
-Alias Myanti-Xdd anti-Xdd
-ChargeConj MyXdd Myanti-Xdd
-
-# Uniform mass distribution from 1.5 to 5.5 GeV/c^2.
-Particle MyXdd 3.5 2.0
-ChangeMassMin MyXdd 1.5
-ChangeMassMax MyXdd 5.5
-LSFLAT MyXdd
 
 Decay vpho
-1.0   MyJ/psi MyXdd  PHSP;
+1.0   MyJ/psi chi_c0  PHSP;
 Enddecay
 
 Decay MyJ/psi
-1.0   e+ e-          PHOTOS PHSP;
+1.0   mu+ mu-         PHOTOS PHSP;
 Enddecay
-
-Decay MyXdd
-1.0   g g            PYTHIA 91;
-Enddecay
-
-CDecay Myanti-Xdd

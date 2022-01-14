@@ -329,6 +329,9 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
     B2DEBUG(19, "Registered Variable " << name);
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
+    if (!unit.empty()) {
+      var.get()->extendDescriptionString("\n\n :Unit: " + unit);
+    }
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
   }

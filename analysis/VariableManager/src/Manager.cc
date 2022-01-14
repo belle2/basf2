@@ -313,7 +313,8 @@ bool Variable::Manager::createVariable(const std::string& fullname, const std::s
 
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::FunctionPtr& f,
-                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype)
+                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype,
+                                         const std::string& unit)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");

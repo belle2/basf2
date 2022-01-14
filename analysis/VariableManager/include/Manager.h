@@ -224,7 +224,7 @@ namespace Belle2 {
                             const Manager::VariableDataType& v, const std::string& unit = "");
       /** Register a variable that takes floating-point arguments (see Variable::Manager::ParameterFunctionPtr). */
       void registerVariable(const std::string& name, const Manager::ParameterFunctionPtr& f, const std::string& description,
-                            const Manager::VariableDataType& v);
+                            const Manager::VariableDataType& v, const std::string& unit = "");
       /** Register a meta-variable that takes string arguments and returns a variable(see Variable::Manager::MetaFunctionPtr). */
       void registerVariable(const std::string& name, const Manager::MetaFunctionPtr& f, const std::string& description,
                             const Manager::VariableDataType& v);
@@ -301,9 +301,10 @@ namespace Belle2 {
         Manager::Instance().registerVariable(name, f, description, v, unit);
       }
       /** constructor. */
-      Proxy(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description, Manager::VariableDataType v)
+      Proxy(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description, Manager::VariableDataType v,
+            const std::string& unit = "")
       {
-        Manager::Instance().registerVariable(name, f, description, v);
+        Manager::Instance().registerVariable(name, f, description, v, unit);
       }
       /** constructor. */
       Proxy(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description, Manager::VariableDataType v)

@@ -338,7 +338,8 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
 }
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::ParameterFunctionPtr& f,
-                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype)
+                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype,
+                                         const std::string& unit)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -352,6 +353,9 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
     B2DEBUG(19, "Registered parameter Variable " << rawName);
     m_parameter_variables[rawName] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
+    if (!unit.empty()) {
+      var.get()->extendDescriptionString("\n\n :Unit: " + unit);
+    }
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
   }

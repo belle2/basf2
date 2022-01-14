@@ -384,19 +384,19 @@ namespace Belle2 {
 #define REGISTER_VARIABLE_WITH_UNIT(name, function, description, unit) \
   static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description), Belle2::Variable::get_function_type(name,function), std::string(unit));
 
-    /** \def HOW_MANY_ARGS(arg1, arg2, arg3, arg4, arg5, ...)
+    /** \def PICK_FIFTH_ARG(arg1, arg2, arg3, arg4, arg5, ...)
      *
      * Helper macro to determine number of provided arguments.
      *
      */
-#define HOW_MANY_ARGS(arg1, arg2, arg3, arg4, arg5, ...) arg5
+#define PICK_FIFTH_ARG(arg1, arg2, arg3, arg4, arg5, ...) arg5
 
     /** \def REGISTER_VARIABLE_MACRO_CHOOSER(...)
      *
      * Helper macro to pick REGISTER_VARIABLE function based on number of provided arguments
      *
      */
-#define REGISTER_VARIABLE_MACRO_CHOOSER(...) HOW_MANY_ARGS(__VA_ARGS__, REGISTER_VARIABLE_WITH_UNIT, REGISTER_VARIABLE_NO_UNIT, )
+#define REGISTER_VARIABLE_MACRO_CHOOSER(...) PICK_FIFTH_ARG(__VA_ARGS__, REGISTER_VARIABLE_WITH_UNIT, REGISTER_VARIABLE_NO_UNIT, )
 
     /** \def REGISTER_VARIABLE(...)
      *

@@ -597,9 +597,9 @@ MassFourCFitKFit::makeCoreMatrix() {
     for (int i = 0; i < m_ConstraintMassCount; i++) {
       for (int k = m_ConstraintMassChildLists[i].first; k <= m_ConstraintMassChildLists[i].second; k++) {
         if (m_IsFixMass[i])
-          Sum_child_al_1[3][0] += energy[i];
+          Sum_child_al_1[i * 4 + 3][0] += energy[k];
         else
-          Sum_child_al_1[3][0] += al_1_prime[i * KFitConst::kNumber7 + 3][0];
+          Sum_child_al_1[i * 4 + 3][0] += al_1_prime[k * KFitConst::kNumber7 + 3][0];
         for (int j = 0; j < 3; j++) Sum_child_al_1[i * 4 + j][0] += al_1_prime[k * KFitConst::kNumber7 + j][0];
       }
     }

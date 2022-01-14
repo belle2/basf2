@@ -83,9 +83,17 @@ def stdPi0s(listtype="eff60_May2020", path=None, loadPhotonBeamBackgroundMVA=Fal
         stdPi0s('eff50_May2020_nomcmatch', path, loadPhotonBeamBackgroundMVA)
         ma.cutAndCopyList('pi0:eff50_May2020', 'pi0:eff50_May2020_nomcmatch', '', True, path)
         ma.matchMCTruth('pi0:eff50_May2020', path)
-    elif 'eff60_May2020' == listtype:
+    elif 'eff60_May2020_nomcmatch' == listtype:
         stdPhotons('pi0eff60_May2020', path, loadPhotonBeamBackgroundMVA)
-        ma.reconstructDecay('pi0:eff60_May2020 -> gamma:pi0eff60_May2020 gamma:pi0eff60_May2020', '0.03<InvM', 1, True, path)
+        ma.reconstructDecay(
+            'pi0:eff60_May2020_nomcmatch -> gamma:pi0eff60_May2020 gamma:pi0eff60_May2020',
+            '0.03<InvM',
+            1,
+            True,
+            path)
+    elif 'eff60_May2020' == listtype:
+        stdPi0s('eff60_May2020_nomcmatch', path, loadPhotonBeamBackgroundMVA)
+        ma.cutAndCopyList('pi0:eff60_May2020', 'pi0:eff60_May2020_nomcmatch', '', True, path)
         ma.matchMCTruth('pi0:eff60_May2020', path)
 
     # skim list(s)
@@ -93,6 +101,10 @@ def stdPi0s(listtype="eff60_May2020", path=None, loadPhotonBeamBackgroundMVA=Fal
         stdPi0s('eff50_May2020_nomcmatch', path, loadPhotonBeamBackgroundMVA)
         ma.cutAndCopyList('pi0:skim', 'pi0:eff50_May2020_nomcmatch', '', True, path)
         kFit('pi0:skim', 0.0, 'mass', path=path)
+    elif listtype == 'SkimHighEff':
+        stdPi0s('eff60_May2020_nomcmatch', path, loadPhotonBeamBackgroundMVA)
+        ma.cutAndCopyList('pi0:SkimHighEff', 'pi0:eff60_May2020_nomcmatch', '', True, path)
+        kFit('pi0:SkimHighEff', 0.0, 'mass', path=path)
 
     # same lists with, but with  mass constraints fits
     elif listtype == 'allFit':
@@ -126,7 +138,7 @@ def stdPi0s(listtype="eff60_May2020", path=None, loadPhotonBeamBackgroundMVA=Fal
     else:
         raise ValueError(f"\"{listtype}\" is none of the allowed standardized types of pi0 lists!")
 
-# pi0 list for skims (and ONLY for skims)
+# pi0 list(s) for skims (and ONLY for skims)
 
 
 def loadStdSkimPi0(path):
@@ -141,3 +153,17 @@ def loadStdSkimPi0(path):
 
     """
     stdPi0s('skim', path, loadPhotonBeamBackgroundMVA=False)
+
+
+def loadStdSkimHighEffPi0(path):
+    """
+    Function to prepare the high-efficiency skim pi0 lists based on eff60_May2020 list.
+
+    Warning:
+        Should only be used by skims.
+
+    Parameters:
+        path (basf2.Path) modules are added to this path
+
+    """
+    stdPi0s('SkimHighEff', path, loadPhotonBeamBackgroundMVA=False)

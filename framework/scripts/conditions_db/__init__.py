@@ -609,8 +609,8 @@ class ConditionsDB:
         Parameters:
           filename (str): filename of the testing payload storage file that should be uploaded
           global_tage (str): name of the globaltag to which the data should be uploaded
-          normalize (bool/str): if True the payload root files will be normalized to have the same checksum for the same content,
-                                if normalize is a string in addition the file name in the root file metadata will be set to it
+          normalize (bool | str): if True the payload root files will be normalized to have the same checksum for the same content,
+                                  if normalize is a string in addition the file name in the root file metadata will be set to it
           ignore_existing (bool): if True do not upload payloads that already exist
           nprocess (int): maximal number of parallel uploads
           uploaded_entries (list): the list of successfully uploaded entries
@@ -753,7 +753,7 @@ class ConditionsDB:
 
         Parameters:
           filename (str): filename of the testing payload storage file that should be uploaded
-          normalize (bool/str): if True the payload root files will be
+          normalize (bool | str): if True the payload root files will be
             normalized to have the same checksum for the same content, if
             normalize is a string in addition the file name in the root file
             metadata will be set to it

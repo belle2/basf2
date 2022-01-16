@@ -24,12 +24,29 @@ namespace Belle2 {
       /** Destructor */
       virtual ~eclLeakageAlgorithm() {}
 
+      /** Setter for m_lowEnergyThreshold */
+      void setLowEnergyThreshold(double lowEnergyThreshold) {m_lowEnergyThreshold = lowEnergyThreshold;}
+
+      /** Getter for m_lowEnergyThreshold */
+      double getLowEnergyThreshold() {return m_lowEnergyThreshold;}
+
+      /** Setter for m_noNCrysThreshold */
+      void setNoNCrysThreshold(double noNCrysThreshold) {m_noNCrysThreshold = noNCrysThreshold;}
+
+      /** Getter for m_noNCrysThreshold */
+      double getNoNCrysThreshold() {return m_noNCrysThreshold;}
+
+
     protected:
 
       /** Run algorithm */
       virtual EResult calibrate() override;
 
     private:
+
+      /** Parameters to control fit procedure */
+      double m_lowEnergyThreshold = 0.0; /**< only minimal fits below this value */
+      double m_noNCrysThreshold = 0.0; /**< no nCrys fits below this value */
 
       /** For TTree */
       int t_cellID = 0; /**< cellID of photon */

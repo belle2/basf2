@@ -381,14 +381,15 @@ namespace {
     TFile file("datafile.root", "RECREATE");
     file.cd();
     TTree tree("tree", "TreeTitle");
-    float a, b, c, d, e, f, g, v, w = 0;
+    float a, b, c, d, e, f, v, w = 0;
+    bool target;
     tree.Branch("a", &a);
     tree.Branch("b", &b);
     tree.Branch("c", &c);
     tree.Branch("d", &d);
     tree.Branch("e__bo__bc", &e);
     tree.Branch("f__bo__bc", &f);
-    tree.Branch("g", &g);
+    tree.Branch("g", &target);
     tree.Branch("__weight__", &c);
     tree.Branch("v__bo__bc", &v);
     tree.Branch("w", &w);
@@ -400,7 +401,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = float(i % 2 == 0);
+      target = (i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree.Fill();
@@ -434,7 +435,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 1.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 1.7);
     EXPECT_FLOAT_EQ(x.m_weight, 1.2);
-    EXPECT_FLOAT_EQ(x.m_target, 1.0);
+    EXPECT_EQ(x.m_target, true);
     EXPECT_EQ(x.m_isSignal, true);
 
     x.loadEvent(1);
@@ -447,7 +448,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 2.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 2.7);
     EXPECT_FLOAT_EQ(x.m_weight, 2.2);
-    EXPECT_FLOAT_EQ(x.m_target, 0.0);
+    EXPECT_EQ(x.m_target, false);
     EXPECT_EQ(x.m_isSignal, false);
 
     x.loadEvent(2);
@@ -460,7 +461,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 3.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 3.7);
     EXPECT_FLOAT_EQ(x.m_weight, 3.2);
-    EXPECT_FLOAT_EQ(x.m_target, 1.0);
+    EXPECT_EQ(x.m_target, true);
     EXPECT_EQ(x.m_isSignal, true);
 
     x.loadEvent(3);
@@ -473,7 +474,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 4.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 4.7);
     EXPECT_FLOAT_EQ(x.m_weight, 4.2);
-    EXPECT_FLOAT_EQ(x.m_target, 0.0);
+    EXPECT_EQ(x.m_target, false);
     EXPECT_EQ(x.m_isSignal, false);
 
     x.loadEvent(4);
@@ -486,7 +487,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 5.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 5.7);
     EXPECT_FLOAT_EQ(x.m_weight, 5.2);
-    EXPECT_FLOAT_EQ(x.m_target, 1.0);
+    EXPECT_EQ(x.m_target, true);
     EXPECT_EQ(x.m_isSignal, true);
 
     EXPECT_FLOAT_EQ(x.getSignalFraction(), 0.6);
@@ -544,11 +545,11 @@ namespace {
 
     auto targets = x.getTargets();
     EXPECT_EQ(targets.size(), 5);
-    EXPECT_FLOAT_EQ(targets[0], 1.0);
-    EXPECT_FLOAT_EQ(targets[1], 0.0);
-    EXPECT_FLOAT_EQ(targets[2], 1.0);
-    EXPECT_FLOAT_EQ(targets[3], 0.0);
-    EXPECT_FLOAT_EQ(targets[4], 1.0);
+    EXPECT_EQ(targets[0], true);
+    EXPECT_EQ(targets[1], false);
+    EXPECT_EQ(targets[2], true);
+    EXPECT_EQ(targets[3], false);
+    EXPECT_EQ(targets[4], true);
 
     auto signals = x.getSignals();
     EXPECT_EQ(signals.size(), 5);
@@ -559,7 +560,7 @@ namespace {
     EXPECT_EQ(signals[4], true);
 
     // Using __weight__ should work as well,
-    // the only difference to using _weight__ instead of g is
+    // the only difference to using _weight__ instead of c is
     // in setBranchAddresses which avoids calling makeROOTCompatible
     // So we have to check the behaviour using __weight__ as well
     general_options.m_weight_variable = "__weight__";
@@ -944,14 +945,15 @@ namespace {
     TFile file("datafile.root", "RECREATE");
     file.cd();
     TTree tree("tree", "TreeTitle");
-    float a, b, c, d, e, f, g, v, w = 0;
+    double a, b, c, d, e, f, v, w = 0;
+    bool target;
     tree.Branch("a", &a);
     tree.Branch("b", &b);
     tree.Branch("c", &c);
     tree.Branch("d", &d);
     tree.Branch("e__bo__bc", &e);
     tree.Branch("f__bo__bc", &f);
-    tree.Branch("g", &g);
+    tree.Branch("g", &target);
     tree.Branch("__weight__", &c);
     tree.Branch("v__bo__bc", &v);
     tree.Branch("w", &w);
@@ -963,7 +965,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = float(i % 2 == 0);
+      target = (i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree.Fill();
@@ -980,7 +982,7 @@ namespace {
     tree2.Branch("d", &d);
     tree2.Branch("e__bo__bc", &e);
     tree2.Branch("f__bo__bc", &f);
-    tree2.Branch("g", &g);
+    tree2.Branch("g", &target);
     tree2.Branch("__weight__", &c);
     tree2.Branch("v__bo__bc", &v);
     tree2.Branch("w", &w);
@@ -992,7 +994,7 @@ namespace {
       d = i + 1.3;
       e = i + 1.4;
       f = i + 1.5;
-      g = float(i % 2 == 0);
+      target = (i % 2 == 0);
       w = i + 1.6;
       v = i + 1.7;
       tree2.Fill();
@@ -1026,7 +1028,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 1.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 1.7);
     EXPECT_FLOAT_EQ(x.m_weight, 1.2);
-    EXPECT_FLOAT_EQ(x.m_target, 1.0);
+    EXPECT_EQ(x.m_target, true);
     EXPECT_EQ(x.m_isSignal, true);
 
     x.loadEvent(5);
@@ -1039,7 +1041,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 1.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 1.7);
     EXPECT_FLOAT_EQ(x.m_weight, 1.2);
-    EXPECT_FLOAT_EQ(x.m_target, 1.0);
+    EXPECT_EQ(x.m_target, true);
     EXPECT_EQ(x.m_isSignal, true);
 
     x.loadEvent(1);
@@ -1052,7 +1054,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 2.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 2.7);
     EXPECT_FLOAT_EQ(x.m_weight, 2.2);
-    EXPECT_FLOAT_EQ(x.m_target, 0.0);
+    EXPECT_EQ(x.m_target, false);
     EXPECT_EQ(x.m_isSignal, false);
 
     x.loadEvent(6);
@@ -1065,7 +1067,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 2.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 2.7);
     EXPECT_FLOAT_EQ(x.m_weight, 2.2);
-    EXPECT_FLOAT_EQ(x.m_target, 0.0);
+    EXPECT_EQ(x.m_target, false);
     EXPECT_EQ(x.m_isSignal, false);
 
     x.loadEvent(2);
@@ -1078,7 +1080,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 3.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 3.7);
     EXPECT_FLOAT_EQ(x.m_weight, 3.2);
-    EXPECT_FLOAT_EQ(x.m_target, 1.0);
+    EXPECT_EQ(x.m_target, true);
     EXPECT_EQ(x.m_isSignal, true);
 
     x.loadEvent(7);
@@ -1091,7 +1093,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 3.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 3.7);
     EXPECT_FLOAT_EQ(x.m_weight, 3.2);
-    EXPECT_FLOAT_EQ(x.m_target, 1.0);
+    EXPECT_EQ(x.m_target, true);
     EXPECT_EQ(x.m_isSignal, true);
 
     x.loadEvent(3);
@@ -1104,7 +1106,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 4.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 4.7);
     EXPECT_FLOAT_EQ(x.m_weight, 4.2);
-    EXPECT_FLOAT_EQ(x.m_target, 0.0);
+    EXPECT_EQ(x.m_target, false);
     EXPECT_EQ(x.m_isSignal, false);
 
     x.loadEvent(8);
@@ -1117,7 +1119,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 4.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 4.7);
     EXPECT_FLOAT_EQ(x.m_weight, 4.2);
-    EXPECT_FLOAT_EQ(x.m_target, 0.0);
+    EXPECT_EQ(x.m_target, false);
     EXPECT_EQ(x.m_isSignal, false);
 
     x.loadEvent(4);
@@ -1130,7 +1132,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 5.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 5.7);
     EXPECT_FLOAT_EQ(x.m_weight, 5.2);
-    EXPECT_FLOAT_EQ(x.m_target, 1.0);
+    EXPECT_EQ(x.m_target, true);
     EXPECT_EQ(x.m_isSignal, true);
 
     x.loadEvent(9);
@@ -1143,7 +1145,7 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_spectators[0], 5.6);
     EXPECT_FLOAT_EQ(x.m_spectators[1], 5.7);
     EXPECT_FLOAT_EQ(x.m_weight, 5.2);
-    EXPECT_FLOAT_EQ(x.m_target, 1.0);
+    EXPECT_EQ(x.m_target, true);
     EXPECT_EQ(x.m_isSignal, true);
 
     EXPECT_FLOAT_EQ(x.getSignalFraction(), 0.6);
@@ -1231,16 +1233,16 @@ namespace {
 
     auto targets = x.getTargets();
     EXPECT_EQ(targets.size(), 10);
-    EXPECT_FLOAT_EQ(targets[0], 1.0);
-    EXPECT_FLOAT_EQ(targets[1], 0.0);
-    EXPECT_FLOAT_EQ(targets[2], 1.0);
-    EXPECT_FLOAT_EQ(targets[3], 0.0);
-    EXPECT_FLOAT_EQ(targets[4], 1.0);
-    EXPECT_FLOAT_EQ(targets[5], 1.0);
-    EXPECT_FLOAT_EQ(targets[6], 0.0);
-    EXPECT_FLOAT_EQ(targets[7], 1.0);
-    EXPECT_FLOAT_EQ(targets[8], 0.0);
-    EXPECT_FLOAT_EQ(targets[9], 1.0);
+    EXPECT_EQ(targets[0], true);
+    EXPECT_EQ(targets[1], false);
+    EXPECT_EQ(targets[2], true);
+    EXPECT_EQ(targets[3], false);
+    EXPECT_EQ(targets[4], true);
+    EXPECT_EQ(targets[5], true);
+    EXPECT_EQ(targets[6], false);
+    EXPECT_EQ(targets[7], true);
+    EXPECT_EQ(targets[8], false);
+    EXPECT_EQ(targets[9], true);
 
     auto signals = x.getSignals();
     EXPECT_EQ(signals.size(), 10);
@@ -1256,7 +1258,7 @@ namespace {
     EXPECT_EQ(signals[9], true);
 
     // Using __weight__ should work as well,
-    // the only difference to using _weight__ instead of g is
+    // the only difference to using _weight__ instead of c is
     // in setBranchAddresses which avoids calling makeROOTCompatible
     // So we have to check the behaviour using __weight__ as well
     general_options.m_weight_variable = "__weight__";

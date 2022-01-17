@@ -165,7 +165,7 @@ def add_mdst_dump(path, print_untested=False):
             "getFirstDaughter", "getLastDaughter", "getDaughters", "getNDaughters", "getMother",
             "getSecondaryPhysicsProcess", "getSeenInDetector",
             "isVirtual", "isInitial", "isPrimaryParticle", "getName"
-        ]),
+        ], {'getDaughter': [0], 'getParticleFromGeneralizedIndexString': ['0:0']}),
         DataStorePrinter("EventLevelTriggerTimeInfo", [
             "isValid", "hasInjection", "isHER", "isRevo2",
             "getTimeSinceLastInjection", "getTimeSincePrevTrigger", "getBunchNumber",

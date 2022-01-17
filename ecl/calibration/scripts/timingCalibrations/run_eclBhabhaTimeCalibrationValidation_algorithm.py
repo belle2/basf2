@@ -20,13 +20,11 @@
 # Glob expression can be passed as an input file.
 # Example: basf2 run_eclBhabhaTimeCalibrationValidation_algorithm.py "exp_0003_run_*.root"
 
-import os
 import sys
 import ROOT
 import basf2 as b2
 from ROOT import Belle2
 from glob import glob
-import array as arr
 
 from basf2 import conditions as b2conditions
 

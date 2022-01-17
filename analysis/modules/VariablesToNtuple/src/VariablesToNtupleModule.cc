@@ -115,16 +115,15 @@ void VariablesToNtupleModule::initialize()
 
   // declare branches and get the variable strings
   m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
-  m_branchAddresses.resize(m_variables.size() + 1);
-  m_tree->get().Branch("__weight__", &m_branchAddresses[0], "__weight__/D");
+  m_branchAddressesDouble.resize(m_variables.size() + 1);
+  m_branchAddressesInt.resize(m_variables.size() + 1);
+  m_tree->get().Branch("__weight__", &m_branchAddressesDouble[0], "__weight__/D");
   size_t enumerate = 1;
   for (const string& varStr : m_variables) {
     string branchName = makeROOTCompatible(varStr);
 
     // Check for deprecated variables
     Variable::Manager::Instance().checkDeprecatedVariable(varStr);
-
-    m_tree->get().Branch(branchName.c_str(), &m_branchAddresses[enumerate], (branchName + "/D").c_str());
 
     // also collection function pointers
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);
@@ -138,6 +137,13 @@ void VariablesToNtupleModule::initialize()
                 "declare it as event based, which avoids this error.\n\n"
                 "vm.addAlias('myAliasName', 'eventCached(myAlias)')");
         continue;
+      }
+      if (var->variabletype == Variable::Manager::VariableDataType::c_double) {
+        m_tree->get().Branch(branchName.c_str(), &m_branchAddressesDouble[enumerate], (branchName + "/D").c_str());
+      } else if (var->variabletype == Variable::Manager::VariableDataType::c_int) {
+        m_tree->get().Branch(branchName.c_str(), &m_branchAddressesInt[enumerate], (branchName + "/I").c_str());
+      } else if (var->variabletype == Variable::Manager::VariableDataType::c_bool) {
+        m_tree->get().Branch(branchName.c_str(), &m_branchAddressesInt[enumerate], (branchName + "/O").c_str());
       }
       m_functions.push_back(var->function);
     }
@@ -166,7 +172,14 @@ float VariablesToNtupleModule::getInverseSamplingRateWeight(const Particle* part
   if (m_sampling_variable == nullptr)
     return 1.0;
 
-  long target = std::lround(m_sampling_variable->function(particle));
+  long target = 0;
+  if (m_sampling_variable->variabletype == Variable::Manager::VariableDataType::c_double) {
+    target = std::lround(std::get<double>(m_sampling_variable->function(particle)));
+  } else if (m_sampling_variable->variabletype == Variable::Manager::VariableDataType::c_int) {
+    target = std::lround(std::get<int>(m_sampling_variable->function(particle)));
+  } else if (m_sampling_variable->variabletype == Variable::Manager::VariableDataType::c_bool) {
+    target = std::lround(std::get<bool>(m_sampling_variable->function(particle)));
+  }
   if (m_sampling_rates.find(target) != m_sampling_rates.end() and m_sampling_rates[target] > 0) {
     m_sampling_counts[target]++;
     if (m_sampling_counts[target] % m_sampling_rates[target] != 0)
@@ -187,10 +200,16 @@ void VariablesToNtupleModule::event()
   m_production = m_eventMetaData->getProduction();
 
   if (m_particleList.empty()) {
-    m_branchAddresses[0] = getInverseSamplingRateWeight(nullptr);
-    if (m_branchAddresses[0] > 0) {
+    m_branchAddressesDouble[0] = getInverseSamplingRateWeight(nullptr);
+    if (m_branchAddressesDouble[0] > 0) {
       for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
-        m_branchAddresses[iVar + 1] = m_functions[iVar](nullptr);
+        if (std::holds_alternative<double>(m_functions[iVar](nullptr))) {
+          m_branchAddressesDouble[iVar + 1] = std::get<double>(m_functions[iVar](nullptr));
+        } else if (std::holds_alternative<int>(m_functions[iVar](nullptr))) {
+          m_branchAddressesInt[iVar + 1] = std::get<int>(m_functions[iVar](nullptr));
+        } else if (std::holds_alternative<bool>(m_functions[iVar](nullptr))) {
+          m_branchAddressesInt[iVar + 1] = std::get<bool>(m_functions[iVar](nullptr));
+        }
       }
       m_tree->get().Fill();
     }
@@ -201,10 +220,16 @@ void VariablesToNtupleModule::event()
     for (unsigned int iPart = 0; iPart < m_ncandidates; iPart++) {
       m_candidate = iPart;
       const Particle* particle = particlelist->getParticle(iPart);
-      m_branchAddresses[0] = getInverseSamplingRateWeight(particle);
-      if (m_branchAddresses[0] > 0) {
+      m_branchAddressesDouble[0] = getInverseSamplingRateWeight(particle);
+      if (m_branchAddressesDouble[0] > 0) {
         for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
-          m_branchAddresses[iVar + 1] = m_functions[iVar](particle);
+          if (std::holds_alternative<double>(m_functions[iVar](particle))) {
+            m_branchAddressesDouble[iVar + 1] = std::get<double>(m_functions[iVar](particle));
+          } else if (std::holds_alternative<int>(m_functions[iVar](particle))) {
+            m_branchAddressesInt[iVar + 1] = std::get<int>(m_functions[iVar](particle));
+          } else if (std::holds_alternative<bool>(m_functions[iVar](particle))) {
+            m_branchAddressesInt[iVar + 1] = std::get<bool>(m_functions[iVar](particle));
+          }
         }
         m_tree->get().Fill();
       }

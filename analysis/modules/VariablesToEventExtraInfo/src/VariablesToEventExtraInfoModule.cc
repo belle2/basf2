@@ -74,7 +74,14 @@ void VariablesToEventExtraInfoModule::addEventExtraInfo(const Particle* source)
 
   const unsigned int nVars = m_functions.size();
   for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-    double value = m_functions[iVar](source);
+    double value = std::numeric_limits<double>::quiet_NaN();
+    if (std::holds_alternative<double>(m_functions[iVar](source))) {
+      value = std::get<double>(m_functions[iVar](source));
+    } else if (std::holds_alternative<int>(m_functions[iVar](source))) {
+      value = std::get<int>(m_functions[iVar](source));
+    } else if (std::holds_alternative<bool>(m_functions[iVar](source))) {
+      value = std::get<bool>(m_functions[iVar](source));
+    }
 
     if (m_eventExtraInfo->hasExtraInfo(m_extraInfoNames[iVar])) {
       double current = m_eventExtraInfo->getExtraInfo(m_extraInfoNames[iVar]);

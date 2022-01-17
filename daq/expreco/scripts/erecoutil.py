@@ -12,8 +12,6 @@
 import os
 import sys
 import subprocess
-import signal
-import socket
 import time
 
 
@@ -23,7 +21,7 @@ import time
 def get_configpath(conffile):
     confdir = str(os.environ.get('ERECO_CONFDIR'))
     if confdir == 'None':
-        print 'ERECO_CONFDIR is not defined. Exit.'
+        print('ERECO_CONFDIR is not defined. Exit.')
         sys.exit()
     cmd = confdir + '/' + conffile + '.conf'
     return cmd
@@ -34,7 +32,7 @@ def get_ergetconf(conffile, item1, item2='NULL', item3='NULL'):
 
     confdir = str(os.environ.get('ERECO_CONFDIR'))
     if confdir == 'None':
-        print 'ERECO_CONFDIR is not defined. Exit.'
+        print('ERECO_CONFDIR is not defined. Exit.')
         sys.exit()
     cmd = 'rfgetconf ' + get_configpath(conffile) + ' ' + item1 + ' ' + item2 \
         + ' ' + item3
@@ -42,11 +40,11 @@ def get_ergetconf(conffile, item1, item2='NULL', item3='NULL'):
                          stderr=subprocess.PIPE)
     p.wait()
     output = p.stdout.read()
-#    print output
+#    print(output)
     return output
 
 
-# print "waiting"
+# print("waiting")
 # confout = p.stdout.read()
 
 # NSMD related utilities
@@ -62,8 +60,8 @@ def run_nsmd(nsmdir, port, nsmhost):
     cmd = 'ssh ' + nsmhost + ' "cd ' + nsmdir + '/' + nsmhost \
         + '; setenv NSMLOGDIR ' + nsmdir + '/' + nsmhost + ';' + nsmd \
         + nsmhost + '"'
-    print cmd
-    p = subprocess.Popen(cmd, shell=True)
+    print(cmd)
+    subprocess.Popen(cmd, shell=True)
     time.sleep(1)
 
 
@@ -77,14 +75,14 @@ def kill_nsmd(port, nsmhost):
     cmd = 'ssh ' + nsmhost + ' "ps -fC nsmd2 | grep ' + port \
         + "| awk '{print \$2}' \" > temp.pid"  # noqa
 #    cmd = "ssh -v " + nsmhost + " \"ps -fC nsmd2 | grep " + port + "| awk '{printf(\"klll \%d\", \$2)} | sh' \""
-#    print cmd
+#    print(cmd)
     p = subprocess.Popen(cmd, shell=True)
     p.wait()
     for line in open('temp.pid', 'r'):
         pid = int(line)
         if pid > 0:
             cmd = 'ssh ' + nsmhost + ' "kill ' + str(pid) + '"'
-#            print cmd
+#            print(cmd)
             p = subprocess.Popen(cmd, shell=True)
             p.wait()
 
@@ -99,13 +97,13 @@ def start_nsmd(conffile):
     # Run nsmd on control node
     ctlhost = get_ergetconf(conffile, 'master', 'ctlhost')
     run_nsmd(nsmdir, port, ctlhost)
-    print 'nsmd on %s started' % ctlhost
+    print('nsmd on %s started' % ctlhost)
 
     # Run nsmd on event server node
     evshost = get_ergetconf(conffile, 'distributor', 'ctlhost')
     if ctlhost.find(evshost) == -1:
         run_nsmd(nsmdir, port, evshost)
-        print 'nsmd on %s started' % evshost
+        print('nsmd on %s started' % evshost)
 
     # Run nsmd on event processor nodes
     nnodes = int(get_ergetconf(conffile, 'processor', 'nnodes'))
@@ -117,7 +115,7 @@ def start_nsmd(conffile):
         if badlist.find(nodeid) == -1:
             evphost = evphostbase + nodeid
             run_nsmd(nsmdir, port, evphost)
-            print 'nsmd on %s started' % evphost
+            print('nsmd on %s started' % evphost)
 
 
 def stop_nsmd(conffile):
@@ -126,13 +124,13 @@ def stop_nsmd(conffile):
     # Kill nsmd on control node
     ctlhost = get_ergetconf(conffile, 'master', 'ctlhost')
     kill_nsmd(port, ctlhost)
-    print 'nsmd on %s stopped' % ctlhost
+    print('nsmd on %s stopped' % ctlhost)
 
     # Run nsmd on event server node
     evshost = get_ergetconf(conffile, 'distributor', 'ctlhost')
     if ctlhost.find(evshost) == -1:
         kill_nsmd(port, evshost)
-        print 'nsmd on %s stopped' % evshost
+        print('nsmd on %s stopped' % evshost)
 
     # Run nsmd on event processor nodes
     nnodes = int(get_ergetconf(conffile, 'processor', 'nnodes'))
@@ -144,7 +142,7 @@ def stop_nsmd(conffile):
         if badlist.find(nodeid) == -1:
             evphost = evphostbase + nodeid
             kill_nsmd(port, evphost)
-            print 'nsmd on %s stopped' % evphost
+            print('nsmd on %s stopped' % evphost)
 
 
 # RFARM server operations
@@ -159,8 +157,8 @@ def run_distributor(conffile):
     cmd = 'ssh ' + evshost + ' "cd ' + basedir + '; setenv NSM2_PORT ' + port \
         + '; ereco_distributor ' + get_configpath(conffile) \
         + ' > & distributor/nsmlog.log" '
-    print cmd
-    p = subprocess.Popen(cmd, shell=True)
+    print(cmd)
+    subprocess.Popen(cmd, shell=True)
     time.sleep(1)
 
 
@@ -180,7 +178,7 @@ def stop_distributor(conffile):
     for pid in open(pidfile, 'r'):
         cmd = 'ssh ' + evshost + ' "kill ' + pid + '; removerb ' + rbufname \
             + "; removeshm " + shmname + '"'
-        print cmd
+        print(cmd)
         p = subprocess.Popen(cmd, shell=True)
         p.wait()
 
@@ -195,7 +193,7 @@ def run_eventprocessor(conffile):
     nnodes = int(get_ergetconf(conffile, 'processor', 'nnodes'))
     procid = int(get_ergetconf(conffile, 'processor', 'idbase'))
     badlist = get_ergetconf(conffile, 'processor', 'badlist')
-    id = int(get_ergetconf(conffile, 'processor', 'idbase'))
+    id = int(get_ergetconf(conffile, 'processor', 'idbase'))  # noqa
 
     for i in range(procid, procid + nnodes):
         nodeid = '%2.2d' % i
@@ -207,8 +205,8 @@ def run_eventprocessor(conffile):
             cmd = 'ssh ' + evphost + ' "cd ' + basedir + '; setenv NSM2_PORT ' \
                 + port + '; ereco_eventprocessor ' + get_configpath(conffile) \
                 + ' > & evp_' + nodename + '/nsmlog.log" '
-            print cmd
-            p = subprocess.Popen(cmd, shell=True)
+            print(cmd)
+            subprocess.Popen(cmd, shell=True)
             time.sleep(1)
 
 
@@ -218,11 +216,11 @@ def stop_eventprocessor(conffile):
     hostbase = get_ergetconf(conffile, 'processor', 'ctlhostbase')
     nodebase = get_ergetconf(conffile, 'processor', 'nodebase')
     basedir = get_ergetconf(conffile, 'system', 'execdir_base')
-    port = get_ergetconf(conffile, 'system', 'nsmport')
+    port = get_ergetconf(conffile, 'system', 'nsmport')  # noqa
     nnodes = int(get_ergetconf(conffile, 'processor', 'nnodes'))
     procid = int(get_ergetconf(conffile, 'processor', 'idbase'))
     badlist = get_ergetconf(conffile, 'processor', 'badlist')
-    id = int(get_ergetconf(conffile, 'processor', 'idbase'))
+    id = int(get_ergetconf(conffile, 'processor', 'idbase'))  # noqa
 
     unit = get_ergetconf(conffile, 'system', 'unitname')
     rbufin = get_ergetconf(conffile, 'collector', 'ringbufin')
@@ -236,7 +234,7 @@ def stop_eventprocessor(conffile):
             evphost = hostbase + nodeid
             nodename = 'evp_' + nodebase + nodeid
             shmname = unit + ':' + nodename
-            print shmname
+            print(shmname)
             p = subprocess.Popen('rfcommand ' + conffile + ' ' + nodename +
                                  ' RC_ABORT', shell=True)
             p.wait()
@@ -247,7 +245,7 @@ def stop_eventprocessor(conffile):
                     + '; removeshm ' + shmname + '; clear_basf2_ipc"'
 #                    + '; removeshm ' +  '"'
 #                    + '; removeshm ' + shmname + '"'
-                print cmd
+                print(cmd)
                 p = subprocess.Popen(cmd, shell=True)
                 p.wait()
 
@@ -263,8 +261,8 @@ def run_dqmserver(conffile):
     cmd = 'ssh ' + dqmhost + ' "cd ' + basedir + '; setenv NSM2_PORT ' + port \
         + '; rf_dqmserver ' + get_configpath(conffile) \
         + ' > & dqmserver/nsmlog.log" '
-    print cmd
-    p = subprocess.Popen(cmd, shell=True)
+    print(cmd)
+    subprocess.Popen(cmd, shell=True)
     time.sleep(1)
 
 
@@ -278,7 +276,7 @@ def stop_dqmserver(conffile):
     pidfile = basedir + '/dqmserver/pid.data'
     for pid in open(pidfile, 'r'):
         cmd = 'ssh ' + dqmhost + ' "kill ' + pid + '"'
-        print cmd
+        print(cmd)
         p = subprocess.Popen(cmd, shell=True)
         p.wait()
 
@@ -294,8 +292,8 @@ def run_eventsampler(conffile):
     cmd = 'ssh ' + samplerhost + ' "cd ' + basedir + '; setenv NSM2_PORT ' + port \
         + '; ereco_eventsampler ' + get_configpath(conffile) \
         + ' > & sampler/nsmlog.log" '
-    print cmd
-    p = subprocess.Popen(cmd, shell=True)
+    print(cmd)
+    subprocess.Popen(cmd, shell=True)
     time.sleep(1)
 
 
@@ -309,7 +307,7 @@ def stop_eventsampler(conffile):
     pidfile = basedir + '/sampler/pid.data'
     for pid in open(pidfile, 'r'):
         cmd = 'ssh ' + samplerhost + ' "kill ' + pid + '"'
-        print cmd
+        print(cmd)
         p = subprocess.Popen(cmd, shell=True)
         p.wait()
 
@@ -325,8 +323,8 @@ def run_master(conffile):
     cmd = 'ssh ' + masterhost + ' "cd ' + basedir + '; setenv NSM2_PORT ' \
         + port + '; ereco_master_local ' + get_configpath(conffile) \
         + ' > & master/nsmlog.log" '
-    print cmd
-    p = subprocess.Popen(cmd, shell=True)
+    print(cmd)
+    subprocess.Popen(cmd, shell=True)
     time.sleep(1)
 
 
@@ -340,7 +338,7 @@ def stop_master(conffile):
     pidfile = basedir + '/master/pid.data'
     for pid in open(pidfile, 'r'):
         cmd = 'ssh ' + masterhost + ' "kill ' + pid + '"'
-        print cmd
+        print(cmd)
         p = subprocess.Popen(cmd, shell=True)
         p.wait()
 

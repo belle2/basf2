@@ -62,7 +62,7 @@ rec.add_reconstruction(path=main_path)
 
 main_path.add_module('RootOutput',
                      outputFileName=output_filename,
-                     branchNames=['MCParticles', 'KLMMuidLikelihoods', 'KLMDigits', 'BKLMHit2ds', 'EKLMHit2ds'])
+                     branchNames=['MCParticles', 'KLMMuidLikelihoods', 'KLMDigits', 'BKLMHit2ds', 'EKLMHit2ds', 'EventT0'])
 
 basf2.process(main_path)
 print(basf2.statistics)

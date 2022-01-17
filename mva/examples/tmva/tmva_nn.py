@@ -56,5 +56,5 @@ if __name__ == "__main__":
     inference_stop = time.time()
     inference_time = inference_stop - inference_start
 
-    auc = basf2_mva_util.calculate_roc_auc(p, t)
+    auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
     print("TMVA", training_time, inference_time, auc)

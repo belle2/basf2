@@ -10,7 +10,7 @@
 
 """ECL calibration to calculate photon energy leakage corrections."""
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 
 
 # --------------------------------------------------------------
@@ -22,14 +22,16 @@ settings = CalibrationSettings(name="ecl_leakage",
                                input_data_names=["single_gamma_mc"],
                                input_data_filters={
                                    "single_gamma_mc": [
-                                       input_data_filters["Data Tag"]["single_gamma_mc"]
+                                       INPUT_DATA_FILTERS["Data Tag"]["single_gamma_mc"]
                                    ]
                                },
                                depends_on=[],
                                expert_config={"number_energies": 8,
                                               "forward_energies": [0.030, 0.050, 0.100, 0.200, 0.483, 1.166, 2.816, 6.800],
                                               "barrel_energies": [0.030, 0.050, 0.100, 0.200, 0.458, 1.049, 2.402, 5.500],
-                                              "backward_energies": [0.030, 0.050, 0.100, 0.200, 0.428, 0.917, 1.962, 4.200]}
+                                              "backward_energies": [0.030, 0.050, 0.100, 0.200, 0.428, 0.917, 1.962, 4.200],
+                                              "lowEnergyThreshold": 0.,
+                                              "noNCrysThreshold": 0.}
                                )
 
 
@@ -47,9 +49,6 @@ def get_calibrations(input_data, **kwargs):
     # ..Input data
     file_to_iov_leakage = input_data["single_gamma_mc"]
     input_files_leakage = list(file_to_iov_leakage.keys())
-
-    # ..Algorithm
-    algo_leakage = Belle2.ECL.eclLeakageAlgorithm()
 
     # ..Collector
     ecl_leakage_collector = basf2.register_module("eclLeakageCollector")
@@ -69,6 +68,13 @@ def get_calibrations(input_data, **kwargs):
 
     backward_energies = expert_config["backward_energies"]
     ecl_leakage_collector.param("energies_backward", backward_energies)
+
+    # ..Algorithm
+    algo_leakage = Belle2.ECL.eclLeakageAlgorithm()
+    lowEnergyThreshold = expert_config["lowEnergyThreshold"]
+    algo_leakage.setLowEnergyThreshold(lowEnergyThreshold)
+    noNCrysThreshold = expert_config["noNCrysThreshold"]
+    algo_leakage.setNoNCrysThreshold(noNCrysThreshold)
 
     # ..The calibration
     cal_ecl_leakage = Calibration(

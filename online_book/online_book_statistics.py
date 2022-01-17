@@ -13,7 +13,6 @@ exercises etc.
 """
 
 from pathlib import Path
-from typing import NamedTuple
 import os
 import pprint
 import re

@@ -69,7 +69,7 @@ namespace Belle2 {
     DBStoreEntry entry(DBStoreEntry::c_Object, name, TObject::Class(), false, true);
     std::vector<DBQuery> query{DBQuery{name, true}};
     getData(event, query);
-    entry.updatePayload(query[0].revision, query[0].iov, query[0].filename, query[0].checksum, event);
+    entry.updatePayload(query[0].revision, query[0].iov, query[0].filename, query[0].checksum, query[0].globaltag, event);
     return std::make_pair(entry.releaseObject(), query[0].iov);
   }
 
@@ -96,7 +96,8 @@ namespace Belle2 {
       m_metadataProvider->getPayloads(event.getExperiment(), event.getRun(), query);
     } catch (std::exception&) {
       // something went wrong with the metadata update ... so let's try next provider
-      B2ERROR("Conditions data: Problem with payload metadata, trying to fall back to next provider ...");
+      B2WARNING("Conditions data: Problem with payload metadata provider, trying to fall back to next provider..."
+                << LogVar("provider", m_currentProvider));
       nextMetadataProvider();
       return getData(event, query);
     }
@@ -155,15 +156,15 @@ namespace Belle2 {
     if (m_metadataConfigurations.empty()) {
       B2FATAL("Conditions data: No more metadata providers available");
     }
-    auto provider = m_metadataConfigurations.back();
+    m_currentProvider = m_metadataConfigurations.back();
     m_metadataConfigurations.pop_back();
     bool remote{false};
-    if (auto pos = provider.find("://"); pos != std::string::npos) {
+    if (auto pos = m_currentProvider.find("://"); pos != std::string::npos) {
       // found a protocol: if file remove, otherwise keep as is and set as remote ...
-      auto protocol = provider.substr(0, pos);
+      auto protocol = m_currentProvider.substr(0, pos);
       boost::algorithm::to_lower(protocol);
       if (protocol == "file") {
-        provider = provider.substr(pos + 3);
+        m_currentProvider = m_currentProvider.substr(pos + 3);
       } else if (protocol == "http" or protocol == "https") {
         remote = true;
       } else {
@@ -173,13 +174,13 @@ namespace Belle2 {
     }
     try {
       if (remote) {
-        m_metadataProvider = std::make_unique<Conditions::CentralMetadataProvider>(provider, m_usableTagStates);
+        m_metadataProvider = std::make_unique<Conditions::CentralMetadataProvider>(m_currentProvider, m_usableTagStates);
       } else {
-        m_metadataProvider = std::make_unique<Conditions::LocalMetadataProvider>(provider, m_usableTagStates);
+        m_metadataProvider = std::make_unique<Conditions::LocalMetadataProvider>(m_currentProvider, m_usableTagStates);
       }
     } catch (std::exception& e) {
       B2WARNING("Conditions data: Metadata provider not usable, trying next one ..."
-                << LogVar("provider", provider) << LogVar("error", e.what()));
+                << LogVar("provider", m_currentProvider) << LogVar("error", e.what()));
       return nextMetadataProvider();
     }
     // and check the tags are useable
@@ -210,6 +211,7 @@ namespace Belle2 {
       m_metadataConfigurations = conf.getMetadataProviders();
       // reverse because we want to pop out elements when used
       std::reverse(m_metadataConfigurations.begin(), m_metadataConfigurations.end());
+      m_currentProvider = "";
       m_configState = c_InitGlobaltagList;
     }
     // do we want to stop early?

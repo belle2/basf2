@@ -72,7 +72,15 @@ class TestStdPi0s(unittest.TestCase):
         """Check that the default list type works."""
         stdPi0s_signature = inspect.signature(stdPi0s.stdPi0s)
         default_listtype = stdPi0s_signature.parameters["listtype"].default
-        self._check_list(expected_lists=["pi0" + default_listtype, "pi0" + default_listtype, default_listtype])
+        self._check_list(
+            expected_lists=[
+                "pi0" +
+                default_listtype,
+                "pi0" +
+                default_listtype,
+                default_listtype +
+                "_nomcmatch",
+                default_listtype])
 
     def test_all_list(self):
         """check that the builder function works with the all list"""
@@ -111,9 +119,22 @@ class TestStdPi0s(unittest.TestCase):
                 "eff50_May2020_nomcmatch",
                 "eff50_May2020"])
 
+    def test_eff60_May2020_nomcmatch_list(self):
+        """check that the builder function works with the eff50_May2020_nomcmatch list"""
+        self._check_list("eff60_May2020_nomcmatch",
+                         expected_lists=["pi0eff60_May2020",
+                                         "pi0eff60_May2020",
+                                         "eff60_May2020_nomcmatch"])
+
     def test_eff60_May2020_list(self):
         """check that the builder function works with the eff60_May2020 list"""
-        self._check_list("eff60_May2020", expected_lists=["pi0eff60_May2020", "pi0eff60_May2020", "eff60_May2020"])
+        self._check_list(
+            "eff60_May2020",
+            expected_lists=[
+                "pi0eff60_May2020",
+                "pi0eff60_May2020",
+                "eff60_May2020_nomcmatch",
+                "eff60_May2020"])
 
     def test_allfit_list(self):
         """check that the builder function works with the allFit list"""
@@ -177,6 +198,7 @@ class TestStdPi0s(unittest.TestCase):
             expected_lists=[
                 "pi0eff60_May2020",
                 "pi0eff60_May2020",
+                'eff60_May2020_nomcmatch',
                 "eff60_May2020",
                 "eff60_May2020Fit"])
 
@@ -189,6 +211,16 @@ class TestStdPi0s(unittest.TestCase):
                 "pi0eff50_May2020",
                 "eff50_May2020_nomcmatch",
                 "skim"])
+
+    def test_SkimHighEff(self):
+        """check that the builder function works with the skim list"""
+        self._check_list(
+            std_function=stdPi0s.loadStdSkimHighEffPi0,
+            expected_lists=[
+                "pi0eff60_May2020",
+                "pi0eff60_May2020",
+                "eff60_May2020_nomcmatch",
+                "SkimHighEff"])
 
 
 if __name__ == '__main__':

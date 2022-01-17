@@ -45,30 +45,6 @@ def filterTRG(path):
 
 
 class nnt_eventfilter(basf2.Module):
-    def initialize(self):
-        self.tracksegmentsname = hwneuroinputsegmenthits,
-        self.twodtracksname = hwneuroinput2dfindertracks,
-        self.neurotracksname = hwneurotracks,
-        self.recotracksname = "RecoTracks"
-        self.nullpath = basf2.create_path()
-
-    def event(self):
-        self.return_value(bool(self.neurotrack_allgoodquality()))
-        self.if_false(self.nullpath)
-
-    def hastrginfo(self):
-        return bool(Belle2.PyStoreArray(self.twodtracksname).getEntries() > 0)
-
-    def neurotrack_allgoodquality(self):
-        isgoodquality = True
-        for tr in Belle2.PyStoreArray("CDCTriggerNeuroTracks"):
-            if tr.getQualityVector() > 0:
-                isgoodquality = False
-                break
-        return isgoodquality
-
-
-class nnt_eventfilter(basf2.Module):
     def initialize(self,
                    tracksegmentsname=hwneuroinputsegmenthits,
                    twodtracksname=hwneuroinput2dfindertracks,
@@ -82,9 +58,7 @@ class nnt_eventfilter(basf2.Module):
         self.nullpath = basf2.create_path()
 
     def event(self):
-        self.return_value(bool(self.hastrginfo() and
-                               self.neurotrack_allgoodquality()
-                               ))
+        self.return_value(bool(self.neurotrack_allgoodquality()))
         self.if_false(self.nullpath)
 
     def hastrginfo(self):

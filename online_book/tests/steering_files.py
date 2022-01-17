@@ -54,14 +54,14 @@ def _touch_file_with_root(path: str) -> None:
 
 
 def _touch_file_with_subprocess(path: str) -> None:
-    subprocess.run(["touch", path])
+    subprocess.run(["touch", path]).check_returncode()
 
 
 def _touch_file_with_subprocess_and_root(path: str) -> None:
     filename = Path(path).name
     working_dir = Path(path).parent
-    cmd = ["root", "-x", "-l", "-q", "-e", f"TFile f(\"{filename}\", \"NEW\"); f.Close();"]
-    subprocess.run(cmd, cwd=working_dir)
+    cmd = ["root", "-x", "-l", "-q", "-e", f"TFile f(\"{filename}\", \"NEW\"); if (not f.IsOpen()) gSystem->Exit(1);"]
+    subprocess.run(cmd, cwd=working_dir).check_returncode()
 
 
 def _touch_file_test(method, path: str, **kwargs):

@@ -30,10 +30,10 @@ contact = 'Martina Laurenza (martina.laurenza@roma3.infn.it)'
 # Shifter Plots
 
 h2dtres = ROOT.TH1F('muon_h2dtres', 'EKLM muon 2d hits time resolution',
-                    200, -20, 10)
+                    80, -20, 20)
 h2dtres.SetXTitle('ns')
 h2dtres.SetYTitle('Events')
-tree.Draw('EKLMHit2ds.m_Time-EKLMHit2ds.m_MCTime>>muon_h2dtres')
+tree.Draw('EKLMHit2ds.m_Time+EventT0.hasEventT0()?EventT0.getEventT0():0-EKLMHit2ds.m_MCTime>>muon_h2dtres')
 functions = h2dtres.GetListOfFunctions()
 functions.Add(TNamed('Description', 'Time resolution'))
 functions.Add(TNamed('Check', 'No bias.'))
@@ -71,13 +71,13 @@ functions.Add(TNamed('Check', 'Number of events decreases with number of layer.'
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 
-time = ROOT.TH1F('Time', 'Hit time for EKLMHit2ds', 150, 0.0, 30.0)
+time = ROOT.TH1F('Time', 'Hit time for EKLMHit2ds', 80, -5.0, 35.0)
 time.GetXaxis().SetTitle('t (ns)')
 time.GetYaxis().SetTitle('Events')
 tree.Draw('EKLMHit2ds.getTime()>>Time', '')
 functions = time.GetListOfFunctions()
 functions.Add(TNamed('Description', 'Time of muon hit in EKLM'))
-functions.Add(TNamed('Check', 'Mean around 13 ns.'))
+functions.Add(TNamed('Check', 'Mean around 16 ns.'))
 functions.Add(TNamed('Contact', contact))
 functions.Add(TNamed('MetaOptions', 'shifter'))
 

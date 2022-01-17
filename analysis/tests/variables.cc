@@ -63,7 +63,7 @@ namespace {
     gearbox.open("geometry/Belle2.xml", false);
 
     {
-      Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+      Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 411);
 
       TMatrixFSym error(7);
       error.Zero();
@@ -194,9 +194,9 @@ namespace {
       }
 
       {
-        Particle pinv({ -0.1 , 0.4, -0.8, 1.0 }, 11);
+        Particle pinv({ -0.1 , 0.4, -0.8, 1.0 }, 411);
         UseReferenceFrame<RestFrame> dummy(&pinv);
-        Particle p2({ 0.0 , 0.0, 0.0, 0.4358899}, 11);
+        Particle p2({ 0.0 , 0.0, 0.0, 0.4358899}, 411);
         EXPECT_FLOAT_EQ(0.9, particleP(&p2));
         EXPECT_FLOAT_EQ(1.0, particleE(&p2));
         EXPECT_FLOAT_EQ(0.1, particlePx(&p2));
@@ -209,7 +209,7 @@ namespace {
     }
 
     {
-      Particle p({ 0.0 , 0.0, 0.0, 0.0 }, 11);
+      Particle p({ 0.0 , 0.0, 0.0, 0.0 }, 411);
       EXPECT_FLOAT_EQ(0.0, particleP(&p));
       EXPECT_FLOAT_EQ(0.0, particleE(&p));
       EXPECT_FLOAT_EQ(0.0, particlePx(&p));
@@ -832,7 +832,7 @@ namespace {
     gearbox.close();
     gearbox.open("geometry/Belle2.xml", false);
 
-    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 411);
     p.setVertex(TVector3(1.0, 2.0, 2.0));
 
     const Manager::Var* var = Manager::Instance().getVariable("p");
@@ -862,7 +862,7 @@ namespace {
 
   TEST_F(MetaVariableTest, useLabFrame)
   {
-    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 411);
     p.setVertex(TVector3(1.0, 2.0, 2.0));
 
     const Manager::Var* var = Manager::Instance().getVariable("p");
@@ -897,7 +897,7 @@ namespace {
     gearbox.close();
     gearbox.open("geometry/Belle2.xml", false);
 
-    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+    Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 411);
     p.setVertex(TVector3(1.0, 2.0, 2.0));
 
     const Manager::Var* var = Manager::Instance().getVariable("p");
@@ -1019,7 +1019,7 @@ namespace {
 
   TEST_F(MetaVariableTest, basicMathTest)
   {
-    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
+    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 411);
 
     const Manager::Var* var = Manager::Instance().getVariable("abs(py)");
     ASSERT_NE(var, nullptr);
@@ -1071,7 +1071,7 @@ namespace {
     // keep particle-based tests here, and operator precedence tests (etc) in
     // framework with the parser itself
 
-    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
+    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, -411);
 
     const Manager::Var* var = Manager::Instance().getVariable("formula(px + py)");
     ASSERT_NE(var, nullptr);
@@ -1124,11 +1124,11 @@ namespace {
 
     var = Manager::Instance().getVariable("formula(PDG * charge)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -11.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 411.0);
 
     var = Manager::Instance().getVariable("formula(PDG**2 * charge)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -121.0);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -168921.0);
 
     var = Manager::Instance().getVariable("formula(10.58 - (px + py + pz - E)**2)");
     ASSERT_NE(var, nullptr);
@@ -1140,13 +1140,13 @@ namespace {
 
     var = Manager::Instance().getVariable("formula(-1.0 * PDG)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -11);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 411);
   }
 
   TEST_F(MetaVariableTest, passesCut)
   {
-    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
-    Particle p2({ 0.1 , -0.4, 0.8, 4.0 }, 11);
+    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 411);
+    Particle p2({ 0.1 , -0.4, 0.8, 4.0 }, 411);
 
     const Manager::Var* var = Manager::Instance().getVariable("passesCut(E < 3)");
     ASSERT_NE(var, nullptr);
@@ -1243,7 +1243,7 @@ namespace {
 
   TEST_F(MetaVariableTest, conditionalVariableSelector)
   {
-    Particle p({ 0.1, -0.4, 0.8, 2.0 }, 11);
+    Particle p({ 0.1, -0.4, 0.8, 2.0 }, 411);
 
     const Manager::Var* var = Manager::Instance().getVariable("conditionalVariableSelector(E>1, px, py)");
     ASSERT_NE(var, nullptr);
@@ -1325,7 +1325,7 @@ namespace {
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(2, 2, 2, 4.0), (i % 2) ? 211 : -211);
+      Particle d(TLorentzVector(2, 2, 2, 4.0), (i % 2) ? 213 : -213);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1753,7 +1753,7 @@ namespace {
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 211 : -211);
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 213 : -213);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1772,7 +1772,7 @@ namespace {
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 211 : -211);
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 213 : -213);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1792,7 +1792,7 @@ namespace {
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 211 : -211);
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 213 : -213);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1811,7 +1811,7 @@ namespace {
     StoreArray<Particle> particles;
     std::vector<int> daughterIndices;
     for (int i = 0; i < nDaughters; i++) {
-      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 211 : -211);
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 213 : -213);
       momentum += d.get4Vector();
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
@@ -1867,7 +1867,7 @@ namespace {
 
     var = Manager::Instance().getVariable("daughterDiffOf(1, 0, useCMSFrame(phi))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -1.513103);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -1.5033823);
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
   }
@@ -2593,7 +2593,7 @@ namespace {
       EXPECT_FLOAT_EQ(std::get<double>(closest->function(electron)), 0.68014491);
 
       const auto* closestCMS = Manager::Instance().getVariable("useCMSFrame(angleToClosestInList(testGammaList))");
-      EXPECT_FLOAT_EQ(std::get<double>(closestCMS->function(electron)), 0.72592634);
+      EXPECT_FLOAT_EQ(std::get<double>(closestCMS->function(electron)), 0.67899209);
     }
 
     {
@@ -2630,7 +2630,7 @@ namespace {
       EXPECT_FLOAT_EQ(std::get<double>(mostB2B->function(electron)), 2.2869499);
 
       const auto* mostB2BCMS = Manager::Instance().getVariable("useCMSFrame(angleToMostB2BInList(testGammaList))");
-      EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMS->function(electron)), 2.6054888);
+      EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMS->function(electron)), 2.7415154);
     }
 
     {
@@ -2935,11 +2935,11 @@ namespace {
     outputList2->addParticle(9, 22, Particle::c_Unflavored);
     outputList2->addParticle(10, 22, Particle::c_Unflavored);
 
-    const Manager::Var* var = Manager::Instance().getVariable("veto(pList1, 0.130 < M < 0.140)");
+    const Manager::Var* var = Manager::Instance().getVariable("veto(pList1, 0.130 < M < 0.140, 22)");
     ASSERT_NE(var, nullptr);
     EXPECT_TRUE(std::get<bool>(var->function(p)));
 
-    var = Manager::Instance().getVariable("veto(pList2, 0.130 < M < 0.140)");
+    var = Manager::Instance().getVariable("veto(pList2, 0.130 < M < 0.140, 22)");
     ASSERT_NE(var, nullptr);
     EXPECT_FALSE(std::get<bool>(var->function(p)));
 
@@ -3139,7 +3139,7 @@ namespace {
 
     for (int i = 0; i < nDaughters; i++) {
       TLorentzVector mom(1, i * 0.5, 1, i * 1.0 + 2.0);
-      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle d(mom, (i % 2) ? 111 : 113);
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
       daughterMomenta.push_back(mom);
@@ -3195,7 +3195,7 @@ namespace {
 
     for (int i = 0; i < 3; i++) {
       TLorentzVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
-      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle d(mom, (i % 2) ? 111 : 113);
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices_1.push_back(newDaughters->getArrayIndex());
       daughterMomenta_1.push_back(mom);
@@ -3213,7 +3213,7 @@ namespace {
 
     for (int i = 0; i < 2; i++) {
       TLorentzVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
-      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle d(mom, (i % 2) ? 111 : 113);
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices_2.push_back(newDaughters->getArrayIndex());
       daughterMomenta_2.push_back(mom);

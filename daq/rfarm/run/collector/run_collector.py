@@ -69,8 +69,8 @@ for i in range(0, ncol):
     inrblist.append(inputrb + str(i + 1))
     outrblist.append(outputrb + str(i + 1))
 
-print inrblist
-print outrblist
+print(inrblist)
+print(outrblist)
 
 for x in inrblist:
     subprocess.call("createrb " + x, shell='True')
@@ -86,12 +86,12 @@ for i in range(0, ncol):
 cmdmrb2rb += outputrb
 
 # Run rb2mrb
-print cmdrb2mrb
+print(cmdrb2mrb)
 procrb2mrb = subprocess.Popen(cmdrb2mrb, shell='True')
 # os.system ("rb2mrb " + inputrb + " " + inrblist[0] + " &" )
 
 # Run mrb2rb
-print cmdmrb2rb
+print(cmdmrb2rb)
 procmrb2rb = subprocess.Popen(cmdmrb2rb, shell='True')
 # os.system ("mrb2rb " + outrblist[0] + " " + outputrb + " &" )
 
@@ -99,7 +99,7 @@ procbasf2 = []
 # run basf2
 for i in range(0, ncol):
     basf2cmd = "basf2 --no-stats " + col_script + " " + inrblist[i] + " " + outrblist[i]
-    print basf2cmd
+    print(basf2cmd)
     procbasf2.append(subprocess.Popen(basf2cmd, shell='True'))
 
 # Sleep

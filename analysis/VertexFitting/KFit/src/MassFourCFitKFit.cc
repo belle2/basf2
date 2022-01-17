@@ -510,7 +510,10 @@ MassFourCFitKFit::prepareOutputMatrix() {
     h3v.setX(m_al_1[index * KFitConst::kNumber7 + 0][0]);
     h3v.setY(m_al_1[index * KFitConst::kNumber7 + 1][0]);
     h3v.setZ(m_al_1[index * KFitConst::kNumber7 + 2][0]);
-    pdata.setMomentum(HepLorentzVector(h3v, m_al_1[index * KFitConst::kNumber7 + 3][0]), KFitConst::kAfterFit);
+    if (m_IsFixMass[index])
+      pdata.setMomentum(HepLorentzVector(h3v, sqrt(h3v.mag2() + pdata.getMass()*pdata.getMass())), KFitConst::kAfterFit);
+    else
+      pdata.setMomentum(HepLorentzVector(h3v, m_al_1[index * KFitConst::kNumber7 + 3][0]), KFitConst::kAfterFit);
     // position
     pdata.setPosition(HepPoint3D(
       m_al_1[index * KFitConst::kNumber7 + 4][0],
@@ -572,6 +575,10 @@ MassFourCFitKFit::makeCoreMatrix() {
     double a;
 
     for (int i = 0; i < m_TrackCount; i++) {
+      a = m_property[i][2];
+      if (!m_FlagAtDecayPoint) a = 0.;
+      al_1_prime[i * KFitConst::kNumber7 + 0][0] -= a * (m_BeforeVertex.y() - al_1_prime[i * KFitConst::kNumber7 + 5][0]);
+      al_1_prime[i * KFitConst::kNumber7 + 1][0] += a * (m_BeforeVertex.x() - al_1_prime[i * KFitConst::kNumber7 + 4][0]);
       energy[i] = sqrt(al_1_prime[i * KFitConst::kNumber7 + 0][0] * al_1_prime[i * KFitConst::kNumber7 + 0][0] +
       al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
       al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
@@ -579,13 +586,21 @@ MassFourCFitKFit::makeCoreMatrix() {
     }
 
     for (int i = 0; i < m_TrackCount; i++) {
-      // 3->4
-      for (int j = 0; j < 4; j++) Sum_al_1[j][0] += al_1_prime[i * KFitConst::kNumber7 + j][0];
+      if (m_IsFixMass[i])
+        Sum_al_1[3][0] += energy[i];
+      else
+        Sum_al_1[3][0] += al_1_prime[i * KFitConst::kNumber7 + 3][0];
+
+      for (int j = 0; j < 3; j++) Sum_al_1[j][0] += al_1_prime[i * KFitConst::kNumber7 + j][0];
     }
 
     for (int i = 0; i < m_ConstraintMassCount; i++) {
       for (int k = m_ConstraintMassChildLists[i].first; k <= m_ConstraintMassChildLists[i].second; k++) {
-        for (int j = 0; j < 4; j++) Sum_child_al_1[i * 4 + j][0] += al_1_prime[k * KFitConst::kNumber7 + j][0];
+        if (m_IsFixMass[k])
+          Sum_child_al_1[i * 4 + 3][0] += energy[k];
+        else
+          Sum_child_al_1[i * 4 + 3][0] += al_1_prime[k * KFitConst::kNumber7 + 3][0];
+        for (int j = 0; j < 3; j++) Sum_child_al_1[i * 4 + j][0] += al_1_prime[k * KFitConst::kNumber7 + j][0];
       }
     }
 
@@ -608,19 +623,37 @@ MassFourCFitKFit::makeCoreMatrix() {
         break;
       }
 
+      a = m_property[i][2];
+      if (!m_FlagAtDecayPoint) a = 0.;
+
       // four-momentum conservation constraint
       for (int l = 0; l < 4; l++) {
         for (int n = 0; n < 6; n++) {
-          if (l == n) m_D[l][i * KFitConst::kNumber7 + n] = 1;
-          else m_D[l][i * KFitConst::kNumber7 + n] = 0;
+          m_D[l][i * KFitConst::kNumber7 + n] = 0;
         }
+      }
+      if (m_IsFixMass[i]) {
+        double invE = 1. / energy[i];
+        m_D[0][i * KFitConst::kNumber7 + 0] = 1;
+        m_D[0][i * KFitConst::kNumber7 + 5] = -a;
+        m_D[1][i * KFitConst::kNumber7 + 1] = 1;
+        m_D[1][i * KFitConst::kNumber7 + 4] = a;
+        m_D[2][i * KFitConst::kNumber7 + 2] = 1;
+        m_D[3][i * KFitConst::kNumber7 + 0] = al_1_prime[i * KFitConst::kNumber7 + 0][0] * invE;
+        m_D[3][i * KFitConst::kNumber7 + 1] = al_1_prime[i * KFitConst::kNumber7 + 1][0] * invE;
+        m_D[3][i * KFitConst::kNumber7 + 2] = al_1_prime[i * KFitConst::kNumber7 + 2][0] * invE;
+        m_D[3][i * KFitConst::kNumber7 + 4] = -al_1_prime[i * KFitConst::kNumber7 + 1][0] * invE * a;
+        m_D[3][i * KFitConst::kNumber7 + 5] = al_1_prime[i * KFitConst::kNumber7 + 0][0] * invE * a;
+      } else {
+        m_D[0][i * KFitConst::kNumber7 + 0] = 1;
+        m_D[1][i * KFitConst::kNumber7 + 1] = 1;
+        m_D[2][i * KFitConst::kNumber7 + 2] = 1;
+        m_D[3][i * KFitConst::kNumber7 + 3] = 1;
       }
 
       // invariant mass constraint
       for (int l = 0; l < m_ConstraintMassCount; l++) {
         if (i >= m_ConstraintMassChildLists[l].first && i <= m_ConstraintMassChildLists[l].second) {
-          a = m_property[i][2];
-          if (!m_FlagAtDecayPoint) a = 0.;
           double invE = 1. / energy[i];
           m_D[4 + l][i * KFitConst::kNumber7 + 0] = 2.*(Sum_child_al_1[l * 4 + 3][0] * al_1_prime[i * KFitConst::kNumber7 + 0][0] * invE -
                                                         Sum_child_al_1[l * 4 + 0][0]);

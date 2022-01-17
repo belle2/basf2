@@ -151,6 +151,9 @@ void FragmentationModule::initialize()
     // Since Pythia event is currently empty, it actually only updates
     // the particle properties (exactly what is necessary).
     evtgen->decay();
+    // Set signal particle suffix.
+    // Signal particle names must end in "sig" in user decay files.
+    evtgen->signalSuffix = "sig";
   }
 
   // List variable(s) that differ from their defaults

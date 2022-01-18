@@ -69,6 +69,10 @@ void DQMHistAnalysisKLMModule::initialize()
     B2FATAL("The threshold used for hot channels is larger than the one for masked channels."
             << LogVar("Threshold for hot channels", m_ThresholdForHot)
             << LogVar("Threshold for masked channels", m_ThresholdForMasked));
+
+  m_rtype = findHist("DQMInfo/rtype");
+  m_runtype = m_rtype ? m_rtype->GetTitle() : "";
+  m_runflag = (m_runtype == "null");
 }
 
 void DQMHistAnalysisKLMModule::terminate()
@@ -342,9 +346,11 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
         latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
         yAlarm -= 0.05;
       }
-      alarm = "Call the KLM experts immediately!";
-      latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-      canvas->Pad()->SetFillColor(kRed);
+      if (m_runflag == false) {
+        alarm = "Call the KLM experts immediately!";
+        latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+        canvas->Pad()->SetFillColor(kRed);
+      }
     }
   } else {
     /* First draw the vertical lines and the sector names. */
@@ -378,9 +384,11 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
         latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
         yAlarm -= 0.05;
       }
-      alarm = "Call the KLM experts immediately!";
-      latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-      canvas->Pad()->SetFillColor(kRed);
+      if (m_runflag == false) {
+        alarm = "Call the KLM experts immediately!";
+        latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+        canvas->Pad()->SetFillColor(kRed);
+      }
     }
   }
   canvas->Modified();

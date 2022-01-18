@@ -54,5 +54,5 @@ if __name__ == "__main__":
     p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
     inference_stop = time.time()
     inference_time = inference_stop - inference_start
-    auc = basf2_mva_util.calculate_roc_auc(p, t)
+    auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
     print("XGBoost", training_time, inference_time, auc)

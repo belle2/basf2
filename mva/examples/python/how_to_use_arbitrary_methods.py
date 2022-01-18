@@ -240,5 +240,5 @@ if __name__ == "__main__":
 
     # We calculate the AUC ROC value of the returned probability and target,
     # our method is very simple, so the AUC won't be good :-)
-    auc = basf2_mva_util.calculate_roc_auc(p, t)
+    auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
     print("Custom Method", auc)

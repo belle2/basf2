@@ -578,7 +578,7 @@ class IoVSet:
 
     @property
     def gaps(self):
-        """Return the gaps in the set: Any area not covered between the first
+        """Return the gaps in the set. Any area not covered between the first
         point of validity and the last
 
         >>> a = IoVSet([(0,0,2,-1)])

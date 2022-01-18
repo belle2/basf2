@@ -87,6 +87,7 @@
 #   fixed a_1+ and a_10 BR decay table to restore isospin simmetry and reimplement the resonant contribution (KK*)
 #   rescaled B->DKK* BR to take into account of resonant contribution B->D(a1->KK*), preserving the BR(NR+Res)= Belle measurement (https://doi.org/10.1016/S0370-2693(02)02373-0)
 
+
 Define qoverp_incohMix_B_s0 1.0
 Define dm_incohMix_B_s0 17.8e12
 Define qoverp_incohMix_B0 1.0
@@ -7849,71 +7850,60 @@ Enddecay
 ##########                                                              ##########
 ##################################################################################
 #
-# Updated to PDG 2011
-#
+# Updated to https://docs.belle2.org/record/1982/files/BELLE2-NOTE-PH-2020-055_v2.pdf Table V
+# adapted from http://pdg.lbl.gov/2020/reviews/rpp2020-rev-tau-branching-fractions.pdf
 
 # tau-
 Decay tau-
-0.154002925   e-  anti-nu_e  nu_tau                        TAULNUNU;
-0.170000000   mu-  anti-nu_mu  nu_tau                      TAULNUNU;
-0.109100000   pi-  nu_tau                                  TAUSCALARNU;
-0.006960000   K-  nu_tau                                   TAUSCALARNU;
-0.255100000   pi-  pi0  nu_tau                             TAUHADNU -0.108 0.775 0.149 1.364 0.400;
-0.001124109   nu_tau  gamma  pi-  pi0                      PYTHIA 21;
-0.079301562   pi0  pi0  pi-  nu_tau                        TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
-0.000385656   nu_tau  K-  pi0  pi0                         PYTHIA 21;
-0.008508640   nu_tau  pi-  pi0  pi0  pi0                   PYTHIA 21;
-0.000864699   nu_tau  pi-  pi0  pi0  pi0  pi0              PHSP;
-#0.2515         rho- nu_tau                                 TAUVECTORNU;
-#0.1790         a_1-  nu_tau                                TAUVECTORNU;
-
-# Modes with K0s
-0.000319939   nu_tau  pi-  anti-K0                         PYTHIA 21;
-0.001590000   nu_tau  K-  K0                               PYTHIA 21;
-0.001700000   nu_tau  K0  pi-  anti-K0                     PYTHIA 21;
-0.001590000   nu_tau  K-  pi0  K0                          PYTHIA 21;
-0.004000000   nu_tau  pi-  anti-K0  pi0                    PYTHIA 21;
-
-# 3 Charged Particles
-0.093200000   pi-  pi-  pi+  nu_tau                        TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
-0.046100000   nu_tau  pi-  pi+  pi-  pi0                   PYTHIA 21;
-0.000501526   nu_tau  pi-  pi-  pi+  pi0  pi0              PHSP;
-0.000155646   nu_tau  pi-  pi-  pi+  pi0  pi0  pi0         PHSP;
-0.003420000   nu_tau  K-  pi+  pi-                         PYTHIA 21;
-0.001360000   nu_tau  K-  pi+  pi-  pi0                    PYTHIA 21;
-0.001400000   nu_tau  K-  pi-  K+                          PYTHIA 21;
-0.000015800   nu_tau  K-  K+  K-                           PYTHIA 21;
-
-# 5 Charged Particles
-0.000700406   nu_tau  pi-  pi-  pi-  pi+  pi+              PHSP;
-0.000129705   nu_tau  pi-  pi-  pi-  pi+  pi+  pi0         PHSP;
-
-# Misc other modes
-0.012000000   K*-  nu_tau                                  TAUVECTORNU;
-0.001390000   nu_tau  eta  pi-  pi0                        PYTHIA 21;
-0.003199387   nu_tau  pi-  omega  pi0                      PYTHIA 21;
-0.000410000   nu_tau  K-  omega                            PYTHIA 21;
-0.002200000   anti-K*0  pi-  nu_tau                        PHSP;
-0.002100000   K*0  K-  nu_tau                              PHSP;
-0.000034000   phi  pi-  nu_tau                             PHSP;
-0.000037000   phi  K-  nu_tau                              PHSP;
-0.003600000   mu-  anti-nu_mu  nu_tau  gamma               PHSP;
-0.017500000   e-  anti-nu_e  nu_tau  gamma                 PHSP;
-0.004290000   K-  pi0  nu_tau                              PHSP;
-0.002200000   anti-K0  rho-  nu_tau                        PHSP;
-0.000260000   pi-  anti-K0  pi0  pi0  nu_tau               PHSP;
-0.000310000   pi-  K0  anti-K0  pi0  nu_tau                PHSP;
-0.000061000   K-  K+  pi-  pi0  nu_tau                     PHSP;
-0.000028000   e-  e-  e+  anti-nu_e  nu_tau                PHSP;
-0.004700000   K_1-  nu_tau                                 PHSP;
-0.001700000   K'_1-  nu_tau                                PHSP;
-0.001500000   K'*-  nu_tau                                 PHSP;
-0.000150000   eta  pi-  pi0  pi0  nu_tau                   PHSP;
-0.000161000   eta  K-  nu_tau                              PHSP;
-0.000138000   eta  K*-  nu_tau                             PHSP;
-0.000048000   eta  K-  pi0  nu_tau                         PHSP;
-0.000093000   eta  anti-K0  pi-  nu_tau                    PHSP;
-0.000360000   f_1  pi-  nu_tau                             PHSP;
+0.178175 e-           anti-nu_e      nu_tau TAULNUNU;
+0.000028 e-  e-   e+  anti-nu_e      nu_tau PYTHIA 21;
+0.173937 mu-          anti-nu_mu     nu_tau TAULNUNU;
+0.108164 pi-                         nu_tau TAUSCALARNU;
+0.000353 pi- gamma                   nu_tau PYTHIA 21;
+0.254941 rho-                        nu_tau TAUVECTORNU;
+0.092595 pi- pi0  pi0                nu_tau TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
+0.010429 pi- pi0  pi0 pi0            nu_tau PYTHIA 21;
+0.001118 pi- pi0  pi0 pi0 pi0        nu_tau PYTHIA 21;
+0.003817 pi- K0   pi0                nu_tau PYTHIA 21;
+0.000263 pi- K0   pi0 pi0            nu_tau PYTHIA 21;
+0.000235 pi- K_S0 K_S0               nu_tau PYTHIA 21;
+0.000235 pi- K_L0 K_L0               nu_tau PYTHIA 21;
+0.001081 pi- K_S0 K_L0               nu_tau PYTHIA 21;
+0.000018 pi- pi0  K_S0 K_S0          nu_tau PYTHIA 21;
+0.000018 pi- pi0  K_L0 K_L0          nu_tau PYTHIA 21;
+0.000325 pi- pi0  K_S0 K_L0          nu_tau PYTHIA 21;
+0.089868 pi- pi-  pi+                nu_tau TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
+0.027404 pi- pi-  pi+  pi0           nu_tau PYTHIA 21;
+0.000981 pi- pi-  pi+  pi0  pi0      nu_tau PYTHIA 21;
+0.000014 pi- pi-  pi+  pi0  pi0 pi0  nu_tau PYTHIA 21;
+0.000247 pi- pi-  pi+  K0            nu_tau PYTHIA 21;
+0.006964 K-                          nu_tau TAUSCALARNU;
+0.012712 K*-                         nu_tau TAUVECTORNU;
+0.000647 K-  pi0  pi0                nu_tau PYTHIA 21;
+0.000478 K-  pi0  pi0 pi0            nu_tau PYTHIA 21;
+0.001486 K-  K0                      nu_tau PYTHIA 21;
+0.001500 K-  K0   pi0                nu_tau PYTHIA 21;
+0.002927 K-  pi-  pi+                nu_tau PYTHIA 21;
+0.000394 K-  pi-  pi+ pi0            nu_tau PYTHIA 21;
+0.001435 pi- K-   K+                 nu_tau PYTHIA 21;
+0.000061 pi- K-   K+  pi0            nu_tau PYTHIA 21;
+0.001389 pi- pi0  eta                nu_tau PYTHIA 21;
+0.000195 pi- pi0  pi0 eta            nu_tau PYTHIA 21;
+0.000220 pi- pi-  pi+ eta            nu_tau PYTHIA 21;
+0.000155 K-  eta                     nu_tau PYTHIA 21;
+0.000048 K-  pi0  eta                nu_tau PYTHIA 21;
+0.000094 pi- K0   eta                nu_tau PYTHIA 21;
+0.019494 pi- omega                   nu_tau PYTHIA 21;
+0.004085 pi- pi0  omega              nu_tau PYTHIA 21;
+0.000072 pi- pi0  pi0 omega          nu_tau PYTHIA 21;
+0.000084 pi- pi-  pi+ omega          nu_tau PYTHIA 21;
+0.000410 K-  omega                   nu_tau PYTHIA 21;
+0.000022 K-  K+   K-                 nu_tau PYTHIA 21;
+0.000015 K-  K_S0 K_L0               nu_tau PYTHIA 21;
+0.000827 pi- pi- pi- pi+ pi+         nu_tau PYTHIA 21;
+0.000038 pi- pi- pi- pi+ pi+ pi0     nu_tau PYTHIA 21;
+0.000001 K-  pi- pi- pi+ pi+         nu_tau PYTHIA 21;
+0.000001 K-  pi- pi- pi+ pi+ pi0     nu_tau PYTHIA 21;
 Enddecay
 
 CDecay tau+

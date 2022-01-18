@@ -256,9 +256,11 @@ based on:
 
 It reproduces the ``goodLambda()`` function in Belle.
 
-``goodBelleLambda`` selection 1 (selected with: ``goodBelleLambda>0``) should be used with ``atcPIDBelle(4,2) > 0.6``,
-and ``goodBelleLambda`` selection 2 (``goodBelleLambda>1``) can be used without a proton PID cut. 
-The former cut is looser than the latter.". 
+``goodBelleLambda`` selection 1 (selected with: ``goodBelleLambda>0``) maximizes the signal significance after applying
+``atcPIDBelle(4,2) > 0.6``, while ``goodBelleLambda`` selection 2 (``goodBelleLambda>1``) is tighter and maximizes the signal
+significance of a :math:`\Lambda^0` sample without any proton PID cut. However, it might still be beneficial to apply a proton PID
+cut on top of it. Which combination of proton PID cut and ``goodBelleLambda`` selection scenario is ideal, is probably
+analysis-dependent.
 
 .. warning:: ``goodBelleLambda`` is not optimized or tested on Belle II data.
 

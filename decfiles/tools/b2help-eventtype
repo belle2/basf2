@@ -1,0 +1,153 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""
+Utility to search for decfiles which include given decay string.
+
+.. note::
+       Currently this script only works on full releases but not on light releases, since it requires the decfile directory.
+       Charge conjugate mode cannot be found if it is not explicitly written.
+       Sub-decay is not supported.
+
+.. warning::
+       Particle name including a prime (e.g. ``eta'``) induces an error and it cannot be found. This is a known issue.
+"""
+
+import sys
+import os
+import argparse
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+
+
+def get_argument_parser():
+    """Return an argument parser to parse all arguments"""
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("decay_string", type=str,
+                        help="Decay string to search for the EventType and decfiles. \
+                              Please use single-/double-quotation to give a decay string (e.g. 'B+ -> K+ e+ e-'). \
+                              Otherwise, an arrow (->) is recognized as redirection.")
+    return parser
+
+
+if __name__ == "__main__":
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
+    from ROOT import Belle2
+    d = Belle2.DecayDescriptor()
+    if not d.init(args.decay_string):
+        print("Invalid decay string")
+        sys.exit()
+
+    import subprocess
+    import pdg
+    import re
+    import shlex
+
+    release_dir = ''
+    if 'BELLE2_RELEASE_DIR' in os.environ:
+        release_dir = os.environ['BELLE2_RELEASE_DIR']
+    if 'BELLE2_LOCAL_DIR' in os.environ:
+        release_dir = os.environ['BELLE2_LOCAL_DIR']
+
+    mother_name = d.getMother().getName()
+
+    process_mother = subprocess.run(['grep', '-rl', 'Decay.*' + re.escape(mother_name), release_dir + '/decfiles/dec/'],
+                                    stdout=subprocess.PIPE)
+    output_mother = process_mother.stdout.decode('utf8')
+
+    # List of files in which "Decay mother" is written
+    matched_list = output_mother.split('\n')
+
+    # Loop for daughters
+
+    # dictionary of grep command for each daughter.
+    # If a daughter is included twice or more, the previous command will be replaced.
+    command_dict = dict()
+
+    for i in range(d.getNDaughters()):
+
+        daughter_name = d.getDaughter(i).getMother().getName()
+        daughter_name = re.escape(daughter_name)  # escape to call grep
+
+        if daughter_name in command_dict:
+            # e.g. "pi-.*;" -> "pi-.*pi-.*;"
+            command = command_dict[daughter_name].replace(daughter_name + '.*;', daughter_name + '.*' + daughter_name + '.*;')
+        else:
+            # line of decay description ends with ';'
+            command = 'grep ' + daughter_name + '.*;'
+
+        command_dict[daughter_name] = command
+
+    # list of grep command.
+    command_list = []
+
+    isFirst = True
+    for command in command_dict.values():
+        if isFirst:
+            # if command is first, a target will be '/decfiles/dec/'
+            command = command + ' -r ' + release_dir + '/decfiles/dec/'
+            isFirst = False
+
+        command_list.append(command)
+
+    # list of process.
+    process_list = []
+
+    # no need to specify stdin for the first process
+    process_list.append(subprocess.Popen(shlex.split(command_list[0]), stdout=subprocess.PIPE))
+
+    for i in range(len(command_list) - 1):
+        # stdin of (i+1)-th process is stdout of i-th process
+        process_list.append(subprocess.Popen(shlex.split(command_list[i + 1]),
+                                             stdin=process_list[i].stdout,
+                                             stdout=subprocess.PIPE))
+        process_list[i].stdout.close()
+
+    # each line including daughters will be output, not only the file name
+    output_daughters = process_list[-1].communicate()[0].decode('utf8')
+    output_daughters_list = output_daughters.split('\n')
+
+    for matched_file in matched_list:
+        hasSignal = False
+
+        for output_daughter in output_daughters_list:
+
+            if matched_file not in output_daughter:
+                # skip if given file name not included in output_daughter
+                continue
+
+            # Search for missing daughter
+
+            isSignal = True
+
+            # comment following ';' may include particle name.
+            output_daughter = re.sub(';.*', '', output_daughter)
+
+            for i in range(d.getNDaughters()):
+                # if daughter's name is found in output_daughter, it will be removed.
+                daughter_name = d.getDaughter(i).getMother().getName()
+                output_daughter = output_daughter.replace(daughter_name, '', 1)
+
+            # remaining output_daughter = missing daughters
+            list_missing = output_daughter.split()
+
+            for missing in list_missing:
+                # check if missing daughter is found in evt.pdl.
+                # TODO: if particle is aliases, it cannot be found. -> match wrongly events missing some particles (e.g. J/psisig)
+                if pdg.search(missing):
+                    isSignal = False
+
+            hasSignal = hasSignal or isSignal
+
+        if hasSignal:
+            print(matched_file)

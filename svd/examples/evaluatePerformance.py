@@ -12,7 +12,6 @@
 import basf2 as b2
 from simulation import add_simulation
 from svd import add_svd_reconstruction
-from tracking import add_tracking_reconstruction
 import glob
 
 numEvents = 2000
@@ -52,6 +51,7 @@ add_simulation(
 add_svd_reconstruction(main)
 
 '''
+from tracking import add_tracking_reconstruction
 add_tracking_reconstruction(
     main,
     components=["SVD"],

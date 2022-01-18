@@ -133,6 +133,7 @@ _RegisteredSkims = [
     ("18520200", "dark", "ElectronMuonPlusMissingEnergy"),
     ("18520300", "dark", "DielectronPlusMissingEnergy"),
     ("18520400", "dark", "LFVZpVisible"),
+    ("18130100", "dark", "BtoKplusLLP"),
     ("18570600", "taupair", "TauGeneric"),
     ("18570700", "taupair", "TauThrust"),
     ("18530100", "lowMulti", "TwoTrackLeptonsForLuminosity"),
@@ -144,6 +145,7 @@ _RegisteredSkims = [
     ("19130201", "btocharmless", "BtoHadTracks"),
     ("19130300", "btocharmless", "BtoHad1Pi0"),
     ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),
+    ("19120400", "btocharmless", "BtoRhopRhom"),
 ]
 """
 A list of all official registered skims and their skim code and parent module. Entries

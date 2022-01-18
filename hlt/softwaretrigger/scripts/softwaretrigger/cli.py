@@ -149,7 +149,7 @@ def add_cut_function(args):
                                reject_cut=args.reject_cut.lower() == "true", iov=None)
     trigger_menu = db_access.download_trigger_menu_from_db(args.base_identifier,
                                                            do_set_event_number=False)
-    cuts = list(trigger_menu.getCutIdentifiers())
+    cuts = [str(cut) for cut in trigger_menu.getCutIdentifiers()]
 
     if args.cut_identifier not in cuts:
         cuts.append(args.cut_identifier)
@@ -166,9 +166,8 @@ def remove_cut_function(args):
 
     trigger_menu = db_access.download_trigger_menu_from_db(
         args.base_identifier, do_set_event_number=False)
-    cuts = trigger_menu.getCutIdentifiers()
+    cuts = [str(cut) for cut in trigger_menu.getCutIdentifiers() if str(cut) != args.cut_identifier]
 
-    cuts = [cut for cut in cuts if cut != args.cut_identifier]
     db_access.upload_trigger_menu_to_db(
         args.base_identifier, cuts, accept_mode=trigger_menu.isAcceptMode(), iov=None)
 
@@ -504,7 +503,7 @@ version of the online GT will be downloaded.
 Attention: this script will override a database defined in the destination
 folder (default localdb)!
 Attention 2: all IoVs of the downloaded triggers will be set to 0, 0, -1, -1
-so you can use the payloads fro your local studies for whatever run you want.
+so you can use the payloads from your local studies for whatever run you want.
 This should not (never!) be used to upload or edit new triggers and
 is purely a convenience function to synchronize your local studies
 with the online database!

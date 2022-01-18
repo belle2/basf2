@@ -96,6 +96,7 @@ namespace Belle2 {
      * Sets the information to be displayed in the provided MultilineWidget
      * @param px X coordinate of mouse cursor.
      * @param py Y coordinate of mouse cursor.
+     * @param panel MultilineWidget to display the information
      */
     virtual void getInformation(int px, int py, MultilineWidget* panel) override;
 

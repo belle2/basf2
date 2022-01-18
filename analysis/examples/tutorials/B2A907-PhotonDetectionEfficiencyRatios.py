@@ -21,7 +21,6 @@
 import basf2 as b2
 import modularAnalysis as ma
 import variables as va
-import os
 
 # create path
 path = b2.create_path()
@@ -61,7 +60,7 @@ weight_vars = ['p', 'E', 'theta', 'phi',
 
 ma.variablesToNtuple(decayString='gamma:full',
                      variables=weight_vars,
-                     filename=f'B2A907-PhotonDetectionEfficiencyRatios.root',
+                     filename='B2A907-PhotonDetectionEfficiencyRatios.root',
                      path=path)
 
 # process the events

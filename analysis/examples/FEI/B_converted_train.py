@@ -42,7 +42,11 @@ if feistate.stage <= 0:
             'validation',
             False),
         applySkim=True,
+        # Actually, the KS finder should be set to True.
+        # However, here it's set to False because the necessary library is only present on kekcc and not on the build server.
         enableNisKsFinder=False,
+        # Set this argument to True (default value) so that the local database on KEKCC is used.
+        # It's only set to False here so that this example can be run on bamboo.
         enableLocalDB=False,
         path=path)
 else:

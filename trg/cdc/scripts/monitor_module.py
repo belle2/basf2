@@ -136,7 +136,6 @@ class Monitor(b2.Module):
         quos = [[]] * 5
         slng = [[]] * 5
         quong = [[]] * 5
-        quo_ghost = [[]] * 5
 
         # 1 bin corresponds to 8 TS (2 bins for a merger unit)
         width = 8

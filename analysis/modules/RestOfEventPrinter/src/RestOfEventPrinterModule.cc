@@ -80,6 +80,7 @@ namespace Belle2 {
       roe->print(RestOfEvent::c_defaultMaskName, m_unpackComposites);
 
       for (const auto& maskName : m_maskNames) {
+        if (!roe->hasMask(maskName)) continue;
         B2INFO(" - " << "Info for ROEMask with name: \'" << maskName << "\'");
         roe->print(maskName, m_unpackComposites);
 

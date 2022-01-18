@@ -1181,6 +1181,13 @@ def fillParticleListsFromMC(decayStringsWithCuts,
         pions = ('pi+:gen', 'pionID>0.1')
         fillParticleListsFromMC([kaons, pions], path=mypath)
 
+    .. tip::
+        Daughters of ``Lambda0`` are not primary, but ``Lambda0`` is not final state particle.
+        Thus, when one reconstructs a particle from ``Lambda0``, that is created with
+        ``addDaughters=True`` and ``skipNonPrimaryDaughters=True``, the particle always has ``isSignal==0``.
+        Please set options for ``Lambda0`` to use MC-matching variables properly as follows,
+        ``addDaughters=True`` and ``skipNonPrimaryDaughters=False``.
+
     @param decayString             specifies type of Particles and determines the name of the ParticleList
     @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
     @param addDaughters            adds the bottom part of the decay chain of the particle to the datastore and

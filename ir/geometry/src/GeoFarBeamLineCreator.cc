@@ -468,41 +468,47 @@ namespace Belle2 {
       //-   Tube (virtual tube for radiation level study)
 
       //define geometry
-      //G4Tubs* geo_Tube = new G4Tubs("geo_Tube_name", 3995 * CLHEP::mm, 4000 * CLHEP::mm, 29 * CLHEP::m, 0. * CLHEP::deg, 360.*CLHEP::deg);
-      //G4Material* mat_Tube = Materials::get("G4_Si");
-      //G4LogicalVolume* logi_Tube = new G4LogicalVolume(geo_Tube, mat_Tube, "logi_Tube_name");
+      G4Tubs* geo_Tube = new G4Tubs("geo_Tube_name", 3995 * CLHEP::mm, 4000 * CLHEP::mm, 29 * CLHEP::m, 0. * CLHEP::deg, 360.*CLHEP::deg);
+      G4Material* mat_Tube = Materials::get("G4_Si");
+      G4LogicalVolume* logi_Tube = new G4LogicalVolume(geo_Tube, mat_Tube, "logi_Tube_name");
 
       //put volume
-      //setColor(*logi_Tube, "#CC0000");
-      //setVisibility(*logi_Tube, false);
-      //bool radiation_study = false;
+      setColor(*logi_Tube, "#CC0000");
+      setVisibility(*logi_Tube, false);
+      bool radiation_study = false;
       // cppcheck-suppress knownConditionTrueFalse
-      //if (radiation_study) {
-      //  new G4PVPlacement(transform_GateShieldL, logi_Tube, "phys_Tube_name", &topVolume, false, 0);
-      //}
+      if (radiation_study && elements.count("GateShieldL")) {
+        new G4PVPlacement(elements["GateShieldL"].transform, logi_Tube, "phys_Tube_name", &topVolume, false, 0);
+      }
 
 
       //---------------------------
       // for dose simulation
       //---------------------------
 
-      //neutron shield (poly)
-      //logi_polyShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1001));
-      //logi_polyShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1002));
-
-      //additional neutron shield (concrete)
-      //logi_ConcreteShieldL->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1003));
-      //logi_ConcreteShieldR->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1004));
-
-      //gate shield (concrete)
-      //logi_GateShield->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1005));
-
-      //virtual material outsire gate-shield
-
       // cppcheck-suppress knownConditionTrueFalse
-      //if (radiation_study) {
-      //  logi_Tube->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1006));
-      //}
+      if (radiation_study) {
+        //neutron shield (poly)
+        if (elements.count("PolyShieldL"))
+          elements["PolyShieldL"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1001));
+        if (elements.count("PolyShieldR"))
+          elements["PolyShieldR"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1002));
+
+        //additional neutron shield (concrete)
+        if (elements.count("ConcreteShieldL"))
+          elements["ConcreteShieldL"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1003));
+        if (elements.count("ConcreteShieldR"))
+          elements["ConcreteShieldR"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1004));
+
+        //gate shield (concrete)
+        if (elements.count("GateShieldL"))
+          elements["GateShieldL"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1005));
+        if (elements.count("GateShieldR"))
+          elements["GateShieldR"].logi->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1006));
+
+        //virtual material outside gate-shield
+        logi_Tube->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1007));
+      }
 
 
       //------------------

@@ -155,6 +155,15 @@ namespace Belle2 {
     /** TText for names in plane histograms. */
     TText m_PlaneText;
 
+    /** histogram from DQMInfo with runtype */
+    TH1* m_rtype = nullptr;
+
+    /** string with runtype: physics or cosmic */
+    TString m_runtype;
+
+    /** run type flag for physics/cosmic runs*/
+    bool m_runflag;
+
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;
 

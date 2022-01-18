@@ -17,6 +17,7 @@ import numpy as np
 
 import ROOT
 from ROOT import Belle2
+from basf2 import B2WARNING
 
 
 def tree2dict(tree, tree_columns, dict_columns=None):
@@ -44,17 +45,64 @@ def tree2dict(tree, tree_columns, dict_columns=None):
 
 def calculate_roc_auc(p, t):
     """
-    Calculates the area under the receiver oeprating characteristic curve (AUC ROC)
+    Deprecated name of ``calculate_auc_efficiency_vs_purity``
+
     @param p np.array filled with the probability output of a classifier
     @param t np.array filled with the target (0 or 1)
     """
-    N = len(t)
-    T = np.sum(t)
+    B2WARNING(
+        "\033[93mcalculate_roc_auc\033[00m has been deprecated and will be removed in future.\n"
+        "This change has been made as calculate_roc_auc returned the area under the efficiency-purity curve\n"
+        "not the efficiency-background retention curve as expected by users.\n"
+        "Please replace calculate_roc_auc with:\n\n"
+        "\033[96mcalculate_auc_efficiency_vs_purity(probability, target[, weight])\033[00m:"
+        " the current definition of calculate_roc_auc\n"
+        "\033[96mcalculate_auc_efficiency_vs_background_retention(probability, target[, weight])\033[00m:"
+        " what is commonly known as roc auc\n")
+    return calculate_auc_efficiency_vs_purity(p, t)
+
+
+def calculate_auc_efficiency_vs_purity(p, t, w=None):
+    """
+    Calculates the area under the efficiency-purity curve
+    @param p np.array filled with the probability output of a classifier
+    @param t np.array filled with the target (0 or 1)
+    @param w None or np.array filled with weights
+    """
+    if w is None:
+        w = np.ones(t.shape)
+
+    wt = w * t
+
+    N = np.sum(w)
+    T = np.sum(wt)
+
     index = np.argsort(p)
-    efficiency = (T - np.cumsum(t[index])) / float(T)
-    purity = (T - np.cumsum(t[index])) / (N - np.cumsum(np.ones(N)))
+    efficiency = (T - np.cumsum(wt[index])) / float(T)
+    purity = (T - np.cumsum(wt[index])) / (N - np.cumsum(w[index]))
     purity = np.where(np.isnan(purity), 0, purity)
     return np.abs(np.trapz(purity, efficiency))
+
+
+def calculate_auc_efficiency_vs_background_retention(p, t, w=None):
+    """
+    Calculates the area under the efficiency-background_retention curve (AUC ROC)
+    @param p np.array filled with the probability output of a classifier
+    @param t np.array filled with the target (0 or 1)
+    @param w None or np.array filled with weights
+    """
+    if w is None:
+        w = np.ones(t.shape)
+
+    wt = w * t
+
+    N = np.sum(w)
+    T = np.sum(wt)
+
+    index = np.argsort(p)
+    efficiency = (T - np.cumsum(wt[index])) / float(T)
+    background_retention = (N - T - np.cumsum((np.abs(1 - t) * w)[index])) / float(N - T)
+    return np.abs(np.trapz(efficiency, background_retention))
 
 
 def calculate_flatness(f, p, w=None):

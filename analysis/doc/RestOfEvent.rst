@@ -200,6 +200,10 @@ over ROE objects related to a certain particle list:
   main_path.for_each('RestOfEvent', 'RestOfEvents', path = roe_path)
 
 
+.. note::
+  Usage of the `SignalSideParticleFilter` module in the ROE loop is mandatory if one 
+  uses several different ROEs with different ROE masks, which will help to avoid missing mask errors.
+
 ROE masks
 ---------
 

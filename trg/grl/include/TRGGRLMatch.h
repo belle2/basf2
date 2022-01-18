@@ -7,7 +7,7 @@
  **************************************************************************/
 
 #include "framework/datastore/StoreArray.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 
 namespace Belle2 {

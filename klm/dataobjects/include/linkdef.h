@@ -11,6 +11,7 @@
 #pragma link C++ class Belle2::KLMDigit+; // checksum=0xe6c810d6, version=1
 #pragma link C++ class Belle2::KLMDigitEventInfo+; // checksum=0xda5c212, version=5
 #pragma link C++ class Belle2::KLMDigitRaw+; // checksum=0x8fdcd43e, version=2
+#pragma link C++ class Belle2::KLMHit2d+;
 #pragma link C++ class Belle2::KLMMuidHit+; // checksum=0x8eea70da, version=1
 #pragma link C++ class Belle2::KLMMuidLikelihood+; // checksum=0x22d1ff03, version=4
 #pragma link C++ class Belle2::KLMScintillatorFirmwareFitResult+; // checksum=0xb25e8edc, version=1

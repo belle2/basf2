@@ -25,7 +25,7 @@ namespace Belle2 {
   void addContinuumSuppression(const Particle* particle, const std::string& maskName)
   {
     // Output
-    StoreArray<ContinuumSuppression> qqArray;
+    StoreArray<ContinuumSuppression> qqArray(maskName);
     // Create ContinuumSuppression object
     ContinuumSuppression* qqVars = qqArray.appendNew();
 

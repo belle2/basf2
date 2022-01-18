@@ -12,6 +12,8 @@
 
 #include <mva/interface/Options.h>
 
+#include <analysis/VariableManager/Manager.h>
+
 #include <TFile.h>
 #include <TChain.h>
 
@@ -429,6 +431,11 @@ namespace Belle2 {
                                     T& variableTargets);
 
       /**
+       * Determines the data type of the target variable and sets it to m_target_data_type
+       */
+      void setTargetRootInputType();
+
+      /**
        * Virtual destructor
        */
       virtual ~ROOTDataset();
@@ -453,7 +460,11 @@ namespace Belle2 {
       std::vector<double> m_input_double; /**< Contains all feature values of the currently loaded event */
       std::vector<double> m_spectators_double; /**< Contains all spectators values of the currently loaded event */
       double m_weight_double; /**< Contains the weight of the currently loaded event */
+      Variable::Manager::VariableDataType m_target_data_type =
+        Variable::Manager::VariableDataType::c_double; /**< Data type of target variable */
       double m_target_double; /**< Contains the target value of the currently loaded event */
+      double m_target_int; /**< Contains the target value of the currently loaded event */
+      bool m_target_bool; /**< Contains the target value of the currently loaded event */
     };
 
   }

@@ -9,8 +9,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import basf2
-
 
 def add_datcon(path):
     """

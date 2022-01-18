@@ -118,8 +118,8 @@ namespace Belle2 {
         int pdgCode  = mother->getPDGCode();
         // The default list name is "all"
         string listName = mother->getName() + ":all";
-        // ROE particles get the label "ROE"
-        if (m_useROEs) listName = mother->getName() + ":ROE";
+        // ROE particles get the full name
+        if (m_useROEs) listName = mother->getFullName();
         // MC particles get the label "MC"
         else if (m_useMCParticles) listName = mother->getName() + ":MC";
         // V0s get the label "V0"
@@ -318,9 +318,7 @@ namespace Belle2 {
 
       TLorentzVector signal4Vector = signalSideParticle->get4Vector();
       TLorentzVector roe4Vector = roe->get4Vector(m_roeMaskName);
-      TLorentzVector missing4Vector;
-      missing4Vector.SetVect(boost4Vector.Vect() - (signal4Vector.Vect() + roe4Vector.Vect()));
-      missing4Vector.SetE(missing4Vector.Vect().Mag());
+      TLorentzVector missing4Vector = boost4Vector - signal4Vector - roe4Vector;
       auto isFlavored = (isSelfConjugatedParticle) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
       newPart = m_particles.appendNew(missing4Vector, pdgCode, isFlavored, Particle::EParticleSourceObject::c_Undefined, mdstIndex);
 

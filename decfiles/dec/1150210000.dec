@@ -1,0 +1,24 @@
+# EventType: 1150210000
+# Descriptor: [B0 -> K*0 nu anti-nu ]cc
+# NickName: Bd_Kstar0nunu
+# Documentation: b->s nu nubar rare process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Filippo Dattola
+# Email: filippo.dattola@desy.de
+# Cuts: None
+# Date: 20211004
+#
+
+# Set the Upsilon(4S) to decay entirely into our signal B's
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+
+# Signal side B decay
+Decay B0sig
+1.0 K*0 nu_e anti-nu_e PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+
+End

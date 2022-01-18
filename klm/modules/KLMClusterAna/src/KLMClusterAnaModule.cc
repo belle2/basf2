@@ -9,9 +9,6 @@
 /* Own header. */
 #include <klm/modules/KLMClusterAna/KLMClusterAnaModule.h>
 
-/* KLM headers. */
-#include <klm/utility/KLMHit2d.h>
-
 /* Other Belle 2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -49,25 +46,11 @@ KLMClusterAnaModule::~KLMClusterAnaModule()
 
 void KLMClusterAnaModule::initialize()
 {
-
   m_KLMClusterShape.registerInDataStore();
-
   m_KLMClusters.isRequired();
-  m_bklmHit2ds.isOptional();
-  m_eklmHit2ds.isOptional();
-
-
+  m_klmHit2ds.isRequired();
   m_KLMClusters.registerRelationTo(m_KLMClusterShape);
-  m_KLMClusterShape.registerRelationTo(m_bklmHit2ds);
-  m_KLMClusterShape.registerRelationTo(m_eklmHit2ds);
-
-  if (m_bklmHit2ds.isValid() == true || m_eklmHit2ds.isValid() == true) {}
-  else {
-    B2ERROR("The KLMClusterAna module requires either BKLMHit2ds or EKLMHit2ds. ");
-  }
-
-
-
+  m_KLMClusterShape.registerRelationTo(m_klmHit2ds);
 }
 
 void KLMClusterAnaModule::beginRun()
@@ -80,15 +63,9 @@ void KLMClusterAnaModule::event()
     //Obtain BKLMHit2D information
     TVector3 hitPosition;
 
-    //Obtain BKLMHit2D Information
-    RelationVector<BKLMHit2d> bHit2ds = klmcluster.getRelationsTo<BKLMHit2d>();
-    int nBKLMHits = bHit2ds.size();
-
-    //Obtain EKLMHit2D information
-    RelationVector<EKLMHit2d> eHit2ds = klmcluster.getRelationsTo<EKLMHit2d>();
-    int nEKLMHits = eHit2ds.size();
-
-    int nHits = nBKLMHits + nEKLMHits;
+    //Obtain KLMHit2D Information
+    RelationVector<KLMHit2d> hit2ds = klmcluster.getRelationsTo<KLMHit2d>();
+    int nHits = hit2ds.size();
 
     std::vector<double> xHits(nHits);
     std::vector<double> yHits(nHits);
@@ -97,23 +74,12 @@ void KLMClusterAnaModule::event()
     std::vector<KLMHit2d> klmHit2ds;
     std::vector<KLMHit2d>::iterator it;
 
-    for (int i = 0; i < nBKLMHits; i++) {
-      klmHit2ds.push_back(KLMHit2d(bHit2ds[i]));
-    }
-
-    for (int i = 0; i < nEKLMHits; i++) {
-      klmHit2ds.push_back(KLMHit2d(eHit2ds[i]));
-    }
-
-
     for (int i = 0; i < nHits; i++) {
       hitPosition = klmHit2ds[i].getPosition();
       xHits[i] = (double) hitPosition.X();
       yHits[i] = (double) hitPosition.Y();
       zHits[i] = (double) hitPosition.Z();
     }
-
-
 
     KLMClusterShape* clusterShape = m_KLMClusterShape.appendNew();
     clusterShape->setNHits(nHits);
@@ -130,14 +96,10 @@ void KLMClusterAnaModule::event()
     klmcluster.addRelationTo(clusterShape);
 
     for (it = klmHit2ds.begin(); it != klmHit2ds.end(); ++it) {
-      if (it->inBKLM())
-        clusterShape->addRelationTo(it->getBKLMHit2d());
-      else
-        clusterShape->addRelationTo(it->getEKLMHit2d());
+      clusterShape->addRelationTo(&(*it));
     }
 
-
-  }//klmcluster loop
+  }
 
 }
 

@@ -20,7 +20,7 @@ import modularAnalysis as ma
 
 def add_analysis_dqm(path):
     """Add the analysis DQM modules to the ``path``.
-    Builds a list of pi0's, Kshorts and the Fox Wolfram event shape variables.
+    Builds a list of pi0's, Kshorts and the Fox Wolfram event shape variables. Also M(mumu) for nominal beam energy monitoring.
 
     Parameters:
         path (basf2.Path): modules are loaded onto this path
@@ -28,8 +28,10 @@ def add_analysis_dqm(path):
     # Kshorts and pi0s
     ma.fillParticleList('gamma:physDQM', 'E > 0.15', loadPhotonBeamBackgroundMVA=False, path=path)
     ma.fillParticleList('pi+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
+    ma.fillParticleList('mu+:physDQM', 'pt>2. and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, True, path)
     ma.reconstructDecay('K_S0:physDQM -> pi-:physDQM pi+:physDQM', '0.48 < M < 0.52', 1, True, path)
+    ma.reconstructDecay('Upsilon:physDQM -> mu-:physDQM mu+:physDQM', '9 < M < 12', 1, True, path)
 
     # have to manually create "all" lists of pi+ and photons to use inside buildEventShape
     # to avoid loading the photons' beamBackgroundMVA variable on the DQM
@@ -50,6 +52,7 @@ def add_analysis_dqm(path):
     dqm = b2.register_module('PhysicsObjectsDQM')
     dqm.param('PI0PListName', 'pi0:physDQM')
     dqm.param('KS0PListName', 'K_S0:physDQM')
+    dqm.param('UpsPListName', 'Upsilon:physDQM')
     path.add_module(dqm)
 
 
@@ -97,8 +100,10 @@ def add_mirabelle_dqm(path):
 
     # MiraBelle di-muon path
     ma.fillParticleList('mu+:physMiraBelle', '', path=MiraBelleMumu_path)
+    ma.reconstructDecay('Upsilon:physMiraBelle -> mu+:physMiraBelle mu-:physMiraBelle', '9 < M < 12', path=MiraBelleMumu_path)
     MiraBelleMumu = b2.register_module('PhysicsObjectsMiraBelle')
     MiraBelleMumu.param('MuPListName', 'mu+:physMiraBelle')
+    MiraBelleMumu.param('MuMuPListName', 'Upsilon:physMiraBelle')
     MiraBelleMumu_path.add_module(MiraBelleMumu)
 
     # MiraBelle D* (followed by D0 -> K pi) path

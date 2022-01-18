@@ -12,8 +12,8 @@
 #pragma link C++ class Belle2::ARICHTrack+; // checksum=0xe97461b5, version=2
 #pragma link C++ class Belle2::ARICHHit+; // checksum=0xbd5a7d82, version=1
 #pragma link C++ class Belle2::ARICHPhoton+; // checksum=0xf6217c88, version=5
-#pragma link C++ class Belle2::ARICHRawDigit+; // checksum=0xe5a3f04, version=1
+#pragma link C++ class Belle2::ARICHRawDigit+; // checksum=0xbb397841, version=2
 #pragma link C++ class Belle2::ARICHThParam+; // checksum=0x3db70df8, version=1
-#pragma link C++ class Belle2::ARICHInfo+; // checksum=0x29d347c3, version=3
+#pragma link C++ class Belle2::ARICHInfo+; // checksum=0x862f1d7c, version=4
 
 #endif

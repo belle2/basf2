@@ -275,7 +275,7 @@ void KLMDQMModule::initialize()
   m_RawKlms.isOptional();
   m_Digits.isOptional();
   m_BklmHit1ds.isOptional();
-  m_EklmHit2ds.isOptional();
+  m_Hit2ds.isOptional();
 }
 
 void KLMDQMModule::beginRun()
@@ -471,7 +471,9 @@ void KLMDQMModule::event()
     break;
   }
   /* Spatial 2D hits distributions. */
-  for (const EKLMHit2d& hit2d : m_EklmHit2ds) {
+  for (const KLMHit2d& hit2d : m_Hit2ds) {
+    if (hit2d.getSubdetector() != KLMElementNumbers::c_EKLM)
+      continue;
     int section = hit2d.getSection();
     int layer = hit2d.getLayer();
     m_Spatial2DHitsEKLM[section - 1][layer - 1]->Fill(hit2d.getPositionX(), hit2d.getPositionY());

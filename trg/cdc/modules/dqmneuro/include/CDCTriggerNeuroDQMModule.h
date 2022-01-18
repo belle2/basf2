@@ -11,10 +11,12 @@
 #include <framework/core/HistoModule.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <framework/dataobjects/BinnedEventT0.h>
 
 #include "TH1F.h"
 #include "TH2F.h"
@@ -159,7 +161,6 @@ namespace Belle2 {
         }
       }
     }
-
     /** Name of the histogram directory in ROOT file */
     std::string m_histogramDirectoryName;
     /** Switch to supress output for dqm online module */
@@ -237,7 +238,8 @@ namespace Belle2 {
     StoreArray<CDCTriggerMLPInput> m_simNeuroInputVectorSWTSSW2D;
     /** StoreArray for neuro tracks using simulated TS and simulated 2D */
     StoreArray<CDCTriggerTrack> m_simNeuroTracksSWTSSW2D;
-
+    /** storeobjpointer for event time */
+    StoreObjPtr<BinnedEventT0> m_eventTime;
     // histograms for neurotrigger
     TH1F* m_neuroHWOutZ = nullptr;                     /**< z distribution of unpacked neuro tracks */
     TH1F* m_neuroHWOutCosTheta = nullptr;              /**< cos theta distribution of unpacked neuro tracks */

@@ -14,8 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 
 /* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
-#include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/dataobjects/KLMHit2d.h>
 #include <klm/dataobjects/KLMClusterShape.h>
 #include <mdst/dataobjects/KLMCluster.h>
 
@@ -65,12 +64,8 @@ namespace Belle2 {
     /** Output per cluster. */
     StoreArray<KLMClusterShape> m_KLMClusterShape;
 
-    /** BKLMhits. */
-    StoreArray<BKLMHit2d> m_bklmHit2ds;
-
-    /** EKLMhits. */
-    StoreArray<EKLMHit2d> m_eklmHit2ds;
-
+    /** Two-dimensional hits. */
+    StoreArray<KLMHit2d> m_klmHit2ds;
 
   };
 

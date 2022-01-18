@@ -15,7 +15,7 @@ from L1trigger import add_trigger_simulation
 from pxd import add_pxd_simulation
 from svd import add_svd_simulation
 from svd import add_svd_reconstruction
-from tracking import add_tracking_for_PXDDataReduction_simulation
+from tracking import add_tracking_for_PXDDataReduction_simulation, add_roiFinder
 
 
 def check_simulation(path):
@@ -92,31 +92,6 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
                                                  '__ROIsvdRecoTracksToRecoHitInformations',
                                                  '__ROIsvdRecoTracksToSPTrackCands__ROI'])
         path.add_module(datastore_cleaner)
-
-
-def add_roiFinder(path, reco_tracks):
-    """
-    Add the ROI finding to the path creating ROIs out of reco tracks by extrapolating them to the PXD volume.
-    :param path: Where to add the module to.
-    :param reco_tracks: Which tracks to use in the extrapolation step.
-    """
-
-    pxdDataRed = b2.register_module('PXDROIFinder')
-    param_pxdDataRed = {
-        'recoTrackListName': reco_tracks,
-        'PXDInterceptListName': 'PXDIntercepts',
-        'ROIListName': 'ROIs',
-        'tolerancePhi': 0.15,
-        'toleranceZ': 0.5,
-        'sigmaSystU': 0.02,
-        'sigmaSystV': 0.02,
-        'numSigmaTotU': 10,
-        'numSigmaTotV': 10,
-        'maxWidthU': 0.5,
-        'maxWidthV': 0.5,
-    }
-    pxdDataRed.param(param_pxdDataRed)
-    path.add_module(pxdDataRed)
 
 
 def add_simulation(

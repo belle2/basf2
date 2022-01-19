@@ -37,7 +37,7 @@ namespace Belle2 {
 
     /**
      * Constructor from KLMDigit (EKLM).
-     * @param[in] s1 One of KLMDigits.
+     * @param[in] digit One of KLMDigits.
      */
     explicit KLMHit2d(KLMDigit* digit);
 

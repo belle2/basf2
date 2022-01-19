@@ -27,6 +27,7 @@ REG_MODULE(DQMHistAnalysisKLM)
 DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   : DQMHistAnalysisModule(),
     m_ProcessedEvents{0},
+    m_runflag{false},
     m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
     m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
     m_ElementNumbers{&(KLMElementNumbers::Instance())},

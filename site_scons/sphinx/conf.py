@@ -104,6 +104,8 @@ nitpicky = keep_warnings
 
 # Mask false warnings
 nitpick_ignore = []
+for entry in ['cppyy.gbl.TObject', 'cppyy.gbl.TFile', 'ROOT.TFile']:
+    nitpick_ignore.append(('py:class', entry))
 for entry in ['int', 'bool', 'list', 'str', 'object', 'None', 'LogConfig', 'ModuleStatistics']:
     nitpick_ignore.append(('py:class', entry + ' :'))
 

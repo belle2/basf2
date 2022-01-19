@@ -30,11 +30,6 @@ import math
 import os
 import numpy as np
 import pdg
-from ROOT import Belle2
-import ROOT
-from ROOT import gSystem
-gSystem.Load('libanalysis.so')
-Belle2.Variable.Manager.Instance()
 
 
 def removeJPsiSlash(string):
@@ -154,6 +149,7 @@ class MonitoringHist:
         Reads histograms from the given file
         @param filename the name of the ROOT file
         """
+        import ROOT
         #: Dictionary of bin-contents for each histogram
         self.values = {}
         #: Dictionary of bin-centers for each histogram
@@ -167,10 +163,10 @@ class MonitoringHist:
             return
 
         f = ROOT.TFile.Open(filename, 'read')
-        d = f.Get(Belle2.makeROOTCompatible(dirname))
+        d = f.Get(ROOT.Belle2.makeROOTCompatible(dirname))
 
         for key in d.GetListOfKeys():
-            name = Belle2.invertMakeROOTCompatible(key.GetName())
+            name = ROOT.Belle2.invertMakeROOTCompatible(key.GetName())
             hist = key.ReadObj()
             if not (isinstance(hist, ROOT.TH1D) or isinstance(hist, ROOT.TH1F) or
                     isinstance(hist, ROOT.TH2D) or isinstance(hist, ROOT.TH2F)):
@@ -251,6 +247,7 @@ class MonitoringNTuple:
         Reads ntuple from the given file
         @param filename the name of the ROOT file
         """
+        import ROOT
         #: Indicates if the ntuple were successfully read
         self.valid = os.path.isfile(filename)
         if not self.valid:
@@ -274,6 +271,7 @@ class MonitoringModuleStatistics:
         Reads the module statistics from the file named Monitor_ModuleStatistics.root
         @param particle the particle for which the statistics are read
         """
+        import ROOT
         root_file = ROOT.TFile.Open('Monitor_ModuleStatistics.root', 'read')
         persistentTree = root_file.Get('persistent')
         persistentTree.GetEntry(0)
@@ -395,11 +393,12 @@ def MonitoringMCCount(particle):
     @param particle the particle for which the MC counts are read
     @return dictionary with 'sum', 'std', 'avg', 'max', and 'min'
     """
+    import ROOT
     root_file = ROOT.TFile.Open('mcParticlesCount.root', 'read')
 
     key = f'NumberOfMCParticlesInEvent({abs(pdg.from_name(particle.name))})'
-    Belle2.Variable.Manager
-    key = Belle2.makeROOTCompatible(key)
+
+    key = ROOT.Belle2.makeROOTCompatible(key)
     hist = root_file.Get(key)
 
     mc_counts = {'sum': 0, 'std': 0, 'avg': 0, 'min': 0, 'max': 0}

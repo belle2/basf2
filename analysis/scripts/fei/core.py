@@ -45,17 +45,6 @@
  to train all the necessary multivariate classifiers.
 """
 
-# FEI defines own command line options, therefore we disable
-# the ROOT command line options, which otherwise interfere sometimes.
-from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True  # noqa
-
-# FEI uses multi-threading for parallel execution of tasks therefore
-# the ROOT gui-thread is disabled, which otherwise interferes sometimes
-PyConfig.StartGuiThread = False  # noqa
-import ROOT
-from ROOT import Belle2
-
 # Import basf2
 import basf2
 from basf2 import B2INFO, B2WARNING
@@ -133,13 +122,12 @@ class TrainingDataInformation:
         Read out the number of MC particles from the file created by reconstruct
         """
         # Unique absolute pdg-codes of all particles
+        import ROOT
         root_file = ROOT.TFile.Open(self.filename, 'read')
         mc_counts = {}
 
-        Belle2.Variable.Manager
-
         for key in root_file.GetListOfKeys():
-            variable = Belle2.invertMakeROOTCompatible(key.GetName())
+            variable = ROOT.Belle2.invertMakeROOTCompatible(key.GetName())
             pdg = abs(int(variable[len('NumberOfMCParticlesInEvent('):-len(")")]))
             hist = key.ReadObj()
             mc_counts[pdg] = {}
@@ -634,6 +622,10 @@ class Teacher:
         """
         Do all trainings for which we find training data
         """
+        import ROOT
+        # FEI uses multi-threading for parallel execution of tasks therefore
+        # the ROOT gui-thread is disabled, which otherwise interferes sometimes
+        ROOT.PyConfig.StartGuiThread = False
         job_list = []
         filename = 'training_input.root'
         if not os.path.isfile(filename):

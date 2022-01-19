@@ -62,6 +62,7 @@ nbsphinx_custom_formats = {
 # prefix each section with the name of the document it is in followed by a
 # colon
 autosectionlabel_prefix_document = True
+suppress_warnings = ['autosectionlabel.*']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_sphinxtemplates']

@@ -89,7 +89,7 @@ nPE = ROOT.TH1F('nGenPE', 'Generated PE in EKLM', 100, 0.0, 200)
 nPE.GetXaxis().SetTitle('# generated PE')
 nPE.GetYaxis().SetTitle('Events')
 tree.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE',
-          subdetector_selection)
+          'KLMDigits.getSubdetector()==2')
 functions = nPE.GetListOfFunctions()
 functions.Add(TNamed('Description', 'Number of generated photoelectrons in EKLM.'))
 functions.Add(TNamed('Check', 'Mean around 37.'))

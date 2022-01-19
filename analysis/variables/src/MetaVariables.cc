@@ -2987,10 +2987,10 @@ Specifying the lab frame is useful in some corner-cases. For example:
 		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
-                      "Useful if you want to write out if a particle would have passed a cut or not.", Manager::VariableDataType::c_double);
+                      "Useful if you want to write out if a particle would have passed a cut or not.", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("passesEventCut(cut)", passesEventCut,
                       "[Eventbased] Returns 1 if event passes the cut otherwise 0.\n"
-                      "Useful if you want to select events passing a cut without looping into particles, such as for skimming.\n", Manager::VariableDataType::c_double);
+                      "Useful if you want to select events passing a cut without looping into particles, such as for skimming.\n", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("countDaughters(cut)", countDaughters,
                       "Returns number of direct daughters which satisfy the cut.\n"
                       "Used by the skimming package (for what exactly?)", Manager::VariableDataType::c_double);

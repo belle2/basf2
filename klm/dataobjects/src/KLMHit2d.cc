@@ -43,8 +43,8 @@ KLMHit2d::KLMHit2d(const BKLMHit1d* hitPhi, const BKLMHit1d* hitZ, const CLHEP::
   m_Layer = hitPhi->getLayer();
   m_Strip[BKLMElementNumbers::c_ZPlane] = hitZ->getStripMin();
   m_LastStrip[BKLMElementNumbers::c_ZPlane] = hitZ->getStripMax();
-  m_Strip[BKLMElementNumbers::c_PhiPlane] = hitZ->getStripMin();
-  m_LastStrip[BKLMElementNumbers::c_PhiPlane] = hitZ->getStripMax();
+  m_Strip[BKLMElementNumbers::c_PhiPlane] = hitPhi->getStripMin();
+  m_LastStrip[BKLMElementNumbers::c_PhiPlane] = hitPhi->getStripMax();
   m_GlobalX = globalPos.x();
   m_GlobalY = globalPos.y();
   m_GlobalZ = globalPos.z();

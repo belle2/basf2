@@ -119,7 +119,7 @@ void DQMHistDeltaHistoModule::event()
     std::string dirname = s[0];
     std::string hname = s[1];
     std::string canvas_name = dirname + "/c_" + hname;
-    TCanvas* c = find_canvas(canvas_name);
+    TCanvas* c = findCanvas(canvas_name);
     if (c == nullptr) continue;
     TH1* h_diff = hq.back()->diff_histo;
     h_diff->SetName((a + "_diff").Data());

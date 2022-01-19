@@ -403,7 +403,7 @@ class TauThrust(BaseSkim):
         ma.cutAndCopyLists('gamma:thrustForPi0', 'gamma:all', gammaForPi0Cuts, path=path)
         ma.reconstructDecay('pi0:thrust -> gamma:thrustForPi0 gamma:thrustForPi0', '0.115 < M < 0.152', path=path)
         gammaCuts = 'E > 0.20 and clusterNHits > 1.5 and -0.8660 < cosTheta < 0.9563'
-        gammaCuts += ' and isDaughterOfList(pi0:thrust) == 0'
+        gammaCuts += ' and isDescendantOfList(pi0:thrust,1) == 0'
         ma.cutAndCopyList('gamma:thrust', 'gamma:all', gammaCuts, path=path)
 
         # Get EventShape variables

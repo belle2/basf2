@@ -58,6 +58,10 @@ Particle::Particle(const PxPyPzEVector& momentum, const int pdgCode) :
   setFlavorType();
   set4Vector(momentum);
   resetErrorMatrix();
+  // set mass of stable charged particle to its nominal value
+  if (Const::chargedStableSet.find(abs(m_pdgCode)) == Const::ParticleType(abs(m_pdgCode))) {
+    updateMass(m_pdgCode);
+  }
 }
 
 
@@ -75,6 +79,10 @@ Particle::Particle(const PxPyPzEVector& momentum,
   setMdstArrayIndex(mdstIndex);
   set4Vector(momentum);
   resetErrorMatrix();
+  // set mass of stable charged particle to its nominal value
+  if (Const::chargedStableSet.find(abs(m_pdgCode)) == Const::ParticleType(abs(m_pdgCode))) {
+    updateMass(m_pdgCode);
+  }
 }
 
 
@@ -95,6 +103,10 @@ Particle::Particle(const PxPyPzEVector& momentum,
     m_pdgCode = -pdgCode;
   set4Vector(momentum);
   resetErrorMatrix();
+  // set mass of stable charged particle to its nominal value
+  if (Const::chargedStableSet.find(abs(m_pdgCode)) == Const::ParticleType(abs(m_pdgCode))) {
+    updateMass(m_pdgCode);
+  }
 
   if (!daughterIndices.empty()) {
     m_particleSource    = c_Composite;
@@ -125,6 +137,10 @@ Particle::Particle(const PxPyPzEVector& momentum,
     m_pdgCode = -pdgCode;
   set4Vector(momentum);
   resetErrorMatrix();
+  // set mass of stable charged particle to its nominal value
+  if (Const::chargedStableSet.find(abs(m_pdgCode)) == Const::ParticleType(abs(m_pdgCode))) {
+    updateMass(m_pdgCode);
+  }
   m_properties = properties;
 
   if (!daughterIndices.empty()) {
@@ -159,6 +175,10 @@ Particle::Particle(const PxPyPzEVector& momentum,
     m_pdgCode = -pdgCode;
   set4Vector(momentum);
   resetErrorMatrix();
+  // set mass of stable charged particle to its nominal value
+  if (Const::chargedStableSet.find(abs(m_pdgCode)) == Const::ParticleType(abs(m_pdgCode))) {
+    updateMass(m_pdgCode);
+  }
   m_properties = properties;
 
   if (!daughterIndices.empty()) {

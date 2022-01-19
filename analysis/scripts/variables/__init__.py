@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -10,24 +8,27 @@
 
 import argparse
 import basf2.utils as b2utils
-import ROOT
-from ROOT import Belle2
-"""
-Makes analysis variables (which can be used in many of the functions defined
-in :mod:`modularAnalysis`) available to Python.
-Details can be found in the VariableManager section at https://software.belle2.org/
-"""
-from ROOT import gSystem
-gSystem.Load('libanalysis.so')
+
+
+def get_variable_manager():
+    """
+    Simple wrapper for returning an instance to the variable manager object.
+    This is necessary for avoiding to import ROOT globally.
+    """
+    import ROOT
+    variable_manager = ROOT.Belle2.Variable.Manager.Instance()
+    return variable_manager
+
 
 #: import everything into current namespace.
-variables = Belle2.Variable.Manager.Instance()
+variables = get_variable_manager()
 
 
 def std_vector(*args):
     """
     Creates an std::vector which can be passed to pyROOT
     """
+    import ROOT
     v = ROOT.std.vector(type(args[0]))()
     for x in args:
         v.push_back(x)
@@ -70,9 +71,9 @@ def getAllTrgNames():
     """
     Return all PSNM trigger bit names
     """
-
-    bits = Belle2.PyDBObj('TRGGDLDBFTDLBits')
-    evt = Belle2.EventMetaData()
-    Belle2.DBStore.Instance().update(evt)
-    size = Belle2.TRGSummary.c_ntrgWords * Belle2.TRGSummary.c_trgWordSize
+    import ROOT
+    bits = ROOT.Belle2.PyDBObj('TRGGDLDBFTDLBits')
+    evt = ROOT.Belle2.EventMetaData()
+    ROOT.Belle2.DBStore.Instance().update(evt)
+    size = ROOT.Belle2.TRGSummary.c_ntrgWords * ROOT.Belle2.TRGSummary.c_trgWordSize
     return [bits.getoutbitname(i) for i in range(size) if bits.getoutbitname(i) != '']

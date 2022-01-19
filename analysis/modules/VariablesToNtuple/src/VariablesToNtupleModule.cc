@@ -146,6 +146,18 @@ void VariablesToNtupleModule::initialize()
         m_tree->get().Branch(branchName.c_str(), &m_branchAddressesInt[enumerate], (branchName + "/O").c_str());
       }
       m_functions.push_back(var->function);
+      if (std::holds_alternative<double>(var->function(nullptr)) and var->variabletype != Variable::Manager::VariableDataType::c_double) {
+        B2WARNING("Wrong registered data type for variable '" + var->name +
+                  "'. Expected Variable::Manager::VariableDataType::c_double. Exported data for this variable might be incorrect.");
+      } else if (std::holds_alternative<int>(var->function(nullptr))
+                 and var->variabletype != Variable::Manager::VariableDataType::c_int) {
+        B2WARNING("Wrong registered data type for variable '" + var->name +
+                  "'. Expected Variable::Manager::VariableDataType::c_int. Exported data for this variable might be incorrect.");
+      } else if (std::holds_alternative<bool>(var->function(nullptr))
+                 and var->variabletype != Variable::Manager::VariableDataType::c_bool) {
+        B2WARNING("Wrong registered data type for variable '" + var->name +
+                  "'. Expected Variable::Manager::VariableDataType::c_bool. Exported data for this variable might be incorrect.");
+      }
     }
     enumerate++;
   }

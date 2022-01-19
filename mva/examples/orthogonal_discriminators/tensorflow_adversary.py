@@ -212,10 +212,10 @@ if __name__ == "__main__":
     specific_options.m_framework = "tensorflow"
     specific_options.m_steering_file = 'mva/examples/orthogonal_discriminators/tensorflow_adversary.py'
     specific_options.m_normalize = True
-    specific_options.m_nIterations = 500
+    specific_options.m_nIterations = 1000
     specific_options.m_mini_batch_size = 400
     specific_options.m_config = '{"pre_train_epochs" : 50, "adversary_steps": 7, '\
-        ' "learning_rate": 0.001, "lambda": 0.1}'
+        ' "learning_rate": 0.001, "lambda": 0.01}'
     basf2_mva.teacher(general_options, specific_options)
 
     method = basf2_mva_util.Method(general_options.m_identifier)
@@ -226,7 +226,7 @@ if __name__ == "__main__":
     results['adversarial'] = {'p': p, 't': t, 'auc': auc}
 
     general_options.m_identifier = "tensorflow_baseline"
-    specific_options.m_nIterations = 100
+    specific_options.m_nIterations = 200
     specific_options.m_mini_batch_size = 400
     specific_options.m_config = '{"pre_train_epochs" : 0, "adversary_steps": 1, '\
         ' "learning_rate": 0.001, "lambda": -1.0}'
@@ -240,7 +240,7 @@ if __name__ == "__main__":
 
     general_options.m_variables = basf2_mva.vector(*variables2)
     general_options.m_identifier = "tensorflow_feature_drop"
-    specific_options.m_nIterations = 100
+    specific_options.m_nIterations = 200
     specific_options.m_mini_batch_size = 400
     specific_options.m_config = '{"pre_train_epochs" : 0, "adversary_steps": 1, '\
         ' "learning_rate": 0.001, "lambda": -1.0}'

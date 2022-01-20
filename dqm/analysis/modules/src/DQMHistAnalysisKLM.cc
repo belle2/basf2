@@ -27,7 +27,7 @@ REG_MODULE(DQMHistAnalysisKLM)
 DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   : DQMHistAnalysisModule(),
     m_ProcessedEvents{0},
-    m_runflag{false},
+    m_IsNullRun{false},
     m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
     m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
     m_ElementNumbers{&(KLMElementNumbers::Instance())},
@@ -71,9 +71,9 @@ void DQMHistAnalysisKLMModule::initialize()
             << LogVar("Threshold for hot channels", m_ThresholdForHot)
             << LogVar("Threshold for masked channels", m_ThresholdForMasked));
 
-  m_rtype = findHist("DQMInfo/rtype");
-  m_runtype = m_rtype ? m_rtype->GetTitle() : "";
-  m_runflag = (m_runtype == "null");
+  m_RunType = findHist("DQMInfo/rtype");
+  m_RunTypeString = m_RunType ? m_RunType->GetTitle() : "";
+  m_IsNullRun = (m_RunTypeString == "null");
 }
 
 void DQMHistAnalysisKLMModule::terminate()
@@ -347,7 +347,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
         latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
         yAlarm -= 0.05;
       }
-      if (m_runflag == false) {
+      if (m_IsNullRun == false) {
         alarm = "Call the KLM experts immediately!";
         latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
         canvas->Pad()->SetFillColor(kRed);
@@ -385,7 +385,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
         latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
         yAlarm -= 0.05;
       }
-      if (m_runflag == false) {
+      if (m_IsNullRun == false) {
         alarm = "Call the KLM experts immediately!";
         latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
         canvas->Pad()->SetFillColor(kRed);

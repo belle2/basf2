@@ -3002,7 +3002,7 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       "If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.\n"
                       "E.g. ``varForMCGen(PDG)`` returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("nParticlesInList(particleListName)", nParticlesInList,
-                      "[Eventbased] Returns number of particles in the given particle List.", Manager::VariableDataType::c_double);
+                      "[Eventbased] Returns number of particles in the given particle List.", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("isInList(particleListName)", isInList,
                       "Returns 1 if the particle is in the list provided, 0 if not. Note that this only checks the particle given. For daughters of composite particles, please see :b2:var:`isDaughterOfList`.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,

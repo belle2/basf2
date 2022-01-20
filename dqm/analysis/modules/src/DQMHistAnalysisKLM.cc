@@ -71,9 +71,6 @@ void DQMHistAnalysisKLMModule::initialize()
             << LogVar("Threshold for hot channels", m_ThresholdForHot)
             << LogVar("Threshold for masked channels", m_ThresholdForMasked));
 
-  m_RunType = findHist("DQMInfo/rtype");
-  m_RunTypeString = m_RunType ? m_RunType->GetTitle() : "";
-  m_IsNullRun = (m_RunTypeString == "null");
 }
 
 void DQMHistAnalysisKLMModule::terminate()
@@ -89,6 +86,10 @@ void DQMHistAnalysisKLMModule::beginRun()
   m_DeadBarrelModules.clear();
   m_DeadEndcapModules.clear();
   m_MaskedChannels.clear();
+
+  m_RunType = findHist("DQMInfo/rtype");
+  m_RunTypeString = m_RunType ? m_RunType->GetTitle() : "";
+  m_IsNullRun = (m_RunTypeString == "null");
 }
 
 void DQMHistAnalysisKLMModule::endRun()

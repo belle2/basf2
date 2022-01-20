@@ -180,105 +180,79 @@ class CosmicsExtapolationPlotModule(basf2.Module):
             self.hist_pres_backward_mup,
             'Momentum resolution (mu+, backward propagation).')
 
+    def fill_histograms_exthit(self, exthit, klmhit2d):
+        """ Fill histograms with ExtHit data. """
+        ext_position = exthit.getPosition()
+        if exthit.isBackwardPropagated():
+            if exthit.getPdgCode() == 13:
+                self.hist_xres_backward_mum.Fill(
+                    ext_position.X() - klmhit2d.getPositionX())
+                self.hist_yres_backward_mum.Fill(
+                    ext_position.Y() - klmhit2d.getPositionY())
+                self.hist_zres_backward_mum.Fill(
+                    ext_position.Z() - klmhit2d.getPositionZ())
+            elif exthit.getPdgCode() == -13:
+                self.hist_xres_backward_mup.Fill(
+                    ext_position.X() - klmhit2d.getPositionX())
+                self.hist_yres_backward_mup.Fill(
+                    ext_position.Y() - klmhit2d.getPositionY())
+                self.hist_zres_backward_mup.Fill(
+                    ext_position.Z() - klmhit2d.getPositionZ())
+        else:
+            if exthit.getPdgCode() == 13:
+                self.hist_xres_forward_mum.Fill(
+                    ext_position.X() - klmhit2d.getPositionX())
+                self.hist_yres_forward_mum.Fill(
+                    ext_position.Y() - klmhit2d.getPositionY())
+                self.hist_zres_forward_mum.Fill(
+                    ext_position.Z() - klmhit2d.getPositionZ())
+            elif exthit.getPdgCode() == -13:
+                self.hist_xres_forward_mup.Fill(
+                    ext_position.X() - klmhit2d.getPositionX())
+                self.hist_yres_forward_mup.Fill(
+                    ext_position.Y() - klmhit2d.getPositionY())
+                self.hist_zres_forward_mup.Fill(
+                    ext_position.Z() - klmhit2d.getPositionZ())
+
     def event(self):
         """ Event function. """
-        bklmhit2ds = Belle2.PyStoreArray('BKLMHit2ds')
-        eklmhit2ds = Belle2.PyStoreArray('EKLMHit2ds')
+        klmhit2ds = Belle2.PyStoreArray('KLMHit2ds')
         exthits = Belle2.PyStoreArray('ExtHits')
         tracks = Belle2.PyStoreArray('Tracks')
         mcparticles = Belle2.PyStoreArray('MCParticles')
 
-        for bklmhit2d in bklmhit2ds:
-            section = bklmhit2d.getSection()
-            sector = bklmhit2d.getSector()
-            layer = bklmhit2d.getLayer()
-            for exthit in exthits:
-                if exthit.getDetectorID() != Belle2.Const.BKLM:
-                    continue
-                module = exthit.getCopyID()
-                section_ext = bklm_numbers.getSectionByModule(module)
-                sector_ext = bklm_numbers.getSectorByModule(module)
-                layer_ext = bklm_numbers.getLayerByModule(module)
-                if (section_ext != section or sector_ext != sector or
-                        layer_ext != layer):
-                    continue
-                ext_position = exthit.getPosition()
-                if exthit.isBackwardPropagated():
-                    if exthit.getPdgCode() == 13:
-                        self.hist_xres_backward_mum.Fill(
-                            ext_position.X() - bklmhit2d.getGlobalPositionX())
-                        self.hist_yres_backward_mum.Fill(
-                            ext_position.Y() - bklmhit2d.getGlobalPositionY())
-                        self.hist_zres_backward_mum.Fill(
-                            ext_position.Z() - bklmhit2d.getGlobalPositionZ())
-                    elif exthit.getPdgCode() == -13:
-                        self.hist_xres_backward_mup.Fill(
-                            ext_position.X() - bklmhit2d.getGlobalPositionX())
-                        self.hist_yres_backward_mup.Fill(
-                            ext_position.Y() - bklmhit2d.getGlobalPositionY())
-                        self.hist_zres_backward_mup.Fill(
-                            ext_position.Z() - bklmhit2d.getGlobalPositionZ())
-                else:
-                    if exthit.getPdgCode() == 13:
-                        self.hist_xres_forward_mum.Fill(
-                            ext_position.X() - bklmhit2d.getGlobalPositionX())
-                        self.hist_yres_forward_mum.Fill(
-                            ext_position.Y() - bklmhit2d.getGlobalPositionY())
-                        self.hist_zres_forward_mum.Fill(
-                            ext_position.Z() - bklmhit2d.getGlobalPositionZ())
-                    elif exthit.getPdgCode() == -13:
-                        self.hist_xres_forward_mup.Fill(
-                            ext_position.X() - bklmhit2d.getGlobalPositionX())
-                        self.hist_yres_forward_mup.Fill(
-                            ext_position.Y() - bklmhit2d.getGlobalPositionY())
-                        self.hist_zres_forward_mup.Fill(
-                            ext_position.Z() - bklmhit2d.getGlobalPositionZ())
-
-        for eklmhit2d in eklmhit2ds:
-            section = eklmhit2d.getSection()
-            sector = eklmhit2d.getSector()
-            layer = eklmhit2d.getLayer()
-            for exthit in exthits:
-                if exthit.getDetectorID() != Belle2.Const.EKLM:
-                    continue
-                strip_global = exthit.getCopyID()
-                section_ext = eklm_numbers.getSectionByGlobalStrip(strip_global)
-                sector_ext = eklm_numbers.getSectorByGlobalStrip(strip_global)
-                layer_ext = eklm_numbers.getLayerByGlobalStrip(strip_global)
-                if (section_ext != section or sector_ext != sector or
-                        layer_ext != layer):
-                    continue
-                ext_position = exthit.getPosition()
-                if exthit.isBackwardPropagated():
-                    if exthit.getPdgCode() == 13:
-                        self.hist_xres_backward_mum.Fill(
-                            ext_position.X() - eklmhit2d.getPositionX())
-                        self.hist_yres_backward_mum.Fill(
-                            ext_position.Y() - eklmhit2d.getPositionY())
-                        self.hist_zres_backward_mum.Fill(
-                            ext_position.Z() - eklmhit2d.getPositionZ())
-                    elif exthit.getPdgCode() == -13:
-                        self.hist_xres_backward_mup.Fill(
-                            ext_position.X() - eklmhit2d.getPositionX())
-                        self.hist_yres_backward_mup.Fill(
-                            ext_position.Y() - eklmhit2d.getPositionY())
-                        self.hist_zres_backward_mup.Fill(
-                            ext_position.Z() - eklmhit2d.getPositionZ())
-                else:
-                    if exthit.getPdgCode() == 13:
-                        self.hist_xres_forward_mum.Fill(
-                            ext_position.X() - eklmhit2d.getPositionX())
-                        self.hist_yres_forward_mum.Fill(
-                            ext_position.Y() - eklmhit2d.getPositionY())
-                        self.hist_zres_forward_mum.Fill(
-                            ext_position.Z() - eklmhit2d.getPositionZ())
-                    elif exthit.getPdgCode() == -13:
-                        self.hist_xres_forward_mup.Fill(
-                            ext_position.X() - eklmhit2d.getPositionX())
-                        self.hist_yres_forward_mup.Fill(
-                            ext_position.Y() - eklmhit2d.getPositionY())
-                        self.hist_zres_forward_mup.Fill(
-                            ext_position.Z() - eklmhit2d.getPositionZ())
+        for klmhit2d in klmhit2ds:
+            subdetector = klmhit2d.getSubdetector()
+            section = klmhit2d.getSection()
+            sector = klmhit2d.getSector()
+            layer = klmhit2d.getLayer()
+            if (subdetector == Belle2.KLMElementNumbers.c_BKLM):
+                for exthit in exthits:
+                    if exthit.getDetectorID() != Belle2.Const.BKLM:
+                        continue
+                    module = exthit.getCopyID()
+                    section_ext = bklm_numbers.getSectionByModule(module)
+                    sector_ext = bklm_numbers.getSectorByModule(module)
+                    layer_ext = bklm_numbers.getLayerByModule(module)
+                    if (section_ext != section or sector_ext != sector or
+                            layer_ext != layer):
+                        continue
+                    self.fill_histograms_exthit(exthit, klmhit2d)
+            else:
+                section = klmhit2d.getSection()
+                sector = klmhit2d.getSector()
+                layer = klmhit2d.getLayer()
+                for exthit in exthits:
+                    if exthit.getDetectorID() != Belle2.Const.EKLM:
+                        continue
+                    strip_global = exthit.getCopyID()
+                    section_ext = eklm_numbers.getSectionByGlobalStrip(strip_global)
+                    sector_ext = eklm_numbers.getSectorByGlobalStrip(strip_global)
+                    layer_ext = eklm_numbers.getLayerByGlobalStrip(strip_global)
+                    if (section_ext != section or sector_ext != sector or
+                            layer_ext != layer):
+                        continue
+                    self.fill_histograms_exthit(exthit, klmhit2d)
 
         for track in tracks:
             track_fit_result = track.getTrackFitResult(Belle2.Const.muon)

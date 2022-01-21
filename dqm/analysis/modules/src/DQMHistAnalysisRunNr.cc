@@ -88,7 +88,7 @@ void DQMHistAnalysisRunNrModule::event()
   m_cRunNr->cd();
   m_cRunNr->Clear();
 
-  auto leg = new TPaveText(0.6, 0.1, 0.9, 0.3, "NDC");
+  auto leg = new TPaveText(0.6, 0.6, 0.95, 0.95, "NDC");
 
   auto name = "hRunnr";
   TH1* hh1 = findHist(name);
@@ -99,7 +99,7 @@ void DQMHistAnalysisRunNrModule::event()
     hh1->Draw("hist");
     mean = hh1->GetMean();
     if (hh1->GetEntries() > 0) {
-      leg->AddText("Containing Run");
+      leg->AddText("Contains Run: Entries");
       // loop over bins and check if more than one is used
       int nfilled = 0;
       for (int i = 0; i <= hh1->GetXaxis()->GetNbins() + 1; i++) {
@@ -107,7 +107,7 @@ void DQMHistAnalysisRunNrModule::event()
         if (hh1->GetBinContent(i) > 0) {
           nfilled++;
           TString tmp;
-          tmp.Form("Run %d, Entries %d", hh1->GetXaxis()->GetBinCenter(i), hh1->GetBinContent(i));
+          tmp.Form("%ld: %ld", (long int)hh1->GetXaxis()->GetBinCenter(i), (long int)hh1->GetBinContent(i));
           leg->AddText(tmp);
         }
       }

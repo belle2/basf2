@@ -9,13 +9,10 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import basf2 as b2
-from ROOT import Belle2
-
 
 # Dictionary containing global tag names for Belle II upgrade flavors with VTX
 valid_upgrade_globaltags = {"upgrade_globaltag_vtx_7layer": "upgrade_2021-07-16_vtx_7layer",
-                            "upgrade_globaltag_vtx_5layer": "upgrade_2021-07-16_vtx_5layer",
+                            "upgrade_globaltag_vtx_5layer": "upgrade_2022-01-21_vtx_5layer",
                             "upgrade_globaltag_vtx_6layer": "upgrade_2021-11-16_vtx_6layer",
                             "upgrade_globaltag_vtx_5layer_discs": "upgrade_2020-07-13_vtx_5layer_discs",
                             "upgrade_globaltag_vtx_tb_2020-03": "upgrade_2020-07-07_VTX-CMOS-testbeam-2020-03-12",
@@ -66,7 +63,7 @@ def get_upgrade_globaltag():
     """
 
     import os
-    from basf2 import B2ERROR, B2INFO
+    from basf2 import B2INFO
 
     env_name = 'BELLE2_VTX_UPGRADE_GT'
     upgrade_globaltag = ''
@@ -104,7 +101,7 @@ def get_upgrade_background_files(folder=None, output_file_info=True):
     import os
     import glob
     from basf2.utils import pretty_print_table
-    from basf2 import create_path, B2ERROR, B2INFO
+    from basf2 import B2INFO
 
     env_name = 'BELLE2_VTX_BACKGROUND_DIR'
     bg = None
@@ -161,7 +158,7 @@ def get_upgrade_background_mixer_files(folder=None, output_file_info=True):
     import os
     import glob
     from basf2.utils import pretty_print_table
-    from basf2 import create_path, B2ERROR, B2INFO
+    from basf2 import B2INFO
 
     env_name = 'BELLE2_VTX_BACKGROUND_MIXING_DIR'
     bg = None

@@ -1,8 +1,8 @@
 {
     "result_path": "train_output/",
     "process_type": "BBBAR",
-    "n_events_training": 25000,
-    "n_events_testing": 5000,
+    "n_events_training": 6000,
+    "n_events_testing": 4000,
     "n_events_per_task": 200,
     "n_events_test_on_data": -1,
     "workers": 3,

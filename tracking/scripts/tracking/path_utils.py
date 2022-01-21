@@ -1217,7 +1217,7 @@ def add_vtx_track_finding_vxdtf2(
     materialBudgetFactor=1.2,
     maxPt=0.01,
     vxdQualityEstimatarParametersFromDB=True,
-    vtx_bg_cut=0.0
+    vtx_bg_cut=0.3
 ):
     """
     Convenience function for adding all vxd track finder Version 2 modules
@@ -1247,7 +1247,7 @@ def add_vtx_track_finding_vxdtf2(
     :param materialBudgetFactor: MaterialBudgetFactor is a hyperparameter of TripletFit QE, Default: 50
     :param maxPt: MaxPt is a hyperparameter of TripletFit QE, Default: 0.5
     :param vxdQualityEstimatarParametersFromDB: If True, take TripletFit hyperparameters from DB, otherwise from function arguments
-    :param vtx_bg_cut: If positive, VTX background remover gets applied. Valid values in range [0,1].
+    :param vtx_bg_cut: If not None, VTX background remover gets applied. Valid cut values in range [0,1].
     """
     ##########################
     # some setting for VXDTF2
@@ -1382,7 +1382,7 @@ def add_vtx_track_finding_vxdtf2(
     momSeedRetriever.param('tcArrayName', nameSPTCs)
     path.add_module(momSeedRetriever)
 
-    if vtx_bg_cut == 0:
+    if vtx_bg_cut is None:
         converter = register_module('SPTC2RTConverter')
         converter.param('recoTracksStoreArrayName', reco_tracks)
         converter.param('spacePointsTCsStoreArrayName', nameSPTCs)

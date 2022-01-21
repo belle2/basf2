@@ -28,7 +28,7 @@ def add_vtx_bg_remover(
     inputStoreArrayName,
     outputStoreArrayName,
     vtx_bg_cut=0.0,
-    weightFileIdentifier='vxdtf2_mva_bgr',
+    weightFileIdentifier='vxdtf2_vtx_bgr_mva',
 ):
 
     bg_remover = VTXBgRemover(

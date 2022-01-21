@@ -16,8 +16,8 @@ Outputs a root file train.root with training data.
 
 Usage:
 export BELLE2_VTX_UPGRADE_GT=upgrade_2021-07-16_vtx_5layer
-export BELLE2_VTX_BACKGROUND_DIR=/path/to/your/overlay/files/
-basf2 collect_data.py -n 2000
+export BELLE2_VTX_BACKGROUND_DIR=/path/to/b2/overlay/files/
+basf2 collect_data.py -n 6000
 """
 
 
@@ -27,7 +27,6 @@ from simulation import add_simulation
 from vtx import get_upgrade_globaltag, get_upgrade_background_files
 from tracking.path_utils import add_vtx_track_finding_vxdtf2, add_hit_preparation_modules
 from vtx_bgr.path_utils import add_vtx_bg_collector
-# from tracking import add_tracking_reconstruction
 
 
 def main():
@@ -63,9 +62,6 @@ def main():
     # Detector Simulation:
     add_simulation(path, bkgfiles=get_upgrade_background_files(), useVTX=True)
 
-    # Data reconstruction
-    # add_tracking_reconstruction(path, useVTX=True, use_vtx_to_cdc_ckf=True)
-
     add_hit_preparation_modules(
         path,
         components=None,
@@ -79,7 +75,7 @@ def main():
         path, components=["VTX"],
         reco_tracks=trackCandidatesColumnName,
         add_mva_quality_indicator=False,
-        vtx_bg_cut=0,
+        vtx_bg_cut=None,
     )
 
     # Data collection for training

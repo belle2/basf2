@@ -695,7 +695,7 @@ class VTXBGRDataCollectionTask(Basf2PathTask):
             path, components=["VTX"],
             reco_tracks=trackCandidatesColumnName,
             add_mva_quality_indicator=False,
-            vtx_bg_cut=0,
+            vtx_bg_cut=None,
         )
 
         # Data collection for training
@@ -878,7 +878,7 @@ class VTXBGRTeacherTask(TeacherBaseTask):
     Task to run basf2 mva teacher on collected data for VXDTF2 track quality estimator
     """
     #: Name of the weightfile that is created.
-    weightfile_identifier_basename = "vxdtf2_mva_bgr"
+    weightfile_identifier_basename = "vxdtf2_vtx_bgr_mva"
     #: Name of the TTree in the ROOT file from the ``data_collection_task`` that
     # contains the training data for the MVA teacher.
     tree_name = "tree"
@@ -1043,7 +1043,7 @@ class VTXBGRHarvestingValidationTask(HarvestingValidationBaseTask):
     #: Teacher task to required to provide a weightfile for background remover.
     teacher_task = VTXBGRTeacherTask
     #: Cut value for VTX background remover. For analysis, better to keep tracks and just write QI
-    vtx_bg_cut = 0.0
+    vtx_bg_cut = None
 
     def add_tracking_with_quality_estimation(self, path):
         """

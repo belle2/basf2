@@ -16,6 +16,6 @@ conditions.testing_payloads = [
     'localdb/database.txt'
 ]
 
-basf2_mva.expert(basf2_mva.vector('vxdtf2_mva_bgr'),
+basf2_mva.expert(basf2_mva.vector('vxdtf2_vtx_bgr_mva'),
                  basf2_mva.vector('test.root'),
                  'tree', 'expert.root')

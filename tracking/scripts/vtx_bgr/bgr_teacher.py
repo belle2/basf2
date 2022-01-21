@@ -15,7 +15,7 @@ go = basf2_mva.GeneralOptions()
 go.m_datafiles = basf2_mva.vector('train.root')
 go.m_treename = 'tree'
 go.m_weight_variable = ""
-go.m_identifier = 'vxdtf2_mva_bgr'
+go.m_identifier = 'vxdtf2_vtx_bgr_mva'
 go.m_variables = basf2_mva.vector(*var_set.var_set)
 go.m_target_variable = 'isSignal'
 

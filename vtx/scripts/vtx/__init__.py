@@ -11,7 +11,7 @@
 
 
 # Dictionary containing global tag names for Belle II upgrade flavors with VTX
-valid_upgrade_globaltags = {"upgrade_globaltag_vtx_7layer": "upgrade_2021-07-16_vtx_7layer",
+valid_upgrade_globaltags = {"upgrade_globaltag_vtx_7layer": "upgrade_2022-01-21_vtx_7layer",
                             "upgrade_globaltag_vtx_5layer": "upgrade_2022-01-21_vtx_5layer",
                             "upgrade_globaltag_vtx_6layer": "upgrade_2021-11-16_vtx_6layer",
                             "upgrade_globaltag_vtx_5layer_discs": "upgrade_2020-07-13_vtx_5layer_discs",

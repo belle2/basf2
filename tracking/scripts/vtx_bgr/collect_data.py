@@ -15,8 +15,8 @@ Script to collect data for training bg remover expert for VTX upgrade of Belle I
 Outputs a root file train.root with training data.
 
 Usage:
-export BELLE2_VTX_UPGRADE_GT=upgrade_2021-07-16_vtx_5layer
-export BELLE2_VTX_BACKGROUND_DIR=/path/to/b2/overlay/files/
+export BELLE2_VTX_UPGRADE_GT=NameOfUpgradeGT
+export BELLE2_VTX_BACKGROUND_DIR=/path/to/overlay/files/
 basf2 collect_data.py -n 6000
 """
 

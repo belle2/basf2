@@ -49,7 +49,8 @@ REG_MODULE(ECLDigitizer)
 
 ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECLDigitWaveformParametersForMC"),
   m_waveformParameters("ECLWaveformData"),
-  m_algoParameters("ECLWFAlgoParams")
+  m_algoParameters("ECLWFAlgoParams"),
+  m_noiseParameters("ECLNoiseData")
 {
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");
@@ -555,9 +556,9 @@ void ECLDigitizerModule::readDSPDB()
   TTree* tree3 = (TTree*) rootfile.Get("EclNoise");
 
   if (m_useWaveformParameters) {
-    // TODO: tree3 as well
     tree  = const_cast<TTree*>(&*m_waveformParameters);
     tree2 = const_cast<TTree*>(&*m_algoParameters);
+    tree3 = const_cast<TTree*>(&*m_noiseParameters);
   }
 
   if (tree == 0 || tree2 == 0 || tree3 == 0) B2FATAL("Data not found");

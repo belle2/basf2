@@ -153,9 +153,11 @@ namespace Belle2 {
     /** dbobject for hadron signal shapes*/
     DBObjPtr<ECLDigitWaveformParametersForMC> m_waveformParametersMC;
     /** dbobject for CellID-specific signal shapes */
-    OptionalDBObjPtr<TTree> m_waveformParameters;
+    DBObjPtr<TTree> m_waveformParameters;
     /** dbobject for shape fitting algo parameters */
-    OptionalDBObjPtr<TTree> m_algoParameters;
+    DBObjPtr<TTree> m_algoParameters;
+    /** dbobject for electronics noise covariance matrix */
+    DBObjPtr<TTree> m_noiseParameters;
 
     /** If true, use m_waveformParameters and m_algoParameters.
      *  If false, use the data from ecl/data/ECL-WF.root and ECL-WF-BG.root

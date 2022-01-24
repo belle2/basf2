@@ -9,6 +9,8 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+# @cond
+
 import torch
 import numpy as np
 import torch.nn as nn
@@ -122,3 +124,5 @@ class ConvNet(nn.Module):
         output = self.fc2(x)
 
         return(output)
+
+# @endcond

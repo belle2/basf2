@@ -9,6 +9,8 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+# @cond
+
 """ This script includes the core of 'CNN_PID_ECL' module
 
 """
@@ -314,3 +316,5 @@ class CNN_PID_ECL(b2.Module):
         chargedStable_name_list = self.pdg.to_names(chargedStable_pdg_list)
 
         return(chargedStable_name_list)
+
+# @endcond

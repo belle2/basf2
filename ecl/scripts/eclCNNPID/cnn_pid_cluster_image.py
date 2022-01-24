@@ -9,6 +9,8 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+# @cond
+
 import torch
 import numpy as np
 from torch.utils.data import Dataset
@@ -43,11 +45,15 @@ class ClusterImage(Dataset):
         self.energy = np.clip(self.energy, 0, 1.0)
 
         theta_input = params['thetaId']
-        theta_input = LabelEncoder().fit_transform(theta_input.ravel())
+        encoder_theta_input = LabelEncoder()
+        encoder_theta_input.fit(np.array([float(i) for i in range(14, 58)]))
+        theta_input = encoder_theta_input.transform(theta_input.ravel())
         self.theta_input = torch.from_numpy(theta_input)
 
         phi_input = params['phiId']
-        phi_input = LabelEncoder().fit_transform(phi_input.ravel())
+        encoder_phi_input = LabelEncoder()
+        encoder_phi_input.fit(np.array([float(i) for i in range(0, 144)]))
+        phi_input = encoder_phi_input.transform(phi_input.ravel())
         self.phi_input = torch.from_numpy(phi_input)
 
         pt = params['pt'].astype(dtype=np.float32)
@@ -63,3 +69,4 @@ class ClusterImage(Dataset):
                self.theta_input[idx],
                self.phi_input[idx],
                self.pt[idx])
+# @endcond

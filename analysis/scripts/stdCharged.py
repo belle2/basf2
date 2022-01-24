@@ -282,7 +282,7 @@ def stdLep(
 
     # Here we must run the BDT if requested.
     if method == "bdt":
-        if classification == "multiclass":
+        if classification == "global":
             ma.applyChargedPidMVA(particleLists=[plistname],
                                   path=path,
                                   trainingMode=trainingModeMulticlass)

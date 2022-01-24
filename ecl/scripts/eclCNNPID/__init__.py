@@ -10,4 +10,4 @@
 ##########################################################################
 
 
-from .cnn_pid_ecl_module import CNN_PID_ECL
+from .cnn_pid_ecl_module import CNN_PID_ECL  # noqa

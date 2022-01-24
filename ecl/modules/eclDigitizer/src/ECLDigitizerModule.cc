@@ -48,9 +48,9 @@ REG_MODULE(ECLDigitizer)
 //-----------------------------------------------------------------
 
 ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECLDigitWaveformParametersForMC"),
-  m_waveformParameters("ECLWaveformData"),
+  m_waveformParameters("ECLWFParameters"),
   m_algoParameters("ECLWFAlgoParams"),
-  m_noiseParameters("ECLNoiseData")
+  m_noiseParameters("ECLWFNoiseParams")
 {
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");
@@ -648,7 +648,7 @@ void ECLDigitizerModule::readDSPDB()
   tree->SetBranchStatus("ncellId", 0); // do not read it at the moment
   tree->SetBranchStatus("cellId", 0); // do not read it at the moment
 
-// fill parameters for each (Waveform x AlgoParams) parameter set
+  // fill parameters for each (Waveform x AlgoParams) parameter set
   for (unsigned int ip = 0; ip < pairIdx.size(); ip++) {
     const uint_pair_t& p = pairIdx[ip];
     tree->GetEntry(p.first); // retrieve data to eclWFData pointer

@@ -159,8 +159,8 @@ namespace Belle2 {
     /** dbobject for electronics noise covariance matrix */
     DBObjPtr<TTree> m_noiseParameters;
 
-    /** If true, use m_waveformParameters and m_algoParameters.
-     *  If false, use the data from ecl/data/ECL-WF.root and ECL-WF-BG.root
+    /** If true, use m_waveformParameters, m_algoParameters, m_noiseParameters.
+     *  If false, use the data from ecl/data/ECL-WF.root or ECL-WF-BG.root
      */
     bool m_useWaveformParameters;
 

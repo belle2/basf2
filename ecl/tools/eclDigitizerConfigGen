@@ -196,9 +196,9 @@ def main():
     #==== Save data, both to localdb and to ECL-WF.root
 
     db = Database.Instance()
-    db.storeData('ECLWaveformData', t1, Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN))
-    db.storeData('ECLWFAlgoParams', t2, Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN))
-    db.storeData('ECLNoiseData'   , t3, Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN))
+    db.storeData('ECLWFParameters' , t1, Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN))
+    db.storeData('ECLWFAlgoParams' , t2, Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN))
+    db.storeData('ECLWFNoiseParams', t3, Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN))
 
     f_out = ROOT.TFile('ECL-WF.root', 'recreate')
     t1.Write()

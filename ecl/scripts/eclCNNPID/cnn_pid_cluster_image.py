@@ -46,6 +46,9 @@ class ClusterImage(Dataset):
 
         theta_input = params['thetaId']
         encoder_theta_input = LabelEncoder()
+        # Since CNN can only predict PID of the tracks inside the barrel,
+        # there are two hard-coded numbers in the following line (14 and 58),
+        # representing the thetaID limit.
         encoder_theta_input.fit(np.array([float(i) for i in range(14, 58)]))
         theta_input = encoder_theta_input.transform(theta_input.ravel())
         self.theta_input = torch.from_numpy(theta_input)

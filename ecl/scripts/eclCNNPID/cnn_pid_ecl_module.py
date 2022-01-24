@@ -120,7 +120,9 @@ class CNN_PID_ECL(b2.Module):
                     b2.B2WARNING('maxCellId is less 0.')
                     return(np.nan, np.nan)
                 else:
-
+                    # Since CNN can only predict PID of the tracks inside the barrel,
+                    # there are two hard-coded numbers in the __init__ (13 and 58),
+                    # representing the thetaID limit.
                     if (self.extThetaId > self.thetaId_range[0] and
                         self.extThetaId < self.thetaId_range[1] and
                         self.pt >= self.pt_range[0] and

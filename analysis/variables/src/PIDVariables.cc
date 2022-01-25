@@ -387,6 +387,31 @@ namespace Belle2 {
                                                                 pdgCodeTest) + ", SVD, CDC, ARICH, ECL, KLM)")->function(part));
     }
 
+    double electronID_noSVD_noTOP(const Particle* part)
+    {
+      // Excluding SVD and TOP for electron ID. This variable is temporary. BII-8444, BII-8760.
+      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, ARICH, ECL, KLM)")->function(part));
+    }
+
+    double binaryPID_noSVD_noTOP(const Particle* part, const std::vector<double>& arguments)
+    {
+      // Excluding SVD and TOP for electron ID. This is temporary. BII-8444, BII-8760.
+      if (arguments.size() != 2) {
+        B2ERROR("The variable binaryPID_noSVD_noTOP needs exactly two arguments: the PDG codes of two hypotheses.");
+        return std::numeric_limits<float>::quiet_NaN();;
+      }
+      int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
+      int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
+      std::vector<int> pdgIds {pdgCodeHyp, pdgCodeTest};
+      if (!std::any_of(pdgIds.begin(), pdgIds.end(), [](int p) {return (p != Const::electron.getPDGCode());})) {
+        B2ERROR("The variable binaryPID_noSVD_noTOP is defined only for particle hypothesis: 11.");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      return std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(
+                                                                pdgCodeHyp) + ", " + std::to_string(
+                                                                pdgCodeTest) + ", CDC, ARICH, ECL, KLM)")->function(part));
+    }
+
     double antineutronID(const Particle* particle)
     {
       if (particle->hasExtraInfo("nbarID")) {
@@ -610,6 +635,18 @@ namespace Belle2 {
     REGISTER_METAVARIABLE("binaryPID(pdgCode1, pdgCode2)", binaryPID,
                           "Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components",
                           Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("nbarID", antineutronID, R"DOC(
+Returns MVA classifier for antineutron PID.
+
+    - 1  signal(antineutron) like
+    - 0  background like
+    - -1 invalid using this PID due to some ECL variables used unavailable
+
+This PID is only for antineutron. Neutron is also considered as background.
+The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `clusterLAT`, `clusterE1E9`, `clusterE9E21`,
+`clusterAbsZernikeMoment40`, `clusterAbsZernikeMoment51`, `clusterZernikeMVA`.)DOC");
+
+    // Special temporary variables defined for users' convenience.
     REGISTER_VARIABLE("electronID_noSVD", electronID_noSVD,
                       "(SPECIAL (TEMP) variable) electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors *excluding the SVD*");
     REGISTER_VARIABLE("muonID_noSVD", muonID_noSVD,
@@ -630,16 +667,11 @@ namespace Belle2 {
     REGISTER_METAVARIABLE("binaryPID_noTOP(pdgCode1, pdgCode2)", binaryPID_noTOP,
                           "(SPECIAL (TEMP) variable) Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the TOP*. Note that either hypothesis in the pair *must be of an electron*.",
                           Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("nbarID", antineutronID, R"DOC(
-Returns MVA classifier for antineutron PID.
-
-    - 1  signal(antineutron) like
-    - 0  background like
-    - -1 invalid using this PID due to some ECL variables used unavailable
-
-This PID is only for antineutron. Neutron is also considered as background.
-The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `clusterLAT`, `clusterE1E9`, `clusterE9E21`,
-`clusterAbsZernikeMoment40`, `clusterAbsZernikeMoment51`, `clusterZernikeMVA`.)DOC");
+    REGISTER_VARIABLE("electronID_noSVD_noTOP", electronID_noSVD_noTOP,
+                      "(SPECIAL (TEMP) variable) electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors *excluding the SVD and the TOP*");
+    REGISTER_METAVARIABLE("binaryPID_noSVD_noTOP(pdgCode1, pdgCode2)", binaryPID_noSVD_noTOP,
+                          "(SPECIAL (TEMP) variable) Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the SVD and the TOP*. Note that either hypothesis in the pair *must be of an electron*.",
+                          Manager::VariableDataType::c_double);
 
     // Metafunctions for experts to access the basic PID quantities
     VARIABLE_GROUP("PID_expert");

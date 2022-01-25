@@ -365,7 +365,26 @@ namespace Belle2 {
     double electronID_noTOP(const Particle* part)
     {
       // Excluding TOP for electron ID. This variable is temporary. BII-8444
-      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, SVD, ARICH, ECL, KLM)")->function(part));
+      return std::get<double>(Manager::Instance().getVariable("pidProbabilityExpert(11, SVD, CDC, ARICH, ECL, KLM)")->function(part));
+    }
+
+    double binaryPID_noTOP(const Particle* part, const std::vector<double>& arguments)
+    {
+      // Excluding TOP for electron ID. This is temporary. BII-8444
+      if (arguments.size() != 2) {
+        B2ERROR("The variable binaryPID_noTOP needs exactly two arguments: the PDG codes of two hypotheses.");
+        return std::numeric_limits<float>::quiet_NaN();;
+      }
+      int pdgCodeHyp = std::abs(int(std::lround(arguments[0])));
+      int pdgCodeTest = std::abs(int(std::lround(arguments[1])));
+      std::vector<int> pdgIds {pdgCodeHyp, pdgCodeTest};
+      if (!std::any_of(pdgIds.begin(), pdgIds.end(), [](int p) {return (p != Const::electron.getPDGCode());})) {
+        B2ERROR("The variable binaryPID_noTOP is defined only for particle hypothesis: 11.");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      return std::get<double>(Manager::Instance().getVariable("pidPairProbabilityExpert(" + std::to_string(
+                                                                pdgCodeHyp) + ", " + std::to_string(
+                                                                pdgCodeTest) + ", SVD, CDC, ARICH, ECL, KLM)")->function(part));
     }
 
     double antineutronID(const Particle* particle)
@@ -608,6 +627,9 @@ namespace Belle2 {
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("electronID_noTOP", electronID_noTOP,
                       "(SPECIAL (TEMP) variable) electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors *excluding the TOP*");
+    REGISTER_METAVARIABLE("binaryPID_noTOP(pdgCode1, pdgCode2)", binaryPID_noTOP,
+                          "(SPECIAL (TEMP) variable) Returns the binary probability for the first provided mass hypothesis with respect to the second mass hypothesis using all detector components, *excluding the TOP*. Note that either hypothesis in the pair *must be of an electron*.",
+                          Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("nbarID", antineutronID, R"DOC(
 Returns MVA classifier for antineutron PID.
 
@@ -642,13 +664,13 @@ The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `cluste
     REGISTER_METAVARIABLE("pidMostLikelyPDG(ePrior=1/6, muPrior=1/6, piPrior=1/6, KPrior=1/6, pPrior=1/6, dPrior=1/6)", mostLikelyPDG,
                           R"DOC(
 Returns PDG code of the largest PID likelihood, or NaN if PID information is not available.
-This function accepts either no arguments, or 6 floats as priors for the charged particle hypotheses 
+This function accepts either no arguments, or 6 floats as priors for the charged particle hypotheses
 following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pidIsMostLikely(ePrior=1/6, muPrior=1/6, piPrior=1/6, KPrior=1/6, pPrior=1/6, dPrior=1/6)", isMostLikely,
                           R"DOC(
 Returns True if the largest PID likelihood of a given particle corresponds to its particle hypothesis.
-This function accepts either no arguments, or 6 floats as priors for the charged particle hypotheses 
+This function accepts either no arguments, or 6 floats as priors for the charged particle hypotheses
 following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC",
                           Manager::VariableDataType::c_bool);
 
@@ -672,7 +694,7 @@ Returns 0.5 in case there is no likelihood found and returns zero if the muon li
 Returns zero/false if not usable or if there is no PID found.
     )DOC");
     REGISTER_VARIABLE("eIDBelle", eIDBelle, R"DOC(
-[Legacy] Returns Belle's electron ID ``eid(3,-1,5).prob()`` variable. 
+[Legacy] Returns Belle's electron ID ``eid(3,-1,5).prob()`` variable.
 Returns 0.5 in case there is no likelihood found (Belle behaviour).
 
 .. warning:: The behaviour is different from Belle II PID variables which typically return NaN in case of error.

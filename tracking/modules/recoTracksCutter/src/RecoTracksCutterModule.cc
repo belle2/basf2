@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/recoTracksCopier/RecoTracksCutterModule.h>
+#include <tracking/modules/recoTracksCutter/RecoTracksCutterModule.h>
 
 using namespace Belle2;
 

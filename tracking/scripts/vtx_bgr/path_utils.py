@@ -13,7 +13,12 @@ from vtx_bgr.modules.collector import VTXTrackCollector
 
 
 def set_weightFileIdentifier(path, weightFileIdentifier):
-    """Set weightFileIdentifier parameter of first python basf2 module named VTXBgRemover."""
+    """
+    Set weightFileIdentifier parameter of first python basf2 module named VTXBgRemover.
+
+    :param path: The path where to search VTXBgRemover module
+    :param weightFileIdentifier(str): Identifier for classifier in condition data base
+    """
 
     for e in path.modules():
         if e.name() == "VTXBgRemover":
@@ -30,6 +35,15 @@ def add_vtx_bg_remover(
     vtx_bg_cut=0.0,
     weightFileIdentifier='vxdtf2_vtx_bgr_mva',
 ):
+    """
+    This function adds all modules for the VTX background fake track remover to the path.
+
+    :param path: The path to add the fake track remover modules to
+    :param inputStoreArrayName: Store array name for Belle2.RecoTracks built from VTX hits
+    :param outputStoreArrayName: Store array name for cleaned Belle2.RecoTracks after removing fakes
+    :param vtx_bg_cut: Cut value in range [0,1] applied to classifier output
+    :param weightFileIdentifier: Identifier for classifier in condition data base
+    """
 
     bg_remover = VTXBgRemover(
         trackCandidatesColumnName=inputStoreArrayName,
@@ -51,6 +65,13 @@ def add_vtx_bg_collector(
     trainingDataOutputName="train.root",
     trackCandidatesColumnName="VTXRecoTracks",
 ):
+    """
+    This function adds all modules for the VTX background collector to the path.
+
+    :param path: The path to add the collector modules to
+    :param trainingDataOutputName: Name of root file with collected training data
+    :param trackCandidatesColumnName: Store array name for Belle2.RecoTracks which needs fake track cleaning
+    """
 
     # Data collection for training
     vtx_collector = VTXTrackCollector(

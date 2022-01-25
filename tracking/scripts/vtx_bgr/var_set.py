@@ -61,9 +61,16 @@ var_set = [
 
 def extract_target(reco_track):
     """
-    Returns classifier label (target) for given track
-    Track is Signal, if all VTXClusters have a related VTXTrueHit.
-    Tracks from background overlay do not have VTXTrueHits.
+    Returns classifier label (target) for input Belle2.RecoTrack
+    The track is Signal, if all VTXClusters have a related VTXTrueHit.
+    Tracks from background overlay do not have VTXTrueHits and are not signal.
+
+    Args:
+    reco_track: Belle2.RecoTrack
+
+    Returns:
+    bool: truth target (or label) of input reco_track
+
     """
 
     for hit in reco_track.getSortedVTXHitList():
@@ -76,7 +83,13 @@ def extract_target(reco_track):
 
 def extract_features(reco_track):
     """
-    Returns array of input feature vector to classifier for given track.
+    Returns array of features values extracted from Belle2.RecoTrack.
+
+    Args:
+    reco_track: Belle2.RecoTrack
+
+    Returns:
+    np.ndarray: Array of features of reco_track.
     """
 
     # Output array

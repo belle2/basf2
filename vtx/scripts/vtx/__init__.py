@@ -9,6 +9,10 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+import os
+import glob
+from basf2 import B2INFO
+from basf2.utils import pretty_print_table
 
 # Dictionary containing global tag names for Belle II upgrade flavors with VTX
 valid_upgrade_globaltags = {"upgrade_globaltag_vtx_7layer": "upgrade_2022-01-21_vtx_7layer",
@@ -62,9 +66,6 @@ def get_upgrade_globaltag():
     BELLE2_VTX_UPGRADE_GT or raises an error if the variable is not set.
     """
 
-    import os
-    from basf2 import B2INFO
-
     env_name = 'BELLE2_VTX_UPGRADE_GT'
     upgrade_globaltag = ''
 
@@ -97,11 +98,6 @@ def get_upgrade_background_files(folder=None, output_file_info=True):
                                 This is useful to understand later which background campaign has been used
                                 to simulate events.
     """
-
-    import os
-    import glob
-    from basf2.utils import pretty_print_table
-    from basf2 import B2INFO
 
     env_name = 'BELLE2_VTX_BACKGROUND_DIR'
     bg = None
@@ -154,11 +150,6 @@ def get_upgrade_background_mixer_files(folder=None, output_file_info=True):
                                 This is useful to understand later which background campaign has been used
                                 to simulate events.
     """
-
-    import os
-    import glob
-    from basf2.utils import pretty_print_table
-    from basf2 import B2INFO
 
     env_name = 'BELLE2_VTX_BACKGROUND_MIXING_DIR'
     bg = None

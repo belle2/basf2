@@ -72,6 +72,8 @@ class VTXBgRemover(b2.Module):
         """
         Initialize mva expert, dataset and features
         Called everytime the weightfile in the database changes in begin run
+
+        :param weightfile: instance of Belle2.MVA.Weightfile
         """
 
         supported_interfaces = Belle2.MVA.AbstractInterface.getSupportedInterfaces()
@@ -89,6 +91,8 @@ class VTXBgRemover(b2.Module):
     def analyse(self, trackCand):
         """
         Calculates expert output for given candidate track
+
+        :param trackCand: Belle2.RecoTrack to analyze with expert
         """
 
         if not self.m_expert:

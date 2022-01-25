@@ -88,7 +88,12 @@ class VTXTrackCollector(b2.Module):
                 self.tree.Fill()
 
     def select_track(self, trackCand, target):
-        """Selects which tracks should be used to produce training data"""
+        """
+        Returns a bool to decide which tracks are picked for training.
+
+        :param trackCand: Belle2.RecoTrack that could be used for training
+        :param target: Truth label of trackCand
+        """
 
         nhits = trackCand.getNumberOfVTXHits()
 

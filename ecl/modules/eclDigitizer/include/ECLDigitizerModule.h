@@ -159,10 +159,8 @@ namespace Belle2 {
     /** dbobject for electronics noise covariance matrix */
     DBObjPtr<TTree> m_noiseParameters;
 
-    /** If true, use m_waveformParameters, m_algoParameters, m_noiseParameters.
-     *  If false, use the data from ecl/data/ECL-WF.root or ECL-WF-BG.root
-     */
-    bool m_useWaveformParameters;
+    /** Always load waveform parameters at least once */
+    bool m_loadOnce = true;
 
     /** callback hadron signal shapes from database*/
     void callbackHadronSignalShapes();
@@ -212,5 +210,9 @@ namespace Belle2 {
     bool m_trigTime; /**< Use trigger time from beam background overlay */
     std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
     bool m_dspDataTest; /**< DSP data usage flag */
+    /** If true, use m_waveformParameters, m_algoParameters, m_noiseParameters.
+     *  If false, use the data from ecl/data/ECL-WF.root or ECL-WF-BG.root
+     */
+    bool m_useWaveformParameters;
   };
 }//Belle2

@@ -80,7 +80,7 @@ ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECL
            "will significantly reduce performance so this option is to be "
            "used for testing only.", false);
   addParam("useWaveformParameters", m_useWaveformParameters,
-           "Use ECLWaveformData and ECLWFAlgoParams payloads", true);
+           "Use ECLWF{Parameters,AlgoParams,NoiseParams} payloads", true);
 
 }
 
@@ -117,8 +117,6 @@ void ECLDigitizerModule::initialize()
   if (m_waveformMaker)
     m_eclWaveforms.registerInDataStore(m_eclWaveformsName);
 
-  readDSPDB();
-
   m_adc.resize(EclConfiguration::m_nch);
 
   EclConfiguration::get().setBackground(m_background);
@@ -136,6 +134,11 @@ void ECLDigitizerModule::beginRun()
       Tmc("ECLMCTimeOffset"),
       Awave("ECL_FPGA_StoreWaveform");
   double ns_per_tick = 1.0 / (4.0 * ec.m_rf) * 1e3;// ~0.49126819903043308239 ns/tick
+
+  if (m_useWaveformParameters || m_loadOnce) {
+    readDSPDB();
+    m_loadOnce = false;
+  }
 
   calibration_t def = {1, 0};
   m_calib.assign(8736, def);
@@ -540,25 +543,37 @@ void ECLDigitizerModule::readDSPDB()
 {
   const EclConfiguration& ec = EclConfiguration::get();
 
-  string dataFileName;
-  if (m_background) {
-    dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-BG.root");
-    B2DEBUG(150, "ECLDigitizer: Reading configuration data with background from: " << dataFileName);
-  } else {
-    dataFileName = FileSystem::findFile("/data/ecl/ECL-WF.root");
-    B2DEBUG(150, "ECLDigitizer: Reading configuration data without background from: " << dataFileName);
-  }
-  assert(! dataFileName.empty());
-
-  TFile rootfile(dataFileName.c_str());
-  TTree* tree  = (TTree*) rootfile.Get("EclWF");
-  TTree* tree2 = (TTree*) rootfile.Get("EclAlgo");
-  TTree* tree3 = (TTree*) rootfile.Get("EclNoise");
+  TFile rootfile;
+  TTree* tree  = nullptr;
+  TTree* tree2 = nullptr;
+  TTree* tree3 = nullptr;
 
   if (m_useWaveformParameters) {
+    bool hasChanged = false;
+    hasChanged |= m_waveformParameters.hasChanged();
+    hasChanged |= m_algoParameters.hasChanged();
+    hasChanged |= m_noiseParameters.hasChanged();
+
+    if (!hasChanged) return;
+
     tree  = const_cast<TTree*>(&*m_waveformParameters);
     tree2 = const_cast<TTree*>(&*m_algoParameters);
     tree3 = const_cast<TTree*>(&*m_noiseParameters);
+  } else {
+    string dataFileName;
+    if (m_background) {
+      dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-BG.root");
+      B2DEBUG(150, "ECLDigitizer: Reading configuration data with background from: " << dataFileName);
+    } else {
+      dataFileName = FileSystem::findFile("/data/ecl/ECL-WF.root");
+      B2DEBUG(150, "ECLDigitizer: Reading configuration data without background from: " << dataFileName);
+    }
+    assert(! dataFileName.empty());
+
+    rootfile.Open(dataFileName.c_str());
+    tree  = (TTree*) rootfile.Get("EclWF");
+    tree2 = (TTree*) rootfile.Get("EclAlgo");
+    tree3 = (TTree*) rootfile.Get("EclNoise");
   }
 
   if (tree == 0 || tree2 == 0 || tree3 == 0) B2FATAL("Data not found");
@@ -677,7 +692,7 @@ void ECLDigitizerModule::readDSPDB()
 
   if (eclWFData) delete eclWFData;
 
-  rootfile.Close();
+  if (!m_useWaveformParameters) rootfile.Close();
 }
 
 void ECLDigitizerModule::repack(const ECLWFAlgoParams& eclWFAlgo, algoparams_t& t)

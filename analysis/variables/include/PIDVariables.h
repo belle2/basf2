@@ -156,10 +156,9 @@ namespace Belle2 {
 
     /**
      * SPECIAL (TEMP) variable (BII-8444).
-     * @return binary PID between two particle hypotheses, where either in the pair must be of an electron,
-     * without TOP information.
+     * @return binary PID between electron hypothesis and another hypothesis, without TOP information.
      */
-    double binaryPID_noTOP(const Particle* part, const std::vector<double>& arguments);
+    double binaryElectronID_noTOP(const Particle* part, const std::vector<double>& arguments);
 
     /**
      * SPECIAL (TEMP) variable (BII-8444, BII-8760).
@@ -169,10 +168,9 @@ namespace Belle2 {
 
     /**
      * SPECIAL (TEMP) variable (BII-8444, BII-8760).
-     * @return binary PID between two particle hypotheses, where either in the pair must be of an electron,
-     * without SVD and TOP information.
+     * @return binary PID between electron hypothesis and another hypothesis, without TOP information.
      */
-    double binaryPID_noSVD_noTOP(const Particle* part, const std::vector<double>& arguments);
+    double binaryElectronID_noSVD_noTOP(const Particle* part, const std::vector<double>& arguments);
 
     /**
     * returns the MVA score for anti-neutron PID (not for neutron)

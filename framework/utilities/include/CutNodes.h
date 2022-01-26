@@ -367,11 +367,13 @@ namespace Belle2 {
           if (std::isnan(std::get<double>(ret))) {
             return false;
           }
-          B2WARNING("Static casting of double value to bool in cutstring evaluation." <<  LogVar("Cut substring",
-                    m_enode->decompile()) << LogVar(" Casted value", std::get<double>(ret)) << LogVar("Casted to", "true"));
+          if (std::get<double>(ret) != 1.0)
+            B2WARNING("Static casting of double value to bool in cutstring evaluation." <<  LogVar("Cut substring",
+                      m_enode->decompile()) << LogVar(" Casted value", std::get<double>(ret)) << LogVar("Casted to", "true"));
         } else {
-          B2WARNING("Static casting of double value to bool in cutstring evaluation." <<  LogVar("Cut substring",
-                    m_enode->decompile()) << LogVar(" Casted value", std::get<double>(ret)) << LogVar("Casted to", "false"));
+          if (std::get<double>(ret) != 0.0)
+            B2WARNING("Static casting of double value to bool in cutstring evaluation." <<  LogVar("Cut substring",
+                      m_enode->decompile()) << LogVar(" Casted value", std::get<double>(ret)) << LogVar("Casted to", "false"));
         }
 
         return static_cast<bool>(std::get<double>(ret));

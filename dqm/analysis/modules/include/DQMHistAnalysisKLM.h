@@ -116,13 +116,6 @@ namespace Belle2 {
      */
     void fillMaskedChannelsHistogram(const std::string& histName);
 
-    /**
-     * Find TCanvas that matches a given name.
-     * @param[in]  canvasName  Name of the desired TCanvas.
-     * @param[out] TCanvas*    Matching TCanvas.
-     */
-    TCanvas* findCanvas(const std::string& canvasName);
-
     /** Number of processed events. */
     double m_ProcessedEvents;
 

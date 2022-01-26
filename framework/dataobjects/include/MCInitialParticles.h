@@ -117,7 +117,7 @@ namespace Belle2 {
     void setTime(double time) {m_time = time;}
 
     /** Set the generation flags to be used for event generation (ORed combination of EGenerationFlags) */
-    void setGenerationFlags(int flags) { m_generationFlags = flags; }
+    virtual void setGenerationFlags(int flags) { m_generationFlags = flags; }
 
     /** Get 4vector of the high energy beam */
     const TLorentzVector& getHER() const { return m_her; }
@@ -184,8 +184,14 @@ namespace Belle2 {
     mutable double m_invariantMass{0.0}; //!transient
     /** Flag to check if a valid MCInitialParticles object was already generated and filled in an event. */
     bool m_validFlag = false;
+
+  protected:
+
     /** Flags to be used when generating events */
     int m_generationFlags{0};
+
+  private:
+
     /** ROOT Dictionary */
     ClassDef(MCInitialParticles, 3);
   };

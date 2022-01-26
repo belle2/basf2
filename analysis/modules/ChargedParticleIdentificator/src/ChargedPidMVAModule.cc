@@ -177,7 +177,7 @@ void ChargedPidMVAModule::event()
         } else if (std::holds_alternative<bool>(varobj->function(particle))) {
           var = std::get<bool>(varobj->function(particle));
         } else {
-          B2ERROR("Variable '" << varobj->name << "' has wrong data type! It must be either double or integer or bool.");
+          B2ERROR("Variable '" << varobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
         }
 
         // Manual imputation value of -999 for NaN (undefined) variables.
@@ -204,7 +204,7 @@ void ChargedPidMVAModule::event()
         } else if (std::holds_alternative<bool>(specobj->function(particle))) {
           spec = std::get<bool>(specobj->function(particle));
         } else {
-          B2ERROR("Variable '" << specobj->name << "' has wrong data type! It must be either double or integer or bool.");
+          B2ERROR("Variable '" << specobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
         }
 
         B2DEBUG(12, "\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);

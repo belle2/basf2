@@ -156,3 +156,4 @@ The CDC QE rejection cut is conducted just after the :ref:`CDC Track Finding<tra
 
 It is assumed that the modelling of more properties with large separation potential between fakes, clones and truth tracks improved in the last MC productions. Moreover, a tightening of the CDC QE rejection threshold and the activation of the VXD- and Recotrack-QE would further increase the fake- and clone rejection while maintaining the same track finding efficiency.
 In previous studies, simply the inclusion of the other two MVAs decreases the fake rate by another 50% and the clone rate by another 30%.
+A tightening of the CDC QE threshold alone increased the primary finding efficiency by 2% as less fakes and clones block truth hits such that track extraploation from the SVD was able to find more truth tracks in the end.

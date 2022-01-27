@@ -221,9 +221,6 @@ def stdLep(pdgId,
         (str): the alias for the lepton ID variable.
     """
 
-    b2.B2INFO(f"Prepending GT with LID corrections: {lid_weights_gt}")
-    b2.conditions.prepend_globaltag(lid_weights_gt)
-
     working_points = (
         "FixedThresh05",
         "FixedThresh09",
@@ -250,6 +247,9 @@ def stdLep(pdgId,
     if classification not in available_classificators:
         b2.B2ERROR(f"classification: {classification}. Must be any of: {available_classificators}.")
         return None
+
+    b2.B2INFO(f"Prepending GT with LID corrections: {lid_weights_gt}")
+    b2.conditions.prepend_globaltag(lid_weights_gt)
 
     # We stick to positive pdgId by convention.
     # Anyway, the particle list will be filled for anti-particles too.

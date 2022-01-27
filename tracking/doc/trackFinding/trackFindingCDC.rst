@@ -10,6 +10,6 @@ In this section we briefly describe the CDC standalone track finding.
 
 CDC Quality Indicator
 """""""""""""""""""""
-Finally, all CDCTracks are rejected that do not exceed a CDC quality indicator threshold based on a BDT.
-This BDT was designed to reject fake and clone tracks while maintaining a high finding efficiency.
-More information is given in :ref:`Track Matching<trk_matching>`.
+Finally, all CDCTracks with a CDC quality indicator below threshold are rejected.
+The CDC Quality Indicator is the output of a BDT that was designed and trained to reject fake and clone tracks while maintaining a high finding efficiency.
+More information is given in the :ref:`Track quality indicators<tracking_qualityIndicators>` section.

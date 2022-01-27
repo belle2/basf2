@@ -1006,7 +1006,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("p", particleP, "momentum magnitude", "GeV/c");
     REGISTER_VARIABLE("E", particleE, "energy", "GeV");
 
-    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy uncertainty (:math:`\sqrt{\sigma^2}`)", "GeV");
+    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, R"DOC(energy uncertainty (:math:`\sqrt{\sigma^2}`)DOC", "GeV");
     REGISTER_VARIABLE("ECLClusterE_uncertainty", particleClusterEUncertainty,
                       "energy uncertainty as given by the underlying ECL cluster", "GeV");
     REGISTER_VARIABLE("px", particlePx, "momentum component x", "GeV/c");
@@ -1024,9 +1024,7 @@ namespace Belle2 {
                       "returns the (i,j)-th element of the MomentumVertex Covariance Matrix (7x7).\n"
                       "Order of elements in the covariance matrix is: px, py, pz, E, x, y, z.", "GeV/c, GeV/c, GeV/c, GeV, cm, cm, cm");
     REGISTER_VARIABLE("momDevChi2", momentumDeviationChi2,
-                      "momentum deviation :math:`\chi^2` value calculated as"
-                      ":math:`\chi^2 = \sum_i (p_i - mc(p_i))^2/\sigma(p_i)^2`, where :math:`\sum` runs over i = px, py, pz and"
-                      ":math:`mc(p_i)` is the mc truth value and :math:`\sigma(p_i)` is the estimated error of i-th component of momentum vector");
+                      R"DOC(momentum deviation :math:`\chi^2` value calculated as :math:`\chi^2 = \sum_i (p_i - mc(p_i))^2/\sigma(p_i)^2`, where :math:`\sum` runs over i = px, py, pz and :math:`mc(p_i)` is the mc truth value and :math:`\sigma(p_i)` is the estimated error of i-th component of momentum vector)DOC");
     REGISTER_VARIABLE("theta", particleTheta, "polar angle in radians", "rad");
     REGISTER_VARIABLE("thetaErr", particleThetaErr, "error of polar angle in radians", "rad");
     REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
@@ -1047,7 +1045,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosToThrustOfEvent", cosToThrustOfEvent,
                       "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable");
 
-    REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
+    REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane", "cm");
 
     REGISTER_VARIABLE("M", particleMass, R"DOC(
 The particle's mass.
@@ -1060,23 +1058,23 @@ Note that this is context-dependent variable and can take different values depen
 - If this particle is composite and a *mass or vertex fit* has been performed then this may be updated by the fit.
 
   * You will see a difference between this mass and the :b2:var:`InvM`.
-  )DOC", "GeV/c:math:`^2`");
-    REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass", "GeV/c:math:`^2`");
+  )DOC", "GeV/:math:`\\text{c}^2`");
+    REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("Q", particleQ, "energy released in decay", "GeV");
     REGISTER_VARIABLE("dQ", particleDQ, ":b2:var:`Q` minus nominal energy released in decay", "GeV");
-    REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass", "GeV/c:math:`^2`");
+    REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference", "GeV");
-    REGISTER_VARIABLE("M2", particleMassSquared, "The particle's mass squared.", "[GeV/c:math:`^2`]:math:`^2`");
+    REGISTER_VARIABLE("M2", particleMassSquared, "The particle's mass squared.", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
 
     REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughtersDisplaced,
                       "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle is V0 or decays at rho > 5 mm, its daughter 4-momentum vectors at fitted vertex are taken.\n"
-                      "If this particle has no daughters, defaults to :b2:var:`M`.", "GeV/c:math:`^2`");
+                      "If this particle has no daughters, defaults to :b2:var:`M`.", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
                       "Invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
-                      "If the particle has not 2 daughters, it returns just the mass value.", "GeV/c:math:`^2`");
+                      "If the particle has not 2 daughters, it returns just the mass value.", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
-                      "uncertainty of invariant mass", "GeV/c:math:`^2`");
+                      "uncertainty of invariant mass", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("SigM", particleInvariantMassSignificance,
                       "signed deviation of particle's invariant mass from its nominal mass in units of the uncertainty on the invariant mass (:b2:var:`dM`/:b2:var:`ErrM`)");
 
@@ -1096,12 +1094,12 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("eRecoil", recoilEnergy,
                       "energy recoiling against given Particle", "GeV");
     REGISTER_VARIABLE("mRecoil", recoilMass,
-                      "Invariant mass of the system recoiling against given Particle", "GeV/c:math:`^2`");
+                      "Invariant mass of the system recoiling against given Particle", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
-                      "invariant mass squared of the system recoiling against given Particle", "[GeV/c:math:`^2`]:math:`^2`");
+                      "invariant mass squared of the system recoiling against given Particle", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
     REGISTER_VARIABLE("m2RecoilSignalSide", m2RecoilSignalSide,
                       "Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter",
-                      "[GeV/c:math:`^2`]:math:`^2`");
+                      ":math:`[\\text{GeV}/\\text{c}^2]^2`");
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,
                       "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.", "rad");

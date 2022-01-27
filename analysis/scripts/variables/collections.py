@@ -141,25 +141,17 @@ mc_variables = [
 
 #: PID variables
 pid = [
-    'kaonID',
+    'electronID',
+    'muonID',
     'pionID',
+    'kaonID',
     'protonID',
     'deuteronID',
-    'muonID',
-    'pidChargedBDTScore(13, ALL)',
-    'electronID',
-    'electronID_noTOP',
-    'electronID_noSVD_noTOP',
-    'pidChargedBDTScore(11, ALL)',
     'binaryPID(11, 211)',
-    'binaryElectronID_noTOP(211)',
-    'binaryElectronID_noSVD_noTOP(211)',
-    'pidPairChargedBDTScore(11, 211, ALL)',
     'binaryPID(13, 211)',
-    'pidPairChargedBDTScore(13, 211, ALL)',
     'binaryPID(211, 321)',
-    'binaryPID(211, 2212)',
     'binaryPID(321, 2212)',
+    'binaryPID(211, 2212)',
 ]
 
 #: Replacement for ROEMultiplicities tool

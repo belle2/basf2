@@ -16,7 +16,7 @@ vtx_bg_remover_teacher
 Purpose of this script
 ~~~~~~~~~~~~~~~~~~~~~~
 
-This python script is used for the training and validation of of one MVA classifier
+This python script is used for the training and validation of one MVA classifier
 for removing background tracks found in the VTX standalone trackfinding. The script
 is adapted from the script ``combined_quality_estimator_teacher.py``.
 
@@ -24,7 +24,7 @@ The standalone VTX track finder suffers from finding a sizeable number of tracks
 innermost 3-4 layers. These are mostly background electrons and positrons
 with few MeV transverse momentum from QED proceses at the IP. The purpose of the bg
 remover is to distinguisch these background tracks from low pT pions originating from
-BBar interactions (signal).
+BBBar interactions (signal).
 
 The classifier requires for its training a data set of and needs to be validated on
 a separate testing data set. For the classifier, a list of variables to be ignored is
@@ -42,7 +42,7 @@ file. For the purpose of creating a dependency graph, the `b2luigi
 `luigi <https://luigi.readthedocs.io>`_ packag developed by spotify.
 
 Each task that has to be done is represented by a special class, which defines
-which defines parameters, output files and which other tasks with which
+parameters, output files and which other tasks with which
 parameters it depends on.  For example a teacher task, which runs
 ``basf2_mva_teacher.py`` to train the classifier, depends on a data collection
 task which runs a reconstruction and writes out track-wise variables into a root
@@ -300,7 +300,7 @@ def get_uncertain_means_for_qi_cuts(df: upd.DataFrame, column: str, qi_cuts: Ite
     :param column: Column of which we want to aggregate the means
         and uncertainties for different QI cuts
     :param qi_cuts: Iterable of quality indicator minimal thresholds.
-    :returns: Series of of means and uncertainties with ``qi_cuts`` as index
+    :returns: Series of means and uncertainties with ``qi_cuts`` as index
     """
 
     uncertain_means = (_my_uncertain_mean(df.query(f"quality_indicator > {qi_cut}")[column])

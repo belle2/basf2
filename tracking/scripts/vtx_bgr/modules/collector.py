@@ -11,6 +11,7 @@ from pybasf2 import B2ERROR
 import basf2 as b2
 import ROOT
 from ROOT import Belle2, addressof
+from tracking.root_utils import root_cd
 import numpy as np
 
 
@@ -51,8 +52,6 @@ class VTXTrackCollector(b2.Module):
 
         #: Output file to store output tre
         self.rfile = ROOT.TFile(self.output_file_name, "RECREATE")
-        self.rfile.cd()
-
         #: TTree for output data
         self.tree = ROOT.TTree('tree', 'tree')
         #: Instance of TrackData class
@@ -84,8 +83,8 @@ class VTXTrackCollector(b2.Module):
 
                 setattr(self.trackData, target, truth)
 
-                self.rfile.cd()
-                self.tree.Fill()
+                with root_cd(self.rfile) as tfile:
+                    tfile.tree.Fill()
 
     def select_track(self, trackCand, target):
         """

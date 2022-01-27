@@ -27,7 +27,7 @@ def argparser():
 
     parser.add_argument("--lid_weights_gt",
                         type=str,
-                        default="leptonid_Moriond2022_Official_rel5_v1",
+                        default="leptonid_Moriond2022_Official_rel5_v1a",
                         help="Name of conditions DB global tag with recommended lepton ID correction factors.\n"
                         "Default: %(default)s.")
 
@@ -62,23 +62,23 @@ def main():
     # ----------
 
     ma.inputMdst(environmentType="default",
-                 filename=b2.find_file("mdst14.root", "validation"),
-                 entrySequence="0:1000",
+                 filename=b2.find_file("mdst13.root", "validation"),
+                 entrySequence="0:10000",
                  path=path)
 
     # ----------------------------------
     # Fill example standard lepton list.
     # ----------------------------------
 
-    electrons_fixed09 = "lh_G_fixed09"
-    electron_id_var = stdE("FixedThresh09", "likelihood", "global", args.lid_weights_gt,
-                           release=6,  # TMP: should be 5...
+    electrons_fixed09 = "lh_B_fixed09"
+    electron_id_var = stdE("FixedThresh09", "likelihood", "binary", args.lid_weights_gt,
+                           release=5,
                            listname=electrons_fixed09,
                            path=path)
 
     muons_uniform90 = "bdt_G_uniform90"
     muon_id_var = stdMu("UniformEff90", "bdt", "global", args.lid_weights_gt,
-                        release=6,  # TMP: should be 5...
+                        release=5,
                         listname=muons_uniform90,
                         path=path)
 
@@ -108,6 +108,8 @@ def main():
     variables_mu = []
 
     variables_jpsi += vc.kinematics
+    variables_jpsi += vc.inv_mass
+
     variables_e += vc.kinematics
     variables_mu += vc.kinematics
 
@@ -130,11 +132,7 @@ def main():
         f"weight_{electron_id_var}_misid_pi_FixedThresh09_rel_stat_dn",
         f"weight_{electron_id_var}_misid_pi_FixedThresh09_rel_sys_up",
         f"weight_{electron_id_var}_misid_pi_FixedThresh09_rel_sys_dn",
-        f"weight_{electron_id_var}_misid_K_FixedThresh09",
-        f"weight_{electron_id_var}_misid_K_FixedThresh09_rel_stat_up",
-        f"weight_{electron_id_var}_misid_K_FixedThresh09_rel_stat_dn",
-        f"weight_{electron_id_var}_misid_K_FixedThresh09_rel_sys_up",
-        f"weight_{electron_id_var}_misid_K_FixedThresh09_rel_sys_dn",
+        # NB: no K->l fake rates corrections (yet) for binary LID...
     ]
 
     variables_e += lid_e
@@ -177,7 +175,7 @@ def main():
         use_names=True)
     aliases_mu = vu.create_aliases_for_selected(
         variables_mu,
-        f"^J/psi:mumu -> ^mu+:{muons_uniform90} ^mu-:{muons_uniform90}",
+        f"J/psi:mumu -> ^mu+:{muons_uniform90} ^mu-:{muons_uniform90}",
         use_names=True)
 
     variables.printAliases()

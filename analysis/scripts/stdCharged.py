@@ -188,6 +188,11 @@ def stdLep(pdgId,
         for the given working point.
         In fact, the threshold value for the PID cut in such cases is set to NaN.
 
+    .. warning::
+        At the moment, the only supported *binary* lepton identification is against the **pion** hypothesis.
+        This implies that, if binary classification is chosen, only :math:`\\pi` fake rate corrections will be added to the
+        resulting particle list.
+
     Parameters:
         pdgId (int): the lepton pdg code.
         working_point (str): name of the chosen working point that defines the content of the list. Choose among the above values.
@@ -352,9 +357,10 @@ def stdLep(pdgId,
     path.add_module("ParticleWeighting",
                     particleList=plistname,
                     tableName=payload_misid_pi).set_name(f"ParticleWeighting_misid_pi_{plistname}")
-    path.add_module("ParticleWeighting",
-                    particleList=plistname,
-                    tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{plistname}")
+    if classification == "global":
+        path.add_module("ParticleWeighting",
+                        particleList=plistname,
+                        tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{plistname}")
 
     # Apply the PID selection cut, which is read from the efficiency payload.
     # The '>=' handles extreme cases in which the variable and the threshold value are at a boundary of the PID variable range.
@@ -365,7 +371,6 @@ def stdLep(pdgId,
     aliases_to_var = {
         f"weight_{pid_alias}_eff_{working_point}": f"extraInfo({payload_eff}_data_MC_ratio)",
         f"weight_{pid_alias}_misid_pi_{working_point}": f"extraInfo({payload_misid_pi}_data_MC_ratio)",
-        f"weight_{pid_alias}_misid_K_{working_point}": f"extraInfo({payload_misid_K}_data_MC_ratio)",
         # These aliases are *relative* variations, so they can be multiplied to the nominal
         # to get the varied value:
         #
@@ -390,15 +395,20 @@ def stdLep(pdgId,
         f"formula(1+[extraInfo({payload_misid_pi}_data_MC_uncertainty_sys_up)/extraInfo({payload_misid_pi}_data_MC_ratio)])",
         f"weight_{pid_alias}_misid_pi_{working_point}_rel_sys_dn":
         f"formula(1-[extraInfo({payload_misid_pi}_data_MC_uncertainty_sys_dn)/extraInfo({payload_misid_pi}_data_MC_ratio)])",
-        f"weight_{pid_alias}_misid_K_{working_point}_rel_stat_up":
-        f"formula(1+[extraInfo({payload_misid_K}_data_MC_uncertainty_stat_up)/extraInfo({payload_misid_K}_data_MC_ratio)])",
-        f"weight_{pid_alias}_misid_K_{working_point}_rel_stat_dn":
-        f"formula(1-[extraInfo({payload_misid_K}_data_MC_uncertainty_stat_dn)/extraInfo({payload_misid_K}_data_MC_ratio)])",
-        f"weight_{pid_alias}_misid_K_{working_point}_rel_sys_up":
-        f"formula(1+[extraInfo({payload_misid_K}_data_MC_uncertainty_sys_up)/extraInfo({payload_misid_K}_data_MC_ratio)])",
-        f"weight_{pid_alias}_misid_K_{working_point}_rel_sys_dn":
-        f"formula(1-[extraInfo({payload_misid_K}_data_MC_uncertainty_sys_dn)/extraInfo({payload_misid_K}_data_MC_ratio)])",
     }
+    if classification == "global":
+        aliases_to_var.update({
+            f"weight_{pid_alias}_misid_K_{working_point}": f"extraInfo({payload_misid_K}_data_MC_ratio)",
+            #
+            f"weight_{pid_alias}_misid_K_{working_point}_rel_stat_up":
+            f"formula(1+[extraInfo({payload_misid_K}_data_MC_uncertainty_stat_up)/extraInfo({payload_misid_K}_data_MC_ratio)])",
+            f"weight_{pid_alias}_misid_K_{working_point}_rel_stat_dn":
+            f"formula(1-[extraInfo({payload_misid_K}_data_MC_uncertainty_stat_dn)/extraInfo({payload_misid_K}_data_MC_ratio)])",
+            f"weight_{pid_alias}_misid_K_{working_point}_rel_sys_up":
+            f"formula(1+[extraInfo({payload_misid_K}_data_MC_uncertainty_sys_up)/extraInfo({payload_misid_K}_data_MC_ratio)])",
+            f"weight_{pid_alias}_misid_K_{working_point}_rel_sys_dn":
+            f"formula(1-[extraInfo({payload_misid_K}_data_MC_uncertainty_sys_dn)/extraInfo({payload_misid_K}_data_MC_ratio)])",
+        })
 
     for alias, var in aliases_to_var.items():
         variables.addAlias(alias, var)

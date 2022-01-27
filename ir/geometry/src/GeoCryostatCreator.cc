@@ -645,6 +645,14 @@ namespace Belle2 {
         double disk_dY = m_config.getParameter(prep + "diskDY") * unitFactor;
         double disk_dZ = m_config.getParameter(prep + "diskDZ") * unitFactor;
 
+        double cut_W = m_config.getParameter(prep + "cutW") * unitFactor;
+        double cut_H = m_config.getParameter(prep + "cutH") * unitFactor;
+        double cut_L = m_config.getParameter(prep + "cutL") * unitFactor;
+        double cut_dX = m_config.getParameter(prep + "cutDX") * unitFactor;
+        double cut_dY = m_config.getParameter(prep + "cutDY") * unitFactor;
+        double cut_dZ = m_config.getParameter(prep + "cutDZ") * unitFactor;
+        double cut_PHI = m_config.getParameter(prep + "cutPHI");
+
         double sup_PHI = m_config.getParameter(prep + "PHI");
 
         // tranformations
@@ -660,6 +668,9 @@ namespace Belle2 {
 
         G4Transform3D transform_disk_hole = G4Translate3D(disk_dX, disk_dY, disk_dZ);
 
+        G4Transform3D transform_cut = G4Translate3D(cut_dX, cut_dY, cut_dZ);
+        transform_cut = transform_cut * G4RotateX3D(cut_PHI / Unit::rad);
+
         //define geometry
         string geo_box_name = "geo_" + name + "_box_name";
         string geo_trd_name = "geo_" + name + "_trd_name";
@@ -667,7 +678,9 @@ namespace Belle2 {
         string geo_box_hole_name = "geo_" + name + "_box_hole_name";
         string geo_trd_hole_name = "geo_" + name + "_trd_hole_name";
         string geo_disk_hole_name = "geo_" + name + "_disk_hole_name";
+        string geo_cut_name = "geo_" + name + "_cut_name";
 
+        string geo_sup4x_name = "geo_" + name + "xxxx_name";
         string geo_supxxx_name = "geo_" + name + "xxx_name";
         string geo_supxx_name = "geo_" + name + "xx_name";
         string geo_supx_name = "geo_" + name + "x_name";
@@ -679,12 +692,14 @@ namespace Belle2 {
         G4Box* geo_box_hole = new G4Box(geo_box_hole_name, hole_W / 2.0, hole_H / 2.0, hole_L / 2.0);
         G4Box* geo_trd_hole = new G4Box(geo_trd_hole_name, trd_hole_W / 2.0, trd_hole_H / 2.0, trd_hole_L / 2.0);
         G4Tubs* geo_disk_hole = new G4Tubs(geo_disk_hole_name, 0.0, disk_r, disk_t, 0.0, 2.0 * M_PI);
+        G4Box* geo_cut = new G4Box(geo_cut_name, cut_W / 2.0, cut_H / 2.0, cut_L / 2.0);
 
-        G4UnionSolid* geo_supxxx = new G4UnionSolid(geo_supxxx_name, geo_box, geo_trd, transform_box.inverse() * transform_trd);
+        G4UnionSolid* geo_sup4x = new G4UnionSolid(geo_sup4x_name, geo_box, geo_trd, transform_box.inverse() * transform_trd);
 
-        G4SubtractionSolid* geo_supxx = new G4SubtractionSolid(geo_supxx_name, geo_supxxx, geo_box_hole, transform_box_hole);
-        G4SubtractionSolid* geo_supx = new G4SubtractionSolid(geo_supx_name, geo_supxx, geo_trd_hole, transform_trd_hole);
-        G4SubtractionSolid* geo_sup = new G4SubtractionSolid(geo_sup_name, geo_supx, geo_disk_hole, transform_disk_hole);
+        G4SubtractionSolid* geo_supxxx = new G4SubtractionSolid(geo_supxxx_name, geo_sup4x, geo_box_hole, transform_box_hole);
+        G4SubtractionSolid* geo_supxx = new G4SubtractionSolid(geo_supxx_name, geo_supxxx, geo_trd_hole, transform_trd_hole);
+        G4SubtractionSolid* geo_supx = new G4SubtractionSolid(geo_supx_name, geo_supxx, geo_disk_hole, transform_disk_hole);
+        G4SubtractionSolid* geo_sup = new G4SubtractionSolid(geo_sup_name, geo_supx, geo_cut, transform_cut);
 
         sup.geo = geo_sup;
         sup.transform = transform_box;

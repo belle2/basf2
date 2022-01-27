@@ -953,8 +953,8 @@
          <sec name="Z1" unit="cm">233.50</sec>
          <sec name="Z2" unit="cm">233.50</sec>
          <sec name="Z3" unit="cm">347.35</sec>
-         <sec name="Z4" unit="cm">353.35</sec>
-         <sec name="Z5" unit="cm">360.85</sec>
+         <sec name="Z4" unit="cm">352.85</sec>
+         <sec name="Z5" unit="cm">360.35</sec>
          <!--sec name="Z6" unit="cm">360.34</sec>
          <sec name="Z7" unit="cm">372.90</sec>
          <sec name="Z8" unit="cm">389.99</sec>
@@ -994,9 +994,9 @@
       <Straight name="C2spc3">
          <N desc="Number of planes">5</N>
          <sec name="Z0" unit="cm">360.85</sec>
-         <sec name="Z1" unit="cm">363.35</sec>
-         <sec name="Z2" unit="cm">363.35</sec>
-         <sec name="Z3" unit="cm">373.41</sec>
+         <sec name="Z1" unit="cm">362.85</sec>
+         <sec name="Z2" unit="cm">362.85</sec>
+         <sec name="Z3" unit="cm">372.91</sec>
          <sec name="Z4" unit="cm">391.00</sec>
          <sec name="R0" unit="cm">38.50</sec>
          <sec name="R1" unit="cm">40.25</sec>
@@ -3296,6 +3296,7 @@
          <sec name="X0" unit="mm">0</sec>
          <sec name="Y0" unit="mm">-237.5</sec>
          <sec name="Z0" unit="mm">-5255</sec>
+         <sec name="PHI" unit="rad">0</sec>
          <sec name="trdW1" unit="mm">630</sec>
          <sec name="trdW2" unit="mm">1540</sec>
          <sec name="trdH" unit="mm">456</sec>
@@ -3320,7 +3321,13 @@
          <sec name="diskDX" unit="mm">0</sec>
          <sec name="diskDY" unit="mm">237.5</sec>
          <sec name="diskDZ" unit="mm">1855</sec>
-         <sec name="PHI" unit="rad">0</sec>
+         <sec name="cutW" unit="mm">80</sec>
+         <sec name="cutH" unit="mm">2460</sec>
+         <sec name="cutL" unit="mm">810</sec>
+         <sec name="cutDX" unit="mm">-735</sec>
+         <sec name="cutDY" unit="mm">404</sec>
+         <sec name="cutDZ" unit="mm">-896</sec>
+         <sec name="cutPHI" unit="rad">1.2153</sec>
          <Material>SUS316L</Material>
          <Desc>Left cryostat support</Desc>
       </Support>
@@ -3332,6 +3339,7 @@
          <sec name="X0" unit="mm">0</sec>
          <sec name="Y0" unit="mm">-212.5</sec>
          <sec name="Z0" unit="mm">5815</sec>
+         <sec name="PHI" unit="rad">0</sec>
          <sec name="trdW1" unit="mm">540</sec>
          <sec name="trdW2" unit="mm">1540</sec>
          <sec name="trdH" unit="mm">351</sec>
@@ -3356,7 +3364,13 @@
          <sec name="diskDX" unit="mm">0</sec>
          <sec name="diskDY" unit="mm">212.5</sec>
          <sec name="diskDZ" unit="mm">-1850</sec>
-         <sec name="PHI" unit="rad">0</sec>
+         <sec name="cutW" unit="mm">80</sec>
+         <sec name="cutH" unit="mm">2176</sec>
+         <sec name="cutL" unit="mm">800</sec>
+         <sec name="cutDX" unit="mm">-735</sec>
+         <sec name="cutDY" unit="mm">412.5</sec>
+         <sec name="cutDZ" unit="mm">1062</sec>
+         <sec name="cutPHI" unit="rad">-1.1668</sec>
          <Material>SUS316L</Material>
          <Desc>Right cryostat support</Desc>
       </Support>

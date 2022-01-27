@@ -2623,7 +2623,7 @@
          <sec name="W" unit="m">5.4</sec>
          <sec name="H" unit="m">5.45</sec>
          <sec name="L" unit="m">12.473</sec>
-         <sec name="X0" unit="m">0.201</sec>
+         <sec name="X0" unit="m">0.2016</sec>
          <sec name="Y0" unit="m">-0.135</sec>
          <sec name="Z0" unit="m">-9.5</sec>
          <sec name="holeW" unit="m">3.9</sec>
@@ -2640,7 +2640,8 @@
          <sec name="W" unit="m">5.4</sec>
          <sec name="H" unit="m">5.45</sec>
          <sec name="L" unit="m">13.066</sec>
-         <sec name="X0" unit="m">0.001</sec>
+         <sec name="X01" unit="m">0.001</sec>
+         <sec name="X0" unit="m">-0.0004</sec>
          <sec name="Y0" unit="m">-0.135</sec>
          <sec name="Z0" unit="m">10.733</sec>
          <sec name="holeW" unit="m">3.9</sec>
@@ -2716,12 +2717,12 @@
 
       <!-- concrete end-of-tunnel shields -->
       <Shield name="ConcreteShieldL">
-         <sec name="W" unit="m">3.898</sec>
+         <sec name="W" unit="m">3.899</sec>
          <sec name="H" unit="m">3.3</sec>
-         <sec name="L" unit="m">0.7</sec>
-         <sec name="X0" unit="m">0.152</sec>
+         <sec name="L" unit="m">0.6</sec>
+         <sec name="X0" unit="m">0.151</sec>
          <sec name="Y0" unit="m">0.190</sec>
-         <sec name="Z0" unit="m">-3.624</sec>
+         <sec name="Z0" unit="m">-3.574</sec>
          <sec name="holeW" unit="m">1.68</sec>
          <sec name="holeH" unit="m">2.85</sec>
          <sec name="holeL" unit="m">0.9</sec>
@@ -2733,12 +2734,12 @@
          <Desc>Concrete end-of-tunnel shield left</Desc>
       </Shield>
       <Shield name="ConcreteShieldR">
-         <sec name="W" unit="m">3.897</sec>
+         <sec name="W" unit="m">3.899</sec>
          <sec name="H" unit="m">3.3</sec>
-         <sec name="L" unit="m">0.7</sec>
+         <sec name="L" unit="m">0.6</sec>
          <sec name="X0" unit="m">0.052</sec>
          <sec name="Y0" unit="m">0.190</sec>
-         <sec name="Z0" unit="m">4.566</sec>
+         <sec name="Z0" unit="m">4.516</sec>
          <sec name="holeW" unit="m">1.68</sec>
          <sec name="holeH" unit="m">2.85</sec>
          <sec name="holeL" unit="m">0.9</sec>
@@ -3342,7 +3343,7 @@
          <sec name="X0" unit="m">0.04</sec>
 	 <sec name="Y0" unit="m">1.17</sec>
          <sec name="Z0" unit="m">-3.86</sec>
-         <sec name="L" unit="m">0.98</sec>
+         <sec name="L" unit="m">1.2</sec>
          <sec name="PHI" unit="rad">2.1178</sec>
          <sec name="PHIYZ" unit="rad">0</sec>
          <sec name="R" unit="mm">88.5</sec>
@@ -3355,7 +3356,7 @@
          <sec name="X0" unit="m">0.04</sec>
 	 <sec name="Y0" unit="m">1.215</sec>
          <sec name="Z0" unit="m">-3.86</sec>
-         <sec name="L" unit="m">0.98</sec>
+         <sec name="L" unit="m">1.2</sec>
          <sec name="PHI" unit="rad">2.1178</sec>
          <sec name="PHIYZ" unit="rad">0</sec>
          <sec name="R" unit="mm">21.35</sec>
@@ -3368,7 +3369,7 @@
          <sec name="X0" unit="m">0.04</sec>
 	 <sec name="Y0" unit="m">1.139</sec>
          <sec name="Z0" unit="m">-3.86</sec>
-         <sec name="L" unit="m">0.98</sec>
+         <sec name="L" unit="m">1.2</sec>
          <sec name="PHI" unit="rad">2.1178</sec>
          <sec name="PHIYZ" unit="rad">0</sec>
          <sec name="R" unit="mm">30.25</sec>
@@ -3381,7 +3382,7 @@
          <sec name="X0" unit="m">0.04</sec>
 	 <sec name="Y0" unit="m">1.215</sec>
          <sec name="Z0" unit="m">-3.86</sec>
-         <sec name="L" unit="m">0.98</sec>
+         <sec name="L" unit="m">1.2</sec>
          <sec name="PHI" unit="rad">2.1178</sec>
          <sec name="PHIYZ" unit="rad">0</sec>
          <sec name="R" unit="mm">17.75</sec>
@@ -3394,7 +3395,7 @@
          <sec name="X0" unit="m">0.04</sec>
 	 <sec name="Y0" unit="m">1.139</sec>
          <sec name="Z0" unit="m">-3.86</sec>
-         <sec name="L" unit="m">0.98</sec>
+         <sec name="L" unit="m">1.2</sec>
          <sec name="PHI" unit="rad">2.1178</sec>
          <sec name="PHIYZ" unit="rad">0</sec>
          <sec name="R" unit="mm">26.35</sec>
@@ -3784,6 +3785,7 @@
          <Material>Pb</Material>
          <Desc>Shield for collimator D01H4 part 3</Desc>
       </Shield>
+
    </Content>
 </DetectorComponent>
 

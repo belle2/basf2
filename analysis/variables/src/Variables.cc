@@ -1006,7 +1006,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("p", particleP, "momentum magnitude", "GeV/c");
     REGISTER_VARIABLE("E", particleE, "energy", "GeV");
 
-    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, R"DOC(energy uncertainty (:math:`\sqrt{\sigma^2}`)DOC", "GeV");
+    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, R"DOC(energy uncertainty (:math:`\sqrt{\sigma^2}`))DOC", "GeV");
     REGISTER_VARIABLE("ECLClusterE_uncertainty", particleClusterEUncertainty,
                       "energy uncertainty as given by the underlying ECL cluster", "GeV");
     REGISTER_VARIABLE("px", particlePx, "momentum component x", "GeV/c");
@@ -1023,14 +1023,16 @@ namespace Belle2 {
     REGISTER_VARIABLE("momVertCovM(i,j)", covMatrixElement,
                       "returns the (i,j)-th element of the MomentumVertex Covariance Matrix (7x7).\n"
                       "Order of elements in the covariance matrix is: px, py, pz, E, x, y, z.", "GeV/c, GeV/c, GeV/c, GeV, cm, cm, cm");
-    REGISTER_VARIABLE("momDevChi2", momentumDeviationChi2,
-                      R"DOC(momentum deviation :math:`\chi^2` value calculated as :math:`\chi^2 = \sum_i (p_i - mc(p_i))^2/\sigma(p_i)^2`, where :math:`\sum` runs over i = px, py, pz and :math:`mc(p_i)` is the mc truth value and :math:`\sigma(p_i)` is the estimated error of i-th component of momentum vector)DOC");
-    REGISTER_VARIABLE("theta", particleTheta, "polar angle in radians", "rad");
-    REGISTER_VARIABLE("thetaErr", particleThetaErr, "error of polar angle in radians", "rad");
+    REGISTER_VARIABLE("momDevChi2", momentumDeviationChi2, R"DOC(
+momentum deviation :math:`\chi^2` value calculated as :math:`\chi^2 = \sum_i (p_i - mc(p_i))^2/\sigma(p_i)^2`, 
+where :math:`\sum` runs over i = px, py, pz and :math:`mc(p_i)` is the mc truth value and :math:`\sigma(p_i)` is the estimated error of i-th component of momentum vector
+)DOC");
+    REGISTER_VARIABLE("theta", particleTheta, "polar angle", "rad");
+    REGISTER_VARIABLE("thetaErr", particleThetaErr, "error of polar angle", "rad");
     REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
     REGISTER_VARIABLE("cosThetaErr", particleCosThetaErr, "error of momentum cosine of polar angle");
-    REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in radians", "rad");
-    REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle in radians", "rad");
+    REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle", "rad");
+    REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle", "rad");
     REGISTER_VARIABLE("PDG", particlePDGCode, "PDG code");
 
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVectorInXYPlane",
@@ -1063,7 +1065,7 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("Q", particleQ, "energy released in decay", "GeV");
     REGISTER_VARIABLE("dQ", particleDQ, ":b2:var:`Q` minus nominal energy released in decay", "GeV");
     REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass", "GeV/:math:`\\text{c}^2`");
-    REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference", "GeV");
+    REGISTER_VARIABLE("deltaE", particleDeltaE, "difference between :b2:var:`E` and half the center of mass energy", "GeV");
     REGISTER_VARIABLE("M2", particleMassSquared, "The particle's mass squared.", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
 
     REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughtersDisplaced,

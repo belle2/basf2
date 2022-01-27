@@ -1140,7 +1140,7 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("printParticle", printParticle,
                       "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
     REGISTER_VARIABLE("mcMomTransfer2", particleMCMomentumTransfer2,
-                      "Return the true momentum transfer to lepton pair in a B(semi -) leptonic B meson decay.");
+                      "Return the true momentum transfer to lepton pair in a B(semi -) leptonic B meson decay.", "GeV/c");
     REGISTER_VARIABLE("False", False,
                       "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,

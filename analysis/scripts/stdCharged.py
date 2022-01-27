@@ -420,10 +420,10 @@ def stdLep(pdgId,
     return pid_alias
 
 
-def stdE(working_point,
-         method,
-         classification,
-         lid_weights_gt,
+def stdE(listtype=_defaultlist,
+         method=None,
+         classification=None,
+         lid_weights_gt=None,
          release=None,
          listname=None,
          trainingModeMulticlass=_TrainingMode.c_Multiclass,
@@ -433,7 +433,7 @@ def stdE(working_point,
     See the documentation of `stdLep` for details.
 
     It also accepts any of the legacy definitions
-    for the ``working_point`` parameter to fall back to the `stdCharged` behaviour:
+    for the ``listtype`` parameter (aka ``working_point`` in `stdLep`) to fall back to the `stdCharged` behaviour:
 
     * 'all'
     * 'good'
@@ -448,11 +448,11 @@ def stdE(working_point,
         (str): the alias for the electron ID variable.
     """
 
-    if working_point in _stdnames + _effnames:
-        stdCharged("e", working_point, path)
+    if listtype in _stdnames + _effnames:
+        stdCharged("e", listtype, path)
         return _pidnames[_chargednames.index("e")]
 
-    return stdLep(Const.electron.getPDGCode(), working_point, method, classification, lid_weights_gt,
+    return stdLep(Const.electron.getPDGCode(), listtype, method, classification, lid_weights_gt,
                   release=release,
                   listname=listname,
                   trainingModeMulticlass=trainingModeMulticlass,
@@ -460,10 +460,10 @@ def stdE(working_point,
                   path=path)
 
 
-def stdMu(working_point,
-          method,
-          classification,
-          lid_weights_gt,
+def stdMu(listtype=_defaultlist,
+          method=None,
+          classification=None,
+          lid_weights_gt=None,
           release=None,
           listname=None,
           trainingModeMulticlass=_TrainingMode.c_Multiclass,
@@ -473,7 +473,7 @@ def stdMu(working_point,
     See the documentation of `stdLep` for details.
 
     It also accepts any of the legacy definitions
-    for the ``working_point`` parameter to fall back to the `stdCharged` behaviour:
+    for the ``listtype`` parameter (aka ``working_point`` in `stdLep`) to fall back to the `stdCharged` behaviour:
 
     * 'all'
     * 'good'
@@ -488,11 +488,11 @@ def stdMu(working_point,
         (str): the alias for the muon ID variable.
     """
 
-    if working_point in _stdnames + _effnames:
-        stdCharged("mu", working_point, path)
+    if listtype in _stdnames + _effnames:
+        stdCharged("mu", listtype, path)
         return _pidnames[_chargednames.index("mu")]
 
-    return stdLep(Const.muon.getPDGCode(), working_point, method, classification, lid_weights_gt,
+    return stdLep(Const.muon.getPDGCode(), listtype, method, classification, lid_weights_gt,
                   release=release,
                   listname=listname,
                   trainingModeMulticlass=trainingModeMulticlass,

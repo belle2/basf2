@@ -6,7 +6,18 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Usage: python3 bgr_teacher.py
+
+"""
+Script to train the expert for detecting background tracks found by VXDTF2. The training data
+is expected to be in a root file named train.root. It creates a localdb containing a FastBDT
+weigthfile. This weightfile can either be used as temporary payload locally or must be uploaded
+into a GT on the conditions data base.
+
+Usage:
+
+python3 bgr_teacher.py
+"""
+
 
 import var_set
 import basf2_mva

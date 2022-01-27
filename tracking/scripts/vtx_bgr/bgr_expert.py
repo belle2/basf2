@@ -7,6 +7,15 @@
 ##########################################################################
 
 
+"""
+Script to apply the bgr expert on independent test data. The weightfile is expected to be in a localdb produced
+by bgr_teacher.py. The test data is expected to be in a root file named test.root produced by collect_data.py.
+
+Usage:
+
+python3 bgr_expert.py
+"""
+
 import basf2_mva
 from basf2 import conditions
 

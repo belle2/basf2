@@ -15,6 +15,7 @@ from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 from vtx import add_vtx_reconstruction
 from tracking.adjustments import adjust_module
+from vtx_bgr.path_utils import add_vtx_bg_remover
 
 
 def use_local_sectormap(path, pathToLocalSM):
@@ -1392,7 +1393,6 @@ def add_vtx_track_finding_vxdtf2(
 
     else:
         B2WARNING("Experimental VTX Background Remover used!")
-        from vtx_bgr.path_utils import add_vtx_bg_remover
 
         reco_tracks_raw = reco_tracks + 'Raw'
 

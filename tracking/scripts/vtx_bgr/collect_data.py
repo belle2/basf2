@@ -11,13 +11,23 @@
 
 
 """
-Script to collect data for training bg remover expert for VTX upgrade of Belle II.
-Outputs a root file train.root with training data.
+Script to collect data for training the bg remover expert for VTX upgrade of Belle II.
+Outputs a root file with default name train.root with training or testing data.
 
 Usage:
+
+Set the correct global tag and path to background files:
+
 export BELLE2_VTX_UPGRADE_GT=NameOfUpgradeGT
 export BELLE2_VTX_BACKGROUND_DIR=/path/to/overlay/files/
-basf2 collect_data.py -n 6000
+
+Create training data:
+
+basf2 collect_data.py -n 6000 -- --output=train.root
+
+Create test data:
+
+basf2 collect_data.py -n 4000 -- --output=test.root
 """
 
 
@@ -27,10 +37,22 @@ from simulation import add_simulation
 from vtx import get_upgrade_globaltag, get_upgrade_background_files
 from tracking.path_utils import add_vtx_track_finding_vxdtf2, add_hit_preparation_modules
 from vtx_bgr.path_utils import add_vtx_bg_collector
+import argparse
+
+
+def parse_args():
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser('collect_data.py')
+    add_arg = parser.add_argument
+    add_arg('--output', type=str, default="train.root")
+    return parser.parse_args()
 
 
 def main():
     """Main function"""
+
+    # Parse the command line
+    args = parse_args()
 
     # Use default global tag prepended with upgrade GT to replace PXD+SVD by VTX
     b2.conditions.disable_globaltag_replay()
@@ -81,7 +103,7 @@ def main():
     # Data collection for training
     add_vtx_bg_collector(
         path,
-        trainingDataOutputName="train.root",
+        trainingDataOutputName=args.output,
         trackCandidatesColumnName=trackCandidatesColumnName,
     )
 

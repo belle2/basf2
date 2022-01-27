@@ -6,6 +6,16 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+"""
+Script to download a weightfile and writes a file weightfile.root into current dir. Here the weightfile
+is expected to to be a localdb produced by the script bgr_teacher.py.
+
+Usage:
+
+python3 bgr_download.py
+"""
+
+
 # Usage: python3 bgr_download.py
 import basf2_mva
 from basf2 import conditions

@@ -48,10 +48,10 @@ file with test.root with test data.
 
 2) Run script bgr_teacher.py to produced a weightfile in a localdb using collected data from train.root 
 
-3) Run script bgr_download.py to produce a xml version of the weightfile placed in current directory. 
+3) Run script bgr_download.py to put the weightfile as a root file in current directory. 
 
 4) Run bash script evaluate.sh to produce output.pdf containing many interesting performance plots. Uses train.root, 
-test.root and the xml weightfile.
+test.root and the weightfile.root.
 
 5) Run tracking validation scripts to better understand the impact of the bgr remover. This requires uploading the localdb
 to a new upgrade GT on conditions database server. The figures of merit for the full tracking validation can be used to find 

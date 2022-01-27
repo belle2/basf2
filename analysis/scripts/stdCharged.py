@@ -310,15 +310,19 @@ def stdLep(pdgId,
     # Depending on the release associated to the chosen LID recommendations GT,
     # some variable names and aliases may need to be reset.
     if int(release) == 5:
-        pid_variables["likelihood"]["global"]["var"][electron] = "electronID_noSVD_noTOP"
-        pid_variables["likelihood"]["global"]["alias"][electron] = "electronID_noSVD_noTOP"
-        pid_variables["likelihood"]["binary"]["var"][electron] = f"binaryElectronID_noSVD_noTOP({pion})"
-        pid_variables["likelihood"]["binary"]["alias"][electron] = "binaryElectronID_noSVD_noTOP_pi"
+        if lepton == electron:
+            b2.B2WARNING("The likelihood-based electron ID in release 5 samples is defined w/o the SVD and the TOP")
+            pid_variables["likelihood"]["global"]["var"][electron] = "electronID_noSVD_noTOP"
+            pid_variables["likelihood"]["global"]["alias"][electron] = "electronID_noSVD_noTOP"
+            pid_variables["likelihood"]["binary"]["var"][electron] = f"binaryElectronID_noSVD_noTOP({pion})"
+            pid_variables["likelihood"]["binary"]["alias"][electron] = "binaryElectronID_noSVD_noTOP_pi"
     if int(release) == 6:
-        pid_variables["likelihood"]["global"]["var"][electron] = "electronID_noTOP"
-        pid_variables["likelihood"]["global"]["alias"][electron] = "electronID_noTOP"
-        pid_variables["likelihood"]["binary"]["var"][electron] = f"binaryElectronID_noTOP({pion})"
-        pid_variables["likelihood"]["binary"]["alias"][electron] = "binaryElectronID_noTOP_pi"
+        if lepton == electron:
+            b2.B2WARNING("The likelihood-based electron ID in release 6 samples is defined w/o the TOP")
+            pid_variables["likelihood"]["global"]["var"][electron] = "electronID_noTOP"
+            pid_variables["likelihood"]["global"]["alias"][electron] = "electronID_noTOP"
+            pid_variables["likelihood"]["binary"]["var"][electron] = f"binaryElectronID_noTOP({pion})"
+            pid_variables["likelihood"]["binary"]["alias"][electron] = "binaryElectronID_noTOP_pi"
 
     # Create the aliases.
     pid_var = pid_variables[method][classification]["var"][lepton]

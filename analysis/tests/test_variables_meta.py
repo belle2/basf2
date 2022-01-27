@@ -1,0 +1,230 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+import re
+import logging
+import subprocess
+import unittest
+
+
+def findMatchedParenthesis(string: str, openchar: str, closechar: str) -> int:
+    """Find matching control token in string.
+
+    Args:
+        string (str): input
+        openchar (str): opening char e.g '{'
+        closechar (str): closing char e.g '}'
+
+    Returns:
+        int: position of matching closing char in string.
+    """
+    end = 1
+    if string[0] == openchar:
+        count = 1
+        while end < len(string) and count > 0:
+            if string[end] == openchar:
+                count += 1
+            elif string[end] == closechar:
+                count -= 1
+            end += 1
+    return end - 1
+
+
+class MetavariableDataTypeTest(unittest.TestCase):
+    """
+    Determine metavariable types from source code and assert correctness
+    """
+
+    #: we have to hardcode some special cases
+    #: as data types can't be obtained from source code directly
+    hardcoded = {
+        "softwareTriggerResult": "double",
+        "formula": "double",
+        "softwareTriggerResultNonPrescaled": "double",
+        "isDaughterOfList": "bool",
+        "isGrandDaughterOfList": "bool",
+        "daughterDiffOf": "double",
+        "daughterDiffOfPhi": "double",
+        "daughterDiffOfClusterPhi": "double",
+        "mcDaughterDiffOfPhi": "double",
+        "grandDaughterDiffOfPhi": "double",
+        "grandDaughterDiffOfClusterPhi": "double",
+        "daughterDiffOfPhiCMS": "double",
+        "daughterDiffOfClusterPhiCMS": "double",
+    }
+
+    # regular expressions
+    #: regex for finding the REGISTER_METAVARIABLE statements.
+    registering_regex = re.compile(
+        r"(?s)REGISTER_METAVARIABLE.*?Manager::VariableDataType::(?:c_double|c_int|c_bool)\);?"  # noqa
+    )
+    #: regex for extracting the function name and the enum type from REGISTER_METAVARIABLE statements  # noqa
+    extract_regex = re.compile(
+        r'REGISTER_METAVARIABLE\(".*?",(?P<function_name>[^,]*),.*?Manager::VariableDataType::c_(?P<enumtype>double|bool|int)\)'  # noqa
+    )
+    #: regex for extracting the type of the lambda function in metavariable function definition  # noqa
+    lambda_type_regex = re.compile(r"-> (?P<lambdatype>double|bool|int)")
+
+    def process_file(self, filepath: str) -> int:
+        """Check all metavariable types for specified file.
+
+        Args:
+            filepath (str): path to file containing REGISTER_METAVARIABLE
+
+        Raises:
+            AssertionError: [description]
+            AssertionError: [description]
+
+        Returns:
+            int: number of metavariables in file.
+            Used for sanity checks of the coverage.
+        """
+
+        # Read file contents
+        with open(filepath, "r") as fp:
+            filecontent = fp.read()
+
+        # List for all found registering statements
+        registering_statements = self.registering_regex.findall(filecontent)
+        # Preprocess all statements by removing spaces and newlines
+        # This makes extraction of function name and enum type easier
+        registering_statements = list(
+            map(
+                lambda line: line.replace(" ", "").replace("\n", ""),
+                registering_statements,
+            ),
+        )
+
+        for statement in registering_statements:
+            # Extract enum type and name
+            match_content = self.extract_regex.match(statement)
+            function_name = match_content.groupdict()["function_name"]
+            enumtype = match_content.groupdict()["enumtype"]
+
+            if function_name in self.hardcoded:
+                self.assertEqual(
+                    enumtype,
+                    self.hardcoded[function_name],
+                    f"In file {filepath}:\n"
+                    f"Expected registered type of Metavariable '{function_name}':"  # noqa
+                    f"{self.hardcoded[function_name]}, actual: {enumtype}",
+                )
+                continue
+
+            # compile regex for finding metavariable function definition
+            function_definition_regex = re.compile(
+                r"Manager::FunctionPtr %s\(.*\)[^\{]*" % function_name
+            )
+            # compile regex for regular typed function definition
+            regular_definition_regex = re.compile(
+                r"(?P<return_type>double|int|bool) %s\(.*?\)" % function_name
+            )
+
+            # Find function body start with regex
+            definition = function_definition_regex.search(filecontent)
+            if definition is not None:
+                func_body_start = definition.end()
+            else:  # Manager::FunctionPtr definition not found
+                # search for a regular typed function
+                return_type = (
+                    regular_definition_regex.search(filecontent)
+                    .groupdict()
+                    .get("return_type")
+                )  # noqa
+                if return_type is not None:
+                    self.assertEqual(
+                        return_type,
+                        enumtype,
+                        f"In file {filepath}:\n"
+                        f"Metavariable function '{function_name}' is of type "
+                        f"{return_type} but is registered as c_{enumtype}",
+                    )
+                    continue
+                else:
+                    raise AssertionError(
+                        f"In file {filepath}:\n"
+                        f"Metavariable function '{function_name}'"
+                        "return type could not be determined.\n"
+                        "You can fix this by adding type the information to "
+                        "the 'hardcoded' dictionary of this testcase."
+                    )
+
+            # grab function body end
+            func_body_end = func_body_start + findMatchedParenthesis(
+                filecontent[func_body_start:], "{", "}"
+            )
+            # Get function body slice from filecontent
+            func_body = filecontent[func_body_start:func_body_end]
+
+            # grab lambda type definition
+            lambdatype_match = self.lambda_type_regex.search(func_body)
+            if lambdatype_match is not None:
+                lambdatype = lambdatype_match.groupdict()["lambdatype"]
+                self.assertEqual(
+                    lambdatype,
+                    enumtype,
+                    f"In file {filepath}:\n"
+                    f"Metavariable function '{function_name}' is of type "
+                    f"{lambdatype} but is registered as c_{enumtype}",
+                )
+            else:  # lambda type or definition not found
+                raise AssertionError(
+                    f"For Metavariable '{function_name}' in {filepath}.\n"
+                    "Lambda definition is missing type information or "
+                    "lambda definition could not be found in metavariable definition. "  # noqa
+                    "Please add type annotation '-> double/int/bool' to lambda.\n"  # noqa
+                    "Or mark metavariable as exception by adding type information to this testcase in the 'hardcoded' dict.\n"  # noqa
+                    f"{func_body}"
+                )
+
+        # Return the number of registering statements in this file
+        return len(registering_statements)
+
+    def test_metavariable_data_types(self):
+        """Metavariables have to be registered with the correct
+        Manager::Variable::VariableDataType enum value.
+        This test makes sure Metavariable definition and
+        variable registration are correct.
+        """
+        # check if grep is available
+        try:
+            subprocess.run(
+                "grep -V", check=True, shell=True, capture_output=True
+            )
+        except subprocess.CalledProcessError:
+            logging.basicConfig(format="%(message)s")
+            logging.error(
+                "TEST SKIPPED: MetavariableDataTypeTest skipped because grep is not available."  # noqa
+            )
+            self.fail()
+
+        # Use grep to find files with REGISTER_METAVARIABLE statements
+        files = subprocess.run(
+            [r'grep "REGISTER_METAVARIABLE" -r . -I -l'],
+            shell=True,
+            capture_output=True,
+        )
+        # Decode stdout and extract filenames
+        files = files.stdout.decode().split("\n")
+        files = list(filter(lambda file: file.endswith(".cc"), files))
+
+        # There should be at least 14 files
+        self.assertGreaterEqual(len(files), 14)
+        # We track the number of metavariables to make sure we don't miss some
+        num_metavariables = 0
+        for filepath in files:
+            num_metavariables += self.process_file(filepath)
+
+        # We should get at least 244 registering statements
+        self.assertGreaterEqual(num_metavariables, 244)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -28,8 +28,11 @@ Standard Particles
         * `stdCharged.stdE`
         * `stdCharged.stdMu`
 
-	for a choice of the input ``listtype`` parameter among:
+	for a choice of the input ``working_point`` parameter among:
 
+	* 'FixedThresh05'
+	* 'FixedThresh09'
+	* 'FixedThresh095'
 	* 'UniformEff60'
 	* 'UniformEff70'
 	* 'UniformEff80'

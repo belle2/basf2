@@ -180,8 +180,8 @@ def stdLep(pdgId,
 
     The function will select particles according to the chosen ``working_point``, and decorate each candidate
     with the nominal Data/MC :math:`\\ell` ID efficiency and :math:`\\pi,K` fake rate
-    correction factors and their stat, syst uncertainty, reading the info from the Conditions Database according
-    to the chosen input global tag.
+    correction factors and their stat, syst uncertainty, reading the info from the Conditions Database (CDB) according
+    to the chosen input global tag (GT).
 
     .. note::
         Particles will *not* be selected if they are outside the Data/MC efficiency corrections' phase space coverage
@@ -193,10 +193,10 @@ def stdLep(pdgId,
         working_point (str): name of the chosen working point that defines the content of the list. Choose among the above values.
         method (str): the PID method: 'likelihood' or 'bdt'.
         classification (str): the type of classifier: 'binary' (one-vs-pion) or 'global' (one-vs-all).
-        lid_weights_gt (str): the name identifier of the CDB global tag with the recommended Data/MC correction weights.
+        lid_weights_gt (str): the name identifier of the global tag with the recommended Data/MC correction weights.
                               Please refer to the
-                             `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
-                              for recommendations.
+                              `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+                              for info about lepton ID recommendations.
         release (Optional[int]): the major release number associated to the recommended global tag chosen.
                                  If specified, this ensures the correct :math:`\\ell` ID variables are used.
                                  Please refer to the
@@ -429,6 +429,9 @@ def stdE(working_point,
     * '95eff'
     * '90eff'
     * '85eff'
+
+    Returns:
+        (str): the alias for the electron ID variable.
     """
 
     if working_point in _stdnames + _effnames:
@@ -466,6 +469,9 @@ def stdMu(working_point,
     * '95eff'
     * '90eff'
     * '85eff'
+
+    Returns:
+        (str): the alias for the muon ID variable.
     """
 
     if working_point in _stdnames + _effnames:

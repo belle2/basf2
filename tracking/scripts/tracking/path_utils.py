@@ -15,6 +15,7 @@ from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 from vtx import add_vtx_reconstruction
 from tracking.adjustments import adjust_module
+from vtx_bgr.path_utils import add_vtx_bg_remover
 
 
 def use_local_sectormap(path, pathToLocalSM):
@@ -1224,6 +1225,7 @@ def add_vtx_track_finding_vxdtf2(
     materialBudgetFactor=1.2,
     maxPt=0.01,
     vxdQualityEstimatarParametersFromDB=True,
+    vtx_bg_cut=0.3
 ):
     """
     Convenience function for adding all vxd track finder Version 2 modules
@@ -1253,6 +1255,7 @@ def add_vtx_track_finding_vxdtf2(
     :param materialBudgetFactor: MaterialBudgetFactor is a hyperparameter of TripletFit QE, Default: 50
     :param maxPt: MaxPt is a hyperparameter of TripletFit QE, Default: 0.5
     :param vxdQualityEstimatarParametersFromDB: If True, take TripletFit hyperparameters from DB, otherwise from function arguments
+    :param vtx_bg_cut: If not None, VTX background remover gets applied. Valid cut values in range [0,1].
     """
     ##########################
     # some setting for VXDTF2
@@ -1387,12 +1390,32 @@ def add_vtx_track_finding_vxdtf2(
     momSeedRetriever.param('tcArrayName', nameSPTCs)
     path.add_module(momSeedRetriever)
 
-    converter = register_module('SPTC2RTConverter')
-    converter.param('recoTracksStoreArrayName', reco_tracks)
-    converter.param('spacePointsTCsStoreArrayName', nameSPTCs)
-    converter.param('vtxClustersName', vtx_clusters)
-    converter.param('vtxHitsStoreArrayName', vtx_clusters)
-    path.add_module(converter)
+    if vtx_bg_cut is None:
+        converter = register_module('SPTC2RTConverter')
+        converter.param('recoTracksStoreArrayName', reco_tracks)
+        converter.param('spacePointsTCsStoreArrayName', nameSPTCs)
+        converter.param('vtxClustersName', vtx_clusters)
+        converter.param('vtxHitsStoreArrayName', vtx_clusters)
+        path.add_module(converter)
+
+    else:
+        B2WARNING("Experimental VTX Background Remover used!")
+
+        reco_tracks_raw = reco_tracks + 'Raw'
+
+        converter = register_module('SPTC2RTConverter')
+        converter.param('recoTracksStoreArrayName', reco_tracks_raw)
+        converter.param('spacePointsTCsStoreArrayName', nameSPTCs)
+        converter.param('vtxClustersName', vtx_clusters)
+        converter.param('vtxHitsStoreArrayName', vtx_clusters)
+        path.add_module(converter)
+
+        add_vtx_bg_remover(
+            path,
+            vtx_bg_cut=vtx_bg_cut,
+            inputStoreArrayName=reco_tracks_raw,
+            outputStoreArrayName=reco_tracks,
+        )
 
 
 def add_simple_vtx_tracking_reconstruction(path, components=['VTX', 'CDC'], pruneTracks=False, skipGeometryAdding=False,

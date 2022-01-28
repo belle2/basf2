@@ -1,0 +1,62 @@
+The folder implements the VTX background track remover (VTX BGR)
+
+
+The vertex detector standalone track finder VXDTF2 allows efficient track finding down to small 
+transervse momenta <100MeV/c. Even though not trained for that, the VXDTF2 can find tracks 
+originating from beam induced background, frequently with very low transverse momentum not reaching 
+the CDC. The subset of found tracks containing only 3 VTX hits is dominated by tracks from beam induced 
+background. These background tracks are found to constitute a large part of the overall fake rate (tracks
+not originating from signal collisions) measured by the full tracking validation. 
+
+The VTX background track remover adds two modules at the end of the VXDTF2 trackfinding. 
+
+1) VTXBgRemover: The module applies a FastBDT to Belle.RecoTRacks produced by the VXDTF2 and 
+sets the FastBDT output (BGR QualityIndicator) value as the QualityIndicator for each track.
+Overriding the VXD QualityIndicator.
+
+2) RecoTracksCutter: The module creates a new StoreArray of RecoTracks with VTX hits having a 
+BGR QualityIndicator above a cut value.
+
+In other words, tracks with three VTX hits that are believed to originate from beam induced background 
+get removed directly and the following parts of the tracking chain will never see them. Those tracks will 
+never be saved to mdst files. Be careful what you do! Detecting 
+tracks from beam induced background is a common problem for any physics analysis. For tracks 
+with few VTX hits that cannot reach the CDC, there can benefit with removing tracks early in the track
+finding using a common/efficient method.  
+
+
+For adding the background track remover modules to the reconstruction path, a convinience functions is defined in 
+path_utils.py. The FastBDT needs a weightfile named 'vxdtf2_vtx_bgr_mva' that must be found on the 
+upgrade global tag being used. The decision cut is defined as an argument to the convience function 
+
+
+def add_vtx_track_finding_vxdtf2(
+    ...
+    vtx_bg_cut=0.3
+)
+
+A cut value of None deactivates the background track remover. The selection of cut value must be 
+reconsidered (re optimized) when the weightfiles change when going to a new default upgrade GT. 
+
+There are two ways for training and testing new weightfiles. The b2luigi based script vtx_bg_remover_teacher.py
+is a one stop solution and creates a directly a localdb with the needed weightfile (for upload to the GT) and 
+pdf with plots for monitoring the performance. Secondly, there is the pedestrian way by running the required 
+scripts manually. The sequence of steps is: 
+
+1) Run script collect_data.py. Best do it twice for creating a root file train.root with training data and an independent root 
+file with test.root with test data. 
+
+2) Run script bgr_teacher.py to produced a weightfile in a localdb using collected data from train.root 
+
+3) Run script bgr_download.py to put the weightfile as a root file in current directory. 
+
+4) Run bash script evaluate.sh to produce output.pdf containing many interesting performance plots. Uses train.root, 
+test.root and the weightfile.root.
+
+5) Run tracking validation scripts to better understand the impact of the bgr remover. This requires uploading the localdb
+to a new upgrade GT on conditions database server. The figures of merit for the full tracking validation can be used to find 
+good cut values for the RecoTracksCutter. 
+
+The folder modules contains the implementation of two python basf2 modules. The module VTXTrackCollector creates the root files 
+for training and testing. The module VTXBgRemover applies the expert to RecoTracks. The RecoTracksCutter is implemented as a cpp
+basf2 module. 

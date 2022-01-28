@@ -1,12 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marcel Hohmann (marcel.hohmann@unimelb.edu.au)           *
- *               Marco Milesi (marco.milesi@unimelb.edu.au)               *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #include <math.h>
@@ -35,7 +32,7 @@ using namespace ECL;
 
 REG_MODULE(ECLChargedPIDMVA)
 
-ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module(), m_variables(113, -999)
+ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module(), m_variables(112, -999.0)
 {
   setDescription("The module implements charged particle identification using ECL-related observables via a multiclass BDT. For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the BDT which is stored in a conditions database payload. The BDT output variables are then used to construct a liklihood from pdfs also stored in the payload. The liklihood is then stored in the ECLPidLikelihood object.");
 
@@ -43,8 +40,6 @@ ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module(), m_variables(113, -9
            m_payload_name,
            "The name of the database payload object with the MVA weights.",
            std::string("ECLChargedPidMVAWeights"));
-
-
 }
 
 ECLChargedPIDMVAModule::~ECLChargedPIDMVAModule() = default;
@@ -67,23 +62,21 @@ void ECLChargedPIDMVAModule::checkDBPayloads()
 
 void ECLChargedPIDMVAModule::initializeMVA()
 {
-  B2INFO("Run: " << m_eventMetaData->getRun() <<
-         ". Load supported MVA interfaces for multi-class charged particle identification...");
+  B2DEBUG(12, "Run: " << m_eventMetaData->getRun() <<
+          ". Load supported MVA interfaces for multi-class charged particle identification...");
 
   MVA::AbstractInterface::initSupportedInterfaces();
   auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
 
-  B2INFO("\tLoading weightfiles from the payload class.");
+  B2DEBUG(12, "\tLoading weightfiles from the payload class.");
 
   auto serialized_weightfiles = (*m_mvaWeights.get())->getMVAWeightStrings();
   auto nfiles = serialized_weightfiles->size();
 
-  B2INFO(" number of weightfiles found: " << nfiles);
+  B2DEBUG(12, " number of weightfiles found: " << nfiles);
   m_experts.resize(nfiles);
-  B2INFO(" Rezised Vector");
   for (unsigned int idx(0); idx < nfiles; idx++) {
 
-    B2INFO("\t\tweightfile[" << idx << "]");
     B2DEBUG(12, "\t\tweightfile[" << idx << "]");
 
     // De-serialize the string into an MVA::Weightfile object.
@@ -97,13 +90,11 @@ void ECLChargedPIDMVAModule::initializeMVA()
     m_experts[idx] = supported_interfaces[general_options.m_method]->getExpert();
     m_experts.at(idx)->load(weightfile);
 
-    B2INFO("\t\tweightfile  at " << idx << " successfully initialised.");
     B2DEBUG(12, "\t\tweightfile  at " << idx << " successfully initialised.");
 
-
     if (idx == 0) {
-      // TODO - should this be moved to one dataset per region?
-      // They all use the same variables and options
+      // For now use one dataset for all regions, they all have the same variables.
+      // In case we move to region dependent variable sets this will need to be adjusted.
       m_dataset = std::make_unique<MVA::SingleDataset>(general_options, m_variables, 1.0, m_spectators);
     }
   }
@@ -114,9 +105,9 @@ void ECLChargedPIDMVAModule::initializeMVA()
 
 void ECLChargedPIDMVAModule::beginRun()
 {
-  //(*m_mvaWeights.get()).addCallback([this]() { checkDBPayloads();});
+  (*m_mvaWeights.get()).addCallback([this]() { checkDBPayloads();});
   checkDBPayloads();
-  //(*m_mvaWeights.get()).addCallback([this]() { initializeMVA(); });
+  (*m_mvaWeights.get()).addCallback([this]() { initializeMVA(); });
   initializeMVA();
 }
 
@@ -125,6 +116,7 @@ void ECLChargedPIDMVAModule::event()
   for (const auto& track : m_tracks) {
 
     // load the pion fit hypothesis or closest in mass.
+    // we require a track to have at least one shower matched to it.
     const TrackFitResult* fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
     if (fitRes == nullptr) continue;
     const auto relShowers = track.getRelationsTo<ECLShower>();
@@ -159,80 +151,56 @@ void ECLChargedPIDMVAModule::event()
     if (!((*m_mvaWeights.get())->isPhasespaceCovered(showerTheta, p, charge))) continue;
 
 
+    // in principle the variables could be stored in the payloads as is done for the analysis level chargedParticleMVA
+    // and accessed via the variable manager. This would be robust against changing the variable set in the future.
+    // However, especially for the digit level variables this would be slower as the energy ranking of the digits would be done for each
+    // of the variables.
+
     // basic variables
-    m_dataset->m_input[0] = maxEnergy;
-    m_dataset->m_input[1] = maxEnergy / p;
-    m_dataset->m_input[2] = mostEnergeticShower->getE1oE9();
-    m_dataset->m_input[3] = mostEnergeticShower->getE9oE21();
-    m_dataset->m_input[4] = mostEnergeticShower->getTrkDepth();
-    m_dataset->m_input[5] = mostEnergeticShower->getLateralEnergy();
-
-
-    // REDUCED VARIABLE SET
-    //   m_dataset->m_input[0] = maxEnergy;
     m_dataset->m_input[0] = maxEnergy / p;
     m_dataset->m_input[1] = mostEnergeticShower->getE1oE9();
     m_dataset->m_input[2] = mostEnergeticShower->getE9oE21();
     m_dataset->m_input[3] = mostEnergeticShower->getTrkDepth();
     m_dataset->m_input[4] = mostEnergeticShower->getLateralEnergy();
 
-
     //Zernike moments
     int offset = 5;
-    for (unsigned int n = 0; n <= 6; n++) {
+    for (unsigned int n = 1; n <= 6; n++) {
       for (unsigned int m = 0; m <= n; m++) {
-        m_dataset->m_input[(n * (n + 1)) / 2 + m + offset] =  mostEnergeticShower->getAbsZernikeMoment(n, m);
+        m_dataset->m_input[(n * (n + 1)) / 2 + m + offset - 1] =  mostEnergeticShower->getAbsZernikeMoment(n, m);
       }
     }
 
     // PSD information
-    offset += 28;
+    offset += 27;
 
     ECLGeometryPar* geometry = ECLGeometryPar::Instance();
-
-    std::vector<std::tuple<double, unsigned int>> EnergyToSort;
-
+    std::vector<std::tuple<double, unsigned int, bool>> EnergyToSort;
     RelationVector<ECLCalDigit> relatedDigits = mostEnergeticShower->getRelationsTo<ECLCalDigit>();
 
     //EnergyToSort vector is used for sorting digits by offline two component energy
     for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
 
       const auto caldigit = relatedDigits.object(iRel);
+      bool goodFit = true;
 
       //exclude digits without waveforms
       const double digitChi2 = caldigit->getTwoComponentChi2();
-      ECLDsp::TwoComponentFitType digitFitType = caldigit->getTwoComponentFitType();
+      if (digitChi2 < 0)  goodFit = false;
 
-      if (!digitChi2) {
-        std::cout << "digitChi2 evaluates to False" << std::endl;
-      }
-
-      if (!digitFitType) {
-        std::cout << "digitFitType evaluates to False" << std::endl;
-      }
-
-      std::cout << "-1 " << std::endl;
-      std::cout << "Test: " << digitChi2 << "  " << caldigit->getTwoComponentHadronEnergy() << std::endl;
-
-      if (digitChi2 < 0)  continue;
-      std::cout << "0 : " <<  caldigit->getTwoComponentSavedChi2(digitFitType) << std::endl;
-      std::cout << "1 : " <<  digitChi2 << std::endl;
-
-//       ECLDsp::TwoComponentFitType digitFitType = caldigit->getTwoComponentFitType();
+      ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
 
       //exclude digits digits with poor chi2
-      std::cout << "2" << std::endl;
-      if (digitFitType == ECLDsp::poorChi2) continue;
+      if (digitFitType1 == ECLDsp::poorChi2) goodFit = false;
 
       //exclude digits with diode-crossing fits
-      if (digitFitType == ECLDsp::photonDiodeCrossing) continue;
-      std::cout << "3" << std::endl;
+      if (digitFitType1 == ECLDsp::photonDiodeCrossing)  goodFit = false;
 
-      EnergyToSort.emplace_back(caldigit->getTwoComponentTotalEnergy(), iRel);
+      // use getTwoComponentTotalEnergy instead?
+      EnergyToSort.emplace_back(caldigit->getEnergy(), iRel, goodFit);
     }
-    std::cout << "Finished getting energy vector" << std::endl;
 
-    //sorting by energy
+    // sort the vector
     std::sort(EnergyToSort.begin(), EnergyToSort.end(), std::greater<>());
 
     //get cluster position information
@@ -243,55 +211,58 @@ void ECLChargedPIDMVAModule::event()
     B2Vector3D showerPosition;
     showerPosition.SetMagThetaPhi(showerR, showerTheta, showerPhi);
 
+    // order of variables is:
+    // 1.Hadron Energy
+    // 2.Online Energy
+    // 3.Hadron Energy Fraction
+    // 4.Fraction of Shower Energy
+    // 5.Digit Weight
+    // 6.Digit Fit type
+    // 7.Digit Radius
+    // 8.Digit Cos Theta
+    // 9.Digit Phi
 
     for (unsigned int digit = 0; digit < 10; ++digit) {
       if (digit < EnergyToSort.size()) {
-        const auto [digitEnergy, next] = EnergyToSort[digit];
+        const auto [digitEnergy, next, goodFit] = EnergyToSort[digit];
         const auto caldigit = relatedDigits.object(next);
         ECLDsp::TwoComponentFitType digitFitType = caldigit->getTwoComponentFitType();
         const int cellId = caldigit->getCellId();
         B2Vector3D calDigitPosition = geometry->GetCrystalPos(cellId - 1);
         TVector3 tempP = showerPosition - calDigitPosition;
 
-        m_dataset->m_input[offset]      = caldigit->getTwoComponentHadronEnergy();
+        m_dataset->m_input[offset]      = goodFit ? caldigit->getTwoComponentHadronEnergy() : 0.0;
         m_dataset->m_input[offset + 1]  = caldigit->getEnergy();
-        m_dataset->m_input[offset + 2]  = m_dataset->m_input[offset] / digitEnergy;
-        m_dataset->m_input[offset + 3]  = relatedDigits.weight(next);
-        m_dataset->m_input[offset + 4]  = digitFitType;
-        m_dataset->m_input[offset + 5]  = tempP.Mag();
-        m_dataset->m_input[offset + 6]  = tempP.CosTheta();
-        m_dataset->m_input[offset + 7]  = tempP.Phi();
+        m_dataset->m_input[offset + 2]  = goodFit ?  m_dataset->m_input[offset] / digitEnergy : 0.0;
+        m_dataset->m_input[offset + 3]  = caldigit->getEnergy() / mostEnergeticShower->getEnergy();
+        m_dataset->m_input[offset + 4]  = relatedDigits.weight(next);
+        m_dataset->m_input[offset + 5]  = goodFit ? digitFitType : -1.0;
+        m_dataset->m_input[offset + 6]  = tempP.Mag();
+        m_dataset->m_input[offset + 7]  = tempP.CosTheta();
+        m_dataset->m_input[offset + 8]  = tempP.Phi();
       } else {
         m_dataset->m_input[offset]      = 0.0;
         m_dataset->m_input[offset + 1]  = 0.0;
         m_dataset->m_input[offset + 2]  = 0.0;
         m_dataset->m_input[offset + 3]  = 0.0;
-        m_dataset->m_input[offset + 4]  = -1.0;
-        m_dataset->m_input[offset + 5]  = 0.0;
+        m_dataset->m_input[offset + 4]  = 0.0;
+        m_dataset->m_input[offset + 5]  = -1.0;
         m_dataset->m_input[offset + 6]  = 0.0;
         m_dataset->m_input[offset + 7]  = 0.0;
+        m_dataset->m_input[offset + 8]  = 0.0;
       }
-      offset += 8;
+      offset += 9;
     }
 
     //get the MVA response values
     unsigned int linearBinIndex = (*m_mvaWeights.get())->getLinearisedBinIndex(showerTheta, p, charge);
-    B2INFO("Bin index, theta, p, charge: " << linearBinIndex << "  " << showerTheta << "  " << p << "  " << charge << " \n");
+    B2DEBUG(12, "Bin index, theta, p, charge: " << linearBinIndex << "  " << showerTheta << "  " << p << "  " << charge << " \n");
     // We deal w/ a SingleDataset, so 0 is the only existing component by construction.
     std::vector<float> scores = m_experts.at(linearBinIndex)->applyMulticlass(*m_dataset)[0];
-
-    B2INFO("Scores:");
-    for (auto score : scores) {
-      B2INFO(score);
-    }
 
     // log transform the scores
     for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
       scores[iResponse] = logTransformation(scores[iResponse]);
-    }
-    B2INFO("Log Transformed Scores:");
-    for (auto score : scores) {
-      B2INFO(score);
     }
 
     float logLikelihoods[Const::ChargedStable::c_SetSize];
@@ -322,21 +293,14 @@ void ECLChargedPIDMVAModule::event()
           transformed_scores = decorrTransformation(transformed_scores, (*m_mvaWeights.get())->getDecorrelationMatrix(absPdgId,
                                                     linearBinIndex));
         }
-
-      }
-      B2INFO("Further Transformed Scores:");
-      for (auto score : scores) {
-        B2INFO(score);
       }
 
       // get the pdf values for each response value
       float logL = 0.0;
-      B2INFO("LogL");
       for (unsigned int iResponse = 0; iResponse < transformed_scores.size(); iResponse++) {
 
-
-//         //TEMP TEST
-//         if (hypo_idx != iResponse) {continue;}
+        if ((*(*m_mvaWeights.get())->getTransformMode(linearBinIndex) ==
+             ECLChargedPIDMVAWeights::BDTResponseTransformMode::c_LogTransformSingle) and (hypo_idx != iResponse)) {continue;}
 
         double xmin, xmax;
         (*m_mvaWeights.get())->getPDF(absPdgId, iResponse, linearBinIndex)->GetRange(xmin, xmax);
@@ -347,10 +311,8 @@ void ECLChargedPIDMVAModule::event()
 
         float pdfval = (*m_mvaWeights.get())->getPDF(absPdgId, iResponse, linearBinIndex)->Eval(transformed_score_copy);
         // dont take a log of inf or 0
-        B2INFO("Raw pdfval: " << pdfval << " Min, Response, Max: " << xmin << ", " << transformed_score_copy << ", " << xmax);
         pdfval = std::max(pdfval , std::numeric_limits<float>::min());
         logL += (std::isnormal(pdfval) && pdfval > 0) ? std::log(pdfval) : c_dummyLogL;
-        B2INFO(logL << "  " << pdfval << "  " << absPdgId << "  " << iResponse);
       }
       logLikelihoods[hypo_idx] = logL;
     } // hypo loop
@@ -358,7 +320,6 @@ void ECLChargedPIDMVAModule::event()
     const auto eclPidLikelihood = m_eclPidLikelihoods.appendNew(logLikelihoods);
 
     track.addRelationTo(eclPidLikelihood);
-
   } // tracks
 }
 
@@ -415,5 +376,3 @@ std::vector<float> ECLChargedPIDMVAModule::decorrTransformation(const std::vecto
   }
   return decor_scores;
 }
-
-

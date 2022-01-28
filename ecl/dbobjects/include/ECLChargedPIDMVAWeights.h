@@ -1,12 +1,9 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
- *                                                                        *
+ * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Marcel Hohmann (marcel.hohmann@unimelb.edu.au)          *
- *                Marco Milesi (marco.milesi@unimelb.edu.au)              *
  *                                                                        *
- * This software is provided "as is" without any warranty.                *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
 #pragma once
@@ -69,10 +66,12 @@ namespace Belle2 {
     enum class BDTResponseTransformMode : unsigned int {
       /** log transform the bdt responses. Default mode */
       c_LogTransform = 0,
+      /** log transform the bdt responses. Take the likelihood from only the bdt response for the hypothesis */
+      c_LogTransformSingle = 1,
       /** Gaussian transform of the log transformed bdt response. */
-      c_GaussianTransform = 1,
+      c_GaussianTransform = 2,
       /** Decorrelation transform of the gaussian transformed bdt responses. */
-      c_DecorrelationTransform = 2
+      c_DecorrelationTransform = 3
     };
 
 

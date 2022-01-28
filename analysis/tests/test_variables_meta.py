@@ -147,7 +147,7 @@ class MetavariableDataTypeTest(unittest.TestCase):
                         enumtype,
                         f"Metavariable '{function_name}' in file {filepath}:\n"
                         "Metavariable function return type and Manager::VariableDataType have to match."  # noqa
-                        f"Return type is {return_type} but it is registered as Manager::VariableDataType::c_{enumtype}.\n"  # noqa
+                        f"Return type is {return_type} but it is registered as Manager::VariableDataType::c_{enumtype}.\n",  # noqa
                     )
                     continue
                 else:
@@ -196,9 +196,7 @@ class MetavariableDataTypeTest(unittest.TestCase):
         """Metavariables have to be registered with the correct Manager::Variable::VariableDataType enum value. This test makes sure Metavariable definition and variable registration are correct."""  # noqa
         # check if grep is available
         try:
-            subprocess.run(
-                "grep -V", check=True, shell=True, capture_output=True
-            )
+            subprocess.run(["grep", "-V"], check=True, capture_output=True)
         except subprocess.CalledProcessError:
             logging.basicConfig(format="%(message)s")
             logging.error(
@@ -207,10 +205,16 @@ class MetavariableDataTypeTest(unittest.TestCase):
             self.fail()
 
         # Use grep to find files with REGISTER_METAVARIABLE statements
-        analysis_module = basf2.find_file('analysis')
+        analysis_module = basf2.find_file("analysis")
         files = subprocess.run(
-            f'grep "REGISTER_METAVARIABLE" -r {analysis_module} -I -l',  # noqa
-            shell=True,
+            [
+                "grep",
+                "REGISTER_METAVARIABLE",
+                "-r",
+                analysis_module,
+                "-I",
+                "-l",
+            ],
             capture_output=True,
         )
         # Decode stdout and extract filenames

@@ -200,7 +200,7 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
   eclShower->setLateralEnergy(LATenergy);
   eclShower->setE1oE9(computeE1oE9(*eclShower));
   if (eclShower->getE9oE21() < 1e-9) eclShower->setE9oE21(computeE9oE21(*eclShower));
-  for (unsigned int n = 0; n <= 6; n++) {
+  for (unsigned int n = 1; n <= 6; n++) {
     for (unsigned int m = 0; m <= n; m++) {
       eclShower->setAbsZernikeMoment(n, m, computeAbsZernikeMoment(projectedECLDigits, sumEnergies, n, m, rho0));
     }

@@ -219,7 +219,7 @@ void ChargedPidMVAModule::event()
         std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(cutstr);
 
         if (!cut->check(particle)) {
-          B2WARNING("\tParticle didn't pass MVA category cut, skip MVA application...");
+          B2DEBUG(11, "\t\tParticle didn't pass MVA category cut, skip MVA application...");
           continue;
         }
 

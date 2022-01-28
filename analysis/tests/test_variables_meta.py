@@ -79,8 +79,9 @@ class MetavariableDataTypeTest(unittest.TestCase):
             filepath (str): path to file containing REGISTER_METAVARIABLE
 
         Raises:
-            AssertionError: [description]
-            AssertionError: [description]
+            AssertionError: Raised if no expected function definition is found.
+            AssertionError: Rased if lambda function has no associated
+                            type information, or no lambda function is defined.
 
         Returns:
             int: number of metavariables in file.
@@ -112,9 +113,9 @@ class MetavariableDataTypeTest(unittest.TestCase):
                 self.assertEqual(
                     enumtype,
                     self.hardcoded[function_name],
-                    f"In file {filepath}:\n"
-                    f"Expected registered type of Metavariable '{function_name}':"  # noqa
-                    f"{self.hardcoded[function_name]}, actual: {enumtype}",
+                    f"Metavariable '{function_name}' in file {filepath}:\n"
+                    f"Metavariable function return type and Manager::VariableDataType have to match.\n"  # noqa
+                    f"Expected: Manager::VariableDataType::{self.hardcoded[function_name]}, actual: Manager::VariableDataType::{enumtype}",  # noqa
                 )
                 continue
 
@@ -142,17 +143,17 @@ class MetavariableDataTypeTest(unittest.TestCase):
                     self.assertEqual(
                         return_type,
                         enumtype,
-                        f"In file {filepath}:\n"
-                        f"Metavariable function '{function_name}' is of type "
-                        f"{return_type} but is registered as c_{enumtype}",
+                        f"Metavariable '{function_name}' in file {filepath}:\n"
+                        "Metavariable function return type and Manager::VariableDataType have to match."  # noqa
+                        f"Return type is {return_type} but it is registered as Manager::VariableDataType::c_{enumtype}.\n"  # noqa
                     )
                     continue
                 else:
                     raise AssertionError(
-                        f"In file {filepath}:\n"
-                        f"Metavariable function '{function_name}'"
-                        "return type could not be determined.\n"
-                        "You can fix this by adding type the information to "
+                        f"Metavariable '{function_name}' in file {filepath}:\n"
+                        "Metavariable function return type and Manager::VariableDataType have to match."  # noqa
+                        "Return type of function could not be automatically determined from the source code."  # noqa
+                        "You can add an exception by adding the expected return type information to "  # noqa
                         "the 'hardcoded' dictionary of this testcase."
                     )
 
@@ -170,17 +171,19 @@ class MetavariableDataTypeTest(unittest.TestCase):
                 self.assertEqual(
                     lambdatype,
                     enumtype,
-                    f"In file {filepath}:\n"
-                    f"Metavariable function '{function_name}' is of type "
-                    f"{lambdatype} but is registered as c_{enumtype}",
+                    f"Metavariable '{function_name}' in file {filepath}:\n"
+                    f"Lambda function has return type {lambdatype} "
+                    f"but is registered with Manager::VariableDataType::c_{enumtype}.\n"  # noqa
+                    "VariableDataType and lambda return type have to match.",
                 )
             else:  # lambda type or definition not found
                 raise AssertionError(
-                    f"For Metavariable '{function_name}' in {filepath}.\n"
-                    "Lambda definition is missing type information or "
-                    "lambda definition could not be found in metavariable definition. "  # noqa
-                    "Please add type annotation '-> double/int/bool' to lambda.\n"  # noqa
-                    "Or mark metavariable as exception by adding type information to this testcase in the 'hardcoded' dict.\n"  # noqa
+                    f"Metavariable '{function_name}' in {filepath}:\n"
+                    "VariableDataType and lambda definition have to match.\n"
+                    "Either lambda function is missing return type information"
+                    ", or lambda definition could not be found.\n"  # noqa
+                    "Please add return type annotation '(const Particle * particle) -> double/int/bool' to lambda.\n"  # noqa
+                    "Or add this metavariable as exception, by adding the expected return type information in the 'hardcoded' dictionary of this testcase\n"  # noqa
                     f"{func_body}"
                 )
 
@@ -188,11 +191,7 @@ class MetavariableDataTypeTest(unittest.TestCase):
         return len(registering_statements)
 
     def test_metavariable_data_types(self):
-        """Metavariables have to be registered with the correct
-        Manager::Variable::VariableDataType enum value.
-        This test makes sure Metavariable definition and
-        variable registration are correct.
-        """
+        """Metavariables have to be registered with the correct Manager::Variable::VariableDataType enum value. This test makes sure Metavariable definition and variable registration are correct."""  # noqa
         # check if grep is available
         try:
             subprocess.run(

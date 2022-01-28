@@ -32,15 +32,15 @@ namespace Belle2 {
   namespace Variable {
 
     enum PSDVarType {
-      onlineEnergy = 1,
+      onlineEnergy = 1,   // (called energy)
       fractionOfShowerEnergy = 2,
-      offlineEnergy = 3,
-      diodeEnergy = 4,
-      hadronEnergy = 5,
+      offlineEnergy = 3, // (twoComponentTotalEnergy)
+      diodeEnergy = 4, //twoComponentDiodeEnergy
+      hadronEnergy = 5, // twoComponentHadronEnergy
       hadronEnergyFraction = 6,
-      digitWeight = 7,
-      digitFitType = 8,
-      radius = 9,
+      digitWeight = 7, //weight
+      digitFitType = 8, //twoComponentFitType
+      radius = 9, //
       theta = 10,
       cosTheta = 11,
       phi = 12,
@@ -55,7 +55,6 @@ namespace Belle2 {
       if (!cluster) return nullptr;
       const auto relShowers = cluster->getRelationsWith<ECLShower>();
       if (relShowers.size() == 0) return nullptr;
-      B2WARNING("TEST");
       // can this relation ever be 1 cluster : many showers?
       if (relShowers.size() != 1) B2INFO("Rel vector has size " << relShowers.size()); // TEMP
 
@@ -95,7 +94,7 @@ namespace Belle2 {
     }
 
 
-    // returns the nm zernike moment (between 00 and 66)
+    // returns the nm zernike moment (between 10 and 66)
     double getAbsZernikeMomentNM(const Particle* particle,
                                  const std::vector<double>& arguments)
     {
@@ -105,42 +104,21 @@ namespace Belle2 {
       const long n = std::lround(arguments[0]);
       const long m = std::lround(arguments[1]);
 
+      if ((n < 1) or (n > 6)) {
+        B2FATAL("n must be between 1 and 6 for meta function absZernikeMoment");
+      }
+      if (m > n) {
+        B2FATAL("m must be less than or equal to n for meta function absZernikeMoment");
+      }
+
       ECLShower* shower = getECLShowerFromParticle(particle);
       if (!shower) return std::numeric_limits<float>::quiet_NaN();
       return shower->getAbsZernikeMoment(n, m);
     }
 
 
-    double getShowerHadronIntensity(const Particle* particle)
-    {
-      ECLShower* shower = getECLShowerFromParticle(particle);
-      if (!shower) return std::numeric_limits<float>::quiet_NaN();
-      return shower->getShowerHadronIntensity();
-    }
-
-    double getShowerNumberOfHadronDigits(const Particle* particle)
-    {
-      ECLShower* shower = getECLShowerFromParticle(particle);
-      if (!shower) return std::numeric_limits<float>::quiet_NaN();
-      return shower->getNumberOfHadronDigits();
-    }
-
-    double getShowerNumberOfCrystalsForEnergy(const Particle* particle)
-    {
-      ECLShower* shower = getECLShowerFromParticle(particle);
-      if (!shower) return std::numeric_limits<float>::quiet_NaN();
-      return shower->getNumberOfCrystalsForEnergy();
-    }
-
-    double getShowerNominalNumberOfCrystalsForEnergy(const Particle* particle)
-    {
-      ECLShower* shower = getECLShowerFromParticle(particle);
-      if (!shower) return std::numeric_limits<float>::quiet_NaN();
-      return shower->getNominalNumberOfCrystalsForEnergy();
-    }
-
-    // Large overlap with similar function in ECLCalDigitVariables. Keep this script for now as things are changing but once converged on a selection
-    // Remove overlap.
+    // Large overlap with similar function in ECLCalDigitVariables.
+    // TODO - Possibly integrate into ECLCalDigitVariables.
     double getDigitVariable(const Particle* particle, const std::vector<double>& arguments, const PSDVarType varType)
     {
       if (arguments.size() != 1) {
@@ -269,20 +247,12 @@ namespace Belle2 {
       return getDigitVariable(particle, arguments, PSDVarType::fractionOfShowerEnergy);
     }
 
+
     VARIABLE_GROUP("ECL Charged PID Expert Variables (cDST)");
 
-    // Info from shower
+    // Zernike moments
     REGISTER_VARIABLE("absZernikeMoment(n, m)", getAbsZernikeMomentNM,
                       "[eclChargedPIDExpert] the absolute value of zernike moment nm. Requires n <= 6 and m <= n.");
-    REGISTER_VARIABLE("getShowerHadronIntensity", getShowerHadronIntensity,
-                      "[eclChargedPIDExpert] gets the hadron intensity of the shower associated with the particle.");
-    REGISTER_VARIABLE("getShowerNumberOfHadronDigits", getShowerNumberOfHadronDigits,
-                      "[eclChargedPIDExpert] gets the number of hadron digits of the shower associated with the particle.");
-    REGISTER_VARIABLE("getShowerNumberOfCrystalsForEnergy", getShowerNumberOfCrystalsForEnergy,
-                      "[eclChargedPIDExpert] gets the number of crystals used for energy of the shower associated with the particle.");
-    REGISTER_VARIABLE("getShowerNominalNumberOfCrystalsForEnergy", getShowerNominalNumberOfCrystalsForEnergy,
-                      "[eclChargedPIDExpert] gets the nominal number of crystals used for energy of the shower associated with the particle.");
-
 
     //ECLCalDigit info
     REGISTER_VARIABLE("hadronEnergy(i)", getHadronEnergy,

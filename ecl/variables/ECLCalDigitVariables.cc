@@ -63,7 +63,14 @@ namespace Belle2 {
       phiOffset = 30,
       thetaOffset = 31,
       phiPointing = 32,
-      thetaPointing = 33
+      thetaPointing = 33,
+      twoComponentHadronEnergyFraction = 41,
+      fractionOfClusterEnergy = 42,
+      phiRelativeToCluster = 43,
+      thetaRelativeToCluster = 44,
+      cosThetaRelativeToCluster = 45,
+      rRelativeToCluster = 46,
+//       useableForChargedPID = 47, // convenience function
     };
 
     // enum with available center types
@@ -177,7 +184,7 @@ namespace Belle2 {
 
         // Mapping object for phi & theta
         StoreObjPtr<ECLCellIdMapping> mapping;
-        if (!mapping) {
+        if ((!mapping) and ((varid == varType::phi) or (varid == varType::theta))) {
           B2ERROR("Mapping not found, did you forget to run the eclFillCellIdMapping module?");
           return std::numeric_limits<double>::quiet_NaN();
         }
@@ -213,12 +220,38 @@ namespace Belle2 {
           return mapping->getCellIdToTheta(caldigitSelected->getCellId());
         } else if (varid == varType::R_geom) {
           return getCellIdMagnitude(caldigitSelected->getCellId());
+        } else if (varid == varType::twoComponentHadronEnergyFraction) {
+          if (caldigitSelected-> getTwoComponentTotalEnergy() > 0) {
+            return caldigitSelected->getTwoComponentHadronEnergy() / caldigitSelected->getTwoComponentTotalEnergy();
+          } else {
+            return 0.0;
+          }
+        } else if (varid == varType::fractionOfClusterEnergy) {
+          return digitEnergy / cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+        } else if ((varid == varType::phiRelativeToCluster) ||
+                   (varid == varType::thetaRelativeToCluster) ||
+                   (varid == varType::cosThetaRelativeToCluster) ||
+                   (varid == varType::rRelativeToCluster)) {
+          ECL::ECLGeometryPar* geometry = ECL::ECLGeometryPar::Instance();
+          B2Vector3D calDigitPosition = geometry->GetCrystalPos(caldigitSelected->getCellId() - 1);
+          B2Vector3D clusterPosition;
+          clusterPosition.SetMagThetaPhi(cluster->getR(), cluster->getTheta(), cluster->getPhi());
+
+          TVector3 tempP = clusterPosition - calDigitPosition;
+          if (varid == varType::rRelativeToCluster) return tempP.Mag();
+          if (varid == varType::thetaRelativeToCluster) return tempP.Theta();
+          if (varid == varType::cosThetaRelativeToCluster) return tempP.CosTheta();
+          if (varid == varType::phiRelativeToCluster) return tempP.Phi();
+//         } else if (varid == varType::useableForChargedPID) {
+//             //exclude digits digits with poor chi2 or diode-crossing fits
+//             if (digitChi2 < 0)  return 0.0;
+//             if (caldigit->getTwoComponentFitType() == ECLDsp::poorChi2) return 0.0;
+//             if (caldigit->getTwoComponentFitType() == ECLDsp::photonDiodeCrossing)  return 0.0;
+//             return 1.0;
         } else {
           B2FATAL("variable id not found.");
         }
-
       }
-
       return std::numeric_limits<double>::quiet_NaN();
 
     }
@@ -485,6 +518,16 @@ namespace Belle2 {
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
     }
 
+    //! @returns the eclcaldigit two component hadron energy fraction by digit energy rank
+    double getTwoComponentHadronEnergyFractionByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentHadronEnergyFraction};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
     //! @returns the eclcaldigit two component diode energy by digit energy rank
     double getTwoComponentDiodeEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
@@ -532,6 +575,56 @@ namespace Belle2 {
         B2FATAL("Need exactly one parameters (energy index).");
       }
       std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::weight};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit fraction of cluster energy by digit energy rank
+    double getECLCalDigitFractionOfClusterEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::fractionOfClusterEnergy};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns phi of the vector joining the eclcaldigit to the shower center by digit energy rank
+    double getECLCalDigitPhiRelativeToClusterByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::phiRelativeToCluster};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns theta of the vector joining the eclcaldigit to the shower center by digit energy rank
+    double getECLCalDigitThetaRelativeToClusterByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::thetaRelativeToCluster};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns cos(theta) of the vector joining the eclcaldigit to the shower center by digit energy rank
+    double getECLCalDigitCosThetaRelativeToClusterByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::cosThetaRelativeToCluster};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns radius of the vector joining the eclcaldigit to the shower center by digit energy rank
+    double getECLCalDigitRadiusRelativeToClusterByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::rRelativeToCluster};
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
     }
 
@@ -1126,8 +1219,8 @@ namespace Belle2 {
       }
 
       return sum;
-
     }
+
 
     double getClusterECLCalDigitMCEnergy(const Particle* particle)
     {
@@ -1158,9 +1251,7 @@ namespace Belle2 {
 
         return sum;
       }
-
       return std::numeric_limits<float>::quiet_NaN();
-
     }
 
     double getExtFrontPositionPhiOffset(const Particle* particle)
@@ -1432,6 +1523,19 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("eclcaldigitRByEnergyRank(i)", getRByEnergyRank,
                       "Returns R of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitTwoComponentHadronEnergyFractionByEnergyRank(i)", getTwoComponentHadronEnergyFractionByEnergyRank,
+                      "Returns the hadron energy fraction of the i-th highest energy caldigit in the cluster (i>=0)");
+    REGISTER_VARIABLE("eclcaldigitFractionOfTotalClusterEnergyByEnergyRank(i)", getECLCalDigitFractionOfClusterEnergyByEnergyRank,
+                      "Returns the fraction of the total cluster energy in the i-th highest energy caldigit in the cluster (i>=0). Assumes a photon hypothesis.");
+    REGISTER_VARIABLE("eclcaldigitPhiRelativeToClusterByEnergyRank(i)", getECLCalDigitPhiRelativeToClusterByEnergyRank,
+                      "Returns phi of the vector joining the i-th highest energy caldigit in the cluster (i>=0) to the cluster center.");
+    REGISTER_VARIABLE("eclcaldigitThetaRelativeToClusterByEnergyRank(i)", getECLCalDigitThetaRelativeToClusterByEnergyRank,
+                      "Returns theta of the vector joining the i-th highest energy caldigit in the cluster (i>=0) to the cluster center.");
+    REGISTER_VARIABLE("eclcaldigitCosThetaRelativeToClusterByEnergyRank(i)", getECLCalDigitCosThetaRelativeToClusterByEnergyRank,
+                      "Returns cos(theta) of the vector joining the i-th highest energy caldigit in the cluster (i>=0) to the cluster center.");
+    REGISTER_VARIABLE("eclcaldigitRadiusRelativeToClusterByEnergyRank(i)", getECLCalDigitRadiusRelativeToClusterByEnergyRank,
+                      "Returns the magnitude of the vector joining the i-th highest energy caldigit in the cluster (i>=0) to the cluster center.");
   }
 
   // Create an empty module which allows basf2 to easily find the library and load it from the steering file

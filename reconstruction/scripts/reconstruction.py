@@ -58,13 +58,12 @@ DIGITS_OBJECTS = (
     'ARICHDigits',
     'CDCHits',
     'ECLDigits',
-    'ECLCalDigits',
     'ECLDsps',
     'KLMDigits',
     'PXDDigits',
     'SVDEventInfoSim',
     'SVDShaperDigits',
-    'TOPDigits'
+    'TOPDigits',
     'TOPRawDigits',
 )
 
@@ -731,10 +730,9 @@ def add_ecl_chargedpid_module(path, components=None, mva=False):
     if components is None or 'ECL' in components:
         # charged PID
         if mva:
-            charged_pid = register_module('ECLChargedPIDMVA')
+            path.add_module('ECLChargedPIDMVA')
         else:
-            charged_pid = register_module('ECLChargedPID')
-        path.add_module(charged_pid)
+            path.add_module('ECLChargedPID')
 
 
 def add_ecl_mc_matcher_module(path, components=None):

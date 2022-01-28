@@ -63,7 +63,7 @@ class MetavariableDataTypeTest(unittest.TestCase):
     # regular expressions
     #: regex for finding the REGISTER_METAVARIABLE statements.
     registering_regex = re.compile(
-        r"(?s)REGISTER_METAVARIABLE.*?Manager::VariableDataType::(?:c_double|c_int|c_bool)\);?"  # noqa
+        r"(?s)REGISTER_METAVARIABLE.*?Manager::VariableDataType::(?:c_double|c_int|c_bool)"  # noqa
     )
     #: regex for extracting the function name and the enum type from REGISTER_METAVARIABLE statements  # noqa
     extract_regex = re.compile(

@@ -67,7 +67,7 @@ class MetavariableDataTypeTest(unittest.TestCase):
     )
     #: regex for extracting the function name and the enum type from REGISTER_METAVARIABLE statements  # noqa
     extract_regex = re.compile(
-        r'REGISTER_METAVARIABLE\(".*?",(?P<function_name>[^,]*),.*?Manager::VariableDataType::c_(?P<enumtype>double|bool|int)\)'  # noqa
+        r'REGISTER_METAVARIABLE\(".*?",(?P<function_name>[^,]*),.*?Manager::VariableDataType::c_(?P<enumtype>double|bool|int)'  # noqa
     )
     #: regex for extracting the type of the lambda function in metavariable function definition  # noqa
     lambda_type_regex = re.compile(r"-> (?P<lambdatype>double|bool|int)")

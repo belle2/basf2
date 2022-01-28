@@ -2936,10 +2936,10 @@ namespace Belle2 {
     REGISTER_METAVARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
                           "[Eventbased] Returns the number of clean Clusters in the event\n"
                           "Clean clusters are defined by the clusters which pass the given cut assuming a photon hypothesis.",
-                          Manager::VariableDataType::c_double);
+                          Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("nCleanedTracks(cut)", nCleanedTracks,
                           "[Eventbased] Returns the number of clean Tracks in the event\n"
-                          "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.", Manager::VariableDataType::c_double);
+                          "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("formula(v1 + v2 * [v3 - v4] / v5^v6)", formula, R"DOCSTRING(
 Returns the result of the given formula, where v1 to vN are variables or floating
 point numbers. Currently the only supported operations are addition (``+``),
@@ -2987,13 +2987,13 @@ Specifying the lab frame is useful in some corner-cases. For example:
 		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
-                      "Useful if you want to write out if a particle would have passed a cut or not.", Manager::VariableDataType::c_double);
+                      "Useful if you want to write out if a particle would have passed a cut or not.", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("passesEventCut(cut)", passesEventCut,
                       "[Eventbased] Returns 1 if event passes the cut otherwise 0.\n"
-                      "Useful if you want to select events passing a cut without looping into particles, such as for skimming.\n", Manager::VariableDataType::c_double);
+                      "Useful if you want to select events passing a cut without looping into particles, such as for skimming.\n", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("countDaughters(cut)", countDaughters,
                       "Returns number of direct daughters which satisfy the cut.\n"
-                      "Used by the skimming package (for what exactly?)", Manager::VariableDataType::c_double);
+                      "Used by the skimming package (for what exactly?)", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("varFor(pdgCode, variable)", varFor,
                       "Returns the value of the variable for the given particle if its abs(pdgCode) agrees with the given one.\n"
                       "E.g. ``varFor(11, p)`` returns the momentum if the particle is an electron or a positron.", Manager::VariableDataType::c_double);
@@ -3002,11 +3002,11 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       "If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.\n"
                       "E.g. ``varForMCGen(PDG)`` returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("nParticlesInList(particleListName)", nParticlesInList,
-                      "[Eventbased] Returns number of particles in the given particle List.", Manager::VariableDataType::c_double);
+                      "[Eventbased] Returns number of particles in the given particle List.", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("isInList(particleListName)", isInList,
-                      "Returns 1 if the particle is in the list provided, 0 if not. Note that this only checks the particle given. For daughters of composite particles, please see :b2:var:`isDaughterOfList`.", Manager::VariableDataType::c_double);
+                      "Returns 1 if the particle is in the list provided, 0 if not. Note that this only checks the particle given. For daughters of composite particles, please see :b2:var:`isDaughterOfList`.", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
-                      "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.", Manager::VariableDataType::c_double);
+                      "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("isDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isDescendantOfList, R"DOC(
                       Returns 1 if the given particle appears in the decay chain of the particles in the given ParticleLists.
 
@@ -3016,7 +3016,7 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       * ``isDescendantOfList(<particle_list>,2)`` returns 1 if particle is a granddaughter of the list,
                       * ``isDescendantOfList(<particle_list>,3)`` returns 1 if particle is a great-granddaughter of the list, etc.
                       * Default value is ``-1`` that is inclusive for all generations.
-                      )DOC", Manager::VariableDataType::c_double);
+                      )DOC", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("isMCDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isMCDescendantOfList, R"DOC(
                       Returns 1 if the given particle is linked to the same MC particle as any reconstructed daughter of the decay lists.
 
@@ -3028,24 +3028,24 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       * Default value is ``-1`` that is inclusive for all generations.
 
                       It makes only sense for lists created with `fillParticleListFromMC` function with ``addDaughters=True`` argument.
-                      )DOC", Manager::VariableDataType::c_double);
+                      )DOC", Manager::VariableDataType::c_bool);
 
     REGISTER_METAVARIABLE("sourceObjectIsInList(particleListName)", sourceObjectIsInList, R"DOC(
 Returns 1 if the underlying mdst object (e.g. track, or cluster) was used to create a particle in ``particleListName``, 0 if not. 
 
 .. note::
   This only makes sense for particles that are not composite. Returns -1 for composite particles.
-)DOC", Manager::VariableDataType::c_double);
+)DOC", Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("mcParticleIsInMCList(particleListName)", mcParticleIsInMCList, R"DOC(
 Returns 1 if the particle's matched MC particle is also matched to a particle in ``particleListName`` 
 (or if either of the lists were filled from generator level `modularAnalysis.fillParticleListFromMC`.)
 
 .. seealso:: :b2:var:`isMCDescendantOfList` to check daughters.
-)DOC", Manager::VariableDataType::c_double);
+)DOC", Manager::VariableDataType::c_bool);
 
     REGISTER_METAVARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
-                      "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.", Manager::VariableDataType::c_double);
+                      "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("daughter(i, variable)", daughter, R"DOC(
                       Returns value of variable for the i-th daughter. E.g.
 
@@ -3231,7 +3231,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns value of given variable and caches this value in the ParticleExtraInfo of the provided particle.\n"
                       "The result of second call to this variable on the same particle will be provided from the cache.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("modulo(variable, n)", modulo,
-                      "Returns rest of division of variable by n.", Manager::VariableDataType::c_double);
+                      "Returns rest of division of variable by n.", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("abs(variable)", abs,
                       "Returns absolute value of the given variable.\n"
                       "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.", Manager::VariableDataType::c_double);
@@ -3248,13 +3248,13 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("isNAN(variable)", isNAN,
                       "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
-                      "Useful for debugging.", Manager::VariableDataType::c_double);
+                      "Useful for debugging.", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("ifNANgiveX(variable, x)", ifNANgiveX,
                       "Returns x (has to be a number) if variable value is nan (determined via std::isnan(double)).\n"
                       "Useful for technical purposes while training MVAs.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
-                      "Useful for debugging.", Manager::VariableDataType::c_double);
+                      "Useful for debugging.", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("unmask(variable, flag1, flag2, ...)", unmask,
                       "unmask(variable, flag1, flag2, ...) or unmask(variable, mask) sets certain bits in the variable to zero.\n"
                       "For example, if you want to set the second, fourth and fifth bits to zero, you could call \n"
@@ -3270,7 +3270,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
                       "For instance one can apply this function on a signal Photon and provide a list of all photons in the rest of event and a cut \n"
                       "around the neutral Pion mass (e.g. ``0.130 < M < 0.140``). \n"
-                      "If a combination of the signal Photon with a ROE photon fits this criteria, hence looks like a neutral pion, the veto-Metavariable will return 1", Manager::VariableDataType::c_double);
+                      "If a combination of the signal Photon with a ROE photon fits this criteria, hence looks like a neutral pion, the veto-Metavariable will return 1", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("matchedMC(variable)", matchedMC,
                       "Returns variable output for the matched MCParticle by constructing a temporary Particle from it.\n"
                       "This may not work too well if your variable requires accessing daughters of the particle.\n"
@@ -3280,7 +3280,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns number of particle which pass given in cut in the specified particle list.\n"
                       "Useful for creating statistics about the number of particles in a list.\n"
                       "E.g. ``countInList(e+, isSignal == 1)`` returns the number of correctly reconstructed electrons in the event.\n"
-                      "The variable is event-based and does not need a valid particle pointer as input.", Manager::VariableDataType::c_double);
+                      "The variable is event-based and does not need a valid particle pointer as input.", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("getVariableByRank(particleList, rankedVariableName, variableName, rank)", getVariableByRank, R"DOC(
                       Returns the value of ``variableName`` for the candidate in the ``particleList`` with the requested ``rank``.
 
@@ -3302,7 +3302,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns 0/NAN/1 if PDGCode does not match/is not available/ matches", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("numberOfNonOverlappingParticles(pList1, pList2, ...)", numberOfNonOverlappingParticles,
                       "Returns the number of non-overlapping particles in the given particle lists"
-                      "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S", Manager::VariableDataType::c_double);
+                      "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("totalEnergyOfParticlesInList(particleListName)", totalEnergyOfParticlesInList,
                       "Returns the total energy of particles in the given particle List.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("totalPxOfParticlesInList(particleListName)", totalPxOfParticlesInList,

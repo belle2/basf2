@@ -1885,7 +1885,7 @@ The probability is accessed via ``extraInfoName``, which can have the following 
 * isRightCategory(KaonPion),
 * isRightCategory(FSC).
 
-)DOC", Manager::VariableDataType::c_double);
+)DOC", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("HighestProbInCat(particleListName, extraInfoName)", HighestProbInCat,
                       "[Expert] Returns the highest target track probability value for the given category, for allowed input values for ``extraInfoName`` see :b2:var:`hasHighestProbInCat`.", Manager::VariableDataType::c_double);
 
@@ -1905,7 +1905,7 @@ Allowed input values for ``particleName`` argument in this variable are the foll
 * Lambda,
 * mcAssociated.
 
-)DOC", Manager::VariableDataType::c_double);
+)DOC", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("isRightCategory(particleName)", isRightCategory,  R"DOC(
 [Expert] Returns 1.0 if the class track by ``particleName`` category has the same flavor as the MC target track, 0.0 otherwise.
 Allowed input values for ``particleName`` argument in this variable are the following:
@@ -1925,7 +1925,7 @@ Allowed input values for ``particleName`` argument in this variable are the foll
 * Lambda,
 * mcAssociated.
 
-)DOC", Manager::VariableDataType::c_double);
+)DOC", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("QpOf(particleListName, outputExtraInfo, rankingExtraInfo)", QpOf,  R"DOC(
 [Eventbased][Expert] Returns the :math:`q*p` value for a given particle list provided as the 1st argument, 
 where math:`p` is the probability of a category stored as extraInfo, provided as the 2nd argument, 
@@ -1982,7 +1982,7 @@ The return values and the corresponding dilution ranges are the following:
 
 .. warning:: You have to run the Flavor Tagger for this variable to be meaningful.
 .. seealso:: :ref:`FlavorTagger` and :func:`flavorTagger.flavorTagger`.
-)DOC", Manager::VariableDataType::c_double);
+)DOC", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("qrOutput(combinerMethod)", qrOutput, R"DOC(
 Returns the output of the flavorTagger, flavor tag :math:`q` times the dilution factor :math:`r`, for the given combiner method. 
 The available methods are 'FBDT' and 'FANN' (category-based combiners), and 'DNN' (DNN tagger output).

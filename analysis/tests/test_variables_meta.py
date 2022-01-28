@@ -13,6 +13,8 @@ import logging
 import subprocess
 import unittest
 
+import basf2
+
 
 def findMatchedParenthesis(string: str, openchar: str, closechar: str) -> int:
     """Find matching control token in string.
@@ -205,8 +207,9 @@ class MetavariableDataTypeTest(unittest.TestCase):
             self.fail()
 
         # Use grep to find files with REGISTER_METAVARIABLE statements
+        analysis_module = basf2.find_file('analysis')
         files = subprocess.run(
-            [r'grep "REGISTER_METAVARIABLE" -r . -I -l'],
+            f'grep "REGISTER_METAVARIABLE" -r {analysis_module} -I -l',  # noqa
             shell=True,
             capture_output=True,
         )
@@ -214,15 +217,15 @@ class MetavariableDataTypeTest(unittest.TestCase):
         files = files.stdout.decode().split("\n")
         files = list(filter(lambda file: file.endswith(".cc"), files))
 
-        # There should be at least 14 files
-        self.assertGreaterEqual(len(files), 14)
+        # There should be at least 13 files
+        self.assertGreaterEqual(len(files), 13)
         # We track the number of metavariables to make sure we don't miss some
         num_metavariables = 0
         for filepath in files:
             num_metavariables += self.process_file(filepath)
 
-        # We should get at least 244 registering statements
-        self.assertGreaterEqual(num_metavariables, 244)
+        # We should get at least 243 registering statements
+        self.assertGreaterEqual(num_metavariables, 243)
 
 
 if __name__ == "__main__":

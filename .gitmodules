@@ -1,0 +1,3 @@
+[submodule "daq/pcie40/Pcie40Software"]
+	path = daq/pcie40/Pcie40Software
+	url = ssh://git@stash.desy.de:7999/bidu/software.git

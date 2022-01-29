@@ -748,10 +748,8 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
   }
 
   // event # check
-  if (evtnum + NUM_SENDER_THREADS == data[EVENUM_POS]) {
+  if (evtnum + NUM_SENDER_THREADS != data[EVENUM_POS]) {
     if (exprun == data[RUNNO_POS] && exprun != 0) {
-      //  if (evtnum + NUM_SENDER_THREADS != data[EVENUM_POS]) {
-      //    if (exprun == data[RUNNO_POS] && exprun != 0) {
       n_messages[ 10 ] = n_messages[ 10 ] + 1 ;
       if (n_messages[ 10 ] < max_number_of_messages) {
         char err_buf[500] = {0};

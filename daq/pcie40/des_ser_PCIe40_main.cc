@@ -185,6 +185,12 @@ unsigned int cur_exprun[NUM_SENDER_THREADS] = {0};
 #define MAX_DMA_WORDS_OF_256BITS 0xFF
 
 
+/////////////////////////////////////////////////////////
+// hostname
+/////////////////////////////////////////////////////////
+std::map< string , unsigned int > host_nodeid;
+char hostnamebuf[50];
+
 
 unsigned int n_messages[17] = {0};
 // std::map< int , int > n_messages = {
@@ -742,13 +748,24 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
   }
 
   // event # check
-  if (evtnum + NUM_SENDER_THREADS != data[EVENUM_POS]) {
+  if (evtnum + NUM_SENDER_THREADS == data[EVENUM_POS]) {
     if (exprun == data[RUNNO_POS] && exprun != 0) {
+      //  if (evtnum + NUM_SENDER_THREADS != data[EVENUM_POS]) {
+      //    if (exprun == data[RUNNO_POS] && exprun != 0) {
       n_messages[ 10 ] = n_messages[ 10 ] + 1 ;
       if (n_messages[ 10 ] < max_number_of_messages) {
+        char err_buf[500] = {0};
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[FATAL] Bad event number prev %.8x cur %.8x\n" , evtnum , data[EVENUM_POS]) ;
+        sprintf(err_buf,
+                "[FATAL] %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u for all channels : prun %u crun %u\n %s %s %d\n",
+                hostnamebuf, -1,
+                data[EVENUM_POS], evtnum + (NUM_SENDER_THREADS - 1),
+                exprun, data[RUNNO_POS],
+                __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        //        printf("[FATAL] Bad event number prev %.8x cur %.8x\n" , evtnum , data[EVENUM_POS]) ;
+        printf("[DEBUG] %s\n", err_buf); fflush(stdout);
         printEventData(data, event_length);
+        B2FATAL(err_buf);
         pthread_mutex_unlock(&(mtx_sender_log));
       }
       err_bad_evenum[sender_id]++;
@@ -1608,7 +1625,7 @@ int main(int argc, char** argv)
   }
 
 
-  char hostnamebuf[50], *endptr;
+  char* endptr;
   unsigned int pcie40_node_id = (unsigned int)strtol(argv[1], &endptr, 0);
   //  char tmp_arg[20];
   // if( argv[1][0] == 'x' || argv[1][0] == 'X' || argv[1][1] == 'x' || argv[1][1] == 'X' ){
@@ -1618,7 +1635,6 @@ int main(int argc, char** argv)
   //   pcie40_node_id = (unsigned int)strtol(tmp_arg, &endptr, 16) ;
   // }
 
-  std::map< string , unsigned int > host_nodeid;
   host_nodeid[ "rsvd1" ] = 0x01000001;
   host_nodeid[ "rsvd2" ] = 0x01000002;
   host_nodeid[ "rsvd3" ] = 0x01000003;
@@ -1640,8 +1656,8 @@ int main(int argc, char** argv)
   host_nodeid[ "rklm1" ] = 0x07000001;
   host_nodeid[ "rtrg1" ] = 0x10000001;
 
+  gethostname(hostnamebuf, sizeof(hostnamebuf));
   if (pcie40_node_id != 0) {
-    gethostname(hostnamebuf, sizeof(hostnamebuf));
     std::map<string, unsigned int>::iterator itr;
     itr = host_nodeid.find(hostnamebuf);
     if (itr != host_nodeid.end()) {

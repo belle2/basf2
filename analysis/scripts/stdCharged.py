@@ -202,11 +202,11 @@ def stdLep(pdgId,
                               Please refer to the
                               `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
                               for info about lepton ID recommendations.
-        release (Optional[int]): the major release number associated to the recommended global tag chosen.
-                                 If specified, this ensures the correct :math:`\\ell` ID variables are used.
+        release (Optional[int]): the major release number of the data and MC campaigns considered.
+                                 If specified, it ensures the correct :math:`\\ell` ID variables are used.
                                  Please refer to the
                                  `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
-                                 for info about lepton identification variables.
+                                 for info about lepton identification variables and campaigns.
         listname (Optional[str]): the name of the lepton list.
                                   By default, it is assigned as: '{lepton}-:{method}_{classification}_{working_point}'
         trainingModeMulticlass (Optional[``Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode``]): enum identifier

@@ -1661,6 +1661,7 @@ int main(int argc, char** argv)
   host_nodeid[ "rsvd2" ] = 0x01000002;
   host_nodeid[ "rsvd3" ] = 0x01000003;
   host_nodeid[ "rsvd4" ] = 0x01000004;
+  host_nodeid[ "rsvd5" ] = 0x01000005;
   host_nodeid[ "rcdc1" ] = 0x02000001;
   host_nodeid[ "rcdc2" ] = 0x02000002;
   host_nodeid[ "rcdc3" ] = 0x02000003;
@@ -1675,6 +1676,7 @@ int main(int argc, char** argv)
   host_nodeid[ "rari2" ] = 0x04000002;
   host_nodeid[ "recl1" ] = 0x05000001;
   host_nodeid[ "recl2" ] = 0x05000002;
+  host_nodeid[ "recl3" ] = 0x05000003;
   host_nodeid[ "rklm1" ] = 0x07000001;
   host_nodeid[ "rtrg1" ] = 0x10000001;
 

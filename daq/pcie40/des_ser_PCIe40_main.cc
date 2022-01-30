@@ -420,6 +420,69 @@ int get1stChannel(unsigned int*& data)
   return ret_1st_ch;
 }
 
+
+void printEventNumberError(unsigned int*& data, const unsigned int evtnum, const unsigned int exprun, const int eve_diff,
+                           const int sender_id)
+{
+//
+// event # check ( Since this check is done in a single thread, only differnce in the prev. event came to this thread can be checked.
+// So, if event # from PCIe40 are in order like, 0, 3, 2, 10002, 9746, 5, 8, 7, 10007, 9753, No event jump can be issued.
+// eb0 will check futher check.
+//
+
+  unsigned int event_length = data[ Belle2::RawHeader_latest::POS_NWORDS ];
+  char err_buf[2000] = {0};
+  int reduced_flag = 1; // 0 : not-reduced(error event) 1: reduced
+  if (data[ MAGIC_7F7F_POS ] & 0x00008000) {
+    reduced_flag = 0;
+  }
+
+  pthread_mutex_lock(&(mtx_sender_log));
+  n_messages[ 10 ] = n_messages[ 10 ] + 1 ;
+  if (reduced_flag == 1) {
+    sprintf(err_buf,
+            "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u for all channels : prun %u crun %u\n %s %s %d\n",
+            sender_id, hostnamebuf, get1stChannel(data),
+            data[EVENUM_POS], evtnum + (eve_diff - 1),
+            exprun, data[RUNNO_POS],
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  } else {
+    sprintf(err_buf,
+            "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u ( ",
+            sender_id, hostnamebuf, get1stChannel(data),
+            data[EVENUM_POS], evtnum + (eve_diff - 1));
+    int temp_pos = 0;
+    unsigned int temp_eve = 0;
+    for (int i = 0; i <  MAX_PCIE40_CH; i++) {
+      int linksize = 0;
+      if (i < 47) {
+        linksize = data[ POS_TABLE_POS + (i + 1) ] - data[ POS_TABLE_POS + i ];
+      } else {
+        linksize = event_length - (data[ POS_TABLE_POS + 47 ] + LEN_ROB_TRAILER);
+      }
+      if (linksize <= 0) continue;
+      temp_pos = data[ POS_TABLE_POS + i ] + OFFSET_HDR;
+      temp_eve = data[ temp_pos +
+                       Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
+                       Belle2::PreRawCOPPERFormat_latest::POS_TT_TAG ];
+
+      if (evtnum + eve_diff != temp_eve) {
+        sprintf(err_buf + strlen(err_buf),
+                "ch %d eve 0x%.8x : ",
+                i, temp_eve);
+      }
+    }
+    sprintf(err_buf + strlen(err_buf), "prun %u crun %u\n %s %s %d\n",
+            exprun, data[RUNNO_POS],
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  }
+  printf("%s\n", err_buf); fflush(stdout);
+  printEventData(data, event_length, sender_id);
+  err_bad_evenum[sender_id]++;
+  pthread_mutex_unlock(&(mtx_sender_log));
+  return;
+}
+
 int checkDMAHeader(unsigned int*& data , unsigned int& size , double& dsize , int& total_pages , int& index_pages)
 {
   if (data == 0) {
@@ -797,63 +860,19 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
     }
   }
 
-//
-// event # check ( Since this check is done in a single thread, only differnce in the prev. event came to this thread can be checked.
-// So, if event # from PCIe40 are in order like, 0, 3, 2, 10002, 9746, 5, 8, 7, 10007, 9753, No event jump can be issued.
-// eb0 will check futher check.
-//
-  if (evtnum + NUM_SENDER_THREADS != data[EVENUM_POS]) {
+  //
+  // Check event # incrementation
+  //
+  if (evtnum + NUM_SENDER_THREADS  != data[EVENUM_POS]) {
     if (exprun == data[RUNNO_POS]
         && exprun != 0) { // After a run-change or if this is the 1st event, event incrementation is not checked.
-      pthread_mutex_lock(&(mtx_sender_log));
-      n_messages[ 10 ] = n_messages[ 10 ] + 1 ;
-      char err_buf[2000] = {0};
-      if (reduced_flag == 1) {
-        sprintf(err_buf,
-                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u for all channels : prun %u crun %u\n %s %s %d\n",
-                sender_id, hostnamebuf, get1stChannel(data),
-                data[EVENUM_POS], evtnum + (NUM_SENDER_THREADS - 1),
-                exprun, data[RUNNO_POS],
-                __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      } else {
-        sprintf(err_buf,
-                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u ( ",
-                sender_id, hostnamebuf, get1stChannel(data),
-                data[EVENUM_POS], evtnum + (NUM_SENDER_THREADS - 1));
-        int temp_pos = 0;
-        unsigned int temp_eve = 0;
-        for (int i = 0; i <  MAX_PCIE40_CH; i++) {
-          int linksize = 0;
-          if (i < 47) {
-            linksize = data[ POS_TABLE_POS + (i + 1) ] - data[ POS_TABLE_POS + i ];
-          } else {
-            linksize = event_length - (data[ POS_TABLE_POS + 47 ] + LEN_ROB_TRAILER);
-          }
-          if (linksize <= 0) continue;
-          temp_pos = data[ POS_TABLE_POS + i ] + OFFSET_HDR;
-          temp_eve = data[ temp_pos +
-                           Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
-                           Belle2::PreRawCOPPERFormat_latest::POS_TT_TAG ];
-          if (temp_eve != 0) {
-            //        if (evtnum + NUM_SENDER_THREADS != temp_eve ) {
-            sprintf(err_buf + strlen(err_buf),
-                    "ch %d eve 0x%.8x : ",
-                    i, temp_eve);
-          }
-        }
-        sprintf(err_buf + strlen(err_buf), "prun %u crun %u\n %s %s %d\n",
-                exprun, data[RUNNO_POS],
-                __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      }
-      printf("%s\n", err_buf); fflush(stdout);
-      printEventData(data, event_length, sender_id);
-      err_bad_evenum[sender_id]++;
-      pthread_mutex_unlock(&(mtx_sender_log));
+      printEventNumberError(data, evtnum, exprun, NUM_SENDER_THREADS, sender_id);
 #ifndef NO_ERROR_STOP
       exit(1);
 #endif
     }
   }
+
   evtnum = data[EVENUM_POS];
 
   // printf("checkEventData()\n"); fflush(stdout);

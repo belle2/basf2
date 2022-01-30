@@ -2039,6 +2039,7 @@ int main(int argc, char** argv)
   int k = 0 ;
 
   unsigned int evtnum = 0;
+  unsigned int exprun = 0;
   int errors = 0 ;
   unsigned int esize = 0 ;
   int total_pages = 0 ;
@@ -2183,11 +2184,28 @@ int main(int argc, char** argv)
         //
         // Send data to senders
         //
-        //  if( false ){
         if (event_words > 0 && event_words < MAX_EVENT_WORDS) {
-          //  printf("sta 2\n");fflush(stdout);
-          client_id = client_id % NUM_SENDER_THREADS;
 
+          //
+          // Check event # incrementation
+          //
+          unsigned int* temp_data = combined_data + dma_hdr_offset;
+          if (evtnum + 1  != temp_data[EVENUM_POS]) {
+            if (exprun == temp_data[RUNNO_POS]
+                && exprun != 0) { // After a run-change or if this is the 1st event, event incrementation is not checked.
+              printEventNumberError(temp_data, evtnum, exprun, 1, -1);
+#ifndef NO_ERROR_STOP
+              exit(1);
+#endif
+            }
+          }
+          evtnum = temp_data[EVENUM_POS];
+          exprun = temp_data[RUNNO_POS];
+
+          //
+          // Copy data to buffer
+          //
+          client_id = client_id % NUM_SENDER_THREADS;
           if (buffer_id[client_id] == 0) {
             while (1) {
               if (buffer_filled[client_id][0] == 0)break;
@@ -2230,6 +2248,9 @@ int main(int argc, char** argv)
           exit(1);
         }
 
+        //
+        // Error-count monitor
+        //
         previous_index = 0 ;
         if (new_buf_combined == 1) {
           delete [] combined_data ;
@@ -2321,7 +2342,7 @@ int main(int argc, char** argv)
     }
 
     //
-    // Status Monitor
+    // Rate Monitor
     //
     cnt++;
     if (cnt == start_cnt) init_time = getTimeSec();

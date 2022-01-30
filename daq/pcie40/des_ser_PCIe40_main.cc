@@ -367,7 +367,7 @@ void printEventData(unsigned int* data, int size, int sender_id)
   printf("thread %d : %.8x : ", sender_id, 0);
   if (0 != data) {
     for (int i = 0 ; i < size; ++i) {
-      printf("%.8x ", data[ i ]);
+      printf("%.8x ", i, data[ i ]);
       if (i % 8 == 7)printf("\nthread %d : %.8x : ", sender_id, i + 1);
     }
   } else printf("No data\n")  ;
@@ -754,7 +754,8 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
 
     if (data[ ERR_POS ] == 0) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d :  Inconsistent header %.8x and errorbit %.8x\n", sender_id, data[ MAGIC_7F7F_POS ], data[ ERR_POS ]);
+      printf("[FATAL] thread %d : Data error was deteced by PCIe40 FPGA. Header %.8x, Errorbit %.8x\n", sender_id, data[ MAGIC_7F7F_POS ],
+             data[ ERR_POS ]);
       printEventData(data, event_length, sender_id);
       pthread_mutex_unlock(&(mtx_sender_log));
 #ifndef NO_ERROR_STOP
@@ -906,7 +907,7 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
       n_messages[ 11 ] = n_messages[ 11 ] + 1 ;
       if (n_messages[ 11 ] < max_number_of_messages) {
         printf("[FATAL] thread %d : The next channel in data is ch %d but it must be ch %d according to masking register info. of PCIe40\n"
-               , sender_id, i,
+               ,  sender_id, i,
                valid_ch[link_cnt]) ;
         printEventData(data, event_length, sender_id);
       }

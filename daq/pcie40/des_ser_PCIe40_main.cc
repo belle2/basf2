@@ -899,11 +899,13 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
 
     // compare valid ch with register value
     //    printf("sdr %d i %d lcnt %d validch %d\n", sdr_id, i, link_cnt, valid_ch[link_cnt]);
-    if (valid_ch[link_cnt] != i) {
+    //    if (valid_ch[link_cnt] != i) {
+    if (valid_ch[link_cnt] == i) {
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 11 ] = n_messages[ 11 ] + 1 ;
       if (n_messages[ 11 ] < max_number_of_messages) {
-        printf("[FATAL] thread %d : A valid ch in data(=%d) is not equal to regeister value(%d) for masking\n" , sender_id, i,
+        printf("[FATAL] thread %d : The next channel in data is ch %d but it must be ch %d according to masking register info. of PCIe40\n"
+               , sender_id, i,
                valid_ch[link_cnt]) ;
         printEventData(data, event_length, sender_id);
       }

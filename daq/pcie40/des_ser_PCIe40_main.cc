@@ -1017,14 +1017,15 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
 #ifdef CRC_CHECK
     if (get_crc(data_for_crc , size , first_crc) != value) {
       pthread_mutex_lock(&(mtx_sender_log));
-      if (crc_err_ch[sender_id][i] == 0) {
-        printf("[FATAL] thread %d : CRC Error calc %.4X data %.8X eve %u ch %d\n" , sender_id,
-               get_crc(data_for_crc , size , first_crc) ,
-               data[ cur_pos + linksize - 2 ], myevtnum, i) ;
-        printf("[DEBUG] thread %d : crc_error : Printing a whole event...\n", sender_id);
-        printEventData(data, event_length, sender_id);
 
-      }
+      // Currently, zero-torellance for a CRC error.
+      //      if (crc_err_ch[sender_id][i] == 0) {
+      printf("[FATAL] thread %d : CRC Error calc %.4X data %.8X eve %u ch %d\n" , sender_id,
+             get_crc(data_for_crc , size , first_crc) ,
+             data[ cur_pos + linksize - 2 ], myevtnum, i) ;
+      printf("[DEBUG] thread %d : crc_error : Printing a whole event...\n", sender_id);
+      printEventData(data, event_length, sender_id);
+      //      }
       crc_err_ch[sender_id][i]++;
       total_crc_errors[sdr_id]++;
       pthread_mutex_unlock(&(mtx_sender_log));

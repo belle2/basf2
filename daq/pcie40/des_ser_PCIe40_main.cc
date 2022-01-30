@@ -367,7 +367,7 @@ void printEventData(unsigned int* data, int size, int sender_id)
   printf("thread %d : %.8x : ", sender_id, 0);
   if (0 != data) {
     for (int i = 0 ; i < size; ++i) {
-      printf("%.8x ", i, data[ i ]);
+      printf("%.8x ", data[ i ]);
       if (i % 8 == 7)printf("\nthread %d : %.8x : ", sender_id, i + 1);
     }
   } else printf("No data\n")  ;
@@ -400,6 +400,25 @@ void printFullData(unsigned int* data)
   fflush(stdout);
 }
 
+int get1stChannel(unsigned int*& data)
+{
+  int ret_1st_ch = -1;
+  unsigned int event_length = data[ Belle2::RawHeader_latest::POS_NWORDS ];
+
+  for (int i = 0; i <  MAX_PCIE40_CH; i++) {
+    int linksize = 0;
+    if (i < 47) {
+      linksize = data[ POS_TABLE_POS + (i + 1) ] - data[ POS_TABLE_POS + i ];
+    } else {
+      linksize = event_length - (data[ POS_TABLE_POS + 47 ] + LEN_ROB_TRAILER);
+    }
+    if (linksize > 0) {
+      ret_1st_ch = i;
+      break;
+    }
+  }
+  return ret_1st_ch;
+}
 
 int checkDMAHeader(unsigned int*& data , unsigned int& size , double& dsize , int& total_pages , int& index_pages)
 {
@@ -691,8 +710,10 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
   int reduced_flag = 1; // 0 : not-reduced(error event) 1: reduced
   //  TO CHECK LATER unsigned int event_size = data[ 8 ] ;
 
+  //
+  // Check if event length is not too long or zero.
+  //
   unsigned int event_length = data[ EVENT_LEN_POS ];
-
   if (event_length > 0x100000) {
     pthread_mutex_lock(&(mtx_sender_log));
     printf("[FATAL] Too large event size. : 0x%.8x : %d words. Exiting...\n", data[ EVENT_LEN_POS ],
@@ -709,6 +730,9 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
     exit(1);
   }
 
+  //
+  // Check the 7f7f magic word
+  //
   if ((data[ MAGIC_7F7F_POS ] & 0xFFFF0000) != 0x7F7F0000) {
     char err_buf[500] = {0};
     pthread_mutex_lock(&(mtx_sender_log));
@@ -725,22 +749,16 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
 #ifndef NO_ERROR_STOP
     exit(1);
 #endif
-    //    return 1 ;
   }
 
   //
   // Store nodeID
   //
   data[ NODEID_POS ] = node_id;
-  // if ( ( data[ 1 ] & 0xFF00 ) >> 8 != 0 ) {
-  //    pthread_mutex_lock(&(mtx_sender_log));
-  //   n_messages[ 8 ] = n_messages[ 8 ] + 1 ;
-  //   if ( n_messages[ 8 ] < max_number_of_messages )
-  //     printf( "Bad version\n" ) ;
-  //    pthread_mutex_unlock(&(mtx_sender_log));
-  //   return 1 ;
-  // }
 
+  //
+  // Printing the 1st event
+  //
   if (evtnum == 0 && sdr_id == 0) {
     pthread_mutex_lock(&(mtx_sender_log));
     printf("[DEBUG] thread %d :  Printing the 1st event.\n", sender_id);
@@ -748,20 +766,22 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
     pthread_mutex_unlock(&(mtx_sender_log));
   }
 
+  //
+  // Check if non data-reduction bit was set or not.
+  //
   if (data[ MAGIC_7F7F_POS ] & 0x00008000) {
     // not-reduced
     reduced_flag = 0;
-
-    if (data[ ERR_POS ] == 0) {
-      pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : Data error was deteced by PCIe40 FPGA. Header %.8x, Errorbit %.8x\n", sender_id, data[ MAGIC_7F7F_POS ],
-             data[ ERR_POS ]);
-      printEventData(data, event_length, sender_id);
-      pthread_mutex_unlock(&(mtx_sender_log));
-#ifndef NO_ERROR_STOP
-      exit(1);
-#endif
-    }
+//     if (data[ ERR_POS ] == 0) {
+//       pthread_mutex_lock(&(mtx_sender_log));
+//       printf("[FATAL] thread %d : Data error was deteced by PCIe40 FPGA. Header %.8x, Errorbit %.8x\n", sender_id, data[ MAGIC_7F7F_POS ],
+//              data[ ERR_POS ]);
+//       printEventData(data, event_length, sender_id);
+//       pthread_mutex_unlock(&(mtx_sender_log));
+// #ifndef NO_ERROR_STOP
+//       exit(1);
+// #endif
+//    }
   } else {
     // reduced
     reduced_flag = 1;
@@ -777,22 +797,31 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
     }
   }
 
-  // event # check
+//
+// event # check
+//
   if (evtnum + NUM_SENDER_THREADS != data[EVENUM_POS]) {
     if (exprun == data[RUNNO_POS] && exprun != 0) {
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 10 ] = n_messages[ 10 ] + 1 ;
       if (n_messages[ 10 ] < max_number_of_messages) {
         char err_buf[500] = {0};
-        sprintf(err_buf,
-                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u for all channels : prun %u crun %u\n %s %s %d\n",
-                sender_id, hostnamebuf, -1,
-                data[EVENUM_POS], evtnum + (NUM_SENDER_THREADS - 1),
-                exprun, data[RUNNO_POS],
-                __FILE__, __PRETTY_FUNCTION__, __LINE__);
-        //        printf("[FATAL] Bad event number prev %.8x cur %.8x\n" , evtnum , data[EVENUM_POS]) ;
-        printf("%s\n", err_buf); fflush(stdout);
-        printEventData(data, event_length, sender_id);
+
+        if (reduced_flag == 1) {
+          sprintf(err_buf,
+                  "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u for all channels : prun %u crun %u\n %s %s %d\n",
+                  sender_id, hostnamebuf, get1stChannel(data),
+                  data[EVENUM_POS], evtnum + (NUM_SENDER_THREADS - 1),
+                  exprun, data[RUNNO_POS],
+                  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          //        printf("[FATAL] Bad event number prev %.8x cur %.8x\n" , evtnum , data[EVENUM_POS]) ;
+          printf("%s\n", err_buf); fflush(stdout);
+          printEventData(data, event_length, sender_id);
+        } else {
+
+
+
+        }
       }
       err_bad_evenum[sender_id]++;
       pthread_mutex_unlock(&(mtx_sender_log));

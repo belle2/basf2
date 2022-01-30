@@ -319,22 +319,6 @@ void printData(unsigned int* data)
   } else printf("No data\n")  ;
 }
 
-void printEventData(unsigned int* data, int size)
-{
-  printf("%.8x : ", 0);
-  if (0 != data) {
-    for (int i = 0 ; i < size; ++i) {
-      printf("%.8x ", data[ i ]);
-      if (i % 8 == 7)printf("\n%.8x : ", i + 1);
-    }
-    // for ( int i = 0 ; i < size/8 ; ++i ) {
-    //   printf( "eved %3d: %8X%8X%8X%8X%8X%8X%8X%8X\n" , i , data[ 8*i+7 ] , data[ 8*i+6 ] , data[ 8*i+5 ] ,
-    //        data[ 8*i+4 ], data[ 8*i+3 ], data[ 8*i+2 ], data[ 8*i+1 ], data[ 8*i ] ) ;
-    // }
-  } else printf("No data\n")  ;
-  printf("\n");
-  fflush(stdout);
-}
 void writeToFile(std::ofstream& the_file , unsigned int* data , int size)
 {
   the_file << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl ; // to separate events
@@ -362,6 +346,32 @@ void printEventData(unsigned int* data)
     printf("%.8x ", data[ i ]);
     if (i % 8 == 7)printf("\n eve %.3x : ", i);
   }
+  fflush(stdout);
+}
+
+void printEventData(unsigned int* data, int size)
+{
+  printf("%.8x : ", 0);
+  if (0 != data) {
+    for (int i = 0 ; i < size; ++i) {
+      printf("%.8x ", data[ i ]);
+      if (i % 8 == 7)printf("\n%.8x : ", i + 1);
+    }
+  } else printf("No data\n")  ;
+  printf("\n");
+  fflush(stdout);
+}
+
+void printEventData(unsigned int* data, int size, int sender_id)
+{
+  printf("thread %d : %.8x : ", sender_id, 0);
+  if (0 != data) {
+    for (int i = 0 ; i < size; ++i) {
+      printf("%.8x ", data[ i ]);
+      if (i % 8 == 7)printf("\nthread %d : %.8x : ", sender_id, i + 1);
+    }
+  } else printf("No data\n")  ;
+  printf("\n");
   fflush(stdout);
 }
 
@@ -684,13 +694,16 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
     exit(1);
   }
 
-  if ((data[ MAGIC_7F7F_POS ] & 0xFFFF0000) != 0x7F7F0000) {
+  if ((data[ MAGIC_7F7F_POS ] & 0xFFFF0000) == 0x7F7F0000) {
+    char err_buf[500] = {0};
     pthread_mutex_lock(&(mtx_sender_log));
     n_messages[ 7 ] = n_messages[ 7 ] + 1 ;
     if (n_messages[ 7 ] < max_number_of_messages) {
-      printf("Bad code 7F7F ( 0x%.8x )\n" , data[ MAGIC_7F7F_POS ]) ;
-      //      printLine(data, MAGIC_7F7F_POS);
-      printEventData(data, event_length);
+      sprintf(err_buf, "[FATAL] thread %d : ERROR_EVENT :  Invalid Magic word in ReadOut Board header( 0x%.8x ) : It must be 0x7f7f????\n"
+              ,
+              sender_id, data[ MAGIC_7F7F_POS ]) ;
+      printf("%s\n", err_buf); fflush(stdout);
+      printEventData(data, event_length, sender_id);
     }
     err_bad_7f7f[sender_id]++;
     pthread_mutex_unlock(&(mtx_sender_log));
@@ -748,22 +761,21 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
   }
 
   // event # check
-  if (evtnum + NUM_SENDER_THREADS != data[EVENUM_POS]) {
+  if (evtnum + NUM_SENDER_THREADS == data[EVENUM_POS]) {
     if (exprun == data[RUNNO_POS] && exprun != 0) {
       n_messages[ 10 ] = n_messages[ 10 ] + 1 ;
       if (n_messages[ 10 ] < max_number_of_messages) {
         char err_buf[500] = {0};
         pthread_mutex_lock(&(mtx_sender_log));
         sprintf(err_buf,
-                "[FATAL] %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u for all channels : prun %u crun %u\n %s %s %d\n",
-                hostnamebuf, -1,
+                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u for all channels : prun %u crun %u\n %s %s %d\n",
+                sender_id, hostnamebuf, -1,
                 data[EVENUM_POS], evtnum + (NUM_SENDER_THREADS - 1),
                 exprun, data[RUNNO_POS],
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         //        printf("[FATAL] Bad event number prev %.8x cur %.8x\n" , evtnum , data[EVENUM_POS]) ;
-        printf("[DEBUG] %s\n", err_buf); fflush(stdout);
-        printEventData(data, event_length);
-        B2FATAL(err_buf);
+        printf("%s\n", err_buf); fflush(stdout);
+        printEventData(data, event_length, sender_id);
         pthread_mutex_unlock(&(mtx_sender_log));
       }
       err_bad_evenum[sender_id]++;
@@ -1364,7 +1376,8 @@ void* sender(void* arg)
   }
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
-    printf("[FATAL] Failed to bind. Maybe other programs have already occupied this port(%d). Exiting...\n",
+    printf("[FATAL] thread %d : Failed to bind. Maybe other programs have already occupied this port(%d). Exiting...\n",
+           sender_id,
            port_to); fflush(stdout);
     // Check the process occupying the port 30000.
     FILE* fp;
@@ -1372,15 +1385,18 @@ void* sender(void* arg)
     char cmdline[500];
     sprintf(cmdline, "/usr/sbin/ss -ap | grep %d", port_to);
     if ((fp = popen(cmdline, "r")) == NULL) {
-      printf("[WARNING] Failed to run %s\n", cmdline);
+      printf("[WARNING] thread %d : Failed to run %s\n", sender_id,
+             cmdline);
     }
     while (fgets(buf, 256, fp) != NULL) {
-      printf("[ERROR] Failed to bind. output of ss(port %d) : %s\n", port_to, buf); fflush(stdout);
+      printf("[INFO] thread %d : Failed to bind. output of ss(port %d) : %s\n", sender_id,
+             port_to, buf); fflush(stdout);
     }
     // Error message
     fclose(fp);
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] Failed to bind.(%s) Maybe other programs have already occupied this port(%d). Exiting...",
+    sprintf(err_buf, "[FATAL] thread %d : Failed to bind.(%s) Maybe other programs have already occupied this port(%d). Exiting...",
+            sender_id,
             strerror(errno), port_to);
     printf("%s\n", err_buf); fflush(stdout);
     //    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -1392,7 +1408,8 @@ void* sender(void* arg)
   int backlog = 1;
   if (listen(fd_listen, backlog) < 0) {
     char err_buf[500];
-    sprintf(err_buf, "Failed in listen(%s). Exting...", strerror(errno));
+    sprintf(err_buf, "[FATAL] thread %d : Failed in listen(%s). Exting...", sender_id,
+            strerror(errno));
     printf("%s\n", err_buf); fflush(stdout);
     //    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
@@ -1403,19 +1420,24 @@ void* sender(void* arg)
   //
   int fd_accept;
   struct sockaddr_in sock_accept;
-  //  printf("[DEBUG] Accepting... : port %d server %s\n", port_to, hostname_local.c_str());
-  printf("[DEBUG] Accepting... : port %d\n", port_to);
+  pthread_mutex_lock(&(mtx_sender_log));
+  printf("[DEBUG] thread %d : Accepting... : port %d\n", sender_id,
+         port_to);
   fflush(stdout);
+  pthread_mutex_unlock(&(mtx_sender_log));
 
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] Failed to accept(%s). Exiting...", strerror(errno));
+    sprintf(err_buf, "[FATAL] thread %d : Failed to accept(%s). Exiting...", sender_id,
+            strerror(errno));
     printf("%s\n", err_buf); fflush(stdout);
     //    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   } else {
     //    B2INFO("Done.");
-    printf("[DEBUG] Accepted.\n"); fflush(stdout);
+    pthread_mutex_lock(&(mtx_sender_log));
+    printf("[DEBUG] thread %d : Accepted.\n", sender_id); fflush(stdout);
+    pthread_mutex_unlock(&(mtx_sender_log));
 
     //    set timepout option
     struct timeval timeout;
@@ -1423,9 +1445,11 @@ void* sender(void* arg)
     timeout.tv_usec = 0;
     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
     if (ret < 0) {
-      char err_buf[500] = "[FATAL] Failed to set TIMEOUT. Exiting...";
+      pthread_mutex_lock(&(mtx_sender_log));
+      char err_buf[500];
+      sprintf(err_buf, "[FATAL] thread %d : Failed to set TIMEOUT. Exiting...", sender_id);
       printf("%s\n", err_buf); fflush(stdout);
-      //      print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      pthread_mutex_unlock(&(mtx_sender_log));
       exit(-1);
     }
   }
@@ -1433,11 +1457,9 @@ void* sender(void* arg)
   if (fd_listen) {
     close(fd_listen);
   }
-
-  printf("Connection(port %d) accepted\n", port_to); fflush(stdout);
+  printf("[INFO] thread %d : Connection(port %d) accepted\n", sender_id, port_to); fflush(stdout);
 #endif
 
-  printf("buff1 = %p\n", buff); fflush(stdout);
   double init_time = getTimeSec();
   double prev_time = init_time;
 
@@ -1489,7 +1511,7 @@ void* sender(void* arg)
     // Check data
     //
     if (buff == NULL) {
-      printf("buff3 = %p\n", buff); fflush(stdout);
+      printf("[FATAL] thread %d : buffer in sender is NULL(= %p )\n", sender_id, buff); fflush(stdout);
       exit(1);
     }
     int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, send_nwords, exprun, evtnum, node_id, valid_ch, sender_id);
@@ -1499,7 +1521,8 @@ void* sender(void* arg)
         //        err_bad_ffaa[sender_id]++;
         unsigned int event_nwords = send_nwords - NW_SEND_HEADER - NW_SEND_TRAILER;
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[WARNING] fake-error events are detected. Header and trailer reduction will be made and data are checked again.\n");
+        printf("[WARNING] thread %d : fake-error events are detected. Header and trailer reduction will be made and data are checked again.\n",
+               sender_id);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
         reduceHdrTrl(buff + NW_SEND_HEADER, event_nwords);
@@ -1511,19 +1534,19 @@ void* sender(void* arg)
         int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, send_nwords, exprun, evtnum, node_id, valid_ch, sender_id);
         if (ret != DATACHECK_OK) {
           pthread_mutex_lock(&(mtx_sender_log));
-          printf("[FATAL] checkEventData() detected an error after reduceHdrTrl(). Exiting...\n");
+          printf("[FATAL] thread %d : checkEventData() detected an error after reduceHdrTrl(). Exiting...\n", sender_id);
           fflush(stdout);
           pthread_mutex_unlock(&(mtx_sender_log));
           exit(1);
         }
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[FATAL] Currently, we will not tolerate a fake-error event. Exiting...\n");
+        printf("[FATAL] thread %d : Currently, we will not tolerate a fake-error event. Exiting...\n", sender_id);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
         exit(1);
       } else {
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[FATAL] checkEventData() detected an error. Exiting...\n");
+        printf("[FATAL] thread %d : checkEventData() detected an error. Exiting...\n", sender_id);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
         exit(1);
@@ -1556,8 +1579,8 @@ void* sender(void* arg)
         } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
           continue;
         } else {
-          perror("[FATAL] write() failed");
-          printf("[FATAL] Return value %d\n", ret);
+          perror("[DEBuG] write() failed");
+          printf("[FATAL] thread %d : write() failed. Return value of write() = %d\n", sender_id, ret);
           fflush(stdout);
           exit(1);
         }
@@ -1568,7 +1591,7 @@ void* sender(void* arg)
         break;
       } else if (sent_bytes > (int)((send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER)
                                     * sizeof(unsigned int))) {
-        printf("[FATAL] Too many bytes are sent\n");
+        printf("[FATAL] thread %d : Too many bytes are sent\n", sender_id);
         fflush(stdout);
         exit(1);
       }
@@ -1585,9 +1608,9 @@ void* sender(void* arg)
     if (cnt % 1000000 == 1) {
       if (cnt > start_cnt) {
         double cur_time = getTimeSec();
-        printf("evt %lld time %.1lf dataflow %.1lf MB/s rate %.2lf kHz : so far dataflow %.1lf MB/s rate %.2lf kHz size %d\n",
-               cnt,
-               cur_time - init_time,
+        printf("[INFO] thread %d : evt %lld time %.1lf dataflow %.1lf MB/s rate %.2lf kHz : so far dataflow %.1lf MB/s rate %.2lf kHz size %d\n",
+               sender_id,
+               cnt, cur_time - init_time,
                NUM_CLIENTS_PER_THREAD * (cnt - prev_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - prev_time),
                (cnt - prev_cnt) / (cur_time - prev_time) / 1000. ,
                NUM_CLIENTS_PER_THREAD * (cnt - start_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - init_time),
@@ -1618,7 +1641,8 @@ int main(int argc, char** argv)
   bool isData = true ;
   bool writeInFile = false ;
   if (argc != 2) {
-    printf("Usage : %s <node ID>, node ID = 0x0, if you are not using the Belle II DAQ system.\n", argv[0]) ;
+    printf("[FATAL] Invalid usage of %s : Usage : %s <node ID>, node ID = 0x0, if you are not using the Belle II DAQ system.\n",
+           argv[0], argv[0]) ;
     return 0 ;
   }
 

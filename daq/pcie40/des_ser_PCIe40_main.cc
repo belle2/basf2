@@ -765,8 +765,8 @@ void reduceHdrTrl(unsigned int* data , unsigned int& event_nwords)
 }
 
 
-int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned int& exprun ,
-                   unsigned int& evtnum, unsigned int node_id, std::vector< int > valid_ch, int sender_id)
+int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsigned int& exprun ,
+                   unsigned int& evtnum, unsigned int node_id, std::vector< int > valid_ch)
 {
   int expected_number_of_links = valid_ch.size() ;
   int reduced_flag = 1; // 0 : not-reduced(error event) 1: reduced
@@ -818,15 +818,6 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
   //
   data[ NODEID_POS ] = node_id;
 
-  //
-  // Printing the 1st event
-  //
-  if (evtnum == 0 && sdr_id == 0) {
-    pthread_mutex_lock(&(mtx_sender_log));
-    printf("[DEBUG] thread %d :  Printing the 1st event.\n", sender_id);
-    printEventData(data, event_length, sender_id);
-    pthread_mutex_unlock(&(mtx_sender_log));
-  }
 
   //
   // Check if non data-reduction bit was set or not.
@@ -907,19 +898,19 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
         //
         // Initialize error counter when run # is changed.
         //
-        total_crc_good[sdr_id] = 0;
-        total_crc_errors[sdr_id] = 0;
-        err_flag_cnt[sdr_id] = 0;
-        cur_evtnum[sdr_id] = 0;
-        err_not_reduced[sdr_id] = 0;
-        err_bad_7f7f[sdr_id] = 0;
-        err_bad_runnum[sdr_id] = 0;
-        err_bad_linknum[sdr_id] = 0;
-        err_bad_evenum[sdr_id] = 0;
-        err_bad_ffaa[sdr_id] = 0;
-        err_bad_ff55[sdr_id] = 0;
-        err_bad_linksize[sdr_id] = 0;
-        err_link_eve_jump[sdr_id] = 0;
+        total_crc_good[sender_id] = 0;
+        total_crc_errors[sender_id] = 0;
+        err_flag_cnt[sender_id] = 0;
+        cur_evtnum[sender_id] = 0;
+        err_not_reduced[sender_id] = 0;
+        err_bad_7f7f[sender_id] = 0;
+        err_bad_runnum[sender_id] = 0;
+        err_bad_linknum[sender_id] = 0;
+        err_bad_evenum[sender_id] = 0;
+        err_bad_ffaa[sender_id] = 0;
+        err_bad_ff55[sender_id] = 0;
+        err_bad_linksize[sender_id] = 0;
+        err_link_eve_jump[sender_id] = 0;
       }
     }
   }
@@ -1021,7 +1012,9 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
       //      return 1 ;
     }
 
-    // b2link time check
+    //
+    // b2link time check ( Only thread == 0 )
+    //
     if (evtnum % 1000000 == 1000) {
       if (reduced_flag == 1) {
         time_t timer;
@@ -1033,8 +1026,8 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
           first_b2lctime_flag = 1;
         }
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[DEBUG] thread %d : eve %u ch %3d B2Lctime %.8x %12u diff %12d %s", sender_id, evtnum, i, data[ cur_pos + FFAA_POS + 1 ],
-               data[ cur_pos + FFAA_POS + 1 ], data[ cur_pos + FFAA_POS + 1 ] - first_b2lctime, asctime(t_st));
+        printf("[DEBUG] thread %d : eve %u ch %3d B2Lctime 0x%.8x diff %.2lf [us] %s", sender_id, evtnum, i, data[ cur_pos + FFAA_POS + 1 ],
+               ((int)(data[ cur_pos + FFAA_POS + 1 ] - first_b2lctime)) / 127.22, asctime(t_st));
         pthread_mutex_unlock(&(mtx_sender_log));
       }
     }
@@ -1118,13 +1111,13 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
       printEventData(data, event_length, sender_id);
       //      }
       crc_err_ch[sender_id][i]++;
-      total_crc_errors[sdr_id]++;
+      total_crc_errors[sender_id]++;
       pthread_mutex_unlock(&(mtx_sender_log));
 #ifndef NO_ERROR_STOP
       exit(1);
 #endif
     } else {
-      total_crc_good[sdr_id]++ ;
+      total_crc_good[sender_id]++ ;
       //      printf("crc check ch %d pos %d val %.4x\n", i, cur_pos, value);
       //      if( true ){
     }
@@ -1135,14 +1128,22 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
       pthread_mutex_lock(&(mtx_sender_log));
       printf("[DEBUG] thread %d :  CRC Good  calc %.4X data %.4X eve %u ch %d crcOK %u crcNG %d errflag %u\n" , sender_id,
              get_crc(data_for_crc , size , first_crc) ,
-             value, myevtnum, i, total_crc_good[sdr_id], total_crc_errors[sender_id], err_flag_cnt[sender_id]) ;
-      printf("[DEBUG] thread %d : crc_err_cnt : ", sender_id);
+             value, myevtnum, i, total_crc_good[sender_id], total_crc_errors[sender_id], err_flag_cnt[sender_id]) ;
+      int temp_err_cnt = 0;
+
       for (int j = 0; j <  MAX_PCIE40_CH; j++) {
+
         if (crc_err_ch[sender_id][j] > 0) {
+          if (temp_err_cnt == 0) {
+            printf("[DEBUG] thread %d : crc_err_cnt : ", sender_id);
+            temp_err_cnt = 1;
+          }
           printf("ch %d %u : ", j, crc_err_ch[sender_id][j]);
         }
       }
-      printf("\n");
+      if (temp_err_cnt != 0) {
+        printf("\n");
+      }
       fflush(stdout);
       pthread_mutex_unlock(&(mtx_sender_log));
     }
@@ -1163,6 +1164,17 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
 #ifndef NO_ERROR_STOP
     exit(1);
 #endif
+  }
+
+
+  //
+  // Printing the 1st event
+  //
+  if (evtnum == 0) {
+    pthread_mutex_lock(&(mtx_sender_log));
+    printf("[DEBUG] thread %d :  Printing the 1st event.\n", sender_id);
+    printEventData(data, event_length, sender_id);
+    pthread_mutex_unlock(&(mtx_sender_log));
   }
 
   //  err_bad_ff55[sender_id]++;
@@ -1668,7 +1680,8 @@ void* sender(void* arg)
       pthread_mutex_unlock(&(mtx_sender_log));
       exit(1);
     }
-    int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, send_nwords, exprun, evtnum, node_id, valid_ch, sender_id);
+
+    int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, send_nwords, exprun, evtnum, node_id, valid_ch);
 
     if (ret != DATACHECK_OK) {
       if (ret == DATACHECK_OK_BUT_ERRFLAG_IN_HDR) {
@@ -1685,7 +1698,7 @@ void* sender(void* arg)
         if (evtnum != 0) {
           evtnum -= NUM_SENDER_THREADS; // To go through checkEventData().
         }
-        int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, send_nwords, exprun, evtnum, node_id, valid_ch, sender_id);
+        int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, send_nwords, exprun, evtnum, node_id, valid_ch);
         if (ret != DATACHECK_OK) {
           pthread_mutex_lock(&(mtx_sender_log));
           printf("[FATAL] thread %d : checkEventData() detected an error after reduceHdrTrl(). Exiting...\n", sender_id);
@@ -2352,11 +2365,12 @@ int main(int argc, char** argv)
           time(&timer);
           t_st = localtime(&timer);
           pthread_mutex_lock(&(mtx_sender_log));
-          printf("[INFO] Event %12d %12d exprun %.8x Rate %6.2lf[kHz] Data %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s] eve_size %6.2lf[kB] numch %d nonred %u crcok %u crcng %u evejump %d bad_7f7f %d bad_runnum %d bad_linknum %d bad_evenum %d bad_ffaa %d bad_ff55 %d bad_linksize %d no_data %d bad_header %d bad_size %d bad_size_dmatrl %d bad_dmatrl %d bad_word_size %d %s",
-                 evecnt - 1, evtnum, exprun, (evecnt  - prev_evecnt) / interval / 1.e3,
+
+          printf("[DEBUG] Event %12d Rate %6.2lf[kHz] Recvd %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s] evenum %12d exprun 0x%.8x eve_size %6.2lf[kB] numch %d nonred %u crcok %u crcng %u evejump %d bad_7f7f %d bad_runnum %d bad_linknum %d bad_evenum %d bad_ffaa %d bad_ff55 %d bad_linksize %d no_data %d bad_header %d bad_size %d bad_size_dmatrl %d bad_dmatrl %d bad_word_size %d %s",
+                 evecnt, (evecnt  - prev_evecnt) / interval / 1.e3,
                  (total_size_bytes - prev_total_size_bytes) / interval / 1.e6,
-                 total_time,
-                 interval,
+                 total_time,                 interval,
+                 evtnum, exprun,
                  (total_size_bytes - prev_total_size_bytes) / (total_eve_cnt - prev_total_eve_cnt) / 1.e3,
                  num_of_chs,
                  sum_err_not_reduced, sum_total_crc_good,  sum_total_crc_errors,  sum_err_link_eve_jump,

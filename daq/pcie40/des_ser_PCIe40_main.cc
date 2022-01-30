@@ -754,7 +754,7 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
 
     if (data[ ERR_POS ] == 0) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] Inconsistent header %.8x and errorbit %.8x\n", data[ MAGIC_7F7F_POS ], data[ ERR_POS ]);
+      printf("[FATAL] thread %d :  Inconsistent header %.8x and errorbit %.8x\n", sender_id, data[ MAGIC_7F7F_POS ], data[ ERR_POS ]);
       printEventData(data, event_length, sender_id);
       pthread_mutex_unlock(&(mtx_sender_log));
 #ifndef NO_ERROR_STOP
@@ -766,7 +766,7 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
     reduced_flag = 1;
     if (data[ ERR_POS ] != 0) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] Inconsistent header %.8x and errorbit %.8x\n", data[ MAGIC_7F7F_POS ], data[ ERR_POS ]);
+      printf("[FATAL] thread %d :  Inconsistent header %.8x and errorbit %.8x\n", sender_id, data[ MAGIC_7F7F_POS ], data[ ERR_POS ]);
       printEventData(data, event_length, sender_id);
       pthread_mutex_unlock(&(mtx_sender_log));
 #ifndef NO_ERROR_STOP
@@ -813,7 +813,7 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
         pthread_mutex_lock(&(mtx_sender_log));
         n_messages[ 9 ] = n_messages[ 9 ] + 1 ;
         if (n_messages[ 9 ] < max_number_of_messages) {
-          printf("[FATAL] Bad exprun(now %.8x prev. %.8x) : exp %d run %d sub %d : Exiting...\n",
+          printf("[FATAL] thread %d :  Bad exprun(now %.8x prev. %.8x) : exp %d run %d sub %d : Exiting...\n", sender_id,
                  exprun, data[RUNNO_POS],
                  data[RUNNO_POS]  >> 22,
                  (data[RUNNO_POS] & 0x003fff00) >> 8,
@@ -903,8 +903,9 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 11 ] = n_messages[ 11 ] + 1 ;
       if (n_messages[ 11 ] < max_number_of_messages) {
-        printf("[FATAL] A valid ch in data(=%d) is not equal to regeister value(%d) for masking\n" , i, valid_ch[link_cnt]) ;
-        printEventData(data, event_length);
+        printf("[FATAL] thread %d : A valid ch in data(=%d) is not equal to regeister value(%d) for masking\n" , sender_id, i,
+               valid_ch[link_cnt]) ;
+        printEventData(data, event_length, sender_id);
       }
       err_bad_linknum[sender_id]++;
       pthread_mutex_unlock(&(mtx_sender_log));
@@ -917,9 +918,9 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 12 ] = n_messages[ 12 ] + 1 ;
       if (n_messages[ 12 ] < max_number_of_messages) {
-        printf("[FATAL] Bad FFAA for linknumber %d\n" , i) ;
+        printf("[FATAL] thread %d : Bad FFAA for linknumber %d\n", sender_id, i) ;
         printLine(data, cur_pos + FFAA_POS);
-        printEventData(data, event_length);
+        printEventData(data, event_length, sender_id);
       }
       err_bad_ffaa[sender_id]++;
       pthread_mutex_unlock(&(mtx_sender_log));
@@ -941,7 +942,7 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
           first_b2lctime_flag = 1;
         }
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[DEBUG]  eve %u ch %3d B2Lctime %.8x %12u diff %12d %s", evtnum, i, data[ cur_pos + FFAA_POS + 1 ],
+        printf("[DEBUG] thread %d : eve %u ch %3d B2Lctime %.8x %12u diff %12d %s", sender_id, evtnum, i, data[ cur_pos + FFAA_POS + 1 ],
                data[ cur_pos + FFAA_POS + 1 ], data[ cur_pos + FFAA_POS + 1 ] - first_b2lctime, asctime(t_st));
         pthread_mutex_unlock(&(mtx_sender_log));
       }
@@ -951,8 +952,9 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 14 ] = n_messages[ 14 ] + 1 ;
       if (n_messages[ 14 ] < max_number_of_messages) {
-        printf("[FATAL] Bad ff55 %X pos %.8x ch %d\n" , data[ cur_pos + linksize - 1  ], cur_pos + linksize - 1  , i) ;
-        printEventData(data, event_length + 16);
+        printf("[FATAL] thread %d : Bad ff55 %X pos %.8x ch %d\n" , sender_id, data[ cur_pos + linksize - 1  ], cur_pos + linksize - 1  ,
+               i) ;
+        printEventData(data, event_length + 16, sender_id);
       }
       err_bad_ff55[sender_id]++;
       pthread_mutex_unlock(&(mtx_sender_log));
@@ -973,9 +975,8 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
       pthread_mutex_lock(&(mtx_sender_log));
       err_link_eve_jump[sender_id]++;
       if (err_link_eve_jump[sender_id] < max_number_of_messages) {
-
-        printf("[FATAL] event diff. in ch %d cur_eve %.8x ffaa %.8x\n", i, evtnum, data[ cur_pos + FFAA_POS ]);
-        printEventData(data, event_length);
+        printf("[FATAL] thread %d : event diff. in ch %d cur_eve %.8x ffaa %.8x\n", sender_id, i, evtnum, data[ cur_pos + FFAA_POS ]);
+        printEventData(data, event_length, sender_id);
       }
       pthread_mutex_unlock(&(mtx_sender_log));
 #ifndef NO_ERROR_STOP
@@ -986,8 +987,8 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
     unsigned int ch_ffaa = (data[ cur_pos + FFAA_POS ] >> 8)  & 0x000000ff;
     if ((unsigned int)i != ch_ffaa) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] Ch number is differnt ch %d ffaa %.8x\n", i, data[ cur_pos + FFAA_POS ]);
-      printEventData(data, event_length);
+      printf("[FATAL] thread %d :  Ch number is differnt ch %d ffaa %.8x\n", sender_id, i, data[ cur_pos + FFAA_POS ]);
+      printEventData(data, event_length, sender_id);
       pthread_mutex_unlock(&(mtx_sender_log));
 #ifndef NO_ERROR_STOP
       exit(1);
@@ -998,9 +999,9 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 13 ] = n_messages[ 13 ] + 1 ;
       if (n_messages[ 13 ] < max_number_of_messages) {
-        printf("[FATAL] Bad link size %d %d\n" , (cur_pos + linksize) , (8 * size)) ;
+        printf("[FATAL] thread %d : Bad link size %d %d\n", sender_id, (cur_pos + linksize) , (8 * size)) ;
       }
-      printEventData(data, event_length);
+      printEventData(data, event_length, sender_id);
       err_bad_linksize[sender_id]++;
       pthread_mutex_unlock(&(mtx_sender_log));
 #ifndef NO_ERROR_STOP
@@ -1017,10 +1018,11 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
     if (get_crc(data_for_crc , size , first_crc) != value) {
       pthread_mutex_lock(&(mtx_sender_log));
       if (crc_err_ch[sender_id][i] == 0) {
-        printf("[FATAL] CRC Error calc %.4X data %.8X eve %u ch %d\n" , get_crc(data_for_crc , size , first_crc) ,
+        printf("[FATAL] thread %d : CRC Error calc %.4X data %.8X eve %u ch %d\n" , sender_id,
+               get_crc(data_for_crc , size , first_crc) ,
                data[ cur_pos + linksize - 2 ], myevtnum, i) ;
-        printf("crc_error : Printing a whole event...\n");
-        printEventData(data, event_length);
+        printf("[DEBUG] thread %d : crc_error : Printing a whole event...\n", sender_id);
+        printEventData(data, event_length, sender_id);
 
       }
       crc_err_ch[sender_id][i]++;
@@ -1039,9 +1041,10 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
     if (evtnum % 1000000 == 0) {
       //    if (total_crc_good[sdr_id] % (1000000 + sdr_id) == 0) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[INFO] CRC Good  calc %.4X data %.4X eve %u ch %d crcOK %u crcNG %d errflag %u\n" ,
+      printf("[DEBUG] thread %d :  CRC Good  calc %.4X data %.4X eve %u ch %d crcOK %u crcNG %d errflag %u\n" , sender_id,
              get_crc(data_for_crc , size , first_crc) ,
              value, myevtnum, i, total_crc_good[sdr_id], total_crc_errors[sender_id], err_flag_cnt[sender_id]) ;
+      printf("[DEBUG] thread %d : crc_err_cnt : ", sender_id);
       for (int j = 0; j <  MAX_PCIE40_CH; j++) {
         if (crc_err_ch[sender_id][j] > 0) {
           printf("ch %d %u : ", j, crc_err_ch[sender_id][j]);
@@ -1061,9 +1064,9 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
 
   if (link_cnt != expected_number_of_links) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] # of links(%d) in data is not the same as exptected(=%d). : Exiting...\n",
+    printf("[FATAL] thread %d :  # of links(%d) in data is not the same as exptected(=%d). : Exiting...\n", sender_id,
            link_cnt, expected_number_of_links);
-    printEventData(data, event_length);
+    printEventData(data, event_length, sender_id);
     pthread_mutex_unlock(&(mtx_sender_log));
 #ifndef NO_ERROR_STOP
     exit(1);
@@ -1074,7 +1077,7 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
   if (reduced_flag == 0) {
     pthread_mutex_lock(&(mtx_sender_log));
     if (err_not_reduced[sender_id] < max_number_of_messages) {
-      printf("[WARNING] Error-flag was set by the data-check module in PCIe40 FPGA.\n");
+      printf("[WARNING]  thread %d : Error-flag was set by the data-check module in PCIe40 FPGA.\n", sender_id);
       printEventData(data, event_length, sender_id);
     }
     err_not_reduced[sender_id]++;

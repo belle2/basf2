@@ -900,7 +900,26 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
         exit(1);
 #endif
       } else {
+        //
+        // A new run was started.
+        //
         exprun = data[RUNNO_POS];
+        //
+        // Initialize error counter when run # is changed.
+        //
+        total_crc_good[sdr_id] = 0;
+        total_crc_errors[sdr_id] = 0;
+        err_flag_cnt[sdr_id] = 0;
+        cur_evtnum[sdr_id] = 0;
+        err_not_reduced[sdr_id] = 0;
+        err_bad_7f7f[sdr_id] = 0;
+        err_bad_runnum[sdr_id] = 0;
+        err_bad_linknum[sdr_id] = 0;
+        err_bad_evenum[sdr_id] = 0;
+        err_bad_ffaa[sdr_id] = 0;
+        err_bad_ff55[sdr_id] = 0;
+        err_bad_linksize[sdr_id] = 0;
+        err_link_eve_jump[sdr_id] = 0;
       }
     }
   }
@@ -2040,6 +2059,7 @@ int main(int argc, char** argv)
 
   unsigned int evtnum = 0;
   unsigned int exprun = 0;
+  unsigned int prev_exprun = 0;
   int errors = 0 ;
   unsigned int esize = 0 ;
   int total_pages = 0 ;
@@ -2058,6 +2078,7 @@ int main(int argc, char** argv)
   int first_flag = 0;
   int first_event_flag = 0;
   unsigned int evecnt = 0;
+  unsigned int prev_evecnt = 0;
   int client_id = 0;
   int dma_hdr_offset = 0;
 
@@ -2199,7 +2220,19 @@ int main(int argc, char** argv)
 #endif
             }
           }
+
+          if (exprun != prev_exprun || exprun == 0) {
+            m_start_time = getTimeSec();
+            m_prev_time = m_start_time;
+            evecnt = 1;
+            prev_evecnt = 1;
+            total_eve_cnt = 1;
+            prev_total_eve_cnt = 0;
+            total_size_bytes = 0.;
+            prev_total_size_bytes = 0.;
+          }
           evtnum = temp_data[EVENUM_POS];
+          prev_exprun = exprun;
           exprun = temp_data[RUNNO_POS];
 
           //
@@ -2263,8 +2296,9 @@ int main(int argc, char** argv)
         get_sp_cnt++;
         ++k ;
         if ((evecnt % 100000) == 0 ||
-            (0 <= evecnt && evecnt < 2) ||
-            ((evecnt % 10000) == 0 && 0 < evecnt && evecnt < 100000)) {
+            ((evecnt % 10000) == 0 && 0 < evecnt && evecnt < 100000) ||
+            evecnt == 1
+           ) {
           unsigned int sum_total_crc_good = 0;
           unsigned int sum_total_crc_errors = 0;
           unsigned int sum_err_flag_cnt = 0;
@@ -2280,33 +2314,35 @@ int main(int argc, char** argv)
           unsigned int sum_err_link_eve_jump = 0;
           unsigned int sum_crc_err_ch[ MAX_PCIE40_CH] = {0};
 
-          for (int l = 0; l < NUM_SENDER_THREADS; l++) {
-            sum_total_crc_good += total_crc_good[l];
-            sum_total_crc_errors +=  total_crc_errors[l];
-            sum_err_flag_cnt +=  err_flag_cnt[l];
-            sum_cur_evtnum +=  cur_evtnum[l];
+          if (evecnt != 1) {
+            for (int l = 0; l < NUM_SENDER_THREADS; l++) {
+              sum_total_crc_good += total_crc_good[l];
+              sum_total_crc_errors +=  total_crc_errors[l];
+              sum_err_flag_cnt +=  err_flag_cnt[l];
+              sum_cur_evtnum +=  cur_evtnum[l];
+              sum_err_not_reduced += err_not_reduced[l];
+              sum_err_bad_7f7f +=  err_bad_7f7f[l];
+              sum_err_bad_runnum +=  err_bad_runnum[l];
+              sum_err_bad_linknum +=  err_bad_linknum[l];
+              sum_err_bad_evenum +=  err_bad_evenum[l];
+              sum_err_bad_ffaa +=  err_bad_ffaa[l];
+              sum_err_bad_ff55 +=  err_bad_ff55[l];
+              sum_err_bad_linksize +=  err_bad_linksize[l];
+              sum_err_link_eve_jump +=  err_link_eve_jump[l];
 
-            sum_err_not_reduced += err_not_reduced[l];
-            sum_err_bad_7f7f +=  err_bad_7f7f[l];
-            sum_err_bad_runnum +=  err_bad_runnum[l];
-            sum_err_bad_linknum +=  err_bad_linknum[l];
-            sum_err_bad_evenum +=  err_bad_evenum[l];
-            sum_err_bad_ffaa +=  err_bad_ffaa[l];
-            sum_err_bad_ff55 +=  err_bad_ff55[l];
-            sum_err_bad_linksize +=  err_bad_linksize[l];
-            sum_err_link_eve_jump +=  err_link_eve_jump[l];
+              // if (cur_exprun[0] != cur_exprun[l]) {
+              //   pthread_mutex_lock(&(mtx_sender_log));
+              //   printf("[FATAL] exprun mismatch thr 0 = 0x%.8x , thr %d = 0x%.8x", cur_exprun[0], l, cur_exprun[l]);
+              //   pthread_mutex_unlock(&(mtx_sender_log));
+              //   exit(1);
+              // }
 
-            // if (cur_exprun[0] != cur_exprun[l]) {
-            //   pthread_mutex_lock(&(mtx_sender_log));
-            //   printf("[FATAL] exprun mismatch thr 0 = 0x%.8x , thr %d = 0x%.8x", cur_exprun[0], l, cur_exprun[l]);
-            //   pthread_mutex_unlock(&(mtx_sender_log));
-            //   exit(1);
-            // }
-
-            for (int m = 0; m <  MAX_PCIE40_CH; m++) {
-              sum_crc_err_ch[m] += crc_err_ch[l][m];
+              for (int m = 0; m <  MAX_PCIE40_CH; m++) {
+                sum_crc_err_ch[m] += crc_err_ch[l][m];
+              }
             }
           }
+
           double cur_time = getTimeSec();
           double total_time = cur_time - m_start_time;
           double interval = cur_time - m_prev_time;
@@ -2317,7 +2353,7 @@ int main(int argc, char** argv)
           t_st = localtime(&timer);
           pthread_mutex_lock(&(mtx_sender_log));
           printf("[INFO] Event %12d %12d exprun %.8x Rate %6.2lf[kHz] Data %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s] eve_size %6.2lf[kB] numch %d nonred %u crcok %u crcng %u evejump %d bad_7f7f %d bad_runnum %d bad_linknum %d bad_evenum %d bad_ffaa %d bad_ff55 %d bad_linksize %d no_data %d bad_header %d bad_size %d bad_size_dmatrl %d bad_dmatrl %d bad_word_size %d %s",
-                 evecnt - 1, evtnum, exprun, (evecnt  - m_prev_nevt) / interval / 1.e3,
+                 evecnt - 1, evtnum, exprun, (evecnt  - prev_evecnt) / interval / 1.e3,
                  (total_size_bytes - prev_total_size_bytes) / interval / 1.e6,
                  total_time,
                  interval,
@@ -2331,7 +2367,7 @@ int main(int argc, char** argv)
           fflush(stdout);
           pthread_mutex_unlock(&(mtx_sender_log));
           prev_total_size_bytes = total_size_bytes;
-          m_prev_nevt = k;
+          prev_evecnt = evecnt;
           prev_total_eve_cnt = total_eve_cnt;
         }
 

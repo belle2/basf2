@@ -766,7 +766,8 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
     reduced_flag = 1;
     if (data[ ERR_POS ] != 0) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d :  Inconsistent header %.8x and errorbit %.8x\n", sender_id, data[ MAGIC_7F7F_POS ], data[ ERR_POS ]);
+      printf("[FATAL] thread %d : Inconsistency between header(no error found by FPGA) %.8x and errorbit %.8x (error-bit is non-zero)\n",
+             sender_id, data[ MAGIC_7F7F_POS ], data[ ERR_POS ]);
       printEventData(data, event_length, sender_id);
       pthread_mutex_unlock(&(mtx_sender_log));
 #ifndef NO_ERROR_STOP

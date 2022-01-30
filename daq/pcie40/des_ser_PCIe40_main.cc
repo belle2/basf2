@@ -1077,7 +1077,7 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
   if (reduced_flag == 0) {
     pthread_mutex_lock(&(mtx_sender_log));
     if (err_not_reduced[sender_id] < max_number_of_messages) {
-      printf("[WARNING]  thread %d : Error-flag was set by the data-check module in PCIe40 FPGA.\n", sender_id);
+      printf("[WARNING] thread %d : Error-flag was set by the data-check module in PCIe40 FPGA.\n", sender_id);
       printEventData(data, event_length, sender_id);
     }
     err_not_reduced[sender_id]++;
@@ -1429,36 +1429,30 @@ void* sender(void* arg)
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] thread %d : Failed to bind. Maybe other programs have already occupied this port(%d). Exiting...\n",
-           sender_id,
+    printf("[FATAL] thread %d : Failed to bind(%s). Maybe other programs have already occupied this port(%d). Exiting...\n",
+           sender_id, strerror(errno),
            port_to); fflush(stdout);
-    // Check the process occupying the port 30000.
+    pthread_mutex_unlock(&(mtx_sender_log));
+
+    // Check the process occupying the port 3100?.
     FILE* fp;
     char buf[256];
     char cmdline[500];
     sprintf(cmdline, "/usr/sbin/ss -ap | grep %d", port_to);
     if ((fp = popen(cmdline, "r")) == NULL) {
+      pthread_mutex_lock(&(mtx_sender_log));
       printf("[WARNING] thread %d : Failed to run %s\n", sender_id,
              cmdline);
+      pthread_mutex_unlock(&(mtx_sender_log));
     }
-    pthread_mutex_unlock(&(mtx_sender_log));
 
     while (fgets(buf, 256, fp) != NULL) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[INFO] thread %d : Failed to bind. output of ss(port %d) : %s\n", sender_id,
+      printf("[DEBUG] thread %d : Port %d is used by : %s\n", sender_id,
              port_to, buf); fflush(stdout);
       pthread_mutex_unlock(&(mtx_sender_log));
     }
-    // Error message
     fclose(fp);
-    char err_buf[500];
-    pthread_mutex_lock(&(mtx_sender_log));
-    sprintf(err_buf, "[FATAL] thread %d : Failed to bind.(%s) Maybe other programs have already occupied this port(%d). Exiting...",
-            sender_id,
-            strerror(errno), port_to);
-    printf("%s\n", err_buf); fflush(stdout);
-    pthread_mutex_unlock(&(mtx_sender_log));
-    //    print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
 

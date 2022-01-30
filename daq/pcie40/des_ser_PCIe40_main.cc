@@ -149,7 +149,6 @@ unsigned int err_bad_ff55[NUM_SENDER_THREADS] = {0};
 unsigned int err_bad_linksize[NUM_SENDER_THREADS] = {0};
 unsigned int err_link_eve_jump[NUM_SENDER_THREADS] = {0};
 unsigned int crc_err_ch[NUM_SENDER_THREADS][ MAX_PCIE40_CH];
-unsigned int cur_exprun[NUM_SENDER_THREADS] = {0};
 
 // format of ROB header
 #define OFFSET_HDR 0
@@ -872,15 +871,13 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
 #endif
     }
   }
-
   evtnum = data[EVENUM_POS];
 
-  // printf("checkEventData()\n"); fflush(stdout);
-  // printEventData(data);
-
+  //
+  // Check exprun #
+  //
   if (exprun == 0) {
     exprun = data[RUNNO_POS];
-    cur_exprun[sender_id] = exprun;
   } else {
     if (exprun != data[RUNNO_POS]) {
       if (evtnum < 0 || evtnum >= NUM_SENDER_THREADS) {
@@ -904,7 +901,6 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
 #endif
       } else {
         exprun = data[RUNNO_POS];
-        cur_exprun[sender_id] = exprun;
       }
     }
   }
@@ -1612,6 +1608,10 @@ void* sender(void* arg)
     ;;
 #endif
   ) {
+
+    //
+    // Copy data from buffer
+    //
     if (buffer_id == 0) {
       while (1) {
         if (buffer_filled[sender_id][0] == 1)break;
@@ -2296,12 +2296,12 @@ int main(int argc, char** argv)
             sum_err_bad_linksize +=  err_bad_linksize[l];
             sum_err_link_eve_jump +=  err_link_eve_jump[l];
 
-            if (cur_exprun[0] != cur_exprun[l]) {
-              pthread_mutex_lock(&(mtx_sender_log));
-              printf("[FATAL] exprun mismatch thr 0 = 0x%.8x , thr %d = 0x%.8x", cur_exprun[0], l, cur_exprun[l]);
-              pthread_mutex_unlock(&(mtx_sender_log));
-              exit(1);
-            }
+            // if (cur_exprun[0] != cur_exprun[l]) {
+            //   pthread_mutex_lock(&(mtx_sender_log));
+            //   printf("[FATAL] exprun mismatch thr 0 = 0x%.8x , thr %d = 0x%.8x", cur_exprun[0], l, cur_exprun[l]);
+            //   pthread_mutex_unlock(&(mtx_sender_log));
+            //   exit(1);
+            // }
 
             for (int m = 0; m <  MAX_PCIE40_CH; m++) {
               sum_crc_err_ch[m] += crc_err_ch[l][m];
@@ -2317,7 +2317,7 @@ int main(int argc, char** argv)
           t_st = localtime(&timer);
           pthread_mutex_lock(&(mtx_sender_log));
           printf("[INFO] Event %12d %12d exprun %.8x Rate %6.2lf[kHz] Data %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s] eve_size %6.2lf[kB] numch %d nonred %u crcok %u crcng %u evejump %d bad_7f7f %d bad_runnum %d bad_linknum %d bad_evenum %d bad_ffaa %d bad_ff55 %d bad_linksize %d no_data %d bad_header %d bad_size %d bad_size_dmatrl %d bad_dmatrl %d bad_word_size %d %s",
-                 evecnt - 1, evtnum, cur_exprun[0], (evecnt  - m_prev_nevt) / interval / 1.e3,
+                 evecnt - 1, evtnum, exprun, (evecnt  - m_prev_nevt) / interval / 1.e3,
                  (total_size_bytes - prev_total_size_bytes) / interval / 1.e6,
                  total_time,
                  interval,

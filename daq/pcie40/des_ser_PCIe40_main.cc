@@ -694,7 +694,7 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
     exit(1);
   }
 
-  if ((data[ MAGIC_7F7F_POS ] & 0xFFFF0000) == 0x7F7F0000) {
+  if ((data[ MAGIC_7F7F_POS ] & 0xFFFF0000) != 0x7F7F0000) {
     char err_buf[500] = {0};
     pthread_mutex_lock(&(mtx_sender_log));
     n_messages[ 7 ] = n_messages[ 7 ] + 1 ;
@@ -761,7 +761,7 @@ int checkEventData(int sdr_id, unsigned int* data , unsigned int size , unsigned
   }
 
   // event # check
-  if (evtnum + NUM_SENDER_THREADS == data[EVENUM_POS]) {
+  if (evtnum + NUM_SENDER_THREADS != data[EVENUM_POS]) {
     if (exprun == data[RUNNO_POS] && exprun != 0) {
       n_messages[ 10 ] = n_messages[ 10 ] + 1 ;
       if (n_messages[ 10 ] < max_number_of_messages) {
@@ -1641,7 +1641,7 @@ int main(int argc, char** argv)
   bool isData = true ;
   bool writeInFile = false ;
   if (argc != 2) {
-    printf("[FATAL] Invalid usage of %s : Usage : %s <node ID>, node ID = 0x0, if you are not using the Belle II DAQ system.\n",
+    printf("[FATAL] Invalid usage of %s : %s <node ID>, node ID = 0x0, if you are not using the Belle II DAQ system.\n",
            argv[0], argv[0]) ;
     return 0 ;
   }

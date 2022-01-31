@@ -30,5 +30,4 @@ It is assumed that the modelling of more properties with large separation potent
 last MC productions. Moreover, **the activation of the VXD- and Recotrack-QI would further increase the fake- and clone rejection by 50% and 30%**
 compared to the current value while maintaining the same track finding efficiency.
 
-More details concerning the different QIs and how to train them can be found on Confluence:
-`MVA Track Quality Indicator <https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=MVA+Track+Quality+Indicator>`.
+More details concerning the different QIs and how to train them can be found on Confluence: "MVA Track Quality Indicator".

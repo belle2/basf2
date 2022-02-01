@@ -782,15 +782,24 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
   unsigned int event_length = data[ EVENT_LEN_POS ];
   if (event_length > 0x100000) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] Too large event size. : 0x%.8x : %d words. Exiting...\n", data[ EVENT_LEN_POS ],
-           data[ EVENT_LEN_POS ]);
+    printf("[FATAL] Too large event size. : 0x%.8x : %d words. : exp %d run %d sub %d : Exiting...\n",
+           data[ EVENT_LEN_POS ], data[ EVENT_LEN_POS ],
+           (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+           (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+           (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
+          );
+
     printEventData(data, (event_length & 0xfffff), sender_id);
     pthread_mutex_unlock(&(mtx_sender_log));
     exit(1);
   } else if (event_length == 0) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] Specified event size is zero. : 0x%.8x : %u words. Exiting...\n",
-           data[ EVENT_LEN_POS ], event_length);
+    printf("[FATAL] Specified event size is zero. : 0x%.8x : %u words. : exp %d run %d sub %d : Exiting...\n",
+           data[ EVENT_LEN_POS ], event_length,
+           (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+           (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+           (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
+          );
     printEventData(data, 24, sender_id);
     pthread_mutex_unlock(&(mtx_sender_log));
     exit(1);
@@ -804,9 +813,13 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
     pthread_mutex_lock(&(mtx_sender_log));
     n_messages[ 7 ] = n_messages[ 7 ] + 1 ;
     if (n_messages[ 7 ] < max_number_of_messages) {
-      sprintf(err_buf, "[FATAL] thread %d : ERROR_EVENT :  Invalid Magic word in ReadOut Board header( 0x%.8x ) : It must be 0x7f7f????\n"
-              ,
-              sender_id, data[ MAGIC_7F7F_POS ]) ;
+      sprintf(err_buf,
+              "[FATAL] thread %d : ERROR_EVENT :  Invalid Magic word in ReadOut Board header( 0x%.8x ) : It must be 0x7f7f???? : exp %d run %d sub %d",
+              sender_id, data[ MAGIC_7F7F_POS ],
+              (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+              (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+              (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
+             ) ;
       printf("%s\n", err_buf); fflush(stdout);
       printEventData(data, event_length, sender_id);
     }
@@ -844,8 +857,12 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
     reduced_flag = 1;
     if (data[ ERR_POS ] != 0) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : Inconsistency between header(no error found by FPGA) %.8x and errorbit %.8x (error-bit is non-zero)\n",
-             sender_id, data[ MAGIC_7F7F_POS ], data[ ERR_POS ]);
+      printf("[FATAL] thread %d : Inconsistency between header(no error found by FPGA) %.8x and errorbit %.8x (error-bit is non-zero) : exp %d run %d sub %d\n",
+             sender_id, data[ MAGIC_7F7F_POS ], data[ ERR_POS ],
+             (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+             (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+             (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
+            );
       printEventData(data, event_length, sender_id);
       pthread_mutex_unlock(&(mtx_sender_log));
 #ifndef NO_ERROR_STOP
@@ -879,11 +896,12 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
         pthread_mutex_lock(&(mtx_sender_log));
         n_messages[ 9 ] = n_messages[ 9 ] + 1 ;
         if (n_messages[ 9 ] < max_number_of_messages) {
-          printf("[FATAL] thread %d :  Bad exprun(now %.8x prev. %.8x) : exp %d run %d sub %d : Exiting...\n", sender_id,
+          printf("[FATAL] thread %d :  Bad exprun(now %.8x prev. %.8x) : exp %d run %d sub %d : Exiting...\n",
+                 sender_id,
                  exprun, data[RUNNO_POS],
-                 data[RUNNO_POS]  >> 22,
-                 (data[RUNNO_POS] & 0x003fff00) >> 8,
-                 data[RUNNO_POS] & 0x000000ff
+                 (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+                 (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+                 (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
                 ) ;
           printEventData(data, event_length, sender_id);
           // printLine(data, RUNNO_POS);
@@ -980,15 +998,17 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
     cur_pos = data[ POS_TABLE_POS + i ] + OFFSET_HDR;
 
     // compare valid ch with register value
-    //    printf("sdr %d i %d lcnt %d validch %d\n", sdr_id, i, link_cnt, valid_ch[link_cnt]);
-    //    if (valid_ch[link_cnt] != i) {
+
     if (valid_ch[link_cnt] != i) {
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 11 ] = n_messages[ 11 ] + 1 ;
       if (n_messages[ 11 ] < max_number_of_messages) {
-        printf("[FATAL] thread %d : The next channel in data is ch %d but it must be ch %d according to masking register info. of PCIe40\n"
-               ,  sender_id, i,
-               valid_ch[link_cnt]) ;
+        printf("[FATAL] thread %d : The next channel in data is ch %d but it must be ch %d according to masking register info. of PCIe40 : exp %d run %d sub %d\n",
+               sender_id, i, valid_ch[link_cnt],
+               (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+               (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+               (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
+              );
         printEventData(data, event_length, sender_id);
       }
       err_bad_linknum[sender_id]++;
@@ -1002,7 +1022,12 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 12 ] = n_messages[ 12 ] + 1 ;
       if (n_messages[ 12 ] < max_number_of_messages) {
-        printf("[FATAL] thread %d : Bad FFAA for linknumber %d\n", sender_id, i) ;
+        printf("[FATAL] thread %d : Bad FFAA for linknumber %d : exp %d run %d sub %d\n",
+               sender_id, i,
+               (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+               (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+               (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
+              ) ;
         printLine(data, cur_pos + FFAA_POS);
         printEventData(data, event_length, sender_id);
       }
@@ -1028,9 +1053,14 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
           first_b2lctime_flag = 1;
         }
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[DEBUG] thread %d : eve %u ch %3d B2Lctime 0x%.8x diff %.2lf [us] %s", sender_id, new_evtnum, i,
+        printf("[DEBUG] thread %d : eve %u ch %3d B2Lctime 0x%.8x diff %.2lf [us] : exp %d run %d sub %d : %s",
+               sender_id, new_evtnum, i,
                data[ cur_pos + FFAA_POS + 1 ],
-               ((int)(data[ cur_pos + FFAA_POS + 1 ] - first_b2lctime)) / 127.22, asctime(t_st));
+               ((int)(data[ cur_pos + FFAA_POS + 1 ] - first_b2lctime)) / 127.22,
+               (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+               (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+               (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+               asctime(t_st));
         pthread_mutex_unlock(&(mtx_sender_log));
       }
     }

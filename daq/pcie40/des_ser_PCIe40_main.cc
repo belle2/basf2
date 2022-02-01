@@ -772,7 +772,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
   int reduced_flag = 1; // 0 : not-reduced(error event) 1: reduced
 
   // For error message
-  unsigned int exp_run = data[ Belle2::RawHeader_latest::POS_EXP_RUN_NO ] ;
+  unsigned int new_exprun = data[ Belle2::RawHeader_latest::POS_EXP_RUN_NO ] ;
   unsigned int new_evtnum = data[ Belle2::RawHeader_latest::POS_EVE_NO ] ;
 
   //  TO CHECK LATER unsigned int event_size = data[ 8 ] ;
@@ -940,7 +940,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
 
 
   unsigned int crc_init = 0xFFFF ;
-  unsigned int f_crc[ 4 ]  = { ctime , new_evtnum , utime , exp_run } ;
+  unsigned int f_crc[ 4 ]  = { ctime , new_evtnum , utime , new_exprun } ;
   unsigned int first_crc = 0;
 
   // find number of links

@@ -3209,9 +3209,11 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "which is the sum of the first two daughter's cluster momenta."
                       "Returns nan if any of the daughters specified don't have an associated cluster."
                       "The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("daughterInvM(i, j)", daughterInvM,
-                      "Returns the invariant Mass adding the Lorentz vectors of the given daughters.\n"
-                      "E.g. ``daughterInvM(0, 1, 2)`` returns the invariant Mass :math:`m = \\sqrt{(p_0 + p_1 + p_2)^2}`` of first, second and third daughter.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("daughterInvM(i[, j, ...])", daughterInvM, R"DOC(
+                       Returns the invariant Mass adding the Lorentz vectors of the given daughters.
+                       E.g. ``daughterInvM(0, 1, 2)`` returns the invariant Mass :math:`m = \sqrt{(p_0 + p_1 + p_2)^2}` of the first, second and third daughter.
+
+                       Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= number of daughters))DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
                       "The extraInfo has to be set by a module first.\n"

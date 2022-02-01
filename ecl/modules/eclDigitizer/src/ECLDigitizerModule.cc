@@ -81,6 +81,10 @@ ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECL
            "used for testing only.", false);
   addParam("useWaveformParameters", m_useWaveformParameters,
            "Use ECLWF{Parameters,AlgoParams,NoiseParams} payloads", true);
+  addParam("unitscale", m_unitscale,
+           "Normalization coefficient for ECL signal shape. "
+           "If positive, use same static value for all ECL channels. "
+           "If negative, calculate dynamically at beginRun().", -1.0);
 
 }
 
@@ -739,6 +743,14 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
   int ib = 1 << eclWFAlgo.getkb();
   int ic = 1 << eclWFAlgo.getkc();
 
+  double dbl_f   [192][16];
+  double dbl_f1  [192][16];
+  double dbl_fg31[192][16];
+  double dbl_fg32[192][16];
+  double dbl_fg33[192][16];
+  double dbl_fg41[24][16];
+  double dbl_fg43[24][16];
+
   int_array_192x16_t& ref_f    = p.f;
   int_array_192x16_t& ref_f1   = p.f1;
   int_array_192x16_t& ref_fg31 = p.fg31;
@@ -747,7 +759,13 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
   int_array_24x16_t&  ref_fg41 = p.fg41;
   int_array_24x16_t&  ref_fg43 = p.fg43;
 
-  ShaperDSP_t dsp(MP, 27.7221);
+  // Dynamic normalization coefficient for shape function
+  double fm = 0;
+
+  double unitscale = 1.0;
+  if (m_unitscale > 0) unitscale = m_unitscale;
+
+  ShaperDSP_t dsp(MP, unitscale);
   dsp.settimestride(ec.m_step);
   dsp.setseedoffset(ec.m_step / ec.m_ndt);
   dsp.settimeseed(-(ec.m_step - (ec.m_step / ec.m_ndt)));
@@ -760,6 +778,7 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
     for (int j = 0; j < 16; j++) {
       double g0 = 0, g1 = 0, g2 = 0;
       for (int i = 0; i < 16; i++) {
+        if (fm < f[i].first) fm = f[i].first;
         g0 += ssd[j][i] * f[i].first;
         g1 += ssd[j][i] * f[i].second;
         g2 += ssd[j][i];
@@ -789,16 +808,16 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
     for (int i = 0; i < 16; i++) {
       double w = i ? 1.0 : 1. / 16.;
 
-      ref_f   [k][i] = lrint(f[i].first  * iff * w);
-      ref_f1  [k][i] = lrint(f[i].second * iff * w * sd);
+      dbl_f   [k][i] = (f[i].first  * iff * w);
+      dbl_f1  [k][i] = (f[i].second * iff * w * sd);
 
       double fg31 = (a00 * sg0[i] + a01 * sg1[i] + a02 * sg2[i]) * igg2;
       double fg32 = (a01 * sg0[i] + a11 * sg1[i] + a12 * sg2[i]) * igg2;
       double fg33 = (a02 * sg0[i] + a12 * sg1[i] + a22 * sg2[i]) * igg2;
 
-      ref_fg31[k][i] = lrint(fg31 * ia * w);
-      ref_fg32[k][i] = lrint(fg32 * ib * w * isd);
-      ref_fg33[k][i] = lrint(fg33 * ic * w);
+      dbl_fg31[k][i] = (fg31 * ia * w);
+      dbl_fg32[k][i] = (fg32 * ib * w * isd);
+      dbl_fg33[k][i] = (fg33 * ic * w);
     }
 
     //first approximation without time correction
@@ -812,9 +831,24 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
 
         double fg41 = (g2g2 * sg0[i] - g0g2 * sg2[i]) * igg1;
         double fg43 = (g0g0 * sg2[i] - g0g2 * sg0[i]) * igg1;
-        ref_fg41[jk][i] = lrint(fg41 * ia * w);
-        ref_fg43[jk][i] = lrint(fg43 * ic * w);
+        dbl_fg41[jk][i] = (fg41 * ia * w);
+        dbl_fg43[jk][i] = (fg43 * ic * w);
       }
+    }
+  }
+  // Ignore dynamically calculated normalization coefficient if
+  // unitscale is set to a static positive value.
+  if (m_unitscale > 0) fm = 1.0;
+  for (int k = 0; k < 2 * ec.m_ndt; k++) {
+    for (int j = 0; j < 16; j++) {
+      ref_f   [k][j] = lrint(dbl_f   [k][j] / fm);
+      ref_f1  [k][j] = lrint(dbl_f1  [k][j] / fm);
+      ref_fg31[k][j] = lrint(dbl_fg31[k][j] * fm);
+      ref_fg32[k][j] = lrint(dbl_fg32[k][j] * fm);
+      ref_fg33[k][j] = lrint(dbl_fg33[k][j]);
+      if (k >= 24) continue;
+      ref_fg41[k][j] = lrint(dbl_fg41[k][j] * fm);
+      ref_fg43[k][j] = lrint(dbl_fg43[k][j]);
     }
   }
 }

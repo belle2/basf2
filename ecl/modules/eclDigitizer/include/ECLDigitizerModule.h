@@ -214,5 +214,11 @@ namespace Belle2 {
      *  If false, use the data from ecl/data/ECL-WF.root or ECL-WF-BG.root
      */
     bool m_useWaveformParameters;
+    /** Normalization coefficient for ECL signal shape.
+     *  If positive, use same static value for all ECL channels.
+     *  If negative, calculate it dynamically at beginRun().
+     *  (for default shape parameters, the static value is 27.7221)
+     */
+    double m_unitscale;
   };
 }//Belle2

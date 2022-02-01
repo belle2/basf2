@@ -770,8 +770,12 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
 {
   int expected_number_of_links = valid_ch.size() ;
   int reduced_flag = 1; // 0 : not-reduced(error event) 1: reduced
-  //  TO CHECK LATER unsigned int event_size = data[ 8 ] ;
 
+  // For error message
+  unsigned int exp_run = data[ Belle2::RawHeader_latest::POS_EXP_RUN_NO ] ;
+  unsigned int new_evtnum = data[ Belle2::RawHeader_latest::POS_EVE_NO ] ;
+
+  //  TO CHECK LATER unsigned int event_size = data[ 8 ] ;
   //
   // Check if event length is not too long or zero.
   //
@@ -871,7 +875,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
     exprun = data[RUNNO_POS];
   } else {
     if (exprun != data[RUNNO_POS]) {
-      if (evtnum < 0 || evtnum >= NUM_SENDER_THREADS) {
+      if (new_evtnum < 0 || new_evtnum >= NUM_SENDER_THREADS) {
         pthread_mutex_lock(&(mtx_sender_log));
         n_messages[ 9 ] = n_messages[ 9 ] + 1 ;
         if (n_messages[ 9 ] < max_number_of_messages) {
@@ -931,14 +935,12 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
   //   }
   // }
 
+  unsigned int ctime = data[ Belle2::RawHeader_latest::POS_TTCTIME_TRGTYPE ] ;
+  unsigned int utime = data[ Belle2::RawHeader_latest::POS_TTUTIME ] ;
 
-  unsigned int myevtnum = data[ 3 ] ;
-  unsigned int ctime = data[ 4 ] ;
-  unsigned int utime = data[ 5] ;
-  unsigned int exp_run = data[ 2 ] ;
 
   unsigned int crc_init = 0xFFFF ;
-  unsigned int f_crc[ 4 ]  = { ctime , myevtnum , utime , exp_run } ;
+  unsigned int f_crc[ 4 ]  = { ctime , new_evtnum , utime , exp_run } ;
   unsigned int first_crc = 0;
 
   // find number of links
@@ -954,7 +956,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
     non_crc_counts = NON_CRC_COUNTS_REDUCED;
   } else {
     err_flag_cnt[sender_id]++;
-    //    printf("ERROR flag : Printing a whole event... %u\n", myevtnum);
+    //    printf("ERROR flag : Printing a whole event... %u\n", new_evtnum);
     // printEventData(data, event_length);
     first_crc = crc_init;
     non_crc_counts = NON_CRC_COUNTS_NOTREDUCED;
@@ -1015,7 +1017,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
     //
     // b2link time check ( Only thread == 0 )
     //
-    if (evtnum % 1000000 == 1000) {
+    if (new_evtnum % 1000000 == 1000) {
       if (reduced_flag == 1) {
         time_t timer;
         struct tm* t_st;
@@ -1026,7 +1028,8 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
           first_b2lctime_flag = 1;
         }
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[DEBUG] thread %d : eve %u ch %3d B2Lctime 0x%.8x diff %.2lf [us] %s", sender_id, evtnum, i, data[ cur_pos + FFAA_POS + 1 ],
+        printf("[DEBUG] thread %d : eve %u ch %3d B2Lctime 0x%.8x diff %.2lf [us] %s", sender_id, new_evtnum, i,
+               data[ cur_pos + FFAA_POS + 1 ],
                ((int)(data[ cur_pos + FFAA_POS + 1 ] - first_b2lctime)) / 127.22, asctime(t_st));
         pthread_mutex_unlock(&(mtx_sender_log));
       }
@@ -1055,11 +1058,11 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
     unsigned int eve_link_8bits =  data[ cur_pos + FFAA_POS ]  & 0x000000ff;
 
 
-    if ((evtnum & 0x000000FF) != eve_link_8bits) {
+    if ((new_evtnum & 0x000000FF) != eve_link_8bits) {
       pthread_mutex_lock(&(mtx_sender_log));
       err_link_eve_jump[sender_id]++;
       if (err_link_eve_jump[sender_id] < max_number_of_messages) {
-        printf("[FATAL] thread %d : event diff. in ch %d cur_eve %.8x ffaa %.8x\n", sender_id, i, evtnum, data[ cur_pos + FFAA_POS ]);
+        printf("[FATAL] thread %d : event diff. in ch %d cur_eve %.8x ffaa %.8x\n", sender_id, i, new_evtnum, data[ cur_pos + FFAA_POS ]);
         printEventData(data, event_length, sender_id);
       }
       pthread_mutex_unlock(&(mtx_sender_log));
@@ -1106,7 +1109,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
       //      if (crc_err_ch[sender_id][i] == 0) {
       printf("[FATAL] thread %d : CRC Error calc %.4X data %.8X eve %u ch %d\n" , sender_id,
              get_crc(data_for_crc , size , first_crc) ,
-             data[ cur_pos + linksize - 2 ], myevtnum, i) ;
+             data[ cur_pos + linksize - 2 ], new_evtnum, i) ;
       printf("[DEBUG] thread %d : crc_error : Printing a whole event...\n", sender_id);
       printEventData(data, event_length, sender_id);
       //      }
@@ -1123,12 +1126,12 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
     }
 #endif // CRC_CHECK
 
-    if (evtnum % 1000000 == 0) {
+    if (new_evtnum % 1000000 == 0) {
       //    if (total_crc_good[sdr_id] % (1000000 + sdr_id) == 0) {
       pthread_mutex_lock(&(mtx_sender_log));
       printf("[DEBUG] thread %d :  CRC Good  calc %.4X data %.4X eve %u ch %d crcOK %u crcNG %d errflag %u\n" , sender_id,
              get_crc(data_for_crc , size , first_crc) ,
-             value, myevtnum, i, total_crc_good[sender_id], total_crc_errors[sender_id], err_flag_cnt[sender_id]) ;
+             value, new_evtnum, i, total_crc_good[sender_id], total_crc_errors[sender_id], err_flag_cnt[sender_id]) ;
       int temp_err_cnt = 0;
 
       for (int j = 0; j <  MAX_PCIE40_CH; j++) {
@@ -1170,7 +1173,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
   //
   // Printing the 1st event
   //
-  if (evtnum == 0) {
+  if (new_evtnum == 0) {
     pthread_mutex_lock(&(mtx_sender_log));
     printf("[DEBUG] thread %d :  Printing the 1st event.\n", sender_id);
     printEventData(data, event_length, sender_id);

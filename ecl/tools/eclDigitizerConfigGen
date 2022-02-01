@@ -228,7 +228,6 @@ def readShaperDSPConfig(dir_path, shaper_id, board_id):
             a = getRow(idx)
             b = getCol(idx)
             wf_data.setMatrixElement(idx, raw_matr[a][b])
-        default_pars = [None, 0.5, 0.6483, 0.4017, 0.3741, 0.8494, 0.00144547, 4.7071, 0.8156, 0.5556, 0.2752]
         # Store shape parameters
         for idx in range(wf_data.c_nParams):
             # FIXME: There are 11 parameters, not sure where the last one supposed to go.

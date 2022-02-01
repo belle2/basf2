@@ -543,7 +543,7 @@ void ECLDigitizerModule::readDSPDB()
 {
   const EclConfiguration& ec = EclConfiguration::get();
 
-  TFile rootfile;
+  TFile* rootfile = nullptr;
   TTree* tree  = nullptr;
   TTree* tree2 = nullptr;
   TTree* tree3 = nullptr;
@@ -570,10 +570,10 @@ void ECLDigitizerModule::readDSPDB()
     }
     assert(! dataFileName.empty());
 
-    rootfile.Open(dataFileName.c_str());
-    tree  = (TTree*) rootfile.Get("EclWF");
-    tree2 = (TTree*) rootfile.Get("EclAlgo");
-    tree3 = (TTree*) rootfile.Get("EclNoise");
+    rootfile = new TFile(dataFileName.c_str(), "read");
+    tree  = (TTree*) rootfile->Get("EclWF");
+    tree2 = (TTree*) rootfile->Get("EclAlgo");
+    tree3 = (TTree*) rootfile->Get("EclNoise");
   }
 
   if (tree == 0 || tree2 == 0 || tree3 == 0) B2FATAL("Data not found");
@@ -692,7 +692,7 @@ void ECLDigitizerModule::readDSPDB()
 
   if (eclWFData) delete eclWFData;
 
-  if (!m_useWaveformParameters) rootfile.Close();
+  if (!m_useWaveformParameters) rootfile->Close();
 }
 
 void ECLDigitizerModule::repack(const ECLWFAlgoParams& eclWFAlgo, algoparams_t& t)

@@ -1,0 +1,41 @@
+# EventType: ???
+# Descriptor:  [B- -> D_0*0 tau- nu, D_0*0 -> D0 eta] cc
+# NickName: Bu_Dzerosttaunu_Deta
+# Documentation: b->c tau nu process, D_0* mode (LLSW model)
+# Tested: No
+# PhysicsWG: SL
+# Responsible: Henrik Junkerkalefeld
+# Email: junkerkalefeld@physik.uni-bonn.de
+# Cuts: None
+# Date: 20220201
+#
+
+ 
+Alias D_0*0sig D_0*0
+Alias anti-D_0*0sig anti-D_0*0
+ChargeConj D_0*0sig anti-D_0*0sig
+ 
+Decay Upsilon(4S)
+0.500 B+sig B-  VSS;
+0.500 B-sig B+  VSS;
+Enddecay
+ 
+ 
+Decay B-sig
+1.0   D_0*0sig  tau-  anti-nu_tau  PHOTOS LLSW 0.68 -0.2 0.3;
+Enddecay
+CDecay B+sig
+ 
+Decay  D_0*0sig
+1.0    D0 eta                     PHSP;
+Enddecay
+CDecay  anti-D_0*0sig
+
+Decay  tau-
+0.5061   e-  anti-nu_e  nu_tau                        PHOTOS TAULNUNU;
+0.4939   mu-  anti-nu_mu  nu_tau                      PHOTOS TAULNUNU;
+Enddecay
+CDecay tau+
+ 
+End
+

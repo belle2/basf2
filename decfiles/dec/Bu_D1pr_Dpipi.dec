@@ -1,0 +1,43 @@
+# EventType: ???
+# Descriptor:  [B- -> D'_10 tau- nu, D'_10 -> D pi pi ] cc 
+# NickName: Bu_Dprime1taunu_Dpipi
+# Documentation: b->c tau nu process, D'1 mode (LLSW model)
+# Tested: No
+# PhysicsWG: SL
+# Responsible: Henrik Junkerkalefeld
+# Email: junkerkalefeld@physik.uni-bonn.de
+# Cuts: None
+# Date: 20220201
+#
+
+
+Alias D'_10sig D'_10
+Alias anti-D'_10sig anti-D'_10
+ChargeConj D'_10sig anti-D'_10sig
+
+Decay Upsilon(4S)
+0.500 B-sig B+  VSS;
+0.500 B- B+sig  VSS;
+Enddecay
+
+
+Decay B-sig
+1.0    D'_10sig  tau-  anti-nu_tau    PHOTOS LLSW 0.68 -0.2 0.3;
+Enddecay
+CDecay B+sig
+ 
+Decay D'_10sig
+0.1719    D0 pi+ pi-                     PHOTOS PHSP;
+0.1145    D0 pi0 pi0                     PHSP;
+0.1145    D+ pi- pi0                     PHOTOS PHSP;
+Enddecay
+CDecay anti-D'_10sig
+
+Decay  tau-
+0.5061   e-  anti-nu_e  nu_tau                        PHOTOS TAULNUNU;
+0.4939   mu-  anti-nu_mu  nu_tau                      PHOTOS TAULNUNU;
+Enddecay
+CDecay tau+
+ 
+ 
+End

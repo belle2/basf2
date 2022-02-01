@@ -1,0 +1,42 @@
+# EventType: ???
+# Descriptor:  [B0 -> D_0*- tau+ nu, D_0*- -> D* pi pi ] cc 
+# NickName: Bd_Dzerosttaunu_Dstpipi
+# Documentation: b->c tau nu process, D_0* mode (LLSW model)
+# Tested: No
+# PhysicsWG: SL
+# Responsible: Henrik Junkerkalefeld
+# Email: junkerkalefeld@physik.uni-bonn.de
+# Cuts: None
+# Date: 20220201
+#
+
+ 
+Alias D_0*-sig D_0*-
+Alias D_0*+sig D_0*+
+ChargeConj D_0*-sig D_0*+sig
+ 
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+ 
+Decay B0sig
+1.0    D_0*-sig  tau+ nu_tau  PHOTOS LLSW 0.68 -0.2 0.3;
+Enddecay
+CDecay anti-B0sig
+ 
+Decay  D_0*-sig
+0.00021  D*-      pi+ pi-                    PHOTOS PHSP;
+0.00014  anti-D*0 pi- pi0                    PHOTOS PHSP;
+0.00014  D*-      pi0 pi0                    PHOTOS PHSP;
+Enddecay
+CDecay  D_0*+sig
+
+Decay  tau-
+0.5061   e-  anti-nu_e  nu_tau                        PHOTOS TAULNUNU;
+0.4939   mu-  anti-nu_mu  nu_tau                      PHOTOS TAULNUNU;
+Enddecay
+CDecay tau+
+ 
+ 
+End
+

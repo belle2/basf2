@@ -1,0 +1,37 @@
+# EventType: ???
+# Descriptor:  [B- -> GAP tau+ nu, PHSP] cc
+# NickName: Bu_GAPtaunu_PHSP
+# Documentation: b->c tau nu process, GAP modes (PHSP)
+# Tested: No
+# PhysicsWG: SL
+# Responsible: Henrik Junkerkalefeld
+# Email: junkerkalefeld@physik.uni-bonn.de
+# Cuts: None
+# Date: 20220201
+#
+
+Decay Upsilon(4S)
+0.500 B-sig B+  VSS;
+0.500 B- B+sig  VSS;
+Enddecay
+
+Decay B-sig
+0.0262   D0  pi+  pi-  tau-  anti-nu_tau                  PHOTOS PHSP;
+0.0171   D+  pi-  pi0  tau-  anti-nu_tau                  PHOTOS PHSP;
+0.0171   D0  pi0  pi0  tau-  anti-nu_tau                  PHOTOS PHSP;
+0.0899   D*0  pi+  pi-  tau-  anti-nu_tau                 PHOTOS PHSP;
+0.0597   D*+  pi-  pi0  tau-  anti-nu_tau                 PHOTOS PHSP;
+0.0597   D*0  pi0  pi0  tau-  anti-nu_tau                 PHOTOS PHSP;
+0.3651   D0  eta  tau-  anti-nu_tau                       PHOTOS PHSP;
+0.3652   D*0  eta  tau-  anti-nu_tau                      PHOTOS PHSP;
+Enddecay
+CDecay B+sig
+
+Decay  tau-
+0.5061   e-  anti-nu_e  nu_tau                        PHOTOS TAULNUNU;
+0.4939   mu-  anti-nu_mu  nu_tau                      PHOTOS TAULNUNU;
+Enddecay
+CDecay tau+
+
+
+End

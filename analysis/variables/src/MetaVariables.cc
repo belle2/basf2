@@ -237,15 +237,16 @@ namespace Belle2 {
             return eventExtraInfo->getExtraInfo(key);
           } else {
             double value = std::numeric_limits<double>::quiet_NaN();
-            if (std::holds_alternative<double>(var->function(nullptr)))
+            auto var_result = var->function(nullptr);
+            if (std::holds_alternative<double>(var_result))
             {
-              value = std::get<double>(var->function(nullptr));
-            } else if (std::holds_alternative<int>(var->function(nullptr)))
+              value = std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result))
             {
-              return std::get<int>(var->function(nullptr));
-            } else if (std::holds_alternative<bool>(var->function(nullptr)))
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result))
             {
-              return std::get<bool>(var->function(nullptr));
+              return std::get<bool>(var_result);
             }
             eventExtraInfo->addExtraInfo(key, value);
             return value;
@@ -412,12 +413,13 @@ namespace Belle2 {
         auto func = [pdgCode, var](const Particle * particle) -> double {
           if (std::abs(particle->getPDGCode()) == std::abs(pdgCode))
           {
-            if (std::holds_alternative<double>(var->function(particle))) {
-              return std::get<double>(var->function(particle));
-            } else if (std::holds_alternative<int>(var->function(particle))) {
-              return std::get<int>(var->function(particle));
-            } else if (std::holds_alternative<bool>(var->function(particle))) {
-              return std::get<bool>(var->function(particle));
+            auto var_result = var->function(particle);
+            if (std::holds_alternative<double>(var_result)) {
+              return std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result)) {
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result)) {
+              return std::get<bool>(var_result);
             } else return std::numeric_limits<double>::quiet_NaN();
           } else return std::numeric_limits<double>::quiet_NaN();
         };
@@ -437,12 +439,13 @@ namespace Belle2 {
             if (particle->getMCParticle()->getStatus(MCParticle::c_PrimaryParticle)
             && (! particle->getMCParticle()->getStatus(MCParticle::c_IsVirtual))
             && (! particle->getMCParticle()->getStatus(MCParticle::c_Initial))) {
-              if (std::holds_alternative<double>(var->function(particle))) {
-                return std::get<double>(var->function(particle));
-              } else if (std::holds_alternative<int>(var->function(particle))) {
-                return std::get<int>(var->function(particle));
-              } else if (std::holds_alternative<bool>(var->function(particle))) {
-                return std::get<bool>(var->function(particle));
+              auto var_result = var->function(particle);
+              if (std::holds_alternative<double>(var_result)) {
+                return std::get<double>(var_result);
+              } else if (std::holds_alternative<int>(var_result)) {
+                return std::get<int>(var_result);
+              } else if (std::holds_alternative<bool>(var_result)) {
+                return std::get<bool>(var_result);
               } else return std::numeric_limits<double>::quiet_NaN();
             } else return std::numeric_limits<double>::quiet_NaN();
           } else return std::numeric_limits<double>::quiet_NaN();
@@ -1467,16 +1470,17 @@ namespace Belle2 {
         // unmask the variable
         auto func = [var, finalMask](const Particle * particle) -> double {
           int value = 0;
-          if (std::holds_alternative<double>(var->function(particle)))
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
           {
             // judge if the value is nan before unmasking
-            if (std::isnan(std::get<double>(var->function(particle)))) {
+            if (std::isnan(std::get<double>(var_result))) {
               return std::numeric_limits<double>::quiet_NaN();
             }
-            value = int(std::get<double>(var->function(particle)));
-          } else if (std::holds_alternative<int>(var->function(particle)))
+            value = int(std::get<double>(var_result));
+          } else if (std::holds_alternative<int>(var_result))
           {
-            value = std::get<int>(var->function(particle));
+            value = std::get<int>(var_result);
           }
 
           // apply the final mask
@@ -1506,23 +1510,25 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
           if (cut->check(particle))
           {
-            if (std::holds_alternative<double>(variableIfTrue->function(particle))) {
-              return std::get<double>(variableIfTrue->function(particle));
-            } else if (std::holds_alternative<int>(variableIfTrue->function(particle))) {
-              return std::get<int>(variableIfTrue->function(particle));
-            } else if (std::holds_alternative<bool>(variableIfTrue->function(particle))) {
-              return std::get<bool>(variableIfTrue->function(particle));
+            auto var_result = variableIfTrue->function(particle);
+            if (std::holds_alternative<double>(var_result)) {
+              return std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result)) {
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result)) {
+              return std::get<bool>(var_result);
             } else return std::numeric_limits<double>::quiet_NaN();
           } else {
-            if (std::holds_alternative<double>(variableIfFalse->function(particle)))
+            auto var_result = variableIfFalse->function(particle);
+            if (std::holds_alternative<double>(var_result))
             {
-              return std::get<double>(variableIfFalse->function(particle));
-            } else if (std::holds_alternative<int>(variableIfFalse->function(particle)))
+              return std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result))
             {
-              return std::get<int>(variableIfFalse->function(particle));
-            } else if (std::holds_alternative<bool>(variableIfFalse->function(particle)))
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result))
             {
-              return std::get<bool>(variableIfFalse->function(particle));
+              return std::get<bool>(var_result);
             } else return std::numeric_limits<double>::quiet_NaN();
           }
         };
@@ -1570,12 +1576,13 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          if (std::holds_alternative<double>(var->function(particle)))
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
           {
-            return std::abs(std::get<double>(var->function(particle)));
-          } else if (std::holds_alternative<int>(var->function(particle)))
+            return std::abs(std::get<double>(var_result));
+          } else if (std::holds_alternative<int>(var_result))
           {
-            return std::abs(std::get<int>(var->function(particle)));
+            return std::abs(std::get<int>(var_result));
           } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
@@ -1595,19 +1602,21 @@ namespace Belle2 {
 
         auto func = [var1, var2](const Particle * particle) -> double {
           double val1, val2;
-          if (std::holds_alternative<double>(var1->function(particle)))
+          auto var_result1 = var1->function(particle);
+          auto var_result2 = var2->function(particle);
+          if (std::holds_alternative<double>(var_result1))
           {
-            val1 = std::get<double>(var1->function(particle));
-          } else if (std::holds_alternative<int>(var1->function(particle)))
+            val1 = std::get<double>(var_result1);
+          } else if (std::holds_alternative<int>(var_result1))
           {
-            val1 = std::get<int>(var1->function(particle));
+            val1 = std::get<int>(var_result1);
           }
-          if (std::holds_alternative<double>(var2->function(particle)))
+          if (std::holds_alternative<double>(var_result2))
           {
-            val2 = std::get<double>(var2->function(particle));
-          } else if (std::holds_alternative<int>(var2->function(particle)))
+            val2 = std::get<double>(var_result2);
+          } else if (std::holds_alternative<int>(var_result2))
           {
-            val2 = std::get<int>(var2->function(particle));
+            val2 = std::get<int>(var_result2);
           }
           return std::max(val1, val2);
         };
@@ -1628,19 +1637,21 @@ namespace Belle2 {
 
         auto func = [var1, var2](const Particle * particle) -> double {
           double val1, val2;
-          if (std::holds_alternative<double>(var1->function(particle)))
+          auto var_result1 = var1->function(particle);
+          auto var_result2 = var2->function(particle);
+          if (std::holds_alternative<double>(var_result1))
           {
-            val1 = std::get<double>(var1->function(particle));
-          } else if (std::holds_alternative<int>(var1->function(particle)))
+            val1 = std::get<double>(var_result1);
+          } else if (std::holds_alternative<int>(var_result1))
           {
-            val1 = std::get<int>(var1->function(particle));
+            val1 = std::get<int>(var_result1);
           }
-          if (std::holds_alternative<double>(var2->function(particle)))
+          if (std::holds_alternative<double>(var_result2))
           {
-            val2 = std::get<double>(var2->function(particle));
-          } else if (std::holds_alternative<int>(var2->function(particle)))
+            val2 = std::get<double>(var_result2);
+          } else if (std::holds_alternative<int>(var_result2))
           {
-            val2 = std::get<int>(var2->function(particle));
+            val2 = std::get<int>(var_result2);
           }
           return std::min(val1, val2);
         };
@@ -1655,10 +1666,11 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          if (std::holds_alternative<double>(var->function(particle)))
-            return std::sin(std::get<double>(var->function(particle)));
-          else if (std::holds_alternative<int>(var->function(particle)))
-            return std::sin(std::get<int>(var->function(particle)));
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return std::sin(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::sin(std::get<int>(var_result));
           else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
@@ -1672,10 +1684,11 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          if (std::holds_alternative<double>(var->function(particle)))
-            return std::asin(std::get<double>(var->function(particle)));
-          else if (std::holds_alternative<int>(var->function(particle)))
-            return std::asin(std::get<int>(var->function(particle)));
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return std::asin(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::asin(std::get<int>(var_result));
           else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
@@ -1689,10 +1702,11 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          if (std::holds_alternative<double>(var->function(particle)))
-            return std::cos(std::get<double>(var->function(particle)));
-          else if (std::holds_alternative<int>(var->function(particle)))
-            return std::cos(std::get<int>(var->function(particle)));
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return std::cos(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::cos(std::get<int>(var_result));
           else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
@@ -1706,10 +1720,11 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          if (std::holds_alternative<double>(var->function(particle)))
-            return std::acos(std::get<double>(var->function(particle)));
-          else if (std::holds_alternative<int>(var->function(particle)))
-            return std::acos(std::get<int>(var->function(particle)));
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return std::acos(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::acos(std::get<int>(var_result));
           else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
@@ -1745,10 +1760,11 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          if (std::holds_alternative<double>(var->function(particle)))
-            return std::exp(std::get<double>(var->function(particle)));
-          else if (std::holds_alternative<int>(var->function(particle)))
-            return std::exp(std::get<int>(var->function(particle)));
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return std::exp(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::exp(std::get<int>(var_result));
           else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
@@ -1762,10 +1778,11 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          if (std::holds_alternative<double>(var->function(particle)))
-            return std::log(std::get<double>(var->function(particle)));
-          else if (std::holds_alternative<int>(var->function(particle)))
-            return std::log(std::get<int>(var->function(particle)));
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return std::log(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::log(std::get<int>(var_result));
           else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
@@ -1779,10 +1796,11 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          if (std::holds_alternative<double>(var->function(particle)))
-            return std::log10(std::get<double>(var->function(particle)));
-          else if (std::holds_alternative<int>(var->function(particle)))
-            return std::log10(std::get<int>(var->function(particle)));
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return std::log10(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::log10(std::get<int>(var_result));
           else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
@@ -1807,15 +1825,16 @@ namespace Belle2 {
           if (daughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<float>::quiet_NaN();
           else {
-            if (std::holds_alternative<double>(var->function(particle->getDaughter(daughterNumber))))
+            auto var_result = var->function(particle->getDaughter(daughterNumber));
+            if (std::holds_alternative<double>(var_result))
             {
-              return std::get<double>(var->function(particle->getDaughter(daughterNumber)));
-            } else if (std::holds_alternative<int>(var->function(particle->getDaughter(daughterNumber))))
+              return std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result))
             {
-              return std::get<int>(var->function(particle->getDaughter(daughterNumber)));
-            } else if (std::holds_alternative<bool>(var->function(particle->getDaughter(daughterNumber))))
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result))
             {
-              return std::get<bool>(var->function(particle->getDaughter(daughterNumber)));
+              return std::get<bool>(var_result);
             } else return std::numeric_limits<double>::quiet_NaN();
           }
         };
@@ -1844,12 +1863,13 @@ namespace Belle2 {
               return std::numeric_limits<float>::quiet_NaN();
             }
             Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
-            if (std::holds_alternative<double>(var->function(&tempParticle))) {
-              return std::get<double>(var->function(&tempParticle));
-            } else if (std::holds_alternative<int>(var->function(&tempParticle))) {
-              return std::get<int>(var->function(&tempParticle));
-            } else if (std::holds_alternative<bool>(var->function(&tempParticle))) {
-              return std::get<bool>(var->function(&tempParticle));
+            auto var_result = var->function(&tempParticle);
+            if (std::holds_alternative<double>(var_result)) {
+              return std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result)) {
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result)) {
+              return std::get<bool>(var_result);
             } else return std::numeric_limits<double>::quiet_NaN();
           } else {
             return std::numeric_limits<float>::quiet_NaN();
@@ -1874,12 +1894,13 @@ namespace Belle2 {
               return std::numeric_limits<float>::quiet_NaN();
             }
             Particle tempParticle = Particle(particle->getMCParticle()->getMother());
-            if (std::holds_alternative<double>(var->function(&tempParticle))) {
-              return std::get<double>(var->function(&tempParticle));
-            } else if (std::holds_alternative<int>(var->function(&tempParticle))) {
-              return std::get<int>(var->function(&tempParticle));
-            } else if (std::holds_alternative<bool>(var->function(&tempParticle))) {
-              return std::get<bool>(var->function(&tempParticle));
+            auto var_result = var->function(&tempParticle);
+            if (std::holds_alternative<double>(var_result)) {
+              return std::get<double>(var_result);
+            } else if (std::holds_alternative<int>(var_result)) {
+              return std::get<int>(var_result);
+            } else if (std::holds_alternative<bool>(var_result)) {
+              return std::get<bool>(var_result);
             } else return std::numeric_limits<double>::quiet_NaN();
           } else {
             return std::numeric_limits<float>::quiet_NaN();
@@ -1911,15 +1932,16 @@ namespace Belle2 {
 
           MCParticle* mcParticle = mcParticles[particleNumber];
           Particle part = Particle(mcParticle);
-          if (std::holds_alternative<double>(var->function(&part)))
+          auto var_result = var->function(&part);
+          if (std::holds_alternative<double>(var_result))
           {
-            return std::get<double>(var->function(&part));
-          } else if (std::holds_alternative<int>(var->function(&part)))
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
           {
-            return std::get<int>(var->function(&part));
-          } else if (std::holds_alternative<bool>(var->function(&part)))
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
           {
-            return std::get<bool>(var->function(&part));
+            return std::get<bool>(var_result);
           } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
@@ -1947,15 +1969,16 @@ namespace Belle2 {
           }
 
           Particle upsilon4S = Particle(mcUpsilon4S);
-          if (std::holds_alternative<double>(var->function(&upsilon4S)))
+          auto var_result = var->function(&upsilon4S);
+          if (std::holds_alternative<double>(var_result))
           {
-            return std::get<double>(var->function(&upsilon4S));
-          } else if (std::holds_alternative<int>(var->function(&upsilon4S)))
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
           {
-            return std::get<int>(var->function(&upsilon4S));
-          } else if (std::holds_alternative<bool>(var->function(&upsilon4S)))
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
           {
-            return std::get<bool>(var->function(&upsilon4S));
+            return std::get<bool>(var_result);
           } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
@@ -1988,12 +2011,13 @@ namespace Belle2 {
           {
             const Particle* p = list->getParticle(i);
             if (p->getExtraInfo(extraInfoName) == rank) {
-              if (std::holds_alternative<double>(var->function(p))) {
-                return std::get<double>(var->function(p));
-              } else if (std::holds_alternative<int>(var->function(p))) {
-                return std::get<int>(var->function(p));
-              } else if (std::holds_alternative<bool>(var->function(p))) {
-                return std::get<bool>(var->function(p));
+              auto var_result = var->function(p);
+              if (std::holds_alternative<double>(var_result)) {
+                return std::get<double>(var_result);
+              } else if (std::holds_alternative<int>(var_result)) {
+                return std::get<int>(var_result);
+              } else if (std::holds_alternative<bool>(var_result)) {
+                return std::get<bool>(var_result);
               } else return std::numeric_limits<double>::quiet_NaN();
             }
           }
@@ -2138,15 +2162,16 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
           }
           Particle tmpPart(mcp);
-          if (std::holds_alternative<double>(var->function(&tmpPart)))
+          auto var_result = var->function(&tmpPart);
+          if (std::holds_alternative<double>(var_result))
           {
-            return std::get<double>(var->function(&tmpPart));
-          } else if (std::holds_alternative<int>(var->function(&tmpPart)))
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
           {
-            return std::get<int>(var->function(&tmpPart));
-          } else if (std::holds_alternative<bool>(var->function(&tmpPart)))
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
           {
-            return std::get<bool>(var->function(&tmpPart));
+            return std::get<bool>(var_result);
           } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
@@ -2558,16 +2583,16 @@ namespace Belle2 {
 
         // final check that the list wasn't empty (or some other problem)
         if (iClosest == -1) return std::numeric_limits<double>::quiet_NaN();
-
-        if (std::holds_alternative<double>(var->function(list->getParticle(iClosest))))
+        auto var_result = var->function(list->getParticle(iClosest));
+        if (std::holds_alternative<double>(var_result))
         {
-          return std::get<double>(var->function(list->getParticle(iClosest)));
-        } else if (std::holds_alternative<int>(var->function(list->getParticle(iClosest))))
+          return std::get<double>(var_result);
+        } else if (std::holds_alternative<int>(var_result))
         {
-          return std::get<int>(var->function(list->getParticle(iClosest)));
-        } else if (std::holds_alternative<bool>(var->function(list->getParticle(iClosest))))
+          return std::get<int>(var_result);
+        } else if (std::holds_alternative<bool>(var_result))
         {
-          return std::get<bool>(var->function(list->getParticle(iClosest)));
+          return std::get<bool>(var_result);
         } else return std::numeric_limits<double>::quiet_NaN();
       };
       return func;
@@ -2648,16 +2673,16 @@ namespace Belle2 {
 
         // final check that the list wasn't empty (or some other problem)
         if (iMostB2B == -1) return std::numeric_limits<double>::quiet_NaN();
-
-        if (std::holds_alternative<double>(var->function(list->getParticle(iMostB2B))))
+        auto var_result = var->function(list->getParticle(iMostB2B));
+        if (std::holds_alternative<double>(var_result))
         {
-          return std::get<double>(var->function(list->getParticle(iMostB2B)));
-        } else if (std::holds_alternative<int>(var->function(list->getParticle(iMostB2B))))
+          return std::get<double>(var_result);
+        } else if (std::holds_alternative<int>(var_result))
         {
-          return std::get<int>(var->function(list->getParticle(iMostB2B)));
-        } else if (std::holds_alternative<bool>(var->function(list->getParticle(iMostB2B))))
+          return std::get<int>(var_result);
+        } else if (std::holds_alternative<bool>(var_result))
         {
-          return std::get<bool>(var->function(list->getParticle(iMostB2B)));
+          return std::get<bool>(var_result);
         } else return std::numeric_limits<double>::quiet_NaN();
       };
       return func;
@@ -2730,16 +2755,17 @@ namespace Belle2 {
           // Make a dummy particle out of the sum of the 4-momenta of the selected daughters
           Particle sumOfDaughters(pSum, 100); // 100 is one of the special numbers
 
+          auto var_result = var->function(&sumOfDaughters);
           // Calculate the variable on the dummy particle
-          if (std::holds_alternative<double>(var->function(&sumOfDaughters)))
+          if (std::holds_alternative<double>(var_result))
           {
-            return std::get<double>(var->function(&sumOfDaughters));
-          } else if (std::holds_alternative<int>(var->function(&sumOfDaughters)))
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
           {
-            return std::get<int>(var->function(&sumOfDaughters));
-          } else if (std::holds_alternative<bool>(var->function(&sumOfDaughters)))
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
           {
-            return std::get<bool>(var->function(&sumOfDaughters));
+            return std::get<bool>(var_result);
           } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;
@@ -2861,16 +2887,17 @@ namespace Belle2 {
           // Make a dummy particle out of the sum of the 4-momenta of the selected daughters
           Particle sumOfDaughters(pSum, 100); // 100 is one of the special numbers
 
+          auto var_result = var->function(&sumOfDaughters);
           // Calculate the variable on the dummy particle
-          if (std::holds_alternative<double>(var->function(&sumOfDaughters)))
+          if (std::holds_alternative<double>(var_result))
           {
-            return std::get<double>(var->function(&sumOfDaughters));
-          } else if (std::holds_alternative<int>(var->function(&sumOfDaughters)))
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
           {
-            return std::get<int>(var->function(&sumOfDaughters));
-          } else if (std::holds_alternative<bool>(var->function(&sumOfDaughters)))
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
           {
-            return std::get<bool>(var->function(&sumOfDaughters));
+            return std::get<bool>(var_result);
           } else return std::numeric_limits<double>::quiet_NaN();
         }; // end of lambda function
         return func;
@@ -2915,15 +2942,16 @@ namespace Belle2 {
             i_p = i_p->getMother();
           }
           Particle m_p(i_p);
-          if (std::holds_alternative<double>(var->function(&m_p)))
+          auto var_result = var->function(&m_p);
+          if (std::holds_alternative<double>(var_result))
           {
-            return std::get<double>(var->function(&m_p));
-          } else if (std::holds_alternative<int>(var->function(&m_p)))
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
           {
-            return std::get<int>(var->function(&m_p));
-          } else if (std::holds_alternative<bool>(var->function(&m_p)))
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
           {
-            return std::get<bool>(var->function(&m_p));
+            return std::get<bool>(var_result);
           } else return std::numeric_limits<double>::quiet_NaN();
         };
         return func;

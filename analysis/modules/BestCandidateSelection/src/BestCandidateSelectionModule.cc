@@ -112,10 +112,11 @@ void BestCandidateSelectionModule::event()
   valueToIndex.reserve(numParticles);
   for (const Particle& p : *m_inputList) {
     double value = 0;
-    if (std::holds_alternative<double>(m_variable->function(&p))) {
-      value = std::get<double>(m_variable->function(&p));
-    } else if (std::holds_alternative<int>(m_variable->function(&p))) {
-      value = std::get<int>(m_variable->function(&p));
+    auto var_result = m_variable->function(&p);
+    if (std::holds_alternative<double>(var_result)) {
+      value = std::get<double>(var_result);
+    } else if (std::holds_alternative<int>(var_result)) {
+      value = std::get<int>(var_result);
     }
     valueToIndex.emplace_back(value, p.getArrayIndex());
   }

@@ -22,7 +22,7 @@ using namespace Belle2;
 using namespace ECL;
 
 // Constructor.
-ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par)
+ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par, const bool sorted)
 {
   // resize the vector
   std::vector<short int> fakeneighbours;
@@ -35,7 +35,7 @@ ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par)
   if (neighbourDef == "N") {
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n: " << parToInt * 2 + 1 << " x " << parToInt * 2
             + 1);
-    if ((parToInt >= 0) and (parToInt < 11)) initializeN(parToInt);
+    if ((parToInt >= 0) and (parToInt < 11)) initializeN(parToInt, sorted);
     else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
   } else if (neighbourDef == "NC") {
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus corners): " << parToInt * 2 + 1 << " x "
@@ -221,7 +221,7 @@ void ECLNeighbours::initializeF(double frac)
 
 }
 
-void ECLNeighbours::initializeN(int n)
+void ECLNeighbours::initializeN(const int n, const bool sorted)
 {
   // This is the "NxN-edges" case (in the barrel)
   for (int i = 0; i < 8736; i++) {
@@ -251,6 +251,51 @@ void ECLNeighbours::initializeN(int n)
     // push back the final vector of IDs, we have to erease the duplicate first ID
     sort(neighbours.begin(), neighbours.end());
     neighbours.erase(unique(neighbours.begin(), neighbours.end()), neighbours.end());
+
+    //sort by theta and phi
+    if (sorted == true) {
+
+      // ECL geometry
+      ECLGeometryPar* geom = ECLGeometryPar::Instance();
+
+      // create a simple struct with cellid, thetaid, and phiid (the latter two will be used for sorting)
+      struct crystal {
+        int cellid;
+        double phi;
+        int thetaid;
+      };
+
+      // fill them all into a vector
+      std::vector<crystal> crystals;
+      for (const auto& nbr : neighbours) {
+        geom->Mapping(nbr - 1);
+        double phi = -1 * atan2(geom->GetCrystalPos(nbr - 1)[0],
+                                -1 * geom->GetCrystalPos(nbr - 1)[1]);
+
+        crystals.push_back({nbr, phi, geom->GetThetaID()});
+      }
+
+      //sort this vector using custom metric
+      std::sort(crystals.begin(), crystals.end(), [](const auto & left, const auto & right) {
+        //primary condition: thetaid
+        if (left.thetaid < right.thetaid) return true;
+        if (left.thetaid > right.thetaid) return false;
+
+        // a=b for primary condition, go to secondary condition
+        // sort points counterclockwise, atan2 takes care of the wrapping
+        if (left.phi < right.phi) return true;
+        if (left.phi > right.phi) return false;
+
+        //we should never arrive here by definition
+        return true;
+      });
+
+      //replace the neighbour vector with this newly sorted one
+      for (int nbidx = 0; nbidx < int(neighbours.size()); nbidx++) {
+        neighbours[nbidx] = crystals[nbidx].cellid;
+      }
+    }
+
     m_neighbourMap.push_back(neighbours);
 
   }
@@ -260,6 +305,7 @@ void ECLNeighbours::initializeNC(const int n)
 {
   // get the normal neighbours
   initializeN(n);
+
   // ECL geometry
   ECLGeometryPar* geom = ECLGeometryPar::Instance();
 

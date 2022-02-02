@@ -240,6 +240,7 @@ namespace Belle2 {
 
       StoreObjPtr<ECLCellIdMapping> mapping;
       const unsigned int posid = int(std::lround(vars[0]));
+
       const int nneighbours = int(std::lround(vars[1]));
       const int varid = int(std::lround(vars[2]));
       const int extid = int(std::lround(vars[3]));
@@ -261,7 +262,6 @@ namespace Belle2 {
       } else {
         maxCellId = getCenterCell(particle);
       }
-
 
       if (maxCellId < 0) return std::numeric_limits<double>::quiet_NaN();
 
@@ -442,6 +442,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit energy by digit energy rank
     double getECLCalDigitEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
+
       if (vars.size() != 1) {
         B2FATAL("Need exactly one parameters (energy index).");
       }
@@ -1512,7 +1513,7 @@ namespace Belle2 {
                       "Returns R of the i-th highest energy caldigit in the cluster (i>=0)");
   }
 
-  // Create an empty module which allows basf2 to easily find the library and load it from the steering file
-  class EnableECLCalDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.
-  REG_MODULE(EnableECLCalDigitVariables); /**< register the empty module */
+//   // Create an empty module which allows basf2 to easily find the library and load it from the steering file
+//   class EnableECLCalDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.
+//   REG_MODULE(EnableECLCalDigitVariables); /**< register the empty module */
 }

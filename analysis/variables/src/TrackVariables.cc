@@ -568,7 +568,7 @@ Returns NaN if called for something other than a track-based particle.
     REGISTER_VARIABLE("omega", trackOmega, R"DOC(
 Returns the tracking parameter :math:`\omega`, the curvature of the track.
 
-Returns NaN if called for something other than a track-based particle."
+Returns NaN if called for something other than a track-based particle.
 		      )DOC", ":math:`\\text{cm}^{-1}`");
     REGISTER_VARIABLE("z0", trackZ0, R"DOC(
 Returns the tracking parameter :math:`z_0`, the z-coordinate of the

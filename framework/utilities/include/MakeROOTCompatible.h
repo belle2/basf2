@@ -13,6 +13,10 @@
 
 namespace Belle2 {
 
+  /**
+   * Helper class for converting strings into a ROOT-friendly format
+   * (e.g.: removing special characters in branch names, etc.)
+   */
   class MakeROOTCompatible {
 
   public:

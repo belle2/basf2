@@ -155,8 +155,8 @@ int RFEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
   //  char* port = m_conf->getconf ( "distributor", "port" );
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
   char* hostbase = m_conf->getconf("processor", "nodebase");
-  int baselen = strlen(hostbase);
   /* OLD impl
+  int baselen = strlen(hostbase);
   char hostname[256];
   gethostname(hostname, sizeof(hostname));
   char id[3];

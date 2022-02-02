@@ -28,19 +28,19 @@ namespace Belle2 {
     virtual ~ERecoMasterCallback() {}
 
   public:
-    virtual void initialize(const DBObject& obj);
-    virtual void configure(const DBObject& obj);
-    virtual void monitor();
-    virtual void ok(const char* node, const char* data);
-    virtual void error(const char* node, const char* data);
-    virtual void load(const DBObject& obj, const std::string& runtype);
-    virtual void start(int expno, int runno);
-    virtual void stop();
-    virtual void recover(const DBObject& obj, const std::string& runtype);
-    virtual bool resume(int subno);
-    virtual bool pause();
-    virtual void abort();
-    virtual bool perform(NSMCommunicator& com);
+    void initialize(const DBObject& obj) override;
+    void configure(const DBObject& obj) override;
+    void monitor() override;
+    void ok(const char* node, const char* data) override;
+    void error(const char* node, const char* data) override;
+    void load(const DBObject& obj, const std::string& runtype) override;
+    void start(int expno, int runno) override;
+    void stop() override;
+    void recover(const DBObject& obj, const std::string& runtype) override;
+    bool resume(int subno) override;
+    bool pause() override;
+    void abort() override;
+    bool perform(NSMCommunicator& com) override;
 
   public:
     void setState(NSMNode& node, const RCState& state);

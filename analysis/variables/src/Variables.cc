@@ -1132,7 +1132,7 @@ Note that this is context-dependent variable and can take different values depen
                       *  0 particle has no associated track
                       *  1 there is a matched track called connected - region(CR) track match
                       )DOC");
-    MAKE_DEPRECATED("trackMatchType", false, "light-minos-2012", R"DOC(
+    MAKE_DEPRECATED("trackMatchType", true, "light-2012-minos", R"DOC(
                      Use better variables like `trackNECLClusters`, `clusterTrackMatch`, and `nECLClusterTrackMatches`.)DOC");
 
     REGISTER_VARIABLE("decayTypeRecoil", recoilMCDecayType,

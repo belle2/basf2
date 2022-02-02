@@ -204,7 +204,7 @@ if __name__ == "__main__":
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
-    general_options.m_spectators = basf2_mva.vector('daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)')
+    general_options.m_spectators = basf2_mva.vector('daughterInvM(0, 1)', 'daughterInvM(0, 2)')
     general_options.m_target_variable = "isSignal"
     general_options.m_identifier = "tensorflow"
 
@@ -253,8 +253,8 @@ if __name__ == "__main__":
     results['featureDrop'] = {'p': p, 't': t, 'auc': auc}
 
     test_tree = uproot.open('test.root')['tree']
-    invMassDaughter01 = test_tree.array('daughterInvariantMass__bo0__cm__sp1__bc')
-    invMassDaughter02 = test_tree.array('daughterInvariantMass__bo0__cm__sp2__bc')
+    invMassDaughter01 = test_tree.array('daughterInvM__bo0__cm__sp1__bc')
+    invMassDaughter02 = test_tree.array('daughterInvM__bo0__cm__sp2__bc')
     isSignal = test_tree.array('isSignal').astype(np.int)
 
     def print_summary(name, data):

@@ -226,7 +226,7 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        std::string key = std::string("__") + makeROOTCompatible(var->name);
+        std::string key = std::string("__") + MakeROOTCompatible::makeROOTCompatible(var->name);
         auto func = [var, key](const Particle*) -> double {
 
           StoreObjPtr<EventExtraInfo> eventExtraInfo;
@@ -261,7 +261,7 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        std::string key = std::string("__") + makeROOTCompatible(var->name);
+        std::string key = std::string("__") + MakeROOTCompatible::makeROOTCompatible(var->name);
         auto func = [var, key](const Particle * particle) -> double {
 
           if (particle->hasExtraInfo(key))

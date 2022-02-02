@@ -92,7 +92,7 @@ void BestCandidateSelectionModule::initialize()
 
   // parse the name that the rank will be stored under
   if (m_outputVariableName.empty()) {
-    std::string root_compatible_VariableName = makeROOTCompatible(m_variableName);
+    std::string root_compatible_VariableName = MakeROOTCompatible::makeROOTCompatible(m_variableName);
     m_outputVariableName = root_compatible_VariableName + "_rank";
   }
 }

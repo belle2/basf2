@@ -163,10 +163,10 @@ class MonitoringHist:
             return
 
         f = ROOT.TFile.Open(filename, 'read')
-        d = f.Get(ROOT.Belle2.makeROOTCompatible(dirname))
+        d = f.Get(ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(dirname))
 
         for key in d.GetListOfKeys():
-            name = ROOT.Belle2.invertMakeROOTCompatible(key.GetName())
+            name = ROOT.Belle2.MakeROOTCompatible.invertMakeROOTCompatible(key.GetName())
             hist = key.ReadObj()
             if not (isinstance(hist, ROOT.TH1D) or isinstance(hist, ROOT.TH1F) or
                     isinstance(hist, ROOT.TH2D) or isinstance(hist, ROOT.TH2F)):
@@ -398,7 +398,7 @@ def MonitoringMCCount(particle):
 
     key = f'NumberOfMCParticlesInEvent({abs(pdg.from_name(particle.name))})'
 
-    key = ROOT.Belle2.makeROOTCompatible(key)
+    key = ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(key)
     hist = root_file.Get(key)
 
     mc_counts = {'sum': 0, 'std': 0, 'avg': 0, 'min': 0, 'max': 0}

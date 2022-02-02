@@ -296,7 +296,7 @@ if __name__ == '__main__':
 
         variables = list(reversed(variables))
         for iVarPosition in range(len(variables)):
-            root_variables[iVarPosition] = Belle2.makeROOTCompatible(variables[iVarPosition])
+            root_variables[iVarPosition] = Belle2.MakeROOTCompatible.makeROOTCompatible(variables[iVarPosition])
 
         # Set special name
         if identifiers[0].find('FSC') != -1:

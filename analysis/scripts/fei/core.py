@@ -127,7 +127,7 @@ class TrainingDataInformation:
         mc_counts = {}
 
         for key in root_file.GetListOfKeys():
-            variable = ROOT.Belle2.invertMakeROOTCompatible(key.GetName())
+            variable = ROOT.Belle2.MakeROOTCompatible.invertMakeROOTCompatible(key.GetName())
             pdg = abs(int(variable[len('NumberOfMCParticlesInEvent('):-len(")")]))
             hist = key.ReadObj()
             mc_counts[pdg] = {}

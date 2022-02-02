@@ -58,7 +58,7 @@ def construct_default_variable_names(particle_lists=None, ranked_variable='p', v
     # make root compatible
     root_compatible_list = []
     for var in variable_names:
-        root_compatible_list.append(Belle2.makeROOTCompatible(var))
+        root_compatible_list.append(Belle2.MakeROOTCompatible.makeROOTCompatible(var))
 
     return root_compatible_list
 

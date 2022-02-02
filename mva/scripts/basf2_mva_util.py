@@ -195,7 +195,7 @@ class Method(object):
         #: List of variables sorted by their importance
         self.variables = list(sorted(variables, key=lambda v: self.importances.get(v, 0.0)))
         #: List of the variable importances calculated by the method, but with the root compatible variable names
-        self.root_variables = [Belle2.makeROOTCompatible(v) for v in self.variables]
+        self.root_variables = [Belle2.MakeROOTCompatible.makeROOTCompatible(v) for v in self.variables]
         #: Dictionary of the variables sorted by their importance but with root compatoble variable names
         self.root_importances = {k: importances[k] for k in self.root_variables}
         #: Description of the method as a xml string returned by basf2_mva.info
@@ -203,7 +203,7 @@ class Method(object):
         #: List of spectators
         self.spectators = [str(v) for v in self.general_options.m_spectators]
         #: List of spectators with root compatible names
-        self.root_spectators = [Belle2.makeROOTCompatible(v) for v in self.spectators]
+        self.root_spectators = [Belle2.MakeROOTCompatible.makeROOTCompatible(v) for v in self.spectators]
 
     def train_teacher(self, datafiles, treename, general_options=None, specific_options=None):
         """
@@ -253,7 +253,9 @@ class Method(object):
 
             expert_target = identifier + '_' + self.general_options.m_target_variable
             stripped_expert_target = self.identifier + '_' + self.general_options.m_target_variable
-            d = tree2dict(roottree,
-                          [Belle2.makeROOTCompatible(identifier), Belle2.makeROOTCompatible(expert_target)],
-                          [self.identifier, stripped_expert_target])
+            d = tree2dict(
+                roottree, [
+                    Belle2.MakeROOTCompatible.makeROOTCompatible(identifier),
+                    Belle2.MakeROOTCompatible.makeROOTCompatible(expert_target)], [
+                    self.identifier, stripped_expert_target])
         return d[self.identifier], d[stripped_expert_target]

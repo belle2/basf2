@@ -153,7 +153,7 @@ namespace Belle2 {
         auto weightfile = Weightfile::load(filename, emd);
         weightfiles.push_back(weightfile);
 
-        std::string branchname = Belle2::makeROOTCompatible(filename);
+        std::string branchname = Belle2::MakeROOTCompatible::makeROOTCompatible(filename);
         auto branch = tree.Branch(branchname.c_str(), &result, (branchname + "/F").c_str());
         branches.push_back(branch);
       }
@@ -192,7 +192,8 @@ namespace Belle2 {
 
 
         if (not general_options.m_target_variable.empty()) {
-          std::string branchname = Belle2::makeROOTCompatible(std::string(branch->GetName()) + "_" + general_options.m_target_variable);
+          std::string branchname = Belle2::MakeROOTCompatible::makeROOTCompatible(std::string(branch->GetName()) + "_" +
+                                   general_options.m_target_variable);
           float target = 0;
           auto target_branch = tree.Branch(branchname.c_str(), &target, (branchname + "/F").c_str());
           auto targets = data.getTargets();

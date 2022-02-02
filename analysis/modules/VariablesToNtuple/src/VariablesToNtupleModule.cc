@@ -120,7 +120,7 @@ void VariablesToNtupleModule::initialize()
   m_tree->get().Branch("__weight__", &m_branchAddressesDouble[0], "__weight__/D");
   size_t enumerate = 1;
   for (const string& varStr : m_variables) {
-    string branchName = makeROOTCompatible(varStr);
+    string branchName = MakeROOTCompatible::makeROOTCompatible(varStr);
 
     // Check for deprecated variables
     Variable::Manager::Instance().checkDeprecatedVariable(varStr);

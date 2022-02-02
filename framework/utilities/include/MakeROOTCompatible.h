@@ -13,19 +13,25 @@
 
 namespace Belle2 {
 
-  /**
-   * Remove special characters that ROOT dislikes in branch names, e.g. (, ), :, etc
-   */
-  std::string makeROOTCompatible(std::string str);
+  class MakeROOTCompatible {
 
-  /**
-   * Invert makeROOTCompatible operation
-   */
-  std::string invertMakeROOTCompatible(std::string str);
+  public:
 
-  /**
-   * Substituation map for makeROOTCompatible
-   */
-  std::map<std::string, std::string> getSubstitutionMap();
+    /**
+     * Remove special characters that ROOT dislikes in branch names, e.g. (, ), :, etc
+     */
+    static std::string makeROOTCompatible(std::string str);
+
+    /**
+     * Invert makeROOTCompatible operation
+     */
+    static std::string invertMakeROOTCompatible(std::string str);
+
+    /**
+     * Substituation map for makeROOTCompatible
+     */
+    static std::map<std::string, std::string> getSubstitutionMap();
+
+  };
 
 }

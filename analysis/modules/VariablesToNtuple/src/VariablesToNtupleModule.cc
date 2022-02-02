@@ -203,21 +203,23 @@ void VariablesToNtupleModule::event()
     m_branchAddressesDouble[0] = getInverseSamplingRateWeight(nullptr);
     if (m_branchAddressesDouble[0] > 0) {
       for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
-        if (std::holds_alternative<double>(std::get<0>(m_functions[iVar])(nullptr))) {
-          if (std::get<1>(m_functions[iVar]) != Variable::Manager::VariableDataType::c_double)
+        auto eval = std::get<0>(m_functions[iVar])(nullptr);
+        auto var_type = std::get<1>(m_functions[iVar]);
+        if (std::holds_alternative<double>(eval)) {
+          if (var_type != Variable::Manager::VariableDataType::c_double)
             B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
                       "'. Expected Variable::Manager::VariableDataType::c_double. Exported data for this variable might be incorrect.");
-          m_branchAddressesDouble[iVar + 1] = std::get<double>(std::get<0>(m_functions[iVar])(nullptr));
-        } else if (std::holds_alternative<int>(std::get<0>(m_functions[iVar])(nullptr))) {
-          if (std::get<1>(m_functions[iVar]) != Variable::Manager::VariableDataType::c_int)
+          m_branchAddressesDouble[iVar + 1] = std::get<double>(eval);
+        } else if (std::holds_alternative<int>(eval)) {
+          if (var_type != Variable::Manager::VariableDataType::c_int)
             B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
                       "'. Expected Variable::Manager::VariableDataType::c_int. Exported data for this variable might be incorrect.");
-          m_branchAddressesInt[iVar + 1] = std::get<int>(std::get<0>(m_functions[iVar])(nullptr));
-        } else if (std::holds_alternative<bool>(std::get<0>(m_functions[iVar])(nullptr))) {
-          if (std::get<1>(m_functions[iVar]) != Variable::Manager::VariableDataType::c_bool)
+          m_branchAddressesInt[iVar + 1] = std::get<int>(eval);
+        } else if (std::holds_alternative<bool>(eval)) {
+          if (var_type != Variable::Manager::VariableDataType::c_bool)
             B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
                       "'. Expected Variable::Manager::VariableDataType::c_bool. Exported data for this variable might be incorrect.");
-          m_branchAddressesInt[iVar + 1] = std::get<bool>(std::get<0>(m_functions[iVar])(nullptr));
+          m_branchAddressesInt[iVar + 1] = std::get<bool>(eval);
         }
       }
       m_tree->get().Fill();
@@ -232,21 +234,23 @@ void VariablesToNtupleModule::event()
       m_branchAddressesDouble[0] = getInverseSamplingRateWeight(particle);
       if (m_branchAddressesDouble[0] > 0) {
         for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
-          if (std::holds_alternative<double>(std::get<0>(m_functions[iVar])(particle))) {
-            if (std::get<1>(m_functions[iVar]) != Variable::Manager::VariableDataType::c_double)
+          auto eval = std::get<0>(m_functions[iVar])(particle);
+          auto var_type = std::get<1>(m_functions[iVar]);
+          if (std::holds_alternative<double>(eval)) {
+            if (var_type != Variable::Manager::VariableDataType::c_double)
               B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
                         "'. Expected Variable::Manager::VariableDataType::c_double. Exported data for this variable might be incorrect.");
-            m_branchAddressesDouble[iVar + 1] = std::get<double>(std::get<0>(m_functions[iVar])(particle));
-          } else if (std::holds_alternative<int>(std::get<0>(m_functions[iVar])(particle))) {
-            if (std::get<1>(m_functions[iVar]) != Variable::Manager::VariableDataType::c_int)
+            m_branchAddressesDouble[iVar + 1] = std::get<double>(eval);
+          } else if (std::holds_alternative<int>(eval)) {
+            if (var_type != Variable::Manager::VariableDataType::c_int)
               B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
                         "'. Expected Variable::Manager::VariableDataType::c_int. Exported data for this variable might be incorrect.");
-            m_branchAddressesInt[iVar + 1] = std::get<int>(std::get<0>(m_functions[iVar])(particle));
-          } else if (std::holds_alternative<bool>(std::get<0>(m_functions[iVar])(particle))) {
-            if (std::get<1>(m_functions[iVar]) != Variable::Manager::VariableDataType::c_bool)
+            m_branchAddressesInt[iVar + 1] = std::get<int>(eval);
+          } else if (std::holds_alternative<bool>(eval)) {
+            if (var_type != Variable::Manager::VariableDataType::c_bool)
               B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
                         "'. Expected Variable::Manager::VariableDataType::c_bool. Exported data for this variable might be incorrect.");
-            m_branchAddressesInt[iVar + 1] = std::get<bool>(std::get<0>(m_functions[iVar])(particle));
+            m_branchAddressesInt[iVar + 1] = std::get<bool>(eval);
           }
         }
         m_tree->get().Fill();

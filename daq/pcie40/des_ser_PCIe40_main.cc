@@ -1069,8 +1069,18 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 14 ] = n_messages[ 14 ] + 1 ;
       if (n_messages[ 14 ] < max_number_of_messages) {
-        printf("[FATAL] thread %d : Bad ff55 %X pos %.8x ch %d\n" , sender_id, data[ cur_pos + linksize - 1  ], cur_pos + linksize - 1  ,
-               i) ;
+        char err_buf[500];
+        sprintf(err_buf,
+                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB trailer magic word(0xff55) is invalid. foooter %.8x : exp %d run %d sub %d : %s %s %d\n",
+                sender_id,
+                hostnamebuf, i,
+                data[ cur_pos + linksize - 1  ],
+                (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+                (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+                (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+                __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        //        printf("[FATAL] thread %d : Bad ff55 %X pos %.8x ch %d\n" , sender_id, data[ cur_pos + linksize - 1  ], cur_pos + linksize - 1  ,   i) ;
+        printf("%s\n", err_buf); fflush(stdout);
         printEventData(data, event_length + 16, sender_id);
       }
       err_bad_ff55[sender_id]++;

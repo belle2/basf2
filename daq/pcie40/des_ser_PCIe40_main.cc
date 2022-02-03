@@ -1003,8 +1003,10 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 11 ] = n_messages[ 11 ] + 1 ;
       if (n_messages[ 11 ] < max_number_of_messages) {
-        printf("[FATAL] thread %d : The next channel in data is ch %d but it must be ch %d according to masking register info. of PCIe40 : exp %d run %d sub %d\n",
-               sender_id, i, valid_ch[link_cnt],
+        printf("[FATAL] thread %d : %s ch=%d or %d : ERROR_EVENT : HSLB or PCIe40 channel found in data is ch %d but the next channel must be ch %d according to masking register info. of PCIe40. Please check the status of channel masking.  : exp %d run %d sub %d\n",
+               sender_id,
+               hostnamebuf, i, valid_ch[link_cnt],
+               i, valid_ch[link_cnt],
                (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
                (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
                (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
@@ -1024,7 +1026,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
       if (n_messages[ 12 ] < max_number_of_messages) {
         char err_buf[500];
         sprintf(err_buf,
-                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB header magic word(0xffaa) is invalid. header %.8x : exp %d run %d sub %d : %s %s %d\n",
+                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 header magic word(0xffaa) is invalid. header %.8x : exp %d run %d sub %d : %s %s %d\n",
                 sender_id,
                 hostnamebuf, i,
                 data[ cur_pos + FFAA_POS ],
@@ -1083,7 +1085,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
       if (n_messages[ 14 ] < max_number_of_messages) {
         char err_buf[500];
         sprintf(err_buf,
-                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB trailer magic word(0xff55) is invalid. foooter %.8x : exp %d run %d sub %d : %s %s %d\n",
+                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 trailer magic word(0xff55) is invalid. foooter %.8x : exp %d run %d sub %d : %s %s %d\n",
                 sender_id,
                 hostnamebuf, i,
                 data[ cur_pos + linksize - 1  ],

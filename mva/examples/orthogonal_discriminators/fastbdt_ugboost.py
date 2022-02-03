@@ -12,6 +12,7 @@ import basf2_mva
 
 if __name__ == "__main__":
     from basf2 import conditions
+    import ROOT  # noqa
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
@@ -42,7 +43,7 @@ if __name__ == "__main__":
                   'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
                   'daughter(2, daughter(0, minC2TDist))', 'daughter(2, daughter(1, minC2TDist))']
 
-    general_options = basf2_mva.GeneralOptions()
+    general_options = ROOT.Belle2.MVA.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
@@ -51,7 +52,7 @@ if __name__ == "__main__":
     general_options.m_target_variable = "isSignal"
     general_options.m_identifier = "fastbdt"
 
-    fastbdt_options = basf2_mva.FastBDTOptions()
+    fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
     fastbdt_options.m_nTrees = 100
     fastbdt_options.m_nCuts = 10
     fastbdt_options.m_nLevels = 5
@@ -59,13 +60,13 @@ if __name__ == "__main__":
     fastbdt_options.m_randRatio = 0.5
     fastbdt_options.m_flatnessLoss = 10.0
 
-    basf2_mva.teacher(general_options, fastbdt_options)
+    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)
 
     general_options.m_identifier = "fastbdt_baseline"
     fastbdt_options.m_flatnessLoss = -1.0
-    basf2_mva.teacher(general_options, fastbdt_options)
+    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)
 
     general_options.m_identifier = "fastbdt_drop_feature"
     fastbdt_options.m_flatnessLoss = -1.0
     general_options.m_variables = basf2_mva.vector(*variables2)
-    basf2_mva.teacher(general_options, fastbdt_options)
+    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)

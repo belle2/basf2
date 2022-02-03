@@ -109,12 +109,13 @@ def apply(state, X):
 
 if __name__ == "__main__":
     from basf2 import conditions
+    import ROOT  # noqa
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
     ]
 
-    general_options = basf2_mva.GeneralOptions()
+    general_options = ROOT.Belle2.MVA.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_identifier = "deep_keras"
     general_options.m_treename = "tree"
@@ -131,14 +132,14 @@ if __name__ == "__main__":
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    specific_options = basf2_mva.PythonOptions()
+    specific_options = ROOT.Belle2.MVA.PythonOptions()
     specific_options.m_framework = "contrib_keras"
     specific_options.m_steering_file = 'mva/examples/keras/preprocessing.py'
     specific_options.m_normalize = True
     specific_options.m_training_fraction = 0.9
 
     training_start = time.time()
-    basf2_mva.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.teacher(general_options, specific_options)
     training_stop = time.time()
     training_time = training_stop - training_start
     method = basf2_mva_util.Method(general_options.m_identifier)

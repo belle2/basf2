@@ -14,25 +14,28 @@ import multiprocessing
 import itertools
 
 if __name__ == "__main__":
+
+    import ROOT  # noqa
+
     training_data = basf2_mva.vector("train.root")
     test_data = basf2_mva.vector("test.root")
 
     # Train model with default parameters
-    general_options = basf2_mva.GeneralOptions()
+    general_options = ROOT.Belle2.MVA.GeneralOptions()
     general_options.m_datafiles = training_data
     general_options.m_treename = "tree"
     general_options.m_identifier = "test.xml"
     general_options.m_variables = basf2_mva.vector('p', 'pz', 'daughter(0, kaonID)', 'chiProb', 'M')
     general_options.m_target_variable = "isSignal"
 
-    fastbdt_options = basf2_mva.FastBDTOptions()
-    basf2_mva.teacher(general_options, fastbdt_options)
+    fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
+    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)
 
     # Load the model and train it again searching for the best hyperparameters
     def grid_search(hyperparameters):
         nTrees, depth = hyperparameters
         method = basf2_mva_util.Method(general_options.m_identifier)
-        options = basf2_mva.FastBDTOptions()
+        options = ROOT.Belle2.MVA.FastBDTOptions()
         options.m_nTrees = nTrees
         options.m_nLevels = depth
         m = method.train_teacher(training_data, general_options.m_treename, specific_options=options)

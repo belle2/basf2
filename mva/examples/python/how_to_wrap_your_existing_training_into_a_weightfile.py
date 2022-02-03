@@ -86,6 +86,7 @@ if __name__ == "__main__":
     but you can overwrite all of them.
     """
     from basf2 import conditions
+    import ROOT  # noqa
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
@@ -104,7 +105,6 @@ if __name__ == "__main__":
 
     # Now we need also a fake input file, we just create one
     # the content doesn't matter, as long as the branches exist.
-    import ROOT
     root_file = ROOT.TFile("fake_train.root", "recreate")
     root_file.cd()
     root_tree = ROOT.TTree('tree', 'title')
@@ -118,18 +118,18 @@ if __name__ == "__main__":
     root_file.Close()
 
     # Now we write the configuration for our fake training
-    general_options = basf2_mva.GeneralOptions()
+    general_options = ROOT.Belle2.MVA.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("fake_train.root")
     general_options.m_treename = "tree"
     general_options.m_identifier = "MyModel"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    python_options = basf2_mva.PythonOptions()
+    python_options = ROOT.Belle2.MVA.PythonOptions()
     python_options.m_framework = "custom"
     python_options.m_steering_file = "mva/examples/python/how_to_wrap_your_existing_training_into_a_weightfile.py"
 
-    basf2_mva.teacher(general_options, python_options)
+    ROOT.Belle2.MVA.teacher(general_options, python_options)
 
     # Apply the training as usual
     method = basf2_mva_util.Method(general_options.m_identifier)

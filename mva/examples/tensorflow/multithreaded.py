@@ -136,6 +136,7 @@ def partial_fit(state, X, S, y, w, epoch):
 
 if __name__ == "__main__":
     from basf2 import conditions
+    import ROOT  # noqa
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
@@ -144,7 +145,7 @@ if __name__ == "__main__":
     import basf2_mva
     import json
 
-    general_options = basf2_mva.GeneralOptions()
+    general_options = ROOT.Belle2.MVA.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     variables = ['p', 'pt', 'pz',
@@ -162,7 +163,7 @@ if __name__ == "__main__":
     general_options.m_spectators = basf2_mva.vector('M')
     general_options.m_target_variable = "isSignal"
 
-    specific_options = basf2_mva.PythonOptions()
+    specific_options = ROOT.Belle2.MVA.PythonOptions()
     specific_options.m_framework = "tensorflow"
     specific_options.m_steering_file = 'mva/examples/tensorflow/multithreaded.py'
     specific_options.m_nIterations = 400
@@ -170,4 +171,4 @@ if __name__ == "__main__":
 
     general_options.m_identifier = "tensorflow_multithreaded"
     specific_options.m_config = json.dumps({'capacity': 2e3, 'min_after_dequeue': 600, 'batch_size': 500})
-    basf2_mva.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.teacher(general_options, specific_options)

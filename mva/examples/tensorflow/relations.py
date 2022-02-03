@@ -193,6 +193,7 @@ if __name__ == "__main__":
 
     import basf2_mva
     import basf2_mva_util
+    import ROOT  # noqa
     # ##############Building Data samples ###########################
     # This is  a dataset for testing relational nets.
     # It consists of number_total_lines lines in 3 dimensional space.
@@ -255,14 +256,14 @@ if __name__ == "__main__":
         # ##########################Do Training#################################
         # Do a comparison of different Nets for this task.
 
-        general_options = basf2_mva.GeneralOptions()
+        general_options = ROOT.Belle2.MVA.GeneralOptions()
         general_options.m_datafiles = basf2_mva.vector(os.path.join(path, 'train.root'))
         general_options.m_treename = "variables"
         general_options.m_variables = basf2_mva.vector(*variables)
         general_options.m_target_variable = "isSignal"
         general_options.m_spectators = basf2_mva.vector(*spectators)
 
-        specific_options = basf2_mva.PythonOptions()
+        specific_options = ROOT.Belle2.MVA.PythonOptions()
         specific_options.m_framework = "tensorflow"
         specific_options.m_steering_file = 'toy_relations.py'
         specific_options.m_nIterations = 100
@@ -272,19 +273,19 @@ if __name__ == "__main__":
         print('Train relational net with pre-training')
         general_options.m_identifier = os.path.join(path, 'relation_2.xml')
         specific_options.m_config = json.dumps({'use_relations': True, 'use_feed_forward': False, 'pre_training_epochs': 30000})
-        basf2_mva.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.teacher(general_options, specific_options)
 
         # Train normal feed forward Net:
         print('Train feed forward net')
         general_options.m_identifier = os.path.join(path, 'feed_forward.xml')
         specific_options.m_config = json.dumps({'use_relations': False, 'use_feed_forward': True, 'pre_training_epochs': 0})
-        basf2_mva.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.teacher(general_options, specific_options)
 
         # Train Relation Net:
         print('Train relational net')
         general_options.m_identifier = os.path.join(path, 'relation.xml')
         specific_options.m_config = json.dumps({'use_relations': True, 'use_feed_forward': True, 'pre_training_epochs': 0})
-        basf2_mva.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.teacher(general_options, specific_options)
 
         # ########################Compare Results####################################
 

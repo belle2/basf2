@@ -12,6 +12,7 @@ import basf2_mva
 
 if __name__ == "__main__":
     from basf2 import conditions
+    import ROOT  # noqa
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
@@ -36,25 +37,25 @@ if __name__ == "__main__":
                  'daughterInvariantMass(1, 2)']
 
     # Perform an sPlot training
-    general_options = basf2_mva.GeneralOptions()
+    general_options = ROOT.Belle2.MVA.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train_mc.root")
     general_options.m_identifier = "MVAFull"
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    fastbdt_options = basf2_mva.FastBDTOptions()
+    fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
     # SPlot is more stable if one doesn't use the randRatio
     # FastBDT has a special sPlot mode, but which isn't implemented yet in the mva package
     fastbdt_options.m_nTrees = 100
     fastbdt_options.m_randRatio = 1.0
-    basf2_mva.teacher(general_options, fastbdt_options)
+    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)
 
     general_options.m_identifier = "MVAOrdinary"
     general_options.m_variables = basf2_mva.vector(*variables[1:])
-    basf2_mva.teacher(general_options, fastbdt_options)
+    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)
 
-    meta_options = basf2_mva.MetaOptions()
+    meta_options = ROOT.Belle2.MVA.MetaOptions()
     meta_options.m_use_splot = True
     meta_options.m_splot_variable = "M"
     # SPlot training assumes that the datafile given to the general options contains only data
@@ -68,37 +69,37 @@ if __name__ == "__main__":
     general_options.m_identifier = "MVASPlot"
     meta_options.m_splot_combined = False
     meta_options.m_splot_boosted = False
-    basf2_mva.teacher(general_options, fastbdt_options, meta_options)
+    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options, meta_options)
 
     # Now we combine the sPlot training with a PDF classifier for M, in one step
     general_options.m_identifier = "MVASPlotCombined"
     meta_options.m_splot_combined = True
     meta_options.m_splot_boosted = False
-    basf2_mva.teacher(general_options, fastbdt_options, meta_options)
+    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options, meta_options)
 
     # Now we use a boosted sPlot training
     general_options.m_identifier = "MVASPlotBoosted"
     meta_options.m_splot_combined = False
     meta_options.m_splot_boosted = True
-    basf2_mva.teacher(general_options, fastbdt_options, meta_options)
+    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options, meta_options)
 
     # And finally a boosted and combined training
     general_options.m_identifier = "MVASPlotCombinedBoosted"
     meta_options.m_splot_combined = True
     meta_options.m_splot_boosted = True
-    basf2_mva.teacher(general_options, fastbdt_options, meta_options)
+    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options, meta_options)
 
     # Also do a training of only the pdf classifier
-    pdf_options = basf2_mva.PDFOptions()
+    pdf_options = ROOT.Belle2.MVA.PDFOptions()
     general_options.m_method = 'PDF'
     general_options.m_identifier = "MVAPdf"
     general_options.m_variables = basf2_mva.vector('M')
-    basf2_mva.teacher(general_options, pdf_options)
+    ROOT.Belle2.MVA.teacher(general_options, pdf_options)
 
     # Apply the trained methods on data
-    basf2_mva.expert(basf2_mva.vector('MVAPdf', 'MVAFull', 'MVAOrdinary', 'MVASPlot',
-                                      'MVASPlotCombined', 'MVASPlotBoosted', 'MVASPlotCombinedBoosted'),
-                     basf2_mva.vector('train.root'), 'tree', 'expert.root')
+    ROOT.Belle2.MVA.expert(basf2_mva.vector('MVAPdf', 'MVAFull', 'MVAOrdinary', 'MVASPlot',
+                                            'MVASPlotCombined', 'MVASPlotBoosted', 'MVASPlotCombinedBoosted'),
+                           basf2_mva.vector('train.root'), 'tree', 'expert.root')
 
     """
     path = b2.create_path()

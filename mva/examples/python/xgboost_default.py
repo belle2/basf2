@@ -14,6 +14,7 @@ import time
 
 if __name__ == "__main__":
     from basf2 import conditions
+    import ROOT  # noqa
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
@@ -30,14 +31,14 @@ if __name__ == "__main__":
                  'daughter(0, kaonID)', 'daughter(0, pionID)',
                  'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
 
-    general_options = basf2_mva.GeneralOptions()
+    general_options = ROOT.Belle2.MVA.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_identifier = "XGBoost"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    specific_options = basf2_mva.PythonOptions()
+    specific_options = ROOT.Belle2.MVA.PythonOptions()
     specific_options.m_steering_file = 'mva/examples/python/xgboost_default.py'
     specific_options.m_framework = "xgboost"
     param = ('{"max_depth": 3, "eta": 0.1, "silent": 1, "objective": "binary:logistic",'
@@ -46,7 +47,7 @@ if __name__ == "__main__":
 
     test_data = ["test.root"] * 10
     training_start = time.time()
-    basf2_mva.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.teacher(general_options, specific_options)
     training_stop = time.time()
     training_time = training_stop - training_start
     method = basf2_mva_util.Method(general_options.m_identifier)

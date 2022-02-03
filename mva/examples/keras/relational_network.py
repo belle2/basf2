@@ -100,6 +100,7 @@ if __name__ == "__main__":
     import basf2_mva
     import basf2_mva_util
     from basf2 import conditions
+    import ROOT  # noqa
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
@@ -163,13 +164,13 @@ if __name__ == "__main__":
         # ##########################Do Training#################################
         # Do a comparison of different Nets for this task.
 
-        general_options = basf2_mva.GeneralOptions()
+        general_options = ROOT.Belle2.MVA.GeneralOptions()
         general_options.m_datafiles = basf2_mva.vector(os.path.join(path, 'train.root'))
         general_options.m_treename = "variables"
         general_options.m_variables = basf2_mva.vector(*variables)
         general_options.m_target_variable = "isSignal"
 
-        specific_options = basf2_mva.PythonOptions()
+        specific_options = ROOT.Belle2.MVA.PythonOptions()
         specific_options.m_framework = "contrib_keras"
         specific_options.m_steering_file = 'mva/examples/keras/relational_network.py'
         specific_options.m_training_fraction = 0.999
@@ -179,13 +180,13 @@ if __name__ == "__main__":
         general_options.m_identifier = os.path.join(path, 'relation.xml')
         specific_options.m_config = json.dumps({'use_relations': True,
                                                 'number_features': 3})
-        basf2_mva.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.teacher(general_options, specific_options)
 
         # Train normal feed forward Net:
         print('Train feed forward net')
         general_options.m_identifier = os.path.join(path, 'feed_forward.xml')
         specific_options.m_config = json.dumps({'use_relations': False})
-        basf2_mva.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.teacher(general_options, specific_options)
 
         # ########################Compare Results####################################
         method1 = basf2_mva_util.Method(os.path.join(path, 'relation.xml'))

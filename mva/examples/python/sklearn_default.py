@@ -15,6 +15,7 @@ import time
 
 if __name__ == "__main__":
     from basf2 import conditions
+    import ROOT  # noqa
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
@@ -32,20 +33,20 @@ if __name__ == "__main__":
                  'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
 
     # Train a MVA method and directly upload it to the database
-    general_options = basf2_mva.GeneralOptions()
+    general_options = ROOT.Belle2.MVA.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_identifier = "SKLearn-BDT"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    sklearn_nn_options = basf2_mva.PythonOptions()
+    sklearn_nn_options = ROOT.Belle2.MVA.PythonOptions()
     sklearn_nn_options.m_framework = "sklearn"
     sklearn_nn_options.m_steering_file = 'mva/examples/python/sklearn_default.py'
 
     test_data = ["test.root"] * 10
     training_start = time.time()
-    basf2_mva.teacher(general_options, sklearn_nn_options)
+    ROOT.Belle2.MVA.teacher(general_options, sklearn_nn_options)
     training_stop = time.time()
     training_time = training_stop - training_start
     method = basf2_mva_util.Method(general_options.m_identifier)

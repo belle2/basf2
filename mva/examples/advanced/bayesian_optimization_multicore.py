@@ -31,12 +31,13 @@ def f(x, general_options, process_number):
     The functions trains the classifier with the given hyperparameters on the training sample and
     calculates the AUC on the independent test sample.
     """
+    import ROOT  # noqa
     g_options = general_options
     g_options.m_identifier = "test{}.xml".format(process_number)
-    options = basf2_mva.FastBDTOptions()
+    options = ROOT.Belle2.FastBDTOptions()
     options.m_nTrees = int(x[0])
     options.m_nLevels = int(x[1])
-    basf2_mva.teacher(g_options, options)
+    ROOT.Belle2.teacher(g_options, options)
     m = basf2_mva_util.Method(g_options.m_identifier)
     p, t = m.apply_expert(test_data, general_options.m_treename)
     return -basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)

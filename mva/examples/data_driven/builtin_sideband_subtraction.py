@@ -34,6 +34,7 @@
 import basf2_mva
 
 if __name__ == "__main__":
+    import ROOT  # noqa
     variables = ['p', 'pt', 'pz', 'phi',
                  # 'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)', 'daughter(0, phi)',
                  # 'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)', 'daughter(1, phi)',
@@ -53,18 +54,18 @@ if __name__ == "__main__":
                  # 'daughterInvariantMass(1, 2)', 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)'
                  ]
 
-    general_options = basf2_mva.GeneralOptions()
+    general_options = ROOT.Belle2.MVA.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train_data.root")
     general_options.m_identifier = "MVASideband"
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    fastbdt_options = basf2_mva.FastBDTOptions()
+    fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
 
-    meta_options = basf2_mva.MetaOptions()
+    meta_options = ROOT.Belle2.MVA.MetaOptions()
     meta_options.m_use_sideband_subtraction = True
     meta_options.m_sideband_variable = 'sideband'
     meta_options.m_sideband_mc_files = basf2_mva.vector("train_mc.root")
 
-    basf2_mva.teacher(general_options, fastbdt_options, meta_options)
+    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options, meta_options)

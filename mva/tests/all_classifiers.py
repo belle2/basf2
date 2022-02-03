@@ -23,22 +23,24 @@ variables = ['p', 'pz', 'daughter(0, p)', 'daughter(0, pz)', 'daughter(1, p)', '
 
 if __name__ == "__main__":
 
+    import ROOT  # noqa
+
     # Skip test if files are not available
     if not (os.path.isfile('train.root') and os.path.isfile('test.root')):
         skip_test('Necessary files "train.root" and "test.root" not available.')
 
-    general_options = basf2_mva.GeneralOptions()
+    general_options = ROOT.Belle2.MVA.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
     methods = [
-        ('Trivial.xml', basf2_mva.TrivialOptions()),
-        ('Python.xml', basf2_mva.PythonOptions()),
-        ('FastBDT.xml', basf2_mva.FastBDTOptions()),
-        ('TMVAClassification.xml', basf2_mva.TMVAOptionsClassification()),
-        ('FANN.xml', basf2_mva.FANNOptions()),
+        ('Trivial.xml', ROOT.Belle2.MVA.TrivialOptions()),
+        ('Python.xml', ROOT.Belle2.MVA.PythonOptions()),
+        ('FastBDT.xml', ROOT.Belle2.MVA.FastBDTOptions()),
+        ('TMVAClassification.xml', ROOT.Belle2.MVA.TMVAOptionsClassification()),
+        ('FANN.xml', ROOT.Belle2.MVA.FANNOptions()),
     ]
 
     olddir = os.getcwd()
@@ -49,10 +51,10 @@ if __name__ == "__main__":
 
         for identifier, specific_options in methods:
             general_options.m_identifier = identifier
-            basf2_mva.teacher(general_options, specific_options)
+            ROOT.Belle2.MVA.teacher(general_options, specific_options)
 
-        basf2_mva.expert(basf2_mva.vector(*[i for i, _ in methods]),
-                         basf2_mva.vector('train.root'), 'tree', 'expert.root')
+        ROOT.Belle2.MVA.expert(basf2_mva.vector(*[i for i, _ in methods]),
+                               basf2_mva.vector('train.root'), 'tree', 'expert.root')
 
         subprocess.call('basf2_mva_evaluate.py -c -o latex.pdf -train train.root -data test.root -i ' +
                         ' '.join([i for i, _ in methods]), shell=True)

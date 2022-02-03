@@ -164,6 +164,7 @@ if __name__ == "__main__":
     but you can overwrite all of them.
     """
     from basf2 import conditions
+    import ROOT  # noqa
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
@@ -181,7 +182,7 @@ if __name__ == "__main__":
                  'daughter(0, kaonID)', 'daughter(0, pionID)',
                  'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
 
-    general_options = basf2_mva.GeneralOptions()
+    general_options = ROOT.Belle2.MVA.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_identifier = "MyFancyModel"
@@ -191,7 +192,7 @@ if __name__ == "__main__":
     # With the PythonOptions you can configure some details how the hook functions are called
     # I describe here every option, but there are reasonable defaults, so usually you only
     # have to set m_framework and m_steering_file
-    python_options = basf2_mva.PythonOptions()
+    python_options = ROOT.Belle2.MVA.PythonOptions()
 
     # You have to use "custom" as framework,
     # this will raise a RuntimeError if you forgot to implement any of the hooks
@@ -228,7 +229,7 @@ if __name__ == "__main__":
 
     # Now you can train as usual
     # Of course you can also use the command line command basf2_mva_teacher to do so
-    basf2_mva.teacher(general_options, python_options)
+    ROOT.Belle2.MVA.teacher(general_options, python_options)
 
     # To validate your method it is convenient to use basf2_mva_util to load a trained method
     method = basf2_mva_util.Method(general_options.m_identifier)

@@ -60,18 +60,20 @@ print("Executed python script")
 
 if __name__ == "__main__":
 
+    import ROOT  # noqa
+
     # Skip test if files are not available
     if not (os.path.isfile('train.root') and os.path.isfile('test.root')):
         skip_test('Necessary files "train.root" and "test.root" not available.')
 
-    general_options = basf2_mva.GeneralOptions()
+    general_options = ROOT.Belle2.MVA.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
     general_options.m_identifier = "Python.xml"
 
-    specific_options = basf2_mva.PythonOptions()
+    specific_options = ROOT.Belle2.MVA.PythonOptions()
     specific_options.m_training_fraction = 0.9
     specific_options.m_nIterations = 1
     specific_options.m_mini_batch_size = 0
@@ -84,11 +86,11 @@ if __name__ == "__main__":
         os.symlink(os.path.abspath('train.root'), tempdir + '/' + os.path.basename('train.root'))
         os.chdir(tempdir)
 
-        basf2_mva.teacher(general_options, specific_options)
-        basf2_mva.expert(basf2_mva.vector("Python.xml"),
-                         basf2_mva.vector('train.root'), 'tree', 'expert.root')
+        ROOT.Belle2.MVA.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.expert(basf2_mva.vector("Python.xml"),
+                               basf2_mva.vector('train.root'), 'tree', 'expert.root')
         specific_options.m_normalize = True
-        basf2_mva.teacher(general_options, specific_options)
-        basf2_mva.expert(basf2_mva.vector("Python.xml"),
-                         basf2_mva.vector('train.root'), 'tree', 'expert.root')
+        ROOT.Belle2.MVA.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.expert(basf2_mva.vector("Python.xml"),
+                               basf2_mva.vector('train.root'), 'tree', 'expert.root')
         os.chdir(olddir)

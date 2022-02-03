@@ -9,15 +9,11 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import basf2_mva
-
 import tempfile
-
 import numpy as np
 
-import ROOT
-from ROOT import Belle2
 from basf2 import B2WARNING
+import basf2_mva
 
 
 def tree2dict(tree, tree_columns, dict_columns=None):
@@ -144,12 +140,15 @@ class Method(object):
         Load a method stored under the given identifier
         @param identifier identifying the method
         """
+        import ROOT  # noqa
+        # Initialize all the available interfaces
+        ROOT.Belle2.MVA.AbstractInterface.initSupportedInterfaces()
         #: Identifier of the method
         self.identifier = identifier
         #: Weightfile of the method
-        self.weightfile = basf2_mva.Weightfile.load(self.identifier)
+        self.weightfile = ROOT.Belle2.MVA.Weightfile.load(self.identifier)
         #: General options of the method
-        self.general_options = basf2_mva.GeneralOptions()
+        self.general_options = ROOT.Belle2.MVA.GeneralOptions()
         self.general_options.load(self.weightfile.getXMLTree())
 
         # This piece of code should be correct but leads to random segmentation faults
@@ -158,30 +157,30 @@ class Method(object):
         # 1. Ownership of the unique_ptr returned by getOptions()
         # 2. Some kind of object slicing, although pyroot identifies the correct type
         # 3. Bug in pyroot
-        # interfaces = basf2_mva.AbstractInterface.getSupportedInterfaces()
+        # interfaces = ROOT.Belle2.MVA.AbstractInterface.getSupportedInterfaces()
         # self.interface = interfaces[self.general_options.m_method]
         # self.specific_options = self.interface.getOptions()
 
         #: Specific options of the method
         self.specific_options = None
         if self.general_options.m_method == "FastBDT":
-            self.specific_options = basf2_mva.FastBDTOptions()
+            self.specific_options = ROOT.Belle2.MVA.FastBDTOptions()
         elif self.general_options.m_method == "TMVAClassification":
-            self.specific_options = basf2_mva.TMVAOptionsClassification()
+            self.specific_options = ROOT.Belle2.MVA.TMVAOptionsClassification()
         elif self.general_options.m_method == "TMVARegression":
-            self.specific_options = basf2_mva.TMVAOptionsRegression()
+            self.specific_options = ROOT.Belle2.MVA.TMVAOptionsRegression()
         elif self.general_options.m_method == "FANN":
-            self.specific_options = basf2_mva.FANNOptions()
+            self.specific_options = ROOT.Belle2.MVA.FANNOptions()
         elif self.general_options.m_method == "Python":
-            self.specific_options = basf2_mva.PythonOptions()
+            self.specific_options = ROOT.Belle2.MVA.PythonOptions()
         elif self.general_options.m_method == "PDF":
-            self.specific_options = basf2_mva.PDFOptions()
+            self.specific_options = ROOT.Belle2.MVA.PDFOptions()
         elif self.general_options.m_method == "Combination":
-            self.specific_options = basf2_mva.CombinationOptions()
+            self.specific_options = ROOT.Belle2.MVA.CombinationOptions()
         elif self.general_options.m_method == "Reweighter":
-            self.specific_options = basf2_mva.ReweighterOptions()
+            self.specific_options = ROOT.Belle2.MVA.ReweighterOptions()
         elif self.general_options.m_method == "Trivial":
-            self.specific_options = basf2_mva.TrivialOptions()
+            self.specific_options = ROOT.Belle2.MVA.TrivialOptions()
         else:
             raise RuntimeError("Unknown method " + self.general_options.m_method)
 
@@ -195,24 +194,25 @@ class Method(object):
         #: List of variables sorted by their importance
         self.variables = list(sorted(variables, key=lambda v: self.importances.get(v, 0.0)))
         #: List of the variable importances calculated by the method, but with the root compatible variable names
-        self.root_variables = [Belle2.MakeROOTCompatible.makeROOTCompatible(v) for v in self.variables]
+        self.root_variables = [ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(v) for v in self.variables]
         #: Dictionary of the variables sorted by their importance but with root compatoble variable names
         self.root_importances = {k: importances[k] for k in self.root_variables}
-        #: Description of the method as a xml string returned by basf2_mva.info
-        self.description = str(basf2_mva.info(self.identifier))
+        #: Description of the method as a xml string returned by ROOT.Belle2.MVA.info
+        self.description = str(ROOT.Belle2.MVA.info(self.identifier))
         #: List of spectators
         self.spectators = [str(v) for v in self.general_options.m_spectators]
         #: List of spectators with root compatible names
-        self.root_spectators = [Belle2.MakeROOTCompatible.makeROOTCompatible(v) for v in self.spectators]
+        self.root_spectators = [ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(v) for v in self.spectators]
 
     def train_teacher(self, datafiles, treename, general_options=None, specific_options=None):
         """
         Train a new method using this method as a prototype
         @param datafiles the training datafiles
         @param treename the name of the tree containing the training data
-        @param general_options general options given to basf2_mva.teacher (if None the options of this method are used)
-        @param specific_options specific options given to basf2_mva.teacher (if None the options of this method are used)
+        @param general_options general options given to ROOT.Belle2.MVA.teacher (if None the options of this method are used)
+        @param specific_options specific options given to ROOT.Belle2.MVA.teacher (if None the options of this method are used)
         """
+        import ROOT  # noqa
         if isinstance(datafiles, str):
             datafiles = [datafiles]
         if general_options is None:
@@ -226,7 +226,7 @@ class Method(object):
             general_options.m_datafiles = basf2_mva.vector(*datafiles)
             general_options.m_identifier = identifier
 
-            basf2_mva.teacher(general_options, specific_options)
+            ROOT.Belle2.MVA.teacher(general_options, specific_options)
 
             method = Method(identifier)
         return method
@@ -237,17 +237,18 @@ class Method(object):
         @param datafiles the datafiles
         @param treename the name of the tree containing the data
         """
+        import ROOT  # noqa
         if isinstance(datafiles, str):
             datafiles = [datafiles]
         with tempfile.TemporaryDirectory() as tempdir:
             identifier = tempdir + "/weightfile.xml"
-            basf2_mva.Weightfile.save(self.weightfile, identifier)
+            ROOT.Belle2.MVA.Weightfile.save(self.weightfile, identifier)
 
             rootfilename = tempdir + '/expert.root'
-            basf2_mva.expert(basf2_mva.vector(identifier),
-                             basf2_mva.vector(*datafiles),
-                             treename,
-                             rootfilename)
+            ROOT.Belle2.MVA.expert(basf2_mva.vector(identifier),
+                                   basf2_mva.vector(*datafiles),
+                                   treename,
+                                   rootfilename)
             rootfile = ROOT.TFile(rootfilename, "UPDATE")
             roottree = rootfile.Get("variables")
 
@@ -255,7 +256,7 @@ class Method(object):
             stripped_expert_target = self.identifier + '_' + self.general_options.m_target_variable
             d = tree2dict(
                 roottree, [
-                    Belle2.MakeROOTCompatible.makeROOTCompatible(identifier),
-                    Belle2.MakeROOTCompatible.makeROOTCompatible(expert_target)], [
+                    ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(identifier),
+                    ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(expert_target)], [
                     self.identifier, stripped_expert_target])
         return d[self.identifier], d[stripped_expert_target]

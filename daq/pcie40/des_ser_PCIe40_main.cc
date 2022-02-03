@@ -1138,7 +1138,14 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
     unsigned int ch_ffaa = (data[ cur_pos + FFAA_POS ] >> 8)  & 0x000000ff;
     if ((unsigned int)i != ch_ffaa) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d :  Ch number is differnt ch %d ffaa %.8x\n", sender_id, i, data[ cur_pos + FFAA_POS ]);
+      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 channel number is differnt. ch should be %d buf ffaa's ch info is %d (%.8x). : exp %d run %d sub %d : %s %s %d\n",
+             sender_id, hostnamebuf,  i,
+             i, (data[ cur_pos + FFAA_POS ] >> 8) & 0xff,
+             data[ cur_pos + FFAA_POS ],
+             (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+             (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+             (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printEventData(data, event_length, sender_id);
       pthread_mutex_unlock(&(mtx_sender_log));
 #ifndef NO_ERROR_STOP

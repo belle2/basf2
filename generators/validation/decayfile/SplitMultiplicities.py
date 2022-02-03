@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 #############################################################
 # Python basf2 module to determine the multiplicities of a particle of a certain pdg code
 # (antiparticles not included) on generator level. We loop over the number of mcParticles and
@@ -8,7 +16,6 @@
 # into categories depending on whether they originate from a B+/B-/B0/antiB0.
 # We need to write the information as extraInfo to reconstructed particles, hence the need for
 # a reco particle list as input.
-# January 2022 - Belle II Collaboration
 #############################################################
 
 

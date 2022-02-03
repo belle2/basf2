@@ -1,11 +1,18 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 #################################################################
 # Plotting script for comparing generated Kaon multiplicities
 # between two MC samples. In addition, the Kaons can be split up
 # by their charge and the B meson flavour they originate from.
-# January 2022
 #################################################################
 
 from root_pandas import read_root

@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 #############################################################
 # Steering file to reconstruct charged/mixed MC cdst files.
 # Used to validate chnages between decay files.
@@ -8,7 +16,6 @@
 # Uses the SplitMultiplicities module to list multiplicities
 # of Kaons depending on B meson flavour in a separate tree.
 # In addition gives tree containing generated event shapes.
-# January 2022 - Belle II Collaboration
 #############################################################
 
 

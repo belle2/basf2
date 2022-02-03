@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 ##############################################################################
 # Script to count how often an initial particle decays directly into another in the dec file.
 # The dec file lines are written to an output file and the sum of the BFs is given.
@@ -10,7 +18,6 @@
 # Final state particles passed using -fs option. Also 4 allowed.
 # Default is [e+, e-, mu+, mu-]. Can also look at KL, Ks, K+, K-, etc.
 # The names of the particles have to agree with the exact spelling used in the dec file.
-# Svenja Granderath, January 2022.
 #############################################################################
 
 import basf2

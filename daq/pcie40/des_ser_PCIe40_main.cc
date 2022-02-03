@@ -1022,14 +1022,26 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 12 ] = n_messages[ 12 ] + 1 ;
       if (n_messages[ 12 ] < max_number_of_messages) {
-        printf("[FATAL] thread %d : Bad FFAA for linknumber %d : exp %d run %d sub %d\n",
-               sender_id, i,
-               (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
-               (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
-               (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
-              ) ;
+        char err_buf[500];
+        sprintf(err_buf,
+                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB header magic word(0xffaa) is invalid. header %.8x : exp %d run %d sub %d : %s %s %d\n",
+                sender_id,
+                hostnamebuf, i,
+                data[ cur_pos + FFAA_POS ],
+                (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+                (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+                (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+                __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        //        printf("[FATAL] thread %d : Bad ff55 %X pos %.8x ch %d\n" , sender_id, data[ cur_pos + linksize - 1  ], cur_pos + linksize - 1  ,   i) ;
+        printf("%s\n", err_buf); fflush(stdout);
         printLine(data, cur_pos + FFAA_POS);
         printEventData(data, event_length, sender_id);
+        // printf("[FATAL] thread %d : Bad FFAA for linknumber %d : exp %d run %d sub %d\n",
+        //        sender_id, i,
+        //        (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+        //        (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+        //        (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
+        //       ) ;
       }
       err_bad_ffaa[sender_id]++;
       pthread_mutex_unlock(&(mtx_sender_log));

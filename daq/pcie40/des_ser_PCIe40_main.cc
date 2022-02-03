@@ -896,7 +896,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
         pthread_mutex_lock(&(mtx_sender_log));
         n_messages[ 9 ] = n_messages[ 9 ] + 1 ;
         if (n_messages[ 9 ] < max_number_of_messages) {
-          printf("[FATAL] thread %d :  Bad exprun(now %.8x prev. %.8x) : exp %d run %d sub %d : Exiting...\n",
+          printf("[FATAL] thread %d : Bad exprun(now %.8x prev. %.8x) : exp %d run %d sub %d : Exiting...\n",
                  sender_id,
                  exprun, data[RUNNO_POS],
                  (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
@@ -1085,7 +1085,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
       if (n_messages[ 14 ] < max_number_of_messages) {
         char err_buf[500];
         sprintf(err_buf,
-                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 trailer magic word(0xff55) is invalid. foooter %.8x : exp %d run %d sub %d : %s %s %d\n",
+                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 trailer magic word(0xff55) is invalid. foooter %.8x : exp %d run %d sub %d : %s %s %d",
                 sender_id,
                 hostnamebuf, i,
                 data[ cur_pos + linksize - 1  ],
@@ -1110,13 +1110,23 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
     }
 
     unsigned int eve_link_8bits =  data[ cur_pos + FFAA_POS ]  & 0x000000ff;
-
-
     if ((new_evtnum & 0x000000FF) != eve_link_8bits) {
       pthread_mutex_lock(&(mtx_sender_log));
       err_link_eve_jump[sender_id]++;
       if (err_link_eve_jump[sender_id] < max_number_of_messages) {
-        printf("[FATAL] thread %d : event diff. in ch %d cur_eve %.8x ffaa %.8x\n", sender_id, i, new_evtnum, data[ cur_pos + FFAA_POS ]);
+
+        char err_buf[500] = {0};
+        //        printf("[FATAL] thread %d : event diff. in ch %d cur_eve %.8x ffaa %.8x\n", sender_id, i, new_evtnum, data[ cur_pos + FFAA_POS ]);
+        sprintf(err_buf,
+                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number (lower 8 bits in ffaa header %.8x ). Exiting...: cur 8bit eve %d this_ch %d : exp %d run %d sub %d : %s %s %d",
+                sender_id,
+                hostnamebuf, i,
+                data[ cur_pos + FFAA_POS ], new_evtnum & 0xff, data[ cur_pos + FFAA_POS ] & 0xff,
+                (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+                (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+                (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+                __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        printf("%s\n", err_buf); fflush(stdout);
         printEventData(data, event_length, sender_id);
       }
       pthread_mutex_unlock(&(mtx_sender_log));

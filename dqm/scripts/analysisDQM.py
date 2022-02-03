@@ -20,11 +20,15 @@ import modularAnalysis as ma
 
 def add_analysis_dqm(path):
     """Add the analysis DQM modules to the ``path``.
-    Builds a list of pi0's, Kshorts and the Fox Wolfram event shape variables. Also M(mumu) for nominal beam energy monitoring.
+    Builds a list of muons, pi0's, Kshorts and the Fox Wolfram event shape variables.
+    Also M(mumu) for nominal beam energy monitoring.
 
     Parameters:
         path (basf2.Path): modules are loaded onto this path
     """
+    # muons
+    ma.fillParticleList('mu+:all', '', path=path)
+
     # Kshorts and pi0s
     ma.fillParticleList('gamma:physDQM', 'E > 0.15', loadPhotonBeamBackgroundMVA=False, path=path)
     ma.fillParticleList('pi+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)

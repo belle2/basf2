@@ -52,8 +52,6 @@ import pybasf2
 import modularAnalysis as ma
 import b2bii
 
-import basf2_mva
-
 # Should come after basf2 import
 import pdg
 
@@ -415,12 +413,13 @@ class PostReconstruction:
         """
         Returns all channels for which the weightfile is missing
         """
+        import ROOT  # noqa
         missing = []
         for particle in self.particles:
             for channel in particle.channels:
                 # weightfile = self.config.prefix + '_' + channel.label
                 weightfile = channel.label + '.xml'
-                if not basf2_mva.available(weightfile):
+                if not ROOT.Belle2.MVA.available(weightfile):
                     missing += [channel.label]
         return missing
 
@@ -613,16 +612,17 @@ class Teacher:
         Upload the weight file into the condition database
         @param channel whose weight file is uploaded
         """
+        import ROOT  # noqa
         disk = channel + '.xml'
         dbase = self.config.prefix + '_' + channel
-        basf2_mva.upload(disk, dbase)
+        ROOT.Belle2.MVA.upload(disk, dbase)
         return (disk, dbase)
 
     def do_all_trainings(self):
         """
         Do all trainings for which we find training data
         """
-        import ROOT
+        import ROOT  # noqa
         # FEI uses multi-threading for parallel execution of tasks therefore
         # the ROOT gui-thread is disabled, which otherwise interferes sometimes
         ROOT.PyConfig.StartGuiThread = False
@@ -643,7 +643,7 @@ class Teacher:
                 for particle in self.particles:
                     for channel in particle.channels:
                         weightfile = channel.label + '.xml'
-                        if not basf2_mva.available(weightfile):
+                        if not ROOT.Belle2.MVA.available(weightfile):
                             keys = [m for m in f.GetListOfKeys() if f"{channel.label}" in m.GetName()]
                             if not keys:
                                 continue
@@ -681,7 +681,7 @@ class Teacher:
         p.join()
         weightfiles = []
         for name, _ in job_list:
-            if not basf2_mva.available(name + '.xml'):
+            if not ROOT.Belle2.MVA.available(name + '.xml'):
                 B2WARNING("Training of MVC failed. For unknown reasons, check the logfile")
                 self.create_fake_weightfile(name)
             weightfiles.append(self.upload(name))
@@ -696,6 +696,7 @@ def convert_legacy_training(particles: typing.Sequence[config.Particle], configu
     @param particles list of config.Particle objects
     @param config config.FeiConfiguration object
     """
+    import ROOT  # noqa
     summary = pickle.load(open(configuration.legacy, 'rb'))
     channel2lists = {k: v[2] for k, v in summary['channel2lists'].items()}
 
@@ -705,12 +706,12 @@ def convert_legacy_training(particles: typing.Sequence[config.Particle], configu
         for channel in particle.channels:
             new_weightfile = configuration.prefix + '_' + channel.label
             old_weightfile = configuration.prefix + '_' + channel2lists[channel.label.replace('Jpsi', 'J/psi')]
-            if not basf2_mva.available(new_weightfile):
-                if old_weightfile is None or not basf2_mva.available(old_weightfile):
+            if not ROOT.Belle2.MVA.available(new_weightfile):
+                if old_weightfile is None or not ROOT.Belle2.MVA.available(old_weightfile):
                     Teacher.create_fake_weightfile(channel.label)
                     teacher.upload(channel.label)
                 else:
-                    basf2_mva.download(old_weightfile, channel.label + '.xml')
+                    ROOT.Belle2.MVA.download(old_weightfile, channel.label + '.xml')
                     teacher.upload(channel.label)
 
 

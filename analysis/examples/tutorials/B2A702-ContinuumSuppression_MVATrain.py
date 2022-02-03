@@ -29,6 +29,8 @@ import subprocess
 
 if __name__ == "__main__":
 
+    import ROOT  # noqa
+
     # Note that the target variable 'isNotContinuum' needs to be
     # saved in your train.root and test.root files, along with the
     # trainingVars, listed again here (see B2A701).
@@ -82,16 +84,16 @@ if __name__ == "__main__":
         'CleoConeCS(9)'
     ]
 
-    general_options = basf2_mva.GeneralOptions()
+    general_options = ROOT.Belle2.MVA.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector(train_data)
     general_options.m_treename = "tree"
     general_options.m_identifier = "MVAFastBDT.root"
     general_options.m_variables = basf2_mva.vector(*trainVars)
     general_options.m_target_variable = "isNotContinuumEvent"
-    fastbdt_options = basf2_mva.FastBDTOptions()
+    fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
 
     # Train a MVA method and store the weightfile (MVAFastBDT.root) locally.
-    basf2_mva.teacher(general_options, fastbdt_options)
+    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)
 
     # Evaluate training.
     subprocess.call('basf2_mva_evaluate.py '
@@ -106,5 +108,9 @@ if __name__ == "__main__":
     # comment these in to apply the trained methods on an independent sample
     # (produced in B2A701 if you ran with the `apply_signal` and `apply_qqbar` options).
     #
-    basf2_mva.expert(basf2_mva.vector('MVAFastBDT.root'), basf2_mva.vector(apply_signal_data), 'tree', 'MVAExpert_signal.root')
-    basf2_mva.expert(basf2_mva.vector('MVAFastBDT.root'), basf2_mva.vector(apply_qqbar_data), 'tree', 'MVAExpert_qqbar.root')
+    ROOT.Belle2.MVA.expert(
+        basf2_mva.vector('MVAFastBDT.root'),
+        basf2_mva.vector(apply_signal_data),
+        'tree',
+        'MVAExpert_signal.root')
+    ROOT.Belle2.MVA.expert(basf2_mva.vector('MVAFastBDT.root'), basf2_mva.vector(apply_qqbar_data), 'tree', 'MVAExpert_qqbar.root')

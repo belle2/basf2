@@ -115,6 +115,8 @@ def choose_input_features(use_vertex_features=True, use_charge_and_ROE_features=
 
 if __name__ == "__main__":
 
+    import ROOT  # noqa
+
     if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
         b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
 
@@ -123,7 +125,7 @@ if __name__ == "__main__":
     train_data = path + 'DNN_train.root'
     test_data = path + 'DNN_test.root'
 
-    general_options = basf2_mva.GeneralOptions()
+    general_options = ROOT.Belle2.MVA.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector(train_data)
     general_options.m_treename = "tree"
     general_options.m_identifier = "Deep_Feed_Forward.xml"
@@ -131,7 +133,7 @@ if __name__ == "__main__":
     general_options.m_spectators = basf2_mva.vector('Mbc', 'DeltaZ')
     general_options.m_target_variable = "isNotContinuumEvent"
 
-    specific_options = basf2_mva.PythonOptions()
+    specific_options = ROOT.Belle2.MVA.PythonOptions()
     specific_options.m_framework = "contrib_keras"
     specific_options.m_steering_file = 'analysis/examples/mva/B2A714-DeepContinuumSuppression_MVAModel.py'
     specific_options.m_training_fraction = 0.9
@@ -150,7 +152,7 @@ if __name__ == "__main__":
     specific_options.m_config = json.dumps(keras_dic)
 
     # Train a MVA method and store the weightfile (Deep_Feed_Forward.xml) locally.
-    basf2_mva.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.teacher(general_options, specific_options)
 
     # Evaluate training.
     subprocess.call('basf2_mva_evaluate.py '
@@ -164,5 +166,7 @@ if __name__ == "__main__":
     # If you're only interested in the network output distribution, then
     # comment these in to apply the trained methods on train and test sample
     #
-    # basf2_mva.expert(basf2_mva.vector('Deep_Feed_Forward.xml'), basf2_mva.vector(train_data), 'tree', 'MVAExpert_train.root')
-    # basf2_mva.expert(basf2_mva.vector('Deep_Feed_Forward.xml'), basf2_mva.vector(test_data), 'tree', 'MVAExpert_test.root')
+    # ROOT.Belle2.MVA.expert(basf2_mva.vector('Deep_Feed_Forward.xml'),
+    #                        basf2_mva.vector(train_data), 'tree', 'MVAExpert_train.root')
+    # ROOT.Belle2.MVA.expert(basf2_mva.vector('Deep_Feed_Forward.xml'),
+    #                        basf2_mva.vector(test_data), 'tree', 'MVAExpert_test.root')

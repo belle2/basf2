@@ -25,7 +25,6 @@ from fei.config import Particle
 
 import numpy as np
 
-import basf2_mva
 import pdg
 
 # @cond
@@ -588,7 +587,7 @@ class TestPostReconstruction(unittest.TestCase):
         channel = 'D0:unittest ==> K-:unittest pi+:unittest'
         with open(channel + ".xml", "w") as f:
             f.write(content.format(channel=channel))
-        basf2_mva.upload(channel + ".xml", 'UNITTEST_' + channel)
+        ROOT.Belle2.MVA.upload(channel + ".xml", 'UNITTEST_' + channel)
 
         self.assertEqual(x.get_missing_channels(), ['pi+:unittest ==> pi+:FSP',
                                                     'D0:unittest ==> pi-:unittest pi+:unittest'])
@@ -597,7 +596,7 @@ class TestPostReconstruction(unittest.TestCase):
         channel = 'D0:unittest ==> pi-:unittest pi+:unittest'
         with open(channel + ".xml", "w") as f:
             f.write(content.format(channel=channel))
-        basf2_mva.upload(channel + ".xml", 'UNITTEST_' + channel)
+        ROOT.Belle2.MVA.upload(channel + ".xml", 'UNITTEST_' + channel)
 
         self.assertEqual(x.get_missing_channels(), ['pi+:unittest ==> pi+:FSP'])
         self.assertEqual(x.available(), False)
@@ -605,7 +604,7 @@ class TestPostReconstruction(unittest.TestCase):
         channel = 'pi+:unittest ==> pi+:FSP'
         with open(channel + ".xml", "w") as f:
             f.write(content.format(channel=channel))
-        basf2_mva.upload(channel + ".xml", 'UNITTEST_' + channel)
+        ROOT.Belle2.MVA.upload(channel + ".xml", 'UNITTEST_' + channel)
 
         self.assertEqual(x.get_missing_channels(), [])
         self.assertEqual(x.available(), True)
@@ -973,19 +972,19 @@ class TestTeacher(unittest.TestCase):
 
     def test_create_fake_weightfile(self):
         self.assertEqual(os.path.isfile('UNITTEST_pi+:generic ==> pi+:FSP.xml'), False)
-        self.assertEqual(basf2_mva.available('UNITTEST_pi+:generic ==> pi+:FSP.xml'), False)
+        self.assertEqual(ROOT.Belle2.MVA.available('UNITTEST_pi+:generic ==> pi+:FSP.xml'), False)
         fei.core.Teacher.create_fake_weightfile('UNITTEST_pi+:generic ==> pi+:FSP')
         self.assertEqual(os.path.isfile('UNITTEST_pi+:generic ==> pi+:FSP.xml'), True)
-        self.assertEqual(basf2_mva.available('UNITTEST_pi+:generic ==> pi+:FSP.xml'), True)
+        self.assertEqual(ROOT.Belle2.MVA.available('UNITTEST_pi+:generic ==> pi+:FSP.xml'), True)
 
     def test_upload(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=False, prefix='UNITTEST', externTeacher='basf2_mva_teacher')
         x = fei.core.Teacher(particles, config)
         fei.core.Teacher.create_fake_weightfile('TEACHER')
-        self.assertEqual(basf2_mva.available('UNITTEST_TEACHER'), False)
+        self.assertEqual(ROOT.Belle2.MVA.available('UNITTEST_TEACHER'), False)
         r = x.upload('TEACHER')
-        self.assertEqual(basf2_mva.available('UNITTEST_TEACHER'), True)
+        self.assertEqual(ROOT.Belle2.MVA.available('UNITTEST_TEACHER'), True)
         self.assertEqual(r, ('TEACHER.xml', 'UNITTEST_TEACHER'))
 
     def test_without_monitoring(self):
@@ -993,17 +992,17 @@ class TestTeacher(unittest.TestCase):
         config = fei.config.FeiConfiguration(monitor=False, prefix='UNITTEST', externTeacher='basf2_mva_teacher')
         x = fei.core.Teacher(particles, config)
 
-        self.assertEqual(basf2_mva.available('UNITTEST_pi+:generic ==> pi+:FSP'), False)
-        self.assertEqual(basf2_mva.available('UNITTEST_K+:generic ==> K+:FSP'), False)
-        self.assertEqual(basf2_mva.available('UNITTEST_D0:generic ==> K-:generic pi+:generic'), False)
-        self.assertEqual(basf2_mva.available('UNITTEST_D0:generic ==> pi-:generic pi+:generic'), False)
+        self.assertEqual(ROOT.Belle2.MVA.available('UNITTEST_pi+:generic ==> pi+:FSP'), False)
+        self.assertEqual(ROOT.Belle2.MVA.available('UNITTEST_K+:generic ==> K+:FSP'), False)
+        self.assertEqual(ROOT.Belle2.MVA.available('UNITTEST_D0:generic ==> K-:generic pi+:generic'), False)
+        self.assertEqual(ROOT.Belle2.MVA.available('UNITTEST_D0:generic ==> pi-:generic pi+:generic'), False)
 
         x.do_all_trainings()
 
-        self.assertEqual(basf2_mva.available('UNITTEST_pi+:generic ==> pi+:FSP'), True)
-        self.assertEqual(basf2_mva.available('UNITTEST_K+:generic ==> K+:FSP'), False)
-        self.assertEqual(basf2_mva.available('UNITTEST_D0:generic ==> K-:generic pi+:generic'), True)
-        self.assertEqual(basf2_mva.available('UNITTEST_D0:generic ==> pi-:generic pi+:generic'), True)
+        self.assertEqual(ROOT.Belle2.MVA.available('UNITTEST_pi+:generic ==> pi+:FSP'), True)
+        self.assertEqual(ROOT.Belle2.MVA.available('UNITTEST_K+:generic ==> K+:FSP'), False)
+        self.assertEqual(ROOT.Belle2.MVA.available('UNITTEST_D0:generic ==> K-:generic pi+:generic'), True)
+        self.assertEqual(ROOT.Belle2.MVA.available('UNITTEST_D0:generic ==> pi-:generic pi+:generic'), True)
 
 
 """
@@ -1218,7 +1217,7 @@ class TestGetPath(unittest.TestCase):
 if __name__ == '__main__':
     # We have to call basf2_mva once, so that ROOT can load the dictionaries
     # otherwise it will try to load them later after we changed the directory and it will fail to do so
-    basf2_mva.loadRootDictionary()
+    ROOT.Belle2.MVA.loadRootDictionary()
     tempdir = tempfile.mkdtemp()
     os.chdir(tempdir)
     basf2.conditions.testing_payloads = ['localdb/database.txt']

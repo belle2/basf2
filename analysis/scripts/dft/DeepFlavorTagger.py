@@ -13,15 +13,8 @@ import os
 import basf2_mva
 from basf2 import B2ERROR, B2FATAL
 import basf2
-from ROOT import Belle2
 import variables.utils as vu
 import modularAnalysis as ma
-from ROOT import gSystem
-gSystem.Load('libanalysis.so')
-
-# make ROOT compatible available
-Belle2.Variable.Manager
-Belle2.Variable.Manager.Instance()
 
 
 def get_variables(particle_list, ranked_variable, variables=None, particleNumber=1):
@@ -48,6 +41,7 @@ def construct_default_variable_names(particle_lists=None, ranked_variable='p', v
     :param particleNumber:
     :return:
     """
+    from ROOT import Belle2  # noqa
     if particle_lists is None:
         particle_lists = ['pi+:pos_charged', 'pi+:neg_charged']
 
@@ -207,9 +201,10 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
             f.write(extern_command)
 
     elif mode == 'teacher':
+        import ROOT  # noqa
         if not os.path.isfile(output_file_name):
             B2FATAL('There is no training data file available. Run flavor tagger in sampler mode first.')
-        general_options = basf2_mva.GeneralOptions()
+        general_options = ROOT.Belle2.MVA.GeneralOptions()
         general_options.m_datafiles = basf2_mva.vector(output_file_name)
 
         general_options.m_treename = tree_name
@@ -218,14 +213,14 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
 
         general_options.m_identifier = uniqueIdentifier
 
-        specific_options = basf2_mva.PythonOptions()
+        specific_options = ROOT.Belle2.MVA.PythonOptions()
         specific_options.m_framework = 'tensorflow'
         specific_options.m_steering_file = mva_steering_file
         specific_options.m_training_fraction = train_valid_fraction
 
         specific_options.m_config = json.dumps(classifier_args)
 
-        basf2_mva.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.teacher(general_options, specific_options)
 
     elif mode == 'expert':
 

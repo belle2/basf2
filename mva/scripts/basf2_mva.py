@@ -10,11 +10,12 @@
 ##########################################################################
 
 
-import variables
-
-
 def vector(*args):
     '''
-    Create a std::vector to be used in PyROOT. Alias of the same function in analysis package.
+    Create a std::vector to be used in PyROOT.
     '''
-    return variables.std_vector(args)
+    import ROOT  # noqa
+    vector = ROOT.std.vector(type(args[0]))()
+    for v in args:
+        vector.push_back(v)
+    return vector

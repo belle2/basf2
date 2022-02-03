@@ -1157,7 +1157,15 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 13 ] = n_messages[ 13 ] + 1 ;
       if (n_messages[ 13 ] < max_number_of_messages) {
-        printf("[FATAL] thread %d : Bad link size %d %d\n", sender_id, (cur_pos + linksize) , (8 * size)) ;
+        printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Bad link size %d %d : exp %d run %d sub %d : %s %s %d\n",
+               sender_id,
+               hostnamebuf,  i,
+               (cur_pos + linksize) , (8 * size),
+               (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+               (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+               (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+
       }
       printEventData(data, event_length, sender_id);
       err_bad_linksize[sender_id]++;
@@ -1178,12 +1186,20 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
 
       // Currently, zero-torellance for a CRC error.
       //      if (crc_err_ch[sender_id][i] == 0) {
-      printf("[FATAL] thread %d : CRC Error calc %.4X data %.8X eve %u ch %d\n" , sender_id,
-             get_crc(data_for_crc , size , first_crc) ,
-             data[ cur_pos + linksize - 2 ], new_evtnum, i) ;
-      printf("[DEBUG] thread %d : crc_error : Printing a whole event...\n", sender_id);
+      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : POST B2link event CRC16 error. data(%x) calc(%x) : exp %d run %d sub %d : %s %s %d\n",
+             sender_id,
+             hostnamebuf, i,
+             value, get_crc(data_for_crc , size , first_crc),
+             (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+             (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+             (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      // printf("[FATAL] thread %d : CRC Error calc %.4X data %.8X eve %u ch %d\n" , sender_id,
+      //        get_crc(data_for_crc , size , first_crc) ,
+      //        data[ cur_pos + linksize - 2 ], new_evtnum, i) ;
       printEventData(data, event_length, sender_id);
       //      }
+
       crc_err_ch[sender_id][i]++;
       total_crc_errors[sender_id]++;
       pthread_mutex_unlock(&(mtx_sender_log));

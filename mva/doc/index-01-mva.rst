@@ -130,8 +130,10 @@ Contains backend independent options
 
 .. code-block:: python
 
+    import ROOT
     import basf2_mva
-    go = basf2_mva.GeneralOptions()
+
+    go = ROOT.Belle2.GeneralOptions()
     go.m_datafiles = basf2_mva.vector('train.root')
     go.m_treename = 'tree'
     go.m_identifier = 'Identifier'
@@ -145,11 +147,13 @@ Contains backend specific options
 
 .. code-block:: python
 
-    sp = basf2_mva.FastBDTOptions()
+    import ROOT
+
+    sp = ROOT.Belle2.MVA.FastBDTOptions()
     sp.m_nTrees = 100
     sp.m_shrinkage = 0.2
     fastbdt_options.m_nLevels = 3
-    sp = basf2_mva.TMVAOptionsClassification()
+    sp = ROOT.Belle2.MVA.TMVAOptionsClassification()
     sp.m_config = '!H:!V:CreateMVAPdfs:BoostType=Grad:'
                   'NTrees=100:Shrinkage=0.2:MaxDepth=3'
 
@@ -169,6 +173,7 @@ Lets look at an example in python:
 
 .. code-block:: python
 
+    import ROOT
     import basf2_mva
 
     go = basf2_mva.GeneralOptions()
@@ -178,9 +183,9 @@ Lets look at an example in python:
     go.m_variables = basf2_mva.vector('p', 'pz', 'M')
     go.m_target_variable = 'isSignal'
 
-    sp = basf2_mva.FastBDTOptions()
+    sp = ROOT.Belle2.MVA.FastBDTOptions()
 
-    basf2_mva.teacher(go, sp)
+    ROOT.Belle2.MVA.teacher(go, sp)
 
 The same thing can be done using the command line via::
 
@@ -238,11 +243,11 @@ Finally, you can also apply the MVA method onto a ROOT file using the basf2_mva_
 
 .. code-block:: python
 
-    import basf2_mva
+    import ROOT
  
-    basf2_mva.expert(basf2_mva.vector('DatabaseIdentifier'),
-                     basf2_mva.vector('test.root'),
-                    'tree', 'expert.root')
+    ROOT.Belle2.MVA.expert(basf2_mva.vector('DatabaseIdentifier'),
+                           basf2_mva.vector('test.root'),
+                           'tree', 'expert.root')
 
 or in bash::
 

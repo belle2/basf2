@@ -1216,13 +1216,17 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
     if (new_evtnum % 1000000 == 0) {
       //    if (total_crc_good[sdr_id] % (1000000 + sdr_id) == 0) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[DEBUG] thread %d :  CRC Good  calc %.4X data %.4X eve %u ch %d crcOK %u crcNG %d errflag %u\n" , sender_id,
+      printf("[DEBUG] thread %d :  CRC Good  calc %.4X data %.4X eve %u ch %d crcOK %u crcNG %d errflag %u : exp %d run %d sub %d\n" ,
+             sender_id,
              get_crc(data_for_crc , size , first_crc) ,
-             value, new_evtnum, i, total_crc_good[sender_id], total_crc_errors[sender_id], err_flag_cnt[sender_id]) ;
+             value, new_evtnum, i, total_crc_good[sender_id], total_crc_errors[sender_id], err_flag_cnt[sender_id],
+             (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+             (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+             (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
+            ) ;
       int temp_err_cnt = 0;
 
       for (int j = 0; j <  MAX_PCIE40_CH; j++) {
-
         if (crc_err_ch[sender_id][j] > 0) {
           if (temp_err_cnt == 0) {
             printf("[DEBUG] thread %d : crc_err_cnt : ", sender_id);
@@ -1247,8 +1251,15 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
 
   if (link_cnt != expected_number_of_links) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] thread %d :  # of links(%d) in data is not the same as exptected(=%d). : Exiting...\n", sender_id,
-           link_cnt, expected_number_of_links);
+    printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : # of links(%d) in data is not the same as exptected(=%d). : Exiting... : exp %d run %d sub %d : %s %s %d\n",
+           sender_id,
+           hostnamebuf, -1,
+           link_cnt, expected_number_of_links,
+           (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+           (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+           (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+           __FILE__, __PRETTY_FUNCTION__, __LINE__);
+
     printEventData(data, event_length, sender_id);
     pthread_mutex_unlock(&(mtx_sender_log));
 #ifndef NO_ERROR_STOP
@@ -1271,13 +1282,19 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
   if (reduced_flag == 0) {
     pthread_mutex_lock(&(mtx_sender_log));
     if (err_not_reduced[sender_id] < max_number_of_messages) {
-      printf("[WARNING] thread %d : Error-flag was set by the data-check module in PCIe40 FPGA.\n", sender_id);
+      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Error-flag was set by the data-check module in PCIe40 FPGA. Exiting... : exp %d run %d sub %d : %s %s %d\n",
+             sender_id,
+             hostnamebuf, -1,
+             (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+             (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+             (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printEventData(data, event_length, sender_id);
     }
     err_not_reduced[sender_id]++;
     pthread_mutex_unlock(&(mtx_sender_log));
-    //    exit(1);
-    return DATACHECK_OK_BUT_ERRFLAG_IN_HDR;
+    exit(1); // zero-torellance  policy
+    //    return DATACHECK_OK_BUT_ERRFLAG_IN_HDR;
   }
 
   return DATACHECK_OK;

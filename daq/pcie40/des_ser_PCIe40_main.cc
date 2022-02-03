@@ -482,6 +482,117 @@ void printEventNumberError(unsigned int*& data, const unsigned int evtnum, const
   return;
 }
 
+
+void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
+{
+
+  unsigned int event_length = data[ Belle2::RawHeader_latest::POS_NWORDS ];
+  unsigned int new_exprun = data[ Belle2::RawHeader_latest::POS_EXP_RUN_NO ] ;
+  int flag = 0, err_flag = 0, err_ch = -1;
+  unsigned int temp_utime = 0, temp_ctime_trgtype = 0, temp_eve = 0, temp_exprun = 0;
+  unsigned int utime[MAX_PCIE40_CH], ctime_trgtype[MAX_PCIE40_CH], eve[MAX_PCIE40_CH], exprun[MAX_PCIE40_CH];
+  int used_ch[MAX_PCIE40_CH] = {0};
+  char err_buf[20000];
+  int first_ch = 0;
+
+  memset(utime, 0, sizeof(utime));
+  memset(ctime_trgtype, 0, sizeof(ctime_trgtype));
+  memset(eve, 0, sizeof(eve));
+  memset(exprun, 0, sizeof(exprun));
+
+  for (int i = 0; i <  MAX_PCIE40_CH; i++) {
+    unsigned int temp_ctime_trgtype_footer = 0, temp_eve_footer = 0;
+    int linksize = 0;
+    if (i < 47) {
+      linksize = data[ POS_TABLE_POS + (i + 1) ] - data[ POS_TABLE_POS + i ];
+    } else {
+      linksize = event_length - (data[ POS_TABLE_POS + 47 ] + LEN_ROB_TRAILER);
+    }
+    if (linksize <= 0) {
+      continue;
+    } else {
+      used_ch[ i ] = 1;
+    }
+
+    int temp_pos = data[ POS_TABLE_POS + i ] + OFFSET_HDR;
+    ctime_trgtype[ i ] = data[ temp_pos +
+                               Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
+                               Belle2::PreRawCOPPERFormat_latest::POS_TT_CTIME_TYPE ];
+    eve[ i ] = data[ temp_pos +
+                     Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
+                     Belle2::PreRawCOPPERFormat_latest::POS_TT_TAG ];
+    utime[ i ] = data[ temp_pos +
+                       Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
+                       Belle2::PreRawCOPPERFormat_latest::POS_TT_UTIME ];
+    exprun[ i ] = data[ temp_pos +
+                        Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
+                        Belle2::PreRawCOPPERFormat_latest::POS_EXP_RUN ];
+    temp_ctime_trgtype_footer = data[ temp_pos + linksize +
+                                      - (Belle2::PreRawCOPPERFormat_latest::SIZE_B2LFEE_TRAILER +
+                                         Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_TRAILER) +
+                                      Belle2::PreRawCOPPERFormat_latest::POS_TT_CTIME_B2LFEE ];
+    temp_eve_footer = data[ temp_pos + linksize +
+                            - (Belle2::PreRawCOPPERFormat_latest::SIZE_B2LFEE_TRAILER +
+                               Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_TRAILER) +
+                            Belle2::PreRawCOPPERFormat_latest::POS_CHKSUM_B2LFEE ];
+
+    if (flag == 0) {
+      temp_ctime_trgtype = ctime_trgtype[ i ];
+      temp_eve = eve[ i ];
+      temp_utime = utime[ i ];
+      temp_exprun = exprun[ i ];
+      flag = 1;
+      first_ch = i;
+    } else {
+      if (temp_ctime_trgtype != ctime_trgtype[ i ] || temp_utime != utime[ i ] ||
+          temp_eve != eve[ i ] || temp_exprun != exprun[ i ]) {
+        err_ch = i;
+        err_flag = 1;
+      }
+    }
+
+    //
+    // Mismatch between header and trailer
+    //
+    if (temp_ctime_trgtype != temp_ctime_trgtype_footer ||
+        (temp_eve & 0xffff) != ((temp_eve_footer >> 16) & 0xffff)) {
+      pthread_mutex_lock(&(mtx_sender_log));
+      printf("[FATAL] thread %d : ch=%d : ERROR_EVENT : mismatch(finesse %d) between header(ctime %.8x eve %.8x) and footer(ctime %.8x eve_crc16 %.8x). Exiting... : exp %d run %d sub %d : %s %s %d\n",
+             sender_id, i, i,
+             temp_ctime_trgtype,  temp_eve, temp_ctime_trgtype_footer, temp_eve_footer,
+             (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+             (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+             (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      pthread_mutex_unlock(&(mtx_sender_log));
+      exit(1);
+    }
+  }
+
+  //
+  // Mismatch over channels
+  //
+  if (err_flag == 1) {
+    pthread_mutex_lock(&(mtx_sender_log));
+    sprintf(err_buf,
+            "[FATAL] thread %d : ch= %d or %d : ERROR_EVENT : mismatch header value over FINESSES ( between ch %d and ch %d ). Exiting...: ",
+            sender_id, err_ch, first_ch, err_ch, first_ch);
+    for (int i = 0; i <  MAX_PCIE40_CH; i++) {
+      if (used_ch[ i ] == 1) {
+        sprintf(err_buf + strlen(err_buf),
+                "\nch = %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x",
+                i, ctime_trgtype[ i ], utime[ i ], eve[ i ], exprun[ i ]);
+      }
+    }
+    printf("%s\n", err_buf); fflush(stdout);
+    pthread_mutex_unlock(&(mtx_sender_log));
+    exit(1);
+  }
+
+  return;
+}
+
+
 int checkDMAHeader(unsigned int*& data , unsigned int& size , double& dsize , int& total_pages , int& index_pages)
 {
   if (data == 0) {
@@ -1280,6 +1391,11 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
 
   //  err_bad_ff55[sender_id]++;
   if (reduced_flag == 0) {
+    //
+    // Check unreduced header consistency
+    //
+    checkUtimeCtimeTRGType(data, sender_id);
+
     pthread_mutex_lock(&(mtx_sender_log));
     if (err_not_reduced[sender_id] < max_number_of_messages) {
       printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Error-flag was set by the data-check module in PCIe40 FPGA. Exiting... : exp %d run %d sub %d : %s %s %d\n",

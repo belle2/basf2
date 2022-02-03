@@ -143,8 +143,10 @@ void ChargedPidMVAMulticlassModule::event()
           var = std::get<double>(varobj->function(particle));
         } else if (std::holds_alternative<int>(varobj->function(particle))) {
           var = std::get<int>(varobj->function(particle));
+        } else if (std::holds_alternative<bool>(varobj->function(particle))) {
+          var = std::get<bool>(varobj->function(particle));
         } else {
-          B2ERROR("Variable '" << varobj->name << "' has wrong data type! It must be either double or integer.");
+          B2ERROR("Variable '" << varobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
         }
 
         // Manual imputation value of -999 for NaN (undefined) variables. Needed by TMVA.
@@ -168,8 +170,10 @@ void ChargedPidMVAMulticlassModule::event()
           spec = std::get<double>(specobj->function(particle));
         } else if (std::holds_alternative<int>(specobj->function(particle))) {
           spec = std::get<int>(specobj->function(particle));
+        } else if (std::holds_alternative<bool>(specobj->function(particle))) {
+          spec = std::get<bool>(specobj->function(particle));
         } else {
-          B2ERROR("Variable '" << specobj->name << "' has wrong data type! It must be either double or integer.");
+          B2ERROR("Variable '" << specobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
         }
 
         B2DEBUG(12, "\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
@@ -184,7 +188,7 @@ void ChargedPidMVAMulticlassModule::event()
         std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(cutstr);
 
         if (!cut->check(particle)) {
-          B2WARNING("\tParticle didn't pass MVA category cut, skip MVA application...");
+          B2DEBUG(11, "\t\tParticle didn't pass MVA category cut, skip MVA application...");
           continue;
         }
 

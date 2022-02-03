@@ -33,7 +33,7 @@ def file_description_set(
     Add file description validation metdata to a ROOT file.
 
     Args:
-        rootfile (TFile, str or pathlib.PurePath): Name of the root file
+        rootfile (ROOT.TFile, str or pathlib.PurePath): Name of the root file
             to open or an already open TFile instance
         description (str):  Common description/information of/about all plots
             in this ROOT file (will be displayed above the plots)

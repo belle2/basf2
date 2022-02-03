@@ -84,7 +84,7 @@ ERecoEventProcessor::~ERecoEventProcessor()
 
 // Functions hooked up by NSM2
 
-int ERecoEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
+int ERecoEventProcessor::Configure(NSMmsg* /*nsmm*/, NSMcontext* /*nsmc*/)
 {
   // Start processes from down stream
 
@@ -130,7 +130,6 @@ int ERecoEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
   //  char* port = m_conf->getconf ( "distributor", "port" );
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
   char* hostbase = m_conf->getconf("processor", "nodebase");
-  int baselen = strlen(hostbase);
   int rport;
   sscanf(&m_nodename[strlen(m_nodename) - 2], "%d", &rport);
   rport += portbase;
@@ -197,7 +196,7 @@ int ERecoEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
   return 0;
 }
 
-int ERecoEventProcessor::Start(NSMmsg* nsmm, NSMcontext* nsmc)
+int ERecoEventProcessor::Start(NSMmsg* nsmm, NSMcontext* /*nsmc*/)
 {
   string rbufin = string(m_conf->getconf("system", "unitname")) + ":" +
                   string(m_conf->getconf("processor", "ringbufin"));

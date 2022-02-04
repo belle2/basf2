@@ -315,7 +315,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         add_mirabelle_dqm(path)
 
     # KLM2 (requires mu+ particle list from add_analysis_dqm)
-    if (components is None or 'KLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
+    if (components is None or 'KLM' in components) and dqm_environment == 'hlt' and (dqm_mode in ["dont_care", "filtered"]):
         klmdqm2 = b2.register_module("KLMDQM2")
         path.add_module(klmdqm2)
 

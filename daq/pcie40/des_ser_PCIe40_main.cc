@@ -1229,10 +1229,10 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
         char err_buf[500] = {0};
         //        printf("[FATAL] thread %d : event diff. in ch %d cur_eve %.8x ffaa %.8x\n", sender_id, i, new_evtnum, data[ cur_pos + FFAA_POS ]);
         sprintf(err_buf,
-                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number (lower 8 bits in ffaa header %.8x ). Exiting...: cur 8bit eve %d this_ch %d : exp %d run %d sub %d : %s %s %d",
+                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number (= lower 8bits in ffaa header -> 0x%.2x). Exiting...: eve 0x%.8x ffaa header 0x%.8x : exp %d run %d sub %d : %s %s %d",
                 sender_id,
                 hostnamebuf, i,
-                data[ cur_pos + FFAA_POS ], new_evtnum & 0xff, data[ cur_pos + FFAA_POS ] & 0xff,
+                data[ cur_pos + FFAA_POS ] & 0xff, new_evtnum, data[ cur_pos + FFAA_POS ],
                 (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
                 (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
                 (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
@@ -1249,7 +1249,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
     unsigned int ch_ffaa = (data[ cur_pos + FFAA_POS ] >> 8)  & 0x000000ff;
     if ((unsigned int)i != ch_ffaa) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 channel number is differnt. ch should be %d buf ffaa's ch info is %d (%.8x). : exp %d run %d sub %d : %s %s %d\n",
+      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 channel-number is differnt. It should be ch %d in the channel table in the ROB header buf ffaa header info says ch is %d (%.8x). : exp %d run %d sub %d : %s %s %d\n",
              sender_id, hostnamebuf,  i,
              i, (data[ cur_pos + FFAA_POS ] >> 8) & 0xff,
              data[ cur_pos + FFAA_POS ],
@@ -1264,11 +1264,11 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
 #endif
     }
 
-    if ((cur_pos + linksize) > (8 * size)) {
+    if (cur_pos + linksize > size) {
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 13 ] = n_messages[ 13 ] + 1 ;
       if (n_messages[ 13 ] < max_number_of_messages) {
-        printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Bad link size %d %d : exp %d run %d sub %d : %s %s %d\n",
+        printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : The end position ( %d words ) of this channel data exceeds event size( %d words ). Exiting... : exp %d run %d sub %d : %s %s %d\n",
                sender_id,
                hostnamebuf,  i,
                (cur_pos + linksize) , (8 * size),
@@ -1294,7 +1294,6 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
 #ifdef CRC_CHECK
     if (get_crc(data_for_crc , size , first_crc) != value) {
       pthread_mutex_lock(&(mtx_sender_log));
-
       // Currently, zero-torellance for a CRC error.
       //      if (crc_err_ch[sender_id][i] == 0) {
       printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : POST B2link event CRC16 error. data(%x) calc(%x) : exp %d run %d sub %d : %s %s %d\n",
@@ -1319,8 +1318,6 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
 #endif
     } else {
       total_crc_good[sender_id]++ ;
-      //      printf("crc check ch %d pos %d val %.4x\n", i, cur_pos, value);
-      //      if( true ){
     }
 #endif // CRC_CHECK
 

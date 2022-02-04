@@ -503,7 +503,6 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
 #endif
   }
 
-
   //
   // Check if non data-reduction bit was set or not.
   //
@@ -1294,7 +1293,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     //
     // Check if the current position exceeds the event end
     //
-    if (cur_pos + linksize > event_nwords) {
+    if (cur_pos + linksize > event_nwords - Belle2::RawTrailer_latest::RAWTRAILER_NWORDS) {
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 13 ] = n_messages[ 13 ] + 1 ;
       if (n_messages[ 13 ] < max_number_of_messages) {
@@ -1345,6 +1344,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     }
 
 
+
     //
     // CRC check
     //
@@ -1382,6 +1382,10 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     }
 #endif // CRC_CHECK
 
+
+    //
+    // Monitoring CRC check status
+    //
     if (new_evtnum % 1000000 == 0) {
       //    if (total_crc_good[sdr_id] % (1000000 + sdr_id) == 0) {
       pthread_mutex_lock(&(mtx_sender_log));
@@ -1411,13 +1415,19 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
       pthread_mutex_unlock(&(mtx_sender_log));
     }
 
+    //
+    // Check the end of the event
+    //
     link_cnt++;
-
-    if (((data[ cur_pos + linksize ] & 0xFFFF0000) == 0x7FFF0000)) break ;
     cur_pos = cur_pos + linksize ;
-    linksize = data[ cur_pos ] & 0xFFFF ;
+    if (((data[ cur_pos ] & 0xFFFF0000) == 0x7FFF0000)) break ;
+
   }
 
+
+  //
+  // Printing the 1st event
+  //
   if (link_cnt != expected_number_of_links) {
     pthread_mutex_lock(&(mtx_sender_log));
     printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : # of links(%d) in data is not the same as exptected(=%d). : Exiting... : exp %d run %d sub %d : %s %s %d\n",
@@ -1447,7 +1457,6 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     pthread_mutex_unlock(&(mtx_sender_log));
   }
 
-  //  err_bad_ff55[sender_id]++;
   if (reduced_flag == 0) {
     //
     // Check unreduced header consistency

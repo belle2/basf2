@@ -169,7 +169,7 @@ unsigned int crc_err_ch[NUM_SENDER_THREADS][ MAX_PCIE40_CH];
 #define NON_CRC_COUNTS_NOTREDUCED 4
 
 // format b2link header
-#define FFAA_POS 0
+//#define FFAA_POS 0
 #define LINK_EVE_POS 2
 #define NO_PROC
 #define CRC_CHECK
@@ -406,10 +406,10 @@ int get1stChannel(unsigned int*& data)
 
   for (int i = 0; i <  MAX_PCIE40_CH; i++) {
     int linksize = 0;
-    if (i < 47) {
+    if (i < MAX_PCIE40_CH - 1) {
       linksize = data[ POS_TABLE_POS + (i + 1) ] - data[ POS_TABLE_POS + i ];
     } else {
-      linksize = event_length - (data[ POS_TABLE_POS + 47 ] + LEN_ROB_TRAILER);
+      linksize = event_length - (data[ POS_TABLE_POS + (MAX_PCIE40_CH - 1) ] + LEN_ROB_TRAILER);
     }
     if (linksize > 0) {
       ret_1st_ch = i;
@@ -454,10 +454,10 @@ void printEventNumberError(unsigned int*& data, const unsigned int evtnum, const
     unsigned int temp_eve = 0;
     for (int i = 0; i <  MAX_PCIE40_CH; i++) {
       int linksize = 0;
-      if (i < 47) {
+      if (i < MAX_PCIE40_CH - 1) {
         linksize = data[ POS_TABLE_POS + (i + 1) ] - data[ POS_TABLE_POS + i ];
       } else {
-        linksize = event_length - (data[ POS_TABLE_POS + 47 ] + LEN_ROB_TRAILER);
+        linksize = event_length - (data[ POS_TABLE_POS + (MAX_PCIE40_CH - 1) ] + LEN_ROB_TRAILER);
       }
       if (linksize <= 0) continue;
       temp_pos = data[ POS_TABLE_POS + i ] + OFFSET_HDR;
@@ -503,10 +503,10 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
   for (int i = 0; i <  MAX_PCIE40_CH; i++) {
     unsigned int temp_ctime_trgtype_footer = 0, temp_eve_footer = 0;
     int linksize = 0;
-    if (i < 47) {
+    if (i < MAX_PCIE40_CH - 1) {
       linksize = data[ POS_TABLE_POS + (i + 1) ] - data[ POS_TABLE_POS + i ];
     } else {
-      linksize = event_length - (data[ POS_TABLE_POS + 47 ] + LEN_ROB_TRAILER);
+      linksize = event_length - (data[ POS_TABLE_POS + (MAX_PCIE40_CH - 1) ] + LEN_ROB_TRAILER);
     }
     if (linksize <= 0) {
       continue;
@@ -876,7 +876,7 @@ void reduceHdrTrl(unsigned int* data , unsigned int& event_nwords)
 }
 
 
-int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsigned int& exprun ,
+int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords, unsigned int& exprun ,
                    unsigned int& evtnum, unsigned int node_id, std::vector< int > valid_ch)
 {
   int expected_number_of_links = valid_ch.size() ;
@@ -951,9 +951,13 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
   //
   // Check if non data-reduction bit was set or not.
   //
+  int ffaa_pos = 0, ff55_pos_from_end = 0;
   if (data[ MAGIC_7F7F_POS ] & 0x00008000) {
     // not-reduced
     reduced_flag = 0;
+    ffaa_pos = Belle2::PreRawCOPPERFormat_latest::POS_MAGIC_B2LHSLB;
+    ff55_pos_from_end = - Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_TRAILER +
+                        Belle2::PreRawCOPPERFormat_latest::POS_CHKSUM_B2LHSLB;
 //     if (data[ ERR_POS ] == 0) {
 //       pthread_mutex_lock(&(mtx_sender_log));
 //       printf("[FATAL] thread %d : Data error was deteced by PCIe40 FPGA. Header %.8x, Errorbit %.8x\n", sender_id, data[ MAGIC_7F7F_POS ],
@@ -967,6 +971,9 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
   } else {
     // reduced
     reduced_flag = 1;
+    ffaa_pos = Belle2::PostRawCOPPERFormat_latest::POS_B2LHSLB_MAGIC;
+    ff55_pos_from_end = - Belle2::PostRawCOPPERFormat_latest::SIZE_B2LHSLB_TRAILER +
+                        Belle2::PostRawCOPPERFormat_latest::POS_B2LHSLB_TRL_MAGIC;
     if (data[ ERR_POS ] != 0) {
       pthread_mutex_lock(&(mtx_sender_log));
       printf("[FATAL] thread %d : Inconsistency between header(no error found by FPGA) %.8x and errorbit %.8x (error-bit is non-zero) : exp %d run %d sub %d\n",
@@ -1066,7 +1073,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
   unsigned int first_crc = 0;
 
   // find number of links
-  unsigned int cur_pos = 8 ;
+  unsigned int cur_pos = 0 ;
   int non_crc_counts = 0;
   // Check eror flag in ROB header
 
@@ -1087,22 +1094,26 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
   int first_eve_flag = 0;
   int link_cnt = 0;
 
-
+  //
+  // Loop over input channels
+  //
   for (int i = 0; i <  MAX_PCIE40_CH; i++) {
     if (i == 0) first_b2lctime_flag = 0;
-    //  while ( true ) {
-    //    unsigned int linknumber = ( data[ cur_pos + 1 ] & 0xFF00 ) >> 8 ;
+
     int linksize = 0;
-    if (i < 47) {
-      linksize = data[ POS_TABLE_POS + (i + 1) ] - data[ POS_TABLE_POS + i ];
+    if (i < MAX_PCIE40_CH - 1) {
+      linksize = data[ Belle2::RawHeader_latest::POS_CH_POS_TABLE + (i + 1) ]
+                 - data[ Belle2::RawHeader_latest::POS_CH_POS_TABLE + i ];
     } else {
-      linksize = event_length - (data[ POS_TABLE_POS + 47 ] + LEN_ROB_TRAILER);
+      linksize = event_length - (data[ Belle2::RawHeader_latest::POS_CH_POS_TABLE + (MAX_PCIE40_CH - 1) ] +
+                                 Belle2::RawTrailer_latest::RAWTRAILER_NWORDS);
     }
     if (linksize <= 0) continue;
-    cur_pos = data[ POS_TABLE_POS + i ] + OFFSET_HDR;
+    cur_pos = data[ Belle2::RawHeader_latest::POS_CH_POS_TABLE + i ] + OFFSET_HDR;
 
+    //
     // compare valid ch with register value
-
+    //
     if (valid_ch[link_cnt] != i) {
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 11 ] = n_messages[ 11 ] + 1 ;
@@ -1124,7 +1135,10 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
 #endif
     }
 
-    if ((data[ cur_pos + FFAA_POS ] & 0xFFFF0000) != 0xFFAA0000) {
+    //
+    // Check FFAA value
+    //
+    if ((data[ cur_pos + ffaa_pos ] & 0xFFFF0000) != 0xFFAA0000) {
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 12 ] = n_messages[ 12 ] + 1 ;
       if (n_messages[ 12 ] < max_number_of_messages) {
@@ -1133,28 +1147,20 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
                 "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 header magic word(0xffaa) is invalid. header %.8x : exp %d run %d sub %d : %s %s %d\n",
                 sender_id,
                 hostnamebuf, i,
-                data[ cur_pos + FFAA_POS ],
+                data[ cur_pos + ffaa_pos ],
                 (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
                 (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
                 (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
-        //        printf("[FATAL] thread %d : Bad ff55 %X pos %.8x ch %d\n" , sender_id, data[ cur_pos + linksize - 1  ], cur_pos + linksize - 1  ,   i) ;
         printf("%s\n", err_buf); fflush(stdout);
-        printLine(data, cur_pos + FFAA_POS);
+        printLine(data, cur_pos + ffaa_pos);
         printEventData(data, event_length, sender_id);
-        // printf("[FATAL] thread %d : Bad FFAA for linknumber %d : exp %d run %d sub %d\n",
-        //        sender_id, i,
-        //        (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
-        //        (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
-        //        (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
-        //       ) ;
       }
       err_bad_ffaa[sender_id]++;
       pthread_mutex_unlock(&(mtx_sender_log));
 #ifndef NO_ERROR_STOP
       exit(1);
 #endif
-      //      return 1 ;
     }
 
     //
@@ -1167,14 +1173,21 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
         time(&timer);
         t_st = localtime(&timer);
         if (first_b2lctime_flag == 0) {
-          first_b2lctime = data[ cur_pos + FFAA_POS + 1 ];
+          first_b2lctime = data[ cur_pos +
+                                 Belle2::PostRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
+                                 Belle2::PostRawCOPPERFormat_latest::POS_B2L_CTIME ];
           first_b2lctime_flag = 1;
         }
         pthread_mutex_lock(&(mtx_sender_log));
         printf("[DEBUG] thread %d : eve %u ch %3d B2Lctime 0x%.8x diff %.2lf [us] : exp %d run %d sub %d : %s",
                sender_id, new_evtnum, i,
-               data[ cur_pos + FFAA_POS + 1 ],
-               ((int)(data[ cur_pos + FFAA_POS + 1 ] - first_b2lctime)) / 127.22,
+               data[ cur_pos +
+                     Belle2::PostRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
+                     Belle2::PostRawCOPPERFormat_latest::POS_B2L_CTIME ],
+               ((int)(data[ cur_pos +
+                            Belle2::PostRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
+                            Belle2::PostRawCOPPERFormat_latest::POS_B2L_CTIME ]
+                      - first_b2lctime)) / 127.22,
                (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
                (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
                (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
@@ -1183,7 +1196,91 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
       }
     }
 
-    if (((data[ cur_pos + linksize - 1 ]) & 0xFFFF0000) != 0xFF550000) {
+    // event # jump
+    if (first_eve_flag == 0) {
+      first_eve_flag = 1;
+    }
+
+    //
+    // Check event number in ffaa header
+    //
+    unsigned int eve_link_8bits =  data[ cur_pos + ffaa_pos ]  & 0x000000ff;
+    if ((new_evtnum & 0x000000FF) != eve_link_8bits) {
+      pthread_mutex_lock(&(mtx_sender_log));
+      err_link_eve_jump[sender_id]++;
+      if (err_link_eve_jump[sender_id] < max_number_of_messages) {
+
+        char err_buf[500] = {0};
+        //        printf("[FATAL] thread %d : event diff. in ch %d cur_eve %.8x ffaa %.8x\n", sender_id, i, new_evtnum, data[ cur_pos + FFAA_POS ]);
+        sprintf(err_buf,
+                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number (= lower 8bits in ffaa header -> 0x%.2x). Exiting...: eve 0x%.8x ffaa header 0x%.8x : exp %d run %d sub %d : %s %s %d",
+                sender_id,
+                hostnamebuf, i,
+                data[ cur_pos + ffaa_pos ] & 0xff, new_evtnum, data[ cur_pos + ffaa_pos ],
+                (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+                (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+                (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+                __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        printf("%s\n", err_buf); fflush(stdout);
+        printEventData(data, event_length, sender_id);
+      }
+      pthread_mutex_unlock(&(mtx_sender_log));
+#ifndef NO_ERROR_STOP
+      exit(1);
+#endif
+    }
+
+    //
+    // Check channel number in ffaa header
+    //
+    unsigned int ch_ffaa = (data[ cur_pos + ffaa_pos ] >> 8)  & 0x000000ff;
+    if ((unsigned int)i != ch_ffaa) {
+      pthread_mutex_lock(&(mtx_sender_log));
+      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 channel-number is differnt. It should be ch %d in the channel table in the ROB header buf ffaa header info says ch is %d (%.8x). : exp %d run %d sub %d : %s %s %d\n",
+             sender_id, hostnamebuf,  i,
+             i, (data[ cur_pos + ffaa_pos ] >> 8) & 0xff,
+             data[ cur_pos + ffaa_pos ],
+             (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+             (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+             (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      printEventData(data, event_length, sender_id);
+      pthread_mutex_unlock(&(mtx_sender_log));
+#ifndef NO_ERROR_STOP
+      exit(1);
+#endif
+    }
+
+
+    //
+    // Check if the current position exceeds the event end
+    //
+    if (cur_pos + linksize > event_nwords) {
+      pthread_mutex_lock(&(mtx_sender_log));
+      n_messages[ 13 ] = n_messages[ 13 ] + 1 ;
+      if (n_messages[ 13 ] < max_number_of_messages) {
+        printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : The end position ( %d words ) of this channel data exceeds event size( %d words ). Exiting... : exp %d run %d sub %d : %s %s %d\n",
+               sender_id,
+               hostnamebuf,  i,
+               (cur_pos + linksize) , event_nwords,
+               (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+               (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+               (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+
+      }
+      printEventData(data, event_length, sender_id);
+      err_bad_linksize[sender_id]++;
+      pthread_mutex_unlock(&(mtx_sender_log));
+#ifndef NO_ERROR_STOP
+      exit(1);
+#endif
+    }
+
+    //
+    // Check FF55 value
+    //
+    if (((data[ cur_pos + linksize + ff55_pos_from_end ]) & 0xFFFF0000) != 0xFF550000) {
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 14 ] = n_messages[ 14 ] + 1 ;
       if (n_messages[ 14 ] < max_number_of_messages) {
@@ -1192,7 +1289,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
                 "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 trailer magic word(0xff55) is invalid. foooter %.8x : exp %d run %d sub %d : %s %s %d",
                 sender_id,
                 hostnamebuf, i,
-                data[ cur_pos + linksize - 1  ],
+                data[ cur_pos + linksize + ff55_pos_from_end ],
                 (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
                 (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
                 (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
@@ -1208,78 +1305,10 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
 #endif
     }
 
-    // event # jump
-    if (first_eve_flag == 0) {
-      first_eve_flag = 1;
-    }
 
-    unsigned int eve_link_8bits =  data[ cur_pos + FFAA_POS ]  & 0x000000ff;
-    if ((new_evtnum & 0x000000FF) != eve_link_8bits) {
-      pthread_mutex_lock(&(mtx_sender_log));
-      err_link_eve_jump[sender_id]++;
-      if (err_link_eve_jump[sender_id] < max_number_of_messages) {
-
-        char err_buf[500] = {0};
-        //        printf("[FATAL] thread %d : event diff. in ch %d cur_eve %.8x ffaa %.8x\n", sender_id, i, new_evtnum, data[ cur_pos + FFAA_POS ]);
-        sprintf(err_buf,
-                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number (= lower 8bits in ffaa header -> 0x%.2x). Exiting...: eve 0x%.8x ffaa header 0x%.8x : exp %d run %d sub %d : %s %s %d",
-                sender_id,
-                hostnamebuf, i,
-                data[ cur_pos + FFAA_POS ] & 0xff, new_evtnum, data[ cur_pos + FFAA_POS ],
-                (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
-                (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
-                (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
-                __FILE__, __PRETTY_FUNCTION__, __LINE__);
-        printf("%s\n", err_buf); fflush(stdout);
-        printEventData(data, event_length, sender_id);
-      }
-      pthread_mutex_unlock(&(mtx_sender_log));
-#ifndef NO_ERROR_STOP
-      exit(1);
-#endif
-    }
-
-    unsigned int ch_ffaa = (data[ cur_pos + FFAA_POS ] >> 8)  & 0x000000ff;
-    if ((unsigned int)i != ch_ffaa) {
-      pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 channel-number is differnt. It should be ch %d in the channel table in the ROB header buf ffaa header info says ch is %d (%.8x). : exp %d run %d sub %d : %s %s %d\n",
-             sender_id, hostnamebuf,  i,
-             i, (data[ cur_pos + FFAA_POS ] >> 8) & 0xff,
-             data[ cur_pos + FFAA_POS ],
-             (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
-             (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
-             (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
-             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      printEventData(data, event_length, sender_id);
-      pthread_mutex_unlock(&(mtx_sender_log));
-#ifndef NO_ERROR_STOP
-      exit(1);
-#endif
-    }
-
-    if (cur_pos + linksize > size) {
-      pthread_mutex_lock(&(mtx_sender_log));
-      n_messages[ 13 ] = n_messages[ 13 ] + 1 ;
-      if (n_messages[ 13 ] < max_number_of_messages) {
-        printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : The end position ( %d words ) of this channel data exceeds event size( %d words ). Exiting... : exp %d run %d sub %d : %s %s %d\n",
-               sender_id,
-               hostnamebuf,  i,
-               (cur_pos + linksize) , (8 * size),
-               (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
-               (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
-               (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
-               __FILE__, __PRETTY_FUNCTION__, __LINE__);
-
-      }
-      printEventData(data, event_length, sender_id);
-      err_bad_linksize[sender_id]++;
-      pthread_mutex_unlock(&(mtx_sender_log));
-#ifndef NO_ERROR_STOP
-      exit(1);
-#endif
-    }
-
-
+    //
+    // CRC check
+    //
     unsigned int crc_data = data[ cur_pos + linksize - 2 ] & 0xFFFF ;
     int size = linksize - non_crc_counts;
     unsigned int value = crc_data;
@@ -1911,7 +1940,7 @@ void* sender(void* arg)
         if (evtnum != 0) {
           evtnum -= NUM_SENDER_THREADS; // To go through checkEventData().
         }
-        int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, send_nwords, exprun, evtnum, node_id, valid_ch);
+        int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, event_nwords, exprun, evtnum, node_id, valid_ch);
         if (ret != DATACHECK_OK) {
           pthread_mutex_lock(&(mtx_sender_log));
           printf("[FATAL] thread %d : checkEventData() detected an error after reduceHdrTrl(). Exiting...\n", sender_id);

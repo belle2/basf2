@@ -10,18 +10,110 @@ import argparse
 import basf2.utils as b2utils
 
 
-def get_variable_manager():
-    """
-    Simple wrapper for returning an instance to the variable manager object.
-    This is necessary for avoiding to import ROOT globally.
-    """
-    import ROOT
-    variable_manager = ROOT.Belle2.Variable.Manager.Instance()
-    return variable_manager
+class PythonVariableManager(object):
+    '''
+    Wrapper around the variable manager class.
+    This is necessary for avoiding to import ROOT globally when 'variables' is imported.
+    '''
+
+    @classmethod
+    def _instance(self):
+        '''
+        Return an instance to the variable manager.
+        '''
+        import ROOT
+        instance = ROOT.Belle2.Variable.Manager.Instance()
+        return instance
+
+    def getVariable(self, *args):
+        '''
+        Wrapper around Manager::getVariable(std::string name) and
+        Manager::getVariable(const std::string& functionName, const std::vector<std::string>& functionArguments).
+        '''
+        instance = PythonVariableManager._instance()
+        return instance.getVariable(*args)
+
+    def getVariables(self, *args):
+        '''
+        Wrapper around Manager::getVariables(const std::vector<std::string>& variables) and
+        Manager::getVariables().
+        '''
+        instance = PythonVariableManager._instance()
+        return instance.getVariables(*args)
+
+    def addAlias(self, alias, variable):
+        '''
+        Wrapper around Manager::addAlias(const std::string& alias, const std::string& variable).
+        '''
+        instance = PythonVariableManager._instance()
+        assert(instance.addAlias(alias, variable))
+
+    def printAliases(self):
+        '''
+        Wrapper around Manager::printAliases().
+        '''
+        instance = PythonVariableManager._instance()
+        instance.printAliases()
+
+    def addCollection(self, *args):
+        '''
+        Wrapper around Manager::addCollection(const std::string& collection, const std::vector<std::string>& variables)
+        '''
+        instance = PythonVariableManager._instance()
+        assert(instance.addCollection(*args))
+
+    def getCollection(self, collection):
+        '''
+        Wrapper around Manager::getCollection(const std::string& collection).
+        '''
+        instance = PythonVariableManager._instance()
+        return instance.getCollection(collection)
+
+    def resolveCollections(self, *args):
+        '''
+        Wrapper around Manager::resolveCollections(const std::vector<std::string>& variables).
+        '''
+        instance = PythonVariableManager._instance()
+        return instance.resolveCollections(*args)
+
+    def checkDeprecatedVariable(self, variable):
+        '''
+        Wrapper around Manager::checkDeprecatedVariable(const std::string& name).
+        '''
+        instance = PythonVariableManager._instance()
+        instance.checkDeprecatedVariable(variable)
+
+    def evaluate(self, variable, particle):
+        '''
+        Wrapper around Manager::evaluate(const std::string& varName, const Particle* p).
+        '''
+        instance = PythonVariableManager._instance()
+        return instance.evaluate(variable, particle)
+
+    def getNames(self):
+        '''
+        Wrapper around Manager::getNames().
+        '''
+        instance = PythonVariableManager._instance()
+        return instance.getNames()
+
+    def getAliasNames(self):
+        '''
+        Wrapper around Manager::getAliasNames().
+        '''
+        instance = PythonVariableManager._instance()
+        return instance.getAliasNames()
+
+    def assertValidName(self, variable):
+        '''
+        Wrapper around Manager::assertValidName(const std::string& name).
+        '''
+        instance = PythonVariableManager._instance()
+        instance.assertValidName(variable)
 
 
-#: import everything into current namespace.
-variables = get_variable_manager()
+#: Allow users to easily interact with the variable mananger.
+variables = PythonVariableManager()
 
 
 def std_vector(*args):

@@ -14,6 +14,9 @@
 
 namespace Belle2::MVA {
 
+  /**
+   * Wrapper class for some utility functions.
+   */
   class Utility {
 
   public:
@@ -50,12 +53,11 @@ namespace Belle2::MVA {
      * @param run2 last valid run
      */
     static void upload_array(const std::vector<std::string>& filenames, const std::string& identifier, int exp1 = 0, int run1 = 0,
-                             int exp2 = -1,
-                             int run2 = -1);
+                             int exp2 = -1, int run2 = -1);
 
     /**
      * Convenience function which checks if an experise is available
-     * @param filename or identifier of the expertise
+     * @param filename filename or identifier of the expertise
      * @param experiment current experiment
      * @param run current run
      * @param event current event
@@ -71,7 +73,7 @@ namespace Belle2::MVA {
 
     /**
      * Print information about the classifier stored in the given weightfile
-     * @param filename of the weightfile
+     * @param filename filename of the weightfile
      */
     static std::string info(const std::string& filename);
 
@@ -89,7 +91,7 @@ namespace Belle2::MVA {
      * Convenience function which performs a training with the given options
      * @param general_options shared options
      * @param specific_options method specific options
-     * @param splot_options optional options for an splot training
+     * @param meta_options optional options
      */
     static void teacher(const GeneralOptions& general_options, const SpecificOptions& specific_options,
                         const MetaOptions& meta_options = MetaOptions());
@@ -97,7 +99,7 @@ namespace Belle2::MVA {
     /**
      * Convenience function applies experts on given data
      * @param filenames vector of filenames or database identifiers
-     * @param datafiles ROOT files containing the data
+     * @param datafile ROOT files containing the data
      * @param treename treename of ROOT file
      * @param outputfile name of the output ROOT file
      * @param experiment number of the experiment
@@ -113,7 +115,7 @@ namespace Belle2::MVA {
      * Convenience function which performs a training on a dataset
      * @param general_options shared options
      * @param specific_options method specific options
-     * @param data to use
+     * @param data data to use
      */
     static std::unique_ptr<Belle2::MVA::Expert> teacher_dataset(GeneralOptions general_options, const SpecificOptions& specific_options,
                                                                 Dataset& data);
@@ -121,8 +123,8 @@ namespace Belle2::MVA {
     /**
      * Performs an splot training, convenience function
      * @param general_options shared options of all methods
-     * @param splot_options splot options defining the splot training
      * @param specific_options of the used mva method
+     * @param meta_options optional options
      */
     static std::unique_ptr<Belle2::MVA::Expert> teacher_splot(const GeneralOptions& general_options,
                                                               const SpecificOptions& specific_options,
@@ -131,8 +133,8 @@ namespace Belle2::MVA {
     /**
      * Performs a sideband subtraction training, convenience function
      * @param general_options shared options of all methods
-     * @param splot_options splot options defining the splot training
      * @param specific_options of the used mva method
+     * @param meta_options optional options
      */
     static std::unique_ptr<Belle2::MVA::Expert> teacher_sideband_subtraction(const GeneralOptions& general_options,
         const SpecificOptions& specific_options,
@@ -141,8 +143,8 @@ namespace Belle2::MVA {
     /**
      * Performs a MC vs data pre-training and afterwards reweighted training, convenience function
      * @param general_options shared options of all methods
-     * @param splot_options splot options defining the splot training
      * @param specific_options of the used mva method
+     * @param meta_options options defining the splot training
      */
     static std::unique_ptr<Belle2::MVA::Expert> teacher_reweighting(const GeneralOptions& general_options,
         const SpecificOptions& specific_options,

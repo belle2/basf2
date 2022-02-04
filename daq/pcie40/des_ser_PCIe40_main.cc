@@ -893,7 +893,8 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
   unsigned int event_length = data[ EVENT_LEN_POS ];
   if (event_length > 0x100000) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] Too large event size. : 0x%.8x : %d words. : exp %d run %d sub %d : Exiting...\n",
+    printf("[FATAL] thread %d : ERROR_EVENT : Too large event size. : 0x%.8x : %d words. : exp %d run %d sub %d : Exiting...\n",
+           sender_id,
            data[ EVENT_LEN_POS ], data[ EVENT_LEN_POS ],
            (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
            (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -905,7 +906,8 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
     exit(1);
   } else if (event_length == 0) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] Specified event size is zero. : 0x%.8x : %u words. : exp %d run %d sub %d : Exiting...\n",
+    printf("[FATAL] thread %d : ERROR_EVENT : Specified event size is zero. : 0x%.8x : %u words. : exp %d run %d sub %d : Exiting...\n",
+           sender_id,
            data[ EVENT_LEN_POS ], event_length,
            (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
            (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -945,7 +947,6 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
   // Store nodeID
   //
   data[ NODEID_POS ] = node_id;
-
 
   //
   // Check if non data-reduction bit was set or not.
@@ -999,7 +1000,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
   //
   // Check exprun #
   //
-  if (exprun == 0) {
+  if (exprun == 0) { // default value of exprun
     exprun = data[RUNNO_POS];
   } else {
     if (exprun != data[RUNNO_POS]) {
@@ -1007,16 +1008,14 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
         pthread_mutex_lock(&(mtx_sender_log));
         n_messages[ 9 ] = n_messages[ 9 ] + 1 ;
         if (n_messages[ 9 ] < max_number_of_messages) {
-          printf("[FATAL] thread %d : Bad exprun(now %.8x prev. %.8x) : exp %d run %d sub %d : Exiting...\n",
-                 sender_id,
+          printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Bad exprun(now %.8x prev. %.8x) : exp %d run %d sub %d : Exiting...\n",
+                 sender_id, hostnamebuf, get1stChannel(data),
                  exprun, data[RUNNO_POS],
                  (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
                  (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
                  (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
                 ) ;
           printEventData(data, event_length, sender_id);
-          // printLine(data, RUNNO_POS);
-          // printFullData(data);
         }
         err_bad_runnum[sender_id]++;
         pthread_mutex_unlock(&(mtx_sender_log));
@@ -1024,6 +1023,14 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
         exit(1);
 #endif
       } else {
+        if (sender_id == 0) {
+          printf("[DEBUG] thread %d : Run number was changed. cur exprun %.8x prev. exprun %.8x cur eve %.8x : exp %d run %d sub %d\n",
+                 sender_id, data[RUNNO_POS], exprun, new_evtnum,
+                 (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+                 (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+                 (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
+                );
+        }
         //
         // A new run was started.
         //
@@ -1048,25 +1055,11 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int size , unsig
     }
   }
 
-  // if (0 == runnumber)
-  //   runnumber = (data[RUNNO_POS] & 0xFFFFFF00) >> 8 ;
-  // else {
-  //   if (runnumber != ((data[RUNNO_POS] & 0xFFFFFF00) >> 8))  {
-  //        pthread_mutex_lock(&(mtx_sender_log));
-  //     n_messages[ 9 ] = n_messages[ 9 ] + 1 ;
-  //     if (n_messages[ 9 ] < max_number_of_messages) {
-  //       printf("[FATAL] Bad runnumber: %.8x\n", (data[RUNNO_POS] & 0xFFFFFF00) >> 8) ;
-  //    printEventData(data, event_length);
-  //     }
-  //     err_bad_runnum[sender_id]++;
-  //    pthread_mutex_unlock(&(mtx_sender_log));
-  //     exit(1);
-  //   }
-  // }
-
+  //
+  // Checking each channel's header
+  //
   unsigned int ctime = data[ Belle2::RawHeader_latest::POS_TTCTIME_TRGTYPE ] ;
   unsigned int utime = data[ Belle2::RawHeader_latest::POS_TTUTIME ] ;
-
 
   unsigned int crc_init = 0xFFFF ;
   unsigned int f_crc[ 4 ]  = { ctime , new_evtnum , utime , new_exprun } ;

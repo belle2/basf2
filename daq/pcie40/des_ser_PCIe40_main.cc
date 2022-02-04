@@ -485,8 +485,46 @@ void printEventNumberError(unsigned int*& data, const unsigned int evtnum, const
 
 void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
 {
-
   unsigned int event_length = data[ Belle2::RawHeader_latest::POS_NWORDS ];
+  //
+  // Check the 7f7f magic word
+  //
+  if ((data[ MAGIC_7F7F_POS ] & 0xFFFF0000) != 0x7F7F0000) {
+    char err_buf[500] = {0};
+    pthread_mutex_lock(&(mtx_sender_log));
+    sprintf(err_buf,
+            "[FATAL] thread %d : ERROR_EVENT :  Invalid Magic word in ReadOut Board header( 0x%.8x ) : It must be 0x7f7f????",
+            sender_id, data[ MAGIC_7F7F_POS ]) ;
+    printf("%s\n", err_buf); fflush(stdout);
+    printEventData(data, event_length, sender_id);
+    pthread_mutex_unlock(&(mtx_sender_log));
+#ifndef NO_ERROR_STOP
+    exit(1);
+#endif
+  }
+
+
+  //
+  // Check if non data-reduction bit was set or not.
+  //
+  if (!(data[ MAGIC_7F7F_POS ] & 0x00008000)) {
+    // reduced
+    pthread_mutex_lock(&(mtx_sender_log));
+    printf("[FATAL] thread %d : This function cannot be used for already reduced data. 7f7f header is 0x%.8x : %s %s %d\n",
+           sender_id, data[ MAGIC_7F7F_POS ],
+           __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printEventData(data, event_length, sender_id);
+    pthread_mutex_unlock(&(mtx_sender_log));
+#ifndef NO_ERROR_STOP
+    exit(1);
+#endif
+  }
+
+
+  //
+  // Check consistency of B2L header over all input channels
+  //
+
   unsigned int new_exprun = data[ Belle2::RawHeader_latest::POS_EXP_RUN_NO ] ;
   int flag = 0, err_flag = 0, err_ch = -1;
   unsigned int temp_utime = 0, temp_ctime_trgtype = 0, temp_eve = 0, temp_exprun = 0;
@@ -554,8 +592,8 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
     //
     // Mismatch between header and trailer
     //
-    if (temp_ctime_trgtype != temp_ctime_trgtype_footer ||
-        (temp_eve & 0xffff) != ((temp_eve_footer >> 16) & 0xffff)) {
+
+    if (temp_ctime_trgtype != temp_ctime_trgtype_footer || (temp_eve & 0xffff) != ((temp_eve_footer >> 16) & 0xffff)) {
       pthread_mutex_lock(&(mtx_sender_log));
       printf("[FATAL] thread %d : ch=%d : ERROR_EVENT : mismatch(finesse %d) between header(ctime 0x%.8x eve 0x%.8x) and footer(ctime 0x%.8x eve_crc16 0x%.8x). Exiting... : exp %d run %d sub %d : %s %s %d\n",
              sender_id, i, i,
@@ -564,6 +602,7 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
              (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
              (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      printEventData(data, event_length, sender_id);
       pthread_mutex_unlock(&(mtx_sender_log));
       exit(1);
     }
@@ -1205,6 +1244,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     // Check event number in ffaa header
     //
     unsigned int eve_link_8bits =  data[ cur_pos + ffaa_pos ]  & 0x000000ff;
+
     if ((new_evtnum & 0x000000FF) != eve_link_8bits) {
       pthread_mutex_lock(&(mtx_sender_log));
       err_link_eve_jump[sender_id]++;

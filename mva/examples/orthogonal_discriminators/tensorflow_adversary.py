@@ -217,7 +217,7 @@ if __name__ == "__main__":
     specific_options.m_mini_batch_size = 400
     specific_options.m_config = '{"pre_train_epochs" : 50, "adversary_steps": 7, '\
         ' "learning_rate": 0.001, "lambda": 0.01}'
-    ROOT.Belle2.MVA.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
     method = basf2_mva_util.Method(general_options.m_identifier)
     test_data = ["test.root"]
@@ -231,7 +231,7 @@ if __name__ == "__main__":
     specific_options.m_mini_batch_size = 400
     specific_options.m_config = '{"pre_train_epochs" : 0, "adversary_steps": 1, '\
         ' "learning_rate": 0.001, "lambda": -1.0}'
-    ROOT.Belle2.MVA.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
     method = basf2_mva_util.Method(general_options.m_identifier)
     test_data = ["test.root"]
@@ -245,7 +245,7 @@ if __name__ == "__main__":
     specific_options.m_mini_batch_size = 400
     specific_options.m_config = '{"pre_train_epochs" : 0, "adversary_steps": 1, '\
         ' "learning_rate": 0.001, "lambda": -1.0}'
-    ROOT.Belle2.MVA.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
     method = basf2_mva_util.Method(general_options.m_identifier)
     test_data = ["test.root"]

@@ -300,17 +300,17 @@ if __name__ == "__main__":
         print('Train relational net with pre-training')
         general_options.m_identifier = os.path.join(path, 'relation_2.xml')
         specific_options.m_config = json.dumps({'use_relations': True, 'use_feed_forward': False, 'pre_training_epochs': 3000})
-        ROOT.Belle2.MVA.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
         print('Train feed forward net')
         general_options.m_identifier = os.path.join(path, 'feed_forward.xml')
         specific_options.m_config = json.dumps({'use_relations': False, 'use_feed_forward': True, 'pre_training_epochs': 0})
-        ROOT.Belle2.MVA.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
         print('Train relational net')
         general_options.m_identifier = os.path.join(path, 'relation.xml')
         specific_options.m_config = json.dumps({'use_relations': True, 'use_feed_forward': True, 'pre_training_epochs': 0})
-        ROOT.Belle2.MVA.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
         # ########################Compare Results####################################
 

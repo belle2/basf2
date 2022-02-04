@@ -51,10 +51,10 @@ if __name__ == "__main__":
 
         for identifier, specific_options in methods:
             general_options.m_identifier = identifier
-            ROOT.Belle2.MVA.teacher(general_options, specific_options)
+            ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
-        ROOT.Belle2.MVA.expert(basf2_mva.vector(*[i for i, _ in methods]),
-                               basf2_mva.vector('train.root'), 'tree', 'expert.root')
+        ROOT.Belle2.MVA.Utility.expert(basf2_mva.vector(*[i for i, _ in methods]),
+                                       basf2_mva.vector('train.root'), 'tree', 'expert.root')
 
         subprocess.call('basf2_mva_evaluate.py -c -o latex.pdf -train train.root -data test.root -i ' +
                         ' '.join([i for i, _ in methods]), shell=True)

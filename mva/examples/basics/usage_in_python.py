@@ -29,20 +29,20 @@ if __name__ == "__main__":
 
     fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
 
-    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
 
     # Download the weightfile from the database and store it on disk in a root file
-    ROOT.Belle2.MVA.download('MVADatabaseIdentifier', 'weightfile.root')
+    ROOT.Belle2.MVA.Utility.download('MVADatabaseIdentifier', 'weightfile.root')
 
     # Train a MVA method and store the weightfile on disk in a root file
     general_options.m_identifier = "weightfile2.root"
-    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
 
     # Upload the weightfile on disk to the database
-    ROOT.Belle2.MVA.upload('weightfile2.root', 'MVADatabaseIdentifier2')
+    ROOT.Belle2.MVA.Utility.upload('weightfile2.root', 'MVADatabaseIdentifier2')
 
     # Apply the trained methods on data
-    ROOT.Belle2.MVA.expert(
+    ROOT.Belle2.MVA.Utility.expert(
         basf2_mva.vector(
             'weightfile.root',
             'weightfile2.root',

@@ -76,17 +76,17 @@ if __name__ == "__main__":
     specific_options = ROOT.Belle2.MVA.PythonOptions()
     specific_options.m_framework = 'hep_ml'
     specific_options.m_steering_file = 'mva/examples/orthogonal_discriminators/hep_ml_ugboost.py'
-    ROOT.Belle2.MVA.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
     # Set the parameters of the uBoostClassifier
     import json
     specific_options.m_config = json.dumps({'uniform_rate': 10.0})
     general_options.m_identifier = "hep_ml"
-    ROOT.Belle2.MVA.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
     specific_options = ROOT.Belle2.MVA.PythonOptions()
     general_options.m_identifier = "hep_ml_feature_drop"
     specific_options.m_framework = 'hep_ml'
     specific_options.m_steering_file = 'mva/examples/orthogonal_discriminators/hep_ml_ugboost.py'
     general_options.m_variables = basf2_mva.vector(*variables2)
-    ROOT.Belle2.MVA.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)

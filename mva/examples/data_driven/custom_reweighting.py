@@ -41,13 +41,13 @@ if __name__ == "__main__":
     # isMC is 1 for MC and 0 for Data
     general_options.m_target_variable = "isMC"
     fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
-    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
 
     reweighter_options = ROOT.Belle2.MVA.ReweighterOptions()
     reweighter_options.m_variable = 'isContinuumEvent'
     reweighter_options.m_weightfile = "boost.xml"
     general_options.m_identifier = "reweighter.xml"
-    ROOT.Belle2.MVA.teacher(general_options, reweighter_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, reweighter_options)
 
     # Now you can use the reweighter.xml expert to output the correct weights
     # and use them in another training

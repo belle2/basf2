@@ -180,13 +180,13 @@ if __name__ == "__main__":
         general_options.m_identifier = os.path.join(path, 'relation.xml')
         specific_options.m_config = json.dumps({'use_relations': True,
                                                 'number_features': 3})
-        ROOT.Belle2.MVA.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
         # Train normal feed forward Net:
         print('Train feed forward net')
         general_options.m_identifier = os.path.join(path, 'feed_forward.xml')
         specific_options.m_config = json.dumps({'use_relations': False})
-        ROOT.Belle2.MVA.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
         # ########################Compare Results####################################
         method1 = basf2_mva_util.Method(os.path.join(path, 'relation.xml'))

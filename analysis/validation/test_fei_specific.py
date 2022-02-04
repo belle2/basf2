@@ -27,8 +27,6 @@ import basf2 as b2
 import modularAnalysis as ma
 import ROOT
 
-ROOT.Belle2.MVA.loadRootDictionary()
-
 tempdir = tempfile.mkdtemp()
 os.chdir(tempdir)
 

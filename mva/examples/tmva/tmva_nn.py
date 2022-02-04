@@ -45,7 +45,7 @@ if __name__ == "__main__":
     tmva_nn_options.m_config = ("H:!V:CreateMVAPdfs:VarTransform=N:NCycles=10:HiddenLayers=N+1:TrainingMethod=BFGS")
 
     training_start = time.time()
-    ROOT.Belle2.MVA.teacher(general_options, tmva_nn_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, tmva_nn_options)
     training_stop = time.time()
 
     training_time = training_stop - training_start

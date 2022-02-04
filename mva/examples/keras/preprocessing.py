@@ -139,7 +139,7 @@ if __name__ == "__main__":
     specific_options.m_training_fraction = 0.9
 
     training_start = time.time()
-    ROOT.Belle2.MVA.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
     training_stop = time.time()
     training_time = training_stop - training_start
     method = basf2_mva_util.Method(general_options.m_identifier)

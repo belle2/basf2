@@ -68,4 +68,4 @@ if __name__ == "__main__":
     meta_options.m_sideband_variable = 'sideband'
     meta_options.m_sideband_mc_files = basf2_mva.vector("train_mc.root")
 
-    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options, meta_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options, meta_options)

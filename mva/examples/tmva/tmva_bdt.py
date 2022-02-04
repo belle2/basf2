@@ -44,7 +44,7 @@ if __name__ == "__main__":
                                  "BaggedSampleFraction=0.5:nCuts=1024:MaxDepth=3:IgnoreNegWeightsInTraining")
 
     training_start = time.time()
-    ROOT.Belle2.MVA.teacher(general_options, tmva_bdt_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, tmva_bdt_options)
     training_stop = time.time()
 
     training_time = training_stop - training_start

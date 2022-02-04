@@ -585,7 +585,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=N
 
             if downloadFlag:
                 if not os.path.isfile(identifierEventLevel):
-                    ROOT.Belle2.MVA.download(methodPrefixEventLevel, identifierEventLevel)
+                    ROOT.Belle2.MVA.Utility.download(methodPrefixEventLevel, identifierEventLevel)
                     if not os.path.isfile(identifierEventLevel):
                         B2FATAL('Flavor Tagger: Weight file ' + identifierEventLevel +
                                 ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
@@ -750,10 +750,10 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu', categories=None):
             trainingOptionsEventLevel.m_target_variable = targetVariable
             trainingOptionsEventLevel.m_max_events = maxEventsNumber
 
-            ROOT.Belle2.MVA.teacher(trainingOptionsEventLevel, getFastBDTCategories())
+            ROOT.Belle2.MVA.Utility.teacher(trainingOptionsEventLevel, getFastBDTCategories())
 
             if uploadFlag:
-                ROOT.Belle2.MVA.upload(weightFile, methodPrefixEventLevel)
+                ROOT.Belle2.MVA.Utility.upload(weightFile, methodPrefixEventLevel)
 
     if ReadyMethods != len(categories):
         return False
@@ -812,7 +812,7 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None,
 
             if downloadFlag:
                 if not os.path.isfile(identifierFBDT):
-                    ROOT.Belle2.MVA.download(methodPrefixCombinerLevel + 'FBDT', identifierFBDT)
+                    ROOT.Belle2.MVA.Utility.download(methodPrefixCombinerLevel + 'FBDT', identifierFBDT)
                     if not os.path.isfile(identifierFBDT):
                         B2FATAL('Flavor Tagger: Weight file ' + identifierFBDT +
                                 ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
@@ -831,7 +831,7 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None,
 
             if downloadFlag:
                 if not os.path.isfile(identifierFANN):
-                    ROOT.Belle2.MVA.download(methodPrefixCombinerLevel + 'FANN', identifierFANN)
+                    ROOT.Belle2.MVA.Utility.download(methodPrefixCombinerLevel + 'FANN', identifierFANN)
                     if not os.path.isfile(identifierFANN):
                         B2FATAL('Flavor Tagger: Weight file ' + identifierFANN +
                                 ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
@@ -900,11 +900,11 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu', variablesCombinerLevel=None,
             trainingOptionsCombinerLevel.m_target_variable = 'qrCombined'
             trainingOptionsCombinerLevel.m_max_events = maxEventsNumber
 
-            ROOT.Belle2.MVA.teacher(trainingOptionsCombinerLevel, getFastBDTCombiner())
+            ROOT.Belle2.MVA.Utility.teacher(trainingOptionsCombinerLevel, getFastBDTCombiner())
 
             if uploadFlag:
-                ROOT.Belle2.MVA.upload(filesDirectory + '/' + methodPrefixCombinerLevel +
-                                       'FBDT' + "_1.root", methodPrefixCombinerLevel + 'FBDT')
+                ROOT.Belle2.MVA.Utility.upload(filesDirectory + '/' + methodPrefixCombinerLevel +
+                                               'FBDT' + "_1.root", methodPrefixCombinerLevel + 'FBDT')
 
         elif FANNmlp and not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root'):
 
@@ -930,11 +930,11 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu', variablesCombinerLevel=None,
             trainingOptionsCombinerLevel.m_target_variable = 'qrCombined'
             trainingOptionsCombinerLevel.m_max_events = maxEventsNumber
 
-            ROOT.Belle2.MVA.teacher(trainingOptionsCombinerLevel, getMlpFANNCombiner())
+            ROOT.Belle2.MVA.Utility.teacher(trainingOptionsCombinerLevel, getMlpFANNCombiner())
 
             if uploadFlag:
-                ROOT.Belle2.MVA.upload(filesDirectory + '/' + methodPrefixCombinerLevel +
-                                       'FANN' + "_1.root", methodPrefixCombinerLevel + 'FANN')
+                ROOT.Belle2.MVA.Utility.upload(filesDirectory + '/' + methodPrefixCombinerLevel +
+                                               'FANN' + "_1.root", methodPrefixCombinerLevel + 'FANN')
 
         elif TMVAfbdt and not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root'):
 

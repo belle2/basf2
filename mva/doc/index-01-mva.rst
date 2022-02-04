@@ -185,7 +185,7 @@ Lets look at an example in python:
 
     sp = ROOT.Belle2.MVA.FastBDTOptions()
 
-    ROOT.Belle2.MVA.teacher(go, sp)
+    ROOT.Belle2.MVA.Utility.teacher(go, sp)
 
 The same thing can be done using the command line via::
 
@@ -245,7 +245,7 @@ Finally, you can also apply the MVA method onto a ROOT file using the basf2_mva_
 
     import ROOT
  
-    ROOT.Belle2.MVA.expert(basf2_mva.vector('DatabaseIdentifier'),
+    ROOT.Belle2.MVA.Utility.expert(basf2_mva.vector('DatabaseIdentifier'),
                            basf2_mva.vector('test.root'),
                            'tree', 'expert.root')
 

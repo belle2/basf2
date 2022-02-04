@@ -197,8 +197,8 @@ class Method(object):
         self.root_variables = [ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(v) for v in self.variables]
         #: Dictionary of the variables sorted by their importance but with root compatoble variable names
         self.root_importances = {k: importances[k] for k in self.root_variables}
-        #: Description of the method as a xml string returned by ROOT.Belle2.MVA.info
-        self.description = str(ROOT.Belle2.MVA.info(self.identifier))
+        #: Description of the method as a xml string returned by ROOT.Belle2.MVA.Utility.info
+        self.description = str(ROOT.Belle2.MVA.Utility.info(self.identifier))
         #: List of spectators
         self.spectators = [str(v) for v in self.general_options.m_spectators]
         #: List of spectators with root compatible names
@@ -209,8 +209,10 @@ class Method(object):
         Train a new method using this method as a prototype
         @param datafiles the training datafiles
         @param treename the name of the tree containing the training data
-        @param general_options general options given to ROOT.Belle2.MVA.teacher (if None the options of this method are used)
-        @param specific_options specific options given to ROOT.Belle2.MVA.teacher (if None the options of this method are used)
+        @param general_options general options given to ROOT.Belle2.MVA.Utility.teacher
+          (if None the options of this method are used)
+        @param specific_options specific options given to ROOT.Belle2.MVA.Utility.teacher
+          (if None the options of this method are used)
         """
         import ROOT  # noqa
         if isinstance(datafiles, str):
@@ -226,7 +228,7 @@ class Method(object):
             general_options.m_datafiles = basf2_mva.vector(*datafiles)
             general_options.m_identifier = identifier
 
-            ROOT.Belle2.MVA.teacher(general_options, specific_options)
+            ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
             method = Method(identifier)
         return method
@@ -245,10 +247,10 @@ class Method(object):
             ROOT.Belle2.MVA.Weightfile.save(self.weightfile, identifier)
 
             rootfilename = tempdir + '/expert.root'
-            ROOT.Belle2.MVA.expert(basf2_mva.vector(identifier),
-                                   basf2_mva.vector(*datafiles),
-                                   treename,
-                                   rootfilename)
+            ROOT.Belle2.MVA.Utility.expert(basf2_mva.vector(identifier),
+                                           basf2_mva.vector(*datafiles),
+                                           treename,
+                                           rootfilename)
             rootfile = ROOT.TFile(rootfilename, "UPDATE")
             roottree = rootfile.Get("variables")
 

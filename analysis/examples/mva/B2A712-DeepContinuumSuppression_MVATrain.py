@@ -152,7 +152,7 @@ if __name__ == "__main__":
     specific_options.m_config = json.dumps(keras_dic)
 
     # Train a MVA method and store the weightfile (Deep_Feed_Forward.xml) locally.
-    ROOT.Belle2.MVA.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
     # Evaluate training.
     subprocess.call('basf2_mva_evaluate.py '
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     # If you're only interested in the network output distribution, then
     # comment these in to apply the trained methods on train and test sample
     #
-    # ROOT.Belle2.MVA.expert(basf2_mva.vector('Deep_Feed_Forward.xml'),
-    #                        basf2_mva.vector(train_data), 'tree', 'MVAExpert_train.root')
-    # ROOT.Belle2.MVA.expert(basf2_mva.vector('Deep_Feed_Forward.xml'),
-    #                        basf2_mva.vector(test_data), 'tree', 'MVAExpert_test.root')
+    # ROOT.Belle2.MVA.Utility.expert(basf2_mva.vector('Deep_Feed_Forward.xml'),
+    #                                basf2_mva.vector(train_data), 'tree', 'MVAExpert_train.root')
+    # ROOT.Belle2.MVA.Utility.expert(basf2_mva.vector('Deep_Feed_Forward.xml'),
+    #                                basf2_mva.vector(test_data), 'tree', 'MVAExpert_test.root')

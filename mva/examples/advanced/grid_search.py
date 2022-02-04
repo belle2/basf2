@@ -29,7 +29,7 @@ if __name__ == "__main__":
     general_options.m_target_variable = "isSignal"
 
     fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
-    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
 
     # Load the model and train it again searching for the best hyperparameters
     def grid_search(hyperparameters):

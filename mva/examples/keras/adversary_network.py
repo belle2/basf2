@@ -273,12 +273,12 @@ if __name__ == "__main__":
     number_bins: Number of Bins which are used to quantify the spectators. 10 should be sufficient.
     """
     specific_options.m_config = '{"adversary_steps": 5, "learning_rate": 0.001, "lambda": 20.0, "number_bins": 10}'
-    ROOT.Belle2.MVA.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
     general_options.m_identifier = "keras_baseline"
     specific_options.m_config = '{"adversary_steps": 1, "learning_rate": 0.001, "lambda": 0.0, "number_bins": 10}'
-    ROOT.Belle2.MVA.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
     general_options.m_variables = basf2_mva.vector(*variables2)
     general_options.m_identifier = "keras_feature_drop"
-    ROOT.Belle2.MVA.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)

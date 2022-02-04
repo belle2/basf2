@@ -78,7 +78,7 @@ if __name__ == "__main__":
     for label, options in [("FastBDT", fastbdt_options), ("FastBDT_PT", fastbdt_pt_options)]:
         training_start = time.time()
         general_options.m_identifier = label
-        ROOT.Belle2.MVA.teacher(general_options, options)
+        ROOT.Belle2.MVA.Utility.teacher(general_options, options)
         training_stop = time.time()
         training_time = training_stop - training_start
         method = basf2_mva_util.Method(general_options.m_identifier)

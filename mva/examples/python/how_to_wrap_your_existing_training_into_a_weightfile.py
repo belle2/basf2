@@ -129,7 +129,7 @@ if __name__ == "__main__":
     python_options.m_framework = "custom"
     python_options.m_steering_file = "mva/examples/python/how_to_wrap_your_existing_training_into_a_weightfile.py"
 
-    ROOT.Belle2.MVA.teacher(general_options, python_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, python_options)
 
     # Apply the training as usual
     method = basf2_mva_util.Method(general_options.m_identifier)

@@ -93,7 +93,7 @@ if __name__ == "__main__":
     fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
 
     # Train a MVA method and store the weightfile (MVAFastBDT.root) locally.
-    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
 
     # Evaluate training.
     subprocess.call('basf2_mva_evaluate.py '
@@ -108,9 +108,13 @@ if __name__ == "__main__":
     # comment these in to apply the trained methods on an independent sample
     # (produced in B2A701 if you ran with the `apply_signal` and `apply_qqbar` options).
     #
-    ROOT.Belle2.MVA.expert(
+    ROOT.Belle2.MVA.Utility.expert(
         basf2_mva.vector('MVAFastBDT.root'),
         basf2_mva.vector(apply_signal_data),
         'tree',
         'MVAExpert_signal.root')
-    ROOT.Belle2.MVA.expert(basf2_mva.vector('MVAFastBDT.root'), basf2_mva.vector(apply_qqbar_data), 'tree', 'MVAExpert_qqbar.root')
+    ROOT.Belle2.MVA.Utility.expert(
+        basf2_mva.vector('MVAFastBDT.root'),
+        basf2_mva.vector(apply_qqbar_data),
+        'tree',
+        'MVAExpert_qqbar.root')

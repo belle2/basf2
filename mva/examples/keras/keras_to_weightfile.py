@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
         general_options.m_identifier = 'converted_keras'
         specific_options.m_config = json.dumps({'file_path': os.path.join(path, 'weights.h5')})
-        ROOT.Belle2.MVA.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
         # ########################Apply weightfile####################################
         method = basf2_mva_util.Method(general_options.m_identifier)

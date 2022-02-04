@@ -220,7 +220,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
 
         specific_options.m_config = json.dumps(classifier_args)
 
-        ROOT.Belle2.MVA.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
 
     elif mode == 'expert':
 

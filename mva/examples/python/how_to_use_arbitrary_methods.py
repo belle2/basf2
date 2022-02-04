@@ -229,7 +229,7 @@ if __name__ == "__main__":
 
     # Now you can train as usual
     # Of course you can also use the command line command basf2_mva_teacher to do so
-    ROOT.Belle2.MVA.teacher(general_options, python_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, python_options)
 
     # To validate your method it is convenient to use basf2_mva_util to load a trained method
     method = basf2_mva_util.Method(general_options.m_identifier)

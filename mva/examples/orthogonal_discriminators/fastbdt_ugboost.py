@@ -60,13 +60,13 @@ if __name__ == "__main__":
     fastbdt_options.m_randRatio = 0.5
     fastbdt_options.m_flatnessLoss = 10.0
 
-    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
 
     general_options.m_identifier = "fastbdt_baseline"
     fastbdt_options.m_flatnessLoss = -1.0
-    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
 
     general_options.m_identifier = "fastbdt_drop_feature"
     fastbdt_options.m_flatnessLoss = -1.0
     general_options.m_variables = basf2_mva.vector(*variables2)
-    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)

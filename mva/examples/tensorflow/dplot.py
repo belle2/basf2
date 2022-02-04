@@ -238,4 +238,4 @@ if __name__ == "__main__":
     specific_options.m_steering_file = 'mva/examples/tensorflow/dplot.py'
     specific_options.m_nIterations = 2  # Feed data twice (first time for boost training, second time for dplot training)
     specific_options.m_mini_batch_size = 0  # Pass all events each 'batch'
-    ROOT.Belle2.MVA.teacher(general_options, specific_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)

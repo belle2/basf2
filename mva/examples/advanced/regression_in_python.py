@@ -35,7 +35,7 @@ def train_mva_method(file_name):
     #   base_options = regression_fastbdt_options.getBaseClassifierOptions()
     #   ...
 
-    ROOT.Belle2.MVA.teacher(general_options, regression_fastbdt_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, regression_fastbdt_options)
 
     return weight_file
 
@@ -54,7 +54,7 @@ def create_random_data():
 def apply_expert(file_name, weight_file):
     import ROOT  # noqa
     output_file = 'expert.root'
-    ROOT.Belle2.MVA.expert(basf2_mva.vector(weight_file), basf2_mva.vector(file_name), 'tree', output_file)
+    ROOT.Belle2.MVA.Utility.expert(basf2_mva.vector(weight_file), basf2_mva.vector(file_name), 'tree', output_file)
     return output_file
 
 

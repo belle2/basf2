@@ -86,11 +86,11 @@ if __name__ == "__main__":
         os.symlink(os.path.abspath('train.root'), tempdir + '/' + os.path.basename('train.root'))
         os.chdir(tempdir)
 
-        ROOT.Belle2.MVA.teacher(general_options, specific_options)
-        ROOT.Belle2.MVA.expert(basf2_mva.vector("Python.xml"),
-                               basf2_mva.vector('train.root'), 'tree', 'expert.root')
+        ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.Utility.expert(basf2_mva.vector("Python.xml"),
+                                       basf2_mva.vector('train.root'), 'tree', 'expert.root')
         specific_options.m_normalize = True
-        ROOT.Belle2.MVA.teacher(general_options, specific_options)
-        ROOT.Belle2.MVA.expert(basf2_mva.vector("Python.xml"),
-                               basf2_mva.vector('train.root'), 'tree', 'expert.root')
+        ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+        ROOT.Belle2.MVA.Utility.expert(basf2_mva.vector("Python.xml"),
+                                       basf2_mva.vector('train.root'), 'tree', 'expert.root')
         os.chdir(olddir)

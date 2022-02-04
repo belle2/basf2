@@ -419,7 +419,7 @@ class PostReconstruction:
             for channel in particle.channels:
                 # weightfile = self.config.prefix + '_' + channel.label
                 weightfile = channel.label + '.xml'
-                if not ROOT.Belle2.MVA.available(weightfile):
+                if not ROOT.Belle2.MVA.Utility.available(weightfile):
                     missing += [channel.label]
         return missing
 
@@ -615,7 +615,7 @@ class Teacher:
         import ROOT  # noqa
         disk = channel + '.xml'
         dbase = self.config.prefix + '_' + channel
-        ROOT.Belle2.MVA.upload(disk, dbase)
+        ROOT.Belle2.MVA.Utility.upload(disk, dbase)
         return (disk, dbase)
 
     def do_all_trainings(self):
@@ -643,7 +643,7 @@ class Teacher:
                 for particle in self.particles:
                     for channel in particle.channels:
                         weightfile = channel.label + '.xml'
-                        if not ROOT.Belle2.MVA.available(weightfile):
+                        if not ROOT.Belle2.MVA.Utility.available(weightfile):
                             keys = [m for m in f.GetListOfKeys() if f"{channel.label}" in m.GetName()]
                             if not keys:
                                 continue
@@ -681,7 +681,7 @@ class Teacher:
         p.join()
         weightfiles = []
         for name, _ in job_list:
-            if not ROOT.Belle2.MVA.available(name + '.xml'):
+            if not ROOT.Belle2.MVA.Utility.available(name + '.xml'):
                 B2WARNING("Training of MVC failed. For unknown reasons, check the logfile")
                 self.create_fake_weightfile(name)
             weightfiles.append(self.upload(name))
@@ -706,12 +706,12 @@ def convert_legacy_training(particles: typing.Sequence[config.Particle], configu
         for channel in particle.channels:
             new_weightfile = configuration.prefix + '_' + channel.label
             old_weightfile = configuration.prefix + '_' + channel2lists[channel.label.replace('Jpsi', 'J/psi')]
-            if not ROOT.Belle2.MVA.available(new_weightfile):
-                if old_weightfile is None or not ROOT.Belle2.MVA.available(old_weightfile):
+            if not ROOT.Belle2.MVA.Utility.available(new_weightfile):
+                if old_weightfile is None or not ROOT.Belle2.MVA.Utility.available(old_weightfile):
                     Teacher.create_fake_weightfile(channel.label)
                     teacher.upload(channel.label)
                 else:
-                    ROOT.Belle2.MVA.download(old_weightfile, channel.label + '.xml')
+                    ROOT.Belle2.MVA.Utility.download(old_weightfile, channel.label + '.xml')
                     teacher.upload(channel.label)
 
 

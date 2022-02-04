@@ -65,4 +65,4 @@ if __name__ == "__main__":
     meta_options.m_reweighting_mc_files = basf2_mva.vector("train_mc_continuum.root")
     meta_options.m_reweighting_data_files = basf2_mva.vector("train_data_continuum.root")
 
-    ROOT.Belle2.MVA.teacher(general_options, fastbdt_options, meta_options)
+    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options, meta_options)

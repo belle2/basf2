@@ -557,7 +557,7 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
     if (temp_ctime_trgtype != temp_ctime_trgtype_footer ||
         (temp_eve & 0xffff) != ((temp_eve_footer >> 16) & 0xffff)) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : ch=%d : ERROR_EVENT : mismatch(finesse %d) between header(ctime %.8x eve %.8x) and footer(ctime %.8x eve_crc16 %.8x). Exiting... : exp %d run %d sub %d : %s %s %d\n",
+      printf("[FATAL] thread %d : ch=%d : ERROR_EVENT : mismatch(finesse %d) between header(ctime 0x%.8x eve 0x%.8x) and footer(ctime 0x%.8x eve_crc16 0x%.8x). Exiting... : exp %d run %d sub %d : %s %s %d\n",
              sender_id, i, i,
              temp_ctime_trgtype,  temp_eve, temp_ctime_trgtype_footer, temp_eve_footer,
              (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
@@ -575,7 +575,7 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
   if (err_flag == 1) {
     pthread_mutex_lock(&(mtx_sender_log));
     sprintf(err_buf,
-            "[FATAL] thread %d : ch= %d or %d : ERROR_EVENT : mismatch header value over FINESSES ( between ch %d and ch %d ). Exiting...: ",
+            "[FATAL] thread %d : ch= %d or %d : ERROR_EVENT : mismatch header value over FINESSEs ( between ch %d and ch %d ). Exiting...: ",
             sender_id, err_ch, first_ch, err_ch, first_ch);
     for (int i = 0; i <  MAX_PCIE40_CH; i++) {
       if (used_ch[ i ] == 1) {
@@ -1250,7 +1250,6 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
       exit(1);
 #endif
     }
-
 
     //
     // Check if the current position exceeds the event end

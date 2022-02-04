@@ -119,36 +119,58 @@ def set_FlavorTagger_pid_aliases():
         variables.variables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC), 0.5)')
 
 
-# Options for Track and Event Levels
-fastBDTCategories = basf2_mva.FastBDTOptions()
-fastBDTCategories.m_nTrees = 500
-fastBDTCategories.m_nCuts = 8
-fastBDTCategories.m_nLevels = 3
-fastBDTCategories.m_shrinkage = 0.10
-fastBDTCategories.m_randRatio = 0.5
+def getFastBDTCategories():
+    '''
+    Helper function for getting the FastBDT categories.
+    It's necessary for removing top-level ROOT imports.
+    '''
+    import ROOT  # noqa
+    fastBDTCategories = ROOT.Belle2.MVA.FastBDTOptions()
+    fastBDTCategories.m_nTrees = 500
+    fastBDTCategories.m_nCuts = 8
+    fastBDTCategories.m_nLevels = 3
+    fastBDTCategories.m_shrinkage = 0.10
+    fastBDTCategories.m_randRatio = 0.5
+    return fastBDTCategories
 
-# Options for Combiner Level
-fastBDTCombiner = basf2_mva.FastBDTOptions()
-fastBDTCombiner.m_nTrees = 500
-fastBDTCombiner.m_nCuts = 8
-fastBDTCombiner.m_nLevels = 3
-fastBDTCombiner.m_shrinkage = 0.10
-fastBDTCombiner.m_randRatio = 0.5
 
-mlpFANNCombiner = basf2_mva.FANNOptions()
-mlpFANNCombiner.m_max_epochs = 10000
-mlpFANNCombiner.m_hidden_layers_architecture = "3*N"
-mlpFANNCombiner.m_hidden_activiation_function = "FANN_SIGMOID_SYMMETRIC"
-mlpFANNCombiner.m_output_activiation_function = "FANN_SIGMOID_SYMMETRIC"
-mlpFANNCombiner.m_error_function = "FANN_ERRORFUNC_LINEAR"
-mlpFANNCombiner.m_training_method = "FANN_TRAIN_RPROP"
-mlpFANNCombiner.m_validation_fraction = 0.5
-mlpFANNCombiner.m_random_seeds = 10
-mlpFANNCombiner.m_test_rate = 500
-mlpFANNCombiner.m_number_of_threads = 8
-mlpFANNCombiner.m_scale_features = True
-mlpFANNCombiner.m_scale_target = False
-# mlpFANNCombiner.m_scale_target = True
+def getFastBDTCombiner():
+    '''
+    Helper function for getting the FastBDT combiner.
+    It's necessary for removing top-level ROOT imports.
+    '''
+    import ROOT  # noqa
+    fastBDTCombiner = ROOT.Belle2.MVA.FastBDTOptions()
+    fastBDTCombiner.m_nTrees = 500
+    fastBDTCombiner.m_nCuts = 8
+    fastBDTCombiner.m_nLevels = 3
+    fastBDTCombiner.m_shrinkage = 0.10
+    fastBDTCombiner.m_randRatio = 0.5
+    return fastBDTCombiner
+
+
+def getMlpFANNCombiner():
+    '''
+    Helper function for getting the MLP FANN combiner.
+    It's necessary for removing top-level ROOT imports.
+    '''
+    import ROOT  # noqa
+    mlpFANNCombiner = ROOT.Belle2.MVA.FANNOptions()
+    mlpFANNCombiner.m_max_epochs = 10000
+    mlpFANNCombiner.m_hidden_layers_architecture = "3*N"
+    mlpFANNCombiner.m_hidden_activiation_function = "FANN_SIGMOID_SYMMETRIC"
+    mlpFANNCombiner.m_output_activiation_function = "FANN_SIGMOID_SYMMETRIC"
+    mlpFANNCombiner.m_error_function = "FANN_ERRORFUNC_LINEAR"
+    mlpFANNCombiner.m_training_method = "FANN_TRAIN_RPROP"
+    mlpFANNCombiner.m_validation_fraction = 0.5
+    mlpFANNCombiner.m_random_seeds = 10
+    mlpFANNCombiner.m_test_rate = 500
+    mlpFANNCombiner.m_number_of_threads = 8
+    mlpFANNCombiner.m_scale_features = True
+    mlpFANNCombiner.m_scale_target = False
+    # mlpFANNCombiner.m_scale_target = True
+    return mlpFANNCombiner
+
 
 # SignalFraction: FBDT feature
 # For smooth output set to -1, this will break the calibration.
@@ -533,6 +555,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=N
     Samples data for training or tests all categories all categories at event level.
     """
 
+    import ROOT  # noqa
     from basf2 import create_path
     from basf2 import register_module
 
@@ -562,7 +585,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=N
 
             if downloadFlag:
                 if not os.path.isfile(identifierEventLevel):
-                    basf2_mva.download(methodPrefixEventLevel, identifierEventLevel)
+                    ROOT.Belle2.MVA.download(methodPrefixEventLevel, identifierEventLevel)
                     if not os.path.isfile(identifierEventLevel):
                         B2FATAL('Flavor Tagger: Weight file ' + identifierEventLevel +
                                 ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
@@ -694,6 +717,8 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu', categories=None):
     Trains all categories at event level.
     """
 
+    import ROOT  # noqa
+
     B2INFO('EVENT LEVEL TEACHER')
 
     ReadyMethods = 0
@@ -717,7 +742,7 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu', categories=None):
 
         else:
             B2INFO('flavorTagger: MVA Teacher training' + methodPrefixEventLevel + ' .')
-            trainingOptionsEventLevel = basf2_mva.GeneralOptions()
+            trainingOptionsEventLevel = ROOT.Belle2.MVA.GeneralOptions()
             trainingOptionsEventLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
             trainingOptionsEventLevel.m_treename = methodPrefixEventLevel + "_tree"
             trainingOptionsEventLevel.m_identifier = weightFile
@@ -725,10 +750,10 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu', categories=None):
             trainingOptionsEventLevel.m_target_variable = targetVariable
             trainingOptionsEventLevel.m_max_events = maxEventsNumber
 
-            basf2_mva.teacher(trainingOptionsEventLevel, fastBDTCategories)
+            ROOT.Belle2.MVA.teacher(trainingOptionsEventLevel, getFastBDTCategories())
 
             if uploadFlag:
-                basf2_mva.upload(weightFile, methodPrefixEventLevel)
+                ROOT.Belle2.MVA.upload(weightFile, methodPrefixEventLevel)
 
     if ReadyMethods != len(categories):
         return False
@@ -741,6 +766,8 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None,
     """
     Samples the input data or tests the combiner according to the selected categories.
     """
+
+    import ROOT  # noqa
 
     B2INFO('COMBINER LEVEL')
 
@@ -785,7 +812,7 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None,
 
             if downloadFlag:
                 if not os.path.isfile(identifierFBDT):
-                    basf2_mva.download(methodPrefixCombinerLevel + 'FBDT', identifierFBDT)
+                    ROOT.Belle2.MVA.download(methodPrefixCombinerLevel + 'FBDT', identifierFBDT)
                     if not os.path.isfile(identifierFBDT):
                         B2FATAL('Flavor Tagger: Weight file ' + identifierFBDT +
                                 ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
@@ -804,7 +831,7 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None,
 
             if downloadFlag:
                 if not os.path.isfile(identifierFANN):
-                    basf2_mva.download(methodPrefixCombinerLevel + 'FANN', identifierFANN)
+                    ROOT.Belle2.MVA.download(methodPrefixCombinerLevel + 'FANN', identifierFANN)
                     if not os.path.isfile(identifierFANN):
                         B2FATAL('Flavor Tagger: Weight file ' + identifierFANN +
                                 ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
@@ -844,6 +871,8 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu', variablesCombinerLevel=None,
     Trains the combiner according to the selected categories.
     """
 
+    import ROOT  # noqa
+
     B2INFO('COMBINER LEVEL TEACHER')
 
     if variablesCombinerLevel is None:
@@ -863,7 +892,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu', variablesCombinerLevel=None,
 
             B2INFO('flavorTagger: MVA Teacher training a FastBDT on Combiner Level')
 
-            trainingOptionsCombinerLevel = basf2_mva.GeneralOptions()
+            trainingOptionsCombinerLevel = ROOT.Belle2.MVA.GeneralOptions()
             trainingOptionsCombinerLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
             trainingOptionsCombinerLevel.m_treename = methodPrefixCombinerLevel + 'FBDT' + "_tree"
             trainingOptionsCombinerLevel.m_identifier = filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + "_1.root"
@@ -871,11 +900,11 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu', variablesCombinerLevel=None,
             trainingOptionsCombinerLevel.m_target_variable = 'qrCombined'
             trainingOptionsCombinerLevel.m_max_events = maxEventsNumber
 
-            basf2_mva.teacher(trainingOptionsCombinerLevel, fastBDTCombiner)
+            ROOT.Belle2.MVA.teacher(trainingOptionsCombinerLevel, getFastBDTCombiner())
 
             if uploadFlag:
-                basf2_mva.upload(filesDirectory + '/' + methodPrefixCombinerLevel +
-                                 'FBDT' + "_1.root", methodPrefixCombinerLevel + 'FBDT')
+                ROOT.Belle2.MVA.upload(filesDirectory + '/' + methodPrefixCombinerLevel +
+                                       'FBDT' + "_1.root", methodPrefixCombinerLevel + 'FBDT')
 
         elif FANNmlp and not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root'):
 
@@ -893,7 +922,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu', variablesCombinerLevel=None,
 
             B2INFO('flavorTagger: MVA Teacher training a FANN MLP on Combiner Level')
 
-            trainingOptionsCombinerLevel = basf2_mva.GeneralOptions()
+            trainingOptionsCombinerLevel = ROOT.Belle2.MVA.GeneralOptions()
             trainingOptionsCombinerLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
             trainingOptionsCombinerLevel.m_treename = methodPrefixCombinerLevel + 'FBDT' + "_tree"
             trainingOptionsCombinerLevel.m_identifier = filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + "_1.root"
@@ -901,11 +930,11 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu', variablesCombinerLevel=None,
             trainingOptionsCombinerLevel.m_target_variable = 'qrCombined'
             trainingOptionsCombinerLevel.m_max_events = maxEventsNumber
 
-            basf2_mva.teacher(trainingOptionsCombinerLevel, mlpFANNCombiner)
+            ROOT.Belle2.MVA.teacher(trainingOptionsCombinerLevel, getMlpFANNCombiner())
 
             if uploadFlag:
-                basf2_mva.upload(filesDirectory + '/' + methodPrefixCombinerLevel +
-                                 'FANN' + "_1.root", methodPrefixCombinerLevel + 'FANN')
+                ROOT.Belle2.MVA.upload(filesDirectory + '/' + methodPrefixCombinerLevel +
+                                       'FANN' + "_1.root", methodPrefixCombinerLevel + 'FANN')
 
         elif TMVAfbdt and not os.path.isfile(filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root'):
 

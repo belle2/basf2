@@ -350,8 +350,9 @@ def parser_class_decorator(cls, parser_type):
             | DOUBLE
 
         <generalidentifier> ::= IDENTIFIER
-            | PARTICLENAME LABEL
             | PARTICLENAME
+            | IDENTIFIER LABEL
+            | PARTICLENAME LABEL
 
         <function> ::= IDENTIFIER LPAREN <parameters> RPAREN
 
@@ -846,6 +847,16 @@ def parser_class_decorator(cls, parser_type):
                 <generalidentifier> ::= IDENTIFIER
             """
             return p.IDENTIFIER
+
+        @_(r"IDENTIFIER LABEL")  # noqa: F821
+        def generalidentifier(self, p):  # noqa: F811
+            """
+            Parsing function for <generalidentifier> nonterminal
+
+            Grammar rule:
+                <generalidentifier> ::= IDENTIFIER LABEL
+            """
+            return p.IDENTIFIER + p.LABEL
 
         @_(r"PARTICLENAME LABEL")  # noqa: F821
         def generalidentifier(self, p):  # noqa: F811

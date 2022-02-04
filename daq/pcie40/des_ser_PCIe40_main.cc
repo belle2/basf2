@@ -996,6 +996,14 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     ffaa_pos = Belle2::PreRawCOPPERFormat_latest::POS_MAGIC_B2LHSLB;
     ff55_pos_from_end = - Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_TRAILER +
                         Belle2::PreRawCOPPERFormat_latest::POS_CHKSUM_B2LHSLB;
+
+    // printf("[WARNING] thread %d : Error was detected by data-check core in PCIe40 FPGA. : exp %d run %d sub %d\n",
+    //          sender_id, data[ MAGIC_7F7F_POS ],
+    //          (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+    //          (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+    //          (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
+    //         );
+
 //     if (data[ ERR_POS ] == 0) {
 //       pthread_mutex_lock(&(mtx_sender_log));
 //       printf("[FATAL] thread %d : Data error was deteced by PCIe40 FPGA. Header %.8x, Errorbit %.8x\n", sender_id, data[ MAGIC_7F7F_POS ],
@@ -1424,15 +1432,35 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
 
   }
 
+  //
+  // Check if the current position exceeds the event end
+  //
+  if (cur_pos != event_nwords - Belle2::RawTrailer_latest::RAWTRAILER_NWORDS) {
+    pthread_mutex_lock(&(mtx_sender_log));
+    printf("[FATAL] thread %d : %s : ERROR_EVENT : The end position of channel data( %d-th word ) does not coincide with the start of RawTrailer( %d-th word ). Exiting... : exp %d run %d sub %d : %s %s %d\n",
+           sender_id,
+           hostnamebuf,
+           cur_pos, event_nwords - Belle2::RawTrailer_latest::RAWTRAILER_NWORDS,
+           (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+           (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+           (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+           __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printEventData(data, event_length, sender_id);
+    pthread_mutex_unlock(&(mtx_sender_log));
+#ifndef NO_ERROR_STOP
+    exit(1);
+#endif
+  }
+
 
   //
-  // Printing the 1st event
+  // Check the consistency of number of input links
   //
   if (link_cnt != expected_number_of_links) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : # of links(%d) in data is not the same as exptected(=%d). : Exiting... : exp %d run %d sub %d : %s %s %d\n",
+    printf("[FATAL] thread %d : %s : ERROR_EVENT : # of links(%d) in data is not the same as exptected(=%d). : Exiting... : exp %d run %d sub %d : %s %s %d\n",
            sender_id,
-           hostnamebuf, -1,
+           hostnamebuf,
            link_cnt, expected_number_of_links,
            (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
            (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -1457,10 +1485,10 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     pthread_mutex_unlock(&(mtx_sender_log));
   }
 
+  //
+  // Check unreduced header consistency
+  //
   if (reduced_flag == 0) {
-    //
-    // Check unreduced header consistency
-    //
     checkUtimeCtimeTRGType(data, sender_id);
 
     pthread_mutex_lock(&(mtx_sender_log));

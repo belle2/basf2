@@ -261,18 +261,16 @@ void ECLNeighbours::initializeN(const int n, const bool sorted)
       // create a simple struct with cellid, thetaid, and phiid (the latter two will be used for sorting)
       struct crystal {
         int cellid;
-        double phi;
+        int phiid;
         int thetaid;
+        int neighbourn; //needed since we can not access local variables in sort
       };
 
       // fill them all into a vector
       std::vector<crystal> crystals;
       for (const auto& nbr : neighbours) {
         geom->Mapping(nbr - 1);
-        double phi = -1 * atan2(geom->GetCrystalPos(nbr - 1)[0],
-                                -1 * geom->GetCrystalPos(nbr - 1)[1]);
-
-        crystals.push_back({nbr, phi, geom->GetThetaID()});
+        crystals.push_back({nbr, geom->GetPhiID(), geom->GetThetaID(), n});
       }
 
       //sort this vector using custom metric
@@ -281,10 +279,16 @@ void ECLNeighbours::initializeN(const int n, const bool sorted)
         if (left.thetaid < right.thetaid) return true;
         if (left.thetaid > right.thetaid) return false;
 
-        // a=b for primary condition, go to secondary condition
-        // sort points counterclockwise, atan2 takes care of the wrapping
-        if (left.phi < right.phi) return true;
-        if (left.phi > right.phi) return false;
+        // left.thetaid == right.thetaid for primary condition, go to secondary condition
+        // first check if we are crossing a phi=0 boundary by checking if the  difference between phiids is larger than the neighbour size (2*N+1)
+        // examples: left.phiid = 0, right.phiid=143 -> returns true (0 ">" 143)
+        // examples: left.phiid = 0, right.phiid=1 -> returns false (1 ">" 0)
+        // examples: left.phiid = 1, right.phiid=0 -> returns true (1 ">" 0)
+        if (fabs(left.phiid - right.phiid) > (2 * left.neighbourn + 1)) {
+          return right.phiid > left.phiid;
+        } else {
+          return left.phiid > right.phiid;
+        }
 
         //we should never arrive here by definition
         return true;

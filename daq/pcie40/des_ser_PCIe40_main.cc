@@ -591,7 +591,6 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
     //
     // Mismatch between header and trailer
     //
-
     if (temp_ctime_trgtype != temp_ctime_trgtype_footer || (temp_eve & 0xffff) != ((temp_eve_footer >> 16) & 0xffff)) {
       pthread_mutex_lock(&(mtx_sender_log));
       printf("[FATAL] thread %d : ch=%d : ERROR_EVENT : mismatch(finesse %d) between header(ctime 0x%.8x eve 0x%.8x) and footer(ctime 0x%.8x eve_crc16 0x%.8x). Exiting... : exp %d run %d sub %d : %s %s %d\n",
@@ -1048,7 +1047,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
 #endif
     }
   }
-  evtnum = data[EVENUM_POS];
+
 
   //
   // Check exprun #
@@ -1365,10 +1364,11 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
       pthread_mutex_lock(&(mtx_sender_log));
       // Currently, zero-torellance for a CRC error.
       //      if (crc_err_ch[sender_id][i] == 0) {
-      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : POST B2link event CRC16 error. data(%x) calc(%x) : exp %d run %d sub %d : %s %s %d\n",
+      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : POST B2link event CRC16 error. data(%x) calc(%x) : eve %d exp %d run %d sub %d : %s %s %d\n",
              sender_id,
              hostnamebuf, i,
              value, get_crc(data_for_crc , size , first_crc),
+             new_evtnum,
              (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
              (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
              (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
@@ -1485,17 +1485,20 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     pthread_mutex_unlock(&(mtx_sender_log));
   }
 
+
+
   //
   // Check unreduced header consistency
   //
+  int ret = DATACHECK_OK;
   if (reduced_flag == 0) {
     checkUtimeCtimeTRGType(data, sender_id);
 
     pthread_mutex_lock(&(mtx_sender_log));
     if (err_not_reduced[sender_id] < max_number_of_messages) {
-      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Error-flag was set by the data-check module in PCIe40 FPGA. Exiting... : exp %d run %d sub %d : %s %s %d\n",
+      printf("[WARNING] thread %d : %s ch=%d : ERROR_EVENT : Error-flag was set by the data-check module in PCIe40 FPGA. Exiting... : eve %d prev thr eve %d : exp %d run %d sub %d : %s %s %d\n",
              sender_id,
-             hostnamebuf, -1,
+             hostnamebuf, -1, new_evtnum, evtnum,
              (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
              (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
              (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
@@ -1504,11 +1507,12 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     }
     err_not_reduced[sender_id]++;
     pthread_mutex_unlock(&(mtx_sender_log));
-    exit(1); // zero-torellance  policy
-    //    return DATACHECK_OK_BUT_ERRFLAG_IN_HDR;
+    //    exit(1); // zero-torellance  policy
+    ret = DATACHECK_OK_BUT_ERRFLAG_IN_HDR;
   }
 
-  return DATACHECK_OK;
+  evtnum = data[EVENUM_POS];
+  return ret;
 }
 
 void checkEventGenerator(unsigned int* data , int i , unsigned int size)

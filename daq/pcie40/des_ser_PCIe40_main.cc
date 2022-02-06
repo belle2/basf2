@@ -486,6 +486,8 @@ void printEventNumberError(unsigned int*& data, const unsigned int evtnum, const
 void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
 {
   unsigned int event_length = data[ Belle2::RawHeader_latest::POS_NWORDS ];
+  unsigned int new_exprun = data[ Belle2::RawHeader_latest::POS_EXP_RUN_NO ] ;
+  unsigned int new_evtnum = data[ Belle2::RawHeader_latest::POS_EVE_NO ] ;
   //
   // Check the 7f7f magic word
   //
@@ -493,8 +495,13 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
     char err_buf[500] = {0};
     pthread_mutex_lock(&(mtx_sender_log));
     sprintf(err_buf,
-            "[FATAL] thread %d : ERROR_EVENT :  Invalid Magic word in ReadOut Board header( 0x%.8x ) : It must be 0x7f7f????",
-            sender_id, data[ MAGIC_7F7F_POS ]) ;
+            "[FATAL] thread %d : ERROR_EVENT : Invalid Magic word in ReadOut Board header( 0x%.8x ) : It must be 0x7f7f???? : eve %d exp %d run %d sub %d : %s %s %d",
+            sender_id, data[ MAGIC_7F7F_POS ],
+            new_evtnum,
+            (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+            (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+            (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s\n", err_buf); fflush(stdout);
     printEventData(data, event_length, sender_id);
     pthread_mutex_unlock(&(mtx_sender_log));
@@ -509,8 +516,12 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
   if (!(data[ MAGIC_7F7F_POS ] & 0x00008000)) {
     // reduced
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] thread %d : This function cannot be used for already reduced data. 7f7f header is 0x%.8x : %s %s %d\n",
+    printf("[FATAL] thread %d : This function cannot be used for already reduced data. 7f7f header is 0x%.8x : eve %d exp %d run %d sub %d : %s %s %d\n",
            sender_id, data[ MAGIC_7F7F_POS ],
+           new_evtnum,
+           (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+           (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+           (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
            __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printEventData(data, event_length, sender_id);
     pthread_mutex_unlock(&(mtx_sender_log));
@@ -523,14 +534,12 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
   //
   // Check consistency of B2L header over all input channels
   //
-
-  unsigned int new_exprun = data[ Belle2::RawHeader_latest::POS_EXP_RUN_NO ] ;
   int flag = 0, err_flag = 0, err_ch = -1;
   unsigned int temp_utime = 0, temp_ctime_trgtype = 0, temp_eve = 0, temp_exprun = 0;
   unsigned int utime[MAX_PCIE40_CH], ctime_trgtype[MAX_PCIE40_CH], eve[MAX_PCIE40_CH], exprun[MAX_PCIE40_CH];
   int used_ch[MAX_PCIE40_CH] = {0};
   char err_buf[20000];
-  int first_ch = 0;
+  int first_ch = -1;
 
   memset(utime, 0, sizeof(utime));
   memset(ctime_trgtype, 0, sizeof(ctime_trgtype));
@@ -580,12 +589,28 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
       temp_exprun = exprun[ i ];
       flag = 1;
       first_ch = i;
+
+      if (temp_eve != new_evtnum) {
+        pthread_mutex_lock(&(mtx_sender_log));
+        printf("[FATAL] thread %d : ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: eve in ROBheader = 0x%.8x , ch %d 's eve = 0x%.8x : exp %d run %d sub %d : %s %s %d\n",
+               sender_id, i,
+               new_evtnum, i, temp_eve,
+               (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+               (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+               (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        printEventData(data, event_length, sender_id);
+        pthread_mutex_unlock(&(mtx_sender_log));
+        exit(1);
+      }
+
     } else {
       if (temp_ctime_trgtype != ctime_trgtype[ i ] || temp_utime != utime[ i ] ||
           temp_eve != eve[ i ] || temp_exprun != exprun[ i ]) {
         err_ch = i;
         err_flag = 1;
       }
+
     }
 
     //
@@ -605,6 +630,7 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
       exit(1);
     }
   }
+
 
   //
   // Mismatch over channels
@@ -1250,7 +1276,6 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     // Check event number in ffaa header
     //
     unsigned int eve_link_8bits =  data[ cur_pos + ffaa_pos ]  & 0x000000ff;
-
     if ((new_evtnum & 0x000000FF) != eve_link_8bits) {
       pthread_mutex_lock(&(mtx_sender_log));
       err_link_eve_jump[sender_id]++;
@@ -1493,10 +1518,9 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
   int ret = DATACHECK_OK;
   if (reduced_flag == 0) {
     checkUtimeCtimeTRGType(data, sender_id);
-
     pthread_mutex_lock(&(mtx_sender_log));
     if (err_not_reduced[sender_id] < max_number_of_messages) {
-      printf("[WARNING] thread %d : %s ch=%d : ERROR_EVENT : Error-flag was set by the data-check module in PCIe40 FPGA. Exiting... : eve %d prev thr eve %d : exp %d run %d sub %d : %s %s %d\n",
+      printf("[WARNING] thread %d : %s ch=%d : ERROR_EVENT : Error-flag was set by the data-check module in PCIe40 FPGA. : eve %d prev thr eve %d : exp %d run %d sub %d : %s %s %d\n",
              sender_id,
              hostnamebuf, -1, new_evtnum, evtnum,
              (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,

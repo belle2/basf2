@@ -32,19 +32,19 @@ if __name__ == "__main__":
                  'daughterInvM(0, 1)', 'daughterInvM(0, 2)', 'daughterInvM(1, 2)']
 
     # Train a MVA method and directly upload it to the database
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_identifier = "TMVA"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    tmva_bdt_options = ROOT.Belle2.MVA.TMVAOptionsClassification()
+    tmva_bdt_options = basf2_mva.TMVAOptionsClassification()
     tmva_bdt_options.m_config = ("!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.2:UseBaggedBoost:"
                                  "BaggedSampleFraction=0.5:nCuts=1024:MaxDepth=3:IgnoreNegWeightsInTraining")
 
     training_start = time.time()
-    ROOT.Belle2.MVA.Utility.teacher(general_options, tmva_bdt_options)
+    basf2_mva.teacher(general_options, tmva_bdt_options)
     training_stop = time.time()
 
     training_time = training_stop - training_start

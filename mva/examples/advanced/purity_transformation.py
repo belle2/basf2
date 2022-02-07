@@ -51,21 +51,21 @@ if __name__ == "__main__":
         'daughterInvM(1, 2)']
 
     # Train a MVA method and directly upload it to the database
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_identifier = "MVADatabaseIdentifier"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
+    fastbdt_options = basf2_mva.FastBDTOptions()
     fastbdt_options.m_nTrees = 100
     fastbdt_options.m_nCuts = 10
     fastbdt_options.m_nLevels = 3
     fastbdt_options.m_shrinkage = 0.2
     fastbdt_options.m_randRatio = 0.5
 
-    fastbdt_pt_options = ROOT.Belle2.MVA.FastBDTOptions()
+    fastbdt_pt_options = basf2_mva.FastBDTOptions()
     fastbdt_pt_options.m_nTrees = 100
     fastbdt_pt_options.m_nCuts = 10
     fastbdt_pt_options.m_nLevels = 3
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     for label, options in [("FastBDT", fastbdt_options), ("FastBDT_PT", fastbdt_pt_options)]:
         training_start = time.time()
         general_options.m_identifier = label
-        ROOT.Belle2.MVA.Utility.teacher(general_options, options)
+        basf2_mva.teacher(general_options, options)
         training_stop = time.time()
         training_time = training_stop - training_start
         method = basf2_mva_util.Method(general_options.m_identifier)

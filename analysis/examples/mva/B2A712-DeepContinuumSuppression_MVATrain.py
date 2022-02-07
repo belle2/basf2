@@ -125,7 +125,7 @@ if __name__ == "__main__":
     train_data = path + 'DNN_train.root'
     test_data = path + 'DNN_test.root'
 
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector(train_data)
     general_options.m_treename = "tree"
     general_options.m_identifier = "Deep_Feed_Forward.xml"
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     general_options.m_spectators = basf2_mva.vector('Mbc', 'DeltaZ')
     general_options.m_target_variable = "isNotContinuumEvent"
 
-    specific_options = ROOT.Belle2.MVA.PythonOptions()
+    specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "contrib_keras"
     specific_options.m_steering_file = 'analysis/examples/mva/B2A714-DeepContinuumSuppression_MVAModel.py'
     specific_options.m_training_fraction = 0.9
@@ -152,7 +152,7 @@ if __name__ == "__main__":
     specific_options.m_config = json.dumps(keras_dic)
 
     # Train a MVA method and store the weightfile (Deep_Feed_Forward.xml) locally.
-    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+    basf2_mva.teacher(general_options, specific_options)
 
     # Evaluate training.
     subprocess.call('basf2_mva_evaluate.py '
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     # If you're only interested in the network output distribution, then
     # comment these in to apply the trained methods on train and test sample
     #
-    # ROOT.Belle2.MVA.Utility.expert(basf2_mva.vector('Deep_Feed_Forward.xml'),
+    # basf2_mva.expert(basf2_mva.vector('Deep_Feed_Forward.xml'),
     #                                basf2_mva.vector(train_data), 'tree', 'MVAExpert_train.root')
-    # ROOT.Belle2.MVA.Utility.expert(basf2_mva.vector('Deep_Feed_Forward.xml'),
+    # basf2_mva.expert(basf2_mva.vector('Deep_Feed_Forward.xml'),
     #                                basf2_mva.vector(test_data), 'tree', 'MVAExpert_test.root')

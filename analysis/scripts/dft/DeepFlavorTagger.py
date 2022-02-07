@@ -204,7 +204,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         import ROOT  # noqa
         if not os.path.isfile(output_file_name):
             B2FATAL('There is no training data file available. Run flavor tagger in sampler mode first.')
-        general_options = ROOT.Belle2.MVA.GeneralOptions()
+        general_options = basf2_mva.GeneralOptions()
         general_options.m_datafiles = basf2_mva.vector(output_file_name)
 
         general_options.m_treename = tree_name
@@ -213,14 +213,14 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
 
         general_options.m_identifier = uniqueIdentifier
 
-        specific_options = ROOT.Belle2.MVA.PythonOptions()
+        specific_options = basf2_mva.PythonOptions()
         specific_options.m_framework = 'tensorflow'
         specific_options.m_steering_file = mva_steering_file
         specific_options.m_training_fraction = train_valid_fraction
 
         specific_options.m_config = json.dumps(classifier_args)
 
-        ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+        basf2_mva.teacher(general_options, specific_options)
 
     elif mode == 'expert':
 

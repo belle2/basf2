@@ -45,15 +45,15 @@ if __name__ == "__main__":
                  'daughterInvM(0, 1)', 'daughterInvM(0, 2)', 'daughterInvM(1, 2)']
 
     # Train model with default parameters
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = training_data
     general_options.m_treename = "tree"
     general_options.m_identifier = "test.xml"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
-    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
+    fastbdt_options = basf2_mva.FastBDTOptions()
+    basf2_mva.teacher(general_options, fastbdt_options)
 
     def roc_for_variable_set(variables):
         method = basf2_mva_util.Method(general_options.m_identifier)

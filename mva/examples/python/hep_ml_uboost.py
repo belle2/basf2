@@ -32,7 +32,7 @@ if __name__ == "__main__":
                  'daughter(0, kaonID)', 'daughter(0, pionID)',
                  'daughterInvM(0, 1)', 'daughterInvM(0, 2)', 'daughterInvM(1, 2)']
 
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     general_options.m_target_variable = "isSignal"
     general_options.m_identifier = "HepMLUBoost"
 
-    specific_options = ROOT.Belle2.MVA.PythonOptions()
+    specific_options = basf2_mva.PythonOptions()
     specific_options.m_steering_file = 'mva/examples/python/hep_ml_uboost.py'
     # Set the parameters of the uBoostClassifier,
     # defaults are 50, which is reasonable, but I want to have a example runtime < 2 minutes
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     specific_options.m_framework = 'hep_ml'
 
     training_start = time.time()
-    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+    basf2_mva.teacher(general_options, specific_options)
     training_stop = time.time()
     training_time = training_stop - training_start
     method = basf2_mva_util.Method(general_options.m_identifier)

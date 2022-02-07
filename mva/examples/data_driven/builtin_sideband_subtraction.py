@@ -54,18 +54,18 @@ if __name__ == "__main__":
                  # 'daughterInvM(1, 2)', 'daughterInvM(0, 1)', 'daughterInvM(0, 2)'
                  ]
 
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train_data.root")
     general_options.m_identifier = "MVASideband"
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
+    fastbdt_options = basf2_mva.FastBDTOptions()
 
-    meta_options = ROOT.Belle2.MVA.MetaOptions()
+    meta_options = basf2_mva.MetaOptions()
     meta_options.m_use_sideband_subtraction = True
     meta_options.m_sideband_variable = 'sideband'
     meta_options.m_sideband_mc_files = basf2_mva.vector("train_mc.root")
 
-    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options, meta_options)
+    basf2_mva.teacher(general_options, fastbdt_options, meta_options)

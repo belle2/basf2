@@ -51,26 +51,26 @@ if __name__ == "__main__":
         'daughterInvM(1, 2)']
 
     # Train a MVA method and directly upload it to the database
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_identifier = "MVADatabaseIdentifier"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    trivial_options = ROOT.Belle2.MVA.TrivialOptions()
+    trivial_options = basf2_mva.TrivialOptions()
 
-    data_options = ROOT.Belle2.MVA.FastBDTOptions()
+    data_options = basf2_mva.FastBDTOptions()
     data_options.m_nTrees = 0
 
-    fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
+    fastbdt_options = basf2_mva.FastBDTOptions()
     fastbdt_options.m_nTrees = 100
     fastbdt_options.m_nCuts = 10
     fastbdt_options.m_nLevels = 3
     fastbdt_options.m_shrinkage = 0.2
     fastbdt_options.m_randRatio = 0.5
 
-    fann_options = ROOT.Belle2.MVA.FANNOptions()
+    fann_options = basf2_mva.FANNOptions()
     fann_options.m_number_of_threads = 1
     fann_options.m_max_epochs = 100
     fann_options.m_validation_fraction = 0.001
@@ -78,25 +78,25 @@ if __name__ == "__main__":
     fann_options.m_hidden_layers_architecture = "N+1"
     fann_options.m_random_seeds = 1
 
-    tmva_bdt_options = ROOT.Belle2.MVA.TMVAOptionsClassification()
+    tmva_bdt_options = basf2_mva.TMVAOptionsClassification()
     tmva_bdt_options.m_config = ("!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.2:UseBaggedBoost:"
                                  "BaggedSampleFraction=0.5:nCuts=1024:MaxDepth=3:IgnoreNegWeightsInTraining")
     tmva_bdt_options.m_prepareOptions = ("SplitMode=block:V:nTrain_Signal=9691:nTrain_Background=136972:"
                                          "nTest_Signal=1:nTest_Background=1")
 
-    tmva_nn_options = ROOT.Belle2.MVA.TMVAOptionsClassification()
+    tmva_nn_options = basf2_mva.TMVAOptionsClassification()
     tmva_nn_options.m_type = "MLP"
     tmva_nn_options.m_method = "MLP"
     tmva_nn_options.m_config = ("H:!V:CreateMVAPdfs:VarTransform=N:NCycles=100:HiddenLayers=N+1:TrainingMethod=BFGS")
     tmva_nn_options.m_prepareOptions = ("SplitMode=block:V:nTrain_Signal=9691:nTrain_Background=136972:"
                                         "nTest_Signal=1:nTest_Background=1")
 
-    sklearn_bdt_options = ROOT.Belle2.MVA.PythonOptions()
+    sklearn_bdt_options = basf2_mva.PythonOptions()
     sklearn_bdt_options.m_framework = "sklearn"
     param = '{"n_estimators": 100, "learning_rate": 0.2, "max_depth": 3, "random_state": 0, "subsample": 0.5}'
     sklearn_bdt_options.m_config = param
 
-    xgboost_options = ROOT.Belle2.MVA.PythonOptions()
+    xgboost_options = basf2_mva.PythonOptions()
     xgboost_options.m_framework = "xgboost"
     param = ('{"max_depth": 3, "eta": 0.1, "silent": 1, "objective": "binary:logistic",'
              '"subsample": 0.5, "nthread": 1, "nTrees": 400}')
@@ -109,7 +109,7 @@ if __name__ == "__main__":
                            ("SKLearn-BDT", sklearn_bdt_options), ("XGBoost", xgboost_options), ("Trivial", trivial_options)]:
         training_start = time.time()
         general_options.m_identifier = label
-        ROOT.Belle2.MVA.Utility.teacher(general_options, options)
+        basf2_mva.teacher(general_options, options)
         training_stop = time.time()
         training_time = training_stop - training_start
         method = basf2_mva_util.Method(general_options.m_identifier)

@@ -34,25 +34,25 @@ if __name__ == "__main__":
                  ]
 
     # Perform an sPlot training
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train_mc.root")
     general_options.m_identifier = "MVAFull"
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
+    fastbdt_options = basf2_mva.FastBDTOptions()
     # SPlot is more stable if one doesn't use the randRatio
     # FastBDT has a special sPlot mode, but which isn't implemented yet in the mva package
     # fastbdt_options.m_nTrees = 100
     fastbdt_options.m_randRatio = 1.0
-    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
+    basf2_mva.teacher(general_options, fastbdt_options)
 
     general_options.m_identifier = "MVAOrdinary"
     general_options.m_variables = basf2_mva.vector(*variables[:-1])
-    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
+    basf2_mva.teacher(general_options, fastbdt_options)
 
-    meta_options = ROOT.Belle2.MVA.MetaOptions()
+    meta_options = basf2_mva.MetaOptions()
     meta_options.m_use_splot = True
     meta_options.m_splot_variable = "M"
     # SPlot training assumes that the datafile given to the general options contains only data
@@ -66,29 +66,29 @@ if __name__ == "__main__":
     general_options.m_identifier = "MVASPlot"
     meta_options.m_splot_combined = False
     meta_options.m_splot_boosted = False
-    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options, meta_options)
+    basf2_mva.teacher(general_options, fastbdt_options, meta_options)
 
     # Now we combine the sPlot training with a PDF classifier for M, in one step
     general_options.m_identifier = "MVASPlotCombined"
     meta_options.m_splot_combined = True
     meta_options.m_splot_boosted = False
-    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options, meta_options)
+    basf2_mva.teacher(general_options, fastbdt_options, meta_options)
 
     # Now we use a boosted sPlot training
     general_options.m_identifier = "MVASPlotBoosted"
     meta_options.m_splot_combined = False
     meta_options.m_splot_boosted = True
-    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options, meta_options)
+    basf2_mva.teacher(general_options, fastbdt_options, meta_options)
 
     # And finally a boosted and combined training
     general_options.m_identifier = "MVASPlotCombinedBoosted"
     meta_options.m_splot_combined = True
     meta_options.m_splot_boosted = True
-    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options, meta_options)
+    basf2_mva.teacher(general_options, fastbdt_options, meta_options)
 
     # Also do a training of only the pdf classifier
-    pdf_options = ROOT.Belle2.MVA.PDFOptions()
+    pdf_options = basf2_mva.PDFOptions()
     general_options.m_method = 'PDF'
     general_options.m_identifier = "MVAPdf"
     general_options.m_variables = basf2_mva.vector('M')
-    ROOT.Belle2.MVA.Utility.teacher(general_options, pdf_options)
+    basf2_mva.teacher(general_options, pdf_options)

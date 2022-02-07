@@ -89,19 +89,19 @@ if __name__ == "__main__":
 
         # ##########################Do Conversion#################################
 
-        general_options = ROOT.Belle2.MVA.GeneralOptions()
+        general_options = basf2_mva.GeneralOptions()
         general_options.m_datafiles = basf2_mva.vector(os.path.join(path, 'data.root'))
         general_options.m_treename = "tree"
         general_options.m_variables = basf2_mva.vector(*variables)
         general_options.m_target_variable = "isSignal"
 
-        specific_options = ROOT.Belle2.MVA.PythonOptions()
+        specific_options = basf2_mva.PythonOptions()
         specific_options.m_framework = "contrib_keras"
         specific_options.m_steering_file = 'mva/examples/keras/keras_to_weightfile.py'
 
         general_options.m_identifier = 'converted_keras'
         specific_options.m_config = json.dumps({'file_path': os.path.join(path, 'weights.h5')})
-        ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+        basf2_mva.teacher(general_options, specific_options)
 
         # ########################Apply weightfile####################################
         method = basf2_mva_util.Method(general_options.m_identifier)

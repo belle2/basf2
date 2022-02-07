@@ -110,7 +110,7 @@ if __name__ == "__main__":
         'localdb/database.txt'
     ]
 
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_identifier = "Tensorflow"
     general_options.m_treename = "tree"
@@ -127,7 +127,7 @@ if __name__ == "__main__":
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    specific_options = ROOT.Belle2.MVA.PythonOptions()
+    specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "tensorflow"
     specific_options.m_steering_file = 'mva/examples/tensorflow/simple_deep.py'
     specific_options.m_normalize = True
@@ -135,7 +135,7 @@ if __name__ == "__main__":
     specific_options.m_mini_batch_size = 500
 
     training_start = time.time()
-    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+    basf2_mva.teacher(general_options, specific_options)
     training_stop = time.time()
     training_time = training_stop - training_start
     method = basf2_mva_util.Method(general_options.m_identifier)

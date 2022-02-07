@@ -10,6 +10,7 @@
 ##########################################################################
 
 import basf2
+import basf2_mva
 import unittest
 import unittest.mock
 import os
@@ -587,7 +588,7 @@ class TestPostReconstruction(unittest.TestCase):
         channel = 'D0:unittest ==> K-:unittest pi+:unittest'
         with open(channel + ".xml", "w") as f:
             f.write(content.format(channel=channel))
-        ROOT.Belle2.MVA.Utility.upload(channel + ".xml", 'UNITTEST_' + channel)
+        basf2_mva.upload(channel + ".xml", 'UNITTEST_' + channel)
 
         self.assertEqual(x.get_missing_channels(), ['pi+:unittest ==> pi+:FSP',
                                                     'D0:unittest ==> pi-:unittest pi+:unittest'])
@@ -596,7 +597,7 @@ class TestPostReconstruction(unittest.TestCase):
         channel = 'D0:unittest ==> pi-:unittest pi+:unittest'
         with open(channel + ".xml", "w") as f:
             f.write(content.format(channel=channel))
-        ROOT.Belle2.MVA.Utility.upload(channel + ".xml", 'UNITTEST_' + channel)
+        basf2_mva.upload(channel + ".xml", 'UNITTEST_' + channel)
 
         self.assertEqual(x.get_missing_channels(), ['pi+:unittest ==> pi+:FSP'])
         self.assertEqual(x.available(), False)
@@ -604,7 +605,7 @@ class TestPostReconstruction(unittest.TestCase):
         channel = 'pi+:unittest ==> pi+:FSP'
         with open(channel + ".xml", "w") as f:
             f.write(content.format(channel=channel))
-        ROOT.Belle2.MVA.Utility.upload(channel + ".xml", 'UNITTEST_' + channel)
+        basf2_mva.upload(channel + ".xml", 'UNITTEST_' + channel)
 
         self.assertEqual(x.get_missing_channels(), [])
         self.assertEqual(x.available(), True)
@@ -972,19 +973,19 @@ class TestTeacher(unittest.TestCase):
 
     def test_create_fake_weightfile(self):
         self.assertEqual(os.path.isfile('UNITTEST_pi+:generic ==> pi+:FSP.xml'), False)
-        self.assertEqual(ROOT.Belle2.MVA.Utility.available('UNITTEST_pi+:generic ==> pi+:FSP.xml'), False)
+        self.assertEqual(basf2_mva.available('UNITTEST_pi+:generic ==> pi+:FSP.xml'), False)
         fei.core.Teacher.create_fake_weightfile('UNITTEST_pi+:generic ==> pi+:FSP')
         self.assertEqual(os.path.isfile('UNITTEST_pi+:generic ==> pi+:FSP.xml'), True)
-        self.assertEqual(ROOT.Belle2.MVA.Utility.available('UNITTEST_pi+:generic ==> pi+:FSP.xml'), True)
+        self.assertEqual(basf2_mva.available('UNITTEST_pi+:generic ==> pi+:FSP.xml'), True)
 
     def test_upload(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=False, prefix='UNITTEST', externTeacher='basf2_mva_teacher')
         x = fei.core.Teacher(particles, config)
         fei.core.Teacher.create_fake_weightfile('TEACHER')
-        self.assertEqual(ROOT.Belle2.MVA.Utility.available('UNITTEST_TEACHER'), False)
+        self.assertEqual(basf2_mva.available('UNITTEST_TEACHER'), False)
         r = x.upload('TEACHER')
-        self.assertEqual(ROOT.Belle2.MVA.Utility.available('UNITTEST_TEACHER'), True)
+        self.assertEqual(basf2_mva.available('UNITTEST_TEACHER'), True)
         self.assertEqual(r, ('TEACHER.xml', 'UNITTEST_TEACHER'))
 
     def test_without_monitoring(self):
@@ -992,17 +993,17 @@ class TestTeacher(unittest.TestCase):
         config = fei.config.FeiConfiguration(monitor=False, prefix='UNITTEST', externTeacher='basf2_mva_teacher')
         x = fei.core.Teacher(particles, config)
 
-        self.assertEqual(ROOT.Belle2.MVA.Utility.available('UNITTEST_pi+:generic ==> pi+:FSP'), False)
-        self.assertEqual(ROOT.Belle2.MVA.Utility.available('UNITTEST_K+:generic ==> K+:FSP'), False)
-        self.assertEqual(ROOT.Belle2.MVA.Utility.available('UNITTEST_D0:generic ==> K-:generic pi+:generic'), False)
-        self.assertEqual(ROOT.Belle2.MVA.Utility.available('UNITTEST_D0:generic ==> pi-:generic pi+:generic'), False)
+        self.assertEqual(basf2_mva.available('UNITTEST_pi+:generic ==> pi+:FSP'), False)
+        self.assertEqual(basf2_mva.available('UNITTEST_K+:generic ==> K+:FSP'), False)
+        self.assertEqual(basf2_mva.available('UNITTEST_D0:generic ==> K-:generic pi+:generic'), False)
+        self.assertEqual(basf2_mva.available('UNITTEST_D0:generic ==> pi-:generic pi+:generic'), False)
 
         x.do_all_trainings()
 
-        self.assertEqual(ROOT.Belle2.MVA.Utility.available('UNITTEST_pi+:generic ==> pi+:FSP'), True)
-        self.assertEqual(ROOT.Belle2.MVA.Utility.available('UNITTEST_K+:generic ==> K+:FSP'), False)
-        self.assertEqual(ROOT.Belle2.MVA.Utility.available('UNITTEST_D0:generic ==> K-:generic pi+:generic'), True)
-        self.assertEqual(ROOT.Belle2.MVA.Utility.available('UNITTEST_D0:generic ==> pi-:generic pi+:generic'), True)
+        self.assertEqual(basf2_mva.available('UNITTEST_pi+:generic ==> pi+:FSP'), True)
+        self.assertEqual(basf2_mva.available('UNITTEST_K+:generic ==> K+:FSP'), False)
+        self.assertEqual(basf2_mva.available('UNITTEST_D0:generic ==> K-:generic pi+:generic'), True)
+        self.assertEqual(basf2_mva.available('UNITTEST_D0:generic ==> pi-:generic pi+:generic'), True)
 
 
 """

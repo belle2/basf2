@@ -31,12 +31,12 @@ if __name__ == "__main__":
                  'daughterInvM(1, 2)', 'daughterInvM(0, 1)', 'daughterInvM(0, 2)'
                  ]
 
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train_mc.root")
     general_options.m_identifier = "MVABaseline"
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
-    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
+    fastbdt_options = basf2_mva.FastBDTOptions()
+    basf2_mva.teacher(general_options, fastbdt_options)

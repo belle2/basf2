@@ -49,20 +49,20 @@ if __name__ == "__main__":
                  'daughter(2, p)', 'daughter(2, pz)', 'daughter(2, pt)', 'daughter(2, phi)',
                  ]
 
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train_mc.root")
     general_options.m_identifier = "MVAReweighted"
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
+    fastbdt_options = basf2_mva.FastBDTOptions()
 
-    meta_options = ROOT.Belle2.MVA.MetaOptions()
+    meta_options = basf2_mva.MetaOptions()
     meta_options.m_use_reweighting = True
     meta_options.m_reweighting_variable = 'isContinuumEvent'
     meta_options.m_reweighting_identifier = "Reweighter"
     meta_options.m_reweighting_mc_files = basf2_mva.vector("train_mc_continuum.root")
     meta_options.m_reweighting_data_files = basf2_mva.vector("train_data_continuum.root")
 
-    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options, meta_options)
+    basf2_mva.teacher(general_options, fastbdt_options, meta_options)

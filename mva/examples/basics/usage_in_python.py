@@ -19,7 +19,7 @@ if __name__ == "__main__":
     ]
 
     # Train a MVA method and directly upload it to the database
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_identifier = "MVADatabaseIdentifier"
@@ -27,22 +27,22 @@ if __name__ == "__main__":
                                                    'daughter(1, kaonID)', 'daughter(1, pionID)', 'chiProb', 'dr', 'dz', 'dphi')
     general_options.m_target_variable = "isSignal"
 
-    fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
+    fastbdt_options = basf2_mva.FastBDTOptions()
 
-    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
+    basf2_mva.teacher(general_options, fastbdt_options)
 
     # Download the weightfile from the database and store it on disk in a root file
-    ROOT.Belle2.MVA.Utility.download('MVADatabaseIdentifier', 'weightfile.root')
+    basf2_mva.download('MVADatabaseIdentifier', 'weightfile.root')
 
     # Train a MVA method and store the weightfile on disk in a root file
     general_options.m_identifier = "weightfile2.root"
-    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
+    basf2_mva.teacher(general_options, fastbdt_options)
 
     # Upload the weightfile on disk to the database
-    ROOT.Belle2.MVA.Utility.upload('weightfile2.root', 'MVADatabaseIdentifier2')
+    basf2_mva.upload('weightfile2.root', 'MVADatabaseIdentifier2')
 
     # Apply the trained methods on data
-    ROOT.Belle2.MVA.Utility.expert(
+    basf2_mva.expert(
         basf2_mva.vector(
             'weightfile.root',
             'weightfile2.root',

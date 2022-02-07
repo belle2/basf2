@@ -33,21 +33,21 @@ if __name__ == "__main__":
                  'daughter(2, daughter(0, minC2TDist))', 'daughter(2, daughter(1, minC2TDist))',
                  'daughterInvM(1, 2)']
 
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train_mc.root")
     general_options.m_identifier = "boost.xml"
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     # isMC is 1 for MC and 0 for Data
     general_options.m_target_variable = "isMC"
-    fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
-    ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
+    fastbdt_options = basf2_mva.FastBDTOptions()
+    basf2_mva.teacher(general_options, fastbdt_options)
 
-    reweighter_options = ROOT.Belle2.MVA.ReweighterOptions()
+    reweighter_options = basf2_mva.ReweighterOptions()
     reweighter_options.m_variable = 'isContinuumEvent'
     reweighter_options.m_weightfile = "boost.xml"
     general_options.m_identifier = "reweighter.xml"
-    ROOT.Belle2.MVA.Utility.teacher(general_options, reweighter_options)
+    basf2_mva.teacher(general_options, reweighter_options)
 
     # Now you can use the reweighter.xml expert to output the correct weights
     # and use them in another training

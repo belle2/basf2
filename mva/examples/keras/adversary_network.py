@@ -250,7 +250,7 @@ if __name__ == "__main__":
                   'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
                   'daughter(2, daughter(0, minC2TDist))', 'daughter(2, daughter(1, minC2TDist))']
 
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
@@ -258,7 +258,7 @@ if __name__ == "__main__":
     general_options.m_target_variable = "isSignal"
     general_options.m_identifier = "keras"
 
-    specific_options = ROOT.Belle2.MVA.PythonOptions()
+    specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "contrib_keras"
     specific_options.m_steering_file = 'mva/examples/keras/adversary_network.py'
     specific_options.m_normalize = True
@@ -273,12 +273,12 @@ if __name__ == "__main__":
     number_bins: Number of Bins which are used to quantify the spectators. 10 should be sufficient.
     """
     specific_options.m_config = '{"adversary_steps": 5, "learning_rate": 0.001, "lambda": 20.0, "number_bins": 10}'
-    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+    basf2_mva.teacher(general_options, specific_options)
 
     general_options.m_identifier = "keras_baseline"
     specific_options.m_config = '{"adversary_steps": 1, "learning_rate": 0.001, "lambda": 0.0, "number_bins": 10}'
-    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+    basf2_mva.teacher(general_options, specific_options)
 
     general_options.m_variables = basf2_mva.vector(*variables2)
     general_options.m_identifier = "keras_feature_drop"
-    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+    basf2_mva.teacher(general_options, specific_options)

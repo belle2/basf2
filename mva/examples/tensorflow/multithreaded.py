@@ -181,7 +181,7 @@ if __name__ == "__main__":
     import basf2_mva
     import json
 
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     variables = ['p', 'pt', 'pz',
@@ -199,7 +199,7 @@ if __name__ == "__main__":
     general_options.m_spectators = basf2_mva.vector('M')
     general_options.m_target_variable = "isSignal"
 
-    specific_options = ROOT.Belle2.MVA.PythonOptions()
+    specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "tensorflow"
     specific_options.m_steering_file = 'mva/examples/tensorflow/multithreaded.py'
     specific_options.m_nIterations = 100
@@ -211,7 +211,7 @@ if __name__ == "__main__":
     import time
     import basf2_mva_util
     training_start = time.time()
-    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+    basf2_mva.teacher(general_options, specific_options)
     training_stop = time.time()
     training_time = training_stop - training_start
     method = basf2_mva_util.Method(general_options.m_identifier)

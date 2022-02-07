@@ -201,7 +201,7 @@ if __name__ == "__main__":
                   'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
                   'daughter(2, daughter(0, minC2TDist))', 'daughter(2, daughter(1, minC2TDist))']
 
-    general_options = ROOT.Belle2.MVA.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
@@ -209,7 +209,7 @@ if __name__ == "__main__":
     general_options.m_target_variable = "isSignal"
     general_options.m_identifier = "tensorflow"
 
-    specific_options = ROOT.Belle2.MVA.PythonOptions()
+    specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "tensorflow"
     specific_options.m_steering_file = 'mva/examples/orthogonal_discriminators/tensorflow_adversary.py'
     specific_options.m_normalize = True
@@ -217,7 +217,7 @@ if __name__ == "__main__":
     specific_options.m_mini_batch_size = 400
     specific_options.m_config = '{"pre_train_epochs" : 50, "adversary_steps": 7, '\
         ' "learning_rate": 0.001, "lambda": 0.01}'
-    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+    basf2_mva.teacher(general_options, specific_options)
 
     method = basf2_mva_util.Method(general_options.m_identifier)
     test_data = ["test.root"]
@@ -231,7 +231,7 @@ if __name__ == "__main__":
     specific_options.m_mini_batch_size = 400
     specific_options.m_config = '{"pre_train_epochs" : 0, "adversary_steps": 1, '\
         ' "learning_rate": 0.001, "lambda": -1.0}'
-    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+    basf2_mva.teacher(general_options, specific_options)
 
     method = basf2_mva_util.Method(general_options.m_identifier)
     test_data = ["test.root"]
@@ -245,7 +245,7 @@ if __name__ == "__main__":
     specific_options.m_mini_batch_size = 400
     specific_options.m_config = '{"pre_train_epochs" : 0, "adversary_steps": 1, '\
         ' "learning_rate": 0.001, "lambda": -1.0}'
-    ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+    basf2_mva.teacher(general_options, specific_options)
 
     method = basf2_mva_util.Method(general_options.m_identifier)
     test_data = ["test.root"]

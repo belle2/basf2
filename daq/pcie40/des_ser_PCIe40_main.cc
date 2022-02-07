@@ -2053,7 +2053,9 @@ void* sender(void* arg)
           exit(1);
         }
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[FATAL] thread %d : Currently, we will not tolerate a fake-error event. Exiting...\n", sender_id);
+        printf("[WARNING] thread %d : Data-check was passed. This event is treated as a normal event.\n", sender_id);
+        //        printf("[FATAL] thread %d : Currently, we will not tolerate a fake-error event. Exiting...\n", sender_id);
+        printEventData(buff + NW_SEND_HEADER, event_nwords);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
         exit(1);

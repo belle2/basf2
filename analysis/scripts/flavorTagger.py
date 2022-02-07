@@ -555,7 +555,6 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=N
     Samples data for training or tests all categories all categories at event level.
     """
 
-    import ROOT  # noqa
     from basf2 import create_path
     from basf2 import register_module
 
@@ -717,8 +716,6 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu', categories=None):
     Trains all categories at event level.
     """
 
-    import ROOT  # noqa
-
     B2INFO('EVENT LEVEL TEACHER')
 
     ReadyMethods = 0
@@ -766,8 +763,6 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None,
     """
     Samples the input data or tests the combiner according to the selected categories.
     """
-
-    import ROOT  # noqa
 
     B2INFO('COMBINER LEVEL')
 
@@ -870,8 +865,6 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu', variablesCombinerLevel=None,
     """
     Trains the combiner according to the selected categories.
     """
-
-    import ROOT  # noqa
 
     B2INFO('COMBINER LEVEL TEACHER')
 

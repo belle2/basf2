@@ -201,7 +201,6 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
             f.write(extern_command)
 
     elif mode == 'teacher':
-        import ROOT  # noqa
         if not os.path.isfile(output_file_name):
             B2FATAL('There is no training data file available. Run flavor tagger in sampler mode first.')
         general_options = basf2_mva.GeneralOptions()

@@ -47,7 +47,6 @@ if __name__ == "__main__":
     from keras.losses import binary_crossentropy
     from keras.activations import sigmoid, tanh
     from basf2 import conditions
-    import ROOT  # noqa
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'

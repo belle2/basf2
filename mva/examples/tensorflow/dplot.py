@@ -214,7 +214,6 @@ def partial_fit(state, X, S, y, w, epoch):
 
 
 if __name__ == "__main__":
-    import ROOT  # noqa
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_identifier = "TensorflowDPlot"

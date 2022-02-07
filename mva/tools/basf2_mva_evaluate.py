@@ -83,9 +83,8 @@ def create_abbreviations(names, length=5):
 if __name__ == '__main__':
 
     import ROOT  # noqa
-    from ROOT import PyConfig  # noqa
-    PyConfig.IgnoreCommandLineOptions = True  # noqa
-    PyConfig.StartGuiThread = False  # noqa
+    ROOT.PyConfig.IgnoreCommandLineOptions = True
+    ROOT.PyConfig.StartGuiThread = False
     ROOT.gROOT.SetBatch(True)
 
     old_cwd = os.getcwd()

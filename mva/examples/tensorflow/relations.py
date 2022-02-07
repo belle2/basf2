@@ -221,7 +221,6 @@ if __name__ == "__main__":
 
     import basf2_mva
     import basf2_mva_util
-    import ROOT  # noqa
     # ##############Building Data samples ###########################
     # This is  a dataset for testing relational nets.
     # It consists of number_total_lines lines in 3 dimensional space.

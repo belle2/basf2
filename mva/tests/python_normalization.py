@@ -60,8 +60,6 @@ print("Executed python script")
 
 if __name__ == "__main__":
 
-    import ROOT  # noqa
-
     # Skip test if files are not available
     if not (os.path.isfile('train.root') and os.path.isfile('test.root')):
         skip_test('Necessary files "train.root" and "test.root" not available.')

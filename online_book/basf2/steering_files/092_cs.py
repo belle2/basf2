@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
 import basf2_mva
-import ROOT
 
-general_options = ROOT.Belle2.MVA.GeneralOptions()
+general_options = basf2_mva.GeneralOptions()
 general_options.m_datafiles = basf2_mva.vector("ContinuumSuppression.root")
 general_options.m_treename = "tree"
 general_options.m_identifier = "MVAFastBDT.root"  # outputted weightfile
@@ -40,6 +39,6 @@ general_options.m_variables = basf2_mva.vector(
     "CleoConeCS(9)",
 )
 general_options.m_target_variable = "isContinuumEvent"
-fastbdt_options = ROOT.Belle2.MVA.FastBDTOptions()
+fastbdt_options = basf2_mva.FastBDTOptions()
 
-ROOT.Belle2.MVA.Utility.teacher(general_options, fastbdt_options)
+basf2_mva.teacher(general_options, fastbdt_options)

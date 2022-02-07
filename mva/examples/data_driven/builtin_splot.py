@@ -11,7 +11,6 @@
 import basf2_mva
 
 if __name__ == "__main__":
-    import ROOT  # noqa
     variables = ['p', 'pt', 'pz', 'phi',
                  'chiProb', 'dr', 'dz', 'dphi',
                  'daughter(0, dr)', 'daughter(1, dr)', 'daughter(0, dz)', 'daughter(1, dz)',

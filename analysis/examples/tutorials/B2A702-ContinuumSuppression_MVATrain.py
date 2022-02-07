@@ -29,8 +29,6 @@ import subprocess
 
 if __name__ == "__main__":
 
-    import ROOT  # noqa
-
     # Note that the target variable 'isNotContinuum' needs to be
     # saved in your train.root and test.root files, along with the
     # trainingVars, listed again here (see B2A701).

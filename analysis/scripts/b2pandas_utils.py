@@ -46,7 +46,7 @@ class VariablesToHDF5(basf2.Module):
     def initialize(self):
         """Create the hdf5 file and list of variable objects to be used during
         event processing."""
-        import ROOT
+        import ROOT  # noqa
         #: variable names
         self._varnames = [
             str(varname) for varname in variables.variables.resolveCollections(
@@ -123,7 +123,7 @@ def make_mcerrors_readable(dataframe, column="mcErrors"):
                 with column containing the output of the  mcErrors variable
         column(str): the name containing the values from the mcErrors variable
     """
-    import ROOT
+    import ROOT  # noqa
 
     if column not in dataframe:
         raise KeyError(f"Cannot find coulumn '{column}'")

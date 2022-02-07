@@ -15,8 +15,6 @@ import itertools
 
 if __name__ == "__main__":
 
-    import ROOT  # noqa
-
     training_data = basf2_mva.vector("train.root")
     test_data = basf2_mva.vector("test.root")
 

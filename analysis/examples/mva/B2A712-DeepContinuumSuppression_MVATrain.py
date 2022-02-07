@@ -115,8 +115,6 @@ def choose_input_features(use_vertex_features=True, use_charge_and_ROE_features=
 
 if __name__ == "__main__":
 
-    import ROOT  # noqa
-
     if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
         b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
 

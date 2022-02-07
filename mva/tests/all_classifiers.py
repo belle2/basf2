@@ -23,8 +23,6 @@ variables = ['p', 'pz', 'daughter(0, p)', 'daughter(0, pz)', 'daughter(1, p)', '
 
 if __name__ == "__main__":
 
-    import ROOT  # noqa
-
     # Skip test if files are not available
     if not (os.path.isfile('train.root') and os.path.isfile('test.root')):
         skip_test('Necessary files "train.root" and "test.root" not available.')

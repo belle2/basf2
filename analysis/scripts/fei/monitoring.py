@@ -149,7 +149,7 @@ class MonitoringHist:
         Reads histograms from the given file
         @param filename the name of the ROOT file
         """
-        import ROOT
+        import ROOT  # noqa
         #: Dictionary of bin-contents for each histogram
         self.values = {}
         #: Dictionary of bin-centers for each histogram
@@ -247,7 +247,7 @@ class MonitoringNTuple:
         Reads ntuple from the given file
         @param filename the name of the ROOT file
         """
-        import ROOT
+        import ROOT  # noqa
         #: Indicates if the ntuple were successfully read
         self.valid = os.path.isfile(filename)
         if not self.valid:
@@ -271,7 +271,7 @@ class MonitoringModuleStatistics:
         Reads the module statistics from the file named Monitor_ModuleStatistics.root
         @param particle the particle for which the statistics are read
         """
-        import ROOT
+        import ROOT  # noqa
         root_file = ROOT.TFile.Open('Monitor_ModuleStatistics.root', 'read')
         persistentTree = root_file.Get('persistent')
         persistentTree.GetEntry(0)
@@ -393,7 +393,7 @@ def MonitoringMCCount(particle):
     @param particle the particle for which the MC counts are read
     @return dictionary with 'sum', 'std', 'avg', 'max', and 'min'
     """
-    import ROOT
+    import ROOT  # noqa
     root_file = ROOT.TFile.Open('mcParticlesCount.root', 'read')
 
     key = f'NumberOfMCParticlesInEvent({abs(pdg.from_name(particle.name))})'

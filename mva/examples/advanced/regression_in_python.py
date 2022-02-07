@@ -17,7 +17,6 @@ from matplotlib import pyplot as plt
 
 
 def train_mva_method(file_name):
-    import ROOT  # noqa
 
     weight_file = "weightfile.root"
 
@@ -52,7 +51,6 @@ def create_random_data():
 
 
 def apply_expert(file_name, weight_file):
-    import ROOT  # noqa
     output_file = 'expert.root'
     basf2_mva.expert(basf2_mva.vector(weight_file), basf2_mva.vector(file_name), 'tree', output_file)
     return output_file

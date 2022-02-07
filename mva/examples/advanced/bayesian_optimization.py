@@ -29,7 +29,6 @@ def f(x):
     The functions trains the classifier with the given hyperparameters on the training sample and
     calculates the AUC on the independent test sample.
     """
-    import ROOT  # noqa
     g_options = general_options
     g_options.m_identifier = "test.xml"
     options = basf2_mva.FastBDTOptions()
@@ -43,12 +42,10 @@ def f(x):
 
 if __name__ == "__main__":
 
-    import ROOT  # noqa
-
     training_data = basf2_mva.vector("train.root")
     test_data = basf2_mva.vector("test.root")
 
-    general_options = ROOT.Belle2.GeneralOptions()
+    general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = training_data
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector('p', 'pz', 'daughter(0, kaonID)', 'chiProb', 'M')

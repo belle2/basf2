@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -148,7 +145,7 @@ class Method(object):
         #: Weightfile of the method
         self.weightfile = ROOT.Belle2.MVA.Weightfile.load(self.identifier)
         #: General options of the method
-        self.general_options = ROOT.Belle2.MVA.GeneralOptions()
+        self.general_options = basf2_mva.GeneralOptions()
         self.general_options.load(self.weightfile.getXMLTree())
 
         # This piece of code should be correct but leads to random segmentation faults
@@ -164,23 +161,23 @@ class Method(object):
         #: Specific options of the method
         self.specific_options = None
         if self.general_options.m_method == "FastBDT":
-            self.specific_options = ROOT.Belle2.MVA.FastBDTOptions()
+            self.specific_options = basf2_mva.FastBDTOptions()
         elif self.general_options.m_method == "TMVAClassification":
-            self.specific_options = ROOT.Belle2.MVA.TMVAOptionsClassification()
+            self.specific_options = basf2_mva.TMVAOptionsClassification()
         elif self.general_options.m_method == "TMVARegression":
-            self.specific_options = ROOT.Belle2.MVA.TMVAOptionsRegression()
+            self.specific_options = basf2_mva.TMVAOptionsRegression()
         elif self.general_options.m_method == "FANN":
-            self.specific_options = ROOT.Belle2.MVA.FANNOptions()
+            self.specific_options = basf2_mva.FANNOptions()
         elif self.general_options.m_method == "Python":
-            self.specific_options = ROOT.Belle2.MVA.PythonOptions()
+            self.specific_options = basf2_mva.PythonOptions()
         elif self.general_options.m_method == "PDF":
-            self.specific_options = ROOT.Belle2.MVA.PDFOptions()
+            self.specific_options = basf2_mva.PDFOptions()
         elif self.general_options.m_method == "Combination":
-            self.specific_options = ROOT.Belle2.MVA.CombinationOptions()
+            self.specific_options = basf2_mva.CombinationOptions()
         elif self.general_options.m_method == "Reweighter":
-            self.specific_options = ROOT.Belle2.MVA.ReweighterOptions()
+            self.specific_options = basf2_mva.ReweighterOptions()
         elif self.general_options.m_method == "Trivial":
-            self.specific_options = ROOT.Belle2.MVA.TrivialOptions()
+            self.specific_options = basf2_mva.TrivialOptions()
         else:
             raise RuntimeError("Unknown method " + self.general_options.m_method)
 
@@ -197,8 +194,8 @@ class Method(object):
         self.root_variables = [ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(v) for v in self.variables]
         #: Dictionary of the variables sorted by their importance but with root compatoble variable names
         self.root_importances = {k: importances[k] for k in self.root_variables}
-        #: Description of the method as a xml string returned by ROOT.Belle2.MVA.Utility.info
-        self.description = str(ROOT.Belle2.MVA.Utility.info(self.identifier))
+        #: Description of the method as a xml string returned by basf2_mva.info
+        self.description = str(basf2_mva.info(self.identifier))
         #: List of spectators
         self.spectators = [str(v) for v in self.general_options.m_spectators]
         #: List of spectators with root compatible names
@@ -209,9 +206,9 @@ class Method(object):
         Train a new method using this method as a prototype
         @param datafiles the training datafiles
         @param treename the name of the tree containing the training data
-        @param general_options general options given to ROOT.Belle2.MVA.Utility.teacher
+        @param general_options general options given to basf2_mva.teacher
           (if None the options of this method are used)
-        @param specific_options specific options given to ROOT.Belle2.MVA.Utility.teacher
+        @param specific_options specific options given to basf2_mva.teacher
           (if None the options of this method are used)
         """
         import ROOT  # noqa
@@ -228,7 +225,7 @@ class Method(object):
             general_options.m_datafiles = basf2_mva.vector(*datafiles)
             general_options.m_identifier = identifier
 
-            ROOT.Belle2.MVA.Utility.teacher(general_options, specific_options)
+            basf2_mva.teacher(general_options, specific_options)
 
             method = Method(identifier)
         return method
@@ -247,10 +244,10 @@ class Method(object):
             ROOT.Belle2.MVA.Weightfile.save(self.weightfile, identifier)
 
             rootfilename = tempdir + '/expert.root'
-            ROOT.Belle2.MVA.Utility.expert(basf2_mva.vector(identifier),
-                                           basf2_mva.vector(*datafiles),
-                                           treename,
-                                           rootfilename)
+            basf2_mva.expert(basf2_mva.vector(identifier),
+                             basf2_mva.vector(*datafiles),
+                             treename,
+                             rootfilename)
             rootfile = ROOT.TFile(rootfilename, "UPDATE")
             roottree = rootfile.Get("variables")
 

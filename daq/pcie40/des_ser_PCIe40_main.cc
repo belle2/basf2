@@ -2058,7 +2058,7 @@ void* sender(void* arg)
         printEventData(buff + NW_SEND_HEADER, event_nwords);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
-        exit(1);
+        //        exit(1);
       } else {
         pthread_mutex_lock(&(mtx_sender_log));
         printf("[FATAL] thread %d : checkEventData() detected an error. Exiting...\n", sender_id);

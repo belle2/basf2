@@ -170,12 +170,13 @@ void ChargedPidMVAModule::event()
         auto varobj = m_variables.at(index).at(ivar);
 
         double var = -999.0;
-        if (std::holds_alternative<double>(varobj->function(particle))) {
-          var = std::get<double>(varobj->function(particle));
-        } else if (std::holds_alternative<int>(varobj->function(particle))) {
-          var = std::get<int>(varobj->function(particle));
-        } else if (std::holds_alternative<bool>(varobj->function(particle))) {
-          var = std::get<bool>(varobj->function(particle));
+        auto var_result = varobj->function(particle);
+        if (std::holds_alternative<double>(var_result)) {
+          var = std::get<double>(var_result);
+        } else if (std::holds_alternative<int>(var_result)) {
+          var = std::get<int>(var_result);
+        } else if (std::holds_alternative<bool>(var_result)) {
+          var = std::get<bool>(var_result);
         } else {
           B2ERROR("Variable '" << varobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
         }
@@ -197,12 +198,13 @@ void ChargedPidMVAModule::event()
         auto specobj = m_spectators.at(index).at(ispec);
 
         double spec = std::numeric_limits<double>::quiet_NaN();
-        if (std::holds_alternative<double>(specobj->function(particle))) {
-          spec = std::get<double>(specobj->function(particle));
-        } else if (std::holds_alternative<int>(specobj->function(particle))) {
-          spec = std::get<int>(specobj->function(particle));
-        } else if (std::holds_alternative<bool>(specobj->function(particle))) {
-          spec = std::get<bool>(specobj->function(particle));
+        auto spec_result = specobj->function(particle);
+        if (std::holds_alternative<double>(spec_result)) {
+          spec = std::get<double>(spec_result);
+        } else if (std::holds_alternative<int>(spec_result)) {
+          spec = std::get<int>(spec_result);
+        } else if (std::holds_alternative<bool>(spec_result)) {
+          spec = std::get<bool>(spec_result);
         } else {
           B2ERROR("Variable '" << specobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
         }

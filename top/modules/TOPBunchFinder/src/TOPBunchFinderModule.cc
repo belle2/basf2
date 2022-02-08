@@ -241,7 +241,7 @@ namespace Belle2 {
     // full time window in which data are taken (smaller time window is used in reconstruction)
 
     const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
-    double timeWindow = m_feSetting->getReadoutWindows() * tdc.getSyncTimeBase() / TOPNominalTDC::c_syncWindows;
+    double timeWindow = m_feSetting->getReadoutWindows() * tdc.getSyncTimeBase() / static_cast<double>(TOPNominalTDC::c_syncWindows);
 
     // counters and temporary containers
 

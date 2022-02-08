@@ -238,6 +238,9 @@ namespace Belle2 {
       }
 
       unsigned int numberOfEvents = training_data.getNumberOfEvents();
+      if (numberOfEvents > 5e+6) {
+        B2WARNING("Number of events for training exceeds 5 million. FastBDT performance starts getting worse when the number reaches O(10^7).");
+      }
 
 #if FastBDT_VERSION_MAJOR >= 4
       FastBDT::EventSample eventSample(numberOfEvents, numberOfFeatures, numberOfSpectators, nBinningLevels);

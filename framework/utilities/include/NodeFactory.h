@@ -13,6 +13,7 @@
 
 #include <boost/python/tuple.hpp>
 #include <boost/python/extract.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace py = boost::python;
 typedef const py::tuple& Nodetuple;
@@ -51,6 +52,8 @@ namespace Belle2 {
 
   template<class AVariableManager>
   class FunctionNode;
+
+  std::vector<std::string> splitOnDelimiterAndConserveParenthesis(std::string str, char delimiter, char open, char close);
 
   /**
    * Wrapper class for static node compile functions
@@ -192,40 +195,26 @@ namespace Belle2 {
         bool b = py::extract<bool>(tuple[1]);
         return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new DataNode<AVariableManager, bool>(b));
       } else if (node_type == NodeType::IdentifierNode) {
-        if (py::len(tuple) != 3) B2FATAL("IdentifierNode nodetuple has to have length 3." << LogVar("actual length", py::len(tuple)));
+        if (py::len(tuple) != 2) B2FATAL("IdentifierNode nodetuple has to have length 2." << LogVar("actual length", py::len(tuple)));
         std::string identifier = py::extract<std::string>(tuple[1]);
-        bool processVariableOnCreation = py::extract<bool>(tuple[2]);
-        return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new IdentifierNode<AVariableManager>(identifier,
-               processVariableOnCreation));
+        return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new IdentifierNode<AVariableManager>(identifier));
       } else if (node_type == NodeType::FunctionNode) {
-        if (py::len(tuple) != 5) B2FATAL("FunctionNode nodetuple has to have length 5." << LogVar("actual length", py::len(tuple)));
+        if (py::len(tuple) != 3) B2FATAL("FunctionNode nodetuple has to have length 3." << LogVar("actual length", py::len(tuple)));
 
         // Extract functionName as second argument of the tuple
         std::string functionName = py::extract<std::string>(tuple[1]);
 
-        // Extract number of function arguments
-        int numArguments = py::extract<int>(tuple[2]);
-
         // Extract argument tuple
-        Nodetuple argumentTuple = static_cast<const py::tuple>(tuple[3]);
-
-        // Create vector of strings by compiling each argument tuple and immediately call decompile.
-        std::vector<std::string> functionArguments;
-        for (int i = 0; i < numArguments; i++) {
-          Nodetuple argument = static_cast<const py::tuple>(argumentTuple[i]);
-
-          // Compile argument
-          std::unique_ptr<const AbstractBooleanNode<AVariableManager>> argNode = compile_boolean_node<AVariableManager>(argument);
-
-          // Decompile argument node into a string
-          std::string stringArgument = argNode->decompile();
-          if (stringArgument.size() == 0) throw std::runtime_error("Argument empty");
-          functionArguments.push_back(stringArgument);
+        std::string argument = py::extract<std::string>(tuple[2]);
+        boost::algorithm::trim(argument);
+        // Define vector for function arguments
+        std::vector<std::string> functionArguments = splitOnDelimiterAndConserveParenthesis(argument, ',', '(', ')');
+        for (auto& str : functionArguments) {
+          boost::algorithm::trim(str);
         }
-        bool processMetaVariableOnCreation = py::extract<bool>(tuple[4]);
 
         return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new FunctionNode<AVariableManager>(functionName,
-               functionArguments, processMetaVariableOnCreation));
+               functionArguments));
       } else {
         throw std::runtime_error("error NodeFactory::compile_expression_node: got invalid expression NodeType.");
       }

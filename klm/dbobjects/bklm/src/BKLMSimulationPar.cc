@@ -97,7 +97,7 @@ double BKLMSimulationPar::getPhiMultiplicityCDF(double stripDiv, int mult) const
     return 0.0;
   if (mult >= c_MAX_NHIT)
     return 1.0;
-  int stripIndex = (int) fabs(stripDiv * static_cast<int>(c_NDIV) / 0.5);
+  int stripIndex = (int) fabs(stripDiv * c_NDIV / 0.5);
   if (stripIndex > c_NDIV)
     return 0.0;
   return m_PhiMultiplicityCDF[stripIndex][mult];
@@ -109,7 +109,7 @@ double BKLMSimulationPar::getZMultiplicityCDF(double stripDiv, int mult) const
     return 0.0;
   if (mult >= c_MAX_NHIT)
     return 1.0;
-  int stripIndex = (int) fabs(stripDiv * static_cast<int>(c_NDIV) / 0.5);
+  int stripIndex = (int) fabs(stripDiv * c_NDIV / 0.5);
   if (stripIndex > c_NDIV)
     return 0.0;
   return m_ZMultiplicityCDF[stripIndex][mult];

@@ -38,7 +38,7 @@ Variables
    a :math:`\chi^2` value.
  * Added new Flavor Tagger related meta-variables to use ROE-mask correctly, ``pMissTag``, ``cosTPTO``, ``ptTracksRoe``, ``pt2TracksRoe``,
    ``isMajorityInRestOfEventFromB0``, ``isMajorityInRestOfEventFromB0bar``, ``hasRestOfEventTracks``, and ``isRelatedRestOfEventMajorityB0Flavor``.
-   Added an argument `maskName` to ``BtagToWBosonVariables``.
+   Added an argument ``maskName`` to ``BtagToWBosonVariables``.
 
 Modules
 +++++++

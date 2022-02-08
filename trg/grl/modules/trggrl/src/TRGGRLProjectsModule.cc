@@ -808,8 +808,8 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "brlfb2") {bit = brlfb == 2;}
     else if (bitname == "brlnb1") {bit = brlnb == 1;}
     else if (bitname == "brlnb2") {bit = brlnb == 2;}
-    else if (bitname == "seklm_0") {bit = n_seklm == 0;}
-    else if (bitname == "seklm_1") {bit = n_seklm > 0;}
+    else if (bitname == "seklm_0") {bit = n_seklm == 1;}
+    else if (bitname == "seklm_1") {bit = n_seklm > 1;}
     else if (bitname == "ieklm") {bit = n_ieklm > 0;}
     else if (bitname == "secl") {bit = n_secl > 0;}
     else if (bitname == "iecl") {bit = n_iecl > 0;}

@@ -36,6 +36,9 @@ Variables
  * Added `percentageWrongParticlesBTag` which gives the percentage of FSP reconstructed not originating from the `mostcommonBTagIndex`.
  * Added the variable `TracksLBoostChi2`, which returns the change of the track positions in the boost direction after a vertex KFit in terms of
    a :math:`\chi^2` value.
+ * Added new Flavor Tagger related meta-variables to use ROE-mask correctly, ``pMissTag``, ``cosTPTO``, ``ptTracksRoe``, ``pt2TracksRoe``,
+   ``isMajorityInRestOfEventFromB0``, ``isMajorityInRestOfEventFromB0bar``, ``hasRestOfEventTracks``, and ``isRelatedRestOfEventMajorityB0Flavor``.
+   Added an argument `maskName` to ``BtagToWBosonVariables``.
 
 Modules
 +++++++

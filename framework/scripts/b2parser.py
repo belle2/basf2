@@ -6,7 +6,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 import argparse
-import re
 from sly import Lexer, Parser
 
 
@@ -29,7 +28,6 @@ class B2Lexer(Lexer):
         LBRACK, RBRACK, LPAREN, RPAREN,  # noqa: F821
         # data types
         DOUBLE, INTEGER, IDENTIFIER, BOOLEAN,  # noqa: F821
-        LABEL, PARTICLENAME,  # noqa: F821
         # boolean operators
         AND, OR, NOT,  # noqa: F821
         # comparison operatots
@@ -72,10 +70,7 @@ class B2Lexer(Lexer):
     PLUS = r"\+"
     #: token regular expression for '-'
     MINUS = r"-"
-    #: token regular expression for matching wrapped particle names
-    PARTICLENAME = r'".*?"'
-    #: token regular expression for particle list labels
-    LABEL = r":[a-zA-Z0-9_]*"
+
     # Scanning Functions for tokens which
     # require additional operations
     # regular expressions are supplied via @_ decorator
@@ -236,7 +231,7 @@ class B2Lexer(Lexer):
             t.value = int(t.value, base=16)
         return t
 
-    @_(r"[a-zA-Z][a-zA-Z_0-9&]*")  # noqa: F821
+    @_(r"[a-zA-Z]([a-zA-Z_0-9&:]|\+:|-:|':)*")  # noqa: F821
     def IDENTIFIER(self, t):
         """
         Scaning function for identifiers
@@ -344,14 +339,10 @@ def parser_class_decorator(cls, parser_type):
 
         <primary> ::= LPAREN <expression> RPAREN
             | <function>
-            | <generalidentifier>
+            | IDENTIFIER
             | INTEGER
             | BOOLEAN
             | DOUBLE
-
-        <generalidentifier> ::= IDENTIFIER
-            | PARTICLENAME LABEL
-            | PARTICLENAME
 
         <function> ::= IDENTIFIER LPAREN <parameters> RPAREN
 
@@ -816,7 +807,7 @@ def parser_class_decorator(cls, parser_type):
             """
             return (self.get_node_type("BooleanNode"), p.BOOLEAN)
 
-        @_(r"generalidentifier")  # noqa: F821
+        @_(r"IDENTIFIER")  # noqa: F821
         def primary(self, p):  # noqa: F811
             """
             Parsing function for <primary> nonterminal
@@ -827,45 +818,15 @@ def parser_class_decorator(cls, parser_type):
             if self.parameter_stack:
                 return (
                     self.get_node_type("IdentifierNode"),
-                    p.generalidentifier,
+                    p.IDENTIFIER,
                     False,
                 )
             else:
                 return (
                     self.get_node_type("IdentifierNode"),
-                    p.generalidentifier,
+                    p.IDENTIFIER,
                     True,
                 )
-
-        @_(r"IDENTIFIER")  # noqa: F821
-        def generalidentifier(self, p):  # noqa: F811
-            """
-            Parsing function for <generalidentifier> nonterminal
-
-            Grammar rule:
-                <generalidentifier> ::= IDENTIFIER
-            """
-            return p.IDENTIFIER
-
-        @_(r"PARTICLENAME LABEL")  # noqa: F821
-        def generalidentifier(self, p):  # noqa: F811
-            """
-            Parsing function for <generalidentifier> nonterminal
-
-            Grammar rule:
-                <generalidentifier> ::= PARTICLENAME LABEL
-            """
-            return p.PARTICLENAME.replace('"', '')+p.LABEL
-
-        @_(r"PARTICLENAME")  # noqa: F821
-        def generalidentifier(self, p):  # noqa: F811
-            """
-            Parsing function for <generalidentifier> nonterminal
-
-            Grammar rule:
-                <generalidentifier> ::= PARTICLENAME
-            """
-            return p.PARTICLENAME.replace('"', '')
 
         @_(r"IDENTIFIER LPAREN parameters RPAREN")  # noqa: F821
         def function(self, p):
@@ -988,22 +949,6 @@ B2Parser = parser_class_decorator(Parser, parser_type="cut")
 B2ExpressionParser = parser_class_decorator(Parser, parser_type="expression")
 
 
-def preprocess(cut: str) -> str:
-    """
-    Some particle names interfere with the grammar and the scanning.
-    They have to be matched in the cut and wrapped in
-    double quotes before tokenization.
-    """
-    def wrap_particle_name(matchobj):
-        particle_name = matchobj.group(1)
-        matched_string = matchobj.group(0)
-        return matched_string.replace(particle_name, f'"{particle_name}"')
-
-    particle_name_pattern = r"[\(,]\s*(?P<ParticleName>anti-Lambda_c\(2593\)-|anti-Lambda_c\(2625\)-|anti-Lambda\(1405\)0|anti-Lambda\(1520\)0|anti-Lambda\(1600\)0|anti-Lambda\(1670\)0|anti-Lambda\(1690\)0|anti-Lambda\(1800\)0|anti-Lambda\(1810\)0|anti-Lambda\(1820\)0|anti-Lambda\(1830\)0|anti-Sigma\(1660\)0|anti-Sigma\(1670\)0|anti-Sigma\(1750\)0|anti-Sigma\(1775\)0|anti-K\(2\)\(1770\)0|anti-K\(2\)\(1820\)0|Lambda_c\(2593\)\+|Lambda_c\(2625\)\+|anti-Sigma_c\*--|anti-Omega_cc\*-|anti-b'-hadron|omega\(3\)\(1670\)|anti-Lambda_c-|anti-Sigma_c--|anti-Sigma_c\*-|anti-Sigma_c\*0|anti-Omega_c\*0|anti-Omega_cc-|anti-Lambda_b0|anti-Sigma_b\*-|anti-Sigma_b\*0|anti-Sigma_b\*\+|anti-Omega_b\*\+|anti-rndmflav|anti-c-hadron|anti-b-hadron|anti-t-hadron|rho\(3\)\(1690\)\+|rho\(3\)\(1690\)-|rho\(3\)\(1690\)0|Upsilon_1\(1D\)|Upsilon_2\(1D\)|Upsilon_3\(1D\)|Upsilon_1\(2D\)|Upsilon_2\(2D\)|Upsilon_3\(2D\)|Lambda\(1405\)0|Lambda\(1520\)0|Lambda\(1600\)0|Lambda\(1670\)0|Lambda\(1690\)0|Lambda\(1800\)0|Lambda\(1810\)0|Lambda\(1820\)0|Lambda\(1830\)0|anti-Sigma_c-|anti-Sigma_c0|anti-Omega_c0|anti-Xi_cc\*--|anti-Sigma_b-|anti-Sigma_b0|anti-Sigma_b\+|anti-Omega_b\+|anti-deuteron|pi\(1\)\(1400\)\+|pi\(1\)\(1400\)-|pi\(1\)\(1400\)0|pi\(1\)\(1600\)\+|pi\(1\)\(1600\)-|pi\(1\)\(1600\)0|eta\(2\)\(1645\)|pi\(2\)\(1670\)\+|pi\(2\)\(1670\)-|pi\(2\)\(1670\)0|phi\(3\)\(1850\)|anti-D\*\(2S\)0|anti-Delta--|anti-Lambda0|anti-Sigma\*-|anti-Sigma\*0|anti-Sigma\*\+|Sigma\(1660\)0|Sigma\(1670\)0|Sigma\(1750\)0|Sigma\(1775\)0|anti-Xi_cc--|anti-Xi_cc\*-|anti-tritium|anti-B0heavy|anti-nu_tau|a\(0\)\(1450\)\+|a\(0\)\(1450\)-|a\(0\)\(1450\)0|omega\(1650\)|K\(2\)\(1770\)\+|K\(2\)\(1770\)-|K\(2\)\(1770\)0|K\(2\)\(1820\)\+|K\(2\)\(1820\)-|K\(2\)\(1820\)0|anti-D\(2S\)0|anti-B_s0\*0|anti-B_s2\*0|anti-B'_s10|Upsilon\(2S\)|Upsilon\(3S\)|Upsilon\(4S\)|Upsilon\(5S\)|Upsilon\(6S\)|anti-Delta-|anti-Delta0|anti-Delta\+|anti-Sigma-|anti-Sigma0|anti-Sigma\+|anti-Omega\+|anti-Xi'_c-|anti-Xi'_c0|anti-Xi_c\*-|anti-Xi_c\*0|anti-Xi_cc-|anti-Xi'_b0|anti-Xi'_b\+|anti-Xi_b\*0|anti-Xi_b\*\+|anti-B0long|anti-nu_mu|f\(0\)\(1710\)|f\(2\)\(1950\)|a_4\(1970\)\+|a_4\(1970\)-|a_4\(1970\)0|f\(2\)\(2010\)|f\(4\)\(2050\)|f\(2\)\(2300\)|f\(2\)\(2340\)|anti-K'_10|anti-K_0\*0|anti-K_2\*0|anti-K''\*0|anti-K_3\*0|anti-K_4\*0|anti-D_0\*0|anti-D'_10|anti-D_2\*0|anti-B_0\*0|anti-B'_10|anti-B_2\*0|anti-B_s\*0|anti-B_s10|eta_b2\(1D\)|chi_b0\(2P\)|chi_b1\(2P\)|chi_b2\(2P\)|eta_b2\(2D\)|chi_b0\(3P\)|chi_b1\(3P\)|chi_b2\(3P\)|Zb\(10610\)-|Zb\(10610\)\+|Zb\(10650\)-|Zb\(10650\)\+|Sigma_c\*\+\+|anti-Xi_c-|anti-Xi_c0|Omega_cc\*\+|anti-Xi_b0|anti-Xi_b\+|anti-alpha|anti-nu_e|anti-nu_L|b'-hadron|anti-dd_1|anti-uu_1|anti-ud_0|anti-ud_1|anti-sd_0|anti-sd_1|anti-su_0|anti-su_1|anti-ss_1|anti-cd_0|anti-cd_1|anti-cu_0|anti-cu_1|anti-cs_0|anti-cs_1|anti-cc_1|anti-bd_0|anti-bd_1|anti-bu_0|anti-bu_1|anti-bs_0|anti-bs_1|anti-bc_0|anti-bc_1|anti-bb_1|anti-Xdu-|eta\(1405\)|omega\(2S\)|eta\(1475\)|f_0\(1500\)|phi\(1680\)|pi\(1800\)\+|pi\(1800\)-|pi\(1800\)0|anti-K_10|anti-K'\*0|anti-D_10|anti-B_10|anti-B_s0|eta_c\(2S\)|psi\(3770\)|X_1\(3872\)|X_2\(3872\)|psi\(4040\)|psi\(4160\)|psi\(4415\)|eta_b\(2S\)|eta_b\(3S\)|anti-Xi\*0|anti-Xi\*\+|Lambda_c\+|Sigma_c\+\+|Sigma_c\*\+|Sigma_c\*0|Omega_c\*0|Omega_cc\+|Sigma_b\*\+|Sigma_b\*0|Sigma_b\*-|Omega_b\*-|B\*\+nospin|B\*-nospin|c-hadron|b-hadron|t-hadron|anti-Xdd|anti-Xsd|anti-Xsu|anti-Xss|rho\(2S\)\+|rho\(2S\)-|rho\(2S\)0|rho\(3S\)\+|rho\(3S\)-|rho\(3S\)0|anti-K\*0|anti-D\*0|anti-B\*0|Z\(4430\)\+|Z\(4430\)-|anti-Xi0|anti-Xi\+|Sigma_c\+|Xi_cc\*\+\+|Sigma_b\+|Sigma_b-|Omega_b-|anti-He3|anti-b'|anti-t'|Higgs'0|anti-R0|eta\(2S\)|pi\(2S\)\+|pi\(2S\)-|pi\(2S\)0|anti-K0|anti-D0|D\*\(2S\)\+|D\*\(2S\)-|D\*\(2S\)0|anti-B0|psi\(2S\)|h_b\(2P\)|h_b\(3P\)|anti-p-|anti-n0|Delta\+\+|Sigma\*\+|Sigma\*0|Sigma\*-|Xi_cc\+\+|Xi_cc\*\+|anti-d|anti-u|anti-s|anti-c|anti-b|anti-t|Higgs\+|Higgs-|D\(2S\)\+|D\(2S\)-|D\(2S\)0|D_s0\*\+|D_s0\*-|D'_s1\+|D'_s1-|D_s2\*\+|D_s2\*-|B_s0\*0|B_s2\*0|B'_s10|B_c0\*\+|B_c0\*-|B_c2\*\+|B_c2\*-|B'_c1\+|B'_c1-|Delta\+|Delta-|Sigma\+|Sigma-|Omega-|Xi'_c\+|Xi'_c0|Xi_c\*\+|Xi_c\*0|Xi_cc\+|Xi'_b0|Xi'_b-|Xi_b\*0|Xi_b\*-|K'_1\+|K'_1-|K'_10|K_0\*\+|K_0\*-|K_0\*0|K_2\*\+|K_2\*-|K_2\*0|K''\*\+|K''\*-|K''\*0|K_3\*\+|K_3\*-|K_3\*0|K_4\*\+|K_4\*-|K_4\*0|D_0\*\+|D_0\*-|D_0\*0|D'_1\+|D'_1-|D'_10|D_2\*\+|D_2\*-|D_2\*0|D_s\*\+|D_s\*-|D_s1\+|D_s1-|B_0\*\+|B_0\*-|B_0\*0|B'_1\+|B'_1-|B'_10|B_2\*\+|B_2\*-|B_2\*0|B_s\*0|B_c\*\+|B_c\*-|B_c1\+|B_c1-|J\/psi|Xi_c\+|Xi_b-|tau-|tau\+|Z''0|Xdu\+|rho\+|rho-|eta'|a_0\+|a_0-|b_1\+|b_1-|a_1\+|a_1-|a_2\+|a_2-|f'_0|h'_1|f'_1|f'_2|K_1\+|K_1-|K'\*\+|K'\*-|K'\*0|D_1\+|D_1-|D_s\+|D_s-|B_1\+|B_1-|B_c\+|B_c-|Xi\*0|Xi\*-|mu-|mu\+|Z'0|W'\+|W'-|Xu\+|Xu-|pi\+|pi-|K\*\+|K\*-|K\*0|D\*\+|D\*-|D\*0|B\*\+|B\*-|B\*0|Xi-|b'|t'|e-|e\+|L\+|L-|W\+|W-|K\+|K-|D\+|D-|B\+|B-|p\+)(?:\s*,|\s*\)|:)"  # noqa: E501
-
-    return re.sub(particle_name_pattern, wrap_particle_name, cut)
-
-
 def parse(cut: str, verbose=False) -> tuple:
     """
     Initialize a parser and lexer object and parse cut
@@ -1012,9 +957,8 @@ def parse(cut: str, verbose=False) -> tuple:
                     parser debugging purposes, not to be set true in production
     """
     lexer = B2Lexer()
-
     parser = B2Parser(verbose)
-    return parser.parse(cut, lexer.tokenize(preprocess(cut)))
+    return parser.parse(cut, lexer.tokenize(cut))
 
 
 def parse_expression(cut: str, verbose=False) -> tuple:
@@ -1026,7 +970,7 @@ def parse_expression(cut: str, verbose=False) -> tuple:
     """
     lexer = B2Lexer()
     parser = B2ExpressionParser(verbose)
-    return parser.parse(cut, lexer.tokenize(preprocess(cut)))
+    return parser.parse(cut, lexer.tokenize(cut))
 
 
 if __name__ == "__main__":
@@ -1034,17 +978,10 @@ if __name__ == "__main__":
     argparser.add_argument(
         "-e", "--expression", action="store_const", default=0, const=1
     )
-    argparser.add_argument(
-        "-l", "--scanning", action="store_const", default=0, const=1
-    )
     args = argparser.parse_args()
-    cut = input("Please input cut\n")
-    cut = preprocess(cut)
-    if args.scanning:
-        lexer = B2Lexer()
-        for token in lexer.tokenize(cut):
-            print(token)
-    elif args.expression:
+    if args.expression:
+        cut = input("Please input expression:\n")
         print(parse_expression(cut))
     else:
+        cut = input("Please input cut:\n")
         print(parse(cut))

@@ -198,7 +198,7 @@ void BKLMAnaModule::event()
     double trktheta = p4.Vect().Theta() * 180.0 / CLHEP::pi;
     if (trkphi < 0)
       trkphi =  trkphi + 360.0;
-    RelationVector<BKLMHit2d> relatedHit2D = track->getRelationsTo<BKLMHit2d>();
+    RelationVector<KLMHit2d> relatedHit2D = track->getRelationsTo<KLMHit2d>();
     RelationVector<ExtHit> relatedExtHit = track->getRelationsTo<ExtHit>();
     for (unsigned int t = 0; t < relatedExtHit.size(); t++) {
       ExtHit* exthit =  relatedExtHit[t];
@@ -232,9 +232,11 @@ void BKLMAnaModule::event()
       m_totalMom->Fill(mom);
       //look for mateched BKLM2dHit
       //for (unsigned int mHit = 0; mHit < relatedHit2D.size(); mHit++) {
-      // BKLMHit2d* hit = relatedHit2D[mHit];
+      // KLMHit2d* hit = relatedHit2D[mHit];
       for (int mHit = 0; mHit < hits2D.getEntries(); mHit++) {
-        BKLMHit2d* hit = hits2D[mHit];
+        KLMHit2d* hit = hits2D[mHit];
+        if (hit->getSubdetector() != KLMElementNumbers::c_BKLM)
+          continue;
         //if(!hit->inRPC()) continue;
         if (hit->getSection() != section)
           continue;
@@ -242,9 +244,9 @@ void BKLMAnaModule::event()
           continue;
         if (hit->getLayer() != layer)
           continue;
-        TVector3 position = hit->getGlobalPosition();
-        TVector3 distance =  extVec - position;
-        //on same track, same sector, same layer, we should believe extHit and BKLMHit2d are matched.
+        TVector3 position = hit->getPosition();
+        TVector3 distance = extVec - position;
+        //on same track, same sector, same layer, we should believe extHit and KLMHit2d are matched.
         //let's record the distance to check, should be small
         m_hdistance->Fill(distance.Mag());
         if (distance.Mag() < 20)

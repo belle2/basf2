@@ -37,7 +37,8 @@ add_cosmics_reconstruction(main, merge_tracks=False)
 # Output.
 output = basf2.register_module('RootOutput')
 output.param('outputFileName', '../CosmicsExtrapolation.root')
-output.param('branchNames', ['ExtHits', 'BKLMHit2ds', 'EKLMHit2ds'])
+output.param('branchNames', ['ExtHits', 'KLMHit2ds',
+                             'MCParticles', 'Tracks', 'TrackFitResults'])
 main.add_module(output)
 
 # Process the path.

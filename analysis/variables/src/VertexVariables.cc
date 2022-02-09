@@ -34,55 +34,6 @@ namespace Belle2 {
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
 
-    // MC Local coordinates and sensor ID from getDecayVertex global coordinates -----------------------------------------------------------------
-
-    tuple<TVector3, int, int, int> getmcLocalCoordinates(const Particle* part)
-    {
-      VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-      auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return make_tuple(TVector3(realNaN, realNaN, realNaN), 0, 0, 0);
-      const auto& mcglobal = mcparticle->getDecayVertex();
-      for (const auto& layer : geo.getLayers()) {
-        for (const auto& ladder : geo.getLadders(layer)) {
-          for (const auto& sensor : geo.getSensors(ladder)) {
-            const auto& sInfo = VXD::GeoCache::get(sensor);
-            const auto& mclocal = sInfo.pointToLocal(mcglobal, true);
-            if (sInfo.inside(mclocal)) return make_tuple(mclocal, sensor.getLayerNumber(), sensor.getLadderNumber(), sensor.getSensorNumber());
-          }
-        }
-      }
-      return make_tuple(TVector3(realNaN, realNaN, realNaN), 0, 0, 0);
-    }
-
-    double mcDecayVertexU(const Particle* part)
-    {
-      return get<0>(getmcLocalCoordinates(part)).X();
-    }
-
-    double mcDecayVertexV(const Particle* part)
-    {
-      return get<0>(getmcLocalCoordinates(part)).Y();
-    }
-
-    double mcDecayVertexW(const Particle* part)
-    {
-      return get<0>(getmcLocalCoordinates(part)).Z();
-    }
-    double mcDecayVertexLayer(const Particle* part)
-    {
-      return get<1>(getmcLocalCoordinates(part));
-    }
-
-    double mcDecayVertexLadder(const Particle* part)
-    {
-      return get<2>(getmcLocalCoordinates(part));
-    }
-
-    double mcDecayVertexSensor(const Particle* part)
-    {
-      return get<3>(getmcLocalCoordinates(part));
-    }
-
     // Generate Vertex information
 
     double mcDecayVertexX(const Particle* part)
@@ -202,55 +153,6 @@ namespace Belle2 {
       auto* mcparticle = part->getMCParticle();
       if (!mcparticle) return realNaN;
       return getMcProductionVertexFromIP(mcparticle).Z();
-    }
-
-    //Local coordinates and sensor ID from getVertex global coordinates -----------------------------------------------------------------
-
-    tuple<TVector3, int, int, int> getLocalCoordinates(const Particle* part)
-    {
-      VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-      const auto& frame = ReferenceFrame::GetCurrent();
-      const auto& global = frame.getVertex(part);
-      for (const auto& layer : geo.getLayers()) {
-        for (const auto& ladder : geo.getLadders(layer)) {
-          for (const auto& sensor : geo.getSensors(ladder)) {
-            const auto& sInfo = VXD::GeoCache::get(sensor);
-            const auto& local = sInfo.pointToLocal(global, true);
-            if (sInfo.inside(local, 0.1, 0.1, 0.1)) return make_tuple(local, sensor.getLayerNumber(), sensor.getLadderNumber(),
-                                                                        sensor.getSensorNumber());
-          }
-        }
-      }
-      return make_tuple(TVector3(realNaN, realNaN, realNaN), 0, 0, 0);
-    }
-
-    double particleU(const Particle* part)
-    {
-      return get<0>(getLocalCoordinates(part)).X();
-    }
-
-    double particleV(const Particle* part)
-    {
-      return get<0>(getLocalCoordinates(part)).Y();
-    }
-
-    double particleW(const Particle* part)
-    {
-      return get<0>(getLocalCoordinates(part)).Z();
-    }
-    double particleLayer(const Particle* part)
-    {
-      return get<1>(getLocalCoordinates(part));
-    }
-
-    double particleLadder(const Particle* part)
-    {
-      return get<2>(getLocalCoordinates(part));
-    }
-
-    double particleSensor(const Particle* part)
-    {
-      return get<3>(getLocalCoordinates(part));
     }
 
     // vertex or POCA in respect to origin ------------------------------
@@ -450,18 +352,6 @@ namespace Belle2 {
                       "Returns the z position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
     REGISTER_VARIABLE("mcDecayVertexRho", mcDecayVertexRho,
                       "Returns the transverse position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcDecayVertexU", mcDecayVertexU,
-                      "Returns the U position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcDecayVertexV", mcDecayVertexV,
-                      "Returns the V position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcDecayVertexW", mcDecayVertexW,
-                      "Returns the W position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcDecayVertexLayer", mcDecayVertexLayer,
-                      "Returns the Layer ID of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcDecayVertexLadder", mcDecayVertexLadder,
-                      "Returns the ladder ID of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcDecayVertexSensor", mcDecayVertexSensor,
-                      "Returns the sensor ID of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
     REGISTER_VARIABLE("mcDecayVertexFromIPX", mcDecayVertexFromIPX,
                       "Returns the x position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
     REGISTER_VARIABLE("mcDecayVertexFromIPY", mcDecayVertexFromIPY,
@@ -504,18 +394,6 @@ If the particle is created from a KLM cluster, the distance is calculated betwee
                       "y coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
     REGISTER_VARIABLE("z", particleZ,
                       "z coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
-    REGISTER_VARIABLE("u", particleU,
-                      "u local sensor coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
-    REGISTER_VARIABLE("v", particleV,
-                      "V local sensor coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
-    REGISTER_VARIABLE("w", particleW,
-                      "w local sensor coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
-    REGISTER_VARIABLE("layer", particleLayer,
-                      "layer identification of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
-    REGISTER_VARIABLE("ladder", particleLadder,
-                      "layer identification of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
-    REGISTER_VARIABLE("sensor", particleSensor,
-                      "sensor identification of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
     REGISTER_VARIABLE("x_uncertainty", particleDXUncertainty, "uncertainty on x (measured with respect to the origin)");
     REGISTER_VARIABLE("y_uncertainty", particleDYUncertainty, "uncertainty on y (measured with respect to the origin)");
     REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z (measured with respect to the origin)");

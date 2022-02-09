@@ -65,10 +65,6 @@ void TrackAnaModule::event()
 {
   // Get Event Info
   StoreObjPtr<EventMetaData> evt;
-  int expno = evt->getExperiment();
-  int runno = evt->getRun();
-  int subrno = evt->getSubrun();
-  int evtno = evt->getEvent();
 
   // Get List of Tracks
   StoreArray<Track> trklist;

@@ -40,7 +40,7 @@ unsigned int ONSENBinData::getEventNumber() const
 {
   unsigned int nframe = getFrameNumber();
   if (nframe > MAX_PXD_FRAMES) return 0;
-  m_start_frame = (sose_frame_t*)(m_body + nframe + 2);
+  m_start_frame = reinterpret_cast<sose_frame_t*>(m_body + nframe + 2);
   return getTrigger();
 }
 

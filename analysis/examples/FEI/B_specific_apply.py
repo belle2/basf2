@@ -60,7 +60,7 @@ ma.buildRestOfEvent('B+:sig', path=path)
 clean_roe_mask = (
     'CleanROE',
     'dr < 2 and abs(dz) < 4',
-    'clusterE9E25 > 0.9 and clusterTiming < 50 and E > 0.9 and trackMatchType==0')
+    'clusterE9E25 > 0.9 and clusterTiming < 50 and E > 0.9 and clusterTrackMatch==0')
 ma.appendROEMasks('B+:sig', [clean_roe_mask], path=path)
 ma.applyCuts('B+:sig', 'roeDeltae(CleanROE) < 2.0 and roeMbc(CleanROE) > 4.8', path=path)
 

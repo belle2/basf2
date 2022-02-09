@@ -1121,6 +1121,7 @@ def fillParticleListFromROE(decayString,
 
 def fillParticleListFromMC(decayString,
                            cut,
+                           skipNonPrimary=False,
                            addDaughters=False,
                            skipNonPrimaryDaughters=False,
                            writeOut=False,
@@ -1133,6 +1134,7 @@ def fillParticleListFromMC(decayString,
 
     @param decayString             specifies type of Particles and determines the name of the ParticleList
     @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
+    @param skipNonPrimary          if true, skip non primary particle
     @param addDaughters            adds the bottom part of the decay chain of the particle to the datastore and
                                    sets mother-daughter relations
     @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
@@ -1143,6 +1145,7 @@ def fillParticleListFromMC(decayString,
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
     pload.param('decayStrings', [decayString])
+    pload.param('skipNonPrimary', skipNonPrimary)
     pload.param('addDaughters', addDaughters)
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
@@ -1191,6 +1194,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
 
     @param decayString             specifies type of Particles and determines the name of the ParticleList
     @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
+    @param skipNonPrimary          if true, skip non primary particle
     @param addDaughters            adds the bottom part of the decay chain of the particle to the datastore and
                                    sets mother-daughter relations
     @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles

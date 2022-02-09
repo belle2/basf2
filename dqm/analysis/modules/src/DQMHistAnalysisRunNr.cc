@@ -77,6 +77,18 @@ void DQMHistAnalysisRunNrModule::beginRun()
   B2DEBUG(99, "DQMHistAnalysisRunNr: beginRun called.");
 
   m_cRunNr->Clear();
+
+  // make sure we reset at run start to retrigger the alarm
+#ifdef _BELLE2_EPICS
+  if (m_useEpics) {
+    double mean = 0.0; // must be double, mean of histogram -> runnr
+    int status = 0; // must be int, epics alarm status 0 = no data, 2 = o.k., 4 = not o.k.
+    // if status & runnr valid
+    SEVCHK(ca_put(DBR_INT, mychid[0], (void*)&status), "ca_set failure");
+    SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&mean), "ca_set failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
+#endif
 }
 
 void DQMHistAnalysisRunNrModule::event()
@@ -96,6 +108,7 @@ void DQMHistAnalysisRunNrModule::event()
     hh1 = findHist(m_histogramDirectoryName, name);
   }
   if (hh1) {
+    hh1->SetStats(kFALSE); // get rid of annoying box, we have our own
     hh1->Draw("hist");
     mean = hh1->GetMean();
     if (hh1->GetEntries() > 0) {

@@ -1412,7 +1412,7 @@ void CDCGeometryPar::calcMeanT0(double minT0, double maxT0, int maxIt, double nS
         isDeadWire(wid, effi);
         effiSum += effi;
         m_meanT0 += (iCL < m_firstLayerOffset) ? 0. : effi * m_t0[iCL][iW];
-        stdvT0   += (iCL < m_firstLayerOffset) ? 0. : effi * m_t0[iCL][iW] * effi * m_t0[iCL][iW];
+        stdvT0   += (iCL < m_firstLayerOffset) ? 0. : effi * m_t0[iCL][iW] * m_t0[iCL][iW];
       }
     }
     if (effiSum > 0.) {

@@ -100,7 +100,6 @@ namespace Belle2 {
       G4Material* medGlue = geometry::Materials::get("CDCGlue");
       G4Material* medAir = geometry::Materials::get("Air");
 
-      // Nakano
       G4double h2odensity = 1.000 * CLHEP::g / CLHEP::cm3;
       G4double a = 1.01 * CLHEP::g / CLHEP::mole;
       G4Element* elH = new G4Element("Hydrogen", "H", 1., a);
@@ -796,7 +795,7 @@ namespace Belle2 {
 
         //G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,
         //                                                logicalName, 0, 0, 0);
-        // ID depndent material definition, Aluminum is default : Nakano
+        // ID depndent material definition, Aluminum is default
         G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum, logicalName, 0, 0, 0);
         if (id > 39 && id < 78) // Cu
           logicalV = new G4LogicalVolume(boxShape, medCopper, logicalName, 0, 0, 0);
@@ -1181,7 +1180,6 @@ namespace Belle2 {
       string Aluminum  = content.getString("Aluminum");
       G4Material* medAluminum = geometry::Materials::get(Aluminum);
       G4Material* medNEMA_G10_Plate = geometry::Materials::get("NEMA_G10_Plate");
-      // Nakano
       G4double density = 1.000 * CLHEP::g / CLHEP::cm3;
       G4double a = 1.01 * CLHEP::g / CLHEP::mole;
       G4Element* elH = new G4Element("Hydrogen", "H", 1., a);
@@ -1309,7 +1307,7 @@ namespace Belle2 {
 
         //G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,
         //                                                logicalName, 0, 0, 0);
-        // ID dependent material definition Aluminum is default: Nakano
+        // ID dependent material definition Aluminum is default
         G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,  logicalName, 0, 0, 0);
         if (ribID > 39 && ribID < 78) // Cu box
           logicalV = new G4LogicalVolume(boxShape, medCopper,  logicalName, 0, 0, 0);
@@ -1608,7 +1606,6 @@ namespace Belle2 {
     void GeoCDCCreatorReducedCDC::createCovers(const CDCGeometry& geom)
     {
       G4Material* medAl = geometry::Materials::get("Al");
-      // Nakano
       G4double density = 1.000 * CLHEP::g / CLHEP::cm3;
       G4double a = 1.01 * CLHEP::g / CLHEP::mole;
       G4Element* elH = new G4Element("Hydrogen", "H", 1., a);

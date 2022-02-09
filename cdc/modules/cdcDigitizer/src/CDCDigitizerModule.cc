@@ -357,8 +357,7 @@ void CDCDigitizerModule::event()
 
     // Hit geom. info
     m_wireID = m_aCDCSimHit->getWireID();
-    ushort superLayerOffset = m_cdcgp->getOffsetOfFirstSuperLayer();
-    if (m_wireID.getISuperLayer() < superLayerOffset) {
+    if (m_wireID.getISuperLayer() < m_cdcgp->getOffsetOfFirstSuperLayer()) {
       B2FATAL("SimHit with wireID " << m_wireID << " is in CDC SuperLayer: " << m_wireID.getISuperLayer() << " which should not happen.");
     }
     //    B2DEBUG(29, "Encoded wire number of current CDCSimHit: " << m_wireID);

@@ -1205,14 +1205,14 @@ namespace Belle2 {
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 
-      ushort m_nSenseWires            = c_nSenseWires;  /*!< Maximum number of Sense Wire Layers */
-      ushort m_nFieldWires            = c_nFieldWires;  /*!< Maximum number of Field Wire Layers */
-      ushort m_maxNSenseLayers        = c_maxNSenseLayers;     /*!< Maximum number of Sense Wire Layers */
-      ushort m_maxNFieldLayers        = c_maxNFieldLayers;     /*!< Maximum number of Field Wire Layers */
-      ushort m_maxNSuperLayers        = c_nSuperLayers;      /*!< Maximum number of Super Layers */
-      ushort m_firstLayerOffset       = 0;      /*!< Offset of the first layer (for reduced CDC studies) */
-      ushort m_firstSuperLayerOffset  = 0;      /*!< Offset of the first super layer (for reduced CDC studies) */
-      ushort m_maxNCellsPerLayer      = c_maxNDriftCells;    /*!< Maximum number wires within a layer */
+      ushort m_nSenseWires            = c_nSenseWires;      /*!< Maximum number of Sense Wires */
+      ushort m_nFieldWires            = c_nFieldWires;      /*!< Maximum number of Field Wires */
+      ushort m_maxNSenseLayers        = c_maxNSenseLayers;  /*!< Maximum number of Sense Wire Layers */
+      ushort m_maxNFieldLayers        = c_maxNFieldLayers;  /*!< Maximum number of Field Wire Layers */
+      ushort m_maxNSuperLayers        = c_nSuperLayers;     /*!< Maximum number of Super Layers */
+      ushort m_firstLayerOffset       = 0;                  /*!< Offset of the first layer (for reduced CDC studies) */
+      ushort m_firstSuperLayerOffset  = 0;                  /*!< Offset of the first super layer (for reduced CDC studies) */
+      ushort m_maxNCellsPerLayer      = c_maxNDriftCells;   /*!< Maximum number wires within a layer */
 
     };
 

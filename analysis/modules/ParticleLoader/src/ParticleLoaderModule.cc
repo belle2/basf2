@@ -62,6 +62,11 @@ namespace Belle2 {
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
+    addParam("skipNonPrimary", m_skipNonPrimary,
+             "If true, the secondary MC particle will be skipped, default is false",
+             false);
+
+
     addParam("addDaughters", m_addDaughters,
              "If true, the particles from the bottom part of the selected particle's decay chain will also be created in the datastore and mother-daughter relations are recursively set",
              false);
@@ -718,6 +723,9 @@ namespace Belle2 {
         const MCParticle* mcParticle = m_mcparticles[i];
 
         if (abs(pdgCode) != abs(mcParticle->getPDG()))
+          continue;
+
+        if (m_skipNonPrimary and !mcParticle->hasStatus(MCParticle::c_PrimaryParticle))
           continue;
 
         Particle particle(mcParticle);

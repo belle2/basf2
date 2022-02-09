@@ -1164,6 +1164,7 @@ def fillParticleListFromMC(decayString,
 
 
 def fillParticleListsFromMC(decayStringsWithCuts,
+                            skipNonPrimary=False,
                             addDaughters=False,
                             skipNonPrimaryDaughters=False,
                             writeOut=False,
@@ -1200,6 +1201,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
     pload.param('decayStrings', [decayString for decayString, cut in decayStringsWithCuts])
+    pload.param('skipNonPrimary', skipNonPrimary)
     pload.param('addDaughters', addDaughters)
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)

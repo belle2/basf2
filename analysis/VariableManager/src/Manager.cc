@@ -269,7 +269,7 @@ bool Variable::Manager::createVariable(const std::string& name)
       }
     } catch (py::error_already_set&) {
       PyErr_Print();
-      B2FATAL("Parsing Error on variable: '" << name);
+      B2FATAL("Parsing Error on variable: '" << name << "'");
     }
   }
 

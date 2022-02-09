@@ -101,6 +101,7 @@ void DQMHistAnalysisRunNrModule::event()
   m_cRunNr->Clear();
 
   auto leg = new TPaveText(0.6, 0.6, 0.95, 0.95, "NDC");
+  let->SetFillColor(kWhite);
 
   auto name = "hRunnr";
   TH1* hh1 = findHist(name);

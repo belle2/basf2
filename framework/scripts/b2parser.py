@@ -332,7 +332,11 @@ class B2Lexer(Lexer):
         if t.type == "IDENTIFIER":
             try:
                 if self.text[self.index] == "(":
-                    self.push_state(B2ParameterLexer)
+                    # Check that closing parenthesis exists
+                    if ")" not in self.text[self.index:]:
+                        raise SyntaxError("Unmatched '('")
+                    else:
+                        self.push_state(B2ParameterLexer)
             except IndexError:
                 pass
         return t

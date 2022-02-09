@@ -35,6 +35,8 @@ namespace Belle2 {
     {
       // get basic histogram
 
+      B2INFO("TOPValidationAlgorithm: get basic histograms");
+
       auto h1 = getObjectPtr<TH2F>("tracks_per_slot");
       if (not h1) {
         B2ERROR("TOPValidationAlgorithm: histogram 'tracks_per_slot' not found");
@@ -65,6 +67,8 @@ namespace Belle2 {
       }
 
       // channelT0 residuals: determine Chi2 minima and the pulls; save results into histograms
+
+      B2INFO("TOPValidationAlgorithm: determine channel T0 residuals");
 
       std::vector<TH1F*> h_slots;
       auto h_pulls = new TH1F("channelT0_pulls", "Channel T0 pulls; pulls", 200, -15.0, 15.0);
@@ -121,6 +125,8 @@ namespace Belle2 {
 
       // moduleT0, commonT0 and others: get input tree and set branch addresses
 
+      B2INFO("TOPValidationAlgorithm: get input tree");
+
       auto inputTree = getObjectPtr<TTree>("tree");
       if (not inputTree) {
         B2ERROR("TOPValidationAlgorithm: input tree 'tree' not found");
@@ -161,29 +167,34 @@ namespace Belle2 {
 
       // sort input tree entries according to exp/run
 
-      std::multimap<int, int> sortedEntries;
+      B2INFO("TOPValidationAlgorithm: sort input tree entries");
+
+      std::multimap<int, ValidationTreeStruct> sortedEntries;
       std::set<int> sortedRuns;
       for (int iev = 0; iev < inputTree->GetEntries(); iev++) {
         inputTree->GetEntry(iev);
         int expRun = (m_inputEntry.expNo << 16) + m_inputEntry.runNo;
-        sortedEntries.emplace(expRun, iev);
+        sortedEntries.emplace(expRun, m_inputEntry);
         sortedRuns.insert(expRun);
       }
 
       // merge input entries of the same exp/run, rescale the errors and fill the output tree
 
+      B2INFO("TOPValidationAlgorithm: merge input tree entries");
+
       for (auto expRun : sortedRuns) {
         m_outputEntry.clearNumMerged();
         const auto range = sortedEntries.equal_range(expRun);
         for (auto it = range.first; it != range.second; ++it) {
-          inputTree->GetEntry(it->second);
-          m_outputEntry.merge(m_inputEntry);
+          m_outputEntry.merge(it->second);
         }
         m_outputEntry.rescaleErrors(scaleFactor);
         outputTree->Fill();
       }
 
       // write-out the results
+
+      B2INFO("TOPValidationAlgorithm: write the results");
 
       file->Write();
       file->Close();

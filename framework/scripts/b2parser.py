@@ -187,7 +187,7 @@ class B2Lexer(Lexer):
         if state == "BRACK":
             return t
         elif state == "PAREN":
-            raise SyntaxError("Illegal ']', expected ').")
+            raise SyntaxError("Illegal ']', expected ')'.")
 
     @_(r"\(")  # noqa: F821
     def LPAREN(self, t):
@@ -208,7 +208,7 @@ class B2Lexer(Lexer):
             sly.lex.Token
         """
         if ")" not in self.text[self.index:]:
-            raise SyntaxError("Unmatched '(")
+            raise SyntaxError("Unmatched '('")
         self.control_token_stack.append("PAREN")
         return t
 

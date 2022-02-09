@@ -80,7 +80,7 @@ namespace Belle2 {
       else
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
-      auto func = [maskName](const Particle * particle)->double {
+      auto func = [maskName](const Particle*) -> double {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid()) return 0;
 
@@ -163,7 +163,7 @@ namespace Belle2 {
       else
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
-      auto func = [maskName](const Particle * particle)->double {
+      auto func = [maskName](const Particle * particle) -> double {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid()) return 0;
 
@@ -304,7 +304,7 @@ namespace Belle2 {
       else
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
-      auto func = [maskName](const Particle * particle)->double {
+      auto func = [maskName](const Particle * particle) -> double {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid()) return 0;
 
@@ -331,7 +331,7 @@ namespace Belle2 {
       else
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
-      auto func = [maskName](const Particle * particle)->double {
+      auto func = [maskName](const Particle * particle) -> double {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid()) return 0;
 
@@ -444,7 +444,7 @@ namespace Belle2 {
       else
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
-      auto func = [maskName](const Particle * particle)->bool {
+      auto func = [maskName](const Particle*) -> bool {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid()) return 0;
 
@@ -485,7 +485,7 @@ namespace Belle2 {
       else
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
-      auto func = [maskName](const Particle * particle)->bool {
+      auto func = [maskName](const Particle*) -> bool {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid()) return 0;
 
@@ -518,7 +518,7 @@ namespace Belle2 {
       else
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
-      auto func = [maskName](const Particle * particle)->bool {
+      auto func = [maskName](const Particle*) -> bool {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid()) return 0;
 
@@ -576,7 +576,7 @@ namespace Belle2 {
       else
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
-      auto func = [maskName](const Particle * particle)->int {
+      auto func = [maskName](const Particle * particle) -> int {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid()) return 0;
 
@@ -712,7 +712,7 @@ namespace Belle2 {
       else
         B2FATAL("At most 1 argument (name of mask) accepted.");
 
-      auto func = [maskName](const Particle * particle)->int {
+      auto func = [maskName](const Particle*) -> int {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid()) return -2;
 
@@ -815,7 +815,7 @@ namespace Belle2 {
                 " requested. The possibilities are recoilMass, recoilMassSqrd, pMissCMS, cosThetaMissCMS or EW90");
       }
 
-      auto func = [requestedVariable, maskName](const Particle * particle)->double {
+      auto func = [requestedVariable, maskName](const Particle * particle) -> double {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (!roe.isValid())
           return 0;
@@ -837,8 +837,8 @@ namespace Belle2 {
           }
         }
 
-        ROOT::Math::PxPyPzEVector momX = PCmsLabTransform::PCmsLabTransform::labToCms(momXChargedTracks + momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
-        ROOT::Math::PxPyPzEVector momTarget = PCmsLabTransform::PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Mu in CMS-System
+        ROOT::Math::PxPyPzEVector momX = PCmsLabTransform::labToCms(momXChargedTracks + momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
+        ROOT::Math::PxPyPzEVector momTarget = PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Mu in CMS-System
         ROOT::Math::PxPyPzEVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
 
         double output = 0.0;
@@ -854,7 +854,7 @@ namespace Belle2 {
 
           const auto& photons = roe->getPhotons(maskName);
           for (auto& photon : photons) {
-            if (PCmsLabTransform::PCmsLabTransform::labToCms(photon->get4Vector()).Vect().Dot(momW.Vect()) > 0) {
+            if (PCmsLabTransform::labToCms(photon->get4Vector()).Vect().Dot(momW.Vect()) > 0) {
               E_W_90 += photon->getECLClusterEnergy();
             }
           }
@@ -868,8 +868,8 @@ namespace Belle2 {
                 continue;
               float iEnergy = chargedCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
               if (iEnergy == iEnergy) {
-                if (PCmsLabTransform::PCmsLabTransform::labToCms(ClusterUtils().Get4MomentumFromCluster(&chargedCluster,
-                                                                 ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0)
+                if (PCmsLabTransform::labToCms(ClusterUtils().Get4MomentumFromCluster(&chargedCluster,
+                                               ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0)
                   E_W_90 += iEnergy;
               }
             }
@@ -890,7 +890,7 @@ namespace Belle2 {
 
 
       auto requestedVariable = arguments[0];
-      auto func = [requestedVariable](const Particle * particle)->double {
+      auto func = [requestedVariable](const Particle * particle) -> double {
         //       StoreObjPtr<ParticleList> KaonList("K+:ROE");
         StoreObjPtr<ParticleList> SlowPionList("pi+:inRoe");
 
@@ -946,7 +946,7 @@ namespace Belle2 {
 
 
       auto requestedVariable = arguments[0];
-      auto func = [requestedVariable](const Particle * particle)->double {
+      auto func = [requestedVariable](const Particle * particle) -> double {
         StoreObjPtr<ParticleList> FastParticleList("pi+:inRoe");
         if (!FastParticleList.isValid()) return 0;
 
@@ -1078,7 +1078,7 @@ namespace Belle2 {
                 ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron and Lambda");
       }
 
-      auto func = [index](const Particle * particle)->int {
+      auto func = [index](const Particle * particle) -> int {
 
         const MCParticle* mcParticle = particle->getMCParticle();
         if (!mcParticle) return -2;
@@ -1226,7 +1226,7 @@ namespace Belle2 {
                 ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
       }
 
-      auto func = [index](const Particle * particle)->int {
+      auto func = [index](const Particle * particle) -> int {
 
         Particle* nullParticle = nullptr;
         double qTarget = particle->getCharge();
@@ -1490,7 +1490,7 @@ namespace Belle2 {
                 "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
       }
 
-      auto func = [particleListName, extraInfoName](const Particle * particle)->bool {
+      auto func = [particleListName, extraInfoName](const Particle * particle) -> bool {
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
         if (!ListOfParticles.isValid()) return 0;
 
@@ -1570,7 +1570,7 @@ namespace Belle2 {
                 "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
       }
 
-      auto func = [particleListName, extraInfoName](const Particle*)->double {
+      auto func = [particleListName, extraInfoName](const Particle*) -> double {
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
         if (!ListOfParticles.isValid()) return 0;
 
@@ -1655,7 +1655,7 @@ namespace Belle2 {
                 "The possibilities for isRightCategory() are " << endl << strAvailableForIsRightCategory);
       }
 
-      auto func = [particleListName, indexOutput, indexRanking](const Particle*)->double {
+      auto func = [particleListName, indexOutput, indexRanking](const Particle*) -> double {
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
         if (!ListOfParticles.isValid()) return 0;
 
@@ -1744,7 +1744,7 @@ namespace Belle2 {
       }
 
 
-      auto func = [particleListName, indexOutput, indexRanking, rankingExtraInfo](const Particle*)->double {
+      auto func = [particleListName, indexOutput, indexRanking, rankingExtraInfo](const Particle*) -> double {
 
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
         if (!ListOfParticles) return 0;
@@ -1843,7 +1843,7 @@ namespace Belle2 {
       }
 
       const Variable::Manager::Var* var = Manager::Instance().getVariable(inputVariable);
-      auto func = [particleListName, var, indexRanking](const Particle*)->double {
+      auto func = [particleListName, var, indexRanking](const Particle*) -> double {
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
         if (!ListOfParticles.isValid()) return realNaN;
 
@@ -1917,7 +1917,7 @@ namespace Belle2 {
                 ". The possibilities for the category name are " << endl << strAvailableForIsRightCategory);
       }
 
-      auto func = [categoryName](const Particle*)->double {
+      auto func = [categoryName](const Particle*) -> double {
         std::string particleListName;
         std::string trackTargetName = categoryName;
 
@@ -1988,7 +1988,7 @@ namespace Belle2 {
                 ". The possibilities for the category name are " << endl << strAvailableForIsRightCategory);
       }
 
-      auto func = [categoryName](const Particle*)->double {
+      auto func = [categoryName](const Particle*) -> double {
         std::string particleListName;
         std::string trackTargetName = categoryName;
 
@@ -2060,7 +2060,7 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments for meta function qrOutput");
 
       std::string combinerMethod = arguments[0];
-      auto func = [combinerMethod](const Particle * particle)->double {
+      auto func = [combinerMethod](const Particle * particle) -> double {
 
         double output = realNaN;
         auto* flavorTaggerInfo = particle->getRelatedTo<FlavorTaggerInfo>();
@@ -2079,7 +2079,7 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments for meta function qOutput");
 
       std::string combinerMethod = arguments[0];
-      auto func = [combinerMethod](const Particle * particle)->double {
+      auto func = [combinerMethod](const Particle * particle) -> double {
 
         double output = realNaN;
         auto* flavorTaggerInfo = particle->getRelatedTo<FlavorTaggerInfo>();
@@ -2099,7 +2099,7 @@ namespace Belle2 {
 
 
       std::string combinerMethod = arguments[0];
-      auto func = [combinerMethod](const Particle * particle)->int {
+      auto func = [combinerMethod](const Particle * particle) -> int {
 
         int output = 0;
         auto* flavorTaggerInfo = particle->getRelatedTo<FlavorTaggerInfo>();
@@ -2127,7 +2127,7 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments for meta function qpCategory");
 
       std::string categoryName = arguments[0];
-      auto func = [categoryName](const Particle * particle)->double {
+      auto func = [categoryName](const Particle * particle) -> double {
 
         double output = realNaN;
         auto* flavorTaggerInfo = particle->getRelatedTo<FlavorTaggerInfo>();
@@ -2150,7 +2150,7 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments for meta function isTrueFTCategory");
 
       std::string categoryName = arguments[0];
-      auto func = [categoryName](const Particle * particle)->double {
+      auto func = [categoryName](const Particle * particle) -> double {
 
         double output = realNaN;
         auto* flavorTaggerInfo = particle->getRelatedTo<FlavorTaggerInfo>();
@@ -2174,7 +2174,7 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments for meta function hasTrueTargets");
 
       std::string categoryName = arguments[0];
-      auto func = [categoryName](const Particle * particle)->double {
+      auto func = [categoryName](const Particle * particle) -> double {
 
         double output = realNaN;
         auto* flavorTaggerInfo = particle->getRelatedTo<FlavorTaggerInfo>();

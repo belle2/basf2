@@ -293,7 +293,7 @@ class B2Lexer(Lexer):
             t.value = int(t.value, base=16)
         return t
 
-    @_(r"[a-zA-Z][a-zA-Z_0-9]*")  # noqa: F821
+    @_(r"[a-zA-Z_][a-zA-Z_0-9]*")  # noqa: F821
     def IDENTIFIER(self, t):
         """
         Scaning function for identifiers

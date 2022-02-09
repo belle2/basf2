@@ -316,6 +316,12 @@ def stdLep(pdgId,
             pid_variables["likelihood"]["global"]["alias"][electron] = "electronID_noSVD_noTOP"
             pid_variables["likelihood"]["binary"]["var"][electron] = f"binaryElectronID_noSVD_noTOP({pion})"
             pid_variables["likelihood"]["binary"]["alias"][electron] = "binaryElectronID_noSVD_noTOP_pi"
+        else:
+            b2.B2INFO("The likelihood-based muon ID in release 5 samples is defined w/o the SVD")
+            pid_variables["likelihood"]["global"]["var"][muon] = "muonID_noSVD"
+            pid_variables["likelihood"]["global"]["alias"][muon] = "muonID_noSVD"
+            pid_variables["likelihood"]["binary"]["var"][muon] = f"binaryPID_noSVD({muon}, {pion})"
+            pid_variables["likelihood"]["binary"]["alias"][muon] = "binaryPID_noSVD_mu_pi"
     if int(release) == 6:
         if lepton == electron:
             b2.B2INFO("The likelihood-based electron ID in release 6 samples is defined w/o the TOP")

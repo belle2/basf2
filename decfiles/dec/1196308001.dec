@@ -2,7 +2,7 @@
 # Descriptor:  [B0 -> D_0*- tau+ nu, D_0*- -> D- eta] cc
 # NickName: Bd_Dzerosttaunu_Deta
 # Documentation: b->c tau nu process, D_0* mode (LLSW model)
-# Tested: No
+# Tested: Yes
 # PhysicsWG: SL
 # Responsible: Henrik Junkerkalefeld
 # Email: junkerkalefeld@physik.uni-bonn.de

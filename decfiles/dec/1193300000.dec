@@ -2,7 +2,7 @@
 # Descriptor:  [B0 -> GAP tau+ nu, PHSP] cc
 # NickName: Bd_GAPtaunu_PHSP
 # Documentation: b->c tau nu process, GAP modes (PHSP)
-# Tested: No
+# Tested: Yes
 # PhysicsWG: SL
 # Responsible: Henrik Junkerkalefeld
 # Email: junkerkalefeld@physik.uni-bonn.de

@@ -60,7 +60,7 @@ void KLMClusterAnaModule::beginRun()
 void KLMClusterAnaModule::event()
 {
   for (KLMCluster& klmcluster : m_KLMClusters) {
-    //Obtain BKLMHit2D information
+    //Obtain KLMHit2D information
     TVector3 hitPosition;
 
     //Obtain KLMHit2D Information
@@ -71,15 +71,17 @@ void KLMClusterAnaModule::event()
     std::vector<double> yHits(nHits);
     std::vector<double> zHits(nHits);
 
-    std::vector<KLMHit2d> klmHit2ds;
-    std::vector<KLMHit2d>::iterator it;
+    std::vector<KLMHit2d*> klmHit2ds;
+    std::vector<KLMHit2d*>::iterator it;
 
     for (int i = 0; i < nHits; i++) {
-      hitPosition = klmHit2ds[i].getPosition();
+      klmHit2ds.push_back(hit2ds[i]);
+      hitPosition = hit2ds[i]->getPosition();
       xHits[i] = (double) hitPosition.X();
       yHits[i] = (double) hitPosition.Y();
       zHits[i] = (double) hitPosition.Z();
     }
+
 
     KLMClusterShape* clusterShape = m_KLMClusterShape.appendNew();
     clusterShape->setNHits(nHits);
@@ -96,7 +98,7 @@ void KLMClusterAnaModule::event()
     klmcluster.addRelationTo(clusterShape);
 
     for (it = klmHit2ds.begin(); it != klmHit2ds.end(); ++it) {
-      clusterShape->addRelationTo(&(*it));
+      clusterShape->addRelationTo(*it);
     }
 
   }

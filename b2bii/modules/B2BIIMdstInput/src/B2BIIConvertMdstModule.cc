@@ -392,7 +392,7 @@ void B2BIIConvertMdstModule::convertBeamEnergy()
   // Get four momentum of beam
   ROOT::Math::PxPyPzEVector P_beam = P_her + P_ler;
 
-  m_collisionBoostVector.setBoost(B2Vector3D(P_beam.BoostToCM()), covariance);
+  m_collisionBoostVector.setBoost(B2Vector3D(-P_beam.BoostToCM()), covariance);
   m_collisionInvM.setMass(P_beam.M(), 0.0 , 0.0);
 
   B2DEBUG(99, "Beam Energy: E_HER = " << Eher << "; E_LER = " << Eler << "; angle = " << crossingAngle);

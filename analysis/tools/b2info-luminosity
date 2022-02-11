@@ -12,9 +12,6 @@
 Script to get the integrated luminosity of a set of runs
 """
 
-__author__ = "Stefano Lacaprara"
-__email__ = "stefano.lacaprara@pd.infn.it, alberto.martini@roma3.infn.it"
-
 
 import argparse
 import getpass
@@ -29,6 +26,7 @@ import pandas as pd
 import numpy as np
 
 import requests
+import math
 
 
 def parseNumRange(string):
@@ -52,17 +50,6 @@ def parseNumList(string):
         result |= parseNumRange(rr)
 
     return sorted(list(result))
-
-def fill_zeros_with_last(arr):
-    """
-    fill the zeros and nan of an array with previous non zero value
-    """
-    prev = np.arange(len(arr))
-    prev[arr == 0] = 0
-    prev[arr == np.nan] = 0
-    prev = np.maximum.accumulate(prev)
-    return arr[prev]
-
 
 def argparser():
     """
@@ -114,7 +101,7 @@ def argparser():
                         action="store",
                         choices=[None, '4S','4S_offres','4S_scan', '5S_scan'],
                         default=None,
-                        help="Consider only runs with given beam energy None(default)/4S/4S_offres/4S_scan")
+                        help="Consider only runs with given beam energy None(default)/4S/4S_offres/4S_scan/5S_scan")
     parser.add_argument("--dbonline",
                         dest="dbonline",
                         action="store",
@@ -176,8 +163,6 @@ class Luminosity:
         self.runs=args.runs
         if len(self.exp)>1 and self.runs:
             b2.B2FATAL(f"No run range (--runs ) allowed if multiple experiments are selected (--exp {self.exp})")
-        if args.plot == 'RUN' and len(self.exp)>1:
-            b2.B2FATAL(f"If plotting lumi per run (--plot RUN) you can select only one experiment (--exp {self.exp})")
         self.runRangeStr = "All runs"
         if self.runs:
             self.runRangeStr=f"Runs {min(self.runs)}-{max(self.runs)}"
@@ -383,10 +368,6 @@ class Luminosity:
                 if beam_energy == "NotDef":
                     b2.B2WARNING(f"Beam energy not in any known range {run['experiment']}/{run['run']} BeamEnergy: {be}.")
         
-                # if run["ler"]["momentum"] >= 4.0 and run["her"]["momentum"] >= 7.0:
-                #     beam_energy = "4S"
-                # else:
-                #     beam_energy = "4S_offres"
             except:
                 b2.B2WARNING(f"Beam energy not set in RunDB for exp/run {run['experiment']}/{run['run']}.")
             row["beam_energy"] = beam_energy

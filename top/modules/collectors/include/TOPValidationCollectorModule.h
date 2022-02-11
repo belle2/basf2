@@ -90,7 +90,7 @@ namespace Belle2 {
     // procedure
     TOP::TrackSelector m_selector; /**< track selection utility */
     TOP::PDFConstructor::EPDFOption m_PDFOption = TOP::PDFConstructor::c_Rough; /**< PDF option */
-    std::vector<std::string> m_namesChi[c_numSets]; /**< histogram names of chi2 scans */
+    std::vector<std::string> m_namesChi; /**< histogram names of chi2 scans */
     std::vector<std::string> m_namesHit; /**< histogram names of photon hits (time vs. channel) */
     std::vector<TOP::Chi2MinimumFinder1D> m_finders[c_numSets]; /**< minimum finders, vector index = slot - 1 */
 

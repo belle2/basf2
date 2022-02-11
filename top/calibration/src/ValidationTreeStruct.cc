@@ -26,7 +26,7 @@ namespace Belle2 {
       for (auto& x : numActive) x = 0;
       for (auto& x : numActiveCalibrated) x = 0;
       for (auto& x : thrEffi) x = 0;
-      for (auto& x : shifts) x = 0;
+      for (auto& x : asicShifts) x = 0;
       numMerged = 0;
     }
 

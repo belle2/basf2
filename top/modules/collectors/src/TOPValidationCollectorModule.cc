@@ -113,16 +113,14 @@ namespace Belle2 {
 
     // create and register histograms and tree
 
-    for (unsigned i = 0; i < c_numSets; i++) {
-      for (int slot = 1; slot <= c_numModules; slot++) {
-        string slotName = to_string(slot);
-        if (slot < 10) slotName.insert(0, "0");
-        string name = "chi2_set" + to_string(i) + "_slot" + slotName;
-        string title = "Chi2 scan, slot" + slotName + "; channel; t0 [ns]";
-        auto h = new TH2F(name.c_str(), title.c_str(),  c_numChannels, 0, c_numChannels, m_numBins, tmin, tmax);
-        registerObject<TH2F>(name, h);
-        m_namesChi[i].push_back(name);
-      }
+    for (int slot = 1; slot <= c_numModules; slot++) {
+      string slotName = to_string(slot);
+      if (slot < 10) slotName.insert(0, "0");
+      string name = "chi2_slot" + slotName;
+      string title = "Chi2 scan, slot" + slotName + "; channel; t0 [ns]";
+      auto h = new TH2F(name.c_str(), title.c_str(),  c_numChannels, 0, c_numChannels, m_numBins, tmin, tmax);
+      registerObject<TH2F>(name, h);
+      m_namesChi.push_back(name);
     }
 
     for (int slot = 1; slot <= c_numModules; slot++) {
@@ -135,18 +133,12 @@ namespace Belle2 {
       m_namesHit.push_back(name);
     }
 
-    auto h1 = new TH2F("tracks_per_slot", "tracks per slot and sample",
-                       c_numModules, 0.5, c_numModules + 0.5, c_numSets, 0, c_numSets);
-    h1->SetXTitle("slot number");
-    h1->SetYTitle("sample number");
-    registerObject<TH2F>("tracks_per_slot", h1);
-
-    auto h2 = new TH1F("moduleT0_pulls", "Module T0 pulls; pulls", 200, -15.0, 15.0);
-    registerObject<TH1F>("moduleT0_pulls", h2);
+    auto h = new TH1F("moduleT0_pulls", "Module T0 pulls; pulls", 200, -15.0, 15.0);
+    registerObject<TH1F>("moduleT0_pulls", h);
 
     auto tree = new TTree("tree", "TOP calibration validation tree");
-    tree->Branch("exp", &m_treeEntry.expNo, "exp/I");
-    tree->Branch("run", &m_treeEntry.runNo, "run/I");
+    tree->Branch("expNo", &m_treeEntry.expNo, "expNo/I");
+    tree->Branch("runNo", &m_treeEntry.runNo, "runNo/I");
     tree->Branch("numTracks", &m_treeEntry.numTracks, "numTracks/I");
     tree->Branch("commonT0", &m_treeEntry.commonT0, "commonT0/F");
     tree->Branch("commonT0Err", &m_treeEntry.commonT0Err, "commonT0Err/F");
@@ -157,7 +149,7 @@ namespace Belle2 {
     tree->Branch("numActive", &m_treeEntry.numActive, "numActive[16]/I");
     tree->Branch("numActiveCalibrated", &m_treeEntry.numActiveCalibrated, "numActiveCalibrated[16]/I");
     tree->Branch("thrEffi", &m_treeEntry.thrEffi, "thrEffi[16]/F");
-    tree->Branch("asicShifts", &m_treeEntry.shifts, "asicShifts[4]/F");
+    tree->Branch("asicShifts", &m_treeEntry.asicShifts, "asicShifts[4]/F");
     registerObject<TTree>("tree", tree);
   }
 
@@ -210,8 +202,8 @@ namespace Belle2 {
 
     for (unsigned carrier = 0; carrier < 4; carrier++) {
       unsigned asic = (3 * 4 + carrier) * 4;
-      m_treeEntry.shifts[carrier] = m_asicShift->isCalibrated(13, asic) ? m_asicShift->getT0(13, asic) :
-                                    std::numeric_limits<float>::quiet_NaN();
+      m_treeEntry.asicShifts[carrier] = m_asicShift->isCalibrated(13, asic) ? m_asicShift->getT0(13, asic) :
+                                        std::numeric_limits<float>::quiet_NaN();
     }
 
   }
@@ -242,10 +234,10 @@ namespace Belle2 {
       if (not pdfConstructor.isValid()) continue;
 
       // minimization procedure: accumulate
-      int set = gRandom->Integer(c_numSets); // generate sub-sample number
       unsigned module = trk.getModuleID() - 1;
-      if (module >= m_namesChi[set].size()) continue;
-      auto h = getObjectPtr<TH2F>(m_namesChi[set][module]);
+      if (module >= m_namesChi.size()) continue;
+      auto h = getObjectPtr<TH2F>(m_namesChi[module]);
+      int set = gRandom->Integer(c_numSets); // generate sub-sample number
       auto& finder = m_finders[set][module];
       for (int ibin = 0; ibin < h->GetNbinsY(); ibin++) {
         double t0 = h->GetYaxis()->GetBinCenter(ibin + 1);
@@ -262,15 +254,11 @@ namespace Belle2 {
       }
       m_treeEntry.numTracks++;
 
-      // fill other histograms
-      auto h1 = getObjectPtr<TH2F>("tracks_per_slot");
-      h1->Fill(trk.getModuleID(), set);
-
-      auto h2 = getObjectPtr<TH2F>(m_namesHit[module]);
+      auto h1 = getObjectPtr<TH2F>(m_namesHit[module]);
       for (const auto& digit : m_digits) {
         if (digit.getHitQuality() != TOPDigit::c_Good) continue;
         if (digit.getModuleID() != trk.getModuleID()) continue;
-        h2->Fill(digit.getChannel(), digit.getTime());
+        h1->Fill(digit.getChannel(), digit.getTime());
       }
 
     }

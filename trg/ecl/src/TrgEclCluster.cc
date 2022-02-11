@@ -280,7 +280,7 @@ void TrgEclCluster::setBarrelICN(int Method)
       tc_lower      = TCFire[iii + 12] ;
       tc_lower_left = TCFire[iii + 13] ;
       tc_left = TCFire[iii + 1] ;
-      tc_upper_left = TCFire[iii + 421] ;
+      tc_upper_left = TCFire[iii + 420] ;
       if (iii % 12 == 0) {
         tc_upper_right = 0;
         tc_right      = 0;
@@ -1434,7 +1434,7 @@ TrgEclCluster::setBarrelICN()
       tc_lower      = TCFire[iii + 12] ;
       tc_lower_left = TCFire[iii + 13] ;
       tc_left = TCFire[iii + 1] ;
-      tc_upper_left = TCFire[iii + 421] ;
+      tc_upper_left = TCFire[iii + 420] ;
       if (iii % 12 == 0) {
         tc_upper_right = 0;
         tc_right      = 0;

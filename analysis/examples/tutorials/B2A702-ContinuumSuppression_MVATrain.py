@@ -106,5 +106,13 @@ if __name__ == "__main__":
     # comment these in to apply the trained methods on an independent sample
     # (produced in B2A701 if you ran with the `apply_signal` and `apply_qqbar` options).
     #
-    basf2_mva.expert(basf2_mva.vector('MVAFastBDT.root'), basf2_mva.vector(apply_signal_data), 'tree', 'MVAExpert_signal.root')
-    basf2_mva.expert(basf2_mva.vector('MVAFastBDT.root'), basf2_mva.vector(apply_qqbar_data), 'tree', 'MVAExpert_qqbar.root')
+    basf2_mva.expert(
+        basf2_mva.vector('MVAFastBDT.root'),
+        basf2_mva.vector(apply_signal_data),
+        'tree',
+        'MVAExpert_signal.root')
+    basf2_mva.expert(
+        basf2_mva.vector('MVAFastBDT.root'),
+        basf2_mva.vector(apply_qqbar_data),
+        'tree',
+        'MVAExpert_qqbar.root')

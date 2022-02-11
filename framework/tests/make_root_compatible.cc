@@ -17,57 +17,59 @@ namespace {
 
   TEST(VariableTest, makeROOTCompatible)
   {
-    EXPECT_EQ("", makeROOTCompatible(""));
-    EXPECT_EQ("test", makeROOTCompatible("test"));
-    EXPECT_EQ("test213", makeROOTCompatible("test213"));
-    EXPECT_EQ("test_23", makeROOTCompatible("test_23"));
+    EXPECT_EQ("", MakeROOTCompatible::makeROOTCompatible(""));
+    EXPECT_EQ("test", MakeROOTCompatible::makeROOTCompatible("test"));
+    EXPECT_EQ("test213", MakeROOTCompatible::makeROOTCompatible("test213"));
+    EXPECT_EQ("test_23", MakeROOTCompatible::makeROOTCompatible("test_23"));
 
-    EXPECT_EQ("", makeROOTCompatible(""));
-    EXPECT_EQ("test", makeROOTCompatible("test"));
-    EXPECT_EQ("test213", makeROOTCompatible("test213"));
-    EXPECT_EQ("test_23", makeROOTCompatible("test_23"));
+    EXPECT_EQ("", MakeROOTCompatible::makeROOTCompatible(""));
+    EXPECT_EQ("test", MakeROOTCompatible::makeROOTCompatible("test"));
+    EXPECT_EQ("test213", MakeROOTCompatible::makeROOTCompatible("test213"));
+    EXPECT_EQ("test_23", MakeROOTCompatible::makeROOTCompatible("test_23"));
 
-    EXPECT_EQ("test__bo23__bc", makeROOTCompatible("test(23)"));
-    EXPECT_EQ("test__so23__sc", makeROOTCompatible("test[23]"));
-    EXPECT_EQ("test__co23__cc", makeROOTCompatible("test{23}"));
-    EXPECT_EQ("test__boe__pl__clgamma__cm__spM__sp__st__sp3__bc", makeROOTCompatible("test(e+:gamma, M < 3)"));
-    EXPECT_EQ("__cl__bo__bc__sp__bo__bc__cm", makeROOTCompatible(":() (),"));
-    EXPECT_EQ("c__cl__bo__bcb__sp__bo__bc__cma", makeROOTCompatible("c:()b (),a"));
-    EXPECT_EQ("c__cl__bo__cm__pl8951aBZWVZUEOH_Rhtnsq__bcb__sp__bo__bc__cma", makeROOTCompatible("c:(,+8951aBZWVZUEOH_Rhtnsq)b (),a"));
-    EXPECT_EQ("foo__bobar__cm__mi0__pt123__cm__sp94__bc", makeROOTCompatible("foo(bar,-0.123, 94)"));
+    EXPECT_EQ("test__bo23__bc", MakeROOTCompatible::makeROOTCompatible("test(23)"));
+    EXPECT_EQ("test__so23__sc", MakeROOTCompatible::makeROOTCompatible("test[23]"));
+    EXPECT_EQ("test__co23__cc", MakeROOTCompatible::makeROOTCompatible("test{23}"));
+    EXPECT_EQ("test__boe__pl__clgamma__cm__spM__sp__st__sp3__bc", MakeROOTCompatible::makeROOTCompatible("test(e+:gamma, M < 3)"));
+    EXPECT_EQ("__cl__bo__bc__sp__bo__bc__cm", MakeROOTCompatible::makeROOTCompatible(":() (),"));
+    EXPECT_EQ("c__cl__bo__bcb__sp__bo__bc__cma", MakeROOTCompatible::makeROOTCompatible("c:()b (),a"));
+    EXPECT_EQ("c__cl__bo__cm__pl8951aBZWVZUEOH_Rhtnsq__bcb__sp__bo__bc__cma",
+              MakeROOTCompatible::makeROOTCompatible("c:(,+8951aBZWVZUEOH_Rhtnsq)b (),a"));
+    EXPECT_EQ("foo__bobar__cm__mi0__pt123__cm__sp94__bc", MakeROOTCompatible::makeROOTCompatible("foo(bar,-0.123, 94)"));
 
-    for (const auto& pair : getSubstitutionMap()) {
-      EXPECT_EQ(pair.second, makeROOTCompatible(pair.first));
+    for (const auto& pair : MakeROOTCompatible::getSubstitutionMap()) {
+      EXPECT_EQ(pair.second, MakeROOTCompatible::makeROOTCompatible(pair.first));
     }
 
-    EXPECT_NO_B2WARNING(makeROOTCompatible("test_a"));
-    EXPECT_B2WARNING(makeROOTCompatible("test__a"));
+    EXPECT_NO_B2WARNING(MakeROOTCompatible::makeROOTCompatible("test_a"));
+    EXPECT_B2WARNING(MakeROOTCompatible::makeROOTCompatible("test__a"));
   }
 
   TEST(VariableTest, invertMakeROOTCompatible)
   {
-    EXPECT_EQ(invertMakeROOTCompatible(""), "");
-    EXPECT_EQ(invertMakeROOTCompatible("test"), "test");
-    EXPECT_EQ(invertMakeROOTCompatible("test213"), "test213");
-    EXPECT_EQ(invertMakeROOTCompatible("test_23"), "test_23");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible(""), "");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible("test"), "test");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible("test213"), "test213");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible("test_23"), "test_23");
 
-    EXPECT_EQ(invertMakeROOTCompatible(""), "");
-    EXPECT_EQ(invertMakeROOTCompatible("test"), "test");
-    EXPECT_EQ(invertMakeROOTCompatible("test213"), "test213");
-    EXPECT_EQ(invertMakeROOTCompatible("test_23"), "test_23");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible(""), "");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible("test"), "test");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible("test213"), "test213");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible("test_23"), "test_23");
 
-    EXPECT_EQ(invertMakeROOTCompatible("test__bo23__bc"), "test(23)");
-    EXPECT_EQ(invertMakeROOTCompatible("test__so23__sc"), "test[23]");
-    EXPECT_EQ(invertMakeROOTCompatible("test__co23__cc"), "test{23}");
-    EXPECT_EQ(invertMakeROOTCompatible("test__boe__pl__clgamma__cm__spM__sp__st__sp3__bc"), "test(e+:gamma, M < 3)");
-    EXPECT_EQ(invertMakeROOTCompatible("__cl__bo__bc__sp__bo__bc__cm"), ":() (),");
-    EXPECT_EQ(invertMakeROOTCompatible("c__cl__bo__bcb__sp__bo__bc__cma"), "c:()b (),a");
-    EXPECT_EQ(invertMakeROOTCompatible("c__cl__bo__cm__pl8951aBZWVZUEOH_Rhtnsq__bcb__sp__bo__bc__cma"),
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible("test__bo23__bc"), "test(23)");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible("test__so23__sc"), "test[23]");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible("test__co23__cc"), "test{23}");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible("test__boe__pl__clgamma__cm__spM__sp__st__sp3__bc"),
+              "test(e+:gamma, M < 3)");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible("__cl__bo__bc__sp__bo__bc__cm"), ":() (),");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible("c__cl__bo__bcb__sp__bo__bc__cma"), "c:()b (),a");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible("c__cl__bo__cm__pl8951aBZWVZUEOH_Rhtnsq__bcb__sp__bo__bc__cma"),
               "c:(,+8951aBZWVZUEOH_Rhtnsq)b (),a");
-    EXPECT_EQ(invertMakeROOTCompatible("foo__bobar__cm__mi0__pt123__cm__sp94__bc"), "foo(bar,-0.123, 94)");
+    EXPECT_EQ(MakeROOTCompatible::invertMakeROOTCompatible("foo__bobar__cm__mi0__pt123__cm__sp94__bc"), "foo(bar,-0.123, 94)");
 
-    for (const auto& pair : getSubstitutionMap()) {
-      EXPECT_EQ(pair.first, invertMakeROOTCompatible(pair.second));
+    for (const auto& pair : MakeROOTCompatible::getSubstitutionMap()) {
+      EXPECT_EQ(pair.first, MakeROOTCompatible::invertMakeROOTCompatible(pair.second));
     }
   }
 

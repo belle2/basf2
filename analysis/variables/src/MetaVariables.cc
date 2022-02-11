@@ -227,7 +227,7 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        std::string key = std::string("__") + makeROOTCompatible(var->name);
+        std::string key = std::string("__") + MakeROOTCompatible::makeROOTCompatible(var->name);
         auto func = [var, key](const Particle*) -> double {
 
           StoreObjPtr<EventExtraInfo> eventExtraInfo;
@@ -263,7 +263,7 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        std::string key = std::string("__") + makeROOTCompatible(var->name);
+        std::string key = std::string("__") + MakeROOTCompatible::makeROOTCompatible(var->name);
         auto func = [var, key](const Particle * particle) -> double {
 
           if (particle->hasExtraInfo(key))
@@ -1399,7 +1399,19 @@ namespace Belle2 {
         } catch (std::invalid_argument&) {
           B2FATAL("Second argument of modulo meta function must be integer!");
         }
-        auto func = [var, divideBy](const Particle * particle) -> int { return int(std::get<double>(var->function(particle))) % divideBy; };
+        auto func = [var, divideBy](const Particle * particle) -> int {
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return int(std::get<double>(var_result)) % divideBy;
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result) % divideBy;
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return int(std::get<bool>(var_result)) % divideBy;
+          } else return std::numeric_limits<double>::quiet_NaN();
+        };
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function modulo");

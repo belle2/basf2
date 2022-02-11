@@ -18,6 +18,7 @@ import basf2
 import basf2_mva
 import inspect
 import modularAnalysis as ma
+import variables
 from variables import utils
 import os
 import glob
@@ -70,17 +71,17 @@ def add_default_FlavorTagger_aliases():
     and defines the collection of flavor tagging variables.
     """
 
-    utils._variablemanager.addAlias('FBDT_qrCombined', 'qrOutput(FBDT)')
-    utils._variablemanager.addAlias('FANN_qrCombined', 'qrOutput(FANN)')
-    utils._variablemanager.addAlias('qrMC', 'isRelatedRestOfEventB0Flavor')
+    variables.variables.addAlias('FBDT_qrCombined', 'qrOutput(FBDT)')
+    variables.variables.addAlias('FANN_qrCombined', 'qrOutput(FANN)')
+    variables.variables.addAlias('qrMC', 'isRelatedRestOfEventB0Flavor')
 
     for iCategory in AvailableCategories:
         aliasForQp = 'qp' + iCategory
         aliasForTrueTarget = 'hasTrueTarget' + iCategory
         aliasForIsRightCategory = 'isRightCategory' + iCategory
-        utils._variablemanager.addAlias(aliasForQp, 'qpCategory(' + iCategory + ')')
-        utils._variablemanager.addAlias(aliasForTrueTarget, 'hasTrueTargets(' + iCategory + ')')
-        utils._variablemanager.addAlias(aliasForIsRightCategory, 'isTrueFTCategory(' + iCategory + ')')
+        variables.variables.addAlias(aliasForQp, 'qpCategory(' + iCategory + ')')
+        variables.variables.addAlias(aliasForTrueTarget, 'hasTrueTargets(' + iCategory + ')')
+        variables.variables.addAlias(aliasForIsRightCategory, 'isTrueFTCategory(' + iCategory + ')')
 
     utils.add_collection(flavor_tagging, 'flavor_tagging')
 
@@ -89,65 +90,87 @@ def set_FlavorTagger_pid_aliases():
     """
     This function adds the pid aliases needed by the flavor tagger.
     """
-    utils._variablemanager.addAlias('eid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)')
-    utils._variablemanager.addAlias('eid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)')
-    utils._variablemanager.addAlias('eid_ECL', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ECL), 0.5)')
+    variables.variables.addAlias('eid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, TOP), 0.5)')
+    variables.variables.addAlias('eid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ARICH), 0.5)')
+    variables.variables.addAlias('eid_ECL', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, ECL), 0.5)')
 
-    utils._variablemanager.addAlias('muid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, TOP), 0.5)')
-    utils._variablemanager.addAlias('muid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, ARICH), 0.5)')
-    utils._variablemanager.addAlias('muid_KLM', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, KLM), 0.5)')
+    variables.variables.addAlias('muid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, TOP), 0.5)')
+    variables.variables.addAlias('muid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, ARICH), 0.5)')
+    variables.variables.addAlias('muid_KLM', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, KLM), 0.5)')
 
-    utils._variablemanager.addAlias('piid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, TOP), 0.5)')
-    utils._variablemanager.addAlias('piid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, ARICH), 0.5)')
+    variables.variables.addAlias('piid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, TOP), 0.5)')
+    variables.variables.addAlias('piid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, ARICH), 0.5)')
 
-    utils._variablemanager.addAlias('Kid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, TOP), 0.5)')
-    utils._variablemanager.addAlias('Kid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, ARICH), 0.5)')
+    variables.variables.addAlias('Kid_TOP', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, TOP), 0.5)')
+    variables.variables.addAlias('Kid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, ARICH), 0.5)')
 
     if getBelleOrBelle2() == "Belle":
-        utils._variablemanager.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
-        utils._variablemanager.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
-        utils._variablemanager.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
-        utils._variablemanager.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
-        utils._variablemanager.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
+        variables.variables.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
+        variables.variables.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
+        variables.variables.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
+        variables.variables.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC, SVD), 0.5)')
+        variables.variables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC, SVD), 0.5)')
     else:
         # Removed SVD PID for Belle II MC and data as it is absent in release 4.
-        utils._variablemanager.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC), 0.5)')
-        utils._variablemanager.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC), 0.5)')
-        utils._variablemanager.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC), 0.5)')
-        utils._variablemanager.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC), 0.5)')
-        utils._variablemanager.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC), 0.5)')
+        variables.variables.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC), 0.5)')
+        variables.variables.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC), 0.5)')
+        variables.variables.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC), 0.5)')
+        variables.variables.addAlias('pi_vs_edEdxid', 'ifNANgiveX(pidPairProbabilityExpert(211, 11, CDC), 0.5)')
+        variables.variables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC), 0.5)')
 
 
-# Options for Track and Event Levels
-fastBDTCategories = basf2_mva.FastBDTOptions()
-fastBDTCategories.m_nTrees = 500
-fastBDTCategories.m_nCuts = 8
-fastBDTCategories.m_nLevels = 3
-fastBDTCategories.m_shrinkage = 0.10
-fastBDTCategories.m_randRatio = 0.5
+def getFastBDTCategories():
+    '''
+    Helper function for getting the FastBDT categories.
+    It's necessary for removing top-level ROOT imports.
+    '''
+    import ROOT  # noqa
+    fastBDTCategories = basf2_mva.FastBDTOptions()
+    fastBDTCategories.m_nTrees = 500
+    fastBDTCategories.m_nCuts = 8
+    fastBDTCategories.m_nLevels = 3
+    fastBDTCategories.m_shrinkage = 0.10
+    fastBDTCategories.m_randRatio = 0.5
+    return fastBDTCategories
 
-# Options for Combiner Level
-fastBDTCombiner = basf2_mva.FastBDTOptions()
-fastBDTCombiner.m_nTrees = 500
-fastBDTCombiner.m_nCuts = 8
-fastBDTCombiner.m_nLevels = 3
-fastBDTCombiner.m_shrinkage = 0.10
-fastBDTCombiner.m_randRatio = 0.5
 
-mlpFANNCombiner = basf2_mva.FANNOptions()
-mlpFANNCombiner.m_max_epochs = 10000
-mlpFANNCombiner.m_hidden_layers_architecture = "3*N"
-mlpFANNCombiner.m_hidden_activiation_function = "FANN_SIGMOID_SYMMETRIC"
-mlpFANNCombiner.m_output_activiation_function = "FANN_SIGMOID_SYMMETRIC"
-mlpFANNCombiner.m_error_function = "FANN_ERRORFUNC_LINEAR"
-mlpFANNCombiner.m_training_method = "FANN_TRAIN_RPROP"
-mlpFANNCombiner.m_validation_fraction = 0.5
-mlpFANNCombiner.m_random_seeds = 10
-mlpFANNCombiner.m_test_rate = 500
-mlpFANNCombiner.m_number_of_threads = 8
-mlpFANNCombiner.m_scale_features = True
-mlpFANNCombiner.m_scale_target = False
-# mlpFANNCombiner.m_scale_target = True
+def getFastBDTCombiner():
+    '''
+    Helper function for getting the FastBDT combiner.
+    It's necessary for removing top-level ROOT imports.
+    '''
+    import ROOT  # noqa
+    fastBDTCombiner = basf2_mva.FastBDTOptions()
+    fastBDTCombiner.m_nTrees = 500
+    fastBDTCombiner.m_nCuts = 8
+    fastBDTCombiner.m_nLevels = 3
+    fastBDTCombiner.m_shrinkage = 0.10
+    fastBDTCombiner.m_randRatio = 0.5
+    return fastBDTCombiner
+
+
+def getMlpFANNCombiner():
+    '''
+    Helper function for getting the MLP FANN combiner.
+    It's necessary for removing top-level ROOT imports.
+    '''
+    import ROOT  # noqa
+    mlpFANNCombiner = basf2_mva.FANNOptions()
+    mlpFANNCombiner.m_max_epochs = 10000
+    mlpFANNCombiner.m_hidden_layers_architecture = "3*N"
+    mlpFANNCombiner.m_hidden_activiation_function = "FANN_SIGMOID_SYMMETRIC"
+    mlpFANNCombiner.m_output_activiation_function = "FANN_SIGMOID_SYMMETRIC"
+    mlpFANNCombiner.m_error_function = "FANN_ERRORFUNC_LINEAR"
+    mlpFANNCombiner.m_training_method = "FANN_TRAIN_RPROP"
+    mlpFANNCombiner.m_validation_fraction = 0.5
+    mlpFANNCombiner.m_random_seeds = 10
+    mlpFANNCombiner.m_test_rate = 500
+    mlpFANNCombiner.m_number_of_threads = 8
+    mlpFANNCombiner.m_scale_features = True
+    mlpFANNCombiner.m_scale_target = False
+    # mlpFANNCombiner.m_scale_target = True
+    return mlpFANNCombiner
+
 
 # SignalFraction: FBDT feature
 # For smooth output set to -1, this will break the calibration.
@@ -220,7 +243,7 @@ AvailableCategories = {
 
 
 # Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
-variables = dict()
+variables_dict = dict()
 KId = {'Belle': 'ifNANgiveX(atcPIDBelle(3,2), 0.5)', 'Belle2': 'kaonID'}
 muId = {'Belle': 'muIDBelle', 'Belle2': 'muonID'}
 eId = {'Belle': 'eIDBelle', 'Belle2': 'electronID'}
@@ -231,7 +254,7 @@ def setVariables():
     Sets the Variables used for Track and Event Levels.
     """
 
-    variables['Electron'] = [
+    variables_dict['Electron'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
         'p',
@@ -248,8 +271,8 @@ def setVariables():
         'cosTPTO',
         'chiProb',
     ]
-    variables['IntermediateElectron'] = variables['Electron']
-    variables['Muon'] = [
+    variables_dict['IntermediateElectron'] = variables_dict['Electron']
+    variables_dict['Muon'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
         'p',
@@ -265,7 +288,7 @@ def setVariables():
         'BtagToWBosonVariables(EW90)',
         'cosTPTO',
     ]
-    variables['IntermediateMuon'] = [
+    variables_dict['IntermediateMuon'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
         'p',
@@ -282,27 +305,7 @@ def setVariables():
         'cosTPTO',
         'chiProb',
     ]
-    variables['KinLepton'] = [
-        'useCMSFrame(p)',
-        'useCMSFrame(pt)',
-        'p',
-        'pt',
-        'cosTheta',
-        muId[getBelleOrBelle2()],
-        'muid_TOP',
-        'muid_ARICH',
-        'muid_KLM',
-        eId[getBelleOrBelle2()],
-        'eid_TOP',
-        'eid_ARICH',
-        'eid_ECL',
-        'BtagToWBosonVariables(recoilMassSqrd)',
-        'BtagToWBosonVariables(pMissCMS)',
-        'BtagToWBosonVariables(cosThetaMissCMS)',
-        'BtagToWBosonVariables(EW90)',
-        'cosTPTO',
-    ]
-    variables['IntermediateKinLepton'] = [
+    variables_dict['KinLepton'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
         'p',
@@ -321,9 +324,29 @@ def setVariables():
         'BtagToWBosonVariables(cosThetaMissCMS)',
         'BtagToWBosonVariables(EW90)',
         'cosTPTO',
+    ]
+    variables_dict['IntermediateKinLepton'] = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'p',
+        'pt',
+        'cosTheta',
+        muId[getBelleOrBelle2()],
+        'muid_TOP',
+        'muid_ARICH',
+        'muid_KLM',
+        eId[getBelleOrBelle2()],
+        'eid_TOP',
+        'eid_ARICH',
+        'eid_ECL',
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(pMissCMS)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(EW90)',
+        'cosTPTO',
         'chiProb',
     ]
-    variables['Kaon'] = [
+    variables_dict['Kaon'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
         'p',
@@ -342,7 +365,7 @@ def setVariables():
         'cosTPTO',
         'chiProb',
     ]
-    variables['SlowPion'] = [
+    variables_dict['SlowPion'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
         'cosTheta',
@@ -365,7 +388,7 @@ def setVariables():
         'BtagToWBosonVariables(pMissCMS)',
         'cosTPTO',
     ]
-    variables['FastHadron'] = [
+    variables_dict['FastHadron'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
         'cosTheta',
@@ -388,7 +411,7 @@ def setVariables():
         'BtagToWBosonVariables(cosThetaMissCMS)',
         'cosTPTO',
     ]
-    variables['Lambda'] = [
+    variables_dict['Lambda'] = [
         'lambdaFlavor',
         'NumberOfKShortsInRoe',
         'M',
@@ -402,14 +425,14 @@ def setVariables():
         'p',
         'chiProb',
     ]
-    variables['MaximumPstar'] = [
+    variables_dict['MaximumPstar'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
         'p',
         'pt',
         'cosTPTO',
     ]
-    variables['FSC'] = [
+    variables_dict['FSC'] = [
         'useCMSFrame(p)',
         'cosTPTO',
         KId[getBelleOrBelle2()],
@@ -420,63 +443,65 @@ def setVariables():
     ]
 
     # For sampling and teaching in a second step
-    variables['KaonPion'] = ['extraInfo(isRightCategory(Kaon))',
-                             'HighestProbInCat(pi+:inRoe, isRightCategory(SlowPion))',
-                             'KaonPionVariables(cosKaonPion)', 'KaonPionVariables(HaveOpositeCharges)', KId[getBelleOrBelle2()]]
+    variables_dict['KaonPion'] = ['extraInfo(isRightCategory(Kaon))',
+                                  'HighestProbInCat(pi+:inRoe, isRightCategory(SlowPion))',
+                                  'KaonPionVariables(cosKaonPion)',
+                                  'KaonPionVariables(HaveOpositeCharges)',
+                                  KId[getBelleOrBelle2()]]
 
     # Special treatment for some input variables:
     if getBelleOrBelle2() == "Belle2":
-        variables['Lambda'].append('daughter(1,protonID)')  # protonID always 0 in B2BII check in future
-        variables['Lambda'].append('daughter(0,pionID)')  # not very powerful in B2BII
+        variables_dict['Lambda'].append('daughter(1,protonID)')  # protonID always 0 in B2BII check in future
+        variables_dict['Lambda'].append('daughter(0,pionID)')  # not very powerful in B2BII
     else:
         # Below we add some input variables in case of Belle B2BII samples.
         # They are added only for Belle samples because they lead to large data/MC discrepancies at Belle II.
         # Add them for Belle II samples, when their distributions will have good data/MC agreement.
-        variables['Electron'].append('eid_dEdx')
-        variables['Electron'].append('ImpactXY')
-        variables['Electron'].append('distance')
+        variables_dict['Electron'].append('eid_dEdx')
+        variables_dict['Electron'].append('ImpactXY')
+        variables_dict['Electron'].append('distance')
 
-        variables['IntermediateElectron'].append('eid_dEdx')
-        variables['IntermediateElectron'].append('ImpactXY')
-        variables['IntermediateElectron'].append('distance')
+        variables_dict['IntermediateElectron'].append('eid_dEdx')
+        variables_dict['IntermediateElectron'].append('ImpactXY')
+        variables_dict['IntermediateElectron'].append('distance')
 
-        variables['Muon'].append('muid_dEdx')
-        variables['Muon'].append('ImpactXY')
-        variables['Muon'].append('distance')
-        variables['Muon'].append('chiProb')
+        variables_dict['Muon'].append('muid_dEdx')
+        variables_dict['Muon'].append('ImpactXY')
+        variables_dict['Muon'].append('distance')
+        variables_dict['Muon'].append('chiProb')
 
-        variables['IntermediateMuon'].append('muid_dEdx')
-        variables['IntermediateMuon'].append('ImpactXY')
-        variables['IntermediateMuon'].append('distance')
+        variables_dict['IntermediateMuon'].append('muid_dEdx')
+        variables_dict['IntermediateMuon'].append('ImpactXY')
+        variables_dict['IntermediateMuon'].append('distance')
 
-        variables['KinLepton'].append('muid_dEdx')
-        variables['KinLepton'].append('eid_dEdx')
-        variables['KinLepton'].append('ImpactXY')
-        variables['KinLepton'].append('distance')
-        variables['KinLepton'].append('chiProb')
+        variables_dict['KinLepton'].append('muid_dEdx')
+        variables_dict['KinLepton'].append('eid_dEdx')
+        variables_dict['KinLepton'].append('ImpactXY')
+        variables_dict['KinLepton'].append('distance')
+        variables_dict['KinLepton'].append('chiProb')
 
-        variables['IntermediateKinLepton'].append('muid_dEdx')
-        variables['IntermediateKinLepton'].append('eid_dEdx')
-        variables['IntermediateKinLepton'].append('ImpactXY')
-        variables['IntermediateKinLepton'].append('distance')
+        variables_dict['IntermediateKinLepton'].append('muid_dEdx')
+        variables_dict['IntermediateKinLepton'].append('eid_dEdx')
+        variables_dict['IntermediateKinLepton'].append('ImpactXY')
+        variables_dict['IntermediateKinLepton'].append('distance')
 
-        variables['Kaon'].append('ImpactXY')
-        variables['Kaon'].append('distance')
+        variables_dict['Kaon'].append('ImpactXY')
+        variables_dict['Kaon'].append('distance')
 
-        variables['SlowPion'].append('piid_dEdx')
-        variables['SlowPion'].append('ImpactXY')
-        variables['SlowPion'].append('distance')
-        variables['SlowPion'].append('chiProb')
+        variables_dict['SlowPion'].append('piid_dEdx')
+        variables_dict['SlowPion'].append('ImpactXY')
+        variables_dict['SlowPion'].append('distance')
+        variables_dict['SlowPion'].append('chiProb')
 
-        variables['FastHadron'].append('BtagToWBosonVariables(pMissCMS)')
-        variables['FastHadron'].append('ImpactXY')
-        variables['FastHadron'].append('distance')
-        variables['FastHadron'].append('chiProb')
+        variables_dict['FastHadron'].append('BtagToWBosonVariables(pMissCMS)')
+        variables_dict['FastHadron'].append('ImpactXY')
+        variables_dict['FastHadron'].append('distance')
+        variables_dict['FastHadron'].append('chiProb')
 
-        variables['Lambda'].append('distance')
+        variables_dict['Lambda'].append('distance')
 
-        variables['MaximumPstar'].append('ImpactXY')
-        variables['MaximumPstar'].append('distance')
+        variables_dict['MaximumPstar'].append('ImpactXY')
+        variables_dict['MaximumPstar'].append('distance')
 
 
 def FillParticleLists(maskName='all', categories=None, path=None):
@@ -669,9 +694,9 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=N
                 ntuple = register_module('VariablesToNtuple')
                 ntuple.param('fileName', filesDirectory + '/' + methodPrefixEventLevel + "sampled" + fileId + ".root")
                 ntuple.param('treeName', methodPrefixEventLevel + "_tree")
-                variablesToBeSaved = variables[category] + [targetVariable, 'ancestorHasWhichFlavor',
-                                                            'isSignal', 'mcPDG', 'mcErrors', 'genMotherPDG',
-                                                            'nMCMatches', 'B0mcErrors']
+                variablesToBeSaved = variables_dict[category] + [targetVariable, 'ancestorHasWhichFlavor',
+                                                                 'isSignal', 'mcPDG', 'mcErrors', 'genMotherPDG',
+                                                                 'nMCMatches', 'B0mcErrors']
                 if category != 'KaonPion' and category != 'FSC':
                     variablesToBeSaved = variablesToBeSaved + \
                         ['extraInfo(isRightTrack(' + category + '))',
@@ -718,11 +743,11 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu', categories=None):
             trainingOptionsEventLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
             trainingOptionsEventLevel.m_treename = methodPrefixEventLevel + "_tree"
             trainingOptionsEventLevel.m_identifier = weightFile
-            trainingOptionsEventLevel.m_variables = basf2_mva.vector(*variables[category])
+            trainingOptionsEventLevel.m_variables = basf2_mva.vector(*variables_dict[category])
             trainingOptionsEventLevel.m_target_variable = targetVariable
             trainingOptionsEventLevel.m_max_events = maxEventsNumber
 
-            basf2_mva.teacher(trainingOptionsEventLevel, fastBDTCategories)
+            basf2_mva.teacher(trainingOptionsEventLevel, getFastBDTCategories())
 
             if uploadFlag:
                 basf2_mva.upload(weightFile, methodPrefixEventLevel)
@@ -868,7 +893,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu', variablesCombinerLevel=None,
             trainingOptionsCombinerLevel.m_target_variable = 'qrCombined'
             trainingOptionsCombinerLevel.m_max_events = maxEventsNumber
 
-            basf2_mva.teacher(trainingOptionsCombinerLevel, fastBDTCombiner)
+            basf2_mva.teacher(trainingOptionsCombinerLevel, getFastBDTCombiner())
 
             if uploadFlag:
                 basf2_mva.upload(filesDirectory + '/' + methodPrefixCombinerLevel +
@@ -898,7 +923,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu', variablesCombinerLevel=None,
             trainingOptionsCombinerLevel.m_target_variable = 'qrCombined'
             trainingOptionsCombinerLevel.m_max_events = maxEventsNumber
 
-            basf2_mva.teacher(trainingOptionsCombinerLevel, mlpFANNCombiner)
+            basf2_mva.teacher(trainingOptionsCombinerLevel, getMlpFANNCombiner())
 
             if uploadFlag:
                 basf2_mva.upload(filesDirectory + '/' + methodPrefixCombinerLevel +

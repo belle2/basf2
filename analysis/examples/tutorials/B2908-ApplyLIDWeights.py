@@ -70,10 +70,25 @@ def main():
     # Fill example standard lepton list.
     # ----------------------------------
 
+    # For electrons, we show the case in which a Bremsstrahlung correction
+    # is applied first to get the 4-momentum right,
+    # and the resulting particle list is passed as input to the stdE list creator.
+    ma.fillParticleList("e+:uncorrected",
+                        cut="dr < 2 and abs(dz) < 4",  # NB: whichever cut is set here, will be inherited by the std electrons.
+                        path=path)
+    ma.fillParticleList("gamma:bremsinput",
+                        cut="E < 1.0",
+                        path=path)
+    ma.correctBrems(outputList="e+:corrected",
+                    inputList="e+:uncorrected",
+                    gammaList="gamma:bremsinput",
+                    path=path)
+
     electrons_fixed09 = "lh_B_fixed09"
     electron_id_var = stdE("FixedThresh09", "likelihood", "binary", args.lid_weights_gt,
                            release=5,
                            listname=electrons_fixed09,
+                           input_listname="e+:corrected",
                            path=path)
 
     muons_uniform90 = "bdt_G_uniform90"

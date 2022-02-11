@@ -163,6 +163,7 @@ def stdLep(pdgId,
            lid_weights_gt,
            release=None,
            listname=None,
+           input_listname=None,
            trainingModeMulticlass=_TrainingMode.c_Multiclass,
            trainingModeBinary=_TrainingMode.c_Classification,
            path=None):
@@ -199,16 +200,33 @@ def stdLep(pdgId,
         method (str): the PID method: 'likelihood' or 'bdt'.
         classification (str): the type of classifier: 'binary' (one-vs-pion) or 'global' (one-vs-all).
         lid_weights_gt (str): the name identifier of the global tag with the recommended Data/MC correction weights.
-                              Please refer to the
-                              `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
-                              for info about lepton ID recommendations.
+
+                              .. tip::
+                                  Please refer to the
+                                  `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+                                  for info about the recommended global tags.
+
         release (Optional[int]): the major release number of the data and MC campaigns considered.
                                  If specified, it ensures the correct :math:`\\ell` ID variables are used.
-                                 Please refer to the
-                                 `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
-                                 for info about lepton identification variables and campaigns.
-        listname (Optional[str]): the name of the lepton list.
-                                  By default, it is assigned as: '{lepton}-:{method}_{classification}_{working_point}'
+
+                              .. tip::
+                                  Please refer to the
+                                  `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+                                  for info about lepton identification variables and campaigns.
+
+        listname (Optional[str]): the name of the lepton list to be created.
+                                  By default, it is assigned as:
+                                  ``'{lepton}-:{method}_{classification}_{working_point}'``.
+        input_listname (Optional[str]): the name of a pre-existing ``ParticleList`` object, of which the standard lepton list
+                                        will be a subset.
+                                        For instance, users might want to apply a Bremsstrahlung correction to electrons first,
+                                        which modifies their 4-momentum, and only later define the subset passing the PID selection,
+                                        including the appropriate PID weights and uncertainties (which are :math:`p`-dependent).
+                                        By default, the standard lepton list is created from all ``Track`` objects in the event.
+
+                                        .. warning::
+                                            Do *not* apply any PID selection on the input list, otherwise results could be biased.
+
         trainingModeMulticlass (Optional[``Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode``]): enum identifier
                                of the multi-class (global PID) training mode.
                                See `modularAnalysis.applyChargedPidMVA` docs for available options.
@@ -341,7 +359,13 @@ def stdLep(pdgId,
     if listname is not None:
         plistname = f"{lepton_name}:{listname}"
 
-    ma.fillParticleList(plistname, "", path=path)
+    if input_listname is None:
+        ma.fillParticleList(plistname, "", path=path)
+    else:
+        b2.B2INFO(
+            f"The standard lepton list: '{plistname}' will be created as a subset \
+              of the following ParticleList: '{input_listname}'")
+        ma.copyList(plistname, input_listname, path=path)
 
     # Here we must run the BDT if requested.
     if method == "bdt":
@@ -432,6 +456,7 @@ def stdE(listtype=_defaultlist,
          lid_weights_gt=None,
          release=None,
          listname=None,
+         input_listname=None,
          trainingModeMulticlass=_TrainingMode.c_Multiclass,
          trainingModeBinary=_TrainingMode.c_Classification,
          path=None):
@@ -461,6 +486,7 @@ def stdE(listtype=_defaultlist,
     return stdLep(Const.electron.getPDGCode(), listtype, method, classification, lid_weights_gt,
                   release=release,
                   listname=listname,
+                  input_listname=input_listname,
                   trainingModeMulticlass=trainingModeMulticlass,
                   trainingModeBinary=trainingModeBinary,
                   path=path)
@@ -472,6 +498,7 @@ def stdMu(listtype=_defaultlist,
           lid_weights_gt=None,
           release=None,
           listname=None,
+          input_listname=None,
           trainingModeMulticlass=_TrainingMode.c_Multiclass,
           trainingModeBinary=_TrainingMode.c_Classification,
           path=None):
@@ -501,6 +528,7 @@ def stdMu(listtype=_defaultlist,
     return stdLep(Const.muon.getPDGCode(), listtype, method, classification, lid_weights_gt,
                   release=release,
                   listname=listname,
+                  input_listname=input_listname,
                   trainingModeMulticlass=trainingModeMulticlass,
                   trainingModeBinary=trainingModeBinary,
                   path=path)

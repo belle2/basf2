@@ -31,10 +31,14 @@ namespace Belle2 {
     class CDCMCCloneLookUp {
 
     public:
+
       /// Getter for the singletone instance
       static CDCMCCloneLookUp& getInstance();
+
       /// Singleton: Delete copy constructor and assignment operator
       CDCMCCloneLookUp(CDCMCCloneLookUp&) = delete;
+
+      /// Operator =.
       CDCMCCloneLookUp& operator=(const CDCMCCloneLookUp&) = delete;
 
       /// fill with all cdcTracks in an event

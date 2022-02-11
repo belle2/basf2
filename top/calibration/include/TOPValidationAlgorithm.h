@@ -32,9 +32,9 @@ namespace Belle2 {
        */
       virtual EResult calibrate() final;
 
+      enum {c_numModules = TOP::ValidationTreeStruct::c_numModules};  /**< number of modules */
 
-      ValidationTreeStruct m_inputEntry;  /**< input tree entry */
-      ValidationTreeStruct m_outputEntry; /**< output tree entry, per run merged entries of input tree */
+      ValidationTreeStruct m_treeEntry;  /**< input tree entry */
 
     };
 

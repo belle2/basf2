@@ -24,12 +24,12 @@ namespace Belle2 {
       float commonT0Err = 0; /**< common T0 uncertainty (not scaled) */
       float moduleT0[c_numModules] = {0};  /**< module T0 residuals, index = slot - 1 */
       float moduleT0Err[c_numModules] = {0}; /**< module T0 uncertainties (not scaled), index = slot - 1 */
-      int numTBCalibrated[c_numModules] = {0}; /**< number of timebase calibrated channels, index slot - 1 */
-      int numT0Calibrated[c_numModules] = {0}; /**< number of channel T0 calibrated channels, index slot - 1 */
-      int numActive[c_numModules] = {0}; /**< number of active channels, index slot - 1 */
-      int numActiveCalibrated[c_numModules] = {0}; /**< number of active calibrated channels, index slot - 1 */
-      float thrEffi[c_numModules] = {0}; /**< threshold efficiency: average over active calibrated channels, index slot - 1 */
-      float shifts[4] = {0}; /**< carrier shifts of BS13d, index = carrier number */
+      int numTBCalibrated[c_numModules] = {0}; /**< number of timebase calibrated channels, index = slot - 1 */
+      int numT0Calibrated[c_numModules] = {0}; /**< number of channel T0 calibrated channels, index = slot - 1 */
+      int numActive[c_numModules] = {0}; /**< number of active channels, index = slot - 1 */
+      int numActiveCalibrated[c_numModules] = {0}; /**< number of active calibrated channels, index = slot - 1 */
+      float thrEffi[c_numModules] = {0}; /**< threshold efficiency: average over active calibrated channels, index = slot - 1 */
+      float asicShifts[4] = {0}; /**< carrier shifts of BS13d, index = carrier number */
       int numMerged = 0; /**< number of merged entries */
 
       /**

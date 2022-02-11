@@ -36,6 +36,9 @@ namespace Belle2 {
      */
     void initialize() override;
 
+    /**
+     * This method is called for each event.
+     */
     void event() override;
 
     /**

@@ -66,7 +66,6 @@ namespace Belle2 {
              "If true, the secondary MC particle will be skipped, default is false",
              false);
 
-
     addParam("addDaughters", m_addDaughters,
              "If true, the particles from the bottom part of the selected particle's decay chain will also be created in the datastore and mother-daughter relations are recursively set",
              false);

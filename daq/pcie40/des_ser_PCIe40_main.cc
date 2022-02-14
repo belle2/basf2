@@ -34,7 +34,6 @@
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 #include <rawdata/dataobjects/PostRawCOPPERFormat_latest.h>
 
-
 /////////////////////////////////////////
 // Parameter for operation
 ////////////////////////////////////////
@@ -1280,7 +1279,6 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
       pthread_mutex_lock(&(mtx_sender_log));
       err_link_eve_jump[sender_id]++;
       if (err_link_eve_jump[sender_id] < max_number_of_messages) {
-
         char err_buf[500] = {0};
         //        printf("[FATAL] thread %d : event diff. in ch %d cur_eve %.8x ffaa %.8x\n", sender_id, i, new_evtnum, data[ cur_pos + FFAA_POS ]);
         sprintf(err_buf,
@@ -2032,14 +2030,14 @@ void* sender(void* arg)
     if (ret != DATACHECK_OK) {
       if (ret == DATACHECK_OK_BUT_ERRFLAG_IN_HDR) {
         //        err_bad_ffaa[sender_id]++;
-        unsigned int event_nwords = send_nwords - NW_SEND_HEADER - NW_SEND_TRAILER;
+        unsigned int event_nwords = 0;
         pthread_mutex_lock(&(mtx_sender_log));
         printf("[WARNING] thread %d : fake-error events are detected. Header and trailer reduction will be made and data are checked again.\n",
                sender_id);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
         reduceHdrTrl(buff + NW_SEND_HEADER, event_nwords);
-        send_nwords = event_nwords + NW_SEND_HEADER + NW_SEND_TRAILER;
+        send_nwords = event_nwords;
 
         if (evtnum != 0) {
           evtnum -= NUM_SENDER_THREADS; // To go through checkEventData().
@@ -2086,6 +2084,27 @@ void* sender(void* arg)
 #ifndef NOT_SEND
     ret = 0;
     int sent_bytes = 0;
+    // pthread_mutex_lock(&(mtx_sender_log));
+    // printf("[DEBUG] thread %d : sent words %d + sndhdr %d + sndtrl %d\n", sender_id, send_nwords, NW_SEND_HEADER,  NW_SEND_TRAILER );
+    // printEventData( buff, send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER, sender_id);
+    // pthread_mutex_unlock(&(mtx_sender_log));
+
+    if (buff[ NW_SEND_HEADER + 1 ] & 0xfffff000 != 0x7f7f0000 ||
+        buff[ NW_SEND_HEADER + send_nwords - 1  ] != 0x7fff0006) {
+      pthread_mutex_lock(&(mtx_sender_log));
+      printf("[FATAL] thread %d : ERROR_EVENT : Invalid Magic word in header( 0x%.8x ) and/or trailer( 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d",
+             sender_id, buff[ NW_SEND_HEADER + 1 ], buff[ NW_SEND_HEADER + send_nwords - 1  ],
+             evtnum,
+             (exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+             (exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+             (exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      printEventData(buff, send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER, sender_id);
+      fflush(stdout);
+      pthread_mutex_unlock(&(mtx_sender_log));
+      exit(1);
+    }
+
     while (true) {
       if ((ret = write(fd_accept, (char*)buff + sent_bytes, (send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER)
                        * sizeof(unsigned int) - sent_bytes)) <= 0) {

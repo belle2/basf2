@@ -788,7 +788,7 @@ class ConditionsDB:
         # determine the staging globaltag name
         data['tag'] = upload_global_tag(data['task'])
         if data['tag'] is None:
-            data['tag'] = f"staging_{data['task']}_{data['user']}_{data['time']}"
+            data['tag'] = f"temp_{data['task']}_{data['user']}_{data['time']}"
 
         # create the staging globaltag if it does not exists yet
         if not self.has_globalTag(data['tag']):

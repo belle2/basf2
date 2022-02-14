@@ -7,7 +7,7 @@
 ##########################################################################
 
 '''
-When the database is initialized, the globaltag names are trimmed in oreder to remove
+When the database is initialized, the globaltag names are trimmed in order to remove
 leading and trailing whitespaces, which would make basf2 crashing.
 
 This test checks if the trim is correctly applied.

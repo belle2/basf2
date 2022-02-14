@@ -202,7 +202,7 @@ namespace Belle2 {
       conf.setInitialized(true);
       m_globalTags = conf.getFinalListOfTags();
       // trim the globaltag names for removing leading/trailing whitespaces, since they
-      // are a potential soruce of FATAL errors
+      // are a potential source of FATAL errors
       std::transform(m_globalTags.begin(), m_globalTags.end(), m_globalTags.begin(),
       [](const auto & tag) {
         return boost::algorithm::trim_copy(tag);

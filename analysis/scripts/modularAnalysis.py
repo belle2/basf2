@@ -1124,7 +1124,8 @@ def fillParticleListFromMC(decayString,
                            addDaughters=False,
                            skipNonPrimaryDaughters=False,
                            writeOut=False,
-                           path=None):
+                           path=None,
+                           skipNonPrimary=False):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -1138,6 +1139,7 @@ def fillParticleListFromMC(decayString,
     @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
+    @param skipNonPrimary          if true, skip non primary particle
     """
 
     pload = register_module('ParticleLoader')
@@ -1147,6 +1149,7 @@ def fillParticleListFromMC(decayString,
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
+    pload.param('skipNonPrimary', skipNonPrimary)
     path.add_module(pload)
 
     from ROOT import Belle2
@@ -1167,7 +1170,8 @@ def fillParticleListsFromMC(decayStringsWithCuts,
                             addDaughters=False,
                             skipNonPrimaryDaughters=False,
                             writeOut=False,
-                            path=None):
+                            path=None,
+                            skipNonPrimary=False):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
@@ -1195,6 +1199,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
+    @param skipNonPrimary          if true, skip non primary particle
     """
 
     pload = register_module('ParticleLoader')
@@ -1204,6 +1209,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
+    pload.param('skipNonPrimary', skipNonPrimary)
     path.add_module(pload)
 
     from ROOT import Belle2

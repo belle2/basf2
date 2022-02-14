@@ -211,6 +211,9 @@ namespace Belle2 {
         std::vector<std::string> functionArguments = splitOnDelimiterAndConserveParenthesis(argument, ',', '(', ')');
         for (auto& str : functionArguments) {
           boost::algorithm::trim(str);
+          if (str.empty()) {
+            B2WARNING("Empty parameter for metavariable '" << functionName << "' in cut.");
+          }
         }
 
         return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new FunctionNode<AVariableManager>(functionName,

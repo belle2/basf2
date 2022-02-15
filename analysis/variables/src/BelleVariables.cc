@@ -234,6 +234,88 @@ namespace Belle2 {
       return (invMass - nomMass) / sqrt(massErrSquared);
     }
 
+    double BelleTof(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getTof();
+    }
+
+    double BelleTofQuality(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getTofQuality();
+    }
+
+    double BelleTofSigma(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getTofSigma();
+    }
+
+    double BellePathLength(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getPathLenght();
+    }
+
+    double BelledEdx(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getdEdx();
+    }
+
+    double BelledEdxQuality(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getdEdxQuality();
+    }
+
+    double BelleACCnPe(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getACCPe();
+    }
+
+    double BelleACCQuality(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return belleTrkExtra->getACCQuality();
+    }
+
+
+
     VARIABLE_GROUP("Belle Variables");
 
     REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort, R"DOC(
@@ -316,6 +398,39 @@ The significance is calculated as the difference between the reconstructed and t
 
 Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is calculated using the photon daughters' covariance matrices.
       )DOC");
+
+    REGISTER_VARIABLE("BelleTof", BelleTof, R"DOC(
+[Legacy] Returns  the time of flight of a track, in ns  (Belle only).
+)DOC");
+
+    REGISTER_VARIABLE("BelleTofQuality", BelleTofQuality, R"DOC(
+[Legacy] Returns the quality flag of the time of flight of a track. Original description from the panther table:  0 if consistency between z of hit by charge Q and corrected times, 1 if zhit from Q NOT consistent with zhit from and correct times. (Belle only).
+)DOC");
+
+    REGISTER_VARIABLE("BelleTofSigma", BelleTofSigma, R"DOC(
+[Legacy] Returns the expected resolution on the time of flight of a track in ns.  (Belle only).
+)DOC");
+
+    REGISTER_VARIABLE("BellePathLength", BellePathLength, R"DOC(
+[Legacy] Returns the track path length (cm). This is defined from the closest point to the z-axis up to TOF counter. (Belle only).
+)DOC");
+
+    REGISTER_VARIABLE("BelledEdx", BelledEdx, R"DOC(
+[Legacy] Returns the dE/dx measured in the CDC (keV/cm). (Belle only).
+)DOC");
+
+    REGISTER_VARIABLE("BelledEdxQuality", BelledEdxQuality, R"DOC(
+[Legacy] Returns the quality flag of the dE/dx measured in the CDC. Sadly no information about the code meaning is given in the original panther tables. (Belle only).
+)DOC");
+
+    REGISTER_VARIABLE("BelleACCnPe", BelleACCnPe, R"DOC(
+[Legacy] Returns the number of photo-eletrons associated to the track in the ACC. (Belle only).
+)DOC");
+
+    REGISTER_VARIABLE("BelleACCQuality", BelleACCQuality, R"DOC(
+[Legacy] Returns the ACC quality flag. Original definition in the pather tables: if 0 normal, if 1 the track is out of ACC acceptance. (Belle only).
+)DOC");
+
 
     // this is defined in ECLVariables.{h,cc}
     REGISTER_VARIABLE("clusterBelleQuality", eclClusterDeltaL, R"DOC(

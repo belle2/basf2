@@ -42,8 +42,8 @@ B2BII Analysis
 
 Prerequisites
 -------------
-The recommended versions to be used are ``release-06-00-03`` or the latest light release
-``light-2112-uraus``.
+The recommended versions to be used are ``release-06-00-08`` or the latest light release
+``light-2201-venus``.
 
 
 B2BII Converter
@@ -148,7 +148,7 @@ There are different kind of MC/data samples available at Belle.
 FAQ
 ===
 
-.. include:: AnalysisKey.rst
+.. toctree:: AnalysisKey
 
 
 

@@ -112,8 +112,45 @@ hence it doesn't work for off-resonance or :math:`\Upsilon(nS)`.
 Generating signal MC with B2BII
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Signal MC samples can also be generated in basf2, using the ``BelleMCOutput`` module.
+An example script of how to generate a MC sample with ``BelleMCOutput`` is at
+
+.. code-block:: csh
+   ls $BELLE2_RELEASE_DIR/b2bii/examples/BelleMCGeneration.py
+
+Here are several notes while using ``BelleMCOutput``
+
++++++++++++++++++++++++++++++
+Beam energy in MC generation
++++++++++++++++++++++++++++++
+
+The default global tag for MC generation is set to be the default gt for MC jobs,
+``B2BII_MC``. The beam energy spread is not considered when the payloads were
+created from the Belle DB; therefore, if you would like to include the energy
+spread in MC generation, please modify the prepended global tag:
+``b2bii_beamParameters_with_smearing``.
+
+.. code-block:: python
+   # Use B2BII global tag.
+   basf2.conditions.prepend_globaltag('b2bii_beamParameters_with_smearing')
 
 
-Because the Belle detector geometry is not implemented in basf2, the simulation part can
-only be done in basf.
+++++++++++++++++
+Run dependent MC
+++++++++++++++++
+If you like to generate run-dependent beam energy MC for non-:math:`\Upsilon(4S)`
+analysis, please contact conveners of your physics subgroup at Belle to get
+more information regarding the list of runs for your analysis.
+
+Then modify the following line in your generation script:
+
+.. code-block:: python
+   # Generate for experiment 55, run 0 (run-independent MC).
+   main.add_module('EventInfoSetter', expList=55, runList=0, evtNumList=100)
+
+
+
+.. note::
+   Because the Belle detector geometry is not and will not be implemented in basf2, the simulation part can 
+   only be done in basf.
 

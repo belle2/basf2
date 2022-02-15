@@ -45,6 +45,8 @@ void BelleTrkExtra::setTofInfo(double tof, double path_lenght, double tof_sigma,
   m_tof = tof;
   m_path_lenght = path_lenght;
   m_tof_sigma = tof_sigma;
+  m_tof_quality = tof_quality;
+
 }
 
 void BelleTrkExtra::setACCInfo(int acc_ph,  short acc_quality)

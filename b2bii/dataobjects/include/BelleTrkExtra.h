@@ -222,7 +222,7 @@ namespace Belle2 {
      *
      *  @return specific ionization [keV/cm+
      */
-    int getdEdx(void) const
+    double getdEdx(void) const
     {
       return m_dedx;
     }

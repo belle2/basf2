@@ -170,7 +170,7 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
         modularAnalysis.reconstructDecay('D*+:ch' + str(chID) + ' -> D0:ch' + str(chID) + ' pi+:all', Dst_Cut, dmID=chID, path=path)
         Dst_List.append('D*+:ch' + str(chID))
     modularAnalysis.copyLists(outputListName='D*+:d0pi', inputListNames=Dst_List, path=path)
-    modularAnalysis.fillParticleList("pi+:offip", '[abs(d0) > 1 and abs(z0) > 2] and [nSVDHits >=3 or nCDCHits >= 20]', path=path)
+    modularAnalysis.fillParticleList("pi+:offip", '[abs(z0) > 10] and [nSVDHits >=3 or nCDCHits >= 20]', path=path)
 
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)

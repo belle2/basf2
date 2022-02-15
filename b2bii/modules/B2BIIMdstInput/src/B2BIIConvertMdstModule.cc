@@ -1675,8 +1675,34 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
 
     // conversion of track position in CDC layers
     if (m_convertTrkExtra) {
+      double tof = 0;
+      double path_lenght = 0;
+      double tof_sigma = 0;
+      short tof_qual = 0;
+      int acc_ph = 0;
+      short acc_qual = 0;
+      double dedx = trk.dEdx();
+      short dedx_qual = trk.quality_dedx();
+
+      const Belle::Mdst_tof& tof_obj = belleTrack.tof();
+      if (tof_obj) {
+        tof = tof_obj.tof();
+        path_lenght = tof_obj.path_length();
+        tof_qual = tof_obj.quality();
+        tof_sigma = tof_obj.sigma_tof();
+      }
+
+      const Belle::Mdst_acc& acc_obj = belleTrack.acc();
+      if (acc_obj) {
+        acc_ph = acc_obj.photo_electron();
+        acc_qual = acc_obj.quality();
+      }
+
+
       auto cdcExtraInfo = m_belleTrkExtra.appendNew(trk_fit.first_x(), trk_fit.first_y(), trk_fit.first_z(),
-                                                    trk_fit.last_x(), trk_fit.last_y(), trk_fit.last_z());
+                                                    trk_fit.last_x(), trk_fit.last_y(), trk_fit.last_z(),
+                                                    tof, path_lenght, tof_qual, tof_sigma,
+                                                    acc_ph, acc_qual, dedx, dedx_qual);
       track->addRelationTo(cdcExtraInfo);
     }
     // conversion of the SVD hit pattern

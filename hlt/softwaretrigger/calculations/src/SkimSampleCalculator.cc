@@ -32,7 +32,8 @@ using namespace SoftwareTrigger;
 SkimSampleCalculator::SkimSampleCalculator() :
   m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim"), m_pionHadParticles("pi+:hadb"), m_pionTauParticles("pi+:tau"),
   m_KsParticles("K_S0:merged"), m_LambdaParticles("Lambda0:merged"), m_DstParticles("D*+:d0pi"), m_offIpParticles("pi+:offip"),
-  m_filterL1TrgNN("software_trigger_cut&filter&L1_trigger_nn_info"), m_BpParticles("B+:btoch"), m_BzParticles("B0:btoch")
+  m_filterL1TrgNN("software_trigger_cut&filter&L1_trigger_nn_info"), m_BpParticles("B+:BtoCharmForHLT"),
+  m_BzParticles("B0:BtoCharmForHLT")
 {
 
 }
@@ -847,31 +848,15 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   calculationResult["MumuHighM"] = mumuHighMass;
 
   // BtoCharm skims
-  unsigned int nBp = 0;
-  unsigned int nBz = 0;
+  calculationResult["Bp"] = 0;
+  calculationResult["Bz"] = 0;
 
   if (m_BpParticles.isValid() && (ntrk_bha >= 3 && Bhabha2Trk == 0)) {
-    for (unsigned int i = 0; i < m_BpParticles->getListSize(); i++) {
-      nBp++;
-    }
+    calculationResult["Bp"] = m_BpParticles->getListSize() >= 1;
   }
 
   if (m_BzParticles.isValid() && (ntrk_bha >= 3 && Bhabha2Trk == 0)) {
-    for (unsigned int i = 0; i < m_BzParticles->getListSize(); i++) {
-      nBz++;
-    }
-  }
-
-  if (nBp > 0) {
-    calculationResult["Bp"] = 1;
-  } else {
-    calculationResult["Bp"] = 0;
-  }
-
-  if (nBz > 0) {
-    calculationResult["Bz"] = 1;
-  } else {
-    calculationResult["Bz"] = 0;
+    calculationResult["Bz"] = m_BzParticles->getListSize() >= 1;
   }
 
 }

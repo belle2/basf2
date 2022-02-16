@@ -1,11 +1,11 @@
 b2biiConversion
 ===============
 .. automodule:: b2biiConversion
-      :members:
+   :members:
    :undoc-members:
 
 b2biiMonitors
 =============
 .. automodule:: b2biiMonitors
-      :members:
+   :members:
    :undoc-members:

@@ -400,24 +400,24 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
       )DOC");
 
     REGISTER_VARIABLE("BelleTof", BelleTof, R"DOC(
-[Legacy] Returns  the time of flight of a track, in ns  (Belle only).
-)DOC");
+[Legacy] Returns  the time of flight of a track. (Belle only).
+)DOC", "ns");
 
     REGISTER_VARIABLE("BelleTofQuality", BelleTofQuality, R"DOC(
 [Legacy] Returns the quality flag of the time of flight of a track. Original description from the panther table:  0 if consistency between z of hit by charge Q and corrected times, 1 if zhit from Q NOT consistent with zhit from and correct times. (Belle only).
 )DOC");
 
     REGISTER_VARIABLE("BelleTofSigma", BelleTofSigma, R"DOC(
-[Legacy] Returns the expected resolution on the time of flight of a track in ns.  (Belle only).
-)DOC");
+[Legacy] Returns the expected resolution on the time of flight of a track in.  (Belle only).
+)DOC", "ns");
 
     REGISTER_VARIABLE("BellePathLength", BellePathLength, R"DOC(
-[Legacy] Returns the track path length (cm). This is defined from the closest point to the z-axis up to TOF counter. (Belle only).
-)DOC");
+[Legacy] Returns the track path length. This is defined from the closest point to the z-axis up to TOF counter. (Belle only).
+)DOC", "cm");
 
     REGISTER_VARIABLE("BelledEdx", BelledEdx, R"DOC(
-[Legacy] Returns the dE/dx measured in the CDC (keV/cm). (Belle only).
-)DOC");
+[Legacy] Returns the dE/dx measured in the CDC. (Belle only).
+)DOC", "keV/cm");
 
     REGISTER_VARIABLE("BelledEdxQuality", BelledEdxQuality, R"DOC(
 [Legacy] Returns the quality flag of the dE/dx measured in the CDC. Sadly no information about the code meaning is given in the original panther tables. (Belle only).

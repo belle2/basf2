@@ -30,9 +30,8 @@ The weights for KID and LID are available in basf2 and can be retreived via payl
 naming schemes of each PID payloads are slightly different.
 
 
-~~~~~~~~~
-Lepton ID
-~~~~~~~~~
+.. rubric:: Lepton ID
+
 Naming scheme for LID is ``BelleLID<e|mu>_<LID cut>``.
 Using ``eIDBelle>0.9`` as an example:
 
@@ -57,10 +56,7 @@ Using ``eIDBelle>0.9`` as an example:
    reweighter.param('particleList', 'pi+:all')
    my_path.add_module(reweighter)
 
-
-~~~~~~~~~~~~~~~~~~~
-Kaon/:math:`\pi` ID
-~~~~~~~~~~~~~~~~~~~
+.. rubric:: Kaon/:math:`\pi` ID
 
 Naming scheme for payloads is:
 ``BelleKID<K|Pi><Eff|Fake><Combined|Plus|Minus>_<PID cut:[1..9]>``
@@ -106,10 +102,8 @@ To append PID correction information for pion efficiency selected as kaons with
    reweighter2.param('particleList', 'pi+:all')
    my_path.add_module(reweighter2)
 
+.. rubric:: Proton ID
 
-~~~~~~~~~
-Proton ID
-~~~~~~~~~
 Naming scheme for proton ID payloads is:
 ``BellePID<Plus|Minus>_<PID cut>``
 

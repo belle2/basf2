@@ -400,7 +400,7 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
       )DOC");
 
     REGISTER_VARIABLE("BelleTof", BelleTof, R"DOC(
-[Legacy] Returns  the time of flight of a track. (Belle only).
+[Legacy] Returns the time of flight of a track. (Belle only).
 )DOC", "ns");
 
     REGISTER_VARIABLE("BelleTofQuality", BelleTofQuality, R"DOC(
@@ -408,7 +408,7 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
 )DOC");
 
     REGISTER_VARIABLE("BelleTofSigma", BelleTofSigma, R"DOC(
-[Legacy] Returns the expected resolution on the time of flight of a track in.  (Belle only).
+[Legacy] Returns the expected resolution on the time of flight of a track. (Belle only).
 )DOC", "ns");
 
     REGISTER_VARIABLE("BellePathLength", BellePathLength, R"DOC(
@@ -424,11 +424,11 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
 )DOC");
 
     REGISTER_VARIABLE("BelleACCnPe", BelleACCnPe, R"DOC(
-[Legacy] Returns the number of photo-eletrons associated to the track in the ACC. (Belle only).
+[Legacy] Returns the number of photo-electrons associated to the track in the ACC. (Belle only).
 )DOC");
 
     REGISTER_VARIABLE("BelleACCQuality", BelleACCQuality, R"DOC(
-[Legacy] Returns the ACC quality flag. Original definition in the pather tables: if 0 normal, if 1 the track is out of ACC acceptance. (Belle only).
+[Legacy] Returns the ACC quality flag. Original definition in the panther tables: if 0 normal, if 1 the track is out of ACC acceptance. (Belle only).
 )DOC");
 
 

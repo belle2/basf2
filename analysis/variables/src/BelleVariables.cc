@@ -271,7 +271,7 @@ namespace Belle2 {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return std::numeric_limits<double>::quiet_NaN();
       }
-      return belleTrkExtra->getPathLenght();
+      return belleTrkExtra->getPathLength();
     }
 
     double BelledEdx(const Particle* particle)

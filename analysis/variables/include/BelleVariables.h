@@ -51,7 +51,7 @@ namespace Belle2 {
     double BelleTofQuality(const Particle* particle);
     /** Returns the expected tof resolution from mdst_tof */
     double BelleTofSigma(const Particle* particle);
-    /** Returns the track's path lenght from mdst_tof */
+    /** Returns the track's path length from mdst_tof */
     double BellePathLength(const Particle* particle);
 
     /** Returns the dEdx from mdst_trk */

@@ -1676,7 +1676,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     // conversion of track position in CDC layers
     if (m_convertTrkExtra) {
       double tof = 0;
-      double path_lenght = 0;
+      double path_length = 0;
       double tof_sigma = 0;
       short tof_qual = 0;
       int acc_ph = 0;
@@ -1687,7 +1687,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
       const Belle::Mdst_tof& tof_obj = belleTrack.tof();
       if (tof_obj) {
         tof = tof_obj.tof();
-        path_lenght = tof_obj.path_length();
+        path_length = tof_obj.path_length();
         tof_qual = tof_obj.quality();
         tof_sigma = tof_obj.sigma_tof();
       }
@@ -1701,7 +1701,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
 
       auto cdcExtraInfo = m_belleTrkExtra.appendNew(trk_fit.first_x(), trk_fit.first_y(), trk_fit.first_z(),
                                                     trk_fit.last_x(), trk_fit.last_y(), trk_fit.last_z(),
-                                                    tof, path_lenght, tof_qual, tof_sigma,
+                                                    tof, path_length, tof_qual, tof_sigma,
                                                     acc_ph, acc_qual, dedx, dedx_qual);
       track->addRelationTo(cdcExtraInfo);
     }

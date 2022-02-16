@@ -16,16 +16,16 @@ namespace Belle2 {
   public:
     /** Constructor initializing everything to zero */
     BelleTrkExtra() : m_firstx(0.0), m_firsty(0.0), m_firstz(0.0), m_lastx(0.0), m_lasty(0.0), m_lastz(0.0), m_tof(0.0),
-      m_path_lenght(0.0), m_tof_quality(0), m_tof_sigma(0.0), m_acc_ph(0), m_acc_quality(0), m_dedx(0.0), m_dedx_quality(0) {};
+      m_path_length(0.0), m_tof_quality(0), m_tof_sigma(0.0), m_acc_ph(0), m_acc_quality(0), m_dedx(0.0), m_dedx_quality(0) {};
 
     /** Constructor initializing variables */
     BelleTrkExtra(double first_x, double first_y, double first_z,
                   double last_x, double last_y, double last_z,
-                  double tof, double path_lenght, short tof_quality, double tof_sigma,
+                  double tof, double path_length, short tof_quality, double tof_sigma,
                   int acc_ph,  short acc_quality,
                   double dedx, short dedx_quality) : m_firstx(first_x), m_firsty(first_y), m_firstz(first_z),
       m_lastx(last_x), m_lasty(last_y), m_lastz(last_z),
-      m_tof(tof), m_path_lenght(path_lenght), m_tof_quality(tof_quality), m_tof_sigma(tof_sigma),
+      m_tof(tof), m_path_length(path_length), m_tof_quality(tof_quality), m_tof_sigma(tof_sigma),
       m_acc_ph(acc_ph),  m_acc_quality(acc_quality),
       m_dedx(dedx), m_dedx_quality(dedx_quality) {};
 
@@ -36,11 +36,11 @@ namespace Belle2 {
     /** Set the tof-related information
      *
      *  @param tof measured tof of the track [ns]
-     *  @param path_lenght lenght of the track from the doca to the beam axis to the tof [cm]
+     *  @param path_length length of the track from the doca to the beam axis to the tof [cm]
      *  @param tof_sigma expected time resolution [ns]
      *  @param tof_quality matching quality: 0 if ok, 1 if track is not matched
      */
-    void setTofInfo(double tof, double path_lenght, double tof_sigma, short tof_quality);
+    void setTofInfo(double tof, double path_length, double tof_sigma, short tof_quality);
 
 
     /** Set the ACC-related information
@@ -172,13 +172,13 @@ namespace Belle2 {
       return m_tof;
     }
 
-    /** Get path lenght
+    /** Get path length
      *
-     *  @return lenght of the track from the doca to the beam axis to the tof [cm]
+     *  @return length of the track from the doca to the beam axis to the tof [cm]
      */
-    double getPathLenght(void) const
+    double getPathLength(void) const
     {
-      return m_path_lenght;
+      return m_path_length;
     }
 
     /** Get tof sigma
@@ -247,7 +247,7 @@ namespace Belle2 {
     double m_lasty; /**< End point of the track near the last CDC hit point. y component. */
     double m_lastz; /**< End point of the track near the last CDC hit point. z component. */
     double m_tof; /**<  measured tof of the track [ns] */
-    double m_path_lenght; /**<  lenght of the track from the doca to the beam axis to the tof [cm] */
+    double m_path_length; /**<  length of the track from the doca to the beam axis to the tof [cm] */
     short m_tof_quality; /**<  matching quality: 0 if ok, 1 if track is not matched */
     double m_tof_sigma; /**<  expected time resolution [ns] */
     int m_acc_ph; /**<  number of ACC photo-electrons associated to the track */

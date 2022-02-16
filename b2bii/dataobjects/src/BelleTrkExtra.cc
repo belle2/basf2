@@ -40,10 +40,10 @@ void BelleTrkExtra::setTrackLastZ(double last_z)
   m_lastz = last_z;
 }
 
-void BelleTrkExtra::setTofInfo(double tof, double path_lenght, double tof_sigma, short tof_quality)
+void BelleTrkExtra::setTofInfo(double tof, double path_length, double tof_sigma, short tof_quality)
 {
   m_tof = tof;
-  m_path_lenght = path_lenght;
+  m_path_length = path_length;
   m_tof_sigma = tof_sigma;
   m_tof_quality = tof_quality;
 

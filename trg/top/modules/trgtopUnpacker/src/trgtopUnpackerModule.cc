@@ -78,7 +78,7 @@ void TRGTOPUnpackerModule::event()
     int node_id = 0;
     int ch_id = 0;
     if (m_pciedata) {
-      node_id = 0x11000001;
+      node_id = 0x10000001;
       ch_id = 23;
     } else {
       node_id = 0x12000001;

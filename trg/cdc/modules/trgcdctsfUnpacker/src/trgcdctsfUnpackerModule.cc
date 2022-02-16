@@ -61,51 +61,51 @@ void TRGCDCTSFUnpackerModule::initialize()
   if (m_TSFMOD == 0) {
     m_copper_address = 0x11000007;
     m_copper_ab = 0;
-    m_pcie40_address = 0x11000001;
+    m_pcie40_address = 0x10000001;
     m_pcie40_ch = 12;
   } else if (m_TSFMOD == 1) {
     if (_exp > 7 || (_exp == 7 && _run > 4023)) {
       m_copper_address = 0x11000009;
       m_copper_ab = 0;
-      m_pcie40_address = 0x11000001;
+      m_pcie40_address = 0x10000001;
       m_pcie40_ch = 13;
     } else {
       m_copper_address = 0x11000007;
       m_copper_ab = 1;
-      m_pcie40_address = 0x11000001;
+      m_pcie40_address = 0x10000001;
       m_pcie40_ch = 13;
     }
   } else if (m_TSFMOD == 2) {
     m_copper_address = 0x11000008;
     m_copper_ab = 0;
-    m_pcie40_address = 0x11000001;
+    m_pcie40_address = 0x10000001;
     m_pcie40_ch = 14;
   } else if (m_TSFMOD == 3) {
     m_copper_address = 0x11000008;
     m_copper_ab = 1;
-    m_pcie40_address = 0x11000001;
+    m_pcie40_address = 0x10000001;
     m_pcie40_ch = 15;
   } else if (m_TSFMOD == 4) {
     if (_exp > 7 || (_exp == 7 && _run > 4023)) {
       m_copper_address = 0x11000007;
       m_copper_ab = 1;
-      m_pcie40_address = 0x11000001;
+      m_pcie40_address = 0x10000001;
       m_pcie40_ch = 16;
     } else {
       m_copper_address = 0x11000009;
       m_copper_ab = 0;
-      m_pcie40_address = 0x11000001;
+      m_pcie40_address = 0x10000001;
       m_pcie40_ch = 16;
     }
   } else if (m_TSFMOD == 5) {
     m_copper_address = 0x11000009;
     m_copper_ab = 1;
-    m_pcie40_address = 0x11000001;
+    m_pcie40_address = 0x10000001;
     m_pcie40_ch = 17;
   } else if (m_TSFMOD == 6) {
     m_copper_address = 0x1100000a;
     m_copper_ab = 0;
-    m_pcie40_address = 0x11000001;
+    m_pcie40_address = 0x10000001;
     m_pcie40_ch = 18;
   } else {
     B2ERROR("trgcdctsfunpacker:cooper address is not set");

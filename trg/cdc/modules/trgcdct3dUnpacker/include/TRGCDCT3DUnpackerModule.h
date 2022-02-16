@@ -3555,7 +3555,7 @@ namespace Belle2 {
       /// address of copper module
       unsigned int m_copper_ab;
       /// address of PCIe40 module
-      unsigned int m_pcie40_address = 0x11000001;
+      unsigned int m_pcie40_address = 0x10000001;
       /// channel ID of PCIe40 module
       unsigned int m_pcie40_ch;
       /// PCIe40 data or copper data;

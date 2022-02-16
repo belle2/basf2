@@ -56,25 +56,25 @@ void TRGCDCT3DUnpackerModule::initialize()
   if (m_T3DMOD == 0) {
     m_copper_address = 0x11000003;
     m_copper_ab = 0;
-    m_pcie40_address = 0x11000001;
+    m_pcie40_address = 0x10000001;
     m_pcie40_ch = 4;
 //    m_nword = 3075;
   } else if (m_T3DMOD == 1) {
     m_copper_address = 0x11000003;
     m_copper_ab = 1;
-    m_pcie40_address = 0x11000001;
+    m_pcie40_address = 0x10000001;
     m_pcie40_ch = 5;
 //    m_nword = 3075;
   } else if (m_T3DMOD == 2) {
     m_copper_address = 0x11000004;
     m_copper_ab = 0;
-    m_pcie40_address = 0x11000001;
+    m_pcie40_address = 0x10000001;
     m_pcie40_ch = 6;
 //    m_nword = 3075;
   } else if (m_T3DMOD == 3) {
     m_copper_address = 0x11000004;
     m_copper_ab = 1;
-    m_pcie40_address = 0x11000001;
+    m_pcie40_address = 0x10000001;
     m_pcie40_ch = 7;
 //    m_nword = 3075;
   } else {

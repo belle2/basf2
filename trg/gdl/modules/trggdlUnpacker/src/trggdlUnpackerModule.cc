@@ -164,7 +164,7 @@ void TRGGDLUnpackerModule::event()
       unsigned int node_id = 0;
       unsigned int ch_id = 0;
       if (m_pciedata) {
-        node_id = 0x11000001;
+        node_id = 0x10000001;
         ch_id = 21;
       } else {
         node_id = 0x15000001;
@@ -204,7 +204,7 @@ void TRGGDLUnpackerModule::event()
         } else if (m_pciedata) {
 
           unsigned pcie40id = raw_trgarray[i]->GetNodeID(j);
-          if (pcie40id == 0x11000001) {
+          if (pcie40id == 0x10000001) {
             int _exp = raw_trgarray[i]->GetExpNo(j);
             int _run = raw_trgarray[i]->GetRunNo(j);
             for (int hslb = 0; hslb < 48; hslb++) {

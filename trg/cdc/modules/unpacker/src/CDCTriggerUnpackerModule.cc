@@ -566,10 +566,10 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
   addParam("2DNodeId", m_tracker2DNodeID,
            "list of COPPER and HSLB ID of 2D tracker", defaultTracker2DNodeID);
   NodeList defaultTracker2DNodeID_pcie40 = {
-    {0x11000001, 0},
-    {0x11000001, 1},
-    {0x11000001, 2},
-    {0x11000001, 3}
+    {0x10000001, 0},
+    {0x10000001, 1},
+    {0x10000001, 2},
+    {0x10000001, 3}
   };
   addParam("2DNodeId_pcie40", m_tracker2DNodeID_pcie40,
            "list of PCIe40 ch ID of 2D tracker", defaultTracker2DNodeID_pcie40);
@@ -583,10 +583,10 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
   addParam("NeuroNodeId", m_neuroNodeID,
            "list of COPPER and HSLB ID of neurotrigger", defaultNeuroNodeID);
   NodeList defaultNeuroNodeID_pcie40 = {
-    {0x11000001, 8},
-    {0x11000001, 9},
-    {0x11000001, 10},
-    {0x11000001, 11}
+    {0x10000001, 8},
+    {0x10000001, 9},
+    {0x10000001, 10},
+    {0x10000001, 11}
   };
   addParam("NeuroNodeId_pcie40", m_neuroNodeID_pcie40,
            "list of PCIe40 ch ID of neurotrigger", defaultNeuroNodeID_pcie40);

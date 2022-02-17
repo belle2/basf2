@@ -17,8 +17,6 @@
 #include <CLHEP/Vector/ThreeVector.h>
 
 /* C++ headers. */
-#include <vector>
-#include <algorithm>
 #include <string>
 
 using namespace Belle2;

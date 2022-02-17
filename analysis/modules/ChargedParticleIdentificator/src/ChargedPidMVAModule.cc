@@ -35,10 +35,6 @@ ChargedPidMVAModule::ChargedPidMVAModule() : Module()
            m_bkg_pdg,
            "The input background mass hypothesis' pdgId.",
            int(0));
-  addParam("allowWrongParticleClass",
-           m_allow_wrong_particle_class,
-           "Flag to allow any particle class, not only signal or background.",
-           bool(false));
   addParam("particleLists",
            m_particle_lists,
            "The input list of ParticleList names.",
@@ -120,15 +116,8 @@ void ChargedPidMVAModule::event()
 
     // Check if this ParticleList matches any of the input (S, B) hypotheses.
     if (pdg != m_sig_pdg && pdg != m_bkg_pdg) {
-      if (m_allow_wrong_particle_class) {
-        B2INFO("Given ParticleList: " << name << " (" << pdg << ") is inconsistent from signal ("
-               << m_sig_pdg << ") nor background (" << m_bkg_pdg << ").");
-      } else {
-        B2WARNING("Given ParticleList: " << name << " (" << pdg << ") is inconsistent from signal ("
-                  << m_sig_pdg << ") nor background (" << m_bkg_pdg << "). pidPairChargedBDTScore_" << m_sig_pdg
-                  << "_" << m_bkg_pdg << " will be empty!");
-        continue;
-      }
+      B2WARNING("Given ParticleList: " << name << " (" << pdg << ") is inconsistent from signal ("
+                << m_sig_pdg << ") nor background (" << m_bkg_pdg << ").");
     }
 
     B2DEBUG(11, "ParticleList: " << pList->getParticleListName() << " - N = " << pList->getListSize() << " particles.");

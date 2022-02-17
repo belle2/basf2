@@ -3231,8 +3231,7 @@ def tagCurlTracks(particleLists,
     path.add_module(curlTagger)
 
 
-def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=False, binaryHypoPDGCodes=(0, 0),
-                       allowWrongParticleClass=False):
+def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=False, binaryHypoPDGCodes=(0, 0)):
     """
     Use an MVA to perform particle identification for charged stable particles, using the `ChargedPidMVA` module.
 
@@ -3277,7 +3276,6 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
         chargeIndependent (bool, ``optional``): use a BDT trained on a sample of inclusively charged particles.
         binaryHypoPDGCodes (tuple(int, int), ``optional``): the pdgIds of the signal, background mass hypothesis.
           Required only for binary PID mode.
-        allowWrongParticleClass (bool, ``optional``): if true, any particleLists are allowed for binary PID.
     """
 
     from ROOT import Belle2
@@ -3410,7 +3408,6 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
         chargedpid.set_name(f"ChargedPidMVA_{binaryHypoPDGCodes[0]}_vs_{binaryHypoPDGCodes[1]}_{mode}")
         chargedpid.param("sigHypoPDGCode", binaryHypoPDGCodes[0])
         chargedpid.param("bkgHypoPDGCode", binaryHypoPDGCodes[1])
-        chargedpid.param("allowWrongParticleClass", allowWrongParticleClass)
 
     chargedpid.param("particleLists", list(plSet))
     chargedpid.param("payloadName", payloadName)

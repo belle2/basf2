@@ -94,11 +94,6 @@ namespace Belle2 {
     int m_bkg_pdg;
 
     /**
-     * Flag to allow any particle class, not only signal or background.
-     */
-    bool m_allow_wrong_particle_class;
-
-    /**
      * The input list of names of ParticleList objects to which MVA weights will be applied.
      */
     std::vector<std::string> m_particle_lists;

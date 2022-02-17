@@ -44,7 +44,7 @@ ECLShowerCorrectorModule::ECLShowerCorrectorModule() : Module(),
 ECLShowerCorrectorModule::~ECLShowerCorrectorModule()
 {
   if (m_leakagePosition != nullptr)
-    delete[] m_leakagePosition;
+    delete m_leakagePosition;
 }
 
 void ECLShowerCorrectorModule::initialize()

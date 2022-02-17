@@ -247,19 +247,19 @@ namespace Belle2 {
     // taub2b 2 Cluster angle cut
     std::vector<int> m_Taub2bAngleCut;
     // taub2b total energy(TC theta id=1-17) cut
-    double m_Taub2bEtotCut;
+    double m_Taub2bEtotCut{0};
     // taub2b Cluster energy cut
-    double m_Taub2bClusterECut1;
-    double m_Taub2bClusterECut2;
+    double m_Taub2bClusterECut1{0};
+    double m_Taub2bClusterECut2{0};
     // taub2b 2 cluster angle cut flag
-    int m_Taub2bAngleFlag;
+    int m_Taub2bAngleFlag{0};
     // taub2b total energy(TC theta id=1-17) flag
-    int m_Taub2bEtotFlag;
+    int m_Taub2bEtotFlag{0};
     // taub2b Cluster energy flag
-    int m_Taub2bClusterEFlag;
+    int m_Taub2bClusterEFlag{0};
     // trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
     // are in CDCTRG region in theta (="InTrack") or not
-    int                 m_3DBhabhaVetoInTrackFlag;
+    int m_3DBhabhaVetoInTrackFlag{0};
     // TCIDs of two clusters of 3D Bhabha veto
     std::vector<int>    m_3DBhabhaVetoClusterTCIds;
     // ThetaIds of two clusters of 3D Bhabha veto

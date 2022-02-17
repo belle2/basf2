@@ -784,7 +784,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   // Flag for events with Trigger B2Link information
   calculationResult["NeuroTRG"] = 0;
-  calculationResult["GGFilter"] = 0;
+  calculationResult["GammaGammaFilter"] = 0;
 
   StoreObjPtr<SoftwareTriggerResult> filter_result;
   if (filter_result.isValid()) {
@@ -797,7 +797,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
                            SoftwareTriggerCutResult::c_accept);
     const bool ggBarrel = (filter_result->getNonPrescaledResult("software_trigger_cut&filter&ggBarrelLoose") ==
                            SoftwareTriggerCutResult::c_accept);
-    if (ggEndcap || ggBarrel) calculationResult["GGFilter"] = 1;
+    if (ggEndcap || ggBarrel) calculationResult["GammaGammaFilter"] = 1;
   }
 
   //Dimuon skim with invariant mass cut allowing at most one track not to be associated with ECL clusters

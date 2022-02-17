@@ -5,6 +5,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::BelleTrkExtra+; // checksum=0xd86a73e6, version=2
+#pragma link C++ class Belle2::BelleTrkExtra+; // checksum=0x203006ae, version=2
 
 #endif

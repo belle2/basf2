@@ -179,13 +179,13 @@ def stdLep(pdgId,
     * 'UniformEff90' 90% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff95' 95% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
 
-    The function will select particles according to the chosen ``working_point``, and decorate each candidate
-    with the nominal Data/MC :math:`\\ell` ID efficiency and :math:`\\pi,K` fake rate
-    correction factors and their stat, syst uncertainty, reading the info from the Conditions Database (CDB) according
-    to the chosen input global tag (GT).
+    The function creates a ``ParticleList``, selecting particles according to the chosen ``working_point``,
+    and decorates each candidate in the list with the nominal Data/MC :math:`\\ell` ID efficiency and
+    :math:`\\pi,K` fake rate correction factors and their stat, syst uncertainty, reading the info
+    from the Conditions Database (CDB) according to the chosen input global tag (GT).
 
     .. note::
-        Particles will *not* be selected if they are outside the Data/MC efficiency corrections' phase space coverage
+        Particles will **not** be selected if they are outside the Data/MC *efficiency* corrections' phase space coverage
         for the given working point.
         In fact, the threshold value for the PID cut in such cases is set to NaN.
 
@@ -209,23 +209,28 @@ def stdLep(pdgId,
         release (Optional[int]): the major release number of the data and MC campaigns considered.
                                  If specified, it ensures the correct :math:`\\ell` ID variables are used.
 
-                              .. tip::
-                                  Please refer to the
-                                  `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
-                                  for info about lepton identification variables and campaigns.
+                                 .. tip::
+                                     Please refer to the
+                                     `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+                                     for info about lepton identification variables and campaigns.
 
-        listname (Optional[str]): the name of the lepton list to be created.
-                                  By default, it is assigned as:
+        listname (Optional[str]): the name of the output lepton list that will be created.
+                                  By default, the standard lepton list name is assigned as:
                                   ``'{lepton}-:{method}_{classification}_{working_point}'``.
-        input_listname (Optional[str]): the name of a pre-existing ``ParticleList`` object, of which the standard lepton list
-                                        will be a subset.
+
+                                  .. note::
+                                      The particle identifier (i.e. 'e-:', 'mu-:') is automatically added by the function,
+                                      therefore it should **not** be prepended to the ``listname`` input parameter.
+
+        input_listname (Optional[str]): the name of a pre-existing ``ParticleList`` object (defined as a full ``decayString``,
+                                        e.g. 'e-:my_input_electrons') of which the standard lepton list will be a subset.
                                         For instance, users might want to apply a Bremsstrahlung correction to electrons first,
                                         which modifies their 4-momentum, and only later define the subset passing the PID selection,
                                         including the appropriate PID weights and uncertainties (which are :math:`p`-dependent).
                                         By default, the standard lepton list is created from all ``Track`` objects in the event.
 
                                         .. warning::
-                                            Do *not* apply any PID selection on the input list, otherwise results could be biased.
+                                            Do **not** apply any PID selection on the input list, otherwise results could be biased.
 
         trainingModeMulticlass (Optional[``Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode``]): enum identifier
                                of the multi-class (global PID) training mode.

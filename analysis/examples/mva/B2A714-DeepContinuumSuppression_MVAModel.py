@@ -15,7 +15,7 @@
 # This describes the keras model for the training in B2A712.             #
 # To understand the code, the keras documentation is a good starting     #
 # point. Also have a look at the contrib keras interface in:             #
-# mva/scripts/basf2_mva_python_interface/contrib_keras.py                #
+# mva/scripts/basf2_mva_python_interface/keras.py                        #
 #                                                                        #
 # Additional examples with keras can be found in the folder:             #
 # mva/examples/keras                                                     #
@@ -27,20 +27,18 @@
 #                                                                        #
 ##########################################################################
 
-import tensorflow.contrib.keras as keras
-
-from keras.layers import Input, Dense, Concatenate, Dropout, Lambda, GlobalAveragePooling1D, Reshape
-from keras.models import Model
-from keras.optimizers import adam
-from keras.losses import binary_crossentropy, sparse_categorical_crossentropy
-from keras.activations import sigmoid, tanh, softmax
-from keras.callbacks import EarlyStopping
-from sklearn.metrics import roc_auc_score
+from tensorflow.keras.layers import Input, Dense, Concatenate, Dropout, Lambda, GlobalAveragePooling1D, Reshape
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import binary_crossentropy, sparse_categorical_crossentropy
+from tensorflow.keras.activations import sigmoid, tanh, softmax
+from tensorflow.keras.callbacks import EarlyStopping, Callback
 import numpy as np
 
-from basf2_mva_python_interface.contrib_keras import State
+from basf2_mva_python_interface.keras import State
 from basf2_mva_extensions.keras_relational import EnhancedRelations
 from basf2_mva_extensions.preprocessing import fast_equal_frequency_binning
+import basf2_mva_util
 
 import warnings
 warnings.filterwarnings('ignore', category=UserWarning)
@@ -159,10 +157,9 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     # Model for applying Data. Loss function will not be used for training, if adversary is used.
     apply_model = Model(input, output)
-    apply_model.compile(optimizer=adam(), loss=binary_crossentropy, metrics=['accuracy'])
+    apply_model.compile(optimizer=Adam(), loss=binary_crossentropy, metrics=['accuracy'])
 
-    state = State(apply_model, use_adv=param['lambda'] > 0 and number_of_spectators > 0, preprocessor_state=None,
-                  custom_objects={'EnhancedRelations': EnhancedRelations})
+    state = State(apply_model, use_adv=param['lambda'] > 0 and number_of_spectators > 0, preprocessor_state=None)
 
     # The following is only relevant when using Adversaries
     # See mva/examples/keras/adversary_network.py  for details
@@ -178,7 +175,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
         # Model which trains first part of the net
         model1 = Model(input, [output] + adversaries)
-        model1.compile(optimizer=adam(),
+        model1.compile(optimizer=Adam(),
                        loss=[binary_crossentropy] + adversary_losses_model, metrics=['accuracy'],
                        loss_weights=[1] + [-parameters['lambda']] * len(adversary_losses_model))
         model1.summary()
@@ -189,7 +186,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         for layer in model2.layers:
             layer.trainable = not layer.trainable
 
-        model2.compile(optimizer=adam(), loss=adversary_losses_model,
+        model2.compile(optimizer=Adam(), loss=adversary_losses_model,
                        metrics=['accuracy'])
         model2.summary()
 
@@ -243,7 +240,7 @@ def partial_fit(state, X, S, y, w, epoch):
         # Build Batch Generator for adversary Callback
         state.batch_gen = batch_generator(X, y, S)
 
-    class AUC_Callback(keras.callbacks.Callback):
+    class AUC_Callback(Callback):
         """
         Callback to print AUC after every epoch.
         """
@@ -253,12 +250,12 @@ def partial_fit(state, X, S, y, w, epoch):
 
         def on_epoch_end(self, epoch, logs=None):
             val_y_pred = state.model.predict(state.Xtest).flatten()
-            val_auc = roc_auc_score(state.ytest, val_y_pred)
+            val_auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(val_y_pred, state.ytest)
             print(f'\nTest AUC: {val_auc}\n')
             self.val_aucs.append(val_auc)
             return
 
-    class Adversary(keras.callbacks.Callback):
+    class Adversary(Callback):
         """
         Callback to train Adversary
         """

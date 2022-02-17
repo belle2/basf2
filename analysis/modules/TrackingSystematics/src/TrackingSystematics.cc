@@ -93,21 +93,21 @@ The module modifies the input particleLists by scaling track momenta as given by
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("scale", m_scale, "scale factor to be applied to 3-momentum", nan(""));
-  addParam("tableName", m_tableName, "ID of table used for reweighing", std::string(""));
+  addParam("payloadName", m_payloadName, "ID of table used for reweighing", std::string(""));
   addParam("scalingFactorName", m_scalingFactorName, "Label for the scale factor in the look up table", std::string(""));
   addParam("smearingFactorName", m_smearingFactorName, "Label for the smearing factor in the look up table", std::string(""));
 }
 
 void TrackingMomentumModule::initialize()
 {
-  if (!isnan(m_scale) && !m_tableName.empty()) {
+  if (!isnan(m_scale) && !m_payloadName.empty()) {
     B2FATAL("It's not allowed to provide both a valid value for the scale parameter and a non-empty table name. Please decide for one of the two options!");
-  } else if (isnan(m_scale) && m_tableName.empty()) {
+  } else if (isnan(m_scale) && m_payloadName.empty()) {
     B2FATAL("Neither a valid value for the scale parameter nor a non-empty table name was provided. Please set (exactly) one of the two options!");
   } else if (!m_scalingFactorName.empty() && !m_smearingFactorName.empty()) {
-    B2FATAL("It's not allowed to provide both a valid value for the scaleFactorName and smearingFartorName. Please set (exactly) one of the two options!");
-  } else if (!m_tableName.empty()) {
-    m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_tableName);
+    B2FATAL("It's not allowed to provide both a valid value for the scalingFactorName and smearingFactorName. Please set (exactly) one of the two options!");
+  } else if (!m_payloadName.empty()) {
+    m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_payloadName);
 
     std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
                                             *m_ParticleWeightingLookUpTable.get())->getAxesNames());
@@ -141,7 +141,7 @@ void TrackingMomentumModule::event()
 
 
 // Getting LookUp info for given particle in given event
-double TrackingMomentumModule::getScale(Particle* particle)
+double TrackingMomentumModule::getScalingFactor(Particle* particle)
 {
   std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
                                           *m_ParticleWeightingLookUpTable.get())->getAxesNames());
@@ -155,15 +155,15 @@ double TrackingMomentumModule::getScale(Particle* particle)
 
   WeightInfo info = (*m_ParticleWeightingLookUpTable.get())->getInfo(values);
   for (const auto& entry : info) {
-    particle->writeExtraInfo(m_tableName + "_" + entry.first, entry.second);
+    particle->writeExtraInfo(m_payloadName + "_" + entry.first, entry.second);
   }
 
-  return particle->getExtraInfo(m_tableName + "_" + m_scalingFactorName);
+  return particle->getExtraInfo(m_payloadName + "_" + m_scalingFactorName);
 }
 
 
 
-double TrackingMomentumModule::getSmearing(Particle* particle)
+double TrackingMomentumModule::getSmearingFactor(Particle* particle)
 {
   std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
                                           *m_ParticleWeightingLookUpTable.get())->getAxesNames());
@@ -177,9 +177,9 @@ double TrackingMomentumModule::getSmearing(Particle* particle)
 
   WeightInfo info = (*m_ParticleWeightingLookUpTable.get())->getInfo(values);
   for (const auto& entry : info) {
-    particle->writeExtraInfo(m_tableName + "_" + entry.first, gRandom->Gaus(1, entry.second));
+    particle->writeExtraInfo(m_payloadName + "_" + entry.first, gRandom->Gaus(1, entry.second));
   }
-  return particle->getExtraInfo(m_tableName + "_" + m_smearingFactorName);
+  return particle->getExtraInfo(m_payloadName + "_" + m_smearingFactorName);
 }
 
 
@@ -204,15 +204,13 @@ void TrackingMomentumModule::setMomentumScalingFactor(Particle* particle)
     const TLorentzVector vec(px, py, pz, E);
     particle->set4Vector(vec);
   } else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Track) {
-    double scale;
     if (!isnan(m_scale)) {
-      scale = m_scale ;
+      particle->setMomentumScalingFactor(m_scale);
     } else if (!m_scalingFactorName.empty()) {
-      scale = getScale(particle);
+      particle->setMomentumScalingFactor(getScalingFactor(particle));
     } else if (!m_smearingFactorName.empty()) {
-      scale = getSmearing(particle);
+      particle->setMomentumSmearingFactor(getSmearingFactor(particle));
     }
-    particle->setMomentumScalingFactor(scale);
   }
 
 

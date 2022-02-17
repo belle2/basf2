@@ -687,7 +687,7 @@ def removeTracksForTrackingEfficiencyCalculation(inputListNames, fraction, path=
     path.add_module(trackingefficiency)
 
 
-def scaleTrackMomenta(inputListNames, scale=float('nan'), tableName="", scalingFactorName="SF", path=None):
+def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalingFactorName="SF", path=None):
     """
 
     Scale momenta of the particles according to a scaling factor scale.
@@ -699,37 +699,34 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), tableName="", scalingF
     Parameters:
         inputListNames (list(str)): input particle list names
         scale (float): scaling factor (1.0 -- no scaling)
-        tableName (str): name of the payload which contains the phase-space dependent scaling factors
+        payloadName (str): name of the payload which contains the phase-space dependent scaling factors
         scalingFactorName (str): name of scaling factor variable in the payload.
         path (basf2.Path): module is added to this path
     """
     trackingmomentum = register_module('TrackingMomentum')
     trackingmomentum.param('particleLists', inputListNames)
     trackingmomentum.param('scale', scale)
-    trackingmomentum.param('tableName', tableName)
+    trackingmomentum.param('payloadName', payloadName)
     trackingmomentum.param('scalingFactorName', scalingFactorName)
 
     path.add_module(trackingmomentum)
 
 
-def smearTrackMomenta(inputListNames, tableName="", smearingFactorName="smear", path=None):
+def smearTrackMomenta(inputListNames, payloadName="", smearingFactorName="smear", path=None):
     """
-    Scale momenta of the particles according to a scaling factor scale.
-    This scaling factor can either be given as constant number or as the name of the payload which contains
-    the variable scale factors.
-    If the particle list contains composite particles, the momenta of the track-based daughters are scaled.
+    Smear the momenta of the particles according the values read from the given payload.
+    If the particle list contains composite particles, the momenta of the track-based daughters are smeared.
     Subsequently, the momentum of the mother particle is updated as well.
 
     Parameters:
         inputListNames (list(str)): input particle list names
-        scale (float): scaling factor (1.0 -- no scaling)
-        tableName (str): name of the payload which contains the phase-space dependent scaling factors
-        scalingFactorName (str): name of scaling factor variable in the payload.
+        payloadName (str): name of the payload which contains the smearing valuess
+        smearingFactorName (str): name of smearing factor variable in the payload.
         path (basf2.Path): module is added to this path
     """
     trackingmomentum = register_module('TrackingMomentum')
     trackingmomentum.param('particleLists', inputListNames)
-    trackingmomentum.param('tableName', tableName)
+    trackingmomentum.param('payloadName', payloadName)
     trackingmomentum.param('smearingFactorName',  smearingFactorName)
 
     path.add_module(trackingmomentum)

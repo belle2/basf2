@@ -10,7 +10,7 @@
 ##########################################################################
 
 """
-Perform code doxygen checks for every commit to the klm package.
+Perform code doxygen checks for every commit to the structure package.
 """
 
 import re
@@ -18,5 +18,5 @@ from b2test_utils import check_error_free
 
 if __name__ == "__main__":
     ignoreme = 'IGNORE_NOTHING'
-    check_error_free("b2code-doxygen-warnings", "doxygen", "klm",
+    check_error_free("b2code-doxygen-warnings", "doxygen", "structure",
                      lambda x: re.findall(ignoreme, x) or x == "'")

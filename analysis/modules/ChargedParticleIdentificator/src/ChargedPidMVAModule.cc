@@ -114,12 +114,6 @@ void ChargedPidMVAModule::event()
               " is not that of a valid particle in Const::chargedStableSet! Aborting...");
     }
 
-    // Check if this ParticleList matches any of the input (S, B) hypotheses.
-    if (pdg != m_sig_pdg && pdg != m_bkg_pdg) {
-      B2WARNING("Given ParticleList: " << name << " (" << pdg << ") is inconsistent from signal ("
-                << m_sig_pdg << ") nor background (" << m_bkg_pdg << ").");
-    }
-
     B2DEBUG(11, "ParticleList: " << pList->getParticleListName() << " - N = " << pList->getListSize() << " particles.");
 
     for (unsigned int ipart(0); ipart < pList->getListSize(); ++ipart) {

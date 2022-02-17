@@ -294,7 +294,18 @@ namespace Belle2 {
      */
     void setMomentumScalingFactor(float momentumScalingFactor)
     {
-      m_momentumScale = momentumScalingFactor;
+      m_momentumScalingFactor = momentumScalingFactor;
+      m_momentumScale = m_momentumScalingFactor * m_momentumSmearingFactor;
+    }
+
+    /**
+     * Sets momentum smearing
+     * @param momentumSmearingFactor scaling factor
+     */
+    void setMomentumSmearingFactor(float momentumSmearingFactor)
+    {
+      m_momentumSmearingFactor = momentumSmearingFactor;
+      m_momentumScale = m_momentumScalingFactor * m_momentumSmearingFactor;
     }
 
     /**
@@ -936,7 +947,9 @@ namespace Belle2 {
     float m_px;     /**< momentum component x */
     float m_py;     /**< momentum component y */
     float m_pz;     /**< momentum component z */
-    float m_momentumScale = 1.0; /**< momentum scaling factor */
+    float m_momentumScale = 1.0; /**< effective momentum scale factor */
+    float m_momentumScalingFactor = 1.0; /**< momentum scaling factor */
+    float m_momentumSmearingFactor = 1.0; /**< momentum smearing factor */
     float m_x;      /**< position component x */
     float m_y;      /**< position component y */
     float m_z;      /**< position component z */

@@ -79,10 +79,10 @@ def main():
     ma.fillParticleList("gamma:bremsinput",
                         cut="E < 1.0",
                         path=path)
-    ma.correctBrems(outputList="e+:corrected",
-                    inputList="e+:uncorrected",
-                    gammaList="gamma:bremsinput",
-                    path=path)
+    ma.correctBremsBelle(outputList="e+:corrected",
+                         inputList="e+:uncorrected",
+                         gammaList="gamma:bremsinput",
+                         path=path)
 
     electrons_fixed09 = "lh_B_fixed09"
     electron_id_var = stdE("FixedThresh09", "likelihood", "binary", args.lid_weights_gt,

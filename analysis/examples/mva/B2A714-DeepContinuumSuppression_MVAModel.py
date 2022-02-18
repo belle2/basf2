@@ -114,10 +114,11 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         param.update(parameters)
 
     # Restrain training to only one GPU if your machine has multiple GPUs
-    # os.environ["CUDA_VISIBLE_DEVICES"] = '0'
-    # Uncomment if you are using GPU and don't want to occupy all GPU resources.
-    # gpu_options = tf.GPUOptions(allow_growth=True)
-    # s = tf.InteractiveSession(config=tf.ConfigProto(gpu_options=gpu_options))
+    # insert tensorflow as tf
+    # gpus = tf.config.list_physical_devices('GPU')
+    # if gpus:
+    #     for gpu in gpus:
+    #         tf.config.experimental.set_memory_growth(gpu, True)
 
     # Build classifier
     input = Input((number_of_features,))

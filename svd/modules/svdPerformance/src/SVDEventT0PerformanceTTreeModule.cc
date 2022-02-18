@@ -227,12 +227,9 @@ void SVDEventT0PerformanceTTreeModule::event()
         if (mcParticle_1.size() > 0) {
           if (mcParticle_1[0]->isPrimaryParticle())
             m_trueEventT0 = mcParticle_1[0]->getProductionTime();
-        } else
-          m_trueEventT0 = (-999);
-      } else {
+        }
+      } else
         m_svdTrueTime.push_back(-99);
-        m_trueEventT0 = (-999);
-      }
     }
   }
 

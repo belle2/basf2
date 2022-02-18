@@ -22,23 +22,39 @@ namespace Belle2 {
 
   class DQMHistAnalysisExampleFlagsModule : public DQMHistAnalysisModule {
 
-    // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisExampleFlagsModule();
-  private:
 
-    //! Module functions to be called from main process
+    /**
+     * Initializer.
+     */
     void initialize() override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event() override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
     void endRun() override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate() override final;
 
-    // Data members
+  private:
 
     /** The histogram for the test. */
     TH2F* m_hFlagtest = nullptr;

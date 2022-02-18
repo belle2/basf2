@@ -131,12 +131,14 @@ if __name__ == '__main__':
         rootchain.Add(datafile)
 
     variables_data = basf2_mva_util.tree2dict(rootchain, root_variables, list(variable_abbreviations.values()))
+    spectators_data = basf2_mva_util.tree2dict(rootchain, root_spectators, list(spectator_abbreviations.values()))
 
     if args.fillnan:
         for column in variable_abbreviations.values():
             np.nan_to_num(variables_data[column], copy=False)
 
-    spectators_data = basf2_mva_util.tree2dict(rootchain, root_spectators, list(spectator_abbreviations.values()))
+        for column in spectator_abbreviations.values():
+            np.nan_to_num(spectators_data[column], copy=False)
 
     print("Create latex file")
     # Change working directory after experts run, because they might want to access

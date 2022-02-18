@@ -67,27 +67,27 @@ def bToCharmHLTSkim(path):
 
     # B+ lists
     ma.reconstructDecay("B+:BtoD0pi_KpiForHLT -> anti-D0:KpiForHLT pi+:GoodTrackForHLT",
-                        "Mbc > 5.2 and abs(deltaE) < 0.5", path=path)
+                        "Mbc > 5.15 and abs(deltaE) < 0.5", path=path)
     BplusList.append("B+:BtoD0pi_KpiForHLT")
     ma.reconstructDecay("B+:BtoD0pi_Kpipi0ForHLT -> anti-D0:Kpipi0ForHLT pi+:GoodTrackForHLT",
-                        "Mbc > 5.2 and abs(deltaE) < 0.3", path=path)
+                        "Mbc > 5.15 and abs(deltaE) < 0.3", path=path)
     BplusList.append("B+:BtoD0pi_Kpipi0ForHLT")
     ma.reconstructDecay("B+:BtoD0pi_KpipipiForHLT -> anti-D0:KpipipiForHLT pi+:GoodTrackForHLT",
-                        "Mbc > 5.2 and abs(deltaE) < 0.3", path=path)
+                        "Mbc > 5.15 and abs(deltaE) < 0.3", path=path)
     BplusList.append("B+:BtoD0pi_KpipipiForHLT")
 
     # B0 lists
     ma.reconstructDecay("B0:B0toDpi_KpipiForHLT -> D-:KpipiForHLT pi+:GoodTrackForHLT",
-                        "5.2 < Mbc and abs(deltaE) < 0.3", path=path)
+                        "5.15 < Mbc and abs(deltaE) < 0.3", path=path)
     BzeroList.append("B0:B0toDpi_KpipiForHLT")
     ma.reconstructDecay("B0:B0toDstarPi_D0pi_KpiForHLT -> D*-:D0_KpiForHLT pi+:GoodTrackForHLT",
-                        "5.2 < Mbc and abs(deltaE) < 0.3", path=path)
+                        "5.15 < Mbc and abs(deltaE) < 0.3", path=path)
     BzeroList.append("B0:B0toDstarPi_D0pi_KpiForHLT")
     ma.reconstructDecay("B0:B0toDstarPi_D0pi_KpipipiForHLT -> D*-:D0_KpipipiForHLT pi+:GoodTrackForHLT",
-                        "5.2 < Mbc and abs(deltaE) < 0.3", path=path)
+                        "5.15 < Mbc and abs(deltaE) < 0.3", path=path)
     BzeroList.append("B0:B0toDstarPi_D0pi_KpipipiForHLT")
     ma.reconstructDecay("B0:B0toDstarPi_D0pi_Kpipi0ForHLT -> D*-:D0_Kpipi0ForHLT pi+:GoodTrackForHLT",
-                        "5.2 < Mbc and abs(deltaE) < 0.3", path=path)
+                        "5.15 < Mbc and abs(deltaE) < 0.3", path=path)
     BzeroList.append("B0:B0toDstarPi_D0pi_Kpipi0ForHLT")
 
     ma.copyLists("B+:BtoCharmForHLT", BplusList, path=path)

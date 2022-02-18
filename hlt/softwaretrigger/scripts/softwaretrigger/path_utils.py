@@ -13,7 +13,7 @@ import stdV0s
 import vertex
 from geometry import check_components
 import reconstruction
-from softwaretrigger.reconstruction_utils import bToChHltSkim
+from softwaretrigger.reconstruction_utils import bToCharmHLTSkim
 
 
 def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode, create_hlt_unit_histograms=False):
@@ -172,7 +172,7 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
         Dst_List.append('D*+:ch' + str(chID))
     modularAnalysis.copyLists(outputListName='D*+:d0pi', inputListNames=Dst_List, path=path)
     modularAnalysis.fillParticleList("pi+:offip", '[abs(d0) > 1 and abs(z0) > 2] and [nSVDHits >=3 or nCDCHits >= 20]', path=path)
-    bToChHltSkim(path)
+    bToCharmHLTSkim(path)
 
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)

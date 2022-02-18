@@ -13,14 +13,14 @@ from stdPi0s import stdPi0s
 import modularAnalysis as ma
 
 
-def bToChHltSkim(path):
+def bToCharmHLTSkim(path):
     """
     Function to reconstruct B meson candidates for HLT skims
     @param path         modules are added to this path
     """
 
-    BpList = []
-    BzList = []
+    BplusList = []
+    BzeroList = []
 
     # Light mesons
     ma.fillParticleList("pi+:GoodTrackForHLT", "abs(d0) < 2 and abs(z0) < 5", path=path)
@@ -68,27 +68,27 @@ def bToChHltSkim(path):
     # B+ lists
     ma.reconstructDecay("B+:BtoD0pi_KpiForHLT -> anti-D0:KpiForHLT pi+:GoodTrackForHLT",
                         "Mbc > 5.2 and abs(deltaE) < 0.5", path=path)
-    BpList.append("B+:BtoD0pi_KpiForHLT")
+    BplusList.append("B+:BtoD0pi_KpiForHLT")
     ma.reconstructDecay("B+:BtoD0pi_Kpipi0ForHLT -> anti-D0:Kpipi0ForHLT pi+:GoodTrackForHLT",
                         "Mbc > 5.2 and abs(deltaE) < 0.3", path=path)
-    BpList.append("B+:BtoD0pi_Kpipi0ForHLT")
+    BplusList.append("B+:BtoD0pi_Kpipi0ForHLT")
     ma.reconstructDecay("B+:BtoD0pi_KpipipiForHLT -> anti-D0:KpipipiForHLT pi+:GoodTrackForHLT",
                         "Mbc > 5.2 and abs(deltaE) < 0.3", path=path)
-    BpList.append("B+:BtoD0pi_KpipipiForHLT")
+    BplusList.append("B+:BtoD0pi_KpipipiForHLT")
 
     # B0 lists
     ma.reconstructDecay("B0:B0toDpi_KpipiForHLT -> D-:KpipiForHLT pi+:GoodTrackForHLT",
                         "5.2 < Mbc and abs(deltaE) < 0.3", path=path)
-    BzList.append("B0:B0toDpi_KpipiForHLT")
+    BzeroList.append("B0:B0toDpi_KpipiForHLT")
     ma.reconstructDecay("B0:B0toDstarPi_D0pi_KpiForHLT -> D*-:D0_KpiForHLT pi+:GoodTrackForHLT",
                         "5.2 < Mbc and abs(deltaE) < 0.3", path=path)
-    BzList.append("B0:B0toDstarPi_D0pi_KpiForHLT")
+    BzeroList.append("B0:B0toDstarPi_D0pi_KpiForHLT")
     ma.reconstructDecay("B0:B0toDstarPi_D0pi_KpipipiForHLT -> D*-:D0_KpipipiForHLT pi+:GoodTrackForHLT",
                         "5.2 < Mbc and abs(deltaE) < 0.3", path=path)
-    BzList.append("B0:B0toDstarPi_D0pi_KpipipiForHLT")
+    BzeroList.append("B0:B0toDstarPi_D0pi_KpipipiForHLT")
     ma.reconstructDecay("B0:B0toDstarPi_D0pi_Kpipi0ForHLT -> D*-:D0_Kpipi0ForHLT pi+:GoodTrackForHLT",
                         "5.2 < Mbc and abs(deltaE) < 0.3", path=path)
-    BzList.append("B0:B0toDstarPi_D0pi_Kpipi0ForHLT")
+    BzeroList.append("B0:B0toDstarPi_D0pi_Kpipi0ForHLT")
 
-    ma.copyLists("B+:BtoCharmForHLT", BpList, path=path)
-    ma.copyLists("B0:BtoCharmForHLT", BzList, path=path)
+    ma.copyLists("B+:BtoCharmForHLT", BplusList, path=path)
+    ma.copyLists("B0:BtoCharmForHLT", BzeroList, path=path)

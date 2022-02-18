@@ -182,6 +182,9 @@ namespace Belle2 {
       //! Sensitive detector for background studies
       BkgSensitiveDetector* m_bkgsensitive = nullptr;
 
+      //! Sensitive detectors for background studies (rib4).
+      std::vector<BkgSensitiveDetector*> m_BkgSensitiveRib4 = {};
+
       //! Vector of pointers to G4VisAttributes
       std::vector<G4VisAttributes*> m_VisAttributes;
 

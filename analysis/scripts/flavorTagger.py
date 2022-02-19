@@ -549,6 +549,24 @@ def FillParticleLists(maskName='all', categories=None, path=None):
         ma.reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
         kFit('K_S0:inRoe', 0.01, path=path)
 
+    # Apply BDT-based LID
+    if getBelleOrBelle2() == 'Belle2':
+        default_list_for_lid_BDT = ['e+:inRoe', 'mu+:inRoe']
+        list_for_lid_BDT = []
+
+        for particleList in default_list_for_lid_BDT:
+            if particleList in readyParticleLists:
+                list_for_lid_BDT.append(particleList)
+
+        ma.applyChargedPidMVA(particleLists=list_for_lid_BDT, path=path,
+                              trainingMode=0,  # binary
+                              binaryHypoPDGCodes=(11, 211))  # e vs pi
+        ma.applyChargedPidMVA(particleLists=list_for_lid_BDT, path=path,
+                              trainingMode=0,  # binary
+                              binaryHypoPDGCodes=(13, 211))  # mu vs pi
+        ma.applyChargedPidMVA(particleLists=list_for_lid_BDT, path=path,
+                              trainingMode=1)  # Multiclass
+
 
 def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=None):
     """

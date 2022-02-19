@@ -3411,8 +3411,8 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
 
             pdg = abs(decayDescriptor.getMother().getPDGCode())
             if pdg not in binaryHypoPDGCodes:
-                B2WARNING("Given ParticleList: ", name, " (", pdg, ") is inconsistent from signal (",
-                          binaryHypoPDGCodes[0], ") nor background (", binaryHypoPDGCodes[1], ").")
+                B2WARNING("Given ParticleList: ", name, " (", pdg, ") is neither signal (", binaryHypoPDGCodes[0],
+                          ") nor background (", binaryHypoPDGCodes[1], ").")
 
         chargedpid = register_module("ChargedPidMVA")
         chargedpid.set_name(f"ChargedPidMVA_{binaryHypoPDGCodes[0]}_vs_{binaryHypoPDGCodes[1]}_{mode}")

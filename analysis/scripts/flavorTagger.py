@@ -119,6 +119,17 @@ def set_FlavorTagger_pid_aliases():
         variables.variables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC), 0.5)')
 
 
+def setInputVariablesWithMask(maskName='all'):
+    """
+    Set aliases for input variables with ROE mask.
+    """
+    variables.variables.addAlias('pMissTag_withMask', 'pMissTag('+maskName+')')
+    variables.variables.addAlias('cosTPTO_withMask', 'cosTPTO('+maskName+')')
+    variables.variables.addAlias('ptTracksRoe_withMask', 'ptTracksRoe('+maskName+')')
+    variables.variables.addAlias('pt2TracksRoe_withMask', 'pt2TracksRoe('+maskName+')')
+    variables.variables.addAlias('ptTracksRoe_withMask', 'ptTracksRoe('+maskName+')')
+
+
 def getFastBDTCategories():
     '''
     Helper function for getting the FastBDT categories.
@@ -1096,13 +1107,14 @@ def flavorTagger(
     setInteractionWithDatabase(downloadFromDatabaseIfNotFound, uploadToDatabaseAfterTraining)
     set_FlavorTagger_pid_aliases()
     setVariables()
+    setInputVariablesWithMask()
 
+    # Create configuration lists and code-name for given category's list
     trackLevelParticleLists = []
     eventLevelParticleLists = []
     variablesCombinerLevel = []
     categoriesCombination = []
     categoriesCombinationCode = 'CatCode'
-
     for category in categories:
         ftCategory = AvailableCategories[category]
 
@@ -1122,6 +1134,17 @@ def flavorTagger(
     for code in sorted(categoriesCombination):
         categoriesCombinationCode = categoriesCombinationCode + '%02d' % code
 
+    # Create default ROE-mask
+    if maskName == '_FTDefaultMask':
+        _FTDefaultMask = (
+            '_FTDefaultMask',
+            'thetaInCDCAcceptance and dr<1 and abs(dz)<3',
+            'thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.03 and clusterReg==2] or \
+                            [E>0.06 and clusterReg==3]]')
+        for name in particleLists:
+            ma.appendROEMasks(list_name=name, mask_tuples=[_FTDefaultMask], path=path)
+
+    # Start ROE-routine
     roe_path = basf2.create_path()
     deadEndPath = basf2.create_path()
 

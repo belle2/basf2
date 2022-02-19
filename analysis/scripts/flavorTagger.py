@@ -558,14 +558,15 @@ def FillParticleLists(maskName='all', categories=None, path=None):
             if particleList in readyParticleLists:
                 list_for_lid_BDT.append(particleList)
 
-        ma.applyChargedPidMVA(particleLists=list_for_lid_BDT, path=path,
-                              trainingMode=0,  # binary
-                              binaryHypoPDGCodes=(11, 211))  # e vs pi
-        ma.applyChargedPidMVA(particleLists=list_for_lid_BDT, path=path,
-                              trainingMode=0,  # binary
-                              binaryHypoPDGCodes=(13, 211))  # mu vs pi
-        ma.applyChargedPidMVA(particleLists=list_for_lid_BDT, path=path,
-                              trainingMode=1)  # Multiclass
+        if list_for_lid_BDT:  # empty check
+            ma.applyChargedPidMVA(particleLists=list_for_lid_BDT, path=path,
+                                  trainingMode=0,  # binary
+                                  binaryHypoPDGCodes=(11, 211))  # e vs pi
+            ma.applyChargedPidMVA(particleLists=list_for_lid_BDT, path=path,
+                                  trainingMode=0,  # binary
+                                  binaryHypoPDGCodes=(13, 211))  # mu vs pi
+            ma.applyChargedPidMVA(particleLists=list_for_lid_BDT, path=path,
+                                  trainingMode=1)  # Multiclass
 
 
 def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=None):

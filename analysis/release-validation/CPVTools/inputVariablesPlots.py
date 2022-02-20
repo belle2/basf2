@@ -63,8 +63,6 @@ ROOT.TH1.SetDefaultSumw2()
 
 allInputVariables = []
 
-ft.setVariables()
-
 belleOrBelle2Flag = belleOrBelle2
 
 identifiersExtraInfosDict = dict()
@@ -199,14 +197,14 @@ def plotInputVariablesOfFlavorTagger():
 
             managerVariableName = str(Belle2.MakeROOTCompatible.invertMakeROOTCompatible(iVariable.GetName()))
 
-            if managerVariableName in ft.variables_dict[category] or managerVariableName == 'distance' or \
+            if managerVariableName in ft.getTrainingVariables(category) or managerVariableName == 'distance' or \
                managerVariableName == 'z0' or managerVariableName == 'ImpactXY' or \
                managerVariableName == 'y' or managerVariableName == 'OBoost':
                 if managerVariableName in categoryInputVariables:
                     continue
 
                 categoryInputVariables.append(managerVariableName)
-                if managerVariableName in ft.variables_dict[category]:
+                if managerVariableName in ft.getTrainingVariables(category):
                     allInputVariables.append((category, managerVariableName))
                     trulyUsedInputVariables.append((category, managerVariableName))
 
@@ -414,8 +412,8 @@ if __name__ == '__main__':
 
     totalNumberOfVariables = 0
 
-    for category in ft.variables_dict:
-        totalNumberOfVariables += len(ft.variables_dict[category])
+    for category in ft.AvailableCategories:
+        totalNumberOfVariables += len(ft.getTrainingVariables(category))
 
     print("Total number of variables = ", totalNumberOfVariables)
 

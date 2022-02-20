@@ -18,19 +18,17 @@
 </header>
 """
 
-from tracking.path_utils import add_cdc_track_finding, add_vtx_track_finding, add_geometry_modules, \
-    add_hit_preparation_modules, add_track_fit_and_track_creator, add_mc_matcher
 from tracking.validation.run import TrackingValidationRun
 import tracking
 import logging
-from basf2 import set_log_level, LogLevel
+from basf2 import LogLevel
 import basf2
 VALIDATION_OUTPUT_FILE = 'VTXFullTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
 basf2.set_random_seed(1337)
-basf2.set_log_level(LogLevel.ERROR)
+basf2.set_log_level(LogLevel.INFO)
 
 
 def setupFinderModule(path):
@@ -60,6 +58,12 @@ class VTXFullTrackingValidationBkg(TrackingValidationRun):
     fit_tracks = False
     #: But we need to tell the validation module to use the fit information
     use_fit_information = True
+    #: Switch to use the extended harvesting validation instead
+    extended = True
+    #: Only works in extended mode
+    saveFullTrees = True
+    #: do not create expert-level output histograms
+    use_expert_folder = True
     #: Include pulls in the validation output
     pulls = True
     #: Include resolution information in the validation output

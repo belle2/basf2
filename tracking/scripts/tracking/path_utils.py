@@ -951,7 +951,7 @@ def add_vtx_track_finding(
                 add_ckf_based_vtx_track_merger(path, cdc_reco_tracks=input_reco_tracks, vtx_reco_tracks=temporary_reco_tracks,
                                                use_mc_truth=use_mc_truth, direction="forward", **kwargs)
         else:
-            path.add_module('VXDCDCTrackMerger',
+            path.add_module('MCTrackMerger',  # merge_radius = 18.0,
                             CDCRecoTrackColName=input_reco_tracks,
                             VXDRecoTrackColName=temporary_reco_tracks)
 

@@ -61,6 +61,10 @@ namespace Belle2 {
     int m_matchedTotal = 0;      /**< will hold number of matches*/
     int m_removedCurlers = 0;    /**< will hold number of tracks with hits >1 loop*/
 
+    int m_foundRelatedTracksCDC = 0;    /**< will hold number of CDC tracks with existing relation*/
+    int m_foundCorrectlyRelatedTracksCDC = 0;    /**< will hold number of CDC tracks with existing correct relation*/
+
+
 
     /** StoreArray name of the VXD Track collection */
     std::string m_VXDRecoTrackColName;

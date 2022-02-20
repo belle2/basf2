@@ -136,9 +136,9 @@ void TRGGRLProjectsModule::initialize()
 {
   radtodeg = 180. / TMath::Pi();
   //..Trigger ThetaID for each trigger cell. Could be replaced by getMaxThetaId() for newer MC
-  TrgEclMapping* trgecl_obj = new TrgEclMapping();
+  TrgEclMapping* eclMapping = new TrgEclMapping();
   for (int tc = 1; tc <= 576; tc++) {
-    TCThetaID.push_back(trgecl_obj->getTCThetaIdFromTCId(tc));
+    TCThetaID.push_back(eclMapping->getTCThetaIdFromTCId(tc));
   }
 
   //-----------------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ void TRGGRLProjectsModule::initialize()
   for (int tc = 1; tc <= 576; tc++) {
 
     //..Four vector of a 1 GeV lab photon at this TC
-    TVector3 CellPosition = trgecl_obj->getTCPosition(tc);
+    TVector3 CellPosition = eclMapping->getTCPosition(tc);
     ROOT::Math::PxPyPzEVector CellLab;
     CellLab.SetPx(CellPosition.Px() / CellPosition.Mag());
     CellLab.SetPy(CellPosition.Py() / CellPosition.Mag());
@@ -169,7 +169,7 @@ void TRGGRLProjectsModule::initialize()
   }
 
   //m_TRGGRLInfo.registerInDataStore(m_TrgGrlInformationName);
-
+  delete eclMapping;
 }
 
 void

@@ -72,6 +72,7 @@ Modules
  * Added a `Pi0VetoEfficiencySystematics` module to obtain pi0 veto efficiency Data/MC weights, their statistical and systematic
    errors as extrainfo variables for a given hard photon and the veto threshold. `addPi0VetoEfficiencySystematics` is a
    corresponding wrapper function.
+ * Added an option ``skipNonPrimary`` to ``fillParticleListFromMC`` and ``fillParticleListsFromMC``.
 
 PID Priors 
 ++++++++++

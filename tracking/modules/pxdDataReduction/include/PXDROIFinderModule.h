@@ -38,14 +38,23 @@ namespace Belle2 {
   private:
 
     /**
-     *Initializes the Module.
+     * Initializes the module.
      */
     void initialize() override;
 
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override;
 
+    /**
+     * This method is called for each event.
+     */
     void event() override;
 
+    /**
+     * This method is called at the end of the event processing.
+     */
     void endRun() override;
 
     ROIPixelTranslator* m_thePixelTranslator = nullptr; /**< the pixel translator object*/

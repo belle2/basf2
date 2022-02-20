@@ -41,6 +41,8 @@ namespace Belle2 {
 
       /// Singleton: Delete copy constructor and assignment operator
       CDCSimHitLookUp(CDCSimHitLookUp&) = delete;
+
+      /// Operator =.
       CDCSimHitLookUp& operator=(const CDCSimHitLookUp&) = delete;
 
       /// Default constructor - for cppcheck

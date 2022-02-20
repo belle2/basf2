@@ -2117,8 +2117,8 @@ namespace Belle2 {
                           "Returns number of composite particles or V0s in the related RestOfEvent object that pass the selection criteria.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("nROE_ParticlesInList(pListName)", nROE_ParticlesInList,
-                          "Returns the number of particles in ROE from the given particle list.\n"
+    REGISTER_METAVARIABLE("nROE_ParticlesInList(pListName[, maskName])", nROE_ParticlesInList,
+                          "Returns the number of particles in ROE from the given particle list. If a mask name is provided the selection criteria are applied.\n"
                           "Use of variable aliases is advised.", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("roeCharge(maskName)", ROE_Charge,

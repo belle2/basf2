@@ -949,6 +949,7 @@ def flavorTagger(
     downloadFromDatabaseIfNotFound=False,
     uploadToDatabaseAfterTraining=False,
     samplerFileId='',
+    prefix='',
     path=None,
 ):
     """
@@ -989,6 +990,7 @@ def flavorTagger(
                                                sampling. Only used in ``Sampler`` mode.  If you are training by yourself and
                                                want to parallelize the sampling, you can run several sampling scripts in
                                                parallel. By changing this parameter you will not overwrite an older sample.
+      @param prefix                            Prefix of weight files.
       @param path                              Modules are added to this path
 
     """
@@ -1063,6 +1065,7 @@ def flavorTagger(
     setInteractionWithDatabase(downloadFromDatabaseIfNotFound, uploadToDatabaseAfterTraining)
     set_FlavorTagger_pid_aliases()
     setInputVariablesWithMask()
+    weightFiles = prefix + weightFiles
 
     # Create configuration lists and code-name for given category's list
     trackLevelParticleLists = []

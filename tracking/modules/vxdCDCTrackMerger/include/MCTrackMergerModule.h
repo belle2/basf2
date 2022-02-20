@@ -38,6 +38,10 @@ namespace Belle2 {
      */
     void event() override;
 
+    /** This method is called if the current run ends.
+     */
+    void endRun() override;
+
   private:
     /** Radius of the inner CDC wall in centimeters */
     double m_CDC_wall_radius = 16.25;
@@ -45,6 +49,18 @@ namespace Belle2 {
     double m_merge_radius;
     bool m_mcParticlesPresent =
       false; /**< This flag is set to false if there are no MC Particles in the data store (probably data run?) and we can not create MC Reco tracks. */
+
+    int m_totalVXDTracks = 0;    /**< will hold number of input VXD tracks*/
+    int m_totalCDCTracks = 0;    /**< will hold number of input CDC tracks*/
+    int m_fakeVXDTracks = 0;     /**< will hold number of fake VXD tracks, i.e. not related to MCParticle*/
+    int m_fakeCDCTracks = 0;     /**< will hold number of fake CDC traks, i.e. not related to MCParticle*/
+    int m_matchedVTXtoCDC = 0;   /**< will hold number of matches from VTX to CDC*/
+    int m_matchedVTXtoVTX = 0;   /**< will hold number of matches from VTX to VTX*/
+    int m_matchedCDCtoVTX = 0;   /**< will hold number of matches from CDC to VTX*/
+    int m_matchedCDCtoCDC = 0;   /**< will hold number of matches from CDC to CDC*/
+    int m_matchedTotal = 0;      /**< will hold number of matches*/
+    int m_removedCurlers = 0;    /**< will hold number of tracks with hits >1 loop*/
+
 
     /** StoreArray name of the VXD Track collection */
     std::string m_VXDRecoTrackColName;

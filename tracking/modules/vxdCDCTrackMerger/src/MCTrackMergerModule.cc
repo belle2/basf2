@@ -28,6 +28,40 @@ std::multimap<B, A> flip_map(const std::map<A, B>& src)
   return dst;
 }
 
+template< class THit, class TSimHit>
+bool isWithinNLoops(double Bz, const THit* aHit, double nLoops)
+{
+  // for SVD there are cases with more than one simhit attached
+  const RelationVector<TSimHit>& relatedSimHits = aHit->template getRelationsWith<TSimHit>();
+
+  // take the first best simhit with mcParticle attached
+  const MCParticle* mcParticle = nullptr;
+  const TSimHit* aSimHit = nullptr;
+  for (const auto& thisSimHit : relatedSimHits) {
+    mcParticle = thisSimHit.template getRelated<MCParticle>();
+    aSimHit = &thisSimHit;
+    if (mcParticle) break;
+  }
+  if (not mcParticle or not aSimHit) {
+    return false;
+  }
+
+  // subtract the production time here in order for this classification to also work
+  // for particles produced at times t' > t0
+  const double tof = aSimHit->getGlobalTime() - mcParticle->getProductionTime();
+  const double speed = mcParticle->get4Vector().Beta() * Const::speedOfLight;
+  const float absMom3D = mcParticle->getMomentum().Mag();
+
+  const double loopLength = 2 * M_PI * absMom3D / (Bz * 0.00299792458);
+  const double loopTOF =  loopLength / speed;
+  if (tof > loopTOF * nLoops) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+
 MCTrackMergerModule::MCTrackMergerModule() :
   Module(), m_CDC_wall_radius(16.25)
 {
@@ -65,11 +99,13 @@ void MCTrackMergerModule::event()
   //get CDC tracks
   unsigned int nCDCTracks = m_CDCRecoTracks.getEntries();
   B2DEBUG(9, "MCTrackMerger: input Number of CDC Tracks: " << nCDCTracks);
+  m_totalCDCTracks += nCDCTracks;
 
   //get VXD tracks
   unsigned int nVXDTracks = m_VXDRecoTracks.getEntries();
   B2DEBUG(9,
           "MCTrackMerger: input Number of VXD Tracks: " << nVXDTracks);
+  m_totalVXDTracks += nVXDTracks;
 
   // Skip in the case there are no MC particles present.
   if (not m_mcParticlesPresent) {
@@ -136,10 +172,11 @@ void MCTrackMergerModule::event()
     std::multimap<int, int> dst = flip_map(counters);
 
     if (dst.size() == 0) {
-      B2DEBUG(9, "No MC found particle found");
+      B2DEBUG(9, "No MC particle found");
       vxdTrackMCParticles.push_back(-1);
+      m_fakeVXDTracks += 1;
     } else {
-      B2DEBUG(9, "MC found particle found at " << dst.crbegin()->second);
+      B2DEBUG(9, "MC found particle at " << dst.crbegin()->second);
       vxdTrackMCParticles.push_back(dst.crbegin()->second);
     }
   }
@@ -198,10 +235,11 @@ void MCTrackMergerModule::event()
     std::multimap<int, int> dst = flip_map(counters);
 
     if (dst.size() == 0) {
-      B2DEBUG(9, "No MC found particle found");
+      B2DEBUG(9, "No MC particle found");
       cdcTrackMCParticles.push_back(-1);
+      m_fakeCDCTracks += 1;
     } else {
-      B2DEBUG(9, "MC found particle found at " << dst.crbegin()->second);
+      B2DEBUG(9, "MC particle found at " << dst.crbegin()->second);
       cdcTrackMCParticles.push_back(dst.crbegin()->second);
     }
   }
@@ -336,6 +374,23 @@ void MCTrackMergerModule::event()
       // -1 is the convention for "before the CDC track" in the related tracks combiner
       B2DEBUG(9, "found match at " << bestMatchedVxdTrack);
       m_VXDRecoTracks[bestMatchedVxdTrack]->addRelationTo(&cdcTrack, -1);
+      m_matchedTotal += 1;
+      m_matchedVTXtoCDC += 1;
     }
   }
 }
+
+void MCTrackMergerModule::endRun()
+{
+  B2INFO("The MCTrackMerger processed total of " << m_totalVXDTracks << " VXD track candidates");
+  B2INFO("The MCTrackMerger processed total of " << m_totalCDCTracks << " CDC track candidates");
+  B2INFO("The MCTrackMerger found total of " <<  m_fakeVXDTracks << " fake VXD track candidates");
+  B2INFO("The MCTrackMerger found total of " <<  m_fakeCDCTracks << " fake CDC track candidates");
+  B2INFO("The MCTrackMerger matched total of " <<  m_matchedTotal << " track candidates");
+  B2INFO("The MCTrackMerger matched total of " <<  m_matchedVTXtoCDC << " track candidates from VXD to CDC");
+  B2INFO("The MCTrackMerger matched total of " <<  m_matchedVTXtoVTX  << " track candidates from VXD to VXD");
+  B2INFO("The MCTrackMerger matched total of " <<  m_matchedCDCtoVTX << " track candidates from CDC to VXD");
+  B2INFO("The MCTrackMerger matched total of " <<  m_matchedCDCtoCDC << " track candidates from CDC to CDC");
+  B2INFO("The MCTrackMerger tagged total of " << m_removedCurlers << " track candidates with hits beyond first loop");
+}
+

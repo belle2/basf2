@@ -977,6 +977,9 @@ def flavorTagger(
       @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` or ``FANN-MLP``. Both used by default.
       @param categories                        Categories used for flavor tagging. By default all are used.
       @param maskName                          Gets ROE particles from a specified ROE mask.
+                                               ``all`` (default): all ROE particles are used.
+                                               ``_FTDefaultMask``: tentative mask definition that will be created automatically.
+                                               Or one can give any mask name defined before calling this function.
       @param saveCategoriesInfo                Sets to save information of individual categories.
       @param useOnlyLocalWeightFiles           [Expert] Uses only locally saved weight files.
       @param downloadFromDatabaseIfNotFound    [Expert] Weight files are downloaded from

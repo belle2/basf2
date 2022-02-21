@@ -1052,7 +1052,7 @@ namespace Belle2 {
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
 
-    ClassDefOverride(Particle, 14); /**< Class to store reconstructed particles. */
+    ClassDefOverride(Particle, 15); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
@@ -1060,6 +1060,7 @@ namespace Belle2 {
     // v12: renamed EParticleType m_particleType to EParticleSourceObject m_particleSource
     // v13: added m_momentumScale
     // v14: added m_jacobiMatrix
+    // v15: added m_momentumScalingFactor, m_momentumSmearingFactor, setMomentumSmearingFactor
 
     friend class ParticleSubset;
   };

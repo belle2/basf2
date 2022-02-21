@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::Particle+; // checksum=0x2a71e1ac, version=14
+#pragma link C++ class Belle2::Particle+; // checksum=0x2a71e1ac, version=15
 #pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x965ad50b, version=2
 #pragma link C++ class Belle2::ParticleList+; // checksum=0x98887650, version=3
 #pragma link C++ class Belle2::RestOfEvent+; // checksum=0xe86f1658, version=8
@@ -39,6 +39,17 @@
 #pragma link C++ class Eigen::DenseCoeffsBase<Eigen::Matrix<double,3,1,0,3,1>,1>+; // checksum=0x2bf33e25, version=-1
 #pragma link C++ class Eigen::DenseCoeffsBase<Eigen::Matrix<double,3,1,0,3,1>,3>+; // checksum=0xd3a06597, version=-1
 #pragma link C++ class Eigen::internal::plain_array<double,3,0,0>+; // checksum=0xa73f796a, version=-1
+
+// ----------------------------------------------------------------------------
+// Particle evolution
+// In version 14 the member m_momentumScalingFactor has been added
+#pragma read                                                                          \
+  sourceClass="Belle2::Particle"                                                      \
+  source="float m_momentumScale"                                                      \
+  version="[-14]"                                                                     \
+  targetClass="Belle2::Particle"                                                      \
+  target="m_momentumScalingFactor"                                                            \
+  code="{onfile.m_momentumScale = m_momentumScalingFactor;}"                   \
 
 // ----------------------------------------------------------------------------
 // Particle evolution

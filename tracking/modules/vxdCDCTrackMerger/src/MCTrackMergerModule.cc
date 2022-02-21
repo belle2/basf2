@@ -276,6 +276,8 @@ void MCTrackMergerModule::event()
       if ((vxdTrackMCParticles[cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)->getArrayIndex()] == cdcMCParticle) &&
           (cdcMCParticle >= 0))  {
         m_foundCorrectlyRelatedTracksCDC += 1;
+      } else if (vxdTrackMCParticles[cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)->getArrayIndex()] < 0) {
+        m_foundWronglyRelatedTracksCDC_FAKE += 1;
       }
 
       continue;
@@ -327,6 +329,7 @@ void MCTrackMergerModule::endRun()
   B2INFO("The MCTrackMerger found total of " <<  m_fakeCDCTracks << " fake CDC track candidates");
   B2INFO("The MCTrackMerger found total of " <<  m_foundRelatedTracksCDC << " CDC track candidates with a relation");
   B2INFO("The MCTrackMerger found total of " <<  m_foundCorrectlyRelatedTracksCDC << " CDC track candidates with a correct relation");
+  B2INFO("The MCTrackMerger found total of " << m_foundWronglyRelatedTracksCDC_FAKE << " CDC tracks with bad relation to fake track");
   B2INFO("The MCTrackMerger matched total of " <<  m_matchedTotal << " track candidates");
   B2INFO("The MCTrackMerger matched total of " <<  m_matchedVTXtoCDC << " track candidates from VXD to CDC");
   B2INFO("The MCTrackMerger matched total of " <<  m_matchedVTXtoVTX  << " track candidates from VXD to VXD");

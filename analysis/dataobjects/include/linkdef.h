@@ -48,8 +48,8 @@
   source="float m_momentumScale"                                                      \
   version="[-14]"                                                                     \
   targetClass="Belle2::Particle"                                                      \
-  target="m_momentumScalingFactor"                                                            \
-  code="{onfile.m_momentumScale = m_momentumScalingFactor;}"                   \
+  target="m_momentumScalingFactor"                                                    \
+  code="{m_momentumScalingFactor = onfile.m_momentumScale;}"                          \
 
 // ----------------------------------------------------------------------------
 // Particle evolution

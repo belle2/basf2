@@ -18,6 +18,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <cmath>
 
 using namespace std;
 
@@ -192,7 +193,7 @@ namespace Belle2 {
 
       for (unsigned slot = 0; slot < c_numModules; slot++) {
         string name = "numT0Calibrated_" + slotNames[slot];
-        string title = "T0 calibrated, " + slotNames[slot] + "; run index; fraction";
+        string title = "channel T0 calibrated, " + slotNames[slot] + "; run index; fraction";
         auto* h = new TH1F(name.c_str(), title.c_str(), nx, 0, nx);
         for (int i = 0; i < nx; i++) {
           h->SetBinContent(i + 1, mergedEntries[i].numT0Calibrated[slot] / 512.0);
@@ -210,7 +211,7 @@ namespace Belle2 {
 
       for (unsigned slot = 0; slot < c_numModules; slot++) {
         string name = "numActiveCalibrated_" + slotNames[slot];
-        string title = "Active calibrated, " + slotNames[slot] + "; run index; fraction";
+        string title = "Active and calibrated, " + slotNames[slot] + "; run index; fraction";
         auto* h = new TH1F(name.c_str(), title.c_str(), nx, 0, nx);
         for (int i = 0; i < nx; i++) {
           h->SetBinContent(i + 1, mergedEntries[i].numActiveCalibrated[slot] / 512.0);
@@ -231,7 +232,13 @@ namespace Belle2 {
         string title = "BS13d, carrier " + to_string(carrier) + "; run index; shift [ns]";
         auto* h = new TH1F(name.c_str(), title.c_str(), nx, 0, nx);
         for (int i = 0; i < nx; i++) {
-          h->SetBinContent(i + 1, mergedEntries[i].asicShifts[carrier]);
+          auto y = mergedEntries[i].asicShifts[carrier];
+          if (isnan(y)) {
+            h->SetBinError(i + 1, 0);
+          } else {
+            h->SetBinContent(i + 1, y);
+            h->SetBinError(i + 1, 0.001);
+          }
         }
       }
 

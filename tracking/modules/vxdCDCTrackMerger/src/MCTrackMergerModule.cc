@@ -252,6 +252,8 @@ void MCTrackMergerModule::event()
   for (auto& vxdTrack : m_VXDRecoTracks) {
     fitter.fit(vxdTrack);
   }
+
+
   B2DEBUG(9, "Matching");
   for (auto& cdcTrack : m_CDCRecoTracks) {
     B2DEBUG(9, "Match with CDCTrack at " <<  cdcTrack.getArrayIndex());
@@ -319,6 +321,138 @@ void MCTrackMergerModule::event()
       m_matchedVTXtoCDC += 1;
     }
   }
+
+
+  B2DEBUG(9, "Matching CDC to CDC");
+  for (auto& cdcTrack : m_CDCRecoTracks) {
+    B2DEBUG(9, "Match with CDCTrack at " <<  cdcTrack.getArrayIndex());
+
+    // get index of matched MCParticle
+    int cdcMCParticle = cdcTrackMCParticles[cdcTrack.getArrayIndex()];
+
+
+    // skip CDC Tracks which were not properly fitted
+    // TODO: do we want this.
+    // TODO: maybe other cuts on hits or whatever
+    if (!cdcTrack.wasFitSuccessful())
+      continue;
+
+    B2DEBUG(9, "Fitable ");
+
+    // skip CDC if it has already a match
+    // TODO: can we allow multiple matches
+    if (cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
+      continue;
+    }
+
+    B2DEBUG(9, "Not yet related ");
+
+    bool matched_track = false;
+
+    // TODO: this can be done independent of each other ....
+    int currentCdcTrack = -1;
+    int bestMatchedCdcTrack = 0;
+    for (auto& cdcTrack2 : m_CDCRecoTracks) {
+      B2DEBUG(9, "Compare with  " <<  cdcTrack2.getArrayIndex());
+      currentCdcTrack++;
+
+      // skip self connections
+      if (cdcTrack.getArrayIndex() == cdcTrack2.getArrayIndex()) {
+        continue;
+      }
+
+      // skip VXD Tracks which were not properly fitted
+      if (!cdcTrack2.wasFitSuccessful()) {
+        continue;
+      }
+
+      // skip VXD if it has already a match
+      if (cdcTrack2.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
+        continue;
+      }
+
+      if ((cdcTrackMCParticles[cdcTrack2.getArrayIndex()] == cdcTrackMCParticles[cdcTrack.getArrayIndex()]) &&
+          (cdcTrackMCParticles[cdcTrack.getArrayIndex()] >= 0))  {
+        matched_track = true;
+        B2DEBUG(9, "matched to MC particle at: " << cdcTrackMCParticles[cdcTrack2.getArrayIndex()]);
+        bestMatchedCdcTrack = currentCdcTrack;
+      }
+    }    //end loop on VXD tracks
+
+    if (matched_track) {
+      // -1 is the convention for "before the CDC track" in the related tracks combiner
+      B2DEBUG(9, "found match at " << bestMatchedCdcTrack);
+      //m_CDCRecoTracks[bestMatchedCdcTrack]->addRelationTo(&cdcTrack, -1);
+      m_matchedTotal += 1;
+      m_matchedCDCtoCDC += 1;
+    }
+  }
+
+  B2DEBUG(9, "Matching VXD to VXD");
+  for (auto& vxdTrack : m_VXDRecoTracks) {
+    B2DEBUG(9, "Match with VXDTrack at " <<  vxdTrack.getArrayIndex());
+
+    // get index of matched MCParticle
+    int vxdMCParticle = vxdTrackMCParticles[vxdTrack.getArrayIndex()];
+
+
+    // skip VXD Tracks which were not properly fitted
+    // TODO: do we want this.
+    // TODO: maybe other cuts on hits or whatever
+    if (!vxdTrack.wasFitSuccessful())
+      continue;
+
+    B2DEBUG(9, "Fitable ");
+
+    // skip VXD if it has already a match
+    // TODO: can we allow multiple matches
+    if (vxdTrack.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
+      continue;
+    }
+
+    B2DEBUG(9, "Not yet related ");
+
+    bool matched_track = false;
+
+    // TODO: this can be done independent of each other ....
+    int currentVxdTrack = -1;
+    int bestMatchedVxdTrack = 0;
+    for (auto& vxdTrack2 : m_VXDRecoTracks) {
+      B2DEBUG(9, "Compare with  " <<  vxdTrack2.getArrayIndex());
+      currentVxdTrack++;
+
+      // skip self connections
+      if (vxdTrack.getArrayIndex() == vxdTrack2.getArrayIndex()) {
+        continue;
+      }
+
+      // skip VXD Tracks which were not properly fitted
+      if (!vxdTrack2.wasFitSuccessful()) {
+        continue;
+      }
+
+      // skip VXD if it has already a match
+      if (vxdTrack2.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
+        continue;
+      }
+
+      if ((vxdTrackMCParticles[vxdTrack2.getArrayIndex()] == vxdTrackMCParticles[vxdTrack.getArrayIndex()]) &&
+          (vxdTrackMCParticles[vxdTrack.getArrayIndex()] >= 0))  {
+        matched_track = true;
+        B2DEBUG(9, "matched to MC particle at: " << vxdTrackMCParticles[vxdTrack2.getArrayIndex()]);
+        bestMatchedVxdTrack = currentVxdTrack;
+      }
+    }    //end loop on VXD tracks
+
+    if (matched_track) {
+      // -1 is the convention for "before the VXD track" in the related tracks combiner
+      B2DEBUG(9, "found match at " << bestMatchedVxdTrack);
+      //m_VXDRecoTracks[bestMatchedVxdTrack]->addRelationTo(&vxdTrack, -1);
+      m_matchedTotal += 1;
+      m_matchedVTXtoVTX += 1;
+    }
+  }
+
 }
 
 void MCTrackMergerModule::endRun()

@@ -25,6 +25,11 @@ namespace Belle2 {
     AbstractDBObject(const AbstractDBObject& obj);
     virtual ~AbstractDBObject();
 
+    /**
+     * Operator =.
+     */
+    const AbstractDBObject& operator=(const AbstractDBObject& object);
+
   public:
     const std::string& getPath() const { return m_path; }
     void setPath(const std::string& path) { m_path = path; }

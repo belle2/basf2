@@ -92,6 +92,7 @@ NSMData::~NSMData()
 
 const NSMData& NSMData::operator=(const NSMData& data)
 {
+  AbstractDBObject::operator=(data);
   m_allocated = data.m_allocated;
   m_pdata = data.m_pdata;
   m_size = data.m_size;

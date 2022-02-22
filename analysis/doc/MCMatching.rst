@@ -51,13 +51,17 @@ Error flags
 ~~~~~~~~~~~
 
 The error flag :b2:var:`mcErrors` is a bit set where each bit flag describes
- a different kind of discrepancy between reconstruction and ``MCParticle``. 
- The individual flags are described by the ``MCMatching::MCErrorFlags`` enum.
- A value of mcErrors equal to 0 indicates perfect reconstruction (signal). 
- Usually candidates with only FSR photons missing are also considered as signal, 
- so you might want to ignore the corresponding ``c_MissFSR`` flag.
- The same is true for ``c_MissingResonance``, which is set for any missing composite particle (e.g. :math:`K_1`, but also :math:`D^{*0}`).
+a different kind of discrepancy between reconstruction and ``MCParticle``.
+The individual flags are described by the ``MCMatching::MCErrorFlags`` enum.
+A value of mcErrors equal to 0 indicates perfect reconstruction (signal).
+Usually candidates with only FSR photons missing are also considered as signal,
+so you might want to ignore the corresponding ``c_MissFSR`` flag.
+The same is true for ``c_MissingResonance``, which is set for any missing composite particle (e.g. :math:`K_1`, but also :math:`D^{*0}`).
 
+The behavior of :b2:var:`mcErrors` can be configured by decay string grammar with :func:`modularAnalysis.recontructDecay`.
+For more information and examples how to use the decay strings correctly, please see :ref:`DecayString` and :ref:`Grammar_for_custom_MCMatching`.
+
+Full documentation of the MCMatching algorithm is described in `BELLE2-CONF-PROC-2022-004 <https://docs.belle2.org/record/2868/files/BELLE2-CONF-PROC-2022-004.pdf>`_.
 
 ==============================  ================================================================================================
 Flag                            Explanation

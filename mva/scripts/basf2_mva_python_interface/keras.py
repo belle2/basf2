@@ -6,27 +6,26 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import os
+import pathlib
 import tempfile
 import numpy as np
 
 
-from keras.layers import Dense, Input
-from keras.models import Model, load_model
-from keras.losses import binary_crossentropy
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.models import Model, load_model
+from tensorflow.keras.losses import binary_crossentropy
 
 
 class State(object):
     """
-    Tensorflow state
+    Tensorflow.keras state
     """
 
-    def __init__(self, model=None, custom_objects=None, **kwargs):
+    def __init__(self, model=None, **kwargs):
         """ Constructor of the state object """
         #: keras model
         self.model = model
-        #: used by keras to load custom objects like custom layers
-        self.custom_objects = custom_objects
+
         #: list of keys to save
         self.collection_keys = []
 
@@ -45,8 +44,9 @@ def feature_importance(state):
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     """
-    Return default tensorflow model
+    Return default tensorflow.keras model
     """
+
     input = Input(shape=(number_of_features,))
     net = Dense(units=1)(input)
 
@@ -61,15 +61,24 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
 def load(obj):
     """
-    Load Tensorflow estimator into state
+    Load Tensorflow.keras model into state
     """
-    with tempfile.TemporaryDirectory() as path:
-        with open(os.path.join(path, 'weights.h5'), 'w+b') as file:
-            file.write(bytes(obj[0]))
-        state = State(load_model(os.path.join(path, 'weights.h5'), custom_objects=obj[1]))
+    with tempfile.TemporaryDirectory() as temp_path:
 
-    for index, key in enumerate(obj[2]):
-        setattr(state, key, obj[index + 3])
+        temp_path = pathlib.Path(temp_path)
+
+        file_names = obj[0]
+        for file_index, file_name in enumerate(file_names):
+            path = temp_path.joinpath(pathlib.Path(file_name))
+            path.parents[0].mkdir(parents=True, exist_ok=True)
+
+            with open(path, 'w+b') as file:
+                file.write(bytes(obj[1][file_index]))
+
+        state = State(load_model(pathlib.Path(temp_path) / 'my_model'))
+
+        for index, key in enumerate(obj[2]):
+            setattr(state, key, obj[3][index])
 
     return state
 
@@ -91,7 +100,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
 
 def partial_fit(state, X, S, y, w, epoch):
     """
-    Pass received data to tensorflow session
+    Pass received data to tensorflow.keras session
     """
     state.model.fit(X, y, batch_size=100, epochs=10)
     return False
@@ -99,16 +108,29 @@ def partial_fit(state, X, S, y, w, epoch):
 
 def end_fit(state):
     """
-    Store tensorflow session in a graph
+    Store tensorflow.keras session in a graph
     """
 
-    with tempfile.TemporaryDirectory() as path:
-        state.model.save(os.path.join(path, 'weights.h5'))
-        with open(os.path.join(path, 'weights.h5'), 'rb') as file:
-            data = file.read()
+    with tempfile.TemporaryDirectory() as temp_path:
 
-    obj_to_save = [data, state.custom_objects, state.collection_keys]
-    for key in state.collection_keys:
-        obj_to_save.append(getattr(state, key))
+        temp_path = pathlib.Path(temp_path)
+        state.model.save(temp_path.joinpath('my_model'))
+
+        # this creates:
+        # path/my_model/saved_model.pb
+        # path/my_model/keras_metadata.pb (sometimes)
+        # path/my_model/variables/*
+        # path/my_model/assets/*
+        file_names = [f.relative_to(temp_path) for f in temp_path.rglob('*') if f.is_file()]
+        files = []
+        for file_name in file_names:
+            with open(temp_path.joinpath(file_name), 'rb') as file:
+                files.append(file.read())
+
+        collection_keys = state.collection_keys
+        collections_to_store = []
+        for key in state.collection_keys:
+            collections_to_store.append(getattr(state, key))
+
     del state
-    return obj_to_save
+    return [file_names, files, collection_keys, collections_to_store]

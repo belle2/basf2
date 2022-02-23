@@ -46,6 +46,7 @@ bool isWithinNLoops(double Bz, const THit* aHit, double nLoops)
     return false;
   }
 
+
   // subtract the production time here in order for this classification to also work
   // for particles produced at times t' > t0
   const double tof = aSimHit->getGlobalTime() - mcParticle->getProductionTime();
@@ -175,9 +176,11 @@ void MCTrackMergerModule::event()
       B2DEBUG(9, "No MC particle found");
       vxdTrackMCParticles.push_back(-1);
       m_fakeVXDTracks += 1;
+      recoTrack.setQualityIndicator(0.0);
     } else {
       B2DEBUG(9, "MC found particle at " << dst.crbegin()->second);
       vxdTrackMCParticles.push_back(dst.crbegin()->second);
+      recoTrack.setQualityIndicator(1.0);
     }
   }
 
@@ -185,6 +188,11 @@ void MCTrackMergerModule::event()
   for (auto& recoTrack : m_CDCRecoTracks) {
 
     std::vector<int> contributingMCParticles;
+    auto nHits = recoTrack.getSortedCDCHitList().size() + \
+                 recoTrack.getSortedPXDHitList().size() + \
+                 recoTrack.getSortedSVDHitList().size() + \
+                 recoTrack.getSortedVTXHitList().size();
+
 
     auto cdcHits = recoTrack.getSortedCDCHitList();
     for (auto& cdcHit : cdcHits) {
@@ -234,13 +242,21 @@ void MCTrackMergerModule::event()
 
     std::multimap<int, int> dst = flip_map(counters);
 
+
     if (dst.size() == 0) {
       B2DEBUG(9, "No MC particle found");
       cdcTrackMCParticles.push_back(-1);
       m_fakeCDCTracks += 1;
+      recoTrack.setQualityIndicator(0.0);
+    } else if (float(dst.crbegin()->first) / nHits < 0.66)  {
+      B2DEBUG(9, "Less than 66% of hits from same MCParticle => fake");
+      cdcTrackMCParticles.push_back(-1);
+      m_fakeCDCTracks += 1;
+      recoTrack.setQualityIndicator(0.0);
     } else {
       B2DEBUG(9, "MC particle found at " << dst.crbegin()->second);
       cdcTrackMCParticles.push_back(dst.crbegin()->second);
+      recoTrack.setQualityIndicator(1.0);
     }
   }
 

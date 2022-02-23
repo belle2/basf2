@@ -50,12 +50,20 @@ void RelatedTracksCombinerModule::event()
   for (RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
     const RelationVector<RecoTrack>& relatedVXDRecoTracks = cdcRecoTrack.getRelationsWith<RecoTrack>(m_vxdRecoTracksStoreArrayName);
 
+    if (cdcRecoTrack.getQualityIndicator() == 0) {
+      continue;
+    }
+
     B2ASSERT("Can not handle more than 2 relations!", relatedVXDRecoTracks.size() <= 2);
 
     RecoTrack* vxdTrackBefore = nullptr;
     RecoTrack* vxdTrackAfter = nullptr;
 
     for (unsigned int index = 0; index < relatedVXDRecoTracks.size(); ++index) {
+      if (relatedVXDRecoTracks[index]->getQualityIndicator() == 0) {
+        continue;
+      }
+
       const double weight = relatedVXDRecoTracks.weight(index);
       if (weight < 0) {
         vxdTrackBefore = relatedVXDRecoTracks[index];
@@ -90,6 +98,10 @@ void RelatedTracksCombinerModule::event()
 
   // Now we only have to add the VXD tracks without a match
   for (RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
+    if (vxdRecoTrack.getQualityIndicator() == 0) {
+      continue;
+    }
+
     const RecoTrack* cdcRecoTrack = vxdRecoTrack.getRelated<RecoTrack>(m_cdcRecoTracksStoreArrayName);
     if (not cdcRecoTrack and trackFitter.fit(vxdRecoTrack)) {
       RecoTrack* newTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);

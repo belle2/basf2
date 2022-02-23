@@ -72,7 +72,7 @@ void TrackingHLTDQMModule::defineHisto()
   DefineHelixParametersAndCorrelations();
   DefineTrackFitStatus();
 
-  DefineFlags();
+  DefineAbortFlagsHistograms();
 
   originalDirectory->cd();
 
@@ -127,7 +127,7 @@ void TrackingHLTDQMModule::event()
 
 }
 
-void TrackingHLTDQMModule::DefineFlags()
+void TrackingHLTDQMModule::DefineAbortFlagsHistograms()
 {
   // only monitor if any flag was set so only 2 bins needed
   const char* flagTitle =

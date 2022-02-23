@@ -151,7 +151,13 @@ namespace Belle2 {
 
       file->cd();
 
-      auto* h_index = new TH1F("runIndex", "Run index; run index; run number", nx, 0, nx);
+      std::set<int> sortedExps;
+      for (auto& entry : mergedEntries) sortedExps.insert(entry.expNo);
+      std::string titleIndex = "Experiment";
+      if (sortedExps.size() > 1) titleIndex += "s";
+      for (auto expNo : sortedExps) titleIndex += " " + to_string(expNo) + ",";
+      titleIndex.pop_back();
+      auto* h_index = new TH1F("runIndex", (titleIndex + "; run index; run number").c_str(), nx, 0, nx);
       for (int i = 0; i < nx; i++) {
         h_index->SetBinContent(i + 1, mergedEntries[i].runNo);
       }

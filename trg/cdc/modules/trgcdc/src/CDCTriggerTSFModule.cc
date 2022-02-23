@@ -476,7 +476,7 @@ CDCTriggerTSFModule::event()
           if (wire->signal().active()) {
             // priority wire has relation weight 2
             double weight = (wire == &(s.priority())) ? 2. : 1.;
-            tsHit->addRelationTo(m_cdcHits[wire->hit()->iCDCHit()], weight);
+            if (weight == 2.) {tsHit->addRelationTo(m_cdcHits[wire->hit()->iCDCHit()], weight);}
           }
         }
         // relation to MCParticles (same as priority hit)
@@ -537,6 +537,7 @@ CDCTriggerTSFModule::event()
 
                 //              std::cout << tsHit->getID() << " " << cdcHits[iHit]->getID() << " " << iHit << " matching id of priohit and current cdchit, creating relation... " << std::endl;
                 recoTrack->addRelationTo(tsHit);
+                tsHit->addRelationTo(recoTrack);
                 if (isl == 0) {
                   // this getrightleftinformation function returns 2 for a right pass, and 3 for a left pass
                   if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  3) lrflag = 0;

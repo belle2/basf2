@@ -300,9 +300,11 @@ def add_neuro_simulation(path, nntweightfile=None, **kwargs):
                     outputCollectionName=sim2dtracks_swts)
     if nntweightfile is not None:
         nnt.param('filename', Belle2.FileSystem.findFile(nntweightfile))
+    if 'et_option' in kwargs:
+        nnt.param('et_option', kwargs['et_option'])
     nnt.param('inputCollectionName', sim2dtracks_swts)
     nnt.param('outputCollectionName', simneurotracks_swtssw2d)
     nnt.param('hitCollectionName', simsegmenthits)
     nnt.param('writeMLPinput', True)
-    nnt.param('fixedPoint', True)
+    nnt.param('fixedPoint', False)
     path.add_module(nnt)

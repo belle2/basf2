@@ -265,7 +265,7 @@ void
 NeuroTrigger::initializeCollections(string hitCollectionName, string eventTimeName, const std::string& et_option)
 {
   m_segmentHits.isRequired(hitCollectionName);
-  if (!((et_option == "fastestpriority") || (et_option == "zero") || (et_option == "fastest2d"))) {
+  if (!((et_option == "fastestpriority") || (et_option == "etfhwin") || (et_option == "zero") || (et_option == "fastest2d"))) {
     m_eventTime.isRequired(eventTimeName);
   }
   m_hitCollectionName = hitCollectionName;

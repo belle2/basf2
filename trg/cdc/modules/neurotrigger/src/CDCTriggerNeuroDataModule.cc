@@ -87,7 +87,7 @@ namespace Belle2 {
              "else skip them.", true);
     addParam("NeuroTrackInputMode", m_neuroTrackInputMode,
              "When using real tracks, use neurotracks instead of 2dtracks as input to the neurotrigger",
-             false);
+             true);
     addParam("phiRange", m_parameters.phiRange,
              "Phi region in degree for which experts are trained. "
              "1 value pair, nMLP value pairs or nPhi value pairs "
@@ -255,9 +255,13 @@ namespace Belle2 {
         if (!m_rescaleTarget && outOfRange) continue;
         //
         // read out or determine event time
+        //std::cout << "time: " << m_NeuroTrigger.m_T0 << std::endl;
+        //std::cout << "getting event time" << std::endl;
         m_NeuroTrigger.getEventTime(isector, *m_tracks[itrack], m_parameters.et_option, m_neuroTrackInputMode);
+        //std::cout << "time: " << m_NeuroTrigger.m_T0 << std::endl;
         // check hit pattern
         unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector, *m_tracks[itrack], m_neuroTrackInputMode);
+        //std::cout << "hitpattern: " << hitPattern << std::endl;
         unsigned long sectorPattern = m_NeuroTrigger[isector].getSLpattern();
         unsigned long sectorPatternMask = m_NeuroTrigger[isector].getSLpatternMask();
         B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
@@ -276,9 +280,11 @@ namespace Belle2 {
         } else {
           hitIds = m_NeuroTrigger.selectHits(isector, *m_tracks[itrack]);
         }
+        std::cout << "hitids: " << hitIds.size() << std::endl;
         CDCTriggerMLPData::NeuroSet<27, 2> sample(m_NeuroTrigger.getInputVector(isector, hitIds).data(), target.data(),
                                                   evtmetadata->getExperiment(), evtmetadata->getRun(), evtmetadata->getSubrun(), evtmetadata->getEvent(), itrack, i);
         //check whether we already have enough samples
+        std::cout << sample << std::endl;
         m_trainSet[isector].addSample(sample);
         if ((m_trainSet)[isector].nSamples() % 1000 == 0) {
           B2DEBUG(50, m_trainSet[isector].nSamples() << " samples for training collected for sector " << isector);

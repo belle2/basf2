@@ -195,7 +195,7 @@ void KLMDQM2Module::initialize()
 {
   REG_HISTOGRAM;
   //inputs
-  m_softwareTriggerResult.isRequired();
+  m_softwareTriggerResult.isOptional();
   m_MuonList.isRequired(m_MuonListName);
   m_Digits.isOptional();
   m_GeometryBKLM = bklm::GeometryPar::instance();

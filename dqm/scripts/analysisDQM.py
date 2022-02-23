@@ -26,10 +26,9 @@ def add_analysis_dqm(path):
     Parameters:
         path (basf2.Path): modules are loaded onto this path
     """
-    # muons
-    ma.fillParticleList('mu+:all', '', path=path)
 
-    # Kshorts and pi0s
+    # muons, Kshorts and pi0s
+    ma.fillParticleList('mu+:KLMDQM', 'p>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.fillParticleList('gamma:physDQM', 'E > 0.15', loadPhotonBeamBackgroundMVA=False, path=path)
     ma.fillParticleList('pi+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.fillParticleList('mu+:physDQM', 'pt>2. and abs(d0) < 2 and abs(z0) < 4', path=path)

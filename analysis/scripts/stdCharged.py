@@ -162,6 +162,9 @@ def stdLep(pdgId,
            classification,
            lid_weights_gt,
            release=None,
+           channel_eff="combination",
+           channel_misid_pi="combination",
+           channel_misid_K="combination",
            listname=None,
            input_listname=None,
            trainingModeMulticlass=_TrainingMode.c_Multiclass,
@@ -214,6 +217,17 @@ def stdLep(pdgId,
                                      `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
                                      for info about lepton identification variables and campaigns.
 
+        channel_eff (Optional[str]): the channel used to derive the :math:`\\ell` ID efficiency corrections.
+                                     By default, 'combination' is set, meaning they are obtained by combining results
+                                     of several hadronic and low multiplicity channels, wherever they overlap.
+
+                                     .. tip::
+                                         Please refer to the
+                                         `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+                                         for other possible choices (if any).
+
+        channel_misid_pi (Optional[str]): the channel used to derive the :math:`\\pi` fake rate corrections.
+        channel_misid_K (Optional[str]): the channel used to derive the :math:`K` fake rate corrections.
         listname (Optional[str]): the name of the output lepton list that will be created.
                                   By default, the standard lepton list name is assigned as:
                                   ``'{lepton}-:{method}_{classification}_{working_point}'``.
@@ -385,9 +399,9 @@ def stdLep(pdgId,
                                   trainingMode=trainingModeBinary)
 
     # The names of the payloads w/ efficiency and mis-id corrections.
-    payload_eff = f"ParticleReweighting:{pid_alias}_eff_combination_{working_point}"
-    payload_misid_pi = f"ParticleReweighting:{pid_alias}_misid_pi_combination_{working_point}"
-    payload_misid_K = f"ParticleReweighting:{pid_alias}_misid_K_combination_{working_point}"
+    payload_eff = f"ParticleReweighting:{pid_alias}_eff_{channel_eff}_{working_point}"
+    payload_misid_pi = f"ParticleReweighting:{pid_alias}_misid_pi_{channel_misid_pi}_{working_point}"
+    payload_misid_K = f"ParticleReweighting:{pid_alias}_misid_K_{channel_misid_K}_{working_point}"
 
     # Configure weighting module(s).
     path.add_module("ParticleWeighting",
@@ -460,6 +474,9 @@ def stdE(listtype=_defaultlist,
          classification=None,
          lid_weights_gt=None,
          release=None,
+         channel_eff="combination",
+         channel_misid_pi="combination",
+         channel_misid_K="combination",
          listname=None,
          input_listname=None,
          trainingModeMulticlass=_TrainingMode.c_Multiclass,
@@ -491,6 +508,9 @@ def stdE(listtype=_defaultlist,
     return stdLep(Const.electron.getPDGCode(), listtype, method, classification, lid_weights_gt,
                   release=release,
                   listname=listname,
+                  channel_eff=channel_eff,
+                  channel_misid_pi=channel_misid_pi,
+                  channel_misid_K=channel_misid_K,
                   input_listname=input_listname,
                   trainingModeMulticlass=trainingModeMulticlass,
                   trainingModeBinary=trainingModeBinary,
@@ -502,6 +522,9 @@ def stdMu(listtype=_defaultlist,
           classification=None,
           lid_weights_gt=None,
           release=None,
+          channel_eff="combination",
+          channel_misid_pi="combination",
+          channel_misid_K="combination",
           listname=None,
           input_listname=None,
           trainingModeMulticlass=_TrainingMode.c_Multiclass,
@@ -533,6 +556,9 @@ def stdMu(listtype=_defaultlist,
     return stdLep(Const.muon.getPDGCode(), listtype, method, classification, lid_weights_gt,
                   release=release,
                   listname=listname,
+                  channel_eff=channel_eff,
+                  channel_misid_pi=channel_misid_pi,
+                  channel_misid_K=channel_misid_K,
                   input_listname=input_listname,
                   trainingModeMulticlass=trainingModeMulticlass,
                   trainingModeBinary=trainingModeBinary,

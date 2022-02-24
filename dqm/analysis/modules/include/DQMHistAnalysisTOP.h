@@ -47,6 +47,15 @@ namespace Belle2 {
     TH1* find_histo_in_canvas(TString hname);
     //! Data members
   private:
+    /** Histogram from DQMInfo with run type. */
+    TH1* m_RunType = nullptr;
+
+    /** String with run type. */
+    TString m_RunTypeString;
+
+    /** Run type flag for null runs. */
+    bool m_IsNullRun;
+
     /** Canvas for the mean of the good hits. */
     TCanvas* m_c_goodHitsMean = nullptr;
     /** Canvas for the RMS of the good hits. */

@@ -182,7 +182,9 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
             PXDPerformanceCollector(using RAVE package for vertexing, obsolete)
         "useClusterPosition": Flag to use cluster postion rather than track point to group pixels for calibration.
         "particle_type": Particle type assigned to tracks. "e" by default.
+        "track_cuts_4gain": Track cuts used for gain calibration.
         "track_cuts_4eff": Track cuts used for efficiency study.
+        "track_cuts_4res": Track cuts used for resolution study.
 
     Return:
       A caf.framework.Calibration obj.
@@ -204,7 +206,9 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
     if not isinstance(useClusterPosition, bool):
         raise ValueError("useClusterPosition has to be a boolean!")
     particle_type = kwargs.get("particle_type", "e")  # rely on modular analysis for value check
+    track_cuts_4gain = kwargs.get("track_cuts_4gain", "p > 1.0")  # see above
     track_cuts_4eff = kwargs.get("track_cuts_4eff", "pt > 2.0")  # see above
+    track_cuts_4res = kwargs.get("track_cuts_4res", "Note2019")  # NOTE-TE-2019-018
 
     # Create basf2 path
 
@@ -232,7 +236,7 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         import vertex
         # Particle list for gain calibration
         p = particle_type
-        ana.fillParticleList(f'{p}+:gain', "p > 1.0", path=main)
+        ana.fillParticleList(f'{p}+:gain', track_cuts_4gain, path=main)
 
         # Particle list for event selection in efficiency monitoring
         # nSVDHits > 5 doesn't help, firstSVDLayer == 3 for < 0.1% improvement?
@@ -246,13 +250,15 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
         # Alias dosn't work with airflow implementation
         # vm.addAlias("pBetaSinTheta3o2", "formula(pt * (1./(1. + tanLambda**2)**0.5)**0.5)")
         # vm.addAlias("absLambda", "abs(atan(tanLambda))")
-        mySelection = 'pt>1.0 and abs(dz)<1.0 and dr<0.3'
-        mySelection += ' and nCDCHits>20 and nSVDHits>=8 and nPXDHits>=1'
-        mySelection += ' and [abs(atan(tanLambda)) < 0.5]'
-        mySelection += ' and [formula(pt * (1./(1. + tanLambda**2)**0.5)**0.5) > 2.0]'
-        # mySelection += ' and [absLambda<0.5]'
-        # mySelection += ' and [pBetaSinTheta3o2>2.0]'
-        ana.fillParticleList(f'{p}+:res', mySelection, path=main)
+        track_cuts_4res_note2019 = 'pt>1.0 and abs(dz)<1.0 and dr<0.3'
+        track_cuts_4res_note2019 += ' and nCDCHits>20 and nSVDHits>=8 and nPXDHits>=1'
+        track_cuts_4res_note2019 += ' and [abs(atan(tanLambda)) < 0.5]'
+        track_cuts_4res_note2019 += ' and [formula(pt * (1./(1. + tanLambda**2)**0.5)**0.5) > 2.0]'
+        # track_cuts_4res_note2019 += ' and [absLambda<0.5]'
+        # track_cuts_4res_note2019 += ' and [pBetaSinTheta3o2>2.0]'
+        if track_cuts_4res == "Note2019":
+            track_cuts_4res = track_cuts_4res_note2019
+        ana.fillParticleList(f'{p}+:res', track_cuts_4res, path=main)
         ana.reconstructDecay(f'vpho:res -> {p}+:res {p}-:res', '9.5<M<11.5', path=main)
         # Remove multiple candidate events
         ana.applyCuts('vpho:res', 'nParticlesInList(vpho:res)==1', path=main)

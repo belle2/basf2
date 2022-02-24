@@ -79,20 +79,22 @@ def main():
     ma.fillParticleList("gamma:bremsinput",
                         cut="E < 1.0",
                         path=path)
-    ma.correctBremsBelle(outputList="e+:corrected",
-                         inputList="e+:uncorrected",
-                         gammaList="gamma:bremsinput",
+    ma.correctBremsBelle(outputListName="e+:corrected",
+                         inputListName="e+:uncorrected",
+                         gammaListName="gamma:bremsinput",
                          path=path)
 
     electrons_fixed09 = "lh_B_fixed09"
-    electron_id_var = stdE("FixedThresh09", "likelihood", "binary", args.lid_weights_gt,
+    electrons_wp = "FixedThresh09"
+    electron_id_var = stdE(electrons_wp, "likelihood", "binary", args.lid_weights_gt,
                            release=5,
                            listname=electrons_fixed09,
                            input_listname="e+:corrected",
                            path=path)
 
     muons_uniform90 = "bdt_G_uniform90"
-    muon_id_var = stdMu("UniformEff90", "bdt", "global", args.lid_weights_gt,
+    muons_wp = "UniformEff90"
+    muon_id_var = stdMu(muons_wp, "bdt", "global", args.lid_weights_gt,
                         release=5,
                         listname=muons_uniform90,
                         path=path)
@@ -137,16 +139,16 @@ def main():
         electron_id_var,
         # The following aliases for LID weights are already set when creating the standard lepton list (see ma.stdLep).
         # You can decide to alias them to something else.
-        f"weight_{electron_id_var}_eff_FixedThresh09",
-        f"weight_{electron_id_var}_eff_FixedThresh09_rel_stat_up",
-        f"weight_{electron_id_var}_eff_FixedThresh09_rel_stat_dn",
-        f"weight_{electron_id_var}_eff_FixedThresh09_rel_sys_up",
-        f"weight_{electron_id_var}_eff_FixedThresh09_rel_sys_dn",
-        f"weight_{electron_id_var}_misid_pi_FixedThresh09",
-        f"weight_{electron_id_var}_misid_pi_FixedThresh09_rel_stat_up",
-        f"weight_{electron_id_var}_misid_pi_FixedThresh09_rel_stat_dn",
-        f"weight_{electron_id_var}_misid_pi_FixedThresh09_rel_sys_up",
-        f"weight_{electron_id_var}_misid_pi_FixedThresh09_rel_sys_dn",
+        f"weight_{electron_id_var}_eff_{electrons_wp}",
+        f"weight_{electron_id_var}_eff_{electrons_wp}_rel_stat_up",
+        f"weight_{electron_id_var}_eff_{electrons_wp}_rel_stat_dn",
+        f"weight_{electron_id_var}_eff_{electrons_wp}_rel_sys_up",
+        f"weight_{electron_id_var}_eff_{electrons_wp}_rel_sys_dn",
+        f"weight_{electron_id_var}_misid_pi_{electrons_wp}",
+        f"weight_{electron_id_var}_misid_pi_{electrons_wp}_rel_stat_up",
+        f"weight_{electron_id_var}_misid_pi_{electrons_wp}_rel_stat_dn",
+        f"weight_{electron_id_var}_misid_pi_{electrons_wp}_rel_sys_up",
+        f"weight_{electron_id_var}_misid_pi_{electrons_wp}_rel_sys_dn",
         # NB: no K->l fake rates corrections (yet) for binary LID...
     ]
 
@@ -156,21 +158,21 @@ def main():
         muon_id_var,
         # The following aliases for LID weights are already set when creating the standard lepton list (see ma.stdLep).
         # You can decide to alias them to something else.
-        f"weight_{muon_id_var}_eff_UniformEff90",
-        f"weight_{muon_id_var}_eff_UniformEff90_rel_stat_up",
-        f"weight_{muon_id_var}_eff_UniformEff90_rel_stat_dn",
-        f"weight_{muon_id_var}_eff_UniformEff90_rel_sys_up",
-        f"weight_{muon_id_var}_eff_UniformEff90_rel_sys_dn",
-        f"weight_{muon_id_var}_misid_pi_UniformEff90",
-        f"weight_{muon_id_var}_misid_pi_UniformEff90_rel_stat_up",
-        f"weight_{muon_id_var}_misid_pi_UniformEff90_rel_stat_dn",
-        f"weight_{muon_id_var}_misid_pi_UniformEff90_rel_sys_up",
-        f"weight_{muon_id_var}_misid_pi_UniformEff90_rel_sys_dn",
-        f"weight_{muon_id_var}_misid_K_UniformEff90",
-        f"weight_{muon_id_var}_misid_K_UniformEff90_rel_stat_up",
-        f"weight_{muon_id_var}_misid_K_UniformEff90_rel_stat_dn",
-        f"weight_{muon_id_var}_misid_K_UniformEff90_rel_sys_up",
-        f"weight_{muon_id_var}_misid_K_UniformEff90_rel_sys_dn",
+        f"weight_{muon_id_var}_eff_{muons_wp}",
+        f"weight_{muon_id_var}_eff_{muons_wp}_rel_stat_up",
+        f"weight_{muon_id_var}_eff_{muons_wp}_rel_stat_dn",
+        f"weight_{muon_id_var}_eff_{muons_wp}_rel_sys_up",
+        f"weight_{muon_id_var}_eff_{muons_wp}_rel_sys_dn",
+        f"weight_{muon_id_var}_misid_pi_{muons_wp}",
+        f"weight_{muon_id_var}_misid_pi_{muons_wp}_rel_stat_up",
+        f"weight_{muon_id_var}_misid_pi_{muons_wp}_rel_stat_dn",
+        f"weight_{muon_id_var}_misid_pi_{muons_wp}_rel_sys_up",
+        f"weight_{muon_id_var}_misid_pi_{muons_wp}_rel_sys_dn",
+        f"weight_{muon_id_var}_misid_K_{muons_wp}",
+        f"weight_{muon_id_var}_misid_K_{muons_wp}_rel_stat_up",
+        f"weight_{muon_id_var}_misid_K_{muons_wp}_rel_stat_dn",
+        f"weight_{muon_id_var}_misid_K_{muons_wp}_rel_sys_up",
+        f"weight_{muon_id_var}_misid_K_{muons_wp}_rel_sys_dn",
     ]
 
     variables_mu += lid_mu

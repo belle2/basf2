@@ -328,6 +328,10 @@ void ERecoMasterCallback::start(int expno, int runno)
       perform(NSMCommunicator::select(30));
     } catch (const TimeoutException& e) {}
   }
+  char cmdline[] = "hsendcommand DQMRC:CLEAR erctl 9991";
+  system(cmdline);
+  printf("ERecoMaster : DQM TMemFile cleared\n");
+
   if (m_callback != NULL)
     m_callback->setState(RCState::RUNNING_S);
   RCCallback::setState(RCState::RUNNING_S);

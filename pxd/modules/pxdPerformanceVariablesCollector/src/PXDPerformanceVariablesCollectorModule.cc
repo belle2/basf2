@@ -228,6 +228,7 @@ void PXDPerformanceVariablesCollectorModule::collect() // Do your event() stuff 
 
   for (auto const& particle : *particles) {
     const Track* trackPtr = particle.getTrack();
+    auto mass = particle.getMass();
     if (!trackPtr) return;
     auto recoTrackPtr = trackPtr->getRelated<RecoTrack>("");
     if (!recoTrackPtr) return;
@@ -235,7 +236,7 @@ void PXDPerformanceVariablesCollectorModule::collect() // Do your event() stuff 
     for (auto const& pxdIntercept : pxdIntercepts) {
       TrackCluster_t trackCluster;
       // Function setValues() also returns a recoTrack pointer
-      if (!trackCluster.setValues(pxdIntercept, "", "PXDClustersFromTracks"))
+      if (!trackCluster.setValues(pxdIntercept, "", "PXDClustersFromTracks", mass))
         continue;
 
       auto const& cluster = trackCluster.cluster;

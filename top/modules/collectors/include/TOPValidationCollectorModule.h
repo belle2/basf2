@@ -108,7 +108,7 @@ namespace Belle2 {
     DBObjPtr<TOPCalAsicShift> m_asicShift; /**< ASIC shifts calibration constants */
 
     // tree variables
-    TOP::ValidationTreeStruct m_treeEntry;
+    TOP::ValidationTreeStruct m_treeEntry; /**< tree entry */
   };
 
 } // end namespace Belle2

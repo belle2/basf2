@@ -81,6 +81,9 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   m_t->Branch("trkpCM", &m_svdTrkpCM);
   m_t->Branch("trkTheta", &m_svdTrkTheta);
   m_t->Branch("trkPhi", &m_svdTrkPhi);
+  m_t->Branch("trkCharge", &m_svdTrkCharge);
+  m_t->Branch("trkPValue", &m_svdTrkPValue);
+  m_t->Branch("trkNDF", &m_svdTrkNDF);
   m_t->Branch("trkPXDHits", &m_svdTrkPXDHits);
   m_t->Branch("trkSVDHits", &m_svdTrkSVDHits);
   m_t->Branch("trkCDCHits", &m_svdTrkCDCHits);

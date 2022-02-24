@@ -38,7 +38,7 @@ namespace Belle2 {
   private:
 
     //datastore
-    StoreObjPtr<EventT0> m_eventT0; /**< event T0 */
+    StoreObjPtr<EventT0> m_EventT0; /**< event T0 */
     StoreArray<SVDCluster> m_clusters; /**< svd clusters */
 
     //rootfile
@@ -76,8 +76,12 @@ namespace Belle2 {
 
 
 
-    float m_svdEventT0 = -99; /**< event T0 */
-    float m_svdEventT0Err = -99; /**< event T0 error */
+    float m_eventT0 = -99; /**< final event T0 */
+    float m_eventT0Err = -99; /**< final event T0 error */
+    float m_cdcEventT0 = -99; /**< CDC event T0 */
+    float m_cdcEventT0Err = -99; /**< CDC event T0 */
+    float m_topEventT0 = -99; /**< TOP event T0 error */
+    float m_topEventT0Err = -99; /**< TOP event T0 error */
     int m_nTracks = 0; /**< number of tracks in the event*/
     int m_svdTB = -1; /**< trigger bin */
     float m_trueEventT0 = -99; /**< true event t0 */

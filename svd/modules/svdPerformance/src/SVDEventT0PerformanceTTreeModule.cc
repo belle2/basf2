@@ -1,10 +1,10 @@
 /**************************************************************************
- * basf2 (Belle II Analysis Software Framework)                           *
- * Author: The Belle II Collaboration                                     *
- *                                                                        *
- * See git log for contributors and copyright holders.                    *
- * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
- **************************************************************************/
+* basf2 (Belle II Analysis Software Framework)                           *
+* Author: The Belle II Collaboration                                     *
+*                                                                        *
+* See git log for contributors and copyright holders.                    *
+* This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+**************************************************************************/
 
 #include <svd/modules/svdPerformance/SVDEventT0PerformanceTTreeModule.h>
 #include <framework/gearbox/Unit.h>
@@ -55,7 +55,7 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
   recoTracks.isOptional();
   m_clusters.isRequired();
-  m_eventT0.isOptional();
+  m_EventT0.isOptional();
 
   TDirectory::TContext context;
 
@@ -65,8 +65,12 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   //one fill per event!
   m_t = new TTree("tree", "Tree for SVD clusters related to tracks");
   m_t->Branch("trueEventT0", &m_trueEventT0, "trueEventT0/F");
-  m_t->Branch("eventT0", &m_svdEventT0, "eventT0/F");
-  m_t->Branch("eventT0Err", &m_svdEventT0Err, "eventT0Err/F");
+  m_t->Branch("eventT0", &m_eventT0, "eventT0/F");
+  m_t->Branch("eventT0Err", &m_eventT0Err, "eventT0Err/F");
+  m_t->Branch("cdcEventT0", &m_cdcEventT0, "cdcEventT0/F");
+  m_t->Branch("cdcEventT0Err", &m_cdcEventT0Err, "cdcEventT0Err/F");
+  m_t->Branch("topEventT0", &m_topEventT0, "topEventT0/F");
+  m_t->Branch("topEventT0Err", &m_topEventT0Err, "topEventT0Err/F");
   m_t->Branch("totTracks", &m_nTracks, "totTracks/i");
   m_t->Branch("TB", &m_svdTB, "TB/i");
   m_t->Branch("trkNumb", &m_trkNumber);
@@ -100,13 +104,36 @@ void SVDEventT0PerformanceTTreeModule::initialize()
 void SVDEventT0PerformanceTTreeModule::event()
 {
   m_trueEventT0 = -999;
-  m_svdEventT0 = -99;
-  m_svdEventT0Err = -99;
+  m_eventT0 = -99; /**< final event T0 */
+  m_eventT0Err = -99; /**< final event T0 error */
+  m_cdcEventT0 = -99; /**< CDC event T0 */
+  m_cdcEventT0 = -99; /**< CDC event T0 */
+  m_topEventT0Err = -99; /**< TOP event T0 error */
+  m_topEventT0Err = -99; /**< TOP event T0 error */
 
-  if (m_eventT0.isValid())
-    if (m_eventT0->hasEventT0()) {
-      m_svdEventT0 = (float)m_eventT0->getEventT0();
-      m_svdEventT0Err = (float)m_eventT0->getEventT0Uncertainty();
+  if (m_EventT0.isValid())
+    if (m_EventT0->hasEventT0()) {
+      m_eventT0 = (float)m_EventT0->getEventT0();
+      m_eventT0Err = (float)m_EventT0->getEventT0Uncertainty();
+
+      if (m_EventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
+        auto evtT0List_CDC = m_EventT0->getTemporaryEventT0s(Const::EDetector::CDC) ;
+
+        // set the CDC event t0 value for filling into the histogram
+        //    The most accurate CDC event t0 value is the last one in the list.
+        m_cdcEventT0 = evtT0List_CDC.back().eventT0 ;
+        m_cdcEventT0Err = evtT0List_CDC.back().eventT0Uncertainty;
+      }
+
+      // Set the TOP event t0 value if it exists
+      if (m_EventT0->hasTemporaryEventT0(Const::EDetector::TOP)) {
+        auto evtT0List_TOP = m_EventT0->getTemporaryEventT0s(Const::EDetector::TOP) ;
+
+        // set the TOP event t0 value for filling into the histogram
+        //    There should only be at most one value in the list per event
+        m_topEventT0 = evtT0List_TOP.back().eventT0 ;
+        m_topEventT0Err = evtT0List_TOP.back().eventT0Uncertainty;
+      }
     }
 
   // clear all vectors

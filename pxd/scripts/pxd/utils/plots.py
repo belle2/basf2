@@ -114,6 +114,7 @@ def df_plot_errorbar(df, x, y, yerr_low, yerr_up, ax=None, *args, **kwargs):
     ax.legend()
     ax.set_xlabel(x)
     ax.set_ylabel(y)
+    return ax
 
 
 # Extend pandas.DataFrame
@@ -325,14 +326,16 @@ def plot_module_efficiencies_in_DHHs(df, eff_var="eff_sel", phase="early_phase3"
         }
     for dhh, pxdid_list in dhh_modules_dic.items():
         plt.figure(figsize=figsize)
+        ymin = 1.0
         for pxdid in pxdid_list:
             df.query(f"{eff_var}>0&pxdid=={pxdid}&{eff_var}_err_low<0.01").errorbar(
                 y=eff_var, x="run", yerr_low=f"{eff_var}_err_low", yerr_up=f"{eff_var}_err_up", label=f"{pxdid}", alpha=0.7)
-            plt.title(dhh + " efficiency")
-            ymin, ymax = plt.ylim()
-            plt.ylim(ymin, 1.0)
-            if save_to:
-                plt.savefig(dhh + "_" + save_to)
+            ymin = min(plt.ylim()[0], ymin)
+        plt.ylabel("Efficiency (selected)")
+        plt.title(dhh + " efficiency")
+        plt.ylim(ymin, 1.0)
+        if save_to:
+            plt.savefig(dhh + "_" + save_to)
 
 
 if __name__ == '__main__':

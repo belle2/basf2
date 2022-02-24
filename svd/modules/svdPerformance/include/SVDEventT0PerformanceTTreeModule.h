@@ -66,7 +66,10 @@ namespace Belle2 {
     std::vector<float> m_svdTrkpT;     /**< pT of the track*/
     std::vector<float> m_svdTrkpCM;     /**< pCM of the track*/
     std::vector<float> m_svdTrkTheta; /**< polar angle of the track*/
-    std::vector<float> m_svdTrkPhi; /**<azimuthal angle of the track*/
+    std::vector<float> m_svdTrkPhi; /**< azimuthal angle of the track*/
+    std::vector<float> m_svdTrkCharge; /**< charge of the track*/
+    std::vector<float> m_svdTrkPValue; /**< pValue of the track*/
+    std::vector<float> m_svdTrkNDF; /**< pValue of the track*/
     std::vector<int> m_svdLayer;  /**< layer */
     std::vector<int> m_svdLadder; /**< ladder */
     std::vector<int> m_svdSensor; /**< sensor */

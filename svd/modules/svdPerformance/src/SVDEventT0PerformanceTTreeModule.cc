@@ -206,6 +206,9 @@ void SVDEventT0PerformanceTTreeModule::event()
         m_svdTrkz0.push_back(tfr->getZ0());
         m_svdTrkp.push_back(tfr->getMomentum().Mag());
         m_svdTrkpT.push_back(tfr->getMomentum().Perp());
+        m_svdTrkPValue.push_back(tfr->getPValue());
+        m_svdTrkCharge.push_back(tfr->getChargeSign());
+        m_svdTrkCharge.push_back(tfr->getNDF());
         TLorentzVector pStar = tfr->get4Momentum();
         pStar.Boost(0, 0, 3. / 11);
         m_svdTrkpCM.push_back(pStar.P());

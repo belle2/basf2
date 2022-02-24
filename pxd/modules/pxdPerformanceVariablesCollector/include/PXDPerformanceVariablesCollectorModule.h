@@ -166,7 +166,7 @@ namespace Belle2 {
     PXDGainMapPar m_gainMap;
 
     /** Track struct for holding required variables */
-    PXD::Track_t track_struct;
+    PXD::Track_t m_track_struct;
     /** Name of the particle list for gain calibration */
     std::string m_PList4GainName = "";
     /** Name of the particle list for efficiency study */

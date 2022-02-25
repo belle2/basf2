@@ -130,7 +130,8 @@ void OverlapCheckerModule::handleOverlap(const std::string& geant4Message)
         for (size_t i = 0; i < volume->GetMotherLogical()->GetNoDaughters(); ++i) {
           G4VPhysicalVolume* sister = volume->GetMotherLogical()->GetDaughter(i);
           // ignoring the ones which don't match the name
-          if (name != sister->GetName()) continue;
+          std::string sisterName{(sister->GetName()).data()};
+          if (name != sisterName) continue;
           // now transform the point into the coordinate system of the volume we actually look at
           G4AffineTransform trans_sister(sister->GetRotation(), sister->GetTranslation());
           G4ThreeVector posMother = trans_sister.TransformPoint(posLocal);

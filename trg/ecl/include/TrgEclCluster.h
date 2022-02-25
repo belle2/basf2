@@ -46,8 +46,11 @@ namespace Belle2 {
     void setICN(const std::vector<int>&, const std::vector<double>&, const std::vector<double>&);
     /** Save Cluster information in TRGECLCluster Table */
     void save(int);
-    /**  calculate  Belle 2 Cluster in Barrel */
+    /** calculate  Belle 2 Cluster in Barrel */
     void setBarrelICN(int);
+    /** calculate 3x3 TC hit map for ICN in Barrel */
+    void setBarrelICNsub(int, std::vector<int>,
+                         int&, int&, int&, int&, int&, int&, int&, int&);
     /**  calculate Belle2 Cluster in Foward endcap */
     void setForwardICN(int);
     /** calculate Belle 2 Cluster in Backward endcap */

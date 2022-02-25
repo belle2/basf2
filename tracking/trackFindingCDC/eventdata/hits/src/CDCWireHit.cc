@@ -186,7 +186,7 @@ Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D,
 
   if (stereoType == EStereoKind::c_StereoV or stereoType == EStereoKind::c_StereoU) {
     const WireLine& wireLine = getWire().getWireLine();
-    const double signedDriftLength = isValid(rlInfo) ? rlInfo * getRefDriftLength() : 0.0;
+    const double signedDriftLength = isValid(rlInfo) ? static_cast<double>(rlInfo) * getRefDriftLength() : 0.0;
     return trajectory2D.reconstruct3D(wireLine, signedDriftLength, z);
 
   } else { /*if (stereoType == EStereoKind::c_Axial)*/

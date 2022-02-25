@@ -10,7 +10,7 @@
 ##########################################################################
 
 # Purpose:
-#   basf module to create BKLM event displays from BKLMHit2ds, ExtHits, and MuidHits.
+#   basf module to create BKLM event displays from KLMHit2ds, ExtHits, and MuidHits.
 #
 
 import basf2
@@ -27,7 +27,7 @@ from ROOT import Belle2
 
 
 class EventDisplayer(basf2.Module):
-    """Draw BKLM event displays from BKLMHit2ds, ExtHits, and MuidHits."""
+    """Draw BKLM event displays from KLMHit2ds, ExtHits, and MuidHits."""
 
     #: COPPER base identifier for BKLM readout
     BKLM_ID = 0x07000000
@@ -68,7 +68,7 @@ class EventDisplayer(basf2.Module):
             run (str): formatter run number
             eventPdfName (str): path name of the output event-display PDF file
             maxDisplays (int): max # of events displays to write
-            minRPCHits (int): min # of RPC BKLMHit2ds in any sector for event display
+            minRPCHits (int): min # of RPC KLMHit2ds in any sector for event display
             minMuidHits (int): min # of MuidHits in the event for event display
         """
         super().__init__()
@@ -80,7 +80,7 @@ class EventDisplayer(basf2.Module):
         self.eventPdfName = eventPdfName
         #: internal copy of the maximum number of event displays to write
         self.maxDisplays = maxDisplays
-        #: internal copy of the minimum number of RPC BKLMHit2ds in any sector for event display
+        #: internal copy of the minimum number of RPC KLMHit2ds in any sector for event display
         self.minRPCHits = minRPCHits
         #: internal copy of the minimum number of MuidHits in the event for event display
         self.minMuidHits = minMuidHits
@@ -300,11 +300,11 @@ class EventDisplayer(basf2.Module):
         self.dcToSectorFB = [10, 14, 2, 6, 11, 15, 3, 7, 12, 8, 4, 0, 13, 9, 5, 1]
         #: RPC-time calibration adjustment (ns) for rawKLMs
         self.t0Cal = 312
-        #: RPC-time calibration adjustment (ns) for BKLMHit2ds
+        #: RPC-time calibration adjustment (ns) for KLMHit2ds
         self.t0Cal2d = 308
         #: scint-ctime calibration adjustment (ns) for rawKLMs
         self.ct0Cal = 455
-        #: scint-ctime calibration adjustment (ns) for BKLMHit2ds
+        #: scint-ctime calibration adjustment (ns) for KLMHit2ds
         self.ct0Cal2d = 520
         #: per-sector variations in RPC-time calibration adjustment (ns) for rawKLMs
         self.t0RPC = [8, -14, -6, -14, -2, 10, 9, 13, 0, -10, -14, -20, 2, 6, 14, 11]
@@ -339,8 +339,8 @@ class EventDisplayer(basf2.Module):
         self.eventCounter += 1
         EventMetaData = Belle2.PyStoreObj('EventMetaData')
         event = EventMetaData.getEvent()
-        rawklms = Belle2.PyStoreArray('RawKLMs')  # to determine if BKLMHit2d is prompt
-        hit2ds = Belle2.PyStoreArray('BKLMHit2ds')
+        rawklms = Belle2.PyStoreArray('RawKLMs')  # to determine if KLMHit2d is prompt
+        hit2ds = Belle2.PyStoreArray('KLMHit2ds')
         exthits = Belle2.PyStoreArray('ExtHits')
         muidhits = Belle2.PyStoreArray('MuidHits')
 
@@ -496,7 +496,7 @@ class EventDisplayer(basf2.Module):
                 zMuids[sector] = z
             nMuids[sector] += 1
 
-        # Process the BKLMHit2ds for event display
+        # Process the KLMHit2ds for event display
 
         rpcHitCount = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         promptXYGraph = ROOT.TGraph()

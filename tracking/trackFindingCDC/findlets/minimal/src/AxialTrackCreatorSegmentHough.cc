@@ -163,7 +163,7 @@ void AxialTrackCreatorSegmentHough::apply(const std::vector<CDCSegment2D>& segme
       const std::array<DiscreteCurv, 2>& curvs = foundHoughBox.getBounds<DiscreteCurv>();
       float lowerCurv = *(curvs[0]);
       float upperCurv = *(curvs[1]);
-      if (ESignUtil::common(lowerCurv, upperCurv) * curv < 0) {
+      if (static_cast<double>(ESignUtil::common(lowerCurv, upperCurv)) * curv < 0) {
         trajectory2D.reverse();
       }
     }

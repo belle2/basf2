@@ -87,7 +87,7 @@ namespace Belle2 {
     StoreArray<RawECL> m_eclRawCOPPERs;
 
     /** temporary buffer to store ADC data */
-    unsigned int adcBuffer_temp[ECL::ECL_CHANNELS_IN_SHAPER * ECL_ADC_SAMPLES_PER_CHANNEL];
+    unsigned int adcBuffer_temp[static_cast<int>(ECL::ECL_CHANNELS_IN_SHAPER) * static_cast<int>(ECL_ADC_SAMPLES_PER_CHANNEL)];
 
     // number of hits, masks etc ...
     /** array of triggered collectors */

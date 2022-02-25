@@ -33,13 +33,19 @@ namespace Belle2 {
 
   private:
 
-    /**  */
+    /**
+     * Initializer.
+     */
     void initialize() override;
 
-    /**  */
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override final;
 
-    /**  */
+    /**
+     * This method is called for each event.
+     */
     void event() override;
 
     /**  all the actual work is done here */

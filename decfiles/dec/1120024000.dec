@@ -1,0 +1,37 @@
+# EventType: 1120024000
+# Descriptor: [B0 -> a_1 pi]
+# NickName: Bd_a1pi
+# Documentation: Peaking background for B+ -> rho+rho0
+# Tested: Yes
+# Physics WG: BToCharmless 
+# Responsible: R. Manfredi
+# Email: riccardo.manfredi@ts.infn.it
+# Cuts: None
+# Date: 22/06/2021
+### 
+###
+###
+Alias B0Rare B0
+Alias anti-B0Rare anti-B0
+ChargeConj B0Rare anti-B0Rare
+###
+Decay Upsilon(4S)
+1.00000 B0 anti-B0 B0Rare anti-B0Rare                   VSS_BMIX dm;
+Enddecay
+### SVV_HELAMP = [|H+|, arg(H+), |H0|, arg(H0), |H-|, arg(H-)]
+### 100% transverse   polarization (1 0 0 0 1 0)
+### 100% longitudinal polarization (0 0 1 0 0 0)
+###
+### |H0| = sqrt(f_L), |H-|=|H+| = sqrt((1-f_L)/2)
+### PDG f_L = 1
+Decay B0Rare
+0.50       a_1- pi+               PHOTOS SVS;     # UL
+0.50       a_1+ pi-              PHOTOS SVS;     # UL
+Enddecay
+CDecay anti-B0Rare
+###
+### 
+###
+### 
+###
+End

@@ -1,0 +1,37 @@
+# EventType: 1220032001
+# Descriptor: [B+ -> a_1+ pi0]
+# NickName: Bu_a1+pi0
+# Documentation: Peaking background for B+ -> rho+rho0
+# Tested: Yes
+# Physics WG: BToCharmless 
+# Responsible: R. Manfredi
+# Email: riccardo.manfredi@ts.infn.it
+# Cuts: None
+# Date: 22/06/2021
+### 
+###
+###
+Alias B-Rare B-
+Alias B+Rare B+
+ChargeConj B-Rare B+Rare
+###
+Decay Upsilon(4S)
+0.50000 B- B+Rare  VSS;
+0.50000 B+ B-Rare  VSS;
+Enddecay
+### SVV_HELAMP = [|H+|, arg(H+), |H0|, arg(H0), |H-|, arg(H-)]
+### 100% transverse   polarization (1 0 0 0 1 0)
+### 100% longitudinal polarization (0 0 1 0 0 0)
+###
+### |H0| = sqrt(f_L), |H-|=|H+| = sqrt((1-f_L)/2)
+### PDG f_L = 1
+Decay B+Rare
+1.0      a_1+ pi0            PHOTOS SVS;
+Enddecay
+CDecay B-Rare
+###
+### 
+###
+### 
+###
+End

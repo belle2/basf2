@@ -123,6 +123,10 @@ void MCTrackMergerModule::event()
   for (auto& recoTrack : m_VXDRecoTracks) {
 
     std::vector<int> contributingMCParticles;
+    auto nHits = recoTrack.getSortedCDCHitList().size() + \
+                 recoTrack.getSortedPXDHitList().size() + \
+                 recoTrack.getSortedSVDHitList().size() + \
+                 recoTrack.getSortedVTXHitList().size();
 
     auto cdcHits = recoTrack.getSortedCDCHitList();
     for (auto& cdcHit : cdcHits) {
@@ -173,12 +177,17 @@ void MCTrackMergerModule::event()
     std::multimap<int, int> dst = flip_map(counters);
 
     if (dst.size() == 0) {
-      B2DEBUG(9, "No MC particle found");
+      B2DEBUG(9, "No MC particle found => fake");
+      vxdTrackMCParticles.push_back(-1);
+      m_fakeVXDTracks += 1;
+      recoTrack.setQualityIndicator(0.0);
+    } else if (float(dst.crbegin()->first) / nHits < 0.66)  {
+      B2DEBUG(9, "Less than 66% of hits from same MCParticle => fake");
       vxdTrackMCParticles.push_back(-1);
       m_fakeVXDTracks += 1;
       recoTrack.setQualityIndicator(0.0);
     } else {
-      B2DEBUG(9, "MC found particle at " << dst.crbegin()->second);
+      B2DEBUG(9, "MC particle found at " << dst.crbegin()->second);
       vxdTrackMCParticles.push_back(dst.crbegin()->second);
       recoTrack.setQualityIndicator(1.0);
     }

@@ -27,17 +27,27 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisPXDInjectionModule();
 
-  private:
-
-    //! Module functions to be called from main process
+    /**
+     * Initializer.
+     */
     void initialize(void) override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun(void) override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event(void) override final;
+
+  private:
 
     // Data members
     //! name of histogram directory

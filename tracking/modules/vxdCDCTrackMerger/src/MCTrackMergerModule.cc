@@ -7,6 +7,11 @@
  **************************************************************************/
 #include <tracking/modules/vxdCDCTrackMerger/MCTrackMergerModule.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <vtx/dataobjects/VTXTrueHit.h>
+#include <svd/dataobjects/SVDTrueHit.h>
+#include <pxd/dataobjects/PXDTrueHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <vxd/geometry/GeoCache.h>
 
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
@@ -27,41 +32,6 @@ std::multimap<B, A> flip_map(const std::map<A, B>& src)
   std::transform(src.begin(), src.end(), std::inserter(dst, dst.begin()), flip_pair<A, B>);
   return dst;
 }
-
-template< class THit, class TSimHit>
-bool isWithinNLoops(double Bz, const THit* aHit, double nLoops)
-{
-  // for SVD there are cases with more than one simhit attached
-  const RelationVector<TSimHit>& relatedSimHits = aHit->template getRelationsWith<TSimHit>();
-
-  // take the first best simhit with mcParticle attached
-  const MCParticle* mcParticle = nullptr;
-  const TSimHit* aSimHit = nullptr;
-  for (const auto& thisSimHit : relatedSimHits) {
-    mcParticle = thisSimHit.template getRelated<MCParticle>();
-    aSimHit = &thisSimHit;
-    if (mcParticle) break;
-  }
-  if (not mcParticle or not aSimHit) {
-    return false;
-  }
-
-
-  // subtract the production time here in order for this classification to also work
-  // for particles produced at times t' > t0
-  const double tof = aSimHit->getGlobalTime() - mcParticle->getProductionTime();
-  const double speed = mcParticle->get4Vector().Beta() * Const::speedOfLight;
-  const float absMom3D = mcParticle->getMomentum().Mag();
-
-  const double loopLength = 2 * M_PI * absMom3D / (Bz * 0.00299792458);
-  const double loopTOF =  loopLength / speed;
-  if (tof > loopTOF * nLoops) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
 
 MCTrackMergerModule::MCTrackMergerModule() :
   Module(), m_CDC_wall_radius(16.25)
@@ -114,10 +84,16 @@ void MCTrackMergerModule::event()
     return;
   }
 
+  //get MC particles
+  StoreArray<MCParticle> mcparticles;
+
   // Find a MCParticle for each track candidate
   std::vector<int> vxdTrackMCParticles;
   std::vector<int> cdcTrackMCParticles;
 
+  // Find minimum time of flight for each track candidate
+  std::vector<double> vxdTrackMinToF;
+  std::vector<double> cdcTrackMinToF;
 
   B2DEBUG(9, "VXD tracks");
   for (auto& recoTrack : m_VXDRecoTracks) {
@@ -128,10 +104,12 @@ void MCTrackMergerModule::event()
                  recoTrack.getSortedSVDHitList().size() + \
                  recoTrack.getSortedVTXHitList().size();
 
+    // Minimum global time of all sim hits in track
+    double minGlobalTime = std::numeric_limits<double>::max();
+
     auto cdcHits = recoTrack.getSortedCDCHitList();
     for (auto& cdcHit : cdcHits) {
       const RelationVector<MCParticle>& relatedMCParticles = cdcHit->getRelationsFrom<MCParticle>();
-
       for (size_t i = 0; i < relatedMCParticles.size(); ++i) {
         auto aParticle = relatedMCParticles.object(i);
         contributingMCParticles.push_back(aParticle->getArrayIndex());
@@ -141,7 +119,6 @@ void MCTrackMergerModule::event()
     auto pxdHits = recoTrack.getSortedPXDHitList();
     for (auto& pxdHit : pxdHits) {
       const RelationVector<MCParticle>& relatedMCParticles = pxdHit->getRelationsTo<MCParticle>();
-
       for (size_t i = 0; i < relatedMCParticles.size(); ++i) {
         auto aParticle = relatedMCParticles.object(i);
         contributingMCParticles.push_back(aParticle->getArrayIndex());
@@ -150,9 +127,7 @@ void MCTrackMergerModule::event()
 
     auto svdHits = recoTrack.getSortedSVDHitList();
     for (auto& svdHit : svdHits) {
-
       const RelationVector<MCParticle>& relatedMCParticles = svdHit->getRelationsTo<MCParticle>();
-
       for (size_t i = 0; i < relatedMCParticles.size(); ++i) {
         auto aParticle = relatedMCParticles.object(i);
         contributingMCParticles.push_back(aParticle->getArrayIndex());
@@ -162,10 +137,18 @@ void MCTrackMergerModule::event()
     auto vtxHits = recoTrack.getSortedVTXHitList();
     for (auto& vtxHit : vtxHits) {
       const RelationVector<MCParticle>& relatedMCParticles = vtxHit->getRelationsTo<MCParticle>();
-
       for (size_t i = 0; i < relatedMCParticles.size(); ++i) {
         auto aParticle = relatedMCParticles.object(i);
         contributingMCParticles.push_back(aParticle->getArrayIndex());
+      }
+
+      const RelationVector<VTXTrueHit>& relatedVTXTrueHits = vtxHit->getRelationsTo<VTXTrueHit>();
+      for (size_t i = 0; i < relatedVTXTrueHits.size(); ++i) {
+        auto aTrueHit = relatedVTXTrueHits.object(i);
+        double tof = aTrueHit->getGlobalTime();
+        if (tof < minGlobalTime) {
+          minGlobalTime = tof;
+        }
       }
     }
 
@@ -179,17 +162,21 @@ void MCTrackMergerModule::event()
     if (dst.size() == 0) {
       B2DEBUG(9, "No MC particle found => fake");
       vxdTrackMCParticles.push_back(-1);
-      m_fakeVXDTracks += 1;
+      vxdTrackMinToF.push_back(minGlobalTime);
       recoTrack.setQualityIndicator(0.0);
+      m_fakeVXDTracks += 1;
     } else if (float(dst.crbegin()->first) / nHits < 0.66)  {
       B2DEBUG(9, "Less than 66% of hits from same MCParticle => fake");
       vxdTrackMCParticles.push_back(-1);
-      m_fakeVXDTracks += 1;
+      vxdTrackMinToF.push_back(minGlobalTime);
       recoTrack.setQualityIndicator(0.0);
+      m_fakeVXDTracks += 1;
     } else {
       B2DEBUG(9, "MC particle found at " << dst.crbegin()->second);
       vxdTrackMCParticles.push_back(dst.crbegin()->second);
+      vxdTrackMinToF.push_back(minGlobalTime - mcparticles[dst.crbegin()->second]->getProductionTime());
       recoTrack.setQualityIndicator(1.0);
+      B2DEBUG(9, "GOOD VXD track with min tof " << minGlobalTime - mcparticles[dst.crbegin()->second]->getProductionTime());
     }
   }
 
@@ -202,14 +189,24 @@ void MCTrackMergerModule::event()
                  recoTrack.getSortedSVDHitList().size() + \
                  recoTrack.getSortedVTXHitList().size();
 
+    // Minimum global time of all sim hits in track
+    double minGlobalTime = std::numeric_limits<double>::max();
 
     auto cdcHits = recoTrack.getSortedCDCHitList();
     for (auto& cdcHit : cdcHits) {
       const RelationVector<MCParticle>& relatedMCParticles = cdcHit->getRelationsFrom<MCParticle>();
-
       for (size_t i = 0; i < relatedMCParticles.size(); ++i) {
         auto aParticle = relatedMCParticles.object(i);
         contributingMCParticles.push_back(aParticle->getArrayIndex());
+      }
+
+      const RelationVector<CDCSimHit>& relatedCDCSimHits = cdcHit->getRelationsFrom<CDCSimHit>();
+      for (size_t i = 0; i < relatedCDCSimHits.size(); ++i) {
+        auto aSimHit = relatedCDCSimHits.object(i);
+        double tof = aSimHit->getGlobalTime();
+        if (tof < minGlobalTime) {
+          minGlobalTime = tof;
+        }
       }
     }
 
@@ -251,21 +248,24 @@ void MCTrackMergerModule::event()
 
     std::multimap<int, int> dst = flip_map(counters);
 
-
     if (dst.size() == 0) {
       B2DEBUG(9, "No MC particle found");
       cdcTrackMCParticles.push_back(-1);
-      m_fakeCDCTracks += 1;
+      cdcTrackMinToF.push_back(minGlobalTime);
       recoTrack.setQualityIndicator(0.0);
+      m_fakeCDCTracks += 1;
     } else if (float(dst.crbegin()->first) / nHits < 0.66)  {
       B2DEBUG(9, "Less than 66% of hits from same MCParticle => fake");
       cdcTrackMCParticles.push_back(-1);
-      m_fakeCDCTracks += 1;
+      cdcTrackMinToF.push_back(minGlobalTime);
       recoTrack.setQualityIndicator(0.0);
+      m_fakeCDCTracks += 1;
     } else {
       B2DEBUG(9, "MC particle found at " << dst.crbegin()->second);
       cdcTrackMCParticles.push_back(dst.crbegin()->second);
+      cdcTrackMinToF.push_back(minGlobalTime - mcparticles[dst.crbegin()->second]->getProductionTime());
       recoTrack.setQualityIndicator(1.0);
+      B2DEBUG(9, "GOOD CDC track with min tof " << minGlobalTime - mcparticles[dst.crbegin()->second]->getProductionTime());
     }
   }
 
@@ -286,6 +286,8 @@ void MCTrackMergerModule::event()
     // get index of matched MCParticle
     int cdcMCParticle = cdcTrackMCParticles[cdcTrack.getArrayIndex()];
 
+    // get min tof of CDC track
+    double cdcMinTof = cdcTrackMinToF[cdcTrack.getArrayIndex()];
 
     // skip CDC Tracks which were not properly fitted
     // TODO: do we want this.
@@ -303,10 +305,13 @@ void MCTrackMergerModule::event()
       if ((vxdTrackMCParticles[cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)->getArrayIndex()] == cdcMCParticle) &&
           (cdcMCParticle >= 0))  {
         m_foundCorrectlyRelatedTracksCDC += 1;
-      } else if (vxdTrackMCParticles[cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)->getArrayIndex()] < 0) {
-        m_foundWronglyRelatedTracksCDC_FAKE += 1;
+      } else {
+        if (vxdTrackMCParticles[cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)->getArrayIndex()] < 0)
+          m_foundWronglyRelatedTracksCDC_FAKE += 1;
+        else
+          m_foundWronglyRelatedTracksCDC_OTHER += 1;
       }
-
+      // Comment this out to allow additional relations created by this module
       continue;
     }
 
@@ -327,6 +332,7 @@ void MCTrackMergerModule::event()
 
       // skip VXD if it has already a match
       if (vxdTrack.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
+        // Comment this out to account for bad relations
         continue;
       }
 
@@ -343,18 +349,18 @@ void MCTrackMergerModule::event()
       B2DEBUG(9, "found match at " << bestMatchedVxdTrack);
       m_VXDRecoTracks[bestMatchedVxdTrack]->addRelationTo(&cdcTrack, -1);
       m_matchedTotal += 1;
-      m_matchedVTXtoCDC += 1;
     }
   }
 
-
-  B2DEBUG(9, "Matching CDC to CDC");
+  B2DEBUG(9, "Removing curlers in CDC => treat as fake");
   for (auto& cdcTrack : m_CDCRecoTracks) {
     B2DEBUG(9, "Match with CDCTrack at " <<  cdcTrack.getArrayIndex());
 
     // get index of matched MCParticle
     int cdcMCParticle = cdcTrackMCParticles[cdcTrack.getArrayIndex()];
 
+    // get min tof of CDC track
+    double cdcMinTof = cdcTrackMinToF[cdcTrack.getArrayIndex()];
 
     // skip CDC Tracks which were not properly fitted
     // TODO: do we want this.
@@ -367,59 +373,56 @@ void MCTrackMergerModule::event()
     // skip CDC if it has already a match
     // TODO: can we allow multiple matches
     if (cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
+      // Comment this out to account for wrong existing relations and try to add new in this module.
       continue;
     }
 
     B2DEBUG(9, "Not yet related ");
 
-    bool matched_track = false;
-
-    // TODO: this can be done independent of each other ....
-    int currentCdcTrack = -1;
-    int bestMatchedCdcTrack = 0;
     for (auto& cdcTrack2 : m_CDCRecoTracks) {
       B2DEBUG(9, "Compare with  " <<  cdcTrack2.getArrayIndex());
-      currentCdcTrack++;
+
+      // get min tof of CDC track
+      double cdcMinTof2 = cdcTrackMinToF[cdcTrack2.getArrayIndex()];
 
       // skip self connections
       if (cdcTrack.getArrayIndex() == cdcTrack2.getArrayIndex()) {
         continue;
       }
 
-      // skip VXD Tracks which were not properly fitted
+      // skip CDC tracks which were not properly fitted
       if (!cdcTrack2.wasFitSuccessful()) {
         continue;
       }
 
-      // skip VXD if it has already a match
+      // skip CDC track if it has already a match
       if (cdcTrack2.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
         continue;
       }
 
       if ((cdcTrackMCParticles[cdcTrack2.getArrayIndex()] == cdcTrackMCParticles[cdcTrack.getArrayIndex()]) &&
           (cdcTrackMCParticles[cdcTrack.getArrayIndex()] >= 0))  {
-        matched_track = true;
         B2DEBUG(9, "matched to MC particle at: " << cdcTrackMCParticles[cdcTrack2.getArrayIndex()]);
-        bestMatchedCdcTrack = currentCdcTrack;
-      }
-    }    //end loop on VXD tracks
 
-    if (matched_track) {
-      // -1 is the convention for "before the CDC track" in the related tracks combiner
-      B2DEBUG(9, "found match at " << bestMatchedCdcTrack);
-      //m_CDCRecoTracks[bestMatchedCdcTrack]->addRelationTo(&cdcTrack, -1);
-      m_matchedTotal += 1;
-      m_matchedCDCtoCDC += 1;
-    }
+        if (cdcMinTof2 < cdcMinTof) {
+          cdcTrack.setQualityIndicator(0);
+        } else {
+          cdcTrack2.setQualityIndicator(0);
+        }
+        m_removedCDCCurlers += 1;
+      }
+    }    //end loop on CDC tracks
   }
 
-  B2DEBUG(9, "Matching VXD to VXD");
+  B2DEBUG(9, "Removing curlers in VXD => treat as fake");
   for (auto& vxdTrack : m_VXDRecoTracks) {
     B2DEBUG(9, "Match with VXDTrack at " <<  vxdTrack.getArrayIndex());
 
     // get index of matched MCParticle
     int vxdMCParticle = vxdTrackMCParticles[vxdTrack.getArrayIndex()];
 
+    // get min tof of VXD track
+    double vxdMinTof = vxdTrackMinToF[vxdTrack.getArrayIndex()];
 
     // skip VXD Tracks which were not properly fitted
     // TODO: do we want this.
@@ -432,22 +435,19 @@ void MCTrackMergerModule::event()
     // skip VXD if it has already a match
     // TODO: can we allow multiple matches
     if (vxdTrack.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
+      // comment that out to deal with wrong relations
       continue;
     }
 
-    B2DEBUG(9, "Not yet related ");
-
-    bool matched_track = false;
-
-    // TODO: this can be done independent of each other ....
-    int currentVxdTrack = -1;
-    int bestMatchedVxdTrack = 0;
     for (auto& vxdTrack2 : m_VXDRecoTracks) {
       B2DEBUG(9, "Compare with  " <<  vxdTrack2.getArrayIndex());
-      currentVxdTrack++;
+
+      // get min tof of VXD track
+      double vxdMinTof2 = vxdTrackMinToF[vxdTrack2.getArrayIndex()];
 
       // skip self connections
       if (vxdTrack.getArrayIndex() == vxdTrack2.getArrayIndex()) {
+        // comment that out to deal with wrong relations
         continue;
       }
 
@@ -463,19 +463,17 @@ void MCTrackMergerModule::event()
 
       if ((vxdTrackMCParticles[vxdTrack2.getArrayIndex()] == vxdTrackMCParticles[vxdTrack.getArrayIndex()]) &&
           (vxdTrackMCParticles[vxdTrack.getArrayIndex()] >= 0))  {
-        matched_track = true;
-        B2DEBUG(9, "matched to MC particle at: " << vxdTrackMCParticles[vxdTrack2.getArrayIndex()]);
-        bestMatchedVxdTrack = currentVxdTrack;
+
+        B2DEBUG(9, "found pair of VXD tracks matched to same MC with tof1= " << vxdMinTof << " tof2=" << vxdMinTof2);
+
+        if (vxdMinTof2 < vxdMinTof) {
+          vxdTrack.setQualityIndicator(0);
+        } else {
+          vxdTrack2.setQualityIndicator(0);
+        }
+        m_removedVXDCurlers += 1;
       }
     }    //end loop on VXD tracks
-
-    if (matched_track) {
-      // -1 is the convention for "before the VXD track" in the related tracks combiner
-      B2DEBUG(9, "found match at " << bestMatchedVxdTrack);
-      //m_VXDRecoTracks[bestMatchedVxdTrack]->addRelationTo(&vxdTrack, -1);
-      m_matchedTotal += 1;
-      m_matchedVTXtoVTX += 1;
-    }
   }
 
 }
@@ -489,11 +487,10 @@ void MCTrackMergerModule::endRun()
   B2INFO("The MCTrackMerger found total of " <<  m_foundRelatedTracksCDC << " CDC track candidates with a relation");
   B2INFO("The MCTrackMerger found total of " <<  m_foundCorrectlyRelatedTracksCDC << " CDC track candidates with a correct relation");
   B2INFO("The MCTrackMerger found total of " << m_foundWronglyRelatedTracksCDC_FAKE << " CDC tracks with bad relation to fake track");
+  B2INFO("The MCTrackMerger found total of " << m_foundWronglyRelatedTracksCDC_OTHER <<
+         " CDC tracks with bad relation to other signal track");
   B2INFO("The MCTrackMerger matched total of " <<  m_matchedTotal << " track candidates");
-  B2INFO("The MCTrackMerger matched total of " <<  m_matchedVTXtoCDC << " track candidates from VXD to CDC");
-  B2INFO("The MCTrackMerger matched total of " <<  m_matchedVTXtoVTX  << " track candidates from VXD to VXD");
-  B2INFO("The MCTrackMerger matched total of " <<  m_matchedCDCtoVTX << " track candidates from CDC to VXD");
-  B2INFO("The MCTrackMerger matched total of " <<  m_matchedCDCtoCDC << " track candidates from CDC to CDC");
-  B2INFO("The MCTrackMerger tagged total of " << m_removedCurlers << " track candidates with hits beyond first loop");
+  B2INFO("The MCTrackMerger removed total of " << m_removedVXDCurlers << " curling track candidates in VXD");
+  B2INFO("The MCTrackMerger removed total of " << m_removedCDCCurlers << " curling track candidates in CDC");
 }
 

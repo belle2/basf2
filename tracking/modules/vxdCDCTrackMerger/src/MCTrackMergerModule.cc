@@ -405,11 +405,16 @@ void MCTrackMergerModule::event()
         B2DEBUG(9, "matched to MC particle at: " << cdcTrackMCParticles[cdcTrack2.getArrayIndex()]);
 
         if (cdcMinTof2 < cdcMinTof) {
-          cdcTrack.setQualityIndicator(0);
+          if (cdcTrack.getQualityIndicator() > 0) {
+            cdcTrack.setQualityIndicator(0);
+            m_removedCDCCurlers += 1;
+          }
         } else {
-          cdcTrack2.setQualityIndicator(0);
+          if (cdcTrack2.getQualityIndicator() > 0) {
+            cdcTrack2.setQualityIndicator(0);
+            m_removedCDCCurlers += 1;
+          }
         }
-        m_removedCDCCurlers += 1;
       }
     }    //end loop on CDC tracks
   }
@@ -467,11 +472,16 @@ void MCTrackMergerModule::event()
         B2DEBUG(9, "found pair of VXD tracks matched to same MC with tof1= " << vxdMinTof << " tof2=" << vxdMinTof2);
 
         if (vxdMinTof2 < vxdMinTof) {
-          vxdTrack.setQualityIndicator(0);
+          if (vxdTrack.getQualityIndicator() > 0) {
+            vxdTrack.setQualityIndicator(0);
+            m_removedVXDCurlers += 1;
+          }
         } else {
-          vxdTrack2.setQualityIndicator(0);
+          if (vxdTrack2.getQualityIndicator() > 0) {
+            vxdTrack2.setQualityIndicator(0);
+            m_removedVXDCurlers += 1;
+          }
         }
-        m_removedVXDCurlers += 1;
       }
     }    //end loop on VXD tracks
   }

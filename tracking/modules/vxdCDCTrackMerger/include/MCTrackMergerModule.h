@@ -57,10 +57,13 @@ namespace Belle2 {
     int m_matchedTotal = 0;      /**< will hold number of matches*/
     int m_removedVXDCurlers = 0;    /**< will hold number of VXD tracks from higher loops*/
     int m_removedCDCCurlers = 0;    /**< will hold number of CDC tracks from higher loops*/
-    int m_foundRelatedTracksCDC = 0;    /**< will hold number of CDC tracks with existing relation*/
-    int m_foundCorrectlyRelatedTracksCDC = 0;    /**< will hold number of CDC tracks with existing correct relation*/
-    int m_foundWronglyRelatedTracksCDC_FAKE = 0;    /**< will hold number of CDC tracks with existing but wrong relation to fake*/
-    int m_foundWronglyRelatedTracksCDC_OTHER =
+    int m_foundRelatedTracks = 0;    /**< will hold number of CDC tracks with existing relation*/
+    int m_foundButWrongRelations = 0;  /**< will hold number of CDC tracks with existing relations that where removed (wrong)*/
+    int m_foundCorrectlyRelatedTracks = 0;    /**< will hold number of CDC tracks with existing correct relation*/
+    int m_foundWronglyRelatedTracks_FAKE = 0;    /**< will hold number of CDC tracks with existing but wrong relation to fake*/
+    int m_foundWronglyRelatedTracks_BADORDER =
+      0;    /**< will hold number of CDC tracks with existing but wrong sorted relation (VXD track after CDC track)*/
+    int m_foundWronglyRelatedTracks_OTHER =
       0;   /**< will hold number of CDC tracks with existing but wrong relation to other signal track*/
 
     /** StoreArray name of the VXD Track collection */

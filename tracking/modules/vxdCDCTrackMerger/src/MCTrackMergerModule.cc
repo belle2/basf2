@@ -279,7 +279,7 @@ void MCTrackMergerModule::event()
   }
 
 
-  B2DEBUG(9, "Matching");
+  B2DEBUG(9, "Matching  CDC to VXD tracks, where VXD track will be added before CDC track");
   for (auto& cdcTrack : m_CDCRecoTracks) {
     B2DEBUG(9, "Match with CDCTrack at " <<  cdcTrack.getArrayIndex());
 
@@ -290,39 +290,63 @@ void MCTrackMergerModule::event()
     double cdcMinTof = cdcTrackMinToF[cdcTrack.getArrayIndex()];
 
     // skip CDC Tracks which were not properly fitted
-    // TODO: do we want this.
-    // TODO: maybe other cuts on hits or whatever
     if (!cdcTrack.wasFitSuccessful())
       continue;
 
     B2DEBUG(9, "Fitable ");
 
-    // skip CDC if it has already a match
-    // TODO: can we allow multiple matches
-    if (cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
-      m_foundRelatedTracksCDC += 1;
-
-      if ((vxdTrackMCParticles[cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)->getArrayIndex()] == cdcMCParticle) &&
-          (cdcMCParticle >= 0))  {
-        m_foundCorrectlyRelatedTracksCDC += 1;
-      } else {
-        if (vxdTrackMCParticles[cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)->getArrayIndex()] < 0)
-          m_foundWronglyRelatedTracksCDC_FAKE += 1;
-        else
-          m_foundWronglyRelatedTracksCDC_OTHER += 1;
-      }
-      // Comment this out to allow additional relations created by this module
+    // skip CDC Tracks with bad quality indicator
+    if (cdcTrack.getQualityIndicator() == 0.0)
       continue;
+
+    B2DEBUG(9, "Good Quality ");
+
+    // skip if CDC track has already a correct match
+    bool cdcHasGoodRelation = false;
+    RelationVector<RecoTrack> relatedVXDRecoTracks = cdcTrack.getRelationsWith<RecoTrack>(m_VXDRecoTrackColName);
+
+    if (relatedVXDRecoTracks.size() > 0)
+      m_foundRelatedTracks += 1;
+
+
+    int offset = 0;
+    auto initialSize = relatedVXDRecoTracks.size();
+    for (unsigned int index = 0; index < initialSize; ++index) {
+      auto relatedIndex = relatedVXDRecoTracks[index - offset]->getArrayIndex();
+      auto relatedQI = relatedVXDRecoTracks[index - offset]->getQualityIndicator();
+      auto relatedToF = vxdTrackMinToF[relatedIndex];
+
+      if ((vxdTrackMCParticles[relatedIndex] == cdcMCParticle) &&
+          (cdcMCParticle >= 0) &&
+          (relatedQI > 0.0) &&
+          (relatedToF < cdcMinTof))  {
+
+        cdcHasGoodRelation = true;
+        m_foundCorrectlyRelatedTracks += 1;
+      } else {
+        // Need to remove the bad relation
+        relatedVXDRecoTracks.remove(index - offset);
+        m_foundButWrongRelations += 1;
+        offset += 1;
+      }
     }
+
+    if (cdcHasGoodRelation)
+      continue;
 
     B2DEBUG(9, "Not yet related ");
 
     bool matched_track = false;
-
-    // TODO: this can be done independent of each other ....
     int currentVxdTrack = -1;
     int bestMatchedVxdTrack = 0;
     for (auto& vxdTrack : m_VXDRecoTracks) {
+
+      // get index of matched MCParticle
+      int vxdMCParticle = vxdTrackMCParticles[vxdTrack.getArrayIndex()];
+
+      // get min tof of VXD track
+      double vxdMinTof = vxdTrackMinToF[vxdTrack.getArrayIndex()];
+
       B2DEBUG(9, "Compare with  " <<  vxdTrack.getArrayIndex());
       currentVxdTrack++;
       // skip VXD Tracks which were not properly fitted
@@ -337,9 +361,11 @@ void MCTrackMergerModule::event()
       }
 
       if ((vxdTrackMCParticles[vxdTrack.getArrayIndex()] == cdcTrackMCParticles[cdcTrack.getArrayIndex()]) &&
-          (vxdTrackMCParticles[vxdTrack.getArrayIndex()] >= 0))  {
+          (vxdTrackMCParticles[vxdTrack.getArrayIndex()] >= 0) &&
+          (vxdMinTof < cdcMinTof))  {
         matched_track = true;
         B2DEBUG(9, "matched to MC particle at: " << vxdTrackMCParticles[vxdTrack.getArrayIndex()]);
+        B2DEBUG(9, "vxd_tof: " << vxdMinTof << " < cdc_tof:" << cdcMinTof);
         bestMatchedVxdTrack = currentVxdTrack;
       }
     }    //end loop on VXD tracks
@@ -402,7 +428,6 @@ void MCTrackMergerModule::event()
 
       if ((cdcTrackMCParticles[cdcTrack2.getArrayIndex()] == cdcTrackMCParticles[cdcTrack.getArrayIndex()]) &&
           (cdcTrackMCParticles[cdcTrack.getArrayIndex()] >= 0))  {
-        B2DEBUG(9, "matched to MC particle at: " << cdcTrackMCParticles[cdcTrack2.getArrayIndex()]);
 
         if (cdcMinTof2 < cdcMinTof) {
           if (cdcTrack.getQualityIndicator() > 0) {
@@ -469,8 +494,6 @@ void MCTrackMergerModule::event()
       if ((vxdTrackMCParticles[vxdTrack2.getArrayIndex()] == vxdTrackMCParticles[vxdTrack.getArrayIndex()]) &&
           (vxdTrackMCParticles[vxdTrack.getArrayIndex()] >= 0))  {
 
-        B2DEBUG(9, "found pair of VXD tracks matched to same MC with tof1= " << vxdMinTof << " tof2=" << vxdMinTof2);
-
         if (vxdMinTof2 < vxdMinTof) {
           if (vxdTrack.getQualityIndicator() > 0) {
             vxdTrack.setQualityIndicator(0);
@@ -494,11 +517,13 @@ void MCTrackMergerModule::endRun()
   B2INFO("The MCTrackMerger processed total of " << m_totalCDCTracks << " CDC track candidates");
   B2INFO("The MCTrackMerger found total of " <<  m_fakeVXDTracks << " fake VXD track candidates");
   B2INFO("The MCTrackMerger found total of " <<  m_fakeCDCTracks << " fake CDC track candidates");
-  B2INFO("The MCTrackMerger found total of " <<  m_foundRelatedTracksCDC << " CDC track candidates with a relation");
-  B2INFO("The MCTrackMerger found total of " <<  m_foundCorrectlyRelatedTracksCDC << " CDC track candidates with a correct relation");
-  B2INFO("The MCTrackMerger found total of " << m_foundWronglyRelatedTracksCDC_FAKE << " CDC tracks with bad relation to fake track");
-  B2INFO("The MCTrackMerger found total of " << m_foundWronglyRelatedTracksCDC_OTHER <<
+  B2INFO("The MCTrackMerger found total of " <<  m_foundRelatedTracks << " CDC track candidates with a relation");
+  B2INFO("The MCTrackMerger found total of " <<  m_foundCorrectlyRelatedTracks << " CDC track candidates with a correct relation");
+  B2INFO("The MCTrackMerger found total of " << m_foundWronglyRelatedTracks_FAKE << " CDC tracks with bad relation to fake track");
+  B2INFO("The MCTrackMerger found total of " << m_foundWronglyRelatedTracks_OTHER <<
          " CDC tracks with bad relation to other signal track");
+  B2INFO("The MCTrackMerger found total of " <<  m_foundWronglyRelatedTracks_BADORDER <<
+         " CDC track candidates with a bad sorted relation relation");
   B2INFO("The MCTrackMerger matched total of " <<  m_matchedTotal << " track candidates");
   B2INFO("The MCTrackMerger removed total of " << m_removedVXDCurlers << " curling track candidates in VXD");
   B2INFO("The MCTrackMerger removed total of " << m_removedCDCCurlers << " curling track candidates in CDC");

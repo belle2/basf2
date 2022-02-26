@@ -354,11 +354,33 @@ void MCTrackMergerModule::event()
         continue;
       }
 
-      // skip VXD if it has already a match
-      if (vxdTrack.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
-        // Comment this out to account for bad relations
-        continue;
+      // skip VXD if it has already a correct match
+      bool vxdHasGoodRelation = false;
+      RelationVector<RecoTrack> relatedCDCRecoTracks = vxdTrack.getRelationsWith<RecoTrack>(m_CDCRecoTrackColName);
+
+      int offsetCDC = 0;
+      auto initialSizeCDC = relatedCDCRecoTracks.size();
+      for (unsigned int index = 0; index < initialSizeCDC; ++index) {
+        auto relatedIndexCDC = relatedCDCRecoTracks[index - offsetCDC]->getArrayIndex();
+        auto relatedQICDC = relatedCDCRecoTracks[index - offsetCDC]->getQualityIndicator();
+        auto relatedToFCDC = cdcTrackMinToF[relatedIndexCDC];
+
+        if ((cdcTrackMCParticles[relatedIndexCDC] == vxdMCParticle) &&
+            (vxdMCParticle >= 0) &&
+            (relatedQICDC > 0.0) &&
+            (vxdMinTof < relatedToFCDC))  {
+
+          vxdHasGoodRelation = true;
+
+        } else {
+          // Need to remove the bad relation
+          relatedCDCRecoTracks.remove(index - offsetCDC);
+          offsetCDC += 1;
+        }
       }
+
+      if (vxdHasGoodRelation)
+        continue;
 
       if ((vxdTrackMCParticles[vxdTrack.getArrayIndex()] == cdcTrackMCParticles[cdcTrack.getArrayIndex()]) &&
           (vxdTrackMCParticles[vxdTrack.getArrayIndex()] >= 0) &&

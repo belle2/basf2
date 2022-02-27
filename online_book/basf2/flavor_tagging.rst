@@ -42,10 +42,12 @@ that is, consult this page again: :ref:`conditionsdb_overview`).
 .. admonition:: Exercise
     :class: stacked exercise
 
-    Add a line to your previous steering file that adds the
-    ``analysis_tools_release-04-02`` global tag. For this you need to call the
+    Add a line to your previous steering file that adds the 
+    latest global tag. For this you need to call the
     `prepend_globaltag` method of the `basf2.conditions` object (which is an
     instance of the `ConditionsConfiguration <basf2.ConditionsConfiguration>` class).
+    To get the latest analysis global tag, you can call 
+    `modularAnalysis.getAnalysisGlobaltag`.
 
 .. admonition:: Solution
     :class: solution toggle

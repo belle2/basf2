@@ -67,24 +67,24 @@ void MCTrackMergerModule::initialize()
 void MCTrackMergerModule::event()
 {
 
-  //get CDC tracks
+  // Get CDC tracks
   unsigned int nCDCTracks = m_CDCRecoTracks.getEntries();
   B2DEBUG(9, "MCTrackMerger: input Number of CDC Tracks: " << nCDCTracks);
   m_totalCDCTracks += nCDCTracks;
 
-  //get VXD tracks
+  // Get VXD tracks
   unsigned int nVXDTracks = m_VXDRecoTracks.getEntries();
   B2DEBUG(9,
           "MCTrackMerger: input Number of VXD Tracks: " << nVXDTracks);
   m_totalVXDTracks += nVXDTracks;
 
-  // Skip in the case there are no MC particles present.
+  // Skip in the case there are no MC particles present
   if (not m_mcParticlesPresent) {
     B2DEBUG(9, "Skipping MC Track Finder as there are no MC Particles registered in the DataStore.");
     return;
   }
 
-  //get MC particles
+  // Get MC particles
   StoreArray<MCParticle> mcparticles;
 
   // Find a MCParticle for each track candidate
@@ -290,8 +290,8 @@ void MCTrackMergerModule::event()
     double cdcMinTof = cdcTrackMinToF[cdcTrack.getArrayIndex()];
 
     // skip CDC Tracks which were not properly fitted
-    if (!cdcTrack.wasFitSuccessful())
-      continue;
+    //if (!cdcTrack.wasFitSuccessful())
+    //  continue;
 
     B2DEBUG(9, "Fitable ");
 
@@ -320,6 +320,11 @@ void MCTrackMergerModule::event()
           (cdcMCParticle >= 0) &&
           (relatedQI > 0.0) &&
           (relatedToF < cdcMinTof))  {
+
+        if (relatedVXDRecoTracks.weight(index - offset) > 0) {
+          B2INFO("Related VXD: Found wrong weight: " << relatedVXDRecoTracks.weight(index - offset));
+          relatedVXDRecoTracks.setWeight(index - offset, -1);
+        }
 
         cdcHasGoodRelation = true;
         m_foundCorrectlyRelatedTracks += 1;
@@ -350,9 +355,9 @@ void MCTrackMergerModule::event()
       B2DEBUG(9, "Compare with  " <<  vxdTrack.getArrayIndex());
       currentVxdTrack++;
       // skip VXD Tracks which were not properly fitted
-      if (!vxdTrack.wasFitSuccessful()) {
-        continue;
-      }
+      //if (!vxdTrack.wasFitSuccessful()) {
+      //  continue;
+      //}
 
       // skip VXD if it has already a correct match
       bool vxdHasGoodRelation = false;
@@ -410,22 +415,9 @@ void MCTrackMergerModule::event()
     // get min tof of CDC track
     double cdcMinTof = cdcTrackMinToF[cdcTrack.getArrayIndex()];
 
-    // skip CDC Tracks which were not properly fitted
-    // TODO: do we want this.
-    // TODO: maybe other cuts on hits or whatever
-    if (!cdcTrack.wasFitSuccessful())
-      continue;
-
-    B2DEBUG(9, "Fitable ");
-
-    // skip CDC if it has already a match
-    // TODO: can we allow multiple matches
-    if (cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
-      // Comment this out to account for wrong existing relations and try to add new in this module.
-      continue;
-    }
-
-    B2DEBUG(9, "Not yet related ");
+    //if (cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
+    //  continue;
+    //}
 
     for (auto& cdcTrack2 : m_CDCRecoTracks) {
       B2DEBUG(9, "Compare with  " <<  cdcTrack2.getArrayIndex());
@@ -438,15 +430,9 @@ void MCTrackMergerModule::event()
         continue;
       }
 
-      // skip CDC tracks which were not properly fitted
-      if (!cdcTrack2.wasFitSuccessful()) {
-        continue;
-      }
-
-      // skip CDC track if it has already a match
-      if (cdcTrack2.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
-        continue;
-      }
+      //if (cdcTrack2.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
+      //  continue;
+      //}
 
       if ((cdcTrackMCParticles[cdcTrack2.getArrayIndex()] == cdcTrackMCParticles[cdcTrack.getArrayIndex()]) &&
           (cdcTrackMCParticles[cdcTrack.getArrayIndex()] >= 0))  {
@@ -476,20 +462,10 @@ void MCTrackMergerModule::event()
     // get min tof of VXD track
     double vxdMinTof = vxdTrackMinToF[vxdTrack.getArrayIndex()];
 
-    // skip VXD Tracks which were not properly fitted
-    // TODO: do we want this.
-    // TODO: maybe other cuts on hits or whatever
-    if (!vxdTrack.wasFitSuccessful())
-      continue;
-
-    B2DEBUG(9, "Fitable ");
-
-    // skip VXD if it has already a match
-    // TODO: can we allow multiple matches
-    if (vxdTrack.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
-      // comment that out to deal with wrong relations
-      continue;
-    }
+    //if (vxdTrack.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
+    // comment that out to deal with wrong relations
+    //  continue;
+    //}
 
     for (auto& vxdTrack2 : m_VXDRecoTracks) {
       B2DEBUG(9, "Compare with  " <<  vxdTrack2.getArrayIndex());
@@ -503,15 +479,10 @@ void MCTrackMergerModule::event()
         continue;
       }
 
-      // skip VXD Tracks which were not properly fitted
-      if (!vxdTrack2.wasFitSuccessful()) {
-        continue;
-      }
-
       // skip VXD if it has already a match
-      if (vxdTrack2.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
-        continue;
-      }
+      //if (vxdTrack2.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
+      //  continue;
+      //}
 
       if ((vxdTrackMCParticles[vxdTrack2.getArrayIndex()] == vxdTrackMCParticles[vxdTrack.getArrayIndex()]) &&
           (vxdTrackMCParticles[vxdTrack.getArrayIndex()] >= 0))  {

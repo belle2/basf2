@@ -165,8 +165,8 @@ def stdLep(pdgId,
            channel_eff="combination",
            channel_misid_pi="combination",
            channel_misid_K="combination",
-           listname=None,
-           input_listname=None,
+           inputListName=None,
+           outputListLabel=None,
            trainingModeMulticlass=_TrainingMode.c_Multiclass,
            trainingModeBinary=_TrainingMode.c_Classification,
            path=None):
@@ -228,23 +228,20 @@ def stdLep(pdgId,
 
         channel_misid_pi (Optional[str]): the channel used to derive the :math:`\\pi` fake rate corrections.
         channel_misid_K (Optional[str]): the channel used to derive the :math:`K` fake rate corrections.
-        listname (Optional[str]): the name of the output lepton list that will be created.
-                                  By default, the standard lepton list name is assigned as:
-                                  ``'{lepton}-:{method}_{classification}_{working_point}'``.
+        inputListName (Optional[str]): the name of a pre-existing ``ParticleList`` object (defined as a full ``decayString``,
+                                       e.g. 'e-:my_input_electrons') of which the standard lepton list will be a subset.
+                                       For instance, users might want to apply a Bremsstrahlung correction to electrons first,
+                                       which modifies their 4-momentum, and only later define the subset passing the PID selection,
+                                       including the appropriate PID weights and uncertainties (which are :math:`p`-dependent).
+                                       By default, the standard lepton list is created from all ``Track`` objects in the event.
 
-                                  .. note::
-                                      The particle identifier (i.e. 'e-:', 'mu-:') is automatically added by the function,
-                                      therefore it should **not** be prepended to the ``listname`` input parameter.
+                                       .. warning::
+                                           Do **not** apply any PID selection on the input list, otherwise results could be biased.
 
-        input_listname (Optional[str]): the name of a pre-existing ``ParticleList`` object (defined as a full ``decayString``,
-                                        e.g. 'e-:my_input_electrons') of which the standard lepton list will be a subset.
-                                        For instance, users might want to apply a Bremsstrahlung correction to electrons first,
-                                        which modifies their 4-momentum, and only later define the subset passing the PID selection,
-                                        including the appropriate PID weights and uncertainties (which are :math:`p`-dependent).
-                                        By default, the standard lepton list is created from all ``Track`` objects in the event.
-
-                                        .. warning::
-                                            Do **not** apply any PID selection on the input list, otherwise results could be biased.
+        outputListLabel (Optional[str]): the name of the output lepton list label, i.e.,
+                                         the string that follows the particle identifier ('e-:', 'mu-:').
+                                         By default, it is assigned as:
+                                         ``'{method}_{classification}_{working_point}'``.
 
         trainingModeMulticlass (Optional[``Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode``]): enum identifier
                                of the multi-class (global PID) training mode.
@@ -374,26 +371,26 @@ def stdLep(pdgId,
         variables.addAlias(pid_alias, pid_var)
 
     # Start creating the particle list, w/o any selection.
-    plistname = f"{lepton_name}:{method}_{classification}_{working_point}"
-    if listname is not None:
-        plistname = f"{lepton_name}:{listname}"
+    outputListName = f"{lepton_name}:{method}_{classification}_{working_point}"
+    if outputListLabel is not None:
+        outputListName = f"{lepton_name}:{outputListLabel}"
 
-    if input_listname is None:
-        ma.fillParticleList(plistname, "", path=path)
+    if inputListName is None:
+        ma.fillParticleList(outputListName, "", path=path)
     else:
         b2.B2INFO(
-            f"The standard lepton list: '{plistname}' will be created as a subset \
-              of the following ParticleList: '{input_listname}'")
-        ma.copyList(plistname, input_listname, path=path)
+            f"The standard lepton list: '{outputListName}' will be created as a subset \
+              of the following ParticleList: '{inputListName}'")
+        ma.copyList(outputListName, inputListName, path=path)
 
     # Here we must run the BDT if requested.
     if method == "bdt":
         if classification == "global":
-            ma.applyChargedPidMVA(particleLists=[plistname],
+            ma.applyChargedPidMVA(particleLists=[outputListName],
                                   path=path,
                                   trainingMode=trainingModeMulticlass)
         elif classification == "binary":
-            ma.applyChargedPidMVA(particleLists=[plistname],
+            ma.applyChargedPidMVA(particleLists=[outputListName],
                                   path=path,
                                   binaryHypoPDGCodes=(lepton, pion),
                                   trainingMode=trainingModeBinary)
@@ -405,20 +402,20 @@ def stdLep(pdgId,
 
     # Configure weighting module(s).
     path.add_module("ParticleWeighting",
-                    particleList=plistname,
-                    tableName=payload_eff).set_name(f"ParticleWeighting_eff_{plistname}")
+                    particleList=outputListName,
+                    tableName=payload_eff).set_name(f"ParticleWeighting_eff_{outputListName}")
     path.add_module("ParticleWeighting",
-                    particleList=plistname,
-                    tableName=payload_misid_pi).set_name(f"ParticleWeighting_misid_pi_{plistname}")
+                    particleList=outputListName,
+                    tableName=payload_misid_pi).set_name(f"ParticleWeighting_misid_pi_{outputListName}")
     if classification == "global":
         path.add_module("ParticleWeighting",
-                        particleList=plistname,
-                        tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{plistname}")
+                        particleList=outputListName,
+                        tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{outputListName}")
 
     # Apply the PID selection cut, which is read from the efficiency payload.
     # The '>=' handles extreme cases in which the variable and the threshold value are at a boundary of the PID variable range.
     cut = f"[{pid_alias} >= extraInfo({payload_eff}_threshold)]"
-    ma.applyCuts(plistname, cut, path=path)
+    ma.applyCuts(outputListName, cut, path=path)
 
     # Define convenience aliases for the nominal weight and up/dn variations.
     aliases_to_var = {
@@ -477,8 +474,8 @@ def stdE(listtype=_defaultlist,
          channel_eff="combination",
          channel_misid_pi="combination",
          channel_misid_K="combination",
-         listname=None,
-         input_listname=None,
+         inputListName=None,
+         outputListLabel=None,
          trainingModeMulticlass=_TrainingMode.c_Multiclass,
          trainingModeBinary=_TrainingMode.c_Classification,
          path=None):
@@ -507,11 +504,11 @@ def stdE(listtype=_defaultlist,
 
     return stdLep(Const.electron.getPDGCode(), listtype, method, classification, lid_weights_gt,
                   release=release,
-                  listname=listname,
                   channel_eff=channel_eff,
                   channel_misid_pi=channel_misid_pi,
                   channel_misid_K=channel_misid_K,
-                  input_listname=input_listname,
+                  inputListName=inputListName,
+                  outputListLabel=outputListLabel,
                   trainingModeMulticlass=trainingModeMulticlass,
                   trainingModeBinary=trainingModeBinary,
                   path=path)
@@ -525,8 +522,8 @@ def stdMu(listtype=_defaultlist,
           channel_eff="combination",
           channel_misid_pi="combination",
           channel_misid_K="combination",
-          listname=None,
-          input_listname=None,
+          inputListName=None,
+          outputListLabel=None,
           trainingModeMulticlass=_TrainingMode.c_Multiclass,
           trainingModeBinary=_TrainingMode.c_Classification,
           path=None):
@@ -555,11 +552,11 @@ def stdMu(listtype=_defaultlist,
 
     return stdLep(Const.muon.getPDGCode(), listtype, method, classification, lid_weights_gt,
                   release=release,
-                  listname=listname,
                   channel_eff=channel_eff,
                   channel_misid_pi=channel_misid_pi,
                   channel_misid_K=channel_misid_K,
-                  input_listname=input_listname,
+                  inputListName=inputListName,
+                  outputListLabel=outputListLabel,
                   trainingModeMulticlass=trainingModeMulticlass,
                   trainingModeBinary=trainingModeBinary,
                   path=path)

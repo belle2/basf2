@@ -88,16 +88,23 @@ def main():
     electrons_wp = "FixedThresh09"
     electron_id_var = stdE(electrons_wp, "likelihood", "binary", args.lid_weights_gt,
                            release=5,
-                           listname=electrons_fixed09,
-                           input_listname="e+:corrected",
+                           inputListName="e+:corrected",
+                           outputListLabel=electrons_fixed09,
                            path=path)
 
     muons_uniform90 = "bdt_G_uniform90"
     muons_wp = "UniformEff90"
     muon_id_var = stdMu(muons_wp, "bdt", "global", args.lid_weights_gt,
                         release=5,
-                        listname=muons_uniform90,
+                        outputListLabel=muons_uniform90,
                         path=path)
+
+    # --------------------------------------------
+    # Add extra cuts on the standard lepton lists.
+    # --------------------------------------------
+
+    ma.applyCuts(f"e-:{electrons_fixed09}", "[pt > 0.1] and thetaInCDCAcceptance", path=path)
+    ma.applyCuts(f"mu-:{muons_uniform90}", "[pt > 0.1] and thetaInCDCAcceptance", path=path)
 
     # --------------------------------------------------
     # Reconstruct J/psi candidates from the std leptons.

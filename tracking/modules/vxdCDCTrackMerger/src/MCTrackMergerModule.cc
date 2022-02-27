@@ -415,10 +415,6 @@ void MCTrackMergerModule::event()
     // get min tof of CDC track
     double cdcMinTof = cdcTrackMinToF[cdcTrack.getArrayIndex()];
 
-    //if (cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
-    //  continue;
-    //}
-
     for (auto& cdcTrack2 : m_CDCRecoTracks) {
       B2DEBUG(9, "Compare with  " <<  cdcTrack2.getArrayIndex());
 
@@ -430,10 +426,6 @@ void MCTrackMergerModule::event()
         continue;
       }
 
-      //if (cdcTrack2.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
-      //  continue;
-      //}
-
       if ((cdcTrackMCParticles[cdcTrack2.getArrayIndex()] == cdcTrackMCParticles[cdcTrack.getArrayIndex()]) &&
           (cdcTrackMCParticles[cdcTrack.getArrayIndex()] >= 0))  {
 
@@ -441,11 +433,21 @@ void MCTrackMergerModule::event()
           if (cdcTrack.getQualityIndicator() > 0) {
             cdcTrack.setQualityIndicator(0);
             m_removedCDCCurlers += 1;
+            // Possible loophole: Also remove the first related VXD track
+            if (cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
+              cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)->setQualityIndicator(0);
+              m_removedVXDCurlers += 1;
+            }
           }
         } else {
           if (cdcTrack2.getQualityIndicator() > 0) {
             cdcTrack2.setQualityIndicator(0);
             m_removedCDCCurlers += 1;
+            // Possible loophole: Also remove the first related VXD track
+            if (cdcTrack2.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
+              cdcTrack2.getRelated<RecoTrack>(m_VXDRecoTrackColName)->setQualityIndicator(0);
+              m_removedVXDCurlers += 1;
+            }
           }
         }
       }
@@ -462,11 +464,6 @@ void MCTrackMergerModule::event()
     // get min tof of VXD track
     double vxdMinTof = vxdTrackMinToF[vxdTrack.getArrayIndex()];
 
-    //if (vxdTrack.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
-    // comment that out to deal with wrong relations
-    //  continue;
-    //}
-
     for (auto& vxdTrack2 : m_VXDRecoTracks) {
       B2DEBUG(9, "Compare with  " <<  vxdTrack2.getArrayIndex());
 
@@ -479,11 +476,6 @@ void MCTrackMergerModule::event()
         continue;
       }
 
-      // skip VXD if it has already a match
-      //if (vxdTrack2.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
-      //  continue;
-      //}
-
       if ((vxdTrackMCParticles[vxdTrack2.getArrayIndex()] == vxdTrackMCParticles[vxdTrack.getArrayIndex()]) &&
           (vxdTrackMCParticles[vxdTrack.getArrayIndex()] >= 0))  {
 
@@ -491,11 +483,21 @@ void MCTrackMergerModule::event()
           if (vxdTrack.getQualityIndicator() > 0) {
             vxdTrack.setQualityIndicator(0);
             m_removedVXDCurlers += 1;
+            // Possible loophole: Also remove the first related CDC track
+            if (vxdTrack.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
+              vxdTrack.getRelated<RecoTrack>(m_CDCRecoTrackColName)->setQualityIndicator(0);
+              m_removedCDCCurlers += 1;
+            }
           }
         } else {
           if (vxdTrack2.getQualityIndicator() > 0) {
             vxdTrack2.setQualityIndicator(0);
             m_removedVXDCurlers += 1;
+            // Possible loophole: Also remove the first related CDC track
+            if (vxdTrack2.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
+              vxdTrack2.getRelated<RecoTrack>(m_CDCRecoTrackColName)->setQualityIndicator(0);
+              m_removedCDCCurlers += 1;
+            }
           }
         }
       }

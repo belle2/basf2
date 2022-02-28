@@ -119,6 +119,17 @@ def set_FlavorTagger_pid_aliases():
         variables.variables.addAlias('Kid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, CDC), 0.5)')
 
 
+def setInputVariablesWithMask(maskName='all'):
+    """
+    Set aliases for input variables with ROE mask.
+    """
+    variables.variables.addAlias('pMissTag_withMask', 'pMissTag('+maskName+')')
+    variables.variables.addAlias('cosTPTO_withMask', 'cosTPTO('+maskName+')')
+    variables.variables.addAlias('ptTracksRoe_withMask', 'ptTracksRoe('+maskName+')')
+    variables.variables.addAlias('pt2TracksRoe_withMask', 'pt2TracksRoe('+maskName+')')
+    variables.variables.addAlias('ptTracksRoe_withMask', 'ptTracksRoe('+maskName+')')
+
+
 def getFastBDTCategories():
     '''
     Helper function for getting the FastBDT categories.
@@ -242,266 +253,219 @@ AvailableCategories = {
 }
 
 
-# Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
-variables_dict = dict()
-KId = {'Belle': 'ifNANgiveX(atcPIDBelle(3,2), 0.5)', 'Belle2': 'kaonID'}
-muId = {'Belle': 'muIDBelle', 'Belle2': 'muonID'}
-eId = {'Belle': 'eIDBelle', 'Belle2': 'electronID'}
-
-
-def setVariables():
+def getTrainingVariables(category=None):
     """
-    Sets the Variables used for Track and Event Levels.
+    Helper function to get training variables.
+
+    NOTE: This function is not called the Expert mode. It is not necessary to be consistent with variables list of weight files.
     """
 
-    variables_dict['Electron'] = [
-        'useCMSFrame(p)',
-        'useCMSFrame(pt)',
-        'p',
-        'pt',
-        'cosTheta',
-        eId[getBelleOrBelle2()],
-        'eid_TOP',
-        'eid_ARICH',
-        'eid_ECL',
-        'BtagToWBosonVariables(recoilMassSqrd)',
-        'BtagToWBosonVariables(pMissCMS)',
-        'BtagToWBosonVariables(cosThetaMissCMS)',
-        'BtagToWBosonVariables(EW90)',
-        'cosTPTO',
-        'chiProb',
-    ]
-    variables_dict['IntermediateElectron'] = variables_dict['Electron']
-    variables_dict['Muon'] = [
-        'useCMSFrame(p)',
-        'useCMSFrame(pt)',
-        'p',
-        'pt',
-        'cosTheta',
-        muId[getBelleOrBelle2()],
-        'muid_TOP',
-        'muid_ARICH',
-        'muid_KLM',
-        'BtagToWBosonVariables(recoilMassSqrd)',
-        'BtagToWBosonVariables(pMissCMS)',
-        'BtagToWBosonVariables(cosThetaMissCMS)',
-        'BtagToWBosonVariables(EW90)',
-        'cosTPTO',
-    ]
-    variables_dict['IntermediateMuon'] = [
-        'useCMSFrame(p)',
-        'useCMSFrame(pt)',
-        'p',
-        'pt',
-        'cosTheta',
-        muId[getBelleOrBelle2()],
-        'muid_TOP',
-        'muid_ARICH',
-        'muid_KLM',
-        'BtagToWBosonVariables(recoilMassSqrd)',
-        'BtagToWBosonVariables(pMissCMS)',
-        'BtagToWBosonVariables(cosThetaMissCMS)',
-        'BtagToWBosonVariables(EW90)',
-        'cosTPTO',
-        'chiProb',
-    ]
-    variables_dict['KinLepton'] = [
-        'useCMSFrame(p)',
-        'useCMSFrame(pt)',
-        'p',
-        'pt',
-        'cosTheta',
-        muId[getBelleOrBelle2()],
-        'muid_TOP',
-        'muid_ARICH',
-        'muid_KLM',
-        eId[getBelleOrBelle2()],
-        'eid_TOP',
-        'eid_ARICH',
-        'eid_ECL',
-        'BtagToWBosonVariables(recoilMassSqrd)',
-        'BtagToWBosonVariables(pMissCMS)',
-        'BtagToWBosonVariables(cosThetaMissCMS)',
-        'BtagToWBosonVariables(EW90)',
-        'cosTPTO',
-    ]
-    variables_dict['IntermediateKinLepton'] = [
-        'useCMSFrame(p)',
-        'useCMSFrame(pt)',
-        'p',
-        'pt',
-        'cosTheta',
-        muId[getBelleOrBelle2()],
-        'muid_TOP',
-        'muid_ARICH',
-        'muid_KLM',
-        eId[getBelleOrBelle2()],
-        'eid_TOP',
-        'eid_ARICH',
-        'eid_ECL',
-        'BtagToWBosonVariables(recoilMassSqrd)',
-        'BtagToWBosonVariables(pMissCMS)',
-        'BtagToWBosonVariables(cosThetaMissCMS)',
-        'BtagToWBosonVariables(EW90)',
-        'cosTPTO',
-        'chiProb',
-    ]
-    variables_dict['Kaon'] = [
-        'useCMSFrame(p)',
-        'useCMSFrame(pt)',
-        'p',
-        'pt',
-        'cosTheta',
-        KId[getBelleOrBelle2()],
-        'Kid_dEdx',
-        'Kid_TOP',
-        'Kid_ARICH',
-        'NumberOfKShortsInRoe',
-        'ptTracksRoe',
-        'BtagToWBosonVariables(recoilMassSqrd)',
-        'BtagToWBosonVariables(pMissCMS)',
-        'BtagToWBosonVariables(cosThetaMissCMS)',
-        'BtagToWBosonVariables(EW90)',
-        'cosTPTO',
-        'chiProb',
-    ]
-    variables_dict['SlowPion'] = [
-        'useCMSFrame(p)',
-        'useCMSFrame(pt)',
-        'cosTheta',
-        'p',
-        'pt',
-        'pionID',
-        'piid_TOP',
-        'piid_ARICH',
-        'pi_vs_edEdxid',
-        KId[getBelleOrBelle2()],
-        'Kid_dEdx',
-        'Kid_TOP',
-        'Kid_ARICH',
-        'NumberOfKShortsInRoe',
-        'ptTracksRoe',
-        eId[getBelleOrBelle2()],
-        'BtagToWBosonVariables(recoilMassSqrd)',
-        'BtagToWBosonVariables(EW90)',
-        'BtagToWBosonVariables(cosThetaMissCMS)',
-        'BtagToWBosonVariables(pMissCMS)',
-        'cosTPTO',
-    ]
-    variables_dict['FastHadron'] = [
-        'useCMSFrame(p)',
-        'useCMSFrame(pt)',
-        'cosTheta',
-        'p',
-        'pt',
-        'pionID',
-        'piid_dEdx',
-        'piid_TOP',
-        'piid_ARICH',
-        'pi_vs_edEdxid',
-        KId[getBelleOrBelle2()],
-        'Kid_dEdx',
-        'Kid_TOP',
-        'Kid_ARICH',
-        'NumberOfKShortsInRoe',
-        'ptTracksRoe',
-        eId[getBelleOrBelle2()],
-        'BtagToWBosonVariables(recoilMassSqrd)',
-        'BtagToWBosonVariables(EW90)',
-        'BtagToWBosonVariables(cosThetaMissCMS)',
-        'cosTPTO',
-    ]
-    variables_dict['Lambda'] = [
-        'lambdaFlavor',
-        'NumberOfKShortsInRoe',
-        'M',
-        'cosAngleBetweenMomentumAndVertexVector',
-        'lambdaZError',
-        'daughter(0,p)',
-        'daughter(0,useCMSFrame(p))',
-        'daughter(1,p)',
-        'daughter(1,useCMSFrame(p))',
-        'useCMSFrame(p)',
-        'p',
-        'chiProb',
-    ]
-    variables_dict['MaximumPstar'] = [
-        'useCMSFrame(p)',
-        'useCMSFrame(pt)',
-        'p',
-        'pt',
-        'cosTPTO',
-    ]
-    variables_dict['FSC'] = [
-        'useCMSFrame(p)',
-        'cosTPTO',
-        KId[getBelleOrBelle2()],
-        'FSCVariables(pFastCMS)',
-        'FSCVariables(cosSlowFast)',
-        'FSCVariables(cosTPTOFast)',
-        'FSCVariables(SlowFastHaveOpositeCharges)',
-    ]
+    KId = {'Belle': 'ifNANgiveX(atcPIDBelle(3,2), 0.5)', 'Belle2': 'kaonID'}
+    muId = {'Belle': 'muIDBelle', 'Belle2': 'muonID'}
+    eId = {'Belle': 'eIDBelle', 'Belle2': 'electronID'}
 
-    # For sampling and teaching in a second step
-    variables_dict['KaonPion'] = ['extraInfo(isRightCategory(Kaon))',
-                                  'HighestProbInCat(pi+:inRoe, isRightCategory(SlowPion))',
-                                  'KaonPionVariables(cosKaonPion)',
-                                  'KaonPionVariables(HaveOpositeCharges)',
-                                  KId[getBelleOrBelle2()]]
+    variables = []
+    if category == 'Electron' or category == 'IntermediateElectron':
+        variables = ['useCMSFrame(p)',
+                     'useCMSFrame(pt)',
+                     'p',
+                     'pt',
+                     'cosTheta',
+                     eId[getBelleOrBelle2()],
+                     'eid_TOP',
+                     'eid_ARICH',
+                     'eid_ECL',
+                     'BtagToWBosonVariables(recoilMassSqrd)',
+                     'BtagToWBosonVariables(pMissCMS)',
+                     'BtagToWBosonVariables(cosThetaMissCMS)',
+                     'BtagToWBosonVariables(EW90)',
+                     'cosTPTO',
+                     'chiProb',
+                     ]
+        if getBelleOrBelle2() == "Belle":
+            variables.append('eid_dEdx')
+            variables.append('ImpactXY')
+            variables.append('distance')
 
-    # Special treatment for some input variables:
-    if getBelleOrBelle2() == "Belle2":
-        variables_dict['Lambda'].append('daughter(1,protonID)')  # protonID always 0 in B2BII check in future
-        variables_dict['Lambda'].append('daughter(0,pionID)')  # not very powerful in B2BII
-    else:
-        # Below we add some input variables in case of Belle B2BII samples.
-        # They are added only for Belle samples because they lead to large data/MC discrepancies at Belle II.
-        # Add them for Belle II samples, when their distributions will have good data/MC agreement.
-        variables_dict['Electron'].append('eid_dEdx')
-        variables_dict['Electron'].append('ImpactXY')
-        variables_dict['Electron'].append('distance')
+    elif category == 'Muon' or category == 'IntermediateMuon':
+        variables = ['useCMSFrame(p)',
+                     'useCMSFrame(pt)',
+                     'p',
+                     'pt',
+                     'cosTheta',
+                     muId[getBelleOrBelle2()],
+                     'muid_TOP',
+                     'muid_ARICH',
+                     'muid_KLM',
+                     'BtagToWBosonVariables(recoilMassSqrd)',
+                     'BtagToWBosonVariables(pMissCMS)',
+                     'BtagToWBosonVariables(cosThetaMissCMS)',
+                     'BtagToWBosonVariables(EW90)',
+                     'cosTPTO',
+                     ]
+        if getBelleOrBelle2() == "Belle":
+            variables.append('muid_dEdx')
+            variables.append('ImpactXY')
+            variables.append('distance')
+            variables.append('chiProb')
 
-        variables_dict['IntermediateElectron'].append('eid_dEdx')
-        variables_dict['IntermediateElectron'].append('ImpactXY')
-        variables_dict['IntermediateElectron'].append('distance')
+    elif category == 'KinLepton' or category == 'IntermediateKinLepton':
+        variables = ['useCMSFrame(p)',
+                     'useCMSFrame(pt)',
+                     'p',
+                     'pt',
+                     'cosTheta',
+                     muId[getBelleOrBelle2()],
+                     'muid_TOP',
+                     'muid_ARICH',
+                     'muid_KLM',
+                     eId[getBelleOrBelle2()],
+                     'eid_TOP',
+                     'eid_ARICH',
+                     'eid_ECL',
+                     'BtagToWBosonVariables(recoilMassSqrd)',
+                     'BtagToWBosonVariables(pMissCMS)',
+                     'BtagToWBosonVariables(cosThetaMissCMS)',
+                     'BtagToWBosonVariables(EW90)',
+                     'cosTPTO',
+                     ]
+        if getBelleOrBelle2() == "Belle":
+            variables.append('eid_dEdx')
+            variables.append('muid_dEdx')
+            variables.append('ImpactXY')
+            variables.append('distance')
+            variables.append('chiProb')
 
-        variables_dict['Muon'].append('muid_dEdx')
-        variables_dict['Muon'].append('ImpactXY')
-        variables_dict['Muon'].append('distance')
-        variables_dict['Muon'].append('chiProb')
+    elif category == 'Kaon':
+        variables = ['useCMSFrame(p)',
+                     'useCMSFrame(pt)',
+                     'p',
+                     'pt',
+                     'cosTheta',
+                     KId[getBelleOrBelle2()],
+                     'Kid_dEdx',
+                     'Kid_TOP',
+                     'Kid_ARICH',
+                     'NumberOfKShortsInRoe',
+                     'ptTracksRoe',
+                     'BtagToWBosonVariables(recoilMassSqrd)',
+                     'BtagToWBosonVariables(pMissCMS)',
+                     'BtagToWBosonVariables(cosThetaMissCMS)',
+                     'BtagToWBosonVariables(EW90)',
+                     'cosTPTO',
+                     'chiProb',
+                     ]
+        if getBelleOrBelle2() == "Belle":
+            variables.append('ImpactXY')
+            variables.append('distance')
 
-        variables_dict['IntermediateMuon'].append('muid_dEdx')
-        variables_dict['IntermediateMuon'].append('ImpactXY')
-        variables_dict['IntermediateMuon'].append('distance')
+    elif category == 'SlowPion':
+        variables = ['useCMSFrame(p)',
+                     'useCMSFrame(pt)',
+                     'cosTheta',
+                     'p',
+                     'pt',
+                     'pionID',
+                     'piid_TOP',
+                     'piid_ARICH',
+                     'pi_vs_edEdxid',
+                     KId[getBelleOrBelle2()],
+                     'Kid_dEdx',
+                     'Kid_TOP',
+                     'Kid_ARICH',
+                     'NumberOfKShortsInRoe',
+                     'ptTracksRoe',
+                     eId[getBelleOrBelle2()],
+                     'BtagToWBosonVariables(recoilMassSqrd)',
+                     'BtagToWBosonVariables(EW90)',
+                     'BtagToWBosonVariables(cosThetaMissCMS)',
+                     'BtagToWBosonVariables(pMissCMS)',
+                     'cosTPTO',
+                     ]
+        if getBelleOrBelle2() == "Belle":
+            variables.append('piid_dEdx')
+            variables.append('ImpactXY')
+            variables.append('distance')
+            variables.append('chiProb')
 
-        variables_dict['KinLepton'].append('muid_dEdx')
-        variables_dict['KinLepton'].append('eid_dEdx')
-        variables_dict['KinLepton'].append('ImpactXY')
-        variables_dict['KinLepton'].append('distance')
-        variables_dict['KinLepton'].append('chiProb')
+    elif category == 'FastHadron':
+        variables = ['useCMSFrame(p)',
+                     'useCMSFrame(pt)',
+                     'cosTheta',
+                     'p',
+                     'pt',
+                     'pionID',
+                     'piid_dEdx',
+                     'piid_TOP',
+                     'piid_ARICH',
+                     'pi_vs_edEdxid',
+                     KId[getBelleOrBelle2()],
+                     'Kid_dEdx',
+                     'Kid_TOP',
+                     'Kid_ARICH',
+                     'NumberOfKShortsInRoe',
+                     'ptTracksRoe',
+                     eId[getBelleOrBelle2()],
+                     'BtagToWBosonVariables(recoilMassSqrd)',
+                     'BtagToWBosonVariables(EW90)',
+                     'BtagToWBosonVariables(cosThetaMissCMS)',
+                     'cosTPTO',
+                     ]
+        if getBelleOrBelle2() == "Belle":
+            variables.append('BtagToWBosonVariables(pMissCMS)')
+            variables.append('ImpactXY')
+            variables.append('distance')
+            variables.append('chiProb')
 
-        variables_dict['IntermediateKinLepton'].append('muid_dEdx')
-        variables_dict['IntermediateKinLepton'].append('eid_dEdx')
-        variables_dict['IntermediateKinLepton'].append('ImpactXY')
-        variables_dict['IntermediateKinLepton'].append('distance')
+    elif category == 'Lambda':
+        variables = ['lambdaFlavor',
+                     'NumberOfKShortsInRoe',
+                     'M',
+                     'cosAngleBetweenMomentumAndVertexVector',
+                     'lambdaZError',
+                     'daughter(0,p)',
+                     'daughter(0,useCMSFrame(p))',
+                     'daughter(1,p)',
+                     'daughter(1,useCMSFrame(p))',
+                     'useCMSFrame(p)',
+                     'p',
+                     'chiProb',
+                     ]
+        if getBelleOrBelle2() == "Belle2":
+            variables.append('daughter(1,protonID)')  # protonID always 0 in B2BII check in future
+            variables.append('daughter(0,pionID)')  # not very powerful in B2BII
+        else:
+            variables.append('distance')
 
-        variables_dict['Kaon'].append('ImpactXY')
-        variables_dict['Kaon'].append('distance')
+    elif category == 'MaximumPstar':
+        variables = ['useCMSFrame(p)',
+                     'useCMSFrame(pt)',
+                     'p',
+                     'pt',
+                     'cosTPTO',
+                     ]
+        if getBelleOrBelle2() == "Belle2":
+            variables.append('ImpactXY')
+            variables.append('distance')
 
-        variables_dict['SlowPion'].append('piid_dEdx')
-        variables_dict['SlowPion'].append('ImpactXY')
-        variables_dict['SlowPion'].append('distance')
-        variables_dict['SlowPion'].append('chiProb')
+    elif category == 'FSC':
+        variables = ['useCMSFrame(p)',
+                     'cosTPTO',
+                     KId[getBelleOrBelle2()],
+                     'FSCVariables(pFastCMS)',
+                     'FSCVariables(cosSlowFast)',
+                     'FSCVariables(cosTPTOFast)',
+                     'FSCVariables(SlowFastHaveOpositeCharges)',
+                     ]
+    elif category == 'KaonPion':
+        variables = ['extraInfo(isRightCategory(Kaon))',
+                     'HighestProbInCat(pi+:inRoe, isRightCategory(SlowPion))',
+                     'KaonPionVariables(cosKaonPion)',
+                     'KaonPionVariables(HaveOpositeCharges)',
+                     KId[getBelleOrBelle2()]
+                     ]
 
-        variables_dict['FastHadron'].append('BtagToWBosonVariables(pMissCMS)')
-        variables_dict['FastHadron'].append('ImpactXY')
-        variables_dict['FastHadron'].append('distance')
-        variables_dict['FastHadron'].append('chiProb')
-
-        variables_dict['Lambda'].append('distance')
-
-        variables_dict['MaximumPstar'].append('ImpactXY')
-        variables_dict['MaximumPstar'].append('distance')
+    return variables
 
 
 def FillParticleLists(maskName='all', categories=None, path=None):
@@ -713,9 +677,9 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', categories=None, path=N
                 ntuple = register_module('VariablesToNtuple')
                 ntuple.param('fileName', filesDirectory + '/' + methodPrefixEventLevel + "sampled" + fileId + ".root")
                 ntuple.param('treeName', methodPrefixEventLevel + "_tree")
-                variablesToBeSaved = variables_dict[category] + [targetVariable, 'ancestorHasWhichFlavor',
-                                                                 'isSignal', 'mcPDG', 'mcErrors', 'genMotherPDG',
-                                                                 'nMCMatches', 'B0mcErrors']
+                variablesToBeSaved = getTrainingVariables(category) + [targetVariable, 'ancestorHasWhichFlavor',
+                                                                       'isSignal', 'mcPDG', 'mcErrors', 'genMotherPDG',
+                                                                       'nMCMatches', 'B0mcErrors']
                 if category != 'KaonPion' and category != 'FSC':
                     variablesToBeSaved = variablesToBeSaved + \
                         ['extraInfo(isRightTrack(' + category + '))',
@@ -762,7 +726,7 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu', categories=None):
             trainingOptionsEventLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
             trainingOptionsEventLevel.m_treename = methodPrefixEventLevel + "_tree"
             trainingOptionsEventLevel.m_identifier = weightFile
-            trainingOptionsEventLevel.m_variables = basf2_mva.vector(*variables_dict[category])
+            trainingOptionsEventLevel.m_variables = basf2_mva.vector(*getTrainingVariables(category))
             trainingOptionsEventLevel.m_target_variable = targetVariable
             trainingOptionsEventLevel.m_max_events = maxEventsNumber
 
@@ -1004,6 +968,7 @@ def flavorTagger(
     downloadFromDatabaseIfNotFound=False,
     uploadToDatabaseAfterTraining=False,
     samplerFileId='',
+    prefix='',
     path=None,
 ):
     """
@@ -1032,6 +997,9 @@ def flavorTagger(
       @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` or ``FANN-MLP``. Both used by default.
       @param categories                        Categories used for flavor tagging. By default all are used.
       @param maskName                          Gets ROE particles from a specified ROE mask.
+                                               ``all`` (default): all ROE particles are used.
+                                               ``_FTDefaultMask``: tentative mask definition that will be created automatically.
+                                               Or one can give any mask name defined before calling this function.
       @param saveCategoriesInfo                Sets to save information of individual categories.
       @param useOnlyLocalWeightFiles           [Expert] Uses only locally saved weight files.
       @param downloadFromDatabaseIfNotFound    [Expert] Weight files are downloaded from
@@ -1041,6 +1009,7 @@ def flavorTagger(
                                                sampling. Only used in ``Sampler`` mode.  If you are training by yourself and
                                                want to parallelize the sampling, you can run several sampling scripts in
                                                parallel. By changing this parameter you will not overwrite an older sample.
+      @param prefix                            Prefix of weight files.
       @param path                              Modules are added to this path
 
     """
@@ -1114,14 +1083,15 @@ def flavorTagger(
 
     setInteractionWithDatabase(downloadFromDatabaseIfNotFound, uploadToDatabaseAfterTraining)
     set_FlavorTagger_pid_aliases()
-    setVariables()
+    setInputVariablesWithMask()
+    weightFiles = prefix + weightFiles
 
+    # Create configuration lists and code-name for given category's list
     trackLevelParticleLists = []
     eventLevelParticleLists = []
     variablesCombinerLevel = []
     categoriesCombination = []
     categoriesCombinationCode = 'CatCode'
-
     for category in categories:
         ftCategory = AvailableCategories[category]
 
@@ -1141,6 +1111,17 @@ def flavorTagger(
     for code in sorted(categoriesCombination):
         categoriesCombinationCode = categoriesCombinationCode + '%02d' % code
 
+    # Create default ROE-mask
+    if maskName == '_FTDefaultMask':
+        _FTDefaultMask = (
+            '_FTDefaultMask',
+            'thetaInCDCAcceptance and dr<1 and abs(dz)<3',
+            'thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.03 and clusterReg==2] or \
+                            [E>0.06 and clusterReg==3]]')
+        for name in particleLists:
+            ma.appendROEMasks(list_name=name, mask_tuples=[_FTDefaultMask], path=path)
+
+    # Start ROE-routine
     roe_path = basf2.create_path()
     deadEndPath = basf2.create_path()
 

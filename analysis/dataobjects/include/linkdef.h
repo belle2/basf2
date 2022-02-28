@@ -46,7 +46,7 @@
 #pragma read                                                                          \
   sourceClass="Belle2::Particle"                                                      \
   source="float m_momentumScale"                                                      \
-  version="[-14]"                                                                     \
+  version="[13-14]"                                                                   \
   targetClass="Belle2::Particle"                                                      \
   target="m_momentumScalingFactor"                                                    \
   code="{m_momentumScalingFactor = onfile.m_momentumScale;}"                          \

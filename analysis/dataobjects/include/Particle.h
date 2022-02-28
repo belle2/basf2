@@ -1060,7 +1060,7 @@ namespace Belle2 {
     // v12: renamed EParticleType m_particleType to EParticleSourceObject m_particleSource
     // v13: added m_momentumScale
     // v14: added m_jacobiMatrix
-    // v15: added m_momentumScalingFactor, m_momentumSmearingFactor, setMomentumSmearingFactor
+    // v15: added m_momentumScalingFactor and m_momentumSmearingFactor
 
     friend class ParticleSubset;
   };

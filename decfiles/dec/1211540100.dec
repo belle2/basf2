@@ -23,7 +23,6 @@
 #                    | 
 #                      -> mu+mu-.
 #
-#Alias J/psisig  J/psi
 Alias Kstpsig   K*+
 Alias Kstmsig   K*-
 Alias K_S0sig   K_S0

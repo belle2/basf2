@@ -19,12 +19,6 @@ Decay Upsilon(4S)
 0.50000 B- B+sig  VSS;
 0.50000 B+ B-sig  VSS;
 Enddecay
-### SVV_HELAMP = [|H+|, arg(H+), |H0|, arg(H0), |H-|, arg(H-)]
-### 100% transverse   polarization (1 0 0 0 1 0)
-### 100% longitudinal polarization (0 0 1 0 0 0)
-###
-### |H0| = sqrt(f_L), |H-|=|H+| = sqrt((1-f_L)/2)
-### PDG f_L = 1
 Decay B+sig
 1.0       a_10 pi+               PHOTOS SVS;
 Enddecay

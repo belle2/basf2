@@ -10,19 +10,19 @@
 # Date: 22/06/2021
 ###
 ###
-Alias B-Rare B-
-Alias B+Rare B+
-ChargeConj B-Rare B+Rare
+Alias B-sig B-
+Alias B+sig B+
+ChargeConj B-sig B+sig
 ###
 Decay Upsilon(4S)
-0.50000 B- B+Rare  VSS;
-0.50000 B+ B-Rare  VSS;
+0.50000 B- B+sig  VSS;
+0.50000 B+ B-sig  VSS;
 Enddecay
 ###
-Decay B+Rare
+Decay B+sig
 1.0  rho- pi+ pi+                PHOTOS PHSP;
 Enddecay
-CDecay B-Rare
+CDecay B-sig
 ###
 ### rho- => pi- pi0
 ### 

@@ -11,12 +11,12 @@
 ### 
 ###
 ###
-Alias B0Rare B0
-Alias anti-B0Rare anti-B0
-ChargeConj B0Rare anti-B0Rare
+Alias B0sig B0
+Alias anti-B0sig anti-B0
+ChargeConj B0sig anti-B0sig
 ###
 Decay Upsilon(4S)
-1.00000 B0 anti-B0 B0Rare anti-B0Rare                   VSS_BMIX dm;
+1.00000 B0 anti-B0 B0sig anti-B0sig                   VSS_BMIX dm;
 Enddecay
 ### SVV_HELAMP = [|H+|, arg(H+), |H0|, arg(H0), |H-|, arg(H-)]
 ### 100% transverse   polarization (1 0 0 0 1 0)
@@ -24,11 +24,11 @@ Enddecay
 ###
 ### |H0| = sqrt(f_L), |H-|=|H+| = sqrt((1-f_L)/2)
 ### PDG f_L = 1
-Decay B0Rare
+Decay B0sig
 0.50       a_1- pi+               PHOTOS SVS;     # UL
 0.50       a_1+ pi-              PHOTOS SVS;     # UL
 Enddecay
-CDecay anti-B0Rare
+CDecay anti-B0sig
 ###
 ### 
 ###

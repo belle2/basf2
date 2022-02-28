@@ -11,22 +11,22 @@
 ### 
 ###
 ###
-Alias B-Rare B-
-Alias B+Rare B+
-ChargeConj B-Rare B+Rare
+Alias B-sig B-
+Alias B+sig B+
+ChargeConj B-sig B+sig
 ###
 Decay Upsilon(4S)
-0.50000 B- B+Rare  VSS;
-0.50000 B+ B-Rare  VSS;
+0.50000 B- B+sig  VSS;
+0.50000 B+ B-sig  VSS;
 Enddecay
 ### SVV_HELAMP = [|H+|, arg(H+), |H0|, arg(H0), |H-|, arg(H-)]
 ### 100% transverse   polarization (1 0 0 0 1 0)
 ### 100% longitudinal polarization (0 0 1 0 0 0)
 ###
-Decay B+Rare
+Decay B+sig
 1.0  rho+  eta'           PHOTOS SVS;
 Enddecay
-CDecay B-Rare
+CDecay B-sig
 ###
 ### rho+ => pi+ pi0
 ### 

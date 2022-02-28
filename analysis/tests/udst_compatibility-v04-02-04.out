@@ -14,6 +14,7 @@ Untested method Particle::set4Vector
 Untested method Particle::setExtraInfo
 Untested method Particle::setJacobiMatrix
 Untested method Particle::setMomentumScalingFactor
+Untested method Particle::setMomentumSmearingFactor
 Untested method Particle::setMomentumVertexErrorMatrix
 Untested method Particle::setPValue
 Untested method Particle::setProperty

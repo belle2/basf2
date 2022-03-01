@@ -19,6 +19,7 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::analysis;
 using namespace CLHEP;
+using namespace ROOT::Math;
 
 RecoilMassKFit::RecoilMassKFit()
 {
@@ -32,7 +33,7 @@ RecoilMassKFit::RecoilMassKFit()
   m_lam = HepMatrix(1, 1, 0);
   m_AfterVertexError = HepSymMatrix(3, 0);
   m_recoilMass = -1.0;
-  m_FourMomentum = TLorentzVector();
+  m_FourMomentum = PxPyPzEVector();
 }
 
 
@@ -71,7 +72,7 @@ RecoilMassKFit::setRecoilMass(const double m) {
 
 
 enum KFitError::ECode
-RecoilMassKFit::setFourMomentum(const  TLorentzVector& m) {
+RecoilMassKFit::setFourMomentum(const PxPyPzEVector& m) {
   m_FourMomentum = m;
 
   return m_ErrorCode = KFitError::kNoError;
@@ -587,8 +588,8 @@ enum KFitError::ECode RecoilMassKFit::updateMother(Particle* mother)
   mother->writeExtraInfo("ndf", ndf);
 
   mother->updateMomentum(
-    CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
-    CLHEPToROOT::getTVector3(kmm.getMotherPosition()),
+    CLHEPToROOT::getLorentzVector(kmm.getMotherMomentum()),
+    CLHEPToROOT::getXYZVector(kmm.getMotherPosition()),
     CLHEPToROOT::getTMatrixFSym(kmm.getMotherError()),
     prob);
   m_ErrorCode = KFitError::kNoError;

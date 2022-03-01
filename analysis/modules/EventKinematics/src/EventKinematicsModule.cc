@@ -55,16 +55,16 @@ void EventKinematicsModule::event()
   if (!m_eventKinematics) m_eventKinematics.construct(m_usingMC);
   EventKinematicsModule::getParticleMomentumLists(m_particleLists);
 
-  TVector3 missingMomentum = EventKinematicsModule::getMissingMomentum();
+  ROOT::Math::XYZVector missingMomentum = EventKinematicsModule::getMissingMomentum();
   m_eventKinematics->addMissingMomentum(missingMomentum);
 
-  TVector3 missingMomentumCMS = EventKinematicsModule::getMissingMomentumCMS();
+  ROOT::Math::XYZVector missingMomentumCMS = EventKinematicsModule::getMissingMomentumCMS();
   m_eventKinematics->addMissingMomentumCMS(missingMomentumCMS);
 
   float missingEnergyCMS = EventKinematicsModule::getMissingEnergyCMS();
   m_eventKinematics->addMissingEnergyCMS(missingEnergyCMS);
 
-  float missingMass2 = missingEnergyCMS * missingEnergyCMS - missingMomentumCMS.Mag() * missingMomentumCMS.Mag();
+  float missingMass2 = missingEnergyCMS * missingEnergyCMS - missingMomentumCMS.R() * missingMomentumCMS.R();
   m_eventKinematics->addMissingMass2(missingMass2);
 
   float visibleEnergyCMS = EventKinematicsModule::getVisibleEnergyCMS();
@@ -103,7 +103,7 @@ void EventKinematicsModule::getParticleMomentumLists(vector<string> particleList
         B2FATAL("EventKinematics received reconstructed Particles as an input, but usingMC flag is true");
       }
 
-      TLorentzVector p_lab = part->get4Vector();
+      ROOT::Math::PxPyPzEVector p_lab = part->get4Vector();
       m_particleMomentumList.push_back(p_lab);
 
       if ((part->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster or
@@ -111,7 +111,7 @@ void EventKinematicsModule::getParticleMomentumLists(vector<string> particleList
           and (part->getPDGCode() == Const::photon.getPDGCode()))
         m_photonsMomentumList.push_back(p_lab);
 
-      TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
+      ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * p_lab;
       m_particleMomentumListCMS.push_back(p_cms);
     }
   }
@@ -119,11 +119,11 @@ void EventKinematicsModule::getParticleMomentumLists(vector<string> particleList
 }
 
 
-TVector3 EventKinematicsModule::getMissingMomentum()
+ROOT::Math::XYZVector EventKinematicsModule::getMissingMomentum()
 {
   PCmsLabTransform T;
-  TLorentzVector beam = T.getBeamFourMomentum();
-  TVector3 p = beam.Vect();
+  ROOT::Math::PxPyPzEVector beam = T.getBeamFourMomentum();
+  ROOT::Math::XYZVector p = beam.Vect();
   int nParticles = m_particleMomentumList.size();
   for (int i = 0; i < nParticles; ++i) {
     p -= m_particleMomentumList.at(i).Vect();
@@ -131,9 +131,9 @@ TVector3 EventKinematicsModule::getMissingMomentum()
   return p;
 }
 
-TVector3 EventKinematicsModule::getMissingMomentumCMS()
+ROOT::Math::XYZVector EventKinematicsModule::getMissingMomentumCMS()
 {
-  TVector3 p(0., 0., 0.);
+  ROOT::Math::XYZVector p(0., 0., 0.);
   int nParticles = m_particleMomentumListCMS.size();
   for (int i = 0; i < nParticles; ++i) {
     p -= m_particleMomentumListCMS.at(i).Vect();

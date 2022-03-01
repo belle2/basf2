@@ -13,7 +13,6 @@
 #include <analysis/dataobjects/EventExtraInfo.h>
 
 #include <TDatabasePDG.h>
-#include <TLorentzVector.h>
 #include <TRandom3.h>
 
 #include <generators/utilities/InitialParticleGeneration.h>
@@ -329,7 +328,7 @@ void BabayagaNLO::init()
 }
 
 
-void BabayagaNLO::generateEvent(MCParticleGraph& mcGraph, double ecm, TVector3 vertex, TLorentzRotation boost)
+void BabayagaNLO::generateEvent(MCParticleGraph& mcGraph, double ecm, TVector3 vertex, ROOT::Math::LorentzRotation boost)
 {
   //Generate event
   int mode = 1;
@@ -485,8 +484,8 @@ void BabayagaNLO::applySettings()
 }
 
 
-void BabayagaNLO::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex, TLorentzRotation boost,
-                                bool isVirtual, bool isInitial, bool isISRFSR)
+void BabayagaNLO::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex,
+                                ROOT::Math::LorentzRotation boost, bool isVirtual, bool isInitial, bool isISRFSR)
 {
 
 //   Create particle
@@ -517,13 +516,13 @@ void BabayagaNLO::storeParticle(MCParticleGraph& mcGraph, const double* mom, int
   part.setEnergy(mom[3]);
 
   //boost
-  TLorentzVector p4 = part.get4Vector();
+  ROOT::Math::PxPyPzEVector p4 = part.get4Vector();
   p4 = boost * p4;
   part.set4Vector(p4);
 
   //set vertex
   if (!isInitial) {
-    TVector3 v3 = part.getProductionVertex();
+    B2Vector3D v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

@@ -2,7 +2,7 @@ Import('env')
 
 env['LIBS'] = [
     'framework', 'framework_io', 'framework_utilities_testhelpers',
-    '$ROOT_LIBS',
+    '$ROOT_LIBS', 'GenVector',
     'boost_filesystem', 'boost_system',
     '$XML_LIBS',
     '$SQLITE_LIBS',

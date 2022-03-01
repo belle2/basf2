@@ -20,6 +20,7 @@
 #include <genfit/TrackPoint.h>
 #include <TVector3.h>
 #include <TDirectory.h>
+#include <Math/Boost.h>
 #include <math.h>
 #include <iostream>
 #include <algorithm>
@@ -219,8 +220,9 @@ void SVDEventT0PerformanceTTreeModule::event()
         m_svdTrkPValue.push_back(tfr->getPValue());
         m_svdTrkCharge.push_back(tfr->getChargeSign());
         m_svdTrkNDF.push_back(tfr->getNDF());
-        TLorentzVector pStar = tfr->get4Momentum();
-        pStar.Boost(0, 0, 3. / 11);
+        ROOT::Math::PxPyPzEVector pStar = tfr->get4Momentum();
+        ROOT::Math::BoostZ boost(3. / 11);
+        pStar = boost(pStar);
         m_svdTrkpCM.push_back(pStar.P());
       }
 

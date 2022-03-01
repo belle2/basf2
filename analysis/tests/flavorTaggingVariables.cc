@@ -27,7 +27,6 @@
 #include <gtest/gtest.h>
 
 #include <TMatrixFSym.h>
-#include <TLorentzVector.h>
 
 using namespace std;
 using namespace Belle2;
@@ -170,8 +169,8 @@ namespace {
     /** Create charged particles from tracks for first ROE. */
     for (unsigned i = 0; i < roeTRFCharges.size(); ++i) {
 
-      TVector3 position(roeTFRProperties[i][0], roeTFRProperties[i][1], roeTFRProperties[i][2]);
-      TVector3 momentum(roeTFRProperties[i][3], roeTFRProperties[i][4], roeTFRProperties[i][5]);
+      B2Vector3D position(roeTFRProperties[i][0], roeTFRProperties[i][1], roeTFRProperties[i][2]);
+      B2Vector3D momentum(roeTFRProperties[i][3], roeTFRProperties[i][4], roeTFRProperties[i][5]);
 
       testsTFRs.appendNew(position, momentum, cov6, roeTRFCharges[i], Const::pion, roeTFRProperties[i][6], bField, roeTRFCDCValues[i],
                           roeTRFVXDValues[i], 0);
@@ -227,7 +226,7 @@ namespace {
 
 
     /** Test if we created the ROE ECLCLusters correctly */
-    TLorentzVector roe1FourVectorECLClusters = roe -> get4VectorNeutralECLClusters();
+    ROOT::Math::PxPyPzEVector roe1FourVectorECLClusters = roe->get4VectorNeutralECLClusters();
 
     B2INFO("The total four momentum of the neutral clusters in the first test ROE is = ("
            << roe1FourVectorECLClusters.E() << ", "

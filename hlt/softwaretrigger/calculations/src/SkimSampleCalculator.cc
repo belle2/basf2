@@ -42,7 +42,8 @@ using namespace SoftwareTrigger;
 SkimSampleCalculator::SkimSampleCalculator() :
   m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim"), m_pionHadParticles("pi+:hadb"), m_pionTauParticles("pi+:tau"),
   m_KsParticles("K_S0:merged"), m_LambdaParticles("Lambda0:merged"), m_DstParticles("D*+:d0pi"), m_offIpParticles("pi+:offip"),
-  m_filterL1TrgNN("software_trigger_cut&filter&L1_trigger_nn_info")
+  m_filterL1TrgNN("software_trigger_cut&filter&L1_trigger_nn_info"),
+  m_BpParticles("B+:BtoCharmForHLT"), m_BzParticles("B0:BtoCharmForHLT")
 {
 
 }
@@ -57,6 +58,8 @@ void SkimSampleCalculator::requireStoreArrays()
   m_LambdaParticles.isOptional();
   m_DstParticles.isOptional();
   m_offIpParticles.isRequired();
+  m_BpParticles.isOptional();
+  m_BzParticles.isOptional();
 
 };
 
@@ -791,6 +794,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   // Flag for events with Trigger B2Link information
   calculationResult["NeuroTRG"] = 0;
+  calculationResult["GammaGammaFilter"] = 0;
 
   StoreObjPtr<SoftwareTriggerResult> filter_result;
   if (filter_result.isValid()) {
@@ -799,6 +803,11 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       const bool hasNN = (filter_result->getNonPrescaledResult(m_filterL1TrgNN) == SoftwareTriggerCutResult::c_accept);
       if (hasNN) calculationResult["NeuroTRG"] = 1;
     }
+    const bool ggEndcap = (filter_result->getNonPrescaledResult("software_trigger_cut&filter&ggEndcapLoose") ==
+                           SoftwareTriggerCutResult::c_accept);
+    const bool ggBarrel = (filter_result->getNonPrescaledResult("software_trigger_cut&filter&ggBarrelLoose") ==
+                           SoftwareTriggerCutResult::c_accept);
+    if (ggEndcap || ggBarrel) calculationResult["GammaGammaFilter"] = 1;
   }
 
   //Dimuon skim with invariant mass cut allowing at most one track not to be associated with ECL clusters
@@ -853,4 +862,17 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   }
 
   calculationResult["MumuHighM"] = mumuHighMass;
+
+  // BtoCharm skims
+  calculationResult["Bp"] = 0;
+  calculationResult["Bz"] = 0;
+
+  if (m_BpParticles.isValid() && (ntrk_bha >= 3 && Bhabha2Trk == 0)) {
+    calculationResult["Bp"] = m_BpParticles->getListSize() >= 1;
+  }
+
+  if (m_BzParticles.isValid() && (ntrk_bha >= 3 && Bhabha2Trk == 0)) {
+    calculationResult["Bz"] = m_BzParticles->getListSize() >= 1;
+  }
+
 }

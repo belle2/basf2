@@ -120,14 +120,14 @@ for (particleList, category, _) in ft.getEventLevelParticleLists(categories):
 
         managerVariableName = str(Belle2.MakeROOTCompatible.invertMakeROOTCompatible(iVariable.GetName()))
 
-        if managerVariableName in ft.variables_dict[category] or managerVariableName == 'distance' or\
+        if managerVariableName in ft.getTrainingVariables(category) or managerVariableName == 'distance' or\
                 managerVariableName == 'z0' or managerVariableName == 'ImpactXY' or\
                 managerVariableName == 'y' or managerVariableName == 'OBoost':
             if managerVariableName in categoryInputVariables:
                 continue
 
             categoryInputVariables.append(managerVariableName)
-            if managerVariableName in ft.variables_dict[category]:
+            if managerVariableName in ft.getTrainingVariables(category):
                 allInputVariables.append((category, managerVariableName))
                 trulyUsedInputVariables.append((category, managerVariableName))
 
@@ -394,7 +394,7 @@ for (particleList, category, _) in ft.getEventLevelParticleLists(categories):
 totalNumberOfVariables = 0
 
 for category in ft.variables_fict:
-    totalNumberOfVariables += len(ft.variables_dict[category])
+    totalNumberOfVariables += len(ft.getTrainingVariables(category))
 
 print("Total number of variables = ", totalNumberOfVariables)
 

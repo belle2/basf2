@@ -1,6 +1,14 @@
 Changes in the analysis package since release-06-00
 ---------------------------------------------------
 
+
+Lepton ID Analysis Helper
++++++++++++++++++++++++++
+
+ * Added :func:`stdCharged.stdLep` helper to build standard lepton lists for a number of supported working
+   points and LID methods (Likelihood ratio or BDT, gloabl or binary). The helper also decorates the particles with the
+   recommended Data/MC corrections and associated uncertainties for efficiency and fake rates, based on the chosen GT.
+
 Neutral Hadron Analysis Tool
 ++++++++++++++++++++++++++++
 
@@ -11,7 +19,7 @@ Neutral Hadron Analysis Tool
 
 Vertex Fitting
 ++++++++++++++
- * Added a new fit-type option ``recoilmass`` to function :func:`vertex.kFit`. The kinematic fit is performed with a constraint 
+ * Added a new fit-type option ``recoilmass`` to function :func:`vertex.kFit`. The kinematic fit is performed with a constraint
    of a recoil mass specified by the option ``recoilMass``.
  * Fixed a bug in ``fourC`` and ``massfourC`` kfit. The mass of final-state particles were not fixed in old version.
 
@@ -25,14 +33,14 @@ Variables
  * Added ``clusterTotalMCMatchWeight`` which returns the sum of all deposited MC energies that can be used to identify beam
    background clusters.
  * The no ROE mask case in the ROE-related variables has now a different name: ``"all"`` instead of an empty string ``""``.
-   Similarly to the ParticleLoader's ``all`` particle lists, this name is reserved, user cannot create a mask with this name. 
-   If ``maskName`` argument is not specified in the ROE-related metavariables, it will default to ``all`` automatically, 
-   but in case of metavariables with many arguments user will be required to call it explicitly, e.g. ``nROE_Charged(all, 321)``. 
+   Similarly to the ParticleLoader's ``all`` particle lists, this name is reserved, user cannot create a mask with this name.
+   If ``maskName`` argument is not specified in the ROE-related metavariables, it will default to ``all`` automatically,
+   but in case of metavariables with many arguments user will be required to call it explicitly, e.g. ``nROE_Charged(all, 321)``.
  * Added ``v0DaughterNRemovedHits`` which returns the number of track hits removed in V0Finder.
  * Added `hadronicSplitOffSuppression` which returns the output of an MVA that uses shower-related variables to distinguish
    between true photons and hadronic split-offs.
- * The variable ``beamBackgroundProbabilityMVA`` now has a new name: `beamBackgroundSuppression`. The weight files for this 
-   MVA have also been updated due to a change in training samples used. 
+ * The variable ``beamBackgroundProbabilityMVA`` now has a new name: `beamBackgroundSuppression`. The weight files for this
+   MVA have also been updated due to a change in training samples used.
  * Added `mostcommonBTagIndex` which returns the B meson index from which most FSP from a given reconstructed B meson candidate
    originated. Use case would be e.g. the FEI.
  * Added `percentageMissingParticlesBTag` which determines the percentage of FSP missed by using the `mostcommonBTagIndex` of the B
@@ -73,13 +81,14 @@ Modules
    errors as extrainfo variables for a given hard photon and the veto threshold. `addPi0VetoEfficiencySystematics` is a
    corresponding wrapper function.
  * Added an option ``skipNonPrimary`` to ``fillParticleListFromMC`` and ``fillParticleListsFromMC``.
+ * Added an argument ``prefix`` to :func:`flavorTagger.flavorTagger` so that one can choose the version of weight files.
 
-PID Priors 
+PID Priors
 ++++++++++
 
  * Added ``analysis-train-priors`` tool that trains a pytorch model for calculating PID priors using an ntuple containing momentum
    and cos(:math:`\theta`) information. It generates a second order combination of the previously mentioned variables along with
    transverse momentum giving a total of nine features and trains the model using a taylor series of cross entropy loss to reduce
    the effect of outliers on the training.
- * For evaluating priors, ``evalPriors`` module containing the ``Priors`` class has been added to calculate these using 
+ * For evaluating priors, ``evalPriors`` module containing the ``Priors`` class has been added to calculate these using
    the trained model. Additionally, posteriors can also be obtained by providing PID's from the detector signals.

@@ -39,21 +39,42 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     DQMHistOutputToEPICSModule();
-    //! Destructor
+
+    /**
+     * Destructor.
+     */
     ~DQMHistOutputToEPICSModule();
 
-  private:
-
-    //! Module functions to be called from main process
+    /**
+     * Initializer.
+     */
     void initialize(void) override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun(void) override final;
+
+    /**
+     * This method is called for each event.
+     */
     void endRun(void) override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
     void event(void) override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate(void) override final;
+
+  private:
 
     //! copy over to "last" PV
     void copyToLast(void);

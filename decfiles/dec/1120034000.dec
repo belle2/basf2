@@ -8,13 +8,11 @@
 # Email: riccardo.manfredi@ts.infn.it
 # Cuts: None
 # Date: 28/02/2022
-###
-###
-###
+
 Alias B0sig B0
 Alias anti-B0sig anti-B0
 ChargeConj B0sig anti-B0sig
-###
+
 Decay Upsilon(4S)
 1.00000 B0 anti-B0 B0sig anti-B0sig                   VSS_BMIX dm;
 Enddecay
@@ -25,14 +23,9 @@ Enddecay
 ### |H0| = sqrt(f_L), |H-|=|H+| = sqrt((1-f_L)/2)
 ### PDG f_L = 1
 Decay B0sig
-0.50       rho+ a_1-               PHOTOS SVV_HELAMP  0.0 0.0 1.0 0.0 0.0 0.0;     # UL
-0.50       rho- a_1+               PHOTOS SVV_HELAMP  0.0 0.0 1.0 0.0 0.0 0.0;     # UL
+0.50       rho+ a_1-               PHOTOS SVV_HELAMP  0.0 0.0 1.0 0.0 0.0 0.0;     
+0.50       rho- a_1+               PHOTOS SVV_HELAMP  0.0 0.0 1.0 0.0 0.0 0.0;     
 Enddecay
 CDecay anti-B0sig
-###
-### rho+ => pi+ pi0
-### rho- => pi- pi0
-###
-### 
-###
+
 End

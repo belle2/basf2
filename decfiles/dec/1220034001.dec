@@ -8,13 +8,11 @@
 # Email: riccardo.manfredi@ts.infn.it
 # Cuts: None
 # Date: 28/02/2022
-### 
-###
-###
+
 Alias B-sig B-
 Alias B+sig B+
 ChargeConj B-sig B+sig
-###
+
 Decay Upsilon(4S)
 0.50000 B- B+sig  VSS;
 0.50000 B+ B-sig  VSS;
@@ -29,10 +27,5 @@ Decay B+sig
 1.0       rho0 a_1+             PHOTOS SVV_HELAMP  0.0 0.0 1.0 0.0 0.0 0.0;
 Enddecay
 CDecay B-sig
-###
-### rho0 => pi+ pi-
-### 
-###
-### 
-###
+
 End

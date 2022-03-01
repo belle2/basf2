@@ -16,6 +16,7 @@
 
 #include <map>
 #include <TRandom.h>
+#include <Math/Vector4D.h>
 
 using namespace Belle2;
 
@@ -201,7 +202,7 @@ void TrackingMomentumModule::setMomentumScalingFactor(Particle* particle)
       pz += daughter->getPz();
       E  += daughter->getEnergy();
     }
-    const TLorentzVector vec(px, py, pz, E);
+    const ROOT::Math::PxPyPzEVector vec(px, py, pz, E);
     particle->set4Vector(vec);
   } else if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Track) {
     if (!isnan(m_scale)) {

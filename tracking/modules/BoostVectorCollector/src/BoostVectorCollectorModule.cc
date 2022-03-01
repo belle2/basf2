@@ -95,8 +95,8 @@ void BoostVectorCollectorModule::collect()
   m_mu1_pid = part1->getPIDLikelihood()->getProbability(Const::ChargedStable(13), Const::ChargedStable(11));
 
   // get 3-vectors of the mu/e momenta
-  m_mu0_p = part0->getMomentum();
-  m_mu1_p = part1->getMomentum();
+  m_mu0_p = B2Vector3D(part0->getMomentum());
+  m_mu1_p = B2Vector3D(part1->getMomentum());
 
 
   getObjectPtr<TTree>("events")->Fill();

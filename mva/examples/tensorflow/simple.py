@@ -18,50 +18,56 @@ from basf2_mva_python_interface.tensorflow import State
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
+    """
+    Return simple tensorflow model
+    """
 
-    tf.reset_default_graph()
-    x = tf.placeholder(tf.float32, [None, number_of_features])
-    y = tf.placeholder(tf.float32, [None, 1])
+    gpus = tf.config.list_physical_devices('GPU')
+    if gpus:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
 
-    def layer(x, shape, name, unit=tf.sigmoid):
-        with tf.name_scope(name):
-            weights = tf.Variable(tf.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))), name='weights')
-            biases = tf.Variable(tf.constant(0.0, shape=[shape[1]]), name='biases')
-            layer = unit(tf.matmul(x, weights) + biases)
-        return layer
+    class my_model(tf.Module):
 
-    inference_hidden1 = layer(x, [number_of_features, number_of_features + 1], 'inference_hidden1')
-    inference_activation = layer(inference_hidden1, [number_of_features + 1, 1], 'inference_sigmoid', unit=tf.sigmoid)
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
 
-    epsilon = 1e-5
-    inference_loss = -tf.reduce_sum(y * tf.log(inference_activation + epsilon) +
-                                    (1.0 - y) * tf.log(1 - inference_activation + epsilon))
+            self.optimizer = tf.optimizers.Adam(0.01)
+            shape = [number_of_features, number_of_features]
+            self.W_hidden1 = tf.Variable(
+                tf.random.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))),
+                name='hidden1_weights')
+            self.b_hidden1 = tf.Variable(tf.zeros(shape=[shape[1]]), name='hidden1_biases')
 
-    inference_optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
-    inference_minimize = inference_optimizer.minimize(inference_loss)
+            shape = [number_of_features, 1]
+            self.W_activation = tf.Variable(
+                tf.random.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))),
+                name='activation_weights')
+            self.b_activation = tf.Variable(tf.zeros(shape=[shape[1]]), name='activation_biases')
 
-    init = tf.global_variables_initializer()
+        @tf.function(input_signature=[tf.TensorSpec(shape=[None, number_of_features], dtype=tf.float32)])
+        def __call__(self, x):
 
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    session = tf.Session(config=config)
+            # __call__ cannot create any new Variables
+            def dense(x, W, b, activation_function):
+                return activation_function(tf.matmul(x, W) + b)
 
-    session.run(init)
-    state = State(x, y, inference_activation, inference_loss, inference_minimize, session)
+            hidden1 = dense(self.clean_nans(x), self.W_hidden1, self.b_hidden1, tf.nn.sigmoid)
+            activation = dense(hidden1, self.W_activation, self.b_activation, tf.nn.sigmoid)
+            return activation
+
+        @tf.function
+        def clean_nans(self, x):
+            return tf.where(tf.math.is_nan(x), tf.zeros_like(x), x)
+
+        @tf.function
+        def loss(self, predicted_y, target_y, w):
+            epsilon = 1e-5
+            diff_from_truth = tf.where(target_y == 1., predicted_y, 1. - predicted_y)
+            return - tf.reduce_sum(w * tf.math.log(diff_from_truth + epsilon)) / tf.reduce_sum(w)
+
+    state = State(model=my_model())
     return state
-
-
-def partial_fit(state, X, S, y, w, epoch):
-    """
-    Pass received data to tensorflow session
-    """
-    feed_dict = {state.x: X, state.y: y}
-    state.session.run(state.optimizer, feed_dict=feed_dict)
-
-    if epoch % 100 == 0:
-        avg_cost = state.session.run(state.cost, feed_dict=feed_dict)
-        print("Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
-    return True
 
 
 if __name__ == "__main__":
@@ -84,7 +90,7 @@ if __name__ == "__main__":
                  'daughter(0, dz)', 'daughter(1, dz)',
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
                  'daughter(0, kaonID)', 'daughter(0, pionID)',
-                 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
+                 'daughterInvM(0, 1)', 'daughterInvM(0, 2)', 'daughterInvM(1, 2)']
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
@@ -104,5 +110,5 @@ if __name__ == "__main__":
     p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
     inference_stop = time.time()
     inference_time = inference_stop - inference_start
-    auc = basf2_mva_util.calculate_roc_auc(p, t)
+    auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
     print("Tensorflow", training_time, inference_time, auc)

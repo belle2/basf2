@@ -54,6 +54,14 @@ And similarly for :py:func:`modularAnalysis.inputMdstList`.
 
 .. include:: framework/doc/whatsnew-since/release-06-00.txt
 
+.. List of changes for the b2bii package
+
+.. include:: b2bii/doc/whatsnew-since/release-06-00.txt
+
+.. List of changes for the mva package
+
+.. include:: mva/doc/whatsnew-since/release-06-00.txt
+
 Changes since release-05
 ========================
 

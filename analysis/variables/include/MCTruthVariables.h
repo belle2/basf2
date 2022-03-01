@@ -10,7 +10,7 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 
 #include <vector>
 
@@ -210,7 +210,7 @@ namespace Belle2 {
     /**
      * Helper function: return total 4-momentum of all daughter neutrinos, recursively down decay tree
      */
-    TLorentzVector MCInvisibleP4(const MCParticle* mcparticle);
+    ROOT::Math::PxPyPzEVector MCInvisibleP4(const MCParticle* mcparticle);
 
     /**
      * return cosThetaBetweenParticleAndNominalB using B momentum with all (grand^n)daughter neutrino momenta subtracted

@@ -55,7 +55,7 @@ NSMCommunicator& NSMCommunicator::select(double usec)
   int highest = 0;
   LockGuard lockGuard(g_mutex_select);
   for (NSMCommunicatorList::iterator it = g_comm.begin();
-       it != g_comm.end(); it++) {
+       it != g_comm.end(); ++it) {
     NSMCommunicator& com(*(*it));
     if (com.m_nsmc != NULL) {
       FD_SET(com.m_nsmc->sock, &fds);
@@ -79,7 +79,7 @@ NSMCommunicator& NSMCommunicator::select(double usec)
     throw (NSMHandlerException("Failed to select"));
   }
   for (NSMCommunicatorList::iterator it = g_comm.begin();
-       it != g_comm.end(); it++) {
+       it != g_comm.end(); ++it) {
     NSMCommunicator& com(*(*it));
     if (com.m_nsmc != NULL) {
       if (FD_ISSET(com.m_nsmc->sock, &fds)) {
@@ -96,7 +96,7 @@ NSMCommunicator& NSMCommunicator::select(double usec)
 NSMCommunicator& NSMCommunicator::connected(const std::string& node)
 {
   for (NSMCommunicatorList::iterator it = g_comm.begin();
-       it != g_comm.end(); it++) {
+       it != g_comm.end(); ++it) {
     NSMCommunicator& com(*(*it));
     if (com.isConnected(node)) return com;
   }
@@ -111,7 +111,7 @@ bool NSMCommunicator::send(const NSMMessage& msg)
   LockGuard lockGuard(g_mutex);
   std::string emsg;
   for (NSMCommunicatorList::iterator it = g_comm.begin();
-       it != g_comm.end(); it++) {
+       it != g_comm.end(); ++it) {
     NSMCommunicator& com(*(*it));
     const char* node = msg.getNodeName();
     if (com.isConnected(node)) {
@@ -194,7 +194,7 @@ void NSMCommunicator::setCallback(NSMCallback* callback)
     m_callback = callback;
     NSMCallback::NSMCommandList& req_v(callback->getCommandList());
     for (NSMCallback::NSMCommandList::iterator it = req_v.begin();
-         it != req_v.end(); it++) {
+         it != req_v.end(); ++it) {
       NSMCommand& command(*it);
       if (b2nsm_callback(command.getLabel(), NULL) < 0) {
         m_id = -1;

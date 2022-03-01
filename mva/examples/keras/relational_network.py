@@ -13,16 +13,15 @@
 # Relevant Paper: https://arxiv.org/abs/1706.01427
 # If you want to try out relational networks to your problem, feel free to import the two classes in your code.
 
-from basf2_mva_python_interface.contrib_keras import State
+from basf2_mva_python_interface.keras import State
 
 
-from keras.layers import Dense, GlobalAveragePooling1D, Input
-from keras.layers.core import Reshape
-from keras.models import Model
-from keras.optimizers import Adam
-from keras.losses import binary_crossentropy
-from keras.activations import sigmoid, tanh
-from keras.callbacks import Callback, EarlyStopping
+from tensorflow.keras.layers import Dense, GlobalAveragePooling1D, Input, Reshape
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import binary_crossentropy
+from tensorflow.keras.activations import sigmoid, tanh
+from tensorflow.keras.callbacks import Callback, EarlyStopping
 import numpy as np
 
 from basf2_mva_extensions.keras_relational import Relations
@@ -138,7 +137,7 @@ if __name__ == "__main__":
             print('Building ' + filename)
             # Use random numbers to build all training and spectator variables.
             data = np.random.normal(size=[number_of_events, number_total_lines * 6])
-            target = np.zeros([number_of_events], dtype=bool)
+            target = np.zeros([number_of_events], dtype=np.bool)
 
             # Overwrite for half of the variables some lines so that they are hitting each other.
             # Write them also at the end for the spectators.
@@ -157,7 +156,7 @@ if __name__ == "__main__":
                 dic.update({name: data[:, i]})
             dic.update({'isSignal': target})
 
-            df = pandas.DataFrame(dic, dtype=np.float32)
+            df = pandas.DataFrame(dic)
             to_root(df, os.path.join(path, filename), key='variables')
 
         # ##########################Do Training#################################
@@ -170,7 +169,7 @@ if __name__ == "__main__":
         general_options.m_target_variable = "isSignal"
 
         specific_options = basf2_mva.PythonOptions()
-        specific_options.m_framework = "contrib_keras"
+        specific_options.m_framework = "keras"
         specific_options.m_steering_file = 'mva/examples/keras/relational_network.py'
         specific_options.m_training_fraction = 0.999
 
@@ -198,5 +197,5 @@ if __name__ == "__main__":
         print('Apply feed forward net')
         p2, t2 = method2.apply_expert(test_data, general_options.m_treename)
 
-        print('Relational Net AUC: ', basf2_mva_util.calculate_roc_auc(p1, t1))
-        print('Feed Forward Net AUC: ', basf2_mva_util.calculate_roc_auc(p2, t2))
+        print('Relational Net AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p1, t1))
+        print('Feed Forward Net AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p2, t2))

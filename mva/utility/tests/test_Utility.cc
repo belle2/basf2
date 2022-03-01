@@ -28,12 +28,12 @@ namespace {
     MVA::Weightfile::save(weightfile, "MVAInterfaceTest.xml");
     MVA::Weightfile::save(weightfile, "MVAInterfaceTest");
 
-    EXPECT_FALSE(MVA::available("DOES_NOT_EXIST.root"));
-    EXPECT_FALSE(MVA::available("DOES_NOT_EXIST.xml"));
-    EXPECT_FALSE(MVA::available("DOES_NOT_EXIST"));
-    EXPECT_TRUE(MVA::available("MVAInterfaceTest.root"));
-    EXPECT_TRUE(MVA::available("MVAInterfaceTest.xml"));
-    EXPECT_TRUE(MVA::available("MVAInterfaceTest"));
+    EXPECT_FALSE(MVA::Utility::available("DOES_NOT_EXIST.root"));
+    EXPECT_FALSE(MVA::Utility::available("DOES_NOT_EXIST.xml"));
+    EXPECT_FALSE(MVA::Utility::available("DOES_NOT_EXIST"));
+    EXPECT_TRUE(MVA::Utility::available("MVAInterfaceTest.root"));
+    EXPECT_TRUE(MVA::Utility::available("MVAInterfaceTest.xml"));
+    EXPECT_TRUE(MVA::Utility::available("MVAInterfaceTest"));
 
     Database::reset();
   }

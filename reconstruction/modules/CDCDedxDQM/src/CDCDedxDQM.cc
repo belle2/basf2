@@ -145,8 +145,8 @@ void CDCDedxDQMModule::event()
     static DBObjPtr<BeamSpot> beamSpotDB;
     helix.passiveMoveBy(beamSpotDB->getIPPosition());
     const auto& frame = ReferenceFrame::GetCurrent();
-    double dr = frame.getVertex(helix.getPerigee()).Perp();
-    double dz = frame.getVertex(helix.getPerigee()).Z();
+    double dr = frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee())).Rho();
+    double dz = frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee())).Z();
     if (dr >= 1.0 || fabs(dz) >= 1.0)continue;
 
     //CDC acceptance as well

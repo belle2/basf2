@@ -17,7 +17,7 @@ using namespace Belle2;
 using namespace std;
 
 // Constructor
-DqmMemFile::DqmMemFile(string name, string mode, int size)
+DqmMemFile::DqmMemFile(string name, const string& mode, int size)
 {
   // Record parameters
   m_size = size;
@@ -45,7 +45,7 @@ DqmMemFile::DqmMemFile(string name, string mode, int size)
     printf("DqmMemFile : TMemFile is opend in READ mode.\n");
 }
 
-DqmMemFile::DqmMemFile(int shm_id, int sem_id, string mode, int size)
+DqmMemFile::DqmMemFile(int shm_id, int sem_id, const string& mode, int size)
 {
   // Record parameters
   m_size = size;

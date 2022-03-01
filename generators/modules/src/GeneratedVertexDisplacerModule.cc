@@ -97,10 +97,10 @@ void GeneratedVertexDisplacerModule::event()
 
 void GeneratedVertexDisplacerModule::displace(MCParticle& particle, float lifetime)
 {
-  TLorentzVector* displacementVector = new TLorentzVector();
+  ROOT::Math::PxPyPzEVector* displacementVector = new ROOT::Math::PxPyPzEVector();
   getDisplacement(particle, lifetime, *displacementVector);
 
-  TVector3 newDecayVertex = particle.getProductionVertex();
+  B2Vector3D newDecayVertex = particle.getProductionVertex();
   newDecayVertex.SetX(newDecayVertex.X() + displacementVector->X());
   newDecayVertex.SetY(newDecayVertex.Y() + displacementVector->Y());
   newDecayVertex.SetZ(newDecayVertex.Z() + displacementVector->Z());
@@ -118,7 +118,8 @@ void GeneratedVertexDisplacerModule::displace(MCParticle& particle, float lifeti
 }
 
 
-void GeneratedVertexDisplacerModule::displaceDaughter(TLorentzVector& motherDisplacementVector, std::vector<MCParticle*> daughters)
+void GeneratedVertexDisplacerModule::displaceDaughter(ROOT::Math::PxPyPzEVector& motherDisplacementVector,
+                                                      std::vector<MCParticle*> daughters)
 {
   for (unsigned int daughter_index = 0; daughter_index < daughters.size(); daughter_index++) {
 
@@ -127,7 +128,7 @@ void GeneratedVertexDisplacerModule::displaceDaughter(TLorentzVector& motherDisp
 
     // getDaughters returns a copied list, need to change parameters of the original particle in the MCParticle StoreArray.
     MCParticle& mcp = *m_mcparticles[daughter_mcpArrayIndex];
-    mcp.setProductionVertex(mcp.getProductionVertex() + motherDisplacementVector.Vect());
+    mcp.setProductionVertex(B2Vector3D(mcp.getProductionVertex() + motherDisplacementVector.Vect()));
     mcp.setProductionTime(mcp.getProductionTime() + motherDisplacementVector.T());
     mcp.setValidVertex(true);
 
@@ -140,9 +141,9 @@ void GeneratedVertexDisplacerModule::displaceDaughter(TLorentzVector& motherDisp
 
 
 void GeneratedVertexDisplacerModule::getDisplacement(
-  const MCParticle& particle, float lifetime, TLorentzVector& displacement)
+  const MCParticle& particle, float lifetime, ROOT::Math::PxPyPzEVector& displacement)
 {
-  TLorentzVector fourVector_mcp = particle.get4Vector();
+  ROOT::Math::PxPyPzEVector fourVector_mcp = particle.get4Vector();
   float decayLength_mcp = 0;
   if (!m_ctau) lifetime *= Const::speedOfLight;
 
@@ -158,10 +159,10 @@ void GeneratedVertexDisplacerModule::getDisplacement(
   }
 
   float pMag = fourVector_mcp.P();
-  displacement.SetX(decayLength_mcp * fourVector_mcp.X() / pMag);
-  displacement.SetY(decayLength_mcp * fourVector_mcp.Y() / pMag);
-  displacement.SetZ(decayLength_mcp * fourVector_mcp.Z() / pMag);
-  displacement.SetT(decayLength_mcp / (Const::speedOfLight * fourVector_mcp.Beta()));
+  displacement.SetPx(decayLength_mcp * fourVector_mcp.X() / pMag);
+  displacement.SetPy(decayLength_mcp * fourVector_mcp.Y() / pMag);
+  displacement.SetPz(decayLength_mcp * fourVector_mcp.Z() / pMag);
+  displacement.SetE(decayLength_mcp / (Const::speedOfLight * fourVector_mcp.Beta()));
 }
 
 

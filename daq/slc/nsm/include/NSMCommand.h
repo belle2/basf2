@@ -47,8 +47,8 @@ namespace Belle2 {
     NSMCommand(const Enum& e) : Enum(e) {}
     NSMCommand(const NSMCommand& cmd) : Enum(cmd) {}
     NSMCommand(const char* label) { *this = label; }
-    NSMCommand(const std::string& label) { *this = label; }
-    NSMCommand(int id) { *this = id; }
+    explicit NSMCommand(const std::string& label) { *this = label; }
+    explicit NSMCommand(int id) { *this = id; }
     ~NSMCommand() {}
 
   public:

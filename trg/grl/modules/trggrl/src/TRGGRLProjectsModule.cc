@@ -23,7 +23,6 @@
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/TRGGDLDBInputBits.h>
 
-#include <TLorentzVector.h>
 #include <TMath.h>
 
 #include <iostream>
@@ -137,9 +136,9 @@ void TRGGRLProjectsModule::initialize()
 {
   radtodeg = 180. / TMath::Pi();
   //..Trigger ThetaID for each trigger cell. Could be replaced by getMaxThetaId() for newer MC
-  TrgEclMapping* trgecl_obj = new TrgEclMapping();
+  TrgEclMapping* eclMapping = new TrgEclMapping();
   for (int tc = 1; tc <= 576; tc++) {
-    TCThetaID.push_back(trgecl_obj->getTCThetaIdFromTCId(tc));
+    TCThetaID.push_back(eclMapping->getTCThetaIdFromTCId(tc));
   }
 
   //-----------------------------------------------------------------------------------------
@@ -148,11 +147,11 @@ void TRGGRLProjectsModule::initialize()
   for (int tc = 1; tc <= 576; tc++) {
 
     //..Four vector of a 1 GeV lab photon at this TC
-    TVector3 CellPosition = trgecl_obj->getTCPosition(tc);
-    TLorentzVector CellLab(1., 1., 1., 1.);
-    CellLab.SetTheta(CellPosition.Theta());
-    CellLab.SetPhi(CellPosition.Phi());
-    CellLab.SetRho(1.);
+    TVector3 CellPosition = eclMapping->getTCPosition(tc);
+    ROOT::Math::PxPyPzEVector CellLab;
+    CellLab.SetPx(CellPosition.Px() / CellPosition.Mag());
+    CellLab.SetPy(CellPosition.Py() / CellPosition.Mag());
+    CellLab.SetPz(CellPosition.Pz() / CellPosition.Mag());
     CellLab.SetE(1.);
 
     //..cotan Theta and phi in lab
@@ -161,7 +160,7 @@ void TRGGRLProjectsModule::initialize()
     TCcotThetaLab.push_back(1. / tantheta);
 
     //..Corresponding 4 vector in the COM frame
-    TLorentzVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
+    ROOT::Math::PxPyPzEVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
     TCThetaCOM.push_back(CellCOM.Theta()*radtodeg);
     TCPhiCOM.push_back(CellCOM.Phi()*radtodeg);
 
@@ -170,7 +169,7 @@ void TRGGRLProjectsModule::initialize()
   }
 
   //m_TRGGRLInfo.registerInDataStore(m_TrgGrlInformationName);
-
+  delete eclMapping;
 }
 
 void
@@ -808,8 +807,8 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "brlfb2") {bit = brlfb == 2;}
     else if (bitname == "brlnb1") {bit = brlnb == 1;}
     else if (bitname == "brlnb2") {bit = brlnb == 2;}
-    else if (bitname == "seklm_0") {bit = n_seklm == 0;}
-    else if (bitname == "seklm_1") {bit = n_seklm > 0;}
+    else if (bitname == "seklm_0") {bit = n_seklm == 1;}
+    else if (bitname == "seklm_1") {bit = n_seklm > 1;}
     else if (bitname == "ieklm") {bit = n_ieklm > 0;}
     else if (bitname == "secl") {bit = n_secl > 0;}
     else if (bitname == "iecl") {bit = n_iecl > 0;}

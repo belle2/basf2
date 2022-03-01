@@ -17,8 +17,6 @@
 #include <CLHEP/Vector/ThreeVector.h>
 
 /* C++ headers. */
-#include <vector>
-#include <algorithm>
 #include <string>
 
 using namespace Belle2;
@@ -195,7 +193,7 @@ void KLMDQM2Module::initialize()
 {
   REG_HISTOGRAM;
   //inputs
-  m_softwareTriggerResult.isRequired();
+  m_softwareTriggerResult.isOptional();
   m_MuonList.isRequired(m_MuonListName);
   m_Digits.isOptional();
   m_GeometryBKLM = bklm::GeometryPar::instance();
@@ -523,7 +521,7 @@ bool KLMDQM2Module::collectDataTrack(
        * The muons with sufficiently large momentum have a very small
        * probability to get absorbed in the detector.
        */
-      if (muon->getMomentum().Mag() < m_MinimalMomentumNoOuterLayers)
+      if (muon->getP() < m_MinimalMomentumNoOuterLayers)
         continue;
     }
     //Filling AddExtHits and MatchedHits histograms

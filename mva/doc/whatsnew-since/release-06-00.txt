@@ -1,0 +1,7 @@
+Changes in the mva package since release-06-00
+----------------------------------------------
+
+ * Deprecated ``basf2_mva_utils.calculate_roc_auc`` as it calculated the efficiency-purity auc not the roc
+   (efficiency-background retention) auc. Use instead ``basf2_mva_utils.calculate_auc_efficiency_vs_purity`` or 
+   ``basf2_mva_utils.calculate_auc_efficiency_vs_backround_retention``.
+

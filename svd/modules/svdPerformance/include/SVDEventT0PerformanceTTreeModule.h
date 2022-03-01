@@ -45,7 +45,7 @@ namespace Belle2 {
     std::string m_rootFileName = "";   /**< root file name */
     TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
 
-    std::string m_recoTracksStoreArrayName{"RecoTracks"};  /**< storeArray name of the input and output RecoTracks */
+    std::string m_recoTracksStoreArrayName = "";  /**< storeArray name of the input and output RecoTracks */
 
     TTree* m_t = nullptr; /**< tree containing info related to the clusters related to tracks*/
 

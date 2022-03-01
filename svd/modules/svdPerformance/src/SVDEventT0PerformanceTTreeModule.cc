@@ -114,8 +114,8 @@ void SVDEventT0PerformanceTTreeModule::event()
   m_eventT0 = -99; /**< final event T0 */
   m_eventT0Err = -99; /**< final event T0 error */
   m_cdcEventT0 = -99; /**< CDC event T0 */
-  m_cdcEventT0 = -99; /**< CDC event T0 */
-  m_topEventT0Err = -99; /**< TOP event T0 error */
+  m_cdcEventT0Err = -99; /**< CDC event T0 */
+  m_topEventT0 = -99; /**< TOP event T0 error */
   m_topEventT0Err = -99; /**< TOP event T0 error */
 
   StoreObjPtr<EventMetaData> evtMetaData;
@@ -130,18 +130,13 @@ void SVDEventT0PerformanceTTreeModule::event()
 
       if (m_EventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
         auto evtT0List_CDC = m_EventT0->getTemporaryEventT0s(Const::EDetector::CDC) ;
-
-        // set the CDC event t0 value for filling into the histogram
         //    The most accurate CDC event t0 value is the last one in the list.
         m_cdcEventT0 = evtT0List_CDC.back().eventT0 ;
         m_cdcEventT0Err = evtT0List_CDC.back().eventT0Uncertainty;
       }
 
-      // Set the TOP event t0 value if it exists
       if (m_EventT0->hasTemporaryEventT0(Const::EDetector::TOP)) {
         auto evtT0List_TOP = m_EventT0->getTemporaryEventT0s(Const::EDetector::TOP) ;
-
-        // set the TOP event t0 value for filling into the histogram
         //    There should only be at most one value in the list per event
         m_topEventT0 = evtT0List_TOP.back().eventT0 ;
         m_topEventT0Err = evtT0List_TOP.back().eventT0Uncertainty;
@@ -162,6 +157,9 @@ void SVDEventT0PerformanceTTreeModule::event()
   m_svdTrkpT.clear();
   m_svdTrkz0.clear();
   m_svdTrkd0.clear();
+  m_svdTrkPValue.clear();
+  m_svdTrkCharge.clear();
+  m_svdTrkNDF.clear();
   m_svdTrkCDCHits.clear();
   m_svdTrkSVDHits.clear();
   m_svdTrkPXDHits.clear();
@@ -220,7 +218,7 @@ void SVDEventT0PerformanceTTreeModule::event()
         m_svdTrkpT.push_back(tfr->getMomentum().Perp());
         m_svdTrkPValue.push_back(tfr->getPValue());
         m_svdTrkCharge.push_back(tfr->getChargeSign());
-        m_svdTrkCharge.push_back(tfr->getNDF());
+        m_svdTrkNDF.push_back(tfr->getNDF());
         TLorentzVector pStar = tfr->get4Momentum();
         pStar.Boost(0, 0, 3. / 11);
         m_svdTrkpCM.push_back(pStar.P());

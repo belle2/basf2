@@ -226,7 +226,6 @@ def gain_calibration(input_files, cal_name="PXDGainCalibration",
     else:  # the default PXDPerformanceVariablesCollector
         import modularAnalysis as ana
         import vertex
-        from variables import variables as vm
         # Particle list for gain calibration
         ana.fillParticleList('e+:gain', "p > 1.0", path=main)
 

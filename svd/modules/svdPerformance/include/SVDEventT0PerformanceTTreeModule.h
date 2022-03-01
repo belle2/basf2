@@ -88,6 +88,10 @@ namespace Belle2 {
     int m_nTracks = 0; /**< number of tracks in the event*/
     int m_svdTB = -1; /**< trigger bin */
     float m_trueEventT0 = -99; /**< true event t0 */
+    int m_exp = -99; /**< experiment number */
+    int m_run = -99; /**< run number */
+    int m_event = -99; /**< event number */
+
   };
 }
 

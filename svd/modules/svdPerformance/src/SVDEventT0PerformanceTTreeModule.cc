@@ -9,6 +9,7 @@
 #include <svd/modules/svdPerformance/SVDEventT0PerformanceTTreeModule.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/core/Environment.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDEventInfo.h>
@@ -64,6 +65,9 @@ void SVDEventT0PerformanceTTreeModule::initialize()
   //Tree for SVD clusters
   //one fill per event!
   m_t = new TTree("tree", "Tree for SVD clusters related to tracks");
+  m_t->Branch("exp", &m_exp, "exp/i");
+  m_t->Branch("run", &m_run, "run/i");
+  m_t->Branch("event", &m_event, "event/i");
   m_t->Branch("trueEventT0", &m_trueEventT0, "trueEventT0/F");
   m_t->Branch("eventT0", &m_eventT0, "eventT0/F");
   m_t->Branch("eventT0Err", &m_eventT0Err, "eventT0Err/F");
@@ -113,6 +117,11 @@ void SVDEventT0PerformanceTTreeModule::event()
   m_cdcEventT0 = -99; /**< CDC event T0 */
   m_topEventT0Err = -99; /**< TOP event T0 error */
   m_topEventT0Err = -99; /**< TOP event T0 error */
+
+  StoreObjPtr<EventMetaData> evtMetaData;
+  m_exp = evtMetaData->getExperiment();
+  m_run = evtMetaData->getRun();
+  m_event = evtMetaData->getEvent();
 
   if (m_EventT0.isValid())
     if (m_EventT0->hasEventT0()) {

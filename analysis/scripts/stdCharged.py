@@ -162,7 +162,11 @@ def stdLep(pdgId,
            classification,
            lid_weights_gt,
            release=None,
-           listname=None,
+           channel_eff="combination",
+           channel_misid_pi="combination",
+           channel_misid_K="combination",
+           inputListName=None,
+           outputListLabel=None,
            trainingModeMulticlass=_TrainingMode.c_Multiclass,
            trainingModeBinary=_TrainingMode.c_Classification,
            path=None):
@@ -178,13 +182,13 @@ def stdLep(pdgId,
     * 'UniformEff90' 90% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
     * 'UniformEff95' 95% lepton efficiency list, uniform in a given multi-dimensional parametrisation.
 
-    The function will select particles according to the chosen ``working_point``, and decorate each candidate
-    with the nominal Data/MC :math:`\\ell` ID efficiency and :math:`\\pi,K` fake rate
-    correction factors and their stat, syst uncertainty, reading the info from the Conditions Database (CDB) according
-    to the chosen input global tag (GT).
+    The function creates a ``ParticleList``, selecting particles according to the chosen ``working_point``,
+    and decorates each candidate in the list with the nominal Data/MC :math:`\\ell` ID efficiency and
+    :math:`\\pi,K` fake rate correction factors and their stat, syst uncertainty, reading the info
+    from the Conditions Database (CDB) according to the chosen input global tag (GT).
 
     .. note::
-        Particles will *not* be selected if they are outside the Data/MC efficiency corrections' phase space coverage
+        Particles will **not** be selected if they are outside the Data/MC *efficiency* corrections' phase space coverage
         for the given working point.
         In fact, the threshold value for the PID cut in such cases is set to NaN.
 
@@ -199,16 +203,46 @@ def stdLep(pdgId,
         method (str): the PID method: 'likelihood' or 'bdt'.
         classification (str): the type of classifier: 'binary' (one-vs-pion) or 'global' (one-vs-all).
         lid_weights_gt (str): the name identifier of the global tag with the recommended Data/MC correction weights.
-                              Please refer to the
-                              `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
-                              for info about lepton ID recommendations.
+
+                              .. tip::
+                                  Please refer to the
+                                  `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+                                  for info about the recommended global tags.
+
         release (Optional[int]): the major release number of the data and MC campaigns considered.
                                  If specified, it ensures the correct :math:`\\ell` ID variables are used.
-                                 Please refer to the
-                                 `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
-                                 for info about lepton identification variables and campaigns.
-        listname (Optional[str]): the name of the lepton list.
-                                  By default, it is assigned as: '{lepton}-:{method}_{classification}_{working_point}'
+
+                                 .. tip::
+                                     Please refer to the
+                                     `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+                                     for info about lepton identification variables and campaigns.
+
+        channel_eff (Optional[str]): the channel used to derive the :math:`\\ell` ID efficiency corrections.
+                                     By default, 'combination' is set, meaning they are obtained by combining results
+                                     of several hadronic and low multiplicity channels, wherever they overlap.
+
+                                     .. tip::
+                                         Please refer to the
+                                         `Lepton ID Confluence page <https://confluence.desy.de/display/BI/Lepton+ID+Performance>`_
+                                         for other possible choices (if any).
+
+        channel_misid_pi (Optional[str]): the channel used to derive the :math:`\\pi` fake rate corrections.
+        channel_misid_K (Optional[str]): the channel used to derive the :math:`K` fake rate corrections.
+        inputListName (Optional[str]): the name of a pre-existing ``ParticleList`` object (defined as a full ``decayString``,
+                                       e.g. 'e-:my_input_electrons') of which the standard lepton list will be a subset.
+                                       For instance, users might want to apply a Bremsstrahlung correction to electrons first,
+                                       which modifies their 4-momentum, and only later define the subset passing the PID selection,
+                                       including the appropriate PID weights and uncertainties (which are :math:`p`-dependent).
+                                       By default, the standard lepton list is created from all ``Track`` objects in the event.
+
+                                       .. warning::
+                                           Do **not** apply any PID selection on the input list, otherwise results could be biased.
+
+        outputListLabel (Optional[str]): the name of the output lepton list label, i.e.,
+                                         the string that follows the particle identifier ('e-:', 'mu-:').
+                                         By default, it is assigned as:
+                                         ``'{method}_{classification}_{working_point}'``.
+
         trainingModeMulticlass (Optional[``Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode``]): enum identifier
                                of the multi-class (global PID) training mode.
                                See `modularAnalysis.applyChargedPidMVA` docs for available options.
@@ -337,45 +371,51 @@ def stdLep(pdgId,
         variables.addAlias(pid_alias, pid_var)
 
     # Start creating the particle list, w/o any selection.
-    plistname = f"{lepton_name}:{method}_{classification}_{working_point}"
-    if listname is not None:
-        plistname = f"{lepton_name}:{listname}"
+    outputListName = f"{lepton_name}:{method}_{classification}_{working_point}"
+    if outputListLabel is not None:
+        outputListName = f"{lepton_name}:{outputListLabel}"
 
-    ma.fillParticleList(plistname, "", path=path)
+    if inputListName is None:
+        ma.fillParticleList(outputListName, "", path=path)
+    else:
+        b2.B2INFO(
+            f"The standard lepton list: '{outputListName}' will be created as a subset \
+              of the following ParticleList: '{inputListName}'")
+        ma.copyList(outputListName, inputListName, path=path)
 
     # Here we must run the BDT if requested.
     if method == "bdt":
         if classification == "global":
-            ma.applyChargedPidMVA(particleLists=[plistname],
+            ma.applyChargedPidMVA(particleLists=[outputListName],
                                   path=path,
                                   trainingMode=trainingModeMulticlass)
         elif classification == "binary":
-            ma.applyChargedPidMVA(particleLists=[plistname],
+            ma.applyChargedPidMVA(particleLists=[outputListName],
                                   path=path,
                                   binaryHypoPDGCodes=(lepton, pion),
                                   trainingMode=trainingModeBinary)
 
     # The names of the payloads w/ efficiency and mis-id corrections.
-    payload_eff = f"ParticleReweighting:{pid_alias}_eff_combination_{working_point}"
-    payload_misid_pi = f"ParticleReweighting:{pid_alias}_misid_pi_combination_{working_point}"
-    payload_misid_K = f"ParticleReweighting:{pid_alias}_misid_K_combination_{working_point}"
+    payload_eff = f"ParticleReweighting:{pid_alias}_eff_{channel_eff}_{working_point}"
+    payload_misid_pi = f"ParticleReweighting:{pid_alias}_misid_pi_{channel_misid_pi}_{working_point}"
+    payload_misid_K = f"ParticleReweighting:{pid_alias}_misid_K_{channel_misid_K}_{working_point}"
 
     # Configure weighting module(s).
     path.add_module("ParticleWeighting",
-                    particleList=plistname,
-                    tableName=payload_eff).set_name(f"ParticleWeighting_eff_{plistname}")
+                    particleList=outputListName,
+                    tableName=payload_eff).set_name(f"ParticleWeighting_eff_{outputListName}")
     path.add_module("ParticleWeighting",
-                    particleList=plistname,
-                    tableName=payload_misid_pi).set_name(f"ParticleWeighting_misid_pi_{plistname}")
+                    particleList=outputListName,
+                    tableName=payload_misid_pi).set_name(f"ParticleWeighting_misid_pi_{outputListName}")
     if classification == "global":
         path.add_module("ParticleWeighting",
-                        particleList=plistname,
-                        tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{plistname}")
+                        particleList=outputListName,
+                        tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{outputListName}")
 
     # Apply the PID selection cut, which is read from the efficiency payload.
     # The '>=' handles extreme cases in which the variable and the threshold value are at a boundary of the PID variable range.
     cut = f"[{pid_alias} >= extraInfo({payload_eff}_threshold)]"
-    ma.applyCuts(plistname, cut, path=path)
+    ma.applyCuts(outputListName, cut, path=path)
 
     # Define convenience aliases for the nominal weight and up/dn variations.
     aliases_to_var = {
@@ -431,7 +471,11 @@ def stdE(listtype=_defaultlist,
          classification=None,
          lid_weights_gt=None,
          release=None,
-         listname=None,
+         channel_eff="combination",
+         channel_misid_pi="combination",
+         channel_misid_K="combination",
+         inputListName=None,
+         outputListLabel=None,
          trainingModeMulticlass=_TrainingMode.c_Multiclass,
          trainingModeBinary=_TrainingMode.c_Classification,
          path=None):
@@ -460,7 +504,11 @@ def stdE(listtype=_defaultlist,
 
     return stdLep(Const.electron.getPDGCode(), listtype, method, classification, lid_weights_gt,
                   release=release,
-                  listname=listname,
+                  channel_eff=channel_eff,
+                  channel_misid_pi=channel_misid_pi,
+                  channel_misid_K=channel_misid_K,
+                  inputListName=inputListName,
+                  outputListLabel=outputListLabel,
                   trainingModeMulticlass=trainingModeMulticlass,
                   trainingModeBinary=trainingModeBinary,
                   path=path)
@@ -471,7 +519,11 @@ def stdMu(listtype=_defaultlist,
           classification=None,
           lid_weights_gt=None,
           release=None,
-          listname=None,
+          channel_eff="combination",
+          channel_misid_pi="combination",
+          channel_misid_K="combination",
+          inputListName=None,
+          outputListLabel=None,
           trainingModeMulticlass=_TrainingMode.c_Multiclass,
           trainingModeBinary=_TrainingMode.c_Classification,
           path=None):
@@ -500,7 +552,11 @@ def stdMu(listtype=_defaultlist,
 
     return stdLep(Const.muon.getPDGCode(), listtype, method, classification, lid_weights_gt,
                   release=release,
-                  listname=listname,
+                  channel_eff=channel_eff,
+                  channel_misid_pi=channel_misid_pi,
+                  channel_misid_K=channel_misid_K,
+                  inputListName=inputListName,
+                  outputListLabel=outputListLabel,
                   trainingModeMulticlass=trainingModeMulticlass,
                   trainingModeBinary=trainingModeBinary,
                   path=path)

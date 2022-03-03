@@ -42,6 +42,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     # Check components.
     check_components(components)
 
+    # TTD trigger and bunch injection monitoring
+    path.add_module('TTDDQM')
+
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         # PXD (not useful on HLT)
         if components is None or 'PXD' in components:

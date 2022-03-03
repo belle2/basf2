@@ -420,7 +420,7 @@ namespace Belle2 {
 
     CLHEP::HepLorentzVector ParticleKinematicFitterModule::getCLHEPLorentzVector(Particle* particle)
     {
-      CLHEP::HepLorentzVector mom(particle->getPx(), particle->getPy(), particle->getPz(), particle->getEnergy());
+      CLHEP::HepLorentzVector mom(particle->getPx(), particle->getPy(), particle->getPz(), particle->get4Vector().E());
       return mom;
     }
 

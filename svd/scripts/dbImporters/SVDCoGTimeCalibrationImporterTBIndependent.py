@@ -55,7 +55,8 @@ else:
         inputFileList = [line.strip() for line in f]
 '''
 
-b2conditions.prepend_globaltag("svd_loadedOnFADC")
+b2conditions.prepend_globaltag("online")
+b2conditions.prepend_globaltag("data_reprocessing_prompt")
 if '_CHECK' not in localdb:
     b2conditions.prepend_globaltag('svd_NOCoGCorrections')
     if os.path.isdir(localdb):

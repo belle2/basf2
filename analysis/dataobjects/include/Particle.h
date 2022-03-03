@@ -541,10 +541,10 @@ namespace Belle2 {
     }
 
     /**
-     * Returns momentum scaling factor
+     * Returns effective momentum scale which is the product of the momentum scaling and smearing factors
      * @return momentum scaling factor
      */
-    float getMomentumScalingFactor() const
+    float getEffectiveMomentumScale() const
     {
       return m_momentumScale;
     }

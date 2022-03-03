@@ -164,7 +164,8 @@ def getHelixFromMCParticle(mc_particle):
     charge_sign = (-1 if mc_particle.getCharge() < 0 else 1)
     b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
 
-    seed_helix = Belle2.Helix(position, momentum, charge_sign, b_field)
+    # workaround for the position vector due to change of types. Can be removed once this is figured out.
+    seed_helix = Belle2.Helix(ROOT.TVector3(position.X(), position.Y(), position.Z()), momentum, charge_sign, b_field)
     return seed_helix
 
 

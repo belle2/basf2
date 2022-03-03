@@ -35,7 +35,7 @@ h2dtres = ROOT.TH1F('muon_h2dtres', 'EKLM muon 2d hits time resolution',
                     80, -20, 20)
 h2dtres.SetXTitle('ns')
 h2dtres.SetYTitle('Events')
-tree.Draw('KLMHit2ds.m_Time+EventT0.hasEventT0()?EventT0.getEventT0():0-KLMHit2ds.m_MCTime>>muon_h2dtres', subdetector_selection)
+tree.Draw('KLMHit2ds.m_Time+(EventT0.hasEventT0()?EventT0.getEventT0():0)-KLMHit2ds.m_MCTime>>muon_h2dtres', subdetector_selection)
 functions = h2dtres.GetListOfFunctions()
 functions.Add(TNamed('Description', 'Time resolution'))
 functions.Add(TNamed('Check', 'No bias.'))

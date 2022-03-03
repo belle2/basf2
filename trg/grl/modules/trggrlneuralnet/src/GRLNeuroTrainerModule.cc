@@ -198,10 +198,10 @@ GRLNeuroTrainerModule::initialize()
 
     //..Four vector of a 1 GeV lab photon at this TC
     TVector3 CellPosition = trgecl_obj->getTCPosition(tc);
-    TLorentzVector CellLab(1., 1., 1., 1.);
-    CellLab.SetTheta(CellPosition.Theta());
-    CellLab.SetPhi(CellPosition.Phi());
-    CellLab.SetRho(1.);
+    ROOT::Math::PxPyPzEVector CellLab;
+    CellLab.SetPx(CellPosition.Unit().Px());
+    CellLab.SetPy(CellPosition.Unit().Py());
+    CellLab.SetPz(CellPosition.Unit().Pz());
     CellLab.SetE(1.);
 
     //..cotan Theta and phi in lab
@@ -210,14 +210,13 @@ GRLNeuroTrainerModule::initialize()
     TCcotThetaLab.push_back(1. / tantheta);
 
     //..Corresponding 4 vector in the COM frame
-    TLorentzVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
-    TCThetaCOM.push_back(CellCOM.Theta()*radtodeg);
-    TCPhiCOM.push_back(CellCOM.Phi()*radtodeg);
+    ROOT::Math::PxPyPzEVector CellCOM = boostrotate.rotateLabToCms() * CellLab;
+    TCThetaCOM.push_back(CellCOM.Theta()*TMath::RadToDeg());
+    TCPhiCOM.push_back(CellCOM.Phi()*TMath::RadToDeg());
 
     //..Scale to give 1 GeV in the COM frame
     TC1GeV.push_back(1. / CellCOM.E());
   }
-  radtodeg = 180. / TMath::Pi();
 
   delete trgecl_obj;
 }

@@ -23,7 +23,7 @@ EKLMHitMomentum::~EKLMHitMomentum()
 {
 }
 
-void EKLMHitMomentum::setMomentum(const TLorentzVector& p)
+void EKLMHitMomentum::setMomentum(const ROOT::Math::PxPyPzEVector& p)
 {
   m_e = p.E();
   m_pX = p.Px();

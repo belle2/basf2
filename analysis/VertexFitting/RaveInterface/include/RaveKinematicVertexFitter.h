@@ -17,6 +17,8 @@
 
 //root
 #include <TMatrixFSym.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 //rave
 #include <rave/Vertex.h>
 #include <rave/Track.h>
@@ -58,7 +60,7 @@ namespace Belle2 {
       int fit();
 
       /** get the position of the fitted vertex.  */
-      TVector3 getPos() ;
+      ROOT::Math::XYZVector getPos() ;
 
       /** get the p value of the fitted vertex.  */
       double getPValue();
@@ -160,9 +162,9 @@ namespace Belle2 {
       /** chi^2 of the vertex fit */
       double m_fittedChi2;
       /** Fitted vertex position */
-      TVector3 m_fittedPos;
+      ROOT::Math::XYZVector m_fittedPos;
       /** 4 momentum of the mother particle after the fit */
-      TLorentzVector m_fitted4Vector;
+      ROOT::Math::PxPyPzEVector m_fitted4Vector;
       /** 7x7 error matrix of the mother particle after the fit */
       TMatrixFSym m_fitted7Cov;
 
@@ -170,10 +172,10 @@ namespace Belle2 {
     private:
 
       /** Convert the error matrix from P-M to P-E. It Requires an input error matrix in the form X,P,M */
-      TMatrixDSym ErrorMatrixMassToEnergy(const TLorentzVector& p4, const TMatrixDSym& MassErr);
+      TMatrixDSym ErrorMatrixMassToEnergy(const ROOT::Math::PxPyPzEVector& p4, const TMatrixDSym& MassErr);
 
       /** Convert the error matrix from P-E to P-M. It Requires an input error matrix in the form X,P,E */
-      TMatrixDSym ErrorMatrixEnergyToMass(const TLorentzVector& p4, const TMatrixDSym& EnergyErr);
+      TMatrixDSym ErrorMatrixEnergyToMass(const ROOT::Math::PxPyPzEVector& p4, const TMatrixDSym& EnergyErr);
 
       /** Start capturing the output of rave and divert it to log messages.
        * Capturing will finish as soon as the returned object goes out of scope

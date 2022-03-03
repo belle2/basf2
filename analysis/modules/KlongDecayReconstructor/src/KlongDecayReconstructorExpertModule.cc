@@ -18,6 +18,8 @@
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
+#include <Math/Vector4D.h>
+
 #include <memory>
 
 using namespace std;
@@ -146,7 +148,7 @@ namespace Belle2 {
         B2FATAL("Higher multiplicity (>2) missing momentum decays not implemented yet!");
 
       int e_check = 0;
-      TLorentzVector pDaughters;
+      ROOT::Math::PxPyPzEVector pDaughters;
       for (auto daughter : daughters) {
         if (daughter->getPDGCode() != Const::Klong.getPDGCode()) {
           pDaughters += daughter->get4Vector();
@@ -155,7 +157,7 @@ namespace Belle2 {
       }
 
 
-      TLorentzVector klDaughters;
+      ROOT::Math::PxPyPzEVector klDaughters;
       for (auto daughter : daughters) {
         if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
           klDaughters += daughter->get4Vector();
@@ -166,11 +168,11 @@ namespace Belle2 {
       }
       double m_b = particle.getPDGMass();
 
-      TLorentzVector mom = pDaughters + klDaughters;
-      mom.SetE(TMath::Sqrt(mom.Vect().Mag2() + m_b * m_b));
-      if ((!isnan(mom.Vect().Mag())) && is_physical)
+      ROOT::Math::PxPyPzEVector mom = pDaughters + klDaughters;
+      mom.SetE(TMath::Sqrt(mom.P2() + m_b * m_b));
+      if ((!isnan(mom.P())) && is_physical)
         particle.set4Vector(mom);
-      if (isnan(mom.Vect().Mag()))
+      if (isnan(mom.P()))
         is_physical = false;
 
       if (!m_cut->check(&particle))

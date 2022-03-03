@@ -521,7 +521,7 @@ bool KLMDQM2Module::collectDataTrack(
        * The muons with sufficiently large momentum have a very small
        * probability to get absorbed in the detector.
        */
-      if (muon->getMomentum().Mag() < m_MinimalMomentumNoOuterLayers)
+      if (muon->getP() < m_MinimalMomentumNoOuterLayers)
         continue;
     }
     //Filling AddExtHits and MatchedHits histograms

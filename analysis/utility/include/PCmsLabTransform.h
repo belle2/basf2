@@ -11,9 +11,11 @@
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/geometry/B2Vector3.h>
 
-#include <TLorentzRotation.h>
-#include <TLorentzVector.h>
+#include <Math/Boost.h>
+#include <Math/LorentzRotation.h>
+#include <Math/Vector4D.h>
 
 namespace Belle2 {
 
@@ -32,7 +34,7 @@ namespace Belle2 {
     /**
      * Returns boost vector (beta=p/E)
      */
-    TVector3 getBoostVector() const
+    B2Vector3D getBoostVector() const
     {
       return m_boostVectorDB->getBoost();
     }
@@ -48,18 +50,18 @@ namespace Belle2 {
     /**
      * Returns LAB four-momentum of e+e-
      */
-    TLorentzVector getBeamFourMomentum() const
+    ROOT::Math::PxPyPzEVector getBeamFourMomentum() const
     {
-      return rotateCmsToLab() * TLorentzVector(0, 0, 0, getCMSEnergy());
+      return rotateCmsToLab() * ROOT::Math::PxPyPzEVector(0, 0, 0, getCMSEnergy());
     }
 
     /**
      * Returns Lorentz transformation from Lab to CMS
      * @return const reference to Lorentz rotation matrix
      */
-    const TLorentzRotation rotateLabToCms() const
+    const ROOT::Math::LorentzRotation rotateLabToCms() const
     {
-      TLorentzRotation rotation(-1.*getBoostVector());
+      ROOT::Math::LorentzRotation rotation(ROOT::Math::Boost(-1.*getBoostVector()));
       return rotation;
     }
 
@@ -67,7 +69,7 @@ namespace Belle2 {
      * Returns Lorentz transformation from CMS to Lab
      * @return const reference to Lorentz rotation matrix
      */
-    const TLorentzRotation rotateCmsToLab() const
+    const ROOT::Math::LorentzRotation rotateCmsToLab() const
     {
       return rotateLabToCms().Inverse();
     }
@@ -77,14 +79,28 @@ namespace Belle2 {
      * @param vec Lorentz vector in Laboratory System
      * @return Lorentz vector in CM System
      */
-    static TLorentzVector labToCms(const TLorentzVector& vec);
+    static ROOT::Math::PxPyPzMVector labToCms(const ROOT::Math::PxPyPzMVector& vec);
 
     /**
      * Transforms Lorentz vector into Laboratory System
      * @param vec Lorentz vector in CM System
      * @return Lorentz vector in Laboratory System
      */
-    static TLorentzVector cmsToLab(const TLorentzVector& vec);
+    static ROOT::Math::PxPyPzMVector cmsToLab(const ROOT::Math::PxPyPzMVector& vec);
+
+    /**
+     * Transforms Lorentz vector into CM System
+     * @param vec Lorentz vector in Laboratory System
+     * @return Lorentz vector in CM System
+     */
+    static ROOT::Math::PxPyPzEVector labToCms(const ROOT::Math::PxPyPzEVector& vec);
+
+    /**
+     * Transforms Lorentz vector into Laboratory System
+     * @param vec Lorentz vector in CM System
+     * @return Lorentz vector in Laboratory System
+     */
+    static ROOT::Math::PxPyPzEVector cmsToLab(const ROOT::Math::PxPyPzEVector& vec);
 
   private:
     const DBObjPtr<CollisionInvariantMass> m_invariantMassDB; /**< db object for invariant mass. */

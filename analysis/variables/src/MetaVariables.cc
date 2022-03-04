@@ -1410,7 +1410,7 @@ namespace Belle2 {
           } else if (std::holds_alternative<bool>(var_result))
           {
             return int(std::get<bool>(var_result)) % divideBy;
-          } else return std::numeric_limits<double>::quiet_NaN();
+          } else return 0;
         };
         return func;
       } else {

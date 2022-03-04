@@ -113,11 +113,6 @@ namespace Belle2 {
      * Clear and reset the list of histograms.
      */
     static void resetHist() { g_hist = std::map<std::string, TH1*>(); }
-    /**
-     * Get the list of histograms.
-     * @return The list of histograms.
-     */
-    static HistList& getHists() { return g_hist; }
 
     // Public functions
   public:

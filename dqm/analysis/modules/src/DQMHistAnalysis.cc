@@ -43,20 +43,6 @@ DQMHistAnalysisModule::~DQMHistAnalysisModule()
 
 }
 
-TCanvas* DQMHistAnalysisModule::find_canvas(TString canvas_name)
-{
-  TIter nextkey(gROOT->GetListOfCanvases());
-  TObject* obj{};
-
-  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
-    if (obj->IsA()->InheritsFrom("TCanvas")) {
-      if (obj->GetName() == canvas_name)
-        return dynamic_cast<TCanvas*>(obj);
-    }
-  }
-  return nullptr;
-}
-
 void DQMHistAnalysisModule::addHist(const std::string& dirname, const std::string& histname, TH1* h)
 {
   if (dirname.size() > 0) {
@@ -82,17 +68,19 @@ MonitoringObject* DQMHistAnalysisModule::getMonitoringObject(const std::string& 
   return obj;
 }
 
-
-const DQMHistAnalysisModule::HistList& DQMHistAnalysisModule::getHistList()
+TCanvas* DQMHistAnalysisModule::findCanvas(TString canvas_name)
 {
-  return g_hist;
-}
+  TIter nextkey(gROOT->GetListOfCanvases());
+  TObject* obj{};
 
-const DQMHistAnalysisModule::MonObjList& DQMHistAnalysisModule::getMonObjList()
-{
-  return g_monObj;
+  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
+    if (obj->IsA()->InheritsFrom("TCanvas")) {
+      if (obj->GetName() == canvas_name)
+        return dynamic_cast<TCanvas*>(obj);
+    }
+  }
+  return nullptr;
 }
-
 
 TH1* DQMHistAnalysisModule::findHist(const std::string& histname)
 {

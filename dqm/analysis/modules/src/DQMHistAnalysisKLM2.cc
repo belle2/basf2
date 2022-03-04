@@ -26,6 +26,7 @@ REG_MODULE(DQMHistAnalysisKLM2)
 
 DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   : DQMHistAnalysisModule(),
+    m_IsNullRun{false},
     m_EklmElementNumbers{&(EKLMElementNumbers::Instance())}
 {
   m_PlaneLine.SetLineColor(kMagenta);
@@ -85,6 +86,9 @@ void DQMHistAnalysisKLM2Module::terminate()
 
 void DQMHistAnalysisKLM2Module::beginRun()
 {
+  m_RunType = findHist("DQMInfo/rtype");
+  m_RunTypeString = m_RunType ? m_RunType->GetTitle() : "";
+  m_IsNullRun = (m_RunTypeString == "null");
 }
 
 void DQMHistAnalysisKLM2Module::endRun()
@@ -183,20 +187,20 @@ void DQMHistAnalysisKLM2Module::event()
   TH1F* matched_hits_eklm_sector = (TH1F*)findHist("KLMEfficiencyDQM/matched_hitsEKLMSector");
 
   /* Check if efficiency histograms exist*/
-  if (all_ext_bklm == NULL || matched_hits_bklm == NULL) {
+  if ((all_ext_bklm == NULL || matched_hits_bklm == NULL) && (m_IsNullRun == false)) {
     B2INFO("Histograms needed for BKLM plane efficiency computation are not found");
     m_c_eff_bklm->SetFillColor(kRed);
   }
 
-  if (all_ext_eklm == NULL || matched_hits_eklm == NULL) {
+  if ((all_ext_eklm == NULL || matched_hits_eklm == NULL) && (m_IsNullRun == false)) {
     B2INFO("Histograms needed for EKLM plane efficiency computation are not found");
     m_c_eff_eklm->SetFillColor(kRed);
   }
-  if (all_ext_bklm_sector == NULL || matched_hits_bklm_sector == NULL) {
+  if ((all_ext_bklm_sector == NULL || matched_hits_bklm_sector == NULL) && (m_IsNullRun == false)) {
     B2INFO("Histograms needed for BKLM sector efficiency computation are not found");
     m_c_eff_bklm_sector->SetFillColor(kRed);
   }
-  if (all_ext_eklm_sector == NULL || matched_hits_eklm_sector == NULL) {
+  if ((all_ext_eklm_sector == NULL || matched_hits_eklm_sector == NULL) && (m_IsNullRun == false)) {
     B2INFO("Histograms needed for EKLM sector efficiency computation are not found");
     m_c_eff_eklm_sector->SetFillColor(kRed);
   }

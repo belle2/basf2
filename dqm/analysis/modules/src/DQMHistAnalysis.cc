@@ -68,16 +68,6 @@ MonitoringObject* DQMHistAnalysisModule::getMonitoringObject(const std::string& 
   return obj;
 }
 
-const DQMHistAnalysisModule::HistList& DQMHistAnalysisModule::getHistList()
-{
-  return g_hist;
-}
-
-const DQMHistAnalysisModule::MonObjList& DQMHistAnalysisModule::getMonObjList()
-{
-  return g_monObj;
-}
-
 TCanvas* DQMHistAnalysisModule::findCanvas(TString canvas_name)
 {
   TIter nextkey(gROOT->GetListOfCanvases());

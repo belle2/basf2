@@ -39,6 +39,9 @@ namespace Belle2 {
 
 
   private:
+    /**
+     * The list of Histograms.
+     */
     static HistList g_hist;
     /**
      * The list of MonitoringObjects.
@@ -51,12 +54,13 @@ namespace Belle2 {
      * Get the list of the histograms.
      * @return The list of the histograms.
      */
-    static const HistList& getHistList();
+    static const HistList& getHistList() { return g_hist;};
+
     /**
      * Get the list of MonitoringObjects.
      * @return The list of the MonitoringObjects.
      */
-    static const MonObjList& getMonObjList();
+    static const MonObjList& getMonObjList() { return g_monObj;};
 
     /**
      * Find canvas by name

@@ -15,13 +15,6 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
-/* Belle 2 headers. */
-#include <framework/database/DBObjPtr.h>
-#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
-#include <klm/dataobjects/KLMChannelArrayIndex.h>
-#include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dataobjects/KLMSectorArrayIndex.h>
-#include <klm/dbobjects/KLMElectronicsMap.h>
 
 /* ROOT headers. */
 #include <TCanvas.h>
@@ -93,6 +86,15 @@ namespace Belle2 {
 
     /** TText for names in plane histograms. */
     TText m_PlaneText;
+
+    /** Histogram from DQMInfo with run type. */
+    TH1* m_RunType = nullptr;
+
+    /** String with run type. */
+    TString m_RunTypeString;
+
+    /** Run type flag for null runs. */
+    bool m_IsNullRun;
 
     /** Histogram for BKLM plane efficiency. */
     TH1* m_eff_bklm = nullptr;

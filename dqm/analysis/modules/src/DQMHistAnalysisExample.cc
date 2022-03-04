@@ -53,7 +53,7 @@ void DQMHistAnalysisExampleModule::event()
   if (h != NULL) {
     m_c->Clear();
     m_c->cd();
-    h->Fit(m_f, "R")
+    h->Fit(m_f, "R");
     h->Draw();
     m_c->Modified();
     B2DEBUG(20, "mean " << m_f->GetParameter(1));

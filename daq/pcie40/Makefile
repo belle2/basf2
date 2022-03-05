@@ -7,8 +7,11 @@ TOP :=$(realpath $(HERE))/Pcie40Software
 TEMP_LOCAL_DIR=$(PWD)/../../
 INCDIR = ./include
 
+ZMQINC ?= ./zmq/include/
+ZMQLIB ?= ./zmq/lib/libzmq.a
+
 LIBFLAG = -lrt -lpthread#-l${LOCALLIB}
-DES_SER_PCIE40_MAIN_CXXFLAGS =$(CFLAGS) -I$(TOP)/Pcie40Applications -I$(TOP)/Pcie40Driver -I$(TOP)/Pcie40Libraries -I$(TOP)/Pcie40DriverLibraries -I${INCDIR}
+DES_SER_PCIE40_MAIN_CXXFLAGS =$(CFLAGS) -I$(TOP)/Pcie40Applications -I$(TOP)/Pcie40Driver -I$(TOP)/Pcie40Libraries -I$(TOP)/Pcie40DriverLibraries -I${INCDIR} -I$(ZMQINC)
 DES_SER_PCIE40_MAIN_INSTALL =$(PREFIX)/bin
 DES_SER_PCIE40_MAIN_LDFLAGS = -L$(TOP)/build/Pcie40Libraries/ -L$(TOP)/build/Pcie40DriverLibraries/ -lpcie40driver -lpcie40
 
@@ -38,4 +41,4 @@ cleanlink:
 
 ${TARGET1}: ${TARGET1}.cc
 	source $(TOP)/Scripts/setup.sh; \
-	$(CC) $(DES_SER_PCIE40_MAIN_CXXFLAGS) ${LIBFLAG} -L./ $(DES_SER_PCIE40_MAIN_LDFLAGS) $^ -o $@
+	$(CC) $(DES_SER_PCIE40_MAIN_CXXFLAGS) ${LIBFLAG} -L./ $(DES_SER_PCIE40_MAIN_LDFLAGS) $^ -o $@ ${ZMQLIB}

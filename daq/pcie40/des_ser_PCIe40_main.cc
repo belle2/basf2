@@ -34,6 +34,11 @@
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 #include <rawdata/dataobjects/PostRawCOPPERFormat_latest.h>
 
+#define USE_ZMQ
+#ifdef USE_ZMQ
+#include "zmq.hpp"
+#endif
+
 /////////////////////////////////////////
 // Parameter for operation
 ////////////////////////////////////////
@@ -90,16 +95,20 @@
 
 using namespace std;
 
+#ifndef USE_ZMQ
 unsigned int* data_1[NUM_SENDER_THREADS];
 unsigned int* data_2[NUM_SENDER_THREADS];
 
 //pthread_t sender_thr[NUM_CLIENTS];
 pthread_mutex_t mtx1_ch[NUM_SENDER_THREADS];
 pthread_mutex_t mtx2_ch[NUM_SENDER_THREADS];
+#endif
 pthread_mutex_t mtx_sender_log;
 
+#ifndef USE_ZMQ
 int buffer_filled[NUM_SENDER_THREADS][2];
 int copy_nwords[NUM_SENDER_THREADS][2];
+#endif
 
 struct sender_argv {
   int sender_id;
@@ -110,6 +119,12 @@ struct sender_argv {
   unsigned int node_id;
   std::vector< int > valid_ch;
 };
+
+/////////////////////////////////////////////////////////
+// Handshake by ZMQ
+/////////////////////////////////////////////////////////
+zmq::socket_t* zmq_writer[NUM_SENDER_THREADS];
+zmq::socket_t* zmq_reader[NUM_SENDER_THREADS];
 
 /////////////////////////////////////////////////////////
 // From main_pcie40_dmahirate.cpp
@@ -1974,7 +1989,9 @@ void* sender(void* arg)
   unsigned int exprun = 0;
   unsigned int evtnum = 0;
 
+#ifndef USE_ZMQ
   int buffer_id = 0;
+#endif
   unsigned int send_nwords = 0;
   for (
 #ifdef MAX_EVENT
@@ -1984,8 +2001,17 @@ void* sender(void* arg)
 #endif
   ) {
 
+#ifdef USE_ZMQ
+    // Copy data from ZMQ (experimental)
     //
-    // Copy data from buffer
+    {
+      zmq::message_t zevent;
+      zmq_reader[sender_id]->recv(&zevent);
+      memcpy(buff + NW_SEND_HEADER, zevent.data(), zevent.size());
+      send_nwords = zevent.size() / sizeof(unsigned int);
+    }
+#else
+    // Copy data from buffer (orignal)
     //
     if (buffer_id == 0) {
       while (1) {
@@ -2014,6 +2040,7 @@ void* sender(void* arg)
         pthread_mutex_unlock(&(mtx2_ch[sender_id]));
       }
     }
+#endif
 
     //
     // Check data
@@ -2135,11 +2162,13 @@ void* sender(void* arg)
       }
     }
 #endif
+#ifndef USE_ZMQ
     if (buffer_id == 0) {
       buffer_id = 1;
     } else {
       buffer_id = 0;
     }
+#endif
     cnt++;
 
     if (cnt == start_cnt) init_time = getTimeSec();
@@ -2249,6 +2278,21 @@ int main(int argc, char** argv)
   }
   fflush(stdout);
 
+#ifdef USE_ZMQ
+  ///////////////////////////////////////////////
+  // ZMQ initialize
+  ///////////////////////////////////////////////
+  zmq::context_t ctx(0);
+  const pid_t pid = getpid();
+  for (int i = 0; i < NUM_SENDER_THREADS; i++) {
+    zmq_writer[i] = new zmq::socket_t(ctx, ZMQ_PAIR);
+    zmq_reader[i] = new zmq::socket_t(ctx, ZMQ_PAIR);
+    char zpath[256];
+    snprintf(zpath, sizeof(zpath), "inproc:///dev/shm/des_ser_PCIe40_main.%d.%d.ipc", pid, i);
+    zmq_writer[i]->bind(zpath);
+    zmq_reader[i]->connect(zpath);
+  }
+#else
   ///////////////////////////////////////////////
   // buffer for inter-threads communication
   ///////////////////////////////////////////////
@@ -2256,9 +2300,7 @@ int main(int argc, char** argv)
     data_1[i] = new unsigned int[MAX_EVENT_WORDS];
     data_2[i] = new unsigned int[MAX_EVENT_WORDS];
   }
-
-
-
+#endif
 
   ///////////////////////////////////////////////
   // Initialize variables
@@ -2268,8 +2310,11 @@ int main(int argc, char** argv)
   unsigned long long int cnt = 0;
   unsigned long long int prev_cnt = 0;
   unsigned long long int start_cnt = 300000;
+#ifndef USE_ZMQ
   int buffer_id[NUM_SENDER_THREADS];
+#endif
   int total_words = 0;
+#ifndef USE_ZMQ
   for (int i = 0; i < NUM_SENDER_THREADS; i++) {
     buffer_id[i] = 0;
     buffer_filled[i][0] = 0;
@@ -2277,6 +2322,7 @@ int main(int argc, char** argv)
     copy_nwords[i][0] = 0;
     copy_nwords[i][1] = 0;
   }
+#endif
 
 
   ///////////////////////////////////////////////
@@ -2619,6 +2665,11 @@ int main(int argc, char** argv)
           // Copy data to buffer
           //
           client_id = client_id % NUM_SENDER_THREADS;
+#ifdef USE_ZMQ
+          // by ZMQ (experimental)
+          zmq_writer[client_id]->send(combined_data + dma_hdr_offset, event_words * sizeof(unsigned int));
+#else
+          // by double buffer (original)
           if (buffer_id[client_id] == 0) {
             while (1) {
               if (buffer_filled[client_id][0] == 0)break;
@@ -2652,6 +2703,7 @@ int main(int argc, char** argv)
           } else {
             buffer_id[client_id] = 0;
           }
+#endif
           client_id++;
         } else {
           pthread_mutex_lock(&(mtx_sender_log));
@@ -2798,10 +2850,12 @@ int main(int argc, char** argv)
   //
   for (int i = 0; i < NUM_SENDER_THREADS; i++) {
     pthread_join(sender_thr[i], NULL);
+#ifndef USE_ZMQ
     pthread_mutex_destroy(&(mtx1_ch[i]));
     pthread_mutex_destroy(&(mtx2_ch[i]));
     delete data_1[i];
     delete data_2[i];
+#endif
   }
   pthread_mutex_destroy(&mtx_sender_log);
   return 0;

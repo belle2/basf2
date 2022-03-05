@@ -117,7 +117,7 @@ namespace Belle2 {
     void normalize(TCanvas*, const std::string&, const Double_t&);
 
     /** flag if to export to EPICS */
-    bool m_useEpics = true;
+    bool m_useEpics;
 
 #ifdef _BELLE2_EPICS
     /** EPICS channels for logic_summary histogram */

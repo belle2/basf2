@@ -36,7 +36,7 @@ DQMHistAnalysisIPModule::DQMHistAnalysisIPModule()
   addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
   addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:TEST:hist:"));
   addParam("MonitorPrefix", m_monPrefix, "Monitor Prefix");// force to be set!
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("minEntries", m_minEntries, "minimum number of new Entries for a fit", 1000);
   B2DEBUG(20, "DQMHistAnalysisIP: Constructor done.");
 }

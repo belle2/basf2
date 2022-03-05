@@ -961,7 +961,11 @@ void TRGGRLProjectsModule::event()
 
     //other trigger bits
     else if (bitname == "itsfb2b") {bit = false;}
+    else if (bitname == "inp156") {bit = false;}
+    else if (bitname == "inp157") {bit = false;}
+    else if (bitname == "inp158") {bit = false;}
     else if (bitname == "inp159") {bit = false;}
+    else if (bitname == "ecl_taub2b2") {bit = false;}
 
     //DITTO: please don't change the WARNING message below.
     //If you change it, please update the test trg_tsim_check_warnings.py accordingly.

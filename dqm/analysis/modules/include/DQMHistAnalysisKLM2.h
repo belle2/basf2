@@ -94,7 +94,7 @@ namespace Belle2 {
     TString m_RunTypeString;
 
     /** Run type flag for null runs. */
-    bool m_IsNullRun;
+    bool m_IsNullRun = false;
 
     /** Histogram for BKLM plane efficiency. */
     TH1* m_eff_bklm = nullptr;
@@ -134,21 +134,6 @@ namespace Belle2 {
 
     /** Number of channel hit histograms per sector for EKLM. */
     const int m_ChannelHitHistogramsEKLM = 3;
-
-
-    /** Number of layers/planes for BKLM. */
-    const int m_PlaneNumBKLM = BKLMElementNumbers::getMaximalLayerGlobalNumber(); //15 layers per octant, forward and backward
-
-    /** Number of layers/planes for EKLM. */
-    const int m_PlaneNumEKLM = EKLMElementNumbers::getMaximalPlaneGlobalNumber();//12 or 14 layers per quadrant, forward and backward
-
-    /** Number of layers/planes for BKLM. */
-    const int m_SectorNumBKLM = BKLMElementNumbers::getMaximalSectorGlobalNumber();
-
-    /** Number of layers/planes for EKLM. */
-    const int m_SectorNumEKLM = EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder();;
-
-
 
   };
 

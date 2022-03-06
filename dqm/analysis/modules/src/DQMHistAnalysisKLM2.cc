@@ -26,7 +26,6 @@ REG_MODULE(DQMHistAnalysisKLM2)
 
 DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   : DQMHistAnalysisModule(),
-    m_IsNullRun{false},
     m_EklmElementNumbers{&(EKLMElementNumbers::Instance())}
 {
   m_PlaneLine.SetLineColor(kMagenta);
@@ -52,28 +51,28 @@ void DQMHistAnalysisKLM2Module::initialize()
 
   m_eff_bklm = new TH1F("KLMEfficiencyDQM/eff_bklm_plane",
                         "Plane Efficiency in BKLM Sector",
-                        m_PlaneNumBKLM, 0.5, 0.5 + m_PlaneNumBKLM);
+                        BKLMElementNumbers::getMaximalLayerGlobalNumber(), 0.5, 0.5 + BKLMElementNumbers::getMaximalLayerGlobalNumber());
   m_eff_bklm->GetXaxis()->SetTitle("Layer number");
   m_eff_bklm->SetStats(false);
   m_eff_bklm->SetOption("HIST");
 
   m_eff_eklm = new TH1F("KLMEfficiencyDQM/eff_eklm_plane",
                         "Plane Efficiency in EKLM Sector",
-                        m_PlaneNumEKLM, 0.5, 0.5 + m_PlaneNumEKLM);
+                        EKLMElementNumbers::getMaximalPlaneGlobalNumber(), 0.5, 0.5 + EKLMElementNumbers::getMaximalPlaneGlobalNumber());
   m_eff_eklm->GetXaxis()->SetTitle("Plane number");
   m_eff_eklm->SetStats(false);
   m_eff_eklm->SetOption("HIST");
 
   m_eff_bklm_sector = new TH1F("KLMEfficiencyDQM/eff_bklm_sector",
                                "Plane Efficiency in BKLM Sector",
-                               m_SectorNumBKLM, 0.5, m_SectorNumBKLM + 0.5);
+                               BKLMElementNumbers::getMaximalSectorGlobalNumber(), 0.5, BKLMElementNumbers::getMaximalSectorGlobalNumber() + 0.5);
   m_eff_bklm_sector->GetXaxis()->SetTitle("Sector number");
   m_eff_bklm_sector->SetStats(false);
   m_eff_bklm_sector->SetOption("HIST");
 
   m_eff_eklm_sector = new TH1F("KLMEfficiencyDQM/eff_eklm_sector",
                                "Plane Efficiency in EKLM Sector",
-                               m_SectorNumEKLM, 0.5, m_SectorNumEKLM + 0.5);
+                               EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(), 0.5, EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() + 0.5);
   m_eff_eklm_sector->GetXaxis()->SetTitle("Sector number");
   m_eff_eklm_sector->SetStats(false);
   m_eff_eklm_sector->SetOption("HIST");
@@ -235,9 +234,6 @@ void DQMHistAnalysisKLM2Module::event()
 
   processPlaneHistogram("eff_bklm_plane", m_eff_bklm);
   processPlaneHistogram("eff_eklm_plane", m_eff_eklm);
-
-
-
 
 }
 

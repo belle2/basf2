@@ -19,10 +19,13 @@ namespace Belle2 {
    * It is used for the Ecms calibration in AirFlow
    */
 
+  /// NaN with double precision for dummy entry
   static const double realNaN = std::numeric_limits<double>::quiet_NaN();
+
+  /// NaN with double precision for dummy entry
   static const int intNaN     = std::numeric_limits<int>::quiet_NaN();
 
-
+  /// Collector for the collision energy calibration based on the hadronic modes
   class EcmsCollectorModule : public CalibrationCollectorModule {
 
   public:

@@ -23,6 +23,7 @@
 #include <Math/SpecFuncMathCore.h>
 #include <Math/DistFunc.h>
 #include <TCanvas.h>
+#include <TRandom3.h>
 #include <fstream>
 
 #include <framework/particledb/EvtGenDatabasePDG.h>
@@ -496,13 +497,16 @@ namespace Belle2 {
 
       // do bootStrap
       vector<double> data;
-      if (bootStrap) gRandom->SetSeed(bootStrap);
+      TRandom3* rand = nullptr;
+      if (bootStrap) rand = new TRandom3(bootStrap);
       for (auto d : dataNow) {
-        int nP = bootStrap ? gRandom->Poisson(1) : 1;
+        int nP = bootStrap ? rand->Poisson(1) : 1;
         for (int i = 0; i < nP; ++i)
           data.push_back(d);
       }
 
+      if (bootStrap)
+        delete rand;
 
       ChebFitter fitter;
       fitter.setDataAndFunction(mainFunction, data);

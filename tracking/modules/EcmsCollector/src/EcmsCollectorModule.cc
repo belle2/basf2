@@ -20,8 +20,6 @@
 using namespace Belle2;
 using namespace std;
 
-#include <iostream>
-
 
 
 
@@ -54,14 +52,15 @@ void EcmsCollectorModule::prepare()
   tree->Branch<int>("run", &m_run);
   tree->Branch<double>("time", &m_time);
 
-  tree->Branch<double>("mBC", &m_mBC);
-  tree->Branch<double>("deltaE", &m_deltaE);
-  tree->Branch<int>("pdg", &m_pdg);
-  tree->Branch<int>("mode", &m_mode);
-  tree->Branch<double>("Kpid", &m_Kpid);
-  tree->Branch<double>("R2", &m_R2);
-  tree->Branch<double>("mD", &m_mD);
-  tree->Branch<double>("dmDstar", &m_dmDstar);
+  tree->Branch<vector<double>>("pBcms", &m_pBcms);
+  tree->Branch<vector<double>>("mB", &m_mB);
+
+  tree->Branch<vector<int>>("pdg", &m_pdg);
+  tree->Branch<vector<int>>("mode", &m_mode);
+  tree->Branch<vector<double>>("Kpid", &m_Kpid);
+  tree->Branch<vector<double>>("R2", &m_R2);
+  tree->Branch<vector<double>>("mD", &m_mD);
+  tree->Branch<vector<double>>("dmDstar", &m_dmDstar);
 
 
   // We register the objects so that our framework knows about them.
@@ -70,25 +69,20 @@ void EcmsCollectorModule::prepare()
   registerObject<TTree>(objectName.Data(), tree);
 }
 
-/** select the best candidate based on the pValue */
-static Particle* getBest(const StoreObjPtr<ParticleList>& B)
+
+void EcmsCollectorModule::resize(int n)
 {
-  double pValBest = -1;
-  double pValInd  = -1;
-  for (unsigned i = 0; i < B->getListSize(); ++i) {
-    const Particle* part = B->getParticle(i);
-    if (!part) continue;
-    double pVal = part->getPValue();
-    if (pVal > pValBest) {
-      pValBest = pVal;
-      pValInd  = i;
-    }
-  }
-
-  if (pValInd < 0) return nullptr;
-
-  return B->getParticle(pValInd);
+  m_pBcms.resize(n);
+  m_mB.resize(n);
+  m_pdg.resize(n);
+  m_mode.resize(n);
+  m_Kpid.resize(n);
+  m_R2.resize(n);
+  m_mD.resize(n);
+  m_dmDstar.resize(n);
 }
+
+
 
 void EcmsCollectorModule::collect()
 {
@@ -102,52 +96,60 @@ void EcmsCollectorModule::collect()
   StoreObjPtr<ParticleList> B0("B0:merged");
   StoreObjPtr<ParticleList> Bm("B-:merged");
 
-  const Particle* Bpart = nullptr;
+
+  //put all the B candidates into the vector
+  vector<const Particle*> Bparts;
 
   if (B0.isValid()) {
-    Bpart = getBest(B0);
-  } else if (Bm.isValid()) {
-    Bpart = getBest(Bm);
+    for (unsigned i = 0; i < B0->getListSize(); ++i)
+      if (B0->getParticle(i))
+        Bparts.push_back(B0->getParticle(i));
+  }
+  if (Bm.isValid()) {
+    for (unsigned i = 0; i < Bm->getListSize(); ++i)
+      if (Bm->getParticle(i))
+        Bparts.push_back(Bm->getParticle(i));
   }
 
-  if (!Bpart) return;
-
-  B2ASSERT("Assert the existence of the Y4S particle data", EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)"));
-
-  const double eBeamRef = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)")->Mass() / 2; //PDG mass of Y4S divided by two
-  const double eBeamNow = PCmsLabTransform().getCMSEnergy() / 2;
-
-  //Convert mBC and deltaE to the Y4S reference
-  m_mBC    = sqrt(max(0.0, pow(eBeamRef, 2) - (pow(eBeamNow, 2) -  pow(Variable::particleMbc(Bpart), 2))));
-  m_deltaE = eBeamNow + Variable::particleDeltaE(Bpart) - eBeamRef;
-  m_pdg    = Bpart->getPDGCode();
-  m_mode   = Bpart->getExtraInfo("decayModeID");
-  m_R2     = Variable::R2(Bpart);
+  if (Bparts.size() == 0) return;
 
 
-  const Particle* D    = nullptr;
-  m_dmDstar = -99;
+  resize(Bparts.size());
 
-  //if D0 or D+ meson
-  if (abs(Bpart->getDaughter(0)->getPDGCode()) == 421 || abs(Bpart->getDaughter(0)->getPDGCode()) == 411) {
-    D = Bpart->getDaughter(0);
-  } else if (abs(Bpart->getDaughter(0)->getPDGCode()) == 413 || abs(Bpart->getDaughter(0)->getPDGCode()) == 423) {
-    const Particle* Dstar = Bpart->getDaughter(0);
-    D = Dstar->getDaughter(0);
-    m_dmDstar = Dstar->getMass() - D->getMass();
-  } else {
-    B2INFO("No D meson found");
+  for (unsigned i = 0; i < Bparts.size(); ++i) {
+    const Particle* Bpart = Bparts[i];
+
+    //Convert mBC and deltaE to the Y4S reference
+    m_pBcms[i]  = PCmsLabTransform::labToCms(Bpart->get4Vector()).P();
+    m_mB[i]     = Bpart->getMass();
+    m_pdg[i]    = Bpart->getPDGCode();
+    m_mode[i]   = Bpart->getExtraInfo("decayModeID");
+    m_R2[i]     = Variable::R2(Bpart);
+
+
+    const Particle* D    = nullptr;
+    m_dmDstar[i] = -99;
+
+    //if D0 or D+ meson
+    if (abs(Bpart->getDaughter(0)->getPDGCode()) == 421 || abs(Bpart->getDaughter(0)->getPDGCode()) == 411) {
+      D = Bpart->getDaughter(0);
+    } else if (abs(Bpart->getDaughter(0)->getPDGCode()) == 413 || abs(Bpart->getDaughter(0)->getPDGCode()) == 423) {
+      const Particle* Dstar = Bpart->getDaughter(0);
+      D = Dstar->getDaughter(0);
+      m_dmDstar[i] = Dstar->getMass() - D->getMass();
+    } else {
+      B2INFO("No D meson found");
+    }
+    m_mD[i] = D->getMass();
+    const Particle* Kaon =  D->getDaughter(0);
+
+
+
+    m_Kpid[i] = -99;
+    if (Kaon && Kaon->getPIDLikelihood()) {
+      m_Kpid[i] = Kaon->getPIDLikelihood()->getProbability(Const::ChargedStable(321), Const::ChargedStable(211));
+    }
   }
-  m_mD = D->getMass();
-  const Particle* Kaon =  D->getDaughter(0);
-
-
-
-  m_Kpid = -99;
-  if (Kaon && Kaon->getPIDLikelihood()) {
-    m_Kpid = Kaon->getPIDLikelihood()->getProbability(Const::ChargedStable(321), Const::ChargedStable(211));
-  }
-
 
 
   getObjectPtr<TTree>("events")->Fill();

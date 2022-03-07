@@ -71,10 +71,10 @@ namespace Belle2 {
     std::vector<Eigen::MatrixXd> cntUnc; ///< vector of uncertainties of means for each calib. subinterval
     Eigen::MatrixXd  spreadMat; ///< spread CovMatrix
 
-    double spreadUnc; ///< stat uncertainty of the spread (for eCMS)
-    double shift;     ///< difference between eCMS for hadronic B decay method and mumu method, i.e. hadB - mumu
-    double shiftUnc;  ///< stat uncertainty of the shift
-    double pull;      ///< pull between mumu and hadB methods (for eCMS)
+    double spreadUnc;          ///< stat uncertainty of the spread (for eCMS)
+    double shift;              ///< difference between eCMS for hadronic B decay method and mumu method, i.e. hadB - mumu
+    double shiftUnc;           ///< stat uncertainty of the shift
+    std::vector<double> pulls; ///< vector of pulls between mumu and hadB methods (for eCMS)
     int size() const {return cnt.size();} ///< number of the subintervals
   };
 
@@ -399,6 +399,7 @@ namespace Belle2 {
     // Run the calibration
     B2INFO("Start of running calibration over calibration interval");
     tie(calD.pars.cnt, calD.pars.cntUnc, calD.pars.spreadMat) = runCalibAnalysis(evtsNow, breaks);
+    calD.pars.pulls.resize(calD.pars.cnt.size());
     B2INFO("End of running analysis - SpreadMatX : " << sqrt(abs(calD.pars.spreadMat(0, 0))));
     B2ASSERT("All subintervals have calibration of the mean value", calD.pars.cnt.size() == r.size());
     B2ASSERT("All subintervals have calibration of the unc. of mean", calD.pars.cntUnc.size() == r.size());

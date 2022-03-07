@@ -29,15 +29,10 @@ namespace Belle2 {
     static const TVector3 vecNaN(realNaN, realNaN, realNaN);
 
 
-    /** structure containing variables relevant for the hadronic B decays */
-    struct Event {
-
-      int exp   = intNaN;  ///< experiment number
-      int run   = intNaN;  ///< run number
-      int evtNo = intNaN;  ///< event number
-
-      double mBC = realNaN;     ///< beam-constrained mass of B meson
-      double deltaE = realNaN;  ///< eBmeson - eCMS/2 in the centre-of-mass frame
+    /** structure containing variables relevant to the B-candidate */
+    struct Candidate {
+      double pBcms = realNaN;   ///< B meson momentum in CMS
+      double mB    = realNaN;   ///< mass of B meson
       int pdg = intNaN;         ///< PDG code of the signal B-meson
       int mode = intNaN;        ///< integer code identifying the decay channel
       double Kpid = realNaN;    ///< Kaon PID
@@ -45,9 +40,23 @@ namespace Belle2 {
       double mD = realNaN;      ///< reconstructed mass of the D meson
       double dmDstar = realNaN; ///< reconstructed mass difference between Dstar and D
 
-      double t = realNaN;       ///< time of the event
-
       bool isSig = false;       ///< isSignal flag (for applying selections)
+    };
+
+
+
+    /** structure containing variables relevant for the hadronic B decays */
+    struct Event {
+
+      int exp   = intNaN;   ///< experiment number
+      int run   = intNaN;   ///< run number
+      int evtNo = intNaN;   ///< event number
+      double t = realNaN;   ///< time of the event
+
+
+      std::vector<Candidate>  cand = {}; ///< vector of B meson candidates
+
+
       int nBootStrap = intNaN;  ///< bootstap weight
     };
 
@@ -55,13 +64,16 @@ namespace Belle2 {
 
 
 
-
+    /** load events from TTree to the vector of Events */
     std::vector<Event> getEvents(TTree* tr);
 
 
+    /** The combined Ecms fit, where the constraints from the mumu fit are defined by limits and mumuVals */
     std::vector<std::vector<double>> doBhadFit(const std::vector<Event>& evts, std::vector<std::pair<double, double>> limits,
                                                std::vector<std::pair<double, double>> mumuVals);
 
+    /** The fit based only on the hadronic B decays */
+    std::vector<double> doBhadOnlyFit(const std::vector<Event>& evts, const std::vector<std::pair<double, double>>& limits);
 
 
     /** Run the InvariantMass analysis where splitPoints are the boundaries of the short calibration intervals

@@ -19,7 +19,10 @@
 
 namespace Belle2 {
 
+  /** values of parameters in ML fit */
   typedef std::map<std::string, double> Pars;
+
+  /** limits of parameters in ML fit */
   typedef std::map<std::string, std::pair<double, double>> Limits;
 
 

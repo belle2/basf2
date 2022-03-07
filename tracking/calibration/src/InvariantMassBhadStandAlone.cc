@@ -86,15 +86,25 @@ namespace Belle2 {
       tr->SetBranchAddress("time", &evt.t); //time in hours
 
 
-      tr->SetBranchAddress("mBC", &evt.mBC);
-      tr->SetBranchAddress("deltaE", &evt.deltaE);
-      tr->SetBranchAddress("pdg", &evt.pdg);
-      tr->SetBranchAddress("mode", &evt.mode);
-      tr->SetBranchAddress("Kpid", &evt.Kpid);
-      tr->SetBranchAddress("R2", &evt.R2);
-      tr->SetBranchAddress("mD", &evt.mD);
-      tr->SetBranchAddress("dmDstar", &evt.dmDstar);
+      vector<double>* pBcms  = new vector<double>;
+      vector<double>* mB     = new vector<double>;
+      vector<int>*    pdg    = new vector<int>;
+      vector<int>*    mode   = new vector<int>;
+      vector<double>* Kpid   = new vector<double>;
+      vector<double>* R2     = new vector<double>;
+      vector<double>* mD     = new vector<double>;
+      vector<double>* dmDstar = new vector<double>;
 
+
+
+      tr->SetBranchAddress("pBcms", &pBcms);
+      tr->SetBranchAddress("mB", &mB);
+      tr->SetBranchAddress("pdg", &pdg);
+      tr->SetBranchAddress("mode", &mode);
+      tr->SetBranchAddress("Kpid", &Kpid);
+      tr->SetBranchAddress("R2", &R2);
+      tr->SetBranchAddress("mD", &mD);
+      tr->SetBranchAddress("dmDstar", &dmDstar);
 
 
 
@@ -102,13 +112,30 @@ namespace Belle2 {
       for (int i = 0; i < tr->GetEntries(); ++i) {
         tr->GetEntry(i);
 
+        int nCand = mode->size();
+        evt.cand.resize(nCand);
+
+        for (int j = 0; j < nCand; ++j) {
+          evt.cand[j].pBcms  = pBcms->at(j);
+          evt.cand[j].mB     = mB->at(j);
+          evt.cand[j].pdg    = pdg->at(j);
+          evt.cand[j].mode   = mode->at(j);
+          evt.cand[j].Kpid   = Kpid->at(j);
+          evt.cand[j].R2     = R2->at(j);
+          evt.cand[j].mD     = mD->at(j);
+          evt.cand[j].dmDstar = dmDstar->at(j);
+
+          evt.cand[j].isSig = true;
+        }
+
         evt.nBootStrap = 1;
-        evt.isSig = true;
+        //evt.isSig = true;
         events.push_back(evt);
       }
 
       //sort by time
       sort(events.begin(), events.end(), [](Event e1, Event e2) {return e1.t < e2.t;});
+
 
       return events;
     }
@@ -185,7 +212,7 @@ namespace Belle2 {
       frame3->Draw() ;
       c1->Update();
 
-      TLine* l = new TLine(5.27, 0.0, 5.37, 0.0);
+      TLine* l = new TLine(5279.34e-3, 0.0, 5.37, 0.0);
       l->SetLineColor(kBlue);
       l->SetLineWidth(3);
       l->Draw();
@@ -193,16 +220,169 @@ namespace Belle2 {
 
       if (fName != "") c1->SaveAs(fName);
 
-      delete mbcframe;
+
       delete hpull;
-      delete frame3;
-      delete c1;
-      delete pad1;
-      delete pad2;
       delete ll;
       delete l;
+      delete pad1;
+      delete pad2;
+
+      delete c1;
+
 
       gROOT->SetBatch(isBatch);
+    }
+
+    map<TString, pair<double, double>> argusFit(const vector<Event>& evts,  vector<pair<double, double>> limits)
+    {
+
+      const double cMBp = EvtGenDatabasePDG::Instance()->GetParticle("B+")->Mass();
+      const double cMB0 = EvtGenDatabasePDG::Instance()->GetParticle("B0")->Mass();
+
+      using namespace RooFit;
+
+      RooRealVar eNow("eNow", "E^{*}_{B} [GeV]", cMBp, 5.37);
+
+
+      RooDataSet* dataE0 = new RooDataSet("dataE0", "dataE0", RooArgSet(eNow));
+      RooDataSet* dataEp = new RooDataSet("dataEp", "dataEp", RooArgSet(eNow));
+
+
+      TH1D* hDeltaE = new TH1D(rn(), "", 30, -0.05, 0.05);
+      TH1D* hMD     = new TH1D(rn(), "", 30, 1.7, 1.9);
+      TH1D* hMB      = new TH1D(rn(), "", 30, -0.15, 0.15);
+
+
+
+      B2ASSERT("Assert the existence of the Y4S particle data", EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)"));
+
+      const double cmsE0 = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)")->Mass(); //Y4S mass
+
+      int nCand = 0, nEv = 0;
+
+      for (auto event : evts) {
+        int iCand = 0;
+        for (auto cand : event.cand) {
+
+          double p = cand.pBcms;
+          double mInv = cand.mB;
+
+          //get mass of B+- or B0
+          double mB = EvtGenDatabasePDG::Instance()->GetParticle(abs(cand.pdg))->Mass();
+
+
+          // Filling the events
+          if (1.830 < cand.mD && cand.mD < 1.894)
+            if (abs(mInv - mB) < 0.05)
+              if (cand.R2 < 0.3)
+                if ((cand.dmDstar < -10)  || (0.143 < cand.dmDstar && cand.dmDstar < 0.147)) {
+                  double eBC = sqrt(p * p + pow(mB, 2)); // beam constrained energy
+                  if (eBC > 5.37) continue;
+
+                  for (unsigned i = 0; i < limits.size(); ++i) {
+                    if (limits[i].first <= event.t && event.t < limits[i].second) {
+                      if (abs(cand.pdg) == 511) {
+                        eNow.setVal(eBC);
+                        dataE0->add(RooArgSet(eNow));
+                      } else {
+                        eNow.setVal(eBC);
+                        dataEp->add(RooArgSet(eNow));
+                      }
+                      ++nCand;
+                      if (iCand == 0) ++nEv;
+                    }
+                  }
+
+                  hDeltaE->Fill(eBC - cmsE0 / 2);
+                  hMD->Fill(cand.mD);
+                  hMB->Fill(mInv - mB);
+                }
+          ++iCand;
+        }
+      }
+
+
+      RooCategory Bcharge("sample", "sample") ;
+      Bcharge.defineType("B0") ;
+      Bcharge.defineType("Bp") ;
+
+      RooDataSet combData("combData", "combined data", eNow, Index(Bcharge), Import("B0", *dataE0), Import("Bp", *dataEp)) ;
+
+
+      // --- Build Gaussian signal PDF ---
+      RooRealVar sigmean("Mean", "B^{#pm} mass", 5.29, 5.27, 5.30) ;
+      RooRealVar sigwidth("#sigma", "B^{#pm} width", 0.00237, 0.0001, 0.030) ;
+      //sigwidth.setConstant(kTRUE);
+
+
+      RooPolyVar sigmeanNow("sigmeanNow", "shape parameter", sigmean, RooArgSet(RooConst(0.000), RooConst(1.)));
+      RooGaussian gauss("gauss", "gaussian PDF", eNow, sigmeanNow, sigwidth) ;
+
+      // --- Build Argus background PDF ---
+      RooRealVar argpar("Argus_param", "argus shape parameter", -150.7, -300., +50.0) ;
+      RooRealVar endpointBp("EndPointBp", "endPoint parameter", cMBp, 5.27, 5.291) ; //B+ value
+      RooRealVar endpointB0("EndPointB0", "endPoint parameter", cMB0, 5.27, 5.291) ; //B0 value
+      endpointB0.setConstant(kTRUE);
+      endpointBp.setConstant(kTRUE);
+
+
+      //B0 pars
+      RooPolyVar shape2B0("EndPoint2B0", "shape parameter", endpointB0, RooArgSet(RooConst(0.), RooConst(2.)));
+      RooPolyVar eNowDifB0("eNowDifB0", "eNowDifB0", eNow, RooArgSet(shape2B0, RooConst(-1.)));
+      RooArgusBG argusB0("argusB0", "Argus PDF", eNowDifB0, endpointB0, argpar) ;
+
+      //Bp pars
+      RooPolyVar shape2Bp("EndPoint2Bp", "shape parameter", endpointBp, RooArgSet(RooConst(0.), RooConst(2.)));
+      RooPolyVar eNowDifBp("eNowDifBp", "eNowDifBp", eNow, RooArgSet(shape2Bp, RooConst(-1.)));
+      RooArgusBG argusBp("argusBp", "Argus PDF", eNowDifBp, endpointBp, argpar) ;
+
+
+      // --- Construct signal+background PDF ---
+      RooRealVar nsigB0("nsigB0", "#signal events", 100, 0., 100000) ;
+      RooRealVar nbkgB0("nbkgB0", "#background events", 100, 0., 500000) ;
+
+      RooRealVar nsigBp("nsigBp", "#signal events", 100, 0., 100000) ;
+      RooRealVar nbkgBp("nbkgBp", "#background events", 100, 0., 500000) ;
+
+
+
+      RooAddPdf sumB0("sumB0", "g0+a0", RooArgList(gauss, argusB0), RooArgList(nsigB0, nbkgB0)) ;
+      RooAddPdf sumBp("sumBp", "gP+aP", RooArgList(gauss, argusBp), RooArgList(nsigBp, nbkgBp)) ;
+
+
+      // Construct a simultaneous pdf using category sample as index
+      RooSimultaneous simPdf("simPdf", "simultaneous pdf", Bcharge) ;
+
+      // Associate model with the physics state and model_ctl with the control state
+      simPdf.addPdf(sumB0,  "B0") ;
+      simPdf.addPdf(sumBp,  "Bp") ;
+
+      simPdf.fitTo(combData);
+
+
+      map<TString, pair<double, double>> resMap;
+      resMap["sigmean"]  = {sigmean.getValV(),  sigmean.getError()};
+      resMap["sigwidth"] = {sigwidth.getValV(), sigwidth.getError()};
+      resMap["argpar"]   = {argpar.getValV(), argpar.getError()};
+      resMap["endpoint"]   = {endpointB0.getValV(), endpointB0.getError()};
+
+      namespace fs = std::filesystem;
+      fs::create_directories("plotsHadBonly");
+
+      plotArgusFit(dataE0, sumB0, argusB0, gauss, eNow, Form("plotsHadBonly/B0Single_%d.pdf", int(round(limits[0].first))));
+      plotArgusFit(dataEp, sumBp, argusBp, gauss, eNow, Form("plotsHadBonly/BpSingle_%d.pdf", int(round(limits[0].first))));
+
+
+      // Delete rooFit objects
+      delete dataE0;
+      delete dataEp;
+
+
+      delete hDeltaE;
+      delete hMD;
+      delete hMB;
+
+      return resMap;
     }
 
 
@@ -221,9 +401,12 @@ namespace Belle2 {
       }
 
 
+      const double cMBp = EvtGenDatabasePDG::Instance()->GetParticle("B+")->Mass();
+      const double cMB0 = EvtGenDatabasePDG::Instance()->GetParticle("B0")->Mass();
+
       using namespace RooFit;
 
-      RooRealVar eNow("eNow", "E^{*}_{B} [GeV]", 5.27, 5.37);
+      RooRealVar eNow("eNow", "E^{*}_{B} [GeV]", cMBp, 5.37);
 
       vector<RooDataSet*> dataE0(limits.size());
       vector<RooDataSet*> dataEp(limits.size());
@@ -241,36 +424,49 @@ namespace Belle2 {
 
       B2ASSERT("Assert the existence of the Y4S particle data", EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)"));
 
-      for (auto ev : evts) {
-        const double cmsE0 = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)")->Mass(); //Y4S mass
-        double E = ev.deltaE + cmsE0 / 2; // energy
-        double p = sqrt(pow(cmsE0 / 2, 2) - pow(ev.mBC, 2)); // momentum
-        double m = sqrt(E * E - p * p);
+      const double cmsE0 = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)")->Mass(); //Y4S mass
 
-        //get mass of B+- or B0
-        double mB = EvtGenDatabasePDG::Instance()->GetParticle(abs(ev.pdg))->Mass();
+      int nCand = 0, nEv = 0;
+
+      for (auto event : evts) {
+        int iCand = 0;
+        for (auto cand : event.cand) {
+
+          double p = cand.pBcms;
+          double mInv = cand.mB;
+
+          //get mass of B+- or B0
+          double mB = EvtGenDatabasePDG::Instance()->GetParticle(abs(cand.pdg))->Mass();
 
 
-        // Filling the events
-        if (1.830 < ev.mD && ev.mD < 1.894)
-          if (abs(m - mB) < 0.05)
-            if (ev.R2 < 0.3)
-              if ((ev.dmDstar < -10)  || (0.143 < ev.dmDstar && ev.dmDstar < 0.147)) {
-                double eBC = sqrt(p * p + pow(mB, 2));
-                if (eBC > 5.37) continue;
+          // Filling the events
+          if (1.830 < cand.mD && cand.mD < 1.894)
+            if (abs(mInv - mB) < 0.05)
+              if (cand.R2 < 0.3)
+                if ((cand.dmDstar < -10)  || (0.143 < cand.dmDstar && cand.dmDstar < 0.147)) {
+                  double eBC = sqrt(p * p + pow(mB, 2)); // beam constrained energy
+                  if (eBC > 5.37) continue;
 
-                eNow.setVal(eBC);
-                for (unsigned i = 0; i < limits.size(); ++i) {
-                  if (limits[i].first <= ev.t && ev.t < limits[i].second) {
-                    if (abs(ev.pdg) == 511) dataE0[i]->add(RooArgSet(eNow));
-                    else                   dataEp[i]->add(RooArgSet(eNow));
+                  for (unsigned i = 0; i < limits.size(); ++i) {
+                    if (limits[i].first <= event.t && event.t < limits[i].second) {
+                      if (abs(cand.pdg) == 511) {
+                        eNow.setVal(eBC);
+                        dataE0[i]->add(RooArgSet(eNow));
+                      } else {
+                        eNow.setVal(eBC);
+                        dataEp[i]->add(RooArgSet(eNow));
+                      }
+                      ++nCand;
+                      if (iCand == 0) ++nEv;
+                    }
                   }
-                }
 
-                hDeltaE->Fill(ev.deltaE);
-                hMD->Fill(ev.mD);
-                hMB->Fill(m - mB);
-              }
+                  hDeltaE->Fill(eBC - cmsE0 / 2);
+                  hMD->Fill(cand.mD);
+                  hMB->Fill(mInv - mB);
+                }
+          ++iCand;
+        }
       }
 
 
@@ -307,8 +503,6 @@ namespace Belle2 {
 
       // --- Build Argus background PDF ---
 
-      const double cMBp = EvtGenDatabasePDG::Instance()->GetParticle("B+")->Mass();
-      const double cMB0 = EvtGenDatabasePDG::Instance()->GetParticle("B0")->Mass();
 
       RooRealVar argpar("Argus_param", "argus shape parameter", -150.7, -300., +50.0) ;
       RooRealVar endpointBp("EndPointBp", "endPoint parameter", cMBp, 5.27, 5.291) ; //B+ value
@@ -435,6 +629,11 @@ namespace Belle2 {
       return resMap;
     }
 
+
+
+
+
+
     vector<vector<double>> doBhadFit(const vector<Event>& evts, vector<pair<double, double>> limits,
                                      vector<pair<double, double>> mumuVals)
     {
@@ -449,7 +648,6 @@ namespace Belle2 {
         string n  = Form("sigmean_%u", i);
         string np = Form("pull_%u", i);
 
-
         //convert to whole eCMS (ecms, ecmsSpread, ecmsShift)
         result[i] = {2 * r.at(n).first,  2 * r.at(n).second,  2 * r.at("sigwidth").first, 2 * r.at("sigwidth").second, 2 * r.at("shift").first, 2 * r.at("shift").second, r.at(np).first};
       }
@@ -457,6 +655,18 @@ namespace Belle2 {
       return result;
 
     }
+
+
+    vector<double> doBhadOnlyFit(const vector<Event>& evts, const vector<pair<double, double>>& limits)
+    {
+
+      auto r = argusFit(evts, limits);
+
+      return {2 * r.at("sigmean").first,  2 * r.at("sigmean").second,  2 * r.at("sigwidth").first, 2 * r.at("sigwidth").second};
+
+    }
+
+
 
 
   }

@@ -11,6 +11,7 @@
 #include <calibration/CalibrationAlgorithm.h>
 #include <tracking/calibration/InvariantMassMuMuStandAlone.h>
 #include <tracking/calibration/InvariantMassBhadStandAlone.h>
+#include <tracking/calibration/calibTools.h>
 
 namespace Belle2 {
   /**
@@ -40,6 +41,12 @@ namespace Belle2 {
     /// set the energy offset
     void setMuMuEcmsOffset(double shift) {m_eCMSmumuShift = shift;}
 
+    /// Load the mumu data from files
+    std::vector<InvariantMassMuMuCalib::Event> getDataMuMu(const std::vector<std::string>& files, bool is4S);
+
+    /// Load the hadB data from files
+    std::vector<InvariantMassBhadCalib::Event> getDataHadB(const std::vector<std::string>& files);
+
   protected:
 
     /// Run algo on data
@@ -47,15 +54,13 @@ namespace Belle2 {
 
   private:
 
-    /// Load the mumu data from files
-    std::vector<InvariantMassMuMuCalib::Event> getDataMuMu(const std::vector<std::string>& files, bool is4S);
-
-    /// Load the hadB data from files
-    std::vector<InvariantMassBhadCalib::Event> getDataHadB(const std::vector<std::string>& files);
+    /// Adjust the energy of the off-resonance runs based on the energy offset between mumu and hadB method in the neighboring blocks
+    std::vector<std::vector<CalibrationData>> adjustOffResonanceEnergy(std::vector<std::vector<CalibrationData>>  CalResultsBlocks,
+                                           const std::vector<std::vector<InvariantMassMuMuCalib::Event>>&  evtsMuMuBlocks);
 
 
     /// Outer loss function (for calibration intervals with constant InvarinatMass spread)
-    TString m_lossFunctionOuter = "pow(0.000020e0*rawTime, 2) +  1./nEv";
+    TString m_lossFunctionOuter = "pow(0.000010e0*rawTime, 2) +  1./nEv";
 
     /// Inner loss function (for calibration subintervals with constant InvariantMass)
     TString m_lossFunctionInner = "pow(0.000120e0*rawTime, 2) +  1./nEv";

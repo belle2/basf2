@@ -12,12 +12,12 @@
 #include <tracking/calibration/InvariantMassMuMuStandAlone.h>
 #include <tracking/calibration/InvariantMassBhadStandAlone.h>
 #include <tracking/calibration/calibTools.h>
+#include <TFile.h>
 
 #include <Eigen/Dense>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-using std::cout;
 using std::endl;
 
 using Eigen::VectorXd;
@@ -27,7 +27,7 @@ using namespace Belle2;
 
 
 //Using boostVector collector for the input
-InvariantMassAlgorithm::InvariantMassAlgorithm() : CalibrationAlgorithm("EcmsCollector")
+InvariantMassAlgorithm::InvariantMassAlgorithm() : CalibrationAlgorithm("BoostVectorCollector")
 {
   setDescription("Collision invariant mass calibration algorithm");
 }
@@ -107,15 +107,90 @@ std::vector<CalibrationData> addSpreadAndOffset(const std::vector<CalibrationDat
 
       calibNew.pars.shift           = offset;
       calibNew.pars.shiftUnc        = offsetUnc;
-      calibNew.pars.pull            = 0;
+      calibNew.pars.pulls[j]        = 0;
     }
   }
   return mumuCalResultsNew;
 }
 
 
+
+
+static std::vector<TTree*> getTrees(TString tag, TFile* f)
+{
+  if (f == nullptr)
+    return {};
+
+  f->cd(tag + "/events");
+  TList* l = f->CurrentDirectory().load()->GetListOfKeys();
+
+
+  std::vector<TTree*> treeVec;
+
+  for (const auto && obj : *l) {
+    TString n = obj->GetName();
+
+    TString trDir = tag + "/events/" + TString(obj->GetName()) + "/events_1";
+
+    treeVec.push_back((TTree*) f->Get(trDir));
+  }
+
+  return treeVec;
+}
+
+
+static std::vector<InvariantMassMuMuCalib::Event> readMuMuFiles(std::vector<std::string> files, bool is4S)
+{
+  std::vector<InvariantMassMuMuCalib::Event> events;
+  for (auto fName : files) {
+    TFile* f = TFile::Open(fName.c_str(), "READ");
+    auto trees = getTrees("BoostVectorCollector", f);
+
+    for (auto tr : trees) {
+      if (!tr) continue;
+      std::vector<InvariantMassMuMuCalib::Event> eventsNow = InvariantMassMuMuCalib::getEvents(tr, is4S);
+      events.insert(events.end(), eventsNow.begin(), eventsNow.end());
+    }
+
+    f->Close();
+  }
+
+  sort(events.begin(), events.end(), [](InvariantMassMuMuCalib::Event e1, InvariantMassMuMuCalib::Event e2) {return e1.t < e2.t;});
+  return events;
+}
+
+
+static std::vector<InvariantMassBhadCalib::Event> readBhadFiles(std::vector<std::string> files)
+{
+  std::vector<InvariantMassBhadCalib::Event> events;
+  for (auto fName : files) {
+    TFile* f = TFile::Open(fName.c_str(), "READ");
+    auto trees = getTrees("EcmsCollector", f);
+
+    for (auto tr : trees) {
+      if (!tr) continue;
+      std::vector<InvariantMassBhadCalib::Event> eventsNow = InvariantMassBhadCalib::getEvents(tr);
+      events.insert(events.end(), eventsNow.begin(), eventsNow.end());
+    }
+
+    f->Close();
+  }
+
+  sort(events.begin(), events.end(), [](InvariantMassBhadCalib::Event e1, InvariantMassBhadCalib::Event e2) {return e1.t < e2.t;});
+  return events;
+}
+
+
+
+
+
+
+
 std::vector<InvariantMassMuMuCalib::Event> InvariantMassAlgorithm::getDataMuMu(const std::vector<std::string>& files, bool is4S)
 {
+  if (files.size() == 0)
+    return {};
+
   clearCalibrationData();
   setPrefix("BoostVectorCollector");
 
@@ -145,6 +220,9 @@ std::vector<InvariantMassMuMuCalib::Event> InvariantMassAlgorithm::getDataMuMu(c
 
 std::vector<InvariantMassBhadCalib::Event> InvariantMassAlgorithm::getDataHadB(const std::vector<std::string>& files)
 {
+  if (files.size() == 0)
+    return {};
+
   clearCalibrationData();
   setPrefix("EcmsCollector");
 
@@ -184,6 +262,8 @@ void printToFile(const std::vector<CalibrationData>&  CalResults, TString outFil
 {
   //Store info to the text file
   std::ofstream finalOut(outFileName);
+  finalOut <<
+           "t1   t2      exp1   run1     exp2   run2     state     Ecms   EcmsUnc     pull   shift   shiftUnc     spread   spreadUnc" << endl;
 
   for (auto cal : CalResults) {
 
@@ -195,15 +275,21 @@ void printToFile(const std::vector<CalibrationData>&  CalResults, TString outFil
 
       double shift    = cal.pars.shift;
       double shiftUnc = cal.pars.shiftUnc;
-      double pull     = cal.pars.pull;
+      double pull     = cal.pars.pulls[j];
 
       double s = cal.subIntervals[j].begin()->second.first;
       double e = cal.subIntervals[j].rbegin()->second.second;
 
+      double exp1 = cal.subIntervals[j].begin()->first.exp;
+      double exp2 = cal.subIntervals[j].rbegin()->first.exp;
+      double run1 = cal.subIntervals[j].begin()->first.run;
+      double run2 = cal.subIntervals[j].rbegin()->first.run;
 
-      finalOut << s << " " << e << " " << j << " " << std::setprecision(8) << 1e3 * cnt << " +- " << 1e3 * cntUnc << " : " <<   pull <<
-               " " << 1e3 * shift << " +- " << 1e3 *
-               shiftUnc << " : " << 1e3 * spread << " +- " << 1e3 * spreadUnc <<  endl;
+
+      finalOut <<  std::setprecision(8) <<  s << " " << e << " " << exp1 << " " << run1 << " " << exp2 << " " << run2  << " " << j << " "
+               <<  1e3 * cnt << "   " << 1e3 * cntUnc << "   " <<   pull <<
+               " " << 1e3 * shift << "    " << 1e3 *
+               shiftUnc << "   " << 1e3 * spread << "   " << 1e3 * spreadUnc <<  endl;
 
     }
 
@@ -213,137 +299,10 @@ void printToFile(const std::vector<CalibrationData>&  CalResults, TString outFil
 
 
 
-
-/* Main calibration method calling dedicated functions */
-CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
+std::vector<std::vector<CalibrationData>> InvariantMassAlgorithm::adjustOffResonanceEnergy(std::vector<std::vector<CalibrationData>>
+                                       CalResultsBlocks,
+                                       const std::vector<std::vector<InvariantMassMuMuCalib::Event>>&  evtsMuMuBlocks)
 {
-  std::vector<std::string> files = getVecInputFileNames();
-
-  std::vector<std::string> filesHad4S, filesMuMu4S, filesMuMuOff;
-  for (auto f : files) {
-    if (f.find("/mumu_4S/") != std::string::npos)
-      filesMuMu4S.push_back(f);
-    else if (f.find("/mumu_Off/") != std::string::npos)
-      filesMuMuOff.push_back(f);
-    else if (f.find("/hadB_4S/") != std::string::npos)
-      filesHad4S.push_back(f);
-    else {
-      B2FATAL("Unrecognised data type");
-    }
-  }
-
-  for (auto r : filesMuMu4S)
-    B2INFO("MuMu4SFile name " << r);
-  for (auto r : filesMuMuOff) {
-    B2INFO("MuMuOffFile name " << r);
-  }
-  for (auto r : filesHad4S)
-    B2INFO("Had4SFile name " << r);
-
-
-
-  // load the mumu data
-  const auto evtsMuMuOff = getDataMuMu(filesMuMuOff, false /*is4S*/);
-  const auto evtsMuMu4S  = getDataMuMu(filesMuMu4S, true /*is4S*/);
-
-  if (evtsMuMuOff.size() + evtsMuMu4S.size() < 50) {
-    B2WARNING("Not enough data, there are only " << evtsMuMuOff.size() + evtsMuMu4S.size() << " mumu events");
-    return CalibrationAlgorithm::EResult::c_NotEnoughData;
-  }
-
-
-  // load hadB data
-  const auto evtsHad = getDataHadB(filesHad4S);
-
-  // merge mumu data
-  std::vector<InvariantMassMuMuCalib::Event> evtsMuMuTemp = evtsMuMu4S;
-  evtsMuMuTemp.insert(evtsMuMuTemp.end(), evtsMuMuOff.begin(), evtsMuMuOff.end());
-
-  if (evtsMuMuTemp.size() < 50) {
-    B2WARNING("Not enough mumu data, there are only " << evtsMuMuTemp.size() << " mumu events");
-    return CalibrationAlgorithm::EResult::c_NotEnoughData;
-  }
-
-  // sort by time
-  std::sort(evtsMuMuTemp.begin(), evtsMuMuTemp.end(), [](const InvariantMassMuMuCalib::Event & evt1,
-  const InvariantMassMuMuCalib::Event & evt2) { return evt1.t < evt2.t; });
-
-  //split the mumu events into the blocks with identical run type
-  std::vector<std::vector<InvariantMassMuMuCalib::Event>> evtsMuMuBlocks;
-  bool is4Sold = evtsMuMuTemp[0].is4S;
-  evtsMuMuBlocks.push_back({}); // empty vec to start
-  for (const auto& ev : evtsMuMuTemp) {
-    if (is4Sold != ev.is4S) {
-      evtsMuMuBlocks.push_back({}); // adding new entry
-      is4Sold = ev.is4S;
-    }
-    evtsMuMuBlocks.back().push_back(ev);
-  }
-  B2INFO("Number of mumu 4S events " << evtsMuMu4S.size());
-  B2INFO("Number of mumu off-res events " << evtsMuMuOff.size());
-  B2INFO("Total number of mumu events " << evtsMuMuTemp.size());
-  B2INFO("Number of hadronic B events " << evtsHad.size());
-
-  B2INFO("Number of main calibration blocks " << evtsMuMuBlocks.size());
-
-
-  std::vector<std::vector<CalibrationData>> CalResultsBlocks;
-  //calibrate each run-type block separately
-  for (const auto& evtsMuMu : evtsMuMuBlocks) {
-
-    // Run the mumuCalibration
-    const std::vector<CalibrationData> mumuCalResults = runMuMuCalibration(evtsMuMu,
-                                                        InvariantMassMuMuCalib::runMuMuInvariantMassAnalysis,
-                                                        m_lossFunctionOuter, m_lossFunctionInner);
-
-
-    //if off-res block or hadB is turned off
-    if (!m_runHadB || evtsMuMu[0].is4S == false) {
-      CalResultsBlocks.push_back(mumuCalResults);
-      continue;
-    }
-
-    // If its 4S type and hadB allowed, run the combined Calib
-    auto combCalResults = mumuCalResults;
-    //Update the calibration with Bhad data
-    for (unsigned i = 0; i < mumuCalResults.size(); ++i) {
-      const auto& calibMuMu = mumuCalResults[i];
-      auto& calibComb = combCalResults[i];
-
-      std::vector<std::pair<double, double>> limits, mumuVals;
-
-      for (unsigned j = 0; j < calibMuMu.subIntervals.size(); ++j) {
-        double s = calibMuMu.subIntervals[j].begin()->second.first;
-        double e = calibMuMu.subIntervals[j].rbegin()->second.second;
-        limits.push_back({s, e});
-
-        double val = calibMuMu.pars.cnt[j](0);
-        double unc = calibMuMu.pars.cntUnc[j](0, 0);
-        mumuVals.push_back({val, unc});
-      }
-
-      auto res = InvariantMassBhadCalib::doBhadFit(evtsHad, limits, mumuVals);
-
-      //update
-      for (unsigned j = 0; j < calibMuMu.subIntervals.size(); ++j) {
-        calibComb.pars.cnt[j](0)       = res[j][0];
-        calibComb.pars.cntUnc[j](0, 0) = res[j][1];
-        calibComb.pars.spreadMat(0, 0) = res[j][2];
-
-        calibComb.pars.spreadUnc = res[j][3];
-        calibComb.pars.shift     = res[j][4];
-        calibComb.pars.shiftUnc  = res[j][5];
-        calibComb.pars.pull      = res[j][6];
-      }
-    }
-
-    CalResultsBlocks.push_back(combCalResults);
-
-  }
-
-  assert(CalResultsBlocks.size() == evtsMuMuBlocks.size());
-
-
   // Adjust the energy in the off-resoncance runs
   for (int b = 0; b < int(CalResultsBlocks.size()); ++b) {
     // only deal with off-res runs
@@ -381,11 +340,173 @@ CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
       shift  = weightAvg(shifts[0], shiftsUnc[0], shifts[1], shiftsUnc[1]);
 
       spreadUnc = sqrt(pow(spreads[0] - spreads[1], 2) + (pow(spreadsUnc[0], 2)  + pow(spreadsUnc[1], 2)) / 2);
-      shiftUnc  = sqrt(pow(shifts[0] - shifts[1], 2) + (pow(shiftsUnc[0], 2)  + pow(shiftsUnc[1], 2)) / 2);
+      shiftUnc  = sqrt((pow(shift - shifts[0], 2) + pow(shift - shifts[1], 2)) / 2 + (pow(shiftsUnc[0], 2)  + pow(shiftsUnc[1], 2)) / 2);
     }
 
     CalResultsBlocks[b] = addSpreadAndOffset(CalResultsBlocks[b], spread, spreadUnc, shift, shiftUnc);
   }
+  return CalResultsBlocks;
+}
+
+
+
+
+
+
+
+
+/* Main calibration method calling dedicated functions */
+CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
+{
+  std::vector<std::string> files = getVecInputFileNames();
+
+  std::vector<std::string> filesHad4S, filesMuMu4S, filesMuMuOff;
+  for (auto f : files) {
+    if (f.find("/dimuon_4S/") != std::string::npos)
+      filesMuMu4S.push_back(f);
+    else if (f.find("/dimuon_Off/") != std::string::npos)
+      filesMuMuOff.push_back(f);
+    else if (f.find("/hadB_4S/") != std::string::npos)
+      filesHad4S.push_back(f);
+    else {
+      B2FATAL("Unrecognised data type");
+    }
+  }
+
+
+  for (auto r : filesMuMu4S)
+    B2INFO("MuMu4SFile name " << r);
+  for (auto r : filesMuMuOff) {
+    B2INFO("MuMuOffFile name " << r);
+  }
+  for (auto r : filesHad4S)
+    B2INFO("Had4SFile name " << r);
+
+
+
+  // load the mumu data
+  const auto evtsMuMuOff = readMuMuFiles(filesMuMuOff, false /*is4S*/);
+  const auto evtsMuMu4S  = readMuMuFiles(filesMuMu4S, true /*is4S*/);
+
+  if (evtsMuMuOff.size() + evtsMuMu4S.size() < 50) {
+    B2WARNING("Not enough data, there are only " << evtsMuMuOff.size() + evtsMuMu4S.size() << " mumu events");
+    return CalibrationAlgorithm::EResult::c_NotEnoughData;
+  }
+
+
+  // load hadB data
+  const auto evtsHad = readBhadFiles(filesHad4S);
+
+  // merge mumu data
+  std::vector<InvariantMassMuMuCalib::Event> evtsMuMuTemp = evtsMuMu4S;
+  evtsMuMuTemp.insert(evtsMuMuTemp.end(), evtsMuMuOff.begin(), evtsMuMuOff.end());
+
+  if (evtsMuMuTemp.size() < 50) {
+    B2WARNING("Not enough mumu data, there are only " << evtsMuMuTemp.size() << " mumu events");
+    return CalibrationAlgorithm::EResult::c_NotEnoughData;
+  }
+
+
+  // sort by time
+  std::sort(evtsMuMuTemp.begin(), evtsMuMuTemp.end(), [](const InvariantMassMuMuCalib::Event & evt1,
+  const InvariantMassMuMuCalib::Event & evt2) { return evt1.t < evt2.t; });
+
+  //split the mumu events into the blocks with identical run type
+  std::vector<std::vector<InvariantMassMuMuCalib::Event>> evtsMuMuBlocks;
+  bool is4Sold = evtsMuMuTemp[0].is4S;
+  evtsMuMuBlocks.push_back({}); // empty vec to start
+  for (const auto& ev : evtsMuMuTemp) {
+    if (is4Sold != ev.is4S) {
+      evtsMuMuBlocks.push_back({}); // adding new entry
+      is4Sold = ev.is4S;
+    }
+    evtsMuMuBlocks.back().push_back(ev);
+  }
+  B2INFO("Number of mumu 4S events " << evtsMuMu4S.size());
+  B2INFO("Number of mumu off-res events " << evtsMuMuOff.size());
+  B2INFO("Total number of mumu events " << evtsMuMuTemp.size());
+  B2INFO("Number of hadronic B events " << evtsHad.size());
+
+  B2INFO("Number of main calibration blocks " << evtsMuMuBlocks.size());
+
+  std::ofstream BonlyOut("BonlyEcmsCalib.txt");
+  BonlyOut << "t1    t2   exp1   run1      exp2   run2      Ecms   EcmsUnc    spread   spreadUnc" << endl;
+
+  std::vector<std::vector<CalibrationData>> CalResultsBlocks;
+  //calibrate each run-type block separately
+  for (const auto& evtsMuMu : evtsMuMuBlocks) {
+
+    // Run the mumuCalibration
+    const std::vector<CalibrationData> mumuCalResults = runMuMuCalibration(evtsMuMu,
+                                                        InvariantMassMuMuCalib::runMuMuInvariantMassAnalysis,
+                                                        m_lossFunctionOuter, m_lossFunctionInner);
+
+
+    //if off-res block or hadB is turned off
+    if (!m_runHadB || evtsMuMu[0].is4S == false) {
+      CalResultsBlocks.push_back(mumuCalResults);
+      continue;
+    }
+
+
+    // If its 4S type and hadB allowed, run the combined Calib
+    auto combCalResults = mumuCalResults;
+    //Update the calibration with Bhad data
+    for (unsigned i = 0; i < mumuCalResults.size(); ++i) {
+      const auto& calibMuMu = mumuCalResults[i];
+      auto& calibComb = combCalResults[i];
+
+      std::vector<std::pair<double, double>> limits, mumuVals;
+
+      for (unsigned j = 0; j < calibMuMu.subIntervals.size(); ++j) {
+        double s = calibMuMu.subIntervals[j].begin()->second.first;
+        double e = calibMuMu.subIntervals[j].rbegin()->second.second;
+        limits.push_back({s, e});
+
+        double val = calibMuMu.pars.cnt[j](0);
+        double unc = calibMuMu.pars.cntUnc[j](0, 0);
+        mumuVals.push_back({val, unc});
+      }
+
+      auto res = InvariantMassBhadCalib::doBhadFit(evtsHad, limits, mumuVals);
+
+      // update calibration data
+      for (unsigned j = 0; j < calibMuMu.subIntervals.size(); ++j) {
+        calibComb.pars.cnt[j](0)       = res[j][0];
+        calibComb.pars.cntUnc[j](0, 0) = res[j][1];
+        calibComb.pars.spreadMat(0, 0) = res[j][2];
+
+        calibComb.pars.spreadUnc = res[j][3];
+        calibComb.pars.shift     = res[j][4];
+        calibComb.pars.shiftUnc  = res[j][5];
+        calibComb.pars.pulls[j]  = res[j][6];
+      }
+
+      // run B mesons stand-alone calibration
+      auto resB = InvariantMassBhadCalib::doBhadOnlyFit(evtsHad, limits);
+
+      // store it to file
+      double s = calibMuMu.subIntervals.front().begin()->second.first; // start time in hours
+      double e = calibMuMu.subIntervals.back().rbegin()->second.second;// end time in hours
+
+      double exp1 = calibMuMu.subIntervals.front().begin()->first.exp;
+      double exp2 = calibMuMu.subIntervals.back().rbegin()->first.exp;
+      double run1 = calibMuMu.subIntervals.front().begin()->first.run;
+      double run2 = calibMuMu.subIntervals.back().rbegin()->first.run;
+
+      BonlyOut <<  std::setprecision(8) <<  s << " " << e << " " << exp1 << " " << run1 << " " << exp2 << " " << run2  << " " <<
+               1e3 * resB[0] << "  " << 1e3 * resB[1] << " " <<  1e3 * resB[2] << "  " << 1e3 * resB[3] <<  endl;
+
+    }
+
+    CalResultsBlocks.push_back(combCalResults);
+
+  }
+
+  assert(CalResultsBlocks.size() == evtsMuMuBlocks.size());
+
+  CalResultsBlocks = adjustOffResonanceEnergy(CalResultsBlocks, evtsMuMuBlocks);
+
 
   std::vector<CalibrationData>  CalResults;
   for (auto cb : CalResultsBlocks)

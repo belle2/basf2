@@ -52,7 +52,7 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Magnet"]["On"]]
     },
     expert_config={
-        "outerLoss": "pow(0.000020e0*rawTime, 2) +  1./nEv",
+        "outerLoss": "pow(0.000010e0*rawTime, 2) +  1./nEv",
         "innerLoss": "pow(0.000120e0*rawTime, 2) +  1./nEv",
         "runHadB": True,
         "eCMSmumuSpread": 5.2e-3,
@@ -62,59 +62,69 @@ settings = CalibrationSettings(
 ##############################
 
 
-def get_hadB_path():
+def get_hadB_path(isCDST):
     """ Selects the hadronic B decays, function returns corresponding path  """
 
     # module to be run prior the collector
     rec_path_1 = create_path()
-    prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
+    if isCDST:
+        prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
 
     add_pid_module(rec_path_1)
     add_ecl_modules(rec_path_1)
 
-    stdCharged.stdPi(listtype='all', path=rec_path_1)
+    stdCharged.stdPi(listtype='loose', path=rec_path_1)
     stdCharged.stdK(listtype='good', path=rec_path_1)
-    stdPi0s.stdPi0s(listtype='eff60_May2020', path=rec_path_1)
+    stdPi0s.stdPi0s(listtype='eff40_May2020', path=rec_path_1)
 
-    ma.cutAndCopyList("pi+:my", "pi+:all", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
+    ma.cutAndCopyList("pi+:my", "pi+:loose", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
     ma.cutAndCopyList("K+:my", "K+:good", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
 
-    ma.cutAndCopyList("pi0:my", "pi0:eff60_May2020", "", path=rec_path_1)
+    ma.cutAndCopyList("pi0:my", "pi0:eff40_May2020", "", path=rec_path_1)
 
     #####################################################
     # Reconstructs the signal B0 candidates from Dstar
     #####################################################
 
+    DcutLoose = '1.7 < M < 2.1'
+    Dcut = '1.830 < M < 1.894'
     # Reconstructs D0s and sets decay mode identifiers
-    ma.reconstructDecay(decayString='D0:Kpi -> K-:my pi+:my', cut='1.7 < M < 2.1', dmID=1, path=rec_path_1)
+    ma.reconstructDecay(decayString='D0:Kpi -> K-:my pi+:my', cut=DcutLoose, dmID=1, path=rec_path_1)
     ma.reconstructDecay(decayString='D0:Kpipi0 -> K-:my pi+:my pi0:my',
-                        cut='1.7 < M < 2.1', dmID=2, path=rec_path_1)   # cut='1.7 < M < 2.1'
+                        cut=DcutLoose, dmID=2, path=rec_path_1)
     ma.reconstructDecay(decayString='D0:Kpipipi -> K-:my pi+:my pi-:my pi+:my',
-                        cut='1.7 < M < 2.1', dmID=3, path=rec_path_1)
+                        cut=DcutLoose, dmID=3, path=rec_path_1)
 
     # Performs mass constrained fit for all D0 candidates
     vertex.kFit(list_name='D0:Kpi', conf_level=0.0, fit_type='mass', path=rec_path_1)
     # vertex.kFit(list_name='D0:Kpipi0',  conf_level=0.0, fit_type='mass', path=rec_path_1)
     vertex.kFit(list_name='D0:Kpipipi', conf_level=0.0, fit_type='mass', path=rec_path_1)
 
-    # Reconstructs D*-s and sets decay mode identifiers
-    ma.reconstructDecay(decayString='D*+:D0pi_Kpi -> D0:Kpi pi+:my', cut='massDifference(0) < 0.16', dmID=1, path=rec_path_1)
-    ma.reconstructDecay(decayString='D*+:D0pi_Kpipi0 -> D0:Kpipi0 pi+:my',
-                        cut='massDifference(0) < 0.16', dmID=2, path=rec_path_1)
-    ma.reconstructDecay(decayString='D*+:D0pi_Kpipipi -> D0:Kpipipi pi+:my',
-                        cut='massDifference(0) < 0.16', dmID=3, path=rec_path_1)
+    ma.applyCuts("D0:Kpi",     Dcut, path=rec_path_1)
+    ma.applyCuts("D0:Kpipi0",  Dcut, path=rec_path_1)
+    ma.applyCuts("D0:Kpipipi", Dcut, path=rec_path_1)
 
-    Bcut = '[5.15 < Mbc] and [abs(deltaE) < 0.2]'
+    DStarcutLoose = 'massDifference(0) < 0.16'
+
+    # Reconstructs D*-s and sets decay mode identifiers
+    ma.reconstructDecay(decayString='D*+:D0pi_Kpi -> D0:Kpi pi+:my', cut=DStarcutLoose, dmID=1, path=rec_path_1)
+    ma.reconstructDecay(decayString='D*+:D0pi_Kpipi0 -> D0:Kpipi0 pi+:my',
+                        cut=DStarcutLoose, dmID=2, path=rec_path_1)
+    ma.reconstructDecay(decayString='D*+:D0pi_Kpipipi -> D0:Kpipipi pi+:my',
+                        cut=DStarcutLoose, dmID=3, path=rec_path_1)
+
+    BcutLoose = '[ useCMSFrame(p) < 1.6 ] and [abs(dM) < 0.25]'
+    Bcut = '[ useCMSFrame(p) < 1.2 ] and [abs(dM) < 0.05]'
 
     # Reconstructs the signal B0 candidates from Dstar
     ma.reconstructDecay(decayString='B0:Dstpi_D0pi_Kpi -> D*-:D0pi_Kpi pi+:my',
-                        cut=Bcut,
+                        cut=BcutLoose,
                         dmID=1, path=rec_path_1)
     ma.reconstructDecay(decayString='B0:Dstpi_D0pi_Kpipi0 -> D*-:D0pi_Kpipi0 pi+:my',
-                        cut=Bcut,
+                        cut=BcutLoose,
                         dmID=2, path=rec_path_1)
     ma.reconstructDecay(decayString='B0:Dstpi_D0pi_Kpipipi -> D*-:D0pi_Kpipipi pi+:my',
-                        cut=Bcut,
+                        cut=BcutLoose,
                         dmID=3, path=rec_path_1)
 
     vertex.treeFit('B0:Dstpi_D0pi_Kpi', updateAllDaughters=True, ipConstraint=True, path=rec_path_1)
@@ -127,13 +137,14 @@ def get_hadB_path():
 
     # Reconstructs charged D mesons and sets decay mode identifiers
     ma.reconstructDecay(decayString='D-:Kpipi -> K+:my pi-:my pi-:my',
-                        cut='1.844 < M < 1.894', dmID=4, path=rec_path_1)
+                        cut=DcutLoose, dmID=4, path=rec_path_1)
 
     vertex.kFit(list_name='D-:Kpipi', conf_level=0.0, fit_type='mass', path=rec_path_1)
+    ma.applyCuts("D-:Kpipi",  '1.844 < M < 1.894', path=rec_path_1)
 
     # Reconstructs the signal B candidates
     ma.reconstructDecay(decayString='B0:Dpi_Kpipi -> D-:Kpipi pi+:my',
-                        cut=Bcut, dmID=4, path=rec_path_1)
+                        cut=BcutLoose, dmID=4, path=rec_path_1)
 
     #####################################################
     # Reconstruct the signal B- candidates
@@ -141,13 +152,13 @@ def get_hadB_path():
 
     # Reconstructs the signal B- candidates
     ma.reconstructDecay(decayString='B-:D0pi_Kpi -> D0:Kpi pi-:my',
-                        cut=Bcut,
+                        cut=BcutLoose,
                         dmID=5, path=rec_path_1)
     ma.reconstructDecay(decayString='B-:D0pi_Kpipi0 -> D0:Kpipi0 pi-:my',
-                        cut=Bcut,
+                        cut=BcutLoose,
                         dmID=6, path=rec_path_1)
     ma.reconstructDecay(decayString='B-:D0pi_Kpipipi -> D0:Kpipipi pi-:my',
-                        cut=Bcut,
+                        cut=BcutLoose,
                         dmID=7, path=rec_path_1)
 
     vertex.treeFit('B-:D0pi_Kpi', updateAllDaughters=True, ipConstraint=True, path=rec_path_1)
@@ -189,18 +200,19 @@ def get_hadB_path():
     ma.appendROEMasks(list_name='B-:merged', mask_tuples=[cleanMask], path=rec_path_1)
     ma.buildContinuumSuppression(list_name='B-:merged', roe_mask='cleanMask', path=rec_path_1)
 
-    ma.applyCuts("B0:merged", "R2 < 0.7", path=rec_path_1)
-    ma.applyCuts("B-:merged", "R2 < 0.7", path=rec_path_1)
+    ma.applyCuts("B0:merged", "[R2 < 0.3] and " + Bcut, path=rec_path_1)
+    ma.applyCuts("B-:merged", "[R2 < 0.3] and " + Bcut, path=rec_path_1)
 
     return rec_path_1
 
 
-def get_mumu_path():
+def get_mumu_path(isCDST):
     """ Selects the ee -> mumu events, function returns corresponding path  """
 
     # module to be run prior the collector
     rec_path_1 = create_path()
-    prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
+    if isCDST:
+        prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
 
     muSelection = '[p>1.0]'
     muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
@@ -275,8 +287,10 @@ def get_calibrations(input_data, **kwargs):
     input_files_MuMu4S, output_iov_MuMu4S = get_data_info(input_data["mumu4S"], kwargs)
     input_files_MuMuOff, output_iov_MuMuOff = get_data_info(input_data["mumuOff"], kwargs)
 
-    rec_path_HadB = get_hadB_path()
-    rec_path_MuMu = get_mumu_path()
+    isCDST = 'mdst' not in (input_files_MuMu4S + input_files_MuMuOff)[0]
+
+    rec_path_HadB = get_hadB_path(isCDST)
+    rec_path_MuMu = get_mumu_path(isCDST)
 
     collector_HadB = register_module('EcmsCollector')
     collector_MuMu = register_module('BoostVectorCollector', Y4SPListName='Upsilon(4S):BV')
@@ -302,8 +316,8 @@ def get_calibrations(input_data, **kwargs):
                                     input_files=input_files_MuMuOff,
                                     pre_collector_path=rec_path_MuMu)
 
-    calibration_ecms.add_collection(name='mumu_4S', collection=collection_MuMu4S)
-    calibration_ecms.add_collection(name='mumu_Off', collection=collection_MuMuOff)
+    calibration_ecms.add_collection(name='dimuon_4S', collection=collection_MuMu4S)
+    calibration_ecms.add_collection(name='dimuon_Off', collection=collection_MuMuOff)
     calibration_ecms.add_collection(name='hadB_4S', collection=collection_HadB)
 
     calibration_ecms.strategies = SingleIOV

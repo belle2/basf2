@@ -488,7 +488,7 @@ namespace Belle2 {
 
     /** run the collision invariant mass calibration,
         it returns (eCMS, eCMSstatUnc, 0) */
-    vector<double>  getInvMassPars(const vector<Event>& evts, int bootStrap = 0)
+    pair<Pars, MatrixXd> getInvMassPars(const vector<Event>& evts, Pars pars, int bootStrap = 0)
     {
       double mMin = 10.2e3, mMax = 10.8e3;
 
@@ -509,7 +509,7 @@ namespace Belle2 {
       fitter.init(256 + 1, mMin, mMax);
 
 
-      Pars pars = {
+      Pars pars0 = {
         {"C" , 15        },
         {"bDelta" , 1.60307        },
         {"bMean" , 0        },
@@ -520,6 +520,9 @@ namespace Belle2 {
         {"slope" , 0.876812        },
         {"tau" , 99.4225}
       };
+
+      if (pars.empty())
+        pars = pars0;
 
 
 
@@ -538,17 +541,8 @@ namespace Belle2 {
       };
 
 
+      return fitter.fitData(pars, limits, true/*useCheb*/);
 
-      Pars resP;
-      MatrixXd resM;
-      tie(resP, resM) = fitter.fitData(pars, limits, true/*useCheb*/);
-
-
-      int ind = distance(resP.begin(), resP.find("m0"));
-      double mass = resP.at("m0");
-      double err  = sqrt(resM(ind, ind));
-
-      return { mass, err, 0}; //spread is set to zero
     }
 
 
@@ -565,6 +559,10 @@ namespace Belle2 {
       MatrixXd          invMassVecSpred;
 
       std::ofstream mumuTextOut("mumuEcalib.txt", ios::app);
+      static int iPrint = 0;
+      if (iPrint == 0)
+        mumuTextOut << "n   id    t1   t2    exp1   run1     exp2  run2    Ecms   EcmsUnc   state" << endl;
+      ++iPrint;
 
       for (int iDiv = 0; iDiv < n; ++iDiv) {
 
@@ -587,15 +585,46 @@ namespace Belle2 {
         vector<double> vals, errs;
         for (int rep = 0; rep < 200; ++rep) {
           double errEst = 50. / sqrt(evtsNow.size());
-          auto res =  getInvMassPars(evtsNow, rep);
-          if (errEst < res[1] && res[1] < 4 * errEst) {
-            vals.push_back(res[0]);
-            errs.push_back(res[1]);
-            if (vals.size() >= nRep) break;
+
+          Pars resP, inDummy;
+          MatrixXd resM;
+
+          // fit using bootstrap replica replicas
+          tie(resP, resM) =  getInvMassPars(evtsNow, inDummy, rep);
+
+          int ind = distance(resP.begin(), resP.find("m0"));
+          double mass = resP.at("m0");
+          double err  = sqrt(resM(ind, ind));
+
+          if (!(errEst < err && err < 4 * errEst))
+            continue;
+
+          vals.push_back(mass);
+          errs.push_back(err);
+
+          if (rep == 0)
+            break;
+
+          // try fit with different input parameters, but without bootstrapping
+          tie(resP, resM) =  getInvMassPars(evtsNow, resP, 0);
+
+          int ind0 = distance(resP.begin(), resP.find("m0"));
+          double mass0 = resP.at("m0");
+          double err0  = sqrt(resM(ind0, ind0));
+
+          // if successful, break
+          if (errEst < err0 && err0 < 4 * errEst) {
+            vals = {mass0};
+            errs = {err0};
+            break;
           }
+
+
+          if (vals.size() >= nRep) break;
+
         }
 
-        if (vals.size() != nRep)
+        if (vals.size() != 1 && vals.size() != nRep)
           B2FATAL("Inconsistency of number of results with number of replicas");
 
         double meanMass    = accumulate(vals.begin(), vals.end(), 0.) / vals.size();
@@ -604,9 +633,12 @@ namespace Belle2 {
         double sum2 = 0;
         for (auto v : vals)
           sum2 += pow(v - meanMass, 2);
+        double errBootStrap = vals.size() > 1 ? sqrt(sum2 / (vals.size() - 1)) : 0;
 
-        mumuTextOut << n << " " << iDiv << " " << setprecision(14) << evtsNow.front().t << " " << evtsNow.back().t << " : " << meanMass <<
-                    " +- " << meanMassUnc << " " << sqrt(sum2 / (vals.size() - 1)) <<   endl;
+        mumuTextOut << n << " " << iDiv << " " << setprecision(14) << evtsNow.front().t << " " << evtsNow.back().t << " " <<
+                    evtsNow.front().exp << " " << evtsNow.front().run << " " << evtsNow.back().exp << " " << evtsNow.back().run  <<   "  " << meanMass
+                    <<
+                    "   " << meanMassUnc << " " << errBootStrap <<   endl;
 
         // Convert to GeV
         invMassVec[iDiv](0) = meanMass / 1e3;

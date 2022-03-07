@@ -84,7 +84,12 @@ namespace Belle2 {
     return pol;
   }
 
-// Evaluate sum of cheb pols up to Size over vector x, x elements are between 0 and 1 (more in nodes.h)
+
+  /** Calculate the Chebyshev polynomials of order i=0..Size-1 at points given in vector x_j and
+      sum it over point index j
+      It returns  sum_j P_i(x_j) for i=0..Size-1
+      The Chebyshev polynomials are defined for x between 0 and 1
+   */
   VectorXd getPolsSum(int Size, VectorXd x)
   {
     assert(Size > 2);
@@ -164,7 +169,7 @@ namespace Belle2 {
 
 
 
-// Evaluate Cheb. pol at point x (more in nodes.h)
+  /** Evaluate Cheb. pol at point x when the coefficients of the expansion are provided */
   double evalPol(const VectorXd& polCoef, double x)
   {
     VectorXd pols = getPols(polCoef.size(), x);
@@ -175,7 +180,9 @@ namespace Belle2 {
   }
 
 
-//Get Interpolation vector at point x (more in nodes.h)
+  /** Get Interpolation vector k_i for point x from the function values at points xi (polynomial interpolation)
+      In the second step, the function value at x can be evaluated as sum_i vals_i k_i
+   */
   VectorXd interpol(const VectorXd& xi, double x)
   {
     double Norm = (xi[xi.size() - 1] - xi[0]) / 2;
@@ -193,7 +200,10 @@ namespace Belle2 {
   }
 
 
-//Get interpolated function value at point x (more in nodes.h)
+  /** Get interpolated function value at point x when function values vals at points xi are provided.
+      If the points xi are fixed and only vals are different between interpol calls, use interpol(xi, x)
+      to speed up the evaluation.
+   */
   double interpol(VectorXd xi, VectorXd vals, double x)
   {
     VectorXd coefs = interpol(xi, x);

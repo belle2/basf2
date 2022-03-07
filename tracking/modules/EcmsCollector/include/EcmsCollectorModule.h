@@ -11,6 +11,7 @@
 
 #include <string>
 #include <limits>
+#include <vector>
 
 namespace Belle2 {
   /**
@@ -43,19 +44,21 @@ namespace Belle2 {
 
   private:
 
+    void resize(int n);  ///< resize the event members to n candidates
+
     int m_exp = intNaN;     ///< experiment number
     int m_run = intNaN;     ///< run number
     int m_evt = intNaN;     ///< event number
     double m_time = realNaN; ///< event time [hours]
 
-    double m_mBC = realNaN;     ///< mBC mass
-    double m_deltaE = realNaN;  ///< deltaE
-    int    m_pdg = intNaN;      ///< B meson PDG code (can neutral or charged)
-    int    m_mode = intNaN;     ///< decay mode ID
-    double m_Kpid = realNaN;    ///< Kaon PID
-    double m_R2 = realNaN;      ///< the R2 variable used for the continuum suppression
-    double m_mD = realNaN;      ///< D meson mass
-    double m_dmDstar = realNaN; ///< D*-D0 mass
+    std::vector<double> m_pBcms = {};   ///< B mesons CMS momentum
+    std::vector<double> m_mB  = {};     ///< B mesons mass
+    std::vector<int>    m_pdg = {};      ///< B meson PDG code (can neutral or charged)
+    std::vector<int>    m_mode = {};     ///< decay mode ID
+    std::vector<double> m_Kpid = {};    ///< Kaon PID
+    std::vector<double> m_R2 = {};      ///< the R2 variable used for the continuum suppression
+    std::vector<double> m_mD = {};      ///< D meson mass
+    std::vector<double> m_dmDstar = {}; ///< D*-D0 mass
 
   };
 

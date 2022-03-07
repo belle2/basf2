@@ -17,6 +17,8 @@
 #include <Math/SpecFuncMathCore.h>
 #include <Math/DistFunc.h>
 
+using namespace std;
+
 namespace Belle2 {
   namespace InvariantMassMuMuCalib {
 
@@ -72,7 +74,6 @@ namespace Belle2 {
       else
         K = 0;
 
-      //double K = (+t) >= eps ? pow( + t, -m_slope) : 0;
       return Core * K;
     }
 
@@ -267,6 +268,8 @@ namespace Belle2 {
       //only one function type
       if (m_x - m_m0 >= 0) {
 
+        assert(m_eps         <= a);
+
         double r1 = ROOT::Math::inc_gamma_c(1 - m_slope,   a   / m_tauL);
         double r2 = ROOT::Math::inc_gamma_c(1 - m_slope,   m_eps / m_tauL);
 
@@ -285,7 +288,48 @@ namespace Belle2 {
 
       }
 
+      //only one function type
+      else if (m_x - m_m0 >= -m_eps) {
+
+        assert(0 <= m_m0 - m_x);
+        assert(m_m0 - m_x <= m_eps);
+        assert(m_eps <= a);
+
+
+        double s01 = integrate([&](double t) {
+          return eval(t);
+        }     , 0, m_m0 - m_x);
+
+
+        double s02 = integrate([&](double t) {
+          return eval(t);
+        }     , m_m0 - m_x, m_eps);
+
+
+        double r1 = ROOT::Math::inc_gamma_c(1 - m_slope,   a   / m_tauL);
+        double r2 = ROOT::Math::inc_gamma_c(1 - m_slope,   m_eps / m_tauL);
+
+        double s = integrate([&](double r) {
+
+          double t = m_tauL * ROOT::Math::gamma_quantile_c(r, 1 - m_slope, 1);
+          double est = pow(t, -m_slope) * exp(- (m_x - m_m0 + t) / m_tauL);
+          return eval(t) / est;
+
+
+        }   , r1, r2);
+
+        s *= exp((m_m0 - m_x) / m_tauL) * pow(m_tauL, -m_slope + 1) * ROOT::Math::tgamma(1 - m_slope);
+
+        return (s01 + s02 + s);
+
+      }
+
+
+      //two function types
       else if (m_x - m_m0 >= -tMin) {
+
+        assert(m_eps       <= m_m0 - m_x);
+        assert(m_m0 - m_x <= a);
 
         //integrate from m_m0 - m_x  to a
         double s1 = 0;
@@ -317,6 +361,7 @@ namespace Belle2 {
           double r2 = pow(m_m0 - m_x, -m_slope + 1) / (1 - m_slope);
 
 
+
           s2 = integrate([&](double r) {
             double t = pow(r * (1 - m_slope), 1. / (1 - m_slope));
             double est = pow(t, -m_slope);
@@ -328,12 +373,17 @@ namespace Belle2 {
 
       } else {
 
+        assert(m_eps       <= tMin);
+        assert(tMin      <= m_m0 - m_x);
+        assert(m_m0 - m_x <= a);
+
         //integrate from m_m0 - m_x  to a
         double s1 = 0;
 
         {
           double r1 = ROOT::Math::inc_gamma_c(1 - m_slope,   a   / m_tauL);
           double r2 = ROOT::Math::inc_gamma_c(1 - m_slope, (m_m0 - m_x) / m_tauL);
+
 
           s1 = integrate([&](double r) {
 

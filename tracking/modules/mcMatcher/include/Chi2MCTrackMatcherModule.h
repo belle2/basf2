@@ -74,5 +74,7 @@ namespace Belle2 {
     int m_noMatchingCandidateCount = 0;
     /** Variable: Counts total event number.*/
     int m_event = 0;
+    /** Variable: Name of the RecoTracks StoreArray which this might be related through the MCParticle */
+    std::string m_MCRecoTracksArrayName = "MCRecoTracks";
   };
 }

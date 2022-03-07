@@ -11,6 +11,7 @@
 // datastore types
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/gearbox/Const.h>
 #include <Eigen/Dense>
@@ -43,6 +44,10 @@ Chi2MCTrackMatcherModule::Chi2MCTrackMatcherModule() : Module()
            m_param_linalg,
            "Parameter to switch between ROOT and Eigen, to invert the covariance5 matrix. ROOT has shown a shorter runtime therefore its recomended. false: ROOT is used; true: Eigen is used",
            false);
+  addParam("MCRecoTracksArrayName",
+           m_MCRecoTracksArrayName,
+           "Name of the StoreArray of RecoTracks which will be related to the input Tracks, using the relations of both to MCParticles",
+           m_MCRecoTracksArrayName);
 }
 
 void Chi2MCTrackMatcherModule::initialize()
@@ -51,6 +56,10 @@ void Chi2MCTrackMatcherModule::initialize()
   m_MCParticles.isRequired();
   m_Tracks.isRequired();
   m_Tracks.registerRelationTo(m_MCParticles);
+
+  StoreArray<RecoTrack> mcRecoTracks(m_MCRecoTracksArrayName);
+  if (mcRecoTracks.isValid()) m_Tracks.registerRelationTo(mcRecoTracks);
+
 }
 
 void Chi2MCTrackMatcherModule::event()
@@ -180,6 +189,9 @@ void Chi2MCTrackMatcherModule::event()
     }
     if (chi2Min < cutOff) {
       track.addRelationTo(mcPart_matched);
+      // check if the mc particle has a related RecoTrack (from e.g. mc track finder), if so add also this relation
+      RecoTrack* mcRecoTrack = mcPart_matched->getRelated<RecoTrack>(m_MCRecoTracksArrayName);
+      if (mcRecoTrack) track.addRelationTo(mcRecoTrack);
     } else {
       m_noMatchCount += 1;
     }

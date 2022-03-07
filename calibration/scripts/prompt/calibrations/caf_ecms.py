@@ -326,7 +326,7 @@ def get_calibrations(input_data, **kwargs):
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun
     for algorithm in calibration_ecms.algorithms:
-        algorithm.params = {"iov_coverage": output_iov_Had}  # TODO merge iov?
+        algorithm.params = {"iov_coverage": output_iov_Had}
 
     # Most other options like database chain and backend args will be overwritten by b2caf-prompt-run.
     # So we don't bother setting them.

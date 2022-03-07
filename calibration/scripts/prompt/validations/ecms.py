@@ -371,6 +371,8 @@ def create_hadB_fit_plots(outputDir, pdflatex):
         else:
             items[t] = max(items[t], i + 1)
 
+    times = sorted(items)
+
     header = """\\documentclass[aspectratio=169]{beamer}
     \\usepackage{graphicx}
 
@@ -378,7 +380,7 @@ def create_hadB_fit_plots(outputDir, pdflatex):
     """
 
     body = ""
-    for t in items:
+    for t in times:
 
         i0 = None
         for i0Temp in range(len(arr)):
@@ -388,6 +390,9 @@ def create_hadB_fit_plots(outputDir, pdflatex):
         assert(i0 is not None)
 
         frac = 1. / (items[t] + 0.2)
+        if items[t] >= 6:
+            frac = 1. / (items[t] + 0.3)
+
         body += '\\begin{frame}[t]\n'
         shift, shiftE = str(round(arr[i0][5][0], 1)), str(round(arr[i0][5][1], 1))
         spread, spreadE = str(round(arr[i0][6][0], 1)), str(round(arr[i0][6][1], 1))

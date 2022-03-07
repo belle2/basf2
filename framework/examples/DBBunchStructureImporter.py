@@ -27,7 +27,7 @@ def getCollidingPatternFromFiles(herFilePath, lerFilePath):
     """
     Take HER and LER filling pattern from file and perform AND operation to take only colliding buckets.
 
-    the format is the one given by the accelerator people. The first column is the number of the bunch,
+    The format is the one given by the accelerator people. The first column is the number of the bunch,
     the second is 1.0000 or .0000 depending on whether the bunch is filled or not. The third column is extra.
     """
 

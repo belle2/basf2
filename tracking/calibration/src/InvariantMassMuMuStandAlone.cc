@@ -25,7 +25,7 @@
 #include <TCanvas.h>
 #include <fstream>
 
-#include "framework/particledb/EvtGenDatabasePDG.h"
+#include <framework/particledb/EvtGenDatabasePDG.h>
 
 //if compiled within BASF2
 #ifdef _PACKAGE_

@@ -21,31 +21,30 @@
 #include <Eigen/Dense>
 
 
-#include "TGraph.h"
-#include "TLine.h"
-#include "TH1D.h"
-#include "Math/Functor.h"
-#include "Math/SpecFuncMathCore.h"
-#include "Math/DistFunc.h"
-#include "TCanvas.h"
-#include "TROOT.h"
+#include <TGraph.h>
+#include <TLine.h>
+#include <TH1D.h>
+#include <Math/Functor.h>
+#include <Math/SpecFuncMathCore.h>
+#include <Math/DistFunc.h>
+#include <TCanvas.h>
+#include <TROOT.h>
 
 
-#include "RooRealVar.h"
-#include "RooDataSet.h"
-#include "RooGaussian.h"
-#include "RooPlot.h"
-#include "RooHist.h"
-#include "RooAddPdf.h"
-#include "RooPolyVar.h"
-#include "RooArgusBG.h"
-#include "RooSimultaneous.h"
-#include "RooCategory.h"
-#include "RooArgSet.h"
-#include "RooConstVar.h"
+#include <RooRealVar.h>
+#include <RooDataSet.h>
+#include <RooGaussian.h>
+#include <RooPlot.h>
+#include <RooHist.h>
+#include <RooAddPdf.h>
+#include <RooPolyVar.h>
+#include <RooArgusBG.h>
+#include <RooSimultaneous.h>
+#include <RooCategory.h>
+#include <RooArgSet.h>
+#include <RooConstVar.h>
 
-
-#include "framework/particledb/EvtGenDatabasePDG.h"
+#include <framework/particledb/EvtGenDatabasePDG.h>
 
 
 //if compiled within BASF2

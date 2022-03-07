@@ -19,12 +19,12 @@
 /* ROOT headers. */
 #include <TCanvas.h>
 #include <TH1.h>
-#include <TH2F.h>
+#include <TString.h>
 #include <TText.h>
 #include <TLine.h>
 
 /* C++ headers. */
-#include <vector>
+#include <string>
 
 namespace Belle2 {
 
@@ -88,7 +88,7 @@ namespace Belle2 {
     TText m_PlaneText;
 
     /** Histogram from DQMInfo with run type. */
-    TH1* m_RunType = nullptr;
+    TH1* m_RunType = NULL;
 
     /** String with run type. */
     TString m_RunTypeString;
@@ -97,28 +97,28 @@ namespace Belle2 {
     bool m_IsNullRun = false;
 
     /** Histogram for BKLM plane efficiency. */
-    TH1* m_eff_bklm = nullptr;
+    TH1* m_eff_bklm = NULL;
 
     /** BKLM plane efficiency canvas */
-    TCanvas* m_c_eff_bklm = nullptr;
+    TCanvas* m_c_eff_bklm = NULL;
 
     /** Histogram for EKLM plane efficiency. */
-    TH1* m_eff_eklm = nullptr;
+    TH1* m_eff_eklm = NULL;
 
     /** EKLM plane efficiency canvas */
-    TCanvas* m_c_eff_eklm = nullptr;
+    TCanvas* m_c_eff_eklm = NULL;
 
     /** Histogram for BKLM sector efficiency. */
-    TH1* m_eff_bklm_sector = nullptr;
+    TH1* m_eff_bklm_sector = NULL;
 
     /** Histogram for BKLM sector efficiency. */
-    TCanvas* m_c_eff_bklm_sector = nullptr;
+    TCanvas* m_c_eff_bklm_sector = NULL;
 
     /** Histogram for EKLM sector efficiency. */
-    TH1* m_eff_eklm_sector = nullptr;
+    TH1* m_eff_eklm_sector = NULL;
 
     /** Histogram for EKLM sector efficiency. */
-    TCanvas* m_c_eff_eklm_sector = nullptr;
+    TCanvas* m_c_eff_eklm_sector = NULL;
 
 
     /** EKLM element numbers. */

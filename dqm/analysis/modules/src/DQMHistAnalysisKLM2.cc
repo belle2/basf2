@@ -13,12 +13,8 @@
 #include <klm/dataobjects/KLMChannelIndex.h>
 
 /* ROOT headers. */
-#include <TClass.h>
 #include <TROOT.h>
-#include <TStyle.h>
 
-/* C++ headers. */
-#include <algorithm>
 
 using namespace Belle2;
 
@@ -105,7 +101,7 @@ void DQMHistAnalysisKLM2Module::processPlaneHistogram(
   const double histRangeNDC = histMaxNDC - histMinNDC;
 
   TCanvas* canvas = findCanvas("KLMEfficiencyDQM/c_" + histName);
-  if (canvas == nullptr) {
+  if (canvas == NULL) {
     B2ERROR("KLMDQM2 histogram canvas KLMEfficiencyDQM/c_" << histName << " is not found.");
     return;
   }
@@ -159,7 +155,7 @@ void DQMHistAnalysisKLM2Module::event()
 {
   /* If KLM is not included, stop here and return. */
   TH1* daqInclusion = findHist("KLM/daq_inclusion");
-  if (not(daqInclusion == nullptr)) {
+  if (not(daqInclusion == NULL)) {
     int isKlmIncluded = daqInclusion->GetBinContent(daqInclusion->GetXaxis()->FindBin("Yes"));
     if (isKlmIncluded == 0)
       return;

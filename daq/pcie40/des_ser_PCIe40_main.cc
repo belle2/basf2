@@ -2052,6 +2052,8 @@ void* sender(void* arg)
       exit(1);
     }
 
+    unsigned int prev_exprun = exprun;
+    unsigned int prev_evtnum = evtnum;
     int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, send_nwords, exprun, evtnum, node_id, valid_ch);
 
     if (ret != DATACHECK_OK) {
@@ -2066,9 +2068,8 @@ void* sender(void* arg)
         reduceHdrTrl(buff + NW_SEND_HEADER, event_nwords);
         send_nwords = event_nwords;
 
-        if (evtnum != 0) {
-          evtnum -= NUM_SENDER_THREADS; // To go through checkEventData().
-        }
+        exprun = prev_exprun;
+        evtnum = prev_evtnum;
         int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, event_nwords, exprun, evtnum, node_id, valid_ch);
         if (ret != DATACHECK_OK) {
           pthread_mutex_lock(&(mtx_sender_log));

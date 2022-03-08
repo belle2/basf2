@@ -8,18 +8,14 @@
 #include <tracking/modules/EcmsCollector/EcmsCollectorModule.h>
 
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/utility/ReferenceFrame.h>
-#include <analysis/variables/Variables.h>
 #include <analysis/variables/ContinuumSuppressionVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 
 
 using namespace Belle2;
-using namespace std;
-
+using std::vector;
 
 
 

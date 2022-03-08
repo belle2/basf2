@@ -188,6 +188,77 @@ void MCTrackMergerModule::analyzeAndCleanTrackArray(
   return;
 }
 
+void MCTrackMergerModule::removeCurlersFromTrackArray(
+  StoreArray<RecoTrack>& recoTracks,
+  std::vector<int>& tracksMCParticles,
+  std::vector<double>& tracksMinToF,
+  const std::string& relatedTracksColumnName,
+  bool isVXD)
+{
+  for (auto& recoTrack : recoTracks) {
+
+    // get index of matched MCParticle
+    int trackMCParticle_1 = tracksMCParticles[recoTrack.getArrayIndex()];
+
+    // get min tof of track
+    double trackMinTof_1 = tracksMinToF[recoTrack.getArrayIndex()];
+
+    for (auto& recoTrack2 : recoTracks) {
+
+      // skip self connections
+      if (recoTrack.getArrayIndex() == recoTrack2.getArrayIndex()) {
+        continue;
+      }
+
+      // get index of matched MCParticle
+      int trackMCParticle_2 = tracksMCParticles[recoTrack2.getArrayIndex()];
+
+      // get min tof of track
+      double trackMinTof_2 = tracksMinToF[recoTrack2.getArrayIndex()];
+
+
+      if ((trackMCParticle_2 == trackMCParticle_1) &&
+          (trackMCParticle_1 >= 0))  {
+
+        if (trackMinTof_2 < trackMinTof_1) {
+          if (recoTrack.getQualityIndicator() > 0) {
+            recoTrack.setQualityIndicator(0);
+            if (isVXD)
+              m_removedVXDCurlers += 1;
+            else
+              m_removedCDCCurlers += 1;
+            // Also remove the first related VXD track
+            if (recoTrack.getRelated<RecoTrack>(relatedTracksColumnName)) {
+              recoTrack.getRelated<RecoTrack>(relatedTracksColumnName)->setQualityIndicator(0);
+              if (isVXD)
+                m_removedCDCCurlers += 1;
+              else
+                m_removedVXDCurlers += 1;
+            }
+          }
+        } else {
+          if (recoTrack2.getQualityIndicator() > 0) {
+            recoTrack2.setQualityIndicator(0);
+            if (isVXD)
+              m_removedVXDCurlers += 1;
+            else
+              m_removedCDCCurlers += 1;
+            // Also remove the first related VXD track
+            if (recoTrack2.getRelated<RecoTrack>(relatedTracksColumnName)) {
+              recoTrack2.getRelated<RecoTrack>(relatedTracksColumnName)->setQualityIndicator(0);
+              if (isVXD)
+                m_removedCDCCurlers += 1;
+              else
+                m_removedVXDCurlers += 1;
+            }
+          }
+        }
+      }
+    }
+  }
+  return;
+}
+
 void MCTrackMergerModule::event()
 {
 
@@ -355,103 +426,22 @@ void MCTrackMergerModule::event()
   }
 
   B2DEBUG(9, "Removing curlers in CDC => treat as fake");
-  for (auto& cdcTrack : m_CDCRecoTracks) {
-    B2DEBUG(9, "Match with CDCTrack at " <<  cdcTrack.getArrayIndex());
-
-    // get index of matched MCParticle
-    int cdcMCParticle = cdcTrackMCParticles[cdcTrack.getArrayIndex()];
-
-    // get min tof of CDC track
-    double cdcMinTof = cdcTrackMinToF[cdcTrack.getArrayIndex()];
-
-    for (auto& cdcTrack2 : m_CDCRecoTracks) {
-      B2DEBUG(9, "Compare with  " <<  cdcTrack2.getArrayIndex());
-
-      // get min tof of CDC track
-      double cdcMinTof2 = cdcTrackMinToF[cdcTrack2.getArrayIndex()];
-
-      // skip self connections
-      if (cdcTrack.getArrayIndex() == cdcTrack2.getArrayIndex()) {
-        continue;
-      }
-
-      if ((cdcTrackMCParticles[cdcTrack2.getArrayIndex()] == cdcTrackMCParticles[cdcTrack.getArrayIndex()]) &&
-          (cdcTrackMCParticles[cdcTrack.getArrayIndex()] >= 0))  {
-
-        if (cdcMinTof2 < cdcMinTof) {
-          if (cdcTrack.getQualityIndicator() > 0) {
-            cdcTrack.setQualityIndicator(0);
-            m_removedCDCCurlers += 1;
-            // Possible loophole: Also remove the first related VXD track
-            if (cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
-              cdcTrack.getRelated<RecoTrack>(m_VXDRecoTrackColName)->setQualityIndicator(0);
-              m_removedVXDCurlers += 1;
-            }
-          }
-        } else {
-          if (cdcTrack2.getQualityIndicator() > 0) {
-            cdcTrack2.setQualityIndicator(0);
-            m_removedCDCCurlers += 1;
-            // Possible loophole: Also remove the first related VXD track
-            if (cdcTrack2.getRelated<RecoTrack>(m_VXDRecoTrackColName)) {
-              cdcTrack2.getRelated<RecoTrack>(m_VXDRecoTrackColName)->setQualityIndicator(0);
-              m_removedVXDCurlers += 1;
-            }
-          }
-        }
-      }
-    }    //end loop on CDC tracks
-  }
+  removeCurlersFromTrackArray(
+    m_CDCRecoTracks,
+    cdcTrackMCParticles,
+    cdcTrackMinToF,
+    m_VXDRecoTrackColName,
+    false
+  );
 
   B2DEBUG(9, "Removing curlers in VXD => treat as fake");
-  for (auto& vxdTrack : m_VXDRecoTracks) {
-    B2DEBUG(9, "Match with VXDTrack at " <<  vxdTrack.getArrayIndex());
-
-    // get index of matched MCParticle
-    int vxdMCParticle = vxdTrackMCParticles[vxdTrack.getArrayIndex()];
-
-    // get min tof of VXD track
-    double vxdMinTof = vxdTrackMinToF[vxdTrack.getArrayIndex()];
-
-    for (auto& vxdTrack2 : m_VXDRecoTracks) {
-      B2DEBUG(9, "Compare with  " <<  vxdTrack2.getArrayIndex());
-
-      // get min tof of VXD track
-      double vxdMinTof2 = vxdTrackMinToF[vxdTrack2.getArrayIndex()];
-
-      // skip self connections
-      if (vxdTrack.getArrayIndex() == vxdTrack2.getArrayIndex()) {
-        // comment that out to deal with wrong relations
-        continue;
-      }
-
-      if ((vxdTrackMCParticles[vxdTrack2.getArrayIndex()] == vxdTrackMCParticles[vxdTrack.getArrayIndex()]) &&
-          (vxdTrackMCParticles[vxdTrack.getArrayIndex()] >= 0))  {
-
-        if (vxdMinTof2 < vxdMinTof) {
-          if (vxdTrack.getQualityIndicator() > 0) {
-            vxdTrack.setQualityIndicator(0);
-            m_removedVXDCurlers += 1;
-            // Possible loophole: Also remove the first related CDC track
-            if (vxdTrack.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
-              vxdTrack.getRelated<RecoTrack>(m_CDCRecoTrackColName)->setQualityIndicator(0);
-              m_removedCDCCurlers += 1;
-            }
-          }
-        } else {
-          if (vxdTrack2.getQualityIndicator() > 0) {
-            vxdTrack2.setQualityIndicator(0);
-            m_removedVXDCurlers += 1;
-            // Possible loophole: Also remove the first related CDC track
-            if (vxdTrack2.getRelated<RecoTrack>(m_CDCRecoTrackColName)) {
-              vxdTrack2.getRelated<RecoTrack>(m_CDCRecoTrackColName)->setQualityIndicator(0);
-              m_removedCDCCurlers += 1;
-            }
-          }
-        }
-      }
-    }    //end loop on VXD tracks
-  }
+  removeCurlersFromTrackArray(
+    m_VXDRecoTracks,
+    vxdTrackMCParticles,
+    vxdTrackMinToF,
+    m_CDCRecoTrackColName,
+    true
+  );
 
 }
 

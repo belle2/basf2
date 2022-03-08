@@ -56,6 +56,19 @@ namespace Belle2 {
     void analyzeAndCleanTrackArray(StoreArray<RecoTrack>& recoTracks, const StoreArray<MCParticle>& mcParticles,
                                    std::vector<int>& trackMCParticles, std::vector<double>& trackMinToF, bool isVXD);
 
+    /** Called once for a VXD or CDC only RecoTrack Store array in an event.
+     *
+     * The methode marks loopers on the tracks array based on the time of flight of segments belonging
+     * to the same MCParticle. The vectors tracksMinToF and tracksMCParticles filled by previous call to
+     * analyzeAndCleanTrackArray should be used. If more than one track belonging to the same MCParticle
+     * in the tracking volume (CDC or VXD) is found, only the track with smaller min time of flight will be
+     * kept. The quality indicator of the other track and all related tracks will be set to zero.
+     */
+    void removeCurlersFromTrackArray(StoreArray<RecoTrack>& recoTracks, std::vector<int>& tracksMCParticles,
+                                     std::vector<double>& tracksMinToF, const std::string& relatedTracksColumnName,
+                                     bool isVXD);
+
+
     bool m_mcParticlesPresent =
       false; /**< This flag is set to false if there are no MC Particles in the data store (probably data run?) and we can not create MC Reco tracks. */
 

@@ -12,19 +12,17 @@
 #include <vector>
 #include <tuple>
 #include <numeric>
+#include <fstream>
+
 #include <TTree.h>
 #include <TVector3.h>
-#include <Eigen/Dense>
-
-
 #include <TGraph.h>
-#include <TH1D.h>
+#include <TRandom3.h>
 #include <Math/Functor.h>
 #include <Math/SpecFuncMathCore.h>
 #include <Math/DistFunc.h>
-#include <TCanvas.h>
-#include <TRandom3.h>
-#include <fstream>
+
+#include <Eigen/Dense>
 
 #include <framework/particledb/EvtGenDatabasePDG.h>
 

@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <vector>
 #include <Eigen/Dense>
 
 namespace Belle2 {

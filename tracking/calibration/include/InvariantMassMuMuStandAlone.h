@@ -10,7 +10,6 @@
 
 #pragma once
 #include <vector>
-#include <utility>
 #include <tuple>
 #include <functional>
 #include <TVector3.h>

@@ -10,12 +10,7 @@
 #include <cmath>
 #include <iostream>
 #include <sstream>
-#include <cstdlib>
-#include <cassert>
 
-
-#include <TGraph.h>
-#include <TString.h>
 #include <Math/Minimizer.h>
 #include <Math/Factory.h>
 #include <Math/Functor.h>

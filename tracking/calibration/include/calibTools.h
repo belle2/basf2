@@ -14,7 +14,6 @@
 #include <TMatrixDSym.h>
 #include <TVector3.h>
 #include <functional>
-#include <tuple>
 #include <map>
 
 #include <framework/database/EventDependency.h>

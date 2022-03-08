@@ -8,9 +8,6 @@
 #include <tracking/modules/BoostVectorCollector/BoostVectorCollectorModule.h>
 
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/utility/ReferenceFrame.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 using namespace Belle2;

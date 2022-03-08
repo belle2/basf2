@@ -7,9 +7,6 @@
  **************************************************************************/
 #include <calibration/CalibrationCollectorModule.h>
 
-#include <TVector3.h>
-
-#include <string>
 #include <limits>
 #include <vector>
 

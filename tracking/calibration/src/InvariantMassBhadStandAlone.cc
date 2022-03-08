@@ -9,26 +9,20 @@
 
 
 #include <iostream>
-#include <fstream>
 #include <iomanip>
 #include <vector>
-#include <tuple>
-#include <numeric>
 #include <filesystem>
 
-#include <TTree.h>
-#include <TVector3.h>
 #include <Eigen/Dense>
 
-
-#include <TGraph.h>
-#include <TLine.h>
+#include <TROOT.h>
+#include <TTree.h>
+#include <TCanvas.h>
 #include <TH1D.h>
+#include <TLine.h>
 #include <Math/Functor.h>
 #include <Math/SpecFuncMathCore.h>
 #include <Math/DistFunc.h>
-#include <TCanvas.h>
-#include <TROOT.h>
 
 
 #include <RooRealVar.h>

@@ -11,12 +11,10 @@
 #include <map>
 #include <algorithm>
 #include <iostream>
-#include <fstream>
 #include <utility>
 #include <cmath>
 #include <numeric>
 #include <TGraphErrors.h>
-#include <TCanvas.h>
 #include <TStyle.h>
 #include <TAxis.h>
 

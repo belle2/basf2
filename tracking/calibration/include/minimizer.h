@@ -10,9 +10,6 @@
 
 #include <vector>
 #include <functional>
-#include <cmath>
-#include <utility>
-#include <iostream>
 
 
 namespace Belle2 {

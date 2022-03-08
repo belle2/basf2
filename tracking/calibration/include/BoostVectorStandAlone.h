@@ -8,11 +8,8 @@
 
 #pragma once
 #include <vector>
-#include <map>
-#include <utility>
 #include <tuple>
 #include <TVector3.h>
-
 #include <Eigen/Dense>
 
 //If compiled within BASF2

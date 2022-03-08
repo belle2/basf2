@@ -127,16 +127,16 @@ void EcmsCollectorModule::collect()
     m_dmDstar[i] = -99;
 
 
-    static const int cPdgD0    = abs(EvtGenDatabasePDG::Instance()->GetParticle("D0")->PdgCode());
-    static const int cPdgDplus = abs(EvtGenDatabasePDG::Instance()->GetParticle("D+")->PdgCode());
+    static const int c_PdgD0    = abs(EvtGenDatabasePDG::Instance()->GetParticle("D0")->PdgCode());
+    static const int c_PdgDplus = abs(EvtGenDatabasePDG::Instance()->GetParticle("D+")->PdgCode());
 
-    static const int cPdgDstar0    = abs(EvtGenDatabasePDG::Instance()->GetParticle("D*0")->PdgCode());
-    static const int cPdgDstarPlus = abs(EvtGenDatabasePDG::Instance()->GetParticle("D*+")->PdgCode());
+    static const int c_PdgDstar0    = abs(EvtGenDatabasePDG::Instance()->GetParticle("D*0")->PdgCode());
+    static const int c_PdgDstarPlus = abs(EvtGenDatabasePDG::Instance()->GetParticle("D*+")->PdgCode());
 
     //if D0 or D+ meson
-    if (abs(Bpart->getDaughter(0)->getPDGCode()) == cPdgD0 || abs(Bpart->getDaughter(0)->getPDGCode()) == cPdgDplus) {
+    if (abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgD0 || abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgDplus) {
       D = Bpart->getDaughter(0);
-    } else if (abs(Bpart->getDaughter(0)->getPDGCode()) == cPdgDstar0 || abs(Bpart->getDaughter(0)->getPDGCode()) == cPdgDstarPlus) {
+    } else if (abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgDstar0 || abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgDstarPlus) {
       const Particle* Dstar = Bpart->getDaughter(0);
       D = Dstar->getDaughter(0);
       m_dmDstar[i] = Dstar->getMass() - D->getMass();

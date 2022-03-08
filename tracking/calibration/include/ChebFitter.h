@@ -11,10 +11,8 @@
 
 #include <vector>
 #include <map>
-#include <utility>
 #include <Eigen/Dense>
 #include <functional>
-#include <TString.h>
 
 
 namespace Belle2 {

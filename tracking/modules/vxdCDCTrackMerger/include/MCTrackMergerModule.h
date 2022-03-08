@@ -68,6 +68,18 @@ namespace Belle2 {
                                      std::vector<double>& tracksMinToF, const std::string& relatedTracksColumnName,
                                      bool isVXD);
 
+    /** Called once for to merge VXD and CDC only tracks an event.
+     *
+     * The methode merges (makes relations) between pairs of a CDC and a VXD track belonging to the same
+     * MCParticle. Tracks with QI of zero are ignored. Incorrect existing relations get removed.
+     */
+    void mergeVXDAndCDCTrackArrays(StoreArray<RecoTrack>& cdcTracks,
+                                   const std::vector<int>& cdcTrackMCParticles,
+                                   const std::vector<double>& cdcTrackMinToF,
+                                   StoreArray<RecoTrack>& vxdTracks,
+                                   const std::vector<int>& vxdTrackMCParticles,
+                                   const std::vector<double>& vxdTrackMinToF);
+
 
     bool m_mcParticlesPresent =
       false; /**< This flag is set to false if there are no MC Particles in the data store (probably data run?) and we can not create MC Reco tracks. */

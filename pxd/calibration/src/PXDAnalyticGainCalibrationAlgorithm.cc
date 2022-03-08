@@ -54,6 +54,17 @@ CalibrationAlgorithm::EResult PXDAnalyticGainCalibrationAlgorithm::calibrate()
   // Get counter histograms
   auto cluster_counter = getObjectPtr<TH1I>("PXDClusterCounter");
 
+  // Check if there is any PXD cluster
+  if (cluster_counter == nullptr) {
+    B2WARNING("No PXD cluster reconstructed!");
+    if (not forceContinue)
+      return c_NotEnoughData;
+    else {
+      B2WARNING("Skip processing.");
+      return c_OK;
+    }
+  }
+
   // Extract number of sensors from counter histograms
   auto nSensors = getNumberOfSensors(cluster_counter);
 

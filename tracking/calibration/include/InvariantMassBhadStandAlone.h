@@ -70,7 +70,7 @@ namespace Belle2 {
 
     /** The combined Ecms fit, where the constraints from the mumu fit are defined by limits and mumuVals */
     std::vector<std::vector<double>> doBhadFit(const std::vector<Event>& evts, std::vector<std::pair<double, double>> limits,
-                                               std::vector<std::pair<double, double>> mumuVals,  std::vector<double> startPars);
+                                               std::vector<std::pair<double, double>> mumuVals,  const std::vector<double>& startPars);
 
     /** The fit based only on the hadronic B decays */
     std::vector<double> doBhadOnlyFit(const std::vector<Event>& evts, const std::vector<std::pair<double, double>>& limits);

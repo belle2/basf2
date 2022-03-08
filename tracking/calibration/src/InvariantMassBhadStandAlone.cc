@@ -648,7 +648,7 @@ namespace Belle2 {
 
 
     vector<vector<double>> doBhadFit(const vector<Event>& evts, vector<pair<double, double>> limits,
-                                     vector<pair<double, double>> mumuVals,  vector<double> startPars)
+                                     vector<pair<double, double>> mumuVals,  const vector<double>& startPars)
     {
 
       auto r = argusFitConstrained(evts, limits, mumuVals, startPars);

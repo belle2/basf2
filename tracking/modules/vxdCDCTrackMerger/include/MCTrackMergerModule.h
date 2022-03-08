@@ -11,7 +11,7 @@
 #include <framework/core/Module.h>
 
 #include <framework/datastore/StoreArray.h>
-
+#include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
@@ -43,10 +43,19 @@ namespace Belle2 {
     void endRun() override;
 
   private:
-    /** Radius of the inner CDC wall in centimeters */
-    double m_CDC_wall_radius = 16.25;
-    /** Maximum distance between extrapolated tracks on the CDC wall */
-    double m_merge_radius;
+
+    /** Called once for a VXD or CDC only RecoTrack Store array in an event.
+     *
+     * The methode loops over all track in the tracks array. The relation of hits to MCParticles
+     * and TrueHits/SimHits are followed to determine the minimum time of fligt over all hits and
+     * the Store array index of the the MCParticle with most hits on track. In case there are no hits
+     * linked to an MCParticle, or less than 66% of hits are linked to the most frequent particle,
+     * the tracks quality indicator will be set to zero and the track will be ignored in the rest of
+     * the processing.
+     */
+    void analyzeAndCleanTrackArray(StoreArray<RecoTrack>& recoTracks, const StoreArray<MCParticle>& mcParticles,
+                                   std::vector<int>& trackMCParticles, std::vector<double>& trackMinToF, bool isVXD);
+
     bool m_mcParticlesPresent =
       false; /**< This flag is set to false if there are no MC Particles in the data store (probably data run?) and we can not create MC Reco tracks. */
 

@@ -143,7 +143,7 @@ void EcmsCollectorModule::collect()
 
     m_Kpid[i] = -99;
     if (Kaon && Kaon->getPIDLikelihood()) {
-      m_Kpid[i] = Kaon->getPIDLikelihood()->getProbability(Const::ChargedStable(321), Const::ChargedStable(211));
+      m_Kpid[i] = Kaon->getPIDLikelihood()->getProbability(Const::kaon, Const::pion);
     }
   }
 

@@ -68,18 +68,25 @@ namespace Belle2 {
         return scanRes;
       }
 
-      //---------------- ExtHit (or TOPBarHit) based --------------------
-
-      double getSlotID(const Particle* particle)
+      int getSlotID(const Particle* particle)
       {
         const auto* extHit = getExtHit(particle);
         return extHit ? extHit->getCopyID() : 0;
       }
 
-      double getSlotIDMCMatch(const Particle* particle)
+
+      //---------------- ExtHit (or TOPBarHit) based --------------------
+
+      double topSlotID(const Particle* particle)
+      {
+        const auto* extHit = getExtHit(particle);
+        return extHit ? extHit->getCopyID() : std::numeric_limits<double>::quiet_NaN();
+      }
+
+      double topSlotIDMCMatch(const Particle* particle)
       {
         const auto* barHit = getBarHit(particle);
-        return barHit ? barHit->getModuleID() : 0;
+        return barHit ? barHit->getModuleID() : std::numeric_limits<double>::quiet_NaN();
       }
 
       bool getLocalPosition(const Particle* particle, TVector3& result)
@@ -291,10 +298,11 @@ namespace Belle2 {
 
       //---------------- TOPDigit based --------------------
 
-      int countHits(const Particle* particle, double tmin, double tmax, bool clean)
+      double countHits(const Particle* particle, double tmin, double tmax, bool clean)
       {
-        int slotID = static_cast<int>(getSlotID(particle));
-        if (slotID == 0) return 0;
+        int slotID = getSlotID(particle);
+        if (slotID == 0) return std::numeric_limits<double>::quiet_NaN();
+
         StoreArray<TOPDigit> digits;
         int count = 0;
         for (const auto& digit : digits) {
@@ -309,8 +317,9 @@ namespace Belle2 {
 
       double topDigitCount(const Particle* particle)
       {
-        int slotID = static_cast<int>(getSlotID(particle));
-        if (slotID == 0) return 0;
+        int slotID = getSlotID(particle);
+        if (slotID == 0) return std::numeric_limits<double>::quiet_NaN();
+
         StoreArray<TOPDigit> topDigits;
         int count = 0;
         for (const auto& t : topDigits) {
@@ -323,15 +332,16 @@ namespace Belle2 {
 
       double topDigitCountMCMatch(const Particle* particle)
       {
-        int slotID = static_cast<int>(getSlotID(particle));
-        if (slotID == 0) return 0;
+        int slotID = getSlotID(particle);
+        if (slotID == 0) return std::numeric_limits<double>::quiet_NaN();
 
         auto* trk = particle->getTrack();
-        if (not trk) return 0;
-        auto* mcParticle = trk->getRelated<MCParticle>();
-        if (not mcParticle) return 0;
-        auto digits = mcParticle->getRelationsWith<TOPDigit>();
+        if (not trk) return std::numeric_limits<double>::quiet_NaN();
 
+        auto* mcParticle = trk->getRelated<MCParticle>();
+        if (not mcParticle) return std::numeric_limits<double>::quiet_NaN();
+
+        auto digits = mcParticle->getRelationsWith<TOPDigit>();
         int count = 0;
         for (const auto& digit : digits) {
           if (digit.getModuleID() != slotID) continue;
@@ -343,8 +353,9 @@ namespace Belle2 {
 
       double topSignalDigitCount(const Particle* particle)
       {
-        int slotID = static_cast<int>(getSlotID(particle));
-        if (slotID == 0) return 0;
+        int slotID = getSlotID(particle);
+        if (slotID == 0) return std::numeric_limits<double>::quiet_NaN();
+
         StoreArray<TOPDigit> digits;
         int count = 0;
         for (const auto& digit : digits) {
@@ -364,8 +375,9 @@ namespace Belle2 {
 
       double topRawDigitCount(const Particle* particle)
       {
-        int slotID = static_cast<int>(getSlotID(particle));
-        if (slotID == 0) return 0;
+        int slotID = getSlotID(particle);
+        if (slotID == 0) return std::numeric_limits<double>::quiet_NaN();
+
         StoreArray<TOPDigit> topDigits;
         int count = 0;
         for (const auto& t : topDigits) {
@@ -396,15 +408,16 @@ namespace Belle2 {
         if (vars.size() != 2) {
           B2FATAL("countTOPHitsInIntervalMCMatch(tmin, tmax): Need exactly two parameters (tmin, tmax)");
         }
-        int slotID = static_cast<int>(getSlotID(particle));
-        if (slotID == 0) return 0;
+        int slotID = getSlotID(particle);
+        if (slotID == 0) return std::numeric_limits<double>::quiet_NaN();
 
         auto* trk = particle->getTrack();
-        if (not trk) return 0;
-        auto* mcParticle = trk->getRelated<MCParticle>();
-        if (not mcParticle) return 0;
-        auto digits = mcParticle->getRelationsWith<TOPDigit>();
+        if (not trk) return std::numeric_limits<double>::quiet_NaN();
 
+        auto* mcParticle = trk->getRelated<MCParticle>();
+        if (not mcParticle) return std::numeric_limits<double>::quiet_NaN();
+
+        auto digits = mcParticle->getRelationsWith<TOPDigit>();
         int count = 0;
         for (const auto& digit : digits) {
           if (digit.getModuleID() != slotID) continue;
@@ -428,17 +441,18 @@ namespace Belle2 {
       double getTOPPhotonCount(const Particle* particle)
       {
         const auto* topLikelihood = TOPVariable::getTOPLikelihood(particle);
-        return topLikelihood ? topLikelihood->getNphot() : 0;
+        return topLikelihood ? topLikelihood->getNphot() : std::numeric_limits<double>::quiet_NaN();
       }
 
       double expectedPhotonCount(const Particle* particle, int pdg)
       {
         const auto* topLikelihood = getTOPLikelihood(particle);
-        if (not topLikelihood) return 0;
-        // if the user does select a hypothesis, use the particle's pdg code
+        if (not topLikelihood) return std::numeric_limits<double>::quiet_NaN();
+
         pdg = pdg != 0 ? pdg : particle->getPDGCode();
         const auto& chargedStable = Const::chargedStableSet.find(abs(pdg));
-        if (chargedStable == Const::invalidParticle) return 0; // PDG code not one of e, mu, pi, K, p, d
+        if (chargedStable == Const::invalidParticle) return std::numeric_limits<double>::quiet_NaN();
+
         return topLikelihood->getEstPhot(chargedStable);
       }
 
@@ -458,48 +472,48 @@ namespace Belle2 {
       double getEstimatedBkgCount(const Particle* particle)
       {
         const auto* topLikelihood = TOPVariable::getTOPLikelihood(particle);
-        return topLikelihood ? topLikelihood->getEstBkg() : 0;
+        return topLikelihood ? topLikelihood->getEstBkg() : std::numeric_limits<double>::quiet_NaN();
       }
 
       double getElectronLogL(const Particle* particle)
       {
         const auto* topLikelihood = getTOPLikelihood(particle);
-        if (not topLikelihood) return 0;
+        if (not topLikelihood) return std::numeric_limits<double>::quiet_NaN();
         return topLikelihood->getLogL_e();
       }
 
       double getMuonLogL(const Particle* particle)
       {
         const auto* topLikelihood = getTOPLikelihood(particle);
-        if (not topLikelihood) return 0;
+        if (not topLikelihood) return std::numeric_limits<double>::quiet_NaN();
         return topLikelihood->getLogL_mu();
       }
 
       double getPionLogL(const Particle* particle)
       {
         const auto* topLikelihood = getTOPLikelihood(particle);
-        if (not topLikelihood) return 0;
+        if (not topLikelihood) return std::numeric_limits<double>::quiet_NaN();
         return topLikelihood->getLogL_pi();
       }
 
       double getKaonLogL(const Particle* particle)
       {
         const auto* topLikelihood = getTOPLikelihood(particle);
-        if (not topLikelihood) return 0;
+        if (not topLikelihood) return std::numeric_limits<double>::quiet_NaN();
         return topLikelihood->getLogL_K();
       }
 
       double getProtonLogL(const Particle* particle)
       {
         const auto* topLikelihood = getTOPLikelihood(particle);
-        if (not topLikelihood) return 0;
+        if (not topLikelihood) return std::numeric_limits<double>::quiet_NaN();
         return topLikelihood->getLogL_p();
       }
 
       double getDeuteronLogL(const Particle* particle)
       {
         const auto* topLikelihood = getTOPLikelihood(particle);
-        if (not topLikelihood) return 0;
+        if (not topLikelihood) return std::numeric_limits<double>::quiet_NaN();
         return topLikelihood->getLogL(Const::deuteron);
       }
 
@@ -558,8 +572,7 @@ namespace Belle2 {
         if (not recBunch.isValid()) return 0;
         if (not recBunch->isReconstructed()) return 0;
         if (not recBunch->isSimulated()) return 0;
-        if (recBunch->getBunchNo() != recBunch->getMCBunchNo()) return 0;
-        return 1;
+        return (recBunch->getBunchNo() == recBunch->getMCBunchNo());
       }
 
       double TOPRecBunchCurrentOffset([[maybe_unused]] const Particle* particle)
@@ -615,8 +628,9 @@ namespace Belle2 {
 
       double TOPTracksInSlot(const Particle* particle)
       {
-        int slotID = static_cast<int>(getSlotID(particle));
-        if (slotID == 0) return 0;
+        int slotID = getSlotID(particle);
+        if (slotID == 0) return std::numeric_limits<double>::quiet_NaN();
+
         StoreArray<Track> tracks;
         int nTracks = 0;
         for (const auto& t : tracks) {
@@ -633,115 +647,115 @@ namespace Belle2 {
     } // TOPVariable
 
 
-    VARIABLE_GROUP("TOP Calibration");
-    REGISTER_VARIABLE("topSlotID", TOPVariable::getSlotID,
-                      "[calibration] slot ID of the particle (0 if N/A)");
-    REGISTER_VARIABLE("topSlotIDMCMatch", TOPVariable::getSlotIDMCMatch,
-                      "[calibration] slot ID of the matched MC particle (0 if N/A)");
+    VARIABLE_GROUP("TOP Variables (cdst needed)");
+    REGISTER_VARIABLE("topSlotID", TOPVariable::topSlotID,
+                      "slot ID of the particle");
+    REGISTER_VARIABLE("topSlotIDMCMatch", TOPVariable::topSlotIDMCMatch,
+                      "slot ID of the matched MC particle");
 
     REGISTER_VARIABLE("topLocalX", TOPVariable::getTOPLocalX,
-                      "[calibration] x coordinate of the particle entry point to TOP in the local frame (NaN if N/A)");
+                      "x coordinate of the particle entry point to TOP in the local frame");
     REGISTER_VARIABLE("topLocalY", TOPVariable::getTOPLocalY,
-                      "[calibration] y coordinate of the particle entry point to TOP in the local frame (NaN if N/A)");
+                      "y coordinate of the particle entry point to TOP in the local frame");
     REGISTER_VARIABLE("topLocalZ", TOPVariable::getTOPLocalZ,
-                      "[calibration] z coordinate of the particle entry point to TOP in the local frame (NaN if N/A)");
+                      "z coordinate of the particle entry point to TOP in the local frame");
     REGISTER_VARIABLE("topLocalXMCMatch", TOPVariable::getTOPLocalXMCMatch,
-                      "[calibration] x coordinate of the matched MC particle entry point to TOP in the local frame (NaN if N/A)");
+                      "x coordinate of the matched MC particle entry point to TOP in the local frame");
     REGISTER_VARIABLE("topLocalYMCMatch", TOPVariable::getTOPLocalYMCMatch,
-                      "[calibration] y coordinate of the matched MC particle entry point to TOP in the local frame (NaN if N/A)");
+                      "y coordinate of the matched MC particle entry point to TOP in the local frame");
     REGISTER_VARIABLE("topLocalZMCMatch", TOPVariable::getTOPLocalZMCMatch,
-                      "[calibration] z coordinate of the matched MC particle entry point to TOP in the local frame (NaN if N/A)");
+                      "z coordinate of the matched MC particle entry point to TOP in the local frame");
     REGISTER_VARIABLE("topLocalPhi", TOPVariable::getTOPLocalPhi,
-                      "[calibration] momentum azimuthal angle of the particle at entry point to TOP in the local frame (NaN if N/A)");
+                      "momentum azimuthal angle of the particle at entry point to TOP in the local frame");
     REGISTER_VARIABLE("topLocalTheta", TOPVariable::getTOPLocalTheta,
-                      "[calibration] momentum polar angle of the particle at entry point to the TOP in the local frame (NaN if N/A)");
+                      "momentum polar angle of the particle at entry point to the TOP in the local frame");
     REGISTER_VARIABLE("topLocalPhiMCMatch", TOPVariable::getTOPLocalPhiMCMatch,
-                      "[calibration] momentum azimuthal angle of the matched MC particle at entry point to TOP in the local frame (NaN if N/A)");
+                      "momentum azimuthal angle of the matched MC particle at entry point to TOP in the local frame");
     REGISTER_VARIABLE("topLocalThetaMCMatch", TOPVariable::getTOPLocalThetaMCMatch,
-                      "[calibration] momentum polar angle of the matched MC particle at entry point to TOP in the local frame (NaN if N/A)");
+                      "momentum polar angle of the matched MC particle at entry point to TOP in the local frame");
     REGISTER_VARIABLE("topTOF", TOPVariable::getTOF,
-                      "[calibration] time-of-flight of the particle from the origin to TOP (NaN if N/A)");
+                      "time-of-flight of the particle from the origin to TOP");
     REGISTER_VARIABLE("topTOFMCMatch", TOPVariable::getTOFMCMatch,
-                      "[calibration] time-of-flight of the matched MC particle from the origin to TOP (NaN if N/A)");
+                      "time-of-flight of the matched MC particle from the origin to TOP");
     REGISTER_VARIABLE("topTOFExpert(pdg)", TOPVariable::getTOFExpert,
-                      "[calibration] time-of-flight from the origin to TOP for a given PDG code (NaN if N/A)");
+                      "time-of-flight from the origin to TOP for a given PDG code");
 
     REGISTER_VARIABLE("extrapTrackToTOPimpactZ", TOPVariable::extrapTrackToTOPz,
-                      "[calibration] z coordinate of the track extrapolated to R = 120 cm using helix from TrackFitResult (NaN if N/A)");
+                      "z coordinate of the track extrapolated to R = 120 cm using helix from TrackFitResult");
     REGISTER_VARIABLE("extrapTrackToTOPimpactTheta", TOPVariable::extrapTrackToTOPtheta,
-                      "[calibration] theta coordinate of the track extrapolated to R = 120 cm using helix from TrackFitResult (NaN if N/A)");
+                      "theta coordinate of the track extrapolated to R = 120 cm using helix from TrackFitResult");
     REGISTER_VARIABLE("extrapTrackToTOPimpactPhi", TOPVariable::extrapTrackToTOPphi,
-                      "[calibration] phi coordinate of the track extrapolated to R = 120 cm using helix from TrackFitResult (NaN if N/A)");
+                      "phi coordinate of the track extrapolated to R = 120 cm using helix from TrackFitResult");
 
     REGISTER_VARIABLE("topDigitCount", TOPVariable::topDigitCount,
-                      "[calibration] number of good digits in the same module as particle (0 if N/A)");
+                      "number of good digits in the same module as particle");
     REGISTER_VARIABLE("topDigitCountSignal", TOPVariable::topSignalDigitCount,
-                      "[calibration] number of good, background-subtracted digits in interval [0, 50 ns] of the same module as particle (0 if N/A)");
+                      "number of good, background-subtracted digits in interval [0, 50 ns] of the same module as particle");
     REGISTER_VARIABLE("topDigitCountBkg", TOPVariable::topBackgroundDigitCount,
-                      "[calibration] number of good digits in interval [-50 ns, 0] of the same module as particle (0 if N/A)");
+                      "number of good digits in interval [-50 ns, 0] of the same module as particle");
     REGISTER_VARIABLE("topDigitCountRaw", TOPVariable::topRawDigitCount,
-                      "[calibration] number of all digits (regardless of hit quality) in the same module as particle (0 if N/A)");
+                      "number of all digits (regardless of hit quality) in the same module as particle");
     REGISTER_VARIABLE("topDigitCountInterval(tmin, tmax)", TOPVariable::countTOPHitsInInterval,
-                      "[calibration] number of good digits in a given time interval of the same module as particle (0 if N/A)");
+                      "number of good digits in a given time interval of the same module as particle");
     REGISTER_VARIABLE("topDigitCountIntervalRaw(tmin, tmax)", TOPVariable::countRawTOPHitsInInterval,
-                      "[calibration] number of all digits (regardless of hit quality) in a given time interval of the same module as particle (0 if N/A)");
+                      "number of all digits (regardless of hit quality) in a given time interval of the same module as particle");
     REGISTER_VARIABLE("topDigitCountMCMatch", TOPVariable::topDigitCountMCMatch,
-                      "[calibration] number of good digits associated with the matched MC particle and in the same module as particle (0 if N/A)");
+                      "number of good digits associated with the matched MC particle and in the same module as particle");
     REGISTER_VARIABLE("topDigitCountIntervalMCMatch(tmin, tmax)", TOPVariable::countTOPHitsInIntervalMCMatch,
-                      "[calibration] number of good digits associated with the matched MC particle in a given time interval and in the same module as particle (0 if N/A)");
+                      "number of good digits associated with the matched MC particle in a given time interval and in the same module as particle");
 
     REGISTER_VARIABLE("topLogLFlag", TOPVariable::getFlag,
-                      "[calibration] reconstruction flag: 1 if log likelihoods available, 0 otherwise");
+                      "reconstruction flag: 1 if log likelihoods available, 0 otherwise");
     REGISTER_VARIABLE("topLogLPhotonCount", TOPVariable::getTOPPhotonCount,
-                      "[calibration] number of photons used for log likelihood calculation (0 if N/A)");
+                      "number of photons used for log likelihood calculation");
     REGISTER_VARIABLE("topLogLExpectedPhotonCount", TOPVariable::getExpectedPhotonCount,
-                      "[calibration] expected number of photons (including bkg) for this particle (0 if N/A)");
+                      "expected number of photons (including bkg) for this particle");
     REGISTER_VARIABLE("topLogLExpectedPhotonCountExpert(pdg)", TOPVariable::getExpectedPhotonCountExpert,
-                      "[calibration] expected number of photons (including bkg) for a given PDG code (0 if N/A)");
+                      "expected number of photons (including bkg) for a given PDG code");
     REGISTER_VARIABLE("topLogLEstimatedBkgCount", TOPVariable::getEstimatedBkgCount,
-                      "[calibration] estimated number of background photons (0 if N/A)");
+                      "estimated number of background photons");
     REGISTER_VARIABLE("topLogLElectron", TOPVariable::getElectronLogL,
-                      "[calibration] electron log likelihood (0 if N/A)");
+                      "electron log likelihood");
     REGISTER_VARIABLE("topLogLMuon", TOPVariable::getMuonLogL,
-                      "[calibration] muon log likelihood (0 if N/A)");
+                      "muon log likelihood");
     REGISTER_VARIABLE("topLogLPion", TOPVariable::getPionLogL,
-                      "[calibration] pion log likelihood (0 if N/A)");
+                      "pion log likelihood");
     REGISTER_VARIABLE("topLogLKaon", TOPVariable::getKaonLogL,
-                      "[calibration] kaon log likelihood (0 if N/A)");
+                      "kaon log likelihood");
     REGISTER_VARIABLE("topLogLProton", TOPVariable::getProtonLogL,
-                      "[calibration] proton log likelihood (0 if N/A)");
+                      "proton log likelihood");
     REGISTER_VARIABLE("topLogLDeuteron", TOPVariable::getDeuteronLogL,
-                      "[calibration] deuteron log likelihood (0 if N/A)");
+                      "deuteron log likelihood");
 
     REGISTER_VARIABLE("logLScanMass", TOPVariable::getLogLScanMass,
-                      "[calibration] mass at the logL maximum from the LL scan (NaN if N/A). Requires TOPLLScanner in the processing path.");
+                      "mass at the logL maximum from the LL scan. Requires TOPLLScanner in the processing path.");
     REGISTER_VARIABLE("logLScanMassUpperInterval", TOPVariable::getLogLScanMassUpperInterval,
-                      "[calibration] Upper edge of the mass interval determined by the LL scan (NaN if N/A). Requires TOPLLScanner in the processing path.");
+                      "Upper edge of the mass interval determined by the LL scan. Requires TOPLLScanner in the processing path.");
     REGISTER_VARIABLE("logLScanMassLowerInterval", TOPVariable::getLogLScanMassLowerInterval,
-                      "[calibration] Lower edge of the mass interval determined by the LL scan (NaN if N/A). Requires TOPLLScanner in the processing path.");
+                      "Lower edge of the mass interval determined by the LL scan. Requires TOPLLScanner in the processing path.");
     REGISTER_VARIABLE("logLScanThreshold", TOPVariable::getLogLScanThreshold,
-                      "[calibration] Cherenkov threshold determind by the LL scan (NaN if N/A). Requires TOPLLScanner in the processing path.");
+                      "Cherenkov threshold determind by the LL scan. Requires TOPLLScanner in the processing path.");
     REGISTER_VARIABLE("logLScanExpectedSignalPhotons", TOPVariable::getLogLScanExpectedSignalPhotons,
-                      "[calibration] Expected signal photon yeild at the LL maximum (NaN if N/A). Requires TOPLLScanner in the processing path.");
+                      "Expected signal photon yeild at the LL maximum. Requires TOPLLScanner in the processing path.");
 
     REGISTER_VARIABLE("topBunchIsReconstructed", TOPVariable::isTOPRecBunchReconstructed,
-                      "[calibration] reconstruction flag: 1 if reconstructed, 0 otherwise");
+                      "reconstruction flag: 1 if reconstructed, 0 otherwise");
     REGISTER_VARIABLE("topBunchNumber", TOPVariable::TOPRecBunchNumber,
-                      "[calibration] reconstructed bunch number relative to L1 trigger (NaN if N/A)");
+                      "reconstructed bunch number relative to L1 trigger");
     REGISTER_VARIABLE("topBunchMCMatch", TOPVariable::isTOPRecBunchNumberEQsim,
-                      "[calibration] MC matching status: 1 if reconstructed bunch equal to simulated bunch, 0 otherwise");
+                      "MC matching status: 1 if reconstructed bunch equal to simulated bunch, 0 otherwise");
     REGISTER_VARIABLE("topBunchOffset", TOPVariable::TOPRecBunchCurrentOffset,
-                      "[calibration] current offset to the reconstructed bunch crossing time (NaN if N/A)");
+                      "current offset to the reconstructed bunch crossing time");
     REGISTER_VARIABLE("topBunchTrackCount", TOPVariable::TOPRecBunchTrackCount,
-                      "[calibration] number of tracks selected for the bunch reconstruction (NaN if N/A)");
+                      "number of tracks selected for the bunch reconstruction");
     REGISTER_VARIABLE("topBunchUsedTrackCount", TOPVariable::TOPRecBunchUsedTrackCount,
-                      "[calibration] number of tracks actually used in the bunch reconstruction (NaN if N/A)");
+                      "number of tracks actually used in the bunch reconstruction");
 
     REGISTER_VARIABLE("topRawPhotonsInSlot(id)", TOPVariable::TOPRawPhotonsInSlot,
-                      "[calibration] number of all photons in the given slot id (0 if N/A)");
+                      "number of all photons in the given slot id");
     REGISTER_VARIABLE("topGoodPhotonsInSlot(id)", TOPVariable::TOPGoodPhotonsInSlot,
-                      "[calibration] number of good photons in the given slot id (0 if N/A)");
+                      "number of good photons in the given slot id");
     REGISTER_VARIABLE("topTracksInSlot", TOPVariable::TOPTracksInSlot,
-                      "[calibration] number of tracks in the same slot as particle (0 if N/A)");
+                      "number of tracks in the same slot as particle");
   } // Variable
 } // Belle2

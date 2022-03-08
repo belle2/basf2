@@ -56,6 +56,15 @@ namespace Belle2 {
       const TOPLikelihoodScanResult* getTOPLikelihoodScanResult(const Particle* particle);
 
 
+      /**
+      * Returns slot ID of the particle at TOP (from ExtHit).
+      * Requires TOPLikelihoods and ExtHits.
+      * @param particle pointer to Particle object (nullptr is also accepted)
+      * @return slot ID (0 if N/A)
+      */
+      int getSlotID(const Particle* particle);
+
+
       //---------------- ExtHit (or TOPBarHit) based --------------------
 
       /**
@@ -63,18 +72,18 @@ namespace Belle2 {
        * Requires TOPLikelihoods and ExtHits.
        * Variable name: topSlotID
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return slot ID (0 if N/A)
+       * @return slot ID (NaN if N/A)
        */
-      double getSlotID(const Particle* particle);
+      double topSlotID(const Particle* particle);
 
       /**
        * Returns slot ID of the matched MC particle at TOP (from TOPBarHit).
        * Requires TOPLikelihoods and TOPBarHits.
        * Variable name: topSlotIDMCMatch
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return slot ID (0 if N/A)
+       * @return slot ID (NaN if N/A)
        */
-      double getSlotIDMCMatch(const Particle* particle);
+      double topSlotIDMCMatch(const Particle* particle);
 
       /**
        * Returns local position of the particle entry point to the TOP.
@@ -276,16 +285,16 @@ namespace Belle2 {
        * @param tmin time window lower limit
        * @param tmax time window upper limit
        * @param clean on true count only good digits
-       * @return digits count (0 if N/A)
+       * @return digits count (NaN if N/A)
        */
-      int countHits(const Particle* particle, double tmin, double tmax, bool clean);
+      double countHits(const Particle* particle, double tmin, double tmax, bool clean);
 
       /**
        * Returns the number of good digits in the same module as the particle.
        * Requires TOPLikelihoods, ExtHits and TOPDigits.
        * Variable name: topDigitCount
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return digits count (0 if N/A)
+       * @return digits count (NaN if N/A)
        */
       double topDigitCount(const Particle* particle);
 
@@ -294,7 +303,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods, ExtHits and TOPDigits.
        * Variable name: topDigitCountMCMatch
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return digits count (0 if N/A)
+       * @return digits count (NaN if N/A)
        */
       double topDigitCountMCMatch(const Particle* particle);
 
@@ -304,7 +313,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods, ExtHits and TOPDigits.
        * Variable name: topDigitCountSignal
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return digits count (0 if N/A)
+       * @return digits count (NaN if N/A)
        */
       double topSignalDigitCount(const Particle* particle);
 
@@ -314,7 +323,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods, ExtHits and TOPDigits.
        * Variable name: topDigitCountBkg
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return digits count (0 if N/A)
+       * @return digits count (NaN if N/A)
        */
       double topBackgroundDigitCount(const Particle* particle);
 
@@ -323,7 +332,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods, ExtHits and TOPDigits.
        * Variable name: topDigitCountRaw
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return digits count (0 if N/A)
+       * @return digits count (NaN if N/A)
        */
       double topRawDigitCount(const Particle* particle);
 
@@ -333,7 +342,7 @@ namespace Belle2 {
        * Variable name: topDigitCountInterval(tmin, tmax)
        * @param particle pointer to Particle object (nullptr is also accepted)
        * @param vars a vector of size = 2 containing time interval (tmin, tmax)
-       * @return digits count (0 if N/A)
+       * @return digits count (NaN if N/A)
        */
       double countTOPHitsInInterval(const Particle* particle, const std::vector<double>& vars);
 
@@ -343,7 +352,7 @@ namespace Belle2 {
        * Variable name: topDigitCountIntervalMCMatch(tmin, tmax)
        * @param particle pointer to Particle object (nullptr is also accepted)
        * @param vars a vector of size = 2 containing time interval (tmin, tmax)
-       * @return digits count (0 if N/A)
+       * @return digits count (NaN if N/A)
        */
       double countTOPHitsInIntervalMCMatch(const Particle* particle, const std::vector<double>& vars);
 
@@ -353,7 +362,7 @@ namespace Belle2 {
        * Variable name: topDigitCountIntervalRaw(tmin, tmax)
        * @param particle pointer to Particle object (nullptr is also accepted)
        * @param vars a vector of size = 2 containing time interval (tmin, tmax)
-       * @return digits count (0 if N/A)
+       * @return digits count (NaN if N/A)
        */
       double countRawTOPHitsInInterval(const Particle* particle, const std::vector<double>& vars);
 
@@ -374,7 +383,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods.
        * Variable name: topLogLPhotonCount
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return number of photons (0 if N/A)
+       * @return number of photons (NaN if N/A)
        */
       double getTOPPhotonCount(const Particle* particle);
 
@@ -383,7 +392,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods.
        * @param particle pointer to Particle object (nullptr is also accepted)
        * @param pdg PDG code of charged stable particle
-       * @return expected number of photons (0 if N/A)
+       * @return expected number of photons (NaN if N/A)
        */
       double expectedPhotonCount(const Particle* particle, int pdg);
 
@@ -392,7 +401,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods.
        * Variable name: topLogLExpectedPhotonCount
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return expected number of photons (0 if N/A)
+       * @return expected number of photons (NaN if N/A)
        */
       double getExpectedPhotonCount(const Particle* particle);
 
@@ -402,7 +411,7 @@ namespace Belle2 {
        * Variable name: topLogLExpectedPhotonCountExpert(pdg)
        * @param particle pointer to Particle object (nullptr is also accepted)
        * @param vars vector of size = 1 containing PDG code of charged stable particle
-       * @return expected number of photons (0 if N/A)
+       * @return expected number of photons (NaN if N/A)
        */
       double getExpectedPhotonCountExpert(const Particle* particle,
                                           const std::vector<double>& vars);
@@ -412,7 +421,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods.
        * Variable name: topLogLEstimatedBkgCount
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return expected number of background hits (0 if N/A)
+       * @return expected number of background hits (NaN if N/A)
        */
       double getEstimatedBkgCount(const Particle* particle);
 
@@ -421,7 +430,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods.
        * Variable name: topLogLElectron
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return log likelihood (0 if N/A)
+       * @return log likelihood (NaN if N/A)
        */
       double getElectronLogL(const Particle* particle);
 
@@ -430,7 +439,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods.
        * Variable name: topLogLMuon
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return log likelihood (0 if N/A)
+       * @return log likelihood (NaN if N/A)
        */
       double getMuonLogL(const Particle* particle);
 
@@ -439,7 +448,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods.
        * Variable name: topLogLPion
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return log likelihood (0 if N/A)
+       * @return log likelihood (NaN if N/A)
        */
       double getPionLogL(const Particle* particle);
 
@@ -448,7 +457,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods.
        * Variable name: topLogLKaon
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return log likelihood (0 if N/A)
+       * @return log likelihood (NaN if N/A)
        */
       double getKaonLogL(const Particle* particle);
 
@@ -457,7 +466,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods.
        * Variable name: topLogLProton
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return log likelihood (0 if N/A)
+       * @return log likelihood (NaN if N/A)
        */
       double getProtonLogL(const Particle* particle);
 
@@ -466,7 +475,7 @@ namespace Belle2 {
        * Requires TOPLikelihoods.
        * Variable name: topLogLDeuteron
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return log likelihood (0 if N/A)
+       * @return log likelihood (NaN if N/A)
        */
       double getDeuteronLogL(const Particle* particle);
 
@@ -584,7 +593,7 @@ namespace Belle2 {
        * Variable name: topRawPhotonsInSlot(id)
        * @param particle unused
        * @param vars vector of size = 1 containig the slot ID
-       * @return number of all hits (0 if N/A)
+       * @return number of all hits
        */
       double TOPRawPhotonsInSlot([[maybe_unused]] const Particle* particle, const std::vector<double>& vars);
 
@@ -594,7 +603,7 @@ namespace Belle2 {
        * Variable name: topGoodPhotonsInSlot(id)
        * @param particle unused
        * @param vars vector of size = 1 containig the slot ID
-       * @return number of good hits (0 if N/A)
+       * @return number of good hits
        */
       double TOPGoodPhotonsInSlot([[maybe_unused]] const Particle* particle, const std::vector<double>& vars);
 
@@ -603,7 +612,7 @@ namespace Belle2 {
        * Requires TOPDigits, TOPLikelihoods and ExtHits.
        * Variable name: topTracksInSlot
        * @param particle pointer to Particle object (nullptr is also accepted)
-       * @return number of tracks (0 if N/A)
+       * @return number of tracks (NaN if N/A)
        */
       double TOPTracksInSlot(const Particle* particle);
 

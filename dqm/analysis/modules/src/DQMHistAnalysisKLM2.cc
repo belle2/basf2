@@ -46,28 +46,28 @@ void DQMHistAnalysisKLM2Module::initialize()
   m_c_eff_eklm_sector = new TCanvas("KLMEfficiencyDQM/c_eff_eklm_sector");
 
   m_eff_bklm = new TH1F("KLMEfficiencyDQM/eff_bklm_plane",
-                        "Plane Efficiency in BKLM Sector",
+                        "Plane Efficiency in BKLM",
                         BKLMElementNumbers::getMaximalLayerGlobalNumber(), 0.5, 0.5 + BKLMElementNumbers::getMaximalLayerGlobalNumber());
   m_eff_bklm->GetXaxis()->SetTitle("Layer number");
   m_eff_bklm->SetStats(false);
   m_eff_bklm->SetOption("HIST");
 
   m_eff_eklm = new TH1F("KLMEfficiencyDQM/eff_eklm_plane",
-                        "Plane Efficiency in EKLM Sector",
+                        "Plane Efficiency in EKLM",
                         EKLMElementNumbers::getMaximalPlaneGlobalNumber(), 0.5, 0.5 + EKLMElementNumbers::getMaximalPlaneGlobalNumber());
   m_eff_eklm->GetXaxis()->SetTitle("Plane number");
   m_eff_eklm->SetStats(false);
   m_eff_eklm->SetOption("HIST");
 
   m_eff_bklm_sector = new TH1F("KLMEfficiencyDQM/eff_bklm_sector",
-                               "Plane Efficiency in BKLM Sector",
+                               "Sector Efficiency in BKLM",
                                BKLMElementNumbers::getMaximalSectorGlobalNumber(), 0.5, BKLMElementNumbers::getMaximalSectorGlobalNumber() + 0.5);
   m_eff_bklm_sector->GetXaxis()->SetTitle("Sector number");
   m_eff_bklm_sector->SetStats(false);
   m_eff_bklm_sector->SetOption("HIST");
 
   m_eff_eklm_sector = new TH1F("KLMEfficiencyDQM/eff_eklm_sector",
-                               "Plane Efficiency in EKLM Sector",
+                               "Sector Efficiency in EKLM",
                                EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(), 0.5, EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() + 0.5);
   m_eff_eklm_sector->GetXaxis()->SetTitle("Sector number");
   m_eff_eklm_sector->SetStats(false);

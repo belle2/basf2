@@ -232,6 +232,8 @@ namespace Belle2 {
       gROOT->SetBatch(isBatch);
     }
 
+
+
     map<TString, pair<double, double>> argusFit(const vector<Event>& evts,  vector<pair<double, double>> limits)
     {
 
@@ -301,6 +303,7 @@ namespace Belle2 {
       }
 
 
+
       RooCategory Bcharge("sample", "sample") ;
       Bcharge.defineType("B0") ;
       Bcharge.defineType("Bp") ;
@@ -363,7 +366,6 @@ namespace Belle2 {
       resMap["sigmean"]  = {sigmean.getValV(),  sigmean.getError()};
       resMap["sigwidth"] = {sigwidth.getValV(), sigwidth.getError()};
       resMap["argpar"]   = {argpar.getValV(), argpar.getError()};
-      resMap["endpoint"]   = {endpointB0.getValV(), endpointB0.getError()};
 
       namespace fs = std::filesystem;
       fs::create_directories("plotsHadBonly");
@@ -391,13 +393,26 @@ namespace Belle2 {
 
 // Analysis itself
     map<TString, pair<double, double>> argusFitConstrained(const vector<Event>& evts, vector<pair<double, double>> limits,
-                                                           vector<pair<double, double>> mumuVals)
+                                                           vector<pair<double, double>> mumuVals,  vector<double> startPars)
     {
       // Calculate eCMS/2
       for (auto& el : mumuVals) {
         el.first  /= 2;
         el.second /= 2;
       }
+
+      //starting values are from the Bonly fit
+      const double meanInit   = startPars[0] / 2;
+      const double sigmaInit  = startPars[2] / 2;
+      const double argparInit = startPars[4];
+
+      double s = 0, sw = 0;
+      for (auto p : mumuVals) {
+        s  += p.first / pow(p.second, 2);
+        sw += 1. / pow(p.second, 2);
+      }
+      const double mumuMean = s / sw;
+      const double shiftInit = meanInit - mumuMean;
 
 
       const double cMBp = EvtGenDatabasePDG::Instance()->GetParticle("B+")->Mass();
@@ -488,7 +503,7 @@ namespace Belle2 {
 
       // --- Build Gaussian signal PDF ---
 
-      RooRealVar sigwidth("#sigma", "width of B-meson energy in CMS", 0.00237, 0.0001, 0.030) ;
+      RooRealVar sigwidth("#sigma", "width of B-meson energy in CMS",  sigmaInit, 0.0001, 0.030) ;
 
       vector<RooRealVar*> sigmean(limits.size());
       vector<RooGaussian*> gauss(limits.size());
@@ -496,14 +511,14 @@ namespace Belle2 {
 
 
       for (unsigned i = 0; i < limits.size(); ++i) {
-        sigmean[i] = new RooRealVar(Form("Mean_%u", i), "mean B-meson energy in CMS", 5.29, 5.27, 5.30) ;
+        sigmean[i] = new RooRealVar(Form("Mean_%u", i), "mean B-meson energy in CMS", meanInit, 5.27, 5.30) ;
         gauss[i]   = new RooGaussian(Form("gauss_%u", i), "gaussian PDF", eNow, *sigmean[i], sigwidth) ;
       }
 
       // --- Build Argus background PDF ---
 
 
-      RooRealVar argpar("Argus_param", "argus shape parameter", -150.7, -300., +50.0) ;
+      RooRealVar argpar("Argus_param", "argus shape parameter", argparInit, -300., +50.0) ;
       RooRealVar endpointBp("EndPointBp", "endPoint parameter", cMBp, 5.27, 5.291) ; //B+ value
       RooRealVar endpointB0("EndPointB0", "endPoint parameter", cMB0, 5.27, 5.291) ; //B0 value
       endpointB0.setConstant(kTRUE);
@@ -558,7 +573,7 @@ namespace Belle2 {
         simPdf.addPdf(*sumBp[i],  Form("Bp_%u", i));
       }
 
-      RooRealVar shift("shift", "shift to mumu", +6e-3, -30e-3, 30e-3);
+      RooRealVar shift("shift", "shift to mumu", shiftInit, -30e-3, 30e-3);
 
       vector<RooGaussian*> fconstraint(limits.size());
       vector<RooPolyVar*> shiftNow(limits.size());
@@ -586,7 +601,6 @@ namespace Belle2 {
 
       resMap["sigwidth"] = {sigwidth.getValV(), sigwidth.getError()};
       resMap["argpar"]   = {argpar.getValV(), argpar.getError()};
-      resMap["endpoint"] = {endpointB0.getValV(), endpointB0.getError()};
       resMap["shift"]    = {shift.getValV(), shift.getError()};
 
 
@@ -634,10 +648,10 @@ namespace Belle2 {
 
 
     vector<vector<double>> doBhadFit(const vector<Event>& evts, vector<pair<double, double>> limits,
-                                     vector<pair<double, double>> mumuVals)
+                                     vector<pair<double, double>> mumuVals,  vector<double> startPars)
     {
 
-      auto r = argusFitConstrained(evts, limits, mumuVals);
+      auto r = argusFitConstrained(evts, limits, mumuVals, startPars);
       assert(limits.size() == mumuVals.size());
 
       vector<vector<double>> result(limits.size());
@@ -661,7 +675,7 @@ namespace Belle2 {
 
       auto r = argusFit(evts, limits);
 
-      return {2 * r.at("sigmean").first,  2 * r.at("sigmean").second,  2 * r.at("sigwidth").first, 2 * r.at("sigwidth").second};
+      return {2 * r.at("sigmean").first,  2 * r.at("sigmean").second,  2 * r.at("sigwidth").first, 2 * r.at("sigwidth").second, r.at("argpar").first};
 
     }
 

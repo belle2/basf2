@@ -468,21 +468,10 @@ CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
         mumuVals.push_back({val, unc});
       }
 
-      auto res = InvariantMassBhadCalib::doBhadFit(evtsHad, limits, mumuVals);
 
-      // update calibration data
-      for (unsigned j = 0; j < calibMuMu.subIntervals.size(); ++j) {
-        calibComb.pars.cnt[j](0)       = res[j][0];
-        calibComb.pars.cntUnc[j](0, 0) = res[j][1];
-        calibComb.pars.spreadMat(0, 0) = res[j][2];
-
-        calibComb.pars.spreadUnc = res[j][3];
-        calibComb.pars.shift     = res[j][4];
-        calibComb.pars.shiftUnc  = res[j][5];
-        calibComb.pars.pulls[j]  = res[j][6];
-      }
-
+      //////////////////////////////////////
       // run B mesons stand-alone calibration
+      //////////////////////////////////////
       auto resB = InvariantMassBhadCalib::doBhadOnlyFit(evtsHad, limits);
 
       // store it to file
@@ -496,6 +485,26 @@ CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
 
       BonlyOut <<  std::setprecision(8) <<  s << " " << e << " " << exp1 << " " << run1 << " " << exp2 << " " << run2  << " " <<
                1e3 * resB[0] << "  " << 1e3 * resB[1] << " " <<  1e3 * resB[2] << "  " << 1e3 * resB[3] <<  endl;
+
+
+
+      //////////////////////////////////////
+      //run the combined calibration
+      //////////////////////////////////////
+      auto res = InvariantMassBhadCalib::doBhadFit(evtsHad, limits, mumuVals, resB);
+
+      // update calibration data
+      for (unsigned j = 0; j < calibMuMu.subIntervals.size(); ++j) {
+        calibComb.pars.cnt[j](0)       = res[j][0];
+        calibComb.pars.cntUnc[j](0, 0) = res[j][1];
+        calibComb.pars.spreadMat(0, 0) = res[j][2];
+
+        calibComb.pars.spreadUnc = res[j][3];
+        calibComb.pars.shift     = res[j][4];
+        calibComb.pars.shiftUnc  = res[j][5];
+        calibComb.pars.pulls[j]  = res[j][6];
+      }
+
 
     }
 

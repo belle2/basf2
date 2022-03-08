@@ -421,7 +421,7 @@ def create_hadB_fit_plots(outputDir, pdflatex):
             body += '$(' + eCMS + '\\pm' + eCMSe + ')$~MeV    \\\\\n'
             body += '$\\mathrm{pull}    = ' + pull + '$    \\\\\n'
             body += '\\includegraphics[width=1.0\\textwidth]{' + outputDir + \
-                '/' + dName + '/B0_' + str(t) + '_' + str(iShort) + '.pdf}\n'
+                '/' + dName + '/B0_' + str(t) + '_' + str(iShort) + '.pdf}\\\\\n'
             body += '\\includegraphics[width=1.0\\textwidth]{' + outputDir + \
                 '/' + dName + '/Bp_' + str(t) + '_' + str(iShort) + '.pdf}\n'
             body += '\\end{center}\n'

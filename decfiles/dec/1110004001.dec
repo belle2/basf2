@@ -9,8 +9,6 @@
 # Cuts: None
 # Date: 02/03/2022
 #
-Alias        K_S0sig   K_S0
-ChargeConj   K_S0sig   K_S0sig
 #
 Decay Upsilon(4S)
 1.0     B0sig anti-B0sig B0 anti-B0	             	VSS_BMIX dm;
@@ -21,7 +19,7 @@ Decay B0sig
 Enddecay
 CDecay anti-B0sig
 #
-Decay K_S0sig
+Decay K_S0
 1.000        pi0       pi0                 PHSP;
 Enddecay
 #

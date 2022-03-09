@@ -111,6 +111,13 @@ namespace Belle2 {
     static const MonObjList& getMonObjList();
 
     /**
+     * Find canvas by name
+     * @param cname Name of the canvas
+     * @return The pointer to the canvas, or nullptr if not found.
+     */
+    TCanvas* findCanvas(TString cname);
+
+    /**
      * Find histogram.
      * @param histname The name of the histogram.
      * @return The found histogram, or nullptr if not found.

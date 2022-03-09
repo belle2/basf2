@@ -110,11 +110,14 @@ void VariablesToEventBasedTreeModule::initialize()
       B2ERROR("Variable '" << varStr << "' is not available in Variable::Manager!");
     } else {
       if (var->variabletype == Variable::Manager::VariableDataType::c_double) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_event_valuesDouble[i], (makeROOTCompatible(varStr) + "/D").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_event_valuesDouble[i],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "/D").c_str());
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_int) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_event_valuesInt[i], (makeROOTCompatible(varStr) + "/I").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_event_valuesInt[i],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "/I").c_str());
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_bool) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_event_valuesInt[i], (makeROOTCompatible(varStr) + "/O").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_event_valuesInt[i],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "/O").c_str());
       }
       m_event_functions.push_back(var->function);
     }
@@ -131,14 +134,14 @@ void VariablesToEventBasedTreeModule::initialize()
       B2ERROR("Variable '" << varStr << "' is not available in Variable::Manager!");
     } else {
       if (var->variabletype == Variable::Manager::VariableDataType::c_double) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_valuesDouble[i][0],
-                             (makeROOTCompatible(varStr) + "[__ncandidates__]/D").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_valuesDouble[i][0],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "[__ncandidates__]/D").c_str());
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_int) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_valuesInt[i][0],
-                             (makeROOTCompatible(varStr) + "[__ncandidates__]/I").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_valuesInt[i][0],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "[__ncandidates__]/I").c_str());
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_bool) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_valuesInt[i][0],
-                             (makeROOTCompatible(varStr) + "[__ncandidates__]/O").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_valuesInt[i][0],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "[__ncandidates__]/O").c_str());
       }
       m_functions.push_back(var->function);
     }

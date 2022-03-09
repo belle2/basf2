@@ -12,8 +12,6 @@
 
 from prompt import CalibrationSettings
 from reconstruction import prepare_cdst_analysis
-from caf.utils import IoV
-import array as arr
 
 
 ##############################
@@ -66,7 +64,6 @@ def get_calibrations(input_data, **kwargs):
     Returns:
       list(caf.framework.Calibration): All of the calibration objects we want to assign to the CAF process
     """
-    import basf2
     # Set up config options
 
     # In this script we want to use one sources of input data.
@@ -90,11 +87,8 @@ def get_calibrations(input_data, **kwargs):
     input_files_physics = list(reduced_file_to_iov_physics.keys())
 
     ###################################################
-    import basf2
     from basf2 import register_module, create_path
-    import ROOT
     from ROOT import Belle2
-    from ROOT.Belle2 import TestCalibrationAlgorithm
     from caf.framework import Collection
 
     ###################################################

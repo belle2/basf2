@@ -84,7 +84,7 @@ void DAQPerfModule::event()
   if (m_mon) {
     StoreArray<RawCOPPER> rawcprary;
     double rawsize = 0;
-    for (unsigned int i = 0; i < rawcprary.getEntries(); i++) {
+    for (int i = 0; i < rawcprary.getEntries(); ++i) {
       rawsize += (double)(rawcprary[i]->TotalBufNwords());
     }
     m_totbytes += rawsize * 4;

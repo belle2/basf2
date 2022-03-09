@@ -16,7 +16,8 @@ Simple script to create some particles in a list with a python module
 # @cond
 
 import basf2
-from ROOT import Belle2, TLorentzVector
+from ROOT import Belle2
+from ROOT.Math import PxPyPzEVector
 
 
 class MyParticleCreator(basf2.Module):
@@ -29,8 +30,8 @@ class MyParticleCreator(basf2.Module):
         self.listB0.create()
         self.listPi0.create()
         for i in range(5):
-            self.listB0.addParticle(TLorentzVector(i, 0, 0, i), i % 2 == 0)
-            self.listPi0.addParticle(TLorentzVector(i, 0, 0, i), i % 2 == 0)
+            self.listB0.addParticle(PxPyPzEVector(i, 0, 0, i), i % 2 == 0)
+            self.listPi0.addParticle(PxPyPzEVector(i, 0, 0, i), i % 2 == 0)
 
 
 basf2.set_random_seed("something important")

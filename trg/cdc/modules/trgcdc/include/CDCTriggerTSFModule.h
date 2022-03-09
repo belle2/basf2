@@ -41,6 +41,9 @@ namespace Belle2 {
     /** Initialize the module and register DataStore arrays. */
     virtual void initialize() override;
 
+    /** Register run-dependent DataStore arrays. */
+    virtual void beginRun() override;
+
     /** Run the TSF for an event. */
     virtual void event() override;
 

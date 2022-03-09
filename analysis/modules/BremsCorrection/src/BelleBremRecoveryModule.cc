@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <TMatrixFSym.h>
+#include <Math/Vector4D.h>
 
 #include <vector>
 using namespace std;
@@ -118,16 +119,15 @@ namespace Belle2 {
     const unsigned int nGam = m_gammaList->getListSize();
     for (unsigned i = 0; i < nLep; i++) {
       const Particle* lepton = m_inputparticleList->getParticle(i);
-      TLorentzVector lepton4Vector = lepton->get4Vector();
-      TLorentzVector new4Vec = lepton->get4Vector();
+      ROOT::Math::PxPyPzEVector new4Vec = lepton->get4Vector();
       std::vector<Particle*> selectedGammas;
       double bremsGammaEnergySum = 0.0;
       // look for all possible (radiative) gamma
       for (unsigned j = 0; j < nGam; j++) {
         Particle* gamma = m_gammaList->getParticle(j);
         // get angle (in lab system)
-        TVector3 pi = lepton->getMomentum();
-        TVector3 pj = gamma->getMomentum();
+        B2Vector3D pi = lepton->getMomentum();
+        B2Vector3D pj = gamma->getMomentum();
         double angle = (pi.Angle(pj));
         //Instead of first-come-first-serve, serve all charged particle equally.
         // https://indico.belle2.org/event/946/contributions/4007/attachments/1946/2967/SCunliffe190827.pdf

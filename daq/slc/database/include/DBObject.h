@@ -69,16 +69,16 @@ namespace Belle2 {
     void setDate(int date) { m_date = date; }
 
   public:
-    virtual const void* getValue(const std::string& name) const;
-    virtual const std::string& getText(const std::string& name) const;
-    virtual void addText(const std::string& name, const std::string& value);
-    virtual void addValue(const std::string& name, const void* value,
-                          DBField::Type type, int length);
-    virtual void setValue(const std::string& name, const void* value, int length);
+    const void* getValue(const std::string& name) const override;
+    const std::string& getText(const std::string& name) const override;
+    void addText(const std::string& name, const std::string& value) override;
+    void addValue(const std::string& name, const void* value,
+                  DBField::Type type, int length) override;
+    void setValue(const std::string& name, const void* value, int length) override;
 
   public:
-    virtual void readObject(Reader& reader);
-    virtual void writeObject(Writer& writer) const;
+    void readObject(Reader& reader) override;
+    void writeObject(Writer& writer) const override;
 
   private:
     FieldValueList m_value_m;
@@ -88,7 +88,7 @@ namespace Belle2 {
     int m_date;
 
   protected:
-    virtual void reset();
+    void reset() override;
 
   private:
     void copy(const DBObject& obj);

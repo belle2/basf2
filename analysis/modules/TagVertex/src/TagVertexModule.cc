@@ -40,7 +40,7 @@
 
 #include <TVector.h>
 #include <TRotation.h>
-
+#include <Math/Vector4D.h>
 
 using namespace std;
 
@@ -49,7 +49,7 @@ namespace Belle2 {
   /** shortcut for NaN of double type */
   static const double    realNaN = std::numeric_limits<double>::quiet_NaN();
   /** vector with NaN entries */
-  static const TVector3  vecNaN(realNaN, realNaN, realNaN);
+  static const B2Vector3D  vecNaN(realNaN, realNaN, realNaN);
   /** 3x3 matrix with NaN entries */
   static const TMatrixDSym matNaN(3, (double [])
   {
@@ -114,7 +114,7 @@ namespace Belle2 {
   void TagVertexModule::initialize()
   {
     // magnetic field
-    m_Bfield = BFieldManager::getField(m_BeamSpotCenter).Z() / Unit::T;
+    m_Bfield = BFieldManager::getFieldInTesla(m_BeamSpotCenter).Z();
     // RAVE setup
     analysis::RaveSetup::initialize(1, m_Bfield);
     B2INFO("TagVertexModule : magnetic field = " << m_Bfield);
@@ -287,7 +287,7 @@ namespace Belle2 {
     else if (m_constraintType == "tube")  tie(m_constraintCenter, m_constraintCov) = findConstraintBTube(Breco, 1000 * cut);
     else if (m_constraintType == "boost") tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(cut * 200000.);
     else if (m_constraintType == "breco") tie(m_constraintCenter, m_constraintCov) = findConstraint(Breco, cut * 2000.);
-    else if (m_constraintType == "noConstraint") m_constraintCenter = TVector3(); //zero vector
+    else if (m_constraintType == "noConstraint") m_constraintCenter = B2Vector3D(); //zero vector
     else  {
       B2ERROR("TagVertex: Invalid constraintType selected");
       return false;
@@ -339,20 +339,7 @@ namespace Belle2 {
     return ok;
   }
 
-
-  /**
-   * Get vector which is opposite to vIn in CMS ref frame
-   * Be aware that input vIn and output are in the Lab frame
-   */
-  static TLorentzVector flipVector(TLorentzVector vIn)
-  {
-    TLorentzVector vCMS = PCmsLabTransform::labToCms(vIn);
-    vCMS.SetVect(-vCMS.Vect());
-    return PCmsLabTransform::cmsToLab(vCMS);
-  }
-
-
-  pair<TVector3, TMatrixDSym> TagVertexModule::findConstraint(const Particle* Breco, double cut) const
+  pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraint(const Particle* Breco, double cut) const
   {
     if (Breco->getPValue() < 0.) return make_pair(vecNaN, matNaN);
 
@@ -362,7 +349,7 @@ namespace Belle2 {
     analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, beamSpotCov);
 
     double pmag = Breco->getMomentumMagnitude();
-    double xmag = (Breco->getVertex() - m_BeamSpotCenter).Mag();
+    double xmag = (B2Vector3D(Breco->getVertex()) - m_BeamSpotCenter).Mag();
 
 
     TMatrixDSym TerrMatrix = Breco->getMomentumVertexErrorMatrix();
@@ -395,9 +382,11 @@ namespace Belle2 {
     // TODO : to be developed the extraction of the momentum from the rave fitted track
 
     // Get expected pBtag 4-momentum using transverse-momentum conservation
-    TVector3 BvertDiff = Breco->getVertex() - BRecoRes->getVertex();
-    TLorentzVector pBrecEstimate(pmag / BvertDiff.Mag() *  BvertDiff, Breco->getPDGMass());
-    TLorentzVector pBtagEstimate = flipVector(pBrecEstimate);
+    ROOT::Math::XYZVector BvertDiff = pmag * (Breco->getVertex() - BRecoRes->getVertex()).Unit();
+    ROOT::Math::PxPyPzMVector pBrecEstimate(BvertDiff.x(), BvertDiff.y(), BvertDiff.z(), Breco->getPDGMass());
+    ROOT::Math::PxPyPzMVector pBtagEstimate = PCmsLabTransform::labToCms(pBrecEstimate);
+    pBtagEstimate.SetPxPyPzE(-pBtagEstimate.px(), -pBtagEstimate.py(), -pBtagEstimate.pz(), pBtagEstimate.E());
+    pBtagEstimate = PCmsLabTransform::cmsToLab(pBtagEstimate);
 
     // rotate err-matrix such that pBrecEstimate goes to eZ
     TMatrixD TubeZ = rotateTensorInv(pBrecEstimate.Vect(), errFinal);
@@ -408,13 +397,13 @@ namespace Belle2 {
 
 
     // rotate err-matrix such that eZ goes to pBtagEstimate
-    TMatrixD Tube = rotateTensor(pBtagEstimate.Vect(), TubeZ);
+    TMatrixD Tube = rotateTensor(B2Vector3D(pBtagEstimate.Vect()), TubeZ);
 
     // Standard algorithm needs no shift
     return make_pair(m_BeamSpotCenter, toSymMatrix(Tube));
   }
 
-  pair<TVector3, TMatrixDSym> TagVertexModule::findConstraintBTube(const Particle* Breco, double cut)
+  pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBTube(const Particle* Breco, double cut)
   {
     //Use Breco as the creator of the B tube.
     if ((Breco->getVertexErrorMatrix()(2, 2)) == 0.0) {
@@ -430,7 +419,7 @@ namespace Belle2 {
 
 
     //get direction of B tag = opposite direction of B rec in CMF
-    TLorentzVector pBrec = tubecreatorBCopy->get4Vector();
+    ROOT::Math::PxPyPzEVector pBrec = tubecreatorBCopy->get4Vector();
 
     //if we want the true info, replace the 4vector by the true one
     if (m_useTruthInFit) {
@@ -440,7 +429,9 @@ namespace Belle2 {
       else
         m_fitTruthStatus = 2;
     }
-    TLorentzVector pBtag = flipVector(pBrec);
+    ROOT::Math::PxPyPzEVector pBtag = PCmsLabTransform::labToCms(pBrec);
+    pBtag.SetPxPyPzE(-pBtag.px(), -pBtag.py(), -pBtag.pz(), pBtag.E());
+    pBtag = PCmsLabTransform::cmsToLab(pBtag);
 
     //To create the B tube, strategy is: take the primary vtx cov matrix, and add to it a cov
     //matrix corresponding to an very big error in the direction of the B tag
@@ -450,9 +441,10 @@ namespace Belle2 {
     if (m_verbose) {
       B2DEBUG(10, "Brec decay vertex before fit: " << printVector(Breco->getVertex()));
       B2DEBUG(10, "Brec decay vertex after fit: " << printVector(tubecreatorBCopy->getVertex()));
-      B2DEBUG(10, "Brec direction before fit: " << printVector((1. / Breco->getP()) * Breco->getMomentum()));
-      B2DEBUG(10, "Brec direction after fit: " << printVector((1. / tubecreatorBCopy->getP()) * tubecreatorBCopy->getMomentum()));
-      B2DEBUG(10, "IP position: " << printVector(m_BeamSpotCenter));
+      B2DEBUG(10, "Brec direction before fit: " << printVector(float(1. / Breco->getP()) * Breco->getMomentum()));
+      B2DEBUG(10, "Brec direction after fit: " << printVector(float(1. / tubecreatorBCopy->getP()) * tubecreatorBCopy->getMomentum()));
+      B2DEBUG(10, "IP position: " << printVector(ROOT::Math::XYZVector(m_BeamSpotCenter.x(), m_BeamSpotCenter.y(),
+                                                 m_BeamSpotCenter.z())));
       B2DEBUG(10, "IP covariance: " << printMatrix(m_BeamSpotCov));
       B2DEBUG(10, "Brec primary vertex: " << printVector(tubecreatorBCopy->getVertex()));
       B2DEBUG(10, "Brec PV covariance: " << printMatrix(pv));
@@ -464,13 +456,13 @@ namespace Belle2 {
 
 
     // make rotation matrix from z axis to BTag line of flight
-    TMatrixD longerrorRotated = rotateTensor(pBtag.Vect(), longerror);
+    TMatrixD longerrorRotated = rotateTensor(B2Vector3D(pBtag.Vect()), longerror);
 
     //pvNew will correspond to the covariance matrix of the B tube
     TMatrixD pvNew = TMatrixD(pv) + longerrorRotated;
 
     //set the constraint
-    TVector3 constraintCenter = tubecreatorBCopy->getVertex();
+    ROOT::Math::XYZVector constraintCenter = tubecreatorBCopy->getVertex();
 
     //if we want the true info, set the centre of the constraint to the primary vertex
     if (m_useTruthInFit) {
@@ -492,14 +484,14 @@ namespace Belle2 {
     m_pvCov.ResizeTo(pv);
     m_pvCov = pv;
 
-    return make_pair(constraintCenter, toSymMatrix(pvNew));
+    return make_pair(B2Vector3D(constraintCenter), toSymMatrix(pvNew));
   }
 
-  pair<TVector3, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut, double shiftAlongBoost) const
+  pair<B2Vector3D, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut, double shiftAlongBoost) const
   {
     //make a long error matrix along boost direction
     TMatrixD longerror(3, 3); longerror(2, 2) = cut * cut;
-    TVector3 boostDir = PCmsLabTransform().getBoostVector().Unit();
+    B2Vector3D boostDir = PCmsLabTransform().getBoostVector().Unit();
     TMatrixD longerrorRotated = rotateTensor(boostDir, longerror);
 
     //Extend error of BeamSpotCov matrix in the boost direction
@@ -507,7 +499,7 @@ namespace Belle2 {
     TMatrixD Tube = TMatrixD(beamSpotCov) + longerrorRotated;
 
     // Standard algorithm needs no shift
-    TVector3 constraintCenter = m_BeamSpotCenter;
+    B2Vector3D constraintCenter = m_BeamSpotCenter;
 
     // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
     if (shiftAlongBoost > -1000) {
@@ -555,8 +547,8 @@ namespace Belle2 {
 
     //both matched -> use closest vertex dist as Reco
     if (isReco(mcBs[0]) && isReco(mcBs[1])) {
-      double dist0 = (mcBs[0]->getDecayVertex() - Breco->getVertex()).Mag2();
-      double dist1 = (mcBs[1]->getDecayVertex() - Breco->getVertex()).Mag2();
+      double dist0 = (mcBs[0]->getDecayVertex() - B2Vector3D(Breco->getVertex())).Mag2();
+      double dist1 = (mcBs[1]->getDecayVertex() - B2Vector3D(Breco->getVertex())).Mag2();
       if (dist0 > dist1)
         swap(mcBs[0], mcBs[1]);
     }
@@ -631,8 +623,8 @@ namespace Belle2 {
     for (unsigned i = 0; i < tagParticles.size(); ++i) {
       const Particle* particle1 = tagParticles.at(i);
       if (!particle1) continue;
-      TLorentzVector mom1 = particle1->get4Vector();
-      if (!isfinite(mom1.Mag2())) continue;
+      ROOT::Math::PxPyPzEVector mom1 = particle1->get4Vector();
+      if (!isfinite(mom1.mag2())) continue;
 
       //is from Ks decay?
       bool isKsDau = false;
@@ -640,8 +632,8 @@ namespace Belle2 {
         if (i == j) continue;
         const Particle* particle2 = tagParticles.at(j);
         if (!particle2) continue;
-        TLorentzVector mom2 = particle2->get4Vector();
-        if (!isfinite(mom2.Mag2())) continue;
+        ROOT::Math::PxPyPzEVector mom2 = particle2->get4Vector();
+        if (!isfinite(mom2.mag2())) continue;
         double mass = (mom1 + mom2).M();
         if (abs(mass - Const::K0Mass) < massWindowWidth) {
           isKsDau = true;
@@ -687,7 +679,7 @@ namespace Belle2 {
     }
   }
 
-  void TagVertexModule::fillTagVinfo(const TVector3& tagVpos, const TMatrixDSym& tagVposErr)
+  void TagVertexModule::fillTagVinfo(const B2Vector3D& tagVpos, const TMatrixDSym& tagVposErr)
   {
     m_tagV = tagVpos;
 
@@ -782,11 +774,11 @@ namespace Belle2 {
         err.sub(5, ROOTToCLHEP::getHepSymMatrix(m_pvCov));
         kFit.setIpTubeProfile(
           ROOTToCLHEP::getHepLorentzVector(m_tagMomentum),
-          ROOTToCLHEP::getPoint3D(m_constraintCenter),
+          ROOTToCLHEP::getPoint3DFromB2Vector(m_constraintCenter),
           err,
           0.);
       } else {
-        kFit.setIpProfile(ROOTToCLHEP::getPoint3D(m_constraintCenter),
+        kFit.setIpProfile(ROOTToCLHEP::getPoint3DFromB2Vector(m_constraintCenter),
                           ROOTToCLHEP::getHepSymMatrix(m_constraintCov));
       }
     }
@@ -801,7 +793,7 @@ namespace Belle2 {
         if (pawi.mcParticle) {
           addedOK = kFit.addTrack(
                       ROOTToCLHEP::getHepLorentzVector(pawi.mcParticle->get4Vector()),
-                      ROOTToCLHEP::getPoint3D(getTruePoca(pawi)),
+                      ROOTToCLHEP::getPoint3DFromB2Vector(getTruePoca(pawi)),
                       ROOTToCLHEP::getHepSymMatrix(pawi.particle->getMomentumVertexErrorMatrix()),
                       pawi.particle->getCharge());
         } else {
@@ -811,7 +803,7 @@ namespace Belle2 {
         if (pawi.mcParticle) {
           addedOK = kFit.addTrack(
                       ROOTToCLHEP::getHepLorentzVector(pawi.mcParticle->get4Vector()),
-                      ROOTToCLHEP::getPoint3D(getRollBackPoca(pawi)),
+                      ROOTToCLHEP::getPoint3DFromB2Vector(getRollBackPoca(pawi)),
                       ROOTToCLHEP::getHepSymMatrix(pawi.particle->getMomentumVertexErrorMatrix()),
                       pawi.particle->getCharge());
         } else {
@@ -842,7 +834,7 @@ namespace Belle2 {
     fillParticles(particleAndWeights);
 
     //Save the infos related to the vertex
-    fillTagVinfo(CLHEPToROOT::getTVector3(kFit.getVertex()),
+    fillTagVinfo(CLHEPToROOT::getXYZVector(kFit.getVertex()),
                  CLHEPToROOT::getTMatrixDSym(kFit.getVertexError()));
 
     m_tagVNDF = kFit.getNDF();
@@ -855,18 +847,18 @@ namespace Belle2 {
   void TagVertexModule::deltaT(const Particle* Breco)
   {
 
-    TVector3 boost = PCmsLabTransform().getBoostVector();
-    TVector3 boostDir = boost.Unit();
+    B2Vector3D boost = PCmsLabTransform().getBoostVector();
+    B2Vector3D boostDir = boost.Unit();
     double bg = boost.Mag() / sqrt(1 - boost.Mag2());
     double c = Const::speedOfLight / 1000.; // cm ps-1
 
     //Reconstructed DeltaL & DeltaT in the boost direction
-    TVector3 dVert = Breco->getVertex() - m_tagV; //reconstructed vtxReco - vtxTag
+    B2Vector3D dVert = B2Vector3D(Breco->getVertex()) - m_tagV; //reconstructed vtxReco - vtxTag
     double dl = dVert.Dot(boostDir);
     m_deltaT  = dl / (bg * c);
 
     //Truth DeltaL & approx DeltaT in the boost direction
-    TVector3 MCdVert = m_mcVertReco - m_mcTagV;   //truth vtxReco - vtxTag
+    B2Vector3D MCdVert = m_mcVertReco - m_mcTagV;   //truth vtxReco - vtxTag
     double MCdl = MCdVert.Dot(boostDir);
     m_mcDeltaT = MCdl / (bg * c);
 
@@ -890,7 +882,7 @@ namespace Belle2 {
     m_truthTagVl = m_mcTagV.Dot(boostDir);
 
     // calculate tagV component and error in the direction orthogonal to the boost
-    TVector3 oboost = getUnitOrthogonal(boostDir);
+    B2Vector3D oboost = getUnitOrthogonal(boostDir);
     TVectorD oVec = toVec(oboost);
 
     //TagVertex error in boost-orthogonal dir
@@ -942,11 +934,11 @@ namespace Belle2 {
   }
 
   // static
-  TVector3 TagVertexModule::getTruePoca(ParticleAndWeight const& paw)
+  B2Vector3D TagVertexModule::getTruePoca(ParticleAndWeight const& paw)
   {
     if (!paw.mcParticle) {
       B2ERROR("In TagVertexModule::getTruePoca: no MC particle set");
-      return TVector3(0., 0., 0.);
+      return B2Vector3D(0., 0., 0.);
     }
 
     return DistanceTools::poca(paw.mcParticle->getProductionVertex(),
@@ -967,14 +959,14 @@ namespace Belle2 {
                           m_Bfield, 0, 0, tfr->getNDF());
   }
 
-  TVector3 TagVertexModule::getRollBackPoca(ParticleAndWeight const& paw)
+  B2Vector3D TagVertexModule::getRollBackPoca(ParticleAndWeight const& paw)
   {
     if (!paw.mcParticle) {
       B2ERROR("In TagVertexModule::getTruePoca: no MC particle set");
-      return TVector3(0., 0., 0.);
+      return B2Vector3D(0., 0., 0.);
     }
 
-    return paw.particle->getTrackFitResult()->getPosition() - paw.mcParticle->getProductionVertex() + m_mcTagV;
+    return paw.particle->getTrackFitResult()->getPosition() - B2Vector3D(paw.mcParticle->getProductionVertex()) + m_mcTagV;
   }
 
   void TagVertexModule::resetReturnParams()
@@ -1007,17 +999,17 @@ namespace Belle2 {
     m_tagVChi2IP = realNaN;
     m_pvCov.ResizeTo(matNaN);
     m_pvCov = matNaN;
-    m_tagMomentum = TLorentzVector(vecNaN, realNaN);
+    m_tagMomentum = ROOT::Math::PxPyPzEVector(realNaN, realNaN, realNaN, realNaN);
   }
 
   //The following functions are just here to help printing stuff
 
   // static
-  std::string TagVertexModule::printVector(const TVector3& vec)
+  std::string TagVertexModule::printVector(const ROOT::Math::XYZVector& vec)
   {
     std::ostringstream oss;
     int w = 14;
-    oss << "(" << std::setw(w) << vec[0] << ", " << std::setw(w) << vec[1] << ", " << std::setw(w) << vec[2] << ")" << std::endl;
+    oss << "(" << std::setw(w) << vec.x() << ", " << std::setw(w) << vec.y() << ", " << std::setw(w) << vec.z() << ")" << std::endl;
     return oss.str();
   }
 

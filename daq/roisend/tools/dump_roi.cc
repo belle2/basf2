@@ -41,7 +41,7 @@ char* timestamp()
 
 
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
   unsigned int buf[400000];
   int infn = fileno(stdin);
@@ -71,5 +71,5 @@ int main(int argc, char** argv)
     nrec++;
 
   }
-
+  return 0;
 }

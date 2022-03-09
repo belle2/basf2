@@ -16,7 +16,7 @@
 # 100 events e+ e- -> mu+ mu- in the Belle II labframe                   #
 ##########################################################################
 
-from basf2 import *
+import basf2 as b2
 from beamparameters import add_beamparameters
 import os
 import subprocess
@@ -77,15 +77,15 @@ subprocess.check_call([mg_externals, mg_steeringfile])
 subprocess.check_call(['gunzip', mg_outputdir + '/Events/run_01/unweighted_events.lhe.gz'])
 
 # creating the path for the processing
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # creating the path for the processing
-main = create_path()
+main = b2.create_path()
 
 # beam parameters
 beamparameters = add_beamparameters(main, "Y3S")
 
-lhereader = register_module('LHEInput')
+lhereader = b2.register_module('LHEInput')
 lhereader.param('makeMaster', True)
 lhereader.param('runNum', 1)
 lhereader.param('expNum', 1)
@@ -98,20 +98,20 @@ lhereader.param('wrongSignPz', True)
 
 # Add lhereader module
 main.add_module(lhereader)
-print_params(lhereader)
+b2.print_params(lhereader)
 
 # Add progress module
-progress = register_module('Progress')
-progress.set_log_level(LogLevel.INFO)
+progress = b2.register_module('Progress')
+progress.set_log_level(b2.LogLevel.INFO)
 main.add_module(progress)
 
 # Add rootoutput module
-rootoutput = register_module('RootOutput')
+rootoutput = b2.register_module('RootOutput')
 rootoutput.param('outputFileName', 'LHEReaderMasterOutputSM.root')
 main.add_module(rootoutput)
 
 # Add mcparticleprinter module
-# main.add_module('PrintMCParticles', logLevel=LogLevel.DEBUG, onlyPrimaries=False)
+# main.add_module('PrintMCParticles', logLevel=b2.LogLevel.DEBUG, onlyPrimaries=False)
 
 # Process
-process(main)
+b2.process(main)

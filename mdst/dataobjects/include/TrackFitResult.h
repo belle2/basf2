@@ -15,7 +15,7 @@
 
 #include <TVector3.h>
 #include <TMatrixDSym.h>
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 
 #include <stdint.h>
 #include <vector>
@@ -108,9 +108,10 @@ namespace Belle2 {
     /** Getter for the 4Momentum at the closest approach of the track in the r/phi projection.
      * P = (px, py, pz, E) where E is calculated via the momentum and the particle hypothesis of the TrackFitResult.
      */
-    TLorentzVector get4Momentum() const
+    ROOT::Math::PxPyPzEVector get4Momentum() const
     {
-      return TLorentzVector(getMomentum(), getEnergy());
+      const B2Vector3D momentum = getMomentum();
+      return ROOT::Math::PxPyPzEVector(momentum.x(), momentum.y(), momentum.z(), getEnergy());
     }
 
     /** Getter for the Energy at the closest approach of the track in the r/phi projection.

@@ -99,8 +99,8 @@ namespace Belle2 {
     virtual ~NSMVHandlerInt() {}
 
   public:
-    virtual bool handleGet(NSMVar& var);
-    virtual bool handleSet(const NSMVar& var);
+    bool handleGet(NSMVar& var) override;
+    bool handleSet(const NSMVar& var) override;
 
   public:
     virtual bool handleGetInt(int& val)
@@ -134,8 +134,8 @@ namespace Belle2 {
     virtual ~NSMVHandlerFloat() {}
 
   private:
-    virtual bool handleGet(NSMVar& var);
-    virtual bool handleSet(const NSMVar& var);
+    bool handleGet(NSMVar& var) override;
+    bool handleSet(const NSMVar& var) override;
 
   public:
     virtual bool handleGetFloat(float& val)
@@ -169,8 +169,8 @@ namespace Belle2 {
     virtual ~NSMVHandlerText() {}
 
   private:
-    virtual bool handleGet(NSMVar& var);
-    virtual bool handleSet(const NSMVar& var);
+    bool handleGet(NSMVar& var) override;
+    bool handleSet(const NSMVar& var) override;
 
   public:
     virtual bool handleGetText(std::string& val)
@@ -206,8 +206,8 @@ namespace Belle2 {
     virtual ~NSMVHandlerIntArray() {}
 
   public:
-    virtual bool handleGet(NSMVar& var);
-    virtual bool handleSet(const NSMVar& var);
+    bool handleGet(NSMVar& var) override;
+    bool handleSet(const NSMVar& var) override;
 
   public:
     virtual bool handleGetIntArray(std::vector<int>& val);
@@ -239,8 +239,8 @@ namespace Belle2 {
     virtual ~NSMVHandlerFloatArray() {}
 
   public:
-    virtual bool handleGet(NSMVar& var);
-    virtual bool handleSet(const NSMVar& var);
+    bool handleGet(NSMVar& var) override;
+    bool handleSet(const NSMVar& var) override;
 
   public:
     virtual bool handleGetFloatArray(std::vector<float>& val);
@@ -265,8 +265,8 @@ namespace Belle2 {
     virtual ~NSMVHandlerRef() {}
 
   public:
-    virtual bool handleGet(NSMVar& var);
-    virtual bool handleSet(const NSMVar& var);
+    bool handleGet(NSMVar& var) override;
+    bool handleSet(const NSMVar& var) override;
 
   private:
     NSMCallback& m_callback;

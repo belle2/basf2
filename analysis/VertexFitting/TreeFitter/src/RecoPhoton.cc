@@ -19,6 +19,7 @@
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
 
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 
 namespace TreeFitter {
 
@@ -93,7 +94,7 @@ namespace TreeFitter {
   {
     const Belle2::ECLCluster* cluster = particle()->getECLCluster();
     const Belle2::ECLCluster::EHypothesisBit clusterhypo = particle()->getECLClusterEHypothesisBit();
-    const TVector3 centroid = cluster->getClusterPosition();
+    const Belle2::B2Vector3D centroid = cluster->getClusterPosition();
     const double energy = cluster->getEnergy(clusterhypo);
 
     m_init = true;
@@ -142,15 +143,15 @@ namespace TreeFitter {
 
     auto p_vec = particle()->getMomentum();
     // find highest momentum, eliminate dim with highest mom
-    if ((std::abs(p_vec(0)) >= std::abs(p_vec(1))) && (std::abs(p_vec(0)) >= std::abs(p_vec(2)))) {
+    if ((std::abs(p_vec.x()) >= std::abs(p_vec.y())) && (std::abs(p_vec.x()) >= std::abs(p_vec.z()))) {
       m_i1 = 0; m_i2 = 1; m_i3 = 2;
-    } else if ((std::abs(p_vec(1)) >= std::abs(p_vec(0))) && (std::abs(p_vec(1)) >= std::abs(p_vec(2)))) {
+    } else if ((std::abs(p_vec.y()) >= std::abs(p_vec.x())) && (std::abs(p_vec.y()) >= std::abs(p_vec.z()))) {
       m_i1 = 1; m_i2 = 0; m_i3 = 2;
-    } else if ((std::abs(p_vec(2)) >= std::abs(p_vec(1))) && (std::abs(p_vec(2)) >= std::abs(p_vec(0)))) {
+    } else if ((std::abs(p_vec.z()) >= std::abs(p_vec.y())) && (std::abs(p_vec.z()) >= std::abs(p_vec.x()))) {
       m_i1 = 2; m_i2 = 1; m_i3 = 0;
     } else {
       B2ERROR("Could not estimate highest momentum for photon constraint. Aborting this fit.\n px: "
-              << p_vec(0) << " py: " << p_vec(1) << " pz: " << p_vec(2) << " calculated from Ec: " << m_clusterPars(3));
+              << p_vec.x() << " py: " << p_vec.y() << " pz: " << p_vec.z() << " calculated from Ec: " << m_clusterPars(3));
       return ErrCode(ErrCode::Status::photondimerror);
     }
 

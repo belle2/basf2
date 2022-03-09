@@ -70,7 +70,7 @@ bool ECLChannelMapper::initFromFile(const char* eclMapFileName)
 
       mapFile >> iCrate >> iShaper >> iChannel >> thetaID >> phiID >> cellID;
 
-      if (cellID > ECL_TOTAL_CHANNELS) {
+      if (cellID > static_cast<float>(ECL_TOTAL_CHANNELS)) {
         B2ERROR("ECLChannelMapper:: wrong cellID in the init file " << eclMapFileName);
         return false;
       }

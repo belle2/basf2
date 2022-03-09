@@ -14,6 +14,7 @@ import multiprocessing
 import itertools
 
 if __name__ == "__main__":
+
     training_data = basf2_mva.vector("train.root")
     test_data = basf2_mva.vector("test.root")
 
@@ -37,7 +38,7 @@ if __name__ == "__main__":
         options.m_nLevels = depth
         m = method.train_teacher(training_data, general_options.m_treename, specific_options=options)
         p, t = m.apply_expert(test_data, general_options.m_treename)
-        return hyperparameters, basf2_mva_util.calculate_roc_auc(p, t)
+        return hyperparameters, basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
 
     p = multiprocessing.Pool(None, maxtasksperchild=1)
     results = p.map(grid_search, itertools.product([10, 50, 100, 500, 1000], [2, 4, 6]))

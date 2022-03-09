@@ -59,12 +59,10 @@ namespace Belle2 {
       if (m_sampleType == c_cosmics) {
         if (m_pocaMomentum.Mag() < m_minMomentum) return false;
       } else if (m_sampleType == c_dimuon or m_sampleType == c_bhabha) {
-        TLorentzVector lorentzLab;
-        lorentzLab.SetXYZM(m_pocaMomentum.X(), m_pocaMomentum.Y(), m_pocaMomentum.Z(),
-                           m_chargedStable.getMass());
+        ROOT::Math::PxPyPzMVector lorentzLab(m_pocaMomentum.X(), m_pocaMomentum.Y(), m_pocaMomentum.Z(), m_chargedStable.getMass());
         PCmsLabTransform T;
         auto lorentzCms = T.labToCms(lorentzLab);
-        m_cmsEnergy = lorentzCms.Energy();
+        m_cmsEnergy = lorentzCms.energy();
         double dE = m_cmsEnergy - T.getCMSEnergy() / 2;
         if (fabs(dE) > m_deltaEcms) return false;
       } else {

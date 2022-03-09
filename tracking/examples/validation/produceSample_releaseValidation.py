@@ -6,7 +6,6 @@ from ROOT import Belle2
 import basf2
 import logging
 
-import tracking as tr
 import reconstruction as re
 
 basf2.set_random_seed(1234)

@@ -309,7 +309,7 @@ namespace Belle2 {
     void waitResume();
 
     //! call checkrunstop
-    void callCheckRunPause(std::string& err_str);
+    void callCheckRunPause(const std::string& err_str);
 
     //! Read data/check a connection
     int CheckConnection(int socket);

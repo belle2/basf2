@@ -212,7 +212,12 @@ void DQMHistAnalysisInputPVSrvModule::event()
     if (m_callback && !n->changed) continue;
     n->changed = false;
 
+    // FIXME: dbr_size_n is a preprocessor macro, it would be nice replacing it with something better
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtype-limits"
     auto bufferorg = new char[dbr_size_n(ca_field_type(n->mychid), ca_element_count(n->mychid))];
+#pragma GCC diagnostic pop
+
     void* buffer = (void*) bufferorg;
     int status;
 

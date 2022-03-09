@@ -188,7 +188,8 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(copper_buf[ tmp_header.POS_TTUTIME ]), 1);
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, &(copper_buf[ tmp_header.POS_EXP_RUN_NO ]), 1);
   int* buf = GetFINESSEBuffer(n, finesse_num) +  SIZE_B2LHSLB_HEADER + POS_B2L_CTIME;
-  int pos_nwords = finesse_nwords - (SIZE_B2LHSLB_HEADER + POS_B2L_CTIME + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER);
+  int pos_nwords = finesse_nwords - (static_cast<int>(SIZE_B2LHSLB_HEADER) + POS_B2L_CTIME + SIZE_B2LFEE_TRAILER +
+                                     SIZE_B2LHSLB_TRAILER);
   temp_crc16 = CalcCRC16LittleEndian(temp_crc16, buf, pos_nwords);
 
   //
@@ -305,8 +306,7 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
   for (int i = 0; i < MAX_PCIE40_CH; i++) {
     if (detector_buf_ch[ i ] == NULL || nwords_ch[ i ] <= 0) continue;    // for an empty FINESSE slot
     length_nwords += nwords_ch[ i ];
-    length_nwords += SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER
-                     + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+    length_nwords += static_cast<int>(SIZE_B2LHSLB_HEADER) + SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
   }
 
   // allocate buffer

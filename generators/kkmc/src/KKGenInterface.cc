@@ -18,7 +18,6 @@
 
 /* ROOT headers. */
 #include <THashList.h>
-#include <TLorentzVector.h>
 
 /* C++ headers. */
 #include <cmath>
@@ -74,13 +73,14 @@ int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::strin
   return 0;
 }
 
-void KKGenInterface::set_beam_info(TLorentzVector P4_LER, double Espread_LER, TLorentzVector P4_HER, double Espread_HER)
+void KKGenInterface::set_beam_info(ROOT::Math::PxPyPzEVector P4_LER, double Espread_LER, ROOT::Math::PxPyPzEVector P4_HER,
+                                   double Espread_HER)
 {
 
   // Beam 4 momenta settings
 //   double crossing_angle = 0.;
-  double ph = P4_HER.Vect().Mag();
-  double pl = P4_LER.Vect().Mag();
+  double ph = P4_HER.P();
+  double pl = P4_LER.P();
   double eh = P4_HER.E();
   double el = P4_LER.E();
   if (ph > 0. && pl > 0. && eh > 0. && el > 0.) {
@@ -240,10 +240,10 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
     }
   }
 
-  TLorentzVector p4(hepevt_.phep[index - 1][0],
-                    hepevt_.phep[index - 1][1],
-                    hepevt_.phep[index - 1][2],
-                    hepevt_.phep[index - 1][3]);
+  ROOT::Math::PxPyPzEVector p4(hepevt_.phep[index - 1][0],
+                               hepevt_.phep[index - 1][1],
+                               hepevt_.phep[index - 1][2],
+                               hepevt_.phep[index - 1][3]);
   gParticle->setMass(hepevt_.phep[index - 1][4]);
   gParticle->set4Vector(p4);
 

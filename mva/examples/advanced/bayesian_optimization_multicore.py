@@ -39,7 +39,7 @@ def f(x, general_options, process_number):
     basf2_mva.teacher(g_options, options)
     m = basf2_mva_util.Method(g_options.m_identifier)
     p, t = m.apply_expert(test_data, general_options.m_treename)
-    return -basf2_mva_util.calculate_roc_auc(p, t)
+    return -basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
 
 
 if __name__ == "__main__":

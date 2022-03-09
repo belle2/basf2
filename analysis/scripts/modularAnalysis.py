@@ -1113,10 +1113,6 @@ def fillParticleListFromROE(decayString,
     decayDescriptor = Belle2.DecayDescriptor()
     if not decayDescriptor.init(decayString):
         raise ValueError("Invalid decay string")
-    if decayDescriptor.getMother().getLabel() != 'ROE':
-        # the particle loader automatically uses the label "ROE" for particles built from the ROE
-        # so we have to copy over the list to name/format that user wants
-        copyList(decayDescriptor.getMother().getFullName(), decayDescriptor.getMother().getName() + ':ROE', writeOut, path)
 
     # apply a cut if a non-empty cut string is provided
     if cut != "":
@@ -1128,7 +1124,8 @@ def fillParticleListFromMC(decayString,
                            addDaughters=False,
                            skipNonPrimaryDaughters=False,
                            writeOut=False,
-                           path=None):
+                           path=None,
+                           skipNonPrimary=False):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -1142,6 +1139,7 @@ def fillParticleListFromMC(decayString,
     @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
+    @param skipNonPrimary          if true, skip non primary particle
     """
 
     pload = register_module('ParticleLoader')
@@ -1151,6 +1149,7 @@ def fillParticleListFromMC(decayString,
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
+    pload.param('skipNonPrimary', skipNonPrimary)
     path.add_module(pload)
 
     from ROOT import Belle2
@@ -1171,7 +1170,8 @@ def fillParticleListsFromMC(decayStringsWithCuts,
                             addDaughters=False,
                             skipNonPrimaryDaughters=False,
                             writeOut=False,
-                            path=None):
+                            path=None,
+                            skipNonPrimary=False):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
@@ -1185,6 +1185,13 @@ def fillParticleListsFromMC(decayStringsWithCuts,
         pions = ('pi+:gen', 'pionID>0.1')
         fillParticleListsFromMC([kaons, pions], path=mypath)
 
+    .. tip::
+        Daughters of ``Lambda0`` are not primary, but ``Lambda0`` is not final state particle.
+        Thus, when one reconstructs a particle from ``Lambda0``, that is created with
+        ``addDaughters=True`` and ``skipNonPrimaryDaughters=True``, the particle always has ``isSignal==0``.
+        Please set options for ``Lambda0`` to use MC-matching variables properly as follows,
+        ``addDaughters=True`` and ``skipNonPrimaryDaughters=False``.
+
     @param decayString             specifies type of Particles and determines the name of the ParticleList
     @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
     @param addDaughters            adds the bottom part of the decay chain of the particle to the datastore and
@@ -1192,6 +1199,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
+    @param skipNonPrimary          if true, skip non primary particle
     """
 
     pload = register_module('ParticleLoader')
@@ -1201,6 +1209,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
+    pload.param('skipNonPrimary', skipNonPrimary)
     path.add_module(pload)
 
     from ROOT import Belle2
@@ -1755,13 +1764,14 @@ def variablesToExtraInfo(particleList, variables, option=0, path=None):
     For each particle in the input list the selected variables are saved in an extra-info field with the given name.
     Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.
 
-    An existing extra info with the same name will be overwritten if the new
-    value is lower / will never be overwritten / will be overwritten if the
-    new value is higher / will always be overwritten (-1/0/1/2).
-
-    @param particleList  The input ParticleList
-    @param variables     Dictionary of Variables and extraInfo names.
-    @param path          modules are added to this path
+    Parameters:
+        particleList (str):         The input ParticleList
+        variables (dict[str,str]):  Dictionary of Variables (key) and extraInfo names (value).
+        option (int):               Option to overwrite an existing extraInfo. Choose among -1, 0, 1, 2.
+                                    An existing extra info with the same name will be overwritten if the new
+                                    value is lower / will never be overwritten / will be overwritten if the
+                                    new value is higher / will always be overwritten (option = -1/0/1/2).
+        path (basf2.Path):          modules are added to this path
     """
 
     mod = register_module('VariablesToExtraInfo')
@@ -1778,15 +1788,15 @@ def variablesToDaughterExtraInfo(particleList, decayString, variables, option=0,
     are saved in an extra-info field with the given name. In other words, the property of mother is saved as extra-info
     to specified daughter particle.
 
-    An existing extra info with the same name will be overwritten if the new
-    value is lower / will never be overwritten / will be overwritten if the
-    new value is higher / will always be overwritten (-1/0/1/2).
-
-    @param particleList  The input ParticleList
-    @param decayString   Decay string that specifies to which daughter the extra info should be appended
-    @param variables     Dictionary of Variables and extraInfo names.
-    @param option        Various options for overwriting
-    @param path          modules are added to this path
+    Parameters:
+        particleList (str):         The input ParticleList
+        decayString (str):          Decay string that specifies to which daughter the extra info should be appended
+        variables (dict[str,str]):  Dictionary of Variables (key) and extraInfo names (value).
+        option (int):               Option to overwrite an existing extraInfo. Choose among -1, 0, 1, 2.
+                                    An existing extra info with the same name will be overwritten if the new
+                                    value is lower / will never be overwritten / will be overwritten if the
+                                    new value is higher / will always be overwritten (option = -1/0/1/2).
+        path (basf2.Path):          modules are added to this path
     """
 
     mod = register_module('VariablesToExtraInfo')
@@ -1803,13 +1813,14 @@ def variablesToEventExtraInfo(particleList, variables, option=0, path=None):
     For each particle in the input list the selected variables are saved in an event-extra-info field with the given name,
     Can be used to save MC truth information, for example, in a ntuple of reconstructed particles.
 
-    An existing extra info with the same name will be overwritten if the new
-    value is lower / will never be overwritten / will be overwritten if the
-    new value is higher / will always be overwritten (-1/0/1/2).
-
-    @param particleList  The input ParticleList
-    @param variables     Dictionary of Variables and extraInfo names.
-    @param path          modules are added to this path
+    Parameters:
+        particleList (str):         The input ParticleList
+        variables (dict[str,str]):  Dictionary of Variables (key) and extraInfo names (value).
+        option (int):               Option to overwrite an existing extraInfo. Choose among -1, 0, 1, 2.
+                                    An existing extra info with the same name will be overwritten if the new
+                                    value is lower / will never be overwritten / will be overwritten if the
+                                    new value is higher / will always be overwritten (option = -1/0/1/2).
+        path (basf2.Path):          modules are added to this path
     """
 
     mod = register_module('VariablesToEventExtraInfo')
@@ -1826,9 +1837,10 @@ def variableToSignalSideExtraInfo(particleList, varToExtraInfo, path):
     particle) as an extra info to the particle related to current ROE.
     Should be used only in the for_each roe path.
 
-    @param particleList  The input ParticleList
-    @param varToExtraInfo Dictionary of Variables and extraInfo names.
-    @param path          modules are added to this path
+    Parameters:
+        particleList (str):              The input ParticleList
+        varToExtraInfo (dict[str,str]):  Dictionary of Variables (key) and extraInfo names (value).
+        path (basf2.Path):               modules are added to this path
     """
     mod = register_module('SignalSideVariablesToExtraInfo')
     mod.set_name('SigSideVarToExtraInfo_' + particleList)
@@ -3155,10 +3167,11 @@ def labelTauPairMC(printDecayInfo=False, path=None, TauolaBelle=False, mapping_m
 
 def tagCurlTracks(particleLists,
                   mcTruth=False,
-                  responseCut=0.324,
+                  responseCut=-1.0,
                   selectorType='cut',
-                  ptCut=0.6,
-                  train=False,
+                  ptCut=0.5,
+                  expert_train=False,
+                  expert_filename="",
                   path=None):
     """
     Warning:
@@ -3173,7 +3186,7 @@ def tagCurlTracks(particleLists,
     The module loops over all particles in a given list that meet the preselection **ptCut** and assigns them to
     bundles based on the response of the chosen **selector** and the required minimum response set by the
     **responseCut**. Once all particles are assigned they are ranked by 25dr^2+dz^2. All but the lowest are tagged
-    with extraInfo(isCurl=1) to allow for later removal  by cutting the list or removing these from ROE as
+    with extraInfo(isCurl=1) to allow for later removal by cutting the list or removing these from ROE as
     applicable.
 
 
@@ -3182,12 +3195,14 @@ def tagCurlTracks(particleLists,
                           extraInfo(truthBundleSize). To calculate these particles are assigned to bundles by their
                           genParticleIndex then ranked and tagged as normal.
     @param responseCut:   float min classifier response that considers two tracks to come from the same particle.
+                          If set to ``-1`` a cut value optimised to maximise the accuracy on a BBbar sample is used.
                           Note 'cut' selector is binary 0/1.
     @param selectorType:  string name of selector to use. The available options are 'cut' and 'mva'.
                           It is strongly recommended to used the 'mva' selection. The 'cut' selection
                           is based on BN1079 and is only calibrated for Belle data.
     @param ptCut:         pre-selection cut on transverse momentum.
-    @param train:         flag to set training mode if selector has a training mode (mva).
+    @param expert_train:  flag to set training mode if selector has a training mode (mva).
+    @param expert_filename: set file name of produced training ntuple (mva).
     @param path:          module is added to this path.
     """
 
@@ -3203,9 +3218,15 @@ def tagCurlTracks(particleLists,
     curlTagger.param('belle', belle)
     curlTagger.param('mcTruth', mcTruth)
     curlTagger.param('responseCut', responseCut)
+    if abs(responseCut + 1) < 1e-9:
+        curlTagger.param('usePayloadCut', True)
+    else:
+        curlTagger.param('usePayloadCut', False)
+
     curlTagger.param('selectorType', selectorType)
     curlTagger.param('ptCut', ptCut)
-    curlTagger.param('train', train)
+    curlTagger.param('train', expert_train)
+    curlTagger.param('trainFilename', expert_filename)
 
     path.add_module(curlTagger)
 
@@ -3382,6 +3403,16 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
             B2FATAL("No charged pid MVA was trained to separate ", binaryHypoPDGCodes[0], " vs. ", binaryHypoPDGCodes[1],
                     ". Please choose among the following pairs:\n",
                     "\n".join(f"{opt[0]} vs. {opt[1]}" for opt in binaryOpts))
+
+        decayDescriptor = Belle2.DecayDescriptor()
+        for name in plSet:
+            if not decayDescriptor.init(name):
+                raise ValueError("Invalid paritlceLists")
+
+            pdg = abs(decayDescriptor.getMother().getPDGCode())
+            if pdg not in binaryHypoPDGCodes:
+                B2WARNING("Given ParticleList: ", name, " (", pdg, ") is neither signal (", binaryHypoPDGCodes[0],
+                          ") nor background (", binaryHypoPDGCodes[1], ").")
 
         chargedpid = register_module("ChargedPidMVA")
         chargedpid.set_name(f"ChargedPidMVA_{binaryHypoPDGCodes[0]}_vs_{binaryHypoPDGCodes[1]}_{mode}")
@@ -3574,6 +3605,36 @@ def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
     photon_efficiency_correction.param('particleLists', inputListNames)
     photon_efficiency_correction.param('tableName', tableName)
     path.add_module(photon_efficiency_correction)
+
+
+def addPi0VetoEfficiencySystematics(particleList, decayString, tableName, threshold, mode='standard', suffix='', path=None):
+    """
+    Add pi0 veto Data/MC efficiency ratio weights to the specified particle list
+
+    @param particleList   the input ParticleList
+    @param decayString    specify hard photon to be performed pi0 veto (e.g. 'B+:sig -> rho+:sig ^gamma:hard')
+    @param tableName      table name corresponding to payload version (e.g. 'Pi0VetoEfficiencySystematics_Nov2021')
+    @param threshold      pi0 veto threshold (0.50, 0.51, ..., 0.99)
+    @param mode           choose one mode (same as writePi0EtaVeto) out of 'standard', 'tight', 'cluster' and 'both'
+    @param suffix         optional suffix to be appended to the usual extraInfo name
+    @param path           the module is added to this path
+
+    The following extraInfo are available related with the given particleList:
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_ratio             : weight of Data/MC for the veto efficiency
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_stat  : the statistical uncertainty of the weight
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_sys   : the systematic uncertainty of the weight
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_total : the total uncertainty of the weight
+    * Pi0VetoEfficiencySystematics_{mode}{suffix}_threshold                 : threshold of the pi0 veto
+    """
+
+    pi0veto_efficiency_correction = register_module('Pi0VetoEfficiencySystematics')
+    pi0veto_efficiency_correction.param('particleLists', particleList)
+    pi0veto_efficiency_correction.param('decayString', decayString)
+    pi0veto_efficiency_correction.param('tableName', tableName)
+    pi0veto_efficiency_correction.param('threshold', threshold)
+    pi0veto_efficiency_correction.param('mode', mode)
+    pi0veto_efficiency_correction.param('suffix', suffix)
+    path.add_module(pi0veto_efficiency_correction)
 
 
 def getAnalysisGlobaltag(timeout=180) -> str:

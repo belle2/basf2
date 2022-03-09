@@ -73,10 +73,10 @@ namespace Belle2 {
     };
 
 
-    //! @returns center cell
+    //! @returns center cell with maximum caldigit energy * reconstructed weight
     int getCenterCell(const Particle* particle)
     {
-      // get maximum cell id for this cluster (ignore weights)
+      // get maximum cell id for this cluster (using energy and weights)
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         int maxCellId = -1;
@@ -85,9 +85,10 @@ namespace Belle2 {
         auto clusterDigitRelations = cluster->getRelationsTo<ECLCalDigit>();
         for (unsigned int ir = 0; ir < clusterDigitRelations.size(); ++ir) {
           const auto calDigit = clusterDigitRelations.object(ir);
+          const auto weight = clusterDigitRelations.weight(ir);
 
-          if (calDigit->getEnergy() > maxEnergy) {
-            maxEnergy = calDigit->getEnergy();
+          if (calDigit->getEnergy()*weight > maxEnergy) {
+            maxEnergy = calDigit->getEnergy() * weight;
             maxCellId = calDigit->getCellId();
           }
         }
@@ -160,8 +161,9 @@ namespace Belle2 {
           for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
 
             const auto caldigit = relatedDigits.object(iRel);
+            const auto weight = relatedDigits.weight(iRel);
 
-            energyToSort.emplace_back(caldigit->getEnergy(), iRel);
+            energyToSort.emplace_back(caldigit->getEnergy()*weight, iRel);
 
           }
 
@@ -204,6 +206,14 @@ namespace Belle2 {
           return int(caldigitSelected->getTwoComponentFitType());
         } else if (varid == varType::cellId) {
           return caldigitSelected->getCellId();
+        } else if (varid == varType::mcenergy) {
+          // loop over all related MCParticles
+          auto digitMCRelations = caldigitSelected->getRelationsTo<MCParticle>();
+          double edep = 0.0;
+          for (unsigned int i = 0; i < digitMCRelations.size(); ++i) {
+            edep += digitMCRelations.weight(i);
+          }
+          return edep;
         } else if (varid == varType::weight) {
           const auto weight = relatedDigits.weight(caldigitIndex);
           return weight;
@@ -232,6 +242,7 @@ namespace Belle2 {
 
       StoreObjPtr<ECLCellIdMapping> mapping;
       const unsigned int posid = int(std::lround(vars[0]));
+
       const int nneighbours = int(std::lround(vars[1]));
       const int varid = int(std::lround(vars[2]));
       const int extid = int(std::lround(vars[3]));
@@ -253,7 +264,6 @@ namespace Belle2 {
       } else {
         maxCellId = getCenterCell(particle);
       }
-
 
       if (maxCellId < 0) return std::numeric_limits<double>::quiet_NaN();
 
@@ -296,6 +306,21 @@ namespace Belle2 {
         if (storearraypos >= 0) {
           if (varid == varType::energy) {
             return eclCalDigits[storearraypos]->getEnergy();
+          } else if (varid == varType::weight) {
+            const ECLCluster* cluster = particle->getECLCluster();
+            if (cluster == nullptr) {return std::numeric_limits<double>::quiet_NaN();}
+            double weight = 0.;
+            auto relatedDigits = cluster->getRelationsTo<ECLCalDigit>();
+            for (unsigned int iDigit = 0; iDigit < relatedDigits.size(); iDigit++) {
+              const auto caldigit = relatedDigits.object(iDigit);
+              const int digitCellID = caldigit->getCellId();
+              if (digitCellID == neighbourid) {
+                weight = relatedDigits.weight(iDigit);
+                break;
+              }
+            }
+            return weight;
+
           } else if (varid == varType::time) {
             return eclCalDigits[storearraypos]->getTime();
           } else if (varid == varType::timeResolution) {
@@ -418,6 +443,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit energy by digit energy rank
     double getECLCalDigitEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
+
       if (vars.size() != 1) {
         B2FATAL("Need exactly one parameters (energy index).");
       }
@@ -432,6 +458,16 @@ namespace Belle2 {
         B2FATAL("Need exactly one parameters (energy index).");
       }
       std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::time};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit MCEnergy by digit energy rank
+    double getECLCalDigitMCEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::mcenergy};
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
     }
 
@@ -543,6 +579,18 @@ namespace Belle2 {
       }
 
       std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::energy, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+
+    //! @returns the eclcaldigit weight
+    double getECLCalDigitWeight(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::weight, ECLCalDigitVariable::centerType::maxCell};
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
 
@@ -1129,6 +1177,30 @@ namespace Belle2 {
 
     }
 
+    double getClusterTotalECLCalDigitMCEnergy(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster == nullptr) {return std::numeric_limits<double>::quiet_NaN();}
+      const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr) {return std::numeric_limits<double>::quiet_NaN();}
+
+      double sum = 0.0;
+      auto relatedDigits = cluster->getRelationsTo<ECLCalDigit>();
+      for (unsigned int iDigit = 0; iDigit < relatedDigits.size(); iDigit++) {
+        const auto caldigit = relatedDigits.object(iDigit);
+        auto mcDigitRelations = caldigit->getRelationsTo<MCParticle>();
+        for (unsigned int i = 0; i < mcDigitRelations.size(); i++) {
+          const MCParticle* digitmcparticle = mcDigitRelations.object(i);
+          if (digitmcparticle == mcparticle) {
+            sum += mcDigitRelations.weight(i);
+          }
+        }
+      }
+      return sum;
+
+    }
+
+
     double getClusterECLCalDigitMCEnergy(const Particle* particle)
     {
       // get MCParticle (return if there is none)
@@ -1275,6 +1347,8 @@ namespace Belle2 {
     VARIABLE_GROUP("ECL Calibration (cDST)");
     REGISTER_VARIABLE("eclcaldigitEnergy(i, j)", getECLCalDigitEnergy,
                       "[calibration] Returns the energy  of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+    REGISTER_VARIABLE("eclcaldigitWeight(i, j)", getECLCalDigitWeight,
+                      "[calibration] Returns the weight of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
     REGISTER_VARIABLE("eclcaldigitTime(i, j)", getECLCalDigitTime,
                       "[calibration] Returns the time of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
     REGISTER_VARIABLE("eclcaldigitTimeResolution(i, j)", getECLCalDigitTimeResolution,
@@ -1388,6 +1462,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclcaldigitTimeByEnergyRank(i)", getECLCalDigitTimeByEnergyRank,
                       "[calibration] Returns the caldigit time of the i-th highest energy caldigit in the cluster (i>=0)");
 
+    REGISTER_VARIABLE("eclcaldigitMCEnergyByEnergyRank(i)", getECLCalDigitMCEnergyByEnergyRank,
+                      "[calibration] Returns the caldigit MC Energy of the i-th highest energy caldigit in the cluster (i>=0)");
+
     REGISTER_VARIABLE("eclcaldigitTwoComponentFitTypeByEnergyRank(i)", getTwoComponentFitTypeByEnergyRank,
                       "[calibration] Returns the offline fit type of the i-th highest energy caldigit in the cluster (i>=0)");
 
@@ -1421,6 +1498,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("totalECLCalDigitMCEnergy", getTotalECLCalDigitMCEnergy,
                       "[calibration] Returns total deposited MC energy in all ECLCalDigits for the MC particle");
 
+    REGISTER_VARIABLE("clusterTotalECLCalDigitMCEnergy", getClusterTotalECLCalDigitMCEnergy,
+                      "[calibration] Returns total MC energy deposited in ECLCalDigits in the cluster by the related MC particle");
+
     REGISTER_VARIABLE("clusterECLCalDigitMCEnergy", getClusterECLCalDigitMCEnergy,
                       "[calibration] Returns total deposited MC energy in all ECLCalDigits for the MC particle that are used to calculate the cluster energy");
 
@@ -1434,7 +1514,7 @@ namespace Belle2 {
                       "Returns R of the i-th highest energy caldigit in the cluster (i>=0)");
   }
 
-  // Create an empty module which allows basf2 to easily find the library and load it from the steering file
-  class EnableECLCalDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.
-  REG_MODULE(EnableECLCalDigitVariables); /**< register the empty module */
+//   // Create an empty module which allows basf2 to easily find the library and load it from the steering file
+//   class EnableECLCalDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.
+//   REG_MODULE(EnableECLCalDigitVariables); /**< register the empty module */
 }

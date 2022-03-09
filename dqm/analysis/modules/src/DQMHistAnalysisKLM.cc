@@ -387,20 +387,6 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   canvas->Update();
 }
 
-TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)
-{
-  TIter nextkey(gROOT->GetListOfCanvases());
-  TObject* obj = nullptr;
-  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
-    if (obj->IsA()->InheritsFrom("TCanvas")) {
-      if (obj->GetName() == canvasName)
-        return dynamic_cast<TCanvas*>(obj);
-    }
-  }
-  return nullptr;
-}
-
-
 void DQMHistAnalysisKLMModule::event()
 {
   /* If KLM is not included, stop here and return. */

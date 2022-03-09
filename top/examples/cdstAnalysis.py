@@ -22,8 +22,10 @@ import modularAnalysis as ma
 from variables import variables
 
 # global tags
+# ******************************************************************************************************************
 # note: The patching global tags and their order are bucket number and basf2 version dependent.
 #       Given below is what is needed for cdst files of bucket 16 calibration and February-2022 development version.
+# ******************************************************************************************************************
 conditions.override_globaltags()
 conditions.append_globaltag('patch_main_release-07')
 conditions.append_globaltag('svd_reco_configuration_patch')
@@ -41,7 +43,7 @@ main.add_module('RootInput')
 # run unpackers and post-tracking reconstruction
 prepare_user_cdst_analysis(main)
 
-# make a particle list of pions from all good charged tracks
+# make a particle list of pions from all charged tracks
 ma.fillParticleList(decayString='pi+:all', cut='', path=main)
 
 # make aliases of some expert variables

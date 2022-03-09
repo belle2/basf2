@@ -736,7 +736,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("logLScanThreshold", TOPVariable::getLogLScanThreshold,
                       "Cherenkov threshold determind by the LL scan. Requires TOPLLScanner in the processing path.");
     REGISTER_VARIABLE("logLScanExpectedSignalPhotons", TOPVariable::getLogLScanExpectedSignalPhotons,
-                      "Expected signal photon yeild at the LL maximum. Requires TOPLLScanner in the processing path.");
+                      "Expected signal photon yield at the LL maximum. Requires TOPLLScanner in the processing path.");
 
     REGISTER_VARIABLE("topBunchIsReconstructed", TOPVariable::isTOPRecBunchReconstructed,
                       "reconstruction flag: 1 if reconstructed, 0 otherwise");

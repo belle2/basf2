@@ -10,44 +10,36 @@
 ##########################################################################
 
 # -------------------------------------------------------------------------
-# Example of using top variables on real data (cdst files required)
-# See topVariables.py on how to use top variables on MC
+# Example of using top variables on MC
+# See cdstAnalysis.py on how to use top variables on real data
 #
 # To print available top variables: basf2 top/examples/printTOPVariables.py
 # -------------------------------------------------------------------------
 
-from basf2 import conditions, create_path, process, statistics
-from reconstruction import prepare_user_cdst_analysis
+from basf2 import create_path, process
+from simulation import add_simulation
+from reconstruction import add_reconstruction
+from background import get_background_files
 import modularAnalysis as ma
 from variables import variables
-
-# global tags
-# ******************************************************************************************************************
-# note: The patching global tags and their order are bucket number and basf2 version dependent.
-#       Given below is what is needed for cdst files of bucket 16 calibration and February-2022 development version.
-# ******************************************************************************************************************
-conditions.override_globaltags()
-conditions.append_globaltag('patch_main_release-07')
-conditions.append_globaltag('svd_reco_configuration_patch')
-conditions.append_globaltag('data_reprocessing_prompt')
-conditions.append_globaltag('dp_recon_release6_patch')
-conditions.append_globaltag('online')
 
 # create path
 main = create_path()
 
-# read events from a cdst file: use -i option to pass the name of the file
-# files of bucket 16 can be found on KEKCC in /gpfs/group/belle2/dataprod/Data/PromptReco/bucket16_calib/
-main.add_module('RootInput')
+# generate and reconstruct 100 generic BBbar events w/ the beam background overlayed
+main.add_module('EventInfoSetter', evtNumList=[100])
+main.add_module('EvtGenInput')
+add_simulation(main, bkgfiles=get_background_files())
+add_reconstruction(main)
 
-# run unpackers and post-tracking reconstruction
-prepare_user_cdst_analysis(main)
-
-# make a particle list of pions from all charged tracks
-ma.fillParticleList(decayString='pi+:all', cut='', path=main)
+# make a particle list of MC true pions
+ma.fillParticleList(decayString='pi+', cut='', path=main)
+ma.matchMCTruth(list_name='pi+', path=main)
+ma.applyCuts(list_name='pi+', cut='isSignal==1', path=main)
 
 # make aliases of some expert variables
 variables.addAlias('topTOF_kaon', 'topTOFExpert(321)')
+variables.addAlias('topLogLPhotonCountMCMatch', 'topDigitCountIntervalMCMatch(-20, 74.327756)')
 
 # define a list of variables to be written to ntuple
 var_list = ['p',
@@ -55,23 +47,33 @@ var_list = ['p',
             'phi',
             'charge',
             'PDG',
+            'isSignal',
             'topSlotID',
+            'topSlotIDMCMatch',
             'topLocalX',
             'topLocalY',
             'topLocalZ',
+            'topLocalXMCMatch',
+            'topLocalYMCMatch',
+            'topLocalZMCMatch',
             'topLocalPhi',
             'topLocalTheta',
+            'topLocalPhiMCMatch',
+            'topLocalThetaMCMatch',
             'topTOF',
+            'topTOFMCMatch',
             'topTOF_kaon',
             'extrapTrackToTOPimpactZ',
             'extrapTrackToTOPimpactTheta',
             'extrapTrackToTOPimpactPhi',
             'topDigitCount',
+            'topDigitCountMCMatch',
             'topDigitCountSignal',
             'topDigitCountBkg',
             'topDigitCountRaw',
             'topLogLFlag',
             'topLogLPhotonCount',
+            'topLogLPhotonCountMCMatch',
             'topLogLExpectedPhotonCount',
             'topLogLEstimatedBkgCount',
             'topLogLElectron',
@@ -82,19 +84,17 @@ var_list = ['p',
             'topLogLDeuteron',
             'topBunchIsReconstructed',
             'topBunchNumber',
+            'topBunchMCMatch',
             'topBunchOffset',
             'topBunchTrackCount',
             'topBunchUsedTrackCount',
             'topTracksInSlot']
 
 # write variables to ntuple
-ma.variablesToNtuple(decayString='pi+:all', variables=var_list, treename='tree', filename='topVars_data.root', path=main)
+ma.variablesToNtuple(decayString='pi+', variables=var_list, treename='tree', filename='topVars_mc.root', path=main)
 
 # print progress
 main.add_module('Progress')
 
 # process events
 process(main)
-
-# Print statistics
-print(statistics)

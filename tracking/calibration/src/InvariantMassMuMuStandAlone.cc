@@ -654,7 +654,6 @@ namespace Belle2::InvariantMassMuMuCalib {
     delete leg2;
 
     gROOT->SetBatch(isBatch);
-
   }
 
 /// plots the result of the fit to the Mmumu, i.e. data and the fitted curve
@@ -668,32 +667,33 @@ namespace Belle2::InvariantMassMuMuCalib {
     TH1D* hFit  = new TH1D("hFit", "", nBins, mMin, mMax);
     TH1D* hPull = new TH1D("hPull", "", nBins, mMin, mMax);
 
+    // fill histogram with data
     for (auto d : data)
       hData->Fill(d);
 
 
+    // construct the fitted function
     TGraph* gr = new TGraph();
-    gr->SetName("grFit");
     const double step = (mMax - mMin) / (nBins);
 
+    for (int i = 0; i <= 2 * nBins; ++i) {
+      double m = mMin + 0.5 * step * i;
+      double V = mainFunction(m, pars);
+      gr->SetPoint(gr->GetN(), m, V);
+    }
+
+
+    // Calculate integrals of the fitted function within each bin
     for (int i = 0; i < nBins; ++i) {
-      double l = mMin + step * i;
-      double r = mMin + step * (i + 1);
-      double c = (l + r) / 2;
-
-      double lV = mainFunction(l, pars);
-      double cV = mainFunction(c, pars);
-      double rV = mainFunction(r, pars);
-
-      gr->SetPoint(gr->GetN(), l, lV);
-      gr->SetPoint(gr->GetN(), c, cV);
-      gr->SetPoint(gr->GetN(), r, rV);
+      double lV = gr->GetPointY(2 * i + 0);
+      double cV = gr->GetPointY(2 * i + 1);
+      double rV = gr->GetPointY(2 * i + 2);
 
       double I = step / 6 * (lV + 4 * cV + rV);
       hFit->SetBinContent(i + 1, I);
     }
 
-    //Normalize it
+    //Normalization factor
     double F = hData->Integral() / hFit->Integral();
 
     hFit->Scale(F);
@@ -703,6 +703,7 @@ namespace Belle2::InvariantMassMuMuCalib {
       gr->SetPointY(i, gr->GetPointY(i) * F * step);
 
 
+    // calculate pulls
     for (int i = 1; i <= nBins; ++i) {
       double pull = (hData->GetBinContent(i) - hFit->GetBinContent(i)) / sqrt(hFit->GetBinContent(i));
       hPull->SetBinContent(i, pull);
@@ -715,8 +716,6 @@ namespace Belle2::InvariantMassMuMuCalib {
     delete hFit;
     delete gr;
     delete hPull;
-
-
   }
 
 

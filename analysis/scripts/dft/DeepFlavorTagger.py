@@ -15,6 +15,7 @@ from basf2 import B2ERROR, B2FATAL
 import basf2
 from ROOT import Belle2
 import variables.utils as vu
+from variables import variables as vm
 import modularAnalysis as ma
 from ROOT import gSystem
 gSystem.Load('libanalysis.so')
@@ -35,8 +36,12 @@ def get_variables(particle_list, ranked_variable, variables=None, particleNumber
     var_list = []
     for var in variables:
         for i_num in range(1, particleNumber + 1):
-            var_list.append('getVariableByRank(' + particle_list + ', ' + ranked_variable + ', ' + var + ', ' +
-                            str(i_num) + ')')
+            alias = 'Ranked_' + particle_list + '_' + ranked_variable + '_' + var + '_' + str(i_num)
+            alias = Belle2.makeROOTCompatible(alias)
+            vm.addAlias(alias,
+                        'eventCached(getVariableByRank(' + particle_list + ', ' + ranked_variable + ', ' + var + ', '
+                        + str(i_num) + '))')
+            var_list.append(alias)
     return var_list
 
 

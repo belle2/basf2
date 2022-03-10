@@ -32,7 +32,7 @@ settings = CalibrationSettings(
     input_data_names=["hadron4S", "mumu4S", "mumuOff"],
     input_data_filters={
         "hadron4S": [
-            INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
+            INPUT_DATA_FILTERS["Data Tag"]["btocharm_calib"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Beam Energy"]["4S"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],

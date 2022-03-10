@@ -9,15 +9,24 @@
 
 #include <iostream>
 #include <iomanip>
+#include <filesystem>
 #include <vector>
 #include <tuple>
 #include <numeric>
 #include <fstream>
 
+#include <TROOT.h>
 #include <TTree.h>
 #include <TVector3.h>
 #include <TGraph.h>
 #include <TRandom3.h>
+#include <TH1D.h>
+#include <TGraph.h>
+#include <TLegend.h>
+#include <TLine.h>
+#include <TCanvas.h>
+#include <TStyle.h>
+#include <TPad.h>
 #include <Math/Functor.h>
 #include <Math/SpecFuncMathCore.h>
 #include <Math/DistFunc.h>
@@ -49,6 +58,9 @@ using namespace std;
 
 namespace Belle2::InvariantMassMuMuCalib {
 
+
+  // fitting range for the mumu invariant mass
+  static const double mMin = 10.2e3, mMax = 10.8e3;
 
 
   /// read events from TTree to std::vector
@@ -98,6 +110,23 @@ namespace Belle2::InvariantMassMuMuCalib {
 
     return events;
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // Analysis itself
 
@@ -484,11 +513,219 @@ namespace Belle2::InvariantMassMuMuCalib {
   }
 
 
+/// plots the result of the fit to the Mmumu, i.e. data and the fitted curve, the base function
+  static void plotMuMuFitBase(TH1D* hData, TGraph* gr, TH1D* hPull, Pars pars, Eigen::MatrixXd mat, int time)
+  {
+    bool isBatch = gROOT->IsBatch();
+    gROOT->SetBatch(kTRUE);
+
+    gStyle->SetOptStat(0);
+
+    TCanvas* can = new TCanvas("can", "");
+
+    TPad* pad1 = new TPad("pad2", "", 0, 0.3, 1, 1.0);
+    TPad* pad2 = new TPad("pad1", "", 0, 0,   1, 0.3);
+
+    pad1->SetBottomMargin(0.05);
+    pad2->SetTopMargin(0.05);
+    pad2->SetBottomMargin(0.35);
+
+    pad1->Draw();
+    pad2->Draw();
+
+    ///////////////////
+    // Main plot
+    ///////////////////
+
+    pad1->cd();
+
+    hData->SetMarkerStyle(kFullCircle);
+    hData->Draw();
+    gr->SetLineColor(kRed);
+    gr->SetLineWidth(2);
+    gr->Draw("same");
+    hData->GetXaxis()->SetLabelSize(0.0001);
+    hData->GetYaxis()->SetLabelSize(0.05);
+    hData->GetYaxis()->SetTitle("Number of events");
+    hData->GetYaxis()->SetTitleSize(0.05);
+    hData->GetYaxis()->SetTitleOffset(0.9);
+
+    double mY4S = 10579.4;
+    double y = gr->Eval(mY4S);
+    TLine* line = new TLine(mY4S, 0, mY4S, y);
+    line->SetLineColor(kGreen);
+    line->SetLineWidth(2);
+    line->Draw();
+
+
+
+    TLegend* leg = new TLegend(.15, .4, .35, .87);
+    int i = 0, nPars = 0;
+    for (auto p : pars) {
+      double err = sqrt(mat(i, i));
+      if (err != 0) {
+        int nDig = log10(p.second / err) + 2;
+
+        TString s   = "%s = %." + TString(Form("%d", nDig)) + "g";
+        TString dig = "%." + TString(Form("%d", nDig)) + "g";
+        TString digE = "%.2g";
+        leg->AddEntry((TObject*)0, Form("%s = " + dig + " #pm " + digE, p.first.c_str(), p.second, err), "h");
+        ++nPars;
+      }
+      ++i;
+    }
+    leg->SetTextSize(0.05);
+    leg->SetBorderSize(0);
+    leg->SetFillStyle(0);
+    leg->Draw();
+
+
+    double chi2 = 0;
+    for (int j = 1; j <= hPull->GetNbinsX(); ++j)
+      chi2 += pow(hPull->GetBinContent(j), 2);
+    int ndf = hPull->GetNbinsX() - nPars - 1;
+
+
+    TLegend* leg2 = new TLegend(.73, .75, .93, .87);
+    leg2->AddEntry((TObject*)0, Form("chi2/ndf = %.2f", chi2 / ndf), "h");
+    leg2->AddEntry((TObject*)0, Form("p = %.2g",   TMath::Prob(chi2, ndf)), "h");
+
+    leg2->SetTextSize(0.05);
+    leg2->SetBorderSize(0);
+    leg2->SetFillStyle(0);
+    leg2->Draw();
+
+
+    double mFit = pars.at("m0");
+    double yF = gr->Eval(mFit);
+    TLine* lineR = new TLine(mFit, 0, mFit, yF);
+    lineR->SetLineColor(kRed);
+    lineR->SetLineWidth(2);
+    lineR->Draw();
+
+
+
+    ///////////////////
+    // Ratio plot
+    ///////////////////
+
+    pad2->cd();
+    hPull->SetMarkerStyle(kFullCircle);
+    hPull->Draw("p");
+
+    hPull->GetXaxis()->SetTitle("M (#mu#mu) [MeV]");
+    hPull->GetYaxis()->SetTitle("pull");
+    hPull->GetXaxis()->SetTitleSize(0.13);
+    hPull->GetXaxis()->SetTitleOffset(1.25);
+    hPull->GetXaxis()->SetLabelSize(0.13);
+    hPull->GetXaxis()->SetLabelOffset(0.05);
+    hPull->GetXaxis()->SetTickSize(0.07);
+
+
+    hPull->GetYaxis()->SetTitleSize(0.13);
+    hPull->GetYaxis()->SetLabelSize(0.13);
+    hPull->GetYaxis()->SetTitleOffset(0.2);
+    hPull->GetYaxis()->CenterTitle();
+
+
+    hPull->GetYaxis()->SetNdivisions(404);
+
+    hPull->GetYaxis()->SetRangeUser(-5, 5);
+
+    TGraph* grLine = new TGraph(2);
+    grLine->SetPoint(0, 10200, 0);
+    grLine->SetPoint(1, 10800, 0);
+    grLine->SetLineWidth(2);
+    grLine->SetLineColor(kRed);
+    grLine->Draw("same");
+
+    filesystem::create_directories("plotsMuMu");
+
+    can->SaveAs(Form("plotsMuMu/mumu_%d.pdf", time));
+
+
+    delete pad1;
+    delete pad2;
+    delete can;
+    delete line;
+    delete lineR;
+    delete grLine;
+    delete leg;
+    delete leg2;
+
+    gROOT->SetBatch(isBatch);
+
+  }
+
+/// plots the result of the fit to the Mmumu, i.e. data and the fitted curve
+  static void plotMuMuFit(const vector<double>& data, const Pars& pars, Eigen::MatrixXd mat, int time)
+  {
+    const int nBins = 100;
+
+    // Fill the data histogram
+    TH1D::SetDefaultSumw2();
+    TH1D* hData = new TH1D("hData", "", nBins, mMin, mMax);
+    TH1D* hFit  = new TH1D("hFit", "", nBins, mMin, mMax);
+    TH1D* hPull = new TH1D("hPull", "", nBins, mMin, mMax);
+
+    for (auto d : data)
+      hData->Fill(d);
+
+
+    TGraph* gr = new TGraph();
+    gr->SetName("grFit");
+    const double step = (mMax - mMin) / (nBins);
+
+    for (int i = 0; i < nBins; ++i) {
+      double l = mMin + step * i;
+      double r = mMin + step * (i + 1);
+      double c = (l + r) / 2;
+
+      double lV = mainFunction(l, pars);
+      double cV = mainFunction(c, pars);
+      double rV = mainFunction(r, pars);
+
+      gr->SetPoint(gr->GetN(), l, lV);
+      gr->SetPoint(gr->GetN(), c, cV);
+      gr->SetPoint(gr->GetN(), r, rV);
+
+      double I = step / 6 * (lV + 4 * cV + rV);
+      hFit->SetBinContent(i + 1, I);
+    }
+
+    //Normalize it
+    double F = hData->Integral() / hFit->Integral();
+
+    hFit->Scale(F);
+
+    // Normalize the curve
+    for (int i = 0; i < gr->GetN(); ++i)
+      gr->SetPointY(i, gr->GetPointY(i) * F * step);
+
+
+    for (int i = 1; i <= nBins; ++i) {
+      double pull = (hData->GetBinContent(i) - hFit->GetBinContent(i)) / sqrt(hFit->GetBinContent(i));
+      hPull->SetBinContent(i, pull);
+    }
+
+
+    plotMuMuFitBase(hData, gr, hPull, pars, mat, time);
+
+    delete hData;
+    delete hFit;
+    delete gr;
+    delete hPull;
+
+
+  }
+
+
+
+
   /** run the collision invariant mass calibration,
       it returns (eCMS, eCMSstatUnc, 0) */
   pair<Pars, MatrixXd> getInvMassPars(const vector<Event>& evts, Pars pars, int bootStrap = 0)
   {
-    double mMin = 10.2e3, mMax = 10.8e3;
 
     vector<double> dataNow = readEvents(evts, 0.9/*PIDcut*/, mMin, mMax);
 
@@ -581,7 +818,8 @@ namespace Belle2::InvariantMassMuMuCalib {
 
       }
 
-      const int nRep = 16;
+      // number of required successful bootstrap replicas
+      const int nRep = 25;
 
       vector<double> vals, errs;
       for (int rep = 0; rep < 200; ++rep) {
@@ -590,38 +828,49 @@ namespace Belle2::InvariantMassMuMuCalib {
         Pars resP, inDummy;
         MatrixXd resM;
 
-        // fit using bootstrap replica replicas
+        // fit using bootstrap replica replicas, rep=0 is no replica
         tie(resP, resM) =  getInvMassPars(evtsNow, inDummy, rep);
 
         int ind = distance(resP.begin(), resP.find("m0"));
         double mass = resP.at("m0");
         double err  = sqrt(resM(ind, ind));
 
+        // if there are problems with fit, try again with diffrent bootstrap replica
         if (!(errEst < err && err < 4 * errEst))
           continue;
 
         vals.push_back(mass);
         errs.push_back(err);
 
-        if (rep == 0)
+        // if now bootstrapping needed, plot & break
+        if (rep == 0) {
+          plotMuMuFit(readEvents(evtsNow, 0.9/*PIDcut*/, mMin, mMax), resP, resM, int(round(evtsNow[0].t)));
           break;
+        }
 
         // try fit with different input parameters, but without bootstrapping
-        tie(resP, resM) =  getInvMassPars(evtsNow, resP, 0);
+        Pars resP0;
+        MatrixXd resM0;
+        tie(resP0, resM0) =  getInvMassPars(evtsNow, resP, 0);
 
-        int ind0 = distance(resP.begin(), resP.find("m0"));
-        double mass0 = resP.at("m0");
-        double err0  = sqrt(resM(ind0, ind0));
+        int ind0 = distance(resP0.begin(), resP0.find("m0"));
+        double mass0 = resP0.at("m0");
+        double err0  = sqrt(resM0(ind0, ind0));
 
-        // if successful, break
+        // if successful, plot & break
         if (errEst < err0 && err0 < 4 * errEst) {
           vals = {mass0};
           errs = {err0};
+          plotMuMuFit(readEvents(evtsNow, 0.9/*PIDcut*/, mMin, mMax), resP0, resM0, int(round(evtsNow[0].t)));
           break;
         }
 
 
-        if (vals.size() >= nRep) break;
+        // if the fit was sucesfull several times only on replicas, plot & break
+        if (vals.size() >= nRep) {
+          plotMuMuFit(readEvents(evtsNow, 0.9/*PIDcut*/, mMin, mMax), resP, resM, int(round(evtsNow[0].t)));
+          break;
+        }
 
       }
 

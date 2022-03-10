@@ -35,7 +35,7 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Red:"));
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
 

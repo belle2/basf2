@@ -32,7 +32,7 @@ DQMHistAnalysisECLShapersModule::DQMHistAnalysisECLShapersModule()
            m_WaveformOption);
   addParam("CrateTimeOffsetsMax", m_CrateTimeOffsetsMax, "Maximum boundary for crate time offsets", 20.);
   addParam("LogicTestMax", m_LogicTestMax, " Maximum of fails for logic test", 50);
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
 }
 
 

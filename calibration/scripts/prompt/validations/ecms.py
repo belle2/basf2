@@ -697,6 +697,11 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     create_hadBonly_fit_plots(location, pdflatex)
     create_mumu_fit_plots(location, pdflatex)
 
+    # copy csv files to validation directory
+    copyfile(f'{location}/BonlyEcmsCalib.txt', 'plots/BonlyEcmsCalib.txt')
+    copyfile(f'{location}/finalEcmsCalib.txt', 'plots/finalEcmsCalib.txt')
+    copyfile(f'{location}/mumuEcalib.txt', 'plots/mumuEcalib.txt')
+
 
 if __name__ == "__main__":
     run_validation(*sys.argv[1:])

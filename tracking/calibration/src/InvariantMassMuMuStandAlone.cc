@@ -115,25 +115,6 @@ namespace Belle2::InvariantMassMuMuCalib {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // Analysis itself
-
-
-
-
-
   // Numerical integration using Gauss-Konrod algorithm
   double integrate(function<double(double)> f, double a, double b)
   {

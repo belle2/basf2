@@ -20,9 +20,8 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+
 using namespace Belle2;
-
-
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -35,6 +34,10 @@ REG_MODULE(KLMDQM2)
 
 KLMDQM2Module::KLMDQM2Module() :
   HistoModule(),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
+  m_PlaneArrayIndex(&(KLMPlaneArrayIndex::Instance())),
+  m_GeometryBKLM{nullptr},
   m_MatchedHitsBKLM{nullptr},
   m_AllExtHitsBKLM{nullptr},
   m_MatchedHitsEKLM{nullptr},

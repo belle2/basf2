@@ -521,10 +521,10 @@ namespace Belle2::InvariantMassMuMuCalib {
 
     gStyle->SetOptStat(0);
 
-    TCanvas* can = new TCanvas("can", "");
+    TCanvas* can = new TCanvas(Form("canMuMu_%d", time), "");
 
-    TPad* pad1 = new TPad("pad2", "", 0, 0.3, 1, 1.0);
-    TPad* pad2 = new TPad("pad1", "", 0, 0,   1, 0.3);
+    TPad* pad1 = new TPad(Form("pad1_%d", time), "", 0, 0.3, 1, 1.0);
+    TPad* pad2 = new TPad(Form("pad2_%d", time), "", 0, 0,   1, 0.3);
 
     pad1->SetBottomMargin(0.05);
     pad2->SetTopMargin(0.05);
@@ -644,14 +644,16 @@ namespace Belle2::InvariantMassMuMuCalib {
     can->SaveAs(Form("plotsMuMu/mumu_%d.pdf", time));
 
 
-    delete pad1;
-    delete pad2;
-    delete can;
+    delete leg;
+    delete leg2;
     delete line;
     delete lineR;
     delete grLine;
-    delete leg;
-    delete leg2;
+
+    delete pad1;
+    delete pad2;
+    delete can;
+
 
     gROOT->SetBatch(isBatch);
   }
@@ -666,6 +668,9 @@ namespace Belle2::InvariantMassMuMuCalib {
     TH1D* hData = new TH1D("hData", "", nBins, mMin, mMax);
     TH1D* hFit  = new TH1D("hFit", "", nBins, mMin, mMax);
     TH1D* hPull = new TH1D("hPull", "", nBins, mMin, mMax);
+    hData->SetDirectory(nullptr);
+    hFit->SetDirectory(nullptr);
+    hPull->SetDirectory(nullptr);
 
     // fill histogram with data
     for (auto d : data)
@@ -714,8 +719,8 @@ namespace Belle2::InvariantMassMuMuCalib {
 
     delete hData;
     delete hFit;
-    delete gr;
     delete hPull;
+    delete gr;
   }
 
 
@@ -725,6 +730,7 @@ namespace Belle2::InvariantMassMuMuCalib {
       it returns (eCMS, eCMSstatUnc, 0) */
   pair<Pars, MatrixXd> getInvMassPars(const vector<Event>& evts, Pars pars, int bootStrap = 0)
   {
+    bool is4S = evts[0].is4S;
 
     vector<double> dataNow = readEvents(evts, 0.9/*PIDcut*/, mMin, mMax);
 
@@ -746,7 +752,7 @@ namespace Belle2::InvariantMassMuMuCalib {
     fitter.init(256 + 1, mMin, mMax);
 
 
-    Pars pars0 = {
+    Pars pars0_4S = {
       {"C" , 15        },
       {"bDelta" , 1.60307        },
       {"bMean" , 0        },
@@ -758,9 +764,21 @@ namespace Belle2::InvariantMassMuMuCalib {
       {"tau" , 99.4225}
     };
 
-    if (pars.empty())
-      pars = pars0;
+    Pars pars0_Off = {
+      {"C" , 15        },
+      {"bDelta" , 2.11        },
+      {"bMean" , 0        },
+      {"frac" , 0.9854        },
+      {"m0" , 10504.7        },
+      {"mean" , 4.13917        },
+      {"sigma" , 36.4         },
+      {"slope" , 0.892           },
+      {"tau" , 64.9}
+    };
 
+    if (pars.empty()) {
+      pars = is4S ? pars0_4S : pars0_Off;
+    }
 
 
 

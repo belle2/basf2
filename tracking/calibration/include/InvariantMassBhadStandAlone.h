@@ -23,7 +23,6 @@
 namespace Belle2::InvariantMassBhadCalib {
 
   static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-  static const int intNaN     = std::numeric_limits<int>::quiet_NaN();
   static const TVector3 vecNaN(realNaN, realNaN, realNaN);
 
 
@@ -31,8 +30,8 @@ namespace Belle2::InvariantMassBhadCalib {
   struct Candidate {
     double pBcms = realNaN;   ///< B meson momentum in CMS
     double mB    = realNaN;   ///< mass of B meson
-    int pdg = intNaN;         ///< PDG code of the signal B-meson
-    int mode = intNaN;        ///< integer code identifying the decay channel
+    int pdg = 0;              ///< PDG code of the signal B-meson, 0 for dummy value
+    int mode = -1;            ///< integer code identifying the decay channel, -1 is dummy value
     double Kpid = realNaN;    ///< Kaon PID
     double R2 = realNaN;      ///< R2 continuum suppression variable
     double mD = realNaN;      ///< reconstructed mass of the D meson
@@ -46,16 +45,16 @@ namespace Belle2::InvariantMassBhadCalib {
   /** structure containing variables relevant for the hadronic B decays */
   struct Event {
 
-    int exp   = intNaN;   ///< experiment number
-    int run   = intNaN;   ///< run number
-    int evtNo = intNaN;   ///< event number
+    int exp   = -1;       ///< experiment number
+    int run   = -1;       ///< run number
+    int evtNo = -1;       ///< event number
     double t = realNaN;   ///< time of the event
 
 
     std::vector<Candidate>  cand = {}; ///< vector of B meson candidates
 
 
-    int nBootStrap = intNaN;  ///< bootstap weight
+    int nBootStrap = 1;  ///< bootstap weight, 1 -> data without bootstrapping
   };
 
 

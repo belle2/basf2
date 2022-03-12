@@ -22,7 +22,6 @@
 namespace Belle2::BoostVectorCalib {
 
   static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-  static const int intNaN     = std::numeric_limits<int>::quiet_NaN();
   static const TVector3 vecNaN(realNaN, realNaN, realNaN);
 
   /** track parameters (neglecting curvature) */
@@ -33,15 +32,15 @@ namespace Belle2::BoostVectorCalib {
 
   /** Event containing two tracks */
   struct Event {
-    int exp  = intNaN;  ///< experiment number
-    int run  = intNaN;  ///< run number
-    int evtNo = intNaN; ///< event number
+    int exp   = -1; ///< experiment number
+    int run   = -1; ///< run number
+    int evtNo = -1; ///< event number
 
 
     Track mu0; ///< track in the event
     Track mu1; ///< other track in the event
 
-    int nBootStrap = intNaN;///< random bootstrap weight (n=1 -> original sample)
+    int nBootStrap = 1;     ///< random bootstrap weight (n=1 -> original sample)
     bool isSig = false;     ///< is not removed by quality cuts?
     double t = realNaN;     ///< time of event [hours]
 

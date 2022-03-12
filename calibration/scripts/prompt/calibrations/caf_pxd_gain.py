@@ -34,6 +34,7 @@ settings = CalibrationSettings(name="PXD gain calibration",
                                        INPUT_DATA_FILTERS["Beam Energy"]["4S"],
                                        INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
                                        INPUT_DATA_FILTERS["Beam Energy"]["Scan"],
+                                       INPUT_DATA_FILTERS["Beam Energy"][""],
                                        INPUT_DATA_FILTERS["Run Type"]["physics"],
                                        INPUT_DATA_FILTERS["Data Quality Tag"]["Good"]]},
                                expert_config={

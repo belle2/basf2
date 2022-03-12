@@ -1000,6 +1000,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     acs->MakeImprint(innervolumesector_logical,  tr, 0, overlap);
     tr = G4RotateZ3D(-M_PI / 16);
     acs->MakeImprint(innervolumesector_logical,  tr, 1, overlap);
+    delete acs;
   }// end of ECL-004K102.pdf page 15
 
   if (b_cover) {

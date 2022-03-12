@@ -48,10 +48,16 @@
 //#define NUM_SENDER_THREADS 1
 //#define NO_ERROR_STOP
 //#define PCIE40_NODE_ID 0x03000001
+
 /////////////////////////////////////////
 // Parameter for dummy-data
 ////////////////////////////////////////
 //#define DUMMY_REDUCED_DATA
+
+/////////////////////////////////////////
+// Parameter for split ECL and ECLTRG data on recl3
+////////////////////////////////////////
+//#define SPLIT_ECL_ECLTRG
 
 /////////////////////////////////////////
 // Parameter for data-contents
@@ -94,6 +100,12 @@
 #endif
 
 using namespace std;
+
+#ifdef SPLIT_ECL_ECLTRG
+#define RECL3_NODEID 0x05000003
+#define ECLTRG_NODE_ID 0x13000001
+std::vector<int> splitted_ch(1, 23);
+#endif
 
 #ifndef USE_ZMQ
 unsigned int* data_1[NUM_SENDER_THREADS];
@@ -1848,6 +1860,177 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
 
 }
 
+
+void split_Ecltrg(int sender_id, unsigned int* data, std::vector< int > valid_ch,
+                  unsigned int* data_main, unsigned int* data_splitted,
+                  unsigned int splitted_node_id, std::vector< int > splitted_ch)
+{
+  unsigned int event_length = data[ Belle2::RawHeader_latest::POS_NWORDS ];
+  pthread_mutex_lock(&(mtx_sender_log));
+  printf("[DEBUG] Before splitting : sdrid %d.  Exiting...\n",
+         sender_id);
+  printEventData(data, (event_length & 0xfffff));
+  pthread_mutex_unlock(&(mtx_sender_log));
+  // Check event size
+
+  if (event_length > 0x100000) {
+    pthread_mutex_lock(&(mtx_sender_log));
+    printf("[FATAL] Too large event size. : sdrid %d : 0x%.8x : %d words. Exiting...\n", sender_id, data[ EVENT_LEN_POS ],
+           data[ EVENT_LEN_POS ]);
+    printEventData(data, (event_length & 0xfffff));
+    pthread_mutex_unlock(&(mtx_sender_log));
+    exit(1);
+  } else if (event_length == 0) {
+    pthread_mutex_lock(&(mtx_sender_log));
+    printf("[FATAL] Specified event size is zero. : 0x%.8x : %u words. Exiting...\n",
+           data[ EVENT_LEN_POS ], event_length);
+    printEventData(data, 24);
+    pthread_mutex_unlock(&(mtx_sender_log));
+    exit(1);
+  }
+
+  // Check magic word
+  if ((data[ MAGIC_7F7F_POS ] & 0xFFFF0000) != 0x7F7F0000) {
+    pthread_mutex_lock(&(mtx_sender_log));
+    n_messages[ 7 ] = n_messages[ 7 ] + 1 ;
+    if (n_messages[ 7 ] < max_number_of_messages) {
+      printf("Bad code 7F7F ( 0x%.8x )\n" , data[ MAGIC_7F7F_POS ]) ;
+      //      printLine(data, MAGIC_7F7F_POS);
+      printEventData(data, event_length);
+    }
+    err_bad_7f7f[sender_id]++;
+    pthread_mutex_unlock(&(mtx_sender_log));
+#ifndef NO_ERROR_STOP
+    exit(1);
+#endif
+    //    return 1 ;
+  }
+
+
+  // Copy RawHeader
+  memcpy(data_main, data, Belle2::RawHeader_latest::POS_CH_POS_TABLE * sizeof(unsigned int));
+  memcpy(data_splitted, data, Belle2::RawHeader_latest::POS_CH_POS_TABLE * sizeof(unsigned int));
+  data_splitted[ Belle2::RawHeader_latest::POS_NODE_ID ] = splitted_node_id;
+
+  int cur_pos = 0;
+  int cur_ch_main = 0;
+  int prev_ch_main = -1;
+  int cur_ch_splitted = 0;
+  int prev_ch_splitted = -1;
+  int cur_pos_main = Belle2::RawHeader_latest::RAWHEADER_NWORDS;
+  int cur_pos_splitted = Belle2::RawHeader_latest::RAWHEADER_NWORDS;
+  int link_cnt = 0;
+
+  int cnt_main = 0;
+  int cnt_splitted = 0;
+
+  for (int i = 0; i <  MAX_PCIE40_CH; i++) {
+    // Calculate linksize
+    int linksize = 0;
+    if (i < 47) {
+      linksize = data[ POS_TABLE_POS + (i + 1) ] - data[ POS_TABLE_POS + i ];
+    } else {
+      linksize = event_length - (data[ POS_TABLE_POS + 47 ] + LEN_ROB_TRAILER);
+    }
+    if (linksize <= 0) continue;
+    cur_pos = data[ POS_TABLE_POS + i ] + OFFSET_HDR;
+
+    // compare valid ch with register value
+    if (valid_ch[link_cnt] != i) {
+      pthread_mutex_lock(&(mtx_sender_log));
+      n_messages[ 11 ] = n_messages[ 11 ] + 1 ;
+      if (n_messages[ 11 ] < max_number_of_messages) {
+        printf("[FATAL] A valid ch in data(=%d) is not equal to regeister value(%d) for masking\n" , i, valid_ch[link_cnt]) ;
+        printEventData(data, event_length);
+      }
+      err_bad_linknum[sender_id]++;
+      pthread_mutex_unlock(&(mtx_sender_log));
+#ifndef NO_ERROR_STOP
+      exit(1);
+#endif
+    }
+
+    // Check main ch or splitted ch
+    int splitted_ch_flag = 0;
+    for (int j = 0; j < splitted_ch.size(); j++) {
+      if (splitted_ch[j] == i) {
+        splitted_ch_flag = 1;
+        break;
+      }
+    }
+
+    // Filling pos-table
+    if (splitted_ch_flag == 0) {
+      data_main[ Belle2::RawHeader_latest::POS_CH_POS_TABLE + i ] = cur_pos_main;
+      for (int j = prev_ch_main + 1; j < i; j++) {
+        data_main[ Belle2::RawHeader_latest::POS_CH_POS_TABLE + j ] = cur_pos_main;
+      }
+      memcpy(data_main + cur_pos_main, data + cur_pos, linksize * sizeof(unsigned int));
+      cur_pos_main += linksize;
+      prev_ch_main = i;
+      cnt_main++;
+    } else {
+      data_splitted[ Belle2::RawHeader_latest::POS_CH_POS_TABLE + i ] = cur_pos_splitted;
+      for (int j = prev_ch_splitted + 1; j < i; j++) {
+        data_splitted[ Belle2::RawHeader_latest::POS_CH_POS_TABLE + j ] = cur_pos_splitted;
+      }
+      memcpy(data_splitted + cur_pos_splitted, data + cur_pos, linksize * sizeof(unsigned int));
+      cur_pos_splitted += linksize;
+      prev_ch_splitted = i;
+      cnt_splitted++;
+    }
+    link_cnt++;
+  }
+
+  if (cnt_main == 0 || cnt_splitted == 0) {
+    pthread_mutex_lock(&(mtx_sender_log));
+    printf("[FATAL] No channels for ECL(# of used ch = %d) or ECLTRG(# of used ch = %d) data. Exiting...\n",
+           cnt_main, cnt_splitted);
+    pthread_mutex_unlock(&(mtx_sender_log));
+    //    exit(1);
+  }
+
+  // Fill remaining position table
+  for (int i = prev_ch_main + 1; i < MAX_PCIE40_CH; i++) {
+    data_main[ Belle2::RawHeader_latest::POS_CH_POS_TABLE + i ] = cur_pos_main;
+  }
+  for (int i = prev_ch_splitted + 1; i < MAX_PCIE40_CH; i++) {
+    data_splitted[ Belle2::RawHeader_latest::POS_CH_POS_TABLE + i ] = cur_pos_splitted;
+  }
+
+  // Calcurate each event-length
+  unsigned int eve_size_main = cur_pos_main + Belle2::RawTrailer_latest::RAWTRAILER_NWORDS;
+  unsigned int eve_size_splitted = cur_pos_splitted + Belle2::RawTrailer_latest::RAWTRAILER_NWORDS;
+  data_main[ Belle2::RawHeader_latest::POS_NWORDS ] = eve_size_main;
+  data_splitted[ Belle2::RawHeader_latest::POS_NWORDS ] = eve_size_splitted;
+
+  // Copy RawTrailer (Currently 00000000 00000000 00000000 7fff0006. So, just copy the 4 words.)
+  memcpy(data_main + cur_pos_main, data + event_length - Belle2::RawTrailer_latest::RAWTRAILER_NWORDS,
+         Belle2::RawTrailer_latest::RAWTRAILER_NWORDS * sizeof(unsigned int));
+  memcpy(data_splitted + cur_pos_splitted, data + event_length - Belle2::RawTrailer_latest::RAWTRAILER_NWORDS,
+         Belle2::RawTrailer_latest::RAWTRAILER_NWORDS * sizeof(unsigned int));
+
+  // Copy back to data buffer
+  memcpy(data, data_main, eve_size_main * sizeof(unsigned int));
+  memcpy(data + eve_size_main, data_splitted, eve_size_splitted * sizeof(unsigned int));
+
+  pthread_mutex_lock(&(mtx_sender_log));
+  printf("[DEBUG]Splitted data sender %d\n",
+         sender_id);
+  printEventData(data, eve_size_main + eve_size_splitted);
+  printf("[DEBUG]main data sender %d\n",
+         sender_id);
+  printEventData(data_main, eve_size_main);
+  printf("[DEBUG]split data sender %d\n",
+         sender_id);
+  printEventData(data_splitted, eve_size_splitted);
+  pthread_mutex_unlock(&(mtx_sender_log));
+
+  return;
+}
+
+
+
 //int sender_id, int   run_no, int nwords_per_fee, int ncpr, int nhslb, std::vector< int > valid_ch)
 void* sender(void* arg)
 {
@@ -1864,6 +2047,26 @@ void* sender(void* arg)
   //
   int total_words = 0;
   unsigned int* buff = new unsigned int[MAX_EVENT_WORDS];
+
+#ifdef SPLIT_ECL_ECLTRG
+  vector<int> valid_main_ch;
+  unsigned int* buff_main = new unsigned int[MAX_EVENT_WORDS];
+  unsigned int* buff_splitted = new unsigned int[MAX_EVENT_WORDS];
+
+  // Prepare valid_main table
+  for (int k = 0; k < valid_ch.size(); k++) {
+    int splitted_ch_flag = 0;
+    for (int l = 0; l < splitted_ch.size(); l++) {
+      if (splitted_ch[l] == valid_ch[k]) {
+        splitted_ch_flag = 1;
+        break;
+      }
+    }
+    if (splitted_ch_flag == 0) {
+      valid_main_ch.push_back(valid_ch[k]);
+    }
+  }
+#endif
 
   //
   // network connection
@@ -2054,7 +2257,17 @@ void* sender(void* arg)
 
     unsigned int prev_exprun = exprun;
     unsigned int prev_evtnum = evtnum;
+#ifdef SPLIT_ECL_ECLTRG
+    split_Ecltrg(sender_id, buff + NW_SEND_HEADER, valid_ch,
+                 buff_main, buff_splitted, ECLTRG_NODE_ID, splitted_ch);
+    unsigned int eve_size_main = *(buff + NW_SEND_HEADER + Belle2::RawHeader_latest::POS_NWORDS);
+    int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, send_nwords, exprun, evtnum,
+                             node_id, valid_main_ch, sender_id);
+    ret = checkEventData(sender_id, buff + NW_SEND_HEADER + eve_size_main, send_nwords, exprun, evtnum,
+                         node_id, splitted_ch, sender_id);
+#else
     int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, send_nwords, exprun, evtnum, node_id, valid_ch);
+#endif
 
     if (ret != DATACHECK_OK) {
       if (ret == DATACHECK_OK_BUT_ERRFLAG_IN_HDR) {
@@ -2099,7 +2312,11 @@ void* sender(void* arg)
     //
     buff[ 0 ] = send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER;
     buff[ 1 ] = 6;
+#ifdef SPLIT_ECL_ECLTRG
+    buff[ 2 ] = 0x00010002;
+#else
     buff[ 2 ] = 0x00010001;
+#endif
     buff[ 3 ] = buff[ NW_SEND_HEADER + 2 ];
     buff[ 4 ] = buff[ NW_SEND_HEADER + 3 ];
     buff[ 5 ] = buff[ NW_SEND_HEADER + 6 ];
@@ -2201,6 +2418,11 @@ void* sender(void* arg)
 #endif
   return (void*)0;
 }
+
+
+
+
+
 
 int main(int argc, char** argv)
 {
@@ -2861,3 +3083,5 @@ int main(int argc, char** argv)
   pthread_mutex_destroy(&mtx_sender_log);
   return 0;
 }
+
+

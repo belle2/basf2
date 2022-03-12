@@ -14,7 +14,6 @@ import basf2_mva
 from basf2 import B2ERROR, B2FATAL
 import basf2
 from ROOT import Belle2
-import variables.utils as vu
 from variables import variables as vm
 import modularAnalysis as ma
 from ROOT import gSystem
@@ -36,12 +35,8 @@ def get_variables(particle_list, ranked_variable, variables=None, particleNumber
     var_list = []
     for var in variables:
         for i_num in range(1, particleNumber + 1):
-            alias = 'Ranked_' + particle_list + '_' + ranked_variable + '_' + var + '_' + str(i_num)
-            alias = Belle2.makeROOTCompatible(alias)
-            vm.addAlias(alias,
-                        'eventCached(getVariableByRank(' + particle_list + ', ' + ranked_variable + ', ' + var + ', '
-                        + str(i_num) + '))')
-            var_list.append(alias)
+            var_list.append('getVariableByRank(' + particle_list + ', ' + ranked_variable + ', ' + var + ', ' +
+                            str(i_num) + ')')
     return var_list
 
 
@@ -251,6 +246,6 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         roe_path.add_module(flavorTaggerInfoFiller)
 
         # Create standard alias for the output of the flavor tagger
-        vu._variablemanager.addAlias('DNN_qrCombined', 'qrOutput(DNN)')
+        vm.addAlias('DNN_qrCombined', 'qrOutput(DNN)')
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

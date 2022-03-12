@@ -64,6 +64,10 @@ void TTDDQMModule::defineHisto()
                                "Correlation between triggered bunch and injected bunch in HER;Injected Bunch(rel);Triggered Bunch(rel)", 256, 0, 1280 * 4, 256, 0,
                                1280 * 4);
 
+  hTrigBunchInjLERproj =  new TH1I("hTTDTrigBunchInjLERproj",
+                                   "Offset between triggered bunch and injected bunch in LER;Injected Bunch(rel);Triggered Bunch(rel)",  1280, 0, 1280 * 4);
+  hTrigBunchInjHERproj =  new TH1I("hTTDTrigBunchInjHERproj",
+                                   "Offset between triggered bunch and injected bunch in HER;Injected Bunch(rel);Triggered Bunch(rel)", 1280, 0, 1280 * 4);
   // cd back to root directory
   oldDir->cd();
 }
@@ -85,6 +89,8 @@ void TTDDQMModule::beginRun()
   hBunchInjLER->Reset();
   hTrigBunchInjLER->Reset();
   hTrigBunchInjHER->Reset();
+  hTrigBunchInjLERproj->Reset();
+  hTrigBunchInjHERproj->Reset();
 }
 
 void TTDDQMModule::event()
@@ -114,10 +120,12 @@ void TTDDQMModule::event()
         hTrigAfterInjHER->Fill(time_since_inj_in_us, time_since_inj_in_us - int(time_since_inj_in_us / (5120 / 508.)) * (5120 / 508.));
         hBunchInjHER->Fill(injected_bunch_in_ticks * 4);
         hTrigBunchInjHER->Fill(injected_bunch_in_ticks * 4, triggered_bunch_in_ticks * 4);
+        hTrigBunchInjHERproj->Fill(((injected_bunch_in_ticks - triggered_bunch_in_ticks + 1280) % 1280) * 4);
       } else {
         hTrigAfterInjLER->Fill(time_since_inj_in_us, time_since_inj_in_us - int(time_since_inj_in_us / (5120 / 508.)) * (5120 / 508.));
         hBunchInjLER->Fill(injected_bunch_in_ticks * 4);
         hTrigBunchInjLER->Fill(injected_bunch_in_ticks * 4, triggered_bunch_in_ticks * 4);
+        hTrigBunchInjLERproj->Fill(((injected_bunch_in_ticks - triggered_bunch_in_ticks + 1280) % 1280) * 4);
       }
     }
   }

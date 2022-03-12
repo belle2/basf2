@@ -36,7 +36,7 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDCM"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode:"));
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
 
   addParam("warnMeanAdhoc", m_warnMeanAdhoc, "warn level for peak position", 2.0);

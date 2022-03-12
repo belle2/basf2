@@ -33,7 +33,7 @@ DQMHistInjectionModule::DQMHistInjectionModule() : DQMHistAnalysisModule()
 
 //   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed", std::string("PXDINJ"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:INJ:"));
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   B2DEBUG(1, "DQMHistInjection: Constructor done.");
 }
 

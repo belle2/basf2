@@ -2326,7 +2326,7 @@ void* sender(void* arg)
         event_nwords = event_nwords_splitted;
         eve_buff = buff + NW_SEND_HEADER + event_nwords_main;
         ret = checkEventData(sender_id, eve_buff, event_nwords_splitted,
-                             exprun, evtnum, node_id, valid_splitted_ch);
+                             exprun, evtnum, ECLTRG_NODE_ID, valid_splitted_ch);
       } else {
         pthread_mutex_lock(&(mtx_sender_log));
         printf("[FATAL] thread %d : # of sub-events must be 1 or 2(for ECL,ECLTRG). k = %d  Exiting... : exp %d run %d sub %d : %s %s %d\n",

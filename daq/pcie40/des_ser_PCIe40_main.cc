@@ -110,7 +110,7 @@ using namespace std;
 #ifdef SPLIT_ECL_ECLTRG
 #define RECL3_NODEID 0x05000003
 #define ECLTRG_NODE_ID 0x13000001
-const std::vector<int> splitted_ch {1, 23}; // ch1 and ch23 are splitted(ECLTRG) from main(ECL) data
+const std::vector<int> splitted_ch {1}; // ch1 and ch23 are splitted(ECLTRG) from main(ECL) data
 #endif
 
 #ifndef USE_ZMQ
@@ -2083,6 +2083,7 @@ void* sender(void* arg)
       split_sub_use = 1;
     }
   }
+
 #endif
 
   //
@@ -2701,6 +2702,15 @@ int main(int argc, char** argv)
   //   }
   // }
   int num_of_chs = valid_ch.size() ;
+  if (num_of_chs <= 0) {
+    pthread_mutex_lock(&(mtx_sender_log));
+    printf("[FATAL] No channels are used for this PCIe40 board in %s. Please mask this readout PC with runcontrol GUI (or exclude sub-system if this is the only readout PC of the sub-system). Exiting..\n",
+           hostnamebuf);
+    fflush(stdout);
+    pthread_mutex_unlock(&(mtx_sender_log));
+    exit(1);
+  }
+
   pthread_mutex_lock(&(mtx_sender_log));
   printf("[DEBUG] # of used channels = %d\n", num_of_chs); fflush(stdout);
   pthread_mutex_unlock(&(mtx_sender_log));

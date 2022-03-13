@@ -1387,10 +1387,10 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
       if (n_messages[ 14 ] < max_number_of_messages) {
         char err_buf[500];
         sprintf(err_buf,
-                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 trailer magic word(0xff55) is invalid. foooter %.8x : exp %d run %d sub %d : %s %s %d",
+                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 trailer magic word(0xff55) is invalid. footer %.8x (pos.=0x%.x) : exp %d run %d sub %d : %s %s %d",
                 sender_id,
                 hostnamebuf, i,
-                data[ cur_pos + linksize + ff55_pos_from_end ],
+                data[ cur_pos + linksize + ff55_pos_from_end ], cur_pos + linksize + ff55_pos_from_end,
                 (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
                 (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
                 (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
@@ -2336,8 +2336,12 @@ void* sender(void* arg)
 #ifdef SPLIT_ECL_ECLTRG
           int ret = 0;
           if (k == 0) {
+            memcpy(buff_splitted, eve_buff + event_nwords_main, event_nwords_splitted * sizeof(unsigned int));
+            memcpy(eve_buff + reduced_event_nwords, buff_splitted, event_nwords_splitted * sizeof(unsigned int));
+            event_nwords_main = reduced_event_nwords;
             ret = checkEventData(sender_id, eve_buff, reduced_event_nwords, exprun, evtnum, node_id, valid_main_ch);
           } else {
+            event_nwords_splitted = reduced_event_nwords;
             ret = checkEventData(sender_id, eve_buff, reduced_event_nwords, exprun, evtnum, node_id, valid_splitted_ch);
           }
 #else

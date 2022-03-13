@@ -1552,7 +1552,8 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     checkUtimeCtimeTRGType(data, sender_id);
     pthread_mutex_lock(&(mtx_sender_log));
     if (err_not_reduced[sender_id] < max_number_of_messages) {
-      printf("[WARNING] thread %d : %s ch=%d : ERROR_EVENT : Error-flag was set by the data-check module in PCIe40 FPGA. : eve %d prev thr eve %d : exp %d run %d sub %d : %s %s %d\n",
+      //      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Error-flag was set by the data-check module in PCIe40 FPGA. : eve %d prev thr eve %d : exp %d run %d sub %d : %s %s %d\n",
+      printf("[WARNING] thread %d : %s ch=%d : Error-flag was set by the data-check module in PCIe40 FPGA. : eve %d prev thr eve %d : exp %d run %d sub %d : %s %s %d\n",
              sender_id,
              hostnamebuf, -1, new_evtnum, evtnum,
              (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,

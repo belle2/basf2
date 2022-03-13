@@ -110,7 +110,8 @@ using namespace std;
 #ifdef SPLIT_ECL_ECLTRG
 #define RECL3_NODEID 0x05000003
 #define ECLTRG_NODE_ID 0x13000001
-const std::vector<int> splitted_ch {1}; // ch1 and ch23 are splitted(ECLTRG) from main(ECL) data
+//const std::vector<int> splitted_ch {2}; // ch1 and ch23 are splitted(ECLTRG) from main(ECL) data
+const std::vector<int> splitted_ch {0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47}; // ch1 and ch23 are splitted(ECLTRG) from main(ECL) data
 #endif
 
 #ifndef USE_ZMQ
@@ -2084,6 +2085,16 @@ void* sender(void* arg)
     }
   }
 
+  if (split_main_use == 0 && split_sub_use == 0) {
+    pthread_mutex_lock(&(mtx_sender_log));
+    printf("[FATAL] thread %d : No channels are used for this PCIe40 board (ECL/ECLTRG) in %s. Please mask this readout PC with runcontrol GUI (or exclude sub-system if this is the only readout PC of the sub-system). Exiting..\n",
+           sender_id, hostnamebuf);
+    fflush(stdout);
+    pthread_mutex_unlock(&(mtx_sender_log));
+    exit(1);
+  }
+
+
 #endif
 
   //
@@ -2276,9 +2287,23 @@ void* sender(void* arg)
     //
 #ifdef SPLIT_ECL_ECLTRG
     int event_nwords_main = 0, event_nwords_splitted = 0;
-    split_Ecltrg(sender_id, buff + NW_SEND_HEADER, valid_ch,
-                 buff_main, buff_splitted, event_nwords_main, event_nwords_splitted, ECLTRG_NODE_ID, splitted_ch);
-    tot_event_nwords = event_nwords_main + event_nwords_splitted;
+    if (split_main_use == 1 && split_sub_use == 1) {
+      split_Ecltrg(sender_id, buff + NW_SEND_HEADER, valid_ch,
+                   buff_main, buff_splitted, event_nwords_main, event_nwords_splitted, ECLTRG_NODE_ID, splitted_ch);
+      tot_event_nwords = event_nwords_main + event_nwords_splitted;
+    } else if (split_main_use == 1 && split_sub_use == 0) {
+      event_nwords_main = tot_event_nwords;
+    } else if (split_main_use == 0 && split_sub_use == 1) {
+      event_nwords_splitted = tot_event_nwords;
+    } else {
+      pthread_mutex_lock(&(mtx_sender_log));
+      printf("[FATAL] thread %d : No channels are used for this PCIe40 board (ECL/ECLTRG) in %s. Please mask this readout PC with runcontrol GUI (or exclude sub-system if this is the only readout PC of the sub-system). Exiting..\n",
+             sender_id, hostnamebuf);
+      fflush(stdout);
+      pthread_mutex_unlock(&(mtx_sender_log));
+      exit(1);
+    }
+
 #endif
     unsigned int prev_exprun = exprun;
     unsigned int prev_evtnum = evtnum;
@@ -2289,11 +2314,13 @@ void* sender(void* arg)
 
 #ifdef SPLIT_ECL_ECLTRG
       if (k == 0) {
+        if (split_main_use == 0) continue;
         event_nwords = event_nwords_main;
         eve_buff = buff + NW_SEND_HEADER;
         ret = checkEventData(sender_id, eve_buff, event_nwords_main,
                              exprun, evtnum, node_id, valid_main_ch);
       } else if (k == 1) {
+        if (split_sub_use == 0) continue;
         exprun = prev_exprun;
         evtnum = prev_evtnum;
         event_nwords = event_nwords_splitted;
@@ -2337,8 +2364,10 @@ void* sender(void* arg)
 #ifdef SPLIT_ECL_ECLTRG
           int ret = 0;
           if (k == 0) {
-            memcpy(buff_splitted, eve_buff + event_nwords_main, event_nwords_splitted * sizeof(unsigned int));
-            memcpy(eve_buff + reduced_event_nwords, buff_splitted, event_nwords_splitted * sizeof(unsigned int));
+            if (event_nwords_splitted != 0) {
+              memcpy(buff_splitted, eve_buff + event_nwords_main, event_nwords_splitted * sizeof(unsigned int));
+              memcpy(eve_buff + reduced_event_nwords, buff_splitted, event_nwords_splitted * sizeof(unsigned int));
+            }
             event_nwords_main = reduced_event_nwords;
             ret = checkEventData(sender_id, eve_buff, reduced_event_nwords, exprun, evtnum, node_id, valid_main_ch);
           } else {

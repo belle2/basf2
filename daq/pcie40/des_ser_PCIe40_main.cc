@@ -110,8 +110,8 @@ using namespace std;
 #ifdef SPLIT_ECL_ECLTRG
 #define RECL3_NODEID 0x05000003
 #define ECLTRG_NODE_ID 0x13000001
-//const std::vector<int> splitted_ch {2}; // ch1 and ch23 are splitted(ECLTRG) from main(ECL) data
-const std::vector<int> splitted_ch {0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47}; // ch1 and ch23 are splitted(ECLTRG) from main(ECL) data
+const std::vector<int> splitted_ch {2}; // ch1 and ch23 are splitted(ECLTRG) from main(ECL) data
+//const std::vector<int> splitted_ch {0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47}; // ch1 and ch23 are splitted(ECLTRG) from main(ECL) data
 #endif
 
 #ifndef USE_ZMQ
@@ -2607,7 +2607,7 @@ int main(int argc, char** argv)
       }
     } else {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] This sever's hostname is not for a PCIe40 ROPC( %s ). Exiting... \n For a test bench, please use \"%s 0x%.8x\"\n",
+      printf("[FATAL] This sever's hostname is not for a PCIe40 ROPC( %s ). Exiting... For a test bench, please use \"%s 0x%.8x\"\n",
              hostnamebuf, argv[0], TESTBENCH_NODE_ID);
       pthread_mutex_unlock(&(mtx_sender_log));
       exit(1);

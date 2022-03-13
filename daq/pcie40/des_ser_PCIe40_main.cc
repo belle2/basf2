@@ -57,7 +57,7 @@
 /////////////////////////////////////////
 // Parameter for split ECL and ECLTRG data on recl3
 ////////////////////////////////////////
-//#define SPLIT_ECL_ECLTRG
+#define SPLIT_ECL_ECLTRG
 
 /////////////////////////////////////////
 // Parameter for data-contents
@@ -104,7 +104,7 @@ using namespace std;
 #ifdef SPLIT_ECL_ECLTRG
 #define RECL3_NODEID 0x05000003
 #define ECLTRG_NODE_ID 0x13000001
-std::vector<int> splitted_ch(1, 23);
+const std::vector<int> splitted_ch {1, 23}; // ch1 and ch23 are splitted(ECLTRG) from main(ECL) data
 #endif
 
 #ifndef USE_ZMQ
@@ -1863,6 +1863,7 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
 
 void split_Ecltrg(int sender_id, unsigned int* data, std::vector< int > valid_ch,
                   unsigned int* data_main, unsigned int* data_splitted,
+                  int& event_nwords_main, int& event_nwords_splitted,
                   unsigned int splitted_node_id, std::vector< int > splitted_ch)
 {
   unsigned int event_length = data[ Belle2::RawHeader_latest::POS_NWORDS ];
@@ -2003,6 +2004,8 @@ void split_Ecltrg(int sender_id, unsigned int* data, std::vector< int > valid_ch
   unsigned int eve_size_splitted = cur_pos_splitted + Belle2::RawTrailer_latest::RAWTRAILER_NWORDS;
   data_main[ Belle2::RawHeader_latest::POS_NWORDS ] = eve_size_main;
   data_splitted[ Belle2::RawHeader_latest::POS_NWORDS ] = eve_size_splitted;
+  event_nwords_main = eve_size_main;
+  event_nwords_splitted = eve_size_splitted;
 
   // Copy RawTrailer (Currently 00000000 00000000 00000000 7fff0006. So, just copy the 4 words.)
   memcpy(data_main + cur_pos_main, data + event_length - Belle2::RawTrailer_latest::RAWTRAILER_NWORDS,
@@ -2050,6 +2053,7 @@ void* sender(void* arg)
 
 #ifdef SPLIT_ECL_ECLTRG
   vector<int> valid_main_ch;
+  vector<int> valid_splitted_ch;
   unsigned int* buff_main = new unsigned int[MAX_EVENT_WORDS];
   unsigned int* buff_splitted = new unsigned int[MAX_EVENT_WORDS];
 
@@ -2064,6 +2068,8 @@ void* sender(void* arg)
     }
     if (splitted_ch_flag == 0) {
       valid_main_ch.push_back(valid_ch[k]);
+    } else {
+      valid_splitted_ch.push_back(valid_ch[k]);
     }
   }
 #endif
@@ -2195,7 +2201,7 @@ void* sender(void* arg)
 #ifndef USE_ZMQ
   int buffer_id = 0;
 #endif
-  unsigned int send_nwords = 0;
+  unsigned int event_nwords = 0;
   for (
 #ifdef MAX_EVENT
     int j = 0; j < MAX_EVENT; j++
@@ -2211,7 +2217,7 @@ void* sender(void* arg)
       zmq::message_t zevent;
       zmq_reader[sender_id]->recv(&zevent);
       memcpy(buff + NW_SEND_HEADER, zevent.data(), zevent.size());
-      send_nwords = zevent.size() / sizeof(unsigned int);
+      event_nwords = zevent.size() / sizeof(unsigned int);
     }
 #else
     // Copy data from buffer (orignal)
@@ -2224,7 +2230,7 @@ void* sender(void* arg)
       {
         pthread_mutex_lock(&(mtx1_ch[sender_id]));
         memcpy((buff + NW_SEND_HEADER) , data_1[sender_id], copy_nwords[sender_id][0] * sizeof(unsigned int));
-        send_nwords = copy_nwords[sender_id][0];
+        event_nwords = copy_nwords[sender_id][0];
         buffer_filled[sender_id][0] = 0;
         pthread_mutex_unlock(&(mtx1_ch[sender_id]));
       }
@@ -2238,7 +2244,7 @@ void* sender(void* arg)
       {
         pthread_mutex_lock(&(mtx2_ch[sender_id]));
         memcpy((buff + NW_SEND_HEADER), data_2[sender_id], copy_nwords[sender_id][1] * sizeof(unsigned int));
-        send_nwords = copy_nwords[sender_id][1];
+        event_nwords = copy_nwords[sender_id][1];
         buffer_filled[sender_id][1] = 0;
         pthread_mutex_unlock(&(mtx2_ch[sender_id]));
       }
@@ -2258,32 +2264,36 @@ void* sender(void* arg)
     unsigned int prev_exprun = exprun;
     unsigned int prev_evtnum = evtnum;
 #ifdef SPLIT_ECL_ECLTRG
+    int event_nwords_main = 0, event_nwords_splitted = 0;
     split_Ecltrg(sender_id, buff + NW_SEND_HEADER, valid_ch,
-                 buff_main, buff_splitted, ECLTRG_NODE_ID, splitted_ch);
-    unsigned int eve_size_main = *(buff + NW_SEND_HEADER + Belle2::RawHeader_latest::POS_NWORDS);
-    int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, send_nwords, exprun, evtnum,
-                             node_id, valid_main_ch, sender_id);
-    ret = checkEventData(sender_id, buff + NW_SEND_HEADER + eve_size_main, send_nwords, exprun, evtnum,
-                         node_id, splitted_ch, sender_id);
+                 buff_main, buff_splitted, event_nwords_main, event_nwords_splitted, ECLTRG_NODE_ID, splitted_ch);
+
+    int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, event_nwords_main, exprun, evtnum,
+                             node_id, valid_main_ch);
+    exprun = prev_exprun;
+    evtnum = prev_evtnum;
+
+    ret = checkEventData(sender_id, buff + NW_SEND_HEADER + event_nwords_main, event_nwords_splitted, exprun, evtnum,
+                         node_id, valid_splitted_ch);
 #else
-    int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, send_nwords, exprun, evtnum, node_id, valid_ch);
+    int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, event_nwords, exprun, evtnum, node_id, valid_ch);
 #endif
 
     if (ret != DATACHECK_OK) {
       if (ret == DATACHECK_OK_BUT_ERRFLAG_IN_HDR) {
         //        err_bad_ffaa[sender_id]++;
-        unsigned int event_nwords = 0;
+        unsigned int reduced_event_nwords = 0;
         pthread_mutex_lock(&(mtx_sender_log));
         printf("[WARNING] thread %d : fake-error events are detected. Header and trailer reduction will be made and data are checked again.\n",
                sender_id);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
-        reduceHdrTrl(buff + NW_SEND_HEADER, event_nwords);
-        send_nwords = event_nwords;
+        reduceHdrTrl(buff + NW_SEND_HEADER, reduced_event_nwords);
+        event_nwords = reduced_event_nwords;
 
         exprun = prev_exprun;
         evtnum = prev_evtnum;
-        int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, event_nwords, exprun, evtnum, node_id, valid_ch);
+        int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, reduced_event_nwords, exprun, evtnum, node_id, valid_ch);
         if (ret != DATACHECK_OK) {
           pthread_mutex_lock(&(mtx_sender_log));
           printf("[FATAL] thread %d : checkEventData() detected an error after reduceHdrTrl(). Exiting...\n", sender_id);
@@ -2294,7 +2304,7 @@ void* sender(void* arg)
         pthread_mutex_lock(&(mtx_sender_log));
         printf("[WARNING] thread %d : Data-check was passed. This event is treated as a normal event.\n", sender_id);
         //        printf("[FATAL] thread %d : Currently, we will not tolerate a fake-error event. Exiting...\n", sender_id);
-        printEventData(buff + NW_SEND_HEADER, event_nwords);
+        printEventData(buff + NW_SEND_HEADER, reduced_event_nwords);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
         //        exit(1);
@@ -2310,7 +2320,7 @@ void* sender(void* arg)
     //
     // Filling SendHeader
     //
-    buff[ 0 ] = send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER;
+    buff[ 0 ] = event_nwords + NW_SEND_HEADER + NW_SEND_TRAILER;
     buff[ 1 ] = 6;
 #ifdef SPLIT_ECL_ECLTRG
     buff[ 2 ] = 0x00010002;
@@ -2323,35 +2333,35 @@ void* sender(void* arg)
     //
     // Filling SendTrailer
     //
-    buff[ send_nwords + NW_SEND_HEADER ] = 0x0;
-    buff[ send_nwords + NW_SEND_HEADER + 1 ] = 0x7fff0007;
+    buff[ event_nwords + NW_SEND_HEADER ] = 0x0;
+    buff[ event_nwords + NW_SEND_HEADER + 1 ] = 0x7fff0007;
 
 #ifndef NOT_SEND
     ret = 0;
     int sent_bytes = 0;
     // pthread_mutex_lock(&(mtx_sender_log));
-    // printf("[DEBUG] thread %d : sent words %d + sndhdr %d + sndtrl %d\n", sender_id, send_nwords, NW_SEND_HEADER,  NW_SEND_TRAILER );
-    // printEventData( buff, send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER, sender_id);
+    // printf("[DEBUG] thread %d : sent words %d + sndhdr %d + sndtrl %d\n", sender_id, event_nwords, NW_SEND_HEADER,  NW_SEND_TRAILER );
+    // printEventData( buff, event_nwords + NW_SEND_HEADER + NW_SEND_TRAILER, sender_id);
     // pthread_mutex_unlock(&(mtx_sender_log));
 
     if (buff[ NW_SEND_HEADER + 1 ] & 0xfffff000 != 0x7f7f0000 ||
-        buff[ NW_SEND_HEADER + send_nwords - 1  ] != 0x7fff0006) {
+        buff[ NW_SEND_HEADER + event_nwords - 1  ] != 0x7fff0006) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : ERROR_EVENT : Invalid Magic word in header( 0x%.8x ) and/or trailer( 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d",
-             sender_id, buff[ NW_SEND_HEADER + 1 ], buff[ NW_SEND_HEADER + send_nwords - 1  ],
+      printf("[FATAL] thread %d : ERROR_EVENT : Invalid Magic word in header( 0x%.8x ) and/or trailer( 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d\n",
+             sender_id, buff[ NW_SEND_HEADER + 1 ], buff[ NW_SEND_HEADER + event_nwords - 1  ],
              evtnum,
              (exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
              (exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
              (exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      printEventData(buff, send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER, sender_id);
+      printEventData(buff, event_nwords + NW_SEND_HEADER + NW_SEND_TRAILER, sender_id);
       fflush(stdout);
       pthread_mutex_unlock(&(mtx_sender_log));
       exit(1);
     }
 
     while (true) {
-      if ((ret = write(fd_accept, (char*)buff + sent_bytes, (send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER)
+      if ((ret = write(fd_accept, (char*)buff + sent_bytes, (event_nwords + NW_SEND_HEADER + NW_SEND_TRAILER)
                        * sizeof(unsigned int) - sent_bytes)) <= 0) {
         if (errno == EINTR) {
           continue;
@@ -2367,10 +2377,10 @@ void* sender(void* arg)
         }
       }
       sent_bytes += ret;
-      if (sent_bytes == (int)((send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER)
+      if (sent_bytes == (int)((event_nwords + NW_SEND_HEADER + NW_SEND_TRAILER)
                               * sizeof(unsigned int))) {
         break;
-      } else if (sent_bytes > (int)((send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER)
+      } else if (sent_bytes > (int)((event_nwords + NW_SEND_HEADER + NW_SEND_TRAILER)
                                     * sizeof(unsigned int))) {
         pthread_mutex_lock(&(mtx_sender_log));
         printf("[FATAL] thread %d : Too many bytes are sent\n", sender_id);

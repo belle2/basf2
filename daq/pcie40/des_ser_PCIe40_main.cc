@@ -2285,6 +2285,7 @@ void* sender(void* arg)
       unsigned int* eve_buff = NULL;
       unsigned int event_nwords = 0;
       int ret = 0;
+
 #ifdef SPLIT_ECL_ECLTRG
       if (k == 0) {
         event_nwords = event_nwords_main;
@@ -2331,7 +2332,17 @@ void* sender(void* arg)
 
           exprun = prev_exprun;
           evtnum = prev_evtnum;
+
+#ifdef SPLIT_ECL_ECLTRG
+          int ret = 0;
+          if (k == 0) {
+            ret = checkEventData(sender_id, eve_buff, reduced_event_nwords, exprun, evtnum, node_id, valid_main_ch);
+          } else {
+            ret = checkEventData(sender_id, eve_buff, reduced_event_nwords, exprun, evtnum, node_id, valid_splitted_ch);
+          }
+#else
           int ret = checkEventData(sender_id, eve_buff, reduced_event_nwords, exprun, evtnum, node_id, valid_ch);
+#endif
           if (ret != DATACHECK_OK) {
             pthread_mutex_lock(&(mtx_sender_log));
             printf("[FATAL] thread %d : checkEventData() detected an error after reduceHdrTrl(). Exiting...\n", sender_id);
@@ -2358,8 +2369,10 @@ void* sender(void* arg)
       if (eve_buff[ 1 ]  & 0xfffff000 != 0x7f7f0000 ||
           eve_buff[ event_nwords - 1  ] != 0x7fff0006) {
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[FATAL] thread %d : ERROR_EVENT : Invalid Magic word in header( 0x%.8x ) and/or trailer( 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d\n",
-               sender_id, eve_buff[ 1 ], eve_buff[ event_nwords - 1  ],
+        printf("[FATAL] thread %d : ERROR_EVENT : Invalid Magic word in header( pos=0x%x, %.8x ) and/or trailer( pos=0x%x, 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d\n",
+               sender_id,
+               1, eve_buff[ 1 ],
+               event_nwords - 1, eve_buff[ event_nwords - 1 ],
                evtnum,
                (exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
                (exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -2402,8 +2415,9 @@ void* sender(void* arg)
     if (buff[ NW_SEND_HEADER + 1 ] & 0xfffff000 != 0x7f7f0000 ||
         buff[ NW_SEND_HEADER + tot_event_nwords - 1  ] != 0x7fff0006) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : ERROR_EVENT : Invalid Magic word in the 1st header( 0x%.8x ) and/or the last trailer( 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d",
-             sender_id, buff[ NW_SEND_HEADER + 1 ], buff[ NW_SEND_HEADER + tot_event_nwords - 1  ],
+      printf("[FATAL] thread %d : ERROR_EVENT : Invalid Magic word in the 1st header( pos=0x%x, 0x%.8x ) and/or the last trailer( pos=0x%x, 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d\n",
+             sender_id, NW_SEND_HEADER + 1, buff[ NW_SEND_HEADER + 1 ],
+             NW_SEND_HEADER + tot_event_nwords - 1, buff[ NW_SEND_HEADER + tot_event_nwords - 1 ],
              evtnum,
              (exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
              (exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,

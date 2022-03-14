@@ -8,6 +8,7 @@
 
 #pragma once
 #include <memory>
+#include <framework/utilities/CutHelpers.h>
 #include <framework/utilities/CutNodes.h>
 #include <framework/logging/Logger.h>
 
@@ -52,8 +53,6 @@ namespace Belle2 {
 
   template<class AVariableManager>
   class FunctionNode;
-
-  std::vector<std::string> splitOnDelimiterAndConserveParenthesis(std::string str, char delimiter, char open, char close);
 
   /**
    * Wrapper class for static node compile functions

@@ -172,7 +172,7 @@ int ERecoDistributor::UnConfigure(NSMmsg*, NSMcontext*)
 
 int ERecoDistributor::Start(NSMmsg*, NSMcontext*)
 {
-  //  m_rbufin->clear();
+  m_rbufin->clear();
   return 0;
 }
 

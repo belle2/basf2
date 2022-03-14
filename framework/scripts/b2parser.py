@@ -37,7 +37,7 @@ class B2ParameterLexer(Lexer):
     Lexer class responsible for changing the default scanning behavior.
     It disables token scanning and captures
     everything within the matched parenthesis.
-    Call pop_state to return to the the default scanning state.
+    Call pop_state to return to the default scanning state.
     """
     #: Single token for matching metavariable parameters
     tokens = {ARGUMENTTUPLE, }  # noqa: F821

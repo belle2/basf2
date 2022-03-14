@@ -36,7 +36,7 @@ namespace Belle2 {
   private:
 
     int m_statThreshold = 1000; /**< minimal number of events to judge */
-    double m_failureRateThreshold = 1; /**< above this rate, there is maybe a problem?*/
+    double m_failureRateThreshold = 0.01; /**< above this rate, there is maybe a problem?*/
 
     /** Monitoring Object to be produced by this module, which contain defined canvases and monitoring variables */
     MonitoringObject* m_monObj = nullptr;

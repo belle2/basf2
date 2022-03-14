@@ -12,9 +12,9 @@
 #include <string>
 
 #include <framework/logging/Logger.h>
+#include <framework/geometry/B2Vector3.h>
 
 //root
-#include <TVector3.h>
 #include <TMatrixDSym.h>
 
 namespace rave {
@@ -47,7 +47,7 @@ namespace Belle2 {
       /** Set everything up so everything needed for vertex fitting is there. Must be called before RaveVertexFitter can be used*/
       static void initialize(int verbosity = 1, double MagneticField = 1.5);
       /** The beam spot position and covariance is known you can set it here so that and a vertex in the beam spot should be fitted you can set it here */
-      void setBeamSpot(const TVector3& beamSpot, const TMatrixDSym& beamSpotCov);
+      void setBeamSpot(const B2Vector3D& beamSpot, const TMatrixDSym& beamSpotCov);
       /** unset beam spot constraint */
       void unsetBeamSpot();
 
@@ -66,7 +66,7 @@ namespace Belle2 {
       ~RaveSetup();
 
       bool m_useBeamSpot; /**< flag determines if beam spot information should be used for vertex fit. Can be overruled by individual fits in RaveVertexFitter */
-      TVector3 m_beamSpot; /**< beam spot position. Can be used as additional information by RaveVertexFitter */
+      B2Vector3D m_beamSpot; /**< beam spot position. Can be used as additional information by RaveVertexFitter */
       TMatrixDSym m_beamSpotCov; /**< beam spot position covariance matrix. Can be used as additional information by RaveVertexFitter */
 
       rave::VertexFactory*

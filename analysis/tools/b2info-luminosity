@@ -12,6 +12,7 @@
 Script to get the integrated luminosity of a set of runs
 """
 
+
 import argparse
 import getpass
 import re
@@ -25,6 +26,7 @@ import pandas as pd
 import numpy as np
 
 import requests
+import math
 
 
 def parseNumRange(string):
@@ -48,17 +50,6 @@ def parseNumList(string):
         result |= parseNumRange(rr)
 
     return sorted(list(result))
-
-def fill_zeros_with_last(arr):
-    """
-    fill the zeros and nan of an array with previous non zero value
-    """
-    prev = np.arange(len(arr))
-    prev[arr == 0] = 0
-    prev[arr == np.nan] = 0
-    prev = np.maximum.accumulate(prev)
-    return arr[prev]
-
 
 def argparser():
     """
@@ -108,9 +99,9 @@ def argparser():
     parser.add_argument("--beam-energy",
                         dest="beam_energy",
                         action="store",
-                        choices=[None, '4S','4S_offres','4S_scan'],
+                        choices=[None, '4S','4S_offres','4S_scan', '5S_scan'],
                         default=None,
-                        help="Consider only runs with given beam energy None(default)/4S/4S_offres/4S_scan")
+                        help="Consider only runs with given beam energy None(default)/4S/4S_offres/4S_scan/5S_scan")
     parser.add_argument("--dbonline",
                         dest="dbonline",
                         action="store",
@@ -185,6 +176,7 @@ class Luminosity:
         nAllRuns = len(self.df)
         if (args.good):
             self.df = self.df[self.df['quality']]
+            df['intLumi'] = self.df['lumi'].cumsum()
             b2.B2INFO(f"Selecting good runs: Good/Total: {len(self.df)}/{nAllRuns}")
         else:
             b2.B2INFO(f"No Selection on good runs (use --good)")
@@ -192,6 +184,7 @@ class Luminosity:
         self.beam_energy = args.beam_energy
         if (args.beam_energy):
             self.df = self.df[self.df['beam_energy']==args.beam_energy]
+            self.df['intLumi'] = self.df['lumi'].cumsum()
             b2.B2INFO(f"Selecting beam-energy {args.beam_energy}/Total= {len(self.df)}/{nAllRuns}")
         else:
             b2.B2INFO(f"No Selection on beam-energy (use --beam-energy XX)")
@@ -352,16 +345,32 @@ class Luminosity:
             row["quality"] = quality & noEvents
 
             # beam energy
+            be_ranges = { 
+                '3S_offres' : (10.290, 10.310),
+                '3S': (10.35 ,10.370),
+                '4S_scan' : (10.370, 10.525),
+                '4S_offres' : (10.525, 10.535),
+                '4S': (10.58, 10.595), 
+                '5S_scan' : (10.595, 10.820),
+                '5S_offres' : (10.820, 10.855),
+                '5S': (10.855, 10.865), 
+            }
+
             beam_energy = "NotDef"
             try:
-                if run["ler"]["momentum"] >= 4.0 and run["her"]["momentum"] >= 7.0:
-                    beam_energy = "4S"
-                else:
-                    beam_energy = "4S_offres"
+                LER = run["ler"]["momentum"]
+                HER = run["her"]["momentum"]
+                be = math.sqrt(4*LER*HER)
+                for tag,rr in be_ranges.items():
+                    if rr[0] < be < rr[1]:
+                        beam_energy = tag
+                        break
+                if beam_energy == "NotDef":
+                    b2.B2WARNING(f"Beam energy not in any known range {run['experiment']}/{run['run']} BeamEnergy: {be}.")
+        
             except:
                 b2.B2WARNING(f"Beam energy not set in RunDB for exp/run {run['experiment']}/{run['run']}.")
             row["beam_energy"] = beam_energy
-
             rows.append(row)
 
         df = pd.DataFrame(rows,columns=columns)
@@ -508,7 +517,7 @@ class Luminosity:
         cols=['exp','run','lumi','date','length','intLumi','intLumiDel','quality','beam_energy']
         dfRuns['length'] = dfRuns['date_stop'] - dfRuns['date']
         dfRuns['date'].fillna(pd.Timedelta(seconds=0))
-        dfRuns = dfRuns[dfRuns['date']>0]
+        #dfRuns = dfRuns[dfRuns['date']>0]
         if (self.verb):
             print('-' * 100)
             print('-' * 40,f"{self.what} Luminosity",'-'*41)

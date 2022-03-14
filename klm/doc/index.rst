@@ -23,7 +23,7 @@ This is a list of the ``klm`` modules. Some modules (in the ``klm/bklm`` and ``k
 Clusterization
 --------------
 
-Few words about how a ``KLMCluster`` is built starting from ``BKLMHit2d`` and ``EKLMHit2d`` are more than desirable.
+Few words about how a ``KLMCluster`` is built starting from ``KLMHit2d`` are more than desirable.
 
 
 Muon identification

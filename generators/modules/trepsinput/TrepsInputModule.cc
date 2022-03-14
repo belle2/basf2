@@ -130,7 +130,7 @@ void TrepsInputModule::event()
     for (int i = 0; i < m_generator.npart ; i++) {
       auto& p = m_mpg.addParticle();
       p.setPDG(part[i].part_prop.icode);
-      p.set4Vector(part[i].p);
+      p.set4Vector(ROOT::Math::PxPyPzEVector(part[i].p.Px(), part[i].p.Py(), part[i].p.Pz(), part[i].p.E()));
       p.setMass(part[i].part_prop.pmass);
       p.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
       p.setProductionVertex(vertex);
@@ -139,7 +139,7 @@ void TrepsInputModule::event()
     // fill data of the recoil electron and positron
     auto& p1 = m_mpg.addParticle();
     p1.setPDG(11);
-    p1.set4Vector(m_generator.pe);
+    p1.set4Vector(ROOT::Math::PxPyPzEVector(m_generator.pe.Px(), m_generator.pe.Py(), m_generator.pe.Pz(), m_generator.pe.E()));
     p1.setMass(m_generator.me);
     p1.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
     p1.setProductionVertex(vertex);
@@ -147,7 +147,7 @@ void TrepsInputModule::event()
 
     auto& p2 = m_mpg.addParticle();
     p2.setPDG(-11);
-    p2.set4Vector(m_generator.pp);
+    p2.set4Vector(ROOT::Math::PxPyPzEVector(m_generator.pp.Px(), m_generator.pp.Py(), m_generator.pp.Pz(), m_generator.pp.E()));
     p2.setMass(m_generator.me);
     p2.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
     p2.setProductionVertex(vertex);
@@ -227,12 +227,11 @@ void TrepsInputModule::initializeGenerator()
   m_generator.applyTransverseMomentumCutCharged(m_applyTransverseMomentumCutCharged);
 
   // Initialize the initial particle information
-  TVector3 p3;
   const BeamParameters& nominalBeam = m_initial.getBeamParameters();
   m_generator.setBeamEnergy(nominalBeam.getMass() / 2.);
-  p3 = nominalBeam.getHER().Vect();
+  B2Vector3D p3 = nominalBeam.getHER().Vect();
   m_generator.setElectronMomentum(p3);
-  p3 = nominalBeam.getLER().Vect();
+  p3 = B2Vector3D(nominalBeam.getLER().Vect());
   m_generator.setPositronMomentum(p3);
 
   // Initialize generator;

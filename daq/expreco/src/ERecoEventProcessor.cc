@@ -198,6 +198,11 @@ int ERecoEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
 
 int ERecoEventProcessor::Start(NSMmsg* nsmm, NSMcontext* /*nsmc*/)
 {
+  // Clear DQM histogram memory
+  char cmdline[] = "hsendcommand DQMRC:CLEAR localhost 10391";
+  system(cmdline);
+  printf("ERecoEventProcessor : DQM TMemFile cleared\n");
+
   string rbufin = string(m_conf->getconf("system", "unitname")) + ":" +
                   string(m_conf->getconf("processor", "ringbufin"));
   string rbufout = string(m_conf->getconf("system", "unitname")) + ":" +

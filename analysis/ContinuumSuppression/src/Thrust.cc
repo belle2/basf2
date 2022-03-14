@@ -28,11 +28,8 @@
 
 
 /* ******************** NOTES ******************** *
- * INPUT : std::vector<TVector3> : momenta         *
- * OUTPUT: TVector3              : thrust axis     *
- *                                                 *
- * = and /= operators not defined for TVector3 obj *
- * [ TVector3 x *= 1 / scalar ] better alternative *
+ * INPUT : std::vector<XYZVector> : momenta        *
+ * OUTPUT: XYZVector              : thrust axis    *
  *                                                 *
  * Thrust Axis defined as:                         *
  *    thrust_axis = ( vec{n} ÷ ||n|| ) * thrust    *
@@ -69,13 +66,13 @@
 #include <analysis/ContinuumSuppression/Thrust.h>
 
 using namespace Belle2;
+using namespace ROOT::Math;
 
-
-TVector3 Thrust::calculateThrust(const std::vector<TVector3>& momenta)
+XYZVector Thrust::calculateThrust(const std::vector<XYZVector>& momenta)
 {
 
   /* STEP 1: Initialization of Variables */
-  TVector3 thrust_axis, trial_axis, base_axis;
+  XYZVector thrust_axis, trial_axis, base_axis;
   auto end = momenta.end();
   auto begin = momenta.begin();
   decltype(begin) itr;
@@ -88,7 +85,7 @@ TVector3 Thrust::calculateThrust(const std::vector<TVector3>& momenta)
   */
 
   for (auto const& momentum : momenta)
-    sum_magnitude_mom += momentum.Mag();
+    sum_magnitude_mom += momentum.R();
 
   /*
     STEP 3: For each momentum in momenta vector,
@@ -97,10 +94,10 @@ TVector3 Thrust::calculateThrust(const std::vector<TVector3>& momenta)
 
   for (auto const& mom : momenta) {
     // By convention, thrust axis in same direction as Z axis
-    trial_axis = (mom.z() >= 0.) ? TVector3(mom) : TVector3(-mom);
+    trial_axis = (mom.z() >= 0.) ? XYZVector(mom) : XYZVector(-mom);
 
     // Normalize if magnitude != 0
-    if (trial_axis.Mag() != 0.) trial_axis *= 1. / trial_axis.Mag();
+    trial_axis = trial_axis.Unit();
 
     /*
       STEP 4: Store the previous trial axis as a base axis and initialize
@@ -110,12 +107,12 @@ TVector3 Thrust::calculateThrust(const std::vector<TVector3>& momenta)
     itr = begin;
     while (itr != end) {
       base_axis = trial_axis;
-      trial_axis = TVector3();
+      trial_axis = XYZVector();
 
       // Z-alignment of momenta and addition to trial axis
       for (auto const& momentum : momenta)
         trial_axis += (momentum.Dot(base_axis) >= 0.) ? \
-                      TVector3(momentum) : TVector3(-momentum);
+                      XYZVector(momentum) : XYZVector(-momentum);
 
       /*
         STEP 5: Check ( p_i · trial_axis ) * ( p_i · base_axis ) < 0 ∀ p_i
@@ -133,8 +130,8 @@ TVector3 Thrust::calculateThrust(const std::vector<TVector3>& momenta)
       */
     }
 
-    double trial_mag(trial_axis.Mag()); // pre-compute
-    // trial_axis *= (1. / trial_axis.Mag());
+    double trial_mag(trial_axis.R()); // pre-compute
+    // trial_axis = trial_axis.Unit();
 
     /*
       STEP 7: Compute the thrust associated to the selected trial axis
@@ -154,7 +151,7 @@ TVector3 Thrust::calculateThrust(const std::vector<TVector3>& momenta)
     */
     if (trial_thrust > thrust) {
       thrust = trial_thrust;
-      thrust_axis = trial_axis * (1. / trial_mag);
+      thrust_axis = trial_axis / trial_mag;
       // thrust_axis = trial_axis;
     }
 

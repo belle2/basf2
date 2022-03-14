@@ -16,11 +16,11 @@ namespace Belle2 {
   /**
    * This dataobject is used only for EKLM alignment. The alignable hits must
    * correspond to only one alignable detector element (EKLM sector in this
-   * case). However, the hit EKLMHit2d corresponds to two sectors. Thus, it is
+   * case). However, the hit KLMHit2d corresponds to two sectors. Thus, it is
    * not directly usable for alignment. Instead, a new StoreArray of
-   * EKLMAlignmentHit is created with 2 entries per each EKLMHit2d. The object
+   * EKLMAlignmentHit is created with 2 entries per each KLMHit2d. The object
    * EKLMAlignmentHit itself does not contain any data except the digit
-   * identifier but has a relation to its EKLMHit2d.
+   * identifier but has a relation to its KLMHit2d.
    */
   class EKLMAlignmentHit : public RelationsObject {
 
@@ -53,7 +53,7 @@ namespace Belle2 {
   private:
 
     /**
-     * Digit identifier (index of digit related to the related EKLMHit2d,
+     * Digit identifier (index of digit related to the related KLMHit2d,
      * 0 or 1).
      */
     int m_DigitIdentifier;

@@ -152,5 +152,8 @@ FAQ
 
 
 
-.. include:: B2BIIModules.rst
+b2bii functions
+===============
+
+.. toctree:: B2BIIModules.rst
 

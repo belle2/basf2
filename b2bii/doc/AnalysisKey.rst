@@ -115,6 +115,7 @@ If you'd like to add the information for proton efficiency selected
 with ``atcPIDBelle(4, 2)>0.6`` and ``atcPIDBelle(4, 3)>0.6``.
 
 .. code-block:: python3
+
    pid_table = "BellePIDPlus_0.6"
 
    va.variables.addAlias("PID_eff_data", 'extraInfo('+pid_table+"_eff_data)")
@@ -132,5 +133,46 @@ with ``atcPIDBelle(4, 2)>0.6`` and ``atcPIDBelle(4, 3)>0.6``.
    reweighter3.param('tableName', pid_table)
    reweighter3.param('particleList', 'pi+:all')
    my_path.add_module(reweighter3)
+
+
+-------------------------
+Full Event Interpretation
+-------------------------
+
+To utilize FEI, the correct prefix of FEI payloads needs to be set:
+
+.. code-block:: python3
+
+   import fei
+   configuration = fei.config.FeiConfiguration(prefix='FEI_B2BII_light-2012-minos',
+                                            training=False, monitor=False, cache=0)
+
+   feistate = fei.get_path(particles, configuration)
+
+   path.add_path(feistate.path)
+
+
+For more details please see `B_converted_apply.py`
+
+
+--------------
+Flavour Tagger
+--------------
+
+To apply flavour tagger in a b2bii analysis, one will need to append the
+correct global tag.
+FlavorTagger will call the corresponding payloads in the module.
+
+.. code-block:: python3
+
+   import flavorTagger as ft
+
+   # Flavour Tagger
+   weightfiles = 'B2nunubarBGx1'
+   basf2.conditions.append_globaltag("analysis_tools_light-2012-minos")
+   ft.flavorTagger(
+       particleLists=['B+:sig'],
+       weightFiles=weightfiles,
+       path=my_path)
 
 

@@ -10,7 +10,10 @@ from sly import Lexer, Parser
 
 
 def findMatchedParenthesis(string: str, openchar: str, closechar: str) -> int:
-    """Find matching control token in string.
+    """
+    Finds matching control token in string and returns the offset.
+    The string's first character must match openchar.
+    Otherwise, 0 is returned.
 
     Args:
         string (str): input

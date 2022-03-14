@@ -125,12 +125,12 @@ namespace Belle2 {
 
     // control histograms
     m_hits1D = TH1F("numHits", "Number of photons per slot",
-                    c_numModules, 0.5, c_numModules + 0.5);
+                    c_numModules, 0.5, static_cast<float>(c_numModules) + 0.5);
     m_hits1D.SetXTitle("slot number");
     m_hits1D.SetYTitle("hits per slot");
 
     m_hits2D = TH2F("timeHits", "Photon times vs. boardstacks",
-                    c_numModules * 4, 0.5, c_numModules + 0.5, 200, 0.0, 20.0);
+                    c_numModules * 4, 0.5, static_cast<float>(c_numModules) + 0.5, 200, 0.0, 20.0);
     m_hits2D.SetXTitle("slot number");
     m_hits2D.SetYTitle("time [ns]");
 

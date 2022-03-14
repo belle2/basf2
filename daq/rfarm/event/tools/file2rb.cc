@@ -43,17 +43,16 @@ int main(int argc, char** argv)
   if (is <= 0) exit(-1);
 
   for (;;) {
-    int is = file->read(evbuf, MAXEVTSIZE);
-    if (is <= 0) break;
-    if (is > MAXEVTSIZE) {
-      printf("Event size too large : %d\n", is);
+    int isN = file->read(evbuf, MAXEVTSIZE);
+    if (isN <= 0) break;
+    if (isN > MAXEVTSIZE) {
+      printf("Event size too large : %d\n", isN);
       continue;
     }
 
     // Put the message in ring buffer
-    int irb = 0;
     for (;;) {
-      irb = rbuf->insq((int*)evbuf, (is - 1) / 4 + 1);
+      int irb = rbuf->insq((int*)evbuf, (isN - 1) / 4 + 1);
       if (irb >= 0) break;
       //      usleep(100);
       usleep(20);

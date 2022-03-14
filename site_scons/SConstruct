@@ -105,7 +105,7 @@ global_env = Environment(
     # for now, add the include folder here, as the path set via
     # CPPPATH below seems to be ignored for C file compiles
     CCFLAGS=['-Wall', '-isystem$EXTINCDIR', '-Iinclude/'],
-    CXXFLAGS=['-std=c++17'],
+    CXXFLAGS=['-std=c++20'],
     FORTRANFLAGS=['-std=legacy'],
     FORTRANMODDIR=os.path.join('$INCDIR', 'fortran_modules'),
     # disable warnings when compiling dictionaries, too much root problems
@@ -223,10 +223,7 @@ elif option == 'clang':
     if not clang_dir:
         print('clang compiler not found.')
         Exit(1)
-    # clang has trouble with c-files under SL5 due to a problem with the glibc.
-    # https://llvm.org/bugs/show_bug.cgi?id=5960
-    # So we compile c files with gcc and only c++ with clang for now
-    # global_env['CC'] = 'clang'
+    global_env['CC'] = 'clang'
     global_env['CXX'] = 'clang++'
     # enable a few extra warnings warnings but disable the missing braces warning, because it can lead
     # to false positives in conjuction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629

@@ -12,31 +12,31 @@
 #include <CLHEP/Geometry/Point3D.h>
 #include <CLHEP/Matrix/SymMatrix.h>
 #include <CLHEP/Vector/LorentzVector.h>
-#include <TLorentzVector.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 #include <TMatrixFSym.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 
   namespace CLHEPToROOT {
 
     /**
-     * Convert CLHEP::HepLorentzVector to TLorentzVector.
+     * Convert CLHEP::HepLorentzVector to PxPyPzEVector.
      * @param[in] vector Vector.
      */
-    inline TLorentzVector
-    getTLorentzVector(const CLHEP::HepLorentzVector& vector)
+    inline ROOT::Math::PxPyPzEVector
+    getLorentzVector(const CLHEP::HepLorentzVector& vector)
     {
-      return TLorentzVector(vector.x(), vector.y(), vector.z(), vector.t());
+      return ROOT::Math::PxPyPzEVector(vector.x(), vector.y(), vector.z(), vector.t());
     }
 
     /**
-     * Convert HepGeom::Point3D<double> to TVector3.
+     * Convert HepGeom::Point3D<double> to XYZVector.
      * @param[in] point Point.
      */
-    inline TVector3 getTVector3(const HepGeom::Point3D<double>& point)
+    inline ROOT::Math::XYZVector getXYZVector(const HepGeom::Point3D<double>& point)
     {
-      return TVector3(point.x(), point.y(), point.z());
+      return ROOT::Math::XYZVector(point.x(), point.y(), point.z());
     }
 
     /**

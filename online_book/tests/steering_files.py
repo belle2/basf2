@@ -153,9 +153,8 @@ class SteeringFileTest(unittest.TestCase):
         working_dir = find_file(shutil.copytree(original_dir, "working_dir"))
         _permission_report(working_dir)
         # Add write permissions for user to this directory
-        # import stat
-        # os.chmod(working_dir, stat.S_IRUSR)
-        # _permission_report(working_dir)
+        os.chmod(working_dir, 0o744)
+        _permission_report(working_dir)
         all_egs = sorted(glob.glob(working_dir + "/*.py"))
         for eg in all_egs:
             filename = os.path.basename(eg)

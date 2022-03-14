@@ -55,7 +55,7 @@ main = basf2.create_path()
 main.add_module("EventInfoSetter", evtNumList=[1000], runList=[1])
 
 # Fixed random seed.
-basf2.set_random_seed("P1s@Merd@")
+basf2.set_random_seed("Pe@ce&Love")
 
 # Single particle generator settings.
 pGun = basf2.register_module("ParticleGun")

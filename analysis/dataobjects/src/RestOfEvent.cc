@@ -19,8 +19,6 @@
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
-#include <TLorentzVector.h>
-
 using namespace Belle2;
 // New methods:
 void RestOfEvent::addParticles(const std::vector<const Particle*>& particlesToAdd)
@@ -305,9 +303,9 @@ bool RestOfEvent::hasMask(const std::string& name) const
   }
   return false;
 }
-TLorentzVector RestOfEvent::get4Vector(const std::string& maskName) const
+ROOT::Math::PxPyPzEVector RestOfEvent::get4Vector(const std::string& maskName) const
 {
-  TLorentzVector roe4Vector;
+  ROOT::Math::PxPyPzEVector roe4Vector;
   std::vector<const Particle*> myParticles = RestOfEvent::getParticles(maskName);
   for (const Particle* particle : myParticles) {
     // KLMClusters are discarded, because KLM energy estimation is based on hit numbers, therefore it is unreliable
@@ -355,10 +353,10 @@ int RestOfEvent::getNKLMClusters(const std::string& maskName) const
   return nROEKLMClusters;
 }
 
-TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& maskName) const
+ROOT::Math::PxPyPzEVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& maskName) const
 {
   auto roeClusters = getPhotons(maskName);
-  TLorentzVector roe4VectorECLClusters;
+  ROOT::Math::PxPyPzEVector roe4VectorECLClusters;
 
   // Add all momenta from neutral ECLClusters which have the nPhotons hypothesis
   for (auto& roeCluster : roeClusters) {

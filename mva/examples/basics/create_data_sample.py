@@ -27,7 +27,7 @@ variables = ['p', 'pt', 'pz', 'phi',
              'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
              'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
              'daughter(2, daughter(0, minC2TDist))', 'daughter(2, daughter(1, minC2TDist))',
-             'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
+             'daughterInvM(0, 1)', 'daughterInvM(0, 2)', 'daughterInvM(1, 2)']
 spectators = ['isSignal', 'M']
 
 

@@ -38,13 +38,20 @@ namespace Belle2 {
 
 
   private:
+
     /**
-     *Initializes the Module.
+     * Initializes the Module.
      */
     void initialize() override final;
 
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override final;
 
+    /**
+     * This method is called for each event.
+     */
     void event() override final;
 
     /**

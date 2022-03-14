@@ -176,7 +176,7 @@ void eclLeakageCollectorModule::collect()
   //..Generated MC particle (always the first entry in the list)
   double mcLabE = m_mcParticleArray[0]->getEnergy();
   TVector3 mcp3 = m_mcParticleArray[0]->getMomentum();
-  TVector3 vertex = m_mcParticleArray[0]->getProductionVertex();
+  B2Vector3D vertex = m_mcParticleArray[0]->getProductionVertex();
 
   //-----------------------------------------------------------------
   //..Find the shower closest to the MC true angle

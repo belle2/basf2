@@ -128,8 +128,8 @@ namespace Belle2 {
     int getDate() const { return m_date; }
 
   public:
-    virtual void readObject(Reader&);
-    virtual void writeObject(Writer&) const;
+    void readObject(Reader&) override;
+    void writeObject(Writer&) const override;
 
   public:
     void copy(const std::string& name, Type type, int len,

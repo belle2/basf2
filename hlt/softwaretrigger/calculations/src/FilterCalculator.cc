@@ -8,7 +8,8 @@
 #include <hlt/softwaretrigger/calculations/FilterCalculator.h>
 #include <hlt/softwaretrigger/calculations/utilities.h>
 
-#include <TLorentzVector.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
@@ -34,9 +35,9 @@ struct MaximumPtTrack {
   /// the momentum magnitude in lab system
   double pLab = NAN;
   /// the 4 momentum in CMS system
-  TLorentzVector p4CMS;
+  ROOT::Math::PxPyPzEVector p4CMS;
   /// the 4 momentum in lab system
-  TLorentzVector p4Lab;
+  ROOT::Math::PxPyPzEVector p4Lab;
 };
 
 /// Temporary data structure holding the ECL clusters used for this analysis
@@ -48,9 +49,9 @@ struct SelectedECLCluster {
   /// the energy in Lab system
   double energyLab = NAN;
   /// the 4 momentum in CMS system
-  TLorentzVector p4CMS;
+  ROOT::Math::PxPyPzEVector p4CMS;
   /// the 4 momentum in lab system
-  TLorentzVector p4Lab;
+  ROOT::Math::PxPyPzEVector p4Lab;
   /// is this ECL cluster likely from a track (or a photon) = is it charged?
   bool isTrack = false;
   /// the time of the cluster
@@ -200,9 +201,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   // Some utilities
   // TODO: into constructor
   ClusterUtils cUtil;
-  const TVector3 clustervertex = cUtil.GetIPPosition();
+  const ROOT::Math::XYZVector clustervertex = cUtil.GetIPPosition();
   PCmsLabTransform boostrotate;
-  TLorentzVector p4ofCOM;
+  ROOT::Math::PxPyPzEVector p4ofCOM;
   p4ofCOM.SetPxPyPzE(0, 0, 0, boostrotate.getCMSEnergy());
 
   // Pointers to the two tracks with the maximum pt
@@ -240,9 +241,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       continue;
     }
 
-    const TLorentzVector& momentumLab = trackFitResult->get4Momentum();
-    const TLorentzVector momentumCMS = boostrotate.rotateLabToCms() * momentumLab;
-    double pCMS = momentumCMS.Rho();
+    const ROOT::Math::PxPyPzEVector& momentumLab = trackFitResult->get4Momentum();
+    const ROOT::Math::PxPyPzEVector momentumCMS = boostrotate.rotateLabToCms() * momentumLab;
+    double pCMS = momentumCMS.P();
 
     // Find the maximum pt negative [0] and positive [1] tracks without z0 cut
     const double pT = trackFitResult->getTransverseMomentum();
@@ -252,7 +253,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       newMaximum.pT = pT;
       newMaximum.track = &track;
       newMaximum.pCMS = pCMS;
-      newMaximum.pLab = momentumLab.Rho();
+      newMaximum.pLab = momentumLab.P();
       newMaximum.p4CMS = momentumCMS;
       newMaximum.p4Lab = momentumLab;
       maximumPtTracksWithoutZCut[charge] = newMaximum;
@@ -275,7 +276,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
         newMaximum.pT = pTLoose;
         newMaximum.track = &track;
         newMaximum.pCMS = pCMS;
-        newMaximum.pLab = momentumLab.Rho();
+        newMaximum.pLab = momentumLab.P();
         newMaximum.p4CMS = momentumCMS;
         newMaximum.p4Lab = momentumLab;
         maximumPtTracks[charge] = newMaximum;
@@ -502,11 +503,11 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     }
 
     // eeee, eemm, mu mu, and radiative Bhabha selection
-    const TLorentzVector p4Miss = p4ofCOM - negativeTrack.p4CMS - positiveTrack.p4CMS;
+    const ROOT::Math::PxPyPzEVector p4Miss = p4ofCOM - negativeTrack.p4CMS - positiveTrack.p4CMS;
     const double pmissTheta = p4Miss.Theta() * TMath::RadToDeg();
-    const double pmissp = p4Miss.Rho();
-    const double relMissAngle0 = negativeTrack.p4CMS.Angle(p4Miss.Vect()) * TMath::RadToDeg();
-    const double relMissAngle1 = positiveTrack.p4CMS.Angle(p4Miss.Vect()) * TMath::RadToDeg();
+    const double pmissp = p4Miss.P();
+    const double relMissAngle0 = B2Vector3D(negativeTrack.p4CMS.Vect()).Angle(B2Vector3D(p4Miss.Vect())) * TMath::RadToDeg();
+    const double relMissAngle1 = B2Vector3D(positiveTrack.p4CMS.Vect()).Angle(B2Vector3D(p4Miss.Vect())) * TMath::RadToDeg();
 
     const bool electronEP = positiveClusterSum > 0.8 * positiveP or negativeClusterSum > 0.8 * negativeP;
     const bool notMuonPair = negativeClusterSumLab > 1 or positiveClusterSumLab > 1;
@@ -727,8 +728,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       const auto& firstCluster = selectedSingleTagClusters[0];
       const auto& secondCluster = selectedSingleTagClusters[1];
 
-      const TLorentzVector trackP4CMS = track.p4CMS;
-      const TLorentzVector pi0P4CMS = firstCluster.p4CMS + secondCluster.p4CMS;
+      const ROOT::Math::PxPyPzEVector trackP4CMS = track.p4CMS;
+      const ROOT::Math::PxPyPzEVector pi0P4CMS = firstCluster.p4CMS + secondCluster.p4CMS;
 
       const bool passPi0ECMS = pi0P4CMS.E() > 1. and pi0P4CMS.E() < 0.525 * p4ofCOM.M();
       const double thetaSumCMS = (pi0P4CMS.Theta() + trackP4CMS.Theta()) * TMath::RadToDeg();
@@ -770,8 +771,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       const double maxClusterENeg = std::accumulate(clustersOfNegTrack.begin(), clustersOfNegTrack.end(), 0.0, accumulatePhotonEnergy);
       const double maxClusterEPos = std::accumulate(clustersOfPosTrack.begin(), clustersOfPosTrack.end(), 0.0, accumulatePhotonEnergy);
 
-      const TLorentzVector& momentumLabNeg(negTrack->p4Lab);
-      const TLorentzVector& momentumLabPos(posTrack->p4Lab);
+      const ROOT::Math::PxPyPzEVector& momentumLabNeg(negTrack->p4Lab);
+      const ROOT::Math::PxPyPzEVector& momentumLabPos(posTrack->p4Lab);
 
       const double& z0Neg = negTrack->track->getTrackFitResultWithClosestMass(Const::pion)->getZ0();
       const double& d0Neg = negTrack->track->getTrackFitResultWithClosestMass(Const::pion)->getD0();

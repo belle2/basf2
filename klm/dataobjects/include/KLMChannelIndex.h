@@ -218,12 +218,12 @@ namespace Belle2 {
     /**
      * Operator ==.
      */
-    bool operator==(const KLMChannelIndex& index);
+    bool operator==(const KLMChannelIndex& index) const;
 
     /**
      * Operator !=.
      */
-    bool operator!=(const KLMChannelIndex& index);
+    bool operator!=(const KLMChannelIndex& index) const;
 
     /**
      * Operator *.

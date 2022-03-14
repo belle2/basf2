@@ -197,9 +197,9 @@ namespace Belle2 {
      */
     unsigned m_qualityvector;
     /** unpacked etf time from the unpacker */
-    int m_etf_unpacked;
+    int m_etf_unpacked{0};
     /** etf time recalculated from the hw input */
-    int m_etf_recalced;
+    int m_etf_recalced{0};
     /** chi2 value from 2D fitter */
     bool m_hasETFTime{0};
     /** values to store the raw network and 2dfinder output */

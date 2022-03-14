@@ -124,7 +124,7 @@ void BabayagaNLOInputModule::event()
   double ecm = initial.getMass();
 
   // true boost (per event!)
-  TLorentzRotation boost = initial.getCMSToLab();
+  ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
   // vertex
   TVector3 vertex = initial.getVertex();

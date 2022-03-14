@@ -355,8 +355,8 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int 
 {
 
   int n = 0;
-  int read_size = 0;
   while (1) {
+    int read_size = 0;
     if ((read_size = read(fd, (char*)buf + n, data_size_byte - n)) < 0) {
       if (errno == EINTR) {
         continue;
@@ -499,7 +499,6 @@ void DeSerializerCOPPERModule::event()
   }
 
 
-  RawDataBlock* temp_rawdblk;
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_COPPER; j++) {
     int m_size_word = 0;
     int delete_flag = 0;
@@ -531,7 +530,7 @@ void DeSerializerCOPPERModule::event()
 
     const int num_nodes = 1;
     const int num_events = 1;
-    temp_rawdblk =  raw_dblkarray.appendNew();
+    RawDataBlock* temp_rawdblk =  raw_dblkarray.appendNew();
     temp_rawdblk->SetBuffer(temp_buf, m_size_word, delete_flag, num_events, num_nodes);
     // Fill Header and Trailer
 

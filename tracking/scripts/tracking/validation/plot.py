@@ -769,6 +769,8 @@ class ValidationPlot(object):
 
             # always disable ROOT's stat plot because it hides items
             meta_options = ["nostats"]
+            # try if Kolmogorov test is more stable than default chi2 test
+            meta_options.append("kolmogorov")
 
             # add expert option, if requested
             if self.is_expert:

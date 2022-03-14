@@ -232,24 +232,41 @@ class DefaultModel(tf.Module):
         "param smooth_cross_entropy:
         """
 
+        # mlp net
         self.mlp = mlp
 
         if wd_coeffs is not None:
             assert len(wd_coeffs) == len(mlp.layers)
+
+        #: weight decay coefficients
         self.wd_coeffs = wd_coeffs
 
+        #: global step
         self.global_step = tf.Variable(0, trainable=False, name='global_step', dtype=tf.int64)
 
-        # optimizer params
+        # --optimizer params--
+        #: initial momentum
         self.c_mom_init = tf.constant(mom_init, dtype=tf.float32)
+
+        #: maximum momentum
         self.c_mom_max = tf.constant(mom_max, dtype=tf.float32)
+
+        #: momentum epochs
         self.c_mom_epochs = tf.constant(mom_epochs, dtype=tf.float32)
+
+        #: momentum decay rate
         self.c_mom_dec_rate = (self.c_mom_max - self.c_mom_init) / tf.cast(self.c_mom_epochs, tf.float32)
 
+        #: initial learning rate
         self.c_lr_init = tf.constant(lr_init, dtype=tf.float32)
+
+        #: minimum learning rate
         self.c_lr_min = tf.constant(lr_min, dtype=tf.float32)
+
+        #: learning rate decay rate
         self.c_lr_dec_rate = tf.constant(lr_dec_rate, dtype=tf.float32)
 
+        #: number of epochs without improvement for early termination
         self.c_stop_epochs = stop_epochs
 
         #: use staircase
@@ -270,6 +287,8 @@ class DefaultModel(tf.Module):
         # termination criterion
         #: min epochs
         self.min_epochs = min_epochs
+
+        #: max epochs
         self.max_epochs = max_epochs
 
         #: termination criterion
@@ -448,15 +467,29 @@ class Trainer:
         :param monitoring_size: int, number of events of training fraction used for monitoring
         """
 
+        # current time
         self._time = time.time()
+
+        # model
         self.model = model
+
+        # dataset
         self.data_set = data_set
         self.model.initialize(data_set)
+
+        # monitoring size
         self.monitoring_size = monitoring_size
+
+        # log dir
         self.log_dir = log_dir
+
+        # termination criterion
         self.termination_criterion = self.model.termination_criterion
 
+        # initialise current epoch
         self.current_epoch = 0
+
+        # initialise best epoch
         self.best_epoch = -np.inf
 
         if log_dir is not None:
@@ -494,7 +527,10 @@ class Trainer:
         log_dir_train = os.path.join(log_dir, 'train')
         log_dir_valid = os.path.join(log_dir, 'valid')
 
+        #: tf.summary.writer for training
         self.train_writer = tf.summary.create_file_writer(log_dir_train)
+
+        #: tf.summary.writer for validation
         self.valid_writer = tf.summary.create_file_writer(log_dir_valid)
         return
 
@@ -502,7 +538,7 @@ class Trainer:
         """
         train epoch
         """
-        # set optimizer for this epoch
+        #: set optimizer for this epoch
         self.optimizer = self.model.get_optimizer(current_epoch)
 
         batch_iter = self.data_set.batch_iterator()
@@ -561,6 +597,7 @@ class Trainer:
                 tf.summary.scalar('best_epoch', self.best_epoch, step=current_epoch)
                 self.valid_writer.flush()
 
+        # update time
         self._time = time.time()
         self.current_epoch += 1
 

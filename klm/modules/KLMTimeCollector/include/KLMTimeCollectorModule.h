@@ -79,7 +79,7 @@ namespace Belle2 {
     /**
      * Collect hits information for scintillator of EKLM.
      */
-    void collectScintEnd(RelationVector<KLMHit2d>&);
+    void collectScintEnd(const RelationVector<KLMHit2d>&);
 
     /**
      * Match KLM hit and extHit.

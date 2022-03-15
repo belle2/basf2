@@ -232,7 +232,7 @@ class DefaultModel(tf.Module):
         "param smooth_cross_entropy:
         """
 
-        # mlp net
+        #: mlp net
         self.mlp = mlp
 
         if wd_coeffs is not None:
@@ -467,29 +467,29 @@ class Trainer:
         :param monitoring_size: int, number of events of training fraction used for monitoring
         """
 
-        # current time
+        #: current time
         self._time = time.time()
 
-        # model
+        #: model
         self.model = model
 
-        # dataset
+        #: dataset
         self.data_set = data_set
         self.model.initialize(data_set)
 
-        # monitoring size
+        #: monitoring size
         self.monitoring_size = monitoring_size
 
-        # log dir
+        #: log dir
         self.log_dir = log_dir
 
-        # termination criterion
+        #: termination criterion
         self.termination_criterion = self.model.termination_criterion
 
-        # initialise current epoch
+        #: initialise current epoch
         self.current_epoch = 0
 
-        # initialise best epoch
+        #: initialise best epoch
         self.best_epoch = -np.inf
 
         if log_dir is not None:
@@ -497,9 +497,10 @@ class Trainer:
 
         if save_name is None:
             time_str = time.strftime("%Y%m%d-%H%M%S")
-            self.save_name = os.path.join(os.getcwd(), '_'.join([time_str, 'model']))
-        else:
-            self.save_name = save_name
+            save_name = os.path.join(os.getcwd(), '_'.join([time_str, 'model']))
+
+        #: set the path and name for saving the weightfiles
+        self.save_name = save_name
 
         self._prepare_monitoring()
         return

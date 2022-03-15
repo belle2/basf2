@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <sstream>
-#define SSTR( x ) dynamic_cast< std::ostringstream & >(( std::ostringstream() << std::dec << x ) ).str()
+#define SSTR( x ) dynamic_cast< std::ostringstream && >(( std::ostringstream() << std::dec << x ) ).str()
 
 // kinfitter
 #include <analysis/modules/ParticleKinematicFitter/ParticleKinematicFitterModule.h>

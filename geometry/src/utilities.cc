@@ -291,7 +291,7 @@ namespace Belle2 {
         //going directly along x. because of that we check that the z
         //coordinates for inner and outer line are always the same, reusing one
         //point if neccessary
-        if (!innerPoints.empty() && innerPoints.front().first <= outerPoints.front().first) {
+        if (innerPoints.front().first <= outerPoints.front().first) {
           boost::tie(innerZ, innerX) = innerPoints.front();
           popInner = true;
         }

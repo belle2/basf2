@@ -39,6 +39,7 @@
 #ifdef _PACKAGE_
 #include <tracking/calibration/InvariantMassMuMuStandAlone.h>
 #include <tracking/calibration/InvariantMassMuMuIntegrator.h>
+#include <tracking/calibration/BoostVectorStandAlone.h>
 #include <tracking/calibration/Splitter.h>
 #include <tracking/calibration/tools.h>
 #include <tracking/calibration/ChebFitter.h>
@@ -59,8 +60,6 @@ using namespace std;
 namespace Belle2::InvariantMassMuMuCalib {
 
 
-  // fitting range for the mumu invariant mass
-  static const double mMin = 10.2e3, mMax = 10.8e3;
 
 
   /// read events from TTree to std::vector
@@ -614,8 +613,8 @@ namespace Belle2::InvariantMassMuMuCalib {
     hPull->GetYaxis()->SetRangeUser(-5, 5);
 
     TGraph* grLine = new TGraph(2);
-    grLine->SetPoint(0, 10200, 0);
-    grLine->SetPoint(1, 10800, 0);
+    grLine->SetPoint(0, hPull->GetBinLowEdge(1), 0);
+    grLine->SetPoint(1, hPull->GetBinLowEdge(hPull->GetNbinsX()) + hPull->GetBinWidth(hPull->GetNbinsX()), 0);
     grLine->SetLineWidth(2);
     grLine->SetLineColor(kRed);
     grLine->Draw("same");
@@ -640,7 +639,7 @@ namespace Belle2::InvariantMassMuMuCalib {
   }
 
 /// plots the result of the fit to the Mmumu, i.e. data and the fitted curve
-  static void plotMuMuFit(const vector<double>& data, const Pars& pars, Eigen::MatrixXd mat, int time)
+  static void plotMuMuFit(const vector<double>& data, const Pars& pars, Eigen::MatrixXd mat, double mMin, double mMax, int time)
   {
     const int nBins = 100;
 
@@ -709,11 +708,12 @@ namespace Belle2::InvariantMassMuMuCalib {
 
   /** run the collision invariant mass calibration,
       it returns (eCMS, eCMSstatUnc, 0) */
-  pair<Pars, MatrixXd> getInvMassPars(const vector<Event>& evts, Pars pars, int bootStrap = 0)
+  pair<Pars, MatrixXd> getInvMassPars(const vector<Event>& evts, Pars pars, double mMin, double mMax, int bootStrap = 0)
   {
     bool is4S = evts[0].is4S;
 
     vector<double> dataNow = readEvents(evts, 0.9/*PIDcut*/, mMin, mMax);
+
 
     // do bootStrap
     vector<double> data;
@@ -750,7 +750,7 @@ namespace Belle2::InvariantMassMuMuCalib {
       {"bDelta" , 2.11        },
       {"bMean" , 0        },
       {"frac" , 0.9854        },
-      {"m0" , 10504.7        },
+      {"m0" , mMax - 230     },
       {"mean" , 4.13917        },
       {"sigma" , 36.4         },
       {"slope" , 0.892           },
@@ -771,7 +771,7 @@ namespace Belle2::InvariantMassMuMuCalib {
       {"tau",    make_pair(20, 250)},
       {"frac",   make_pair(0.00, 1.0)},
 
-      {"m0",    make_pair(10500, 10700)},
+      {"m0",    make_pair(10450, 10950)},
       {"slope", make_pair(0.3, 0.999)},
       {"C",     make_pair(0, 0)}
     };
@@ -816,8 +816,28 @@ namespace Belle2::InvariantMassMuMuCalib {
 
       }
 
+
+
+      // default fitting range for the mumu invariant mass
+      double mMin = 10.2e3, mMax = 10.8e3;
+
+      // in case of offResonance runs adjust limits from median
+      if (!evtsNow[0].is4S) {
+        vector<double> dataNow;
+        for (const auto& ev : evtsNow)
+          dataNow.push_back(ev.m);
+        double mMedian = 1e3 * Belle2::BoostVectorCalib::median(dataNow.data(), dataNow.size());
+        double est = mMedian + 30;
+        mMax = est + 220;
+        mMin = est - 380;
+      }
+
+
+
+
       // number of required successful bootstrap replicas
       const int nRep = 25;
+
 
       vector<double> vals, errs;
       for (int rep = 0; rep < 200; ++rep) {
@@ -826,12 +846,14 @@ namespace Belle2::InvariantMassMuMuCalib {
         Pars resP, inDummy;
         MatrixXd resM;
 
+
         // fit using bootstrap replica replicas, rep=0 is no replica
-        tie(resP, resM) =  getInvMassPars(evtsNow, inDummy, rep);
+        tie(resP, resM) =  getInvMassPars(evtsNow, inDummy, mMin, mMax, rep);
 
         int ind = distance(resP.begin(), resP.find("m0"));
         double mass = resP.at("m0");
         double err  = sqrt(resM(ind, ind));
+
 
         // if there are problems with fit, try again with diffrent bootstrap replica
         if (!(errEst < err && err < 4 * errEst))
@@ -842,14 +864,14 @@ namespace Belle2::InvariantMassMuMuCalib {
 
         // if now bootstrapping needed, plot & break
         if (rep == 0) {
-          plotMuMuFit(readEvents(evtsNow, 0.9/*PIDcut*/, mMin, mMax), resP, resM, int(round(evtsNow[0].t)));
+          plotMuMuFit(readEvents(evtsNow, 0.9/*PIDcut*/, mMin, mMax), resP, resM, mMin, mMax, int(round(evtsNow[0].t)));
           break;
         }
 
         // try fit with different input parameters, but without bootstrapping
         Pars resP0;
         MatrixXd resM0;
-        tie(resP0, resM0) =  getInvMassPars(evtsNow, resP, 0);
+        tie(resP0, resM0) =  getInvMassPars(evtsNow, resP, mMin, mMax, 0);
 
         int ind0 = distance(resP0.begin(), resP0.find("m0"));
         double mass0 = resP0.at("m0");
@@ -859,14 +881,14 @@ namespace Belle2::InvariantMassMuMuCalib {
         if (errEst < err0 && err0 < 4 * errEst) {
           vals = {mass0};
           errs = {err0};
-          plotMuMuFit(readEvents(evtsNow, 0.9/*PIDcut*/, mMin, mMax), resP0, resM0, int(round(evtsNow[0].t)));
+          plotMuMuFit(readEvents(evtsNow, 0.9/*PIDcut*/, mMin, mMax), resP0, resM0, mMin, mMax, int(round(evtsNow[0].t)));
           break;
         }
 
 
         // if the fit was sucesfull several times only on replicas, plot & break
         if (vals.size() >= nRep) {
-          plotMuMuFit(readEvents(evtsNow, 0.9/*PIDcut*/, mMin, mMax), resP, resM, int(round(evtsNow[0].t)));
+          plotMuMuFit(readEvents(evtsNow, 0.9/*PIDcut*/, mMin, mMax), resP, resM, mMin, mMax, int(round(evtsNow[0].t)));
           break;
         }
 

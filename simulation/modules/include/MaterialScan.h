@@ -22,8 +22,6 @@
 class TH1D;
 class TH2D;
 
-#include <boost/optional.hpp>
-
 namespace Belle2 {
 
   /** Base class for Material Scans */
@@ -343,7 +341,7 @@ namespace Belle2 {
     /** Materials ignored when ray scanning */
     std::vector<std::string> m_rayIgnoredMaterials;
     /** Direction of the ray, cannot be set at the same time as Theta and Phi */
-    boost::optional<std::vector<double>> m_rayDirection;
+    std::optional<std::vector<double>> m_rayDirection;
     /** Theta direction of the ray if custom direction is not set */
     double m_rayTheta{0};
     /** Phi direction of the ray if custom direction is not set */

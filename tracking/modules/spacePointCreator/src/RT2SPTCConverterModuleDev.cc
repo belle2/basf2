@@ -39,9 +39,9 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
   addParam("SVDClusters", m_SVDClusterName, "SVDCluster collection name", std::string(""));
 
   addParam("SVDSpacePointStoreArrayName", m_svdSpacePointsStoreArrayName, "Name of the collection for SVD.",
-           boost::make_optional<std::string>("SVDSpacePoints"));
+           std::make_optional<std::string>("SVDSpacePoints"));
   addParam("PXDSpacePointStoreArrayName", m_pxdSpacePointsStoreArrayName, "Name of the collection for PXD.",
-           boost::make_optional<std::string>("PXDSpacePoints"));
+           std::make_optional<std::string>("PXDSpacePoints"));
 
   // optional input
   addParam("SVDSingleClusterSP", m_SVDSingleClusterSPName, "SVD single Cluster SpacePoints collection name.", std::string(""));

@@ -3325,7 +3325,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "E.g. ``countInList(e+, isSignal == 1)`` returns the number of correctly reconstructed electrons in the event.\n"
                       "The variable is event-based and does not need a valid particle pointer as input.", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("getVariableByRank(particleList, rankedVariableName, variableName, rank)", getVariableByRank, R"DOC(
-                      Returns the value of ``variableName`` for the candidate in the ``particleList`` with the requested ``rank``.
+                      [Eventbased] Returns the value of ``variableName`` for the candidate in the ``particleList`` with the requested ``rank``.
 
                       .. note::
                         The `BestCandidateSelection` module available via `rankByHighest` / `rankByLowest` has to be used before.

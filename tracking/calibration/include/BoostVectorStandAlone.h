@@ -52,6 +52,10 @@ namespace Belle2::BoostVectorCalib {
   std::vector<Event> getEvents(TTree* tr);
 
 
+  /** get median of array v of length n */
+  double median(double* v, int n);
+
+
   /** Run the BoostVector analysis with short calibration intervals defined by the splitPoints
     @param evts: vector of events
     @param splitPoints: the vector containing times of the edges of the short calibration intervals [hours]

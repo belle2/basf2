@@ -421,17 +421,17 @@ def stdLep(pdgId,
     weight_aliases_to_var = {
         f"weight_{pid_alias}_eff_{working_point}": f"extraInfo({payload_eff}_data_MC_ratio)",
         f"weight_{pid_alias}_misid_pi_{working_point}": f"extraInfo({payload_misid_pi}_data_MC_ratio)",
-        # these aliases are *absolute* variations.
-        f"weight_{pid_alias}_eff_{working_point}_abs_stat_up": f"extraInfo({payload_eff}_data_MC_uncertainty_stat_up)",
-        f"weight_{pid_alias}_eff_{working_point}_abs_stat_dn": f"extraInfo({payload_eff}_data_MC_uncertainty_stat_dn)",
-        f"weight_{pid_alias}_eff_{working_point}_abs_sys_up": f"extraInfo({payload_eff}_data_MC_uncertainty_sys_up)",
-        f"weight_{pid_alias}_eff_{working_point}_abs_sys_dn": f"extraInfo({payload_eff}_data_MC_uncertainty_sys_dn)",
-        f"weight_{pid_alias}_misid_pi_{working_point}_abs_stat_up": f"extraInfo({payload_misid_pi}_data_MC_uncertainty_stat_up)",
-        f"weight_{pid_alias}_misid_pi_{working_point}_abs_stat_dn": f"extraInfo({payload_misid_pi}_data_MC_uncertainty_stat_dn)",
-        f"weight_{pid_alias}_misid_pi_{working_point}_abs_sys_up": f"extraInfo({payload_misid_pi}_data_MC_uncertainty_sys_up)",
-        f"weight_{pid_alias}_misid_pi_{working_point}_abs_sys_dn": f"extraInfo({payload_misid_pi}_data_MC_uncertainty_sys_dn)",
+        # These aliases are *absolute* variations.
+        f"weight_{pid_alias}_eff_{working_point}_stat_up": f"extraInfo({payload_eff}_data_MC_uncertainty_stat_up)",
+        f"weight_{pid_alias}_eff_{working_point}_stat_dn": f"extraInfo({payload_eff}_data_MC_uncertainty_stat_dn)",
+        f"weight_{pid_alias}_eff_{working_point}_sys_up": f"extraInfo({payload_eff}_data_MC_uncertainty_sys_up)",
+        f"weight_{pid_alias}_eff_{working_point}_sys_dn": f"extraInfo({payload_eff}_data_MC_uncertainty_sys_dn)",
+        f"weight_{pid_alias}_misid_pi_{working_point}_stat_up": f"extraInfo({payload_misid_pi}_data_MC_uncertainty_stat_up)",
+        f"weight_{pid_alias}_misid_pi_{working_point}_stat_dn": f"extraInfo({payload_misid_pi}_data_MC_uncertainty_stat_dn)",
+        f"weight_{pid_alias}_misid_pi_{working_point}_sys_up": f"extraInfo({payload_misid_pi}_data_MC_uncertainty_sys_up)",
+        f"weight_{pid_alias}_misid_pi_{working_point}_sys_dn": f"extraInfo({payload_misid_pi}_data_MC_uncertainty_sys_dn)",
         # These aliases are *relative* variations, so they can be multiplied to the nominal
-        # to get the varied value:
+        # to get the varied weight:
         #
         # w_rel_var_up = (1 + w_up/w_nominal)
         # w_rel_var_dn = (1 - w_dn/w_nominal)
@@ -459,10 +459,10 @@ def stdLep(pdgId,
         weight_aliases_to_var.update({
             f"weight_{pid_alias}_misid_K_{working_point}": f"extraInfo({payload_misid_K}_data_MC_ratio)",
             #
-            f"weight_{pid_alias}_misid_K_{working_point}_abs_stat_up": f"extraInfo({payload_misid_K}_data_MC_uncertainty_stat_up)",
-            f"weight_{pid_alias}_misid_K_{working_point}_abs_stat_dn": f"extraInfo({payload_misid_K}_data_MC_uncertainty_stat_dn)",
-            f"weight_{pid_alias}_misid_K_{working_point}_abs_sys_up": f"extraInfo({payload_misid_K}_data_MC_uncertainty_sys_up)",
-            f"weight_{pid_alias}_misid_K_{working_point}_abs_sys_dn": f"extraInfo({payload_misid_K}_data_MC_uncertainty_sys_dn)",
+            f"weight_{pid_alias}_misid_K_{working_point}_stat_up": f"extraInfo({payload_misid_K}_data_MC_uncertainty_stat_up)",
+            f"weight_{pid_alias}_misid_K_{working_point}_stat_dn": f"extraInfo({payload_misid_K}_data_MC_uncertainty_stat_dn)",
+            f"weight_{pid_alias}_misid_K_{working_point}_sys_up": f"extraInfo({payload_misid_K}_data_MC_uncertainty_sys_up)",
+            f"weight_{pid_alias}_misid_K_{working_point}_sys_dn": f"extraInfo({payload_misid_K}_data_MC_uncertainty_sys_dn)",
             #
             f"weight_{pid_alias}_misid_K_{working_point}_rel_stat_up":
             f"formula(1+[extraInfo({payload_misid_K}_data_MC_uncertainty_stat_up)/extraInfo({payload_misid_K}_data_MC_ratio)])",

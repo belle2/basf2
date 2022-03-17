@@ -27,8 +27,11 @@
 #include <G4Torus.hh>
 #include <G4Polycone.hh>
 #include <G4Trd.hh>
+#include <G4Trap.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4UnionSolid.hh>
+#include <G4MultiUnion.hh>
 #include <G4UserLimits.hh>
 
 using namespace std;
@@ -742,6 +745,621 @@ namespace Belle2 {
         elements[name_body1] = collimator_body1;
         elements[name_body2] = collimator_body2;
       }
+
+      //--------------
+      //-   Additional concrete shield left (backward)
+      //-   Fills gap between end-of-tunnel shield and QCS
+
+      FarBeamLineElement ACSL;
+
+      //get parameters from .xml file
+      std::string name = "ACSL";
+      prep = name + ".";
+
+      int acsl_En = int(m_config.getParameter(prep + "Enable"));
+
+      double acsl_X0 = m_config.getParameter(prep + "X0") * unitFactor;
+      double acsl_Y0 = m_config.getParameter(prep + "Y0") * unitFactor;
+      double acsl_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+      double acsl_PHI = m_config.getParameter(prep + "PHI");
+
+      double acsl_box1_W = m_config.getParameter(prep + "box1_W") * unitFactor;
+      double acsl_box1_H = m_config.getParameter(prep + "box1_H") * unitFactor;
+      double acsl_box1_L = m_config.getParameter(prep + "box1_L") * unitFactor;
+
+      double acsl_box2_W = m_config.getParameter(prep + "box2_W") * unitFactor;
+      double acsl_box2_H = m_config.getParameter(prep + "box2_H") * unitFactor;
+      double acsl_box2_L = m_config.getParameter(prep + "box2_L") * unitFactor;
+      double acsl_box2_dX = m_config.getParameter(prep + "box2_dX") * unitFactor;
+      double acsl_box2_dY = m_config.getParameter(prep + "box2_dY") * unitFactor;
+      double acsl_box2_dZ = m_config.getParameter(prep + "box2_dZ") * unitFactor;
+
+      double acsl_trd1_X1 = m_config.getParameter(prep + "trd1_X1") * unitFactor;
+      double acsl_trd1_X2 = m_config.getParameter(prep + "trd1_X2") * unitFactor;
+      double acsl_trd1_Y1 = m_config.getParameter(prep + "trd1_Y1") * unitFactor;
+      double acsl_trd1_Y2 = m_config.getParameter(prep + "trd1_Y2") * unitFactor;
+      double acsl_trd1_Z  = m_config.getParameter(prep + "trd1_Z") * unitFactor;
+      double acsl_trd1_dX  = m_config.getParameter(prep + "trd1_dX") * unitFactor;
+      double acsl_trd1_dY  = m_config.getParameter(prep + "trd1_dY") * unitFactor;
+      double acsl_trd1_dZ  = m_config.getParameter(prep + "trd1_dZ") * unitFactor;
+      double acsl_trd1_PHI = m_config.getParameter(prep + "trd1_PHI");
+
+      double acsl_trd2_X1 = m_config.getParameter(prep + "trd2_X1") * unitFactor;
+      double acsl_trd2_X2 = m_config.getParameter(prep + "trd2_X2") * unitFactor;
+      double acsl_trd2_Y1 = m_config.getParameter(prep + "trd2_Y1") * unitFactor;
+      double acsl_trd2_Y2 = m_config.getParameter(prep + "trd2_Y2") * unitFactor;
+      double acsl_trd2_Z  = m_config.getParameter(prep + "trd2_Z") * unitFactor;
+      double acsl_trd2_dX  = m_config.getParameter(prep + "trd2_dX") * unitFactor;
+      double acsl_trd2_dY  = m_config.getParameter(prep + "trd2_dY") * unitFactor;
+      double acsl_trd2_dZ  = m_config.getParameter(prep + "trd2_dZ") * unitFactor;
+      double acsl_trd2_PHI = m_config.getParameter(prep + "trd2_PHI");
+
+      // solids
+      string geo_box1_name = "geo_" + name + "_box1_name";
+      string geo_box2_name = "geo_" + name + "_box2_name";
+      string geo_trd1_name = "geo_" + name + "_trd1_name";
+      string geo_trd2_name = "geo_" + name + "_trd2_name";
+      string geo_acsl_name = "geo_" + name + "_name";
+
+      G4Box* geo_box1 = new G4Box(geo_box1_name, acsl_box1_W / 2.0, acsl_box1_H / 2.0, acsl_box1_L / 2.0);
+      G4Box* geo_box2 = new G4Box(geo_box2_name, acsl_box2_W / 2.0, acsl_box2_H / 2.0, acsl_box2_L / 2.0);
+      G4Trd* geo_trd1 = new G4Trd(geo_trd1_name, acsl_trd1_X1, acsl_trd1_X2, acsl_trd1_Y1, acsl_trd1_Y2, acsl_trd1_Z);
+      G4Trd* geo_trd2 = new G4Trd(geo_trd2_name, acsl_trd2_X1, acsl_trd2_X2, acsl_trd2_Y1, acsl_trd2_Y2, acsl_trd2_Z);
+
+      // transformations
+      G4Transform3D box1_trans = G4Translate3D(0, 0, 0);
+
+      G4Transform3D box2_trans = G4Translate3D(acsl_box2_dX, acsl_box2_dY, acsl_box2_dZ);
+
+      G4Transform3D trd1_trans = G4Translate3D(acsl_trd1_dX, acsl_trd1_dY, acsl_trd1_dZ);
+      trd1_trans = trd1_trans * G4RotateY3D(acsl_trd1_PHI / Unit::rad);
+
+      G4Transform3D trd2_trans = G4Translate3D(acsl_trd2_dX, acsl_trd2_dY, acsl_trd2_dZ);
+      trd2_trans = trd2_trans * G4RotateY3D(acsl_trd2_PHI / Unit::rad);
+
+      ACSL.transform = G4Translate3D(acsl_X0, acsl_Y0, acsl_Z0);
+      ACSL.transform = ACSL.transform * G4RotateY3D(acsl_PHI / Unit::rad);;
+
+      /******************
+      not supported yet by Geant4VM
+
+      // composite solid
+      G4MultiUnion* geo_acsl = new G4MultiUnion(geo_acsl_name);
+      geo_acsl->AddNode(*geo_box1, box1_trans);
+      geo_acsl->AddNode(*geo_box2, box2_trans);
+      geo_acsl->AddNode(*geo_trd1, trd1_trans);
+      geo_acsl->AddNode(*geo_trd2, trd2_trans);
+      geo_acsl->Voxelize();
+      ***********************/
+
+      string geo_interm1_name = "geo_" + name + "_interm1_name";
+      string geo_interm2_name = "geo_" + name + "_interm2_name";
+      G4UnionSolid* geo_interm1 = new G4UnionSolid(geo_interm1_name, geo_box1, geo_box2, box2_trans);
+      G4UnionSolid* geo_interm2 = new G4UnionSolid(geo_interm2_name, geo_interm1, geo_trd1, trd1_trans);
+      G4UnionSolid* geo_acsl = new G4UnionSolid(geo_acsl_name, geo_interm2, geo_trd2, trd2_trans);
+
+      ACSL.geo = geo_acsl;
+
+      // define logical volume
+      string strMat_acsl = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_acsl = Materials::get(strMat_acsl);
+      string logi_acsl_name = "logi_" + name + "_name";
+      G4LogicalVolume* logi_acsl = new G4LogicalVolume(geo_acsl, mat_acsl, logi_acsl_name);
+      setColor(*logi_acsl, "#00CC00");
+      setVisibility(*logi_acsl, false);
+
+      ACSL.logi = logi_acsl;
+
+      //put volume
+      string phys_acsl_name = "phys_" + name + "_name";
+      if (acsl_En == 1)
+        new G4PVPlacement(ACSL.transform, ACSL.logi, phys_acsl_name, &topVolume, false, 0);
+
+      elements[name] = ACSL;
+
+
+      //--------------
+      //-   Additional concrete shield right (forward)
+      //-   Fills gap between end-of-tunnel shield and QCS
+
+      // Consists of two disjoined trapezoids
+      // Part 1
+
+      FarBeamLineElement ACSR1;
+
+      //get parameters from .xml file
+      name = "ACSR1";
+      prep = name + ".";
+
+      int acsr1_En = int(m_config.getParameter(prep + "Enable"));
+
+      double acsr1_X0 = m_config.getParameter(prep + "X0") * unitFactor;
+      double acsr1_Y0 = m_config.getParameter(prep + "Y0") * unitFactor;
+      double acsr1_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+      double acsr1_PHI0 = m_config.getParameter(prep + "PHI0");
+
+      double acsr1_X1 = m_config.getParameter(prep + "X1") * unitFactor;
+      double acsr1_X2 = m_config.getParameter(prep + "X2") * unitFactor;
+      double acsr1_Y1 = m_config.getParameter(prep + "Y1") * unitFactor;
+      double acsr1_Y2 = m_config.getParameter(prep + "Y2") * unitFactor;
+      double acsr1_Z  = m_config.getParameter(prep + "Z") * unitFactor;
+      double acsr1_THETA  = m_config.getParameter(prep + "THETA");
+      double acsr1_PHI  = m_config.getParameter(prep + "PHI");
+      double acsr1_ANG  = m_config.getParameter(prep + "ANG");
+
+      double acsr1_dx = (acsr1_X1 - acsr1_X2) / 2.0;
+      double acsr1_dy = (acsr1_Y2 - acsr1_Y1) / 2.0;
+
+//      G4ThreeVector acsr1_pt[8];
+//      acsr1_pt[0] = G4ThreeVector(              -acsr1_X1 + acsr1_dx,                -acsr1_Y1 + acsr1_dy, -acsr1_Z);
+//      acsr1_pt[1] = G4ThreeVector(               acsr1_X1 + acsr1_dx,                -acsr1_Y1 + acsr1_dy, -acsr1_Z);
+//      acsr1_pt[2] = G4ThreeVector(              -acsr1_X1 + acsr1_dx,                 acsr1_Y1 + acsr1_dy, -acsr1_Z);
+//      acsr1_pt[3] = G4ThreeVector(               acsr1_X1 + acsr1_dx,                 acsr1_Y1 + acsr1_dy, -acsr1_Z);
+//      acsr1_pt[4] = G4ThreeVector(              -acsr1_X1 + acsr1_dx, -2.0*acsr1_Y2 + acsr1_Y1 + acsr1_dy,  acsr1_Z);
+//      acsr1_pt[5] = G4ThreeVector( 2.0*acsr1_X2 -acsr1_X1 + acsr1_dx, -2.0*acsr1_Y2 + acsr1_Y1 + acsr1_dy,  acsr1_Z);
+//      acsr1_pt[6] = G4ThreeVector(              -acsr1_X1 + acsr1_dx,                 acsr1_Y1 + acsr1_dy,  acsr1_Z);
+//      acsr1_pt[7] = G4ThreeVector( 2.0*acsr1_X2 -acsr1_X1 + acsr1_dx,                 acsr1_Y1 + acsr1_dy,  acsr1_Z);
+
+      // solids
+      string geo_acsr1_name = "geo_" + name + "_name";
+      G4Trap* geo_acsr1 = new G4Trap(geo_acsr1_name, acsr1_Z, acsr1_THETA, acsr1_PHI, acsr1_Y1, acsr1_X1, acsr1_X1, acsr1_ANG, acsr1_Y2,
+                                     acsr1_X2, acsr1_X2, acsr1_ANG);
+//      G4Trap* geo_acsr1 = new G4Trap(geo_acsr1_name, acsr1_pt);
+
+      ACSR1.geo = geo_acsr1;
+
+      // transformations
+      ACSR1.transform = G4Translate3D(acsr1_X0, acsr1_Y0 - acsr1_dy, acsr1_Z0 - acsr1_dx);
+      ACSR1.transform = ACSR1.transform * G4RotateY3D(acsr1_PHI0 / Unit::rad);;
+
+      // define logical volume
+      string strMat_acsr1 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_acsr1 = Materials::get(strMat_acsr1);
+      string logi_acsr1_name = "logi_" + name + "_name";
+      G4LogicalVolume* logi_acsr1 = new G4LogicalVolume(geo_acsr1, mat_acsr1, logi_acsr1_name);
+      setColor(*logi_acsr1, "#00CC00");
+      setVisibility(*logi_acsr1, false);
+
+      ACSR1.logi = logi_acsr1;
+
+      //put volume
+      string phys_acsr1_name = "phys_" + name + "_name";
+      if (acsr1_En == 1)
+        new G4PVPlacement(ACSR1.transform, ACSR1.logi, phys_acsr1_name, &topVolume, false, 0);
+
+      elements[name] = ACSR1;
+
+      //--------------
+      // Part 2
+
+      FarBeamLineElement ACSR2;
+
+      //get parameters from .xml file
+      name = "ACSR2";
+      prep = name + ".";
+
+      int acsr2_En = int(m_config.getParameter(prep + "Enable"));
+
+      double acsr2_X0 = m_config.getParameter(prep + "X0") * unitFactor;
+      double acsr2_Y0 = m_config.getParameter(prep + "Y0") * unitFactor;
+      double acsr2_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+      double acsr2_PHI0 = m_config.getParameter(prep + "PHI0");
+
+      double acsr2_X1 = m_config.getParameter(prep + "X1") * unitFactor;
+      double acsr2_X2 = m_config.getParameter(prep + "X2") * unitFactor;
+      double acsr2_Y1 = m_config.getParameter(prep + "Y1") * unitFactor;
+      double acsr2_Y2 = m_config.getParameter(prep + "Y2") * unitFactor;
+      double acsr2_Z  = m_config.getParameter(prep + "Z") * unitFactor;
+      double acsr2_THETA  = m_config.getParameter(prep + "THETA");
+      double acsr2_PHI  = m_config.getParameter(prep + "PHI");
+      double acsr2_ANG  = m_config.getParameter(prep + "ANG");
+
+      double acsr2_dx = (acsr2_X1 - acsr2_X2) / 2.0;
+      double acsr2_dy = (acsr2_Y2 - acsr2_Y1) / 2.0;
+
+//      G4ThreeVector acsr2_pt[8];
+//      acsr2_pt[0] = G4ThreeVector(              -acsr2_X1 + acsr2_dx,                -acsr2_Y1 + acsr2_dy, -acsr2_Z);
+//      acsr2_pt[1] = G4ThreeVector(               acsr2_X1 + acsr2_dx,                -acsr2_Y1 + acsr2_dy, -acsr2_Z);
+//      acsr2_pt[2] = G4ThreeVector(              -acsr2_X1 + acsr2_dx,                 acsr2_Y1 + acsr2_dy, -acsr2_Z);
+//      acsr2_pt[3] = G4ThreeVector(               acsr2_X1 + acsr2_dx,                 acsr2_Y1 + acsr2_dy, -acsr2_Z);
+//      acsr2_pt[4] = G4ThreeVector(              -acsr2_X1 + acsr2_dx, -2.0*acsr2_Y2 + acsr2_Y1 + acsr2_dy,  acsr2_Z);
+//      acsr2_pt[5] = G4ThreeVector( 2.0*acsr2_X2 -acsr2_X1 + acsr2_dx, -2.0*acsr2_Y2 + acsr2_Y1 + acsr2_dy,  acsr2_Z);
+//      acsr2_pt[6] = G4ThreeVector(              -acsr2_X1 + acsr2_dx,                 acsr2_Y1 + acsr2_dy,  acsr2_Z);
+//      acsr2_pt[7] = G4ThreeVector( 2.0*acsr2_X2 -acsr2_X1 + acsr2_dx,                 acsr2_Y1 + acsr2_dy,  acsr2_Z);
+
+      // solids
+      string geo_acsr2_name = "geo_" + name + "_name";
+      G4Trap* geo_acsr2 = new G4Trap(geo_acsr2_name, acsr2_Z, acsr2_THETA, acsr2_PHI, acsr2_Y1, acsr2_X1, acsr2_X1, acsr2_ANG, acsr2_Y2,
+                                     acsr2_X2, acsr2_X2, acsr2_ANG);
+//      G4Trap* geo_acsr2 = new G4Trap(geo_acsr2_name, acsr2_pt);
+
+      ACSR2.geo = geo_acsr2;
+
+      // transformations
+      ACSR2.transform = G4Translate3D(acsr2_X0, acsr2_Y0 - acsr2_dy, acsr2_Z0 - acsr2_dx);
+      ACSR2.transform = ACSR2.transform * G4RotateY3D(acsr2_PHI0 / Unit::rad);;
+
+      // define logical volume
+      string strMat_acsr2 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_acsr2 = Materials::get(strMat_acsr2);
+      string logi_acsr2_name = "logi_" + name + "_name";
+      G4LogicalVolume* logi_acsr2 = new G4LogicalVolume(geo_acsr2, mat_acsr2, logi_acsr2_name);
+      setColor(*logi_acsr2, "#00CC00");
+      setVisibility(*logi_acsr2, false);
+
+      ACSR2.logi = logi_acsr2;
+
+      //put volume
+      string phys_acsr2_name = "phys_" + name + "_name";
+      if (acsr2_En == 1)
+        new G4PVPlacement(ACSR2.transform, ACSR2.logi, phys_acsr2_name, &topVolume, false, 0);
+
+      elements[name] = ACSR2;
+
+
+      //--------------
+      //-   Additional polyethilene shield left (backward)
+      //-   Fills gap between PolyShield and QCS
+
+      // Consists of two disjoined parts
+      // Part 1
+
+      FarBeamLineElement APSL1;
+
+      //get parameters from .xml file
+      name = "APSL1";
+      prep = name + ".";
+
+      int apsl1_En = int(m_config.getParameter(prep + "Enable"));
+
+      double apsl1_W = m_config.getParameter(prep + "W") * unitFactor;
+      double apsl1_H = m_config.getParameter(prep + "H") * unitFactor;
+      double apsl1_L = m_config.getParameter(prep + "L") * unitFactor;
+      double apsl1_X0 = m_config.getParameter(prep + "X0") * unitFactor;
+      double apsl1_Y0 = m_config.getParameter(prep + "Y0") * unitFactor;
+      double apsl1_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+      double apsl1_hole_R = m_config.getParameter(prep + "holeR") * unitFactor;
+      double apsl1_hole_D = m_config.getParameter(prep + "holeD") * unitFactor;
+      double apsl1_hole_dX = m_config.getParameter(prep + "holeDX") * unitFactor;
+      double apsl1_hole_dY = m_config.getParameter(prep + "holeDY") * unitFactor;
+      double apsl1_hole_dZ = m_config.getParameter(prep + "holeDZ") * unitFactor;
+      double apsl1_PHI = m_config.getParameter(prep + "PHI");
+
+      // transformations
+      APSL1.transform = G4Translate3D(apsl1_X0, apsl1_Y0, apsl1_Z0);
+      APSL1.transform = APSL1.transform * G4RotateY3D(apsl1_PHI / Unit::rad);;
+
+      G4Transform3D transform_apsl1_hole = G4Translate3D(apsl1_hole_dX, apsl1_hole_dY, apsl1_hole_dZ);
+
+      //define geometry
+      string geo_apsl1_box_name = "geo_" + name + "_box_name";
+      string geo_apsl1_hole_name = "geo_" + name + "_hole_name";
+      string geo_apsl1_name = "geo_" + name + "_name";
+
+      G4Box* geo_apsl1_box = new G4Box(geo_apsl1_box_name, apsl1_W / 2.0, apsl1_H / 2.0, apsl1_L / 2.0);
+      G4Tubs* geo_apsl1_hole = new G4Tubs(geo_apsl1_hole_name, 0.0, apsl1_hole_R, apsl1_hole_D / 2.0, 0.0, 2.0 * M_PI);
+      G4SubtractionSolid* geo_apsl1 = new G4SubtractionSolid(geo_apsl1_name, geo_apsl1_box, geo_apsl1_hole, transform_apsl1_hole);
+
+      APSL1.geo = geo_apsl1;
+
+      // define logical volume
+      string strMat_apsl1 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_apsl1 = Materials::get(strMat_apsl1);
+      string logi_apsl1_name = "logi_" + name + "_name";
+      G4LogicalVolume* logi_apsl1 = new G4LogicalVolume(geo_apsl1, mat_apsl1, logi_apsl1_name);
+      setColor(*logi_apsl1, "#00CC00");
+      setVisibility(*logi_apsl1, false);
+
+      APSL1.logi = logi_apsl1;
+
+      //put volume
+      string phys_apsl1_name = "phys_" + name + "_name";
+      if (apsl1_En == 1)
+        new G4PVPlacement(APSL1.transform, APSL1.logi, phys_apsl1_name, &topVolume, false, 0);
+
+      elements[name] = APSL1;
+
+      //--------------
+      // Part 2
+
+      FarBeamLineElement APSL2;
+
+      //get parameters from .xml file
+      name = "APSL2";
+      prep = name + ".";
+
+      int apsl2_En = int(m_config.getParameter(prep + "Enable"));
+
+      double apsl2_W = m_config.getParameter(prep + "W") * unitFactor;
+      double apsl2_H = m_config.getParameter(prep + "H") * unitFactor;
+      double apsl2_L = m_config.getParameter(prep + "L") * unitFactor;
+      double apsl2_X0 = m_config.getParameter(prep + "X0") * unitFactor;
+      double apsl2_Y0 = m_config.getParameter(prep + "Y0") * unitFactor;
+      double apsl2_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+      double apsl2_hole_R = m_config.getParameter(prep + "holeR") * unitFactor;
+      double apsl2_hole_D = m_config.getParameter(prep + "holeD") * unitFactor;
+      double apsl2_hole_dX = m_config.getParameter(prep + "holeDX") * unitFactor;
+      double apsl2_hole_dY = m_config.getParameter(prep + "holeDY") * unitFactor;
+      double apsl2_hole_dZ = m_config.getParameter(prep + "holeDZ") * unitFactor;
+      double apsl2_PHI = m_config.getParameter(prep + "PHI");
+
+      // transformations
+      APSL2.transform = G4Translate3D(apsl2_X0, apsl2_Y0, apsl2_Z0);
+      APSL2.transform = APSL2.transform * G4RotateY3D(apsl2_PHI / Unit::rad);;
+
+      G4Transform3D transform_apsl2_hole = G4Translate3D(apsl2_hole_dX, apsl2_hole_dY, apsl2_hole_dZ);
+
+      //define geometry
+      string geo_apsl2_box_name = "geo_" + name + "_box_name";
+      string geo_apsl2_hole_name = "geo_" + name + "_hole_name";
+      string geo_apsl2_name = "geo_" + name + "_name";
+
+      G4Box* geo_apsl2_box = new G4Box(geo_apsl2_box_name, apsl2_W / 2.0, apsl2_H / 2.0, apsl2_L / 2.0);
+      G4Tubs* geo_apsl2_hole = new G4Tubs(geo_apsl2_hole_name, 0.0, apsl2_hole_R, apsl2_hole_D / 2.0, 0.0, 2.0 * M_PI);
+      G4SubtractionSolid* geo_apsl2 = new G4SubtractionSolid(geo_apsl2_name, geo_apsl2_box, geo_apsl2_hole, transform_apsl2_hole);
+
+      APSL2.geo = geo_apsl2;
+
+      // define logical volume
+      string strMat_apsl2 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_apsl2 = Materials::get(strMat_apsl2);
+      string logi_apsl2_name = "logi_" + name + "_name";
+      G4LogicalVolume* logi_apsl2 = new G4LogicalVolume(geo_apsl2, mat_apsl2, logi_apsl2_name);
+      setColor(*logi_apsl2, "#00CC00");
+      setVisibility(*logi_apsl2, false);
+
+      APSL2.logi = logi_apsl2;
+
+      //put volume
+      string phys_apsl2_name = "phys_" + name + "_name";
+      if (apsl2_En == 1)
+        new G4PVPlacement(APSL2.transform, APSL2.logi, phys_apsl2_name, &topVolume, false, 0);
+
+      elements[name] = APSL2;
+
+
+      //--------------
+      //-   Additional polyethilene shield right (forward)
+      //-   Fills gap between PolyShield and QCS
+
+      // Consists of two disjoined parts
+      // Part 1
+
+      FarBeamLineElement APSR1;
+
+      //get parameters from .xml file
+      name = "APSR1";
+      prep = name + ".";
+
+      int apsr1_En = int(m_config.getParameter(prep + "Enable"));
+
+      double apsr1_W = m_config.getParameter(prep + "W") * unitFactor;
+      double apsr1_H = m_config.getParameter(prep + "H") * unitFactor;
+      double apsr1_L = m_config.getParameter(prep + "L") * unitFactor;
+      double apsr1_X0 = m_config.getParameter(prep + "X0") * unitFactor;
+      double apsr1_Y0 = m_config.getParameter(prep + "Y0") * unitFactor;
+      double apsr1_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+      double apsr1_hole_R = m_config.getParameter(prep + "holeR") * unitFactor;
+      double apsr1_hole_D = m_config.getParameter(prep + "holeD") * unitFactor;
+      double apsr1_hole_dX = m_config.getParameter(prep + "holeDX") * unitFactor;
+      double apsr1_hole_dY = m_config.getParameter(prep + "holeDY") * unitFactor;
+      double apsr1_hole_dZ = m_config.getParameter(prep + "holeDZ") * unitFactor;
+      double apsr1_PHI = m_config.getParameter(prep + "PHI");
+
+      // transformations
+      APSR1.transform = G4Translate3D(apsr1_X0, apsr1_Y0, apsr1_Z0);
+      APSR1.transform = APSR1.transform * G4RotateY3D(apsr1_PHI / Unit::rad);;
+
+      G4Transform3D transform_apsr1_hole = G4Translate3D(apsr1_hole_dX, apsr1_hole_dY, apsr1_hole_dZ);
+
+      //define geometry
+      string geo_apsr1_box_name = "geo_" + name + "_box_name";
+      string geo_apsr1_hole_name = "geo_" + name + "_hole_name";
+      string geo_apsr1_name = "geo_" + name + "_name";
+
+      G4Box* geo_apsr1_box = new G4Box(geo_apsr1_box_name, apsr1_W / 2.0, apsr1_H / 2.0, apsr1_L / 2.0);
+      G4Tubs* geo_apsr1_hole = new G4Tubs(geo_apsr1_hole_name, 0.0, apsr1_hole_R, apsr1_hole_D / 2.0, 0.0, 2.0 * M_PI);
+      G4SubtractionSolid* geo_apsr1 = new G4SubtractionSolid(geo_apsr1_name, geo_apsr1_box, geo_apsr1_hole, transform_apsr1_hole);
+
+      APSR1.geo = geo_apsr1;
+
+      // define logical volume
+      string strMat_apsr1 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_apsr1 = Materials::get(strMat_apsr1);
+      string logi_apsr1_name = "logi_" + name + "_name";
+      G4LogicalVolume* logi_apsr1 = new G4LogicalVolume(geo_apsr1, mat_apsr1, logi_apsr1_name);
+      setColor(*logi_apsr1, "#00CC00");
+      setVisibility(*logi_apsr1, false);
+
+      APSR1.logi = logi_apsr1;
+
+      //put volume
+      string phys_apsr1_name = "phys_" + name + "_name";
+      if (apsr1_En == 1)
+        new G4PVPlacement(APSR1.transform, APSR1.logi, phys_apsr1_name, &topVolume, false, 0);
+
+      elements[name] = APSR1;
+
+      //--------------
+      // Part 2
+
+      FarBeamLineElement APSR2;
+
+      //get parameters from .xml file
+      name = "APSR2";
+      prep = name + ".";
+
+      int apsr2_En = int(m_config.getParameter(prep + "Enable"));
+
+      double apsr2_W = m_config.getParameter(prep + "W") * unitFactor;
+      double apsr2_H = m_config.getParameter(prep + "H") * unitFactor;
+      double apsr2_L = m_config.getParameter(prep + "L") * unitFactor;
+      double apsr2_X0 = m_config.getParameter(prep + "X0") * unitFactor;
+      double apsr2_Y0 = m_config.getParameter(prep + "Y0") * unitFactor;
+      double apsr2_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+      double apsr2_hole_R = m_config.getParameter(prep + "holeR") * unitFactor;
+      double apsr2_hole_D = m_config.getParameter(prep + "holeD") * unitFactor;
+      double apsr2_hole_dX = m_config.getParameter(prep + "holeDX") * unitFactor;
+      double apsr2_hole_dY = m_config.getParameter(prep + "holeDY") * unitFactor;
+      double apsr2_hole_dZ = m_config.getParameter(prep + "holeDZ") * unitFactor;
+      double apsr2_PHI = m_config.getParameter(prep + "PHI");
+
+      // transformations
+      APSR2.transform = G4Translate3D(apsr2_X0, apsr2_Y0, apsr2_Z0);
+      APSR2.transform = APSR2.transform * G4RotateY3D(apsr2_PHI / Unit::rad);;
+
+      G4Transform3D transform_apsr2_hole = G4Translate3D(apsr2_hole_dX, apsr2_hole_dY, apsr2_hole_dZ);
+
+      //define geometry
+      string geo_apsr2_box_name = "geo_" + name + "_box_name";
+      string geo_apsr2_hole_name = "geo_" + name + "_hole_name";
+      string geo_apsr2_name = "geo_" + name + "_name";
+
+      G4Box* geo_apsr2_box = new G4Box(geo_apsr2_box_name, apsr2_W / 2.0, apsr2_H / 2.0, apsr2_L / 2.0);
+      G4Tubs* geo_apsr2_hole = new G4Tubs(geo_apsr2_hole_name, 0.0, apsr2_hole_R, apsr2_hole_D / 2.0, 0.0, 2.0 * M_PI);
+      G4SubtractionSolid* geo_apsr2 = new G4SubtractionSolid(geo_apsr2_name, geo_apsr2_box, geo_apsr2_hole, transform_apsr2_hole);
+
+      APSR2.geo = geo_apsr2;
+
+      // define logical volume
+      string strMat_apsr2 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_apsr2 = Materials::get(strMat_apsr2);
+      string logi_apsr2_name = "logi_" + name + "_name";
+      G4LogicalVolume* logi_apsr2 = new G4LogicalVolume(geo_apsr2, mat_apsr2, logi_apsr2_name);
+      setColor(*logi_apsr2, "#00CC00");
+      setVisibility(*logi_apsr2, false);
+
+      APSR2.logi = logi_apsr2;
+
+      //put volume
+      string phys_apsr2_name = "phys_" + name + "_name";
+      if (apsr2_En == 1)
+        new G4PVPlacement(APSR2.transform, APSR2.logi, phys_apsr2_name, &topVolume, false, 0);
+
+      elements[name] = APSR2;
+
+
+      //--------------
+      //-   Additional polyethilene shield right (forward)
+      //-   Fills gap between QCS and ARICH
+
+      FarBeamLineElement APSR3;
+
+      //get parameters from .xml file
+      name = "APSR3";
+      prep = name + ".";
+
+      int apsr3_En = int(m_config.getParameter(prep + "Enable"));
+      int apsr3_N = int(m_config.getParameter(prep + "N"));
+
+      std::vector<double> apsr3_Z(apsr3_N);
+      std::vector<double> apsr3_R(apsr3_N);
+      std::vector<double> apsr3_r(apsr3_N);
+
+      for (int i = 0; i < apsr3_N; ++i) {
+        ostringstream ossZID;
+        ossZID << "Z" << i;
+
+        ostringstream ossRID;
+        ossRID << "R" << i;
+
+        ostringstream ossrID;
+        ossrID << "r" << i;
+
+        apsr3_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        apsr3_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        apsr3_r[i] = m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
+      }
+
+      // transformations
+      APSR3.transform = G4Translate3D(0.0, 0.0, 0.0);
+
+      //define geometry
+      string geo_apsr3_name = "geo_" + name + "_name";
+
+      G4Polycone* geo_apsr3 = new G4Polycone(geo_apsr3_name, 0.0, 2.0 * M_PI, apsr3_N, &(apsr3_Z[0]), &(apsr3_r[0]), &(apsr3_R[0]));
+
+      APSR3.geo = geo_apsr3;
+
+      // define logical volume
+      string strMat_apsr3 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_apsr3 = Materials::get(strMat_apsr3);
+      string logi_apsr3_name = "logi_" + name + "_name";
+      G4LogicalVolume* logi_apsr3 = new G4LogicalVolume(geo_apsr3, mat_apsr3, logi_apsr3_name);
+      setColor(*logi_apsr3, "#00CC00");
+      setVisibility(*logi_apsr3, false);
+
+      APSR3.logi = logi_apsr3;
+
+      //put volume
+      string phys_apsr3_name = "phys_" + name + "_name";
+      if (apsr3_En == 1)
+        new G4PVPlacement(APSR3.transform, APSR3.logi, phys_apsr3_name, &topVolume, false, 0);
+
+      elements[name] = APSR3;
+
+
+
+      //--------------
+      //-   Additional polyethilene shield left (backward)
+      //-   Fills gap between QCS and ARICH
+
+      FarBeamLineElement APSL3;
+
+      //get parameters from .xml file
+      name = "APSL3";
+      prep = name + ".";
+
+      int apsl3_En = int(m_config.getParameter(prep + "Enable"));
+      int apsl3_N = int(m_config.getParameter(prep + "N"));
+
+      std::vector<double> apsl3_Z(apsl3_N);
+      std::vector<double> apsl3_R(apsl3_N);
+      std::vector<double> apsl3_r(apsl3_N);
+
+      for (int i = 0; i < apsl3_N; ++i) {
+        ostringstream ossZID;
+        ossZID << "Z" << i;
+
+        ostringstream ossRID;
+        ossRID << "R" << i;
+
+        ostringstream ossrID;
+        ossrID << "r" << i;
+
+        apsl3_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        apsl3_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        apsl3_r[i] = m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
+      }
+
+      // transformations
+      APSL3.transform = G4Translate3D(0.0, 0.0, 0.0);
+
+      //define geometry
+      string geo_apsl3_name = "geo_" + name + "_name";
+
+      G4Polycone* geo_apsl3 = new G4Polycone(geo_apsl3_name, 0.0, 2.0 * M_PI, apsl3_N, &(apsl3_Z[0]), &(apsl3_r[0]), &(apsl3_R[0]));
+
+      APSL3.geo = geo_apsl3;
+
+      // define logical volume
+      string strMat_apsl3 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_apsl3 = Materials::get(strMat_apsl3);
+      string logi_apsl3_name = "logi_" + name + "_name";
+      G4LogicalVolume* logi_apsl3 = new G4LogicalVolume(geo_apsl3, mat_apsl3, logi_apsl3_name);
+      setColor(*logi_apsl3, "#00CC00");
+      setVisibility(*logi_apsl3, false);
+
+      APSL3.logi = logi_apsl3;
+
+      //put volume
+      string phys_apsl3_name = "phys_" + name + "_name";
+      if (apsl3_En == 1)
+        new G4PVPlacement(APSL3.transform, APSL3.logi, phys_apsl3_name, &topVolume, false, 0);
+
+      elements[name] = APSL3;
+
     }
   }
 }
+

@@ -1840,6 +1840,80 @@ namespace Belle2 {
 
       ////=
       ////==========
+
+
+      //--------------
+      //-   Additional layer of gold
+
+      // Consists of two disjoined parts
+      // Part 1
+
+      //get parameters from .xml file
+      prep = "GoldLayer1.";
+
+      int gl1_En = int(m_config.getParameter(prep + "Enable"));
+
+      double gl1_L = m_config.getParameter(prep + "L") * Unit::cm / Unit::mm;
+      double gl1_R = m_config.getParameter(prep + "R") * Unit::cm / Unit::mm;
+      double gl1_r = m_config.getParameter(prep + "r") * Unit::cm / Unit::mm;
+      double gl1_X0 = m_config.getParameter(prep + "X0", 0.0) * Unit::cm / Unit::mm;
+      double gl1_Y0 = m_config.getParameter(prep + "Y0", 0.0) * Unit::cm / Unit::mm;
+      double gl1_Z0 = m_config.getParameter(prep + "Z0") * Unit::cm / Unit::mm;
+      double gl1_PHI = m_config.getParameter(prep + "PHI", 0.0);
+
+      // transformation
+      G4Transform3D transform_gl1 = G4Translate3D(gl1_X0, gl1_Y0, gl1_Z0);
+      transform_gl1 = transform_gl1 * G4RotateY3D(gl1_PHI / Unit::rad);
+
+      //define geometry
+      G4Tubs* geo_gl1 = new G4Tubs("geo_gl1_name", gl1_r, gl1_R, gl1_L / 2.0, 0.0, 2.0 * M_PI);
+
+      // define logical volume
+      string strMat_gl1 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_gl1 = Materials::get(strMat_gl1);
+      G4LogicalVolume* logi_gl1 = new G4LogicalVolume(geo_gl1, mat_gl1, "logi_gl1_name");
+      setColor(*logi_gl1, "#00CC00");
+      setVisibility(*logi_gl1, false);
+
+      //put volume
+      if (gl1_En == 1)
+        new G4PVPlacement(transform_gl1, logi_gl1, "phys_gl1_name", logi_Lv2Paraf, false, 0);
+
+
+      // Part 2
+
+      //get parameters from .xml file
+      prep = "GoldLayer2.";
+
+      int gl2_En = int(m_config.getParameter(prep + "Enable"));
+
+      double gl2_L = m_config.getParameter(prep + "L") * Unit::cm / Unit::mm;
+      double gl2_R = m_config.getParameter(prep + "R") * Unit::cm / Unit::mm;
+      double gl2_r = m_config.getParameter(prep + "r") * Unit::cm / Unit::mm;
+      double gl2_X0 = m_config.getParameter(prep + "X0", 0.0) * Unit::cm / Unit::mm;
+      double gl2_Y0 = m_config.getParameter(prep + "Y0", 0.0) * Unit::cm / Unit::mm;
+      double gl2_Z0 = m_config.getParameter(prep + "Z0") * Unit::cm / Unit::mm;
+      double gl2_PHI = m_config.getParameter(prep + "PHI", 0.0);
+
+      // transformation
+      G4Transform3D transform_gl2 = G4Translate3D(gl2_X0, gl2_Y0, gl2_Z0);
+      transform_gl2 = transform_gl2 * G4RotateY3D(gl2_PHI / Unit::rad);
+
+      //define geometry
+      G4Tubs* geo_gl2 = new G4Tubs("geo_gl2_name", gl2_r, gl2_R, gl2_L / 2.0, 0.0, 2.0 * M_PI);
+
+      // define logical volume
+      string strMat_gl2 = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_gl2 = Materials::get(strMat_gl2);
+      G4LogicalVolume* logi_gl2 = new G4LogicalVolume(geo_gl2, mat_gl2, "logi_gl2_name");
+      setColor(*logi_gl2, "#00CC00");
+      setVisibility(*logi_gl2, false);
+
+      //put volume
+      if (gl2_En == 1)
+        new G4PVPlacement(transform_gl2, logi_gl2, "phys_gl2_name", logi_Lv2Paraf, false, 0);
+
     }
   }
 }
+

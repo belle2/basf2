@@ -475,6 +475,24 @@
       <Material>Cu</Material>
     </PXDMountFixtureBwd>
 
+    <GoldLayer1>
+      <Enable>0</Enable>
+      <sec name="L" unit="mm">11.5</sec>
+      <sec name="R" unit="mm">10.61</sec>
+      <sec name="r" unit="mm">10.6</sec>
+      <sec name="Z0" unit="mm">-26.25</sec>
+      <Material>Au</Material>
+    </GoldLayer1>
+
+    <GoldLayer2>
+      <Enable>0</Enable>
+      <sec name="L" unit="mm">17.0</sec>
+      <sec name="R" unit="mm">10.61</sec>
+      <sec name="r" unit="mm">10.6</sec>
+      <sec name="Z0" unit="mm">45.5</sec>
+      <Material>Au</Material>
+    </GoldLayer2>
+
   </Content>
 
 </DetectorComponent>

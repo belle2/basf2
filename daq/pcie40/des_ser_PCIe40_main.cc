@@ -1402,7 +1402,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
       pthread_mutex_lock(&(mtx_sender_log));
       // Currently, zero-torellance for a CRC error.
       //      if (crc_err_ch[sender_id][i] == 0) {
-      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : POST B2link event CRC16 error. data(%x) calc(%x) : eve %d exp %d run %d sub %d : %s %s %d\n",
+      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : PRE CRC16 error or POST B2link event CRC16 error. data(%x) calc(%x) : eve %d exp %d run %d sub %d : %s %s %d\n",
              sender_id,
              hostnamebuf, i,
              value, get_crc(data_for_crc , size , first_crc),

@@ -995,9 +995,8 @@ namespace Belle2 {
     /**
     * Constructor
     * @param name (const std::string&): name of the identifier in cut
-    * @param processVariableOnCreation (bool): flag indicating if the identifier is in the outer scope of the cut and therefore is considered as a variable which should be retrieved from AVariableManager. This is nessesary because MetaVariable arguments might not be valid variables. If every IdentiferNode tried to retrieve them at creation we get lookup errors.
     **/
-    explicit IdentifierNode(const std::string& name, bool processVariableOnCreation) : m_name{name}, m_var{nullptr} {if (processVariableOnCreation) processVariable();}
+    explicit IdentifierNode(const std::string& name) : m_name{name}, m_var{nullptr} {processVariable();}
     const std::string m_name; /**< name of the variable **/
     const Var* m_var; /**< set if there was a valid variable in this cut */
   };
@@ -1070,12 +1069,10 @@ namespace Belle2 {
     * Constructor
     * @param functionName (const std::string&): function name of the MetaVariable
     * @param functionArguments (const std::vector<std::string>&): function arguments of the MetaVariable
-    * @param processMetaVariableOnCreation (bool): flag indicating if the identifier in in the outer scope of the cut and therefore is considered as a variable which should be retrieved from AVariableManager. This is nessesary because MetaVariable arguments might not be valid variables. If every IdentiferNode tried to retrieve them at creation we get lookup errors.
     **/
-    explicit FunctionNode(const std::string& functionName, const std::vector<std::string>& functionArguments,
-                          bool processMetaVariableOnCreation): m_name{functionName},
+    explicit FunctionNode(const std::string& functionName, const std::vector<std::string>& functionArguments): m_name{functionName},
       m_arguments{functionArguments}
-    {if (processMetaVariableOnCreation) processMetaVariable();}
+    {processMetaVariable();}
     const std::string m_name; /**< Function name of the MetaVariable **/
     const std::vector<std::string> m_arguments; /**< vector of string arguments of the MetaVariable **/
     const Var* m_var; /**< set if there was a valid variable in this cut */

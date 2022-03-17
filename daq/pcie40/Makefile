@@ -1,7 +1,7 @@
 #export LD_LIBRARY_PATH = $(shell echo $$LD_LIBRARY_PATH):./Pcie40Software/Pcie40Libraries/lib:./Pcie40Software/Pcie40DriverLibraries/pcie40driver_ecs)
 
 SHELL=/bin/bash
-CC=g++ -fPIC -g -O3 -Wall -DNOBASF2
+CC=g++ -fPIC -g -O3 -Wall -DNOBASF2 -std=c++11
 HERE :=$(strip $(realpath $(dir $(lastword $(MAKEFILE_LIST)))))
 TOP :=$(realpath $(HERE))/Pcie40Software
 TEMP_LOCAL_DIR=$(PWD)/../../

@@ -17,9 +17,6 @@
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
-/* C++ headers. */
-#include <cstdint>
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::KLM;

@@ -76,7 +76,7 @@ add_reconstruction(path)
 
 output = b2.register_module('RootOutput')
 output.param('outputFileName', output_filename)
-output.param('branchNames', ['MCParticles', 'ExtHits', 'KLMMuidLikelihoods', 'BKLMHit2ds', 'EKLMHit2ds'])
+output.param('branchNames', ['MCParticles', 'ExtHits', 'KLMMuidLikelihoods', 'KLMHit2ds'])
 path.add_module(output)
 
 b2.process(path)

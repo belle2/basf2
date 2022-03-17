@@ -31,7 +31,7 @@ namespace Belle2 {
   namespace Variable {
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-    static const TVector3 vecNaN(realNaN, realNaN, realNaN);
+    static const B2Vector3D vecNaN(realNaN, realNaN, realNaN);
 
     double trackNHits(const Particle* part, const Const::EDetector& det)
     {
@@ -249,7 +249,7 @@ namespace Belle2 {
     }
 
     // used in trackHelixExtTheta and trackHelixExtPhi
-    TVector3 getPositionOnHelix(const Particle* part, const std::vector<double>& pars)
+    B2Vector3D getPositionOnHelix(const Particle* part, const std::vector<double>& pars)
     {
       if (pars.size() != 3) {
         B2FATAL("Exactly three parameters (r, zfwd, zbwd) required.");
@@ -290,7 +290,7 @@ namespace Belle2 {
       if (pars.size() != 3) {
         B2FATAL("Exactly three parameters (r, zfwd, zbwd) required for helixExtTheta.");
       }
-      TVector3 position = getPositionOnHelix(part, pars);
+      B2Vector3D position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return realNaN;
       return position.Theta();
     }
@@ -301,7 +301,7 @@ namespace Belle2 {
       if (pars.size() != 3) {
         B2FATAL("Exactly three parameters (r, zfwd, zbwd) required for helixExtPhi.");
       }
-      TVector3 position = getPositionOnHelix(part, pars);
+      B2Vector3D position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return realNaN;
       return position.Phi();
     }
@@ -405,8 +405,8 @@ namespace Belle2 {
 
       const Belle2::UncertainHelix measHelix = trackfit->getUncertainHelix();
       const TMatrixDSym measCovariance = measHelix.getCovariance();
-      const TVector3 mcProdVertex = mcparticle->getVertex();
-      const TVector3 mcMomentum = mcparticle->getMomentum();
+      const B2Vector3D mcProdVertex = mcparticle->getVertex();
+      const B2Vector3D mcMomentum = mcparticle->getMomentum();
 
       const double BzAtProdVertex = Belle2::BFieldManager::getFieldInTesla(mcProdVertex).Z();
       const double mcParticleCharge = mcparticle->getCharge();

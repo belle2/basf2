@@ -7,8 +7,9 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 from variables.utils import create_aliases
-from variables import variables
+import variables
 
 
 def mc_gen_topo(n=200):
@@ -53,7 +54,7 @@ def mc_gen_topo(n=200):
     wrapper = 'genParticle({variable}, varForMCGen(mcMother(mdstIndex)))'
     prefix = 'MCGenMothIndex'
     MCGenMothIndex = create_aliases(list_of_indexes, wrapper, prefix)
-    variables.addAlias('nMCGen', 'nMCParticles')
+    variables.variables.addAlias('nMCGen', 'nMCParticles')
     list_of_variables = ['nMCGen']
     for i in range(n):
         list_of_variables.append(MCGenPDG[i])

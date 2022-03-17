@@ -25,6 +25,8 @@
 #include <gtest/gtest.h>
 #include <set>
 
+#include <Math/Vector4D.h>
+
 //using namespace std;
 using namespace Belle2;
 
@@ -273,7 +275,7 @@ namespace {
     {
       StoreObjPtr<ParticleList> list(listName);
       StoreArray<Particle> particles;
-      Particle* part = particles.appendNew(TLorentzVector(), pdgCode,
+      Particle* part = particles.appendNew(ROOT::Math::PxPyPzEVector(), pdgCode,
                                            isSelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored, Particle::c_MCParticle, mdstSource);
       list->addParticle(part);
     }
@@ -282,7 +284,7 @@ namespace {
     {
       StoreObjPtr<ParticleList> list(antiListName);
       StoreArray<Particle> particles;
-      Particle* part = particles.appendNew(TLorentzVector(), -pdgCode,
+      Particle* part = particles.appendNew(ROOT::Math::PxPyPzEVector(), -pdgCode,
                                            isSelfConjugatedParticle ? Particle::c_Unflavored : Particle::c_Flavored, Particle::c_MCParticle, mdstSource);
       list->addParticle(part);
     }
@@ -860,42 +862,66 @@ namespace {
     eclKL->setClusterId(1);
     eclKL->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
 
-    Particle* pip_1 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track, 2));
-    Particle* pip_2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track, 4));
-    Particle* pip_3 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track, 6));
+    Particle* pip_1 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track,
+                                                   2));
+    Particle* pip_2 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track,
+                                                   4));
+    Particle* pip_3 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track,
+                                                   6));
 
-    Particle* pim_1 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -211, Particle::c_Flavored, Particle::c_Track, 1));
-    Particle* pim_2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -211, Particle::c_Flavored, Particle::c_Track, 3));
-    Particle* pim_3 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -211, Particle::c_Flavored, Particle::c_Track, 5));
+    Particle* pim_1 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), -211, Particle::c_Flavored, Particle::c_Track,
+                                                   1));
+    Particle* pim_2 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), -211, Particle::c_Flavored, Particle::c_Track,
+                                                   3));
+    Particle* pim_3 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), -211, Particle::c_Flavored, Particle::c_Track,
+                                                   5));
 
-    Particle* kp_1 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track, 2));
-    Particle* kp_2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track, 4));
-    Particle* kp_3 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track, 6));
+    Particle* kp_1 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track,
+                                                  2));
+    Particle* kp_2 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track,
+                                                  4));
+    Particle* kp_3 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track,
+                                                  6));
 
-    Particle* km_1 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track, 1));
-    Particle* km_2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track, 3));
-    Particle* km_3 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track, 5));
+    Particle* km_1 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track,
+                                                  1));
+    Particle* km_2 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track,
+                                                  3));
+    Particle* km_3 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track,
+                                                  5));
 
     //copies of FS particles
-    Particle* pim_1_copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -211, Particle::c_Flavored, Particle::c_Track, 1));
-    Particle* pip_1_copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track, 2));
+    Particle* pim_1_copy = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), -211, Particle::c_Flavored,
+                                                        Particle::c_Track, 1));
+    Particle* pip_1_copy = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0),  211, Particle::c_Flavored,
+                                                        Particle::c_Track, 2));
 
-    Particle* km_1_copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track, 1));
-    Particle* kp_1_copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track, 2));
+    Particle* km_1_copy = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), -321, Particle::c_Flavored,
+                                                       Particle::c_Track, 1));
+    Particle* kp_1_copy = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0),  321, Particle::c_Flavored,
+                                                       Particle::c_Track, 2));
 
-    Particle* g_1 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 0));
-    Particle* g_2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 1));
-    Particle* g_3 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 2));
-    Particle* g_4 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 3));
-    Particle* KL  = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), Const::Klong.getPDGCode(), Particle::c_Unflavored,
+    Particle* g_1 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored,
+                                                 Particle::c_ECLCluster, 0));
+    Particle* g_2 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored,
+                                                 Particle::c_ECLCluster, 1));
+    Particle* g_3 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored,
+                                                 Particle::c_ECLCluster, 2));
+    Particle* g_4 = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored,
+                                                 Particle::c_ECLCluster, 3));
+    Particle* KL  = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), Const::Klong.getPDGCode(),
+                                                 Particle::c_Unflavored,
                                                  Particle::c_ECLCluster, 4));
 
 
-    Particle* g_1_copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
+    Particle* g_1_copy = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored,
+                                                      Particle::c_ECLCluster,
                                                       0));
-    Particle* g_2_copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
+    Particle* g_2_copy = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored,
+                                                      Particle::c_ECLCluster,
                                                       1));
-    Particle* g_3_copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
+    Particle* g_3_copy = particles.appendNew(Particle(ROOT::Math::PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored,
+                                                      Particle::c_ECLCluster,
                                                       2));
 
     // create Particle Lists

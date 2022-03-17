@@ -73,10 +73,10 @@ namespace Belle2 {
     };
 
 
-    //! @returns center cell
+    //! @returns center cell with maximum caldigit energy * reconstructed weight
     int getCenterCell(const Particle* particle)
     {
-      // get maximum cell id for this cluster (ignore weights)
+      // get maximum cell id for this cluster (using energy and weights)
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         int maxCellId = -1;
@@ -85,9 +85,10 @@ namespace Belle2 {
         auto clusterDigitRelations = cluster->getRelationsTo<ECLCalDigit>();
         for (unsigned int ir = 0; ir < clusterDigitRelations.size(); ++ir) {
           const auto calDigit = clusterDigitRelations.object(ir);
+          const auto weight = clusterDigitRelations.weight(ir);
 
-          if (calDigit->getEnergy() > maxEnergy) {
-            maxEnergy = calDigit->getEnergy();
+          if (calDigit->getEnergy()*weight > maxEnergy) {
+            maxEnergy = calDigit->getEnergy() * weight;
             maxCellId = calDigit->getCellId();
           }
         }
@@ -160,8 +161,9 @@ namespace Belle2 {
           for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
 
             const auto caldigit = relatedDigits.object(iRel);
+            const auto weight = relatedDigits.weight(iRel);
 
-            energyToSort.emplace_back(caldigit->getEnergy(), iRel);
+            energyToSort.emplace_back(caldigit->getEnergy()*weight, iRel);
 
           }
 
@@ -240,6 +242,7 @@ namespace Belle2 {
 
       StoreObjPtr<ECLCellIdMapping> mapping;
       const unsigned int posid = int(std::lround(vars[0]));
+
       const int nneighbours = int(std::lround(vars[1]));
       const int varid = int(std::lround(vars[2]));
       const int extid = int(std::lround(vars[3]));
@@ -261,7 +264,6 @@ namespace Belle2 {
       } else {
         maxCellId = getCenterCell(particle);
       }
-
 
       if (maxCellId < 0) return std::numeric_limits<double>::quiet_NaN();
 
@@ -304,7 +306,6 @@ namespace Belle2 {
         if (storearraypos >= 0) {
           if (varid == varType::energy) {
             return eclCalDigits[storearraypos]->getEnergy();
-
           } else if (varid == varType::weight) {
             const ECLCluster* cluster = particle->getECLCluster();
             if (cluster == nullptr) {return std::numeric_limits<double>::quiet_NaN();}
@@ -442,6 +443,7 @@ namespace Belle2 {
     //! @returns the eclcaldigit energy by digit energy rank
     double getECLCalDigitEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
+
       if (vars.size() != 1) {
         B2FATAL("Need exactly one parameters (energy index).");
       }
@@ -1512,7 +1514,7 @@ namespace Belle2 {
                       "Returns R of the i-th highest energy caldigit in the cluster (i>=0)");
   }
 
-  // Create an empty module which allows basf2 to easily find the library and load it from the steering file
-  class EnableECLCalDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.
-  REG_MODULE(EnableECLCalDigitVariables); /**< register the empty module */
+//   // Create an empty module which allows basf2 to easily find the library and load it from the steering file
+//   class EnableECLCalDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.
+//   REG_MODULE(EnableECLCalDigitVariables); /**< register the empty module */
 }

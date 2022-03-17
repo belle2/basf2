@@ -1317,8 +1317,8 @@ namespace Belle2 {
           B2DEBUG(21, padright("      ETFVAL: " + std::to_string(std::stoi(p_etfval.data, 0, 2)) + ", (" + p_etfval.data + ")", 100));
           B2DEBUG(21, padright("      ETFT0: " + std::to_string(std::stoi(p_etftime.data, 0, 2)) + ", (" + p_etftime.data + ")", 100));
           B2DEBUG(21, padright("      ETFQuality: " + std::to_string(std::stoi(p_etfqual.data, 0, 2)) + ", (" + p_etfqual.data + ")", 100));
-          bool hasETFTime = false;
           if (p_nnenable.data == "1") {
+            bool hasETFTime = false;
             if (p_etfval.data == "1") {
               storeETFTime->addBinnedEventT0(std::stoi(p_etftime.data, 0, 2), Const::CDC);
               hasETFTime = true;

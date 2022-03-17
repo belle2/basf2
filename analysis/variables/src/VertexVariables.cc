@@ -14,7 +14,6 @@
 #include <framework/utilities/Conversion.h>
 
 #include <TMatrixFSym.h>
-#include <TVector3.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -58,11 +57,11 @@ namespace Belle2 {
       return mcparticle->getDecayVertex().Perp();
     }
 
-    TVector3 getMcDecayVertexFromIP(const MCParticle* mcparticle)
+    B2Vector3D getMcDecayVertexFromIP(const MCParticle* mcparticle)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition());
+      return frame.getVertex(ROOT::Math::XYZVector(mcparticle->getDecayVertex() - beamSpotDB->getIPPosition()));
     }
 
     double mcDecayVertexFromIPX(const Particle* part)
@@ -121,11 +120,11 @@ namespace Belle2 {
       return mcparticle->getProductionVertex().Z();
     }
 
-    TVector3 getMcProductionVertexFromIP(const MCParticle* mcparticle)
+    B2Vector3D getMcProductionVertexFromIP(const MCParticle* mcparticle)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(mcparticle->getProductionVertex() - beamSpotDB->getIPPosition());
+      return frame.getVertex(mcparticle->getProductionVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
     }
 
     double mcProductionVertexFromIPX(const Particle* part)
@@ -199,17 +198,17 @@ namespace Belle2 {
     //----------------------------------------------------------------------------------
     // vertex or POCA in respect to measured IP
 
-    TVector3 getVertexD(const Particle* part)
+    B2Vector3D getVertexD(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
       auto trackFit = part->getTrackFitResult();
       if (!trackFit)
-        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition());
+        return frame.getVertex(part->getVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
 
       UncertainHelix helix = trackFit->getUncertainHelix();
       helix.passiveMoveBy(beamSpotDB->getIPPosition());
-      return frame.getVertex(helix.getPerigee());
+      return frame.getVertex(ROOT::Math::XYZVector(helix.getPerigee()));
     }
 
 
@@ -258,10 +257,10 @@ namespace Belle2 {
       // and V_{ij} is the covariance matrix
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      const TVector3& vertex = frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition());
+      const B2Vector3D& vertex = frame.getVertex(part->getVertex() - ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
       const TMatrixFSym& vertexErr = frame.getVertexErrorMatrix(static_cast<TMatrixDSym>(part->getVertexErrorMatrix()) +
                                                                 beamSpotDB->getCovVertex());
-      const double denominator = vertex * (vertexErr * vertex);
+      const double denominator = vertex * B2Vector3D(vertexErr * vertex);
       if (denominator <= 0) return realNaN;
 
       return vertex.Mag2() / std::sqrt(denominator);

@@ -151,8 +151,8 @@ void KKGenInputModule::initializeGenerator()
                  m_taudecaytableFileName, m_KKMCOutputFileName);
 
   const MCInitialParticles& initial = m_initial.generate();
-  TLorentzVector v_ler = initial.getLER();
-  TLorentzVector v_her = initial.getHER();
+  ROOT::Math::PxPyPzEVector v_ler = initial.getLER();
+  ROOT::Math::PxPyPzEVector v_her = initial.getHER();
 
   //set the beam parameters, ignoring beam energy spread for the moment
   m_Ikkgen.set_beam_info(v_ler, 0.0, v_her, 0.0);

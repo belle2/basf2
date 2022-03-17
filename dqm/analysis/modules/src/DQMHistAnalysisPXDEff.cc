@@ -42,7 +42,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDEFF"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("useEpicsRO", m_useEpicsRO, "useEpics ReadOnly", false);
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);

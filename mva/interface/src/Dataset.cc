@@ -395,7 +395,7 @@ namespace Belle2 {
 
     std::vector<float> ROOTDataset::getWeights()
     {
-      std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_weight_variable);
+      std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_weight_variable);
       if (branchName.empty()) {
         B2INFO("No TBranch name given for weights. Using 1s as default weights.");
         int nentries = getNumberOfEvents();
@@ -426,7 +426,7 @@ namespace Belle2 {
                 << getNumberOfFeatures());
       }
 
-      std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]);
+      std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_variables[iFeature]);
       std::string typeName = "features";
 
       if (m_isDoubleInputType)
@@ -442,7 +442,7 @@ namespace Belle2 {
                 << getNumberOfSpectators());
       }
 
-      std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_spectators[iSpectator]);
+      std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_spectators[iSpectator]);
       std::string typeName = "spectators";
 
       if (m_isDoubleInputType)
@@ -507,14 +507,14 @@ namespace Belle2 {
           m_tree->SetBranchStatus(variableName.c_str(), true);
           m_tree->SetBranchAddress(variableName.c_str(), &variableTarget);
         } else {
-          if (checkForBranch(m_tree, Belle2::makeROOTCompatible(variableName))) {
-            m_tree->SetBranchStatus(Belle2::makeROOTCompatible(variableName).c_str(), true);
-            m_tree->SetBranchAddress(Belle2::makeROOTCompatible(variableName).c_str(), &variableTarget);
+          if (checkForBranch(m_tree, Belle2::MakeROOTCompatible::makeROOTCompatible(variableName))) {
+            m_tree->SetBranchStatus(Belle2::MakeROOTCompatible::makeROOTCompatible(variableName).c_str(), true);
+            m_tree->SetBranchAddress(Belle2::MakeROOTCompatible::makeROOTCompatible(variableName).c_str(), &variableTarget);
           } else {
             B2ERROR("Couldn't find given " << variableType << " variable named " << variableName <<
-                    " (I tried also using makeROOTCompatible)");
+                    " (I tried also using MakeROOTCompatible::makeROOTCompatible)");
             throw std::runtime_error("Couldn't find given " + variableType + " variable named " + variableName +
-                                     " (I tried also using makeROOTCompatible)");
+                                     " (I tried also using MakeROOTCompatible::makeROOTCompatible)");
           }
         }
       }
@@ -591,8 +591,8 @@ namespace Belle2 {
       for (auto& variable : m_general_options.m_variables) {
         if (checkForBranch(m_tree, variable))
           control_variable = variable;
-        else if (checkForBranch(m_tree, Belle2::makeROOTCompatible(variable)))
-          control_variable = Belle2::makeROOTCompatible(variable);
+        else if (checkForBranch(m_tree, Belle2::MakeROOTCompatible::makeROOTCompatible(variable)))
+          control_variable = Belle2::MakeROOTCompatible::makeROOTCompatible(variable);
         if (not control_variable.empty()) {
           TBranch* branch = m_tree->GetBranch(control_variable.c_str());
           TLeaf* leaf = branch->GetLeaf(control_variable.c_str());

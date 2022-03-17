@@ -62,6 +62,10 @@ namespace Belle2 {
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
+    addParam("skipNonPrimary", m_skipNonPrimary,
+             "If true, the secondary MC particle will be skipped, default is false",
+             false);
+
     addParam("addDaughters", m_addDaughters,
              "If true, the particles from the bottom part of the selected particle's decay chain will also be created in the datastore and mother-daughter relations are recursively set",
              false);
@@ -314,11 +318,11 @@ namespace Belle2 {
       // Create a particle from missing momentum
       auto* signalSideParticle = roe->getRelatedFrom<Particle>();
       PCmsLabTransform T;
-      TLorentzVector boost4Vector = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector boost4Vector = T.getBeamFourMomentum();
 
-      TLorentzVector signal4Vector = signalSideParticle->get4Vector();
-      TLorentzVector roe4Vector = roe->get4Vector(m_roeMaskName);
-      TLorentzVector missing4Vector = boost4Vector - signal4Vector - roe4Vector;
+      ROOT::Math::PxPyPzEVector signal4Vector = signalSideParticle->get4Vector();
+      ROOT::Math::PxPyPzEVector roe4Vector = roe->get4Vector(m_roeMaskName);
+      ROOT::Math::PxPyPzEVector missing4Vector = boost4Vector - signal4Vector - roe4Vector;
       auto isFlavored = (isSelfConjugatedParticle) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
       newPart = m_particles.appendNew(missing4Vector, pdgCode, isFlavored, Particle::EParticleSourceObject::c_Undefined, mdstIndex);
 
@@ -449,7 +453,7 @@ namespace Belle2 {
         newDaugM->addRelationTo(v0TrackFitResults.second);
 
         // sum the 4-momenta of the daughters and construct a particle object
-        TLorentzVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
+        ROOT::Math::PxPyPzEVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
         Particle v0P(v0Momentum, v0Type.getPDGCode(), v0FlavorType,
                      Particle::EParticleSourceObject::c_V0, v0->getArrayIndex());
 
@@ -718,6 +722,9 @@ namespace Belle2 {
         const MCParticle* mcParticle = m_mcparticles[i];
 
         if (abs(pdgCode) != abs(mcParticle->getPDG()))
+          continue;
+
+        if (m_skipNonPrimary and !mcParticle->hasStatus(MCParticle::c_PrimaryParticle))
           continue;
 
         Particle particle(mcParticle);

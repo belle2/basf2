@@ -463,7 +463,7 @@ namespace Belle2 {
       Variable::Manager::VariableDataType m_target_data_type =
         Variable::Manager::VariableDataType::c_double; /**< Data type of target variable */
       double m_target_double; /**< Contains the target value of the currently loaded event */
-      double m_target_int; /**< Contains the target value of the currently loaded event */
+      int m_target_int; /**< Contains the target value of the currently loaded event */
       bool m_target_bool; /**< Contains the target value of the currently loaded event */
     };
 

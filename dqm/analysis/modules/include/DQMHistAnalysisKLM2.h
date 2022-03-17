@@ -94,7 +94,7 @@ namespace Belle2 {
     TString m_RunTypeString;
 
     /** Run type flag for null runs. */
-    bool m_IsNullRun = false;
+    bool m_IsPhysicsRun = false;
 
     /** Histogram for BKLM plane efficiency. */
     TH1* m_eff_bklm = NULL;

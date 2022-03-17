@@ -32,6 +32,8 @@ def findMatchedParenthesis(string: str, openchar: str, closechar: str) -> int:
             elif string[end] == closechar:
                 count -= 1
             end += 1
+        if count > 0:
+            raise SyntaxError("Matched parenthesis for metavariable could not be found.")
     return end - 1
 
 

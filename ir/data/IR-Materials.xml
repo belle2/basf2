@@ -71,4 +71,68 @@
     </Components>
   </Material>
 
+
+  <!-- Following borated polyethylene definition copied from STR-Materials.xml -->
+
+  <!-- Polyethylene with 3%(w/w) natural Boron; PE + B -->
+  <Material name="IR-PEB03">
+    <state>Solid</state>
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.03">B</Element>
+       <Material fraction="0.97">G4_POLYETHYLENE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 5%(w/w) natural Boron; PE + B -->
+  <Material name="IR-PEB05">
+    <state>Solid</state>
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.05">B</Element>
+       <Material fraction="0.95">G4_POLYETHYLENE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 10%(w/w) natural Boron; PE + B -->
+  <Material name="IR-PEB10">
+    <state>Solid</state>
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.10">B</Element>
+       <Material fraction="0.90">G4_POLYETHYLENE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 15%(w/w) natural Boron; PE + B -->
+  <Material name="IR-PEB15">
+    <state>Solid</state>
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.15">B</Element>
+       <Material fraction="0.85">G4_POLYETHYLENE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 20%(w/w) natural Boron; PE + B -->
+  <Material name="IR-PEB20">
+    <state>Solid</state>
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.20">B</Element>
+       <Material fraction="0.80">G4_POLYETHYLENE</Material>
+    </Components>
+  </Material>
+
+  <!-- Polyethylene with 25%(w/w) natural Boron; PE + B -->
+  <Material name="IR-PEB25">
+    <state>Solid</state>
+    <density unit="g/cm3">0.99</density>
+    <Components>
+       <Element  fraction="0.25">B</Element>
+       <Material fraction="0.75">G4_POLYETHYLENE</Material>
+    </Components>
+  </Material>
+
 </Materials>
+

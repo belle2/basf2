@@ -41,7 +41,8 @@ class CosmicsExtapolationPlotModule(basf2.Module):
         function_list.Add(TNamed('Check', ' No bias, no large background, resolution ~ 2 cm.'))
         function_list.Add(TNamed('Contact', contact))
         if shifter:
-            function_list.Add(TNamed('MetaOptions', 'shifter'))
+            basf2.B2WARNING("temporarily removed all shifter plots for the CosmicsExtrapolationPlots")
+            # function_list.Add(TNamed('MetaOptions', 'shifter'))
 
     def set_options_momentum(self, histogram, description):
         """ Set options for momentum plot. """

@@ -377,11 +377,11 @@ void printEventData(unsigned int* data, int size)
 
 void printEventData(unsigned int* data, int size, int sender_id)
 {
-  printf("thread %d : %.8x : ", sender_id, 0);
+  printf("thread %d ; %.8x : ", sender_id, 0);
   if (0 != data) {
     for (int i = 0 ; i < size; ++i) {
       printf("%.8x ", data[ i ]);
-      if (i % 8 == 7)printf("\nthread %d : %.8x : ", sender_id, i + 1);
+      if (i % 8 == 7)printf("\nthread %d ; %.8x : ", sender_id, i + 1);
     }
   } else printf("No data\n")  ;
   printf("\n");
@@ -454,14 +454,14 @@ void printEventNumberError(unsigned int*& data, const unsigned int evtnum, const
   n_messages[ 10 ] = n_messages[ 10 ] + 1 ;
   if (reduced_flag == 1) {
     sprintf(err_buf,
-            "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u for all channels : prun %u crun %u\n %s %s %d\n",
+            "[FATAL] thread %d ; %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u for all channels : prun %u crun %u\n %s %s %d\n",
             sender_id, hostnamebuf, get1stChannel(data),
             data[EVENUM_POS], evtnum + (eve_diff - 1),
             exprun, data[RUNNO_POS],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
   } else {
     sprintf(err_buf,
-            "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u ( ",
+            "[FATAL] thread %d ; %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u ( ",
             sender_id, hostnamebuf, get1stChannel(data),
             data[EVENUM_POS], evtnum + (eve_diff - 1));
     int temp_pos = 0;
@@ -509,7 +509,7 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
     char err_buf[500] = {0};
     pthread_mutex_lock(&(mtx_sender_log));
     sprintf(err_buf,
-            "[FATAL] thread %d : ERROR_EVENT : Invalid Magic word in ReadOut Board header( 0x%.8x ) : It must be 0x7f7f???? : eve %d exp %d run %d sub %d : %s %s %d",
+            "[FATAL] thread %d ; ERROR_EVENT : Invalid Magic word in ReadOut Board header( 0x%.8x ) : It must be 0x7f7f???? : eve %d exp %d run %d sub %d : %s %s %d",
             sender_id, data[ MAGIC_7F7F_POS ],
             new_evtnum,
             (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
@@ -530,7 +530,7 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
   if (!(data[ MAGIC_7F7F_POS ] & 0x00008000)) {
     // reduced
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] thread %d : This function cannot be used for already reduced data. 7f7f header is 0x%.8x : eve %d exp %d run %d sub %d : %s %s %d\n",
+    printf("[FATAL] thread %d ; This function cannot be used for already reduced data. 7f7f header is 0x%.8x : eve %d exp %d run %d sub %d : %s %s %d\n",
            sender_id, data[ MAGIC_7F7F_POS ],
            new_evtnum,
            (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
@@ -606,7 +606,7 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
 
       if (temp_eve != new_evtnum) {
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[FATAL] thread %d : ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: eve in ROBheader = 0x%.8x , ch %d 's eve = 0x%.8x : exp %d run %d sub %d : %s %s %d\n",
+        printf("[FATAL] thread %d ; ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: eve in ROBheader = 0x%.8x , ch %d 's eve = 0x%.8x : exp %d run %d sub %d : %s %s %d\n",
                sender_id, i,
                new_evtnum, i, temp_eve,
                (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
@@ -632,7 +632,7 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
     //
     if (temp_ctime_trgtype != temp_ctime_trgtype_footer || (temp_eve & 0xffff) != ((temp_eve_footer >> 16) & 0xffff)) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : ch=%d : ERROR_EVENT : mismatch(finesse %d) between header(ctime 0x%.8x eve 0x%.8x) and footer(ctime 0x%.8x eve_crc16 0x%.8x). Exiting... : exp %d run %d sub %d : %s %s %d\n",
+      printf("[FATAL] thread %d ; ch=%d : ERROR_EVENT : mismatch(finesse %d) between header(ctime 0x%.8x eve 0x%.8x) and footer(ctime 0x%.8x eve_crc16 0x%.8x). Exiting... : exp %d run %d sub %d : %s %s %d\n",
              sender_id, i, i,
              temp_ctime_trgtype,  temp_eve, temp_ctime_trgtype_footer, temp_eve_footer,
              (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
@@ -652,7 +652,7 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
   if (err_flag == 1) {
     pthread_mutex_lock(&(mtx_sender_log));
     sprintf(err_buf,
-            "[FATAL] thread %d : ch= %d or %d : ERROR_EVENT : mismatch header value over FINESSEs ( between ch %d and ch %d ). Exiting...: ",
+            "[FATAL] thread %d ; ch= %d or %d : ERROR_EVENT : mismatch header value over FINESSEs ( between ch %d and ch %d ). Exiting...: ",
             sender_id, err_ch, first_ch, err_ch, first_ch);
     for (int i = 0; i <  MAX_PCIE40_CH; i++) {
       if (used_ch[ i ] == 1) {
@@ -970,7 +970,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
   unsigned int event_length = data[ EVENT_LEN_POS ];
   if (event_length > 0x100000) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] thread %d : ERROR_EVENT : Too large event size. : 0x%.8x : %d words. : exp %d run %d sub %d : Exiting...\n",
+    printf("[FATAL] thread %d ; ERROR_EVENT : Too large event size. : 0x%.8x : %d words. : exp %d run %d sub %d : Exiting...\n",
            sender_id,
            data[ EVENT_LEN_POS ], data[ EVENT_LEN_POS ],
            (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
@@ -983,7 +983,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     exit(1);
   } else if (event_length == 0) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] thread %d : ERROR_EVENT : Specified event size is zero. : 0x%.8x : %u words. : exp %d run %d sub %d : Exiting...\n",
+    printf("[FATAL] thread %d ; ERROR_EVENT : Specified event size is zero. : 0x%.8x : %u words. : exp %d run %d sub %d : Exiting...\n",
            sender_id,
            data[ EVENT_LEN_POS ], event_length,
            (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
@@ -1004,7 +1004,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     n_messages[ 7 ] = n_messages[ 7 ] + 1 ;
     if (n_messages[ 7 ] < max_number_of_messages) {
       sprintf(err_buf,
-              "[FATAL] thread %d : ERROR_EVENT :  Invalid Magic word in ReadOut Board header( 0x%.8x ) : It must be 0x7f7f???? : exp %d run %d sub %d",
+              "[FATAL] thread %d ; ERROR_EVENT :  Invalid Magic word in ReadOut Board header( 0x%.8x ) : It must be 0x7f7f???? : exp %d run %d sub %d",
               sender_id, data[ MAGIC_7F7F_POS ],
               (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
               (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -1036,7 +1036,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     ff55_pos_from_end = - Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_TRAILER +
                         Belle2::PreRawCOPPERFormat_latest::POS_CHKSUM_B2LHSLB;
 
-    // printf("[WARNING] thread %d : Error was detected by data-check core in PCIe40 FPGA. : exp %d run %d sub %d\n",
+    // printf("[WARNING] thread %d ; Error was detected by data-check core in PCIe40 FPGA. : exp %d run %d sub %d\n",
     //          sender_id, data[ MAGIC_7F7F_POS ],
     //          (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
     //          (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -1045,7 +1045,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
 
 //     if (data[ ERR_POS ] == 0) {
 //       pthread_mutex_lock(&(mtx_sender_log));
-//       printf("[FATAL] thread %d : Data error was deteced by PCIe40 FPGA. Header %.8x, Errorbit %.8x\n", sender_id, data[ MAGIC_7F7F_POS ],
+//       printf("[FATAL] thread %d ; Data error was deteced by PCIe40 FPGA. Header %.8x, Errorbit %.8x\n", sender_id, data[ MAGIC_7F7F_POS ],
 //              data[ ERR_POS ]);
 //       printEventData(data, event_length, sender_id);
 //       pthread_mutex_unlock(&(mtx_sender_log));
@@ -1061,7 +1061,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
                         Belle2::PostRawCOPPERFormat_latest::POS_B2LHSLB_TRL_MAGIC;
     if (data[ ERR_POS ] != 0) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : Inconsistency between header(no error found by FPGA) %.8x and errorbit %.8x (error-bit is non-zero) : exp %d run %d sub %d\n",
+      printf("[FATAL] thread %d ; Inconsistency between header(no error found by FPGA) %.8x and errorbit %.8x (error-bit is non-zero) : exp %d run %d sub %d\n",
              sender_id, data[ MAGIC_7F7F_POS ], data[ ERR_POS ],
              (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
              (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -1100,7 +1100,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
         pthread_mutex_lock(&(mtx_sender_log));
         n_messages[ 9 ] = n_messages[ 9 ] + 1 ;
         if (n_messages[ 9 ] < max_number_of_messages) {
-          printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Bad exprun(now %.8x prev. %.8x) : exp %d run %d sub %d : Exiting...\n",
+          printf("[FATAL] thread %d ; %s ch=%d : ERROR_EVENT : Bad exprun(now %.8x prev. %.8x) : exp %d run %d sub %d : Exiting...\n",
                  sender_id, hostnamebuf, get1stChannel(data),
                  exprun, data[RUNNO_POS],
                  (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
@@ -1116,7 +1116,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
 #endif
       } else {
         if (sender_id == 0) {
-          printf("[DEBUG] thread %d : Run number was changed. cur exprun %.8x prev. exprun %.8x cur eve %.8x : exp %d run %d sub %d\n",
+          printf("[DEBUG] thread %d ; Run number was changed. cur exprun %.8x prev. exprun %.8x cur eve %.8x : exp %d run %d sub %d\n",
                  sender_id, data[RUNNO_POS], exprun, new_evtnum,
                  (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
                  (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -1203,7 +1203,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 11 ] = n_messages[ 11 ] + 1 ;
       if (n_messages[ 11 ] < max_number_of_messages) {
-        printf("[FATAL] thread %d : %s ch=%d or %d : ERROR_EVENT : HSLB or PCIe40 channel found in data is ch %d but the next channel must be ch %d according to masking register info. of PCIe40. Please check the status of channel masking.  : exp %d run %d sub %d\n",
+        printf("[FATAL] thread %d ; %s ch=%d or %d : ERROR_EVENT : HSLB or PCIe40 channel found in data is ch %d but the next channel must be ch %d according to masking register info. of PCIe40. Please check the status of channel masking.  : exp %d run %d sub %d\n",
                sender_id,
                hostnamebuf, i, valid_ch[link_cnt],
                i, valid_ch[link_cnt],
@@ -1229,7 +1229,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
       if (n_messages[ 12 ] < max_number_of_messages) {
         char err_buf[500];
         sprintf(err_buf,
-                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 header magic word(0xffaa) is invalid. header %.8x : exp %d run %d sub %d : %s %s %d\n",
+                "[FATAL] thread %d ; %s ch=%d : ERROR_EVENT : HSLB or PCIe40 header magic word(0xffaa) is invalid. header %.8x : exp %d run %d sub %d : %s %s %d\n",
                 sender_id,
                 hostnamebuf, i,
                 data[ cur_pos + ffaa_pos ],
@@ -1264,7 +1264,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
           first_b2lctime_flag = 1;
         }
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[DEBUG] thread %d : eve %u ch %3d B2Lctime 0x%.8x diff %.2lf [us] : exp %d run %d sub %d : %s",
+        printf("[DEBUG] thread %d ; eve %u ch %3d B2Lctime 0x%.8x diff %.2lf [us] : exp %d run %d sub %d : %s",
                sender_id, new_evtnum, i,
                data[ cur_pos +
                      Belle2::PostRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
@@ -1295,9 +1295,9 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
       err_link_eve_jump[sender_id]++;
       if (err_link_eve_jump[sender_id] < max_number_of_messages) {
         char err_buf[500] = {0};
-        //        printf("[FATAL] thread %d : event diff. in ch %d cur_eve %.8x ffaa %.8x\n", sender_id, i, new_evtnum, data[ cur_pos + FFAA_POS ]);
+        //        printf("[FATAL] thread %d ; event diff. in ch %d cur_eve %.8x ffaa %.8x\n", sender_id, i, new_evtnum, data[ cur_pos + FFAA_POS ]);
         sprintf(err_buf,
-                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number (= lower 8bits in ffaa header -> 0x%.2x). Exiting...: eve 0x%.8x ffaa header 0x%.8x : exp %d run %d sub %d : %s %s %d",
+                "[FATAL] thread %d ; %s ch=%d : ERROR_EVENT : Invalid event_number (= lower 8bits in ffaa header -> 0x%.2x). Exiting...: eve 0x%.8x ffaa header 0x%.8x : exp %d run %d sub %d : %s %s %d",
                 sender_id,
                 hostnamebuf, i,
                 data[ cur_pos + ffaa_pos ] & 0xff, new_evtnum, data[ cur_pos + ffaa_pos ],
@@ -1320,7 +1320,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     unsigned int ch_ffaa = (data[ cur_pos + ffaa_pos ] >> 8)  & 0x000000ff;
     if ((unsigned int)i != ch_ffaa) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 channel-number is differnt. It should be ch %d in the channel table in the ROB header buf ffaa header info says ch is %d (%.8x). : exp %d run %d sub %d : %s %s %d\n",
+      printf("[FATAL] thread %d ; %s ch=%d : ERROR_EVENT : HSLB or PCIe40 channel-number is differnt. It should be ch %d in the channel table in the ROB header buf ffaa header info says ch is %d (%.8x). : exp %d run %d sub %d : %s %s %d\n",
              sender_id, hostnamebuf,  i,
              i, (data[ cur_pos + ffaa_pos ] >> 8) & 0xff,
              data[ cur_pos + ffaa_pos ],
@@ -1342,7 +1342,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 13 ] = n_messages[ 13 ] + 1 ;
       if (n_messages[ 13 ] < max_number_of_messages) {
-        printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : The end position ( %d words ) of this channel data exceeds event size( %d words ). Exiting... : exp %d run %d sub %d : %s %s %d\n",
+        printf("[FATAL] thread %d ; %s ch=%d : ERROR_EVENT : The end position ( %d words ) of this channel data exceeds event size( %d words ). Exiting... : exp %d run %d sub %d : %s %s %d\n",
                sender_id,
                hostnamebuf,  i,
                (cur_pos + linksize) , event_nwords,
@@ -1369,7 +1369,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
       if (n_messages[ 14 ] < max_number_of_messages) {
         char err_buf[500];
         sprintf(err_buf,
-                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 trailer magic word(0xff55) is invalid. foooter %.8x : exp %d run %d sub %d : %s %s %d",
+                "[FATAL] thread %d ; %s ch=%d : ERROR_EVENT : HSLB or PCIe40 trailer magic word(0xff55) is invalid. foooter %.8x : exp %d run %d sub %d : %s %s %d",
                 sender_id,
                 hostnamebuf, i,
                 data[ cur_pos + linksize + ff55_pos_from_end ],
@@ -1377,7 +1377,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
                 (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
                 (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
-        //        printf("[FATAL] thread %d : Bad ff55 %X pos %.8x ch %d\n" , sender_id, data[ cur_pos + linksize - 1  ], cur_pos + linksize - 1  ,   i) ;
+        //        printf("[FATAL] thread %d ; Bad ff55 %X pos %.8x ch %d\n" , sender_id, data[ cur_pos + linksize - 1  ], cur_pos + linksize - 1  ,   i) ;
         printf("%s\n", err_buf); fflush(stdout);
         printEventData(data, event_length + 16, sender_id);
       }
@@ -1402,7 +1402,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
       pthread_mutex_lock(&(mtx_sender_log));
       // Currently, zero-torellance for a CRC error.
       //      if (crc_err_ch[sender_id][i] == 0) {
-      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : PRE CRC16 error or POST B2link event CRC16 error. data(%x) calc(%x) : eve %d exp %d run %d sub %d : %s %s %d\n",
+      printf("[FATAL] thread %d ; %s ch=%d : ERROR_EVENT : PRE CRC16 error or POST B2link event CRC16 error. data(%x) calc(%x) : eve %d exp %d run %d sub %d : %s %s %d\n",
              sender_id,
              hostnamebuf, i,
              value, get_crc(data_for_crc , size , first_crc),
@@ -1411,7 +1411,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
              (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
              (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      // printf("[FATAL] thread %d : CRC Error calc %.4X data %.8X eve %u ch %d\n" , sender_id,
+      // printf("[FATAL] thread %d ; CRC Error calc %.4X data %.8X eve %u ch %d\n" , sender_id,
       //        get_crc(data_for_crc , size , first_crc) ,
       //        data[ cur_pos + linksize - 2 ], new_evtnum, i) ;
       printEventData(data, event_length, sender_id);
@@ -1435,7 +1435,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     if (new_evtnum % 1000000 == 0) {
       //    if (total_crc_good[sdr_id] % (1000000 + sdr_id) == 0) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[DEBUG] thread %d :  CRC Good  calc %.4X data %.4X eve %u ch %d crcOK %u crcNG %d errflag %u : exp %d run %d sub %d\n" ,
+      printf("[DEBUG] thread %d ;  CRC Good  calc %.4X data %.4X eve %u ch %d crcOK %u crcNG %d errflag %u : exp %d run %d sub %d\n" ,
              sender_id,
              get_crc(data_for_crc , size , first_crc) ,
              value, new_evtnum, i, total_crc_good[sender_id], total_crc_errors[sender_id], err_flag_cnt[sender_id],
@@ -1448,7 +1448,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
       for (int j = 0; j <  MAX_PCIE40_CH; j++) {
         if (crc_err_ch[sender_id][j] > 0) {
           if (temp_err_cnt == 0) {
-            printf("[DEBUG] thread %d : crc_err_cnt : ", sender_id);
+            printf("[DEBUG] thread %d ; crc_err_cnt : ", sender_id);
             temp_err_cnt = 1;
           }
           printf("ch %d %u : ", j, crc_err_ch[sender_id][j]);
@@ -1475,7 +1475,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
   //
   if (cur_pos != event_nwords - Belle2::RawTrailer_latest::RAWTRAILER_NWORDS) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] thread %d : %s : ERROR_EVENT : The end position of channel data( %d-th word ) does not coincide with the start of RawTrailer( %d-th word ). Exiting... : exp %d run %d sub %d : %s %s %d\n",
+    printf("[FATAL] thread %d ; %s : ERROR_EVENT : The end position of channel data( %d-th word ) does not coincide with the start of RawTrailer( %d-th word ). Exiting... : exp %d run %d sub %d : %s %s %d\n",
            sender_id,
            hostnamebuf,
            cur_pos, event_nwords - Belle2::RawTrailer_latest::RAWTRAILER_NWORDS,
@@ -1496,7 +1496,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
   //
   if (link_cnt != expected_number_of_links) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] thread %d : %s : ERROR_EVENT : # of links(%d) in data is not the same as exptected(=%d). : Exiting... : exp %d run %d sub %d : %s %s %d\n",
+    printf("[FATAL] thread %d ; %s : ERROR_EVENT : # of links(%d) in data is not the same as exptected(=%d). : Exiting... : exp %d run %d sub %d : %s %s %d\n",
            sender_id,
            hostnamebuf,
            link_cnt, expected_number_of_links,
@@ -1518,7 +1518,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
   //
   if (new_evtnum == 0) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[DEBUG] thread %d :  Printing the 1st event.\n", sender_id);
+    printf("[DEBUG] thread %d ;  Printing the 1st event.\n", sender_id);
     printEventData(data, event_length, sender_id);
     pthread_mutex_unlock(&(mtx_sender_log));
   }
@@ -1533,7 +1533,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     checkUtimeCtimeTRGType(data, sender_id);
     pthread_mutex_lock(&(mtx_sender_log));
     if (err_not_reduced[sender_id] < max_number_of_messages) {
-      printf("[WARNING] thread %d : %s ch=%d : ERROR_EVENT : Error-flag was set by the data-check module in PCIe40 FPGA. : eve %d prev thr eve %d : exp %d run %d sub %d : %s %s %d\n",
+      printf("[WARNING] thread %d ; %s ch=%d : ERROR_EVENT : Error-flag was set by the data-check module in PCIe40 FPGA. : eve %d prev thr eve %d : exp %d run %d sub %d : %s %s %d\n",
              sender_id,
              hostnamebuf, -1, new_evtnum, evtnum,
              (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
@@ -1892,7 +1892,7 @@ void* sender(void* arg)
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] thread %d : Failed to bind(%s). Maybe other programs have already occupied this port(%d). Exiting...\n",
+    printf("[FATAL] thread %d ; Failed to bind(%s). Maybe other programs have already occupied this port(%d). Exiting...\n",
            sender_id, strerror(errno),
            port_to); fflush(stdout);
     pthread_mutex_unlock(&(mtx_sender_log));
@@ -1904,14 +1904,14 @@ void* sender(void* arg)
     sprintf(cmdline, "/usr/sbin/ss -ap | grep %d", port_to);
     if ((fp = popen(cmdline, "r")) == NULL) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[WARNING] thread %d : Failed to run %s\n", sender_id,
+      printf("[WARNING] thread %d ; Failed to run %s\n", sender_id,
              cmdline);
       pthread_mutex_unlock(&(mtx_sender_log));
     }
 
     while (fgets(buf, 256, fp) != NULL) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[DEBUG] thread %d : Port %d is used by : %s\n", sender_id,
+      printf("[DEBUG] thread %d ; Port %d is used by : %s\n", sender_id,
              port_to, buf); fflush(stdout);
       pthread_mutex_unlock(&(mtx_sender_log));
     }
@@ -1925,7 +1925,7 @@ void* sender(void* arg)
   if (listen(fd_listen, backlog) < 0) {
     char err_buf[500];
     pthread_mutex_lock(&(mtx_sender_log));
-    sprintf(err_buf, "[FATAL] thread %d : Failed in listen(%s). Exting...", sender_id,
+    sprintf(err_buf, "[FATAL] thread %d ; Failed in listen(%s). Exting...", sender_id,
             strerror(errno));
     printf("%s\n", err_buf); fflush(stdout);
     pthread_mutex_unlock(&(mtx_sender_log));
@@ -1939,7 +1939,7 @@ void* sender(void* arg)
   int fd_accept;
   struct sockaddr_in sock_accept;
   pthread_mutex_lock(&(mtx_sender_log));
-  printf("[DEBUG] thread %d : Accepting... : port %d\n", sender_id,
+  printf("[DEBUG] thread %d ; Accepting... : port %d\n", sender_id,
          port_to);
   fflush(stdout);
   pthread_mutex_unlock(&(mtx_sender_log));
@@ -1947,7 +1947,7 @@ void* sender(void* arg)
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
     char err_buf[500];
     pthread_mutex_lock(&(mtx_sender_log));
-    sprintf(err_buf, "[FATAL] thread %d : Failed to accept(%s). Exiting...", sender_id,
+    sprintf(err_buf, "[FATAL] thread %d ; Failed to accept(%s). Exiting...", sender_id,
             strerror(errno));
     printf("%s\n", err_buf); fflush(stdout);
     pthread_mutex_unlock(&(mtx_sender_log));
@@ -1956,7 +1956,7 @@ void* sender(void* arg)
   } else {
     //    B2INFO("Done.");
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[INFO] thread %d : Connection(port %d) from eb0 was accepted\n", sender_id, port_to); fflush(stdout);
+    printf("[INFO] thread %d ; Connection(port %d) from eb0 was accepted\n", sender_id, port_to); fflush(stdout);
     pthread_mutex_unlock(&(mtx_sender_log));
 
     //    set timepout option
@@ -1967,7 +1967,7 @@ void* sender(void* arg)
     if (ret < 0) {
       pthread_mutex_lock(&(mtx_sender_log));
       char err_buf[500];
-      sprintf(err_buf, "[FATAL] thread %d : Failed to set TIMEOUT. Exiting...", sender_id);
+      sprintf(err_buf, "[FATAL] thread %d ; Failed to set TIMEOUT. Exiting...", sender_id);
       printf("%s\n", err_buf); fflush(stdout);
       pthread_mutex_unlock(&(mtx_sender_log));
       exit(-1);
@@ -2047,7 +2047,7 @@ void* sender(void* arg)
     //
     if (buff == NULL) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : buffer in sender is NULL(= %p )\n", sender_id, buff); fflush(stdout);
+      printf("[FATAL] thread %d ; buffer in sender is NULL(= %p )\n", sender_id, buff); fflush(stdout);
       pthread_mutex_unlock(&(mtx_sender_log));
       exit(1);
     }
@@ -2061,7 +2061,7 @@ void* sender(void* arg)
         //        err_bad_ffaa[sender_id]++;
         unsigned int event_nwords = 0;
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[WARNING] thread %d : fake-error events are detected. Header and trailer reduction will be made and data are checked again.\n",
+        printf("[WARNING] thread %d ; fake-error events are detected. Header and trailer reduction will be made and data are checked again.\n",
                sender_id);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
@@ -2073,21 +2073,21 @@ void* sender(void* arg)
         int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, event_nwords, exprun, evtnum, node_id, valid_ch);
         if (ret != DATACHECK_OK) {
           pthread_mutex_lock(&(mtx_sender_log));
-          printf("[FATAL] thread %d : checkEventData() detected an error after reduceHdrTrl(). Exiting...\n", sender_id);
+          printf("[FATAL] thread %d ; checkEventData() detected an error after reduceHdrTrl(). Exiting...\n", sender_id);
           fflush(stdout);
           pthread_mutex_unlock(&(mtx_sender_log));
           exit(1);
         }
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[WARNING] thread %d : Data-check was passed. This event is treated as a normal event.\n", sender_id);
-        //        printf("[FATAL] thread %d : Currently, we will not tolerate a fake-error event. Exiting...\n", sender_id);
-        printEventData(buff + NW_SEND_HEADER, event_nwords);
+        printf("[WARNING] thread %d ; Data-check was passed. This event is treated as a normal event.\n", sender_id);
+        //        printf("[FATAL] thread %d ; Currently, we will not tolerate a fake-error event. Exiting...\n", sender_id);
+        printEventData(buff + NW_SEND_HEADER, event_nwords, sender_id);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
         //        exit(1);
       } else {
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[FATAL] thread %d : checkEventData() detected an error. Exiting...\n", sender_id);
+        printf("[FATAL] thread %d ; checkEventData() detected an error. Exiting...\n", sender_id);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
         exit(1);
@@ -2113,14 +2113,14 @@ void* sender(void* arg)
     ret = 0;
     int sent_bytes = 0;
     // pthread_mutex_lock(&(mtx_sender_log));
-    // printf("[DEBUG] thread %d : sent words %d + sndhdr %d + sndtrl %d\n", sender_id, send_nwords, NW_SEND_HEADER,  NW_SEND_TRAILER );
+    // printf("[DEBUG] thread %d ; sent words %d + sndhdr %d + sndtrl %d\n", sender_id, send_nwords, NW_SEND_HEADER,  NW_SEND_TRAILER );
     // printEventData( buff, send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER, sender_id);
     // pthread_mutex_unlock(&(mtx_sender_log));
 
     if (buff[ NW_SEND_HEADER + 1 ] & 0xfffff000 != 0x7f7f0000 ||
         buff[ NW_SEND_HEADER + send_nwords - 1  ] != 0x7fff0006) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : ERROR_EVENT : Invalid Magic word in header( 0x%.8x ) and/or trailer( 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d",
+      printf("[FATAL] thread %d ; ERROR_EVENT : Invalid Magic word in header( 0x%.8x ) and/or trailer( 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d",
              sender_id, buff[ NW_SEND_HEADER + 1 ], buff[ NW_SEND_HEADER + send_nwords - 1  ],
              evtnum,
              (exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
@@ -2143,7 +2143,7 @@ void* sender(void* arg)
         } else {
           perror("[DEBuG] write() failed");
           pthread_mutex_lock(&(mtx_sender_log));
-          printf("[FATAL] thread %d : write() failed. Return value of write() = %d\n", sender_id, ret);
+          printf("[FATAL] thread %d ; write() failed. Return value of write() = %d\n", sender_id, ret);
           fflush(stdout);
           pthread_mutex_unlock(&(mtx_sender_log));
           exit(1);
@@ -2156,7 +2156,7 @@ void* sender(void* arg)
       } else if (sent_bytes > (int)((send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER)
                                     * sizeof(unsigned int))) {
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[FATAL] thread %d : Too many bytes are sent\n", sender_id);
+        printf("[FATAL] thread %d ; Too many bytes are sent\n", sender_id);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
         exit(1);
@@ -2177,7 +2177,7 @@ void* sender(void* arg)
       if (cnt > start_cnt) {
         double cur_time = getTimeSec();
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[INFO] thread %d : evt %lld time %.1lf dataflow %.1lf MB/s rate %.2lf kHz : so far dataflow %.1lf MB/s rate %.2lf kHz size %d\n",
+        printf("[INFO] thread %d ; evt %lld time %.1lf dataflow %.1lf MB/s rate %.2lf kHz : so far dataflow %.1lf MB/s rate %.2lf kHz size %d\n",
                sender_id,
                cnt, cur_time - init_time,
                NUM_CLIENTS_PER_THREAD * (cnt - prev_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - prev_time),

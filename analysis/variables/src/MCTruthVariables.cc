@@ -270,7 +270,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).Px();
     }
 
@@ -280,7 +280,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).Py();
     }
 
@@ -290,7 +290,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).Pz();
     }
 
@@ -300,7 +300,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).Pt();
     }
 
@@ -310,7 +310,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).E();
     }
 
@@ -320,7 +320,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).P();
     }
 
@@ -330,7 +330,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).Theta();
     }
 
@@ -340,7 +340,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).Phi();
     }
 
@@ -349,8 +349,8 @@ namespace Belle2 {
       StoreArray<MCParticle> mcparticles;
       if (mcparticles.getEntries() < 1) return realNaN;
 
-      TLorentzVector pInitial = mcparticles[0]->get4Vector();
-      TLorentzVector pDaughters;
+      ROOT::Math::PxPyPzEVector pInitial = mcparticles[0]->get4Vector();
+      ROOT::Math::PxPyPzEVector pDaughters;
       const std::vector<Particle*> daughters = part->getDaughters();
       for (auto daughter : daughters) {
         const MCParticle* mcD = daughter->getMCParticle();
@@ -361,9 +361,9 @@ namespace Belle2 {
       return (pInitial - pDaughters).M();
     }
 
-    TLorentzVector MCInvisibleP4(const MCParticle* mcparticle)
+    ROOT::Math::PxPyPzEVector MCInvisibleP4(const MCParticle* mcparticle)
     {
-      TLorentzVector ResultP4;
+      ROOT::Math::PxPyPzEVector ResultP4;
       int pdg = abs(mcparticle->getPDG());
       bool isNeutrino = (pdg == 12 or pdg == 14 or pdg == 16);
 
@@ -404,10 +404,10 @@ namespace Belle2 {
       if (mcParticlePDG != 511 and mcParticlePDG != 521)
         return realNaN;
 
-      TLorentzVector p = T.rotateLabToCms() * (mcB->get4Vector() - MCInvisibleP4(mcB));
+      ROOT::Math::PxPyPzEVector p = T.rotateLabToCms() * (mcB->get4Vector() - MCInvisibleP4(mcB));
       double e_d = p.E();
       double m_d = p.M();
-      double p_d = p.Rho();
+      double p_d = p.P();
 
       double theta_BY = (2 * e_Beam * e_d - m_B * m_B - m_d * m_d)
                         / (2 * p_B * p_d);
@@ -669,8 +669,8 @@ namespace Belle2 {
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      TVector3 herVec = beamParamsDB->getHER().Vect();
-      TVector3 lerVec = beamParamsDB->getLER().Vect();
+      B2Vector3D herVec = beamParamsDB->getHER().Vect();
+      B2Vector3D lerVec = beamParamsDB->getLER().Vect();
 
       // only looking at the horizontal (XZ plane) -> set y-coordinates to zero
       herVec.SetY(0);
@@ -684,8 +684,8 @@ namespace Belle2 {
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      TVector3 herVec = beamParamsDB->getHER().Vect();
-      TVector3 lerVec = beamParamsDB->getLER().Vect();
+      B2Vector3D herVec = beamParamsDB->getHER().Vect();
+      B2Vector3D lerVec = beamParamsDB->getLER().Vect();
 
       // only looking at the vertical (YZ plane) -> set x-coordinates to zero
       herVec.SetX(0);

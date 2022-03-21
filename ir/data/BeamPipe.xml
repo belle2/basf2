@@ -39,7 +39,7 @@
       <sec name="R9" unit="cm">2.25</sec>
       <sec name="R10" unit="cm">2.5</sec>
       <sec name="R11" unit="cm">1.45</sec>
-      <Material desc="SUS">SUS316L</Material>      
+      <Material>Ti</Material>
     </Lv1SUS>
         
     <Lv2OutTi>
@@ -267,7 +267,7 @@
       <sec name="R1" unit="cm">1.0</sec>
       <Material>Vacuum</Material>
     </Lv2VacLERDwn>
-    
+
   </Content>
 
 </DetectorComponent>

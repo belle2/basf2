@@ -72,7 +72,7 @@ void TrackingHLTDQMModule::defineHisto()
   DefineHelixParametersAndCorrelations();
   DefineTrackFitStatus();
 
-  DefineFlags();
+  DefineAbortFlagsHistograms();
 
   originalDirectory->cd();
 
@@ -127,7 +127,7 @@ void TrackingHLTDQMModule::event()
 
 }
 
-void TrackingHLTDQMModule::DefineFlags()
+void TrackingHLTDQMModule::DefineAbortFlagsHistograms()
 {
   // only monitor if any flag was set so only 2 bins needed
   const char* flagTitle =
@@ -142,22 +142,22 @@ void TrackingHLTDQMModule::DefineFlags()
   m_abortVStimeHER = new TH2F(
     "TrkAbortVsTimeHER",
     "Tracking Abort vs HER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
-    500, 0, c_noInjectionTime, 100, 0, c_revolutionTime);
+    100, 0, c_noInjectionTime, 50, 0, c_revolutionTime);
 
   m_abortVStimeLER = new TH2F(
     "TrkAbortVsTimeLER",
     "Tracking Abort vs LER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
-    500, 0, c_noInjectionTime, 100, 0, c_revolutionTime);
+    100, 0, c_noInjectionTime, 50, 0, c_revolutionTime);
 
   //tracking all VS time after HER/LER injection and time within a beam cycle
   m_allVStimeHER = new TH2F(
     "allEvtsVsTimeHER",
     "Number Of Events vs HER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
-    500, 0, c_noInjectionTime, 100, 0, c_revolutionTime);
+    100, 0, c_noInjectionTime, 50, 0, c_revolutionTime);
 
   m_allVStimeLER = new TH2F(
     "allEvtsVsTimeLER",
     "Number of Events vs LER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
-    500, 0, c_noInjectionTime, 100, 0, c_revolutionTime);
+    100, 0, c_noInjectionTime, 50, 0, c_revolutionTime);
 
 }

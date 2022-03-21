@@ -10,6 +10,7 @@
 
 #include <analysis/dataobjects/Particle.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
 
@@ -213,7 +214,7 @@ namespace Belle2 {
     double getHelixTanLambdaPull(const Particle* part);
 
     /** helper function to get the position on the Helix */
-    TVector3 getPositionOnHelix(const Particle* part, const std::vector<double>& pars);
+    B2Vector3D getPositionOnHelix(const Particle* part, const std::vector<double>& pars);
   }
 } // Belle2 namespace
 

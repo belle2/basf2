@@ -15,5 +15,7 @@
 #pragma link C++ class Belle2::TOP::TOPPulseHeightAlgorithm-;
 #pragma link C++ class Belle2::TOP::TOPAlignmentAlgorithm-;
 #pragma link C++ class Belle2::TOP::TOPChannelMaskAlgorithm-;
+#pragma link C++ class Belle2::TOP::ValidationTreeStruct-;
+#pragma link C++ class Belle2::TOP::TOPValidationAlgorithm-;
 
 #endif

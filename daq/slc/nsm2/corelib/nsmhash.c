@@ -25,7 +25,7 @@
 
 #define HASHMAX 2039
 
-static char *hashtable[HASHMAX];
+//static char *hashtable[HASHMAX]; //TODO can this be removed?
 static int deltatable[HASHMAX];
 
 struct NSMsys;

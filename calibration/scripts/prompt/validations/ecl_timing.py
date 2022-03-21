@@ -14,9 +14,7 @@ ECL Timing Validation
 
 from prompt import ValidationSettings
 import sys
-import ROOT as r
 from pathlib import Path
-import os
 
 ##############################
 # REQUIRED VARIABLE #
@@ -35,14 +33,12 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     # input_data_path will be replaced with path/to/data_path used for calibration, e.g. /group/belle2/dataprod/Data/PromptSkim/
 
     # Verify that output from airflow is OK
-    from ROOT import TH1F, TCanvas, TFile, TGraph, TLine, kRed, gStyle
-    import numpy as np
+    from ROOT import TH1F, TCanvas, TFile, gStyle
     import os
-    from array import array
 
     # Set root style so that there are ticks on all four sides of the plots
-    r.gStyle.SetPadTickX(1)
-    r.gStyle.SetPadTickY(1)
+    gStyle.SetPadTickX(1)
+    gStyle.SetPadTickY(1)
 
     # Output information about the parameters passed to the function
     print("job_path = ", job_path)
@@ -95,7 +91,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     num_files = len(crate_calib_files)
     print(f'Looping over {num_files} files')
     for count, in_file_name in enumerate(crate_calib_files, start=1):
-        in_file = r.TFile(str(in_file_name))
+        in_file = TFile(str(in_file_name))
         print("--------------------\nReading file ", in_file, "\n Crate calib iteration = ", count, "\n")
 
         inFileBaseName = str(in_file_name)
@@ -172,7 +168,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     num_files = len(crystal_calib_files)
     print(f'Looping over {num_files} files')
     for count, in_file_name in enumerate(crystal_calib_files, start=1):
-        in_file = r.TFile(str(in_file_name))
+        in_file = TFile(str(in_file_name))
         print("--------------------\nReading file ", in_file, "\n crystal calib iteration = ", count, "\n")
 
         inFileBaseName = str(in_file_name)
@@ -325,7 +321,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     num_files = len(merger_files)
     print(f'Looping over {num_files} files')
     for count, in_file_name in enumerate(merger_files, start=1):
-        in_file = r.TFile(str(in_file_name))
+        in_file = TFile(str(in_file_name))
         print("--------------------\nReading file ", in_file, "\n Crystal calib iteration or blocks = ", count, "\n")
 
         inFileBaseName = str(in_file_name)
@@ -426,7 +422,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     num_files = len(bhabhaVal_files)
     print(f'Looping over {num_files} files')
     for count, in_file_name in enumerate(bhabhaVal_files, start=1):
-        in_file = r.TFile(str(in_file_name))
+        in_file = TFile(str(in_file_name))
         print("--------------------\nReading file ", in_file, ", crystal calib block # = ", count, "\n")
 
         inFileBaseName = str(in_file_name)
@@ -571,7 +567,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     num_files = len(hadronVal_files)
     print(f'Looping over {num_files} files')
     for count, in_file_name in enumerate(hadronVal_files, start=1):
-        in_file = r.TFile(str(in_file_name))
+        in_file = TFile(str(in_file_name))
         print("--------------------\nReading file ", in_file, ", crystal calib block # = ", count, "\n")
 
         inFileBaseName = str(in_file_name)

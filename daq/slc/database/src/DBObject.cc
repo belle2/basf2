@@ -50,7 +50,7 @@ void DBObject::copy(const DBObject& obj)
   setPath(obj.getPath());
   setName(obj.getName());
   for (DBField::NameList::const_iterator it = obj.getFieldNames().begin();
-       it != obj.getFieldNames().end(); it++) {
+       it != obj.getFieldNames().end(); ++it) {
     const std::string& name(*it);
     DBField::Type type = obj.getProperty(name).getType();
     switch (type) {
@@ -127,7 +127,7 @@ void DBObject::reset()
     }
   }
   for (FieldValueList::iterator it = m_value_m.begin();
-       it != m_value_m.end(); it++) {
+       it != m_value_m.end(); ++it) {
     free(it->second);
   }
   m_value_m = FieldValueList();
@@ -179,7 +179,7 @@ void DBObject::writeObject(Writer& writer) const
   const DBField::NameList& name_v(getFieldNames());
   writer.writeInt(name_v.size());
   for (DBField::NameList::const_iterator iname = name_v.begin();
-       iname != name_v.end(); iname++) {
+       iname != name_v.end(); ++iname) {
     const std::string name = *iname;
     DBField::Type type = getProperty(name).getType();
     writer.writeString(name);
@@ -197,7 +197,7 @@ void DBObject::writeObject(Writer& writer) const
         const DBObjectList& obj_v(getObjects(name));
         writer.writeInt(obj_v.size());
         for (DBObjectList::const_iterator iobj = obj_v.begin();
-             iobj != obj_v.end(); iobj++) {
+             iobj != obj_v.end(); ++iobj) {
           iobj->writeObject(writer);
         }
       }; break;
@@ -288,7 +288,7 @@ void DBObject::print(bool isfull) const
   search(map, name_in, isfull);
   size_t length = 0;
   for (NameValueList::iterator it = map.begin();
-       it != map.end(); it++) {
+       it != map.end(); ++it) {
     if (it->name.size() > length) length = it->name.size();
   }
   printf("#\n");
@@ -304,7 +304,7 @@ void DBObject::print(bool isfull) const
   }
   printf("\n");
   for (NameValueList::iterator it = map.begin();
-       it != map.end(); it++) {
+       it != map.end(); ++it) {
     printf("%*s : %s\n", int(-length), it->name.c_str(), it->value.c_str());
   }
   printf("\n");
@@ -321,7 +321,7 @@ const std::string DBObject::sprint(bool isfull) const
   search(map, name_in, isfull);
   size_t length = 0;
   for (NameValueList::iterator it = map.begin();
-       it != map.end(); it++) {
+       it != map.end(); ++it) {
     if (it->name.size() > length) length = it->name.size();
   }
   ss << "#" << std::endl;
@@ -340,7 +340,7 @@ const std::string DBObject::sprint(bool isfull) const
   }
   ss << "" << std::endl;
   for (NameValueList::iterator it = map.begin();
-       it != map.end(); it++) {
+       it != map.end(); ++it) {
     ss << StringUtil::form("%*s : %s\n", -length, it->name.c_str(), it->value.c_str())
        << std::endl;
   }
@@ -369,7 +369,7 @@ void DBObject::printHTML(bool isfull) const
   }
   std::string rcconfig, dbtable, nodename;
   for (NameValueList::iterator it = map.begin();
-       it != map.end(); it++) {
+       it != map.end(); ++it) {
     if (it->name.find("name") != std::string::npos) {
       nodename = it->value;
       printf("<tr><td>%s</td><td>%s</td>\n", it->name.c_str(), it->value.c_str());
@@ -395,7 +395,7 @@ StringList DBObject::getNameList(bool isfull) const
   search(map, name_in, isfull);
   StringList str;
   for (NameValueList::iterator it = map.begin();
-       it != map.end(); it++) {
+       it != map.end(); ++it) {
     str.push_back(it->name);
   }
   return str;
@@ -406,7 +406,7 @@ const
 {
   const DBField::NameList& name_v(getFieldNames());
   for (DBField::NameList::const_iterator it = name_v.begin();
-       it != name_v.end(); it++) {
+       it != name_v.end(); ++it) {
     const std::string& name(*it);
     const DBField::Property& pro(getProperty(name));
     std::string name_out = name_in;
@@ -444,10 +444,10 @@ const
           }
         }
       } else {
-        size_t length = getNObjects(name);
-        if (length > 1) {
+        size_t lengthCur = getNObjects(name);
+        if (lengthCur > 1) {
           const DBObjectList& objs(getObjects(name));
-          for (size_t i = 0; i < length; i++) {
+          for (size_t i = 0; i < lengthCur; i++) {
             objs[i].search(map, StringUtil::form("%s[%d]", name_out.c_str(), i), isfull);
           }
         } else {
@@ -481,9 +481,8 @@ const std::string DBObject::printSQL(const std::string& table, int id) const
   bool isfull = false;
   search(map, name_in, isfull);
   for (NameValueList::iterator it = map.begin();
-       it != map.end(); it++) {
+       it != map.end(); ++it) {
     NameValue& nv(*it);
-    std::string ptype;
     std::string value = nv.value;
     std::string::size_type pos = value.find_first_of("(");
     DBField::Type type = DBField::TEXT;

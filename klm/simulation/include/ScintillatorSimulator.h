@@ -16,9 +16,6 @@
 #include <klm/simulation/ScintillatorFirmware.h>
 #include <klm/time/KLMTime.h>
 
-/* Belle 2 headers. */
-#include <framework/database/DBObjPtr.h>
-
 namespace Belle2 {
 
   namespace KLM {

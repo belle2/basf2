@@ -28,7 +28,7 @@ hitXPDerivate::hitXPDerivate(const SVDTrueHit& hit, const SVDCluster& cluster, c
   m_momentumLocalEntry = hit.getEntryMomentum(); /** local momentum ad entrypoint */
   m_momentumLocalExit = hit.getExitMomentum(); /** local momentum at exitpoint */
   m_PDGID = particle.getPDG(); /** PDGID */
-  m_position0 = particle.getVertex(); /** position at IP */
+  m_position0 = B2Vector3D(particle.getVertex()); /** position at IP */
   m_momentum0 = particle.getMomentum(); /** momentum at IP */
   m_time = hit.getGlobalTime(); /** time of the hit */
   m_sensorSensor = hit.getSensorID().getSensorNumber(); /** sensor number */
@@ -62,7 +62,7 @@ hitXPDerivate::hitXPDerivate(const PXDTrueHit& hit, const MCParticle& particle, 
   m_momentumLocalEntry = hit.getEntryMomentum(); /** local momentum ad entrypoint */
   m_momentumLocalExit = hit.getExitMomentum(); /** local momentum at exitpoint */
   m_PDGID = particle.getPDG(); /** PDGID */
-  m_position0 = particle.getVertex(); /** position at IP */
+  m_position0 = B2Vector3D(particle.getVertex()); /** position at IP */
   m_momentum0 = particle.getMomentum(); /** momentum at IP */
   m_time = hit.getGlobalTime(); /** time of the hit */
   m_sensorSensor = hit.getSensorID().getSensorNumber(); /** sensor number */

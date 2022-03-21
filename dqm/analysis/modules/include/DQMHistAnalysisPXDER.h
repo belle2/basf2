@@ -23,18 +23,39 @@ namespace Belle2 {
 
   public:
 
-    /** Constructor */
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisPXDERModule();
-    /* Destructor */
+
+    /**
+     * Destructor.
+     */
     ~DQMHistAnalysisPXDERModule();
 
-  private:
-
-    /** Module functions */
+    /**
+     * Initializer.
+     */
     void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event() override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
     void endRun() override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate() override final;
 
   private:

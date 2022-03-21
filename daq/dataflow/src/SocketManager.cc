@@ -38,7 +38,7 @@ int SocketManager::examine()
   memcpy(&m_rset, &m_allset, sizeof(m_rset));
   memcpy(&m_wset, &m_allset, sizeof(m_wset));
 
-  struct timeval timeout;
+  timeval timeout;
   timeout.tv_sec = 0; // 1sec
   timeout.tv_usec = 1000; // 1msec (in microsec)
   //  printf ( "SocketManager: maxfd = %d, start select...; rset=%x, wset=%x\n", m_maxfd, m_rset, m_wset);
@@ -62,10 +62,10 @@ int SocketManager::examine()
     return -1;
 
   // Accept if new connection request
-  int t;
   if (FD_ISSET(m_sock, &m_rset)) { // New connection request
     //    int fd  = (m_recv->sock())->accept();
 
+    int t;
     struct sockaddr_in isa;
     socklen_t i = sizeof(isa);
     getsockname(m_sock, (struct sockaddr*)&isa, &i);
@@ -74,7 +74,7 @@ int SocketManager::examine()
       return (-1);
     }
     m_fd.push_back(t);
-    printf("New socket registered t=%d, list size = %d\n", t, m_fd.size());
+    printf("New socket registered t=%d, list size = %lu\n", t, m_fd.size());
     FD_SET(t, &m_allset);
     if (t > m_maxfd) m_maxfd = t;
 

@@ -8,7 +8,6 @@
 
 #include <svd/modules/svdDQM/SVDDQMHitTimeModule.h>
 #include <framework/core/HistoModule.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <TDirectory.h>
 
@@ -52,56 +51,56 @@ void SVDDQMHitTimeModule::defineHisto()
     refFrame = "in SVD reference";
 
   m_l3v_bhabha_L1_ECLTRG = new TH1F("SVDTime_L3V_bhabha_ECLTRG",
-                                    Form("SVD L3 V-Side Cluster Time %s: bhabhas, ECLTRG time ~ Exp%d Run%d", refFrame.Data(), m_expNumber, m_runNumber),
+                                    Form("SVD L3 V-Side Cluster Time %s: bhabhas, ECLTRG time", refFrame.Data()),
                                     nBins, minT0, maxT0);
   m_l3v_bhabha_L1_ECLTRG->GetXaxis()->SetTitle("cluster time (ns)");
   m_l3vEvtT0_bhabha_L1_ECLTRG = new TH1F("SVDTimeEvtT0_L3V_bhabha_ECLTRG",
-                                         Form("SVD L3 V-Side Cluster Time - EventT0 : bhabhas, ECLTRG time ~ Exp%d Run%d", m_expNumber, m_runNumber),
+                                         "SVD L3 V-Side Cluster Time - EventT0 : bhabhas, ECLTRG time",
                                          nBins, minT0, maxT0);
   m_l3vEvtT0_bhabha_L1_ECLTRG->GetXaxis()->SetTitle("cluster time - EventT0 (ns)");
 
   m_l3v_hadron_L1_ECLTRG = new TH1F("SVDTime_L3V_hadron_ECLTRG",
-                                    Form("SVD L3 V-Side Cluster Time %s: hadrons, ECLTRG time ~ Exp%d Run%d", refFrame.Data(), m_expNumber, m_runNumber),
+                                    Form("SVD L3 V-Side Cluster Time %s: hadrons, ECLTRG time", refFrame.Data()),
                                     nBins, minT0, maxT0);
   m_l3v_hadron_L1_ECLTRG->GetXaxis()->SetTitle("cluster time (ns)");
   m_l3vEvtT0_hadron_L1_ECLTRG = new TH1F("SVDTimeEvtT0_L3V_hadron_ECLTRG",
-                                         Form("SVD L3 V-Side Cluster Time - EventT0 : hadrons, ECLTRG time ~ Exp%d Run%d", m_expNumber, m_runNumber),
+                                         "SVD L3 V-Side Cluster Time - EventT0 : hadrons, ECLTRG time",
                                          nBins, minT0, maxT0);
   m_l3vEvtT0_hadron_L1_ECLTRG->GetXaxis()->SetTitle("cluster time - EventT0 (ns)");
 
   m_l3v_mumu_L1_ECLTRG = new TH1F("SVDTime_L3V_mumu_ECLTRG",
-                                  Form("SVD L3 V-Side Cluster Time %s: mumus, ECLTRG time ~ Exp%d Run%d", refFrame.Data(), m_expNumber, m_runNumber),
+                                  Form("SVD L3 V-Side Cluster Time %s: mumus, ECLTRG time", refFrame.Data()),
                                   nBins, minT0, maxT0);
   m_l3v_mumu_L1_ECLTRG->GetXaxis()->SetTitle("cluster time (ns)");
   m_l3vEvtT0_mumu_L1_ECLTRG = new TH1F("SVDTimeEvtT0_L3V_mumu_ECLTRG",
-                                       Form("SVD L3 V-Side Cluster Time - EventT0 : mumus, ECLTRG time ~ Exp%d Run%d", m_expNumber, m_runNumber),
+                                       "SVD L3 V-Side Cluster Time - EventT0 : mumus, ECLTRG time",
                                        nBins, minT0, maxT0);
   m_l3vEvtT0_mumu_L1_ECLTRG->GetXaxis()->SetTitle("cluster time - EventT0 (ns)");
 
   m_l3v_bhabha_L1_CDCTRG = new TH1F("SVDTime_L3V_bhabha_CDCTRG",
-                                    Form("SVD L3 V-Side Cluster Time %s: bhabhas, CDCTRG time ~ Exp%d Run%d", refFrame.Data(), m_expNumber, m_runNumber),
+                                    Form("SVD L3 V-Side Cluster Time %s: bhabhas, CDCTRG time", refFrame.Data()),
                                     nBins, minT0, maxT0);
   m_l3v_bhabha_L1_CDCTRG->GetXaxis()->SetTitle("cluster time (ns)");
   m_l3vEvtT0_bhabha_L1_CDCTRG = new TH1F("SVDTimeEvtT0_L3V_bhabha_CDCTRG",
-                                         Form("SVD L3 V-Side Cluster Time - EventT0 : bhabhas, CDCTRG time ~ Exp%d Run%d", m_expNumber, m_runNumber),
+                                         "SVD L3 V-Side Cluster Time - EventT0 : bhabhas, CDCTRG time",
                                          nBins, minT0, maxT0);
   m_l3vEvtT0_bhabha_L1_CDCTRG->GetXaxis()->SetTitle("cluster time - EventT0 (ns)");
 
   m_l3v_hadron_L1_CDCTRG = new TH1F("SVDTime_L3V_hadron_CDCTRG",
-                                    Form("SVD L3 V-Side Cluster Time %s: hadrons, CDCTRG time ~ Exp%d Run%d", refFrame.Data(), m_expNumber, m_runNumber),
+                                    Form("SVD L3 V-Side Cluster Time %s: hadrons, CDCTRG time", refFrame.Data()),
                                     nBins, minT0, maxT0);
   m_l3v_hadron_L1_CDCTRG->GetXaxis()->SetTitle("cluster time (ns)");
   m_l3vEvtT0_hadron_L1_CDCTRG = new TH1F("SVDTimeEvtT0_L3V_hadron_CDCTRG",
-                                         Form("SVD L3 V-Side Cluster Time - EventT0 : hadrons, CDCTRG time ~ Exp%d Run%d", m_expNumber, m_runNumber),
+                                         "SVD L3 V-Side Cluster Time - EventT0 : hadrons, CDCTRG time",
                                          nBins, minT0, maxT0);
   m_l3vEvtT0_hadron_L1_CDCTRG->GetXaxis()->SetTitle("cluster time - EventT0 (ns)");
 
   m_l3v_mumu_L1_CDCTRG = new TH1F("SVDTime_L3V_mumu_CDCTRG",
-                                  Form("SVD L3 V-Side Cluster Time %s: mumus, CDCTRG time ~ Exp%d Run%d", refFrame.Data(), m_expNumber, m_runNumber),
+                                  Form("SVD L3 V-Side Cluster Time %s: mumus, CDCTRG time", refFrame.Data()),
                                   nBins, minT0, maxT0);
   m_l3v_mumu_L1_CDCTRG->GetXaxis()->SetTitle("cluster time (ns)");
   m_l3vEvtT0_mumu_L1_CDCTRG = new TH1F("SVDTimeEvtT0_L3V_mumu_CDCTRG",
-                                       Form("SVD L3 V-Side Cluster Time - EventT0 : mumus, CDCTRG time ~ Exp%d Run%d", m_expNumber, m_runNumber),
+                                       "SVD L3 V-Side Cluster Time - EventT0 : mumus, CDCTRG time",
                                        nBins, minT0, maxT0);
   m_l3vEvtT0_mumu_L1_CDCTRG->GetXaxis()->SetTitle("cluster time - EventT0 (ns)");
 
@@ -128,9 +127,6 @@ void SVDDQMHitTimeModule::initialize()
 //---------------------------------
 void SVDDQMHitTimeModule::beginRun()
 {
-  StoreObjPtr<EventMetaData> evtMetaData;
-  m_expNumber = evtMetaData->getExperiment();
-  m_runNumber = evtMetaData->getRun();
 
   m_l3v_bhabha_L1_ECLTRG->Reset();
   m_l3vEvtT0_bhabha_L1_ECLTRG->Reset();

@@ -1,0 +1,11 @@
+Import('env')
+
+
+env['LIBS'] = ['framework', '$ROOT_LIBS',
+               'analysis_utility',
+               'trg', 'trg_ecl_dataobjects', 'trg_grl_dataobjects',
+               'fann',
+               'mdst_dataobjects']
+               
+
+Return('env')

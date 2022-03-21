@@ -12,7 +12,7 @@
 energy calibration. Requires e+e- --> mu mu mc in mdst format with
 ECLDigits as additional branch."""
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings
 
 # --------------------------------------------------------------
 # ..Tell the automated script some required details
@@ -32,7 +32,6 @@ def get_calibrations(input_data, **kwargs):
     from ROOT import Belle2
     from caf.utils import IoV
     from caf.framework import Calibration
-    from reconstruction import prepare_cdst_analysis
 
     # --------------------------------------------------------------
     # ..Input data

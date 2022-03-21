@@ -24,12 +24,9 @@ from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
 
 from tracking import (
     add_mc_tracking_reconstruction,
-    add_tracking_reconstruction,
     add_prefilter_tracking_reconstruction,
     add_postfilter_tracking_reconstruction,
     add_cr_tracking_reconstruction,
-    add_mc_track_finding,
-    add_track_finding,
     add_prune_tracks,
 )
 

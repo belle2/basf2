@@ -34,20 +34,42 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisRooFitExampleModule();
-    //! Destructor
-    ~DQMHistAnalysisRooFitExampleModule();
-  private:
 
-    //! Module functions to be called from main process
+    /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisRooFitExampleModule();
+
+    /**
+     * Initializer.
+     */
     void initialize(void) override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun(void) override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event(void) override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
     void endRun(void) override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate(void) override final;
+
+  private:
 
     // Data member
     /** The RooFit work space. */

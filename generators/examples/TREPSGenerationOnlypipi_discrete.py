@@ -11,7 +11,6 @@
 
 import basf2
 from basf2 import set_log_level, LogLevel, process, statistics
-from ROOT import Belle2
 from beamparameters import add_beamparameters
 from generators import add_treps_generator
 

@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+from basf2 import set_random_seed, create_path, register_module, process, Module
+from b2test_utils import require_file, configure_logging_for_tests
+from evalPriors import Priors
+from ROOT import Belle2
+import modularAnalysis as ma
+import subprocess
+import numpy as np
+
+
+class PidPriorPrint(Module):
+    """Print PID priors"""
+
+    def initialize(self):
+        """Create particle list 'pi+' object"""
+        #: Priors
+        self.priors = Priors([211, 321], 'pid_priors.pth')
+        #: ParticleList object
+        self.plist = Belle2.PyStoreObj('pi+')
+
+    def event(self):
+        """Print PID priors for 'pi+' list"""
+        for p in self.plist:
+            self.priors.calculate_priors(np.array([p.getP()]), np.array(np.cos([p.getMomentum().Theta()])))
+            print(self.priors.get_priors())
+
+
+configure_logging_for_tests()
+set_random_seed('pid_priors')
+
+main = create_path()
+
+inputfile = require_file('analysis/1000_B_DstD0Kpi_skimmed.root', 'validation')
+ma.inputMdst(inputfile, path=main)
+
+ma.fillParticleList('pi+', '', path=main)
+ma.matchMCTruth('pi+', path=main)
+
+main.add_module(PidPriorPrint())
+
+process(main)

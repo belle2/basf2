@@ -66,20 +66,6 @@ void DQMHistDeltaHistoModule::beginRun()
   }
 }
 
-TCanvas* DQMHistDeltaHistoModule::find_canvas(TString canvas_name)
-{
-  TIter nextkey(gROOT->GetListOfCanvases());
-  TObject* obj = nullptr;
-
-  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
-    if (obj->IsA()->InheritsFrom("TCanvas")) {
-      if (obj->GetName() == canvas_name)
-        return dynamic_cast<TCanvas*>(obj);
-    }
-  }
-  return nullptr;
-}
-
 void DQMHistDeltaHistoModule::clear_node(SSNODE* n)
 {
   delete n->histo;
@@ -133,7 +119,7 @@ void DQMHistDeltaHistoModule::event()
     std::string dirname = s[0];
     std::string hname = s[1];
     std::string canvas_name = dirname + "/c_" + hname;
-    TCanvas* c = find_canvas(canvas_name);
+    TCanvas* c = findCanvas(canvas_name);
     if (c == nullptr) continue;
     TH1* h_diff = hq.back()->diff_histo;
     h_diff->SetName((a + "_diff").Data());

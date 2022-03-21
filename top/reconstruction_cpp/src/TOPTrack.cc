@@ -133,7 +133,7 @@ namespace Belle2 {
 
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       const auto& tdc = geo->getNominalTDC();
-      double timeWindow = m_feSetting->getReadoutWindows() * tdc.getSyncTimeBase() / TOPNominalTDC::c_syncWindows;
+      double timeWindow = m_feSetting->getReadoutWindows() * tdc.getSyncTimeBase() / static_cast<double>(TOPNominalTDC::c_syncWindows);
 
       const auto& backgroundPDFs = TOPRecoManager::getBackgroundPDFs();
       unsigned k = m_moduleID - 1;

@@ -30,10 +30,10 @@ settings = CalibrationSettings(
     expert_username="skohani",
     description=__doc__,
     input_data_formats=["cdst"],
-    input_data_names=["mumutight_or_highm_calib"],
+    input_data_names=["mumu_tight_or_highm_calib"],
     input_data_filters={
-        "mumutight_or_highm_calib": [
-            INPUT_DATA_FILTERS["Data Tag"]["mumutight_or_highm_calib"],
+        "mumu_tight_or_highm_calib": [
+            INPUT_DATA_FILTERS["Data Tag"]["mumu_tight_or_highm_calib"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"]]},
     depends_on=[top_pretracking],
@@ -52,7 +52,7 @@ def get_calibrations(input_data, **kwargs):
     :**kwargs: Configuration options to be sent in.
     '''
 
-    file_to_iov = input_data["mumutight_or_highm_calib"]
+    file_to_iov = input_data["mumu_tight_or_highm_calib"]
     sample = 'dimuon'
     requested_iov = kwargs.get("requested_iov", None)
     expert_config = kwargs.get("expert_config")

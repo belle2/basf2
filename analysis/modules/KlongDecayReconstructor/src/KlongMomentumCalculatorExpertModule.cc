@@ -22,6 +22,8 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/ParticleCopy.h>
 
+#include <Math/Vector4D.h>
+
 #include <memory>
 
 using namespace std;
@@ -124,7 +126,6 @@ namespace Belle2 {
 
       Particle particle = m_generator->getCurrentParticle();
 
-      TLorentzVector missDaughters;
       Particle* kparticle = nullptr;
 
       bool is_physical = true;
@@ -137,14 +138,14 @@ namespace Belle2 {
       if (daughters.size() > 3)
         B2FATAL("Higher multiplicity (>2) missing momentum decays not implemented yet!");
 
-      TLorentzVector pDaughters;
+      ROOT::Math::PxPyPzEVector pDaughters;
       for (auto daughter : daughters) {
         if (daughter->getPDGCode() != Const::Klong.getPDGCode()) {
           pDaughters += daughter->get4Vector();
         }
       }
 
-      TLorentzVector klDaughters;
+      ROOT::Math::PxPyPzEVector klDaughters;
       for (auto daughter : daughters) {
         if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
           kparticle = ParticleCopy::copyParticle(daughter);
@@ -184,15 +185,17 @@ namespace Belle2 {
       k_mag1 = (s_pm + std::sqrt((s_p2) * (m_sum2) - 4 * ((e_j2) - (s_p2)) * ((e_j2) * (m_k2) - (m_sum2) / 4))) / (2 * (e_j2 - s_p2));
       k_mag2 = (s_pm - std::sqrt((s_p2) * (m_sum2) - 4 * ((e_j2) - (s_p2)) * ((e_j2) * (m_k2) - (m_sum2) / 4))) / (2 * (e_j2 - s_p2));
 
+      ROOT::Math::PxPyPzEVector missDaughters;
+
       if (k_mag1 > 0)
-        missDaughters.SetVect(k_mag1 * (klDaughters.Vect().Unit()));
+        missDaughters = k_mag1 * klDaughters / klDaughters.P();
       else
-        missDaughters.SetVect(k_mag2 * (klDaughters.Vect().Unit()));
-      missDaughters.SetE(std::sqrt(m_k * m_k + missDaughters.Vect().Mag2()));
+        missDaughters = k_mag2 * klDaughters / klDaughters.P();
+      missDaughters.SetE(std::sqrt(m_k * m_k + missDaughters.P2()));
 
       for (auto daughter : daughters) {
         if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
-          if (!isnan(missDaughters.Vect().Mag())) {
+          if (!isnan(missDaughters.P())) {
             kparticle->set4Vector(missDaughters);
           } else
             is_physical = false;
@@ -200,10 +203,10 @@ namespace Belle2 {
       }
 
       if (is_physical) {
-        TLorentzVector mom = pDaughters + missDaughters;
-        mom.SetE(std::sqrt(m_b * m_b + mom.Vect().Mag2()));
+        ROOT::Math::PxPyPzEVector mom = pDaughters + missDaughters;
+        mom.SetE(std::sqrt(m_b * m_b + mom.P2()));
         particle.set4Vector(mom);
-        if (isnan(mom.Vect().Mag()))
+        if (isnan(mom.P()))
           is_physical = false;
       }
 

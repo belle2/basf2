@@ -31,7 +31,7 @@ namespace Belle2 {
   namespace Variable {
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-    static const TVector3 vecNaN(realNaN, realNaN, realNaN);
+    static const B2Vector3D vecNaN(realNaN, realNaN, realNaN);
 
     double trackNHits(const Particle* part, const Const::EDetector& det)
     {
@@ -263,7 +263,7 @@ namespace Belle2 {
     }
 
     // used in trackHelixExtTheta and trackHelixExtPhi
-    TVector3 getPositionOnHelix(const Particle* part, const std::vector<double>& pars)
+    B2Vector3D getPositionOnHelix(const Particle* part, const std::vector<double>& pars)
     {
       if (pars.size() != 3) {
         B2FATAL("Exactly three parameters (r, zfwd, zbwd) required.");
@@ -304,7 +304,7 @@ namespace Belle2 {
       if (pars.size() != 3) {
         B2FATAL("Exactly three parameters (r, zfwd, zbwd) required for helixExtTheta.");
       }
-      TVector3 position = getPositionOnHelix(part, pars);
+      B2Vector3D position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return realNaN;
       return position.Theta();
     }
@@ -315,7 +315,7 @@ namespace Belle2 {
       if (pars.size() != 3) {
         B2FATAL("Exactly three parameters (r, zfwd, zbwd) required for helixExtPhi.");
       }
-      TVector3 position = getPositionOnHelix(part, pars);
+      B2Vector3D position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return realNaN;
       return position.Phi();
     }
@@ -419,8 +419,8 @@ namespace Belle2 {
 
       const Belle2::UncertainHelix measHelix = trackfit->getUncertainHelix();
       const TMatrixDSym measCovariance = measHelix.getCovariance();
-      const TVector3 mcProdVertex = mcparticle->getVertex();
-      const TVector3 mcMomentum = mcparticle->getMomentum();
+      const B2Vector3D mcProdVertex = mcparticle->getVertex();
+      const B2Vector3D mcMomentum = mcparticle->getMomentum();
 
       const double BzAtProdVertex = Belle2::BFieldManager::getFieldInTesla(mcProdVertex).Z();
       const double mcParticleCharge = mcparticle->getCharge();
@@ -576,18 +576,18 @@ point-of-closest-approach (POCA) in the :math:`r-\phi` plane.
         study or some debugging).
 
 Returns NaN if called for something other than a track-based particle.
-    )DOC");
+    )DOC", "cm");
     REGISTER_VARIABLE("phi0", trackPhi0, R"DOC(
 Returns the tracking parameter :math:`\phi_0`, the angle of the transverse
 momentum in the :math:`r-\phi` plane.
 
 Returns NaN if called for something other than a track-based particle.
-    )DOC");
+    )DOC", "rad");
     REGISTER_VARIABLE("omega", trackOmega, R"DOC(
 Returns the tracking parameter :math:`\omega`, the curvature of the track.
 
-Returns NaN if called for something other than a track-based particle."
-    )DOC");
+Returns NaN if called for something other than a track-based particle.
+		      )DOC", ":math:`\\text{cm}^{-1}`");
     REGISTER_VARIABLE("z0", trackZ0, R"DOC(
 Returns the tracking parameter :math:`z_0`, the z-coordinate of the
 point-of-closest-approach (POCA).
@@ -600,7 +600,7 @@ point-of-closest-approach (POCA).
         study or some debugging).
 
 Returns NaN if called for something other than a track-based particle.
-    )DOC");
+    )DOC", "cm");
     REGISTER_VARIABLE("tanLambda", trackTanLambda, R"DOC(
 Returns :math:`\tan\lambda`, the slope of the track in the :math:`r-z` plane.
 
@@ -613,7 +613,7 @@ point-of-closest-approach (POCA) in the :math:`r-\phi` plane.
 .. seealso:: :b2:var:`d0`, :b2:var:`d0Pull`
 
 Returns NaN if called for something other than a track-based particle.
-    )DOC");
+    )DOC", "cm");
     REGISTER_VARIABLE("phi0Err", trackPhi0Error, R"DOC(
 Returns the uncertainty on :math:`\phi_0`, the angle of the transverse momentum
 in the :math:`r-\phi` plane. 
@@ -621,14 +621,14 @@ in the :math:`r-\phi` plane.
 .. seealso:: :b2:var:`phi0`, :b2:var:`phi0Pull`
 
 Returns NaN if called for something other than a track-based particle.
-    )DOC");
+    )DOC", "rad");
     REGISTER_VARIABLE("omegaErr", trackOmegaError, R"DOC(
 Returns the uncertainty on :math:`\omega`, the curvature of the track. 
 
 .. seealso:: :b2:var:`omega`, :b2:var:`omegaPull`
 
 Returns NaN if called for something other than a track-based particle.
-    )DOC");
+    )DOC", ":math:`\\text{cm}^{-1}`");
     REGISTER_VARIABLE("z0Err", trackZ0Error, R"DOC(
 Returns the uncertainty on :math:`z_0`, the z-coordinate of the
 point-of-closest-approach (POCA). 
@@ -636,7 +636,7 @@ point-of-closest-approach (POCA).
 .. seealso:: :b2:var:`z0`, :b2:var:`z0Pull`
 
 Returns NaN if called for something other than a track-based particle."
-    )DOC");
+    )DOC", "cm");
     REGISTER_VARIABLE("tanLambdaErr", trackTanLambdaError, R"DOC(
 Returns the uncertainty on :math:`\tan\lambda`, the slope of the track in the
 :math:`r-z` plane.
@@ -687,9 +687,9 @@ Returns NaN if called for something other than a track-based particle.
     )DOC");
 
     REGISTER_VARIABLE("helixExtTheta", trackHelixExtTheta,
-                      "Returns theta of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)");
+                      "Returns theta of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)", "rad");
     REGISTER_VARIABLE("helixExtPhi", trackHelixExtPhi,
-                      "Returns phi of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)");
+                      "Returns phi of extrapolated helix parameters (parameters (in cm): radius, z fwd, z bwd)", "rad");
 
     REGISTER_VARIABLE("nExtraCDCHits", nExtraCDCHits, R"DOC(
 [Eventbased] The number of CDC hits in the event not assigned to any track.

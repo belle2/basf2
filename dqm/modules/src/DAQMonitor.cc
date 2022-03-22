@@ -42,12 +42,15 @@ void DAQMonitorModule::defineHisto()
   h_trgSize = new TH1F("TRGDataSize", "TRG Data Size;Size [kB];", 100, 0.0, 40.0);
   h_hltSize = new TH1F("HLTDataSize", "HLT (Total - PXD) Data Size;Size [kB];", 100, 0.0, 300.0);
   h_totalSize = new TH1F("TotalDataSize", "Total (HLT + PXD) Data Size;Size [kB];", 100, 0.0, 300.0);
+  h_runNr = new TH1F("hRunnr", "Run Number", 1, 0, 1); // define with a dummy bin, set correct range on first event
+
   oldDir->cd();
 }
 
 void DAQMonitorModule::initialize()
 {
   REG_HISTOGRAM;
+  m_eventMetaData.isRequired();
   m_pxdRaw.isOptional();
   m_svdRaw.isOptional();
   m_cdcRaw.isOptional();
@@ -60,6 +63,7 @@ void DAQMonitorModule::initialize()
 
 void DAQMonitorModule::beginRun()
 {
+  h_runNr->Reset();
   h_nEvt->Reset();
   h_pxdSize->Reset();
   h_svdSize->Reset();
@@ -77,6 +81,21 @@ void DAQMonitorModule::event()
 {
   // Total number of events: just fill the histogram with 1
   h_nEvt->Fill(1.0);
+
+  auto runNr = m_eventMetaData->getRun();
+  if (h_runNr->GetXaxis()->GetNbins() == 1) {
+    // this happens on the first event only.
+    // now we define a correct range for the histogram
+    h_runNr->SetBins(10, runNr - 5, runNr + 5); // just easy readable
+    // for the case that we have some histogram bleeding from another run
+    // we must set CanExtend or we can not merge histograms
+    // because of different axis. if th1 histogram is rebinned,
+    // we may lose the lowest bits of th1 run nr, but we still
+    // would know that we have more than one run in it!
+    // (which is the main purpose of this histogram)
+    h_runNr->GetXaxis()->SetCanExtend(kTRUE);
+  }
+  h_runNr->Fill(runNr);
 
   // Since sizeof returns the size in bytes (B),
   // if we divide it by 1000 we obtain kilobytes (kB).
@@ -130,6 +149,7 @@ void DAQMonitorModule::event()
   h_trgSize->Fill(static_cast<float>(trgSize) / 1000.);
 
   // HLT size and total (HLT + PXD) size
+  // this ignores aux data (e.g. softwaretrigger result) from HLT
   int hltSize = svdSize + cdcSize + topSize + arichSize + eclSize + klmSize + trgSize;
   h_hltSize->Fill(static_cast<float>(hltSize) / 1000.);
   int totalSize = pxdSize + hltSize;

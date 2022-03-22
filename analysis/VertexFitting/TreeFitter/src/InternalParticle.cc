@@ -27,7 +27,7 @@ namespace TreeFitter {
     if (lhstype == rhstype  &&
         lhstype == ParticleBase::TFParticleType::kRecoTrack) {
 
-      rc =  lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp();
+      rc =  lhs->particle()->getMomentum().Rho() > rhs->particle()->getMomentum().Rho();
     } else if (lhs->particle() && rhs->particle() && lhs->particle()->getNDaughters() > 0 &&
                rhs->particle()->getNDaughters() > 0) {
       rc = lhs->nFinalChargedCandidates() > rhs->nFinalChargedCandidates();
@@ -79,7 +79,7 @@ namespace TreeFitter {
   bool InternalParticle::compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs)
   {
 
-    return lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp();
+    return lhs->particle()->getMomentum().Rho() > rhs->particle()->getMomentum().Rho();
   }
 
   ErrCode InternalParticle::initMotherlessParticle(FitParams& fitparams)
@@ -110,7 +110,7 @@ namespace TreeFitter {
         }
       }
 
-      TVector3 v;
+      Belle2::B2Vector3D v;
 
       if (trkdaughters.size() >= 2) {
         std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);

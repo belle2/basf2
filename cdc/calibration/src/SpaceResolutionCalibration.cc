@@ -595,7 +595,7 @@ void SpaceResolutionCalibration::readSigmaFromDB()
   }
   m_sigmaParamMode_old = (*m_sResolFromDB)->getSigmaParamMode();
 
-  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+  for (unsigned short iCL = 0; iCL < c_maxNSenseLayers; ++iCL) {
     for (unsigned short iLR = 0; iLR < 2; ++iLR) {
       for (unsigned short iA = 0; iA < nalpha_old; ++iA) {
         for (unsigned short iT = 0; iT < ntheta_old; ++iT) {

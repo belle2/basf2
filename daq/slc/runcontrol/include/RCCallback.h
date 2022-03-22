@@ -28,7 +28,7 @@ namespace Belle2 {
     virtual ~RCCallback() {}
 
   public:
-    virtual void init(NSMCommunicator& com);
+    void init(NSMCommunicator& com) override;
     virtual void boot(const std::string& /* opt */, const DBObject&) {}
     virtual void load(const DBObject&, const std::string& /*runtype*/) {}
     virtual void start(int /*expno*/, int /*runno*/) {}
@@ -41,8 +41,8 @@ namespace Belle2 {
     virtual std::string dbdump();
 
   public:
-    virtual bool perform(NSMCommunicator& com);
-    virtual void timeout(NSMCommunicator& com);
+    bool perform(NSMCommunicator& com) override;
+    void timeout(NSMCommunicator& com) override;
 
   public:
     virtual void initialize(const DBObject&) {}

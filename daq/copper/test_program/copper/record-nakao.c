@@ -33,16 +33,11 @@ void closefile( )
 void
 show_event(unsigned long * head, int len)
 {
-  int i,j,k;
-  char* temp_buf = (char*)buffer;
-  for (i=0; i<(len/4); i+= 8) {
-    printf("%08d %08x %08x %08x %08x %08x %08x %08x %08x\n", i,
+  for (int i=0; i<(len/4); i+= 8) {
+    printf("%08d %08lx %08lx %08lx %08lx %08lx %08lx %08lx %08lx\n", i,
 	   buffer[i], buffer[i+1], buffer[i+2], buffer[i+3],
 	   buffer[i+4], buffer[i+5], buffer[i+6], buffer[i+7]);
   }
-
-  
-
 }
 
 
@@ -50,7 +45,6 @@ unsigned long
 xor(unsigned long * start, int wordlen)
 {
   unsigned long ret = 0;
-  int i;
   while (wordlen--) {
     ret ^= *(start++);
   }
@@ -62,16 +56,9 @@ int cprfd;
 int
 main(int argc, char **argv)
 {   
-  FILE *fpr;  // for file read modified by Jingzhou Zhao
-  char SaveFile[100];// SaveFile
-  int irun;
-  char timebuf[100];
-  time_t t;//             
 
   int event=0;
   int ret, i = 0;
-  fd_set rfds, efds;
-  int amtfd[4];
   int iii;
   int istop;
   int istart;    
@@ -119,15 +106,18 @@ main(int argc, char **argv)
   //
   // Open an output file
   //
-  time(&t);
+  time_t tt;//             
+  time(&tt);
 #ifdef FILE_OUT 
-  strftime(timebuf,sizeof(timebuf),"RUN%Y%m%d%H%M%S",localtime(&t));
+  char timebuf[100];
+  strftime(timebuf,sizeof(timebuf),"RUN%Y%m%d%H%M%S",localtime(&tt));
+  char SaveFile[100];// SaveFile
   strcpy(SaveFile,timebuf);
   strcat(SaveFile,".dat");
   printf("File Name: %s\n",SaveFile);
 
 
-  if((fpr=fopen(SaveFile,"r"))!=NULL) {
+  if((FILE *fpr=fopen(SaveFile,"r"))!=NULL) {
     printf("File: %s exists on the disk!",SaveFile);
     fclose(fpr);
     exit(0);
@@ -156,6 +146,7 @@ main(int argc, char **argv)
   ioctl(cprfd,CPRIOSET_LEF_WD_FF,&j); 
 
   ret = ioctl(cprfd, CPRIOSET_FINESSE_STA, &use_slot, sizeof(use_slot));
+  /* int amtfd[4]; */
   /*   amtfd[0] = open("/dev/copper/fngeneric:a", O_RDWR); */
   /*   amtfd[1] = open("/dev/copper/fngeneric:b", O_RDWR); */
   /*   amtfd[2] = open("/dev/copper/fngeneric:c", O_RDWR); */
@@ -169,12 +160,12 @@ main(int argc, char **argv)
   //
   while (1) {
     /*        printf("before redo.\n"); */
-    int redo;
     /*        printf("                         after redo.\n"); */
 #if 0
     /* If you want to test select() */
     FD_ZERO(&rfds); FD_SET(cprfd, &rfds);
     printf("after Rfds.\n");
+    fd_set rfds, efds;
     FD_ZERO(&efds); FD_SET(cprfd, &efds);
     printf("                         after Efds.\n");
     ret = select(1+fd, &rfds, NULL, &efds, NULL);

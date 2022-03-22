@@ -58,9 +58,9 @@ void SPTC2RTConverterModule::initialize()
   // are in the wrong places. This does not hurt at the moment because values values and defaults coincide
   // by chance.
   RecoTrack::registerRequiredRelations(m_recoTracks,
-                                       "",
-                                       m_param_svdHitsStoreArrayName,
                                        m_param_pxdHitsStoreArrayName,
+                                       m_param_svdHitsStoreArrayName,
+                                       "",
                                        "",
                                        "",
                                        m_param_recoHitInformationStoreArrayName);

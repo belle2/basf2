@@ -1124,7 +1124,8 @@ def fillParticleListFromMC(decayString,
                            addDaughters=False,
                            skipNonPrimaryDaughters=False,
                            writeOut=False,
-                           path=None):
+                           path=None,
+                           skipNonPrimary=False):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -1138,6 +1139,7 @@ def fillParticleListFromMC(decayString,
     @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
+    @param skipNonPrimary          if true, skip non primary particle
     """
 
     pload = register_module('ParticleLoader')
@@ -1147,6 +1149,7 @@ def fillParticleListFromMC(decayString,
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
+    pload.param('skipNonPrimary', skipNonPrimary)
     path.add_module(pload)
 
     from ROOT import Belle2
@@ -1167,7 +1170,8 @@ def fillParticleListsFromMC(decayStringsWithCuts,
                             addDaughters=False,
                             skipNonPrimaryDaughters=False,
                             writeOut=False,
-                            path=None):
+                            path=None,
+                            skipNonPrimary=False):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
@@ -1181,6 +1185,13 @@ def fillParticleListsFromMC(decayStringsWithCuts,
         pions = ('pi+:gen', 'pionID>0.1')
         fillParticleListsFromMC([kaons, pions], path=mypath)
 
+    .. tip::
+        Daughters of ``Lambda0`` are not primary, but ``Lambda0`` is not final state particle.
+        Thus, when one reconstructs a particle from ``Lambda0``, that is created with
+        ``addDaughters=True`` and ``skipNonPrimaryDaughters=True``, the particle always has ``isSignal==0``.
+        Please set options for ``Lambda0`` to use MC-matching variables properly as follows,
+        ``addDaughters=True`` and ``skipNonPrimaryDaughters=False``.
+
     @param decayString             specifies type of Particles and determines the name of the ParticleList
     @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
     @param addDaughters            adds the bottom part of the decay chain of the particle to the datastore and
@@ -1188,6 +1199,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
+    @param skipNonPrimary          if true, skip non primary particle
     """
 
     pload = register_module('ParticleLoader')
@@ -1197,6 +1209,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
+    pload.param('skipNonPrimary', skipNonPrimary)
     path.add_module(pload)
 
     from ROOT import Belle2
@@ -3390,6 +3403,16 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
             B2FATAL("No charged pid MVA was trained to separate ", binaryHypoPDGCodes[0], " vs. ", binaryHypoPDGCodes[1],
                     ". Please choose among the following pairs:\n",
                     "\n".join(f"{opt[0]} vs. {opt[1]}" for opt in binaryOpts))
+
+        decayDescriptor = Belle2.DecayDescriptor()
+        for name in plSet:
+            if not decayDescriptor.init(name):
+                raise ValueError("Invalid paritlceLists")
+
+            pdg = abs(decayDescriptor.getMother().getPDGCode())
+            if pdg not in binaryHypoPDGCodes:
+                B2WARNING("Given ParticleList: ", name, " (", pdg, ") is neither signal (", binaryHypoPDGCodes[0],
+                          ") nor background (", binaryHypoPDGCodes[1], ").")
 
         chargedpid = register_module("ChargedPidMVA")
         chargedpid.set_name(f"ChargedPidMVA_{binaryHypoPDGCodes[0]}_vs_{binaryHypoPDGCodes[1]}_{mode}")

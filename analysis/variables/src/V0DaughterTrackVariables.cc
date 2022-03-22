@@ -189,7 +189,7 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
-      TVector3 v0Vertex = particle->getVertex();
+      B2Vector3F v0Vertex = particle->getVertex();
 
       const Particle* daug = particle->getDaughter(daughterID[0]);
 
@@ -212,7 +212,7 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
-      TVector3 v0Vertex = particle->getVertex();
+      B2Vector3F v0Vertex = particle->getVertex();
 
       const Particle* daug = particle->getDaughter(daughterID[0]);
 
@@ -252,8 +252,8 @@ namespace Belle2 {
       if (!trackFit) { return std::numeric_limits<double>::quiet_NaN(); }
 
       // MC information
-      const TVector3 mcProdVertex   = mcparticle->getVertex();
-      const TVector3 mcMomentum     = mcparticle->getMomentum();
+      const B2Vector3D mcProdVertex   = mcparticle->getVertex();
+      const B2Vector3D mcMomentum     = mcparticle->getMomentum();
       const double mcParticleCharge = mcparticle->getCharge();
       const double BzAtProdVertex = BFieldManager::getFieldInTesla(mcProdVertex).Z();
       Helix mcHelix = Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
@@ -644,11 +644,11 @@ namespace Belle2 {
       return vtxXY.Mod();
     }
 
-    TVector3 convertedPhoton3Momentum(const Particle* gamma, const std::vector<double>& daughterIndices)
+    B2Vector3D convertedPhoton3Momentum(const Particle* gamma, const std::vector<double>& daughterIndices)
     {
       //Do basic checks
       int errFlag = convertedPhotonErrorChecks(gamma, daughterIndices);
-      if (errFlag == -1) {return TVector3(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());}
+      if (errFlag == -1) {return B2Vector3D(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());}
 
       //Load helix parameters
       double Phi01, D01, Omega1, Z01, TanLambda1, Phi02, D02, Omega2, Z02, TanLambda2;
@@ -659,13 +659,13 @@ namespace Belle2 {
                                                TanLambda2);
       if (errFlag == -1) {
         B2ERROR("First track provided has curvature zero. Calculation of convertedPhoton3Momentum failed.");
-        return  TVector3(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
-                         std::numeric_limits<double>::quiet_NaN());
+        return  B2Vector3D(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
+                           std::numeric_limits<double>::quiet_NaN());
       }
       if (errFlag == -2) {
         B2ERROR("Second track provided has curvature zero. Calculation of convertedPhoton3Momentum failed.");
-        return  TVector3(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
-                         std::numeric_limits<double>::quiet_NaN());
+        return  B2Vector3D(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(),
+                           std::numeric_limits<double>::quiet_NaN());
       }
 
       //Delta-Z
@@ -692,10 +692,10 @@ namespace Belle2 {
 
       //Photon 3-momentum
       double p1  = gamma->getDaughter(daughterIndex1)->getMomentumMagnitude();
-      TVector3 e1Momentum(coslam1 * cos(phiN1), coslam1 * sin(phiN1), sinlam1);
+      B2Vector3D e1Momentum(coslam1 * cos(phiN1), coslam1 * sin(phiN1), sinlam1);
       double p2  = gamma->getDaughter(daughterIndex2)->getMomentumMagnitude();
-      TVector3 e2Momentum(coslam2 * cos(phiN2), coslam2 * sin(phiN2), sinlam2);
-      TVector3 gammaMomentum = (e1Momentum * p1) + (e2Momentum * p2);
+      B2Vector3D e2Momentum(coslam2 * cos(phiN2), coslam2 * sin(phiN2), sinlam2);
+      B2Vector3D gammaMomentum = (e1Momentum * p1) + (e2Momentum * p2);
 
       return gammaMomentum;
     }
@@ -750,37 +750,38 @@ namespace Belle2 {
     VARIABLE_GROUP("V0Daughter");
 
     REGISTER_VARIABLE("v0DaughterNCDCHits(i)", v0DaughterTrackNCDCHits, "Number of CDC hits associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterNCDCHits(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterNCDCHits", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `nCDCHits`,
                      so replace the current call with ``daughter(i, nCDCHits)``.)DOC");
     REGISTER_VARIABLE("v0DaughterNSVDHits(i)", v0DaughterTrackNSVDHits, "Number of SVD hits associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterNSVDHits(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterNSVDHits", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `nSVDHits`,
                      so replace the current call with ``daughter(i, nSVDHits)``.)DOC");
     REGISTER_VARIABLE("v0DaughterNPXDHits(i)", v0DaughterTrackNPXDHits, "Number of PXD hits associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterNPXDHits(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterNPXDHits", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `nPXDHits`,
                      so replace the current call with ``daughter(i, nPXDHits)``.)DOC");
+
     REGISTER_VARIABLE("v0DaughterNVTXHits(i)", v0DaughterTrackNVTXHits, "Number of VTX hits associated to the i-th daughter track");
     // FIXME: Not sure whether this should be included, as so far there is no official light release with the VTX variables
     // MAKE_DEPRECATED("v0DaughterNVTXHits(i)", false, "light-2104-poseidon", R"DOC(
     //                  The same value can be calculated with the more generic variable `nVTXHits`,
     //                  so replace the current call with ``daughter(i, nVTXHits)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterNVXDHits(i)", v0DaughterTrackNVXDHits,
-                      "Number of PXD+SVD+VTX hits associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterNVXDHits(i)", false, "light-2104-poseidon", R"DOC(
+
+    REGISTER_VARIABLE("v0DaughterNVXDHits(i)", v0DaughterTrackNVXDHits, "Number of PXD+SVD hits associated to the i-th daughter track");
+    MAKE_DEPRECATED("v0DaughterNVXDHits", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `nVXDHits`,
                      so replace the current call with ``daughter(i, nVXDHits)``.)DOC");
     REGISTER_VARIABLE("v0DaughterNRemovedHits(i)", v0DaughterTrackNRemovedHits,
                       "The number of the i-th daughter track hits removed in V0Finder. Returns 0 if called for something other than V0 daughters.");
     REGISTER_VARIABLE("v0DaughterFirstSVDLayer(i)", v0DaughterTrackFirstSVDLayer,
                       "First activated SVD layer associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterFirstSVDLayer(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterFirstSVDLayer", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `firstSVDLayer`,
                      so replace the current call with ``daughter(i, firstSVDLayer)``.)DOC");
     REGISTER_VARIABLE("v0DaughterFirstPXDLayer(i)", v0DaughterTrackFirstPXDLayer,
                       "First activated PXD layer associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterFirstPXDLayer(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterFirstPXDLayer", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `firstPXDLayer`,
                      so replace the current call with ``daughter(i, firstPXDLayer)``.)DOC");
     REGISTER_VARIABLE("v0DaughterFirstVTXLayer(i)", v0DaughterTrackFirstVTXLayer,
@@ -791,59 +792,59 @@ namespace Belle2 {
     //                  so replace the current call with ``daughter(i, firstVTXLayer)``.)DOC");
     REGISTER_VARIABLE("v0DaughterFirstCDCLayer(i)", v0DaughterTrackFirstCDCLayer,
                       "First activated CDC layer associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterFirstCDCLayer(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterFirstCDCLayer", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `firstCDCLayer`,
                      so replace the current call with ``daughter(i, firstCDCLayer)``.)DOC");
     REGISTER_VARIABLE("v0DaughterLastCDCLayer(i)",  v0DaughterTrackLastCDCLayer,
                       "Last CDC layer associated to the i-th daughter track");
-    MAKE_DEPRECATED("v0DaughterLastCDCLayer(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterLastCDCLayer", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `lastCDCLayer`,
                      so replace the current call with ``daughter(i, lastCDCLayer)``.)DOC");
     REGISTER_VARIABLE("v0DaughterPValue(i)", v0DaughterTrackPValue,
                       "chi2 probalility of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterPValue(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterPValue", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `pValue`,
                      so replace the current call with ``daughter(i, pValue)``.)DOC");
     /// helix parameters
     REGISTER_VARIABLE("v0DaughterD0(i)",        v0DaughterTrackD0,        "d0 of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterD0(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterD0", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `d0`,
                      so replace the current call with ``daughter(i, d0)``.)DOC");
     REGISTER_VARIABLE("v0DaughterPhi0(i)",      v0DaughterTrackPhi0,      "phi0 of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterPhi0(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterPhi0", false, "light-2104-poseidon", R"DOC(
                  The same value can be calculated with the more generic variable `phi0`,
                  so replace the current call with ``daughter(i, phi0)``.)DOC");
     REGISTER_VARIABLE("v0DaughterOmega(i)",     v0DaughterTrackOmega,     "omega of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterOmega(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterOmega", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `omega`,
                      so replace the current call with ``daughter(i, omega)``.)DOC");
     REGISTER_VARIABLE("v0DaughterZ0(i)",        v0DaughterTrackZ0,        "z0 of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterZ0(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterZ0", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `z0`,
                      so replace the current call with ``daughter(i, z0)``.)DOC");
     REGISTER_VARIABLE("v0DaughterTanLambda(i)", v0DaughterTrackTanLambda, "tan(lambda) of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterTanLambda(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterTanLambda", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `tanLambda`,
                      so replace the current call with ``daughter(i, tanLambda)``.)DOC");
     /// error of helix parameters
     REGISTER_VARIABLE("v0DaughterD0Error(i)", v0DaughterTrackD0Error, "d0 error of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterD0Error(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterD0Error", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `d0Err`,
                      so replace the current call with ``daughter(i, d0Err)``.)DOC");
     REGISTER_VARIABLE("v0DaughterPhi0Error(i)", v0DaughterTrackPhi0Error, "phi0 error of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterPhi0Error(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterPhi0Error", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `phi0Err`,
                      so replace the current call with ``daughter(i, phi0Err)``.)DOC");
     REGISTER_VARIABLE("v0DaughterOmegaError(i)", v0DaughterTrackOmegaError, "omega error of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterOmegaError(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterOmegaError", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `omegaErr`,
                      so replace the current call with ``daughter(i, omegaErr)``.)DOC");
     REGISTER_VARIABLE("v0DaughterZ0Error(i)", v0DaughterTrackZ0Error, "z0 error of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterZ0Error(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterZ0Error", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `z0Err`,
                      so replace the current call with ``daughter(i, z0Err)``.)DOC");
     REGISTER_VARIABLE("v0DaughterTanLambdaError(i)", v0DaughterTrackTanLambdaError, "tan(lambda) error of the i-th daughter track fit");
-    MAKE_DEPRECATED("v0DaughterTanLambdaError(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterTanLambdaError", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `tanLambdaErr`,
                      so replace the current call with ``daughter(i, tanLambdaErr)``.)DOC");
 
@@ -871,27 +872,27 @@ namespace Belle2 {
     /// pull of helix parameters with the origin as the pivot
     REGISTER_VARIABLE("v0DaughterD0PullWithOriginAsPivot(i)",       v0DaughterHelixWithOriginAsPivotD0Pull,
                       "d0 pull of the i-th daughter track with the origin as the track pivot");
-    MAKE_DEPRECATED("v0DaughterD0PullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterD0PullWithOriginAsPivot", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `d0Pull`,
                      so replace the current call with ``daughter(i, d0Pull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterPhi0PullWithOriginAsPivot(i)",     v0DaughterHelixWithOriginAsPivotPhi0Pull,
                       "phi0 pull of the i-th daughter track with the origin as the track pivot");
-    MAKE_DEPRECATED("v0DaughterPhi0PullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterPhi0PullWithOriginAsPivot", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `phi0Pull`,
                      so replace the current call with ``daughter(i, phi0Pull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterOmegaPullWithOriginAsPivot(i)",    v0DaughterHelixWithOriginAsPivotOmegaPull,
                       "omega pull of the i-th daughter track with the origin as the track pivot");
-    MAKE_DEPRECATED("v0DaughterOmegaPullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterOmegaPullWithOriginAsPivot", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `omegaPull`,
                      so replace the current call with ``daughter(i, omegaPull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterZ0PullWithOriginAsPivot(i)",       v0DaughterHelixWithOriginAsPivotZ0Pull,
                       "z0 pull of the i-th daughter track with the origin as the track pivot");
-    MAKE_DEPRECATED("v0DaughterZ0PullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterZ0PullWithOriginAsPivot", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `z0Pull`,
                      so replace the current call with ``daughter(i, z0Pull)``.)DOC");
     REGISTER_VARIABLE("v0DaughterTanLambdaPullWithOriginAsPivot(i)", v0DaughterHelixWithOriginAsPivotTanLambdaPull,
                       "tan(lambda) pull of the i-th daughter track with the origin as the track pivot");
-    MAKE_DEPRECATED("v0DaughterTanLambdaPullWithOriginAsPivot(i)", false, "light-2104-poseidon", R"DOC(
+    MAKE_DEPRECATED("v0DaughterTanLambdaPullWithOriginAsPivot", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `tanLambdaPull`,
                      so replace the current call with ``daughter(i, tanLambdaPull)``.)DOC");
     /// helix parameters and covariance matrix elements

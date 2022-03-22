@@ -12076,7 +12076,7 @@ MCParticle#2:
   isPrimaryParticle(): True
   isVirtual(): False
 MCParticle#3:
-  get4Vector(): (-0.140336,-0.315071,-0.591684,2.12371)
+  get4Vector(): (-0.140336,-0.315071,-0.591684,2.1237)
   getArrayIndex(): 3
   getCharge(): -1
   getDaughter(0): -> MCParticles#11
@@ -12696,7 +12696,7 @@ MCParticle#21:
   isPrimaryParticle(): True
   isVirtual(): False
 MCParticle#22:
-  get4Vector(): (-0.394567,-0.275415,-0.421839,0.63991)
+  get4Vector(): (-0.394567,-0.275415,-0.421839,0.639911)
   getArrayIndex(): 22
   getCharge(): -1
   getDaughter(0): -> MCParticles#40
@@ -19367,7 +19367,7 @@ MCParticle#18:
   isPrimaryParticle(): False
   isVirtual(): False
 MCParticle#19:
-  get4Vector(): (-0.00877153,-0.0101492,-0.00634103,0.939683)
+  get4Vector(): (-0.00877153,-0.0101492,-0.00634103,0.939682)
   getArrayIndex(): 19
   getCharge(): 0
   getDaughter(0): -> NULL
@@ -19896,7 +19896,7 @@ MCParticle#34:
   isPrimaryParticle(): True
   isVirtual(): False
 MCParticle#35:
-  get4Vector(): (-0.322116,-0.366965,-0.134324,0.525305)
+  get4Vector(): (-0.322116,-0.366965,-0.134324,0.525304)
   getArrayIndex(): 35
   getCharge(): -1
   getDaughter(0): -> MCParticles#62

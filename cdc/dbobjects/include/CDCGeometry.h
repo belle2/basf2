@@ -1626,6 +1626,37 @@ namespace Belle2 {
     double getNominalSpaceResolution() const { return m_nominalSpaceResolution;}
 
 
+    /**
+     * Get the number of sense layers.
+     */
+    ushort getNumberOfSenseLayers() const { return m_maxNSenseLayers;}
+
+    /**
+     * Get the number of field layers.
+     */
+    ushort getNumberOfFieldLayers() const { return m_maxNFieldLayers;}
+
+    /**
+     * Get the maximum number of super layers.
+     */
+    ushort getMaxNumberOfSuperLayers() const { return m_maxNSuperLayers;}
+
+    /**
+     * Get the offset of the first layer.
+     */
+    ushort getOffsetOfFirstLayer() const { return m_firstLayerOffset;}
+
+    /**
+     * Get the offset of the first super layer.
+     */
+    ushort getOffsetOfFirstSuperLayer() const { return m_firstSuperLayerOffset;}
+
+    /**
+     * Get the maximum number of cells in one layer.
+     */
+    ushort getMaxNumberOfCellsPerLayer() const { return m_maxNCellsPerLayer;}
+
+
   private:
 
     double m_globalPhiRotation = 0.0; /**< Global rotation in phi (rad). */
@@ -1662,7 +1693,14 @@ namespace Belle2 {
     double m_clockFrequency; /**< Clock frequency. */
     double m_nominalSpaceResolution;/**< Nominal space resolution. */
 
-    ClassDef(CDCGeometry, 4);  /**< ClassDef, must be the last term before the closing {}*/
+    ushort m_maxNSenseLayers        = 56;   /**< Maximum number of Sense Wire Layers */
+    ushort m_maxNFieldLayers        = 55;   /**< Maximum number of Field Wire Layers */
+    ushort m_maxNSuperLayers        = 9;    /**< Maximum number of Super Layers */
+    ushort m_firstLayerOffset       = 0;    /**< Offset of the first layer (for reduced CDC studies) */
+    ushort m_firstSuperLayerOffset  = 0;    /**< Offset of the first super layer (for reduced CDC studies) */
+    ushort m_maxNCellsPerLayer      = 384;  /**< Maximum number wires within a layer */
+
+    ClassDef(CDCGeometry, 5);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 } // end of namespace Belle2

@@ -24,14 +24,30 @@ namespace Belle2 {
   class DQMHistoModuleBase : public HistoModule {
 
   public:
-    /** Constructor */
+
+    /**
+     * Constructor.
+     */
     DQMHistoModuleBase();
-    /** Destructor */
+
+    /**
+     * Destructor.
+     */
     ~DQMHistoModuleBase();
 
-    /** Module functions */
+    /**
+     * Initializer.
+     */
     virtual void initialize() override;
+
+    /**
+     * Called when entering a new run.
+     */
     virtual void beginRun() override;
+
+    /**
+     * This method is called for each event.
+     */
     virtual void event() override;
 
     /** Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed to be placed in this function.

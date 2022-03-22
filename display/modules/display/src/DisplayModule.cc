@@ -60,10 +60,8 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
            "If true, CDCHit objects will be shown as drift cylinders (shortened, z position set to zero).", false);
   addParam("showTriggerObjects", m_showTriggerObjects,
            "If true, CDCHit objects will be assigned to trigger segments and trigger tracks will be shown.", false);
-  addParam("showBKLM2dHits", m_showBKLM2dHits,
-           "If true, BKLM2dHit objects will be shown in the display", true);
-  addParam("showEKLM2dHits", m_showEKLM2dHits,
-           "If true, EKLMHit2d objects will be shown in the display", true);
+  addParam("showKLM2dHits", m_showKLM2dHits,
+           "If true, KLMHit2d objects will be shown in the display.", true);
   addParam("showARICHHits", m_showARICHHits,
            "If true, ARICHHit objects will be shown.", false);
   addParam("automatic", m_automatic,
@@ -103,8 +101,7 @@ void DisplayModule::initialize()
   StoreArray<EKLMSimHit> EKLMSimHits; EKLMSimHits.isOptional();
   StoreArray<ECLCluster> ECLClusters; ECLClusters.isOptional();
   StoreArray<KLMCluster> KLMClusters; KLMClusters.isOptional();
-  StoreArray<BKLMHit2d> BKLMHit2ds; BKLMHit2ds.isOptional();
-  StoreArray<EKLMHit2d> EKLMHit2ds; EKLMHit2ds.isOptional();
+  StoreArray<KLMHit2d> KLMHit2ds; KLMHit2ds.isOptional();
   StoreArray<Track> Tracks; Tracks.isOptional();
   StoreArray<TrackFitResult> TrackFitResults; TrackFitResults.isOptional();
   StoreArray<RecoTrack> RecoTracks; RecoTracks.isOptional();
@@ -260,16 +257,14 @@ void DisplayModule::event()
     }
   }
 
-  if (m_showBKLM2dHits) {
-    StoreArray<BKLMHit2d> bklmhits;
-    for (auto& hit : bklmhits)
-      m_visualizer->addBKLMHit2d(&hit);
-  }
-
-  if (m_showEKLM2dHits) {
-    StoreArray<EKLMHit2d> eklmhits;
-    for (auto& hit : eklmhits)
-      m_visualizer->addEKLMHit2d(&hit);
+  if (m_showKLM2dHits) {
+    StoreArray<KLMHit2d> klmHits;
+    for (auto& hit : klmHits) {
+      if (hit.getSubdetector() == KLMElementNumbers::c_BKLM)
+        m_visualizer->addBKLMHit2d(&hit);
+      else
+        m_visualizer->addEKLMHit2d(&hit);
+    }
   }
 
   if (m_showARICHHits) {

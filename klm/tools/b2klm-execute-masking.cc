@@ -8,7 +8,6 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
-#include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMSectorArrayIndex.h>
 

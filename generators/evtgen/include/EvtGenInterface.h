@@ -55,7 +55,7 @@ namespace Belle2 {
               const std::string& userFileName = std::string(""), bool coherentMixing = true);
 
     /** Generate a single event */
-    int simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle,
+    int simulateEvent(MCParticleGraph& graph, ROOT::Math::PxPyPzEVector pParentParticle,
                       TVector3 pPrimaryVertex, int inclusiveType, const std::string& inclusiveParticle);
 
     /** Simulate a particle decay. */

@@ -13,15 +13,8 @@ import os
 import basf2_mva
 from basf2 import B2ERROR, B2FATAL
 import basf2
-from ROOT import Belle2
-import variables.utils as vu
+from variables import variables as vm
 import modularAnalysis as ma
-from ROOT import gSystem
-gSystem.Load('libanalysis.so')
-
-# make ROOT compatible available
-Belle2.Variable.Manager
-Belle2.Variable.Manager.Instance()
 
 
 def get_variables(particle_list, ranked_variable, variables=None, particleNumber=1):
@@ -48,6 +41,7 @@ def construct_default_variable_names(particle_lists=None, ranked_variable='p', v
     :param particleNumber:
     :return:
     """
+    from ROOT import Belle2  # noqa
     if particle_lists is None:
         particle_lists = ['pi+:pos_charged', 'pi+:neg_charged']
 
@@ -58,7 +52,7 @@ def construct_default_variable_names(particle_lists=None, ranked_variable='p', v
     # make root compatible
     root_compatible_list = []
     for var in variable_names:
-        root_compatible_list.append(Belle2.makeROOTCompatible(var))
+        root_compatible_list.append(Belle2.MakeROOTCompatible.makeROOTCompatible(var))
 
     return root_compatible_list
 
@@ -246,6 +240,6 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         roe_path.add_module(flavorTaggerInfoFiller)
 
         # Create standard alias for the output of the flavor tagger
-        vu._variablemanager.addAlias('DNN_qrCombined', 'qrOutput(DNN)')
+        vm.addAlias('DNN_qrCombined', 'qrOutput(DNN)')
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

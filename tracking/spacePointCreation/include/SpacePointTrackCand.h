@@ -108,7 +108,7 @@ namespace Belle2 {
      * Checks the equality of the pointers to the contained SpacePoints (pdg-code and charge estimate are not compared!)
      * NOTE: returns false if both TrackCands do not contain any SpacePoints
      */
-    bool operator == (const SpacePointTrackCand& rhs);
+    bool operator == (const SpacePointTrackCand& rhs) const;
 
 
     /**

@@ -82,11 +82,8 @@ main(int argc, char **argv)
   int fd[4];
   int use[4];
   int readback[4];
-  int i, j;
-  FILE *fp;
-  int ch;
-  int tem;
-  int k = 0, l;
+  int i;
+  int k = 0;
   int val;
   int feetype,feehwv,feefwv;
   time_t   lt;
@@ -103,7 +100,7 @@ main(int argc, char **argv)
         break;
       }
 
-      j = argv[1][i] - 'a';
+      int j = argv[1][i] - 'a';
       if (use[j]) {
         fprintf(stderr, "HSLB %c is specified twice\n", 'a'+j);
         exit(1);
@@ -122,11 +119,11 @@ main(int argc, char **argv)
    for (i=0; i<4; i++) {
      if (! use[i]) continue;
      if (fd[i] < 0) {
-       char DEVICE[256];
-       sprintf(DEVICE, "/dev/copper/fngeneric:%c", 'a' + i);
-       if ((fd[i] = open(DEVICE,O_RDWR)) < 0) {
+       char dev[256];
+       sprintf(dev, "/dev/copper/fngeneric:%c", 'a' + i);
+       if ((fd[i] = open(dev,O_RDWR)) < 0) {
          fprintf(stderr, "%s: cannot open %s: %s\n",
-                  ARGV0, DEVICE, strerror(errno));
+                  ARGV0, dev, strerror(errno));
          exit(1);
         }
         if ( ( tem =  rdmgt( fd[i] , 0x71 ) )  != FirmwareVersion ) {
@@ -376,5 +373,5 @@ main(int argc, char **argv)
      usage();
      exit(1);
    }
+   return 0;
 }  
-  

@@ -23,7 +23,7 @@ namespace Belle2 {
       // Create an empty time base
       SVDRecoTimeBase timeBase;
       // Test getters
-      EXPECT_EQ(0, timeBase.getSensorID());
+      EXPECT_EQ(VxdID{0}, timeBase.getSensorID());
       EXPECT_TRUE(timeBase.isUStrip());
       const SVDRecoTimeBase::BinEdgesArray bins = timeBase.getBins();
       EXPECT_EQ(0, timeBase.getNBins());

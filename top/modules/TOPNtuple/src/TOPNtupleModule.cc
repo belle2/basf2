@@ -158,7 +158,7 @@ namespace Belle2 {
         if (mother) m_top.motherPDG = mother->getPDG();
         m_top.primary = mcParticle->getStatus(MCParticle::c_PrimaryParticle);
         m_top.seen = mcParticle->hasSeenInDetector(Const::TOP);
-        TVector3 prodVertex = mcParticle->getProductionVertex();
+        B2Vector3D prodVertex = mcParticle->getProductionVertex();
         m_top.rhoProd = prodVertex.Perp();
         m_top.zProd = prodVertex.Z();
         m_top.phiProd = prodVertex.Phi();

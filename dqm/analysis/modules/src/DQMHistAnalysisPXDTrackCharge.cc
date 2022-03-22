@@ -48,7 +48,7 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
 //   addParam("PeakBefore", m_peakBefore, "Range for fit before peak (positive)", 5.);
 //   addParam("PeakAfter", m_peakAfter, "Range for after peak", 40.);
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:TrackCharge:"));
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
   addParam("ColorAlert", m_color, "Whether to show the color alert", true);
 

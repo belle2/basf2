@@ -16,6 +16,9 @@
 //DQM
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
+//std
+#include <set>
+
 //ECL
 #include <ecl/dbobjects/ECLChannelMap.h>
 
@@ -51,12 +54,17 @@ namespace Belle2 {
     /** flag if to export to EPICS */
     bool m_useEpics;
 
-    /** Number of ECLCollector modules */
+    /** Number of ECLCollector modules (normally 52) */
     const static int c_collector_count = ECL::ECL_CRATES;
+
+    /** Remove upper 10% of the values, return the maximum in the remaining 90% */
+    double robust_max(std::multiset<double> values);
 
 #ifdef _BELLE2_EPICS
     /** EPICS channels for logic_summary histogram */
-    chid chid_logic[collector_count];
+    chid chid_logic[c_collector_count];
+    /** EPICS channels for pedestal width */
+    chid chid_pedwidth[4];
 #endif
   };
 } // end namespace Belle2

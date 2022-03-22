@@ -1485,6 +1485,12 @@ void CDCGeometryPar::setXtRel()
   m_xtParamMode = (*m_xtRelFromDB)->getXtParamMode();
 
   for (unsigned short iCL = 0; iCL < c_maxNSenseLayers; ++iCL) {
+    if (iCL < m_firstLayerOffset) {
+      // m_XT is initialized to 0, but reading
+      // (*m_xtRelFromDB)->getXtParams(iCL, iLR, iA, iT)
+      // could fail if iCL < m_firstLayerOffset, thus continue as m_XT would be set to 0 in this case anyway
+      continue;
+    }
     for (unsigned short iLR = 0; iLR < 2; ++iLR) {
       for (unsigned short iA = 0; iA < m_nAlphaPoints; ++iA) {
         for (unsigned short iT = 0; iT < m_nThetaPoints; ++iT) {
@@ -1492,10 +1498,10 @@ void CDCGeometryPar::setXtRel()
           unsigned short np = params.size();
           //    std::cout <<"np4xt= " << np << std::endl;
           for (unsigned short i = 0; i < np; ++i) {
-            m_XT[iCL][iLR][iA][iT][i] = (iCL < m_firstLayerOffset) ? 0. : params[i];
+            m_XT[iCL][iLR][iA][iT][i] = params[i];
           }
 
-          double boundT = (iCL < m_firstLayerOffset) ? 0. : m_XT[iCL][iLR][iA][iT][6];
+          double boundT = m_XT[iCL][iLR][iA][iT][6];
           if (m_xtParamMode == 1) {
             m_XT[iCL][iLR][iA][iT][np] = ROOT::Math::Chebyshev5(boundT, m_XT[iCL][iLR][iA][iT][0], m_XT[iCL][iLR][iA][iT][1],
                                                                 m_XT[iCL][iLR][iA][iT][2], m_XT[iCL][iLR][iA][iT][3], m_XT[iCL][iLR][iA][iT][4], m_XT[iCL][iLR][iA][iT][5]);
@@ -1703,6 +1709,11 @@ void CDCGeometryPar::Print() const
 
 const TVector3 CDCGeometryPar::wireForwardPosition(uint layerID, int cellID, EWirePosition set) const
 {
+  // return early in case of empty layer, i.e. layerID < m_firstLayerOffset
+  if (layerID < m_firstLayerOffset) {
+    return TVector3(0, 0, 0);
+  }
+
   //  std::cout <<"cdcgeopar::fwdpos set= " << set << std::endl;
   TVector3 wPos(m_FWirPosAlign[layerID][cellID][0],
                 m_FWirPosAlign[layerID][cellID][1],
@@ -1718,15 +1729,16 @@ const TVector3 CDCGeometryPar::wireForwardPosition(uint layerID, int cellID, EWi
     wPos.SetZ(m_FWirPos        [layerID][cellID][2]);
   }
 
-  if (layerID < m_firstLayerOffset) {
-    wPos.SetXYZ(0., 0., 0.);
-  }
-
   return wPos;
 }
 
 const TVector3 CDCGeometryPar::wireForwardPosition(uint layerID, int cellID, double z, EWirePosition set) const
 {
+  // return early in case of empty layer, i.e. layerID < m_firstLayerOffset
+  if (layerID < m_firstLayerOffset) {
+    return TVector3(0, 0, 0);
+  }
+
   double yb_sag = 0.;
   double yf_sag = 0.;
   getWireSagEffect(set, layerID, cellID, z, yb_sag, yf_sag);
@@ -1741,15 +1753,16 @@ const TVector3 CDCGeometryPar::wireForwardPosition(uint layerID, int cellID, dou
     wPos.SetZ(m_FWirPos        [layerID][cellID][2]);
   }
 
-  if (layerID < m_firstLayerOffset) {
-    wPos.SetXYZ(0., 0., 0.);
-  }
-
   return wPos;
 }
 
 const TVector3 CDCGeometryPar::wireBackwardPosition(uint layerID, int cellID, EWirePosition set) const
 {
+  // return early in case of empty layer, i.e. layerID < m_firstLayerOffset
+  if (layerID < m_firstLayerOffset) {
+    return TVector3(0, 0, 0);
+  }
+
   TVector3 wPos(m_BWirPosAlign[layerID][cellID][0],
                 m_BWirPosAlign[layerID][cellID][1],
                 m_BWirPosAlign[layerID][cellID][2]);
@@ -1764,15 +1777,16 @@ const TVector3 CDCGeometryPar::wireBackwardPosition(uint layerID, int cellID, EW
     wPos.SetZ(m_BWirPos        [layerID][cellID][2]);
   }
 
-  if (layerID < m_firstLayerOffset) {
-    wPos.SetXYZ(0., 0., 0.);
-  }
-
   return wPos;
 }
 
 const TVector3 CDCGeometryPar::wireBackwardPosition(uint layerID, int cellID, double z, EWirePosition set) const
 {
+  // return early in case of empty layer, i.e. layerID < m_firstLayerOffset
+  if (layerID < m_firstLayerOffset) {
+    return TVector3(0, 0, 0);
+  }
+
   double yb_sag = 0.;
   double yf_sag = 0.;
   getWireSagEffect(set, layerID, cellID, z, yb_sag, yf_sag);
@@ -1785,10 +1799,6 @@ const TVector3 CDCGeometryPar::wireBackwardPosition(uint layerID, int cellID, do
   } else if (set == c_Base) {
     wPos.SetX(m_BWirPos        [layerID][cellID][0]);
     wPos.SetZ(m_BWirPos        [layerID][cellID][2]);
-  }
-
-  if (layerID < m_firstLayerOffset) {
-    wPos.SetXYZ(0., 0., 0.);
   }
 
   return wPos;
@@ -1975,6 +1985,13 @@ void CDCGeometryPar::getWireSagEffect(const EWirePosition set, const unsigned la
   //N.B.- Maybe replaced with a bit more accurate formula.
   //    - The electrostatic force effect is not included.
 
+  // return early in case of empty layer, i.e. layerID < m_firstLayerOffset
+  if (layerID < m_firstLayerOffset) {
+    Yb_sag = 0.;
+    Yf_sag = 0.;
+    return;
+  }
+
   double Xb = 0.;
   double Xf = 0.;
   double Yb = 0.;
@@ -2041,11 +2058,6 @@ void CDCGeometryPar::getWireSagEffect(const EWirePosition set, const unsigned la
 
   Yb_sag = Y_sag + dydz * (Zb - Z);
   Yf_sag = Y_sag + dydz * (Zf - Z);
-
-  if (layerID < m_firstLayerOffset) {
-    Yb_sag = 0.;
-    Yf_sag = 0.;
-  }
 
 }
 

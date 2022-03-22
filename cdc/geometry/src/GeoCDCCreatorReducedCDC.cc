@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <cdc/geometry/GeoCDCCreator.h>
+#include <cdc/geometry/GeoCDCCreatorReducedCDC.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeoControlPar.h>
 #include <cdc/simulation/CDCSimControlPar.h>
@@ -53,13 +53,13 @@ namespace Belle2 {
      * Register the GeoCreator.
      */
 
-    geometry::CreatorFactory<GeoCDCCreator> GeoCDCFactory("CDCCreator");
+    geometry::CreatorFactory<GeoCDCCreatorReducedCDC> GeoCDCFactoryReducedCDC("CDCCreatorReducedCDC");
 
     //-----------------------------------------------------------------
     //                 Implementation
     //-----------------------------------------------------------------
 
-    GeoCDCCreator::GeoCDCCreator()
+    GeoCDCCreatorReducedCDC::GeoCDCCreatorReducedCDC()
     {
       // Set job control params. before sensitivedetector and gometry construction
       CDCSimControlPar::getInstance();
@@ -70,10 +70,12 @@ namespace Belle2 {
       m_VisAttributes.clear();
       m_VisAttributes.push_back(new G4VisAttributes(false)); // for "invisible"
       m_userLimits.clear();
+
+      B2WARNING("Using CDC without SL0!");
     }
 
 
-    GeoCDCCreator::~GeoCDCCreator()
+    GeoCDCCreatorReducedCDC::~GeoCDCCreatorReducedCDC()
     {
       delete m_sensitive;
       if (m_bkgsensitive) delete m_bkgsensitive;
@@ -83,7 +85,7 @@ namespace Belle2 {
       m_userLimits.clear();
     }
 
-    void GeoCDCCreator::createGeometry(const CDCGeometry& geo, G4LogicalVolume& topVolume, geometry::GeometryTypes)
+    void GeoCDCCreatorReducedCDC::createGeometry(const CDCGeometry& geo, G4LogicalVolume& topVolume, geometry::GeometryTypes)
     {
 
       m_sensitive = new CDCSensitiveDetector("CDCSensitiveDetector", (2 * 24)* CLHEP::eV, 10 * CLHEP::MeV);
@@ -239,9 +241,9 @@ namespace Belle2 {
       //
       // Construct sensitive layers.
       //
-      const int nSLayer = geo.getNSenseLayers();
+      const uint nSLayer = geo.getNSenseLayers();
       const double length_feedthrough  = geo.getFeedthroughLength();
-      for (int iSLayer = 0; iSLayer < nSLayer; ++iSLayer) {
+      for (uint iSLayer = 0; iSLayer < nSLayer; ++iSLayer) {
         const auto& endplate = geo.getEndPlate(iSLayer);
         const int nEPLayer = endplate.getNEndPlateLayers();
         // Get parameters for sensitive layer: left, middle and right.
@@ -272,7 +274,7 @@ namespace Belle2 {
           rmax_sensitive_right = fieldLayer.getR();
           zback_sensitive_right = epLayerFwd.getZbwd();
           zfor_sensitive_right = senseLayer.getZfwd();
-        } else if (iSLayer >= 1 && iSLayer <= 14) {
+        } else if (iSLayer >= 1 && iSLayer <= 6) {
           const auto& epLayerBwd = endplate.getEndPlateLayer(1);
           const auto& epLayerFwd = endplate.getEndPlateLayer((nEPLayer / 2) + 1);
           const auto& senseLayer = geo.getSenseLayer(iSLayer);
@@ -293,7 +295,7 @@ namespace Belle2 {
           rmax_sensitive_right = fieldLayerOut.getR();
           zback_sensitive_right = epLayerFwd.getZbwd();
           zfor_sensitive_right = senseLayer.getZfwd();
-        } else if (iSLayer >= 15 && iSLayer <= 18) {
+        } else if (iSLayer >= 7 && iSLayer <= 10) {
           const auto& epLayerBwd = endplate.getEndPlateLayer(1);
           const auto& epLayerFwd = endplate.getEndPlateLayer(nEPLayer / 2);
           const auto& senseLayer = geo.getSenseLayer(iSLayer);
@@ -314,7 +316,7 @@ namespace Belle2 {
           rmax_sensitive_right = fieldLayerOut.getR();
           zback_sensitive_right = epLayerFwd.getZbwd();
           zfor_sensitive_right = senseLayer.getZfwd();
-        } else if (iSLayer >= 19 && iSLayer < 55) {
+        } else if (iSLayer >= 11 && iSLayer < 47) {
           const auto& epLayerBwd = endplate.getEndPlateLayer(0);
           const auto& epLayerFwd = endplate.getEndPlateLayer(nEPLayer / 2);
           const auto& senseLayer = geo.getSenseLayer(iSLayer);
@@ -336,7 +338,7 @@ namespace Belle2 {
           zback_sensitive_right = epLayerFwd.getZbwd();
           zfor_sensitive_right = senseLayer.getZfwd();
 
-        } else if (iSLayer == 55) {
+        } else if (iSLayer == 47) {
 
           const auto& epLayerBwdIn = endplate.getEndPlateLayer(0);
           const auto& epLayerBwdOut = endplate.getEndPlateLayer((nEPLayer / 2) - 1);
@@ -1092,7 +1094,7 @@ namespace Belle2 {
     }
 
 
-    void GeoCDCCreator::createNeutronShields(const GearDir& content)
+    void GeoCDCCreatorReducedCDC::createNeutronShields(const GearDir& content)
     {
 
       G4Material* C2H4 = geometry::Materials::get("G4_POLYETHYLENE");
@@ -1142,7 +1144,7 @@ namespace Belle2 {
     }
 
 
-    void GeoCDCCreator::createNeutronShields(const CDCGeometry& geom)
+    void GeoCDCCreatorReducedCDC::createNeutronShields(const CDCGeometry& geom)
     {
 
       G4Material* C2H4 = geometry::Materials::get("G4_POLYETHYLENE");
@@ -1173,7 +1175,7 @@ namespace Belle2 {
 
     }
 
-    void GeoCDCCreator::createCovers(const GearDir& content)
+    void GeoCDCCreatorReducedCDC::createCovers(const GearDir& content)
     {
       string Aluminum  = content.getString("Aluminum");
       G4Material* medAluminum = geometry::Materials::get(Aluminum);
@@ -1601,7 +1603,7 @@ namespace Belle2 {
     }
 
 
-    void GeoCDCCreator::createCovers(const CDCGeometry& geom)
+    void GeoCDCCreatorReducedCDC::createCovers(const CDCGeometry& geom)
     {
       G4Material* medAl = geometry::Materials::get("Al");
       G4double density = 1.000 * CLHEP::g / CLHEP::cm3;
@@ -1662,7 +1664,7 @@ namespace Belle2 {
       }
     }
 
-    void GeoCDCCreator::createCover2s(const CDCGeometry& geom)
+    void GeoCDCCreatorReducedCDC::createCover2s(const CDCGeometry& geom)
     {
       G4Material* medHV = geometry::Materials::get("CDCHVCable");
       G4Material* medFiber = geometry::Materials::get("CDCOpticalFiber");
@@ -1691,11 +1693,11 @@ namespace Belle2 {
       }
     }
 
-    void GeoCDCCreator::createCone(const double rmin1, const double rmax1,
-                                   const double rmin2, const double rmax2,
-                                   const double thick, const double posZ,
-                                   const int id, G4Material* med,
-                                   const string& name)
+    void GeoCDCCreatorReducedCDC::createCone(const double rmin1, const double rmax1,
+                                             const double rmin2, const double rmax2,
+                                             const double thick, const double posZ,
+                                             const int id, G4Material* med,
+                                             const string& name)
     {
       const string solidName = "solid" + name;
       const string logicalName = "logical" + name;
@@ -1710,10 +1712,10 @@ namespace Belle2 {
 
     }
 
-    void GeoCDCCreator::createTube(const double rmin, const double rmax,
-                                   const double thick, const double posZ,
-                                   const int id, G4Material* med,
-                                   const string& name)
+    void GeoCDCCreatorReducedCDC::createTube(const double rmin, const double rmax,
+                                             const double thick, const double posZ,
+                                             const int id, G4Material* med,
+                                             const string& name)
     {
       const string solidName = "solid" + name;
       const string logicalName = "logical" + name;
@@ -1732,11 +1734,11 @@ namespace Belle2 {
 
     }
 
-    void GeoCDCCreator::createBox(const double length, const double height,
-                                  const double thick, const double x,
-                                  const double y, const double z,
-                                  const int id, G4Material* med,
-                                  const string& name)
+    void GeoCDCCreatorReducedCDC::createBox(const double length, const double height,
+                                            const double thick, const double x,
+                                            const double y, const double z,
+                                            const int id, G4Material* med,
+                                            const string& name)
     {
       const string solidName = (format("solid%1%%2%") % name % id).str();
       const string logicalName = (format("logical%1%%2%") % name % id).str();
@@ -1752,10 +1754,10 @@ namespace Belle2 {
 
     }
 
-    void GeoCDCCreator::createTorus(const double rmin1, const double rmax1,
-                                    const double thick, const double posZ,
-                                    const int id, G4Material* med,
-                                    const string& name)
+    void GeoCDCCreatorReducedCDC::createTorus(const double rmin1, const double rmax1,
+                                              const double thick, const double posZ,
+                                              const int id, G4Material* med,
+                                              const string& name)
     {
       const string solidName = "solid" + name;
       const string logicalName = "logical" + name;
@@ -1778,11 +1780,11 @@ namespace Belle2 {
 
     }
 
-    void GeoCDCCreator::createTube2(const double rmin, const double rmax,
-                                    const double phis, const double phie,
-                                    const double thick, const double posZ,
-                                    const int id, G4Material* med,
-                                    const string& name)
+    void GeoCDCCreatorReducedCDC::createTube2(const double rmin, const double rmax,
+                                              const double phis, const double phie,
+                                              const double thick, const double posZ,
+                                              const int id, G4Material* med,
+                                              const string& name)
     {
       const string solidName = "solid" + name;
       const string logicalName = "logical" + name;
@@ -1801,7 +1803,7 @@ namespace Belle2 {
 
     }
 
-    void GeoCDCCreator::createMapper(G4LogicalVolume& topVolume)
+    void GeoCDCCreatorReducedCDC::createMapper(G4LogicalVolume& topVolume)
     {
       CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
       if (!gcp.getMapperGeometry()) return;

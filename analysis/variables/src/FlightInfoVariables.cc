@@ -823,8 +823,7 @@ namespace Belle2 {
                       "Returns the uncertainty on the distance between the production and decay vertex of a particle. Returns NaN if particle has no production or decay vertex.",
                       "cm");
     REGISTER_VARIABLE("vertexDistanceSignificance", vertexDistanceSignificance,
-                      "Returns the distance between the production and decay vertex of a particle in units of the uncertainty on this value, i.e. the significance of the vertex separation.",
-                      "cm");
+                      "Returns the distance between the production and decay vertex of a particle in units of the uncertainty on this value, i.e. the significance of the vertex separation.");
     REGISTER_METAVARIABLE("vertexDistanceOfDaughter(daughterN, option = '')", vertexDistanceOfDaughter,
                           "If any second argument is provided it returns the distance between the decay vertices of the particle and of its daughter with index daughterN.\n"
                           "Otherwise, it is assumed that the particle has a production vertex (typically the IP) which is used to calculate the distance to the daughter's decay vertex.\n"
@@ -835,8 +834,7 @@ namespace Belle2 {
                           "Returns NaN in case anything goes wrong.", "cm", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("vertexDistanceOfDaughterSignificance(daughterN, option = '')", vertexDistanceOfDaughterSignificance,
                           "If any second argument is provided it returns the distance between the decay vertices of the particle and of its daughter with index daughterN in units of the uncertainty on this value.\n"
-                          "Otherwise, it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix and the significance of the separation to this vertex is calculated.",
-                          "cm",
+                          "Otherwise, it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix and the significance of the separation to this vertex is calculated."
                           Manager::VariableDataType::c_double);
     // GrandDaughters
     //REGISTER_VARIABLE("flightDistanceOfGrandDaughter(daughterN)", flightDistanceOfGrandDaughter,

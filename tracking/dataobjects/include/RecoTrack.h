@@ -169,7 +169,7 @@ namespace Belle2 {
      * @param storeArrayNameOfCDCHits The name of the store array where the related cdc hits are stored.
      * @param storeArrayNameOfSVDHits The name of the store array where the related svd hits are stored.
      * @param storeArrayNameOfPXDHits The name of the store array where the related pxd hits are stored.
-     * @param storeArrayNameOfVXTHits The name of the store array where the related vtx hits are stored.
+     * @param storeArrayNameOfVTXHits The name of the store array where the related vtx hits are stored.
      * @param storeArrayNameOfBKLMHits The name of the store array where the related bklm hits are stored.
      * @param storeArrayNameOfEKLMHits The name of the store array where the related eklm hits are stored.
      * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.

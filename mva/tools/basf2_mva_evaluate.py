@@ -12,6 +12,7 @@
 import basf2_mva_util
 
 from basf2_mva_evaluation import plotting
+from basf2 import conditions
 import argparse
 import tempfile
 
@@ -40,6 +41,11 @@ def get_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument('-w', '--working_directory', dest='working_directory', type=str, default='',
                         help="""Working directory where the created images and root files are stored,
                               default is to create a temporary directory.""")
+    parser.add_argument('-l', '--localdb', dest='localdb',  type=str, action='append', nargs='+', required=False,
+                        help="""path or list of paths to local database(s) containing the mvas of interest.
+                                The testing payloads are preprended and take precedence over payloads in global tags.""")
+    parser.add_argument('-g', '--globaltag', dest='globaltag',  type=str, action='append', nargs='+', required=False,
+                        help='globaltag or list of globaltags containing the mvas of interest. The globaltags are prepended.')
     parser.add_argument('-n', '--fillnan', dest='fillnan', action='store_true',
                         help='Fill nan and inf values with actual numbers')
     parser.add_argument('-c', '--compile', dest='compile', action='store_true',
@@ -95,6 +101,13 @@ if __name__ == '__main__':
     identifier_abbreviations = create_abbreviations(identifiers)
 
     datafiles = sum(args.datafiles, [])
+    if args.localdb is not None:
+        for localdb in sum(args.localdb, []):
+            conditions.prepend_testing_payloads(localdb)
+
+    if args.globaltag is not None:
+        for tag in sum(args.globaltag, []):
+            conditions.prepend_globaltag(tag)
 
     print("Load methods")
     methods = [basf2_mva_util.Method(identifier) for identifier in identifiers]

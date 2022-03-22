@@ -65,6 +65,14 @@ def unique(input_list: List[Any]) -> List[Any]:
     return output
 
 
+def flatten(input_list: List[List[Any]]) -> List[Any]:
+    """
+    Flattens a list of lists
+    @param input_list list of lists to be flattened
+    """
+    return [item for sublist in input_list for item in sublist]
+
+
 def create_abbreviations(names, length=5):
     count = dict()
     for name in names:
@@ -84,10 +92,6 @@ def create_abbreviations(names, length=5):
             count2[abbreviation] += 1
             abbreviations[name] += str(count2[abbreviation])
     return abbreviations
-
-
-def flatten(t):
-    return [item for sublist in t for item in sublist]
 
 
 if __name__ == '__main__':

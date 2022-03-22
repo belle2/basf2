@@ -86,6 +86,10 @@ def create_abbreviations(names, length=5):
     return abbreviations
 
 
+def flatten(t):
+    return [item for sublist in t for item in sublist]
+
+
 if __name__ == '__main__':
 
     import ROOT  # noqa
@@ -97,16 +101,16 @@ if __name__ == '__main__':
     parser = get_argument_parser()
     args = parser.parse_args()
 
-    identifiers = sum(args.identifiers, [])
+    identifiers = flatten(args.identifiers)
     identifier_abbreviations = create_abbreviations(identifiers)
 
-    datafiles = sum(args.datafiles, [])
+    datafiles = flatten(args.datafiles)
     if args.localdb is not None:
-        for localdb in sum(args.localdb, []):
+        for localdb in flatten(args.localdb):
             conditions.prepend_testing_payloads(localdb)
 
     if args.globaltag is not None:
-        for tag in sum(args.globaltag, []):
+        for tag in flatten(args.globaltag):
             conditions.prepend_globaltag(tag)
 
     print("Load methods")

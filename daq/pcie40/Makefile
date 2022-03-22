@@ -7,10 +7,8 @@ TOP :=$(realpath $(HERE))/Pcie40Software
 TEMP_LOCAL_DIR=$(PWD)/../../
 INCDIR = ./include
 
-#ZMQINC ?= ${BELLE2_EXTERNALS_DIR}/include
-#ZMQLIB ?= ${BELLE2_EXTERNALS_DIR}/${BELLE2_ARCH}/common/lib/libzmq.a
-ZMQINC ?= /home/usr/yamadas/work/pcie40-zmq/include
-ZMQLIB ?= /home/usr/yamadas/work/pcie40-zmq/lib/libzmq.a
+ZMQINC ?= ${BELLE2_EXTERNALS_DIR}/include
+ZMQLIB ?= ${BELLE2_EXTERNALS_DIR}/${BELLE2_ARCH}/common/lib/libzmq.a
 
 LIBFLAG = -lrt -lpthread#-l${LOCALLIB}
 DES_SER_PCIE40_MAIN_CXXFLAGS =$(CFLAGS) -I$(TOP)/Pcie40Applications -I$(TOP)/Pcie40Driver -I$(TOP)/Pcie40Libraries -I$(TOP)/Pcie40DriverLibraries -I${INCDIR} -I$(ZMQINC)

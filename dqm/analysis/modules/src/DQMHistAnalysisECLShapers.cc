@@ -9,12 +9,8 @@
 //THIS MODULE
 #include <dqm/analysis/modules/DQMHistAnalysisECLShapers.h>
 
-#include <boost/format.hpp>
-#include <cmath>
-#include <TROOT.h>
-#include <TStyle.h>
-#include <TColor.h>
-#include <sstream>
+//ROOT
+#include <TProfile.h>
 
 using namespace Belle2;
 
@@ -25,13 +21,6 @@ DQMHistAnalysisECLShapersModule::DQMHistAnalysisECLShapersModule()
 {
   B2DEBUG(20, "DQMHistAnalysisECLShapers: Constructor done.");
 
-  m_WaveformOption = {"psd", "logic", "rand", "dphy", "other"};
-
-  addParam("HitMapThresholds", m_HitMapThresholds, "Thresholds to display hit map, MeV", std::vector<double> {0, 5, 10, 50});
-  addParam("WaveformOption", m_WaveformOption, "Option (all,psd,logic,rand,dphy) to display waveform flow",
-           m_WaveformOption);
-  addParam("CrateTimeOffsetsMax", m_CrateTimeOffsetsMax, "Maximum boundary for crate time offsets", 20.);
-  addParam("LogicTestMax", m_LogicTestMax, " Maximum of fails for logic test", 50);
   addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
 }
 
@@ -47,79 +36,24 @@ DQMHistAnalysisECLShapersModule::~DQMHistAnalysisECLShapersModule()
 
 void DQMHistAnalysisECLShapersModule::initialize()
 {
-  gROOT->cd();
   B2DEBUG(20, "DQMHistAnalysisECLShapers: initialized.");
-
-  //new canvases for existing histograms
-  c_quality_analysis = new TCanvas("ECL/c_quality_analysis");
-  c_quality_other_analysis = new TCanvas("ECL/c_quality_other_analysis");
-  c_bad_quality_analysis = new TCanvas("ECL/c_bad_quality_analysis");
-  c_trigtag1_analysis = new TCanvas("ECL/c_trigtag1_analysis");
-  c_trigtag2_analysis = new TCanvas("ECL/c_trigtag2_analysis");
-  c_adc_hits_analysis = new TCanvas("ECL/c_adc_hits_analysis");
-  c_ampfail_quality_analysis = new TCanvas("ECL/c_ampfail_quality_analysis");
-  c_timefail_quality_analysis = new TCanvas("ECL/c_timefail_quality_analysis");
-  c_quality_fit_data_analysis = new TCanvas("ECL/c_quality_fit_data_analysis");
-
-  for (const auto& id : m_HitMapThresholds) {
-    std::string canvas_name = str(boost::format("ECL/c_cid_Thr%1%MeV_analysis") % id);
-    TCanvas* canvas  = new TCanvas(canvas_name.c_str());
-    c_cid_analysis.push_back(canvas);
-  }
-
-  for (const auto& id : m_WaveformOption) {
-    if (id != "other") {
-      std::string canvas_name = str(boost::format("ECL/c_wf_cid_%1%_analysis") % id);
-      TCanvas* canvas  = new TCanvas(canvas_name.c_str());
-      c_wf_analysis.push_back(canvas);
-    }
-  }
-
-  //Boundaries for 'trigtag2_trigid' histogram
-  m_lower_boundary_trigtag2 = new TLine(1, 0, 53, 0);
-  m_lower_boundary_trigtag2->SetLineWidth(3);
-  m_lower_boundary_trigtag2->SetLineColor(kBlue);
-
-  m_upper_boundary_trigtag2 = new TLine(1, 1, 53, 1);
-  m_upper_boundary_trigtag2->SetLineWidth(3);
-  m_upper_boundary_trigtag2->SetLineColor(kBlue);
-  //Boundaries for 'crate_time_offset' plot
-  m_lower_boundary_time_offsets = new TLine(0, -20, 52, -20);
-  m_lower_boundary_time_offsets->SetLineWidth(3);
-  m_lower_boundary_time_offsets->SetLineColor(kBlue);
-
-  m_upper_boundary_time_offsets = new TLine(0, 20, 52, 20);
-  m_upper_boundary_time_offsets->SetLineWidth(3);
-  m_upper_boundary_time_offsets->SetLineColor(kBlue);
-
-  //Summary crate_time_offsets plot
-  c_crate_time_offsets = new TCanvas("ECL/c_crate_time_offsets");
-  h_crate_time_offsets = new TGraphErrors();
-  h_crate_time_offsets->SetName("t_off");
-  h_crate_time_offsets->SetTitle("Crate time offset (E > 1 GeV); Crate ID (same as ECLCollector ID); Time offset [ns]");
-  h_crate_time_offsets->SetMarkerColor(kBlue);
-  h_crate_time_offsets->SetMarkerStyle(20);
-
-  //New DQM summary for logic test in CR shifter panel
-  c_logic_summary = new TCanvas("ECL/c_logic_summary");
-  h_logic_summary = new TH2F("logic_summary", "FPGA <-> C++ fitter inconsistencies count", 52, 1, 53, 12, 1, 13);
-  h_logic_summary->SetTitle("FPGA <-> C++ fitter inconsistencies count; ECLCollector ID (same as Crate ID); Shaper ID inside the crate");
-  h_logic_summary->SetCanExtend(TH1::kAllAxes);
-  h_logic_summary->SetStats(0);
-  for (unsigned short i = 0; i < 52; i++) h_logic_summary->GetXaxis()->SetBinLabel(i + 1, std::to_string(i + 1).c_str());
-  for (unsigned short i = 0; i < 12; i++) h_logic_summary->GetYaxis()->SetBinLabel(i + 1, std::to_string(i + 1).c_str());
-  h_logic_summary->LabelsOption("v");
-  h_logic_summary->SetTickLength(0, "xy");
 
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
+
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    for (int i = 0; i < 52; i++) {
+    for (int i = 0; i < c_collector_count; i++) {
       std::string pv_name = "ECL:logic_check:crate" + std::to_string(i + 1);
-      SEVCHK(ca_create_channel(pv_name.c_str(), NULL, NULL, 10, &mychid[i]), "ca_create_channel failure");
-      // Read LO and HI limits from EPICS, seems this needs additional channels?
-      // SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
+      SEVCHK(ca_create_channel(pv_name.c_str(), NULL, NULL, 10, &chid_logic[i]), "ca_create_channel failure");
     }
+    SEVCHK(ca_create_channel("ECL:pedwidth:test:max_fw", NULL, NULL, 10,
+                             &chid_pedwidth[0]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel("ECL:pedwidth:test:max_br", NULL, NULL, 10,
+                             &chid_pedwidth[1]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel("ECL:pedwidth:test:max_bw", NULL, NULL, 10,
+                             &chid_pedwidth[2]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel("ECL:pedwidth:test:max_al", NULL, NULL, 10,
+                             &chid_pedwidth[3]), "ca_create_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
@@ -132,13 +66,48 @@ void DQMHistAnalysisECLShapersModule::beginRun()
 
 void DQMHistAnalysisECLShapersModule::event()
 {
-  TH1* h_fail_crateid = findHist("ECL/fail_crateid");
+  TH1* h_fail_crateid  = findHist("ECL/fail_crateid");
+  TProfile* h_pedrms_cellid = (TProfile*)findHist("ECL/pedrms_cellid");
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics && h_fail_crateid != NULL) {
-    for (int i = 0; i < 52; i++) {
-      int errors_count = h_fail_crateid->GetBinContent(i + 1);
-      if (mychid[i]) SEVCHK(ca_put(DBR_LONG, mychid[i], (void*)&errors_count), "ca_set failure");
+  if (m_useEpics) {
+    if (h_fail_crateid != NULL) {
+      for (int i = 0; i < c_collector_count; i++) {
+        int errors_count = h_fail_crateid->GetBinContent(i + 1);
+        if (chid_logic[i]) SEVCHK(ca_put(DBR_LONG, chid_logic[i], (void*)&errors_count), "ca_set failure");
+      }
+    }
+    if (h_pedrms_cellid != NULL) {
+      // Using multiset to automatically sort the added values.
+      std::multiset<double> barrel_pedwidth;
+      std::multiset<double> bwd_pedwidth;
+      std::multiset<double> fwd_pedwidth;
+
+      for (int i = 0; i < 8736; i++) {
+        const int cellid = i + 1;
+        if (h_pedrms_cellid->GetBinEntries(cellid) < 100) continue;
+        double pedrms = h_pedrms_cellid->GetBinContent(cellid);
+        if (cellid < 1153) {
+          fwd_pedwidth.insert(pedrms);
+        } else if (cellid < 7777) {
+          barrel_pedwidth.insert(pedrms);
+        } else {
+          bwd_pedwidth.insert(pedrms);
+        }
+      }
+
+      double pedwidth_max[4] = {
+        robust_max(barrel_pedwidth),
+        robust_max(bwd_pedwidth),
+        robust_max(fwd_pedwidth),
+        0
+      };
+      pedwidth_max[3] = *std::max(&pedwidth_max[0], &pedwidth_max[2]);
+      for (int i = 0; i < 4; i++) {
+        if (pedwidth_max[i] <= 0) continue;
+        if (!chid_pedwidth[i]) continue;
+        SEVCHK(ca_put(DBR_DOUBLE, chid_pedwidth[i], (void*)&pedwidth_max[i]), "ca_set failure");
+      }
     }
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
@@ -157,10 +126,27 @@ void DQMHistAnalysisECLShapersModule::terminate()
 
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
-    for (int i = 0; i < 52; i++) {
-      if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
+    for (int i = 0; i < c_collector_count; i++) {
+      if (chid_logic[i]) SEVCHK(ca_clear_channel(chid_logic[i]), "ca_clear_channel failure");
+    }
+    for (int i = 0; i < 4; i++) {
+      if (chid_pedwidth[i]) SEVCHK(ca_clear_channel(chid_pedwidth[i]), "ca_clear_channel failure");
     }
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
 }
+
+double DQMHistAnalysisECLShapersModule::robust_max(std::multiset<double> values)
+{
+  int len = values.size();
+  if (len < 10) {
+    return 0;
+  }
+  // Move end iterator back by 10% to remove
+  // noisy values.
+  auto end_iter = std::prev(values.end(), len * 0.1);
+
+  return *end_iter;
+}
+

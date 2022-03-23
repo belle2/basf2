@@ -15,6 +15,9 @@
 #include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
+  class MCParticle;
+  class Particle;
+
   namespace Variable {
     /*
     * Given a reconstructed B meson candidate e.g. by the FEI the FSP are determined and a relation between reconstructed and generated FSP is drawn.

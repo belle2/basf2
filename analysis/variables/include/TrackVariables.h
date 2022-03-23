@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
+  class Particle;
 
   namespace Variable {
 

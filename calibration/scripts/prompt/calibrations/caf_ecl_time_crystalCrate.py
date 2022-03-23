@@ -31,7 +31,7 @@ import copy
 #     the hadron skim for validations.
 settings = CalibrationSettings(
     name="ECL crystal and crate time calibrations and validations",
-    expert_username="ehill",
+    expert_username="hearty",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["bhabha_all_calib", "hadron_calib"],
@@ -207,9 +207,7 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     from basf2 import register_module, create_path
-    import ROOT
     from ROOT import Belle2
-    from ROOT.Belle2 import TestCalibrationAlgorithm
     from caf.framework import Collection
 
     ###################################################

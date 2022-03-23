@@ -7,10 +7,13 @@
  **************************************************************************/
 
 #pragma once
+
 #include <analysis/VariableManager/Manager.h>
 
 #include <analysis/dataobjects/RestOfEvent.h>
+
 #include <Math/Vector4D.h>
+
 #include <string>
 #include <vector>
 #include <set>

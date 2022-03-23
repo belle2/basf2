@@ -10,6 +10,9 @@
 
 #include <analysis/VariableManager/Manager.h>
 
+#include <string>
+#include <vector>
+
 namespace Belle2 {
   class Particle;
 

@@ -6,7 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+// Own include
 #include <analysis/variables/BelleVariables.h>
+
+// include VariableManager
+#include <analysis/VariableManager/Manager.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/variables/Variables.h>

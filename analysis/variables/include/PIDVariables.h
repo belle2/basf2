@@ -8,10 +8,13 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
 
+#include <vector>
+#include <string>
+
 namespace Belle2 {
+  class Particle;
 
   namespace Variable {
 

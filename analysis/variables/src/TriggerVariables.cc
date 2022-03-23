@@ -6,7 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+// Own include
 #include <analysis/variables/TriggerVariables.h>
+
 #include <analysis/dataobjects/Particle.h>
 
 // trigger dataobjects

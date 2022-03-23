@@ -6,7 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+// Own include
 #include <analysis/variables/FEIVariables.h>
+
+// include VariableManager
+#include <analysis/VariableManager/Manager.h>
+
+#include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>

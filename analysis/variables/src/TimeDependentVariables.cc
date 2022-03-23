@@ -8,9 +8,7 @@
 
 // Own include
 #include <analysis/variables/TimeDependentVariables.h>
-#include <analysis/VariableManager/Manager.h>
 
-#include <analysis/utility/PCmsLabTransform.h>
 #include <framework/dbobjects/BeamParameters.h>
 
 // dataobjects
@@ -20,6 +18,7 @@
 
 //utilities
 #include <analysis/utility/DistanceTools.h>
+#include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/RotationTools.h>
 
 // framework aux

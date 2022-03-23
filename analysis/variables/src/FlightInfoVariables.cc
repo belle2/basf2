@@ -402,16 +402,16 @@ namespace Belle2 {
       }
 
       const Particle* daughter = particle->getDaughter(daughterNumber);
-      double flightTimeErr = 0.0;
+      double flightTimeError;
       if (grandDaughterNumber > -1) {
         if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-          return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr, "time", true);
+          return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeError, "time", true);
         } else {
           B2ERROR("The granddaughter index provided to flightTimeOfDaughter is too large!");
           return std::numeric_limits<float>::quiet_NaN();
         }
       } else {
-        return getFlightInfoBtw(particle, daughter, flightTimeErr, "time");
+        return getFlightInfoBtw(particle, daughter, flightTimeError, "time");
       }
     }
 
@@ -440,19 +440,17 @@ namespace Belle2 {
       }
 
       const Particle* daughter = particle->getDaughter(daughterNumber);
-      double flightTimeErr = 0.0;
+      double flightTimeError = std::numeric_limits<float>::quiet_NaN();;
       if (grandDaughterNumber > -1) {
         if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-          getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr, "time", true);
-          return flightTimeErr;
+          getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeError, "time", true);
         } else {
           B2ERROR("The granddaughter index provided to flightTimeOfDaughterErr is too large!");
-          return std::numeric_limits<float>::quiet_NaN();
         }
       } else {
-        getFlightInfoBtw(particle, daughter, flightTimeErr, "time");
-        return flightTimeErr;
+        getFlightInfoBtw(particle, daughter, flightTimeError, "time");
       }
+      return flightTimeError;
     }
 
     double flightDistanceOfDaughter(const Particle* particle, const std::vector<double>& daughters)
@@ -479,16 +477,16 @@ namespace Belle2 {
       }
 
       const Particle* daughter = particle->getDaughter(daughterNumber);
-      double flightDistanceErr = 0.0;
+      double flightDistanceError;
       if (grandDaughterNumber > -1) {
         if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-          return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr, "distance", true);
+          return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceError, "distance", true);
         } else {
           B2ERROR("The granddaughter index provided to flightDistanceOfDaughter is too large!");
           return std::numeric_limits<float>::quiet_NaN();
         }
       } else {
-        return getFlightInfoBtw(particle, daughter, flightDistanceErr, "distance");
+        return getFlightInfoBtw(particle, daughter, flightDistanceError, "distance");
       }
     }
 
@@ -517,19 +515,17 @@ namespace Belle2 {
       }
 
       const Particle* daughter = particle->getDaughter(daughterNumber);
-      double flightDistanceErr = 0.0;
+      double flightDistanceError = std::numeric_limits<float>::quiet_NaN();
       if (grandDaughterNumber > -1) {
         if (grandDaughterNumber < (int)daughter->getNDaughters()) {
-          getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr, "distance", true);
-          return flightDistanceErr;
+          getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceError, "distance", true);
         } else {
           B2ERROR("The granddaughter index provided to flightDistanceOfDaughterErr is too large!");
-          return std::numeric_limits<float>::quiet_NaN();
         }
       } else {
-        getFlightInfoBtw(particle, daughter, flightDistanceErr, "distance");
-        return flightDistanceErr;
+        getFlightInfoBtw(particle, daughter, flightDistanceError, "distance");
       }
+      return flightDistanceError;
     }
 
     // Distance between mother and daughter vertices
@@ -556,8 +552,8 @@ namespace Belle2 {
       }
 
       const Particle* daughter = particle->getDaughter(daughterNumber);
-      double vertexDistanceErr = std::numeric_limits<float>::quiet_NaN();
-      return getVertexDistance(particle, daughter, vertexDistanceErr, prodVertIsIP);
+      double vertexDistanceError;
+      return getVertexDistance(particle, daughter, vertexDistanceError, prodVertIsIP);
     }
 
     // Uncertainty on distance between mother and daughter vertices
@@ -584,9 +580,9 @@ namespace Belle2 {
       }
 
       const Particle* daughter = particle->getDaughter(daughterNumber);
-      double vertexDistanceErr = std::numeric_limits<float>::quiet_NaN();
-      getVertexDistance(particle, daughter, vertexDistanceErr, prodVertIsIP);
-      return vertexDistanceErr;
+      double vertexDistanceError;
+      getVertexDistance(particle, daughter, vertexDistanceError, prodVertIsIP);
+      return vertexDistanceError;
     }
 
     // Significance of distance between mother and daughter vertices
@@ -613,8 +609,8 @@ namespace Belle2 {
       }
 
       const Particle* daughter = particle->getDaughter(daughterNumber);
-      double vertexDistanceErr = std::numeric_limits<float>::quiet_NaN();
-      return getVertexDistance(particle, daughter, vertexDistanceErr, prodVertIsIP) / vertexDistanceErr;
+      double vertexDistanceError;
+      return getVertexDistance(particle, daughter, vertexDistanceError, prodVertIsIP) / vertexDistanceError;
     }
 
     // MC variables
@@ -673,7 +669,7 @@ namespace Belle2 {
       //get the MC DAUGHTER
       const MCParticle* daughter = daughterReco->getMCParticle();
 
-      double flightDistanceMC = std::numeric_limits<float>::quiet_NaN();
+      double flightDistanceMC;
       if (grandDaughterNumber > -1 && grandDaughterNumber < (int)daughterReco->getNDaughters()) {
         // Compute value between mother and granddaughter
         const MCParticle* gdaughter = daughterReco->getDaughter(grandDaughterNumber)->getMCParticle();
@@ -712,7 +708,7 @@ namespace Belle2 {
       //get the MC DAUGHTER
       const MCParticle* daughter = daughterReco->getMCParticle();
 
-      double flightTimeMC = std::numeric_limits<float>::quiet_NaN();
+      double flightTimeMC;
       if (grandDaughterNumber > -1 && grandDaughterNumber < (int)daughterReco->getNDaughters()) {
         // Compute value between mother and granddaughter
         const MCParticle* gdaughter = daughterReco->getDaughter(grandDaughterNumber)->getMCParticle();

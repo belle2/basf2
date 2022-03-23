@@ -9,6 +9,7 @@
 // Own include
 #include <analysis/variables/EventVariables.h>
 
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
 
 // framework - DataStore

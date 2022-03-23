@@ -6,7 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <analysis/VariableManager/Manager.h>
+// Own include
+#include <analysis/variables/EventShapeVariables.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventShapeContainer.h>
 

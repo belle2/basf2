@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <analysis/variables/VertexVariables.h>
+
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/database/DBObjPtr.h>

@@ -8,10 +8,12 @@
 
 // Own include
 #include <analysis/variables/Variables.h>
+
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
-
 #include <analysis/utility/MCMatching.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
 

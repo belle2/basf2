@@ -6,8 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+// Own include
 #include <analysis/variables/ParameterVariables.h>
+
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>

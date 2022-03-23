@@ -6,9 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+// Own include
 #include <analysis/variables/OrcaKinFitVariables.h>
 
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
 #include <analysis/dataobjects/Particle.h>
 
 #include <framework/logging/Logger.h>

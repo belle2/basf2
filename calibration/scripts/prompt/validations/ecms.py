@@ -42,6 +42,48 @@ settings = ValidationSettings(name='eCMS Calibrations',
                               expert_config={})
 
 
+def setPlotRange(df, tag):
+    """
+    Function which adjusts the y-axis range of the plot according to tag
+    """
+
+    if tag == '4S':
+        df4S = df[df['Ecms'] > 10560]['Ecms']
+        if len(df4S) > 0:
+            yMin = df4S.min()
+            plt.ylim(bottom=yMin-3)
+
+        dfHigh = df[df['Ecms'] < 10600]['Ecms']
+        if len(dfHigh) > 0:
+            yMax = dfHigh.max()
+            plt.ylim(top=yMax+3)
+
+    elif tag == 'Off':
+        dfOff = df[df['Ecms'] < 10560]['Ecms']
+        if len(dfOff) > 0:
+            yMax = dfOff.max()
+            plt.ylim(top=yMax+3)
+
+
+def toJST(times):
+    """
+    Converts time from UTC to the JST
+    """
+    return np.vectorize(lambda t:  datetime.utcfromtimestamp((t + 9) * 3600))(times)
+
+
+def plotSplitLines(dfC):
+    """
+    Plot vertical lines in places where run energy type changes
+    """
+    indx = np.where(np.diff(dfC['pull'] == 0))[0]
+    for i in indx:
+        tt1 = toJST(dfC['t2'].loc[i]).item()
+        tt2 = toJST(dfC['t1'].loc[i+1]).item()
+        tt = tt1 + (tt2 - tt1) / 2
+        plt.axvline(x=tt, color='g', linestyle='--')
+
+
 def get_Ecms_values(path):
     """
     Load the values of the Ecms properties from the payloads into the list
@@ -127,8 +169,8 @@ class Plotter():
         timesg = np.c_[df['t1'].to_numpy(),   avg,  df['t2'].to_numpy()].ravel()
         eCMSg = np.c_[df[var].to_numpy(), nan,  df[var].to_numpy()].ravel()
 
-        times = np.vectorize(lambda t:  datetime.utcfromtimestamp((t + 9) * 3600))(times)
-        timesg = np.vectorize(lambda t:  datetime.utcfromtimestamp((t + 9) * 3600))(timesg)
+        times = toJST(times)
+        timesg = toJST(timesg)
 
         plt.fill_between(times, eCMS-eCMSu, eCMS+eCMSu, alpha=0.2, color=color)
         plt.plot(times, eCMS, linewidth=2, color=color, label=label)
@@ -148,16 +190,11 @@ class Plotter():
         dfMc['Ecms'] += d
         Plotter.plotLine(dfMc, 'Ecms', 'blue', label=f'mumu method (+{round(d,1)} MeV)')
 
-        if tag == '4S':
-            df4S = self.dfC[self.dfC['Ecms'] > 10560]['Ecms']
-            if len(df4S) > 0:
-                yMin = df4S.min()
-                plt.ylim(bottom=yMin-3)
-        elif tag == 'Off':
-            dfOff = self.dfC[self.dfC['Ecms'] < 10560]['Ecms']
-            if len(dfOff) > 0:
-                yMax = dfOff.max()
-                plt.ylim(top=yMax+3)
+        plotSplitLines(self.dfC)
+        setPlotRange(self.dfC, tag)
+
+        plt.xlabel('time')
+        plt.ylabel('Ecms [MeV]')
 
         plt.legend()
 
@@ -178,7 +215,12 @@ class Plotter():
         Plotter.plotLine(self.dfB, 'spread', 'green', label='B decay method')
         Plotter.plotLine(self.dfC, 'spread', 'red', label='Combined method')
 
+        plotSplitLines(self.dfC)
+
         plt.legend()
+
+        plt.xlabel('time')
+        plt.ylabel('spread [MeV]')
 
         loc = 'plots/allData'
         if limits is not None:
@@ -201,7 +243,7 @@ class Plotter():
             avg = (df['t1']+df['t2']).to_numpy()/2
             times = np.c_[df[['t1',    't2']].to_numpy(), avg].ravel()
             eCMS = np.c_[df[[var, var]].to_numpy(), nan].ravel()
-            times = np.vectorize(lambda t:  datetime.utcfromtimestamp((t + 9) * 3600))(times)
+            times = toJST(times)
 
             if withBand:
                 eCMSu = np.c_[df[[varUnc, varUnc]].to_numpy(), nan].ravel()
@@ -213,7 +255,7 @@ class Plotter():
         avg = (df['t1']+df['t2']).to_numpy()/2
         timesg = np.c_[df['t1'].to_numpy(),   avg,  df['t2'].to_numpy()].ravel()
         eCMSg = np.c_[df[var].to_numpy(), nan,  df[var].to_numpy()].ravel()
-        timesg = np.vectorize(lambda t:  datetime.utcfromtimestamp((t + 9) * 3600))(timesg)
+        timesg = toJST(timesg)
 
         if withCurve:
             plt.plot(timesg, eCMSg, linewidth=2, color='gray', alpha=0.35)
@@ -227,6 +269,8 @@ class Plotter():
         """
 
         Plotter.plotCurve(self.dfC, 'shift',  label='Combined method')
+
+        plotSplitLines(self.dfC)
 
         plt.xlabel('time')
         plt.ylabel('shift [MeV]')
@@ -248,19 +292,12 @@ class Plotter():
 
         Plotter.plotCurve(self.dfC, 'Ecms',  label='Combined method')
 
+        plotSplitLines(self.dfC)
+
         plt.xlabel('time')
         plt.ylabel('Ecms [MeV]')
 
-        if tag == '4S':
-            df4S = self.dfC[self.dfC['Ecms'] > 10560]['Ecms']
-            if len(df4S) > 0:
-                yMin = df4S.min()
-                plt.ylim(bottom=yMin-3)
-        elif tag == 'Off':
-            dfOff = self.dfC[self.dfC['Ecms'] < 10560]['Ecms']
-            if len(dfOff) > 0:
-                yMax = dfOff.max()
-                plt.ylim(top=yMax+3)
+        setPlotRange(self.dfC, tag)
 
         loc = 'plots/allData'
         if limits is not None:
@@ -281,6 +318,8 @@ class Plotter():
         dfC['refUnc'] = 1
         Plotter.plotCurve(dfC, 'pull', label='Combined method', withBand=False)
         Plotter.plotCurve(dfC, 'ref',  label='Combined method', withCurve=False)
+
+        plotSplitLines(self.dfC)
 
         plt.ylim(-1.5, 1.5)
         plt.xlabel('time')

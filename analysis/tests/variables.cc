@@ -4785,7 +4785,7 @@ namespace {
     StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
 
-    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughter(1, noIP)");
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughter(1, 0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 5.0);
 
@@ -4803,7 +4803,7 @@ namespace {
     StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
 
-    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterErr(1, noIP)");
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterErr(1, 0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 0.2);
 
@@ -4817,7 +4817,7 @@ namespace {
     StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
 
-    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterSignificance(1, noIP)");
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterSignificance(1, 0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 25);
 

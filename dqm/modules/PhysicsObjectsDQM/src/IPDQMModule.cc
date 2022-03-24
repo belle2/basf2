@@ -6,36 +6,48 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <dqm/modules/PhysicsObjectsDQM/IPDQMExpressRecoModule.h>
+/* Own include. */
+#include <dqm/modules/PhysicsObjectsDQM/IPDQMModule.h>
+
+/* Belle 2 headers. */
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <framework/core/Environment.h>
+#include <framework/logging/LogConfig.h>
+#include <framework/logging/Logger.h>
+#include <hlt/utilities/Units.h>
+
+/* ROOT headers. */
 #include <TDirectory.h>
 
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
-REG_MODULE(IPDQMExpressReco)
+REG_MODULE(IPDQM)
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
-
-IPDQMExpressRecoModule::IPDQMExpressRecoModule() : HistoModule()
+IPDQMModule::IPDQMModule() : HistoModule()
 {
-  //Set module properties
-
-  setDescription("Monitor the position of the beamspot using mu+mu- events");
+  setDescription("Monitor the position and the size of the interaction point using mu+mu- events");
   setPropertyFlags(c_ParallelProcessingCertified);
-
   addParam("Y4SPListName", m_Y4SPListName, "Name of the Y4S particle list", std::string("Upsilon(4S):IPDQM"));
+  addParam("onlineMode", m_onlineMode, "Mode of the online processing ('HLT' or 'ExpressReco')");
+  if (m_onlineMode == "HLT") {
+    m_no_units = HLTUnits::max_hlt_units;
+  } else if (m_onlineMode == "ExpressReco") {
+    m_no_units = ExpressRecoUnits::max_ereco_units;
+  } else {
+    if (Environment::Instance().getRealm() == LogConfig::c_Online)
+      B2FATAL("Unknown online processing mode"
+              << LogVar("Set mode", m_onlineMode));
+    else // We are likely running offline (for testing purposes, for example): let's assume we use only 1 unit.
+      m_no_units = 1;
+  }
+  m_size_per_unit = m_size / m_no_units;
 }
 
-void IPDQMExpressRecoModule::defineHisto()
+void IPDQMModule::defineHisto()
 {
-  TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("IPMonitoring")->cd();
+  TDirectory* newDirectory{gDirectory->mkdir("IPMonitoring")};
+  TDirectory::TContext context{gDirectory, newDirectory};
 
   m_h_x = new TH1F("Y4S_Vertex.X", "IP position - coord. X", 1000, -0.5, 0.5);
   m_h_x->SetXTitle("IP_coord. X [cm]");
@@ -84,18 +96,16 @@ void IPDQMExpressRecoModule::defineHisto()
   m_h_cov_x_z->SetXTitle("Covar. XZ [cm^{2} ]");
   m_h_cov_y_z = new TH1F("Covar.YZ", "YZ Covariance", 1000, -0.005, 0.005);
   m_h_cov_y_z->SetXTitle("Covar. YZ [cm^{2} ]");
-
-  oldDir->cd();
 }
 
 
-void IPDQMExpressRecoModule::initialize()
+void IPDQMModule::initialize()
 {
   REG_HISTOGRAM
 }
 
 
-void IPDQMExpressRecoModule::beginRun()
+void IPDQMModule::beginRun()
 {
   m_h_x->Reset();
   m_h_y->Reset();
@@ -125,7 +135,7 @@ void IPDQMExpressRecoModule::beginRun()
 }
 
 
-void IPDQMExpressRecoModule::endRun()
+void IPDQMModule::endRun()
 {
   m_h_x->GetXaxis()->SetRangeUser(m_h_x->GetMean(1) - 5 * m_h_x->GetRMS(1), m_h_x->GetMean(1) + 5 * m_h_x->GetRMS(1));
   m_h_y->GetXaxis()->SetRangeUser(m_h_y->GetMean(1) - 5 * m_h_y->GetRMS(1), m_h_y->GetMean(1) + 5 * m_h_y->GetRMS(1));
@@ -153,16 +163,14 @@ void IPDQMExpressRecoModule::endRun()
                                         m_h_cov_y_z->GetMean(1) + 5 * m_h_cov_y_z->GetRMS(1));
 }
 
-void IPDQMExpressRecoModule::terminate()
+void IPDQMModule::terminate()
 {
 }
 
-void IPDQMExpressRecoModule::event()
+void IPDQMModule::event()
 {
-
   StoreObjPtr<ParticleList> Y4SParticles(m_Y4SPListName);
   const auto& frame = ReferenceFrame::GetCurrent();
-
 
   if (Y4SParticles.isValid() && abs(Y4SParticles->getPDGCode()) == 300553) {
 

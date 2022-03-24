@@ -7,12 +7,11 @@
  **************************************************************************/
 
 #pragma once
-// Own include
+
 #include <analysis/VariableManager/Manager.h>
 
-
-// dataobjects
-#include <analysis/dataobjects/Particle.h>
+#include <vector>
+#include <string>
 
 namespace Belle2 {
   class Particle;

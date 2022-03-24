@@ -8,10 +8,8 @@
 
 // Own include
 #include <analysis/variables/ROEVariables.h>
-#include <analysis/variables/Variables.h>
-#include <analysis/utility/PCmsLabTransform.h>
 
-#include <analysis/VariableManager/Manager.h>
+#include <analysis/variables/Variables.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -20,7 +18,7 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-
+#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
 // framework aux
@@ -29,6 +27,7 @@
 #include <framework/gearbox/Const.h>
 
 // utility
+#include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <TRandom.h>

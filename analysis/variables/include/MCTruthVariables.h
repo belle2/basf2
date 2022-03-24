@@ -8,13 +8,12 @@
 
 #pragma once
 
-#include <mdst/dataobjects/MCParticle.h>
-
 #include <Math/Vector4D.h>
 
 #include <vector>
 
 namespace Belle2 {
+  class MCParticle;
   class Particle;
 
   namespace Variable {

@@ -2383,6 +2383,39 @@ namespace {
     EXPECT_FALSE(std::get<bool>(vsensible->function(notinthelist)));
   }
 
+  /// Checks that particle list names with special characters parsed correctly in a cut.
+  TEST_F(MetaVariableTest, cutIsInList)
+  {
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    const std::string listname {"wil/d(-+)'':l*"};
+
+    StoreObjPtr<ParticleList> particlelist(listname);
+    DataStore::Instance().setInitializeActive(true);
+    particlelist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    particlelist.create();
+    particlelist->initialize(22, listname);
+
+    Particle goingin({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0);
+    Particle notgoingin({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
+    auto* inthelist = particles.appendNew(goingin);
+    auto* notinthelist = particles.appendNew(notgoingin);
+
+    // put the the zeroth one in the list the first on not in the list
+    particlelist->addParticle(0, 22, Particle::c_Unflavored);
+
+    // use passesCut metavariable to check cut parsing of isInList particle list.
+    const Manager::Var* nonexistlist = Manager::Instance().getVariable("passesCut(isInList(NONEXISTANTLIST))");
+    const Manager::Var* existlist = Manager::Instance().getVariable("passesCut(isInList(" + listname + "))");
+
+    EXPECT_B2FATAL(std::get<bool>(nonexistlist->function(inthelist)));
+    EXPECT_FALSE(std::get<bool>(existlist->function(notinthelist)));
+    EXPECT_TRUE(std::get<bool>(existlist->function(inthelist)));
+  }
+
   TEST_F(MetaVariableTest, sourceObjectIsInList)
   {
     // datastore things
@@ -4752,7 +4785,7 @@ namespace {
     StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
 
-    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughter(1, noIP)");
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughter(1, 0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 5.0);
 
@@ -4770,7 +4803,7 @@ namespace {
     StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
 
-    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterErr(1, noIP)");
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterErr(1, 0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 0.2);
 
@@ -4784,7 +4817,7 @@ namespace {
     StoreArray<Particle> particles{};
     const Particle* newDp = particles[2]; // Get D+, its daughter KS has both a production and decay vertex
 
-    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterSignificance(1, noIP)");
+    const Manager::Var* var = Manager::Instance().getVariable("vertexDistanceOfDaughterSignificance(1, 0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 25);
 

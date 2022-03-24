@@ -86,18 +86,18 @@ def main():
 
     electrons_fixed09 = "lh_B_fixed09"
     electrons_wp = "FixedThresh09"
-    electron_id_var = stdE(electrons_wp, "likelihood", "binary", args.lid_weights_gt,
-                           release=5,
-                           inputListName="e+:corrected",
-                           outputListLabel=electrons_fixed09,
-                           path=path)
+    electron_id_var, electron_id_weights = stdE(electrons_wp, "likelihood", "binary", args.lid_weights_gt,
+                                                release=5,
+                                                inputListName="e+:corrected",
+                                                outputListLabel=electrons_fixed09,
+                                                path=path)
 
     muons_uniform90 = "bdt_G_uniform90"
     muons_wp = "UniformEff90"
-    muon_id_var = stdMu(muons_wp, "bdt", "global", args.lid_weights_gt,
-                        release=5,
-                        outputListLabel=muons_uniform90,
-                        path=path)
+    muon_id_var, muon_id_weights = stdMu(muons_wp, "bdt", "global", args.lid_weights_gt,
+                                         release=5,
+                                         outputListLabel=muons_uniform90,
+                                         path=path)
 
     # --------------------------------------------
     # Add extra cuts on the standard lepton lists.
@@ -142,46 +142,10 @@ def main():
     variables_e += cms_kinematics
     variables_mu += cms_kinematics
 
-    lid_e = [
-        electron_id_var,
-        # The following aliases for LID weights are already set when creating the standard lepton list (see ma.stdLep).
-        # You can decide to alias them to something else.
-        f"weight_{electron_id_var}_eff_{electrons_wp}",
-        f"weight_{electron_id_var}_eff_{electrons_wp}_rel_stat_up",
-        f"weight_{electron_id_var}_eff_{electrons_wp}_rel_stat_dn",
-        f"weight_{electron_id_var}_eff_{electrons_wp}_rel_sys_up",
-        f"weight_{electron_id_var}_eff_{electrons_wp}_rel_sys_dn",
-        f"weight_{electron_id_var}_misid_pi_{electrons_wp}",
-        f"weight_{electron_id_var}_misid_pi_{electrons_wp}_rel_stat_up",
-        f"weight_{electron_id_var}_misid_pi_{electrons_wp}_rel_stat_dn",
-        f"weight_{electron_id_var}_misid_pi_{electrons_wp}_rel_sys_up",
-        f"weight_{electron_id_var}_misid_pi_{electrons_wp}_rel_sys_dn",
-        # NB: no K->l fake rates corrections (yet) for binary LID...
-    ]
-
+    lid_e = [electron_id_var] + electron_id_weights
     variables_e += lid_e
 
-    lid_mu = [
-        muon_id_var,
-        # The following aliases for LID weights are already set when creating the standard lepton list (see ma.stdLep).
-        # You can decide to alias them to something else.
-        f"weight_{muon_id_var}_eff_{muons_wp}",
-        f"weight_{muon_id_var}_eff_{muons_wp}_rel_stat_up",
-        f"weight_{muon_id_var}_eff_{muons_wp}_rel_stat_dn",
-        f"weight_{muon_id_var}_eff_{muons_wp}_rel_sys_up",
-        f"weight_{muon_id_var}_eff_{muons_wp}_rel_sys_dn",
-        f"weight_{muon_id_var}_misid_pi_{muons_wp}",
-        f"weight_{muon_id_var}_misid_pi_{muons_wp}_rel_stat_up",
-        f"weight_{muon_id_var}_misid_pi_{muons_wp}_rel_stat_dn",
-        f"weight_{muon_id_var}_misid_pi_{muons_wp}_rel_sys_up",
-        f"weight_{muon_id_var}_misid_pi_{muons_wp}_rel_sys_dn",
-        f"weight_{muon_id_var}_misid_K_{muons_wp}",
-        f"weight_{muon_id_var}_misid_K_{muons_wp}_rel_stat_up",
-        f"weight_{muon_id_var}_misid_K_{muons_wp}_rel_stat_dn",
-        f"weight_{muon_id_var}_misid_K_{muons_wp}_rel_sys_up",
-        f"weight_{muon_id_var}_misid_K_{muons_wp}_rel_sys_dn",
-    ]
-
+    lid_mu = [muon_id_var] + muon_id_weights
     variables_mu += lid_mu
 
     aliases_jpsiee = vu.create_aliases_for_selected(

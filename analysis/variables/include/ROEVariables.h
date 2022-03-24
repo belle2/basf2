@@ -7,15 +7,19 @@
  **************************************************************************/
 
 #pragma once
+
 #include <analysis/VariableManager/Manager.h>
-#include <mdst/dataobjects/MCParticle.h>
+
 #include <analysis/dataobjects/RestOfEvent.h>
+
 #include <Math/Vector4D.h>
+
 #include <string>
 #include <vector>
 #include <set>
 
 namespace Belle2 {
+  class MCParticle;
   class Particle;
 
   namespace Variable {

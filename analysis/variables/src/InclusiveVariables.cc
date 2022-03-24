@@ -8,7 +8,8 @@
 
 // Own include
 #include <analysis/variables/InclusiveVariables.h>
-#include <analysis/VariableManager/Manager.h>
+
+#include <analysis/dataobjects/Particle.h>
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>

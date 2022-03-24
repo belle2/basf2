@@ -120,7 +120,8 @@ class TrackingValidationModule(basf2.Module):
         exclude_profile_pr_parameter='',
         use_expert_folder=True,
         trackCandidatesColumnName="RecoTracks",
-        mcTrackCandidatesColumName="MCRecoTracks"
+        mcTrackCandidatesColumName="MCRecoTracks",
+        non_expert_parameters=['p_{t}']
     ):
         """Constructor"""
 
@@ -155,6 +156,8 @@ class TrackingValidationModule(basf2.Module):
         self.trackCandidatesColumnName = trackCandidatesColumnName
         #: cached name of the MCRecoTracks StoreArray
         self.mcTrackCandidatesColumnName = mcTrackCandidatesColumName
+        #: list of parameters that determines which plots (all with corresponding x-axis) are marked as shifter plots
+        self.non_expert_parameters = non_expert_parameters
 
         #: default binning used for resolution plots over pt
         self.resolution_pt_binning = [0.05, 0.1, 0.25, 0.4, 0.6, 1., 1.5, 2., 3., 4.]
@@ -644,7 +647,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             'theta',
             'ndf',
         ],
-        non_expert_parameters=['p_{t}'],
         make_hist=True,
         weights=None
     ):
@@ -672,7 +674,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             profile_parameters,
             unit,
             make_hist,
-            non_expert_parameters=non_expert_parameters,
             weights=weights
         )
 
@@ -712,7 +713,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         profile_parameters,
         unit,
         make_hist,
-        non_expert_parameters=[],
         weights=None,
     ):
         """Create profile histograms for generic parameters"""
@@ -740,7 +740,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             if parameter_name in parameter_names \
                     or root_save_name(parameter_name) in parameter_names:
 
-                is_expert = not(parameter_name in non_expert_parameters)
+                is_expert = not(parameter_name in self.non_expert_parameters)
 
                 # Apply some boundaries for the maximal tracking acceptance
                 # such that the plots look more instructive

@@ -8,9 +8,8 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
-
 namespace Belle2 {
+  class Particle;
 
   namespace Variable {
 

@@ -125,16 +125,6 @@ namespace Belle2 {
     const EKLMElementNumbers* m_EklmElementNumbers;
 
 
-    /*******************************************/
-    //OTHER USEFUL VARIABLES
-    /*******************************************/
-
-    /** Number of channel hit histograms per sector for BKLM. */
-    const int m_ChannelHitHistogramsBKLM = 2;
-
-    /** Number of channel hit histograms per sector for EKLM. */
-    const int m_ChannelHitHistogramsEKLM = 3;
-
   };
 
 }

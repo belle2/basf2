@@ -246,7 +246,7 @@ bool Variable::Manager::createVariable(const std::string& name)
     }
   }
   // Try Formula registration with python parser if variable is not a simple identifier (else we get a infinite loop)
-  if (not std::regex_match(name, std::regex("^[a-zA-Z]([a-zA-Z_0-9&:]|\\+:|-:|':)*$"))) {
+  if (not std::regex_match(name, std::regex("^[a-zA-Z_][a-zA-Z_0-9]*$")) and not name.empty()) {
     Py_Initialize();
     try {
       // Import parser
@@ -269,7 +269,7 @@ bool Variable::Manager::createVariable(const std::string& name)
       }
     } catch (py::error_already_set&) {
       PyErr_Print();
-      B2FATAL("Parsing Error on variable: '" << name);
+      B2FATAL("Parsing error for formula: '" << name << "'");
     }
   }
 

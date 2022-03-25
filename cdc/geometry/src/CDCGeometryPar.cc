@@ -604,7 +604,7 @@ void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometr
 
   uint iL(0), iC(0);
   const int np = 3;
-  double back[np], fwrd[np], tension; // cppcheck-suppress constVariable
+  double back[np], fwrd[np], tension;
   unsigned nRead = 0;
 
   while (true) {

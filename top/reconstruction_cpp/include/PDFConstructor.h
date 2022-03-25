@@ -44,7 +44,7 @@ namespace Belle2 {
        */
       enum EStoreOption {
         c_Reduced = 0, /**< only PDF peak data */
-        c_Full = 1     /**< also extra information */
+        c_Full = 1     /**< also extra information and derivatives */
       };
 
       /**
@@ -288,6 +288,13 @@ namespace Belle2 {
        * @return number of calls
        */
       int getNCalls_expandPDF(SignalPDF::EPeakType type) const {return m_ncallsExpandPDF[type];}
+
+      /**
+       * Returns a collection of derivatives for debugging purposes.
+       * The derivatives are available only for EStoreOption::c_Full
+       * @return map of xD and derivatives
+       */
+      const std::map <double, YScanner::Derivatives>& getDerivatives() const {return m_derivatives;}
 
     private:
 
@@ -575,6 +582,7 @@ namespace Belle2 {
       mutable std::vector<LogL> m_pixelLLs; /**< pixel log likelihoods (index = pixelID - 1) */
       mutable std::vector<Pull> m_pulls; /**< photon pulls w.r.t PDF peaks */
       mutable bool m_deltaPDFOn = true; /**< include/exclude delta-ray PDF in likelihood calculation */
+      mutable std::map <double, YScanner::Derivatives> m_derivatives; /**< a map of xD and derivatives */
 
     };
 
@@ -716,7 +724,11 @@ namespace Belle2 {
 
         m_Fic = sol.getFic() + m_dFic;
 
+        if (m_storeOption == c_Full) m_derivatives[xD] = D;
+
         expandSignalPDF(col, D, t.type);
+
+        // if(m_yScanner->getResults().empty()) B2INFO("results are empty");
       }
     }
 

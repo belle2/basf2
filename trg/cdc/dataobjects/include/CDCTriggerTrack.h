@@ -208,7 +208,7 @@ namespace Belle2 {
     int m_rawz{0};
     int m_rawtheta{0};
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerTrack, 13);
+    ClassDef(CDCTriggerTrack, 14);
 
   };
 }

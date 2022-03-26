@@ -1,10 +1,5 @@
 Import('env')
 
-#env['LIBS'] = ['Core',  'GX11',  'Graf3d', 'Gui', 'RGL',
-#               '$ROOT_LIBS', 'ecl_dataobjects', 'rawdata_dataobjects',
-#               'mdst_dataobjects', 'simulation_dataobjects', 'ecl',
-#               'framework']
-env['LIBS'] = ['Core', '$ROOT_LIBS', 'Gui', 'ecl_dataobjects', 'ecl', 'framework']
-#env['LIBS'] += env['TEVE_LIBS']
+env['LIBS'] = ['Core', '$ROOT_LIBS', 'Gui', 'ecl_dataobjects', 'ecl_mapper', 'framework']
 
 Return('env')

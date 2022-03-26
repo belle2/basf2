@@ -487,19 +487,15 @@ void ECLDQMEXTENDEDModule::event()
   int iAmpflag_qualityfail = 0;
   int iTimeflag_qualityfail = 0;
 
+  if (!m_ECLTrigs.isValid()) B2FATAL("ECL DQM logic test FATAL: Trigger time information is not available");
+
   for (auto& aECLDsp : m_ECLDsps) {
     m_CellId = aECLDsp.getCellId();
     std::vector<int> DspArray = aECLDsp.getDspA();
-    if (!m_ECLTrigs.isValid()) B2FATAL("ECL DQM logic test FATAL: Trigger time information is not available");
-    for (auto& aECLTrig : m_ECLTrigs) {
-      if (aECLTrig.getTrigId() == mapper.getCrateID(m_CellId)) {
-        m_TrigTime = aECLTrig.getTimeTrig();
-        break;
-      }
-    }
+    m_TrigTime = ECLTrig::getByCellID(m_CellId)->getTimeTrig();
 
     emulator(m_CellId, m_TrigTime, DspArray);
-    ECLDigit* aECLDigit = aECLDsp.getRelated<ECLDigit>();
+    ECLDigit* aECLDigit = ECLDigit::getByCellID(m_CellId);
 
     if ((m_AmpFit >= (int)v_totalthrAskip[m_CellId - 1]) && m_QualityFit < 4 && !aECLDigit)
       B2ERROR("ECL DQM logic test error: ECL Digit does not exist for A_emulator > Thr_skip"

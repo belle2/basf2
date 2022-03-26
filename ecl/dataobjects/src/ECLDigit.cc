@@ -5,9 +5,18 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#pragma once
 
-// This file is kept as a redirect for ecl/mapper/ECLChannelMapper to provide
-// backwards compatibility.
-#include <ecl/mapper/ECLChannelMapper.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <framework/datastore/StoreArray.h>
+
+using namespace Belle2;
+
+ECLDigit* ECLDigit::getByCellID(int cid)
+{
+  static StoreArray<ECLDigit> ecl_digits_arr;
+  for (auto& ecl_dig : ecl_digits_arr) {
+    if (ecl_dig.getCellId() == cid) return &ecl_dig;
+  }
+  return nullptr;
+}
 

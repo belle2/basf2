@@ -50,6 +50,8 @@ namespace Belle2 {
     bool Getmumu();
     //!  Taub2b selection
     bool GetTaub2b(double);
+    //!  Taub2b selection (tighter selection than Taub2b)
+    bool GetTaub2b2(double);
     // Additional Bhabha veto
     int GetBhabhaAddition(void);
     //! Output 2D Bhabha combination
@@ -101,19 +103,30 @@ namespace Belle2 {
     // [0], [1] for low and high of dphi, [2], [3] for low and high of Theta Sum
     void setTaub2bAngleCut(const std::vector<int>& iTaub2bAngleCut)
     {
-      m_Taub2bAngleCut = iTaub2bAngleCut;
+      m_taub2bAngleCut = iTaub2bAngleCut;
     }
     //
     void setTaub2bEtotCut(const double iTaub2bEtotCut)
     {
-      m_Taub2bEtotCut = iTaub2bEtotCut;
+      m_taub2bEtotCut = iTaub2bEtotCut;
     }
     //
     void setTaub2bClusterECut(const double iTaub2bClusterECut1,
                               const double iTaub2bClusterECut2)
     {
-      m_Taub2bClusterECut1 = iTaub2bClusterECut1;
-      m_Taub2bClusterECut2 = iTaub2bClusterECut2;
+      m_taub2bClusterECut1 = iTaub2bClusterECut1;
+      m_taub2bClusterECut2 = iTaub2bClusterECut2;
+    }
+    // set taub2b2 cut
+    void setTaub2b2Cut(const std::vector<int>& iTaub2b2AngleCut,
+                       const double iTaub2b2EtotCut,
+                       const double iTaub2b2CLEEndcapCut,
+                       const double iTaub2b2CLECut)
+    {
+      m_taub2b2AngleCut     = iTaub2b2AngleCut;
+      m_taub2b2EtotCut      = iTaub2b2EtotCut;
+      m_taub2b2CLEEndcapCut = iTaub2b2CLEEndcapCut;
+      m_taub2b2CLECut       = iTaub2b2CLECut;
     }
     // get trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
     // are in CDCTRG region in theta (="InTrack") or not
@@ -200,11 +213,11 @@ namespace Belle2 {
       return m_3DBhabhaSelectionClusterTimings[cl_idx];
     }
     // get taub2b 2 cluster angle cut flag
-    int getTaub2bAngleFlag(void) { return m_Taub2bAngleFlag; }
+    int getTaub2bAngleFlag(void) { return m_taub2bAngleFlag; }
     // get total energy(TC theta id=1-17) flag for taub2b
-    int getTaub2bEtotFlag(void) { return m_Taub2bEtotFlag; }
+    int getTaub2bEtotFlag(void) { return m_taub2bEtotFlag; }
     // taub2b Cluster energy flag
-    int getTaub2bClusterEFlag(void) { return m_Taub2bClusterEFlag; }
+    int getTaub2bClusterEFlag(void) { return m_taub2bClusterEFlag; }
 
   private:
     /** Object of TC Mapping */
@@ -244,19 +257,27 @@ namespace Belle2 {
     std::vector<double> _mumuAngle;
     // Angle selection of additional Bhabha veto in CM frame
     std::vector<double> m_3DBhabhaAddAngleCut;
-    // taub2b 2 Cluster angle cut
-    std::vector<int> m_Taub2bAngleCut;
-    // taub2b total energy(TC theta id=1-17) cut
-    double m_Taub2bEtotCut;
-    // taub2b Cluster energy cut
-    double m_Taub2bClusterECut1;
-    double m_Taub2bClusterECut2;
+    // taub2b 2 Cluster angle cut (degree)
+    std::vector<int> m_taub2bAngleCut;
+    // taub2b total energy(TC theta id=1-17) cut (GeV)
+    double m_taub2bEtotCut;
+    // taub2b Cluster energy cut (GeV)
+    double m_taub2bClusterECut1;
+    double m_taub2bClusterECut2;
     // taub2b 2 cluster angle cut flag
-    int m_Taub2bAngleFlag;
+    int m_taub2bAngleFlag;
     // taub2b total energy(TC theta id=1-17) flag
-    int m_Taub2bEtotFlag;
+    int m_taub2bEtotFlag;
     // taub2b Cluster energy flag
-    int m_Taub2bClusterEFlag;
+    int m_taub2bClusterEFlag;
+    // taub2b2 total energy cut (GeV)
+    double m_taub2b2EtotCut;
+    // taub2b2 two Cluster angle cut (degree)
+    std::vector<int> m_taub2b2AngleCut;
+    // taub2b2 cluster energy cut for endcap cluster (GeV)
+    double m_taub2b2CLEEndcapCut;
+    // taub2b2 cluster energy cut (GeV)
+    double m_taub2b2CLECut;
     // trigger bit of flag(1bit) whether two clusters statisfy 3D Bhabha veto
     // are in CDCTRG region in theta (="InTrack") or not
     int                 m_3DBhabhaVetoInTrackFlag;

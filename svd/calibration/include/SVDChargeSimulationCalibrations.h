@@ -29,7 +29,7 @@ namespace Belle2 {
     SVDChargeSimulationCalibrations(): m_aDBObjPtr(name)
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDChargeSimulationCalibrations: from now on we are using " <<
+        B2DEBUG(20, "SVDChargeSimulationCalibrations: from now on we are using " <<
         this->m_aDBObjPtr -> get_uniqueID()); });
 
     }

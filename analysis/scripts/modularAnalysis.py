@@ -3613,8 +3613,8 @@ def addPi0VetoEfficiencySystematics(particleList, decayString, tableName, thresh
 
     @param particleList   the input ParticleList
     @param decayString    specify hard photon to be performed pi0 veto (e.g. 'B+:sig -> rho+:sig ^gamma:hard')
-    @param tableName      table name corresponding to payload version (e.g. 'Pi0VetoEfficiencySystematics_Nov2021')
-    @param threshold      pi0 veto threshold (0.50, 0.51, ..., 0.99)
+    @param tableName      table name corresponding to payload version (e.g. 'Pi0VetoEfficiencySystematics_Mar2022')
+    @param threshold      pi0 veto threshold (0.10, 0.11, ..., 0.99)
     @param mode           choose one mode (same as writePi0EtaVeto) out of 'standard', 'tight', 'cluster' and 'both'
     @param suffix         optional suffix to be appended to the usual extraInfo name
     @param path           the module is added to this path

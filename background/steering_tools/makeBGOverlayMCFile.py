@@ -10,7 +10,6 @@
 ##########################################################################
 
 from basf2 import create_path, set_log_level, B2ERROR, B2INFO, LogLevel, process, statistics
-import basf2 as b2
 import os
 from svd import add_svd_simulation
 import glob
@@ -71,10 +70,15 @@ if len(bg) == 0:
     B2ERROR('No root files found in folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
     sys.exit()
 
+# SVDOverlayDir must become an environmental variable, this is temporary solution:
+SVDOverlayDir = "/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/randomTRG"
+SVDOverlayFiles = glob.glob(SVDOverlayDir + '/*_overlay.root')
+
 B2INFO('Making BG overlay sample for ' + argvs[1] + ' with ECL compression = ' +
        str(compression) + ' and PXD in ' + mode + ' mode')
 B2INFO('Using background samples from folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
 B2INFO('With scaling factor: ' + str(scaleFactor))
+B2INFO('With SVD xTalk&Noise files from folder ' + str(SVDOverlayDir))
 
 set_log_level(LogLevel.WARNING)
 
@@ -112,23 +116,10 @@ else:
 
 # SVD digitization
 add_svd_simulation(main)
-
 # SVD overlay of random trigger data to add SVD Noise & xTalk
-SVDOverlayDir = "/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/randomTRG"
-SVDOverlayFiles = glob.glob(SVDOverlayDir + '/*_overlay.root')
-bkginput = b2.register_module('BGOverlayInput')
-bkginput.set_name('BGOverlayInput_SVDOverlay')
-bkginput.param('skipExperimentCheck', True)  # yes, we are extrmely sure what we are doing
-bkginput.param('bkgInfoName', 'BackgroundInfoSVDOverlay')
-bkginput.param('extensionName', "_SVDOverlay")
-bkginput.param('inputFileNames', SVDOverlayFiles)
-main.add_module(bkginput)
-bkgexecutor = b2.register_module('BGOverlayExecutor')
-bkgexecutor.set_name('BGOverlayExecutor_SVDOverlay')
-bkgexecutor.param('bkgInfoName', 'BackgroundInfoSVDOverlay')
-main.add_module(bkgexecutor)
-main.add_module("SVDShaperDigitSorter")
-
+main.add_module('BGOverlayInput', skipExperimentCheck=True, bkgInfoName='BackgroundInfoSVDOverlay', inputFileNames=SVDOverlayFiles)
+main.add_module('BGOverlayExecutor', bkgInfoName='BackgroundInfoSVDOverlay')
+main.add_module('SVDShaperDigitSorter')
 
 # CDC digitization
 main.add_module('CDCDigitizer')

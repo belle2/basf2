@@ -738,8 +738,12 @@ namespace Belle2 {
         if (hit.time < m_minTime or hit.time > m_maxTime) continue;
         double f = pdfValue(hit.pixelID, hit.time, hit.timeErr);
         if (f <= 0) {
-          B2ERROR("TOP::PDFConstructor::getLogL(): PDF value is zero or negative"
-                  << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          auto ret = m_zeroPixels.insert(hit.pixelID);
+          if (ret.second) {
+            B2ERROR("TOP::PDFConstructor::getLogL(): PDF value is zero or negative"
+                    << LogVar("slotID", m_moduleID)
+                    << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          }
           continue;
         }
         LL.logL += log(f);
@@ -761,8 +765,12 @@ namespace Belle2 {
         if (hit.time < minTime or hit.time > maxTime) continue;
         double f = pdfValue(hit.pixelID, hit.time - t0, hit.timeErr, sigt);
         if (f <= 0) {
-          B2ERROR("TOP::PDFConstructor::getLogL(): PDF value is zero or negative"
-                  << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          auto ret = m_zeroPixels.insert(hit.pixelID);
+          if (ret.second) {
+            B2ERROR("TOP::PDFConstructor::getLogL(): PDF value is zero or negative"
+                    << LogVar("slotID", m_moduleID)
+                    << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          }
           continue;
         }
         LL.logL += log(f);
@@ -786,8 +794,12 @@ namespace Belle2 {
         if (hit.time < minTime or hit.time > maxTime) continue;
         double f = bkgPhotons * m_backgroundPDF->getPDFValue(hit.pixelID);
         if (f <= 0) {
-          B2ERROR("TOP::PDFConstructor::getBackgroundLogL(): PDF value is zero or negative"
-                  << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          auto ret = m_zeroPixels.insert(hit.pixelID);
+          if (ret.second) {
+            B2ERROR("TOP::PDFConstructor::getBackgroundLogL(): PDF value is zero or negative"
+                    << LogVar("slotID", m_moduleID)
+                    << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          }
           continue;
         }
         LL.logL += log(f);
@@ -811,8 +823,12 @@ namespace Belle2 {
         if (hit.time < minTime or hit.time > maxTime) continue;
         double f = pdfValue(hit.pixelID, hit.time - t0, hit.timeErr, sigt);
         if (f <= 0) {
-          B2ERROR("TOP::PDFConstructor::getPixelLogLs(): PDF value is zero or negative"
-                  << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          auto ret = m_zeroPixels.insert(hit.pixelID);
+          if (ret.second) {
+            B2ERROR("TOP::PDFConstructor::getPixelLogLs(): PDF value is zero or negative"
+                    << LogVar("slotID", m_moduleID)
+                    << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          }
           continue;
         }
         unsigned k = hit.pixelID - 1;

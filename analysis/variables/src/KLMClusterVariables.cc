@@ -9,10 +9,12 @@
 /* Own header. */
 #include <analysis/variables/KLMClusterVariables.h>
 
+// include VariableManager
+#include <analysis/VariableManager/Manager.h>
+
 /* Analysis headers. */
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/VariableManager/Manager.h>
 
 /* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>

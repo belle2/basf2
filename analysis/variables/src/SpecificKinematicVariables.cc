@@ -8,6 +8,10 @@
 
 // Own include
 #include <analysis/variables/SpecificKinematicVariables.h>
+
+// include VariableManager
+#include <analysis/VariableManager/Manager.h>
+
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/variables/Variables.h>
 

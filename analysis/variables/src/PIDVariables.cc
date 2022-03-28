@@ -9,8 +9,7 @@
 // Own include
 #include <analysis/variables/PIDVariables.h>
 
-#include <analysis/VariableManager/Manager.h>
-
+#include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 // framework aux

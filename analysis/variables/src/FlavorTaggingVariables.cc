@@ -8,13 +8,14 @@
 
 // Own include
 #include <analysis/variables/FlavorTaggingVariables.h>
+
 #include <analysis/variables/MCTruthVariables.h>
 #include <analysis/variables/KLMClusterVariables.h>
-#include <analysis/utility/PCmsLabTransform.h>
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
 #include <analysis/utility/MCMatching.h>
+#include <analysis/utility/PCmsLabTransform.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreObjPtr.h>
@@ -31,7 +32,6 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-
 
 // framework aux
 #include <framework/gearbox/Const.h>

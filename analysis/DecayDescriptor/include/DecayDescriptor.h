@@ -114,6 +114,9 @@ namespace Belle2 {
 
     /** Get a vector of pointers with selected daughters in the decay tree. */
     std::vector<const Particle*> getSelectionParticles(const Particle* particle);
+    /** Get a vector of pointers with not-selected daughters in the decay tree. */
+    std::vector<const Particle*> getNotSelectionFinalParticles(const Particle* particle);
+
     /** Return list of human readable names of selected particles.
     Example for the case that all particles are selected in B+ -> (anti-D0 -> K^- pi^+) pi^+:
     ["B", "D0", "D0_K", "D_pi", "pi"] */

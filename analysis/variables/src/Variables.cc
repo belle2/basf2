@@ -510,7 +510,7 @@ namespace Belle2 {
         }
         Helix helix = tfr->getHelix();
         helix.passiveMoveBy(vertex);
-        double scalingFactor = daughter->getMomentumScalingFactor();
+        double scalingFactor = daughter->getEffectiveMomentumScale();
         double momX = scalingFactor * helix.getMomentumX(bField);
         double momY = scalingFactor * helix.getMomentumY(bField);
         double momZ = scalingFactor * helix.getMomentumZ(bField);

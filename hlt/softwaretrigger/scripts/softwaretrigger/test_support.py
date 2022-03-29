@@ -38,7 +38,8 @@ class CheckForCorrectHLTResults(basf2.Module):
             basf2.B2FATAL("ROIs are not present")
 
 
-def generate_input_file(run_type, location, output_file_name, exp_number, passthrough):
+def generate_input_file(run_type, location, output_file_name, exp_number, passthrough,
+                        simulate_events_of_doom_buster):
     """
     Generate an input file for usage in the test.
     Simulate uubar for "beam" and two muons for "cosmic" setting.
@@ -49,6 +50,8 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
     :param output_file_name: where to store the result file
     :param exp_number: which experiment number to simulate
     :param passthrough: if true don't generate a trigger result in the input file
+    :param simulate_events_of_doom_buster: if true, simulate the effect of the
+      EventsOfDoomBuster module by inflating the number of CDC hits
     """
     if os.path.exists(output_file_name):
         return
@@ -68,12 +71,37 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
 
     add_simulation(path, usePXDDataReduction=(location == constants.Location.expressreco))
 
+    # inflate the number of CDC hits in order to later simulate the effect of the
+    # EventsOfDoomBuster module
+    if simulate_events_of_doom_buster:
+
+        class InflateCDCHits(basf2.Module):
+            """Artificially inflate the number of CDC hits."""
+
+            def initialize(self):
+                """Initialize."""
+                self.cdc_hits = Belle2.PyStoreArray("CDCHits")
+                self.cdc_hits.isRequired()
+                eodb_parameters = Belle2.PyDBObj("EventsOfDoomParameters")
+                if not eodb_parameters.isValid():
+                    basf2.B2FATAL("EventsOfDoomParameters is not valid")
+                self.cdc_hits_threshold = eodb_parameters.getNCDCHitsMax() + 1
+
+            def event(self):
+                """Event"""
+                if self.cdc_hits.isValid():
+                    # Let's simply append a (default) CDC hit multiple times
+                    for i in range(self.cdc_hits_threshold):
+                        self.cdc_hits.appendNew()
+
+        path.add_module(InflateCDCHits())
+
     if location == constants.Location.hlt:
         components = DEFAULT_HLT_COMPONENTS
     elif location == constants.Location.expressreco:
         components = DEFAULT_EXPRESSRECO_COMPONENTS
     else:
-        basf2.B2FATAL("Location {} for test is not supported".format(location.name))
+        basf2.B2FATAL(f"Location {location.name} for test is not supported")
 
     components.append("TRG")
 
@@ -173,7 +201,8 @@ def test_script(script_location, input_file_name, temp_dir):
         basf2.process(test_path)
 
 
-def test_folder(location, run_type, exp_number, phase, passthrough=False):
+def test_folder(location, run_type, exp_number, phase, passthrough=False,
+                simulate_events_of_doom_buster=False):
     """
     Run all hlt operation scripts in a given folder
     and test the outputs of the files.
@@ -192,13 +221,15 @@ def test_folder(location, run_type, exp_number, phase, passthrough=False):
     :param passthrough: only relevant for express reco: If true don't create a
                      software trigger result in the input file to test running
                      express reco if hlt is in passthrough mode
-
+    :param simulate_events_of_doom_buster: if true, simulate the effect of the
+                     EventsOfDoomBuster module by inflating the number of CDC hits
     """
     temp_dir = tempfile.mkdtemp()
     output_file_name = os.path.join(temp_dir, f"{location.name}_{run_type.name}.root")
     generate_input_file(run_type=run_type, location=location,
                         output_file_name=output_file_name, exp_number=exp_number,
-                        passthrough=passthrough)
+                        passthrough=passthrough,
+                        simulate_events_of_doom_buster=simulate_events_of_doom_buster)
 
     script_dir = basf2.find_file(f"hlt/operation/{phase}/global/{location.name}/evp_scripts/")
     run_at_least_one = False

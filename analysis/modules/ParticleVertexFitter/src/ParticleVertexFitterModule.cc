@@ -213,6 +213,9 @@ namespace Belle2 {
     // fits with KFit
     if (m_vertexFitter == "KFit") {
 
+      if (m_decayString != "" and m_fitType != "vertex")
+        B2FATAL("ParticleVertexFitter: KFit does not support yet selection of daughters via decay string except for vertex fit!");
+
       // vertex fit
       if (m_fitType == "vertex") {
         if (m_withConstraint == "ipprofile") {
@@ -223,6 +226,7 @@ namespace Belle2 {
           ok = doKVertexFit(mother, false, false);
         }
       }
+
 
       // mass-constrained vertex fit
       if (m_fitType == "massvertex") {
@@ -353,6 +357,15 @@ namespace Belle2 {
     return true;
   }
 
+  bool ParticleVertexFitterModule::fillNotFitParticles(const Particle* mother, std::vector<const Particle*>& notFitChildren)
+  {
+    // if decayString is empty, just use all primary daughters
+    if (!m_decayString.empty())
+      notFitChildren = m_decaydescriptor.getNotSelectionFinalParticles(mother);
+
+    return true;
+  }
+
   bool ParticleVertexFitterModule::redoTwoPhotonDaughterMassFit(Particle* postFit, const Particle* preFit,
       const analysis::VertexFitKFit& kv)
   {
@@ -416,6 +429,10 @@ namespace Belle2 {
 
     if (!validChildren)
       return false;
+
+    std::vector<const Particle*> notFitChildren;
+    fillNotFitParticles(mother, notFitChildren);
+
 
     if (twoPhotonChildren.size() > 1) {
       B2FATAL("[ParticleVertexFitterModule::doKVertexFit] Vertex fit using KFit does not support fit with multiple particles decaying to two photons like pi0 (yet).");
@@ -484,6 +501,12 @@ namespace Belle2 {
 
       ok = makeKVertexMother(kv2, mother);
     }
+
+    // update 4-vector using not-fit-particles
+    ROOT::Math::PxPyPzEVector total4Vector(mother->get4Vector());
+    for (auto& child : notFitChildren)
+      total4Vector += child->get4Vector();
+    mother->set4Vector(total4Vector);
 
     return ok;
   }

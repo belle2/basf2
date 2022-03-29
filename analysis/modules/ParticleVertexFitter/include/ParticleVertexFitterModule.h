@@ -249,6 +249,11 @@ namespace Belle2 {
                           std::vector<const Particle*>& twoPhotonChildren);
 
     /**
+     * Fills valid particle's children (with valid error matrix) in the vector of Particles that will not enter the fit.
+     */
+    bool fillNotFitParticles(const Particle* mother, std::vector<const Particle*>& notFitChildren);
+
+    /**
      * Combines preFit particle and vertex information from vertex fit kv to create new postFit particle.
      * A mass refit of this new particle is performed assuming that it originates from the point given by VertexFit.
      */

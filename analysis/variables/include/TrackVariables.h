@@ -124,6 +124,11 @@ namespace Belle2 {
     double trackTanLambdaError(const Particle* part);
 
     /**
+     * returns the track fit covariance matrix element
+     */
+    double trackFitCovariance(const Particle* particle, const std::vector<double>& indices);
+
+    /**
      * returns the pValue of the track's fit
      */
     double trackPValue(const Particle* part);

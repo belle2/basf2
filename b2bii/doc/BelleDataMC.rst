@@ -149,6 +149,18 @@ Then modify the following line in your generation script:
    main.add_module('EventInfoSetter', expList=55, runList=0, evtNumList=100)
 
 
+.. rubric:: User signal decay files
+
+To generate user-defined decay files, use the following line in the script:
+
+.. code-block:: python3
+
+   from generators import add_evtgen_generator
+   add_evtgen_generator(path=mypath,
+                        finalstate="signal",
+                        signaldecfile="user_defined_decfile.dec"
+   )
+
 
 .. note::
    Because the Belle detector geometry is not and will not be implemented in basf2, the simulation part can 

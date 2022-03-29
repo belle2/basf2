@@ -19,7 +19,7 @@ data is to be analysed within the same job, without any intermediate conversion
 to output ROOT file (Belle II MDST format). The B2BII conversion plus analysis
 workflow is illustrated in this figure:
 
-.. figure:: figs/B2BIIWorkflow.png
+.. figure:: figs/B2BIIWorkFlow_update_v2.png
 
 and is divided between
 

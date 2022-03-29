@@ -124,6 +124,7 @@ void TrackFinderVXDBasicPathFinderModule::event()
   int nRounds = m_cellularAutomaton.apply(segmentNetwork);
   if (nRounds < 0) {
     B2WARNING("Basic Path Finder failed, skipping event!");
+    m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
     return;
   }
 
@@ -152,7 +153,8 @@ void TrackFinderVXDBasicPathFinderModule::event()
     unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
     B2DEBUG(10, "Number of families in the network: " << nFamilies);
     if (nFamilies > m_PARAMmaxFamilies)  {
-      B2WARNING("Maximal number of track canidates per event was exceeded: " << LogVar(" Number of Families", nFamilies));
+      B2WARNING("Maximal number of track canidates per event was exceeded: " << LogVar(" Number of Families", nFamilies)
+                << LogVar("Max number of families", m_PARAMmaxFamilies));
       m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
       return;
     }

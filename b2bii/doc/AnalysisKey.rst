@@ -61,10 +61,10 @@ Using ``eIDBelle>0.9`` as an example:
 Naming scheme for payloads is:
 ``BelleKID<K|Pi><Eff|Fake><Combined|Plus|Minus>_<PID cut:[1..9]>``
 Here,
-  - K or Pi refers to correction information obtained for kaons or pions, accordingly
-  - Eff or Fake refers to efficiency or fake rate corrections
-  - Combined, Plus or Minus refers to the charge of tracks used for the study
-  - PID cut is an integer number from 1 to 9 that correspond to "cut > 0.number"
+- K or Pi refers to correction information obtained for kaons or pions, accordingly
+- Eff or Fake refers to efficiency or fake rate corrections
+- Combined, Plus or Minus refers to the charge of tracks used for the study
+- PID cut is an integer number from 1 to 9 that correspond to "cut > 0.number"
 
 To append PID correction information for pion efficiency selected as kaons with
 ``atcPIDBelle(3, 2)>0.6`` cut:
@@ -108,8 +108,8 @@ Naming scheme for proton ID payloads is:
 ``BellePID<Plus|Minus>_<PID cut>``
 
 Here,
-  - Plus or Minus refers to the charge of tracks used for the study
-  - PID cut can be 0.6, 0.7, 0.8 or 0.9
+- Plus or Minus refers to the charge of tracks used for the study
+- PID cut can be 0.6, 0.7, 0.8 or 0.9
 
 If you'd like to add the information for proton efficiency selected
 with ``atcPIDBelle(4, 2)>0.6`` and ``atcPIDBelle(4, 3)>0.6``.
@@ -152,7 +152,7 @@ To utilize FEI, the correct prefix of FEI payloads needs to be set:
    path.add_path(feistate.path)
 
 
-For more details please see `B_converted_apply.py`
+For more details please see :code:`B_converted_apply.py`
 
 
 --------------

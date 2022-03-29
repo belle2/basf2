@@ -116,6 +116,7 @@ Signal MC samples can also be generated in basf2, using the ``BelleMCOutput`` mo
 An example script of how to generate a MC sample with ``BelleMCOutput`` is at
 
 .. code-block:: csh
+
    ls $BELLE2_RELEASE_DIR/b2bii/examples/BelleMCGeneration.py
 
 Here are several notes while using ``BelleMCOutput``.
@@ -129,6 +130,7 @@ spread in MC generation, please modify the prepended global tag:
 ``b2bii_beamParameters_with_smearing``.
 
 .. code-block:: python
+
    # Use B2BII global tag.
    basf2.conditions.prepend_globaltag('b2bii_beamParameters_with_smearing')
 

@@ -85,7 +85,7 @@ performs some kind of reconstruction, you simply need to replace the loading of
 Belle II MDST files with the Belle MDST files and executing the conversion.
 
 
-To load Belle MDST file(s) and to convert them use :b2:mod:`convertBelleMdstToBelleIIMdst`.
+To load Belle MDST file(s) and to convert them use :code:`convertBelleMdstToBelleIIMdst`.
 This function has input parameters to specify the input MDST files to be converted,
 flag to specify whether or not the fix_mdst should be applied or not (it should!)
 and path.

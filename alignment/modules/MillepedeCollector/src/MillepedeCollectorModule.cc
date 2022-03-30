@@ -25,10 +25,8 @@
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/dataobjects/EventT0.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/dbobjects/BeamParameters.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 #include <framework/pcore/ProcHandler.h>
@@ -162,8 +160,7 @@ void MillepedeCollectorModule::prepare()
   StoreObjPtr<EventMetaData> emd;
   emd.isRequired();
 
-  StoreObjPtr<EventT0> eventT0;
-  eventT0.isOptional();
+  m_eventT0.isOptional();
 
   if (m_tracks.empty() &&
       m_particles.empty() &&
@@ -303,8 +300,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (eventT0.isValid() && eventT0->hasEventT0()) {
-        evt0 =  eventT0->getEventT0();
+      if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+        evt0 = m_eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -329,8 +326,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (eventT0.isValid() && eventT0->hasEventT0()) {
-          evt0 =  eventT0->getEventT0();
+        if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+          evt0 = m_eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -362,8 +359,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (eventT0.isValid() && eventT0->hasEventT0()) {
-          evt0 =  eventT0->getEventT0();
+        if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+          evt0 = m_eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -499,8 +496,8 @@ void MillepedeCollectorModule::collect()
           getObjectPtr<TH1I>("ndf")->Fill(ndf);
           getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
           getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-          if (eventT0.isValid() && eventT0->hasEventT0()) {
-            evt0 =  eventT0->getEventT0();
+          if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+            evt0 = m_eventT0->getEventT0();
             getObjectPtr<TH1F>("evt0")->Fill(evt0);
           }
 
@@ -515,8 +512,8 @@ void MillepedeCollectorModule::collect()
           getObjectPtr<TH1I>("ndf")->Fill(ndf);
           getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
           getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-          if (eventT0.isValid() && eventT0->hasEventT0()) {
-            evt0 =  eventT0->getEventT0();
+          if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+            evt0 = m_eventT0->getEventT0();
             getObjectPtr<TH1F>("evt0")->Fill(evt0);
           }
 
@@ -579,8 +576,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (eventT0.isValid() && eventT0->hasEventT0()) {
-        evt0 =  eventT0->getEventT0();
+      if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+        evt0 = m_eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -635,8 +632,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (eventT0.isValid() && eventT0->hasEventT0()) {
-        evt0 =  eventT0->getEventT0();
+      if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+        evt0 = m_eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -704,8 +701,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (eventT0.isValid() && eventT0->hasEventT0()) {
-        evt0 =  eventT0->getEventT0();
+      if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+        evt0 = m_eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -944,8 +941,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (eventT0.isValid() && eventT0->hasEventT0()) {
-          evt0 =  eventT0->getEventT0();
+        if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+          evt0 = m_eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -964,8 +961,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (eventT0.isValid() && eventT0->hasEventT0()) {
-          evt0 =  eventT0->getEventT0();
+        if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+          evt0 = m_eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 

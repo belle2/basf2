@@ -18,7 +18,7 @@ import modularAnalysis as ma
 import vertex as vx
 
 
-def add_IP_dqm(path, dqm_environment):
+def add_IP_dqm(path, dqm_environment='expressreco'):
     '''
     This function adds the IPDQM module to the path.
     @param dqm_environment: The environment the DQM modules are running in
@@ -35,18 +35,18 @@ def add_IP_dqm(path, dqm_environment):
         dqm = basf2.register_module('IPDQM')
         dqm.set_log_level(basf2.LogLevel.INFO)
         dqm.param('Y4SPListName', 'Upsilon(4S):IPDQM')
-        dqm.param('onlineMode', 'ExpressReco')
+        dqm.param('onlineMode', dqm_environment)
         path.add_module(dqm)
 
     elif dqm_environment == 'hlt':
         # In order to save computing time, we fill the ParticleList only if the event passes the dimuon skim.
         mySelection += ' and [SoftwareTriggerResult(software_trigger_cut&skim&accept_mumu_tight_or_highm) > 0]'
         ma.fillParticleList('mu+:DQM_HLT', mySelection, path=path)
-        ma.reconstructDecay('Upsilon(4S):IPDQM -> mu+:DQM_HLT mu-:DQM_HLT', '9.5<M<11.5', path=path)
+        ma.reconstructDecay('Upsilon(4S):IPDQM_HLT -> mu+:DQM_HLT mu-:DQM_HLT', '9.5<M<11.5', path=path)
         vx.kFit('Upsilon(4S):IPDQM_HLT', conf_level=0, path=path)
 
         dqm = basf2.register_module('IPDQM')
         dqm.set_log_level(basf2.LogLevel.INFO)
         dqm.param('Y4SPListName', 'Upsilon(4S):IPDQM_HLT')
-        dqm.param('onlineMode', 'HLT')
+        dqm.param('onlineMode', dqm_environment)
         path.add_module(dqm)

@@ -53,7 +53,7 @@ extern "C" {
 
 
   /** Replace internal random generator with the framework random generator */
-  void teegg_rndmarr_(double* drvec, int* lengt)
+  void teegg_rndmarr_(double* drvec, const int* lengt)
   {
     for (int i = 0; i < *lengt; ++i) {
       double rr = gRandom->Rndm();
@@ -71,7 +71,7 @@ extern "C" {
   void teeggm_(int* mode, double* xpar, int* npar);
 
   /** Callback to show warning */
-  void teegg_warning_generic_(double* weight, double* max)
+  void teegg_warning_generic_(const double* weight, const double* max)
   {
     B2WARNING("TEEGG: Maximum weight " << *max  << " to small, increase fmax to at least " << *weight);
   }

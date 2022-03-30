@@ -350,7 +350,7 @@ namespace Belle2 {
       func->SetLineWidth(1);
       TF1* funcFull = NULL;
       if (LoadHisto == c_LoadForFitHeight or LoadHisto == c_LoadForFitIntegral) {
-        hCharge->Fit(func, m_fitoption.c_str(), "", threshold , m_fitMax);
+        hCharge->Fit(func, m_fitoption.c_str(), "", threshold, m_fitMax);
 
         if (func->GetNDF() < 2) { DummyFillBranch(LoadHisto); continue;}
 
@@ -618,6 +618,7 @@ namespace Belle2 {
     return;
   }
 
+  // cppcheck-suppress constParameter
   double TOPGainEfficiencyCalculatorModule::TOPGainFunc(double* var, double* par)
   {
 

@@ -16,6 +16,7 @@
 
 #include <numeric>
 #include <stdexcept>
+#include <optional>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;

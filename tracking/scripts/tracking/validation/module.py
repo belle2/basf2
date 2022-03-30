@@ -233,6 +233,12 @@ class TrackingValidationModule(basf2.Module):
 
         #: list of MC-track matches
         self.mc_matches = collections.deque()
+        #: list of MC-track matches, including matched charge
+        self.mc_charge_matches = collections.deque()
+        #: list of MC-track matches charge asymmetry
+        self.mc_charge_asymmetry = collections.deque()
+        #: list of MC-track matches charge asymmetry weights
+        self.mc_charge_asymmetry_weights = collections.deque()
         #: list of MC-track primaries
         self.mc_primaries = collections.deque()
         #: list of MC-track d0 values
@@ -355,6 +361,7 @@ class TrackingValidationModule(basf2.Module):
             isMatchedOrIsClone = is_matched or is_clone
             self.pr_clones_and_matches.append(isMatchedOrIsClone)
             self.pr_matches.append(is_matched)
+
             self.pr_fakes.append(not isMatchedOrIsClone)
 
             self.pr_omega_estimates.append(omega_estimate)
@@ -387,9 +394,26 @@ class TrackingValidationModule(basf2.Module):
             return
 
         multiplicity = mcTrackCands.getEntries()
+        multiplicity_primaries = multiplicity
+
+        # measure the charge asymmetry
+        n_matched_plus = 0
+        n_matched_minus = 0
 
         for mcTrackCand in mcTrackCands:
             is_matched = trackMatchLookUp.isMatchedMCRecoTrack(mcTrackCand)
+
+            relatedPRtrackCand = trackMatchLookUp.getRelatedPRRecoTrack(mcTrackCand)
+            if relatedPRtrackCand:
+                is_chargeMatched = trackMatchLookUp.isChargeMatched(relatedPRtrackCand)
+            else:
+                is_chargeMatched = 0
+
+            if is_chargeMatched:
+                if mcTrackCand.getChargeSeed() > 0:
+                    n_matched_plus += 1
+                else:
+                    n_matched_minus += 1
 
             hit_efficiency = trackMatchLookUp.getRelatedEfficiency(mcTrackCand)
             if math.isnan(hit_efficiency):
@@ -414,6 +438,7 @@ class TrackingValidationModule(basf2.Module):
             ndf = calc_ndf_from_det_hit_ids(det_hit_ids)
 
             self.mc_matches.append(is_matched)
+            self.mc_charge_matches.append(is_chargeMatched and is_matched)
             self.mc_primaries.append(is_primary(mcParticle))
             self.mc_hit_efficiencies.append(hit_efficiency)
             self.mc_pts.append(pt)
@@ -423,6 +448,17 @@ class TrackingValidationModule(basf2.Module):
             self.mc_theta.append(momentum.Theta())
             self.mc_phi.append(momentum.Phi())
             self.mc_ndf.append(ndf)
+            if not is_primary(mcParticle):
+                multiplicity_primaries -= 1
+
+        charge_asymmetry = (n_matched_plus - n_matched_minus)/(n_matched_plus + n_matched_minus)
+        for mcTrackCand in mcTrackCands:
+            if is_primary(mcParticle):
+                self.mc_charge_asymmetry.append(charge_asymmetry)
+                self.mc_charge_asymmetry_weights.append(1./multiplicity_primaries)
+            else:
+                self.mc_charge_asymmetry.append(0)
+                self.mc_charge_asymmetry_weights.append(0)
 
     def terminate(self):
         """Receive signal at the end of event processing"""
@@ -431,6 +467,12 @@ class TrackingValidationModule(basf2.Module):
 
         # Overall figures of merit #
         ############################
+
+        mc_matched_primaries = np.logical_and(self.mc_primaries, self.mc_matches)
+
+        charge_asymmetry = np.average(self.mc_charge_asymmetry, weights=self.mc_charge_asymmetry_weights)
+        charge_efficiency = np.average(self.mc_charge_matches, weights=mc_matched_primaries)
+        total_efficiency = np.average(self.mc_charge_matches, weights=self.mc_primaries)
         finding_efficiency = np.average(self.mc_matches, weights=self.mc_primaries)
         fake_rate = 1.0 - np.mean(self.pr_clones_and_matches)
         # can only be computed if there are entries
@@ -440,22 +482,27 @@ class TrackingValidationModule(basf2.Module):
         else:
             clone_rate = float('nan')
 
-        mc_matched_primaries = np.logical_and(self.mc_primaries, self.mc_matches)
         hit_efficiency = np.average(self.mc_hit_efficiencies, weights=mc_matched_primaries)
 
         figures_of_merit = ValidationFiguresOfMerit('%s_figures_of_merit'
                                                     % name)
+        figures_of_merit['total_efficiency'] = total_efficiency
         figures_of_merit['finding_efficiency'] = finding_efficiency
+        figures_of_merit['charge_efficiency'] = charge_efficiency
+        figures_of_merit['charge_asymmetry'] = charge_asymmetry
         figures_of_merit['fake_rate'] = fake_rate
         figures_of_merit['clone_rate'] = clone_rate
         figures_of_merit['hit_efficiency'] = hit_efficiency
 
         figures_of_merit.description = \
             """
-finding_efficiency - the ratio of matched Monte Carlo tracks to all Monte Carlo tracks <br/>
+finding_efficiency - the ratio of matched Monte Carlo tracks to all primary Monte Carlo tracks <br/>
+charge_efficiency - the ratio of matched Monte Carlo tracks with correct charge to matched primary Monte Carlo tracks <br/>
+total_efficiency - the ratio of matched Monte Carlo tracks with correct charge to all primary Monte Carlo tracks <br/>
 fake_rate - ratio of pattern recognition tracks that are not related to a particle
             (background, ghost) to all pattern recognition tracks <br/>
 clone_rate - ratio of clones divided the number of tracks that are related to a particle (clones and matches) <br/>
+
 """
         figures_of_merit.check = 'Compare for degradations with respect to the reference'
         figures_of_merit.contact = contact
@@ -470,8 +517,39 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         ######################
         plots = self.profiles_by_mc_parameters(self.mc_matches,
                                                'finding efficiency',
-                                               make_hist=False,
                                                weights=self.mc_primaries)
+
+        validation_plots.extend(plots)
+
+        # Fake rate (all tracks not matched or clone            #
+        # use TrackCand seeds for the fake track plotting       #
+        # as the fit (if successful) is probably not meaningful #
+        #########################################################
+        print('fake list: ' + str(self.pr_fakes.count(1)))
+        plots = self.profiles_by_pr_parameters(self.pr_fakes, 'fake rate',
+                                               make_hist=False)
+        validation_plots.extend(plots)
+
+        # Charge efficiency of matched primary tracks #
+        #######################################
+        plots = self.profiles_by_mc_parameters(self.mc_charge_matches,
+                                               'charge efficiency for matched primary tracks',
+                                               weights=mc_matched_primaries)
+
+        validation_plots.extend(plots)
+
+        # Finding & Charge efficiency of primary tracks #
+        #######################################
+        plots = self.profiles_by_mc_parameters(self.mc_charge_matches,
+                                               'finding and charge efficiency for primary tracks',
+                                               weights=self.mc_primaries)
+
+        # Charge asymmetry of primary tracks #
+        #######################################
+        plots = self.profiles_by_mc_parameters(self.mc_charge_asymmetry,
+                                               'charge asymmetry for primary tracks',
+                                               weights=self.mc_charge_asymmetry_weights,
+                                               is_asymmetry=True)
 
         validation_plots.extend(plots)
 
@@ -648,7 +726,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             'ndf',
         ],
         make_hist=True,
-        weights=None
+        weights=None,
+        is_asymmetry=False,
     ):
         """Create profile histograms by MC-track parameters"""
 
@@ -674,7 +753,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             profile_parameters,
             unit,
             make_hist,
-            weights=weights
+            weights=weights,
+            is_asymmetry=is_asymmetry
         )
 
     def profiles_by_pr_parameters(
@@ -714,6 +794,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         unit,
         make_hist,
         weights=None,
+        is_asymmetry=False,
     ):
         """Create profile histograms for generic parameters"""
 
@@ -767,7 +848,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                      lower_bound=lower_bound,
                                      upper_bound=upper_bound,
                                      y_binary=True,
-                                     is_expert=is_expert)
+                                     is_expert=is_expert,
+                                     is_asymmetry=is_asymmetry)
 
                 profile_plot.xlabel = compose_axis_label(parameter_name)
                 profile_plot.ylabel = compose_axis_label(quantity_name, unit)

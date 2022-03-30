@@ -162,8 +162,8 @@ void MillepedeCollectorModule::prepare()
   StoreObjPtr<EventMetaData> emd;
   emd.isRequired();
 
-  // StoreObjPtr<EventT0> eventT0;
-  //eventT0.isRequired();
+  StoreObjPtr<EventT0> eventT0;
+  eventT0.isOptional();
 
   if (m_tracks.empty() &&
       m_particles.empty() &&

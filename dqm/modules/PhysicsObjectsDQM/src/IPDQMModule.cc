@@ -29,10 +29,10 @@ IPDQMModule::IPDQMModule() : HistoModule()
   setDescription("Monitor the position and the size of the interaction point using mu+mu- events");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("Y4SPListName", m_Y4SPListName, "Name of the Y4S particle list", std::string("Upsilon(4S):IPDQM"));
-  addParam("onlineMode", m_onlineMode, "Mode of the online processing ('HLT' or 'ExpressReco')");
-  if (m_onlineMode == "HLT") {
+  addParam("onlineMode", m_onlineMode, "Mode of the online processing ('hlt' or 'expressreco')", std::string("expressreco"));
+  if (m_onlineMode == "hlt") {
     m_no_units = HLTUnits::max_hlt_units;
-  } else if (m_onlineMode == "ExpressReco") {
+  } else if (m_onlineMode == "expressreco") {
     m_no_units = ExpressRecoUnits::max_ereco_units;
   } else {
     if (Environment::Instance().getRealm() == LogConfig::c_Online)

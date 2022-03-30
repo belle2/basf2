@@ -1,6 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['generators_phokhara', 'generators_evtgen', 'generators',
-               'mdst_dataobjects', 'framework']
+env['LIBS'] = ['generators_phokhara', 'mdst_dataobjects', 'generators', 'framework']
 
 Return('env')

@@ -6,13 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-/* Own header. */
 #include <generators/modules/phokharainput/PhokharaInputModule.h>
 
-/* Generators headers. */
-#include <generators/evtgen/EvtGenUtilities.h>
-
-/* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/utilities/IOIntercept.h>
@@ -90,17 +85,9 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
   addParam("BeamEnergySpread", m_BeamEnergySpread,
            "Simulate beam-energy spread (initializes PHOKHARA for every "
            "event - very slow).", false);
+//   addParam("InputFile", m_InputFile, "File that contain input configuration", FileSystem::findFile("/data/generators/phokhara/input_9.1.dat"));
 
-  /* Parameters for combination of PHOKHARA and EvtGen. */
-  addParam("EvtGenCombination", m_EvtGenCombination,
-           "Whether to use combination of PHOKHARA and EvtGen.", false);
-  addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC).",
-           FileSystem::findFile(
-             "decfiles/dec/DECAY_BELLE2.DEC", true));
-  addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file.",
-           std::string(""));
 }
-
 
 //-----------------------------------------------------------------
 //                 Destructor
@@ -150,9 +137,7 @@ void PhokharaInputModule::initialize()
                               BeamParameters::c_smearBeam);
   }
   m_initial.initialize();
-  /* EvtGen initialziation. */
-  if (m_EvtGenCombination)
-    generators::initializeEvtGenDecayFile(m_DecFile);
+
 }
 
 //-----------------------------------------------------------------

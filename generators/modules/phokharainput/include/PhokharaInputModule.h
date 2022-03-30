@@ -85,15 +85,6 @@ namespace Belle2 {
     std::string m_ParameterFile; /**< file that holds all resonance parameters*/
     bool m_BeamEnergySpread; /**< Simulate beam-energy spread. */
 
-    /** Whether to use combination of PHOKHARA and EvtGen. */
-    bool m_EvtGenCombination;
-
-    /** Decay file. */
-    std::string m_DecFile;
-
-    /** User decay file. */
-    std::string m_UserDecFile;
-
     /** Variables */
     Phokhara m_generator;   /**< The Phokhara generator. */
     MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */

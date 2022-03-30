@@ -75,7 +75,8 @@ namespace Belle2 {
         storeAcceptedPath(newPath, allNodePaths);
 
         if (allNodePaths.size() > pathLimit) {
-          B2ERROR("Number of collected paths to large: skipping the event and not processing it.");
+          B2WARNING("Number of collected paths is too large: skipping the event and not processing it."
+                    << LogVar("Number of node paths", allNodePaths.size()) << LogVar("Current limit of paths", pathLimit));
           return false;
         }
       }

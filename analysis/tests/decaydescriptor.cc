@@ -583,20 +583,6 @@ namespace {
 
     EXPECT_EQ(dd.getSelectionParticles(D0).size(), 0);
 
-    // check not-selected-final particles which are used in KFit
-    std::vector<const Particle*> notSelectionFinalParticles = dd.getNotSelectionFinalParticles(B0);
-    EXPECT_EQ(notSelectionFinalParticles.size(), 2);
-    EXPECT_EQ(notSelectionFinalParticles[0], Kp);
-    EXPECT_EQ(notSelectionFinalParticles[1], pim2);
-
-    EXPECT_B2ERROR(dd.getNotSelectionFinalParticles(D0));
-    EXPECT_EQ(dd.getNotSelectionFinalParticles(D0).size(), 0);
-
-    EXPECT_B2WARNING(dd.getNotSelectionFinalParticles(pip));
-    EXPECT_B2WARNING(dd.getNotSelectionFinalParticles(Kp));
-    EXPECT_B2WARNING(dd.getNotSelectionFinalParticles(pim1));
-    EXPECT_B2WARNING(dd.getNotSelectionFinalParticles(pim2));
-
     DataStore::Instance().reset();
   }
 

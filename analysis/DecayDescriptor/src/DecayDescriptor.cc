@@ -321,48 +321,6 @@ vector<const Particle*> DecayDescriptor::getSelectionParticles(const Particle* p
   return selparticles;
 }
 
-vector<const Particle*> DecayDescriptor::getNotSelectionFinalParticles(const Particle* particle)
-{
-  // Create vector for output
-  vector<const Particle*> notSelFinalParticles;
-  int nDaughters_d = getNDaughters();
-  if (!m_mother.isSelected() and nDaughters_d == 0) {
-    int motherPDG = abs(particle->getPDGCode());
-    int decayDescriptorMotherPDG = abs(m_mother.getPDGCode());
-    if (motherPDG != decayDescriptorMotherPDG)
-      B2ERROR("The PDG code of the mother particle (" << motherPDG <<
-              ") does not match the PDG code of the DecayDescriptor mother (" << decayDescriptorMotherPDG <<
-              ")! Check the order of the decay string is the same you expect in the reconstructed Particles.");
-    notSelFinalParticles.push_back(particle);
-  }
-  for (int iDaughter_d = 0; iDaughter_d < nDaughters_d; ++iDaughter_d) {
-    // retrieve the particle daughter ID from this DecayDescriptor daughter
-    int iDaughter_p = m_daughters[iDaughter_d].getMatchedDaughter();
-    // If the particle daughter ID is below one, the match function was not called before
-    // or the match was ambiguous. In this case try to use the daughter ID of the DecayDescriptor.
-    // This corresponds to using the particle order in the decay string.
-    if (iDaughter_p < 0) iDaughter_p = iDaughter_d;
-    const Particle* daughter = particle->getDaughter(iDaughter_p);
-    if (!daughter) {
-      B2WARNING("Could not find daughter!");
-      continue;
-    }
-    // check if the daughter has the correct PDG code
-    int daughterPDG = abs(daughter->getPDGCode());
-    int decayDescriptorDaughterPDG = abs(m_daughters[iDaughter_d].getMother()->getPDGCode());
-    if (daughterPDG != decayDescriptorDaughterPDG) {
-      B2ERROR("The PDG code of the particle daughter (" << daughterPDG <<
-              ") does not match the PDG code of the DecayDescriptor daughter (" << decayDescriptorDaughterPDG <<
-              ")! Check the order of the decay string is the same you expect in the reconstructed Particles.");
-      break;
-    }
-    vector<const Particle*> notSelFinalDaughters = m_daughters[iDaughter_d].getNotSelectionFinalParticles(daughter);
-    notSelFinalParticles.insert(notSelFinalParticles.end(), notSelFinalDaughters.begin(), notSelFinalDaughters.end());
-  }
-  return notSelFinalParticles;
-}
-
-
 bool DecayDescriptor::isSelfConjugated() const
 {
 

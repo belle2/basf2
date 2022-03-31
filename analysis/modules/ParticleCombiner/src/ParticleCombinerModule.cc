@@ -66,7 +66,7 @@ namespace Belle2 {
              "    - D1, D2, ..., DN are attached as daughters of M\n\n"
              "  b) recoilParticleType = 2: \n\n"
              "    - the mother momentum is given by: p(M) = p(D1) - p(D2) - ... - p(DN)\n"
-             "    - D1, D2, ..., DN are attached as daughters of M\n\n" , 0);
+             "    - D1, D2, ..., DN are attached as daughters of M\n\n", 0);
     addParam("chargeConjugation", m_chargeConjugation,
              "If true, the charge-conjugated mode will be reconstructed as well", true);
     addParam("allowChargeViolation", m_allowChargeViolation,

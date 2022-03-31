@@ -239,8 +239,8 @@ namespace {
     for (auto* particle : v0maskParticlesUnpacked) {
       B2INFO("My pdg: " << particle->getPDGCode());
     }
-    EXPECT_FLOAT_EQ(v0maskParticles.size() , 5);
-    EXPECT_FLOAT_EQ(v0maskParticlesUnpacked.size() , 6);
+    EXPECT_FLOAT_EQ(v0maskParticles.size(), 5);
+    EXPECT_FLOAT_EQ(v0maskParticlesUnpacked.size(), 6);
   }
 
   TEST_F(ROETest, maskNamingConventions)

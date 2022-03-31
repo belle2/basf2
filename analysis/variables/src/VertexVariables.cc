@@ -311,7 +311,7 @@ namespace Belle2 {
       }
 
       const std::vector<char> names = {'x', 'y', 'z'};
-      const std::string prodVertS = Form("prodVertS%c%c", names[ielement] , names[jelement]);
+      const std::string prodVertS = Form("prodVertS%c%c", names[ielement], names[jelement]);
 
       return [prodVertS](const Particle * part) -> double {
         if (!part->hasExtraInfo(prodVertS)) return realNaN;

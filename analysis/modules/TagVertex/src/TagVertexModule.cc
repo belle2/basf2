@@ -597,7 +597,7 @@ namespace Belle2 {
     const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
     if (!roe) return fitParticles;
     //load all particles from the ROE
-    std::vector<const Particle*> ROEParticles = roe->getChargedParticles(m_roeMaskName, 0 , false);
+    std::vector<const Particle*> ROEParticles = roe->getChargedParticles(m_roeMaskName, 0, false);
     if (ROEParticles.size() == 0) return fitParticles;
 
     for (auto& ROEParticle : ROEParticles) {

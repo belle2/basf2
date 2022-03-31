@@ -60,12 +60,12 @@ namespace TreeFitter {
       m_posVec(0) = vertexVector.x();
       m_posVec(1) = vertexVector.y();
       m_posVec(2) = vertexVector.z();
-      m_covariance(0, 0) = covVertex(0 , 0);
-      m_covariance(1, 1) = covVertex(1 , 1);
-      m_covariance(2, 2) = covVertex(2 , 2);
-      m_covariance(1, 0) = covVertex(1 , 0);
-      m_covariance(2, 0) = covVertex(2 , 0);
-      m_covariance(2, 1) = covVertex(2 , 1);
+      m_covariance(0, 0) = covVertex(0, 0);
+      m_covariance(1, 1) = covVertex(1, 1);
+      m_covariance(2, 2) = covVertex(2, 2);
+      m_covariance(1, 0) = covVertex(1, 0);
+      m_covariance(2, 0) = covVertex(2, 0);
+      m_covariance(2, 1) = covVertex(2, 1);
 
     } else if (m_beamSpot && m_isBeamSpot && m_constraintDimension == 2) {
       m_covariance = Eigen::Matrix<double, 2, 2>::Zero(2, 2);
@@ -73,9 +73,9 @@ namespace TreeFitter {
       const TMatrixDSym& covVertex = m_beamSpot->getCovVertex();
       m_posVec(0) = vertexVector.x();
       m_posVec(1) = vertexVector.y();
-      m_covariance(0, 0) = covVertex(0 , 0);
-      m_covariance(1, 1) = covVertex(1 , 1);
-      m_covariance(1, 0) = covVertex(1 , 0);
+      m_covariance(0, 0) = covVertex(0, 0);
+      m_covariance(1, 1) = covVertex(1, 1);
+      m_covariance(1, 0) = covVertex(1, 0);
 
     } else if (!m_isBeamSpot && m_constraintDimension == 3) {
 

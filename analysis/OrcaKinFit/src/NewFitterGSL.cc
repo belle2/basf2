@@ -64,7 +64,7 @@ namespace Belle2 {
         permW(nullptr), eigenws(nullptr), eigenwsdim(0),
         chi2best(0), chi2new(0), chi2old(0), fvalbest(0),
         scale(0), scalebest(0), stepsize(0), stepbest(0),
-        scalevals{0}, fvals{0} ,
+        scalevals{0}, fvals{0},
         imerit(1),
         try2ndOrderCorr(true),
         debug(debuglevel)

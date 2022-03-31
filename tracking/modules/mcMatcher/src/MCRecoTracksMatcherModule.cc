@@ -388,8 +388,8 @@ void MCRecoTracksMatcherModule::event()
         totalWeight_by_mcId(mcId) += ndfForOneHit * mcWeight;
       } else {
         for (const auto& detId_hitId_pair_and_mcId : mcIds_for_detId_hitId_pair) {
-          WeightedRecoTrackId mcId = detId_hitId_pair_and_mcId.second;
-          double mcWeight = mcId.weight;
+          int mcId = detId_hitId_pair_and_mcId.second;
+          double mcWeight = detId_hitId_pair_and_mcId.second.weight;
           totalNDF_by_mcId(mcId) += ndfForOneHit;
           totalWeight_by_mcId(mcId) += ndfForOneHit * mcWeight;
         }
@@ -404,16 +404,16 @@ void MCRecoTracksMatcherModule::event()
 
       // Fill the confusion matrix
       for (const auto& detId_hitId_pair_and_prId : prIds_for_detId_hitId_pair) {
-        RecoTrackId prId = detId_hitId_pair_and_prId.second;
+        int prId = detId_hitId_pair_and_prId.second;
         if (mcIds_for_detId_hitId_pair.empty()) {
-          RecoTrackId mcId = mcBkgId;
+          int mcId = mcBkgId;
           double mcWeight = 1;
           confusionMatrix(prId, mcId) += ndfForOneHit;
           weightedConfusionMatrix(prId, mcId) += ndfForOneHit * mcWeight;
         } else {
           for (const auto& detId_hitId_pair_and_mcId : mcIds_for_detId_hitId_pair) {
-            WeightedRecoTrackId mcId = detId_hitId_pair_and_mcId.second;
-            double mcWeight = mcId.weight;
+            int mcId = detId_hitId_pair_and_mcId.second;
+            double mcWeight = detId_hitId_pair_and_mcId.second.weight;
             confusionMatrix(prId, mcId) += ndfForOneHit;
             weightedConfusionMatrix(prId, mcId) += ndfForOneHit * mcWeight;
           }

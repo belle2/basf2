@@ -163,7 +163,7 @@ void MillepedeCollectorModule::prepare()
   emd.isRequired();
 
   StoreObjPtr<EventT0> eventT0;
-  //eventT0.isRequired();
+  eventT0.isOptional();
 
   if (m_tracks.empty() &&
       m_particles.empty() &&
@@ -182,9 +182,9 @@ void MillepedeCollectorModule::prepare()
   }
 
   if (!m_particles.empty() || !m_vertices.empty() || !m_primaryVertices.empty()) {
-    StoreArray<RecoTrack> recoTracks;
-    StoreArray<Track> tracks;
-    StoreArray<TrackFitResult> trackFitResults;
+    // StoreArray<RecoTrack> recoTracks;
+    // StoreArray<Track> tracks;
+    // StoreArray<TrackFitResult> trackFitResults;
 
     //recoTracks.isRequired();
     //tracks.isRequired();

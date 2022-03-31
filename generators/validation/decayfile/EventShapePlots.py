@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# coding: utf-8
+# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -9,14 +9,16 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-###########################################
-# Plotting script to compare event shape
-# variables between two MC samples
-##########################################
+"""
+<header>
+    <input>MCvalidation.root</input>
+    <description>Comparing event shape variables</description>
+</header>
+"""
 
 from root_pandas import read_root
 import matplotlib.pyplot as plt
-import numpy as np
+# import numpy as np
 
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=["#7fcdbb", "#081d58"])
 
@@ -24,30 +26,30 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(color=["#7fcdbb", "#081d58"])
 def PlottingCompHistos(var):
     ''' Plotting function to create two histograms and the corresponding residuals '''
     # get unnormalised bin counts
-    raw, _, _ = plt.hist(new[var], bins=bins, range=range_dic[var])
-    raw2, outbins, _ = plt.hist(old[var], bins=bins, range=range_dic[var], histtype='step')
+    raw, _, _ = plt.hist(file[var], bins=bins, range=range_dic[var])
+    # raw2, outbins, _ = plt.hist(old[var], bins=bins, range=range_dic[var], histtype='step')
     plt.close()
 
     # plot normalised event shape histograms
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(5, 5), dpi=300, sharex=True, gridspec_kw={"height_ratios": [3.5, 1]})
-    count1, _, _ = ax1.hist(new[var], bins=bins, range=range_dic[var], density=True, label=label_new)
-    count2, outbins, _ = ax1.hist(old[var], bins=bins, range=range_dic[var], histtype='step', density=True, label=label_old)
+    count1, _, _ = ax1.hist(file[var], bins=bins, range=range_dic[var], density=True)
+    # count2, outbins, _ = ax1.hist(old[var], bins=bins, range=range_dic[var], histtype='step', density=True)
 
-    # calculate ratios
-    bin_centers = outbins[:-1] + np.diff(outbins) / 2
-    ratio = count1/count2
-    err = np.sqrt((1/raw)+(1/raw2))
+    # # calculate ratios
+    # bin_centers = outbins[:-1] + np.diff(outbins) / 2
+    # ratio = count1/count2
+    # err = np.sqrt((1/raw)+(1/raw2))
 
-    # plot residuals
-    ax2.errorbar(x=bin_centers, y=ratio, yerr=err, ls='', marker='_',  markersize='10', color="#4575b4")
-    ax2.axhline(1.0, alpha=0.3)
+    # # plot residuals
+    # ax2.errorbar(x=bin_centers, y=ratio, yerr=err, ls='', marker='_',  markersize='10', color="#4575b4")
+    # ax2.axhline(1.0, alpha=0.3)
 
-    # add labels and legend
-    ax1.legend()
-    ax2.set_xlabel(axis_dic[var])
-    ax2.set_ylabel(r'$\dfrac{New}{Old}$')
+    # # add labels and legend
+    # ax1.legend()
+    # ax2.set_xlabel(axis_dic[var])
+    # ax2.set_ylabel(r'$\dfrac{New}{Old}$')
     ax1.set_ylabel("Norm. Entries/Bin")
-    ax2.set_ylim(0.9, 1.1)
+    # ax2.set_ylim(0.9, 1.1)
 
     # save histograms
     fig.tight_layout()
@@ -58,11 +60,7 @@ def PlottingCompHistos(var):
 if __name__ == '__main__':
 
     # load in the two root files
-    new = read_root("MCvalidationR5.root", key="EventShape")
-    old = read_root("MCvalidationR4.root", key="EventShape")
-
-    label_new = 'Release 5'
-    label_old = 'Release 4'
+    file = read_root("MCvalidation.root", key="EventShape")
 
     bins = 25
 
@@ -87,7 +85,7 @@ if __name__ == '__main__':
         'cleoConeThrust8']
     all_list = FWM_list + HM_list + oth_list + cc_list
 
-    # define dictionaries for the ranges and axis-lables
+    # define dictionaries for the ranges and axis-labels
     range_dic = {'foxWolframR1': [0, 0.15],
                  'foxWolframR2': [0, 0.4],
                  'foxWolframR3': [0, 0.25],

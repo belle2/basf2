@@ -9,20 +9,17 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#############################################################
-# Steering file to create charged/mixed MC cdst files
-# needed for the DecayFile/Multiplicity validation
-#############################################################
+"""
+<header>
+    <output>charged.cdst.root</output>
+    <description>creating charged MC cdst files needed for the DecayFile/Multiplicity validation</description>
+</header>
+"""
 
 import basf2 as b2
 import generators as ge
 import simulation as si
-import L1trigger as l1
 import reconstruction as re
-
-# set MC type (charged or mixed) and output path
-MCtype = 'charged'
-outputpath = MCtype+'R4.cdst.root'
 
 # create path
 main = b2.create_path()
@@ -31,19 +28,16 @@ main = b2.create_path()
 main.add_module("EventInfoSetter", expList=1003, runList=0, evtNumList=2000)
 
 # generate BBbar events
-ge.add_evtgen_generator(path=main, finalstate=MCtype)
+ge.add_evtgen_generator(path=main, finalstate='charged')
 
 # detector simulation
 si.add_simulation(path=main)
-
-# trigger simulation
-l1.add_tsim(path=main)
 
 # reconstruction
 re.add_reconstruction(path=main, reconstruct_cdst='rawFormat')
 
 # finally add cdst output
-main.add_module('RootOutput', outputFileName=outputpath)
+main.add_module('RootOutput', outputFileName='charged.cdst.root')
 
 # process events and print call statistics
 b2.process(path=main)

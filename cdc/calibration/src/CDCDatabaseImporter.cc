@@ -59,7 +59,7 @@ using namespace Belle2;
 CDCDatabaseImporter::CDCDatabaseImporter(int fexp, int frun, int lexp, int lrun):
   m_firstExperiment(fexp), m_firstRun(frun), m_lastExperiment(lexp), m_lastRun(lrun)
 {
-  CDC::CDCGeometryPar& cdcgp = CDC::CDCGeometryPar::Instance();
+  const CDC::CDCGeometryPar& cdcgp = CDC::CDCGeometryPar::Instance();
   m_firstLayerOffset  = cdcgp.getOffsetOfFirstLayer();
   m_superLayerOffset  = cdcgp.getOffsetOfFirstSuperLayer();
   m_nSenseWires       = cdcgp.getNumberOfSenseWires();

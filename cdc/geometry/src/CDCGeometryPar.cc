@@ -377,9 +377,9 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   //Set various quantities (should be moved to CDC.xml later...)
   m_clockFreq4TDC = geom.getClockFrequency();
   const double officialClockFreq4TDC = 2 * m_clockSettings->getAcceleratorRF(); // in GHz
-  if (m_clockFreq4TDC != officialClockFreq4TDC) {
+  if (abs(m_clockFreq4TDC - officialClockFreq4TDC) / m_clockFreq4TDC > 1.e-4) {
     B2WARNING("ClockFreq4TDC changed from cdclocal " << scientific << setprecision(6) << m_clockFreq4TDC << " to official " <<
-              officialClockFreq4TDC << " (GHz)!");
+              officialClockFreq4TDC << " (GHz) (difference larger than 0.01%)");
     m_clockFreq4TDC = officialClockFreq4TDC;
   }
   B2DEBUG(100, "CDCGeometryPar: Clock freq. for TDC= " << m_clockFreq4TDC << " (GHz).");
@@ -1009,7 +1009,7 @@ void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
 
   unsigned short np = 0;
   unsigned short iCL, iLR;
-  double sigma[c_nSigmaParams];
+  double sigma[c_nSigmaParams]; // cppcheck-suppress constVariable
   double theta, alpha;
   unsigned nRead = 0;
 
@@ -1580,11 +1580,9 @@ void CDCGeometryPar::setFFactor()
   for (unsigned short id = 0; id < nEnt; ++id) {
     unsigned short np = ((*m_fFactorFromDB)->getFactors(id)).size();
     if (np != 3) B2FATAL("CDCGeometryPar:: No. of fudge factors != 3!");
-    if (groupId == 0) { //per all-layers
-      for (unsigned short i = 0; i < np; ++i) {
-        m_fudgeFactorForSigma[i] = ((*m_fFactorFromDB)->getFactors(id))[i];
-        B2DEBUG(29, i << " " << m_fudgeFactorForSigma[i]);
-      }
+    for (unsigned short i = 0; i < np; ++i) {
+      m_fudgeFactorForSigma[i] = ((*m_fFactorFromDB)->getFactors(id))[i];
+      B2DEBUG(29, i << " " << m_fudgeFactorForSigma[i]);
     }
   }
 

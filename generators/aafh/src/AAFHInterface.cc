@@ -30,13 +30,13 @@ extern "C" {
     return gRandom->Rndm();
   }
   /** Callback to show error if weights are not sufficient */
-  void aafhdiag36_esft_maxed_(double* weight)
+  void aafhdiag36_esft_maxed_(const double* weight)
   {
     B2ERROR("AAFH: Maximum weight to small, increase maxFinalWeight to at least "
             << *weight);
   }
   /** Callback to show error if weights are not sufficient */
-  void aafhdiag36_eswe_maxed_(double* weight)
+  void aafhdiag36_eswe_maxed_(const double* weight)
   {
     B2ERROR("AAFH: Maximum weight to small, increase maxSubGeneratorWeight to at least "
             << *weight);

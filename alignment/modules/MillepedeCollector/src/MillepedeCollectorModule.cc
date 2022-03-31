@@ -157,9 +157,6 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
 
 void MillepedeCollectorModule::prepare()
 {
-  StoreObjPtr<EventMetaData> emd;
-  emd.isRequired();
-
   m_eventT0.isOptional();
 
   if (m_tracks.empty() &&
@@ -256,9 +253,7 @@ void MillepedeCollectorModule::prepare()
 
 void MillepedeCollectorModule::collect()
 {
-  StoreObjPtr<EventMetaData> emd;
-  alignment::GlobalCalibrationManager::getInstance().preCollect(*emd);
-  StoreObjPtr<EventT0> eventT0;
+  alignment::GlobalCalibrationManager::getInstance().preCollect(*m_evtMetaData);
 
   if (!m_useGblTree) {
     // Open new file on request (at start or after being closed)
@@ -1024,12 +1019,11 @@ void MillepedeCollectorModule::storeTrajectory(gbl::GblTrajectory& trajectory)
 
 std::string MillepedeCollectorModule::getUniqueMilleName()
 {
-  StoreObjPtr<EventMetaData> emd;
   string name = getName();
 
-  name += "-e"   + to_string(emd->getExperiment());
-  name += "-r"   + to_string(emd->getRun());
-  name += "-ev"  + to_string(emd->getEvent());
+  name += "-e"   + to_string(m_evtMetaData->getExperiment());
+  name += "-r"   + to_string(m_evtMetaData->getRun());
+  name += "-ev"  + to_string(m_evtMetaData->getEvent());
 
   if (ProcHandler::parallelProcessingUsed())
     name += "-pid" + to_string(ProcHandler::EvtProcID());

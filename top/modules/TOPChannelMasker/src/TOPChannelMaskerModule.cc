@@ -126,6 +126,20 @@ namespace Belle2 {
         digit.setHitQuality(TOPDigit::c_Masked);
         continue;
       }
+      if (not m_savedAsicMask.isActive(slotID, channel)) {
+        digit.setHitQuality(TOPDigit::c_Masked);
+        const unsigned maxCount = 10; // at HLT this means (10 * number-of-processes) messages before being suppressed
+        if (m_errorCount < maxCount) {
+          B2ERROR("Unexpected hit found in a channel that is masked-out by firmware"
+                  << LogVar("slotID", slotID) << LogVar("channel", channel));
+        } else if (m_errorCount == maxCount) {
+          B2ERROR("Unexpected hit found in a channel that is masked-out by firmware"
+                  << LogVar("slotID", slotID) << LogVar("channel", channel)
+                  << LogVar("... message will be suppressed now, errorCount", m_errorCount));
+        }
+        m_errorCount++;
+        continue;
+      }
       if (m_maskUncalibratedChannelT0 and not m_channelT0->isCalibrated(slotID, channel)) {
         digit.setHitQuality(TOPDigit::c_Uncalibrated);
         continue;

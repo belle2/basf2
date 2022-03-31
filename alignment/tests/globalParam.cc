@@ -122,24 +122,24 @@ namespace {
     }
 
     // First a check, no interface called yet
-    EXPECT_EQ(interface1->hasBeenCalled() , 0);
-    EXPECT_EQ(interface2->hasBeenCalled() , 0);
-    EXPECT_EQ(interface3->hasBeenCalled() , 0);
+    EXPECT_EQ(interface1->hasBeenCalled(), 0);
+    EXPECT_EQ(interface2->hasBeenCalled(), 0);
+    EXPECT_EQ(interface3->hasBeenCalled(), 0);
 
     std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>> emptyResult;
 
     // Full vector accepted everything and calls all interfaces
     gpv.postReadFromResult(emptyResult);
-    EXPECT_EQ(interface1->hasBeenCalled() , 1);
-    EXPECT_EQ(interface2->hasBeenCalled() , 1); // only one more read due to uniqueness
-    EXPECT_EQ(interface3->hasBeenCalled() , 1);
+    EXPECT_EQ(interface1->hasBeenCalled(), 1);
+    EXPECT_EQ(interface2->hasBeenCalled(), 1);  // only one more read due to uniqueness
+    EXPECT_EQ(interface3->hasBeenCalled(), 1);
 
     // BeamSpot have interface 1 and interface 3 (added for any components configuration)
     // Interface 2 should not be stored/called in 'gpvComp'
     gpvComp.postReadFromResult(emptyResult);
-    EXPECT_EQ(interface1->hasBeenCalled() , 2);
-    EXPECT_EQ(interface2->hasBeenCalled() , 1);
-    EXPECT_EQ(interface3->hasBeenCalled() , 2);
+    EXPECT_EQ(interface1->hasBeenCalled(), 2);
+    EXPECT_EQ(interface2->hasBeenCalled(), 1);
+    EXPECT_EQ(interface3->hasBeenCalled(), 2);
 
     EXPECT_EQ(gpv.getGlobalParamSet<VXDAlignment>().isConstructed(), false);
     EXPECT_EQ(gpvComp.getGlobalParamSet<VXDAlignment>().isConstructed(), false);

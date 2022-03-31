@@ -422,16 +422,19 @@ namespace Belle2 {
 
                       Useful to identify intermediate resonances in a decay, which weren't reconstructed explicitly.
 
-                      Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= number of daughters).)DOC");
+                      Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= number of daughters).)DOC",
+                      "GeV/:math:`\\text{c}^2`");
     MAKE_DEPRECATED("daughterInvariantMass", false, "light-2203-zeus", R"DOC(
                      The variable `daughterInvM` provides exactly the same functionality.)DOC");
     REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass ,
-                      "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.");
+                      "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.",
+                      "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,
-                      "Angle in the mother's rest frame between the reverted CMS momentum vector and the direction of the i-th daughter");
+                      "Angle in the mother's rest frame between the reverted CMS momentum vector and the direction of the i-th daughter", "rad");
     REGISTER_VARIABLE("pointingAngle(i)", pointingAngle, R"DOC(
                       Angle between i-th daughter's momentum vector and vector connecting production and decay vertex of i-th daughter.
-                      This makes only sense if the i-th daughter has itself daughter particles and therefore a properly defined vertex.)DOC");
+                      This makes only sense if the i-th daughter has itself daughter particles and therefore a properly defined vertex.)DOC",
+                      "rad");
     REGISTER_VARIABLE("azimuthalAngleInDecayPlane(i, j)", azimuthalAngleInDecayPlane, R"DOC(
                       Azimuthal angle of i-th daughter in decay plane towards projection of particle momentum into decay plane.
 
@@ -461,11 +464,12 @@ namespace Belle2 {
                         \cos \psi &= \frac{\vec{M} \cdot \vec{L}}{|\vec{M}| \cdot |\vec{L}|} = \frac{-M \cdot L}{|\vec{M}| \cdot \sqrt{-L^2}}\\
                         |\vec{D1}| &= \sqrt{\frac{(D1 \cdot P)^2}{m^2_P} - m^2_{D1}}
 
-                      )DOC");
+                      )DOC", "rad");
 
-    REGISTER_VARIABLE("massDifference(i)", massDifference, "Difference in invariant masses of this particle and its i-th daughter");
+    REGISTER_VARIABLE("massDifference(i)", massDifference, "Difference in invariant masses of this particle and its i-th daughter",
+                      "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("massDifferenceError(i)", massDifferenceError,
-                      "Estimated uncertainty on difference in invariant masses of this particle and its i-th daughter");
+                      "Estimated uncertainty on difference in invariant masses of this particle and its i-th daughter", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("massDifferenceSignificance(i)", massDifferenceSignificance,
                       "Signed significance of the deviation from the nominal mass difference of this particle and its i-th daughter [(massDiff - NOMINAL_MASS_DIFF)/ErrMassDiff]");
 

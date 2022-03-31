@@ -67,6 +67,7 @@ double TTSPDF(double x, double time, double deltaT, double sigma1, double sigma2
 // 2 TTSPDF
 // 1 crystal ball PDF for the extra peak at +1 ns we don't understand
 // 1 gaussian to help modelling the tail
+// cppcheck-suppress constParameter
 double laserPDF(double* x, double* p)
 {
   double time = p[0];

@@ -261,7 +261,7 @@ double CDCDedxDQMModule::getIndexVal(int iWire, TString what)
 {
   //few hardcoded number
   //radius of each CDC layer
-  double r[56] = {
+  const double r[56] = {
     16.80,  17.80,  18.80,  19.80,  20.80,  21.80,  22.80,  23.80,
     25.70,  27.52,  29.34,  31.16,  32.98,  34.80,
     36.52,  38.34,  40.16,  41.98,  43.80,  45.57,

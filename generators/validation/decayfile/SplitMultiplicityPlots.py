@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# coding: utf-8
+# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -9,23 +9,24 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-#################################################################
-# Plotting script for comparing generated Kaon multiplicities
-# between two MC samples. In addition, the Kaons can be split up
-# by their charge and the B meson flavour they originate from.
-#################################################################
+"""
+<header>
+    <input>MCvalidation.root</input>
+    <description>Comparing generated kaon multiplicities, optionally split by charge and originating B meson flavor</description>
+</header>
+"""
 
 from root_pandas import read_root
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.gridspec as gridspec
-import matplotlib.ticker as ticker
+# import matplotlib.ticker as ticker
 
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=["#7fcdbb", "#081d58"])
 
 
 def PlottingCompHistos(particle, varlp, varlm, legend):
-    ''' Function to plot histograms of particle multiplicites'''
+    ''' Function to plot histograms of particle multiplicities'''
 
     nbins = int(range_dic[particle][1] - (range_dic[particle][0]))
 
@@ -37,55 +38,55 @@ def PlottingCompHistos(particle, varlp, varlm, legend):
     # create subplots
     ax1 = plt.subplot(gs[0, 1])
     ax2 = plt.subplot(gs[0, 0], sharey=ax1)
-    ax1b = plt.subplot(gs[1, 1], sharex=ax1)
-    ax2b = plt.subplot(gs[1, 0], sharex=ax2, sharey=ax1b)
+    # ax1b = plt.subplot(gs[1, 1], sharex=ax1)
+    # ax2b = plt.subplot(gs[1, 0], sharex=ax2, sharey=ax1b)
 
     # make axes that overlap invisible
     plt.setp(ax1.get_yticklabels(), visible=False)
-    plt.setp(ax1b.get_yticklabels(), visible=False)
-    plt.setp(ax1.get_xticklabels(), visible=False)
+    # plt.setp(ax1b.get_yticklabels(), visible=False)
     plt.setp(ax2.get_xticklabels(), visible=False)
+    # plt.setp(ax2b.get_xticklabels(), visible=False)
 
     # create histograms
     count = 0
     for varnp, varnm, leg in zip(varlp, varlm, legend):
         # get unnormalised bin counts
-        raw_p, _ = np.histogram(new[varnp], bins=nbins, range=range_dic[particle])
-        raw_p2, outbins = np.histogram(old[varnp], bins=nbins, range=range_dic[particle])
+        raw_p, _ = np.histogram(file[varnp], bins=nbins, range=range_dic[particle])
+        # raw_p2, outbins = np.histogram(old[varnp], bins=nbins, range=range_dic[particle])
 
-        raw_m, _ = np.histogram(new[varnm], bins=nbins, range=range_dic[particle])
-        raw_m2, outbins = np.histogram(old[varnm], bins=nbins, range=range_dic[particle])
+        raw_m, _ = np.histogram(file[varnm], bins=nbins, range=range_dic[particle])
+        # raw_m2, outbins = np.histogram(old[varnm], bins=nbins, range=range_dic[particle])
 
         # plot normalised multiplicity histograms
-        count1_p, _, _ = ax1.hist(new[varnp], bins=nbins, ls=lines[count], color=colors[count],
-                                  range=range_dic[particle], density=True, histtype='step', label=label_new+leg)
-        count2_p, outbins, _ = ax1.hist(old[varnp], ls=lines[count+1], bins=nbins, color=colors[count],
-                                        range=range_dic[particle], histtype='step',  density=True, label=label_old+leg)
+        count1_p, _, _ = ax1.hist(file[varnp], bins=nbins, ls=lines[count], color=colors[count],
+                                  range=range_dic[particle], density=True, histtype='step')
+        # count2_p, outbins, _ = ax1.hist(old[varnp], ls=lines[count+1], bins=nbins, color=colors[count],
+        #                                 range=range_dic[particle], histtype='step',  density=True)
 
-        count1_m, _, _ = ax2.hist(new[varnm], bins=nbins, ls=lines[count], color=colors[count],
-                                  range=range_dic[particle], density=True, histtype='step', label=label_new+leg)
-        count2_m, outbins, _ = ax2.hist(old[varnm], ls=lines[count+1], color=colors[count], bins=nbins,
-                                        range=range_dic[particle], histtype='step', fill=False, density=True, label=label_old+leg)
+        count1_m, _, _ = ax2.hist(file[varnm], bins=nbins, ls=lines[count], color=colors[count],
+                                  range=range_dic[particle], density=True, histtype='step')
+        # count2_m, outbins, _ = ax2.hist(old[varnm], ls=lines[count+1], color=colors[count], bins=nbins,
+        #                                 range=range_dic[particle], histtype='step', fill=False, density=True)
 
-        # calculate ratios
-        bin_centers = outbins[:-1] + np.diff(outbins) / 2
-        ratio_p = count1_p/count2_p
-        err_p = np.sqrt((1/raw_p)+(1/raw_p2))
-        ratio_m = count1_m/count2_m
-        err_m = np.sqrt((1/raw_m)+(1/raw_m2))
+        # # calculate ratios
+        # bin_centers = outbins[:-1] + np.diff(outbins) / 2
+        # ratio_p = count1_p/count2_p
+        # err_p = np.sqrt((1/raw_p)+(1/raw_p2))
+        # ratio_m = count1_m/count2_m
+        # err_m = np.sqrt((1/raw_m)+(1/raw_m2))
 
-        # plot residuals
-        ax1b.errorbar(x=bin_centers, y=ratio_p, yerr=err_p,
-                      color=colors[count],
-                      marker=markers[2*count],
-                      ls='',
-                      markersize=markers[2*count+1])
+        # # plot residuals
+        # ax1b.errorbar(x=bin_centers, y=ratio_p, yerr=err_p,
+        #               color=colors[count],
+        #               marker=markers[2*count],
+        #               ls='',
+        #               markersize=markers[2*count+1])
 
-        ax2b.errorbar(x=bin_centers, y=ratio_m, yerr=err_m,
-                      color=colors[count],
-                      ls='',
-                      marker=markers[2*count],
-                      markersize=markers[2*count+1])
+        # ax2b.errorbar(x=bin_centers, y=ratio_m, yerr=err_m,
+        #               color=colors[count],
+        #               ls='',
+        #               marker=markers[2*count],
+        #               markersize=markers[2*count+1])
 
         count += 1
 
@@ -94,21 +95,21 @@ def PlottingCompHistos(particle, varlp, varlm, legend):
     ax2.set_xlim(range_dic[particle][0] - 0.5, range_dic[particle][1] + 0.5)
     ax2.invert_xaxis()
 
-    # set a tick frequenzy equal to 1
-    ax1b.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
-    ax2b.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
+    # # set a tick frequency equal to 1
+    # ax1b.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
+    # ax2b.xaxis.set_major_locator(ticker.MultipleLocator(1.0))
 
-    # draw separating line and set residuals axis
-    ax1b.axhline(1.0, alpha=0.3)
-    ax2b.axhline(1.0, alpha=0.3)
-    ax1b.set_ylim(0.9, 1.1)
+    # # draw separating line and set residuals axis
+    # ax1b.axhline(1.0, alpha=0.3)
+    # ax2b.axhline(1.0, alpha=0.3)
+    # ax1b.set_ylim(0.9, 1.1)
 
-    # add some labels and titles
-    ax1b.set_xlabel(axisp_dic[particle])
-    ax2b.set_xlabel(axism_dic[particle])
-    ax2b.set_ylabel(r'$\dfrac{\mathrm{New}}{\mathrm{Old}}$')
+    # # add some labels and titles
+    # ax1b.set_xlabel(axisp_dic[particle])
+    # ax2b.set_xlabel(axism_dic[particle])
+    # ax2b.set_ylabel(r'$\dfrac{\mathrm{New}}{\mathrm{Old}}$')
     ax2.set_ylabel("Norm. Entries/Bin")
-    ax1.legend(frameon=False, fontsize='xx-small')
+    # ax1.legend(frameon=False, fontsize='xx-small')
 
     ax2.annotate(
         f"{B}", (0.02, 0.98), xytext=(4, -4), xycoords='axes fraction',
@@ -127,12 +128,9 @@ def PlottingCompHistos(particle, varlp, varlm, legend):
 if __name__ == '__main__':
 
     # load in the root files
-    new = read_root("MCvalidationR5.root", key="Split")
-    old = read_root("MCvalidationR4.root", key="Split")
+    file = read_root("MCvalidation.root", key="Split")
 
     B = 'charged'
-    label_new = 'R5'
-    label_old = 'R4'
 
     # define axis-label and range dictionaries
     axism_dic = {'Kpm': '$\\# K^{-}$',

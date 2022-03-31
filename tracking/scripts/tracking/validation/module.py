@@ -528,6 +528,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         print('fake list: ' + str(self.pr_fakes.count(1)))
         plots = self.profiles_by_pr_parameters(self.pr_fakes, 'fake rate',
                                                make_hist=False)
+
         validation_plots.extend(plots)
 
         # Charge efficiency of matched primary tracks #
@@ -543,6 +544,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         plots = self.profiles_by_mc_parameters(self.mc_charge_matches,
                                                'finding and charge efficiency for primary tracks',
                                                weights=self.mc_primaries)
+
+        validation_plots.extend(plots)
 
         # Charge asymmetry of primary tracks #
         #######################################
@@ -567,6 +570,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         plots = self.profiles_by_mc_parameters(self.mc_hit_efficiencies,
                                                'hit efficiency with matched tracks',
                                                weights=mc_matched_primaries)
+
         validation_plots.extend(plots)
 
         # Fit quality #

@@ -533,7 +533,7 @@ void SpaceResolutionCalibration::readSigmaFromText()
   unsigned nRead = 0;
 
   ifs >> m_sigmaParamMode_old >> np;
-  double sigma[8];
+  double sigma[8]; // cppcheck-suppress constVariable
   //  if (m_sigmaParamMode < 0 || m_sigmaParamMode > 1) cout<<"CDCGeometryPar: invalid sigma-parameterization mode read !"<<endl;
   //if (m_sigmaParamMode == 1) cout<<"CDCGeometryPar: sigma-parameterization mode=1 not ready yet"<<endl;
   //  if (np <= 0 || np > nSigmaParams) cout<<"CDCGeometryPar: no. of sigma-params. outside limits !"<<endl;

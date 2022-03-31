@@ -202,7 +202,7 @@ void DQMHistAnalysisEventT0Module::terminate()
 
 }
 
-
+// cppcheck-suppress constParameter
 double DQMHistAnalysisEventT0Module::fDoubleGaus(double* x, double* par)
 {
   double N = par[0];

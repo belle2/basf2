@@ -173,10 +173,9 @@ bool CDCDedxSkimModule::isGoodTrack(const Track* track, const Const::ChargedStab
   double trackPVal = fitResult->getPValue();
   double d0 = fitResult->getD0();
   double z0 = fitResult->getZ0();
-  int nCDCHits = recoTrack->getNumberOfTotalHits();
 
   // apply track quality cuts
-  if (trackPVal < 0.00001 || nCDCHits < 1 || std::abs(d0) <= 0.1 || std::abs(z0) <= 10) {
+  if (trackPVal < 0.00001 || std::abs(d0) <= 0.1 || std::abs(z0) <= 10) {
     return false;
   }
 

@@ -233,7 +233,7 @@ def add_udst_dump(path, print_untested=False):
                 "getExtraInfoNames",
                 "getExtraInfoMap",
                 "getExtraInfoSize",
-                "getMomentumScalingFactor",
+                "getEffectiveMomentumScale",
                 "print",
             ],
             {

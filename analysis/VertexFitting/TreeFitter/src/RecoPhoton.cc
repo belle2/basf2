@@ -30,7 +30,7 @@ namespace TreeFitter {
     m_useEnergy(useEnergy(*particle)),
     m_clusterPars(),
     m_covariance(),
-    m_momentumScalingFactor(particle->getMomentumScalingFactor())
+    m_momentumScalingFactor(particle->getEffectiveMomentumScale())
   {
     initParams() ;
   }

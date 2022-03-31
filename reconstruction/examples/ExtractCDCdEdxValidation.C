@@ -39,7 +39,7 @@ void ExtractCDCdEdxValidation(string filename = "fvalidatehadron_outfile.root") 
 		isRGdEdx  = kFALSE, isMeanSigmavsP = kFALSE;
 	}
 
-	int iList[TotalList + 1]  = {isRGBasic, isRGdEdx, isMeanSigmavsP, 0};
+	const int iList[TotalList + 1]  = {isRGBasic, isRGdEdx, isMeanSigmavsP, 0};
 	string iListName[TotalList + 1] = {"ARBasics", "PRdedx", "MeanSigmavsP", ""};
 
 	for ( unsigned int i = 0; iListName[i].length(); i++ ) {

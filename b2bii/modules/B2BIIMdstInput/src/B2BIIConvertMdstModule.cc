@@ -393,7 +393,7 @@ void B2BIIConvertMdstModule::convertBeamEnergy()
   ROOT::Math::PxPyPzEVector P_beam = P_her + P_ler;
 
   m_collisionBoostVector.setBoost(B2Vector3D(-P_beam.BoostToCM()), covariance);
-  m_collisionInvM.setMass(P_beam.M(), 0.0 , 0.0);
+  m_collisionInvM.setMass(P_beam.M(), 0.0, 0.0);
 
   B2DEBUG(99, "Beam Energy: E_HER = " << Eher << "; E_LER = " << Eler << "; angle = " << crossingAngle);
   B2DEBUG(99, "Beam Momentum (pre-convert) : P_X = " << p_beam.px() << "; P_Y = " << p_beam.py() << "; P_Z = " << p_beam.pz());
@@ -2023,8 +2023,8 @@ void B2BIIConvertMdstModule::testMCRelation(const Belle::Gen_hepevt& belleMC, co
     B2WARNING("[B2BIIConvertMdstModule] " << objectName << " matched to different MCParticle! " << bellePDGCode << " vs. " <<
               belleIIPDGCode);
 
-  double belleMomentum[]  = { belleMC.PX(), belleMC.PY(), belleMC.PZ() };
-  double belle2Momentum[] = { mcP->get4Vector().Px(),  mcP->get4Vector().Py(),  mcP->get4Vector().Pz() };
+  const double belleMomentum[]  = { belleMC.PX(), belleMC.PY(), belleMC.PZ() };
+  const double belle2Momentum[] = { mcP->get4Vector().Px(),  mcP->get4Vector().Py(),  mcP->get4Vector().Pz() };
 
   for (unsigned i = 0; i < 3; i++) {
     double relDev = (belle2Momentum[i] - belleMomentum[i]) / belleMomentum[i];

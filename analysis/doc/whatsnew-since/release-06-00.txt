@@ -6,7 +6,7 @@ Lepton ID Analysis Helper
 +++++++++++++++++++++++++
 
  * Added :func:`stdCharged.stdLep` helper to build standard lepton lists for a number of supported working
-   points and LID methods (Likelihood ratio or BDT, gloabl or binary). The helper also decorates the particles with the
+   points and LID methods (Likelihood ratio or BDT, global or binary). The helper also decorates the particles with the
    recommended Data/MC corrections and associated uncertainties for efficiency and fake rates, based on the chosen GT.
 
 Neutral Hadron Analysis Tool
@@ -49,21 +49,26 @@ Variables
    `mostcommonBTagIndex`.
  * Added the variable `TracksLBoostChi2`, which returns the change of the track positions in the boost direction after a vertex KFit
    in terms of a :math:`\chi^2` value.
- * Added `mostcommonBTagIndex` which returns the B meson index from which most FSP from a given reconstructed B meson candidate originated. Use case would be e.g. the FEI.
- * Added `percentageMissingParticlesBTag` which determines the percentage of FSP missed by using the `mostcommonBTagIndex` of the B meson.
- * Added `percentageWrongParticlesBTag` which gives the percentage of FSP reconstructed not originating from the `mostcommonBTagIndex`.
- * Added the variable `TracksLBoostChi2`, which returns the change of the track positions in the boost direction after a vertex KFit in terms of
-   a :math:`\chi^2` value.
- * Added new Flavor Tagger related meta-variables to use ROE-mask correctly, ``pMissTag``, ``cosTPTO``, ``ptTracksRoe``, ``pt2TracksRoe``,
-   ``isMajorityInRestOfEventFromB0``, ``isMajorityInRestOfEventFromB0bar``, ``hasRestOfEventTracks``, and ``isRelatedRestOfEventMajorityB0Flavor``.
-   Added an argument ``maskName`` to ``BtagToWBosonVariables``.
+ * Added `mostcommonBTagIndex` which returns the B meson index from which most FSP from a given reconstructed B meson candidate
+   originated. Use case would be e.g. the FEI.
+ * Added `percentageMissingParticlesBTag` which determines the percentage of FSP missed by using the `mostcommonBTagIndex` of the B
+   meson.
+ * Added `percentageWrongParticlesBTag` which gives the percentage of FSP reconstructed not originating from the
+   `mostcommonBTagIndex`.
+ * Added the variable `TracksLBoostChi2`, which returns the change of the track positions in the boost direction after a vertex KFit
+   in terms of a :math:`\chi^2` value.
+ * Added new Flavor Tagger related meta-variables to use ROE-mask correctly, ``pMissTag``, ``cosTPTO``, ``ptTracksRoe``,
+   ``pt2TracksRoe``, ``isMajorityInRestOfEventFromB0``, ``isMajorityInRestOfEventFromB0bar``, ``hasRestOfEventTracks``, and
+   ``isRelatedRestOfEventMajorityB0Flavor``. Added an argument ``maskName`` to ``BtagToWBosonVariables``.
+ * Added the variable `trackFitCovariance`, which returns the track fit covariance matrix element corresponding to the two provided
+   indices.
 
 Modules
 +++++++
 
- * The :b2:mod:`TrackingMomentum` module has been extended. Now the module can scale track momenta based on phase-space dependent
-   scaling factors given which are read from payloads according to parameters ``tableName`` and ``scalingFactorName``. The
-   corresponding wrapper function `scaleTrackMomenta` has been also extended accordingly.
+ * The :b2:mod:`TrackingMomentum` module has been extended. Now the module can scale and smear track momenta based on phase-space dependent
+   scaling and smearing factors which are read from payloads according to parameters ``payloadName``, ``scalingFactorName`` and ``scalingFactorName``. 
+   The corresponding wrapper functions `scaleTrackMomenta` and `smearTrackMomenta` have also been modified accordingly.
  * The :b2:mod:`HelixErrorScaler` has been extended to K_S0 that are reconstructed from V0. A new python function
    `stdV0s.scaleErrorKshorts` provides an alternative to the standard list ``K_S0:merged`` with a correction applied to the
    uncertainties of the K_S0 daughter helix parameters.

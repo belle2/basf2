@@ -86,10 +86,8 @@ namespace Belle2 {
         if (CPName.contains("Neutron")) neuProc = true;
       }
       */
-      if (m_trackID != track.GetTrackID()) {
-        //TrackID changed, store track informations
-        m_trackID = track.GetTrackID();
-      }
+      //set TrackID
+      m_trackID = track.GetTrackID();
 
       //Save Hit if track leaves volume or is killed
       if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {

@@ -60,7 +60,7 @@ extern"C" {
   void kw_getmomdec_(double* p1, double* p2, double* p3, double* p4);
   void kw_getxsecmc_(double* xSecMC, double* xErrMC);
 
-  void koralw_warning_ecm_(double* ecmconfig, double* ecm)
+  void koralw_warning_ecm_(const double* ecmconfig, const double* ecm)
   {
     B2WARNING("KORALW: Different center of mass energy in config file (obsolete), E=" << *ecmconfig << ", and from beam parameters, E="
               << *ecm);

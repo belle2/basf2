@@ -90,7 +90,7 @@ namespace Belle2 {
 
 
   private:
-    double interp(double* y, double x)
+    double interp(const double* y, double x)
     {
 
       double a = y[1] - y[0];

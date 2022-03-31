@@ -347,15 +347,15 @@ MassFitKFit::prepareInputMatrix() {
     m_V_al_1 = HepMatrix(KFitConst::kNumber7 * m_TrackCount, KFitConst::kNumber7 * m_TrackCount, 0);
     m_D      = m_V_al_1.sub(1, 1, 1, KFitConst::kNumber7 * m_TrackCount);
 
-  } else {
+  } else
+  {
     // m_FlagFitIncludingVertex == true
     int index = 0;
     m_al_0     = HepMatrix(KFitConst::kNumber7 * m_TrackCount + 3, 1, 0);
     m_property = HepMatrix(m_TrackCount, 3, 0);
     m_V_al_0   = HepSymMatrix(KFitConst::kNumber7 * m_TrackCount + 3, 0);
 
-    for (auto& track : m_Tracks)
-    {
+    for (auto& track : m_Tracks) {
       // momentum x,y,z and position x,y,z
       m_al_0[index * KFitConst::kNumber7 + 0][0] = track.getMomentum(KFitConst::kBeforeFit).x();
       m_al_0[index * KFitConst::kNumber7 + 1][0] = track.getMomentum(KFitConst::kBeforeFit).y();
@@ -382,8 +382,7 @@ MassFitKFit::prepareInputMatrix() {
     m_V_al_0.sub(KFitConst::kNumber7 * m_TrackCount + 1, m_BeforeVertexError);
 
     // error between track and track
-    if (m_FlagCorrelation)
-    {
+    if (m_FlagCorrelation) {
       this->prepareCorrelation();
       if (m_ErrorCode != KFitError::kNoError) {
         KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
@@ -489,17 +488,17 @@ MassFitKFit::prepareOutputMatrix() {
       pdata.setMomentum(HepLorentzVector(h3v, m_al_1[index * KFitConst::kNumber7 + 3][0]), KFitConst::kAfterFit);
     // position
     pdata.setPosition(HepPoint3D(
-      m_al_1[index * KFitConst::kNumber7 + 4][0],
-      m_al_1[index * KFitConst::kNumber7 + 5][0],
-      m_al_1[index * KFitConst::kNumber7 + 6][0]), KFitConst::kAfterFit);
+                        m_al_1[index * KFitConst::kNumber7 + 4][0],
+                        m_al_1[index * KFitConst::kNumber7 + 5][0],
+                        m_al_1[index * KFitConst::kNumber7 + 6][0]), KFitConst::kAfterFit);
     // error of the tracks
     pdata.setError(this->makeError3(pdata.getMomentum(),
-    m_V_al_1.sub(
-      index    * KFitConst::kNumber7 + 1,
-      (index + 1)*KFitConst::kNumber7,
-      index    * KFitConst::kNumber7 + 1,
-      (index + 1)*KFitConst::kNumber7), m_IsFixMass[index]),
-    KFitConst::kAfterFit);
+                                    m_V_al_1.sub(
+                                      index    * KFitConst::kNumber7 + 1,
+                                      (index + 1)*KFitConst::kNumber7,
+                                      index    * KFitConst::kNumber7 + 1,
+                                      (index + 1)*KFitConst::kNumber7), m_IsFixMass[index]),
+                   KFitConst::kAfterFit);
     if (m_ErrorCode != KFitError::kNoError) break;
     index++;
   }
@@ -525,7 +524,8 @@ MassFitKFit::prepareOutputMatrix() {
       else
         m_AfterTrackVertexError.push_back(hm);
     }
-  } else {
+  } else
+  {
     // not fit
     m_AfterVertex = m_BeforeVertex;
   }
@@ -550,9 +550,9 @@ MassFitKFit::makeCoreMatrix() {
       al_1_prime[i * KFitConst::kNumber7 + 0][0] -= a * (m_BeforeVertex.y() - al_1_prime[i * KFitConst::kNumber7 + 5][0]);
       al_1_prime[i * KFitConst::kNumber7 + 1][0] += a * (m_BeforeVertex.x() - al_1_prime[i * KFitConst::kNumber7 + 4][0]);
       energy[i] = sqrt(al_1_prime[i * KFitConst::kNumber7 + 0][0] * al_1_prime[i * KFitConst::kNumber7 + 0][0] +
-      al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
-      al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
-      m_property[i][1] * m_property[i][1]);
+                       al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
+                       al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
+                       m_property[i][1] * m_property[i][1]);
     }
 
     for (int i = 0; i < m_TrackCount; i++) {
@@ -599,7 +599,8 @@ MassFitKFit::makeCoreMatrix() {
       }
     }
 
-  } else {
+  } else
+  {
 
     // m_FlagFitIncludingVertex == true
     HepMatrix al_1_prime(m_al_1);
@@ -607,22 +608,20 @@ MassFitKFit::makeCoreMatrix() {
     double energy[KFitConst::kMaxTrackCount2];
     double a;
 
-    for (int i = 0; i < m_TrackCount; i++)
-    {
+    for (int i = 0; i < m_TrackCount; i++) {
       a = m_property[i][2];
       al_1_prime[i * KFitConst::kNumber7 + 0][0] -= a * (al_1_prime[KFitConst::kNumber7 * m_TrackCount + 1][0] - al_1_prime[i *
-      KFitConst::kNumber7 + 5][0]);
+                                                         KFitConst::kNumber7 + 5][0]);
       al_1_prime[i * KFitConst::kNumber7 + 1][0] += a * (al_1_prime[KFitConst::kNumber7 * m_TrackCount + 0][0] - al_1_prime[i *
-      KFitConst::kNumber7 + 4][0]);
+                                                         KFitConst::kNumber7 + 4][0]);
       energy[i] = sqrt(al_1_prime[i * KFitConst::kNumber7 + 0][0] * al_1_prime[i * KFitConst::kNumber7 + 0][0] +
-      al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
-      al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
-      m_property[i][1] * m_property[i][1]);
+                       al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
+                       al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
+                       m_property[i][1] * m_property[i][1]);
       Sum_al_1[6][0] = + a;
     }
 
-    for (int i = 0; i < m_TrackCount; i++)
-    {
+    for (int i = 0; i < m_TrackCount; i++) {
       if (energy[i] == 0) {
         m_ErrorCode = KFitError::kDivisionByZero;
         KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
@@ -646,8 +645,7 @@ MassFitKFit::makeCoreMatrix() {
       - Sum_al_1[1][0] * Sum_al_1[1][0] - Sum_al_1[2][0] * Sum_al_1[2][0]
       - m_InvariantMass * m_InvariantMass;
 
-    for (int i = 0; i < m_TrackCount; i++)
-    {
+    for (int i = 0; i < m_TrackCount; i++) {
       if (energy[i] == 0) {
         m_ErrorCode = KFitError::kDivisionByZero;
         KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);

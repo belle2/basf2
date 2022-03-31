@@ -644,7 +644,7 @@ namespace Belle2 {
         for (auto roeParticle : particles)
         {
           if (roeParticle->getParticleSource() == Particle::c_Composite or
-          roeParticle->getParticleSource() == Particle::c_V0) {
+              roeParticle->getParticleSource() == Particle::c_V0) {
             result++;
           }
         }
@@ -1770,7 +1770,8 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        } else {
+        } else
+        {
           return std::numeric_limits<float>::quiet_NaN();
         }
       };
@@ -1825,7 +1826,8 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        } else {
+        } else
+        {
           return std::numeric_limits<float>::quiet_NaN();
         }
       };

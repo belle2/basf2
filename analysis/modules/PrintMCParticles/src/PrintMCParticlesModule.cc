@@ -47,7 +47,7 @@ namespace {
       {MCParticle::c_IsPHOTOSPhoton, "IsPHOTOSPhoton"},
     };
     std::vector<std::string> set;
-    for (auto && [status, name] : names) {
+    for (auto&& [status, name] : names) {
       if (mc.hasStatus(status)) set.emplace_back(name);
     }
     return boost::join(set, ", ");
@@ -88,9 +88,9 @@ namespace {
       {152, "LeptonAtRest"},
       {161, "ChargeExchange"},
       {210, "RadioactiveDecay"},
-      {201, "Decay"} ,
-      {202, "Decay_WithSpin"} ,
-      {203, "Decay_PionMakeSpin"} ,
+      {201, "Decay"},
+      {202, "Decay_WithSpin"},
+      {203, "Decay_PionMakeSpin"},
       {210, "Decay_Radioactive"},
       {211, "Decay_Unknown"},
       {221, "Decay_MuAtom "},

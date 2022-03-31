@@ -11,6 +11,8 @@
 #include <analysis/dataobjects/Particle.h>
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/dataobjects/EventT0.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/geometry/B2Vector3.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -179,6 +181,12 @@ namespace Belle2 {
 
     /** Current vector of GBL data from trajectory to be stored in a tree */
     std::vector<gbl::GblData> m_currentGblData{};
+
+    /** Optional input for EventT0 */
+    StoreObjPtr<EventT0> m_eventT0;
+
+    /** Required object pointer to EventMetaData */
+    StoreObjPtr<EventMetaData> m_evtMetaData;
 
     /** Update mass and width of the particle (mother in list) with user custom-defined values */
     void updateMassWidthIfSet(std::string listName, double& mass, double& width);

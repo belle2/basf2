@@ -523,7 +523,7 @@ namespace Belle2 {
         if (bevt->ExpMC() == 1) energy = Belle::BeamEnergy::E_beam2();
         if (bevt->ExpMC() == 2) {
           if (m_benergy_mcdb == 0) return energy;    //energy = 5.290000;
-          if (m_benergy_mcdb != 0) energy = Belle::BeamEnergy::E_beam2();
+          else energy = Belle::BeamEnergy::E_beam2();
         }
         return energy;
       }

@@ -36,7 +36,7 @@ extern "C" {
    * @param drvec array to store the random numbers
    * @param lenght size of the array
    */
-  void varran_(double* drvec, int* lengt)
+  void varran_(double* drvec, const int* lengt)
   {
     for (int i = 0; i < *lengt; ++i) {
       do {

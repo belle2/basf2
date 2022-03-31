@@ -1009,7 +1009,7 @@ void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
 
   unsigned short np = 0;
   unsigned short iCL, iLR;
-  double sigma[c_nSigmaParams];
+  double sigma[c_nSigmaParams]; // cppcheck-suppress constVariable
   double theta, alpha;
   unsigned nRead = 0;
 
@@ -1580,11 +1580,9 @@ void CDCGeometryPar::setFFactor()
   for (unsigned short id = 0; id < nEnt; ++id) {
     unsigned short np = ((*m_fFactorFromDB)->getFactors(id)).size();
     if (np != 3) B2FATAL("CDCGeometryPar:: No. of fudge factors != 3!");
-    if (groupId == 0) { //per all-layers
-      for (unsigned short i = 0; i < np; ++i) {
-        m_fudgeFactorForSigma[i] = ((*m_fFactorFromDB)->getFactors(id))[i];
-        B2DEBUG(29, i << " " << m_fudgeFactorForSigma[i]);
-      }
+    for (unsigned short i = 0; i < np; ++i) {
+      m_fudgeFactorForSigma[i] = ((*m_fFactorFromDB)->getFactors(id))[i];
+      B2DEBUG(29, i << " " << m_fudgeFactorForSigma[i]);
     }
   }
 

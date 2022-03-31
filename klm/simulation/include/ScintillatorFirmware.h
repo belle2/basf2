@@ -46,7 +46,7 @@ namespace Belle2 {
        * @param[out] fitData   Fit data.
        * @return Fit status.
        */
-      enum ScintillatorFirmwareFitStatus fit(int* amp, int threshold, KLMScintillatorFirmwareFitResult* fitData);
+      enum ScintillatorFirmwareFitStatus fit(const int* amp, int threshold, KLMScintillatorFirmwareFitResult* fitData);
 
     private:
 

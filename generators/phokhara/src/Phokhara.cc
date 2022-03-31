@@ -41,7 +41,7 @@ extern "C" {
    * @param drvec array to store the random numbers
    * @param lenght size of the array
    */
-  void phokhara_rndmarray(double* drvec, int* lengt)
+  void phokhara_rndmarray(double* drvec, const int* lengt)
   {
     for (int i = 0; i < *lengt; ++i) {
       drvec[i] = gRandom->Rndm();
@@ -56,19 +56,19 @@ extern "C" {
   void phokhara_set_parameter_file(const char* paramfilename);
 
   /** Callback to show error if event is rejected*/
-  void phokhara_error_trials_(double* trials)
+  void phokhara_error_trials_(const double* trials)
   {
     B2ERROR("PHOKHARA: Event rejected! Number of maximal trials (" << *trials << " << exceeded");
   }
 
   /** Callback to show warning if weight is larger than maxweight*/
-  void phokhara_warning_weight_(int* photmult, double* weight, double* max)
+  void phokhara_warning_weight_(const int* photmult, const double* weight, const double* max)
   {
     B2WARNING("PHOKHARA: Event weight (" << *weight <<  ") exceeds limit (" << *max << "), photon multiplicity: " << *photmult);
   }
 
   /** Callback to show warning if weight is negative*/
-  void phokhara_warning_negweight_(int* photmult, double* weight)
+  void phokhara_warning_negweight_(const int* photmult, const double* weight)
   {
     B2WARNING("PHOKHARA: Event weight (" << *weight <<  ") is negative, photon multiplicity: " << *photmult);
   }

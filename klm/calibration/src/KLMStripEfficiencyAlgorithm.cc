@@ -159,7 +159,7 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
 }
 
 int KLMStripEfficiencyAlgorithm::Results::newMeasuredPlanes(
-  float* efficiency) const
+  const float* efficiency) const
 {
   const int nPlanes = KLMPlaneArrayIndex::Instance().getNElements();
   int newPlanes = 0;
@@ -171,7 +171,7 @@ int KLMStripEfficiencyAlgorithm::Results::newMeasuredPlanes(
 }
 
 int KLMStripEfficiencyAlgorithm::Results::newExtHitsPlanes(
-  int* extHitsPlane) const
+  const int* extHitsPlane) const
 {
   const int nPlanes = KLMPlaneArrayIndex::Instance().getNElements();
   int newPlanes = 0;

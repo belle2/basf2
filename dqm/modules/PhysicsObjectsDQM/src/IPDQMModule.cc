@@ -55,7 +55,7 @@ void IPDQMModule::defineHisto()
   m_h_y->SetXTitle("IP_coord. Y [cm]");
   m_h_z = new TH1F("Y4S_Vertex.Z", "IP position - coord. Z", 2000, -2, 2);
   m_h_z->SetXTitle("IP_coord. Z [cm]");
-  if (m_onlineMode == 'expressreco') {
+  if (m_onlineMode == "expressreco") {
     m_h_px = new TH1F("Y4S_Vertex.pX", "Total momentum in lab. frame - coord. X", 100, -2, 2);
     m_h_px->SetXTitle("pX [GeV/c]");
     m_h_py = new TH1F("Y4S_Vertex.pY", "Total momentum in lab. frame - coord. Y", 100, -2, 2);
@@ -113,7 +113,7 @@ void IPDQMModule::beginRun()
   m_h_x->Reset();
   m_h_y->Reset();
   m_h_z->Reset();
-  if (m_onlineMode == 'expressreco') {
+  if (m_onlineMode == "expressreco") {
     m_h_pull->Reset();
     m_h_temp->Reset();
     m_h_y_risol->Reset();
@@ -145,7 +145,7 @@ void IPDQMModule::endRun()
   m_h_x->GetXaxis()->SetRangeUser(m_h_x->GetMean(1) - 5 * m_h_x->GetRMS(1), m_h_x->GetMean(1) + 5 * m_h_x->GetRMS(1));
   m_h_y->GetXaxis()->SetRangeUser(m_h_y->GetMean(1) - 5 * m_h_y->GetRMS(1), m_h_y->GetMean(1) + 5 * m_h_y->GetRMS(1));
   m_h_z->GetXaxis()->SetRangeUser(m_h_z->GetMean(1) - 5 * m_h_z->GetRMS(1), m_h_z->GetMean(1) + 5 * m_h_z->GetRMS(1));
-  if (m_onlineMode == 'expressreco') {
+  if (m_onlineMode == "expressreco") {
     m_h_xy->GetXaxis()->SetRangeUser(m_h_xy->GetMean(1) - 5 * m_h_xy->GetRMS(1), m_h_xy->GetMean(1) + 5 * m_h_xy->GetRMS(1));
     m_h_xz->GetXaxis()->SetRangeUser(m_h_xz->GetMean(1) - 5 * m_h_xz->GetRMS(1), m_h_xz->GetMean(1) + 5 * m_h_xz->GetRMS(1));
     m_h_yz->GetXaxis()->SetRangeUser(m_h_yz->GetMean(1) - 5 * m_h_yz->GetRMS(1), m_h_yz->GetMean(1) + 5 * m_h_yz->GetRMS(1));
@@ -190,7 +190,7 @@ void IPDQMModule::event()
       m_h_y->Fill(IPVertex.Y());
       m_h_z->Fill(IPVertex.Z());
 
-      if (m_onlineMode == 'expressreco') {
+      if (m_onlineMode == "expressreco") {
         m_h_xy->Fill(IPVertex.X()*IPVertex.Y());
         m_h_xz->Fill(IPVertex.X()*IPVertex.Z());
         m_h_yz->Fill(IPVertex.Y()*IPVertex.Z());

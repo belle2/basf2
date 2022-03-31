@@ -22,6 +22,7 @@ Vertex Fitting
  * Added a new fit-type option ``recoilmass`` to function :func:`vertex.kFit`. The kinematic fit is performed with a constraint
    of a recoil mass specified by the option ``recoilMass``.
  * Fixed a bug in ``fourC`` and ``massfourC`` kfit. The mass of final-state particles were not fixed in old version.
+ * Fixed the calculation of kinematics after vertex KFit with selected particles. Disabled the feature of selecting fit particles for KFit except for vertex fit.
 
 Variables
 +++++++++

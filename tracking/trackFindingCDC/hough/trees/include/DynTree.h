@@ -214,8 +214,8 @@ namespace Belle2 {
 
     public:
       /// Constructor taking properties with which the top node of the tree is initialised.
-      DynTree(const Properties& properties,
-              const SubPropertiesFactory& subPropertiesFactory = SubPropertiesFactory()) :
+      explicit DynTree(const Properties& properties,
+                       const SubPropertiesFactory& subPropertiesFactory = SubPropertiesFactory()) :
         m_subPropertiesFactory(subPropertiesFactory),
         m_topNode(properties),
         m_children()
@@ -264,7 +264,8 @@ namespace Belle2 {
           if (nNodesByLevel.count(node->getLevel()) == 0)
           {
             nNodesByLevel[node->getLevel()] = 1;
-          } else {
+          } else
+          {
             nNodesByLevel[node->getLevel()]++;
           }
           return true;

@@ -86,7 +86,7 @@ namespace Belle2 {
 
 
     /// Prints information about all paths provided in a vector of paths
-    static std::string printPaths(std::vector<Path>& allPaths)
+    static std::string printPaths(const std::vector<Path>& allPaths)
     {
       std::stringstream out;
       unsigned int longestPath = 0, longesPathIndex = 0, index = 0;

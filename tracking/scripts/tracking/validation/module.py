@@ -407,7 +407,7 @@ class TrackingValidationModule(basf2.Module):
             if relatedPRtrackCand:
                 is_chargeMatched = trackMatchLookUp.isChargeMatched(relatedPRtrackCand)
             else:
-                is_chargeMatched = 0
+                is_chargeMatched = False
 
             if is_chargeMatched:
                 if mcTrackCand.getChargeSeed() > 0:
@@ -472,7 +472,7 @@ class TrackingValidationModule(basf2.Module):
 
         charge_asymmetry = np.average(self.mc_charge_asymmetry, weights=self.mc_charge_asymmetry_weights)
         charge_efficiency = np.average(self.mc_charge_matches, weights=mc_matched_primaries)
-        total_efficiency = np.average(self.mc_charge_matches, weights=self.mc_primaries)
+        finding_charge_efficiency = np.average(self.mc_charge_matches, weights=self.mc_primaries)
         finding_efficiency = np.average(self.mc_matches, weights=self.mc_primaries)
         fake_rate = 1.0 - np.mean(self.pr_clones_and_matches)
         # can only be computed if there are entries
@@ -486,7 +486,7 @@ class TrackingValidationModule(basf2.Module):
 
         figures_of_merit = ValidationFiguresOfMerit('%s_figures_of_merit'
                                                     % name)
-        figures_of_merit['total_efficiency'] = total_efficiency
+        figures_of_merit['finding_charge_efficiency'] = finding_charge_efficiency
         figures_of_merit['finding_efficiency'] = finding_efficiency
         figures_of_merit['charge_efficiency'] = charge_efficiency
         figures_of_merit['charge_asymmetry'] = charge_asymmetry
@@ -498,7 +498,7 @@ class TrackingValidationModule(basf2.Module):
             """
 finding_efficiency - the ratio of matched Monte Carlo tracks to all primary Monte Carlo tracks <br/>
 charge_efficiency - the ratio of matched Monte Carlo tracks with correct charge to matched primary Monte Carlo tracks <br/>
-total_efficiency - the ratio of matched Monte Carlo tracks with correct charge to all primary Monte Carlo tracks <br/>
+finding_charge_efficiency - the ratio of matched Monte Carlo tracks with correct charge to all primary Monte Carlo tracks <br/>
 fake_rate - ratio of pattern recognition tracks that are not related to a particle
             (background, ghost) to all pattern recognition tracks <br/>
 clone_rate - ratio of clones divided the number of tracks that are related to a particle (clones and matches) <br/>
@@ -517,6 +517,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         ######################
         plots = self.profiles_by_mc_parameters(self.mc_matches,
                                                'finding efficiency',
+                                               make_hist=False,
                                                weights=self.mc_primaries)
 
         validation_plots.extend(plots)

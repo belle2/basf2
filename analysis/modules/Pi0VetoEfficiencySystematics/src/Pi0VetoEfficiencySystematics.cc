@@ -66,8 +66,8 @@ void Pi0VetoEfficiencySystematicsModule::initialize()
     B2ERROR("Invalid input decay string: " << m_decayString);
   }
 
-  if (m_threshold < 0.5 || 0.99 < m_threshold) {
-    B2ERROR("Please provide pi0veto threshold from 0.50 to 0.99 for Pi0VetoEfficiencySystematicsModule");
+  if (m_threshold < 0.1 || 0.99 < m_threshold) {
+    B2ERROR("Please provide pi0veto threshold from 0.10 to 0.99 for Pi0VetoEfficiencySystematicsModule");
   }
 
   //Table is identified with mode and threshold

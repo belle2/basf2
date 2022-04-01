@@ -826,14 +826,14 @@ Decay B0
 
 # b -> s gamma
 #
-0.000041770   K*0  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000000440   omega  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;
-0.000000860   rho0  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.;
-0.000043000   K_10  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;
-0.000006500   K'_10  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;  #Upper limit is 1.2e-6. #[Comment - PG 03/2022]
-0.000012370   K_2*0  gamma                                 HELAMP 1.0 0.0 1.0 0.0;      #[BF update - PG 09/2020]
-0.000001700   K''*0  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;  #Upper limit is 2e-3. #[Comment - PG 03/2022]
-0.000242360   Xsd  gamma                                   BTOXSGAMMA 2 ;               #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2016]
+0.000041770   K*0  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000000440   omega  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000000860   rho0  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.;  #[BF update - PG 04/2022]
+0.000043000   K_10  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 5.8e-5. #[Comment - PG 04/2022]
+0.000006500   K'_10  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 1.2e-6. #[Comment - PG 04/2022]
+0.000012370   K_2*0  gamma                                 HELAMP 1.0 0.0 1.0 0.0;     #[BF update - PG 04/2022]
+0.000001700   K''*0  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 2e-3. #[Comment - PG 04/2022]
+0.000242360   Xsd  gamma                                   BTOXSGAMMA 2 ;              #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2022]
 
 # Do not include to avoid double counting with higher K states.
 #0.000004600   K+  pi-  gamma                                PHSP; #Commented out as this double counts the K*2_0 decaying into Kpi.
@@ -2584,14 +2584,14 @@ Decay anti-B0
 
 # b -> s gamma
 #
-0.000041770   anti-K*0  gamma                              SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 09/2020]
-0.000000440   omega  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;
-0.000000860   rho0  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.;
-0.000043000   anti-K_10  gamma                             SVP_HELAMP 1.0 0.0 1.0 0.0;
-0.000006500   anti-K'_10  gamma                            SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 1.2e-6. #[Comment - PG 03/2022]
-0.000012370   anti-K_2*0  gamma                            HELAMP 1.0 0.0 1.0 0.0;     #[BF update - PG 09/2020]
-0.000001700   anti-K''*0  gamma                            SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 2e-3. #[Comment - PG 03/2022]
-0.000242360   anti-Xsd  gamma                              BTOXSGAMMA 2 ;              #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2016]
+0.000041770   anti-K*0  gamma                              SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]                                      
+0.000000440   omega  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000000860   rho0  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.;  #[BF update - PG 04/2022]
+0.000043000   anti-K_10  gamma                             SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 5.8e-5. #[Comment - PG 04/2022]
+0.000006500   anti-K'_10  gamma                            SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 1.2e-6. #[Comment - PG 04/2022]                
+0.000012370   anti-K_2*0  gamma                            HELAMP 1.0 0.0 1.0 0.0;     #[BF update - PG 04/2022]                                      
+0.000001700   anti-K''*0  gamma                            SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 2e-3. #[Comment - PG 04/2022]                  
+0.000242360   anti-Xsd  gamma                              BTOXSGAMMA 2 ;              #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2022]
 
 # Do not include to avoid double counting with higher K states.
 #0.000004600  K-  pi+  gamma                                PHSP; #Commented out as this double counts the K*2_0 decaying into Kpi.
@@ -4267,14 +4267,14 @@ Decay B+
 
 # b -> s gamma
 #
-0.000039180   K*+  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000043800   K_1+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000013770   K_2*+  gamma                                 HELAMP 1.0 0.0 1.0 0.0;      #[BF update - PG 09/2020]
-0.000000980   rho+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;  #[PDG2016]
-0.000009700   K'_1+  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000027100   K'*+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000066700   K''*+  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000147770   Xsu  gamma                                   BTOXSGAMMA 2;                #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2016]
+0.000039180   K*+  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000043800   K_1+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000013770   K_2*+  gamma                                 HELAMP 1.0 0.0 1.0 0.0;     #[BF update - PG 04/2022]
+0.000000980   rho+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000009700   K'_1+  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000027100   K'*+  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000066700   K''*+  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000147770   Xsu  gamma                                   BTOXSGAMMA 2;               #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[BF update - PG 04/2022]
 
 # Do not include K pi pi gamma and K*0 pi gamma to avoid double counting with higher K states.
 #0.000007600   K+  pi-  pi+  gamma                          PHSP;
@@ -5775,14 +5775,14 @@ Decay B-
 
 # b -> s gamma
 #
-0.000039180   K*-  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000043800   K_1-  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000013770   K_2*-  gamma                                 HELAMP 1.0 0.0 1.0 0.0;      #[BF update - PG 09/2020]
-0.000000980   rho-  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;  #[PDG2016]
-0.000009700   K'_1-  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000027100   K'*-  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000066700   K''*-  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
-0.000147770   anti-Xsu  gamma                              BTOXSGAMMA 2 ;               #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2016]
+0.000039180   K*-  gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000043800   K_1-  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000013770   K_2*-  gamma                                 HELAMP 1.0 0.0 1.0 0.0;     #[BF update - PG 04/2022]
+0.000000980   rho-  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000009700   K'_1-  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000027100   K'*-  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000066700   K''*-  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
+0.000147770   anti-Xsu  gamma                              BTOXSGAMMA 2 ;              #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[BF update - PG 04/2022]
 
 # Do not include K pi pi gamma and K*0 pi gamma to avoid double counting with higher K states.
 #0.000007600   K-  pi+  pi-  gamma                          PHSP;

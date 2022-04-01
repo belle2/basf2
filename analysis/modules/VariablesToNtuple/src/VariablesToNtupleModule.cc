@@ -115,6 +115,15 @@ void VariablesToNtupleModule::initialize()
 
   // declare branches and get the variable strings
   m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
+  // remove duplicates from list of variables but keep the previous order
+  unordered_set<string> seen;
+  auto newEnd = remove_if(m_variables.begin(), m_variables.end(), [&seen](const string & varStr) {
+    if (seen.find(varStr) != std::end(seen)) return true;
+    seen.insert(varStr);
+    return false;
+  });
+  m_variables.erase(newEnd, m_variables.end());
+
   m_branchAddressesDouble.resize(m_variables.size() + 1);
   m_branchAddressesInt.resize(m_variables.size() + 1);
   m_tree->get().Branch("__weight__", &m_branchAddressesDouble[0], "__weight__/D");

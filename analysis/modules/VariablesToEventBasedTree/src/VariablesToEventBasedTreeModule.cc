@@ -78,7 +78,25 @@ void VariablesToEventBasedTreeModule::initialize()
   }
 
   m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
+  // remove duplicates from list of variables but keep the previous order
+  unordered_set<string> seen;
+  auto newEnd = remove_if(m_variables.begin(), m_variables.end(), [&seen](const string & varStr) {
+    if (seen.find(varStr) != std::end(seen)) return true;
+    seen.insert(varStr);
+    return false;
+  });
+  m_variables.erase(newEnd, m_variables.end());
+
   m_event_variables = Variable::Manager::Instance().resolveCollections(m_event_variables);
+  // remove duplicates from list of variables but keep the previous order
+  unordered_set<string> seenEventVariables;
+  auto eventVariablesEnd = remove_if(m_event_variables.begin(),
+  m_event_variables.end(), [&seenEventVariables](const string & varStr) {
+    if (seenEventVariables.find(varStr) != std::end(seenEventVariables)) return true;
+    seenEventVariables.insert(varStr);
+    return false;
+  });
+  m_event_variables.erase(eventVariablesEnd, m_event_variables.end());
 
   m_tree.registerInDataStore(m_fileName + m_treeName, DataStore::c_DontWriteOut);
   m_tree.construct(m_treeName.c_str(), "");

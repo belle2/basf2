@@ -472,7 +472,6 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
 
   G4ThreeVector positionG4e = position * CLHEP::cm; // convert from genfit2 units (cm) to geant4 units (mm)
   G4ThreeVector momentumG4e = momentum * CLHEP::GeV; // convert from genfit2 units (GeV/c) to geant4 units (MeV/c)
-  // cppcheck-suppress knownConditionTrueFalse
   if (isCosmic)
     momentumG4e = -momentumG4e;
   G4ErrorSymMatrix covarianceG4e(5, 0); // in Geant4e units (GeV/c, cm)

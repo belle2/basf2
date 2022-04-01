@@ -77,7 +77,7 @@ PXDInterceptor::appendIntercepts(StoreArray<PXDIntercept>* interceptList, std::l
 
   PXDIntercept tmpPXDIntercept;
 
-  genfit::Track& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
+  const genfit::Track& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
   std::list<ROIDetPlane>::iterator itPlanes = planeList.begin();
 

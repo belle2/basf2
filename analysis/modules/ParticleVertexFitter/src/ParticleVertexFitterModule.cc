@@ -227,7 +227,6 @@ namespace Belle2 {
         }
       }
 
-
       // mass-constrained vertex fit
       if (m_fitType == "massvertex") {
         if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut") {
@@ -362,6 +361,9 @@ namespace Belle2 {
   {
     if (fitChildren.empty())
       B2WARNING("[ParticleVertexFitterModule::fillNotFitParticles] fitChildren is empty! Please call fillFitParticles firstly");
+    if (!notFitChildren.empty())
+      B2WARNING("[ParticleVertexFitterModule::fillNotFitParticles] notFitChildren is NOT empty!"
+                << " The function should be called only once");
 
     if (m_decayString.empty())
       // if decayString is empty, just use all primary daughters
@@ -389,12 +391,12 @@ namespace Belle2 {
         bool isChildrenInFit = funcCheckInFit(child);
         isAnyChildrenInFit = isChildrenInFit or isAnyChildrenInFit;
 
-        // if the child is not in fitChildren, fill the child in temporary vector
+        // if the child is not in fitChildren, fill the child in a temporary vector
         if (!isChildrenInFit)
           notFitChildren_tmp.push_back(child);
       }
 
-      // is there are a sister in fitChildren, the children in the temporary vector will be filled in notFitChildren
+      // if there are a sister in fitChildren, the children in the temporary vector will be filled in notFitChildren
       if (isAnyChildrenInFit)
         notFitChildren.insert(notFitChildren.end(), notFitChildren_tmp.begin(), notFitChildren_tmp.end());
 
@@ -414,8 +416,6 @@ namespace Belle2 {
 
     return true;
   }
-
-
 
   bool ParticleVertexFitterModule::redoTwoPhotonDaughterMassFit(Particle* postFit, const Particle* preFit,
       const analysis::VertexFitKFit& kv)

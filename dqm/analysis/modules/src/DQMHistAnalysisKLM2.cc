@@ -184,20 +184,16 @@ void DQMHistAnalysisKLM2Module::event()
   /* Check if efficiency histograms exist*/
   if ((all_ext_bklm == NULL || matched_hits_bklm == NULL) && (m_IsPhysicsRun == true)) {
     B2INFO("Histograms needed for BKLM plane efficiency computation are not found");
-    m_c_eff_bklm->SetFillColor(kRed);
   }
 
   if ((all_ext_eklm == NULL || matched_hits_eklm == NULL) && (m_IsPhysicsRun == true)) {
     B2INFO("Histograms needed for EKLM plane efficiency computation are not found");
-    m_c_eff_eklm->SetFillColor(kRed);
   }
   if ((all_ext_bklm_sector == NULL || matched_hits_bklm_sector == NULL) && (m_IsPhysicsRun == true)) {
     B2INFO("Histograms needed for BKLM sector efficiency computation are not found");
-    m_c_eff_bklm_sector->SetFillColor(kRed);
   }
   if ((all_ext_eklm_sector == NULL || matched_hits_eklm_sector == NULL) && (m_IsPhysicsRun == true)) {
     B2INFO("Histograms needed for EKLM sector efficiency computation are not found");
-    m_c_eff_eklm_sector->SetFillColor(kRed);
   }
 
   /* Check if efficiency histograms exist*/

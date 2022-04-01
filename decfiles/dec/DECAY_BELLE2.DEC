@@ -2584,13 +2584,13 @@ Decay anti-B0
 
 # b -> s gamma
 #
-0.000041770   anti-K*0  gamma                              SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]                                      
+0.000041770   anti-K*0  gamma                              SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
 0.000000440   omega  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #[BF update - PG 04/2022]
 0.000000860   rho0  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.;  #[BF update - PG 04/2022]
 0.000043000   anti-K_10  gamma                             SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 5.8e-5. #[Comment - PG 04/2022]
-0.000006500   anti-K'_10  gamma                            SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 1.2e-6. #[Comment - PG 04/2022]                
-0.000012370   anti-K_2*0  gamma                            HELAMP 1.0 0.0 1.0 0.0;     #[BF update - PG 04/2022]                                      
-0.000001700   anti-K''*0  gamma                            SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 2e-3. #[Comment - PG 04/2022]                  
+0.000006500   anti-K'_10  gamma                            SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 1.2e-6. #[Comment - PG 04/2022]
+0.000012370   anti-K_2*0  gamma                            HELAMP 1.0 0.0 1.0 0.0;     #[BF update - PG 04/2022]
+0.000001700   anti-K''*0  gamma                            SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 2e-3. #[Comment - PG 04/2022]
 0.000242360   anti-Xsd  gamma                              BTOXSGAMMA 2 ;              #BF = 3.49e-4 - Sum of exclusive b -> s gamma modes. #[PDG2022]
 
 # Do not include to avoid double counting with higher K states.

@@ -3073,10 +3073,7 @@ namespace {
       particles.appendNew(g);
 
     // put the photons in the test lists
-    if (gammavector.size() % 2 == 0) {
-      evengammalist->addParticle(0, 22, Particle::c_Unflavored);
-    } else
-      oddgammalist->addParticle(0, 22, Particle::c_Unflavored);
+    oddgammalist->addParticle(0, 22, Particle::c_Unflavored);
     for (size_t i = 1; i < gammavector.size(); i++) {
       oddgammalist->addParticle(i, 22, Particle::c_Unflavored);
       evengammalist->addParticle(i, 22, Particle::c_Unflavored);

@@ -252,11 +252,11 @@ namespace Belle2 {
       int elementJ = int(std::lround(element[1]));
 
       if (elementI < 0 || elementI > 3) {
-        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 3]: i = " << elementI);
+        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 3]:" << LogVar("i", elementI));
         return std::numeric_limits<float>::quiet_NaN();
       }
       if (elementJ < 0 || elementJ > 3) {
-        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 3]: j = " << elementJ);
+        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 3]:" << LogVar("j", elementJ));
         return std::numeric_limits<float>::quiet_NaN();
       }
 

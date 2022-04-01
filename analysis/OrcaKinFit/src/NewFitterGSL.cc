@@ -1124,9 +1124,8 @@ namespace Belle2 {
           continue;
         }
 
-        if (imode == 0) {       // Armijo
-          break;
-        } else if (imode == 1) { // Wolfe
+        // imode == 0 (Armijo) asserted above
+        if (imode == 1) { // Wolfe
           dphi = meritFunctionDeriv(mu, vecxnew, vece, vecdx, vecw);
           if (dphi < zeta * dphi0) {
             B2DEBUG(15, "NewFitterGSL::doLineSearch, Wolfe: dphi=" << dphi

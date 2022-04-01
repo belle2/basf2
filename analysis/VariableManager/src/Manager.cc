@@ -462,7 +462,6 @@ double Variable::Manager::evaluate(const std::string& varName, const Particle* p
   const Var* var = getVariable(varName);
   if (!var) {
     throw std::runtime_error("Variable::Manager::evaluate(): variable '" + varName + "' not found!");
-    return 0.0; //never reached, suppresses cppcheck warning
   }
 
   if (var->variabletype == Variable::Manager::VariableDataType::c_double)

@@ -780,6 +780,7 @@ namespace Belle2 {
       [](const std::pair<double, int>& l, const std::pair<double, int>& r) {
         return l.first > r.first;
       });
+      // cppcheck-suppress containerOutOfBounds
       return mcps.object(weightsAndIndices[0].second)->getPDG();
     }
 

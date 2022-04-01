@@ -20,7 +20,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(NeutralHadron4MomentumCalculator)
+REG_MODULE(NeutralHadron4MomentumCalculator);
 
 NeutralHadron4MomentumCalculatorModule::NeutralHadron4MomentumCalculatorModule() : Module()
 {

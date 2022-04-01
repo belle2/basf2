@@ -28,7 +28,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(VariablesToNtuple)
+REG_MODULE(VariablesToNtuple);
 
 
 VariablesToNtupleModule::VariablesToNtupleModule() :

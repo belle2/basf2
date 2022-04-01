@@ -25,7 +25,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PrintMCParticles)
+REG_MODULE(PrintMCParticles);
 
 //-----------------------------------------------------------------
 //                 Implementation

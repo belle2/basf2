@@ -42,7 +42,7 @@ namespace Belle2 {
     //                 Register module
     //-----------------------------------------------------------------
 
-    REG_MODULE(ParticleKinematicFitter)
+    REG_MODULE(ParticleKinematicFitter);
 
     //-----------------------------------------------------------------
     //                 Implementation

@@ -16,7 +16,7 @@ using namespace Belle2;
 
 
 
-REG_MODULE(AnalysisConfiguration)
+REG_MODULE(AnalysisConfiguration);
 
 AnalysisConfigurationModule::AnalysisConfigurationModule() : Module()
 {

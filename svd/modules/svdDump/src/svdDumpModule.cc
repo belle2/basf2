@@ -91,7 +91,7 @@ void svdDumpModule::event()
       total_nWords += remaining_nWords;
     }
   }
-  uint32_t  header = (0xf << 28);
+  uint32_t  header = (0xf << 27);
   header |= ((total_nWords & 0xffff) << 12) + (m_event & 0xfff);
   m_outputFile->write((char*)(&header), sizeof(uint32_t));
 

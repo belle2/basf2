@@ -213,6 +213,9 @@ namespace Belle2 {
     // fits with KFit
     if (m_vertexFitter == "KFit") {
 
+      if (m_decayString != "" and m_fitType != "vertex")
+        B2FATAL("ParticleVertexFitter: KFit does not support yet selection of daughters via decay string except for vertex fit!");
+
       // vertex fit
       if (m_fitType == "vertex") {
         if (m_withConstraint == "ipprofile") {
@@ -353,6 +356,67 @@ namespace Belle2 {
     return true;
   }
 
+  bool ParticleVertexFitterModule::fillNotFitParticles(const Particle* mother, std::vector<const Particle*>& notFitChildren,
+                                                       const std::vector<const Particle*>& fitChildren)
+  {
+    if (fitChildren.empty())
+      B2WARNING("[ParticleVertexFitterModule::fillNotFitParticles] fitChildren is empty! Please call fillFitParticles firstly");
+    if (!notFitChildren.empty())
+      B2WARNING("[ParticleVertexFitterModule::fillNotFitParticles] notFitChildren is NOT empty!"
+                << " The function should be called only once");
+
+    if (m_decayString.empty())
+      // if decayString is empty, just use all primary daughters
+      return true;
+
+    std::function<bool(const Particle*)> funcCheckInFit =
+    [&funcCheckInFit, &notFitChildren, fitChildren](const Particle * part) {
+
+      // check if the given particle in fitChildren
+      // if it is included, return true
+      if (std::find(fitChildren.begin(), fitChildren.end(), part) != fitChildren.end())
+        return true;
+
+      // if not, firstly check if particle has children
+      if (part->getNDaughters() == 0)
+        // if it has no children (=final-state-particle), return false
+        return false;
+
+      // here, the given particle is not in fitChildren and has children
+      bool isAnyChildrenInFit = false;
+      vector<const Particle*> notFitChildren_tmp;
+      for (unsigned ichild = 0; ichild < part->getNDaughters(); ichild++) {
+        // call funcCheckInFit recursively for all children
+        const Particle* child = part->getDaughter(ichild);
+        bool isChildrenInFit = funcCheckInFit(child);
+        isAnyChildrenInFit = isChildrenInFit or isAnyChildrenInFit;
+
+        // if the child is not in fitChildren, fill the child in a temporary vector
+        if (!isChildrenInFit)
+          notFitChildren_tmp.push_back(child);
+      }
+
+      // if there are a sister in fitChildren, the children in the temporary vector will be filled in notFitChildren
+      if (isAnyChildrenInFit)
+        notFitChildren.insert(notFitChildren.end(), notFitChildren_tmp.begin(), notFitChildren_tmp.end());
+
+      // if no children in fitChildren, the given particle should be filled instead of all children.
+
+      return isAnyChildrenInFit;
+    };
+
+
+    // call funcCheckInFit for all primary children
+    for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
+      const Particle* child = mother->getDaughter(ichild);
+      bool isGivenParticleOrAnyChildrenInFit = funcCheckInFit(child);
+      if (!isGivenParticleOrAnyChildrenInFit)
+        notFitChildren.push_back(child);
+    }
+
+    return true;
+  }
+
   bool ParticleVertexFitterModule::redoTwoPhotonDaughterMassFit(Particle* postFit, const Particle* preFit,
       const analysis::VertexFitKFit& kv)
   {
@@ -416,6 +480,10 @@ namespace Belle2 {
 
     if (!validChildren)
       return false;
+
+    std::vector<const Particle*> notFitChildren;
+    fillNotFitParticles(mother, notFitChildren, fitChildren);
+
 
     if (twoPhotonChildren.size() > 1) {
       B2FATAL("[ParticleVertexFitterModule::doKVertexFit] Vertex fit using KFit does not support fit with multiple particles decaying to two photons like pi0 (yet).");
@@ -484,6 +552,12 @@ namespace Belle2 {
 
       ok = makeKVertexMother(kv2, mother);
     }
+
+    // update 4-vector using not-fit-particles
+    ROOT::Math::PxPyPzEVector total4Vector(mother->get4Vector());
+    for (auto& child : notFitChildren)
+      total4Vector += child->get4Vector();
+    mother->set4Vector(total4Vector);
 
     return ok;
   }

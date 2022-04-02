@@ -36,7 +36,7 @@ from shutil import copyfile, rmtree
 
 
 #: Tells the automated system some details of this script
-settings = ValidationSettings(name='eCMS Calibrations',
+settings = ValidationSettings(name='Ecms Calibrations',
                               description=__doc__,
                               download_files=['stdout'],
                               expert_config={})

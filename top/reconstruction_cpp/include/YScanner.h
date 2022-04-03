@@ -69,7 +69,7 @@ namespace Belle2 {
          * @param sol1 displaced solution
          * @return the derivative
          */
-        double dLen_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
+        static double dLen_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
 
         /**
          * Calculates the derivative of unfolded y coordinate at detection
@@ -77,7 +77,7 @@ namespace Belle2 {
          * @param sol1 displaced solution
          * @return the derivative
          */
-        double dyD_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
+        static double dyD_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
 
         /**
          * Calculates the derivative of unfolded y coordinate at prism entrance
@@ -85,7 +85,7 @@ namespace Belle2 {
          * @param sol1 displaced solution
          * @return the derivative
          */
-        double dyB_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
+        static double dyB_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
 
         /**
          * Calculates the derivative of Cerenkov azimuthal angle
@@ -93,7 +93,7 @@ namespace Belle2 {
          * @param sol1 displaced solution
          * @return the derivative
          */
-        double dFic_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
+        static double dFic_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
       };
 
 

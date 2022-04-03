@@ -147,24 +147,24 @@ namespace Belle2 {
         RelationIndex<MCParticle, BeamBackHit> relBeamBackHitToMCParticle(mcParticles, beamBackHits);
         if (relBeamBackHitToMCParticle.getFirstElementTo(arichhit)) {
           const MCParticle* currParticle = relBeamBackHitToMCParticle.getFirstElementTo(arichhit)->from;
-          phVtx = currParticle->getVertex();
+          phVtx = B2Vector3D(currParticle->getVertex());
           const MCParticle* mother = currParticle->getMother();
           int mm = 0;
           while (mother) {
             if (mm == 0) {
               phMPDG = mother->getPDG();
-              phMvtx = mother->getVertex();
+              phMvtx = B2Vector3D(mother->getVertex());
               phMmom = mother->getMomentum();
             }
             if (mm == 1) {
               phGMPDG = mother->getPDG();
-              phGMvtx = mother->getVertex();
+              phGMvtx = B2Vector3D(mother->getVertex());
               phGMmom = mother->getMomentum();
             }
             const MCParticle* pommother = mother->getMother();
             if (!pommother) {
               phPPDG = mother->getPDG();
-              phPvtx = mother->getVertex();
+              phPvtx = B2Vector3D(mother->getVertex());
               phPmom = mother->getMomentum();
             }
             mother = pommother;
@@ -191,24 +191,24 @@ namespace Belle2 {
         RelationIndex<MCParticle, ARICHSimHit> relSimHitToMCParticle(mcParticles, arichSimHits);
         if (relSimHitToMCParticle.getFirstElementTo(simHit)) {
           const MCParticle* currParticle = relSimHitToMCParticle.getFirstElementTo(simHit)->from;
-          phVtx = currParticle->getVertex();
+          phVtx = B2Vector3D(currParticle->getVertex());
           const MCParticle* mother = currParticle->getMother();
           int mm = 0;
           while (mother) {
             if (mm == 0) {
               phMPDG = mother->getPDG();
-              phMvtx = mother->getVertex();
+              phMvtx = B2Vector3D(mother->getVertex());
               phMmom = mother->getMomentum();
             }
             if (mm == 1) {
               phGMPDG = mother->getPDG();
-              phGMvtx = mother->getVertex();
+              phGMvtx = B2Vector3D(mother->getVertex());
               phGMmom = mother->getMomentum();
             }
             const MCParticle* pommother = mother->getMother();
             if (!pommother) {
               phPPDG = mother->getPDG();
-              phPvtx = mother->getVertex();
+              phPvtx = B2Vector3D(mother->getVertex());
               phPmom = mother->getMomentum();
             }
             mother = pommother;

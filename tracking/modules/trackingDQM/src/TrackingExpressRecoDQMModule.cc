@@ -30,13 +30,14 @@ REG_MODULE(TrackingExpressRecoDQM)
 TrackingExpressRecoDQMModule::TrackingExpressRecoDQMModule() : DQMHistoModuleBase()
 {
   setPropertyFlags(c_ParallelProcessingCertified);
-
-  setDescription("Data Quality Monitoring of the tracking run on ExpressReco. "
-                );
-  addParam("produce1Dresiduals", m_produce1Dres, "If True, produce 1D residual plots for each VXD sensor", bool(m_produce1Dres));
-
-  addParam("produce2Dresiduals", m_produce2Dres, "If True, produce 2D residual plots for each VXD sensor", bool(m_produce2Dres));
-
+  setDescription("Data Quality Monitoring of the tracking run on ExpressReco.");
+  addParam("produce1Dresiduals", m_produce1Dres, "If True, produce 1D residual plots for each VXD sensor", m_produce1Dres);
+  addParam("produce2Dresiduals", m_produce2Dres, "If True, produce 2D residual plots for each VXD sensor", m_produce2Dres);
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory for the histograms", m_histogramDirectoryName);
+  addParam("histogramTitleSuffix", m_histogramTitleSuffix,
+           "Optional suffix to be appended to the title of the histograms."
+           " Applied only to those histograms whose content depend on the track StoreArray chosen.",
+           m_histogramTitleSuffix);
 }
 
 //------------------------------------------------------------------
@@ -59,9 +60,9 @@ void TrackingExpressRecoDQMModule::defineHisto()
   // Create a separate histogram directories and cd into it.
   TDirectory* originalDirectory = gDirectory;
 
-  TDirectory* TracksDQM = originalDirectory->GetDirectory("TrackingERDQM");
+  TDirectory* TracksDQM = originalDirectory->GetDirectory(m_histogramDirectoryName.c_str());
   if (!TracksDQM)
-    TracksDQM = originalDirectory->mkdir("TrackingERDQM");
+    TracksDQM = originalDirectory->mkdir(m_histogramDirectoryName.c_str());
 
   TracksDQM->cd();
   DefineTracks();
@@ -82,6 +83,18 @@ void TrackingExpressRecoDQMModule::defineHisto()
 
   for (auto change : m_histogramParameterChanges)
     ProcessHistogramParameterChange(get<0>(change), get<1>(change), get<2>(change));
+
+  // Add the title suffix (if a suffix was provided via the module parameter)
+  for (TH1* hist : m_histograms) {
+    // Skip histograms whose content does *not* depend on the list (StoreArray)
+    // of tracks used as input to this module
+    if (hist->GetName() == string("NumberTrackingErrorFlags"))
+      continue;
+    if (hist->GetName() == string("TrackingErrorFlagsReasons"))
+      continue;
+    string newTitle = hist->GetTitle() + m_histogramTitleSuffix;
+    hist->SetTitle(newTitle.c_str());
+  }
 }
 
 void TrackingExpressRecoDQMModule::event()

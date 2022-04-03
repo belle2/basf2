@@ -9,6 +9,7 @@
 // Own include
 #include <analysis/variables/EventVariables.h>
 
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
 
 // framework - DataStore
@@ -36,9 +37,6 @@
 
 #include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
-
-#include <TLorentzVector.h>
-#include <TVector3.h>
 
 namespace Belle2 {
   namespace Variable {
@@ -274,7 +272,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Mag();
+      double missing = evtShape->getMissingMomentum().R();
       return missing;
     }
 
@@ -285,7 +283,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Px();
+      double missing = evtShape->getMissingMomentum().x();
       return missing;
     }
 
@@ -296,7 +294,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Py();
+      double missing = evtShape->getMissingMomentum().y();
       return missing;
     }
 
@@ -307,7 +305,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Pz();
+      double missing = evtShape->getMissingMomentum().z();
       return missing;
     }
 
@@ -329,7 +327,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Mag();
+      double missing = evtShape->getMissingMomentumCMS().R();
       return missing;
     }
 
@@ -340,7 +338,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Mag();
+      double missing = evtShape->getMissingMomentumCMS().R();
       return missing;
     }
 
@@ -351,7 +349,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Px();
+      double missing = evtShape->getMissingMomentumCMS().x();
       return missing;
     }
 
@@ -362,7 +360,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Py();
+      double missing = evtShape->getMissingMomentumCMS().y();
       return missing;
     }
 
@@ -373,7 +371,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Pz();
+      double missing = evtShape->getMissingMomentumCMS().z();
       return missing;
     }
 
@@ -748,9 +746,6 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("isMC", isMC,
                       "[Eventbased] Returns 1 if current basf2 process is running over simulated (Monte-Carlo) dataset and 0 in case of real experimental data.");
-    REGISTER_VARIABLE("EventType", eventType, "[Eventbased] EventType (0 MC, 1 Data)");
-    MAKE_DEPRECATED("EventType", true, "light-minos-2012", R"DOC(
-                     Use `isMC` instead of this variable but keep in mind that the meaning of the outcome is reversed.)DOC");
     REGISTER_VARIABLE("isContinuumEvent", isContinuumEvent,
                       "[Eventbased] Returns 1.0 if event doesn't contain a :math:`\\Upsilon(4S)` particle on generator level, 0.0 otherwise.");
     REGISTER_VARIABLE("isNotContinuumEvent", isNotContinuumEvent,

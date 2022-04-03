@@ -167,7 +167,7 @@ other servers.
     same level of support on other machines though.
 
 .. admonition:: If you're working on your own machine
-    :class: stacked toggle
+    :class: toggle
 
     In this case you might first need to copy the data files to your home
     directory on your local machine from kekcc or DESY via a SSH connection (cf.

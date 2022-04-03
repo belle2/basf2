@@ -8,10 +8,12 @@
 
 // Own include
 #include <analysis/variables/Variables.h>
+
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
-
 #include <analysis/utility/MCMatching.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
@@ -37,10 +39,9 @@
 #include <framework/geometry/BFieldManager.h>
 #include <framework/gearbox/Const.h>
 
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 #include <TRandom.h>
 #include <TVectorF.h>
-#include <TVector3.h>
 
 #include <iostream>
 #include <cmath>
@@ -239,7 +240,7 @@ namespace Belle2 {
     double particleTheta(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
-      return acos(frame.getMomentum(part).CosTheta());
+      return frame.getMomentum(part).Theta();
     }
 
     double particleThetaErr(const Particle* part)
@@ -274,7 +275,7 @@ namespace Belle2 {
     double particleCosTheta(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getMomentum(part).CosTheta();
+      return cos(frame.getMomentum(part).Theta());
     }
 
     double particleCosThetaErr(const Particle* part)
@@ -315,8 +316,8 @@ namespace Belle2 {
     double particleXp(const Particle* part)
     {
       PCmsLabTransform T;
-      TLorentzVector p4 = part -> get4Vector();
-      TLorentzVector p4CMS = T.rotateLabToCms() * p4;
+      ROOT::Math::PxPyPzEVector p4 = part -> get4Vector();
+      ROOT::Math::PxPyPzEVector p4CMS = T.rotateLabToCms() * p4;
       float s = T.getCMSEnergy();
       float M = part->getMass();
       return p4CMS.P() / TMath::Sqrt(s * s / 4 - M * M);
@@ -330,11 +331,11 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
-      double px = part->getMomentum().Px();
-      double py = part->getMomentum().Py();
+      double px = part->getPx();
+      double py = part->getPy();
 
-      double xV = part->getVertex().X();
-      double yV = part->getVertex().Y();
+      double xV = part->getX();
+      double yV = part->getY();
 
       double xIP = (beamSpotDB->getIPPosition()).X();
       double yIP = (beamSpotDB->getIPPosition()).Y();
@@ -349,7 +350,7 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
-      return std::cos((part->getVertex() - beamSpotDB->getIPPosition()).Angle(part->getMomentum()));
+      return cos((B2Vector3D(part->getVertex()) - beamSpotDB->getIPPosition()).Angle(B2Vector3D(part->getMomentum())));
     }
 
     double cosThetaBetweenParticleAndNominalB(const Particle* part)
@@ -368,10 +369,10 @@ namespace Belle2 {
       }
       double p_B = std::sqrt(e_Beam * e_Beam - m_B * m_B);
 
-      TLorentzVector p = T.rotateLabToCms() * part->get4Vector();
+      ROOT::Math::PxPyPzEVector p = T.rotateLabToCms() * part->get4Vector();
       double e_d = p.E();
       double m_d = p.M();
-      double p_d = p.Rho();
+      double p_d = p.P();
 
       double theta_BY = (2 * e_Beam * e_d - m_B * m_B - m_d * m_d)
                         / (2 * p_B * p_d);
@@ -386,8 +387,8 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
       PCmsLabTransform T;
-      TVector3 th = evtShape->getThrustAxis();
-      TVector3 particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
+      B2Vector3D th = evtShape->getThrustAxis();
+      B2Vector3D particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
       return std::cos(th.Angle(particleMomentum));
     }
 
@@ -395,14 +396,14 @@ namespace Belle2 {
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
 
-      TVector3 mom = particle->getMomentum();
+      B2Vector3D mom = particle->getMomentum();
 
-      TVector3 r = particle->getVertex() - beamSpotDB->getIPPosition();
+      B2Vector3D r = B2Vector3D(particle->getVertex()) - beamSpotDB->getIPPosition();
 
-      TVector3 Bfield = BFieldManager::getInstance().getFieldInTesla(beamSpotDB->getIPPosition());
+      B2Vector3D Bfield = BFieldManager::getInstance().getFieldInTesla(beamSpotDB->getIPPosition());
 
-      TVector3 curvature = - Bfield * Const::speedOfLight * particle->getCharge(); //Curvature of the track
-      double T = TMath::Sqrt(mom.Perp2() - 2 * curvature * r.Cross(mom) + curvature.Mag2() * r.Perp2());
+      B2Vector3D curvature = - Bfield * Const::speedOfLight * particle->getCharge(); //Curvature of the track
+      double T = TMath::Sqrt(mom.Perp2() - 2.0 * curvature * r.Cross(mom) + curvature.Mag2() * r.Perp2());
 
       return TMath::Abs((-2 * r.Cross(mom).z() + curvature.Mag() * r.Perp2()) / (T + mom.Perp()));
     }
@@ -415,9 +416,9 @@ namespace Belle2 {
         B2FATAL("You are trying to use an Armenteros variable. The mother particle is required to have exactly two daughters");
 
       const auto& daughters = part -> getDaughters();
-      TVector3 motherMomentum = frame.getMomentum(part).Vect();
-      TVector3 daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
-      TVector3 daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
+      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
+      B2Vector3D daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
+      B2Vector3D daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
 
       int daughter1Charge = daughters[0] -> getCharge();
       int daughter2Charge = daughters[1] -> getCharge();
@@ -441,8 +442,8 @@ namespace Belle2 {
         B2FATAL("You are trying to use an Armenteros variable. The mother particle is required to have exactly two daughters.");
 
       const auto& daughters = part -> getDaughters();
-      TVector3 motherMomentum = frame.getMomentum(part).Vect();
-      TVector3 daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
+      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
+      B2Vector3D daughter1Momentum = frame.getMomentum(daughters[0]).Vect();
       double qt = daughter1Momentum.Perp(motherMomentum);
 
       return qt;
@@ -456,8 +457,8 @@ namespace Belle2 {
         B2FATAL("You are trying to use an Armenteros variable. The mother particle is required to have exactly two daughters.");
 
       const auto& daughters = part -> getDaughters();
-      TVector3 motherMomentum = frame.getMomentum(part).Vect();
-      TVector3 daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
+      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
+      B2Vector3D daughter2Momentum = frame.getMomentum(daughters[1]).Vect();
       double qt = daughter2Momentum.Perp(motherMomentum);
 
       return qt;
@@ -480,7 +481,7 @@ namespace Belle2 {
     {
       const std::vector<Particle*> daughters = part->getDaughters();
       if (daughters.size() > 0) {
-        TLorentzVector sum;
+        ROOT::Math::PxPyPzEVector sum;
         for (auto daughter : daughters)
           sum += daughter->get4Vector();
 
@@ -500,7 +501,7 @@ namespace Belle2 {
       if (daughters.size() == 0) return particleInvariantMassFromDaughters(part);
 
       const double bField = BFieldManager::getFieldInTesla(vertex).Z();
-      TLorentzVector sum;
+      ROOT::Math::PxPyPzMVector sum;
       for (auto daughter : daughters) {
         const TrackFitResult* tfr = daughter->getTrackFitResult();
         if (!tfr) {
@@ -509,10 +510,12 @@ namespace Belle2 {
         }
         Helix helix = tfr->getHelix();
         helix.passiveMoveBy(vertex);
-        TVector3 mom3 = daughter->getMomentumScalingFactor() * helix.getMomentum(bField);
+        double scalingFactor = daughter->getEffectiveMomentumScale();
+        double momX = scalingFactor * helix.getMomentumX(bField);
+        double momY = scalingFactor * helix.getMomentumY(bField);
+        double momZ = scalingFactor * helix.getMomentumZ(bField);
         float mPDG = daughter->getPDGMass();
-        float E = std::sqrt(mom3.Mag2() + mPDG * mPDG);
-        sum += TLorentzVector(mom3, E);
+        sum += ROOT::Math::PxPyPzMVector(momX, momY, momZ, mPDG);
       }
       return sum.M();
     }
@@ -521,9 +524,9 @@ namespace Belle2 {
     {
       const std::vector<Particle*> daughters = part->getDaughters();
       if (daughters.size() == 2) {
-        TLorentzVector dt1;
-        TLorentzVector dt2;
-        TLorentzVector dtsum;
+        ROOT::Math::PxPyPzEVector dt1;
+        ROOT::Math::PxPyPzEVector dt2;
+        ROOT::Math::PxPyPzEVector dtsum;
         double mpi = Const::pionMass;
         double mpr = Const::protonMass;
         dt1 = daughters[0]->get4Vector();
@@ -564,25 +567,25 @@ namespace Belle2 {
 
     double particleMassSquared(const Particle* part)
     {
-      TLorentzVector p4 = part->get4Vector();
+      ROOT::Math::PxPyPzEVector p4 = part->get4Vector();
       return p4.M2();
     }
 
     double b2bTheta(const Particle* part)
     {
       PCmsLabTransform T;
-      TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
-      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
-      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      ROOT::Math::PxPyPzEVector pcms = T.rotateLabToCms() * part->get4Vector();
+      ROOT::Math::PxPyPzEVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      ROOT::Math::PxPyPzEVector b2blab = T.rotateCmsToLab() * b2bcms;
       return b2blab.Theta();
     }
 
     double b2bPhi(const Particle* part)
     {
       PCmsLabTransform T;
-      TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
-      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
-      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      ROOT::Math::PxPyPzEVector pcms = T.rotateLabToCms() * part->get4Vector();
+      ROOT::Math::PxPyPzEVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      ROOT::Math::PxPyPzEVector b2blab = T.rotateCmsToLab() * b2bcms;
       return b2blab.Phi();
     }
 
@@ -595,13 +598,13 @@ namespace Belle2 {
 
       // get 4 momentum from cluster
       ClusterUtils clutls;
-      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterHypothesis);
+      ROOT::Math::PxPyPzEVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterHypothesis);
 
       // find the vector that balances this in the CMS
       PCmsLabTransform T;
-      TLorentzVector pcms = T.rotateLabToCms() * p4Cluster;
-      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
-      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      ROOT::Math::PxPyPzEVector pcms = T.rotateLabToCms() * p4Cluster;
+      ROOT::Math::PxPyPzEVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      ROOT::Math::PxPyPzEVector b2blab = T.rotateCmsToLab() * b2bcms;
       return b2blab.Theta();
     }
 
@@ -614,13 +617,13 @@ namespace Belle2 {
 
       // get 4 momentum from cluster
       ClusterUtils clutls;
-      TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterHypothesis);
+      ROOT::Math::PxPyPzEVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterHypothesis);
 
       // find the vector that balances this in the CMS
       PCmsLabTransform T;
-      TLorentzVector pcms = T.rotateLabToCms() * p4Cluster;
-      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
-      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      ROOT::Math::PxPyPzEVector pcms = T.rotateLabToCms() * p4Cluster;
+      ROOT::Math::PxPyPzEVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      ROOT::Math::PxPyPzEVector b2blab = T.rotateCmsToLab() * b2bcms;
       return b2blab.Phi();
     }
 
@@ -654,9 +657,9 @@ namespace Belle2 {
     double particleMbc(const Particle* part)
     {
       PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
+      ROOT::Math::PxPyPzEVector vec = T.rotateLabToCms() * part->get4Vector();
       double E = T.getCMSEnergy() / 2;
-      double m2 = E * E - vec.Vect().Mag2();
+      double m2 = E * E - vec.P2();
       double mbc = m2 >= 0 ? sqrt(m2) : std::numeric_limits<double>::quiet_NaN();
       return mbc;
     }
@@ -664,7 +667,7 @@ namespace Belle2 {
     double particleDeltaE(const Particle* part)
     {
       PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * part->get4Vector();
+      ROOT::Math::PxPyPzEVector vec = T.rotateLabToCms() * part->get4Vector();
       return vec.E() - T.getCMSEnergy() / 2;
     }
 
@@ -709,7 +712,7 @@ namespace Belle2 {
       if (!mcB)
         return std::numeric_limits<double>::quiet_NaN();
 
-      TLorentzVector pB = mcB->get4Vector();
+      ROOT::Math::PxPyPzEVector pB = mcB->get4Vector();
 
       std::vector<MCParticle*> mcDaug = mcB->getDaughters();
 
@@ -718,7 +721,7 @@ namespace Belle2 {
 
       // B -> X l nu
       // q = pB - pX
-      TLorentzVector pX;
+      ROOT::Math::PxPyPzEVector pX;
 
       for (auto mcTemp : mcDaug) {
         if (abs(mcTemp->getPDG()) <= 16)
@@ -727,9 +730,9 @@ namespace Belle2 {
         pX += mcTemp->get4Vector();
       }
 
-      TLorentzVector q = pB - pX;
+      ROOT::Math::PxPyPzEVector q = pB - pX;
 
-      return q.Mag2();
+      return q.M2();
     }
 
 // Recoil Kinematics related ---------------------------------------------
@@ -738,7 +741,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -750,7 +753,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -762,7 +765,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -774,7 +777,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -786,7 +789,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -798,7 +801,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -810,7 +813,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -822,7 +825,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -834,7 +837,7 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       // Initial state (e+e- momentum in LAB)
-      TLorentzVector pIN = T.getBeamFourMomentum();
+      ROOT::Math::PxPyPzEVector pIN = T.getBeamFourMomentum();
 
       // Use requested frame for final calculation
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -846,10 +849,8 @@ namespace Belle2 {
       PCmsLabTransform T;
       double beamEnergy = T.getCMSEnergy() / 2.;
       if (part->getNDaughters() != 2) return std::numeric_limits<double>::quiet_NaN();
-      TLorentzVector tagVec = T.rotateLabToCms()
-                              * part->getDaughter(0)->get4Vector();
-      TLorentzVector sigVec = T.rotateLabToCms()
-                              * part->getDaughter(1)->get4Vector();
+      ROOT::Math::PxPyPzEVector tagVec = T.rotateLabToCms() * part->getDaughter(0)->get4Vector();
+      ROOT::Math::PxPyPzEVector sigVec = T.rotateLabToCms() * part->getDaughter(1)->get4Vector();
       tagVec.SetE(-beamEnergy);
       return (-tagVec - sigVec).M2();
     }
@@ -1003,36 +1004,36 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("Kinematics");
-    REGISTER_VARIABLE("p", particleP, "momentum magnitude");
-    REGISTER_VARIABLE("E", particleE, "energy");
+    REGISTER_VARIABLE("p", particleP, "momentum magnitude", "GeV/c");
+    REGISTER_VARIABLE("E", particleE, "energy", "GeV");
 
-    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy uncertainty (sqrt(sigma2))");
+    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, R"DOC(energy uncertainty (:math:`\sqrt{\sigma^2}`))DOC", "GeV");
     REGISTER_VARIABLE("ECLClusterE_uncertainty", particleClusterEUncertainty,
-                      "energy uncertainty as given by the underlying ECL cluster.");
-    REGISTER_VARIABLE("px", particlePx, "momentum component x");
-    REGISTER_VARIABLE("py", particlePy, "momentum component y");
-    REGISTER_VARIABLE("pz", particlePz, "momentum component z");
-    REGISTER_VARIABLE("pt", particlePt, "transverse momentum");
+                      "energy uncertainty as given by the underlying ECL cluster", "GeV");
+    REGISTER_VARIABLE("px", particlePx, "momentum component x", "GeV/c");
+    REGISTER_VARIABLE("py", particlePy, "momentum component y", "GeV/c");
+    REGISTER_VARIABLE("pz", particlePz, "momentum component z", "GeV/c");
+    REGISTER_VARIABLE("pt", particlePt, "transverse momentum", "GeV/c");
     REGISTER_VARIABLE("xp", particleXp,
                       "scaled momentum: the momentum of the particle in the CMS as a fraction of its maximum available momentum in the collision");
-    REGISTER_VARIABLE("pErr", particlePErr, "error of momentum magnitude");
-    REGISTER_VARIABLE("pxErr", particlePxErr, "error of momentum component x");
-    REGISTER_VARIABLE("pyErr", particlePyErr, "error of momentum component y");
-    REGISTER_VARIABLE("pzErr", particlePzErr, "error of momentum component z");
-    REGISTER_VARIABLE("ptErr", particlePtErr, "error of transverse momentum");
+    REGISTER_VARIABLE("pErr", particlePErr, "error of momentum magnitude", "GeV/c");
+    REGISTER_VARIABLE("pxErr", particlePxErr, "error of momentum component x", "GeV/c");
+    REGISTER_VARIABLE("pyErr", particlePyErr, "error of momentum component y", "GeV/c");
+    REGISTER_VARIABLE("pzErr", particlePzErr, "error of momentum component z", "GeV/c");
+    REGISTER_VARIABLE("ptErr", particlePtErr, "error of transverse momentum", "GeV/c");
     REGISTER_VARIABLE("momVertCovM(i,j)", covMatrixElement,
                       "returns the (i,j)-th element of the MomentumVertex Covariance Matrix (7x7).\n"
-                      "Order of elements in the covariance matrix is: px, py, pz, E, x, y, z.");
-    REGISTER_VARIABLE("momDevChi2", momentumDeviationChi2,
-                      "momentum deviation chi^2 value calculated as"
-                      "chi^2 = sum_i (p_i - mc(p_i))^2/sigma(p_i)^2, where sum runs over i = px, py, pz and"
-                      "mc(p_i) is the mc truth value and sigma(p_i) is the estimated error of i-th component of momentum vector");
-    REGISTER_VARIABLE("theta", particleTheta, "polar angle in radians");
-    REGISTER_VARIABLE("thetaErr", particleThetaErr, "error of polar angle in radians");
+                      "Order of elements in the covariance matrix is: px, py, pz, E, x, y, z.", "GeV/c, GeV/c, GeV/c, GeV, cm, cm, cm");
+    REGISTER_VARIABLE("momDevChi2", momentumDeviationChi2, R"DOC(
+momentum deviation :math:`\chi^2` value calculated as :math:`\chi^2 = \sum_i (p_i - mc(p_i))^2/\sigma(p_i)^2`, 
+where :math:`\sum` runs over i = px, py, pz and :math:`mc(p_i)` is the mc truth value and :math:`\sigma(p_i)` is the estimated error of i-th component of momentum vector
+)DOC");
+    REGISTER_VARIABLE("theta", particleTheta, "polar angle", "rad");
+    REGISTER_VARIABLE("thetaErr", particleThetaErr, "error of polar angle", "rad");
     REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
     REGISTER_VARIABLE("cosThetaErr", particleCosThetaErr, "error of momentum cosine of polar angle");
-    REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in radians");
-    REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle in radians");
+    REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle", "rad");
+    REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle", "rad");
     REGISTER_VARIABLE("PDG", particlePDGCode, "PDG code");
 
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVectorInXYPlane",
@@ -1047,7 +1048,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosToThrustOfEvent", cosToThrustOfEvent,
                       "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable");
 
-    REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
+    REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane", "cm");
 
     REGISTER_VARIABLE("M", particleMass, R"DOC(
 The particle's mass.
@@ -1060,67 +1061,68 @@ Note that this is context-dependent variable and can take different values depen
 - If this particle is composite and a *mass or vertex fit* has been performed then this may be updated by the fit.
 
   * You will see a difference between this mass and the :b2:var:`InvM`.
-  )DOC");
-    REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass");
-    REGISTER_VARIABLE("Q", particleQ, "released energy in decay");
-    REGISTER_VARIABLE("dQ", particleDQ,
-                      "released energy in decay minus nominal one");
-    REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass");
-    REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
-    REGISTER_VARIABLE("M2", particleMassSquared,
-                      "The particle's mass squared.");
+  )DOC", "GeV/:math:`\\text{c}^2`");
+    REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass", "GeV/:math:`\\text{c}^2`");
+    REGISTER_VARIABLE("Q", particleQ, "energy released in decay", "GeV");
+    REGISTER_VARIABLE("dQ", particleDQ, ":b2:var:`Q` minus nominal energy released in decay", "GeV");
+    REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass", "GeV/:math:`\\text{c}^2`");
+    REGISTER_VARIABLE("deltaE", particleDeltaE, "difference between :b2:var:`E` and half the center of mass energy", "GeV");
+    REGISTER_VARIABLE("M2", particleMassSquared, "The particle's mass squared.", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
 
     REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughtersDisplaced,
                       "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle is V0 or decays at rho > 5 mm, its daughter 4-momentum vectors at fitted vertex are taken.\n"
-                      "If this particle has no daughters, defaults to :b2:var:`M`.");
+                      "If this particle has no daughters, defaults to :b2:var:`M`.", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
                       "Invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
-                      "If the particle has not 2 daughters, it returns just the mass value.");
+                      "If the particle has not 2 daughters, it returns just the mass value.", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
-                      "uncertainty of invariant mass");
+                      "uncertainty of invariant mass", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("SigM", particleInvariantMassSignificance,
-                      "signed deviation of particle's invariant mass from its nominal mass in units of the uncertainty on the invariant mass (dM/ErrM)");
+                      "signed deviation of particle's invariant mass from its nominal mass in units of the uncertainty on the invariant mass (:b2:var:`dM`/:b2:var:`ErrM`)");
 
     REGISTER_VARIABLE("pxRecoil", recoilPx,
-                      "component x of 3-momentum recoiling against given Particle");
+                      "component x of 3-momentum recoiling against given Particle", "GeV/c");
     REGISTER_VARIABLE("pyRecoil", recoilPy,
-                      "component y of 3-momentum recoiling against given Particle");
+                      "component y of 3-momentum recoiling against given Particle", "GeV/c");
     REGISTER_VARIABLE("pzRecoil", recoilPz,
-                      "component z of 3-momentum recoiling against given Particle");
+                      "component z of 3-momentum recoiling against given Particle", "GeV/c");
 
     REGISTER_VARIABLE("pRecoil", recoilMomentum,
-                      "magnitude of 3 - momentum recoiling against given Particle");
+                      "magnitude of 3 - momentum recoiling against given Particle", "GeV/c");
     REGISTER_VARIABLE("pRecoilTheta", recoilMomentumTheta,
-                      "Polar angle of a particle's missing momentum");
+                      "Polar angle of a particle's missing momentum", "rad");
     REGISTER_VARIABLE("pRecoilPhi", recoilMomentumPhi,
-                      "Azimuthal angle of a particle's missing momentum");
+                      "Azimuthal angle of a particle's missing momentum", "rad");
     REGISTER_VARIABLE("eRecoil", recoilEnergy,
-                      "energy recoiling against given Particle");
+                      "energy recoiling against given Particle", "GeV");
     REGISTER_VARIABLE("mRecoil", recoilMass,
-                      "Invariant mass of the system recoiling against given Particle");
+                      "Invariant mass of the system recoiling against given Particle", "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
-                      "invariant mass squared of the system recoiling against given Particle");
+                      "invariant mass squared of the system recoiling against given Particle", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
     REGISTER_VARIABLE("m2RecoilSignalSide", m2RecoilSignalSide,
-                      "Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter ");
+                      "Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter",
+                      ":math:`[\\text{GeV}/\\text{c}^2]^2`");
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,
-                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.");
+                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.", "rad");
     REGISTER_VARIABLE("b2bPhi", b2bPhi,
-                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.");
+                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.", "rad");
     REGISTER_VARIABLE("b2bClusterTheta", b2bClusterTheta,
-                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.");
+                      "Polar angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.",
+                      "rad");
     REGISTER_VARIABLE("b2bClusterPhi", b2bClusterPhi,
-                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.");
+                      "Azimuthal angle in the lab system that is back-to-back to the particle's associated ECLCluster in the CMS. Returns NAN if no cluster is found. Useful for low multiplicity studies.",
+                      "rad");
     REGISTER_VARIABLE("ArmenterosLongitudinalMomentumAsymmetry", ArmenterosLongitudinalMomentumAsymmetry,
                       "Longitudinal momentum asymmetry of V0's daughters.\n"
                       "The mother (V0) is required to have exactly two daughters");
     REGISTER_VARIABLE("ArmenterosDaughter1Qt", ArmenterosDaughter1Qt,
                       "Transverse momentum of the first daughter with respect to the V0 mother.\n"
-                      "The mother is required to have exactly two daughters");
+                      "The mother is required to have exactly two daughters", "GeV/c");
     REGISTER_VARIABLE("ArmenterosDaughter2Qt", ArmenterosDaughter2Qt,
                       "Transverse momentum of the second daughter with respect to the V0 mother.\n"
-                      "The mother is required to have exactly two daughters");
+                      "The mother is required to have exactly two daughters", "GeV/c");
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
@@ -1131,7 +1133,7 @@ Note that this is context-dependent variable and can take different values depen
                       *  0 particle has no associated track
                       *  1 there is a matched track called connected - region(CR) track match
                       )DOC");
-    MAKE_DEPRECATED("trackMatchType", false, "light-minos-2012", R"DOC(
+    MAKE_DEPRECATED("trackMatchType", true, "light-2012-minos", R"DOC(
                      Use better variables like `trackNECLClusters`, `clusterTrackMatch`, and `nECLClusterTrackMatches`.)DOC");
 
     REGISTER_VARIABLE("decayTypeRecoil", recoilMCDecayType,
@@ -1141,7 +1143,7 @@ Note that this is context-dependent variable and can take different values depen
     REGISTER_VARIABLE("printParticle", printParticle,
                       "For debugging, print Particle and daughter PDG codes, plus MC match. Returns 0.");
     REGISTER_VARIABLE("mcMomTransfer2", particleMCMomentumTransfer2,
-                      "Return the true momentum transfer to lepton pair in a B(semi -) leptonic B meson decay.");
+                      "Return the true momentum transfer to lepton pair in a B(semi -) leptonic B meson decay.", "GeV/c");
     REGISTER_VARIABLE("False", False,
                       "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,

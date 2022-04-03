@@ -27,7 +27,7 @@ namespace Belle2 {
   public:
 
     /** All the variables will be written in @param tree */
-    VariablesTTree(TTree* tree): m_tree(tree) {};
+    explicit VariablesTTree(TTree* tree): m_tree(tree) {};
 
     /** Accessor to the TTree pointer */
     TTree* getTTree(void) { return m_tree; };

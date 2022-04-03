@@ -42,7 +42,7 @@ MassVertexFitKFit::setInitialVertex(const HepPoint3D& v) {
   return m_ErrorCode = KFitError::kNoError;
 }
 
-enum KFitError::ECode MassVertexFitKFit::setInitialVertex(const TVector3& v)
+enum KFitError::ECode MassVertexFitKFit::setInitialVertex(const B2Vector3D& v)
 {
   m_BeforeVertex = HepPoint3D(v.X(), v.Y(), v.Z());
   m_ErrorCode = KFitError::kNoError;
@@ -597,8 +597,8 @@ enum KFitError::ECode MassVertexFitKFit::updateMother(Particle* mother)
   }
 
   mother->updateMomentum(
-    CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
-    CLHEPToROOT::getTVector3(kmm.getMotherPosition()),
+    CLHEPToROOT::getLorentzVector(kmm.getMotherMomentum()),
+    CLHEPToROOT::getXYZVector(kmm.getMotherPosition()),
     CLHEPToROOT::getTMatrixFSym(kmm.getMotherError()),
     prob);
   m_ErrorCode = KFitError::kNoError;

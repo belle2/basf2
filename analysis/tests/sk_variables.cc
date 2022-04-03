@@ -21,11 +21,11 @@
 
 #include <analysis/VariableManager/Manager.h>
 
-#include <TLorentzVector.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Variable;
+using namespace ROOT::Math;
+
 namespace {
   class SpecificKinematicVariablesTest : public ::testing::Test {
   protected:
@@ -48,11 +48,11 @@ namespace {
 
       TestUtilities::TestParticleFactory factory;
       PCmsLabTransform T;
-      TLorentzVector b0momentum(.20, 0., 0., 4.85);
+      PxPyPzEVector b0momentum(.20, 0., 0., 4.85);
       b0momentum = T.rotateCmsToLab() * b0momentum;
-      TLorentzVector pimomentum(0.1, 0, 2.5, sqrt(0.139 * 0.139 + 2.5 * 2.5));
-      TLorentzVector emomentum(0., 0, 1., 1.);
-      TVector3 ipposition(0, 0, 0);
+      PxPyPzEVector pimomentum(0.1, 0, 2.5, sqrt(0.139 * 0.139 + 2.5 * 2.5));
+      PxPyPzEVector emomentum(0., 0, 1., 1.);
+      B2Vector3D ipposition(0, 0, 0);
       factory.produceParticle(string("^B0 -> pi- e+"), b0momentum, ipposition);
       myParticles[0]->set4Vector(pimomentum); //pion
       myParticles[1]->set4Vector(emomentum);  //electron

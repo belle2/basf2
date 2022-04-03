@@ -36,7 +36,7 @@ SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePo
 
 // 'Equal To' operator for easier comparison of SpacePointTrackCands (e.g. for testing this class)
 // bool operator== (SpacePointTrackCand& lhs, SpacePointTrackCand& rhs)
-bool SpacePointTrackCand::operator== (const SpacePointTrackCand& rhs)
+bool SpacePointTrackCand::operator== (const SpacePointTrackCand& rhs) const
 {
   const auto& lhsHits = this->getHits();
   const auto& rhsHits = rhs.getHits();

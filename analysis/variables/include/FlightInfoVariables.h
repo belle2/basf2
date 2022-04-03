@@ -1,4 +1,3 @@
-
 /**************************************************************************
  * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
@@ -8,12 +7,8 @@
  **************************************************************************/
 
 #pragma once
-// Own include
-#include <analysis/VariableManager/Manager.h>
 
-
-// dataobjects
-#include <analysis/dataobjects/Particle.h>
+#include <vector>
 
 namespace Belle2 {
   class Particle;
@@ -28,14 +23,14 @@ namespace Belle2 {
     double vertexDistanceSignificance(const Particle* part);
     double mcFlightDistance(const Particle* part);
     double mcFlightTime(const Particle* part);
-    Manager::FunctionPtr flightTimeOfDaughterErr(const std::vector<std::string>& arguments);
-    Manager::FunctionPtr flightDistanceOfDaughterErr(const std::vector<std::string>& arguments);
-    Manager::FunctionPtr flightTimeOfDaughter(const std::vector<std::string>& arguments);
-    Manager::FunctionPtr flightDistanceOfDaughter(const std::vector<std::string>& arguments);
-    Manager::FunctionPtr vertexDistanceOfDaughter(const std::vector<std::string>& arguments);
-    Manager::FunctionPtr vertexDistanceOfDaughterErr(const std::vector<std::string>& arguments);
-    Manager::FunctionPtr vertexDistanceOfDaughterSignificance(const std::vector<std::string>& arguments);
-    Manager::FunctionPtr mcFlightDistanceOfDaughter(const std::vector<std::string>& arguments);
-    Manager::FunctionPtr mcFlightTimeOfDaughter(const std::vector<std::string>& arguments);
+    double flightTimeOfDaughterErr(const Particle* part, const std::vector<double>& daughters);
+    double flightDistanceOfDaughterErr(const Particle* part, const std::vector<double>& daughters);
+    double flightTimeOfDaughter(const Particle* part, const std::vector<double>& daughters);
+    double flightDistanceOfDaughter(const Particle* part, const std::vector<double>& daughters);
+    double vertexDistanceOfDaughter(const Particle* part, const std::vector<double>& arguments);
+    double vertexDistanceOfDaughterErr(const Particle* part, const std::vector<double>& arguments);
+    double vertexDistanceOfDaughterSignificance(const Particle* part, const std::vector<double>& arguments);
+    double mcFlightDistanceOfDaughter(const Particle* part, const std::vector<double>& daughters);
+    double mcFlightTimeOfDaughter(const Particle* part, const std::vector<double>& daughters);
   }
 } //namespace Belle2

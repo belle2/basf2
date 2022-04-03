@@ -202,7 +202,7 @@ namespace Belle2 {
 
     /** converts the SpacePoints into a SecMapTrainerTC and stores it to m_TCs */
     void convertSP2TC(
-      std::vector<std::pair< FullSecID, const SpacePoint*> >& goodSPs,
+      const std::vector<std::pair< FullSecID, const SpacePoint*> >& goodSPs,
       unsigned tcID, double pTValue, int pdgCode)
     {
       B2DEBUG(10, "SecMapTrainer::convertSPTC: nGoodHits: " << goodSPs.size());
@@ -228,7 +228,7 @@ namespace Belle2 {
   public:
 
     /** constructor. */
-    explicit SecMapTrainer(const std::string& setupName , const std::string& appendix = "") :
+    explicit SecMapTrainer(const std::string& setupName, const std::string& appendix = "") :
       m_nameSetup(setupName),
       m_config(m_filtersContainer.getFilters(m_nameSetup)->getConfig()),
       m_factory(

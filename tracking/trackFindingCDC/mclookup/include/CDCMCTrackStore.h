@@ -32,10 +32,14 @@ namespace Belle2 {
       static const CDCMCTrackStore& getInstance();
 
     public:
+
       /// Default constructor - for cppcheck
       CDCMCTrackStore() = default;
+
       /// Singleton: Delete copy constructor and assignment operator
       CDCMCTrackStore(CDCMCTrackStore&) = delete;
+
+      /// Operator =.
       CDCMCTrackStore& operator=(const CDCMCTrackStore&) = delete;
 
     public:

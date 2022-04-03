@@ -50,6 +50,7 @@ int RawRevRb2Sock::Reconnect(void)
   delete m_sock;
   m_sock = new RSocketSend((u_short)port);
   m_sock->accept();
+  return 0; //TODO is it correct?
 }
 
 

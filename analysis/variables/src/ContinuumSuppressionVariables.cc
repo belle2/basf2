@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <analysis/variables/ContinuumSuppressionVariables.h>
+
 #include <analysis/variables/ROEVariables.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
@@ -24,9 +25,6 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-
-#include <TLorentzVector.h>
-#include <TVector3.h>
 
 #include <cmath>
 
@@ -389,20 +387,20 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
 
           bool isinROE = isInRestOfEvent(particle);
-          TVector3 newZ;
+          ROOT::Math::XYZVector newZ;
           if (modeisSignal or (modeisAuto and isinROE))
             newZ = qq->getThrustB();
           else
             newZ = qq->getThrustO();
 
-          TVector3 newY(0, 0, 0);
-          if (newZ(2) == 0 and newZ(1) == 0)
-            newY(0) = 1;
+          ROOT::Math::XYZVector newY(0, 0, 0);
+          if (newZ.z() == 0 and newZ.y() == 0)
+            newY.SetX(1);
           else{
-            newY(1) = newZ(2);
-            newY(2) = -newZ(1);
+            newY.SetY(newZ.z());
+            newY.SetZ(-newZ.y());
           }
-          TVector3 newX = newY.Cross(newZ);
+          ROOT::Math::XYZVector newX = newY.Cross(newZ);
 
           UseReferenceFrame<CMSRotationFrame> signalframe(newX, newY, newZ);
 

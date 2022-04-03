@@ -13,7 +13,6 @@ namespace Belle2 {
 
   namespace Variable {
 
-
     /**
      * return Chi2 of OrcaKinFit
      */
@@ -58,7 +57,5 @@ namespace Belle2 {
      * return Unmeasured E error of OrcaKinFit 1C
      */
     double UnmeasuredErrorE(const Particle* part);
-
-
   }
 } // Belle2 namespace

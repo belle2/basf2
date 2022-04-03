@@ -8,7 +8,7 @@
 #include "TMapFile.h"
 #include "TH1.h"
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
   TMapFile* file = TMapFile::Create("TestHisto", "RECREATE", 2000000);
   TH1F* h1 = new TH1F("testhisto", "testhisto", 100, 0.0, 100.0);
@@ -21,4 +21,5 @@ int main(int argc, char** argv)
     }
     h1->Reset();
   }
+  return 0;
 }

@@ -8,35 +8,46 @@
 
 #pragma once
 
+#include <framework/geometry/B2Vector3.h>
+
 /* External headers. */
 #include <CLHEP/Geometry/Point3D.h>
 #include <CLHEP/Matrix/SymMatrix.h>
 #include <CLHEP/Vector/LorentzVector.h>
-#include <TLorentzVector.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 #include <TMatrixFSym.h>
 #include <TMatrixDSym.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 
   namespace ROOTToCLHEP {
 
     /**
-     * Convert TLorentzVector to CLHEP::HepLorentzVector.
+     * Convert PxPyPzEVector to CLHEP::HepLorentzVector.
      * @param[in] vector Vector.
      */
     inline CLHEP::HepLorentzVector
-    getHepLorentzVector(const TLorentzVector& vector)
+    getHepLorentzVector(const ROOT::Math::PxPyPzEVector& vector)
     {
       return CLHEP::HepLorentzVector(vector.X(), vector.Y(), vector.Z(),
                                      vector.T());
     }
 
     /**
-     * Convert TVector3 to HepGeom::Point3D<double>.
+     * Convert B2Vector3 to HepGeom::Point3D<double>.
      * @param[in] vector Vector.
      */
-    inline HepGeom::Point3D<double> getPoint3D(const TVector3& vector)
+    inline HepGeom::Point3D<double> getPoint3DFromB2Vector(const B2Vector3D& vector)
+    {
+      return HepGeom::Point3D<double>(vector.X(), vector.Y(), vector.Z());
+    }
+
+    /**
+     * Convert XYZVector to HepGeom::Point3D<double>.
+     * @param[in] vector Vector.
+     */
+    inline HepGeom::Point3D<double> getPoint3D(const ROOT::Math::XYZVector& vector)
     {
       return HepGeom::Point3D<double>(vector.X(), vector.Y(), vector.Z());
     }

@@ -179,7 +179,7 @@ void V0findingPerformanceEvaluationModule::event()
 
     MCParticleInfo mcParticleInfo(mcParticle, magField);
 
-    TVector3 MC_prodvtx = mcParticle.getVertex();
+    B2Vector3D MC_prodvtx = mcParticle.getVertex();
     TVector3 MC_vtx = mcParticle.getDecayVertex();
     float MC_mom = mcParticle.getMomentum().Mag();
     float MC_mass = mcParticle.getMass();

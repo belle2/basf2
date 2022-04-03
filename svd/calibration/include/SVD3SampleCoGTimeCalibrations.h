@@ -34,7 +34,7 @@ namespace Belle2 {
     SVD3SampleCoGTimeCalibrations() : m_aDBObjPtr(name)
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVD3SampleCoGTimeCalibrations: from now on we are using " <<
+        B2DEBUG(20, "SVD3SampleCoGTimeCalibrations: from now on we are using " <<
         this->m_aDBObjPtr -> get_uniqueID()); });
     }
 

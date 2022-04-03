@@ -35,7 +35,7 @@
 const char *PROGRAM = "bootmgt";
 
 typedef int mgt_t;
-mgt_t mgt = -1;
+//mgt_t mgt = -1;
 volatile unsigned long *xmemp = 0;
 int xslot = 0;
 

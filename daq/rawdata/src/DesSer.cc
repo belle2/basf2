@@ -262,7 +262,7 @@ int DesSer::sendByWriteV(RawDataBlockFormat* rawdblk)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "[WARNING] WRITEV error.(%s) : sent %d bytes, header %d bytes body %d trailer %d\n" ,
+        sprintf(err_buf, "[WARNING] WRITEV error.(%s) : sent %d bytes, header %lu bytes body %lu trailer %lu\n" ,
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
 #ifdef NONSTOP
         m_run_error = 1;
@@ -582,7 +582,7 @@ void DesSer::pauseRun()
 
 
 
-void DesSer::callCheckRunPause(string& err_str)
+void DesSer::callCheckRunPause(const string& err_str)
 {
 #ifdef NONSTOP_DEBUG
   printf("\033[34m");

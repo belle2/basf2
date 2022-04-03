@@ -115,7 +115,7 @@ with b2test_utils.clean_working_directory():
     assert bool(t1), methodPrefixEventLevel + "_tree" + " isn't contained in file"
     assert t1.GetEntries() > 0, methodPrefixEventLevel + "_tree" + "contains zero entries"
     for iVariable in variablesToBeSaved:
-        iROOTVariable = str(ROOT.Belle2.makeROOTCompatible(iVariable))
+        iROOTVariable = str(ROOT.Belle2.MakeROOTCompatible.makeROOTCompatible(iVariable))
         assert t1.GetListOfBranches().Contains(iROOTVariable),  iROOTVariable +\
             " branch is missing from " + methodPrefixEventLevel + "_tree"
 

@@ -41,6 +41,9 @@ namespace Belle2 {
     /** Initialize the module and register DataStore arrays. */
     virtual void initialize() override;
 
+    /** Register run-dependent DataStore arrays. */
+    virtual void beginRun() override;
+
     /** Run the TSF for an event. */
     virtual void event() override;
 
@@ -90,9 +93,9 @@ namespace Belle2 {
      *  for the outer super layers */
     std::vector<std::vector<unsigned>> outerTrueLRTable = {};
     //** number of layers in Super layer**/
-    const static int MAX_N_LAYERS = 8;
+    const static int MAX_N_LAYERS = c_maxWireLayersPerSuperLayer;
     /** bad channel mapping */
-    bool deadch_map[nSuperLayers][MAX_N_LAYERS][MAX_N_SCELLS] = {};
+    bool deadch_map[c_nSuperLayers][MAX_N_LAYERS][c_maxNDriftCells] = {};
 
     /** list of input CDC hits */
     StoreArray<CDCHit> m_cdcHits;

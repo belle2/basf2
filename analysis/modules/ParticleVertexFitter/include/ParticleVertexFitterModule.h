@@ -16,6 +16,8 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <framework/geometry/B2Vector3.h>
+
 // DataObjects
 #include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dbobjects/BeamSpot.h>
@@ -28,6 +30,7 @@
 #include <analysis/VertexFitting/KFit/MassVertexFitKFit.h>
 #include <analysis/VertexFitting/KFit/VertexFitKFit.h>
 #include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
+#include <analysis/VertexFitting/KFit/RecoilMassKFit.h>
 
 // Rave
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
@@ -80,10 +83,11 @@ namespace Belle2 {
     bool m_updateDaughters;       /**< flag for daughters update */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
     bool m_hasCovMatrix = false;      /**< flag for mother covariance matrix (PseudoFitter)*/
-    TVector3 m_BeamSpotCenter;    /**< Beam spot position */
+    B2Vector3D m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
     double m_smearing;            /**< smearing width applied to IP tube */
+    double m_recoilMass;            /**< recoil mass for constraint*/
     std::vector<int> m_massConstraintList; /**< PDG codes of the particles to be mass constraint (massfourC)*/
     std::vector<std::string> m_massConstraintListParticlename; /**< Name of the particles to be mass constraint (massfourC)*/
 
@@ -139,6 +143,13 @@ namespace Belle2 {
     bool doKMassFourCFit(Particle* p);
 
     /**
+     * RecoilMass fit using KFit
+     * @param p pointer to particle
+     * @return true for successful fit
+     */
+    bool doKRecoilMassFit(Particle* p);
+
+    /**
      * Update mother particle after unconstrained vertex fit using KFit
      * @param kv reference to KFit VertexFit object
      * @param p pointer to particle
@@ -187,6 +198,14 @@ namespace Belle2 {
     bool makeMassKFourCMother(analysis::MassFourCFitKFit& kv, Particle* p);
 
     /**
+     * Update mother particle after RecoilMass fit using KFit
+     * @param kf reference to KFit MassFit object
+     * @param p pointer to particle
+     * @return true for successful construction of mother
+     */
+    bool makeKRecoilMassMother(analysis::RecoilMassKFit& kf, Particle* p);
+
+    /**
      * update the map of daughter and tracks, find out which tracks belong to each daughter.
      * @param l represent the tracks ID
      * @param pars map of all parameters
@@ -228,6 +247,12 @@ namespace Belle2 {
      */
     bool fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren,
                           std::vector<const Particle*>& twoPhotonChildren);
+
+    /**
+     * Fills valid particle's children (with valid error matrix) in the vector of Particles that will not enter the fit.
+     */
+    bool fillNotFitParticles(const Particle* mother, std::vector<const Particle*>& notFitChildren,
+                             const std::vector<const Particle*>& fitChildren);
 
     /**
      * Combines preFit particle and vertex information from vertex fit kv to create new postFit particle.

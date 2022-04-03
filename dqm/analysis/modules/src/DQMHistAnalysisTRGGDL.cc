@@ -43,7 +43,7 @@ DQMHistAnalysisTRGGDLModule::DQMHistAnalysisTRGGDLModule()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("debug", m_debug, "debug mode", false);
   addParam("alert", m_enableAlert, "Enable color alert", true);
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
 }
 
 DQMHistAnalysisTRGGDLModule::~DQMHistAnalysisTRGGDLModule()
@@ -792,19 +792,5 @@ void DQMHistAnalysisTRGGDLModule::terminate()
   }
 #endif
   B2DEBUG(20, "terminate called");
-}
-
-TCanvas* DQMHistAnalysisTRGGDLModule::find_canvas(TString canvas_name)
-{
-  TIter nextckey(gROOT->GetListOfCanvases());
-  TObject* cobj = NULL;
-
-  while ((cobj = (TObject*)nextckey())) {
-    if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      if (cobj->GetName() == canvas_name)
-        break;
-    }
-  }
-  return (TCanvas*)cobj;
 }
 

@@ -167,7 +167,7 @@ namespace Belle2 {
 
       string cryLogiVolName = (format("Enclosure_%1%_Crystal_%2%") % iEnclosure % iCry).str();
       G4Trap* CrystalShape = new G4Trap((format("sCrystal_%1%") % iCry).str().c_str(),
-                                        halflength , 0 , 0, h1 ,   bl1, tl1 , alpha1 , h2   , bl2, tl2, alpha2);
+                                        halflength, 0, 0, h1,   bl1, tl1, alpha1, h2, bl2, tl2, alpha2);
       G4LogicalVolume* Crystal = new G4LogicalVolume(CrystalShape, crystalMaterial,
                                                      cryLogiVolName.c_str(),
                                                      0, 0, 0);
@@ -180,13 +180,13 @@ namespace Belle2 {
 
       /////////////////  add actual foil ///////////////////////////////////////
       G4Trap* Foilout = new G4Trap((format("Foilout_%1%") % iCry).str().c_str(),
-                                   foilhalflength , 0 , 0, foilh1,  foilbl1,
-                                   foiltl1, alpha1 , foilh2, foilbl2,
+                                   foilhalflength, 0, 0, foilh1,  foilbl1,
+                                   foiltl1, alpha1, foilh2, foilbl2,
                                    foiltl2, alpha2);
 
       G4Trap* Foilin = new G4Trap((format("solidEclCrystal_%1%") % iCry).str().c_str(),
-                                  halflength * avoidov , 0 , 0, h1 * avoidov ,
-                                  bl1 * avoidov, tl1 * avoidov , alpha1 , h2 * avoidov,
+                                  halflength * avoidov, 0, 0, h1 * avoidov,
+                                  bl1 * avoidov, tl1 * avoidov, alpha1, h2 * avoidov,
                                   bl2 * avoidov, tl2 * avoidov, alpha2);
       G4SubtractionSolid* FoilShape = new G4SubtractionSolid((format("sFoil_%1%") % iCry).str().c_str(),
                                                              Foilout, Foilin);

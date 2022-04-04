@@ -31,6 +31,7 @@ namespace Belle2 {
   class RecoTrackGenfitAccess;
 
   BELLE2_DEFINE_EXCEPTION(NoTrackFitResult, "No track fit result available for this hit (e.g. DAF has removed it).")
+  BELLE2_DEFINE_EXCEPTION(NoStateOnPlaneFound, "No measured state on pland for any track point found.")
 
   /** This is the Reconstruction Event-Data Model Track.
    *
@@ -119,7 +120,7 @@ namespace Belle2 {
      * @param recoHitInformationStoreArrayName  name of the StoreArray holding RecoHitInformation lists
      */
     static void registerRequiredRelations(
-      StoreArray<RecoTrack> const& recoTracks,
+      StoreArray<RecoTrack>& recoTracks,
       std::string const& pxdHitsStoreArrayName = "",
       std::string const& svdHitsStoreArrayName = "",
       std::string const& cdcHitsStoreArrayName = "",
@@ -588,9 +589,9 @@ namespace Belle2 {
         const genfit::AbsTrackRep* representation = nullptr) const;
 
     /** Return genfit's MasuredStateOnPlane, that is closest to the given point
-     * useful for extrapolation of measurements other locations. If non is found a nullptr will be returned
+     * useful for extrapolation of measurements other locations
      */
-    const genfit::MeasuredStateOnPlane* getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
         const genfit::AbsTrackRep* representation = nullptr);
 
     /** Prune the genfit track, e.g. remove all track points with measurements, but the first and the last one.

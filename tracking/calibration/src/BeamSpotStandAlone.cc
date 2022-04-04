@@ -1958,11 +1958,9 @@ namespace Belle2::BeamSpotCalib {
 
 
 
-  /** Returns tuple with the beamspot parameters
-   @param kPlot:  plots for index kPlot
-  */
+  // Returns tuple with the beamspot parameters
   tuple<vector<VectorXd>, vector<MatrixXd>, MatrixXd>  runBeamSpotAnalysis(vector<Event> evts,
-      const vector<double>& splitPoints, const int kPlot = -1)
+      const vector<double>& splitPoints)
   {
     const double xyPosLimit  = 70; //um
     const double xySize2Limit = pow(40, 2); //um^2
@@ -1986,6 +1984,7 @@ namespace Belle2::BeamSpotCalib {
       //simple XY pos fit
       auto resTemp = fitSpotPositionSplines(evts, indX, indY);
 
+      const int kPlot = -1;
       if (k == kPlot) {
         plotSpotPositionFit(evts, resTemp, "positionFitSimpe");
         plotSpotPositionPull(evts, resTemp, "pullsPositionSimple",  xyPosLimit);

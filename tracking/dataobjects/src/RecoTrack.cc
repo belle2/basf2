@@ -47,7 +47,7 @@ RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum,
 }
 
 void RecoTrack::registerRequiredRelations(
-  StoreArray<RecoTrack> const& recoTracks,
+  StoreArray<RecoTrack>& recoTracks,
   std::string const& pxdHitsStoreArrayName,
   std::string const& svdHitsStoreArrayName,
   std::string const& cdcHitsStoreArrayName,
@@ -362,7 +362,7 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
       m_genfitTrack.getFittedState(i, representation);
       return true;
     } catch (const genfit::Exception& exception) {
-      B2DEBUG(25, "Can not get mSoP because of: " << exception.what());
+      B2DEBUG(100, "Can not get mSoP because of: " << exception.what());
     }
   }
 
@@ -415,7 +415,7 @@ genfit::AbsTrackRep* RecoTrackGenfitAccess::createOrReturnRKTrackRep(RecoTrack& 
   return trackRepresentation;
 }
 
-const genfit::MeasuredStateOnPlane* RecoTrack::getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
+const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
     const genfit::AbsTrackRep* representation)
 {
   checkDirtyFlag();
@@ -436,12 +436,18 @@ const genfit::MeasuredStateOnPlane* RecoTrack::getMeasuredStateOnPlaneClosestTo(
         minimalDistance2 = currentDistance2;
       }
     } catch (const genfit::Exception& exception) {
-      B2DEBUG(20, "Can not get mSoP because of: " << exception.what());
+      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
       continue;
     }
   }
 
-  return nearestStateOnPlane;
+  // catch case no hit has measured state on plane (not sure how likely that is) which would lead to undefined behavior
+  if (not nearestStateOnPlane) {
+    B2WARNING("Non of the track hits had a MeasuredStateOnPlane! Exception thrown.");
+    throw  NoStateOnPlaneFound();
+  }
+
+  return *nearestStateOnPlane;
 }
 
 
@@ -591,7 +597,7 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromFirstH
     try {
       return m_genfitTrack.getFittedState(i, representation);
     } catch (const genfit::Exception& exception) {
-      B2DEBUG(20, "Can not get mSoP because of: " << exception.what());
+      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
     }
   }
 
@@ -605,7 +611,7 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromLastHi
     try {
       return m_genfitTrack.getFittedState(i, representation);
     } catch (const genfit::Exception& exception) {
-      B2DEBUG(20, "Can not get mSoP because of: " << exception.what());
+      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
     }
   }
 

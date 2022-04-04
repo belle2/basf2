@@ -119,7 +119,7 @@ namespace Belle2 {
      * @param recoHitInformationStoreArrayName  name of the StoreArray holding RecoHitInformation lists
      */
     static void registerRequiredRelations(
-      StoreArray<RecoTrack>& recoTracks,
+      StoreArray<RecoTrack> const& recoTracks,
       std::string const& pxdHitsStoreArrayName = "",
       std::string const& svdHitsStoreArrayName = "",
       std::string const& cdcHitsStoreArrayName = "",
@@ -588,9 +588,9 @@ namespace Belle2 {
         const genfit::AbsTrackRep* representation = nullptr) const;
 
     /** Return genfit's MasuredStateOnPlane, that is closest to the given point
-     * useful for extrapolation of measurements other locations
+     * useful for extrapolation of measurements other locations. If non is found a nullptr will be returned
      */
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
+    const genfit::MeasuredStateOnPlane* getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
         const genfit::AbsTrackRep* representation = nullptr);
 
     /** Prune the genfit track, e.g. remove all track points with measurements, but the first and the last one.

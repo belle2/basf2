@@ -47,7 +47,7 @@ RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum,
 }
 
 void RecoTrack::registerRequiredRelations(
-  StoreArray<RecoTrack>& recoTracks,
+  StoreArray<RecoTrack> const& recoTracks,
   std::string const& pxdHitsStoreArrayName,
   std::string const& svdHitsStoreArrayName,
   std::string const& cdcHitsStoreArrayName,
@@ -362,7 +362,7 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
       m_genfitTrack.getFittedState(i, representation);
       return true;
     } catch (const genfit::Exception& exception) {
-      B2DEBUG(100, "Can not get mSoP because of: " << exception.what());
+      B2DEBUG(25, "Can not get mSoP because of: " << exception.what());
     }
   }
 
@@ -375,7 +375,7 @@ void RecoTrack::prune()
   // Copy is intended!
   std::vector<RelationEntry> relatedRecoHitInformations = getRelationsWith<RecoHitInformation>
                                                           (m_storeArrayNameOfRecoHitInformation).relations();
-  std::sort(relatedRecoHitInformations.begin(), relatedRecoHitInformations.end() , [](const RelationEntry & lhs,
+  std::sort(relatedRecoHitInformations.begin(), relatedRecoHitInformations.end(), [](const RelationEntry & lhs,
   const RelationEntry & rhs) {
     return dynamic_cast<RecoHitInformation*>(lhs.object)->getSortingParameter() > dynamic_cast<RecoHitInformation*>
            (rhs.object)->getSortingParameter();
@@ -415,7 +415,7 @@ genfit::AbsTrackRep* RecoTrackGenfitAccess::createOrReturnRKTrackRep(RecoTrack& 
   return trackRepresentation;
 }
 
-const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
+const genfit::MeasuredStateOnPlane* RecoTrack::getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
     const genfit::AbsTrackRep* representation)
 {
   checkDirtyFlag();
@@ -436,11 +436,12 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(
         minimalDistance2 = currentDistance2;
       }
     } catch (const genfit::Exception& exception) {
-      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
+      B2DEBUG(20, "Can not get mSoP because of: " << exception.what());
       continue;
     }
   }
-  return *nearestStateOnPlane;
+
+  return nearestStateOnPlane;
 }
 
 
@@ -590,7 +591,7 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromFirstH
     try {
       return m_genfitTrack.getFittedState(i, representation);
     } catch (const genfit::Exception& exception) {
-      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
+      B2DEBUG(20, "Can not get mSoP because of: " << exception.what());
     }
   }
 
@@ -604,7 +605,7 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromLastHi
     try {
       return m_genfitTrack.getFittedState(i, representation);
     } catch (const genfit::Exception& exception) {
-      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
+      B2DEBUG(20, "Can not get mSoP because of: " << exception.what());
     }
   }
 

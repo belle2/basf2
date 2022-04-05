@@ -51,6 +51,8 @@ He3tubeStudyModule::He3tubeStudyModule() : HistoModule()
   // Parameter definitions
   addParam("sampleTime", m_sampletime, "Length of sample, in us", 10000);
 
+  //convert sample time into rate in Hz
+  rateCorrection = m_sampletime / 1e6;
 }
 
 He3tubeStudyModule::~He3tubeStudyModule()
@@ -122,9 +124,6 @@ void He3tubeStudyModule::initialize()
   B2INFO("He3tubeStudyModule: Initialize");
 
   REG_HISTOGRAM
-
-  //convert sample time into rate in Hz
-  rateCorrection = m_sampletime / 1e6;
 }
 
 void He3tubeStudyModule::beginRun()

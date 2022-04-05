@@ -67,7 +67,7 @@ void DQMHistAnalysisExampleFlagsModule::event()
 
   // doesnt change
   const Int_t colNum = 5;
-  Int_t palette[colNum] {13 /* (dark) grey*/, 0 /* White*/ , 3 /* Green */, 5 /* Yellow */, 2 /* Red */};
+  Int_t palette[colNum] {13 /* (dark) grey*/, 0 /* White*/, 3 /* Green */, 5 /* Yellow */, 2 /* Red */};
 
   // Guess I have to set this for every update
   gStyle->SetPalette(5, palette);

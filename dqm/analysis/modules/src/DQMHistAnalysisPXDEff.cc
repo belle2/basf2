@@ -528,7 +528,7 @@ void DQMHistAnalysisPXDEffModule::event()
       if (ay) ay->SetRangeUser(scale_min, 1.0);
       auto ax = gr->GetXaxis();
       if (ax) {
-        ax->Set(m_PXDModules.size() , 0, m_PXDModules.size());
+        ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
           TString ModuleName = (std::string)m_PXDModules[i];
           ax->SetBinLabel(i + 1, ModuleName);

@@ -1985,6 +1985,7 @@ namespace Belle2::BeamSpotCalib {
       auto resTemp = fitSpotPositionSplines(evts, indX, indY);
 
       const int kPlot = -1;
+      // cppcheck-suppress knownConditionTrueFalse
       if (k == kPlot) {
         plotSpotPositionFit(evts, resTemp, "positionFitSimpe");
         plotSpotPositionPull(evts, resTemp, "pullsPositionSimple",  xyPosLimit);

@@ -281,7 +281,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
         alpha = cdcgeo.getOutgoingAlpha(alpha);
 
         B2DEBUG(99, "x_unbiased " << x_u << " |left_right " << lr);
-        if (m_calExpectedDriftTime) { t_fit = cdcgeo.getDriftTime(abs(x_u), lay, lr, alpha , theta);}
+        if (m_calExpectedDriftTime) { t_fit = cdcgeo.getDriftTime(abs(x_u), lay, lr, alpha, theta);}
         alpha *= 180 / M_PI;
         theta *= 180 / M_PI;
         //estimate drift time

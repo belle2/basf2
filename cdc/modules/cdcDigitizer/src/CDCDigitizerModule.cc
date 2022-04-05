@@ -819,7 +819,7 @@ double CDCDigitizerModule::smearDriftLength(const double driftLength, const doub
 #endif
 
   // Smear drift length
-  double newDL = gRandom->Gaus(driftLength + mean , resolution);
+  double newDL = gRandom->Gaus(driftLength + mean, resolution);
   while (newDL <= 0.) newDL = gRandom->Gaus(driftLength + mean, resolution);
   //  cout << "totalFugeF in Digi= " << m_totalFudgeFactor << endl;
   return newDL;

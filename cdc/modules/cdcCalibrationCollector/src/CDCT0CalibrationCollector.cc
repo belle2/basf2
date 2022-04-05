@@ -181,7 +181,7 @@ void CDCT0CalibrationCollectorModule::collect()
           theta = cdcgeo.getOutgoingTheta(alpha, theta);
           alpha = cdcgeo.getOutgoingAlpha(alpha);
 
-          double t_fit = cdcgeo.getDriftTime(std::abs(x_u), lay, lr, alpha , theta);
+          double t_fit = cdcgeo.getDriftTime(std::abs(x_u), lay, lr, alpha, theta);
           //estimate drift time
           double dt_flight;
           double dt_prop;

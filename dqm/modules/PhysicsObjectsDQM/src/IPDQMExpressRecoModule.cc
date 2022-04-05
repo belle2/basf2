@@ -16,7 +16,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(IPDQMExpressReco)
+REG_MODULE(IPDQMExpressReco);
 
 //-----------------------------------------------------------------
 //                 Implementation

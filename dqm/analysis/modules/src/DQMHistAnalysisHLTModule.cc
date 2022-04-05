@@ -33,7 +33,7 @@ namespace {
   }
 }
 
-REG_MODULE(DQMHistAnalysisHLT)
+REG_MODULE(DQMHistAnalysisHLT);
 
 DQMHistAnalysisHLTModule::DQMHistAnalysisHLTModule()
 {

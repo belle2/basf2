@@ -23,7 +23,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisPXDEff)
+REG_MODULE(DQMHistAnalysisPXDEff);
 
 //-----------------------------------------------------------------
 //                 Implementation

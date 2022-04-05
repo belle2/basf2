@@ -24,7 +24,7 @@ using namespace Belle2;
 using namespace CDC;
 
 // register module
-REG_MODULE(CDCDigitizer)
+REG_MODULE(CDCDigitizer);
 CDCDigitizerModule::CDCDigitizerModule() : Module(),
   m_cdcgp(), m_gcp(), m_aCDCSimHit(), m_posFlag(0),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),

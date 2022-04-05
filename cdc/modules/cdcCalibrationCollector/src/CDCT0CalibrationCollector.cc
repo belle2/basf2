@@ -23,7 +23,7 @@ using namespace Belle2;
 using namespace CDC;
 using namespace genfit;
 
-REG_MODULE(CDCT0CalibrationCollector)
+REG_MODULE(CDCT0CalibrationCollector);
 
 CDCT0CalibrationCollectorModule::CDCT0CalibrationCollectorModule() : CalibrationCollectorModule()
 {

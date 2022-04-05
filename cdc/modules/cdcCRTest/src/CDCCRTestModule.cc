@@ -34,7 +34,7 @@ using namespace genfit;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCCRTest)
+REG_MODULE(CDCCRTest);
 
 //                 Implementation
 CDCCRTestModule::CDCCRTestModule() : HistoModule()

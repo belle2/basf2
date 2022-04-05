@@ -32,7 +32,7 @@ using namespace genfit;
 using namespace TrackFindingCDC;
 
 
-REG_MODULE(CDCCalibrationCollector)
+REG_MODULE(CDCCalibrationCollector);
 
 
 CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationCollectorModule()

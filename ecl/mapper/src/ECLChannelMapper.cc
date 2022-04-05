@@ -264,7 +264,7 @@ int ECLChannelMapper::getCrateID(int iCOPPERNode, int iFINESSE, bool pcie40)
       }
     } else if (iCOPPERNode == BECL_ID + 3) {
       // Endcap crates
-      iCrate = 2 * ECL_BARREL_FEE_IN_PCIE40 + iFINESSE + 1;
+      iCrate = 2 * ECL_BARREL_FEE_IN_PCIE40 + (iFINESSE % 2) * 8 + iFINESSE / 2 + 1;
       if (iFINESSE >= ECL_ENDCAP_FEE_IN_PCIE40) {
         B2ERROR("ECLChannelMapper:: slot id must be less than 16, got slot id " << iFINESSE);
         return -1;

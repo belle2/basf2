@@ -256,7 +256,7 @@ bool ParticleKinematicFitterModule::doOrcaKinFitFit(Particle* mother)
         mother->addExtraInfo("OrcaKinFit" + name + "E", tlv.E());
 
         // Uncertainty
-        const double err0 = getFitObjectError(fitobject, 0);
+        // const double err0 = getFitObjectError(fitobject, 0);
         mother->addExtraInfo("OrcaKinFit" + name + "ErrorTheta", getFitObjectError(fitobject, 1));
         mother->addExtraInfo("OrcaKinFit" + name + "ErrorPhi", getFitObjectError(fitobject, 2));
         mother->addExtraInfo("OrcaKinFit" + name + "ErrorE", getFitObjectError(fitobject, 0));

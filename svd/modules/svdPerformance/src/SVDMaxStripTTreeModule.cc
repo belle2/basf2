@@ -16,7 +16,7 @@ using namespace Belle2;
 using namespace std;
 using namespace SoftwareTrigger;
 
-REG_MODULE(SVDMaxStripTTree)
+REG_MODULE(SVDMaxStripTTree);
 
 SVDMaxStripTTreeModule::SVDMaxStripTTreeModule() : Module()
 {

@@ -22,7 +22,7 @@ using namespace std;
 
 using namespace Belle2;
 
-REG_MODULE(SVDHotStripFinder)
+REG_MODULE(SVDHotStripFinder);
 SVDHotStripFinderModule::SVDHotStripFinderModule() : Module()
 {
   setDescription("The svdHotStripFinder module finds hot strips in SVD data SVDShaperDigit");

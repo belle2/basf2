@@ -16,7 +16,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(SVDB4CommissioningPlots)
+REG_MODULE(SVDB4CommissioningPlots);
 
 SVDB4CommissioningPlotsModule::SVDB4CommissioningPlotsModule() : Module()
   , m_nTracks(0), m_Pvalue(), m_mom(0), m_nSVDhits(0)

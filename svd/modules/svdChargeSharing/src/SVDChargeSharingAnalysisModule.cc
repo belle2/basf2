@@ -37,7 +37,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDChargeSharingAnalysis)
+REG_MODULE(SVDChargeSharingAnalysis);
 
 //-----------------------------------------------------------------
 //                 Implementation

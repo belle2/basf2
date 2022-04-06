@@ -17,7 +17,7 @@ using namespace Belle2::VXD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDDQMInjection)
+REG_MODULE(SVDDQMInjection);
 
 //-----------------------------------------------------------------
 //                 Implementation

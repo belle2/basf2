@@ -25,7 +25,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(SVDClusterEvaluationTrueInfo)
+REG_MODULE(SVDClusterEvaluationTrueInfo);
 
 
 SVDClusterEvaluationTrueInfoModule::SVDClusterEvaluationTrueInfoModule() : Module()

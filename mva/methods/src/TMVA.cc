@@ -214,6 +214,7 @@ namespace Belle2 {
         free(directory_template);
       }
 
+      // cppcheck-suppress unreadVariable
       auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;
@@ -315,6 +316,7 @@ namespace Belle2 {
         free(directory_template);
       }
 
+      // cppcheck-suppress unreadVariable
       auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;

@@ -451,7 +451,8 @@ class TrackingValidationModule(basf2.Module):
             if not is_primary(mcParticle):
                 multiplicity_primaries -= 1
 
-        charge_asymmetry = (n_matched_plus - n_matched_minus)/(n_matched_plus + n_matched_minus)
+        charge_asymmetry = (n_matched_plus - n_matched_minus)/(n_matched_plus +
+                                                               n_matched_minus) if (n_matched_plus + n_matched_minus) != 0 else 0
         for mcTrackCand in mcTrackCands:
             if is_primary(mcParticle):
                 self.mc_charge_asymmetry.append(charge_asymmetry)

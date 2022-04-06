@@ -513,8 +513,8 @@ namespace Belle2 {
       double radius1 = 1 / Omega1;
       double radius2 = 1 / Omega2;
 
-      TVector2 center1((radius1 + D01) * sin(Phi01) , -1 * (radius1 + D01) * cos(Phi01));
-      TVector2 center2((radius2 + D02) * sin(Phi02) , -1 * (radius2 + D02) * cos(Phi02));
+      TVector2 center1((radius1 + D01) * sin(Phi01), -1 * (radius1 + D01) * cos(Phi01));
+      TVector2 center2((radius2 + D02) * sin(Phi02), -1 * (radius2 + D02) * cos(Phi02));
       TVector2 cenDiff = center1 - center2;
 
       double delR = fabs(radius1) + fabs(radius2) - cenDiff.Mod();
@@ -547,8 +547,8 @@ namespace Belle2 {
       double radius1 = 1 / Omega1;
       double radius2 = 1 / Omega2;
 
-      TVector2 center1((radius1 + D01) * sin(Phi01) , -1 * (radius1 + D01) * cos(Phi01));
-      TVector2 center2((radius2 + D02) * sin(Phi02) , -1 * (radius2 + D02) * cos(Phi02));
+      TVector2 center1((radius1 + D01) * sin(Phi01), -1 * (radius1 + D01) * cos(Phi01));
+      TVector2 center2((radius2 + D02) * sin(Phi02), -1 * (radius2 + D02) * cos(Phi02));
 
       TVector2 n1 =  center1 - center2; n1 = n1.Unit();
       TVector2 n2 = -1 * n1;
@@ -606,8 +606,8 @@ namespace Belle2 {
       double radius1 = 1 / Omega1;
       double radius2 = 1 / Omega2;
 
-      TVector2 center1((radius1 + D01) * sin(Phi01) , -1 * (radius1 + D01) * cos(Phi01));
-      TVector2 center2((radius2 + D02) * sin(Phi02) , -1 * (radius2 + D02) * cos(Phi02));
+      TVector2 center1((radius1 + D01) * sin(Phi01), -1 * (radius1 + D01) * cos(Phi01));
+      TVector2 center2((radius2 + D02) * sin(Phi02), -1 * (radius2 + D02) * cos(Phi02));
       TVector2 cenDiff = center2 - center1;
       double delR = fabs(radius1) + fabs(radius2) - cenDiff.Mod();
 
@@ -664,8 +664,8 @@ namespace Belle2 {
       double radius1 = 1 / Omega1;
       double radius2 = 1 / Omega2;
 
-      TVector2 center1((radius1 + D01) * sin(Phi01) , -1 * (radius1 + D01) * cos(Phi01));
-      TVector2 center2((radius2 + D02) * sin(Phi02) , -1 * (radius2 + D02) * cos(Phi02));
+      TVector2 center1((radius1 + D01) * sin(Phi01), -1 * (radius1 + D01) * cos(Phi01));
+      TVector2 center2((radius2 + D02) * sin(Phi02), -1 * (radius2 + D02) * cos(Phi02));
       TVector2 n1 =  center1 - center2; n1 = n1.Unit();
       TVector2 n2 = -1 * n1;
       n1 = copysign(1.0, Omega1) * n1;

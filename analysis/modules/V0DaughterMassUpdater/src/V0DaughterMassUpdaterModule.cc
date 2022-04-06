@@ -16,7 +16,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(V0DaughterMassUpdater)
+REG_MODULE(V0DaughterMassUpdater);
 
 V0DaughterMassUpdaterModule::V0DaughterMassUpdaterModule() : Module()
 {

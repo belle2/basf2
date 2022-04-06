@@ -780,6 +780,7 @@ namespace Belle2 {
       [](const std::pair<double, int>& l, const std::pair<double, int>& r) {
         return l.first > r.first;
       });
+      // cppcheck-suppress containerOutOfBounds
       return mcps.object(weightsAndIndices[0].second)->getPDG();
     }
 
@@ -952,7 +953,7 @@ namespace Belle2 {
                       "NaN if i-th daughter does not exist.");
     REGISTER_VARIABLE("genNMissingDaughter(PDG)", genNMissingDaughter,
                       "Returns the number of missing daughters having assigned PDG codes. "
-                      "NaN if no MCParticle is associated to the particle.")
+                      "NaN if no MCParticle is associated to the particle.");
     REGISTER_VARIABLE("Eher", getHEREnergy, R"DOC(
 [Eventbased] The nominal HER energy used by the generator.
 
@@ -976,13 +977,13 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Generated tau decay information");
     REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode,
-                      "[Eventbased] Decay ID for the positive tau lepton in a tau pair generated event.")
+                      "[Eventbased] Decay ID for the positive tau lepton in a tau pair generated event.");
     REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode,
-                      "[Eventbased] Decay ID for the negative tau lepton in a tau pair generated event.")
+                      "[Eventbased] Decay ID for the negative tau lepton in a tau pair generated event.");
     REGISTER_VARIABLE("tauPlusMCProng", tauPlusMcProng,
-                      "[Eventbased] Prong for the positive tau lepton in a tau pair generated event.")
+                      "[Eventbased] Prong for the positive tau lepton in a tau pair generated event.");
     REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
-                      "[Eventbased] Prong for the negative tau lepton in a tau pair generated event.")
+                      "[Eventbased] Prong for the negative tau lepton in a tau pair generated event.");
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,

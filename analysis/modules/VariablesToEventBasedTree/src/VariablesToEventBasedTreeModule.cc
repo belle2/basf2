@@ -23,7 +23,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(VariablesToEventBasedTree)
+REG_MODULE(VariablesToEventBasedTree);
 
 
 VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :

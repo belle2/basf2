@@ -81,7 +81,7 @@ void SelectorMVA::initialize()
     m_TFile = TFile::Open(m_TFileName.c_str(), "RECREATE");
     m_TTree = new TTree("ntuple", "Training Data for the Curl Tagger MVA");
 
-    m_TTree -> Branch("PPhi"  , &m_PPhi, "PPhi/F");
+    m_TTree -> Branch("PPhi", &m_PPhi, "PPhi/F");
     m_TTree -> Branch("ChargeProduct", &m_ChargeProduct, "ChargeProduct/F");
     m_TTree -> Branch("PtDiffEW", &m_PtDiffEW, "PtDiffEW/F");
     m_TTree -> Branch("PzDiffEW", &m_PzDiffEW, "PzDiffEW/F");

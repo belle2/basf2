@@ -143,10 +143,6 @@ void SVDCoGTimeEstimatorModule::event()
 
     m_StopCreationReco = false;
 
-
-    if (m_StopCreationReco)
-      continue;
-
     samples_vec = shaper.getSamples();
 
     //retrieve the VxdID, sensor and cellID of the current RecoDigit

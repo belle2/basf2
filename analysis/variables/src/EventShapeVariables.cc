@@ -585,7 +585,8 @@ namespace Belle2 {
           ROOT::Math::XYZVector newY(0, 0, 0);
           if (newZ.z() == 0 and newZ.y() == 0)
             newY.SetX(1);
-          else{
+          else
+          {
             newY.SetY(newZ.z());
             newY.SetZ(-newZ.y());
           }

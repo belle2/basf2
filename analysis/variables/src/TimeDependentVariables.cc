@@ -787,7 +787,7 @@ namespace Belle2 {
 
       return [variable](const Particle * part) -> double {
         double sum = cumulate(part, variable, 0, [](double s, double f, double) {return s + f;});
-        double tot = cumulate(part, variable, 0, [](double s, double  , double) {return s + 1;});
+        double tot = cumulate(part, variable, 0, [](double s, double, double) {return s + 1;});
         return (tot > 0) ? sum / tot : realNaN;
       };
     }
@@ -801,7 +801,7 @@ namespace Belle2 {
 
       return [variable](const Particle * part) -> double {
         double sum = cumulate(part, variable, 0, [](double s, double f, double) {return s + f * f;});
-        double tot = cumulate(part, variable, 0, [](double s, double  , double) {return s + 1;});
+        double tot = cumulate(part, variable, 0, [](double s, double, double) {return s + 1;});
         return (tot > 0) ? sum / tot : realNaN;
       };
     }
@@ -842,7 +842,7 @@ namespace Belle2 {
 
       return [variable](const Particle * part) -> double {
         double num = cumulate(part, variable, 0, [](double s, double f, double w) {return s + w * f;});
-        double den = cumulate(part, variable, 0, [](double s, double  , double w) {return s + w;});
+        double den = cumulate(part, variable, 0, [](double s, double, double w) {return s + w;});
         return (den > 0) ? num / den : realNaN;
       };
     }
@@ -856,7 +856,7 @@ namespace Belle2 {
 
       return [variable](const Particle * part) -> double {
         double num = cumulate(part, variable, 0, [](double s, double f, double w) {return s + w * f * f;});
-        double den = cumulate(part, variable, 0, [](double s, double  , double w) {return s + w;});
+        double den = cumulate(part, variable, 0, [](double s, double, double w) {return s + w;});
         return (den > 0) ? num / den : realNaN;
       };
     }

@@ -18,7 +18,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(FlavorTaggerInfoFiller)
+REG_MODULE(FlavorTaggerInfoFiller);
 
 FlavorTaggerInfoFillerModule::FlavorTaggerInfoFillerModule() : Module()
 {

@@ -344,17 +344,17 @@ MassVertexFitKFit::prepareOutputMatrix() {
       pdata.setMomentum(HepLorentzVector(h3v, m_al_1[index * KFitConst::kNumber7 + 3][0]), KFitConst::kAfterFit);
     // position
     pdata.setPosition(HepPoint3D(
-      m_al_1[index * KFitConst::kNumber7 + 4][0],
-      m_al_1[index * KFitConst::kNumber7 + 5][0],
-      m_al_1[index * KFitConst::kNumber7 + 6][0]), KFitConst::kAfterFit);
+                        m_al_1[index * KFitConst::kNumber7 + 4][0],
+                        m_al_1[index * KFitConst::kNumber7 + 5][0],
+                        m_al_1[index * KFitConst::kNumber7 + 6][0]), KFitConst::kAfterFit);
     // error of the tracks
     pdata.setError(this->makeError3(pdata.getMomentum(),
-    m_V_al_1.sub(
-      index    * KFitConst::kNumber7 + 1,
-      (index + 1)*KFitConst::kNumber7,
-      index    * KFitConst::kNumber7 + 1,
-      (index + 1)*KFitConst::kNumber7), m_IsFixMass[index]),
-    KFitConst::kAfterFit);
+                                    m_V_al_1.sub(
+                                      index    * KFitConst::kNumber7 + 1,
+                                      (index + 1)*KFitConst::kNumber7,
+                                      index    * KFitConst::kNumber7 + 1,
+                                      (index + 1)*KFitConst::kNumber7), m_IsFixMass[index]),
+                   KFitConst::kAfterFit);
     if (m_ErrorCode != KFitError::kNoError) break;
     index++;
   }
@@ -399,9 +399,9 @@ MassVertexFitKFit::makeCoreMatrix() {
     al_1_prime[i * KFitConst::kNumber7 + 0][0] -= a * (m_v_a[1][0] - al_1_prime[i * KFitConst::kNumber7 + 5][0]);
     al_1_prime[i * KFitConst::kNumber7 + 1][0] += a * (m_v_a[0][0] - al_1_prime[i * KFitConst::kNumber7 + 4][0]);
     energy[i] = sqrt(al_1_prime[i * KFitConst::kNumber7 + 0][0] * al_1_prime[i * KFitConst::kNumber7 + 0][0] +
-    al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
-    al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
-    m_property[i][1] * m_property[i][1]);
+                     al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
+                     al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
+                     m_property[i][1] * m_property[i][1]);
   }
 
   for (int i = 0; i < m_TrackCount; i++)

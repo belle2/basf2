@@ -15,7 +15,7 @@
 
 namespace Belle2 {
 
-  REG_MODULE(MVAPrototype)
+  REG_MODULE(MVAPrototype);
 
   MVAPrototypeModule::MVAPrototypeModule() : Module()
   {

@@ -215,7 +215,7 @@ void SVDUnpackerModule::event()
 
       for (unsigned int buf = 0; buf < maxNumOfCh; buf++) { // loop over 4 buffers
 
-        if (data32tab[buf] == nullptr && nWords[buf] == 0) continue;
+        if (data32tab[buf] == nullptr || nWords[buf] == 0) continue;
         if (m_printRaw) printB2Debug(data32tab[buf], data32tab[buf], &data32tab[buf][nWords[buf] - 1], nWords[buf]);
 
         cntFADCboards++;

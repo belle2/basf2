@@ -105,7 +105,8 @@ namespace Belle2 {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
             return std::numeric_limits<double>::quiet_NaN();
-          try {
+          try
+          {
             return trg->testPsnm(name);
           } catch (const std::exception&)
           {
@@ -132,7 +133,8 @@ namespace Belle2 {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
             return std::numeric_limits<double>::quiet_NaN();
-          try {
+          try
+          {
             return trg->testPsnm(testBit);
           } catch (const std::exception&)
           {
@@ -154,7 +156,8 @@ namespace Belle2 {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
             return std::numeric_limits<double>::quiet_NaN();
-          try {
+          try
+          {
             return trg->testFtdl(name);
           } catch (const std::exception&)
           {
@@ -181,7 +184,8 @@ namespace Belle2 {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
             return std::numeric_limits<double>::quiet_NaN();
-          try {
+          try
+          {
             return trg->testFtdl(testBit);
           } catch (const std::exception&)
           {
@@ -203,7 +207,8 @@ namespace Belle2 {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
             return std::numeric_limits<double>::quiet_NaN();
-          try {
+          try
+          {
             return trg->testInput(name);
           } catch (const std::exception&)
           {
@@ -230,7 +235,8 @@ namespace Belle2 {
           StoreObjPtr<TRGSummary> trg;
           if (!trg)
             return std::numeric_limits<double>::quiet_NaN();
-          try {
+          try
+          {
             return trg->testInput(testBit);
           } catch (const std::exception&)
           {
@@ -386,12 +392,12 @@ namespace Belle2 {
 
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("L1 Trigger");
-    REGISTER_VARIABLE("L1Trigger", L1Trigger ,
+    REGISTER_VARIABLE("L1Trigger", L1Trigger,
                       "[Eventbased] Returns 1 if at least one PSNM L1 trigger bit is true.");
-    REGISTER_METAVARIABLE("L1PSNM(name)", L1PSNM ,
+    REGISTER_METAVARIABLE("L1PSNM(name)", L1PSNM,
                           "[Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of the trigger bit with the given name.",
                           Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("L1FTDL(name)", L1FTDL ,
+    REGISTER_METAVARIABLE("L1FTDL(name)", L1FTDL,
                           "[Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of the trigger bit with the given name.",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("L1Input(name)", L1Input,

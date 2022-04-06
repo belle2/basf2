@@ -394,7 +394,7 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("ParameterFunctions");
-    REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdgcode)", NumberOfMCParticlesInEvent , R"DOC(
+    REGISTER_VARIABLE("NumberOfMCParticlesInEvent(pdgcode)", NumberOfMCParticlesInEvent, R"DOC(
                       Returns number of MC Particles (including anti-particles) with the given pdgcode in the event.
 
                       Used in the FEI to determine to calculate reconstruction efficiencies.
@@ -414,7 +414,7 @@ namespace Belle2 {
                       Second argument is optional, 1 means that the sign of the PDG code is taken into account, default is 0.
 
                       If there is no MC relations found, -1 is returned. In case of nullptr particle, NaN is returned.)DOC");
-    REGISTER_VARIABLE("daughterInvariantMass(i, j, ...)", daughterInvariantMass , R"DOC(
+    REGISTER_VARIABLE("daughterInvariantMass(i, j, ...)", daughterInvariantMass, R"DOC(
                       Returns invariant mass of the given daughter particles. E.g.:
 
                       * daughterInvariantMass(0, 1) returns the invariant mass of the first and second daughter.
@@ -426,7 +426,7 @@ namespace Belle2 {
                       "GeV/:math:`\\text{c}^2`");
     MAKE_DEPRECATED("daughterInvariantMass", false, "light-2203-zeus", R"DOC(
                      The variable `daughterInvM` provides exactly the same functionality.)DOC");
-    REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass ,
+    REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass,
                       "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.",
                       "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,

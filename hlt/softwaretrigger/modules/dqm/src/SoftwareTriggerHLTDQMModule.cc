@@ -21,7 +21,7 @@
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
-REG_MODULE(SoftwareTriggerHLTDQM)
+REG_MODULE(SoftwareTriggerHLTDQM);
 
 SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
 {

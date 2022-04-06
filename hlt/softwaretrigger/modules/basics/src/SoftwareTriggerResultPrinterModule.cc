@@ -21,7 +21,7 @@
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
-REG_MODULE(SoftwareTriggerResultPrinter)
+REG_MODULE(SoftwareTriggerResultPrinter);
 
 
 SoftwareTriggerResultPrinterModule::SoftwareTriggerResultPrinterModule()

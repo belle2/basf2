@@ -23,7 +23,7 @@ REG_MODULE(SVDDQMInjection)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDDQMInjectionModule::SVDDQMInjectionModule() : HistoModule() , m_vxdGeometry(VXD::GeoCache::getInstance())
+SVDDQMInjectionModule::SVDDQMInjectionModule() : HistoModule(), m_vxdGeometry(VXD::GeoCache::getInstance())
 {
   //Set module properties
   setDescription("Monitor SVD Occupancy after Injection.");

@@ -278,7 +278,7 @@ void SVDHotStripFinderModule::endRun()
             for (int l = 0; l < nstrips; l++) {
               hotStripsDBObjPtr->set(layer, ladder, sensor, k, l, (int)hsflag[l]);
               if (hsflag[l] == 0) {
-                hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1 , stripOccAfterAbsCut[l]);
+                hm_occupancy_after->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1, stripOccAfterAbsCut[l]);
                 hm_occAfter->fill(*itSvdSensors, k, stripOccAfterAbsCut[l]);
               } else {
                 hm_hot_strips->getHistogram(*itSvdSensors, k)->SetBinContent(l + 1, 1);

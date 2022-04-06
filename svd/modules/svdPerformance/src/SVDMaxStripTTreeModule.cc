@@ -51,7 +51,7 @@ void SVDMaxStripTTreeModule::beginRun()
 
   TH1F hHits("nHits_L@layerL@ladderS@sensor@view@apv",
              "Number of Hits per Event in @layer.@ladder.@sensor chip @apv on the @view/@side side",
-             2, -0.5 , 1.5);
+             2, -0.5, 1.5);
 
   m_hHits = new SVDAPVHistograms<TH1F>(hHits);
 

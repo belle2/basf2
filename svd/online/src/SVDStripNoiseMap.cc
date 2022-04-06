@@ -19,8 +19,8 @@ SVDStripNoiseMap::SVDStripNoiseMap(SVDOnlineToOfflineMap* onl2offl_map_ptr):
   m_onl2offl_map_ptr(onl2offl_map_ptr)
 {
 
-  memset(m_pedestalMap , 0, sizeof(m_pedestalMap));
-  memset(m_noiseMap    , 0, sizeof(m_noiseMap));
+  memset(m_pedestalMap, 0, sizeof(m_pedestalMap));
+  memset(m_noiseMap, 0, sizeof(m_noiseMap));
   memset(m_thresholdMap, 0, sizeof(m_thresholdMap));
   memset(m_goodStripMap, 0, sizeof(m_goodStripMap));
 
@@ -48,8 +48,8 @@ int SVDStripNoiseMap::initializeMap(const string& noisefilename)
     return -1;
   }
 
-  memset(m_pedestalMap , 0, sizeof(m_pedestalMap));
-  memset(m_noiseMap    , 0, sizeof(m_noiseMap));
+  memset(m_pedestalMap, 0, sizeof(m_pedestalMap));
+  memset(m_noiseMap, 0, sizeof(m_noiseMap));
   memset(m_thresholdMap, 0, sizeof(m_thresholdMap));
   memset(m_goodStripMap, 0, sizeof(m_goodStripMap));
 

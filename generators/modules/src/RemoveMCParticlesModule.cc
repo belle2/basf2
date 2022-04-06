@@ -17,7 +17,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(RemoveMCParticles)
+REG_MODULE(RemoveMCParticles);
 
 //-----------------------------------------------------------------
 //                 Implementation

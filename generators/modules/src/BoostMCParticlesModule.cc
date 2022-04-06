@@ -19,7 +19,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(BoostMCParticles)
+REG_MODULE(BoostMCParticles);
 
 BoostMCParticlesModule::BoostMCParticlesModule() : Module(), m_firstEvent{true}, m_initial(0)
 {

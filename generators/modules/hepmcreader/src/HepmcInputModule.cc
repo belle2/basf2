@@ -16,7 +16,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(HepMCInput)
+REG_MODULE(HepMCInput);
 
 HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_minEvent(-1), m_maxEvent(INT_MAX), m_totalEvents(-1)
 {

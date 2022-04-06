@@ -17,7 +17,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 REG_MODULE(CombinedPIDPerformance)
 
-CombinedPIDPerformanceModule::CombinedPIDPerformanceModule() : Module() , m_rootFilePtr(NULL)
+CombinedPIDPerformanceModule::CombinedPIDPerformanceModule() : Module(), m_rootFilePtr(NULL)
 {
   setDescription("This module evaluates the combined PID performance");
 

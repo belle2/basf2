@@ -15,7 +15,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CombinedPIDPerformance)
+REG_MODULE(CombinedPIDPerformance);
 
 CombinedPIDPerformanceModule::CombinedPIDPerformanceModule() : Module(), m_rootFilePtr(NULL)
 {

@@ -289,34 +289,24 @@ namespace Belle2 {
     }
 
     // Production vertex covariance matrix
-    Manager::FunctionPtr particleProductionCovElement(const std::vector<std::string>& arguments)
+    double particleProductionCovElement(const Particle* part, const std::vector<double>& indices)
     {
-      if (arguments.size() != 2) {
+      if (indices.size() != 2) {
         B2FATAL("Number of arguments of prodVertexCov function is incorrect!");
       }
 
-      int ielement = -1;
-      int jelement = -1;
-      try {
-        ielement = Belle2::convertString<int>(arguments[0]);
-        jelement = Belle2::convertString<int>(arguments[1]);
-      } catch (std::invalid_argument&) {
-        B2ERROR("Arguments of prodVertexCov function must be integer!");
-        return nullptr;
-      }
+      int ielement = std::lround(indices[0]);
+      int jelement = std::lround(indices[1]);
 
       if (std::min(ielement, jelement) < 0 || std::max(ielement, jelement) > 2) {
         B2ERROR("Range of indexes of prodVertexCov function is incorrect!");
-        return nullptr;
       }
 
       const std::vector<char> names = {'x', 'y', 'z'};
       const std::string prodVertS = Form("prodVertS%c%c", names[ielement], names[jelement]);
 
-      return [prodVertS](const Particle * part) -> double {
-        if (!part->hasExtraInfo(prodVertS)) return realNaN;
-        return part->getExtraInfo(prodVertS);
-      };
+      if (!part->hasExtraInfo(prodVertS)) return realNaN;
+      return part->getExtraInfo(prodVertS);
     }
 
     double particleProductionXErr(const Particle* part)
@@ -419,10 +409,9 @@ If the particle is created from a KLM cluster, the distance is calculated betwee
     REGISTER_VARIABLE("prodVertexZ", particleProductionZ,
                       "Returns the z position of particle production vertex.", "cm");
     // Production vertex covariance matrix
-    REGISTER_METAVARIABLE("prodVertexCov(i,j)", particleProductionCovElement,
-                          "Returns the ij covariance matrix component of particle production vertex, arguments i,j should be 0, 1 or 2. Returns NaN if particle has no production covariance matrix.",
-                          ":math:`\\text{cm}^2`",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("prodVertexCov(i,j)", particleProductionCovElement,
+                      "Returns the ij covariance matrix component of particle production vertex, arguments i,j should be 0, 1 or 2. Returns NaN if particle has no production covariance matrix.",
+                      ":math:`\\text{cm}^2`");
     REGISTER_VARIABLE("prodVertexXErr", particleProductionXErr,
                       "Returns the x position uncertainty of particle production vertex. Returns NaN if particle has no production vertex.", "cm");
     REGISTER_VARIABLE("prodVertexYErr", particleProductionYErr,

@@ -205,7 +205,7 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_runInfoHistograms["hlt_unit_number"]->SetMinimum(0);
 
     for (const auto& cutIdentifierPerUnit : m_param_cutResultIdentifiersPerUnit) {
-      m_cutResultPerUnitHistograms.emplace(cutIdentifierPerUnit , new TH1F((cutIdentifierPerUnit + "_per_unit").c_str(),
+      m_cutResultPerUnitHistograms.emplace(cutIdentifierPerUnit, new TH1F((cutIdentifierPerUnit + "_per_unit").c_str(),
                                            ("Events triggered per unit in HLT : " + cutIdentifierPerUnit).c_str(), HLTUnit::max_hlt_units + 1, 0,
                                            HLTUnit::max_hlt_units + 1));
       m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetXTitle("HLT unit number");

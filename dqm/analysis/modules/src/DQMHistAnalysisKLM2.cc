@@ -182,17 +182,17 @@ void DQMHistAnalysisKLM2Module::event()
   TH1F* matched_hits_eklm_sector = (TH1F*)findHist("KLMEfficiencyDQM/matched_hitsEKLMSector");
 
   /* Check if efficiency histograms exist*/
-  if ((all_ext_bklm == nullptr || matched_hits_bklm == nullptr) && (m_IsPhysicsRun == true)) {
+  if ((all_ext_bklm == nullptr || matched_hits_bklm == nullptr) && (m_IsPhysicsRun)) {
     B2INFO("Histograms needed for BKLM plane efficiency computation are not found");
   }
 
-  if ((all_ext_eklm == nullptr || matched_hits_eklm == nullptr) && (m_IsPhysicsRun == true)) {
+  if ((all_ext_eklm == nullptr || matched_hits_eklm == nullptr) && (m_IsPhysicsRun)) {
     B2INFO("Histograms needed for EKLM plane efficiency computation are not found");
   }
-  if ((all_ext_bklm_sector == nullptr || matched_hits_bklm_sector == nullptr) && (m_IsPhysicsRun == true)) {
+  if ((all_ext_bklm_sector == nullptr || matched_hits_bklm_sector == nullptr) && (m_IsPhysicsRun)) {
     B2INFO("Histograms needed for BKLM sector efficiency computation are not found");
   }
-  if ((all_ext_eklm_sector == nullptr || matched_hits_eklm_sector == nullptr) && (m_IsPhysicsRun == true)) {
+  if ((all_ext_eklm_sector == nullptr || matched_hits_eklm_sector == nullptr) && (m_IsPhysicsRun)) {
     B2INFO("Histograms needed for EKLM sector efficiency computation are not found");
   }
 

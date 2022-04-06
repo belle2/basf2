@@ -409,8 +409,8 @@ If the particle is created from a KLM cluster, the distance is calculated betwee
     REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z (measured with respect to the origin)", "cm");
     REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP for a vertex; track d0 relative to IP for a track.",
                       "cm");
-    REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle of the vertex or POCA in degrees in respect to IP", "deg");
-    REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex or POCA polar angle in respect to IP", "cm");
+    REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle of the vertex or POCA in degrees in respect to IP", "rad");
+    REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex or POCA polar angle in respect to IP");
     // Production vertex position
     REGISTER_VARIABLE("prodVertexX", particleProductionX,
                       "Returns the x position of particle production vertex. Returns NaN if particle has no production vertex.", "cm");
@@ -421,6 +421,7 @@ If the particle is created from a KLM cluster, the distance is calculated betwee
     // Production vertex covariance matrix
     REGISTER_METAVARIABLE("prodVertexCov(i,j)", particleProductionCovElement,
                           "Returns the ij covariance matrix component of particle production vertex, arguments i,j should be 0, 1 or 2. Returns NaN if particle has no production covariance matrix.",
+                          ":math:`\\text{cm}^2`",
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("prodVertexXErr", particleProductionXErr,
                       "Returns the x position uncertainty of particle production vertex. Returns NaN if particle has no production vertex.", "cm");

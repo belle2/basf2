@@ -263,7 +263,6 @@ void CDCTriggerNeuroDQMOnlineModule::fillHWPlots()
 {
 
   unsigned valtrackcount = 0;
-  unsigned twodintrackcount = 0;
 
   // first, fill the tsid plots and the cdcfe plot:
 

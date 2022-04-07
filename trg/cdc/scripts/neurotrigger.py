@@ -222,7 +222,7 @@ def add_neurotrigger_hw(path, nntweightfile=None, debug_level=4, debugout=False,
     if 'et_option' in kwargs:
         nnt.param('et_option', kwargs['et_option'])
     else:
-        nnt.param('et_option', 'etf_or_fastestpriority')
+        nnt.param('et_option', 'etfhwin')
 
     if 'EventTimeName' in kwargs:
         nnt.param('EventTimeName', kwargs['EventTimeName'])

@@ -8,6 +8,8 @@
 #pragma once
 
 #include <framework/core/Module.h>
+
+#include <optional>
 #include <string>
 
 namespace Belle2 {

@@ -11,9 +11,10 @@
 #include <framework/core/Module.h>
 #include <framework/gearbox/Unit.h>
 
+#include <optional>
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
 
 #include <G4UserSteppingAction.hh>
 #include <G4ThreeVector.hh>

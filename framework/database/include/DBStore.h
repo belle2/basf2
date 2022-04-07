@@ -12,9 +12,10 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <optional>
+#include <set>
 #include <string>
 #include <unordered_map>
-#include <set>
 
 namespace Belle2 {
 

@@ -10,8 +10,9 @@
 #include <framework/gearbox/Const.h>
 #include <TObject.h>
 
-#include <vector>
 #include <cmath>
+#include <optional>
+#include <vector>
 
 namespace Belle2 {
   /**

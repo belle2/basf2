@@ -82,24 +82,6 @@ namespace Belle2 {
     TH1F* m_h_pz = nullptr;
     /** Energy in LAB frame*/
     TH1F* m_h_E = nullptr;
-    /** y pull*/
-    TH1F* m_h_pull = nullptr;
-    /** y resolution */
-    TH1F* m_h_y_risol = nullptr;
-    /** initial histogram for median calculation*/
-    TH1F* m_h_temp = nullptr;
-    /** xx coord*/
-    TH1F* m_h_xx = nullptr;
-    /** yy coord*/
-    TH1F* m_h_yy = nullptr;
-    /** zz coord*/
-    TH1F* m_h_zz = nullptr;
-    /** xz coord*/
-    TH1F* m_h_xz = nullptr;
-    /** yz coord*/
-    TH1F* m_h_yz = nullptr;
-    /** xy coord*/
-    TH1F* m_h_xy = nullptr;
     /** Var x*/
     TH1F* m_h_cov_x_x = nullptr;
     /** Var y*/
@@ -112,22 +94,6 @@ namespace Belle2 {
     TH1F* m_h_cov_y_z = nullptr;
     /** Cov xy*/
     TH1F* m_h_cov_x_y = nullptr;
-    /** store the y coordinates for the pull*/
-    std::vector<float> m_v_y;
-    /** store the y errors for the pull*/
-    std::vector<float> m_err_y;
-    /** The median of y coord*/
-    double m_median = 0;
-    /** The 0.5 quantile for the median*/
-    double m_quantile = 0.5;
-    /** Counter for sampling*/
-    int m_r = 0;
-    /** Size for sampling*/
-    int m_size = 200;
-    /** Number of units*/
-    int m_no_units = 1; // Changed later
-    /** Size for sampling per each unit*/
-    int m_size_per_unit = 1; // Changed later
     /** Name of the Y4S particle list */
     std::string m_Y4SPListName = "";
     /** Mode of online processing ("HLT" or "ExpressReco") */

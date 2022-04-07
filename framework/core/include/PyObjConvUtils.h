@@ -15,8 +15,9 @@
 #include <boost/python/extract.hpp>
 #include <boost/variant.hpp>
 
-#include <set>
 #include <map>
+#include <optional>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -311,7 +312,7 @@ namespace Belle2 {
                       SizeT<N>)
     {
       using Scalar = typename std::tuple_element < N - 1, std::tuple<Types...> >::type;
-      if (checkPythonObject(pyObject , Scalar())) {
+      if (checkPythonObject(pyObject, Scalar())) {
         return true;
       }
       return CheckVariant(variant, pyObject, SizeT < N - 1 > ());

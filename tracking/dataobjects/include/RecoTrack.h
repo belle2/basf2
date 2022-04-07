@@ -16,8 +16,6 @@
 
 #include <tracking/dataobjects/RecoHitInformation.h>
 
-#include <boost/optional.hpp>
-
 #include <string>
 #include <vector>
 
@@ -220,7 +218,7 @@ namespace Belle2 {
      * @return The number of hits copied.
      */
     size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset = 0,
-                                bool reversed = false, boost::optional<double> optionalMinimalWeight = boost::none);
+                                bool reversed = false, std::optional<double> optionalMinimalWeight = std::nullopt);
 
     /**
      * Adds a cdc hit with the given information to the reco track.

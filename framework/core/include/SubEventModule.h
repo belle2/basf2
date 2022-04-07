@@ -11,7 +11,9 @@
 #include <framework/core/Module.h>
 #include <framework/core/EventProcessor.h>
 #include <framework/datastore/StoreArray.h>
+
 #include <memory>
+#include <optional>
 
 namespace Belle2 {
   class Path;

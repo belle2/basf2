@@ -12,8 +12,10 @@
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <string>
 #include <map>
+#include <optional>
+#include <string>
+
 #include <boost/variant.hpp>
 
 namespace Belle2 {

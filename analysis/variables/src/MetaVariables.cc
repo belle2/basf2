@@ -1204,45 +1204,34 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr grandDaughterDecayAngle(const std::vector<std::string>& arguments)
+    double grandDaughterDecayAngle(const Particle* particle, const std::vector<double>& arguments)
     {
       if (arguments.size() == 2) {
 
-        auto func = [arguments](const Particle * particle) -> double {
-          if (!particle)
-            return std::numeric_limits<double>::quiet_NaN();
+        if (!particle)
+          return std::numeric_limits<double>::quiet_NaN();
 
-          unsigned daughterIndex, grandDaughterIndex;
-          try
-          {
-            daughterIndex = Belle2::convertString<int>(arguments[0]);
-            grandDaughterIndex = Belle2::convertString<int>(arguments[1]);
-          } catch (std::invalid_argument&)
-          {
-            B2FATAL("The arguments of grandDaughterDecayAngle have to be integers!");
-          }
+        int daughterIndex = std::lround(arguments[0]);
+        if (daughterIndex >= int(particle->getNDaughters()))
+          return std::numeric_limits<float>::quiet_NaN();
+        const Particle* daughter = particle->getDaughter(daughterIndex);
 
-          if (daughterIndex >= particle->getNDaughters())
-            return std::numeric_limits<float>::quiet_NaN();
+        int grandDaughterIndex = std::lround(arguments[1]);
+        if (grandDaughterIndex >= int(daughter->getNDaughters()))
+          return std::numeric_limits<float>::quiet_NaN();
 
-          const Particle* daughter = particle->getDaughter(daughterIndex);
+        B2Vector3D  boost = daughter->get4Vector().BoostToCM();
 
-          if (grandDaughterIndex >= daughter->getNDaughters())
-            return std::numeric_limits<float>::quiet_NaN();
+        ROOT::Math::PxPyPzEVector motherMomentum = - particle->get4Vector();
+        motherMomentum = ROOT::Math::Boost(boost) * motherMomentum;
 
-          B2Vector3D  boost = daughter->get4Vector().BoostToCM();
+        ROOT::Math::PxPyPzEVector grandDaughterMomentum = daughter->getDaughter(grandDaughterIndex)->get4Vector();
+        grandDaughterMomentum = ROOT::Math::Boost(boost) * grandDaughterMomentum;
 
-          ROOT::Math::PxPyPzEVector motherMomentum = - particle->get4Vector();
-          motherMomentum = ROOT::Math::Boost(boost) * motherMomentum;
+        return B2Vector3D(motherMomentum.Vect()).Angle(B2Vector3D(grandDaughterMomentum.Vect()));
 
-          ROOT::Math::PxPyPzEVector grandDaughterMomentum = daughter->getDaughter(grandDaughterIndex)->get4Vector();
-          grandDaughterMomentum = ROOT::Math::Boost(boost) * grandDaughterMomentum;
-
-          return B2Vector3D(motherMomentum.Vect()).Angle(B2Vector3D(grandDaughterMomentum.Vect()));
-        };
-        return func;
       } else {
-        B2FATAL("The meta variable grandDaughterDecayAngle needs exactly two integers as arguments!");
+        B2FATAL("The variable grandDaughterDecayAngle needs exactly two integers as arguments!");
       }
     }
 
@@ -1297,64 +1286,52 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr daughterClusterAngleInBetween(const std::vector<std::string>& arguments)
+    double daughterClusterAngleInBetween(const Particle* particle, const std::vector<double>& daughterIndices)
     {
-      if (arguments.size() == 2 || arguments.size() == 3) {
-        std::vector<int> daughterIndices;
-        try {
-          for (auto& argument : arguments) daughterIndices.push_back(Belle2::convertString<int>(argument));
-        } catch (std::invalid_argument&) {
-          B2FATAL("The arguments of daughterClusterAngleInBetween meta function must be integers!");
+      if (daughterIndices.size() == 2) {
+        int daughterIndexi = std::lround(daughterIndices[0]);
+        int daughterIndexj = std::lround(daughterIndices[1]);
+        if (std::max(daughterIndexi, daughterIndexj) >= int(particle->getNDaughters())) {
+          return std::numeric_limits<double>::quiet_NaN();
+        } else {
+          const ECLCluster* clusteri = particle->getDaughter(daughterIndexi)->getECLCluster();
+          const ECLCluster* clusterj = particle->getDaughter(daughterIndexj)->getECLCluster();
+          if (clusteri and clusterj) {
+            const auto& frame = ReferenceFrame::GetCurrent();
+            const ECLCluster::EHypothesisBit clusteriBit = (particle->getDaughter(daughterIndexi))->getECLClusterEHypothesisBit();
+            const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndexj))->getECLClusterEHypothesisBit();
+            ClusterUtils clusutils;
+            B2Vector3D pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
+            B2Vector3D pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
+            return pi.Angle(pj);
+          }
+          return std::numeric_limits<float>::quiet_NaN();
         }
-        auto func = [daughterIndices](const Particle * particle) -> double {
-          if (particle == nullptr)
-            return std::numeric_limits<double>::quiet_NaN();
-          if (daughterIndices.size() == 2)
-          {
-            if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters()))
-              return std::numeric_limits<double>::quiet_NaN();
-            else {
-              const auto& frame = ReferenceFrame::GetCurrent();
-              const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
-              const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
-              const ECLCluster::EHypothesisBit clusteriBit = (particle->getDaughter(daughterIndices[0]))->getECLClusterEHypothesisBit();
-              const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndices[1]))->getECLClusterEHypothesisBit();
-              if (clusteri and clusterj) {
-                ClusterUtils clusutils;
-                B2Vector3D pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
-                B2Vector3D pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
-                return pi.Angle(pj);
-              }
-              return std::numeric_limits<float>::quiet_NaN();
-            }
-          } else if (daughterIndices.size() == 3)
-          {
-            if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters())
-                || daughterIndices[2] >= int(particle->getNDaughters())) return std::numeric_limits<double>::quiet_NaN();
-            else {
-              const auto& frame = ReferenceFrame::GetCurrent();
-              const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
-              const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
-              const ECLCluster* clusterk = (particle->getDaughter(daughterIndices[2]))->getECLCluster();
-              const ECLCluster::EHypothesisBit clusteriBit = (particle->getDaughter(daughterIndices[0]))->getECLClusterEHypothesisBit();
-              const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndices[1]))->getECLClusterEHypothesisBit();
-              const ECLCluster::EHypothesisBit clusterkBit = (particle->getDaughter(daughterIndices[2]))->getECLClusterEHypothesisBit();
-
-              if (clusteri and clusterj and clusterk) {
-                ClusterUtils clusutils;
-                B2Vector3D pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
-                B2Vector3D pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
-                B2Vector3D pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk, clusterkBit)).Vect();
-                return pk.Angle(pi + pj);
-              }
-              return std::numeric_limits<float>::quiet_NaN();
-            }
-          } else return std::numeric_limits<double>::quiet_NaN();
-
-        };
-        return func;
+      } else if (daughterIndices.size() == 3) {
+        int daughterIndexi = std::lround(daughterIndices[0]);
+        int daughterIndexj = std::lround(daughterIndices[1]);
+        int daughterIndexk = std::lround(daughterIndices[2]);
+        if (std::max(std::max(daughterIndexi, daughterIndexj), daughterIndexk) >= int(particle->getNDaughters())) {
+          return std::numeric_limits<double>::quiet_NaN();
+        } else {
+          const ECLCluster* clusteri = (particle->getDaughter(daughterIndices[0]))->getECLCluster();
+          const ECLCluster* clusterj = (particle->getDaughter(daughterIndices[1]))->getECLCluster();
+          const ECLCluster* clusterk = (particle->getDaughter(daughterIndices[2]))->getECLCluster();
+          if (clusteri and clusterj and clusterk) {
+            const auto& frame = ReferenceFrame::GetCurrent();
+            const ECLCluster::EHypothesisBit clusteriBit = (particle->getDaughter(daughterIndices[0]))->getECLClusterEHypothesisBit();
+            const ECLCluster::EHypothesisBit clusterjBit = (particle->getDaughter(daughterIndices[1]))->getECLClusterEHypothesisBit();
+            const ECLCluster::EHypothesisBit clusterkBit = (particle->getDaughter(daughterIndices[2]))->getECLClusterEHypothesisBit();
+            ClusterUtils clusutils;
+            B2Vector3D pi = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusteri, clusteriBit)).Vect();
+            B2Vector3D pj = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterj, clusterjBit)).Vect();
+            B2Vector3D pk = frame.getMomentum(clusutils.Get4MomentumFromCluster(clusterk, clusterkBit)).Vect();
+            return pk.Angle(pi + pj);
+          }
+          return std::numeric_limits<float>::quiet_NaN();
+        }
       } else {
-        B2FATAL("Wrong number of arguments for meta function daughterClusterAngleInBetween");
+        B2FATAL("Wrong number of arguments for daughterClusterAngleInBetween!");
       }
     }
 
@@ -2192,27 +2169,18 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr matchedMCHasPDG(const std::vector<std::string>& arguments)
+    double matchedMCHasPDG(const Particle* particle, const std::vector<double>& pdgCode)
     {
-      if (arguments.size() == 1) {
-        int inputPDG = 0 ;
-        try {
-          inputPDG = Belle2::convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("Argument must be an integer value.");
-        }
+      if (pdgCode.size() != 1) {
+        B2FATAL("Too many arguments provided to matchedMCHasPDG!");
+      }
+      int inputPDG = std::lround(pdgCode[0]);
 
-        auto func = [inputPDG](const Particle * particle) -> double {
-          const MCParticle* mcp = particle->getMCParticle();
-          if (!mcp)
-            return std::numeric_limits<double>::quiet_NaN();
+      const MCParticle* mcp = particle->getMCParticle();
+      if (!mcp)
+        return std::numeric_limits<double>::quiet_NaN();
 
-          return std::abs(mcp->getPDG()) == inputPDG;
-
-        };
-        return func;
-      } else
-        B2FATAL("Wrong number of arguments for meta function matchedMC");
+      return std::abs(mcp->getPDG()) == inputPDG;
     }
 
     Manager::FunctionPtr totalEnergyOfParticlesInList(const std::vector<std::string>& arguments)
@@ -3239,10 +3207,10 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,
                       "MC matched version of the `daughterAngle` function. Also works if applied directly to MC particles.", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
+    REGISTER_VARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
                       "Returns the decay angle of the granddaughter in the daughter particle's rest frame.\n"
                       "It is calculated with respect to the reverted momentum vector of the particle.\n"
-                      "Two arguments representing the daughter and granddaughter indices have to be provided as arguments.", Manager::VariableDataType::c_double);
+                      "Two arguments representing the daughter and granddaughter indices have to be provided as arguments.", "rad");
     REGISTER_METAVARIABLE("daughterClusterAngleInBetween(i, j)", daughterClusterAngleInBetween,
                       "Returns function which returns the angle between clusters associated to the two daughters."
                       "If two indices given: returns the angle between the momenta of the clusters associated to the two given daughters."
@@ -3340,9 +3308,9 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
 
                       An example of this variable's usage is given in the tutorial `B2A602-BestCandidateSelection <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/examples/tutorials/B2A602-BestCandidateSelection.py>`_
                       )DOC", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("matchedMCHasPDG(PDGCode)", matchedMCHasPDG,
-                      "Returns if the absolute value of a PDGCode of a MCParticle related to a Particle matches a given PDGCode."
-                      "Returns 0/NAN/1 if PDGCode does not match/is not available/ matches", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("matchedMCHasPDG(PDGCode)", matchedMCHasPDG,
+                      "Returns if the absolute value of the PDGCode of the MCParticle related to the Particle matches a given PDGCode."
+                      "Returns 0/NAN/1 if PDGCode does not match/is not available/ matches");
     REGISTER_METAVARIABLE("numberOfNonOverlappingParticles(pList1, pList2, ...)", numberOfNonOverlappingParticles,
                       "Returns the number of non-overlapping particles in the given particle lists"
                       "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S", Manager::VariableDataType::c_int);

@@ -489,45 +489,31 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr mostLikelyPDG(const std::vector<std::string>& arguments)
+    double mostLikelyPDG(const Particle* part, const std::vector<double>& arguments)
     {
       if (arguments.size() != 0 and arguments.size() != Const::ChargedStable::c_SetSize) {
         B2ERROR("Need zero or exactly " << Const::ChargedStable::c_SetSize << " arguments for pidMostLikelyPDG");
-        return nullptr;
+        return std::numeric_limits<double>::quiet_NaN();
       }
       double prob[Const::ChargedStable::c_SetSize];
       if (arguments.size() == 0) {
         for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) prob[i] = 1. / Const::ChargedStable::c_SetSize;
+      } else {
+        copy(arguments.begin(), arguments.end(), prob);
       }
-      if (arguments.size() == Const::ChargedStable::c_SetSize) {
-        try {
-          int i = 0;
-          for (std::string arg : arguments) {
-            prob[i++] = Belle2::convertString<float>(arg);
-          }
-        } catch (std::invalid_argument& e) {
-          B2ERROR("All arguments of mostLikelyPDG must be a float number");
-          return nullptr;
-        }
-      }
-      auto func = [prob](const Particle * part) -> double {
-        auto* pid = part->getPIDLikelihood();
-        if (!pid) return std::numeric_limits<double>::quiet_NaN();
-        return pid->getMostLikely(prob).getPDGCode();
-      };
-      return func;
+
+      auto* pid = part->getPIDLikelihood();
+      if (!pid) return std::numeric_limits<double>::quiet_NaN();
+      return pid->getMostLikely(prob).getPDGCode();
     }
 
-    Manager::FunctionPtr isMostLikely(const std::vector<std::string>& arguments)
+    bool isMostLikely(const Particle* part, const std::vector<double>& arguments)
     {
-      if (arguments.size() != 0 and arguments.size() != 6) {
+      if (arguments.size() != 0 and arguments.size() != Const::ChargedStable::c_SetSize) {
         B2ERROR("Need zero or exactly " << Const::ChargedStable::c_SetSize << " arguments for pidIsMostLikely");
-        return nullptr;
+        return false;
       }
-      auto func = [arguments](const Particle * part) -> bool {
-        return std::get<double>(mostLikelyPDG(arguments)(part)) == abs(part->getPDGCode());
-      };
-      return func;
+      return mostLikelyPDG(part, arguments) == abs(part->getPDGCode());
     }
 
     //*************
@@ -688,18 +674,15 @@ The variables used are `clusterPulseShapeDiscriminationMVA`, `clusterE`, `cluste
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pidMissingProbabilityExpert(detectorList)", pidMissingProbabilityExpert,
                           "returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0. ", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("pidMostLikelyPDG(ePrior=1/6, muPrior=1/6, piPrior=1/6, KPrior=1/6, pPrior=1/6, dPrior=1/6)", mostLikelyPDG,
-                          R"DOC(
+    REGISTER_VARIABLE("pidMostLikelyPDG(ePrior=1/6, muPrior=1/6, piPrior=1/6, KPrior=1/6, pPrior=1/6, dPrior=1/6)", mostLikelyPDG,
+                      R"DOC(
 Returns PDG code of the largest PID likelihood, or NaN if PID information is not available.
 This function accepts either no arguments, or 6 floats as priors for the charged particle hypotheses
-following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC",
-                          Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("pidIsMostLikely(ePrior=1/6, muPrior=1/6, piPrior=1/6, KPrior=1/6, pPrior=1/6, dPrior=1/6)", isMostLikely,
-                          R"DOC(
+following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC");
+    REGISTER_VARIABLE("pidIsMostLikely(ePrior=1/6, muPrior=1/6, piPrior=1/6, KPrior=1/6, pPrior=1/6, dPrior=1/6)", isMostLikely, R"DOC(
 Returns True if the largest PID likelihood of a given particle corresponds to its particle hypothesis.
 This function accepts either no arguments, or 6 floats as priors for the charged particle hypotheses
-following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC",
-                          Manager::VariableDataType::c_bool);
+following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC");
 
     // B2BII PID
     VARIABLE_GROUP("Belle PID variables");

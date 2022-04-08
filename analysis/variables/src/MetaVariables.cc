@@ -3392,12 +3392,12 @@ daughter (3) of the second daughter (1) of the first daughter (0) of the mother 
 
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("useAlternativeDaughterHypothesis(variable, daughterIndex_1:newMassHyp_1, ..., daughterIndex_n:newMassHyp_n)", useAlternativeDaughterHypothesis,R"DOC(
-Returns a ``variable`` calculated using new mass hypotheses for (some of) the particle's daughers.
+Returns a ``variable`` calculated using new mass hypotheses for (some of) the particle's daughters.
 
 .. warning::
     ``variable`` can only be a function of the particle 4-momentum, which is re-calculated as the sum of the daughters' 4-momenta.
     This means that if you made a kinematic fit without updating the daughters' momenta, the result of this variable will not reflect the effect of the kinematic fit.
-    Also, the track fit is not performed again: the variable only re-calculates the 4-vectors using different mass assumptions. The alternative mass assumpion is
+    Also, the track fit is not performed again: the variable only re-calculates the 4-vectors using different mass assumptions. The alternative mass assumption is
     used only internally by the variable, and is not stored in the datastore (i.e the daughters are not permanently changed).
 
 .. warning::

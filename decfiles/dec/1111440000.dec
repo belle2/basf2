@@ -1,6 +1,6 @@
-# EventType: 1111540000
-# Descriptor: [B0 -> Jpsi [ -> e+ e-] K*0 [ -> K+ pi-] ]cc
-# NickName: Bd_J/psiK*0_e+e-K+_pi-
+# EventType: 1111440000
+# Descriptor: [B0 -> Jpsi [ -> mu+ mu-] K*0 [ -> K+ pi-] ]cc
+# NickName: Bd_J/psiK*0_mu+mu-K+_pi-
 # Documentation: Study of CKM with TDCPV analysis
 # Tested: Yes
 # Physics WG: TDCPV
@@ -8,7 +8,7 @@
 # Email: miyabaya@cc.nara-wu.ac.jp
 # Cuts: None
 # Date: 20180918
-# Updated: 20220203 Stefano.Lacaprara@pd.infn.it for inclusive J/psi->e e decay
+# Updated: 20220203 Stefano.Lacaprara@pd.infn.it for inclusive J/psi->mu mu decay
 # Comments:
 
 #This is for MC B0 -> J/Psi K*0, K*0 -> K- pi+.
@@ -43,14 +43,14 @@ Decay anti-B0sig
 Enddecay
 #
 Decay J/psisig
-1.000 e+ e-           PHOTOS VLL;
+1.000 mu+ mu-         PHOTOS VLL;
 Enddecay
 #
-Decay K*0sig 
+Decay K*0sig
 1.000 K+ pi-          PHOTOS VSS;
 Enddecay
 #
-Decay anti-K*0sig 
+Decay anti-K*0sig
 1.000 K- pi+          PHOTOS VSS;
 Enddecay
 #

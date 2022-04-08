@@ -1365,14 +1365,12 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
           ROOT::Math::PxPyPzEVector pSum;
 
-          for (unsigned int iCoord = 1; iCoord < arguments.size(); iCoord++)
+          for (auto& generalizedIndex : arguments)
           {
-            auto generalizedIndex = arguments[iCoord];
             const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
             if (dauPart)
               pSum += frame.getMomentum(dauPart);
             else {
-              B2WARNING("Trying to access a daughter that does not exist. Index = " << generalizedIndex);
               return std::numeric_limits<float>::quiet_NaN();
             }
           }

@@ -55,8 +55,7 @@ namespace Belle2 {
      from ROOT import Belle2
      tracks = Belle2.PyStoreArray('Tracks')
      for tracks in tracks:
-       clusters = track.getRelationsTo['KLMCluster'](
-   'KLMClusters', 'Secondary')
+       clusters = track.getRelationsTo['KLMCluster']('KLMClusters', 'Secondary')
        for cluster in clusters:
          # Do something
     \endcode

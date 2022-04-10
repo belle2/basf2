@@ -98,7 +98,7 @@ void TTDDQMModule::beginRun()
 void TTDDQMModule::event()
 {
 
-  if (m_EventLevelTriggerTimeInfo->isValid()) {
+  if (m_EventLevelTriggerTimeInfo.isValid() and m_EventLevelTriggerTimeInfo->isValid()) {
     // TODO conversion of clock ticks to time not yet done in EventLevelTriggerTimeInfo
     // all values are given in clock ticks of RF clock/4, thus one tick correspond to 4 bunches
     // ~ 508 MHz RF -> 127 = 508/4 (clock ticks)
@@ -113,7 +113,7 @@ void TTDDQMModule::event()
 
     if (m_EventLevelTriggerTimeInfo->hasInjection()) {
       auto time_since_inj_in_ticks = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection();// in clock ticks
-      //  127MHz clock ticks to us, inexact rounding, use integer to avoid binning effects
+      // 127MHz clock ticks to us, inexact rounding, use integer to avoid binning effects
       float time_since_inj_in_us = time_since_inj_in_ticks / 127.;
       // swapped? 1280-1-injected_bunch_in_ticks?
       int injected_bunch_in_ticks = ((time_since_inj_in_ticks - triggered_bunch_in_ticks + 1280) % 1280);

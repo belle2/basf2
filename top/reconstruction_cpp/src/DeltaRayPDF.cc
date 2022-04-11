@@ -10,6 +10,7 @@
 #include <top/reconstruction_cpp/TOPRecoManager.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <framework/logging/Logger.h>
+#include <cmath>
 
 using namespace std;
 
@@ -83,7 +84,7 @@ namespace Belle2 {
       }
 
       double beta = track.getBeta(hypothesis);
-      int PDGCode = abs(hypothesis.getPDGCode());
+      int PDGCode = std::abs(hypothesis.getPDGCode());
       if (PDGCode < 20) PDGCode = -PDGCode;
       if (track.getCharge() < 0) PDGCode = -PDGCode;
       double tlen = track.getLengthInQuartz();
@@ -94,7 +95,7 @@ namespace Belle2 {
       m_numPhotons = photonYield(beta, PDGCode) * tlen * m_fraction * relEffi;
 
       for (const auto& pixel : m_pixelPositions->getPixels()) {
-        double dfi_dx = abs(m_zD - m_zE) / (pow(pixel.xc - m_xE, 2) + pow(pixel.yc - m_yE, 2) + pow(m_zD - m_zE, 2));
+        double dfi_dx = std::abs(m_zD - m_zE) / (pow(pixel.xc - m_xE, 2) + pow(pixel.yc - m_yE, 2) + pow(m_zD - m_zE, 2));
         m_pixelAcceptances.push_back(dfi_dx * pixel.Dx);
       }
       double sum = 0;
@@ -137,7 +138,7 @@ namespace Belle2 {
       if (tmax > t0) i1 = t0 / tmax * nt;
       int i2 = nt;
       if (tmin > t0) i2 = t0 / tmin * nt;
-      return abs(m_norms[i2] - m_norms[i1]);
+      return std::abs(m_norms[i2] - m_norms[i1]);
     }
 
     double DeltaRayPDF::totalFraction(double tmin, double tmax) const
@@ -150,7 +151,7 @@ namespace Belle2 {
     double DeltaRayPDF::directFraction(double z) const
     {
       // coefficients of 5th order polynom (from fit to MC, see B2GM/TOP Software status, June 2020)
-      double par[] = {0.332741, -0.00331502, 2.0801e-05, -3.43689e-09, -6.35849e-10, 3.54556e-12};
+      const double par[] = {0.332741, -0.00331502, 2.0801e-05, -3.43689e-09, -6.35849e-10, 3.54556e-12};
 
       double x = 1;
       double f = 0;
@@ -167,14 +168,14 @@ namespace Belle2 {
       const double averagePDE = 1.06404889; // relative to nominal PDE
       const double scaleFactor = 0.79;
 
-      if (abs(PDGCode) == 11) { // electorns and positrons
+      if (std::abs(PDGCode) == 11) { // electorns and positrons
         return 5.30 * scaleFactor / averagePDE;
       } else if (PDGCode == -2212) { // anti-protons
-        double par[] = {13.5859, -28.0625, 17.2684};
+        const double par[] = {13.5859, -28.0625, 17.2684};
         double f = par[0] + par[1] * beta + par[2] * beta * beta;
         return f * scaleFactor / averagePDE;
       } else { // other charged particles
-        double par[] = { -8.15871, 10.0082, -1.25140, -120.225, 120.210};
+        const double par[] = { -8.15871, 10.0082, -1.25140, -120.225, 120.210};
         double f = exp(par[0] + par[1] * beta + par[2] * beta * beta) + exp(par[3] + par[4] * beta);
         return f * scaleFactor / averagePDE;
       }

@@ -232,7 +232,7 @@ namespace Belle2 {
       double x1 = 0;                    // x is dFic
       double y1 = deltaXD(x1, sol, xD); // y is the difference in xD
       if (isnan(y1)) return false;
-      if (abs(y1) < precision) return m_fastRaytracer->getTotalReflStatus(m_cosTotal);
+      if (std::abs(y1) < precision) return m_fastRaytracer->getTotalReflStatus(m_cosTotal);
       int n1 = m_fastRaytracer->getNxm();
 
       double step = -dFic_dx * y1;
@@ -259,13 +259,13 @@ namespace Belle2 {
           }
           if (y2 * y1 > 0) return false; // solution does not exist
         }
-        if (abs(y2) < precision) return m_fastRaytracer->getTotalReflStatus(m_cosTotal);
+        if (std::abs(y2) < precision) return m_fastRaytracer->getTotalReflStatus(m_cosTotal);
         if (y2 * y1 < 0) { // zero-crossing interval is identified
           for (int k = 0; k < 20; k++) { // find zero-crossing using bisection
             double x = (x1 + x2) / 2;
             double y = deltaXD(x, sol, xD);
             if (isnan(y)) return false;
-            if (abs(y) < precision) return m_fastRaytracer->getTotalReflStatus(m_cosTotal);
+            if (std::abs(y) < precision) return m_fastRaytracer->getTotalReflStatus(m_cosTotal);
             if (y * y1 < 0) {
               x2 = x;
             } else {
@@ -323,7 +323,7 @@ namespace Belle2 {
 
       m_yScanner->expand(col, yB, dydz, D, doScan);
 
-      double numPhotons = m_yScanner->getNumPhotons() * abs(D.dFic_dx * pixel.Dx);
+      double numPhotons = m_yScanner->getNumPhotons() * std::abs(D.dFic_dx * pixel.Dx);
       int nx = m_fastRaytracer->getNx();
       int ny = m_fastRaytracer->getNy();
       for (const auto& result : m_yScanner->getResults()) {
@@ -376,7 +376,7 @@ namespace Belle2 {
     {
       double bulk = TOPGeometryPar::Instance()->getAbsorptionLength(E);
       double surf = m_yScanner->getBars().front().reflectivity;
-      double p = exp(-propLen / bulk) * pow(surf, abs(nx) + abs(ny));
+      double p = exp(-propLen / bulk) * pow(surf, std::abs(nx) + std::abs(ny));
       if (type == SignalPDF::c_Reflected) p *= std::min(m_yScanner->getMirror().reflectivity, 1.0);
       return p;
     }
@@ -416,7 +416,7 @@ namespace Belle2 {
 
       double theta = acos(trk.cosTh);
       if (dz < 0) theta = M_PI - theta; // rotation around x by 180 deg. (z -> -z, phi -> -phi)
-      dz = abs(dz);
+      dz = std::abs(dz);
       double thetaCer = acos(cer.cosThc);
       if (theta - thetaCer >= M_PI / 2) return false; // photons cannot reach the plane at z
 
@@ -437,7 +437,7 @@ namespace Belle2 {
       }
       std::vector<double> cosFic(2, cosLimit);
       for (int i = 0; i < 2; i++) {
-        if (abs(dxdz[i]) < INFINITY) {
+        if (std::abs(dxdz[i]) < INFINITY) {
           double aa = (dxdz[i] * cos(theta) - trk.cosFi * sin(theta)) * cer.cosThc;
           double bb = (dxdz[i] * sin(theta) + trk.cosFi * cos(theta)) * cer.sinThc;
           double dd = trk.sinFi * cer.sinThc;
@@ -498,18 +498,18 @@ namespace Belle2 {
 
       double x1 = (-Ah - mirror.xc) / mirror.R;
       double y1 = derivativeOfReflectedX(x1, xe, ze, zd);
-      if (y1 != y1 or abs(y1) == INFINITY) return -Ah;
+      if (y1 != y1 or std::abs(y1) == INFINITY) return -Ah;
 
       double x2 = (Ah - mirror.xc) / mirror.R;
       double y2 = derivativeOfReflectedX(x2, xe, ze, zd);
-      if (y2 != y2 or abs(y2) == INFINITY) return -Ah;
+      if (y2 != y2 or std::abs(y2) == INFINITY) return -Ah;
 
       if (y1 * y2 > 0) return -Ah; // no minimum or maximum
 
       for (int i = 0; i < 50; i++) {
         double x = (x1 + x2) / 2;
         double y = derivativeOfReflectedX(x, xe, ze, zd);
-        if (y != y or abs(y) == INFINITY) return -Ah;
+        if (y != y or std::abs(y) == INFINITY) return -Ah;
         if (y * y1 < 0) {
           x2 = x;
         } else {
@@ -542,7 +542,7 @@ namespace Belle2 {
         for (int Nxe = nxmi; Nxe <= nxma; Nxe++) {
           for (size_t k = 0; k < prism.unfoldedWindows.size(); k++) {
             const auto sol = prismSolution(pixel, k, Nxe);
-            if (sol.len == 0 or abs(sol.L) > m_track.getLengthInQuartz() / 2) continue;
+            if (sol.len == 0 or std::abs(sol.L) > m_track.getLengthInQuartz() / 2) continue;
 
             bool ok = prismRaytrace(sol);
             if (not ok) continue;
@@ -594,7 +594,7 @@ namespace Belle2 {
             double dx_dFic = (lastState_dFic.getX() - lastState.getX()) / dFic;
             double dy_dFic = (lastState_dFic.getY() - lastState.getY()) / dFic;
             double Jacobi = dx_dL * dy_dFic - dy_dL * dx_dFic;
-            double numPhotons = m_yScanner->getNumPhotonsPerLen() * pixel.Dx * Dy / abs(Jacobi) * RQE;
+            double numPhotons = m_yScanner->getNumPhotonsPerLen() * pixel.Dx * Dy / std::abs(Jacobi) * RQE;
 
             double dLen_de = (lastState_de.getPropagationLen() - lastState.getPropagationLen()) / de;
             double dLen_dL = (lastState_dL.getPropagationLen() - lastState.getPropagationLen()) / dL;
@@ -677,7 +677,7 @@ namespace Belle2 {
     {
       const auto& prism = m_inverseRaytracer->getPrism();
       const auto& win = prism.unfoldedWindows[k];
-      double dz = abs(prism.zD - prism.zFlat);
+      double dz = std::abs(prism.zD - prism.zFlat);
       TVector3 rD(func::unfold(pixel.xc, nx, prism.A),
                   pixel.yc * win.sy + win.y0 + win.ny * dz,
                   pixel.yc * win.sz + win.z0 + win.nz * dz);
@@ -685,8 +685,8 @@ namespace Belle2 {
       double L = 0;
       for (int iter = 0; iter < 100; iter++) {
         auto sol = prismSolution(rD, L);
-        if (abs(sol.L) > m_track.getLengthInQuartz() / 2) return sol;
-        if (abs(sol.L - L) < 0.01) return sol;
+        if (std::abs(sol.L) > m_track.getLengthInQuartz() / 2) return sol;
+        if (std::abs(sol.L - L) < 0.01) return sol;
         L = sol.L;
       }
       B2DEBUG(20, "TOP::PDFConstructor::prismSolution: iterations not converging");

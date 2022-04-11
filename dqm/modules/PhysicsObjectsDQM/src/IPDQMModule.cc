@@ -22,7 +22,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(IPDQM)
+REG_MODULE(IPDQM);
 
 IPDQMModule::IPDQMModule() : HistoModule()
 {

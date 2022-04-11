@@ -32,7 +32,7 @@ using namespace beamabort;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(BeamabortStudy)
+REG_MODULE(BeamabortStudy);
 
 //-----------------------------------------------------------------
 //                 Implementation

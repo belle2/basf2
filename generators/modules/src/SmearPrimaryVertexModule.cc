@@ -20,7 +20,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(SmearPrimaryVertex)
+REG_MODULE(SmearPrimaryVertex);
 
 SmearPrimaryVertexModule::SmearPrimaryVertexModule() : Module(),
   m_Initial(BeamParameters::c_smearVertex)

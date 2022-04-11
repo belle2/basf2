@@ -23,7 +23,7 @@
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
-REG_MODULE(StatisticsTimingHLTDQM)
+REG_MODULE(StatisticsTimingHLTDQM);
 
 StatisticsTimingHLTDQMModule::StatisticsTimingHLTDQMModule() : HistoModule()
 {

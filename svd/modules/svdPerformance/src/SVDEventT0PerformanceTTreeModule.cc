@@ -36,7 +36,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDEventT0PerformanceTTree)
+REG_MODULE(SVDEventT0PerformanceTTree);
 
 //-----------------------------------------------------------------
 //                 Implementation

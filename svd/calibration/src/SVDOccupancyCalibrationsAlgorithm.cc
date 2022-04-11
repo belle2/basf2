@@ -30,7 +30,7 @@ CalibrationAlgorithm::EResult SVDOccupancyCalibrationsAlgorithm::calibrate()
 {
 
   float occCal = 1.;
-  auto payload = new Belle2::SVDOccupancyCalibrations::t_payload(occCal , m_id);
+  auto payload = new Belle2::SVDOccupancyCalibrations::t_payload(occCal, m_id);
 
   auto tree = getObjectPtr<TTree>("HTreeOccupancyCalib");
 

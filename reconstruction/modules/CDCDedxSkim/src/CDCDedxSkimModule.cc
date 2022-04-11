@@ -24,7 +24,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(CDCDedxSkim)
+REG_MODULE(CDCDedxSkim);
 
 CDCDedxSkimModule::CDCDedxSkimModule() : Module()
 {

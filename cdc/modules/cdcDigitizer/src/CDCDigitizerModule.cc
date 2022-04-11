@@ -24,7 +24,7 @@ using namespace Belle2;
 using namespace CDC;
 
 // register module
-REG_MODULE(CDCDigitizer)
+REG_MODULE(CDCDigitizer);
 CDCDigitizerModule::CDCDigitizerModule() : Module(),
   m_cdcgp(), m_gcp(), m_aCDCSimHit(), m_posFlag(0),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
@@ -819,7 +819,7 @@ double CDCDigitizerModule::smearDriftLength(const double driftLength, const doub
 #endif
 
   // Smear drift length
-  double newDL = gRandom->Gaus(driftLength + mean , resolution);
+  double newDL = gRandom->Gaus(driftLength + mean, resolution);
   while (newDL <= 0.) newDL = gRandom->Gaus(driftLength + mean, resolution);
   //  cout << "totalFugeF in Digi= " << m_totalFudgeFactor << endl;
   return newDL;

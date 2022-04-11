@@ -43,7 +43,7 @@ void DQMHistAnalysisHLTMonObjModule::initialize()
 
   // make canvases to be added to MonitoringObject
   m_c_filter = new TCanvas("Filter", "filter", 750, 400);
-  m_c_skim = new TCanvas("Skim" , "skim", 400, 400);
+  m_c_skim = new TCanvas("Skim", "skim", 400, 400);
   m_c_hardware = new TCanvas("Hardware", "hardware", 1000, 1000);
   m_c_l1 = new TCanvas("L1", "l1", 750, 400);
 

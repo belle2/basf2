@@ -23,7 +23,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistDeltaHisto)
+REG_MODULE(DQMHistDeltaHisto);
 
 //-----------------------------------------------------------------
 //                 Implementation

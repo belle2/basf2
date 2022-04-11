@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(DQMHistAnalysisECL)
+REG_MODULE(DQMHistAnalysisECL);
 
 DQMHistAnalysisECLModule::DQMHistAnalysisECLModule()
   : DQMHistAnalysisModule()

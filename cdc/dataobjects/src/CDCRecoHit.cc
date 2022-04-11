@@ -298,12 +298,12 @@ std::vector<double> CDCRecoHit::timeDerivativesMeasurementsOnPlane(const genfit:
   // from CDCGeometryPar::getNewLeftRightRaw().
   auto fL = [&](const double & t) -> double {
     return s_tdcCountTranslator->getDriftLength(m_tdcCount, m_wireID, t,
-    false, //left
-    z, alpha, theta, m_adcCount); };
+                                                false, //left
+                                                z, alpha, theta, m_adcCount); };
   auto fR = [&](const double & t) -> double {
     return s_tdcCountTranslator->getDriftLength(m_tdcCount, m_wireID, t,
-    true, //right
-    z, alpha, theta, m_adcCount); };
+                                                true, //right
+                                                z, alpha, theta, m_adcCount); };
 
   // Calculate derivative for all left and right mirror hit.
   //

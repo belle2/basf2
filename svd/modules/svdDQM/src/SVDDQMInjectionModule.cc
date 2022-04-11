@@ -17,13 +17,13 @@ using namespace Belle2::VXD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDDQMInjection)
+REG_MODULE(SVDDQMInjection);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDDQMInjectionModule::SVDDQMInjectionModule() : HistoModule() , m_vxdGeometry(VXD::GeoCache::getInstance())
+SVDDQMInjectionModule::SVDDQMInjectionModule() : HistoModule(), m_vxdGeometry(VXD::GeoCache::getInstance())
 {
   //Set module properties
   setDescription("Monitor SVD Occupancy after Injection.");

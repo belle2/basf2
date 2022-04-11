@@ -20,7 +20,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisPXDInjection)
+REG_MODULE(DQMHistAnalysisPXDInjection);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -44,8 +44,8 @@ void DQMHistAnalysisPXDInjectionModule::initialize()
                                    TString("/c_PXDInjectionLER")); // different name, as we have the other module
   m_cInjectionHERPXD = new TCanvas(m_histogramDirectoryName +
                                    TString("/c_PXDInjectionHER")); // which makes this hist for ALL detectors (SVD, ECl, TOP)
-  m_hInjectionLERPXD = new TH1F("HitInjectionLERPXD", "PXD Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
-  m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "PXD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+  m_hInjectionLERPXD = new TH1F("HitInjectionLERPXD", "PXD Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0, 20000);
+  m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "PXD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0, 20000);
   const VXD::GeoCache& vxdGeometry = VXD::GeoCache::getInstance();
   std::vector<VxdID> vxdsensors = vxdGeometry.getListOfSensors();
   for (VxdID& avxdid : vxdsensors) {

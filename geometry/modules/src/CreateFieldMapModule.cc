@@ -24,7 +24,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CreateFieldMap)
+REG_MODULE(CreateFieldMap);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -200,7 +200,7 @@ void CreateFieldMapModule::beginRun()
         //Determine global coordinates
         switch (type) {
           case c_XY:
-            pos.SetXYZ(u, v , m_wOffset);
+            pos.SetXYZ(u, v, m_wOffset);
             break;
           case c_ZX:
             pos.SetXYZ(v, m_wOffset, u);

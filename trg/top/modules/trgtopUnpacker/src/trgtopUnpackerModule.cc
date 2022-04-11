@@ -33,7 +33,8 @@ string TRGTOPUnpackerModule::version() const
 //-----------------------------------------------------------------
 
 TRGTOPUnpackerModule::TRGTOPUnpackerModule()
-  : Module::Module(), m_eventNumber(0), m_trigType(0), m_nodeId(0), m_nWords(0)
+  : Module::Module(), m_eventNumber(0), m_trigType(0), m_nodeId(0), m_nWords(0), m_reportedAlreadyRun_1(false),
+    m_reportedAlreadyRun_2(false)
 {
   // Set module properties
 
@@ -61,6 +62,8 @@ void TRGTOPUnpackerModule::initialize()
 
 void TRGTOPUnpackerModule::beginRun()
 {
+  m_reportedAlreadyRun_1 = false;
+  m_reportedAlreadyRun_2 = false;
 }
 
 void TRGTOPUnpackerModule::event()
@@ -73,20 +76,24 @@ void TRGTOPUnpackerModule::event()
 
       m_nodeId = raw_trgarray[i]->GetNodeID(j);
 
+      //      B2INFO("m_nodeId = " << std::hex <<  m_nodeId);
+
       if (m_nodeId == 0x12000001) {               ////// TRGTOP NodeID is 0x12000001, verified (tp & vs)
 
         m_nWords       = raw_trgarray[i]->GetDetectorNwords(j, 0);
         m_eventNumber  = raw_trgarray[i]->GetEveNo(j);
         m_trigType     = raw_trgarray[i]->GetTRGType(j);
 
+        //  B2INFO("m_nWords from cpr12001 = " << m_nWords);
+
         //        if ( m_nWords > 3 ) {                                         ////general header is 3 words long
         if (m_nWords > 0) {                                           ////general header is 3 words long
 
-          //    B2INFO("raw_trgarray.getEntries() = " << raw_trgarray.getEntries());
-          //    B2INFO("raw_trgarray[i]->GetNumEntries() = " << raw_trgarray[i]->GetNumEntries());
-          //    B2INFO("raw_trgarray[]->GetEveNo(j) = " << raw_trgarray[i]->GetEveNo(j));
-          //    B2INFO("raw_trgarray[]->GetNodeID(j) = " << std::hex << raw_trgarray[i]->GetNodeID(j) << std::dec);
-          //    B2INFO("raw_trgarray[]->GetDetectorNwords(j,0) = " << m_nWords);
+          //          B2INFO("raw_trgarray.getEntries() = " << raw_trgarray.getEntries());
+          //          B2INFO("raw_trgarray[i]->GetNumEntries() = " << raw_trgarray[i]->GetNumEntries());
+          //          B2INFO("raw_trgarray[]->GetEveNo(j) = " << raw_trgarray[i]->GetEveNo(j));
+          //          B2INFO("raw_trgarray[]->GetNodeID(j) = " << std::hex << raw_trgarray[i]->GetNodeID(j) << std::dec);
+          //          B2INFO("raw_trgarray[]->GetDetectorNwords(j,0) = " << m_nWords);
 
           readCOPPEREvent(raw_trgarray[i] , j);
 
@@ -132,6 +139,8 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   // 3 = 3:  header only
   // 1875 = 3 + 48*39: format used starting ~June 30 2019 and until Oct. 1, 2019 (until Receive FW version 0x02067301)
   // 771 = 3 + 24*32: format used starting ~Oct. 1, 2019 (Receive FW version 0x02067301 and newer)
+  // 1539 = 3 + 48*32: format used starting ~Mar. 25, 2021 (Receive FW version 0x03020003 and newer)
+  // 3075 = 3 + 96*32: format used starting ~Mar. 25, 2021 (Receive FW version 0x03020003 and newer)
 
   //   m_nWords==3 means only a header
   if (m_nWords == 3) {
@@ -149,10 +158,23 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
     numberOfWindows = 48;
     dataFormatKnown = true;
     dataFormatVersionExpected = 1;
+  } else if (m_nWords == 1539) {
+    windowSize = 32;
+    numberOfWindows = 48;
+    dataFormatKnown = true;
+    dataFormatVersionExpected = 4;
+  } else if (m_nWords == 3075) {
+    windowSize = 32;
+    numberOfWindows = 96;
+    dataFormatKnown = true;
+    dataFormatVersionExpected = 4;
   }
 
   if (!dataFormatKnown) {
-    B2INFO("Unknown data format / error / exiting");
+    if (!m_reportedAlreadyRun_1) {
+      B2INFO("Unknown data format / error / exiting. This message is reported only once per run.");
+      m_reportedAlreadyRun_1 = true;
+    }
     return;
   }
 
@@ -178,6 +200,8 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   // need to know when a new decision is made (there could be more than one TOP L1 timing decision stored in the same B2L buffer)
   // cppcheck-suppress variableScope
   int t0CombinedDecisionLast = -1;
+  int logLSumLast = -1;
+  int logLSumNow = 0;
 
   bool performBufferAnalysis = true;
   bool reportAllErrors = true;
@@ -351,7 +375,8 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
 
       unsigned int testPatternExpected = 0;
       if (dataFormatVersionExpected == 1) testPatternExpected = 0xbbba;
-      else if (dataFormatVersionExpected == 2 || dataFormatVersionExpected == 3) testPatternExpected = 0xdddd;
+      else if (dataFormatVersionExpected == 2 || dataFormatVersionExpected == 3
+               || dataFormatVersionExpected == 4) testPatternExpected = 0xdddd;
 
       testPattern = (rdat[index] >> 16) & 0xffff;
       //    B2INFO("testPattern = " << std::hex << testPattern << std::dec);
@@ -367,10 +392,18 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
       if (dataFormatVersionNow == 3 && dataFormatVersionExpected == 2) {
         dataFormatVersionExpected = 3;
       }
+      if (dataFormatVersionNow == 4 && dataFormatVersionExpected == 2) {
+        dataFormatVersionExpected = 4;
+      }
 
       if (dataFormatVersionNow != dataFormatVersionExpected) {
-        if (reportAllErrors) B2ERROR("Unexpected data format version: " << dataFormatVersionNow << ", window " << iWindow << ", index = " <<
-                                       index);
+        if (reportAllErrors) {
+          if (!m_reportedAlreadyRun_2) {
+            B2ERROR("Unexpected data format version: " << dataFormatVersionNow << ", window " << iWindow << ", index = " <<
+                    index);
+            m_reportedAlreadyRun_2 = true;
+          }
+        }
         errorCountWindowMajor++;
       }
 
@@ -414,12 +447,15 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
       }
       cntr127Last = cntr127Now;
 
-      testPattern = (rdat[index + 1]) & 0x0000ffff;
+      // Tianping Oct. 22, 2021 -> vs Mar. 25, 2022 / removed
+
+      //      testPattern = (rdat[index + 1]) & 0x0000ffff;
       //    B2INFO("testPattern = " << std::hex << testPattern << std::dec);
-      if (testPattern != 0) {
-        if (reportAllErrors) B2ERROR("Unexpected test pattern 2: " << testPattern << ", window " << iWindow << ", index = " << index + 1);
-        errorCountWindowMajor++;
-      }
+      //      if (testPattern != 0) {
+      //        if (reportAllErrors) B2ERROR("Unexpected test pattern 2: " << testPattern << ", window " << iWindow << ", index = " << index + 1);
+      //        errorCountWindowMajor++;
+      //      }
+
 
       // combined t0 from the current window
       int t0CombinedDecisionNow = (rdat[index + 2]) & 0x3ffff;
@@ -555,6 +591,7 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
 
       int logLikelihoodsSlots[16];
 
+      // dataFormatVersion == 4 does not have logL info
       if (dataFormatVersionExpected == 2 || dataFormatVersionExpected == 3) {
         logLikelihoodsSlots[0] = (rdat[index + 21]) & 0xffff;
         logLikelihoodsSlots[1] = (rdat[index + 21] >> 16) & 0xffff;
@@ -665,8 +702,21 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
       int cnttrgNow = rdat[index];
       //    B2INFO("trgtag (evt) from buffer header, cnttrg and rvc from window = " << trgtag <<", " << cnttrgNow << ", " << revoClockNow);
 
+      // does not work like this for waveform readout version
+      logLSumNow = 0;
+      for (int iSlot = 0; iSlot < NUMBER_OF_SLOTS; iSlot++) {
+        // store compromised decisions also
+        if (nHitsSlots[iSlot] != 0) {
+          logLSumNow = logLSumNow + logLikelihoodsSlots[iSlot];
+        }
+      }
+
       // report and store combined t0 decision - this is where we can write all this info into persistent objects
-      if (t0CombinedDecisionNow != t0CombinedDecisionLast) {
+
+      if ((t0CombinedDecisionNow != t0CombinedDecisionLast && dataFormatVersionExpected == 4) || (logLSumNow != logLSumLast
+          && dataFormatVersionExpected != 4)) {
+
+        logLSumLast = logLSumNow;
 
         t0CombinedDecisionLast = t0CombinedDecisionNow;
 

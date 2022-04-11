@@ -19,7 +19,7 @@ from basf2 import B2ERROR
 import sys
 
 #: Tells the automated system some details of this script
-settings = ValidationSettings(name='TOP calibration validation',
+settings = ValidationSettings(name='TOP post-tracking calibration',
                               description=__doc__,
                               download_files=[],
                               expert_config=None)

@@ -27,7 +27,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisEventT0)
+REG_MODULE(DQMHistAnalysisEventT0);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -202,7 +202,6 @@ void DQMHistAnalysisEventT0Module::terminate()
 
 }
 
-// cppcheck-suppress constParameter
 double DQMHistAnalysisEventT0Module::fDoubleGaus(double* x, double* par)
 {
   double N = par[0];

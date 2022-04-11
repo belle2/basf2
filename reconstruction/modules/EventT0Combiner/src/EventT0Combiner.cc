@@ -12,7 +12,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(EventT0Combiner)
+REG_MODULE(EventT0Combiner);
 
 EventT0CombinerModule::EventT0CombinerModule() : Module()
 {

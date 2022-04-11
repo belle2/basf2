@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(DQMHistAnalysisKLM2)
+REG_MODULE(DQMHistAnalysisKLM2);
 
 DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   : DQMHistAnalysisModule(),

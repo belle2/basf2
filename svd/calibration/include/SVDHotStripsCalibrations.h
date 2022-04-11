@@ -36,7 +36,7 @@ namespace Belle2 {
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
         B2DEBUG(20, "SVDHotStripsCalibrations: from now on we are using " <<
-        this->m_aDBObjPtr -> get_uniqueID()); });
+                this->m_aDBObjPtr -> get_uniqueID()); });
     }
 
 
@@ -50,7 +50,7 @@ namespace Belle2 {
      * it throws std::out_of_range if the strip is unknown
      */
 
-    inline float isHot(const VxdID& sensorID, const bool& isU , const unsigned short& strip) const
+    inline float isHot(const VxdID& sensorID, const bool& isU, const unsigned short& strip) const
     {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),

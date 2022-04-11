@@ -25,7 +25,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistSnapshots)
+REG_MODULE(DQMHistSnapshots);
 
 //-----------------------------------------------------------------
 //                 Implementation

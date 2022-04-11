@@ -29,7 +29,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(Display)
+REG_MODULE(Display);
 
 DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
 {

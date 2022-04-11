@@ -32,7 +32,7 @@ def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode, create
         add_cosmic_dqm(path, components=components, dqm_environment=dqm_environment,
                        dqm_mode=dqm_mode, create_hlt_unit_histograms=create_hlt_unit_histograms)
     else:
-        basf2.B2FATAL("Run type {} not supported.".format(run_type))
+        basf2.B2FATAL(f"Run type {run_type} not supported.")
 
     if dqm_mode in ["dont_care", "all_events"]:
         path.add_module('DelayDQM', title=dqm_environment, histogramDirectoryName='DAQ')

@@ -53,7 +53,7 @@ using namespace alignment;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(MillepedeCollector)
+REG_MODULE(MillepedeCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation

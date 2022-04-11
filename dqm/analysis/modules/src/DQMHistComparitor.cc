@@ -28,7 +28,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistComparitor)
+REG_MODULE(DQMHistComparitor);
 
 //-----------------------------------------------------------------
 //                 Implementation

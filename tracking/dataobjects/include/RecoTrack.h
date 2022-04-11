@@ -31,7 +31,7 @@ namespace Belle2 {
   class RecoTrackGenfitAccess;
 
   BELLE2_DEFINE_EXCEPTION(NoTrackFitResult, "No track fit result available for this hit (e.g. DAF has removed it).")
-  BELLE2_DEFINE_EXCEPTION(NoStateOnPlaneFound, "No measured state on pland for any track point found.")
+  BELLE2_DEFINE_EXCEPTION(NoStateOnPlaneFound, "No measured state on plane for any track point found.")
 
   /** This is the Reconstruction Event-Data Model Track.
    *

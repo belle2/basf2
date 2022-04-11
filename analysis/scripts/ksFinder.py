@@ -96,7 +96,7 @@ def ksFinder(
     saveInputVariables=True,
     useCentralDB=True,
     useLocalDB=False,
-    localDB='/home/belle2/rsugiura/work/basf2/weight/localdb/database.txt',
+    localDB='',
     path=None
 ):
     """
@@ -108,7 +108,7 @@ def ksFinder(
                                         When 'standard', 'tight', or 'loose', a cut with Ks efficiency 90%, 95%, 85% is applied.
     @path                               basf2 path to execute
     """
-    centralDB = "sugiura_KsFinder_dev"
+    centralDB = "KsFinder_dev"
     basf2.conditions.prepend_globaltag(centralDB)
 
     if not Belle2.FileSystem.findFile(workingDirectory, True):

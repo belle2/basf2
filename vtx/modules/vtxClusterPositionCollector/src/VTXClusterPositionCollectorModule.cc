@@ -27,7 +27,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(VTXClusterPositionCollector)
+REG_MODULE(VTXClusterPositionCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -51,7 +51,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SimpleVTXSpacePointCreator)
+REG_MODULE(SimpleVTXSpacePointCreator);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -106,7 +106,7 @@ void SimpleVTXSpacePointCreatorModule::event()
 
     // Random values just for compilation, to be reworked
     B2Vector3<double> posErrors(0.0, 0.0, 0.0);
-    std::pair<double, double> normalizedLocals(0. , 0.);
+    std::pair<double, double> normalizedLocals(0., 0.);
     std::pair<bool, bool> clustersAssigneds(true, true);
 
     // VTX SpacePoints

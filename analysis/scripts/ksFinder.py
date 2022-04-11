@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# *************  ksFinder   ************
-# * Authors: Ryohei Sugiura
-# * Institute: The University of Tokyo
-# * Email: sugiura@hep.phys.s.u-tokyo.ac.jp                 *
-# * Minimal module for providing FBDT as Ks classification.
-# ********************************************
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 from basf2 import B2INFO, B2FATAL
 import basf2
 import modularAnalysis as ma
 import variables
 from variables import utils
-from ROOT import Belle2
 import os
-
-# default list of Ks finder info to be saved with particle
-saveToNtupleVariables = []
 
 
 def getInputVariablesList():
@@ -44,7 +42,8 @@ def getInputVariablesList():
     return inputVariablesList
 
 
-ks_finder_info = getInputVariablesList() + ['isSignal', 'M', 'p', 'mcPDG']
+ks_finder_info = getInputVariablesList()
+utils.add_collection(ks_finder_info, 'ks_finder_info')
 
 
 def add_default_ks_finder_aliases():
@@ -71,13 +70,7 @@ def add_default_ks_finder_aliases():
     variables.variables.addAlias('pin_cosTheta', 'daughter(1,cosTheta)')
     variables.variables.addAlias('pip_protonID', 'daughter(0,protonID)')
     variables.variables.addAlias('pin_protonID', 'daughter(1,protonID)')
-    utils.add_collection(ks_finder_info, 'ks_finder_info')
 
-
-# *****************************************************************
-# General variables init for KsFinder
-# *****************************************************************
-add_default_ks_finder_aliases()
 
 # ****************************************
 # KS FINDER MAIN FUNCTION
@@ -89,13 +82,7 @@ def ksFinder(
     listtype='all',
     extraInfoName_V0Selector='KsFinder_V0Selector',
     extraInfoName_LambdaVeto='KsFinder_LambdaVeto',
-    identifier_Ks='sugiura_KsFinder_V0Selector',
-    identifier_vLambda='sugiura_KsFinder_LambdaVeto',
-    workingDirectory='.',
-    doClassification=True,
-    saveInputVariables=True,
     useCentralDB=True,
-    useLocalDB=False,
     localDB='',
     path=None
 ):
@@ -105,14 +92,22 @@ def ksFinder(
 
     @param particleLists                reconstructed Ks list with 2 charged daughters
     @param listtype                     Type of Ks cut. When 'all'(default), no cut is applied on Ks.
-                                        When 'standard', 'tight', or 'loose', a cut with Ks efficiency 90%, 95%, 85% is applied.
-    @path                               basf2 path to execute
+                                        When 'standard', 'tight', or 'loose', a cut with Ks efficiency
+                                        90%, 95%, and 85% is applied.
+    @param extraInfoName_V0Selector     Variable name for V0Selector MVA output
+    @param extraInfoName_LambdaVeto     Variable name for LambdaVeto MVA output
+    @param useCentralDB                 Flag whether weight file is taken from globaltag or local.
+                                        If false, weight file is taken from local file specified by localDB.
+    @param localDB                      Path for local weight file for MVA.
+                                        Only valid when useCentralDB == False.
+    @param path                         Basf2 path to execute
     """
     centralDB = "KsFinder_dev"
     basf2.conditions.prepend_globaltag(centralDB)
-
-    if not Belle2.FileSystem.findFile(workingDirectory, True):
-        B2FATAL('Ks Finder: THE GIVEN WORKING DIRECTORY "' + workingDirectory + '" DOES NOT EXIST! PLEASE SPECIFY A VALID PATH.')
+    add_default_ks_finder_aliases()
+    identifier_Ks = 'sugiura_KsFinder_V0Selector',
+    identifier_vLambda = 'sugiura_KsFinder_LambdaVeto',
+    useLocalDB = not useCentralDB
 
     # ****************************************
     # Do the Ks classification
@@ -130,43 +125,36 @@ def ksFinder(
     else:
         B2FATAL('KsFinder: please specify to use weight file from only local or only central database.')
 
-    if doClassification:
-        path.add_module('MVAExpert',
-                        listNames=particleList,
-                        extraInfoName=extraInfoName_V0Selector,
-                        identifier=identifier_Ks
-                        )
-        path.add_module('MVAExpert',
-                        listNames=particleList,
-                        extraInfoName=extraInfoName_LambdaVeto,
-                        identifier=identifier_vLambda
-                        )
+    path.add_module('MVAMultipleExperts',
+                    listNames=particleList,
+                    extraInfoNames=[extraInfoName_V0Selector, extraInfoName_LambdaVeto],
+                    identifier=[identifier_Ks, identifier_vLambda])
 
-        _effnames = ['all', 'standard', 'tight', 'loose']
-        if listtype not in _effnames:
-            B2INFO('Invalid List type! No cut is applied on '+particleListName)
-        elif listtype == 'all':
-            B2INFO('No cut is applied on '+particleListName)
-        else:
-            V0_thr = 0
-            Lambda_thr = 0
-            if listtype == 'standard':
-                B2INFO('Standard Cut is applied on '+particleListName+'!')
-                B2INFO('Threshold is (0.90, 0.11)')
-                V0_thr = 0.90
-                Lambda_thr = 0.11
-            elif listtype == 'tight':
-                B2INFO('Tight Cut is applied on '+particleListName+'!')
-                B2INFO('Threshold is (0.96, 0.27)')
-                V0_thr = 0.96
-                Lambda_thr = 0.27
-            elif listtype == 'loose':
-                B2INFO('Loose Cut is applied on '+particleListName+'!')
-                B2INFO('Threshold is (0.49, 0.02)')
-                V0_thr = 0.49
-                Lambda_thr = 0.02
-            cut_string = 'extraInfo('+extraInfoName_V0Selector+')>'+str(V0_thr) + \
-                ' and extraInfo('+extraInfoName_LambdaVeto+')>'+str(Lambda_thr)
-            ma.applyCuts(list_name=particleListName,
-                         cut=cut_string,
-                         path=path)
+    _effnames = ['all', 'standard', 'tight', 'loose']
+    if listtype not in _effnames:
+        B2INFO('Invalid List type! No cut is applied on '+particleListName)
+    elif listtype == 'all':
+        B2INFO('No cut is applied on '+particleListName)
+    else:
+        V0_thr = 0
+        Lambda_thr = 0
+        if listtype == 'standard':
+            B2INFO('Standard Cut is applied on '+particleListName+'!')
+            B2INFO('Threshold is (0.90, 0.11)')
+            V0_thr = 0.90
+            Lambda_thr = 0.11
+        elif listtype == 'tight':
+            B2INFO('Tight Cut is applied on '+particleListName+'!')
+            B2INFO('Threshold is (0.96, 0.27)')
+            V0_thr = 0.96
+            Lambda_thr = 0.27
+        elif listtype == 'loose':
+            B2INFO('Loose Cut is applied on '+particleListName+'!')
+            B2INFO('Threshold is (0.49, 0.02)')
+            V0_thr = 0.49
+            Lambda_thr = 0.02
+        cut_string = 'extraInfo('+extraInfoName_V0Selector+')>'+str(V0_thr) + \
+            ' and extraInfo('+extraInfoName_LambdaVeto+')>'+str(Lambda_thr)
+        ma.applyCuts(list_name=particleListName,
+                     cut=cut_string,
+                     path=path)

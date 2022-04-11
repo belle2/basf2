@@ -25,7 +25,7 @@ using namespace Belle2;
 //Note that the 'Module' part of the class name is missing, this is also the way it
 //will be called in the module list.
 
-REG_MODULE(CosmicsAlignmentValidation)
+REG_MODULE(CosmicsAlignmentValidation);
 
 CosmicsAlignmentValidationModule::CosmicsAlignmentValidationModule() :
   Module(),

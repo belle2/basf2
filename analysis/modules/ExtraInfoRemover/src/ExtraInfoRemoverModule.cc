@@ -13,7 +13,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(ExtraInfoRemover)
+REG_MODULE(ExtraInfoRemover);
 
 ExtraInfoRemoverModule::ExtraInfoRemoverModule() : Module()
 {

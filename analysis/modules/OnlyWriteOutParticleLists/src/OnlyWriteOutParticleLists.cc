@@ -12,7 +12,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(OnlyWriteOutParticleLists)
+REG_MODULE(OnlyWriteOutParticleLists);
 
 OnlyWriteOutParticleListsModule::OnlyWriteOutParticleListsModule()
 {

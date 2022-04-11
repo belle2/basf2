@@ -32,7 +32,7 @@ using namespace CDC;
 //                 Register module
 //-----------------------------------------------------------------
 
-REG_MODULE(CDCDQM)
+REG_MODULE(CDCDQM);
 
 CDCDQMModule::CDCDQMModule() : HistoModule()
 {

@@ -21,7 +21,7 @@ KLM::ScintillatorFirmware::~ScintillatorFirmware()
 }
 
 enum KLM::ScintillatorFirmwareFitStatus KLM::ScintillatorFirmware::fit(
-  int* amp, int threshold, KLMScintillatorFirmwareFitResult* fitData)
+  const int* amp, int threshold, KLMScintillatorFirmwareFitResult* fitData)
 {
   /*
    * Upper bound of the background region: number of points before threshold

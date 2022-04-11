@@ -38,7 +38,7 @@ using namespace Belle2;
 using namespace CDC;
 using namespace Dedx;
 
-REG_MODULE(CDCDedxPID)
+REG_MODULE(CDCDedxPID);
 
 CDCDedxPIDModule::CDCDedxPIDModule() : Module()
 {
@@ -813,7 +813,7 @@ double CDCDedxPIDModule::getMean(double bg) const
   return (A * partA + B * partB + C * partC);
 }
 
-double CDCDedxPIDModule::sigmaCurve(double* x, double* par, int version) const
+double CDCDedxPIDModule::sigmaCurve(double* x, const double* par, int version) const
 {
   // calculate the predicted mean value as a function of beta-gamma (bg)
   // this is done with a different function depending dE/dx, nhit, and sin(theta)

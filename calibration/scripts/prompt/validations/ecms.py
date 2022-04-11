@@ -42,6 +42,48 @@ settings = ValidationSettings(name='eCMS Calibrations',
                               expert_config={})
 
 
+def setPlotRange(df, tag):
+    """
+    Function which adjusts the y-axis range of the plot according to tag
+    """
+
+    if tag == '4S':
+        df4S = df[df['Ecms'] > 10560]['Ecms']
+        if len(df4S) > 0:
+            yMin = df4S.min()
+            plt.ylim(bottom=yMin-3)
+
+        dfHigh = df[df['Ecms'] < 10600]['Ecms']
+        if len(dfHigh) > 0:
+            yMax = dfHigh.max()
+            plt.ylim(top=yMax+3)
+
+    elif tag == 'Off':
+        dfOff = df[df['Ecms'] < 10560]['Ecms']
+        if len(dfOff) > 0:
+            yMax = dfOff.max()
+            plt.ylim(top=yMax+3)
+
+
+def toJST(times):
+    """
+    Converts time from UTC to the JST
+    """
+    return np.vectorize(lambda t:  datetime.utcfromtimestamp((t + 9) * 3600))(times)
+
+
+def plotSplitLines(dfC):
+    """
+    Plot vertical lines in places where run energy type changes
+    """
+    indx = np.where(np.diff(dfC['pull'] == 0))[0]
+    for i in indx:
+        tt1 = toJST(dfC['t2'].loc[i]).item()
+        tt2 = toJST(dfC['t1'].loc[i+1]).item()
+        tt = tt1 + (tt2 - tt1) / 2
+        plt.axvline(x=tt, color='g', linestyle='--')
+
+
 def get_Ecms_values(path):
     """
     Load the values of the Ecms properties from the payloads into the list
@@ -127,8 +169,8 @@ class Plotter():
         timesg = np.c_[df['t1'].to_numpy(),   avg,  df['t2'].to_numpy()].ravel()
         eCMSg = np.c_[df[var].to_numpy(), nan,  df[var].to_numpy()].ravel()
 
-        times = np.vectorize(lambda t:  datetime.utcfromtimestamp((t + 9) * 3600))(times)
-        timesg = np.vectorize(lambda t:  datetime.utcfromtimestamp((t + 9) * 3600))(timesg)
+        times = toJST(times)
+        timesg = toJST(timesg)
 
         plt.fill_between(times, eCMS-eCMSu, eCMS+eCMSu, alpha=0.2, color=color)
         plt.plot(times, eCMS, linewidth=2, color=color, label=label)
@@ -148,16 +190,11 @@ class Plotter():
         dfMc['Ecms'] += d
         Plotter.plotLine(dfMc, 'Ecms', 'blue', label=f'mumu method (+{round(d,1)} MeV)')
 
-        if tag == '4S':
-            df4S = self.dfC[self.dfC['Ecms'] > 10560]['Ecms']
-            if len(df4S) > 0:
-                yMin = df4S.min()
-                plt.ylim(bottom=yMin-3)
-        elif tag == 'Off':
-            dfOff = self.dfC[self.dfC['Ecms'] < 10560]['Ecms']
-            if len(dfOff) > 0:
-                yMax = dfOff.max()
-                plt.ylim(top=yMax+3)
+        plotSplitLines(self.dfC)
+        setPlotRange(self.dfC, tag)
+
+        plt.xlabel('time')
+        plt.ylabel('Ecms [MeV]')
 
         plt.legend()
 
@@ -178,7 +215,12 @@ class Plotter():
         Plotter.plotLine(self.dfB, 'spread', 'green', label='B decay method')
         Plotter.plotLine(self.dfC, 'spread', 'red', label='Combined method')
 
+        plotSplitLines(self.dfC)
+
         plt.legend()
+
+        plt.xlabel('time')
+        plt.ylabel('spread [MeV]')
 
         loc = 'plots/allData'
         if limits is not None:
@@ -201,7 +243,7 @@ class Plotter():
             avg = (df['t1']+df['t2']).to_numpy()/2
             times = np.c_[df[['t1',    't2']].to_numpy(), avg].ravel()
             eCMS = np.c_[df[[var, var]].to_numpy(), nan].ravel()
-            times = np.vectorize(lambda t:  datetime.utcfromtimestamp((t + 9) * 3600))(times)
+            times = toJST(times)
 
             if withBand:
                 eCMSu = np.c_[df[[varUnc, varUnc]].to_numpy(), nan].ravel()
@@ -213,7 +255,7 @@ class Plotter():
         avg = (df['t1']+df['t2']).to_numpy()/2
         timesg = np.c_[df['t1'].to_numpy(),   avg,  df['t2'].to_numpy()].ravel()
         eCMSg = np.c_[df[var].to_numpy(), nan,  df[var].to_numpy()].ravel()
-        timesg = np.vectorize(lambda t:  datetime.utcfromtimestamp((t + 9) * 3600))(timesg)
+        timesg = toJST(timesg)
 
         if withCurve:
             plt.plot(timesg, eCMSg, linewidth=2, color='gray', alpha=0.35)
@@ -227,6 +269,8 @@ class Plotter():
         """
 
         Plotter.plotCurve(self.dfC, 'shift',  label='Combined method')
+
+        plotSplitLines(self.dfC)
 
         plt.xlabel('time')
         plt.ylabel('shift [MeV]')
@@ -248,19 +292,12 @@ class Plotter():
 
         Plotter.plotCurve(self.dfC, 'Ecms',  label='Combined method')
 
+        plotSplitLines(self.dfC)
+
         plt.xlabel('time')
         plt.ylabel('Ecms [MeV]')
 
-        if tag == '4S':
-            df4S = self.dfC[self.dfC['Ecms'] > 10560]['Ecms']
-            if len(df4S) > 0:
-                yMin = df4S.min()
-                plt.ylim(bottom=yMin-3)
-        elif tag == 'Off':
-            dfOff = self.dfC[self.dfC['Ecms'] < 10560]['Ecms']
-            if len(dfOff) > 0:
-                yMax = dfOff.max()
-                plt.ylim(top=yMax+3)
+        setPlotRange(self.dfC, tag)
 
         loc = 'plots/allData'
         if limits is not None:
@@ -281,6 +318,8 @@ class Plotter():
         dfC['refUnc'] = 1
         Plotter.plotCurve(dfC, 'pull', label='Combined method', withBand=False)
         Plotter.plotCurve(dfC, 'ref',  label='Combined method', withCurve=False)
+
+        plotSplitLines(self.dfC)
 
         plt.ylim(-1.5, 1.5)
         plt.xlabel('time')
@@ -343,6 +382,26 @@ def read_Bonly_data(outputDir):
                     ll[0]), float(
                     ll[1])), (int(ll[2]), int(ll[3]), int(ll[4]), int(ll[5])),
                  (float(ll[2+4]), float(ll[3+4])), (float(ll[4+4]), float(ll[5+4]))))
+    return arr
+
+
+def read_mumu_data(outputDir):
+    """
+    It reads the calibration table from the text file produced by the CAF calibration.
+    This text file includes the results from the mumu-based calibration.
+    """
+
+    arr = []
+    with open(outputDir + '/mumuEcalib.txt', "r") as text_file:
+        for i, ll in enumerate(text_file):
+            if i == 0:
+                continue
+            ll = ll.strip().split()
+            arr.append(
+                ((float(
+                    ll[2+0]), float(
+                    ll[2+1])), (int(ll[2+2]), int(ll[2+3]), int(ll[2+4]), int(ll[2+5])),
+                 (float(ll[2+6]), float(ll[2+7])), (int(ll[0]), int(ll[1]))))
     return arr
 
 
@@ -533,6 +592,108 @@ def create_hadBonly_fit_plots(outputDir, pdflatex):
     rmtree('tmp')
 
 
+def create_mumu_fit_plots(outputDir, pdflatex):
+    """
+    Create multi-page pdf file with the fit plots for mumu method.
+    The file is created using pdflatex
+    """
+
+    arr = read_mumu_data(outputDir)
+
+    limits = []
+    for i, a in enumerate(arr):
+        if a[3][1] == a[3][0] - 1:
+            limits.append((i - a[3][1], a[3][0]))
+
+    dName = 'plotsMuMu'
+
+    files = glob(outputDir+'/'+dName + '/*.pdf')
+    files = list(map(os.path.basename, files))
+
+    items = set()
+
+    for f in files:
+        res = re.search('mumu_([0-9]*)\\.pdf', f)
+        t = int(res.group(1))
+        items.add(t)
+
+    items = sorted(items)
+
+    header = """\\documentclass[aspectratio=169]{beamer}
+    \\usepackage{graphicx}
+
+    \\begin{document}
+    """
+
+    body = ""
+    for k, n in limits:
+
+        frac = None
+        if n >= 11:
+            frac = 0.159
+        elif n >= 9:
+            frac = 0.193
+        elif n >= 7:
+            frac = 0.24
+        elif n >= 5:
+            frac = 0.3
+        elif n >= 3:
+            frac = 0.33
+        elif n >= 2:
+            frac = 0.48
+        elif n >= 1:
+            frac = 0.75
+
+        body += '\\begin{frame}[t]\n'
+
+        for i in range(k, k+n):
+
+            body += '\\begin{minipage}{' + str(frac) + '\\textwidth}\n'
+
+            exp1, run1, exp2, run2 = map(str, arr[i][1])
+            eCMS, eCMSe = str(round(arr[i][2][0], 1)), str(round(arr[i][2][1], 1))
+
+            tStart, tEnd = arr[i][0][0], arr[i][0][1]
+
+            t1 = datetime.utcfromtimestamp((tStart + 9) * 3600).strftime('%y-%m-%d %H:%M')
+            t2 = datetime.utcfromtimestamp((tEnd + 9) * 3600).strftime('%y-%m-%d %H:%M')
+
+            body += '\\begin{center}\n'
+            body += '\\tiny  $E_\\mathrm{cms} = (' + eCMS + '\\pm' + eCMSe + ')$~MeV    \\\\\n'
+            body += '\\tiny ' + exp1 + ' ' + run1 + '\\hspace{0.3cm} ' + t1 + ' \\\\\n'
+            body += '\\tiny ' + exp2 + ' ' + run2 + '\\hspace{0.3cm} ' + t2 + ' \\\\\n'
+            body += '\\tiny ' + str(round(tEnd - tStart, 1)) + ' hours  \\vspace{0.3cm}\n'
+            body += '\\includegraphics[trim=0.3cm 0.0cm 1.3cm 0.7cm,clip=true,width=0.99\\textwidth]{' + \
+                outputDir + '/' + dName + '/mumu_' + str(items[i]) + '.pdf}\n'
+            body += '\\end{center}\n'
+            body += '\\end{minipage}\n'
+
+        body += '\\end{frame}\n\n'
+
+    tail = '\n\\end{document}'
+
+    whole = header + body + tail
+
+    os.makedirs('tmp', exist_ok=True)
+
+    with open("tmp/mumuFits.tex", "w") as text_file:
+        text_file.write(whole)
+
+    subprocess.call(f'{pdflatex} tmp/mumuFits.tex', shell=True)
+
+    os.makedirs('plots', exist_ok=True)
+    copyfile('mumuFits.pdf', 'plots/mumuFits.pdf')
+
+    ext = ['aux', 'log', 'nav', 'out', 'pdf', 'snm', 'toc']
+    for e in ext:
+        if os.path.exists(f'mumuFits.{e}'):
+            os.remove(f'mumuFits.{e}')
+
+    if os.path.exists("tmp/mumuFits.tex"):
+        os.remove("tmp/mumuFits.tex")
+    rmtree('tmp')
+
+
 def run_validation(job_path, input_data_path, requested_iov, expert_config):
     """
     Create validation plots related to the Ecms calibration
@@ -573,6 +734,12 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     # create pdf with plots of fits
     create_hadB_fit_plots(location, pdflatex)
     create_hadBonly_fit_plots(location, pdflatex)
+    create_mumu_fit_plots(location, pdflatex)
+
+    # copy csv files to validation directory
+    copyfile(f'{location}/BonlyEcmsCalib.txt', 'plots/BonlyEcmsCalib.txt')
+    copyfile(f'{location}/finalEcmsCalib.txt', 'plots/finalEcmsCalib.txt')
+    copyfile(f'{location}/mumuEcalib.txt', 'plots/mumuEcalib.txt')
 
 
 if __name__ == "__main__":

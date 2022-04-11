@@ -25,10 +25,8 @@
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/dataobjects/EventT0.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/dbobjects/BeamParameters.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 #include <framework/pcore/ProcHandler.h>
@@ -55,7 +53,7 @@ using namespace alignment;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(MillepedeCollector)
+REG_MODULE(MillepedeCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -159,11 +157,7 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
 
 void MillepedeCollectorModule::prepare()
 {
-  StoreObjPtr<EventMetaData> emd;
-  emd.isRequired();
-
-  StoreObjPtr<EventT0> eventT0;
-  //eventT0.isRequired();
+  m_eventT0.isOptional();
 
   if (m_tracks.empty() &&
       m_particles.empty() &&
@@ -182,9 +176,9 @@ void MillepedeCollectorModule::prepare()
   }
 
   if (!m_particles.empty() || !m_vertices.empty() || !m_primaryVertices.empty()) {
-    StoreArray<RecoTrack> recoTracks;
-    StoreArray<Track> tracks;
-    StoreArray<TrackFitResult> trackFitResults;
+    // StoreArray<RecoTrack> recoTracks;
+    // StoreArray<Track> tracks;
+    // StoreArray<TrackFitResult> trackFitResults;
 
     //recoTracks.isRequired();
     //tracks.isRequired();
@@ -259,9 +253,7 @@ void MillepedeCollectorModule::prepare()
 
 void MillepedeCollectorModule::collect()
 {
-  StoreObjPtr<EventMetaData> emd;
-  alignment::GlobalCalibrationManager::getInstance().preCollect(*emd);
-  StoreObjPtr<EventT0> eventT0;
+  alignment::GlobalCalibrationManager::getInstance().preCollect(*m_evtMetaData);
 
   if (!m_useGblTree) {
     // Open new file on request (at start or after being closed)
@@ -303,8 +295,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (eventT0.isValid() && eventT0->hasEventT0()) {
-        evt0 =  eventT0->getEventT0();
+      if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+        evt0 = m_eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -329,8 +321,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (eventT0.isValid() && eventT0->hasEventT0()) {
-          evt0 =  eventT0->getEventT0();
+        if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+          evt0 = m_eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -362,8 +354,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (eventT0.isValid() && eventT0->hasEventT0()) {
-          evt0 =  eventT0->getEventT0();
+        if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+          evt0 = m_eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -499,8 +491,8 @@ void MillepedeCollectorModule::collect()
           getObjectPtr<TH1I>("ndf")->Fill(ndf);
           getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
           getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-          if (eventT0.isValid() && eventT0->hasEventT0()) {
-            evt0 =  eventT0->getEventT0();
+          if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+            evt0 = m_eventT0->getEventT0();
             getObjectPtr<TH1F>("evt0")->Fill(evt0);
           }
 
@@ -515,8 +507,8 @@ void MillepedeCollectorModule::collect()
           getObjectPtr<TH1I>("ndf")->Fill(ndf);
           getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
           getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-          if (eventT0.isValid() && eventT0->hasEventT0()) {
-            evt0 =  eventT0->getEventT0();
+          if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+            evt0 = m_eventT0->getEventT0();
             getObjectPtr<TH1F>("evt0")->Fill(evt0);
           }
 
@@ -579,8 +571,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (eventT0.isValid() && eventT0->hasEventT0()) {
-        evt0 =  eventT0->getEventT0();
+      if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+        evt0 = m_eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -635,8 +627,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (eventT0.isValid() && eventT0->hasEventT0()) {
-        evt0 =  eventT0->getEventT0();
+      if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+        evt0 = m_eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -704,8 +696,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (eventT0.isValid() && eventT0->hasEventT0()) {
-        evt0 =  eventT0->getEventT0();
+      if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+        evt0 = m_eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -944,8 +936,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (eventT0.isValid() && eventT0->hasEventT0()) {
-          evt0 =  eventT0->getEventT0();
+        if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+          evt0 = m_eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -964,8 +956,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (eventT0.isValid() && eventT0->hasEventT0()) {
-          evt0 =  eventT0->getEventT0();
+        if (m_eventT0.isValid() && m_eventT0->hasEventT0()) {
+          evt0 = m_eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -1027,12 +1019,11 @@ void MillepedeCollectorModule::storeTrajectory(gbl::GblTrajectory& trajectory)
 
 std::string MillepedeCollectorModule::getUniqueMilleName()
 {
-  StoreObjPtr<EventMetaData> emd;
   string name = getName();
 
-  name += "-e"   + to_string(emd->getExperiment());
-  name += "-r"   + to_string(emd->getRun());
-  name += "-ev"  + to_string(emd->getEvent());
+  name += "-e"   + to_string(m_evtMetaData->getExperiment());
+  name += "-r"   + to_string(m_evtMetaData->getRun());
+  name += "-ev"  + to_string(m_evtMetaData->getEvent());
 
   if (ProcHandler::parallelProcessingUsed())
     name += "-pid" + to_string(ProcHandler::EvtProcID());

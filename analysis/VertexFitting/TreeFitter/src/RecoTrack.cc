@@ -28,7 +28,7 @@ namespace TreeFitter {
     m_flt(0),
     m_params(5),
     m_covariance(5, 5),
-    m_momentumScalingFactor(particle->getMomentumScalingFactor())
+    m_momentumScalingFactor(particle->getEffectiveMomentumScale())
   {
     m_bfield = Belle2::BFieldManager::getFieldInTesla(Belle2::B2Vector3D(0, 0, 0)).Z(); //Bz in Tesla
     m_covariance = Eigen::Matrix<double, 5, 5>::Zero(5, 5);

@@ -6,8 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
+// Own include
 #include <analysis/variables/HelicityVariables.h>
+
 #include <analysis/variables/EventVariables.h>
 
 #include <analysis/dataobjects/Particle.h>
@@ -371,7 +372,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("acoplanarityAngle", acoplanarityAngle,
                       R"DOC(
                       Acoplanarity angle (see ``Particle::getAcoplanarity``) assuming a two body decay of the particle and its daughters.
-                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the acoplanarity angle.)DOC");
+                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the acoplanarity angle.)DOC",
+                      "rad");
 
   }
 }

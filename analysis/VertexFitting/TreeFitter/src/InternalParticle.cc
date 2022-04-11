@@ -282,12 +282,8 @@ namespace TreeFitter {
     // tau index only exist with a vertex and geo constraint
     //
     if (m_shares_vertex_with_mother) { return 4; }
-    if (!m_shares_vertex_with_mother && !m_geo_constraint) { return 7; }
-    if (!m_shares_vertex_with_mother && m_geo_constraint) { return 8; }
-
-    // this case should not appear
-    if (m_shares_vertex_with_mother && m_geo_constraint) { return -1; }
-    return -1;
+    else if (!m_geo_constraint) { return 7; }
+    else { return 8; }
   }
 
   int InternalParticle::tauIndex() const
@@ -306,7 +302,7 @@ namespace TreeFitter {
 
     if (m_shares_vertex_with_mother) { return this->index(); }
 
-    if (!m_shares_vertex_with_mother && !m_geo_constraint) {return index() + 3 ;}
+    if (!m_geo_constraint) {return index() + 3 ;}
 
     // this will crash the initialisation
     return -1;

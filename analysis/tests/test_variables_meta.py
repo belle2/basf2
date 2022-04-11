@@ -221,8 +221,8 @@ class MetavariableDataTypeTest(unittest.TestCase):
         files = files.stdout.decode().split("\n")
         files = list(filter(lambda file: file.endswith(".cc"), files))
 
-        # There should be at least 13 files
-        self.assertGreaterEqual(len(files), 13)
+        # There should be at least 11 files
+        self.assertGreaterEqual(len(files), 11)
         # We track the number of metavariables to make sure we don't miss some
         num_metavariables = 0
         for filepath in files:

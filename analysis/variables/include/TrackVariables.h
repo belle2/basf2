@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
+  class Particle;
 
   namespace Variable {
 
@@ -132,6 +132,11 @@ namespace Belle2 {
      * returns the track's slope error
      */
     double trackTanLambdaError(const Particle* part);
+
+    /**
+     * returns the track fit covariance matrix element
+     */
+    double trackFitCovariance(const Particle* particle, const std::vector<double>& indices);
 
     /**
      * returns the pValue of the track's fit

@@ -30,7 +30,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisPXDTrackCharge)
+REG_MODULE(DQMHistAnalysisPXDTrackCharge);
 
 //-----------------------------------------------------------------
 //                 Implementation

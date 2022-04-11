@@ -45,7 +45,7 @@ class CheckRelationBremClusterTestModule(b2.Module):
                 # is there a relation to our secondary cluster?
                 bremCluster = cluster.getRelated("ECLClusters")
 
-        if (eventMetaData.getEvent() == 1):
+        if (eventMetaData.getEvent() in [1, 4]):
             # the check fails on the first event. Instead of finding new settings, check
             # if the bremCluster is None only for the first event
             assert(not bremCluster)

@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <vector>
 
 namespace Belle2 {
+  class MCParticle;
   class Particle;
 
   namespace Variable {

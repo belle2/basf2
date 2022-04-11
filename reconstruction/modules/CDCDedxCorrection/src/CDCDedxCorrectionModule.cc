@@ -17,7 +17,7 @@
 using namespace Belle2;
 using namespace Dedx;
 
-REG_MODULE(CDCDedxCorrection)
+REG_MODULE(CDCDedxCorrection);
 
 CDCDedxCorrectionModule::CDCDedxCorrectionModule() : Module()
 {

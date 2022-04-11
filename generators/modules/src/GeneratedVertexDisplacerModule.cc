@@ -17,7 +17,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(GeneratedVertexDisplacer)
+REG_MODULE(GeneratedVertexDisplacer);
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -267,7 +267,7 @@ void KLMTimeCollectorModule::collect()
   }
 }
 
-void KLMTimeCollectorModule::collectScintEnd(RelationVector<KLMHit2d>& klmHit2ds)
+void KLMTimeCollectorModule::collectScintEnd(const RelationVector<KLMHit2d>& klmHit2ds)
 {
   const HepGeom::Transform3D* tr;
   HepGeom::Point3D<double> hitGlobal_extHit, hitLocal_extHit;

@@ -10,7 +10,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(ExtraInfoPrinter)
+REG_MODULE(ExtraInfoPrinter);
 
 ExtraInfoPrinterModule::ExtraInfoPrinterModule() : Module()
 {

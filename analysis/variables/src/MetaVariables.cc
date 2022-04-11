@@ -6,7 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+// Own include
 #include <analysis/variables/MetaVariables.h>
+
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
@@ -36,7 +38,6 @@
 #include <cmath>
 #include <stdexcept>
 #include <memory>
-#include <string>
 #include <regex>
 
 #include <TDatabasePDG.h>
@@ -136,8 +137,8 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
           if (listSize > 1)
             B2WARNING("The selected ParticleList contains more than 1 Particles in this event. The variable useParticleRestFrame will use only the first candidate, and the result may not be the expected one."
-            << LogVar("ParticleList", listName)
-            << LogVar("Number of candidates in the list", listSize));
+                      << LogVar("ParticleList", listName)
+                      << LogVar("Number of candidates in the list", listSize));
           const Particle* p = list->getParticle(0);
           UseReferenceFrame<RestFrame> frame(p);
           double result = std::get<double>(var->function(particle));
@@ -161,8 +162,8 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
           if (listSize > 1)
             B2WARNING("The selected ParticleList contains more than 1 Particles in this event. The variable useParticleRestFrame will use only the first candidate, and the result may not be the expected one."
-            << LogVar("ParticleList", listName)
-            << LogVar("Number of candidates in the list", listSize));
+                      << LogVar("ParticleList", listName)
+                      << LogVar("Number of candidates in the list", listSize));
           const Particle* p = list->getParticle(0);
           PCmsLabTransform T;
           ROOT::Math::PxPyPzEVector recoil = T.getBeamFourMomentum() - p->get4Vector();
@@ -192,7 +193,8 @@ namespace Belle2 {
           if (particle->hasExtraInfo(extraInfoName))
           {
             return particle->getExtraInfo(extraInfoName);
-          } else {
+          } else
+          {
             return std::numeric_limits<float>::quiet_NaN();
           }
         };
@@ -213,7 +215,8 @@ namespace Belle2 {
           if (eventExtraInfo->hasExtraInfo(extraInfoName))
           {
             return eventExtraInfo->getExtraInfo(extraInfoName);
-          } else {
+          } else
+          {
             return std::numeric_limits<float>::quiet_NaN();
           }
         };
@@ -236,17 +239,15 @@ namespace Belle2 {
           if (eventExtraInfo->hasExtraInfo(key))
           {
             return eventExtraInfo->getExtraInfo(key);
-          } else {
+          } else
+          {
             double value = std::numeric_limits<double>::quiet_NaN();
             auto var_result = var->function(nullptr);
-            if (std::holds_alternative<double>(var_result))
-            {
+            if (std::holds_alternative<double>(var_result)) {
               value = std::get<double>(var_result);
-            } else if (std::holds_alternative<int>(var_result))
-            {
+            } else if (std::holds_alternative<int>(var_result)) {
               return std::get<int>(var_result);
-            } else if (std::holds_alternative<bool>(var_result))
-            {
+            } else if (std::holds_alternative<bool>(var_result)) {
               return std::get<bool>(var_result);
             }
             eventExtraInfo->addExtraInfo(key, value);
@@ -269,7 +270,8 @@ namespace Belle2 {
           if (particle->hasExtraInfo(key))
           {
             return particle->getExtraInfo(key);
-          } else {
+          } else
+          {
             double value = std::get<double>(var->function(particle));
             // Remove constness from Particle pointer.
             // The extra-info is used as a cache in our case,
@@ -438,8 +440,8 @@ namespace Belle2 {
           if (particle->getMCParticle())
           {
             if (particle->getMCParticle()->getStatus(MCParticle::c_PrimaryParticle)
-            && (! particle->getMCParticle()->getStatus(MCParticle::c_IsVirtual))
-            && (! particle->getMCParticle()->getStatus(MCParticle::c_Initial))) {
+                && (! particle->getMCParticle()->getStatus(MCParticle::c_IsVirtual))
+                && (! particle->getMCParticle()->getStatus(MCParticle::c_Initial))) {
               auto var_result = var->function(particle);
               if (std::holds_alternative<double>(var_result)) {
                 return std::get<double>(var_result);
@@ -522,7 +524,7 @@ namespace Belle2 {
         // from some mdst object (tracks, clusters..)
         Particle::EParticleSourceObject particlesource = particle->getParticleSource();
         if (particlesource == Particle::EParticleSourceObject::c_Composite
-        or particlesource == Particle::EParticleSourceObject::c_Undefined)
+            or particlesource == Particle::EParticleSourceObject::c_Undefined)
           return -1;
 
         // it *is* possible to have a particle list from different sources (like
@@ -595,7 +597,8 @@ namespace Belle2 {
         auto func = [listNames](const Particle * particle) -> bool {
           bool output = false;
           int generation_flag = -1;
-          try {
+          try
+          {
             generation_flag = Belle2::convertString<int>(listNames.back());
           } catch (std::exception& e) {}
 
@@ -607,7 +610,7 @@ namespace Belle2 {
             } catch (std::exception& e) {}
 
             // Creating recursive lambda
-            auto list_comparison  = [](auto && self, const Particle * m, const Particle * p, int flag)-> bool {
+            auto list_comparison  = [](auto&& self, const Particle * m, const Particle * p, int flag)-> bool {
               bool result = false;
               for (unsigned i = 0; i < m->getNDaughters(); ++i)
               {
@@ -657,7 +660,8 @@ namespace Belle2 {
         auto func = [listNames](const Particle * particle) -> bool {
           bool output = false;
           int generation_flag = -1;
-          try {
+          try
+          {
             generation_flag = Belle2::convertString<int>(listNames.back());
           } catch (std::exception& e) {}
 
@@ -673,7 +677,7 @@ namespace Belle2 {
               continue;
             } catch (std::exception& e) {}
             // Creating recursive lambda
-            auto list_comparison  = [](auto && self, const Particle * m, const Particle * p, int flag)-> bool {
+            auto list_comparison  = [](auto&& self, const Particle * m, const Particle * p, int flag)-> bool {
               bool result = false;
               for (unsigned i = 0; i < m->getNDaughters(); ++i)
               {
@@ -860,22 +864,21 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          else {
+          else
+          {
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
             auto result_j = var->function(particle->getDaughter(jDaughterNumber));
             auto result_i = var->function(particle->getDaughter(iDaughterNumber));
             double diff = std::numeric_limits<double>::quiet_NaN();
-            if (std::holds_alternative<double>(result_j) && std::holds_alternative<double>(result_i))
-            {
+            if (std::holds_alternative<double>(result_j) && std::holds_alternative<double>(result_i)) {
               diff = std::get<double>(result_j) - std::get<double>(result_i);
-            } else if (std::holds_alternative<int>(result_j) && std::holds_alternative<int>(result_i))
-            {
+            } else if (std::holds_alternative<int>(result_j) && std::holds_alternative<int>(result_i)) {
               diff = std::get<int>(result_j) - std::get<int>(result_i);
             } else {
               throw std::runtime_error("Bad variant access");
             }
-            if (variablename == "phi" or variablename == "clusterPhi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")) or std::regex_match(variablename, std::regex("use.*Frame\\(clusterPhi\\)")))
-            {
+            if (variablename == "phi" or variablename == "clusterPhi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)"))
+                or std::regex_match(variablename, std::regex("use.*Frame\\(clusterPhi\\)"))) {
               if (fabs(diff) > M_PI) {
                 if (diff > M_PI) {
                   diff = diff - 2 * M_PI;
@@ -912,7 +915,8 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (particle->getDaughter(jDaughterNumber)->getMCParticle() == nullptr || particle->getDaughter(iDaughterNumber)->getMCParticle() == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
-          else {
+          else
+          {
             const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getMCParticle();
             const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getMCParticle();
             Particle iTmpPart(iMcDaughter);
@@ -921,17 +925,14 @@ namespace Belle2 {
             auto result_j = var->function(&jTmpPart);
             auto result_i = var->function(&iTmpPart);
             double diff = std::numeric_limits<double>::quiet_NaN();
-            if (std::holds_alternative<double>(result_j) && std::holds_alternative<double>(result_i))
-            {
+            if (std::holds_alternative<double>(result_j) && std::holds_alternative<double>(result_i)) {
               diff = std::get<double>(result_j) - std::get<double>(result_i);
-            } else if (std::holds_alternative<int>(result_j) && std::holds_alternative<int>(result_i))
-            {
+            } else if (std::holds_alternative<int>(result_j) && std::holds_alternative<int>(result_i)) {
               diff = std::get<int>(result_j) - std::get<int>(result_i);
             } else {
               throw std::runtime_error("Bad variant access");
             }
-            if (variablename == "phi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")))
-            {
+            if (variablename == "phi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)"))) {
               if (fabs(diff) > M_PI) {
                 if (diff > M_PI) {
                   diff = diff - 2 * M_PI;
@@ -963,18 +964,21 @@ namespace Belle2 {
         }
         auto variablename = arguments[4];
         auto func = [variablename, iDaughterNumber, jDaughterNumber, agrandDaughterNumber,
-        bgrandDaughterNumber](const Particle * particle) -> double {
+                      bgrandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
           if (agrandDaughterNumber >= int((particle->getDaughter(iDaughterNumber))->getNDaughters()) || bgrandDaughterNumber >= int((particle->getDaughter(jDaughterNumber))->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          else {
+          else
+          {
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            double diff = std::get<double>(var->function((particle->getDaughter(jDaughterNumber))->getDaughter(bgrandDaughterNumber))) - std::get<double>(var->function((particle->getDaughter(iDaughterNumber))->getDaughter(agrandDaughterNumber)));
-            if (variablename == "phi" or variablename == "clusterPhi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")) or std::regex_match(variablename, std::regex("use.*Frame\\(clusterPhi\\)")))
-            {
+            double diff = std::get<double>(var->function((particle->getDaughter(jDaughterNumber))->getDaughter(
+                                                           bgrandDaughterNumber))) - std::get<double>(var->function((particle->getDaughter(iDaughterNumber))->getDaughter(
+                                                                 agrandDaughterNumber)));
+            if (variablename == "phi" or variablename == "clusterPhi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)"))
+                or std::regex_match(variablename, std::regex("use.*Frame\\(clusterPhi\\)"))) {
               if (fabs(diff) > M_PI) {
                 if (diff > M_PI) {
                   diff = diff - 2 * M_PI;
@@ -1065,14 +1069,13 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          else {
+          else
+          {
             double iValue, jValue;
-            if (std::holds_alternative<double>(var->function(particle->getDaughter(jDaughterNumber))))
-            {
+            if (std::holds_alternative<double>(var->function(particle->getDaughter(jDaughterNumber)))) {
               iValue = std::get<double>(var->function(particle->getDaughter(iDaughterNumber)));
               jValue = std::get<double>(var->function(particle->getDaughter(jDaughterNumber)));
-            } else if (std::holds_alternative<int>(var->function(particle->getDaughter(jDaughterNumber))))
-            {
+            } else if (std::holds_alternative<int>(var->function(particle->getDaughter(jDaughterNumber)))) {
               iValue = std::get<int>(var->function(particle->getDaughter(iDaughterNumber)));
               jValue = std::get<int>(var->function(particle->getDaughter(jDaughterNumber)));
             } else return std::numeric_limits<double>::quiet_NaN();
@@ -1100,23 +1103,21 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (daughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          else {
+          else
+          {
             const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
             auto result_mother = var->function(particle);
             auto result_daughter = var->function(particle->getDaughter(daughterNumber));
             double diff = std::numeric_limits<double>::quiet_NaN();
-            if (std::holds_alternative<double>(result_mother) && std::holds_alternative<double>(result_daughter))
-            {
+            if (std::holds_alternative<double>(result_mother) && std::holds_alternative<double>(result_daughter)) {
               diff = std::get<double>(result_mother) - std::get<double>(result_daughter);
-            } else if (std::holds_alternative<int>(result_mother) && std::holds_alternative<int>(result_daughter))
-            {
+            } else if (std::holds_alternative<int>(result_mother) && std::holds_alternative<int>(result_daughter)) {
               diff = std::get<int>(result_mother) - std::get<int>(result_daughter);
             } else {
               throw std::runtime_error("Bad variant access");
             }
 
-            if (variablename == "phi" or variablename == "useCMSFrame(phi)")
-            {
+            if (variablename == "phi" or variablename == "useCMSFrame(phi)") {
               if (fabs(diff) > M_PI) {
                 if (diff > M_PI) {
                   diff = diff - 2 * M_PI;
@@ -1149,14 +1150,13 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (daughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          else {
+          else
+          {
             double daughterValue = 0.0, motherValue = 0.0;
-            if (std::holds_alternative<double>(var->function(particle)))
-            {
+            if (std::holds_alternative<double>(var->function(particle))) {
               daughterValue = std::get<double>(var->function(particle->getDaughter(daughterNumber)));
               motherValue = std::get<double>(var->function(particle));
-            } else if (std::holds_alternative<int>(var->function(particle)))
-            {
+            } else if (std::holds_alternative<int>(var->function(particle))) {
               daughterValue = std::get<int>(var->function(particle->getDaughter(daughterNumber)));
               motherValue = std::get<int>(var->function(particle));
             }
@@ -1213,7 +1213,8 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
 
           unsigned daughterIndex, grandDaughterIndex;
-          try {
+          try
+          {
             daughterIndex = Belle2::convertString<int>(arguments[0]);
             grandDaughterIndex = Belle2::convertString<int>(arguments[1]);
           } catch (std::invalid_argument&)
@@ -1269,9 +1270,9 @@ namespace Belle2 {
 
               pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
             }
-          } else{
-            for (auto& generalizedIndex : arguments)
-            {
+          } else
+          {
+            for (auto& generalizedIndex : arguments) {
               const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
               if (dauPart == nullptr)
                 return std::numeric_limits<double>::quiet_NaN();
@@ -1369,12 +1370,12 @@ namespace Belle2 {
         auto func = [daughterIndices](const Particle * particle) -> double {
           if (particle == nullptr)
             return std::numeric_limits<float>::quiet_NaN();
-          else {
+          else
+          {
             const auto& frame = ReferenceFrame::GetCurrent();
             ROOT::Math::PxPyPzEVector pSum;
 
-            for (auto& index : daughterIndices)
-            {
+            for (auto& index : daughterIndices) {
               if (index >= int(particle->getNDaughters())) {
                 return std::numeric_limits<float>::quiet_NaN();
               } else pSum += frame.getMomentum(particle->getDaughter(index));
@@ -1531,16 +1532,14 @@ namespace Belle2 {
             } else if (std::holds_alternative<bool>(var_result)) {
               return std::get<bool>(var_result);
             } else return std::numeric_limits<double>::quiet_NaN();
-          } else {
+          } else
+          {
             auto var_result = variableIfFalse->function(particle);
-            if (std::holds_alternative<double>(var_result))
-            {
+            if (std::holds_alternative<double>(var_result)) {
               return std::get<double>(var_result);
-            } else if (std::holds_alternative<int>(var_result))
-            {
+            } else if (std::holds_alternative<int>(var_result)) {
               return std::get<int>(var_result);
-            } else if (std::holds_alternative<bool>(var_result))
-            {
+            } else if (std::holds_alternative<bool>(var_result)) {
               return std::get<bool>(var_result);
             } else return std::numeric_limits<double>::quiet_NaN();
           }
@@ -1837,16 +1836,14 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
           if (daughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<float>::quiet_NaN();
-          else {
+          else
+          {
             auto var_result = var->function(particle->getDaughter(daughterNumber));
-            if (std::holds_alternative<double>(var_result))
-            {
+            if (std::holds_alternative<double>(var_result)) {
               return std::get<double>(var_result);
-            } else if (std::holds_alternative<int>(var_result))
-            {
+            } else if (std::holds_alternative<int>(var_result)) {
               return std::get<int>(var_result);
-            } else if (std::holds_alternative<bool>(var_result))
-            {
+            } else if (std::holds_alternative<bool>(var_result)) {
               return std::get<bool>(var_result);
             } else return std::numeric_limits<double>::quiet_NaN();
           }
@@ -1884,7 +1881,8 @@ namespace Belle2 {
             } else if (std::holds_alternative<bool>(var_result)) {
               return std::get<bool>(var_result);
             } else return std::numeric_limits<double>::quiet_NaN();
-          } else {
+          } else
+          {
             return std::numeric_limits<float>::quiet_NaN();
           }
         };
@@ -1915,7 +1913,8 @@ namespace Belle2 {
             } else if (std::holds_alternative<bool>(var_result)) {
               return std::get<bool>(var_result);
             } else return std::numeric_limits<double>::quiet_NaN();
-          } else {
+          } else
+          {
             return std::numeric_limits<float>::quiet_NaN();
           }
         };
@@ -2513,7 +2512,8 @@ namespace Belle2 {
           if (nParticles % 2 != 0)
           {
             return valuesInList[nParticles / 2];
-          } else {
+          } else
+          {
             return 0.5 * (valuesInList[nParticles / 2] + valuesInList[nParticles / 2 - 1]);
           }
         };

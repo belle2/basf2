@@ -359,8 +359,7 @@ namespace Belle2::InvariantMassBhadCalib {
     resMap["sigwidth"] = {sigwidth.getValV(), sigwidth.getError()};
     resMap["argpar"]   = {argpar.getValV(), argpar.getError()};
 
-    namespace fs = std::filesystem;
-    fs::create_directories("plotsHadBonly");
+    filesystem::create_directories("plotsHadBonly");
 
     plotArgusFit(dataE0, sumB0, argusB0, gauss, eNow, Form("plotsHadBonly/B0Single_%d.pdf", int(round(limits[0].first))));
     plotArgusFit(dataEp, sumBp, argusBp, gauss, eNow, Form("plotsHadBonly/BpSingle_%d.pdf", int(round(limits[0].first))));

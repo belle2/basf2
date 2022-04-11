@@ -31,7 +31,7 @@ using namespace pindiode;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PindiodeStudy)
+REG_MODULE(PindiodeStudy);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -122,7 +122,7 @@ void PindiodeStudyModule::event()
   //Look at the meta data to extract IR rate and scattering ring section
   double rate = 0;
   int ring_section = -1;
-  int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+  const int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
   for (const auto& MetaHit : MetaHits) {
     rate = MetaHit.getrate();
     double sad_ssraw = MetaHit.getssraw();

@@ -29,7 +29,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisPXDER)
+REG_MODULE(DQMHistAnalysisPXDER);
 
 
 //-----------------------------------------------------------------
@@ -324,7 +324,7 @@ void DQMHistAnalysisPXDERModule::getIDsFromIndex(const int Index, int& Layer, in
   }
 }
 
-int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, double* pars, double ratio, const std::string& name_hist,
+int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, const double* pars, double ratio, const std::string& name_hist,
                                         const std::string& name_refhist, TH1I* flaghist)
 {
   int iret = 0;

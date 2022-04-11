@@ -18,7 +18,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDClusterFilter)
+REG_MODULE(SVDClusterFilter);
 
 //-----------------------------------------------------------------
 //                 Implementation

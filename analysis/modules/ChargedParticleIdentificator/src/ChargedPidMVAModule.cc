@@ -19,7 +19,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(ChargedPidMVA)
+REG_MODULE(ChargedPidMVA);
 
 ChargedPidMVAModule::ChargedPidMVAModule() : Module()
 {

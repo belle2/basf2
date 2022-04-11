@@ -8,7 +8,11 @@
 
 // Own includes
 #include <analysis/variables/TrackVariables.h>
+
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
+#include <analysis/dataobjects/Particle.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreObjPtr.h>
@@ -233,6 +237,19 @@ namespace Belle2 {
       double errorSquared = trackFit->getCovariance5()[4][4];
       if (errorSquared <= 0) return realNaN;
       return sqrt(errorSquared);
+    }
+
+    double trackFitCovariance(const Particle* particle, const std::vector<double>& indices)
+    {
+      if (indices.size() != 2) {
+        B2FATAL("Exactly two indices must be provided to the variable trackFitCovariance!");
+      }
+      if (*(std::min_element(indices.begin(), indices.end())) < 0 or *(std::max_element(indices.begin(), indices.end())) > 4) {
+        B2FATAL("The indices provided to the variable trackFitCovariance must be in the range 0 - 4!");
+      }
+      auto trackFit = particle->getTrackFitResult();
+      if (!trackFit) return realNaN;
+      return trackFit->getCovariance5()[indices[0]][indices[1]];
     }
 
     double trackPValue(const Particle* part)
@@ -645,6 +662,23 @@ Returns the uncertainty on :math:`\tan\lambda`, the slope of the track in the
 
 Returns NaN if called for something other than a track-based particle.
     )DOC");
+    REGISTER_VARIABLE("trackFitCovariance(i, j)", trackFitCovariance, R"DOC(
+      The track fit covariance matrix element corresponding to the two indices is returned.
+      This is the association between integers and parameters:
+
+      * 0: :math:`d_0`
+      * 1: :math:`\phi_0`
+      * 2: :math:`\omega`
+      * 3: :math:`z_0`
+      * 4: :math:`\tan\lambda`
+
+      .. note::
+
+              The covariance is returned. This means that the return value can be negative.
+              Furthermore, it's the squared value of the track fit error variables :b2:var:`d0Err`, etc.
+              when selecting the diagonal entries.
+
+      )DOC");
     REGISTER_VARIABLE("pValue", trackPValue, R"DOC(
 The :math:`\chi^2` probability of the **track** fit.
 

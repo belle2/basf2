@@ -84,7 +84,7 @@ namespace TreeFitter {
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
         if (0 == m_niter) {
           m_errCode = m_decaychain->filter(*m_fitparams);
-        } else if (m_niter > 0 && m_useReferencing) {
+        } else if (m_useReferencing) {
           auto* tempState = new FitParams(*m_fitparams);
           m_errCode = m_decaychain->filterWithReference(*m_fitparams, *tempState);
           delete tempState;
@@ -159,7 +159,6 @@ namespace TreeFitter {
     return m_decaychain->tauIndex(particle);
   }
 
-  // cppcheck-suppress constParameter ; returncov is clearly changed in the function
   void FitManager::getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const
   {
 

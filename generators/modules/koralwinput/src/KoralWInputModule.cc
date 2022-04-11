@@ -18,7 +18,7 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(KoralWInput)
+REG_MODULE(KoralWInput);
 
 
 KoralWInputModule::KoralWInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)

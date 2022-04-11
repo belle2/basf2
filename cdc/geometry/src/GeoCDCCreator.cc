@@ -77,6 +77,8 @@ namespace Belle2 {
     {
       delete m_sensitive;
       if (m_bkgsensitive) delete m_bkgsensitive;
+      for (BkgSensitiveDetector* sensitiveDetector : m_BkgSensitiveRib4)
+        delete sensitiveDetector;
       for (G4VisAttributes* visAttr : m_VisAttributes) delete visAttr;
       m_VisAttributes.clear();
       for (G4UserLimits* userLimits : m_userLimits) delete userLimits;
@@ -1001,7 +1003,10 @@ namespace Belle2 {
         G4LogicalVolume* logicalV = new G4LogicalVolume(sqHoleBase, medCopper,  logicalName, 0, 0, 0);
         if (id < 19) {
           logicalV = new G4LogicalVolume(sqHoleBase, medNEMA_G10_Plate,  logicalName, 0, 0, 0);
-          logicalV->SetSensitiveDetector(new BkgSensitiveDetector("CDC", 2000 + id));
+          BkgSensitiveDetector* sensitiveDetector =
+            new BkgSensitiveDetector("CDC", 2000 + id);
+          logicalV->SetSensitiveDetector(sensitiveDetector);
+          m_BkgSensitiveRib4.push_back(sensitiveDetector);
         }
 
         logicalV->SetVisAttributes(m_VisAttributes.back());

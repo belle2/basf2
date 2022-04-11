@@ -820,10 +820,10 @@ In such cases the event numbers are sequential *only within a production*, so ex
 .. note:: For old data and uncalibrated MC files this will return 0.0.
 
 .. note:: You might hear tracking and calibration people refer to this as the ``BeamSpot``.
-)DOC",":math:`\\text{cm}^2`");
+)DOC","cm");
     REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] Returns y coordinate of the measured interaction point.","cm");
     REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] Returns z coordinate of the measured interaction point.","cm");
-    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] Returns (i,j)-th element of the covariance matrix of the measured interaction point.","cm");
+    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] Returns (i,j)-th element of the covariance matrix of the measured interaction point.",":math:`\\text{cm}^2`");
 
     REGISTER_VARIABLE("genIPX", getGenIPX, R"DOC(
 [Eventbased] Returns x coordinate of the interaction point used for the underlying **MC generation**.
@@ -846,7 +846,7 @@ Returns NaN for data.
   For more precise event time, see :b2:var:`eventTimeSeconds` and :b2:var:`eventTimeSecondsFractionRemainder`.
 )DOC");
     REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
-                      "[Eventbased] Time of the event in seconds (truncated down) since 1970/1/1 (Unix epoch).","s");
+                      "[Eventbased] Time of the event (truncated down) since 1970/1/1 (Unix epoch).","s");
     REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder, R"DOC(
 [Eventbased] Remainder of the event time in fractions of a second.
 
@@ -855,7 +855,7 @@ Returns NaN for data.
 )DOC","s");
 
     REGISTER_VARIABLE("timeSincePrevTriggerClockTicks", timeSincePrevTriggerClockTicks,
-                      "[Eventbased] Time since the previous trigger in clock ticks (127MHz=RF/4 clock).","clock ticks");
+                      "[Eventbased] Time since the previous trigger (127MHz=RF/4 clock).","clock ticks");
 
     REGISTER_VARIABLE("timeSincePrevTriggerMicroSeconds", timeSincePrevTriggerMicroSeconds,
                       "[Eventbased] Time since the previous trigger.","ms");
@@ -877,7 +877,7 @@ Returns NaN for data.
                       "[Eventbased] Returns 1 if an injection happened recently, 0 otherwise.");
 
     REGISTER_VARIABLE("timeSinceLastInjectionSignalClockTicks", timeSinceLastInjectionSignalClockTicks, R"DOC(
-[Eventbased] Time since the last injection pre-kick signal in clock ticks (127MHz=RF/4 clock)
+[Eventbased] Time since the last injection pre-kick signal (127MHz=RF/4 clock)
 
 .. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
 )DOC","clock ticks");

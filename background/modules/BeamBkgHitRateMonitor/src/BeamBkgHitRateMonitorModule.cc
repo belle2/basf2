@@ -27,7 +27,6 @@
 #include <framework/utilities/EnvironmentVariables.h>
 
 #include <boost/python.hpp>
-#include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/algorithm/string.hpp>

@@ -235,7 +235,7 @@ const genfit::TrackPoint* RecoTrack::getCreatedTrackPoint(const RecoHitInformati
 }
 
 size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset, bool reversed,
-                                       boost::optional<double> optionalMinimalWeight)
+                                       std::optional<double> optionalMinimalWeight)
 {
   size_t hitsCopied = 0;
 

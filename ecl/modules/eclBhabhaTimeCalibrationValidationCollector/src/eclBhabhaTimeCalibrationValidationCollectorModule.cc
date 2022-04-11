@@ -35,10 +35,8 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <ecl/digitization/EclConfiguration.h>
-
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
-#include <boost/optional.hpp>
 
 #include <TH2F.h>
 #include <TTree.h>

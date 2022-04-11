@@ -30,6 +30,7 @@
 #include <framework/database/CentralMetadataProvider.h>
 #include <framework/database/Configuration.h>
 
+#include <algorithm>
 #include <cstdlib>
 
 namespace Belle2 {
@@ -200,6 +201,12 @@ namespace Belle2 {
       // it will not do anything else than setting the final list of globaltags
       conf.setInitialized(true);
       m_globalTags = conf.getFinalListOfTags();
+      // trim the globaltag names for removing leading/trailing whitespaces, since they
+      // are a potential source of FATAL errors
+      std::transform(m_globalTags.begin(), m_globalTags.end(), m_globalTags.begin(),
+      [](const auto & tag) {
+        return boost::algorithm::trim_copy(tag);
+      });
       // and remove duplicates, there's no need to look in the same gt multiple times
       std::set<std::string> seen;
       m_globalTags.erase(std::remove_if(m_globalTags.begin(), m_globalTags.end(),

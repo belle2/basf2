@@ -19,7 +19,7 @@ namespace Belle2 {
     /**
      * helper function to initialize xt function with 5th order polynomial + linear.
      */
-
+    // cppcheck-suppress constParameter
     Double_t pol5pol1(Double_t* x, Double_t* par)
     {
       Double_t xx = x[0];
@@ -40,7 +40,7 @@ namespace Belle2 {
     /**
      * helper function to initialize xt function with 5th order Chebshev Polynomial + linear.
      */
-
+    // cppcheck-suppress constParameter
     Double_t cheby5pol1(Double_t* x, Double_t* par)
     {
       Double_t xx = x[0];
@@ -192,9 +192,9 @@ namespace Belle2 {
       void setBField(bool bfield) {m_bField = bfield;}
 
       /**
-       * Set Paramerters for fit.
+       * Set Parameters for fit.
        */
-      void  setXTParams(double p[8])
+      void setXTParams(const double p[8])
       {
         for (int i = 0; i < 8; ++i) {m_XTParam[i] = p[i];}
         m_tmax = p[6] + 50;

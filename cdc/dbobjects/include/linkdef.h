@@ -16,7 +16,7 @@
 #pragma link C++ class Belle2::CDCAlignment+; // checksum=0x93495a07, version=2
 #pragma link C++ class Belle2::CDCLayerAlignment+; // checksum=0x84c87874, version=1
 #pragma link C++ class Belle2::CDCMisalignment+; // checksum=0x67b5fdae, version=1
-#pragma link C++ class Belle2::CDCGeometry+; // checksum=0xe6063d38, version=4
+#pragma link C++ class Belle2::CDCGeometry+; // checksum=0xb2234303, version=5
 #pragma link C++ class Belle2::CDCGeometry::Rib+; // checksum=0x4ba6e828, version=2
 #pragma link C++ class Belle2::CDCGeometry::Rib2+; // checksum=0xbfd84675, version=1
 #pragma link C++ class Belle2::CDCGeometry::Rib3+; // checksum=0xf00885b5, version=1

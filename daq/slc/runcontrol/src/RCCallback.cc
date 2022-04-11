@@ -34,13 +34,13 @@ namespace Belle2 {
     RCConfigHandler(RCCallback& callback,
                     const std::string& name, const std::string& val)
       : NSMVHandlerText(name, true, true, val), m_callback(callback) {}
-    bool handleGetText(std::string& val)
+    bool handleGetText(std::string& val) override
     {
       const DBObject& obj(m_callback.getDBObject());
       val = obj.getName();
       return true;
     }
-    bool handleSetText(const std::string& val)
+    bool handleSetText(const std::string& val) override
     {
       RCState state(m_callback.getNode().getState());
       RCState tstate(RCCommand::CONFIGURE.nextTState());
@@ -51,7 +51,7 @@ namespace Belle2 {
       } catch (const IOException& e) {
         throw (RCHandlerException(e.what()));
       }
-      DBObject& obj(m_callback.getDBObject());
+      const DBObject& obj(m_callback.getDBObject());
       obj.getName();
       m_callback.configure(obj);
       m_callback.setState(state);
@@ -200,15 +200,15 @@ bool RCCallback::perform(NSMCommunicator& com)
         log(LogFile::FATAL, "Failed to recover/abort : %s", e.what());
       }
     }
-    RCState state = cmd.nextState();
+    RCState State = cmd.nextState();
     if (getNode().getState() == tstate &&
-        state != Enum::UNKNOWN && m_auto) {
-      setState(state);
+        State != Enum::UNKNOWN && m_auto) {
+      setState(State);
     }
-    state = getNode().getState();
-    if (state != Enum::UNKNOWN) {
+    State = getNode().getState();
+    if (State != Enum::UNKNOWN) {
       if ((cmd == RCCommand::START &&
-           (state == RCState::RUNNING_S || state == RCState::STARTING_TS)) ||
+           (State == RCState::RUNNING_S || State == RCState::STARTING_TS)) ||
           ((cmd == RCCommand::STOP || cmd == RCCommand::ABORT)
            && state_org == RCState::RUNNING_S))  {
         try {
@@ -288,11 +288,11 @@ std::string RCCallback::dbdump()
 {
   std::stringstream ss;
   StringList& hnames(getHandlerNames());
-  NSMVHandlerList& handlers(getHandlers());
+  const NSMVHandlerList& handlers(getHandlers());
   for (StringList::iterator it = hnames.begin();
-       it != hnames.end(); it++) {
+       it != hnames.end(); ++it) {
     std::string hname = *it;
-    NSMVHandler& handler(*handlers[hname]);
+    NSMVHandler& handler(*handlers.at(hname));
     std::string vname = StringUtil::replace(hname, "@", "");
     if (!handler.useGet()) {
       continue;
@@ -405,7 +405,7 @@ void RCCallback::configure_raw(int length, const char* data)
 
 void RCCallback::dbload(int /*length*/, const char* /*data*/)
 {
-  NSMNode& node(getNode());
+  const NSMNode& node(getNode());
   m_rcconfig = node.getName() + "@RC:" + m_rcconfig_org;
   LogFile::debug("Loading '%s'", m_rcconfig.c_str());
   if (m_file.size() > 0) {

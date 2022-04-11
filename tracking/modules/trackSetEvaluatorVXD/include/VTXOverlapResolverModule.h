@@ -17,6 +17,9 @@
 
 namespace Belle2 {
 
+  /**
+   * VTX overlap resolver module.
+   */
   class VTXOverlapResolverModule : public Module {
 
   public:

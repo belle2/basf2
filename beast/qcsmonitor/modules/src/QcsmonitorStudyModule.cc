@@ -33,7 +33,7 @@ using namespace qcsmonitor;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(QcsmonitorStudy)
+REG_MODULE(QcsmonitorStudy);
 
 //-----------------------------------------------------------------
 //                 Implementation

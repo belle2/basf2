@@ -20,6 +20,8 @@ Physics = [
     "skim accept fourlep",
     "skim accept tau 2trk",
     "skim accept tau Ntrk",
+    "skim accept b charged",
+    "skim accept b neutral"
 ]
 
 # Skims used for calibration

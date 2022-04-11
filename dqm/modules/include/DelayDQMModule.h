@@ -22,16 +22,29 @@ namespace Belle2 {
 
   public:
 
-    /** Constructor */
+    /**
+     * Constructor.
+     */
     DelayDQMModule();
 
-  private:
-
-    /** Module functions */
+    /**
+     * Initializer.
+     */
     void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event() override final;
 
+    /**
+     * Definition of the histograms.
+     */
     void defineHisto() override final;
 
   private:

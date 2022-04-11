@@ -27,7 +27,7 @@ namespace TreeFitter {
     if (lhstype == rhstype  &&
         lhstype == ParticleBase::TFParticleType::kRecoTrack) {
 
-      rc =  lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp();
+      rc =  lhs->particle()->getMomentum().Rho() > rhs->particle()->getMomentum().Rho();
     } else if (lhs->particle() && rhs->particle() && lhs->particle()->getNDaughters() > 0 &&
                rhs->particle()->getNDaughters() > 0) {
       rc = lhs->nFinalChargedCandidates() > rhs->nFinalChargedCandidates();
@@ -79,7 +79,7 @@ namespace TreeFitter {
   bool InternalParticle::compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs)
   {
 
-    return lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp();
+    return lhs->particle()->getMomentum().Rho() > rhs->particle()->getMomentum().Rho();
   }
 
   ErrCode InternalParticle::initMotherlessParticle(FitParams& fitparams)
@@ -110,7 +110,7 @@ namespace TreeFitter {
         }
       }
 
-      TVector3 v;
+      Belle2::B2Vector3D v;
 
       if (trkdaughters.size() >= 2) {
         std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
@@ -282,12 +282,8 @@ namespace TreeFitter {
     // tau index only exist with a vertex and geo constraint
     //
     if (m_shares_vertex_with_mother) { return 4; }
-    if (!m_shares_vertex_with_mother && !m_geo_constraint) { return 7; }
-    if (!m_shares_vertex_with_mother && m_geo_constraint) { return 8; }
-
-    // this case should not appear
-    if (m_shares_vertex_with_mother && m_geo_constraint) { return -1; }
-    return -1;
+    else if (!m_geo_constraint) { return 7; }
+    else { return 8; }
   }
 
   int InternalParticle::tauIndex() const
@@ -306,7 +302,7 @@ namespace TreeFitter {
 
     if (m_shares_vertex_with_mother) { return this->index(); }
 
-    if (!m_shares_vertex_with_mother && !m_geo_constraint) {return index() + 3 ;}
+    if (!m_geo_constraint) {return index() + 3 ;}
 
     // this will crash the initialisation
     return -1;

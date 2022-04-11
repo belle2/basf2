@@ -138,7 +138,7 @@ void V0FinderModule::event()
   tracksMinus.reserve(m_tracks.getEntries());
 
   for (const auto& track : m_tracks) {
-    RecoTrack const* const  recoTrack = track.getRelated<RecoTrack>();
+    RecoTrack const* const  recoTrack = track.getRelated<RecoTrack>(m_arrayNameRecoTrack);
     B2ASSERT("No RecoTrack available for given Track.", recoTrack);
 
     if (recoTrack->getChargeSeed() > 0) {

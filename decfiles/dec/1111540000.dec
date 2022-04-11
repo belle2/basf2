@@ -1,25 +1,57 @@
-# Description: [B0 -> KS0 J/psi]
-# NickName: Bd_JpsiKS0
-# Documentation: EWP analysis
+# EventType: 1111540000
+# Descriptor: [B0 -> Jpsi [ -> e+ e-] K*0 [ -> K+ pi-] ]cc
+# NickName: Bd_J/psiK*0_e+e-K+_pi-
+# Documentation: Study of CKM with TDCPV analysis
 # Tested: Yes
-# Physics WG: EWP
-# Responsible: Filippo Dattola
-# Email: filippo.dattola@desy.de
+# Physics WG: TDCPV
+# Responsible: Kenkichi Miyabayashi, Miho Fujii
+# Email: miyabaya@cc.nara-wu.ac.jp
 # Cuts: None
-# Date: 20211004
+# Date: 20180918
+# Updated: 20220203 Stefano.Lacaprara@pd.infn.it for inclusive J/psi->e e decay
+# Comments:
 
+#This is for MC B0 -> J/Psi K*0, K*0 -> K- pi+.
+#And this is two body decay.
+#|H+|,|H-|=0.0, |H0|=1.0
+# Decay table to generate
+# Upsilon(4S) -> B0 anti-B0 -> Generic
+#                |
+#                 -> J/Psi K*0
+#                    |     |  
+#                    |      -> K+ pi-
+#                    | 
+#                      -> e+e- or mu+mu-.
+#
+Alias K*0sig   K*0
+Alias anti-K*0sig anti-K*0
+ChargeConj K*0sig anti-K*0sig
+#
+# B0-B0bar mixing Delta m in PDG2018
+Define dm 0.5064e12
 #
 Decay Upsilon(4S)
-1.0     B0sig anti-B0sig B0 anti-B0                     VSS_BMIX dm;
+1.000 B0 anti-B0 B0sig anti-B0sig VSS_BMIX dm;
 Enddecay
 #
 Decay B0sig
-1.000   K_S0      J/psisig   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0. -1.0 0.;
+1.000 J/psisig K*0sig SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 0.0199;
 Enddecay
-CDecay anti-B0sig
+#
+Decay anti-B0sig
+1.000 J/psisig anti-K*0sig SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 0.0199;
+Enddecay
 #
 Decay J/psisig
-0.5000 e+ e-    PHOTOS  VLL;
-0.5000 mu+ mu-  PHOTOS  VLL;
+1.000 e+ e-           PHOTOS VLL;
 Enddecay
+#
+Decay K*0sig 
+1.000 K+ pi-          PHOTOS VSS;
+Enddecay
+#
+Decay anti-K*0sig 
+1.000 K- pi+          PHOTOS VSS;
+Enddecay
+#
 End

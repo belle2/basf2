@@ -102,6 +102,15 @@ namespace Belle2 {
      */
     float getMatchedEfficiency(const RecoTrack& recoTrack) const;
 
+
+    /*!
+     * Checks if the recoTrack charge is correctly assigned.
+     *
+     * Returns NAN if the recoTrack is not matched.
+     * The given track can be both Monte Carlo track or pattern recognition track.
+     */
+    bool isChargeMatched(const RecoTrack& recoTrack) const;
+
   public:
     /*!
      * Gets the matching category of Monte Carlo track.

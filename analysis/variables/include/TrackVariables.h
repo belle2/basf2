@@ -8,10 +8,11 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
+  class Particle;
 
   namespace Variable {
 
@@ -133,6 +134,11 @@ namespace Belle2 {
     double trackTanLambdaError(const Particle* part);
 
     /**
+     * returns the track fit covariance matrix element
+     */
+    double trackFitCovariance(const Particle* particle, const std::vector<double>& indices);
+
+    /**
      * returns the pValue of the track's fit
      */
     double trackPValue(const Particle* part);
@@ -223,7 +229,7 @@ namespace Belle2 {
     double getHelixTanLambdaPull(const Particle* part);
 
     /** helper function to get the position on the Helix */
-    TVector3 getPositionOnHelix(const Particle* part, const std::vector<double>& pars);
+    B2Vector3D getPositionOnHelix(const Particle* part, const std::vector<double>& pars);
   }
 } // Belle2 namespace
 

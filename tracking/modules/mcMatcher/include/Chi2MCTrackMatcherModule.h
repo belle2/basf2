@@ -74,5 +74,9 @@ namespace Belle2 {
     int m_noMatchingCandidateCount = 0;
     /** Variable: Counts total event number.*/
     int m_event = 0;
+    /** Variable: Name of the RecoTracks StoreArray of MC tracks */
+    std::string m_MCRecoTracksArrayName = "MCRecoTracks";
+    /** Variable: Name of the RecoTracks StoreArray of PR tracks */
+    std::string m_PRRecoTracksArrayName = "RecoTracks";
   };
 }

@@ -28,7 +28,7 @@ namespace Belle2 {
 
   class HistoServer {
   public:
-    HistoServer(int port, std::string mapfile);
+    HistoServer(int port, const std::string& mapfile);
     ~HistoServer();
 
     int init();

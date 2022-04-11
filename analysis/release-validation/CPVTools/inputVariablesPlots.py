@@ -63,8 +63,6 @@ ROOT.TH1.SetDefaultSumw2()
 
 allInputVariables = []
 
-ft.setVariables()
-
 belleOrBelle2Flag = belleOrBelle2
 
 identifiersExtraInfosDict = dict()
@@ -86,7 +84,7 @@ variablesPlotParamsDict = {
     'p': ['p', pBins, 0, 3, r'$p\ [{\rm GeV}/c]$', r"{\rm GeV}/c\, "],
     'pt': ['pt', pBins, 0, 3, r'$p_{\rm t}\ [{\rm GeV}/c]$', r"{\rm GeV}/c\, "],
     'cosTheta': ['cosTheta', dBw, -1, 1.01, r'$\cos{\theta}$', ""],
-    ft.eId[ft.getBelleOrBelle2()]: [Belle2.makeROOTCompatible(ft.eId[ft.getBelleOrBelle2()]),
+    ft.eId[ft.getBelleOrBelle2()]: [Belle2.MakeROOTCompatible.makeROOTCompatible(ft.eId[ft.getBelleOrBelle2()]),
                                     dBw, 0, 1.01, r'$\mathcal{L}_{e}$', ""],
     'eid_dEdx': ['eid_dEdx', dBw, 0, 1.01, r'$\mathcal{L}_{e}^{{\rm d}E/{\rm d}x}$', ""],
     'eid_TOP': ['eid_TOP', dBw, 0, 1.01, r'$\mathcal{L}_{e}^{\rm TOP}$', ""],
@@ -110,13 +108,13 @@ variablesPlotParamsDict = {
     'OBoost': ['OBoost', dBw, -0.15, 0.15, r'$d_0^\prime\ [{\rm ' + unitImp + '}]$', r"{\rm " + unitImp + r"}\, "],
     'distance': ['distance', dBw, 0, 1.5, r'$\xi_0\ [{\rm ' + unitImp + '}]$', r"{\rm " + unitImp + r"}\, "],
     'chiProb': ['chiProb', dBw, 0, 1.01, r'$p$-${\rm value}$', ""],
-    ft.muId[ft.getBelleOrBelle2()]: [Belle2.makeROOTCompatible(ft.muId[ft.getBelleOrBelle2()]),
+    ft.muId[ft.getBelleOrBelle2()]: [Belle2.MakeROOTCompatible.makeROOTCompatible(ft.muId[ft.getBelleOrBelle2()]),
                                      dBw, 0, 1.01, r'$\mathcal{L}_{\mu}$', ""],
     'muid_dEdx': ['muid_dEdx', dBw, 0, 1.01, r'$\mathcal{L}_{\mu}^{{\rm d}E/{\rm d}x}$', ""],
     'muid_TOP': ['muid_TOP', dBw, 0, 1.01, r'$\mathcal{L}_{\mu}^{\rm TOP}$', ""],
     'muid_ARICH': ['muid_ARICH', dBw, 0, 1.01, r'$\mathcal{L}_{\mu}^{\rm ARICH}$', ""],
     'muid_KLM': ['muid_KLM', dBw, 0, 1.01, r'$\mathcal{L}_{\mu}^{\rm KLM}$', ""],
-    ft.KId[ft.getBelleOrBelle2()]: [Belle2.makeROOTCompatible(ft.KId[ft.getBelleOrBelle2()]),
+    ft.KId[ft.getBelleOrBelle2()]: [Belle2.MakeROOTCompatible.makeROOTCompatible(ft.KId[ft.getBelleOrBelle2()]),
                                     dBw, 0, 1.01, r'$\mathcal{L}_{K}$', ""],
     'Kid_dEdx': ['Kid_dEdx', dBw, 0, 1.01, r'$\mathcal{L}_{K}^{{\rm d}E/{\rm d}x}$', ""],
     'Kid_TOP': ['Kid_TOP', dBw, 0, 1.01, r'$\mathcal{L}_{K}^{\rm TOP}$', ""],
@@ -197,16 +195,16 @@ def plotInputVariablesOfFlavorTagger():
         trulyUsedInputVariables = []
         for iVariable in tree.GetListOfBranches():
 
-            managerVariableName = str(Belle2.invertMakeROOTCompatible(iVariable.GetName()))
+            managerVariableName = str(Belle2.MakeROOTCompatible.invertMakeROOTCompatible(iVariable.GetName()))
 
-            if managerVariableName in ft.variables[category] or managerVariableName == 'distance' or \
+            if managerVariableName in ft.getTrainingVariables(category) or managerVariableName == 'distance' or \
                managerVariableName == 'z0' or managerVariableName == 'ImpactXY' or \
                managerVariableName == 'y' or managerVariableName == 'OBoost':
                 if managerVariableName in categoryInputVariables:
                     continue
 
                 categoryInputVariables.append(managerVariableName)
-                if managerVariableName in ft.variables[category]:
+                if managerVariableName in ft.getTrainingVariables(category):
                     allInputVariables.append((category, managerVariableName))
                     trulyUsedInputVariables.append((category, managerVariableName))
 
@@ -256,11 +254,11 @@ def plotInputVariablesOfFlavorTagger():
                 if inputVariable == 'chiProb':
                     nBins = 25
 
-            signalHistogram = ROOT.TH1F("signal" + category + str(Belle2.makeROOTCompatible(inputVariable)), "",
+            signalHistogram = ROOT.TH1F("signal" + category + str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)), "",
                                         nBins,
                                         limXmin,
                                         limXmax)
-            backgroundHistogram = ROOT.TH1F("bkg" + category + str(Belle2.makeROOTCompatible(inputVariable)), "",
+            backgroundHistogram = ROOT.TH1F("bkg" + category + str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)), "",
                                             nBins,
                                             limXmin,
                                             limXmax)
@@ -272,11 +270,19 @@ def plotInputVariablesOfFlavorTagger():
                                               'y' or inputVariable == 'OBoost'):
                 factorMultiplication = "*10 "
 
-            tree.Draw(variablesPlotParamsDict[inputVariable][0] + factorMultiplication + ">> signal" + category +
-                      str(Belle2.makeROOTCompatible(inputVariable)), Belle2.makeROOTCompatible(targetVariable) + " > 0")
+            tree.Draw(variablesPlotParamsDict[inputVariable][0] + factorMultiplication + ">> signal" + category + str(
+                Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)),
+                Belle2.MakeROOTCompatible.makeROOTCompatible(targetVariable) + " > 0")
 
-            tree.Draw(variablesPlotParamsDict[inputVariable][0] + factorMultiplication + ">> bkg" + category +
-                      str(Belle2.makeROOTCompatible(inputVariable)), Belle2.makeROOTCompatible(targetVariable) + " < 1")
+            tree.Draw(
+                variablesPlotParamsDict[inputVariable][0] +
+                factorMultiplication +
+                ">> bkg" +
+                category +
+                str(
+                    Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)),
+                Belle2.MakeROOTCompatible.makeROOTCompatible(targetVariable) +
+                " < 1")
 
             signalScalingFactor = signalHistogram.Integral()
             backgroundScalingFactor = backgroundHistogram.Integral()
@@ -393,7 +399,7 @@ def plotInputVariablesOfFlavorTagger():
             # ax1.set_ylim(0, 1.4)
             ax1.set_xlim(limXmin, limXmax)
             plt.savefig('./InputVariablesPlots/' + category + '/' + category +
-                        "_" + str(Belle2.makeROOTCompatible(inputVariable)) + '.pdf')
+                        "_" + str(Belle2.MakeROOTCompatible.makeROOTCompatible(inputVariable)) + '.pdf')
             fig1.clear()
 
             signalHistogram.Delete()
@@ -406,8 +412,8 @@ if __name__ == '__main__':
 
     totalNumberOfVariables = 0
 
-    for category in ft.variables:
-        totalNumberOfVariables += len(ft.variables[category])
+    for category in ft.AvailableCategories:
+        totalNumberOfVariables += len(ft.getTrainingVariables(category))
 
     print("Total number of variables = ", totalNumberOfVariables)
 

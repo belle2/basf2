@@ -820,7 +820,7 @@ In such cases the event numbers are sequential *only within a production*, so ex
 .. note:: For old data and uncalibrated MC files this will return 0.0.
 
 .. note:: You might hear tracking and calibration people refer to this as the ``BeamSpot``.
-)DOC","cm");
+)DOC",":math:`\\text{cm}^2`");
     REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] Returns y coordinate of the measured interaction point.","cm");
     REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] Returns z coordinate of the measured interaction point.","cm");
     REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] Returns (i,j)-th element of the covariance matrix of the measured interaction point.","cm");
@@ -855,10 +855,10 @@ Returns NaN for data.
 )DOC","s");
 
     REGISTER_VARIABLE("timeSincePrevTriggerClockTicks", timeSincePrevTriggerClockTicks,
-                      "[Eventbased] Time since the previous trigger in clock ticks (127MHz=RF/4 clock).","ns");
+                      "[Eventbased] Time since the previous trigger in clock ticks (127MHz=RF/4 clock).","clock ticks");
 
     REGISTER_VARIABLE("timeSincePrevTriggerMicroSeconds", timeSincePrevTriggerMicroSeconds,
-                      "[Eventbased] Time since the previous trigger in micro seconds.","ms");
+                      "[Eventbased] Time since the previous trigger.","ms");
 
     REGISTER_VARIABLE("triggeredBunchNumberTTD", triggeredBunchNumberTTD, R"DOC(
 [Eventbased] Number of triggered bunch ranging from 0-1279.
@@ -880,19 +880,19 @@ Returns NaN for data.
 [Eventbased] Time since the last injection pre-kick signal in clock ticks (127MHz=RF/4 clock)
 
 .. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
-)DOC","ns");
+)DOC","clock ticks");
 
     REGISTER_VARIABLE("timeSinceLastInjectionSignalMicroSeconds", timeSinceLastInjectionSignalMicroSeconds, R"DOC(
-[Eventbased] Time since the last injection pre-kick signal in micro seconds
+[Eventbased] Time since the last injection pre-kick signal
 
 .. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
 )DOC","ms");
 
     REGISTER_VARIABLE("timeSinceLastInjectionClockTicks", timeSinceLastInjectionClockTicks,
-      "[Eventbased] Time since the last injected bunch passed by the detector in micro seconds.","ms")
+      "[Eventbased] Time since the last injected bunch passed by the detector.","ms")
 
     REGISTER_VARIABLE("timeSinceLastInjectionMicroSeconds", timeSinceLastInjectionMicroSeconds,
-      "[Eventbased] Time since the last injected bunch passed by the detector in micro seconds.","ms")
+      "[Eventbased] Time since the last injected bunch passed by the detector.","ms")
 
     REGISTER_VARIABLE("injectionInHER", injectionInHER,
                   "[Eventbased] Returns 1 if injection was in HER, 0 otherwise.");
@@ -968,7 +968,7 @@ Returns NaN for data.
 
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0, R"DOC(
-[Eventbased][Calibration] The Event t0, measured in ns, is the time of the event relative to the trigger time. 
+[Eventbased][Calibration] The Event t0, is the time of the event relative to the trigger time. 
 
 .. note::
   The event time can be measured by several sub-detectors including the CDC, ECL, and TOP.

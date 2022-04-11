@@ -1214,18 +1214,18 @@ namespace Belle2 {
         int daughterIndex = std::lround(arguments[0]);
         if (daughterIndex >= int(particle->getNDaughters()))
           return std::numeric_limits<float>::quiet_NaN();
-        const Particle* daughter = particle->getDaughter(daughterIndex);
+        const Particle* dau = particle->getDaughter(daughterIndex);
 
         int grandDaughterIndex = std::lround(arguments[1]);
-        if (grandDaughterIndex >= int(daughter->getNDaughters()))
+        if (grandDaughterIndex >= int(dau->getNDaughters()))
           return std::numeric_limits<float>::quiet_NaN();
 
-        B2Vector3D  boost = daughter->get4Vector().BoostToCM();
+        B2Vector3D  boost = dau->get4Vector().BoostToCM();
 
         ROOT::Math::PxPyPzEVector motherMomentum = - particle->get4Vector();
         motherMomentum = ROOT::Math::Boost(boost) * motherMomentum;
 
-        ROOT::Math::PxPyPzEVector grandDaughterMomentum = daughter->getDaughter(grandDaughterIndex)->get4Vector();
+        ROOT::Math::PxPyPzEVector grandDaughterMomentum = dau->getDaughter(grandDaughterIndex)->get4Vector();
         grandDaughterMomentum = ROOT::Math::Boost(boost) * grandDaughterMomentum;
 
         return B2Vector3D(motherMomentum.Vect()).Angle(B2Vector3D(grandDaughterMomentum.Vect()));

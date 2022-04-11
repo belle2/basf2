@@ -36,7 +36,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPUnpacker)
+  REG_MODULE(TOPUnpacker);
 
   //-----------------------------------------------------------------
   //                 Implementation

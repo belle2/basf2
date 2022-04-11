@@ -24,7 +24,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPGeometryParInitializer)
+  REG_MODULE(TOPGeometryParInitializer);
 
   //-----------------------------------------------------------------
   //                 Implementation

@@ -22,7 +22,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPCommonT0BFCollector)
+  REG_MODULE(TOPCommonT0BFCollector);
 
   //-----------------------------------------------------------------
   //                 Implementation

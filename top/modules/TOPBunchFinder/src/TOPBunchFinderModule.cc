@@ -39,7 +39,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPBunchFinder)
+  REG_MODULE(TOPBunchFinder);
 
   //-----------------------------------------------------------------
   //                 Implementation

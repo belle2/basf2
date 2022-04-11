@@ -43,7 +43,7 @@ namespace Belle2 {
   //                 Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPBackground)
+  REG_MODULE(TOPBackground);
 
 
   //-----------------------------------------------------------------
@@ -94,7 +94,7 @@ namespace Belle2 {
     setDescription("A module to analyze beam background simulations regarding TOP");
 
     // Add parameters
-    addParam("Type", m_BkgType, "Backgound type" , string("Backgound"));
+    addParam("Type", m_BkgType, "Backgound type", string("Backgound"));
     addParam("Output", m_OutputFileName, "Name of the output file",
              string("Backgound.root"));
     addParam("TimeOfSimulation", m_TimeOfSimulation,
@@ -210,7 +210,7 @@ namespace Belle2 {
       if (!simHit) continue;
       int PMTID = simHit->getPmtID();
 
-      module_occupancy->SetPoint(count_occ, PMTID , barID);
+      module_occupancy->SetPoint(count_occ, PMTID, barID);
       count_occ++;
 
       genergy->Fill(simHit->getEnergy());

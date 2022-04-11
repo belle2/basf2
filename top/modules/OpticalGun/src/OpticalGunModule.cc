@@ -35,7 +35,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(OpticalGun)
+  REG_MODULE(OpticalGun);
 
   //-----------------------------------------------------------------
   //                 Implementation

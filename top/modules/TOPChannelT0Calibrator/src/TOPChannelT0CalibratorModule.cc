@@ -25,7 +25,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPChannelT0Calibrator)
+  REG_MODULE(TOPChannelT0Calibrator);
 
   //-----------------------------------------------------------------
   //                 Implementation

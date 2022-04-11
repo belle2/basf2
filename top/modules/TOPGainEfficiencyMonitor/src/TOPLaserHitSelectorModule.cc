@@ -30,7 +30,7 @@ namespace Belle2 {
   //                 Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPLaserHitSelector)
+  REG_MODULE(TOPLaserHitSelector);
 
 
   //-----------------------------------------------------------------

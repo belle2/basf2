@@ -31,7 +31,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPWaveformFeatureExtractor)
+  REG_MODULE(TOPWaveformFeatureExtractor);
 
   //-----------------------------------------------------------------
   //                 Implementation

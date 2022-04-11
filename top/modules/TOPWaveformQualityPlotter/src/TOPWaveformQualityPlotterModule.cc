@@ -22,7 +22,7 @@ using namespace std;
 
 namespace Belle2 {
 
-  REG_MODULE(TOPWaveformQualityPlotter)
+  REG_MODULE(TOPWaveformQualityPlotter);
 
   TOPWaveformQualityPlotterModule::TOPWaveformQualityPlotterModule()
     : HistoModule()

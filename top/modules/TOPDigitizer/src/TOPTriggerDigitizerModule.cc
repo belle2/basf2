@@ -32,7 +32,7 @@ namespace Belle2 {
   //                 Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPTriggerDigitizer)
+  REG_MODULE(TOPTriggerDigitizer);
 
 
   //-----------------------------------------------------------------

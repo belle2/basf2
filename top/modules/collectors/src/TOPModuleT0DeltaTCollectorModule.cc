@@ -19,7 +19,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPModuleT0DeltaTCollector)
+  REG_MODULE(TOPModuleT0DeltaTCollector);
 
   //-----------------------------------------------------------------
   //                 Implementation

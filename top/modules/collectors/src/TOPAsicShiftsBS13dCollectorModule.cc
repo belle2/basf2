@@ -23,7 +23,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPAsicShiftsBS13dCollector)
+  REG_MODULE(TOPAsicShiftsBS13dCollector);
 
   //-----------------------------------------------------------------
   //                 Implementation

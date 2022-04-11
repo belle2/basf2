@@ -35,7 +35,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPRawDigitConverter)
+  REG_MODULE(TOPRawDigitConverter);
 
   //-----------------------------------------------------------------
   //                 Implementation

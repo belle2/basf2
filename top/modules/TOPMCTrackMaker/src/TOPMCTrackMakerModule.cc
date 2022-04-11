@@ -32,7 +32,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPMCTrackMaker)
+  REG_MODULE(TOPMCTrackMaker);
 
   //-----------------------------------------------------------------
   //                 Implementation

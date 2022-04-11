@@ -34,7 +34,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPLaserCalibrator)
+  REG_MODULE(TOPLaserCalibrator);
 
   //-----------------------------------------------------------------
   //                 Implementation

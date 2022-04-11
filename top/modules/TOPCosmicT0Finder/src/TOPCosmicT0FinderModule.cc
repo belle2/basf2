@@ -41,7 +41,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPCosmicT0Finder)
+  REG_MODULE(TOPCosmicT0Finder);
 
   //-----------------------------------------------------------------
   //                 Implementation

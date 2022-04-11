@@ -46,7 +46,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPDQM)
+  REG_MODULE(TOPDQM);
 
   //-----------------------------------------------------------------
   //                 Implementation

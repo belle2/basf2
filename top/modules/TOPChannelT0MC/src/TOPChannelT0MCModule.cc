@@ -27,7 +27,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPChannelT0MC)
+  REG_MODULE(TOPChannelT0MC);
 
   //-----------------------------------------------------------------
   //                 Implementation

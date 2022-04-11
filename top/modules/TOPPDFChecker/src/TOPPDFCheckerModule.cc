@@ -36,7 +36,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPPDFChecker)
+  REG_MODULE(TOPPDFChecker);
 
   //-----------------------------------------------------------------
   //                 Implementation

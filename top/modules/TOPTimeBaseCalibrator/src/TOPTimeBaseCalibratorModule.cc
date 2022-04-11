@@ -39,7 +39,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPTimeBaseCalibrator)
+  REG_MODULE(TOPTimeBaseCalibrator);
 
   //-----------------------------------------------------------------
   //                 Implementation

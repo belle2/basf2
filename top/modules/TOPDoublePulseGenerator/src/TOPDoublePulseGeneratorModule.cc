@@ -37,7 +37,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPDoublePulseGenerator)
+  REG_MODULE(TOPDoublePulseGenerator);
 
   //-----------------------------------------------------------------
   //                 Implementation

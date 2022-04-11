@@ -33,7 +33,7 @@ namespace Belle2 {
   //                 Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPGainEfficiencyCalculator)
+  REG_MODULE(TOPGainEfficiencyCalculator);
 
 
   //-----------------------------------------------------------------

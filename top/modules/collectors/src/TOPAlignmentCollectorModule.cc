@@ -29,7 +29,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPAlignmentCollector)
+  REG_MODULE(TOPAlignmentCollector);
 
   //-----------------------------------------------------------------
   //                 Implementation

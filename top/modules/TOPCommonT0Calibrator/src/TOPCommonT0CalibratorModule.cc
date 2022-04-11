@@ -24,7 +24,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPCommonT0Calibrator)
+  REG_MODULE(TOPCommonT0Calibrator);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -209,7 +209,7 @@ namespace Belle2 {
         m_numPhotons++;
         m_hits1D.Fill(digit.getModuleID());
         int bs = digit.getBoardstackNumber();
-        m_hits2D.Fill((digit.getModuleID() * 4 + bs - 1.5) / 4.0 , digit.getTime());
+        m_hits2D.Fill((digit.getModuleID() * 4 + bs - 1.5) / 4.0, digit.getTime());
       }
 
       // fill output tree

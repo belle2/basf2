@@ -35,7 +35,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPValidationCollector)
+  REG_MODULE(TOPValidationCollector);
 
   //-----------------------------------------------------------------
   //                 Implementation

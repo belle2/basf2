@@ -26,7 +26,7 @@ namespace Belle2 {
   //                 Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPReconstructor)
+  REG_MODULE(TOPReconstructor);
 
   //-----------------------------------------------------------------
   //                 Implementation

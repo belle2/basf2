@@ -80,12 +80,16 @@ class VTXBgRemover(b2.Module):
         general_options = Belle2.MVA.GeneralOptions()
         weightfile.getOptions(general_options)
 
+        #: cached MVA expert for classifying tracks into signal / backrgound
         self.m_expert = supported_interfaces[general_options.m_method].getExpert()
         self.m_expert.load(weightfile)
 
+        #: cached list of feature variables
         self.m_feature_variables = general_options.m_variables
 
         dummy = np.zeros((self.m_feature_variables.size(),))
+
+        #: cached dataset, defining input to MVA expert for one track
         self.m_dataset = Belle2.MVA.SingleDataset(general_options, dummy, 0)
 
     def analyse(self, trackCand):

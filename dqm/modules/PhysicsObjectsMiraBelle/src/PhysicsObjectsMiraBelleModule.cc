@@ -99,6 +99,8 @@ void PhysicsObjectsMiraBelleModule::defineHisto()
   m_h_klmTotalEndcapHits->SetXTitle("hist_klmTotalEndcapHits");
   m_h_dPhicms = new TH1F("hist_dPhicms", "hist_dPhicms: 180#circ - |#phi_{1} - #phi_{2}|", 100, -10, 10);
   m_h_dPhicms->SetXTitle("hist_dPhicms");
+  m_h_dThetacms = new TH1F("hist_dThetacms", "hist_dThetacms: |#theta_{1} + #theta_{2}| - 180#circ", 100, -10, 10);
+  m_h_dThetacms->SetXTitle("hist_dThetacms");
 
   oldDir->cd();
 }
@@ -139,6 +141,7 @@ void PhysicsObjectsMiraBelleModule::beginRun()
   m_h_klmTotalBarrelHits->Reset();
   m_h_klmTotalEndcapHits->Reset();
   m_h_dPhicms->Reset();
+  m_h_dThetacms->Reset();
 }
 
 void PhysicsObjectsMiraBelleModule::event()
@@ -165,6 +168,7 @@ void PhysicsObjectsMiraBelleModule::event()
   double z0[2] = {};
   double ptcms[2] = {};
   double phicms[2] = {};
+  double thetacms[2] = {};
 
   //get the di-muons for beam energy check
   StoreObjPtr<ParticleList> UpsParticles(m_mumuPListName);
@@ -231,6 +235,7 @@ void PhysicsObjectsMiraBelleModule::event()
       // Momentum
       ptcms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Pt();//CMS
       phicms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Phi() * TMath::RadToDeg();
+      thetacms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Theta() * TMath::RadToDeg();
       m_h_Pt->Fill(fitresult->get4Momentum().Pt());//Lab
       m_h_theta->Fill(Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Theta() * TMath::RadToDeg());//CMS
       m_h_Phi0->Fill(fitresult->get4Momentum().Phi() * TMath::RadToDeg());//Lab
@@ -242,6 +247,7 @@ void PhysicsObjectsMiraBelleModule::event()
   m_h_dZ0->Fill((z0[0] - z0[1]) / sqrt(2));
   m_h_dPtcms->Fill((ptcms[0] - ptcms[1]) / sqrt(2));
   m_h_dPhicms->Fill(180 - abs(phicms[0] - phicms[1]));
+  m_h_dThetacms->Fill(abs(thetacms[0] + thetacms[1]) - 180);
   // Event level information
   StoreObjPtr<EventLevelTrackingInfo> elti;
   if (elti) {

@@ -92,6 +92,7 @@ namespace Belle2 {
     TH1F* m_h_Pt = nullptr;/**< histogram for Pt of muon track */
     TH1F* m_h_Mom = nullptr;/**< histogram for Momentum of muon track */
     TH1F* m_h_dPhicms = nullptr;/**< histogram for phi difference between mu+ and mu- in CMS */
+    TH1F* m_h_dThetacms = nullptr;/**< histogram for theta difference between mu+ and mu- in CMS */
 
     /** Trigger identifier string used to select events for the histograms */
     std::string m_triggerIdentifier = "";

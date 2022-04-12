@@ -97,7 +97,7 @@ void PhysicsObjectsMiraBelleModule::defineHisto()
   m_h_klmTotalBarrelHits->SetXTitle("hist_klmTotalBarrelHits");
   m_h_klmTotalEndcapHits = new TH1F("hist_klmTotalEndcapHits", "hist_klmTotalEndcapHits", 16, 0, 16);
   m_h_klmTotalEndcapHits->SetXTitle("hist_klmTotalEndcapHits");
-  m_h_dPhicms = new TH1F("hist_dPhicms", "hist_dPhicms", 100, -10, 10);
+  m_h_dPhicms = new TH1F("hist_dPhicms", "hist_dPhicms: 180#circ - |#phi_{1} - #phi_{2}|", 100, -10, 10);
   m_h_dPhicms->SetXTitle("hist_dPhicms");
 
   oldDir->cd();

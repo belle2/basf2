@@ -12,10 +12,10 @@
 # This steering file steers the collectors for the training of the VTX cluster
 # position estimator running the CAF.
 #
-# Execute as: basf2 cluster_position_collector.py -n 15000000
+# Execute as: basf2 cluster_position_collector.py -n 1000000
 #
 # The collector will create source files for training of clusterkind 0 by simulating
-# 10 million clusters.
+# 1 million clusters.
 
 import basf2 as b2
 from ROOT import Belle2
@@ -29,6 +29,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate training data for computing cluster shape corrections")
     parser.add_argument('--momentum', dest='momentum', default=0.5, type=float, help='Momentum of particle gun')
     parser.add_argument('--pdgCode', dest='pdgCode', default=-211, type=int, help='PDG code for particle gun')
+    parser.add_argument('--index', dest='index', default=0, type=int, help='Training file index, part of output file name')
     args = parser.parse_args()
 
     # In order to create source for a specific kind of clusters, we position the particle gun below
@@ -45,7 +46,7 @@ if __name__ == "__main__":
     eventinfosetter = main.add_module("EventInfoSetter")
     histoman = main.add_module(
         'HistoManager',
-        histoFileName='VTXClusterPositionCollectorOutput_kind_{:d}.root'.format(0))
+        histoFileName='VTXClusterPositionCollectorOutput_kind_{:d}_{:d}.root'.format(0, args.index))
     gearbox = main.add_module("Gearbox")
     main.add_module('Geometry', excludedComponents=['PXD', 'SVD', 'CDC', 'ECL', 'ARICH', 'TOP', 'KLM'],
                     additionalComponents=['VTX-CMOS-5layer'],

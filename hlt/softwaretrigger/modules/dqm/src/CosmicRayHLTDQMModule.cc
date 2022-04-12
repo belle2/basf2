@@ -20,7 +20,7 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/KLMHit2d.h>
 
 #include <TDirectory.h>
 
@@ -33,7 +33,7 @@ using namespace SoftwareTrigger;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CosmicRayHLTDQM)
+REG_MODULE(CosmicRayHLTDQM);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -110,17 +110,17 @@ void CosmicRayHLTDQMModule::defineHisto()
 
   //KLM
   h_nbklmhit = new TH1F("nbklmhit", "number of 2D hits on barrel KLM", 30, 0, 30);
-  h_nbklmhit->SetXTitle("Nhits (bKLM)");
+  h_nbklmhit->SetXTitle("Nhits (BKLM)");
   h_layerId_bklmhit = new TH1F("layerId_bklmhit", "layer ID of 2D hits on barrel KLM", 18, 0, 18);
-  h_layerId_bklmhit->SetXTitle("Layer ID (bKLM)");
+  h_layerId_bklmhit->SetXTitle("Layer ID (BKLM)");
   h_sectorId_bklmhit = new TH1F("sectorId_bklmhit", "sector ID of 2D hits on barrel KLM", 10, 0, 10);
-  h_sectorId_bklmhit->SetXTitle("Sector ID (bKLM)");
+  h_sectorId_bklmhit->SetXTitle("Sector ID (BKLM)");
   h_neklmhit = new TH1F("neklmhit", "number of 2D hits on endcap KLM", 30, 0, 30);
-  h_neklmhit->SetXTitle("Nhits (eKLM)");
+  h_neklmhit->SetXTitle("Nhits (EKLM)");
   h_layerId_eklmhit = new TH1F("layerId_eklmhit", "layer ID of 2D hits on endcap KLM", 18, 0, 18);
-  h_layerId_eklmhit->SetXTitle("Layer ID (eKLM)");
+  h_layerId_eklmhit->SetXTitle("Layer ID (EKLM)");
   h_sectorId_eklmhit = new TH1F("sectorId_eklmhit", "sector ID of 2D hits on endcap KLM", 10, 0, 10);
-  h_sectorId_eklmhit->SetXTitle("Sector ID (eKLM)");
+  h_sectorId_eklmhit->SetXTitle("Sector ID (EKLM)");
   oldDir->cd();
 }
 
@@ -188,22 +188,20 @@ void CosmicRayHLTDQMModule::event()
 
 
 //Monitor KLM
-  StoreArray<BKLMHit2d> bklmhits;
-  if (bklmhits.isValid()) {
-    h_nbklmhit->Fill(bklmhits.getEntries());
-    for (const auto& bklmhit : bklmhits) {
-      h_layerId_bklmhit->Fill(bklmhit.getLayer());
-      h_sectorId_bklmhit->Fill(bklmhit.getSector());
+  StoreArray<KLMHit2d> klmHits;
+  if (klmHits.isValid()) {
+    int nBKLMHits = 0;
+    int nEKLMHits = 0;
+    for (const auto& klmHit : klmHits) {
+      if (klmHit.getSubdetector() == KLMElementNumbers::c_BKLM) {
+        h_layerId_bklmhit->Fill(klmHit.getLayer());
+        h_sectorId_bklmhit->Fill(klmHit.getSector());
+      } else {
+        h_layerId_eklmhit->Fill(klmHit.getLayer());
+        h_sectorId_eklmhit->Fill(klmHit.getSector());
+      }
     }
+    h_nbklmhit->Fill(nBKLMHits);
+    h_neklmhit->Fill(nEKLMHits);
   }
-  /*
-  StoreArray<EKLMHit2d> eklmhits;
-  if (eklmhits.isValid()) {
-    h_neklmhit->Fill(eklmhits.getEntries());
-    for (const auto& eklmhit : eklmhits) {
-      h_layerId_eklmhit->Fill(eklmhit.getLayer());
-      h_sectorId_eklmhit->Fill(eklmhit.getSector());
-    }
-  }
-  */
 }

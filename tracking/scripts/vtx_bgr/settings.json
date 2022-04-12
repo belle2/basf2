@@ -1,0 +1,19 @@
+{
+    "result_path": "train_output/",
+    "process_type": "BBBAR",
+    "n_events_training": 6000,
+    "n_events_testing": 4000,
+    "n_events_per_task": 200,
+    "n_events_test_on_data": -1,
+    "workers": 3,
+    "basf2_processes_per_worker": 0,
+    "test_selected_task": false,
+    "run_mva_evaluate": true,
+    "run_validation_tasks": true,
+    "globaltags": ["NameOfUpgradeGT"],
+    "experiment_numbers": [0],
+    "datafiles": [],
+    "bkgfiles_by_exp": {
+        "0": "/path/to/overlay/files/"
+    }
+}

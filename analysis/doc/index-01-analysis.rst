@@ -140,6 +140,7 @@ Advanced Topics
 
 .. toctree:: MVA
 
+.. toctree:: Priors
 
 .. _analysismodules:
 

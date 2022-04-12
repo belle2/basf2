@@ -116,13 +116,6 @@ namespace Belle2 {
      */
     void fillMaskedChannelsHistogram(const std::string& histName);
 
-    /**
-     * Find TCanvas that matches a given name.
-     * @param[in]  canvasName  Name of the desired TCanvas.
-     * @param[out] TCanvas*    Matching TCanvas.
-     */
-    TCanvas* findCanvas(const std::string& canvasName);
-
     /** Number of processed events. */
     double m_ProcessedEvents;
 
@@ -131,6 +124,9 @@ namespace Belle2 {
 
     /** Threshold for hot channels. */
     int m_ThresholdForHot;
+
+    /** Threshold for log scale. */
+    int m_ThresholdForLog;
 
     /** Minimal number of hits for flagging. */
     int m_MinHitsForFlagging;
@@ -158,6 +154,15 @@ namespace Belle2 {
 
     /** TText for names in plane histograms. */
     TText m_PlaneText;
+
+    /** Histogram from DQMInfo with run type. */
+    TH1* m_RunType = nullptr;
+
+    /** String with run type. */
+    TString m_RunTypeString;
+
+    /** Run type flag for null runs. */
+    bool m_IsNullRun;
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;

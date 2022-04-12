@@ -26,8 +26,7 @@
 #                 +-> mu+ nu                                             #
 #                                                                        #
 # The original example has been modified to apply the                    #
-# event based selection, and the ntuples are filled                      #
-# also with the R2EventLevel variable.                                   #
+# event based selection, and the ntuples are filled.                     #
 # While signal/charged samples have R2 distributions below               #
 # 0.3, ccbar sample has a larger distribution and the                    #
 # initial selection reduces the processing time.                         #
@@ -45,8 +44,7 @@ from stdPi0s import stdPi0s
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdstList(environmentType='default',
-                 filelist=[b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False)],
+ma.inputMdstList(filelist=[b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False)],
                  path=my_path)
 
 # We want to apply cut on event shape. For this, we are creating events shape object

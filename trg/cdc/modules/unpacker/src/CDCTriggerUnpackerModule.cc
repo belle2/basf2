@@ -555,6 +555,7 @@ void CDCTriggerUnpackerModule::initialize()
     m_NNInput2DFinderTracks.registerInDataStore("CDCTriggerNNInput2DFinderTracks");
     m_NeuroTracks.registerInDataStore("CDCTriggerNeuroTracks");
     m_NeuroInputs.registerInDataStore("CDCTriggerNeuroTracksInput");
+    m_ETFTime.registerInDataStore("CDCTriggerNeuroETFT0");
     m_NeuroTracks.registerRelationTo(m_NNInputTSHits);
     m_NNInput2DFinderTracks.registerRelationTo(m_NNInputTSHits);
     m_NNInput2DFinderTracks.registerRelationTo(m_NNInputTSHitsAll);
@@ -639,7 +640,10 @@ void CDCTriggerUnpackerModule::beginRun()
 
 void CDCTriggerUnpackerModule::event()
 {
-
+  if (m_decodeNeuro == true) {
+    // needed to unpack neuroinput etf time without problems
+    if (!m_ETFTime.isValid()) m_ETFTime.create();
+  }
   B2DEBUG(10, padright(" ", 100));
   B2DEBUG(10, "----------------------------------------------------------------------------------------------------");
   B2DEBUG(10, padright(" ", 100));
@@ -751,7 +755,7 @@ void CDCTriggerUnpackerModule::event()
   B2DEBUG(99, "now unpack neuro ");
   if (m_decodeNeuro) {
     if (m_useDB == true) {
-      decodeNNIO(&m_bitsNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NNInputTSHitsAll, &m_NeuroInputs,
+      decodeNNIO(&m_bitsNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NNInputTSHitsAll, &m_NeuroInputs, m_ETFTime,
                  m_cdctriggerneuroconfig, m_sim13dt);
     } else {
       decodeNNIO_old(&m_bitsNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NeuroInputs);

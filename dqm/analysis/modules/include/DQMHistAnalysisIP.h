@@ -33,16 +33,34 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisIPModule();
+
+    /**
+     * Destructor.
+     */
     ~DQMHistAnalysisIPModule();
 
-    //! Module functions to be called from main process
+    /**
+     * Initializer.
+     */
     void initialize() override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event() override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate() override final;
 
     // Data members

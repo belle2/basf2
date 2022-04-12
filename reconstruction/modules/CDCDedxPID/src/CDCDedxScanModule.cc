@@ -28,7 +28,7 @@ using namespace Belle2;
 using namespace CDC;
 using namespace Dedx;
 
-REG_MODULE(CDCDedxScan)
+REG_MODULE(CDCDedxScan);
 
 CDCDedxScanModule::CDCDedxScanModule() : Module()
 {

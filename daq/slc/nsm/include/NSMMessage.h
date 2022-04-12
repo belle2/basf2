@@ -38,7 +38,7 @@ namespace Belle2 {
 
   public:
     NSMMessage();
-    NSMMessage(const NSMNode& node);
+    explicit NSMMessage(const NSMNode& node);
     NSMMessage(const NSMNode& node, const NSMCommand& cmd);
     NSMMessage(const NSMNode& node, const NSMCommand& cmd,
                int npar, int* pars);
@@ -51,15 +51,15 @@ namespace Belle2 {
     NSMMessage(const NSMNode& node, const DAQLogMessage& log);
     NSMMessage(const NSMNode& node, const DAQLogMessage& log, const NSMCommand& cmd);
     NSMMessage(const NSMNode& node, const NSMData& data);
-    NSMMessage(const NSMCommand& cmd);
+    explicit NSMMessage(const NSMCommand& cmd);
     NSMMessage(const NSMCommand& cmd, int par);
     NSMMessage(const NSMCommand& cmd, int npar, int* pars);
     NSMMessage(const NSMNode& node, const NSMCommand& cmd, int npar, int* pars,
                const std::string& data);
     NSMMessage(const NSMCommand& cmd, const std::string& data);
-    NSMMessage(const NSMVar& var);
-    NSMMessage(const DAQLogMessage& log);
-    NSMMessage(const NSMData& data);
+    explicit NSMMessage(const NSMVar& var);
+    explicit NSMMessage(const DAQLogMessage& log);
+    explicit NSMMessage(const NSMData& data);
     NSMMessage(const NSMMessage& msg);
     virtual ~NSMMessage() { }
 
@@ -107,8 +107,8 @@ namespace Belle2 {
     void push(const NSMMessage& msg);
 
   public:
-    virtual void readObject(Reader&);
-    virtual void writeObject(Writer&) const;
+    void readObject(Reader&) override;
+    void writeObject(Writer&) const override;
 
   public:
     size_t read(NSMcontext* nsmc);

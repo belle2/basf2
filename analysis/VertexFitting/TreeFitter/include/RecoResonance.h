@@ -30,7 +30,7 @@ namespace TreeFitter {
     /** destructor */
     virtual ~RecoResonance() {};
 
-    /** dimenstion of the vector */
+    /** dimension of the vector */
     virtual int dim() const override { return hasEnergy() ? 4 : 3;} // (px,py,pz,(E))
 
     /** project the constraint */

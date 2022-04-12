@@ -57,6 +57,8 @@ namespace Belle2 {
     protected:
 
       //1. Collections and relations Names
+      /** Name of the collection to use for the SVDEventInfo */
+      std::string m_svdEventInfoName;
       /** Name of the collection to use for the SVDShaperDigits */
       std::string m_storeShaperDigitsName;
       /** Name of the collection to use for the SVDClusters */
@@ -151,7 +153,7 @@ namespace Belle2 {
       /**
        * writes the relations of the SVDClusters with the other StoreArrays
        */
-      void writeClusterRelations(Belle2::SVD::RawCluster& rawCluster);
+      void writeClusterRelations(const Belle2::SVD::RawCluster& rawCluster);
 
     };// end class declarations
 

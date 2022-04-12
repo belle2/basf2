@@ -9,7 +9,6 @@
 </header>
 """
 
-from basf2 import *
 import ROOT
 import math
 

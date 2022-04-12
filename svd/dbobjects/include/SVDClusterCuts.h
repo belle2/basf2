@@ -25,8 +25,12 @@ namespace Belle2 {
      */
     float minClusterSNR;
 
+    /** Unfolding coefficient for the strip charges in the cluster
+     */
+    float UnfoldingCoeff;
 
-    ClassDef(SVDClusterCuts, 2); /**< needed by root*/
+
+    ClassDef(SVDClusterCuts, 3); /**< needed by root*/
 
   };
 

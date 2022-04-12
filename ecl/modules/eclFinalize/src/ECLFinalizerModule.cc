@@ -13,6 +13,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventT0.h>
+#include <limits>
 
 //ECL
 #include <ecl/dataobjects/ECLShower.h>
@@ -174,8 +175,17 @@ void ECLFinalizerModule::event()
   if (!m_eventLevelClusteringInfo) {
     m_eventLevelClusteringInfo.create();
   }
+
+  if (rejectedShowersFwd > std::numeric_limits<int>::max())
+    rejectedShowersFwd = std::numeric_limits<int>::max();
   m_eventLevelClusteringInfo->setNECLShowersRejectedFWD(rejectedShowersFwd);
+
+  if (rejectedShowersBrl > static_cast<int>(std::numeric_limits<uint8_t>::max()))
+    rejectedShowersBrl = static_cast<int>(std::numeric_limits<uint8_t>::max());
   m_eventLevelClusteringInfo->setNECLShowersRejectedBarrel(rejectedShowersBrl);
+
+  if (rejectedShowersBwd > std::numeric_limits<int>::max())
+    rejectedShowersBwd = std::numeric_limits<int>::max();
   m_eventLevelClusteringInfo->setNECLShowersRejectedBWD(rejectedShowersBwd);
 
   B2DEBUG(35, "ECLFinalizerModule::event found " << rejectedShowersFwd << ", " << rejectedShowersBrl << ", " << rejectedShowersBwd

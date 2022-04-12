@@ -38,24 +38,26 @@ from tracking.path_utils import (  # noqa
     use_local_sectormap,
 )
 
+from pxd import add_pxd_reconstruction
+
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
-                                use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False, use_vtx_to_cdc_ckf=True,
-                                useVTX=False, add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
-                                useVTXClusterShapes=True):
+                                use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
+                                add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
+                                pxd_filtering_offline=False, useVTX=False, use_vtx_to_cdc_ckf=True, useVTXClusterShapes=True):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
 
-    #. first we find tracks using the CDC hits only, see :ref:`CDC Track Finding<tracking_trackFindingCDC>`
-    #. CDC tracks are extrapolated to SVD and SVD hits are attached, see :ref:`CDC to SVD CKF<tracking_cdc2svd_ckf>`
-    #. remaining  SVD hits are used to find SVD tracks, see :ref:`SVD Track Finding<tracking_trackFindingSVD>`
-    #. SVD tracks are extrapolated to CDC to attach CDC hits, see :ref:`SVD to CDC CKF<tracking_svd2cdc_ckf>`
-    #. SVD and CDC tracks are merged and fitted, see :ref:`Track Fitting<tracking_trackFitting>`
-    #. merged SVD+CDC tracks are extrapolated to PXD to attach PXD hits, see :ref:`SVD to PXD CKF<tracking_svd2pxd_ckf>`
+    # . first we find tracks using the CDC hits only, see :ref:`CDC Track Finding<tracking_trackFindingCDC>`
+    # . CDC tracks are extrapolated to SVD and SVD hits are attached, see :ref:`CDC to SVD CKF<tracking_cdc2svd_ckf>`
+    # . remaining  SVD hits are used to find SVD tracks, see :ref:`SVD Track Finding<tracking_trackFindingSVD>`
+    # . SVD tracks are extrapolated to CDC to attach CDC hits, see :ref:`SVD to CDC CKF<tracking_svd2cdc_ckf>`
+    # . SVD and CDC tracks are merged and fitted, see :ref:`Track Fitting<tracking_trackFitting>`
+    # . merged SVD+CDC tracks are extrapolated to PXD to attach PXD hits, see :ref:`SVD to PXD CKF<tracking_svd2pxd_ckf>`
 
     .. note::
 
@@ -64,7 +66,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
        the tracks on the PXD sensors and defining regions in which we expect to find the hit.\
        Only fired pixels inside these regions reach Event Builder 2.
 
-    #. after all the tracks from the IP are found, we look for special classes of tracks,\
+    # . after all the tracks from the IP are found, we look for special classes of tracks,\
     in particular we search for displaced vertices to reconstruct K-short, Lambda and\
     photon-conversions, see :ref:`V0 Finding<tracking_v0Finding>`
 
@@ -102,6 +104,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param add_recoTrack_QI: if true, add the MVA track quality estimation
         to the path that sets the quality indicator property of all found reco tracks
         (Both other QIs needed as input.)
+    :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
+        The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     """
 
     add_prefilter_tracking_reconstruction(
@@ -120,8 +124,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_cdcTrack_QI=add_cdcTrack_QI,
         add_vxdTrack_QI=add_vxdTrack_QI,
         add_recoTrack_QI=add_recoTrack_QI,
-        use_vtx_to_cdc_ckf=use_vtx_to_cdc_ckf,
+        pxd_filtering_offline=pxd_filtering_offline,
         useVTX=useVTX,
+        use_vtx_to_cdc_ckf=use_vtx_to_cdc_ckf,
         useVTXClusterShapes=useVTXClusterShapes)
 
     add_postfilter_tracking_reconstruction(path,
@@ -133,12 +138,13 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
 
 def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdding=False,
-                                          mcTrackFinding=False, trackFitHypotheses=None,
-                                          reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
+                                          mcTrackFinding=False, trackFitHypotheses=None, reco_tracks="RecoTracks",
+                                          prune_temporary_tracks=True, fit_tracks=True,
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
-                                          use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False, use_vtx_to_cdc_ckf=False,
+                                          use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                           add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
-                                          useVTX=False, useVTXClusterShapes=True):
+                                          pxd_filtering_offline=False,
+                                          useVTX=False, use_vtx_to_cdc_ckf=False, useVTXClusterShapes=True):
     """
     This function adds the tracking reconstruction modules required to calculate HLT filter decision
     to a path.
@@ -160,8 +166,6 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
     :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
     :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
-    :param use_vtx_to_cdc_ckf: if true, add VTX to CDC CKF module.
-    :param useVTX: If true, the VTX reconstruction is performed.
     :param add_cdcTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found CDC standalone tracks
     :param add_vxdTrack_QI: If true, add the MVA track quality estimation
@@ -171,6 +175,10 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
     :param add_recoTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of all found reco tracks
         (Both other QIs needed as input.)
+    :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
+        The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param useVTX: If true, the VTX reconstruction is performed.
+    :param use_vtx_to_cdc_ckf: if true, add VTX to CDC CKF module.
     :param useVTXClusterShapes: If true, use cluster shape corrections for hit position finding.
     """
 
@@ -193,8 +201,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         add_geometry_modules(path, components=components)
 
     if not skipHitPreparerAdding:
-        add_hit_preparation_modules(path, components=components, useVTX=useVTX,
-                                    useVTXClusterShapes=useVTXClusterShapes)
+        add_hit_preparation_modules(path, components=components, pxd_filtering_offline=pxd_filtering_offline,
+                                    useVTX=useVTX, useVTXClusterShapes=useVTXClusterShapes)
 
     # Material effects for all track extrapolations
     if 'SetupGenfitExtrapolation' not in path:
@@ -210,9 +218,11 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                           use_second_cdc_hits=use_second_cdc_hits,
                           use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
                           use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
-                          use_vtx_to_cdc_ckf=use_vtx_to_cdc_ckf,
+                          add_cdcTrack_QI=add_cdcTrack_QI,
+                          add_vxdTrack_QI=add_vxdTrack_QI,
+                          pxd_filtering_offline=pxd_filtering_offline,
                           useVTX=useVTX,
-                          add_cdcTrack_QI=add_cdcTrack_QI, add_vxdTrack_QI=add_vxdTrack_QI)
+                          use_vtx_to_cdc_ckf=use_vtx_to_cdc_ckf)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
@@ -261,14 +271,12 @@ def add_time_extraction(path, components=None):
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                                    skip_geometry_adding=False, event_time_extraction=True,
-                                   data_taking_period="early_phase3", top_in_counter=False,
-                                   merge_tracks=False, use_second_cdc_hits=False, useVTX=False):
+                                   merge_tracks=True, use_second_cdc_hits=False,
+                                   useVTX=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
 
     :param path: The path to which to add the tracking reconstruction modules
-    :param data_taking_period: The cosmics generation will be added using the
-           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
 
     :param components: the list of geometry components in use or None for all components.
     :param prune_tracks: Delete all hits except the first and the last in the found tracks.
@@ -280,9 +288,8 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
     :param event_time_extraction: extract the event time
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param useVTX: If True, the VTX is used instead of the VXD
 
-    :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
-           (assuming PMT is put at -z of the counter).
     """
 
     # make sure CDC is used
@@ -300,21 +307,19 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                         energyLossBrems=False, noiseBrems=False)
 
     # track finding
-    add_cr_track_finding(path, reco_tracks="RecoTracks", components=components, data_taking_period=data_taking_period,
-                         merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits, useVTX=useVTX)
+    add_cr_track_finding(path, reco_tracks="RecoTracks", components=components,
+                         merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits,
+                         useVTX=useVTX)
 
     # track fitting
     # if tracks were merged, use the unmerged collection for time extraction
     add_cr_track_fit_and_track_creator(path, components=components, prune_tracks=prune_tracks,
-                                       event_timing_extraction=event_time_extraction,
-                                       data_taking_period=data_taking_period,
-                                       top_in_counter=top_in_counter)
+                                       event_timing_extraction=event_time_extraction)
 
     if merge_tracks:
         # Do also fit the not merged tracks
         add_cr_track_fit_and_track_creator(path, components=components, prune_tracks=prune_tracks,
                                            event_timing_extraction=False,
-                                           data_taking_period=data_taking_period, top_in_counter=top_in_counter,
                                            reco_tracks="NonMergedRecoTracks", tracks="NonMergedTracks")
 
 
@@ -343,9 +348,10 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       prune_temporary_tracks=True, use_second_cdc_hits=False,
                       use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True,
                       use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
+                      add_cdcTrack_QI=True, add_vxdTrack_QI=False,
+                      pxd_filtering_offline=False, use_HLT_ROIs=False,
                       useVTX=False, vtx_ckf_mode="VXDTF2_after",
-                      use_vtx_to_cdc_ckf=True, use_ckf_based_cdc_vtx_merger=False,
-                      add_cdcTrack_QI=True, add_vxdTrack_QI=False):
+                      use_vtx_to_cdc_ckf=True, use_ckf_based_cdc_vtx_merger=False,):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
@@ -370,6 +376,9 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         to the path that sets the quality indicator property of the found VXDTF2 tracks
         (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
         -> setting this option to 'True' will have some influence on the final track collection)
+    :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
+        The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param use_HLT_ROIs: Don't calculate the ROIs here but use the ones from the HLT (does obviously not work for simulation)
     """
 
     if not is_svd_used(components) and not is_cdc_used(components) and not is_vtx_used(components):
@@ -464,6 +473,24 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         latest_reco_tracks = combined_ecl_reco_tracks
 
     if is_pxd_used(components) and not useVTX:
+        if pxd_filtering_offline:
+            roiName = "ROIs"
+            if not use_HLT_ROIs:
+                path.add_module("DAFRecoFitter", recoTracksStoreArrayName=latest_reco_tracks)
+
+                roiName = "ROIs_offline"
+                add_roiFinder(path, reco_tracks=latest_reco_tracks, roiName=roiName)
+
+            pxd_digifilter = b2.register_module('PXDdigiFilter')
+            pxd_digifilter.param('ROIidsName', roiName)
+            pxd_digifilter.param('PXDDigitsName', 'PXDDigits')
+            pxd_digifilter.param('PXDDigitsInsideROIName', 'PXDDigits')
+            pxd_digifilter.param('overrideDB', True)
+            pxd_digifilter.param('usePXDDataReduction', True)
+            path.add_module(pxd_digifilter)
+
+            add_pxd_reconstruction(path)
+
         add_pxd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
                               use_mc_truth=use_mc_truth, output_reco_tracks=reco_tracks,
                               temporary_reco_tracks=pxd_reco_tracks,
@@ -476,72 +503,62 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                 path.add_module('PruneRecoTracks', storeArrayName=temporary_reco_track_name)
 
 
-def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_taking_period='early_phase3',
-                         merge_tracks=True, use_second_cdc_hits=False, useVTX=False):
-    import cdc.cr as cosmics_setup
+def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None,
+                         merge_tracks=True, use_second_cdc_hits=False,
+                         useVTX=False):
 
     # register EventTrackingInfo
     if 'RegisterEventLevelTrackingInfo' not in path:
         path.add_module('RegisterEventLevelTrackingInfo')
 
-    if data_taking_period not in ["phase2", "early_phase3", "phase3"]:
-        cosmics_setup.set_cdc_cr_parameters(data_taking_period)
+    if not is_cdc_used(components):
+        b2.B2FATAL("CDC must be in components")
 
-        # track finding
-        add_cdc_cr_track_finding(path, merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits,
-                                 trigger_point=tuple(cosmics_setup.triggerPos))
+    reco_tracks_from_track_finding = reco_tracks
+    if merge_tracks:
+        reco_tracks_from_track_finding = "NonMergedRecoTracks"
 
-    else:
-        if not is_cdc_used(components):
-            b2.B2FATAL("CDC must be in components")
+    cdc_reco_tracks = "CDCRecoTracks"
+    if not is_pxd_used(components) and not is_svd_used(components):
+        cdc_reco_tracks = reco_tracks_from_track_finding
 
-        reco_tracks_from_track_finding = reco_tracks
-        if merge_tracks:
-            reco_tracks_from_track_finding = "NonMergedRecoTracks"
+    svd_cdc_reco_tracks = "SVDCDCRecoTracks"
+    if not is_pxd_used(components):
+        svd_cdc_reco_tracks = reco_tracks_from_track_finding
 
-        cdc_reco_tracks = "CDCRecoTracks"
-        if not is_pxd_used(components) and not is_svd_used(components) and not (is_vtx_used(components) and useVTX):
-            cdc_reco_tracks = reco_tracks_from_track_finding
+    vtx_cdc_reco_tracks = "VTXCDCRecoTracks"
+    if useVTX and not is_vtx_used(components):
+        vtx_cdc_reco_tracks = reco_tracks_from_track_finding
 
-        svd_cdc_reco_tracks = "SVDCDCRecoTracks"
-        if not is_pxd_used(components):
-            svd_cdc_reco_tracks = reco_tracks_from_track_finding
+    full_reco_tracks = reco_tracks_from_track_finding
 
-        # TODO check this. VTX can not be used in ["phase2", "early_phase3", "phase3"],
-        # so maybe it should be in the "if data_taking_period not in ["phase2", "early_phase3", "phase3"]" clause...
-        vtx_cdc_reco_tracks = "VTXCDCRecoTracks"
-        if useVTX and not is_vtx_used(components):
-            vtx_cdc_reco_tracks = reco_tracks_from_track_finding
+    # CDC track finding with default settings
+    add_cdc_cr_track_finding(path, merge_tracks=False, use_second_cdc_hits=use_second_cdc_hits,
+                             output_reco_tracks=cdc_reco_tracks)
 
-        full_reco_tracks = reco_tracks_from_track_finding
+    latest_reco_tracks = cdc_reco_tracks
 
-        # CDC track finding with default settings
-        add_cdc_cr_track_finding(path, merge_tracks=False, use_second_cdc_hits=use_second_cdc_hits,
-                                 output_reco_tracks=cdc_reco_tracks)
+    if is_svd_used(components) and not useVTX:
+        add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
+                              output_reco_tracks=svd_cdc_reco_tracks,
+                              svd_ckf_mode="cosmics", add_both_directions=True)
+        latest_reco_tracks = svd_cdc_reco_tracks
 
-        latest_reco_tracks = cdc_reco_tracks
+    if is_pxd_used(components) and not useVTX:
+        add_pxd_cr_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
+                                 output_reco_tracks=full_reco_tracks, add_both_directions=True,
+                                 filter_cut=0.01)
 
-        if is_svd_used(components) and not useVTX:
-            add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                  output_reco_tracks=svd_cdc_reco_tracks,
-                                  svd_ckf_mode="cosmics", add_both_directions=True)
-            latest_reco_tracks = svd_cdc_reco_tracks
+    if is_vtx_used(components) and useVTX:
+        add_vtx_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
+                              output_reco_tracks=vtx_cdc_reco_tracks,
+                              vtx_ckf_mode="cosmics", add_both_directions=True)
+        latest_reco_tracks = svd_cdc_reco_tracks
 
-        if is_pxd_used(components) and not useVTX:
-            add_pxd_cr_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                     output_reco_tracks=full_reco_tracks, add_both_directions=True,
-                                     filter_cut=0.01)
-
-        if is_vtx_used(components) and useVTX:
-            add_vtx_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                  output_reco_tracks=vtx_cdc_reco_tracks,
-                                  vtx_ckf_mode="cosmics", add_both_directions=True)
-            latest_reco_tracks = svd_cdc_reco_tracks
-
-        if merge_tracks:
-            # merge the tracks together
-            path.add_module("CosmicsTrackMerger", inputRecoTracks=reco_tracks_from_track_finding,
-                            outputRecoTracks=reco_tracks)
+    if merge_tracks:
+        # merge the tracks together
+        path.add_module("CosmicsTrackMerger", inputRecoTracks=reco_tracks_from_track_finding,
+                        outputRecoTracks=reco_tracks)
 
 
 def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_second_cdc_hits=False):
@@ -596,6 +613,32 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
     dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)
     dafRecoFitter.param('svdHitsStoreArrayName', svd_cluster)
     path.add_module(dafRecoFitter)
+
+
+def add_roiFinder(path, reco_tracks="RecoTracks", roiName="ROIs"):
+    """
+    Add the ROI finding to the path creating ROIs out of reco tracks by extrapolating them to the PXD volume.
+    :param path: Where to add the module to.
+    :param reco_tracks: Which tracks to use in the extrapolation step.
+    :param roiName: Name of the produced/stored ROIs.
+    """
+
+    pxdDataRed = b2.register_module('PXDROIFinder')
+    param_pxdDataRed = {
+        'recoTrackListName': reco_tracks,
+        'PXDInterceptListName': 'PXDIntercepts',
+        'ROIListName': roiName,
+        'tolerancePhi': 0.15,
+        'toleranceZ': 0.5,
+        'sigmaSystU': 0.02,
+        'sigmaSystV': 0.02,
+        'numSigmaTotU': 10,
+        'numSigmaTotV': 10,
+        'maxWidthU': 0.5,
+        'maxWidthV': 0.5,
+    }
+    pxdDataRed.param(param_pxdDataRed)
+    path.add_module(pxdDataRed)
 
 
 def add_vxd_standalone_cosmics_finder(
@@ -674,16 +717,16 @@ def add_vtx_standalone_cosmics_finder(
 
     # register EventTrackingInfo
     if 'RegisterEventLevelTrackingInfo' not in path:
-        path.add_module(RegisterEventLevelTrackingInfo())
+        path.add_module('RegisterEventLevelTrackingInfo')
 
     if 'VTXSpacePointCreator' not in path:
-        sp_creator_vtx = register_module('VTXSpacePointCreator')
+        sp_creator_vtx = b2.register_module('VTXSpacePointCreator')
         sp_creator_vtx.param('SpacePoints', vtx_spacepoints_name)
         path.add_module(sp_creator_vtx)
 
     # Or is VTXSpacePointCreator already applied in funtion add_vtx_reconstruction?
 
-    track_finder = register_module('TrackFinderVXDCosmicsStandalone')
+    track_finder = b2.register_module('TrackFinderVXDCosmicsStandalone')
     track_finder.param('SpacePointTrackCandArrayName', "")
     track_finder.param('SpacePoints', [vtx_spacepoints_name])
     track_finder.param('QualityCut', quality_cut)
@@ -691,6 +734,6 @@ def add_vtx_standalone_cosmics_finder(
     track_finder.param('MaxRejectedSPs', max_rejected_sps)
     path.add_module(track_finder)
 
-    converter = register_module('SPTC2RTConverter')
+    converter = b2.register_module('SPTC2RTConverter')
     converter.param('recoTracksStoreArrayName', reco_tracks)
     path.add_module(converter)

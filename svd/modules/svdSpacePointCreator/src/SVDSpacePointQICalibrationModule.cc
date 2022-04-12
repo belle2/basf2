@@ -16,7 +16,7 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(SVDSpacePointQICalibration)
+REG_MODULE(SVDSpacePointQICalibration);
 
 SVDSpacePointQICalibrationModule::SVDSpacePointQICalibrationModule() :
   Module()

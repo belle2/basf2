@@ -24,8 +24,6 @@
 #include <G4VSolid.hh>
 #include <CLHEP/Vector/LorentzVector.h>
 
-#include <TLorentzVector.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Simulation;
@@ -77,7 +75,7 @@ G4PrimaryVertex*  MCParticleGenerator::determineVertex(const MCParticleGraph::Gr
 {
   // We want to determine the simulation vertex for the given particle.
   // So lets see where it is
-  TVector3 mcProdVtx = p.getProductionVertex();
+  B2Vector3D mcProdVtx = p.getProductionVertex();
   G4ThreeVector pos(mcProdVtx.X() / Unit::mm * CLHEP::mm,
                     mcProdVtx.Y() / Unit::mm * CLHEP::mm,
                     mcProdVtx.Z() / Unit::mm * CLHEP::mm);
@@ -86,7 +84,7 @@ G4PrimaryVertex*  MCParticleGenerator::determineVertex(const MCParticleGraph::Gr
   if (m_topSolid && m_topSolid->Inside(pos) == kOutside) {
     // Ok, we're outside the simulation volume. Check if we can actually
     // get to the simulation volume in time, no fields outside the volume
-    TLorentzVector mcPartMom4 = p.get4Vector();
+    ROOT::Math::PxPyPzEVector mcPartMom4 = p.get4Vector();
     CLHEP::HepLorentzVector mom(mcPartMom4.X() / Unit::MeV * CLHEP::MeV,
                                 mcPartMom4.Y() / Unit::MeV * CLHEP::MeV,
                                 mcPartMom4.Z() / Unit::MeV * CLHEP::MeV,
@@ -154,7 +152,7 @@ void MCParticleGenerator::addParticle(const MCParticle& mcParticle,
   graphParticle.setValidVertex(mcParticle.hasValidVertex());
   graphParticle.setProductionTime(mcParticle.getProductionTime());
   graphParticle.setDecayTime(mcParticle.getDecayTime());
-  graphParticle.setProductionVertex(mcParticle.getProductionVertex());
+  graphParticle.setProductionVertex(B2Vector3D(mcParticle.getProductionVertex()));
   graphParticle.setMomentum(mcParticle.getMomentum());
   graphParticle.setDecayVertex(mcParticle.getDecayVertex());
   graphParticle.setFirstDaughter(mcParticle.getFirstDaughter());
@@ -181,7 +179,7 @@ void MCParticleGenerator::addParticle(const MCParticle& mcParticle,
   // So now we have a particle to add and either a mother or a vertex.
   // Let's create the particle in Geant4
   if (addToG4) {
-    const TLorentzVector mcPartMom4 = graphParticle.get4Vector();
+    const ROOT::Math::PxPyPzEVector mcPartMom4 = graphParticle.get4Vector();
     newPart = new G4PrimaryParticle(pdef,
                                     mcPartMom4.X() / Unit::MeV * CLHEP::MeV,
                                     mcPartMom4.Y() / Unit::MeV * CLHEP::MeV,

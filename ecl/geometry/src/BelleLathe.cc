@@ -37,9 +37,10 @@ map<string, counter_t> counterl;
 //#define MATCHOUT(x) G4cout<<GetName()<<" "<<x<<G4endl;
 #define MATCHOUT(x)
 
+/** define plane struct */
 struct Plane_t {
-  G4ThreeVector n;// Normal unit vector (x,y,z)
-  double d;       // offset (d)
+  G4ThreeVector n; /**< Normal unit vector (x,y,z) */
+  double d;       /**< offset (d) */
   // => n.x*x + n.y*y + n.z*z + d = 0
 };
 
@@ -57,8 +58,10 @@ ostream& operator <<(ostream& o, const zr_t& v)
   return o << "{" << v.z << ",  " << v.r << "}";
 }
 
+/** curl struct */
 struct curl_t {
-  G4ThreeVector v;
+  G4ThreeVector v; /**< vector */
+  /** constructor */
   explicit curl_t(const G4ThreeVector& _v): v(_v) {}
 };
 
@@ -110,43 +113,42 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
 
   // remove vertices on the same line
   do {
-    auto inc = [&contour](vector<zr_t>::iterator & it) -> void {
-      if (++it >= contour.end()) it = contour.begin();
-    };
-    auto dec = [&contour](vector<zr_t>::iterator & it) -> void {
-      if (--it < contour.begin()) it = (++contour.rbegin()).base();
-    };
     vector<zr_t>::iterator it0 = contour.begin(), it1 = it0 + 1, it2 = it1 + 1;
     for (; it0 != contour.end();) {
       const zr_t& s0 = *it0, &s1 = *it1, &s2 = *it2;
       double dr2 = s2.r - s0.r, dz2 = s2.z - s0.z;
       double d = (s1.z - s0.z) * dr2 - (s1.r - s0.r) * dz2;
+
       if (d * d < kCarTolerance * kCarTolerance * (dr2 * dr2 + dz2 * dz2)) {
-        it1 = contour.erase(it1); it2 = it1; inc(it2); it0 = it1; dec(it0);
+        it1 = contour.erase(it1);
+        it2 = it1;
+        if (++it2 >= contour.end()) it2 = contour.begin();
+        it0 = it1;
+        if (--it0 < contour.begin()) it0 = (++contour.rbegin()).base();
+
       } else {
-        ++it0; inc(it1); inc(it2);
+        ++it0;
+        if (++it1 >= contour.end()) it1 = contour.begin();
+        if (++it2 >= contour.end()) it2 = contour.begin();
       }
+
     }
   } while (0);
 
-  auto isClockwise = [&contour]() -> bool {
-    double sum = 0;
-    zr_t p0 = contour[0];
-    for (int i = 1, imax = contour.size(); i < imax; i++)
-    {
-      zr_t p1 = contour[i]; sum += (p1.z - p0.z) * (p1.r + p0.r);
-      p0 = p1;
-    }
-    zr_t p1 = contour[0]; sum += (p1.z - p0.z) * (p1.r + p0.r);
-    return sum > 0;
-  };
-
-  if (isClockwise()) {
-    // std::ostringstream message;
-    // message << "Polygon is not in anti-clockwise order: " << GetName() << "\nReversing order...";
-    // G4Exception("BelleLathe::BelleLathe()", "BelleLathe", JustWarning, message);
-    std::reverse(contour.begin(), contour.end());
+  double sum = 0;
+  zr_t p0 = contour[0];
+  for (int i = 1, imax = contour.size(); i < imax; i++) {
+    zr_t p1 = contour[i];
+    sum += (p1.z - p0.z) * (p1.r + p0.r);
+    p0 = p1;
   }
+  zr_t p1 = contour[0];
+  sum += (p1.z - p0.z) * (p1.r + p0.r);
+
+  // If contour is Clockwise: reverse contour
+  if (sum > 0)
+    std::reverse(contour.begin(), contour.end());
+
   fcontour = contour;
 
   auto convexside = [this](cachezr_t& s, double eps) -> void {
@@ -380,7 +382,11 @@ inline int quadsolve(double a, double b, double c, double& t0, double& t1)
   return 0;
 }
 
-struct solution_t {double t, s;};
+/** solution struct */
+struct solution_t {
+  double t; /**< t */
+  double s; /**< s */
+};
 vector<solution_t> extremum(double A, double B, double C, double D, double E, double F)
 {
   // extremum of Fun(t,s) = A*t*t + B*t*s + C*s*s + D*t + E*s + F => dFun/ds = 0

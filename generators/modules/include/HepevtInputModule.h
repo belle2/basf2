@@ -8,14 +8,15 @@
 
 #pragma once
 
+/* Belle2 headers. */
 #include <framework/core/Module.h>
-
-#include <string>
-
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <generators/hepevt/HepevtReader.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <generators/hepevt/HepevtReader.h>
-#include <generators/utilities/InitialParticleGeneration.h>
+/* C++ headers. */
+#include <string>
 
 namespace Belle2 {
 
@@ -52,7 +53,6 @@ namespace Belle2 {
     HepevtReader m_hepevt;           /**< An instance of the HepEvt reader. */
     MCParticleGraph mpg;             /**< The MCParticle graph object. */
     bool m_useWeights;               /**< Parameter to switch on/off weight propagation */
-    bool m_boost2Lab;                /**< Parameter to switch on/off boost to LAB system */
     bool m_wrongSignPz;              /**< Parameter to signal that direction of LER and HER was switched*/
     bool m_makeMaster;               /**< Parameter to signal if the modul should act as master */
     int m_runNum;                    /**< The run number that should be used if the reader acts as master */
@@ -60,7 +60,8 @@ namespace Belle2 {
     int m_evtNum;                    /**< The event number is needed if the reader acts as master */
 
   private:
-    InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
+
+    StoreObjPtr<EventMetaData> m_eventMetaData; /**< Event meta data */
 
   };
 

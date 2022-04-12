@@ -1214,8 +1214,8 @@ c]]]]
       DOUBLE PRECISION   T3e,Qe
       DOUBLE PRECISION   T3f,Qf,m_MW,m_GammW,m_MW_true
       DOUBLE COMPLEX     PropW,Coef,Coef1,DelW
-      DOUBLE COMPLEX     RhoEW, VPgamma, CorEle, CorFin, CorEleFin, VVCef, CosThetD
-      DOUBLE PRECISION   Deno,  dummy,row,Dum1,Dum2,Dum3,Dum4,Dum5,Dum6
+      DOUBLE COMPLEX     RhoEW, VPgamma, CorEle, CorFin, CorEleFin, VVCef
+      DOUBLE PRECISION   Deno,  dummy,row,Dum1,Dum2,Dum3,Dum4,Dum5,Dum6, CosThetD
       DOUBLE COMPLEX     GSW(100)
       INTEGER icont
       DATA icont /0/

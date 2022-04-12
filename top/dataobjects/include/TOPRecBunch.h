@@ -91,6 +91,12 @@ namespace Belle2 {
     void setRevo9Counter(unsigned short revo9Counter) {m_revo9Counter = revo9Counter;}
 
     /**
+     * Sets chi2 value at minimum
+     * @param minChi2 value at minimum
+     */
+    void setMinChi2(double minChi2) {m_minChi2 = minChi2;}
+
+    /**
      * Add histogram
      * @param histo one dimensional histogram
      */
@@ -146,6 +152,12 @@ namespace Belle2 {
      * @return uncertainly
      */
     double getCurrentOffsetError() const {return m_currentOffsetError;}
+
+    /**
+     * Returns chi2 value at minimum
+     * @return chi2 at minimum
+     */
+    double getMinChi2() const {return m_minChi2;}
 
     /**
      * Returns average offset to reconstructed bunch
@@ -239,8 +251,9 @@ namespace Belle2 {
     bool m_simValid = false;  /**< status of sim */
 
     unsigned short m_revo9Counter = 0; /**< number of clock ticks since last revo9 flag */
+    float m_minChi2 = 0; /**< chi2 value at minimum */
 
-    ClassDef(TOPRecBunch, 3); /**< ClassDef */
+    ClassDef(TOPRecBunch, 4); /**< ClassDef */
 
   };
 

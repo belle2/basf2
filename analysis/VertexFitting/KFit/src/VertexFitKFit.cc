@@ -53,7 +53,7 @@ VertexFitKFit::setInitialVertex(const HepPoint3D& v) {
   return m_ErrorCode = KFitError::kNoError;
 }
 
-enum KFitError::ECode VertexFitKFit::setInitialVertex(const TVector3& v)
+enum KFitError::ECode VertexFitKFit::setInitialVertex(const B2Vector3D& v)
 {
   m_BeforeVertex = HepPoint3D(v.X(), v.Y(), v.Z());
   m_ErrorCode = KFitError::kNoError;
@@ -282,7 +282,7 @@ VertexFitKFit::doFit3() {
 
         HepMatrix tD = m_D.sub(2 * k + 1, 2 * (k + 1), KFitConst::kNumber6 * k + 1, KFitConst::kNumber6 * (k + 1)); // 2x6
         HepMatrix tV_D = ((m_V_al_0.sub(KFitConst::kNumber6 * k + 1,
-        (int)(KFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(err_inverse); // 2x2
+                                        (int)(KFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(err_inverse); // 2x2
         if (err_inverse) {
           m_ErrorCode = KFitError::kCannotGetMatrixInverse;
           KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
@@ -430,7 +430,7 @@ VertexFitKFit::doFit4() {
   m_v[2][0] = m_BeforeVertex.z();
 
   double tmp_each_chisq[KFitConst::kMaxTrackCount2];
-  double tmp_vertex_chisq = 1.e+30; // An init-value is not needed but the C++ complier requires the init-value.
+  double tmp_vertex_chisq = 1.e+30; // An init-value is not needed but the C++ compiler requires the init-value.
 
   // to avoid overestimation of vertex-z error.
   bool it_flag = false;
@@ -560,7 +560,7 @@ VertexFitKFit::doFit5() {
     for (int k = 0; k < m_TrackCount; k++) {
       HepMatrix tD = m_D.sub(2 * k + 1, 2 * (k + 1), KFitConst::kNumber6 * k + 1, KFitConst::kNumber6 * (k + 1)); // 2x6
       HepMatrix tV_D = ((m_V_al_0.sub(KFitConst::kNumber6 * k + 1,
-      (int)(KFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(err_inverse); // 2x2
+                                      (int)(KFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(err_inverse); // 2x2
       if (err_inverse) {
         m_ErrorCode = KFitError::kCannotGetMatrixInverse;
         KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
@@ -623,9 +623,9 @@ VertexFitKFit::prepareInputMatrix() {
       KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
       return m_ErrorCode;
     }
-  } else {
-    if (m_TrackCount > KFitConst::kMaxTrackCount)
-    {
+  } else
+  {
+    if (m_TrackCount > KFitConst::kMaxTrackCount) {
       m_ErrorCode = KFitError::kBadTrackSize;
       KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
       return m_ErrorCode;
@@ -719,17 +719,17 @@ VertexFitKFit::prepareOutputMatrix() {
     pdata.setMomentum(HepLorentzVector(h3v, sqrt(h3v.mag2() + pdata.getMass()*pdata.getMass())), KFitConst::kAfterFit);
     // position
     pdata.setPosition(HepPoint3D(
-      m_al_1[index * KFitConst::kNumber6 + 3][0],
-      m_al_1[index * KFitConst::kNumber6 + 4][0],
-      m_al_1[index * KFitConst::kNumber6 + 5][0]), KFitConst::kAfterFit);
+                        m_al_1[index * KFitConst::kNumber6 + 3][0],
+                        m_al_1[index * KFitConst::kNumber6 + 4][0],
+                        m_al_1[index * KFitConst::kNumber6 + 5][0]), KFitConst::kAfterFit);
     // error of the tracks
     pdata.setError(makeError1(pdata.getMomentum(),
-    m_V_al_1.sub(
-      index    * KFitConst::kNumber6 + 1,
-      (index + 1)*KFitConst::kNumber6,
-      index    * KFitConst::kNumber6 + 1,
-      (index + 1)*KFitConst::kNumber6)),
-    KFitConst::kAfterFit);
+                              m_V_al_1.sub(
+                                index    * KFitConst::kNumber6 + 1,
+                                (index + 1)*KFitConst::kNumber6,
+                                index    * KFitConst::kNumber6 + 1,
+                                (index + 1)*KFitConst::kNumber6)),
+                   KFitConst::kAfterFit);
     if (m_ErrorCode != KFitError::kNoError) break;
     index++;
   }
@@ -933,8 +933,8 @@ enum KFitError::ECode VertexFitKFit::updateMother(Particle* mother)
   }
 
   mother->updateMomentum(
-    CLHEPToROOT::getTLorentzVector(kmm.getMotherMomentum()),
-    CLHEPToROOT::getTVector3(kmm.getMotherPosition()),
+    CLHEPToROOT::getLorentzVector(kmm.getMotherMomentum()),
+    CLHEPToROOT::getXYZVector(kmm.getMotherPosition()),
     CLHEPToROOT::getTMatrixFSym(kmm.getMotherError()),
     prob);
   m_ErrorCode = KFitError::kNoError;

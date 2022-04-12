@@ -130,7 +130,7 @@ void ECLDigitizerModule::beginRun()
       Tct("ECLCrateTimeOffset"),
       Tmc("ECLMCTimeOffset"),
       Awave("ECL_FPGA_StoreWaveform");
-  double ns_per_tick = 1.0 / (4.0 * ec.m_rf) * 1e3;// ~0.49126819903043308239 ns/tick
+  double ns_per_tick = 1.0 / (4.0 * ec.getRF()) * 1e3;// ~0.49126819903043308239 ns/tick
 
   calibration_t def = {1, 0};
   m_calib.assign(8736, def);
@@ -237,8 +237,8 @@ void ECLDigitizerModule::shapeSignals()
   const EclConfiguration& ec = EclConfiguration::get();
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
 
-  const double trgtick = ec.s_clock / ec.m_rf / ec.m_ntrg;   // trigger tick
-  const double tscale = 2 * trgtick, toff = ec.s_clock / (2 * ec.m_rf);
+  const double trgtick = ec.s_clock / ec.getRF() / ec.m_ntrg;   // trigger tick
+  const double tscale = 2 * trgtick, toff = ec.s_clock / (2 * ec.getRF());
 
   // clear the storage for the event
   memset(m_adc.data(), 0, m_adc.size()*sizeof(adccounts_t));
@@ -721,7 +721,7 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
   int_array_24x16_t&  ref_fg41 = p.fg41;
   int_array_24x16_t&  ref_fg43 = p.fg43;
 
-  ShaperDSP_t dsp(MP);
+  ShaperDSP_t dsp(MP, 27.7221);
   dsp.settimestride(ec.m_step);
   dsp.setseedoffset(ec.m_step / ec.m_ndt);
   dsp.settimeseed(-(ec.m_step - (ec.m_step / ec.m_ndt)));

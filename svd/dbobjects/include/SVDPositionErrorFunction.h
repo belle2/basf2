@@ -54,44 +54,41 @@ namespace Belle2 {
 
     //SETTERS FOR function ID = 0 (v0, CoGOnly)
     /** set the a1 cluster size dependent parameters*/
-    void set_a1(double* a1, int maxSize)
+    void set_a1(double a1_1, double a1_2, double a1_3, double a1_4, double a1_5)
     {
-      if (maxSize != maxClusterSize)
-        B2ERROR("please provide the parameters for exactly a max cluster size = " << maxClusterSize <<
-                ", i.e. >= " << maxClusterSize << "share the same parameters");
-      else
-        for (int i = 0; i < maxClusterSize; i++)
-          m_a1[i] = a1[i];
+      m_a1[0] = a1_1;
+      m_a1[1] = a1_2;
+      m_a1[2] = a1_3;
+      m_a1[3] = a1_4;
+      m_a1[4] = a1_5;
     }
     /** set the a2 cluster size dependent parameters*/
-    void set_a2(double* a2, int maxSize)
+    void set_a2(double a2_1, double a2_2, double a2_3, double a2_4, double a2_5)
     {
-      if (maxSize != maxClusterSize)
-        B2ERROR("please provide the parameters for exactly a max cluster size = " << maxClusterSize <<
-                ", i.e. >= " << maxClusterSize << "share the same parameters");
-      else
-        for (int i = 0; i < maxClusterSize; i++)
-          m_a2[i] = a2[i];
+      m_a2[0] = a2_1;
+      m_a2[1] = a2_2;
+      m_a2[2] = a2_3;
+      m_a2[3] = a2_4;
+      m_a2[4] = a2_5;
     }
     /** set the b1 cluster size dependent parameters*/
-    void set_b1(double* b1, int maxSize)
+    void set_b1(double b1_1, double b1_2, double b1_3, double b1_4, double b1_5)
     {
-      if (maxSize != maxClusterSize)
-        B2ERROR("please provide the parameters for exactly a max cluster size = " << maxClusterSize <<
-                ", i.e. >= " << maxClusterSize << "share the same parameters");
-      else
-        for (int i = 0; i < maxClusterSize; i++)
-          m_b1[i] = b1[i];
+      m_b1[0] = b1_1;
+      m_b1[1] = b1_2;
+      m_b1[2] = b1_3;
+      m_b1[3] = b1_4;
+      m_b1[4] = b1_5;
     }
+
     /** set the c1 cluster size dependent parameters*/
-    void set_c1(double* c1, int maxSize)
+    void set_c1(double c1_1, double c1_2, double c1_3, double c1_4, double c1_5)
     {
-      if (maxSize != maxClusterSize)
-        B2ERROR("please provide the parameters for exactly a max cluster size = " << maxClusterSize <<
-                ", i.e. >= " << maxClusterSize << "share the same parameters");
-      else
-        for (int i = 0; i < maxClusterSize; i++)
-          m_c1[i] = c1[i];
+      m_c1[0] = c1_1;
+      m_c1[1] = c1_2;
+      m_c1[2] = c1_3;
+      m_c1[3] = c1_4;
+      m_c1[4] = c1_5;
     }
 
 

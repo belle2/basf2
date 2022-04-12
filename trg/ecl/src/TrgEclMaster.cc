@@ -50,7 +50,11 @@
 //                   |      1 |  85 downto 84 | event timing quality flag
 //                   |      1 |         86    | 3D Bhabha Veto Intrk
 //                   |      1 |  88 downto 87 | 3D Bhabha selection theta flag
-//                   |      1 |         89    | ecltaub2b for 1x1 tau process (110<delta phi(CM)<250, 130<Thata Sum(CM)<230, Etot1to17(Lab)<7GeV, E(1CL)(Lab)<1.9GeV)
+//                   |      1 |         89    | [ecltaub2b] for 1x1 tau process : (110<delta phi(CM)<250, 130<Thata Sum(CM)<230, Etot1to17(Lab)<7GeV, E(1CL)(Lab)<1.9GeV)
+//                   |      1 |         90    | [hie1] hie && 1CL veto(not (N(CL)=1 && CL in FW)) && 2CL veto-1(not (N(CL)=2 && 160 < dphi < 200 && 150 < sum theta < 250))
+//                   |      1 |         91    | [hie2] hie && 1CL veto(not (N(CL)=1 && CL in FW)) && 2CL veto-2(not (N(CL)=2 && 160 < dphi < 200 || 150 < sum theta < 250))
+//                   |      1 |         92    | [hie3] hie && 1CL veto(not (N(CL)=1 && CL in FW)) && 2CL veto-3(not (N(CL)=2 && CL_lowe in FW or BW)
+//                   |      1 |         93    | [ecltaub2b v2] for 1x1 tau process : (120<delta phi(CM)<240, 140<Thata Sum(CM)<220, Etot1to17(Lab)<7GeV, N(CL) in endcap with E(CL)(3GeV) , E(CL)>0.165 for N(CL)==2, 1CL E(CL)>0.14 and 2CL E(CL)>0.165 for N(CL)==3,  2CL E(CL)>0.14 and 2CL E(CL)>0.165 for N(CL)==4,  1CL E(CL)>0.12 and 2CL E(CL)>0.14 and 2CL E(CL)>0.165 for N(CL)>4
 // ---------------------------------------------------------------------------------
 
 #define TRG_SHORT_NAMES
@@ -75,69 +79,23 @@ using namespace Belle2;
 //
 TrgEclMaster::TrgEclMaster():
   TimeWindow(250.0), OverlapWindow(0.0), _Clustering(1), _Bhabha(0),
-  _EventTiming(1), _NofTopTC(3), _ClusterLimit(6), _Lowmultibit(0),
-  _PrescaleFactor(0), _PrescaleCounter(0), _mumuThreshold(20),
-  _n300MeVCluster(1), _ECLBurstThreshold(200)
+  _EventTiming(1), _NofTopTC(3), _ClusterLimit(6), _Triggerbit{0, 0, 0, 0},
+  _Lowmultibit(0), _PrescaleFactor(0), _PrescaleCounter(0), _mumuThreshold(20),
+  m_taub2bEtotCut(7.0),
+  m_taub2bClusterECut1(1.9),
+  m_taub2bClusterECut2(999),
+  m_taub2b2EtotCut(7.0),
+  m_taub2b2CLEEndcapCut(3.0),
+  m_taub2b2CLECut(0.162),
+  _n300MeVCluster(1),
+  _ECLBurstThreshold(200)
 {
 
-  TCEnergy.clear();
-  TCTiming.clear();
-  TCBeamBkgTag.clear();
-  HitTCId.clear();
-  TCHitEnergy.clear();
-  TCHitTiming.clear();
-  TCHitBeamBkgTag.clear();
-
-
-  TCEnergy.resize(576);
-  TCTiming.resize(576);
-  TCBeamBkgTag.resize(576);
-
-  _Triggerbit[0] = 0;
-  _Triggerbit[1] = 0;
-  _Triggerbit[2] = 0;
-  _Triggerbit[3] = 0;
-
-
-  _2DBhabhaThresholdFWD.clear();
-  _2DBhabhaThresholdBWD.clear();
-  _3DBhabhaSelectionThreshold.clear();
-  _3DBhabhaVetoThreshold.clear();
-  _3DBhabhaSelectionAngle.clear();
-  _3DBhabhaVetoAngle.clear();
-  _mumuAngle.clear();
-  m_taub2bAngleCut.clear();
-
-  _TotalEnergy.clear();
-  _LowMultiThreshold.clear();
-
-  _TotalEnergy = {5, 10, 30}; // /100 MeV
-  _2DBhabhaThresholdFWD  = {40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 30, 35}; // /100 MeV
-  _2DBhabhaThresholdBWD  = {25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 30, 30}; // /100 MeV
-  _3DBhabhaVetoThreshold = {30, 45}; //  /100 MeV
-  _3DBhabhaSelectionThreshold = {20, 40}; //  /100 MeV
-  _3DBhabhaVetoAngle = {160, 200, 165, 190}; //  /100 MeV
-  _3DBhabhaSelectionAngle = {140, 220, 160, 200}; //  /100 MeV
-  _mumuAngle = {160, 200, 165, 190}; //  degree
-  _LowMultiThreshold = {10, 20, 25, 30}; // degree
-
-  m_3DBhabhaVetoInTrackThetaRegion = {3, 15};
-  m_EventTimingQualityThresholds = {5, 6}; // GeV
-
-  m_taub2bAngleCut = {110, 250, 130, 230}; // degree
-  m_taub2bEtotCut = 7; // GeV
-  m_taub2bClusterECut1 = 1.9; // GeV
-  m_taub2bClusterECut2 = 999; // GeV
-
-  //ThetaRingSum.resize(3,std::vector<double>(36,0));
-  //PhiRingSum.resize(17,0);
-
-  //  obf_timing = new TrgEclTiming();
-  obj_cluster = new TrgEclCluster();
-  obj_beambkg = new TrgEclBeamBKG();
-  obj_bhabha = new TrgEclBhabha();
-  obj_timing = new TrgEclTiming();
-  obj_map = new TrgEclMapping();
+  obj_cluster  = new TrgEclCluster();
+  obj_beambkg  = new TrgEclBeamBKG();
+  obj_bhabha   = new TrgEclBhabha();
+  obj_timing   = new TrgEclTiming();
+  obj_map      = new TrgEclMapping();
   obj_database = new TrgEclDataBase();
 }
 //
@@ -173,22 +131,47 @@ TrgEclMaster::version(void) const
 void
 TrgEclMaster::initialize(int)
 {
-}
-//
-//
-//
-TrgEclMaster* TrgEclMaster::_ecl = 0;
-//
-//
-//
-TrgEclMaster*
-TrgEclMaster::getTrgEclMaster(void)
-{
+  TCEnergy.clear();
+  TCTiming.clear();
+  TCBeamBkgTag.clear();
+  HitTCId.clear();
+  TCHitEnergy.clear();
+  TCHitTiming.clear();
+  TCHitBeamBkgTag.clear();
 
-  if (_ecl) { delete _ecl; }
-  _ecl = new TrgEclMaster();
+  TCEnergy.resize(576);
+  TCTiming.resize(576);
+  TCBeamBkgTag.resize(576);
 
-  return _ecl;
+  _TotalEnergy = {5, 10, 30}; // /100 MeV
+  _2DBhabhaThresholdFWD  =
+  {40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 30, 35}; // /100 MeV
+  _2DBhabhaThresholdBWD  =
+  {25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 30, 30}; // /100 MeV
+  _3DBhabhaVetoThreshold = {30, 45}; //  /100 MeV
+  _3DBhabhaSelectionThreshold = {20, 40}; //  /100 MeV
+  _3DBhabhaVetoAngle      = {160, 200, 165, 190}; //  /100 MeV
+  _3DBhabhaSelectionAngle = {140, 220, 160, 200}; //  /100 MeV
+  _mumuAngle              = {160, 200, 165, 190}; //  degree
+  m_3DBhabhaAddAngleCut   = {150, 210, 160, 200};  //  degree
+  _LowMultiThreshold      = {10, 20, 25, 30}; // degree
+
+  m_3DBhabhaVetoInTrackThetaRegion = {3, 15};
+  m_EventTimingQualityThresholds = {5, 6}; // GeV
+  _ECLBurstThreshold = 200; // 10 ADC
+
+  // taub2b cut
+  m_taub2bAngleCut = {110, 250, 130, 230}; // degree
+  m_taub2bEtotCut = 7.0; // GeV
+  m_taub2bClusterECut1 = 1.9; // GeV
+  m_taub2bClusterECut2 = 999; // GeV
+
+  // taub2b2 cut
+  m_taub2b2AngleCut = {120, 240, 140, 220}; // degree
+  m_taub2b2EtotCut = 7.0; // GeV
+  m_taub2b2CLEEndcapCut = 3.0; // GeV
+  m_taub2b2CLECut = 0.162; // GeV
+
 }
 //========================================================
 //
@@ -315,7 +298,7 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
       E_total += phiringsum[iii];
     }
     if (E_total == 0) {continue;}
-    int ELow, EHigh, ELum;
+    int ELow = 0, EHigh = 0, ELum = 0;
 
     if (E_total > _ECLBurstThreshold / 10) {
       E_burst = 0x01;
@@ -379,10 +362,15 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     obj_bhabha->set3DBhabhaVetoAngle(_3DBhabhaVetoAngle);
     obj_bhabha->setmumuThreshold(_mumuThreshold);
     obj_bhabha->setmumuAngle(_mumuAngle);
+    obj_bhabha->set3DBhabhaAddAngleCut(m_3DBhabhaAddAngleCut);
     obj_bhabha->setTaub2bAngleCut(m_taub2bAngleCut);
     obj_bhabha->setTaub2bEtotCut(m_taub2bEtotCut);
     obj_bhabha->setTaub2bClusterECut(m_taub2bClusterECut1,
                                      m_taub2bClusterECut2);
+    obj_bhabha->setTaub2b2Cut(m_taub2b2AngleCut,
+                              m_taub2b2EtotCut,
+                              m_taub2b2CLEEndcapCut,
+                              m_taub2b2CLECut);
 
     std::vector<double> vct_bhabha;
     vct_bhabha.clear();
@@ -393,6 +381,7 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     int bhabha3DVetoInTrackFlag = 0;
     int bhabha3DSelectionThetaFlag = 0;
     int taub2bFlag = 0;
+    int taub2b2Flag = 0;
 
     bool b_2Dbhabha = obj_bhabha->GetBhabha00(phiringsum);
     vct_bhabha = obj_bhabha->GetBhabhaComb();
@@ -405,7 +394,8 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     if (b_mumu) {mumu = 1;}
     bhabha3DVetoInTrackFlag = obj_bhabha->get3DBhabhaVetoInTrackFlag();
     bhabha3DSelectionThetaFlag = obj_bhabha->get3DBhabhaSelectionThetaFlag();
-    taub2bFlag = obj_bhabha->GetTaub2b(E_total);
+    taub2bFlag  = (obj_bhabha->GetTaub2b(E_total)) ? 1 : 0;
+    taub2b2Flag = (obj_bhabha->GetTaub2b2(E_total)) ? 1 : 0;
     //------------------------
     // Beam Background veto (Old cosmic veto)
     //------------------------
@@ -448,7 +438,7 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
                    EventTimingQualityFlag,
                    bhabha3DVetoInTrackFlag,
                    bhabha3DSelectionThetaFlag,
-                   taub2bFlag);
+                   taub2bFlag, 0, taub2b2Flag);
 
     int m_hitEneNum = 0;
     StoreArray<TRGECLTrg> trgEcltrgArray;
@@ -623,6 +613,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   TCHitTiming.clear();
   TCHitEnergy.clear();
   TCHitBeamBkgTag.clear();
+
   // prepare TC Hit in time window --
   for (int iTCId = 0; iTCId < 576; iTCId++) {
     const int hitsize =  TCTiming[iTCId].size();
@@ -676,8 +667,9 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     //if (iii > 14) {E_bwd += phiringsum[iii];} //TODO not used, should be?
     E_total += phiringsum[iii];
   }
+
   if (E_total == 0) {return;}
-  int ELow, EHigh, ELum;
+  int ELow = 0, EHigh = 0, ELum = 0;
   if (E_total > _ECLBurstThreshold) {
     E_burst = 0x01;
   }
@@ -714,13 +706,16 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   std::vector<double> ClusterTiming;
   std::vector<double> ClusterEnergy;
   std::vector<int> MaxTCId;
+  std::vector<int> MaxThetaId;
   ClusterTiming.clear();
   ClusterEnergy.clear();
   MaxTCId.clear();
+  MaxThetaId.clear();
   StoreArray<TRGECLCluster> trgeclClusterArray;
   for (int ii = 0; ii < trgeclClusterArray.getEntries(); ii++) {
     TRGECLCluster* aTRGECLCluster = trgeclClusterArray[ii];
     int maxTCId    = aTRGECLCluster->getMaxTCId();
+    int maxThetaId = aTRGECLCluster->getMaxThetaId();
     double clusterenergy  = aTRGECLCluster->getEnergyDep();
     double clustertiming  =  aTRGECLCluster->getTimeAve();
     TVector3 clusterposition(aTRGECLCluster->getPositionX(),
@@ -729,6 +724,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     ClusterTiming.push_back(clustertiming);
     ClusterEnergy.push_back(clusterenergy);
     MaxTCId.push_back(maxTCId);
+    MaxThetaId.push_back(maxThetaId);
   }
   //    int NofCluster =  obj_cluster->getNofCluster();
   makeLowMultiTriggerBit(MaxTCId, ClusterEnergy);
@@ -743,11 +739,16 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   obj_bhabha->set3DBhabhaVetoAngle(_3DBhabhaVetoAngle);
   obj_bhabha->setmumuThreshold(_mumuThreshold);
   obj_bhabha->setmumuAngle(_mumuAngle);
+  obj_bhabha->set3DBhabhaAddAngleCut(m_3DBhabhaAddAngleCut);
   obj_bhabha->set3DBhabhaVetoInTrackThetaRegion(m_3DBhabhaVetoInTrackThetaRegion);
   obj_bhabha->setTaub2bAngleCut(m_taub2bAngleCut);
   obj_bhabha->setTaub2bEtotCut(m_taub2bEtotCut);
   obj_bhabha->setTaub2bClusterECut(m_taub2bClusterECut1,
                                    m_taub2bClusterECut2);
+  obj_bhabha->setTaub2b2Cut(m_taub2b2AngleCut,
+                            m_taub2b2EtotCut,
+                            m_taub2b2CLEEndcapCut,
+                            m_taub2b2CLECut);
 
   std::vector<double> vct_bhabha;
   vct_bhabha.clear();
@@ -758,6 +759,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   int bhabha3DVetoInTrackFlag = -1;
   int bhabha3DSelectionThetaFlag = -1;
   int taub2bFlag = 0;
+  int taub2b2Flag = 0;
 
   bool b_2Dbhabha = obj_bhabha->GetBhabha00(phiringsum);
   vct_bhabha = obj_bhabha->GetBhabhaComb();
@@ -777,13 +779,26 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   }
   bhabha3DVetoInTrackFlag    = obj_bhabha->get3DBhabhaVetoInTrackFlag();
   bhabha3DSelectionThetaFlag = obj_bhabha->get3DBhabhaSelectionThetaFlag();
-  taub2bFlag = (obj_bhabha->GetTaub2b(E_total)) ? 1 : 0;
+  taub2bFlag  = (obj_bhabha->GetTaub2b(E_total)) ? 1 : 0;
+  taub2b2Flag = (obj_bhabha->GetTaub2b2(E_total)) ? 1 : 0;
   //------------------------
-  // Beam Background veto
+  // additional Bhabha veto
+  //------------------------
+  int bhabha_addition = obj_bhabha->GetBhabhaAddition();
+  //------------------------
+  // hie with additional Bhabha veto
   //------------------------
   int beambkgtag = 0;
   beambkgtag = obj_beambkg->GetBeamBkg(thetaringsum);
 
+  int bit_hie_bhav = 0;
+  if (E_phys > 1.0) {
+    bit_hie_bhav |= (~bhabha_addition & 0x01) & (~bhabha_addition >> 3 & 0x01);
+    bit_hie_bhav <<= 1;
+    bit_hie_bhav |= (~bhabha_addition & 0x01) & (~bhabha_addition >> 2 & 0x01);
+    bit_hie_bhav <<= 1;
+    bit_hie_bhav |= (~bhabha_addition & 0x01) & (~bhabha_addition >> 1 & 0x01);
+  }
   //-------------
   // Make ECL  Trigger Bit
   //-------------
@@ -792,6 +807,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   int RevoFAM = 0;
   int TimingSource = obj_timing->GetTimingSource(); //  FWD(0), Barrel(0), Backward(0);
   int etot = (int)(E_phys * 1000 + 0.5); // total Energy in theta ID [2~15]
+
   //int bhabha2D = BtoBTag ;
   int physics = 0;
   if ((etot > 1000 || icn > 3) && !(bhabha2D == 1)) {physics = 1;}
@@ -814,7 +830,10 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
                  EventTimingQualityFlag,
                  bhabha3DVetoInTrackFlag,
                  bhabha3DSelectionThetaFlag,
-                 taub2bFlag);
+                 taub2bFlag,
+                 bit_hie_bhav,
+                 taub2b2Flag);
+
   //----------------------------------------------------
   // ECL trigger
   //----------------------------------------------------
@@ -1071,7 +1090,9 @@ TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSource,
                              int bhabha3D_sel, int mumubit, int prescale, int burst,
                              int EventTimingQualityFlag, int bhabha3DVetoInTrackFlag,
                              int bhabha3DSelectionThetaFlag,
-                             int taub2bFlag)
+                             int taub2bFlag,
+                             int bit_hie_bhav,
+                             int taub2b2Flag)
 {
 
   _Triggerbit[0] = 0;
@@ -1140,7 +1161,12 @@ TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSource,
     bit_bhabha3dselectionthetaflag = bhabha3DSelectionThetaFlag & 0x03;
   }
   int bit_taub2bflag = taub2bFlag & 0x01;
+  int bit_taub2b2flag = taub2b2Flag & 0x01;
 
+  _Triggerbit[2] |= bit_taub2b2flag;
+  _Triggerbit[2] <<= 3;
+  _Triggerbit[2] |= bit_hie_bhav;
+  _Triggerbit[2] <<= 1;
   _Triggerbit[2] |= bit_taub2bflag;
   _Triggerbit[2] <<= 2;
   _Triggerbit[2] |= bit_bhabha3dselectionthetaflag;

@@ -68,7 +68,7 @@ if __name__ == "__main__":
     path = b2.create_path()
 
     # Add input data and ParticleLoader modules to the path.
-    ma.inputMdstList("default", filelist=[b2.find_file("mdst14.root", "validation")], path=path)
+    ma.inputMdstList(filelist=[b2.find_file("mdst14.root", "validation")], path=path)
 
     # Fill a particle list of charged stable particles.
     # Apply (optionally) some quality selection.

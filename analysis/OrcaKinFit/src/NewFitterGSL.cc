@@ -64,7 +64,7 @@ namespace Belle2 {
         permW(nullptr), eigenws(nullptr), eigenwsdim(0),
         chi2best(0), chi2new(0), chi2old(0), fvalbest(0),
         scale(0), scalebest(0), stepsize(0), stepbest(0),
-        scalevals{0}, fvals{0} ,
+        scalevals{0}, fvals{0},
         imerit(1),
         try2ndOrderCorr(true),
         debug(debuglevel)
@@ -599,7 +599,7 @@ namespace Belle2 {
       }
 
       // Second, all terms d^2 chi^2/dlambda dx,
-      // i.e. the first derivatives of the contraints,
+      // i.e. the first derivatives of the constraints,
       // plus the second derivatives times the lambda values
       for (auto c : constraints) {
         assert(c);
@@ -786,7 +786,7 @@ namespace Belle2 {
 
       gsl_matrix_set_zero(MatM);
 
-      // The first derivatives of the contraints,
+      // The first derivatives of the constraints,
       for (auto c : constraints) {
         assert(c);
         int kglobal = c->getGlobalNum();
@@ -1017,7 +1017,7 @@ namespace Belle2 {
             debug_print(xnew, "xnew");
           }
           if (phi2ndOrder <= phi0 + eta * alpha * dphi0) {
-            B2DEBUG(12, "  -> 2nd order correction successfull!");
+            B2DEBUG(12, "  -> 2nd order correction successful!");
             return 1;
           }
           B2DEBUG(12, "  -> 2nd order correction failed, do linesearch!");
@@ -1124,9 +1124,8 @@ namespace Belle2 {
           continue;
         }
 
-        if (imode == 0) {       // Armijo
-          break;
-        } else if (imode == 1) { // Wolfe
+        // imode == 0 (Armijo) asserted above
+        if (imode == 1) { // Wolfe
           dphi = meritFunctionDeriv(mu, vecxnew, vece, vecdx, vecw);
           if (dphi < zeta * dphi0) {
             B2DEBUG(15, "NewFitterGSL::doLineSearch, Wolfe: dphi=" << dphi

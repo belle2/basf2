@@ -19,12 +19,25 @@ namespace Belle2 {
   /** Module turning SpacePointsTrackCands to RecoTracks. */
   class SPTC2RTConverterModule : public Module {
   public:
+
+    /**
+     * Constructor.
+     */
     SPTC2RTConverterModule();
 
+    /**
+     * Initializer.
+     */
     void initialize() override;
 
+    /**
+     * This method is called for each event.
+     */
     void event() override;
 
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate() override;
 
 

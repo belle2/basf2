@@ -48,7 +48,21 @@ then use it:
 
 .. autofunction:: svd.skim_utils.skimFineTRGEventsPyModule
 
-.. autofunction:: svd.skim_utils.skimLowEventT0EventsPyModule
+.. autofunction:: svd.skim_utils.skimLowHighEventT0EventsPyModule
+
+example:
+
+.. code::
+
+   # select events with |EventT0| < maxAbsEvtT0 and |EventT0| > minAbsEvtT0
+   maxAbsEvtT0 = 25 # in ns
+   minAbsEvtT0 = -1 # in ns
+   skim = b2.register_module(skimLowHighEventT0EventsPyModule())
+   skim.set_maxAbsEventT0( maxAbsEvtT0 )
+   skim.set_minAbsEventT0( minAbsEvtT0 )
+   main.add_module(skim)
+   emptypath = b2.create_path()
+   skim.if_false(emptypath)
 
 calibration validation utils
 ----------------------------

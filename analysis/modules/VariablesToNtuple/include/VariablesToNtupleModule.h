@@ -67,10 +67,12 @@ namespace Belle2 {
     int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     int m_candidate{ -1};            /**< candidate counter */
     unsigned int m_ncandidates{0};   /**< total n candidates */
-    /** Variable branch addresses */
-    std::vector<double> m_branchAddresses;
-    /** List of function pointers corresponding to given variables. */
-    std::vector<Variable::Manager::FunctionPtr> m_functions;
+    /** Branch addresses of variables of type double */
+    std::vector<double> m_branchAddressesDouble;
+    /** Branch addresses of variables of type int (or bool) */
+    std::vector<int> m_branchAddressesInt;
+    /** List of pairs of function pointers and respective data type corresponding to given variables. */
+    std::vector<std::pair<Variable::Manager::FunctionPtr, Variable::Manager::VariableDataType>> m_functions;
 
     /** Tuple of variable name and a map of integer values and inverse sampling rate. E.g. (signal, {1: 0, 0:10}) selects all signal candidates and every 10th background candidate. */
     std::tuple<std::string, std::map<int, unsigned int>> m_sampling;

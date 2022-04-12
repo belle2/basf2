@@ -32,14 +32,13 @@
 #                                                                        #
 ##########################################################################
 
-import root_pandas
-import decayHash
+import uproot
 import basf2 as b2
 from decayHash import DecayHashMap
 import sys
 
 # read in root-file as a pandas dataframe
-data = root_pandas.read_root(b2.find_file('Jpsi_from_B2A502.root', 'examples', False))
+data = uproot.open(b2.find_file('Jpsi_from_B2A502.root', 'examples', False))["variables"].arrays(library="pd")
 hashmap = DecayHashMap(b2.find_file('hashmap_Jpsi_from_B2A502.root', 'examples', False), removeRadiativeGammaFlag=False)
 hashmap2 = DecayHashMap(b2.find_file('hashmap_Jpsi_from_B2A502.root', 'examples', False), removeRadiativeGammaFlag=True)
 
@@ -62,8 +61,9 @@ org2 = hashmap2.get_original_decay(*candidate42)
 print(org2.to_string())
 
 # search for a specific decay (sub-decay)
+import ROOT  # noqa
 print("Search for decay:")
-search_decay = decayHash.Belle2.DecayTree('511 (-> 130 (-> -11 11 22) 443)')
+search_decay = ROOT.Belle2.DecayTree('511 (-> 130 (-> -11 11 22) 443)')
 print(search_decay.to_string())
 found = hashmap.get_original_decay(data.iloc[42]["extraInfo__boDecayHash__bc"],
                                    data.iloc[42]["extraInfo__boDecayHashExtended__bc"]).find_decay(search_decay)

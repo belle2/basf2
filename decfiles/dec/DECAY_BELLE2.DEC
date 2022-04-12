@@ -1,5 +1,4 @@
 # BelleII collaboration generic DECAY.DEC
-# BelleII collaboration generic DECAY.DEC
 # Based on EvtGen DECAY.DEC and Belle DECAY.DEC
 #
 # Changes
@@ -81,9 +80,14 @@
 # June 2021, U. Tamponi (tamponi@to.infn.it)
 #   Updated all the narrow bottomonia (M < Y(4S))
 #
-#
 # June 2021 Automated: Converted PYTHIA ids
 #   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
+#
+# December 2021, V. Bertacchi (bertacchi@cppm.in2p3.fr)
+#   fixed a_1+ and a_10 BR decay table to restore isospin simmetry and reimplement the resonant contribution (KK*)
+#   rescaled B->DKK* BR to take into account of resonant contribution B->D(a1->KK*), preserving the BR(NR+Res)= Belle measurement (https://doi.org/10.1016/S0370-2693(02)02373-0)
+#   https://stash.desy.de/projects/B2/repos/basf2/pull-requests/581/overview
+
 
 Define qoverp_incohMix_B_s0 1.0
 Define dm_incohMix_B_s0 17.8e12
@@ -737,8 +741,8 @@ Decay B0
 0.003547860   D_s1+  D-                                    SVS;  #[BF update - PG 09/2020]
 0.009282570   D*-  D_s1+                                   SVV_HELAMP 0.4904 0. 0.7204 0. 0.4904 0.0; #[BF update - PG 09/2020]
 
-0.000880000   D-  K+  anti-K*0                             PHSP;
-0.001290000   D*-  K+  anti-K*0                            PHSP;
+0.000580000   D-  K+  anti-K*0                             PHSP; #[BF update - VB 12/2021, subtracted resonant D- a_1+ component, BR(R+NR)=0.00088]
+0.000640292   D*-  K+  anti-K*0                            PHSP; #[BF update - VB 12/2021, subtracted resonant D*- a_1+ component, BR(R+NR)=0.00129]
 0.000300000   D*-  K0  pi+                                 PHSP;
 0.000300000   D*+  K0  pi-                                 PHSP;
 0.000490000   D-  K0  pi+                                  PHSP;
@@ -2067,31 +2071,31 @@ Decay B0
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
 # Lam_c X  / Sigma_c X   4.0 %
-0.00987248    anti-cd_0  ud_0                              PYTHIA 63;
-0.01974506    anti-cd_1  ud_1                              PYTHIA 63;
+0.00989348    anti-cd_0  ud_0                              PYTHIA 63;
+0.01978706    anti-cd_1  ud_1                              PYTHIA 63;
 
 # Xi_c X      2.5%
-0.00269252    anti-cs_0  ud_0                              PYTHIA 63;
-0.00538503    anti-cs_1  ud_1                              PYTHIA 63;
+0.00269825    anti-cs_0  ud_0                              PYTHIA 63;
+0.00539648    anti-cs_1  ud_1                              PYTHIA 63;
 
-0.24219051    u  anti-d  anti-c  d                         PYTHIA 23;
-0.04128504    u  anti-d  anti-c  d                         PYTHIA 43;
-0.01884754    u  anti-s  anti-c  d                         PYTHIA 43;
-0.01615504    u  anti-c  anti-d  d                         PYTHIA 23;
-0.00080774    u  anti-c  anti-s  d                         PYTHIA 23;
+0.24270569    u  anti-d  anti-c  d                         PYTHIA 23;
+0.04137286    u  anti-d  anti-c  d                         PYTHIA 43;
+0.01888763    u  anti-s  anti-c  d                         PYTHIA 43;
+0.01618940    u  anti-c  anti-d  d                         PYTHIA 23;
+0.00080946    u  anti-c  anti-s  d                         PYTHIA 23;
 # Try to crank up the psi production (Lange).
-0.06641505    c  anti-s  anti-c  d                         PYTHIA 43;
-0.00538503    c  anti-d  anti-c  d                         PYTHIA 43;
-0.00269252    u  anti-d  anti-u  d                         PYTHIA 23;
-0.00359003    c  anti-s  anti-u  d                         PYTHIA 23;
+0.06655633    c  anti-s  anti-c  d                         PYTHIA 43;
+0.00539648    c  anti-d  anti-c  d                         PYTHIA 43;
+0.00269825    u  anti-d  anti-u  d                         PYTHIA 23;
+0.00359767    c  anti-s  anti-u  d                         PYTHIA 23;
 # This and similar a few lines above have been divided by two to solve a double-counting problem for this channel (JGS 11/5/02).
-0.00183985    u  anti-u  anti-d  d                         PYTHIA 23;
-0.00006284    d  anti-d  anti-d  d                         PYTHIA 23;
-0.00008077    s  anti-s  anti-d  d                         PYTHIA 23;
-0.00197446    u  anti-u  anti-s  d                         PYTHIA 23;
-0.00161547    d  anti-d  anti-s  d                         PYTHIA 23;
-0.00134626    s  anti-s  anti-s  d                         PYTHIA 23;
-0.00448752    anti-s  d                                    PYTHIA 91;
+0.00184376    u  anti-u  anti-d  d                         PYTHIA 23;
+0.00006297    d  anti-d  anti-d  d                         PYTHIA 23;
+0.00008094    s  anti-s  anti-d  d                         PYTHIA 23;
+0.00197866    u  anti-u  anti-s  d                         PYTHIA 23;
+0.00161891    d  anti-d  anti-s  d                         PYTHIA 23;
+0.00134912    s  anti-s  anti-s  d                         PYTHIA 23;
+0.00449707    anti-s  d                                    PYTHIA 91;
 
 Enddecay
 
@@ -2495,8 +2499,8 @@ Decay anti-B0
 0.003547860   D_s1-  D+                                    SVS;  #[BF update - PG 09/2020]
 0.009282570   D*+  D_s1-                                   SVV_HELAMP 0.4904 0. 0.7204 0. 0.4904 0.0; #[BF update - PG 09/2020]
 
-0.000880000   D+  K-  K*0                                  PHSP;
-0.001290000   D*+  K-  K*0                                 PHSP;
+0.000580000   D+  K-  K*0                                  PHSP; #[BF update - VB 12/2021, subtracted resonant D+ a_1- component, BR(R+NR)=0.00088]
+0.000640292   D*+  K-  K*0                                 PHSP; #[BF update - VB 12/2021, subtracted resonant D*+ a_1- component, BR(R+NR)=0.00129]
 0.000300000   D*+  K0  pi-                                 PHSP;
 0.000300000   D*-  K0  pi+                                 PHSP;
 0.000490000   D+  anti-K0  pi-                             PHSP;
@@ -3825,31 +3829,31 @@ Decay anti-B0
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
 # Lam_c X  / Sigma_c X   4.0 %
-0.00987248    cd_0  anti-ud_0                              PYTHIA 63;
-0.01974506    cd_1  anti-ud_1                              PYTHIA 63;
+0.00989348    cd_0  anti-ud_0                              PYTHIA 63;
+0.01978706    cd_1  anti-ud_1                              PYTHIA 63;
 
 # Xi_c X      2.5%
-0.00269252    cs_0  anti-ud_0                              PYTHIA 63;
-0.00538503    cs_1  anti-ud_1                              PYTHIA 63;
+0.00269825    cs_0  anti-ud_0                              PYTHIA 63;
+0.00539648    cs_1  anti-ud_1                              PYTHIA 63;
 
-0.24219051    anti-u  d  c  anti-d                         PYTHIA 23;
-0.04128504    anti-u  d  c  anti-d                         PYTHIA 65;
-0.01884754    anti-u  s  c  anti-d                         PYTHIA 63;
-0.01615504    anti-u  c  d  anti-d                         PYTHIA 23;
-0.00080774    anti-u  c  s  anti-d                         PYTHIA 23;
+0.24270569    anti-u  d  c  anti-d                         PYTHIA 23;
+0.04137286    anti-u  d  c  anti-d                         PYTHIA 65;
+0.01888763    anti-u  s  c  anti-d                         PYTHIA 63;
+0.01618940    anti-u  c  d  anti-d                         PYTHIA 23;
+0.00080946    anti-u  c  s  anti-d                         PYTHIA 23;
 # Try to crank up the psi production (Lange).
-0.06641505    anti-c  s  c  anti-d                         PYTHIA 43;
-0.00538503    anti-c  d  c  anti-d                         PYTHIA 43;
-0.00269252    anti-u  d  u  anti-d                         PYTHIA 23;
-0.00359003    anti-c  s  u  anti-d                         PYTHIA 23;
+0.06655633    anti-c  s  c  anti-d                         PYTHIA 43;
+0.00539648    anti-c  d  c  anti-d                         PYTHIA 43;
+0.00269825    anti-u  d  u  anti-d                         PYTHIA 23;
+0.00359767    anti-c  s  u  anti-d                         PYTHIA 23;
 # This and similar a few lines above have been divided by two to solve a double-counting problem for this channel (JGS 11/5/02).
-0.00183985    anti-u  u  d  anti-d                         PYTHIA 23;
-0.00006284    anti-d  d  d  anti-d                         PYTHIA 23;
-0.00008077    anti-s  s  d  anti-d                         PYTHIA 23;
-0.00197446    anti-u  u  s  anti-d                         PYTHIA 23;
-0.00161547    anti-d  d  s  anti-d                         PYTHIA 23;
-0.00134626    anti-s  s  s  anti-d                         PYTHIA 23;
-0.00448752    s  anti-d                                    PYTHIA 91;
+0.00184376    anti-u  u  d  anti-d                         PYTHIA 23;
+0.00006297    anti-d  d  d  anti-d                         PYTHIA 23;
+0.00008094    anti-s  s  d  anti-d                         PYTHIA 23;
+0.00197866    anti-u  u  s  anti-d                         PYTHIA 23;
+0.00161891    anti-d  d  s  anti-d                         PYTHIA 23;
+0.00134912    anti-s  s  s  anti-d                         PYTHIA 23;
+0.00449707    s  anti-d                                    PYTHIA 91;
 
 Enddecay
 
@@ -4188,8 +4192,8 @@ Decay B+
 0.003091320   D_s1+  anti-D0                               SVS;  #[BF update - PG 09/2020]
 0.011960470   anti-D*0  D_s1+                              SVV_HELAMP 0.4904 0.0 0.7204 0.0 0.4904 0.0; #[BF update - PG 09/2020]
 0.000550000   anti-D0  K+  anti-K0                         PHSP;
-0.000750000   anti-D0  K+  anti-K*0                        PHSP;
-0.001530000   anti-D*0  K+  anti-K*0                       PHSP; #[BF update - PG 09/2020]
+0.000525000   anti-D0  K+  anti-K*0                        PHSP; #[BF update - VB 12/2021, subtracted resonant D0 a_1+ component, BR(R+NR)=0.00075]
+0.000590000   anti-D*0  K+  anti-K*0                       PHSP; #[BF update - VB 12/2021, subtracted resonant D*0 a_1+ component, BR(R+NR)=0.00153]
 0.004100000   anti-D0  omega  pi+                          PHSP; #[BF update - PG 09/2020]
 0.004500000   anti-D*0  omega  pi+                         PHSP;
 0.000450000   anti-D0  D'_s1+                              PHSP;
@@ -5349,27 +5353,27 @@ Decay B+
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
 # Lam_c X  / Sigma_c X   4.0 %
-0.02968449    anti-cd_1  uu_1                              PYTHIA 63;
+0.02977380    anti-cd_1  uu_1                              PYTHIA 63;
 
 # Xi_c X      2.4%
-0.00809581    anti-cs_1  uu_1                              PYTHIA 63;
+0.00812017    anti-cs_1  uu_1                              PYTHIA 63;
 
-0.20263378    u  anti-d  anti-c  u                         PYTHIA 23;
-0.03867983    u  anti-d  anti-c  u                         PYTHIA 43;
-0.02023943    u  anti-s  anti-c  u                         PYTHIA 43;
+0.20324342    u  anti-d  anti-c  u                         PYTHIA 23;
+0.03879620    u  anti-d  anti-c  u                         PYTHIA 43;
+0.02030032    u  anti-s  anti-c  u                         PYTHIA 43;
 # Try to crank up the psi production (Lange).
-0.06656528    c  anti-s  anti-c  u                         PYTHIA 43;
-0.00359810    c  anti-d  anti-c  u                         PYTHIA 43;
-0.00269857    u  anti-d  anti-u  u                         PYTHIA 23;
-0.00359810    c  anti-s  anti-u  u                         PYTHIA 23;
+0.06676555    c  anti-s  anti-c  u                         PYTHIA 43;
+0.00360893    c  anti-d  anti-c  u                         PYTHIA 43;
+0.00270669    u  anti-d  anti-u  u                         PYTHIA 23;
+0.00360893    c  anti-s  anti-u  u                         PYTHIA 23;
 # This and similar a few lines above have been divided by two to solve a double-counting problem for this channel (JGS 11/5/02).
-0.00184404    u  anti-u  anti-d  u                         PYTHIA 23;
-0.00006300    d  anti-d  anti-d  u                         PYTHIA 23;
-0.00008097    s  anti-s  anti-d  u                         PYTHIA 23;
-0.00197900    u  anti-u  anti-s  u                         PYTHIA 23;
-0.00161917    d  anti-d  anti-s  u                         PYTHIA 23;
-0.00134934    s  anti-s  anti-s  u                         PYTHIA 23;
-0.00449762    anti-s  u                                    PYTHIA 91;
+0.00184959    u  anti-u  anti-d  u                         PYTHIA 23;
+0.00006319    d  anti-d  anti-d  u                         PYTHIA 23;
+0.00008121    s  anti-s  anti-d  u                         PYTHIA 23;
+0.00198495    u  anti-u  anti-s  u                         PYTHIA 23;
+0.00162404    d  anti-d  anti-s  u                         PYTHIA 23;
+0.00135340    s  anti-s  anti-s  u                         PYTHIA 23;
+0.00451115    anti-s  u                                    PYTHIA 91;
 
 Enddecay
 
@@ -5696,8 +5700,8 @@ Decay B-
 0.003091320   D_s1-  D0                                    SVS;  #[BF update - PG 09/2020]
 0.011960470   D*0  D_s1-                                   SVV_HELAMP 0.4904 0.0 0.7204 0.0 0.4904 0.0;  #[BF update - PG 09/2020]
 0.000550000   D0  K-  anti-K0                              PHSP;
-0.000750000   D0  K-  anti-K*0                             PHSP;
-0.001530000   D*0  K-  anti-K*0                            PHSP; #[BF update - PG 09/2020]
+0.000525000   D0  K-  anti-K*0                             PHSP; #[BF update - VB 12/2021, subtracted resonant anti-D0 a_1- component, BR(R+NR)=0.00075]
+0.000590000   D*0  K-  anti-K*0                            PHSP; #[BF update - VB 12/2021, subtracted resonant anti-D*0 a_1- component, BR(R+NR)=0.00153]
 0.004100000   D0  omega  pi-                               PHSP; #[BF update - PG 09/2020]
 0.004500000   D*0  omega  pi-                              PHSP;
 0.000450000   D0  D'_s1-                                   PHSP;
@@ -6857,27 +6861,27 @@ Decay B-
 # Pythia contributions rescaled after each update such that the total B meson BF is compatible with 1 (decfiles/tools/b2dec-correct-pythiaBFs).
 
 # Lam_c X  / Sigma_c X   4.0 %
-0.02968449    cd_1  anti-uu_1                              PYTHIA 63;
+0.02977380    cd_1  anti-uu_1                              PYTHIA 63;
 
 # Xi_c X      2.4%
-0.00809581    cs_1  anti-uu_1                              PYTHIA 63;
+0.00812017    cs_1  anti-uu_1                              PYTHIA 63;
 
-0.20263378    anti-u  d  c  anti-u                         PYTHIA 23;
-0.03867983    anti-u  d  c  anti-u                         PYTHIA 43;
-0.02023943    anti-u  s  c  anti-u                         PYTHIA 43;
+0.20324342    anti-u  d  c  anti-u                         PYTHIA 23;
+0.03879620    anti-u  d  c  anti-u                         PYTHIA 43;
+0.02030032    anti-u  s  c  anti-u                         PYTHIA 43;
 # Try to crank up the psi production (Lange).
-0.06656528    anti-c  s  c  anti-u                         PYTHIA 43;
-0.00359810    anti-c  d  c  anti-u                         PYTHIA 43;
-0.00269857    anti-u  d  u  anti-u                         PYTHIA 23;
-0.00359810    anti-c  s  u  anti-u                         PYTHIA 23;
+0.06676555    anti-c  s  c  anti-u                         PYTHIA 43;
+0.00360893    anti-c  d  c  anti-u                         PYTHIA 43;
+0.00270669    anti-u  d  u  anti-u                         PYTHIA 23;
+0.00360893    anti-c  s  u  anti-u                         PYTHIA 23;
 # This and similar a few lines above have been divided by two to solve a double-counting problem for this channel (JGS 11/5/02).
-0.00184404    anti-u  u  d  anti-u                         PYTHIA 23;
-0.00006300    anti-d  d  d  anti-u                         PYTHIA 23;
-0.00008097    anti-s  s  d  anti-u                         PYTHIA 23;
-0.00197900    anti-u  u  s  anti-u                         PYTHIA 23;
-0.00161917    anti-d  d  s  anti-u                         PYTHIA 23;
-0.00134934    anti-s  s  s  anti-u                         PYTHIA 23;
-0.00449762    s  anti-u                                    PYTHIA 91;
+0.00184959    anti-u  u  d  anti-u                         PYTHIA 23;
+0.00006319    anti-d  d  d  anti-u                         PYTHIA 23;
+0.00008121    anti-s  s  d  anti-u                         PYTHIA 23;
+0.00198495    anti-u  u  s  anti-u                         PYTHIA 23;
+0.00162404    anti-d  d  s  anti-u                         PYTHIA 23;
+0.00135340    anti-s  s  s  anti-u                         PYTHIA 23;
+0.00451115    s  anti-u                                    PYTHIA 91;
 
 Enddecay
 
@@ -7847,71 +7851,60 @@ Enddecay
 ##########                                                              ##########
 ##################################################################################
 #
-# Updated to PDG 2011
-#
+# Updated to https://docs.belle2.org/record/1982/files/BELLE2-NOTE-PH-2020-055_v2.pdf Table V
+# adapted from http://pdg.lbl.gov/2020/reviews/rpp2020-rev-tau-branching-fractions.pdf
 
 # tau-
 Decay tau-
-0.154002925   e-  anti-nu_e  nu_tau                        TAULNUNU;
-0.170000000   mu-  anti-nu_mu  nu_tau                      TAULNUNU;
-0.109100000   pi-  nu_tau                                  TAUSCALARNU;
-0.006960000   K-  nu_tau                                   TAUSCALARNU;
-0.255100000   pi-  pi0  nu_tau                             TAUHADNU -0.108 0.775 0.149 1.364 0.400;
-0.001124109   nu_tau  gamma  pi-  pi0                      PYTHIA 21;
-0.079301562   pi0  pi0  pi-  nu_tau                        TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
-0.000385656   nu_tau  K-  pi0  pi0                         PYTHIA 21;
-0.008508640   nu_tau  pi-  pi0  pi0  pi0                   PYTHIA 21;
-0.000864699   nu_tau  pi-  pi0  pi0  pi0  pi0              PHSP;
-#0.2515         rho- nu_tau                                 TAUVECTORNU;
-#0.1790         a_1-  nu_tau                                TAUVECTORNU;
-
-# Modes with K0s
-0.000319939   nu_tau  pi-  anti-K0                         PYTHIA 21;
-0.001590000   nu_tau  K-  K0                               PYTHIA 21;
-0.001700000   nu_tau  K0  pi-  anti-K0                     PYTHIA 21;
-0.001590000   nu_tau  K-  pi0  K0                          PYTHIA 21;
-0.004000000   nu_tau  pi-  anti-K0  pi0                    PYTHIA 21;
-
-# 3 Charged Particles
-0.093200000   pi-  pi-  pi+  nu_tau                        TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
-0.046100000   nu_tau  pi-  pi+  pi-  pi0                   PYTHIA 21;
-0.000501526   nu_tau  pi-  pi-  pi+  pi0  pi0              PHSP;
-0.000155646   nu_tau  pi-  pi-  pi+  pi0  pi0  pi0         PHSP;
-0.003420000   nu_tau  K-  pi+  pi-                         PYTHIA 21;
-0.001360000   nu_tau  K-  pi+  pi-  pi0                    PYTHIA 21;
-0.001400000   nu_tau  K-  pi-  K+                          PYTHIA 21;
-0.000015800   nu_tau  K-  K+  K-                           PYTHIA 21;
-
-# 5 Charged Particles
-0.000700406   nu_tau  pi-  pi-  pi-  pi+  pi+              PHSP;
-0.000129705   nu_tau  pi-  pi-  pi-  pi+  pi+  pi0         PHSP;
-
-# Misc other modes
-0.012000000   K*-  nu_tau                                  TAUVECTORNU;
-0.001390000   nu_tau  eta  pi-  pi0                        PYTHIA 21;
-0.003199387   nu_tau  pi-  omega  pi0                      PYTHIA 21;
-0.000410000   nu_tau  K-  omega                            PYTHIA 21;
-0.002200000   anti-K*0  pi-  nu_tau                        PHSP;
-0.002100000   K*0  K-  nu_tau                              PHSP;
-0.000034000   phi  pi-  nu_tau                             PHSP;
-0.000037000   phi  K-  nu_tau                              PHSP;
-0.003600000   mu-  anti-nu_mu  nu_tau  gamma               PHSP;
-0.017500000   e-  anti-nu_e  nu_tau  gamma                 PHSP;
-0.004290000   K-  pi0  nu_tau                              PHSP;
-0.002200000   anti-K0  rho-  nu_tau                        PHSP;
-0.000260000   pi-  anti-K0  pi0  pi0  nu_tau               PHSP;
-0.000310000   pi-  K0  anti-K0  pi0  nu_tau                PHSP;
-0.000061000   K-  K+  pi-  pi0  nu_tau                     PHSP;
-0.000028000   e-  e-  e+  anti-nu_e  nu_tau                PHSP;
-0.004700000   K_1-  nu_tau                                 PHSP;
-0.001700000   K'_1-  nu_tau                                PHSP;
-0.001500000   K'*-  nu_tau                                 PHSP;
-0.000150000   eta  pi-  pi0  pi0  nu_tau                   PHSP;
-0.000161000   eta  K-  nu_tau                              PHSP;
-0.000138000   eta  K*-  nu_tau                             PHSP;
-0.000048000   eta  K-  pi0  nu_tau                         PHSP;
-0.000093000   eta  anti-K0  pi-  nu_tau                    PHSP;
-0.000360000   f_1  pi-  nu_tau                             PHSP;
+0.178175 e-           anti-nu_e      nu_tau TAULNUNU;
+0.000028 e-  e-   e+  anti-nu_e      nu_tau PYTHIA 21;
+0.173937 mu-          anti-nu_mu     nu_tau TAULNUNU;
+0.108164 pi-                         nu_tau TAUSCALARNU;
+0.000353 pi- gamma                   nu_tau PYTHIA 21;
+0.254941 rho-                        nu_tau TAUVECTORNU;
+0.092595 pi- pi0  pi0                nu_tau TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
+0.010429 pi- pi0  pi0 pi0            nu_tau PYTHIA 21;
+0.001118 pi- pi0  pi0 pi0 pi0        nu_tau PYTHIA 21;
+0.003817 pi- K0   pi0                nu_tau PYTHIA 21;
+0.000263 pi- K0   pi0 pi0            nu_tau PYTHIA 21;
+0.000235 pi- K_S0 K_S0               nu_tau PYTHIA 21;
+0.000235 pi- K_L0 K_L0               nu_tau PYTHIA 21;
+0.001081 pi- K_S0 K_L0               nu_tau PYTHIA 21;
+0.000018 pi- pi0  K_S0 K_S0          nu_tau PYTHIA 21;
+0.000018 pi- pi0  K_L0 K_L0          nu_tau PYTHIA 21;
+0.000325 pi- pi0  K_S0 K_L0          nu_tau PYTHIA 21;
+0.089868 pi- pi-  pi+                nu_tau TAUHADNU -0.108 0.775 0.149 1.364 0.400 1.23 0.4;
+0.027404 pi- pi-  pi+  pi0           nu_tau PYTHIA 21;
+0.000981 pi- pi-  pi+  pi0  pi0      nu_tau PYTHIA 21;
+0.000014 pi- pi-  pi+  pi0  pi0 pi0  nu_tau PYTHIA 21;
+0.000247 pi- pi-  pi+  K0            nu_tau PYTHIA 21;
+0.006964 K-                          nu_tau TAUSCALARNU;
+0.012712 K*-                         nu_tau TAUVECTORNU;
+0.000647 K-  pi0  pi0                nu_tau PYTHIA 21;
+0.000478 K-  pi0  pi0 pi0            nu_tau PYTHIA 21;
+0.001486 K-  K0                      nu_tau PYTHIA 21;
+0.001500 K-  K0   pi0                nu_tau PYTHIA 21;
+0.002927 K-  pi-  pi+                nu_tau PYTHIA 21;
+0.000394 K-  pi-  pi+ pi0            nu_tau PYTHIA 21;
+0.001435 pi- K-   K+                 nu_tau PYTHIA 21;
+0.000061 pi- K-   K+  pi0            nu_tau PYTHIA 21;
+0.001389 pi- pi0  eta                nu_tau PYTHIA 21;
+0.000195 pi- pi0  pi0 eta            nu_tau PYTHIA 21;
+0.000220 pi- pi-  pi+ eta            nu_tau PYTHIA 21;
+0.000155 K-  eta                     nu_tau PYTHIA 21;
+0.000048 K-  pi0  eta                nu_tau PYTHIA 21;
+0.000094 pi- K0   eta                nu_tau PYTHIA 21;
+0.019494 pi- omega                   nu_tau PYTHIA 21;
+0.004085 pi- pi0  omega              nu_tau PYTHIA 21;
+0.000072 pi- pi0  pi0 omega          nu_tau PYTHIA 21;
+0.000084 pi- pi-  pi+ omega          nu_tau PYTHIA 21;
+0.000410 K-  omega                   nu_tau PYTHIA 21;
+0.000022 K-  K+   K-                 nu_tau PYTHIA 21;
+0.000015 K-  K_S0 K_L0               nu_tau PYTHIA 21;
+0.000827 pi- pi- pi- pi+ pi+         nu_tau PYTHIA 21;
+0.000038 pi- pi- pi- pi+ pi+ pi0     nu_tau PYTHIA 21;
+0.000001 K-  pi- pi- pi+ pi+         nu_tau PYTHIA 21;
+0.000001 K-  pi- pi- pi+ pi+ pi0     nu_tau PYTHIA 21;
 Enddecay
 
 CDecay tau+
@@ -9817,7 +9810,7 @@ Enddecay
 
 Decay eta' # Edited by U. Tamponi, October 2016
 0.432000000   pi+  pi-  eta                                ETAPRIME_DALITZ  -0.047  -0.069  0.0    0.073; # New dalitz mode
-0.217000000   pi0  pi0  eta                                ETAPRIME_DALITZ  -0.047  -0.069  0.0    0.073;# New dalitz mode
+0.217000000   pi0  pi0  eta                                ETAPRIME_DALITZ  -0.047  -0.069  0.0    0.073; # New dalitz mode
 0.293511000   rho0  gamma                                  SVP_HELAMP  1.0 0.0 1.0 0.0;
 0.027500000   omega  gamma                                 SVP_HELAMP  1.0 0.0 1.0 0.0;
 0.022200000   gamma  gamma                                 PHSP;
@@ -9825,6 +9818,21 @@ Decay eta' # Edited by U. Tamponi, October 2016
 0.000109000   gamma  mu-  mu+                              PHSP;
 0.003600000   pi+  pi-  pi0                                PHSP;
 0.002400000   pi+  pi-  e+  e-                             PHSP;
+Enddecay
+
+Decay eta(1405) # Based on Amsler et al., Eur. Phys. J.C33 (2004) 23, and Adams et al., Phys. Lett. B516 (2001) 264
+0.198000000   a_00  pi0                                    PHSP;
+0.198000000   a_0+  pi-                                    PHSP;
+0.198000000   a_0-  pi+                                    PHSP;
+0.012000000   K*+  K-                                      SVS;
+0.012000000   K*-  K+                                      SVS;
+0.012000000   K*0  anti-K0                                 SVS;
+0.012000000   anti-K*0  K0                                 SVS;
+0.080000000   K+  K-  pi0                                  PHSP;
+0.080000000   K0  anti-K0  pi0                             PHSP;
+0.080000000   anti-K0  K+  pi-                             PHSP;
+0.080000000   K0  K-  pi+                                  PHSP;
+0.038000000   rho0  gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0;
 Enddecay
 
 Decay phi # Edited by U. Tamponi, October 2016
@@ -9883,27 +9891,27 @@ CDecay a_0-
 #   paritial amplitudes. Interference effects are significant but neglected here
 # - Partial amplitudes from CLEO, Phys.Rev. D61 (2000) 01200.
 
-Decay a_10 #  Edited by U. Tamponi, March 2016
+Decay a_10 #  Edited by U. Tamponi (March 2016), and V. Bertacchi (December 2021)
 0.233300000   rho-  pi+                                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.233300000   rho+  pi-                                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.233400000   rho0  pi0                                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.200000000   pi+  pi-  pi0                                PHSP; #placeholder for K* K final states, which are off-shell
-0.025000000   K+  pi-  K0                                  PHSP; #placeholder for K* K final states, which are off-shell
-0.025000000   K-  pi+  anti-K0                             PHSP; #placeholder for K* K final states, which are off-shell
-0.025000000   anti-K0  pi0  K0                             PHSP; #placeholder for K* K final states, which are off-shell
-0.025000000   K+  K-  pi0                                  PHSP; #placeholder for K* K final states, which are off-shell
+0.200000000   sigma_0  pi0                                 PHSP;
+0.025000000   K*-  K+                                      VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.025000000   K*+  K-                                      VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.025000000   K*0  anti-K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.025000000   anti-K*0  K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 
 # a_1(1260)+
-Decay a_1+ #  Edited by U. Tamponi, March 2016
+Decay a_1+ #  Edited by U. Tamponi (March 2016), and V. Bertacchi (December 2021)
 0.308750000   rho0  pi+                                    VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
 0.308750000   rho+  pi0                                    VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
 0.013000000   rho(2S)0  pi+                                VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave # off mass shell, included back into the simulation on request of Pablo Goldenzweig
 0.013000000   rho(2S)+  pi0                                VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave # off mass shell, included back into the simulation on request of Pablo Goldenzweig
 0.161800000   sigma_0  pi+                                 PHSP;
-0.025000000   K+  K0  pi0                                  PHSP; #placeholder for K* K final states, which are off-shell
-0.025000000   anti-K0  K0  pi+                             PHSP; #placeholder for K* K final states, which are off-shell
-0.147300000   pi+  pi+  pi-                                PHSP; # added to fix the sum of the BF to 1. f_2(1270) and f_0(1370) contributions should be present
+0.050000000   anti-K*0  K+                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.050000000   K*+  anti-K0                                 VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.097300000   pi+  pi+  pi-                                PHSP; # added to fix the sum of the BF to 1. f_2(1270) and f_0(1370) contributions should be present
 Enddecay
 
 CDecay a_1-
@@ -10155,46 +10163,145 @@ Enddecay
 ##########                         cc=  mesons                          ##########
 ##########                                                              ##########
 ##################################################################################
-Decay eta_c
-0.001300000   p+  anti-p-                                  PHSP;
-0.002700000   phi  phi                                     SVV_HELAMP 1.0 0.0 0.0 0.0 -1.0 0.0;
-0.002900000   phi  K+  K-                                  PHSP;
-0.006700000   rho0  rho0                                   SVV_HELAMP 1.0 0.0 0.0 0.0 -1.0 0.0;
-0.013300000   rho+  rho-                                   SVV_HELAMP 1.0 0.0 0.0 0.0 -1.0 0.0;
-0.012000000   pi+  pi-  pi+  pi-                           PHSP;
-0.001600000   K+  K-  K+  K-                               PHSP;
-0.015000000   K+  K-  pi+  pi-                             PHSP;
-0.032700000   eta  pi+  pi-                                PHSP;
-0.016300000   eta  pi0  pi0                                PHSP;
-0.027300000   eta'  pi+  pi-                               PHSP;
-0.013700000   eta'  pi0  pi0                               PHSP;
-0.011700000   pi0  K+  K-                                  PHSP;
-0.023300000   K+  anti-K0  pi-                             PHSP;
-0.023300000   K-  K0  pi+                                  PHSP;
-0.011700000   K0  anti-K0  pi0                             PHSP;
-0.004600000   K*+  K*-                                     SVV_HELAMP 1.0 0.0 0.0 0.0 -1.0 0.0;
-0.004600000   K*0  anti-K*0                                SVV_HELAMP 1.0 0.0 0.0 0.0 -1.0 0.0 ;
-0.010000000   K*0  K-  pi+                                 PHSP;
-0.010000000   anti-K*0  K+  pi-                            PHSP;
-0.015000000   K*0  anti-K*0  pi+  pi-                      PHSP;
-0.007100000   K+  K-  pi+  pi-  pi+  pi-                   PHSP;
-0.015000000   pi+  pi-  pi+  pi-  pi+  pi-                 PHSP;
-0.001040000   Lambda0  anti-Lambda0                        PHSP;
-0.007600000   f_2  f_2                                     PHSP;
-0.027000000   f_2  f'_2                                    PHSP;
 
-0.682497000   rndmflav  anti-rndmflav                      PYTHIA 42;
-0.000063000   gamma  gamma                                 PHSP;
+
+
+# Data from PDG 2021.
+Decay eta_c
+
+# Decays involving hadronic resonances.
+
+# branching(M026, 24) * (2/3)
+0.027333333   eta'  pi+  pi-                               PHSP;
+# branching(M026, 24) / 3
+0.013666667   eta'  pi0  pi0                               PHSP;
+# branching(M026, 19) * (2/3)
+0.012000000   rho+  rho-                                   SVV_HELAMP 1.0 0.0 0.0 0.0 -1.0 0.0;
+# branching(M026, 19) * (1/3)
+0.006000000   rho0  rho0                                   SVV_HELAMP 1.0 0.0 0.0 0.0 -1.0 0.0;
+# branching(M026, 26) / 2
+0.010000000   K*0  K-  pi+                                 PHSP;
+# branching(M026, 26) / 2
+0.010000000   anti-K*0  K+  pi-                            PHSP;
+# branching(M026, 18) / 2
+0.003450000   K*+  K*-                                     SVV_HELAMP 1.0 0.0 0.0 0.0 -1.0 0.0;
+# branching(M026, 18) / 2
+0.003450000   K*0  anti-K*0                                SVV_HELAMP 1.0 0.0 0.0 0.0 -1.0 0.0;
+# branching(M026, 57)
+0.011000000   K*0  anti-K*0  pi+  pi-                      PHSP;
+# branching(M026, 28)
+0.002900000   phi  K+  K-                                  PHSP;
+# branching(M026, 17)
+0.001740000   phi  phi                                     SVV_HELAMP 1.0 0.0 0.0 0.0 -1.0 0.0;
+# branching(M026, 20)
+0.002900000   omega  omega                                 SVV_HELAMP 1.0 0.0 0.0 0.0 -1.0 0.0;
+# branching(M026, 46)
+0.009800000   f_2  f_2                                     PHSP;
+# branching(M026, 59)
+0.009500000   f_2  f'_2                                    PHSP;
+
+
+# Decays into stable hadrons.
+
+# branching(M026, 14) / 3
+0.024333333   K+  anti-K0  pi-                             PHSP;
+# branching(M026, 14) / 3
+0.024333333   K-  K0  pi+                                  PHSP;
+# branching(M026, 14) / 6
+0.012166667   K+  K-  pi0                                  PHSP;
+# branching(M026, 14) / 6
+0.012166667   K0  anti-K0  pi0                             PHSP;
+# branching(M026, 25) / 2
+0.006800000   K+  K- eta                                   PHSP;
+# branching(M026, 25) / 2
+0.006800000   K0  anti-K0 eta                              PHSP;
+# branching(M026, 16)
+0.017000000   eta  pi+  pi-                                PHSP;
+# branching(M026, 16) / 2
+0.008500000   eta  pi0  pi0                                PHSP;
+# branching(M026, 61)
+0.044000000   eta  pi+  pi- pi+ pi-                        PHSP;
+# branching(M026, 15)
+0.006600000   K+  K-  pi+  pi-                             PHSP;
+# branching(M026, 60)
+0.035000000   K+  K-  pi+  pi-  pi0                        PHSP;
+# branching(M026, 62) / 2
+0.028000000   K0  K-  pi+  pi-  pi+                        PHSP;
+# branching(M026, 62) / 2
+0.028000000   anti-K0  K+  pi-  pi+  pi-                   PHSP;
+# branching(M026, 55)
+0.007500000   K+  K-  pi+  pi-  pi+  pi-                   PHSP;
+# branching(M026, 27)
+0.001430000   K+  K-  K+  K-                               PHSP;
+# branching(M026, 63)
+0.047000000   pi+  pi-  pi0  pi0                           PHSP;
+# branching(M026, 11)
+0.009100000   pi+  pi-  pi+  pi-                           PHSP;
+# branching(M026, 64)
+0.158000000   pi+  pi-  pi0  pi+  pi-  pi0                 PHSP;
+# branching(M026, 56)
+0.017000000   pi+  pi-  pi+  pi-  pi+  pi-                 PHSP;
+# branching(M026, 12)
+0.001440000   p+  anti-p-                                  PHSP;
+# branching(M026, 65)
+0.003600000   p+  anti-p-  pi0                             PHSP;
+# branching(M026, 45)
+0.001060000   Lambda0  anti-Lambda0                        PHSP;
+# K+  anti-p-  Lambda0, submode anti-Lambda(1520)0 Lambda0
+# (branching(M026, 82) - branching(M026, 83) * branching(B038, 1) / 2) / 2
+0.000901250   K+  anti-p-  Lambda0                         PHSP;
+# (branching(M026, 82) - branching(M026, 83) * branching(B038, 1) / 2) / 2
+0.000901250   K-  p+  anti-Lambda0                         PHSP;
+# branching(M026, 83) / 2
+0.001550000   anti-Lambda(1520)0 Lambda0                   PHSP;
+# branching(M026, 83) / 2
+0.001550000   Lambda(1520)0 anti-Lambda0                   PHSP;
+# branching(M026, 66)
+0.002100000   Sigma+  anti-Sigma-                          PHSP;
+# branching(M026, 67)
+0.000900000   Xi-  anti-Xi+                                PHSP;
+# branching(M026, 13)
+0.005300000   p+  anti-p-  pi+  pi-                        PHSP;
+
+# Radiative decays.
+
+# branching(M026, 31)
+0.000161000   gamma  gamma                                 PHSP;
+
+# Non-measured decays.
+
+# 1 - exclusive_branching_sum()
+0.363066500   rndmflav  anti-rndmflav                      PYTHIA 42;
+
 Enddecay
 
 
 
+# Data from PDG 2021.
 Decay eta_c(2S)
-0.019000000   K+  anti-K0  pi-                             PHSP;
-0.019000000   K-  K0  pi+                                  PHSP;
-0.009500000   pi0  K+  K-                                  PHSP;
-0.009500000   K0  anti-K0  pi0                             PHSP;
-0.943000000   rndmflav  anti-rndmflav                      PYTHIA 42;
+
+# branching(M059, 4) / 3
+0.006333333   K+  anti-K0  pi-                             PHSP;
+# branching(M059, 4) / 3
+0.006333333   K-  K0  pi+                                  PHSP;
+# branching(M059, 4) / 6
+0.003166667   K+  K-  pi0                                  PHSP;
+# branching(M059, 4) / 6
+0.003166667   K0  anti-K0  pi0                             PHSP;
+# branching(M059, 20) / 2
+0.002500000   K+  K- eta                                   PHSP;
+# branching(M059, 20) / 2
+0.002500000   K0  anti-K0 eta                              PHSP;
+# branching(M059, 9)
+0.014000000   K+  K-  pi+  pi-  pi0                        PHSP;
+# branching(M059, 2)
+0.000190000   gamma  gamma                                 PHSP;
+
+# Non-measured decays.
+
+# 1 - exclusive_branching_sum()
+0.961810000   rndmflav  anti-rndmflav                      PYTHIA 42;
+
 Enddecay
 
 
@@ -10543,95 +10650,207 @@ Enddecay
 
 
 
+# Data from PDG 2021.
 Decay chi_c0
-#[Updated BR according to PDG2017]
-0.012700000   gamma  J/psi                                 PHSP;
-0.000225000   p+  anti-p-                                  PHSP;
-0.000223000   gamma  gamma                                 PHSP;
-0.002430000   pi0  pi0                                     PHSP;
-0.004870000   pi+  pi-                                     PHSP;
-0.022400000   pi+  pi-  pi+  pi-                           PHSP;
-0.002750000   K+  K-  K+  K-                               PHSP;
-0.012000000   pi+  pi-  pi+  pi-  pi+  pi-                 PHSP;
-0.008700000   rho0  pi+  pi-                               PHSP;
-0.014000000   rho+  pi-  pi0                               PHSP;
-0.014000000   rho-  pi+  pi0                               PHSP;
-0.005910000   K+  K-                                       PHSP;
-0.000770000   phi  phi                                     PHSP;
-0.001700000   anti-K*0  K*0                                PHSP;
-0.003600000   anti-K*0  K+  pi-                            PHSP;
-0.003600000   K*0  K-  pi+                                 PHSP;
-0.004300000   K*+  anti-K0  pi-                            PHSP;
-0.004300000   K*-  K0  pi+                                 PHSP;
-0.017500000   pi+  pi-  K+  K-                             PHSP;
-0.002100000   pi+  pi-  p+  anti-p-                        PHSP;
-0.002950000   eta  eta                                     PHSP;
-0.000321000   Lambda0  anti-Lambda0                        PHSP;
 
-# Confirm that this should be commented out [PG 05/02/2018]
-#0.00016    f_0 f_0                                         PHSP;
+# Hadronic decays.
 
-0.000000000   K0  anti-K0                                  PHSP;
-0.003100000   K_S0  K_S0                                   PHSP;
-0.002820000   K_L0  K_L0                                   PHSP;
-0.000000000   K_S0  K_L0                                   PHSP;
-0.001960000   eta'  eta'                                   PHSP;
-0.000950000   omega  omega                                 PHSP;
-0.003050000   K_1+  K-                                     PHSP;
-0.003050000   K_1-  K+                                     PHSP;
-0.000950000   K+  K-  phi                                  PHSP;
-0.001240000   p+  anti-n0  pi-                             PHSP;
-0.000610000   K+  anti-p-  Lambda0                         PHSP;
-0.000610000   K-  p+  Lambda0                              PHSP;
-0.005600000   K_S0  K_S0  pi+  pi-                         PHSP;
-0.005900000   K_L0  K_L0  pi+  pi-                         PHSP;
-0.000000000   K0  anti-K0  pi+  pi-                        PHSP;
-0.001400000   K+  K-  K_S0  K_S0                           PHSP;
-0.001500000   K+  K-  K_L0  K_L0                           PHSP;
-0.000000000   K+  K-  K0  anti-K0                          PHSP;
-
-0.799360000   rndmflav  anti-rndmflav                      PYTHIA 42;
-0.033000000   pi+  pi-  pi0  pi0                           PHSP;
-0.005400000   K+  K-  pi0  pi0                             PHSP;
-0.003000000   K+  K-  eta  pi0                             PHSP;
-0.000680000   p+  anti-p-  pi0                             PHSP;
-0.000350000   p+  anti-p-  eta                             PHSP;
-0.001020000   pi0  pi0  p+  anti-p-                        PHSP;
-0.000440000   Sigma0  anti-Sigma0                          PHSP;
-0.000310000   Sigma+  anti-Sigma-                          PHSP;
-0.000390000   Xi0  anti-Xi0                                PHSP;
-0.000470000   Xi-  anti-Xi+                                PHSP;
-
-#New Modes from PDG 2017
-0.000650000   f_0  f_0                                     PHSP;
-0.003200000   pi0  pi0  pi0  pi0                           PHSP;
+# branching(M056, 3) - branching(M056, 9) * branching(M009, 12)
+# - branching(M056, 20) * branching(f_0 -> pi+ pi-)**2
+0.001265000   pi+  pi-  pi+  pi-                           PHSP;
+# branching(M056, 9)
+0.000910000   rho0  pi+  pi-                               PHSP;
+# branching(M056, 20)
+0.000660000   f_0  f_0                                     PHSP;
+# branching(M056, 61) - branching(M056, 62) * branching(M009, 11)
+0.004000000   pi+  pi-  pi0  pi0                           PHSP;
+# branching(M056, 62) / 2
+0.014500000   rho+  pi-  pi0                               PHSP;
+# branching(M056, 62) / 2
+0.014500000   rho-  pi+  pi0                               PHSP;
+# branching(M056, 70)
+0.003300000   pi0  pi0  pi0  pi0                           PHSP;
+# branching(M056, 5)
+0.018100000   pi+  pi-  K+  K-                             PHSP;
+# branching(M056, 75)
 0.008600000   K+  K-  pi+  pi-  pi0                        PHSP;
+# branching(M056, 87) / 2
 0.002100000   K_S0  K+  pi-  pi+  pi-                      PHSP;
+# branching(M056, 87) / 2
 0.002100000   K_S0  K-  pi+  pi+  pi-                      PHSP;
-0.012200000   K+  pi-  anti-K0  pi0                        PHSP;
-0.012200000   K-  pi+  K0  pi0                             PHSP;
-0.005900000   rho+  K-  K0                                 PHSP;
-0.005900000   rho-  K+  anti-K0                            PHSP;
-0.000116000   omega  phi                                   PHSP;
+# branching(M056, 63)
+0.005600000   K+  K-  pi0  pi0                             PHSP;
+# (branching(M056, 65) - branching(M056, 66) * branching(M009, 11)
+# - branching(M056, 67) *  branching(M018, 11)) / 2
+0.004102254   K+  pi-  anti-K0  pi0                        PHSP;
+# (branching(M056, 65) - branching(M056, 66) * branching(M009, 11)
+# - branching(M056, 67) *  branching(M018, 11)) / 2
+0.004102254   K-  pi+  K0  pi0                             PHSP;
+# branching(M056, 66) / 2
+0.006050000   rho+  K-  K0                                 PHSP;
+# branching(M056, 66) / 2
+0.006050000   rho-  K+  anti-K0                            PHSP;
+# branching(M056, 67) / 2
+0.002300000   K*-  K+  pi0                                 PHSP;
+# branching(M056, 67) / 2
+0.002300000   K*+  K-  pi0                                 PHSP;
+# branching(M056, 67) / 2 * 2
+0.004600000   K*+  anti-K0  pi-                            PHSP;
+# branching(M056, 67) / 2 * 2
+0.004600000   K*-  K0  pi+                                 PHSP;
+# branching(M056, 41)
+0.005700000   K_S0  K_S0  pi+  pi-                         PHSP;
+# branching(M056, 41)
+0.005700000   K_L0  K_L0  pi+  pi-                         PHSP;
+# Forbidden, added to disable in Pythia.
+0.000000000   K0  anti-K0  pi+  pi-                        PHSP;
+# branching(M056, 68)
+0.003000000   K+  K-  eta  pi0                             PHSP;
+# branching(M056, 4)
+0.012000000   pi+  pi-  pi+  pi-  pi+  pi-                 PHSP;
+# branching(M056, 10) / 2
+0.003750000   K+  anti-K*0  pi-                            PHSP;
+# branching(M056, 10) / 2
+0.003750000   K-  K*0  pi+                                 PHSP;
+# branching(M056, 21)
+0.001700000   K*0  anti-K*0                                PHSP;
+# branching(M056, 18) * (2/3)
+0.005673333   pi+  pi-                                     PHSP;
+# branching(M056, 18) / 3
+0.002836667   pi0  pi0                                     PHSP;
+# branching(M056, 13)
+0.003010000   eta  eta                                     PHSP;
+# branching(M056, 37)
+0.000091000   eta  eta'                                    PHSP;
+# branching(M056, 46)
+0.002170000   eta'  eta'                                   PHSP;
+# branching(M056, 22)
+0.000970000   omega  omega                                 PHSP;
+# branching(M056, 76)
+0.000141000   omega  phi                                   PHSP;
+# branching(M056, 88)
 0.001940000   omega  K+  K-                                PHSP;
+# branching(M056, 2)
+0.006050000   K+  K-                                       PHSP;
+# branching(M056, 15)
+0.003160000   K_S0  K_S0                                   PHSP;
+# branching(M056, 15)
+0.003160000   K_L0  K_L0                                   PHSP;
+# Forbidden, added to disable in Pythia.
+0.000000000   K0 anti-K0                                   PHSP;
+# branching(M056, 42)
+0.001400000   K+  K-  K_S0  K_S0                           PHSP;
+# branching(M056, 42)
+0.001400000   K+  K-  K_L0  K_L0                           PHSP;
+# Forbidden, added to disable in Pythia.
+0.000000000   K+  K-  K0  anti-K0                          PHSP;
+# branching(M056, 94)
+0.000580000   K_S0  K_S0  K_S0  K_S0                       PHSP;
+# branching(M056, 94)
+0.000580000   K_S0  K_S0  K_L0  K_L0                       PHSP;
+# branching(M056, 94)
+0.000580000   K_L0  K_L0  K_L0  K_L0                       PHSP;
+# Forbidden, added to disable in Pythia.
+0.000000000   K0  anti-K0  K0  anti-K0                     PHSP;
+# branching(M056, 14)
+0.002820000   K+  K-  K+  K-                               PHSP;
+# branching(M056, 44)
+0.000970000   K+  K-  phi                                  PHSP;
+# branching(M056, 91) / 2
 0.001850000   anti-K0  K+  pi-  phi                        PHSP;
+# branching(M056, 91) / 2
 0.001850000   K0  K-  pi+  phi                             PHSP;
+# branching(M056, 92)
 0.001900000   K+  K-  pi0  phi                             PHSP;
+# branching(M056, 89)
 0.001180000   phi  pi+  pi-  pi0                           PHSP;
-0.000510000   p+  anti-p-  omega                           PHSP;
-0.000059000   p+  anti-p-  phi                             PHSP;
-0.000119000   p+  anti-p-  K+  K-                          PHSP;
-0.001340000   anti-p-  n0  pi+                             PHSP;
-0.002290000   p+  anti-n0  pi-  pi0                        PHSP;
-0.002160000   anti-p-  n0  pi+  pi0                        PHSP;
-0.001150000   Lambda0  anti-Lambda0  pi+  pi-              PHSP;
-0.000290000   K+  anti-p-  Lambda(1520)0                   PHSP;
-0.000290000   K-  p+  anti-Lambda(1520)0                   PHSP;
+# branching(M056, 16)
+0.000800000   phi  phi                                     PHSP;
+# branching(M056, 96)
+0.000840000   phi  phi  eta                                PHSP;
+# branching(M056, 11)
+0.000221000   p+  anti-p-                                  PHSP;
+# branching(M056, 48)
+0.000700000   p+  anti-p-  pi0                             PHSP;
+# branching(M056, 52)
+0.000350000   p+  anti-p-  eta                             PHSP;
+# branching(M056, 69)
+0.000520000   p+  anti-p-  omega                           PHSP;
+# branching(M056, 74)
+0.000060000   p+  anti-p-  phi                             PHSP;
+# branching(M056, 8)
+0.002100000   p+  anti-p-  pi+  pi-                        PHSP;
+# branching(M056, 64)
+0.001040000   p+  anti-p-  pi0  pi0                        PHSP;
+# branching(M056, 71)
+0.000122000   p+  anti-p-  K+  K-                          PHSP;
+# branching(M056, 43)
+0.001270000   p+  anti-n0  pi-                             PHSP;
+# branching(M056, 82)
+0.001370000   anti-p-  n0  pi+                             PHSP;
+# branching(M056, 83)
+0.002340000   p+  anti-n0  pi-  pi0                        PHSP;
+# branching(M056, 84)
+0.002210000   anti-p-  n0  pi+  pi0                        PHSP;
+# branching(M056, 19)
+0.000327000   Lambda0  anti-Lambda0                        PHSP;
+# branching(M056, 38)
+0.001180000   Lambda0  anti-Lambda0  pi+  pi-              PHSP;
+# branching(M056, 49) / 2
+0.000625000   K+  anti-p-  Lambda0                         PHSP;
+# branching(M056, 49) / 2
+0.000625000   K-  p+  anti-Lambda0                         PHSP;
+# branching(M056, 98) / 2
+0.000240000   K*+  anti-p-  Lambda0                        PHSP;
+# branching(M056, 98) / 2
+0.000240000   K*-  p+  anti-Lambda0                        PHSP;
+# branching(M056, 72) / 2
+0.000145000   K+  anti-p-  Lambda(1520)0                   PHSP;
+# branching(M056, 72) / 2
+0.000145000   K-  p+  anti-Lambda(1520)0                   PHSP;
+# branching(M056, 73)
 0.000310000   Lambda(1520)0  anti-Lambda(1520)0            PHSP;
+# branching(M056, 58)
+0.000468000   Sigma0  anti-Sigma0                          PHSP;
+# branching(M056, 97) / 2
+0.000176000   Sigma+  anti-p-  K_S0                        PHSP;
+# branching(M056, 97) / 2
+0.000176000   anti-Sigma-  p+  K_S0                        PHSP;
+# branching(M056, 100) / 2
+0.000151500   Sigma0  anti-p-  K+                          PHSP;
+# branching(M056, 100) / 2
+0.000151500   anti-Sigma0  p+  K-                          PHSP;
+# branching(M056, 59)
+0.000460000   Sigma+  anti-Sigma-                          PHSP;
+# branching(M056, 99)
+0.000510000   Sigma-  anti-Sigma+                          PHSP;
+# branching(M056, 80)
 0.000160000   Sigma*+  anti-Sigma*-                        PHSP;
+# branching(M056, 81)
 0.000230000   Sigma*-  anti-Sigma*+                        PHSP;
-0.000095000   K-  Lambda0  anti-Xi+                        PHSP;
-0.000095000   K+  anti-Lambda0  Xi-                        PHSP;
+# branching(M056, 85) / 2
+0.000097000   K-  Lambda0  anti-Xi+                        PHSP;
+# branching(M056, 85) / 2
+0.000097000   K+  anti-Lambda0  Xi-                        PHSP;
+# branching(M056, 60)
+0.000310000   Xi0  anti-Xi0                                PHSP;
+# branching(M056, 39)
+0.000480000   Xi-  anti-Xi+                                PHSP;
+
+# Radiative decays.
+
+# branching(M056, 6)
+0.014000000   gamma  J/psi                                 PHSP;
+# branching(M056, 7)
+0.000204000   gamma  gamma                                 PHSP;
+# branching(M056, 93)
+0.000133000   e+  e-  J/psi                                PHSP;
+
+# Non-measured decays.
+
+# 1 - exclusive_branching_sum()
+0.774764490   rndmflav  anti-rndmflav                      PYTHIA 42;
+
 Enddecay
 
 
@@ -10820,10 +11039,38 @@ Enddecay
 
 
 
+# Data from PDG 2021.
 Decay X_1(3872)
-1.000000000   rndmflav  anti-rndmflav                      PYTHIA 42;
-Enddecay
 
+# branching(M176, 2)
+0.03800000    pi+  pi-  J/psi                              PHSP;
+# branching(M176, 13)
+0.04300000    omega  J/psi                                 PHSP;
+
+# Branching fractions of open-charm decays are measured with large
+# uncertainties. They are rescaled so that the sum of all branching fractions
+# equals to 1.
+# S = branching(M176, 2) + branching(M176, 13) + branching(M176, 18) +
+#     branching(M176, 9) + branching(M176, 11)
+# SD = branching(M176, 8) + branching(M176, 12)
+# branching(M176, 8) / SD * (1 - S)
+0.47404652    D0  anti-D0  pi0                             PHSP;
+# branching(M176, 12) / SD * (1 - S) / 2
+0.17897674    D*0  anti-D0                                 PHSP;
+# branching(M176, 12) / SD * (1 - S) / 2
+0.17897674    anti-D*0  D0                                 PHSP;
+
+# branching(M176, 18)
+0.03400000    pi0 chi_c1                                   PHSP;
+
+# Radiative decays.
+
+# branching(M176, 9)
+0.00800000    gamma  J/psi                                 PHSP;
+# branching(M176, 11)
+0.04500000    gamma  psi(2S)                               PHSP;
+
+Enddecay
 
 
 

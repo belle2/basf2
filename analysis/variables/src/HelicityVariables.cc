@@ -6,8 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-
+// Own include
 #include <analysis/variables/HelicityVariables.h>
+
 #include <analysis/variables/EventVariables.h>
 
 #include <analysis/dataobjects/Particle.h>
@@ -17,8 +18,9 @@
 #include <framework/utilities/Conversion.h>
 #include <framework/gearbox/Const.h>
 
-#include <TLorentzVector.h>
-#include <TVector3.h>
+#include <Math/Boost.h>
+#include <Math/Vector4D.h>
+using namespace ROOT::Math;
 #include <cmath>
 
 namespace Belle2 {
@@ -28,8 +30,8 @@ namespace Belle2 {
     {
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TVector3 motherBoost = - frame.getMomentum(part).BoostVector();
-      TVector3 motherMomentum = frame.getMomentum(part).Vect();
+      B2Vector3D motherBoost = frame.getMomentum(part).BoostToCM();
+      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
       const auto& daughters = part -> getDaughters() ;
 
       if (daughters.size() == 2) {
@@ -48,43 +50,43 @@ namespace Belle2 {
         if (isOneConversion) {
           //only for pi0 decay where one gamma converts
 
-          TLorentzVector pGamma;
+          PxPyPzEVector pGamma;
 
           for (auto& idaughter : daughters) {
             if (idaughter -> getNDaughters() == 2) continue;
             else pGamma = frame.getMomentum(idaughter);
           }
 
-          pGamma.Boost(motherBoost);
+          pGamma = Boost(motherBoost) * pGamma;
 
           return std::cos(motherMomentum.Angle(pGamma.Vect()));
 
         } else {
-          TLorentzVector pDaughter1 = frame.getMomentum(daughters[0]);
-          TLorentzVector pDaughter2 = frame.getMomentum(daughters[1]);
+          PxPyPzEVector pDaughter1 = frame.getMomentum(daughters[0]);
+          PxPyPzEVector pDaughter2 = frame.getMomentum(daughters[1]);
 
-          pDaughter1.Boost(motherBoost);
-          pDaughter2.Boost(motherBoost);
+          pDaughter1 = Boost(motherBoost) * pDaughter1;
+          pDaughter2 = Boost(motherBoost) * pDaughter2;
 
-          TVector3 p12 = (pDaughter2 - pDaughter1).Vect();
+          B2Vector3D p12 = (pDaughter2 - pDaughter1).Vect();
 
           return std::cos(motherMomentum.Angle(p12));
         }
 
       } else if (daughters.size() == 3) {
 
-        TLorentzVector pDaughter1 = frame.getMomentum(daughters[0]);
-        TLorentzVector pDaughter2 = frame.getMomentum(daughters[1]);
-        TLorentzVector pDaughter3 = frame.getMomentum(daughters[2]);
+        PxPyPzEVector pDaughter1 = frame.getMomentum(daughters[0]);
+        PxPyPzEVector pDaughter2 = frame.getMomentum(daughters[1]);
+        PxPyPzEVector pDaughter3 = frame.getMomentum(daughters[2]);
 
-        pDaughter1.Boost(motherBoost);
-        pDaughter2.Boost(motherBoost);
-        pDaughter3.Boost(motherBoost);
+        pDaughter1 = Boost(motherBoost) * pDaughter1;
+        pDaughter2 = Boost(motherBoost) * pDaughter2;
+        pDaughter3 = Boost(motherBoost) * pDaughter3;
 
-        TVector3 p12 = (pDaughter2 - pDaughter1).Vect();
-        TVector3 p13 = (pDaughter3 - pDaughter1).Vect();
+        B2Vector3D p12 = (pDaughter2 - pDaughter1).Vect();
+        B2Vector3D p13 = (pDaughter3 - pDaughter1).Vect();
 
-        TVector3 n = p12.Cross(p13);
+        B2Vector3D n = p12.Cross(p13);
 
         return std::cos(motherMomentum.Angle(n));
 
@@ -96,20 +98,20 @@ namespace Belle2 {
     {
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TVector3 motherBoost = - frame.getMomentum(part).BoostVector();
-      TVector3 motherMomentum = frame.getMomentum(part).Vect();
+      B2Vector3D motherBoost = frame.getMomentum(part).BoostToCM();
+      B2Vector3D motherMomentum = frame.getMomentum(part).Vect();
       const auto& daughters = part -> getDaughters() ;
 
 
       if (daughters.size() == 3) {
 
-        TLorentzVector pGamma;
+        PxPyPzEVector pGamma;
 
         for (auto& idaughter : daughters) {
           if (std::abs(idaughter -> getPDGCode()) == Const::photon.getPDGCode()) pGamma = frame.getMomentum(idaughter);
         }
 
-        pGamma.Boost(motherBoost);
+        pGamma = Boost(motherBoost) * pGamma;
 
         return std::cos(motherMomentum.Angle(pGamma.Vect()));
 
@@ -137,16 +139,16 @@ namespace Belle2 {
           B2FATAL("Couldn't find the " << idau << "th daughter");
         }
 
-        TLorentzVector beam4Vector(getBeamPx(nullptr), getBeamPy(nullptr), getBeamPz(nullptr), getBeamE(nullptr));
-        TLorentzVector part4Vector = part->get4Vector();
-        TLorentzVector mother4Vector = mother->get4Vector();
+        PxPyPzEVector beam4Vector(getBeamPx(nullptr), getBeamPy(nullptr), getBeamPz(nullptr), getBeamE(nullptr));
+        PxPyPzEVector part4Vector = part->get4Vector();
+        PxPyPzEVector mother4Vector = mother->get4Vector();
 
-        TVector3 motherBoost = -(mother4Vector.BoostVector());
+        B2Vector3D motherBoost = mother4Vector.BoostToCM();
 
-        beam4Vector.Boost(motherBoost);
-        part4Vector.Boost(motherBoost);
+        beam4Vector = Boost(motherBoost) * beam4Vector;
+        part4Vector = Boost(motherBoost) * part4Vector;
 
-        return - part4Vector.Vect().Dot(beam4Vector.Vect()) / part4Vector.Vect().Mag() / beam4Vector.Vect().Mag();
+        return - part4Vector.Vect().Dot(beam4Vector.Vect()) / part4Vector.P() / beam4Vector.P();
       };
       return func;
     }
@@ -177,17 +179,17 @@ namespace Belle2 {
           B2FATAL("Couldn't find the " << iGrandDau << "th daughter of the " << iDau << "th daughter.");
 
 
-        TLorentzVector mother4Vector = mother->get4Vector();
-        TLorentzVector daughter4Vector = daughter->get4Vector();
-        TLorentzVector grandDaughter4Vector = grandDaughter->get4Vector();
+        PxPyPzEVector mother4Vector = mother->get4Vector();
+        PxPyPzEVector daughter4Vector = daughter->get4Vector();
+        PxPyPzEVector grandDaughter4Vector = grandDaughter->get4Vector();
 
-        TVector3 daughterBoost = -(daughter4Vector.BoostVector());
+        B2Vector3D daughterBoost = daughter4Vector.BoostToCM();
 
         // We boost the momentum of the mother and of the granddaughter to the reference frame of the daughter.
-        grandDaughter4Vector.Boost(daughterBoost);
-        mother4Vector.Boost(daughterBoost);
+        grandDaughter4Vector = Boost(daughterBoost) * grandDaughter4Vector;
+        mother4Vector = Boost(daughterBoost) * mother4Vector;
 
-        return - grandDaughter4Vector.Vect().Dot(mother4Vector.Vect()) / grandDaughter4Vector.Vect().Mag() / mother4Vector.Vect().Mag();
+        return - grandDaughter4Vector.Vect().Dot(mother4Vector.Vect()) / grandDaughter4Vector.P() / mother4Vector.P();
 
       };
       return func;
@@ -223,27 +225,27 @@ namespace Belle2 {
         if (!grandDaughter2)
           B2FATAL("Couldn't find the " << iGrandDau2 << "th daughter of the second daughter.");
 
-        TLorentzVector mother4Vector = mother->get4Vector();
-        TLorentzVector daughter4Vector1 = daughter1->get4Vector();
-        TLorentzVector daughter4Vector2 = daughter2->get4Vector();
-        TLorentzVector grandDaughter4Vector1 = grandDaughter1->get4Vector();
-        TLorentzVector grandDaughter4Vector2 = grandDaughter2->get4Vector();
+        PxPyPzEVector mother4Vector = mother->get4Vector();
+        PxPyPzEVector daughter4Vector1 = daughter1->get4Vector();
+        PxPyPzEVector daughter4Vector2 = daughter2->get4Vector();
+        PxPyPzEVector grandDaughter4Vector1 = grandDaughter1->get4Vector();
+        PxPyPzEVector grandDaughter4Vector2 = grandDaughter2->get4Vector();
 
-        TVector3 motherBoost = -(mother4Vector.BoostVector());
-        TVector3 daughter1Boost = -(daughter4Vector1.BoostVector());
-        TVector3 daughter2Boost = -(daughter4Vector2.BoostVector());
+        B2Vector3D motherBoost = mother4Vector.BoostToCM();
+        B2Vector3D daughter1Boost = daughter4Vector1.BoostToCM();
+        B2Vector3D daughter2Boost = daughter4Vector2.BoostToCM();
 
         // Boosting daughters to reference frame of the mother
-        daughter4Vector1.Boost(motherBoost);
-        daughter4Vector2.Boost(motherBoost);
+        daughter4Vector1 = Boost(motherBoost) * daughter4Vector1;
+        daughter4Vector2 = Boost(motherBoost) * daughter4Vector2;
 
         // Boosting each granddaughter to reference frame of its mother
-        grandDaughter4Vector1.Boost(daughter1Boost);
-        grandDaughter4Vector2.Boost(daughter2Boost);
+        grandDaughter4Vector1 = Boost(daughter1Boost) * grandDaughter4Vector1;
+        grandDaughter4Vector2 = Boost(daughter2Boost) * grandDaughter4Vector2;
 
         // We calculate the normal vectors of the decay two planes
-        TVector3 normalVector1 = daughter4Vector1.Vect().Cross(grandDaughter4Vector1.Vect());
-        TVector3 normalVector2 = daughter4Vector2.Vect().Cross(grandDaughter4Vector2.Vect());
+        B2Vector3D normalVector1 = daughter4Vector1.Vect().Cross(grandDaughter4Vector1.Vect());
+        B2Vector3D normalVector2 = daughter4Vector2.Vect().Cross(grandDaughter4Vector2.Vect());
 
         return std::cos(normalVector1.Angle(normalVector2));
 
@@ -309,14 +311,15 @@ namespace Belle2 {
 
                       Otherwise, it returns 0.)DOC");
 
-    REGISTER_VARIABLE("cosHelicityAngleBeamMomentum(i)", cosHelicityAngleBeamMomentum,
-                      R"DOC(
+    REGISTER_METAVARIABLE("cosHelicityAngleBeamMomentum(i)", cosHelicityAngleBeamMomentum,
+                          R"DOC(
                       Cosine of the helicity angle of the :math:`i`-th daughter of the particle provided,
                       assuming that the mother of the provided particle corresponds to the centre-of-mass system, whose parameters are
-                      automatically loaded by the function, given the accelerator's conditions.)DOC");
+                      automatically loaded by the function, given the accelerator's conditions.)DOC",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("cosHelicityAngle(i, j)", cosHelicityAngle,
-                      R"DOC(
+    REGISTER_METAVARIABLE("cosHelicityAngle(i, j)", cosHelicityAngle,
+                          R"DOC(
                       Cosine of the helicity angle between the momentum of the provided particle and the momentum of the selected granddaughter
                       in the reference frame of the selected daughter (:math:`\theta_1` and :math:`\theta_2` in the
                       `PDG <https://journals.aps.org/prd/abstract/10.1103/PhysRevD.98.030001>`_ 2018, p. 722).
@@ -328,10 +331,11 @@ namespace Belle2 {
                       the variable will return the angle between the momentum of the :math:`B^0` and the momentum of the :math:`\mu^+`,
                       both momenta in the rest frame of the :math:`J/\psi`.
 
-                      This variable is needed for angular analyses of :math:`B`-meson decays into two vector particles.)DOC");
+                      This variable is needed for angular analyses of :math:`B`-meson decays into two vector particles.)DOC",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_VARIABLE("cosAcoplanarityAngle(i, j)", cosAcoplanarityAngle,
-                      R"DOC(
+    REGISTER_METAVARIABLE("cosAcoplanarityAngle(i, j)", cosAcoplanarityAngle,
+                          R"DOC(
                       Cosine of the acoplanarity angle (:math:`\Phi` in the `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_).
                       Given a two-body decay, the acoplanarity angle is defined as
                       the angle between the two decay planes in the reference frame of the mother. 
@@ -344,15 +348,16 @@ namespace Belle2 {
                       second granddaughter. 
 
                       For example, in the decay :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, if the provided particle is :math:`B^0` and the selected indices are (0, 0),
-                      the variable will return the acoplanarity using the :math:`\mu^+` and the :math:`K^+` granddaughters.)DOC");
+                      the variable will return the acoplanarity using the :math:`\mu^+` and the :math:`K^+` granddaughters.)DOC",
+                          Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("cosHelicityAnglePrimary", cosHelicityAnglePrimary,
                       R"DOC(
                       Cosine of the helicity angle (see``Particle::getCosHelicity``) assuming the center of mass system as mother rest frame.
                       See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");
 
-    REGISTER_VARIABLE("cosHelicityAngleDaughter(i [, j] )", cosHelicityAngleDaughter,
-                      R"DOC(
+    REGISTER_METAVARIABLE("cosHelicityAngleDaughter(i [, j] )", cosHelicityAngleDaughter,
+                          R"DOC(
                       Cosine of the helicity angle of the i-th daughter (see ``Particle::getCosHelicityDaughter``).
                       The optional second argument is the index of the granddaughter that defines the angle, default is 0.
 
@@ -361,12 +366,14 @@ namespace Belle2 {
                       If the selected index is 1 the variable will return the helicity angle of the :math:`K^+` (defined via the rest frame of the :math:`K^{*0}`).
                       In rare cases if one wanted the helicity angle of the second granddaughter, indices 1,1 would return the helicity angle of the :math:`\pi^-`).
 
-                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");
+                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC",
+                          Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("acoplanarityAngle", acoplanarityAngle,
                       R"DOC(
                       Acoplanarity angle (see ``Particle::getAcoplanarity``) assuming a two body decay of the particle and its daughters.
-                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the acoplanarity angle.)DOC");
+                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the acoplanarity angle.)DOC",
+                      "rad");
 
   }
 }

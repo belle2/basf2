@@ -11,9 +11,9 @@
 
 # **************  Flavor Tagging   **************
 # *                                             *
-# * This script calculates the paramters charac-*
-# * terizing the performance of the flavor tag- *
-# * ger. It produces as well plots for the qr   *
+# * This script calculates the parameters char- *
+# * acterizing the performance of the flavor    *
+# * tagger. It produces plots for the qr        *
 # * distribution of the combiners and the dis-  *
 # * tributions of the combiner input variables. *
 # *                                             *
@@ -45,9 +45,9 @@ if len(workingFiles) < 1:
 workingDirectory = '.'
 
 #
-# *****************************************
-# DETERMINATION OF TOTAL EFFECTIVE EFFIENCY
-# *****************************************
+# *******************************************
+# DETERMINATION OF TOTAL EFFECTIVE EFFICIENCY
+# *******************************************
 #
 
 # working directory
@@ -84,15 +84,12 @@ for cat in categories:
     if catBranch in totalBranches:
         usedCategories.append(cat)
 
-if len(usedCategories) > 1:
-    ft.WhichCategories(usedCategories)
-
 YmaxForQrPlot = 0
 
 total_notTagged = 0
 
 for method in methods:
-    # Get erro with GetBinError(), set erro with SetBinError()
+    # Get error with GetBinError(), set error with SetBinError()
     # histogram contains the average r in each of 7 bins -> calculation see below
     histo_avr_r = ROOT.TH1F('Average_r', 'Average r in each of the bins (B0 and B0bar)', int(r_size - 2),
                             r_subsample)
@@ -660,47 +657,15 @@ for method in methods:
     for i in range(1, r_size):
         print('$ ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '$ & $'
               '{: 7.2f}'.format(muParam[i] * 100) + r" \pm " + '{:2.2f}'.format(muParamUncertainty[i] * 100) + r' $ & ')
-# **********************************************
+# ************************************************
 # DETERMINATION OF INDIVIDUAL EFFECTIVE EFFICIENCY
-# **********************************************
+# ************************************************
 
 # keep in mind:
-# the individual efficiency is determind on basis of the combiner training.
+# the individual efficiency is determined on basis of the combiner training.
 # Whereas the efficiency is determined on basis of the final expert output.
-# print(eventLevelParticleLists)
-# eventLevelParticleLists.append(('K+:inRoe', 'KaonNotWeighted',
-#                                 'QpOf(K+:inRoe, isRightCategory(Kaon), isRightCategory(Kaon))'))
-# eventLevelParticleLists.append(('Lambda0:inRoe', 'LambdaNotWeighted',
-#                                 'weightedQpOf(Lambda0:inRoe, isRightCategory(Lambda), isRightCategory(Lambda))'))
-# eventLevelParticleLists.append(('e+:inRoe', 'Electron',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(Electron), isRightCategory(Electron))'))
-# eventLevelParticleLists.append(
-#     ('e+:inRoe',
-#      'IntermediateElectron',
-#      'weightedQpOf(e+:inRoe, isRightCategory(IntermediateElectron), isRightCategory(IntermediateElectron))'))
-# eventLevelParticleLists.append(('mu+:inRoe', 'Muon',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(Muon), isRightCategory(Muon))'))
-# eventLevelParticleLists.append(('mu+:inRoe', 'IntermediateMuon',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(IntermediateMuon), isRightCategory(IntermediateMuon))'))
-# eventLevelParticleLists.append(('mu+:inRoe', 'KinLepton',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(KinLepton), isRightCategory(KinLepton))'))
-# eventLevelParticleLists.append(
-#     ('mu+:inRoe',
-#      'IntermediateKinLepton',
-#      'weightedQpOf(e+:inRoe, isRightCategory(IntermediateKinLepton), isRightCategory(IntermediateKinLepton))'))
-# eventLevelParticleLists.append(('pi+:inRoe', 'SlowPion',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(MaximumPstar), isRightCategory(MaximumPstar))'))
-# eventLevelParticleLists.append(('pi+:inRoe', 'FSC',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(SlowPion), isRightCategory(SlowPion))'))
-# eventLevelParticleLists.append(('pi+:inRoe', 'MaximumPstar',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(FSC), isRightCategory(SlowPion))'))
-# eventLevelParticleLists.append(('pi+:inRoe', 'FastHadron',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(FastHadron), isRightCategory(FastHadron))'))
-# eventLevelParticleLists.append(('K+:inRoe', 'KaonPion',
-#                                 'weightedQpOf(e+:inRoe, isRightCategory(KaonPion), isRightCategory(Kaon))'))
 
-
-print(ft.eventLevelParticleLists)
+print(ft.getEventLevelParticleLists(usedCategories))
 
 
 print('******************************************* MEASURED EFFECTIVE EFFICIENCY FOR INDIVIDUAL CATEGORIES ' +
@@ -711,7 +676,7 @@ print('*                                                                        
 # but is re-evaluated under combiner target. Signal is B0, background is B0Bar.
 categoriesPerformance = []
 NbinsCategories = 100
-for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
+for category in usedCategories:
     # histogram of input variable (only signal) - not yet a probability! It's a classifier plot!
     hist_both = ROOT.TH1F('Both_' + category, 'Input Both (B0) ' +
                           category + ' (binning)', NbinsCategories, -1.0, 1.0)
@@ -722,7 +687,7 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
     hist_background = ROOT.TH1F('Background_' + category, 'Input Background (B0bar) ' +
                                 category + ' (binning)', NbinsCategories, -1.0, 1.0)
 
-    # per definiton that input is not comparable to the network output, this has to be transformed.
+    # per definition that input is not comparable to the network output, this has to be transformed.
     # probability output from 0 to 1 (corresponds to net output probability) -> calculation below
     hist_probB0 = ROOT.TH1F('Probability' + category,
                             'Transformed to probability (B0) (' + category + ')',
@@ -879,7 +844,7 @@ for (particleList, category, combinerVariable) in ft.eventLevelParticleLists:
             purityB0bar[i] = back[i] / (signal[i] + back[i])
             dilutionB0bar2[i] = -1 + 2 * back[i] / (signal[i] + back[i])
 
-        # filling histogram with probabilty from 0 to 1
+        # filling histogram with probability from 0 to 1
         hist_probB0.Fill(purityB0[i], signal[i])
         hist_probB0bar.Fill(purityB0bar[i], back[i])
 

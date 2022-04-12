@@ -36,7 +36,7 @@ namespace {
 namespace {
   MCParticleGraph gParticleGraph;
 
-  /** is this a final state particle? (determines wether a Particle->MCParticle relation will be created during reconstruction) */
+  /** is this a final state particle? (determines whether a Particle->MCParticle relation will be created during reconstruction) */
   bool isFSP(int pdg)
   {
     switch (abs(pdg)) {
@@ -218,7 +218,8 @@ namespace {
           std::sort(decaybarlist.begin(), decaybarlist.end());
           bool isUnflavored = (decaylist == decaybarlist);
 
-          m_particle = particles.appendNew(TLorentzVector(), decay.m_pdg, isUnflavored ? (Particle::c_Unflavored) : (Particle::c_Flavored),
+          m_particle = particles.appendNew(ROOT::Math::PxPyPzEVector(), decay.m_pdg,
+                                           isUnflavored ? (Particle::c_Unflavored) : (Particle::c_Flavored),
                                            daughterIndices);
         }
       }
@@ -748,7 +749,7 @@ namespace {
       EXPECT_EQ(MCMatching::c_DecayInFlight, MCMatching::getMCErrors(d.m_particle)) << d.getString();
     }
   }
-  /** we reconstrcut D*+ -> D0 pi+, but it's actually D+ pi0. */
+  /** we reconstruct D*+ -> D0 pi+, but it's actually D+ pi0. */
   TEST_F(MCMatchingTest, CorrectFSPsWrongDecay)
   {
     {

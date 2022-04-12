@@ -30,6 +30,7 @@ import basf2
 # run at most over this amount of events
 N_EVENTS = 100
 ACTIVE = True
+CONTACT = 'software-tracking@belle2.org'
 
 basf2.set_random_seed(1337)
 
@@ -46,7 +47,7 @@ class Standalone(TrackingValidationRun):
     finder_module = None
     #: Calculate also pull variables
     pulls = True
-    #: The contact person (Thomas Hauth)
+    #: The contact person
     contact = CONTACT
 
 

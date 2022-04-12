@@ -55,14 +55,14 @@ class BtoXgamma(BaseSkim):
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
-        stdPhotons("all", path=path)
-        stdPhotons("loose", path=path)
+        stdPhotons("loose", path=path, loadPhotonBeamBackgroundMVA=False)
 
     def build_lists(self, path):
         """Build the skim list for :math:`B \\to X\\gamma` decays."""
         # event level cuts: R2 and require a minimum number of tracks + decent photons
         ma.fillParticleList(decayString='pi+:BtoXgamma_eventshape', cut='pt > 0.1', path=path)
-        ma.fillParticleList(decayString='gamma:BtoXgamma_eventshape', cut='E > 0.1', path=path)
+        ma.fillParticleList(decayString='gamma:BtoXgamma_eventshape', cut='E > 0.1', path=path,
+                            loadPhotonBeamBackgroundMVA=False)
 
         ma.buildEventShape(inputListNames=['pi+:BtoXgamma_eventshape', 'gamma:BtoXgamma_eventshape'],
                            allMoments=False,
@@ -94,7 +94,7 @@ class BtoXgamma(BaseSkim):
         histogram_filename = f'{self}_Validation.root'
 
         stdK('all', path=path)
-        stdPhotons('cdc', path=path)
+        stdPhotons('cdc', path=path, loadPhotonBeamBackgroundMVA=False)
         ma.cutAndCopyList('gamma:sig', 'gamma:cdc', 'clusterNHits > 1.5 and E > 1.5', True, path)
 
         ma.reconstructDecay('K*0:sig  -> K+:all pi-:all', '0.6 < M < 1.6', path=path)
@@ -160,7 +160,7 @@ class BtoXll(BaseSkim):
         stdE("all", path=path)
         stdMu("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
 
     def build_lists(self, path):
         """Build the skim list for :math:`B \\to X\\ell\\ell` non-LFV decays."""
@@ -272,7 +272,7 @@ class BtoXll_LFV(BaseSkim):
         stdE("all", path=path)
         stdMu("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path)
+        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
 
     def build_lists(self, path):
         """Build the skim list for :math:`B \\to X\\ell\\ell` LFV decays."""

@@ -23,18 +23,39 @@ namespace Belle2 {
 
   public:
 
-    /** Constructor */
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisPXDERModule();
-    /* Destructor */
+
+    /**
+     * Destructor.
+     */
     ~DQMHistAnalysisPXDERModule();
 
-  private:
-
-    /** Module functions */
+    /**
+     * Initializer.
+     */
     void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event() override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
     void endRun() override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate() override final;
 
   private:
@@ -171,7 +192,7 @@ namespace Belle2 {
        * @param flaghist Histogram of flags.
        * @return Indication of succes of realizing of condition, 1: OK.
        */
-    int SetFlag(int Type, int bin, double* pars, double ratio, const std::string& name_hist, const std::string& name_refhist,
+    int SetFlag(int Type, int bin, const double* pars, double ratio, const std::string& name_hist, const std::string& name_refhist,
                 TH1I* flaghist);
     /** Function return flag histogram filled based on condition from TH1I source.
        * Flag values:

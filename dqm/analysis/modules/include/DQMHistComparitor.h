@@ -57,9 +57,40 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistComparitorModule();
+
+    /**
+     * Destructor.
+     */
     ~DQMHistComparitorModule();
+
+    /**
+     * Initializer.
+     */
+    void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     */
+    void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
+    void event() override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
+    void endRun() override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
+    void terminate() override final;
 
     /**
      * Find histogram corresponding to canvas.
@@ -67,14 +98,6 @@ namespace Belle2 {
      * @return The pointer to the histogram, or nullptr if not found.
      */
     TH1* find_histo_in_canvas(TString hname);
-    //! Module functions to be called from main process
-    void initialize() override final;
-
-    //! Module functions to be called from event process
-    void beginRun() override final;
-    void event() override final;
-    void endRun() override final;
-    void terminate() override final;
 
     // Data members
   private:

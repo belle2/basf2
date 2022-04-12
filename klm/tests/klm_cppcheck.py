@@ -15,6 +15,9 @@ Perform code quality cppchecks for every commit to the klm package.
 
 import re
 from b2test_utils import check_error_free
+from b2test_utils import skip_test
+
+skip_test("Interference of cppcheck warnings from rawdata package.")
 
 if __name__ == "__main__":
     ignoreme = "Cppcheck cannot find all the include files"

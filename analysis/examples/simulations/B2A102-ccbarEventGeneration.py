@@ -12,7 +12,7 @@
 #                                                                        #
 # Stuck? Ask for help at questions.belle2.org                            #
 #                                                                        #
-# e+e- -> ccbar -> D*+ antyhing event generation                         #
+# e+e- -> ccbar -> D*+ anything event generation                         #
 #                                                                        #
 # This tutorial demonstrates how to generate                             #
 #                                                                        #
@@ -36,7 +36,7 @@ import generators as ge
 my_path = b2.create_path()
 
 # generation of 100 events according to the specified DECAY table
-# e+e- -> ccbar -> D*+ anthing
+# e+e- -> ccbar -> D*+ anything
 # D*+ -> D0 pi+; D0 -> K- pi+
 #
 ma.setupEventInfo(100, path=my_path)

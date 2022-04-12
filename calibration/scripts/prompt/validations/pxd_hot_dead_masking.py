@@ -13,19 +13,16 @@ Validation of PXD hot/dead pixel calibration.
 '''
 
 
-import basf2
 from prompt import ValidationSettings
-import ROOT
 import sys
 import subprocess
-import math
 from glob import glob
 
 
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='PXD hot/dead pixel calibration',
                               description=__doc__,
-                              download_files=['PXDRawHotPixelMaskCollectordebug.root', 'stdout'],
+                              download_files=['PXDRawHotPixelMaskCollectordebug.root'],
                               expert_config={})
 
 

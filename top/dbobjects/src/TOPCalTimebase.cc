@@ -78,7 +78,7 @@ namespace Belle2 {
       m_map[key] = &sampleTime;
     }
 
-    B2DEBUG(100, "Map created, size = " << m_map.size());
+    B2DEBUG(29, "TOPCalTimebase: map created, size = " << m_map.size());
   }
 
 } // end Belle2 namespace

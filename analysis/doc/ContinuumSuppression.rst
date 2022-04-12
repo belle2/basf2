@@ -4,9 +4,18 @@ Continuum suppression
 =====================
 
 This page contains instructions on how to use the continuum suppression
-framework, with a focus on recent modifications. For a detailed description of
-the variables, please refer to Chapter 9 (Background suppression for B decays)
-of `The Physics of the B Factories book <https://arxiv.org/abs/1406.6311>`_
+framework, with a focus on recent modifications. 
+
+.. seealso::
+
+  For a detailed description of
+  the variables, please refer to Chapter 9 (Background suppression for B decays)
+  of `The Physics of the B Factories book <https://arxiv.org/abs/1406.6311>`_
+
+.. seealso::
+
+  For a beginner friendly tutorial on continuum suppression, head over to
+  :ref:`onlinebook_cs`.
 
 Example usage
 -------------
@@ -35,7 +44,7 @@ The generic interface is the following:
   buildContinuumSuppression('B0', 'cleanMask', path=main)
 
 Where ``<Your selections for ROE>`` is a set of cuts on tracks and clusters of ROE
-which are in general analysis dependet. Some examples will be given below.
+which are in general analysis dependent. Some examples will be given below.
 
 .. autofunction:: modularAnalysis.buildContinuumSuppression
    :noindex:

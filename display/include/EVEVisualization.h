@@ -22,9 +22,8 @@
 #include <vtx/dataobjects/VTXTrueHit.h>
 #include <vtx/dataobjects/VTXCluster.h>
 #include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/eklm/EKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/dataobjects/KLMHit2d.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <vxd/geometry/GeoCache.h>
@@ -182,10 +181,10 @@ namespace Belle2 {
     void addKLMCluster(const KLMCluster* cluster);
 
     /** Add a reconstructed 2d hit in the BKLM. */
-    void addBKLMHit2d(const BKLMHit2d* bklm2dhit);
+    void addBKLMHit2d(const KLMHit2d* bklm2dhit);
 
     /** Add a reconstructed 2d hit in the EKLM. */
-    void addEKLMHit2d(const EKLMHit2d* bklm2dhit);
+    void addEKLMHit2d(const KLMHit2d* eklm2dhit);
 
     /** Add recontructed hit in ARICH */
     void addARICHHit(const ARICHHit* hit);

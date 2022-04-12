@@ -34,7 +34,7 @@ namespace Belle2 {
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
         B2DEBUG(20, "SVDClustering: from now on we are using " <<
-        this->m_aDBObjPtr -> get_uniqueID()); });
+                this->m_aDBObjPtr -> get_uniqueID()); });
 
     }
 
@@ -84,6 +84,29 @@ namespace Belle2 {
 
     }
 
+    /** Return the unfolding coefficient for the strip charge
+     *
+     * Input:
+     * @param sensorID: identity of the sensor for which the calibration is required
+     * @param isU: sensor side, true for p side, false for n side
+     * @param strip: NOT USED
+     *
+     * Output: double corresponding to the unfolding coefficient for the cluster
+     */
+    inline double getUnfoldingCoeff(
+      const Belle2::VxdID& sensorID,
+      const bool& isU
+    ) const
+    {
+      return m_aDBObjPtr->getReference(sensorID.getLayerNumber(),
+                                       sensorID.getLadderNumber(),
+                                       sensorID.getSensorNumber(),
+                                       m_aDBObjPtr->sideIndex(isU),
+                                       0 //strip not relevant
+                                      ).UnfoldingCoeff;
+
+    }
+
     /** Return the minimum SNR for the cluster
      *
      * Input:
@@ -106,6 +129,7 @@ namespace Belle2 {
                                       ).minClusterSNR;
 
     }
+
 
     /** returns the unique ID of the payload */
     TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }

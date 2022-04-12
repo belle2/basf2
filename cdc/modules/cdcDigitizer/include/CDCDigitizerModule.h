@@ -223,21 +223,21 @@ namespace Belle2 {
     double m_totalFudgeFactor = 1.;  /**< total fudge factor for space resol. */
 
     bool m_gasGainSmearing = false;  /**< Swtich for gas gain smearing */
-    double m_effWForGasGainSmearing = 0.0265;  /**< Effective energy (keV) for one electron prod. for gas gain smearing */
+    double m_effWForGasGainSmearing = 0.0266;  /**< Effective energy (keV) for one electron prod. for gas gain smearing */
     double m_thetaOfPolya = 0.5;     /**< theta of Polya function for gas gain smearing */
-    bool m_extraADCSmearing = true; /**< Swtich for extra ADC smearing */
+    bool m_extraADCSmearing = false; /**< Swtich for extra ADC smearing */
     //    double m_sigmaForExtraADCSmearing = 0.3;  /**< Gaussian sigma for extra ADC smearing */
     double m_runGain = 1.;  /**< run gain. */
-    float m_semiTotalGain[MAX_N_SLAYERS][MAX_N_SCELLS] = {{}}; /**< total gain per wire */
+    float m_semiTotalGain[c_maxNSenseLayers][c_maxNDriftCells] = {{}}; /**< total gain per wire */
     double m_overallGainFactor = 1.;  /**< Overall gain factor. */
-    double m_degOfSPEOnThreshold;     /**< Degree of space charge effect on timing threshold */
+    double m_degOfSPEOnThreshold = 0; /**< Degree of space charge effect on timing threshold */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
     bool m_addTimeWalk; /**< A switch used to control adding time-walk delay into the total drift time or not */
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
-    bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
+    bool m_addTimeOfFlight; /**< A switch used to control adding time of flight into the total drift time or not */
     bool m_addInWirePropagationDelay4Bg; /**< A switch used to control adding propagation delay into the total drift time or not for beam bg. */
-    bool m_addTimeOfFlight4Bg;     /**< A switch used to control adding time of flight into the total drift time or not for beam bg. */
+    bool m_addTimeOfFlight4Bg; /**< A switch used to control adding time of flight into the total drift time or not for beam bg. */
     bool m_outputNegativeDriftTime;     /**< A switch to output negative drift time to CDCHit */
     bool m_output2ndHit;         /**< A switch to output 2nd hit */
     bool m_align;             /**< A switch to control alignment */
@@ -247,11 +247,11 @@ namespace Belle2 {
 
     bool m_useDB4FEE;             /**< Fetch FEE params from DB */
     DBArray<CDCFEElectronics>* m_fEElectronicsFromDB = nullptr; /*!< Pointer to FE electronics params. from DB. */
-    float m_lowEdgeOfTimeWindow[nBoards] = {0}; /*!< Lower edge of time-window */
-    float m_uprEdgeOfTimeWindow[nBoards] = {0}; /*!< Upper edge of time-window */
-    float m_tdcThresh          [nBoards] = {0}; /*!< Threshold for timing-signal */
-    float m_adcThresh          [nBoards] = {0}; /*!< Threshold for FADC */
-    unsigned short m_widthOfTimeWindowInCount  [nBoards] = {0}; /*!< Width of time window */
+    float m_lowEdgeOfTimeWindow[c_nBoards] = {0}; /*!< Lower edge of time-window */
+    float m_uprEdgeOfTimeWindow[c_nBoards] = {0}; /*!< Upper edge of time-window */
+    float m_tdcThresh          [c_nBoards] = {0}; /*!< Threshold for timing-signal */
+    float m_adcThresh          [c_nBoards] = {0}; /*!< Threshold for FADC */
+    unsigned short m_widthOfTimeWindowInCount  [c_nBoards] = {0}; /*!< Width of time window */
 
     bool m_useDB4EDepToADC;             /**< Fetch edep-to-ADC conversion params. from DB */
     bool m_useDB4RunGain;               /**< Fetch run gain from DB */
@@ -261,7 +261,7 @@ namespace Belle2 {
     DBObjPtr<CDCDedxScaleFactor>* m_gain0FromDB = nullptr; /*!< Pointer to overall gain factor from DB. */
     DBObjPtr<CDCDedxWireGain>* m_wireGainFromDB = nullptr; /*!< Pointer to wire gain from DB. */
     //    DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB = nullptr; /*!< Pointer to edep-to-ADC conv. params. from DB. */
-    //    float m_eDepToADCParams[MAX_N_SLAYERS][4]; /*!< edep-to-ADC conv. params. */
+    //    float m_eDepToADCParams[c_maxNSenseLayers][4]; /*!< edep-to-ADC conv. params. */
 
     bool m_addXTalk;           /**< Flag to switch on/off crosstalk */
     bool m_issue2ndHitWarning; /**< Flag to switch on/off a warning on the 2nd TDC hit */
@@ -277,7 +277,7 @@ namespace Belle2 {
     int m_offsetForTriggerBin = 1; /**< Input to getCDCTriggerBin(offset) */
     int m_trgTimingOffsetInCount   = 4; /**< Trigger timing offset in unit of count */
     int m_shiftOfTimeWindowIn32Count = 153; /**< Shift of time window for synchronization in 32count */
-    unsigned short m_trgDelayInCount[nBoards] = {0}; /**< Trigger delay in frontend electronics in count */
+    unsigned short m_trgDelayInCount[c_nBoards] = {0}; /**< Trigger delay in frontend electronics in count */
 
     /** Structure for saving the signal information. */
     struct SignalInfo {

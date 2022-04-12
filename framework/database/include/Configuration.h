@@ -15,6 +15,7 @@
 
 #include <variant>
 #include <set>
+#include <optional>
 
 namespace Belle2::Conditions {
   /** Wrapper class for a list of strings to either be held in a std::vector or

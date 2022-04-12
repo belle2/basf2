@@ -280,14 +280,14 @@ namespace Belle2 {
       // DANIEL added
       // derivatives of intermediate variables wrt object's local parameters
       // these must be implemented by the derived classes for each type of object
-      virtual double getFirstDerivative_Meta_Local(int iMeta ,
-                                                   int ilocal ,
+      virtual double getFirstDerivative_Meta_Local(int iMeta,
+                                                   int ilocal,
                                                    int metaSet
                                                   ) const = 0;
 
       virtual double getSecondDerivative_Meta_Local(int iMeta,
-                                                    int ilocal ,
-                                                    int jlocal ,
+                                                    int ilocal,
+                                                    int jlocal,
                                                     int metaSet
                                                    ) const = 0;
 
@@ -317,7 +317,7 @@ namespace Belle2 {
       bool measured[BaseDefs::MAXPAR];
       /// fixed flag
       bool fixed[BaseDefs::MAXPAR];
-      /// global paramter number for each parameter
+      /// global parameter number for each parameter
       int globalParNum [BaseDefs::MAXPAR];
       /// local covariance matrix
       double cov [BaseDefs::MAXPAR][BaseDefs::MAXPAR];

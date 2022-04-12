@@ -10,12 +10,14 @@
 
 import basf2_mva
 import pandas as pd
-from root_pandas import to_root, read_root
+from root_pandas import to_root
+import uproot
 import numpy as np
 from matplotlib import pyplot as plt
 
 
 def train_mva_method(file_name):
+
     weight_file = "weightfile.root"
 
     general_options = basf2_mva.GeneralOptions()
@@ -55,7 +57,7 @@ def apply_expert(file_name, weight_file):
 
 
 def create_plot(expert_file):
-    df = read_root(expert_file)
+    df = uproot.open(expert_file)["variables"].arrays(library="pd")
     df.plot.scatter("weightfile__ptroot_C", "weightfile__ptroot", ax=plt.gca())
     plt.xlabel("Correct")
     plt.ylabel("Output")

@@ -15,7 +15,7 @@ from softwaretrigger.processing import setup_basf2_and_db, start_path, finalize_
 args = setup_basf2_and_db()
 
 path = start_path(args, location=constants.Location.expressreco)
-add_expressreco_processing(path, run_type=constants.RunTypes.cosmic, data_taking_period="early_phase3")
+add_expressreco_processing(path, run_type=constants.RunTypes.cosmic)
 finalize_path(path, args, location=constants.Location.expressreco)
 
 basf2.print_path(path)

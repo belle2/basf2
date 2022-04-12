@@ -313,8 +313,10 @@ namespace Belle2 {
     {
       m_input_double.resize(m_general_options.m_variables.size(), 0);
       m_spectators_double.resize(m_general_options.m_spectators.size(), 0);
-      m_target_double = 0.0;
       m_weight_double = 1.0;
+      m_target_double = 0.0;
+      m_target_int = 0;
+      m_target_bool = 0;
 
       for (const auto& variable : general_options.m_variables)
         for (const auto& spectator : general_options.m_spectators)
@@ -358,13 +360,14 @@ namespace Belle2 {
       for (const auto& filename : filenames) {
         //nentries = -1 forces AddFile() to read headers
         if (!m_tree->AddFile(filename.c_str(), -1)) {
-          B2ERROR("Error during open of ROOT file named " << filename << " cannot retreive tree named " <<
+          B2ERROR("Error during open of ROOT file named " << filename << " cannot retrieve tree named " <<
                   m_general_options.m_treename);
-          throw std::runtime_error("Error during open of ROOT file named " + filename + " cannot retreive tree named " +
+          throw std::runtime_error("Error during open of ROOT file named " + filename + " cannot retrieve tree named " +
                                    m_general_options.m_treename);
         }
       }
       setRootInputType();
+      setTargetRootInputType();
       setBranchAddresses();
     }
 
@@ -375,19 +378,24 @@ namespace Belle2 {
       }
       if (m_isDoubleInputType) {
         m_weight = (float) m_weight_double;
-        m_target = (float) m_target_double;
         for (unsigned int i = 0; i < m_input_double.size(); i++)
           m_input[i] = (float) m_input_double[i];
         for (unsigned int i = 0; i < m_spectators_double.size(); i++)
           m_spectators[i] = (float) m_spectators_double[i];
       }
+      if (m_target_data_type == Variable::Manager::VariableDataType::c_double)
+        m_target = (float) m_target_double;
+      else if (m_target_data_type == Variable::Manager::VariableDataType::c_int)
+        m_target = (float) m_target_int;
+      else if (m_target_data_type == Variable::Manager::VariableDataType::c_bool)
+        m_target = (float) m_target_bool;
 
       m_isSignal = std::lround(m_target) == m_general_options.m_signal_class;
     }
 
     std::vector<float> ROOTDataset::getWeights()
     {
-      std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_weight_variable);
+      std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_weight_variable);
       if (branchName.empty()) {
         B2INFO("No TBranch name given for weights. Using 1s as default weights.");
         int nentries = getNumberOfEvents();
@@ -418,7 +426,7 @@ namespace Belle2 {
                 << getNumberOfFeatures());
       }
 
-      std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]);
+      std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_variables[iFeature]);
       std::string typeName = "features";
 
       if (m_isDoubleInputType)
@@ -434,7 +442,7 @@ namespace Belle2 {
                 << getNumberOfSpectators());
       }
 
-      std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_spectators[iSpectator]);
+      std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_spectators[iSpectator]);
       std::string typeName = "spectators";
 
       if (m_isDoubleInputType)
@@ -499,14 +507,14 @@ namespace Belle2 {
           m_tree->SetBranchStatus(variableName.c_str(), true);
           m_tree->SetBranchAddress(variableName.c_str(), &variableTarget);
         } else {
-          if (checkForBranch(m_tree, Belle2::makeROOTCompatible(variableName))) {
-            m_tree->SetBranchStatus(Belle2::makeROOTCompatible(variableName).c_str(), true);
-            m_tree->SetBranchAddress(Belle2::makeROOTCompatible(variableName).c_str(), &variableTarget);
+          if (checkForBranch(m_tree, Belle2::MakeROOTCompatible::makeROOTCompatible(variableName))) {
+            m_tree->SetBranchStatus(Belle2::MakeROOTCompatible::makeROOTCompatible(variableName).c_str(), true);
+            m_tree->SetBranchAddress(Belle2::MakeROOTCompatible::makeROOTCompatible(variableName).c_str(), &variableTarget);
           } else {
             B2ERROR("Couldn't find given " << variableType << " variable named " << variableName <<
-                    " (I tried also using makeROOTCompatible)");
+                    " (I tried also using MakeROOTCompatible::makeROOTCompatible)");
             throw std::runtime_error("Couldn't find given " + variableType + " variable named " + variableName +
-                                     " (I tried also using makeROOTCompatible)");
+                                     " (I tried also using MakeROOTCompatible::makeROOTCompatible)");
           }
         }
       }
@@ -553,16 +561,22 @@ namespace Belle2 {
         ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_weight_variable, m_weight);
       }
 
-      if (m_isDoubleInputType) {
+      if (m_target_data_type == Variable::Manager::VariableDataType::c_double) {
         typeName = "target";
         ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_target_variable, m_target_double);
+      } else if (m_target_data_type == Variable::Manager::VariableDataType::c_int) {
+        typeName = "target";
+        ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_target_variable, m_target_int);
+      } else if (m_target_data_type == Variable::Manager::VariableDataType::c_bool) {
+        typeName = "target";
+        ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_target_variable, m_target_bool);
+      }
+      if (m_isDoubleInputType) {
         typeName = "feature";
         ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_variables, m_input_double);
         typeName = "spectator";
         ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_spectators, m_spectators_double);
       } else {
-        typeName = "target";
-        ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_target_variable, m_target);
         typeName = "feature";
         ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_variables, m_input);
         typeName = "spectator";
@@ -577,8 +591,8 @@ namespace Belle2 {
       for (auto& variable : m_general_options.m_variables) {
         if (checkForBranch(m_tree, variable))
           control_variable = variable;
-        else if (checkForBranch(m_tree, Belle2::makeROOTCompatible(variable)))
-          control_variable = Belle2::makeROOTCompatible(variable);
+        else if (checkForBranch(m_tree, Belle2::MakeROOTCompatible::makeROOTCompatible(variable)))
+          control_variable = Belle2::MakeROOTCompatible::makeROOTCompatible(variable);
         if (not control_variable.empty()) {
           TBranch* branch = m_tree->GetBranch(control_variable.c_str());
           TLeaf* leaf = branch->GetLeaf(control_variable.c_str());
@@ -598,6 +612,21 @@ namespace Belle2 {
       throw std::runtime_error("No valid feature was found. Check your input features.");
     }
 
-
+    void ROOTDataset::setTargetRootInputType()
+    {
+      TBranch* branch = m_tree->GetBranch(m_general_options.m_target_variable.c_str());
+      TLeaf* leaf = branch->GetLeaf(m_general_options.m_target_variable.c_str());
+      std::string target_type_name = leaf->GetTypeName();
+      if (target_type_name == "Double_t")
+        m_target_data_type = Variable::Manager::VariableDataType::c_double;
+      else if (target_type_name == "Int_t")
+        m_target_data_type = Variable::Manager::VariableDataType::c_int;
+      else if (target_type_name == "Bool_t")
+        m_target_data_type = Variable::Manager::VariableDataType::c_bool;
+      else {
+        B2FATAL("Input type " << target_type_name << " for target variable is not supported");
+        throw std::runtime_error("Unsupported target input type: " + target_type_name);
+      }
+    }
   }
 }

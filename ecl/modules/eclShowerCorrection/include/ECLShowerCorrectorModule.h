@@ -52,7 +52,7 @@ namespace Belle2 {
     StoreArray<ECLShower> m_eclShowers;
 
     /** location of cluster; cellID and position within the crystal*/
-    ECL::ECLLeakagePosition* leakagePosition{nullptr};
+    ECL::ECLLeakagePosition* m_leakagePosition{nullptr};
 
     /** Leakage correction from database */
     DBObjPtr<ECLLeakageCorrections> m_eclLeakageCorrections;

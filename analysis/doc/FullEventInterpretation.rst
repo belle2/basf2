@@ -614,7 +614,7 @@ therefore this is only done once.
 After the database ``files_database.json`` is created, the maximum number of events stored in the files is determined per dataset corresponding to a single line in the original dataset list.
 Based on these numbers, and the value of ``n_events`` in the ``processing_type`` dictionary for a considered stage, the number of instances of ``FEIAnalysisTask`` to be spawned is computed
 for each single dataset. Furthermore, the corresponding `basf2` option values for ``-n`` and ``--skip-events``, and
-a partial dataset list are constructed and then passed to the corresponding ``FEIAnalysisTask`` instance, which is extented with further properties ``process_events`` and ``skip_events`` to pass
+a partial dataset list are constructed and then passed to the corresponding ``FEIAnalysisTask`` instance, which is extended with further properties ``process_events`` and ``skip_events`` to pass
 them to `basf2`.
 
 The options ``-n`` and ``--skip-events`` of `basf2` take care automatically of cases, when the number of remaining events to be processed from a file is smaller than configured by ``-n`` or
@@ -770,7 +770,7 @@ The reason for doing it currently with ``PrepareInputsTask`` by hand, is that th
 storage elements is introduced to `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_, the option ``--input_sandboxfiles`` can then be used directly and this would make the
 module ``PrepareInputsTask`` obsolete.
 
-Another possibile improvement of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ which is currently considered by the developers is the possibility to start merging jobs on the grid.
+Another possible improvement of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ which is currently considered by the developers is the possibility to start merging jobs on the grid.
 This would allow for performing ``MergeOutputsTask`` on the grid with the potential to speed up this part of the workflow, avoiding the time spent for downloads and merging on the local machine.
 
 In general, it is good to have a look at the process of `gbasf2 <https://confluence.desy.de/display/BI/Computing+GBasf2>`_ developments and extend the workflow and/or

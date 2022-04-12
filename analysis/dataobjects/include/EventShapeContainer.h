@@ -11,8 +11,8 @@
 #include <framework/datastore/RelationsObject.h>
 #include <framework/logging/Logger.h>
 
-#include <TVector3.h>
-#include <TLorentzVector.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 #include <vector>
 
 namespace Belle2 {
@@ -75,7 +75,7 @@ namespace Belle2 {
      * @param i the order (0,1,2)
      * @param eigenvector the eigenvector
      */
-    void setSphericityEigenvector(short i, TVector3 eigenvector)
+    void setSphericityEigenvector(short i, ROOT::Math::XYZVector eigenvector)
     {
       if (i < 0 || i > 2)
         B2ERROR("Invalid  EigenVector number  (n = " << i << "). You can set only 3 eigenvectors.");
@@ -122,22 +122,22 @@ namespace Belle2 {
      * Sets the thrust axis, normalizing it
      * @param thrustAxis thrust axis.
      */
-    void setThrustAxis(TVector3 thrustAxis)
+    void setThrustAxis(ROOT::Math::XYZVector thrustAxis)
     {
-      if (thrustAxis.Mag() < 1.E-10)
+      if (thrustAxis.R() < 1.E-10)
         B2WARNING("The thrust axis you are trying to set has magnitude numerically compatible with 0.");
-      m_thrustAxis = (1. / thrustAxis.Mag()) * thrustAxis;
+      m_thrustAxis = thrustAxis.Unit();
     };
 
     /**
      * Sets the spherocity axis, normalizing it
      * @param spherocityAxis sperocity axis. Must have magnitude equal to the thrust value.
      */
-    void setSpherocityAxis(TVector3 spherocityAxis)
+    void setSpherocityAxis(ROOT::Math::XYZVector spherocityAxis)
     {
-      if (spherocityAxis.Mag() < 1.E-10)
+      if (spherocityAxis.R() < 1.E-10)
         B2WARNING("The spherocity axis you are trying to set has magnitude numerically compatible with 0.");
-      m_spherocityAxis = (1. / spherocityAxis.Mag()) * spherocityAxis;
+      m_spherocityAxis = spherocityAxis.Unit();
     };
 
     /**
@@ -194,18 +194,18 @@ namespace Belle2 {
 
     /**
      * Sets the 4-momentum of the forward hemisphere, as defined by the thrust axis.
-     * @param mom TLorentzVector 4-momentum of the particles in the forward hemisphere
+     * @param mom PxPyPzEVector of the particles in the forward hemisphere
      */
-    void setForwardHemisphere4Momentum(TLorentzVector mom)
+    void setForwardHemisphere4Momentum(ROOT::Math::PxPyPzEVector mom)
     {
       m_forwardHemisphere4Momentum = mom;
     };
 
     /**
      * Sets the 4-momentum of the backward hemisphere, as defined by the thrust axis.
-     * @param mom TLorentzVector 4-momentum of the particles in the backward hemisphere
+     * @param mom PxPyPzEVector of the particles in the backward hemisphere
      */
-    void setBackwardHemisphere4Momentum(TLorentzVector mom)
+    void setBackwardHemisphere4Momentum(ROOT::Math::PxPyPzEVector mom)
     {
       m_backwardHemisphere4Momentum = mom;
     };
@@ -218,7 +218,7 @@ namespace Belle2 {
 
     /**
      * Returns the thrust
-     * @return TVector3 the thrust axis, normalized
+     * @return XYZVector the thrust axis, normalized
      */
     float getThrust() const
     {
@@ -227,18 +227,18 @@ namespace Belle2 {
 
     /**
      * Returns the thrust axis (normalized).
-     * @return TVector3 the thrust axis, normalized
+     * @return XYZVector the thrust axis, normalized
      */
-    TVector3 getThrustAxis() const
+    ROOT::Math::XYZVector getThrustAxis() const
     {
       return m_thrustAxis;
     };
 
     /**
      * Returns the spherocity axis (normalized).
-     * @return TVector3 the spherocity axis, normalized
+     * @return XYZVector the spherocity axis, normalized
      */
-    TVector3 getSpherocityAxis() const
+    ROOT::Math::XYZVector getSpherocityAxis() const
     {
       return m_spherocityAxis;
     };
@@ -263,12 +263,12 @@ namespace Belle2 {
      * @param i the number of the eigenvalue (0,1,2)
      * @return float the eigenvector
      */
-    TVector3 getSphericityEigenvector(short i) const
+    ROOT::Math::XYZVector getSphericityEigenvector(short i) const
     {
       if (i < 0 || i > 2) {
         B2ERROR("Invalid  Eigenvalue number  (n = " << i << "). There are only 3 eigenvalues...");
-        return TVector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(),
-                        std::numeric_limits<float>::quiet_NaN());
+        return ROOT::Math::XYZVector(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(),
+                                     std::numeric_limits<float>::quiet_NaN());
       } else
         return m_sphericityEigenvector[i];
     };
@@ -349,18 +349,18 @@ namespace Belle2 {
 
     /**
      * Returns the 4-momentum of the forward hemisphere, as defined by the thrust axis.
-     * @return TLorentzVector 4-momentum of the particles in the hemisphere
+     * @return PxPyPzEVector of the particles in the hemisphere
      */
-    TLorentzVector getForwardHemisphere4Momentum() const
+    ROOT::Math::PxPyPzEVector getForwardHemisphere4Momentum() const
     {
       return m_forwardHemisphere4Momentum;
     };
 
     /**
      * Return the 4-momentum of the backward hemisphere, as defined by the thrust axis.
-     * @return TLorentzVector 4-momentum of the particles in the hemisphere
+     * @return PxPyPzEVector of the particles in the hemisphere
      */
-    TLorentzVector getBackwardHemisphere4Momentum() const
+    ROOT::Math::PxPyPzEVector getBackwardHemisphere4Momentum() const
     {
       return m_backwardHemisphere4Momentum;
     };
@@ -369,11 +369,11 @@ namespace Belle2 {
   private:
 
     // Axes
-    TVector3 m_thrustAxis; /**< Thrust axis. It is not normalized, and it's length is the thrust value */
-    TVector3 m_spherocityAxis; /**< Spherocity axis. It is not normalized, and it's length is the spherocity value */
+    ROOT::Math::XYZVector m_thrustAxis; /**< Thrust axis. It is not normalized, and it's length is the thrust value */
+    ROOT::Math::XYZVector m_spherocityAxis; /**< Spherocity axis. It is not normalized, and it's length is the spherocity value */
 
     // Axis-independent quantities
-    TVector3 m_sphericityEigenvector[3]; /**< Sphericity tensor eigenvectors*/
+    ROOT::Math::XYZVector m_sphericityEigenvector[3]; /**< Sphericity tensor eigenvectors*/
     float m_sphericityEigenvalue[3] = {0.}; /**< Sphericity tensor eigenvalues*/
     float m_foxWolframMoments[10] = {0.}; /**< Fox Wolfram moments up to order 9. */
 
@@ -385,10 +385,10 @@ namespace Belle2 {
     float m_cleoConesCollision[10] = {0.}; /**< Cleo cones up to order 9, calculated respect to the collision axis. */
 
     // Hemisphere related quantities
-    TLorentzVector m_forwardHemisphere4Momentum; /**< Total 4-momentum of the particles in the forward hemisphere */
-    TLorentzVector m_backwardHemisphere4Momentum; /**< Total 4-momentum of the particles in the backward hemisphere */
+    ROOT::Math::PxPyPzEVector m_forwardHemisphere4Momentum; /**< Total 4-momentum of the particles in the forward hemisphere */
+    ROOT::Math::PxPyPzEVector m_backwardHemisphere4Momentum; /**< Total 4-momentum of the particles in the backward hemisphere */
 
-    ClassDef(EventShapeContainer, 1) /**< class definition */
+    ClassDef(EventShapeContainer, 2) /**< class definition */
 
   };
 

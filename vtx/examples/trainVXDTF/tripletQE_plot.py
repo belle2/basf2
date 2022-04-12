@@ -12,6 +12,8 @@
 #####################################################################
 # Visualize results from hyperparameter scan for tripletFit QE
 # created by running the script tripletQE_scan.py
+#
+# Usage: python3 tripletQE_plot.py
 #####################################################################
 
 import os
@@ -20,6 +22,15 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
+
+
+def parse_args():
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser('tripletQE_plot.py')
+    add_arg = parser.add_argument
+    add_arg('-i', '--input_dir', default='git_hash=None', type=str)
+    return parser.parse_args()
 
 
 def show_values(pc, fmt="%.3f", **kw):
@@ -70,6 +81,9 @@ def get_fom(path):
 
 if __name__ == "__main__":
 
+    # Parse the command line
+    args = parse_args()
+
     # Create a dictionary
     results = {}
     results['maxP'] = []
@@ -79,7 +93,7 @@ if __name__ == "__main__":
     results['fake_rate'] = []
     results['clone_rate'] = []
 
-    for path in Path('git_hash=None').rglob('FoM_validation.root'):
+    for path in Path(args.input_dir).rglob('FoM_validation.root'):
         print(path)
 
         # Parse the hyper parameters from path

@@ -31,7 +31,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(B2BIIMCParticlesMonitor)
+REG_MODULE(B2BIIMCParticlesMonitor);
 
 //-----------------------------------------------------------------
 //                 Implementation

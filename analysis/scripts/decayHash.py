@@ -12,17 +12,10 @@ import re
 import struct
 import pdg
 import basf2
-
 import pybasf2
+
 # inspect is also used by LogPythonInterface. Do not remove
 import numpy as np
-import ROOT
-from ROOT import Belle2
-
-logging = pybasf2.LogPythonInterface()
-
-ROOT.gSystem.Load("libanalysis.so")
-ROOT.gSystem.Load("libanalysis_utility.so")
 
 
 def _bitwiseConversion(value, i='f', o='i'):
@@ -61,6 +54,7 @@ class DecayHashMap:
     def __init__(self, rootfile, removeRadiativeGammaFlag=False):
         """Constructor"""
         import root_numpy
+        import ROOT
         ntuple = root_numpy.root2array(rootfile)
         # self._removeGammaFlag = removeRadiativeGammaFlag
         #: Dict Int -> DecayStrings
@@ -68,11 +62,11 @@ class DecayHashMap:
         #: Dict Int -> Reconstructed DecayTree
         self._forest = {}
         for decayHash, decayHashExtended, decayString in ntuple:
-            decayInt = Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)
+            decayInt = ROOT.Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)
             if decayInt in self._string:
                 continue
             self._string[decayInt] = decayString
-            self._forest[decayInt] = Belle2.DecayForest(decayString, True, removeRadiativeGammaFlag)
+            self._forest[decayInt] = ROOT.Belle2.DecayForest(decayString, True, removeRadiativeGammaFlag)
 
     def get_string(self, decayHash, decayHashExtended):
         """
@@ -80,7 +74,8 @@ class DecayHashMap:
         @param decayHash output of extraInfo(decayHash)
         @param decayHashExtended output of extraInfo(decayHashExtended)
         """
-        return self._string[Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)]
+        import ROOT
+        return self._string[ROOT.Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)]
 
     def get_original_decay(self, decayHash, decayHashExtended):
         """
@@ -88,7 +83,8 @@ class DecayHashMap:
         @param decayHash output of extraInfo(decayHash)
         @param decayHashExtended output of extraInfo(decayHashExtended)
         """
-        return self._forest[Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)].getOriginalTree()
+        import ROOT
+        return self._forest[ROOT.Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)].getOriginalTree()
 
     def get_reconstructed_decay(self, decayHash, decayHashExtended):
         """
@@ -96,7 +92,8 @@ class DecayHashMap:
         @param decayHash output of extraInfo(decayHash)
         @param decayHashExtended output of extraInfo(decayHashExtended)
         """
-        return self._forest[Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)].getReconstructedTree()
+        import ROOT
+        return self._forest[ROOT.Belle2.DecayForest.decayHashFloatToInt(decayHash, decayHashExtended)].getReconstructedTree()
 
     def print_hash(self, decayHash, decayHashExtended):
         """

@@ -6,7 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <analysis/VariableManager/Manager.h>
+// Own include
+#include <analysis/variables/EventShapeVariables.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventShapeContainer.h>
 
@@ -16,9 +18,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/Conversion.h>
 
-#include <TLorentzVector.h>
 #include <TVectorF.h>
-#include <TVector3.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -63,8 +63,6 @@ namespace Belle2 {
       return func;
     }
 
-
-
     Manager::FunctionPtr foxWolframH(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 1) {
@@ -97,8 +95,6 @@ namespace Belle2 {
       };
       return func;
     }
-
-
 
     Manager::FunctionPtr harmonicMoment(const std::vector<std::string>& arguments)
     {
@@ -141,7 +137,6 @@ namespace Belle2 {
       return func;
     }
 
-
     Manager::FunctionPtr cleoCone(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 2) {
@@ -182,8 +177,6 @@ namespace Belle2 {
       };
       return func;
     }
-
-
 
     double foxWolframR1(const Particle*)
     {
@@ -241,7 +234,6 @@ namespace Belle2 {
       return evtShapeCont->getFWMoment(4) / evtShapeCont->getFWMoment(0);
     }
 
-
     double harmonicMomentThrust0(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
@@ -291,7 +283,6 @@ namespace Belle2 {
       }
       return evtShapeCont->getHarmonicMomentThrust(4);
     }
-
 
     double cleoConeThrust0(const Particle*)
     {
@@ -383,7 +374,6 @@ namespace Belle2 {
       return evtShapeCont->getCleoConeThrust(8);
     }
 
-
     double sphericity(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
@@ -413,7 +403,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardHemisphere4Momentum().Mag();
+      return evtShapeCont->getForwardHemisphere4Momentum().M();
     }
 
     double forwardHemisphereX(const Particle*)
@@ -423,7 +413,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardHemisphere4Momentum().Vect().X();
+      return evtShapeCont->getForwardHemisphere4Momentum().px();
     }
 
     double forwardHemisphereY(const Particle*)
@@ -433,7 +423,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardHemisphere4Momentum().Vect().Y();
+      return evtShapeCont->getForwardHemisphere4Momentum().py();
     }
 
     double forwardHemisphereZ(const Particle*)
@@ -443,7 +433,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardHemisphere4Momentum().Vect().Z();
+      return evtShapeCont->getForwardHemisphere4Momentum().pz();
     }
 
     double forwardHemisphereMomentum(const Particle*)
@@ -453,7 +443,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardHemisphere4Momentum().Vect().Mag();
+      return evtShapeCont->getForwardHemisphere4Momentum().P();
     }
 
     double forwardHemisphereEnergy(const Particle*)
@@ -466,9 +456,6 @@ namespace Belle2 {
       return evtShapeCont->getForwardHemisphere4Momentum().E();
     }
 
-
-
-
     double backwardHemisphereMass(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
@@ -476,9 +463,8 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardHemisphere4Momentum().Mag();
+      return evtShapeCont->getBackwardHemisphere4Momentum().M();
     }
-
 
     double backwardHemisphereX(const Particle*)
     {
@@ -487,7 +473,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardHemisphere4Momentum().Vect().X();
+      return evtShapeCont->getBackwardHemisphere4Momentum().px();
     }
 
     double backwardHemisphereY(const Particle*)
@@ -497,7 +483,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardHemisphere4Momentum().Vect().Y();
+      return evtShapeCont->getBackwardHemisphere4Momentum().py();
     }
 
     double backwardHemisphereZ(const Particle*)
@@ -507,7 +493,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardHemisphere4Momentum().Vect().Z();
+      return evtShapeCont->getBackwardHemisphere4Momentum().pz();
     }
 
     double backwardHemisphereMomentum(const Particle*)
@@ -517,7 +503,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardHemisphere4Momentum().Vect().Mag();
+      return evtShapeCont->getBackwardHemisphere4Momentum().P();
     }
 
     double backwardHemisphereEnergy(const Particle*)
@@ -530,10 +516,6 @@ namespace Belle2 {
       return evtShapeCont->getBackwardHemisphere4Momentum().E();
     }
 
-
-
-
-
     double thrust(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
@@ -543,7 +525,6 @@ namespace Belle2 {
       }
       return evtShapeCont->getThrust();
     }
-
 
     double thrustAxisX(const Particle*)
     {
@@ -575,7 +556,6 @@ namespace Belle2 {
       return evtShapeCont->getThrustAxis().Z();
     }
 
-
     double thrustAxisCosTheta(const Particle*)
     {
       StoreObjPtr<EventShapeContainer> evtShapeCont;
@@ -583,9 +563,8 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getThrustAxis().CosTheta();
+      return cos(evtShapeCont->getThrustAxis().Theta());
     }
-
 
     Manager::FunctionPtr useThrustFrame(const std::vector<std::string>& arguments)
     {
@@ -602,19 +581,20 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
           }
 
-          TVector3 newZ = evtShapeCont->getThrustAxis();
-          TVector3 newY(0, 0, 0);
-          if (newZ(2) == 0 and newZ(1) == 0)
-            newY(0) = 1;
-          else{
-            newY(1) = newZ(2);
-            newY(2) = -newZ(1);
+          ROOT::Math::XYZVector newZ = evtShapeCont->getThrustAxis();
+          ROOT::Math::XYZVector newY(0, 0, 0);
+          if (newZ.z() == 0 and newZ.y() == 0)
+            newY.SetX(1);
+          else
+          {
+            newY.SetY(newZ.z());
+            newY.SetZ(-newZ.y());
           }
-          TVector3 newX = newY.Cross(newZ);
+          ROOT::Math::XYZVector newX = newY.Cross(newZ);
 
           UseReferenceFrame<CMSRotationFrame> signalframe(newX, newY, newZ);
 
-          return var->function(particle);
+          return std::get<double>(var->function(particle));
         };
         return func;
       } else {
@@ -622,39 +602,38 @@ namespace Belle2 {
       }
     }
 
-
     VARIABLE_GROUP("EventShape");
 
-    REGISTER_VARIABLE("foxWolframR(i)", foxWolframR, R"DOC(
+    REGISTER_METAVARIABLE("foxWolframR(i)", foxWolframR, R"DOC(
 [Eventbased] Ratio of the i-th to the 0-th order Fox Wolfram moments. The order ``i`` can go from 0 up to 8th.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
-    REGISTER_VARIABLE("foxWolframH(i)", foxWolframH, R"DOC(
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("foxWolframH(i)", foxWolframH, R"DOC(
 [Eventbased] Returns i-th order Fox Wolfram moment. The order ``i`` can go from 0 up to 8th."
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
-    REGISTER_VARIABLE("harmonicMoment(i, axisName)", harmonicMoment, R"DOC(
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("harmonicMoment(i, axisName)", harmonicMoment, R"DOC(
 [Eventbased] Returns i-th order harmonic moment, calculated with respect to the axis ``axisName``. The order ``i`` can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision'.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
-    REGISTER_VARIABLE("cleoCone(i, axisName)", cleoCone, R"DOC(
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("cleoCone(i, axisName)", cleoCone, R"DOC(
 [Eventbased] Returns i-th order Cleo cone, calculated with respect to the axis ``axisName``. The order ``i`` can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision'.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
-    REGISTER_VARIABLE("useThrustFrame(variable)", useThrustFrame, R"DOC(
+)DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useThrustFrame(variable)", useThrustFrame, R"DOC(
 Evaluates a variable value in the thrust reference frame.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC", Manager::VariableDataType::c_double);
 
 
     REGISTER_VARIABLE("foxWolframR1", foxWolframR1, R"DOC(
@@ -886,5 +865,6 @@ Evaluates a variable value in the thrust reference frame.
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
 )DOC");
+
   }
 }

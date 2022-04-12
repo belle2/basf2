@@ -52,6 +52,7 @@ BelleCrystal::BelleCrystal(const G4String& pName, int n,
   memset(fcounter, 0, sizeof(fcounter));
 #endif
 #ifdef MATCHNAME
+  // cppcheck-suppress ConfigurationNotChecked
   fmatch = GetName() == QUOTE(MATCHNAME);
   cout.precision(17);
 #endif

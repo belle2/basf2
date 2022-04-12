@@ -83,7 +83,7 @@ namespace Belle2 {
 
       const auto& prism = m_inverseRaytracer->getPrism();
 
-      if (m_track.getEmissionPoint(m_track.getLengthInQuartz() / 2).position.Z() > prism.zR) {
+      if (m_track.getEmissionPoint().position.Z() > prism.zR) {
         setSignalPDF_direct();
         setSignalPDF_reflected();
       } else {
@@ -689,7 +689,7 @@ namespace Belle2 {
         if (abs(sol.L - L) < 0.01) return sol;
         L = sol.L;
       }
-      B2WARNING("TOP::PDFConstructor::prismSolution: iterations not converging");
+      B2DEBUG(20, "TOP::PDFConstructor::prismSolution: iterations not converging");
       return PrismSolution();
     }
 
@@ -730,13 +730,20 @@ namespace Belle2 {
         return LogL(0);
       }
 
-      LogL LL(getExpectedPhotons());
+      double expectedPhot = m_signalPhotons + m_bkgPhotons;
+      if (m_deltaPDFOn) expectedPhot += m_deltaPhotons;
+
+      LogL LL(expectedPhot);
       for (const auto& hit : m_selectedHits) {
         if (hit.time < m_minTime or hit.time > m_maxTime) continue;
         double f = pdfValue(hit.pixelID, hit.time, hit.timeErr);
         if (f <= 0) {
-          B2ERROR("TOP::PDFConstructor::getLogL(): PDF value is zero or negative"
-                  << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          auto ret = m_zeroPixels.insert(hit.pixelID);
+          if (ret.second) {
+            B2ERROR("TOP::PDFConstructor::getLogL(): PDF value is zero or negative"
+                    << LogVar("slotID", m_moduleID)
+                    << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          }
           continue;
         }
         LL.logL += log(f);
@@ -758,8 +765,12 @@ namespace Belle2 {
         if (hit.time < minTime or hit.time > maxTime) continue;
         double f = pdfValue(hit.pixelID, hit.time - t0, hit.timeErr, sigt);
         if (f <= 0) {
-          B2ERROR("TOP::PDFConstructor::getLogL(): PDF value is zero or negative"
-                  << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          auto ret = m_zeroPixels.insert(hit.pixelID);
+          if (ret.second) {
+            B2ERROR("TOP::PDFConstructor::getLogL(): PDF value is zero or negative"
+                    << LogVar("slotID", m_moduleID)
+                    << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          }
           continue;
         }
         LL.logL += log(f);
@@ -767,6 +778,36 @@ namespace Belle2 {
       }
       return LL;
     }
+
+
+    PDFConstructor::LogL PDFConstructor::getBackgroundLogL(double minTime, double maxTime) const
+    {
+      if (not m_valid) {
+        B2ERROR("TOP::PDFConstructor::getBackgroundLogL(): object status is invalid - cannot provide log likelihood");
+        return LogL(0);
+      }
+
+      double bkgPhotons = m_bkgPhotons * (maxTime - minTime) / (m_maxTime - m_minTime);
+
+      LogL LL(bkgPhotons);
+      for (const auto& hit : m_selectedHits) {
+        if (hit.time < minTime or hit.time > maxTime) continue;
+        double f = bkgPhotons * m_backgroundPDF->getPDFValue(hit.pixelID);
+        if (f <= 0) {
+          auto ret = m_zeroPixels.insert(hit.pixelID);
+          if (ret.second) {
+            B2ERROR("TOP::PDFConstructor::getBackgroundLogL(): PDF value is zero or negative"
+                    << LogVar("slotID", m_moduleID)
+                    << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          }
+          continue;
+        }
+        LL.logL += log(f);
+        LL.numPhotons++;
+      }
+      return LL;
+    }
+
 
     const std::vector<PDFConstructor::LogL>&
     PDFConstructor::getPixelLogLs(double t0, double minTime, double maxTime, double sigt) const
@@ -782,8 +823,12 @@ namespace Belle2 {
         if (hit.time < minTime or hit.time > maxTime) continue;
         double f = pdfValue(hit.pixelID, hit.time - t0, hit.timeErr, sigt);
         if (f <= 0) {
-          B2ERROR("TOP::PDFConstructor::getPixelLogLs(): PDF value is zero or negative"
-                  << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          auto ret = m_zeroPixels.insert(hit.pixelID);
+          if (ret.second) {
+            B2ERROR("TOP::PDFConstructor::getPixelLogLs(): PDF value is zero or negative"
+                    << LogVar("slotID", m_moduleID)
+                    << LogVar("pixelID", hit.pixelID) << LogVar("time", hit.time) << LogVar("PDFValue", f));
+          }
           continue;
         }
         unsigned k = hit.pixelID - 1;
@@ -801,7 +846,7 @@ namespace Belle2 {
       for (const auto& signalPDF : m_signalPDFs) {
         ps += signalPDF.getIntegral(minTime, maxTime);
       }
-      double pd = m_deltaRayPDF.getIntegral(minTime, maxTime);
+      double pd = m_deltaPDFOn ? m_deltaRayPDF.getIntegral(minTime, maxTime) : 0.0;
       double pb = (maxTime - minTime) / (m_maxTime - m_minTime);
 
       return ps * m_signalPhotons + pd * m_deltaPhotons + pb * m_bkgPhotons;
@@ -811,7 +856,7 @@ namespace Belle2 {
     {
       m_pixelLLs.clear();
 
-      double pd = m_deltaRayPDF.getIntegral(minTime, maxTime);
+      double pd = m_deltaPDFOn ? m_deltaRayPDF.getIntegral(minTime, maxTime) : 0.0;
       double pb = (maxTime - minTime) / (m_maxTime - m_minTime);
       double bfot = pd * m_deltaPhotons + pb * m_bkgPhotons;
       const auto& pixelPDF = m_backgroundPDF->getPDF();

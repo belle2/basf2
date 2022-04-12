@@ -29,7 +29,6 @@ path = b2.Path()
 skim = TauThrust(validation=True, udstOutput=False)
 
 ma.inputMdstList(
-    "default",
     b2.find_file(skim.validation_sample, data_type="validation"),
     path=path,
 )

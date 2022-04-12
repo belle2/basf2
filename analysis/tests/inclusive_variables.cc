@@ -9,7 +9,6 @@
 
 #include <TMatrixFSym.h>
 #include <TRandom3.h>
-#include <TLorentzVector.h>
 #include <TMath.h>
 
 #include <analysis/VariableManager/Manager.h>
@@ -67,8 +66,8 @@ namespace {
       DataStore::Instance().setInitializeActive(false);
 
       TestUtilities::TestParticleFactory factory;
-      TVector3 ipposition(0, 0, 0);
-      TLorentzVector b0momentum(3, 0, 0, 5);
+      B2Vector3D ipposition(0, 0, 0);
+      ROOT::Math::PxPyPzEVector b0momentum(3, 0, 0, 5);
       factory.produceParticle(string("^B0 -> [^K_S0 -> ^pi+ ^pi-] [^pi0 -> ^gamma ^gamma] ^e+ ^e-"), b0momentum, ipposition);
     }
 
@@ -82,36 +81,36 @@ namespace {
   {
     StoreArray<Particle> myParticles;
     auto* var = Manager::Instance().getVariable("nCompositeDaughters");
-    EXPECT_FLOAT_EQ(var->function(myParticles[8]), 2.0);
+    EXPECT_EQ(std::get<int>(var->function(myParticles[8])), 2);
   }
   TEST_F(InclusiveVariablesTest, nPhotonDaughters)
   {
     StoreArray<Particle> myParticles;
     auto* var = Manager::Instance().getVariable("nDaughterPhotons");
-    EXPECT_FLOAT_EQ(var->function(myParticles[8]), 2.0);
+    EXPECT_EQ(std::get<int>(var->function(myParticles[8])), 2);
   }
   TEST_F(InclusiveVariablesTest, nDaughterNeutralHadrons)
   {
     StoreArray<Particle> myParticles;
     auto* var = Manager::Instance().getVariable("nDaughterNeutralHadrons");
-    EXPECT_FLOAT_EQ(var->function(myParticles[8]), 0.0);
+    EXPECT_EQ(std::get<int>(var->function(myParticles[8])), 0);
   }
   TEST_F(InclusiveVariablesTest, nChargedDaughters)
   {
     StoreArray<Particle> myParticles;
     auto* var = Manager::Instance().getVariable("nDaughterCharged()");
-    EXPECT_FLOAT_EQ(var->function(myParticles[8]), 4.0);
+    EXPECT_EQ(std::get<int>(var->function(myParticles[8])), 4);
     var = Manager::Instance().getVariable("nDaughterCharged(11)");
-    EXPECT_FLOAT_EQ(var->function(myParticles[8]), 2.0);
+    EXPECT_EQ(std::get<int>(var->function(myParticles[8])), 2);
     var = Manager::Instance().getVariable("nDaughterCharged(211)");
-    EXPECT_FLOAT_EQ(var->function(myParticles[8]), 2.0);
+    EXPECT_EQ(std::get<int>(var->function(myParticles[8])), 2);
 
   }
   TEST_F(InclusiveVariablesTest, daughterAverageOf)
   {
     StoreArray<Particle> myParticles;
     auto* var = Manager::Instance().getVariable("daughterAverageOf(PDG)");
-    EXPECT_FLOAT_EQ(var->function(myParticles[8]), 105.25);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(myParticles[8])), 105.25);
   }
 
 }

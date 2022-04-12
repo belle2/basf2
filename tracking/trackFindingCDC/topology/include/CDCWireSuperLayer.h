@@ -43,6 +43,10 @@ namespace Belle2 {
       /// Type of the base class
       using Super = ConstVectorRange<CDCWireLayer>;
 
+      /// Empty constructor for creating an empty dummy CDCWireSuperLayer for studies with a CDC with missing super layers
+      CDCWireSuperLayer() : m_innerRefZ(0.0), m_outerRefZ(0.0), m_refTanLambda(0.0)
+      {};
+
       /// Constructor taking the range of layers the superlayer shall contain. Use rather getInstance() to avoid instance constructions.
       explicit CDCWireSuperLayer(const ConstVectorRange<CDCWireLayer>& wireLayers);
 

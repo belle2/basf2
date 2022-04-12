@@ -68,7 +68,7 @@ def argparser():
     parser.add_argument("--global_tag_append",
                         type=str,
                         nargs="+",
-                        default=["chargedpidmva_rel-05_test", getAnalysisGlobaltag()],
+                        default=[getAnalysisGlobaltag()],
                         help="List of names of conditions DB global tag(s) to append on top of GT replay.\n"
                         "NB: these GTs will have lowest priority.\n"
                         "Pass a space-separated list of names.")
@@ -106,8 +106,7 @@ if __name__ == '__main__':
     # Add input.
     # ----------
 
-    ma.inputMdst(environmentType="default",
-                 filename=basf2.find_file("mdst13.root", "validation"),
+    ma.inputMdst(filename=basf2.find_file("mdst13.root", "validation"),
                  path=path)
 
     # ---------------------------------------
@@ -134,7 +133,7 @@ if __name__ == '__main__':
     if args.matchTruth:
         for plistname, _ in plists:
             ma.matchMCTruth(plistname, path=path)
-            applyCuts(plistname, "isSignal == 1", path=path)
+            ma.applyCuts(plistname, "isSignal == 1", path=path)
 
     # -------------------
     # Global/Binary PID ?

@@ -19,7 +19,7 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(BestCandidateSelection)
+REG_MODULE(BestCandidateSelection);
 
 
 BestCandidateSelectionModule::BestCandidateSelectionModule():
@@ -82,6 +82,9 @@ void BestCandidateSelectionModule::initialize()
   if (!m_variable) {
     B2ERROR("Variable '" << m_variableName << "' is not available in Variable::Manager!");
   }
+  if (!(m_variable->variabletype == Variable::Manager::VariableDataType::c_double or m_variable->variabletype == Variable::Manager::VariableDataType::c_int)) {
+    B2ERROR("Variable '" << m_variableName << "' has wrong data type! It must be either double or integer.");
+  }
   if (m_numBest < 0) {
     B2ERROR("value of numBest must be >= 0!");
   }
@@ -89,7 +92,7 @@ void BestCandidateSelectionModule::initialize()
 
   // parse the name that the rank will be stored under
   if (m_outputVariableName.empty()) {
-    std::string root_compatible_VariableName = makeROOTCompatible(m_variableName);
+    std::string root_compatible_VariableName = MakeROOTCompatible::makeROOTCompatible(m_variableName);
     m_outputVariableName = root_compatible_VariableName + "_rank";
   }
 }
@@ -108,7 +111,13 @@ void BestCandidateSelectionModule::event()
   const unsigned int numParticles = m_inputList->getListSize();
   valueToIndex.reserve(numParticles);
   for (const Particle& p : *m_inputList) {
-    double value = m_variable->function(&p);
+    double value = 0;
+    auto var_result = m_variable->function(&p);
+    if (std::holds_alternative<double>(var_result)) {
+      value = std::get<double>(var_result);
+    } else if (std::holds_alternative<int>(var_result)) {
+      value = std::get<int>(var_result);
+    }
     valueToIndex.emplace_back(value, p.getArrayIndex());
   }
 

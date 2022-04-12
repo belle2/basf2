@@ -11,8 +11,9 @@
 #include <framework/core/Module.h>
 #include <framework/core/EventProcessor.h>
 #include <framework/datastore/StoreArray.h>
-#include <boost/optional.hpp>
+
 #include <memory>
+#include <optional>
 
 namespace Belle2 {
   class Path;
@@ -48,9 +49,9 @@ namespace Belle2 {
      * Does nothing if both are setup already */
     void setDoWhileConditions();
     /** name of our loop variable in case of forEach. */
-    boost::optional<std::string> m_objectName{boost::none};
+    std::optional<std::string> m_objectName{std::nullopt};
     /** name for m_loopOver in case of forEach. */
-    boost::optional<std::string> m_loopOverName{boost::none};
+    std::optional<std::string> m_loopOverName{std::nullopt};
     /** array looped over in case of forEach */
     StoreArray<TObject> m_loopOver;
     /** Path to execute. */
@@ -61,7 +62,7 @@ namespace Belle2 {
     /** maximum number of iterations before giving up in case of doWhile() */
     unsigned int m_maxIterations{10000};
     /** String for the condition when looping */
-    boost::optional<std::string> m_loopConditionString{boost::none};
+    std::optional<std::string> m_loopConditionString{std::nullopt};
     /** Condition object to evaluate if the loop is finished in case of doWhile() */
     std::unique_ptr<ModuleCondition> m_loopCondition;
     /** pointer to the module to provide the returnValue in case of doWhile() */

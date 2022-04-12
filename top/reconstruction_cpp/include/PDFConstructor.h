@@ -18,6 +18,7 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <vector>
 #include <map>
+#include <set>
 #include <limits>
 
 namespace Belle2 {
@@ -108,14 +109,20 @@ namespace Belle2 {
       bool isValid() const {return m_valid;}
 
       /**
-       * Switch off delta-ray PDF to speed-up log likelihood calculation
+       * Exclude delta-ray PDF in log likelihood calculation
        */
       void switchOffDeltaRayPDF() const {m_deltaPDFOn = false;}
 
       /**
-       * Switch on delta-ray PDF (back to default)
+       * Include delta-ray PDF in log likelihood calculation (this is default)
        */
       void switchOnDeltaRayPDF() const {m_deltaPDFOn = true;}
+
+      /**
+       * Include or exclude delta-ray PDF in log likelihood calculation
+       * @param deltaPDFOn true = include, false = exclude
+       */
+      void switchDeltaRayPDF(bool deltaPDFOn) const {m_deltaPDFOn = deltaPDFOn;}
 
       /**
        * Returns slot ID
@@ -229,6 +236,20 @@ namespace Belle2 {
        * @return log likelihood
        */
       LogL getLogL(double t0, double minTime, double maxTime, double sigt = 0) const;
+
+      /**
+       * Returns extended log likelihood for background hypothesis using default time window
+       * @return log likelihood
+       */
+      LogL getBackgroundLogL() const {return getBackgroundLogL(m_minTime, m_maxTime);}
+
+      /**
+       * Returns extended log likelihood for background hypothesis
+       * @param minTime time window lower edge
+       * @param maxTime time window upper edge
+       * @return log likelihood
+       */
+      LogL getBackgroundLogL(double minTime, double maxTime) const;
 
       /**
        * Returns extended log likelihoods in pixels for PDF shifted in time.
@@ -555,6 +576,7 @@ namespace Belle2 {
       mutable std::vector<LogL> m_pixelLLs; /**< pixel log likelihoods (index = pixelID - 1) */
       mutable std::vector<Pull> m_pulls; /**< photon pulls w.r.t PDF peaks */
       mutable bool m_deltaPDFOn = true; /**< include/exclude delta-ray PDF in likelihood calculation */
+      mutable std::set<int> m_zeroPixels; /**< collection of pixelID's with zero pdfValue */
 
     };
 
@@ -634,7 +656,7 @@ namespace Belle2 {
       int k = 0;
       while (m_inverseRaytracer->isNymDifferent()) { // get rid of discontinuities
         if (k > 8) {
-          B2WARNING("PDFConstructor::setSignalPDF: failed to find the same Nym (dx)");
+          B2DEBUG(20, "TOP::PDFConstructor::setSignalPDF: failed to find the same Nym (dx)");
           return;
         }
         dx = - dx / 2;
@@ -651,7 +673,7 @@ namespace Belle2 {
       k = 0;
       while (m_inverseRaytracer->isNymDifferent()) { // get rid of discontinuities
         if (k > 8) {
-          B2WARNING("PDFConstructor::setSignalPDF: failed to find the same Nym (dL)");
+          B2DEBUG(20, "TOP::PDFConstructor::setSignalPDF: failed to find the same Nym (dL)");
           return;
         }
         dL = - dL / 2;
@@ -668,7 +690,7 @@ namespace Belle2 {
       k = 0;
       while (m_inverseRaytracer->isNymDifferent()) { // get rid of discontinuities
         if (k > 8) {
-          B2WARNING("PDFConstructor::setSignalPDF: failed to find the same Nym (de)");
+          B2DEBUG(20, "TOP::PDFConstructor::setSignalPDF: failed to find the same Nym (de)");
           return;
         }
         de = - de / 2;

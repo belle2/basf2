@@ -30,3 +30,64 @@ After testing, the output sectormap can be prepared for uploading to a GT. For t
 the file is a single line "dbstore/VTXSectorMaps.root 1 0,0,0,-1" giving the name and IoV of the to be uploaded payload. Next you can copy the sectormap file 
 into the localdb and change its name to dbstore\_VTXSectorMaps.root\_rev\_1.root. 
 
+
+The concrete steps to be executed are: 
+
+1. copy vtx/example/trainVXDTF2 folder somewhere in /group/belle2/users/benjamin  where you have few hundred GB space
+
+2. cd into that new directory
+
+3. Set the geometry. For example: 
+
+export  BELLE2_VTX_UPGRADE_GT=upgrade_2021-07-16_vtx_7layer  
+
+4. Create folder for training events
+
+mkdir datadir 
+
+5. Submit jobs via bsub to simulate events (~2TB space needed)
+
+bash submitSomeJobs.sh
+
+6. prepare training: 
+
+bsub -q l -o logTrainingPreparation.log  'basf2 -l WARNING trainingPreparation.py -i "./datadir/SimEvts*.root" '
+
+7. Training requires >8GB RAM and takes long (>1h). Run it with nohup in background on KEKCC worker node 
+
+
+nohup basf2 trainSecMap.py -- --train VTXDefault_Belle2_VTX.root  --secmap VTXSectorMaps.root &
+
+
+8) Upload results. Do not forget to delete datadir and other big intermediate files
+
+
+After testing, the output sectormap can be prepared for uploading to a GT. For this, create a folder 'localdb' containing a file 'database.txt'. The content of
+the file is a single line "dbstore/VTXSectorMaps.root 1 0,0,0,-1" giving the name and IoV of the to be uploaded payload. Next you can copy the sectormap file
+into the localdb and change its name to dbstore\_VTXSectorMaps.root\_rev\_1.root.
+The localdb can be uploaded to the development GT on the condDB server with b2conditionsdb.
+
+
+9. Upload  VXDQualityEstimatorParameters with circleFit to localdb and later to condDB
+
+
+python3 VXDTFQualityParameterDataBaseImporter.py --estimationMethod=circleFit
+
+and upload payload to development GT. To test the tracking, you need to use an upgrade GT that has the sectormaps and valid quality parameters. 
+
+10. Potentially, the tripletFit can give better results. But we need to scan its parameters first Find best
+
+10.1. Create a dataset for the study
+b2validation -s VTXEvtGenSim.py
+
+10.2 Run the scan 
+python3 tripletQE_scan.py
+
+10.3 Make plots of tracking figures of merit  to find best values 
+python3 tripletQE_plot.py
+
+10.4 If good enough, switch to tripletFit with best values 
+
+python3 VXDTFQualityParameterDataBaseImporter.py --estimationMethod=tripletFit --maxPt=<value> --materialBudgetFactor=<value>
+
+and upload payload to condDB server

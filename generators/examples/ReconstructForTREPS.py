@@ -16,7 +16,7 @@ from modularAnalysis import fillParticleListFromMC, reconstructDecay, variablesT
 main = basf2.create_path()
 
 # load input mdst file
-inputMdst('default', 'utrepsbpipi_100k.root', path=main)
+inputMdst('utrepsbpipi_100k.root', path=main)
 
 # get pi+:MC from MCParticles
 fillParticleListFromMC('pi+:MC', 'mcPrimary', path=main)

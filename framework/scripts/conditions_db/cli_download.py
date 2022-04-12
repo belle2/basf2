@@ -253,7 +253,7 @@ def command_download(args, db=None):
        one globaltag and optionally create a text file with payload information
        as well as download all necessary file. This has been changed and will
        now create a sqlite file containing the payload metadata. If you need the
-       old behavior please use the command ``b2conditionsdb legacydownload``
+       old behavior please use the command ``b2conditionsdb-legacydownload``
     """
 
     if db is None:

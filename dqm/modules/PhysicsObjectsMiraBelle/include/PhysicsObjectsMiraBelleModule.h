@@ -18,15 +18,40 @@ namespace Belle2 {
    */
   class PhysicsObjectsMiraBelleModule : public HistoModule {
   public:
-    /** Constructor, for setting module description and parameters. */
+
+    /**
+     * Constructor.
+     */
     PhysicsObjectsMiraBelleModule();
 
+    /**
+     * Initializer.
+     */
     void initialize() override;
+
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override;
+
+    /**
+     * This method is called for each event.
+     */
     void event() override;
+
+    /**
+     * This method is called if the current run ends.
+     */
     void endRun() override;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate() override;
 
+    /**
+     * Definition of the histograms.
+     */
     void defineHisto() override;
 
   private:
@@ -73,6 +98,9 @@ namespace Belle2 {
 
     /** Name of the mu+ particle list */
     std::string m_muPListName = "";
+
+    /** Name of the mu+mu- (Upsilon) particle list */
+    std::string m_mumuPListName = "";
 
   };
 }

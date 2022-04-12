@@ -9,6 +9,7 @@
 // Own include
 #include <analysis/variables/EventVariables.h>
 
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
 
 // framework - DataStore
@@ -37,30 +38,27 @@
 #include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 
-#include <TLorentzVector.h>
-#include <TVector3.h>
-
 namespace Belle2 {
   namespace Variable {
 
     // Event ------------------------------------------------
-    double isMC(const Particle*)
+    bool isMC(const Particle*)
     {
       return Environment::Instance().isMC();
     }
 
-    double eventType(const Particle*)
+    bool eventType(const Particle*)
     {
       StoreArray<MCParticle> mcparticles;
       return (mcparticles.getEntries()) > 0 ? 0 : 1;
     }
 
-    double isContinuumEvent(const Particle*)
+    bool isContinuumEvent(const Particle*)
     {
-      return (isNotContinuumEvent(nullptr) == 1.0 ? 0.0 : 1.0);
+      return (isNotContinuumEvent(nullptr) == 1 ? 0 : 1);
     }
 
-    double isChargedBEvent(const Particle*)
+    bool isChargedBEvent(const Particle*)
     {
       StoreArray<MCParticle> mcParticles;
       for (const auto& mcp : mcParticles) {
@@ -84,8 +82,7 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
-
-    double isNotContinuumEvent(const Particle*)
+    bool isNotContinuumEvent(const Particle*)
     {
       StoreArray<MCParticle> mcParticles;
       for (const MCParticle& mcp : mcParticles) {
@@ -97,30 +94,30 @@ namespace Belle2 {
              (pdg_no == 300553) ||
              (pdg_no == 9000553) ||
              (pdg_no == 9010553)))
-          return 1.0;
+          return 1;
       }
-      return 0.0;
+      return 0;
     }
 
-    double nMCParticles(const Particle*)
+    int nMCParticles(const Particle*)
     {
       StoreArray<MCParticle> mcps;
       return mcps.getEntries();
     }
 
-    double nTracks(const Particle*)
+    int nTracks(const Particle*)
     {
       StoreArray<Track> tracks;
       return tracks.getEntries();
     }
 
-    double nChargeZeroTrackFits(const Particle*)
+    int nChargeZeroTrackFits(const Particle*)
     {
       StoreArray<TrackFitResult> tfrs;
       int out = 0;
       for (const auto& t : tfrs)
         if (t.getChargeSign() == 0) out++;
-      return double(out);
+      return out;
     }
 
     double belleECLEnergy(const Particle*)
@@ -137,34 +134,34 @@ namespace Belle2 {
       return result;
     }
 
-    double nKLMClusters(const Particle*)
+    int nKLMClusters(const Particle*)
     {
       StoreArray<KLMCluster> klmClusters;
       return klmClusters.getEntries();
     }
 
-    double expNum(const Particle*)
+    int expNum(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
       int exp_no = evtMetaData->getExperiment();
       return exp_no;
     }
 
-    double productionIdentifier(const Particle*)
+    int productionIdentifier(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
       int eventProduction = evtMetaData->getProduction();
       return eventProduction;
     }
 
-    double evtNum(const Particle*)
+    int evtNum(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
       int evt_no = evtMetaData->getEvent();
       return evt_no;
     }
 
-    double runNum(const Particle*)
+    int runNum(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
       int run_no = evtMetaData->getRun();
@@ -255,11 +252,11 @@ namespace Belle2 {
       int elementJ = int(std::lround(element[1]));
 
       if (elementI < 0 || elementI > 3) {
-        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 3]: i = " << elementI);
+        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 3]:" << LogVar("i", elementI));
         return std::numeric_limits<float>::quiet_NaN();
       }
       if (elementJ < 0 || elementJ > 3) {
-        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 3]: j = " << elementJ);
+        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 3]:" << LogVar("j", elementJ));
         return std::numeric_limits<float>::quiet_NaN();
       }
 
@@ -275,7 +272,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Mag();
+      double missing = evtShape->getMissingMomentum().R();
       return missing;
     }
 
@@ -286,7 +283,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Px();
+      double missing = evtShape->getMissingMomentum().x();
       return missing;
     }
 
@@ -297,7 +294,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Py();
+      double missing = evtShape->getMissingMomentum().y();
       return missing;
     }
 
@@ -308,7 +305,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Pz();
+      double missing = evtShape->getMissingMomentum().z();
       return missing;
     }
 
@@ -330,7 +327,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Mag();
+      double missing = evtShape->getMissingMomentumCMS().R();
       return missing;
     }
 
@@ -341,7 +338,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Mag();
+      double missing = evtShape->getMissingMomentumCMS().R();
       return missing;
     }
 
@@ -352,7 +349,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Px();
+      double missing = evtShape->getMissingMomentumCMS().x();
       return missing;
     }
 
@@ -363,7 +360,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Py();
+      double missing = evtShape->getMissingMomentumCMS().y();
       return missing;
     }
 
@@ -374,7 +371,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Pz();
+      double missing = evtShape->getMissingMomentumCMS().z();
       return missing;
     }
 
@@ -478,7 +475,6 @@ namespace Belle2 {
       double energyOfPhotons = evtShape->getTotalPhotonsEnergy();
       return energyOfPhotons;
     }
-
 
     double eventYearMonthDay(const Particle*)
     {
@@ -750,9 +746,6 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("isMC", isMC,
                       "[Eventbased] Returns 1 if current basf2 process is running over simulated (Monte-Carlo) dataset and 0 in case of real experimental data.");
-    REGISTER_VARIABLE("EventType", eventType, "[Eventbased] EventType (0 MC, 1 Data)");
-    MAKE_DEPRECATED("EventType", true, "light-minos-2012", R"DOC(
-                     Use `isMC` instead of this variable but keep in mind that the meaning of the outcome is reversed.)DOC");
     REGISTER_VARIABLE("isContinuumEvent", isContinuumEvent,
                       "[Eventbased] Returns 1.0 if event doesn't contain a :math:`\\Upsilon(4S)` particle on generator level, 0.0 otherwise.");
     REGISTER_VARIABLE("isNotContinuumEvent", isNotContinuumEvent,
@@ -821,7 +814,6 @@ In such cases the event numbers are sequential *only within a production*, so ex
     REGISTER_VARIABLE("beamPx", getBeamPx, "[Eventbased] Returns x component of total beam momentum in the laboratory frame.");
     REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Returns y component of total beam momentum in the laboratory frame.");
     REGISTER_VARIABLE("beamPz", getBeamPz, "[Eventbased] Returns z component of total beam momentum in the laboratory frame.");
-
     REGISTER_VARIABLE("IPX", getIPX, R"DOC(
 [Eventbased] Returns x coordinate of the measured interaction point.
 

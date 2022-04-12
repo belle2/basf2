@@ -24,7 +24,7 @@ import os
 VALIDATION_OUTPUT_FILE = "fullTrackingTableValidation.root"
 
 try:
-    from root_pandas import read_root  # noqa
+    import uproot  # noqa
     import pandas as pd  # noqa
 except ImportError:
     basf2.B2FATAL("You need to have pandas installed for this validation script to run.")
@@ -142,7 +142,7 @@ if __name__ == '__main__':
         ("cdc_was_found", lambda x: x["cdc_was_found"] == 1),
     ]
 
-    df = read_root("../matching_validation.root")
+    df = uproot.open("../matching_validation.root")['VxdCdcPartFinderHarvester_tree'].arrays(library='pd')
     html = get_html(df, test)
 
     tfile = TFile(VALIDATION_OUTPUT_FILE, "RECREATE")

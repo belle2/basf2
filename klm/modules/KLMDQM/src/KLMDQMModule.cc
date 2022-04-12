@@ -86,7 +86,7 @@ void KLMDQMModule::defineHisto()
   m_DAQInclusion->GetXaxis()->SetBinLabel(2, "Yes");
   m_DAQInclusion->SetOption("LIVE");
   /* Time histograms. */
-  m_TimeRPC = new TH1F("time_rpc", "RPC hit time", 128, -1023.5, 0.5);
+  m_TimeRPC = new TH1F("time_rpc", "RPC hit time", 128, -1223.5, -199.5);
   m_TimeRPC->GetXaxis()->SetTitle("Time, ns");
   m_TimeRPC->SetOption("LIVE");
   m_TimeScintillatorBKLM =
@@ -96,7 +96,7 @@ void KLMDQMModule::defineHisto()
   m_TimeScintillatorBKLM->SetOption("LIVE");
   m_TimeScintillatorEKLM =
     new TH1F("time_scintillator_eklm", "Scintillator hit time (EKLM)",
-             100, -5000, -4000);
+             100, -5100, -4100);
   m_TimeScintillatorEKLM->GetXaxis()->SetTitle("Time, ns");
   m_TimeScintillatorEKLM->SetOption("LIVE");
   /* Number of hits per plane. */
@@ -275,7 +275,7 @@ void KLMDQMModule::initialize()
   m_RawKlms.isOptional();
   m_Digits.isOptional();
   m_BklmHit1ds.isOptional();
-  m_EklmHit2ds.isOptional();
+  m_Hit2ds.isOptional();
 }
 
 void KLMDQMModule::beginRun()
@@ -471,7 +471,9 @@ void KLMDQMModule::event()
     break;
   }
   /* Spatial 2D hits distributions. */
-  for (const EKLMHit2d& hit2d : m_EklmHit2ds) {
+  for (const KLMHit2d& hit2d : m_Hit2ds) {
+    if (hit2d.getSubdetector() != KLMElementNumbers::c_EKLM)
+      continue;
     int section = hit2d.getSection();
     int layer = hit2d.getLayer();
     m_Spatial2DHitsEKLM[section - 1][layer - 1]->Fill(hit2d.getPositionX(), hit2d.getPositionY());

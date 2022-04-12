@@ -38,7 +38,7 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
   addParam("CDCHitCollectionName",
            m_CDCHitCollectionName,
            "Name of the input StoreArray of CDCHits.",
-           string(""));
+           string("CDCHits4Trg"));
   addParam("TSHitCollectionName",
            m_TSHitCollectionName,
            "Name of the output StoreArray of CDCTriggerSegmentHits.",
@@ -119,6 +119,9 @@ CDCTriggerTSFModule::initialize()
   unsigned axialStereoSuperLayerId = 0;
   unsigned nWires = 0;
   for (unsigned i = 0; i < nLayers; i++) {
+    if (i < cdc.getOffsetOfFirstLayer()) {
+      continue;
+    }
     const unsigned nWiresInLayer = cdc.nWiresInLayer(i);
 
     //...Axial or stereo?...
@@ -127,6 +130,14 @@ CDCTriggerTSFModule::initialize()
     if (axial) ++ia;
     else ++is;
     axialStereoLayerId = (axial) ? ia : is;
+
+    // Add empty TRGCDCLayer in case a superlayer is not present
+    if (superLayers.size() == 0 and cdc.getOffsetOfFirstSuperLayer() != 0) {
+      for (uint superLayerOffset = 0; superLayerOffset < cdc.getOffsetOfFirstSuperLayer(); superLayerOffset++) {
+        superLayers.push_back(vector<TRGCDCLayer*>());
+        superLayerId++;
+      }
+    }
 
     //...Is this in a new super layer?...
     if ((lastNWires != nWiresInLayer) || (lastShifts != nShifts)) {
@@ -215,6 +226,11 @@ CDCTriggerTSFModule::initialize()
   unsigned id = 0;
   unsigned idTS = 0;
   for (unsigned i = 0; i < superLayers.size(); i++) {
+    if (i < cdc.getOffsetOfFirstSuperLayer()) {
+      TRGCDCLayer* emptylayer = new TRGCDCLayer();
+      tsLayers.push_back(emptylayer);
+      continue;
+    }
     unsigned tsType = (i) ? 1 : 0;
 
     //...TS layer... w is a central wire
@@ -269,27 +285,33 @@ CDCTriggerTSFModule::initialize()
     }
   }
 
+}
+
+void
+CDCTriggerTSFModule::beginRun()
+{
   if (m_deadchflag) {
-    if (!m_db_deadchannel) {
-      B2INFO("No database for CDCTRG dead channel mapping. Channel masking is skipped.");
-      for (unsigned int i = 0; i < nSuperLayers; i++) { //SL
+    if (not m_db_deadchannel.isValid()) {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      B2ERROR("No database for CDCTRG dead channel mapping. Channel masking is skipped. exp " << evtMetaData->getExperiment() << " run "
+              << evtMetaData->getRun());
+      for (unsigned int i = 0; i < c_nSuperLayers; i++) { //SL
         for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
-          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) { //
+          for (unsigned int k = 0; k < c_maxNDriftCells; k++) { //
             deadch_map[i][j][k] = true;
           }
         }
       }
     } else {
-      for (unsigned int i = 0; i < nSuperLayers; i++) { //SL
+      for (unsigned int i = 0; i < c_nSuperLayers; i++) { //SL
         for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
-          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) { //
+          for (unsigned int k = 0; k < c_maxNDriftCells; k++) { //
             deadch_map[i][j][k] = m_db_deadchannel->getdeadch(i, j, k);
           }
         }
       }
     }
   }
-
 }
 
 void
@@ -516,7 +538,11 @@ CDCTriggerTSFModule::terminate()
 void
 CDCTriggerTSFModule::clear()
 {
+  const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
   for (unsigned isl = 0; isl < superLayers.size(); ++isl) {
+    if (isl < cdc.getOffsetOfFirstSuperLayer()) {
+      continue;
+    }
     for (unsigned il = 0; il < superLayers[isl].size(); ++il) {
       for (unsigned iw = 0; iw < superLayers[isl][il]->nCells(); ++iw) {
         TRGCDCWire& w = (TRGCDCWire&) superLayers[isl][il]->cell(iw);
@@ -529,4 +555,5 @@ CDCTriggerTSFModule::clear()
       s.clear();
     }
   }
+
 }

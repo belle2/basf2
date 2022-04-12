@@ -14,7 +14,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDZeroSuppressionEmulator)
+REG_MODULE(SVDZeroSuppressionEmulator);
 
 //-----------------------------------------------------------------
 //                 Implementation

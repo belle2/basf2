@@ -236,14 +236,14 @@ namespace Belle2 {
     void initIndicesToUniqueIDMap();
 
     /**
-     * Assignes unique IDs to all particles in list A, which do not have the unique ID already assigned. The same unique ID
+     * Assigns unique IDs to all particles in list A, which do not have the unique ID already assigned. The same unique ID
      * is assigned to copies of particles from list A found in the list B. This function has to be executed first.
      *
      */
     void fillIndicesToUniqueIDMap(const std::vector<int>& listA, const std::vector<int>& listB, int& uniqueID);
 
     /**
-     * Assignes unique IDs to all particles in list A, which do not have the unique ID already assigned.
+     * Assigns unique IDs to all particles in list A, which do not have the unique ID already assigned.
      */
     void fillIndicesToUniqueIDMap(const std::vector<int>& listA, int& uniqueID);
 

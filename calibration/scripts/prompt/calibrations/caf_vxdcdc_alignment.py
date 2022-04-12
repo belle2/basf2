@@ -14,9 +14,8 @@ The input collections are:
 
 import basf2
 import ROOT
-from ROOT import Belle2
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_cdc import settings as cdc_calibration
 from prompt.utils import events_in_basf2_file
 from caf.utils import IoV
@@ -42,12 +41,13 @@ default_config = {
     "cosmic.max_processed_events_per_file": 4000,
     "hadron.max_processed_events_per_file": 1000,
     "mumu.max_processed_events_per_file": 5000,
-    "offip.max_processed_events_per_file": 2000
+    "offip.max_processed_events_per_file": 2000,
+    "stage1.method": "fullLAPACK"
 }
 
-quality_flags = [input_data_filters["Run Type"]["physics"],
-                 input_data_filters["Data Quality Tag"]["Good Or Recoverable"],
-                 input_data_filters["Magnet"]["On"]]
+quality_flags = [INPUT_DATA_FILTERS["Run Type"]["physics"],
+                 INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+                 INPUT_DATA_FILTERS["Magnet"]["On"]]
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="Full VXD and CDC Alignment",
@@ -56,10 +56,10 @@ settings = CalibrationSettings(name="Full VXD and CDC Alignment",
                                input_data_formats=["raw"],
                                input_data_names=collection_names,
                                input_data_filters={
-                                   "cosmic": [input_data_filters["Data Tag"]["cosmic_calib"]] + quality_flags,
-                                   "mumu": [input_data_filters["Data Tag"]["mumutight_calib"]] + quality_flags,
-                                   "hadron": [input_data_filters["Data Tag"]["hadron_calib"]] + quality_flags,
-                                   "offip": [input_data_filters["Data Tag"]["offip_calib"]] + quality_flags
+                                   "cosmic": [INPUT_DATA_FILTERS["Data Tag"]["cosmic_calib"]] + quality_flags,
+                                   "mumu": [INPUT_DATA_FILTERS["Data Tag"]["mumu_tight_or_highm_calib"]] + quality_flags,
+                                   "hadron": [INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"]] + quality_flags,
+                                   "offip": [INPUT_DATA_FILTERS["Data Tag"]["offip_calib"]] + quality_flags
                                },
 
                                expert_config=default_config,
@@ -148,7 +148,6 @@ def create_cosmics_path():
         pruneTracks=False,
         skipGeometryAdding=True,
         addClusterExpertModules=False,
-        data_taking_period='early_phase3',
         merge_tracks=True
     )
 
@@ -239,7 +238,7 @@ def create_prompt(files, cfg):
             mpc.make_collection("offip", path=create_std_path(), tracks=["RecoTracks"])
         ],
         tags=None,
-        files=files,
+        files=dict(mumu=mumu, cosmic=cosmic, hadron=hadron, offip=offip),
         timedep=None,
         constraints=[
             alignment.constraints.VXDHierarchyConstraints(type=2, pxd=True, svd=True),
@@ -253,7 +252,7 @@ def create_prompt(files, cfg):
         params=dict(minPValue=0.00001, externalIterations=0, granularity="run"),
         min_entries=1000000)
 
-    cal.max_iterations = 0
+    cal.max_iterations = 5
 
     return cal
 
@@ -332,7 +331,7 @@ def create_stage1(files, cfg):
 
     mumu = select_files(files["mumu"], 1.5e6, cfg["mumu.max_processed_events_per_file"])
     cosmic = select_files(files["cosmic"], 0.7e6, cfg["cosmic.max_processed_events_per_file"])
-    hadron_and_offip = select_files(files["hadron"] + files["offip"], 3.0e6, cfg["mumu.max_processed_events_per_file"])
+    hadron_and_offip = select_files(files["hadron"] + files["offip"], int(4.0e6 / 10.), cfg["hadron.max_processed_events_per_file"])
 
     cal = mpc.create(
         name='VXDCDCalignment_stage1',
@@ -353,11 +352,11 @@ def create_stage1(files, cfg):
         fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=False)
         + alignment.parameters.beamspot(),
         commands=[
-            "method fullLAPACK 6 0.001",
+            f"method {cfg['stage1.method']} 6 0.001",
             "entries 1000",
             "threads 10 10"],
         params=dict(minPValue=0.00001, externalIterations=0, granularity="run"),
-        min_entries=2000000)
+        min_entries=500000)
 
     # Ignore results for BeamSpot
     std_components = ROOT.vector('string')()
@@ -391,7 +390,7 @@ def create_stage2(files, cfg):
             mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"]),
             make_mumu_collection(name="mumu")],
         tags=None,
-        files=files,
+        files=dict(mumu=mumu, cosmic=cosmic),
         timedep=None,
         constraints=[
             alignment.constraints.VXDHierarchyConstraints(type=2, pxd=True, svd=True),

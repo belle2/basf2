@@ -23,7 +23,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(VariablesToEventBasedTree)
+REG_MODULE(VariablesToEventBasedTree);
 
 
 VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
@@ -65,7 +65,7 @@ void VariablesToEventBasedTreeModule::initialize()
   m_file =  RootFileCreationManager::getInstance().getFile(m_fileName);
   if (!m_file) {
     B2ERROR("Could not create file \"" << m_fileName <<
-            "\". Please set a vaild root output file name (\"fileName\" module parameter).");
+            "\". Please set a valid root output file name (\"fileName\" module parameter).");
     return;
   }
 
@@ -78,13 +78,33 @@ void VariablesToEventBasedTreeModule::initialize()
   }
 
   m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
+  // remove duplicates from list of variables but keep the previous order
+  unordered_set<string> seen;
+  auto newEnd = remove_if(m_variables.begin(), m_variables.end(), [&seen](const string & varStr) {
+    if (seen.find(varStr) != std::end(seen)) return true;
+    seen.insert(varStr);
+    return false;
+  });
+  m_variables.erase(newEnd, m_variables.end());
+
   m_event_variables = Variable::Manager::Instance().resolveCollections(m_event_variables);
+  // remove duplicates from list of variables but keep the previous order
+  unordered_set<string> seenEventVariables;
+  auto eventVariablesEnd = remove_if(m_event_variables.begin(),
+  m_event_variables.end(), [&seenEventVariables](const string & varStr) {
+    if (seenEventVariables.find(varStr) != std::end(seenEventVariables)) return true;
+    seenEventVariables.insert(varStr);
+    return false;
+  });
+  m_event_variables.erase(eventVariablesEnd, m_event_variables.end());
 
   m_tree.registerInDataStore(m_fileName + m_treeName, DataStore::c_DontWriteOut);
   m_tree.construct(m_treeName.c_str(), "");
 
-  m_values.resize(m_variables.size());
-  m_event_values.resize(m_event_variables.size());
+  m_valuesDouble.resize(m_variables.size());
+  m_valuesInt.resize(m_variables.size());
+  m_event_valuesDouble.resize(m_event_variables.size());
+  m_event_valuesInt.resize(m_event_variables.size());
 
   m_tree->get().Branch("__event__", &m_event, "__event__/I");
   m_tree->get().Branch("__run__", &m_run, "__run__/I");
@@ -102,28 +122,45 @@ void VariablesToEventBasedTreeModule::initialize()
       continue;
     }
 
-    m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_event_values[i], (makeROOTCompatible(varStr) + "/D").c_str());
-
     //also collection function pointers
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);
     if (!var) {
       B2ERROR("Variable '" << varStr << "' is not available in Variable::Manager!");
     } else {
+      if (var->variabletype == Variable::Manager::VariableDataType::c_double) {
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_event_valuesDouble[i],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "/D").c_str());
+      } else if (var->variabletype == Variable::Manager::VariableDataType::c_int) {
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_event_valuesInt[i],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "/I").c_str());
+      } else if (var->variabletype == Variable::Manager::VariableDataType::c_bool) {
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_event_valuesInt[i],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "/O").c_str());
+      }
       m_event_functions.push_back(var->function);
     }
   }
 
   for (unsigned int i = 0; i < m_variables.size(); ++i) {
     auto varStr = m_variables[i];
-    m_values[i].resize(m_maxCandidates);
-    m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_values[i][0],
-                         (makeROOTCompatible(varStr) + "[__ncandidates__]/D").c_str());
+    m_valuesDouble[i].resize(m_maxCandidates);
+    m_valuesInt[i].resize(m_maxCandidates);
 
     //also collection function pointers
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);
     if (!var) {
       B2ERROR("Variable '" << varStr << "' is not available in Variable::Manager!");
     } else {
+      if (var->variabletype == Variable::Manager::VariableDataType::c_double) {
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_valuesDouble[i][0],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "[__ncandidates__]/D").c_str());
+      } else if (var->variabletype == Variable::Manager::VariableDataType::c_int) {
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_valuesInt[i][0],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "[__ncandidates__]/I").c_str());
+      } else if (var->variabletype == Variable::Manager::VariableDataType::c_bool) {
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_valuesInt[i][0],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "[__ncandidates__]/O").c_str());
+      }
       m_functions.push_back(var->function);
     }
   }
@@ -151,7 +188,15 @@ float VariablesToEventBasedTreeModule::getInverseSamplingRateWeight()
   if (m_sampling_variable == nullptr)
     return 1.0;
 
-  long target = std::lround(m_sampling_variable->function(nullptr));
+  long target = 0;
+  if (m_sampling_variable->variabletype == Variable::Manager::VariableDataType::c_double) {
+    target = std::lround(std::get<double>(m_sampling_variable->function(nullptr)));
+  } else if (m_sampling_variable->variabletype == Variable::Manager::VariableDataType::c_int) {
+    target = std::lround(std::get<int>(m_sampling_variable->function(nullptr)));
+  } else if (m_sampling_variable->variabletype == Variable::Manager::VariableDataType::c_bool) {
+    target = std::lround(std::get<bool>(m_sampling_variable->function(nullptr)));
+  }
+
   if (m_sampling_rates.find(target) != m_sampling_rates.end() and m_sampling_rates[target] > 0) {
     m_sampling_counts[target]++;
     if (m_sampling_counts[target] % m_sampling_rates[target] != 0)
@@ -178,7 +223,13 @@ void VariablesToEventBasedTreeModule::event()
   m_weight = getInverseSamplingRateWeight();
   if (m_weight > 0) {
     for (unsigned int iVar = 0; iVar < m_event_functions.size(); iVar++) {
-      m_event_values[iVar] = m_event_functions[iVar](nullptr);
+      if (std::holds_alternative<double>(m_event_functions[iVar](nullptr))) {
+        m_event_valuesDouble[iVar] = std::get<double>(m_event_functions[iVar](nullptr));
+      } else if (std::holds_alternative<int>(m_event_functions[iVar](nullptr))) {
+        m_event_valuesInt[iVar] = std::get<int>(m_event_functions[iVar](nullptr));
+      } else if (std::holds_alternative<bool>(m_event_functions[iVar](nullptr))) {
+        m_event_valuesInt[iVar] = std::get<bool>(m_event_functions[iVar](nullptr));
+      }
     }
     for (unsigned int iPart = 0; iPart < m_ncandidates; iPart++) {
 
@@ -189,7 +240,13 @@ void VariablesToEventBasedTreeModule::event()
 
       const Particle* particle = particlelist->getParticle(iPart);
       for (unsigned int iVar = 0; iVar < m_functions.size(); iVar++) {
-        m_values[iVar][iPart] = m_functions[iVar](particle);
+        if (std::holds_alternative<double>(m_functions[iVar](particle))) {
+          m_valuesDouble[iVar][iPart] = std::get<double>(m_functions[iVar](particle));
+        } else if (std::holds_alternative<int>(m_functions[iVar](particle))) {
+          m_valuesInt[iVar][iPart] = std::get<int>(m_functions[iVar](particle));
+        } else if (std::holds_alternative<bool>(m_functions[iVar](particle))) {
+          m_valuesInt[iVar][iPart] = std::get<bool>(m_functions[iVar](particle));
+        }
       }
     }
     m_tree->get().Fill();
@@ -205,7 +262,7 @@ void VariablesToEventBasedTreeModule::terminate()
 
     const bool writeError = m_file->TestBit(TFile::kWriteError);
     if (writeError) {
-      B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
+      B2FATAL("A write error occurred while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
   }
 }

@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = ['framework', 'analysis_dataobjects', 'analysis_DecayDescriptor', '$ROOT_LIBS', 'mdst_dataobjects', 'analysis_utility']
+
+Return('env')

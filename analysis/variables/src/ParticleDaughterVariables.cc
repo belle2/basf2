@@ -9,7 +9,9 @@
 // Own include
 #include <analysis/variables/ParticleDaughterVariables.h>
 
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
 #include <analysis/variables/MCTruthVariables.h>
 
 // dataobjects

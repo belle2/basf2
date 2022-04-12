@@ -7,8 +7,9 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 from variables.utils import create_aliases
-from variables import variables
+import variables
 
 
 def mc_gen_topo(n=200):
@@ -41,7 +42,7 @@ def mc_gen_topo(n=200):
        * Normally, the maximum of ``nMCGen`` in the MC samples at Belle II is less than 200.
          Hence, if you have no idea about the maximum of ``nMCGen`` in your own MC sample,
          it is usually a safe choice to use the default parameter value 200.
-       * However, an overlarge parameter value leads to unncessary waste of disk space and
+       * However, an overlarge parameter value leads to unnecessary waste of disk space and
          redundant variables with inelegant ``nan`` values.
          Hence, if you know the maximum of ``nMCGen`` in your own MC sample,
          it is a better choice to assign the parameter a proper value.
@@ -53,7 +54,7 @@ def mc_gen_topo(n=200):
     wrapper = 'genParticle({variable}, varForMCGen(mcMother(mdstIndex)))'
     prefix = 'MCGenMothIndex'
     MCGenMothIndex = create_aliases(list_of_indexes, wrapper, prefix)
-    variables.addAlias('nMCGen', 'nMCParticles')
+    variables.variables.addAlias('nMCGen', 'nMCParticles')
     list_of_variables = ['nMCGen']
     for i in range(n):
         list_of_variables.append(MCGenPDG[i])

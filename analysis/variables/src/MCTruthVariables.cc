@@ -6,8 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+// Own include
 #include <analysis/variables/MCTruthVariables.h>
+
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/TauPairDecay.h>
 #include <analysis/utility/MCMatching.h>
@@ -30,7 +34,6 @@ namespace Belle2 {
   namespace Variable {
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
-    static const int     intNaN = std::numeric_limits<int>::quiet_NaN();
 
 
     double isSignal(const Particle* part)
@@ -271,7 +274,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).Px();
     }
 
@@ -281,7 +284,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).Py();
     }
 
@@ -291,7 +294,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).Pz();
     }
 
@@ -301,7 +304,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).Pt();
     }
 
@@ -311,7 +314,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).E();
     }
 
@@ -321,7 +324,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).P();
     }
 
@@ -331,7 +334,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).Theta();
     }
 
@@ -341,7 +344,7 @@ namespace Belle2 {
       if (!mcparticle) return realNaN;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      ROOT::Math::PxPyPzEVector mcpP4 = mcparticle->get4Vector();
       return frame.getMomentum(mcpP4).Phi();
     }
 
@@ -350,8 +353,8 @@ namespace Belle2 {
       StoreArray<MCParticle> mcparticles;
       if (mcparticles.getEntries() < 1) return realNaN;
 
-      TLorentzVector pInitial = mcparticles[0]->get4Vector();
-      TLorentzVector pDaughters;
+      ROOT::Math::PxPyPzEVector pInitial = mcparticles[0]->get4Vector();
+      ROOT::Math::PxPyPzEVector pDaughters;
       const std::vector<Particle*> daughters = part->getDaughters();
       for (auto daughter : daughters) {
         const MCParticle* mcD = daughter->getMCParticle();
@@ -362,9 +365,9 @@ namespace Belle2 {
       return (pInitial - pDaughters).M();
     }
 
-    TLorentzVector MCInvisibleP4(const MCParticle* mcparticle)
+    ROOT::Math::PxPyPzEVector MCInvisibleP4(const MCParticle* mcparticle)
     {
-      TLorentzVector ResultP4;
+      ROOT::Math::PxPyPzEVector ResultP4;
       int pdg = abs(mcparticle->getPDG());
       bool isNeutrino = (pdg == 12 or pdg == 14 or pdg == 16);
 
@@ -405,10 +408,10 @@ namespace Belle2 {
       if (mcParticlePDG != 511 and mcParticlePDG != 521)
         return realNaN;
 
-      TLorentzVector p = T.rotateLabToCms() * (mcB->get4Vector() - MCInvisibleP4(mcB));
+      ROOT::Math::PxPyPzEVector p = T.rotateLabToCms() * (mcB->get4Vector() - MCInvisibleP4(mcB));
       double e_d = p.E();
       double m_d = p.M();
-      double p_d = p.Rho();
+      double p_d = p.P();
 
       double theta_BY = (2 * e_Beam * e_d - m_B * m_B - m_d * m_d)
                         / (2 * p_B * p_d);
@@ -495,7 +498,7 @@ namespace Belle2 {
       StoreObjPtr<TauPairDecay> tauDecay;
       if (!tauDecay) {
         B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
-        return intNaN;
+        return 0;
       }
       return tauDecay->getTauPlusIdMode();
     }
@@ -505,7 +508,7 @@ namespace Belle2 {
       StoreObjPtr<TauPairDecay> tauDecay;
       if (!tauDecay) {
         B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
-        return intNaN;
+        return 0;
       }
       return tauDecay->getTauMinusIdMode();
     }
@@ -515,7 +518,7 @@ namespace Belle2 {
       StoreObjPtr<TauPairDecay> tauDecay;
       if (!tauDecay) {
         B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
-        return intNaN;
+        return 0;
       }
       return tauDecay->getTauPlusMcProng();
     }
@@ -525,12 +528,10 @@ namespace Belle2 {
       StoreObjPtr<TauPairDecay> tauDecay;
       if (!tauDecay) {
         B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
-        return intNaN;
+        return 0;
       }
       return tauDecay->getTauMinusMcProng();
     }
-
-
 
     double isReconstructible(const Particle* p)
     {
@@ -625,12 +626,12 @@ namespace Belle2 {
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) {
         B2WARNING("No MCParticle is associated to the particle");
-        return intNaN;
+        return 0;
       }
 
       int nChildren = p->getNDaughters();
       if (arguments[0] >= nChildren) {
-        return intNaN;
+        return 0;
       }
 
       const Particle*   daugP   = p->getDaughter(arguments[0]);
@@ -639,7 +640,7 @@ namespace Belle2 {
         // This is a strange case.
         // The particle, p, has the related MC particle, but i-th daughter does not have the related MC Particle.
         B2WARNING("No MCParticle is associated to the i-th daughter");
-        return intNaN;
+        return 0;
       }
 
       if (nChildren == 1) return 1;
@@ -660,7 +661,7 @@ namespace Belle2 {
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) {
         B2WARNING("No MCParticle is associated to the particle");
-        return intNaN;
+        return 0;
       }
 
       return MCMatching::countMissingParticle(p, mcp, PDGcodes);
@@ -682,8 +683,8 @@ namespace Belle2 {
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      TVector3 herVec = beamParamsDB->getHER().Vect();
-      TVector3 lerVec = beamParamsDB->getLER().Vect();
+      B2Vector3D herVec = beamParamsDB->getHER().Vect();
+      B2Vector3D lerVec = beamParamsDB->getLER().Vect();
 
       // only looking at the horizontal (XZ plane) -> set y-coordinates to zero
       herVec.SetY(0);
@@ -697,8 +698,8 @@ namespace Belle2 {
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      TVector3 herVec = beamParamsDB->getHER().Vect();
-      TVector3 lerVec = beamParamsDB->getLER().Vect();
+      B2Vector3D herVec = beamParamsDB->getHER().Vect();
+      B2Vector3D lerVec = beamParamsDB->getLER().Vect();
 
       // only looking at the vertical (YZ plane) -> set x-coordinates to zero
       herVec.SetX(0);
@@ -789,7 +790,23 @@ namespace Belle2 {
       [](const std::pair<double, int>& l, const std::pair<double, int>& r) {
         return l.first > r.first;
       });
+      // cppcheck-suppress containerOutOfBounds
       return mcps.object(weightsAndIndices[0].second)->getPDG();
+    }
+
+    double particleClusterTotalMCMatchWeight(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return realNaN;
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+
+      // if there are no relations to any MCParticles, we return 0!
+      double weightsum = 0;
+      for (unsigned int i = 0; i < mcps.size(); ++i)
+        weightsum += mcps.weight(i);
+
+      return weightsum;
     }
 
     double isBBCrossfeed(const Particle* particle)
@@ -946,7 +963,7 @@ namespace Belle2 {
                       "NaN if i-th daughter does not exist.");
     REGISTER_VARIABLE("genNMissingDaughter(PDG)", genNMissingDaughter,
                       "Returns the number of missing daughters having assigned PDG codes. "
-                      "NaN if no MCParticle is associated to the particle.")
+                      "NaN if no MCParticle is associated to the particle.");
     REGISTER_VARIABLE("Eher", getHEREnergy, R"DOC(
 [Eventbased] The nominal HER energy used by the generator.
 
@@ -970,13 +987,13 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Generated tau decay information");
     REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode,
-                      "[Eventbased] Decay ID for the positive tau lepton in a tau pair generated event.")
+                      "[Eventbased] Decay ID for the positive tau lepton in a tau pair generated event.");
     REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode,
-                      "[Eventbased] Decay ID for the negative tau lepton in a tau pair generated event.")
+                      "[Eventbased] Decay ID for the negative tau lepton in a tau pair generated event.");
     REGISTER_VARIABLE("tauPlusMCProng", tauPlusMcProng,
-                      "[Eventbased] Prong for the positive tau lepton in a tau pair generated event.")
+                      "[Eventbased] Prong for the positive tau lepton in a tau pair generated event.");
     REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
-                      "[Eventbased] Prong for the negative tau lepton in a tau pair generated event.")
+                      "[Eventbased] Prong for the negative tau lepton in a tau pair generated event.");
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,
@@ -1007,6 +1024,8 @@ namespace Belle2 {
                       "returns the weight of the ECLCluster -> MCParticle relation for the relation with the largest weight.");
     REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode,
                       "returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
+    REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight,
+                      "returns the sum of all weights of the ECLCluster -> MCParticles relations.");
 
   }
 }

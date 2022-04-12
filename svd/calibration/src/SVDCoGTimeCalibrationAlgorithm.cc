@@ -108,7 +108,7 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           TProfile* pfx = hEventT0vsCoG->ProfileX();
           std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
           pfx->SetName(name.c_str());
-          TFitResultPtr tfr = pfx->Fit("pol3", "RQS");
+          TFitResultPtr tfr = pfx->Fit("pol3", "RQSM");
           double par[4];
           pol3->GetParameters(par);
           /** Fit with pol1 **/

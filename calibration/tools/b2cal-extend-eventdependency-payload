@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+import argparse
+import sys
+import basf2
+
+'''
+Tool to be used for managing the payloads containing EventDependency objects.
+It inspects a payload, it takes the last object from the EventDependency one
+and it creates a new payload valid for the given IoV containing the object.
+It can be used for "extending" the validity of a EventDependency payload by
+assigning to the new (extended) IoV the last object valid for the previous IoV.
+'''
+
+
+def arg_parser():
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-i', '--input',
+                        required=True,
+                        type=str,
+                        help='path to the input payload file')
+    parser.add_argument('-n', '--name',
+                        required=True,
+                        type=str,
+                        help='name of the object stored in the payload file')
+    parser.add_argument('--iov',
+                        required=True,
+                        type=int,
+                        nargs=4,
+                        help='IoV of the new payload (for the IoV '
+                        '``(A,B,C,D)`` use ``--iov A B C D``)')
+    parser.add_argument('--output_db',
+                        required=True,
+                        type=file_path,
+                        help='path to the local database file '
+                        '(it must exist before executing this tool)')
+    return parser
+
+
+def file_path(file_path):
+    try:
+        return basf2.find_file(file_path)
+    except FileNotFoundError as e:
+        raise argparse.ArgumentTypeError(e)
+
+
+if __name__ == '__main__':
+
+    args = arg_parser().parse_args()
+
+    import ROOT # noqa
+
+    payload_file = None
+    try:
+        payload_file = ROOT.TFile.Open(args.input)
+        if not payload_file.IsOpen():
+            basf2.B2FATAL(f'The file {payload_file} can not be opened')
+    except OSError as e:
+        basf2.B2FATAL(e)
+
+    all_objects = payload_file.Get(args.name)
+    if not all_objects:
+        payload_file.Close()
+        basf2.B2FATAL(f'The file does not contain a {args.name} payload')
+    if not all_objects.ClassName() == 'Belle2::EventDependency':
+        payload_file.Close()
+        basf2.B2FATAL('The payload does not contain a Belle2::EventDependency object')
+    payload_file.Close()
+
+    basf2.conditions.expert_settings(save_payloads=args.output_db)
+    last_object = all_objects.getObjectByIndex(all_objects.getEventNumbers().size())
+    event_object = ROOT.Belle2.EventDependency(last_object)
+    database = ROOT.Belle2.Database.Instance()
+    iov = ROOT.Belle2.IntervalOfValidity(args.iov[0], args.iov[1], args.iov[2], args.iov[3])
+    created = database.storeData(args.name, event_object, iov)
+
+    if created:
+        basf2.B2INFO(f'A new payload for {args.name} valid for the IoV '
+                     f'({args.iov[0]},{args.iov[1]},{args.iov[2]},{args.iov[3]}) '
+                     f'is added to the local database {args.output_db}')
+        sys.exit(0)
+    else:
+        basf2.B2FATAL('Something went wrong during the addition of a new payload '
+                      f'for {args.name} to the local database {args.output_db}')

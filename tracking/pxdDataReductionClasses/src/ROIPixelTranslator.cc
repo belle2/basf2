@@ -45,7 +45,7 @@ ROIPixelTranslator::fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
                                   StoreArray<ROIid>* ROIidList)
 {
 
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   for (int i = 0; i < listOfIntercepts->getEntries(); i++) {
 
@@ -54,9 +54,9 @@ ROIPixelTranslator::fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
 
     const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo((*listOfIntercepts)[i]->getSensorID());
 
-    double widthTotU = std::min(m_maxWidthU ,
+    double widthTotU = std::min(m_maxWidthU,
                                 sqrt((*listOfIntercepts)[i]->getSigmaU() * (*listOfIntercepts)[i]->getSigmaU() + m_sigmaSystU * m_sigmaSystU) * m_numSigmaTotU);
-    double widthTotV = std::min(m_maxWidthV ,
+    double widthTotV = std::min(m_maxWidthV,
                                 sqrt((*listOfIntercepts)[i]->getSigmaV() * (*listOfIntercepts)[i]->getSigmaV() + m_sigmaSystV * m_sigmaSystV) * m_numSigmaTotV);
 
     double minU = (*listOfIntercepts)[i]->getCoorU() - widthTotU / 2 ;

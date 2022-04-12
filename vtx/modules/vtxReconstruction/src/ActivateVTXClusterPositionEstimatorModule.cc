@@ -16,7 +16,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ActivateVTXClusterPositionEstimator)
+REG_MODULE(ActivateVTXClusterPositionEstimator);
 
 ActivateVTXClusterPositionEstimatorModule::ActivateVTXClusterPositionEstimatorModule() : Module()
 {

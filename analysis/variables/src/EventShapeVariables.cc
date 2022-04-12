@@ -6,7 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <analysis/VariableManager/Manager.h>
+// Own include
+#include <analysis/variables/EventShapeVariables.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventShapeContainer.h>
 
@@ -16,84 +18,59 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/Conversion.h>
 
-#include <TLorentzVector.h>
 #include <TVectorF.h>
-#include <TVector3.h>
 
 #include <boost/algorithm/string.hpp>
 
 namespace Belle2 {
   namespace Variable {
 
-    Manager::FunctionPtr foxWolframR(const std::vector<std::string>& arguments)
+    double foxWolframR(const Particle*, const std::vector<double>& index)
     {
-      if (arguments.size() != 1) {
+      if (index.size() != 1) {
         B2ERROR("foxWolframR cannot be called without providing the moment order");
-        return nullptr;
+        return std::numeric_limits<float>::quiet_NaN();
       }
 
-      int order = -1;
-      try {
-        order = Belle2::convertString<int>(arguments[0]);
-      } catch (std::invalid_argument&) {
-        B2ERROR("Argument of foxWolframR must be an integer");
-        return nullptr;
-      }
+      int order = std::lround(index[0]);
 
       if (order < 0 || order > 8) {
         B2ERROR("The Fox-Wolfram moment order must be within 0 and 8.");
-        return nullptr;
+        return std::numeric_limits<float>::quiet_NaN();
       }
 
-      auto func = [order](const Particle*) -> double{
-
-        StoreObjPtr<EventShapeContainer> evtShapeCont;
-        if (!evtShapeCont)
-        {
-          B2ERROR("No EventShapeContainer object has been found in the datastore");
-          return std::numeric_limits<float>::quiet_NaN();
-        }
-        if (evtShapeCont->getFWMoment(0) == 0)
-        {
-          B2ERROR("The 0th-order FoxWolfram moment is zero");
-          return std::numeric_limits<float>::quiet_NaN();
-        }
-        return evtShapeCont->getFWMoment(order) / evtShapeCont->getFWMoment(0);
-      };
-      return func;
+      StoreObjPtr<EventShapeContainer> evtShapeCont;
+      if (!evtShapeCont) {
+        B2ERROR("No EventShapeContainer object has been found in the datastore");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      if (evtShapeCont->getFWMoment(0) == 0) {
+        B2ERROR("The 0th-order FoxWolfram moment is zero");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      return evtShapeCont->getFWMoment(order) / evtShapeCont->getFWMoment(0);
     }
 
-    Manager::FunctionPtr foxWolframH(const std::vector<std::string>& arguments)
+    double foxWolframH(const Particle*, const std::vector<double>& index)
     {
-      if (arguments.size() != 1) {
+      if (index.size() != 1) {
         B2ERROR("foxWolframH cannot be called without providing the moment order");
-        return nullptr;
+        return std::numeric_limits<float>::quiet_NaN();
       }
 
-      int order = -1;
-      try {
-        order = Belle2::convertString<int>(arguments[0]);
-      } catch (std::invalid_argument&) {
-        B2ERROR("Argument of foxWolframH must be an integer");
-        return nullptr;
-      }
+      int order = std::lround(index[0]);
 
       if (order < 0 || order > 8) {
         B2ERROR("The Fox-Wolfram moment order must be within 0 and 8.");
-        return nullptr;
+        return std::numeric_limits<float>::quiet_NaN();
       }
 
-      auto func = [order](const Particle*) -> double{
-
-        StoreObjPtr<EventShapeContainer> evtShapeCont;
-        if (!evtShapeCont)
-        {
-          B2ERROR("No EventShapeContainer object has been found in the datastore");
-          return std::numeric_limits<float>::quiet_NaN();
-        }
-        return evtShapeCont->getFWMoment(order);
-      };
-      return func;
+      StoreObjPtr<EventShapeContainer> evtShapeCont;
+      if (!evtShapeCont) {
+        B2ERROR("No EventShapeContainer object has been found in the datastore");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      return evtShapeCont->getFWMoment(order);
     }
 
     Manager::FunctionPtr harmonicMoment(const std::vector<std::string>& arguments)
@@ -403,7 +380,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardHemisphere4Momentum().Mag();
+      return evtShapeCont->getForwardHemisphere4Momentum().M();
     }
 
     double forwardHemisphereX(const Particle*)
@@ -413,7 +390,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardHemisphere4Momentum().Vect().X();
+      return evtShapeCont->getForwardHemisphere4Momentum().px();
     }
 
     double forwardHemisphereY(const Particle*)
@@ -423,7 +400,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardHemisphere4Momentum().Vect().Y();
+      return evtShapeCont->getForwardHemisphere4Momentum().py();
     }
 
     double forwardHemisphereZ(const Particle*)
@@ -433,7 +410,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardHemisphere4Momentum().Vect().Z();
+      return evtShapeCont->getForwardHemisphere4Momentum().pz();
     }
 
     double forwardHemisphereMomentum(const Particle*)
@@ -443,7 +420,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getForwardHemisphere4Momentum().Vect().Mag();
+      return evtShapeCont->getForwardHemisphere4Momentum().P();
     }
 
     double forwardHemisphereEnergy(const Particle*)
@@ -463,7 +440,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardHemisphere4Momentum().Mag();
+      return evtShapeCont->getBackwardHemisphere4Momentum().M();
     }
 
     double backwardHemisphereX(const Particle*)
@@ -473,7 +450,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardHemisphere4Momentum().Vect().X();
+      return evtShapeCont->getBackwardHemisphere4Momentum().px();
     }
 
     double backwardHemisphereY(const Particle*)
@@ -483,7 +460,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardHemisphere4Momentum().Vect().Y();
+      return evtShapeCont->getBackwardHemisphere4Momentum().py();
     }
 
     double backwardHemisphereZ(const Particle*)
@@ -493,7 +470,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardHemisphere4Momentum().Vect().Z();
+      return evtShapeCont->getBackwardHemisphere4Momentum().pz();
     }
 
     double backwardHemisphereMomentum(const Particle*)
@@ -503,7 +480,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getBackwardHemisphere4Momentum().Vect().Mag();
+      return evtShapeCont->getBackwardHemisphere4Momentum().P();
     }
 
     double backwardHemisphereEnergy(const Particle*)
@@ -563,7 +540,7 @@ namespace Belle2 {
         B2ERROR("No EventShapeContainer object has been found in the datastore");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return evtShapeCont->getThrustAxis().CosTheta();
+      return cos(evtShapeCont->getThrustAxis().Theta());
     }
 
     Manager::FunctionPtr useThrustFrame(const std::vector<std::string>& arguments)
@@ -581,15 +558,16 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
           }
 
-          TVector3 newZ = evtShapeCont->getThrustAxis();
-          TVector3 newY(0, 0, 0);
-          if (newZ(2) == 0 and newZ(1) == 0)
-            newY(0) = 1;
-          else{
-            newY(1) = newZ(2);
-            newY(2) = -newZ(1);
+          ROOT::Math::XYZVector newZ = evtShapeCont->getThrustAxis();
+          ROOT::Math::XYZVector newY(0, 0, 0);
+          if (newZ.z() == 0 and newZ.y() == 0)
+            newY.SetX(1);
+          else
+          {
+            newY.SetY(newZ.z());
+            newY.SetZ(-newZ.y());
           }
-          TVector3 newX = newY.Cross(newZ);
+          ROOT::Math::XYZVector newX = newY.Cross(newZ);
 
           UseReferenceFrame<CMSRotationFrame> signalframe(newX, newY, newZ);
 
@@ -603,18 +581,18 @@ namespace Belle2 {
 
     VARIABLE_GROUP("EventShape");
 
-    REGISTER_METAVARIABLE("foxWolframR(i)", foxWolframR, R"DOC(
+    REGISTER_VARIABLE("foxWolframR(i)", foxWolframR, R"DOC(
 [Eventbased] Ratio of the i-th to the 0-th order Fox Wolfram moments. The order ``i`` can go from 0 up to 8th.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("foxWolframH(i)", foxWolframH, R"DOC(
+)DOC");
+    REGISTER_VARIABLE("foxWolframH(i)", foxWolframH, R"DOC(
 [Eventbased] Returns i-th order Fox Wolfram moment. The order ``i`` can go from 0 up to 8th."
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC", Manager::VariableDataType::c_double);
+)DOC");
     REGISTER_METAVARIABLE("harmonicMoment(i, axisName)", harmonicMoment, R"DOC(
 [Eventbased] Returns i-th order harmonic moment, calculated with respect to the axis ``axisName``. The order ``i`` can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision'.
 

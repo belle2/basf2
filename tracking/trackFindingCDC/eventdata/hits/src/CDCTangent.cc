@@ -50,9 +50,9 @@ CDCTangent::CDCTangent(const CDCRLWireHit& fromRLWireHit,
 void CDCTangent::adjustLine()
 {
   m_line = ParameterLine2D::touchingCircles(getFromRLWireHit().getRefPos2D(),
-                                            getFromRLInfo() * getFromRLWireHit().getRefDriftLength(),
+                                            static_cast<double>(getFromRLInfo()) * getFromRLWireHit().getRefDriftLength(),
                                             getToRLWireHit().getRefPos2D(),
-                                            getToRLInfo() * getToRLWireHit().getRefDriftLength());
+                                            static_cast<double>(getToRLInfo()) * getToRLWireHit().getRefDriftLength());
 }
 
 void CDCTangent::adjustRLInfo()

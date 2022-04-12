@@ -61,9 +61,11 @@ namespace Belle2 {
       /** Update values from a PXDCluster.
        * @param pxdIntercept a PXDIntercept object.
        * @param recoTracksName Name of RecoTrack collection
+       * @param mass Mass of the impinging particle
        * @return the pointer of the related RecoTrack object.
        */
-      RecoTrack* setValues(const PXDIntercept& pxdIntercept, const std::string& recoTracksName = "");
+      RecoTrack* setValues(const PXDIntercept& pxdIntercept, const std::string& recoTracksName = "",
+                           const double& mass = Const::electronMass);
 
       float x;         /**< Global position in x. */
       float y;         /**< Global position in y. */
@@ -86,11 +88,13 @@ namespace Belle2 {
        * @param pxdIntercept a PXDIntercept object.
        * @param recoTracksName Name of RecoTrack collection
        * @param pxdTrackClustersName Name of track matched PXDClusters
+       * @param mass Mass of the impinging particle
        * @return the pointer of the related RecoTrack object.
        */
       RecoTrack* setValues(const PXDIntercept& pxdIntercept,
                            const std::string& recoTracksName = "",
-                           const std::string& pxdTrackClustersName = "PXDClustersFromTracks");
+                           const std::string& pxdTrackClustersName = "PXDClustersFromTracks",
+                           const double& mass = Const::electronMass);
 
       bool usedInTrack;        /**< True if the cluster is used in tracking */
       float dU;                /**< Residual (meas - prediction) in U. */

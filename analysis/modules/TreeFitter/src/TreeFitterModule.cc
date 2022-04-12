@@ -22,7 +22,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(TreeFitter)
+REG_MODULE(TreeFitter);
 
 TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_nCandidatesAfter(-1)
 {

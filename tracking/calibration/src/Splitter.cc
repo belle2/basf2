@@ -6,16 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+
 #include <vector>
 #include <map>
 #include <algorithm>
 #include <iostream>
-#include <fstream>
 #include <utility>
 #include <cmath>
 #include <numeric>
 #include <TGraphErrors.h>
-#include <TCanvas.h>
 #include <TStyle.h>
 #include <TAxis.h>
 
@@ -171,11 +170,16 @@ namespace Belle2 {
   // split to many small intervals (atoms)
   vector<pair<double, double>> Splitter::splitToSmall(map<ExpRun, pair<double, double>> runs, double intSize)
   {
-    // split into ~1m intervals
+    // split into small intervals
     vector<pair<double, double>> smallRuns;
 
     for (auto r : runs) {
       auto& I = r.second;
+      if (intSize < 0) {
+        smallRuns.push_back(I);
+        continue;
+      }
+
       double runTime = I.second - I.first;
       int nSplits = runTime / intSize; //1-m intervals
       nSplits = max(1, nSplits); //at least 1 interval

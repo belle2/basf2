@@ -246,7 +246,7 @@ namespace Belle2 {
           m_arich.PDG = particle->getPDG();
           m_arich.primary = particle->getStatus(MCParticle::c_PrimaryParticle);
           m_arich.seen = particle->hasSeenInDetector(Const::ARICH);
-          TVector3 prodVertex = particle->getProductionVertex();
+          B2Vector3D prodVertex = particle->getProductionVertex();
           m_arich.rhoProd = prodVertex.Perp();
           m_arich.zProd = prodVertex.Z();
           m_arich.phiProd = prodVertex.Phi();
@@ -317,7 +317,7 @@ namespace Belle2 {
             if (mother) m_arich.motherPDG = mother->getPDG();
             m_arich.primary = particle->getStatus(MCParticle::c_PrimaryParticle);
             m_arich.seen = particle->hasSeenInDetector(Const::ARICH);
-            TVector3 prodVertex = particle->getProductionVertex();
+            B2Vector3D prodVertex = particle->getProductionVertex();
             m_arich.rhoProd = prodVertex.Perp();
             m_arich.zProd = prodVertex.Z();
             m_arich.phiProd = prodVertex.Phi();

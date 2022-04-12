@@ -26,17 +26,39 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisTOPModule();
+
+    /**
+     * Destructor.
+     */
     virtual ~DQMHistAnalysisTOPModule();
 
-    //! Module functions to be called from main process
+    /**
+     * Initializer.
+     */
     virtual void initialize() override;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     virtual void beginRun() override;
+
+    /**
+     * This method is called for each event.
+     */
     virtual void event() override;
+
+    /**
+     * This method is called if the current run ends.
+     */
     virtual void endRun() override;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     virtual void terminate() override;
 
     /**
@@ -47,6 +69,15 @@ namespace Belle2 {
     TH1* find_histo_in_canvas(TString hname);
     //! Data members
   private:
+    /** Histogram from DQMInfo with run type. */
+    TH1* m_RunType = nullptr;
+
+    /** String with run type. */
+    TString m_RunTypeString;
+
+    /** Run type flag for null runs. */
+    bool m_IsNullRun;
+
     /** Canvas for the mean of the good hits. */
     TCanvas* m_c_goodHitsMean = nullptr;
     /** Canvas for the RMS of the good hits. */

@@ -35,10 +35,8 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <ecl/digitization/EclConfiguration.h>
-
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
-#include <boost/optional.hpp>
 
 #include <TH2F.h>
 #include <TTree.h>
@@ -282,7 +280,7 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   // Conversion coefficient from ADC ticks to nanoseconds
   // TICKS_TO_NS ~ 0.4931 ns/clock tick
   // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency
-  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::m_rf) * 1e3;
+  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
 
 
   vector<float> Crate_time_ns(52, 0.0); /**< vector derived from DB object */
@@ -328,8 +326,6 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
 
   //---------------------------------------------------------------------
   //..Some utilities
-  ClusterUtils cUtil;
-  const TVector3 clustervertex = cUtil.GetIPPosition();
   PCmsLabTransform boostrotate;
 
   //---------------------------------------------------------------------
@@ -445,8 +441,8 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
   double trkEClustCOM[2] = {0., 0.};
   double trkpLab[2];
   double trkpCOM[2];
-  TLorentzVector trkp4Lab[2];
-  TLorentzVector trkp4COM[2];
+  ROOT::Math::PxPyPzEVector trkp4Lab[2];
+  ROOT::Math::PxPyPzEVector trkp4COM[2];
 
   // Index of the cluster and the crystal that has the highest energy crystal for the two tracks
   int numClustersPerTrack[2] = { 0, 0 };
@@ -466,8 +462,8 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::collect()
 
       trkp4Lab[icharge] = tempTrackFit->get4Momentum();
       trkp4COM[icharge] = boostrotate.rotateLabToCms() * trkp4Lab[icharge];
-      trkpLab[icharge] = trkp4Lab[icharge].Rho();
-      trkpCOM[icharge] = trkp4COM[icharge].Rho();
+      trkpLab[icharge] = trkp4Lab[icharge].P();
+      trkpCOM[icharge] = trkp4COM[icharge].P();
 
 
       /* For each cluster associated to the current track, sum up the energies to get the total

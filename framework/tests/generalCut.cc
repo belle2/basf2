@@ -64,7 +64,7 @@ namespace {
       }
     }
 
-    Var* getVariable(const std::string& functionName, const std::vector<std::string>& functionArguments)
+    Var* getVariable(const std::string& functionName, __attribute__((unused)) const std::vector<std::string>& functionArguments)
     {
       if (functionName == "mocking_variable") {
         return &m_mocking_variable;

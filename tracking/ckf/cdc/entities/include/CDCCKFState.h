@@ -15,8 +15,6 @@
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 
-#include <boost/optional.hpp>
-
 namespace Belle2 {
 
   /// Define states for CKF algorithm, which can be seed track or CDC wire hit.
@@ -154,12 +152,12 @@ namespace Belle2 {
 
   private:
     /// (optional) pointer to the seed track
-    boost::optional<const RecoTrack*> m_seed;
+    std::optional<const RecoTrack*> m_seed;
     /// (optional) pointer to the wire hit
-    boost::optional<const TrackFindingCDC::CDCWireHit*> m_cdcWireHit;
+    std::optional<const TrackFindingCDC::CDCWireHit*> m_cdcWireHit;
 
     /// (optional) genfit MeasuredStateOnPlane
-    boost::optional<genfit::MeasuredStateOnPlane> m_trackState;
+    std::optional<genfit::MeasuredStateOnPlane> m_trackState;
 
     /// arc length along the trajectory to the hit
     double m_arcLength = 0;

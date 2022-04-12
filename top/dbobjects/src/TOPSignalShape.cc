@@ -84,4 +84,26 @@ namespace Belle2 {
     return m_interpolator->Eval(t);
   }
 
+
+  double TOPSignalShape::getPeakingTime() const
+  {
+    if (m_peakTime == 0) {
+      double t1 = 0;
+      double t2 = 1;
+      while (getValue(t2) > 0.5) t2 += 1;
+      for (int i = 0; i < 20; i++) {
+        double t = (t1 + t2) / 2;
+        if (m_interpolator->Derivative(t) > 0) {
+          t1 = t;
+        } else {
+          t2 = t;
+        }
+      }
+      m_peakTime = (t1 + t2) / 2;
+    }
+
+    return m_peakTime;
+  }
+
+
 } // end Belle2 namespace

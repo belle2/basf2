@@ -30,7 +30,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(BKLMSimHistogrammer)
+REG_MODULE(BKLMSimHistogrammer);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -232,8 +232,10 @@ void BKLMSimHistogrammerModule::event()
   }
 
   for (int i = 0; i < hits2D.getEntries(); i++) {
+    if (hits2D[i]->getSubdetector() != KLMElementNumbers::c_BKLM)
+      continue;
     int scaledTag = -1;
-    TVector3 gHitPos = hits2D[i]->getGlobalPosition();
+    TVector3 gHitPos = hits2D[i]->getPosition();
     RelationVector<BKLMHit1d> related1DHits = hits2D[i]->getRelationsTo<BKLMHit1d>();
     for (const auto& hit1d : related1DHits) {
       RelationVector<KLMDigit> bklmDigits = hit1d.getRelationsTo<KLMDigit>();
@@ -288,8 +290,8 @@ void BKLMSimHistogrammerModule::event()
   if (nSimHit == 0)
     return;
   for (int i = 0; i < n2DHits; i++) {
-    BKLMHit2d* hit2D = hits2D[i];
-    TVector3 gHitPos = hit2D->getGlobalPosition();
+    KLMHit2d* hit2D = hits2D[i];
+    TVector3 gHitPos = hit2D->getPosition();
     if (hit2D->inRPC()) {
       m_hSimHitPhiRPC->Fill(gHitPos.Phi(), m_weight);
       m_hSimHitThetaRPC->Fill(gHitPos.Theta(), m_weight);

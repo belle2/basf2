@@ -76,7 +76,7 @@ RfShm_Cell& RFFlowStat::getinfo(int id)
 
 void RFFlowStat::fillNodeInfo(int id, RfNodeInfo* info, bool outflag)
 {
-  RfShm_Cell& cell = getinfo(id);
+  const RfShm_Cell& cell = getinfo(id);
   //DEBUG  printf ( "fillNodeInfo: celleid = %d, nevent = %d\n", id, cell.nevent );
   if (!outflag) {
     info->nevent_in = cell.nevent;

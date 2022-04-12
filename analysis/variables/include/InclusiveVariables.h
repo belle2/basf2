@@ -8,10 +8,13 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
 
+#include <string>
+#include <vector>
+
 namespace Belle2 {
+  class Particle;
 
   namespace Variable {
 
@@ -26,7 +29,7 @@ namespace Belle2 {
     /**
      * Number of charged daughters
      */
-    Manager::FunctionPtr nDaughterCharged(const std::vector<std::string>& arguments);
+    int nDaughterCharged(const Particle* particle, const std::vector<double>& argument);
     /**
      * PDG of the most common mother of daughters
      */

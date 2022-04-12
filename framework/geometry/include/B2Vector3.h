@@ -12,6 +12,7 @@
 #include <framework/logging/Logger.h>
 
 #include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <string>
 #include <iostream>     // std::cout, std::fixed
 #include <iomanip>      // std::setprecision
@@ -69,6 +70,12 @@ namespace Belle2 {
     /** Constructor expecting a pointer to a B2Vector3 of different type */
     template <typename OtherType> explicit B2Vector3(const B2Vector3<OtherType>* b2Vec3):
       m_coordinates {static_cast<DataType>(b2Vec3->X()), static_cast<DataType>(b2Vec3->Y()), static_cast<DataType>(b2Vec3->Z())} {};
+    /** Constructor expecting a XYZVector */
+    // cppcheck-suppress noExplicitConstructor
+    B2Vector3(const ROOT::Math::XYZVector& xyzVec): m_coordinates {static_cast<DataType>(xyzVec.X()), static_cast<DataType>(xyzVec.Y()), static_cast<DataType>(xyzVec.Z())} {};
+    /** Constructor expecting a pointer to a XYZVector */
+    // cppcheck-suppress noExplicitConstructor
+    B2Vector3(const ROOT::Math::XYZVector* xyzVec): m_coordinates {static_cast<DataType>(xyzVec->X()), static_cast<DataType>(xyzVec->Y()), static_cast<DataType>(xyzVec->Z())} {};
 
     /** member access without boundary check */
     DataType operator()(unsigned i) const { return m_coordinates[i]; }
@@ -83,6 +90,8 @@ namespace Belle2 {
     B2Vector3<DataType>& operator = (const B2Vector3<DataType>& b);
     /** Assignment via TVector3 */
     B2Vector3<DataType>& operator = (const TVector3& b);
+    /** Assignment via XYZVector */
+    B2Vector3<DataType>& operator = (const ROOT::Math::XYZVector& b);
 
     /** type conversion in TVector3 */
     operator TVector3() const { return GetTVector3(); }

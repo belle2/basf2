@@ -58,8 +58,10 @@
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
-[INFO]  - ROE related to particle with PDG: 511
-[INFO]  - ROE related to MC particle with PDG: -1
+[INFO]  - ROE related to particle with
+	PDG = 511
+[INFO]  - ROE related to MC particle with
+	PDG = -1
 [INFO]  - ROE is build from generated particles
 [INFO]  - No. of generated particles in ROE: 3
 [INFO]  - |310 | 3122 | 22 | 
@@ -109,8 +111,10 @@
 
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
-[INFO]  - ROE related to particle with PDG: 511
-[INFO]  - ROE related to MC particle with PDG: -1
+[INFO]  - ROE related to particle with
+	PDG = 511
+[INFO]  - ROE related to MC particle with
+	PDG = -1
 [INFO]  - ROE is build from generated particles
 [INFO]  - No. of generated particles in ROE: 3
 [INFO]  - |310 | 3122 | 22 | 

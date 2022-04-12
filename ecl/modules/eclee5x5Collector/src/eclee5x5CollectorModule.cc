@@ -10,6 +10,8 @@
 
 //Root
 #include <TH2F.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 
 //Analysis
 #include <analysis/ClusterUtility/ClusterUtils.h>
@@ -286,25 +288,25 @@ void eclee5x5CollectorModule::collect()
   //------------------------------------------------------------------------
   /** Find COM 4-vectors */
   ClusterUtils cUtil;
-  const TVector3 clustervertex = cUtil.GetIPPosition();
+  const ROOT::Math::XYZVector clustervertex = cUtil.GetIPPosition();
 
   double phi0 = m_eclClusterArray[icMax[0]]->getPhi();
   TVector3 p30(0., 0., maxClustE[0]);
   p30.SetTheta(theta0);
   p30.SetPhi(phi0);
-  const TLorentzVector p40 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[0]], clustervertex,
-                                                           ECLCluster::EHypothesisBit::c_nPhotons);
+  const ROOT::Math::PxPyPzEVector p40 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[0]], clustervertex,
+                                        ECLCluster::EHypothesisBit::c_nPhotons);
 
   double phi1 = m_eclClusterArray[icMax[1]]->getPhi();
   TVector3 p31(0., 0., maxClustE[1]);
   p31.SetTheta(theta1);
   p31.SetPhi(phi1);
-  const TLorentzVector p41 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[1]], clustervertex,
-                                                           ECLCluster::EHypothesisBit::c_nPhotons);
+  const ROOT::Math::PxPyPzEVector p41 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[1]], clustervertex,
+                                        ECLCluster::EHypothesisBit::c_nPhotons);
 
   /** Check how back-to-back in theta* */
-  TLorentzVector p40COM = m_boostrotate.rotateLabToCms() * p40;
-  TLorentzVector p41COM = m_boostrotate.rotateLabToCms() * p41;
+  ROOT::Math::PxPyPzEVector p40COM = m_boostrotate.rotateLabToCms() * p40;
+  ROOT::Math::PxPyPzEVector p41COM = m_boostrotate.rotateLabToCms() * p41;
   double theta01COM = (p41COM.Theta() + p40COM.Theta()) * TMath::RadToDeg();
   if (abs(theta01COM - 180.) > m_maxdThetaSum) {return;}
 

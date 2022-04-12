@@ -30,19 +30,19 @@ namespace Belle2 {
     virtual ~GenRawSendModule();
 
     //! Initialize the Module
-    virtual void initialize();
+    void initialize() override;
 
     //! Called when entering a new run
-    virtual void beginRun();
+    void beginRun() override;
 
     //! Running over all events
-    virtual void event();
+    void event() override;
 
     //! Is called after processing the last event of a run
-    virtual void endRun();
+    void endRun() override;
 
     //! Is called at the end of your Module
-    virtual void terminate();
+    void terminate() override;
 
   private:
     //    unsigned int* m_buffer;

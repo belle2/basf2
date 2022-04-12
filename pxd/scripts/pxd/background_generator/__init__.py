@@ -138,31 +138,31 @@ class PXDBackgroundGenerator(basf2.Module):
     """Generates PXD background samples for background overlay on the fly.
 
     :param model: Name of the generator model to use - either "convnet" or "resnet",
-        defaults to "convnet"
-    :type model: str, optional
+        defaults to "convnet" (optional)
+    :type model: str
 
     :param checkpoint: Path to the checkpoint file with weights for the selected model,
-        defaults to None - use the default checkpoint from the conditions database
-    :type checkpoint: str, optional
+        defaults to None - use the default checkpoint from the conditions database (optional)
+    :type checkpoint: str
 
     :param seed: Integer number in the interval :math:`[-2^{63}, 2^{63} - 1]`
         used internally as the initial seed,
         defaults to None - derive a deterministic seed from the
-        value returned by :py:func:`basf2.get_random_seed`
-    :type seed: int, optional
+        value returned by :py:func:`basf2.get_random_seed` (optional)
+    :type seed: int
 
     :param nintra: Number of intra-op threads to be utilized for the generation,
-        defaults to 1
-    :type nintra: int, optional
+        defaults to 1 (optional)
+    :type nintra: int
 
     :param ninter: Number of inter-op threads to be utilized for the generation,
-        defaults to 1
-    :type ninter: int, optional
+        defaults to 1 (optional)
+    :type ninter: int
 
     :param globaltag: Global tag of the conditions database
         providing the default checkpoints stored as payloads,
-        defaults to "PXDBackgroundGenerator"
-    :type globaltag: str, optional
+        defaults to "PXDBackgroundGenerator" (optional)
+    :type globaltag: str
     """
 
     ##

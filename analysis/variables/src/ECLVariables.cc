@@ -26,6 +26,8 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
+#include <Math/Vector4D.h>
+
 #include <cmath>
 #include <stack>
 
@@ -208,7 +210,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         ClusterUtils clutls;
-        TLorentzVector p4Cluster = clutls.GetCluster4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
+        ROOT::Math::PxPyPzEVector p4Cluster = clutls.GetCluster4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
 
         return frame.getMomentum(p4Cluster).E();
       }
@@ -266,7 +268,7 @@ namespace Belle2 {
           return cellID - 1;
         } else {
           int closestinlist = lastCellIDperThetaID[std::distance(lastCellIDperThetaID.begin(), std::lower_bound(lastCellIDperThetaID.begin(),
-                                                                 lastCellIDperThetaID.end(), cellID)) - 1];
+                                                                                                             lastCellIDperThetaID.end(), cellID)) - 1];
           return cellID - closestinlist - 1;
         }
       }
@@ -318,7 +320,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         ClusterUtils clutls;
-        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
+        ROOT::Math::PxPyPzEVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
 
         return frame.getMomentum(p4Cluster).Theta();
       }
@@ -352,7 +354,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         ClusterUtils clutls;
-        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
+        ROOT::Math::PxPyPzEVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
 
         return frame.getMomentum(p4Cluster).Phi();
       }
@@ -753,7 +755,7 @@ namespace Belle2 {
     double eclClusterOnlyInvariantMass(const Particle* part)
     {
       int nDaughters = part->getNDaughters();
-      TLorentzVector sum;
+      ROOT::Math::PxPyPzEVector sum;
 
       if (nDaughters < 1) {
         return part->getMass();
@@ -770,7 +772,7 @@ namespace Belle2 {
             const ECLCluster::EHypothesisBit clusterBit = current->getECLClusterEHypothesisBit();
             nClusterDaughters ++;
             ClusterUtils clutls;
-            TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterBit);
+            ROOT::Math::PxPyPzEVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, clusterBit);
             sum += p4Cluster;
           } else {
             const std::vector<Particle*> daughters = current->getDaughters();
@@ -820,13 +822,13 @@ namespace Belle2 {
         if (!(photonlist.isValid()))
         {
           B2WARNING("The provided particle list " << photonlistname << " does not exist."
-          " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
+                    " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
           return std::numeric_limits<double>::quiet_NaN();
         }
         if (photonlist->getPDGCode() != Const::photon.getPDGCode())
         {
           B2WARNING("The list " << photonlistname << " does not contain photons."
-          " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
+                    " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
           return std::numeric_limits<double>::quiet_NaN();
         }
 
@@ -834,13 +836,13 @@ namespace Belle2 {
         if (!(tracklist.isValid()))
         {
           B2WARNING("The provided particle list " << tracklistname << " does not exist."
-          " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
+                    " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
           return std::numeric_limits<double>::quiet_NaN();
         }
         if (!Const::chargedStableSet.contains(Const::ParticleType(abs(tracklist->getPDGCode()))))
         {
           B2WARNING("The list " << tracklistname << " does not contain charged final state particles."
-          " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
+                    " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
           return std::numeric_limits<double>::quiet_NaN();
         }
 

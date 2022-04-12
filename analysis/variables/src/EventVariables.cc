@@ -848,7 +848,7 @@ Returns NaN for data.
     REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
                       "[Eventbased] Time of the event (truncated down) since 1970/1/1 (Unix epoch).","s");
     REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder, R"DOC(
-[Eventbased] Remainder of the event time in fractions of a second.
+[Eventbased] Remainder of the event time.
 
 .. tip::
   Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.

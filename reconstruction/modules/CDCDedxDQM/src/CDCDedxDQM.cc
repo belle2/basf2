@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(CDCDedxDQM)
+REG_MODULE(CDCDedxDQM);
 
 //---------------------------------
 CDCDedxDQMModule::CDCDedxDQMModule(): HistoModule()

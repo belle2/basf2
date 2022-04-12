@@ -34,7 +34,7 @@ using namespace genfit;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCCRTest)
+REG_MODULE(CDCCRTest);
 
 //                 Implementation
 CDCCRTestModule::CDCCRTestModule() : HistoModule()
@@ -419,7 +419,7 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
           theta = cdcgeo.getOutgoingTheta(alpha, theta);
           alpha = cdcgeo.getOutgoingAlpha(alpha);
           B2DEBUG(199, "x_unbiased " << x_u << " |left_right " << lr);
-          if (m_calExpectedDriftTime) { t_fit = cdcgeo.getDriftTime(std::abs(x_u), lay, lr, alpha , theta);}
+          if (m_calExpectedDriftTime) { t_fit = cdcgeo.getDriftTime(std::abs(x_u), lay, lr, alpha, theta);}
           alpha *= 180 / M_PI;
           theta *= 180 / M_PI;
           m_hAlpha->Fill(alpha);
@@ -573,7 +573,7 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
     //}
     //    if (hitID > track->getNumberOfCDCHits() / 2) { //case for last part of track, searching backward, and stop at the first choice
     auto hitListReverse = track->getCDCHitList();
-    std::reverse(hitListReverse.begin() , hitListReverse.end());
+    std::reverse(hitListReverse.begin(), hitListReverse.end());
     for (const RecoHitInformation::UsedCDCHit* hit : hitListReverse) {
       RecoHitInformation const* recoHitInfo_bkw = track->getRecoHitInformation(hit);
       if (recoHitInfo_bkw->useInFit()) {

@@ -34,7 +34,7 @@ namespace Belle2 {
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
         B2DEBUG(20, "SVDCoGTimeCalibrations: from now on we are using " <<
-        this->m_aDBObjPtr -> get_uniqueID()); });
+                this->m_aDBObjPtr -> get_uniqueID()); });
     }
 
     /** Return the strip time, given the raw strip time

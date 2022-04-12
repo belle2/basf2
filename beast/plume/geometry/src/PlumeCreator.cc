@@ -141,7 +141,7 @@ namespace Belle2 {
       support->AddPlacedVolume(l_foam, transl);
 
       //create glue layers
-      G4Box* s_glue = new G4Box("s_glue", flexlen / 2., foamwid / 2. , GlueThickness / 2.);
+      G4Box* s_glue = new G4Box("s_glue", flexlen / 2., foamwid / 2., GlueThickness / 2.);
       G4LogicalVolume* l_glue = new G4LogicalVolume(s_glue, geometry::Materials::get("Glue"), "PLUME.l_glue");
       G4double r_glue = foamthick / 2. + AirGap + GlueThickness / 2.;
       transl = G4Translate3D(flexZ + zshift, foamY, -r_glue);
@@ -151,7 +151,7 @@ namespace Belle2 {
 
       //create Kapton layers
       G4Box* s_kapton = new G4Box("s_kapton", flexlen / 2., flexwid / 2., KaptonThickness / 2.);
-      G4LogicalVolume* l_kapton = new G4LogicalVolume(s_kapton, geometry::Materials::get("Kapton") , "PLUME.l_kapton");
+      G4LogicalVolume* l_kapton = new G4LogicalVolume(s_kapton, geometry::Materials::get("Kapton"), "PLUME.l_kapton");
       G4double r_Kapton = r_glue + AirGap + (GlueThickness + KaptonThickness) / 2.;
       transl = G4Translate3D(flexZ + zshift, 0, -r_Kapton);
       support->AddPlacedVolume(l_kapton, transl);
@@ -198,36 +198,36 @@ namespace Belle2 {
       G4int ncomponents;
       G4double fractionmass;
       a = 1.01 * CLHEP::g / CLHEP::mole;
-      G4Element* elH  = new G4Element(name = "Hydrogen", symbol = "H" , zz = 1., a);
+      G4Element* elH  = new G4Element(name = "Hydrogen", symbol = "H", zz = 1., a);
       a = 12.01 * CLHEP::g / CLHEP::mole;
-      G4Element* elC  = new G4Element(name = "Carbon"  , symbol = "C" , zz = 6., a);
+      G4Element* elC  = new G4Element(name = "Carbon", symbol = "C", zz = 6., a);
       a = 16.00 * CLHEP::g / CLHEP::mole;
-      G4Element* elO  = new G4Element(name = "Oxygen"  , symbol = "O" , zz = 8., a);
+      G4Element* elO  = new G4Element(name = "Oxygen", symbol = "O", zz = 8., a);
       density = 1.31 * CLHEP::g / CLHEP::cm3;
-      G4Material* peekMat = new G4Material(name = "plumePeek"  , density, ncomponents = 3);
+      G4Material* peekMat = new G4Material(name = "plumePeek", density, ncomponents = 3);
       peekMat->AddElement(elC, fractionmass = 0.76);
       peekMat->AddElement(elH, fractionmass = 0.08);
       peekMat->AddElement(elO, fractionmass = 0.16);
       density = 1.5 * CLHEP::g / CLHEP::cm3;
-      G4Material* carbMat = new G4Material(name = "plumeCarb"  , density, ncomponents = 1);
+      G4Material* carbMat = new G4Material(name = "plumeCarb", density, ncomponents = 1);
       carbMat->AddElement(elC, fractionmass = 1.0);
 
       G4Box* s_sensor = new G4Box("s_sensor", SensorLengthX / 2., SensorLengthY / 2., dz_sensor);
       G4LogicalVolume* l_sensor = new G4LogicalVolume(s_sensor, geometry::Materials::get("G4_AIR"), "PLUME.l_sensor");
 
       //                            Substrate Layer                                 //
-      G4Box* s_substrate = new G4Box("s_substrate", SensorLengthX / 2. , SensorLengthY / 2. , SubstrateThickness / 2.);
+      G4Box* s_substrate = new G4Box("s_substrate", SensorLengthX / 2., SensorLengthY / 2., SubstrateThickness / 2.);
       G4LogicalVolume* l_substrate = new G4LogicalVolume(s_substrate, geometry::Materials::get("Silicon"), "PLUME.l_substrate");
       new G4PVPlacement(0, G4ThreeVector(0, 0, -dz_sensor + SubstrateThickness / 2.), l_substrate, "p_substrate", l_sensor, false, 1);
 
       //                            Epitaxial Layer                                 //
-      G4Box* s_epitaxial = new G4Box("s_epitaxial", SensorLengthX / 2. , SensorLengthY / 2., EpitaxialThickness / 2.);
+      G4Box* s_epitaxial = new G4Box("s_epitaxial", SensorLengthX / 2., SensorLengthY / 2., EpitaxialThickness / 2.);
       G4LogicalVolume* l_epitaxial = new G4LogicalVolume(s_epitaxial, geometry::Materials::get("Silicon"), "PLUME.l_epitaxial", 0,
                                                          m_sensitive);
       new G4PVPlacement(0, G4ThreeVector(0, 0, -dz_sensor + AirGap + SubstrateThickness + EpitaxialThickness / 2.), l_epitaxial,
                         "p_epitaxial", l_sensor, false, 1);
       //                            Metalized Layer                                 //
-      G4Box* s_metalized = new G4Box("s_metalized", SensorLengthX / 2. , SensorLengthY / 2. , MetalThickness / 2.);
+      G4Box* s_metalized = new G4Box("s_metalized", SensorLengthX / 2., SensorLengthY / 2., MetalThickness / 2.);
       G4LogicalVolume* l_metalized = new G4LogicalVolume(s_metalized, geometry::Materials::get("SiO2Al"), "PLUME.l_metalized");
       new G4PVPlacement(0, G4ThreeVector(0, 0, -dz_sensor + 2 * AirGap + SubstrateThickness + EpitaxialThickness + MetalThickness / 2.),
                         l_metalized, "p_metalized", l_sensor, false, 1);
@@ -367,8 +367,8 @@ namespace Belle2 {
       G4ExtrudedSolid* s1_peek0 = new G4ExtrudedSolid("s1_peek0", points, 10.0, G4TwoVector(0, 0), 1, G4TwoVector(0, 0), 1);
       G4LogicalVolume* l1_peek0 = new G4LogicalVolume(s1_peek0, peek, "PLUME.l1_peek0");
 
-      G4Box* s1_peek1 = new G4Box("s1_peek1", 24. / 2., 6. / 2. , 20. / 2.);
-      G4Box* s1_peek2 = new G4Box("s1_peek2", 19.4 / 2., 3. / 2. , 20. / 2.);
+      G4Box* s1_peek1 = new G4Box("s1_peek1", 24. / 2., 6. / 2., 20. / 2.);
+      G4Box* s1_peek2 = new G4Box("s1_peek2", 19.4 / 2., 3. / 2., 20. / 2.);
       G4LogicalVolume* l1_peek1 = new G4LogicalVolume(s1_peek1, peek, "PLUME.l1_peek1");
       G4LogicalVolume* l1_peek2 = new G4LogicalVolume(s1_peek2, peek, "PLUME.l1_peek2");
 
@@ -384,9 +384,9 @@ namespace Belle2 {
       transform = G4Translate3D(21.7, 1.5, 0);
       assemblySup->AddPlacedVolume(l1_peek2, transform);
 
-      G4Trd* s1_al0 = new G4Trd("s1_al0", 12. / 2. ,  20. / 2. , 3. / 2., 3. / 2., 94.5 / 2.);
-      G4Box* s1_al1 = new G4Box("s1_al1", 12. / 2. ,  20.5 / 2. , 3.5 / 2.);
-      G4Box* s1_al2 = new G4Box("s1_al2", 12. / 2. ,  4.0 / 2. , 10.5 / 2.);
+      G4Trd* s1_al0 = new G4Trd("s1_al0", 12. / 2.,  20. / 2., 3. / 2., 3. / 2., 94.5 / 2.);
+      G4Box* s1_al1 = new G4Box("s1_al1", 12. / 2.,  20.5 / 2., 3.5 / 2.);
+      G4Box* s1_al2 = new G4Box("s1_al2", 12. / 2.,  4.0 / 2., 10.5 / 2.);
 
       G4LogicalVolume* l1_al0 = new G4LogicalVolume(s1_al0, geometry::Materials::get("Al"), "PLUME.l1_al0");
       G4LogicalVolume* l1_al1 = new G4LogicalVolume(s1_al1, geometry::Materials::get("Al"), "PLUME.l1_al1");
@@ -414,8 +414,8 @@ namespace Belle2 {
       G4LogicalVolume* l2_peek0 = new G4LogicalVolume(s2_peek0, peek, "PLUME.l2_peek0");
 
 
-      G4Box* s2_peek1 = new G4Box("s2_peek1", 10. / 2. ,  6.7 / 2. , 12.5 / 2.);
-      G4Box* s2_peek2 = new G4Box("s2_peek2", 39.0 / 2.,  4. / 2. , 12.5 / 2.);
+      G4Box* s2_peek1 = new G4Box("s2_peek1", 10. / 2.,  6.7 / 2., 12.5 / 2.);
+      G4Box* s2_peek2 = new G4Box("s2_peek2", 39.0 / 2.,  4. / 2., 12.5 / 2.);
       G4LogicalVolume* l2_peek1 = new G4LogicalVolume(s2_peek1, peek, "PLUME.l2_peek1");
       G4LogicalVolume* l2_peek2 = new G4LogicalVolume(s2_peek2, peek, "PLUME.l2_peek2");
 
@@ -431,7 +431,7 @@ namespace Belle2 {
       transform = G4Translate3D(24.5, -1.35, 0);
       assemblySup->AddPlacedVolume(l2_peek2, transform);
 
-      G4Box* s2_al0 = new G4Box("s2_al0", 140. / 2. , 4. / 2. , 12. / 2.);
+      G4Box* s2_al0 = new G4Box("s2_al0", 140. / 2., 4. / 2., 12. / 2.);
       G4LogicalVolume* l2_al0 = new G4LogicalVolume(s2_al0, geometry::Materials::get("Al"), "PLUME.l2_al0");
 
       transform = G4Translate3D(-26.0, -5.35, 0);
@@ -449,13 +449,13 @@ namespace Belle2 {
       G4ExtrudedSolid* s3_peek0 = new G4ExtrudedSolid("s3_peek0", points, 16.0, G4TwoVector(0, 0), 1, G4TwoVector(0, 0), 1);
       G4LogicalVolume* l3_peek0 = new G4LogicalVolume(s3_peek0, peek, "PLUME.l3_peek0");
 
-      G4Box* s3_tmp0 = new G4Box("s3_tmp0", 5. / 2. , 21.5 / 2., 32. / 2.);
-      G4Box* s3_tmp1 = new G4Box("s3_tmp1", 5.2 / 2. , 6.5 / 2., 30. / 2.);
+      G4Box* s3_tmp0 = new G4Box("s3_tmp0", 5. / 2., 21.5 / 2., 32. / 2.);
+      G4Box* s3_tmp1 = new G4Box("s3_tmp1", 5.2 / 2., 6.5 / 2., 30. / 2.);
       G4Transform3D transform = G4Translate3D(0, -1.6, 0);
       G4SubtractionSolid* s3_peek1 = new G4SubtractionSolid("s3_peek1", s3_tmp0, s3_tmp1, transform);
 
       G4Trd* s3_peek2 = new G4Trd("s3_peek2", 5. / 2., 5. / 2., 16., 10.,  3.0);
-      G4Box* s3_peek3 = new G4Box("s3_peek3", 3. / 2. , 15.5 / 2., 20. / 2.);
+      G4Box* s3_peek3 = new G4Box("s3_peek3", 3. / 2., 15.5 / 2., 20. / 2.);
       G4LogicalVolume* l3_peek1 = new G4LogicalVolume(s3_peek1, peek, "PLUME.l3_peek1");
       G4LogicalVolume* l3_peek2 = new G4LogicalVolume(s3_peek2, peek, "PLUME.l3_peek2");
       G4LogicalVolume* l3_peek3 = new G4LogicalVolume(s3_peek3, peek, "PLUME.l3_peek3");
@@ -480,8 +480,8 @@ namespace Belle2 {
       assemblySup->AddPlacedVolume(l3_peek0, tra);
 
 
-      G4Trd* s3_al0 = new G4Trd("s3_al0", 3. / 2. , 3. / 2., 10.0, 6.0, 51.1566 / 2.);
-      G4Box* s3_al1 = new G4Box("s3_al1", 12. / 2. ,  4. / 2. , 12. / 2.);
+      G4Trd* s3_al0 = new G4Trd("s3_al0", 3. / 2., 3. / 2., 10.0, 6.0, 51.1566 / 2.);
+      G4Box* s3_al1 = new G4Box("s3_al1", 12. / 2.,  4. / 2., 12. / 2.);
       G4LogicalVolume* l3_al0 = new G4LogicalVolume(s3_al0, geometry::Materials::get("Al"), "PLUME.l3_al0");
       G4LogicalVolume* l3_al1 = new G4LogicalVolume(s3_al1, geometry::Materials::get("Al"), "PLUME.l3_al1");
       ra.rotateX(-M_PI / 2.);
@@ -504,9 +504,9 @@ namespace Belle2 {
       G4ExtrudedSolid* s4_peek0 = new G4ExtrudedSolid("s4_peek0", points, 10.0, G4TwoVector(0, 0), 1, G4TwoVector(0, 0), 1);
       G4LogicalVolume* l4_peek0 = new G4LogicalVolume(s4_peek0, peek, "PLUME.l4_peek0");
 
-      G4Trd* s4_al0 = new G4Trd("s4_al0", 12. / 2. ,  20. / 2. , 3. / 2., 3. / 2., 36.5 / 2.);
-      G4Box* s4_al1 = new G4Box("s4_al1", 12. / 2. ,  16. / 2. , 3.5 / 2.);
-      G4Box* s4_al2 = new G4Box("s4_al2", 12. / 2. ,  4. / 2. , 14. / 2.);
+      G4Trd* s4_al0 = new G4Trd("s4_al0", 12. / 2.,  20. / 2., 3. / 2., 3. / 2., 36.5 / 2.);
+      G4Box* s4_al1 = new G4Box("s4_al1", 12. / 2.,  16. / 2., 3.5 / 2.);
+      G4Box* s4_al2 = new G4Box("s4_al2", 12. / 2.,  4. / 2., 14. / 2.);
 
       G4LogicalVolume* l4_al0 = new G4LogicalVolume(s4_al0, geometry::Materials::get("Al"), "PLUME.l4_al0");
       G4LogicalVolume* l4_al1 = new G4LogicalVolume(s4_al1, geometry::Materials::get("Al"), "PLUME.l4_al1");

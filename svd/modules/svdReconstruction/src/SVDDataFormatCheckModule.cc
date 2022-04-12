@@ -14,7 +14,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDDataFormatCheck)
+REG_MODULE(SVDDataFormatCheck);
 
 //-----------------------------------------------------------------
 //                 Implementation

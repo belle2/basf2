@@ -150,7 +150,7 @@ void fill7x7ErrorMatrix(const TrackFitResult* tfr, TMatrixDSym& error7x7, const 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(B2BIIConvertMdst)
+REG_MODULE(B2BIIConvertMdst);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -946,7 +946,6 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
 
   // Loop over all Belle Mdst_ecl
   Belle::Mdst_ecl_Manager& ecl_manager = Belle::Mdst_ecl_Manager::get_manager();
-  // cppcheck-suppress constVariable; cppcheck doesn't understand the manager initialisation
   Belle::Mdst_ecl_aux_Manager& ecl_aux_manager = Belle::Mdst_ecl_aux_Manager::get_manager();
 
   for (Belle::Mdst_ecl_Manager::iterator eclIterator = ecl_manager.begin(); eclIterator != ecl_manager.end(); ++eclIterator) {
@@ -1365,14 +1364,14 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   double tofL[c_nHyp];
   double cdcL[c_nHyp];
   for (int i = 0; i < c_nHyp; i++) {
-    accL[i] = tofL[i] = cdcL[i] = 1.0;
+    accL[i] = tofL[i] = cdcL[i] = 1.0; // cppcheck-suppress unreadVariable
   }
 #ifdef HAVE_KID_ACC
   //accq0 = 3, as implemented in acc_prob3()
   const auto& acc = belleTrack.acc();
   if (acc and acc.quality() == 0) {
     for (int i = 0; i < c_nHyp; i++)
-      accL[i] = likelihoods[i] = acc_pid(belleTrack, i);
+      accL[i] = likelihoods[i] = acc_pid(belleTrack, i); // cppcheck-suppress unreadVariable
     setLikelihoods(pid, Const::ARICH, likelihoods, true);
   }
 #endif
@@ -1382,7 +1381,7 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   const Belle::Mdst_tof& tof = belleTrack.tof();
   if (tof and tof.quality() == 0) {
     for (int i = 0; i < c_nHyp; i++)
-      tofL[i] = likelihoods[i] = tof.pid(i);
+      tofL[i] = likelihoods[i] = tof.pid(i); // cppcheck-suppress unreadVariable
     setLikelihoods(pid, Const::TOP, likelihoods, true);
   }
 
@@ -1393,7 +1392,7 @@ void B2BIIConvertMdstModule::convertPIDData(const Belle::Mdst_charged& belleTrac
   if (trk.dEdx() > 0) {
     for (int i = 0; i < c_nHyp; i++) {
       likelihoods[i] = trk.pid(i);
-      cdcL[i] = cdc_pid(belleTrack, i);
+      cdcL[i] = cdc_pid(belleTrack, i); // cppcheck-suppress unreadVariable
     }
     setLikelihoods(pid, Const::CDC, likelihoods, true);
   }

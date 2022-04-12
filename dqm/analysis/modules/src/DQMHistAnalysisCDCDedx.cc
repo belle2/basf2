@@ -12,7 +12,7 @@ using namespace std;
 using namespace Belle2;
 using boost::format;
 
-REG_MODULE(DQMHistAnalysisCDCDedx)
+REG_MODULE(DQMHistAnalysisCDCDedx);
 
 //-----------------------------------------------------------------
 DQMHistAnalysisCDCDedxModule::DQMHistAnalysisCDCDedxModule()

@@ -14,7 +14,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(DQMHistAnalysisECLShapers)
+REG_MODULE(DQMHistAnalysisECLShapers);
 
 DQMHistAnalysisECLShapersModule::DQMHistAnalysisECLShapersModule()
   : DQMHistAnalysisModule()

@@ -14,7 +14,7 @@
 using namespace Belle2;
 using namespace Dedx;
 
-REG_MODULE(HitLevelInfoWriter)
+REG_MODULE(HitLevelInfoWriter);
 
 HitLevelInfoWriterModule::HitLevelInfoWriterModule() : Module()
 {

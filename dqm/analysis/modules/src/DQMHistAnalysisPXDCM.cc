@@ -22,7 +22,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisPXDCM)
+REG_MODULE(DQMHistAnalysisPXDCM);
 
 //-----------------------------------------------------------------
 //                 Implementation

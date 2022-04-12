@@ -25,7 +25,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(BelleMCOutput)
+REG_MODULE(BelleMCOutput);
 
 BelleMCOutputModule::BelleMCOutputModule() :
   Module()

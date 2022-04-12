@@ -11,6 +11,7 @@
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
+#include <hlt/utilities/Units.h>
 
 #include <framework/core/ModuleParam.templateDetails.h>
 
@@ -21,7 +22,7 @@
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
-REG_MODULE(SoftwareTriggerHLTDQM)
+REG_MODULE(SoftwareTriggerHLTDQM);
 
 SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
 {
@@ -195,19 +196,19 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
   if (m_param_create_hlt_unit_histograms) {
     if (m_param_histogramDirectoryName != "softwaretrigger_before_filter") {
       m_runInfoHistograms.emplace("hlt_unit_number", new TH1D("hlt_unit_number_after_filter",
-                                                              ("Number of events per HLT unit " + m_param_pathLocation).c_str(), HLTUnit::max_hlt_units + 1, 0,
-                                                              HLTUnit::max_hlt_units + 1));
+                                                              ("Number of events per HLT unit " + m_param_pathLocation).c_str(), HLTUnits::max_hlt_units + 1, 0,
+                                                              HLTUnits::max_hlt_units + 1));
     } else {
       m_runInfoHistograms.emplace("hlt_unit_number", new TH1D("hlt_unit_number",
-                                                              ("Number of events per HLT unit " + m_param_pathLocation).c_str(), HLTUnit::max_hlt_units + 1, 0,
-                                                              HLTUnit::max_hlt_units + 1));
+                                                              ("Number of events per HLT unit " + m_param_pathLocation).c_str(), HLTUnits::max_hlt_units + 1, 0,
+                                                              HLTUnits::max_hlt_units + 1));
     }
     m_runInfoHistograms["hlt_unit_number"]->SetMinimum(0);
 
     for (const auto& cutIdentifierPerUnit : m_param_cutResultIdentifiersPerUnit) {
-      m_cutResultPerUnitHistograms.emplace(cutIdentifierPerUnit , new TH1F((cutIdentifierPerUnit + "_per_unit").c_str(),
-                                           ("Events triggered per unit in HLT : " + cutIdentifierPerUnit).c_str(), HLTUnit::max_hlt_units + 1, 0,
-                                           HLTUnit::max_hlt_units + 1));
+      m_cutResultPerUnitHistograms.emplace(cutIdentifierPerUnit, new TH1F((cutIdentifierPerUnit + "_per_unit").c_str(),
+                                           ("Events triggered per unit in HLT : " + cutIdentifierPerUnit).c_str(), HLTUnits::max_hlt_units + 1, 0,
+                                           HLTUnits::max_hlt_units + 1));
       m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetXTitle("HLT unit number");
       m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetOption("histe");
       m_cutResultPerUnitHistograms[cutIdentifierPerUnit]->SetMinimum(0);
@@ -234,7 +235,7 @@ void SoftwareTriggerHLTDQMModule::initialize()
 
   if (m_param_create_hlt_unit_histograms) {
     std::ifstream file;
-    file.open(HLTUnit::hlt_unit_file);
+    file.open(HLTUnits::hlt_unit_file);
     if (file.good()) {
       std::string host;
       getline(file, host);

@@ -47,7 +47,7 @@ namespace Belle2 {
 
     /** This enumeration assure the same semantic of the
     isU methods defined by Peter Kv.*/
-    enum E_side { VIndex = 0 , UIndex = 1 };
+    enum E_side { VIndex = 0, UIndex = 1 };
 
     /** get a reference to the histogram for @param vxdID side @param view
      * please, use the enumeration SVDSummaryPlots::Vindex and
@@ -130,9 +130,9 @@ namespace Belle2 {
     void customizeString(std::string& base, bool isU)
     {
       std::string view = isU ? "U" : "V" ;
-      base = std::regex_replace(base, std::regex("[@]view")  , view);
+      base = std::regex_replace(base, std::regex("[@]view"), view);
       std::string side = isU ? "P" : "N" ;
-      base = std::regex_replace(base, std::regex("[@]side")  , side);
+      base = std::regex_replace(base, std::regex("[@]side"), side);
     }
 
     /** delete pointers*/
@@ -208,7 +208,7 @@ namespace Belle2 {
     }
 
 
-    ClassDef(SVDSummaryPlots , 1); /**< needed by root */
+    ClassDef(SVDSummaryPlots, 1);  /**< needed by root */
   };
 
 

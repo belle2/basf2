@@ -14,7 +14,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisExample)
+REG_MODULE(DQMHistAnalysisExample);
 
 //-----------------------------------------------------------------
 //                 Implementation

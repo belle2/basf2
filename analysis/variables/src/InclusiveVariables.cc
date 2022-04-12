@@ -45,34 +45,25 @@ namespace Belle2 {
       return result;
     }
 
-    Manager::FunctionPtr nDaughterCharged(const std::vector<std::string>& arguments)
+    int nDaughterCharged(const Particle* particle, const std::vector<double>& argument)
     {
-
       int pdgCode = 0;
-      if (arguments.size() == 1) {
-        try {
-          pdgCode = Belle2::convertString<int>(arguments[0]);
-        } catch (std::invalid_argument&) {
-          B2ERROR("If an argument is provided to the meta variable nDaughterCharged it has to be an integer!");
-          return nullptr;
-        }
+      if (argument.size() == 1) {
+        pdgCode = std::lround(argument[0]);
       }
-      auto func = [pdgCode](const Particle * particle) -> int {
-        int result = 0;
-        auto fspDaughters = particle->getFinalStateDaughters();
-        for (auto* daughter : fspDaughters)
-        {
-          if (pdgCode != 0) {
-            if (abs(daughter->getPDGCode()) == pdgCode) {
-              result++;
-            }
-          } else if (abs(daughter->getCharge()) > 0) {
+
+      int result = 0;
+      auto fspDaughters = particle->getFinalStateDaughters();
+      for (auto* daughter : fspDaughters) {
+        if (pdgCode != 0) {
+          if (abs(daughter->getPDGCode()) == pdgCode) {
             result++;
           }
+        } else if (abs(daughter->getCharge()) > 0) {
+          result++;
         }
-        return result;
-      };
-      return func;
+      }
+      return result;
     }
 
     int nCompositeDaughters(const Particle* particle)
@@ -125,9 +116,9 @@ namespace Belle2 {
                       "Returns the number of final state daughter photons.");
     REGISTER_VARIABLE("nDaughterNeutralHadrons",   nDaughterNeutralHadrons,
                       "Returns the number of K_L0 or neutrons among the final state daughters.");
-    REGISTER_METAVARIABLE("nDaughterCharged(pdg)",   nDaughterCharged,
-                          "Returns the number of charged daughters with the provided PDG code or the number "
-                          "of all charged daughters if no argument has been provided.", Manager::VariableDataType::c_int);
+    REGISTER_VARIABLE("nDaughterCharged(pdg)",   nDaughterCharged,
+                      "Returns the number of charged daughters with the provided PDG code or the number "
+                      "of all charged daughters if no argument has been provided.");
     REGISTER_VARIABLE("nCompositeDaughters",   nCompositeDaughters,
                       "Returns the number of final state composite daughters.");
     REGISTER_METAVARIABLE("daughterAverageOf(variable)", daughterAverageOf,

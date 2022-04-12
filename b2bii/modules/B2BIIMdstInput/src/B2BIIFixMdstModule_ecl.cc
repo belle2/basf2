@@ -856,7 +856,7 @@ namespace Belle2 {
 //--
 //     45<  theta< 100
 //---
-    } else if (theta > 45. && theta <= 100.) {
+    } else if (theta <= 100.) {
 //--
 //                       p-low
 //---
@@ -917,7 +917,7 @@ namespace Belle2 {
 //--
 //       theta> 100
 //---
-    } else if (theta > 100.) {
+    } else {
 //--
 //                       p-low
 //---

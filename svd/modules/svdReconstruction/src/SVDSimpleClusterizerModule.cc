@@ -24,7 +24,7 @@ using namespace Belle2::SVD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDSimpleClusterizer)
+REG_MODULE(SVDSimpleClusterizer);
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -618,7 +618,6 @@ namespace Belle2 {
     return;
   }
 
-  // cppcheck-suppress constParameter
   double TOPGainEfficiencyCalculatorModule::TOPGainFunc(double* var, double* par)
   {
 

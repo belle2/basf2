@@ -30,7 +30,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(BKLMSimHistogrammer)
+REG_MODULE(BKLMSimHistogrammer);
 
 //-----------------------------------------------------------------
 //                 Implementation

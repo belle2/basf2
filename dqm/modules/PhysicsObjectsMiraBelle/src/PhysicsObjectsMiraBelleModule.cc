@@ -26,6 +26,7 @@
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <TDirectory.h>
+#include <TMath.h>
 #include <map>
 
 using namespace Belle2;
@@ -82,9 +83,9 @@ void PhysicsObjectsMiraBelleModule::defineHisto()
   m_h_D0->SetXTitle("hist_D0");
   m_h_Z0 = new TH1F("hist_Z0", "hist_Z0", 100, -0.3, 0.3);
   m_h_Z0->SetXTitle("hist_Z0");
-  m_h_theta = new TH1F("hist_theta", "hist_theta", 36, 10, 170);
+  m_h_theta = new TH1F("hist_theta", "hist_theta in CMS", 32, 10, 170);
   m_h_theta->SetXTitle("hist_theta");
-  m_h_Phi0 = new TH1F("hist_Phi0", "hist_Phi0", 72, -180, 180);
+  m_h_Phi0 = new TH1F("hist_Phi0", "hist_Phi0 in lab frame", 72, -180, 180);
   m_h_Phi0->SetXTitle("hist_Phi0");
   m_h_Pt = new TH1F("hist_Pt", "hist_Pt", 100, 0, 10);
   m_h_Pt->SetXTitle("hist_Pt");
@@ -96,7 +97,7 @@ void PhysicsObjectsMiraBelleModule::defineHisto()
   m_h_klmTotalBarrelHits->SetXTitle("hist_klmTotalBarrelHits");
   m_h_klmTotalEndcapHits = new TH1F("hist_klmTotalEndcapHits", "hist_klmTotalEndcapHits", 16, 0, 16);
   m_h_klmTotalEndcapHits->SetXTitle("hist_klmTotalEndcapHits");
-  m_h_dPhicms = new TH1F("hist_dPhicms", "hist_dPhicms", 100, -1, 1);
+  m_h_dPhicms = new TH1F("hist_dPhicms", "hist_dPhicms", 100, -10, 10);
   m_h_dPhicms->SetXTitle("hist_dPhicms");
 
   oldDir->cd();
@@ -229,10 +230,10 @@ void PhysicsObjectsMiraBelleModule::event()
       m_h_Z0->Fill(z0[index]);
       // Momentum
       ptcms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Pt();//CMS
-      phicms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Phi();
+      phicms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Phi() * TMath::RadToDeg();
       m_h_Pt->Fill(fitresult->get4Momentum().Pt());//Lab
-      m_h_theta->Fill(Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Theta());//CMS
-      m_h_Phi0->Fill(fitresult->get4Momentum().Phi());//Lab
+      m_h_theta->Fill(Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Theta() * TMath::RadToDeg());//CMS
+      m_h_Phi0->Fill(fitresult->get4Momentum().Phi() * TMath::RadToDeg());//Lab
       m_h_Mom->Fill(fitresult->get4Momentum().P());//Lab
     }
   }

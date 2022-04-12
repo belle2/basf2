@@ -15,7 +15,7 @@ using namespace std;
 namespace Belle2 {
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
   REG_MODULE(TOPChannelMaskCollector);

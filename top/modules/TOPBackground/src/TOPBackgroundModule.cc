@@ -40,7 +40,7 @@ using namespace boost;
 
 namespace Belle2 {
   //-----------------------------------------------------------------
-  //                 Register the Module
+  ///                 Register the Module
   //-----------------------------------------------------------------
 
   REG_MODULE(TOPBackground);

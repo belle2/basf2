@@ -23,7 +23,16 @@ using boost::format;
 
 namespace Belle2 {
   using namespace TOP;
+
+  //-----------------------------------------------------------------
+  ///                 Register module
+  //-----------------------------------------------------------------
+
   REG_MODULE(TOPTBCComparator);
+
+  //-----------------------------------------------------------------
+  //                 Implementation
+  //-----------------------------------------------------------------
 
   TOPTBCComparatorModule::TOPTBCComparatorModule() : HistoModule()
   {

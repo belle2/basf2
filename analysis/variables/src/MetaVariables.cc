@@ -1338,28 +1338,20 @@ namespace Belle2 {
     Manager::FunctionPtr daughterInvM(const std::vector<std::string>& arguments)
     {
       if (arguments.size() > 1) {
-        std::vector<int> daughterIndices;
-        try {
-          for (auto& argument : arguments) daughterIndices.push_back(Belle2::convertString<int>(argument));
-        } catch (std::invalid_argument&) {
-          B2FATAL("The arguments of daughterInvM meta function must be integers!");
-        }
-        auto func = [daughterIndices](const Particle * particle) -> double {
-          if (particle == nullptr)
-            return std::numeric_limits<float>::quiet_NaN();
-          else
+        auto func = [arguments](const Particle * particle) -> double {
+          const auto& frame = ReferenceFrame::GetCurrent();
+          ROOT::Math::PxPyPzEVector pSum;
+
+          for (auto& generalizedIndex : arguments)
           {
-            const auto& frame = ReferenceFrame::GetCurrent();
-            ROOT::Math::PxPyPzEVector pSum;
-
-            for (auto& index : daughterIndices) {
-              if (index >= int(particle->getNDaughters())) {
-                return std::numeric_limits<float>::quiet_NaN();
-              } else pSum += frame.getMomentum(particle->getDaughter(index));
+            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+            if (dauPart)
+              pSum += frame.getMomentum(dauPart);
+            else {
+              return std::numeric_limits<float>::quiet_NaN();
             }
-
-            return pSum.M();
           }
+          return pSum.M();
         };
         return func;
       } else {
@@ -3219,10 +3211,15 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns nan if any of the daughters specified don't have an associated cluster."
                       "The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.", "rad");
     REGISTER_METAVARIABLE("daughterInvM(i[, j, ...])", daughterInvM, R"DOC(
-                       Returns the invariant Mass adding the Lorentz vectors of the given daughters.
+                       Returns the invariant mass adding the Lorentz vectors of the given daughters.
                        E.g. ``daughterInvM(0, 1, 2)`` returns the invariant Mass :math:`m = \sqrt{(p_0 + p_1 + p_2)^2}` of the first, second and third daughter.
 
-                       Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= number of daughters))DOC", Manager::VariableDataType::c_double);
+                       Daughters from different generations of the decay tree can be combined using generalized daughter indexes,
+                       which are simply colon-separated daughter indexes for each generation, starting from the root particle. For
+                       example, ``0:1:3`` identifies the fourth daughter (3) of the second daughter (1) of the first daughter(0) of
+                       the mother particle.
+
+                       Returns NaN if the given daughter-index is out of bound (>= number of daughters))DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
                       "The extraInfo has to be set by a module first.\n"
@@ -3360,12 +3357,12 @@ daughter (3) of the second daughter (1) of the first daughter (0) of the mother 
 
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("useAlternativeDaughterHypothesis(variable, daughterIndex_1:newMassHyp_1, ..., daughterIndex_n:newMassHyp_n)", useAlternativeDaughterHypothesis,R"DOC(
-Returns a ``variable`` calculated using new mass hypotheses for (some of) the particle's daughers.
+Returns a ``variable`` calculated using new mass hypotheses for (some of) the particle's daughters.
 
 .. warning::
     ``variable`` can only be a function of the particle 4-momentum, which is re-calculated as the sum of the daughters' 4-momenta.
     This means that if you made a kinematic fit without updating the daughters' momenta, the result of this variable will not reflect the effect of the kinematic fit.
-    Also, the track fit is not performed again: the variable only re-calculates the 4-vectors using different mass assumptions. The alternative mass assumpion is
+    Also, the track fit is not performed again: the variable only re-calculates the 4-vectors using different mass assumptions. The alternative mass assumption is
     used only internally by the variable, and is not stored in the datastore (i.e the daughters are not permanently changed).
 
 .. warning::

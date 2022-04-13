@@ -28,7 +28,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SignalSideParticleListCreator)
+REG_MODULE(SignalSideParticleListCreator);
 
 //-----------------------------------------------------------------
 //                 Implementation

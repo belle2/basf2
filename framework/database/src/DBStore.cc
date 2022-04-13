@@ -10,6 +10,8 @@
 #include <framework/database/Database.h>
 #include <framework/logging/Logger.h>
 
+#include <boost/none.hpp>
+
 #include <TClass.h>
 
 namespace Belle2 {
@@ -84,7 +86,7 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> event;
     m_storeEvent = event;
     // Clear the m_manualEvent to indicate that we now want to use the DataStore event numbers
-    m_manualEvent = boost::none;
+    m_manualEvent = std::nullopt;
     performUpdate(*m_storeEvent);
   }
 
@@ -184,7 +186,7 @@ namespace Belle2 {
     // because probably this is after resetting the DataStore (BII-1262)
     StoreObjPtr<EventMetaData> event;
     m_storeEvent = event;
-    m_manualEvent = boost::none;
+    m_manualEvent = std::nullopt;
   }
 
   void DBStore::addConstantOverride(const std::string& name, TObject* obj, bool oneRun)

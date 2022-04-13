@@ -20,7 +20,7 @@ using boost::format;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisTOP)
+REG_MODULE(DQMHistAnalysisTOP);
 
 //-----------------------------------------------------------------
 //                 Implementation

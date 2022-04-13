@@ -14,7 +14,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(KLMPacker)
+REG_MODULE(KLMPacker);
 
 KLMPackerModule::KLMPackerModule() :
   Module(),

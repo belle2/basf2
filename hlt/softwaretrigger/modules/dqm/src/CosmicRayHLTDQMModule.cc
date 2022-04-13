@@ -33,7 +33,7 @@ using namespace SoftwareTrigger;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CosmicRayHLTDQM)
+REG_MODULE(CosmicRayHLTDQM);
 
 //-----------------------------------------------------------------
 //                 Implementation

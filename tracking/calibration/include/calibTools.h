@@ -70,9 +70,10 @@ namespace Belle2 {
     std::vector<Eigen::MatrixXd> cntUnc; ///< vector of uncertainties of means for each calib. subinterval
     Eigen::MatrixXd  spreadMat; ///< spread CovMatrix
 
-    double spreadUnc;          ///< stat uncertainty of the spread (for eCMS)
-    double shift;              ///< difference between eCMS for hadronic B decay method and mumu method, i.e. hadB - mumu
-    double shiftUnc;           ///< stat uncertainty of the shift
+    double spreadUnc = std::numeric_limits<double>::quiet_NaN(); ///< stat uncertainty of the spread (for eCMS)
+    double shift =
+      std::numeric_limits<double>::quiet_NaN();   ///< difference between eCMS for hadronic B decay method and mumu method, i.e. hadB - mumu
+    double shiftUnc = std::numeric_limits<double>::quiet_NaN();           ///< stat uncertainty of the shift
     std::vector<double> pulls; ///< vector of pulls between mumu and hadB methods (for eCMS)
     int size() const {return cnt.size();} ///< number of the subintervals
   };

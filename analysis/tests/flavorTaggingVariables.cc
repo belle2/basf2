@@ -160,9 +160,9 @@ namespace {
     /** Vector containing the energy, theta, phi and radius values for each charged ROE ECLCluster */
     vector<vector<double>> roeChargedECLClusterProperties{{0.964336, 1.23481, -2.25428, 148.729},
       {0.214864, 0.965066,   -0.232973, 170.008},
-      {0.0148855, 0.914396,  1.01693  , 175.861},
-      {0.524092, 0.956389,   0.854331 , 171.378},
-      {0.230255, 1.33317,    -1.45326 , 144.849}};
+      {0.0148855, 0.914396,  1.01693, 175.861},
+      {0.524092, 0.956389,   0.854331, 171.378},
+      {0.230255, 1.33317,    -1.45326, 144.849}};
 
     unsigned int chargedECLCLusterCounter = 0;
 

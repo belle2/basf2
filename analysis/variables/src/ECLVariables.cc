@@ -268,7 +268,7 @@ namespace Belle2 {
           return cellID - 1;
         } else {
           int closestinlist = lastCellIDperThetaID[std::distance(lastCellIDperThetaID.begin(), std::lower_bound(lastCellIDperThetaID.begin(),
-                                                                 lastCellIDperThetaID.end(), cellID)) - 1];
+                                                                                                             lastCellIDperThetaID.end(), cellID)) - 1];
           return cellID - closestinlist - 1;
         }
       }
@@ -822,13 +822,13 @@ namespace Belle2 {
         if (!(photonlist.isValid()))
         {
           B2WARNING("The provided particle list " << photonlistname << " does not exist."
-          " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
+                    " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
           return std::numeric_limits<double>::quiet_NaN();
         }
         if (photonlist->getPDGCode() != Const::photon.getPDGCode())
         {
           B2WARNING("The list " << photonlistname << " does not contain photons."
-          " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
+                    " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
           return std::numeric_limits<double>::quiet_NaN();
         }
 
@@ -836,13 +836,13 @@ namespace Belle2 {
         if (!(tracklist.isValid()))
         {
           B2WARNING("The provided particle list " << tracklistname << " does not exist."
-          " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
+                    " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
           return std::numeric_limits<double>::quiet_NaN();
         }
         if (!Const::chargedStableSet.contains(Const::ParticleType(abs(tracklist->getPDGCode()))))
         {
           B2WARNING("The list " << tracklistname << " does not contain charged final state particles."
-          " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
+                    " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
           return std::numeric_limits<double>::quiet_NaN();
         }
 

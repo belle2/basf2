@@ -140,14 +140,10 @@ namespace Belle2 {
       double time = 40.0e-9; // 40 ns
       // expected function value
       double expected_value = 0;
-      SVDWaveform::relations_map expected_particles_map;
-      SVDWaveform::relations_map expected_truehits_map;
       int i = 0;
       for (SVDWaveform::ElementaryWaveform wave : waveform.getElementaryWaveforms()) {
         double value = waveform.waveform(time, wave);
         expected_value += value;
-        expected_particles_map[mcParticles.at(i)] += wave.m_charge;
-        expected_truehits_map[trueHits.at(i)] += wave.m_charge;
         i++;
       }
       double function_value = waveform(time);

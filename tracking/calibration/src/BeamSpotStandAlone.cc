@@ -841,7 +841,7 @@ namespace Belle2::BeamSpotCalib {
     //////////////////////////
 
     //Maximum likelihood over eigenvector and angle
-    TF2 fEig(rn(), [covMatI, pars, s2MinLimit](double * x, double*) {
+    TF2 fEig(rn(), [covMatI, pars, s2MinLimit](const double * x, const double*) {
       double eig1 = x[0];
       double eig2 = s2MinLimit;
       double phi  = x[1];
@@ -1576,7 +1576,7 @@ namespace Belle2::BeamSpotCalib {
     vector<vector<double>> basesKX = fillSplineBasesZero(evts, splKX, [](Track tr, double) {return -tr.z0 * tr.tanlambda * cos(tr.phi0);});
     vector<vector<double>> basesKY = fillSplineBasesZero(evts, splKY, [](Track tr, double) {return -tr.z0 * tr.tanlambda * sin(tr.phi0);});
 
-    vector<vector<double>> basesZ  = fillSplineBasesZero(evts, splZ,  [](Track , double) {return 1;});
+    vector<vector<double>> basesZ  = fillSplineBasesZero(evts, splZ,  [](Track, double) {return 1;});
 
 
     vector<double> dataVec;
@@ -1958,7 +1958,7 @@ namespace Belle2::BeamSpotCalib {
 
 
 
-// Returns tuple with the beamspot parameters
+  // Returns tuple with the beamspot parameters
   tuple<vector<VectorXd>, vector<MatrixXd>, MatrixXd>  runBeamSpotAnalysis(vector<Event> evts,
       const vector<double>& splitPoints)
   {
@@ -1976,7 +1976,6 @@ namespace Belle2::BeamSpotCalib {
     vector<double> indKY =  {};
 
     UnknownPars allPars;
-    const int kPlot = -1; //do plots for index kPlot
     for (int k = 0; k < 1; ++k) { //loop over BootStrap replicas
       for (auto& e : evts) e.isSig = true; //reset cuts
       if (k != 0) bootStrap(evts);
@@ -1985,6 +1984,8 @@ namespace Belle2::BeamSpotCalib {
       //simple XY pos fit
       auto resTemp = fitSpotPositionSplines(evts, indX, indY);
 
+      const int kPlot = -1;
+      // cppcheck-suppress knownConditionTrueFalse
       if (k == kPlot) {
         plotSpotPositionFit(evts, resTemp, "positionFitSimpe");
         plotSpotPositionPull(evts, resTemp, "pullsPositionSimple",  xyPosLimit);

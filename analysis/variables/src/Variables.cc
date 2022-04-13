@@ -105,11 +105,11 @@ namespace Belle2 {
       int elementJ = int(std::lround(element[1]));
 
       if (elementI < 0 || elementI > 6) {
-        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 6]: i = " << elementI);
+        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 6]:" << LogVar("i", elementI));
         return std::numeric_limits<double>::quiet_NaN();
       }
       if (elementJ < 0 || elementJ > 6) {
-        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 6]: j = " << elementJ);
+        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 6]:" << LogVar("j", elementJ));
         return std::numeric_limits<double>::quiet_NaN();
       }
 
@@ -510,7 +510,7 @@ namespace Belle2 {
         }
         Helix helix = tfr->getHelix();
         helix.passiveMoveBy(vertex);
-        double scalingFactor = daughter->getMomentumScalingFactor();
+        double scalingFactor = daughter->getEffectiveMomentumScale();
         double momX = scalingFactor * helix.getMomentumX(bField);
         double momY = scalingFactor * helix.getMomentumY(bField);
         double momZ = scalingFactor * helix.getMomentumZ(bField);

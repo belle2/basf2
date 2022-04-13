@@ -10,10 +10,8 @@
 
 #include <framework/core/Module.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
-
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
 
-#include <boost/optional.hpp>
 #include <bitset>
 
 namespace Belle2 {
@@ -82,8 +80,8 @@ namespace Belle2 {
 
     std::string m_SVDClusterName; /**< SVDCluster collection name */
 
-    boost::optional<std::string> m_pxdSpacePointsStoreArrayName; /**< PXD SpacePoints collection names */
-    boost::optional<std::string> m_svdSpacePointsStoreArrayName; /**< Non SingleCluster SVD SpacePoints collection names */
+    std::optional<std::string> m_pxdSpacePointsStoreArrayName; /**< PXD SpacePoints collection names */
+    std::optional<std::string> m_svdSpacePointsStoreArrayName; /**< Non SingleCluster SVD SpacePoints collection names */
 
     std::string m_SVDSingleClusterSPName; /**< Single Cluster SVD SpacePoints collection name */
 

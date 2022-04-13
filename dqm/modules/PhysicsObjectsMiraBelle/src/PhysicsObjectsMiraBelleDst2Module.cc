@@ -30,7 +30,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(PhysicsObjectsMiraBelleDst2)
+REG_MODULE(PhysicsObjectsMiraBelleDst2);
 
 PhysicsObjectsMiraBelleDst2Module::PhysicsObjectsMiraBelleDst2Module() : HistoModule()
 {

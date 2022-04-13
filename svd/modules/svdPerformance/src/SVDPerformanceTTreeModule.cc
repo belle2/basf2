@@ -37,7 +37,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDPerformanceTTree)
+REG_MODULE(SVDPerformanceTTree);
 
 //-----------------------------------------------------------------
 //                 Implementation

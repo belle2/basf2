@@ -19,7 +19,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(ChargedPidMVAMulticlass)
+REG_MODULE(ChargedPidMVAMulticlass);
 
 ChargedPidMVAMulticlassModule::ChargedPidMVAMulticlassModule() : Module()
 {

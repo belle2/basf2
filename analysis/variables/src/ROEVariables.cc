@@ -225,13 +225,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_RemainingTracksWithMask(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function nROETracks");
 
       auto func = [maskName](const Particle * particle) -> int {
@@ -383,13 +381,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_MC_MissingFlags(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function nROETracks");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -444,13 +440,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_Tracks(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function nROETracks");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -471,13 +465,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_ECLClusters(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function nROEECLClusters");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -498,13 +490,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr nROE_NeutralECLClusters(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function nROENeutralECLClusters");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -529,8 +519,7 @@ namespace Belle2 {
 
       if (arguments.size() == 1) {
         maskName = arguments[0];
-      }
-      if (arguments.size() > 1) {
+      } else if (arguments.size() > 1) {
         B2FATAL("At most 1 argument (name of mask) accepted for meta function nROE_Photons");
       }
       auto func = [maskName](const Particle * particle) -> double {
@@ -563,8 +552,7 @@ namespace Belle2 {
 
       if (arguments.size() == 1) {
         maskName = arguments[0];
-      }
-      if (arguments.size() > 1) {
+      } else if (arguments.size() > 1) {
         B2FATAL("At most 1 argument (name of mask) accepted for meta function nROE_NeutralHadrons");
       }
       auto func = [maskName](const Particle * particle) -> double {
@@ -589,8 +577,7 @@ namespace Belle2 {
       int pdgCode = 0;
       if (arguments.size() == 1) {
         maskName = arguments[0];
-      }
-      if (arguments.size() == 2) {
+      } else if (arguments.size() == 2) {
         maskName = arguments[0];
         try {
           pdgCode = Belle2::convertString<int>(arguments[1]);
@@ -598,8 +585,7 @@ namespace Belle2 {
           B2ERROR("First argument of nROE_ChargedParticles must be a PDG code");
           return nullptr;
         }
-      }
-      if (arguments.size() > 2)  {
+      } else if (arguments.size() > 2)  {
         B2FATAL("Wrong number of arguments (2 optional) for meta function nROE_ChargedParticles");
       }
       auto func = [maskName, pdgCode](const Particle * particle) -> double {
@@ -624,8 +610,7 @@ namespace Belle2 {
 
       if (arguments.size() == 1) {
         maskName = arguments[0];
-      }
-      if (arguments.size() > 1) {
+      } else if (arguments.size() > 1) {
         B2FATAL("At most 1 argument (name of mask) accepted for meta function nROE_Composites");
       }
       auto func = [maskName](const Particle * particle) -> double {
@@ -644,7 +629,7 @@ namespace Belle2 {
         for (auto roeParticle : particles)
         {
           if (roeParticle->getParticleSource() == Particle::c_Composite or
-          roeParticle->getParticleSource() == Particle::c_V0) {
+              roeParticle->getParticleSource() == Particle::c_V0) {
             result++;
           }
         }
@@ -656,11 +641,10 @@ namespace Belle2 {
     Manager::FunctionPtr nROE_ParticlesInList(const std::vector<std::string>& arguments)
     {
       std::string pListName;
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
       if (arguments.size() == 1) {
         pListName = arguments[0];
-        maskName = RestOfEvent::c_defaultMaskName;
       } else if (arguments.size() == 2) {
         pListName = arguments[0];
         maskName = arguments[1];
@@ -699,13 +683,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_Charge(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function ROECharge");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -735,13 +717,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_ExtraEnergy(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function extraEnergy");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -778,13 +758,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_NeutralExtraEnergy(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function extraEnergy");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -812,13 +790,13 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_E(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      std::string maskName = RestOfEvent::c_defaultMaskName;
+
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_E");
+
       auto func = [maskName](const Particle * particle) -> double {
         const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
         if (!roe)
@@ -835,13 +813,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_M(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_M");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -862,13 +838,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_P(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_P");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -891,13 +865,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_Px(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_Px");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -920,13 +892,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_Py(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_Py");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -949,13 +919,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_Pt(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_Pt");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -978,13 +946,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_Pz(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_Pz");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -1007,13 +973,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_PTheta(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_PTheta");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -1036,13 +1000,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_DeltaE(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_deltae");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -1065,13 +1027,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr ROE_Mbc(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function ROE_mbc");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -1099,13 +1059,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr bssMassDifference(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function bssMassDifference");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -1437,13 +1395,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr WE_xiZ(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function xiZ");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -1485,13 +1441,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr WE_MissM2OverMissE(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function WE_MissM2OverMissE");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -1641,13 +1595,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr WE_cosThetaEll(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function cosThetaEll");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -1685,13 +1637,11 @@ namespace Belle2 {
 
     Manager::FunctionPtr passesROEMask(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName = RestOfEvent::c_defaultMaskName;
 
-      if (arguments.size() == 0)
-        maskName = RestOfEvent::c_defaultMaskName;
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1)
         maskName = arguments[0];
-      else
+      else if (arguments.size() > 1)
         B2FATAL("At most 1 argument (name of mask) accepted for meta function passesROEMask");
 
       auto func = [maskName](const Particle * particle) -> double {
@@ -1770,7 +1720,8 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        } else {
+        } else
+        {
           return std::numeric_limits<float>::quiet_NaN();
         }
       };
@@ -1825,7 +1776,8 @@ namespace Belle2 {
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
-        } else {
+        } else
+        {
           return std::numeric_limits<float>::quiet_NaN();
         }
       };

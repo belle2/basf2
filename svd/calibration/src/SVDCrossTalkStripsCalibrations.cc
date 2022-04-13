@@ -13,7 +13,7 @@
 std::string Belle2::SVDCrossTalkStripsCalibrations::name = std::string("SVDCrossTalkStripsCalibrations");
 
 
-bool Belle2::SVDCrossTalkStripsCalibrations::isInCrossTalkRegion(const VxdID& sensorID, const bool& isU , const float& clsPosition)
+bool Belle2::SVDCrossTalkStripsCalibrations::isInCrossTalkRegion(const VxdID& sensorID, const bool& isU, const float& clsPosition)
 {
   const VXD::SensorInfoBase* currentSensorInfo = dynamic_cast<const VXD::SensorInfoBase*>(&VXD::GeoCache::get(
                                                    sensorID)); /** SensorInfo class providing information about the current sensor*/

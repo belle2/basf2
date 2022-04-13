@@ -17,7 +17,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(RestOfEventBuilder)
+REG_MODULE(RestOfEventBuilder);
 
 //-----------------------------------------------------------------
 //                 Implementation

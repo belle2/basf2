@@ -18,7 +18,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(SVDPerformance)
+REG_MODULE(SVDPerformance);
 
 SVDPerformanceModule::SVDPerformanceModule() : Module()
   , m_nTracks(0), m_Pvalue(), m_mom(0), m_nSVDhits(0)

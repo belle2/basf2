@@ -16,7 +16,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(CDCDedxValidation)
+REG_MODULE(CDCDedxValidation);
 
 //-------------------------------------------------
 CDCDedxValidationModule::CDCDedxValidationModule():

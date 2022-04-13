@@ -687,7 +687,7 @@ def removeTracksForTrackingEfficiencyCalculation(inputListNames, fraction, path=
     path.add_module(trackingefficiency)
 
 
-def scaleTrackMomenta(inputListNames, scale=float('nan'), tableName="", scalingFactorName="SF", path=None):
+def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalingFactorName="SF", path=None):
     """
 
     Scale momenta of the particles according to a scaling factor scale.
@@ -699,15 +699,35 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), tableName="", scalingF
     Parameters:
         inputListNames (list(str)): input particle list names
         scale (float): scaling factor (1.0 -- no scaling)
-        tableName (str): name of the payload which contains the phase-space dependent scaling factors
+        payloadName (str): name of the payload which contains the phase-space dependent scaling factors
         scalingFactorName (str): name of scaling factor variable in the payload.
         path (basf2.Path): module is added to this path
     """
     trackingmomentum = register_module('TrackingMomentum')
     trackingmomentum.param('particleLists', inputListNames)
     trackingmomentum.param('scale', scale)
-    trackingmomentum.param('tableName', tableName)
+    trackingmomentum.param('payloadName', payloadName)
     trackingmomentum.param('scalingFactorName', scalingFactorName)
+
+    path.add_module(trackingmomentum)
+
+
+def smearTrackMomenta(inputListNames, payloadName="", smearingFactorName="smear", path=None):
+    """
+    Smear the momenta of the particles according the values read from the given payload.
+    If the particle list contains composite particles, the momenta of the track-based daughters are smeared.
+    Subsequently, the momentum of the mother particle is updated as well.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        payloadName (str): name of the payload which contains the smearing valuess
+        smearingFactorName (str): name of smearing factor variable in the payload.
+        path (basf2.Path): module is added to this path
+    """
+    trackingmomentum = register_module('TrackingMomentum')
+    trackingmomentum.param('particleLists', inputListNames)
+    trackingmomentum.param('payloadName', payloadName)
+    trackingmomentum.param('smearingFactorName',  smearingFactorName)
 
     path.add_module(trackingmomentum)
 
@@ -3613,8 +3633,8 @@ def addPi0VetoEfficiencySystematics(particleList, decayString, tableName, thresh
 
     @param particleList   the input ParticleList
     @param decayString    specify hard photon to be performed pi0 veto (e.g. 'B+:sig -> rho+:sig ^gamma:hard')
-    @param tableName      table name corresponding to payload version (e.g. 'Pi0VetoEfficiencySystematics_Nov2021')
-    @param threshold      pi0 veto threshold (0.50, 0.51, ..., 0.99)
+    @param tableName      table name corresponding to payload version (e.g. 'Pi0VetoEfficiencySystematics_Mar2022')
+    @param threshold      pi0 veto threshold (0.10, 0.11, ..., 0.99)
     @param mode           choose one mode (same as writePi0EtaVeto) out of 'standard', 'tight', 'cluster' and 'both'
     @param suffix         optional suffix to be appended to the usual extraInfo name
     @param path           the module is added to this path

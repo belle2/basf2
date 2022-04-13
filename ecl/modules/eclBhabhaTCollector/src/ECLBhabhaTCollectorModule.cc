@@ -20,7 +20,6 @@
 #include <ecl/digitization/EclConfiguration.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
-#include <boost/optional.hpp>
 #include <ecl/geometry/ECLGeometryPar.h>
 
 #include <TH2F.h>

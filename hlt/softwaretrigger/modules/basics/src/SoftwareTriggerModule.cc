@@ -16,7 +16,7 @@
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
-REG_MODULE(SoftwareTrigger)
+REG_MODULE(SoftwareTrigger);
 
 
 /// Create a new module instance and set the parameters.

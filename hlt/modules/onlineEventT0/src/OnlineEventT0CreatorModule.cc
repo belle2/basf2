@@ -15,7 +15,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(OnlineEventT0Creator)
+REG_MODULE(OnlineEventT0Creator);
 
 OnlineEventT0CreatorModule::OnlineEventT0CreatorModule() : Module()
 {

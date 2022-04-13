@@ -16,8 +16,7 @@
 
 #include <tracking/dataobjects/RecoHitInformation.h>
 
-#include <boost/optional.hpp>
-
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -31,6 +30,7 @@ namespace Belle2 {
   class RecoTrackGenfitAccess;
 
   BELLE2_DEFINE_EXCEPTION(NoTrackFitResult, "No track fit result available for this hit (e.g. DAF has removed it).")
+  BELLE2_DEFINE_EXCEPTION(NoStateOnPlaneFound, "No measured state on plane for any track point found.")
 
   /** This is the Reconstruction Event-Data Model Track.
    *
@@ -220,7 +220,7 @@ namespace Belle2 {
      * @return The number of hits copied.
      */
     size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset = 0,
-                                bool reversed = false, boost::optional<double> optionalMinimalWeight = boost::none);
+                                bool reversed = false, std::optional<double> optionalMinimalWeight = std::nullopt);
 
     /**
      * Adds a cdc hit with the given information to the reco track.

@@ -326,7 +326,6 @@ bool EKLM::AlignmentChecker::checkAlignment(
             segment = m_ElementNumbers->segmentNumber(
                         iSection, iLayer, iSector, iPlane, iSegment);
             const KLMAlignmentData* segmentAlignmentData =
-              /* cppcheck-suppress nullPointerRedundantCheck */
               segmentAlignment->getSegmentAlignment(segment);
             if (segmentAlignment == nullptr)
               B2FATAL("Incomplete alignment data.");

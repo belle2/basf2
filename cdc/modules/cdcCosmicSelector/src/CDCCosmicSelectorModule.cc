@@ -15,7 +15,7 @@ using namespace std;
 using namespace Belle2;
 
 // register module
-REG_MODULE(CDCCosmicSelector)
+REG_MODULE(CDCCosmicSelector);
 CDCCosmicSelectorModule::CDCCosmicSelectorModule() : Module()
 {
   // Set description

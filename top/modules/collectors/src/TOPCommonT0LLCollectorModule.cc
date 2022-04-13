@@ -29,10 +29,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPCommonT0LLCollector)
+  REG_MODULE(TOPCommonT0LLCollector);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -198,7 +198,7 @@ namespace Belle2 {
         if (digit.getTime() > timeMax) continue;
         h2->Fill(digit.getModuleID());
         int bs = digit.getBoardstackNumber();
-        h3->Fill((digit.getModuleID() * 4 + bs - 1.5) / 4.0 , digit.getTime());
+        h3->Fill((digit.getModuleID() * 4 + bs - 1.5) / 4.0, digit.getTime());
       }
       ntra++;
     }

@@ -144,7 +144,7 @@ namespace Belle2 {
       }
       double dndE = topgp->getPhaseIndexDerivative(m_meanE);
       double dEdTheta = n * sqrt(pow(beta * n, 2) - 1) / dndE;
-      m_sigmaScat = abs(thetaScat * dEdTheta); // r.m.s of multiple scattering angle converted to photon energy
+      m_sigmaScat = std::abs(thetaScat * dEdTheta); // r.m.s of multiple scattering angle converted to photon energy
 
       double step = m_energyDistribution.step;
       int ng = lround(3 * m_sigmaScat / step);
@@ -162,7 +162,7 @@ namespace Belle2 {
         double se = 0;
         double see = 0;
         for (int i = -ng; i <= ng; i++) {
-          double p = gaus[abs(i)] * m_energyDistribution.getY(k - i);
+          double p = gaus[std::abs(i)] * m_energyDistribution.getY(k - i);
           double e = m_energyDistribution.getX(k - i);
           s += p;
           se += p * e;
@@ -219,7 +219,7 @@ namespace Belle2 {
       double minE = m_quasyEnergyDistribution.getXmin();
       double maxE = m_quasyEnergyDistribution.getXmax();
       double pixDx  = m_pixelPositions.get(col + 1).Dx;
-      double dely = (abs(D.dyB_dL) * m_length + abs(D.dyB_dx) * pixDx) / 2;
+      double dely = (std::abs(D.dyB_dL) * m_length + std::abs(D.dyB_dx) * pixDx) / 2;
       double y1 = yB - dely;
       double y2 = yB + dely;
       if (D.dyB_de > 0) {
@@ -283,10 +283,10 @@ namespace Belle2 {
         m_results.push_back(Result(pixelID));
         for (int j = j1; j < j2; j++) {
           double ybar = j * m_bars.front().B - yB;
-          for (const auto& projection : projections[abs(j) % 2]) {
+          for (const auto& projection : projections[std::abs(j) % 2]) {
             double Ecp = (ybar + projection.yc) / D.dyB_de + m_meanE;
             double wid = projection.mask->getFullWidth();
-            if (abs(Ecp - Ecp_old) > (wid + wid_old) / 2 and m_results.back().sum > 0) {
+            if (std::abs(Ecp - Ecp_old) > (wid + wid_old) / 2 and m_results.back().sum > 0) {
               m_results.push_back(Result(pixelID));
             }
             integrate(projection.mask, Ecp, m_results.back());
@@ -370,7 +370,7 @@ namespace Belle2 {
         int i2 = std::min(i0 + M - 1, N);
         for (int i = i1; i <= i2; i++) {
           const auto& entry = m_quasyEnergyDistribution.entries[i];
-          double m = mask[abs(i - i0)] * (1 - fract) + mask[abs(i - i0 + 1)] * fract;
+          double m = mask[std::abs(i - i0)] * (1 - fract) + mask[std::abs(i - i0 + 1)] * fract;
           double s = entry.y * m;
           result.sum += s;
           result.e0 += entry.x * s;
@@ -383,7 +383,7 @@ namespace Belle2 {
     double YScanner::prismEntranceY(double y, int k, double dydz) const
     {
       const auto& win = m_prism.unfoldedWindows[k];
-      double dz = abs(m_prism.zD - m_prism.zFlat);
+      double dz = std::abs(m_prism.zD - m_prism.zFlat);
       double z1 = y * win.sz + win.z0 + win.nz * dz;
       double y1 = y * win.sy + win.y0 + win.ny * dz;
       return y1 + dydz * (m_prism.zR - z1);

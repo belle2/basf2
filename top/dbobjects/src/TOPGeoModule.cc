@@ -118,14 +118,12 @@ namespace Belle2 {
   TVector3 TOPGeoModule::pointToGlobal(const TVector3& point) const
   {
     if (!m_rotation) setTransformation();
-    // cppcheck-suppress nullPointerRedundantCheck
     return (*m_rotation) * point + (*m_translation);
   }
 
   TVector3 TOPGeoModule::momentumToGlobal(const TVector3& momentum) const
   {
     if (!m_rotation) setTransformation();
-    // cppcheck-suppress nullPointerRedundantCheck
     return (*m_rotation) * momentum;
   }
 

@@ -123,7 +123,7 @@ namespace Belle2 {
       double t2 = withinSingleTurn((phi - m_phi0 + alpha) / m_omega);
       double ta = std::min(t1, t2);
       double tb = std::max(t1 - m_T0, t2 - m_T0);
-      double t = (abs(ta) < abs(tb)) ? ta : tb;
+      double t = (std::abs(ta) < std::abs(tb)) ? ta : tb;
       return t;
     }
 

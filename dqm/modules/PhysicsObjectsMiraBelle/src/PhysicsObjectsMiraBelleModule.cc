@@ -85,6 +85,8 @@ void PhysicsObjectsMiraBelleModule::defineHisto()
   m_h_Z0->SetXTitle("hist_Z0");
   m_h_theta = new TH1F("hist_theta", "hist_theta in CMS", 32, 10, 170);
   m_h_theta->SetXTitle("hist_theta");
+  m_h_theta_lab = new TH1F("hist_theta_lab", "hist_theta in lab frame", 180, 0, 180);
+  m_h_theta_lab->SetXTitle("hist_theta_lab");
   m_h_Phi0 = new TH1F("hist_Phi0", "hist_Phi0 in lab frame", 72, -180, 180);
   m_h_Phi0->SetXTitle("hist_Phi0");
   m_h_Pt = new TH1F("hist_Pt", "hist_Pt", 100, 0, 10);
@@ -134,6 +136,7 @@ void PhysicsObjectsMiraBelleModule::beginRun()
   m_h_D0->Reset();
   m_h_Z0->Reset();
   m_h_theta->Reset();
+  m_h_theta_lab->Reset();
   m_h_Phi0->Reset();
   m_h_Pt->Reset();
   m_h_Mom->Reset();
@@ -238,6 +241,7 @@ void PhysicsObjectsMiraBelleModule::event()
       thetacms[index] = Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Theta() * TMath::RadToDeg();
       m_h_Pt->Fill(fitresult->get4Momentum().Pt());//Lab
       m_h_theta->Fill(Belle2::PCmsLabTransform::labToCms(fitresult->get4Momentum()).Theta() * TMath::RadToDeg());//CMS
+      m_h_theta_lab->Fill(fitresult->get4Momentum().Theta() * TMath::RadToDeg());//Lab
       m_h_Phi0->Fill(fitresult->get4Momentum().Phi() * TMath::RadToDeg());//Lab
       m_h_Mom->Fill(fitresult->get4Momentum().P());//Lab
     }

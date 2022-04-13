@@ -88,6 +88,7 @@ namespace Belle2 {
     TH1F* m_h_D0 = nullptr;/**< histogram for D0 of muon track */
     TH1F* m_h_Z0 = nullptr;/**< histogram for Z0 of muon track */
     TH1F* m_h_theta = nullptr;/**< histogram for theta of muon track */
+    TH1F* m_h_theta_lab = nullptr;/**< histogram for theta of muon track in lab frame */
     TH1F* m_h_Phi0 = nullptr;/**< histogram for phi of muon track */
     TH1F* m_h_Pt = nullptr;/**< histogram for Pt of muon track */
     TH1F* m_h_Mom = nullptr;/**< histogram for Momentum of muon track */

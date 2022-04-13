@@ -27,7 +27,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(NoKickCutsEval)
+REG_MODULE(NoKickCutsEval);
 
 NoKickCutsEvalModule::NoKickCutsEvalModule() : Module()
 {
@@ -258,9 +258,7 @@ void NoKickCutsEvalModule::endRun()
                                             "CUTS_m_" + m_namePar.at(par) + Form("_layer%d_%d", lay1, lay2), c_nbinp, c_pmin, c_pmax, c_nbint, c_tmin, c_tmax));
         for (int theta = 1; theta <= c_nbint; theta++) {
           for (int p = 1; p <= c_nbinp; p++) {
-            // cppcheck-suppress containerOutOfBounds
             cut_M_histo_lay1.at(lay2)->SetBinContent(p, theta, cut_M.at(par).at(lay1).at(lay2).at(theta - 1).at(p - 1));
-            // cppcheck-suppress containerOutOfBounds
             cut_m_histo_lay1.at(lay2)->SetBinContent(p, theta, cut_m.at(par).at(lay1).at(lay2).at(theta - 1).at(p - 1));
           }
         }

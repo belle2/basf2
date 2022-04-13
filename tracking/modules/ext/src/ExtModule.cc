@@ -28,7 +28,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(Ext)
+REG_MODULE(Ext);
 
 ExtModule::ExtModule() :
   Module(),

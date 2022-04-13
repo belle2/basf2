@@ -21,7 +21,7 @@ using boost::format;
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(TrackingHLTDQM)
+REG_MODULE(TrackingHLTDQM);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -122,7 +122,7 @@ void TrackingHLTDQMModule::event()
         } //time overflow
       }// loop on RawFTSW
     } //RawFTSW is valid
-  }  else
+  } else
     m_trackingErrorFlags->Fill(0.0);
 
 }

@@ -31,7 +31,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(V0findingPerformanceEvaluation)
+REG_MODULE(V0findingPerformanceEvaluation);
 
 V0findingPerformanceEvaluationModule::V0findingPerformanceEvaluationModule() :
   Module()

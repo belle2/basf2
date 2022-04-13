@@ -13,7 +13,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(PXDSVDCut)
+REG_MODULE(PXDSVDCut);
 
 PXDSVDCutModule::PXDSVDCutModule() : Module()
 {

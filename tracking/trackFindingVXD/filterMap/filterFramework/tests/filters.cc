@@ -260,10 +260,10 @@ namespace VXDTFfilterTest {
   TEST_F(FilterTest, SwitchingObservers)
   {
     //build an dummy filter which is unobserved (VoidObserver)
-    // cppcheck-suppress duplicateExpression
     auto dummyFilter = ((-10. <= SquaredDistance3D() <= 10.) &&
                         ((-100. <=  SquaredDistance2Dxy() <= -10.) ||    // put 2nd pair of parentheses to silence warning
                          (-10. <= SquaredDistance1Dx() <= 10.)) &&
+                        // cppcheck-suppress duplicateExpression
                         !(-10. <= SquaredDistance1Dx() <= -10.));
 
     // values are chosen in that way that all sub-filters of dummyFilter have to be called (see comment below)

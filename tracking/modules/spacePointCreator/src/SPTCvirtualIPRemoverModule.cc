@@ -13,7 +13,7 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(SPTCvirtualIPRemover)
+REG_MODULE(SPTCvirtualIPRemover);
 
 SPTCvirtualIPRemoverModule::SPTCvirtualIPRemoverModule() : Module()
 {

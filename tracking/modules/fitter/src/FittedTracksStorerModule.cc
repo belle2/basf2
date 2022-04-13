@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(FittedTracksStorer)
+REG_MODULE(FittedTracksStorer);
 
 FittedTracksStorerModule::FittedTracksStorerModule() :
   Module()

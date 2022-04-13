@@ -28,7 +28,7 @@ using namespace std;
 using namespace Belle2;
 
 /// Register the Module
-REG_MODULE(MCTrackCandClassifier)
+REG_MODULE(MCTrackCandClassifier);
 
 /// Implementation
 MCTrackCandClassifierModule::MCTrackCandClassifierModule() : Module()

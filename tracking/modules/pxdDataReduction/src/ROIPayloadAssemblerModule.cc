@@ -21,7 +21,7 @@ using namespace Belle2;
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(ROIPayloadAssembler)
+REG_MODULE(ROIPayloadAssembler);
 
 //-----------------------------------------------------------------
 //                 Implementation

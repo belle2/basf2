@@ -18,7 +18,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(TrackFinderVXDBasicPathFinder)
+REG_MODULE(TrackFinderVXDBasicPathFinder);
 
 
 TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Module()

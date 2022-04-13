@@ -17,7 +17,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(TrackFinderVXDCellOMat)
+REG_MODULE(TrackFinderVXDCellOMat);
 
 
 TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()

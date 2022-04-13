@@ -24,7 +24,6 @@ TrackletFilterFactory::~TrackletFilterFactory() = default;
 
 std::string TrackletFilterFactory::getIdentifier() const
 {
-  return "SVD Hit Pair";
   return "Factory for Filters for SpacePointTrackCands";
 }
 

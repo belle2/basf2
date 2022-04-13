@@ -43,7 +43,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TrackingPerformanceEvaluation)
+REG_MODULE(TrackingPerformanceEvaluation);
 
 TrackingPerformanceEvaluationModule::TrackingPerformanceEvaluationModule() :
   Module()

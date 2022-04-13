@@ -21,7 +21,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(RecoTrackParticleLoader)
+REG_MODULE(RecoTrackParticleLoader);
 
 RecoTrackParticleLoaderModule::RecoTrackParticleLoaderModule() :
   Module()

@@ -16,7 +16,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDdigiFilter)
+REG_MODULE(PXDdigiFilter);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -122,7 +122,7 @@ void PXDdigiFilterModule::filterDigits()
   multimap< VxdID, ROIid > ROIids;
 
   for (auto ROI : ROIids_store_array)
-    ROIids.insert(pair<VxdID, ROIid> (ROI.getSensorID() , ROI));
+    ROIids.insert(pair<VxdID, ROIid> (ROI.getSensorID(), ROI));
 
   m_selectorIN.select([ROIids](const PXDDigit * thePxdDigit) {
     auto ROIidsRange = ROIids.equal_range(thePxdDigit->getSensorID()) ;

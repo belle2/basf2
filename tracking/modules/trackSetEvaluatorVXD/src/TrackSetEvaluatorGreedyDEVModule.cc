@@ -16,7 +16,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(TrackSetEvaluatorGreedyDEV)
+REG_MODULE(TrackSetEvaluatorGreedyDEV);
 
 TrackSetEvaluatorGreedyDEVModule::TrackSetEvaluatorGreedyDEVModule() : Module()
 {
@@ -39,7 +39,7 @@ void TrackSetEvaluatorGreedyDEVModule::event()
   qiTrackOverlap.reserve(nSpacePointTrackCands);
 
   //fill this object with the necessary information:
-  for (auto && spacePointTrackCand : m_spacePointTrackCands) {
+  for (auto&& spacePointTrackCand : m_spacePointTrackCands) {
     qiTrackOverlap.emplace_back(spacePointTrackCand.getQualityIndicator(), spacePointTrackCand.getArrayIndex(),
                                 m_overlapNetworks[0]->getOverlapForTrackIndex(spacePointTrackCand.getArrayIndex()),
                                 true);
@@ -49,7 +49,7 @@ void TrackSetEvaluatorGreedyDEVModule::event()
   Scrooge scrooge;
   scrooge.performSelection(qiTrackOverlap);
 
-  for (auto && track : qiTrackOverlap) {
+  for (auto&& track : qiTrackOverlap) {
     if (track.activityState < 0.75) {
       m_spacePointTrackCands[track.trackIndex]->removeRefereeStatus(SpacePointTrackCand::c_isActive);
     }

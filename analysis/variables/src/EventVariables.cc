@@ -789,7 +789,7 @@ namespace Belle2 {
     vm.addAlias("myNeutralECLEnergy", "totalEnergyOfParticlesInList(gamma:cleaned)")
     vm.addAlias("myChargedECLEnergy", "totalEnergyOfParticlesInList(e+:cleaned)")
     vm.addAlias("myECLEnergy", "formula(myNeutralECLEnergy+myChargedECLEnergy)")
-)DOC");
+)DOC","GeV");
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters,
                       "[Eventbased] Returns number of KLM clusters in the event.");
     REGISTER_VARIABLE("nMCParticles", nMCParticles,
@@ -809,30 +809,30 @@ In such cases the event numbers are sequential *only within a production*, so ex
 .. seealso:: `Where can I rely on uniqueness of the ['__experiment__', '__run__', '__event__', '__candidate__'] combination? <https://questions.belle2.org/question/9704>`__
 )DOC");
 
-    REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] Returns center-of-mass energy.");
-    REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Returns total beam energy in the laboratory frame.");
-    REGISTER_VARIABLE("beamPx", getBeamPx, "[Eventbased] Returns x component of total beam momentum in the laboratory frame.");
-    REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Returns y component of total beam momentum in the laboratory frame.");
-    REGISTER_VARIABLE("beamPz", getBeamPz, "[Eventbased] Returns z component of total beam momentum in the laboratory frame.");
+    REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] Returns center-of-mass energy.","GeV");
+    REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Returns total beam energy in the laboratory frame.","GeV");
+    REGISTER_VARIABLE("beamPx", getBeamPx, "[Eventbased] Returns x component of total beam momentum in the laboratory frame.","GeV/c");
+    REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Returns y component of total beam momentum in the laboratory frame.","GeV/c");
+    REGISTER_VARIABLE("beamPz", getBeamPz, "[Eventbased] Returns z component of total beam momentum in the laboratory frame.","GeV/c");
     REGISTER_VARIABLE("IPX", getIPX, R"DOC(
 [Eventbased] Returns x coordinate of the measured interaction point.
 
 .. note:: For old data and uncalibrated MC files this will return 0.0.
 
 .. note:: You might hear tracking and calibration people refer to this as the ``BeamSpot``.
-)DOC");
-    REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] Returns y coordinate of the measured interaction point.");
-    REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] Returns z coordinate of the measured interaction point.");
-    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] Returns (i,j)-th element of the covariance matrix of the measured interaction point.");
+)DOC","cm");
+    REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] Returns y coordinate of the measured interaction point.","cm");
+    REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] Returns z coordinate of the measured interaction point.","cm");
+    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] Returns (i,j)-th element of the covariance matrix of the measured interaction point.",":math:`\\text{cm}^2`");
 
     REGISTER_VARIABLE("genIPX", getGenIPX, R"DOC(
 [Eventbased] Returns x coordinate of the interaction point used for the underlying **MC generation**.
 Returns NaN for data.
 
 .. note:: This is normally smeared from 0.0
-)DOC");
-    REGISTER_VARIABLE("genIPY", getGenIPY, "[Eventbased] Returns y coordinate of the interaction point used for the underlying **MC generation**. Returns NaN for data.");
-    REGISTER_VARIABLE("genIPZ", getGenIPZ, "[Eventbased] Returns z coordinate of the interaction point used for the underlying **MC generation**. Returns NaN for data.");
+)DOC","cm");
+    REGISTER_VARIABLE("genIPY", getGenIPY, "[Eventbased] Returns y coordinate of the interaction point used for the underlying **MC generation**. Returns NaN for data.","cm");
+    REGISTER_VARIABLE("genIPZ", getGenIPZ, "[Eventbased] Returns z coordinate of the interaction point used for the underlying **MC generation**. Returns NaN for data.","cm");
 
     REGISTER_VARIABLE("date", eventYearMonthDay, R"DOC(
 [Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).
@@ -846,19 +846,19 @@ Returns NaN for data.
   For more precise event time, see :b2:var:`eventTimeSeconds` and :b2:var:`eventTimeSecondsFractionRemainder`.
 )DOC");
     REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
-                      "[Eventbased] Time of the event in seconds (truncated down) since 1970/1/1 (Unix epoch).");
+                      "[Eventbased] Time of the event (truncated down) since 1970/1/1 (Unix epoch).","s");
     REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder, R"DOC(
-[Eventbased] Remainder of the event time in fractions of a second.
+[Eventbased] Remainder of the event time.
 
 .. tip::
   Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.
-)DOC");
+)DOC","s");
 
     REGISTER_VARIABLE("timeSincePrevTriggerClockTicks", timeSincePrevTriggerClockTicks,
-                      "[Eventbased] Time since the previous trigger in clock ticks (127MHz=RF/4 clock).");
+                      "[Eventbased] Time since the previous trigger (127MHz=RF/4 clock).","clock ticks");
 
     REGISTER_VARIABLE("timeSincePrevTriggerMicroSeconds", timeSincePrevTriggerMicroSeconds,
-                      "[Eventbased] Time since the previous trigger in micro seconds.");
+                      "[Eventbased] Time since the previous trigger.","ms");
 
     REGISTER_VARIABLE("triggeredBunchNumberTTD", triggeredBunchNumberTTD, R"DOC(
 [Eventbased] Number of triggered bunch ranging from 0-1279.
@@ -877,22 +877,22 @@ Returns NaN for data.
                       "[Eventbased] Returns 1 if an injection happened recently, 0 otherwise.");
 
     REGISTER_VARIABLE("timeSinceLastInjectionSignalClockTicks", timeSinceLastInjectionSignalClockTicks, R"DOC(
-[Eventbased] Time since the last injection pre-kick signal in clock ticks (127MHz=RF/4 clock)
+[Eventbased] Time since the last injection pre-kick signal (127MHz=RF/4 clock)
 
 .. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
-)DOC");
+)DOC","clock ticks");
 
     REGISTER_VARIABLE("timeSinceLastInjectionSignalMicroSeconds", timeSinceLastInjectionSignalMicroSeconds, R"DOC(
-[Eventbased] Time since the last injection pre-kick signal in micro seconds
+[Eventbased] Time since the last injection pre-kick signal
 
 .. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
-)DOC");
+)DOC","ms");
 
     REGISTER_VARIABLE("timeSinceLastInjectionClockTicks", timeSinceLastInjectionClockTicks,
-      "[Eventbased] Time since the last injected bunch passed by the detector in micro seconds.")
+      "[Eventbased] Time since the last injected bunch passed by the detector.","ms")
 
     REGISTER_VARIABLE("timeSinceLastInjectionMicroSeconds", timeSinceLastInjectionMicroSeconds,
-      "[Eventbased] Time since the last injected bunch passed by the detector in micro seconds.")
+      "[Eventbased] Time since the last injected bunch passed by the detector.","ms")
 
     REGISTER_VARIABLE("injectionInHER", injectionInHER,
                   "[Eventbased] Returns 1 if injection was in HER, 0 otherwise.");
@@ -910,70 +910,70 @@ Returns NaN for data.
 
 .. warning:: You have to run the Event Kinematics builder module for this variable to be meaningful.
 .. seealso:: `modularAnalysis.buildEventKinematics`.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEvent_Px", missingMomentumOfEvent_Px, R"DOC(
 [Eventbased] The x component of the missing momentum in laboratory frame.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEvent_Py", missingMomentumOfEvent_Py, R"DOC(
 [Eventbased] The y component of the missing momentum in laboratory frame.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEvent_Pz", missingMomentumOfEvent_Pz, R"DOC(
 [Eventbased] The z component of the missing momentum in laboratory frame.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEvent_theta", missingMomentumOfEvent_theta, R"DOC(
 [Eventbased] The theta angle of the missing momentum of the event in laboratory frame.
-)DOC");
+)DOC","rad");
     REGISTER_VARIABLE("missingMomentumOfEventCMS", missingMomentumOfEventCMS, R"DOC(
 [Eventbased] The magnitude of the missing momentum in center-of-mass frame.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("genMissingMomentumOfEventCMS", genMissingMomentumOfEventCMS, R"DOC(
 [Eventbased] The magnitude of the missing momentum in center-of-mass frame from generator
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Px", missingMomentumOfEventCMS_Px, R"DOC(
 [Eventbased] The x component of the missing momentum in center-of-mass frame.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Py", missingMomentumOfEventCMS_Py, R"DOC(
 [Eventbased] The y component of the missing momentum in center-of-mass frame.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Pz", missingMomentumOfEventCMS_Pz, R"DOC(
 [Eventbased] The z component of the missing momentum in center-of-mass frame.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEventCMS_theta", missingMomentumOfEventCMS_theta, R"DOC(
 [Eventbased] The theta angle of the missing momentum in center-of-mass frame.
-)DOC");
+)DOC","rad");
     REGISTER_VARIABLE("missingEnergyOfEventCMS", missingEnergyOfEventCMS, R"DOC(
 [Eventbased] The missing energy in center-of-mass frame.
-)DOC");
+)DOC","GeV");
     REGISTER_VARIABLE("genMissingEnergyOfEventCMS", genMissingEnergyOfEventCMS, R"DOC(
 [Eventbased] The missing energy in center-of-mass frame from generator.
-)DOC");
+)DOC","GeV");
     REGISTER_VARIABLE("missingMass2OfEvent", missingMass2OfEvent, R"DOC(
 [Eventbased] The missing mass squared.
-)DOC");
+)DOC",":math:`[\\text{GeV}/\\text{c}^2]^2`");
     REGISTER_VARIABLE("genMissingMass2OfEvent", genMissingMass2OfEvent, R"DOC(
 [Eventbased] The missing mass squared from generator
-)DOC");
+)DOC",":math:`[\\text{GeV}/\\text{c}^2]^2`");
     REGISTER_VARIABLE("visibleEnergyOfEventCMS", visibleEnergyOfEventCMS, R"DOC(
 [Eventbased] The visible energy in center-of-mass frame.
-)DOC");
+)DOC","GeV");
     REGISTER_VARIABLE("genVisibleEnergyOfEventCMS", genVisibleEnergyOfEventCMS, R"DOC(
 [Eventbased] The visible energy in center-of-mass frame from generator.
-)DOC");
+)DOC","GeV");
     REGISTER_VARIABLE("totalPhotonsEnergyOfEvent", totalPhotonsEnergyOfEvent, R"DOC(
 [Eventbased] The energy in laboratory frame of all the photons.
-)DOC");
+)DOC","GeV");
     REGISTER_VARIABLE("genTotalPhotonsEnergyOfEvent", genTotalPhotonsEnergyOfEvent, R"DOC(
 [Eventbased] The energy in laboratory frame of all the photons. from generator.
-)DOC");
+)DOC","GeV");
 
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0, R"DOC(
-[Eventbased][Calibration] The Event t0, measured in ns, is the time of the event relative to the trigger time. 
+[Eventbased][Calibration] The Event t0, is the time of the event relative to the trigger time. 
 
 .. note::
   The event time can be measured by several sub-detectors including the CDC, ECL, and TOP.
   This Event t0 variable is the final combined value of all the event time measurements.
   Currently only the CDC and ECL are used in this combination.
-)DOC");
+)DOC","ns");
   }
 }

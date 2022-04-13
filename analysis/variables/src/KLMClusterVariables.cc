@@ -294,7 +294,7 @@ namespace Belle2::Variable {
   REGISTER_VARIABLE("klmClusterBelleECLFlag", klmClusterBelleECLFlag,
                     "Returns the Belle-style ECL flag.");
   REGISTER_VARIABLE("klmClusterTiming", klmClusterTiming, R"DOC(
-Returns the timing informationf of the associated KLMCluster.
+Returns the timing information of the associated KLMCluster.
 
 .. warning::
   Currently the KLM has no time calibration. This leads to a huge discrepancy for the variable :b2:var:`klmClusterTiming` if one compares collisions and simulated data. Moreover, the distribution of the variable on collisions data has a very complicated structure, due to the different timing shifts of different KLM components.

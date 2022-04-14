@@ -311,8 +311,8 @@ namespace Belle2 {
 
     ROOTDataset::ROOTDataset(const GeneralOptions& general_options) : Dataset(general_options)
     {
-      m_input_double.resize(m_general_options.m_variables.size(), 0);
-      m_spectators_double.resize(m_general_options.m_spectators.size(), 0);
+      m_input_set.resize(m_general_options.m_variables.size());
+      m_spectators_set.resize(m_general_options.m_spectators.size());
       m_weight_double = 1.0;
       m_target_double = 0.0;
       m_target_int = 0;
@@ -378,11 +378,31 @@ namespace Belle2 {
       }
       if (m_isDoubleInputType) {
         m_weight = (float) m_weight_double;
-        for (unsigned int i = 0; i < m_input_double.size(); i++)
-          m_input[i] = (float) m_input_double[i];
-        for (unsigned int i = 0; i < m_spectators_double.size(); i++)
-          m_spectators[i] = (float) m_spectators_double[i];
+
+        for (unsigned int i = 0; i < m_input_set.size(); i++) {
+          Variable::Manager::VariableDataType varType = m_input_set[i].first;
+
+          if (varType == Variable::Manager::VariableDataType::c_double)
+            m_input[i] = (float) std::get<double>(m_input_set[i].second);
+          else if (varType == Variable::Manager::VariableDataType::c_int)
+            m_input[i] = (float) std::get<int>(m_input_set[i].second);
+          else if (varType == Variable::Manager::VariableDataType::c_bool)
+            m_input[i] = (float) std::get<bool>(m_input_set[i].second);
+        }
+
+        for (unsigned int i = 0; i < m_spectators_set.size(); i++) {
+          Variable::Manager::VariableDataType varType = m_spectators_set[i].first;
+
+          if (varType == Variable::Manager::VariableDataType::c_double)
+            m_spectators[i] = (float) std::get<double>(m_spectators_set[i].second);
+          else if (varType == Variable::Manager::VariableDataType::c_int)
+            m_spectators[i] = (float) std::get<int>(m_spectators_set[i].second);
+          else if (varType == Variable::Manager::VariableDataType::c_bool)
+            m_spectators[i] = (float) std::get<bool>(m_spectators_set[i].second);
+        }
+
       }
+
       if (m_target_data_type == Variable::Manager::VariableDataType::c_double)
         m_target = (float) m_target_double;
       else if (m_target_data_type == Variable::Manager::VariableDataType::c_int)
@@ -429,8 +449,15 @@ namespace Belle2 {
       std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_variables[iFeature]);
       std::string typeName = "features";
 
-      if (m_isDoubleInputType)
-        return ROOTDataset::getVectorFromTTree(typeName, branchName, m_input_double[iFeature]);
+      if (m_isDoubleInputType) {
+        Variable::Manager::VariableDataType varType = m_input_set[iFeature].first;
+        if (varType == Variable::Manager::VariableDataType::c_double)
+          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<double>(m_input_set[iFeature].second));
+        else if (varType == Variable::Manager::VariableDataType::c_int)
+          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<int>(m_input_set[iFeature].second));
+        else if (varType == Variable::Manager::VariableDataType::c_bool)
+          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<bool>(m_input_set[iFeature].second));
+      }
 
       return ROOTDataset::getVectorFromTTree(typeName, branchName, m_input[iFeature]);
     }
@@ -445,8 +472,15 @@ namespace Belle2 {
       std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_spectators[iSpectator]);
       std::string typeName = "spectators";
 
-      if (m_isDoubleInputType)
-        return ROOTDataset::getVectorFromTTree(typeName, branchName, m_spectators_double[iSpectator]);
+      if (m_isDoubleInputType) {
+        Variable::Manager::VariableDataType varType = m_spectators_set[iSpectator].first;
+        if (varType == Variable::Manager::VariableDataType::c_double)
+          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<double>(m_spectators_set[iSpectator].second));
+        else if (varType == Variable::Manager::VariableDataType::c_int)
+          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<int>(m_spectators_set[iSpectator].second));
+        else if (varType == Variable::Manager::VariableDataType::c_bool)
+          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<bool>(m_spectators_set[iSpectator].second));
+      }
 
       return ROOTDataset::getVectorFromTTree(typeName, branchName, m_spectators[iSpectator]);
     }
@@ -528,6 +562,20 @@ namespace Belle2 {
         ROOTDataset::setScalarVariableAddress(variableType, variableNames[i], variableTargets[i]);
     }
 
+    void ROOTDataset::setVectorVariableAddress(std::string& variableType, std::vector<std::string>& variableNames,
+                                               std::vector<VariableSet>& variableSetTargets)
+    {
+      for (unsigned int i = 0; i < variableNames.size(); ++i) {
+        Variable::Manager::VariableDataType varType = variableSetTargets[i].first;
+        if (varType == Variable::Manager::VariableDataType::c_double)
+          ROOTDataset::setScalarVariableAddress(variableType, variableNames[i], std::get<double>(variableSetTargets[i].second));
+        else if (varType == Variable::Manager::VariableDataType::c_int)
+          ROOTDataset::setScalarVariableAddress(variableType, variableNames[i], std::get<int>(variableSetTargets[i].second));
+        else if (varType == Variable::Manager::VariableDataType::c_bool)
+          ROOTDataset::setScalarVariableAddress(variableType, variableNames[i], std::get<bool>(variableSetTargets[i].second));
+      }
+    }
+
     void ROOTDataset::setBranchAddresses()
     {
       // Deactivate all branches by default
@@ -571,11 +619,12 @@ namespace Belle2 {
         typeName = "target";
         ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_target_variable, m_target_bool);
       }
+
       if (m_isDoubleInputType) {
         typeName = "feature";
-        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_variables, m_input_double);
+        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_variables, m_input_set);
         typeName = "spectator";
-        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_spectators, m_spectators_double);
+        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_spectators, m_spectators_set);
       } else {
         typeName = "feature";
         ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_variables, m_input);
@@ -587,35 +636,70 @@ namespace Belle2 {
 
     void ROOTDataset::setRootInputType()
     {
-      std::string control_variable;
-      for (auto& variable : m_general_options.m_variables) {
-        if (checkForBranch(m_tree, variable))
-          control_variable = variable;
-        else if (checkForBranch(m_tree, Belle2::MakeROOTCompatible::makeROOTCompatible(variable)))
-          control_variable = Belle2::MakeROOTCompatible::makeROOTCompatible(variable);
-        if (not control_variable.empty()) {
-          TBranch* branch = m_tree->GetBranch(control_variable.c_str());
-          TLeaf* leaf = branch->GetLeaf(control_variable.c_str());
+      m_isDoubleInputType = true;
+
+      for (unsigned int i = 0; i < m_general_options.m_variables.size(); i++) {
+        auto variable = m_general_options.m_variables[i];
+        std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(variable);
+
+        if (checkForBranch(m_tree, branchName)) {
+          TBranch* branch = m_tree->GetBranch(branchName.c_str());
+          TLeaf* leaf = branch->GetLeaf(branchName.c_str());
           std::string type_name = leaf->GetTypeName();
-          if (type_name == "Double_t")
-            m_isDoubleInputType = true;
-          else if (type_name == "Float_t")
+          if (type_name == "Float_t") {
             m_isDoubleInputType = false;
-          else {
+            return;
+          }
+
+          if (type_name == "Double_t") {
+            m_input_set[i] = VariableSet(Variable::Manager::VariableDataType::c_double, {0.0, 0, false});
+          } else if (type_name == "Int_t") {
+            m_input_set[i] = VariableSet(Variable::Manager::VariableDataType::c_int, {0.0, 0, false});
+          } else if (type_name == "Bool_t") {
+            m_input_set[i] = VariableSet(Variable::Manager::VariableDataType::c_bool, {0.0, 0, false});
+          } else {
             B2FATAL("Unknown root input type: " << type_name);
             throw std::runtime_error("Unknown root input type: " + type_name);
           }
-          return;
+
         }
       }
-      B2FATAL("No valid feature was found. Check your input features.");
-      throw std::runtime_error("No valid feature was found. Check your input features.");
+
+      for (unsigned int i = 0; i < m_general_options.m_spectators.size(); i++) {
+        auto variable = m_general_options.m_spectators[i];
+        std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(variable);
+
+        if (checkForBranch(m_tree, branchName)) {
+          TBranch* branch = m_tree->GetBranch(branchName.c_str());
+          TLeaf* leaf = branch->GetLeaf(branchName.c_str());
+          std::string type_name = leaf->GetTypeName();
+          if (type_name == "Float_t") {
+            m_isDoubleInputType = false;
+            return;
+          }
+
+          if (type_name == "Double_t") {
+            m_spectators_set[i] = VariableSet(Variable::Manager::VariableDataType::c_double, {0.0, 0, false});
+          } else if (type_name == "Int_t") {
+            m_spectators_set[i] = VariableSet(Variable::Manager::VariableDataType::c_int, {0.0, 0, false});
+          } else if (type_name == "Bool_t") {
+            m_spectators_set[i] = VariableSet(Variable::Manager::VariableDataType::c_bool, {0.0, 0, false});
+          } else {
+            B2FATAL("Unknown root input type: " << type_name);
+            throw std::runtime_error("Unknown root input type: " + type_name);
+          }
+
+        }
+      }
+
     }
 
     void ROOTDataset::setTargetRootInputType()
     {
-      TBranch* branch = m_tree->GetBranch(m_general_options.m_target_variable.c_str());
-      TLeaf* leaf = branch->GetLeaf(m_general_options.m_target_variable.c_str());
+      std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_target_variable);
+
+      TBranch* branch = m_tree->GetBranch(branchName.c_str());
+      TLeaf* leaf = branch->GetLeaf(branchName.c_str());
       std::string target_type_name = leaf->GetTypeName();
       if (target_type_name == "Double_t")
         m_target_data_type = Variable::Manager::VariableDataType::c_double;

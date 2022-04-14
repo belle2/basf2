@@ -18,6 +18,7 @@
 #include <TChain.h>
 
 #include <string>
+#include <tuple>
 
 namespace Belle2 {
   namespace MVA {
@@ -344,6 +345,8 @@ namespace Belle2 {
      */
     class ROOTDataset : public Dataset {
 
+      typedef std::pair<Variable::Manager::VariableDataType, std::tuple<double, int, bool>> VariableSet;
+
     public:
       /**
        * Creates a new ROOTDataset
@@ -431,6 +434,16 @@ namespace Belle2 {
                                     T& variableTargets);
 
       /**
+       * sets the branch address for a vector of VariableSet to a given target
+       * @tparam T target type (std::vector<float>, std::vector<double>)
+       * @param variableType defines {feature, weights, spectator, target}
+       * @param variableName names of the variable, usually defined in general_options
+       * @param variableSetTargets variables, the address is set to
+       */
+      void setVectorVariableAddress(std::string& variableType, std::vector<std::string>& variableName,
+                                    std::vector<VariableSet>& variableSetTarget);
+
+      /**
        * Determines the data type of the target variable and sets it to m_target_data_type
        */
       void setTargetRootInputType();
@@ -457,8 +470,9 @@ namespace Belle2 {
     protected:
       TChain* m_tree = nullptr; /**< Pointer to the TChain containing the data */
       bool m_isDoubleInputType = true; /**< Defines the expected datatype in the ROOT file */
-      std::vector<double> m_input_double; /**< Contains all feature values of the currently loaded event */
-      std::vector<double> m_spectators_double; /**< Contains all spectators values of the currently loaded event */
+      std::vector<VariableSet> m_input_set; /**< Contains all feature values of the currently loaded event */
+      std::vector<VariableSet> m_spectators_set; /**< Contains all feature values of the currently loaded event */
+
       double m_weight_double; /**< Contains the weight of the currently loaded event */
       Variable::Manager::VariableDataType m_target_data_type =
         Variable::Manager::VariableDataType::c_double; /**< Data type of target variable */

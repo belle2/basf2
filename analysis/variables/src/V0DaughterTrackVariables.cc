@@ -810,7 +810,7 @@ namespace Belle2 {
     MAKE_DEPRECATED("v0DaughterD0Error", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `d0Err`,
                      so replace the current call with ``daughter(i, d0Err)``.)DOC");
-    REGISTER_VARIABLE("v0DaughterPhi0Error(i)", v0DaughterTrackPhi0Error, "phi0 error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterPhi0Error(i)", v0DaughterTrackPhi0Error, "phi0 error of the i-th daughter track fit", "rad");
     MAKE_DEPRECATED("v0DaughterPhi0Error", false, "light-2104-poseidon", R"DOC(
                      The same value can be calculated with the more generic variable `phi0Err`,
                      so replace the current call with ``daughter(i, phi0Err)``.)DOC");
@@ -878,11 +878,11 @@ namespace Belle2 {
     /// helix parameters and covariance matrix elements
     REGISTER_VARIABLE("v0DaughterTau(i,j)",        v0DaughterTrackParam5AtIPPerigee,
                       "j-th track parameter (at IP perigee) of the i-th daughter track. "
-                      "j:  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda", "cm, unitless, :math:`\\text{cm}^{-1}`, cm, unitless");
+                      "j:  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda", "cm, rad, :math:`\\text{cm}^{-1}`, cm, unitless");
     REGISTER_VARIABLE("v0DaughterCov(i,j)",        v0DaughterTrackParamCov5x5AtIPPerigee,
                       "j-th element of the 15 covariance matrix elements (at IP perigee) of the i-th daughter track. "
                       "(0,0), (0,1) ... (1,1), (1,2) ... (2,2) ..."
-                      "index order is:  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda", "cm, unitless, :math:`\\text{cm}^{-1}`, cm, unitless");
+                      "index order is:  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda", "cm, rad, :math:`\\text{cm}^{-1}`, cm, unitless");
     /// Converted photon variables
     REGISTER_VARIABLE("convertedPhotonInvariantMass(i,j)",       convertedPhotonInvariantMass,
                       "Invariant mass of the i-j daughter system as defined in https://indico.belle2.org/event/3644/contributions/18622/attachments/9401/14443/Photon_vertexin_B2GM.pdf, assuming it's a converted photon",

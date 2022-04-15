@@ -63,10 +63,10 @@ namespace Belle2 {
     std::string m_recoTracks; /**< name of RecoTracks StoreArray */
     double m_pt = 0.25; /**< Cut on pt for RecoTrack selection */
     double m_pz = 0.; /**< Cut on pz for RecoTrack selection */
-    std::string m_algorithm = "clsOnTrack_time_average"; /* name of the algorithm used to evaluate SVD-eventT0 */
-    double m_evtT0; /* SVD-EventT0 */
-    double m_evtT0_err; /* SVD-EventT0 error */
-    double m_quality; /* SVD-EventT0 quality */
+    std::string m_algorithm = "clsOnTrack_time_average"; /**< name of the algorithm used to evaluate SVD-eventT0 */
+    double m_evtT0; /**< SVD-EventT0 */
+    double m_evtT0_err; /**< SVD-EventT0 error */
+    double m_quality; /**< SVD-EventT0 quality */
 
   };
 }

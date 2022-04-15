@@ -65,6 +65,18 @@ namespace Belle2 {
 
     }
 
+    /** Return the error of the CoG cluster time.
+     *
+     * Input:
+     * @param sensorID: identity of the sensor for which the calibration is required
+     * @param isU: sensor side, true for p side, false for n side
+     * @param strip: strip number - NOT USED
+     * @param raw_time : raw CoG time in ns
+     * @param raw_timeError : raw CoG time error in ns
+     * @param bin : trigger bin (0,1,2,3)
+     *
+     * Output: double corresponding to the corrected time error [ns]
+     */
     inline double getCorrectedTimeError(
       const Belle2::VxdID& sensorID,
       const bool& isU, const unsigned short& strip,

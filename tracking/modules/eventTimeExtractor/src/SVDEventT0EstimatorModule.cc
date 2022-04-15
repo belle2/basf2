@@ -96,9 +96,9 @@ void SVDEventT0EstimatorModule::event()
   if (N_cls > 0) {
     m_quality = N_cls;
     m_evtT0 = clsTime_sum / N_cls;
-    m_evtT0_err = std::sqrt(clsTime_err_sum / (N_cls * N_cls));
+    m_evtT0_err = std::sqrt(clsTime_err_sum / (N_cls * (N_cls - 1));
   }
-  EventT0::EventT0Component evtT0_comp(m_evtT0, m_evtT0_err, Const::SVD, m_algorithm, m_quality);
+                EventT0::EventT0Component evtT0_comp(m_evtT0, m_evtT0_err, Const::SVD, m_algorithm, m_quality);
   eventT0->addTemporaryEventT0(evtT0_comp);
 }
 

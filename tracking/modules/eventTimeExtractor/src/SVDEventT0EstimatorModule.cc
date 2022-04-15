@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <svd/modules/svdReconstruction/SVDEventT0EstimatorModule.h>
+#include <tracking/modules/eventTimeExtractor/SVDEventT0EstimatorModule.h>
 
 using namespace Belle2;
 using namespace std;

@@ -65,6 +65,22 @@ namespace Belle2 {
 
     }
 
+    inline double getCorrectedTimeError(
+      const Belle2::VxdID& sensorID,
+      const bool& isU, const unsigned short& strip,
+      const double& raw_time,
+      const double& raw_timeError,
+      const int& bin
+    ) const
+    {
+      return m_aDBObjPtr->getReference(sensorID.getLayerNumber(),
+                                       sensorID.getLadderNumber(),
+                                       sensorID.getSensorNumber(),
+                                       m_aDBObjPtr->sideIndex(isU),
+                                       strip).calibratedValueError(raw_time, raw_timeError, bin);
+
+    }
+
     /** returns the unique ID of the payload */
     TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
 

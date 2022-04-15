@@ -22,12 +22,12 @@ REG_MODULE(SVDEventT0Estimator)
 
 SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
 {
-  setDescription("This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks. The EventT0 is set to NaN if there are not RecoTracks or there are not SVD clusters associated to tracks or track pt < ptMin OR track pz < pzMin. The EventT0 estimated is added to the temporaryEventT0s to the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.");
+  setDescription("This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks. The EventT0 is set to NaN if there are not RecoTracks or there are not SVD clusters associated to tracks or RecoTrack pt < ptMin OR RecoTrack pz < pzMin. The EventT0 estimated is added to the temporaryEventT0s to the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.");
   //* Definition of input parameters */
   addParam("RecoTracks", m_recoTracks, "StoreArray with the input RecoTracks", string(""));
   addParam("EventT0", m_eventT0, "StoreObjPtr with the input EventT0", string(""));
-  addParam("ptMin", m_pt, "Cut on minimum transverse momentum pt for track selection", m_pt);
-  addParam("pzMin", m_pz, "Cut on minimum longitudinal momentum pz for track selection", m_pz);
+  addParam("ptMin", m_pt, "Cut on minimum transverse momentum pt for RecoTrack selection", m_pt);
+  addParam("pzMin", m_pz, "Cut on minimum longitudinal momentum pz for RecoTrack selection", m_pz);
 }
 
 
@@ -100,34 +100,4 @@ void SVDEventT0EstimatorModule::endRun()
 void SVDEventT0EstimatorModule::terminate()
 {
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

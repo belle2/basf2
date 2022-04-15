@@ -345,6 +345,9 @@ namespace Belle2 {
      */
     class ROOTDataset : public Dataset {
 
+      /**
+       * Pair of a selector (VariableDataType) and tuple of three variable types (double, int, bool)
+       */
       typedef std::pair<Variable::Manager::VariableDataType, std::tuple<double, int, bool>> VariableSet;
 
     public:
@@ -441,7 +444,7 @@ namespace Belle2 {
        * @param variableSetTargets variables, the address is set to
        */
       void setVectorVariableAddress(std::string& variableType, std::vector<std::string>& variableName,
-                                    std::vector<VariableSet>& variableSetTarget);
+                                    std::vector<VariableSet>& variableSetTargets);
 
       /**
        * Determines the data type of the target variable and sets it to m_target_data_type
@@ -471,8 +474,7 @@ namespace Belle2 {
       TChain* m_tree = nullptr; /**< Pointer to the TChain containing the data */
       bool m_isDoubleInputType = true; /**< Defines the expected datatype in the ROOT file */
       std::vector<VariableSet> m_input_set; /**< Contains all feature values of the currently loaded event */
-      std::vector<VariableSet> m_spectators_set; /**< Contains all feature values of the currently loaded event */
-
+      std::vector<VariableSet> m_spectators_set; /**< Contains all spectators values of the currently loaded event */
       double m_weight_double; /**< Contains the weight of the currently loaded event */
       Variable::Manager::VariableDataType m_target_data_type =
         Variable::Manager::VariableDataType::c_double; /**< Data type of target variable */

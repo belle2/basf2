@@ -30,8 +30,10 @@
 
 namespace Belle2 {
 
-  /**
-   *
+  /** This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks.
+   *  The EVentT0 is set to NaN if: there are not tracks, there are not SVD clusters associated to tracks,
+   *  track pt < 0.25 GeV OR track pz < 0.1 GeV. The EventT0 estimated is added to the temporaryEventT0s to
+   *  the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.
    */
 
   class SVDEventT0EstimatorModule : public Module {
@@ -58,11 +60,12 @@ namespace Belle2 {
     /** This method is called at the end of the event processing.   */
     virtual void terminate() override;
 
-
   private:
 
     std::string m_eventT0; /**< name of StoreObj EventT0  */
     std::string m_recoTracks; /**< name of RecoTracks StoreArray */
+    std::string m_tracks; /**< name of Tracks StoreArray */
+    std::string m_trkFitResults; /**< name of TrackFitResults StoreArray */
 
   protected:
 
@@ -70,8 +73,6 @@ namespace Belle2 {
      *  clusters associated to tracks
      */
     double eventT0Estimator(const std::vector<SVDCluster* > svdClusters);
-
-
   };
 }
 

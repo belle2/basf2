@@ -66,6 +66,8 @@ namespace Belle2 {
     std::string m_recoTracks; /**< name of RecoTracks StoreArray */
     std::string m_tracks; /**< name of Tracks StoreArray */
     std::string m_trkFitResults; /**< name of TrackFitResults StoreArray */
+    double m_pt; /**< Cut on pt for track selection */
+    double m_pz; /**< Cut on pz for track selection */
 
   protected:
 

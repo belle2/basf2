@@ -96,7 +96,6 @@ class SVDExtraEventStatisticsModule(PerEventStatisticsGetterModule):
         if self.svdZS5strips.isOptional():
             self.svd_ZS5strips[0] = self.svdZS5strips.getEntries()
         if self.tracks.isOptional():
-            print(self.tracks.getEntries())
             self.svd_tracks[0] = self.tracks.getEntries()
 
         super().event()

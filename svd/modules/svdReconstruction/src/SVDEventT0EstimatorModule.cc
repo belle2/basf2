@@ -22,14 +22,14 @@ REG_MODULE(SVDEventT0Estimator)
 
 SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
 {
-  setDescription("This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks. The EVentT0 is set to NaN if: there are not tracks, there are not SVD clusters associated to tracks, track pt < 0.25 GeV OR track pz < 0.1 GeV. The EventT0 estimated is added to the temporaryEventT0s to the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.");
+  setDescription("This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks. The EventT0 is set to NaN if there are not tracks or there are not SVD clusters associated to tracks or track pt < ptMin OR track pz < pzMin. The EventT0 estimated is added to the temporaryEventT0s to the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.");
   //* Definition of input parameters */
-  addParam("RecoTracks", m_recoTracks, "StoreArray with the input RecoTracks", string("RecoTracks"));
-  addParam("Tracks", m_tracks, "StoreArray with the input Tracks", string("Tracks"));
-  addParam("TrackFitResults", m_trkFitResults, "StoreArray with the input TrackFitResults", string("TrackFitResults"));
-  addParam("EventT0", m_eventT0, "StoreObjPtr with the input EventT0", string("EventT0"));
-  addParam("ptSelection", m_pt, "Cut on transverse momentum pt for track selection (default is 0.25 GeV)", 0.25);
-  addParam("pzSelection", m_pz, "Cut on longitudinal momentum pz for track selection (default is 0 GeV)", 0.);
+  addParam("RecoTracks", m_recoTracks, "StoreArray with the input RecoTracks", string(""));
+  addParam("Tracks", m_tracks, "StoreArray with the input Tracks", string(""));
+  addParam("TrackFitResults", m_trkFitResults, "StoreArray with the input TrackFitResults", string(""));
+  addParam("EventT0", m_eventT0, "StoreObjPtr with the input EventT0", string(""));
+  addParam("ptMin", m_pt, "Cut on minimum transverse momentum pt for track selection", m_pt);
+  addParam("pzMin", m_pz, "Cut on minimum longitudinal momentum pz for track selection", m_pz);
 }
 
 
@@ -65,18 +65,12 @@ void SVDEventT0EstimatorModule::event()
   StoreArray<RecoTrack> recoTracks(m_recoTracks);
   StoreObjPtr<EventT0> eventT0(m_eventT0);
 
-  double evtT0 = NAN;
-  double evtT0_err = NAN;
+  m_evtT0 = NAN;
+  m_evtT0_err = NAN;
   double clsTime_sum = 0;
   double clsTime_err_sum = 0;
-  double quality = NAN;
+  m_quality = NAN;
   int N_cls = 0;
-  const string& algorithm = "clsOnTrack_time_average";
-  if (recoTracks.getEntries() == 0) {
-    evtT0 = NAN;
-    evtT0_err = NAN;
-    quality = NAN;
-  }
 
   // loop on recotracks
   for (const auto& recoTrack : recoTracks) {
@@ -84,8 +78,8 @@ void SVDEventT0EstimatorModule::event()
     RelationVector<Track> trk = DataStore::getRelationsWithObj<Track>(&recoTrack);
     if (trk.size() == 0) continue;
     const TrackFitResult*  tfr = trk[0]->getTrackFitResultWithClosestMass(Const::pion);
-    double pt = tfr->getMomentum().Perp();
     TVector3 p = tfr->getMomentum();
+    double pt = p.Perp();
     double pz = p[2];
     const vector<SVDCluster* > svdClusters = recoTrack.getSVDHitList();
     if (svdClusters.size() == 0) continue;
@@ -100,11 +94,11 @@ void SVDEventT0EstimatorModule::event()
     N_cls += svdClusters.size();
   }
   if (N_cls > 0) {
-    quality = N_cls;
-    evtT0 = clsTime_sum / N_cls;
-    evtT0_err = std::sqrt(clsTime_err_sum / (N_cls * N_cls));
+    m_quality = N_cls;
+    m_evtT0 = clsTime_sum / N_cls;
+    m_evtT0_err = std::sqrt(clsTime_err_sum / (N_cls * N_cls));
   }
-  EventT0::EventT0Component evtT0_comp(evtT0, evtT0_err, Const::SVD, algorithm, quality);
+  EventT0::EventT0Component evtT0_comp(m_evtT0, m_evtT0_err, Const::SVD, m_algorithm, m_quality);
   eventT0->addTemporaryEventT0(evtT0_comp);
 }
 

@@ -71,10 +71,6 @@ namespace Belle2 {
 
   protected:
 
-    /** Estimate the SVD eventT0 as the average of time of clusters
-     *  clusters associated to tracks
-     */
-    double eventT0Estimator(const std::vector<SVDCluster* > svdClusters);
   };
 }
 

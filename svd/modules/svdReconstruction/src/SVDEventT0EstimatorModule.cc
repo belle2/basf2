@@ -67,9 +67,16 @@ void SVDEventT0EstimatorModule::event()
 
   double evtT0 = NAN;
   double evtT0_err = NAN;
-  double quality = -2;
-  const string& algorithm = "cls_time_average";
-  if (recoTracks.getEntries() == 0) evtT0 = NAN;
+  double clsTime_sum = 0;
+  double clsTime_err_sum = 0;
+  double quality = NAN;
+  int N_cls = 0;
+  const string& algorithm = "clsOnTrack_time_average";
+  if (recoTracks.getEntries() == 0) {
+    evtT0 = NAN;
+    evtT0_err = NAN;
+    quality = NAN;
+  }
 
   // loop on recotracks
   for (const auto& recoTrack : recoTracks) {
@@ -83,9 +90,19 @@ void SVDEventT0EstimatorModule::event()
     const vector<SVDCluster* > svdClusters = recoTrack.getSVDHitList();
     if (svdClusters.size() == 0) continue;
     B2DEBUG(40, "FITTED TRACK:   NUMBER OF SVD HITS = " << svdClusters.size());
-    if (pt < m_pt || pz < m_pz) continue;
-    evtT0 = eventT0Estimator(svdClusters);
-    quality = svdClusters.size();
+    if (pt < m_pt || abs(pz) < m_pz) continue;
+    for (unsigned int i = 0; i < svdClusters.size(); i++) {
+      double clsTime = svdClusters[i]->getClsTime();
+      double clsTime_err = svdClusters[i]->getClsTimeSigma();
+      clsTime_sum += clsTime;
+      clsTime_err_sum += clsTime_err * clsTime_err;
+    }
+    N_cls += svdClusters.size();
+  }
+  if (N_cls > 0) {
+    quality = N_cls;
+    evtT0 = clsTime_sum / N_cls;
+    evtT0_err = std::sqrt(clsTime_err_sum / (N_cls * N_cls));
   }
   EventT0::EventT0Component evtT0_comp(evtT0, evtT0_err, Const::SVD, algorithm, quality);
   eventT0->addTemporaryEventT0(evtT0_comp);
@@ -101,16 +118,6 @@ void SVDEventT0EstimatorModule::terminate()
 {
 }
 
-double SVDEventT0EstimatorModule::eventT0Estimator(const vector<SVDCluster* > svdClusters)
-{
-  double clsTime_sum = 0;
-  for (unsigned int i = 0; i < svdClusters.size(); i++) {
-    double clsTime = svdClusters[i]->getClsTime();
-    clsTime_sum += clsTime;
-  }
-  double evtT0 = clsTime_sum / double(svdClusters.size());
-  return evtT0;
-}
 
 
 

@@ -22,16 +22,12 @@ REG_MODULE(SVDEventT0Estimator)
 
 SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
 {
-  setDescription("This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks.
-                 The EVentT0 is set to NaN if : there are not tracks, there are not SVD clusters associated to tracks,
-                 track pt < 0.25 GeV OR track pz < 0.1 GeV. The EventT0 estimated is added to the temporaryEventT0s to
-                 the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector = SVD, algorithm,
-                 quality.");
-                 //* Definition of input parameters */
-                 addParam("RecoTracks", m_recoTracks, "StoreArray with the input RecoTracks", string("RecoTracks"));
-                 addParam("Tracks", m_tracks, "StoreArray with the input Tracks", string("Tracks"));
-                 addParam("TrackFitResults", m_trkFitResults, "StoreArray with the input TrackFitResults", string("TrackFitResults"));
-                 addParam("EventT0", m_eventT0, "StoreObjPtr with the input EventT0", string("EventT0"));
+  setDescription("This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks. The EVentT0 is set to NaN if: there are not tracks, there are not SVD clusters associated to tracks, track pt < 0.25 GeV OR track pz < 0.1 GeV. The EventT0 estimated is added to the temporaryEventT0s to the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.");
+  //* Definition of input parameters */
+  addParam("RecoTracks", m_recoTracks, "StoreArray with the input RecoTracks", string("RecoTracks"));
+  addParam("Tracks", m_tracks, "StoreArray with the input Tracks", string("Tracks"));
+  addParam("TrackFitResults", m_trkFitResults, "StoreArray with the input TrackFitResults", string("TrackFitResults"));
+  addParam("EventT0", m_eventT0, "StoreObjPtr with the input EventT0", string("EventT0"));
 }
 
 
@@ -72,6 +68,8 @@ void SVDEventT0EstimatorModule::event()
   double quality = -2;
   const string& algorithm = "cls_time_average";
   if (recoTracks.getEntries() == 0) evtT0 = NAN;
+
+  // loop on recotracks
   for (const auto& recoTrack : recoTracks) {
     if (! recoTrack.wasFitSuccessful()) continue;
     RelationVector<Track> trk = DataStore::getRelationsWithObj<Track>(&recoTrack);

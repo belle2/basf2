@@ -22,11 +22,9 @@ REG_MODULE(SVDEventT0Estimator)
 
 SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
 {
-  setDescription("This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks. The EventT0 is set to NaN if there are not tracks or there are not SVD clusters associated to tracks or track pt < ptMin OR track pz < pzMin. The EventT0 estimated is added to the temporaryEventT0s to the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.");
+  setDescription("This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks. The EventT0 is set to NaN if there are not RecoTracks or there are not SVD clusters associated to tracks or track pt < ptMin OR track pz < pzMin. The EventT0 estimated is added to the temporaryEventT0s to the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.");
   //* Definition of input parameters */
   addParam("RecoTracks", m_recoTracks, "StoreArray with the input RecoTracks", string(""));
-  addParam("Tracks", m_tracks, "StoreArray with the input Tracks", string(""));
-  addParam("TrackFitResults", m_trkFitResults, "StoreArray with the input TrackFitResults", string(""));
   addParam("EventT0", m_eventT0, "StoreObjPtr with the input EventT0", string(""));
   addParam("ptMin", m_pt, "Cut on minimum transverse momentum pt for track selection", m_pt);
   addParam("pzMin", m_pz, "Cut on minimum longitudinal momentum pz for track selection", m_pz);
@@ -41,17 +39,11 @@ SVDEventT0EstimatorModule::~SVDEventT0EstimatorModule()
 void SVDEventT0EstimatorModule::initialize()
 {
   B2DEBUG(10, "RecoTracks: " << m_recoTracks);
-  B2DEBUG(10, "Tracks: " << m_tracks);
-  B2DEBUG(10, "TrackFitResults: " << m_trkFitResults);
   B2DEBUG(10, "EventT0: " << m_eventT0);
 
   StoreArray<RecoTrack> rTracks(m_recoTracks);
-  StoreArray<TrackFitResult> tfResults(m_trkFitResults);
-  StoreArray<Track> trks(m_tracks);
   StoreObjPtr<EventT0> eT0(m_eventT0);
   rTracks.isRequired();
-  tfResults.isRequired();
-  trks.isRequired();
   eT0.isRequired();
 }
 
@@ -75,10 +67,7 @@ void SVDEventT0EstimatorModule::event()
   // loop on recotracks
   for (const auto& recoTrack : recoTracks) {
     if (! recoTrack.wasFitSuccessful()) continue;
-    RelationVector<Track> trk = DataStore::getRelationsWithObj<Track>(&recoTrack);
-    if (trk.size() == 0) continue;
-    const TrackFitResult*  tfr = trk[0]->getTrackFitResultWithClosestMass(Const::pion);
-    TVector3 p = tfr->getMomentum();
+    TVector3 p = recoTrack.getMomentumSeed();
     double pt = p.Perp();
     double pz = p[2];
     const vector<SVDCluster* > svdClusters = recoTrack.getSVDHitList();

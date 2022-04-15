@@ -23,15 +23,13 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <genfit/TrackPoint.h>
 #include <TVector3.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <string>
 
 namespace Belle2 {
 
   /** This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks.
-   *  The EventT0 is set to NaN if there are not tracks or there are not SVD clusters associated to tracks or
+   *  The EventT0 is set to NaN if there are not RecoTracks or there are not SVD clusters associated to tracks or
    *  track pt < m_pt OR track pz < m_pz. The EventT0 estimated is added to the temporaryEventT0s to
    *  the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.
    */
@@ -64,8 +62,6 @@ namespace Belle2 {
 
     std::string m_eventT0; /**< name of StoreObj EventT0  */
     std::string m_recoTracks; /**< name of RecoTracks StoreArray */
-    std::string m_tracks; /**< name of Tracks StoreArray */
-    std::string m_trkFitResults; /**< name of TrackFitResults StoreArray */
     double m_pt = 0.25; /**< Cut on pt for track selection */
     double m_pz = 0.; /**< Cut on pz for track selection */
     std::string m_algorithm = "clsOnTrack_time_average"; /* name of the algorithm used to evaluate SVD-eventT0 */

@@ -28,8 +28,8 @@ SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
   addParam("Tracks", m_tracks, "StoreArray with the input Tracks", string("Tracks"));
   addParam("TrackFitResults", m_trkFitResults, "StoreArray with the input TrackFitResults", string("TrackFitResults"));
   addParam("EventT0", m_eventT0, "StoreObjPtr with the input EventT0", string("EventT0"));
-  addParam("ptSelection", m_pt, "Cut on transverse momentum pt for track selection (default 0.25 GeV)", 0.25);
-  addParam("pzSelection", m_pz, "Cut on longitudinal momentum pz for track selection (default 0.1 GeV)", 0.1);
+  addParam("ptSelection", m_pt, "Cut on transverse momentum pt for track selection (default is 0.25 GeV)", 0.25);
+  addParam("pzSelection", m_pz, "Cut on longitudinal momentum pz for track selection (default is 0 GeV)", 0.);
 }
 
 

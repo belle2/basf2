@@ -79,59 +79,59 @@ namespace Belle2 {
 
     std::vector<double> m_ADCtoEnergy;  /**< calibration vector form adc to energy*/
 
-    std::string m_OutputFileName; /** output filename  */
+    std::string m_OutputFileName; /**< output filename >*/
 
-    double m_EnergyThresholdGeV; /** Energy Threshold in GeV.*/
+    double m_EnergyThresholdGeV; /**< Energy Threshold in GeV. >*/
 
-    int m_EventsProcessed; /** number of events processed */
+    int m_EventsProcessed; /**< number of events processed >*/
 
-    TFile* m_rootFilePtr; /**< root file used for storing info */
+    TFile* m_rootFilePtr; /**< root file used for storing info >*/
 
-    TTree* m_tree; /**< Root tree and file for saving the output */
+    TTree* m_tree; /**< Root tree and file for saving the output >*/
 
-    int m_CellID; /**< To read ntuple branch  */
-    double m_OnlineE; /**< To read ntuple branch  */
-    double m_OfflineE;  /**< To read ntuple branch  */
-    double m_OfflineHadE; /**< To read ntuple branch  */
-    double m_Baseline; /**< To read ntuple branch  */
-    double m_BaselineRMS; /**< To read ntuple branch  */
-    double m_calibConst; /**< To read ntuple branch  */
-    double m_Chi2; /**< To read ntuple branch  */
-    double m_Chi2Save0; /**< To read ntuple branch  */
-    double m_Chi2Save1; /**< To read ntuple branch  */
-    double m_Chi2Save2; /**< To read ntuple branch  */
-    int m_FitType; /**< To read ntuple branch  */
-    int m_ADC0; /**< To read ntuple branch  */
-    int m_ADC1; /**< To read ntuple branch  */
-    int m_ADC2; /**< To read ntuple branch  */
-    int m_ADC3; /**< To read ntuple branch  */
-    int m_ADC4; /**< To read ntuple branch  */
-    int m_ADC5; /**< To read ntuple branch  */
-    int m_ADC6; /**< To read ntuple branch  */
-    int m_ADC7; /**< To read ntuple branch  */
-    int m_ADC8; /**< To read ntuple branch  */
-    int m_ADC9; /**< To read ntuple branch  */
-    int m_ADC10; /**< To read ntuple branch  */
-    int m_ADC11; /**< To read ntuple branch  */
-    int m_ADC12; /**< To read ntuple branch  */
-    int m_ADC13; /**< To read ntuple branch  */
-    int m_ADC14; /**< To read ntuple branch  */
-    int m_ADC15; /**< To read ntuple branch  */
-    int m_ADC16; /**< To read ntuple branch  */
-    int m_ADC17; /**< To read ntuple branch  */
-    int m_ADC18; /**< To read ntuple branch  */
-    int m_ADC19; /**< To read ntuple branch  */
-    int m_ADC20; /**< To read ntuple branch  */
-    int m_ADC21; /**< To read ntuple branch  */
-    int m_ADC22; /**< To read ntuple branch  */
-    int m_ADC23; /**< To read ntuple branch  */
-    int m_ADC24; /**< To read ntuple branch  */
-    int m_ADC25; /**< To read ntuple branch  */
-    int m_ADC26; /**< To read ntuple branch  */
-    int m_ADC27; /**< To read ntuple branch  */
-    int m_ADC28; /**< To read ntuple branch  */
-    int m_ADC29; /**< To read ntuple branch  */
-    int m_ADC30; /**< To read ntuple branch  */
+    int m_CellID; /**< To read ntuple branch > */
+    double m_OnlineE; /**< To read ntuple branch > */
+    double m_OfflineE;  /**< To read ntuple branch > */
+    double m_OfflineHadE; /**< To read ntuple branch > */
+    double m_Baseline; /**< To read ntuple branch > */
+    double m_BaselineRMS; /**< To read ntuple branch > */
+    double m_calibConst; /**< To read ntuple branch > */
+    double m_Chi2; /**< To read ntuple branch > */
+    double m_Chi2Save0; /**< To read ntuple branch > */
+    double m_Chi2Save1; /**< To read ntuple branch > */
+    double m_Chi2Save2; /**< To read ntuple branch > */
+    int m_FitType; /**< To read ntuple branch > */
+    int m_ADC0; /**< To read ntuple branch > */
+    int m_ADC1; /**< To read ntuple branch > */
+    int m_ADC2; /**< To read ntuple branch > */
+    int m_ADC3; /**< To read ntuple branch > */
+    int m_ADC4; /**< To read ntuple branch > */
+    int m_ADC5; /**< To read ntuple branch > */
+    int m_ADC6; /**< To read ntuple branch > */
+    int m_ADC7; /**< To read ntuple branch > */
+    int m_ADC8; /**< To read ntuple branch > */
+    int m_ADC9; /**< To read ntuple branch > */
+    int m_ADC10; /**< To read ntuple branch > */
+    int m_ADC11; /**< To read ntuple branch > */
+    int m_ADC12; /**< To read ntuple branch > */
+    int m_ADC13; /**< To read ntuple branch > */
+    int m_ADC14; /**< To read ntuple branch > */
+    int m_ADC15; /**< To read ntuple branch > */
+    int m_ADC16; /**< To read ntuple branch > */
+    int m_ADC17; /**< To read ntuple branch > */
+    int m_ADC18; /**< To read ntuple branch > */
+    int m_ADC19; /**< To read ntuple branch > */
+    int m_ADC20; /**< To read ntuple branch > */
+    int m_ADC21; /**< To read ntuple branch > */
+    int m_ADC22; /**< To read ntuple branch > */
+    int m_ADC23; /**< To read ntuple branch > */
+    int m_ADC24; /**< To read ntuple branch > */
+    int m_ADC25; /**< To read ntuple branch > */
+    int m_ADC26; /**< To read ntuple branch > */
+    int m_ADC27; /**< To read ntuple branch > */
+    int m_ADC28; /**< To read ntuple branch > */
+    int m_ADC29; /**< To read ntuple branch > */
+    int m_ADC30; /**< To read ntuple branch > */
 
   };
 } // end Belle2 namespace

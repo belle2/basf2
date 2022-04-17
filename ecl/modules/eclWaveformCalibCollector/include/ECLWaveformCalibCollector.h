@@ -77,7 +77,7 @@ namespace Belle2 {
 
     StoreArray<ECLDigit> m_eclDigits;   /**< StoreArray ECLDigit */
 
-    std::vector<double> m_ADCtoEnergy;  /**< calibration vector form adc to energy*/
+    std::vector<float> m_ADCtoEnergy;  /**< calibration vector form adc to energy*/
 
     std::string m_OutputFileName; /**< output filename >*/
 

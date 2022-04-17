@@ -73,7 +73,7 @@ void ECLWaveformCalibCollectorModule::initialize()
   m_tree->Branch("Chi2Save2", &m_Chi2Save2,      "m_Chi2Save2/D");
   m_tree->Branch("m_Baseline", &m_Baseline,      "m_Baseline/D");
   m_tree->Branch("m_BaselineRMS", &m_BaselineRMS,      "m_BaselineRMS/D");
-  m_tree->Branch("m_calibConst", &m_calibConst,      "m_calibConst/D");
+  m_tree->Branch("m_calibConst", &m_calibConst,      "m_calibConst/F");
   m_tree->Branch("ADC0", &m_ADC0,      "m_ADC0/I");
   m_tree->Branch("ADC1", &m_ADC1,      "m_ADC1/I");
   m_tree->Branch("ADC2", &m_ADC2,      "m_ADC2/I");

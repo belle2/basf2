@@ -157,10 +157,11 @@ namespace Belle2 {
 
     VARIABLE_GROUP("DirectDaughterInfo");
     REGISTER_VARIABLE("hasCharmedDaughter(i)", hasCharmedDaughter,
-                      "Returns information regarding the charm quark presence in the decay.");
+                      "The variable determines whether the particle's MC partner, which has to be a B-meson, has at least one daughter with a charm or anti-charm quark.\n"
+                      "If i = 1 is provided it checks for b -> anti-c / anti-b -> c transition and for i = -1 it checks for b -> c / anti-b -> anti-c transitions.");
     REGISTER_VARIABLE("hasCharmoniumDaughter", hasCharmoniumDaughter,
-                      "Returns information regarding the charmonium state presence in the decay.");
+                      "The variable determines whether on MC truth level a b -> c anti-c q transition was generated. The particle's MC partner must be a B-meson.");
     REGISTER_VARIABLE("hasRealPhotonDaughter", hasRealPhotonDaughter,
-                      "Returns information regarding photon daughter origin for a particle.");
+                      "The variable checks whether on MC truth level there is at least one real photon daughter, a photon that was not created by photos.");
   }
 }

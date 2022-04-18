@@ -868,7 +868,7 @@ namespace Belle2 {
         return nullptr;
       }
 
-      return [variable](const Particle * part) {
+      return [variable](const Particle * part) -> double {
         return cumulate(part, variable, 0, [](double s, double f, double) {return s + f;});
       };
     }
@@ -1089,6 +1089,11 @@ Returns the status of the fit performed with rolled back tracks. Possible values
 
     REGISTER_METAVARIABLE("TagTrackWeightedAverageSquares(var)", tagTrackWeightedAverageSquares,
                           "return the average over the tag tracks of the variable ``var``, weighted by weights of the tag vertex fitter. ``var`` must be one of the TagTrackXXX variables, for example: ``TagTrackWeightedAverageSquares(TagTrackDistanceToConstraint)``.",
+                          Manager::VariableDataType::c_double);
+
+    REGISTER_METAVARIABLE("TagTrackSum(var)", tagTrackSum,
+                          "Returns the sum of the provided variable for all tag tracks. The variable must be one of the TagTrackXXX variables, "
+                          "for example ``TagTrackSum(TagTrackD0)``. The tracks that are assigned a zero weight are ignored.",
                           Manager::VariableDataType::c_double);
   }
 }

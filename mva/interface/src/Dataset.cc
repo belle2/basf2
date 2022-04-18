@@ -311,8 +311,8 @@ namespace Belle2 {
 
     ROOTDataset::ROOTDataset(const GeneralOptions& general_options) : Dataset(general_options)
     {
-      m_input_set.resize(m_general_options.m_variables.size());
-      m_spectators_set.resize(m_general_options.m_spectators.size());
+      m_input_variant.resize(m_general_options.m_variables.size());
+      m_spectators_variant.resize(m_general_options.m_spectators.size());
       m_weight_double = 1.0;
       m_target_double = 0.0;
       m_target_int = 0;
@@ -379,28 +379,22 @@ namespace Belle2 {
       if (m_isDoubleInputType) {
         m_weight = (float) m_weight_double;
 
-        for (unsigned int i = 0; i < m_input_set.size(); i++) {
-          Variable::Manager::VariableDataType varType = m_input_set[i].first;
-
-          if (varType == Variable::Manager::VariableDataType::c_double)
-            m_input[i] = (float) std::get<double>(m_input_set[i].second);
-          else if (varType == Variable::Manager::VariableDataType::c_int)
-            m_input[i] = (float) std::get<int>(m_input_set[i].second);
-          else if (varType == Variable::Manager::VariableDataType::c_bool)
-            m_input[i] = (float) std::get<bool>(m_input_set[i].second);
+        for (unsigned int i = 0; i < m_input_variant.size(); i++) {
+          if (std::holds_alternative<double>(m_input_variant[i]))
+            m_input[i] = (float) std::get<double>(m_input_variant[i]);
+          else if (std::holds_alternative<int>(m_input_variant[i]))
+            m_input[i] = (float) std::get<int>(m_input_variant[i]);
+          else if (std::holds_alternative<bool>(m_input_variant[i]))
+            m_input[i] = (float) std::get<bool>(m_input_variant[i]);
         }
-
-        for (unsigned int i = 0; i < m_spectators_set.size(); i++) {
-          Variable::Manager::VariableDataType varType = m_spectators_set[i].first;
-
-          if (varType == Variable::Manager::VariableDataType::c_double)
-            m_spectators[i] = (float) std::get<double>(m_spectators_set[i].second);
-          else if (varType == Variable::Manager::VariableDataType::c_int)
-            m_spectators[i] = (float) std::get<int>(m_spectators_set[i].second);
-          else if (varType == Variable::Manager::VariableDataType::c_bool)
-            m_spectators[i] = (float) std::get<bool>(m_spectators_set[i].second);
+        for (unsigned int i = 0; i < m_spectators_variant.size(); i++) {
+          if (std::holds_alternative<double>(m_spectators_variant[i]))
+            m_spectators[i] = (float) std::get<double>(m_spectators_variant[i]);
+          else if (std::holds_alternative<int>(m_spectators_variant[i]))
+            m_spectators[i] = (float) std::get<int>(m_spectators_variant[i]);
+          else if (std::holds_alternative<bool>(m_spectators_variant[i]))
+            m_spectators[i] = (float) std::get<bool>(m_spectators_variant[i]);
         }
-
       }
 
       if (m_target_data_type == Variable::Manager::VariableDataType::c_double)
@@ -450,13 +444,12 @@ namespace Belle2 {
       std::string typeName = "features";
 
       if (m_isDoubleInputType) {
-        Variable::Manager::VariableDataType varType = m_input_set[iFeature].first;
-        if (varType == Variable::Manager::VariableDataType::c_double)
-          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<double>(m_input_set[iFeature].second));
-        else if (varType == Variable::Manager::VariableDataType::c_int)
-          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<int>(m_input_set[iFeature].second));
-        else if (varType == Variable::Manager::VariableDataType::c_bool)
-          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<bool>(m_input_set[iFeature].second));
+        if (std::holds_alternative<double>(m_input_variant[iFeature]))
+          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<double>(m_input_variant[iFeature]));
+        else if (std::holds_alternative<int>(m_input_variant[iFeature]))
+          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<int>(m_input_variant[iFeature]));
+        else if (std::holds_alternative<bool>(m_input_variant[iFeature]))
+          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<bool>(m_input_variant[iFeature]));
       }
 
       return ROOTDataset::getVectorFromTTree(typeName, branchName, m_input[iFeature]);
@@ -473,13 +466,12 @@ namespace Belle2 {
       std::string typeName = "spectators";
 
       if (m_isDoubleInputType) {
-        Variable::Manager::VariableDataType varType = m_spectators_set[iSpectator].first;
-        if (varType == Variable::Manager::VariableDataType::c_double)
-          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<double>(m_spectators_set[iSpectator].second));
-        else if (varType == Variable::Manager::VariableDataType::c_int)
-          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<int>(m_spectators_set[iSpectator].second));
-        else if (varType == Variable::Manager::VariableDataType::c_bool)
-          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<bool>(m_spectators_set[iSpectator].second));
+        if (std::holds_alternative<double>(m_spectators_variant[iSpectator]))
+          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<double>(m_spectators_variant[iSpectator]));
+        else if (std::holds_alternative<int>(m_spectators_variant[iSpectator]))
+          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<int>(m_spectators_variant[iSpectator]));
+        else if (std::holds_alternative<bool>(m_spectators_variant[iSpectator]))
+          return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<bool>(m_spectators_variant[iSpectator]));
       }
 
       return ROOTDataset::getVectorFromTTree(typeName, branchName, m_spectators[iSpectator]);
@@ -563,16 +555,15 @@ namespace Belle2 {
     }
 
     void ROOTDataset::setVectorVariableAddress(std::string& variableType, std::vector<std::string>& variableNames,
-                                               std::vector<VariableSet>& variableSetTargets)
+                                               std::vector<Variable::Manager::VarVariant>& varVariantTargets)
     {
       for (unsigned int i = 0; i < variableNames.size(); ++i) {
-        Variable::Manager::VariableDataType varType = variableSetTargets[i].first;
-        if (varType == Variable::Manager::VariableDataType::c_double)
-          ROOTDataset::setScalarVariableAddress(variableType, variableNames[i], std::get<double>(variableSetTargets[i].second));
-        else if (varType == Variable::Manager::VariableDataType::c_int)
-          ROOTDataset::setScalarVariableAddress(variableType, variableNames[i], std::get<int>(variableSetTargets[i].second));
-        else if (varType == Variable::Manager::VariableDataType::c_bool)
-          ROOTDataset::setScalarVariableAddress(variableType, variableNames[i], std::get<bool>(variableSetTargets[i].second));
+        if (std::holds_alternative<double>(varVariantTargets[i]))
+          ROOTDataset::setScalarVariableAddress(variableType, variableNames[i], std::get<double>(varVariantTargets[i]));
+        else if (std::holds_alternative<int>(varVariantTargets[i]))
+          ROOTDataset::setScalarVariableAddress(variableType, variableNames[i], std::get<int>(varVariantTargets[i]));
+        else if (std::holds_alternative<bool>(varVariantTargets[i]))
+          ROOTDataset::setScalarVariableAddress(variableType, variableNames[i], std::get<bool>(varVariantTargets[i]));
       }
     }
 
@@ -622,9 +613,9 @@ namespace Belle2 {
 
       if (m_isDoubleInputType) {
         typeName = "feature";
-        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_variables, m_input_set);
+        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_variables, m_input_variant);
         typeName = "spectator";
-        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_spectators, m_spectators_set);
+        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_spectators, m_spectators_variant);
       } else {
         typeName = "feature";
         ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_variables, m_input);
@@ -651,17 +642,16 @@ namespace Belle2 {
             return;
           }
 
-          if (type_name == "Double_t") {
-            m_input_set[i] = VariableSet(Variable::Manager::VariableDataType::c_double, {0.0, 0, false});
-          } else if (type_name == "Int_t") {
-            m_input_set[i] = VariableSet(Variable::Manager::VariableDataType::c_int, {0.0, 0, false});
-          } else if (type_name == "Bool_t") {
-            m_input_set[i] = VariableSet(Variable::Manager::VariableDataType::c_bool, {0.0, 0, false});
-          } else {
+          if (type_name == "Double_t")
+            m_input_variant[i] = 0.0;
+          else if (type_name == "Int_t")
+            m_input_variant[i] = 0;
+          else if (type_name == "Bool_t")
+            m_input_variant[i] = false;
+          else {
             B2FATAL("Unknown root input type: " << type_name);
             throw std::runtime_error("Unknown root input type: " + type_name);
           }
-
         }
       }
 
@@ -677,18 +667,16 @@ namespace Belle2 {
             m_isDoubleInputType = false;
             return;
           }
-
-          if (type_name == "Double_t") {
-            m_spectators_set[i] = VariableSet(Variable::Manager::VariableDataType::c_double, {0.0, 0, false});
-          } else if (type_name == "Int_t") {
-            m_spectators_set[i] = VariableSet(Variable::Manager::VariableDataType::c_int, {0.0, 0, false});
-          } else if (type_name == "Bool_t") {
-            m_spectators_set[i] = VariableSet(Variable::Manager::VariableDataType::c_bool, {0.0, 0, false});
-          } else {
+          if (type_name == "Double_t")
+            m_spectators_variant[i] = 0.0;
+          else if (type_name == "Int_t")
+            m_spectators_variant[i] = 0;
+          else if (type_name == "Bool_t")
+            m_spectators_variant[i] = false;
+          else {
             B2FATAL("Unknown root input type: " << type_name);
             throw std::runtime_error("Unknown root input type: " + type_name);
           }
-
         }
       }
 

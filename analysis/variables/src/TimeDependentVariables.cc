@@ -951,38 +951,32 @@ namespace Belle2 {
                       "[Expert] [Debugging] This variable is only for internal checks of the TagV module by developers. \n"
                       "It returns the internal mc flavor information of the tag-side B provided by the TagV module.");
 
-    REGISTER_METAVARIABLE("TagTrackMomentum(i) ", tagTrackMomentum,
-                          "return the magnitude of the momentum of the ith track used in the tag vtx fit.", "GeV/c", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("TagTrackMomentumX(i) ", tagTrackMomentumX,
-                          "return the X component of the momentum of the ith track used in the tag vtx fit.", "GeV/c", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("TagTrackMomentumY(i) ", tagTrackMomentumY,
-                          "return the Y component of the momentum of the ith track used in the tag vtx fit.", "GeV/c", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("TagTrackMomentumZ(i) ", tagTrackMomentumZ,
-                          "return the Z component of the momentum of the ith track used in the tag vtx fit.", "GeV/c", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackMomentum(i) ", tagTrackMomentum,
+                      "Returns the magnitude of the momentum of the ith track used in the tag vtx fit.", "GeV/c");
+    REGISTER_VARIABLE("TagTrackMomentumX(i) ", tagTrackMomentumX,
+                      "Returns the X component of the momentum of the ith track used in the tag vtx fit.", "GeV/c");
+    REGISTER_VARIABLE("TagTrackMomentumY(i) ", tagTrackMomentumY,
+                      "Returns the Y component of the momentum of the ith track used in the tag vtx fit.", "GeV/c");
+    REGISTER_VARIABLE("TagTrackMomentumZ(i) ", tagTrackMomentumZ,
+                      "Returns the Z component of the momentum of the ith track used in the tag vtx fit.", "GeV/c");
 
-    REGISTER_METAVARIABLE("TagTrackZ0(i)", tagTrackZ0, "return the z0 parameter of the ith track used in the tag vtx fit", "cm",
-                          Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("TagTrackD0(i)", tagTrackD0, "return the d0 parameter of the ith track used in the tag vtx fit", "cm",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackZ0(i)", tagTrackZ0, "Returns the z0 parameter of the ith track used in the tag vtx fit", "cm");
+    REGISTER_VARIABLE("TagTrackD0(i)", tagTrackD0, "Returns the d0 parameter of the ith track used in the tag vtx fit", "cm");
 
 
-    REGISTER_METAVARIABLE("TagTrackRaveWeight(i)", tagTrackRaveWeight, "returns the weight assigned by Rave to track i",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackRaveWeight(i)", tagTrackRaveWeight, "Returns the weight assigned by Rave to track i");
 
     REGISTER_VARIABLE("TagVNFitTracks", particleTagVNFitTracks,
                       "returns the number of tracks used by rave to fit the vertex (not counting the ones coming from Kshorts)");
 
-    REGISTER_METAVARIABLE("TagTrackDistanceToConstraint(i)", tagTrackDistanceToConstraint,
-                          "returns the measured distance between the ith tag track and the centre of the constraint.", "cm",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackDistanceToConstraint(i)", tagTrackDistanceToConstraint,
+                      "Returns the measured distance between the ith tag track and the centre of the constraint.", "cm");
 
-    REGISTER_METAVARIABLE("TagTrackDistanceToConstraintErr(i)", tagTrackDistanceToConstraintErr,
-                          "returns the estimated error on the distance between the ith tag track and the centre of the constraint.", "cm",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackDistanceToConstraintErr(i)", tagTrackDistanceToConstraintErr,
+                      "Returns the estimated error on the distance between the ith tag track and the centre of the constraint.", "cm");
 
-    REGISTER_METAVARIABLE("TagTrackDistanceToConstraintSignificance(i)", tagTrackDistanceToConstraintSignificance,
-                          "returns the significance of the distance between the centre of the constraint and the tag track indexed by track index (computed as distance / uncertainty)",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackDistanceToConstraintSignificance(i)", tagTrackDistanceToConstraintSignificance,
+                      "Returns the significance of the distance between the centre of the constraint and the tag track indexed by track index (computed as distance / uncertainty)");
 
 
     REGISTER_VARIABLE("TagVDistanceToConstraint", tagVDistanceToConstraint,
@@ -994,60 +988,50 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVDistanceToConstraintSignificance", tagVDistanceToConstraintSignificance,
                       "returns the significance of the distance between the tag vtx and the centre of the constraint (computed as distance / uncertainty)");
 
-    REGISTER_METAVARIABLE("TagTrackDistanceToTagV(i)", tagTrackDistanceToTagV,
-                          "returns the measured distance between the ith tag track and the tag vtx.", "cm", Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackDistanceToTagV(i)", tagTrackDistanceToTagV,
+                      "Returns the measured distance between the ith tag track and the tag vtx.", "cm");
 
-    REGISTER_METAVARIABLE("TagTrackDistanceToTagVErr(i)", tagTrackDistanceToTagVErr,
-                          "returns the estimated error on the distance between the ith tag track and the tag vtx. Warning: only the uncertainties on the track position parameters are taken into account.",
-                          "cm",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackDistanceToTagVErr(i)", tagTrackDistanceToTagVErr, R"DOC(
+                      "Returns the estimated error on the distance between the ith tag track and the tag vtx.
 
-    REGISTER_METAVARIABLE("TagTrackDistanceToTagVSignificance(i)", tagTrackDistanceToTagVSignificance,
-                          "returns the significance of the distance between the tag vtx and the tag track indexed by trackIndex (computed as distance / uncertainty)",
-                          Manager::VariableDataType::c_double);
+                       .. warning:: Only the uncertainties on the track position parameters are taken into account.
+                       )DOC", "cm");
 
-    REGISTER_METAVARIABLE("TagTrackTrueDistanceToTagV(i)", tagTrackTrueDistanceToTagV,
-                          "return the true distance between the true B Tag decay vertex and the p'cle corresponding to the ith tag vtx track.", "cm",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackDistanceToTagVSignificance(i)", tagTrackDistanceToTagVSignificance,
+                      "Returns the significance of the distance between the tag vtx and the tag track indexed by trackIndex (computed as distance / uncertainty)");
 
-    REGISTER_METAVARIABLE("TagTrackTrueVecToTagVX(i)", tagTrackTrueVecToTagVX,
-                          "return the X coordinate of the vector between the mc particle corresponding to the ith tag vtx track and the true tag B decay vertex.",
-                          "cm",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueDistanceToTagV(i)", tagTrackTrueDistanceToTagV,
+                      "Returns the true distance between the true B Tag decay vertex and the particle corresponding to the ith tag vtx track.", "cm");
 
-    REGISTER_METAVARIABLE("TagTrackTrueVecToTagVY(i)", tagTrackTrueVecToTagVY,
-                          "return the Y coordinate of the vector between the mc particle corresponding to the ith tag vtx track and the true tag B decay vertex.",
-                          "cm",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueVecToTagVX(i)", tagTrackTrueVecToTagVX,
+                      "Returns the X coordinate of the vector between the mc particle corresponding to the ith tag vtx track and the true tag B decay vertex.",
+                      "cm");
 
-    REGISTER_METAVARIABLE("TagTrackTrueVecToTagVZ(i)", tagTrackTrueVecToTagVZ,
-                          "return the Z coordinate of the vector between the mc particle corresponding to the ith tag vtx track and the true tag B decay vertex.",
-                          "cm",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueVecToTagVY(i)", tagTrackTrueVecToTagVY,
+                      "Returns the Y coordinate of the vector between the mc particle corresponding to the ith tag vtx track and the true tag B decay vertex.",
+                      "cm");
 
-    REGISTER_METAVARIABLE("TagTrackTrueMomentumX(i)", tagTrackTrueMomentumX,
-                          "return the X component of the true momentum of the MC particle corresponding to the ith tag vtx track.", "GeV/c",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueVecToTagVZ(i)", tagTrackTrueVecToTagVZ,
+                      "Returns the Z coordinate of the vector between the mc particle corresponding to the ith tag vtx track and the true tag B decay vertex.",
+                      "cm");
 
-    REGISTER_METAVARIABLE("TagTrackTrueMomentumY(i)", tagTrackTrueMomentumY,
-                          "return the Y component of the true momentum of the MC particle corresponding to the ith tag vtx track.", "GeV/c",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueMomentumX(i)", tagTrackTrueMomentumX,
+                      "Returns the X component of the true momentum of the MC particle corresponding to the ith tag vtx track.", "GeV/c");
 
-    REGISTER_METAVARIABLE("TagTrackTrueMomentumZ(i)", tagTrackTrueMomentumZ,
-                          "return the Z component of the true momentum of the MC particle corresponding to the ith tag vtx track.", "GeV/c",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueMomentumY(i)", tagTrackTrueMomentumY,
+                      "Returns the Y component of the true momentum of the MC particle corresponding to the ith tag vtx track.", "GeV/c");
 
-    REGISTER_METAVARIABLE("TagTrackTrueOriginX(i)", tagTrackTrueOriginX,
-                          "return the X component of the true origin of the MC particle corresponding to the ith tag vtx track.", "cm",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueMomentumZ(i)", tagTrackTrueMomentumZ,
+                      "Returns the Z component of the true momentum of the MC particle corresponding to the ith tag vtx track.", "GeV/c");
 
-    REGISTER_METAVARIABLE("TagTrackTrueOriginY(i)", tagTrackTrueOriginY,
-                          "return the Y component of the true origin of the MC particle corresponding to the ith tag vtx track.", "cm",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueOriginX(i)", tagTrackTrueOriginX,
+                      "Returns the X component of the true origin of the MC particle corresponding to the ith tag vtx track.", "cm");
 
-    REGISTER_METAVARIABLE("TagTrackTrueOriginZ(i)", tagTrackTrueOriginZ,
-                          "return the Z component of the true origin of the MC particle corresponding to the ith tag vtx track.", "cm",
-                          Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("TagTrackTrueOriginY(i)", tagTrackTrueOriginY,
+                      "Returns the Y component of the true origin of the MC particle corresponding to the ith tag vtx track.", "cm");
+
+    REGISTER_VARIABLE("TagTrackTrueOriginZ(i)", tagTrackTrueOriginZ,
+                      "Returns the Z component of the true origin of the MC particle corresponding to the ith tag vtx track.", "cm");
 
     REGISTER_VARIABLE("TagVFitTruthStatus", fitTruthStatus, R"DOC(
 Returns the status of the fit performed with the truth info. Possible values are:

@@ -54,33 +54,38 @@ void TRGECLUnpackerModule::event()
 
   StoreArray<RawTRG> raw_trgarray;
 
-  for (int i = 0; i < raw_trgarray.getEntries(); i++) {
+  for (int i = 0; i < raw_trgarray.getEntries(); i++) { // # of readout boards
     iFiness = i;
-    for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
+    for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) { // Basically 1 entry
       nodeid     = ((raw_trgarray[i]->GetNodeID(j)) >> 24) & 0x1F;
-      nwords     = raw_trgarray[i]->GetDetectorNwords(j, 0);
       trgtype    = raw_trgarray[i]->GetTRGType(j);
       n_basf2evt = raw_trgarray[i]->GetEveNo(j);
       if (nodeid == 0x13) {
-        if (nwords < 9) {
-          B2ERROR("Consistecy error in unpacker.");
-          B2ERROR("data length " << nwords << " nWord " << nwords);
-          B2ERROR("Node ID " << nodeid << ", Finness ID " << iFiness);
-          continue;
+        for (int ch = 0; ch < raw_trgarray[i]->GetMaxNumOfCh(j); ch++) { // ch in a readout board
+          nwords     = raw_trgarray[i]->GetDetectorNwords(j, ch);
+          if (nwords == 0) {
+            continue; // This channel might be masked.
+          } else if (nwords < 9) {
+            B2ERROR("Consistecy error in unpacker.");
+            B2ERROR("data length " << nwords << " nWord " << nwords);
+            B2ERROR("Node ID " << nodeid << ", Finness ID " << iFiness);
+            continue;
+          }
+          readCOPPEREvent(raw_trgarray[i], j, nwords, ch);
         }
-        readCOPPEREvent(raw_trgarray[i], j, nwords);
       }
     }
   }
 }
 
-void TRGECLUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i, int nnn)
+void TRGECLUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i, int nnn, int ch)
 {
   /* cppcheck-suppress variableScope */
   int* rdat;
-  if (raw_copper->GetDetectorNwords(i, 0) > 0) {
-    rdat = raw_copper->GetDetectorBuffer(i, 0);
+  if (raw_copper->GetDetectorNwords(i, ch) > 0) {
+    rdat = raw_copper->GetDetectorBuffer(i, ch);
     etm_version = ((rdat[0] >> 16) & 0xffff);
+    B2INFO("ch " << ch << " nWord " << nnn << " etm_ver " << etm_version);
     if (etm_version > 136) {
       checkBuffer(rdat, nnn);
     } else  {

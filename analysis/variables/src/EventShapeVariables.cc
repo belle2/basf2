@@ -749,19 +749,19 @@ Evaluates a variable value in the thrust reference frame.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","cm");
     REGISTER_VARIABLE("thrustAxisY", thrustAxisY, R"DOC(
 [Eventbased] Y component of the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","cm");
     REGISTER_VARIABLE("thrustAxisZ", thrustAxisZ, R"DOC(
 [Eventbased] Z component of the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","cm");
     REGISTER_VARIABLE("thrustAxisCosTheta", thrustAxisCosTheta, R"DOC(      
 [Eventbased] Cosine of the polar angle component of the thrust axis.
 
@@ -774,74 +774,73 @@ Evaluates a variable value in the thrust reference frame.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("forwardHemisphereX", forwardHemisphereX, R"DOC(
 [Eventbased] X component of the total momentum of the particles flying in the same direction as the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("forwardHemisphereY", forwardHemisphereY, R"DOC(
 [Eventbased] Y component of the total momentum of the particles flying in the same direction as the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("forwardHemisphereZ", forwardHemisphereZ, R"DOC(
 [Eventbased] Z component of the total momentum of the particles flying in the same  direction of the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("forwardHemisphereMomentum", forwardHemisphereMomentum, R"DOC(
 [Eventbased] Total momentum of the particles flying in the same direction as the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("forwardHemisphereEnergy", forwardHemisphereEnergy, R"DOC(
 [Eventbased] Total energy of the particles flying in the same direction as the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
-
+)DOC","GeV");
     REGISTER_VARIABLE("backwardHemisphereMass", backwardHemisphereMass, R"DOC(
 [Eventbased] Invariant mass of the particles flying in the direction opposite to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("backwardHemisphereX", backwardHemisphereX, R"DOC(
 [Eventbased] X component of the total momentum of the particles flying in the direction opposite to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("backwardHemisphereY", backwardHemisphereY, R"DOC(
 [Eventbased] Y component of the total momentum of the particles flying in the direction opposite to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("backwardHemisphereZ", backwardHemisphereZ, R"DOC(
 [Eventbased] Z component of the total momentum of the particles flying in the direction opposite to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("backwardHemisphereMomentum", backwardHemisphereMomentum, R"DOC(
 [Eventbased] Total momentum of the particles flying in the direction opposite to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("backwardHemisphereEnergy", backwardHemisphereEnergy, R"DOC(
 [Eventbased] Total energy of the particles flying in the direction opposite to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV");
 
   }
 }

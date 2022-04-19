@@ -105,8 +105,8 @@ def ksFinder(
     centralDB = "KsFinder_dev"
     basf2.conditions.prepend_globaltag(centralDB)
     add_default_ks_finder_aliases()
-    identifier_Ks = 'sugiura_KsFinder_V0Selector',
-    identifier_vLambda = 'sugiura_KsFinder_LambdaVeto',
+    identifier_Ks = "sugiura_KsFinder_V0Selector"
+    identifier_vLambda = "sugiura_KsFinder_LambdaVeto"
     useLocalDB = not useCentralDB
 
     # ****************************************
@@ -128,7 +128,7 @@ def ksFinder(
     path.add_module('MVAMultipleExperts',
                     listNames=particleList,
                     extraInfoNames=[extraInfoName_V0Selector, extraInfoName_LambdaVeto],
-                    identifier=[identifier_Ks, identifier_vLambda])
+                    identifiers=[identifier_Ks, identifier_vLambda])
 
     _effnames = ['all', 'standard', 'tight', 'loose']
     if listtype not in _effnames:

@@ -85,7 +85,6 @@ void TRGECLUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i, int nnn, i
   if (raw_copper->GetDetectorNwords(i, ch) > 0) {
     rdat = raw_copper->GetDetectorBuffer(i, ch);
     etm_version = ((rdat[0] >> 16) & 0xffff);
-    B2INFO("ch " << ch << " nWord " << nnn << " etm_ver " << etm_version);
     if (etm_version > 136) {
       checkBuffer(rdat, nnn);
     } else  {

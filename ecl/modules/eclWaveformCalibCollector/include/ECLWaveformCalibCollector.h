@@ -81,7 +81,9 @@ namespace Belle2 {
 
     std::string m_OutputFileName; /**< output filename >*/
 
-    double m_EnergyThresholdGeV; /**< Energy Threshold in GeV. >*/
+    double m_LowEnergyThresholdGeV; /**< Low Energy Threshold in GeV. >*/
+
+    double m_HighEnergyThresholdGeV; /**< High Energy Threshold in GeV. >*/
 
     int m_EventsProcessed; /**< number of events processed >*/
 

@@ -33,7 +33,8 @@ ECLWaveformCalibCollectorModule::ECLWaveformCalibCollectorModule()
   setDescription("Module to export waveforms to ntuple for template calibration.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("OutputFileName", m_OutputFileName, "Output file directory.", std::string("input"));
-  addParam("EnergyThresholdGeV", m_EnergyThresholdGeV, "Energy Threshold in GeV.", 1.0);
+  addParam("LowEnergyThresholdGeV", m_LowEnergyThresholdGeV, "Low Energy Threshold in GeV.", 1.0);
+  addParam("HighEnergyThresholdGeV", m_HighEnergyThresholdGeV, "High Energy Threshold in GeV.", 5.5);
 }
 
 // destructor
@@ -123,7 +124,7 @@ void ECLWaveformCalibCollectorModule::event()
 
     double energy = amplitude * m_ADCtoEnergy[cellid - 1];
 
-    if (energy > m_EnergyThresholdGeV) {
+    if (energy > m_LowEnergyThresholdGeV && energy < m_HighEnergyThresholdGeV) {
       for (auto& aECLDsp : m_eclDSPs) {
         if (aECLDsp.getCellId() == cellid) {
           m_Chi2 = aECLDsp.getTwoComponentChi2();

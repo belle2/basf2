@@ -138,15 +138,17 @@ void ECLWaveformCalibCollectorModule::event()
           m_calibConst = m_ADCtoEnergy[cellid - 1];
 
           //computing baseline noise
+          const double BaselineLimit = 10.0;
+          double iLimit = 1. / BaselineLimit;
           double baselinemean = 0.0;
-          for (int i = 0; i < 10; i++) baselinemean += aECLDsp.getDspA()[i];
-          baselinemean = baselinemean * 0.1;
+          for (int i = 0; i < BaselineLimit; i++) baselinemean += aECLDsp.getDspA()[i];
+          baselinemean = baselinemean * iLimit;
           double baslineRMS = 0.0;
-          for (int i = 0; i < 10; i++) {
+          for (int i = 0; i < BaselineLimit; i++) {
             double temp = aECLDsp.getDspA()[i] - baselinemean;
             baslineRMS += (temp * temp);
           }
-          baslineRMS *= 0.1;
+          baslineRMS *= iLimit;//squared
 
           m_Baseline = baselinemean;
           m_BaselineRMS = baslineRMS;

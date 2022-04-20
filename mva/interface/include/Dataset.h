@@ -466,7 +466,7 @@ namespace Belle2 {
 
     protected:
       TChain* m_tree = nullptr; /**< Pointer to the TChain containing the data */
-      bool m_isDoubleInputType = true; /**< Defines the expected datatype in the ROOT file */
+      bool m_isFloatInputType = true; /**< Defines the expected datatype in the ROOT file */
       std::vector<Variable::Manager::VarVariant> m_input_variant; /**< Contains all feature values of the currently loaded event */
       std::vector<Variable::Manager::VarVariant>
       m_spectators_variant; /**< Contains all spectators values of the currently loaded event */

@@ -376,7 +376,8 @@ namespace Belle2 {
       if (m_tree->GetEntry(event, 0) == 0) {
         B2ERROR("Error during loading entry from chain");
       }
-      if (m_isDoubleInputType) {
+
+      if (!m_isFloatInputType) {
         m_weight = (float) m_weight_double;
 
         for (unsigned int i = 0; i < m_input_variant.size(); i++) {
@@ -427,10 +428,12 @@ namespace Belle2 {
 
       std::string typeName = "weights";
 
-      if (m_isDoubleInputType)
+      if (m_isFloatInputType)
+        return ROOTDataset::getVectorFromTTree(typeName, branchName, m_weight);
+      else
         return ROOTDataset::getVectorFromTTree(typeName, branchName, m_weight_double);
 
-      return ROOTDataset::getVectorFromTTree(typeName, branchName, m_weight);
+
     }
 
     std::vector<float> ROOTDataset::getFeature(unsigned int iFeature)
@@ -443,7 +446,7 @@ namespace Belle2 {
       std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_variables[iFeature]);
       std::string typeName = "features";
 
-      if (m_isDoubleInputType) {
+      if (!m_isFloatInputType) {
         if (std::holds_alternative<double>(m_input_variant[iFeature]))
           return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<double>(m_input_variant[iFeature]));
         else if (std::holds_alternative<int>(m_input_variant[iFeature]))
@@ -465,7 +468,7 @@ namespace Belle2 {
       std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(m_general_options.m_spectators[iSpectator]);
       std::string typeName = "spectators";
 
-      if (m_isDoubleInputType) {
+      if (!m_isFloatInputType) {
         if (std::holds_alternative<double>(m_spectators_variant[iSpectator]))
           return ROOTDataset::getVectorFromTTree(typeName, branchName, std::get<double>(m_spectators_variant[iSpectator]));
         else if (std::holds_alternative<int>(m_spectators_variant[iSpectator]))
@@ -582,22 +585,22 @@ namespace Belle2 {
       if (m_general_options.m_weight_variable == "__weight__") {
         if (checkForBranch(m_tree, "__weight__")) {
           m_tree->SetBranchStatus("__weight__", true);
-          if (m_isDoubleInputType)
-            m_tree->SetBranchAddress("__weight__", &m_weight_double);
-          else
+          if (m_isFloatInputType)
             m_tree->SetBranchAddress("__weight__", &m_weight);
+          else
+            m_tree->SetBranchAddress("__weight__", &m_weight_double);
         } else {
           B2INFO("Couldn't find default weight feature named __weight__, all weights will be 1. Consider setting the "
                  "weight variable to an empty string if you don't need it.");
           m_weight = 1;
           m_weight_double = 1;
         }
-      } else if (m_isDoubleInputType) {
-        typeName = "weight";
-        ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_weight_variable, m_weight_double);
-      } else {
+      } else if (m_isFloatInputType) {
         typeName = "weight";
         ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_weight_variable, m_weight);
+      } else {
+        typeName = "weight";
+        ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_weight_variable, m_weight_double);
       }
 
       if (m_target_data_type == Variable::Manager::VariableDataType::c_double) {
@@ -611,24 +614,22 @@ namespace Belle2 {
         ROOTDataset::setScalarVariableAddress(typeName, m_general_options.m_target_variable, m_target_bool);
       }
 
-      if (m_isDoubleInputType) {
-        typeName = "feature";
-        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_variables, m_input_variant);
-        typeName = "spectator";
-        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_spectators, m_spectators_variant);
-      } else {
+      if (m_isFloatInputType) {
         typeName = "feature";
         ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_variables, m_input);
         typeName = "spectator";
         ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_spectators, m_spectators);
+      } else {
+        typeName = "feature";
+        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_variables, m_input_variant);
+        typeName = "spectator";
+        ROOTDataset::setVectorVariableAddress(typeName, m_general_options.m_spectators, m_spectators_variant);
       }
     }
 
 
     void ROOTDataset::setRootInputType()
     {
-      m_isDoubleInputType = true;
-
       for (unsigned int i = 0; i < m_general_options.m_variables.size(); i++) {
         auto variable = m_general_options.m_variables[i];
         std::string branchName = Belle2::MakeROOTCompatible::makeROOTCompatible(variable);
@@ -637,18 +638,32 @@ namespace Belle2 {
           TBranch* branch = m_tree->GetBranch(branchName.c_str());
           TLeaf* leaf = branch->GetLeaf(branchName.c_str());
           std::string type_name = leaf->GetTypeName();
-          if (type_name == "Float_t") {
-            m_isDoubleInputType = false;
-            return;
+
+          // m_isFloatInputType is decided from the first input variable.
+          if (i == 0) {
+            if (type_name == "Float_t")
+              m_isFloatInputType = true;
+            else
+              m_isFloatInputType = false;
           }
 
-          if (type_name == "Double_t")
-            m_input_variant[i] = 0.0;
-          else if (type_name == "Int_t")
-            m_input_variant[i] = 0;
-          else if (type_name == "Bool_t")
-            m_input_variant[i] = false;
-          else {
+          if (type_name == "Float_t") {
+            if (m_isFloatInputType)
+              continue;
+            else
+              B2ERROR("There is a mix of float and basf2 variable types (double, int, bool)");
+          } else if (type_name == "Double_t" or type_name == "Int_t" or type_name == "Bool_t") {
+            if (m_isFloatInputType)
+              B2ERROR("There is a mix of float and basf2 variable types (double, int, bool)");
+            else {
+              if (type_name == "Double_t")
+                m_input_variant[i] = 0.0;
+              else if (type_name == "Int_t")
+                m_input_variant[i] = 0;
+              else if (type_name == "Bool_t")
+                m_input_variant[i] = false;
+            }
+          } else {
             B2FATAL("Unknown root input type: " << type_name);
             throw std::runtime_error("Unknown root input type: " + type_name);
           }
@@ -664,16 +679,22 @@ namespace Belle2 {
           TLeaf* leaf = branch->GetLeaf(branchName.c_str());
           std::string type_name = leaf->GetTypeName();
           if (type_name == "Float_t") {
-            m_isDoubleInputType = false;
-            return;
-          }
-          if (type_name == "Double_t")
-            m_spectators_variant[i] = 0.0;
-          else if (type_name == "Int_t")
-            m_spectators_variant[i] = 0;
-          else if (type_name == "Bool_t")
-            m_spectators_variant[i] = false;
-          else {
+            if (m_isFloatInputType)
+              continue;
+            else
+              B2ERROR("There is a mix of float and basf2 variable types (double, int, bool)");
+          } else if (type_name == "Double_t" or type_name == "Int_t" or type_name == "Bool_t") {
+            if (m_isFloatInputType)
+              B2ERROR("There is a mix of float and basf2 variable types (double, int, bool)");
+            else {
+              if (type_name == "Double_t")
+                m_input_variant[i] = 0.0;
+              else if (type_name == "Int_t")
+                m_input_variant[i] = 0;
+              else if (type_name == "Bool_t")
+                m_input_variant[i] = false;
+            }
+          } else {
             B2FATAL("Unknown root input type: " << type_name);
             throw std::runtime_error("Unknown root input type: " + type_name);
           }

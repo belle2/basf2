@@ -82,48 +82,42 @@ def ksFinder(
     listtype='all',
     extraInfoName_V0Selector='KsFinder_V0Selector',
     extraInfoName_LambdaVeto='KsFinder_LambdaVeto',
+    identifier_Ks="sugiura_KsFinder_V0Selector",
+    identifier_vLambda="sugiura_KsFinder_LambdaVeto",
     useCentralDB=True,
     localDB='',
     path=None
 ):
     """
-    Defines the configuration of Ks Finder process for each Ks candidates
-    of the input particle list.
+    Defines the configuration of KsFinder process for the input particle list.
 
-    @param particleLists                reconstructed Ks list with 2 charged daughters
+    @param particleLists                reconstructed Ks list with 2 charged daughters.
     @param listtype                     Type of Ks cut. When 'all'(default), no cut is applied on Ks.
                                         When 'standard', 'tight', or 'loose', a cut with Ks efficiency
                                         90%, 95%, and 85% is applied.
-    @param extraInfoName_V0Selector     Variable name for V0Selector MVA output
-    @param extraInfoName_LambdaVeto     Variable name for LambdaVeto MVA output
+    @param extraInfoName_V0Selector     Variable name for V0Selector MVA output.
+    @param extraInfoName_LambdaVeto     Variable name for LambdaVeto MVA output.
+    @param identifier_Ks                Identifier name for V0Selector weight file.
+    @param identifier_vLambda           Identifier name for LambdaVeto weight file.
     @param useCentralDB                 Flag whether weight file is taken from globaltag or local.
-                                        If false, weight file is taken from local file specified by localDB.
+                                        If False, weight file is taken from local file specified by localDB.
     @param localDB                      Path for local weight file for MVA.
                                         Only valid when useCentralDB == False.
-    @param path                         Basf2 path to execute
+    @param path                         Basf2 path to execute.
     """
-    centralDB = "KsFinder_dev"
-    basf2.conditions.prepend_globaltag(centralDB)
     add_default_ks_finder_aliases()
-    identifier_Ks = "sugiura_KsFinder_V0Selector"
-    identifier_vLambda = "sugiura_KsFinder_LambdaVeto"
-    useLocalDB = not useCentralDB
-
-    # ****************************************
-    # Do the Ks classification
-    # ****************************************
     particleList = [particleListName]
 
-    if useLocalDB and useCentralDB is False:
+    if useCentralDB:
+        centralDB = "KsFinder_dev"
+        B2INFO('KsFinder: use extra central database:'+centralDB)
+        basf2.conditions.prepend_globaltag(centralDB)
+    else:
         if os.path.exists(localDB):
             B2INFO('KsFinder: use local database:'+localDB)
             basf2.conditions.append_testing_payloads(localDB)
         else:
             B2FATAL('KsFinder: No local database is found.')
-    elif useLocalDB is False and useCentralDB:
-        B2INFO('KsFinder: use extra central database:'+centralDB)
-    else:
-        B2FATAL('KsFinder: please specify to use weight file from only local or only central database.')
 
     path.add_module('MVAMultipleExperts',
                     listNames=particleList,

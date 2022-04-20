@@ -81,9 +81,9 @@ namespace Belle2 {
 
     std::string m_OutputFileName; /**< output filename >*/
 
-    double m_LowEnergyThresholdGeV; /**< Low Energy Threshold in GeV. >*/
+    float m_LowEnergyThresholdGeV; /**< Low Energy Threshold in GeV. >*/
 
-    double m_HighEnergyThresholdGeV; /**< High Energy Threshold in GeV. >*/
+    float m_HighEnergyThresholdGeV; /**< High Energy Threshold in GeV. >*/
 
     int m_EventsProcessed; /**< number of events processed >*/
 
@@ -92,16 +92,16 @@ namespace Belle2 {
     TTree* m_tree; /**< Root tree and file for saving the output >*/
 
     int m_CellID; /**< To read ntuple branch > */
-    double m_OnlineE; /**< To read ntuple branch > */
-    double m_OfflineE;  /**< To read ntuple branch > */
-    double m_OfflineHadE; /**< To read ntuple branch > */
-    double m_Baseline; /**< To read ntuple branch > */
-    double m_BaselineRMS; /**< To read ntuple branch > */
-    double m_calibConst; /**< To read ntuple branch > */
-    double m_Chi2; /**< To read ntuple branch > */
-    double m_Chi2Save0; /**< To read ntuple branch > */
-    double m_Chi2Save1; /**< To read ntuple branch > */
-    double m_Chi2Save2; /**< To read ntuple branch > */
+    float m_OnlineE; /**< To read ntuple branch > */
+    float m_OfflineE;  /**< To read ntuple branch > */
+    float m_OfflineHadE; /**< To read ntuple branch > */
+    float m_Baseline; /**< To read ntuple branch > */
+    float m_BaselineRMS; /**< To read ntuple branch > */
+    float m_calibConst; /**< To read ntuple branch > */
+    float m_Chi2; /**< To read ntuple branch > */
+    float m_Chi2Save0; /**< To read ntuple branch > */
+    float m_Chi2Save1; /**< To read ntuple branch > */
+    float m_Chi2Save2; /**< To read ntuple branch > */
     int m_FitType; /**< To read ntuple branch > */
     int m_ADC0; /**< To read ntuple branch > */
     int m_ADC1; /**< To read ntuple branch > */

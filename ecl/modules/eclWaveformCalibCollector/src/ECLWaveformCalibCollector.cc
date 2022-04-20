@@ -35,6 +35,7 @@ ECLWaveformCalibCollectorModule::ECLWaveformCalibCollectorModule()
   addParam("OutputFileName", m_OutputFileName, "Output file directory.", std::string("input"));
   addParam("LowEnergyThresholdGeV", m_LowEnergyThresholdGeV, "Low Energy Threshold in GeV.", 1.0);
   addParam("HighEnergyThresholdGeV", m_HighEnergyThresholdGeV, "High Energy Threshold in GeV.", 5.5);
+  addParam("IncludeWaveforms", m_includeWaveforms, "Flag to save ADC information.", true);
 }
 
 // destructor
@@ -75,38 +76,40 @@ void ECLWaveformCalibCollectorModule::initialize()
   m_tree->Branch("m_Baseline", &m_Baseline,      "m_Baseline/D");
   m_tree->Branch("m_BaselineRMS", &m_BaselineRMS,      "m_BaselineRMS/D");
   m_tree->Branch("m_calibConst", &m_calibConst,      "m_calibConst/F");
-  m_tree->Branch("ADC0", &m_ADC0,      "m_ADC0/I");
-  m_tree->Branch("ADC1", &m_ADC1,      "m_ADC1/I");
-  m_tree->Branch("ADC2", &m_ADC2,      "m_ADC2/I");
-  m_tree->Branch("ADC3", &m_ADC3,      "m_ADC3/I");
-  m_tree->Branch("ADC4", &m_ADC4,      "m_ADC4/I");
-  m_tree->Branch("ADC5", &m_ADC5,      "m_ADC5/I");
-  m_tree->Branch("ADC6", &m_ADC6,      "m_ADC6/I");
-  m_tree->Branch("ADC7", &m_ADC7,      "m_ADC7/I");
-  m_tree->Branch("ADC8", &m_ADC8,      "m_ADC8/I");
-  m_tree->Branch("ADC9", &m_ADC9,      "m_ADC9/I");
-  m_tree->Branch("ADC10", &m_ADC10,      "m_ADC10/I");
-  m_tree->Branch("ADC11", &m_ADC11,      "m_ADC11/I");
-  m_tree->Branch("ADC12", &m_ADC12,      "m_ADC12/I");
-  m_tree->Branch("ADC13", &m_ADC13,      "m_ADC13/I");
-  m_tree->Branch("ADC14", &m_ADC14,      "m_ADC14/I");
-  m_tree->Branch("ADC15", &m_ADC15,      "m_ADC15/I");
-  m_tree->Branch("ADC16", &m_ADC16,      "m_ADC16/I");
-  m_tree->Branch("ADC17", &m_ADC17,      "m_ADC17/I");
-  m_tree->Branch("ADC18", &m_ADC18,      "m_ADC18/I");
-  m_tree->Branch("ADC19", &m_ADC19,      "m_ADC19/I");
-  m_tree->Branch("ADC20", &m_ADC20,      "m_ADC20/I");
-  m_tree->Branch("ADC21", &m_ADC21,      "m_ADC21/I");
-  m_tree->Branch("ADC22", &m_ADC22,      "m_ADC22/I");
-  m_tree->Branch("ADC23", &m_ADC23,      "m_ADC23/I");
-  m_tree->Branch("ADC24", &m_ADC24,      "m_ADC24/I");
-  m_tree->Branch("ADC25", &m_ADC25,      "m_ADC25/I");
-  m_tree->Branch("ADC26", &m_ADC26,      "m_ADC26/I");
-  m_tree->Branch("ADC27", &m_ADC27,      "m_ADC27/I");
-  m_tree->Branch("ADC28", &m_ADC28,      "m_ADC28/I");
-  m_tree->Branch("ADC29", &m_ADC29,      "m_ADC29/I");
-  m_tree->Branch("ADC30", &m_ADC30,      "m_ADC30/I");
 
+  if (m_includeWaveforms) {
+    m_tree->Branch("ADC0", &m_ADC0,      "m_ADC0/I");
+    m_tree->Branch("ADC1", &m_ADC1,      "m_ADC1/I");
+    m_tree->Branch("ADC2", &m_ADC2,      "m_ADC2/I");
+    m_tree->Branch("ADC3", &m_ADC3,      "m_ADC3/I");
+    m_tree->Branch("ADC4", &m_ADC4,      "m_ADC4/I");
+    m_tree->Branch("ADC5", &m_ADC5,      "m_ADC5/I");
+    m_tree->Branch("ADC6", &m_ADC6,      "m_ADC6/I");
+    m_tree->Branch("ADC7", &m_ADC7,      "m_ADC7/I");
+    m_tree->Branch("ADC8", &m_ADC8,      "m_ADC8/I");
+    m_tree->Branch("ADC9", &m_ADC9,      "m_ADC9/I");
+    m_tree->Branch("ADC10", &m_ADC10,      "m_ADC10/I");
+    m_tree->Branch("ADC11", &m_ADC11,      "m_ADC11/I");
+    m_tree->Branch("ADC12", &m_ADC12,      "m_ADC12/I");
+    m_tree->Branch("ADC13", &m_ADC13,      "m_ADC13/I");
+    m_tree->Branch("ADC14", &m_ADC14,      "m_ADC14/I");
+    m_tree->Branch("ADC15", &m_ADC15,      "m_ADC15/I");
+    m_tree->Branch("ADC16", &m_ADC16,      "m_ADC16/I");
+    m_tree->Branch("ADC17", &m_ADC17,      "m_ADC17/I");
+    m_tree->Branch("ADC18", &m_ADC18,      "m_ADC18/I");
+    m_tree->Branch("ADC19", &m_ADC19,      "m_ADC19/I");
+    m_tree->Branch("ADC20", &m_ADC20,      "m_ADC20/I");
+    m_tree->Branch("ADC21", &m_ADC21,      "m_ADC21/I");
+    m_tree->Branch("ADC22", &m_ADC22,      "m_ADC22/I");
+    m_tree->Branch("ADC23", &m_ADC23,      "m_ADC23/I");
+    m_tree->Branch("ADC24", &m_ADC24,      "m_ADC24/I");
+    m_tree->Branch("ADC25", &m_ADC25,      "m_ADC25/I");
+    m_tree->Branch("ADC26", &m_ADC26,      "m_ADC26/I");
+    m_tree->Branch("ADC27", &m_ADC27,      "m_ADC27/I");
+    m_tree->Branch("ADC28", &m_ADC28,      "m_ADC28/I");
+    m_tree->Branch("ADC29", &m_ADC29,      "m_ADC29/I");
+    m_tree->Branch("ADC30", &m_ADC30,      "m_ADC30/I");
+  }
 }
 
 void ECLWaveformCalibCollectorModule::event()
@@ -154,37 +157,39 @@ void ECLWaveformCalibCollectorModule::event()
           m_Baseline = baselinemean;
           m_BaselineRMS = baslineRMS;
 
-          m_ADC0 = aECLDsp.getDspA()[0];
-          m_ADC1 = aECLDsp.getDspA()[1];
-          m_ADC2 = aECLDsp.getDspA()[2];
-          m_ADC3 = aECLDsp.getDspA()[3];
-          m_ADC4 = aECLDsp.getDspA()[4];
-          m_ADC5 = aECLDsp.getDspA()[5];
-          m_ADC6 = aECLDsp.getDspA()[6];
-          m_ADC7 = aECLDsp.getDspA()[7];
-          m_ADC8 = aECLDsp.getDspA()[8];
-          m_ADC9 = aECLDsp.getDspA()[9];
-          m_ADC10 = aECLDsp.getDspA()[10];
-          m_ADC11 = aECLDsp.getDspA()[11];
-          m_ADC12 = aECLDsp.getDspA()[12];
-          m_ADC13 = aECLDsp.getDspA()[13];
-          m_ADC14 = aECLDsp.getDspA()[14];
-          m_ADC15 = aECLDsp.getDspA()[15];
-          m_ADC16 = aECLDsp.getDspA()[16];
-          m_ADC17 = aECLDsp.getDspA()[17];
-          m_ADC18 = aECLDsp.getDspA()[18];
-          m_ADC19 = aECLDsp.getDspA()[19];
-          m_ADC20 = aECLDsp.getDspA()[20];
-          m_ADC21 = aECLDsp.getDspA()[21];
-          m_ADC22 = aECLDsp.getDspA()[22];
-          m_ADC23 = aECLDsp.getDspA()[23];
-          m_ADC24 = aECLDsp.getDspA()[24];
-          m_ADC25 = aECLDsp.getDspA()[25];
-          m_ADC26 = aECLDsp.getDspA()[26];
-          m_ADC27 = aECLDsp.getDspA()[27];
-          m_ADC28 = aECLDsp.getDspA()[28];
-          m_ADC29 = aECLDsp.getDspA()[29];
-          m_ADC30 = aECLDsp.getDspA()[30];
+          if (m_includeWaveforms) {
+            m_ADC0 = aECLDsp.getDspA()[0];
+            m_ADC1 = aECLDsp.getDspA()[1];
+            m_ADC2 = aECLDsp.getDspA()[2];
+            m_ADC3 = aECLDsp.getDspA()[3];
+            m_ADC4 = aECLDsp.getDspA()[4];
+            m_ADC5 = aECLDsp.getDspA()[5];
+            m_ADC6 = aECLDsp.getDspA()[6];
+            m_ADC7 = aECLDsp.getDspA()[7];
+            m_ADC8 = aECLDsp.getDspA()[8];
+            m_ADC9 = aECLDsp.getDspA()[9];
+            m_ADC10 = aECLDsp.getDspA()[10];
+            m_ADC11 = aECLDsp.getDspA()[11];
+            m_ADC12 = aECLDsp.getDspA()[12];
+            m_ADC13 = aECLDsp.getDspA()[13];
+            m_ADC14 = aECLDsp.getDspA()[14];
+            m_ADC15 = aECLDsp.getDspA()[15];
+            m_ADC16 = aECLDsp.getDspA()[16];
+            m_ADC17 = aECLDsp.getDspA()[17];
+            m_ADC18 = aECLDsp.getDspA()[18];
+            m_ADC19 = aECLDsp.getDspA()[19];
+            m_ADC20 = aECLDsp.getDspA()[20];
+            m_ADC21 = aECLDsp.getDspA()[21];
+            m_ADC22 = aECLDsp.getDspA()[22];
+            m_ADC23 = aECLDsp.getDspA()[23];
+            m_ADC24 = aECLDsp.getDspA()[24];
+            m_ADC25 = aECLDsp.getDspA()[25];
+            m_ADC26 = aECLDsp.getDspA()[26];
+            m_ADC27 = aECLDsp.getDspA()[27];
+            m_ADC28 = aECLDsp.getDspA()[28];
+            m_ADC29 = aECLDsp.getDspA()[29];
+            m_ADC30 = aECLDsp.getDspA()[30];
+          }
 
           m_tree->Fill();
         }

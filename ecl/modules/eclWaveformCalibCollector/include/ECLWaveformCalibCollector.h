@@ -87,6 +87,8 @@ namespace Belle2 {
 
     int m_EventsProcessed; /**< number of events processed >*/
 
+    bool m_includeWaveforms; /**< Flag to save ADC information. >*/
+
     TFile* m_rootFilePtr; /**< root file used for storing info >*/
 
     TTree* m_tree; /**< Root tree and file for saving the output >*/

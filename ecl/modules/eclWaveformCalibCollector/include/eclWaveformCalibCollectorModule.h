@@ -8,59 +8,34 @@
 
 #pragma once
 
-// FRAMEWORK
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
+//Calibration
+#include <calibration/CalibrationCollectorModule.h>
+
+//Framework
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 
 // ECL
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dbobjects/ECLDigitWaveformParameters.h>
-#include <ecl/digitization/shaperdsp.h>
 
 #include <TTree.h>
-#include <TFile.h>
-
-class TMinuit;
 
 namespace Belle2 {
 
-  //class to store coveriance matrix related quantities
-  class CrystalCovInfo {
-  private:
-  public:
-  };
-
-  /** Module performs offline fit for saved ecl waveforms.
-   *    */
-  class ECLWaveformCalibCollectorModule : public Module {
+  /** Store information needed to calculate ECL waveform template shapes */
+  class eclWaveformCalibCollectorModule : public CalibrationCollectorModule {
 
   public:
 
-    /** Constructor.
-     */
-    ECLWaveformCalibCollectorModule();
+    /** Constructor: Sets the description, the properties and the parameters of the module */
+    eclWaveformCalibCollectorModule();
 
-    /** Destructor.
-     */
-    ~ECLWaveformCalibCollectorModule();
+    /** Define histograms and read payloads from DB */
+    void prepare() override;
 
-    /** Initialize variables. */
-    virtual void initialize() override;
-
-    /** begin run.*/
-    virtual void beginRun() override;
-
-    /** event per event.
-     */
-    virtual void event() override;
-
-    /** end run. */
-    virtual void endRun() override;
-
-    /** terminate.*/
-    virtual void terminate() override;
+    /** Select events and crystals and accumulate histograms */
+    void collect() override;
 
     /** ECLDigits Array Name.*/
     virtual const char* eclDigitArrayName() const
@@ -70,26 +45,20 @@ namespace Belle2 {
     virtual const char* eclDspArrayName() const
     { return "ECLDsps" ; }
 
-
   private:
-
     StoreArray<ECLDsp> m_eclDSPs;  /**< StoreArray ECLDsp */
 
     StoreArray<ECLDigit> m_eclDigits;   /**< StoreArray ECLDigit */
 
     std::vector<float> m_ADCtoEnergy;  /**< calibration vector form adc to energy*/
 
-    std::string m_OutputFileName; /**< output filename >*/
+    double m_LowEnergyThresholdGeV; /**< Low Energy Threshold in GeV. >*/
 
-    float m_LowEnergyThresholdGeV; /**< Low Energy Threshold in GeV. >*/
-
-    float m_HighEnergyThresholdGeV; /**< High Energy Threshold in GeV. >*/
+    double m_HighEnergyThresholdGeV; /**< High Energy Threshold in GeV. >*/
 
     int m_EventsProcessed; /**< number of events processed >*/
 
     bool m_includeWaveforms; /**< Flag to save ADC information. >*/
-
-    TFile* m_rootFilePtr; /**< root file used for storing info >*/
 
     TTree* m_tree; /**< Root tree and file for saving the output >*/
 
@@ -138,4 +107,4 @@ namespace Belle2 {
     int m_ADC30; /**< To read ntuple branch > */
 
   };
-} // end Belle2 namespace
+}

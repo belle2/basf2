@@ -92,7 +92,7 @@ namespace Belle2 {
     /** number of EPICS PVs */
     static const int m_parameters = 3;
 #ifdef _BELLE2_EPICS
-    chid mychid[m_parameters];// hard limit max 2 parameters
+    chid mychid[m_parameters];// hard limit max parameters
 #endif
   };
 } // end namespace Belle2

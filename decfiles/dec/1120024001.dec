@@ -1,0 +1,34 @@
+# EventType: 
+# Descriptor: [B0 -> omega pi0]cc
+# NickName: Bd_omegapi0
+# Documentation: 2 Body charmless process 
+# Reponsible: Yu Nakazawa
+# Email: nakancyo@post.kek.jp
+# Tested: 
+# PhysicsWG: BToCharmless
+# Cuts: None
+# Date: XX/02/2022
+#
+#
+#
+Define gamma 1.387
+Define minusTwoBeta -0.78
+Define minusGamma -1.387
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0			VSS_BMIX dm;
+Enddecay
+### BF with 1.3 sigma
+### https://arxiv.org/pdf/0804.2422.pdf. 
+### BF update - PG 09/2020 
+Decay B0sig
+1.0  pi0  a_10        PHOTOS SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+Enddecay
+CDecay anti-B0sig
+###
+###
+###
+###
+###
+End
+

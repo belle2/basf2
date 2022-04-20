@@ -200,6 +200,7 @@ void DQMHistAnalysisIPModule::event()
       m_h_last->Reset();
       m_h_last->Add(hh1);
 
+      delta->ResetStats(); // kills the Mean from filling, now only use bin values excl over/underflow
       double x = delta->GetMean();// must be double bc of EPICS below
       double w = delta->GetRMS();// must be double bc of EPICS below
       double y1 = delta->GetMaximum();

@@ -17,13 +17,11 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
-
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
+//ROOT
+#include <TTree.h>
 
 using namespace std;
 using namespace Belle2;
-
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -64,54 +62,54 @@ void eclWaveformCalibCollectorModule::prepare()
   m_eclDigits.registerInDataStore();
 
   m_EventsProcessed = 0;
-
-  m_tree = new TTree("m_tree", "");
-  m_tree->Branch("CellID", &m_CellID,      "m_CellID/I");
-  m_tree->Branch("OnlineE", &m_OnlineE,      "m_OnlineE/D");
-  m_tree->Branch("OfflineE", &m_OfflineE,      "m_OfflineE/D");
-  m_tree->Branch("OfflineHadE", &m_OfflineHadE,      "m_OfflineHadE/D");
-  m_tree->Branch("FitType", &m_FitType,      "m_FitType/I");
-  m_tree->Branch("Chi2", &m_Chi2,      "m_Chi2/D");
-  m_tree->Branch("Chi2Save0", &m_Chi2Save0,      "m_Chi2Save0/D");
-  m_tree->Branch("Chi2Save1", &m_Chi2Save1,      "m_Chi2Save1/D");
-  m_tree->Branch("Chi2Save2", &m_Chi2Save2,      "m_Chi2Save2/D");
-  m_tree->Branch("m_Baseline", &m_Baseline,      "m_Baseline/D");
-  m_tree->Branch("m_BaselineRMS", &m_BaselineRMS,      "m_BaselineRMS/D");
-  m_tree->Branch("m_calibConst", &m_calibConst,      "m_calibConst/F");
+  auto tree = new TTree("wavefortree", "");
+  tree->Branch("CellID", &m_CellID,      "m_CellID/I");
+  tree->Branch("OnlineE", &m_OnlineE,      "m_OnlineE/D");
+  tree->Branch("OfflineE", &m_OfflineE,      "m_OfflineE/D");
+  tree->Branch("OfflineHadE", &m_OfflineHadE,      "m_OfflineHadE/D");
+  tree->Branch("FitType", &m_FitType,      "m_FitType/I");
+  tree->Branch("Chi2", &m_Chi2,      "m_Chi2/D");
+  tree->Branch("Chi2Save0", &m_Chi2Save0,      "m_Chi2Save0/D");
+  tree->Branch("Chi2Save1", &m_Chi2Save1,      "m_Chi2Save1/D");
+  tree->Branch("Chi2Save2", &m_Chi2Save2,      "m_Chi2Save2/D");
+  tree->Branch("m_Baseline", &m_Baseline,      "m_Baseline/D");
+  tree->Branch("m_BaselineRMS", &m_BaselineRMS,      "m_BaselineRMS/D");
+  tree->Branch("m_calibConst", &m_calibConst,      "m_calibConst/F");
 
   if (m_includeWaveforms) {
-    m_tree->Branch("ADC0", &m_ADC0,      "m_ADC0/I");
-    m_tree->Branch("ADC1", &m_ADC1,      "m_ADC1/I");
-    m_tree->Branch("ADC2", &m_ADC2,      "m_ADC2/I");
-    m_tree->Branch("ADC3", &m_ADC3,      "m_ADC3/I");
-    m_tree->Branch("ADC4", &m_ADC4,      "m_ADC4/I");
-    m_tree->Branch("ADC5", &m_ADC5,      "m_ADC5/I");
-    m_tree->Branch("ADC6", &m_ADC6,      "m_ADC6/I");
-    m_tree->Branch("ADC7", &m_ADC7,      "m_ADC7/I");
-    m_tree->Branch("ADC8", &m_ADC8,      "m_ADC8/I");
-    m_tree->Branch("ADC9", &m_ADC9,      "m_ADC9/I");
-    m_tree->Branch("ADC10", &m_ADC10,      "m_ADC10/I");
-    m_tree->Branch("ADC11", &m_ADC11,      "m_ADC11/I");
-    m_tree->Branch("ADC12", &m_ADC12,      "m_ADC12/I");
-    m_tree->Branch("ADC13", &m_ADC13,      "m_ADC13/I");
-    m_tree->Branch("ADC14", &m_ADC14,      "m_ADC14/I");
-    m_tree->Branch("ADC15", &m_ADC15,      "m_ADC15/I");
-    m_tree->Branch("ADC16", &m_ADC16,      "m_ADC16/I");
-    m_tree->Branch("ADC17", &m_ADC17,      "m_ADC17/I");
-    m_tree->Branch("ADC18", &m_ADC18,      "m_ADC18/I");
-    m_tree->Branch("ADC19", &m_ADC19,      "m_ADC19/I");
-    m_tree->Branch("ADC20", &m_ADC20,      "m_ADC20/I");
-    m_tree->Branch("ADC21", &m_ADC21,      "m_ADC21/I");
-    m_tree->Branch("ADC22", &m_ADC22,      "m_ADC22/I");
-    m_tree->Branch("ADC23", &m_ADC23,      "m_ADC23/I");
-    m_tree->Branch("ADC24", &m_ADC24,      "m_ADC24/I");
-    m_tree->Branch("ADC25", &m_ADC25,      "m_ADC25/I");
-    m_tree->Branch("ADC26", &m_ADC26,      "m_ADC26/I");
-    m_tree->Branch("ADC27", &m_ADC27,      "m_ADC27/I");
-    m_tree->Branch("ADC28", &m_ADC28,      "m_ADC28/I");
-    m_tree->Branch("ADC29", &m_ADC29,      "m_ADC29/I");
-    m_tree->Branch("ADC30", &m_ADC30,      "m_ADC30/I");
+    tree->Branch("ADC0", &m_ADC0,      "m_ADC0/I");
+    tree->Branch("ADC1", &m_ADC1,      "m_ADC1/I");
+    tree->Branch("ADC2", &m_ADC2,      "m_ADC2/I");
+    tree->Branch("ADC3", &m_ADC3,      "m_ADC3/I");
+    tree->Branch("ADC4", &m_ADC4,      "m_ADC4/I");
+    tree->Branch("ADC5", &m_ADC5,      "m_ADC5/I");
+    tree->Branch("ADC6", &m_ADC6,      "m_ADC6/I");
+    tree->Branch("ADC7", &m_ADC7,      "m_ADC7/I");
+    tree->Branch("ADC8", &m_ADC8,      "m_ADC8/I");
+    tree->Branch("ADC9", &m_ADC9,      "m_ADC9/I");
+    tree->Branch("ADC10", &m_ADC10,      "m_ADC10/I");
+    tree->Branch("ADC11", &m_ADC11,      "m_ADC11/I");
+    tree->Branch("ADC12", &m_ADC12,      "m_ADC12/I");
+    tree->Branch("ADC13", &m_ADC13,      "m_ADC13/I");
+    tree->Branch("ADC14", &m_ADC14,      "m_ADC14/I");
+    tree->Branch("ADC15", &m_ADC15,      "m_ADC15/I");
+    tree->Branch("ADC16", &m_ADC16,      "m_ADC16/I");
+    tree->Branch("ADC17", &m_ADC17,      "m_ADC17/I");
+    tree->Branch("ADC18", &m_ADC18,      "m_ADC18/I");
+    tree->Branch("ADC19", &m_ADC19,      "m_ADC19/I");
+    tree->Branch("ADC20", &m_ADC20,      "m_ADC20/I");
+    tree->Branch("ADC21", &m_ADC21,      "m_ADC21/I");
+    tree->Branch("ADC22", &m_ADC22,      "m_ADC22/I");
+    tree->Branch("ADC23", &m_ADC23,      "m_ADC23/I");
+    tree->Branch("ADC24", &m_ADC24,      "m_ADC24/I");
+    tree->Branch("ADC25", &m_ADC25,      "m_ADC25/I");
+    tree->Branch("ADC26", &m_ADC26,      "m_ADC26/I");
+    tree->Branch("ADC27", &m_ADC27,      "m_ADC27/I");
+    tree->Branch("ADC28", &m_ADC28,      "m_ADC28/I");
+    tree->Branch("ADC29", &m_ADC29,      "m_ADC29/I");
+    tree->Branch("ADC30", &m_ADC30,      "m_ADC30/I");
   }
+  registerObject<TTree>("tree", tree);
 }
 
 
@@ -120,8 +118,6 @@ void eclWaveformCalibCollectorModule::prepare()
 void eclWaveformCalibCollectorModule::collect()
 {
   //intended to run over gamma gamma cdst skim.
-
-  const int NumDsp = m_eclDSPs.getEntries();
 
   for (auto& aECLDigit : m_eclDigits) {
 
@@ -195,7 +191,7 @@ void eclWaveformCalibCollectorModule::collect()
             m_ADC30 = aECLDsp.getDspA()[30];
           }
 
-          m_tree->Fill();
+          getObjectPtr<TTree>("tree")->Fill();
         }
       }
     }

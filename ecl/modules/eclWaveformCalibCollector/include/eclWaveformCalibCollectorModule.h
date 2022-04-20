@@ -19,8 +19,6 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 
-#include <TTree.h>
-
 namespace Belle2 {
 
   /** Store information needed to calculate ECL waveform template shapes */
@@ -59,8 +57,6 @@ namespace Belle2 {
     int m_EventsProcessed; /**< number of events processed >*/
 
     bool m_includeWaveforms; /**< Flag to save ADC information. >*/
-
-    TTree* m_tree; /**< Root tree and file for saving the output >*/
 
     int m_CellID; /**< To read ntuple branch > */
     float m_OnlineE; /**< To read ntuple branch > */

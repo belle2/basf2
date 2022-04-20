@@ -592,13 +592,13 @@ namespace Belle2 {
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC",":math:`\\text{GeV}^2`/:math:`\\text{c}^2`");
     REGISTER_METAVARIABLE("harmonicMoment(i, axisName)", harmonicMoment, R"DOC(
 [Eventbased] Returns i-th order harmonic moment, calculated with respect to the axis ``axisName``. The order ``i`` can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision'.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC", Manager::VariableDataType::c_double);
+)DOC","GeV/c", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("cleoCone(i, axisName)", cleoCone, R"DOC(
 [Eventbased] Returns i-th order Cleo cone, calculated with respect to the axis ``axisName``. The order ``i`` can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision'.
 
@@ -643,31 +643,31 @@ Evaluates a variable value in the thrust reference frame.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("harmonicMomentThrust1", harmonicMomentThrust1, R"DOC(
 [Eventbased] Harmonic moment of the 1st order calculated with respect to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("harmonicMomentThrust2", harmonicMomentThrust2, R"DOC(
 [Eventbased] Harmonic moment of the 2nd order calculated with respect to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("harmonicMomentThrust3", harmonicMomentThrust3, R"DOC(
 [Eventbased] Harmonic moment of the 3rd order calculated with respect to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("harmonicMomentThrust4", harmonicMomentThrust4, R"DOC(
 [Eventbased] Harmonic moment of the 4th order calculated with respect to the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC");
+)DOC","GeV/c");
 
     REGISTER_VARIABLE("cleoConeThrust0", cleoConeThrust0, R"DOC(
 [Eventbased] 0th Cleo cone calculated with respect to the thrust axis.
@@ -749,19 +749,19 @@ Evaluates a variable value in the thrust reference frame.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC","cm");
+)DOC");
     REGISTER_VARIABLE("thrustAxisY", thrustAxisY, R"DOC(
 [Eventbased] Y component of the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC","cm");
+)DOC");
     REGISTER_VARIABLE("thrustAxisZ", thrustAxisZ, R"DOC(
 [Eventbased] Z component of the thrust axis.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC","cm");
+)DOC");
     REGISTER_VARIABLE("thrustAxisCosTheta", thrustAxisCosTheta, R"DOC(      
 [Eventbased] Cosine of the polar angle component of the thrust axis.
 

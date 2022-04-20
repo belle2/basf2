@@ -77,6 +77,8 @@ void DQMHistAnalysisIPModule::initialize()
     SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
     aa = m_pvPrefix + "RMS";
     SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
+    aa = m_pvPrefix + "Median";
+    SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
     // Read LO and HI limits from EPICS, seems this needs additional channels?
     // SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
@@ -203,6 +205,10 @@ void DQMHistAnalysisIPModule::event()
       delta->ResetStats(); // kills the Mean from filling, now only use bin values excl over/underflow
       double x = delta->GetMean();// must be double bc of EPICS below
       double w = delta->GetRMS();// must be double bc of EPICS below
+      double q = 0.5; // array size one for quantiles
+      double m = 0; // array of size 1 for result = median
+      delta->ComputeIntegral(); // precaution
+      delta->GetQuantiles(1, &m, &q);
       double y1 = delta->GetMaximum();
       double y2 = delta->GetMinimum();
       B2DEBUG(20, "Fit " << x << "," << w << "," << y1 << "," << y2);
@@ -217,6 +223,7 @@ void DQMHistAnalysisIPModule::event()
       m_c1->Modified();
       m_c1->Update();
 
+      m_monObj->setVariable(m_monPrefix + "_median", m);
       m_monObj->setVariable(m_monPrefix + "_mean", x);
       m_monObj->setVariable(m_monPrefix + "_width", w);
 
@@ -225,6 +232,7 @@ void DQMHistAnalysisIPModule::event()
         B2INFO("Update EPICS");
         if (mychid[0]) SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&x), "ca_set failure");
         if (mychid[1]) SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&w), "ca_set failure");
+        if (mychid[2]) SEVCHK(ca_put(DBR_DOUBLE, mychid[2], (void*)&m), "ca_set failure");
         SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
       }
 #endif

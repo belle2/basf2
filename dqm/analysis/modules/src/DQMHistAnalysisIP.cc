@@ -65,6 +65,10 @@ void DQMHistAnalysisIPModule::initialize()
   m_line->SetVertical(true);
   m_line->SetLineColor(8);
   m_line->SetLineWidth(3);
+  m_line2 = new TLine(0, 10, 0, 0);
+  m_line2->SetVertical(true);
+  m_line2->SetLineColor(9);
+  m_line2->SetLineWidth(3);
 
   m_monObj->addCanvas(m_c1);
 
@@ -132,6 +136,7 @@ void DQMHistAnalysisIPModule::beginRun()
     m_c1->cd();
     hh1->Draw();
     m_line->Draw();
+    m_line2->Draw();
   } else {
     B2DEBUG(20, "Histo " << m_histoname << " not found");
   }
@@ -215,10 +220,14 @@ void DQMHistAnalysisIPModule::event()
       m_line->SetY1(y1 + (y1 - y2) * 0.05);
       m_line->SetX1(x);
       m_line->SetX2(x);
+      m_line2->SetY1(y1 + (y1 - y2) * 0.05);
+      m_line2->SetX1(m);
+      m_line2->SetX2(m);
       delta->GetXaxis()->SetRangeUser(x - 3 * w, x + 3 * w);
       if (!flag) {
         // dont add another line...
         m_line->Draw();
+        m_line2->Draw();
       }
       m_c1->Modified();
       m_c1->Update();

@@ -76,8 +76,10 @@ namespace Belle2 {
 
     /** The drawing canvas. */
     TCanvas* m_c1 = nullptr;
-    /** The line for the fitting result. */
+    /** The line for the mean result. */
     TLine* m_line = nullptr;
+    /** The line for the median result. */
+    TLine* m_line2 = nullptr;
 
     /** last histogram */
     TH1* m_h_last = nullptr;

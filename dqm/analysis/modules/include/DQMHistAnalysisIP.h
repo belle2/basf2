@@ -88,7 +88,7 @@ namespace Belle2 {
     /** flag if to export to EPICS */
     bool m_useEpics;
     /** number of EPICS PVs */
-    static const int m_parameters = 2;
+    static const int m_parameters = 3;
 #ifdef _BELLE2_EPICS
     chid mychid[m_parameters];// hard limit max 2 parameters
 #endif

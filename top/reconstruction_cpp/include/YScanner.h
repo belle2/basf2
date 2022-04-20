@@ -347,6 +347,12 @@ namespace Belle2 {
       double getSigmaScattering() const {return m_sigmaScat;}
 
       /**
+       * Returns surface roughness parameter in units of photon energy
+       * @return surface roughness parameter [eV]
+       */
+      double getSigmaAlpha() const {return m_sigmaAlpha;}
+
+      /**
        * Returns photon energy distribution
        * @return photon energy distribution
        */
@@ -456,6 +462,7 @@ namespace Belle2 {
       mutable double m_meanE = 0; /**< mean photon energy */
       mutable double m_rmsE = 0; /**< r.m.s of photon energy */
       mutable double m_sigmaScat = 0; /**< r.m.s. of multiple scattering angle in photon energy units */
+      mutable double m_sigmaAlpha = 0; /**< surface roughness parameter in photon energy units */
       mutable Table m_energyDistribution; /**< photon energy distribution */
       mutable Table m_quasyEnergyDistribution; /**< photon energy distribution convoluted with multiple scattering */
       mutable bool m_aboveThreshold = false; /**< true if beta is above the Cerenkov threshold */

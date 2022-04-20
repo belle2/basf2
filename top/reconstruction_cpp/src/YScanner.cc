@@ -141,6 +141,7 @@ namespace Belle2 {
       double dndE = topgp->getPhaseIndexDerivative(m_meanE);
       double dEdTheta = n * sqrt(pow(beta * n, 2) - 1) / dndE;
       m_sigmaScat = std::abs(thetaScat * dEdTheta); // r.m.s of multiple scattering angle converted to photon energy
+      m_sigmaAlpha = std::abs(m_bars.back().sigmaAlpha * dEdTheta); // surface roughness converted to photon energy
 
       double step = m_energyDistribution.step;
       int ng = lround(3 * m_sigmaScat / step);

@@ -402,11 +402,17 @@ namespace Belle2 {
       // contribution of multiple scattering in quartz
       double sigmaScat = D.dLen_de * m_yScanner->getSigmaScattering() / speedOfLightQuartz;
 
+      // contribution of quartz surface roughness at single reflection and effective number of reflections
+      double sigmaAlpha = D.dLen_de * m_yScanner->getSigmaAlpha() / speedOfLightQuartz;
+      int Ny_eff = 2 * std::abs(m_fastRaytracer->getNym()) + std::abs(m_fastRaytracer->getNyb());
+
       const auto& pixel = m_yScanner->getPixelPositions().get(col + 1);
       double L = m_track.getLengthInQuartz();
 
-      // sigma squared: pixel size, parallax, propagation time difference, multiple scattering
-      double wid0 = (pow(dt_dx * pixel.Dx, 2) + pow(dt_dL * L, 2) + pow(dTime, 2)) / 12 + pow(sigmaScat, 2);
+      // sigma squared: pixel size, parallax, propagation time difference, multiple scattering, surface roughness
+      double wid0 = (pow(dt_dx * pixel.Dx, 2) + pow(dt_dL * L, 2) + pow(dTime, 2)) / 12 + pow(sigmaScat, 2) +
+                    pow(sigmaAlpha, 2) * Ny_eff;
+
       // sigma squared: adding chromatic contribution
       double wid = wid0 + pow(dt_de * m_yScanner->getRMSEnergy(), 2);
 

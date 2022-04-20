@@ -7,6 +7,9 @@
  **************************************************************************/
 
 #include <tracking/modules/eventTimeExtractor/SVDEventT0EstimatorModule.h>
+#include <framework/datastore/RelationArray.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <framework/geometry/B2Vector3.h>
 
 using namespace Belle2;
 using namespace std;
@@ -14,7 +17,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDEventT0Estimator)
+REG_MODULE(SVDEventT0Estimator);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -27,7 +30,7 @@ SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
   addParam("RecoTracks", m_recoTracks, "StoreArray with the input RecoTracks", string(""));
   addParam("EventT0", m_eventT0, "StoreObjPtr with the input EventT0", string(""));
   addParam("ptMin", m_pt, "Cut on minimum transverse momentum pt for RecoTrack selection", m_pt);
-  addParam("pzMin", m_pz, "Cut on minimum longitudinal momentum pz for RecoTrack selection", m_pz);
+  addParam("pzMin", m_absPz, "Cut on minimum absolute value of the longitudinal momentum, abs(pz), for RecoTrack selection", m_absPz);
 }
 
 
@@ -41,22 +44,13 @@ void SVDEventT0EstimatorModule::initialize()
   B2DEBUG(10, "RecoTracks: " << m_recoTracks);
   B2DEBUG(10, "EventT0: " << m_eventT0);
 
-  StoreArray<RecoTrack> rTracks(m_recoTracks);
-  StoreObjPtr<EventT0> eT0(m_eventT0);
-  rTracks.isRequired();
-  eT0.isRequired();
-}
-
-void SVDEventT0EstimatorModule::beginRun()
-{
+  m_rTracks.isRequired(m_recoTracks);
+  m_eT0.isRequired(m_eventT0);
 }
 
 
 void SVDEventT0EstimatorModule::event()
 {
-  StoreArray<RecoTrack> recoTracks(m_recoTracks);
-  StoreObjPtr<EventT0> eventT0(m_eventT0);
-
   m_evtT0 = NAN;
   m_evtT0_err = NAN;
   double clsTime_sum = 0;
@@ -65,15 +59,15 @@ void SVDEventT0EstimatorModule::event()
   int N_cls = 0;
 
   // loop on recotracks
-  for (const auto& recoTrack : recoTracks) {
+  for (const auto& recoTrack : m_rTracks) {
     if (! recoTrack.wasFitSuccessful()) continue;
-    TVector3 p = recoTrack.getMomentumSeed();
-    double pt = p.Perp();
-    double pz = p[2];
-    const vector<SVDCluster* > svdClusters = recoTrack.getSVDHitList();
+    const B2Vector3D& p = recoTrack.getMomentumSeed();
+    const double pt = p.Perp();
+    const double pz = p[2];
+    const vector<SVDCluster* >& svdClusters = recoTrack.getSVDHitList();
     if (svdClusters.size() == 0) continue;
     B2DEBUG(40, "FITTED TRACK:   NUMBER OF SVD HITS = " << svdClusters.size());
-    if (pt < m_pt || abs(pz) < m_pz) continue;
+    if (pt < m_pt || abs(pz) < m_absPz) continue;
     for (unsigned int i = 0; i < svdClusters.size(); i++) {
       double clsTime = svdClusters[i]->getClsTime();
       double clsTime_err = svdClusters[i]->getClsTimeSigma();
@@ -88,16 +82,5 @@ void SVDEventT0EstimatorModule::event()
     m_evtT0_err = std::sqrt(clsTime_err_sum / (N_cls * (N_cls - 1)));
   }
   EventT0::EventT0Component evtT0_comp(m_evtT0, m_evtT0_err, Const::SVD, m_algorithm, m_quality);
-  eventT0->addTemporaryEventT0(evtT0_comp);
+  m_eT0->addTemporaryEventT0(evtT0_comp);
 }
-
-
-void SVDEventT0EstimatorModule::endRun()
-{
-}
-
-
-void SVDEventT0EstimatorModule::terminate()
-{
-}
-

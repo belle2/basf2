@@ -13,15 +13,11 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/core/Environment.h>
 
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventT0.h>
 
-#include <svd/dataobjects/SVDCluster.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/RecoHitInformation.h>
-#include <TVector3.h>
 
 #include <string>
 
@@ -45,24 +41,17 @@ namespace Belle2 {
     /** Initialize the SVDEventT0Estimator.*/
     virtual void initialize() override;
 
-    /** Called when entering a new run.     */
-    virtual void beginRun() override;
-
     /** This method is the core of the SVDEventT0Estimator. */
     virtual void event() override;
-
-    /** This method is called if the current run ends. */
-    virtual void endRun() override;
-
-    /** This method is called at the end of the event processing.   */
-    virtual void terminate() override;
 
   private:
 
     std::string m_eventT0; /**< name of StoreObj EventT0  */
     std::string m_recoTracks; /**< name of RecoTracks StoreArray */
+    StoreObjPtr<EventT0> m_eT0; /**< EventT0 StoreObjPtr */
+    StoreArray<RecoTrack> m_rTracks; /**< RecoTracks StoreArray */
     double m_pt = 0.25; /**< Cut on pt for RecoTrack selection */
-    double m_pz = 0.; /**< Cut on pz for RecoTrack selection */
+    double m_absPz = 0.; /**< Cut on abs(pz) for RecoTrack selection */
     std::string m_algorithm = "clsOnTrack_time_average"; /**< name of the algorithm used to evaluate SVD-eventT0 */
     double m_evtT0; /**< SVD-EventT0 */
     double m_evtT0_err; /**< SVD-EventT0 error */

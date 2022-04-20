@@ -112,7 +112,7 @@ namespace Belle2 {
       //compute the noise of the clustered sample
       //it is the same for all samples
       //computed assuming 2. (-> linear sum, not quadratic)
-      auto noise = 0;
+      float noise = 0.;
       std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
       for (int i = 0; i < (int)strips.size(); i++)
         noise += (strips.at(i)).noise;
@@ -121,7 +121,7 @@ namespace Belle2 {
       //assuming only the clustered sample amplitude carries an uncertainty
       double rawtimeError = 0;
       begin = selectedSamples.begin();
-      for (auto i = 0.; begin != end; ++begin, i += 1)
+      for (float i = 0.; begin != end; ++begin, i += 1)
         rawtimeError += TMath::Power((m_apvClockPeriod * i - rawtime) / norm, 2);
       rawtimeError = sqrt(rawtimeError) * noise;
 

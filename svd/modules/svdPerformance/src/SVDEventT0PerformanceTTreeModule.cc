@@ -114,14 +114,14 @@ void SVDEventT0PerformanceTTreeModule::initialize()
 void SVDEventT0PerformanceTTreeModule::event()
 {
   m_trueEventT0 = -999;
-  m_eventT0 = -99; /**< final event T0 */
-  m_eventT0Err = -99; /**< final event T0 error */
-  m_svdEventT0 = -99; /**< sVD event T0 */
-  m_svdEventT0Err = -99; /**< SVD event T0 */
-  m_cdcEventT0 = -99; /**< CDC event T0 */
-  m_cdcEventT0Err = -99; /**< CDC event T0 */
-  m_topEventT0 = -99; /**< TOP event T0 error */
-  m_topEventT0Err = -99; /**< TOP event T0 error */
+  m_eventT0 = -99;
+  m_eventT0Err = -99;
+  m_svdEventT0 = -99;
+  m_svdEventT0Err = -99;
+  m_cdcEventT0 = -99;
+  m_cdcEventT0Err = -99;
+  m_topEventT0 = -99;
+  m_topEventT0Err = -99;
 
   StoreObjPtr<EventMetaData> evtMetaData;
   m_exp = evtMetaData->getExperiment();

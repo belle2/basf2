@@ -322,10 +322,6 @@ namespace Belle2 {
       double dLen_de = (rayTracer_de.getPropagationLen() - m_fastRaytracer->getPropagationLen()) / de;
       double dLen_dFic = (rayTracer_dFic.getPropagationLen() - m_fastRaytracer->getPropagationLen()) / dFic;
 
-      double dyD_dL = (rayTracer_dL.getYD() - m_fastRaytracer->getYD()) / dL;
-      double dyD_de = (rayTracer_de.getYD() - m_fastRaytracer->getYD()) / de;
-      double dyD_dFic = (rayTracer_dFic.getYD() - m_fastRaytracer->getYD()) / dFic;
-
       double dyB_dL = (rayTracer_dL.getYB() - m_fastRaytracer->getYB()) / dL;
       double dyB_de = (rayTracer_de.getYB() - m_fastRaytracer->getYB()) / de;
       double dyB_dFic = (rayTracer_dFic.getYB() - m_fastRaytracer->getYB()) / dFic;
@@ -341,10 +337,6 @@ namespace Belle2 {
       D.dLen_dx = dLen_dFic / dx_dFic;
       D.dLen_de = dLen_de - dLen_dFic * dx_de / dx_dFic;
       D.dLen_dL = dLen_dL - dLen_dFic * dx_dL / dx_dFic;
-
-      D.dyD_dx = dyD_dFic / dx_dFic;
-      D.dyD_de = dyD_de - dyD_dFic * dx_de / dx_dFic;
-      D.dyD_dL = dyD_dL - dyD_dFic * dx_dL / dx_dFic;  //TODO vsi tile so neuporabljeni!!
 
       D.dyB_dx = dyB_dFic / dx_dFic;
       D.dyB_de = dyB_de - dyB_dFic * dx_de / dx_dFic;

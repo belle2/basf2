@@ -36,9 +36,6 @@ namespace Belle2 {
         double dLen_dx = 0; /**< propagation length over photon detection coordinate x */
         double dLen_de = 0; /**< propagation length over photon energy */
         double dLen_dL = 0; /**< propagation length over running parameter of particle trajectory */
-        double dyD_dx = 0;  /**< unfolded y coordinate at detection over photon detection coordinate x */
-        double dyD_de = 0;  /**< unfolded y coordinate at detection over photon energy */
-        double dyD_dL = 0;  /**< unfolded y coordinate at detection over running parameter of particle trajectory */
         double dyB_dx = 0;  /**< unfolded y coordinate at prism entrance over photon detection coordinate x */
         double dyB_de = 0;  /**< unfolded y coordinate at prism entrance over photon energy */
         double dyB_dL = 0;  /**< unfolded y coordinate at prism entrance over running parameter of particle trajectory */
@@ -71,14 +68,6 @@ namespace Belle2 {
          * @return the derivative
          */
         static double dLen_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
-
-        /**
-         * Calculates the derivative of unfolded y coordinate at detection
-         * @param sol0 central solution
-         * @param sol1 displaced solution
-         * @return the derivative
-         */
-        static double dyD_d(const InverseRaytracer::Solution& sol0, const InverseRaytracer::Solution& sol1);
 
         /**
          * Calculates the derivative of unfolded y coordinate at prism entrance
@@ -488,12 +477,6 @@ namespace Belle2 {
                                                 const InverseRaytracer::Solution& sol1)
     {
       return (sol1.len - sol0.len) / sol1.step;
-    }
-
-    inline double YScanner::Derivatives::dyD_d(const InverseRaytracer::Solution& sol0,
-                                               const InverseRaytracer::Solution& sol1)
-    {
-      return (sol1.yD - sol0.yD) / sol1.step;
     }
 
     inline double YScanner::Derivatives::dyB_d(const InverseRaytracer::Solution& sol0,

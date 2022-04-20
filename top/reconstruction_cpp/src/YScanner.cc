@@ -31,10 +31,6 @@ namespace Belle2 {
       dLen_de = dLen_d(sol, sol_de);
       dLen_dL = dLen_d(sol, sol_dL);
 
-      dyD_dx = dyD_d(sol, sol_dx);
-      dyD_de = dyD_d(sol, sol_de);
-      dyD_dL = dyD_d(sol, sol_dL);
-
       dyB_dx = dyB_d(sol, sol_dx);
       dyB_de = dyB_d(sol, sol_de);
       dyB_dL = dyB_d(sol, sol_dL);

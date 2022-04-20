@@ -9,7 +9,8 @@
 #ifndef TRGTOPUNPACKERSTORE_H
 #define TRGTOPUNPACKERSTORE_H
 
-#include <TObject.h>
+//#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
 
 #include <vector>
 
@@ -19,7 +20,8 @@ namespace Belle2 {
 
 
   //! Example Detector
-  class TRGTOPUnpackerStore : public TObject {
+  //  class TRGTOPUnpackerStore : public TObject {
+  class TRGTOPUnpackerStore : public RelationsObject {
 
   public:
 

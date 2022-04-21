@@ -44,16 +44,13 @@ namespace Belle2 {
 
   private:
 
-    std::string m_eventT0; /**< name of StoreObj EventT0  */
-    std::string m_recoTracks; /**< name of RecoTracks StoreArray */
-    StoreObjPtr<EventT0> m_eT0; /**< EventT0 StoreObjPtr */
-    StoreArray<RecoTrack> m_rTracks; /**< RecoTracks StoreArray */
+    std::string m_eventT0Name; /**< name of StoreObj EventT0  */
+    std::string m_recoTracksName; /**< name of RecoTracks StoreArray */
+    StoreObjPtr<EventT0> m_eventT0; /**< EventT0 StoreObjPtr */
+    StoreArray<RecoTrack> m_recoTracks; /**< RecoTracks StoreArray */
     double m_pt = 0.25; /**< Cut on pt for RecoTrack selection */
     double m_absPz = 0.; /**< Cut on abs(pz) for RecoTrack selection */
     std::string m_algorithm = "clsOnTrack_time_average"; /**< name of the algorithm used to evaluate SVD-eventT0 */
-    double m_evtT0; /**< SVD-EventT0 */
-    double m_evtT0_err; /**< SVD-EventT0 error */
-    double m_quality; /**< SVD-EventT0 quality */
 
   };
 }

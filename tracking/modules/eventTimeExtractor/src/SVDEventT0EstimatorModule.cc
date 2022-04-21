@@ -27,10 +27,11 @@ SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
 {
   setDescription("This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks. The EventT0 is set to NaN if there are not RecoTracks or there are not SVD clusters associated to tracks or RecoTrack pt < ptMin OR RecoTrack pz < pzMin. The EventT0 estimated is added to the temporaryEventT0s to the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.");
   //* Definition of input parameters */
-  addParam("RecoTracks", m_recoTracks, "StoreArray with the input RecoTracks", string(""));
-  addParam("EventT0", m_eventT0, "StoreObjPtr with the input EventT0", string(""));
+  addParam("RecoTracks", m_recoTracksName, "Name of the StoreArray with the input RecoTracks", string(""));
+  addParam("EventT0", m_eventT0Name, "Name of the StoreObjPtr with the input EventT0", string(""));
   addParam("ptMin", m_pt, "Cut on minimum transverse momentum pt for RecoTrack selection", m_pt);
-  addParam("pzMin", m_absPz, "Cut on minimum absolute value of the longitudinal momentum, abs(pz), for RecoTrack selection", m_absPz);
+  addParam("absPzMin", m_absPz, "Cut on minimum absolute value of the longitudinal momentum, abs(pz), for RecoTrack selection",
+           m_absPz);
 }
 
 
@@ -41,46 +42,43 @@ SVDEventT0EstimatorModule::~SVDEventT0EstimatorModule()
 
 void SVDEventT0EstimatorModule::initialize()
 {
-  B2DEBUG(10, "RecoTracks: " << m_recoTracks);
-  B2DEBUG(10, "EventT0: " << m_eventT0);
+  B2DEBUG(20, "RecoTracks: " << m_recoTracksName);
+  B2DEBUG(20, "EventT0: " << m_eventT0Name);
 
-  m_rTracks.isRequired(m_recoTracks);
-  m_eT0.isRequired(m_eventT0);
+  m_recoTracks.isRequired(m_recoTracksName);
+  m_eventT0.isRequired(m_eventT0Name);
 }
 
 
 void SVDEventT0EstimatorModule::event()
 {
-  m_evtT0 = NAN;
-  m_evtT0_err = NAN;
+  double evtT0 = NAN;
+  double evtT0_err = NAN;
   double clsTime_sum = 0;
   double clsTime_err_sum = 0;
-  m_quality = NAN;
+  double quality = NAN;
   int N_cls = 0;
 
   // loop on recotracks
-  for (const auto& recoTrack : m_rTracks) {
-    if (! recoTrack.wasFitSuccessful()) continue;
+  for (const auto& recoTrack : m_recoTracks) {
     const B2Vector3D& p = recoTrack.getMomentumSeed();
     const double pt = p.Perp();
     const double pz = p[2];
     const vector<SVDCluster* >& svdClusters = recoTrack.getSVDHitList();
     if (svdClusters.size() == 0) continue;
-    B2DEBUG(40, "FITTED TRACK:   NUMBER OF SVD HITS = " << svdClusters.size());
+    B2DEBUG(20, "FITTED TRACK:   NUMBER OF SVD HITS = " << svdClusters.size());
     if (pt < m_pt || abs(pz) < m_absPz) continue;
-    for (unsigned int i = 0; i < svdClusters.size(); i++) {
-      double clsTime = svdClusters[i]->getClsTime();
-      double clsTime_err = svdClusters[i]->getClsTimeSigma();
-      clsTime_sum += clsTime;
-      clsTime_err_sum += clsTime_err * clsTime_err;
+    for (const SVDCluster* svdCluster : svdClusters) {
+      clsTime_sum += svdCluster->getClsTime();
+      clsTime_err_sum += (svdCluster->getClsTimeSigma() * svdCluster->getClsTimeSigma());
     }
     N_cls += svdClusters.size();
   }
-  if (N_cls > 0) {
-    m_quality = N_cls;
-    m_evtT0 = clsTime_sum / N_cls;
-    m_evtT0_err = std::sqrt(clsTime_err_sum / (N_cls * (N_cls - 1)));
+  if (N_cls > 1) {
+    quality = N_cls;
+    evtT0 = clsTime_sum / N_cls;
+    evtT0_err = std::sqrt(clsTime_err_sum / (N_cls * (N_cls - 1)));
   }
-  EventT0::EventT0Component evtT0_comp(m_evtT0, m_evtT0_err, Const::SVD, m_algorithm, m_quality);
-  m_eT0->addTemporaryEventT0(evtT0_comp);
+  EventT0::EventT0Component evtT0_comp(evtT0, evtT0_err, Const::SVD, m_algorithm, quality);
+  m_eventT0->addTemporaryEventT0(evtT0_comp);
 }

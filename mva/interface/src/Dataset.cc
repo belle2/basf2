@@ -688,11 +688,11 @@ namespace Belle2 {
               B2ERROR("There is a mix of float and basf2 variable types (double, int, bool)");
             else {
               if (type_name == "Double_t")
-                m_input_variant[i] = 0.0;
+                m_spectators_variant[i] = 0.0;
               else if (type_name == "Int_t")
-                m_input_variant[i] = 0;
+                m_spectators_variant[i] = 0;
               else if (type_name == "Bool_t")
-                m_input_variant[i] = false;
+                m_spectators_variant[i] = false;
             }
           } else {
             B2FATAL("Unknown root input type: " << type_name);

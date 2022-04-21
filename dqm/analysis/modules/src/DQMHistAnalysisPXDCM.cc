@@ -112,13 +112,13 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
   m_monObj->addCanvas(m_cCommonMode);
 
-  if (m_par_module_list.length() != m_par_gate_list.length()) {
+  if (m_par_module_list.size() != m_par_gate_list.size()) {
     B2FATAL("Parameter list need same length");
     return;
   }
-  for (int i = 0; i < m_par_module_list.length; i++) {
+  for (size_t i = 0; i < m_par_module_list.size(); i++) {
     for (auto n : m_par_gate_list[i]) {
-      m_masked_gates[VxdId(m_par_module_list[i])].push_back(n);
+      m_masked_gates[VxdID(m_par_module_list[i])].push_back(n);
     }
   }
 
@@ -186,7 +186,7 @@ void DQMHistAnalysisPXDCMModule::event()
   m_hCommonMode->Reset(); // dont sum up!!!
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    std::string name = "PXDDAQCM2_" + (std::string)m_PXDModules[i ];
+    std::string name = "PXDDAQCM_" + (std::string)m_PXDModules[i ];
     // std::replace( name.begin(), name.end(), '.', '_');
 
     TH1* hh1 = findHist(name);
@@ -204,9 +204,22 @@ void DQMHistAnalysisPXDCMModule::event()
       if (update) m_hCommonModeOld->SetBinContent(i + 1, 0, nevent);
       if (scale > 0) scale = 1.0 / scale;
       else scale = 1.; // worst case, no events at run start
+
+      auto& gm = m_masked_gates[m_PXDModules[i]];
+      // We loop over a 2d histogram!
+      // loop CM values
       for (int bin = 1; bin <= 63; bin++) { // we ignore CM63!!!
-        double v;
-        v = hh1->GetBinContent(bin);
+        // loop gates*asics
+        double v = 0;
+        for (int gate = 0; gate < 192; gate++) {
+          // attention, gate is not bin nr!
+          if (std::find(gm.begin(), gm.end(), gate) != gm.end()) {
+            v += hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 0, bin));
+            v += hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 1, bin));
+            v += hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 2, bin));
+            v += hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 3, bin));
+          }
+        }
         m_hCommonMode->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
         current_full += v;
         if (nevent < m_minEntries) {

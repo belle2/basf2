@@ -11,6 +11,7 @@
 #include <svd/reconstruction/SVDMaxSumAlgorithm.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <TMath.h>
+#include <numeric>
 
 using namespace std;
 
@@ -112,10 +113,8 @@ namespace Belle2 {
       //compute the noise of the clustered sample
       //it is the same for all samples
       //computed assuming 2. (-> linear sum, not quadratic)
-      float noise = 0.;
       std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
-      for (int i = 0; i < (int)strips.size(); i++)
-        noise += (strips.at(i)).noise;
+      float noise = std::accumulate(strips.begin(), strips.end(), 0., [](float sum, const Belle2::SVD::StripInRawCluster & strip) { return sum + strip.noise; });
 
       //compute the noise of the raw time
       //assuming only the clustered sample amplitude carries an uncertainty

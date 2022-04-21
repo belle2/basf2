@@ -13,11 +13,13 @@
 def add_VXDHoughTracking(path,
                          svd_space_points='SVDSpacePoints',
                          svd_clusters='SVDClusters',
-                         reco_tracks='VXDHoughTrackingRecoTracks',
+                         useAllSpacePoints=False,
+                         reco_tracks='VXDHoughRecoTracks',
+                         svdspacepointtrackcandidates='SVDHoughSpacePointTrackCands',
                          use_simple_roi_calculation=False,
-                         usePXDROIFinderModule=True,
-                         pxd_intercepts_name='VXDHoughTrackingPXDIntercepts',
-                         rois_name='VXDHoughTrackingROIs'):
+                         usePXDROIFinderModule=False,
+                         pxd_intercepts_name='VXDHoughPXDIntercepts',
+                         rois_name='VXDHoughROIs'):
     """
     Convenience function to add the optimized VXDHoughTracking to the path.
     : param path: The path to add the VXDHoughTracking module to.
@@ -48,16 +50,13 @@ def add_VXDHoughTracking(path,
                     finalOverlapResolverNameSVDClusters=svd_clusters,
                     refinerOverlapResolverNameSVDClusters=svd_clusters,
                     RecoTracksStoreArrayName=reco_tracks,
+                    useAllSpacePoints=useAllSpacePoints,
+                    SVDSpacePointTrackCandsStoreArrayName=svdspacepointtrackcandidates,
 
                     relationFilter='angleAndTime',
-                    relationFilterParameters={'AngleAndTimeThetaCutDeltaL0': 0.03,
-                                              'AngleAndTimeThetaCutDeltaL1': 0.10,
-                                              'AngleAndTimeThetaCutDeltaL2': 0.20,
-                                              'AngleAndTimeDeltaUTime': 15.,
-                                              'AngleAndTimeDeltaVTime': 15., },
 
-                    twoHitUseNBestHits=5,
-                    threeHitUseNBestHits=5,
+                    twoHitUseNBestHits=4,
+                    threeHitUseNBestHits=3,
                     fourHitUseNBestHits=3,
                     fiveHitUseNBestHits=2,
                     )

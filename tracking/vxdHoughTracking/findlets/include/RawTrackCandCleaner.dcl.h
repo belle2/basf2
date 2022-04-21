@@ -73,7 +73,7 @@ namespace Belle2 {
       std::vector<SpacePointTrackCand> m_filteredResults;
 
       /// maximum number of relations that can be created per track candidate
-      uint m_param_maxRelations = 2000;
+      uint m_param_maxRelations = 100;
     };
 
   }

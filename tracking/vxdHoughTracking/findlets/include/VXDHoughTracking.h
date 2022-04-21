@@ -28,7 +28,7 @@ namespace Belle2 {
     class VXDHoughState;
 
     /**
-    * Main Findlet for DATCON.
+    * Main Findlet for the SVDHoughTracking.
     */
     class VXDHoughTracking : public TrackFindingCDC::Findlet<> {
       /// Parent class

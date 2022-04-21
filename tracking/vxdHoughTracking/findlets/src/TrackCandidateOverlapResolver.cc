@@ -121,7 +121,7 @@ void TrackCandidateOverlapResolver::apply(std::vector<SpacePointTrackCand>& spac
     }
   }
 
-  for (auto && track : qiTrackOverlap) {
+  for (auto&& track : qiTrackOverlap) {
     if (track.activityState < m_param_minActivityState) {
       activeCandidates[track.trackIndex]->removeRefereeStatus(SpacePointTrackCand::c_isActive);
     }

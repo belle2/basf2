@@ -14,8 +14,8 @@
 
 namespace Belle2 {
   /**
-   * Optimized DATCON that is not bound to limitations of an FPGA and thus can work as a
-   * full tracking module, use genfit fitting and produce RecoTracks for proper anlysis.
+   * Hough Transformation SVD track finding, similar to DATCON, that is not bound to limitations of an FPGA and
+   * thus can work as a full tracking module, use genfit fitting and produce RecoTracks for proper analysis.
    */
   class VXDHoughTrackingModule : public TrackFindingCDC::FindletModule<vxdHoughTracking::VXDHoughTracking> {
 
@@ -23,9 +23,9 @@ namespace Belle2 {
     /// Set description
     VXDHoughTrackingModule()
     {
-      setDescription("Optimized DATCON that is not bound to limitations of an FPGA and thus "
-                     "can work as a full tracking module, use genfit fitting and produce "
-                     "RecoTracks for proper anlysis.");
+      setDescription("Hough Transformation SVD track finding, similar to DATCON, that is not bound to "
+                     "limitations of an FPGA and thus can work as a full tracking module, use genfit "
+                     "fitting and produce RecoTracks for proper anlysis.");
     }
   };
 

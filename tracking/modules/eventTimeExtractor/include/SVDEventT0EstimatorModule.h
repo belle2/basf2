@@ -10,13 +10,10 @@
 #pragma once
 
 #include <framework/core/Module.h>
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventT0.h>
-
 #include <tracking/dataobjects/RecoTrack.h>
-
 #include <string>
 
 namespace Belle2 {
@@ -54,30 +51,3 @@ namespace Belle2 {
 
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

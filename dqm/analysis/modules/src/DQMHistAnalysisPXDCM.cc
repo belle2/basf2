@@ -112,6 +112,16 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
   m_monObj->addCanvas(m_cCommonMode);
 
+  if (m_par_module_list.length() != m_par_gate_list.length()) {
+    B2FATAL("Parameter list need same length");
+    return;
+  }
+  for (int i = 0; i < m_par_module_list.length; i++) {
+    for (auto n : m_par_gate_list[i]) {
+      m_masked_gates[VxdId(m_par_module_list[i])].push_back(n);
+    }
+  }
+
   /// FIXME were to put the lines depends ...
   m_line1 = new TLine(0, 10, m_PXDModules.size(), 10);
   m_lineA = new TLine(0, m_upperLineAdhoc, m_PXDModules.size(), m_upperLineAdhoc);

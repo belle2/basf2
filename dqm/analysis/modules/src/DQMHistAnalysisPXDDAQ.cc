@@ -73,13 +73,6 @@ void DQMHistAnalysisPXDDAQModule::initialize()
   m_hMissingDHC = new TH2F("hPXDMissingDHC", "PXD Missing DHC", 16, 0, 16, 2, 0, 2);
   m_hMissingDHE = new TH2F("hPXDMissingDHE", "PXD Missing DHE", 64, 0, 64, 2, 0, 2);
 
-//   m_hDaqStatDelta  = new TH1D("hPXDDAQStatDelta", "hPXDDAQStatDelta", 20, 0, 20);
-//   m_hDaqStatDelta->SetDirectory(0);// dont mess with it, this is MY histogram
-//   m_hDaqStatDelta->SetStats(false);
-//   m_hDaqStatOld = new TH1D("hPXDDAQStatOld", "hPXDDAQStatOld", 20, 0, 20);
-//   m_hDaqStatOld->SetDirectory(0);// dont mess with it, this is MY histogram
-//   m_hDaqStatOld->SetStats(false);
-
 #ifdef _BELLE2_EPICS
   mychid.resize(20);
   if (m_useEpics) {

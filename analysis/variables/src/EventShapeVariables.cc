@@ -594,7 +594,9 @@ namespace Belle2 {
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
 )DOC",":math:`\\text{GeV}^2`/:math:`\\text{c}^2`");
     REGISTER_METAVARIABLE("harmonicMoment(i, axisName)", harmonicMoment, R"DOC(
-[Eventbased] Returns i-th order harmonic moment, calculated with respect to the axis ``axisName``. The order ``i`` can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision', GeV/c .
+[Eventbased] Returns i-th order harmonic moment, calculated with respect to the axis ``axisName``.
+The order ``i`` can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision'.
+The unit of the harmonic moment is ``GeV/c``.
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.

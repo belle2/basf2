@@ -15,6 +15,7 @@
 #include <TROOT.h>
 #include <TLatex.h>
 #include <vxd/geometry/GeoCache.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 using namespace std;
 using namespace Belle2;

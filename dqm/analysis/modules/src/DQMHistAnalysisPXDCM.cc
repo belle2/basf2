@@ -50,6 +50,10 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   addParam("warnOutsideFull", m_warnOutsideFull, "warn level for outside fraction", 1e-5);
   addParam("errorOutsideFull", m_errorOutsideFull, "error level for outside fraction", 1e-4);
   addParam("upperLineFull", m_upperLineFull, "upper threshold and line for outside fraction", 17);
+
+  addParam("gateMaskModuleList", m_par_module_list, "Module List for Gate Masking");
+  addParam("gateMaskGateList", m_par_gate_list, "Gate List for Gate Masking");
+
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 

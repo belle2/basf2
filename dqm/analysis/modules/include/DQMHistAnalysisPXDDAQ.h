@@ -82,7 +82,7 @@ namespace Belle2 {
     //! Histogram covering stat
     TH1D* m_hStatistic = nullptr;
     //! Histogram preserving last stat upd
-    TH1D* m_hDaqStatOld = nullptr;
+    TH1* m_hDaqStatOld = nullptr;
     //! Final Canvas
     TCanvas* m_cDAQError = nullptr;
     //! Final Canvas

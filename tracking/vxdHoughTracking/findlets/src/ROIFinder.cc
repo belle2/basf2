@@ -8,6 +8,9 @@
 #include <tracking/vxdHoughTracking/findlets/ROIFinder.h>
 #include <tracking/vxdHoughTracking/findlets/RawTrackCandCleaner.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParamList.h>
 #include <framework/geometry/BFieldManager.h>
@@ -36,11 +39,11 @@ void ROIFinder::exposeParameters(ModuleParamList* moduleParamList, const std::st
                                 m_param_calculateROI);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storePXDInterceptsName"), m_param_storePXDInterceptsName,
-                                "Name of the PXDIntercepts StoreArray produced by DATCON using a simple circle extrapolation in r-phi and a straight line extrapolation in theta.",
+                                "Name of the PXDIntercepts StoreArray produced by SVDHoughTracking using a simple circle extrapolation in r-phi and a straight line extrapolation in theta.",
                                 m_param_storePXDInterceptsName);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storeROIsName"), m_param_storeROIsName,
-                                "Name of the ROIs StoreArray produced by DATCON using a simple circle extrapolation in r-phi and a straight line extrapolation in theta.",
+                                "Name of the ROIs StoreArray produced by SVDHoughTracking using a simple circle extrapolation in r-phi and a straight line extrapolation in theta.",
                                 m_param_storeROIsName);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "tolerancePhi"), m_param_tolerancePhi,
@@ -50,15 +53,22 @@ void ROIFinder::exposeParameters(ModuleParamList* moduleParamList, const std::st
                                 "Allowed tolerance in z (in cm) (for ROI calculation in v direction). If the intercept is within this range of the active region of a sensor, an intercept is created.",
                                 m_param_toleranceZ);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "radiusCorrectionFactor"), m_param_radiusCorrectionFactor,
-                                "Correct charge-dependent bias of the extrapolated hit with radiusCorrectionFactor * trackCharge / trackRadius.",
-                                m_param_radiusCorrectionFactor);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "radiusCorrectionFactorL1"), m_param_radiusCorrectionFactorL1,
+                                "Correct charge-dependent bias of the extrapolated hit on L1 with radiusCorrectionFactor * trackCharge / trackRadius.",
+                                m_param_radiusCorrectionFactorL1);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "radiusCorrectionFactorL2"), m_param_radiusCorrectionFactorL2,
+                                "Correct charge-dependent bias of the extrapolated hit on L2 with radiusCorrectionFactor * trackCharge / trackRadius.",
+                                m_param_radiusCorrectionFactorL2);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "sinPhiCorrectionFactor"), m_param_sinPhiCorrectionFactor,
                                 "Correct sin(trackPhi) dependent bias with sinPhiCorrectionFactor * sin(trackPhi).",
                                 m_param_sinPhiCorrectionFactor);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cosPhiCorrectionFactor"), m_param_cosPhiCorrectionFactor,
                                 "Correct cos(trackPhi) dependent bias with cosPhiCorrectionFactor * cos(trackPhi).",
                                 m_param_cosPhiCorrectionFactor);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "zPositionCorrectionFactor"), m_param_zPositionCorrectionFactor,
+                                "Correction factor for the extrapolated z position.",
+                                m_param_zPositionCorrectionFactor);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumROISizeUL1"), m_param_minimumROISizeUL1,
                                 "Minimum ROI size (in pixel) in u direction on L1.", m_param_minimumROISizeUL1);
@@ -87,6 +97,15 @@ void ROIFinder::exposeParameters(ModuleParamList* moduleParamList, const std::st
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumROISizeV"), m_param_maximumROISizeV,
                                 "Maximum ROI size in v.", m_param_maximumROISizeV);
 
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "refit"), m_param_refit,
+                                "Refit the track with trackQualityEstimationMethod?", m_param_refit);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "addVirtualIP"), m_param_addVirtualIP,
+                                "Add virtual IP to fit the tracks again for ROI creation?", m_param_addVirtualIP);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ROIFitMethod"), m_param_ROIFitMethod,
+                                "Identifier which fit method to use. Valid identifiers are: [circleFit, tripletFit, helixFit]",
+                                m_param_ROIFitMethod);
+
 }
 
 /// Create the store arrays
@@ -111,6 +130,16 @@ void ROIFinder::initialize()
             "None of minimumROISizeUL1, minimumROISizeUL2, minimumROISizeVL1, minimumROISizeVL2, "
             "multiplierUL1, multiplierUL2, multiplierVL1, multiplierVL2, overlapU, overlapV must be < 0!");
   }
+
+  if (m_param_ROIFitMethod == "tripletFit") {
+    m_estimator = std::make_unique<QualityEstimatorTripletFit>();
+  } else if (m_param_ROIFitMethod == "circleFit") {
+    m_estimator = std::make_unique<QualityEstimatorCircleFit>();
+  } else if (m_param_ROIFitMethod == "helixFit") {
+    m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
+  }
+  B2ASSERT("QualityEstimator could not be initialized with method: " << m_param_ROIFitMethod, m_estimator);
+
 };
 
 void ROIFinder::beginRun()
@@ -123,12 +152,16 @@ void ROIFinder::beginRun()
   Super::beginRun();
 
   m_bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
+  m_estimator->setMagneticFieldStrength(m_bFieldZ);
 
   DBObjPtr<BeamSpot> beamSpotDB;
   if (beamSpotDB.isValid()) {
     m_BeamSpotPosition = (*beamSpotDB).getIPPosition();
+    const TMatrixDSym posErr = (*beamSpotDB).getIPPositionCovMatrix();
+    m_BeamSpotPositionError.SetXYZ(sqrt(posErr[0][0]), sqrt(posErr[1][1]), sqrt(posErr[2][2]));
   } else {
     m_BeamSpotPosition.SetXYZ(0., 0., 0.);
+    m_BeamSpotPositionError.SetXYZ(0., 0., 0.);
   }
 }
 
@@ -156,10 +189,29 @@ void ROIFinder::apply(const std::vector<SpacePointTrackCand>& finalTracks)
       continue;
     }
 
+    QualityEstimationResults refittedTrackEstimate;
+    if (m_param_refit) {
+      auto sortedHits = track.getSortedHits();
+
+      if (m_param_addVirtualIP) {
+        SpacePoint virtualIPSpacePoint = SpacePoint(m_BeamSpotPosition, m_BeamSpotPositionError, {0.5, 0.5}, {false, false},
+                                                    VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
+        sortedHits.push_back(&virtualIPSpacePoint);
+      }
+
+      std::sort(sortedHits.begin(), sortedHits.end(),
+      [](const SpacePoint * a, const SpacePoint * b) {return a->getPosition().Perp() < b->getPosition().Perp(); });
+
+      refittedTrackEstimate = m_estimator->estimateQualityAndProperties(sortedHits);
+    }
+
     std::vector<PXDIntercept> thisTracksIntercepts;
     thisTracksIntercepts.reserve(8);
 
-    const B2Vector3D& momentumEstimate = track.getMomSeed();
+    B2Vector3D momentumEstimate = track.getMomSeed();
+    if (m_param_refit) {
+      momentumEstimate = *refittedTrackEstimate.p;
+    }
 
     const double trackPhi       = momentumEstimate.Phi();
     const double trackTheta     = momentumEstimate.Theta();
@@ -191,9 +243,13 @@ void ROIFinder::apply(const std::vector<SpacePointTrackCand>& finalTracks)
         // Don't try to extrapolate if track direction and sensor are too different (in phi)
         // this should speed up the calculation as wrong combinations are not checked at all.
         // Two values to check both the outgoing (0.3) and incoming (0.8) arm.
-        if (fabs(phiDiff) > 0.3 * M_PI /*and fabs(phiDiff) < 0.8 * M_PI*/) {
+        if (fabs(phiDiff) > 0.25 * M_PI and fabs(phiDiff) < 0.75 * M_PI) {
           continue;
         }
+        if (fabs(phiDiff) > 0.75 * M_PI and fabs(tanTrackLambda) > 0.2 /*and fabs(trackRadius) > 20*/) {
+          continue;
+        }
+
 
         // relative phi value of the track center compared to the rotated
         // coordinate system defined by the (rotated) line perpendicular
@@ -215,13 +271,14 @@ void ROIFinder::apply(const std::vector<SpacePointTrackCand>& finalTracks)
         const double yplus    = yCenter + ytmp + rotatedBeamSpotY;
         const double yminus   = yCenter - ytmp + rotatedBeamSpotY;
 
-        const double correctionterm = (m_param_radiusCorrectionFactor * trackCharge / trackRadius) +
+        const double correctionterm = ((layer == 1 ? m_param_radiusCorrectionFactorL1 : m_param_radiusCorrectionFactorL2) * trackCharge /
+                                       trackRadius) +
                                       m_param_sinPhiCorrectionFactor * sin(trackPhi) +
                                       m_param_cosPhiCorrectionFactor * cos(trackPhi);
 
         const double localUPositionPlus   = yplus  - m_const_shiftY + correctionterm;
         const double localUPositionMinus  = yminus - m_const_shiftY + correctionterm;
-        const double toleranceRPhi = m_param_tolerancePhi * sensorLocalX;
+        const double toleranceRPhi        = m_param_tolerancePhi * sensorLocalX;
 
         // if the hit for sure is out of reach of the current ladder, continue
         if (not(yplus  >= m_const_sensorMinY - toleranceRPhi and yplus  <= m_const_sensorMaxY + toleranceRPhi) and
@@ -230,27 +287,32 @@ void ROIFinder::apply(const std::vector<SpacePointTrackCand>& finalTracks)
         }
 
         // estimate the z coordinate of the extrapolation on this layer
-        const double z = sensorLocalX * tanTrackLambda - m_BeamSpotPosition.Z();
+        const double z      = sensorLocalX * tanTrackLambda - m_BeamSpotPosition.Z();
+        const double zPlus  = sqrt(sensorLocalX * sensorLocalX + yplus * yplus)   * tanTrackLambda * m_param_zPositionCorrectionFactor -
+                              m_BeamSpotPosition.Z();
+        const double zMinus = sqrt(sensorLocalX * sensorLocalX + yminus * yminus) * tanTrackLambda * m_param_zPositionCorrectionFactor -
+                              m_BeamSpotPosition.Z();
 
         /** Loop over both modules of a ladder */
         for (int sensor = 1; sensor <= 2; sensor++) {
 
           const double shiftZ = (layer == 1) ? m_const_centerZShiftLayer1[sensor - 1] : m_const_centerZShiftLayer2[sensor - 1];
 
-          double localVPosition = z - shiftZ;
+          double localVPosition       = z - shiftZ;
+          double localVPositionPlus   = zPlus - shiftZ;
+          double localVPositionMinus  = zMinus - shiftZ;
           // check whether z intersection possibly is on sensor to be checked, only continue with the rest of calculations if that's the case
           if (localVPosition >= ((-m_const_activeSensorLength[layer - 1] / 2.0) - m_param_toleranceZ) and
               localVPosition <= ((m_const_activeSensorLength[layer - 1] / 2.0) + m_param_toleranceZ)) {
 
             const VxdID sensorID = VxdID(layer, ladder, sensor);
 
-            // double localVPosition = z - shiftZ;
             // check for first option of the intersection
             if (localUPositionPlus >= -m_const_activeSensorWidth / 2.0 - toleranceRPhi and
                 localUPositionPlus <=  m_const_activeSensorWidth / 2.0 + toleranceRPhi) {
               PXDIntercept intercept;
               intercept.setCoorU(localUPositionPlus);
-              intercept.setCoorV(localVPosition);
+              intercept.setCoorV(localVPositionPlus);
               intercept.setVxdID(sensorID);
               m_storePXDIntercepts.appendNew(intercept);
               thisTracksIntercepts.push_back(intercept);
@@ -260,7 +322,7 @@ void ROIFinder::apply(const std::vector<SpacePointTrackCand>& finalTracks)
                 localUPositionMinus <=  m_const_activeSensorWidth / 2.0 + toleranceRPhi) {
               PXDIntercept intercept;
               intercept.setCoorU(localUPositionMinus);
-              intercept.setCoorV(localVPosition);
+              intercept.setCoorV(localVPositionMinus);
               intercept.setVxdID(sensorID);
               m_storePXDIntercepts.appendNew(intercept);
               thisTracksIntercepts.push_back(intercept);

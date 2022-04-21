@@ -10,6 +10,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/geometry/B2Vector3.h>
 
@@ -23,7 +24,7 @@ namespace Belle2 {
   namespace vxdHoughTracking {
 
     /**
-    * Findlet for performing the DATCON ROI calculation.
+    * Findlet for performing the simple SVDHoughTracking ROI calculation.
     */
     class ROIFinder : public TrackFindingCDC::Findlet<const SpacePointTrackCand> {
       /// Parent class
@@ -57,13 +58,24 @@ namespace Belle2 {
 
       // StoreArrays
       /// Name of the PXDIntercepts StoreArray
-      std::string m_param_storePXDInterceptsName = "DATCONPXDIntercepts";
+      std::string m_param_storePXDInterceptsName = "SVDHoughPXDIntercepts";
       /// Name of the ROIs StoreArray
-      std::string m_param_storeROIsName = "DATCONROIs";
+      std::string m_param_storeROIsName = "SVDHoughROIs";
       /// PXDIntercepts StoreArray
       StoreArray<PXDIntercept> m_storePXDIntercepts;
       /// ROIs StoreArray
       StoreArray<ROIid> m_storeROIs;
+
+
+      /// Refit the tracks with m_param_ROIFitMethod
+      bool m_param_refit = true;
+      /// Add a virtual IP for the refit?
+      bool m_param_addVirtualIP = true;
+      /// Refit with this estimator, options are circleFit, tripletFit, helixFit
+      std::string m_param_ROIFitMethod = "helixFit";
+
+      /// pointer to the selected QualityEstimator
+      std::unique_ptr<QualityEstimatorBase> m_estimator;
 
 
       //  Extrapolation parameters
@@ -76,12 +88,17 @@ namespace Belle2 {
       //  a) the residuals show a ~1/R bias, that is larger for low pT = small track radii
       //  b) the residuals show a larger sin(phi) and a smaller cos(phi modulation)
       //  Both of these can be corrected for
-      /// Correction factor for radial bias: factor * charge / radius
-      double m_param_radiusCorrectionFactor = 4.0;
+      /// Correction factor for radial bias for L1: factor * charge / radius
+      double m_param_radiusCorrectionFactorL1 = -2.0;
+      /// Correction factor for radial bias for L2: factor * charge / radius
+      double m_param_radiusCorrectionFactorL2 = -5.0;
       /// Correction factor for the sin(phi) modulation
       double m_param_sinPhiCorrectionFactor = 0.0;
       /// Correction factor for the cos(phi) modulation
       double m_param_cosPhiCorrectionFactor = 0.0;
+
+      /// Correction factor for the z position
+      double m_param_zPositionCorrectionFactor = 1.0;
 
 
       //  ROI calculation parameters
@@ -90,26 +107,26 @@ namespace Belle2 {
       /// Minimum size of ROI in v-direction on L1 in pixel
       double m_param_minimumROISizeVL1 = 40;
       /// Minimum size of ROI in u-direction on L2 in pixel
-      double m_param_minimumROISizeUL2 = 40;
+      double m_param_minimumROISizeUL2 = 35;
       /// Minimum size of ROI in v-direction on L2 in pixel
-      double m_param_minimumROISizeVL2 = 40;
+      double m_param_minimumROISizeVL2 = 30;
 
       /// Multiplier term in ROI size estimation
       /// For u: size = multiplier * 1/R + minimumROISize
       /// For v: size = (1 + abs(tan(lambda)) * multiplier) + minimumROISize
       /// Multiplier term for u-direction on L1
-      double m_param_multiplierUL1 = 600;
+      double m_param_multiplierUL1 = 500;
       /// Multiplier term for u-direction on L2
-      double m_param_multiplierUL2 = 800;
+      double m_param_multiplierUL2 = 600;
       /// Multiplier term for v-direction on L1
       double m_param_multiplierVL1 = 0.8;
       /// Multiplier term for v-direction on L2
-      double m_param_multiplierVL2 = 1.2;
+      double m_param_multiplierVL2 = 0.8;
 
       /// maximum ROI size in u in pixel
-      unsigned short m_param_maximumROISizeU = 120;
+      unsigned short m_param_maximumROISizeU = 100;
       /// maximum ROI size in v in pixel
-      unsigned short m_param_maximumROISizeV = 192;
+      unsigned short m_param_maximumROISizeV = 100;
 
       //  Constants used during extrapolation to PXD and ROI calculation
       // ATTENTION: hard coded values taken and derived from pxd/data/PXD-Components.xml
@@ -143,6 +160,8 @@ namespace Belle2 {
 
       /// B2Vector3D actually contining the BeamSpot position. This will be used as the starting point of the extrapolation.
       B2Vector3D m_BeamSpotPosition;
+      /// B2Vector3D actually contining the BeamSpot position error.
+      B2Vector3D m_BeamSpotPositionError;
 
     };
 

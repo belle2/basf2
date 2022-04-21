@@ -594,11 +594,11 @@ namespace Belle2 {
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
 )DOC",":math:`\\text{GeV}^2`/:math:`\\text{c}^2`");
     REGISTER_METAVARIABLE("harmonicMoment(i, axisName)", harmonicMoment, R"DOC(
-[Eventbased] Returns i-th order harmonic moment, calculated with respect to the axis ``axisName``. The order ``i`` can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision'.
+[Eventbased] Returns i-th order harmonic moment, calculated with respect to the axis ``axisName``. The order ``i`` can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision', GeV/c .
 
 .. warning:: You have to run the Event Shape builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_eventshape` and `modularAnalysis.buildEventShape`.
-)DOC","GeV/c", Manager::VariableDataType::c_double);
+)DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("cleoCone(i, axisName)", cleoCone, R"DOC(
 [Eventbased] Returns i-th order Cleo cone, calculated with respect to the axis ``axisName``. The order ``i`` can go from 0 up to 8th, the ``axisName`` can be either 'thrust' or 'collision'.
 

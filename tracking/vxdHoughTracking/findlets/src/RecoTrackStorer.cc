@@ -41,6 +41,10 @@ void RecoTrackStorer::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "RecoTracksStoreArrayName"), m_param_RecoTracksStoreArrayName,
                                 "Name of the RecoTracks Store Array.", m_param_RecoTracksStoreArrayName);
 
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "SVDSpacePointTrackCandsStoreArrayName"),
+                                m_param_SVDSpacePointTrackCandsStoreArrayName,
+                                "Name of the SpacePointTrackCand Store Array.", m_param_SVDSpacePointTrackCandsStoreArrayName);
+
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ResultStorerQualityEstimationMethod"), m_param_EstimationMethod,
                                 "Identifier which estimation method to use. Valid identifiers are: [mcInfo, circleFit, tripletFit, helixFit].",
                                 m_param_EstimationMethod);
@@ -62,6 +66,9 @@ void RecoTrackStorer::initialize()
 
   m_storeRecoTracks.registerInDataStore(m_param_RecoTracksStoreArrayName);
   RecoTrack::registerRequiredRelations(m_storeRecoTracks, "", m_param_SVDClustersStoreArrayName, "", "", "", "");
+  m_storeSpacePointTrackCands.registerInDataStore(m_param_SVDSpacePointTrackCandsStoreArrayName,
+                                                  DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+  m_storeRecoTracks.registerRelationTo(m_storeSpacePointTrackCands);
 
   // create pointer to chosen estimator
   if (m_param_EstimationMethod == "mcInfo") {
@@ -100,7 +107,7 @@ void RecoTrackStorer::beginEvent()
   m_usedSpacePoints.clear();
 }
 
-void RecoTrackStorer::apply(const std::vector<SpacePointTrackCand>& finishedResults,
+void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
                             const std::vector<const SpacePoint*>& spacePoints)
 {
   for (auto& thisSPTC : finishedResults) {
@@ -112,7 +119,6 @@ void RecoTrackStorer::apply(const std::vector<SpacePointTrackCand>& finishedResu
     auto sortedHits = thisSPTC.getSortedHits();
     const auto& estimatorResult = m_estimator->estimateQualityAndProperties(sortedHits);
 
-    // const TVector3& trackPosition = TVector3(0., 0., 0.); // initial version, since there in principal is no better POCA estimate
     const TVector3& trackPosition = TVector3(sortedHits.front()->X(), sortedHits.front()->Y(), sortedHits.front()->Z());
     const TVector3& trackMomentum = *estimatorResult.p;
     const short& trackChargeSeed = estimatorResult.curvatureSign ? -1 * (*(estimatorResult.curvatureSign)) : 0;
@@ -123,9 +129,28 @@ void RecoTrackStorer::apply(const std::vector<SpacePointTrackCand>& finishedResu
 
     // TODO: find out where these numbers come from!
     // This is copied from the VXDTF2 counterpart tracking/modules/spacePointCreator/SPTCmomentumSeedRetrieverModule !
+    TVectorD stateSeed(6); //(x,y,z,px,py,pz)
     TMatrixDSym covSeed(6);
     covSeed(0, 0) = 0.01 ; covSeed(1, 1) = 0.01 ; covSeed(2, 2) = 0.04 ; // 0.01 = 0.1^2 = dx*dx =dy*dy. 0.04 = 0.2^2 = dz*dz
     covSeed(3, 3) = 0.01 ; covSeed(4, 4) = 0.01 ; covSeed(5, 5) = 0.04 ;
+
+    stateSeed(0) = (sortedHits.front()->X());
+    stateSeed(1) = (sortedHits.front()->Y());
+    stateSeed(2) = (sortedHits.front()->Z());
+    if (estimatorResult.p) {
+      auto momentumSeed = *(estimatorResult.p);
+      stateSeed(3) = momentumSeed.X();
+      stateSeed(4) = momentumSeed.Y();
+      stateSeed(5) = momentumSeed.Z();
+    } else {
+      stateSeed(3) = 0;
+      stateSeed(4) = 0;
+      stateSeed(5) = 0;
+    }
+
+    thisSPTC.set6DSeed(stateSeed);
+    thisSPTC.setCovSeed(covSeed);
+    thisSPTC.setChargeSeed(trackChargeSeed);
     // until here
 
     // Set information not required by constructor
@@ -133,6 +158,10 @@ void RecoTrackStorer::apply(const std::vector<SpacePointTrackCand>& finishedResu
 
     // Transfer quality indicator from SPTC to RecoTrack
     newRecoTrack->setQualityIndicator(qi);
+
+    SpacePointTrackCand* newSPTC = m_storeSpacePointTrackCands.appendNew(thisSPTC);
+    // Add relation to SpacePointTrackCandidate
+    newRecoTrack->addRelationTo(newSPTC);
 
 
     unsigned int sortingParameter = 0;
@@ -142,7 +171,7 @@ void RecoTrackStorer::apply(const std::vector<SpacePointTrackCand>& finishedResu
       RelationVector<SVDCluster> relatedClusters = spacePoint->getRelationsTo<SVDCluster>(m_param_SVDClustersStoreArrayName);
       for (const SVDCluster& relatedCluster : relatedClusters) {
         m_usedClusters.insert(&relatedCluster);
-        newRecoTrack->addSVDHit(&relatedCluster, sortingParameter);
+        newRecoTrack->addSVDHit(&relatedCluster, sortingParameter, Belle2::RecoHitInformation::c_SVDHough);
         sortingParameter++;
       }
     }

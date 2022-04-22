@@ -49,9 +49,9 @@ void VXDHoughTracking::exposeParameters(ModuleParamList* moduleParamList, const 
   moduleParamList->getParameter<std::string>("fiveHitFilter").setDefaultValue("qualityIndicator");
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useMultiHoughSpaceInterceptFinding"),
-                                m_param_useMultiHoughSpaceInterceptFinding,
+                                m_useMultiHoughSpaceInterceptFinding,
                                 "Use Hough spaces working on a subset of hits (=true), or just one Hough space working on all hits at the same time (=false)?",
-                                m_param_useMultiHoughSpaceInterceptFinding);
+                                m_useMultiHoughSpaceInterceptFinding);
 }
 
 void VXDHoughTracking::beginEvent()
@@ -73,7 +73,7 @@ void VXDHoughTracking::apply()
   m_spacePointLoaderAndPreparer.apply(m_spacePointVector, m_vxdHoughStates);
   B2DEBUG(29, "m_vxdHoughStates.size(): " << m_vxdHoughStates.size());
 
-  if (m_param_useMultiHoughSpaceInterceptFinding) {
+  if (m_useMultiHoughSpaceInterceptFinding) {
     m_multiHouthSpaceInterceptFinder.apply(m_vxdHoughStates, m_rawTrackCandidates);
   } else {
     m_singleHouthSpaceInterceptFinder.apply(m_vxdHoughStates, m_rawTrackCandidates);

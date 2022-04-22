@@ -92,7 +92,7 @@ namespace Belle2 {
 
       /// Use the elaborate FastInterceptFinder2D with multiple Hough spaces (true)
       /// or the simple one with just one Hough space (false)
-      bool m_param_useMultiHoughSpaceInterceptFinding = false;
+      bool m_useMultiHoughSpaceInterceptFinding = false;
 
     };
 

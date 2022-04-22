@@ -40,8 +40,8 @@ namespace Belle2::vxdHoughTracking {
     m_treeSearcher.exposeParameters(moduleParamList, prefix);
     m_resultRefiner.exposeParameters(moduleParamList, prefix);
 
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxRelations"), m_param_maxRelations,
-                                  "Maximum number of relations allowed for entering tree search.", m_param_maxRelations);
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxRelations"), m_maxRelations,
+                                  "Maximum number of relations allowed for entering tree search.", m_maxRelations);
   }
 
   template<class AHit>
@@ -67,7 +67,7 @@ namespace Belle2::vxdHoughTracking {
 
       m_relationCreator.apply(rawTrackCand, m_relations);
 
-      if (m_relations.size() > m_param_maxRelations) {
+      if (m_relations.size() > m_maxRelations) {
         m_relations.clear();
         continue;
       }

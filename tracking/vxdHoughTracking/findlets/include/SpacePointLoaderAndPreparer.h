@@ -41,30 +41,30 @@ namespace Belle2 {
       {
         Super::exposeParameters(moduleParamList, prefix);
 
-        moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "SVDSpacePointStoreArrayName"), m_param_SVDSpacePointStoreArrayName,
-                                      "Name of the SVDSpacePoints Store Array.", m_param_SVDSpacePointStoreArrayName);
+        moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "SVDSpacePointStoreArrayName"), m_SVDSpacePointStoreArrayName,
+                                      "Name of the SVDSpacePoints Store Array.", m_SVDSpacePointStoreArrayName);
 
-        moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumUClusterTime"), m_param_minimumUClusterTime,
-                                      "Minimum time of the u cluster (in ns).", m_param_minimumUClusterTime);
+        moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumUClusterTime"), m_minimumUClusterTime,
+                                      "Minimum time of the u cluster (in ns).", m_minimumUClusterTime);
 
-        moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumVClusterTime"), m_param_minimumVClusterTime,
-                                      "Minimum time of the v cluster (in ns).", m_param_minimumVClusterTime);
+        moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumVClusterTime"), m_minimumVClusterTime,
+                                      "Minimum time of the v cluster (in ns).", m_minimumVClusterTime);
 
-        moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumUClusterTime"), m_param_maximumUClusterTime,
-                                      "Maximum time of the u cluster (in ns).", m_param_maximumUClusterTime);
+        moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumUClusterTime"), m_maximumUClusterTime,
+                                      "Maximum time of the u cluster (in ns).", m_maximumUClusterTime);
 
-        moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumVClusterTime"), m_param_maximumVClusterTime,
-                                      "Maximum time of the v cluster (in ns).", m_param_maximumVClusterTime);
+        moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumVClusterTime"), m_maximumVClusterTime,
+                                      "Maximum time of the v cluster (in ns).", m_maximumVClusterTime);
 
-        moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useAllSpacePoints"), m_param_useAllSpacePoints,
-                                      "Use all SVDSpacePoints for track finding or only unassigned ones?", m_param_useAllSpacePoints);
+        moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useAllSpacePoints"), m_useAllSpacePoints,
+                                      "Use all SVDSpacePoints for track finding or only unassigned ones?", m_useAllSpacePoints);
       };
 
       /// Create the store arrays
       void initialize() override
       {
         Super::initialize();
-        m_storeSpacePoints.isRequired(m_param_SVDSpacePointStoreArrayName);
+        m_storeSpacePoints.isRequired(m_SVDSpacePointStoreArrayName);
       };
 
       /// Retrieve the BeamSpot from DB
@@ -88,13 +88,13 @@ namespace Belle2 {
         hits.reserve(m_storeSpacePoints.getEntries());
         spacePoints.reserve(m_storeSpacePoints.getEntries());
         for (auto& spacePoint : m_storeSpacePoints) {
-          if (not m_param_useAllSpacePoints and spacePoint.getAssignmentState() == true) {
+          if (not m_useAllSpacePoints and spacePoint.getAssignmentState() == true) {
             continue;
           }
-          if (spacePoint.TimeU() >= m_param_minimumUClusterTime and
-              spacePoint.TimeV() >= m_param_minimumVClusterTime and
-              spacePoint.TimeU() <= m_param_maximumUClusterTime and
-              spacePoint.TimeV() <= m_param_maximumVClusterTime) {
+          if (spacePoint.TimeU() >= m_minimumUClusterTime and
+              spacePoint.TimeV() >= m_minimumVClusterTime and
+              spacePoint.TimeU() <= m_maximumUClusterTime and
+              spacePoint.TimeV() <= m_maximumVClusterTime) {
             hits.emplace_back(VXDHoughState(&spacePoint, m_BeamSpotPosition));
             spacePoints.emplace_back(&spacePoint);
           }
@@ -103,18 +103,18 @@ namespace Belle2 {
 
     private:
       /// StoreArray name of the input Track Store Array
-      std::string m_param_SVDSpacePointStoreArrayName = "SVDSpacePoints";
+      std::string m_SVDSpacePointStoreArrayName = "SVDSpacePoints";
 
       /// Minimum u cluster time
-      double m_param_minimumUClusterTime = -50;
+      double m_minimumUClusterTime = -50;
       /// Minimum v cluster time
-      double m_param_minimumVClusterTime = -50;
+      double m_minimumVClusterTime = -50;
       /// Maximum u cluster time
-      double m_param_maximumUClusterTime = 30;
+      double m_maximumUClusterTime = 30;
       /// Maximum v cluster time
-      double m_param_maximumVClusterTime = 30;
+      double m_maximumVClusterTime = 30;
       /// Use all SVDSpacePoints for track finding or only unassigned ones
-      bool m_param_useAllSpacePoints = false;
+      bool m_useAllSpacePoints = false;
 
       /// Input SpacePoints Store Array
       StoreArray<SpacePoint> m_storeSpacePoints;

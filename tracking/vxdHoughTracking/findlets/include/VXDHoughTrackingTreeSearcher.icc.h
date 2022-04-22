@@ -31,9 +31,9 @@ namespace Belle2 {
       m_pathFilter.exposeParameters(moduleParamList, prefix);
 
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "twoHitFilterLimit"),
-                                    m_param_applyTwoHitFilterIfMoreChildStates,
+                                    m_applyTwoHitFilterIfMoreChildStates,
                                     "Use the TwoHitFilter (path length == 1) if there are more child states than this value.",
-                                    m_param_applyTwoHitFilterIfMoreChildStates);
+                                    m_applyTwoHitFilterIfMoreChildStates);
     }
 
     template <class AHit, class APathFilter, class AResult>
@@ -94,7 +94,7 @@ namespace Belle2 {
 
       // Do everything with child states, linking, extrapolation, teaching, discarding, what have you.
       const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& constPath = path;
-      if (path.size() > 1 or childHits.size() > m_param_applyTwoHitFilterIfMoreChildStates) {
+      if (path.size() > 1 or childHits.size() > m_applyTwoHitFilterIfMoreChildStates) {
         m_pathFilter.apply(constPath, childHits);
       }
 

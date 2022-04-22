@@ -35,54 +35,54 @@ void RecoTrackStorer::exposeParameters(ModuleParamList* moduleParamList, const s
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "SVDClustersStoreArrayName"), m_param_SVDClustersStoreArrayName,
-                                "Name of the SVDClusters Store Array.", m_param_SVDClustersStoreArrayName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "SVDClustersStoreArrayName"), m_SVDClustersStoreArrayName,
+                                "Name of the SVDClusters Store Array.", m_SVDClustersStoreArrayName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "RecoTracksStoreArrayName"), m_param_RecoTracksStoreArrayName,
-                                "Name of the RecoTracks Store Array.", m_param_RecoTracksStoreArrayName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "RecoTracksStoreArrayName"), m_RecoTracksStoreArrayName,
+                                "Name of the RecoTracks Store Array.", m_RecoTracksStoreArrayName);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "SVDSpacePointTrackCandsStoreArrayName"),
-                                m_param_SVDSpacePointTrackCandsStoreArrayName,
-                                "Name of the SpacePointTrackCand Store Array.", m_param_SVDSpacePointTrackCandsStoreArrayName);
+                                m_SVDSpacePointTrackCandsStoreArrayName,
+                                "Name of the SpacePointTrackCand Store Array.", m_SVDSpacePointTrackCandsStoreArrayName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ResultStorerQualityEstimationMethod"), m_param_EstimationMethod,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ResultStorerQualityEstimationMethod"), m_EstimationMethod,
                                 "Identifier which estimation method to use. Valid identifiers are: [mcInfo, circleFit, tripletFit, helixFit].",
-                                m_param_EstimationMethod);
+                                m_EstimationMethod);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ResultStorerMCRecoTracksStoreArrayName"),
-                                m_param_MCRecoTracksStoreArrayName,
+                                m_MCRecoTracksStoreArrayName,
                                 "Only required for MCInfo method. Name of StoreArray containing MCRecoTracks.",
-                                m_param_MCRecoTracksStoreArrayName);
+                                m_MCRecoTracksStoreArrayName);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ResultStorerMCStrictQualityEstimator"),
-                                m_param_MCStrictQualityEstimator,
+                                m_MCStrictQualityEstimator,
                                 "Only required for MCInfo method. If false combining several MCTracks is allowed.",
-                                m_param_MCStrictQualityEstimator);
+                                m_MCStrictQualityEstimator);
 }
 
 void RecoTrackStorer::initialize()
 {
   Super::initialize();
 
-  m_storeRecoTracks.registerInDataStore(m_param_RecoTracksStoreArrayName);
-  RecoTrack::registerRequiredRelations(m_storeRecoTracks, "", m_param_SVDClustersStoreArrayName, "", "", "", "");
-  m_storeSpacePointTrackCands.registerInDataStore(m_param_SVDSpacePointTrackCandsStoreArrayName,
+  m_storeRecoTracks.registerInDataStore(m_RecoTracksStoreArrayName);
+  RecoTrack::registerRequiredRelations(m_storeRecoTracks, "", m_SVDClustersStoreArrayName, "", "", "", "");
+  m_storeSpacePointTrackCands.registerInDataStore(m_SVDSpacePointTrackCandsStoreArrayName,
                                                   DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
   m_storeRecoTracks.registerRelationTo(m_storeSpacePointTrackCands);
 
   // create pointer to chosen estimator
-  if (m_param_EstimationMethod == "mcInfo") {
+  if (m_EstimationMethod == "mcInfo") {
     StoreArray<RecoTrack> mcRecoTracks;
-    mcRecoTracks.isRequired(m_param_MCRecoTracksStoreArrayName);
-    m_estimator = std::make_unique<QualityEstimatorMC>(m_param_MCRecoTracksStoreArrayName, m_param_MCStrictQualityEstimator);
-  } else if (m_param_EstimationMethod == "tripletFit") {
+    mcRecoTracks.isRequired(m_MCRecoTracksStoreArrayName);
+    m_estimator = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
+  } else if (m_EstimationMethod == "tripletFit") {
     m_estimator = std::make_unique<QualityEstimatorTripletFit>();
-  } else if (m_param_EstimationMethod == "circleFit") {
+  } else if (m_EstimationMethod == "circleFit") {
     m_estimator = std::make_unique<QualityEstimatorCircleFit>();
-  } else if (m_param_EstimationMethod == "helixFit") {
+  } else if (m_EstimationMethod == "helixFit") {
     m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
   }
-  B2ASSERT("QualityEstimator could not be initialized with method: " << m_param_EstimationMethod, m_estimator);
+  B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
 }
 
 void RecoTrackStorer::beginRun()
@@ -93,7 +93,7 @@ void RecoTrackStorer::beginRun()
   double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
   m_estimator->setMagneticFieldStrength(bFieldZ);
 
-  if (m_param_EstimationMethod == "mcInfo") {
+  if (m_EstimationMethod == "mcInfo") {
     QualityEstimatorMC* MCestimator = static_cast<QualityEstimatorMC*>(m_estimator.get());
     MCestimator->forceUpdateClusterNames();
   }
@@ -125,7 +125,7 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
     const double qi = estimatorResult.qualityIndicator;
 
     RecoTrack* newRecoTrack = m_storeRecoTracks.appendNew(trackPosition, trackMomentum, trackChargeSeed, "",
-                                                          m_param_SVDClustersStoreArrayName);
+                                                          m_SVDClustersStoreArrayName);
 
     // TODO: find out where these numbers come from!
     // This is copied from the VXDTF2 counterpart tracking/modules/spacePointCreator/SPTCmomentumSeedRetrieverModule !
@@ -168,7 +168,7 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
     for (const SpacePoint* spacePoint : sortedHits) {
       m_usedSpacePoints.insert(spacePoint);
 
-      RelationVector<SVDCluster> relatedClusters = spacePoint->getRelationsTo<SVDCluster>(m_param_SVDClustersStoreArrayName);
+      RelationVector<SVDCluster> relatedClusters = spacePoint->getRelationsTo<SVDCluster>(m_SVDClustersStoreArrayName);
       for (const SVDCluster& relatedCluster : relatedClusters) {
         m_usedClusters.insert(&relatedCluster);
         newRecoTrack->addSVDHit(&relatedCluster, sortingParameter, Belle2::RecoHitInformation::c_SVDHough);
@@ -183,7 +183,7 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
       continue;
     }
 
-    const auto& relatedClusters = spacePoint->getRelationsTo<SVDCluster>(m_param_SVDClustersStoreArrayName);
+    const auto& relatedClusters = spacePoint->getRelationsTo<SVDCluster>(m_SVDClustersStoreArrayName);
     for (const SVDCluster& relatedCluster : relatedClusters) {
       if (TrackFindingCDC::is_in(&relatedCluster, m_usedClusters)) {
         spacePoint->setAssignmentState(true);

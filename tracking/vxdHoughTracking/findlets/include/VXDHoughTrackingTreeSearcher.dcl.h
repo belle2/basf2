@@ -67,7 +67,7 @@ namespace Belle2 {
       TrackFindingCDC::CellularAutomaton<AHit> m_automaton;
 
       /// TwoHitFilter activarion cut
-      uint m_param_applyTwoHitFilterIfMoreChildStates = 50;
+      uint m_applyTwoHitFilterIfMoreChildStates = 50;
     };
 
   }

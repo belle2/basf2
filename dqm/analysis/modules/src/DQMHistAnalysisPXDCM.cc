@@ -215,7 +215,7 @@ void DQMHistAnalysisPXDCMModule::event()
         double v = 0;
         for (int gate = 0; gate < 192; gate++) {
           // attention, gate is not bin nr!
-          if (std::find(gm.begin(), gm.end(), gate) != gm.end()) {
+          if (std::find(gm.begin(), gm.end(), gate) == gm.end()) {
             v += hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 0, bin)) +
                  hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 1, bin)) +
                  hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 2, bin)) +

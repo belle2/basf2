@@ -10,7 +10,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <framework/geometry/B2Vector3.h>
-
+#include <cmath>
 using namespace Belle2;
 using namespace std;
 
@@ -29,9 +29,10 @@ SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
   //* Definition of input parameters */
   addParam("RecoTracks", m_recoTracksName, "Name of the StoreArray with the input RecoTracks", string(""));
   addParam("EventT0", m_eventT0Name, "Name of the StoreObjPtr with the input EventT0", string(""));
-  addParam("ptMin", m_pt, "Cut on minimum transverse momentum pt for RecoTrack selection", m_pt);
-  addParam("absPzMin", m_absPz, "Cut on minimum absolute value of the longitudinal momentum, abs(pz), for RecoTrack selection",
-           m_absPz);
+  addParam("ptMinSelection", m_ptSelection, "Cut on minimum transverse momentum pt for RecoTrack selection", m_ptSelection);
+  addParam("absPzMinSelection", m_absPzSelection,
+           "Cut on minimum absolute value of the longitudinal momentum, abs(pz), for RecoTrack selection",
+           m_absPzSelection);
 }
 
 
@@ -62,12 +63,9 @@ void SVDEventT0EstimatorModule::event()
   // loop on recotracks
   for (const auto& recoTrack : m_recoTracks) {
     const B2Vector3D& p = recoTrack.getMomentumSeed();
-    const double pt = p.Perp();
-    const double pz = p[2];
+    if (p.Perp() < m_ptSelection || std::fabs(p.Z()) < m_absPzSelection) continue;
     const vector<SVDCluster* >& svdClusters = recoTrack.getSVDHitList();
-    if (svdClusters.size() == 0) continue;
     B2DEBUG(20, "FITTED TRACK:   NUMBER OF SVD HITS = " << svdClusters.size());
-    if (pt < m_pt || abs(pz) < m_absPz) continue;
     for (const SVDCluster* svdCluster : svdClusters) {
       clsTime_sum += svdCluster->getClsTime();
       clsTime_err_sum += (svdCluster->getClsTimeSigma() * svdCluster->getClsTimeSigma());

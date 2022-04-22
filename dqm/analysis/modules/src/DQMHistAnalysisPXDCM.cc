@@ -209,20 +209,31 @@ void DQMHistAnalysisPXDCMModule::event()
       auto& gm = m_masked_gates[m_PXDModules[i]];
       // We loop over a 2d histogram!
       // loop CM values
-      for (int bin = 1; bin <= 63; bin++) { // we ignore CM63!!!
+      double dhpc = 0.0;
+      for (int bin = 1; bin <= 64; bin++) { // including CM63!!!
         // loop gates*asics
         double v = 0;
         for (int gate = 0; gate < 192; gate++) {
           // attention, gate is not bin nr!
           if (std::find(gm.begin(), gm.end(), gate) != gm.end()) {
-            v += hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 0, bin));
-            v += hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 1, bin));
-            v += hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 2, bin));
-            v += hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 3, bin));
+            v += hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 0, bin)) +
+                 hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 1, bin)) +
+                 hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 2, bin)) +
+                 hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 3, bin));
           }
         }
         m_hCommonMode->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
-        current_full += v;
+        // integration intervalls depend on CM default value, this seems to be agreed =10
+        // FIXME currently we have to much noise below the line ... thus excluding this to avoid false alarms
+        // outside_full += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
+        // attention, n bins!
+        // we integrate up including value 62 (cm overflow), but not 63 (fifo full)
+        if (bin == 63 + 1) { // CM63
+          dhpc += v;
+        } else { // excluding CM63
+          current_full += v;
+          if (bin > m_upperLineFull + 1) outside_full += v;
+        }
         if (nevent < m_minEntries) {
           m_hCommonModeDelta->SetBinContent(i + 1, bin, v * scale); // attention, mixing bin nr and index
         } else if (update) {
@@ -232,14 +243,8 @@ void DQMHistAnalysisPXDCMModule::event()
         }
       }
 
-      /// TODO: integration intervalls depend on CM default value, this seems to be agreed =10
-      // Attention, Integral uses the bin nr, not the value!
-      outside_full += hh1->Integral(m_upperLineFull + 1, 63);
-      // FIXME currently we have to much noise below the line ... thus excluding this to avoid false alarms
-      // outside_full += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
       all_outside += outside_full;
       all += current_full;
-      double dhpc = hh1->GetBinContent(64);
       all_cm += dhpc;
       if (current_full > 1) {
         error_full_flag |= (outside_full / current_full > m_errorOutsideFull);

@@ -428,7 +428,7 @@ namespace Belle2 {
         doScan = m_track.isScanRequired(col, time, wid);
       }
 
-      m_yScanner->expand(col, yB, dydz, D, doScan);
+      m_yScanner->expand(col, yB, dydz, D, Ny_eff, doScan);
 
       double numPhotons = m_yScanner->getNumPhotons() * std::abs(D.dFic_dx * pixel.Dx);
       int nx = m_fastRaytracer->getNx();

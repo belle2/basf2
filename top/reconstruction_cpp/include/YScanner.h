@@ -17,6 +17,7 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
+#include <map>
 
 
 namespace Belle2 {
@@ -252,9 +253,10 @@ namespace Belle2 {
        * @param yB unfolded coordinate y of photon at prism entrance (= Bar exit) plane
        * @param dydz photon slope in y-z projection at prism entrance (dy/dz)
        * @param D the derivatives
+       * @param Ny effective number of reflections
        * @param doScan if true decide between scan and merge methods, if false always use merge method
        */
-      void expand(unsigned col, double yB, double dydz, const Derivatives& D, bool doScan) const;
+      void expand(unsigned col, double yB, double dydz, const Derivatives& D, int Ny, bool doScan) const;
 
       /**
        * Returns pixel positions and their sizes
@@ -359,10 +361,11 @@ namespace Belle2 {
       const Table& getEnergyDistribution() const {return m_energyDistribution;}
 
       /**
-       * Returns photon energy distribution convoluted with multiple scattering
-       * @return photon energy distribution convoluted with multiple scattering
+       * Returns photon energy distributions convoluted with multiple scattering and surface roughness.
+       * Map entries correspond to different Gaussian widths due to different number of reflections.
+       * @return photon energy distributions convoluted with multiple scattering and surface roughness
        */
-      const Table& getQuasyEnergyDistribution() const {return m_quasyEnergyDistribution;}
+      const std::map<int, Table> getQuasyEnergyDistributions() const {return m_quasyEnergyDistributions;}
 
       /**
        * Returns the results of PDF expansion in y
@@ -385,6 +388,12 @@ namespace Belle2 {
        * @return integral of distribution before normalization
        */
       double setEnergyDistribution(double beta) const;
+
+      /**
+       * Sets photon energy distribution convoluted with a normalized Gaussian
+       * @param sigma width of the Gaussian [eV]
+       */
+      void setQuasyEnergyDistribution(double sigma) const;
 
       /**
        * Integrates quasy energy distribution multiplied with energy mask
@@ -464,7 +473,9 @@ namespace Belle2 {
       mutable double m_sigmaScat = 0; /**< r.m.s. of multiple scattering angle in photon energy units */
       mutable double m_sigmaAlpha = 0; /**< surface roughness parameter in photon energy units */
       mutable Table m_energyDistribution; /**< photon energy distribution */
-      mutable Table m_quasyEnergyDistribution; /**< photon energy distribution convoluted with multiple scattering */
+      mutable std::map<int, Table>
+      m_quasyEnergyDistributions; /**< photon energy distributions convoluted with Gaussian of different widths */
+      mutable Table* m_quasyEnergyDistribution = nullptr; /**< a pointer to the element in m_quasyEnergyDistributions */
       mutable bool m_aboveThreshold = false; /**< true if beta is above the Cerenkov threshold */
 
       // results of expand method (pixel column dependent)

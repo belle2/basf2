@@ -101,7 +101,7 @@ void VariablesToNtupleModule::initialize()
   // declare counter branches - pass through variable list, remove counters added by user
   m_tree->get().Branch("__experiment__", &m_experiment, "__experiment__/I");
   m_tree->get().Branch("__run__", &m_run, "__run__/I");
-  m_tree->get().Branch("__event__", &m_event, "__event__/I");
+  m_tree->get().Branch("__event__", &m_event, "__event__/i");
   m_tree->get().Branch("__production__", &m_production, "__production__/I");
   if (not m_particleList.empty()) {
     m_tree->get().Branch("__candidate__", &m_candidate, "__candidate__/I");

@@ -62,6 +62,7 @@ void DQMHistAnalysisPXDDAQModule::initialize()
   m_cMissingDHE = new TCanvas((m_histogramDirectoryName + "/c_MissingDHE").data());
   m_cMissingDHP = new TCanvas((m_histogramDirectoryName + "/c_MissingDHP").data());
   m_cStatistic = new TCanvas((m_histogramDirectoryName + "/c_Statistic").data());
+  m_cStatisticUpd = new TCanvas((m_histogramDirectoryName + "/c_StatisticUpd").data());
 
   m_monObj->addCanvas(m_cDAQError);
   m_monObj->addCanvas(m_cMissingDHC);

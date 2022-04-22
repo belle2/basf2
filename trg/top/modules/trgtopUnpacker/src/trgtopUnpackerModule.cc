@@ -17,7 +17,7 @@ include directive to avoid an undefined reference on compilation.
 * ---------------------------------------------------------------------- */
 // #include <framework/core/ModuleParam.templateDetails.h>
 
-using namespace std;
+//using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -25,9 +25,9 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 REG_MODULE(TRGTOPUnpacker);
 
-string TRGTOPUnpackerModule::version() const
+std::string TRGTOPUnpackerModule::version() const
 {
-  return string("1.00");
+  return std::string("1.00");
 }
 
 //-----------------------------------------------------------------
@@ -41,7 +41,7 @@ TRGTOPUnpackerModule::TRGTOPUnpackerModule()
   // Set module properties
 
 
-  string desc = "TRGTOPUnpackerModule(" + version() + ")";
+  std::string desc = "TRGTOPUnpackerModule(" + version() + ")";
   setDescription(desc);
   setPropertyFlags(c_ParallelProcessingCertified);
 

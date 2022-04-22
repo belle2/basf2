@@ -10,7 +10,7 @@
 
 #include <string>
 
-#pragma once
+//#pragma once
 
 #include "rawdata/dataobjects/RawTRG.h"
 #include "trg/top/dataobjects/TRGTOPWaveFormTimeStampsSlot.h"

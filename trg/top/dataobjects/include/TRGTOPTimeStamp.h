@@ -9,7 +9,7 @@
 #ifndef TRGTOPTIMESTAMP_H
 #define TRGTOPTIMESTAMP_H
 
-#pragma once
+//#pragma once
 
 //#include <TObject.h>
 #include <framework/datastore/RelationsObject.h>
@@ -18,8 +18,6 @@
 #include <limits>
 
 namespace Belle2 {
-
-  static const int intNaNTTTS = std::numeric_limits<int>::quiet_NaN();
 
   //! Example Detector
   //  class TRGTOPTimeStamp : public TObject {
@@ -30,7 +28,7 @@ namespace Belle2 {
     // Empty constructor
     // Recommended for ROOT IO
     TRGTOPTimeStamp() :
-      m_timeStamp(intNaNTTTS)
+      m_timeStamp(0)
     {}
 
     //! A Useful Constructor

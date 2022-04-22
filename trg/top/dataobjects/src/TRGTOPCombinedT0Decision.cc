@@ -10,7 +10,7 @@
 
 //#include <framework/datastore/RelationVector.h>
 
-using namespace std;
+//using namespace std;
 using namespace Belle2;
 
 void TRGTOPCombinedT0Decision::setCombinedT0(int combinedT0) { m_combinedT0 = combinedT0 ; }

@@ -9,7 +9,7 @@
 #ifndef TRGTOPWAVEFORMTIMESTAMPSSLOT_H
 #define TRGTOPWAVEFORMTIMESTAMPSSLOT_H
 
-#pragma once
+//#pragma once
 
 //#include <TObject.h>
 #include <framework/datastore/RelationsObject.h>
@@ -30,7 +30,7 @@ namespace Belle2 {
     // Empty constructor
     // Recommended for ROOT IO
     TRGTOPWaveFormTimeStampsSlot() :
-      m_slotId(intNaNTTWFTS)
+      m_slotId(0)
     {}
 
     //! A Useful Constructor

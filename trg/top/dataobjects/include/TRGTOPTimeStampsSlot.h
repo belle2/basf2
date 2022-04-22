@@ -9,7 +9,7 @@
 #ifndef TRGTOPTIMESTAMPSSLOT_H
 #define TRGTOPTIMESTAMPSSLOT_H
 
-#pragma once
+//#pragma once
 
 //#include <TObject.h>
 #include <framework/datastore/RelationsObject.h>
@@ -30,7 +30,7 @@ namespace Belle2 {
     // Empty constructor
     // Recommended for ROOT IO
     TRGTOPTimeStampsSlot() :
-      m_slotId(intNaNTTTS)
+      m_slotId(0)
     {}
 
     //! A Useful Constructor

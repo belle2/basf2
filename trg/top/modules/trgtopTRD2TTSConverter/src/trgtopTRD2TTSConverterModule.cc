@@ -17,7 +17,7 @@ include directive to avoid an undefined reference on compilation.
 
 #include <iostream>
 
-using namespace std;
+//using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -25,9 +25,9 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 REG_MODULE(TRGTOPTRD2TTSConverter);
 
-string TRGTOPTRD2TTSConverterModule::version() const
+std::string TRGTOPTRD2TTSConverterModule::version() const
 {
-  return string("1.00");
+  return std::string("1.00");
 }
 
 //-----------------------------------------------------------------
@@ -40,7 +40,7 @@ TRGTOPTRD2TTSConverterModule::TRGTOPTRD2TTSConverterModule()
   // Set module properties
 
 
-  string desc = "TRGTOPTRD2TTSConverterModule(" + version() + ")" + "converts TOPRawDigits to TOP TRG timestamps";
+  std::string desc = "TRGTOPTRD2TTSConverterModule(" + version() + ")" + "converts TOPRawDigits to TOP TRG timestamps";
   setDescription(desc);
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -50,17 +50,17 @@ TRGTOPTRD2TTSConverterModule::TRGTOPTRD2TTSConverterModule()
 
   // Add parameters
   addParam("inputRawDigitsName", m_inputRawDigitsName,
-           "name of TOPRawDigit store array", string(""));
+           "name of TOPRawDigit store array", std::string(""));
 
   addParam("inputConvertedDigitsName", m_inputConvertedDigitsName,
-           "name of TOPDigit store array", string(""));
+           "name of TOPDigit store array", std::string(""));
 
   // Add parameters
   addParam("outputTimeStampsSlotName", m_outputTimeStampsSlotName,
-           "name of TRGTOPTimeStampsSlot store array", string(""));
+           "name of TRGTOPTimeStampsSlot store array", std::string(""));
 
   addParam("outputTimeStampName", m_outputTimeStampName,
-           "name of TRGTOPTimeStamp store array", string(""));
+           "name of TRGTOPTimeStamp store array", std::string(""));
 
   addParam("addRelations", m_addRelations, "if true, make relations to TOPRawDigits", true);
 

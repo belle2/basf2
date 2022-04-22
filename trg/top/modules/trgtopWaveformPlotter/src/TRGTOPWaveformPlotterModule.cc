@@ -42,7 +42,7 @@
 
 #include <iostream>
 
-using namespace std;
+//using namespace std;
 using namespace Belle2;
 
 REG_MODULE(TRGTOPWaveformPlotter);
@@ -244,7 +244,7 @@ void TRGTOPWaveformPlotterModule::event()
   int topTRGISimMRODecisionNTS[NUMBER_OF_TOP_SLOTS] = {0};
   int topTRGISimMRODecisionNumber[NUMBER_OF_TOP_SLOTS] = {0};
 
-  string topTRGIsimMRODecisionText[NUMBER_OF_TOP_SLOTS];
+  std::string topTRGIsimMRODecisionText[NUMBER_OF_TOP_SLOTS];
   for (int slot = 1; slot <= NUMBER_OF_TOP_SLOTS; slot++) topTRGIsimMRODecisionText[slot - 1] = "All iSim TOP decisions: ";
 
   for (const auto& slotDecision : trgtopTimingISimMainReadoutAll) {
@@ -256,11 +256,11 @@ void TRGTOPWaveformPlotterModule::event()
     topTRGISimMRODecisionNTS[slot - 1] = topTRGISimMRODecisionNTS[slot - 1] + slotDecision.getSlotNHits();
     topTRGISimMRODecisionNumber[slot - 1] = topTRGISimMRODecisionNumber[slot - 1] + 1;
 
-    stringstream ss1;
+    std::stringstream ss1;
     ss1 << slotDecision.getSlotNHits();
-    stringstream ss2;
+    std::stringstream ss2;
     ss2 << slotDecision.getSlotTiming();
-    stringstream ss3;
+    std::stringstream ss3;
     ss3 << slotDecision.getSlotDecisionClockCycle();
     topTRGIsimMRODecisionText[slot - 1] = topTRGIsimMRODecisionText[slot - 1] + " " + ss2.str() + " ( " + ss1.str() + " [" + ss3.str() +
                                           "]" + " ); ";
@@ -274,7 +274,7 @@ void TRGTOPWaveformPlotterModule::event()
   int topTRGISimWFRODecisionNTS[NUMBER_OF_TOP_SLOTS] = {0};
   int topTRGISimWFRODecisionNumber[NUMBER_OF_TOP_SLOTS] = {0};
 
-  string topTRGIsimWFRODecisionText[NUMBER_OF_TOP_SLOTS];
+  std::string topTRGIsimWFRODecisionText[NUMBER_OF_TOP_SLOTS];
   for (int slot = 1; slot <= NUMBER_OF_TOP_SLOTS; slot++) topTRGIsimWFRODecisionText[slot - 1] = "All iSim TRG decisions: ";
 
   for (const auto& slotDecision : trgtopTimingISimTriggerReadoutAll) {
@@ -286,11 +286,11 @@ void TRGTOPWaveformPlotterModule::event()
     topTRGISimWFRODecisionNTS[slot - 1] = topTRGISimWFRODecisionNTS[slot - 1] + slotDecision.getSlotNHits();
     topTRGISimWFRODecisionNumber[slot - 1] = topTRGISimWFRODecisionNumber[slot - 1] + 1;
 
-    stringstream ss1;
+    std::stringstream ss1;
     ss1 << slotDecision.getSlotNHits();
-    stringstream ss2;
+    std::stringstream ss2;
     ss2 << slotDecision.getSlotTiming();
-    stringstream ss3;
+    std::stringstream ss3;
     ss3 << slotDecision.getSlotDecisionClockCycle();
     topTRGIsimWFRODecisionText[slot - 1] = topTRGIsimWFRODecisionText[slot - 1] + " " + ss2.str() + " ( " + ss1.str() + " [" + ss3.str()
                                            + "]" + " ); ";
@@ -305,7 +305,7 @@ void TRGTOPWaveformPlotterModule::event()
   int topTRGDecisionNumber[NUMBER_OF_TOP_SLOTS] = {0};
   //  int topTRGDecisionClockCycle[NUMBER_OF_TOP_SLOTS] = {0};
 
-  string topTRGDecisionText[NUMBER_OF_TOP_SLOTS];
+  std::string topTRGDecisionText[NUMBER_OF_TOP_SLOTS];
   for (int slot = 1; slot <= NUMBER_OF_TOP_SLOTS; slot++) topTRGDecisionText[slot - 1] = "All online TRG decisions: ";
 
   for (const auto& slotDecision : trgtopSlotTimingAll) {
@@ -321,11 +321,11 @@ void TRGTOPWaveformPlotterModule::event()
       //      topTRGDecisionClockCycle[slot-1] = slotDecision.getSlotDecisionClockCycle();
       topTRGDecisionNumber[slot - 1] = topTRGDecisionNumber[slot - 1] + 1;
 
-      stringstream ss1;
+      std::stringstream ss1;
       ss1 << slotDecision.getSlotNHits();
-      stringstream ss2;
+      std::stringstream ss2;
       ss2 << slotDecision.getSlotTiming() / 2;
-      stringstream ss3;
+      std::stringstream ss3;
       ss3 << slotDecision.getSlotDecisionClockCycle();
       topTRGDecisionText[slot - 1] = topTRGDecisionText[slot - 1] + " " + ss2.str() + " ( " + ss1.str() + " [" + ss3.str() + "]" + " ); ";
 
@@ -482,14 +482,14 @@ void TRGTOPWaveformPlotterModule::event()
     }
   }
 
-  xMin = max(xMin - 10, 0);
+  xMin = std::max(xMin - 10, 0);
   xMax = xMax + 10;
-  yMin = max(yMin - 10, 0);
+  yMin = std::max(yMin - 10, 0);
   yMax = yMax + 10;
 
-  string myMultiGraphTitle[NUMBER_OF_TOP_SLOTS];
+  std::string myMultiGraphTitle[NUMBER_OF_TOP_SLOTS];
 
-  string myPaveTextInfo[NUMBER_OF_TOP_SLOTS][8];
+  std::string myPaveTextInfo[NUMBER_OF_TOP_SLOTS][8];
 
   for (int slot = 1; slot <= NUMBER_OF_TOP_SLOTS; slot++) {
 
@@ -499,7 +499,7 @@ void TRGTOPWaveformPlotterModule::event()
       // In principle, we can allow TCanvas (where this TMultiGraph will be plotted) to assume the ownership over this graph.
       // Then, when memory is freed, it should be sufficient to delete TCanvas only, as it would delete the graph also.
       //    m_myMultiGraph[slot-1]->SetBit(kCanDelete);
-      stringstream slotInfo;
+      std::stringstream slotInfo;
       slotInfo << slot;
       myMultiGraphTitle[slot - 1] = "Slot " + slotInfo.str() + " : ";
 
@@ -555,31 +555,31 @@ void TRGTOPWaveformPlotterModule::event()
 
       myMultiGraphTitle[slot - 1] = myMultiGraphTitle[slot - 1] + " TOP / TRG / L1 / iSim TOP / iSim TRG hits:";
 
-      stringstream nHitInfoMainReadout;
+      std::stringstream nHitInfoMainReadout;
       nHitInfoMainReadout << topTRGMRONTS[slot - 1];
       myMultiGraphTitle[slot - 1] = myMultiGraphTitle[slot - 1] + " " + nHitInfoMainReadout.str();
 
       myPaveTextInfo[slot - 1][0] = "N hits (TOP readout): " + nHitInfoMainReadout.str();
 
-      stringstream nHitInfoTriggerReadout;
+      std::stringstream nHitInfoTriggerReadout;
       nHitInfoTriggerReadout << topTRGWFRONTS[slot - 1];
       myMultiGraphTitle[slot - 1] = myMultiGraphTitle[slot - 1] + " / " + nHitInfoTriggerReadout.str();
 
       myPaveTextInfo[slot - 1][1] = "N timestamps (TRG readout): " + nHitInfoTriggerReadout.str();
 
-      stringstream nHitInfoTriggerDecision;
+      std::stringstream nHitInfoTriggerDecision;
       nHitInfoTriggerDecision << topTRGDecisionNTS[slot - 1];
       myMultiGraphTitle[slot - 1] = myMultiGraphTitle[slot - 1] + " / " + nHitInfoTriggerDecision.str();
 
       myPaveTextInfo[slot - 1][2] = "N timestamps TRG online: " + nHitInfoTriggerDecision.str();
 
-      stringstream nHitInfoISimTriggerDecisionMainReadout;
+      std::stringstream nHitInfoISimTriggerDecisionMainReadout;
       nHitInfoISimTriggerDecisionMainReadout << topTRGISimMRODecisionNTS[slot - 1];
       myMultiGraphTitle[slot - 1] = myMultiGraphTitle[slot - 1] + " / " + nHitInfoISimTriggerDecisionMainReadout.str();
 
       myPaveTextInfo[slot - 1][3] = "N timestamps TRG ISim (all, TOP readout): " + nHitInfoISimTriggerDecisionMainReadout.str();
 
-      stringstream nHitInfoISimTriggerDecisionTriggerReadout;
+      std::stringstream nHitInfoISimTriggerDecisionTriggerReadout;
       nHitInfoISimTriggerDecisionTriggerReadout << topTRGISimWFRODecisionNTS[slot - 1];
       myMultiGraphTitle[slot - 1] = myMultiGraphTitle[slot - 1] + " / " + nHitInfoISimTriggerDecisionTriggerReadout.str();
 
@@ -588,9 +588,9 @@ void TRGTOPWaveformPlotterModule::event()
       //      myMultiGraphTitle[slot-1] = myMultiGraphTitle[slot-1] + ", t0 online/ISim main/TRG: ";
 
       if (topTRGDecisionPresent[slot - 1]) {
-        stringstream nTimingInfoTriggerDecision;
+        std::stringstream nTimingInfoTriggerDecision;
         nTimingInfoTriggerDecision << topTRGDecisionTiming[slot - 1] / 2;
-        stringstream nNumberInfoTriggerDecision;
+        std::stringstream nNumberInfoTriggerDecision;
         nNumberInfoTriggerDecision << topTRGDecisionNumber[slot - 1];
         myPaveTextInfo[slot - 1][5] = "Number of online TRG decisions: " + nNumberInfoTriggerDecision.str() + ", most recent t0: " +
                                       nTimingInfoTriggerDecision.str();
@@ -602,9 +602,9 @@ void TRGTOPWaveformPlotterModule::event()
       }
 
       if (topTRGISimMRODecisionPresent[slot - 1]) {
-        stringstream nTimingInfoTriggerDecision;
+        std::stringstream nTimingInfoTriggerDecision;
         nTimingInfoTriggerDecision << topTRGISimMRODecisionTiming[slot - 1];
-        stringstream nNumberInfoTriggerDecision;
+        std::stringstream nNumberInfoTriggerDecision;
         nNumberInfoTriggerDecision << topTRGISimMRODecisionNumber[slot - 1];
         myPaveTextInfo[slot - 1][6] = "Number of ISim TOP readout TRG decisions: " + nNumberInfoTriggerDecision.str() + ", most recent t0: "
                                       + nTimingInfoTriggerDecision.str();
@@ -616,9 +616,9 @@ void TRGTOPWaveformPlotterModule::event()
       }
 
       if (topTRGISimWFRODecisionPresent[slot - 1]) {
-        stringstream nTimingInfoTriggerDecision;
+        std::stringstream nTimingInfoTriggerDecision;
         nTimingInfoTriggerDecision << topTRGISimWFRODecisionTiming[slot - 1];
-        stringstream nNumberInfoTriggerDecision;
+        std::stringstream nNumberInfoTriggerDecision;
         nNumberInfoTriggerDecision << topTRGISimWFRODecisionNumber[slot - 1];
         myPaveTextInfo[slot - 1][7] = "Number of ISim TRG readout TRG decisions: " + nNumberInfoTriggerDecision.str() + ", most recent t0: "
                                       + nTimingInfoTriggerDecision.str();
@@ -632,10 +632,10 @@ void TRGTOPWaveformPlotterModule::event()
       myMultiGraphTitle[slot - 1] = myMultiGraphTitle[slot - 1] + "; Clock cycle (8ns units); Hit time (2ns units)";
       m_myMultiGraph[slot - 1]->SetTitle(myMultiGraphTitle[slot - 1].c_str());
 
-      stringstream slotInfo;
+      std::stringstream slotInfo;
       slotInfo << slot;
-      string name = "c_" + slotInfo.str();
-      string title = "Main readout hits (red) and trigger readout timestamps (blue/black) for slot " + slotInfo.str();
+      std::string name = "c_" + slotInfo.str();
+      std::string title = "Main readout hits (red) and trigger readout timestamps (blue/black) for slot " + slotInfo.str();
       m_myCanvas[slot - 1] = new TCanvas(name.c_str(), title.c_str(), canvasXMin, canvasYMin, canvasXSize, canvasYSize);
       if (m_shiftCanvas) {
         canvasXMin = canvasXMin + m_xShiftCanvas;
@@ -657,9 +657,9 @@ void TRGTOPWaveformPlotterModule::event()
         m_myMultiGraph[slot - 1]->SetMaximum(m_yMax);
         xAxis->SetLimits(m_xMin, m_xMax);
       } else if (m_plottingMode == 1) {
-        m_myMultiGraph[slot - 1]->SetMinimum(min(yMinMRO[slot - 1], yMinWFRO[slot - 1]));
-        m_myMultiGraph[slot - 1]->SetMaximum(max(yMaxMRO[slot - 1], yMaxWFRO[slot - 1]));
-        xAxis->SetLimits(min(xMinMRO[slot - 1], xMinWFRO[slot - 1]), max(xMaxMRO[slot - 1], xMaxWFRO[slot - 1]));
+        m_myMultiGraph[slot - 1]->SetMinimum(std::min(yMinMRO[slot - 1], yMinWFRO[slot - 1]));
+        m_myMultiGraph[slot - 1]->SetMaximum(std::max(yMaxMRO[slot - 1], yMaxWFRO[slot - 1]));
+        xAxis->SetLimits(std::min(xMinMRO[slot - 1], xMinWFRO[slot - 1]), std::max(xMaxMRO[slot - 1], xMaxWFRO[slot - 1]));
       } else if (m_plottingMode == 2) {
         m_myMultiGraph[slot - 1]->SetMinimum(yMin);
         m_myMultiGraph[slot - 1]->SetMaximum(yMax);

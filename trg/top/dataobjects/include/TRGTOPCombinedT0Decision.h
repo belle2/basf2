@@ -9,7 +9,7 @@
 #ifndef TRGTOPCOMBINEDT0DECISION_H
 #define TRGTOPCOMBINEDT0DECISION_H
 
-#pragma once
+//#pragma once
 
 //#include <TObject.h>
 #include <framework/datastore/RelationsObject.h>
@@ -18,8 +18,6 @@
 #include <limits>
 
 namespace Belle2 {
-
-  static const int intNaNCT0D = std::numeric_limits<int>::quiet_NaN();
 
   //! Example Detector
   //  class TRGTOPCombinedT0Decision : public TObject {
@@ -30,12 +28,12 @@ namespace Belle2 {
     // Empty constructor
     // Recommended for ROOT IO
     TRGTOPCombinedT0Decision() :
-      m_combinedT0(intNaNCT0D),
-      m_rvcNow(intNaNCT0D),
-      m_combinedT0ClockCycle(intNaNCT0D),
-      m_combinedT0RVC2GDL(intNaNCT0D),
-      m_eventNumberL1(intNaNCT0D),
-      m_rvcL1(intNaNCT0D)
+      m_combinedT0(0),
+      m_rvcNow(0),
+      m_combinedT0ClockCycle(0),
+      m_combinedT0RVC2GDL(0),
+      m_eventNumberL1(0),
+      m_rvcL1(0)
     {}
 
     //! A Useful Constructor

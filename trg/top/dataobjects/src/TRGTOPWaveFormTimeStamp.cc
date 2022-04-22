@@ -12,7 +12,7 @@
 
 //#include <framework/datastore/RelationVector.h>
 
-using namespace std;
+//using namespace std;
 using namespace Belle2;
 
 void TRGTOPWaveFormTimeStamp::setTimeStamp(int timeStamp) { m_timeStamp      = timeStamp     ; }

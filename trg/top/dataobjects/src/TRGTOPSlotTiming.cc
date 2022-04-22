@@ -8,7 +8,7 @@
 
 #include "trg/top/dataobjects/TRGTOPSlotTiming.h"
 
-using namespace std;
+//using namespace std;
 using namespace Belle2;
 
 void TRGTOPSlotTiming::setSlotId(int slotId) { m_slotId      = slotId     ; }

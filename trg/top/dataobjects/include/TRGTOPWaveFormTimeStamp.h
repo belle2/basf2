@@ -9,7 +9,7 @@
 #ifndef TRGTOPWAVEFORMTIMESTAMP_H
 #define TRGTOPWAVEFORMTIMESTAMP_H
 
-#pragma once
+//#pragma once
 
 //#include <TObject.h>
 #include <framework/datastore/RelationsObject.h>
@@ -18,8 +18,6 @@
 #include <limits>
 
 namespace Belle2 {
-
-  static const int intNaNTTWFTS = std::numeric_limits<int>::quiet_NaN();
 
   //! Example Detector
   //  class TRGTOPWaveFormTimeStamp : public TObject {
@@ -30,7 +28,7 @@ namespace Belle2 {
     // Empty constructor
     // Recommended for ROOT IO
     TRGTOPWaveFormTimeStamp() :
-      m_timeStamp(intNaNTTWFTS)
+      m_timeStamp(0)
     {}
 
     //! A Useful Constructor

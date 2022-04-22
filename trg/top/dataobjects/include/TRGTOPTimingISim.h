@@ -18,8 +18,6 @@
 
 namespace Belle2 {
 
-  static const int intNaNTIS = std::numeric_limits<int>::quiet_NaN();
-
   //! Example Detector
   //  class TRGTOPTimingISim : public TObject {
   class TRGTOPTimingISim : public RelationsObject {
@@ -29,12 +27,12 @@ namespace Belle2 {
     // Empty constructor
     // Recommended for ROOT IO
     TRGTOPTimingISim() :
-      m_slotId(intNaNTIS),
-      m_slotTiming(intNaNTIS),
-      m_slotSegment(intNaNTIS),
-      m_slotNHits(intNaNTIS),
-      m_slotLogL(intNaNTIS),
-      m_slotDecisionClockCycle(intNaNTIS)
+      m_slotId(0),
+      m_slotTiming(0),
+      m_slotSegment(0),
+      m_slotNHits(0),
+      m_slotLogL(0),
+      m_slotDecisionClockCycle(0)
     {}
 
     //! A Useful Constructor
@@ -42,10 +40,10 @@ namespace Belle2 {
       int slotId
     ) :
       m_slotId(slotId),
-      m_slotTiming(intNaNTIS),
-      m_slotSegment(intNaNTIS),
-      m_slotNHits(intNaNTIS),
-      m_slotLogL(intNaNTIS),
+      m_slotTiming(0),
+      m_slotSegment(0),
+      m_slotNHits(0),
+      m_slotLogL(0),
       m_slotDecisionClockCycle(0)
     {}
 

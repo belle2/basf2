@@ -8,7 +8,7 @@
 #ifndef TRGTOPTRD2TTSCONVERTER_H
 #define TRGTOPTRD2TTSCONVERTER_H
 
-#pragma once
+//#pragma once
 
 #include <framework/core/Module.h>
 #include <string>

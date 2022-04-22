@@ -12,7 +12,7 @@
 #include <top/dataobjects/TOPDigit.h>
 //#include <framework/datastore/RelationVector.h>
 
-using namespace std;
+//using namespace std;
 using namespace Belle2;
 
 void TRGTOPTimeStamp::setTimeStamp(int timeStamp) { m_timeStamp      = timeStamp     ; }

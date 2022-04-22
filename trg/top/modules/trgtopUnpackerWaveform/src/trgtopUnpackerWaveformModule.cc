@@ -17,7 +17,7 @@ include directive to avoid an undefined reference on compilation.
 
 #include <iostream>
 
-using namespace std;
+//using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -25,9 +25,9 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 REG_MODULE(TRGTOPUnpackerWaveform);
 
-string TRGTOPUnpackerWaveformModule::version() const
+std::string TRGTOPUnpackerWaveformModule::version() const
 {
-  return string("1.00");
+  return std::string("1.00");
 }
 
 //-----------------------------------------------------------------
@@ -41,7 +41,7 @@ TRGTOPUnpackerWaveformModule::TRGTOPUnpackerWaveformModule()
   // Set module properties
 
 
-  string desc = "TRGTOPUnpackerWaveformModule(" + version() + ")" + "Unpacks TOP TRG waveforms";
+  std::string desc = "TRGTOPUnpackerWaveformModule(" + version() + ")" + "Unpacks TOP TRG waveforms";
   setDescription(desc);
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -50,10 +50,10 @@ TRGTOPUnpackerWaveformModule::TRGTOPUnpackerWaveformModule()
   // Parameter definitions
 
   addParam("outputTimeStampsSlotsName", m_outputWaveFormTimeStampsSlotsName,
-           "name of TRGTOPWaveFormTimeStampsSlot store array", string(""));
+           "name of TRGTOPWaveFormTimeStampsSlot store array", std::string(""));
 
   addParam("outputTimeStampsName", m_outputWaveFormTimeStampsName,
-           "name of TRGTOPWaveFormTimeStamp store array", string(""));
+           "name of TRGTOPWaveFormTimeStamp store array", std::string(""));
 
   addParam("overrideControlBits", m_overrideControlBits,
            "Override control bits in data",

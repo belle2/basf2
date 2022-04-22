@@ -463,7 +463,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
     hdEdxvsPhi->SetTitle("CDC-dEdx vs Phi");
     hdEdxvsPhi->Draw("col");
 
-    l_line->DrawLine(-3.20, 1.0, 3.20, 1.0);
+    l_line->DrawLine(-3.20, m_mean, 3.20, m_mean);
 
     TPaveText* pinfo0 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
     set_Text_Style(pinfo0);
@@ -488,7 +488,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
     hdEdxvsCosth->SetTitle("CDC-dEdx vs Costh");
     hdEdxvsCosth->Draw("col");
 
-    l_line->DrawLine(-1.0, 1.0, 1.0, 1.0);
+    l_line->DrawLine(-1.0, m_mean, 1.0, m_mean);
 
     TPaveText* pinfo1 = new TPaveText(0.60, 0.77, 0.85, 0.89, "NBNDC");
     set_Text_Style(pinfo1);

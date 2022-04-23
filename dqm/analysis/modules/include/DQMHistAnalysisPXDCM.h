@@ -96,6 +96,14 @@ namespace Belle2 {
     /** threshold level/line for outside fraction */
     int m_upperLineFull{};
 
+    //! Module list for mask
+    std::vector <std::string> m_par_module_list;
+    //! Double-gate list for mask
+    std::vector <std::vector<int>> m_par_gate_list;
+
+    //! Module wise gate masking in CM plot and alarm
+    std::map <VxdID, std::vector<int>> m_masked_gates;
+
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
 

@@ -5,45 +5,42 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef TRGTOPUNPACKER_H
-#define TRGTOPUNPACKER_H
+#ifndef TRGTOPUNPACKERWAVEFORM_H
+#define TRGTOPUNPACKERWAVEFORM_H
 
 #include <string>
-#include <algorithm>
+
+//#pragma once
 
 #include "rawdata/dataobjects/RawTRG.h"
-//#include "trg/top/dataobjects/TRGTOPUnpackerStore.h"
-#include "trg/top/dataobjects/TRGTOPCombinedT0Decision.h"
-
-#include "trg/top/dataobjects/TRGTOPSlotTiming.h"
+#include "trg/top/dataobjects/TRGTOPWaveFormTimeStampsSlot.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
 
-#define NUMBER_OF_SLOTS 16
+
+#define NUMBER_OF_TOP_SLOTS 16
 
 namespace Belle2 {
   /**
-  * TRG TOP Unpacker
+  * TRG TOP Unpacker for Timestamps
   *
-  * TOP trigger unpacker
+  * TOP TRG timestamps unpacker
   *
   *
   */
 
-  class TRGTOPUnpackerModule : public Module {
+  class TRGTOPUnpackerWaveformModule : public Module {
 
   public:
-
-    static constexpr double clkTo1ns = 0.5 / 0.508877;
 
     /**
     * Constructor: Sets the description, the properties and the parameters of the module.
     */
-    TRGTOPUnpackerModule();
+    TRGTOPUnpackerWaveformModule();
 
     /**  */
-    virtual ~TRGTOPUnpackerModule() override;
+    virtual ~TRGTOPUnpackerWaveformModule() override;
 
     /**  */
     virtual void initialize() override;
@@ -60,14 +57,14 @@ namespace Belle2 {
     /**  */
     virtual void terminate() override;
 
-    /** returns version of TRGGDLUnpackerModule.*/
+    /** returns version of TRGTOPUnpackerWaveformModule.*/
     std::string version() const;
 
     /** Read data from TRG DAQ.*/
     virtual void readDAQEvent(RawTRG*, int, int);
 
     /** Unpacker main function.*/
-    virtual void unpackT0Decisions(int*, int);
+    virtual void unpackWaveforms(int*, int);
 
   protected:
 
@@ -83,12 +80,11 @@ namespace Belle2 {
 
   private:
 
-    // time period of revo strobe in "ns" (assuming the clock of "125MHz")
-    static constexpr int revoToNS = 1280 * 8;
+    std::string m_outputWaveFormTimeStampsSlotsName;    /**< name of TOPTRGTimeStampsSlot store array */
+    std::string m_outputWaveFormTimeStampsName;    /**< name of TOPTRGTimeStamp store array */
 
-    //    StoreArray<TRGTOPUnpackerStore>  m_TRGTOPCombinedTimingArray;
-    StoreArray<TRGTOPCombinedT0Decision>  m_TRGTOPCombinedT0DecisionArray;
-    StoreArray<TRGTOPSlotTiming>  m_TRGTOPSlotTimingArray;
+    StoreArray<TRGTOPWaveFormTimeStampsSlot>  m_TRGTOPWaveFormTimeStampsSlots;
+    StoreArray<TRGTOPWaveFormTimeStamp>  m_TRGTOPWaveFormTimeStamps;
 
   };
 }

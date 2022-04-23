@@ -6,8 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef TRGTOPSLOTTIMING_H
-#define TRGTOPSLOTTIMING_H
+#ifndef TRGTOPTIMINGISIM_H
+#define TRGTOPTIMINGISIM_H
 
 //#include <TObject.h>
 #include <framework/datastore/RelationsObject.h>
@@ -19,27 +19,24 @@
 namespace Belle2 {
 
   //! Example Detector
-  //  class TRGTOPSlotTiming : public TObject {
-  class TRGTOPSlotTiming : public RelationsObject {
+  //  class TRGTOPTimingISim : public TObject {
+  class TRGTOPTimingISim : public RelationsObject {
 
   public:
 
     // Empty constructor
     // Recommended for ROOT IO
-    TRGTOPSlotTiming() :
+    TRGTOPTimingISim() :
       m_slotId(0),
       m_slotTiming(0),
       m_slotSegment(0),
       m_slotNHits(0),
       m_slotLogL(0),
-      m_slotDecisionClockCycle(0),
-      m_slotNErrors(0),
-      m_slotThisBoard(0),
-      m_slotFirstTS(0)
+      m_slotDecisionClockCycle(0)
     {}
 
     //! A Useful Constructor
-    explicit TRGTOPSlotTiming(
+    explicit TRGTOPTimingISim(
       int slotId
     ) :
       m_slotId(slotId),
@@ -47,37 +44,28 @@ namespace Belle2 {
       m_slotSegment(0),
       m_slotNHits(0),
       m_slotLogL(0),
-      m_slotDecisionClockCycle(0),
-      m_slotNErrors(0),
-      m_slotThisBoard(1),
-      m_slotFirstTS(-1)
+      m_slotDecisionClockCycle(0)
     {}
 
     //! Another Useful Constructor
-    TRGTOPSlotTiming(
+    TRGTOPTimingISim(
       int slotId,
       int slotTiming,
       int slotSegment,
       int slotNHits,
       int slotLogL,
-      int slotDecisionClockCycle,
-      int slotNErrors,
-      int slotThisBoard,
-      int slotFirstTS
+      int slotDecisionClockCycle
     ) :
       m_slotId(slotId),
       m_slotTiming(slotTiming),
       m_slotSegment(slotSegment),
       m_slotNHits(slotNHits),
       m_slotLogL(slotLogL),
-      m_slotDecisionClockCycle(slotDecisionClockCycle),
-      m_slotNErrors(slotNErrors),
-      m_slotThisBoard(slotThisBoard),
-      m_slotFirstTS(slotFirstTS)
+      m_slotDecisionClockCycle(slotDecisionClockCycle)
     {}
 
     //! Destructor
-    ~TRGTOPSlotTiming() {}
+    ~TRGTOPTimingISim() {}
 
     int getSlotId()      const { return m_slotId;     }
     int getSlotTiming()  const { return m_slotTiming; }
@@ -85,9 +73,6 @@ namespace Belle2 {
     int getSlotNHits()   const { return m_slotNHits;  }
     int getSlotLogL()    const { return m_slotLogL;   }
     int getSlotDecisionClockCycle() const { return m_slotDecisionClockCycle;}
-    int getSlotNErrors() const { return m_slotNErrors;}
-    int getSlotThisBoard() const { return m_slotThisBoard;}
-    int getSlotFirstTS() const { return m_slotFirstTS;}
     //int get() const { return m_;}
 
     void setSlotId(int slotId);
@@ -96,14 +81,7 @@ namespace Belle2 {
     void setSlotNHits(int slotNHits);
     void setSlotLogL(int slotLogL);
     void setSlotDecisionClockCycle(int slotDecisionClockCycle);
-    void setSlotNErrors(int slotNErrors);
-    void setSlotThisBoard(int slotThisBoard);
-    void setSlotFirstTS(int slotFirstTS);
     //void set(int );
-
-    bool isThisBoard() const;
-
-    bool isFirstTSAvailable() const;
 
   private:
 
@@ -119,15 +97,9 @@ namespace Belle2 {
     int m_slotLogL;
     //! clock cycle when the decision was made
     int m_slotDecisionClockCycle;
-    //! slot errors
-    int m_slotNErrors;
-    //! source of slot information (1 means this UT3, 0 means the other UT3)
-    int m_slotThisBoard;
-    //! first TS for the decision (when available)
-    int m_slotFirstTS;
 
     /** the class title*/
-    ClassDef(TRGTOPSlotTiming, 5);
+    ClassDef(TRGTOPTimingISim, 1);
 
   };
 

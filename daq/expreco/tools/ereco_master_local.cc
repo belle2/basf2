@@ -13,6 +13,11 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
+  if (argc < 2) {
+    printf("Wrong number of arguments\n");
+    return 1;
+  }
+
   RFConf conf(argv[1]);
 
   ERecoMaster* master = new ERecoMaster(argv[1]);
@@ -24,4 +29,5 @@ int main(int argc, char** argv)
 
   master->monitor_loop();
 
+  return 0;
 }

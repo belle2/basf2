@@ -36,7 +36,7 @@
 using namespace Belle2;
 using namespace TOP;
 
-REG_MODULE(TOPLLScanner)
+REG_MODULE(TOPLLScanner);
 
 TOPLLScannerModule::TOPLLScannerModule() : Module()
 {

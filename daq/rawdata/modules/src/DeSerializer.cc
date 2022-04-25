@@ -293,9 +293,9 @@ int* DeSerializerModule::getPreAllocBuf()
 
 void DeSerializerModule::RateMonitor(unsigned int nevt, int subrun, int run)
 {
-  double cur_time = getTimeSec();
-  double total_time = cur_time - m_start_time;
-  double interval = cur_time - m_prev_time;
+  double current_time = getTimeSec();
+  double total_time = current_time - m_start_time;
+  double interval = current_time - m_prev_time;
   time_t timer;
   struct tm* t_st;
   time(&timer);
@@ -309,7 +309,7 @@ void DeSerializerModule::RateMonitor(unsigned int nevt, int subrun, int run)
          asctime(t_st));
 
   fflush(stdout);
-  m_prev_time = cur_time;
+  m_prev_time = current_time;
   m_prev_totbytes = m_totbytes;
   m_prev_nevt = nevt;
 

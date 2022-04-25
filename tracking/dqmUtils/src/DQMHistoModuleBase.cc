@@ -396,14 +396,14 @@ void DQMHistoModuleBase::DefineTRClusters()
     string title = str(format("Correlations in Phi for Layers %1% %2%") % layerNumber % (layerNumber + 1));
     string xTitle = str(format("angle layer %1% [deg]") % layerNumber);
     string yTitle = str(format("angle layer %1% [deg]") % (layerNumber + 1));
-    m_TRClusterCorrelationsPhi[layerIndex] = Create(name.c_str(), title.c_str(), nbins, -range, range, nbins, -range, range,
-                                                    xTitle.c_str(), yTitle.c_str(), "counts");
+    m_TRClusterCorrelationsPhi[layerIndex] = Create(name, title, nbins, -range, range, nbins, -range, range,
+                                                    xTitle, yTitle, "counts");
 
     /** Track related clusters - neighbor corelations in Theta */
     name = str(format("CorrelationsThetaLayers_%1%_%2%") % layerNumber % (layerNumber + 1));
     title = str(format("Correlations in Theta for Layers %1% %2%") % layerNumber % (layerNumber + 1));
-    m_TRClusterCorrelationsTheta[layerIndex] = Create(name.c_str(), title.c_str(), nbins / 2, .0, range, nbins / 2, .0, range,
-                                                      xTitle.c_str(), yTitle.c_str(), "counts");
+    m_TRClusterCorrelationsTheta[layerIndex] = Create(name, title, nbins / 2, .0, range, nbins / 2, .0, range,
+                                                      xTitle, yTitle, "counts");
   }
 }
 

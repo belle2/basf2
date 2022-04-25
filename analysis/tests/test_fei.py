@@ -10,6 +10,7 @@
 ##########################################################################
 
 import basf2
+import basf2_mva
 import unittest
 import unittest.mock
 import os
@@ -25,7 +26,6 @@ from fei.config import Particle
 
 import numpy as np
 
-import basf2_mva
 import pdg
 
 # @cond
@@ -1216,9 +1216,7 @@ class TestGetPath(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # We have to call basf2_mva once, so that ROOT can load the dictionaries
-    # otherwise it will try to load them later after we changed the directory and it will fail to do so
-    basf2_mva.loadRootDictionary()
+
     tempdir = tempfile.mkdtemp()
     os.chdir(tempdir)
     basf2.conditions.testing_payloads = ['localdb/database.txt']

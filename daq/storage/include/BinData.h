@@ -77,13 +77,13 @@ namespace Belle2 {
     void setBodyWordSize(int nword)
     {
       setWordSize(nword + (sizeof(BinHeader) + sizeof(BinTrailer)) / 4);
-      m_trailer = (BinTrailer*)(m_body + getBodyWordSize());
+      m_trailer = reinterpret_cast<BinTrailer*>(m_body + getBodyWordSize());
       m_trailer->magic = TRAILER_MAGIC;
     }
     int getBodyWordSize() const { return (getBodyByteSize() / 4); };
     unsigned int getTrailerMagic()
     {
-      m_trailer = (BinTrailer*)(m_body + getBodyWordSize());
+      m_trailer = reinterpret_cast<BinTrailer*>(m_body + getBodyWordSize());
       return m_trailer->magic;
     }
     int getNodeId() const { return m_header->node_id; };

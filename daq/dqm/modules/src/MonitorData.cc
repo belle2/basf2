@@ -95,11 +95,10 @@ void MonitorDataModule::event()
   for (int j = 0; j < ncpr; j++) {
     for (int i = 0; i < rawcprarray[ j ]->GetNumEntries(); i++) {
 
-      int* buf;
-      int size_byte = 0;
-      buf = rawcprarray[ j ]->GetBuffer(i);
+      //int* buf;
+      //buf = rawcprarray[ j ]->GetBuffer(i);
 
-      size_byte = rawcprarray[ j ]->GetBlockNwords(i) * sizeof(int);
+      int size_byte = rawcprarray[ j ]->GetBlockNwords(i) * sizeof(int);
       h_size->Fill((float)size_byte);
       h_size2d->Fill((float)size_byte, (float)j);
 
@@ -113,10 +112,10 @@ void MonitorDataModule::event()
 //        size_byte);
 
 
-      int* finesse_buf_1st = rawcprarray[ j ]->Get1stFINESSEBuffer(i);
-      int* finesse_buf_2nd = rawcprarray[ j ]->Get2ndFINESSEBuffer(i);
-      int* finesse_buf_3rd = rawcprarray[ j ]->Get3rdFINESSEBuffer(i);
-      int* finesse_buf_4th = rawcprarray[ j ]->Get4thFINESSEBuffer(i);
+      //int* finesse_buf_1st = rawcprarray[ j ]->Get1stFINESSEBuffer(i);
+      //int* finesse_buf_2nd = rawcprarray[ j ]->Get2ndFINESSEBuffer(i);
+      //int* finesse_buf_3rd = rawcprarray[ j ]->Get3rdFINESSEBuffer(i);
+      //int* finesse_buf_4th = rawcprarray[ j ]->Get4thFINESSEBuffer(i);
       //    printf("FEEbuf %p %p %p %p\n", fee_buf_1st, fee_buf_2nd, fee_buf_3rd, fee_buf_4th);
     }
   }

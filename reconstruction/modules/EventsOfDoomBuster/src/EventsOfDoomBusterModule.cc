@@ -14,7 +14,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(EventsOfDoomBuster)
+REG_MODULE(EventsOfDoomBuster);
 
 EventsOfDoomBusterModule::EventsOfDoomBusterModule()
 {

@@ -26,13 +26,13 @@ namespace Belle2 {
   public:
 
     //! Constructor / Destructor
-    DesSerCOPPER(std::string host_recv, int port_recv, std::string host_send, int port_send, int shmflag,
+    DesSerCOPPER(std::string host_recv, int port_recv, const std::string& host_send, int port_send, int shmflag,
                  const std::string& nodename, int nodeid, int finesse_bitflag);
     //    DesSerCOPPER();
     virtual ~DesSerCOPPER();
 
     //! Module functions to be called from event process
-    void DataAcquisition();
+    void DataAcquisition() override;
 
     //! Read one event from COPPER
     int* readOneEventFromCOPPERFIFO(const int entry, int* delete_flag, int* m_size_word);

@@ -246,7 +246,7 @@ bool Variable::Manager::createVariable(const std::string& name)
     }
   }
   // Try Formula registration with python parser if variable is not a simple identifier (else we get a infinite loop)
-  if (not std::regex_match(name, std::regex("^[a-zA-Z]([a-zA-Z_0-9&:]|\\+:|-:|':)*$"))) {
+  if (not std::regex_match(name, std::regex("^[a-zA-Z_][a-zA-Z_0-9]*$")) and not name.empty()) {
     Py_Initialize();
     try {
       // Import parser
@@ -269,7 +269,7 @@ bool Variable::Manager::createVariable(const std::string& name)
       }
     } catch (py::error_already_set&) {
       PyErr_Print();
-      B2FATAL("Parsing Error on variable: '" << name);
+      B2FATAL("Parsing error for formula: '" << name << "'");
     }
   }
 
@@ -313,7 +313,8 @@ bool Variable::Manager::createVariable(const std::string& fullname, const std::s
 
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::FunctionPtr& f,
-                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype)
+                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype,
+                                         const std::string& unit)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -328,13 +329,17 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
     B2DEBUG(19, "Registered Variable " << name);
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
+    if (!unit.empty()) {
+      var.get()->extendDescriptionString("\n\n :Unit: " + unit);
+    }
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
   }
 }
 
 void Variable::Manager::registerVariable(const std::string& name, const Variable::Manager::ParameterFunctionPtr& f,
-                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype)
+                                         const std::string& description, const Variable::Manager::VariableDataType& variabletype,
+                                         const std::string& unit)
 {
   if (!f) {
     B2FATAL("No function provided for variable '" << name << "'.");
@@ -348,6 +353,9 @@ void Variable::Manager::registerVariable(const std::string& name, const Variable
     B2DEBUG(19, "Registered parameter Variable " << rawName);
     m_parameter_variables[rawName] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
+    if (!unit.empty()) {
+      var.get()->extendDescriptionString("\n\n :Unit: " + unit);
+    }
   } else {
     B2FATAL("A variable named '" << name << "' was already registered! Note that all variables need a unique name!");
   }
@@ -385,11 +393,33 @@ void Variable::Manager::deprecateVariable(const std::string& name, bool make_fat
   auto mapIter = m_variables.find(name);
   if (mapIter != m_variables.end()) {
     if (make_fatal) {
-      mapIter->second.get()->extendDescriptionString("\n.. warning:: ");
+      mapIter->second.get()->extendDescriptionString("\n\n.. warning:: ");
     } else {
-      mapIter->second.get()->extendDescriptionString("\n.. note:: ");
+      mapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
     }
     mapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
+  } else {
+    auto parMapIter = m_parameter_variables.find(name);
+    if (parMapIter != m_parameter_variables.end()) {
+      if (make_fatal) {
+        parMapIter->second.get()->extendDescriptionString("\n\n.. warning:: ");
+      } else {
+        parMapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
+      }
+      parMapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
+    } else {
+      auto metaMapIter = m_meta_variables.find(name);
+      if (metaMapIter != m_meta_variables.end()) {
+        if (make_fatal) {
+          metaMapIter->second.get()->extendDescriptionString("\n\n.. warning:: ");
+        } else {
+          metaMapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
+        }
+        metaMapIter->second.get()->extendDescriptionString(".. deprecated:: " + version + "\n " + description);
+      } else {
+        B2FATAL("The variable '" << name << "' is not registered so it makes no sense to try to deprecate it.");
+      }
+    }
   }
 
 }
@@ -432,7 +462,6 @@ double Variable::Manager::evaluate(const std::string& varName, const Particle* p
   const Var* var = getVariable(varName);
   if (!var) {
     throw std::runtime_error("Variable::Manager::evaluate(): variable '" + varName + "' not found!");
-    return 0.0; //never reached, suppresses cppcheck warning
   }
 
   if (var->variabletype == Variable::Manager::VariableDataType::c_double)

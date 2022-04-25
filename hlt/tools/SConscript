@@ -1,0 +1,8 @@
+Import('env')
+
+env['TOOLS_LIBS']['hlt-check-dqm-size'] = ['framework',
+                                           'zmq',
+                                           'stdc++',
+                                           '$ROOT_LIBS']
+
+Return('env')

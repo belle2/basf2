@@ -205,8 +205,8 @@ namespace {
     JacobianMatrix<6, 5> jacobianInflate = JacobianMatrixUtil::zero<6, 5>();
 
     const double alpha = CDCBFieldUtil::getAlphaFromBField(bZ);
-    const double chargeAlphaCurv = charge * alpha * curvatureXY;
-    const double chargeAlphaCurv2 = charge * alpha * std::pow(curvatureXY, 2);
+    const double chargeAlphaCurv = static_cast<double>(charge) * alpha * curvatureXY;
+    const double chargeAlphaCurv2 = static_cast<double>(charge) * alpha * std::pow(curvatureXY, 2);
 
     const double invChargeAlphaCurv = 1.0 / chargeAlphaCurv;
     const double invChargeAlphaCurv2 = 1.0 / chargeAlphaCurv2;

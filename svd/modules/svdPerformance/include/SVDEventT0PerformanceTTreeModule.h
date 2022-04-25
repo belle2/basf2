@@ -38,14 +38,14 @@ namespace Belle2 {
   private:
 
     //datastore
-    StoreObjPtr<EventT0> m_eventT0; /**< event T0 */
+    StoreObjPtr<EventT0> m_EventT0; /**< event T0 */
     StoreArray<SVDCluster> m_clusters; /**< svd clusters */
 
     //rootfile
     std::string m_rootFileName = "";   /**< root file name */
     TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
 
-    std::string m_recoTracksStoreArrayName{"RecoTracks"};  /**< storeArray name of the input and output RecoTracks */
+    std::string m_recoTracksStoreArrayName = "";  /**< storeArray name of the input and output RecoTracks */
 
     TTree* m_t = nullptr; /**< tree containing info related to the clusters related to tracks*/
 
@@ -65,6 +65,11 @@ namespace Belle2 {
     std::vector<float> m_svdTrkp;     /**< p of the track*/
     std::vector<float> m_svdTrkpT;     /**< pT of the track*/
     std::vector<float> m_svdTrkpCM;     /**< pCM of the track*/
+    std::vector<float> m_svdTrkTheta; /**< polar angle of the track*/
+    std::vector<float> m_svdTrkPhi; /**< azimuthal angle of the track*/
+    std::vector<float> m_svdTrkCharge; /**< charge of the track*/
+    std::vector<float> m_svdTrkPValue; /**< pValue of the track*/
+    std::vector<float> m_svdTrkNDF; /**< pValue of the track*/
     std::vector<int> m_svdLayer;  /**< layer */
     std::vector<int> m_svdLadder; /**< ladder */
     std::vector<int> m_svdSensor; /**< sensor */
@@ -72,10 +77,23 @@ namespace Belle2 {
     std::vector<int> m_svdisUside; /**< is U-cluster side */
     std::vector<int> m_trkNumber; /**< track number in the event*/
 
-    float m_svdEventT0 = -99; /**< event T0 */
-    float m_svdEventT0Err = -99; /**< event T0 error */
+
+
+    float m_eventT0 = -99; /**< final event T0 */
+    float m_eventT0Err = -99; /**< final event T0 error */
+    float m_svdEventT0 = -99; /**< SVD event T0 */
+    float m_svdEventT0Err = -99; /**< SVD event T0 Error */
+    float m_cdcEventT0 = -99; /**< CDC event T0 */
+    float m_cdcEventT0Err = -99; /**< CDC event T0 Error */
+    float m_topEventT0 = -99; /**< TOP event T0 error */
+    float m_topEventT0Err = -99; /**< TOP event T0 error */
     int m_nTracks = 0; /**< number of tracks in the event*/
     int m_svdTB = -1; /**< trigger bin */
+    float m_trueEventT0 = -99; /**< true event t0 */
+    int m_exp = -99; /**< experiment number */
+    int m_run = -99; /**< run number */
+    int m_event = -99; /**< event number */
+
   };
 }
 

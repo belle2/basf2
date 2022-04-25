@@ -15,7 +15,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(TrackIsoCalculator)
+REG_MODULE(TrackIsoCalculator);
 
 TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
 {

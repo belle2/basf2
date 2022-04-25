@@ -50,7 +50,7 @@ vector<string> globbing(const vector<string>& patterns)
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(B2BIIMdstInput)
+REG_MODULE(B2BIIMdstInput);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -69,7 +69,7 @@ B2BIIMdstInputModule::B2BIIMdstInputModule() : Module()
   //Parameter definition
   addParam("inputFileName", m_inputFileName, "Belle MDST input file name. "
            "For more than one file use inputFileNames", std::string(""));
-  addParam("inputFileNames"  , m_inputFileNames, "Belle MDST input file names.",
+  addParam("inputFileNames", m_inputFileNames, "Belle MDST input file names.",
            m_inputFileNames);
 
   std::vector<std::string> emptyvector;

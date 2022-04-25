@@ -28,7 +28,7 @@ using namespace csi;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CsIStudy)
+REG_MODULE(CsIStudy);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -116,8 +116,6 @@ void CsIStudyModule::event()
   if (m_hits.getEntries() > 0) {
     int hitNum = m_hits.getEntries(); /**< Number of Crystal hits */
 
-    double E_tmp[16] = {0};       /**< Sum energy deposited in each cell */
-
     double Mass = 5;             /**< Mass of the crystal (to be replaced with data from the xml once actual mass is known)**/
     double edeptodose = GeVtoJ / Mass * usInYr / Sampletime; /**< Get dose in Gy/yr from Edep */
 
@@ -127,8 +125,6 @@ void CsIStudyModule::event()
       int m_cellID = aCsIHit->getCellId();       /**< Index of the Cell*/
       double edep = aCsIHit->getEnergyDep();     /**< Energy deposited in the current hit */
       //double hitTime = aCsIHit->getTimeAve();    /**< Time of the hit*/
-
-      E_tmp[m_cellID] += edep;
 
       // Fill histograms
       h_CrystalSpectrum->Fill(edep, eventWeight);

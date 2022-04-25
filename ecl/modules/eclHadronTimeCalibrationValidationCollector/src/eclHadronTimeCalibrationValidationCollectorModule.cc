@@ -18,8 +18,6 @@
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <ecl/digitization/EclConfiguration.h>
 
-#include <boost/optional.hpp>
-
 #include <TH2F.h>
 #include <TTree.h>
 #include <TFile.h>

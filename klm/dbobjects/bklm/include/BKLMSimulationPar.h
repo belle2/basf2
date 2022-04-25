@@ -19,10 +19,11 @@ namespace Belle2 {
   //! Provides BKLM simulation parameters
   class BKLMSimulationPar: public TObject {
 
-    enum {
-      c_NDIV     = 5,
-      c_MAX_NHIT = 10
-    };
+    /** Number of divisions. */
+    static const int c_NDIV = 5;
+
+    /** Maximum number of hits. */
+    static const int c_MAX_NHIT = 10;
 
   public:
 

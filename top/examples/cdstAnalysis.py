@@ -9,40 +9,92 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Example of writing TOP cdst variable information using analysis package tools
+# -------------------------------------------------------------------------
+# Example of using top variables on real data (cdst files required)
+# See topVariables.py on how to use top variables on MC
+#
+# To print available top variables: basf2 top/examples/printTOPVariables.py
+# -------------------------------------------------------------------------
 
-from basf2 import create_path, use_central_database, process, statistics
-from modularAnalysis import variablesToNtuple
-from ROOT import gSystem
+from basf2 import conditions, create_path, process, statistics
+from reconstruction import prepare_user_cdst_analysis
+import modularAnalysis as ma
+from variables import variables
 
-# you need to choose a consistent global tag that corresponds to the data
-# you are analysing this will change from production to production
-inputdata = "/hsm/belle2/bdata/Data/release-02-00-01/DB00000425/prod00000005/e0003/4S/r00784/all/cdst/sub00/*.root"
-datadbtag = "data_reprocessing_prod5"
+# global tags
+# ******************************************************************************************************************
+# note: The patching global tags and their order are bucket number and basf2 version dependent.
+#       Given below is what is needed for cdst files of bucket 16 calibration and February-2022 development version.
+# ******************************************************************************************************************
+conditions.override_globaltags()
+conditions.append_globaltag('patch_main_release-07')
+conditions.append_globaltag('svd_reco_configuration_patch')
+conditions.append_globaltag('data_reprocessing_prompt')
+conditions.append_globaltag('dp_recon_release6_patch')
+conditions.append_globaltag('online')
 
-# Load the top libraries -- needed until the "top/variables" directory
-# gets upgraded and variables linked automatically
-gSystem.Load('libtop.so')
+# create path
+main = create_path()
 
-# setup and input
-path = create_path()
-use_central_database(datadbtag)
-path.add_module('RootInput', inputFileName=inputdata)
-goodtracks = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15 and nCDCHits > 0'
-# units:                 cm                cm          GeV/c
-# note that this selection is more-or-less sensible on phase2 data
-path.add_module('ParticleLoader',
-                decayStringsWithCuts=[('K+:goodtracks', goodtracks)])
+# read events from a cdst file: use -i option to pass the name of the file
+# files of bucket 16 can be found on KEKCC in /gpfs/group/belle2/dataprod/Data/PromptReco/bucket16_calib/
+main.add_module('RootInput')
 
-# variables one might care about
-variables_of_interest = [
-    "topModuleDigitCount",
-    "topModuleReflectedDigitCount",
-    "topModuleDigitGapSize",
-    "px", "py", "pz", "E", "pt", "p", "theta", "phi"
-]
-variablesToNtuple("K+:goodtracks", variables=variables_of_interest, path=path)
+# run unpackers and post-tracking reconstruction
+prepare_user_cdst_analysis(main)
 
-# process path
-process(path, 10)  # process 10 events, override with basf2 -n option
+# make a particle list of pions from all charged tracks
+ma.fillParticleList(decayString='pi+:all', cut='', path=main)
+
+# make aliases of some expert variables
+variables.addAlias('topTOF_kaon', 'topTOFExpert(321)')
+
+# define a list of variables to be written to ntuple
+var_list = ['p',
+            'theta',
+            'phi',
+            'charge',
+            'PDG',
+            'topSlotID',
+            'topLocalX',
+            'topLocalY',
+            'topLocalZ',
+            'topLocalPhi',
+            'topLocalTheta',
+            'topTOF',
+            'topTOF_kaon',
+            'extrapTrackToTOPimpactZ',
+            'extrapTrackToTOPimpactTheta',
+            'extrapTrackToTOPimpactPhi',
+            'topDigitCount',
+            'topDigitCountSignal',
+            'topDigitCountBkg',
+            'topDigitCountRaw',
+            'topLogLFlag',
+            'topLogLPhotonCount',
+            'topLogLExpectedPhotonCount',
+            'topLogLEstimatedBkgCount',
+            'topLogLElectron',
+            'topLogLMuon',
+            'topLogLPion',
+            'topLogLKaon',
+            'topLogLProton',
+            'topLogLDeuteron',
+            'topBunchIsReconstructed',
+            'topBunchNumber',
+            'topBunchOffset',
+            'topBunchTrackCount',
+            'topBunchUsedTrackCount',
+            'topTracksInSlot']
+
+# write variables to ntuple
+ma.variablesToNtuple(decayString='pi+:all', variables=var_list, treename='tree', filename='topVars_data.root', path=main)
+
+# print progress
+main.add_module('Progress')
+
+# process events
+process(main)
+
+# Print statistics
 print(statistics)

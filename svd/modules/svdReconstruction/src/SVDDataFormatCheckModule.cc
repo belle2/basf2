@@ -14,7 +14,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDDataFormatCheck)
+REG_MODULE(SVDDataFormatCheck);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -149,8 +149,8 @@ void SVDDataFormatCheckModule::event()
   }
 
   int triggerBin = modeByte.getTriggerBin();
-  //between 0 and 3
-  if (triggerBin < 0 || triggerBin > 3) {
+  //between 0 and 3 (triggerBin < 0 is always false)
+  if (triggerBin > 3) {
     m_nBadTBEvts++;
     isProblematic = true;
     if (!m_shutUpWarnings)

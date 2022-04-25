@@ -27,25 +27,48 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisSVDEfficiencyModule();
+
+    /**
+     * Destructor.
+     */
     virtual ~DQMHistAnalysisSVDEfficiencyModule();
 
-    //! Module functions to be called from main process
+    /**
+     * Initializer.
+     */
     virtual void initialize() override;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     virtual void beginRun() override;
+
+    /**
+     * This method is called for each event.
+     */
     virtual void event() override;
+
+    /**
+     * This method is called if the current run ends.
+     */
     virtual void endRun() override;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     virtual void terminate() override;
+
+  private:
 
     //parameters
     float m_effError; /**<error level of the efficiency */
     float m_effWarning; /**< warning level of the efficiency */
     float m_statThreshold; /**<minimal number of tracks per sensor to set green or red frame */
     //! Data members
-  private:
 
     /** Reference Histogram Root file name */
     std::string m_refFileName;

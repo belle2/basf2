@@ -14,7 +14,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(SPTCmomentumSeedRetriever)
+REG_MODULE(SPTCmomentumSeedRetriever);
 
 SPTCmomentumSeedRetrieverModule::SPTCmomentumSeedRetrieverModule() : Module()
 {

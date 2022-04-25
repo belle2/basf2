@@ -31,7 +31,7 @@ using std::sqrt;
 
 using namespace Belle2;
 
-REG_MODULE(VXDSimpleClusterizer)
+REG_MODULE(VXDSimpleClusterizer);
 
 VXDSimpleClusterizerModule::VXDSimpleClusterizerModule() : Module()
 {

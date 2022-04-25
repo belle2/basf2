@@ -1,13 +1,13 @@
 # EventType: 
 # Descriptor: [B0 -> rho+ pi- pi0]cc
-# NickName: Bd_rho+pi0pi0
+# NickName: Bd_rho+pi-pi0
 # Documentation: 3 Body charmless process 
 # Reponsible: Yu Nakazawa
 # Email: nakancyo@post.kek.jp
 # Tested: 
 # PhysicsWG: BToCharmless
 # Cuts: None
-# Date: XX/02/2022
+# Date: 25/04/2022
 #
 #
 #

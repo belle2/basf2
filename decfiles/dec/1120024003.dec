@@ -7,7 +7,7 @@
 # Tested: 
 # PhysicsWG: BToCharmless
 # Cuts: None
-# Date: XX/02/2022
+# Date: 25/04/2022
 #
 #
 #
@@ -22,7 +22,7 @@ Enddecay
 ### https://arxiv.org/pdf/0804.2422.pdf. 
 ### BF update - PG 09/2020 
 Decay B0sig
-1.0  pi0 omega        PHOTOS SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+1.0  pi0 omega        SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 Enddecay
 CDecay anti-B0sig
 ###

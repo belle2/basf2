@@ -48,7 +48,7 @@ namespace Belle2 {
 
     StoreArray<ECLDigit> m_eclDigits;   /**< StoreArray ECLDigit */
 
-    std::vector<float> m_ADCtoEnergy;  /**< calibration vector form adc to energy*/
+    std::vector<float> m_ADCtoEnergy;  /**< calibration vector from adc to energy*/
 
     double m_LowEnergyThresholdGeV; /**< Low Energy Threshold in GeV. >*/
 

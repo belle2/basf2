@@ -64,16 +64,16 @@ void eclWaveformCalibCollectorModule::prepare()
   m_EventsProcessed = 0;
   auto tree = new TTree("tree", "");
   tree->Branch("CellID", &m_CellID,      "m_CellID/I");
-  tree->Branch("OnlineE", &m_OnlineE,      "m_OnlineE/D");
-  tree->Branch("OfflineE", &m_OfflineE,      "m_OfflineE/D");
-  tree->Branch("OfflineHadE", &m_OfflineHadE,      "m_OfflineHadE/D");
+  tree->Branch("OnlineE", &m_OnlineE,      "m_OnlineE/F");
+  tree->Branch("OfflineE", &m_OfflineE,      "m_OfflineE/F");
+  tree->Branch("OfflineHadE", &m_OfflineHadE,      "m_OfflineHadE/F");
   tree->Branch("FitType", &m_FitType,      "m_FitType/I");
-  tree->Branch("Chi2", &m_Chi2,      "m_Chi2/D");
-  tree->Branch("Chi2Save0", &m_Chi2Save0,      "m_Chi2Save0/D");
-  tree->Branch("Chi2Save1", &m_Chi2Save1,      "m_Chi2Save1/D");
-  tree->Branch("Chi2Save2", &m_Chi2Save2,      "m_Chi2Save2/D");
-  tree->Branch("m_Baseline", &m_Baseline,      "m_Baseline/D");
-  tree->Branch("m_BaselineRMS", &m_BaselineRMS,      "m_BaselineRMS/D");
+  tree->Branch("Chi2", &m_Chi2,      "m_Chi2/F");
+  tree->Branch("Chi2Save0", &m_Chi2Save0,      "m_Chi2Save0/F");
+  tree->Branch("Chi2Save1", &m_Chi2Save1,      "m_Chi2Save1/F");
+  tree->Branch("Chi2Save2", &m_Chi2Save2,      "m_Chi2Save2/F");
+  tree->Branch("m_Baseline", &m_Baseline,      "m_Baseline/F");
+  tree->Branch("m_BaselineRMS", &m_BaselineRMS,      "m_BaselineRMS/F");
   tree->Branch("m_calibConst", &m_calibConst,      "m_calibConst/F");
 
   if (m_includeWaveforms) {

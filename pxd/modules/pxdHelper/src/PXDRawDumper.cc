@@ -22,7 +22,7 @@ using ubig32_t = boost::endian::big_uint32_t;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDRawDumper)
+REG_MODULE(PXDRawDumper);
 
 void PXDRawDumperModule::initialize(void)
 {

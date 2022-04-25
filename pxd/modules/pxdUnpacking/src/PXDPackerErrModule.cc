@@ -28,7 +28,7 @@ using namespace Belle2::PXD::PXDError;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDPackerErr)
+REG_MODULE(PXDPackerErr);
 
 
 using boost::crc_optimal;

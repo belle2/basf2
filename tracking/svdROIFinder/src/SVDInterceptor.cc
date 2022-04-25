@@ -79,7 +79,7 @@ SVDInterceptor::appendIntercepts(StoreArray<SVDIntercept>* interceptList, std::l
 
   SVDIntercept tmpSVDIntercept;
 
-  genfit::Track& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
+  const genfit::Track& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
   std::list<ROIDetPlane>::iterator itPlanes = planeList.begin();
 

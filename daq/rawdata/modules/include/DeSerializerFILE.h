@@ -32,10 +32,10 @@ namespace Belle2 {
     virtual ~DeSerializerFILEModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void event();
+    void event() override;
 
     //! open a file
     virtual void fileOpen();

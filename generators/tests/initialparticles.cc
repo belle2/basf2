@@ -55,7 +55,7 @@ namespace {
     DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
     auto initialCMS = generator.generate();
     // transformation should be identity
-    EXPECT_EQ(initialCMS.getLabToCMS(), TLorentzRotation());
+    EXPECT_EQ(initialCMS.getLabToCMS(), ROOT::Math::LorentzRotation());
     // her should be along z
     EXPECT_NEAR(initialCMS.getHER().Theta(), 0, 1e-15);
     // ler should be opposite z
@@ -214,8 +214,8 @@ namespace {
     DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
 
     MCInitialParticles& initial = generator.generate();
-    TLorentzVector her = initial.getHER();
-    TLorentzVector ler = initial.getLER();
+    ROOT::Math::PxPyPzEVector her = initial.getHER();
+    ROOT::Math::PxPyPzEVector ler = initial.getLER();
     TVector3 vertex = initial.getVertex();
     for (int i = 0; i < 10; ++i) {
       initial = generator.generate();

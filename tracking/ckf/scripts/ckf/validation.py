@@ -190,6 +190,7 @@ def peel_matching_information(pr_track_and_mc_track_matcher, key="{part_name}"):
 
 class VxdCdcMergerHarvesterPRSide(HarvestingModule):
     """Gather the reconstructed VXD-CDC-merger results into ROOT file"""
+
     def __init__(self, foreach, others, output_file_name):
         """
         Init harvester

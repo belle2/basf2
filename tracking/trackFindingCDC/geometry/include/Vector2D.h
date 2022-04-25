@@ -302,7 +302,7 @@ namespace Belle2 {
       /// Orthogonal vector to the direction given by the counterclockwise info
       Vector2D orthogonal(const ERotation ccwInfo) const
       {
-        return isValid(ccwInfo) ? Vector2D(-ccwInfo * y(), ccwInfo * x()) : Vector2D();
+        return isValid(ccwInfo) ? Vector2D(-static_cast<double>(ccwInfo) * y(), static_cast<double>(ccwInfo) * x()) : Vector2D();
       }
 
       /// Normalizes the vector to unit length

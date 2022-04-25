@@ -40,7 +40,7 @@ using namespace microtpc;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(MicrotpcStudy)
+REG_MODULE(MicrotpcStudy);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -262,7 +262,7 @@ void MicrotpcStudyModule::event()
   StoreArray<SADMetaHit> sadMetaHits;
   double rate = 0;
   int ring_section = 0;
-  int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+  const int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
   for (const auto& sadMetaHit : sadMetaHits) {
     rate = sadMetaHit.getrate();
     double ss = sadMetaHit.getss() / 100.;

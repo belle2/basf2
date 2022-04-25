@@ -24,7 +24,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(PhaseSpaceAnalysis)
+REG_MODULE(PhaseSpaceAnalysis);
 
 PhaseSpaceAnalysisModule::PhaseSpaceAnalysisModule() : Module()
 {
@@ -135,6 +135,7 @@ void PhaseSpaceAnalysisModule::event()
     m_rootVariables = RootVariables(); // clear root variables for each run
     for (int id : mcPartIds[iTree]) {
       if (id < 0) {
+        // cppcheck-suppress
         B2WARNING("Found a negative id in mcParticleId: " << id << \
                   ". It seems that it has not been set properly, I will skip this MC Particle");
         m_skippedTCsCtr++;
@@ -225,7 +226,7 @@ void PhaseSpaceAnalysisModule::getValuesForRoot(Belle2::MCParticle* mcParticle, 
   B2DEBUG(499, "TVector3 momentum: (" << momentum.X() << "," << momentum.Y() << "," << momentum.Z() << \
           "). This leads to p_T = " << momentum.Pt() << " and eta = " << momentum.Eta());
 
-  const TVector3 vertex = mcParticle->getVertex();
+  const B2Vector3D vertex = mcParticle->getVertex();
   rootVariables.VertX.push_back(vertex.Y());
   rootVariables.VertY.push_back(vertex.Y());
   rootVariables.VertZ.push_back(vertex.Z());

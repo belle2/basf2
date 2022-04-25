@@ -29,10 +29,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPCommonT0LLCollector)
+  REG_MODULE(TOPCommonT0LLCollector);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -121,13 +121,13 @@ namespace Belle2 {
     registerObject<TH1F>("tracks_per_set", h1);
 
     auto h2 = new TH1F("numHits", "Number of photons per slot",
-                       c_numModules, 0.5, c_numModules + 0.5);
+                       c_numModules, 0.5, static_cast<float>(c_numModules) + 0.5);
     h2->SetXTitle("slot number");
     h2->SetYTitle("hits per slot");
     registerObject<TH1F>("numHits", h2);
 
     auto h3 = new TH2F("timeHits", "Photon times vs. boardstacks",
-                       c_numModules * 4, 0.5, c_numModules + 0.5, 200, 0.0, 20.0);
+                       c_numModules * 4, 0.5, static_cast<float>(c_numModules) + 0.5, 200, 0.0, 20.0);
     h3->SetXTitle("slot number");
     h3->SetYTitle("time [ns]");
     registerObject<TH2F>("timeHits", h3);
@@ -198,7 +198,7 @@ namespace Belle2 {
         if (digit.getTime() > timeMax) continue;
         h2->Fill(digit.getModuleID());
         int bs = digit.getBoardstackNumber();
-        h3->Fill((digit.getModuleID() * 4 + bs - 1.5) / 4.0 , digit.getTime());
+        h3->Fill((digit.getModuleID() * 4 + bs - 1.5) / 4.0, digit.getTime());
       }
       ntra++;
     }

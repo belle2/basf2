@@ -17,13 +17,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDROIFinder)
+REG_MODULE(PXDROIFinder);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDROIFinderModule::PXDROIFinderModule() : Module() , m_ROIinfo()
+PXDROIFinderModule::PXDROIFinderModule() : Module(), m_ROIinfo()
 {
   //Set module properties
   setDescription("This module performs the reduction of the PXD data output");

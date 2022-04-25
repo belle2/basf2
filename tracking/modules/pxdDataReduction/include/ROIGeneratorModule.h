@@ -29,8 +29,14 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Initializer.
+     */
     void initialize() override final;
 
+    /**
+     * This method is called for each event.
+     */
     void event() override final;
 
 

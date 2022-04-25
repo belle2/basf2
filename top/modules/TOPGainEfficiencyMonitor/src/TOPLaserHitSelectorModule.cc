@@ -27,10 +27,10 @@ using namespace std;
 namespace Belle2 {
 
   //-----------------------------------------------------------------
-  //                 Register the Module
+  ///                 Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPLaserHitSelector)
+  REG_MODULE(TOPLaserHitSelector);
 
 
   //-----------------------------------------------------------------

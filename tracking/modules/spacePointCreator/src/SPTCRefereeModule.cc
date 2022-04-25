@@ -24,7 +24,7 @@
 using namespace Belle2;
 using namespace std;
 
-REG_MODULE(SPTCReferee) // register the module
+REG_MODULE(SPTCReferee); // register the module
 
 SPTCRefereeModule::SPTCRefereeModule() : Module()
 {

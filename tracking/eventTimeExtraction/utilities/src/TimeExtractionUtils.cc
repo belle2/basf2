@@ -73,7 +73,7 @@ namespace {
 }
 
 
-void TimeExtractionUtils::addEventT0WithQuality(std::vector<RecoTrack*>& recoTracks,
+void TimeExtractionUtils::addEventT0WithQuality(const std::vector<RecoTrack*>& recoTracks,
                                                 StoreObjPtr<EventT0>& eventT0,
                                                 std::vector<EventT0::EventT0Component>& eventT0WithQualityIndex)
 {

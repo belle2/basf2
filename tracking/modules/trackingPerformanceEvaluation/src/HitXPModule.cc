@@ -20,7 +20,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(HitXP)
+REG_MODULE(HitXP);
 
 HitXPModule::HitXPModule() : Module()
 {
@@ -58,7 +58,7 @@ void HitXPModule::initialize()
 
   RelationArray relClusterTrueHits(storeClusters, storeTrueHits);
   RelationArray relClusterMCParticles(storeClusters, storeMCParticles);
-  RelationArray recoTracksToMCParticles(recoTracks , storeMCParticles);
+  RelationArray recoTracksToMCParticles(recoTracks, storeMCParticles);
 
 
 

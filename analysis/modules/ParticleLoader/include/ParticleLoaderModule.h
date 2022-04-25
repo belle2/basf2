@@ -180,6 +180,7 @@ namespace Belle2 {
     m_ECLKLMClusters2Plists; /**< Collection of PLists that will collect Particles created from ECLClusters and KLMClusters */
 
     bool m_writeOut;  /**< toggle particle list btw. transient/persistent */
+    bool m_skipNonPrimary; /**< toggle skip of secondary MC particle */
     bool m_addDaughters; /**< toggle addition of the bottom part of the particle's decay chain */
     bool m_skipNonPrimaryDaughters; /**< toggle skip of secondary MC daughters */
     std::string m_roeMaskName; /**< ROE mask name to load */

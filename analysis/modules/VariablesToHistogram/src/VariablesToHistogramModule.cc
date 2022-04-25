@@ -22,7 +22,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(VariablesToHistogram)
+REG_MODULE(VariablesToHistogram);
 
 
 VariablesToHistogramModule::VariablesToHistogramModule() :
@@ -62,7 +62,7 @@ void VariablesToHistogramModule::initialize()
   // Make sure we don't disturb the global directory for other modules, friggin side effects everywhere
   TDirectory::TContext directoryGuard(m_file.get());
   if (not m_directory.empty()) {
-    m_directory = makeROOTCompatible(m_directory);
+    m_directory = MakeROOTCompatible::makeROOTCompatible(m_directory);
     m_file->mkdir(m_directory.c_str());
     m_file->cd(m_directory.c_str());
   }
@@ -73,7 +73,7 @@ void VariablesToHistogramModule::initialize()
     float low = 0;
     float high = 0;
     std::tie(varStr, varNbins, low, high) = varTuple;
-    std::string compatibleName = makeROOTCompatible(varStr);
+    std::string compatibleName = MakeROOTCompatible::makeROOTCompatible(varStr);
 
     auto ptr = std::make_unique<StoreObjPtr<RootMergeable<TH1D>>>("", DataStore::c_Persistent);
     ptr->registerInDataStore(m_fileName + m_directory + varStr, DataStore::c_DontWriteOut);
@@ -99,8 +99,8 @@ void VariablesToHistogramModule::initialize()
     float low2 = 0;
     float high2 = 0;
     std::tie(varStr1, varNbins1, low1, high1, varStr2, varNbins2, low2, high2) = varTuple;
-    std::string compatibleName1 = makeROOTCompatible(varStr1);
-    std::string compatibleName2 = makeROOTCompatible(varStr2);
+    std::string compatibleName1 = MakeROOTCompatible::makeROOTCompatible(varStr1);
+    std::string compatibleName2 = MakeROOTCompatible::makeROOTCompatible(varStr2);
 
     auto ptr2d = std::make_unique<StoreObjPtr<RootMergeable<TH2D>>>("", DataStore::c_Persistent);
     ptr2d->registerInDataStore(m_fileName + m_directory + varStr1 + varStr2, DataStore::c_DontWriteOut);

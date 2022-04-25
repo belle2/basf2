@@ -97,6 +97,10 @@ namespace Belle2 {
              m_EventTimingQualityThresholds,
              "set EventTimingQualityThresholds (low energy(GeV) and high energy(GeV))",
              m_EventTimingQualityThresholds);
+    addParam("3DBhabhaAddAngleCut",
+             m_3DBhabhaAddAngleCut,
+             "set Angle Cut of Bhbaha Additional veto for hie (dphi low and high, theta sum low and high(degree)",
+             m_3DBhabhaAddAngleCut);
     addParam("Taub2bAngleCut",
              m_taub2bAngleCut,
              "set Taub2bAngleCut(dphi low and high, theta sum low and high(degree)",
@@ -114,6 +118,23 @@ namespace Belle2 {
              "set Taub2b 1 cluster energy Cut (GeV) for CL2 : ",
              m_taub2bClusterECut2);
 
+    addParam("Taub2b2AngleCut",
+             m_taub2b2AngleCut,
+             "set Taub2b2AngleCut(dphi low and high, theta sum low and high(degree))",
+             m_taub2b2AngleCut);
+    addParam("Taub2b2EtotCut",
+             m_taub2b2EtotCut,
+             "set Taub2b2 total energy cut in TC ThetaID 1-17(GeV)",
+             m_taub2b2EtotCut);
+    addParam("Taub2b2CLEEndcapCut",
+             m_taub2b2CLEEndcapCut,
+             "set Taub2b2 energy Cut (GeV) for cluseter in endcap (GeV) : ",
+             m_taub2b2CLEEndcapCut);
+    addParam("Taub2b2CLECut",
+             m_taub2b2CLECut,
+             "set Taub2b2 cluster energy Cut (GeV) : ",
+             m_taub2b2CLECut);
+
     _2DBhabhaThresholdFWD.clear();
     _2DBhabhaThresholdBWD.clear();
     _3DBhabhaSelectionThreshold.clear();
@@ -121,7 +142,9 @@ namespace Belle2 {
     _3DBhabhaSelectionAngle.clear();
     _3DBhabhaVetoAngle.clear();
     _mumuAngle.clear();
+    m_3DBhabhaAddAngleCut.clear();
     m_taub2bAngleCut.clear();
+    m_taub2b2AngleCut.clear();
 
     _TotalEnergy.clear();
     _LowMultiThreshold.clear();
@@ -135,15 +158,22 @@ namespace Belle2 {
     _3DBhabhaSelectionAngle = {140, 220, 160, 200}; //  /100 MeV
     _mumuThreshold = 20; //100 MeV
     _mumuAngle = {160, 200, 165, 190}; //  degree
+    m_3DBhabhaAddAngleCut   = {150, 210, 160, 200}; // degree
     _LowMultiThreshold = {10, 20, 25, 30}; // degree
     _n300MeVCluster = 1;
     _ECLBurstThreshold = 20;
     m_3DBhabhaVetoInTrackThetaRegion = {3, 15};
     m_EventTimingQualityThresholds = {0.5, 10}; // GeV
+    // taub2b
     m_taub2bAngleCut = {110, 250, 130, 230}; // degree
     m_taub2bEtotCut = 7; // GeV
     m_taub2bClusterECut1 = 1.9; // GeV
     m_taub2bClusterECut2 = 999; // GeV
+    // taub2b2
+    m_taub2b2AngleCut = {120, 240, 140, 220}; // degree
+    m_taub2b2EtotCut = 7.0; // GeV
+    m_taub2b2CLEEndcapCut = 3.0; // GeV
+    m_taub2b2CLECut = 0.162; // GeV
 
     if (TRGDebug::level()) {
       std::cout << "TRGECLModule ... created" << std::endl;
@@ -215,13 +245,13 @@ namespace Belle2 {
           (double)para.get3DBhabhaVetoAngle(1),
           (double)para.get3DBhabhaVetoAngle(2),
           (double)para.get3DBhabhaVetoAngle(3)
-        }; //  /100 MeV
+        };
         _3DBhabhaSelectionAngle = {
           (double)para.get3DBhabhaSelectionAngle(0),
           (double)para.get3DBhabhaSelectionAngle(1),
           (double)para.get3DBhabhaSelectionAngle(2),
           (double)para.get3DBhabhaSelectionAngle(3)
-        }; //  /100 MeV
+        };
         _mumuThreshold =
           (double)(para.getmumuThreshold());
         _mumuAngle = {
@@ -246,7 +276,7 @@ namespace Belle2 {
            << m_EventTimingQualityThresholds[0] << " : "
            << m_EventTimingQualityThresholds[1] << ") (GeV)");
 
-    B2INFO("[TRGECLModule] Taub2b 2 CL Angle cut in CM (degree) (dphi L, H, theta sum L, H ) = ("
+    B2INFO("[TRGECLModule] Taub2b two CL Angle cut in CM (degree) (dphi L, H, theta sum L, H ) = ("
            << m_taub2bAngleCut[0] << ","
            << m_taub2bAngleCut[1] << ","
            << m_taub2bAngleCut[2] << ","
@@ -256,6 +286,23 @@ namespace Belle2 {
     B2INFO("[TRGECLModule] Taub2b Cluster Energy Cut in lab. (GeV) : (E(CL1), E(CL2)) = ("
            << m_taub2bClusterECut1 << ", "
            << m_taub2bClusterECut2 << ")");
+    B2INFO("[TRGECLModule] Bhabha Add Angle cut in CM (degree) (dphi L, H, theta sum L, H) = ("
+           << m_3DBhabhaAddAngleCut[0] << ","
+           << m_3DBhabhaAddAngleCut[1] << ","
+           << m_3DBhabhaAddAngleCut[2] << ","
+           << m_3DBhabhaAddAngleCut[3] << ")");
+
+    B2INFO("[TRGECLModule] Taub2b2 two CL Angle cut in CM (degree) (dphi L, H, theta sum L, H) = ("
+           << m_taub2b2AngleCut[0] << ","
+           << m_taub2b2AngleCut[1] << ","
+           << m_taub2b2AngleCut[2] << ","
+           << m_taub2b2AngleCut[3] << ")");
+    B2INFO("[TRGECLModule] Taub2b2 Total Energy Cut in lab. (GeV) = "
+           << m_taub2b2EtotCut);
+    B2INFO("[TRGECLModule] Taub2b2 Energy Cut in lab. for cluster in endcap (GeV) = "
+           << m_taub2b2CLEEndcapCut);
+    B2INFO("[TRGECLModule] Taub2b2 Cluster energy cut in lab. (GeV) = "
+           << m_taub2b2CLECut);
 
     if (TRGDebug::level()) {
       std::cout << "TRGECLModule ... beginRun called " << std::endl;
@@ -293,9 +340,15 @@ namespace Belle2 {
     _ecl->set3DBhabhaVetoAngle(_3DBhabhaVetoAngle);
     _ecl->setmumuThreshold(_mumuThreshold);
     _ecl->setmumuAngle(_mumuAngle);
+    _ecl->set3DBhabhaAddAngleCut(m_3DBhabhaAddAngleCut);
     _ecl->setTaub2bAngleCut(m_taub2bAngleCut);
     _ecl->setTaub2bEtotCut(m_taub2bEtotCut);
-    _ecl->setTaub2bClusterECut(m_taub2bClusterECut1, m_taub2bClusterECut2);
+    _ecl->setTaub2bClusterECut(m_taub2bClusterECut1,
+                               m_taub2bClusterECut2);
+    _ecl->setTaub2b2Cut(m_taub2b2AngleCut,
+                        m_taub2b2EtotCut,
+                        m_taub2b2CLEEndcapCut,
+                        m_taub2b2CLECut);
     _ecl->setTotalEnergyThreshold(_TotalEnergy);
     _ecl->setLowMultiplicityThreshold(_LowMultiThreshold);
     _ecl->setn300MeVClusterThreshold(_n300MeVCluster);

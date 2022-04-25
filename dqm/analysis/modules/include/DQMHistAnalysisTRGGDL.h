@@ -77,13 +77,6 @@ namespace Belle2 {
      */
     virtual void terminate() override;
 
-    /**
-    * Find canvas by name
-    * @param cname Name of the canvas
-    * @return The pointer to the canvas, or nullptr if not found.
-    */
-    TCanvas* find_canvas(TString cname);
-
   protected:
     bool m_debug;/**<debug*/
     bool m_enableAlert;/**<Enable alert by base color of canvases*/
@@ -195,17 +188,17 @@ namespace Belle2 {
     TLine* m_line_limit_low_shifter[n_eff_shifter] = {}; /**<lower limit line for the simplified efficiency histogram*/
     TLine* m_line_limit_high_shifter[n_eff_shifter] = {}; /**<upper limit line for the simplified efficiency histogram*/
     double m_limit_low_shifter[n_eff_shifter] = {
-      0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.40, 0.10, 0.35, 0.80, 0.20, 0.40, 0.60, 0.70
+      0.80, 0.80, 0.80, 0.80, 0.80, 0.80, 0.40, 0.05, 0.35, 0.80, 0.20, 0.40, 0.00, 0.70
     }; /**<lower limit value in each bin*/
     double m_limit_high_shifter[n_eff_shifter] = {
-      0.95, 0.95, 0.95, 0.95, 1.00, 1.00, 0.50, 0.20, 0.55, 1.00, 0.40, 0.60, 0.90, 0.90
+      0.95, 0.95, 0.95, 0.95, 1.00, 1.00, 0.50, 0.20, 0.55, 1.00, 0.40, 0.70, 1.00, 0.90
     }; /**<upper limit value in each bin*/
 
     TH1* m_rtype = nullptr; /**< histogram from DQMInfo with runtype */
     TString m_runtype; /**< string with runtype: physics or cosmic */
 
     /** flag if to export to EPICS */
-    bool m_useEpics = true;
+    bool m_useEpics;
 
 #ifdef _BELLE2_EPICS
     chid mychid[n_eff_shifter];// hard limit max 10 parameters

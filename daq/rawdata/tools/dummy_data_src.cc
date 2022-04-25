@@ -499,9 +499,9 @@ int main(int argc, char** argv)
     //    if( i % 10 == 9 ) printf("\n");
     //  }
 
-    int ret = 0;
-    if ((ret = write(connfd, buff, total_words * sizeof(int))) <= 0) {
-      printf("[FATAL] Return value %d\n", ret);
+    int Ret = 0;
+    if ((Ret = write(connfd, buff, total_words * sizeof(int))) <= 0) {
+      printf("[FATAL] Return value %d\n", Ret);
       fflush(stdout);
       exit(1);
     }

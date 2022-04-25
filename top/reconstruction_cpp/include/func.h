@@ -85,7 +85,7 @@ namespace Belle2 {
        */
       inline int getNumOfEven(int j1, int j2)
       {
-        return (j2 - j1 + 1 - abs(j1) % 2) / 2;
+        return (j2 - j1 + 1 - std::abs(j1) % 2) / 2;
       }
 
       /**

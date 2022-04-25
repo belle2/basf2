@@ -77,6 +77,12 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
     } catch (genfit::Exception& exception) {
       B2WARNING(exception.what());
       continue;
+    } catch (const std::runtime_error& er) {
+      B2WARNING("Runtime error encountered: " << er.what());
+      continue;
+    } catch (...) {
+      B2WARNING("Undefined exception encountered.");
+      continue;
     }
 
     genfit::MeasuredStateOnPlane extrapolatedMSoP = msop;
@@ -185,7 +191,7 @@ uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack)
         if (svdHit->isU())
           hitPatternVXD.setSVDLayer(layerNumber, currentHits.first + 1, currentHits.second);
         else
-          hitPatternVXD.setSVDLayer(layerNumber, currentHits.first , currentHits.second + 1);
+          hitPatternVXD.setSVDLayer(layerNumber, currentHits.first, currentHits.second + 1);
       }
 
     }

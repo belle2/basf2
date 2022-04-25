@@ -9,11 +9,10 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from keras.layers.core import Reshape
-from keras import activations
-from keras.activations import sigmoid, tanh
-from keras.engine.topology import Layer
-from keras import backend as K
+from tensorflow.keras.layers import Layer, Reshape
+from tensorflow.keras import activations
+from tensorflow.keras.activations import sigmoid, tanh
+from tensorflow.keras import backend as K
 import numpy as np
 
 
@@ -149,7 +148,7 @@ class EnhancedRelations(Layer):
         #: how many neurons has one comparable object
         self.group_len = 0
         #: saves weights for call
-        self.variables = []
+        self.weightvariables = []
         #: number of relation combinations
         self.combinations = 0
         #: size of second input vector
@@ -186,7 +185,7 @@ class EnhancedRelations(Layer):
             bias = self.add_weight(name='relation_weights_{}'.format(i),
                                    shape=(dense_shape[i + 1],), initializer='zeros', trainable=True)
 
-            self.variables.append([weights, bias])
+            self.weightvariables.append([weights, bias])
 
         super(EnhancedRelations, self).build(input_shape)
 
@@ -201,9 +200,9 @@ class EnhancedRelations(Layer):
         outputs = []
         for index, group1 in enumerate(input_groups[:-1]):
             for group2 in input_groups[index + 1:]:
-                net = K.dot(K.concatenate([group1, group2, questions]), self.variables[0][0])
-                net = K.bias_add(net, self.variables[0][1])
-                for variables in self.variables[1:]:
+                net = K.dot(K.concatenate([group1, group2, questions]), self.weightvariables[0][0])
+                net = K.bias_add(net, self.weightvariables[0][1])
+                for variables in self.weightvariables[1:]:
                     net = self.activation(net)
                     net = K.dot(net, variables[0])
                     net = K.bias_add(net, variables[1])

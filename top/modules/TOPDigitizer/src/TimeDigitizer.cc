@@ -481,12 +481,7 @@ namespace Belle2 {
         double pulseHeight = hit.second.pulseHeight;
         const auto* pulseShape = hit.second.shape;
         if (not pulseShape) continue;
-        double timeWalk = 0;
-        if (s_timeWalk) {
-          double t = (*s_timeWalk)->getTimeWalk(pulseHeight);
-          double sig = (*s_timeWalk)->getSigma(pulseHeight);
-          timeWalk = gRandom->Gaus(t, sig);
-        }
+        double timeWalk = generateTimeWalk(hitTime, pulseShape->getPeakingTime());
         int size = waveform.size();
         for (int sample = 0; sample < size; sample++) {
           double t = m_sampleTimes->getTime(s_window, sample - startSample) - m_timeOffset;
@@ -514,6 +509,23 @@ namespace Belle2 {
     }
 
 
+    double TimeDigitizer::generateTimeWalk(double hitTime, double peakTime) const
+    {
+      if (not s_timeWalk) return 0;
+
+      double pulseHeight = 0;
+      for (const auto& hit : m_times) {
+        double hTime = hit.first;
+        const auto* pulseShape = hit.second.shape;
+        if (not pulseShape) continue;
+        pulseHeight += hit.second.pulseHeight * pulseShape->getValue(hTime - hitTime + peakTime);
+      }
+
+      double t = (*s_timeWalk)->getTimeWalk(pulseHeight);
+      double sig = (*s_timeWalk)->getSigma(pulseHeight);
+
+      return gRandom->Gaus(t, sig);
+    }
 
   } // TOP namespace
 } // Belle2 namespace

@@ -18,18 +18,18 @@ namespace TreeFitter {
     /** constructor */
     ConstraintConfiguration() :
       m_massConstraintType(false),
-      m_massConstraintListPDG( {}),
-                             m_fixedToMotherVertexListPDG({}),
-                             m_geoConstraintListPDG({}),
-                             m_removeConstraintList({}),
-                             m_automatic_vertex_constraining(false),
-                             m_ipConstraint(false),
-                             m_customOrigin(false),
-                             m_customOriginVertex({}),
-                             m_customOriginCovariance({}),
-                             m_originDimension(3),
-                             m_headOfTreePDG(0),
-                             m_inflationFactorCovZ(1)
+      m_massConstraintListPDG({}),
+                            m_fixedToMotherVertexListPDG({}),
+                            m_geoConstraintListPDG({}),
+                            m_removeConstraintList({}),
+                            m_automatic_vertex_constraining(false),
+                            m_ipConstraint(false),
+                            m_customOrigin(false),
+                            m_customOriginVertex({}),
+                            m_customOriginCovariance({}),
+                            m_originDimension(3),
+                            m_headOfTreePDG(0),
+                            m_inflationFactorCovZ(1)
     {};
 
     /** constructor */

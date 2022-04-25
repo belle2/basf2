@@ -135,7 +135,7 @@ namespace Belle2 {
 
       /// Getter for wire layer getter by continuous layer id.
       const CDCWireLayer& getWireLayer(ILayer iCLayer) const
-      { return m_wireLayers[ iCLayer ]; }
+      { return m_wireLayers[ iCLayer - m_FirstLayerOffset ]; }
 
       /// Getter for wire layer getter by superlayer id and layer id.
       const CDCWireLayer& getWireLayer(ISuperLayer iSuperLayer, ILayer iLayer) const
@@ -480,6 +480,9 @@ namespace Belle2 {
 
       /// Storage for all wire superlayers in the CDC
       std::vector<Belle2::TrackFindingCDC::CDCWireSuperLayer> m_wireSuperLayers;
+
+      /// Offset of first layer
+      ILayer m_FirstLayerOffset = 0;
 
     };
   }

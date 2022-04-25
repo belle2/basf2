@@ -7,6 +7,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <TMath.h>
+#include <Math/Vector4D.h>
 
 #include <analysis/dataobjects/Particle.h>
 
@@ -83,7 +84,7 @@ namespace TreeFitter {
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
         if (0 == m_niter) {
           m_errCode = m_decaychain->filter(*m_fitparams);
-        } else if (m_niter > 0 && m_useReferencing) {
+        } else if (m_useReferencing) {
           auto* tempState = new FitParams(*m_fitparams);
           m_errCode = m_decaychain->filterWithReference(*m_fitparams, *tempState);
           delete tempState;
@@ -158,7 +159,6 @@ namespace TreeFitter {
     return m_decaychain->tauIndex(particle);
   }
 
-  // cppcheck-suppress constParameter ; returncov is clearly changed in the function
   void FitManager::getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const
   {
 
@@ -244,9 +244,9 @@ namespace TreeFitter {
 
     if (m_updateDaugthers || isTreeHead) {
       if (posindex >= 0) {
-        const TVector3 pos(m_fitparams->getStateVector()(posindex),
-                           m_fitparams->getStateVector()(posindex + 1),
-                           m_fitparams->getStateVector()(posindex + 2));
+        const ROOT::Math::XYZVector pos(m_fitparams->getStateVector()(posindex),
+                                        m_fitparams->getStateVector()(posindex + 1),
+                                        m_fitparams->getStateVector()(posindex + 2));
         cand.setVertex(pos);
         if (&pb == m_decaychain->cand()) { // if head
           const double fitparchi2 = m_fitparams->chiSquare();
@@ -267,7 +267,7 @@ namespace TreeFitter {
       }
 
       const int momindex = pb.momIndex();
-      TLorentzVector p;
+      ROOT::Math::PxPyPzEVector p;
       p.SetPx(m_fitparams->getStateVector()(momindex));
       p.SetPy(m_fitparams->getStateVector()(momindex + 1));
       p.SetPz(m_fitparams->getStateVector()(momindex + 2));
@@ -276,7 +276,7 @@ namespace TreeFitter {
         cand.set4Vector(p);
       } else {
         const double mass = cand.getPDGMass();
-        p.SetE(std::sqrt(p.Vect()*p.Vect() + mass * mass));
+        p.SetE(std::sqrt(p.P2() + mass * mass));
         cand.set4Vector(p);
       }
       TMatrixFSym cov7b2(7);

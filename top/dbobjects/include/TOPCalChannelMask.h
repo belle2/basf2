@@ -113,7 +113,7 @@ namespace Belle2 {
      */
     double getActiveFraction() const
     {
-      return static_cast<double>(getNumOfActiveChannels()) / c_numModules / c_numChannels;
+      return static_cast<double>(getNumOfActiveChannels()) / static_cast<double>(c_numModules) / static_cast<double>(c_numChannels);
     }
 
     /**
@@ -136,7 +136,7 @@ namespace Belle2 {
      */
     double getActiveFraction(int moduleID) const
     {
-      return static_cast<double>(getNumOfActiveChannels(moduleID)) / c_numChannels;
+      return static_cast<double>(getNumOfActiveChannels(moduleID)) / static_cast<double>(c_numChannels);
     }
 
 

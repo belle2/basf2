@@ -21,7 +21,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisIP)
+REG_MODULE(DQMHistAnalysisIP);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -36,7 +36,7 @@ DQMHistAnalysisIPModule::DQMHistAnalysisIPModule()
   addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
   addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:TEST:hist:"));
   addParam("MonitorPrefix", m_monPrefix, "Monitor Prefix");// force to be set!
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("minEntries", m_minEntries, "minimum number of new Entries for a fit", 1000);
   B2DEBUG(20, "DQMHistAnalysisIP: Constructor done.");
 }
@@ -65,6 +65,10 @@ void DQMHistAnalysisIPModule::initialize()
   m_line->SetVertical(true);
   m_line->SetLineColor(8);
   m_line->SetLineWidth(3);
+  m_line2 = new TLine(0, 10, 0, 0);
+  m_line2->SetVertical(true);
+  m_line2->SetLineColor(9);
+  m_line2->SetLineWidth(3);
 
   m_monObj->addCanvas(m_c1);
 
@@ -77,6 +81,8 @@ void DQMHistAnalysisIPModule::initialize()
     SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
     aa = m_pvPrefix + "RMS";
     SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
+    aa = m_pvPrefix + "Median";
+    SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
     // Read LO and HI limits from EPICS, seems this needs additional channels?
     // SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
@@ -92,7 +98,7 @@ void DQMHistAnalysisIPModule::beginRun()
   m_c1->Clear();
 
   TH1* hh1;
-  hh1 = findHist(m_histoname.c_str());
+  hh1 = findHist(m_histoname);
 
   if (hh1 == NULL) {
     B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
@@ -130,6 +136,7 @@ void DQMHistAnalysisIPModule::beginRun()
     m_c1->cd();
     hh1->Draw();
     m_line->Draw();
+    m_line2->Draw();
   } else {
     B2DEBUG(20, "Histo " << m_histoname << " not found");
   }
@@ -142,7 +149,7 @@ void DQMHistAnalysisIPModule::event()
   TH1* hh1;
   bool flag = false;
 
-  hh1 = findHist(m_histoname.c_str());
+  hh1 = findHist(m_histoname);
   if (hh1 == NULL) {
     B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
     TDirectory* d = gROOT;
@@ -200,22 +207,32 @@ void DQMHistAnalysisIPModule::event()
       m_h_last->Reset();
       m_h_last->Add(hh1);
 
+      delta->ResetStats(); // kills the Mean from filling, now only use bin values excl over/underflow
       double x = delta->GetMean();// must be double bc of EPICS below
       double w = delta->GetRMS();// must be double bc of EPICS below
+      double q = 0.5; // array size one for quantiles
+      double m = 0; // array of size 1 for result = median
+      delta->ComputeIntegral(); // precaution
+      delta->GetQuantiles(1, &m, &q);
       double y1 = delta->GetMaximum();
       double y2 = delta->GetMinimum();
       B2DEBUG(20, "Fit " << x << "," << w << "," << y1 << "," << y2);
       m_line->SetY1(y1 + (y1 - y2) * 0.05);
       m_line->SetX1(x);
       m_line->SetX2(x);
+      m_line2->SetY1(y1 + (y1 - y2) * 0.05);
+      m_line2->SetX1(m);
+      m_line2->SetX2(m);
       delta->GetXaxis()->SetRangeUser(x - 3 * w, x + 3 * w);
       if (!flag) {
         // dont add another line...
         m_line->Draw();
+        m_line2->Draw();
       }
       m_c1->Modified();
       m_c1->Update();
 
+      m_monObj->setVariable(m_monPrefix + "_median", m);
       m_monObj->setVariable(m_monPrefix + "_mean", x);
       m_monObj->setVariable(m_monPrefix + "_width", w);
 
@@ -224,6 +241,7 @@ void DQMHistAnalysisIPModule::event()
         B2INFO("Update EPICS");
         if (mychid[0]) SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&x), "ca_set failure");
         if (mychid[1]) SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&w), "ca_set failure");
+        if (mychid[2]) SEVCHK(ca_put(DBR_DOUBLE, mychid[2], (void*)&m), "ca_set failure");
         SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
       }
 #endif

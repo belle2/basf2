@@ -124,37 +124,56 @@ namespace Belle2 {
     {
       invalidateCache();
 
-      int iE  = getGlobalParNum(0);
-      int ith = getGlobalParNum(1);
-      int iph = getGlobalParNum(2);
-      assert(iE  >= 0 && iE  < idim);
-      assert(ith >= 0 && ith < idim);
-      assert(iph >= 0 && iph < idim);
+      bool result = false;
+      bool mirrored_e = false;
 
-      double e  = pp[iE];
-      double th = pp[ith];
-      double ph = pp[iph];
+      if (!isParamFixed(0)) {
+        int iE  = getGlobalParNum(0);
+        assert(iE  >= 0 && iE  < idim);
+        double e  = pp[iE];
 
-      if (e < 0) {
-        B2INFO("JetFitObject::updateParams: mirrored E!\n");
-        e  = -e;
-        th = M_PI - th;
-        ph = M_PI + ph;
+        if (e < 0) {
+          B2INFO("JetFitObject::updateParams: mirrored E!\n");
+          e  = -e;
+          mirrored_e = true;
+        }
+
+        double massPlusEpsilon = mass * (1.0000001);
+        if (e < massPlusEpsilon) e = massPlusEpsilon;
+        result = result || ((e - par[0]) * (e - par[0]) > eps2 * cov[0][0]);
+        par[0] = e;
+        pp[iE]  = par[0];
       }
 
-      double massPlusEpsilon = mass * (1.0000001);
-      if (e < massPlusEpsilon) e = massPlusEpsilon;
+      if (!isParamFixed(1)) {
+        int ith = getGlobalParNum(1);
+        assert(ith >= 0 && ith < idim);
+        double th = pp[ith];
 
-      bool result = ((e - par[0]) * (e - par[0]) > eps2 * cov[0][0]) ||
-                    ((th - par[1]) * (th - par[1]) > eps2 * cov[1][1]) ||
-                    ((ph - par[2]) * (ph - par[2]) > eps2 * cov[2][2]);
+        if (mirrored_e) {
+          th = M_PI - th;
+        }
 
-      par[0] = e;
-      par[1] = th;
-      par[2] = ph;
-      pp[iE]  = par[0];
-      pp[ith] = par[1];
-      pp[iph] = par[2];
+        result = result || ((th - par[1]) * (th - par[1]) > eps2 * cov[1][1]);
+        par[1] = th;
+        pp[ith] = par[1];
+      }
+
+      if (!isParamFixed(2)) {
+        int iph = getGlobalParNum(2);
+        assert(iph >= 0 && iph < idim);
+        double ph = pp[iph];
+
+        if (mirrored_e) {
+          ph = M_PI + ph;
+        }
+
+        result = result || ((ph - par[2]) * (ph - par[2]) > eps2 * cov[2][2]);
+        par[2] = ph;
+        pp[iph] = par[2];
+      }
+
+
       return result;
     }
 
@@ -243,7 +262,7 @@ namespace Belle2 {
 
 
 
-    double JetFitObject::getFirstDerivative_Meta_Local(int iMeta, int ilocal , int metaSet) const
+    double JetFitObject::getFirstDerivative_Meta_Local(int iMeta, int ilocal, int metaSet) const
     {
 
       assert(metaSet == 0);
@@ -268,7 +287,7 @@ namespace Belle2 {
     }
 
 
-    double JetFitObject::getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal , int metaSet) const
+    double JetFitObject::getSecondDerivative_Meta_Local(int iMeta, int ilocal, int jlocal, int metaSet) const
     {
       assert(metaSet == 0);
       if (!cachevalid) updateCache();

@@ -77,8 +77,8 @@ if __name__ == "__main__":
     print(" ")
 
     svdCrossTalkCAF = SVDCrossTalkCalibrations(input_files,
-                                               ['data_reprocessing_prompt_rel4_patchb',
-                                                'svd_loadedOnFADC', 'svd_basic'])
+                                               ['data_reprocessing_prompt',
+                                                'svd_basic', 'online'])
 
     cal_fw = CAF()
     cal_fw.add_calibration(svdCrossTalkCAF)

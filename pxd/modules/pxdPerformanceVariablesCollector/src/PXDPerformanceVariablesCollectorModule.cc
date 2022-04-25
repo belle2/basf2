@@ -216,16 +216,20 @@ void PXDPerformanceVariablesCollectorModule::collect() // Do your event() stuff 
   StoreObjPtr<ParticleList> particles4Eff(m_PList4EffName);
   if (particles4Eff.isValid() && particles4Eff->getListSize() == 1)
     m_selected4Eff = true;
+  const Particle* vpho4eff = particles4Eff->getParticle(0);
 
   collectDeltaIP(); // using ParticleList(m_PList4ResName)
 
   StoreObjPtr<ParticleList> particles(m_PList4GainName);
+  // This list is used to extract info for both gain calibration and efficiency monitoring
+  // as it has the loosest selection and we can reuse the for loop.
   // Do nothing if the list is empty
   if (!particles.isValid() || particles->getListSize() < 1)
     return;
 
   for (auto const& particle : *particles) {
     const Track* trackPtr = particle.getTrack();
+    auto mass = particle.getMass();
     if (!trackPtr) return;
     auto recoTrackPtr = trackPtr->getRelated<RecoTrack>("");
     if (!recoTrackPtr) return;
@@ -233,7 +237,7 @@ void PXDPerformanceVariablesCollectorModule::collect() // Do your event() stuff 
     for (auto const& pxdIntercept : pxdIntercepts) {
       TrackCluster_t trackCluster;
       // Function setValues() also returns a recoTrack pointer
-      if (!trackCluster.setValues(pxdIntercept, "", "PXDClustersFromTracks"))
+      if (!trackCluster.setValues(pxdIntercept, "", "PXDClustersFromTracks", mass))
         continue;
 
       auto const& cluster = trackCluster.cluster;
@@ -242,8 +246,13 @@ void PXDPerformanceVariablesCollectorModule::collect() // Do your event() stuff 
 
 
       // Collect info for efficiency study
-      if (m_selected4Eff)
-        collectEfficiencyVariables(trackCluster);
+      if (m_selected4Eff && intersection.inside) {
+        // check if the particle is vpho4eff's daughter
+        for (auto const& daughter : vpho4eff->getDaughters()) {
+          if (particle.isCopyOf(daughter))
+            collectEfficiencyVariables(trackCluster);
+        }  // end of vpho4eff daughter loop
+      }
 
       // Collect info for gain calibration
       // Check for valid cluster and intersection
@@ -282,12 +291,12 @@ void PXDPerformanceVariablesCollectorModule::collectDeltaIP()
   const TrackFitResult* tr0 = part0->getTrack()->getTrackFitResultWithClosestMass(Const::pion);
   const TrackFitResult* tr1 = part1->getTrack()->getTrackFitResultWithClosestMass(Const::pion);
 
-  track_struct.setTrackVariables(tr0, vertex);
-  auto d0p_0 = track_struct.d0p;
-  auto z0p_0 = track_struct.z0p;
-  track_struct.setTrackVariables(tr1, vertex);
-  auto d0p_1 = track_struct.d0p;
-  auto z0p_1 = track_struct.z0p;
+  m_track_struct.setTrackVariables(tr0, vertex);
+  auto d0p_0 = m_track_struct.d0p;
+  auto z0p_0 = m_track_struct.z0p;
+  m_track_struct.setTrackVariables(tr1, vertex);
+  auto d0p_1 = m_track_struct.d0p;
+  auto z0p_1 = m_track_struct.z0p;
 
   m_deltaD0oSqrt2 = (d0p_0 + d0p_1) / sqrt(2.);
   m_deltaZ0oSqrt2 = (z0p_0 - z0p_1) / sqrt(2.);
@@ -306,11 +315,21 @@ void PXDPerformanceVariablesCollectorModule::collectGainVariables(const TrackClu
   m_estimated = intersection.chargeMPV;
 
   int uBin(-1), vBin(-1);
-  auto binID = getBinID(trackCluster, uBin, vBin, m_useClusterPosition);
+  int binID = 0;
   VxdID sensorID = getVxdIDFromPXDModuleID(cluster.pxdID);
   auto layerNumber = sensorID.getLayerNumber();
   auto ladderNumber = sensorID.getLadderNumber();
   auto sensorNumber = sensorID.getSensorNumber();
+  try {
+    binID = getBinID(trackCluster, uBin, vBin, m_useClusterPosition);
+  } catch (...) {
+    // It happends very rarely (2 track clusters out of all in s-proc3 HLT bhabha skim.)
+    // One could check hit reconstruction bias and the calculation of uBin/vBin in PXDGainCalibrator
+    B2ERROR("On module " << sensorID
+            << ": Failed to get bin ID for the track cluster at (u,v) = (" << cluster.posU << "," << cluster.posV
+            << ") and (uBin, vBin) = (" << uBin << "," << vBin << ").");
+    return;
+  }
 
 // Increment the counter
   getObjectPtr<TH1I>("PXDClusterCounter")->Fill(binID);
@@ -348,6 +367,8 @@ void PXDPerformanceVariablesCollectorModule::collectEfficiencyVariables(const Tr
   auto iSensor = VXD::GeoCache::getInstance().getGeoTools()->getPXDSensorIndex(sensorID);
   auto uBin = PXD::PXDGainCalibrator::getInstance().getBinU(sensorID, uID, vID, m_nBinsU);
   auto vBin = PXD::PXDGainCalibrator::getInstance().getBinV(sensorID, vID, m_nBinsV);
+  if (uBin >= m_nBinsU || vBin >= m_nBinsV)
+    return;
   auto binID = iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin;
 
   // Filling counters

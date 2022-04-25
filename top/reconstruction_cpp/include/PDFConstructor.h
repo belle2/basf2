@@ -18,6 +18,7 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <vector>
 #include <map>
+#include <set>
 #include <limits>
 
 namespace Belle2 {
@@ -575,6 +576,7 @@ namespace Belle2 {
       mutable std::vector<LogL> m_pixelLLs; /**< pixel log likelihoods (index = pixelID - 1) */
       mutable std::vector<Pull> m_pulls; /**< photon pulls w.r.t PDF peaks */
       mutable bool m_deltaPDFOn = true; /**< include/exclude delta-ray PDF in likelihood calculation */
+      mutable std::set<int> m_zeroPixels; /**< collection of pixelID's with zero pdfValue */
 
     };
 

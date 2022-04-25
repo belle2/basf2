@@ -169,7 +169,7 @@ RunNumberList RunNumberTable::get(const std::string& node, int expno, int runno_
     }
     const DBRecordList record_v(m_db.loadRecords());
     for (DBRecordList::const_iterator it = record_v.begin();
-         it != record_v.end(); it++) {
+         it != record_v.end(); ++it) {
       const DBRecord& record(*it);
       list.push_back(RunNumber(record.get("node"), record.get("runtype"),
                                record.getInt("expno"), record.getInt("runno"),

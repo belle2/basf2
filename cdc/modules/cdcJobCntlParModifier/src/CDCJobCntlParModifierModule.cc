@@ -14,7 +14,7 @@ using namespace Belle2;
 using namespace CDC;
 
 // register module
-REG_MODULE(CDCJobCntlParModifier)
+REG_MODULE(CDCJobCntlParModifier);
 CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDCSimControlPar::getInstance()),
   m_gcp(CDCGeoControlPar::getInstance()), m_timeWalk(), m_wireSag(), m_modLeftRightFlag(), m_debug4Sim(), m_thresholdEnergyDeposit(),
   m_minTrackLength(), m_addFudgeFactorForSigmaForData(), m_addFudgeFactorForSigmaForMC(),

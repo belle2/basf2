@@ -300,7 +300,6 @@ int sender(int sender_id, int   run_no, int nwords_per_fee, int ncpr, int nhslb)
   // network connection
   //
   int port_to = 30000 + sender_id;
-  int listenfd;
   struct sockaddr_in servaddr;
   struct pollfd client[NUM_CLIENTS_PER_THREAD + 1];
 

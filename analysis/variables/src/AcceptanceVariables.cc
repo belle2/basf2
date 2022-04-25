@@ -8,7 +8,11 @@
 
 // Own include
 #include <analysis/variables/AcceptanceVariables.h>
+
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
+#include <analysis/dataobjects/Particle.h>
 
 using namespace std;
 
@@ -28,7 +32,7 @@ namespace Belle2 {
     bool thetaInTOPAcceptance(const Particle* particle)
     {
       double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
-      if (theta > 31. && theta < 128.) {
+      if (theta > 32.20 && theta < 123.86) {
         return true;
       } else return false;
     }

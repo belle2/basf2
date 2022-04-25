@@ -76,14 +76,6 @@ namespace Belle2 {
     virtual void terminate() override;
 
     /**
-    * Find canvas by name
-    * @param cname Name of the canvas
-    * @return The pointer to the canvas, or nullptr if not found.
-    */
-    TCanvas* find_canvas(TString cname);
-
-
-    /**
      * make bad channel list.
      */
     void makeBadChannelList();
@@ -112,14 +104,11 @@ namespace Belle2 {
 
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
 
-    TH1F* m_hfastTDC = nullptr; /**< Histogram of num. event */
-    TH2F* m_hADC = nullptr; /**< Summary of ADC histograms  */
-    TH2F* m_hADCTOTCut = nullptr; /**< Summary of ADC histograms with tot cut*/
-    TH2F* m_hTDC = nullptr; /**< Summary of TDC histograms */
+    TH2F* m_hADC = nullptr; /**< Summary of ADC histograms with track associated hits*/
+    TH2F* m_hTDC = nullptr; /**< Summary of TDC histograms with track associated hits*/
     TH2F* m_hHit = nullptr; /**< Summary of hit histograms */
-    TH1D* m_hADCs[300]; /**< ADC histograms for each board (0-299) */
-    TH1D* m_hADCTOTCuts[300]; /**< ADC histograms with tot cut for each board (0-299) */
-    TH1D* m_hTDCs[300]; /**< TDC histograms for each board (0-299) */
+    TH1D* m_hADCs[300]; /**< ADC histograms with track associated hits (0-299) */
+    TH1D* m_hTDCs[300]; /**< TDC histograms with track associated hits (0-299) */
     TH1D* m_hHits[56]; /**< hit histograms for each layer (0-55) */
 
     std::vector<std::pair<int, int>> m_badChannels = {}; /**< bad wires list */

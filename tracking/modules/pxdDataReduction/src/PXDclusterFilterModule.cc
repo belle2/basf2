@@ -15,7 +15,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDclusterFilter)
+REG_MODULE(PXDclusterFilter);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -136,7 +136,7 @@ void PXDclusterFilterModule::filterClusters()
   multimap< VxdID, ROIid > ROIids;
 
   for (auto ROI : ROIids_store_array)
-    ROIids.insert(pair<VxdID, ROIid> (ROI.getSensorID() , ROI));
+    ROIids.insert(pair<VxdID, ROIid> (ROI.getSensorID(), ROI));
 
   m_selectorIN.select([ROIids, this](const PXDCluster * thePxdCluster) {
     auto ROIidsRange = ROIids.equal_range(thePxdCluster->getSensorID()) ;

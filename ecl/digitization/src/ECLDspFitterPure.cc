@@ -53,7 +53,7 @@ void Belle2::ECL::initParams(EclConfigurationPure::fitparamspure_t& params,
     }
   }
 
-  double kdt = 0.001 / (EclConfigurationPure::m_tickPure / EclConfigurationPure::m_ndtPure) ; // df / dtau = df / dt * dt / dtau
+  double kdt = 0.001 / (EclConfigurationPure::getTickPure() / EclConfigurationPure::m_ndtPure) ; // df / dtau = df / dt * dt / dtau
 
   params.c002 = 0;
   for (int h = 0; h < 16; h++) {

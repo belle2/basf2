@@ -34,7 +34,7 @@ using namespace Belle2::Tracking;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TrackFinderVXDAnalizer)
+REG_MODULE(TrackFinderVXDAnalizer);
 
 //-----------------------------------------------------------------
 //                 Implementation

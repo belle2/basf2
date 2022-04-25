@@ -32,18 +32,39 @@ namespace Belle2 {
 
   public:
 
+    /**
+     * Constructor.
+     */
     TrackingPerformanceEvaluationModule();
 
+    /**
+     * Destructor.
+     */
     ~TrackingPerformanceEvaluationModule();
 
+    /**
+     * Initializer.
+     */
     void initialize() override;
 
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override;
 
+    /**
+     * This method is called for each event.
+     */
     void event() override;
 
+    /**
+     * This method is called if the current run ends.
+     */
     void endRun() override;
 
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate() override;
 
   private:

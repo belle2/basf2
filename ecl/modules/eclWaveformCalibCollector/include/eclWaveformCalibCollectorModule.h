@@ -35,14 +35,6 @@ namespace Belle2 {
     /** Select events and crystals and accumulate histograms */
     void collect() override;
 
-    /** ECLDigits Array Name.*/
-    virtual const char* eclDigitArrayName() const
-    { return "ECLDigits" ; }
-
-    /** ECLDspsArray Name.*/
-    virtual const char* eclDspArrayName() const
-    { return "ECLDsps" ; }
-
   private:
     StoreArray<ECLDsp> m_eclDSPs;  /**< StoreArray ECLDsp */
 

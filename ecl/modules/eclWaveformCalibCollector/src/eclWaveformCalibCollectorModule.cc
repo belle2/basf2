@@ -145,7 +145,7 @@ void eclWaveformCalibCollectorModule::collect()
           const double BaselineLimit = 10.0;
           double baselinemean = 0.0;
           for (int i = 0; i < BaselineLimit; i++) baselinemean += aECLDsp.getDspA()[i];
-          baselinemean = baselinemean * iLimit;
+          baselinemean /= BaselineLimit;
           double baselineRMS = 0.0;
           for (int i = 0; i < BaselineLimit; i++) {
             double temp = aECLDsp.getDspA()[i] - baselinemean;

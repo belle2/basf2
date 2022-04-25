@@ -147,15 +147,15 @@ void eclWaveformCalibCollectorModule::collect()
           double baselinemean = 0.0;
           for (int i = 0; i < BaselineLimit; i++) baselinemean += aECLDsp.getDspA()[i];
           baselinemean = baselinemean * iLimit;
-          double baslineRMS = 0.0;
+          double baselineRMS = 0.0;
           for (int i = 0; i < BaselineLimit; i++) {
             double temp = aECLDsp.getDspA()[i] - baselinemean;
-            baslineRMS += (temp * temp);
+            baselineRMS += (temp * temp);
           }
-          baslineRMS *= iLimit;//squared
+          baselineRMS *= iLimit;//squared
 
           m_Baseline = baselinemean;
-          m_BaselineRMS = baslineRMS;
+          m_BaselineRMS = baselineRMS;
 
           if (m_includeWaveforms) {
             m_ADC0 = aECLDsp.getDspA()[0];

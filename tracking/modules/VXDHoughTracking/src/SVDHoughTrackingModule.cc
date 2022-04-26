@@ -6,9 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/VXDHoughTracking/VXDHoughTrackingModule.h>
+#include <tracking/modules/VXDHoughTracking/SVDHoughTrackingModule.h>
 
 using namespace Belle2;
-// using namespace vxdHoughTracking;
 
-REG_MODULE(VXDHoughTracking)
+REG_MODULE(SVDHoughTracking);

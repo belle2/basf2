@@ -5,9 +5,9 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/vxdHoughTracking/findlets/VXDHoughTracking.h>
+#include <tracking/vxdHoughTracking/findlets/SVDHoughTracking.h>
 #include <tracking/vxdHoughTracking/findlets/RawTrackCandCleaner.icc.h>
-#include <tracking/vxdHoughTracking/utilities/VXDHoughTrackingHelpers.h>
+#include <tracking/vxdHoughTracking/utilities/SVDHoughTrackingHelpers.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/logging/Logger.h>
@@ -17,9 +17,9 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace vxdHoughTracking;
 
-VXDHoughTracking::~VXDHoughTracking() = default;
+SVDHoughTracking::~SVDHoughTracking() = default;
 
-VXDHoughTracking::VXDHoughTracking()
+SVDHoughTracking::SVDHoughTracking()
 {
   addProcessingSignalListener(&m_spacePointLoaderAndPreparer);
   addProcessingSignalListener(&m_multiHouthSpaceInterceptFinder);
@@ -30,7 +30,7 @@ VXDHoughTracking::VXDHoughTracking()
   addProcessingSignalListener(&m_roiFinder);
 }
 
-void VXDHoughTracking::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void SVDHoughTracking::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
 
@@ -54,7 +54,7 @@ void VXDHoughTracking::exposeParameters(ModuleParamList* moduleParamList, const 
                                 m_useMultiHoughSpaceInterceptFinding);
 }
 
-void VXDHoughTracking::beginEvent()
+void SVDHoughTracking::beginEvent()
 {
   Super::beginEvent();
 
@@ -68,7 +68,7 @@ void VXDHoughTracking::beginEvent()
 
 }
 
-void VXDHoughTracking::apply()
+void SVDHoughTracking::apply()
 {
   m_spacePointLoaderAndPreparer.apply(m_spacePointVector, m_vxdHoughStates);
   B2DEBUG(29, "m_vxdHoughStates.size(): " << m_vxdHoughStates.size());

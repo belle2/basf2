@@ -30,7 +30,7 @@ namespace Belle2 {
     * It is however crucial, that the relations do not create cycles in the graph!
     */
     template <class AHit, class APathFilter, class AResult>
-    class VXDHoughTrackingTreeSearcher : public
+    class SVDHoughTrackingTreeSearcher : public
       TrackFindingCDC::Findlet<AHit*, const TrackFindingCDC::WeightedRelation<AHit>, AResult> {
     private:
       /// Parent class
@@ -38,7 +38,7 @@ namespace Belle2 {
 
     public:
       /// Construct this findlet and add the subfindlet as listener
-      VXDHoughTrackingTreeSearcher();
+      SVDHoughTrackingTreeSearcher();
 
       /// Expose the parameters of the subfindlet
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;

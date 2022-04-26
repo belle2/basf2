@@ -6,14 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/vxdHoughTracking/findlets/RawTrackCandCleaner.dcl.h>
-#include <tracking/vxdHoughTracking/utilities/VXDHoughTrackingHelpers.h>
+#include <tracking/vxdHoughTracking/utilities/SVDHoughTrackingHelpers.h>
 
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 #include <tracking/vxdHoughTracking/filters/relations/LayerRelationFilter.icc.h>
-#include <tracking/vxdHoughTracking/findlets/VXDHoughTrackingTreeSearcher.icc.h>
+#include <tracking/vxdHoughTracking/findlets/SVDHoughTrackingTreeSearcher.icc.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>

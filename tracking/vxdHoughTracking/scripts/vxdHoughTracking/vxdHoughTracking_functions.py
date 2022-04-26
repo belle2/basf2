@@ -10,48 +10,30 @@
 ##########################################################################
 
 
-def add_VXDHoughTracking(path,
-                         svd_space_points='SVDSpacePoints',
-                         svd_clusters='SVDClusters',
-                         useAllSpacePoints=False,
-                         reco_tracks='VXDHoughRecoTracks',
-                         svdspacepointtrackcandidates='SVDHoughSpacePointTrackCands',
-                         use_simple_roi_calculation=False,
-                         usePXDROIFinderModule=False,
-                         pxd_intercepts_name='VXDHoughPXDIntercepts',
-                         rois_name='VXDHoughROIs'):
+def add_svd_hough_tracking(path,
+                           svd_space_points='SVDSpacePoints',
+                           svd_clusters='SVDClusters',
+                           reco_tracks='RecoTracks',
+                           svd_space_point_track_candidates='SPTrackCands',
+                           suffix=''):
     """
-    Convenience function to add the optimized VXDHoughTracking to the path.
-    : param path: The path to add the VXDHoughTracking module to.
-    : param reco_tracks: Name of the StoreArray containing the RecoTracks found by VXDHoughTracking
-    : param use_simple_roi_calculation: Use a simple ROI calculation with a circle extrapolation in r-phi
-        and a straight line extrapolation in theta
-    : param usePXDROIFinderModule: Calculate ROI using the PXDROIFinderModule
-    : param pxd_intercepts_name: Name of the StoreArray containing the PXDIntercepts calculated by VXDHoughTracking.
-        If both simple and advanced ROI finding are selected, the StoreArray for the advanced ROI finding will get
-        the prefix PXDROIFinder,
-    : param rois_name: Name of the StoreArray containing the ROIs calculated by VXDHoughTracking.
-        If both simple and advanced ROI finding are selected, the StoreArray for the advanced ROI finding will get
-        the prefix PXDROIFinder,
+    Convenience function to add the SVDHoughTracking to the path.
+    :param path: The path to add the SVDHoughTracking module to.
+    :param svd_space_points: Name of the StoreArray containing the SVDSpacePoints
+    :param svd_clusters: Name of the StoreArray containing the SVDClusters
+    :param reco_tracks: Name of the StoreArray containing the RecoTracks
+    :param svd_space_point_track_candidates: Name of the StoreArray containing the SpacePointTrackCandidates
+    :param suffix: all names of intermediate StoreArrays will have the suffix appended. Useful in cases someone needs to
+                   put several instances of track finding in one path.
     """
 
-    advancedPXDInterceptsName = pxd_intercepts_name
-    advancedROIName = rois_name
-    # If both simple VXDHoughTracking ROI finding and regular ROI finding using the PXDROIFinder with the RecoTracks found by
-    # VXDHoughTracking shall be performed, set a different name for the PXDInterecepts and the ROIs from the PXDROIFinder
-    # (advancedPXDInterceptsName and advancedROINames) to be able to distinguish them.
-    if use_simple_roi_calculation and usePXDROIFinderModule:
-        advancedPXDInterceptsName = 'PXDROIFinder' + advancedPXDInterceptsName
-        advancedROIName = 'PXDROIFinder' + advancedROIName
-
-    path.add_module('VXDHoughTracking',
-                    SVDSpacePointStoreArrayName=svd_space_points,
-                    SVDClustersStoreArrayName=svd_clusters,
-                    finalOverlapResolverNameSVDClusters=svd_clusters,
-                    refinerOverlapResolverNameSVDClusters=svd_clusters,
-                    RecoTracksStoreArrayName=reco_tracks,
-                    useAllSpacePoints=useAllSpacePoints,
-                    SVDSpacePointTrackCandsStoreArrayName=svdspacepointtrackcandidates,
+    path.add_module('SVDHoughTracking',
+                    SVDSpacePointStoreArrayName=svd_space_points + suffix,
+                    SVDClustersStoreArrayName=svd_clusters + suffix,
+                    finalOverlapResolverNameSVDClusters=svd_clusters + suffix,
+                    refinerOverlapResolverNameSVDClusters=svd_clusters + suffix,
+                    RecoTracksStoreArrayName=reco_tracks + suffix,
+                    SVDSpacePointTrackCandsStoreArrayName=svd_space_point_track_candidates + suffix,
 
                     relationFilter='angleAndTime',
 
@@ -60,24 +42,3 @@ def add_VXDHoughTracking(path,
                     fourHitUseNBestHits=3,
                     fiveHitUseNBestHits=2,
                     )
-
-    if usePXDROIFinderModule:
-
-        if 'SetupGenfitExtrapolation' not in path:
-            path.add_module('SetupGenfitExtrapolation').set_name('SetupGenfitExtrapolationForVXDHoughTracking')
-
-        # TRACK FITTING
-        path.add_module('DAFRecoFitter', recoTracksStoreArrayName=reco_tracks).set_name('VXDHoughTracking-only DAFRecoFitter')
-
-        path.add_module('PXDROIFinder',
-                        recoTrackListName=reco_tracks,
-                        PXDInterceptListName=advancedPXDInterceptsName,
-                        ROIListName=advancedROIName,
-                        tolerancePhi=0.15,
-                        toleranceZ=0.5,
-                        sigmaSystU=0.02,
-                        sigmaSystV=0.02,
-                        numSigmaTotU=10,
-                        numSigmaTotV=10,
-                        maxWidthU=0.5,
-                        maxWidthV=0.5,).set_name('VXDHoughTrackingPXDROIFinder')

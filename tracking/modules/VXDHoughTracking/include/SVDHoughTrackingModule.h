@@ -8,24 +8,21 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
-#include <tracking/vxdHoughTracking/findlets/VXDHoughTracking.h>
+#include <tracking/vxdHoughTracking/findlets/SVDHoughTracking.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 
 namespace Belle2 {
   /**
-   * Hough Transformation SVD track finding, similar to DATCON, that is not bound to limitations of an FPGA and
-   * thus can work as a full tracking module, use genfit fitting and produce RecoTracks for proper analysis.
+   * Full Hough Transformation based SVD track finding.
    */
-  class VXDHoughTrackingModule : public TrackFindingCDC::FindletModule<vxdHoughTracking::VXDHoughTracking> {
+  class SVDHoughTrackingModule : public TrackFindingCDC::FindletModule<vxdHoughTracking::SVDHoughTracking> {
 
   public:
     /// Set description
-    VXDHoughTrackingModule()
+    SVDHoughTrackingModule()
     {
-      setDescription("Hough Transformation SVD track finding, similar to DATCON, that is not bound to "
-                     "limitations of an FPGA and thus can work as a full tracking module, use genfit "
-                     "fitting and produce RecoTracks for proper anlysis.");
+      setDescription("Full Hough Transformation based SVD track finding.");
     }
   };
 

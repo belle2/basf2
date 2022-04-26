@@ -367,7 +367,7 @@ void SVDUnpackerModule::event()
                                                  apvErrors));
             }
             // temporary SVDDAQDiagnostic object (no info from trailers and APVmatch code)
-            currentDAQDiagnostic = m_storeDAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, nFADCmatch,
+            currentDAQDiagnostic = m_storeDAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, true,
                                                                    nAPVmatch,
                                                                    badHeader, missedHeader, missedTrailer,
                                                                    fadc, apv);
@@ -446,7 +446,7 @@ void SVDUnpackerModule::event()
             unsigned short nAPVs = APVmap->count(fadc);
 
             if (nAPVheaders == 0) {
-              currentDAQDiagnostic = m_storeDAQDiagnostics.appendNew(0, 0, 0, 0, 0, 0, ftbError, nFADCmatch, nAPVmatch, badHeader, 0, 0, fadc, 0);
+              currentDAQDiagnostic = m_storeDAQDiagnostics.appendNew(0, 0, 0, 0, 0, 0, ftbError, true, nAPVmatch, badHeader, 0, 0, fadc, 0);
               vDiagnostic_ptr.push_back(currentDAQDiagnostic);
             }
 
@@ -566,6 +566,11 @@ void SVDUnpackerModule::event()
                                                              cntFADCboards)  << LogVar("# of FADCs", nFADCboards) << LogVar("Event number", eventNo));
 
     nFADCmatch = false;
+
+    // We override all FADCMatch fields in diagnostics and set it to false.
+    for (auto& p : m_storeDAQDiagnostics) {
+      p.setFADCMatch(false);
+    }
   }
 
   // Detect upset APVs and report/treat

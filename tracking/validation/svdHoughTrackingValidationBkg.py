@@ -13,9 +13,9 @@
 <header>
   <contact>software-tracking@belle2.org</contact>
   <input>EvtGenSim.root</input>
-  <output>VXDHoughTrackingValidationBkg.root</output>
+  <output>SVDHoughTrackingValidationBkg.root</output>
   <description>
-  This module validates that the DATCON SVD only track finding is capable of reconstructing tracks in Y(4S) runs.
+  This module validates that the SVDHoughTracking is capable of reconstructing tracks in Y(4S) runs with background.
   </description>
 </header>
 """
@@ -24,16 +24,16 @@ import tracking
 from tracking.validation.run import TrackingValidationRun
 import logging
 import basf2
-from vxdHoughTracking.vxdHoughTracking_functions import add_VXDHoughTracking
+from vxdHoughTracking.vxdHoughTracking_functions import add_svd_hough_tracking
 
-VALIDATION_OUTPUT_FILE = 'VXDHoughTrackingValidationBkg.root'
+VALIDATION_OUTPUT_FILE = 'SVDHoughTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
 basf2.set_random_seed(1337)
 
 
-class VXDHoughTrackingValidationBkg(TrackingValidationRun):
+class SVDHoughTrackingValidationBkg(TrackingValidationRun):
     """
     Validation class for the DATCON tracking
     """
@@ -50,7 +50,7 @@ class VXDHoughTrackingValidationBkg(TrackingValidationRun):
     def finder_module(path):
         """Add the VXDHoughTracking module and related modules to the basf2 path"""
         tracking.add_hit_preparation_modules(path, components=["SVD"])
-        add_VXDHoughTracking(path, reco_tracks='RecoTracks', use_simple_roi_calculation=False)
+        add_svd_hough_tracking(path)
 
     #: use only the svd hits when computing efficiencies
     tracking_coverage = {
@@ -74,7 +74,7 @@ def main():
     """
     create SVD validation class and execute
     """
-    validation_run = VXDHoughTrackingValidationBkg()
+    validation_run = SVDHoughTrackingValidationBkg()
     validation_run.configure_and_execute_from_commandline()
 
 

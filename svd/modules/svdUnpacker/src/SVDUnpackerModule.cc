@@ -161,7 +161,6 @@ void SVDUnpackerModule::event()
     return;
   }
 
-  bool nFADCmatch = true;
   bool nAPVmatch = true;
   bool badMapping = false;
   bool badHeader = false;
@@ -564,8 +563,6 @@ void SVDUnpackerModule::event()
     if (!(nFADCMatchErrors % m_errorRate))  B2ERROR("Number of data objects in rawSVD do not match the number of FADC boards" <<
                                                       LogVar("# of data objects in rawSVD",
                                                              cntFADCboards)  << LogVar("# of FADCs", nFADCboards) << LogVar("Event number", eventNo));
-
-    nFADCmatch = false;
 
     // We override all FADCMatch fields in diagnostics and set it to false.
     for (auto& p : m_storeDAQDiagnostics) {

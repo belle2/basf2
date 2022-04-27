@@ -17,7 +17,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(TriggerSkim)
+REG_MODULE(TriggerSkim);
 
 TriggerSkimModule::TriggerSkimModule() : Module()
 {

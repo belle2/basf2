@@ -111,9 +111,6 @@ void SVDUnpackerModule::beginRun()
   //setting UnpackerErrorRate factor to use it for BadMapping error suppression
   m_map->setErrorRate(m_errorRate);
 
-  //number of PCIe40 ROPCs
-  nPCIe40ROPCs = 5;
-
   nTriggerMatchErrors = -1;
   nEventMatchErrors = -1;
   nUpsetAPVsErrors = -1;
@@ -212,12 +209,16 @@ void SVDUnpackerModule::event()
       bool is3sampleData = false;
       bool is6sampleData = false;
 
-      for (unsigned int buf = 0; buf < maxNumOfCh; buf++) { // loop over 4 buffers
+      for (unsigned int buf = 0; buf < maxNumOfCh; buf++) { // loop over 4(COPPER) or 48(PCIe40) buffers
 
         if (data32tab[buf] == nullptr || nWords[buf] == 0) {
           if (data32tab[buf] != nullptr || nWords[buf] != 0) {
-            B2WARNING("Invalid combination of buffer pointer and nWords : data32tab[" << buf << "]= " << data32tab[buf] <<
-                      ", nWords[" << buf << "]= " <<  nWords[buf] << "(i,j = " << i << "," << j << ")");
+            B2WARNING("Invalid combination of buffer pointer and nWords:" <<
+                      LogVar("COPPER/PCIe40 ID", i) <<
+                      LogVar("COPPER/PCIe40 Entry", j) <<
+                      LogVar("COPPER/PCIe40 Channel", buf) <<
+                      LogVar("data32tab[buf]", data32tab[buf]) <<
+                      LogVar("nWords[buf]", nWords[buf]));
           }
           continue;
         }
@@ -526,7 +527,7 @@ void SVDUnpackerModule::event()
 
         } // end loop over 32-bit frames in each buffer
 
-      } // end iteration on 4 data buffers
+      } // end iteration on 4(COPPER)/48(PCIe40) data buffers
 
       //Let's check if all the headers and trailers were in place in the last frame
       if (seenHeadersAndTrailers != 0xf) {

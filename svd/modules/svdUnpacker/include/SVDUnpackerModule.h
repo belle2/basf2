@@ -68,9 +68,6 @@ namespace Belle2::SVD {
     /** how many FADCs we have */
     unsigned short nFADCboards;
 
-    /** how many PCIe40 ROPCs we have */
-    unsigned short nPCIe40ROPCs;
-
     /** pointer to APVforFADCmap filled by mapping procedure */
     std::unordered_multimap<unsigned char, unsigned char>* APVmap;
 

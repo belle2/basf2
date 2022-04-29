@@ -264,9 +264,9 @@ def split_h5(
     assert test_size >= 0, f"test_size ({test_size}) may not be negative"
     assert val_size + test_size != 0, "val_size and test_size cannot both be zero"
 
-    if test_size == 0:
-        test_size = val_size
-        val_size = 0
+    if val_size == 0:
+        val_size = test_size
+        test_size = 0
 
     if train_size + val_size + test_size != 1:
         total = train_size + val_size + test_size
@@ -292,36 +292,26 @@ def split_h5(
     t = theta_data[mask]
 
     makedirs(output_dir, exist_ok=True)
+    kw = dict(shuffle=shuffle, random_state=random_state)
 
     # split once
     (X_0, X, y_0, y, p_0, p, t_0, t) = train_test_split(
-        X,
-        y,
-        p,
-        t,
-        train_size=train_size,
-        shuffle=shuffle,
-        random_state=random_state,
+        X, y, p, t, train_size=train_size, **kw
     )
     np.savez(join(output_dir, "train.npz"), X=X_0, y=y_0, p=p_0, t=t_0)
 
     # split again if desired
-    if val_size != 0:
+    if test_size != 0:
+        size = val_size / (1 - train_size)
         (X_1, X_2, y_1, y_2, p_1, p_2, t_1, t_2) = train_test_split(
-            X,
-            y,
-            p,
-            t,
-            train_size=(val_size / (1 - train_size)),
-            shuffle=shuffle,
-            random_state=random_state,
+            X, y, p, t, train_size=size, **kw
         )
 
         np.savez(join(output_dir, "val.npz"), X=X_1, y=y_1, p=p_1, t=t_1)
         np.savez(join(output_dir, "test.npz"), X=X_2, y=y_2, p=p_2, t=t_2)
 
     else:
-        np.savez(join(output_dir, "test.npz"), X=X, y=y, p=p, t=t)
+        np.savez(join(output_dir, "val.npz"), X=X, y=y, p=p, t=t)
 
 
 def softmax(x):
@@ -713,8 +703,7 @@ def read_npz(filename):
     """
     data = np.load(filename)
     df = pd.DataFrame(
-        data=data["X"],
-        columns=[f"{d}_{p}" for p in PARTICLES for d in DETECTORS],
+        data=data["X"], columns=[f"{d}_{p}" for p in PARTICLES for d in DETECTORS],
     )
     df["labels"] = data["y"]
     df["p"] = data["p"]

@@ -28,25 +28,22 @@ namespace Belle2 {
     virtual void finish() override;
   private:
 
-    StoreObjPtr<EventMetaData> m_emdata;
+    StoreObjPtr<EventMetaData> m_emdata; /**< emdata */
 
-    /** Current event id */
-    int m_evt = -1;
-    /** Current run id */
-    int m_run = -1;
-    /** Current experiment id */
-    int m_exp = -1;
-    /** Fake coordinates of a hit */
-    double m_hitX = 0.0;
-    double m_hitY = 0.0;
-    double m_hitZ = 0.0;
+    int m_evt = -1; /**< Current event id */
+    int m_run = -1; /**< Current run id */
+    int m_exp = -1; /**< Current experiment id */
 
-    double m_trackX = 0.0;
-    double m_trackY = 0.0;
-    double m_trackZ = 0.0;
-    double m_chisq = 0.0;
-    double m_pvalue = 0.0;
-    double m_dof = 0.0;
+    double m_hitX = 0.0; /**< Fake x coordinate of a hit */
+    double m_hitY = 0.0; /**< Fake y coordinate of a hit */
+    double m_hitZ = 0.0; /**< Fake z coordinate of a hit */
+
+    double m_trackX = 0.0; /**< trackX */
+    double m_trackY = 0.0; /**< trackY */
+    double m_trackZ = 0.0; /**< trackZ */
+    double m_chisq = 0.0; /**< chisq */
+    double m_pvalue = 0.0; /**< pvalue */
+    double m_dof = 0.0; /**< dof */
 
     /** Number of entries created in the saved tree per event. Will affect the total size of objects stored */
     int m_entriesPerEvent;
@@ -54,6 +51,7 @@ namespace Belle2 {
     int m_spread;
     /// Runs during the defineHisto() function
     virtual void inDefineHisto() override;
+    /// Describe process (gives debug output)
     void describeProcess(const std::string& functionName);
   };
 }

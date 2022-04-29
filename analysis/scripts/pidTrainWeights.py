@@ -5,7 +5,7 @@ Connor Hainje & Jan Strube -- {connor.hainje, jan.strube}@pnnl.gov
 Methods and a script for training PID calibration weights.
 
 Sample usage:
-    $ python pidTrainWeights.py data/file.h5 models/net.pt -n 100
+    $ python pidTrainWeights.py data/ models/net.pt -n 100
 
 Use `python pidTrainWeights.py -h` to see all command-line options.
 """
@@ -362,14 +362,7 @@ def train_model(args, use_tqdm=True):
 
     net.cpu()
     save_checkpoint(
-        args.output,
-        net,
-        opt,
-        epochs_0 + args.n_epochs,
-        loss_t,
-        loss_v,
-        accu_t,
-        accu_v,
+        args.output, net, opt, epochs_0 + args.n_epochs, loss_t, loss_v, accu_t, accu_v,
     )
 
     wgt = net.get_weights(to_numpy=True)
@@ -388,9 +381,7 @@ def parse():
 
     ap = ArgumentParser(description="", epilog="")
     ap.add_argument(
-        "input",
-        type=str,
-        help="Path to folder with training files (in .npz format).",
+        "input", type=str, help="Path to folder with training files (in .npz format).",
     )
     ap.add_argument(
         "output",

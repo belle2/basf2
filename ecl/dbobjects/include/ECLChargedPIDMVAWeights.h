@@ -130,7 +130,6 @@ namespace Belle2 {
      * store the MVA weight files (one for each category) into the payload.
      *
      * @param filepaths a vector of xml (root) file paths for all (theta, p, charge) categories.
-     * @param separate_deuteron_response a vector of bools that specifies whether 5 (no deuteron) or 6 BDT responses are expected.
      * @param variables a vector of vectors filled with std strings. For each index gives the list of classifier variables.
               Note that these should be stored in the full version without aliasing! Otherwise the aliases will need to be defined
               to match during runtime.
@@ -146,7 +145,6 @@ namespace Belle2 {
      */
     void storeMVAWeights(std::vector<std::string>& filepaths,
                          std::vector<std::vector<std::string>>& variables,
-                         std::vector<bool>& separate_deuteron_response,
                          std::vector<BDTResponseTransformMode>& transformations,
                          std::vector<std::vector<std::unordered_map<unsigned int, TF1>>>& pdfs,
                          std::unordered_map<unsigned int, std::vector<std::unordered_map<unsigned int, TH1F>>>& cdfs,
@@ -178,7 +176,6 @@ namespace Belle2 {
 
         m_variables.push_back(variables[idx]);
         m_bdtResponseTransformModes.push_back(transformations[idx]);
-        m_separate_deuteron_response.push_back(separate_deuteron_response[idx]);
         m_pdfs.push_back(pdfs[idx]);
 
         // These are optional based on which transformation mode is used.
@@ -259,13 +256,6 @@ namespace Belle2 {
       return m_log_transform_offset.GetVal();
     }
 
-    /**
-    * returns true if 6 BDT response are expected, false if 5 (no deuteron).
-    */
-    const bool hasSeparateDeuteronResponse(const unsigned int linearBinIndex) const
-    {
-      return m_separate_deuteron_response.at(linearBinIndex);
-    }
 
     /**
     * gets the cdf for the hypothesis pdg for a given response value for a given phase space region.

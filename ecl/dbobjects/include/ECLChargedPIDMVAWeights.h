@@ -131,6 +131,9 @@ namespace Belle2 {
      *
      * @param filepaths a vector of xml (root) file paths for all (theta, p, charge) categories.
      * @param separate_deuteron_response a vector of bools that specifies whether 5 (no deuteron) or 6 BDT responses are expected.
+     * @param variables a vector of vectors filled with std strings. For each index gives the list of classifier variables.
+              Note that these should be stored in the full version without aliasing! Otherwise the aliases will need to be defined
+              to match during runtime.
      * @param transformations a vector of BDTResponseTransformMode for all (theta, p, charge) categories.
      * @param pdfs a vector of vectors of unsigned maps with TF1 pdfs for all charged hypothesis
               for all bdt response values for all (theta, p, charge) categories.
@@ -142,6 +145,7 @@ namespace Belle2 {
      *        Used to check consistency of the xml vector indexing w/ the linearised TH3 category map.
      */
     void storeMVAWeights(std::vector<std::string>& filepaths,
+                         std::vector<std::vector<std::string>>& variables,
                          std::vector<bool>& separate_deuteron_response,
                          std::vector<BDTResponseTransformMode>& transformations,
                          std::vector<std::vector<std::unordered_map<unsigned int, TF1>>>& pdfs,
@@ -155,13 +159,6 @@ namespace Belle2 {
         auto t_center = std::get<0>(bin_centers);
         auto p_center = std::get<1>(bin_centers);
         auto c_center = std::get<2>(bin_centers);
-
-        std::cout << t_center << std::endl;
-        std::cout << p_center << std::endl;
-        std::cout << c_center << std::endl;
-        // why are these always 0,0,0?
-        //
-        //checkIndexConsistency(idx, t_center, p_center, c_center);
 
         Belle2::MVA::Weightfile weightfile;
         if (boost::ends_with(filepaths[idx], ".root")) {
@@ -179,6 +176,7 @@ namespace Belle2 {
         Belle2::MVA::Weightfile::saveToStream(weightfile, ss);
         m_weights.push_back(ss.str());
 
+        m_variables.push_back(variables[idx]);
         m_bdtResponseTransformModes.push_back(transformations[idx]);
         m_separate_deuteron_response.push_back(separate_deuteron_response[idx]);
         m_pdfs.push_back(pdfs[idx]);
@@ -207,7 +205,7 @@ namespace Belle2 {
     bool isPhasespaceCovered(const float theta, const float p, const float charge) const
     {
       if (!m_categories) {
-        B2FATAL("No (clusterTheta, p) TH3 grid was found in the ECLChargedPIDMVA DB payload. This should not happen! Abort...");
+        B2FATAL("No (clusterTheta, p, charge) TH3 grid was found in the ECLChargedPIDMVA DB payload. This should not happen! Abort...");
       }
 
       const float ttheta = theta  / m_ang_unit.GetVal();
@@ -234,7 +232,7 @@ namespace Belle2 {
     unsigned int getLinearisedBinIndex(const float theta, const float p, const float charge) const
     {
       if (!m_categories) {
-        B2FATAL("No (clusterTheta, p) TH3 grid was found in the ECLChargedPIDMVA DB payload. This should not happen! Abort...");
+        B2FATAL("No (clusterTheta, p, charge) TH3 grid was found in the ECLChargedPIDMVA DB payload. This should not happen! Abort...");
       }
       // alternatively set these to be just inside the first or last bin.
       if (!isPhasespaceCovered(theta, p, charge)) {
@@ -348,6 +346,11 @@ namespace Belle2 {
      * Stores the weightfiles for all the (theta, p, charge) categories.
      */
     std::vector<std::string> m_weights;
+
+    /**
+     * Stores the classifier variables for all the (theta, p, charge) categories.
+     */
+    std::vector<std::vector<std::string>> m_variables;
 
     /**
      * Stores which transformation mode to apply to the bdt responses.

@@ -217,7 +217,7 @@ def create_pre_collector_path(clusterizers, isMC=False, is_validation=False):
 
     if not isMC:
         # run tracking reconstruction
-        add_tracking_reconstruction(path)
+        add_tracking_reconstruction(path, fullGrid=True)
         path = remove_module(path, "V0Finder")
         if not is_validation:
             b2.set_module_parameters(path, 'SVDClusterizer', returnClusterRawTime=True)

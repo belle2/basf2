@@ -19,14 +19,19 @@ EventT0CombinerModule::EventT0CombinerModule() : Module()
   setDescription("Module to combine the EventT0 values from multiple sub-detectors");
 
   addParam("combinationLogic", m_paramCombinationMode, "Method of how the final T0 is selected.\n"
-           "Currently '" + m_combinationModePreferCDC + "' and '" + m_combinationModeCombineCDCandECL + "' is available\n" +
-           m_combinationModePreferCDC + ": the CDC t0 value (if available) will be set as the final T0 value."
-           "Only if no CDC value could be found "
-           "(which is very rare for BBBar events, and around 5% of low multiplicity events), the best ECL value will be set\n" +
-           m_combinationModeCombineCDCandECL + ": In this mode, the CDC t0 value (if available) will be used to "
+           "Currently '" + m_combinationModePreferSVD + ", " + m_combinationModePreferCDC + "' and '" + m_combinationModeCombineCDCandECLandSVD
+           + "' is available\n" +
+           m_combinationModePreferSVD + ": the SVD t0 value (if available) will be set as the final T0 value."
+           "Only if no SVD value could be found "
+           "(which is very rare for BBBar events, and around less than 5% of low multiplicity events), the best CDC value will be set"
+           "If also no CDC value could be found "
+           "(which is also very rare for BBBar events, and around 5% of low multiplicity events), the best ECL value will be set\n" +
+           m_combinationModeCombineCDCandECLandSVD + ": In this mode, the SVD and CDC t0 values (if available) will be used to "
            "select the ECL t0 information which is closest in time "
-           "to the best CDC value and this two values will be combined to one final value.",
-           m_combinationModePreferCDC);
+           "to the best SVD and/or CDC values. If both CDC and SVD are availbale and ECL is compatible with both,"
+           "SVD, CDC and ECL values will be combined to one final value. If only one between CDC and SVD is available and ECL is compatible,"
+           "SVD or CDC and ECL values will be combined to one final value.",
+           m_paramCombinationMode);
 
   setPropertyFlags(c_ParallelProcessingCertified);
 }
@@ -38,26 +43,39 @@ void EventT0CombinerModule::event()
     return;
   }
 
+  // check if a SVD hypothesis exists
+  auto svdHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::SVD);
+
   // check if a CDC hypothesis exists
   auto cdcHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
 
-  if (cdcHypos.size() == 0) {
-    B2DEBUG(20, "No CDC time hypothesis available, stopping");
+  if (svdHypos.size() == 0 && cdcHypos.size() == 0) {
+    B2DEBUG(20, "No SVD and CDC time hypotheses available, stopping");
     // if no CDC value was found, the best t0 has already been set by the ECL t0 module.
     return;
   }
+
+  // get the latest SVD hypothesis information, that is also the only one available
+  const auto svdBestT0 = svdHypos.back();
+  B2DEBUG(20, "Best SVD time hypothesis t0 = " << svdBestT0.eventT0 << " +- " << svdBestT0.eventT0Uncertainty);
+
   // get the latest CDC hypothesis information, this is also the most accurate t0 value the CDC can provide
   const auto cdcBestT0 = cdcHypos.back();
-
   B2DEBUG(20, "Best CDC time hypothesis t0 = " << cdcBestT0.eventT0 << " +- " << cdcBestT0.eventT0Uncertainty);
 
-  if (m_paramCombinationMode == m_combinationModePreferCDC) {
+  if (m_paramCombinationMode == m_combinationModePreferSVD) {
+    // we have a SVD value, so set this as new best global value
+    B2DEBUG(20, "Setting SVD time hypothesis t0 = " << svdBestT0.eventT0 << " +- " << svdBestT0.eventT0Uncertainty <<
+            " as new final value.");
+    //set SVD value, if available
+    m_eventT0->setEventT0(svdBestT0);
+  } else if (m_paramCombinationMode == m_combinationModePreferCDC) {
     // we have a CDC value, so set this as new best global value
     B2DEBUG(20, "Setting CDC time hypothesis t0 = " << cdcBestT0.eventT0 << " +- " << cdcBestT0.eventT0Uncertainty <<
             " as new final value.");
     //set CDC value, if available
     m_eventT0->setEventT0(cdcBestT0);
-  } else if (m_paramCombinationMode == m_combinationModeCombineCDCandECL) {
+  } else if (m_paramCombinationMode == m_combinationModeCombineCDCandECLandSVD) {
     // start comparing with all available ECL hypothesis
     auto eclHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::ECL);
 
@@ -67,34 +85,53 @@ void EventT0CombinerModule::event()
     }
 
     EventT0::EventT0Component eclBestMatch;
-    double bestDistance = std::numeric_limits<double>::max();
-    bool foundMatch = false;
+    double bestDistanceSVD = std::numeric_limits<double>::max();
+    double bestDistanceCDC = std::numeric_limits<double>::max();
     for (auto const& eclHypo : eclHypos) {
       // compute distance
-      double dist = std::abs(eclHypo.eventT0 - cdcBestT0.eventT0);
-      B2DEBUG(20, "Checking compatibility of ECL  t0 = " << eclHypo.eventT0 << " +- " << eclHypo.eventT0Uncertainty << " distance = " <<
-              dist);
-      if (dist < bestDistance) {
+      double distSVD = std::abs(eclHypo.eventT0 - svdBestT0.eventT0);
+      double distCDC = std::abs(eclHypo.eventT0 - cdcBestT0.eventT0);
+      B2DEBUG(20, "Checking compatibility of ECL t0 = " << eclHypo.eventT0 << " +- " << eclHypo.eventT0Uncertainty <<
+              " distance w.r.t SVD = " <<
+              distSVD << ", distance w.r.t CDC = " << distCDC);
+
+      // combine and update final value
+      if (distSVD < bestDistanceSVD && distCDC < bestDistanceCDC) {
         eclBestMatch = eclHypo;
-        bestDistance = dist;
-        foundMatch = true;
+        bestDistanceSVD = distSVD;
+        bestDistanceCDC = distCDC;
+
+        B2DEBUG(20, "Best Matching ECL timing is t0 = " << eclBestMatch.eventT0 << " +- " << eclBestMatch.eventT0Uncertainty);
+
+        const auto combined = computeCombination({ eclBestMatch, cdcBestT0, svdBestT0 });
+        m_eventT0->setEventT0(combined);
+        B2DEBUG(20, "Combined T0 from SVD, CDC and ECL is t0 = " << combined.eventT0 << " +- " << combined.eventT0Uncertainty);
+      } else if (distSVD < bestDistanceSVD) {
+        eclBestMatch = eclHypo;
+        bestDistanceSVD = distSVD;
+
+        B2DEBUG(20, "Best Matching ECL timing is t0 = " << eclBestMatch.eventT0 << " +- " << eclBestMatch.eventT0Uncertainty);
+
+        const auto combined = computeCombination({ eclBestMatch, svdBestT0 });
+        m_eventT0->setEventT0(combined);
+        B2DEBUG(20, "Combined T0 from SVD and ECL is t0 = " << combined.eventT0 << " +- " << combined.eventT0Uncertainty);
+      } else if (distCDC < bestDistanceCDC) {
+        eclBestMatch = eclHypo;
+        bestDistanceSVD = distCDC;
+
+        B2DEBUG(20, "Best Matching ECL timing is t0 = " << eclBestMatch.eventT0 << " +- " << eclBestMatch.eventT0Uncertainty);
+
+        const auto combined = computeCombination({ eclBestMatch, cdcBestT0 });
+        m_eventT0->setEventT0(combined);
+        B2DEBUG(20, "Combined T0 from CDC and ECL is t0 = " << combined.eventT0 << " +- " << combined.eventT0Uncertainty);
+      } else {
+
+        //set SVD value, if available (SVD is the one with highest efficiency)
+        m_eventT0->setEventT0(svdBestT0);
+
+        B2DEBUG(20, "No sufficient match found between SVD and ECL timing, setting best SVD t0 = " << cdcBestT0.eventT0 << " +- " <<
+                cdcBestT0.eventT0Uncertainty);
       }
-    }
-
-    B2DEBUG(20, "Best Matching ECL timing is t0 = " << eclBestMatch.eventT0 << " +- " << eclBestMatch.eventT0Uncertainty);
-
-    // combine and update final value
-    if (foundMatch) {
-      const auto combined = computeCombination({ eclBestMatch, cdcBestT0 });
-      m_eventT0->setEventT0(combined);
-      B2DEBUG(20, "Combined T0 from CDC and ECL is t0 = " << combined.eventT0 << " +- " << combined.eventT0Uncertainty);
-    } else {
-
-      //set CDC value, if available
-      m_eventT0->setEventT0(cdcBestT0);
-
-      B2DEBUG(20, "No sufficient match found between CDC and ECL timing, setting best CDC t0 = " << cdcBestT0.eventT0 << " +- " <<
-              cdcBestT0.eventT0Uncertainty);
     }
   } else {
     B2FATAL("Event t0 combination mode " << m_paramCombinationMode << " not supported.");

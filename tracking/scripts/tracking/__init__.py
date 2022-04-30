@@ -44,7 +44,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
-                                pxd_filtering_offline=False):
+                                pxd_filtering_offline=False, fullGrid=False):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
@@ -101,6 +101,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         (Both other QIs needed as input.)
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param fullGrid: set true if you want to use the FullGrid module (default: false)
     """
 
     add_prefilter_tracking_reconstruction(
@@ -119,7 +120,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_cdcTrack_QI=add_cdcTrack_QI,
         add_vxdTrack_QI=add_vxdTrack_QI,
         add_recoTrack_QI=add_recoTrack_QI,
-        pxd_filtering_offline=pxd_filtering_offline)
+        pxd_filtering_offline=pxd_filtering_offline,
+        fullGrid=fullGrid)
 
     add_postfilter_tracking_reconstruction(path,
                                            components=components,
@@ -135,7 +137,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                           use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                           add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
-                                          pxd_filtering_offline=False):
+                                          pxd_filtering_offline=False, fullGrid=False):
     """
     This function adds the tracking reconstruction modules required to calculate HLT filter decision
     to a path.
@@ -168,6 +170,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         (Both other QIs needed as input.)
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param fullGrid: set true if you want to use the FullGrid module (default: false)
     """
 
     if not is_svd_used(components) and not is_cdc_used(components):
@@ -211,7 +214,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
-    add_time_extraction(path, components=components)
+    add_time_extraction(path, fullGrid, components=components)
 
     add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
                    use_second_cdc_hits=use_second_cdc_hits)
@@ -245,12 +248,18 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
         path.add_module("PruneRecoHits")
 
 
-def add_time_extraction(path, components=None):
+def add_time_extraction(path, fullGrid=False, components=None):
     """
     Add time extraction components via tracking
-    """
 
-    if is_cdc_used(components):
+    :param path: The path to add the tracking reconstruction modules to
+    :param fullGrid: set true if you want to use the FullGrid module (default: false)
+    :param components: the list of geometry components in use or None for all components.
+    """
+    if is_svd_used(components) and not fullGrid:
+        path.add_module("SVDEventT0Estimator")
+
+    if is_cdc_used(components) and fullGrid:
         path.add_module("FullGridChi2TrackTimeExtractor")
 
 

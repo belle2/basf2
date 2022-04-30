@@ -78,7 +78,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
-                       pxd_filtering_offline=False):
+                       pxd_filtering_offline=False, fullGrid=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -117,6 +117,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         generated numbers, otherwise are applied using an internal counter.
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param fullGrid: set true if you want to use the FullGrid module (default: false)
     """
 
     add_prefilter_reconstruction(path,
@@ -131,7 +132,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  pruneTracks=False,
                                  event_abort=event_abort,
                                  use_random_numbers_for_hlt_prescale=use_random_numbers_for_hlt_prescale,
-                                 pxd_filtering_offline=pxd_filtering_offline)
+                                 pxd_filtering_offline=pxd_filtering_offline,
+                                 fullGrid=fullGrid)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
     if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
@@ -151,7 +153,7 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
                                  skipGeometryAdding=False, trackFitHypotheses=None, use_second_cdc_hits=False,
                                  add_muid_hits=False, reconstruct_cdst=None, addClusterExpertModules=True,
                                  pruneTracks=True, event_abort=default_event_abort,
-                                 use_random_numbers_for_hlt_prescale=True, pxd_filtering_offline=False):
+                                 use_random_numbers_for_hlt_prescale=True, pxd_filtering_offline=False, fullGrid=False):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
@@ -182,6 +184,7 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
         post-filter reconstruction is also run).
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param fullGrid: set true if you want to use the FullGrid module (default: false)
     """
 
     # Check components.
@@ -203,7 +206,8 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
                                           skipGeometryAdding=skipGeometryAdding,
                                           trackFitHypotheses=trackFitHypotheses,
                                           use_second_cdc_hits=use_second_cdc_hits,
-                                          pxd_filtering_offline=pxd_filtering_offline)
+                                          pxd_filtering_offline=pxd_filtering_offline,
+                                          fullGrid=fullGrid)
 
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Prefilter_Tracking')

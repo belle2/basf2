@@ -16,6 +16,7 @@
 #include <top/reconstruction_cpp/EnergyMask.h>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 
 
 namespace Belle2 {
@@ -504,7 +505,7 @@ namespace Belle2 {
     inline double YScanner::Derivatives::dFic_d(const InverseRaytracer::Solution& sol0,
                                                 const InverseRaytracer::Solution& sol1)
     {
-      if (abs(sol0.cosFic) > abs(sol0.sinFic)) {
+      if (std::abs(sol0.cosFic) > std::abs(sol0.sinFic)) {
         return (sol1.sinFic - sol0.sinFic) / sol0.cosFic / sol1.step;
       } else {
         return -(sol1.cosFic - sol0.cosFic) / sol0.sinFic / sol1.step;

@@ -28,7 +28,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(Muid)
+REG_MODULE(Muid);
 
 MuidModule::MuidModule() :
   Module(),

@@ -19,7 +19,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(BoostVectorCollector)
+REG_MODULE(BoostVectorCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation

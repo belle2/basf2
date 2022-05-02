@@ -8,7 +8,7 @@
 
 #include "trg/top/dataobjects/TRGTOPUnpackerStore.h"
 
-using namespace std;
+//using namespace std;
 using namespace Belle2;
 
 void TRGTOPUnpackerStore::setEventIdL1(int eventIdL1) { m_eventIdL1 = eventIdL1; }

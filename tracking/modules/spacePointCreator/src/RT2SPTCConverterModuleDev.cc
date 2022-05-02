@@ -22,7 +22,7 @@
 using namespace Belle2;
 using ConversionState = std::bitset<2>;
 
-REG_MODULE(RT2SPTCConverter)
+REG_MODULE(RT2SPTCConverter);
 
 RT2SPTCConverterModule::RT2SPTCConverterModule() :
   Module(),
@@ -286,10 +286,12 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(std::vec
 
     // NOTE: double cluster SVD SP and PXD SP should be stored in the same StoreArray!
     const SpacePoint* relatedSpacePoint = [this, hitInfo, relatedTrueHit]() -> const SpacePoint* {
-      if (m_svdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) {
+      if (m_svdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD)
+      {
         return relatedTrueHit->getRelatedFrom<SpacePoint>(*m_svdSpacePointsStoreArrayName);
       }
-      if (m_pxdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_PXD) {
+      if (m_pxdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_PXD)
+      {
         return relatedTrueHit->getRelatedFrom<SpacePoint>(*m_pxdSpacePointsStoreArrayName);
       }
       return nullptr;

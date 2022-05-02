@@ -158,7 +158,6 @@ void SVDUnpackerModule::event()
     return;
   }
 
-  bool nFADCmatch = true;
   bool nAPVmatch = true;
   bool badMapping = false;
   bool badHeader = false;
@@ -180,33 +179,20 @@ void SVDUnpackerModule::event()
 
   short fadc = 255, apv = 63;
 
-  if (nEntries_rawSVD != nFADCboards) {
-    nFADCMatchErrors++;
-    if (!(nFADCMatchErrors % m_errorRate))  B2ERROR("Number of RawSVD data objects do not match the number of FADC boards" <<
-                                                      LogVar("#RawSVD",
-                                                             nEntries_rawSVD)  << LogVar("#FADCs", nFADCboards) << LogVar("Event number", eventNo));
-
-    nFADCmatch = false;
-  }
-
+  unsigned short cntFADCboards = 0;
   for (unsigned int i = 0; i < nEntries_rawSVD; i++) {
 
     unsigned int numEntries_rawSVD = m_rawSVD[ i ]->GetNumEntries();
     for (unsigned int j = 0; j < numEntries_rawSVD; j++) {
 
-      unsigned short nWords[4];
-      nWords[0] = m_rawSVD[i]->Get1stDetectorNwords(j);
-      nWords[1] = m_rawSVD[i]->Get2ndDetectorNwords(j);
-      nWords[2] = m_rawSVD[i]->Get3rdDetectorNwords(j);
-      nWords[3] = m_rawSVD[i]->Get4thDetectorNwords(j);
+      const unsigned short maxNumOfCh = m_rawSVD[i]->GetMaxNumOfCh(j);
 
-      uint32_t* data32tab[4]; //vector of pointers
-
-      data32tab[0] = (uint32_t*)m_rawSVD[i]->Get1stDetectorBuffer(j); // points at the begining of the 1st buffer
-      data32tab[1] = (uint32_t*)m_rawSVD[i]->Get2ndDetectorBuffer(j);
-      data32tab[2] = (uint32_t*)m_rawSVD[i]->Get3rdDetectorBuffer(j);
-      data32tab[3] = (uint32_t*)m_rawSVD[i]->Get4thDetectorBuffer(j);
-
+      unsigned short nWords   [maxNumOfCh];
+      uint32_t*      data32tab[maxNumOfCh]; //vector of pointers
+      for (unsigned int k = 0; k < maxNumOfCh; k++) {
+        nWords[k]    = m_rawSVD[i]->GetDetectorNwords(j, k);
+        data32tab[k] = (uint32_t*)m_rawSVD[i]->GetDetectorBuffer(j, k); // points at the begining of the 1st buffer
+      }
 
       unsigned short ftbError = 0;
       unsigned short trgType = 0;
@@ -223,10 +209,22 @@ void SVDUnpackerModule::event()
       bool is3sampleData = false;
       bool is6sampleData = false;
 
-      for (unsigned int buf = 0; buf < 4; buf++) { // loop over 4 buffers
+      for (unsigned int buf = 0; buf < maxNumOfCh; buf++) { // loop over 4(COPPER) or 48(PCIe40) buffers
 
-        if (data32tab[buf] == nullptr && nWords[buf] == 0) continue;
+        if (data32tab[buf] == nullptr || nWords[buf] == 0) {
+          if (data32tab[buf] != nullptr || nWords[buf] != 0) {
+            B2WARNING("Invalid combination of buffer pointer and nWords:" <<
+                      LogVar("COPPER/PCIe40 ID", i) <<
+                      LogVar("COPPER/PCIe40 Entry", j) <<
+                      LogVar("COPPER/PCIe40 Channel", buf) <<
+                      LogVar("data32tab[buf]", data32tab[buf]) <<
+                      LogVar("nWords[buf]", nWords[buf]));
+          }
+          continue;
+        }
         if (m_printRaw) printB2Debug(data32tab[buf], data32tab[buf], &data32tab[buf][nWords[buf] - 1], nWords[buf]);
+
+        cntFADCboards++;
 
         missedHeader = false;
         missedTrailer = false;
@@ -369,7 +367,7 @@ void SVDUnpackerModule::event()
                                                  apvErrors));
             }
             // temporary SVDDAQDiagnostic object (no info from trailers and APVmatch code)
-            currentDAQDiagnostic = m_storeDAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, nFADCmatch,
+            currentDAQDiagnostic = m_storeDAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, true,
                                                                    nAPVmatch,
                                                                    badHeader, missedHeader, missedTrailer,
                                                                    fadc, apv);
@@ -448,7 +446,7 @@ void SVDUnpackerModule::event()
             unsigned short nAPVs = APVmap->count(fadc);
 
             if (nAPVheaders == 0) {
-              currentDAQDiagnostic = m_storeDAQDiagnostics.appendNew(0, 0, 0, 0, 0, 0, ftbError, nFADCmatch, nAPVmatch, badHeader, 0, 0, fadc, 0);
+              currentDAQDiagnostic = m_storeDAQDiagnostics.appendNew(0, 0, 0, 0, 0, 0, ftbError, true, nAPVmatch, badHeader, 0, 0, fadc, 0);
               vDiagnostic_ptr.push_back(currentDAQDiagnostic);
             }
 
@@ -529,7 +527,7 @@ void SVDUnpackerModule::event()
 
         } // end loop over 32-bit frames in each buffer
 
-      } // end iteration on 4 data buffers
+      } // end iteration on 4(COPPER)/48(PCIe40) data buffers
 
       //Let's check if all the headers and trailers were in place in the last frame
       if (seenHeadersAndTrailers != 0xf) {
@@ -559,6 +557,19 @@ void SVDUnpackerModule::event()
     } // end event loop
 
   }// end loop over RawSVD objects
+
+  // Check the number of FADC boards
+  if (cntFADCboards != nFADCboards) { // nFADCboards=52
+    nFADCMatchErrors++;
+    if (!(nFADCMatchErrors % m_errorRate))  B2ERROR("Number of data objects in rawSVD do not match the number of FADC boards" <<
+                                                      LogVar("# of data objects in rawSVD",
+                                                             cntFADCboards)  << LogVar("# of FADCs", nFADCboards) << LogVar("Event number", eventNo));
+
+    // We override all FADCMatch fields in diagnostics and set it to false.
+    for (auto& p : m_storeDAQDiagnostics) {
+      p.setFADCMatch(false);
+    }
+  }
 
   // Detect upset APVs and report/treat
   auto major_apv = max_element(apvsByPipeline.begin(), apvsByPipeline.end(),

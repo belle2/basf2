@@ -28,7 +28,7 @@ using namespace std;
 using namespace Belle2;
 
 /// Register the Module
-REG_MODULE(MCTrackCandClassifier)
+REG_MODULE(MCTrackCandClassifier);
 
 /// Implementation
 MCTrackCandClassifierModule::MCTrackCandClassifierModule() : Module()
@@ -109,11 +109,11 @@ void MCTrackCandClassifierModule::initialize()
 
   //histograms to produce efficiency plots
   Double_t bins_pt[9 + 1] = {0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 1, 2, 3.5}; //GeV/c
-  Double_t bins_theta[10 + 1] = {0, 0.25, 0.5, 0.75, 0.75 + 0.32, 0.75 + 2 * 0.32, 0.75 + 3 * 0.32, 0.75 + 4 * 0.32, 0.75 + 5 * 0.32, 2.65, TMath::Pi()};
+  const Double_t bins_theta[10 + 1] = {0, 0.25, 0.5, 0.75, 0.75 + 0.32, 0.75 + 2 * 0.32, 0.75 + 3 * 0.32, 0.75 + 4 * 0.32, 0.75 + 5 * 0.32, 2.65, TMath::Pi()};
   Double_t bins_lambda[10 + 1];
-  Double_t width_lambda =  TMath::Pi() / 10;
+  const Double_t width_lambda =  TMath::Pi() / 10;
   Double_t bins_phi[14 + 1];
-  Double_t width_phi = 2 * TMath::Pi() / 14;
+  const Double_t width_phi = 2 * TMath::Pi() / 14;
   for (int bin = 0; bin < 14 + 1; bin++)
     bins_phi[bin] = - TMath::Pi() + bin * width_phi;
 

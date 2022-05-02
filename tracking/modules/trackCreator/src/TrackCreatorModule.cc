@@ -20,7 +20,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(TrackCreator)
+REG_MODULE(TrackCreator);
 
 TrackCreatorModule::TrackCreatorModule() :
   Module()

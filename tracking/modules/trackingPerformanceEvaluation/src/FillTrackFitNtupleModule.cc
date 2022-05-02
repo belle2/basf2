@@ -18,7 +18,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(FillTrackFitNtuple)
+REG_MODULE(FillTrackFitNtuple);
 
 FillTrackFitNtupleModule::FillTrackFitNtupleModule() :
   Module()

@@ -66,8 +66,8 @@ void AsicBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
     auto asicID = pair<int, int>(board, channel / 8);  // ASIC are groups of 8 channels
     groupedByAsic[asicID].push_back(&wireHit);
   };
-  for (auto& [asicID, asicList] :  groupedByAsic) {
-    applyAsicFilter(asicList);
+  for (auto& asicList :  groupedByAsic) {
+    applyAsicFilter(asicList.second);
   };
 
   return;

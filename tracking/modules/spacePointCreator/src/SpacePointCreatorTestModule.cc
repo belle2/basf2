@@ -21,7 +21,7 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(SpacePointCreatorTest)
+REG_MODULE(SpacePointCreatorTest);
 
 SpacePointCreatorTestModule::SpacePointCreatorTestModule() :
   Module()

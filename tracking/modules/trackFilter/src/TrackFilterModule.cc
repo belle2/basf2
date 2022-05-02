@@ -35,7 +35,7 @@ TNtuple* TrackFilterModule::m_rejectedNtpl = nullptr;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TrackFilter)
+REG_MODULE(TrackFilter);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -162,7 +162,7 @@ bool TrackFilterModule::isSelected(const Track* track)
 
 }
 
-void TrackFilterModule::fillControlNtuples(const Track* track , bool isSelected)
+void TrackFilterModule::fillControlNtuples(const Track* track, bool isSelected)
 {
 
   int pionCode = 211;

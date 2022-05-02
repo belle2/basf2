@@ -261,7 +261,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   }
   // TDC related
   B2DEBUG(20, "tdc related");
-  int nDeadTDC = 1; // bid 0 always empty
+  int nDeadTDC = -1; // bid 0 always empty
   TH1F* hTDCEdge = new TH1F("hTDCEdge", "TDC edge;board;tdc edge [nsec]", 300, 0, 300);
   TH1F* hTDCSlope = new TH1F("hTDCSlope", "TDC slope;board;tdc slope [nsec]", 300, 0, 300);
   std::vector<float> tdcEdges = {};
@@ -435,7 +435,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_monObj->setVariable("adcMean", std::accumulate(means.begin(), means.end(), 0.0) / means.size());
   m_monObj->setVariable("nDeadADC", nDeadADC);
   m_monObj->setVariable("nBadADC", nBadADC); //???? n_0/n_tot>0.9
-  m_monObj->setVariable("tdcEdge", std::accumulate(tdcEdges.begin(), tdcEdges.end(), 0.0) / tdcEdges.size());
+  m_monObj->setVariable("tdcEdge", std::accumulate(tdcEdges.begin(), tdcEdges.end(), 0.0) / (tdcEdges.size() - 1 - nDeadTDC));
   m_monObj->setVariable("nDeadTDC", nDeadTDC);
   m_monObj->setVariable("tdcSlope", std::accumulate(tdcSlopes.begin(), tdcSlopes.end(), 0.0) / tdcSlopes.size());
 

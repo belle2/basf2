@@ -38,10 +38,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPNtuple)
+  REG_MODULE(TOPNtuple);
 
   //-----------------------------------------------------------------
   //                 Implementation

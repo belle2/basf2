@@ -18,7 +18,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SecMapTrainerVXDTF)
+REG_MODULE(SecMapTrainerVXDTF);
 
 //-----------------------------------------------------------------
 //                 Implementation

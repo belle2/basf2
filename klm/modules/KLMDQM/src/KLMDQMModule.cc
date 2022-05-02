@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(KLMDQM)
+REG_MODULE(KLMDQM);
 
 KLMDQMModule::KLMDQMModule() :
   HistoModule(),

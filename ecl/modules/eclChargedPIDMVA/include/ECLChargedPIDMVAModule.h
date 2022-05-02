@@ -142,26 +142,32 @@ namespace Belle2 {
     static constexpr float c_dummyLogL = -std::numeric_limits<float>::max();
 
     /**
-     * vector containing the ECL variables to be fed to the MVA.
-     * use the same variables in each region.
-     * TODO: can be altered to allow each phasespace region to have a unique variable set.
+     * Vector of vectors containing the variables objects to be fed to the MVA.
+     * Each region can have a unique set of variables.
      */
-    std::vector<float> m_variables;
+    std::vector< std::vector<const Variable::Manager::Var*> > m_variables;
 
-    /**
-     * vector containing the spectator variables to be fed to the MVA.
-     * use the same variables in each region.
-     * TODO: can be altered to allow each phasespace region to have a unique variable set.
-     */
-    std::vector<float> m_spectators;
+//     /**
+//      * Vector of vectors containing the evaluated variables to be fed to the MVA.
+//      * Each region can have a unique set of variables.
+//      */
+//     std::vector<std::vector<float>> m_features;
+
+//     /**
+//      * Vector containing the spectator variables to be fed to the MVA.
+//      * This is in essence an empty dummy vector as we do not consider spectator variables.
+//      * All regions share the same spectator vector.
+//      */
+//     std::vector<float> m_spectators;
 
     /**
       * MVA dataset to be passed to the expert.
+      * One per region.
       */
-    std::unique_ptr<MVA::SingleDataset> m_dataset;
+    std::vector<std::unique_ptr<MVA::SingleDataset>> m_datasets;
 
     /**
-     * Defintion of sqrt(2)
+     * Definition of sqrt(2)
      */
     static constexpr double c_sqrt2 = 1.41421356237309504880;
 

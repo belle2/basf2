@@ -10,6 +10,10 @@
 #include <algorithm>
 #include "TMath.h"
 
+#include <framework/geometry/B2Vector3.h>
+#include <framework/gearbox/Const.h>
+#include <framework/gearbox/Unit.h>
+
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/geometry/ECLNeighbours.h>
 
@@ -18,10 +22,13 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 
-#include <framework/geometry/B2Vector3.h>
+#include <analysis/VariableManager/Manager.h>
+#include <analysis/variables/ECLVariables.h>
+#include <analysis/dataobjects/Particle.h>
+
 #include <mva/interface/Interface.h>
 #include <mva/methods/TMVA.h>
-#include <iostream>
+#include <mdst/dataobjects/Track.h>
 #include <limits>
 
 
@@ -32,7 +39,7 @@ using namespace ECL;
 
 REG_MODULE(ECLChargedPIDMVA)
 
-ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module(), m_variables(112, -999.0)
+ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module()
 {
   setDescription("The module implements charged particle identification using ECL-related observables via a multiclass BDT. For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the BDT which is stored in a conditions database payload. The BDT output variables are then used to construct a liklihood from pdfs also stored in the payload. The liklihood is then stored in the ECLPidLikelihood object.");
 
@@ -74,7 +81,11 @@ void ECLChargedPIDMVAModule::initializeMVA()
   auto nfiles = serialized_weightfiles->size();
 
   B2DEBUG(12, " number of weightfiles found: " << nfiles);
+
   m_experts.resize(nfiles);
+  m_variables.resize(nfiles);
+
+
   for (unsigned int idx(0); idx < nfiles; idx++) {
 
     B2DEBUG(12, "\t\tweightfile[" << idx << "]");
@@ -92,11 +103,14 @@ void ECLChargedPIDMVAModule::initializeMVA()
 
     B2DEBUG(12, "\t\tweightfile  at " << idx << " successfully initialised.");
 
-    if (idx == 0) {
-      // For now use one dataset for all regions, they all have the same variables.
-      // In case we move to region dependent variable sets this will need to be adjusted.
-      m_dataset = std::make_unique<MVA::SingleDataset>(general_options, m_variables, 1.0, m_spectators);
-    }
+    // Load the variable objects
+    Variable::Manager& manager = Variable::Manager::Instance();
+    m_variables[idx] = manager.getVariables(general_options.m_variables);
+
+    std::vector<float> features(general_options.m_variables.size(), 0.0);
+    std::vector<float> spectators;
+
+    m_datasets[idx] = std::make_unique<MVA::SingleDataset>(general_options, features, 1.0, spectators);
   }
 
   m_log_transform_offset = (*m_mvaWeights.get())->getLogTransformOffset();
@@ -116,149 +130,51 @@ void ECLChargedPIDMVAModule::event()
   for (const auto& track : m_tracks) {
 
     // load the pion fit hypothesis or closest in mass.
-    // we require a track to have at least one shower matched to it.
     const TrackFitResult* fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
     if (fitRes == nullptr) continue;
+
+    // we require a track to have at least one shower matched to it.
     const auto relShowers = track.getRelationsTo<ECLShower>();
     if (relShowers.size() == 0) continue;
 
-    const double p     = fitRes->getMomentum().Mag();
-//     const double theta = fitRes->getMomentum().Theta();
-    const auto charge  = fitRes->getChargeSign();
+    // create a particle object so that we can use the variable manager.
+    const Particle particle = Particle(&track, Const::ChargedStable(211));
 
-    // get and fill the variables
-    double shEnergy(0.0), maxEnergy(0.0);
+    const double p = fitRes->getMomentum().Mag();
+    const int charge = fitRes->getChargeSign();
+    const double showerTheta = Belle2::Variable::eclClusterTheta(&particle);
 
-    const ECLShower* mostEnergeticShower = nullptr;
-
-    for (const auto& eclShower : relShowers) {
-
-      if (eclShower.getHypothesisId() != ECLShower::c_nPhotons) continue;
-
-      shEnergy = eclShower.getEnergy();
-      if (shEnergy > maxEnergy) {
-        maxEnergy = shEnergy;
-        mostEnergeticShower = &eclShower;
-      }
-
-    }
-    // Need at least 1 shower with a photon hypothesis.
-    if (!mostEnergeticShower) continue;
-
-    double showerTheta = mostEnergeticShower->getTheta();
-
-    //check that we cover this region with our weightfiles.
-    if (!((*m_mvaWeights.get())->isPhasespaceCovered(showerTheta, p, charge))) continue;
-
-
-    // in principle the variables could be stored in the payloads as is done for the analysis level chargedParticleMVA
-    // and accessed via the variable manager. This would be robust against changing the variable set in the future.
-    // However, especially for the digit level variables this would be slower as the energy ranking of the digits would be done for each
-    // of the variables.
-
-    // basic variables
-    m_dataset->m_input[0] = maxEnergy / p;
-    m_dataset->m_input[1] = mostEnergeticShower->getE1oE9();
-    m_dataset->m_input[2] = mostEnergeticShower->getE9oE21();
-    m_dataset->m_input[3] = mostEnergeticShower->getTrkDepth();
-    m_dataset->m_input[4] = mostEnergeticShower->getLateralEnergy();
-
-    //Zernike moments
-    int offset = 5;
-    for (unsigned int n = 1; n <= 6; n++) {
-      for (unsigned int m = 0; m <= n; m++) {
-        m_dataset->m_input[(n * (n + 1)) / 2 + m + offset - 1] =  mostEnergeticShower->getAbsZernikeMoment(n, m);
-      }
-    }
-
-    // PSD information
-    offset += 27;
-
-    ECLGeometryPar* geometry = ECLGeometryPar::Instance();
-    std::vector<std::tuple<double, unsigned int, bool>> EnergyToSort;
-    RelationVector<ECLCalDigit> relatedDigits = mostEnergeticShower->getRelationsTo<ECLCalDigit>();
-
-    //EnergyToSort vector is used for sorting digits by offline two component energy
-    for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
-
-      const auto caldigit = relatedDigits.object(iRel);
-      bool goodFit = true;
-
-      //exclude digits without waveforms
-      const double digitChi2 = caldigit->getTwoComponentChi2();
-      if (digitChi2 < 0)  goodFit = false;
-
-      ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
-
-      //exclude digits digits with poor chi2
-      if (digitFitType1 == ECLDsp::poorChi2) goodFit = false;
-
-      //exclude digits with diode-crossing fits
-      if (digitFitType1 == ECLDsp::photonDiodeCrossing)  goodFit = false;
-
-      // use getTwoComponentTotalEnergy instead?
-      EnergyToSort.emplace_back(caldigit->getEnergy(), iRel, goodFit);
-    }
-
-    // sort the vector
-    std::sort(EnergyToSort.begin(), EnergyToSort.end(), std::greater<>());
-
-    //get cluster position information
-    const double showerR = mostEnergeticShower->getR();
-    //const double showerTheta = cluster->getTheta();
-    const double showerPhi = mostEnergeticShower->getPhi();
-
-    B2Vector3D showerPosition;
-    showerPosition.SetMagThetaPhi(showerR, showerTheta, showerPhi);
-
-    // order of variables is:
-    // 1.Hadron Energy
-    // 2.Online Energy
-    // 3.Hadron Energy Fraction
-    // 4.Fraction of Shower Energy
-    // 5.Digit Weight
-    // 6.Digit Fit type
-    // 7.Digit Radius
-    // 8.Digit Cos Theta
-    // 9.Digit Phi
-
-    for (unsigned int digit = 0; digit < 10; ++digit) {
-      if (digit < EnergyToSort.size()) {
-        const auto [digitEnergy, next, goodFit] = EnergyToSort[digit];
-        const auto caldigit = relatedDigits.object(next);
-        ECLDsp::TwoComponentFitType digitFitType = caldigit->getTwoComponentFitType();
-        const int cellId = caldigit->getCellId();
-        B2Vector3D calDigitPosition = geometry->GetCrystalPos(cellId - 1);
-        TVector3 tempP = showerPosition - calDigitPosition;
-
-        m_dataset->m_input[offset]      = goodFit ? caldigit->getTwoComponentHadronEnergy() : 0.0;
-        m_dataset->m_input[offset + 1]  = caldigit->getEnergy();
-        m_dataset->m_input[offset + 2]  = goodFit ?  m_dataset->m_input[offset] / digitEnergy : 0.0;
-        m_dataset->m_input[offset + 3]  = caldigit->getEnergy() / mostEnergeticShower->getEnergy();
-        m_dataset->m_input[offset + 4]  = relatedDigits.weight(next);
-        m_dataset->m_input[offset + 5]  = goodFit ? digitFitType : -1.0;
-        m_dataset->m_input[offset + 6]  = tempP.Mag();
-        m_dataset->m_input[offset + 7]  = tempP.CosTheta();
-        m_dataset->m_input[offset + 8]  = tempP.Phi();
-      } else {
-        m_dataset->m_input[offset]      = 0.0;
-        m_dataset->m_input[offset + 1]  = 0.0;
-        m_dataset->m_input[offset + 2]  = 0.0;
-        m_dataset->m_input[offset + 3]  = 0.0;
-        m_dataset->m_input[offset + 4]  = 0.0;
-        m_dataset->m_input[offset + 5]  = -1.0;
-        m_dataset->m_input[offset + 6]  = 0.0;
-        m_dataset->m_input[offset + 7]  = 0.0;
-        m_dataset->m_input[offset + 8]  = 0.0;
-      }
-      offset += 9;
-    }
-
-    //get the MVA response values
+    //get the MVA region
     unsigned int linearBinIndex = (*m_mvaWeights.get())->getLinearisedBinIndex(showerTheta, p, charge);
+
+    unsigned int nvars = m_variables.at(linearBinIndex).size();
+
+    // fill the feature vectors
+    for (unsigned int ivar(0); ivar < nvars; ++ivar) {
+      auto varobj = m_variables.at(linearBinIndex).at(ivar);
+
+      float val = std::numeric_limits<float>::quiet_NaN();
+
+      if (std::holds_alternative<double>(varobj->function(&particle))) {
+        val = (float)std::get<double>(varobj->function(&particle));
+      } else if (std::holds_alternative<int>(varobj->function(&particle))) {
+        val = (float)std::get<int>(varobj->function(&particle));
+      } else if (std::holds_alternative<bool>(varobj->function(&particle))) {
+        val = (float)std::get<bool>(varobj->function(&particle));
+      } else {
+        B2ERROR("Variable '" << varobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
+      }
+
+      if (std::isnan(val)) {
+        B2ERROR("Variable '" << varobj->name <<
+                "' has NaN entries. Variable definitions should include 'ifNaNGiveX(X, DEFAULT)' with a proper default value.");
+      }
+      m_datasets.at(linearBinIndex)->m_input[ivar] = val;
+    }
+
+    // get the mva response and convert to likelihood
     B2DEBUG(12, "Bin index, theta, p, charge: " << linearBinIndex << "  " << showerTheta << "  " << p << "  " << charge << " \n");
-    // We deal w/ a SingleDataset, so 0 is the only existing component by construction.
-    std::vector<float> scores = m_experts.at(linearBinIndex)->applyMulticlass(*m_dataset)[0];
+    std::vector<float> scores = m_experts.at(linearBinIndex)->applyMulticlass(*m_datasets.at(linearBinIndex))[0];
 
     // log transform the scores
     for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
@@ -311,7 +227,7 @@ void ECLChargedPIDMVAModule::event()
 
         float pdfval = (*m_mvaWeights.get())->getPDF(absPdgId, iResponse, linearBinIndex)->Eval(transformed_score_copy);
         // dont take a log of inf or 0
-        pdfval = std::max(pdfval , std::numeric_limits<float>::min());
+        pdfval = std::max(pdfval, std::numeric_limits<float>::min());
         logL += (std::isnormal(pdfval) && pdfval > 0) ? std::log(pdfval) : c_dummyLogL;
       }
       logLikelihoods[hypo_idx] = logL;

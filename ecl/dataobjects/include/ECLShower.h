@@ -13,6 +13,10 @@
 #include <math.h>
 #include <TMatrixDSym.h>
 
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+
 namespace Belle2 {
 
   /*! Class to store ECL Showers
@@ -85,9 +89,8 @@ namespace Belle2 {
       m_NumberOfHadronDigits(0.0),             /**< Shower Number of hadron digits*/
       m_numberOfCrystalsForEnergy(0.0),        /**< number of crystals used for energy calculation*/
       m_nominalNumberOfCrystalsForEnergy(0.0), /**< nominal number of crystals used for energy calculation*/
-      m_listOfCrystalsForEnergy{}              /**< list of cell ids used for energy calculation*/
-
-
+      m_listOfCrystalsForEnergy{},             /**< list of cell ids used for energy calculation*/
+      m_listOfCrystalEnergyRankAndQuality{}    /**< list of ECLCalDigit indices sorted by online energy*/
 
     { }
 
@@ -399,6 +402,51 @@ namespace Belle2 {
      */
     std::vector<unsigned int>& getListOfCrystalsForEnergy()  { return m_listOfCrystalsForEnergy; }
 
+    /*! Get list of indexes of related ECLCalDigit objects sorted by online energy with flag for PSD useability for charged PID.
+     *  @return m_listOfCrystalEnergyRankAndQuality
+     */
+    std::vector<std::pair<unsigned int, bool>> getListOfCrystalEnergyRankAndQuality()
+    {
+      // only fill this ranking upon first request
+      if (m_listOfCrystalEnergyRankAndQuality.empty()) {
+
+        std::vector<std::tuple<double, unsigned int, bool>> EnergyToSort;
+        RelationVector<ECLCalDigit> relatedDigits = this->getRelationsTo<ECLCalDigit>();
+
+        //EnergyToSort vector is used for sorting digits by online energy
+        for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
+
+          const auto caldigit = relatedDigits.object(iRel);
+          bool goodFit = true;
+
+          //exclude digits without waveforms
+          const double digitChi2 = caldigit->getTwoComponentChi2();
+          if (digitChi2 < 0)  goodFit = false;
+
+          ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
+
+          //exclude digits with poor chi2
+          if (digitFitType1 == ECLDsp::poorChi2) goodFit = false;
+
+          //exclude digits with diode-crossing fits
+          if (digitFitType1 == ECLDsp::photonDiodeCrossing)  goodFit = false;
+
+          // use getTwoComponentTotalEnergy instead?
+          EnergyToSort.emplace_back(caldigit->getEnergy(), iRel, goodFit);
+        }
+
+        // sort the vector
+        std::sort(EnergyToSort.begin(), EnergyToSort.end(), std::greater<>());
+
+        for (unsigned int iSorted = 0; iSorted < EnergyToSort.size(); iSorted++) {
+          m_listOfCrystalEnergyRankAndQuality.push_back(std::make_pair(std::get<1>(EnergyToSort[iSorted]),
+                                                        std::get<2>(EnergyToSort[iSorted])));
+        }
+
+      }
+      return m_listOfCrystalEnergyRankAndQuality;
+    }
+
 
 
     //! The method to get return  TVector3 Momentum
@@ -516,6 +564,8 @@ namespace Belle2 {
     Double32_t m_numberOfCrystalsForEnergy; /**< number of crystals used for energy calculation (TF)*/
     Double32_t m_nominalNumberOfCrystalsForEnergy; /**< number of crystals used for energy calculation (TF)*/
     std::vector<unsigned int> m_listOfCrystalsForEnergy; /**< list of cell ids used for energy calculation (TF)*/
+    std::vector<std::pair<unsigned int, bool>>
+                                            m_listOfCrystalEnergyRankAndQuality; /**< list of indices of related ECLCalDigits by energy. Also stores a quality flag for each digit denoting whether the PSD information can be used for charged particle ID. Cached here to avoid resorting the ECLCalDigit vector 90 times per track.*/
 
     // 2: added uniqueID and highestE (TF)
     // 3: added LAT and distance to closest track and trk match flag (GDN)
@@ -531,7 +581,7 @@ namespace Belle2 {
     // 13: made enums strongly typed
     // 14: added m_numberOfCrystalsForEnergy of crystals for energy determination
     // 15: added m_listOfCrystalsForEnergy, m_nominalNumberOfCrystalsForEnergy
-    // 16: removed m_absZernike40 and 51, added m_absZernikeMoments (MH)
+    // 16: removed m_absZernike40 and 51, added m_absZernikeMoments, m_crystalEnergyRankAndQuality (MH)
     ClassDef(ECLShower, 16);/**< ClassDef */
 
   };

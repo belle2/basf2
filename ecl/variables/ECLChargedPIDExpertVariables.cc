@@ -56,7 +56,7 @@ namespace Belle2 {
       const auto relShowers = cluster->getRelationsWith<ECLShower>();
       if (relShowers.size() == 0) return nullptr;
       // can this relation ever be 1 cluster : many showers?
-      if (relShowers.size() != 1) B2INFO("Rel vector has size " << relShowers.size()); // TEMP
+      if (relShowers.size() != 1) B2ERROR("Cluster to shower relation vector has size " << relShowers.size());
 
       ECLShower* shower = relShowers.object(0);
       return shower;
@@ -131,16 +131,18 @@ namespace Belle2 {
 
       auto relatedDigits = shower->getRelationsTo<ECLCalDigit>();
 
-      std::vector<std::tuple<double, unsigned int, bool>> EnergyToSort = getDigitEnergyToSortVector(shower);
+//       std::vector<std::tuple<double, unsigned int, bool>> EnergyToSort = getDigitEnergyToSortVector(shower);
 
-      if (EnergyToSort.size() <= digit) return std::numeric_limits<float>::quiet_NaN();
+//       if (EnergyToSort.size() <= digit) return std::numeric_limits<float>::quiet_NaN();
 
-      //sorting by energy
-      std::sort(EnergyToSort.begin(), EnergyToSort.end(), std::greater<>());
-
-      const auto [digitEnergy, next, goodFit] = EnergyToSort[digit];
-      const auto caldigit = relatedDigits.object(next);
-
+//       //sorting by energy
+//       std::sort(EnergyToSort.begin(), EnergyToSort.end(), std::greater<>());
+//         const auto caldigit = relatedDigits.object(iRel);
+      const std::pair<unsigned int, bool> idxAndQuality = shower->getListOfCrystalEnergyRankAndQuality().at(digit);
+      const auto idx = idxAndQuality.first;
+      const auto goodFit = idxAndQuality.second;
+      const auto caldigit = relatedDigits.object(idx);
+      const auto digitEnergy = caldigit->getEnergy();
 
       // variables that are / rely on the fit result should only be returned if there actually was a good fit
       // variables like position and online energy can always be returned
@@ -157,7 +159,7 @@ namespace Belle2 {
       if (varType == PSDVarType::onlineEnergy) return caldigit->getEnergy();
       if (varType == PSDVarType::fractionOfShowerEnergy) return caldigit-> getEnergy() / shower->getEnergy();
       if (varType == PSDVarType::hadronEnergyFraction) return caldigit->getTwoComponentHadronEnergy()  / digitEnergy;
-      if (varType == PSDVarType::digitWeight) return relatedDigits.weight(next);
+      if (varType == PSDVarType::digitWeight) return relatedDigits.weight(idx);
       if (varType == PSDVarType::digitFitType) return caldigit->getTwoComponentFitType();
 
       const int cellId = caldigit->getCellId();

@@ -2089,7 +2089,7 @@ namespace Belle2 {
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("roeM(maskName)", ROE_M,
-                          "Returns invariant mass of unused tracks and clusters in ROE. The unit of the invariant mass is ``GeV/:math:`\\text{c}^2``` ",
+                          "Returns invariant mass of unused tracks and clusters in ROE. The unit of the invariant mass is :math:`\\text{GeV/c}^2`",
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("roeP(maskName)", ROE_P,
@@ -2121,7 +2121,7 @@ namespace Belle2 {
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("roeMbc(maskName)", ROE_Mbc,
-                          "Returns beam constrained mass of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`. The unit of the beam constrained mass is ``GeV/:math:`\\text{c}^2``` ",
+                          "Returns beam constrained mass of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`. The unit of the beam constrained mass is :math:`\\text{GeV/c}^2`.",
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("weDeltae(maskName, opt)", WE_DeltaE,
@@ -2129,11 +2129,11 @@ namespace Belle2 {
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("weMbc(maskName, opt)", WE_Mbc,
-                          "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`. The unit of the beam constrained mass is ``GeV/:math:`\\text{c}^2``` ",
+                          "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`. The unit of the beam constrained mass is :math:`\\text{GeV/c}^2`.",
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("weMissM2(maskName, opt)", WE_MissM2,
-                          "Returns the invariant mass squared of the missing momentum (see :b2:var:`weMissE` possible options). The unit of the invariant mass squared is ``:math:`[\\text{GeV}/\\text{c}^2]^2``` ",
+                          "Returns the invariant mass squared of the missing momentum (see :b2:var:`weMissE` possible options). The unit of the invariant mass squared is :math:`[\\text{GeV}/\\text{c}^2]^2`.",
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("weMissPTheta(maskName, opt)", WE_MissPTheta,
@@ -2174,7 +2174,7 @@ namespace Belle2 {
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("bssMassDifference(maskName)", bssMassDifference,
-                          "Bs* - Bs mass difference. The unit of the mass is ``GeV/:math:`\\text{c}^2``` ", Manager::VariableDataType::c_double);
+                          "Bs* - Bs mass difference. The unit of the mass is :math:`\\text{GeV/c}^2`.", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("weCosThetaEll(maskName)", WE_cosThetaEll, R"DOC(
 
@@ -2194,16 +2194,16 @@ The neutrino momentum is calculated from ROE taking into account the specified m
     REGISTER_METAVARIABLE("weQ2lnuSimple(maskName,option)", WE_q2lnuSimple,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
                       "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter. \n"
-                      "By default, option is set to ``1`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value. The unit of the momentum transfer squared is ``:math:`[\\text{GeV}/\\text{c}]^2``` ", Manager::VariableDataType::c_double);
+                      "By default, option is set to ``1`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value. The unit of the momentum transfer squared is :math:`[\\text{GeV}/\\text{c}]^2`.", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("weQ2lnu(maskName,option)", WE_q2lnu,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
                       "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter. \n"
                       "This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction. \n"
-                      "By default, option is set to ``7`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value. The unit of the momentum transfer squared is ``:math:`[\\text{GeV}/\\text{c}]^2``` ", Manager::VariableDataType::c_double);
+                      "By default, option is set to ``7`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value. The unit of the momentum transfer squared is :math:`[\\text{GeV}/\\text{c}]^2`.", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("weMissM2OverMissE(maskName)", WE_MissM2OverMissE,
-                      "Returns missing mass squared over missing energy. The unit of the missing mass squared ``GeV/:math:`\\text{c}^4``` ", Manager::VariableDataType::c_double);
+                      "Returns missing mass squared over missing energy. The unit of the missing mass squared is :math:`\\text{GeV/c}^4`.", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("passesROEMask(maskName)", passesROEMask,
                       "Returns boolean value if a particle passes a certain mask or not. Only to be used in for_each path, otherwise returns quiet NaN.", Manager::VariableDataType::c_double);

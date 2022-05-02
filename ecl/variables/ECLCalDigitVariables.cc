@@ -228,6 +228,7 @@ namespace Belle2 {
           }
         } else if (varid == varType::fractionOfClusterEnergy) {
           return digitEnergy / cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+
         } else if ((varid == varType::phiRelativeToCluster) ||
                    (varid == varType::thetaRelativeToCluster) ||
                    (varid == varType::cosThetaRelativeToCluster) ||

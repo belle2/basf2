@@ -46,8 +46,6 @@ namespace Belle2 {
       phi = 12,
     };
 
-
-
     ECLShower* getECLShowerFromParticle(const Particle* particle)
     {
 
@@ -60,37 +58,6 @@ namespace Belle2 {
 
       ECLShower* shower = relShowers.object(0);
       return shower;
-    }
-
-
-    std::vector<std::tuple<double, unsigned int, bool>> getDigitEnergyToSortVector(const ECLShower* shower)
-    {
-
-      std::vector<std::tuple<double, unsigned int, bool>> EnergyToSort;
-      auto relatedDigits = shower->getRelationsTo<ECLCalDigit>();
-
-      //EnergyToSort vector is used for sorting digits by offline two component energy
-      for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
-
-        const auto caldigit = relatedDigits.object(iRel);
-        bool goodFit = true;
-
-        //exclude digits without waveforms
-        const double digitChi2 = caldigit->getTwoComponentChi2();
-        if (digitChi2 < 0)  goodFit = false;
-
-        ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
-
-        //exclude digits digits with poor chi2
-        if (digitFitType1 == ECLDsp::poorChi2) goodFit = false;
-
-        //exclude digits with diode-crossing fits
-        if (digitFitType1 == ECLDsp::photonDiodeCrossing)  goodFit = false;
-
-        // use getTwoComponentTotalEnergy instead?
-        EnergyToSort.emplace_back(caldigit->getEnergy(), iRel, goodFit);
-      }
-      return EnergyToSort;
     }
 
 
@@ -131,16 +98,13 @@ namespace Belle2 {
 
       auto relatedDigits = shower->getRelationsTo<ECLCalDigit>();
 
-//       std::vector<std::tuple<double, unsigned int, bool>> EnergyToSort = getDigitEnergyToSortVector(shower);
+      const std::vector<std::pair<unsigned int, bool>> idxAndQualityList = shower->getListOfCrystalEnergyRankAndQuality();
 
-//       if (EnergyToSort.size() <= digit) return std::numeric_limits<float>::quiet_NaN();
+      // return nan if we ask for the nth crystal when there are less than n in the shower
+      if (digit >= idxAndQualityList.size()) return std::numeric_limits<float>::quiet_NaN();
 
-//       //sorting by energy
-//       std::sort(EnergyToSort.begin(), EnergyToSort.end(), std::greater<>());
-//         const auto caldigit = relatedDigits.object(iRel);
-      const std::pair<unsigned int, bool> idxAndQuality = shower->getListOfCrystalEnergyRankAndQuality().at(digit);
-      const auto idx = idxAndQuality.first;
-      const auto goodFit = idxAndQuality.second;
+      const auto idx = idxAndQualityList.at(digit).first;
+      const auto goodFit = idxAndQualityList.at(digit).second;
       const auto caldigit = relatedDigits.object(idx);
       const auto digitEnergy = caldigit->getEnergy();
 

@@ -256,7 +256,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
         counter ++;
       }
     }
-    segmentFilters->addSectorsOnSensor(uDividersMinusLastOne ,
+    segmentFilters->addSectorsOnSensor(uDividersMinusLastOne,
                                        vDividersMinusLastOne,
                                        sectors) ;
   }//end loop over sensors
@@ -282,7 +282,7 @@ SectorMapBootstrapModule::persistSectorMap(void)
 {
 
   // the "CREATE" option results in the root file not being opened if it already exists (to prevent overwriting existing sectormaps)
-  TFile rootFile(m_sectorMapsOutputFile.c_str() , "CREATE");
+  TFile rootFile(m_sectorMapsOutputFile.c_str(), "CREATE");
   if (!rootFile.IsOpen()) B2FATAL("Unable to open rootfile! This could be caused by an already existing file of the same name: "
                                     << m_sectorMapsOutputFile.c_str());
 
@@ -342,6 +342,7 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
   if (tree == nullptr) B2FATAL("SectorMapBootstrapModule: tree not found! tree name: " << c_setupKeyNameTTreeName.c_str());
 
   TString* setupKeyName = nullptr;
+  // cppcheck-suppress nullPointerRedundantCheck
   tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
                          & setupKeyName);
   if (setupKeyName == nullptr) B2FATAL("SectorMapBootstrapModule: setupKeyName not found");

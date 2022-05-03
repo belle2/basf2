@@ -97,6 +97,7 @@ namespace Belle2 {
   };
 
   /** Test simple Setters and Getters. */
+  // cppcheck-suppress syntaxError
   TEST_F(RecoTrackTest, cdcHit)
   {
     StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);

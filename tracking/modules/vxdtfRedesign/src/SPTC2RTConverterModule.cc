@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(SPTC2RTConverter)
+REG_MODULE(SPTC2RTConverter);
 
 SPTC2RTConverterModule::SPTC2RTConverterModule() : Module()
 {
@@ -144,7 +144,7 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
 
 void SPTC2RTConverterModule::terminate()
 {
-  B2DEBUG(100, "SPTC2RTConverter::terminate: Got " << m_SPTCCtr << " SpacePointTrackCands and created " << m_RTCtr << " RecoTracks";);
+  B2DEBUG(100, "SPTC2RTConverter::terminate: Got " << m_SPTCCtr << " SpacePointTrackCands and created " << m_RTCtr << " RecoTracks");
 }
 
 void SPTC2RTConverterModule::initializeCounters()

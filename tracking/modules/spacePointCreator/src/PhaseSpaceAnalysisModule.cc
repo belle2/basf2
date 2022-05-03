@@ -135,7 +135,7 @@ void PhaseSpaceAnalysisModule::event()
     m_rootVariables = RootVariables(); // clear root variables for each run
     for (int id : mcPartIds[iTree]) {
       if (id < 0) {
-        // cppcheck-suppress
+        // cppcheck-suppress shiftNegative
         B2WARNING("Found a negative id in mcParticleId: " << id << \
                   ". It seems that it has not been set properly, I will skip this MC Particle");
         m_skippedTCsCtr++;

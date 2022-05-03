@@ -462,7 +462,12 @@ Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCod
   }
   int particlePDG = (pdgCode == 0) ? getPDGCode() : pdgCode;
   auto isFlavored = (isSelfConjugated) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
+  // By default, the ROE-based particles should have unspecified property to simplify the MC-matching
+  int propertyFlags = Particle::PropertyFlags::c_IsUnspecified;
+  // Same properties as for "->" usage in DecayDescriptor
+  propertyFlags |= Particle::PropertyFlags::c_IsIgnoreIntermediate;
+  propertyFlags |= Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons;
   return particles.appendNew(get4Vector(maskName), particlePDG, isFlavored, std::vector(source.begin(),
-                             source.end()), Particle::PropertyFlags::c_IsUnspecified);
+                             source.end()), propertyFlags);
 }
 

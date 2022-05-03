@@ -279,7 +279,7 @@ void PXDMappingLookup::write_inversemapping_to_file(void)
 
 void PXDMappingLookup::check(void)
 {
-  unsigned int dhe_ID[4] = {0x02, 0x03, 0x22, 0x23};// one of each kind, IB, OB, IF, OF
+  const unsigned int dhe_ID[4] = {0x02, 0x03, 0x22, 0x23};// one of each kind, IB, OB, IF, OF
   for (int i = 0; i < 4; i++) {
     unsigned int dhe = dhe_ID[i];
     for (unsigned int u_org = 0; i < 768; i++) {

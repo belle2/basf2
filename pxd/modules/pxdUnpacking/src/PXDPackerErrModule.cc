@@ -524,12 +524,12 @@ void PXDPackerErrModule::start_frame(void)
   m_current_frame.clear();
 }
 
-void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
+void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids, bool send_all = true, bool send_roi = false)
 {
   B2DEBUG(27, "PXD Packer Err --> pack_dhc ID " << dhc_id << " DHE act: " << dhe_active);
 
-  bool m_send_all = true;
-  bool m_send_roi = false;
+  bool m_send_all = send_all;
+  bool m_send_roi = send_roi;
 
   /// HLT frame ??? format still t.b.d. TODO
   start_frame();

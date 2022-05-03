@@ -88,7 +88,7 @@ bool PXDRawDumperModule::getTrigNr(RawPXD& px, unsigned int& innerDHH, unsigned 
 
   Frames_in_event = ((ubig32_t*)data.data())[1];
   if (Frames_in_event < 0 || Frames_in_event > 256) {
-    B2ERROR("Number of Frames invalid: Will not unpack anything. Header corrupted! Frames in event: " << Frames_in_event);
+    B2ERROR("Number of Frames invalid: Will not unpack anything. Header corrupted! Frames in event: " << to_string(Frames_in_event));
     return false;
   }
 

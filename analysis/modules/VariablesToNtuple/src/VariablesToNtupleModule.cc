@@ -48,6 +48,7 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
 
   addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToNtuple.root"));
   addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
+  addParam("basketSize", m_basketsize, "Size of baskets in Output NTuple in bytes.", 1600);
 
   std::tuple<std::string, std::map<int, unsigned int>> default_sampling{"", {}};
   addParam("sampling", m_sampling,
@@ -158,7 +159,7 @@ void VariablesToNtupleModule::initialize()
     }
     enumerate++;
   }
-  m_tree->get().SetBasketSize("*", 1600);
+  m_tree->get().SetBasketSize("*", m_basketsize);
 
   m_sampling_name = std::get<0>(m_sampling);
   m_sampling_rates = std::get<1>(m_sampling);

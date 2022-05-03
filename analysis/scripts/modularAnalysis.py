@@ -1718,7 +1718,7 @@ def printList(list_name, full, path):
     path.add_module(prlist)
 
 
-def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None):
+def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -1730,6 +1730,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         treename (str): name of the ntuple tree
         filename (str): which is used to store the variables
         path (basf2.Path): the basf2 path where the analysis is processed
+        basketsize (int): size of baskets in the output ntuple in bytes
     """
 
     output = register_module('VariablesToNtuple')
@@ -1738,6 +1739,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('variables', variables)
     output.param('fileName', filename)
     output.param('treeName', treename)
+    output.param('basketSize', basketsize)
     path.add_module(output)
 
 

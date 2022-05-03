@@ -185,7 +185,7 @@ namespace Belle2 {
 
       /** Pack one DHC (several DHE) stored in one RawPXD object.
        */
-      void pack_dhc(int dhc_id, int dhe_mask, int* dhe_ids, bool send_all, bool send_roi);
+      void pack_dhc(int dhc_id, int dhe_mask, int* dhe_ids, bool send_all = true, bool send_roi = false);
 
       /** Pack one DHE (several DHP) to buffer.
        */

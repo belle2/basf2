@@ -524,7 +524,7 @@ void PXDPackerErrModule::start_frame(void)
   m_current_frame.clear();
 }
 
-void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids, bool send_all = true, bool send_roi = false)
+void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids, bool send_all, bool send_roi)
 {
   B2DEBUG(27, "PXD Packer Err --> pack_dhc ID " << dhc_id << " DHE act: " << dhe_active);
 

@@ -74,6 +74,10 @@ namespace Belle2 {
       m_deltaPhotons = m_deltaRayPDF.getNumPhotons();
 
       m_bkgPhotons = std::max(m_bkgRate * (m_maxTime - m_minTime), 0.1);
+
+      // release the memory not needed anymore
+
+      m_rayTracers.clear();
     }
 
 
@@ -283,6 +287,103 @@ namespace Belle2 {
     }
 
 
+    bool PDFConstructor::setDerivatives(YScanner::Derivatives& D, double dL, double de, double dFic)
+    {
+      while (m_rayTracers.size() < 3) m_rayTracers.push_back(*m_fastRaytracer); // push back a copy of the object
+
+      bool ok = true;
+      auto& rayTracer_dL = m_rayTracers[0];
+      for (int i = 0; i < 10; i++) {
+        ok = raytrace(rayTracer_dL, dL);
+        if (ok) break;
+        dL = - dL / 2;
+      }
+      if (not ok) return false;
+
+      auto& rayTracer_de = m_rayTracers[1];
+      for (int i = 0; i < 10; i++) {
+        ok = raytrace(rayTracer_de, 0, de);
+        if (ok) break;
+        de = - de / 2;
+      }
+      if (not ok) return false;
+
+      auto& rayTracer_dFic = m_rayTracers[2];
+      for (int i = 0; i < 10; i++) {
+        ok = raytrace(rayTracer_dFic, 0, 0, dFic);
+        if (ok) break;
+        dFic = - dFic / 2;
+      }
+      if (not ok) return false;
+
+      // partial derivatives on L, e and Fic
+
+      double dLen_dL = (rayTracer_dL.getPropagationLen() - m_fastRaytracer->getPropagationLen()) / dL;
+      double dLen_de = (rayTracer_de.getPropagationLen() - m_fastRaytracer->getPropagationLen()) / de;
+      double dLen_dFic = (rayTracer_dFic.getPropagationLen() - m_fastRaytracer->getPropagationLen()) / dFic;
+
+      double dyB_dL = (rayTracer_dL.getYB() - m_fastRaytracer->getYB()) / dL;
+      double dyB_de = (rayTracer_de.getYB() - m_fastRaytracer->getYB()) / de;
+      double dyB_dFic = (rayTracer_dFic.getYB() - m_fastRaytracer->getYB()) / dFic;
+
+      double dx_dL = (rayTracer_dL.getXD() - m_fastRaytracer->getXD()) / dL;
+      double dx_de = (rayTracer_de.getXD() - m_fastRaytracer->getXD()) / de;
+      double dx_dFic = (rayTracer_dFic.getXD() - m_fastRaytracer->getXD()) / dFic;
+
+      if (dx_dFic == 0) return false;
+
+      // derivatives on L, e, and x. Derivatives on L and e have to be given at constant x.
+
+      D.dLen_dx = dLen_dFic / dx_dFic;
+      D.dLen_de = dLen_de - dLen_dFic * dx_de / dx_dFic;
+      D.dLen_dL = dLen_dL - dLen_dFic * dx_dL / dx_dFic;
+
+      D.dyB_dx = dyB_dFic / dx_dFic;
+      D.dyB_de = dyB_de - dyB_dFic * dx_de / dx_dFic;
+      D.dyB_dL = dyB_dL - dyB_dFic * dx_dL / dx_dFic;
+
+      D.dFic_dx = 1 / dx_dFic;
+      D.dFic_de = - dx_de / dx_dFic;
+      D.dFic_dL = - dx_dL / dx_dFic;
+
+      return true;
+    }
+
+
+    bool PDFConstructor::raytrace(const FastRaytracer& rayTracer, double dL, double de, double dFic)
+    {
+      const auto& emi = m_track.getEmissionPoint(dL);
+      const auto& trk = emi.trackAngles;
+      const auto& cer = cerenkovAngle(de);
+
+      double fic = m_Fic + dFic;
+      double cosFic = cos(fic);
+      double sinFic = sin(fic);
+      double a = trk.cosTh * cer.sinThc * cosFic + trk.sinTh * cer.cosThc;
+      double b = cer.sinThc * sinFic;
+      double kx = a * trk.cosFi - b * trk.sinFi;
+      double ky = a * trk.sinFi + b * trk.cosFi;
+      double kz = trk.cosTh * cer.cosThc - trk.sinTh * cer.sinThc * cosFic;
+      PhotonState photon(emi.position, kx, ky, kz);
+      rayTracer.propagate(photon, true);
+      if (not rayTracer.getPropagationStatus()) return false;
+
+      if (rayTracer.getNxm() != m_fastRaytracer->getNxm()) return false;
+      if (rayTracer.getNym() != m_fastRaytracer->getNym()) return false;
+      if (rayTracer.getNxe() != m_fastRaytracer->getNxe()) return false;
+      if (rayTracer.getNye() != m_fastRaytracer->getNye()) return false;
+      if (rayTracer.getNxb() != m_fastRaytracer->getNxb()) return false;
+      if (rayTracer.getNyb() != m_fastRaytracer->getNyb()) return false;
+
+      if (rayTracer.getExtraStates().empty() or m_fastRaytracer->getExtraStates().empty()) return true;
+
+      if (rayTracer.getExtraStates().back().getNx() != m_fastRaytracer->getExtraStates().back().getNx()) return false;
+      if (rayTracer.getExtraStates().back().getNy() != m_fastRaytracer->getExtraStates().back().getNy()) return false;
+
+      return true;
+    }
+
+
     void PDFConstructor::expandSignalPDF(unsigned col, const YScanner::Derivatives& D, SignalPDF::EPeakType type)
     {
       m_ncallsExpandPDF[type]++;
@@ -301,11 +402,17 @@ namespace Belle2 {
       // contribution of multiple scattering in quartz
       double sigmaScat = D.dLen_de * m_yScanner->getSigmaScattering() / speedOfLightQuartz;
 
+      // contribution of quartz surface roughness at single reflection and effective number of reflections
+      double sigmaAlpha = D.dLen_de * m_yScanner->getSigmaAlpha() / speedOfLightQuartz;
+      int Ny_eff = 2 * std::abs(m_fastRaytracer->getNym()) + std::abs(m_fastRaytracer->getNyb());
+
       const auto& pixel = m_yScanner->getPixelPositions().get(col + 1);
       double L = m_track.getLengthInQuartz();
 
-      // sigma squared: pixel size, parallax, propagation time difference, multiple scattering
-      double wid0 = (pow(dt_dx * pixel.Dx, 2) + pow(dt_dL * L, 2) + pow(dTime, 2)) / 12 + pow(sigmaScat, 2);
+      // sigma squared: pixel size, parallax, propagation time difference, multiple scattering, surface roughness
+      double wid0 = (pow(dt_dx * pixel.Dx, 2) + pow(dt_dL * L, 2) + pow(dTime, 2)) / 12 + pow(sigmaScat, 2) +
+                    pow(sigmaAlpha, 2) * Ny_eff;
+
       // sigma squared: adding chromatic contribution
       double wid = wid0 + pow(dt_de * m_yScanner->getRMSEnergy(), 2);
 
@@ -321,7 +428,7 @@ namespace Belle2 {
         doScan = m_track.isScanRequired(col, time, wid);
       }
 
-      m_yScanner->expand(col, yB, dydz, D, doScan);
+      m_yScanner->expand(col, yB, dydz, D, Ny_eff, doScan);
 
       double numPhotons = m_yScanner->getNumPhotons() * std::abs(D.dFic_dx * pixel.Dx);
       int nx = m_fastRaytracer->getNx();

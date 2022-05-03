@@ -61,20 +61,28 @@ CDCPathPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseCDCPathPairFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
     return std::make_unique<TrackFindingCDC::AllFilter<BaseCDCPathPairFilter>>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "distance") {
     return std::make_unique<DistanceBasedCDCPathPairFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "chi2") {
     return std::make_unique<Chi2BasedCDCPathPairFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "duplicateHits") {
     return std::make_unique<DuplicateCDCPathPairFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "hitDistance") {
     return std::make_unique<HitDistanceBasedCDCPathPairFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "arc_length") {
     return std::make_unique<ArcLengthBasedCDCPathPairFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "arc_length_fromEcl") {
     return std::make_unique<ArcLengthBasedCDCfromEclPathPairFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "mc_truth") {
     return std::make_unique<MCTruthCDCPathPairFilter>();
   } else {

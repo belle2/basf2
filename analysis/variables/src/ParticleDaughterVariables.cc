@@ -159,10 +159,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("hasCharmedDaughter(i)", hasCharmedDaughter,
                       "The variable determines whether the particle's MC partner, which has to be a B-meson, has at least one daughter with a charm or anti-charm quark.\n"
                       "Returns 1 if the process is a b -> anti-c / anti-b -> c transition and -1 if the process is a b -> c / anti-b -> anti-c transition.\n"
-                      "Returns Nan if the particle's MC partner does not have any charm or anti-charm quark.")
+                      "Returns 0 if the particle's MC partner does not have any charm or anti-charm quark.")
     REGISTER_VARIABLE("hasCharmoniumDaughter", hasCharmoniumDaughter,
-                      "Returns 1 if on MC truth level a b -> c anti-c q transition was generated, otherwise returns NaN. The particle's MC partner must be a B-meson.\n");
+                      "Returns 1 if on MC truth level a b -> c anti-c q transition was generated, otherwise returns 0. The particle's MC partner must be a B-meson.\n");
     REGISTER_VARIABLE("hasRealPhotonDaughter", hasRealPhotonDaughter,
-                      "Returns 1 if on MC truth level there is at least one real photon daughter, a photon that was not created by photos, otherwise returns NaN.");
+                      "Returns 1 if on MC truth level there is at least one real photon daughter, a photon that was not created by photos, otherwise returns 0.");
   }
 }

@@ -17,6 +17,8 @@
 #include <klm/dbobjects/eklm/EKLMAlignment.h>
 #include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
+#include <klm/dbobjects/KLMTimeCableDelay.h>
+#include <klm/dbobjects/KLMTimeConstants.h>
 
 /* Belle II headers. */
 #include <framework/database/Database.h>
@@ -465,6 +467,111 @@ void KLMCalibrationChecker::createStripEfficiencyHistograms()
     delete hist;
   }
   delete canvas;
+  /* Reset the database. Needed to avoid mess if we call this method multiple times with different GTs. */
+  resetDatabase();
+}
+
+
+void KLMCalibrationChecker::checkTimeCableDelay()
+{
+  /* Initialize the database. */
+  initializeDatabase();
+  /* Now we can read the payload. */
+  DBObjPtr<KLMTimeCableDelay> timeCableDelay;
+  if (!timeCableDelay.isValid())
+    B2FATAL("Time Cable delay data are not valid.");
+  if (m_GlobalTagName != "")
+    printPayloadInformation(timeCableDelay);
+  /* Create trees with time cable delay measurement results. */
+  int subdetector, section, sector, layer, plane, strip, channelno;
+  double timeDelay;
+  TFile* timeCableDelayResults =
+    new TFile(m_TimeCableDelayResultsFile.c_str(), "recreate");
+  TTree* cabledelayTree = new TTree("cabledelay", "KLM timecabledelay data");
+  cabledelayTree->Branch("experiment", &m_experiment, "experiment/I");
+  cabledelayTree->Branch("run", &m_run, "run/I");
+  cabledelayTree->Branch("subdetector", &subdetector, "subdetector/I");
+  cabledelayTree->Branch("section", &section, "section/I");
+  cabledelayTree->Branch("sector", &sector, "sector/I");
+  cabledelayTree->Branch("layer", &layer, "layer/I");
+  cabledelayTree->Branch("plane", &plane, "plane/I");
+  cabledelayTree->Branch("strip", &strip, "strip/I");
+  cabledelayTree->Branch("channelno", &channelno, "channelno/I");
+  cabledelayTree->Branch("timeDelay", &timeDelay, "timeDelay/D");
+  KLMChannelIndex klmStrips(KLMChannelIndex::c_IndexLevelStrip);
+  for (KLMChannelIndex& klmStrip : klmStrips) {
+    subdetector = klmStrip.getSubdetector();
+    section = klmStrip.getSection();
+    sector = klmStrip.getSector();
+    layer = klmStrip.getLayer();
+    plane = klmStrip.getPlane();
+    strip = klmStrip.getStrip();
+    KLMChannelNumber channel = m_ElementNumbers->channelNumber(
+                                 subdetector, section, sector, layer, plane, strip);
+    timeDelay = timeCableDelay->getTimeDelay(channel);
+    channelno = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
+    cabledelayTree->Fill();
+  }
+  cabledelayTree->Write();
+  delete cabledelayTree;
+  delete timeCableDelayResults;
+  /* Reset the database. Needed to avoid mess if we call this method multiple times with different GTs. */
+  resetDatabase();
+}
+
+void KLMCalibrationChecker::checkTimeConstants()
+{
+  /* Initialize the database. */
+  initializeDatabase();
+  /* Now we can read the payload. */
+  DBObjPtr<KLMTimeConstants> timeConstants;
+  if (!timeConstants.isValid())
+    B2FATAL("Time Constants data are not valid.");
+  if (m_GlobalTagName != "")
+    printPayloadInformation(timeConstants);
+  /* Create trees with time constant measurement results. */
+  int subdetector, section, sector, layer, plane, strip, module, channelno;
+  float contEKLM, contBKLM, contRPCPhi, contRPCZ;
+  TFile* timeConstantsResults =
+    new TFile(m_TimeConstantsResultsFile.c_str(), "recreate");
+  TTree* constantsTree = new TTree("constants", "KLM timeConstants data.");
+  constantsTree->Branch("experiment", &m_experiment, "experiment/I");
+  constantsTree->Branch("run", &m_run, "run/I");
+  constantsTree->Branch("subdetector", &subdetector, "subdetector/I");
+  constantsTree->Branch("section", &section, "section/I");
+  constantsTree->Branch("sector", &sector, "sector/I");
+  constantsTree->Branch("layer", &layer, "layer/I");
+  constantsTree->Branch("plane", &plane, "plane/I");
+  constantsTree->Branch("strip", &strip, "strip/I");
+  constantsTree->Branch("module", &module, "module/I");
+  constantsTree->Branch("channelno", &channelno, "channelno/I");
+  constantsTree->Branch("contEKLM", &contEKLM, "contEKLM/F");
+  constantsTree->Branch("contBKLM", &contBKLM, "contBKLM/F");
+  constantsTree->Branch("contRPCPhi", &contRPCPhi, "contRPCPhi/F");
+  constantsTree->Branch("contRPCZ", &contRPCZ, "contRPCZ/F");
+  KLMChannelIndex klmStrips(KLMChannelIndex::c_IndexLevelStrip);
+  for (KLMChannelIndex& klmStrip : klmStrips) {
+    subdetector = klmStrip.getSubdetector();
+    section = klmStrip.getSection();
+    sector = klmStrip.getSector();
+    layer = klmStrip.getLayer();
+    plane = klmStrip.getPlane();
+    strip = klmStrip.getStrip();
+    channelno = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
+    module = m_ElementNumbers->moduleNumber(subdetector, section, sector, layer);
+    int c_EKLM = 1;
+    int c_BKLM = 2;
+    int c_RPCPhi = 3;
+    int c_RPCZ = 4;
+    contEKLM = timeConstants->getDelay(c_EKLM);
+    contBKLM = timeConstants->getDelay(c_BKLM);
+    contRPCPhi = timeConstants->getDelay(c_RPCPhi);
+    contRPCZ = timeConstants->getDelay(c_RPCZ);
+    constantsTree->Fill();
+  }
+  constantsTree->Write();
+  delete constantsTree;
+  delete timeConstantsResults;
   /* Reset the database. Needed to avoid mess if we call this method multiple times with different GTs. */
   resetDatabase();
 }

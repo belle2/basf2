@@ -157,6 +157,7 @@ namespace Belle2 {
 
     VARIABLE_GROUP("DirectDaughterInfo");
     REGISTER_VARIABLE("hasCharmedDaughter(i)", hasCharmedDaughter,
+                      "If i = 1 is provided it checks for b -> anti-c / anti-b -> c transition and for i = -1 it checks for b -> c / anti-b -> anti-c transitions.\n"
                       "Returns 1 if at least one of the daughters on MC truth level is a charm meson. The particle's MC partner must be a B-meson.\n"
                       "Returns 0 if no charmed daughter found on MC truth level and NaN if no MC partner was found or the related MC particle isn't a B-meson.");
     REGISTER_VARIABLE("hasCharmoniumDaughter", hasCharmoniumDaughter,

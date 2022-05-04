@@ -116,9 +116,6 @@ namespace Belle2 {
     }
 
     /**
-    =======
-
-    /**
     * Useful constructor.
     * @param weightfilePath path to the BDT weightfile for this phasespace category.
     * @param bdtResponeTransformMode bdt response transform mode booked for this phasespace.

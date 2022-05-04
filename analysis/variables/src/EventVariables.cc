@@ -115,6 +115,26 @@ namespace Belle2 {
       return n;
     }
 
+    int nInitialPrimaryMCParticles(const Particle*)
+    {
+      int n = 0;
+      StoreArray<MCParticle> mcps;
+      for (const auto& mcp : mcps)
+        if (mcp.isInitial() and mcp.isPrimaryParticle())
+          n++;
+      return n;
+    }
+
+    int nVirtualPrimaryMCParticles(const Particle*)
+    {
+      int n = 0;
+      StoreArray<MCParticle> mcps;
+      for (const auto& mcp : mcps)
+        if (mcp.isVirtual() and mcp.isPrimaryParticle())
+          n++;
+      return n;
+    }
+
     int nTracks(const Particle*)
     {
       StoreArray<Track> tracks;
@@ -806,6 +826,10 @@ namespace Belle2 {
                       "[Eventbased] Returns number of MCParticles in the event.");
     REGISTER_VARIABLE("nPrimaryMCParticles", nPrimaryMCParticles,
                       "[Eventbased] Returns number of primary MCParticles in the event.");
+    REGISTER_VARIABLE("nInitialPrimaryMCParticles", nInitialPrimaryMCParticles,
+                      "[Eventbased] Returns number of initial primary MCParticles in the event.");
+    REGISTER_VARIABLE("nVirtualPrimaryMCParticles", nVirtualPrimaryMCParticles,
+                      "[Eventbased] Returns number of virtual primary MCParticles in the event.");
 
     REGISTER_VARIABLE("expNum", expNum, "[Eventbased] Returns the experiment number.");
     REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] Returns the event number.");

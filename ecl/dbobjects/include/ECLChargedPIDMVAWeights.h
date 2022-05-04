@@ -36,17 +36,166 @@
 
 namespace Belle2 {
 
+  /**
+   * Stores the bdt weightfile, pdfs, transforms, etc. for each phasespace region.
+   */
+  class ECLChargedPIDPhasespaceCategory : public TObject {
+
+  public:
+
+    enum class BDTResponseTransformMode : unsigned int {
+      /** log transform the bdt responses. And take the likelihood as the product of likelihoods from all bdt responses. */
+      c_LogTransform = 0,
+      /** log transform the bdt responses. Take the likelihood from only the bdt response for the hypothesis. */
+      c_LogTransformSingle = 1,
+      /** Gaussian transform of the log transformed bdt response. */
+      c_GaussianTransform = 2,
+      /** Decorrelation transform of the gaussian transformed bdt responses. */
+      c_DecorrelationTransform = 3
+    };
+
+    /**
+    * Default constructor, necessary for ROOT to stream the object.
+    */
+    ECLChargedPIDPhasespaceCategory()
+    {};
+    /**
+    * Useful constructor.
+    * @param weightfilePath path to the BDT weightfile for this phasespace category.
+    * @param bdtResponeTransformMode bdt response transform mode booked for this phasespace.
+    * @param pdfs vector of unordered_map mapping hypothesis to pdfs for each bdt response.
+    */
+    ECLChargedPIDPhasespaceCategory(const std::string weightfilePath,
+                                    const BDTResponseTransformMode& bdtResponeTransformMode,
+                                    const std::vector<std::unordered_map<unsigned int, TF1>>& pdfs)
+    {
+      // Load and serialize the MVA::Weightfile object into a string for storage in the database,
+      // otherwise there are issues w/ dictionary generation for the payload class...
+      Belle2::MVA::Weightfile weightfile;
+      if (boost::ends_with(weightfilePath, ".root")) {
+        weightfile = Belle2::MVA::Weightfile::loadFromROOTFile(weightfilePath);
+      } else  if (boost::ends_with(weightfilePath, ".xml")) {
+        weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(weightfilePath);
+      } else {
+        B2WARNING("Unkown file extension for file: " << weightfilePath << ", fallback to xml...");
+        weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(weightfilePath);
+      }
+      std::stringstream ss;
+      Belle2::MVA::Weightfile::saveToStream(weightfile, ss);
+
+      // store
+      m_weight = ss.str();
+      m_bdtResponseTransformMode = bdtResponeTransformMode;
+      m_pdfs = pdfs;
+    }
+
+    /**
+     * Destructor.
+     */
+    ~ECLChargedPIDPhasespaceCategory() {};
+
+    /**
+     * getter for serialised weightfile.
+     */
+    const std::string getSerialisedWeight() const {return m_weight;}
+
+    /**
+     * getter for the BDT transform mode.
+     */
+    BDTResponseTransformMode getTransformMode() const {return m_bdtResponseTransformMode;}
+
+    /**
+     * getter for pdfs.
+     * @param iBDTResponse index of BDT response.
+     * @param hypoPDG, hypothesis pdg.
+     */
+    const TF1* getPDF(const unsigned int iBDTResponse, const unsigned int hypoPDG) const
+    {
+      return &m_pdfs.at(iBDTResponse).at(hypoPDG);
+    }
+
+    /**
+     * gets the cdf for the hypothesis pdg for a given response value.
+     * @param iBDTResponse index of BDT response.
+     * @param hypoPDG, hypothesis pdg.
+     */
+    const TH1F* getCDF(const unsigned int iBDTResponse, const int hypoPDG) const
+    {
+      return &m_cdfs.at(iBDTResponse).at(hypoPDG);
+    }
+
+    /**
+     * gets the decorrelation matrix for a given particle hypothesis.
+     * @param hypoPDG, hypothesis pdg.
+     */
+    const std::vector<float>* getDecorrelationMatrix(const int hypoPDG) const
+    {
+      return &m_decorrelationMatrices.at(hypoPDG);
+    }
+
+
+    /**
+     * set the cdfs.
+     * @param vector of map of cdfs to be stored in the payload.
+     */
+    void setCDFs(std::vector<std::unordered_map<unsigned int, TH1F>> cdfs) {m_cdfs = cdfs;}
+
+    /**
+     * set the decorrelation matrices.
+     * @param decorrelationMatrices map of decorrelation matrices to be stored in the payload.
+     */
+    void setDecorrelationMatrixMap(std::unordered_map<unsigned int, std::vector<float>> decorrelationMatrices)
+    {
+      m_decorrelationMatrices = decorrelationMatrices;
+    }
+
+  private:
+
+    /**
+     * Serialsed BDT weightfile.
+     */
+    std::string m_weight;
+
+    /**
+     * Stores which transformation mode to apply to the bdt responses.
+     */
+    BDTResponseTransformMode m_bdtResponseTransformMode;
+
+
+    /**
+     * A vector of unodered maps. The vector corresponds to the N return values of the BDT.
+     * The unordered map maps the hypothesis pdg values to their matching TF1 pdfs from which the liklihood will be taken.
+     */
+    std::vector<std::unordered_map<unsigned int, TF1>> m_pdfs;
+
+
+    /**
+     * CDFs for each bdt return value for each hypothesis.
+     * The N vector elements correspond to the N BDT return values.
+     * The unordered map maps the hypothesis pdg values to their matching TH1F cdfs which can be used for a gaussianisation.
+     */
+    std::vector<std::unordered_map<unsigned int, TH1F>> m_cdfs;
+
+    /**
+     * Decorrelation matrices. To be used (optionally) afer gaussianisation.
+     * The unordered map maps the hypothesis pdg values to their matching linearised decorrelation matrix.
+     */
+    std::unordered_map<unsigned int, std::vector<float>> m_decorrelationMatrices;
+
+    /**< 1: first class implementation. */
+    ClassDef(ECLChargedPIDPhasespaceCategory, 1);
+  };
+
+
   /** Class to contain payload of everything needed for MVA based charged particle identification.
-  * For each bin of (theta, p, charge), this includes:
-  *  - MVA weightfiles for multiclass BDT.
-  *  - TF1 p.d.fs for each charged particle hypothesis for each bdt output variable.
-  *  - (Optional) TH1F for each charged particle hypothesis for each bdt output variable for gaussianisation.
-  *  - (Optional) vector of floats (flattened square matrix) for potential linear decorrelation of the gaussian transformed bdt response variables.
-  *
-  */
-
+    * For each bin of (theta, p, charge), this includes:
+    *  - MVA weightfiles for multiclass BDT.
+    *  - TF1 p.d.fs for each charged particle hypothesis for each bdt output variable.
+    *  - (Optional) TH1F for each charged particle hypothesis for each bdt output variable for gaussianisation.
+    *  - (Optional) vector of floats (flattened square matrix) for potential linear decorrelation of the gaussian transformed bdt response variables.
+    *
+    */
   class ECLChargedPIDMVAWeights : public TObject {
-
   public:
     /**
     * Default constructor, necessary for ROOT to stream the object.
@@ -63,141 +212,6 @@ namespace Belle2 {
     ~ECLChargedPIDMVAWeights() {};
 
 
-    enum class BDTResponseTransformMode : unsigned int {
-      /** log transform the bdt responses. And take the likelihood as the product of likelihoods from all bdt responses. */
-      c_LogTransform = 0,
-      /** log transform the bdt responses. Take the likelihood from only the bdt response for the hypothesis. Default. */
-      c_LogTransformSingle = 1,
-      /** Gaussian transform of the log transformed bdt response. */
-      c_GaussianTransform = 2,
-      /** Decorrelation transform of the gaussian transformed bdt responses. */
-      c_DecorrelationTransform = 3
-    };
-
-    /**
-     * Stores the bdt weightfile, pdfs, transforms, etc. for each phasespace region.
-     */
-    class PhasespaceCategory : public TObject {
-
-    public:
-      /**
-       * Default Constructor.
-       * @param weightfilePath path to the BDT weightfile for this phasespace category.
-       * @param bdtResponeTransformMode bdt response transform mode booked for this phasespace.
-       * @param pdfs vector of unordered_map mapping hypothesis to pdfs for each bdt response.
-       */
-      PhasespaceCategory(const std::string weightfilePath,
-                         const BDTResponseTransformMode bdtResponeTransformMode,
-                         const std::vector<std::unordered_map<unsigned int, TF1>> pdfs)
-      {
-        // Load and serialize the MVA::Weightfile object into a string for storage in the database,
-        // otherwise there are issues w/ dictionary generation for the payload class...
-        Belle2::MVA::Weightfile weightfile;
-        if (boost::ends_with(weightfilePath, ".root")) {
-          weightfile = Belle2::MVA::Weightfile::loadFromROOTFile(weightfilePath);
-        } else  if (boost::ends_with(weightfilePath, ".xml")) {
-          weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(weightfilePath);
-        } else {
-          B2WARNING("Unkown file extension for file: " << weightfilePath << ", fallback to xml...");
-          weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(weightfilePath);
-        }
-        std::stringstream ss;
-        Belle2::MVA::Weightfile::saveToStream(weightfile, ss);
-
-        // store
-        m_weight = ss.str();
-        m_bdtResponseTransformMode = bdtResponeTransformMode;
-        m_pdfs = pdfs;
-      }
-
-      /**
-       * Destructor.
-       */
-      ~PhasespaceCategory() {};
-
-      /**
-       * getter for serialised weightfile.
-       */
-      const std::string* getSerialisedWeight() const {return &m_weight;}
-
-      /**
-       * getter for pdfs.
-       * @param iBDTResponse index of BDT response.
-       * @param hypoPDG, hypothesis pdg.
-       */
-      const TF1* getPDF(const unsigned int iBDTResponse, const unsigned int hypoPDG) const
-      {
-        return &m_pdfs.at(iBDTResponse).at(hypoPDG);
-      }
-
-      /**
-       * gets the cdf for the hypothesis pdg for a given response value.
-       * @param iBDTResponse index of BDT response.
-       * @param hypoPDG, hypothesis pdg.
-       */
-      const TH1F* getCDF(const unsigned int iBDTResponse, const int hypoPDG) const
-      {
-        return &m_cdfs.at(iBDTResponse).at(hypoPDG);
-      }
-
-      /**
-       * gets the decorrelation matrix for a given particle hypothesis.
-       * @param hypoPDG, hypothesis pdg.
-       */
-      const std::vector<float>* getDecorrelationMatrix(const int hypoPDG) const
-      {
-        return &m_decorrelationMatrices.at(hypoPDG);
-      }
-
-
-      /**
-       * set the cdfs.
-       * @param vector of map of cdfs to be stored in the payload.
-       */
-      void setCDFs(std::vector<std::unordered_map<unsigned int, TH1F>> cdfs) {m_cdfs = cdfs;}
-
-      /**
-       * set the decorrelation matrices.
-       * @param decorrelationMatrices map of decorrelation matrices to be stored in the payload.
-       */
-      void setDecorrelationMatrixMap(std::unordered_map<unsigned int, std::vector<float>> decorrelationMatrices)
-      {
-        m_decorrelationMatrices = decorrelationMatrices;
-      }
-
-    private:
-
-      /**
-       * Serialsed BDT weightfile.
-       */
-      std::string m_weight;
-
-      /**
-       * Stores which transformation mode to apply to the bdt responses.
-       */
-      BDTResponseTransformMode m_bdtResponseTransformMode;
-
-
-      /**
-       * A vector of unodered maps. The vector corresponds to the N return values of the BDT.
-       * The unordered map maps the hypothesis pdg values to their matching TF1 pdfs from which the liklihood will be taken.
-       */
-      std::vector<std::unordered_map<unsigned int, TF1>> m_pdfs;
-
-
-      /**
-       * CDFs for each bdt return value for each hypothesis.
-       * The N vector elements correspond to the N BDT return values.
-       * The unordered map maps the hypothesis pdg values to their matching TH1F cdfs which can be used for a gaussianisation.
-       */
-      std::vector<std::unordered_map<unsigned int, TH1F>> m_cdfs;
-
-      /**
-       * Decorrelation matrices. To be used (optionally) afer gaussianisation.
-       * The unordered map maps the hypothesis pdg values to their matching linearised decorrelation matrix.
-       */
-      std::unordered_map<unsigned int, std::vector<float>> m_decorrelationMatrices;
-    };
 
     /**
      * Set the energy unit to ensure consistency w/ the one used to define the bins grid.
@@ -251,61 +265,30 @@ namespace Belle2 {
     }
 
     /**
-     * store the MVA weight files (one for each category) into the payload.
-     *
-     * @param filepaths a vector of xml (root) file paths for all (theta, p, charge) categories.
-     * @param transformations a vector of BDTResponseTransformMode for all (theta, p, charge) categories.
-     * @param pdfs a vector of vectors of unsigned maps with TF1 pdfs for all charged hypothesis
-              for all bdt response values for all (theta, p, charge) categories.
-     * @param cdfs an unordered map of vectors of unodered maps. The outer map corresponds to the phasespace region.
-              The vector to the N return values of the BDT. The inner unordered map maps the hypothesis pdg values
-              to their matching TH1F cdfs which can be used for a gaussianisation.
-     * @param decorrelationMatrices an unordered map of unodered maps. The outer map corresponds to the phasespace region.
-              The inner unordered map maps the hypothesis pdg values to their matching linearised matrix which can be used to
-              perform a decorrelation transformation on the gaussian transformed variables.
+     * store the ECLChargedPIDPhasespaceCategory objects into the payload.
+     * @param phasespaceCategories a vector of ECLChargedPIDPhasespaceCategory objects, one per phasespace region.
+              Each object contains all the data required to process tracks in that phasespace.
      */
-    void storeMVAWeights(std::vector<std::string>& filepaths,
-                         std::vector<BDTResponseTransformMode>& transformations,
-                         std::vector<std::vector<std::unordered_map<unsigned int, TF1>>>& pdfs,
-                         std::unordered_map<unsigned int, std::vector<std::unordered_map<unsigned int, TH1F>>>& cdfs,
-                         std::unordered_map<unsigned int, std::unordered_map<unsigned int, std::vector<float>>>& decorrelationMatrices
-                        )
+    void storeMVAWeights(std::vector<ECLChargedPIDPhasespaceCategory>& phasespaceCategories)
     {
-      for (unsigned int idx = 0; idx < filepaths.size(); idx++) {
-
-        Belle2::MVA::Weightfile weightfile;
-        if (boost::ends_with(filepaths[idx], ".root")) {
-          weightfile = Belle2::MVA::Weightfile::loadFromROOTFile(filepaths[idx]);
-        } else  if (boost::ends_with(filepaths[idx], ".xml")) {
-          weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(filepaths[idx]);
-        } else {
-          B2WARNING("Unkown file extension for file: " << filepaths[idx] << ", fallback to xml...");
-          weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(filepaths[idx]);
-        }
-
-        // Serialize the MVA::Weightfile object into a string for storage in the database,
-        // otherwise there are issues w/ dictionary generation for the payload class...
-        std::stringstream ss;
-        Belle2::MVA::Weightfile::saveToStream(weightfile, ss);
-        m_weights.push_back(ss.str());
-
-        m_bdtResponseTransformModes.push_back(transformations[idx]);
-        m_pdfs.push_back(pdfs[idx]);
-
-        // These are optional based on which transformation mode is used.
-        if (transformations[idx] == BDTResponseTransformMode::c_GaussianTransform) {
-          m_cdfs[idx] = cdfs[idx];
-        } else if (transformations[idx] == BDTResponseTransformMode::c_DecorrelationTransform) {
-          m_cdfs[idx] = cdfs[idx];
-          m_decorrelationMatrices[idx] = decorrelationMatrices[idx];
-        }
-      }
+      m_phasespaceCategories = phasespaceCategories;
     }
 
-    const std::vector<std::string>* getMVAWeightStrings() const
-    {
-      return &m_weights;
-    }
+    /**
+     * returns number of phasespace categories.
+     */
+    unsigned int nCategories() const {return m_phasespaceCategories.size();}
+
+    /**
+     * returns the ith ECLChargedPIDPhasespaceCategory.
+     * @param idx, index of ECLChargedPIDPhasespaceCategory.
+     */
+    const ECLChargedPIDPhasespaceCategory* getPhasespaceCategory(const unsigned int idx)  const {return &m_phasespaceCategories.at(idx);}
+
+    /**
+     * returns the vector of phasespaceCategories.
+     */
+    const std::vector<ECLChargedPIDPhasespaceCategory>* getPhasespaceCategories() const {return &m_phasespaceCategories;}
 
     /**
     * returns bool whether or not the given p, theta, charge values are within the phasespace covered by the trainings in the weightfile
@@ -365,80 +348,11 @@ namespace Belle2 {
     /**
      * get the log transform offset
     */
-    const float getLogTransformOffset() const
+    float getLogTransformOffset() const
     {
       return m_log_transform_offset.GetVal();
     }
 
-
-    /**
-    * gets the cdf for the hypothesis pdg for a given response value for a given phase space region.
-    */
-    const TH1F* getCDF(const int hypoPDG, const unsigned int iBDTResponse, const unsigned int linearBinIndex) const
-    {
-      return &m_cdfs.at(linearBinIndex).at(iBDTResponse).at(hypoPDG);
-    }
-
-    /**
-    * gets the cdf for the hypothesis pdg for a given response value for a given phase space region.
-    */
-    const TH1F* getCDF(const int hypoPDG, const unsigned int iBDTResponse, const float theta, const float p, const float charge) const
-    {
-      unsigned int linearBinIndex = getLinearisedBinIndex(theta, p, charge);
-      return getCDF(hypoPDG, iBDTResponse, linearBinIndex);
-    }
-
-
-    /**
-    * gets the pdf for the hypothesis pdg for a given response value for a given phase space region.
-    */
-    const TF1* getPDF(const int hypoPDG, const unsigned int iBDTResponse, const unsigned int linearBinIndex) const
-    {
-      return &m_pdfs.at(linearBinIndex).at(iBDTResponse).at(hypoPDG);
-    }
-
-    /**
-    * gets the pdf for the hypothesis pdg for a given response value for a given phase space region.
-    */
-    const TF1* getPDF(const int hypoPDG, const unsigned int iBDTResponse, const float theta, const float p, const float charge) const
-    {
-      unsigned int linearBinIndex = getLinearisedBinIndex(theta, p, charge);
-      return getPDF(hypoPDG, iBDTResponse, linearBinIndex);
-    }
-
-    /**
-    * gets the decorrelation matrix for a given response value for a given phase space region.
-    */
-    const std::vector<float>* getDecorrelationMatrix(const int hypoPDG, const unsigned int linearBinIndex) const
-    {
-      return &m_decorrelationMatrices.at(linearBinIndex).at(hypoPDG);
-    }
-
-    /**
-    * gets the decorrelation matrix for the hypothesis pdg for a given phase space region.
-    */
-    const std::vector<float>* getDecorrelationMatrix(const int hypoPDG, const float theta, const float p, const float charge)
-    {
-      unsigned int linearBinIndex = getLinearisedBinIndex(theta, p, charge);
-      return getDecorrelationMatrix(hypoPDG, linearBinIndex);
-    }
-
-    /**
-    * gets the transformations applied to the bdt output for a given phase space region.
-    */
-    const BDTResponseTransformMode* getTransformMode(const unsigned int linearBinIndex)  const
-    {
-      return &m_bdtResponseTransformModes.at(linearBinIndex);
-    }
-
-    /**
-    * gets the transformations applied to the bdt output for a given phase space region.
-    */
-    const BDTResponseTransformMode* getTransformMode(const float theta, const float p, const float charge)  const
-    {
-      unsigned int linearBinIndex = getLinearisedBinIndex(theta, p, charge);
-      return getTransformMode(linearBinIndex);
-    }
 
 
   private:
@@ -453,34 +367,9 @@ namespace Belle2 {
     TH3F* m_categories = nullptr;
 
     /**
-     * Stores the weightfiles for all the (theta, p, charge) categories.
+     * Stores the ECLChargedPIDPhasespaceCategory object for all the (theta, p, charge) categories.
      */
-    std::vector<std::string> m_weights;
-
-    /**
-     * Stores which transformation mode to apply to the bdt responses.
-     */
-    std::vector<BDTResponseTransformMode> m_bdtResponseTransformModes;
-
-
-    /**
-     * A vector of vectors of unodered maps. The outer vector corresponds to the phasespace region. The inner vector to the N return values of the BDT.
-     * The unordered map maps the hypothesis pdg values to their matching TF1 pdfs from which the liklihood will be taken.
-     */
-    std::vector < std::vector<std::unordered_map<unsigned int, TF1>>> m_pdfs;
-
-
-    /**
-     * An unordered map of vectors of unodered maps. The outer map corresponds to the phasespace region. The vector to the N return values of the BDT.
-     * The inner unordered map maps the hypothesis pdg values to their matching TH1F cdfs which can be used for a gaussianisation.
-     */
-    std::unordered_map < unsigned int, std::vector<std::unordered_map<unsigned int, TH1F>>> m_cdfs;
-
-    /**
-     * An unordered map of unodered maps. The outer map corresponds to the phasespace region.
-     * The inner unordered map maps the hypothesis pdg values to their matching linearised matrix which can be used to perform a decorrelation transformation on the gaussian transformed variables.
-     */
-    std::unordered_map < unsigned int, std::unordered_map<unsigned int, std::vector<float>>> m_decorrelationMatrices;
+    std::vector<ECLChargedPIDPhasespaceCategory> m_phasespaceCategories;
 
 
     /**< 1: first class implementation. */

@@ -72,26 +72,25 @@ void ECLChargedPIDMVAModule::initializeMVA()
   B2DEBUG(12, "Run: " << m_eventMetaData->getRun() <<
           ". Load supported MVA interfaces for multi-class charged particle identification...");
 
+  m_log_transform_offset = (*m_mvaWeights.get())->getLogTransformOffset();
+
   MVA::AbstractInterface::initSupportedInterfaces();
   auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
 
-  B2DEBUG(12, "\tLoading weightfiles from the payload class.");
+  auto nCategories = (*m_mvaWeights.get())->nCategories();
 
-  auto serialized_weightfiles = (*m_mvaWeights.get())->getMVAWeightStrings();
-  auto nfiles = serialized_weightfiles->size();
+  B2DEBUG(12, " number of categories booked: " << nCategories);
 
-  B2DEBUG(12, " number of weightfiles found: " << nfiles);
-
-  m_experts.resize(nfiles);
-  m_variables.resize(nfiles);
+  m_experts.resize(nCategories);
+  m_variables.resize(nCategories);
 
 
-  for (unsigned int idx(0); idx < nfiles; idx++) {
+  for (unsigned int idx(0); idx < nCategories; idx++) {
 
     B2DEBUG(12, "\t\tweightfile[" << idx << "]");
 
     // De-serialize the string into an MVA::Weightfile object.
-    std::stringstream ss(serialized_weightfiles->at(idx));
+    std::stringstream ss((*m_mvaWeights.get())->getPhasespaceCategory(idx)->getSerialisedWeight());
     auto weightfile = MVA::Weightfile::loadFromStream(ss);
 
     MVA::GeneralOptions general_options;
@@ -117,8 +116,6 @@ void ECLChargedPIDMVAModule::initializeMVA()
 
     m_datasets[idx] = std::make_unique<MVA::SingleDataset>(general_options, features, 1.0, spectators);
   }
-
-  m_log_transform_offset = (*m_mvaWeights.get())->getLogTransformOffset();
 }
 
 
@@ -151,8 +148,10 @@ void ECLChargedPIDMVAModule::event()
 
     //get the MVA region
     unsigned int linearBinIndex = (*m_mvaWeights.get())->getLinearisedBinIndex(showerTheta, p, charge);
-
     unsigned int nvars = m_variables.at(linearBinIndex).size();
+
+    // get the phasespaceCategory
+    const auto phasespaceCategory = (*m_mvaWeights.get())->getPhasespaceCategory(linearBinIndex);
 
     // fill the feature vectors
     for (unsigned int ivar(0); ivar < nvars; ++ivar) {
@@ -198,21 +197,19 @@ void ECLChargedPIDMVAModule::event()
       transformed_scores = scores;
 
       // perform extra transformations if they are booked
-      if ((*(*m_mvaWeights.get())->getTransformMode(linearBinIndex) ==
-           ECLChargedPIDMVAWeights::BDTResponseTransformMode::c_GaussianTransform)
+      if ((phasespaceCategory->getTransformMode() ==
+           ECLChargedPIDPhasespaceCategory::BDTResponseTransformMode::c_GaussianTransform)
           or
-          (*(*m_mvaWeights.get())->getTransformMode(linearBinIndex) ==
-           ECLChargedPIDMVAWeights::BDTResponseTransformMode::c_DecorrelationTransform)) {
+          (phasespaceCategory->getTransformMode() ==
+           ECLChargedPIDPhasespaceCategory::BDTResponseTransformMode::c_DecorrelationTransform)) {
 
         // gaussian transform
         for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
-          transformed_scores[iResponse] = gaussTransformation(scores[iResponse], (*m_mvaWeights.get())->getCDF(absPdgId,  iResponse,
-                                                              linearBinIndex));
+          transformed_scores[iResponse] = gaussTransformation(scores[iResponse], phasespaceCategory->getCDF(absPdgId,  iResponse));
         }
-        if (*(*m_mvaWeights.get())->getTransformMode(linearBinIndex) ==
-            ECLChargedPIDMVAWeights::BDTResponseTransformMode::c_DecorrelationTransform) {
-          transformed_scores = decorrTransformation(transformed_scores, (*m_mvaWeights.get())->getDecorrelationMatrix(absPdgId,
-                                                    linearBinIndex));
+        if (phasespaceCategory->getTransformMode() ==
+            ECLChargedPIDPhasespaceCategory::BDTResponseTransformMode::c_DecorrelationTransform) {
+          transformed_scores = decorrTransformation(transformed_scores, phasespaceCategory->getDecorrelationMatrix(absPdgId));
         }
       }
 
@@ -220,17 +217,17 @@ void ECLChargedPIDMVAModule::event()
       float logL = 0.0;
       for (unsigned int iResponse = 0; iResponse < transformed_scores.size(); iResponse++) {
 
-        if ((*(*m_mvaWeights.get())->getTransformMode(linearBinIndex) ==
-             ECLChargedPIDMVAWeights::BDTResponseTransformMode::c_LogTransformSingle) and (hypo_idx != iResponse)) {continue;}
+        if ((phasespaceCategory->getTransformMode() ==
+             ECLChargedPIDPhasespaceCategory::BDTResponseTransformMode::c_LogTransformSingle) and (hypo_idx != iResponse)) {continue;}
 
         double xmin, xmax;
-        (*m_mvaWeights.get())->getPDF(absPdgId, iResponse, linearBinIndex)->GetRange(xmin, xmax);
+        phasespaceCategory->getPDF(absPdgId, iResponse)->GetRange(xmin, xmax);
         // kick the response back into the range of the PDF (alternatively consider logL = std::numeric_limits<float>::min() if outside range)
         float transformed_score_copy = transformed_scores[iResponse];
         if (transformed_score_copy < xmin) transformed_score_copy = xmin + 1e-5;
         if (transformed_score_copy > xmax) transformed_score_copy = xmax - 1e-5;
 
-        float pdfval = (*m_mvaWeights.get())->getPDF(absPdgId, iResponse, linearBinIndex)->Eval(transformed_score_copy);
+        float pdfval = phasespaceCategory->getPDF(absPdgId, iResponse)->Eval(transformed_score_copy);
         // dont take a log of inf or 0
         pdfval = std::max(pdfval, std::numeric_limits<float>::min());
         logL += (std::isnormal(pdfval) && pdfval > 0) ? std::log(pdfval) : c_dummyLogL;

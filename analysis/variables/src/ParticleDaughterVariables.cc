@@ -157,12 +157,13 @@ namespace Belle2 {
 
     VARIABLE_GROUP("DirectDaughterInfo");
     REGISTER_VARIABLE("hasCharmedDaughter(i)", hasCharmedDaughter,
-                      "The variable determines whether the particle's MC partner, which has to be a B-meson, has at least one daughter with a charm or anti-charm quark.\n"
-                      "Returns 1 if the process is a b -> anti-c / anti-b -> c transition and -1 if the process is a b -> c / anti-b -> anti-c transition.\n"
-                      "Returns 0 if the particle's MC partner does not have any charm or anti-charm quark.")
+                      "Returns 1 if at least one of the daughters on MC truth level is a charm meson. The particle's MC partner must be a B-meson.\n"
+                      "Returns 0 if no charmed daughter found on MC truth level and NaN if no MC partner was found or the related MC particle isn't a B-meson.");
     REGISTER_VARIABLE("hasCharmoniumDaughter", hasCharmoniumDaughter,
-                      "Returns 1 if on MC truth level a b -> c anti-c q transition was generated, otherwise returns 0. The particle's MC partner must be a B-meson.\n");
+                      "Returns 1 if at least one of the daughters on MC truth level is a ccbar resonance. The particle's MC partner must be a B-meson.\n"
+                      "Returns 0 if no ccbar resonance found on MC truth level and NaN if no MC partner was found or the related MC particle isn't a B-meson.");
     REGISTER_VARIABLE("hasRealPhotonDaughter", hasRealPhotonDaughter,
-                      "Returns 1 if on MC truth level there is at least one real photon daughter, a photon that was not created by photos, otherwise returns 0.");
+                      "Returns 1 if on MC truth level there is at least one real photon daughter, a photon that was not created by photos.\n"
+                      "Returns 0 if no real photon daughter found and NaN if the particle has no daughters.");
   }
 }

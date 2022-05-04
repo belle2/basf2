@@ -105,6 +105,16 @@ namespace Belle2 {
       return mcps.getEntries();
     }
 
+    int nPrimaryMCParticles(const Particle*)
+    {
+      int n = 0;
+      StoreArray<MCParticle> mcps;
+      for (const auto& mcp : mcps)
+        if (mcp.isPrimaryParticle())
+          n++;
+      return n;
+    }
+
     int nTracks(const Particle*)
     {
       StoreArray<Track> tracks;
@@ -767,20 +777,20 @@ namespace Belle2 {
 [Eventbased] Returns number of track fits with zero charge.
 
 .. note::
-  Sometimes, track fits can have zero charge, if background or non IP originating tracks, for example, are fit from the IP. 
+  Sometimes, track fits can have zero charge, if background or non IP originating tracks, for example, are fit from the IP.
   These tracks are excluded from particle lists, but a large amount of charge zero
   fits may indicate problems with whole event constraints
   or abnominally high beam backgrounds and/or noisy events.
 )DOC");
 
     REGISTER_VARIABLE("belleECLEnergy", belleECLEnergy, R"DOC(
-[Eventbased][Legacy] Returns total energy in ECL in the event as used in Belle 1 analyses. 
+[Eventbased][Legacy] Returns total energy in ECL in the event as used in Belle 1 analyses.
 
 .. warning::
 
-  For Belle II use cases use either ``totalEnergyOfParticlesInList(gamma:all)``, 
+  For Belle II use cases use either ``totalEnergyOfParticlesInList(gamma:all)``,
   or (probably better) fill a photon list with some minimal cleanup cuts and use that instea
-  
+
   .. code-block:: python
 
     from variables import variables as vm
@@ -794,13 +804,15 @@ namespace Belle2 {
                       "[Eventbased] Returns number of KLM clusters in the event.");
     REGISTER_VARIABLE("nMCParticles", nMCParticles,
                       "[Eventbased] Returns number of MCParticles in the event.");
+    REGISTER_VARIABLE("nPrimaryMCParticles", nPrimaryMCParticles,
+                      "[Eventbased] Returns number of primary MCParticles in the event.");
 
     REGISTER_VARIABLE("expNum", expNum, "[Eventbased] Returns the experiment number.");
     REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] Returns the event number.");
     REGISTER_VARIABLE("runNum", runNum, "[Eventbased] Returns the run number.");
     REGISTER_VARIABLE("productionIdentifier", productionIdentifier, R"DOC(
 [Eventbased] Production identifier.
-Uniquely identifies an MC sample by the (grid-jargon) production ID. 
+Uniquely identifies an MC sample by the (grid-jargon) production ID.
 This is useful when analysing large MC samples split between more than one production or combining different MC samples (e.g. combining all continuum samples).
 In such cases the event numbers are sequential *only within a production*, so experiment/run/event will restart with every new sample analysed.
 
@@ -968,7 +980,7 @@ Returns NaN for data.
 
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0, R"DOC(
-[Eventbased][Calibration] The Event t0, is the time of the event relative to the trigger time. 
+[Eventbased][Calibration] The Event t0, is the time of the event relative to the trigger time.
 
 .. note::
   The event time can be measured by several sub-detectors including the CDC, ECL, and TOP.

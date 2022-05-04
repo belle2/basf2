@@ -59,6 +59,7 @@ namespace Belle2 {
     */
     ECLChargedPIDPhasespaceCategory()
     {};
+
     /**
     * Useful constructor.
     * @param weightfilePath path to the BDT weightfile for this phasespace category.
@@ -115,6 +116,65 @@ namespace Belle2 {
     }
 
     /**
+    =======
+
+    /**
+    * Useful constructor.
+    * @param weightfilePath path to the BDT weightfile for this phasespace category.
+    * @param bdtResponeTransformMode bdt response transform mode booked for this phasespace.
+    * @param pdfs vector of unordered_map mapping hypothesis to pdfs for each bdt response.
+    */
+    ECLChargedPIDPhasespaceCategory(const std::string& weightfilePath,
+                                    const BDTResponseTransformMode& bdtResponeTransformMode,
+                                    const std::vector<std::unordered_map<unsigned int, TF1>>& pdfs)
+    {
+      // Load and serialize the MVA::Weightfile object into a string for storage in the database,
+      // otherwise there are issues w/ dictionary generation for the payload class...
+      Belle2::MVA::Weightfile weightfile;
+      if (boost::ends_with(weightfilePath, ".root")) {
+        weightfile = Belle2::MVA::Weightfile::loadFromROOTFile(weightfilePath);
+      } else  if (boost::ends_with(weightfilePath, ".xml")) {
+        weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(weightfilePath);
+      } else {
+        B2WARNING("Unkown file extension for file: " << weightfilePath << ", fallback to xml...");
+        weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(weightfilePath);
+      }
+      std::stringstream ss;
+      Belle2::MVA::Weightfile::saveToStream(weightfile, ss);
+
+      // store
+      m_weight = ss.str();
+      m_bdtResponseTransformMode = bdtResponeTransformMode;
+      m_pdfs = pdfs;
+    }
+
+    /**
+     * Destructor.
+     */
+    ~ECLChargedPIDPhasespaceCategory() {};
+
+    /**
+     * getter for serialised weightfile.
+     */
+    const std::string getSerialisedWeight() const {return m_weight;}
+
+    /**
+     * getter for the BDT transform mode.
+     */
+    BDTResponseTransformMode getTransformMode() const {return m_bdtResponseTransformMode;}
+
+    /**
+     * getter for pdfs.
+     * @param iBDTResponse index of BDT response.
+     * @param hypoPDG, hypothesis pdg.
+     */
+    const TF1* getPDF(const unsigned int iBDTResponse, const unsigned int hypoPDG) const
+    {
+      return &m_pdfs.at(iBDTResponse).at(hypoPDG);
+    }
+
+    /**
+    >>>>>>> Stashed changes
      * gets the cdf for the hypothesis pdg for a given response value.
      * @param iBDTResponse index of BDT response.
      * @param hypoPDG, hypothesis pdg.

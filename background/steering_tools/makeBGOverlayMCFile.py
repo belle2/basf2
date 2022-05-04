@@ -62,6 +62,7 @@ if len(argvs) > 3 and argvs[3] == 'gated':
 # background files
 if 'BELLE2_BACKGROUND_MIXING_DIR' not in os.environ:
     B2ERROR('BELLE2_BACKGROUND_MIXING_DIR variable is not set - it must contain the path to BG samples')
+    B2INFO('on KEKCC: /sw/belle2/bkg.mixing')
     sys.exit()
 
 bg = glob.glob(os.environ['BELLE2_BACKGROUND_MIXING_DIR'] + '/*.root')
@@ -70,9 +71,18 @@ if len(bg) == 0:
     B2ERROR('No root files found in folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
     sys.exit()
 
-# SVDOverlayDir must become an environmental variable, this is temporary solution:
-SVDOverlayDir = "/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/randomTRG"
+# extra files for adding SVD pick-up noise
+if 'BELLE2_BACKGROUND_MIXING_EXTRA_DIRS' not in os.environ:
+    B2ERROR('BELLE2_BACKGROUND_MIXING_EXTRA_DIRS variable is not set - it must contain the path to extra samples')
+    B2INFO('on KEKCC: /sw/belle2/bkg.mixing_extra')
+    sys.exit()
+
+SVDOverlayDir = os.environ['BELLE2_BACKGROUND_MIXING_EXTRA_DIRS'] + '/SVD'
 SVDOverlayFiles = glob.glob(SVDOverlayDir + '/*_overlay.root')
+
+if len(SVDOverlayFiles) == 0:
+    B2ERROR('No root files found in folder ' + SVDOverlayDir)
+    sys.exit()
 
 B2INFO('Making BG overlay sample for ' + argvs[1] + ' with ECL compression = ' +
        str(compression) + ' and PXD in ' + mode + ' mode')

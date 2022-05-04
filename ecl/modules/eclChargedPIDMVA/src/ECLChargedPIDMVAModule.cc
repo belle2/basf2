@@ -32,7 +32,6 @@
 #include <limits>
 #include <string>
 
-
 #include <ecl/modules/eclChargedPIDMVA/ECLChargedPIDMVAModule.h>
 
 using namespace Belle2;
@@ -107,7 +106,8 @@ void ECLChargedPIDMVAModule::initializeMVA()
     // Load the variable objects
     Variable::Manager& manager = Variable::Manager::Instance();
 
-    // why doesnt this work?
+    // get the full version of the variable names.
+    // These are stored in the xml as an additional vector.
     const std::string identifier = std::string("de_aliased_clf_vars");
     auto clf_vars = weightfile.getVector<std::string>(identifier);
     m_variables[idx] = manager.getVariables(clf_vars);

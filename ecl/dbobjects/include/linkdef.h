@@ -22,6 +22,7 @@
 #pragma link C++ class Belle2::ECLChargedPidPDFs::VarTransfoSettings+; // checksum=0x1a8bc0c9, implicit, version=-1
 #pragma link C++ class Belle2::ECLChargedPIDMVAWeights+; // checksum=0xe7ece1d2, version=1
 #pragma link C++ enum Belle2::ECLChargedPIDMVAWeights::BDTResponseTransformMode+; //implicit
+#pragma link C++ class Belle2::ECLChargedPIDMVAWeights::PhasespaceCategory+; // checksum=0x8c3c3de1, implicit, version=1
 #pragma link C++ class Belle2::PackedAutoCovariance; // checksum=0xb1a29561, implicit, version=1
 #pragma link C++ class Belle2::ECLAutoCovariance; // checksum=0x1f75052d, version=1
 #pragma link C++ class Belle2::ECLTrackClusterMatchingThresholds; // checksum=0xdc6f9453, version=1

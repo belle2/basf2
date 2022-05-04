@@ -74,6 +74,130 @@ namespace Belle2 {
       c_DecorrelationTransform = 3
     };
 
+    /**
+     * Stores the bdt weightfile, pdfs, transforms, etc. for each phasespace region.
+     */
+    class PhasespaceCategory : public TObject {
+
+    public:
+      /**
+       * Default Constructor.
+       * @param weightfilePath path to the BDT weightfile for this phasespace category.
+       * @param bdtResponeTransformMode bdt response transform mode booked for this phasespace.
+       * @param pdfs vector of unordered_map mapping hypothesis to pdfs for each bdt response.
+       */
+      PhasespaceCategory(const std::string weightfilePath,
+                         const BDTResponseTransformMode bdtResponeTransformMode,
+                         const std::vector<std::unordered_map<unsigned int, TF1>> pdfs)
+      {
+        // Load and serialize the MVA::Weightfile object into a string for storage in the database,
+        // otherwise there are issues w/ dictionary generation for the payload class...
+        Belle2::MVA::Weightfile weightfile;
+        if (boost::ends_with(weightfilePath, ".root")) {
+          weightfile = Belle2::MVA::Weightfile::loadFromROOTFile(weightfilePath);
+        } else  if (boost::ends_with(weightfilePath, ".xml")) {
+          weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(weightfilePath);
+        } else {
+          B2WARNING("Unkown file extension for file: " << weightfilePath << ", fallback to xml...");
+          weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(weightfilePath);
+        }
+        std::stringstream ss;
+        Belle2::MVA::Weightfile::saveToStream(weightfile, ss);
+
+        // store
+        m_weight = ss.str();
+        m_bdtResponseTransformMode = bdtResponeTransformMode;
+        m_pdfs = pdfs;
+      }
+
+      /**
+       * Destructor.
+       */
+      ~PhasespaceCategory() {};
+
+      /**
+       * getter for serialised weightfile.
+       */
+      const std::string* getSerialisedWeight() const {return &m_weight;}
+
+      /**
+       * getter for pdfs.
+       * @param iBDTResponse index of BDT response.
+       * @param hypoPDG, hypothesis pdg.
+       */
+      const TF1* getPDF(const unsigned int iBDTResponse, const unsigned int hypoPDG) const
+      {
+        return &m_pdfs.at(iBDTResponse).at(hypoPDG);
+      }
+
+      /**
+       * gets the cdf for the hypothesis pdg for a given response value.
+       * @param iBDTResponse index of BDT response.
+       * @param hypoPDG, hypothesis pdg.
+       */
+      const TH1F* getCDF(const unsigned int iBDTResponse, const int hypoPDG) const
+      {
+        return &m_cdfs.at(iBDTResponse).at(hypoPDG);
+      }
+
+      /**
+       * gets the decorrelation matrix for a given particle hypothesis.
+       * @param hypoPDG, hypothesis pdg.
+       */
+      const std::vector<float>* getDecorrelationMatrix(const int hypoPDG) const
+      {
+        return &m_decorrelationMatrices.at(hypoPDG);
+      }
+
+
+      /**
+       * set the cdfs.
+       * @param vector of map of cdfs to be stored in the payload.
+       */
+      void setCDFs(std::vector<std::unordered_map<unsigned int, TH1F>> cdfs) {m_cdfs = cdfs;}
+
+      /**
+       * set the decorrelation matrices.
+       * @param decorrelationMatrices map of decorrelation matrices to be stored in the payload.
+       */
+      void setDecorrelationMatrixMap(std::unordered_map<unsigned int, std::vector<float>> decorrelationMatrices)
+      {
+        m_decorrelationMatrices = decorrelationMatrices;
+      }
+
+    private:
+
+      /**
+       * Serialsed BDT weightfile.
+       */
+      std::string m_weight;
+
+      /**
+       * Stores which transformation mode to apply to the bdt responses.
+       */
+      BDTResponseTransformMode m_bdtResponseTransformMode;
+
+
+      /**
+       * A vector of unodered maps. The vector corresponds to the N return values of the BDT.
+       * The unordered map maps the hypothesis pdg values to their matching TF1 pdfs from which the liklihood will be taken.
+       */
+      std::vector<std::unordered_map<unsigned int, TF1>> m_pdfs;
+
+
+      /**
+       * CDFs for each bdt return value for each hypothesis.
+       * The N vector elements correspond to the N BDT return values.
+       * The unordered map maps the hypothesis pdg values to their matching TH1F cdfs which can be used for a gaussianisation.
+       */
+      std::vector<std::unordered_map<unsigned int, TH1F>> m_cdfs;
+
+      /**
+       * Decorrelation matrices. To be used (optionally) afer gaussianisation.
+       * The unordered map maps the hypothesis pdg values to their matching linearised decorrelation matrix.
+       */
+      std::unordered_map<unsigned int, std::vector<float>> m_decorrelationMatrices;
+    };
 
     /**
      * Set the energy unit to ensure consistency w/ the one used to define the bins grid.
@@ -144,7 +268,7 @@ namespace Belle2 {
                          std::vector<BDTResponseTransformMode>& transformations,
                          std::vector<std::vector<std::unordered_map<unsigned int, TF1>>>& pdfs,
                          std::unordered_map<unsigned int, std::vector<std::unordered_map<unsigned int, TH1F>>>& cdfs,
-                         std::unordered_map<unsigned int, std::unordered_map<unsigned int, std::vector<float>>>& decorrelationMatrices,
+                         std::unordered_map<unsigned int, std::unordered_map<unsigned int, std::vector<float>>>& decorrelationMatrices
                         )
     {
       for (unsigned int idx = 0; idx < filepaths.size(); idx++) {
@@ -165,7 +289,6 @@ namespace Belle2 {
         Belle2::MVA::Weightfile::saveToStream(weightfile, ss);
         m_weights.push_back(ss.str());
 
-//         m_variables.push_back(variables[idx]);
         m_bdtResponseTransformModes.push_back(transformations[idx]);
         m_pdfs.push_back(pdfs[idx]);
 

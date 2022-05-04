@@ -64,9 +64,9 @@ namespace Belle2 {
 
 
     enum class BDTResponseTransformMode : unsigned int {
-      /** log transform the bdt responses. Default mode */
+      /** log transform the bdt responses. And take the likelihood as the product of likelihoods from all bdt responses. */
       c_LogTransform = 0,
-      /** log transform the bdt responses. Take the likelihood from only the bdt response for the hypothesis */
+      /** log transform the bdt responses. Take the likelihood from only the bdt response for the hypothesis. Default. */
       c_LogTransformSingle = 1,
       /** Gaussian transform of the log transformed bdt response. */
       c_GaussianTransform = 2,
@@ -130,33 +130,24 @@ namespace Belle2 {
      * store the MVA weight files (one for each category) into the payload.
      *
      * @param filepaths a vector of xml (root) file paths for all (theta, p, charge) categories.
-     * @param variables a vector of vectors filled with std strings. For each index gives the list of classifier variables.
-              Note that these should be stored in the full version without aliasing! Otherwise the aliases will need to be defined
-              to match during runtime.
      * @param transformations a vector of BDTResponseTransformMode for all (theta, p, charge) categories.
      * @param pdfs a vector of vectors of unsigned maps with TF1 pdfs for all charged hypothesis
               for all bdt response values for all (theta, p, charge) categories.
-     * @param cdfs a vector of vectors of unsigned maps with TH1F histograms for all charged hypothesis
-              for all bdt response values for all (theta, p, charge) categories.
-     * @param decorrelationMatrices a vector of unsigned maps with TMatrix for all charged hypothesis
-              for all (theta, p, charge) categories.
-     * @param categoryBinCentres a vector of tuple<float, float, float> representing the (theta, p, charge) bin centres.
-     *        Used to check consistency of the xml vector indexing w/ the linearised TH3 category map.
+     * @param cdfs an unordered map of vectors of unodered maps. The outer map corresponds to the phasespace region.
+              The vector to the N return values of the BDT. The inner unordered map maps the hypothesis pdg values
+              to their matching TH1F cdfs which can be used for a gaussianisation.
+     * @param decorrelationMatrices an unordered map of unodered maps. The outer map corresponds to the phasespace region.
+              The inner unordered map maps the hypothesis pdg values to their matching linearised matrix which can be used to
+              perform a decorrelation transformation on the gaussian transformed variables.
      */
     void storeMVAWeights(std::vector<std::string>& filepaths,
-                         std::vector<std::vector<std::string>>& variables,
                          std::vector<BDTResponseTransformMode>& transformations,
                          std::vector<std::vector<std::unordered_map<unsigned int, TF1>>>& pdfs,
                          std::unordered_map<unsigned int, std::vector<std::unordered_map<unsigned int, TH1F>>>& cdfs,
                          std::unordered_map<unsigned int, std::unordered_map<unsigned int, std::vector<float>>>& decorrelationMatrices,
-                         std::vector<std::tuple<double, double, double>>& categoryBinCentres)
+                        )
     {
       for (unsigned int idx = 0; idx < filepaths.size(); idx++) {
-        // loose check for consistency
-        auto bin_centers = categoryBinCentres.at(idx);
-        auto t_center = std::get<0>(bin_centers);
-        auto p_center = std::get<1>(bin_centers);
-        auto c_center = std::get<2>(bin_centers);
 
         Belle2::MVA::Weightfile weightfile;
         if (boost::ends_with(filepaths[idx], ".root")) {
@@ -174,7 +165,7 @@ namespace Belle2 {
         Belle2::MVA::Weightfile::saveToStream(weightfile, ss);
         m_weights.push_back(ss.str());
 
-        m_variables.push_back(variables[idx]);
+//         m_variables.push_back(variables[idx]);
         m_bdtResponseTransformModes.push_back(transformations[idx]);
         m_pdfs.push_back(pdfs[idx]);
 
@@ -309,11 +300,17 @@ namespace Belle2 {
       return getDecorrelationMatrix(hypoPDG, linearBinIndex);
     }
 
+    /**
+    * gets the transformations applied to the bdt output for a given phase space region.
+    */
     const BDTResponseTransformMode* getTransformMode(const unsigned int linearBinIndex)  const
     {
       return &m_bdtResponseTransformModes.at(linearBinIndex);
     }
 
+    /**
+    * gets the transformations applied to the bdt output for a given phase space region.
+    */
     const BDTResponseTransformMode* getTransformMode(const float theta, const float p, const float charge)  const
     {
       unsigned int linearBinIndex = getLinearisedBinIndex(theta, p, charge);
@@ -338,19 +335,10 @@ namespace Belle2 {
     std::vector<std::string> m_weights;
 
     /**
-     * Stores the classifier variables for all the (theta, p, charge) categories.
-     */
-    std::vector<std::vector<std::string>> m_variables;
-
-    /**
      * Stores which transformation mode to apply to the bdt responses.
      */
     std::vector<BDTResponseTransformMode> m_bdtResponseTransformModes;
 
-    /**
-     * Stores whether 5 (no deuteron) or 6 BDT response are expected for the particular bin;
-     */
-    std::vector<bool> m_separate_deuteron_response;
 
     /**
      * A vector of vectors of unodered maps. The outer vector corresponds to the phasespace region. The inner vector to the N return values of the BDT.
@@ -367,7 +355,7 @@ namespace Belle2 {
 
     /**
      * An unordered map of unodered maps. The outer map corresponds to the phasespace region.
-     * The inner unordered map maps the hypothesis pdg values to their matching matrix which can be used to perform a decorrelation transformation on the gaussian transformed variables.
+     * The inner unordered map maps the hypothesis pdg values to their matching linearised matrix which can be used to perform a decorrelation transformation on the gaussian transformed variables.
      */
     std::unordered_map < unsigned int, std::unordered_map<unsigned int, std::vector<float>>> m_decorrelationMatrices;
 

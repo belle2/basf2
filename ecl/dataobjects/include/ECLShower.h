@@ -79,7 +79,7 @@ namespace Belle2 {
       m_trkDepth(0.0),                         /**< Path on track extrapolation to POCA to average cluster direction   */
       m_showerDepth(0.0),                      /**< Same as above, but on the cluster average direction */
       m_numberOfCrystals(0.0),                 /**< Sum of weights of crystals (~number of crystals) */
-      m_absZernikeMoments{ -999.0},            /**< Shower shape variables, absolute values of Zernike Moments 00 to 66 */
+      m_absZernikeMoments{ -999.0},            /**< Shower shape variables, absolute values of Zernike Moments 10 to 66 */
       m_zernikeMVA(0.0),                       /**< Shower shape variable, Zernike MVA output */
       m_secondMoment(0.0),                     /**< Shower shape variable, second moment (needed for merged pi0) */
       m_E1oE9(0.0),                            /**< Shower shape variable, E1oE9 */
@@ -402,7 +402,7 @@ namespace Belle2 {
      */
     std::vector<unsigned int>& getListOfCrystalsForEnergy()  { return m_listOfCrystalsForEnergy; }
 
-    /*! Get list of indexes of related ECLCalDigit objects sorted by online energy with flag for PSD useability for charged PID.
+    /*! Get list of indexes of related ECLCalDigit objects sorted by calibrated energy with flag for PSD useability for charged PID.
      *  @return m_listOfCrystalEnergyRankAndQuality
      */
     std::vector<std::pair<unsigned int, bool>> getListOfCrystalEnergyRankAndQuality()
@@ -410,10 +410,10 @@ namespace Belle2 {
       // only fill this ranking upon first request
       if (m_listOfCrystalEnergyRankAndQuality.empty()) {
 
-        std::vector<std::tuple<double, unsigned int, bool>> EnergyToSort;
+        std::vector<std::tuple<double, unsigned int, bool>> energyToSort;
         RelationVector<ECLCalDigit> relatedDigits = this->getRelationsTo<ECLCalDigit>();
 
-        //EnergyToSort vector is used for sorting digits by online energy
+        //energyToSort vector is used for sorting digits by calibrated energy
         for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
 
           const auto caldigit = relatedDigits.object(iRel);
@@ -431,16 +431,15 @@ namespace Belle2 {
           //exclude digits with diode-crossing fits
           if (digitFitType1 == ECLDsp::photonDiodeCrossing)  goodFit = false;
 
-          // use getTwoComponentTotalEnergy instead?
-          EnergyToSort.emplace_back(caldigit->getEnergy(), iRel, goodFit);
+          energyToSort.emplace_back(caldigit->getEnergy(), iRel, goodFit);
         }
 
         // sort the vector
-        std::sort(EnergyToSort.begin(), EnergyToSort.end(), std::greater<>());
+        std::sort(energyToSort.begin(), energyToSort.end(), std::greater<>());
 
-        for (unsigned int iSorted = 0; iSorted < EnergyToSort.size(); iSorted++) {
-          m_listOfCrystalEnergyRankAndQuality.push_back(std::make_pair(std::get<1>(EnergyToSort[iSorted]),
-                                                        std::get<2>(EnergyToSort[iSorted])));
+        for (unsigned int iSorted = 0; iSorted < energyToSort.size(); iSorted++) {
+          m_listOfCrystalEnergyRankAndQuality.push_back(std::make_pair(std::get<1>(energyToSort[iSorted]),
+                                                        std::get<2>(energyToSort[iSorted])));
         }
 
       }
@@ -581,7 +580,7 @@ namespace Belle2 {
     // 13: made enums strongly typed
     // 14: added m_numberOfCrystalsForEnergy of crystals for energy determination
     // 15: added m_listOfCrystalsForEnergy, m_nominalNumberOfCrystalsForEnergy
-    // 16: removed m_absZernike40 and 51, added m_absZernikeMoments, m_crystalEnergyRankAndQuality (MH)
+    // 16: removed m_absZernike40 and 51, added m_absZernikeMoments, m_listOfCrystalEnergyRankAndQuality (MH)
     ClassDef(ECLShower, 16);/**< ClassDef */
 
   };

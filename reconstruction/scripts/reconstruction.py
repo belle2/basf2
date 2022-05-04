@@ -63,8 +63,7 @@ DIGITS_OBJECTS = (
     'PXDDigits',
     'SVDEventInfoSim',
     'SVDShaperDigits',
-    'TOPDigits',
-    'TOPRawDigits',
+    'TOPDigits'
 )
 
 

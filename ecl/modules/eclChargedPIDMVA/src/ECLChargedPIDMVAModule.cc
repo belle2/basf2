@@ -30,6 +30,7 @@
 #include <mva/methods/TMVA.h>
 #include <mdst/dataobjects/Track.h>
 #include <limits>
+#include <string>
 
 
 #include <ecl/modules/eclChargedPIDMVA/ECLChargedPIDMVAModule.h>
@@ -41,7 +42,7 @@ REG_MODULE(ECLChargedPIDMVA)
 
 ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module()
 {
-  setDescription("The module implements charged particle identification using ECL-related observables via a multiclass BDT. For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the BDT which is stored in a conditions database payload. The BDT output variables are then used to construct a liklihood from pdfs also stored in the payload. The liklihood is then stored in the ECLPidLikelihood object.");
+  setDescription("The module implements charged particle identification using ECL-related observables via a multiclass BDT. For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the BDT which is stored in a conditions database payload. The BDT output variables are then used to construct a likelihood from pdfs also stored in the payload. The likelihood is then stored in the ECLPidLikelihood object.");
 
   addParam("payloadName",
            m_payload_name,
@@ -105,7 +106,11 @@ void ECLChargedPIDMVAModule::initializeMVA()
 
     // Load the variable objects
     Variable::Manager& manager = Variable::Manager::Instance();
-    m_variables[idx] = manager.getVariables(general_options.m_variables);
+
+    // why doesnt this work?
+    const std::string identifier = std::string("de_aliased_clf_vars");
+    auto clf_vars = weightfile.getVector<std::string>(identifier);
+    m_variables[idx] = manager.getVariables(clf_vars);
 
     std::vector<float> features(general_options.m_variables.size(), 0.0);
     std::vector<float> spectators;

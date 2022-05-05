@@ -28,11 +28,16 @@
 
 #include <mva/interface/Interface.h>
 #include <mva/methods/TMVA.h>
+
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
+
 #include <limits>
 #include <string>
 
 #include <ecl/modules/eclChargedPIDMVA/ECLChargedPIDMVAModule.h>
+
+#include <iostream>
 
 using namespace Belle2;
 using namespace ECL;
@@ -83,6 +88,7 @@ void ECLChargedPIDMVAModule::initializeMVA()
 
   m_experts.resize(nCategories);
   m_variables.resize(nCategories);
+  m_datasets.resize(nCategories);
 
 
   for (unsigned int idx(0); idx < nCategories; idx++) {
@@ -90,6 +96,10 @@ void ECLChargedPIDMVAModule::initializeMVA()
     B2DEBUG(12, "\t\tweightfile[" << idx << "]");
 
     // De-serialize the string into an MVA::Weightfile object.
+    //breaks on this line??? Why?
+    (*m_mvaWeights.get())->getPhasespaceCategory(idx);
+    (*m_mvaWeights.get())->getPhasespaceCategory(idx)->getSerialisedWeight();
+
     std::stringstream ss((*m_mvaWeights.get())->getPhasespaceCategory(idx)->getSerialisedWeight());
     auto weightfile = MVA::Weightfile::loadFromStream(ss);
 
@@ -135,16 +145,26 @@ void ECLChargedPIDMVAModule::event()
     const TrackFitResult* fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
     if (fitRes == nullptr) continue;
 
-    // we require a track to have at least one shower matched to it.
-    const auto relShowers = track.getRelationsTo<ECLShower>();
-    if (relShowers.size() == 0) continue;
+    // if a track omega value is very small trackFitResult
+    // might return a charge of 0. The particle is then not
+    // able to be assigned a pdg code.
+    // Skip such tracks.
+    const int charge = fitRes->getChargeSign();
+    if (charge == 0) continue;
 
     // create a particle object so that we can use the variable manager.
-    const Particle particle = Particle(&track, Const::ChargedStable(211));
+    const Particle particle = Particle(&track, Const::pion);
+
+    // require a matched cluster for the particle.
+    // this internally requires a shower with a photon hypo.
+    if (!particle.getECLCluster()) continue;
 
     const double p = fitRes->getMomentum().Mag();
-    const int charge = fitRes->getChargeSign();
     const double showerTheta = Belle2::Variable::eclClusterTheta(&particle);
+
+    // require we cover the phasespace
+    // alternatively could take closest covered region but behaviour will not be well understood.
+    if (!(*m_mvaWeights.get())->isPhasespaceCovered(showerTheta, p, charge)) continue;
 
     //get the MVA region
     unsigned int linearBinIndex = (*m_mvaWeights.get())->getLinearisedBinIndex(showerTheta, p, charge);
@@ -184,7 +204,6 @@ void ECLChargedPIDMVAModule::event()
     for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
       scores[iResponse] = logTransformation(scores[iResponse]);
     }
-
     float logLikelihoods[Const::ChargedStable::c_SetSize];
 
     // Order of loop is defined in UnitConst.cc: e, mu, pi, K, p, d
@@ -221,16 +240,17 @@ void ECLChargedPIDMVAModule::event()
              ECLChargedPIDPhasespaceCategory::BDTResponseTransformMode::c_LogTransformSingle) and (hypo_idx != iResponse)) {continue;}
 
         double xmin, xmax;
-        phasespaceCategory->getPDF(absPdgId, iResponse)->GetRange(xmin, xmax);
+        phasespaceCategory->getPDF(iResponse, absPdgId)->GetRange(xmin, xmax);
         // kick the response back into the range of the PDF (alternatively consider logL = std::numeric_limits<float>::min() if outside range)
         float transformed_score_copy = transformed_scores[iResponse];
         if (transformed_score_copy < xmin) transformed_score_copy = xmin + 1e-5;
         if (transformed_score_copy > xmax) transformed_score_copy = xmax - 1e-5;
 
-        float pdfval = phasespaceCategory->getPDF(absPdgId, iResponse)->Eval(transformed_score_copy);
+        float pdfval = phasespaceCategory->getPDF(iResponse, absPdgId)->Eval(transformed_score_copy);
         // dont take a log of inf or 0
         pdfval = std::max(pdfval, std::numeric_limits<float>::min());
         logL += (std::isnormal(pdfval) && pdfval > 0) ? std::log(pdfval) : c_dummyLogL;
+        B2DEBUG(12, "BDT response index, BDT score, logL: " << iResponse << "  " << transformed_score_copy << "  " << logL << " \n");
       }
       logLikelihoods[hypo_idx] = logL;
     } // hypo loop

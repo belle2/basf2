@@ -53,10 +53,23 @@ namespace Belle2 {
       if (!cluster) return nullptr;
       const auto relShowers = cluster->getRelationsWith<ECLShower>();
       if (relShowers.size() == 0) return nullptr;
-      // can this relation ever be 1 cluster : many showers?
-      if (relShowers.size() != 1) B2ERROR("Cluster to shower relation vector has size " << relShowers.size());
 
-      ECLShower* shower = relShowers.object(0);
+      ECLShower* shower;
+      if (relShowers.size() == 1) {
+        shower = relShowers.object(0);
+      } else {
+        // in case there are multiple showers matched take the highest energy one with a
+        // photon hypothesis.
+        float highestEnergy = -1.0;
+        for (unsigned int i = 0; i < relShowers.size(); ++i) {
+          if (relShowers.object(i)->getHypothesisId() == Belle2::ECLShower::c_nPhotons) {
+            if (shower->getEnergy() > highestEnergy) {
+              shower = relShowers.object(i);
+              highestEnergy = shower->getEnergy();
+            }
+          }
+        }
+      }
       return shower;
     }
 

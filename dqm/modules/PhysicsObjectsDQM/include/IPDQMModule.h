@@ -50,17 +50,6 @@ namespace Belle2 {
     void event() override;
 
     /**
-     * End-of-run action.
-     * The histograms range is set to be large 10 sigmas and centered on the mean
-     */
-    void endRun() override;
-
-    /**
-     * Termination action.
-     */
-    void terminate() override;
-
-    /**
      * Defining the histograms.
      * Every new histogram added to the module has to be initialized here.
      */

@@ -20,6 +20,9 @@
 /* ROOT headers. */
 #include <TDirectory.h>
 
+/* C++ headers. */
+#include <cmath>
+
 using namespace Belle2;
 
 REG_MODULE(IPDQM)
@@ -29,11 +32,10 @@ IPDQMModule::IPDQMModule() : HistoModule()
   setDescription("Monitor the position and the size of the interaction point using mu+mu- events");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("Y4SPListName", m_Y4SPListName, "Name of the Y4S particle list", std::string("Upsilon(4S):IPDQM"));
+  addParam("rangeCoordinateX", m_rangeX, "Absolute value of the range (in cm) for the X coordinate histogram", 0.5);
+  addParam("rangeCoordinateY", m_rangeY, "Absolute value of the range (in cm) for the Y coordinate histogram", 0.5);
+  addParam("rangeCoordinateZ", m_rangeZ, "Absolute value of the range (in cm) for the Z coordinate histogram", 2.0);
   addParam("onlineMode", m_onlineMode, "Mode of the online processing ('hlt' or 'expressreco')", std::string("expressreco"));
-  if (not(m_onlineMode == "hlt" or m_onlineMode == "expressreco")) {
-    B2FATAL("Unknown online processing mode"
-            << LogVar("Set mode", m_onlineMode));
-  }
 }
 
 void IPDQMModule::defineHisto()
@@ -43,11 +45,11 @@ void IPDQMModule::defineHisto()
   // Common set of plots for HLT and ExpressReco
   // Let's add a suffix to the plots when we run on HLT: necessary for the analysis module
   std::string suffix = (m_onlineMode == "hlt") ? "_hlt" : "";
-  m_h_x = new TH1F(std::string{"Y4S_Vertex.X" + suffix}.c_str(), "IP position - coord. X", 1000, -0.5, 0.5);
+  m_h_x = new TH1F(std::string{"Y4S_Vertex.X" + suffix} .c_str(), "IP position - coord. X", 1000, -m_rangeX, m_rangeX);
   m_h_x->SetXTitle("IP_coord. X [cm]");
-  m_h_y = new TH1F(std::string{"Y4S_Vertex.Y" + suffix}.c_str(), "IP position - coord. Y", 1000, -0.5, 0.5);
+  m_h_y = new TH1F(std::string{"Y4S_Vertex.Y" + suffix} .c_str(), "IP position - coord. Y", 1000, -m_rangeY, m_rangeY);
   m_h_y->SetXTitle("IP_coord. Y [cm]");
-  m_h_z = new TH1F(std::string{"Y4S_Vertex.Z" + suffix}.c_str(), "IP position - coord. Z", 2000, -2, 2);
+  m_h_z = new TH1F(std::string{"Y4S_Vertex.Z" + suffix} .c_str(), "IP position - coord. Z", 2000, -m_rangeZ, m_rangeZ);
   m_h_z->SetXTitle("IP_coord. Z [cm]");
   if (m_onlineMode == "expressreco") {
     m_h_px = new TH1F("Y4S_Vertex.pX", "Total momentum in lab. frame - coord. X", 100, -2, 2);
@@ -76,6 +78,10 @@ void IPDQMModule::defineHisto()
 
 void IPDQMModule::initialize()
 {
+  if (m_rangeX < 0. or m_rangeY < 0. or m_rangeZ < 0.)
+    B2FATAL("The histogram ranges must be positive");
+  if (not(m_onlineMode == "hlt" or m_onlineMode == "expressreco"))
+    B2FATAL("Unknown online processing mode" << LogVar("Set mode", m_onlineMode));
   REG_HISTOGRAM
 }
 
@@ -101,26 +107,31 @@ void IPDQMModule::beginRun()
 void IPDQMModule::event()
 {
   StoreObjPtr<ParticleList> Y4SParticles(m_Y4SPListName);
-  const auto& frame = ReferenceFrame::GetCurrent();
   if (Y4SParticles.isValid() && abs(Y4SParticles->getPDGCode()) == 300553) {
+    const auto& frame = ReferenceFrame::GetCurrent();
     for (unsigned int i = 0; i < Y4SParticles->getListSize(); i++) {
       Particle* Y4S = Y4SParticles->getParticle(i);
       TVector3 IPVertex = frame.getVertex(Y4S);
-      const auto& errMatrix = Y4S->getVertexErrorMatrix();
-      m_h_x->Fill(IPVertex.X());
-      m_h_y->Fill(IPVertex.Y());
-      m_h_z->Fill(IPVertex.Z());
-      if (m_onlineMode == "expressreco") {
-        m_h_cov_x_x->Fill(errMatrix(0, 0));
-        m_h_cov_y_y->Fill(errMatrix(1, 1));
-        m_h_cov_z_z->Fill(errMatrix(2, 2));
-        m_h_cov_x_y->Fill(errMatrix(0, 1));
-        m_h_cov_x_z->Fill(errMatrix(0, 2));
-        m_h_cov_y_z->Fill(errMatrix(1, 2));
-        m_h_px->Fill(frame.getMomentum(Y4S).Px());
-        m_h_py->Fill(frame.getMomentum(Y4S).Py());
-        m_h_pz->Fill(frame.getMomentum(Y4S).Pz());
-        m_h_E->Fill(frame.getMomentum(Y4S).E());
+      double IPX{IPVertex.X()};
+      double IPY{IPVertex.Y()};
+      double IPZ{IPVertex.Z()};
+      if (std::abs(IPX) < m_rangeX and std::abs(IPY) < m_rangeY and std::abs(IPZ) < m_rangeZ) {
+        m_h_x->Fill(IPVertex.X());
+        m_h_y->Fill(IPVertex.Y());
+        m_h_z->Fill(IPVertex.Z());
+        if (m_onlineMode == "expressreco") {
+          const auto& errMatrix = Y4S->getVertexErrorMatrix();
+          m_h_cov_x_x->Fill(errMatrix(0, 0));
+          m_h_cov_y_y->Fill(errMatrix(1, 1));
+          m_h_cov_z_z->Fill(errMatrix(2, 2));
+          m_h_cov_x_y->Fill(errMatrix(0, 1));
+          m_h_cov_x_z->Fill(errMatrix(0, 2));
+          m_h_cov_y_z->Fill(errMatrix(1, 2));
+          m_h_px->Fill(frame.getMomentum(Y4S).Px());
+          m_h_py->Fill(frame.getMomentum(Y4S).Py());
+          m_h_pz->Fill(frame.getMomentum(Y4S).Pz());
+          m_h_E->Fill(frame.getMomentum(Y4S).E());
+        }
       }
     }
   }

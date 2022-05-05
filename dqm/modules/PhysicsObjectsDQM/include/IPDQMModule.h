@@ -57,6 +57,12 @@ namespace Belle2 {
 
   private:
 
+    /** Absolute value of the range (in cm) for the X coordinate histogram */
+    double m_rangeX;
+    /** Absolute value of the range (in cm) for the Y coordinate histogram */
+    double m_rangeY;
+    /** Absolute value of the range (in cm) for the Z coordinate histogram */
+    double m_rangeZ;
     /** x coord*/
     TH1F* m_h_x = nullptr;
     /** y coord*/

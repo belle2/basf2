@@ -37,8 +37,6 @@
 
 #include <ecl/modules/eclChargedPIDMVA/ECLChargedPIDMVAModule.h>
 
-#include <iostream>
-
 using namespace Belle2;
 using namespace ECL;
 
@@ -96,7 +94,6 @@ void ECLChargedPIDMVAModule::initializeMVA()
     B2DEBUG(12, "\t\tweightfile[" << idx << "]");
 
     // De-serialize the string into an MVA::Weightfile object.
-    //breaks on this line??? Why?
     (*m_mvaWeights.get())->getPhasespaceCategory(idx);
     (*m_mvaWeights.get())->getPhasespaceCategory(idx)->getSerialisedWeight();
 

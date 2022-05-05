@@ -15,7 +15,6 @@
 
 // MVA
 #include <mva/interface/Weightfile.h>
-#include <mdst/dataobjects/ECLCluster.h>
 
 // ROOT
 #include <TObject.h>
@@ -31,8 +30,6 @@
 #include <cmath>
 #include <unordered_map>
 #include <tuple>
-
-#include <iostream>
 
 
 namespace Belle2 {

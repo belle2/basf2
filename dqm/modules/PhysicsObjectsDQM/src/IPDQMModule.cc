@@ -98,31 +98,6 @@ void IPDQMModule::beginRun()
   }
 }
 
-void IPDQMModule::endRun()
-{
-  m_h_x->GetXaxis()->SetRangeUser(m_h_x->GetMean(1) - 5 * m_h_x->GetRMS(1), m_h_x->GetMean(1) + 5 * m_h_x->GetRMS(1));
-  m_h_y->GetXaxis()->SetRangeUser(m_h_y->GetMean(1) - 5 * m_h_y->GetRMS(1), m_h_y->GetMean(1) + 5 * m_h_y->GetRMS(1));
-  m_h_z->GetXaxis()->SetRangeUser(m_h_z->GetMean(1) - 5 * m_h_z->GetRMS(1), m_h_z->GetMean(1) + 5 * m_h_z->GetRMS(1));
-  if (m_onlineMode == "expressreco") {
-    m_h_cov_x_x->GetXaxis()->SetRangeUser(m_h_cov_x_x->GetMean(1) - 5 * m_h_cov_x_x->GetRMS(1),
-                                          m_h_cov_x_x->GetMean(1) + 5 * m_h_cov_x_x->GetRMS(1));
-    m_h_cov_y_y->GetXaxis()->SetRangeUser(m_h_cov_y_y->GetMean(1) - 5 * m_h_cov_y_y->GetRMS(1),
-                                          m_h_cov_y_y->GetMean(1) + 5 * m_h_cov_y_y->GetRMS(1));
-    m_h_cov_z_z->GetXaxis()->SetRangeUser(m_h_cov_z_z->GetMean(1) - 5 * m_h_cov_z_z->GetRMS(1),
-                                          m_h_cov_z_z->GetMean(1) + 5 * m_h_cov_z_z->GetRMS(1));
-    m_h_cov_x_z->GetXaxis()->SetRangeUser(m_h_cov_x_z->GetMean(1) - 5 * m_h_cov_x_z->GetRMS(1),
-                                          m_h_cov_x_z->GetMean(1) + 5 * m_h_cov_x_z->GetRMS(1));
-    m_h_cov_x_y->GetXaxis()->SetRangeUser(m_h_cov_x_y->GetMean(1) - 5 * m_h_cov_x_y->GetRMS(1),
-                                          m_h_cov_x_y->GetMean(1) + 5 * m_h_cov_x_y->GetRMS(1));
-    m_h_cov_y_z->GetXaxis()->SetRangeUser(m_h_cov_y_z->GetMean(1) - 5 * m_h_cov_y_z->GetRMS(1),
-                                          m_h_cov_y_z->GetMean(1) + 5 * m_h_cov_y_z->GetRMS(1));
-  }
-}
-
-void IPDQMModule::terminate()
-{
-}
-
 void IPDQMModule::event()
 {
   StoreObjPtr<ParticleList> Y4SParticles(m_Y4SPListName);

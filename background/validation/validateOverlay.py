@@ -40,7 +40,7 @@ class Histogrammer(b2.Module):
         self.hist = []
         self.hist.append(TH1F('PXDDigits', 'PXDDigits (no data reduction)',
                               100, 30000, 40000))
-        self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 4000))
+        self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 8000))
         self.hist.append(TH1F('CDCHits', 'CDCHits', 100, 0, 6000))
         self.hist.append(TH1F('TOPDigits', 'TOPDigits', 100, 0, 2000))
         self.hist.append(TH1F('ARICHDigits', 'ARICHDigits', 100, 0, 300))

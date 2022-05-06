@@ -8,14 +8,12 @@
 
 /* Belle 2 headers. */
 #include <framework/core/HistoModule.h>
-#include <hlt/softwaretrigger/modules/dqm/SoftwareTriggerHLTDQMModule.h>
 
 /* ROOT headers. */
 #include <TH1F.h>
 
 /* C++ headers. */
 #include <string>
-#include <vector>
 
 namespace Belle2 {
 
@@ -39,7 +37,7 @@ namespace Belle2 {
 
     /**
      * Called when entering a new run
-     * Reset the histograms and counter m_r and clear the vectors
+     * Reset the histograms
      */
     void beginRun() override;
 
@@ -57,12 +55,6 @@ namespace Belle2 {
 
   private:
 
-    /** Absolute value of the range (in cm) for the X coordinate histogram */
-    double m_rangeX;
-    /** Absolute value of the range (in cm) for the Y coordinate histogram */
-    double m_rangeY;
-    /** Absolute value of the range (in cm) for the Z coordinate histogram */
-    double m_rangeZ;
     /** x coord*/
     TH1F* m_h_x = nullptr;
     /** y coord*/

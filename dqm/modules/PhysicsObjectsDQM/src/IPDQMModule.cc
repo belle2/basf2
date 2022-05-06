@@ -12,10 +12,7 @@
 /* Belle 2 headers. */
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/ReferenceFrame.h>
-#include <framework/core/Environment.h>
-#include <framework/logging/LogConfig.h>
 #include <framework/logging/Logger.h>
-#include <hlt/utilities/Units.h>
 
 /* ROOT headers. */
 #include <TDirectory.h>
@@ -32,9 +29,6 @@ IPDQMModule::IPDQMModule() : HistoModule()
   setDescription("Monitor the position and the size of the interaction point using mu+mu- events");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("Y4SPListName", m_Y4SPListName, "Name of the Y4S particle list", std::string("Upsilon(4S):IPDQM"));
-  addParam("rangeCoordinateX", m_rangeX, "Absolute value of the range (in cm) for the X coordinate histogram", 0.5);
-  addParam("rangeCoordinateY", m_rangeY, "Absolute value of the range (in cm) for the Y coordinate histogram", 0.5);
-  addParam("rangeCoordinateZ", m_rangeZ, "Absolute value of the range (in cm) for the Z coordinate histogram", 2.0);
   addParam("onlineMode", m_onlineMode, "Mode of the online processing ('hlt' or 'expressreco')", std::string("expressreco"));
 }
 
@@ -45,11 +39,11 @@ void IPDQMModule::defineHisto()
   // Common set of plots for HLT and ExpressReco
   // Let's add a suffix to the plots when we run on HLT: necessary for the analysis module
   std::string suffix = (m_onlineMode == "hlt") ? "_hlt" : "";
-  m_h_x = new TH1F(std::string{"Y4S_Vertex.X" + suffix} .c_str(), "IP position - coord. X", 1000, -m_rangeX, m_rangeX);
+  m_h_x = new TH1F(std::string{"Y4S_Vertex.X" + suffix}.c_str(), "IP position - coord. X", 1000, -0.5, 0.5);
   m_h_x->SetXTitle("IP_coord. X [cm]");
-  m_h_y = new TH1F(std::string{"Y4S_Vertex.Y" + suffix} .c_str(), "IP position - coord. Y", 1000, -m_rangeY, m_rangeY);
+  m_h_y = new TH1F(std::string{"Y4S_Vertex.Y" + suffix}.c_str(), "IP position - coord. Y", 1000, -0.5, 0.5);
   m_h_y->SetXTitle("IP_coord. Y [cm]");
-  m_h_z = new TH1F(std::string{"Y4S_Vertex.Z" + suffix} .c_str(), "IP position - coord. Z", 2000, -m_rangeZ, m_rangeZ);
+  m_h_z = new TH1F(std::string{"Y4S_Vertex.Z" + suffix}.c_str(), "IP position - coord. Z", 2000, -2.0, 2.0);
   m_h_z->SetXTitle("IP_coord. Z [cm]");
   if (m_onlineMode == "expressreco") {
     m_h_px = new TH1F("Y4S_Vertex.pX", "Total momentum in lab. frame - coord. X", 100, -2, 2);
@@ -78,10 +72,9 @@ void IPDQMModule::defineHisto()
 
 void IPDQMModule::initialize()
 {
-  if (m_rangeX < 0. or m_rangeY < 0. or m_rangeZ < 0.)
-    B2FATAL("The histogram ranges must be positive");
-  if (not(m_onlineMode == "hlt" or m_onlineMode == "expressreco"))
+  if (not(m_onlineMode == "hlt" or m_onlineMode == "expressreco")) {
     B2FATAL("Unknown online processing mode" << LogVar("Set mode", m_onlineMode));
+  }
   REG_HISTOGRAM
 }
 
@@ -115,7 +108,7 @@ void IPDQMModule::event()
       double IPX{IPVertex.X()};
       double IPY{IPVertex.Y()};
       double IPZ{IPVertex.Z()};
-      if (std::abs(IPX) < m_rangeX and std::abs(IPY) < m_rangeY and std::abs(IPZ) < m_rangeZ) {
+      if (std::abs(IPX) < 0.5 and std::abs(IPY) < 0.5 and std::abs(IPZ) < 2.0) { // in cm
         m_h_x->Fill(IPVertex.X());
         m_h_y->Fill(IPVertex.Y());
         m_h_z->Fill(IPVertex.Z());

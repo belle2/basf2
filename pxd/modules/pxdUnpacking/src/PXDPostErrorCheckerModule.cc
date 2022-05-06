@@ -122,8 +122,9 @@ void PXDPostErrorCheckerModule::initialize()
     defaulterrormask[c_nrFAKE_NO_FAKE_DATA ] = 1;
     // other bits not used yet
     m_criticalErrorMask = defaulterrormask;
-  } else
+  } else {
     B2FATAL("Undefined value for criticalErrorMaskSet");
+  }
 
   m_storeDAQEvtStats.isRequired();
 

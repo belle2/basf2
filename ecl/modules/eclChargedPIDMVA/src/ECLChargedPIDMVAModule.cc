@@ -37,8 +37,6 @@
 
 #include <ecl/modules/eclChargedPIDMVA/ECLChargedPIDMVAModule.h>
 
-#include <iostream>
-
 using namespace Belle2;
 using namespace ECL;
 

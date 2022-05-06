@@ -211,8 +211,7 @@ void PXDDAQDQMModule::event()
       }
       unsigned int cmask = dhc.getEndErrorInfo();
       for (int i = 0; i < 32; i++) {
-        unsigned int mask_pre = 1;
-        unsigned int mask = (mask_pre << i);
+        unsigned int mask = (1U << i);
         if ((cmask & mask) == mask) hDAQEndErrorDHC->Fill(dhc.getDHCID(), i);
       }
       if (hDAQDHCReduction[dhc.getDHCID()]) {

@@ -41,8 +41,8 @@ namespace Belle2 {
   /**
   * This module implements charged particle identification using ECL-related observables via a multiclass BDT.
   * For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the BDT which is stored in a conditions database payload.
-  * The BDT output variables are then used to construct a liklihood from pdfs also stored in the payload.
-  * The liklihood is then stored in the ECLPidLikelihood object.
+  * The BDT output variables are then used to construct a likelihood from pdfs also stored in the payload.
+  * The likelihood is then stored in the ECLPidLikelihood object.
   */
 
   class ECLChargedPIDMVAModule : public Module {
@@ -81,18 +81,36 @@ namespace Belle2 {
      */
     virtual void event() override;
 
-
     /**
      * Check payloads for consistency.
      */
     void checkDBPayloads();
 
+    /**
+     * Initialise the multiclass BDTs.
+     */
     void initializeMVA();
 
-    float logTransformation(const float value) const;
+    /**
+     * log transformation.
+     * @param value to be log transformed.
+     * @param offset offset applied during the log transformation to prevent transforming 0.
+     */
+    float logTransformation(const float value, const float offset) const;
 
+    /**
+     * gaussian transformation.
+     * @param value to be gauss transformed.
+     * @param cdf histogram containing a cdf of the distribution from which value is taken.
+     */
     float gaussTransformation(const float value, const TH1F* cdf) const;
 
+    /**
+     * decorrelation transformation.
+     * Follows the TMVA algorithm for input variable decorrelation.
+     @ param scores list of scores to be transformed.
+     @ param decorrelationMatrix 1D flattened list of a square matrix.
+     */
     std::vector<float> decorrTransformation(const std::vector<float> scores, const std::vector<float>* decorrelationMatrix) const;
 
 
@@ -114,7 +132,7 @@ namespace Belle2 {
     StoreArray<Track> m_tracks;
 
     /**
-     * Array of ECLPidLiklihood objects.
+     * Array of ECLPidLikelihood objects.
      */
     StoreArray<ECLPidLikelihood> m_eclPidLikelihoods;
 
@@ -129,13 +147,7 @@ namespace Belle2 {
     std::vector<std::unique_ptr<MVA::Expert>> m_experts;
 
     /**
-     * Small offset to use in the log transformation. Stored in the payload.
-     */
-
-    double m_log_transform_offset;
-
-    /**
-     * Dummy value of Log Likelihood for a particle hypothesis.
+     * Dummy value of log Likelihood for a particle hypothesis.
      * This leads to a null contribution in the PID likelihood ratio.
      * Used when the pdf value is (0 | subnormal | inf | NaN).
     */
@@ -147,18 +159,6 @@ namespace Belle2 {
      */
     std::vector< std::vector<const Variable::Manager::Var*> > m_variables;
 
-//     /**
-//      * Vector of vectors containing the evaluated variables to be fed to the MVA.
-//      * Each region can have a unique set of variables.
-//      */
-//     std::vector<std::vector<float>> m_features;
-
-//     /**
-//      * Vector containing the spectator variables to be fed to the MVA.
-//      * This is in essence an empty dummy vector as we do not consider spectator variables.
-//      * All regions share the same spectator vector.
-//      */
-//     std::vector<float> m_spectators;
 
     /**
       * MVA dataset to be passed to the expert.

@@ -37,6 +37,8 @@
 
 #include <ecl/modules/eclChargedPIDMVA/ECLChargedPIDMVAModule.h>
 
+#include <iostream>
+
 using namespace Belle2;
 using namespace ECL;
 
@@ -74,8 +76,6 @@ void ECLChargedPIDMVAModule::initializeMVA()
 {
   B2DEBUG(12, "Run: " << m_eventMetaData->getRun() <<
           ". Load supported MVA interfaces for multi-class charged particle identification...");
-
-  m_log_transform_offset = (*m_mvaWeights.get())->getLogTransformOffset();
 
   MVA::AbstractInterface::initSupportedInterfaces();
   auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
@@ -164,7 +164,7 @@ void ECLChargedPIDMVAModule::event()
     if (!(*m_mvaWeights.get())->isPhasespaceCovered(showerTheta, p, charge)) continue;
 
     //get the MVA region
-    unsigned int linearBinIndex = (*m_mvaWeights.get())->getLinearisedBinIndex(showerTheta, p, charge);
+    unsigned int linearBinIndex = (*m_mvaWeights.get())->getLinearisedCategoryIndex(showerTheta, p, charge);
     unsigned int nvars = m_variables.at(linearBinIndex).size();
 
     // get the phasespaceCategory
@@ -199,7 +199,7 @@ void ECLChargedPIDMVAModule::event()
 
     // log transform the scores
     for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
-      scores[iResponse] = logTransformation(scores[iResponse]);
+      scores[iResponse] = logTransformation(scores[iResponse], phasespaceCategory->getLogTransformOffset());
     }
     float logLikelihoods[Const::ChargedStable::c_SetSize];
 
@@ -208,7 +208,7 @@ void ECLChargedPIDMVAModule::event()
       unsigned int hypo_idx = hypo.getIndex();
       auto absPdgId = abs(hypo.getPDGCode());
 
-      // copy the scores so they arent transformed in place
+      // copy the scores so they aren't transformed in place
       std::vector<float> transformed_scores;
       transformed_scores = scores;
 
@@ -234,7 +234,8 @@ void ECLChargedPIDMVAModule::event()
       for (unsigned int iResponse = 0; iResponse < transformed_scores.size(); iResponse++) {
 
         if ((phasespaceCategory->getTransformMode() ==
-             ECLChargedPIDPhasespaceCategory::BDTResponseTransformMode::c_LogTransformSingle) and (hypo_idx != iResponse)) {continue;}
+             ECLChargedPIDPhasespaceCategory::BDTResponseTransformMode::c_LogTransformSingle)
+            and (phasespaceCategory->getBDTIndexForHypothesis(absPdgId) != iResponse)) {continue;}
 
         double xmin, xmax;
         phasespaceCategory->getPDF(iResponse, absPdgId)->GetRange(xmin, xmax);
@@ -259,10 +260,10 @@ void ECLChargedPIDMVAModule::event()
 }
 
 
-float ECLChargedPIDMVAModule::logTransformation(const float value) const
+float ECLChargedPIDMVAModule::logTransformation(const float value, const float offset) const
 {
   // BDT response is limited to be between 0 and 1 so can safely hardcode 1.0 as the max value.
-  return std::log((value + m_log_transform_offset) / (1.0 + m_log_transform_offset - value));
+  return std::log((value + offset) / (1.0 + offset - value));
 }
 
 

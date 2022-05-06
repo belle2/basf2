@@ -20,8 +20,8 @@
 #pragma link C++ class Belle2::ECLReferenceCrystalPerCrateCalib+; // checksum=0x5c126a47, version=3
 #pragma link C++ enum Belle2::ECLChargedPidPDFs::InputVar+; //implicit
 #pragma link C++ class Belle2::ECLChargedPidPDFs::VarTransfoSettings+; // checksum=0x1a8bc0c9, implicit, version=-1
-#pragma link C++ class Belle2::ECLChargedPIDPhasespaceCategory+; // checksum=0x1914fc18, implicit, version=1
-#pragma link C++ class Belle2::ECLChargedPIDMVAWeights+; // checksum=0x8b74837d, version=1
+#pragma link C++ class Belle2::ECLChargedPIDPhasespaceCategory+; // checksum=0x8e831d0a, implicit, version=1
+#pragma link C++ class Belle2::ECLChargedPIDMVAWeights+; // checksum=0x34208d3b, version=1
 #pragma link C++ enum Belle2::ECLChargedPIDPhasespaceCategory::BDTResponseTransformMode+; //implicit
 #pragma link C++ class Belle2::PackedAutoCovariance; // checksum=0xb1a29561, implicit, version=1
 #pragma link C++ class Belle2::ECLAutoCovariance; // checksum=0x1f75052d, version=1

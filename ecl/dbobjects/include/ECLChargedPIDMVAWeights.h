@@ -31,11 +31,17 @@
 #include <unordered_map>
 #include <tuple>
 
-
 namespace Belle2 {
 
   /**
-   * Stores the bdt weightfile, pdfs, transforms, etc. for each phasespace region.
+   * Stores all required information for the ECLChargedPIDMVA for a phasespace category - (clusterTheta, p, charge) region.
+   * This includes:
+   *  - MVA weightfiles for multiclass BDT.
+   *  - TF1 p.d.fs for each charged particle hypothesis for each bdt output variable.
+   *  - BDTResponseTransform mode detailing which transformations will be applied to the BDT response.
+   *  - unordered_map mapping a particle hypothesis to the output index of a BDT.
+   *  - (Optional) TH1F for each charged particle hypothesis for each bdt output variable for gaussianisation.
+   *  - (Optional) vector of floats (flattened square matrix) for potential linear decorrelation of the gaussian transformed bdt response variables.
    */
   class ECLChargedPIDPhasespaceCategory : public TObject {
 
@@ -55,7 +61,8 @@ namespace Belle2 {
     /**
     * Default constructor, necessary for ROOT to stream the object.
     */
-    ECLChargedPIDPhasespaceCategory()
+    ECLChargedPIDPhasespaceCategory() :
+      m_log_transform_offset("logTransformOffset", 1e-15)
     {};
 
     /**
@@ -63,10 +70,16 @@ namespace Belle2 {
     * @param weightfilePath path to the BDT weightfile for this phasespace category.
     * @param bdtResponeTransformMode bdt response transform mode booked for this phasespace.
     * @param pdfs vector of unordered_map mapping hypothesis to pdfs for each bdt response.
+    * @param bdtIndexForHypothesis unordered_map mapping hypothesis to index of bdt response. Useful if we exclude a class from the BDT training
+    *        but want to use the likelihood of a different particle. For example using the proton pdf for a deuteron.
     */
     ECLChargedPIDPhasespaceCategory(const std::string weightfilePath,
                                     const BDTResponseTransformMode& bdtResponeTransformMode,
-                                    const std::vector<std::unordered_map<unsigned int, TF1>>& pdfs)
+                                    const std::vector<std::unordered_map<unsigned int, TF1>>& pdfs,
+                                    const std::unordered_map<unsigned int, unsigned int>& bdtIndexForHypothesis) :
+
+      m_log_transform_offset("logTransformOffset", 1e-15)
+
     {
       // Load and serialize the MVA::Weightfile object into a string for storage in the database,
       // otherwise there are issues w/ dictionary generation for the payload class...
@@ -86,6 +99,7 @@ namespace Belle2 {
       m_weight = ss.str();
       m_bdtResponseTransformMode = bdtResponeTransformMode;
       m_pdfs = pdfs;
+      m_bdtIndexForHypothesis = bdtIndexForHypothesis;
     }
 
     /**
@@ -148,7 +162,36 @@ namespace Belle2 {
       m_decorrelationMatrices = decorrelationMatrices;
     }
 
+    /**
+     * Set the offset used in the log transformation to be consistent with the offset used when generating the p.d.f.s
+     */
+    void setlogTransformOffset(const float& offset)
+    {
+      m_log_transform_offset.SetVal(offset);
+    }
+
+    /**
+     * get the log transform offset
+     */
+    float getLogTransformOffset() const
+    {
+      return m_log_transform_offset.GetVal();
+    }
+
+    /**
+     * maps a charged stable pdg code to an index of the BDT response.
+     * In general this is a one-to-one mapping however in cases where we do not include all six
+       stable charged particles in the BDT training we may have a many-to-one mapping.
+     * For example if we take the proton response value also for deuterons.
+     */
+    unsigned int getBDTIndexForHypothesis(const unsigned int hypoPDG) const
+    {
+      return m_bdtIndexForHypothesis.at(hypoPDG);
+    }
+
   private:
+
+    TParameter<float> m_log_transform_offset; /**< Small offset to avoid bdt response values of 1.0 being log transformed to NaN. */
 
     /**
      * Serialsed BDT weightfile.
@@ -162,11 +205,16 @@ namespace Belle2 {
 
 
     /**
-     * A vector of unodered maps. The vector corresponds to the N return values of the BDT.
+     * A vector of unodered maps. The vector corresponds to the return values of the BDT, one for each class correspondonding to charged stable particles considered by the BDT. In general this is the full six charged stable particles {e, mu, pi, K, p, d}.
      * The unordered map maps the hypothesis pdg values to their matching TF1 pdfs from which the liklihood will be taken.
      */
     std::vector<std::unordered_map<unsigned int, TF1>> m_pdfs;
 
+    /**
+     * unordered map of abs(pdg_code) for the 6 charged stable hypotheses to index of the BDT response vector.
+     * needed if we do not train with all 6 species to map several to the same BDT response value.
+     */
+    std::unordered_map<unsigned int, unsigned int> m_bdtIndexForHypothesis;
 
     /**
      * CDFs for each bdt return value for each hypothesis.
@@ -174,6 +222,7 @@ namespace Belle2 {
      * The unordered map maps the hypothesis pdg values to their matching TH1F cdfs which can be used for a gaussianisation.
      */
     std::vector<std::unordered_map<unsigned int, TH1F>> m_cdfs;
+
 
     /**
      * Decorrelation matrices. To be used (optionally) afer gaussianisation.
@@ -185,14 +234,9 @@ namespace Belle2 {
     ClassDef(ECLChargedPIDPhasespaceCategory, 1);
   };
 
-
   /** Class to contain payload of everything needed for MVA based charged particle identification.
-    * For each bin of (theta, p, charge), this includes:
-    *  - MVA weightfiles for multiclass BDT.
-    *  - TF1 p.d.fs for each charged particle hypothesis for each bdt output variable.
-    *  - (Optional) TH1F for each charged particle hypothesis for each bdt output variable for gaussianisation.
-    *  - (Optional) vector of floats (flattened square matrix) for potential linear decorrelation of the gaussian transformed bdt response variables.
-    *
+    * - TH3 object specifying the (clusterTheta, p, charge) boundaries that define the categories (regions) under consideration,
+    * - Vector of ECLChargedPIDPhasespaceCategory objects which contain specific settings for each category.
     */
   class ECLChargedPIDMVAWeights : public TObject {
   public:
@@ -201,8 +245,7 @@ namespace Belle2 {
     */
     ECLChargedPIDMVAWeights():
       m_energy_unit("energyUnit", Unit::GeV),
-      m_ang_unit("angularUnit", Unit::rad),
-      m_log_transform_offset("logTransformOffset", 1e-15)
+      m_ang_unit("angularUnit", Unit::rad)
     {};
 
     /**
@@ -210,10 +253,8 @@ namespace Belle2 {
      */
     ~ECLChargedPIDMVAWeights() {};
 
-
-
     /**
-     * Set the energy unit to ensure consistency w/ the one used to define the bins grid.
+     * Set the energy unit to ensure consistency w/ the one used to define the phasespace category grid.
      * @param unit: the energy unit.
      */
     void setEnergyUnit(const float& unit)
@@ -223,7 +264,7 @@ namespace Belle2 {
 
 
     /**
-     * Set the angular unit to ensure consistency w/ the one used to define the bins grid.
+     * Set the angular unit to ensure consistency w/ the one used to define the phasespace category grid.
      * @param unit: the angular unit.
      */
     void setAngularUnit(const float& unit)
@@ -231,17 +272,11 @@ namespace Belle2 {
       m_ang_unit.SetVal(unit);
     }
 
-    /**
-     * Set the offset used in the log transformation to be consistent with the offset used when generating the p.d.f.s
-     */
-    void setlogTransformOffset(const float& offset)
-    {
-      m_log_transform_offset.SetVal(offset);
-    }
 
     /**
      * Set the 3D (clusterTheta, p, charge) grid representing the categories for which weightfiles are defined.
-     * @param h the 3D histogram.
+     * @param h the 3D histogram in (clusterTheta, p, charge).
+     * A multiclass BDT is trained for each phases-space region defined by the bin boundaries.
     */
     void setWeightCategories(TH3F* h)
     {
@@ -250,15 +285,16 @@ namespace Belle2 {
 
 
     /**
-     * checks if the input index is the same as that returned for the given (theta, p, charge) triplet
+     * checks if the input index is the same as that returned for the given (clusterTheta, p, charge) triplet
      */
-    void checkIndexConsistency(const unsigned int idx, const float theta, const float p, const float charge) const
+    void checkIndexConsistency(const unsigned int idx, const float clusterTheta, const float p, const float charge) const
     {
-      B2FATAL("(theta = " << theta << ", p = " << p << ", charge = " << charge << ")");
-      auto h_idx = getLinearisedBinIndex(theta, p, charge);
+      B2FATAL("(clusterTheta = " << clusterTheta << ", p = " << p << ", charge = " << charge << ")");
+      auto h_idx = getLinearisedCategoryIndex(clusterTheta, p, charge);
       if (idx != h_idx) {
         B2FATAL("index in input vector:\n" << idx << "\ndoes not correspond to:\n" << h_idx <<
-                "\n, i.e. the linearised index of the 3D bin centered in (clusterTheta, p, charge) = (" << theta << ", " << p << ", " << charge <<
+                "\n, i.e. the linearised index of the 3D category centered in (clusterTheta, p, charge) = (" << clusterTheta << ", " << p << ", " <<
+                charge <<
                 ")\nPlease check how the input vector is being filled.");
       }
     }
@@ -290,18 +326,18 @@ namespace Belle2 {
     const std::vector<ECLChargedPIDPhasespaceCategory>* getPhasespaceCategories() const {return &m_phasespaceCategories;}
 
     /**
-    * returns bool whether or not the given p, theta, charge values are within the phasespace covered by the trainings in the weightfile
-    * @param theta: theta of the cluster [rad].
+    * returns bool whether or not the given p, clusterTheta, charge values are within the phasespace covered by the trainings in the weightfile
+    * @param clusterTheta: clusterTheta of the cluster [rad].
     * @param p: momentum of the track [GeV].
     * @param charge: charge of the track.
     */
-    bool isPhasespaceCovered(const float theta, const float p, const float charge) const
+    bool isPhasespaceCovered(const float clusterTheta, const float p, const float charge) const
     {
       if (!m_categories) {
         B2FATAL("No (clusterTheta, p, charge) TH3 grid was found in the ECLChargedPIDMVA DB payload. This should not happen! Abort...");
       }
 
-      const float ttheta = theta  / m_ang_unit.GetVal();
+      const float ttheta = clusterTheta  / m_ang_unit.GetVal();
       const float pp = p / m_energy_unit.GetVal();
 
       if (ttheta < m_categories->GetXaxis()->GetBinLowEdge(1)) return false;
@@ -317,26 +353,26 @@ namespace Belle2 {
     }
 
     /**
-    * returns the flattened 1D bin index of the 3D binning.
-    * @param theta: theta of the cluster [rad].
+    * returns the flattened 1D index of the 3D phasespace category grid.
+    * @param clusterTheta: clusterTheta of the cluster [rad].
     * @param p: momentum of the track [GeV].
     * @param charge: charge of the track.
     */
-    unsigned int getLinearisedBinIndex(const float theta, const float p, const float charge) const
+    unsigned int getLinearisedCategoryIndex(const float clusterTheta, const float p, const float charge) const
     {
       if (!m_categories) {
         B2FATAL("No (clusterTheta, p, charge) TH3 grid was found in the ECLChargedPIDMVA DB payload. This should not happen! Abort...");
       }
-      // alternatively set these to be just inside the first or last bin.
-      if (!isPhasespaceCovered(theta, p, charge)) {
-        B2FATAL("Attempting to get bin index for event with (theta = " << theta << ", p = " << p << ", charge = " << charge <<
+      // alternatively set these to be just inside the nearest category.
+      if (!isPhasespaceCovered(clusterTheta, p, charge)) {
+        B2FATAL("Attempting to get bin index for event with (clusterTheta = " << clusterTheta << ", p = " << p << ", charge = " << charge <<
                 ") outside the covered phasespace. This should not happen! Abort...");
       }
       // This is different to the root FindBin index as that includes under and overflow bins in each dimension.
       const unsigned int nTheta  = m_categories->GetXaxis()->GetNbins();
       const unsigned int nP      = m_categories->GetYaxis()->GetNbins();
 
-      const unsigned int iTheta  = m_categories->GetXaxis()->FindBin(theta / m_ang_unit.GetVal()) - 1;
+      const unsigned int iTheta  = m_categories->GetXaxis()->FindBin(clusterTheta / m_ang_unit.GetVal()) - 1;
       const unsigned int iP      = m_categories->GetYaxis()->FindBin(p / m_energy_unit.GetVal()) - 1;
       const unsigned int iCharge = m_categories->GetZaxis()->FindBin(charge) - 1;
 
@@ -344,29 +380,20 @@ namespace Belle2 {
       return iTheta + nTheta * (iP + nP * iCharge);
     }
 
-    /**
-     * get the log transform offset
-    */
-    float getLogTransformOffset() const
-    {
-      return m_log_transform_offset.GetVal();
-    }
-
 
 
   private:
-    TParameter<float> m_energy_unit; /**< The energy unit used for defining the bins grid. */
-    TParameter<float> m_ang_unit;    /**< The angular unit used for defining the bins grid. */
-    TParameter<float> m_log_transform_offset; /**< Small offset to avoid bdt response values of 1.0 being log transformed to NaN. */
+    TParameter<float> m_energy_unit; /**< The energy unit used for defining the 3D (clusterTheta, p, charge) category grid. */
+    TParameter<float> m_ang_unit;    /**< The angular unit used for defining the 3D (clusterTheta, p, charge) category grid. */
 
     /**
-     * A 3D (theta, p, charge) histogram whose bins represent the categories for which the training is performed .
-      * It is used to lookup the correct file in the payload, given a reconstructed triplet (theta, p, charge).
+     * A 3D (clusterTheta, p, charge) histogram whose bins define the boundaries of the categories for which the training is performed.
+      * It is used to lookup the correct file in the payload, given a reconstructed triplet (clusterTheta, p, charge).
      */
     TH3F* m_categories = nullptr;
 
     /**
-     * Stores the ECLChargedPIDPhasespaceCategory object for all the (theta, p, charge) categories.
+     * Stores the ECLChargedPIDPhasespaceCategory object for all the (clusterTheta, p, charge) categories.
      */
     std::vector<ECLChargedPIDPhasespaceCategory> m_phasespaceCategories;
 

@@ -8,6 +8,7 @@
 
 #include <top/modules/TOPChannelMasker/TOPChannelMaskerModule.h>
 #include <top/reconstruction_cpp/TOPRecoManager.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 using namespace std;
 
@@ -16,9 +17,9 @@ namespace Belle2 {
   using namespace TOP;
 
 //-----------------------------------------------------------------
-//                 Register the Module
+///                 Register the Module
 //-----------------------------------------------------------------
-  REG_MODULE(TOPChannelMasker)
+  REG_MODULE(TOPChannelMasker);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -116,17 +117,46 @@ namespace Belle2 {
           digit.getHitQuality() == TOPDigit::c_Uncalibrated) {
         digit.setHitQuality(TOPDigit::c_Good);
       }
-      // skip digit if not c_Good
       if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+
       // now do the new masking of c_Good
-      if (not m_channelMask->isActive(digit.getModuleID(), digit.getChannel())) {
+      auto slotID = digit.getModuleID();
+      auto channel = digit.getChannel();
+      if (not m_channelMask->isActive(slotID, channel)) {
         digit.setHitQuality(TOPDigit::c_Masked);
+        continue;
       }
-      if (m_maskUncalibratedChannelT0 and not digit.isChannelT0Calibrated()) {
-        digit.setHitQuality(TOPDigit::c_Uncalibrated);
+      if (not m_savedAsicMask.isActive(slotID, channel)) {
+        digit.setHitQuality(TOPDigit::c_Masked);
+        const unsigned maxCount = 10; // at HLT this means (10 * number-of-processes) messages before being suppressed
+        if (m_errorCount < maxCount) {
+          B2ERROR("Unexpected hit found in a channel that is masked-out by firmware"
+                  << LogVar("slotID", slotID) << LogVar("channel", channel));
+        } else if (m_errorCount == maxCount) {
+          B2ERROR("Unexpected hit found in a channel that is masked-out by firmware"
+                  << LogVar("slotID", slotID) << LogVar("channel", channel)
+                  << LogVar("... message will be suppressed now, errorCount", m_errorCount));
+        }
+        m_errorCount++;
+        continue;
       }
-      if (m_maskUncalibratedTimebase and not digit.isTimeBaseCalibrated()) {
+      if (m_maskUncalibratedChannelT0 and not m_channelT0->isCalibrated(slotID, channel)) {
         digit.setHitQuality(TOPDigit::c_Uncalibrated);
+        continue;
+      }
+      if (m_maskUncalibratedTimebase) {
+        const auto& fe_mapper = TOPGeometryPar::Instance()->getFrontEndMapper();
+        const auto* fe = fe_mapper.getMap(slotID, channel / 128);
+        if (not fe) {
+          B2ERROR("No front-end map found" << LogVar("slotID", slotID) << LogVar("channel", channel));
+          digit.setHitQuality(TOPDigit::c_Uncalibrated);
+          continue;
+        }
+        auto scrodID = fe->getScrodID();
+        const auto* sampleTimes = m_timebase->getSampleTimes(scrodID, channel);
+        if (not sampleTimes->isCalibrated()) {
+          digit.setHitQuality(TOPDigit::c_Uncalibrated);
+        }
       }
     }
 

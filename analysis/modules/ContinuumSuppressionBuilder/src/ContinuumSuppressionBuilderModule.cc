@@ -16,7 +16,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ContinuumSuppressionBuilder)
+REG_MODULE(ContinuumSuppressionBuilder);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -44,8 +44,12 @@ void ContinuumSuppressionBuilderModule::initialize()
     m_ROEMask = RestOfEvent::c_defaultMaskName;
   }
 
+  if (m_ROEMask == "FS1" or m_ROEMask == "ROE") {
+    B2ERROR("The ROE mask for the continuum suppression must not be called " << m_ROEMask);
+  }
+
   // Output
-  m_csarray.registerInDataStore();
+  m_csarray.registerInDataStore(m_ROEMask);
   StoreArray<Particle>().registerRelationTo(m_csarray);
 }
 

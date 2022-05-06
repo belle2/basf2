@@ -7,15 +7,19 @@
  **************************************************************************/
 
 #pragma once
+
 #include <analysis/VariableManager/Manager.h>
-#include <mdst/dataobjects/MCParticle.h>
+
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <TLorentzVector.h>
+
+#include <Math/Vector4D.h>
+
 #include <string>
 #include <vector>
 #include <set>
 
 namespace Belle2 {
+  class MCParticle;
   class Particle;
 
   namespace Variable {
@@ -44,7 +48,7 @@ namespace Belle2 {
     /**
      * Helper function for nRemainingTracksInRestOfEventWithMask and nRemainingTracksInRestOfEvent
      */
-    double nRemainingTracksInROE(const Particle* particle, const std::string& maskName = RestOfEvent::c_defaultMaskName);
+    int nRemainingTracksInROE(const Particle* particle, const std::string& maskName = RestOfEvent::c_defaultMaskName);
 
     /**
      * Returns number of tracks in the event minus in the current RestOfEvent object accepting a mask.
@@ -59,7 +63,7 @@ namespace Belle2 {
     /**
      * Returns number of tracks in the event minus in the current RestOfEvent object
      */
-    double nROE_RemainingTracks(const Particle* particle);
+    int nROE_RemainingTracks(const Particle* particle);
 
     /**
      * Returns number of remaining KLM clusters in the related RestOfEvent object
@@ -351,7 +355,7 @@ namespace Belle2 {
      * Option 6: LAB: Same as option 5, but fix Emiss = pmiss (missing mass set to 0)
      * Option 7: LAB: Same as 6, correct pmiss 4vector with factor
      */
-    TLorentzVector missing4Vector(const Particle* particle, const std::string& maskName, const std::string& opt);
+    ROOT::Math::PxPyPzEVector missing4Vector(const Particle* particle, const std::string& maskName, const std::string& opt);
 
     /**
      * Helper function: Returns bit-pattern of flags corresponding to daughters of MCParticle missing in ROE

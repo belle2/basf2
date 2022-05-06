@@ -12,6 +12,8 @@
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <Math/Boost.h>
+
 using namespace Belle2;
 
 double TrackFilterModule::m_min_d0 = -100;
@@ -33,7 +35,7 @@ TNtuple* TrackFilterModule::m_rejectedNtpl = nullptr;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TrackFilter)
+REG_MODULE(TrackFilter);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -160,7 +162,7 @@ bool TrackFilterModule::isSelected(const Track* track)
 
 }
 
-void TrackFilterModule::fillControlNtuples(const Track* track , bool isSelected)
+void TrackFilterModule::fillControlNtuples(const Track* track, bool isSelected)
 {
 
   int pionCode = 211;
@@ -175,8 +177,9 @@ void TrackFilterModule::fillControlNtuples(const Track* track , bool isSelected)
   float omega = tfr->getOmega();
 
   double pt = tfr->getMomentum().Pt();
-  TLorentzVector pStar = tfr->get4Momentum();
-  pStar.Boost(0, 0, 3. / 11);
+  ROOT::Math::PxPyPzEVector pStar = tfr->get4Momentum();
+  ROOT::Math::BoostZ boost(3. / 11);
+  pStar = boost(pStar);
   double pCM = pStar.P();
   double pVal = tfr->getPValue();
   int nPXDhits = hitPatternVXD.getNPXDHits();

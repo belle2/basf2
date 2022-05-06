@@ -54,7 +54,7 @@ namespace Belle2 {
       int fit(std::string options = "default");
 
       /** get the position of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
-      TVector3 getPos(VecSize vertexId = 0) const;
+      B2Vector3D getPos(VecSize vertexId = 0) const;
 
       /** get the p value of the fitted vertex. If Rave was also used to find different vertices the user has to provide the index of that vertex */
       double getPValue(VecSize vertexId = 0) const;
@@ -79,8 +79,7 @@ namespace Belle2 {
       {
         if (beamSpot == true) {
           if (RaveSetup::getRawInstance()->m_useBeamSpot == false) {
-            B2ERROR("Beam spot information cannot be used because the beam spot position and covariance was not set in RaveSetup");
-            throw;
+            B2FATAL("Beam spot information cannot be used because the beam spot position and covariance was not set in RaveSetup");
           }
           m_useBeamSpot = true;
         } else {

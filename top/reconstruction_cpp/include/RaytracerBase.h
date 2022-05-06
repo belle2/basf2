@@ -48,6 +48,7 @@ namespace Belle2 {
         double zL = 0; /**< minimal z */
         double zR = 0; /**< maximal z */
         double reflectivity = 0; /**< surface reflectivity */
+        double sigmaAlpha = 0; /**< surface roughness parameter */
 
         /**
          * default constructor

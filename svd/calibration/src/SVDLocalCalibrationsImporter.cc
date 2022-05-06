@@ -112,7 +112,7 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
   unique_ptr<SVDOnlineToOfflineMap> map =
     make_unique<SVDOnlineToOfflineMap>(OnlineToOfflineMapFileName->getFileName());
 
-  payload.construct(defaultValue , xmlFileName);
+  payload.construct(defaultValue, xmlFileName);
 
   // This is the property tree
   ptree pt;
@@ -186,7 +186,7 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
                           " sensor " << sensor << "\n");
 
 
-                payload->set(layer, ladder, sensor, side , strip, value);
+                payload->set(layer, ladder, sensor, side, strip, value);
               }
             }
           }
@@ -221,7 +221,7 @@ void SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std:
   unique_ptr<SVDOnlineToOfflineMap> map =
     make_unique<SVDOnlineToOfflineMap>(OnlineToOfflineMapFileName->getFileName());
 
-  pulseShapes.construct(SVDStripCalAmp() , xmlFileName);
+  pulseShapes.construct(SVDStripCalAmp(), xmlFileName);
 
   // This is the property tree
   ptree pt;
@@ -301,7 +301,7 @@ void SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std:
                 stripCalAmp.gain = amp / 22500.;
                 stripCalAmp.peakTime = peakTime * 31.44 / 8;
                 stripCalAmp.pulseWidth = width * 31.44 / 8 ;
-                pulseShapes->set(layer, ladder, sensor, side , strip, stripCalAmp);
+                pulseShapes->set(layer, ladder, sensor, side, strip, stripCalAmp);
 
               }
             }

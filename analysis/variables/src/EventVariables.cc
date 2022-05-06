@@ -9,6 +9,7 @@
 // Own include
 #include <analysis/variables/EventVariables.h>
 
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
 
 // framework - DataStore
@@ -37,30 +38,27 @@
 #include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 
-#include <TLorentzVector.h>
-#include <TVector3.h>
-
 namespace Belle2 {
   namespace Variable {
 
     // Event ------------------------------------------------
-    double isMC(const Particle*)
+    bool isMC(const Particle*)
     {
       return Environment::Instance().isMC();
     }
 
-    double eventType(const Particle*)
+    bool eventType(const Particle*)
     {
       StoreArray<MCParticle> mcparticles;
       return (mcparticles.getEntries()) > 0 ? 0 : 1;
     }
 
-    double isContinuumEvent(const Particle*)
+    bool isContinuumEvent(const Particle*)
     {
-      return (isNotContinuumEvent(nullptr) == 1.0 ? 0.0 : 1.0);
+      return (isNotContinuumEvent(nullptr) == 1 ? 0 : 1);
     }
 
-    double isChargedBEvent(const Particle*)
+    bool isChargedBEvent(const Particle*)
     {
       StoreArray<MCParticle> mcParticles;
       for (const auto& mcp : mcParticles) {
@@ -84,8 +82,7 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
-
-    double isNotContinuumEvent(const Particle*)
+    bool isNotContinuumEvent(const Particle*)
     {
       StoreArray<MCParticle> mcParticles;
       for (const MCParticle& mcp : mcParticles) {
@@ -97,30 +94,30 @@ namespace Belle2 {
              (pdg_no == 300553) ||
              (pdg_no == 9000553) ||
              (pdg_no == 9010553)))
-          return 1.0;
+          return 1;
       }
-      return 0.0;
+      return 0;
     }
 
-    double nMCParticles(const Particle*)
+    int nMCParticles(const Particle*)
     {
       StoreArray<MCParticle> mcps;
       return mcps.getEntries();
     }
 
-    double nTracks(const Particle*)
+    int nTracks(const Particle*)
     {
       StoreArray<Track> tracks;
       return tracks.getEntries();
     }
 
-    double nChargeZeroTrackFits(const Particle*)
+    int nChargeZeroTrackFits(const Particle*)
     {
       StoreArray<TrackFitResult> tfrs;
       int out = 0;
       for (const auto& t : tfrs)
         if (t.getChargeSign() == 0) out++;
-      return double(out);
+      return out;
     }
 
     double belleECLEnergy(const Particle*)
@@ -137,34 +134,34 @@ namespace Belle2 {
       return result;
     }
 
-    double nKLMClusters(const Particle*)
+    int nKLMClusters(const Particle*)
     {
       StoreArray<KLMCluster> klmClusters;
       return klmClusters.getEntries();
     }
 
-    double expNum(const Particle*)
+    int expNum(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
       int exp_no = evtMetaData->getExperiment();
       return exp_no;
     }
 
-    double productionIdentifier(const Particle*)
+    int productionIdentifier(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
       int eventProduction = evtMetaData->getProduction();
       return eventProduction;
     }
 
-    double evtNum(const Particle*)
+    int evtNum(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
       int evt_no = evtMetaData->getEvent();
       return evt_no;
     }
 
-    double runNum(const Particle*)
+    int runNum(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
       int run_no = evtMetaData->getRun();
@@ -255,11 +252,11 @@ namespace Belle2 {
       int elementJ = int(std::lround(element[1]));
 
       if (elementI < 0 || elementI > 3) {
-        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 3]: i = " << elementI);
+        B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 3]:" << LogVar("i", elementI));
         return std::numeric_limits<float>::quiet_NaN();
       }
       if (elementJ < 0 || elementJ > 3) {
-        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 3]: j = " << elementJ);
+        B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 3]:" << LogVar("j", elementJ));
         return std::numeric_limits<float>::quiet_NaN();
       }
 
@@ -275,7 +272,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Mag();
+      double missing = evtShape->getMissingMomentum().R();
       return missing;
     }
 
@@ -286,7 +283,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Px();
+      double missing = evtShape->getMissingMomentum().x();
       return missing;
     }
 
@@ -297,7 +294,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Py();
+      double missing = evtShape->getMissingMomentum().y();
       return missing;
     }
 
@@ -308,7 +305,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentum().Pz();
+      double missing = evtShape->getMissingMomentum().z();
       return missing;
     }
 
@@ -330,7 +327,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Mag();
+      double missing = evtShape->getMissingMomentumCMS().R();
       return missing;
     }
 
@@ -341,7 +338,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Mag();
+      double missing = evtShape->getMissingMomentumCMS().R();
       return missing;
     }
 
@@ -352,7 +349,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Px();
+      double missing = evtShape->getMissingMomentumCMS().x();
       return missing;
     }
 
@@ -363,7 +360,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Py();
+      double missing = evtShape->getMissingMomentumCMS().y();
       return missing;
     }
 
@@ -374,7 +371,7 @@ namespace Belle2 {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getMissingMomentumCMS().Pz();
+      double missing = evtShape->getMissingMomentumCMS().z();
       return missing;
     }
 
@@ -478,7 +475,6 @@ namespace Belle2 {
       double energyOfPhotons = evtShape->getTotalPhotonsEnergy();
       return energyOfPhotons;
     }
-
 
     double eventYearMonthDay(const Particle*)
     {
@@ -750,9 +746,6 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("isMC", isMC,
                       "[Eventbased] Returns 1 if current basf2 process is running over simulated (Monte-Carlo) dataset and 0 in case of real experimental data.");
-    REGISTER_VARIABLE("EventType", eventType, "[Eventbased] EventType (0 MC, 1 Data)");
-    MAKE_DEPRECATED("EventType", true, "light-minos-2012", R"DOC(
-                     Use `isMC` instead of this variable but keep in mind that the meaning of the outcome is reversed.)DOC");
     REGISTER_VARIABLE("isContinuumEvent", isContinuumEvent,
                       "[Eventbased] Returns 1.0 if event doesn't contain a :math:`\\Upsilon(4S)` particle on generator level, 0.0 otherwise.");
     REGISTER_VARIABLE("isNotContinuumEvent", isNotContinuumEvent,
@@ -796,7 +789,7 @@ namespace Belle2 {
     vm.addAlias("myNeutralECLEnergy", "totalEnergyOfParticlesInList(gamma:cleaned)")
     vm.addAlias("myChargedECLEnergy", "totalEnergyOfParticlesInList(e+:cleaned)")
     vm.addAlias("myECLEnergy", "formula(myNeutralECLEnergy+myChargedECLEnergy)")
-)DOC");
+)DOC","GeV");
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters,
                       "[Eventbased] Returns number of KLM clusters in the event.");
     REGISTER_VARIABLE("nMCParticles", nMCParticles,
@@ -816,31 +809,30 @@ In such cases the event numbers are sequential *only within a production*, so ex
 .. seealso:: `Where can I rely on uniqueness of the ['__experiment__', '__run__', '__event__', '__candidate__'] combination? <https://questions.belle2.org/question/9704>`__
 )DOC");
 
-    REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] Returns center-of-mass energy.");
-    REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Returns total beam energy in the laboratory frame.");
-    REGISTER_VARIABLE("beamPx", getBeamPx, "[Eventbased] Returns x component of total beam momentum in the laboratory frame.");
-    REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Returns y component of total beam momentum in the laboratory frame.");
-    REGISTER_VARIABLE("beamPz", getBeamPz, "[Eventbased] Returns z component of total beam momentum in the laboratory frame.");
-
+    REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] Returns center-of-mass energy.","GeV");
+    REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Returns total beam energy in the laboratory frame.","GeV");
+    REGISTER_VARIABLE("beamPx", getBeamPx, "[Eventbased] Returns x component of total beam momentum in the laboratory frame.","GeV/c");
+    REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Returns y component of total beam momentum in the laboratory frame.","GeV/c");
+    REGISTER_VARIABLE("beamPz", getBeamPz, "[Eventbased] Returns z component of total beam momentum in the laboratory frame.","GeV/c");
     REGISTER_VARIABLE("IPX", getIPX, R"DOC(
 [Eventbased] Returns x coordinate of the measured interaction point.
 
 .. note:: For old data and uncalibrated MC files this will return 0.0.
 
 .. note:: You might hear tracking and calibration people refer to this as the ``BeamSpot``.
-)DOC");
-    REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] Returns y coordinate of the measured interaction point.");
-    REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] Returns z coordinate of the measured interaction point.");
-    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] Returns (i,j)-th element of the covariance matrix of the measured interaction point.");
+)DOC","cm");
+    REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] Returns y coordinate of the measured interaction point.","cm");
+    REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] Returns z coordinate of the measured interaction point.","cm");
+    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] Returns (i,j)-th element of the covariance matrix of the measured interaction point.",":math:`\\text{cm}^2`");
 
     REGISTER_VARIABLE("genIPX", getGenIPX, R"DOC(
 [Eventbased] Returns x coordinate of the interaction point used for the underlying **MC generation**.
 Returns NaN for data.
 
 .. note:: This is normally smeared from 0.0
-)DOC");
-    REGISTER_VARIABLE("genIPY", getGenIPY, "[Eventbased] Returns y coordinate of the interaction point used for the underlying **MC generation**. Returns NaN for data.");
-    REGISTER_VARIABLE("genIPZ", getGenIPZ, "[Eventbased] Returns z coordinate of the interaction point used for the underlying **MC generation**. Returns NaN for data.");
+)DOC","cm");
+    REGISTER_VARIABLE("genIPY", getGenIPY, "[Eventbased] Returns y coordinate of the interaction point used for the underlying **MC generation**. Returns NaN for data.","cm");
+    REGISTER_VARIABLE("genIPZ", getGenIPZ, "[Eventbased] Returns z coordinate of the interaction point used for the underlying **MC generation**. Returns NaN for data.","cm");
 
     REGISTER_VARIABLE("date", eventYearMonthDay, R"DOC(
 [Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).
@@ -854,19 +846,19 @@ Returns NaN for data.
   For more precise event time, see :b2:var:`eventTimeSeconds` and :b2:var:`eventTimeSecondsFractionRemainder`.
 )DOC");
     REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
-                      "[Eventbased] Time of the event in seconds (truncated down) since 1970/1/1 (Unix epoch).");
+                      "[Eventbased] Time of the event (truncated down) since 1970/1/1 (Unix epoch).","s");
     REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder, R"DOC(
-[Eventbased] Remainder of the event time in fractions of a second.
+[Eventbased] Remainder of the event time.
 
 .. tip::
   Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.
-)DOC");
+)DOC","s");
 
     REGISTER_VARIABLE("timeSincePrevTriggerClockTicks", timeSincePrevTriggerClockTicks,
-                      "[Eventbased] Time since the previous trigger in clock ticks (127MHz=RF/4 clock).");
+                      "[Eventbased] Time since the previous trigger (127MHz=RF/4 clock).","clock ticks");
 
     REGISTER_VARIABLE("timeSincePrevTriggerMicroSeconds", timeSincePrevTriggerMicroSeconds,
-                      "[Eventbased] Time since the previous trigger in micro seconds.");
+                      "[Eventbased] Time since the previous trigger.","ms");
 
     REGISTER_VARIABLE("triggeredBunchNumberTTD", triggeredBunchNumberTTD, R"DOC(
 [Eventbased] Number of triggered bunch ranging from 0-1279.
@@ -885,22 +877,22 @@ Returns NaN for data.
                       "[Eventbased] Returns 1 if an injection happened recently, 0 otherwise.");
 
     REGISTER_VARIABLE("timeSinceLastInjectionSignalClockTicks", timeSinceLastInjectionSignalClockTicks, R"DOC(
-[Eventbased] Time since the last injection pre-kick signal in clock ticks (127MHz=RF/4 clock)
+[Eventbased] Time since the last injection pre-kick signal (127MHz=RF/4 clock)
 
 .. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
-)DOC");
+)DOC","clock ticks");
 
     REGISTER_VARIABLE("timeSinceLastInjectionSignalMicroSeconds", timeSinceLastInjectionSignalMicroSeconds, R"DOC(
-[Eventbased] Time since the last injection pre-kick signal in micro seconds
+[Eventbased] Time since the last injection pre-kick signal
 
 .. warning:: this returns the time without the delay until the injected bunch reaches the detector (which differs for HER/LER)
-)DOC");
+)DOC","ms");
 
     REGISTER_VARIABLE("timeSinceLastInjectionClockTicks", timeSinceLastInjectionClockTicks,
-      "[Eventbased] Time since the last injected bunch passed by the detector in micro seconds.")
+      "[Eventbased] Time since the last injected bunch passed by the detector.","ms")
 
     REGISTER_VARIABLE("timeSinceLastInjectionMicroSeconds", timeSinceLastInjectionMicroSeconds,
-      "[Eventbased] Time since the last injected bunch passed by the detector in micro seconds.")
+      "[Eventbased] Time since the last injected bunch passed by the detector.","ms")
 
     REGISTER_VARIABLE("injectionInHER", injectionInHER,
                   "[Eventbased] Returns 1 if injection was in HER, 0 otherwise.");
@@ -918,70 +910,70 @@ Returns NaN for data.
 
 .. warning:: You have to run the Event Kinematics builder module for this variable to be meaningful.
 .. seealso:: `modularAnalysis.buildEventKinematics`.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEvent_Px", missingMomentumOfEvent_Px, R"DOC(
 [Eventbased] The x component of the missing momentum in laboratory frame.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEvent_Py", missingMomentumOfEvent_Py, R"DOC(
 [Eventbased] The y component of the missing momentum in laboratory frame.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEvent_Pz", missingMomentumOfEvent_Pz, R"DOC(
 [Eventbased] The z component of the missing momentum in laboratory frame.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEvent_theta", missingMomentumOfEvent_theta, R"DOC(
 [Eventbased] The theta angle of the missing momentum of the event in laboratory frame.
-)DOC");
+)DOC","rad");
     REGISTER_VARIABLE("missingMomentumOfEventCMS", missingMomentumOfEventCMS, R"DOC(
 [Eventbased] The magnitude of the missing momentum in center-of-mass frame.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("genMissingMomentumOfEventCMS", genMissingMomentumOfEventCMS, R"DOC(
 [Eventbased] The magnitude of the missing momentum in center-of-mass frame from generator
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Px", missingMomentumOfEventCMS_Px, R"DOC(
 [Eventbased] The x component of the missing momentum in center-of-mass frame.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Py", missingMomentumOfEventCMS_Py, R"DOC(
 [Eventbased] The y component of the missing momentum in center-of-mass frame.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Pz", missingMomentumOfEventCMS_Pz, R"DOC(
 [Eventbased] The z component of the missing momentum in center-of-mass frame.
-)DOC");
+)DOC","GeV/c");
     REGISTER_VARIABLE("missingMomentumOfEventCMS_theta", missingMomentumOfEventCMS_theta, R"DOC(
 [Eventbased] The theta angle of the missing momentum in center-of-mass frame.
-)DOC");
+)DOC","rad");
     REGISTER_VARIABLE("missingEnergyOfEventCMS", missingEnergyOfEventCMS, R"DOC(
 [Eventbased] The missing energy in center-of-mass frame.
-)DOC");
+)DOC","GeV");
     REGISTER_VARIABLE("genMissingEnergyOfEventCMS", genMissingEnergyOfEventCMS, R"DOC(
 [Eventbased] The missing energy in center-of-mass frame from generator.
-)DOC");
+)DOC","GeV");
     REGISTER_VARIABLE("missingMass2OfEvent", missingMass2OfEvent, R"DOC(
 [Eventbased] The missing mass squared.
-)DOC");
+)DOC",":math:`[\\text{GeV}/\\text{c}^2]^2`");
     REGISTER_VARIABLE("genMissingMass2OfEvent", genMissingMass2OfEvent, R"DOC(
 [Eventbased] The missing mass squared from generator
-)DOC");
+)DOC",":math:`[\\text{GeV}/\\text{c}^2]^2`");
     REGISTER_VARIABLE("visibleEnergyOfEventCMS", visibleEnergyOfEventCMS, R"DOC(
 [Eventbased] The visible energy in center-of-mass frame.
-)DOC");
+)DOC","GeV");
     REGISTER_VARIABLE("genVisibleEnergyOfEventCMS", genVisibleEnergyOfEventCMS, R"DOC(
 [Eventbased] The visible energy in center-of-mass frame from generator.
-)DOC");
+)DOC","GeV");
     REGISTER_VARIABLE("totalPhotonsEnergyOfEvent", totalPhotonsEnergyOfEvent, R"DOC(
 [Eventbased] The energy in laboratory frame of all the photons.
-)DOC");
+)DOC","GeV");
     REGISTER_VARIABLE("genTotalPhotonsEnergyOfEvent", genTotalPhotonsEnergyOfEvent, R"DOC(
 [Eventbased] The energy in laboratory frame of all the photons. from generator.
-)DOC");
+)DOC","GeV");
 
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0, R"DOC(
-[Eventbased][Calibration] The Event t0, measured in ns, is the time of the event relative to the trigger time. 
+[Eventbased][Calibration] The Event t0, is the time of the event relative to the trigger time. 
 
 .. note::
   The event time can be measured by several sub-detectors including the CDC, ECL, and TOP.
   This Event t0 variable is the final combined value of all the event time measurements.
   Currently only the CDC and ECL are used in this combination.
-)DOC");
+)DOC","ns");
   }
 }

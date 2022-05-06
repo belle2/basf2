@@ -12,7 +12,7 @@
    merges the relevant crystal payloads, and makes validation plots.  It is the
    main script for executing the ECL timing calibrations."""
 
-from prompt import CalibrationSettings, input_data_filters
+from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from reconstruction import prepare_cdst_analysis, prepare_user_cdst_analysis
 from caf.utils import IoV, ExpRun
 import copy
@@ -31,24 +31,24 @@ import copy
 #     the hadron skim for validations.
 settings = CalibrationSettings(
     name="ECL crystal and crate time calibrations and validations",
-    expert_username="ehill",
+    expert_username="hearty",
     description=__doc__,
     input_data_formats=["cdst"],
     input_data_names=["bhabha_all_calib", "hadron_calib"],
-    input_data_filters={"bhabha_all_calib": [input_data_filters["Data Tag"]["bhabha_all_calib"],
-                                             input_data_filters["Beam Energy"]["4S"],
-                                             input_data_filters["Beam Energy"]["Continuum"],
-                                             input_data_filters["Beam Energy"]["Scan"],
-                                             input_data_filters["Data Quality Tag"]["Good"],
-                                             input_data_filters["Run Type"]["physics"],
-                                             input_data_filters["Magnet"]["On"]],
-                        "hadron_calib": [input_data_filters["Data Tag"]["hadron_calib"],
-                                         input_data_filters["Beam Energy"]["4S"],
-                                         input_data_filters["Beam Energy"]["Continuum"],
-                                         input_data_filters["Beam Energy"]["Scan"],
-                                         input_data_filters["Data Quality Tag"]["Good"],
-                                         input_data_filters["Run Type"]["physics"],
-                                         input_data_filters["Magnet"]["On"]]},
+    input_data_filters={"bhabha_all_calib": [INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
+                                             INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+                                             INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
+                                             INPUT_DATA_FILTERS["Beam Energy"]["Scan"],
+                                             INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                             INPUT_DATA_FILTERS["Run Type"]["physics"],
+                                             INPUT_DATA_FILTERS["Magnet"]["On"]],
+                        "hadron_calib": [INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
+                                         INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+                                         INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
+                                         INPUT_DATA_FILTERS["Beam Energy"]["Scan"],
+                                         INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
+                                         INPUT_DATA_FILTERS["Run Type"]["physics"],
+                                         INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],
     expert_config={"numCrysCrateIterations": 1,
                    "maxNumberEvents": 50000000,
@@ -207,9 +207,7 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     from basf2 import register_module, create_path
-    import ROOT
     from ROOT import Belle2
-    from ROOT.Belle2 import TestCalibrationAlgorithm
     from caf.framework import Collection
 
     ###################################################
@@ -224,7 +222,7 @@ def get_calibrations(input_data, **kwargs):
     if 'Geometry' not in rec_path_bhabha:
         rec_path_bhabha.add_module('Geometry', useDB=True)
 
-    prepare_cdst_analysis(rec_path_bhabha)  # for new 2020 cdst format
+    prepare_cdst_analysis(rec_path_bhabha, components=['SVD', 'CDC', 'ECL', 'KLM'])
 
     # ====================================================
     # t0BiasCorrection = -0.9  # Correct for the CDC t0 bias in ns
@@ -390,7 +388,7 @@ def get_calibrations(input_data, **kwargs):
 
             cal_ecl_merge_i.save_payloads = False
             ecl_merge_pre_path_i = basf2.create_path()
-            prepare_cdst_analysis(ecl_merge_pre_path_i)
+            prepare_cdst_analysis(ecl_merge_pre_path_i, components=['SVD', 'CDC', 'ECL', 'KLM'])
             ecl_merge_pre_path_i.pre_collector_path = ecl_merge_pre_path_i
 
             # If payload boundaries are set use SequentialBoundaries
@@ -476,8 +474,8 @@ def get_calibrations(input_data, **kwargs):
         if 'Geometry' not in rec_path_bhabha_val:
             rec_path_bhabha_val.add_module('Geometry', useDB=True)
 
-        prepare_user_cdst_analysis(rec_path_bhabha_val)    # for new 2020 cdst format
-
+        # exclude PXD and PID, so only CDC and ECL used for eventT0
+        prepare_user_cdst_analysis(rec_path_bhabha_val, components=['SVD', 'CDC', 'ECL', 'KLM'])
         col_bhabha_val = register_module('eclBhabhaTimeCalibrationValidationCollector')
         col_bhabha_val.param('timeAbsMax', 70)
         col_bhabha_val.param('saveTree', False)
@@ -552,8 +550,8 @@ def get_calibrations(input_data, **kwargs):
         if 'Geometry' not in rec_path_hadron_val:
             rec_path_hadron_val.add_module('Geometry', useDB=True)
 
-        prepare_user_cdst_analysis(rec_path_hadron_val)    # for new 2020 cdst format
-
+        # exclude PXD and PID, so only CDC and ECL used for eventT0
+        prepare_user_cdst_analysis(rec_path_hadron_val, components=['SVD', 'CDC', 'ECL', 'KLM'])
         col_hadron_val = register_module('eclHadronTimeCalibrationValidationCollector')
         col_hadron_val.param('timeAbsMax', 70)
         col_hadron_val.param('saveTree', False)
@@ -632,7 +630,7 @@ def get_calibrations(input_data, **kwargs):
         if 'Geometry' not in rec_path_bhabha_plotting:
             rec_path_bhabha_plotting.add_module('Geometry', useDB=True)
 
-        prepare_cdst_analysis(rec_path_bhabha_plotting)  # for new 2020 cdst format
+        prepare_cdst_analysis(rec_path_bhabha_plotting, components=['SVD', 'CDC', 'ECL', 'KLM'])
 
         col_bhabha_plotting = register_module('eclTimeShiftsPlottingCollector')
         eclTCol = Collection(collector=col_bhabha_plotting,

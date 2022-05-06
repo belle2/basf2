@@ -82,7 +82,7 @@ namespace Belle2 {
       int calcDxSVD();
 
       /// Print a Matrix M and a vector y of dimension idim
-      void printMy(double M[], double y[], int idim);
+      void printMy(const double M[], const double y[], int idim);
 
       bool updateParams(gsl_vector* xnew);
       void fillxold();

@@ -75,7 +75,8 @@ namespace Belle2 {
         storeAcceptedPath(newPath, allNodePaths);
 
         if (allNodePaths.size() > pathLimit) {
-          B2ERROR("Number of collected paths to large. Aborting Event!");
+          B2WARNING("Number of collected paths is too large: skipping the event and not processing it."
+                    << LogVar("Number of node paths", allNodePaths.size()) << LogVar("Current limit of paths", pathLimit));
           return false;
         }
       }
@@ -85,7 +86,7 @@ namespace Belle2 {
 
 
     /// Prints information about all paths provided in a vector of paths
-    static std::string printPaths(std::vector<Path>& allPaths)
+    static std::string printPaths(const std::vector<Path>& allPaths)
     {
       std::stringstream out;
       unsigned int longestPath = 0, longesPathIndex = 0, index = 0;

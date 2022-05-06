@@ -60,9 +60,9 @@ namespace Belle2 {
     DBObjPtr<CDCCrossTalkLibrary>* m_xTalkFromDB = nullptr; /*!< Pointer to cross-talk from DB. */
 
     DBArray<CDCFEElectronics>* m_fEElectronicsFromDB = nullptr; /*!< Pointer to FE electronics params. from DB. */
-    float m_lowEdgeOfTimeWindow[nBoards] = {0}; /*!< Lower edge of time-window */
-    float m_uprEdgeOfTimeWindow[nBoards] = {0}; /*!< Upper edge of time-window */
-    unsigned short m_widthOfTimeWindow [nBoards] = {0}; /*!< Width of time window */
+    float m_lowEdgeOfTimeWindow[c_nBoards] = {0}; /*!< Lower edge of time-window */
+    float m_uprEdgeOfTimeWindow[c_nBoards] = {0}; /*!< Upper edge of time-window */
+    unsigned short m_widthOfTimeWindow [c_nBoards] = {0}; /*!< Width of time window */
 
     double m_invOfTDCBinWidth = 0;    /**< Inv. of TDC-bin width (in ns^-1)*/
 

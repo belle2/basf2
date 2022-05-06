@@ -3,6 +3,8 @@
 MVA package
 ===========
 
+.. tip:: For a hands-on introductory lesson with the MVA package, see :ref:`online_book_cs_bdt`.
+
 Overview
 --------
 
@@ -129,6 +131,7 @@ Contains backend independent options
 .. code-block:: python
 
     import basf2_mva
+
     go = basf2_mva.GeneralOptions()
     go.m_datafiles = basf2_mva.vector('train.root')
     go.m_treename = 'tree'
@@ -142,6 +145,8 @@ SpecificOptions
 Contains backend specific options
 
 .. code-block:: python
+
+    import basf2_mva
 
     sp = basf2_mva.FastBDTOptions()
     sp.m_nTrees = 100
@@ -235,12 +240,10 @@ Very roughly:
 Finally, you can also apply the MVA method onto a ROOT file using the basf2_mva_expert, either in Python
 
 .. code-block:: python
-
-    import basf2_mva
  
     basf2_mva.expert(basf2_mva.vector('DatabaseIdentifier'),
                      basf2_mva.vector('test.root'),
-                    'tree', 'expert.root')
+                     'tree', 'expert.root')
 
 or in bash::
 

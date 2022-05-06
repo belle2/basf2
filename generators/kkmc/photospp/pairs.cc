@@ -662,6 +662,12 @@ namespace Photospp {
       YOT1 = YOT1 * XMP * XMP * XMP * XMP / ((darkr.MXX * darkr.MXX - XMP * XMP) * (darkr.MXX * darkr.MXX - XMP * XMP) + darkr.GXX *
                                              darkr.GXX * darkr.MXX * darkr.MXX);
       YOT1 = YOT1 * darkr.GXX * darkr.MXX ; // factor of total rate should be elsewhere
+      // YOT1=YOT1* (AMTO*AMTO-4*AMCH*AMCH)/(AMTO*AMTO); //oct 21 11:00
+      // YOT1=YOT1* XMK2/(XMK2-4*AMCH*AMCH);//* XMK2/(AMTO*AMTO);//oct 21 11:00
+
+      YOT1 = YOT1 * AMTO / sqrt(XMK2); //oct 21 10:55
+      YOT1 = YOT1 * AMTO / sqrt(XMK2); //oct 21 10:55
+      YOT1 = YOT1 * sqrt((AMTO * AMTO - XMK2 + 2 * AMCH * AMCH) / (AMTO * AMTO - XMK2)); //oct 21 10:55
     } else if (darkr.ifspecial == 1) {
       double mcr = 0.5 * darkr.MXX * darkr.MXX;
       mcr = 0.5 * XMP * XMP;

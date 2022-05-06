@@ -73,7 +73,7 @@ def get_argument_parser():
     parser.add_argument('-t', '--treename', dest='treename', type=str, default='tree',
                         help='Tree name in data file (default: tree)')
     parser.add_argument('--columns', dest='columns', type=str, required=False, action='append', nargs='+',
-                        help='(Optional) Columns to consider.', default=None)
+                        help='(Optional) Columns to consider.', default=[])
     parser.add_argument('--cut', dest='cut', type=str, default=None,
                         help='(Optional) Cut on both signal and background.')
     parser.add_argument('--cut_sig', dest='cut_sig', type=str, default=None,
@@ -104,12 +104,13 @@ if __name__ == '__main__':
 
     data_sig = sum(args.data_sig, [])
     data_bkg = sum(args.data_bkg, [])
+    columns  = sum(args.columns,  [])
 
     # Load the data
     print("Load data")
 
-    df_sig = read_root(data_sig, args.treename, args.columns, where=cut_sig)
-    df_bkg = read_root(data_bkg, args.treename, args.columns, where=cut_bkg)
+    df_sig = read_root(data_sig, args.treename, columns, where=cut_sig)
+    df_bkg = read_root(data_bkg, args.treename, columns, where=cut_bkg)
 
     n_sig = len(df_sig)
     n_bkg = len(df_bkg)
@@ -118,8 +119,8 @@ if __name__ == '__main__':
     print("- %d background candidates selected." % n_bkg)
 
     # Add signal column
-    df_sig[args.signalcolumn] = 1
-    df_bkg[args.signalcolumn] = 0
+    df_sig[args.signalcolumn] = True
+    df_bkg[args.signalcolumn] = False
 
     # Adjust the signal/background ratio if requested
     if args.fsig is not None:

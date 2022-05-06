@@ -16,7 +16,7 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(RemoveParticlesNotInLists)
+REG_MODULE(RemoveParticlesNotInLists);
 
 RemoveParticlesNotInListsModule::RemoveParticlesNotInListsModule(): m_nRemoved(0), m_nTotal(0)
 {

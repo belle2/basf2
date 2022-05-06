@@ -18,7 +18,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(FlavorTaggerInfoFiller)
+REG_MODULE(FlavorTaggerInfoFiller);
 
 FlavorTaggerInfoFillerModule::FlavorTaggerInfoFillerModule() : Module()
 {
@@ -46,10 +46,6 @@ void FlavorTaggerInfoFillerModule::initialize()
 
 void FlavorTaggerInfoFillerModule::event()
 {
-  if (!m_roe->isBuiltWithMostLikely()) {
-    B2ERROR("The ROE was not created with most-likely particle lists."
-            "The flavor tagger will not work properly.");
-  }
   auto* flavorTaggerInfo = m_roe->getRelatedTo<FlavorTaggerInfo>();
 
   Variable::Manager& manager = Variable::Manager::Instance();
@@ -119,8 +115,8 @@ void FlavorTaggerInfoFillerModule::event()
 
           for (unsigned int i = 0; i < particleList->getListSize(); ++i) {
             Particle* iParticle =  particleList ->getParticle(i);
-            float hasMaxProb = manager.getVariable("hasHighestProbInCat(" + particleListName + "," + "isRightTrack(" +
-                                                   category + "))")-> function(iParticle);
+            bool hasMaxProb = std::get<bool>(manager.getVariable("hasHighestProbInCat(" + particleListName + "," + "isRightTrack(" + category +
+                                                                 "))")->function(iParticle));
             if (hasMaxProb == 1) {
               float targetProb = iParticle -> getExtraInfo("isRightTrack(" + category + ")");
               infoMapsFBDT->setProbTrackLevel(category, targetProb);
@@ -158,17 +154,17 @@ void FlavorTaggerInfoFillerModule::event()
 
           for (unsigned int i = 0; i < particleList->getListSize(); ++i) {
             Particle* iParticle =  particleList ->getParticle(i);
-            float hasMaxProb = manager.getVariable("hasHighestProbInCat(" + particleListName + "," + "isRightCategory(" +
-                                                   category + "))")-> function(iParticle);
+            bool hasMaxProb = std::get<bool>(manager.getVariable("hasHighestProbInCat(" + particleListName + "," + "isRightCategory(" + category
+                                                                 + "))")-> function(iParticle));
             if (hasMaxProb == 1) {
               float categoryProb = iParticle -> getExtraInfo("isRightCategory(" + category + ")");
-              float qpCategory =  manager.getVariable(qpCategoryVariable)-> function(iParticle);
+              float qpCategory = std::get<double>(manager.getVariable(qpCategoryVariable)-> function(iParticle));
               infoMapsFBDT->setProbEventLevel(category, categoryProb);
               infoMapsFBDT -> setQpCategory(category, qpCategory);
               if (m_istrueCategories and m_mcparticles.isValid()) {
-                float isTrueTarget = manager.getVariable("hasTrueTarget(" + category + ")")-> function(nullptr);
+                float isTrueTarget = std::get<double>(manager.getVariable("hasTrueTarget(" + category + ")")-> function(nullptr));
                 infoMapsFBDT -> setHasTrueTarget(category, isTrueTarget);
-                float isTrueCategory = manager.getVariable("isTrueCategory(" + category + ")")-> function(nullptr);
+                float isTrueCategory = std::get<double>(manager.getVariable("isTrueCategory(" + category + ")")-> function(nullptr));
                 infoMapsFBDT -> setIsTrueCategory(category, isTrueCategory);
               }
               if (m_trackPointers) {

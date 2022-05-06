@@ -56,6 +56,15 @@
 using namespace std;
 using namespace Belle2;
 
+CDCDatabaseImporter::CDCDatabaseImporter(int fexp, int frun, int lexp, int lrun):
+  m_firstExperiment(fexp), m_firstRun(frun), m_lastExperiment(lexp), m_lastRun(lrun)
+{
+  const CDC::CDCGeometryPar& cdcgp = CDC::CDCGeometryPar::Instance();
+  m_firstLayerOffset  = cdcgp.getOffsetOfFirstLayer();
+  m_superLayerOffset  = cdcgp.getOffsetOfFirstSuperLayer();
+  m_nSenseWires       = cdcgp.getNumberOfSenseWires();
+}
+
 void CDCDatabaseImporter::importTimeZero(std::string fileName)
 {
   std::ifstream stream;
@@ -69,13 +78,18 @@ void CDCDatabaseImporter::importTimeZero(std::string fileName)
   DBImportObjPtr<CDCTimeZeros> tz;
   tz.construct();
 
-  int iL(0);
+  uint iL(0);
   int iC(0);
   double t0(0.);
   int nRead(0);
 
   while (true) {
     stream >> iL >> iC >> t0;
+
+    if (iL < m_firstLayerOffset) {
+      continue;
+    }
+
     if (stream.eof()) break;
     ++nRead;
     WireID wire(iL, iC);
@@ -86,8 +100,8 @@ void CDCDatabaseImporter::importTimeZero(std::string fileName)
   }
   stream.close();
 
-  if (nRead != nSenseWires) B2FATAL("#lines read-in (=" << nRead << ") is inconsistent with total #sense wires (=" << nSenseWires <<
-                                      ") !");
+  if (nRead != m_nSenseWires) B2FATAL("#lines read-in (=" << nRead << ") is inconsistent with total #sense wires (=" << m_nSenseWires
+                                        << ") !");
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
@@ -110,14 +124,19 @@ void CDCDatabaseImporter::importChannelMap(std::string fileName)
 
   DBImportArray<CDCChannelMap> cm;
 
-  int isl;
-  int il;
-  int iw;
-  int iBoard;
-  int iCh;
+  uint isl;
+  uint il;
+  uint iw;
+  uint iBoard;
+  uint iCh;
 
   while (!stream.eof()) {
     stream >>  isl >> il >> iw >> iBoard >> iCh;
+
+    if (il < m_firstLayerOffset) {
+      continue;
+    }
+
     cm.appendNew(isl, il, iw, iBoard, iCh);
   }
   stream.close();
@@ -192,22 +211,29 @@ void CDCDatabaseImporter::importEDepToADC(std::string fileName)
 
   unsigned short id = 0;
   std::vector<float> coeffs(nParams);
-  int nRead = 0;
+  uint nRead = 0;
 
   while (stream >> id) {
     for (unsigned short i = 0; i < nParams; ++i) {
       stream >> coeffs[i];
+    }
+    // TODO: check these two if conditions
+    if (groupId == 0 and id < m_superLayerOffset) {
+      continue;
+    }
+    if (groupId == 1 and id < m_firstLayerOffset) {
+      continue;
     }
     ++nRead;
     etoa->setParams(id, coeffs);
   }
   stream.close();
 
-  unsigned short nId = nSuperLayers;
+  unsigned short nId = c_nSuperLayers;
   if (groupId == 1) {
-    nId = MAX_N_SLAYERS;
+    nId = c_maxNSenseLayers;
   } else if (groupId == 2) {
-    nId = nSenseWires;
+    nId = m_nSenseWires;
   }
   if (nRead != nId) B2FATAL("#lines read-in (=" << nRead << ") is not equal #ids (=" << nId << ") !");
 
@@ -231,12 +257,17 @@ void CDCDatabaseImporter::importBadWire(std::string fileName)
   DBImportObjPtr<CDCBadWires> bw;
   bw.construct();
 
-  int iL(0), iC(0), nRead(0);
+  uint iL(0), iC(0), nRead(0);
   double effi(0.);
 
   while (true) {
     stream >> iL >> iC >> effi;
     if (stream.eof()) break;
+
+    if (iL < m_firstLayerOffset) {
+      continue;
+    }
+
     ++nRead;
     bw->setWire(WireID(iL, iC), effi);
     //      if (m_debug) {
@@ -245,8 +276,8 @@ void CDCDatabaseImporter::importBadWire(std::string fileName)
   }
   stream.close();
 
-  if (nRead > static_cast<int>(nSenseWires)) B2FATAL("#lines read-in (=" << nRead << ") is larger than #sense wires (=" << nSenseWires
-                                                       << ") !");
+  if (nRead > static_cast<int>(m_nSenseWires)) B2FATAL("#lines read-in (=" << nRead << ") is larger than #sense wires (=" <<
+                                                         m_nSenseWires << ") !");
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
@@ -268,12 +299,17 @@ void CDCDatabaseImporter::importPropSpeed(std::string fileName)
   DBImportObjPtr<CDCPropSpeeds> ps;
   ps.construct();
 
-  int iCL(0), nRead(0);
+  uint iCL(0), nRead(0);
   double speed(0.);
 
   while (true) {
     stream >> iCL >> speed;
     if (stream.eof()) break;
+
+    if (iCL < m_firstLayerOffset) {
+      continue;
+    }
+
     ++nRead;
     //    ps->setSpeed(speed);
     ps->setSpeed(iCL, speed);
@@ -284,7 +320,8 @@ void CDCDatabaseImporter::importPropSpeed(std::string fileName)
   }
   stream.close();
 
-  if (nRead != MAX_N_SLAYERS) B2FATAL("#lines read-in (=" << nRead << ") is no equal #sense layers (=" << MAX_N_SLAYERS << ") !");
+  if (nRead != c_maxNSenseLayers) B2FATAL("#lines read-in (=" << nRead << ") is no equal #sense layers (=" << c_maxNSenseLayers <<
+                                            ") !");
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
@@ -326,7 +363,7 @@ void CDCDatabaseImporter::importTimeWalk(std::string fileName)
   }
   stream.close();
 
-  if (nRead != nBoards) B2FATAL("#lines read-in (=" << nRead << ") is not equal #boards (=" << nBoards << ") !");
+  if (nRead != c_nBoards) B2FATAL("#lines read-in (=" << nRead << ") is not equal #boards (=" << c_nBoards << ") !");
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
@@ -358,7 +395,7 @@ void CDCDatabaseImporter::importXT(std::string fileName)
 
   unsigned short nAlphaBins = 0;
   if (ifs >> nAlphaBins) {
-    if (nAlphaBins == 0 || nAlphaBins > maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
+    if (nAlphaBins == 0 || nAlphaBins > c_maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
   } else {
     B2FATAL("Fail to read alpha bins !");
   }
@@ -374,7 +411,7 @@ void CDCDatabaseImporter::importXT(std::string fileName)
   //read theta bins
   unsigned short nThetaBins = 0;
   if (ifs >> nThetaBins) {
-    if (nThetaBins == 0 || nThetaBins > maxNThetaPoints) B2FATAL("Fail to read theta bins !");
+    if (nThetaBins == 0 || nThetaBins > c_maxNThetaPoints) B2FATAL("Fail to read theta bins !");
   } else {
     B2FATAL("Fail to read theta bins !");
   }
@@ -400,7 +437,7 @@ void CDCDatabaseImporter::importXT(std::string fileName)
   */
   short xtParamMode, np;
   unsigned short iCL, iLR;
-  const unsigned short npx = nXTParams - 1;
+  const unsigned short npx = c_nXTParams - 1;
   double xtc[npx];
   double theta, alpha, dummy1;
   unsigned nRead = 0;
@@ -418,6 +455,13 @@ void CDCDatabaseImporter::importXT(std::string fileName)
     for (int i = 0; i < np; ++i) {
       ifs >> xtc[i];
     }
+
+    // TODO: check whether this is correct, as nRead isn't used, it might also be possible to only
+    // perform xt->setXtParams() below if the condition is met
+    if (iCL < m_firstLayerOffset) {
+      continue;
+    }
+
     ++nRead;
 
     int ialpha = -99;
@@ -474,7 +518,7 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
 
   unsigned short nAlphaBins = 0;
   if (ifs >> nAlphaBins) {
-    if (nAlphaBins == 0 || nAlphaBins > maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
+    if (nAlphaBins == 0 || nAlphaBins > c_maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
   } else {
     B2FATAL("Fail to read alpha bins !");
   }
@@ -490,7 +534,7 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
   //read theta bins
   unsigned short nThetaBins = 0;
   if (ifs >> nThetaBins) {
-    if (nThetaBins == 0 || nThetaBins > maxNThetaPoints) B2FATAL("Fail to read theta bins !");
+    if (nThetaBins == 0 || nThetaBins > c_maxNThetaPoints) B2FATAL("Fail to read theta bins !");
   } else {
     B2FATAL("Fail to read theta bins !");
   }
@@ -508,7 +552,7 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
   //read sigma params.
   short sgParamMode, np;
   unsigned short iCL, iLR;
-  const unsigned short npx = nSigmaParams;
+  const unsigned short npx = c_nSigmaParams;
   double sgm[npx];
   double theta, alpha;
   unsigned nRead = 0;
@@ -530,6 +574,13 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
     for (int i = 0; i < np; ++i) {
       ifs >> sgm[i];
     }
+
+    // TODO: check whether this is correct, as nRead isn't used, it might also be possible to only
+    // perform sg->setSigmaParams() below if the condition is met
+    if (iCL < m_firstLayerOffset) {
+      continue;
+    }
+
     ++nRead;
 
     int ialpha = -99;
@@ -627,7 +678,7 @@ void CDCDatabaseImporter::importDisplacement(std::string fileName)
 
   DBImportArray<CDCDisplacement> disp;
 
-  int iL(0), iC(0);
+  uint iL(0), iC(0);
   const int np = 3;
   double back[np], fwrd[np];
   double tension = 0.;
@@ -645,6 +696,11 @@ void CDCDatabaseImporter::importDisplacement(std::string fileName)
 
     if (ifs.eof()) break;
 
+    if (iL < m_firstLayerOffset) {
+      continue;
+    }
+
+
     ++nRead;
     WireID wire(iL, iC);
     TVector3 fwd(fwrd[0], fwrd[1], fwrd[2]);
@@ -652,8 +708,8 @@ void CDCDatabaseImporter::importDisplacement(std::string fileName)
     disp.appendNew(wire, fwd, bwd, tension);
   }
 
-  if (nRead != nSenseWires) B2FATAL("CDCDatabaseimporter::importDisplacement: #lines read-in (=" << nRead <<
-                                      ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
+  if (nRead != m_nSenseWires) B2FATAL("CDCDatabaseimporter::importDisplacement: #lines read-in (=" << nRead <<
+                                        ") is inconsistent with total #sense wires (=" << m_nSenseWires << ") !");
 
   //  ifs.close();
   boost::iostreams::close(ifs);
@@ -683,7 +739,7 @@ void CDCDatabaseImporter::importWirPosAlign(std::string fileName)
   DBImportObjPtr<CDCAlignment> al;
   al.construct();
 
-  int iL(0), iC(0);
+  uint iL(0), iC(0);
   const int np = 3;
   double back[np], fwrd[np], tension;
   unsigned nRead = 0;
@@ -699,6 +755,10 @@ void CDCDatabaseImporter::importWirPosAlign(std::string fileName)
     ifs >> tension;
     if (ifs.eof()) break;
 
+    if (iL < m_firstLayerOffset) {
+      continue;
+    }
+
     ++nRead;
     WireID wire(iL, iC);
 
@@ -713,8 +773,8 @@ void CDCDatabaseImporter::importWirPosAlign(std::string fileName)
     al->set(wire, CDCAlignment::wireTension, tension);
   }
 
-  if (nRead != nSenseWires) B2FATAL("CDCDatabaseimporter::importWirPosAlign: #lines read-in (=" << nRead <<
-                                      ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
+  if (nRead != m_nSenseWires) B2FATAL("CDCDatabaseimporter::importWirPosAlign: #lines read-in (=" << nRead <<
+                                        ") is inconsistent with total #sense wires (=" << m_nSenseWires << ") !");
 
   //  ifs.close();
   boost::iostreams::close(ifs);
@@ -1101,8 +1161,8 @@ void CDCDatabaseImporter::importWirPosMisalign(std::string fileName)
     mal->set(wire, CDCMisalignment::wireTension, tension);
   }
 
-  if (nRead != nSenseWires) B2FATAL("CDCDatabaseimporter::importWirPosMisalign: #lines read-in (=" << nRead <<
-                                      ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
+  if (nRead != m_nSenseWires) B2FATAL("CDCDatabaseimporter::importWirPosMisalign: #lines read-in (=" << nRead <<
+                                        ") is inconsistent with total #sense wires (=" << m_nSenseWires << ") !");
 
   ifs.close();
 

@@ -218,7 +218,8 @@ namespace {
           std::sort(decaybarlist.begin(), decaybarlist.end());
           bool isUnflavored = (decaylist == decaybarlist);
 
-          m_particle = particles.appendNew(TLorentzVector(), decay.m_pdg, isUnflavored ? (Particle::c_Unflavored) : (Particle::c_Flavored),
+          m_particle = particles.appendNew(ROOT::Math::PxPyPzEVector(), decay.m_pdg,
+                                           isUnflavored ? (Particle::c_Unflavored) : (Particle::c_Flavored),
                                            daughterIndices);
         }
       }

@@ -292,6 +292,17 @@ namespace Belle2 {
     }
 
     /**
+     * Returns average surface roughness parameter (weigthed by segment lengths)
+     * @return average surface roughness
+     */
+    double getSigmaAlpha() const
+    {
+      return (m_bar1.getSigmaAlpha() * m_bar1.getFullLength() +
+              m_bar2.getSigmaAlpha() * m_bar2.getFullLength() +
+              m_mirror.getSigmaAlpha() * m_mirror.getFullLength()) / getBarLength();
+    }
+
+    /**
      * Returns z of bar center (w/o prism) in Belle II frame
      * @return z coordinate if bar center
      */

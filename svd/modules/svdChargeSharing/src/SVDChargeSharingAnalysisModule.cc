@@ -37,7 +37,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDChargeSharingAnalysis)
+REG_MODULE(SVDChargeSharingAnalysis);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -61,7 +61,6 @@ SVDChargeSharingAnalysisModule::~SVDChargeSharingAnalysisModule()
 
 void SVDChargeSharingAnalysisModule::initialize()
 {
-  // cppcheck-suppress publicAllocationError
   m_outputRootFile = new TFile((m_outputDirName + "/" + m_outputRootFileName).c_str(), "RECREATE");
 
   //StoreArrays

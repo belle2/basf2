@@ -15,6 +15,7 @@
 #include <TROOT.h>
 #include <TLatex.h>
 #include <vxd/geometry/GeoCache.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 using namespace std;
 using namespace Belle2;
@@ -22,7 +23,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisPXDCM)
+REG_MODULE(DQMHistAnalysisPXDCM);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -36,7 +37,7 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDCM"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode:"));
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
 
   addParam("warnMeanAdhoc", m_warnMeanAdhoc, "warn level for peak position", 2.0);
@@ -50,6 +51,10 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   addParam("warnOutsideFull", m_warnOutsideFull, "warn level for outside fraction", 1e-5);
   addParam("errorOutsideFull", m_errorOutsideFull, "error level for outside fraction", 1e-4);
   addParam("upperLineFull", m_upperLineFull, "upper threshold and line for outside fraction", 17);
+
+  addParam("gateMaskModuleList", m_par_module_list, "Module List for Gate Masking");
+  addParam("gateMaskGateList", m_par_gate_list, "Gate List for Gate Masking");
+
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 
@@ -107,6 +112,16 @@ void DQMHistAnalysisPXDCMModule::initialize()
   m_hCommonModeOld->Draw("colz");
 
   m_monObj->addCanvas(m_cCommonMode);
+
+  if (m_par_module_list.size() != m_par_gate_list.size()) {
+    B2FATAL("Parameter list need same length");
+    return;
+  }
+  for (size_t i = 0; i < m_par_module_list.size(); i++) {
+    for (auto n : m_par_gate_list[i]) {
+      m_masked_gates[VxdID(m_par_module_list[i])].push_back(n);
+    }
+  }
 
   /// FIXME were to put the lines depends ...
   m_line1 = new TLine(0, 10, m_PXDModules.size(), 10);
@@ -172,7 +187,7 @@ void DQMHistAnalysisPXDCMModule::event()
   m_hCommonMode->Reset(); // dont sum up!!!
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    std::string name = "PXDDAQCM2_" + (std::string)m_PXDModules[i ];
+    std::string name = "PXDDAQCM_" + (std::string)m_PXDModules[i ];
     // std::replace( name.begin(), name.end(), '.', '_');
 
     TH1* hh1 = findHist(name);
@@ -190,11 +205,35 @@ void DQMHistAnalysisPXDCMModule::event()
       if (update) m_hCommonModeOld->SetBinContent(i + 1, 0, nevent);
       if (scale > 0) scale = 1.0 / scale;
       else scale = 1.; // worst case, no events at run start
-      for (int bin = 1; bin <= 63; bin++) { // we ignore CM63!!!
-        double v;
-        v = hh1->GetBinContent(bin);
+
+      auto& gm = m_masked_gates[m_PXDModules[i]];
+      // We loop over a 2d histogram!
+      // loop CM values
+      double dhpc = 0.0;
+      for (int bin = 1; bin <= 64; bin++) { // including CM63!!!
+        // loop gates*asics
+        double v = 0;
+        for (int gate = 0; gate < 192; gate++) {
+          // attention, gate is not bin nr!
+          if (std::find(gm.begin(), gm.end(), gate) == gm.end()) {
+            v += hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 0, bin)) +
+                 hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 1, bin)) +
+                 hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 2, bin)) +
+                 hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 3, bin));
+          }
+        }
         m_hCommonMode->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
-        current_full += v;
+        // integration intervalls depend on CM default value, this seems to be agreed =10
+        // FIXME currently we have to much noise below the line ... thus excluding this to avoid false alarms
+        // outside_full += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
+        // attention, n bins!
+        // we integrate up including value 62 (cm overflow), but not 63 (fifo full)
+        if (bin == 63 + 1) { // CM63
+          dhpc += v;
+        } else { // excluding CM63
+          current_full += v;
+          if (bin > m_upperLineFull + 1) outside_full += v;
+        }
         if (nevent < m_minEntries) {
           m_hCommonModeDelta->SetBinContent(i + 1, bin, v * scale); // attention, mixing bin nr and index
         } else if (update) {
@@ -204,14 +243,8 @@ void DQMHistAnalysisPXDCMModule::event()
         }
       }
 
-      /// TODO: integration intervalls depend on CM default value, this seems to be agreed =10
-      // Attention, Integral uses the bin nr, not the value!
-      outside_full += hh1->Integral(m_upperLineFull + 1, 63);
-      // FIXME currently we have to much noise below the line ... thus excluding this to avoid false alarms
-      // outside_full += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
       all_outside += outside_full;
       all += current_full;
-      double dhpc = hh1->GetBinContent(64);
       all_cm += dhpc;
       if (current_full > 1) {
         error_full_flag |= (outside_full / current_full > m_errorOutsideFull);

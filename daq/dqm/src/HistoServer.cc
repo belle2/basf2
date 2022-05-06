@@ -14,7 +14,7 @@ using namespace Belle2;
 using namespace std;
 
 // Constructor / Destructor
-HistoServer::HistoServer(int port, string filename)
+HistoServer::HistoServer(int port, const string& filename)
 {
   m_port = port;
   m_force_exit = 0;
@@ -81,7 +81,6 @@ int HistoServer::server()
           vector<string> strlist;
           msghdl.decode_msg(hmsg, objlist, strlist);
           int nobjs = (hmsg->header())->reserved[1];
-          int narys = (hmsg->header())->reserved[2];
           //    string subdir = "ROOT";
           string subdir = "";
           now = time(0);
@@ -108,7 +107,7 @@ int HistoServer::server()
               updated = false;
               continue;
             }
-            int lpos = objname.find("SUBDIR:");
+            auto lpos = objname.find("SUBDIR:");
             if (lpos != string::npos) {
               subdir = objname.substr(7);
               if (subdir == "EXIT") subdir = "";

@@ -29,7 +29,7 @@ REG_MODULE(PXDDAQDQM)
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDDAQDQMModule::PXDDAQDQMModule() : HistoModule() , m_vxdGeometry(VXD::GeoCache::getInstance())
+PXDDAQDQMModule::PXDDAQDQMModule() : HistoModule(), m_vxdGeometry(VXD::GeoCache::getInstance())
 {
   //Set module properties
   setDescription("Monitor DAQ errors");
@@ -179,6 +179,7 @@ void PXDDAQDQMModule::event()
   hDAQErrorDHC->Fill(-1, -1); // to normalize to the number of events
   hDAQErrorDHE->Fill(-1, -1); // to normalize to the number of events
   for (auto& it : hDAQCM2) if (it.second) it.second->Fill(-1); // to normalize to the number of events
+  for (auto& it : hDAQCM) if (it.second) it.second->Fill(-1, -1); // to normalize to the number of events
   /// An Error Flag can only be set, if the object actually exists,
   /// thus we have to check for a difference to the number of events, too
   /// Remark: for HLT event selection and/or events rejected by the event-

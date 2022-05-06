@@ -8,6 +8,7 @@
 
 #include <pxd/utilities/PXDUtilities.h>
 #include <framework/logging/Logger.h>
+#include <pxd/reconstruction/PXDPixelMasker.h>
 
 namespace Belle2 {
   namespace PXD {
@@ -42,5 +43,29 @@ namespace Belle2 {
       return statePtr;
     }
 
+    bool isCloseToBorder(int u, int v, int checkDistance)
+    {
+
+      if (u - checkDistance < 0 || u + checkDistance >= 250 ||
+          v - checkDistance < 0 || v + checkDistance >= 768) {
+        return true;
+      }
+      return false;
+    }
+
+    bool isDefectivePixelClose(int u, int v, int checkDistance, const VxdID& moduleID)
+    {
+
+      //Iterate over square around the intersection to see if any close pixel is dead
+      for (int u_iter = u - checkDistance; u_iter <= u + checkDistance ; ++u_iter) {
+        for (int v_iter = v - checkDistance; v_iter <= v + checkDistance ; ++v_iter) {
+          if (PXDPixelMasker::getInstance().pixelDead(moduleID, u_iter, v_iter)
+              || !PXDPixelMasker::getInstance().pixelOK(moduleID, u_iter, v_iter)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
   } // end namespace PXD
 } // end namespace Belle2

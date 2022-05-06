@@ -33,8 +33,7 @@ def store_cdst(rawdata_file_name, cdst_file_name, data_type, number_of_events):
                                reconstruct_cdst='rawFormat')
     rec.add_cdst_output(path=child,
                         mc=False,
-                        filename=cdst_file_name,
-                        rawFormat=True)
+                        filename=cdst_file_name)
     basf2.process(path=child,
                   max_event=number_of_events)
 

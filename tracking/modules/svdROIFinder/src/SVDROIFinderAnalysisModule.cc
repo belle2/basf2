@@ -25,7 +25,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDROIFinderAnalysis)
+REG_MODULE(SVDROIFinderAnalysis);
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -1920,7 +1920,7 @@ class Bits(object):
                 data = bytearray.fromhex(hexstring)
             except TypeError:
                 # Python 2.6 needs a unicode string (a bug). 2.7 and 3.x work fine.
-                data = bytearray.fromhex(unicode(hexstring))
+                data = bytearray.fromhex(unicode(hexstring))  # noqa
         except ValueError:
             raise CreationError("Invalid symbol in hex initialiser.")
         self._setbytes_unsafe(data, length * 4, 0)

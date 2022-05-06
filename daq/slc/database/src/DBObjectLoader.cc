@@ -40,7 +40,7 @@ DBObject DBObjectLoader::load(ConfigFile& config)
   else
     obj.setName(configname);
   for (StringList::iterator it = config.getLabels().begin();
-       it != config.getLabels().end(); it++) {
+       it != config.getLabels().end(); ++it) {
     const std::string name = *it;
     StringList str = StringUtil::split(name, '.');
     if (str[0] == "config") continue;
@@ -187,7 +187,7 @@ bool DBObjectLoader::setObject(DBObject& obj, StringList& str,
     if (found) {
       DBObjectList& objs(obj.getObjects(name));
       for (DBObjectList::iterator it = objs.begin();
-           it != objs.end(); it++) {
+           it != objs.end(); ++it) {
         if (it->getIndex() == index) {
           found = false;
           break;
@@ -203,7 +203,7 @@ bool DBObjectLoader::setObject(DBObject& obj, StringList& str,
     }
     DBObjectList& objs(obj.getObjects(name));
     for (DBObjectList::iterator it = objs.begin();
-         it != objs.end(); it++) {
+         it != objs.end(); ++it) {
       DBObject& cobj(*it);
       if (cobj.getIndex() == index) {
         return setObject(cobj, str, type, value, table_in, config_in, db);

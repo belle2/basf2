@@ -27,6 +27,7 @@ from basf2 import _override_print  # noqa
 # import the C++ library with the exported functions
 import pybasf2  # noqa
 # and also import all of them in current scope for ease of use
+from pybasf2 import logging
 from pybasf2 import *  # noqa
 
 # make sure conditions objects are read only
@@ -36,7 +37,7 @@ from basf2 import _constwrapper  # noqa
 #: name of the framework
 basf2label = 'basf2 (Belle II Analysis Software Framework)'
 #: and copyright notice
-basf2copyright = 'Copyright(C) 2010-2021 Members of the Belle II Collaboration'
+basf2copyright = 'Copyright(C) 2010-2022 Members of the Belle II Collaboration'
 #: license details
 basf2license = '(See "basf2 --license" for more information.)'
 

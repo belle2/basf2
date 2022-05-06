@@ -50,6 +50,18 @@ And similarly for :py:func:`modularAnalysis.inputMdstList`.
 
 .. include:: analysis/doc/whatsnew-since/release-06-00.txt
 
+.. List of changes for the framework package
+
+.. include:: framework/doc/whatsnew-since/release-06-00.txt
+
+.. List of changes for the b2bii package
+
+.. include:: b2bii/doc/whatsnew-since/release-06-00.txt
+
+.. List of changes for the mva package
+
+.. include:: mva/doc/whatsnew-since/release-06-00.txt
+
 Changes since release-05
 ========================
 
@@ -119,8 +131,6 @@ No individual options have to be set in modular analysis functions.
 .. include:: analysis/doc/whatsnew-since/release-05-00.txt
 
 .. List of changes for the framework package
-
-.. include:: framework/doc/whatsnew-since/release-06-00.txt
 
 .. include:: framework/doc/whatsnew-since/release-05-01.txt
 

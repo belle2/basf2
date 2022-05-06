@@ -14,7 +14,7 @@
 #include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <TVector3.h>
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 #include <TF1.h>
 #include <string>
 #include <map>
@@ -47,14 +47,13 @@ namespace Belle2 {
 
 
   protected:
-    // called for a particle, displaces its vertex and of its subsequent daughters
-    void displace(MCParticle& particle, float
-                  lifetime); /**< Helper function to displace the mother particles (corresponding to given pdf values). */
-    void displaceDaughter(TLorentzVector& motherDisplacementVector,
-                          std::vector<MCParticle*>
-                          daughters); /**< Helper function to loop over subsequent daughters and displaces their vertices corresponding to their mother decay vertex. */
-    void getDisplacement(const MCParticle& particle, float lifetime,
-                         TLorentzVector& displacement); /**< Helper function to calculate the numerical value of the vertex displacement (x,y,z,t) */
+    // called for a particle, displaces its vertex and its subsequent daughters
+    /** Helper function to displace the mother particles (corresponding to given pdf values). */
+    void displace(MCParticle& particle, float lifetime);
+    /** Helper function to loop over subsequent daughters and displaces their vertices corresponding to their mother decay vertex. */
+    void displaceDaughter(ROOT::Math::PxPyPzEVector& motherDisplacementVector, std::vector<MCParticle*> daughters);
+    /** Helper function to calculate the numerical value of the vertex displacement (x,y,z,t) */
+    void getDisplacement(const MCParticle& particle, float lifetime, ROOT::Math::PxPyPzEVector& displacement);
     std::string m_particleList; /**< The name of the MCParticle collection. */
     StoreArray<MCParticle> m_mcparticles; /**< store array for the MCParticles */
 

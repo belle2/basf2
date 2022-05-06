@@ -118,6 +118,8 @@ namespace Belle2 {
     double _mumuThreshold;
     //! mumu bit  Angle
     std::vector<double> _mumuAngle;
+    // Angle selection of additional Bhabha veto in CM frame
+    std::vector<double> m_3DBhabhaAddAngleCut;
     //! The number of Cluster exceeding 300 MeV
     int _n300MeVCluster;
     //!ECL Burst Bit Threshold
@@ -138,6 +140,14 @@ namespace Belle2 {
     //! taub2b Cluster energy selection (GeV)
     double m_taub2bClusterECut1;
     double m_taub2bClusterECut2;
+    // taub2b2 total energy cut (GeV)
+    double m_taub2b2EtotCut;
+    // taub2b2 two Cluster angle cut (degree)
+    std::vector<int> m_taub2b2AngleCut;
+    // taub2b2 cluster energy cut for endcap cluster (GeV)
+    double m_taub2b2CLEEndcapCut;
+    // taub2b2 cluster energy cut (GeV)
+    double m_taub2b2CLECut;
     //! The number of Cluster exceeding 300 MeV
 
     /** output for TRGECLHit */

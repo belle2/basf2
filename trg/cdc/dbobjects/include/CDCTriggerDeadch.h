@@ -28,9 +28,9 @@ namespace Belle2 {
     /** Default constructor */
     CDCTriggerDeadch()
     {
-      for (unsigned int i = 0; i < nSuperLayers; i++) {
+      for (unsigned int i = 0; i < c_nSuperLayers; i++) {
         for (unsigned int j = 0; j < MAX_N_LAYERS; j++) {
-          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) {
+          for (unsigned int k = 0; k < c_maxNDriftCells; k++) {
             m_deadch[i][j][k] = true;
           }
         }
@@ -39,9 +39,9 @@ namespace Belle2 {
     /** copy constructor */
     CDCTriggerDeadch(const CDCTriggerDeadch& b): TObject(b)
     {
-      for (unsigned int i = 0; i < nSuperLayers; i++) {
+      for (unsigned int i = 0; i < c_nSuperLayers; i++) {
         for (unsigned int j = 0; j < MAX_N_LAYERS; j++) {
-          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) {
+          for (unsigned int k = 0; k < c_maxNDriftCells; k++) {
             m_deadch[i][j][k] = b.m_deadch[i][j][k];
           }
         }
@@ -50,9 +50,9 @@ namespace Belle2 {
     /** assignment operator */
     CDCTriggerDeadch& operator=(const CDCTriggerDeadch& b)
     {
-      for (unsigned int i = 0; i < nSuperLayers; i++) {
+      for (unsigned int i = 0; i < c_nSuperLayers; i++) {
         for (unsigned int j = 0; j < MAX_N_LAYERS; j++) {
-          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) {
+          for (unsigned int k = 0; k < c_maxNDriftCells; k++) {
             m_deadch[i][j][k] = b.m_deadch[i][j][k];
           }
         }
@@ -78,7 +78,7 @@ namespace Belle2 {
     const static int MAX_N_LAYERS = 8;
 
     /** Dead channel mapping in each superlayer, layer, ch*/
-    bool m_deadch[nSuperLayers][MAX_N_LAYERS][MAX_N_SCELLS];
+    bool m_deadch[c_nSuperLayers][MAX_N_LAYERS][c_maxNDriftCells];
 
     ClassDef(CDCTriggerDeadch, 1);  /**< ClassDef, must be the last term before the closing {}*/
   };

@@ -16,6 +16,7 @@ from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
 import glob
 import sys
+from ROOT import Belle2
 
 
 event_type = str(sys.argv[1])

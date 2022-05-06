@@ -49,17 +49,17 @@ namespace Belle2 {
     int getCellID() const {return m_cellID; };
 
     /** Set calibration amplitude (measured)
-     * @param calibration amplitude
+     * @param amplitude calibration amplitude
      */
     void setConstant(float amplitude) {m_amplitude = amplitude; };
 
     /** Set calibration energy (known from physics, e.g. ee->gg kinematics)
-     * @param calibration energy
+     * @param energy calibration energy
      */
     void setEnergy(float energy) {m_energy = energy; };
 
     /** Set cell ID
-     * @param cell ID
+     * @param cellid cell ID
      */
     void setCellID(int cellid) {m_cellID = cellid; };
 

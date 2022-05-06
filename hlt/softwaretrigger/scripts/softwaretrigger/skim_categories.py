@@ -20,6 +20,8 @@ Physics = [
     "skim accept fourlep",
     "skim accept tau 2trk",
     "skim accept tau Ntrk",
+    "skim accept b charged",
+    "skim accept b neutral"
 ]
 
 # Skims used for calibration
@@ -28,6 +30,8 @@ Calibration = [
     "skim accept gamma gamma",
     "skim accept hadron",
     "skim accept mumutight",
+    "skim accept mumu highmass",
+    "skim accept mumu tight or highm",
     "skim accept offip",
     "skim accept radmumu",
 ]

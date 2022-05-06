@@ -1,0 +1,60 @@
+# EventType: 1211540100
+# Descriptor: [B+ -> J/psi [-> e+ e-] K*+ [ -> K_S0 pi-] ] cc
+# NickName: Bu_J/psiK*+_e+e-K_S0pi+
+# Documentation: Study of CKM with TDCPV analysis
+# Tested: Yes
+# Physics WG: TDCPV
+# Responsible: Kenkichi Miyabayashi, Miho Fujii
+# Email: miyabaya@cc.nara-wu.ac.jp
+# Cuts: None
+# Date: 20220203
+# Comments:
+#
+# This is for MC B+ -> J/Psi K*+, K*+ -> KS pi+, KS -> pi+pi-.
+# PDG2018 A0, Apara and Aperp are converted to H+, H0 and H-.
+# Decay table to generate
+# Upsilon(4S) -> B+ B- -> Generic
+#                |
+#                 -> J/Psi K*+
+#                    |     |  
+#                    |      -> KS pi+
+#                    |         |
+#                    |         -> pi+ pi-
+#                    | 
+#                      -> mu+mu-.
+#
+Alias Kstpsig   K*+
+Alias Kstmsig   K*-
+Alias K_S0sig   K_S0
+#
+#
+Decay Upsilon(4S)
+0.500 B+ B-sig VSS;
+0.500 B+sig B- VSS;
+Enddecay
+#
+Decay B-sig 
+1.000 J/psisig Kstmsig SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 0.0199;
+Enddecay
+#
+Decay B+sig
+1.000 J/psisig Kstpsig SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 0.0199;
+Enddecay
+#
+Decay J/psisig
+1.000 e+ e-           PHOTOS VLL;
+Enddecay
+#
+Decay Kstmsig
+1.000 K_S0sig pi-          PHOTOS VSS;
+Enddecay
+#
+Decay Kstpsig 
+1.000 K_S0sig pi+          PHOTOS VSS;
+Enddecay
+#
+Decay K_S0sig
+1.000   pi+ pi-      PHSP; 
+Enddecay
+#
+End

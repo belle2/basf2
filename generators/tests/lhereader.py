@@ -4,6 +4,7 @@
 # Test LHEReader and LHEInputModule
 
 import os
+import sys
 import math
 from ROOT import TFile
 from pdg import add_particle
@@ -11,7 +12,6 @@ from basf2 import create_path, register_module, process, print_params, find_file
 from modularAnalysis import fillParticleListsFromMC
 from modularAnalysis import variablesToNtuple as v2nt
 from variables import variables as vm
-from beamparameters import add_beamparameters
 from tempfile import TemporaryDirectory
 
 # check that the file exists, if not: skip the test
@@ -19,7 +19,7 @@ inputfile = find_file('generators/tests/event.lhe')
 if len(inputfile) == 0:
     sys.stderr.write(
         'TEST SKIPPED: input file ' +
-        filepath +
+        inputfile +
         ' not found.')
     sys.exit(-1)
 
@@ -94,9 +94,9 @@ with TemporaryDirectory() as tmp:
 
     assert t1.px == 0.24189484119415283, 'Boosted momenta are not as expected'
     assert t1.py == 0.0025198485236614943, 'Boosted momenta are not as expected'
-    assert t1.pz == -2.136873722076416, 'Boosted momenta are not as expected'
+    assert math.isclose(t1.pz, -2.136873722076416, rel_tol=eps), 'Boosted momenta are not as expected'
 
-    assert t2.px == 0.21474215388298035, 'Boosted momenta are not as expected'
+    assert math.isclose(t2.px, 0.21474215388298035, rel_tol=eps), 'Boosted momenta are not as expected'
     assert t2.py == -0.0025198485236614943, 'Boosted momenta are not as expected'
     assert t2.pz == 5.136414527893066, 'Boosted momenta are not as expected'
 

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 
 namespace Belle2 {
 
@@ -30,6 +31,8 @@ namespace Belle2 {
     /**
      * Add a new item with an estimator value
      *
+     * @param item item
+     * @param est estimator
      * @param estComparison The default estimator will favor items with
      *  smaller estimates
      */
@@ -40,7 +43,7 @@ namespace Belle2 {
     {
       if (!hasMatch()) {
         // not best match yet, take this one !
-        setBestMatch(item , est);
+        setBestMatch(item, est);
         return true;
       }
 

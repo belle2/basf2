@@ -25,7 +25,7 @@
 using namespace Belle2;
 using namespace Dedx;
 
-REG_MODULE(VXDDedxPID)
+REG_MODULE(VXDDedxPID);
 
 VXDDedxPIDModule::VXDDedxPIDModule() : Module()
 {

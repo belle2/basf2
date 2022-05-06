@@ -15,6 +15,8 @@
 
 //root
 #include <Math/ProbFunc.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector4D.h>
 //stl
 using std::string;
 #include <vector>
@@ -59,8 +61,8 @@ rave::Track RaveVertexFitter::TrackFitResultToRaveTrack(const TrackFitResult* co
 {
   const int id = m_raveTracks.size();
 
-  TVector3 pos = aTrackPtr->getPosition();
-  TVector3 mom = aTrackPtr->getMomentum();
+  B2Vector3D pos = aTrackPtr->getPosition();
+  B2Vector3D mom = aTrackPtr->getMomentum();
   TMatrixF cov(aTrackPtr->getCovariance6());
 
 
@@ -85,8 +87,8 @@ rave::Track RaveVertexFitter::TrackFitResultToRaveTrack(const TrackFitResult* co
 void RaveVertexFitter::addTrack(const Particle* aParticlePtr)
 {
   const int id = m_raveTracks.size();
-  const TVector3& pos = aParticlePtr->getVertex();
-  const TVector3& mom = aParticlePtr->getMomentum();
+  const ROOT::Math::XYZVector& pos = aParticlePtr->getVertex();
+  const ROOT::Math::XYZVector& mom = aParticlePtr->getMomentum();
   rave::Vector6D ravestate(pos.X(), pos.Y(), pos.Z(), mom.X(), mom.Y(), mom.Z());
 
   const TMatrixFSym& cov = aParticlePtr->getMomentumVertexErrorMatrix();
@@ -136,7 +138,7 @@ int RaveVertexFitter::fit(string options)
   int nOfVertices = -100;
 
   if (m_useBeamSpot == true) {
-    const TVector3& bsPos = RaveSetup::getRawInstance()->m_beamSpot;
+    const B2Vector3D& bsPos = RaveSetup::getRawInstance()->m_beamSpot;
     const TMatrixDSym& bsCov = RaveSetup::getRawInstance()->m_beamSpotCov;
     const rave::Covariance3D bsCovRave(bsCov(0, 0), bsCov(0, 1), bsCov(0, 2), bsCov(1, 1), bsCov(1, 2), bsCov(2, 2));
     RaveSetup::getRawInstance()->m_raveVertexFactory->setBeamSpot(rave::Ellipsoid3D(rave::Point3D(bsPos.X(), bsPos.Y(), bsPos.Z()),
@@ -164,12 +166,12 @@ void RaveVertexFitter::isVertexIdValid(const VecSize vertexId) const
 
 }
 
-TVector3 RaveVertexFitter::getPos(VecSize vertexId) const
+B2Vector3D RaveVertexFitter::getPos(VecSize vertexId) const
 {
   isVertexIdValid(vertexId);
 
-  return TVector3(m_raveVertices[vertexId].position().x(), m_raveVertices[vertexId].position().y(),
-                  m_raveVertices[vertexId].position().z());
+  return B2Vector3D(m_raveVertices[vertexId].position().x(), m_raveVertices[vertexId].position().y(),
+                    m_raveVertices[vertexId].position().z());
 
 }
 
@@ -265,10 +267,9 @@ void RaveVertexFitter::updateDaughters()
     const rave::Vector3D fittedP = rtrk.momentum();
     const rave::Covariance6D& fittedCov = rtrk.error();
 
-    TVector3 x3(fittedV.x(), fittedV.y(), fittedV.z());
-    TLorentzVector p4;
+    ROOT::Math::XYZVector x3(fittedV.x(), fittedV.y(), fittedV.z());
     double fittedE = sqrt(fittedP.mag2() + (m_belleDaughters[i]->getMass() * (m_belleDaughters[i]->getMass())));
-    p4.SetXYZT(fittedP.x(), fittedP.y(), fittedP.z(), fittedE);
+    ROOT::Math::PxPyPzEVector p4(fittedP.x(), fittedP.y(), fittedP.z(), fittedE);
 
     TMatrixDSym fitted7CovPart = m_belleDaughters[i]->getMomentumVertexErrorMatrix() ;
 

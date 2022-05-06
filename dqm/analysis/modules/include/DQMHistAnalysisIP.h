@@ -33,16 +33,34 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisIPModule();
+
+    /**
+     * Destructor.
+     */
     ~DQMHistAnalysisIPModule();
 
-    //! Module functions to be called from main process
+    /**
+     * Initializer.
+     */
     void initialize() override final;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event() override final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate() override final;
 
     // Data members
@@ -58,8 +76,10 @@ namespace Belle2 {
 
     /** The drawing canvas. */
     TCanvas* m_c1 = nullptr;
-    /** The line for the fitting result. */
+    /** The line for the mean result. */
     TLine* m_line = nullptr;
+    /** The line for the median result. */
+    TLine* m_line2 = nullptr;
 
     /** last histogram */
     TH1* m_h_last = nullptr;
@@ -70,9 +90,9 @@ namespace Belle2 {
     /** flag if to export to EPICS */
     bool m_useEpics;
     /** number of EPICS PVs */
-    static const int m_parameters = 2;
+    static const int m_parameters = 3;
 #ifdef _BELLE2_EPICS
-    chid mychid[m_parameters];// hard limit max 2 parameters
+    chid mychid[m_parameters];// hard limit max parameters
 #endif
   };
 } // end namespace Belle2

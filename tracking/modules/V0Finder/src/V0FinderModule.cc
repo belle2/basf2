@@ -19,18 +19,16 @@ REG_MODULE(V0Finder);
 
 V0FinderModule::V0FinderModule() : Module()
 {
-  setDescription("This is a simple V0 finder which matches all positive "
-                 "tracks with all negative tracks, fitting a vertex for each "
-                 "pair.  Depending on the outcome of each fit, a corresponding "
+  setDescription("This is a simple V0 finder for X = Ks, Lambda and converted fotons "
+                 "which matches all positive tracks with all negative tracks, "
+                 "fitting a vertex for each pair. "
+                 "Depending on the outcome of each fit, a corresponding "
                  "Belle2::V0 is stored or not.\n\n"
-
+                 "A loose cut on the invariant mass (``massRangeX``) is applied before the fit (not considering material effects), "
+                 "then a vertex fit is performed and only pairs passing a chi^2 (``vertexChi2CutOutside``) "
+                 "and a second cut on the invariant mass (``invMassRangeX``) are stored as Belle2::V0. \n\n"
                  "No V0s with vertex inside the beam pipe "
-                 "are saved. They are recovered in a following step.\n\n"
-
-                 "Outside the beam pipe only a chi^2 cut is applied "
-                 "('vertexChi2CutOutside').\n"
-                 "The value used as beam pipe radius is a parameter and "
-                 "can be changed.");
+                 "are saved as they can be recovered at analysis level. ");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -73,9 +71,9 @@ V0FinderModule::V0FinderModule() : Module()
 
   addParam("v0FitterMode", m_v0FitterMode,
            "designate which fitAndStore function is called in V0Fitter.\n"
-           "    0: store V0 at the first vertex fit, regardless of inner hits \n"
-           "    1: remove hits inside the V0 vertex position\n"
-           "    2: mode 2 +  don't use SVD hits if there is only one available SVD hit-pair (default)",
+           "    0: store V0 at the first vertex fit, regardless of inner hits; \n"
+           "    1: remove hits inside the V0 vertex position;\n"
+           "    2: mode 2 + don't use SVD hits if there is only one available SVD hit-pair",
            1);
 
   addParam("massRangeKshort", m_preFilterMassRangeKshort,
@@ -140,7 +138,7 @@ void V0FinderModule::event()
   tracksMinus.reserve(m_tracks.getEntries());
 
   for (const auto& track : m_tracks) {
-    RecoTrack const* const  recoTrack = track.getRelated<RecoTrack>();
+    RecoTrack const* const  recoTrack = track.getRelated<RecoTrack>(m_arrayNameRecoTrack);
     B2ASSERT("No RecoTrack available for given Track.", recoTrack);
 
     if (recoTrack->getChargeSeed() > 0) {

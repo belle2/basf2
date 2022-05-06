@@ -56,14 +56,16 @@ namespace Belle2 {
 
       /** Default constructor */
       TrackPoint_t(): x(0.0), y(0.0), z(0.0),
-        tol(0.0), chargeMPV(0.0) {}
+        tol(0.0), chargeMPV(0.0), inside(false) {}
 
       /** Update values from a PXDCluster.
        * @param pxdIntercept a PXDIntercept object.
        * @param recoTracksName Name of RecoTrack collection
+       * @param mass Mass of the impinging particle
        * @return the pointer of the related RecoTrack object.
        */
-      RecoTrack* setValues(const PXDIntercept& pxdIntercept, const std::string& recoTracksName = "");
+      RecoTrack* setValues(const PXDIntercept& pxdIntercept, const std::string& recoTracksName = "",
+                           const double& mass = Const::electronMass);
 
       float x;         /**< Global position in x. */
       float y;         /**< Global position in y. */
@@ -74,6 +76,7 @@ namespace Belle2 {
        */
       float tol;       /**< cos(incident angle) = thickness/path length. */
       float chargeMPV; /**< Expected charge in ADU. */
+      bool inside; /**< True if it's inside the active region. */
     }; // end struct TrackPoint_t
 
     /** Struct to hold variables for track clusters. */
@@ -85,11 +88,13 @@ namespace Belle2 {
        * @param pxdIntercept a PXDIntercept object.
        * @param recoTracksName Name of RecoTrack collection
        * @param pxdTrackClustersName Name of track matched PXDClusters
+       * @param mass Mass of the impinging particle
        * @return the pointer of the related RecoTrack object.
        */
       RecoTrack* setValues(const PXDIntercept& pxdIntercept,
                            const std::string& recoTracksName = "",
-                           const std::string& pxdTrackClustersName = "PXDClustersFromTracks");
+                           const std::string& pxdTrackClustersName = "PXDClustersFromTracks",
+                           const double& mass = Const::electronMass);
 
       bool usedInTrack;        /**< True if the cluster is used in tracking */
       float dU;                /**< Residual (meas - prediction) in U. */

@@ -20,7 +20,7 @@
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/WireHitMC.h"
-#include "trg/cdc/Track.h"
+#include "trg/cdc/TRGCDCTrack.h"
 #include "trg/cdc/TrackMC.h"
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/Link.h"

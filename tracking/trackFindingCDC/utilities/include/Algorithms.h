@@ -9,9 +9,10 @@
 
 #include <tracking/trackFindingCDC/utilities/Range.h>
 
-#include <vector>
-#include <iterator>
 #include <algorithm>
+#include <iterator>
+#include <optional>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

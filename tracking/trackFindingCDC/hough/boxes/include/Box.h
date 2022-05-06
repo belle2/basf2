@@ -95,10 +95,9 @@ namespace Belle2 {
       /// Initialise the box with bound in each dimension.
       Box(const std::array<FirstType, 2>& firstBound,
           const std::array<ASubordinaryTypes, 2>& ... subordinaryBounds)
-        : m_firstBounds{{
-          std::min(firstBound[0], firstBound[1]),
-          std::max(firstBound[1], firstBound[0])}}
-      , m_subordinaryBox(subordinaryBounds...)
+        : m_firstBounds{std::min(firstBound[0], firstBound[1]),
+                        std::max(firstBound[1], firstBound[0])}
+        , m_subordinaryBox(subordinaryBounds...)
       {
       }
 

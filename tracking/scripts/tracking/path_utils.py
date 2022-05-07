@@ -832,6 +832,7 @@ def add_vtx_track_finding(
         use_ckf_based_cdc_vtx_merger=False,
         prune_temporary_tracks=True,
         add_mva_quality_indicator=False,
+        use_mc_vtx_cdc_merger=False,
         **kwargs,
 ):
     """
@@ -861,6 +862,7 @@ def add_vtx_track_finding(
     :param prune_temporary_tracks: Delete all hits expect the first and last from intermediate track objects.
     :param add_mva_quality_indicator: Add the VVXDQualityEstimatorMVA module to set the quality indicator
            property for tracks from VXDTF2 standalone tracking
+    :param use_mc_vtx_cdc_merger: Use the MC based MCTrackMerger module.
     """
 
     if not is_vtx_used(components):
@@ -950,8 +952,13 @@ def add_vtx_track_finding(
             if add_both_directions:
                 add_ckf_based_vtx_track_merger(path, cdc_reco_tracks=input_reco_tracks, vtx_reco_tracks=temporary_reco_tracks,
                                                use_mc_truth=use_mc_truth, direction="forward", **kwargs)
+
+        elif use_mc_vtx_cdc_merger:
+            path.add_module('MCTrackMerger',
+                            CDCRecoTrackColName=input_reco_tracks,
+                            VXDRecoTrackColName=temporary_reco_tracks)
         else:
-            path.add_module('MCTrackMerger',  # merge_radius = 18.0,
+            path.add_module('VXDCDCTrackMerger',
                             CDCRecoTrackColName=input_reco_tracks,
                             VXDRecoTrackColName=temporary_reco_tracks)
 

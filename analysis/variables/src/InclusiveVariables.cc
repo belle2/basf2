@@ -8,7 +8,8 @@
 
 // Own include
 #include <analysis/variables/InclusiveVariables.h>
-#include <analysis/VariableManager/Manager.h>
+
+#include <analysis/dataobjects/Particle.h>
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
@@ -126,7 +127,7 @@ namespace Belle2 {
                       "Returns the number of K_L0 or neutrons among the final state daughters.");
     REGISTER_METAVARIABLE("nDaughterCharged(pdg)",   nDaughterCharged,
                           "Returns the number of charged daughters with the provided PDG code or the number "
-                          "of all charged daughters if no argument has been provided.", Manager::VariableDataType::c_double);
+                          "of all charged daughters if no argument has been provided.", Manager::VariableDataType::c_int);
     REGISTER_VARIABLE("nCompositeDaughters",   nCompositeDaughters,
                       "Returns the number of final state composite daughters.");
     REGISTER_METAVARIABLE("daughterAverageOf(variable)", daughterAverageOf,

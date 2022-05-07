@@ -23,7 +23,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(VariablesToEventBasedTree)
+REG_MODULE(VariablesToEventBasedTree);
 
 
 VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
@@ -78,7 +78,25 @@ void VariablesToEventBasedTreeModule::initialize()
   }
 
   m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
+  // remove duplicates from list of variables but keep the previous order
+  unordered_set<string> seen;
+  auto newEnd = remove_if(m_variables.begin(), m_variables.end(), [&seen](const string & varStr) {
+    if (seen.find(varStr) != std::end(seen)) return true;
+    seen.insert(varStr);
+    return false;
+  });
+  m_variables.erase(newEnd, m_variables.end());
+
   m_event_variables = Variable::Manager::Instance().resolveCollections(m_event_variables);
+  // remove duplicates from list of variables but keep the previous order
+  unordered_set<string> seenEventVariables;
+  auto eventVariablesEnd = remove_if(m_event_variables.begin(),
+  m_event_variables.end(), [&seenEventVariables](const string & varStr) {
+    if (seenEventVariables.find(varStr) != std::end(seenEventVariables)) return true;
+    seenEventVariables.insert(varStr);
+    return false;
+  });
+  m_event_variables.erase(eventVariablesEnd, m_event_variables.end());
 
   m_tree.registerInDataStore(m_fileName + m_treeName, DataStore::c_DontWriteOut);
   m_tree.construct(m_treeName.c_str(), "");
@@ -110,11 +128,14 @@ void VariablesToEventBasedTreeModule::initialize()
       B2ERROR("Variable '" << varStr << "' is not available in Variable::Manager!");
     } else {
       if (var->variabletype == Variable::Manager::VariableDataType::c_double) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_event_valuesDouble[i], (makeROOTCompatible(varStr) + "/D").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_event_valuesDouble[i],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "/D").c_str());
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_int) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_event_valuesInt[i], (makeROOTCompatible(varStr) + "/I").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_event_valuesInt[i],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "/I").c_str());
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_bool) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_event_valuesInt[i], (makeROOTCompatible(varStr) + "/O").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_event_valuesInt[i],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "/O").c_str());
       }
       m_event_functions.push_back(var->function);
     }
@@ -131,14 +152,14 @@ void VariablesToEventBasedTreeModule::initialize()
       B2ERROR("Variable '" << varStr << "' is not available in Variable::Manager!");
     } else {
       if (var->variabletype == Variable::Manager::VariableDataType::c_double) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_valuesDouble[i][0],
-                             (makeROOTCompatible(varStr) + "[__ncandidates__]/D").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_valuesDouble[i][0],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "[__ncandidates__]/D").c_str());
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_int) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_valuesInt[i][0],
-                             (makeROOTCompatible(varStr) + "[__ncandidates__]/I").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_valuesInt[i][0],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "[__ncandidates__]/I").c_str());
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_bool) {
-        m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_valuesInt[i][0],
-                             (makeROOTCompatible(varStr) + "[__ncandidates__]/O").c_str());
+        m_tree->get().Branch(MakeROOTCompatible::makeROOTCompatible(varStr).c_str(), &m_valuesInt[i][0],
+                             (MakeROOTCompatible::makeROOTCompatible(varStr) + "[__ncandidates__]/O").c_str());
       }
       m_functions.push_back(var->function);
     }

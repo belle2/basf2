@@ -16,7 +16,7 @@ using namespace Belle2::VXD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(VXDMisalignment)
+REG_MODULE(VXDMisalignment);
 
 //-----------------------------------------------------------------
 //                 Implementation

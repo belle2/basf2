@@ -222,6 +222,11 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
   outputWireHits.reserve(nHits);
   for (const CDCHit& hit : hits) {
 
+    if (hit.getICLayer() < geometryPar.getOffsetOfFirstLayer() or
+        hit.getISuperLayer() < geometryPar.getOffsetOfFirstSuperLayer()) {
+      continue;
+    }
+
     // ignore this hit if it contains the information of a 2nd hit
     if (!m_param_useSecondHits && hit.is2ndHit()) {
       continue;

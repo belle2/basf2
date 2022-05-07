@@ -330,7 +330,7 @@ namespace Belle2 {
       /// 4-hit:
       if (variableType == FilterID::deltapT) {
         return [ = ](const PointType & outerHit, const PointType & outerCenterHit,
-        const PointType & innerCenterHit , const PointType & innerHit) -> double {
+        const PointType & innerCenterHit, const PointType & innerHit) -> double {
           prepareStuff4Hit(outerHit, outerCenterHit, innerCenterHit, innerHit);
           return m_fourHit.calcDeltapT();
         };
@@ -338,7 +338,7 @@ namespace Belle2 {
 
       if (variableType == FilterID::deltaDistance2IP) {
         return [ = ](const PointType & outerHit, const PointType & outerCenterHit,
-        const PointType & innerCenterHit , const PointType & innerHit) -> double {
+        const PointType & innerCenterHit, const PointType & innerHit) -> double {
           prepareStuff4Hit(outerHit, outerCenterHit, innerCenterHit, innerHit);
           return m_fourHit.calcDeltaDistCircleCenter();
         };

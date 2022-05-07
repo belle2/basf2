@@ -57,6 +57,12 @@ CDCTrigger3DFitterModule::CDCTrigger3DFitterModule() : Module::Module()
            false);
 }
 
+CDCTrigger3DFitterModule::~CDCTrigger3DFitterModule()
+{
+  if (m_commonData != nullptr)
+    delete m_commonData;
+}
+
 void
 CDCTrigger3DFitterModule::initialize()
 {

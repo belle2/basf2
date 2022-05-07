@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 
   for (const auto& filename : filenames) {
     std::cout << "Information about " << filename << std::endl;
-    std::cout << Belle2::MVA::info(filename) << std::endl;
+    std::cout << Belle2::MVA::Utility::info(filename) << std::endl;
     std::cout << std::endl;
   }
   return 0;

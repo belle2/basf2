@@ -40,11 +40,11 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
   addParam("SVDClusters", m_SVDClusterName, "SVDCluster collection name", std::string(""));
 
   addParam("SVDSpacePointStoreArrayName", m_svdSpacePointsStoreArrayName, "Name of the collection for SVD.",
-           boost::make_optional<std::string>("SVDSpacePoints"));
+           std::make_optional<std::string>("SVDSpacePoints"));
   addParam("PXDSpacePointStoreArrayName", m_pxdSpacePointsStoreArrayName, "Name of the collection for PXD.",
-           boost::make_optional<std::string>("PXDSpacePoints"));
+           std::make_optional<std::string>("PXDSpacePoints"));
   addParam("VTXSpacePointStoreArrayName", m_vtxSpacePointsStoreArrayName, "Name of the collection for VTX.",
-           boost::make_optional<std::string>("VTXSpacePoints"));
+           std::make_optional<std::string>("VTXSpacePoints"));
 
   // optional input
   addParam("SVDSingleClusterSP", m_SVDSingleClusterSPName, "SVD single Cluster SpacePoints collection name.", std::string(""));
@@ -308,13 +308,16 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(std::vec
 
     // NOTE: double cluster SVD SP and PXD SP and VTX SP should be stored in the same StoreArray!
     const SpacePoint* relatedSpacePoint = [this, hitInfo, relatedTrueHit]() -> const SpacePoint* {
-      if (m_svdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) {
+      if (m_svdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD)
+      {
         return relatedTrueHit->getRelatedFrom<SpacePoint>(*m_svdSpacePointsStoreArrayName);
       }
-      if (m_pxdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_PXD) {
+      if (m_pxdSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_PXD)
+      {
         return relatedTrueHit->getRelatedFrom<SpacePoint>(*m_pxdSpacePointsStoreArrayName);
       }
-      if (m_vtxSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_VTX) {
+      if (m_vtxSpacePointsStoreArrayName and hitInfo->getTrackingDetector() == RecoHitInformation::c_VTX)
+      {
         return relatedTrueHit->getRelatedFrom<SpacePoint>(*m_vtxSpacePointsStoreArrayName);
       }
       return nullptr;

@@ -44,8 +44,7 @@ KLMTimeCollectorModule::KLMTimeCollectorModule() :
   m_HeventT0_0(nullptr),
   m_HeventT0_1(nullptr),
   m_HnumTrack(nullptr),
-  m_HnBHit2dOfTrack(nullptr),
-  m_HnEHit2dOfTrack(nullptr),
+  m_HnKLMHit2dOfTrack(nullptr),
   m_HpositionDiff{nullptr},
   m_HpositionXDiff(nullptr),
   m_HpositionYDiff(nullptr),
@@ -111,8 +110,7 @@ void KLMTimeCollectorModule::prepare()
   m_HeventT0_1 = new TH1D("m_HeventT0_1", "collision time after track number request;t0[ns]", 200, -100, 100);
   m_HnumTrack = new TH1I("m_HnnumTrack", "Number of Track;nTrack", 30, 0, 30);
 
-  m_HnBHit2dOfTrack = new TH1I("m_HnBKLMHit2dOfTrack", "Number of BKLMHit2d belong to recTrack;num of BKLMHit2d", 20, 0, 20);
-  m_HnEHit2dOfTrack = new TH1I("m_HnEKLMHit2dOfTrack", "Number of EKLMHit2d belong to recTrack;num of EKLMHit2d", 15, 0, 15);
+  m_HnKLMHit2dOfTrack = new TH1I("m_HnKLMHit2dOfTrack", "Number of KLMHit2d belong to recTrack;num of KLMHit2d", 20, 0, 20);
 
   m_HpositionDiff = new TH1D("m_HpositionDiff", "Dist between extHit and KLMHit2d;dist", 160, 0, 8);
   m_HpositionXDiff = new TH1D("m_HpositionXDiff", "DistX between extHit and KLMHit2d;distX", 100, 0, 5);
@@ -130,8 +128,7 @@ void KLMTimeCollectorModule::prepare()
   registerObject<TH1D>("m_HevtT0_0", m_HeventT0_0);
   registerObject<TH1D>("m_HevtT0_1", m_HeventT0_1);
   registerObject<TH1I>("m_HnTrack", m_HnumTrack);
-  registerObject<TH1I>("m_HnBHit2d", m_HnBHit2dOfTrack);
-  registerObject<TH1I>("m_HnEHit2d", m_HnEHit2dOfTrack);
+  registerObject<TH1I>("m_HnKLMHit2d", m_HnKLMHit2dOfTrack);
 
   registerObject<TH1D>("m_HposiDiff", m_HpositionDiff);
   registerObject<TH1D>("m_HposiXDiff", m_HpositionXDiff);
@@ -190,15 +187,13 @@ void KLMTimeCollectorModule::collect()
 
     // Find data objects related to track
     RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
-    RelationVector<BKLMHit2d> bklmHit2ds = track->getRelationsTo<BKLMHit2d>();
-    RelationVector<EKLMHit2d> eklmHit2ds = track->getRelationsTo<EKLMHit2d>();
+    RelationVector<KLMHit2d> klmHit2ds = track->getRelationsTo<KLMHit2d>();
 
-    getObjectPtr<TH1I>("m_HnBHit2d")->Fill(int(bklmHit2ds.size()));
-    getObjectPtr<TH1I>("m_HnEHit2d")->Fill(int(eklmHit2ds.size()));
+    getObjectPtr<TH1I>("m_HnKLMHit2d")->Fill(int(klmHit2ds.size()));
 
     B2DEBUG(20, "Track" << LogVar("exthits", extHits.size())
-            << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
-    if (eklmHit2ds.size() < 2 && bklmHit2ds.size() < 2)
+            << LogVar("KLMHit2d", klmHit2ds.size()));
+    if (klmHit2ds.size() < 2)
       continue;
 
     // Loop for extroplate hits
@@ -262,28 +257,25 @@ void KLMTimeCollectorModule::collect()
         }
       }
     }
-
-    //B2INFO("Hits Collection Done."
-    //        << LogVar("exthits in BKLM", m_vExtHitsB.size()) << LogVar("BKLMHit2d", bklmHit2ds.size())
-    //        << LogVar("exthits in EKLM", m_vExtHitsE.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
-
     if (m_vExtHits.size() > 0) {
-      collectScintEnd(eklmHit2ds);
-      collectScint(bklmHit2ds);
+      collectScintEnd(klmHit2ds);
+      collectScint(klmHit2ds);
     }
     if (m_vExtHits_RPC.size() > 0) {
-      collectRPC(bklmHit2ds);
+      collectRPC(klmHit2ds);
     }
   }
 }
 
-void KLMTimeCollectorModule::collectScintEnd(RelationVector<EKLMHit2d>& eklmHit2ds)
+void KLMTimeCollectorModule::collectScintEnd(const RelationVector<KLMHit2d>& klmHit2ds)
 {
   const HepGeom::Transform3D* tr;
   HepGeom::Point3D<double> hitGlobal_extHit, hitLocal_extHit;
   double l;
 
-  for (const EKLMHit2d& hit2d : eklmHit2ds) {
+  for (const KLMHit2d& hit2d : klmHit2ds) {
+    if (hit2d.getSubdetector() != KLMElementNumbers::c_EKLM)
+      continue;
     RelationVector<KLMDigit> digits = hit2d.getRelationsTo<KLMDigit>();
     unsigned nDigit = digits.size();
     getObjectPtr<TH1I>("m_HnDigit_scint_end")->Fill(nDigit);
@@ -331,10 +323,12 @@ void KLMTimeCollectorModule::collectScintEnd(RelationVector<EKLMHit2d>& eklmHit2
   }
 }
 
-void KLMTimeCollectorModule::collectScint(RelationVector<BKLMHit2d>& bklmHit2ds)
+void KLMTimeCollectorModule::collectScint(RelationVector<KLMHit2d>& klmHit2ds)
 {
   double stripWidtm_HZ, stripWidtm_HPhi;
-  for (BKLMHit2d& hit2d : bklmHit2ds) {
+  for (KLMHit2d& hit2d : klmHit2ds) {
+    if (hit2d.getSubdetector() != KLMElementNumbers::c_BKLM)
+      continue;
     if (hit2d.inRPC())
       continue;
     if (hit2d.isOutOfTime())
@@ -344,7 +338,7 @@ void KLMTimeCollectorModule::collectScint(RelationVector<BKLMHit2d>& bklmHit2ds)
     if (bklmHit1ds.size() != 2)
       continue;
 
-    TVector3 positionGlobal_hit2d = hit2d.getGlobalPosition();
+    TVector3 positionGlobal_hit2d = hit2d.getPosition();
     const bklm::Module* corMod = m_geoParB->findModule(hit2d.getSection(), hit2d.getSector(), hit2d.getLayer());
     stripWidtm_HZ = corMod->getZStripWidth();
     stripWidtm_HPhi = corMod->getPhiStripWidth();
@@ -401,9 +395,11 @@ void KLMTimeCollectorModule::collectScint(RelationVector<BKLMHit2d>& bklmHit2ds)
   }
 }
 
-void KLMTimeCollectorModule::collectRPC(RelationVector<BKLMHit2d>& bklmHit2ds)
+void KLMTimeCollectorModule::collectRPC(RelationVector<KLMHit2d>& klmHit2ds)
 {
-  for (BKLMHit2d& hit2d : bklmHit2ds) {
+  for (KLMHit2d& hit2d : klmHit2ds) {
+    if (hit2d.getSubdetector() != KLMElementNumbers::c_BKLM)
+      continue;
     if (!hit2d.inRPC())
       continue;
     if (hit2d.isOutOfTime())
@@ -412,7 +408,7 @@ void KLMTimeCollectorModule::collectRPC(RelationVector<BKLMHit2d>& bklmHit2ds)
     if (bklmHit1ds.size() != 2)
       continue;
 
-    TVector3 positionGlobal_hit2d = hit2d.getGlobalPosition();
+    TVector3 positionGlobal_hit2d = hit2d.getPosition();
     const bklm::Module* corMod = m_geoParB->findModule(hit2d.getSection(), hit2d.getSector(), hit2d.getLayer());
     double stripWidtm_HZ = corMod->getZStripWidth();
     double stripWidtm_HPhi = corMod->getPhiStripWidth();

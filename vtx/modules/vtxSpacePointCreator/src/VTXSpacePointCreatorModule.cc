@@ -17,7 +17,7 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(VTXSpacePointCreator)
+REG_MODULE(VTXSpacePointCreator);
 
 VTXSpacePointCreatorModule::VTXSpacePointCreatorModule() :
   Module()

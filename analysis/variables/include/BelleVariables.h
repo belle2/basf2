@@ -45,6 +45,25 @@ namespace Belle2 {
     /** Returns last_z from mdst_trk_fit */
     double BelleLastCDCHitZ(const Particle* particle);
 
+    /** Returns the tof from mdst_tof */
+    double BelleTof(const Particle* particle);
+    /** Returns the tof quality from mdst_tof */
+    double BelleTofQuality(const Particle* particle);
+    /** Returns the expected tof resolution from mdst_tof */
+    double BelleTofSigma(const Particle* particle);
+    /** Returns the track's path length from mdst_tof */
+    double BellePathLength(const Particle* particle);
+
+    /** Returns the dEdx from mdst_trk */
+    double BelledEdx(const Particle* particle);
+    /** Returns the dEdx quality from mdst_trk */
+    double BelledEdxQuality(const Particle* particle);
+
+    /** Returns the number of ACC photo-electrons from mdst_acc */
+    double BelleACCnPe(const Particle* particle);
+    /** Returns the quality of the ACC information */
+    double BelleACCQuality(const Particle* particle);
+
     /** Returns significance of invariant mass using daughters' covariance matrices */
     double BellePi0InvariantMassSignificance(const Particle* particle);
   }

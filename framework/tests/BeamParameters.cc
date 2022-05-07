@@ -21,9 +21,8 @@ namespace {
     beamparams.setLER(3.49841, M_PI,  0, std::vector<double>());
     beamparams.setHER(7.99638, 0.022, 0, std::vector<double>());
 
-    const TLorentzVector upsVec = beamparams.getHER() + beamparams.getLER();
-    TLorentzVector upsVecCMS = upsVec;
-    upsVecCMS.Transform(beamparams.getLabToCMS());
+    const ROOT::Math::PxPyPzEVector upsVec = beamparams.getHER() + beamparams.getLER();
+    ROOT::Math::PxPyPzEVector upsVecCMS = beamparams.getLabToCMS() * upsVec;
 
     const double mUpsilon = 10.5794;
     EXPECT_TRUE(fabs(upsVecCMS.E() - mUpsilon) < 1e-2);
@@ -41,9 +40,9 @@ namespace {
     beamparams.setLER(3.49841, M_PI,  0, std::vector<double>());
     beamparams.setHER(7.99638, 0.022, 0, std::vector<double>());
 
-    auto backAndForth = beamparams.getCMSToLab().MatrixMultiplication(beamparams.getLabToCMS());
-    TLorentzVector vec(1, 1, 1, 1);
-    vec.Transform(backAndForth);
+    auto backAndForth = beamparams.getCMSToLab() * (beamparams.getLabToCMS());
+    ROOT::Math::PxPyPzEVector vec(1, 1, 1, 1);
+    vec = backAndForth * vec;
     EXPECT_TRUE(fabs(vec.X() - 1) < 1e-15);
     EXPECT_TRUE(fabs(vec.Y() - 1) < 1e-15);
     EXPECT_TRUE(fabs(vec.Z() - 1) < 1e-15);

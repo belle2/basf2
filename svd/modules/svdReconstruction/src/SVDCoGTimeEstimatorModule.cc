@@ -14,7 +14,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDCoGTimeEstimator)
+REG_MODULE(SVDCoGTimeEstimator);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -142,10 +142,6 @@ void SVDCoGTimeEstimatorModule::event()
   for (const SVDShaperDigit& shaper : m_storeShaper) {
 
     m_StopCreationReco = false;
-
-
-    if (m_StopCreationReco)
-      continue;
 
     samples_vec = shaper.getSamples();
 

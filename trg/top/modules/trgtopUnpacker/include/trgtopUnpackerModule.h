@@ -72,6 +72,9 @@ namespace Belle2 {
     int m_nodeId;         /**Our read-out ID */
     int m_nWords;         /**N words in raw data */
 
+    bool m_reportedAlreadyRun_1;
+    bool m_reportedAlreadyRun_2;
+
   private:
 
     StoreArray<TRGTOPUnpackerStore>  m_TRGTOPCombinedTimingArray;

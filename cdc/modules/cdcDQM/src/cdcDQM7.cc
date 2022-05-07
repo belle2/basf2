@@ -23,7 +23,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(cdcDQM7)
+REG_MODULE(cdcDQM7);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -74,7 +74,7 @@ void cdcDQM7Module::defineHisto()
 
   int bmin = 0;
   int bmax;
-  int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
+  const int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
 
   for (int b = 0; b < 56; b++) {
 
@@ -216,7 +216,7 @@ void cdcDQM7Module::event()
   int whits_L[56] = {}; // wire hits
   double occ_L[56] = {}; // occupancy
 
-  int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
+  const int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
 
   for (int i = 0; i < nent; i++) {
     CDCHit* cdchit = static_cast<CDCHit*>(m_CDCHits[i]);

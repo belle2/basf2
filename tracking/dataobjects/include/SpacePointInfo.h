@@ -19,21 +19,21 @@ namespace Belle2 {
   public:
     /// constructor
     SpacePointInfo() :
-      m_position( {0., 0., 0.}),
-                m_positionError({1., 1., 1.}),
-                m_normalizedLocalU(0.),
-                m_normalizedLocalV(0.),
-                m_clustersAssignedU(false),
-                m_clustersAssignedV(false),
-                m_vxdID(Belle2::VxdID::baseType(0)),
-                m_sensorType(-1),
-                m_qualityIndicator(0.5),
-                m_isAssigned(false)
+      m_position(0., 0., 0.),
+      m_positionError(1., 1., 1.),
+      m_normalizedLocalU(0.),
+      m_normalizedLocalV(0.),
+      m_clustersAssignedU(false),
+      m_clustersAssignedV(false),
+      m_vxdID(Belle2::VxdID::baseType(0)),
+      m_sensorType(-1),
+      m_qualityIndicator(0.5),
+      m_isAssigned(false)
     {
-    };
+    }
 
     /// destructor
-    ~SpacePointInfo() {};
+    ~SpacePointInfo() {}
 
     /** setter for the position.
      * @param v: 3-vector with new position

@@ -16,7 +16,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDEventInfoSetter)
+REG_MODULE(SVDEventInfoSetter);
 
 //-----------------------------------------------------------------
 //                 Implementation

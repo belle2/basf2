@@ -21,7 +21,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisIP)
+REG_MODULE(DQMHistAnalysisIP);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -36,7 +36,7 @@ DQMHistAnalysisIPModule::DQMHistAnalysisIPModule()
   addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
   addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:TEST:hist:"));
   addParam("MonitorPrefix", m_monPrefix, "Monitor Prefix");// force to be set!
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("minEntries", m_minEntries, "minimum number of new Entries for a fit", 1000);
   B2DEBUG(20, "DQMHistAnalysisIP: Constructor done.");
 }
@@ -92,7 +92,7 @@ void DQMHistAnalysisIPModule::beginRun()
   m_c1->Clear();
 
   TH1* hh1;
-  hh1 = findHist(m_histoname.c_str());
+  hh1 = findHist(m_histoname);
 
   if (hh1 == NULL) {
     B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
@@ -142,7 +142,7 @@ void DQMHistAnalysisIPModule::event()
   TH1* hh1;
   bool flag = false;
 
-  hh1 = findHist(m_histoname.c_str());
+  hh1 = findHist(m_histoname);
   if (hh1 == NULL) {
     B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
     TDirectory* d = gROOT;

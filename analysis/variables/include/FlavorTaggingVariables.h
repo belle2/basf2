@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #pragma once
+
 #include <analysis/VariableManager/Manager.h>
 
 #include <vector>
@@ -23,11 +24,13 @@ namespace Belle2 {
      * requires that StoreObjPtr<RestOfEvent> roe("RestOfEvent") exists.
      */
     double momentumMissingTagSide(const Particle*);
+    Manager::FunctionPtr momentumMissingTagSideWithMask(const std::vector<std::string>& arguments);
 
     /**
      * return cosine of angle between thrust axis of given particle and thrust axis of ROE
      */
     double cosTPTO(const Particle* part);
+    Manager::FunctionPtr cosTPTOWithMask(const std::vector<std::string>& arguments);
 
     /**
      * 1 if pdg-code for Lambda0, -1 if Anti-Lambda0, 0 else
@@ -68,6 +71,12 @@ namespace Belle2 {
      * Returns the transverse momentum of all charged tracks if there exists a ROE for the given particle, else 0.
      */
     double transverseMomentumOfChargeTracksInRoe(const Particle* part);
+    Manager::FunctionPtr transverseMomentumOfChargeTracksInRoeWithMask(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the transverse momentum squared of all charged tracks if there exists a ROE for the given particle, else 0.
+     */
+    Manager::FunctionPtr transverseMomentumSquaredOfChargeTracksInRoeWithMask(const std::vector<std::string>& arguments);
 
     /**
      * Returns the number of K_S0 in the given ROE Particle List(flavor tagging specific variable).
@@ -85,21 +94,25 @@ namespace Belle2 {
       * return 1 if majority of tracks in ROE are from B0
       */
     bool isMajorityInRestOfEventFromB0(const Particle*);
+    Manager::FunctionPtr isMajorityInRestOfEventFromB0WithMask(const std::vector<std::string>& arguments);
 
     /**
      * return 1 if majority of tracks in ROE are from B0bar
      */
     bool isMajorityInRestOfEventFromB0bar(const Particle*);
+    Manager::FunctionPtr isMajorityInRestOfEventFromB0barWithMask(const std::vector<std::string>& arguments);
 
     /**
      * return whether current RestOfEvent contains tracks. Used for cuts
      */
     bool hasRestOfEventTracks(const Particle* part);
+    Manager::FunctionPtr hasRestOfEventTracksWithMask(const std::vector<std::string>& arguments);
 
     /**
      * -1 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the CP side.
      */
     int isRelatedRestOfEventB0Flavor(const Particle* part);
+    Manager::FunctionPtr isRelatedRestOfEventB0FlavorWithMask(const std::vector<std::string>& arguments);
 
     /**
      * -1 (1) if current RestOfEvent is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the CP side.
@@ -125,6 +138,7 @@ namespace Belle2 {
      * 0 (1) if the majority of tracks and clusters of the current RestOfEvent are related to a B0bar (B0).
      */
     int isRestOfEventMajorityB0Flavor(const Particle*);
+    Manager::FunctionPtr isRelatedRestOfEventMajorityB0FlavorWithMask(const std::vector<std::string>& arguments);
 
     /**
      * Returns the MC flavor (+-1) of the accompanying tag-side B meson if the given particle is a correctly MC-matched B candidate.

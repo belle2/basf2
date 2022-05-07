@@ -64,7 +64,7 @@ public:
   int getFileId() { return m_fileid; }
 
 public:
-  int open(const std::string& dir, int ndisks, int expno, int runno, int fileid)
+  int open(const std::string& dir, int ndisks, int /*expno*/, int /*runno*/, int fileid)
   {
     m_filesize = 0;
     m_fileid = 0;

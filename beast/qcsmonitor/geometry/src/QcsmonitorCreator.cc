@@ -139,7 +139,7 @@ namespace Belle2 {
             }
             //cout << "QCS r " << r_pos[i] << " width " << dz_scint << " z " << z_pos[i] << " phi " << phi << " x " << x_pos[i] << " y " <<
             //     y_pos[i] << endl;
-            new G4PVPlacement(transform, l_scint, TString::Format("p_scint_%d", detID).Data() , &topVolume, false, detID);
+            new G4PVPlacement(transform, l_scint, TString::Format("p_scint_%d", detID).Data(), &topVolume, false, detID);
             B2INFO("QCSS-" << detID << " placed at: " << transform.getTranslation() << " mm ");
             //cout << " Nb of detector " << detID << endl;
             detID++;

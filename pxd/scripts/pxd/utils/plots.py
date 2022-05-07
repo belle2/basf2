@@ -114,6 +114,7 @@ def df_plot_errorbar(df, x, y, yerr_low, yerr_up, ax=None, *args, **kwargs):
     ax.legend()
     ax.set_xlabel(x)
     ax.set_ylabel(y)
+    return ax
 
 
 # Extend pandas.DataFrame
@@ -181,7 +182,7 @@ def plot_efficiency_map(tree, exp_runs=[], num_name="hTrackClustersLayer1", den_
         exp_runs = sorted(exp_runs)
         use_exp_run_tuple = False
     count = 0
-    h_num, h_den = None, None
+    h_eff, h_num, h_den = None, None, None
     for i_evt in range(tree.GetEntries()):
         tree.GetEntry(i_evt)
         exp = getattr(tree, "exp")
@@ -199,14 +200,36 @@ def plot_efficiency_map(tree, exp_runs=[], num_name="hTrackClustersLayer1", den_
             h_den.Add(getattr(tree, den_name))
         count += 1
     if count:
-        h_num.Divide(h_den)
-        h_num.SetTitle(title)
-        h_num.SetStats(False)
-        h_num.Draw("colz")
+        h_temp = h_den.Clone()
+        h_temp.Divide(h_den)  # h_temp bins filled to 1 if there is any counts in h_den
+        h_eff = h_num.Clone()
+        h_eff.Add(h_temp, 1e-9)  # Added 1e-9 which shouldn't bias eff
+        h_eff.Divide(h_den)
+        h_eff.SetTitle(title)
+        h_eff.SetStats(True)
+        # default_opt_stat = ROOT.gStyle.GetOptStat()
+        ROOT.gStyle.SetOptStat(10)
+        h_eff.Draw("colz")
         canvas.Draw()
+        s = h_eff.GetListOfFunctions().FindObject("stats")
+        # print(s.GetX1NDC(), s.GetX2NDC())
+        s.SetX1NDC(0.7)
+        s.SetX2NDC(0.9)
+        s.SetY1NDC(0.9)
+        s.SetY2NDC(0.95)
+        s.SetFillColorAlpha(0, 0.1)
+        s.SetLineColorAlpha(0, 0)
+        canvas.Update()
         if save_to:
+            h_eff.GetZaxis().SetRangeUser(0.9, 1)
+            canvas.Update()
+            canvas.Print(save_to+".above90.png")
+            h_eff.GetZaxis().SetRangeUser(0, 1)
+            canvas.Update()
             canvas.Print(save_to)
-    return h_num
+
+        # ROOT.gStyle.SetOptStat(default_opt_stat)
+    return h_eff, h_num, h_den
 
 
 def plot_in_module_efficiency(df, pxdid=1052, figsize=(12, 16), alpha=0.7, save_to="",
@@ -303,14 +326,16 @@ def plot_module_efficiencies_in_DHHs(df, eff_var="eff_sel", phase="early_phase3"
         }
     for dhh, pxdid_list in dhh_modules_dic.items():
         plt.figure(figsize=figsize)
+        ymin = 1.0
         for pxdid in pxdid_list:
             df.query(f"{eff_var}>0&pxdid=={pxdid}&{eff_var}_err_low<0.01").errorbar(
                 y=eff_var, x="run", yerr_low=f"{eff_var}_err_low", yerr_up=f"{eff_var}_err_up", label=f"{pxdid}", alpha=0.7)
-            plt.title(dhh + " efficiency")
-            ymin, ymax = plt.ylim()
-            plt.ylim(ymin, 1.0)
-            if save_to:
-                plt.savefig(dhh + "_" + save_to)
+            ymin = min(plt.ylim()[0], ymin)
+        plt.ylabel("Efficiency (selected)")
+        plt.title(dhh + " efficiency")
+        plt.ylim(ymin, 1.0)
+        if save_to:
+            plt.savefig(dhh + "_" + save_to)
 
 
 if __name__ == '__main__':

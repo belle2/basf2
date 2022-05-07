@@ -10,6 +10,8 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+#include <Math/RotationY.h>
+
 namespace Belle2 {
 
   void InitialParticleGeneration::initialize()
@@ -27,8 +29,8 @@ namespace Belle2 {
     return initial;
   }
 
-  TLorentzVector InitialParticleGeneration::generateBeam(const TLorentzVector& initial, const TMatrixDSym& cov,
-                                                         MultivariateNormalGenerator& gen)
+  ROOT::Math::PxPyPzEVector InitialParticleGeneration::generateBeam(const ROOT::Math::PxPyPzEVector& initial, const TMatrixDSym& cov,
+      MultivariateNormalGenerator& gen)
   {
     if (!(m_event->getGenerationFlags() & BeamParameters::c_smearBeam)) {
       //no smearing, nothing to do
@@ -50,7 +52,7 @@ namespace Belle2 {
       p[1] = 0;
       p[2] = 0;
     }
-    // calculate TLorentzvector from p
+    // calculate Lorentzvector from p
     const double pz = std::sqrt(p[0] * p[0] - Const::electronMass * Const::electronMass);
     // Rotate around theta_x and theta_y. Same as result.RotateX(p[1]);
     // result.RotateY(p[2]) but as we know it's a 0,0,pz vector this can be
@@ -61,9 +63,10 @@ namespace Belle2 {
     const double cy = cos(p[2]);
     const double px = sy * cx * pz;
     const double py = -sx * pz;
-    TLorentzVector result(px, py, cx * cy * pz, p[0]);
+    ROOT::Math::PxPyPzEVector result(px, py, cx * cy * pz, p[0]);
     // And rotate into the direction of the nominal beam
-    result.RotateY(initial.Theta());
+    ROOT::Math::RotationY rotateY(initial.Theta());
+    result = rotateY(result);
     return result;
   }
 
@@ -86,8 +89,8 @@ namespace Belle2 {
       m_generateVertex.reset();
     }
     m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & allowedFlags);
-    TLorentzVector her = generateBeam(m_beamParams->getHER(), m_beamParams->getCovHER(), m_generateHER);
-    TLorentzVector ler = generateBeam(m_beamParams->getLER(), m_beamParams->getCovLER(), m_generateLER);
+    ROOT::Math::PxPyPzEVector her = generateBeam(m_beamParams->getHER(), m_beamParams->getCovHER(), m_generateHER);
+    ROOT::Math::PxPyPzEVector ler = generateBeam(m_beamParams->getLER(), m_beamParams->getCovLER(), m_generateLER);
     TVector3 vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
     m_event->set(her, ler, vtx);
     //Check if we want to go to CMS, if so boost both

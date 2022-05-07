@@ -13,7 +13,6 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMDigit.h>
-#include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMPlaneArrayIndex.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
@@ -240,17 +239,11 @@ namespace Belle2 {
     /** Extrapolated hits in plane for BKLM */
     TH1F* m_AllExtHitsBKLM;
 
-    /** Matched over Extrapolated hits in plane for BKLM */
-    TH1F* m_PlaneEfficienciesBKLM;
-
     /** Matched hits in plane for EKLM */
     TH1F* m_MatchedHitsEKLM;
 
     /** Extrapolated hits in plane for EKLM */
     TH1F* m_AllExtHitsEKLM;
-
-    /** Matched over Extrapolated hits in plane for EKLM */
-    TH1F* m_PlaneEfficienciesEKLM;
 
     /** Matched hits in sector for BKLM */
     TH1F* m_MatchedHitsBKLMSector;
@@ -258,17 +251,12 @@ namespace Belle2 {
     /** Extrapolated hits in sector for BKLM */
     TH1F* m_AllExtHitsBKLMSector;
 
-    /** Matched over Extrapolated hits in sector for BKLM */
-    TH1F* m_PlaneEfficienciesBKLMSector;
-
     /** Matched hits in sector for EKLM */
     TH1F* m_MatchedHitsEKLMSector;
 
     /** Extrapolated hits in sector for EKLM */
     TH1F* m_AllExtHitsEKLMSector;
 
-    /** Matched over Extrapolated hits in sector for EKLM */
-    TH1F* m_PlaneEfficienciesEKLMSector;
 
     /*******************************************/
     /*******************************************/

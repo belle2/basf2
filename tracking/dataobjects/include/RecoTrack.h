@@ -16,8 +16,7 @@
 
 #include <tracking/dataobjects/RecoHitInformation.h>
 
-#include <boost/optional.hpp>
-
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -169,7 +168,7 @@ namespace Belle2 {
      * @param storeArrayNameOfCDCHits The name of the store array where the related cdc hits are stored.
      * @param storeArrayNameOfSVDHits The name of the store array where the related svd hits are stored.
      * @param storeArrayNameOfPXDHits The name of the store array where the related pxd hits are stored.
-     * @param storeArrayNameOfVXTHits The name of the store array where the related vtx hits are stored.
+     * @param storeArrayNameOfVTXHits The name of the store array where the related vtx hits are stored.
      * @param storeArrayNameOfBKLMHits The name of the store array where the related bklm hits are stored.
      * @param storeArrayNameOfEKLMHits The name of the store array where the related eklm hits are stored.
      * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
@@ -228,7 +227,7 @@ namespace Belle2 {
      * @return The number of hits copied.
      */
     size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset = 0,
-                                bool reversed = false, boost::optional<double> optionalMinimalWeight = boost::none);
+                                bool reversed = false, std::optional<double> optionalMinimalWeight = std::nullopt);
 
     /**
      * Adds a cdc hit with the given information to the reco track.

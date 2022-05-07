@@ -119,8 +119,8 @@ namespace Belle2 {
           transform.SetDx(g4transform[12]*Unit::mm);
           transform.SetDy(g4transform[13]*Unit::mm);
           transform.SetDz(g4transform[14]*Unit::mm);
-          info->setTransformation(transform);
-          info->setTransformation(transform, true);
+          info->setTransformation(transform); // cppcheck-suppress nullPointerRedundantCheck
+          info->setTransformation(transform, true); // cppcheck-suppress nullPointerRedundantCheck
 
           addSensor(info);
         }

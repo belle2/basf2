@@ -8,10 +8,13 @@
 
 #pragma once
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
 
+#include <vector>
+#include <string>
+
 namespace Belle2 {
+  class Particle;
 
   namespace Variable {
 
@@ -153,6 +156,24 @@ namespace Belle2 {
      * @return electron ID without TOP information
      */
     double electronID_noTOP(const Particle* part);
+
+    /**
+     * SPECIAL (TEMP) variable (BII-8444).
+     * @return binary PID between electron hypothesis and another hypothesis, without TOP information.
+     */
+    double binaryElectronID_noTOP(const Particle* part, const std::vector<double>& arguments);
+
+    /**
+     * SPECIAL (TEMP) variable (BII-8444, BII-8760).
+     * @return electron ID without SVD and TOP information.
+     */
+    double electronID_noSVD_noTOP(const Particle* part);
+
+    /**
+     * SPECIAL (TEMP) variable (BII-8444, BII-8760).
+     * @return binary PID between electron hypothesis and another hypothesis, without TOP information.
+     */
+    double binaryElectronID_noSVD_noTOP(const Particle* part, const std::vector<double>& arguments);
 
     /**
     * returns the MVA score for anti-neutron PID (not for neutron)

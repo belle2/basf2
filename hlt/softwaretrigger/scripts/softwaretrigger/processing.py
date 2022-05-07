@@ -283,7 +283,7 @@ def add_expressreco_processing(path,
             add_cosmics_reconstruction(path, components=reco_components, pruneTracks=False,
                                        skipGeometryAdding=True, **kwargs)
         else:
-            basf2.B2FATAL("Run Type {} not supported.".format(run_type))
+            basf2.B2FATAL(f"Run Type {run_type} not supported.")
 
     path_utils.add_expressreco_dqm(path, run_type, components=reco_components)
 

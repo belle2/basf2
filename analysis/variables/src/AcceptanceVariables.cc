@@ -8,7 +8,11 @@
 
 // Own include
 #include <analysis/variables/AcceptanceVariables.h>
+
+// include VariableManager
 #include <analysis/VariableManager/Manager.h>
+
+#include <analysis/dataobjects/Particle.h>
 
 using namespace std;
 

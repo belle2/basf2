@@ -10,7 +10,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <vector>
 
 namespace Belle2 {
@@ -51,14 +51,14 @@ namespace Belle2 {
      *
      * @param thrustB B thrust axis
      */
-    void addThrustB(const TVector3& thrustB);
+    void addThrustB(const ROOT::Math::XYZVector& thrustB);
 
     /**
      * Add ROE thrust axis.
      *
      * @param thrustO ROE thrust axis
      */
-    void addThrustO(const TVector3& thrustO);
+    void addThrustO(const ROOT::Math::XYZVector& thrustO);
 
     /**
      * Add magnitude of B thrust axis.
@@ -127,9 +127,9 @@ namespace Belle2 {
     /**
      * Get B thrust axis.
      *
-     * @return TVector3 ROE thrust axis
+     * @return ROOT::Math::XYZVector ROE thrust axis
      */
-    TVector3 getThrustB() const
+    ROOT::Math::XYZVector getThrustB() const
     {
       return m_thrustB;
     }
@@ -137,9 +137,9 @@ namespace Belle2 {
     /**
      * Get ROE thrust axis.
      *
-     * @return TVector3 ROE thrust axis
+     * @return ROOT::Math::XYZVector ROE thrust axis
      */
-    TVector3 getThrustO() const
+    ROOT::Math::XYZVector getThrustO() const
     {
       return m_thrustO;
     }
@@ -238,8 +238,8 @@ namespace Belle2 {
   private:
 
     // persistent data members
-    TVector3 m_thrustO; /**< ROE thrust axis */
-    TVector3 m_thrustB; /**< B thrust axis */
+    ROOT::Math::XYZVector m_thrustO; /**< ROE thrust axis */
+    ROOT::Math::XYZVector m_thrustB; /**< B thrust axis */
 
     float m_thrustBm;   /**< magnitude of B thrust axis */
     float m_thrustOm;   /**< magnitude of ROE thrust axis */
@@ -253,7 +253,7 @@ namespace Belle2 {
     std::vector<float> m_cleoConesALL;  /**< vector of Cleo Cones constructed from all final state particles */
     std::vector<float> m_cleoConesROE;  /**< vector of Cleo Cones constructed from only ROE particles */
 
-    ClassDef(ContinuumSuppression, 1) /**< class definition */
+    ClassDef(ContinuumSuppression, 2) /**< class definition */
 
   };
 

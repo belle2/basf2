@@ -15,7 +15,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(VariablesToEventExtraInfo)
+REG_MODULE(VariablesToEventExtraInfo);
 
 VariablesToEventExtraInfoModule::VariablesToEventExtraInfoModule()
 {

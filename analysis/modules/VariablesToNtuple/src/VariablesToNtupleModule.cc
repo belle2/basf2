@@ -28,7 +28,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(VariablesToNtuple)
+REG_MODULE(VariablesToNtuple);
 
 
 VariablesToNtupleModule::VariablesToNtupleModule() :
@@ -115,12 +115,21 @@ void VariablesToNtupleModule::initialize()
 
   // declare branches and get the variable strings
   m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
+  // remove duplicates from list of variables but keep the previous order
+  unordered_set<string> seen;
+  auto newEnd = remove_if(m_variables.begin(), m_variables.end(), [&seen](const string & varStr) {
+    if (seen.find(varStr) != std::end(seen)) return true;
+    seen.insert(varStr);
+    return false;
+  });
+  m_variables.erase(newEnd, m_variables.end());
+
   m_branchAddressesDouble.resize(m_variables.size() + 1);
   m_branchAddressesInt.resize(m_variables.size() + 1);
   m_tree->get().Branch("__weight__", &m_branchAddressesDouble[0], "__weight__/D");
   size_t enumerate = 1;
   for (const string& varStr : m_variables) {
-    string branchName = makeROOTCompatible(varStr);
+    string branchName = MakeROOTCompatible::makeROOTCompatible(varStr);
 
     // Check for deprecated variables
     Variable::Manager::Instance().checkDeprecatedVariable(varStr);
@@ -145,7 +154,7 @@ void VariablesToNtupleModule::initialize()
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_bool) {
         m_tree->get().Branch(branchName.c_str(), &m_branchAddressesInt[enumerate], (branchName + "/O").c_str());
       }
-      m_functions.push_back(var->function);
+      m_functions.push_back(std::make_pair(var->function, var->variabletype));
     }
     enumerate++;
   }
@@ -203,12 +212,23 @@ void VariablesToNtupleModule::event()
     m_branchAddressesDouble[0] = getInverseSamplingRateWeight(nullptr);
     if (m_branchAddressesDouble[0] > 0) {
       for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
-        if (std::holds_alternative<double>(m_functions[iVar](nullptr))) {
-          m_branchAddressesDouble[iVar + 1] = std::get<double>(m_functions[iVar](nullptr));
-        } else if (std::holds_alternative<int>(m_functions[iVar](nullptr))) {
-          m_branchAddressesInt[iVar + 1] = std::get<int>(m_functions[iVar](nullptr));
-        } else if (std::holds_alternative<bool>(m_functions[iVar](nullptr))) {
-          m_branchAddressesInt[iVar + 1] = std::get<bool>(m_functions[iVar](nullptr));
+        auto var_result = std::get<0>(m_functions[iVar])(nullptr);
+        auto var_type = std::get<1>(m_functions[iVar]);
+        if (std::holds_alternative<double>(var_result)) {
+          if (var_type != Variable::Manager::VariableDataType::c_double)
+            B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
+                      "'. Expected Variable::Manager::VariableDataType::c_double. Exported data for this variable might be incorrect.");
+          m_branchAddressesDouble[iVar + 1] = std::get<double>(var_result);
+        } else if (std::holds_alternative<int>(var_result)) {
+          if (var_type != Variable::Manager::VariableDataType::c_int)
+            B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
+                      "'. Expected Variable::Manager::VariableDataType::c_int. Exported data for this variable might be incorrect.");
+          m_branchAddressesInt[iVar + 1] = std::get<int>(var_result);
+        } else if (std::holds_alternative<bool>(var_result)) {
+          if (var_type != Variable::Manager::VariableDataType::c_bool)
+            B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
+                      "'. Expected Variable::Manager::VariableDataType::c_bool. Exported data for this variable might be incorrect.");
+          m_branchAddressesInt[iVar + 1] = std::get<bool>(var_result);
         }
       }
       m_tree->get().Fill();
@@ -223,12 +243,23 @@ void VariablesToNtupleModule::event()
       m_branchAddressesDouble[0] = getInverseSamplingRateWeight(particle);
       if (m_branchAddressesDouble[0] > 0) {
         for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
-          if (std::holds_alternative<double>(m_functions[iVar](particle))) {
-            m_branchAddressesDouble[iVar + 1] = std::get<double>(m_functions[iVar](particle));
-          } else if (std::holds_alternative<int>(m_functions[iVar](particle))) {
-            m_branchAddressesInt[iVar + 1] = std::get<int>(m_functions[iVar](particle));
-          } else if (std::holds_alternative<bool>(m_functions[iVar](particle))) {
-            m_branchAddressesInt[iVar + 1] = std::get<bool>(m_functions[iVar](particle));
+          auto var_result = std::get<0>(m_functions[iVar])(particle);
+          auto var_type = std::get<1>(m_functions[iVar]);
+          if (std::holds_alternative<double>(var_result)) {
+            if (var_type != Variable::Manager::VariableDataType::c_double)
+              B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
+                        "'. Expected Variable::Manager::VariableDataType::c_double. Exported data for this variable might be incorrect.");
+            m_branchAddressesDouble[iVar + 1] = std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result)) {
+            if (var_type != Variable::Manager::VariableDataType::c_int)
+              B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
+                        "'. Expected Variable::Manager::VariableDataType::c_int. Exported data for this variable might be incorrect.");
+            m_branchAddressesInt[iVar + 1] = std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result)) {
+            if (var_type != Variable::Manager::VariableDataType::c_bool)
+              B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
+                        "'. Expected Variable::Manager::VariableDataType::c_bool. Exported data for this variable might be incorrect.");
+            m_branchAddressesInt[iVar + 1] = std::get<bool>(var_result);
           }
         }
         m_tree->get().Fill();

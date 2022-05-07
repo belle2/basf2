@@ -248,6 +248,16 @@ namespace Belle2 {
     int getMinimalPlaneNumber(int subdetector) const;
 
     /**
+     * Get maximal plane number.
+     */
+    static constexpr int getMaximalPlaneNumber()
+    {
+      /* BKLM plane number is 0-based! */
+      return std::max(EKLMElementNumbers::getMaximalPlaneNumber(),
+                      BKLMElementNumbers::getMaximalPlaneNumber() + 1);
+    }
+
+    /**
      * Get DAQ name for a given sector.
      * @param[in] subdetector Subdetector.
      * @param[in] section     Section.

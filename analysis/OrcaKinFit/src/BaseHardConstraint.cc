@@ -93,7 +93,7 @@ namespace Belle2 {
 
       // Derivatives $\frac{\partial ^2 g}{\partial P_i \partial a_l}$ at fixed i
       // d2GdPdAl[4*l + ii] is $\frac{\partial ^2 g}{\partial P_{i,ii} \partial a_l}$
-      double d2GdPdAl[BaseDefs::MAXINTERVARS * BaseDefs::MAXPAR];
+      double d2GdPdAl[static_cast<int>(BaseDefs::MAXINTERVARS) * BaseDefs::MAXPAR];
       // Derivatives $\frac{\partial ^2 g}{\partial a_k \partial a_l}$
       double d2GdAkdAl[BaseDefs::MAXPAR * BaseDefs::MAXPAR] = {0};
 
@@ -118,11 +118,13 @@ namespace Belle2 {
           assert(foj);
           if (secondDerivatives(i, j, d2GdPidPj)) {
             if (!dPidAkval[i]) {
-              foi->getDerivatives(dPidAk + i * (BaseDefs::MAXPAR * BaseDefs::MAXINTERVARS), BaseDefs::MAXPAR * BaseDefs::MAXINTERVARS);
+              foi->getDerivatives(dPidAk + i * (static_cast<int>(BaseDefs::MAXPAR) * BaseDefs::MAXINTERVARS),
+                                  static_cast<int>(BaseDefs::MAXPAR) * BaseDefs::MAXINTERVARS);
               dPidAkval[i] = true;
             }
             if (!dPidAkval[j]) {
-              foj->getDerivatives(dPidAk + j * (BaseDefs::MAXPAR * BaseDefs::MAXINTERVARS), BaseDefs::MAXPAR * BaseDefs::MAXINTERVARS);
+              foj->getDerivatives(dPidAk + j * (static_cast<int>(BaseDefs::MAXPAR) * BaseDefs::MAXINTERVARS),
+                                  static_cast<int>(BaseDefs::MAXPAR) * BaseDefs::MAXINTERVARS);
               dPidAkval[j] = true;
             }
             // Now sum over E/px/Py/Pz for object j:
@@ -133,7 +135,7 @@ namespace Belle2 {
             for (int llocal = 0; llocal < foj->getNPar(); ++llocal) {
               for (int ii = 0; ii < BaseDefs::MAXINTERVARS; ++ii) {
                 int ind1 = BaseDefs::MAXINTERVARS * ii;
-                int ind2 = (BaseDefs::MAXPAR * BaseDefs::MAXINTERVARS) * j + BaseDefs::MAXINTERVARS * llocal;
+                int ind2 = (static_cast<int>(BaseDefs::MAXPAR) * BaseDefs::MAXINTERVARS) * j + BaseDefs::MAXINTERVARS * llocal;
                 double& r = d2GdPdAl[BaseDefs::MAXINTERVARS * llocal + ii];
                 r  = d2GdPidPj[  ind1] * dPidAk[  ind2];   // E
                 r += d2GdPidPj[++ind1] * dPidAk[++ind2];   // px
@@ -150,7 +152,7 @@ namespace Belle2 {
             for (int klocal = 0; klocal < foi->getNPar(); ++klocal) {
               for (int llocal = 0; llocal < foj->getNPar(); ++llocal) {
                 int ind1 = BaseDefs::MAXINTERVARS * llocal;
-                int ind2 = (BaseDefs::MAXPAR * BaseDefs::MAXINTERVARS) * i + BaseDefs::MAXINTERVARS * klocal;
+                int ind2 = (static_cast<int>(BaseDefs::MAXPAR) * BaseDefs::MAXINTERVARS) * i + BaseDefs::MAXINTERVARS * klocal;
                 double& r = d2GdAkdAl[BaseDefs::MAXPAR * klocal + llocal];
                 r  = d2GdPdAl[  ind1] * dPidAk[  ind2];    //E
                 r += d2GdPdAl[++ind1] * dPidAk[++ind2];   // px

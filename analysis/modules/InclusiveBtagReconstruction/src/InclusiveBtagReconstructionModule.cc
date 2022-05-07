@@ -13,14 +13,14 @@
 #include <unordered_set>
 #include <map>
 #include <vector>
-#include <TLorentzVector.h>
+#include <Math/Vector4D.h>
 
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(InclusiveBtagReconstruction)
+REG_MODULE(InclusiveBtagReconstruction);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -117,7 +117,7 @@ void InclusiveBtagReconstructionModule::event()
 
     for (std::vector<int> daughterIndices : btagCandidates) {
       std::map<int, size_t> nonFinalStateIndicesCount;
-      TLorentzVector momentum;
+      ROOT::Math::PxPyPzEVector momentum;
       for (int index : daughterIndices) {
         // check if there are non-final-state particles. If yes, the momentum should be added just once.
         if ((m_particles[index]->getFinalStateDaughters()).size() > 1) {

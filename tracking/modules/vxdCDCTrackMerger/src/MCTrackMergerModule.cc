@@ -36,7 +36,7 @@ MCTrackMergerModule::MCTrackMergerModule() :
   Module()
 {
   setDescription(
-    "This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC");
+    "This module merges tracks which are reconstructed, separately, in the silicon and in the CDC");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //input

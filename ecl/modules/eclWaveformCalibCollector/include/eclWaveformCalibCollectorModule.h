@@ -29,8 +29,11 @@ namespace Belle2 {
     /** Constructor: Sets the description, the properties and the parameters of the module */
     eclWaveformCalibCollectorModule();
 
-    /** Define histograms and read payloads from DB */
+    /** Define ttree and read payloads from DB */
     void prepare() override;
+
+    /** beginRun equivalent. used to load ADC to GeV calibration constants*/
+    void startRun() override;
 
     /** Select events and crystals and accumulate histograms */
     void collect() override;

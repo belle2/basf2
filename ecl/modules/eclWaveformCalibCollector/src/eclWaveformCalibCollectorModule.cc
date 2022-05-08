@@ -51,12 +51,6 @@ eclWaveformCalibCollectorModule::eclWaveformCalibCollectorModule() : Calibration
 void eclWaveformCalibCollectorModule::prepare()
 {
 
-  //used to convert ADC to GeV
-  DBObjPtr<ECLCrystalCalib> Ael("ECLCrystalElectronics"), Aen("ECLCrystalEnergy");
-  m_ADCtoEnergy.resize(8736);
-  if (Ael) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] = Ael->getCalibVector()[i];
-  if (Aen) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] *= Aen->getCalibVector()[i];
-
   // ECL dataobjects
   m_eclDSPs.registerInDataStore();
   m_eclDigits.registerInDataStore();
@@ -109,6 +103,16 @@ void eclWaveformCalibCollectorModule::prepare()
     tree->Branch("ADC30", &m_ADC30,      "m_ADC30/I");
   }
   registerObject<TTree>("tree", tree);
+}
+
+void eclWaveformCalibCollectorModule::startRun()
+{
+  //called at beginning of run
+  //used to convert ADC to GeV
+  DBObjPtr<ECLCrystalCalib> Ael("ECLCrystalElectronics"), Aen("ECLCrystalEnergy");
+  m_ADCtoEnergy.resize(8736);
+  if (Ael) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] = Ael->getCalibVector()[i];
+  if (Aen) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] *= Aen->getCalibVector()[i];
 }
 
 

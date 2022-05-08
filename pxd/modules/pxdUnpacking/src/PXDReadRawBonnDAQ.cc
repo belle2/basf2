@@ -25,7 +25,7 @@ typedef crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhe_crc_32_type;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDReadRawBonnDAQ)
+REG_MODULE(PXDReadRawBonnDAQ);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -248,7 +248,7 @@ void PXDReadRawBonnDAQModule::event()
 void PXDReadRawBonnDAQModule::terminate()
 {
   if (fh) {
-    delete(fh);
+    delete (fh);
     fh = 0;
   }
 }

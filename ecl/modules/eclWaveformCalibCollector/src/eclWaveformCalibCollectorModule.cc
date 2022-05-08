@@ -61,7 +61,6 @@ void eclWaveformCalibCollectorModule::prepare()
   m_eclDSPs.registerInDataStore();
   m_eclDigits.registerInDataStore();
 
-  m_EventsProcessed = 0;
   auto tree = new TTree("tree", "");
   tree->Branch("CellID", &m_CellID,      "m_CellID/I");
   tree->Branch("OnlineE", &m_OnlineE,      "m_OnlineE/F");

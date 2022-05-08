@@ -46,8 +46,6 @@ namespace Belle2 {
 
     double m_HighEnergyThresholdGeV; /**< High Energy Threshold in GeV. >*/
 
-    int m_EventsProcessed; /**< number of events processed >*/
-
     bool m_includeWaveforms; /**< Flag to save ADC information. >*/
 
     int m_CellID; /**< To read ntuple branch > */

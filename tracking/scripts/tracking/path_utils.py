@@ -984,10 +984,16 @@ def add_vtx_track_finding(
     else:
         combined_vtx_cdc_standalone_tracks = output_reco_tracks
 
-        # Write out the combinations of tracks
+    # Write out the combinations of tracks
+    if use_mc_vtx_cdc_merger:
+        keepOnlyGoodQITracks = True
+    else:
+        keepOnlyGoodQITracks = False
+
     path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=temporary_reco_tracks,
                     CDCRecoTracksStoreArrayName=input_reco_tracks,
-                    recoTracksStoreArrayName=combined_vtx_cdc_standalone_tracks)
+                    recoTracksStoreArrayName=combined_vtx_cdc_standalone_tracks,
+                    keepOnlyGoodQITracks=keepOnlyGoodQITracks)
 
     if use_vtx_to_cdc_ckf:
         path.add_module("ToCDCCKF",

@@ -28,7 +28,7 @@ N_EVENTS = 1000
 ACTIVE = True
 
 basf2.set_random_seed(1337)
-basf2.set_log_level(LogLevel.INFO)
+basf2.set_log_level(LogLevel.ERROR)
 
 
 def setupFinderModule(path):

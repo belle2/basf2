@@ -21,11 +21,13 @@ RelatedTracksCombinerModule::RelatedTracksCombinerModule() :
                  "if the hits go before (-1) or after (+1) the CDC track.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("CDCRecoTracksStoreArrayName", m_cdcRecoTracksStoreArrayName , "Name of the input CDC StoreArray.",
+  addParam("CDCRecoTracksStoreArrayName", m_cdcRecoTracksStoreArrayName, "Name of the input CDC StoreArray.",
            m_cdcRecoTracksStoreArrayName);
-  addParam("VXDRecoTracksStoreArrayName", m_vxdRecoTracksStoreArrayName , "Name of the input VXD StoreArray.",
+  addParam("VXDRecoTracksStoreArrayName", m_vxdRecoTracksStoreArrayName, "Name of the input VXD StoreArray.",
            m_vxdRecoTracksStoreArrayName);
   addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "Name of the output StoreArray.", m_recoTracksStoreArrayName);
+  addParam("keepOnlyGoodQITracks", m_param_onlyGoodQITracks, "Only keep good QI tracks", m_param_onlyGoodQITracks);
+  addParam("minRequiredQuality", m_param_qiCutValue, "Minimum QI to keep tracks", m_param_qiCutValue);
 }
 
 void RelatedTracksCombinerModule::initialize()
@@ -50,7 +52,7 @@ void RelatedTracksCombinerModule::event()
   for (RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
     const RelationVector<RecoTrack>& relatedVXDRecoTracks = cdcRecoTrack.getRelationsWith<RecoTrack>(m_vxdRecoTracksStoreArrayName);
 
-    if (cdcRecoTrack.getQualityIndicator() == 0) {
+    if (m_param_onlyGoodQITracks and cdcRecoTrack.getQualityIndicator() <=  m_param_qiCutValue) {
       continue;
     }
 
@@ -60,7 +62,7 @@ void RelatedTracksCombinerModule::event()
     RecoTrack* vxdTrackAfter = nullptr;
 
     for (unsigned int index = 0; index < relatedVXDRecoTracks.size(); ++index) {
-      if (relatedVXDRecoTracks[index]->getQualityIndicator() == 0) {
+      if (m_param_onlyGoodQITracks and relatedVXDRecoTracks[index]->getQualityIndicator() <=  m_param_qiCutValue) {
         continue;
       }
 
@@ -98,7 +100,7 @@ void RelatedTracksCombinerModule::event()
 
   // Now we only have to add the VXD tracks without a match
   for (RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
-    if (vxdRecoTrack.getQualityIndicator() == 0) {
+    if (m_param_onlyGoodQITracks and vxdRecoTrack.getQualityIndicator() <=  m_param_qiCutValue) {
       continue;
     }
 

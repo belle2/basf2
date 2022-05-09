@@ -36,25 +36,26 @@ namespace Belle2 {
   /**
    * Stores all required information for the ECLChargedPIDMVA for a phasespace category - (clusterTheta, p, charge) region.
    * This includes:
-   *  - MVA weightfiles for multiclass BDT.
-   *  - TF1 p.d.fs for each charged particle hypothesis for each bdt output variable.
-   *  - BDTResponseTransform mode detailing which transformations will be applied to the BDT response.
-   *  - unordered_map mapping a particle hypothesis to the output index of a BDT.
-   *  - (Optional) TH1F for each charged particle hypothesis for each bdt output variable for gaussianisation.
-   *  - (Optional) vector of floats (flattened square matrix) for potential linear decorrelation of the gaussian transformed bdt response variables.
+   *  - MVA weightfiles for multiclass MVA.
+   *  - TF1 p.d.fs for each charged particle hypothesis for each mva output variable.
+   *  - MVAResponseTransform mode detailing which transformations will be applied to the MVA response.
+   *  - unordered_map mapping a particle hypothesis to the output index of a MVA.
+   *  - (Optional) TH1F for each charged particle hypothesis for each mva output variable for gaussianisation.
+   *  - (Optional) vector of floats (flattened square matrix) for potential linear decorrelation of the gaussian transformed mva response variables.
    */
+
   class ECLChargedPIDPhasespaceCategory : public TObject {
 
   public:
 
-    enum class BDTResponseTransformMode : unsigned int {
-      /** log transform the bdt responses. And take the likelihood as the product of likelihoods from all bdt responses. */
+    enum class MVAResponseTransformMode : unsigned int {
+      /** log transform the mva responses. And take the likelihood as the product of likelihoods from all mva responses. */
       c_LogTransform = 0,
-      /** log transform the bdt responses. Take the likelihood from only the bdt response for the hypothesis. */
+      /** log transform the mva responses. Take the likelihood from only the mva response for the hypothesis. */
       c_LogTransformSingle = 1,
-      /** Gaussian transform of the log transformed bdt response. */
+      /** Gaussian transform of the log transformed mva response. */
       c_GaussianTransform = 2,
-      /** Decorrelation transform of the gaussian transformed bdt responses. */
+      /** Decorrelation transform of the gaussian transformed mva responses. */
       c_DecorrelationTransform = 3
     };
 
@@ -67,16 +68,16 @@ namespace Belle2 {
 
     /**
     * Useful constructor.
-    * @param weightfilePath path to the BDT weightfile for this phasespace category.
-    * @param bdtResponeTransformMode bdt response transform mode booked for this phasespace.
-    * @param pdfs vector of unordered_map mapping hypothesis to pdfs for each bdt response.
-    * @param bdtIndexForHypothesis unordered_map mapping hypothesis to index of bdt response. Useful if we exclude a class from the BDT training
+    * @param weightfilePath path to the MVA weightfile for this phasespace category.
+    * @param mvaResponeTransformMode mva response transform mode booked for this phasespace.
+    * @param pdfs vector of unordered_map mapping hypothesis to pdfs for each mva response.
+    * @param mvaIndexForHypothesis unordered_map mapping hypothesis to index of mva response. Useful if we exclude a class from the MVA training
     *        but want to use the likelihood of a different particle. For example using the proton pdf for a deuteron.
     */
     ECLChargedPIDPhasespaceCategory(const std::string weightfilePath,
-                                    const BDTResponseTransformMode& bdtResponeTransformMode,
+                                    const MVAResponseTransformMode& mvaResponeTransformMode,
                                     const std::vector<std::unordered_map<unsigned int, TF1>>& pdfs,
-                                    const std::unordered_map<unsigned int, unsigned int>& bdtIndexForHypothesis) :
+                                    const std::unordered_map<unsigned int, unsigned int>& mvaIndexForHypothesis) :
 
       m_log_transform_offset("logTransformOffset", 1e-15)
 
@@ -97,9 +98,9 @@ namespace Belle2 {
 
       // store
       m_weight = ss.str();
-      m_bdtResponseTransformMode = bdtResponeTransformMode;
+      m_mvaResponseTransformMode = mvaResponeTransformMode;
       m_pdfs = pdfs;
-      m_bdtIndexForHypothesis = bdtIndexForHypothesis;
+      m_mvaIndexForHypothesis = mvaIndexForHypothesis;
     }
 
     /**
@@ -113,28 +114,28 @@ namespace Belle2 {
     const std::string getSerialisedWeight() const {return m_weight;}
 
     /**
-     * getter for the BDT transform mode.
+     * getter for the MVA transform mode.
      */
-    BDTResponseTransformMode getTransformMode() const {return m_bdtResponseTransformMode;}
+    MVAResponseTransformMode getTransformMode() const {return m_mvaResponseTransformMode;}
 
     /**
      * getter for pdfs.
-     * @param iBDTResponse index of BDT response.
+     * @param iMVAResponse index of MVA response.
      * @param hypoPDG, hypothesis pdg.
      */
-    const TF1* getPDF(const unsigned int iBDTResponse, const unsigned int hypoPDG) const
+    const TF1* getPDF(const unsigned int iMVAResponse, const unsigned int hypoPDG) const
     {
-      return &m_pdfs.at(iBDTResponse).at(hypoPDG);
+      return &m_pdfs.at(iMVAResponse).at(hypoPDG);
     }
 
     /**
      * gets the cdf for the hypothesis pdg for a given response value.
-     * @param iBDTResponse index of BDT response.
+     * @param iMVAResponse index of MVA response.
      * @param hypoPDG, hypothesis pdg.
      */
-    const TH1F* getCDF(const unsigned int iBDTResponse, const int hypoPDG) const
+    const TH1F* getCDF(const unsigned int iMVAResponse, const int hypoPDG) const
     {
-      return &m_cdfs.at(iBDTResponse).at(hypoPDG);
+      return &m_cdfs.at(iMVAResponse).at(hypoPDG);
     }
 
     /**
@@ -179,46 +180,46 @@ namespace Belle2 {
     }
 
     /**
-     * maps a charged stable pdg code to an index of the BDT response.
+     * maps a charged stable pdg code to an index of the MVA response.
      * In general this is a one-to-one mapping however in cases where we do not include all six
-       stable charged particles in the BDT training we may have a many-to-one mapping.
+       stable charged particles in the MVA training we may have a many-to-one mapping.
      * For example if we take the proton response value also for deuterons.
      */
-    unsigned int getBDTIndexForHypothesis(const unsigned int hypoPDG) const
+    unsigned int getMVAIndexForHypothesis(const unsigned int hypoPDG) const
     {
-      return m_bdtIndexForHypothesis.at(hypoPDG);
+      return m_mvaIndexForHypothesis.at(hypoPDG);
     }
 
   private:
 
-    TParameter<float> m_log_transform_offset; /**< Small offset to avoid bdt response values of 1.0 being log transformed to NaN. */
+    TParameter<float> m_log_transform_offset; /**< Small offset to avoid mva response values of 1.0 being log transformed to NaN. */
 
     /**
-     * Serialsed BDT weightfile.
+     * Serialsed MVA weightfile.
      */
     std::string m_weight;
 
     /**
-     * Stores which transformation mode to apply to the bdt responses.
+     * Stores which transformation mode to apply to the mva responses.
      */
-    BDTResponseTransformMode m_bdtResponseTransformMode;
+    MVAResponseTransformMode m_mvaResponseTransformMode;
 
 
     /**
-     * A vector of unodered maps. The vector corresponds to the return values of the BDT, one for each class correspondonding to charged stable particles considered by the BDT. In general this is the full six charged stable particles {e, mu, pi, K, p, d}.
+     * A vector of unodered maps. The vector corresponds to the return values of the MVA, one for each class correspondonding to charged stable particles considered by the MVA. In general this is the full six charged stable particles {e, mu, pi, K, p, d}.
      * The unordered map maps the hypothesis pdg values to their matching TF1 pdfs from which the liklihood will be taken.
      */
     std::vector<std::unordered_map<unsigned int, TF1>> m_pdfs;
 
     /**
-     * unordered map of abs(pdg_code) for the 6 charged stable hypotheses to index of the BDT response vector.
-     * needed if we do not train with all 6 species to map several to the same BDT response value.
+     * unordered map of abs(pdg_code) for the 6 charged stable hypotheses to index of the MVA response vector.
+     * needed if we do not train with all 6 species to map several to the same MVA response value.
      */
-    std::unordered_map<unsigned int, unsigned int> m_bdtIndexForHypothesis;
+    std::unordered_map<unsigned int, unsigned int> m_mvaIndexForHypothesis;
 
     /**
-     * CDFs for each bdt return value for each hypothesis.
-     * The N vector elements correspond to the N BDT return values.
+     * CDFs for each mva return value for each hypothesis.
+     * The N vector elements correspond to the N MVA return values.
      * The unordered map maps the hypothesis pdg values to their matching TH1F cdfs which can be used for a gaussianisation.
      */
     std::vector<std::unordered_map<unsigned int, TH1F>> m_cdfs;
@@ -276,7 +277,7 @@ namespace Belle2 {
     /**
      * Set the 3D (clusterTheta, p, charge) grid representing the categories for which weightfiles are defined.
      * @param h the 3D histogram in (clusterTheta, p, charge).
-     * A multiclass BDT is trained for each phases-space region defined by the bin boundaries.
+     * A multiclass MVA is trained for each phases-space region defined by the bin boundaries.
     */
     void setWeightCategories(TH3F* h)
     {
@@ -379,7 +380,6 @@ namespace Belle2 {
 
       return iTheta + nTheta * (iP + nP * iCharge);
     }
-
 
 
   private:

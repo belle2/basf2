@@ -39,9 +39,9 @@ namespace Belle2 {
 
 
   /**
-  * This module implements charged particle identification using ECL-related observables via a multiclass BDT.
-  * For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the BDT which is stored in a conditions database payload.
-  * The BDT output variables are then used to construct a likelihood from pdfs also stored in the payload.
+  * This module implements charged particle identification using ECL-related observables via a multiclass MVA.
+  * For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the MVA which is stored in a conditions database payload.
+  * The MVA output variables are then used to construct a likelihood from pdfs also stored in the payload.
   * The likelihood is then stored in the ECLPidLikelihood object.
   */
 
@@ -87,7 +87,7 @@ namespace Belle2 {
     void checkDBPayloads();
 
     /**
-     * Initialise the multiclass BDTs.
+     * Initialise the multiclass MVAs.
      */
     void initializeMVA();
 

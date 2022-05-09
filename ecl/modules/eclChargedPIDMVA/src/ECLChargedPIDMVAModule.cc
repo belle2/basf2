@@ -44,7 +44,7 @@ REG_MODULE(ECLChargedPIDMVA)
 
 ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module()
 {
-  setDescription("The module implements charged particle identification using ECL-related observables via a multiclass BDT. For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the BDT which is stored in a conditions database payload. The BDT output variables are then used to construct a likelihood from pdfs also stored in the payload. The likelihood is then stored in the ECLPidLikelihood object.");
+  setDescription("The module implements charged particle identification using ECL-related observables via a multiclass MVA. For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the MVA method which is stored in a conditions database payload. The MVA output variables are then used to construct a likelihood from pdfs also stored in the payload. The likelihood is then stored in the ECLPidLikelihood object.");
 
   addParam("payloadName",
            m_payload_name,
@@ -212,17 +212,17 @@ void ECLChargedPIDMVAModule::event()
 
       // perform extra transformations if they are booked
       if ((phasespaceCategory->getTransformMode() ==
-           ECLChargedPIDPhasespaceCategory::BDTResponseTransformMode::c_GaussianTransform)
+           ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_GaussianTransform)
           or
           (phasespaceCategory->getTransformMode() ==
-           ECLChargedPIDPhasespaceCategory::BDTResponseTransformMode::c_DecorrelationTransform)) {
+           ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_DecorrelationTransform)) {
 
         // gaussian transform
         for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
           transformed_scores[iResponse] = gaussTransformation(scores[iResponse], phasespaceCategory->getCDF(absPdgId,  iResponse));
         }
         if (phasespaceCategory->getTransformMode() ==
-            ECLChargedPIDPhasespaceCategory::BDTResponseTransformMode::c_DecorrelationTransform) {
+            ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_DecorrelationTransform) {
           transformed_scores = decorrTransformation(transformed_scores, phasespaceCategory->getDecorrelationMatrix(absPdgId));
         }
       }
@@ -232,8 +232,8 @@ void ECLChargedPIDMVAModule::event()
       for (unsigned int iResponse = 0; iResponse < transformed_scores.size(); iResponse++) {
 
         if ((phasespaceCategory->getTransformMode() ==
-             ECLChargedPIDPhasespaceCategory::BDTResponseTransformMode::c_LogTransformSingle)
-            and (phasespaceCategory->getBDTIndexForHypothesis(absPdgId) != iResponse)) {continue;}
+             ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_LogTransformSingle)
+            and (phasespaceCategory->getMVAIndexForHypothesis(absPdgId) != iResponse)) {continue;}
 
         double xmin, xmax;
         phasespaceCategory->getPDF(iResponse, absPdgId)->GetRange(xmin, xmax);
@@ -246,7 +246,7 @@ void ECLChargedPIDMVAModule::event()
         // dont take a log of inf or 0
         pdfval = std::max(pdfval, std::numeric_limits<float>::min());
         logL += (std::isnormal(pdfval) && pdfval > 0) ? std::log(pdfval) : c_dummyLogL;
-        B2DEBUG(12, "BDT response index, BDT score, logL: " << iResponse << "  " << transformed_score_copy << "  " << logL << " \n");
+        B2DEBUG(12, "MVA response index, MVA score, logL: " << iResponse << "  " << transformed_score_copy << "  " << logL << " \n");
       }
       logLikelihoods[hypo_idx] = logL;
     } // hypo loop
@@ -257,13 +257,11 @@ void ECLChargedPIDMVAModule::event()
   } // tracks
 }
 
-
 float ECLChargedPIDMVAModule::logTransformation(const float value, const float offset) const
 {
-  // BDT response is limited to be between 0 and 1 so can safely hardcode 1.0 as the max value.
+  // MVA response is limited to be between 0 and 1 so can safely hardcode 1.0 as the max value.
   return std::log((value + offset) / (1.0 + offset - value));
 }
-
 
 float ECLChargedPIDMVAModule::gaussTransformation(const float value, const TH1F* cdf) const
 {

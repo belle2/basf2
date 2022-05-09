@@ -185,7 +185,7 @@ void ECLChargedPIDMVAModule::event()
 
       if (std::isnan(val)) {
         //NaNs cause crashed if using TMVA MulticlassBDT.
-        //In case other MVA methods are used NaNs likely should be masked properly also.
+        //In case other MVA methods are used, NaNs likely should be masked properly also.
         B2FATAL("Variable '" << varobj->name <<
                 "' has NaN entries. Variable definitions in the MVA payload should include 'ifNaNGiveX(X, DEFAULT)' with a proper default value.");
       }
@@ -198,7 +198,7 @@ void ECLChargedPIDMVAModule::event()
     std::vector<float> scores = m_experts.at(linearCategoryIndex)->applyMulticlass(*m_datasets.at(linearCategoryIndex))[0];
 
     // log transform the scores
-    // This turns the MVA output which if using the nominal TMVA MulticlassBDT
+    // This turns the MVA output which, if using the nominal TMVA MulticlassBDT,
     // is heavily peaked at 0 and 1 into a smooth curve.
     // We can then evaluate the likelihoods from this curve directly or further transform the responses.
     for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {

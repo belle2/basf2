@@ -40,7 +40,7 @@ MVAExpertModule::MVAExpertModule() : Module()
   addParam("identifier", m_identifier, "The database identifier which is used to load the weights during the training.");
   addParam("signalFraction", m_signal_fraction_override,
            "signalFraction to calculate probability (if -1 the signalFraction of the training data is used)", -1.0);
-  addParam("overwriteOld", m_overwriteOld,
+  addParam("overwriteExistingExtraInfo", m_overwriteExistingExtraInfo,
            "If true, when the given extraInfo has already defined, the old extraInfo value is overwritten. If false, the original value is kept.",
            true);
 }
@@ -142,7 +142,7 @@ void MVAExpertModule::event()
       float targetValue = analyse(particle);
       if (particle->hasExtraInfo(m_extraInfoName)) {
         m_existGivenExtraInfo = true;
-        if (m_overwriteOld)
+        if (m_overwriteExistingExtraInfo)
           particle->setExtraInfo(m_extraInfoName, targetValue);
       } else {
         particle->addExtraInfo(m_extraInfoName, targetValue);
@@ -157,7 +157,7 @@ void MVAExpertModule::event()
     float targetValue = analyse(nullptr);
     if (eventExtraInfo->hasExtraInfo(m_extraInfoName)) {
       m_existGivenExtraInfo = true;
-      if (m_overwriteOld)
+      if (m_overwriteExistingExtraInfo)
         eventExtraInfo->setExtraInfo(m_extraInfoName, targetValue);
     } else {
       eventExtraInfo->addExtraInfo(m_extraInfoName, targetValue);
@@ -171,9 +171,10 @@ void MVAExpertModule::terminate()
   m_dataset.reset();
 
   if (m_existGivenExtraInfo) {
-    if (m_overwriteOld)
-      B2WARNING("The given extraInfo has already been set! It was overwritten by this module!");
+    if (m_overwriteExistingExtraInfo)
+      B2WARNING("The extraInfo " << m_extraInfoName << " has already been set! It was overwritten by this module!");
     else
-      B2WARNING("The given extraInfo has already been set! The original value was kept and this module does not overwrite it!");
+      B2WARNING("The extraInfo " << m_extraInfoName << " has already been set! "
+                << "The original value was kept and this module does not overwrite it!");
   }
 }

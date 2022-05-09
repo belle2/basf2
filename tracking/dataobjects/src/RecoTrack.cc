@@ -467,6 +467,13 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(
       continue;
     }
   }
+
+  // catch case no hit has measured state on plane (not sure how likely that is) which would lead to undefined behavior
+  if (not nearestStateOnPlane) {
+    B2WARNING("Non of the track hits had a MeasuredStateOnPlane! Exception thrown.");
+    throw  NoStateOnPlaneFound();
+  }
+
   return *nearestStateOnPlane;
 }
 

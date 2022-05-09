@@ -21,7 +21,7 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::KLM;
 
-REG_MODULE(KLMUnpacker)
+REG_MODULE(KLMUnpacker);
 
 KLMUnpackerModule::KLMUnpackerModule() : Module(),
   m_Time(&(KLMTime::Instance())),

@@ -23,7 +23,7 @@
 using namespace Belle2;
 using ConversionState = std::bitset<2>;
 
-REG_MODULE(RT2SPTCConverter)
+REG_MODULE(RT2SPTCConverter);
 
 RT2SPTCConverterModule::RT2SPTCConverterModule() :
   Module(),
@@ -416,6 +416,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
               relatedSpacePointsA.size());
 
       // Try to verify SpacePoint by using next cluster to build a U/V pair.
+      // cppcheck-suppress knownConditionTrueFalse
       if (clusterA && clusterB && (clusterA->isUCluster() != clusterB->isUCluster())) {
         auto relatedSpacePointsB = clusterB->getRelationsFrom<SpacePoint>(*m_svdSpacePointsStoreArrayName);
 

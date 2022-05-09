@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(RecoTrackCreator)
+REG_MODULE(RecoTrackCreator);
 
 RecoTrackCreatorModule::RecoTrackCreatorModule() :
   Module()

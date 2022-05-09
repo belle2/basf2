@@ -24,7 +24,6 @@ TrackletFilterFactory::~TrackletFilterFactory() = default;
 
 std::string TrackletFilterFactory::getIdentifier() const
 {
-  return "SVD Hit Pair";
   return "Factory for Filters for SpacePointTrackCands";
 }
 
@@ -48,6 +47,7 @@ TrackletFilterFactory::create(const std::string& filterName) const
     return std::make_unique<TrackFindingCDC::AllFilter<BaseTrackletFilter>>();
   }
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseTrackletFilter>>();
   }

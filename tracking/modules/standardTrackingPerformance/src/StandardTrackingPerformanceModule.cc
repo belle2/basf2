@@ -35,7 +35,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(StandardTrackingPerformance)
+REG_MODULE(StandardTrackingPerformance);
 
 StandardTrackingPerformanceModule::StandardTrackingPerformanceModule() :
   Module(), m_outputFile(nullptr), m_dataTree(nullptr), m_trackProperties(-999),  m_pValue(-999),

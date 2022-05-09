@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(KLMClustersReconstructor)
+REG_MODULE(KLMClustersReconstructor);
 
 KLMClustersReconstructorModule::KLMClustersReconstructorModule() : Module(),
   m_PositionMode(c_FirstLayer),

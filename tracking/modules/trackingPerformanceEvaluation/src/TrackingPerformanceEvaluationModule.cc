@@ -46,7 +46,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TrackingPerformanceEvaluation)
+REG_MODULE(TrackingPerformanceEvaluation);
 
 TrackingPerformanceEvaluationModule::TrackingPerformanceEvaluationModule() :
   Module()
@@ -853,7 +853,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
     pt = fitResult->getMomentum().Pt();
   }
 
-  bool hasCDChit[56] = { false };
+  const bool hasCDChit[56] = { false };
 
   RelationVector<RecoTrack> RecoTracks_fromTrack = DataStore::getRelationsWithObj<RecoTrack>(&theTrack);
 
@@ -899,7 +899,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h1_nVXDhitsPR->Fill(sensor.getLayerNumber());
 
-          m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber() , weight);
+          m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber(), weight);
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
@@ -940,7 +940,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h1_nVXDhitsPR->Fill(sensor.getLayerNumber());
 
-          m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber() , weight);
+          m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber(), weight);
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
@@ -978,7 +978,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h1_nVXDhitsPR->Fill(sensor.getLayerNumber());
 
-          m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber() , weight);
+          m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber(), weight);
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
 
@@ -1001,7 +1001,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
           VxdID sensor = svdHit->getSensorID();
           m_h1_nVXDhitsPR->Fill(sensor.getLayerNumber());
 
-          m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber() , weight);
+          m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber(), weight);
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
@@ -1015,7 +1015,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
           if (! hasCDChit[wire.getICLayer()]) { //needed to validate the HitPatternCDC filling
             m_h1_nCDChitsPR->Fill(wire.getICLayer());
 
-            m_h1_nCDChitsWeighted->Fill(wire.getICLayer() , weight);
+            m_h1_nCDChitsWeighted->Fill(wire.getICLayer(), weight);
             //    hasCDChit[wire.getICLayer()] = true;  //to validate the HitPatternCDC filling: uncomment this
           }
           m_h2_TrackPointFitWeightCDC->Fill(wire.getICLayer(), weight);

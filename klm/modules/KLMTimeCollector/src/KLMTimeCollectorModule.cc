@@ -34,7 +34,7 @@ using namespace Belle2;
 using namespace Belle2::bklm;
 using namespace Belle2::EKLM;
 
-REG_MODULE(KLMTimeCollector)
+REG_MODULE(KLMTimeCollector);
 
 KLMTimeCollectorModule::KLMTimeCollectorModule() :
   CalibrationCollectorModule(),

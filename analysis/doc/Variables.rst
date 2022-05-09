@@ -498,7 +498,10 @@ They have a **[Calibration]** pretag.
 FEIVariables
 ~~~~~~~~~~~~
 
-As known by many analysts by using the ``isSignal`` flag for truth matching for the  tagging B meson from the FEI there is still a peak visible for the background in e.g. the :math:M_{bc}` distribution making it hard to determine e.g. a yield there.
+As known by many analysts by using the ``isSignal`` flag for truth matching
+for the  tagging B meson from the FEI there is still a peak visible for the
+background in e.g. the :math:`M_{\text{bc}}` distribution making it hard to
+determine e.g. a yield there.
 
 New variables seem to be found to address this problem.
 

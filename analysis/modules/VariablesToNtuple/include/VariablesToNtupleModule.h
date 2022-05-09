@@ -55,6 +55,8 @@ namespace Belle2 {
     std::string m_fileName;
     /** Name of the TTree. */
     std::string m_treeName;
+    /** Size of TBaskets in the output ROOT file in bytes. */
+    int m_basketsize;
 
     /** ROOT file for output. */
     std::shared_ptr<TFile> m_file{nullptr};

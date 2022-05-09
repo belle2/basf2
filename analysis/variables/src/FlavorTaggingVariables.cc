@@ -2367,14 +2367,14 @@ Allowed input values for ``particleName`` argument in this variable are the foll
 )DOC", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("QpOf(particleListName, outputExtraInfo, rankingExtraInfo)", QpOf,  R"DOC(
 [Eventbased][Expert] Returns the :math:`q*p` value for a given particle list provided as the 1st argument, 
-where math:`p` is the probability of a category stored as extraInfo, provided as the 2nd argument, 
+where :math:`p` is the probability of a category stored as extraInfo, provided as the 2nd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 The particle is selected after ranking according to a flavor tagging extraInfo, provided as the 3rd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("weightedQpOf(particleListName, outputExtraInfo, rankingExtraInfo)", weightedQpOf, R"DOC(
 [Eventbased][Expert] Returns the weighted :math:`q*p` value for a given particle list, provided as the  1st argument, 
-where math:`p` is the probability of a category stored as extraInfo, provided in the 2nd argument, 
+where :math:`p` is the probability of a category stored as extraInfo, provided in the 2nd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.
 The particles in the list are ranked according to a flavor tagging extraInfo, provided as the 3rd argument, 
 allowed values are same as in :b2:var:`hasHighestProbInCat`.

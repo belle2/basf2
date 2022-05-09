@@ -15,7 +15,7 @@
 using namespace Belle2;
 using namespace std;
 
-REG_MODULE(MLSegmentNetworkProducer)
+REG_MODULE(MLSegmentNetworkProducer);
 
 MLSegmentNetworkProducerModule::MLSegmentNetworkProducerModule() : Module()
 {

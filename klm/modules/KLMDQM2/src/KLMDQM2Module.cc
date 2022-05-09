@@ -24,7 +24,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(KLMDQM2)
+REG_MODULE(KLMDQM2);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -426,7 +426,6 @@ bool KLMDQM2Module::collectDataTrack(
   }
   /* Find matching digits. */
   int nDigits = 0;
-  std::map<int, int>::iterator it2;
   for (it = selectedHits.begin(); it != selectedHits.end(); ++it) {
     findMatchingDigit(&(it->second));
     if (it->second.digit != nullptr) {

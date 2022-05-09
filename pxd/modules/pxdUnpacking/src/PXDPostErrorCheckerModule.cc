@@ -15,7 +15,7 @@ using namespace Belle2::PXD::PXDError;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDPostErrorChecker)
+REG_MODULE(PXDPostErrorChecker);
 
 //-----------------------------------------------------------------
 //                 Implementation

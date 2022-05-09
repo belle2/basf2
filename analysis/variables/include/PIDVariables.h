@@ -208,12 +208,12 @@ namespace Belle2 {
     /**
      * returns most likely PDG code based on PID information.
      */
-    Manager::FunctionPtr mostLikelyPDG(const std::vector<std::string>& arguments);
+    double mostLikelyPDG(const Particle* part, const std::vector<double>& arguments);
 
     /**
      * returns true if a particle is assigned to its most likely type according to PID likelihood
      */
-    Manager::FunctionPtr isMostLikely(const std::vector<std::string>& arguments);
+    bool isMostLikely(const Particle* part, const std::vector<double>& arguments);
 
     /**
      * Returns Belle's main PID variable to separate pions, kaons and protons:  atc_pid(3,1,5).prob()

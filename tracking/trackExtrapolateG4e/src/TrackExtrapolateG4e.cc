@@ -343,8 +343,8 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
     std::vector<int> muidPdgCodes = MuidElementNumbers::getPDGVector();
     if (!m_MuidBuilderMap.empty()) {
       if (m_klmLikelihoodParameters.hasChanged()) { /* Clear m_MuidBuilderMap if KLMLikelihoodParameters payload changed. */
-        for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)
-          delete muidBuilder;
+        for (auto const& muidBuilder : m_MuidBuilderMap)
+          delete muidBuilder.second;
         m_MuidBuilderMap.clear();
       } else /* Return if m_MuidBuilderMap is already initialized. */
         return;
@@ -420,8 +420,8 @@ void TrackExtrapolateG4e::terminate(bool byMuid)
     delete m_DefaultHypotheses;
   if (byMuid) {
     delete m_TargetMuid;
-    for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)
-      delete muidBuilder;
+    for (auto const& muidBuilder : m_MuidBuilderMap)
+      delete muidBuilder.second;
   }
   if (m_TargetExt != nullptr) {
     delete m_TargetExt;

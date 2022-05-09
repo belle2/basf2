@@ -51,7 +51,7 @@ using namespace TOP;
 using namespace Belle2::Variable;
 
 
-REG_MODULE(TOPRingPlotter)
+REG_MODULE(TOPRingPlotter);
 
 TOPRingPlotterModule::TOPRingPlotterModule() : Module()
 {

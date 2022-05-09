@@ -23,7 +23,7 @@ using namespace Belle2;
 using namespace Belle2::bklm;
 using namespace CLHEP;
 
-REG_MODULE(BKLMTracking)
+REG_MODULE(BKLMTracking);
 
 BKLMTrackingModule::BKLMTrackingModule() : Module(),
   m_effiYX(nullptr),
@@ -51,7 +51,7 @@ BKLMTrackingModule::BKLMTrackingModule() : Module(),
            "[bool], do the BKLMTrack fitting in global system (multi-sectors track) or local system (sector by sector) (default is false, local sys.)",
            false);
   addParam("StudyEffiMode", m_studyEffi, "[bool], run in efficieny study mode (default is false)", false);
-  addParam("outputName", m_outPath , "[string],  output file name containing efficiencies plots ", string("bklmEffi.root"));
+  addParam("outputName", m_outPath, "[string],  output file name containing efficiencies plots ", string("bklmEffi.root"));
 }
 
 BKLMTrackingModule::~BKLMTrackingModule()
@@ -124,7 +124,7 @@ void BKLMTrackingModule::event()
     for (int iSection = 0; iSection < 2; iSection++) {
       for (int iSector = 0; iSector < 8; iSector++) {
         for (int iLayer = 0; iLayer < 15; iLayer++) {
-          runTracking(1, iSection, iSector , iLayer);
+          runTracking(1, iSection, iSector, iLayer);
           if (m_storeTracks.getEntries() > 0)
             thereIsATrack = true;
           generateEffi(iSection, iSector, iLayer);

@@ -1,0 +1,5 @@
+# Selective background simulation using graph neural networks
+Using graph neural network to predict whether a generated event will pass the skim after detector simulation, reconstruction and so on. Then select and reweight the event together with selection and weighting methods. In this way the computational resource used for steps between generation and skim is saved, meanwhile the bias is also avoided through weightings.
+
+Currently only the usage part is available e.g. The well trained neural network (parameters saved under generators/trained_models.py) to filter out events that can pass FEI hadronic B0 skim is added directly after event generation (see generators/examples/EvtGen_withNN.py). 
+Neural network build up is stored in generators/smartBKG/model/gatgap.py while GAT_apple_module.py is a wrapper suited in basf2 framework. 

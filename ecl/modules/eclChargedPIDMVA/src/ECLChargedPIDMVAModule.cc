@@ -197,7 +197,9 @@ void ECLChargedPIDMVAModule::event()
 
     // log transform the scores
     for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
-      scores[iResponse] = logTransformation(scores[iResponse], phasespaceCategory->getLogTransformOffset());
+      scores[iResponse] = logTransformation(scores[iResponse],
+                                            phasespaceCategory->getLogTransformOffset(),
+                                            phasespaceCategory->getMaxPossibleResponseValue());
     }
     float logLikelihoods[Const::ChargedStable::c_SetSize];
 
@@ -257,10 +259,9 @@ void ECLChargedPIDMVAModule::event()
   } // tracks
 }
 
-float ECLChargedPIDMVAModule::logTransformation(const float value, const float offset) const
+float ECLChargedPIDMVAModule::logTransformation(const float value, const float offset, const float max) const
 {
-  // MVA response is limited to be between 0 and 1 so can safely hardcode 1.0 as the max value.
-  return std::log((value + offset) / (1.0 + offset - value));
+  return std::log((value + offset) / (max + offset - value));
 }
 
 float ECLChargedPIDMVAModule::gaussTransformation(const float value, const TH1F* cdf) const

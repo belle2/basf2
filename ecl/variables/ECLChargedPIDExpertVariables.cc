@@ -46,8 +46,6 @@ namespace Belle2 {
       phi = 12,
     };
 
-
-
     std::vector<std::pair<unsigned int, bool>> calculateListOfCrystalEnergyRankAndQuality(ECLShower* shower)
     {
       std::vector<std::pair<unsigned int, bool>> listOfCrystalEnergyRankAndQuality;

@@ -63,7 +63,8 @@ namespace Belle2 {
     * Default constructor, necessary for ROOT to stream the object.
     */
     ECLChargedPIDPhasespaceCategory() :
-      m_log_transform_offset("logTransformOffset", 1e-15)
+      m_log_transform_offset("logTransformOffset", 1e-15),
+      m_max_possible_response_value("maxPossibleResponseValue", 1.0)
     {};
 
     /**
@@ -78,8 +79,8 @@ namespace Belle2 {
                                     const MVAResponseTransformMode& mvaResponeTransformMode,
                                     const std::vector<std::unordered_map<unsigned int, TF1>>& pdfs,
                                     const std::unordered_map<unsigned int, unsigned int>& mvaIndexForHypothesis) :
-
-      m_log_transform_offset("logTransformOffset", 1e-15)
+      m_log_transform_offset("logTransformOffset", 1e-15),
+      m_max_possible_response_value("maxPossibleResponseValue", 1.0)
 
     {
       // Load and serialize the MVA::Weightfile object into a string for storage in the database,
@@ -180,6 +181,22 @@ namespace Belle2 {
     }
 
     /**
+     * Set the max possible response value, used in log transformation of the responses.
+     */
+    void setMaxPossibleResponseValue(const float& offset)
+    {
+      m_max_possible_response_value.SetVal(offset);
+    }
+
+    /**
+     * Get the max possible response value, used in log transformation of the responses.
+     */
+    float getMaxPossibleResponseValue() const
+    {
+      return m_max_possible_response_value.GetVal();
+    }
+
+    /**
      * maps a charged stable pdg code to an index of the MVA response.
      * In general this is a one-to-one mapping however in cases where we do not include all six
        stable charged particles in the MVA training we may have a many-to-one mapping.
@@ -193,6 +210,7 @@ namespace Belle2 {
   private:
 
     TParameter<float> m_log_transform_offset; /**< Small offset to avoid mva response values of 1.0 being log transformed to NaN. */
+    TParameter<float> m_max_possible_response_value; /**< Max possible value of the mva response. Used in the log transformation. */
 
     /**
      * Serialsed MVA weightfile.
@@ -376,7 +394,6 @@ namespace Belle2 {
       const unsigned int iTheta  = m_categories->GetXaxis()->FindBin(clusterTheta / m_ang_unit.GetVal()) - 1;
       const unsigned int iP      = m_categories->GetYaxis()->FindBin(p / m_energy_unit.GetVal()) - 1;
       const unsigned int iCharge = m_categories->GetZaxis()->FindBin(charge) - 1;
-
 
       return iTheta + nTheta * (iP + nP * iCharge);
     }

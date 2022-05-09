@@ -56,13 +56,7 @@ namespace Belle2 {
     /**
      * Called at the end of the event processing.
      */
-    virtual void terminate() override
-    {
-      for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
-        m_experts[i].reset();
-        m_datasets[i].reset();
-      }
-    }
+    virtual void terminate() override;
 
   private:
     /**
@@ -99,6 +93,9 @@ namespace Belle2 {
     std::vector<std::unique_ptr<MVA::Expert>> m_experts; /**< Vector of pointers to the current MVA Experts */
 
     std::vector<std::unique_ptr<MVA::SingleDataset>> m_datasets; /**< Vector of pointers to the current input datasets */
+
+    bool m_overwriteOld; /**< if true, when the given extraInfo has already defined, the old extraInfo value is overwritten */
+    bool m_existGivenExtraInfo; /**< check if the given extraInfo has already defined. */
   };
 
 } // Belle2 namespace

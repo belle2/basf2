@@ -56,11 +56,7 @@ namespace Belle2 {
     /**
      * Called at the end of the event processing.
      */
-    virtual void terminate() override
-    {
-      m_expert.reset();
-      m_dataset.reset();
-    }
+    virtual void terminate() override;
 
   private:
     /**
@@ -88,6 +84,9 @@ namespace Belle2 {
                                                                m_weightfile_representation; /**< Database pointer to the Database representation of the weightfile */
     std::unique_ptr<MVA::Expert> m_expert; /**< Pointer to the current MVA Expert */
     std::unique_ptr<MVA::SingleDataset> m_dataset; /**< Pointer to the current dataset */
+
+    bool m_overwriteOld; /**< if true, when the given extraInfo has already defined, the old extraInfo value is overwritten */
+    bool m_existGivenExtraInfo; /**< check if the given extraInfo has already defined. */
   };
 
 } // Belle2 namespace

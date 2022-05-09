@@ -40,6 +40,9 @@ MVAMultipleExpertsModule::MVAMultipleExpertsModule() : Module()
   addParam("identifiers", m_identifiers, "The database identifiers which is used to load the weights during the training.");
   addParam("signalFraction", m_signal_fraction_override,
            "signalFraction to calculate probability (if -1 the signalFraction of the training data is used)", -1.0);
+  addParam("overwriteOld", m_overwriteOld,
+           "If true, when the given extraInfo has already defined, the old extraInfo value is overwritten. If false, the original value is kept.",
+           true);
 }
 
 void MVAMultipleExpertsModule::initialize()
@@ -76,6 +79,7 @@ void MVAMultipleExpertsModule::initialize()
 
   MVA::AbstractInterface::initSupportedInterfaces();
 
+  m_existGivenExtraInfo = false;
 }
 
 void MVAMultipleExpertsModule::beginRun()
@@ -170,10 +174,9 @@ void MVAMultipleExpertsModule::event()
 
       for (unsigned int j = 0; j < m_identifiers.size(); ++j) {
         if (particle->hasExtraInfo(m_extraInfoNames[j])) {
-          if (particle->getExtraInfo(m_extraInfoNames[j]) != targetValues[j]) {
-            B2WARNING("Extra Info with given name is already set! Overwriting old value!");
+          m_existGivenExtraInfo = true;
+          if (m_overwriteOld)
             particle->setExtraInfo(m_extraInfoNames[j], targetValues[j]);
-          }
         } else {
           particle->addExtraInfo(m_extraInfoNames[j], targetValues[j]);
         }
@@ -187,10 +190,27 @@ void MVAMultipleExpertsModule::event()
     std::vector<float> targetValues = analyse(nullptr);
     for (unsigned int j = 0; j < m_identifiers.size(); ++j) {
       if (eventExtraInfo->hasExtraInfo(m_extraInfoNames[j])) {
-        B2WARNING("Extra Info with given name is already set! I won't set it again!");
+        m_existGivenExtraInfo = true;
+        if (m_overwriteOld)
+          eventExtraInfo->setExtraInfo(m_extraInfoNames[j], targetValues[j]);
       } else {
         eventExtraInfo->addExtraInfo(m_extraInfoNames[j], targetValues[j]);
       }
     }
+  }
+}
+
+void MVAMultipleExpertsModule::terminate()
+{
+  for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
+    m_experts[i].reset();
+    m_datasets[i].reset();
+  }
+
+  if (m_existGivenExtraInfo) {
+    if (m_overwriteOld)
+      B2WARNING("The given extraInfo has already been set! It was overwritten by this module!");
+    else
+      B2WARNING("The given extraInfo has already been set! The original value was kept and this module does not overwrite it!");
   }
 }

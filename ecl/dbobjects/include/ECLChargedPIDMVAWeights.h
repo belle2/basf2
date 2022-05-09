@@ -148,7 +148,6 @@ namespace Belle2 {
       return &m_decorrelationMatrices.at(hypoPDG);
     }
 
-
     /**
      * set the cdfs.
      * @param vector of map of cdfs to be stored in the payload.
@@ -222,7 +221,6 @@ namespace Belle2 {
      */
     MVAResponseTransformMode m_mvaResponseTransformMode;
 
-
     /**
      * A vector of unodered maps. The vector corresponds to the return values of the MVA, one for each class correspondonding to charged stable particles considered by the MVA. In general this is the full six charged stable particles {e, mu, pi, K, p, d}.
      * The unordered map maps the hypothesis pdg values to their matching TF1 pdfs from which the liklihood will be taken.
@@ -241,7 +239,6 @@ namespace Belle2 {
      * The unordered map maps the hypothesis pdg values to their matching TH1F cdfs which can be used for a gaussianisation.
      */
     std::vector<std::unordered_map<unsigned int, TH1F>> m_cdfs;
-
 
     /**
      * Decorrelation matrices. To be used (optionally) afer gaussianisation.
@@ -281,7 +278,6 @@ namespace Belle2 {
       m_energy_unit.SetVal(unit);
     }
 
-
     /**
      * Set the angular unit to ensure consistency w/ the one used to define the phasespace category grid.
      * @param unit: the angular unit.
@@ -290,7 +286,6 @@ namespace Belle2 {
     {
       m_ang_unit.SetVal(unit);
     }
-
 
     /**
      * Set the 3D (clusterTheta, p, charge) grid representing the categories for which weightfiles are defined.
@@ -301,7 +296,6 @@ namespace Belle2 {
     {
       m_categories = h;
     }
-
 
     /**
      * checks if the input index is the same as that returned for the given (clusterTheta, p, charge) triplet
@@ -398,7 +392,6 @@ namespace Belle2 {
       return iTheta + nTheta * (iP + nP * iCharge);
     }
 
-
   private:
     TParameter<float> m_energy_unit; /**< The energy unit used for defining the 3D (clusterTheta, p, charge) category grid. */
     TParameter<float> m_ang_unit;    /**< The angular unit used for defining the 3D (clusterTheta, p, charge) category grid. */
@@ -413,7 +406,6 @@ namespace Belle2 {
      * Stores the ECLChargedPIDPhasespaceCategory object for all the (clusterTheta, p, charge) categories.
      */
     std::vector<ECLChargedPIDPhasespaceCategory> m_phasespaceCategories;
-
 
     /**< 1: first class implementation. */
     ClassDef(ECLChargedPIDMVAWeights, 1);

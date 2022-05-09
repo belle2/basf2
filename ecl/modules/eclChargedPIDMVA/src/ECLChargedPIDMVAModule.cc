@@ -251,7 +251,6 @@ void ECLChargedPIDMVAModule::event()
 
         float pdfval = phasespaceCategory->getPDF(iResponse, absPdgId)->Eval(transformed_score_copy);
         // dont take a log of inf or 0
-        pdfval = std::max(pdfval, std::numeric_limits<float>::min());
         logL += (std::isnormal(pdfval) && pdfval > 0) ? std::log(pdfval) : c_dummyLogL;
         B2DEBUG(12, "MVA response index, MVA score, logL: " << iResponse << "  " << transformed_score_copy << "  " << logL << " \n");
       }

@@ -151,7 +151,7 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
                                  skipGeometryAdding=False, trackFitHypotheses=None, use_second_cdc_hits=False,
                                  add_muid_hits=False, reconstruct_cdst=None, addClusterExpertModules=True,
                                  pruneTracks=True, event_abort=default_event_abort,
-                                 use_random_numbers_for_hlt_prescale=True, pxd_filtering_offline=False):
+                                 use_random_numbers_for_hlt_prescale=True, pxd_filtering_offline=False, ecl_pid_mva=False):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
@@ -182,6 +182,8 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
         post-filter reconstruction is also run).
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param ecl_pid_mva: Bool denoting whether to use the EoP based charged particleID in the ECL (false) or
+      MVA based charged particle ID (true).
     """
 
     # Check components.
@@ -227,7 +229,8 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
                                                       components=components,
                                                       pruneTracks=pruneTracks,
                                                       add_muid_hits=add_muid_hits,
-                                                      addClusterExpertModules=addClusterExpertModules)
+                                                      addClusterExpertModules=addClusterExpertModules,
+                                                      ecl_pid_mva=ecl_pid_mva)
         # if you don't need the software trigger result, it's enough to add only
         # these two modules of the pre-filter post-tracking reconstruction
         else:
@@ -251,7 +254,8 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
                                                   components=components,
                                                   pruneTracks=pruneTracks,
                                                   add_muid_hits=add_muid_hits,
-                                                  addClusterExpertModules=addClusterExpertModules)
+                                                  addClusterExpertModules=addClusterExpertModules,
+                                                  ecl_pid_mva=ecl_pid_mva)
 
     #
     # ANYTING ELSE CASE
@@ -262,7 +266,8 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
                                                   components=components,
                                                   pruneTracks=pruneTracks,
                                                   add_muid_hits=add_muid_hits,
-                                                  addClusterExpertModules=addClusterExpertModules)
+                                                  addClusterExpertModules=addClusterExpertModules,
+                                                  ecl_pid_mva=ecl_pid_mva)
 
 
 def add_postfilter_reconstruction(path, components=None, pruneTracks=False):
@@ -291,7 +296,8 @@ def add_cosmics_reconstruction(
         use_second_cdc_hits=False,
         add_muid_hits=False,
         reconstruct_cdst=False,
-        posttracking=True):
+        posttracking=True,
+        ecl_pid_mva=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
     Consists of tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`,
@@ -316,6 +322,8 @@ def add_cosmics_reconstruction(
 
     :param reconstruct_cdst: run only the minimal reconstruction needed to produce the cdsts (raw+tracking+dE/dx)
     :param posttracking: run reconstruction for outer detectors.
+    :param ecl_pid_mva: Bool denoting whether to use the EoP based charged particleID in the ECL (false) or
+      MVA based charged particle ID (true).
     """
 
     # Check components.
@@ -354,11 +362,12 @@ def add_cosmics_reconstruction(
                                                       pruneTracks=pruneTracks,
                                                       addClusterExpertModules=addClusterExpertModules,
                                                       add_muid_hits=add_muid_hits,
+                                                      ecl_pid_mva=ecl_pid_mva,
                                                       cosmics=True)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                          use_second_cdc_hits=False, add_muid_hits=False):
+                          use_second_cdc_hits=False, add_muid_hits=False, ecl_pid_mva=False):
     """
     This function adds the standard reconstruction modules with MC tracking
     to a path.
@@ -366,6 +375,8 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
     @param components list of geometry components to include reconstruction for, or None for all components.
     @param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
+    :param ecl_pid_mva: Bool denoting whether to use the EoP based charged particleID in the ECL (false) or
+      MVA based charged particle ID (true).
     """
 
     # Add modules that have to be run before track reconstruction
@@ -386,7 +397,8 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
                                               components=components,
                                               pruneTracks=pruneTracks,
                                               add_muid_hits=add_muid_hits,
-                                              addClusterExpertModules=addClusterExpertModules)
+                                              addClusterExpertModules=addClusterExpertModules,
+                                              ecl_pid_mva=ecl_pid_mva)
 
 
 def add_prefilter_pretracking_reconstruction(path, components=None):
@@ -424,6 +436,8 @@ def add_prefilter_posttracking_reconstruction(path, components=None, pruneTracks
            for_cdst_analysis is False. This is useful for validation purposes for avoiding to run the full
            add_reconstruction(). Note that, with the default settings (for_cdst_analysis=False and
            add_eventt0_combiner_for_cdst=False), the EventT0Combiner module is added to the path.
+    :param ecl_pid_mva: Bool denoting whether to use the EoP based charged particleID in the ECL (false) or
+      MVA based charged particle ID (true).
     """
 
     # Not add dEdx modules in prepare_cdst_analysis()
@@ -783,6 +797,8 @@ def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=
     :param add_eventt0_combiner: If True, it adds the EventT0Combiner module when the post-tracking
       reconstruction is run. This must NOT be used during the calibration, but it may be necessary
       for validation purposes or for the user analyses.
+    :param ecl_pid_mva: Bool denoting whether to use the EoP based charged particleID in the ECL (false) or
+      MVA based charged particle ID (true).
     """
     # Add the unpackers only if not running on MC, otherwise check the components and simply add
     # the Gearbox and the Geometry modules

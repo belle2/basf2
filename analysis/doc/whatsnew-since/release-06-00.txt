@@ -63,6 +63,9 @@ Variables
    ``isRelatedRestOfEventMajorityB0Flavor``. Added an argument ``maskName`` to ``BtagToWBosonVariables``.
  * Added the variable `trackFitCovariance`, which returns the track fit covariance matrix element corresponding to the two provided
    indices.
+ * Added the variable `nPrimaryMCParticles` which returns the number of primary MC particles.
+ * Added the variable `nVirtualPrimaryMCParticles` which returns the number of virtual primary MC particles.
+ * Added the variable `nInitialPrimaryMCParticles` which returns the number of initial primary MC particles.
 
 Modules
 +++++++

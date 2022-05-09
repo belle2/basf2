@@ -32,7 +32,6 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>();
-        ECLShower* shower;
         if (clusterShowerRelations.size() == 1) {
           return clusterShowerRelations.object(0)->getNumberOfCrystalsForEnergy();
         } else {
@@ -48,7 +47,6 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>();
-        ECLShower* shower;
         if (clusterShowerRelations.size() == 1) {
           return clusterShowerRelations.object(0)->getNominalNumberOfCrystalsForEnergy();
         } else {
@@ -64,7 +62,6 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>();
-        ECLShower* shower;
         if (clusterShowerRelations.size() == 1) {
           return clusterShowerRelations.object(0)->getShowerHadronIntensity();
         } else {
@@ -80,7 +77,6 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>();
-        ECLShower* shower;
         if (clusterShowerRelations.size() == 1) {
           return clusterShowerRelations.object(0)->getNumberOfHadronDigits();
         } else {

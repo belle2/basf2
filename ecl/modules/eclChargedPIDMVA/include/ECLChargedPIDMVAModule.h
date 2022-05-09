@@ -96,7 +96,7 @@ namespace Belle2 {
      * @param value to be log transformed.
      * @param offset offset applied during the log transformation to prevent transforming 0.
      */
-    float logTransformation(const float value, const float offset) const;
+    float logTransformation(const float value, const float offset, const float max) const;
 
     /**
      * gaussian transformation.

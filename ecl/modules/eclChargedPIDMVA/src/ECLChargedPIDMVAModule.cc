@@ -136,41 +136,40 @@ void ECLChargedPIDMVAModule::event()
 {
   for (const auto& track : m_tracks) {
 
-    // load the pion fit hypothesis or closest in mass.
+    // Load the pion fit hypothesis or closest in mass.
     const TrackFitResult* fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
     if (fitRes == nullptr) continue;
 
-    // if a track omega value is very small trackFitResult
-    // might return a charge of 0. The particle is then not
-    // able to be assigned a pdg code.
+    // If a track omega value is very small trackFitResult might return a charge of 0.
+    // The particle is then not able to be assigned a pdg code causing a crash.
     // Skip such tracks.
     const int charge = fitRes->getChargeSign();
     if (charge == 0) continue;
 
-    // create a particle object so that we can use the variable manager.
+    // Create a particle object so that we can use the variable manager.
     const Particle particle = Particle(&track, Const::pion);
 
-    // require a matched cluster for the particle.
-    // this internally requires a shower with a photon hypo.
+    // Require a matched cluster for the particle.
+    // This internally requires a shower with a photon hypo.
     if (!particle.getECLCluster()) continue;
 
     const double p = fitRes->getMomentum().Mag();
     const double showerTheta = Belle2::Variable::eclClusterTheta(&particle);
 
-    // require we cover the phasespace
-    // alternatively could take closest covered region but behaviour will not be well understood.
+    // Require we cover the phasespace.
+    // Alternatively could take closest covered region but behaviour will not be well understood.
     if (!(*m_mvaWeights.get())->isPhasespaceCovered(showerTheta, p, charge)) continue;
 
-    //get the MVA region
-    unsigned int linearBinIndex = (*m_mvaWeights.get())->getLinearisedCategoryIndex(showerTheta, p, charge);
-    unsigned int nvars = m_variables.at(linearBinIndex).size();
+    // Get the MVA region
+    unsigned int linearCategoryIndex = (*m_mvaWeights.get())->getLinearisedCategoryIndex(showerTheta, p, charge);
+    unsigned int nvars = m_variables.at(linearCategoryIndex).size();
 
     // get the phasespaceCategory
-    const auto phasespaceCategory = (*m_mvaWeights.get())->getPhasespaceCategory(linearBinIndex);
+    const auto phasespaceCategory = (*m_mvaWeights.get())->getPhasespaceCategory(linearCategoryIndex);
 
     // fill the feature vectors
     for (unsigned int ivar(0); ivar < nvars; ++ivar) {
-      auto varobj = m_variables.at(linearBinIndex).at(ivar);
+      auto varobj = m_variables.at(linearCategoryIndex).at(ivar);
 
       float val = std::numeric_limits<float>::quiet_NaN();
 
@@ -185,17 +184,23 @@ void ECLChargedPIDMVAModule::event()
       }
 
       if (std::isnan(val)) {
-        B2ERROR("Variable '" << varobj->name <<
-                "' has NaN entries. Variable definitions should include 'ifNaNGiveX(X, DEFAULT)' with a proper default value.");
+        //NaNs cause crashed if using TMVA MulticlassBDT.
+        //In case other MVA methods are used NaNs likely should be masked properly also.
+        B2FATAL("Variable '" << varobj->name <<
+                "' has NaN entries. Variable definitions in the MVA payload should include 'ifNaNGiveX(X, DEFAULT)' with a proper default value.");
       }
-      m_datasets.at(linearBinIndex)->m_input[ivar] = val;
+      m_datasets.at(linearCategoryIndex)->m_input[ivar] = val;
     }
 
     // get the mva response and convert to likelihood
-    B2DEBUG(12, "Bin index, theta, p, charge: " << linearBinIndex << "  " << showerTheta << "  " << p << "  " << charge << " \n");
-    std::vector<float> scores = m_experts.at(linearBinIndex)->applyMulticlass(*m_datasets.at(linearBinIndex))[0];
+    B2DEBUG(12, "Category index, theta, p, charge: " << linearCategoryIndex << "  " << showerTheta << "  " << p << "  " << charge <<
+            " \n");
+    std::vector<float> scores = m_experts.at(linearCategoryIndex)->applyMulticlass(*m_datasets.at(linearCategoryIndex))[0];
 
     // log transform the scores
+    // This turns the MVA output which if using the nominal TMVA MulticlassBDT
+    // is heavily peaked at 0 and 1 into a smooth curve.
+    // We can then evaluate the likelihoods from this curve directly or further transform the responses.
     for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
       scores[iResponse] = logTransformation(scores[iResponse],
                                             phasespaceCategory->getLogTransformOffset(),

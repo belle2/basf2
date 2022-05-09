@@ -139,6 +139,44 @@ namespace Belle2 {
       return position.Mag();
     }
 
+    //! @returns a vector of indices and quality flags.
+    std::vector<std::pair<unsigned int, bool>> calculateListOfCrystalEnergyRankAndQuality(ECLShower* shower)
+    {
+      std::vector<std::pair<unsigned int, bool>> listOfCrystalEnergyRankAndQuality;
+      std::vector<std::tuple<double, unsigned int, bool>> energyToSort;
+      RelationVector<ECLCalDigit> relatedDigits = shower->getRelationsTo<ECLCalDigit>();
+
+      //energyToSort vector is used for sorting digits by calibrated energy
+      for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
+
+        const auto caldigit = relatedDigits.object(iRel);
+        bool goodFit = true;
+
+        //exclude digits without waveforms
+        const double digitChi2 = caldigit->getTwoComponentChi2();
+        if (digitChi2 < 0)  goodFit = false;
+
+        ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
+
+        //exclude digits with poor chi2
+        if (digitFitType1 == ECLDsp::poorChi2) goodFit = false;
+
+        //exclude digits with diode-crossing fits
+        if (digitFitType1 == ECLDsp::photonDiodeCrossing)  goodFit = false;
+
+        energyToSort.emplace_back(caldigit->getEnergy(), iRel, goodFit);
+      }
+
+      // sort the vector
+      std::sort(energyToSort.begin(), energyToSort.end(), std::greater<>());
+
+      for (unsigned int iSorted = 0; iSorted < energyToSort.size(); iSorted++) {
+        listOfCrystalEnergyRankAndQuality.push_back(std::make_pair(std::get<1>(energyToSort[iSorted]),
+                                                                   std::get<2>(energyToSort[iSorted])));
+      }
+      return listOfCrystalEnergyRankAndQuality;
+    }
+
     //! @returns variable requested (expert function, only called from this file)
     double getCalDigitExpertByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
@@ -157,6 +195,7 @@ namespace Belle2 {
       std::vector<std::tuple<double, unsigned int>> energyToSort;
 
       const ECLCluster* cluster = particle->getECLCluster();
+      std::vector<std::pair<unsigned int, bool>> calculateListOfCrystalEnergyRankAndQuality;
 
       if (cluster) {
 
@@ -243,12 +282,6 @@ namespace Belle2 {
           if (varid == varType::thetaRelativeToCluster) return tempP.Theta();
           if (varid == varType::cosThetaRelativeToCluster) return tempP.CosTheta();
           if (varid == varType::phiRelativeToCluster) return tempP.Phi();
-//         } else if (varid == varType::useableForChargedPID) {
-//             //exclude digits digits with poor chi2 or diode-crossing fits
-//             if (digitChi2 < 0)  return 0.0;
-//             if (caldigit->getTwoComponentFitType() == ECLDsp::poorChi2) return 0.0;
-//             if (caldigit->getTwoComponentFitType() == ECLDsp::photonDiodeCrossing)  return 0.0;
-//             return 1.0;
         } else {
           B2FATAL("variable id not found.");
         }
@@ -361,13 +394,16 @@ namespace Belle2 {
           } else if (varid == varType::usedforenergy) {
             const ECLCluster* cluster = particle->getECLCluster();
             if (cluster) {
-              unsigned int cellid = eclCalDigits[storearraypos]->getCellId();
 
+              unsigned int cellid = eclCalDigits[storearraypos]->getCellId();
               std::vector<unsigned int> listCellIds;
-              auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>(); // should never happen to have more than one shower
-              for (unsigned int ir = 0; ir < clusterShowerRelations.size(); ++ir) {
-                const auto shower = clusterShowerRelations.object(ir);
-                listCellIds = shower->getListOfCrystalsForEnergy();
+
+              auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>();
+
+              if (clusterShowerRelations.size() == 1) {
+                listCellIds = clusterShowerRelations.object(0)->getListOfCrystalsForEnergy();
+              } else {
+                B2ERROR("Somehow found more than 1 ECLShower matched to the ECLCluster. This should not be possible!");
               }
 
               if (std::find(listCellIds.begin(), listCellIds.end(), cellid) != listCellIds.end()) { //find is faster than count
@@ -1233,10 +1269,11 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         std::vector<unsigned int> listCellIds;
-        auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>(); // should never happen to have more than one shower
-        for (unsigned int ir = 0; ir < clusterShowerRelations.size(); ++ir) {
-          const auto shower = clusterShowerRelations.object(ir);
-          listCellIds = shower->getListOfCrystalsForEnergy();
+        auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>();
+        if (clusterShowerRelations.size() == 1) {
+          listCellIds = clusterShowerRelations.object(0)->getListOfCrystalsForEnergy();
+        } else {
+          B2ERROR("Somehow found more than 1 ECLShower matched to the ECLCluster. This should not be possible!");
         }
 
         double sum = 0.0;

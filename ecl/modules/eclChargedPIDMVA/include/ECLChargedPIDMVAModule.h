@@ -95,6 +95,7 @@ namespace Belle2 {
      * log transformation.
      * @param value to be log transformed.
      * @param offset offset applied during the log transformation to prevent transforming 0.
+     * @param max maximum possible return value of the MVA method.
      */
     float logTransformation(const float value, const float offset, const float max) const;
 

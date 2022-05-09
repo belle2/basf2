@@ -95,17 +95,7 @@ namespace Belle2 {
       if (relShowers.size() == 1) {
         shower = relShowers.object(0);
       } else {
-        // in case there are multiple showers matched take the highest energy one with a
-        // photon hypothesis.
-        float highestEnergy = -1.0;
-        for (unsigned int i = 0; i < relShowers.size(); ++i) {
-          if (relShowers.object(i)->getHypothesisId() == Belle2::ECLShower::c_nPhotons) {
-            if (shower->getEnergy() > highestEnergy) {
-              shower = relShowers.object(i);
-              highestEnergy = shower->getEnergy();
-            }
-          }
-        }
+        B2ERROR("Somehow found more than 1 ECLShower matched to the ECLCluster. This should not be possible!");
       }
       // fill the list if it doesn't exist yet.
       if (shower->getListOfCrystalEnergyRankAndQuality().empty()) {
@@ -281,7 +271,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("onlineEnergy(i)", getOnlineEnergy,
                       "[eclChargedPIDExpert] the online energy of the ith most energetic crystal in the shower.");
     REGISTER_VARIABLE("offlineEnergy(i)", getOfflineEnergy,
-                      "[eclChargedPIDExpert] the online energy of the ith most energetic crystal in the shower.");
+                      "[eclChargedPIDExpert] the offline energy of the ith most energetic crystal in the shower.");
     REGISTER_VARIABLE("fractionOfShowerEnergy(i)", getFractionOfShowerEnergy,
                       "[eclChargedPIDExpert] the fraction of total shower energy in the digit ith digit.");
     REGISTER_VARIABLE("hadronEnergyFraction(i)", getHadronEnergyFraction,
@@ -289,7 +279,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("digitWeight(i)", getDigitWeight,
                       "[eclChargedPIDExpert] the digit weight of the ith most energetic crystal in the shower.");
     REGISTER_VARIABLE("digitFitType(i)", getDigitFitType,
-                      "[eclChargedPIDExpert] the digit weight of the ith most energetic crystal in the shower.");
+                      "[eclChargedPIDExpert] the digit fit type of the ith most energetic crystal in the shower.");
     REGISTER_VARIABLE("digitRadius(i)", getDigitRadius,
                       "[eclChargedPIDExpert] the magnitude of the vector from the ith most energetic crystal in the shower to the shower center.");
     REGISTER_VARIABLE("digitTheta(i)", getDigitTheta,

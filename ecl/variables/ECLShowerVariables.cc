@@ -31,18 +31,14 @@ namespace Belle2 {
     {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        double showerNumberOfCrystalsForEnergy = -1.0;
-
         auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>();
-        for (unsigned int ir = 0; ir < clusterShowerRelations.size(); ++ir) {
-          const auto shower = clusterShowerRelations.object(ir);
-
-          showerNumberOfCrystalsForEnergy = shower->getNumberOfCrystalsForEnergy();
+        ECLShower* shower;
+        if (clusterShowerRelations.size() == 1) {
+          return clusterShowerRelations.object(0)->getNumberOfCrystalsForEnergy();
+        } else {
+          B2ERROR("Somehow found more than 1 ECLShower matched to the ECLCluster. This should not be possible!");
         }
-
-        return showerNumberOfCrystalsForEnergy;
       }
-
       return std::numeric_limits<double>::quiet_NaN();
     }
 
@@ -51,37 +47,29 @@ namespace Belle2 {
     {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        double showerNominalNumberOfCrystalsForEnergy = -1.0;
-
         auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>();
-        for (unsigned int ir = 0; ir < clusterShowerRelations.size(); ++ir) {
-          const auto shower = clusterShowerRelations.object(ir);
-
-          showerNominalNumberOfCrystalsForEnergy = shower->getNominalNumberOfCrystalsForEnergy();
+        ECLShower* shower;
+        if (clusterShowerRelations.size() == 1) {
+          return clusterShowerRelations.object(0)->getNominalNumberOfCrystalsForEnergy();
+        } else {
+          B2ERROR("Somehow found more than 1 ECLShower matched to the ECLCluster. This should not be possible!");
         }
-
-        return showerNominalNumberOfCrystalsForEnergy;
       }
-
       return std::numeric_limits<double>::quiet_NaN();
     }
-
 
     //! @returns hadron intensity of the shower
     double getShowerHadronIntensity(const Particle* particle)
     {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        double showerHadronIntensity = 0.0;
-
         auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>();
-        for (unsigned int ir = 0; ir < clusterShowerRelations.size(); ++ir) {
-          const auto shower = clusterShowerRelations.object(ir);
-
-          showerHadronIntensity = shower->getShowerHadronIntensity();
+        ECLShower* shower;
+        if (clusterShowerRelations.size() == 1) {
+          return clusterShowerRelations.object(0)->getShowerHadronIntensity();
+        } else {
+          B2ERROR("Somehow found more than 1 ECLShower matched to the ECLCluster. This should not be possible!");
         }
-
-        return showerHadronIntensity;
       }
       return std::numeric_limits<double>::quiet_NaN();
     }
@@ -91,16 +79,13 @@ namespace Belle2 {
     {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        double showerNumberOfHadronDigits = 0.0;
-
         auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>();
-        for (unsigned int ir = 0; ir < clusterShowerRelations.size(); ++ir) {
-          const auto shower = clusterShowerRelations.object(ir);
-
-          showerNumberOfHadronDigits = shower->getNumberOfHadronDigits();
+        ECLShower* shower;
+        if (clusterShowerRelations.size() == 1) {
+          return clusterShowerRelations.object(0)->getNumberOfHadronDigits();
+        } else {
+          B2ERROR("Somehow found more than 1 ECLShower matched to the ECLCluster. This should not be possible!");
         }
-
-        return showerNumberOfHadronDigits;
       }
       return std::numeric_limits<double>::quiet_NaN();
     }

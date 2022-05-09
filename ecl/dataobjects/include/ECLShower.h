@@ -226,6 +226,10 @@ namespace Belle2 {
      */
     void setListOfCrystalsForEnergy(const std::vector<unsigned int>& listofcrystals) { m_listOfCrystalsForEnergy = listofcrystals;}
 
+    /*! Set list of indexes of related ECLCalDigit objects sorted by calibrated energy with flag for PSD useability for charged PID.
+     */
+    void setListOfCrystalEnergyRankAndQuality(std::vector<std::pair<unsigned int, bool>>
+                                              listOfCrystalEnergyRankAndQuality) {m_listOfCrystalEnergyRankAndQuality = listOfCrystalEnergyRankAndQuality;}
 
     /*! Get if matched with a Track
      * @return flag for track Matching
@@ -405,46 +409,7 @@ namespace Belle2 {
     /*! Get list of indexes of related ECLCalDigit objects sorted by calibrated energy with flag for PSD useability for charged PID.
      *  @return m_listOfCrystalEnergyRankAndQuality
      */
-    std::vector<std::pair<unsigned int, bool>> getListOfCrystalEnergyRankAndQuality()
-    {
-      // only fill this ranking upon first request
-      if (m_listOfCrystalEnergyRankAndQuality.empty()) {
-
-        std::vector<std::tuple<double, unsigned int, bool>> energyToSort;
-        RelationVector<ECLCalDigit> relatedDigits = this->getRelationsTo<ECLCalDigit>();
-
-        //energyToSort vector is used for sorting digits by calibrated energy
-        for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
-
-          const auto caldigit = relatedDigits.object(iRel);
-          bool goodFit = true;
-
-          //exclude digits without waveforms
-          const double digitChi2 = caldigit->getTwoComponentChi2();
-          if (digitChi2 < 0)  goodFit = false;
-
-          ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
-
-          //exclude digits with poor chi2
-          if (digitFitType1 == ECLDsp::poorChi2) goodFit = false;
-
-          //exclude digits with diode-crossing fits
-          if (digitFitType1 == ECLDsp::photonDiodeCrossing)  goodFit = false;
-
-          energyToSort.emplace_back(caldigit->getEnergy(), iRel, goodFit);
-        }
-
-        // sort the vector
-        std::sort(energyToSort.begin(), energyToSort.end(), std::greater<>());
-
-        for (unsigned int iSorted = 0; iSorted < energyToSort.size(); iSorted++) {
-          m_listOfCrystalEnergyRankAndQuality.push_back(std::make_pair(std::get<1>(energyToSort[iSorted]),
-                                                        std::get<2>(energyToSort[iSorted])));
-        }
-
-      }
-      return m_listOfCrystalEnergyRankAndQuality;
-    }
+    std::vector<std::pair<unsigned int, bool>> getListOfCrystalEnergyRankAndQuality() {return m_listOfCrystalEnergyRankAndQuality; }
 
 
 

@@ -46,6 +46,45 @@ namespace Belle2 {
       phi = 12,
     };
 
+
+
+    std::vector<std::pair<unsigned int, bool>> calculateListOfCrystalEnergyRankAndQuality(ECLShower* shower)
+    {
+      std::vector<std::pair<unsigned int, bool>> listOfCrystalEnergyRankAndQuality;
+      std::vector<std::tuple<double, unsigned int, bool>> energyToSort;
+      RelationVector<ECLCalDigit> relatedDigits = shower->getRelationsTo<ECLCalDigit>();
+
+      //energyToSort vector is used for sorting digits by calibrated energy
+      for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
+
+        const auto caldigit = relatedDigits.object(iRel);
+        bool goodFit = true;
+
+        //exclude digits without waveforms
+        const double digitChi2 = caldigit->getTwoComponentChi2();
+        if (digitChi2 < 0)  goodFit = false;
+
+        ECLDsp::TwoComponentFitType digitFitType1 = caldigit->getTwoComponentFitType();
+
+        //exclude digits with poor chi2
+        if (digitFitType1 == ECLDsp::poorChi2) goodFit = false;
+
+        //exclude digits with diode-crossing fits
+        if (digitFitType1 == ECLDsp::photonDiodeCrossing)  goodFit = false;
+
+        energyToSort.emplace_back(caldigit->getEnergy(), iRel, goodFit);
+      }
+
+      // sort the vector
+      std::sort(energyToSort.begin(), energyToSort.end(), std::greater<>());
+
+      for (unsigned int iSorted = 0; iSorted < energyToSort.size(); iSorted++) {
+        listOfCrystalEnergyRankAndQuality.push_back(std::make_pair(std::get<1>(energyToSort[iSorted]),
+                                                                   std::get<2>(energyToSort[iSorted])));
+      }
+      return listOfCrystalEnergyRankAndQuality;
+    }
+
     ECLShower* getECLShowerFromParticle(const Particle* particle)
     {
 
@@ -70,9 +109,12 @@ namespace Belle2 {
           }
         }
       }
+      // fill the list if it doesn't exist yet.
+      if (shower->getListOfCrystalEnergyRankAndQuality().empty()) {
+        shower->setListOfCrystalEnergyRankAndQuality(calculateListOfCrystalEnergyRankAndQuality(shower));
+      }
       return shower;
     }
-
 
     // returns the nm zernike moment (between 10 and 66)
     double getAbsZernikeMomentNM(const Particle* particle,

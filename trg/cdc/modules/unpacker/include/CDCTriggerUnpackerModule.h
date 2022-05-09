@@ -12,7 +12,6 @@
 #include <framework/core/Module.h>
 #include <rawdata/dataobjects/RawTRG.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 
 #include <trg/cdc/dataobjects/Bitstream.h>
@@ -24,7 +23,6 @@
 #include <trg/cdc/dbobjects/CDCTrigger2DConfig.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
-#include <framework/dataobjects/BinnedEventT0.h>
 
 #include <array>
 #include <bitset>
@@ -314,9 +312,6 @@ namespace Belle2 {
 
     /** bitstream of Neuro input and output (including intermediate results) */
     StoreArray<CDCTriggerUnpacker::NNBitStream> m_bitsNN;
-
-    /** store object for unpacked etf event time from neuro b2link */
-    StoreObjPtr<BinnedEventT0> m_ETFTime;
 
     /** decoded Neuro tracks */
     StoreArray<CDCTriggerTrack> m_NeuroTracks;

@@ -102,7 +102,8 @@ class SVDValidationTTreeSimhit(b2.Module):
                 energy = simhit.getElectrons() * Belle2.Const.ehEnergy
                 self.data.simhit_length = length
                 self.data.simhit_energy = energy
-                self.data.simhit_dEdx = energy / length
+                if (length != 0):
+                    self.data.simhit_dEdx = energy / length
                 # A reasonable cut to see a nice Landau distribution
                 if self.data.simhit_dEdx > 0.015:
                     continue

@@ -84,7 +84,7 @@ void TRGCDCETFUnpackerModule::event()
     }
 
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
-      if (raw_trgarray[i]->GetNodeID(j) == mode_id) {
+      if (raw_trgarray[i]->GetNodeID(j) == node_id) {
         if (raw_trgarray[i]->GetDetectorNwords(j, ch_id) > 0) {
           fillTreeTRGCDCETFUnpacker(raw_trgarray[i]->GetDetectorBuffer(j, ch_id), raw_trgarray[j]->GetEveNo(j));
         }

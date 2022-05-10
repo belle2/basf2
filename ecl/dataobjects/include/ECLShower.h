@@ -13,10 +13,6 @@
 #include <math.h>
 #include <TMatrixDSym.h>
 
-#include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-
 namespace Belle2 {
 
   /*! Class to store ECL Showers

@@ -44,7 +44,7 @@ namespace Belle2 {
 
   public:
     NSMCommunicator(const std::string& host = "", int port = -1);
-    NSMCommunicator(NSMcontext* nsmc);
+    explicit NSMCommunicator(NSMcontext* nsmc);
     ~NSMCommunicator() {}
 
   public:

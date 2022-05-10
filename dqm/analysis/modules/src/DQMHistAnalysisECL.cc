@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(DQMHistAnalysisECL)
+REG_MODULE(DQMHistAnalysisECL);
 
 DQMHistAnalysisECLModule::DQMHistAnalysisECLModule()
   : DQMHistAnalysisModule()
@@ -331,7 +331,7 @@ void DQMHistAnalysisECLModule::event()
         double yval = (h_time_crate_Thr1GeV->GetMean() > 0) ?
                       h_time_crate_Thr1GeV->GetMean() - 2 * h_time_crate_Thr1GeV->GetMeanError() :
                       h_time_crate_Thr1GeV->GetMean() + 2 * h_time_crate_Thr1GeV->GetMeanError();
-        if (abs(yval) > m_CrateTimeOffsetsMax) colRed = true;
+        if (fabs(yval) > m_CrateTimeOffsetsMax) colRed = true;
       } else m_low.push_back(i + 1);
     }
   }

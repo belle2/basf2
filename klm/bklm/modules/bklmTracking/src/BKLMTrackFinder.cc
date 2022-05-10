@@ -10,7 +10,7 @@
 #include <klm/bklm/modules/bklmTracking/BKLMTrackFinder.h>
 
 /* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/KLMHit2d.h>
 
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>
@@ -43,12 +43,12 @@ void BKLMTrackFinder::registerFitter(BKLMTrackFitter* fitter)
 }
 
 //! find associated hits and do fit
-bool BKLMTrackFinder::filter(const std::list<BKLMHit2d*>& seed,
-                             std::list<BKLMHit2d*>& hits,
-                             std::list<BKLMHit2d*>& track)
+bool BKLMTrackFinder::filter(const std::list<KLMHit2d*>& seed,
+                             std::list<KLMHit2d*>& hits,
+                             std::list<KLMHit2d*>& track)
 {
 
-  std::list<BKLMHit2d*>::iterator i;
+  std::list<KLMHit2d*>::iterator i;
 
   track = seed;
 
@@ -60,6 +60,8 @@ bool BKLMTrackFinder::filter(const std::list<BKLMHit2d*>& seed,
   m_Fitter->fit(track);//fit seed
 
   for (i = hits.begin(); i != hits.end(); ++i) {
+    if ((*i)->getSubdetector() != KLMElementNumbers::c_BKLM)
+      continue;
 
     // Prevent duplicate hits or hits on same layer
     // no duplicate hit is alreday guaranteed and now we allow hits on same layer so the following is commented out

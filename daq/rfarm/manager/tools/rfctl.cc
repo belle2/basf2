@@ -41,9 +41,7 @@ FILE* master_logfp = 0;
 void
 xreopenlog()
 {
-  static int logid = -1;
   static char logprefix[1024];
-  static int  isdirprefix = 0;
   char logfile[1024];
   time_t now = time(0);
   tm* cur = localtime(&now);
@@ -76,12 +74,12 @@ xreopenlog()
 void
 xprintlog(const char* fmt, ...)
 {
-  va_list ap;
-  char datebuf[32];
   void xlogtime(char* buf);
 
   if (master_logfp) {
+    va_list ap;
     va_start(ap, fmt);
+    char datebuf[32];
     xlogtime(datebuf);
     fputs(datebuf, master_logfp);
     vfprintf(master_logfp, fmt, ap);
@@ -99,11 +97,11 @@ xlogtime(char* buf)
 {
   timeval now;
   tm* cur;
-  static int lastday = -1;
 
   gettimeofday(&now, 0);
   cur = localtime((time_t*)&now.tv_sec);
   /*
+  static int lastday = -1;
   if (lastday != cur->tm_yday) {
     char datebuf[128];
     lastday = cur->tm_yday;
@@ -122,7 +120,7 @@ xlogtime(char* buf)
 int
 xgetargs(char* buf, char* argv[])
 {
-  int i, argc = 0, inword = 0, inquote = 0;
+  int argc = 0, inword = 0, inquote = 0;
   char* p = buf;
 
   while (*p) {
@@ -159,7 +157,7 @@ xgetargs(char* buf, char* argv[])
 //
 // ----------------------------------------------------------------------
 void
-ok_handler(NSMmsg* msg, NSMcontext*)
+ok_handler(NSMmsg* /*msg*/, NSMcontext*)
 {
   xprintlog("OK received");
 }
@@ -167,7 +165,7 @@ ok_handler(NSMmsg* msg, NSMcontext*)
 //
 // ----------------------------------------------------------------------
 void
-error_handler(NSMmsg* msg, NSMcontext*)
+error_handler(NSMmsg* /*msg*/, NSMcontext*)
 {
   xprintlog("ERROR received");
 }
@@ -176,7 +174,7 @@ error_handler(NSMmsg* msg, NSMcontext*)
 //
 // ----------------------------------------------------------------------
 void
-msg_handler(NSMmsg* msg, NSMcontext*)
+msg_handler(NSMmsg* /*msg*/, NSMcontext*)
 {
   xprintlog("MSG received");
 }
@@ -194,10 +192,7 @@ main(int argc, char** argv)
   char* input = 0;
   char* prev = 0;
   char* av[128];
-  int ac;
   char* prompt;
-
-  int ret;
 
   //  xreopenlog();
   master_logfp = stdout;
@@ -256,15 +251,16 @@ main(int argc, char** argv)
       strcpy(prev, input);
     }
 #else
-    static char buf[1024];
-    buf[0] = 0;
+    static char buffer[1024];
+    buffer[0] = 0;
     printf("%s", prompt);
     do {
-      fgets(buf, sizeof(buf), stdin);
-    } while (! buf[0]); /* to cope with EINTR */
+      fgets(buffer, sizeof(buffer), stdin);
+    } while (! buffer[0]); /* to cope with EINTR */
 #endif
 
-    if ((ac = xgetargs(buf, av)) <= 0)
+    int ac;
+    if ((ac = xgetargs(buf, av)) <= 0) //TODO should there be buf or buffer?
       continue;
     printf("ac=%d av[0]=%s\n", ac, av[0]);
 

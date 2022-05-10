@@ -18,7 +18,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(RawSecMapMerger)
+REG_MODULE(RawSecMapMerger);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -307,7 +307,7 @@ void RawSecMapMergerModule::printData(
 void RawSecMapMergerModule::printVXDTFFilters(const VXDTFFilters<SpacePoint>& filters,
                                               std::string configName, unsigned int nHitCombinations, bool print2File)
 {
-  SecMapHelper::printStaticSectorRelations<SpacePoint>(filters , configName , nHitCombinations, print2File);
+  SecMapHelper::printStaticSectorRelations<SpacePoint>(filters, configName, nHitCombinations, print2File);
 }
 
 

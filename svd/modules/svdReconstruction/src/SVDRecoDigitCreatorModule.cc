@@ -28,7 +28,7 @@ using namespace Belle2::SVD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDRecoDigitCreator)
+REG_MODULE(SVDRecoDigitCreator);
 
 //-----------------------------------------------------------------
 //                 Implementation

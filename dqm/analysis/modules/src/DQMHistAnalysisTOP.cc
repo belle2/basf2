@@ -20,14 +20,15 @@ using boost::format;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisTOP)
+REG_MODULE(DQMHistAnalysisTOP);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
 DQMHistAnalysisTOPModule::DQMHistAnalysisTOPModule()
-  : DQMHistAnalysisModule()
+  : DQMHistAnalysisModule(),
+    m_IsNullRun{false}
 {
   //Parameter definition
   B2DEBUG(20, "DQMHistAnalysisTOP: Constructor done.");
@@ -99,6 +100,9 @@ void DQMHistAnalysisTOPModule::initialize()
 void DQMHistAnalysisTOPModule::beginRun()
 {
   //B2DEBUG(20, "DQMHistAnalysisTOP: beginRun called.");
+  m_RunType = findHist("DQMInfo/rtype");
+  m_RunTypeString = m_RunType ? m_RunType->GetTitle() : "";
+  m_IsNullRun = (m_RunTypeString == "null");
 }
 
 TH1* DQMHistAnalysisTOPModule::find_histo_in_canvas(TString histo_name)
@@ -108,9 +112,7 @@ TH1* DQMHistAnalysisTOPModule::find_histo_in_canvas(TString histo_name)
   std::string hname = s[1];
   std::string canvas_name = dirname + "/c_" + hname;
 
-  TIter nextckey(gROOT->GetListOfCanvases());
-
-  auto cobj = find_canvas(canvas_name);
+  auto cobj = findCanvas(canvas_name);
   if (cobj == nullptr) return nullptr;
 
   TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
@@ -167,14 +169,14 @@ void DQMHistAnalysisTOPModule::event()
   m_text1->Clear();
   m_text1->AddText(Form("Ratio of entries outside of red lines: %.2f %%", exRatio * 100.0));
   if (exRatio > 0.01) {
-    m_text1->AddText(">1% bad, report to TOP experts!");
+    if (m_IsNullRun == false) m_text1->AddText(">1% bad, report to TOP experts!");
   } else {
     m_text1->AddText("<0.1% good, 0.1-1% recoverable.");
   }
 
   //addHist("", m_h_goodHitsMean->GetName(), m_h_goodHitsMean);
 
-  TCanvas* c1 = find_canvas("TOP/c_hitsPerEvent");
+  TCanvas* c1 = findCanvas("TOP/c_hitsPerEvent");
   //TH1* h1=find_histo_in_canvas("TOP/hitsPerEvent");
   if (c1 != NULL) {
     c1->SetName("TOP/c_hitsPerEvent_top");
@@ -183,10 +185,10 @@ void DQMHistAnalysisTOPModule::event()
   //  h1->SetName("TOP/hitsPerEvent_top");
   //}
 
-  TCanvas* c2 = find_canvas("TOP/c_window_vs_slot");
+  TCanvas* c2 = findCanvas("TOP/c_window_vs_slot");
   if (c2 != NULL) {
     c2->cd();
-    if (exRatio > 0.01) c2->Pad()->SetFillColor(kRed);
+    if (exRatio > 0.01 && m_IsNullRun == false) c2->Pad()->SetFillColor(kRed);
     else c2->Pad()->SetFillColor(kWhite);
     m_line1->Draw();
     m_line2->Draw();
@@ -206,10 +208,10 @@ void DQMHistAnalysisTOPModule::event()
   m_text2->Clear();
   m_text2->AddText(Form("fraction of deviating hits: %.4f %%", badRatio * 100.0));
 
-  TCanvas* c3 = find_canvas("TOP/c_BoolEvtMonitor");
+  TCanvas* c3 = findCanvas("TOP/c_BoolEvtMonitor");
   if (c3 != NULL) {
     c3->cd();
-    if (badRatio > 0.0001) c3->Pad()->SetFillColor(kRed);
+    if (badRatio > 0.0001 && m_IsNullRun == false) c3->Pad()->SetFillColor(kRed);
     else c3->Pad()->SetFillColor(kWhite);
     m_text2->Draw();
   }

@@ -23,7 +23,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisPXDEff)
+REG_MODULE(DQMHistAnalysisPXDEff);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -42,7 +42,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDEFF"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
-  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
   addParam("useEpicsRO", m_useEpicsRO, "useEpics ReadOnly", false);
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
@@ -528,7 +528,7 @@ void DQMHistAnalysisPXDEffModule::event()
       if (ay) ay->SetRangeUser(scale_min, 1.0);
       auto ax = gr->GetXaxis();
       if (ax) {
-        ax->Set(m_PXDModules.size() , 0, m_PXDModules.size());
+        ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
           TString ModuleName = (std::string)m_PXDModules[i];
           ax->SetBinLabel(i + 1, ModuleName);

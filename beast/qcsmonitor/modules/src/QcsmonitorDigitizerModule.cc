@@ -25,7 +25,7 @@ using namespace qcsmonitor;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(QcsmonitorDigitizer)
+REG_MODULE(QcsmonitorDigitizer);
 
 //-----------------------------------------------------------------
 //                 Implementation

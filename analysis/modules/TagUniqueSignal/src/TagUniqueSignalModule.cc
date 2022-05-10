@@ -24,7 +24,7 @@ using namespace Belle2;
 //                 Register module
 //-----------------------------------------------------------------
 
-REG_MODULE(TagUniqueSignal)
+REG_MODULE(TagUniqueSignal);
 
 TagUniqueSignalModule::TagUniqueSignalModule() : Module(), m_targetVar(nullptr)
 {

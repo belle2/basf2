@@ -183,7 +183,7 @@ public:
     m.setValidVertex(m.hasValidVertex() &&  d.hasValidVertex());
     if (m.hasValidVertex() && d.getProductionTime() >= m.getDecayTime()) {
       if (m_setVertex) {
-        m.setDecayVertex(d.getProductionVertex());
+        m.setDecayVertex(B2Vector3D(d.getProductionVertex()));
       }
       if (m_setTime) {
         m.setDecayTime(d.getProductionTime());

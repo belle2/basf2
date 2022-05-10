@@ -17,7 +17,7 @@ using namespace Belle2;
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(ROISender)
+REG_MODULE(ROISender);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -47,7 +47,7 @@ ROISenderModule::initialize()
 
   m_messageQueueNameCstring =  m_messageQueueName.c_str();
 
-  bool slashFree = (nullptr == strchr(m_messageQueueNameCstring + 1 , '/'));
+  bool slashFree = (nullptr == strchr(m_messageQueueNameCstring + 1, '/'));
 
   if (! slashFree || m_messageQueueNameCstring[0] != '/')
     B2FATAL(__FILE__ << ":" << __LINE__ <<

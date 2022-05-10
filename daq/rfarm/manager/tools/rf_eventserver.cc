@@ -15,7 +15,7 @@ using namespace Belle2;
 
 static RFEventServer* evs = NULL;
 
-extern "C" void sighandler(int sig)
+extern "C" void sighandler(int /*sig*/)
 {
   printf("SIGTERM handler here\n");
   evs->cleanup();
@@ -23,6 +23,11 @@ extern "C" void sighandler(int sig)
 
 int main(int argc, char** argv)
 {
+  if (argc < 2) {
+    printf("Wrong number of parameters\n");
+    return 1;
+  }
+
   RFConf conf(argv[1]);
 
   // Creation of event server instance. evs contains the instance
@@ -41,4 +46,5 @@ int main(int argc, char** argv)
 
   evs->server();
 
+  return 0;
 }

@@ -38,8 +38,8 @@ namespace Belle2 {
       : m_calAmp_aDBObjPtr(calAmp_name)
     {
       m_calAmp_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDPulseShapeCalibrations: from now on we are using " <<
-        this->m_calAmp_aDBObjPtr -> get_uniqueID()); });
+        B2DEBUG(20, "SVDPulseShapeCalibrations: from now on we are using " <<
+                this->m_calAmp_aDBObjPtr -> get_uniqueID()); });
     }
 
     /** Return the charge (number of electrons/holes) collected on a specific

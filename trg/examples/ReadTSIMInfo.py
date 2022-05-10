@@ -83,9 +83,7 @@ def Vec_Cluster(cluster):
     z = cluster.getPositionZ()
     e = cluster.getEnergyDep()
     vec = ROOT.TVector3(x, y, z)
-    vec_unit = vec.Unit()
-    vec_unit *= e
-    v_mom = ROOT.TLorentzVector(vec_unit, e)
+    v_mom = e * ROOT.Math.PxPyPzEVector(x / vec.Mag(), y / vec.Mag(), z / vec.Mag(), 1)
     new_theta = v_mom.Theta() * Fac
     new_phi = v_mom.Phi() * Fac
     if(new_phi < 0):

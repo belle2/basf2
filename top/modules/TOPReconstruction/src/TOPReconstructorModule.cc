@@ -23,10 +23,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register the Module
+  ///                 Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPReconstructor)
+  REG_MODULE(TOPReconstructor);
 
   //-----------------------------------------------------------------
   //                 Implementation

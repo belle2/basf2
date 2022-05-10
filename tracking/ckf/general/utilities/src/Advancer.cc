@@ -29,7 +29,7 @@ double Advancer::extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateO
     const double extrapolatedS = measuredStateOnPlane.extrapolateToPlane(plane);
 
     if (arcLengthInRightDirection(extrapolatedS, m_param_direction)) {
-      returnValue = m_param_direction * extrapolatedS;
+      returnValue = static_cast<double>(m_param_direction) * extrapolatedS;
     }
   } catch (const genfit::Exception& e) {
     B2DEBUG(29, "Extrapolation failed: " << e.what());

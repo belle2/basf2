@@ -21,6 +21,7 @@ namespace Belle2 {
   SELECTION_VARIABLE(Difference, 2, double,
                      static double value(const double& t1,
                                          const double& t2)
+                     // cppcheck-suppress unknownMacro
   { return t1 - t2; };
                     );
 
@@ -56,10 +57,10 @@ namespace Belle2 {
   TEST_F(VariablesOnTTree, basic_test)
   {
     auto filter1 = 0 < Difference() < 1 && 0 < Sum() < 1;
-    auto variables1 = VariablesTTree<>::build(filter1 , tree1);
+    auto variables1 = VariablesTTree<>::build(filter1, tree1);
 
     auto filter2 = 0 < Difference() < 1 && 0 < Sum() < 1;
-    auto variables2 = VariablesTTree<>::build(filter2 , tree2);
+    auto variables2 = VariablesTTree<>::build(filter2, tree2);
 
     double a(0.), b(1.0);
     variables1.evaluateOn(a, b);

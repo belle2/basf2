@@ -18,7 +18,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(TrackFinderVXDBasicPathFinder)
+REG_MODULE(TrackFinderVXDBasicPathFinder);
 
 
 TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Module()
@@ -123,7 +123,8 @@ void TrackFinderVXDBasicPathFinderModule::event()
   /// apply CA algorithm:
   int nRounds = m_cellularAutomaton.apply(segmentNetwork);
   if (nRounds < 0) {
-    B2ERROR("Basic Path Finder failed, skipping event!");
+    B2WARNING("Basic Path Finder failed, skipping event!");
+    m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
     return;
   }
 
@@ -152,7 +153,8 @@ void TrackFinderVXDBasicPathFinderModule::event()
     unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
     B2DEBUG(10, "Number of families in the network: " << nFamilies);
     if (nFamilies > m_PARAMmaxFamilies)  {
-      B2ERROR("Maximal number of track canidates per event was exceeded: Number of Families = " << nFamilies);
+      B2WARNING("Maximal number of track canidates per event was exceeded: " << LogVar(" Number of Families", nFamilies)
+                << LogVar("Max number of families", m_PARAMmaxFamilies));
       m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
       return;
     }
@@ -161,7 +163,7 @@ void TrackFinderVXDBasicPathFinderModule::event()
   /// collect all Paths starting from a Seed:
   m_collectedPaths.clear();
   if (not m_pathCollector.findPaths(segmentNetwork, m_collectedPaths, m_PARAMmaxPaths, m_PARAMstoreSubsets)) {
-    B2ERROR("VXDBasicPathFinder got signal to abort the event.");
+    B2WARNING("VXDBasicPathFinder got signal to abort the event.");
     m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
     m_network->set_collectedPaths(m_collectedPaths.size());
     return;

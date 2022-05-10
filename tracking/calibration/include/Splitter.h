@@ -9,8 +9,6 @@
 #pragma once
 #include <map>
 #include <vector>
-#include <utility>
-#include <limits>
 #include <TF1.h>
 
 
@@ -153,19 +151,20 @@ namespace Belle2 {
       * @param evts: A vector with all events
       * @param lossFunctionOuter: A formula of the outer loss function (for calib. intervals)
       * @param lossFunctionInner: A formula of the inner loss function (for calib. subintervals)
+      * @param atomSize: lenght of the small calibration interval - atom (in hours)
       * @return: Vector of the calib. intervals always containing vector of calib. subintervals.
       *          Each subinterval is defined as a map spanning in general over several runs
       **/
     template<typename Evt>
     std::vector<std::vector<std::map<ExpRun, std::pair<double, double>>>>  getIntervals(
       const std::map<ExpRun, std::pair<double, double>>& runs,  std::vector<Evt> evts,
-      TString lossFunctionOuter, TString lossFunctionInner)
+      TString lossFunctionOuter, TString lossFunctionInner, double atomSize = 3. / 60)
     {
       //sort events by time
       std::sort(evts.begin(), evts.end(), [](const Evt & e1, const Evt & e2) { return (e1.t > e2.t); });
 
       // Divide into small intervals
-      std::vector<std::pair<double, double>> smallRuns = splitToSmall(runs, 0.1);
+      std::vector<std::pair<double, double>> smallRuns = splitToSmall(runs, atomSize);
 
       std::vector<Atom> atoms = createAtoms(smallRuns, evts);
 

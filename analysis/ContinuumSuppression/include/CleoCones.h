@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 #include <vector>
 
@@ -21,7 +21,8 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CleoCones(const std::vector<TVector3>& p3_cms_all, const std::vector<TVector3>& p3_cms_roe, const TVector3& thrustB,
+    CleoCones(const std::vector<ROOT::Math::XYZVector>& p3_cms_all, const std::vector<ROOT::Math::XYZVector>& p3_cms_roe,
+              const ROOT::Math::XYZVector& thrustB,
               bool calc_CleoCones_with_all, bool calc_CleoCones_with_roe);
 
     /**

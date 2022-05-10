@@ -15,7 +15,7 @@
 /**
  * helper function to initialize xt function with 5th order polynomial + linear.
  */
-
+// cppcheck-suppress constParameter
 Double_t pol5pol1(Double_t* x, Double_t* par)
 {
   Double_t xx = x[0];
@@ -36,7 +36,7 @@ Double_t pol5pol1(Double_t* x, Double_t* par)
 /**
  * helper function to initialize xt function with 5th order Chebshev Polynomial + linear.
  */
-
+// cppcheck-suppress constParameter
 Double_t Cheb5pol1(Double_t* x, Double_t* par)
 {
   Double_t xx = x[0];
@@ -88,7 +88,7 @@ public:
   }
 
   /**
-   * Set Parameter 6 for polynomia fit.
+   * Set Parameter 6 for polynomial fit.
    */
   void  setP6(double p6)
   {
@@ -97,7 +97,7 @@ public:
 
   /**
    * Set XT mode.
-   * 1 is 5th order Chebshev polynomial.
+   * 1 is 5th order Chebyshev polynomial.
    * 0 is 5th order polynomial.
    */
   void setMode(int mode)
@@ -110,9 +110,9 @@ public:
   void BField(bool bfield) {m_BField = bfield;}
 
   /**
-   * Set Paramerters for fit.
+   * Set Parameters for fit.
    */
-  void  setXTParams(double p[8])
+  void  setXTParams(const double p[8])
   {
     for (int i = 0; i < 8; ++i) {m_XTParam[i] = p[i];}
     m_tmax = p[6] + 250;

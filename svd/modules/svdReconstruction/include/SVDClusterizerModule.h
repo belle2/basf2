@@ -153,7 +153,7 @@ namespace Belle2 {
       /**
        * writes the relations of the SVDClusters with the other StoreArrays
        */
-      void writeClusterRelations(Belle2::SVD::RawCluster& rawCluster);
+      void writeClusterRelations(const Belle2::SVD::RawCluster& rawCluster);
 
     };// end class declarations
 

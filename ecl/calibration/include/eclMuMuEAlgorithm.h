@@ -49,7 +49,6 @@ namespace Belle2 {
       int noLowerEdge = 5; /**< could not determine lower edge of fit */
       int atLimit = 4; /**< a parameter is at the limit; fit not useable */
       int poorFit = 3; /**< low chi square; fit not useable */
-      int noPeak = 2; /**< Novosibirsk component of fit is negligible; fit not useable */
       int notFit = -1; /**< no fit performed */
 
     };

@@ -72,9 +72,9 @@ namespace Belle2 {
     std::vector<char> m_uncompressedBuffer;
 
     /// If already received: the experiment number of the data (on mismatch, everything is cleared)
-    std::optional<unsigned int> m_storedExperiment = {};
+    std::optional<int> m_storedExperiment = {};
     /// If already received: the run number of the data (on mismatch, everything is cleared)
-    std::optional<unsigned int> m_storedRun = {};
+    std::optional<int> m_storedRun = {};
   };
 
   template<class AConnectionClass>

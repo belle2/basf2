@@ -31,7 +31,7 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
-    DBObjPtr<TestCalibMean> m_obj_constant;
-    DBArray<TestCalibObject> m_array_constants;
+    DBObjPtr<TestCalibMean> m_obj_constant; /**< obj_constant */
+    DBArray<TestCalibObject> m_array_constants; /**< array_constants */
   };
 }

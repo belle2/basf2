@@ -47,7 +47,7 @@ namespace Belle2 {
   class ECLChargedPIDPhasespaceCategory : public TObject {
 
   public:
-
+    /** enum of implemented transformations which can be applied to the MVA response */
     enum class MVAResponseTransformMode : unsigned int {
       /** log transform the mva responses. And take the likelihood as the product of likelihoods from all mva responses. */
       c_LogTransform = 0,
@@ -150,7 +150,7 @@ namespace Belle2 {
 
     /**
      * set the cdfs.
-     * @param vector of map of cdfs to be stored in the payload.
+     * @param cdfs vector of map of cdfs to be stored in the payload.
      */
     void setCDFs(std::vector<std::unordered_map<unsigned int, TH1F>> cdfs) {m_cdfs = cdfs;}
 
@@ -246,8 +246,8 @@ namespace Belle2 {
      */
     std::unordered_map<unsigned int, std::vector<float>> m_decorrelationMatrices;
 
-    /**< 1: first class implementation. */
-    ClassDef(ECLChargedPIDPhasespaceCategory, 1);
+    // 1: first class implementation.
+    ClassDef(ECLChargedPIDPhasespaceCategory, 1); /**< ClassDef */
   };
 
   /** Class to contain payload of everything needed for MVA based charged particle identification.
@@ -407,8 +407,8 @@ namespace Belle2 {
      */
     std::vector<ECLChargedPIDPhasespaceCategory> m_phasespaceCategories;
 
-    /**< 1: first class implementation. */
-    ClassDef(ECLChargedPIDMVAWeights, 1);
+    // 1: first class implementation.
+    ClassDef(ECLChargedPIDMVAWeights, 1); /**< ClassDef  */
 
   }; // class ECLChargedPIDMVAWeights
 } // Belle 2 Namespace

@@ -510,7 +510,7 @@ namespace Belle2 {
     Double32_t m_trkDepth;          /**< Path on track ext. to POCA to avg. cluster dir. (GDN) */
     Double32_t m_showerDepth;       /**< Same as above, but on the cluster average direction (GDN) */
     Double32_t m_numberOfCrystals;       /**< Sum of weights of crystals (~number of crystals) (TF) */
-    Double32_t m_absZernikeMoments[27];  /** Shower shape variables, absolute values of Zernike Moments (MH) */
+    Double32_t m_absZernikeMoments[27];  /**< Shower shape variables, absolute values of Zernike Moments (MH) */
     Double32_t m_zernikeMVA;        /**< Shower shape variable, zernike MVA output */
     Double32_t m_secondMoment;      /**< Shower shape variable, second moment (for merged pi0) (TF) */
     Double32_t m_E1oE9;             /**< Shower shape variable, E1oE9 (TF) */

@@ -130,7 +130,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclShowerNumberOfHadronDigits", getShowerNumberOfHadronDigits,
                       "[debugging] Returns the number of hadron digits of the shower associated with the particle.");
 
-    VARIABLE_GROUP("ECL Shower Debugging (cDST)");
+    VARIABLE_GROUP("ECL Shower Variables (cDST)");
 
     REGISTER_VARIABLE("absZernikeMoment(n, m)", getAbsZernikeMomentNM,
                       "[eclChargedPIDExpert] the absolute value of zernike moment nm. Requires n <= 6 and m <= n.");

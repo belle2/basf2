@@ -3961,7 +3961,7 @@ Decay B+
 0.000100000   J/psi  K'_1+                                 SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.001800000   J/psi  K_1+                                  SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.000500000   J/psi  K_2*+                                 PHSP;
-0.000811420   J/psi  K+  pi+  pi-                          PHSP; #[BF update - PG 09/2020]
+0.000055137   J/psi  K+  pi+  pi-                          PHSP; #[BF update - PG 09/2020]
 0.000033700   J/psi  K+  K+  K-                            PHSP;
 0.000123590   J/psi  eta  K+                               PHSP; #[BF update - PG 09/2020]
 0.000050120   J/psi  phi  K+                               PHSP; #[BF update - PG 09/2020]
@@ -5469,7 +5469,7 @@ Decay B-
 0.000100000   J/psi  K'_1-                                 SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.001800000   J/psi  K_1-                                  SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.000500000   J/psi  K_2*-                                 PHSP;
-0.000811420   J/psi  K-  pi+  pi-                          PHSP; #[BF update - PG 09/2020]
+0.000055137   J/psi  K-  pi+  pi-                          PHSP; #[BF update - PG 09/2020]
 0.000033700   J/psi  K-  K+  K-                            PHSP;
 0.000123590   J/psi  eta  K-                               PHSP; #[BF update - PG 09/2020]
 0.000050120   J/psi  phi  K-                               PHSP; #[BF update - PG 09/2020]

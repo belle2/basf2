@@ -35,16 +35,15 @@ class V0Harvester(HarvestingModule):
         HarvestingModule.__init__(self, foreach="MCParticles", output_file_name="../V0ValidationHarvested.root")
 
     def pick(self, mc_particle):
-        """Selects all MCParticles which are KShort AND decay to charged pions.
+        """Selects all MCParticles which are KShort AND decay to Pi+Pi-.
 
         :param mc_particle: Belle2::MCParticle.
-        :return: True if the MCParticle is a KShort decaying to charged pions.
+        :return: True if the MCParticle is a KShort decaying to two charged pions.
         """
         if abs(mc_particle.getPDG()) != 310:
             return False
         daughters = mc_particle.getDaughters()
-        # only check one of the daughters which should be sufficient for KS decays
-        return len(daughters) >= 2 and abs(daughters[0].getPDG()) == 211
+        return len(daughters) == 2 and abs(daughters[0].getPDG()) == 211 and abs(daughters[1].getPDG()) == 211
 
     def peel(self, mc):
         """Selects MCTrue variables of interest for all KShort in the sample. If the KShort has a related reconstructed

@@ -8,6 +8,7 @@
 
 // analysis
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/Particle.h>
 
 // framework
 #include <framework/core/Module.h>
@@ -22,15 +23,12 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
-
-#include <analysis/dataobjects/Particle.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLCellIdMapping.h>
-#include <tracking/dataobjects/ExtHit.h>
-
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/geometry/ECLGeometryPar.h>
+
+#include <tracking/dataobjects/ExtHit.h>
 
 using namespace std;
 
@@ -180,7 +178,6 @@ namespace Belle2 {
 
     ECLShower* getECLShowerFromParticle(const Particle* particle)
     {
-
       const ECLCluster* cluster = particle->getECLCluster();
       if (!cluster) return nullptr;
       const auto relShowers = cluster->getRelationsWith<ECLShower>();
@@ -192,10 +189,6 @@ namespace Belle2 {
       } else {
         B2ERROR("Somehow found more than 1 ECLShower matched to the ECLCluster. This should not be possible!");
       }
-      // fill the list if it doesn't exist yet.
-      if (shower->getListOfCrystalEnergyRankAndQuality().empty()) {
-        shower->setListOfCrystalEnergyRankAndQuality(calculateListOfCrystalEnergyRankAndQuality(shower));
-      }
       return shower;
     }
 
@@ -203,7 +196,7 @@ namespace Belle2 {
     double getCalDigitExpertByEnergyRank(const Particle* particle, const std::vector<double>& vars)
     {
 
-      if (!((vars.size() == 2) | (vars.size() == 3))) {
+      if (!((vars.size() == 2) || (vars.size() == 3))) {
         B2FATAL("Need two or three parameters (energy rank, variable id, [onlyGoodQualityPSDFits]).");
       }
 
@@ -214,7 +207,9 @@ namespace Belle2 {
       const int varid = int(std::lround(vars[1]));
 
       bool onlyGoodQualityPSDFits = false;
-      if (vars.size() == 3) {onlyGoodQualityPSDFits = bool(std::lround(vars[2]));}
+      if (vars.size() == 3) {
+        onlyGoodQualityPSDFits = static_cast<bool>(std::lround(vars[2]));
+      }
 
       ECLShower* shower = getECLShowerFromParticle(particle);
       if (!shower) return std::numeric_limits<float>::quiet_NaN();
@@ -545,7 +540,7 @@ namespace Belle2 {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
-      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[2]);}
+      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[1]);}
 
       std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentFitType, onlyGoodQualityPSDFits};
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
@@ -558,7 +553,7 @@ namespace Belle2 {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
-      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[2]);}
+      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[1]);}
 
       std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentChi2, onlyGoodQualityPSDFits};
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
@@ -571,7 +566,7 @@ namespace Belle2 {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
-      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[2]);}
+      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[1]);}
 
       std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentTotalEnergy, onlyGoodQualityPSDFits};
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
@@ -584,7 +579,7 @@ namespace Belle2 {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
-      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[2]);}
+      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[1]);}
 
       std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentHadronEnergy, onlyGoodQualityPSDFits};
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
@@ -597,7 +592,7 @@ namespace Belle2 {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
-      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[2]);}
+      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[1]);}
 
       std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentHadronEnergyFraction, onlyGoodQualityPSDFits};
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
@@ -610,7 +605,7 @@ namespace Belle2 {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
-      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[2]);}
+      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[1]);}
 
       std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentDiodeEnergy, onlyGoodQualityPSDFits};
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
@@ -623,7 +618,7 @@ namespace Belle2 {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
-      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[2]);}
+      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[1]);}
 
       std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentSavedChi2_PhotonHadron, onlyGoodQualityPSDFits};
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
@@ -636,7 +631,7 @@ namespace Belle2 {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
-      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[2]);}
+      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[1]);}
 
       std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentSavedChi2_PileUpPhoton, onlyGoodQualityPSDFits};
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
@@ -649,7 +644,7 @@ namespace Belle2 {
         B2FATAL("Need one or two parameters (energy index, [onlyGoodQualityPSDFits]).");
       }
       double onlyGoodQualityPSDFits = 0.0;
-      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[2]);}
+      if (vars.size() == 2) {onlyGoodQualityPSDFits = std::lround(vars[1]);}
 
       std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentSavedChi2_PhotonDiode, onlyGoodQualityPSDFits};
       return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
@@ -1568,19 +1563,19 @@ namespace Belle2 {
                       "[calibration] Returns the caldigit time of the i-th highest energy caldigit in the cluster (i>=0)");
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentFitTypeByEnergyRank(i[, b])", getTwoComponentFitTypeByEnergyRank,
-                      "[calibration/eclChargedPIDExpert] Returns the offline fit type of the i-th highest energy caldigit in the cluster (i>=0). If b is set to True only caldigits considered to have good quality PSD fits return PSD information.");
+                      "[calibration/eclChargedPIDExpert] Returns the offline fit type of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information.");
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2ByEnergyRank(i[, b])", getTwoComponentChi2ByEnergyRank,
-                      "[calibration/eclChargedPIDExpert] Returns the two component chi2 of the i-th highest energy caldigit in the cluster (i>=0). If b is set to True only caldigits considered to have good quality PSD fits return PSD information.");
+                      "[calibration/eclChargedPIDExpert] Returns the two component chi2 of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information.");
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentEnergyByEnergyRank(i)", getTwoComponentTotalEnergyByEnergyRank,
                       "[calibration] Returns the two component total energy of the i-th highest energy caldigit in the cluster (i>=0)");
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentHadronEnergyByEnergyRank(i[, b])", getTwoComponentHadronEnergyByEnergyRank,
-                      "[calibration/eclChargedPIDExpert] Returns the two component fit Hadron Energy of the i-th highest energy caldigit in the cluster (i>=0). If b is set to True only caldigits considered to have good quality PSD fits return PSD information.");
+                      "[calibration/eclChargedPIDExpert] Returns the two component fit Hadron Energy of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information.");
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentDiodeEnergyByEnergyRank(i[, b])", getTwoComponentDiodeEnergyByEnergyRank,
-                      "[calibration/eclChargedPIDExpert] Returns the two component fit Diode Energy of the i-th highest energy caldigit in the cluster (i>=0). If b is set to True only caldigits considered to have good quality PSD fits return PSD information.");
+                      "[calibration/eclChargedPIDExpert] Returns the two component fit Diode Energy of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information.");
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2SavedByEnergyRank_PhotonHadron(i)", getTwoComponentChi2SavedByEnergyRank_PhotonHadron,
                       "[calibration] Returns the chi2 for the photo+hadron fit type of the i-th highest energy caldigit in the cluster (i>=0)");
@@ -1614,7 +1609,7 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentHadronEnergyFractionByEnergyRank(i[, b])",
                       getTwoComponentHadronEnergyFractionByEnergyRank,
-                      "[eclChargedPIDExpert] Returns the hadron energy fraction of the i-th highest energy caldigit in the cluster (i>=0). If b is set to True only caldigits considered to have good quality PSD fits return PSD information.");
+                      "[eclChargedPIDExpert] Returns the hadron energy fraction of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information.");
     REGISTER_VARIABLE("eclcaldigitFractionOfTotalShowerEnergyByEnergyRank(i)", getECLCalDigitFractionOfShowerEnergyByEnergyRank,
                       "[eclChargedPIDExpert] Returns the fraction of the total Shower energy in the i-th highest energy caldigit in the Shower (i>=0). Assumes a photon hypothesis.");
     REGISTER_VARIABLE("eclcaldigitPhiRelativeToShowerByEnergyRank(i)", getECLCalDigitPhiRelativeToShowerByEnergyRank,

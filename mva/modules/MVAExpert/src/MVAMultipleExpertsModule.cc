@@ -213,7 +213,7 @@ void MVAMultipleExpertsModule::terminate()
         B2WARNING("The extraInfo " << m_extraInfoNames[i] << " has already been set! It was overwritten by this module!");
       else
         B2WARNING("The extraInfo " << m_extraInfoNames[i] << " has already been set! "
-                  << "The original value was kept and this module does not overwrite it!");
+                  << "The original value was kept and this module did not overwrite it!");
     }
   }
 

@@ -85,8 +85,8 @@ namespace Belle2 {
     std::unique_ptr<MVA::Expert> m_expert; /**< Pointer to the current MVA Expert */
     std::unique_ptr<MVA::SingleDataset> m_dataset; /**< Pointer to the current dataset */
 
-    bool m_overwriteExistingExtraInfo; /**< if true, when the given extraInfo has already defined, the old extraInfo value is overwritten */
-    bool m_existGivenExtraInfo; /**< check if the given extraInfo has already defined. */
+    bool m_overwriteExistingExtraInfo; /**< if true, when the given extraInfo is already defined, the old extraInfo value is overwritten */
+    bool m_existGivenExtraInfo; /**< check if the given extraInfo is already defined. */
   };
 
 } // Belle2 namespace

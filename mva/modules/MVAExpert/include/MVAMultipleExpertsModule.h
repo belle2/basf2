@@ -95,8 +95,8 @@ namespace Belle2 {
     std::vector<std::unique_ptr<MVA::SingleDataset>> m_datasets; /**< Vector of pointers to the current input datasets */
 
     std::vector<bool>
-    m_overwriteExistingExtraInfo; /**< if true, when the given extraInfo has already defined, the old extraInfo value is overwritten */
-    std::vector<bool> m_existGivenExtraInfo; /**< check if the given extraInfo has already defined. */
+    m_overwriteExistingExtraInfo; /**< if true, when the given extraInfo is already defined, the old extraInfo value is overwritten */
+    std::vector<bool> m_existGivenExtraInfo; /**< check if the given extraInfo is already defined. */
   };
 
 } // Belle2 namespace

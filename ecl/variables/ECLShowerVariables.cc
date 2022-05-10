@@ -86,6 +86,35 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
+    // returns the nm zernike moment (between 10 and 66)
+    double getAbsZernikeMomentNM(const Particle* particle,
+                                 const std::vector<double>& arguments)
+    {
+      if (arguments.size() != 2) {
+        B2FATAL("Wrong number of arguments, 2 required for meta function absZernikeMoment");
+      }
+      const long n = std::lround(arguments[0]);
+      const long m = std::lround(arguments[1]);
+
+      if ((n < 1) or (n > 6)) {
+        B2FATAL("n must be between 1 and 6 for meta function absZernikeMoment");
+      }
+      if (m > n) {
+        B2FATAL("m must be less than or equal to n for meta function absZernikeMoment");
+      }
+
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>();
+        if (clusterShowerRelations.size() == 1) {
+          return clusterShowerRelations.object(0)->getAbsZernikeMoment(n, m);
+        } else {
+          B2ERROR("Somehow found more than 1 ECLShower matched to the ECLCluster. This should not be possible!");
+        }
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
 
     VARIABLE_GROUP("ECL Shower Debugging (cDST)");
 
@@ -100,5 +129,10 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("eclShowerNumberOfHadronDigits", getShowerNumberOfHadronDigits,
                       "[debugging] Returns the number of hadron digits of the shower associated with the particle.");
+
+    VARIABLE_GROUP("ECL Shower Debugging (cDST)");
+
+    REGISTER_VARIABLE("absZernikeMoment(n, m)", getAbsZernikeMomentNM,
+                      "[eclChargedPIDExpert] the absolute value of zernike moment nm. Requires n <= 6 and m <= n.");
   }
 }

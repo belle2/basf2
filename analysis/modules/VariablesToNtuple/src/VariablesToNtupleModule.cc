@@ -12,6 +12,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
+#include <analysis/dataobjects/StringWrapper.h>
 
 // framework
 #include <framework/logging/Logger.h>
@@ -62,6 +63,7 @@ void VariablesToNtupleModule::initialize()
   if (not m_particleList.empty())
     StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
+  m_stringWrapper.isOptional("MCDecayString");
 
   // Initializing the output root file
   if (m_fileName.empty()) {
@@ -108,6 +110,9 @@ void VariablesToNtupleModule::initialize()
     m_tree->get().Branch("__candidate__", &m_candidate, "__candidate__/I");
     m_tree->get().Branch("__ncandidates__", &m_ncandidates, "__ncandidates__/I");
   }
+
+  m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
+
   for (const auto& variable : m_variables)
     if (Variable::isCounterVariable(variable)) {
       B2WARNING("The counter '" << variable
@@ -208,6 +213,11 @@ void VariablesToNtupleModule::event()
   m_run = m_eventMetaData->getRun();
   m_experiment = m_eventMetaData->getExperiment();
   m_production = m_eventMetaData->getProduction();
+
+  if (m_stringWrapper.isValid())
+    m_MCDecayString = m_stringWrapper->getString();
+  else
+    m_MCDecayString = "";
 
   if (m_particleList.empty()) {
     m_branchAddressesDouble[0] = getInverseSamplingRateWeight(nullptr);

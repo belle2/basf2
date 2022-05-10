@@ -21,6 +21,8 @@
 
 namespace Belle2 {
 
+  class StringWrapper;
+
   /** Module to calculate variables specified by the user for a given ParticleList
    *  and save them into a ROOT TTree.
    *  The ntuple is candidate-based, meaning the variables of each candidate are saved in a separate
@@ -68,6 +70,9 @@ namespace Belle2 {
     int m_experiment{ -1};           /**< experiment number */
     int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     int m_candidate{ -1};            /**< candidate counter */
+
+    std::string m_MCDecayString; /**< MC decay string stored by PrintMCParticlesModule */
+
     unsigned int m_ncandidates{0};   /**< total n candidates */
     /** Branch addresses of variables of type double */
     std::vector<double> m_branchAddressesDouble;
@@ -86,6 +91,6 @@ namespace Belle2 {
     const Variable::Manager::Var* m_sampling_variable{nullptr}; /**< Variable Pointer to target variable */
     std::map<int, unsigned long int> m_sampling_counts; /**< Current number of samples with this value */
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< the event information */
-
+    StoreObjPtr<StringWrapper> m_stringWrapper; /**< string wrapper to store the MCDecayString */
   };
 } // end namespace Belle2

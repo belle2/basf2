@@ -315,7 +315,7 @@ def printPrimaryMCParticles(path, **kwargs):
 
 
 def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
-                     showProperties=False, showMomenta=False, showVertices=False, showStatus=False):
+                     showProperties=False, showMomenta=False, showVertices=False, showStatus=False, suppressPrint=False):
     """
     Prints all MCParticles or just primary MCParticles up to specified level. -1 means no limit.
 
@@ -433,6 +433,7 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
         showMomenta=showMomenta,
         showVertices=showVertices,
         showStatus=showStatus,
+        suppressPrint=suppressPrint,
     )
 
 

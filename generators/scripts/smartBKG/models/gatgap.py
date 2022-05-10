@@ -1,11 +1,18 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 import torch
 import torch.nn.functional as F
 import dgl
 import dgl.nn.pytorch as dglnn
 from dgl.nn.pytorch.glob import GlobalAttentionPooling
-from smartBKG import tokenize_dict
+from smartBKG import TOKENIZE_DICT
 
-NUM_PDG = len(tokenize_dict)
+NUM_PDG = len(TOKENIZE_DICT)
 
 
 class GATModule(torch.nn.Module):
@@ -50,7 +57,7 @@ class GATModule(torch.nn.Module):
         return h, hg
 
 
-class SimpleGATModel(torch.nn.Module):
+class GATGAPModel(torch.nn.Module):
     def __init__(
         self,
         units=128,
@@ -90,41 +97,3 @@ class SimpleGATModel(torch.nn.Module):
         for layer in self.gat_layers:
             h, hg = layer(graph, h, hg)
         return self.fc_output(hg)
-
-
-def get_embedded_feats(model, graph):
-    """
-    Return features that go into graph network (concatenation of pdg
-    embeddings and other node features)
-
-    Note: Assumes the model has the pdg embedding layer as a member
-    named `pdg_embedding`
-    """
-    g = graph
-    h_pdg = g.ndata["x_pdg"]
-    h_feat = g.ndata["x_feature"]
-    h_pdg = model.pdg_embedding(h_pdg.long())
-    return torch.cat((h_pdg, h_feat), axis=1)
-
-
-def get_edge_attention(graph_layer, graph, feat):
-    """
-    Return the edge attention weights of GAT layers
-    """
-    import dgl.function as fn
-    # copied relevant parts from source code
-    # https://docs.dgl.ai/_modules/dgl/nn/pytorch/conv/gatconv.html#GATConv
-    self = graph_layer
-    with graph.local_scope():
-        from dgl.ops import edge_softmax
-        h_src = self.feat_drop(feat)
-        feat_src = feat_dst = self.fc(h_src).view(-1, self._num_heads, self._out_feats)
-        el = (feat_src * self.attn_l).sum(dim=-1).unsqueeze(-1)
-        er = (feat_dst * self.attn_r).sum(dim=-1).unsqueeze(-1)
-        graph.srcdata.update({'ft': feat_src, 'el': el})
-        graph.dstdata.update({'er': er})
-        # compute edge attention, el and er are a_l Wh_i and a_r Wh_j respectively.
-        graph.apply_edges(fn.u_add_v('el', 'er', 'e'))
-        e = self.leaky_relu(graph.edata.pop('e'))
-        # compute softmax
-        return self.attn_drop(edge_softmax(graph, e))

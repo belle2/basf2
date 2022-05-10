@@ -1,14 +1,13 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# All PDG codes known to man
-# 0 at the bottom if for the motherPDG code given to the Y4S by CCNPandasPickle.py
-# James Kahn
-from __future__ import absolute_import
-pdgTokens = [
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+# PDG codes are taken from basf2/decfiles/dec
+PDG_TOKENS = [
     0,
-    # '(-->',
-    # ' <--)',
     329,
     110553,
     5,
@@ -550,30 +549,15 @@ pdgTokens = [
     20325,
 ]
 
-tokenize_dict = {v: k for k, v in enumerate(pdgTokens)}
+TOKENIZE_DICT = {v: k for k, v in enumerate(PDG_TOKENS)}
 
-preproc_config = {
-    "graph_format": "mothers",
+# preprocessing configurations
+PREPROC_CONFIG = {
     "cuts": ["abs(x) < 10", "abs(y) < 10", "abs(z) < 10"],
-    "fail_cuts": ["`nParticlesInList(B0:feiHadronic)` == 0"],
-    "features": ['PDG', 'prodTime', "energy", 'x', 'y', 'z', 'px', 'py', 'pz'],
-    "normalizers": {
-        "PDG": ["pdg_tokenizer"]
-    },
-    "decorrelation_features": [
-        'totalPhotonsEnergyOfEvent',
-        'deltaE',
-        'nTracks',
-        'missingMass2OfEvent',
-        'missingEnergyOfEventCMS',
-        'visibleEnergyOfEventCMS',
-        'foxWolframR4',
-        'sphericity',
-        'thrust',
-        'aplanarity',
-        'foxWolframR2',
-        'backwardHemisphereMomentum',
-        'nMCParticles',
-        'Mbc',
-    ]
+    "features": ['PDG', 'prodTime', "energy", 'x', 'y', 'z', 'px', 'py', 'pz']
+}
+
+# model configurations
+MODEL_CONFIG = {
+    "units": 32, "attention_heads": 4, "n_layers": 6, "use_gap": True
 }

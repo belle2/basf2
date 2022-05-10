@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# Make sure to have basf2 available before open jupyter/python or call
-# this module. In terminal: "source /cvmfs/belle.cern.ch/tools/b2setup
-# release-xx-xx-xx". Current release-06-00-03
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 import os
 import numpy as np
 
@@ -14,16 +16,11 @@ import basf2 as b2
 from ROOT import Belle2
 from ROOT.Belle2 import DBAccessorBase, DBStoreEntry
 
-from smartBKG import tokenize_dict, preproc_config
-from smartBKG.models.gatgap import SimpleGATModel
+from smartBKG import TOKENIZE_DICT, PREPROC_CONFIG, MODEL_CONFIG
+from smartBKG.models.gatgap import GATGAPModel
 
 os.environ["DGLBACKEND"] = "pytorch"
-device = torch.device("cpu")
-# print(torch.cuda.is_available())
-
-model_config = {
-    "units": 32, "attention_heads": 4, "n_layers": 6, "use_gap": True
-}
+DEVICE = torch.device("cpu")
 
 
 def check_status_bit(status_bit):
@@ -38,7 +35,7 @@ def check_status_bit(status_bit):
     )
 
 
-class GATApplyModule(b2.Module):
+class NNFilterModule(b2.Module):
     """
     Goals:
        1. Build a graph from an event composed of MCParticles
@@ -63,8 +60,8 @@ class GATApplyModule(b2.Module):
     def __init__(
         self,
         model_file=None,
-        model_config=model_config,
-        preproc_config=preproc_config,
+        model_config=MODEL_CONFIG,
+        preproc_config=PREPROC_CONFIG,
         threshold=None,
         extra_info_var="NN_prediction"
     ):
@@ -87,20 +84,21 @@ class GATApplyModule(b2.Module):
             payload = "GATGAPgen.pth"
             accessor = DBAccessorBase(DBStoreEntry.c_RawFile, payload, True)
             self.model_file = accessor.getFilename()
-        trained_parameters = torch.load(self.model_file, map_location=device)
+        trained_parameters = torch.load(self.model_file, map_location=DEVICE)
 
         # build model with trained parameters
-        self.model = SimpleGATModel(**model_config)
+        self.model = GATGAPModel(**self.model_config)
         self.model.load_state_dict(trained_parameters['model_state_dict'])
 
         # Create a StoreArray to save weights to
-        self.e_e_info = Belle2.PyStoreObj('EventExtraInfo')
-        self.e_e_info.registerInDataStore()
+        self.EventExtraInfo = Belle2.PyStoreObj('EventExtraInfo')
+        if not self.EventExtraInfo.isValid():
+            self.EventExtraInfo.registerInDataStore()
 
         # Store generated variables as node features in a graph
         self.gen_vars = defaultdict(list)
-        self.out_features = preproc_config['features']
-        if 'PDG' in preproc_config['features']:
+        self.out_features = self.preproc_config['features']
+        if 'PDG' in self.preproc_config['features']:
             self.out_features.remove('PDG')
 
     def event(self):
@@ -108,10 +106,10 @@ class GATApplyModule(b2.Module):
         Return match of event number to input list
         """
         # Initialize for every event
-        self.gen_vars = defaultdict(list)
+        self.gen_vars.clear()
 
         # Need to create the eventExtraInfo entry for each event
-        self.e_e_info.create()
+        self.EventExtraInfo.create()
 
         mcplist = Belle2.PyStoreArray("MCParticles")
 
@@ -143,14 +141,15 @@ class GATApplyModule(b2.Module):
                 self.gen_vars['py'].append(four_vec.Py())
                 self.gen_vars['pz'].append(four_vec.Pz())
                 self.gen_vars['PDG'].append(
-                    tokenize_dict[int(mcp.getPDG())]
+                    TOKENIZE_DICT[int(mcp.getPDG())]
                 )
 
                 # Particle level cutting
                 df = pd.DataFrame(self.gen_vars).tail(1)
-                df.query(" and ".join(preproc_config["cuts"]), inplace=True)
+                df.query(" and ".join(self.preproc_config["cuts"]), inplace=True)
                 if df.empty:
-                    [self.gen_vars[key].pop() for key in self.gen_vars.keys()]
+                    for values in self.gen_vars.values():
+                        values.pop()
                     continue
 
                 # Collect indices for graph
@@ -160,11 +159,6 @@ class GATApplyModule(b2.Module):
                     mother_indices.append(mother.getArrayIndex())
                 else:
                     mother_indices.append(0)
-
-        # Check the whole event
-        if len(self.gen_vars['PDG']) == 0:
-            print("Interpreted as pure fail dataframe.")
-            self.endRun()
 
         graph = self.build_graph(
             array_indices=array_indices, mother_indices=mother_indices,
@@ -176,18 +170,13 @@ class GATApplyModule(b2.Module):
         pred = torch.sigmoid(self.model(graph)).detach().numpy().squeeze()
 
         # Save the pass probability to EventExtraInfo
-        self.e_e_info.addExtraInfo(self.extra_info_var, pred)
+        self.EventExtraInfo.addExtraInfo(self.extra_info_var, pred)
 
         # Module returns bool of whether prediciton passes threshold for use in basf2 path flow control
         if self.threshold:
             self.return_value(int(pred >= self.threshold))
         else:
             self.return_value(int(pred >= np.random.rand()))
-
-    def terminate(self):
-        # del self.model
-        # print(self.e_e_info)
-        print('GATModule finished')
 
     def mapped_mother_indices(self, array_indices, mother_indices):
         """

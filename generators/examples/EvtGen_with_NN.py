@@ -1,3 +1,10 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 import sys
 
 # Custom functions
@@ -10,11 +17,11 @@ import modularAnalysis as ma
 import glob
 import mdst
 
-from smartBKG.models.GAT_apply_module import GATApplyModule
+from smartBKG.NN_filter_module import NNFilterModule
 
 # according to official MC14 mixed script
 # https://stash.desy.de/projects/B2P/repos/mc/browse/MC14/release-05-02-00/DB00001330/4S/mixed/mixed_eph3.py
-num_events = 100
+num_events = 1000
 out_dir = "./"
 
 # used for slurm batch, get job array id from slurm input
@@ -41,12 +48,12 @@ main.add_module("EventInfoSetter", expList=1003, runList=0, evtNumList=num_event
 ge.add_evtgen_generator(path=main, finalstate='mixed')
 
 # GAT prediction
-GATApplyModule_m = GATApplyModule(
+NNFilterModule_m = NNFilterModule(
         extra_info_var='GAT_AfterGen'
     )
 dead_path = b2.create_path()
-GATApplyModule_m.if_false(dead_path)
-main.add_module(GATApplyModule_m)
+NNFilterModule_m.if_false(dead_path)
+main.add_module(NNFilterModule_m)
 
 # Create the mDST output file directly after EvtGen, can be used for training NN
 mdst.add_mdst_output(

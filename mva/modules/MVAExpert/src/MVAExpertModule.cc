@@ -141,9 +141,11 @@ void MVAExpertModule::event()
       Particle* particle = list->getParticle(i);
       float targetValue = analyse(particle);
       if (particle->hasExtraInfo(m_extraInfoName)) {
-        m_existGivenExtraInfo = true;
-        if (m_overwriteExistingExtraInfo)
-          particle->setExtraInfo(m_extraInfoName, targetValue);
+        if (particle->getExtraInfo(m_extraInfoName) != targetValue) {
+          m_existGivenExtraInfo = true;
+          if (m_overwriteExistingExtraInfo)
+            particle->setExtraInfo(m_extraInfoName, targetValue);
+        }
       } else {
         particle->addExtraInfo(m_extraInfoName, targetValue);
       }

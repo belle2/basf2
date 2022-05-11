@@ -176,9 +176,11 @@ void MVAMultipleExpertsModule::event()
 
       for (unsigned int j = 0; j < m_identifiers.size(); ++j) {
         if (particle->hasExtraInfo(m_extraInfoNames[j])) {
-          m_existGivenExtraInfo[j] = true;
-          if (m_overwriteExistingExtraInfo[j])
-            particle->setExtraInfo(m_extraInfoNames[j], targetValues[j]);
+          if (particle->getExtraInfo(m_extraInfoNames[j]) != targetValues[j]) {
+            m_existGivenExtraInfo[j] = true;
+            if (m_overwriteExistingExtraInfo[j])
+              particle->setExtraInfo(m_extraInfoNames[j], targetValues[j]);
+          }
         } else {
           particle->addExtraInfo(m_extraInfoNames[j], targetValues[j]);
         }

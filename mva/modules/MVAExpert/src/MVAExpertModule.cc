@@ -40,6 +40,9 @@ MVAExpertModule::MVAExpertModule() : Module()
   addParam("identifier", m_identifier, "The database identifier which is used to load the weights during the training.");
   addParam("signalFraction", m_signal_fraction_override,
            "signalFraction to calculate probability (if -1 the signalFraction of the training data is used)", -1.0);
+  addParam("overwriteExistingExtraInfo", m_overwriteExistingExtraInfo,
+           "If true, when the given extraInfo has already defined, the old extraInfo value is overwritten. If false, the original value is kept.",
+           true);
 }
 
 void MVAExpertModule::initialize()
@@ -64,6 +67,7 @@ void MVAExpertModule::initialize()
   }
   MVA::AbstractInterface::initSupportedInterfaces();
 
+  m_existGivenExtraInfo = false;
 }
 
 void MVAExpertModule::beginRun()
@@ -138,8 +142,9 @@ void MVAExpertModule::event()
       float targetValue = analyse(particle);
       if (particle->hasExtraInfo(m_extraInfoName)) {
         if (particle->getExtraInfo(m_extraInfoName) != targetValue) {
-          B2WARNING("Extra Info with given name is already set! Overwriting old value!");
-          particle->setExtraInfo(m_extraInfoName, targetValue);
+          m_existGivenExtraInfo = true;
+          if (m_overwriteExistingExtraInfo)
+            particle->setExtraInfo(m_extraInfoName, targetValue);
         }
       } else {
         particle->addExtraInfo(m_extraInfoName, targetValue);
@@ -150,11 +155,28 @@ void MVAExpertModule::event()
     StoreObjPtr<EventExtraInfo> eventExtraInfo;
     if (not eventExtraInfo.isValid())
       eventExtraInfo.create();
+
+    float targetValue = analyse(nullptr);
     if (eventExtraInfo->hasExtraInfo(m_extraInfoName)) {
-      B2WARNING("Extra Info with given name is already set! I won't set it again!");
+      m_existGivenExtraInfo = true;
+      if (m_overwriteExistingExtraInfo)
+        eventExtraInfo->setExtraInfo(m_extraInfoName, targetValue);
     } else {
-      float targetValue = analyse(nullptr);
       eventExtraInfo->addExtraInfo(m_extraInfoName, targetValue);
     }
+  }
+}
+
+void MVAExpertModule::terminate()
+{
+  m_expert.reset();
+  m_dataset.reset();
+
+  if (m_existGivenExtraInfo) {
+    if (m_overwriteExistingExtraInfo)
+      B2WARNING("The extraInfo " << m_extraInfoName << " has already been set! It was overwritten by this module!");
+    else
+      B2WARNING("The extraInfo " << m_extraInfoName << " has already been set! "
+                << "The original value was kept and this module did not overwrite it!");
   }
 }

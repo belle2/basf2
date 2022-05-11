@@ -63,8 +63,6 @@ void VariablesToNtupleModule::initialize()
   if (not m_particleList.empty())
     StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
-  m_stringWrapper.isOptional("MCDecayString");
-
   // Initializing the output root file
   if (m_fileName.empty()) {
     B2FATAL("Output root file name is not set. Please set a valid root output file name (\"fileName\" module parameter).");
@@ -111,7 +109,8 @@ void VariablesToNtupleModule::initialize()
     m_tree->get().Branch("__ncandidates__", &m_ncandidates, "__ncandidates__/I");
   }
 
-  m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
+  if (m_stringWrapper.isOptional("MCDecayString"))
+    m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
 
   for (const auto& variable : m_variables)
     if (Variable::isCounterVariable(variable)) {

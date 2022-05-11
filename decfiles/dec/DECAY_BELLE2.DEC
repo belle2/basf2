@@ -3963,9 +3963,15 @@ Decay B+
 #
 0.001005560   J/psi  K+                                    SVS; #[BF update - PG 09/2020]
 
-0.001429920   J/psi  K*+                                   SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_280 PDGLive => Exclusive BF. #[BF update - PG 09/2020]
-0.000189690   J/psi  K0  pi+                               PHSP; #Gamma_276 PDGLive => 0.001142970. Subtract K* component: BF = 0.001142970 - 2/3 * 0.001429920.   #[BF update - PG 09/2020]
-0.000094840   J/psi  K+  pi0                               PHSP; #No PDGLive value. From Isospin: BF(J/psi K+ pi0) = BF(J/psi K0 pi+) / 2.                         #[BF update - PG 09/2020]
+#$ BF('S041:Desig=142')
+0.001430000   J/psi  K*+                                   SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[BF update - KC 05/2022]
+# Requires subtraction of K* component.
+#$ BF('S041:Desig=612') - BF('S041:Desig=142') * 2 / 3
+0.000186667   J/psi  K0  pi+                               PHSP; #[BF update - KC 05/2022]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('J/psi K0 pi+') / 2
+0.000093333   J/psi  K+  pi0                               PHSP; #[BF update - PG 05/2022]
 
 0.000038670   J/psi  pi+                                   SVS;  #[BF update - PG 09/2020]
 0.000040970   J/psi  rho+                                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[BF update - PG 09/2020]
@@ -5471,9 +5477,15 @@ Decay B-
 #
 0.001005560   J/psi  K-                                    SVS; #[BF update - PG 09/2020]
 
-0.001429920   J/psi  K*-                                   SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_280 PDGLive => Exclusive BF. #[BF update - PG 09/2020]
-0.000189690   J/psi  anti-K0  pi-                          PHSP; #Gamma_276 PDGLive => Exclusive BF.                                                               #[BF update - PG 09/2020]
-0.000094840   J/psi  K-  pi0                               PHSP; #No PDGLive value. From Isospin: BF(J/psi K+ pi0) = BF(J/psi K0 pi+) / 2.                         #[BF update - PG 09/2020]
+#$ BF('S041:Desig=142')
+0.001430000   J/psi  K*-                                   SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[BF update - PG 05/2022]
+# Requires subtraction of K* component.
+#$ BF('S041:Desig=612') - BF('S041:Desig=142') * 2 / 3
+0.000186667   J/psi  anti-K0  pi-                         PHSP; #[BF update - KC 05/2022]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('J/psi K0 pi+') / 2
+0.000093333   J/psi  K-  pi0                               PHSP; #[BF update - KC 05/2022]
 
 0.000038670   J/psi  pi-                                   SVS;  #[BF update - PG 09/2020]
 0.000040970   J/psi  rho-                                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;  #[BF update - PG 09/2020]

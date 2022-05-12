@@ -116,10 +116,10 @@ namespace Belle2 {
                 ss << "ch# " << ch << "(" << val << ") ";
                 hasHit = true;
                 if (febno < 0 || febno > 6) {
-                  B2ERROR("FEB is bad : " << febno << " hslb-" << finesse << ":"
-                          << " type=" << type_feb << ", ver=" << ver << " "
-                          << ", boardid=" << boardid << ", febno=" << febno
-                          << ", length=" << length << ", evtno=" << evtno);
+                  B2ERROR("FEB is bad:" << LogVar("FEB", int(febno) + " hslb-" + finesse)
+                          << LogVar("type", type_feb) << LogVar("ver", ver)
+                          << LogVar("boardid", boardid) << LogVar("febno", febno)
+                          << LogVar("length", length) << LogVar("evtno", evtno));
                 }
                 feb.push_back(ch, val);
               }
@@ -138,10 +138,10 @@ namespace Belle2 {
                 ss << "ch# " << ch << "(" << val << ") ";
                 hasHit = true;
                 if (febno < 0 || febno > 6) {
-                  B2ERROR("FEB is bad : " << febno << " hslb-" << finesse << ":"
-                          << " type=" << type_feb << ", ver=" << ver << " "
-                          << ", boardid=" << boardid << ", febno=" << febno
-                          << ", length=" << length << ", evtno=" << evtno);
+                  B2ERROR("FEB is bad:" << LogVar("FEB", int(febno) + " hslb-" + finesse)
+                          << LogVar("type", type_feb) << LogVar("ver", ver)
+                          << LogVar("boardid", boardid) << LogVar("febno", febno)
+                          << LogVar("length", length) << LogVar("evtno", evtno));
                   return;
                 }
                 feb.push_back(ch, val);

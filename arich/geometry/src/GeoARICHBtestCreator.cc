@@ -411,7 +411,7 @@ namespace Belle2 {
         //setVisibility(*mwpc, true);
 
         int id = mwpc.getInt("@id", -1);
-        B2INFO("GeoARICHBtestCreator:: MWPC ID=" << id);
+        B2INFO("GeoARICHBtestCreator::" << LogVar("MWPC ID", id));
         if (id < 4 && id >= 0) {
           m_mwpc[id].tdc[0]   = mwpc.getInt("tdc/y/up");
           m_mwpc[id].tdc[1]   = mwpc.getInt("tdc/y/down");

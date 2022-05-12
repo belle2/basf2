@@ -39,7 +39,7 @@ CalibrationAlgorithm::EResult ARICHChannelMaskMaker::calibrate()
 
   double ringChnAvg[7] = {0.};
   double ringChnAvgS2N[7] = {0.};
-  int hapdInRing[7] = {42, 48, 54, 60, 66, 72, 78};
+  const int hapdInRing[7] = {42, 48, 54, 60, 66, 72, 78};
 
   for (int bin = 1; bin < numChannels; ++bin) {
     int moduleID = (bin - 1) / NumberOfChannelsPerHapd + 1;

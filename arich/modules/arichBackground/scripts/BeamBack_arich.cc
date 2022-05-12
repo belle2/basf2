@@ -132,7 +132,7 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
   Belle2::ARICHChannelHist* mapsNeutrons[9];
   Belle2::ARICHChannelHist* mapsDose[9];
 
-  TString tHist[9] = {"RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER", "twoPhoton", "brems", "total"};
+  const TString tHist[9] = {"RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER", "twoPhoton", "brems", "total"};
 
   for (int i = 0; i < 9; i++) {
     mapsPhotons[i] = new Belle2::ARICHChannelHist("photonFlux_" + tHist[i], "photons / cm^2 / s - " + tHist[i], 1);
@@ -291,7 +291,7 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
     }
   }
 
-  double nhapd[7] = {42., 48., 54., 60., 66., 72., 78.}; // 7 rings
+  const double nhapd[7] = {42., 48., 54., 60., 66., 72., 78.}; // 7 rings
 
   // This is important. nflux_board holds total flux of neutrons wighted by 1MeV equiv. factor in a given
   // time "time". Here this is transformed in flux/cm^2/year.

@@ -315,7 +315,7 @@ def printPrimaryMCParticles(path, **kwargs):
 
 
 def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
-                     showProperties=False, showMomenta=False, showVertices=False, showStatus=False):
+                     showProperties=False, showMomenta=False, showVertices=False, showStatus=False, suppressPrint=False):
     """
     Prints all MCParticles or just primary MCParticles up to specified level. -1 means no limit.
 
@@ -413,6 +413,12 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
                 ├── K*+ (323) → …
                 ╰── pi- (-211)
 
+    The same information will be stored in the branch ``__MCDecayString__`` of
+    TTree created by `VariablesToNtuple` or `VariablesToEventBasedTree` module.
+    This branch is automatically created when `PrintMCParticles` modules is called.
+    Printing the information on the log message can be suppressed if ``suppressPrint``
+    is True, while the branch ``__MCDecayString__``. This option helps to reduce the
+    size of the log message.
 
     Parameters:
         onlyPrimaries (bool): If True show only primary particles, that is particles coming from
@@ -423,6 +429,8 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
         showVertices (bool): if True show production vertex and production time of all particles
         showStatus (bool): if True show some status information on the particles.
             For secondary particles this includes creation process.
+        suppressPrint (bool): if True printing the information on the log message is suppressed.
+            Even if True, the branch ``__MCDecayString__`` is created.
     """
 
     return path.add_module(
@@ -433,6 +441,7 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
         showMomenta=showMomenta,
         showVertices=showVertices,
         showStatus=showStatus,
+        suppressPrint=suppressPrint,
     )
 
 

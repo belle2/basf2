@@ -56,23 +56,33 @@ void TRGCDCT3DUnpackerModule::initialize()
   if (m_T3DMOD == 0) {
     m_copper_address = 0x11000003;
     m_copper_ab = 0;
+    m_pcie40_address = 0x10000001;
+    m_pcie40_ch = 4;
 //    m_nword = 3075;
   } else if (m_T3DMOD == 1) {
     m_copper_address = 0x11000003;
     m_copper_ab = 1;
+    m_pcie40_address = 0x10000001;
+    m_pcie40_ch = 5;
 //    m_nword = 3075;
   } else if (m_T3DMOD == 2) {
     m_copper_address = 0x11000004;
     m_copper_ab = 0;
+    m_pcie40_address = 0x10000001;
+    m_pcie40_ch = 6;
 //    m_nword = 3075;
   } else if (m_T3DMOD == 3) {
     m_copper_address = 0x11000004;
     m_copper_ab = 1;
+    m_pcie40_address = 0x10000001;
+    m_pcie40_ch = 7;
 //    m_nword = 3075;
   } else {
     B2ERROR("trgcdct3dunpacker:cooper address is not set");
     m_copper_address = 0;
     m_copper_ab = 0;
+    m_pcie40_address = 0;
+    m_pcie40_ch = 0;
 //    m_nword = 3075;
   }
 
@@ -90,20 +100,37 @@ void TRGCDCT3DUnpackerModule::event()
 {
   StoreArray<RawTRG> raw_trgarray;
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
-    for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
-      if (raw_trgarray[i]->GetNodeID(j) == m_copper_address) {
 
-        if (raw_trgarray[i]->GetDetectorNwords(j, m_copper_ab) == m_nword_2k) {
-          int firm_id = (raw_trgarray[i]->GetDetectorBuffer(j, m_copper_ab))[0];
+    // Check PCIe40 data or Copper data
+    if (raw_trgarray[i]->GetMaxNumOfCh(0) == 48) { m_pciedata = true; }
+    else if (raw_trgarray[i]->GetMaxNumOfCh(0) == 4) { m_pciedata = false; }
+    else { B2FATAL("TRGCDCT3DUnpackerModule: Invalid value of GetMaxNumOfCh from raw data: " << LogVar("Number of ch: ", raw_trgarray[i]->GetMaxNumOfCh(0))); }
+
+    unsigned int node_id = 0;
+    unsigned int ch_id = 0;
+    if (m_pciedata) {
+      node_id = m_pcie40_address;
+      ch_id = m_pcie40_ch;
+    } else {
+      node_id = m_copper_address;
+      ch_id = m_copper_ab;
+    }
+
+    for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
+
+      if (raw_trgarray[i]->GetNodeID(j) == node_id) {
+
+        if (raw_trgarray[i]->GetDetectorNwords(j, ch_id) == m_nword_2k) {
+          int firm_id = (raw_trgarray[i]->GetDetectorBuffer(j, ch_id))[0];
           if (firm_id == 0x32444620) { // 2D fitter
-            fillTreeTRGCDCT3DUnpacker_2dfitter(raw_trgarray[i]->GetDetectorBuffer(j, m_copper_ab), raw_trgarray[i]->GetEveNo(j));
+            fillTreeTRGCDCT3DUnpacker_2dfitter(raw_trgarray[i]->GetDetectorBuffer(j, ch_id), raw_trgarray[i]->GetEveNo(j));
           } else {
-            fillTreeTRGCDCT3DUnpacker(raw_trgarray[i]->GetDetectorBuffer(j, m_copper_ab), raw_trgarray[i]->GetEveNo(j));
+            fillTreeTRGCDCT3DUnpacker(raw_trgarray[i]->GetDetectorBuffer(j, ch_id), raw_trgarray[i]->GetEveNo(j));
           }
         }
         // 2.6k, 15 TS version
-        else if (raw_trgarray[i]->GetDetectorNwords(j, m_copper_ab) == m_nword_2624) {
-          fillTreeTRGCDCT3DUnpacker_2624(raw_trgarray[i]->GetDetectorBuffer(j, m_copper_ab), raw_trgarray[i]->GetEveNo(j));
+        else if (raw_trgarray[i]->GetDetectorNwords(j, ch_id) == m_nword_2624) {
+          fillTreeTRGCDCT3DUnpacker_2624(raw_trgarray[i]->GetDetectorBuffer(j, ch_id), raw_trgarray[i]->GetEveNo(j));
         }
       }
     }

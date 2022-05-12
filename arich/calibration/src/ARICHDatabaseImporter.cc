@@ -1174,7 +1174,7 @@ void ARICHDatabaseImporter::dumpAerogelOpticalProperties(std::string outRootFile
   ARICHAerogelHist* h2_aerogel_down_thick = new ARICHAerogelHist("h2_aerogel_down_thick", "aerogel down thick");
 
   std::string condDBname = "ARICHdata";
-
+  // cppcheck-suppress knownConditionTrueFalse
   if (condDBname == "ARICHdata") {
 
     //

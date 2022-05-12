@@ -99,3 +99,15 @@ PID Priors
    the effect of outliers on the training.
  * For evaluating priors, ``evalPriors`` module containing the ``Priors`` class has been added to calculate these using
    the trained model. Additionally, posteriors can also be obtained by providing PID's from the detector signals.
+
+MC Truth Information
+++++++++++++++++++++
+
+ * The :b2:mod:`PrintMCParticles` and :b2:mod:`VariablesToNtuple` (:b2:mod:`VariablesToEventBasedTree`) are extended.
+   The MCParticles information printed by the :b2:mod:`PrintMCParticles` module can be stored in TTree via 
+   :b2:mod:`VariablesToNtuple` and :b2:mod:`VariablesToEventBasedTree`. When the :b2:mod:`PrintMCParticles`
+   is called, the branch ``__MCDecayString__`` is automatically created and the same information that is printed
+   by the :b2:mod:`PrintMCParticles`.
+ * An argument ``suppressPrint`` is added to `modularAnalysis.printMCParticles` to suppress printing the information
+   on the log message. This option helps to reduce the size of the log message while keeping the branch
+   ``__MCDecayString__`` in a TTree.

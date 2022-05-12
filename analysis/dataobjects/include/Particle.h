@@ -706,6 +706,13 @@ namespace Belle2 {
     //Need namespace qualifier because ROOT CINT has troubles otherwise
 
     /**
+     * Returns a vector of pointers to all generation's daughter particles
+     * @return vector of pointers to all generation's daughter particles
+     */
+    std::vector<const Belle2::Particle*> getAllDaughters() const;
+    //Need namespace qualifier because ROOT CINT has troubles otherwise
+
+    /**
      * Returns a vector of StoreArray indices of given MDST dataobjects
      *
      * @param type EParticleSourceObject corresponding to a given MDST dataobject
@@ -1022,6 +1029,13 @@ namespace Belle2 {
      * @param fspDaughters vector of daughter particles
      */
     void fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughters) const;
+    /**
+     * Fill all generation's daughters into a vector
+     *
+     * Function is called recursively
+     * @param fspDaughters vector of daughter particles
+     */
+    void fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const;
 
     /**
      * Fill vector with (PDGCode, MdstSource) pairs for the entire decay chain.
@@ -1050,7 +1064,7 @@ namespace Belle2 {
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
 
-    ClassDefOverride(Particle, 15); /**< Class to store reconstructed particles. */
+    ClassDefOverride(Particle, 16); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
@@ -1059,6 +1073,7 @@ namespace Belle2 {
     // v13: added m_momentumScale
     // v14: added m_jacobiMatrix
     // v15: added m_momentumScalingFactor and m_momentumSmearingFactor
+    // v16: added fillAllDaughters and getAllDaughters
 
     friend class ParticleSubset;
   };

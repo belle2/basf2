@@ -14,7 +14,7 @@ using namespace Belle2;
 ARICHChannelMaskMaker::ARICHChannelMaskMaker(): CalibrationAlgorithm("ARICHChannelMask")
 {
   setDescription(
-    " --------------------- ARICHChannelMask Calibration Algoritm ------------------\n"
+    " --------------------- ARICHChannelMask Calibration Algorithm -----------------\n"
     "                                                                               \n"
     "  Produces channel mask for arich hot/dead channels, based on criteria of      \n"
     "  minimal and maximal occupancy                                                \n"
@@ -55,7 +55,7 @@ CalibrationAlgorithm::EResult ARICHChannelMaskMaker::calibrate()
     ringChnAvg[i] /= float(hapdInRing[i] * NumberOfChannelsPerHapd);
     ringChnAvgS2N[i] /= float(hapdInRing[i] * NumberOfChannelsPerHapd);
   }
-  B2INFO("Average hits in channel in outter HAPD ring is " << ringChnAvg[6] << " (which is less that minimaly required,  " <<
+  B2INFO("Average hits in channel in outer HAPD ring is " << ringChnAvg[6] << " (which is less that minimally required,  " <<
          m_minHitPerChn << ")");
   if (ringChnAvg[6] < m_minHitPerChn) return c_NotEnoughData;
 

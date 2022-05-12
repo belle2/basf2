@@ -469,8 +469,13 @@ Decay B0
 0.000098333   psi(2S)  K*L                                 SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
 0.000393333   psi(2S)  K*0T                                SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
 
-0.000186667   psi(2S)  K+  pi-                             PHSP; #Gamma_256 PDGLive => 5.8e-4 includes K*0. Subtract K* component: BF(psi(2S) K+ pi-) = 0.00058 - 2/3 * 0.00059. #[BF update - PG 09/2020]
-0.000093333   psi(2S)  K0  pi0                             PHSP; #No PDGLive value. Assume BF(psi(2S) K0 pi0) = BF(psi(2S) K+ pi-) / 2. #[BF update - PG 09/2020]
+# Requires subtraction of K* component.
+#$ BF('S042:Desig=70') - BF('S042:Desig=69') * BF('M018:Desig=12') * 2 / 3
+0.000186667   psi(2S)  K+  pi-                             PHSP; #[BF update - PG 09/2020]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('B0 -> psi(2S) K+ pi-') / 2
+0.000093333   psi(2S)  K0  pi0                             PHSP; #[BF update - PG 09/2020]
 0.000200000   psi(2S)  K0  pi-  pi+                        PHSP;
 0.000100000   psi(2S)  K0  pi0  pi0                        PHSP;
 0.000100000   psi(2S)  K+  pi-  pi0                        PHSP;
@@ -2231,8 +2236,13 @@ Decay anti-B0
 0.000098333   psi(2S)  K*L                                 SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
 0.000393333   psi(2S)  anti-K*0T                           SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
 
-0.000186667   psi(2S)  K-  pi+                             PHSP; #Gamma_256 PDGLive => 5.8e-4 includes K*0. Subtract K* component: BF(psi(2S) K+ pi-) = 0.00058 - 2/3 * 0.00059. #[BF update - PG 09/2020]
-0.000093333   psi(2S)  anti-K0  pi0                        PHSP; #No PDGLive value. Assume BF(psi(2S) K0 pi0) = BF(psi(2S) K+ pi-) / 2. #[BF update - PG 09/2020]
+# Requires subtraction of K* component.
+#$ BF('S042:Desig=70') - BF('S042:Desig=69') * BF('M018:Desig=12') * 2 / 3
+0.000186667   psi(2S)  K-  pi+                             PHSP; #[BF update - PG 09/2020]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('B0 -> psi(2S) K- pi+') / 2
+0.000093333   psi(2S)  anti-K0  pi0                        PHSP; #[BF update - PG 09/2020]
 0.000200000   psi(2S)  anti-K0  pi+  pi-                   PHSP;
 0.000100000   psi(2S)  anti-K0  pi0  pi0                   PHSP;
 0.000100000   psi(2S)  K-  pi+  pi0                        PHSP;
@@ -3963,10 +3973,9 @@ Decay B+
 #
 0.001005560   J/psi  K+                                    SVS; #[BF update - PG 09/2020]
 
-#$ BF('S041:Desig=142')
 0.001430000   J/psi  K*+                                   SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[BF update - KC 05/2022]
 # Requires subtraction of K* component.
-#$ BF('S041:Desig=612') - BF('S041:Desig=142') * 2 / 3
+#$ BF('S041:Desig=612') - BF('S041:Desig=142') * BF('M018:Desig=11') * 2 / 3
 0.000186667   J/psi  K0  pi+                               PHSP; #[BF update - KC 05/2022]
 # This branching fraction is not measured. The value is assigned
 # from isospin relation.
@@ -3994,8 +4003,13 @@ Decay B+
 0.000619130   psi(2S)  K+                                  SVS;  #[BF update - PG 09/2020]
 
 0.000667680   psi(2S)  K*+                                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_312 PDGLive => Exclusive BF.                         #[BF update - PG 09/2020]
-0.000142880   psi(2S)  K0  pi+                             PHSP; #Gamma_313 PDGLive => No Value. Unused BaBar BF=0.000588000. Subtract K* component: BF = 0.000588000 - 2/3 * 0.000667680. #[BF update - PG 09/2020]
-0.000071440   psi(2S)  K+  pi0                             PHSP; #No PDGLive value. From Isospin: BF(psi(2S) K+ pi0) = BF(psi(2S) K0 pi+) / 2.                                             #[BF update - PG 09/2020]
+# Requires subtraction of K* component. No value, unused BaBar BF=0.000588000.
+#$ BF('S041:Desig=613') - BF('S041:Desig=143') * BF('M018:Desig=11') * 2 / 3
+0.000142880   psi(2S)  K0  pi+                             PHSP; #[BF update - PG 09/2020]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('B+ -> psi(2S) K0 pi+') / 2
+0.000071440   psi(2S)  K+  pi0                             PHSP; #[BF update - PG 09/2020]
 
 0.000434100   psi(2S)  K+  pi+  pi-                        PHSP; #[BF update - PG 09/2020]
 0.000100000   psi(2S)  K+  pi0  pi0                        PHSP;
@@ -5479,10 +5493,9 @@ Decay B-
 #
 0.001005560   J/psi  K-                                    SVS; #[BF update - PG 09/2020]
 
-#$ BF('S041:Desig=142')
-0.001430000   J/psi  K*-                                   SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[BF update - PG 05/2022]
+0.001430000   J/psi  K*-                                   SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[BF update - KC 05/2022]
 # Requires subtraction of K* component.
-#$ BF('S041:Desig=612') - BF('S041:Desig=142') * 2 / 3
+#$ BF('S041:Desig=612') - BF('S041:Desig=142') * BF('M018:Desig=11') * 2 / 3
 0.000186667   J/psi  anti-K0  pi-                         PHSP; #[BF update - KC 05/2022]
 # This branching fraction is not measured. The value is assigned
 # from isospin relation.
@@ -5510,8 +5523,13 @@ Decay B-
 0.000619130   psi(2S)  K-                                  SVS;  #[BF update - PG 09/2020]
 
 0.000667680   psi(2S)  K*-                                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #Gamma_312 PDGLive => Exclusive BF.                         #[BF update - PG 09/2020]
-0.000142880   psi(2S)  anti-K0  pi-                        PHSP; #Gamma_313 PDGLive => No Value. Unused BaBar BF=0.000588000. Subtract K* component: BF = 0.000588000 - 2/3 * 0.000667680. #[BF update - PG 09/2020]
-0.000071440   psi(2S)  K-  pi0                             PHSP; #No PDGLive value. From Isospin: BF(psi(2S) K+ pi0) = BF(psi(2S) K0 pi+) / 2.                                             #[BF update - PG 09/2020]
+# Requires subtraction of K* component. No value, unused BaBar BF=0.000588000.
+#$ BF('S041:Desig=613') - BF('S041:Desig=143') * BF('M018:Desig=11') * 2 / 3
+0.000142880   psi(2S)  anti-K0  pi-                        PHSP; #[BF update - PG 09/2020]
+# This branching fraction is not measured. The value is assigned
+# from isospin relation.
+#$ BF('B- -> psi(2S) anti-K0 pi-') / 2
+0.000071440   psi(2S)  K-  pi0                             PHSP; #[BF update - PG 09/2020]
 
 0.000434100   psi(2S)  K-  pi+  pi-                        PHSP; #[BF update - PG 09/2020]
 0.000100000   psi(2S)  K-  pi0  pi0                        PHSP;

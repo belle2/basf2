@@ -47,16 +47,16 @@ namespace Belle2 {
 
     int nDaughterCharged(const Particle* particle, const std::vector<double>& argument)
     {
-      int pdgCode = 0;
+      int absPDGCode = 0;
       if (argument.size() == 1) {
-        pdgCode = std::lround(argument[0]);
+        absPDGCode = abs(std::lround(argument[0]));
       }
 
       int result = 0;
       auto fspDaughters = particle->getFinalStateDaughters();
       for (auto* daughter : fspDaughters) {
-        if (pdgCode != 0) {
-          if (abs(daughter->getPDGCode()) == pdgCode) {
+        if (absPDGCode != 0) {
+          if (abs(daughter->getPDGCode()) == absPDGCode) {
             result++;
           }
         } else if (abs(daughter->getCharge()) > 0) {
@@ -68,9 +68,9 @@ namespace Belle2 {
 
     int nCompositeDaughters(const Particle* particle, const std::vector<double>& argument)
     {
-      int pdgCode = 0;
+      int absPDGCode = 0;
       if (argument.size() == 1) {
-        pdgCode = std::lround(argument[0]);
+        absPDGCode = abs(std::lround(argument[0]));
       }
 
       int result = 0;
@@ -78,8 +78,8 @@ namespace Belle2 {
       for (auto* daughter : primaryDaughters) {
         if (daughter->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
             daughter->getParticleSource() == Particle::EParticleSourceObject::c_V0) {
-          if (pdgCode != 0) {
-            if (abs(daughter->getPDGCode()) == pdgCode) {
+          if (absPDGCode != 0) {
+            if (abs(daughter->getPDGCode()) == absPDGCode) {
               result++;
             }
           } else {
@@ -92,9 +92,9 @@ namespace Belle2 {
 
     int nCompositeAllGenerationDaughters(const Particle* particle, const std::vector<double>& argument)
     {
-      int pdgCode = 0;
+      int absPDGCode = 0;
       if (argument.size() == 1) {
-        pdgCode = std::lround(argument[0]);
+        absPDGCode = abs(std::lround(argument[0]));
       }
 
       int result = 0;
@@ -102,8 +102,8 @@ namespace Belle2 {
       for (auto* daughter : allDaughters) {
         if (daughter->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
             daughter->getParticleSource() == Particle::EParticleSourceObject::c_V0) {
-          if (pdgCode != 0) {
-            if (abs(daughter->getPDGCode()) == pdgCode) {
+          if (absPDGCode != 0) {
+            if (abs(daughter->getPDGCode()) == absPDGCode) {
               result++;
             }
           } else {

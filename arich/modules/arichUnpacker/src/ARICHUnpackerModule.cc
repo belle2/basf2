@@ -37,10 +37,10 @@ namespace Belle2 {
   //using namespace ARICH;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(ARICHUnpacker)
+  REG_MODULE(ARICHUnpacker);
 
   //-----------------------------------------------------------------
   //                 Implementation

@@ -2193,7 +2193,7 @@ Decay anti-B0
 0.000303333   J/psi  K-  pi+                               PHSP; #[BF update - PG 09/2020]
 # This branching fraction is not measured. The value is assigned
 # from isospin relation.
-#$ BF('B0 -> J/psi K+ pi-') / 2
+#$ BF('anti-B0 -> J/psi K- pi+') / 2
 0.000151665   J/psi  anti-K0  pi0                          PHSP; #[BF update - PG 09/2020]
 
 0.000016570   J/psi  pi0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;                #[BF update - PG 09/2020]
@@ -3970,7 +3970,7 @@ Decay B+
 0.000186667   J/psi  K0  pi+                               PHSP; #[BF update - KC 05/2022]
 # This branching fraction is not measured. The value is assigned
 # from isospin relation.
-#$ BF('J/psi K0 pi+') / 2
+#$ BF('B+ -> J/psi K0 pi+') / 2
 0.000093333   J/psi  K+  pi0                               PHSP; #[BF update - PG 05/2022]
 
 0.000038670   J/psi  pi+                                   SVS;  #[BF update - PG 09/2020]
@@ -5486,7 +5486,7 @@ Decay B-
 0.000186667   J/psi  anti-K0  pi-                         PHSP; #[BF update - KC 05/2022]
 # This branching fraction is not measured. The value is assigned
 # from isospin relation.
-#$ BF('J/psi K0 pi+') / 2
+#$ BF('B- -> J/psi anti-K0 pi-') / 2
 0.000093333   J/psi  K-  pi0                               PHSP; #[BF update - KC 05/2022]
 
 0.000038670   J/psi  pi-                                   SVS;  #[BF update - PG 09/2020]

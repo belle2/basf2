@@ -271,7 +271,7 @@ namespace Belle2 {
     ARICHBtestGeometryPar* _arichbtgp = ARICHBtestGeometryPar::Instance();
     //-----------------------------------------------------
 
-    int bmask = 0xF;
+    unsigned int bmask = 0xF;
 
     for (int module = 0; module < 6; module++) {
       int istart = 19 * module;

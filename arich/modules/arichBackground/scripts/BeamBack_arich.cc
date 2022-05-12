@@ -149,8 +149,8 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
   double flux_phot[420][8];
   double edep_board_all[420]; // sum of background from all sources
   double nflux_board_all[420];
-  double edep_hapd_all[420];
-  double nflux_hapd_all[420];
+  // double edep_hapd_all[420];
+  // double nflux_hapd_all[420];
   double phot_all[420];
 
   // hapd x,y positions
@@ -165,8 +165,8 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
       nflux_hapd[i][j] = 0;
       flux_phot[i][j] = 0;
       origins[i][0] = 0.; origins[i][1] = 0.;
-      edep_board_all[i] = 0.; edep_hapd_all[i] = 0.;
-      nflux_board_all[i] = 0.; nflux_hapd_all[i] = 0.;
+      edep_board_all[i] = 0.; // edep_hapd_all[i] = 0.;
+      nflux_board_all[i] = 0.; // nflux_hapd_all[i] = 0.;
       phot_all[i] = 0.;
     }
   }
@@ -312,9 +312,9 @@ void BeamBack_arich(std::string path = "/gpfs/home/belle/mmanca/basf2/background
       flux_phot[i][j] = flux_phot[i][j] * 1.E+6 / 53.29 / time;  // photocathode size = 7.3x7.3cm
 
       edep_board_all[i] += edep_board[i][j];
-      edep_hapd_all[i] += edep_hapd[i][j];
+      // edep_hapd_all[i] += edep_hapd[i][j];
       nflux_board_all[i] += nflux_board[i][j];
-      nflux_hapd_all[i] += nflux_hapd[i][j];
+      // nflux_hapd_all[i] += nflux_hapd[i][j];
       phot_all[i] += flux_phot[i][j];
 
       avgeb[nrow][j] += edep_board[i][j] / nhapd[nrow];

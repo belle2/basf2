@@ -38,7 +38,7 @@ CalibrationAlgorithm::EResult ARICHChannelMaskMaker::calibrate()
   auto* mask = new ARICHChannelMask();
 
   double ringChnAvg[7] = {0.};
-  double ringChnAvgS2N[7] = {0.};
+  // double ringChnAvgS2N[7] = {0.};
   const int hapdInRing[7] = {42, 48, 54, 60, 66, 72, 78};
 
   for (int bin = 1; bin < numChannels; ++bin) {
@@ -48,12 +48,12 @@ CalibrationAlgorithm::EResult ARICHChannelMaskMaker::calibrate()
     int ring = getRing(moduleID);
     if (nsig / float(nevt) > 0.02) continue; // skip channels with anomalously high occupancy
     ringChnAvg[ring] += nsig;
-    ringChnAvgS2N[ring] += s2n;
+    // ringChnAvgS2N[ring] += s2n;
   }
 
   for (int i = 0; i < 7; i++) {
     ringChnAvg[i] /= float(hapdInRing[i] * NumberOfChannelsPerHapd);
-    ringChnAvgS2N[i] /= float(hapdInRing[i] * NumberOfChannelsPerHapd);
+    // ringChnAvgS2N[i] /= float(hapdInRing[i] * NumberOfChannelsPerHapd);
   }
   B2INFO("Average hits in channel in outer HAPD ring is " << ringChnAvg[6] << " (which is less that minimally required,  " <<
          m_minHitPerChn << ")");

@@ -3121,47 +3121,47 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "(That means that it returns :math:`p_j - p_i`)\n"
                       "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`grandDaughterDiffOfPhi` function.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
-                      "Returns the difference in :math:`\\phi` between the two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the two given daughters. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("daughterDiffOfPhi", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("mcDaughterDiffOfPhi(i, j)", mcDaughterDiffOfPhi,
-                      "MC matched version of the `daughterDiffOfPhi` function.", Manager::VariableDataType::c_double);
+                      "MC matched version of the `daughterDiffOfPhi` function. The unit of the angle is ``rad``", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("mcDaughterDiffOfPhi", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
-                      "Returns the difference in :math:`\\phi` between the first daughters of the two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the first daughters of the two given daughters. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("grandDaughterDiffOfPhi", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
-                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("daughterDiffOfClusterPhi", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two daughters can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("grandDaughterDiffOfClusterPhi(i, j)", grandDaughterDiffOfClusterPhi,
-                      "Returns the difference in :math:`\\phi` between the ECLClusters of the daughters of the two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of the daughters of the two given daughters. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("grandDaughterDiffOfClusterPhi", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the related ECL clusters of two granddaughters can be calculated with the generic variable :b2:var:`grandDaughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("daughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
-                      "Returns the difference in :math:`\\phi` between the two given daughters in the CMS frame.\n"
+                      "Returns the difference in :math:`\\phi` between the two given daughters in the CMS frame. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("daughterDiffOfPhiCMS", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`daughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("mcDaughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
-                      "MC matched version of the `daughterDiffOfPhiCMS` function.", Manager::VariableDataType::c_double);
+                      "MC matched version of the `daughterDiffOfPhiCMS` function. The unit of the angle is ``rad``", Manager::VariableDataType::c_double);
     MAKE_DEPRECATED("mcDaughterDiffOfPhiCMS", false, "release-06-00-00", R"DOC(
                      The difference of the azimuthal angle :math:`\\phi` of the MC partners of two daughters in the CMS frame can be calculated with the generic variable :b2:var:`mcDaughterDiffOf`.)DOC");
     REGISTER_METAVARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
-                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters in the CMS frame.\n"
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters in the CMS frame. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i``.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.", Manager::VariableDataType::c_double);
@@ -3178,6 +3178,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "E.g. ``daughterMotherNormDiffOf(1, p)`` returns the normalized momentum difference between the given particle and its second daughter in the lab frame.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("daughterAngle(daughterIndex_1, daughterIndex_2[, daughterIndex_3])", daughterAngle, R"DOC(
                        Returns the angle in between any pair of particles belonging to the same decay tree.
+                       The unit of the angle is ``rad``.
 
                        The particles are identified via generalized daughter indexes, which are simply colon-separated lists of
                        daughter indexes, ordered starting from the root particle. For example, ``0:1:3``  identifies the fourth
@@ -3198,7 +3199,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
 
                       )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,
-                      "MC matched version of the `daughterAngle` function. Also works if applied directly to MC particles.", Manager::VariableDataType::c_double);
+                      "MC matched version of the `daughterAngle` function. Also works if applied directly to MC particles. The unit of the angle is ``rad``", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
                       "Returns the decay angle of the granddaughter in the daughter particle's rest frame.\n"
                       "It is calculated with respect to the reverted momentum vector of the particle.\n"
@@ -3211,7 +3212,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns nan if any of the daughters specified don't have an associated cluster."
                       "The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.", "rad");
     REGISTER_METAVARIABLE("daughterInvM(i[, j, ...])", daughterInvM, R"DOC(
-                       Returns the invariant mass adding the Lorentz vectors of the given daughters.
+                       Returns the invariant mass adding the Lorentz vectors of the given daughters. The unit of the invariant mass is ``GeV/:math:`\\text{c}^2```
                        E.g. ``daughterInvM(0, 1, 2)`` returns the invariant Mass :math:`m = \sqrt{(p_0 + p_1 + p_2)^2}` of the first, second and third daughter.
 
                        Daughters from different generations of the decay tree can be combined using generalized daughter indexes,
@@ -3246,11 +3247,11 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("max(var1,var2)", max, "Returns max value of two variables.\n", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("min(var1,var2)", min, "Returns min value of two variables.\n", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("sin(variable)", sin, "Returns sine value of the given variable.", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("asin(variable)", asin, "Returns arcsine of the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("asin(variable)", asin, "Returns arcsine of the given variable. The unit of the asin() is ``rad``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("cos(variable)", cos, "Returns cosine value of the given variable.", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("acos(variable)", acos, "Returns arccosine value of the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("acos(variable)", acos, "Returns arccosine value of the given variable. The unit of the acos() is ``rad``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("tan(variable)", tan, "Returns tangent value of the given variable.", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("atan(variable)", atan, "Returns arctangent value of the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("atan(variable)", atan, "Returns arctangent value of the given variable. The unit of the atan() is ``rad``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
@@ -3312,19 +3313,19 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns the number of non-overlapping particles in the given particle lists"
                       "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("totalEnergyOfParticlesInList(particleListName)", totalEnergyOfParticlesInList,
-                      "Returns the total energy of particles in the given particle List.", Manager::VariableDataType::c_double);
+                      "Returns the total energy of particles in the given particle List. The unit of the energy is ``GeV``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("totalPxOfParticlesInList(particleListName)", totalPxOfParticlesInList,
-                      "Returns the total momentum Px of particles in the given particle List.", Manager::VariableDataType::c_double);
+                      "Returns the total momentum Px of particles in the given particle List. The unit of the momentum is ``GeV/c``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("totalPyOfParticlesInList(particleListName)", totalPyOfParticlesInList,
-                      "Returns the total momentum Py of particles in the given particle List.", Manager::VariableDataType::c_double);
+                      "Returns the total momentum Py of particles in the given particle List. The unit of the momentum is ``GeV/c``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("totalPzOfParticlesInList(particleListName)", totalPzOfParticlesInList,
-                      "Returns the total momentum Pz of particles in the given particle List.", Manager::VariableDataType::c_double);
+                      "Returns the total momentum Pz of particles in the given particle List. The unit of the momentum is ``GeV/c``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
-                      "Returns the invariant mass of the combination of particles in the given particle lists.", Manager::VariableDataType::c_double);
+                      "Returns the invariant mass of the combination of particles in the given particle lists. The unit of the invariant mass is ``GeV/:math:`\\text{c}^2``` ", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("totalECLEnergyOfParticlesInList(particleListName)", totalECLEnergyOfParticlesInList,
-                      "Returns the total ECL energy of particles in the given particle List.", Manager::VariableDataType::c_double);
+                      "Returns the total ECL energy of particles in the given particle List. The unit of the energy is ``GeV``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("maxPtInList(particleListName)", maxPtInList,
-                      "Returns maximum transverse momentum Pt in the given particle List.", Manager::VariableDataType::c_double);
+                      "Returns maximum transverse momentum Pt in the given particle List. The unit of the transverse momentum is ``GeV/c``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("eclClusterSpecialTrackMatched(cut)", eclClusterTrackMatchedWithCondition,
                       "Returns if at least one Track that satisfies the given condition is related to the ECLCluster of the Particle.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("averageValueInList(particleListName, variable)", averageValueInList,
@@ -3332,15 +3333,15 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("medianValueInList(particleListName, variable)", medianValueInList,
                       "Returns the median value of the given variable of the particles in the given particle list.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("angleToClosestInList(particleListName)", angleToClosestInList,
-                      "Returns the angle between this particle and the closest particle (smallest opening angle) in the list provided.", Manager::VariableDataType::c_double);
+                      "Returns the angle between this particle and the closest particle (smallest opening angle) in the list provided. The unit of the angle is ``rad`` ", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("closestInList(particleListName, variable)", closestInList,
                       "Returns `variable` for the closest particle (smallest opening angle) in the list provided.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("angleToMostB2BInList(particleListName)", angleToMostB2BInList,
-                      "Returns the angle between this particle and the most back-to-back particle (closest opening angle to 180) in the list provided.", Manager::VariableDataType::c_double);
+                      "Returns the angle between this particle and the most back-to-back particle (closest opening angle to 180) in the list provided. The unit of the angle is ``rad`` ", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
                       "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("maxOpeningAngleInList(particleListName)", maxOpeningAngleInList,
-                      "Returns maximum opening angle in the given particle List.", Manager::VariableDataType::c_double);
+                      "Returns maximum opening angle in the given particle List. The unit of the angle is ``rad`` ", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("daughterCombination(variable, daughterIndex_1, daughterIndex_2 ... daughterIndex_n)", daughterCombination,R"DOC(
 Returns a ``variable`` function only of the 4-momentum calculated on an arbitrary set of (grand)daughters.
 

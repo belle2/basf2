@@ -424,7 +424,7 @@ Decay B0
 
 0.000211667   J/psi  K*S                                   SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #J/psi K*0 is Gamma_200 PDGLive = 1.27e-3. #[Comment - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000211667   J/psi  K*L                                   SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
-0.000846667   J/psi  anti-K*0T                             SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
+0.000846667   J/psi  K*0T                                  SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
 
 # Example of how to subtract K* contribution from inc. BF: ! get_branching('S042:Desig=4') - ! get_branching('S042:Desig=22') * get_branching('M018:Desig=12') * 2 / 3.
 0.000303333   J/psi  K+  pi-                               PHSP; #Gamma_199 PDGLive => 1.15e-3 includes K*0. Subtract K* component: BF(J/psi K+ pi-) = 0.00115 - 2/3 * 0.00127. #[BF update - PG 09/2020]
@@ -2182,7 +2182,7 @@ Decay anti-B0
 
 0.000211667   J/psi  K*S                                   SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; #J/psi K*0 is Gamma_200 PDGLive = 1.27e-3. #[Comment - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000211667   J/psi  K*L                                   SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;
-0.000846667   J/psi  K*0T                                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
+0.000846667   J/psi  anti-K*0T                             SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
 
 # Example of how to subtract K* contribution from inc. BF: ! get_branching('S042:Desig=4') - ! get_branching('S042:Desig=22') * get_branching('M018:Desig=12') * 2 / 3.
 0.000303333   J/psi  K-  pi+                               PHSP; #Gamma_199 PDGLive => 1.15e-3 includes K*0. Subtract K* component: BF(J/psi K+ pi-) = 0.00115 - 2/3 * 0.00127. #[BF update - PG 09/2020]

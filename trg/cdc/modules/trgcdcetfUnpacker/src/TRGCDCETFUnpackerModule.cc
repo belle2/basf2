@@ -83,7 +83,6 @@ void TRGCDCETFUnpackerModule::event()
       ch_id = m_copper_ab;
     }
 
-
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
       if (raw_trgarray[i]->GetNodeID(j) == node_id) {
         if (raw_trgarray[i]->GetDetectorNwords(j, ch_id) > 0) {

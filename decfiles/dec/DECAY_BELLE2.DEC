@@ -3947,7 +3947,7 @@ Decay B+
 0.000100000   J/psi  K'_1+                                 SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.001800000   J/psi  K_1+                                  SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.000500000   J/psi  K_2*+                                 PHSP;
-# Subtract BR from resonant decay for J/psi K+ pi+ pi-.
+# Requires subtraction of resonant components
 #$ BF('S041:Desig=19') - BF('B+ -> J/psi K1(1400)+') * ( BF('M064:Desig=1')*(2/3)*BF('M018:Desig=1')*(2/3) + BF('M064:Desig=2')*(1/3)*BF(M009:Desig=1) + BF('M064:Desig=5')*BF('M001:Desig=2') + BF('K1(1430)+ -> K+ pi+ pi-')) - BF('S041:Desig=271') * ( BF('M028:Desig=1')*(2/3)*BF('M018:Desig=1')*(2/3) + BF(M028:Desig=2)*(1/3)*BF(M009:Desig=1) + BF(M028:Desig=5)*BF('M001:Desig=2') + BF('K1(1270)+ -> K+ pi+ pi-') ) - BF('B+ -> J/psi K2(1430)+') * ( BF('M022:Desig=2')*(2/3)*BF('M018:Desig=1')*(2/3) + BF('M022:Desig=3')*(1/3)*BF(M009:Desig=1) + BF('M022:Desig=4')*BF('M001:Desig=2') )
 0.000055137   J/psi  K+  pi+  pi-                          PHSP; #[BF update - JP 05/2022]
 0.000033700   J/psi  K+  K+  K-                            PHSP;
@@ -5446,7 +5446,7 @@ Decay B-
 0.000100000   J/psi  K'_1-                                 SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.001800000   J/psi  K_1-                                  SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.000500000   J/psi  K_2*-                                 PHSP;
-# Subtract BR from resonant decay for J/psi K+ pi+ pi-.
+# Requires subtraction of resonant components
 #$ BF('S041:Desig=19') - BF('B+ -> J/psi K1(1400)+') * ( BF('M064:Desig=1')*(2/3)*BF('M018:Desig=1')*(2/3) + BF('M064:Desig=2')*(1/3)*BF(M009:Desig=1) + BF('M064:Desig=5')*BF('M001:Desig=2') + BF('K1(1430)+ -> K+ pi+ pi-')) - BF('S041:Desig=271') * ( BF('M028:Desig=1')*(2/3)*BF('M018:Desig=1')*(2/3) + BF(M028:Desig=2)*(1/3)*BF(M009:Desig=1) + BF(M028:Desig=5)*BF('M001:Desig=2') + BF('K1(1270)+ -> K+ pi+ pi-') ) - BF('B+ -> J/psi K2(1430)+') * ( BF('M022:Desig=2')*(2/3)*BF('M018:Desig=1')*(2/3) + BF('M022:Desig=3')*(1/3)*BF(M009:Desig=1) + BF('M022:Desig=4')*BF('M001:Desig=2') )
 0.000055137   J/psi  K-  pi+  pi-                          PHSP; #[BF update - JP 05/2022]
 0.000033700   J/psi  K-  K+  K-                            PHSP;

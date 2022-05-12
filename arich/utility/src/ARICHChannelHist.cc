@@ -237,7 +237,7 @@ void ARICHChannelHist::setPoly(TH2Poly* poly)
 {
 
   if (poly->GetNumberOfBins() == 0) {
-    for (const auto && bin : *fBins) {
+    for (const auto&& bin : *fBins) {
       poly->AddBin((TGraph*)((TH2PolyBin*)bin)->GetPolygon());
     }
   }

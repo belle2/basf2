@@ -166,7 +166,7 @@ namespace Belle2 {
     // loop over produced photoelectrons. Apply suppression due to the reverse polarization crosstalk
     // among channels on the same chip, and produce hit bitmap (4 bits).
 
-    for (std::map<std::pair<int, int> , int>::iterator it = photoElectrons.begin(); it != photoElectrons.end(); ++it) {
+    for (std::map<std::pair<int, int>, int>::iterator it = photoElectrons.begin(); it != photoElectrons.end(); ++it) {
 
       std::pair<int, int> modch = it->first;
       double npe = double(it->second);

@@ -1033,7 +1033,7 @@ namespace Belle2 {
      * Fill all generation's daughters into a vector
      *
      * Function is called recursively
-     * @param fspDaughters vector of daughter particles
+     * @param allDaughters vector of daughter particles
      */
     void fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const;
 

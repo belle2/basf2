@@ -126,9 +126,9 @@ void PyStoreObj::ensureAttached() const
 {
   if (not m_storeEntry) {
     attach();
-  }
-  if (not m_storeEntry) {
-    B2ERROR("PyStoreObj " << m_storeAccessor.readableName() << " has not been registered!");
+    if (not m_storeEntry) {
+      B2ERROR("PyStoreObj " << m_storeAccessor.readableName() << " has not been registered!");
+    }
   }
 }
 

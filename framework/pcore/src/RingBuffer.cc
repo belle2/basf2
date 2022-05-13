@@ -201,7 +201,6 @@ int RingBuffer::insq(const int* buf, int size, bool checkTx)
     if (size > m_bufinfo->size + 2) {
       throw std::runtime_error("[RingBuffer::insq ()] Inserted item (size: " + std::to_string(size) +
                                ") is larger than RingBuffer (size: " + std::to_string(m_bufinfo->size + 2) + ")!");
-      return -1;
     }
     m_bufinfo->errtype = 0;
     int* wptr = m_buftop + m_bufinfo->wptr;

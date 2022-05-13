@@ -54,7 +54,7 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
            "The number sequences (e.g. 23:42,101) defining the entries which are processed for each inputFileName."
            "Must be specified exactly once for each file to be opened."
            "The first event has the entry number 0.", emptyvector);
-  addParam("ignoreCommandLineOverride"  , m_ignoreCommandLineOverride,
+  addParam("ignoreCommandLineOverride", m_ignoreCommandLineOverride,
            "Ignore override of file name via command line argument -i.", false);
 
   addParam("skipNEvents", m_skipNEvents, "Skip this number of events before starting.", 0u);
@@ -77,7 +77,7 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
            "Number of generations of parent files (files used as input when creating a file) to be read. This can be useful if a file is missing some information available in its parent. See https://confluence.desy.de/display/BI/Software+ParentFiles for details.",
            0);
 
-  addParam("collectStatistics"  , m_collectStatistics,
+  addParam("collectStatistics", m_collectStatistics,
            "Collect statistics on amount of data read and print statistics (seperate for input & parent files) after processing. Data is collected from TFile using GetBytesRead(), GetBytesReadExtra(), GetReadCalls()",
            false);
   addParam("cacheSize", m_cacheSize,

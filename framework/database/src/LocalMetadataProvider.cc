@@ -44,7 +44,7 @@ namespace Belle2::Conditions {
   bool LocalMetadataProvider::updatePayloads(const std::string& globaltag, int exp, int run)
   {
     try {
-      for (auto && row : m_selectPayloads.execute(globaltag, exp, run)) {
+      for (auto&& row : m_selectPayloads.execute(globaltag, exp, run)) {
         addPayload(std::move(row), "Local Database");
       }
     } catch (std::exception& e) {

@@ -49,7 +49,8 @@ namespace {
         if (object != nullptr)
         {
           return object->m_value;
-        } else {
+        } else
+        {
           return std::numeric_limits<double>::quiet_NaN();
         }
       };

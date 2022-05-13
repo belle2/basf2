@@ -239,7 +239,7 @@ namespace Belle2 {
      *
      *  \return pointer to the created object
      */
-    inline T* appendNew() { return new(nextFreeAdress()) T(); }
+    inline T* appendNew() { return new (nextFreeAdress()) T(); }
 
     /** Construct a new T object directly at the end of the array.
      *
@@ -263,7 +263,7 @@ namespace Belle2 {
      */
     template<class ...Args> T* appendNew(Args&& ... params)
     {
-      return new(nextFreeAdress()) T(std::forward<Args>(params)...);
+      return new (nextFreeAdress()) T(std::forward<Args>(params)...);
     }
 
 

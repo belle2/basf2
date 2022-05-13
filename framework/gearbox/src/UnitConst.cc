@@ -260,7 +260,7 @@ size_t Const::DetectorSet::size() const
 std::string Const::DetectorSet::__repr__() const
 {
   std::string result = "<set: ";
-  std::string detectorNames[] = {"invalidDetector", "PXD", "SVD", "CDC", "TOP", "ARICH", "ECL", "KLM", "IR", "TRG", "DAQ", "BEAST", "TEST"};
+  const std::string detectorNames[] = {"invalidDetector", "PXD", "SVD", "CDC", "TOP", "ARICH", "ECL", "KLM", "IR", "TRG", "DAQ", "BEAST", "TEST"};
   for (size_t index = 1; index <= Const::TEST; index++) {
     if (contains(EDetector(index))) {
       if (result.size() > 6) {

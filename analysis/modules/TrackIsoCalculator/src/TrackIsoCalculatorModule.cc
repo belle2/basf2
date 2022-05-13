@@ -44,6 +44,10 @@ void TrackIsoCalculatorModule::initialize()
 
   m_event_metadata.isRequired();
   m_pList.isRequired(m_pListName);
+  if (m_pListName.find(':') != std::string::npos)
+    m_pListOfAllTracks.isRequired(m_pListName.substr(0, m_pListName.find_first_of(':')) + std::string(":all"));
+  else
+    m_pListOfAllTracks.isRequired(m_pListName + std::string(":all"));
 
   B2INFO("TrackIsoCalculator module will calculate isolation variables for the ParticleList: " << m_pListName << ".");
 
@@ -60,38 +64,40 @@ void TrackIsoCalculatorModule::event()
   }
 
   const auto nParticles = m_pList->getListSize();
+  const auto nParticlesAllTracks = m_pListOfAllTracks->getListSize();
 
-  B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n" << "nParticles: " << nParticles);
+  B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n" << "nParticles: " << nParticles << "\n"
+          << "nParticlesAllTracks: " << nParticlesAllTracks);
 
   // Store the pair-wise distances in a 2D array.
   // Size is given by the length of the particle list.
-  std::vector<double> defaultDistances(nParticles, 1e9);
+  std::vector<double> defaultDistances(nParticlesAllTracks, 1e9);
   std::vector<std::vector<double>> pairwiseDistances(nParticles, defaultDistances);
 
   B2DEBUG(11, "Array of pair-wise distances between tracks in particle list. Initial values:");
-  this->printDistancesArr(pairwiseDistances, nParticles);
+  this->printDistancesArr(pairwiseDistances, nParticles, nParticlesAllTracks);
 
   for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
-
     Particle* iParticle = m_pList->getParticle(iPart);
 
-    for (unsigned int jPart(iPart + 1); jPart < nParticles; ++jPart) {
+    for (unsigned int jPart(0); jPart < nParticlesAllTracks; ++jPart) {
+      Particle* jParticle = m_pListOfAllTracks->getParticle(jPart);
 
-      Particle* jParticle = m_pList->getParticle(jPart);
+      if (iParticle->getTrackFitResult() == jParticle->getTrackFitResult())
+        continue;
 
       // Calculate the pair-wise distance.
       double ijDist = (!m_use2DRhoPhiDist) ? this->get3DDistAtDetSurface(iParticle,
                       jParticle) : this->get2DRhoPhiDistAsChordLength(iParticle, jParticle);
 
       pairwiseDistances[iPart][jPart] = ijDist;
-      pairwiseDistances[jPart][iPart] = ijDist;
 
     }
 
   }
 
   B2DEBUG(11, "Array of pair-wise distances between tracks in particle list. Final values:");
-  this->printDistancesArr(pairwiseDistances, nParticles);
+  this->printDistancesArr(pairwiseDistances, nParticles, nParticlesAllTracks);
 
   // For each particle index, find the index of the particle w/ minimal distance in the corresponding row of the 2D array.
   for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
@@ -189,15 +195,15 @@ double TrackIsoCalculatorModule::get2DRhoPhiDistAsChordLength(Particle* iParticl
   return 2 * rho * sin(std::abs(diffPhi) / 2.0);
 }
 
-void TrackIsoCalculatorModule::printDistancesArr(const std::vector<std::vector<double>>& arr, int size)
+void TrackIsoCalculatorModule::printDistancesArr(const std::vector<std::vector<double>>& arr, int size_x, int size_y)
 {
 
   auto logConfig = this->getLogConfig();
 
   if (logConfig.getLogLevel() == LogConfig::c_Debug && logConfig.getDebugLevel() >= 11) {
     std::cout << "" << std::endl;
-    for (int i(0); i < size; ++i) {
-      for (int j(0); j < size; ++j) {
+    for (int i(0); i < size_x; ++i) {
+      for (int j(0); j < size_y; ++j) {
         std::cout << std::setw(7) << arr[i][j] << " ";
       }
       std::cout << "\n";

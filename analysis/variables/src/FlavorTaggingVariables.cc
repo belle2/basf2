@@ -2214,7 +2214,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("lambdaFlavor", lambdaFlavor,
                       "[Expert] Returns 1.0 if particle is ``Lambda0``, -1.0 in case of ``anti-Lambda0``, 0.0 otherwise.");
     REGISTER_VARIABLE("isLambda", isLambda,  "[Expert] Returns 1.0 if particle is truth-matched to ``Lambda0``, 0.0 otherwise.");
-    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "[Expert] Returns the variance of the z-component of the decay vertex.","cm");
+    REGISTER_VARIABLE("lambdaZError", lambdaZError,  "[Expert] Returns the variance of the z-component of the decay vertex.",":math:`\\text{cm}^2`");
     REGISTER_VARIABLE("momentumOfSecondDaughter", momentumOfSecondDaughter,
                       "[Expert] Returns the momentum of second daughter if exists, 0. otherwise.","GeV/c");
     REGISTER_VARIABLE("momentumOfSecondDaughterCMS", momentumOfSecondDaughterCMS,
@@ -2226,10 +2226,10 @@ namespace Belle2 {
 :noindex:
 )DOC","GeV/c");
     REGISTER_METAVARIABLE("ptTracksRoe(maskName)", transverseMomentumOfChargeTracksInRoeWithMask,
-                          "[Exepert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum is ``GeV/c`` ",
+                          "[Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum is ``GeV/c`` ",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pt2TracksRoe(maskName)", transverseMomentumSquaredOfChargeTracksInRoeWithMask,
-                          "[Expert] Returns the transverse momentum squared of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum squared is ``:math:`[\\text{GeV}/\\text{c}]^2``` ",
+                          "[Expert] Returns the transverse momentum squared of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum squared is (GeV/c)^2 ",
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("NumberOfKShortsInRoe", NumberOfKShortsInRoe,
                       "[Expert] Returns the number of ``K_S0`` in the rest of event. The particle list ``K_S0:inRoe`` has to be filled beforehand.");
@@ -2285,7 +2285,7 @@ In other words, this variable checks the generated flavor of the other generated
 
     REGISTER_METAVARIABLE("BtagToWBosonVariables(requestedVariable[, maskName])", BtagToWBosonVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables assuming a semileptonic decay with the given particle as target.
-The input values of ``requestedVariable`` can be the following:  recoilMass, pMissCMS, cosThetaMissCMS and EW90.
+The input values of ``requestedVariable`` can be the following:  recoilMass in GeV/c^2 , pMissCMS in ``GeV/c``, cosThetaMissCMS and EW90.
 )DOC", Manager::VariableDataType::c_double);
   REGISTER_METAVARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables , R"DOC(
 [Expert] Returns values of FlavorTagging-specific kinematical variables for ``KaonPion`` category.
@@ -2293,7 +2293,7 @@ The input values of ``requestedVariable`` can be the following:  cosKaonPion, Ha
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("FSCVariables(requestedVariable)", FSCVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables for ``FastSlowCorrelated`` category.
-The input values of ``requestedVariable`` can be the following: pFastCMS, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast.
+The input values of ``requestedVariable`` can be the following: pFastCMS in ``GeV/c``, cosSlowFast, SlowFastHaveOpositeCharges, or cosTPTOFast.
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("hasHighestProbInCat(particleListName, extraInfoName)", hasHighestProbInCat, R"DOC(
 [Expert] Returns 1.0 if the given Particle is classified as target track, i.e. if it has the highest target track probability in particleListName. 

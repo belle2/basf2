@@ -487,7 +487,7 @@ Returns cosine of angle between thrust axis of the signal B and z-axis.
 :noindex:
 )DOC");
     REGISTER_METAVARIABLE("KSFWVariables(variable[, string, string])", KSFWVariables,  R"DOC(
-Returns variable et (The unit of the et is ``GeV/c``), mm2 (The unit of the mm2 is ``:math:`[\\text{GeV}/\\text{c}^2]^2```), or one of the 16 KSFW moments.
+Returns variable et in ``GeV/c``, mm2 in (GeV/c^2)^2, or one of the 16 KSFW moments.
 The second and third arguments are optional unless you have created multiple instances of the ContinuumSuppression with different ROE masks.
 In that case the desired ROE mask name must be provided as well.
 If the second argument is set to 'FS1', the KSFW moment is calculated from the B final state daughters.

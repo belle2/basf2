@@ -2282,9 +2282,9 @@ Decay anti-B0
 0.000100000   eta_c  anti-K0  pi0  pi0                     PHSP;
 0.000100000   eta_c  K-  pi+  pi0                          PHSP;
 
-# Br(B0 -> eta_c K_S0) = Br(B+ -> eta_c K+) * Br(B0 -> eta_c (-> p anti-p pi+ pi-) K_S0) / Br (B+ -> eta_c (-> p anti-p pi+ pi-) K+) = 4.4e-4 * (4.2e-7 / 1.12e-6) = 0.00016500. #[Comment - KL 09/2020]
 #$ forbid_pythia()
 0.000000000   eta_c(2S)  anti-K0                           PHSP;
+# Br(B0 -> eta_c K_S0) = Br(B+ -> eta_c K+) * Br(B0 -> eta_c (-> p anti-p pi+ pi-) K_S0) / Br (B+ -> eta_c (-> p anti-p pi+ pi-) K+) = 4.4e-4 * (4.2e-7 / 1.12e-6) = 0.00016500. #[Comment - KL 09/2020]
 0.000165000   eta_c(2S)  K_S0                              SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[BF update - PG 09/2020] #[w/CPV - BO 09/2017]
 0.000165000   eta_c(2S)  K_L0                              SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #[BF update - PG 09/2020]
 

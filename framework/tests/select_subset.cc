@@ -282,19 +282,14 @@ namespace {
         if (fromElement != m_set.end()) {
           return fromElement->second.isPresentRelationTo(otherSetName, toKey);
         } else {
-          static int i(0);
-          if (i ++ < 999 || (i % 100) == 0) {
-            cout << "Error: from: " << getName() << " id " <<  fromKey  <<
-                 " -> " << otherSetName << " id " << toKey << endl;
-            for (const auto& element : m_set)
-              cout << element.first << "\t";
-            cout << endl;
-            for (const auto& element : m_storeArray)
-              cout << element.GetUniqueID() << "\t";
-            cout << endl;
-          } else if (i == 1000) {
-            cout << "Skipping 99% of the following errors" << endl;
-          }
+          cout << "Error: from: " << getName() << " id " <<  fromKey  <<
+               " -> " << otherSetName << " id " << toKey << endl;
+          for (const auto& element : m_set)
+            cout << element.first << "\t";
+          cout << endl;
+          for (const auto& element : m_storeArray)
+            cout << element.GetUniqueID() << "\t";
+          cout << endl;
           return false;
         }
       }

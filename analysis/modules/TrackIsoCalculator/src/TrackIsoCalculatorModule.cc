@@ -85,12 +85,18 @@ void TrackIsoCalculatorModule::event()
 
       if (iParticle->getTrackFitResult() == jParticle->getTrackFitResult())
         continue;
+      if (pairwiseDistances[iPart][jPart] != 1e9)
+        continue;
 
       // Calculate the pair-wise distance.
       double ijDist = (!m_use2DRhoPhiDist) ? this->get3DDistAtDetSurface(iParticle,
                       jParticle) : this->get2DRhoPhiDistAsChordLength(iParticle, jParticle);
 
       pairwiseDistances[iPart][jPart] = ijDist;
+
+      int jPart_in_inputList = m_pList->getIndex(jParticle);
+      if (jPart_in_inputList != -1)
+        pairwiseDistances[jPart_in_inputList][iPart] = ijDist;
 
     }
 

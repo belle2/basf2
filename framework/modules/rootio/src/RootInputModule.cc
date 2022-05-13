@@ -432,8 +432,8 @@ void RootInputModule::readTree()
     m_nextEntry = -2;
     return; //end of file
   } else if (localEntryNumber < 0) {
-    B2FATAL("Failed to load tree, corrupt file? Check standard error for additional messages. (TChain::LoadTree() returned error " <<
-            localEntryNumber << ")");
+    B2FATAL("Failed to load tree, corrupt file? Check standard error for additional messages. TChain::LoadTree() returned" <<
+            LogVar("error", localEntryNumber));
   }
   B2DEBUG(39, "Reading file entry " << m_nextEntry);
 

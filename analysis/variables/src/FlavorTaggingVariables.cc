@@ -2229,7 +2229,7 @@ namespace Belle2 {
                           "[Expert] Returns the transverse momentum of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum is ``GeV/c`` ",
                           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("pt2TracksRoe(maskName)", transverseMomentumSquaredOfChargeTracksInRoeWithMask,
-                          "[Expert] Returns the transverse momentum squared of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum squared is (GeV/c)^2 ",
+                          "[Expert] Returns the transverse momentum squared of all charged tracks of the ROE related to the given particle, 0.0 if particle has no related ROE. The unit of the momentum squared is :math:`[\\text{GeV}/\\text{c}]^2` ",
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("NumberOfKShortsInRoe", NumberOfKShortsInRoe,
                       "[Expert] Returns the number of ``K_S0`` in the rest of event. The particle list ``K_S0:inRoe`` has to be filled beforehand.");

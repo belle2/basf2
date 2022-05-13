@@ -45,7 +45,7 @@ namespace Belle2 {
        */
       enum EStoreOption {
         c_Reduced = 0, /**< only PDF peak data */
-        c_Full = 1     /**< also extra information */
+        c_Full = 1     /**< also extra information and derivatives */
       };
 
       /**
@@ -290,6 +290,13 @@ namespace Belle2 {
        */
       int getNCalls_expandPDF(SignalPDF::EPeakType type) const {return m_ncallsExpandPDF[type];}
 
+      /**
+       * Returns a collection of derivatives for debugging purposes.
+       * The derivatives are available only for EStoreOption::c_Full
+       * @return map of xD and derivatives
+       */
+      const std::map <double, YScanner::Derivatives>& getDerivatives() const {return m_derivatives;}
+
     private:
 
       /**
@@ -431,6 +438,26 @@ namespace Belle2 {
       double deltaXD(double dFic, const InverseRaytracer::Solution& sol, double xD);
 
       /**
+       * Sets the derivatives (numerically) using forward ray-tracing
+       * @param D derivatives to be set
+       * @param dL step in trajectory running parameter [cm]
+       * @param de step in photon energy [eV]
+       * @param dFic step in Cherenkov azimuthal angle
+       * @return true on success
+       */
+      bool setDerivatives(YScanner::Derivatives& D, double dL, double de, double dFic);
+
+      /**
+       * Forward ray-tracing (called by setDerivatives)
+       * @param rayTracer forward ray-tracer object
+       * @param dL value to be added to trajectory running parameter [cm]
+       * @param de value to be added to photon energy [eV]
+       * @param dFic value to be added to Cherenkov azimuthal angle
+       * @return true on success
+       */
+      bool raytrace(const FastRaytracer& rayTracer, double dL = 0, double de = 0, double dFic = 0);
+
+      /**
        * Returns photon propagation losses (bulk absorption, surface reflectivity, mirror reflectivity)
        * @param E photon energy
        * @param propLen propagation length
@@ -546,6 +573,7 @@ namespace Belle2 {
       const Const::ChargedStable m_hypothesis; /**< particle hypothesis */
       const InverseRaytracer* m_inverseRaytracer = 0; /**< inverse ray-tracer */
       const FastRaytracer* m_fastRaytracer = 0; /**< fast ray-tracer */
+      std::vector<FastRaytracer> m_rayTracers; /**< copies of fast ray-tracer used to compute derivatives */
       const YScanner* m_yScanner = 0; /**< PDF expander in y */
       const BackgroundPDF* m_backgroundPDF = 0; /**< background PDF */
       DeltaRayPDF m_deltaRayPDF; /**< delta-ray PDF */
@@ -576,6 +604,7 @@ namespace Belle2 {
       mutable std::vector<LogL> m_pixelLLs; /**< pixel log likelihoods (index = pixelID - 1) */
       mutable std::vector<Pull> m_pulls; /**< photon pulls w.r.t PDF peaks */
       mutable bool m_deltaPDFOn = true; /**< include/exclude delta-ray PDF in likelihood calculation */
+      mutable std::map <double, YScanner::Derivatives> m_derivatives; /**< a map of xD and derivatives */
       mutable std::set<int> m_zeroPixels; /**< collection of pixelID's with zero pdfValue */
 
     };
@@ -625,6 +654,7 @@ namespace Belle2 {
       return cer;
     }
 
+
     template<class T>
     void PDFConstructor::setSignalPDF(T& t, unsigned col, double xD, double zD, int Nxm, double xmMin, double xmMax)
     {
@@ -665,58 +695,47 @@ namespace Belle2 {
         k++;
       }
 
-      // solutions with emission point displaced by dL
-
-      double dL = 0.1; // cm
-      int i_dL = t.solve(xD, zD, Nxm, xmMin, xmMax, m_track.getEmissionPoint(dL), cerenkovAngle(), dL);
-      if (i_dL < 0) return;
-      k = 0;
-      while (m_inverseRaytracer->isNymDifferent()) { // get rid of discontinuities
-        if (k > 8) {
-          B2DEBUG(20, "TOP::PDFConstructor::setSignalPDF: failed to find the same Nym (dL)");
-          return;
-        }
-        dL = - dL / 2;
-        i_dL = t.solve(xD, zD, Nxm, xmMin, xmMax, m_track.getEmissionPoint(dL), cerenkovAngle(), dL);
-        if (i_dL < 0) return;
-        k++;
-      }
-
-      // solutions with photon energy changed by de
-
-      double de = 0.1; // eV
-      int i_de = t.solve(xD, zD, Nxm, xmMin, xmMax, m_track.getEmissionPoint(), cerenkovAngle(de), de);
-      if (i_de < 0) return;
-      k = 0;
-      while (m_inverseRaytracer->isNymDifferent()) { // get rid of discontinuities
-        if (k > 8) {
-          B2DEBUG(20, "TOP::PDFConstructor::setSignalPDF: failed to find the same Nym (de)");
-          return;
-        }
-        de = - de / 2;
-        i_de = t.solve(xD, zD, Nxm, xmMin, xmMax, m_track.getEmissionPoint(), cerenkovAngle(de), de);
-        if (i_de < 0) return;
-        k++;
-      }
-
-      // loop over the two solutions, compute the derivatives, do ray-tracing corrections and expand PDF in y
+      // loop over the two solutions, do ray-tracing corrections, compute the derivatives and expand PDF in y
 
       for (unsigned i = 0; i < 2; i++) {
         if (not m_inverseRaytracer->getStatus(i)) continue;
         const auto& solutions = m_inverseRaytracer->getSolutions(i);
         const auto& sol = solutions[i0];
         const auto& sol_dx = solutions[i_dx];
-        const auto& sol_de = solutions[i_de];
-        const auto& sol_dL = solutions[i_dL];
-        YScanner::Derivatives D(sol, sol_dx, sol_de, sol_dL);
+
+        // compute dFic/dx needed in raytracing corrections
+
+        double dFic_dx = YScanner::Derivatives::dFic_d(sol, sol_dx);
+
+        // do raytracing corrections
+
         m_dFic = 0;
-        bool ok = doRaytracingCorrections(sol, D.dFic_dx, xD);
+        bool ok = doRaytracingCorrections(sol, dFic_dx, xD);
         if (not ok) continue;
+        m_Fic = sol.getFic() + m_dFic;
+
+        // check if time is still within the reconstruction range
 
         double time = m_tof + m_fastRaytracer->getPropagationLen() * m_groupIndex / Const::speedOfLight;
         if (time > m_maxTime) continue;
 
-        m_Fic = sol.getFic() + m_dFic;
+        // compute the derivatives
+
+        YScanner::Derivatives D;
+        ok = setDerivatives(D, 0.1, 0.1, 0.001);
+        if (not ok) {
+          B2DEBUG(20, "TOP::PDFConstructor::setSignalPDF: failed to determine derivatives: "
+                  << LogVar("track momentum", m_track.getMomentumMag())
+                  << LogVar("impact local z", m_track.getEmissionPoint().position.Z())
+                  << LogVar("xD", xD)
+                  << LogVar("Nxm", Nxm)
+                  << LogVar("time", time)
+                  << LogVar("peak type", t.type));
+          continue;
+        }
+        if (m_storeOption == c_Full) m_derivatives[xD] = D;
+
+        // expand PDF in y
 
         expandSignalPDF(col, D, t.type);
       }

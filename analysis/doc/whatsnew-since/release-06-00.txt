@@ -63,6 +63,9 @@ Variables
    ``isRelatedRestOfEventMajorityB0Flavor``. Added an argument ``maskName`` to ``BtagToWBosonVariables``.
  * Added the variable `trackFitCovariance`, which returns the track fit covariance matrix element corresponding to the two provided
    indices.
+ * Added the variable `nPrimaryMCParticles` which returns the number of primary MC particles.
+ * Added the variable `nVirtualPrimaryMCParticles` which returns the number of virtual primary MC particles.
+ * Added the variable `nInitialPrimaryMCParticles` which returns the number of initial primary MC particles.
 
 Modules
 +++++++
@@ -88,6 +91,7 @@ Modules
    corresponding wrapper function. The allowed range of the veto threshold is extended to (0.10,0.99).
  * Added an option ``skipNonPrimary`` to ``fillParticleListFromMC`` and ``fillParticleListsFromMC``.
  * Added an argument ``prefix`` to :func:`flavorTagger.flavorTagger` so that one can choose the version of weight files.
+ * Added an option ``basketsize`` to :func:`modularAnalysis.variablesToNtuple` to set the size of TBaskets in the output ntuple in bytes.
 
 PID Priors
 ++++++++++
@@ -98,3 +102,15 @@ PID Priors
    the effect of outliers on the training.
  * For evaluating priors, ``evalPriors`` module containing the ``Priors`` class has been added to calculate these using
    the trained model. Additionally, posteriors can also be obtained by providing PID's from the detector signals.
+
+MC Truth Information
+++++++++++++++++++++
+
+ * The :b2:mod:`PrintMCParticles` and :b2:mod:`VariablesToNtuple` (:b2:mod:`VariablesToEventBasedTree`) are extended.
+   The MCParticles information printed by the :b2:mod:`PrintMCParticles` module can be stored in TTree via 
+   :b2:mod:`VariablesToNtuple` and :b2:mod:`VariablesToEventBasedTree`. When the :b2:mod:`PrintMCParticles`
+   is called, the branch ``__MCDecayString__`` is automatically created and the same information that is printed
+   by the :b2:mod:`PrintMCParticles`.
+ * An argument ``suppressPrint`` is added to `modularAnalysis.printMCParticles` to suppress printing the information
+   on the log message. This option helps to reduce the size of the log message while keeping the branch
+   ``__MCDecayString__`` in a TTree.

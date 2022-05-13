@@ -375,6 +375,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
               relatedSpacePointsA.size());
 
       // Try to verify SpacePoint by using next cluster to build a U/V pair.
+      // cppcheck-suppress knownConditionTrueFalse
       if (clusterA && clusterB && (clusterA->isUCluster() != clusterB->isUCluster())) {
         auto relatedSpacePointsB = clusterB->getRelationsFrom<SpacePoint>(*m_svdSpacePointsStoreArrayName);
 

@@ -106,7 +106,7 @@ void PhaseSpaceAnalysisModule::event()
   for (string name : m_PARAMcontainerNames) {
     arrayNames += " " + name;
   }
-  B2DEBUG(10, "PhaseSpaceAnalysis::event(). Processing event " << eventCounter << " for StoreArray names :" << arrayNames);
+  B2DEBUG(25, "PhaseSpaceAnalysis::event(). Processing event " << eventCounter << " for StoreArray names :" << arrayNames);
 
   StoreArray<MCParticle> mcParticles;
   const int nMCParticles = mcParticles.getEntries();
@@ -135,7 +135,7 @@ void PhaseSpaceAnalysisModule::event()
     m_rootVariables = RootVariables(); // clear root variables for each run
     for (int id : mcPartIds[iTree]) {
       if (id < 0) {
-        // cppcheck-suppress
+        // cppcheck-suppress shiftNegative
         B2WARNING("Found a negative id in mcParticleId: " << id << \
                   ". It seems that it has not been set properly, I will skip this MC Particle");
         m_skippedTCsCtr++;
@@ -170,7 +170,7 @@ void PhaseSpaceAnalysisModule::terminate()
     stringstream output;
     output << "tree-wise summary (no of mcParticles):";
     for (unsigned int ctr : m_mcPartCtr) output << " " << ctr;
-    B2DEBUG(1, output.str());
+    B2DEBUG(25, output.str());
   }
 
   // do ROOT stuff
@@ -184,7 +184,7 @@ void PhaseSpaceAnalysisModule::terminate()
 // ================================== initialize root ===============================
 void PhaseSpaceAnalysisModule::initializeRootFile(std::string fileName, std::string writeOption, std::vector<std::string> treeNames)
 {
-  B2DEBUG(10, "initializing root file. fileName: " << fileName << ", writeOption: " << writeOption);
+  B2DEBUG(25, "initializing root file. fileName: " << fileName << ", writeOption: " << writeOption);
   m_rootFilePtr = new TFile(fileName.c_str(), writeOption.c_str());
 
   for (size_t i = 0; i < treeNames.size(); ++i) {
@@ -213,7 +213,7 @@ void PhaseSpaceAnalysisModule::initializeRootFile(std::string fileName, std::str
 // =============================== collect values for root ====================================
 void PhaseSpaceAnalysisModule::getValuesForRoot(Belle2::MCParticle* mcParticle, RootVariables& rootVariables)
 {
-  B2DEBUG(100, "Collecting values for MCParticle " << mcParticle->getArrayIndex());
+  B2DEBUG(25, "Collecting values for MCParticle " << mcParticle->getArrayIndex());
   // collect all the momentum
   const TVector3 momentum = mcParticle->getMomentum();
   rootVariables.MomX.push_back(momentum.X());
@@ -223,7 +223,7 @@ void PhaseSpaceAnalysisModule::getValuesForRoot(Belle2::MCParticle* mcParticle, 
   rootVariables.pT.push_back(momentum.Pt());
   rootVariables.Eta.push_back(momentum.Eta());
 
-  B2DEBUG(499, "TVector3 momentum: (" << momentum.X() << "," << momentum.Y() << "," << momentum.Z() << \
+  B2DEBUG(25, "TVector3 momentum: (" << momentum.X() << "," << momentum.Y() << "," << momentum.Z() << \
           "). This leads to p_T = " << momentum.Pt() << " and eta = " << momentum.Eta());
 
   const B2Vector3D vertex = mcParticle->getVertex();
@@ -231,14 +231,14 @@ void PhaseSpaceAnalysisModule::getValuesForRoot(Belle2::MCParticle* mcParticle, 
   rootVariables.VertY.push_back(vertex.Y());
   rootVariables.VertZ.push_back(vertex.Z());
 
-  B2DEBUG(499, "TVector3 vertex: (" << vertex.X() << "," << vertex.Y() << "," << vertex.Z() << ")");
+  B2DEBUG(25, "TVector3 vertex: (" << vertex.X() << "," << vertex.Y() << "," << vertex.Z() << ")");
 
   rootVariables.Charge.push_back(mcParticle->getCharge());
   rootVariables.Energy.push_back(mcParticle->getEnergy());
   rootVariables.PDG.push_back(mcParticle->getPDG());
   rootVariables.Mass.push_back(mcParticle->getMass());
 
-  B2DEBUG(499, "Charge " << mcParticle->getCharge() << ", PDG code" << mcParticle->getPDG() << ", Energy " << \
+  B2DEBUG(25, "Charge " << mcParticle->getCharge() << ", PDG code" << mcParticle->getPDG() << ", Energy " << \
           mcParticle->getEnergy() << ", Mass " << mcParticle->getMass());
 }
 
@@ -259,7 +259,7 @@ std::vector<int> PhaseSpaceAnalysisModule::getMCParticleIDs(Belle2::StoreArray<T
 std::vector<std::vector<int> > PhaseSpaceAnalysisModule::getDiffIds(const std::vector<std::vector<int> >& allIDs)
 {
   if (allIDs.size() < 2) { // do nothing if there are less than two entries
-    B2DEBUG(50, "There are no more than 1 vectors passed to getDiffIds. No comparison possible. Returning passed vector");
+    B2DEBUG(25, "There are no more than 1 vectors passed to getDiffIds. No comparison possible. Returning passed vector");
     return allIDs;
   }
 

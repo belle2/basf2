@@ -16,7 +16,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ActivatePXDGainCalibrator)
+REG_MODULE(ActivatePXDGainCalibrator);
 
 ActivatePXDGainCalibratorModule::ActivatePXDGainCalibratorModule() : Module()
 {

@@ -40,6 +40,10 @@ MVAMultipleExpertsModule::MVAMultipleExpertsModule() : Module()
   addParam("identifiers", m_identifiers, "The database identifiers which is used to load the weights during the training.");
   addParam("signalFraction", m_signal_fraction_override,
            "signalFraction to calculate probability (if -1 the signalFraction of the training data is used)", -1.0);
+  std::vector<bool> empty_bool;
+  addParam("overwriteExistingExtraInfo", m_overwriteExistingExtraInfo,
+           "If true, when the given extraInfo has already defined, the old extraInfo value is overwritten. If false, the original value is kept.",
+           empty_bool);
 }
 
 void MVAMultipleExpertsModule::initialize()
@@ -66,6 +70,9 @@ void MVAMultipleExpertsModule::initialize()
   m_experts.resize(m_identifiers.size());
   m_individual_feature_variables.resize(m_identifiers.size());
   m_datasets.resize(m_identifiers.size());
+  // if the size of m_overwriteExistingExtraInfo is smaller than that of m_identifiers, true will be filled.
+  m_overwriteExistingExtraInfo.resize(m_identifiers.size(), true);
+  m_existGivenExtraInfo.resize(m_identifiers.size(), false);
 
   for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
     if (not(boost::ends_with(m_identifiers[i], ".root") or boost::ends_with(m_identifiers[i], ".xml"))) {
@@ -75,7 +82,6 @@ void MVAMultipleExpertsModule::initialize()
   }
 
   MVA::AbstractInterface::initSupportedInterfaces();
-
 }
 
 void MVAMultipleExpertsModule::beginRun()
@@ -171,8 +177,9 @@ void MVAMultipleExpertsModule::event()
       for (unsigned int j = 0; j < m_identifiers.size(); ++j) {
         if (particle->hasExtraInfo(m_extraInfoNames[j])) {
           if (particle->getExtraInfo(m_extraInfoNames[j]) != targetValues[j]) {
-            B2WARNING("Extra Info with given name is already set! Overwriting old value!");
-            particle->setExtraInfo(m_extraInfoNames[j], targetValues[j]);
+            m_existGivenExtraInfo[j] = true;
+            if (m_overwriteExistingExtraInfo[j])
+              particle->setExtraInfo(m_extraInfoNames[j], targetValues[j]);
           }
         } else {
           particle->addExtraInfo(m_extraInfoNames[j], targetValues[j]);
@@ -187,10 +194,29 @@ void MVAMultipleExpertsModule::event()
     std::vector<float> targetValues = analyse(nullptr);
     for (unsigned int j = 0; j < m_identifiers.size(); ++j) {
       if (eventExtraInfo->hasExtraInfo(m_extraInfoNames[j])) {
-        B2WARNING("Extra Info with given name is already set! I won't set it again!");
+        m_existGivenExtraInfo[j] = true;
+        if (m_overwriteExistingExtraInfo[j])
+          eventExtraInfo->setExtraInfo(m_extraInfoNames[j], targetValues[j]);
       } else {
         eventExtraInfo->addExtraInfo(m_extraInfoNames[j], targetValues[j]);
       }
     }
   }
+}
+
+void MVAMultipleExpertsModule::terminate()
+{
+  for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
+    m_experts[i].reset();
+    m_datasets[i].reset();
+
+    if (m_existGivenExtraInfo[i]) {
+      if (m_overwriteExistingExtraInfo[i])
+        B2WARNING("The extraInfo " << m_extraInfoNames[i] << " has already been set! It was overwritten by this module!");
+      else
+        B2WARNING("The extraInfo " << m_extraInfoNames[i] << " has already been set! "
+                  << "The original value was kept and this module did not overwrite it!");
+    }
+  }
+
 }

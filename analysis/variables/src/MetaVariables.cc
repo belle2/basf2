@@ -3212,7 +3212,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns nan if any of the daughters specified don't have an associated cluster."
                       "The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.", "rad");
     REGISTER_METAVARIABLE("daughterInvM(i[, j, ...])", daughterInvM, R"DOC(
-                       Returns the invariant mass adding the Lorentz vectors of the given daughters. The unit of the invariant mass is GeV/:math:`\\text{c}^2`
+                       Returns the invariant mass adding the Lorentz vectors of the given daughters. The unit of the invariant mass is GeV/:math:`\text{c}^2`
                        E.g. ``daughterInvM(0, 1, 2)`` returns the invariant Mass :math:`m = \sqrt{(p_0 + p_1 + p_2)^2}` of the first, second and third daughter.
 
                        Daughters from different generations of the decay tree can be combined using generalized daughter indexes,

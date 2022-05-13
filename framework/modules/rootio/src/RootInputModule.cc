@@ -34,7 +34,7 @@ using namespace std;
 using namespace Belle2;
 using namespace RootIOUtilities;
 
-REG_MODULE(RootInput)
+REG_MODULE(RootInput);
 
 RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentEntry(-1), m_tree(nullptr), m_persistent(nullptr)
 {

@@ -828,7 +828,7 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
       } else {
         if (((unsigned int)m_node_id & DETECTOR_MASK) == ARICH_ID) {
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
-          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x8 << 28);
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x8) << 28;
           sprintf(err_buf,
                   "[WARNING] %s ch=%d : ARICH : B2link packet CRC error slot D eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
                   hostname, 3,
@@ -840,7 +840,7 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
           fflush(stdout);
         } else {
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
-          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x8 << 28);
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x8) << 28;
           sprintf(err_buf, "[FATAL] %s ch=%d : ERROR_EVENT : B2link packet CRC error slot D eve %8u foooter %.8x : %s %s %d\n",
                   hostname, 3,
                   cur_ftsw_eve32,

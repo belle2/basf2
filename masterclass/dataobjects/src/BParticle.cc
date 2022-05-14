@@ -20,6 +20,21 @@ BParticle::BParticle(float px, float py, float pz, float e,
   m_pid = pid;
 }
 
+BParticle& BParticle::operator+=(const BParticle& a)
+{
+  m_px += a.px();
+  m_py += a.py();
+  m_pz += a.pz();
+  m_e += a.e();
+  m_charge += a.charge();
+  m_pid = PHOTON; // wrong
+  return *this;
+}
+
+BParticle operator+(BParticle a, const BParticle& b)
+{
+  return a += b;
+}
 
 float BParticle::GetMass(SIMPLEPID pid)
 {
@@ -83,10 +98,10 @@ int CombineParticles(TClonesArray* plist1, TClonesArray* plist2, int same, float
   pout->Clear();
   int nprt = 0;
 
-  for (TIter next1(plist1); BParticle* p1 = dynamic_cast<BParticle*>(next1());) {
+  for (TIter next1(plist1); const BParticle* p1 = dynamic_cast<BParticle*>(next1());) {
     // the second loop
     for (TIter next2 = (plist1 != plist2
-                        && same == 0) ?  TIter(plist2) : TIter(next1) ; BParticle* p2 = dynamic_cast<BParticle*>(next2());) {
+                        && same == 0) ?  TIter(plist2) : TIter(next1) ; const BParticle* p2 = dynamic_cast<BParticle*>(next2());) {
       BParticle  p = *p1 + *p2; // Combine two particles into a new particle
       if (p.InMassRange(masslow, massup)) {
         p.SetPid(pid);

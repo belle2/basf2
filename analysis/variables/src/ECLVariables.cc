@@ -1257,7 +1257,7 @@ for hadronic events, and electrons with a close-by radiative or Bremsstrahlung p
     | Lower limit: :math:`0.0`
     | Upper limit: :math:`1.0`
     | Precision: :math:`10` bit
-)DOC","GeV");
+)DOC");
     REGISTER_VARIABLE("clusterNHits", eclClusterNHits, R"DOC(
 Returns sum of weights :math:`w_{i}` (:math:`w_{i} \leq 1`) of all crystals in an ECL cluster.
 For non-overlapping clusters this is equal to the number of crystals in the cluster.

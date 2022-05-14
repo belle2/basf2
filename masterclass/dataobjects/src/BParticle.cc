@@ -62,7 +62,7 @@ void BParticle::SetEnergyFromPid()
   SetEnergyFromMass(GetMass(m_pid));
 }
 
-int SelectParticles(TClonesArray* pin , int charge, SIMPLEPID type, TClonesArray* pout)
+int SelectParticles(TClonesArray* pin, int charge, SIMPLEPID type, TClonesArray* pout)
 {
   pout->Clear();
   int nprt = 0;
@@ -70,13 +70,13 @@ int SelectParticles(TClonesArray* pin , int charge, SIMPLEPID type, TClonesArray
   for (TIter next(pin); BParticle* p = dynamic_cast<BParticle*>(next());) {
     if (p->charge() == charge && p->pid() == type) {
       TClonesArray& list = *pout;
-      new(list[nprt++]) BParticle(*p);
+      new (list[nprt++]) BParticle(*p);
     }
   }
   return nprt;
 }
 
-int CombineParticles(TClonesArray* plist1 , TClonesArray* plist2 , int same, float masslow, float massup, SIMPLEPID pid,
+int CombineParticles(TClonesArray* plist1, TClonesArray* plist2, int same, float masslow, float massup, SIMPLEPID pid,
                      TClonesArray* pout)
 {
 // Loop over all the particles in both lists.
@@ -91,7 +91,7 @@ int CombineParticles(TClonesArray* plist1 , TClonesArray* plist2 , int same, flo
       if (p.InMassRange(masslow, massup)) {
         p.SetPid(pid);
         TClonesArray& list = *pout;
-        new(list[nprt++]) BParticle(p);     // create a new entry in kslist list of particles
+        new (list[nprt++]) BParticle(p);    // create a new entry in kslist list of particles
       }
 
     }

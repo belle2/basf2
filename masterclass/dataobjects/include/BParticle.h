@@ -154,7 +154,7 @@ public:
   ClassDef(BParticle, 1)    // Simple particle class
 };
 
-int SelectParticles(TClonesArray* pin , int charge, SIMPLEPID type, TClonesArray* pout);
+int SelectParticles(TClonesArray* pin, int charge, SIMPLEPID type, TClonesArray* pout);
 
-int CombineParticles(TClonesArray* plist1 , TClonesArray* plist2 , int same, float masslow, float massup, SIMPLEPID pid,
+int CombineParticles(TClonesArray* plist1, TClonesArray* plist2, int same, float masslow, float massup, SIMPLEPID pid,
                      TClonesArray* pout);

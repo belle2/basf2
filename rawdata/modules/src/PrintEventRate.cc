@@ -91,7 +91,7 @@ void PrintEventRateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
   error_flag = (unsigned int)(raw_copper->GetDataType(i));
   if (error_flag) {
     printf("!!!!!!!!! ERROR (RawCOPPER hdr) !!!!!!!!!! : run %d sub %d event %u errflag %.8x nodeID %.8x\n",
-           m_run, m_subrun, m_cur_event, error_flag , raw_copper->GetNodeID(i));
+           m_run, m_subrun, m_cur_event, error_flag, raw_copper->GetNodeID(i));
     m_errcpr++;
   }
 

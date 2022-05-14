@@ -293,7 +293,7 @@ int PostRawCOPPERFormat_v1::CheckCRC16(int n, int finesse_num)
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
     //  if ( false ) {
     PrintData(m_buffer, m_nwords);
-    printf("POST CRC16 error %x %x %d\n", *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+    printf("POST CRC16 error %x %x %d\n", *buf, temp_crc16, GetFINESSENwords(n, finesse_num));
     printf("\n");
     int* temp_buf = GetFINESSEBuffer(n, finesse_num);
     printf("%.8x ", 0);

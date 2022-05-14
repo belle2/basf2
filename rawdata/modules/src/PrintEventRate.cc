@@ -304,11 +304,8 @@ void PrintEventRateModule::event()
     m_prev_tot_bytes = m_tot_bytes;
     m_prev_event = m_n_basf2evt;
 
-    /* cppcheck-suppress redundantAssignment */
     m_prev_tot_bytes = m_tot_bytes;
-    /* cppcheck-suppress redundantAssignment */
     m_prev_event = m_n_basf2evt;
-    /* cppcheck-suppress redundantAssignment */
     m_prev_utime = m_cur_utime;
   }
 

@@ -1375,11 +1375,11 @@ Returns extrapolated :math:`\phi` ID.
     REGISTER_VARIABLE("weightedAverageECLTime", weightedAverageECLTime, R"DOC(
 Returns ECL weighted average time of all clusters (neutrals) and matched clusters (charged) of daughters
 (of any generation) of the provided particle.
-)DOC");
+)DOC", "ns");
     REGISTER_VARIABLE("maxWeightedDistanceFromAverageECLTime", maxWeightedDistanceFromAverageECLTime, R"DOC(
 Returns maximum weighted distance between time of the cluster of a photon and the ECL average time, amongst
 the clusters (neutrals) and matched clusters (charged) of daughters (of all generations) of the provided particle.
-)DOC");
+)DOC", "ns");
     REGISTER_VARIABLE("clusterMdstIndex", eclClusterMdstIndex, R"DOC(
 StoreArray index(0 - based) of the MDST ECLCluster (useful for track-based particles matched to a cluster).
 )DOC");

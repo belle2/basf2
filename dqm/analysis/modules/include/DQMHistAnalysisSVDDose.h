@@ -64,9 +64,24 @@ namespace Belle2 {
     } MyPV;
 #endif
 
+    /**
+     * Initializer.
+     */
     void initialize() override final;
+
+    /**
+     * Called when entering a new run.
+     */
     void beginRun() override final;
+
+    /**
+     * This method is called for each event.
+     */
     void event() override final;
+
+    /**
+     * This method is called if the current run ends.
+     */
     void endRun() override final;
 
     void updateCanvases(); /**< updated canvas */

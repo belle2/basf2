@@ -76,7 +76,7 @@ namespace {
 
   const double curlCurv = 0.018;
 
-
+  // cppcheck-suppress syntaxError
   TEST_F(TrackFindingCDCTestWithSimpleSimulation, hough_perigee_phi0_tanl_on_hits)
   {
     std::string svgFileName = "phi0_tanl_on_hits.svg";

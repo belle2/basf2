@@ -1,4 +1,3 @@
-#pragma once
 /**************************************************************************
  * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
@@ -7,14 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#pragma once
 
-// include VariableManager
-#include <analysis/VariableManager/Manager.h>
-
-// include the Belle II Particle class
-#include <analysis/dataobjects/Particle.h>
+#include <vector>
 
 namespace Belle2 {
+  class MCParticle;
+  class Particle;
+
   namespace Variable {
     /*
     * Given a reconstructed B meson candidate e.g. by the FEI the FSP are determined and a relation between reconstructed and generated FSP is drawn.

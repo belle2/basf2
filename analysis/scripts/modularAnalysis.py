@@ -315,7 +315,7 @@ def printPrimaryMCParticles(path, **kwargs):
 
 
 def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
-                     showProperties=False, showMomenta=False, showVertices=False, showStatus=False):
+                     showProperties=False, showMomenta=False, showVertices=False, showStatus=False, suppressPrint=False):
     """
     Prints all MCParticles or just primary MCParticles up to specified level. -1 means no limit.
 
@@ -413,6 +413,12 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
                 ├── K*+ (323) → …
                 ╰── pi- (-211)
 
+    The same information will be stored in the branch ``__MCDecayString__`` of
+    TTree created by `VariablesToNtuple` or `VariablesToEventBasedTree` module.
+    This branch is automatically created when `PrintMCParticles` modules is called.
+    Printing the information on the log message can be suppressed if ``suppressPrint``
+    is True, while the branch ``__MCDecayString__``. This option helps to reduce the
+    size of the log message.
 
     Parameters:
         onlyPrimaries (bool): If True show only primary particles, that is particles coming from
@@ -423,6 +429,8 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
         showVertices (bool): if True show production vertex and production time of all particles
         showStatus (bool): if True show some status information on the particles.
             For secondary particles this includes creation process.
+        suppressPrint (bool): if True printing the information on the log message is suppressed.
+            Even if True, the branch ``__MCDecayString__`` is created.
     """
 
     return path.add_module(
@@ -433,6 +441,7 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
         showMomenta=showMomenta,
         showVertices=showVertices,
         showStatus=showStatus,
+        suppressPrint=suppressPrint,
     )
 
 
@@ -687,7 +696,7 @@ def removeTracksForTrackingEfficiencyCalculation(inputListNames, fraction, path=
     path.add_module(trackingefficiency)
 
 
-def scaleTrackMomenta(inputListNames, scale=float('nan'), tableName="", scalingFactorName="SF", path=None):
+def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalingFactorName="SF", path=None):
     """
 
     Scale momenta of the particles according to a scaling factor scale.
@@ -699,15 +708,35 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), tableName="", scalingF
     Parameters:
         inputListNames (list(str)): input particle list names
         scale (float): scaling factor (1.0 -- no scaling)
-        tableName (str): name of the payload which contains the phase-space dependent scaling factors
+        payloadName (str): name of the payload which contains the phase-space dependent scaling factors
         scalingFactorName (str): name of scaling factor variable in the payload.
         path (basf2.Path): module is added to this path
     """
     trackingmomentum = register_module('TrackingMomentum')
     trackingmomentum.param('particleLists', inputListNames)
     trackingmomentum.param('scale', scale)
-    trackingmomentum.param('tableName', tableName)
+    trackingmomentum.param('payloadName', payloadName)
     trackingmomentum.param('scalingFactorName', scalingFactorName)
+
+    path.add_module(trackingmomentum)
+
+
+def smearTrackMomenta(inputListNames, payloadName="", smearingFactorName="smear", path=None):
+    """
+    Smear the momenta of the particles according the values read from the given payload.
+    If the particle list contains composite particles, the momenta of the track-based daughters are smeared.
+    Subsequently, the momentum of the mother particle is updated as well.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        payloadName (str): name of the payload which contains the smearing valuess
+        smearingFactorName (str): name of smearing factor variable in the payload.
+        path (basf2.Path): module is added to this path
+    """
+    trackingmomentum = register_module('TrackingMomentum')
+    trackingmomentum.param('particleLists', inputListNames)
+    trackingmomentum.param('payloadName', payloadName)
+    trackingmomentum.param('smearingFactorName',  smearingFactorName)
 
     path.add_module(trackingmomentum)
 
@@ -1124,7 +1153,8 @@ def fillParticleListFromMC(decayString,
                            addDaughters=False,
                            skipNonPrimaryDaughters=False,
                            writeOut=False,
-                           path=None):
+                           path=None,
+                           skipNonPrimary=False):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -1138,6 +1168,7 @@ def fillParticleListFromMC(decayString,
     @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
+    @param skipNonPrimary          if true, skip non primary particle
     """
 
     pload = register_module('ParticleLoader')
@@ -1147,6 +1178,7 @@ def fillParticleListFromMC(decayString,
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
+    pload.param('skipNonPrimary', skipNonPrimary)
     path.add_module(pload)
 
     from ROOT import Belle2
@@ -1167,7 +1199,8 @@ def fillParticleListsFromMC(decayStringsWithCuts,
                             addDaughters=False,
                             skipNonPrimaryDaughters=False,
                             writeOut=False,
-                            path=None):
+                            path=None,
+                            skipNonPrimary=False):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
@@ -1195,6 +1228,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
     @param writeOut                whether RootOutput module should save the created ParticleList
     @param path                    modules are added to this path
+    @param skipNonPrimary          if true, skip non primary particle
     """
 
     pload = register_module('ParticleLoader')
@@ -1204,6 +1238,7 @@ def fillParticleListsFromMC(decayStringsWithCuts,
     pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
+    pload.param('skipNonPrimary', skipNonPrimary)
     path.add_module(pload)
 
     from ROOT import Belle2
@@ -1692,7 +1727,7 @@ def printList(list_name, full, path):
     path.add_module(prlist)
 
 
-def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None):
+def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -1704,6 +1739,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         treename (str): name of the ntuple tree
         filename (str): which is used to store the variables
         path (basf2.Path): the basf2 path where the analysis is processed
+        basketsize (int): size of baskets in the output ntuple in bytes
     """
 
     output = register_module('VariablesToNtuple')
@@ -1712,6 +1748,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('variables', variables)
     output.param('fileName', filename)
     output.param('treeName', treename)
+    output.param('basketSize', basketsize)
     path.add_module(output)
 
 
@@ -3398,6 +3435,16 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
                     ". Please choose among the following pairs:\n",
                     "\n".join(f"{opt[0]} vs. {opt[1]}" for opt in binaryOpts))
 
+        decayDescriptor = Belle2.DecayDescriptor()
+        for name in plSet:
+            if not decayDescriptor.init(name):
+                raise ValueError("Invalid paritlceLists")
+
+            pdg = abs(decayDescriptor.getMother().getPDGCode())
+            if pdg not in binaryHypoPDGCodes:
+                B2WARNING("Given ParticleList: ", name, " (", pdg, ") is neither signal (", binaryHypoPDGCodes[0],
+                          ") nor background (", binaryHypoPDGCodes[1], ").")
+
         chargedpid = register_module("ChargedPidMVA")
         chargedpid.set_name(f"ChargedPidMVA_{binaryHypoPDGCodes[0]}_vs_{binaryHypoPDGCodes[1]}_{mode}")
         chargedpid.param("sigHypoPDGCode", binaryHypoPDGCodes[0])
@@ -3597,8 +3644,8 @@ def addPi0VetoEfficiencySystematics(particleList, decayString, tableName, thresh
 
     @param particleList   the input ParticleList
     @param decayString    specify hard photon to be performed pi0 veto (e.g. 'B+:sig -> rho+:sig ^gamma:hard')
-    @param tableName      table name corresponding to payload version (e.g. 'Pi0VetoEfficiencySystematics_Nov2021')
-    @param threshold      pi0 veto threshold (0.50, 0.51, ..., 0.99)
+    @param tableName      table name corresponding to payload version (e.g. 'Pi0VetoEfficiencySystematics_Mar2022')
+    @param threshold      pi0 veto threshold (0.10, 0.11, ..., 0.99)
     @param mode           choose one mode (same as writePi0EtaVeto) out of 'standard', 'tight', 'cluster' and 'both'
     @param suffix         optional suffix to be appended to the usual extraInfo name
     @param path           the module is added to this path

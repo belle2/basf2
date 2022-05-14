@@ -49,7 +49,7 @@ namespace Belle2 {
 
     /** initialize the calibration bitmap*/
     static void init(payloadContainerType& svdBitmap, unsigned int layer,
-                     unsigned int /*ladder*/ , unsigned int /*sensor*/,
+                     unsigned int /*ladder*/, unsigned int /*sensor*/,
                      unsigned int side, bool defaultB)
     {
       unsigned int numberOfStrips = 0;

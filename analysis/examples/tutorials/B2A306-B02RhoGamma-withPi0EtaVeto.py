@@ -85,8 +85,8 @@ ma.buildRestOfEvent(target_list_name='B0',
 #        If one wants to use one's own payload and soft-photon criteria, please use arguments,
 #        pi0PayloadNameOverride, pi0SoftPhotonCutOverride, etaPayloadNameOverride, etaSoftPhotonCutOverride,
 mode = 'standard'
-threshold = 0.75
-suffix = '75'
+threshold = 0.30
+suffix = '30'
 ma.writePi0EtaVeto(particleList='B0',
                    decayString='B0 -> rho0 ^gamma',
                    mode=mode,
@@ -94,7 +94,7 @@ ma.writePi0EtaVeto(particleList='B0',
 
 # Perform addPi0VetoEfficiencySystematics
 # Data/MC ratio will be provided as extraInfo related with particleList for a given threshold.
-tableName = 'Pi0VetoEfficiencySystematics_Nov2021'
+tableName = 'Pi0VetoEfficiencySystematics_Mar2022'
 ma.addPi0VetoEfficiencySystematics(particleList='B0',
                                    decayString='B0 -> rho0 ^gamma',
                                    tableName=tableName,

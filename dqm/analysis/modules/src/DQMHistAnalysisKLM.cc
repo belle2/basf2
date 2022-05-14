@@ -22,11 +22,12 @@
 
 using namespace Belle2;
 
-REG_MODULE(DQMHistAnalysisKLM)
+REG_MODULE(DQMHistAnalysisKLM);
 
 DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   : DQMHistAnalysisModule(),
     m_ProcessedEvents{0},
+    m_IsNullRun{false},
     m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
     m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
     m_ElementNumbers{&(KLMElementNumbers::Instance())},
@@ -69,6 +70,7 @@ void DQMHistAnalysisKLMModule::initialize()
     B2FATAL("The threshold used for hot channels is larger than the one for masked channels."
             << LogVar("Threshold for hot channels", m_ThresholdForHot)
             << LogVar("Threshold for masked channels", m_ThresholdForMasked));
+
 }
 
 void DQMHistAnalysisKLMModule::terminate()
@@ -84,6 +86,10 @@ void DQMHistAnalysisKLMModule::beginRun()
   m_DeadBarrelModules.clear();
   m_DeadEndcapModules.clear();
   m_MaskedChannels.clear();
+
+  m_RunType = findHist("DQMInfo/rtype");
+  m_RunTypeString = m_RunType ? m_RunType->GetTitle() : "";
+  m_IsNullRun = (m_RunTypeString == "null");
 }
 
 void DQMHistAnalysisKLMModule::endRun()
@@ -342,9 +348,11 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
         latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
         yAlarm -= 0.05;
       }
-      alarm = "Call the KLM experts immediately!";
-      latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-      canvas->Pad()->SetFillColor(kRed);
+      if (m_IsNullRun == false) {
+        alarm = "Call the KLM experts immediately!";
+        latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+        canvas->Pad()->SetFillColor(kRed);
+      }
     }
   } else {
     /* First draw the vertical lines and the sector names. */
@@ -378,9 +386,11 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
         latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
         yAlarm -= 0.05;
       }
-      alarm = "Call the KLM experts immediately!";
-      latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-      canvas->Pad()->SetFillColor(kRed);
+      if (m_IsNullRun == false) {
+        alarm = "Call the KLM experts immediately!";
+        latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+        canvas->Pad()->SetFillColor(kRed);
+      }
     }
   }
   canvas->Modified();

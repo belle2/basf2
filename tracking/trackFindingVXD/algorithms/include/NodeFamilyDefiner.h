@@ -62,7 +62,7 @@ namespace Belle2 {
 
   private:
     /** Assign family to all connected nodes and return their neighbours.*/
-    NeighbourContainerType markNodes(short family, NeighbourContainerType& neighbours)
+    NeighbourContainerType markNodes(short family, const NeighbourContainerType& neighbours)
     {
       NeighbourContainerType newNeighbours;
       for (auto& neighbour : neighbours) {

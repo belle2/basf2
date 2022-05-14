@@ -75,7 +75,7 @@ ECLDigitizerPureCsIModule::~ECLDigitizerPureCsIModule()
 void ECLDigitizerPureCsIModule::initialize()
 {
   m_nEvent  = 0 ;
-  EclConfigurationPure::m_tickPure = m_tickFactor * EclConfiguration::m_tick / EclConfiguration::m_ntrg;
+  EclConfigurationPure::setTickPure(m_tickFactor * EclConfiguration::getTick() / EclConfiguration::m_ntrg);
 
   m_ecldsps.registerInDataStore(eclDspArrayName());
 

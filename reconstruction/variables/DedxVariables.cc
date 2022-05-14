@@ -172,7 +172,8 @@ namespace Belle2 {
         if (!dedxTrack)
         {
           return std::numeric_limits<float>::quiet_NaN();
-        } else {
+        } else
+        {
           if (var == "chi") return dedxTrack->getChi(index);
           else if (var == "pmean") return dedxTrack->getPmean(index);
           else if (var == "preso") return dedxTrack->getPreso(index);

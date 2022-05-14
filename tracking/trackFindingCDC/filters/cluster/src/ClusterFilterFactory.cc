@@ -51,8 +51,10 @@ ClusterFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "all") {
     return std::make_unique<AllClusterFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "unionrecording") {
     return std::make_unique<UnionRecordingClusterFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "mva_bkg") {
     return std::make_unique<MVABackgroundClusterFilter>();
   } else {

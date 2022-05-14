@@ -24,10 +24,30 @@ namespace Belle2 {
    */
   class DQMHistAnalysisHLTModule : public DQMHistAnalysisModule {
   public:
+
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisHLTModule();
+
+    /**
+     * Initializer.
+     */
     void initialize() final;
+
+    /**
+     * Called when entering a new run.
+     */
     void beginRun()  final;
+
+    /**
+     * This method is called for each event.
+     */
     void event() final;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     void terminate() final;
 
   private:

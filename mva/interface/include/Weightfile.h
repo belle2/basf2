@@ -177,7 +177,7 @@ namespace Belle2 {
       std::vector<T> getVector(const std::string& identifier) const
       {
         std::vector<T> vector;
-        vector.resize(m_pt.get<T>(identifier + "_size"));
+        vector.resize(m_pt.get<size_t>(identifier + "_size"));
         for (unsigned int i = 0; i < vector.size(); ++i) {
           vector[i] = m_pt.get<T>(identifier + std::to_string(i));
         }

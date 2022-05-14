@@ -51,6 +51,10 @@ namespace Belle2 {
       StoreObjPtr<ParticleList> m_offIpParticles;
       /// HLT filter line for the TRG skim.
       std::string m_filterL1TrgNN = "";
+      /// Internal storage of the B+'s.
+      StoreObjPtr<ParticleList> m_BpParticles;
+      /// Internal storage of the B0's.
+      StoreObjPtr<ParticleList> m_BzParticles;
     };
   }
 }

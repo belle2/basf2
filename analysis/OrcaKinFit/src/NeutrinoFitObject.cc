@@ -183,7 +183,7 @@ namespace Belle2 {
       return 0;
     }
 
-    double NeutrinoFitObject::getFirstDerivative_Meta_Local(int iMeta, int ilocal , int metaSet) const
+    double NeutrinoFitObject::getFirstDerivative_Meta_Local(int iMeta, int ilocal, int metaSet) const
     {
       // iMeta = intermediate variable (i.e. E,px,py,pz)
       // ilocal = local variable (E, theta, phi)
@@ -211,7 +211,7 @@ namespace Belle2 {
     }
 
 
-    double NeutrinoFitObject::getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal , int metaSet) const
+    double NeutrinoFitObject::getSecondDerivative_Meta_Local(int iMeta, int ilocal, int jlocal, int metaSet) const
     {
       assert(metaSet == 0);
       if (!cachevalid) updateCache();

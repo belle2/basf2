@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(VXDCDCTrackMerger)
+REG_MODULE(VXDCDCTrackMerger);
 
 VXDCDCTrackMergerModule::VXDCDCTrackMergerModule() :
   Module(), m_CDC_wall_radius(16.25)

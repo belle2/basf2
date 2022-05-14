@@ -101,7 +101,7 @@ SectorMapBootstrapModule::initialize()
 
   // in case sector map is read from the DB one needs to set the DB pointer
   if (m_readSecMapFromDB) {
-    B2DEBUG(1, "SectorMapBootstrapModule: Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile);
+    B2DEBUG(29, "SectorMapBootstrapModule: Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile);
     m_ptrDBObjPtr = new DBObjPtr<PayloadFile>(m_sectorMapsInputFile);
     if (m_ptrDBObjPtr == nullptr) B2FATAL("SectorMapBootstrapModule: the DBObjPtr is not initialized");
     // add a callback function so that the sectormap is updated each time the DBObj changes
@@ -118,7 +118,7 @@ SectorMapBootstrapModule::initialize()
     if (std::ifstream(m_sectorMapsOutputFile.c_str())) {
       B2FATAL("Detected existing output file! Please delete or move before proceeding! File name: " << m_sectorMapsOutputFile);
     } else {
-      B2DEBUG(1, "Checked that output file does not exist!");
+      B2DEBUG(29, "Checked that output file does not exist!");
     }
   }
 
@@ -256,7 +256,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
         counter ++;
       }
     }
-    segmentFilters->addSectorsOnSensor(uDividersMinusLastOne ,
+    segmentFilters->addSectorsOnSensor(uDividersMinusLastOne,
                                        vDividersMinusLastOne,
                                        sectors) ;
   }//end loop over sensors
@@ -282,7 +282,7 @@ SectorMapBootstrapModule::persistSectorMap(void)
 {
 
   // the "CREATE" option results in the root file not being opened if it already exists (to prevent overwriting existing sectormaps)
-  TFile rootFile(m_sectorMapsOutputFile.c_str() , "CREATE");
+  TFile rootFile(m_sectorMapsOutputFile.c_str(), "CREATE");
   if (!rootFile.IsOpen()) B2FATAL("Unable to open rootfile! This could be caused by an already existing file of the same name: "
                                     << m_sectorMapsOutputFile.c_str());
 
@@ -331,7 +331,7 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
     rootFileName = (*m_ptrDBObjPtr)->getFileName();
   }
 
-  B2DEBUG(1, "SectorMapBootstrapModule: retrieving new SectorMap. New file name: " << rootFileName);
+  B2DEBUG(29, "SectorMapBootstrapModule: retrieving new SectorMap. New file name: " << rootFileName);
   TFile rootFile(rootFileName.c_str());
 
   // some cross check that the file is open
@@ -342,6 +342,7 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
   if (tree == nullptr) B2FATAL("SectorMapBootstrapModule: tree not found! tree name: " << c_setupKeyNameTTreeName.c_str());
 
   TString* setupKeyName = nullptr;
+  // cppcheck-suppress nullPointerRedundantCheck
   tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
                          & setupKeyName);
   if (setupKeyName == nullptr) B2FATAL("SectorMapBootstrapModule: setupKeyName not found");
@@ -367,7 +368,7 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
 
     rootFile.cd(setupKeyName->Data());
 
-    B2DEBUG(1, "Retrieving SectorMap with name " << setupKeyName->Data());
+    B2DEBUG(29, "Retrieving SectorMap with name " << setupKeyName->Data());
 
     VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
 
@@ -395,7 +396,7 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
     // locks all functions that can modify the filters
     segmentFilters->lockFilters();
 
-    B2DEBUG(1, "Retrieved map with name: " << setupKeyNameStd << " from rootfie.");
+    B2DEBUG(29, "Retrieved map with name: " << setupKeyNameStd << " from rootfie.");
     filtersContainer.assignFilters(setupKeyNameStd, segmentFilters);
 
     rootFile.cd("..");

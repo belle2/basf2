@@ -14,7 +14,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(DensityScaler)
+REG_MODULE(DensityScaler);
 
 DensityScalerModule::DensityScalerModule() : Module()
 {

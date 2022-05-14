@@ -9,6 +9,67 @@ import argparse
 from sly import Lexer, Parser
 
 
+def findMatchedParenthesis(string: str, openchar: str, closechar: str) -> int:
+    """
+    Finds matching control token in string and returns the offset.
+    The string's first character must match openchar.
+    Otherwise, 0 is returned.
+
+    Args:
+        string (str): input
+        openchar (str): opening char e.g '{'
+        closechar (str): closing char e.g '}'
+
+    Returns:
+        int: position of matching closing char in string.
+    """
+    end = 1
+    if string[0] == openchar:
+        count = 1
+        while end < len(string) and count > 0:
+            if string[end] == openchar:
+                count += 1
+            elif string[end] == closechar:
+                count -= 1
+            end += 1
+        if count > 0:
+            raise SyntaxError("Matched parenthesis for metavariable could not be found.")
+    return end - 1
+
+
+class B2ParameterLexer(Lexer):
+    """
+    Lexer class responsible for changing the default scanning behavior.
+    It disables token scanning and captures
+    everything within the matched parenthesis.
+    Call pop_state to return to the default scanning state.
+    """
+    #: Single token for matching metavariable parameters
+    tokens = {ARGUMENTTUPLE, }  # noqa: F821
+
+    @_(r"\(")  # noqa: F821
+    def ARGUMENTTUPLE(self, t):
+        """
+        Capture metavariable parameters by finding the matched parenthesis.
+
+        Args:
+            t (sly.lex.token): token of type LPAREN
+
+        Returns:
+            t (sly.lex.token): ARGUMENTTUPLE token
+        """
+        # Find the offset of the matching parenthesis
+        pos = findMatchedParenthesis(self.text[self.index-1:], "(", ")")
+        # Set value to slice
+        t.value = self.text[self.index-1: self.index+pos]
+        #: Increment current scanning position
+        self.index = self.index+pos
+        # Return to default B2Lexer state
+        self.pop_state()
+        # Return token
+        return t
+
+
 class B2Lexer(Lexer):
     """
     Class responsible for scanning the cut and generating a stream of tokens.
@@ -22,20 +83,26 @@ class B2Lexer(Lexer):
         #: errors on scanner level.
         self.control_token_stack = list()
 
-    #: Set of all tokens
-    tokens = {
+    #: cut specific tokens
+    cut_tokens = {
         # structure tokens
-        LBRACK, RBRACK, LPAREN, RPAREN,  # noqa: F821
-        # data types
-        DOUBLE, INTEGER, IDENTIFIER, BOOLEAN,  # noqa: F821
+        RBRACK, LBRACK,  # noqa: F821
         # boolean operators
         AND, OR, NOT,  # noqa: F821
-        # comparison operatots
+        # comparison operators
         EQUALEQUAL, GREATEREQUAL, LESSEQUAL, GREATER, LESS,  # noqa: F821
         NOTEQUAL,  # noqa: F821
+    }
+    #: expression tokens, also needed for cut.
+    expression_tokens = {
+        LPAREN, RPAREN,  # noqa: F821
+        # data types
+        DOUBLE, INTEGER, IDENTIFIER, BOOLEAN,  # noqa: F821
         # arithmetic operators
         POWER, TIMES, DIVIDE, PLUS, MINUS  # noqa: F821
     }
+    #: Set of all tokens
+    tokens = expression_tokens.union(cut_tokens)
 
     # Scanning Rules
     #: ignore spaces tabs and newlines
@@ -125,7 +192,7 @@ class B2Lexer(Lexer):
         if state == "BRACK":
             return t
         elif state == "PAREN":
-            raise SyntaxError("Illegal ']', expected ').")
+            raise SyntaxError("Illegal ']', expected ')'.")
 
     @_(r"\(")  # noqa: F821
     def LPAREN(self, t):
@@ -146,7 +213,7 @@ class B2Lexer(Lexer):
             sly.lex.Token
         """
         if ")" not in self.text[self.index:]:
-            raise SyntaxError("Unmatched '(")
+            raise SyntaxError("Unmatched '('")
         self.control_token_stack.append("PAREN")
         return t
 
@@ -231,7 +298,7 @@ class B2Lexer(Lexer):
             t.value = int(t.value, base=16)
         return t
 
-    @_(r"[a-zA-Z]([a-zA-Z_0-9&:]|\+:|-:|':)*")  # noqa: F821
+    @_(r"[a-zA-Z_][a-zA-Z_0-9]*")  # noqa: F821
     def IDENTIFIER(self, t):
         """
         Scaning function for identifiers
@@ -267,6 +334,16 @@ class B2Lexer(Lexer):
         # Take care of special infinity and nan values.
         if t.type == "DOUBLE":
             t.value = float(t.value)
+        if t.type == "IDENTIFIER":
+            try:
+                if self.text[self.index] == "(":
+                    # Check that closing parenthesis exists
+                    if ")" not in self.text[self.index:]:
+                        raise SyntaxError("Unmatched '('")
+                    else:
+                        self.push_state(B2ParameterLexer)
+            except IndexError:
+                pass
         return t
 
 
@@ -344,15 +421,7 @@ def parser_class_decorator(cls, parser_type):
             | BOOLEAN
             | DOUBLE
 
-        <function> ::= IDENTIFIER LPAREN <parameters> RPAREN
-
-        <parameters> ::= EMPTY
-            | <parameter_list>
-
-        <parameter_list> ::= <parameter>
-            | <parameter_list> COMMA <parameter>
-
-        <parameter> ::= <boolean_expression>
+        <function> ::= IDENTIFIER ARGUMENTTUPLE
         """
 
         def __init__(self, verbose=False):
@@ -371,22 +440,34 @@ def parser_class_decorator(cls, parser_type):
             #: used for scope detection of variables and metavariables
             self.parameter_stack = list()
 
-        #: token list from B2Lexer, this is required
-        tokens = B2Lexer.tokens
+        if parser_type == "cut":
+            #: token list for B2Parser include cut specific tokens
+            tokens = B2Lexer.tokens.union(B2ParameterLexer.tokens)
+        else:
+            #: token list for B2ExpressionParser exclude cut specific tokens
+            tokens = B2Lexer.expression_tokens.union(B2ParameterLexer.tokens)
         start = parser_type
-        #: Define precedence of operators starting with lowest precedence
-        #: first element of tuple indicates associativity of operator
-        precedence = (  # noqa: F841
-            ("left", "OR"),
-            ("left", "AND"),
-            ("nonassoc", "NOT"),
-            ("left", "EQUALEQUAL", "GREATER", "LESS",
-             "GREATEREQUAL", "LESSEQUAL", "NOTEQUAL"),
-            ("left", "PLUS", "MINUS"),
-            ("left", "TIMES", "DIVIDE"),
-            ("right", "POWER"),
-        )
-
+        # Define precedence of operators starting with lowest precedence
+        # first element of tuple indicates associativity of operator
+        if parser_type == "cut":
+            #: Precedence definition for B2Parser
+            precedence = (  # noqa: F841
+                ("left", "OR"),
+                ("left", "AND"),
+                ("nonassoc", "NOT"),
+                ("left", "EQUALEQUAL", "GREATER", "LESS",
+                    "GREATEREQUAL", "LESSEQUAL", "NOTEQUAL"),
+                ("left", "PLUS", "MINUS"),
+                ("left", "TIMES", "DIVIDE"),
+                ("right", "POWER"),
+            )
+        else:
+            #: Reduced precedence definition for B2ExpressionParser
+            precedence = (  # noqa: F841
+                ("left", "PLUS", "MINUS"),
+                ("left", "TIMES", "DIVIDE"),
+                ("right", "POWER"),
+            )
         #: Dict for encoding nodetypes to integers
         #: Must match enum in framework/utilities/AbstractNodes.h
         node_types = {
@@ -482,160 +563,160 @@ def parser_class_decorator(cls, parser_type):
                         )
                     )
 
-        @_(r"disjunction")  # noqa: F821
-        def boolean_expression(self, p):
-            """
-            Parsing function for <boolean_expression> nonterminal
+            @_(r"disjunction")  # noqa: F821
+            def boolean_expression(self, p):
+                """
+                Parsing function for <boolean_expression> nonterminal
 
-            Grammar rule:
-                <boolean_expression> ::= <disjunction>
-            """
-            return p.disjunction
+                Grammar rule:
+                    <boolean_expression> ::= <disjunction>
+                """
+                return p.disjunction
 
-        @_(r"disjunction OR conjunction", r"conjunction")  # noqa: F821
-        def disjunction(self, p):
-            """
-            Parsing function for <disjunction> nonterminal
+            @_(r"disjunction OR conjunction", r"conjunction")  # noqa: F821
+            def disjunction(self, p):
+                """
+                Parsing function for <disjunction> nonterminal
 
-            Grammar rules:
-                <disjunction> ::= <conjunction>
-                    | <disjunction> OR <conjunction>
-            """
-            try:
+                Grammar rules:
+                    <disjunction> ::= <conjunction>
+                        | <disjunction> OR <conjunction>
+                """
+                try:
+                    return (
+                        self.get_node_type("BinaryBooleanNode"),
+                        p.disjunction,
+                        p.conjunction,
+                        self.get_boper_type(p.OR),
+                    )
+                except AttributeError:
+                    return p.conjunction
+
+            @_(r"conjunction AND negation", r"negation")  # noqa: F821
+            def conjunction(self, p):
+                """
+                Parsing function for <conjunction> nonterminal
+
+                Grammar rules:
+                    <conjunction> ::= <negation>
+                        | <conjunction> AND <negation>
+                """
+                try:
+                    return (
+                        self.get_node_type("BinaryBooleanNode"),
+                        p.conjunction,
+                        p.negation,
+                        self.get_boper_type(p.AND),
+                    )
+                except AttributeError:
+                    return p.negation
+
+            @_(r"bracket_expression", r"NOT negation")  # noqa: F821
+            def negation(self, p):
+                """
+                Parsing function for <negation> nonterminal
+
+                Grammar rules:
+                    <negation> ::= <bracket_expression>
+                        | NOT <negation>
+                """
+                try:
+                    return p.bracket_expression
+                except AttributeError:
+                    return (
+                        self.get_node_type("UnaryBooleanNode"),
+                        p.negation,
+                        True,
+                        False,
+                    )
+
+            @_(  # noqa: F821
+                r"relational_expression",
+                r"LBRACK boolean_expression RBRACK")
+            def bracket_expression(self, p):
+                """
+                Parsing function for <bracket_expression> nonterminal
+
+                Grammar rules:
+                    <bracket_expression> ::= <relational_expression>
+                        | LBRACK <boolean_expression> RBRACK
+                """
+                try:
+                    return p.relational_expression
+                except AttributeError:
+                    return (
+                        self.get_node_type("UnaryBooleanNode"),
+                        p.boolean_expression,
+                        False,
+                        True,
+                    )
+
+            @_(r"expression")  # noqa: F821
+            def relational_expression(self, p):  # noqa: F811
+                """
+                Parsing function for <relational_expression> nonterminal
+
+                Grammar rule:
+                    <relational_expression> ::= <expression>
+                """
+
+                return (self.get_node_type("UnaryRelationalNode"), p.expression)
+
+            @_(r"expression comparison_operator expression")  # noqa: F821
+            def relational_expression(self, p):  # noqa: F811
+                """
+                Parsing function for <relational_expression> nonterminal
+
+                Grammar rule:
+                    <relational_expression> ::= <expression> <comparison_operator>
+                                                <expression>
+                """
                 return (
-                    self.get_node_type("BinaryBooleanNode"),
-                    p.disjunction,
-                    p.conjunction,
-                    self.get_boper_type(p.OR),
+                    self.get_node_type("BinaryRelationalNode"),
+                    p.expression0,
+                    p.expression1,
+                    self.get_coper_type(p.comparison_operator),
                 )
-            except AttributeError:
-                return p.conjunction
 
-        @_(r"conjunction AND negation", r"negation")  # noqa: F821
-        def conjunction(self, p):
-            """
-            Parsing function for <conjunction> nonterminal
+            @_(r"expression comparison_operator expression comparison_operator expression")  # noqa: F821, E501
+            def relational_expression(self, p):  # noqa: F811
+                """
+                Parsing function for <relational_expression> nonterminal
 
-            Grammar rules:
-                <conjunction> ::= <negation>
-                    | <conjunction> AND <negation>
-            """
-            try:
+                Grammar rule:
+                    <relational_expression> ::= expression> <comparison_operator>
+                        <expression> <comparison_operator> <expression>
+                """
                 return (
-                    self.get_node_type("BinaryBooleanNode"),
-                    p.conjunction,
-                    p.negation,
-                    self.get_boper_type(p.AND),
-                )
-            except AttributeError:
-                return p.negation
-
-        @_(r"bracket_expression", r"NOT negation")  # noqa: F821
-        def negation(self, p):
-            """
-            Parsing function for <negation> nonterminal
-
-            Grammar rules:
-                <negation> ::= <bracket_expression>
-                    | NOT <negation>
-            """
-            try:
-                return p.bracket_expression
-            except AttributeError:
-                return (
-                    self.get_node_type("UnaryBooleanNode"),
-                    p.negation,
-                    True,
-                    False,
+                    self.get_node_type("TernaryRelationalNode"),
+                    p.expression0,
+                    p.expression1,
+                    p.expression2,
+                    self.get_coper_type(p.comparison_operator0),
+                    self.get_coper_type(p.comparison_operator1),
                 )
 
-        @_(  # noqa: F821
-            r"relational_expression",
-            r"LBRACK boolean_expression RBRACK")
-        def bracket_expression(self, p):
-            """
-            Parsing function for <bracket_expression> nonterminal
-
-            Grammar rules:
-                <bracket_expression> ::= <relational_expression>
-                    | LBRACK <boolean_expression> RBRACK
-            """
-            try:
-                return p.relational_expression
-            except AttributeError:
-                return (
-                    self.get_node_type("UnaryBooleanNode"),
-                    p.boolean_expression,
-                    False,
-                    True,
-                )
-
-        @_(r"expression")  # noqa: F821
-        def relational_expression(self, p):  # noqa: F811
-            """
-            Parsing function for <relational_expression> nonterminal
-
-            Grammar rule:
-                <relational_expression> ::= <expression>
-            """
-
-            return (self.get_node_type("UnaryRelationalNode"), p.expression)
-
-        @_(r"expression comparison_operator expression")  # noqa: F821
-        def relational_expression(self, p):  # noqa: F811
-            """
-            Parsing function for <relational_expression> nonterminal
-
-            Grammar rule:
-                <relational_expression> ::= <expression> <comparison_operator>
-                                            <expression>
-            """
-            return (
-                self.get_node_type("BinaryRelationalNode"),
-                p.expression0,
-                p.expression1,
-                self.get_coper_type(p.comparison_operator),
+            @_(  # noqa: F821
+                r"EQUALEQUAL",
+                r"GREATER",
+                r"LESS",
+                r"GREATEREQUAL",
+                r"LESSEQUAL",
+                r"NOTEQUAL",
             )
+            def comparison_operator(self, p):
+                """
+                Parsing function for <comparison_operator> nonterminal
 
-        @_(r"expression comparison_operator expression comparison_operator expression")  # noqa: F821, E501
-        def relational_expression(self, p):  # noqa: F811
-            """
-            Parsing function for <relational_expression> nonterminal
-
-            Grammar rule:
-                <relational_expression> ::= expression> <comparison_operator>
-                    <expression> <comparison_operator> <expression>
-            """
-            return (
-                self.get_node_type("TernaryRelationalNode"),
-                p.expression0,
-                p.expression1,
-                p.expression2,
-                self.get_coper_type(p.comparison_operator0),
-                self.get_coper_type(p.comparison_operator1),
-            )
-
-        @_(  # noqa: F821
-            r"EQUALEQUAL",
-            r"GREATER",
-            r"LESS",
-            r"GREATEREQUAL",
-            r"LESSEQUAL",
-            r"NOTEQUAL",
-        )
-        def comparison_operator(self, p):
-            """
-            Parsing function for <comparison_operator> nonterminal
-
-            Grammar rules:
-                <comparison_operator> ::= EQUALEQUAL
-                    | GREATER
-                    | LESS
-                    | GREATEREQUAL
-                    | LESSEQUAL
-                    | NOTEQUAL
-            """
-            return p[0]
+                Grammar rules:
+                    <comparison_operator> ::= EQUALEQUAL
+                        | GREATER
+                        | LESS
+                        | GREATEREQUAL
+                        | LESSEQUAL
+                        | NOTEQUAL
+                """
+                return p[0]
 
         @_(r"sum")  # noqa: F821
         def expression(self, p):
@@ -819,16 +900,14 @@ def parser_class_decorator(cls, parser_type):
                 return (
                     self.get_node_type("IdentifierNode"),
                     p.IDENTIFIER,
-                    False,
                 )
             else:
                 return (
                     self.get_node_type("IdentifierNode"),
                     p.IDENTIFIER,
-                    True,
                 )
 
-        @_(r"IDENTIFIER LPAREN parameters RPAREN")  # noqa: F821
+        @_(r"IDENTIFIER ARGUMENTTUPLE")  # noqa: F821
         def function(self, p):
             """
             Parsing function for <function> nonterminal
@@ -840,70 +919,14 @@ def parser_class_decorator(cls, parser_type):
                 return (
                     self.get_node_type("FunctionNode"),
                     p.IDENTIFIER,
-                    len(p.parameters),
-                    p.parameters,
-                    False,
+                    p.ARGUMENTTUPLE[1:-1],
                 )
             else:
                 return (
                     self.get_node_type("FunctionNode"),
                     p.IDENTIFIER,
-                    len(p.parameters),
-                    p.parameters,
-                    True,
+                    p.ARGUMENTTUPLE[1:-1],
                 )
-
-        @_(r"", r"parameter_list")  # noqa: F821
-        def parameters(self, p):
-            """
-            Parsing function for <parameters> nonterminal
-
-            Grammar rules:
-                <parameters> ::= EMPTY
-                    | <parameter_list>
-            """
-            try:
-                return p.parameter_list
-            except AttributeError:
-                return tuple()
-
-        @_(r"parameter", r"parameter_list ',' parameter")  # noqa: F821
-        def parameter_list(self, p):
-            """
-            Parsing function for <parameter_list> nonterminal
-
-            Grammar rules:
-                <parameter_list> ::= <parameter>
-                    | <parameter_list> COMMA <parameter>
-            """
-            try:
-                return p.parameter_list + (p.parameter,)
-            except AttributeError:
-                return (p.parameter,)
-
-        @_(r"parameter_begin_scope boolean_expression parameter_end_scope")  # noqa: F821, E501
-        def parameter(self, p):
-            """
-            Parsing function for <parameter> nonterminal
-
-            Grammar rules:
-                <parameter> ::= <boolean_expression>
-            """
-            return p.boolean_expression
-
-        @_("")  # noqa: F821
-        def parameter_begin_scope(self, p):
-            """
-            Parsing action to open parameter scope
-            """
-            self.parameter_stack.append(None)
-
-        @_("")  # noqa: F821
-        def parameter_end_scope(self, p):
-            """
-            Parsing action to close parameter scope
-            """
-            self.parameter_stack.pop()
 
         def error(self, p):
             """

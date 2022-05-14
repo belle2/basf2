@@ -17,7 +17,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(HepevtInput)
+REG_MODULE(HepevtInput);
 
 HepevtInputModule::HepevtInputModule() : Module(), m_evtNum(-1)
 {

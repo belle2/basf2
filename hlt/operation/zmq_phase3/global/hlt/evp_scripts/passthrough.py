@@ -14,6 +14,9 @@ from softwaretrigger import constants
 from softwaretrigger.processing import finalize_zmq_path, setup_basf2_and_db, start_zmq_path
 from pxd import add_pxd_percentframe_phase3_early, add_roi_payload_assembler
 
+
+basf2.logging.add_udp('hltctl', 6900)
+
 args = setup_basf2_and_db(zmq=True)
 
 path, reco_path = start_zmq_path(args, location=constants.Location.hlt)

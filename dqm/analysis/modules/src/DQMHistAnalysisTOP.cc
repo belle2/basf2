@@ -20,14 +20,15 @@ using boost::format;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisTOP)
+REG_MODULE(DQMHistAnalysisTOP);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
 DQMHistAnalysisTOPModule::DQMHistAnalysisTOPModule()
-  : DQMHistAnalysisModule()
+  : DQMHistAnalysisModule(),
+    m_IsNullRun{false}
 {
   //Parameter definition
   B2DEBUG(20, "DQMHistAnalysisTOP: Constructor done.");
@@ -99,6 +100,9 @@ void DQMHistAnalysisTOPModule::initialize()
 void DQMHistAnalysisTOPModule::beginRun()
 {
   //B2DEBUG(20, "DQMHistAnalysisTOP: beginRun called.");
+  m_RunType = findHist("DQMInfo/rtype");
+  m_RunTypeString = m_RunType ? m_RunType->GetTitle() : "";
+  m_IsNullRun = (m_RunTypeString == "null");
 }
 
 TH1* DQMHistAnalysisTOPModule::find_histo_in_canvas(TString histo_name)
@@ -165,7 +169,7 @@ void DQMHistAnalysisTOPModule::event()
   m_text1->Clear();
   m_text1->AddText(Form("Ratio of entries outside of red lines: %.2f %%", exRatio * 100.0));
   if (exRatio > 0.01) {
-    m_text1->AddText(">1% bad, report to TOP experts!");
+    if (m_IsNullRun == false) m_text1->AddText(">1% bad, report to TOP experts!");
   } else {
     m_text1->AddText("<0.1% good, 0.1-1% recoverable.");
   }
@@ -184,7 +188,7 @@ void DQMHistAnalysisTOPModule::event()
   TCanvas* c2 = findCanvas("TOP/c_window_vs_slot");
   if (c2 != NULL) {
     c2->cd();
-    if (exRatio > 0.01) c2->Pad()->SetFillColor(kRed);
+    if (exRatio > 0.01 && m_IsNullRun == false) c2->Pad()->SetFillColor(kRed);
     else c2->Pad()->SetFillColor(kWhite);
     m_line1->Draw();
     m_line2->Draw();
@@ -207,7 +211,7 @@ void DQMHistAnalysisTOPModule::event()
   TCanvas* c3 = findCanvas("TOP/c_BoolEvtMonitor");
   if (c3 != NULL) {
     c3->cd();
-    if (badRatio > 0.0001) c3->Pad()->SetFillColor(kRed);
+    if (badRatio > 0.0001 && m_IsNullRun == false) c3->Pad()->SetFillColor(kRed);
     else c3->Pad()->SetFillColor(kWhite);
     m_text2->Draw();
   }

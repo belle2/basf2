@@ -21,7 +21,7 @@ using boost::format;
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(TrackingHLTDQM)
+REG_MODULE(TrackingHLTDQM);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -72,7 +72,7 @@ void TrackingHLTDQMModule::defineHisto()
   DefineHelixParametersAndCorrelations();
   DefineTrackFitStatus();
 
-  DefineFlags();
+  DefineAbortFlagsHistograms();
 
   originalDirectory->cd();
 
@@ -122,12 +122,12 @@ void TrackingHLTDQMModule::event()
         } //time overflow
       }// loop on RawFTSW
     } //RawFTSW is valid
-  }  else
+  } else
     m_trackingErrorFlags->Fill(0.0);
 
 }
 
-void TrackingHLTDQMModule::DefineFlags()
+void TrackingHLTDQMModule::DefineAbortFlagsHistograms()
 {
   // only monitor if any flag was set so only 2 bins needed
   const char* flagTitle =

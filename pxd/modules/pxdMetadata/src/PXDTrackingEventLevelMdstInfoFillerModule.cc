@@ -12,7 +12,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(PXDTrackingEventLevelMdstInfoFiller)
+REG_MODULE(PXDTrackingEventLevelMdstInfoFiller);
 
 PXDTrackingEventLevelMdstInfoFillerModule::PXDTrackingEventLevelMdstInfoFillerModule() : Module()
 {

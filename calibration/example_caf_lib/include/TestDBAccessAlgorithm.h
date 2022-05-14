@@ -23,7 +23,9 @@ namespace Belle2 {
 
     /// Destructor
     virtual ~TestDBAccessAlgorithm() {}
+    /// Setter for m_generatePayloads
     void setGeneratePayloads(const bool& value) {m_generatePayloads = value;}
+    /// Getter for m_generatePayloads
     bool getGeneratePayloads() const {return m_generatePayloads;}
     void saveSameMeans();
 
@@ -33,10 +35,13 @@ namespace Belle2 {
     virtual EResult calibrate() override;
 
   private:
+    /// Grabs DBObjects from the Database and finds out the average distance from 42.
     float getAverageDistanceFromAnswer();
+    /// Generates new payloads
     void generateNewPayloads();
+    /// Saves new DB values for each run where they are a little closer to 42
     void reduceDistancesAndSave();
-    bool m_generatePayloads = true;
-    DBObjPtr<TestCalibMean> m_dbMean;
+    bool m_generatePayloads = true; /**< generatePayloads */
+    DBObjPtr<TestCalibMean> m_dbMean; /**< dbMean */
   };
 } // namespace Belle2

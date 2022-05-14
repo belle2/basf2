@@ -15,7 +15,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(FlavorTaggerInfoBuilder)
+REG_MODULE(FlavorTaggerInfoBuilder);
 
 //-----------------------------------------------------------------
 //                 Implementation

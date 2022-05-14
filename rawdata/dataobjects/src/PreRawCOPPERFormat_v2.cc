@@ -1492,7 +1492,7 @@ int* PreRawCOPPERFormat_v2::PackDetectorBuf(int* packed_buf_nwords,
 
   int poswords_to = 0;
   int* detector_buf[ 4 ] = { detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th };
-  int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
+  const int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
 
   // calculate the event length
   int length_nwords = tmp_header.GetHdrNwords() + SIZE_COPPER_HEADER + SIZE_COPPER_TRAILER + tmp_trailer.GetTrlNwords();

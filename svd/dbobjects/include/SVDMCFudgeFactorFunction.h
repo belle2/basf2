@@ -1,0 +1,105 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
+#pragma once
+
+#include <framework/logging/Logger.h>
+#include <TObject.h>
+#include <TF1.h>
+#include <TString.h>
+#include <TROOT.h>
+
+#include <cmath>
+#include <vector>
+
+namespace Belle2 {
+
+  /** class to contain the MC fudge factor formulae*/
+  class SVDMCFudgeFactorFunction : public TObject {
+
+  public:
+
+    /** typedef of the return value of the fudge factor function*/
+    typedef double (SVDMCFudgeFactorFunction::*fudgeFactorFunction)(double) const;
+
+    /** returns the position error, depending on the track's angle*/
+    double getFudgeFactor(double angle) const
+    {
+      fudgeFactorFunction f = m_implementations[m_current];
+      return (this->*f)(angle) ;
+    }
+
+    /** constructor */
+    SVDMCFudgeFactorFunction()
+    {
+      // The m_implementations vector is static.
+      // We have to initialize it just once.
+      if (m_implementations.size() == 0) {
+        m_implementations.push_back(&SVDMCFudgeFactorFunction::cheby_v0);
+      }
+
+      m_current = m_implementations.size() - 1;
+
+    };
+
+    /** allows to choose the function version */
+    void set_current(int current)
+    {
+      m_current = current;
+    }
+
+    //SETTERS FOR function ID = 0 (cheby_v0)
+    /** set the Chebyshev coefficients*/
+    void set_c(double c_1, double c_2, double c_3, double c_4, double c_5)
+    {
+      m_c[0] = c_1;
+      m_c[1] = c_2;
+      m_c[2] = c_3;
+      m_c[3] = c_4;
+      m_c[4] = c_5;
+    }
+
+    /** copy constructor */
+    SVDMCFudgeFactorFunction(const Belle2::SVDMCFudgeFactorFunction& a);
+
+    /** operator = */
+    SVDMCFudgeFactorFunction& operator=(const Belle2::SVDMCFudgeFactorFunction& a);
+
+  private:
+
+    /** order of Chebyshev polynomial */
+    static const int chebyshevPolyOrder = 5;
+
+    /** function parameters & implementations*/
+
+    /** ID = {0}, rel07: fudge factor parametrized with 4th order Chebyshev polynomial
+     */
+    double m_c[ chebyshevPolyOrder ] = {1, 0, 0, 0, 0};
+
+    /** cheby_v0 implementation
+     * @param trkAngle track's incident angle
+     * @return final cluster position error, including scale factor
+     */
+    double cheby_v0(double trkAngle) const
+    {
+      TF1* f = (TF1*) gROOT->GetFunction(TString::Format("chebyshev%d", chebyshevPolyOrder - 1));
+      f->SetParameters(&m_c[0]);
+
+      return f->Eval(trkAngle);
+    };
+
+    /** current function ID */
+    int m_current;
+
+    /** vector of functions for fudge factor computation, we use the m_current*/
+    static std::vector < fudgeFactorFunction > m_implementations; //! Do not stream this, please throw it in the WC
+
+    ClassDef(SVDMCFudgeFactorFunction, 2);
+  };
+
+}

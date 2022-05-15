@@ -96,9 +96,9 @@ and path.
    convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, path=my_path)
 
 - ``inputBelleMDSTFile`` : a BASF mdst file name or an url of the mdst file location.
-- ``pathe=my_path`` : your basf2 steering process path.
+- ``path=my_path`` : your basf2 steering process path.
 
-Examples of analysis steering files can be found in example directory of b2bii package:
+Examples of analysis steering files can be found in example directory of the b2bii package:
 
 .. code-block:: csh
 

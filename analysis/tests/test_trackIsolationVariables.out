@@ -1325,7 +1325,7 @@
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 4.00877
 [INFO]      o) dist3DToClosestTrkAtSurfacePID = 62.3079
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfacePID = 36.6481
-[INFO]      o) dist3DToClosestTrkAtSurfaceECL = 88.3324
+[INFO]      o) dist3DToClosestTrkAtSurfaceECL = 88.3323
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceECL = 58.1028
 [INFO]      o) dist3DToClosestTrkAtSurfaceKLM = 56.0374
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 20.5094
@@ -1406,7 +1406,7 @@
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 0.406386
 [INFO]      o) dist3DToClosestTrkAtSurfacePID = 109.078
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfacePID = 3.39491
-[INFO]      o) dist3DToClosestTrkAtSurfaceECL = 88.3324
+[INFO]      o) dist3DToClosestTrkAtSurfaceECL = 88.3323
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceECL = 5.48412
 [INFO]      o) dist3DToClosestTrkAtSurfaceKLM = 17.979
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 47.5933
@@ -1436,7 +1436,7 @@
 [INFO]      o) dist3DToClosestTrkAtSurfaceECL = 101.791
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceECL = 17.6201
 [INFO]      o) dist3DToClosestTrkAtSurfaceKLM = 206.507
-[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 90.3541
+[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 90.3542
 [INFO]  - 29 = -321[13]
 [INFO]      o) dist3DToClosestTrkAtSurfaceCDC = 4.98831
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 1.67348
@@ -1804,7 +1804,7 @@
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 0.406386
 [INFO]      o) dist3DToClosestTrkAtSurfacePID = 109.078
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfacePID = 3.39491
-[INFO]      o) dist3DToClosestTrkAtSurfaceECL = 88.3324
+[INFO]      o) dist3DToClosestTrkAtSurfaceECL = 88.3323
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceECL = 5.48412
 [INFO]      o) dist3DToClosestTrkAtSurfaceKLM = 17.979
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 47.5933
@@ -1834,7 +1834,7 @@
 [INFO]      o) dist3DToClosestTrkAtSurfaceECL = 101.791
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceECL = 17.6201
 [INFO]      o) dist3DToClosestTrkAtSurfaceKLM = 206.507
-[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 90.3541
+[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 90.3542
 [INFO]  - 29 = -321[5]
 [INFO]      o) dist3DToClosestTrkAtSurfaceCDC = 4.98831
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 1.67348
@@ -1867,7 +1867,7 @@
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 4.00877
 [INFO]      o) dist3DToClosestTrkAtSurfacePID = 62.3079
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfacePID = 36.6481
-[INFO]      o) dist3DToClosestTrkAtSurfaceECL = 88.3324
+[INFO]      o) dist3DToClosestTrkAtSurfaceECL = 88.3323
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceECL = 58.1028
 [INFO]      o) dist3DToClosestTrkAtSurfaceKLM = 56.0374
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 20.5094
@@ -2110,10 +2110,10 @@
     3.8e-06    6.5e-08    1.7e-07   -1.6e-06   -2.8e-09    8.4e-08   -6.5e-06
     6.5e-08      4e-06   -1.8e-08   -8.1e-08    2.9e-07   -8.6e-06   -2.5e-07
     1.7e-07   -1.8e-08    3.9e-06    1.2e-06   -2.2e-09    6.8e-08   -8.8e-06
-   -1.6e-06   -8.1e-08    1.2e-06    1.1e-06   -2.8e-09    8.5e-08   -1.5e-11
+   -1.6e-06   -8.1e-08    1.2e-06    1.1e-06   -2.8e-09    8.5e-08   -1.6e-11
    -2.8e-09    2.9e-07   -2.2e-09   -2.8e-09    2.2e-08   -6.6e-07   -5.2e-09
     8.4e-08   -8.6e-06    6.8e-08    8.5e-08   -6.6e-07      2e-05    1.5e-07
-   -6.5e-06   -2.5e-07   -8.8e-06   -1.5e-11   -5.2e-09    1.5e-07    3.1e-05
+   -6.5e-06   -2.5e-07   -8.8e-06   -1.6e-11   -5.2e-09    1.5e-07    3.1e-05
 
  extra info=( dist2DRhoPhiToClosestTrkAtCDCSurface=0.1708 dist2DRhoPhiToClosestTrkAtECLSurface=62.44 dist2DRhoPhiToClosestTrkAtKLMSurface=24.8 dist2DRhoPhiToClosestTrkAtPIDSurface=56.64 dist3DToClosestTrkAtCDCSurface=4.725 dist3DToClosestTrkAtECLSurface=80.16 dist3DToClosestTrkAtKLMSurface=121.8 dist3DToClosestTrkAtPIDSurface=61.01 ) 
 
@@ -2420,10 +2420,10 @@
     3.8e-06    6.5e-08    1.7e-07   -1.6e-06   -2.8e-09    8.4e-08   -6.5e-06
     6.5e-08      4e-06   -1.8e-08   -8.1e-08    2.9e-07   -8.6e-06   -2.5e-07
     1.7e-07   -1.8e-08    3.9e-06    1.2e-06   -2.2e-09    6.8e-08   -8.8e-06
-   -1.6e-06   -8.1e-08    1.2e-06    1.1e-06   -2.8e-09    8.5e-08   -1.5e-11
+   -1.6e-06   -8.1e-08    1.2e-06    1.1e-06   -2.8e-09    8.5e-08   -1.6e-11
    -2.8e-09    2.9e-07   -2.2e-09   -2.8e-09    2.2e-08   -6.6e-07   -5.2e-09
     8.4e-08   -8.6e-06    6.8e-08    8.5e-08   -6.6e-07      2e-05    1.5e-07
-   -6.5e-06   -2.5e-07   -8.8e-06   -1.5e-11   -5.2e-09    1.5e-07    3.1e-05
+   -6.5e-06   -2.5e-07   -8.8e-06   -1.6e-11   -5.2e-09    1.5e-07    3.1e-05
 
  extra info=( dist2DRhoPhiToClosestTrkAtCDCSurface=0.1708 dist2DRhoPhiToClosestTrkAtECLSurface=62.44 dist2DRhoPhiToClosestTrkAtKLMSurface=24.8 dist2DRhoPhiToClosestTrkAtPIDSurface=56.64 dist3DToClosestTrkAtCDCSurface=4.725 dist3DToClosestTrkAtECLSurface=80.16 dist3DToClosestTrkAtKLMSurface=121.8 dist3DToClosestTrkAtPIDSurface=61.01 ) 
 
@@ -3110,10 +3110,10 @@
     1.8e-06   -2.4e-07   -1.1e-07    2.4e-07   -4.2e-06    1.5e-06    6.7e-07
    -2.4e-07    1.2e-06   -3.4e-07    8.4e-07    1.4e-06   -4.9e-07      2e-06
    -1.1e-07   -3.4e-07    1.8e-06    3.7e-07   -5.5e-09    1.7e-09   -4.9e-06
-    2.4e-07    8.4e-07    3.7e-07    9.5e-07    4.8e-08   -1.7e-08    4.6e-11
+    2.4e-07    8.4e-07    3.7e-07    9.5e-07    4.8e-08   -1.7e-08    4.7e-11
    -4.2e-06    1.4e-06   -5.5e-09    4.8e-08    1.1e-05   -3.9e-06   -4.8e-08
     1.5e-06   -4.9e-07    1.7e-09   -1.7e-08   -3.9e-06    1.4e-06    1.9e-08
-    6.7e-07      2e-06   -4.9e-06    4.6e-11   -4.8e-08    1.9e-08    1.6e-05
+    6.7e-07      2e-06   -4.9e-06    4.7e-11   -4.8e-08    1.9e-08    1.6e-05
 
  extra info=( dist2DRhoPhiToClosestTrkAtCDCSurface=1.013 dist2DRhoPhiToClosestTrkAtECLSurface=2.553 dist2DRhoPhiToClosestTrkAtKLMSurface=73.21 dist2DRhoPhiToClosestTrkAtPIDSurface=4.459 dist3DToClosestTrkAtCDCSurface=9.148 dist3DToClosestTrkAtECLSurface=64.96 dist3DToClosestTrkAtKLMSurface=233.7 dist3DToClosestTrkAtPIDSurface=59.87 ) 
 
@@ -3420,10 +3420,10 @@
     1.8e-06   -2.4e-07   -1.1e-07    2.4e-07   -4.2e-06    1.5e-06    6.7e-07
    -2.4e-07    1.2e-06   -3.4e-07    8.4e-07    1.4e-06   -4.9e-07      2e-06
    -1.1e-07   -3.4e-07    1.8e-06    3.7e-07   -5.5e-09    1.7e-09   -4.9e-06
-    2.4e-07    8.4e-07    3.7e-07    9.5e-07    4.8e-08   -1.7e-08    4.6e-11
+    2.4e-07    8.4e-07    3.7e-07    9.5e-07    4.8e-08   -1.7e-08    4.7e-11
    -4.2e-06    1.4e-06   -5.5e-09    4.8e-08    1.1e-05   -3.9e-06   -4.8e-08
     1.5e-06   -4.9e-07    1.7e-09   -1.7e-08   -3.9e-06    1.4e-06    1.9e-08
-    6.7e-07      2e-06   -4.9e-06    4.6e-11   -4.8e-08    1.9e-08    1.6e-05
+    6.7e-07      2e-06   -4.9e-06    4.7e-11   -4.8e-08    1.9e-08    1.6e-05
 
  extra info=( dist2DRhoPhiToClosestTrkAtCDCSurface=1.013 dist2DRhoPhiToClosestTrkAtECLSurface=2.553 dist2DRhoPhiToClosestTrkAtKLMSurface=73.21 dist2DRhoPhiToClosestTrkAtPIDSurface=4.459 dist3DToClosestTrkAtCDCSurface=9.148 dist3DToClosestTrkAtECLSurface=64.96 dist3DToClosestTrkAtKLMSurface=233.7 dist3DToClosestTrkAtPIDSurface=59.87 ) 
 
@@ -4969,7 +4969,7 @@
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 11.741
 [INFO]  - 7 = 211[3]
 [INFO]      o) dist3DToClosestTrkAtSurfaceCDC = 13.2295
-[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.3443
+[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.34429
 [INFO]      o) dist3DToClosestTrkAtSurfacePID = 80.2137
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfacePID = 2.41855
 [INFO]      o) dist3DToClosestTrkAtSurfaceECL = 86.677
@@ -5281,7 +5281,7 @@
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 11.741
 [INFO]  - 7 = 211[8]
 [INFO]      o) dist3DToClosestTrkAtSurfaceCDC = 13.2295
-[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.3443
+[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.34429
 [INFO]      o) dist3DToClosestTrkAtSurfacePID = 80.2137
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfacePID = 2.41855
 [INFO]      o) dist3DToClosestTrkAtSurfaceECL = 86.677
@@ -5500,7 +5500,7 @@
 [INFO]      o) dist3DToClosestTrkAtSurfaceECL = 86.5119
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceECL = 2.16583
 [INFO]      o) dist3DToClosestTrkAtSurfaceKLM = 184.503
-[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 69.595
+[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 69.5951
 [INFO]  - 16 = 321[3]
 [INFO]      o) dist3DToClosestTrkAtSurfaceCDC = 13.2337
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.35306
@@ -5812,7 +5812,7 @@
 [INFO]      o) dist3DToClosestTrkAtSurfaceECL = 86.5119
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceECL = 2.16583
 [INFO]      o) dist3DToClosestTrkAtSurfaceKLM = 184.503
-[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 69.595
+[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 69.5951
 [INFO]  - 16 = 321[8]
 [INFO]      o) dist3DToClosestTrkAtSurfaceCDC = 13.2337
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.35306
@@ -5858,10 +5858,10 @@
       1e-05    1.1e-06    1.7e-06   -9.1e-07   -2.9e-05   -2.4e-05     -4e-05
     1.1e-06      1e-05     -2e-06    1.1e-06   -2.5e-05   -2.1e-05    4.8e-05
     1.7e-06     -2e-06    8.1e-06    1.8e-06   -1.3e-07   -1.1e-07     -5e-05
-   -9.1e-07    1.1e-06    1.8e-06    8.8e-07   -1.3e-07   -1.1e-07    2.1e-10
+   -9.1e-07    1.1e-06    1.8e-06    8.8e-07   -1.3e-07   -1.1e-07      2e-10
    -2.9e-05   -2.5e-05   -1.3e-07   -1.3e-07    0.00013    0.00011   -2.7e-06
    -2.4e-05   -2.1e-05   -1.1e-07   -1.1e-07    0.00011    9.1e-05   -2.2e-06
-     -4e-05    4.8e-05     -5e-05    2.1e-10   -2.7e-06   -2.2e-06    0.00057
+     -4e-05    4.8e-05     -5e-05      2e-10   -2.7e-06   -2.2e-06    0.00057
 
  extra info=( dist2DRhoPhiToClosestTrkAtCDCSurface=5.396 dist2DRhoPhiToClosestTrkAtECLSurface=34.23 dist2DRhoPhiToClosestTrkAtKLMSurface=74.83 dist2DRhoPhiToClosestTrkAtPIDSurface=11.29 dist3DToClosestTrkAtCDCSurface=11.71 dist3DToClosestTrkAtECLSurface=114.9 dist3DToClosestTrkAtKLMSurface=30.79 dist3DToClosestTrkAtPIDSurface=107.9 ) 
 
@@ -6225,10 +6225,10 @@
       1e-05    1.1e-06    1.7e-06   -9.1e-07   -2.9e-05   -2.4e-05     -4e-05
     1.1e-06      1e-05     -2e-06    1.1e-06   -2.5e-05   -2.1e-05    4.8e-05
     1.7e-06     -2e-06    8.1e-06    1.8e-06   -1.3e-07   -1.1e-07     -5e-05
-   -9.1e-07    1.1e-06    1.8e-06    8.8e-07   -1.3e-07   -1.1e-07    2.1e-10
+   -9.1e-07    1.1e-06    1.8e-06    8.8e-07   -1.3e-07   -1.1e-07      2e-10
    -2.9e-05   -2.5e-05   -1.3e-07   -1.3e-07    0.00013    0.00011   -2.7e-06
    -2.4e-05   -2.1e-05   -1.1e-07   -1.1e-07    0.00011    9.1e-05   -2.2e-06
-     -4e-05    4.8e-05     -5e-05    2.1e-10   -2.7e-06   -2.2e-06    0.00057
+     -4e-05    4.8e-05     -5e-05      2e-10   -2.7e-06   -2.2e-06    0.00057
 
  extra info=( dist2DRhoPhiToClosestTrkAtCDCSurface=5.396 dist2DRhoPhiToClosestTrkAtECLSurface=34.23 dist2DRhoPhiToClosestTrkAtKLMSurface=74.83 dist2DRhoPhiToClosestTrkAtPIDSurface=11.29 dist3DToClosestTrkAtCDCSurface=11.71 dist3DToClosestTrkAtECLSurface=114.9 dist3DToClosestTrkAtKLMSurface=30.79 dist3DToClosestTrkAtPIDSurface=107.9 ) 
 
@@ -6571,7 +6571,7 @@
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 11.741
 [INFO]  - 34 = -11[3]
 [INFO]      o) dist3DToClosestTrkAtSurfaceCDC = 13.2295
-[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.3443
+[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.34429
 [INFO]      o) dist3DToClosestTrkAtSurfacePID = 80.2137
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfacePID = 2.41855
 [INFO]      o) dist3DToClosestTrkAtSurfaceECL = 86.677
@@ -6883,7 +6883,7 @@
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 11.741
 [INFO]  - 34 = -11[8]
 [INFO]      o) dist3DToClosestTrkAtSurfaceCDC = 13.2295
-[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.3443
+[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.34429
 [INFO]      o) dist3DToClosestTrkAtSurfacePID = 80.2137
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfacePID = 2.41855
 [INFO]      o) dist3DToClosestTrkAtSurfaceECL = 86.677
@@ -7105,7 +7105,7 @@
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 11.741
 [INFO]  - 43 = -13[3]
 [INFO]      o) dist3DToClosestTrkAtSurfaceCDC = 13.2295
-[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.3443
+[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.34429
 [INFO]      o) dist3DToClosestTrkAtSurfacePID = 80.2137
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfacePID = 2.41855
 [INFO]      o) dist3DToClosestTrkAtSurfaceECL = 86.677
@@ -7417,7 +7417,7 @@
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 11.741
 [INFO]  - 43 = -13[8]
 [INFO]      o) dist3DToClosestTrkAtSurfaceCDC = 13.2295
-[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.3443
+[INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.34429
 [INFO]      o) dist3DToClosestTrkAtSurfacePID = 80.2137
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfacePID = 2.41855
 [INFO]      o) dist3DToClosestTrkAtSurfaceECL = 86.677

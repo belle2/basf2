@@ -488,7 +488,7 @@ TMatrixFSym Particle::getVertexErrorMatrix() const
   return pos;
 }
 
-float Particle::getCosHelicity(const Particle* mother) const
+double Particle::getCosHelicity(const Particle* mother) const
 {
   // boost vector to the rest frame of the particle
   Boost boost(get4Vector().BoostToCM());
@@ -527,17 +527,17 @@ float Particle::getCosHelicity(const Particle* mother) const
   }
 
   double mag2 = pMother.P2() * pDaughter.P2();
-  if (mag2 <= 0) return std::numeric_limits<float>::quiet_NaN();
+  if (mag2 <= 0) return std::numeric_limits<double>::quiet_NaN();
   return -pMother.Vect().Dot(pDaughter.Vect()) / sqrt(mag2);
 }
 
-float Particle::getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaughter) const
+double Particle::getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaughter) const
 {
   // check existence of daughter
   if (getNDaughters() <= iDaughter) {
     B2ERROR("No daughter of particle 'name' with index 'iDaughter' for calculation of helicity angle"
             << LogVar("name", getName()) << LogVar("iDaughter", iDaughter));
-    return std::numeric_limits<float>::quiet_NaN();
+    return std::numeric_limits<double>::quiet_NaN();
   }
 
   // boost vector to the rest frame of the daughter particle
@@ -551,24 +551,24 @@ float Particle::getCosHelicityDaughter(unsigned iDaughter, unsigned iGrandDaught
   if (daughter->getNDaughters() <= iGrandDaughter) {
     B2ERROR("No grand daughter of daughter 'iDaughter' of particle 'name' with index 'iGrandDaughter' for calculation of helicity angle"
             << LogVar("name", getName()) << LogVar("iDaughter", iDaughter) << LogVar("iGrandDaughter", iGrandDaughter));
-    return std::numeric_limits<float>::quiet_NaN();
+    return std::numeric_limits<double>::quiet_NaN();
   }
 
   // momentum of the grand daughter in the daughter's rest frame
   PxPyPzEVector pGrandDaughter = boost * daughter->getDaughter(iGrandDaughter)->get4Vector();
 
   double mag2 = pMother.P2() * pGrandDaughter.P2();
-  if (mag2 <= 0) return std::numeric_limits<float>::quiet_NaN();
+  if (mag2 <= 0) return std::numeric_limits<double>::quiet_NaN();
   return -pMother.Vect().Dot(pGrandDaughter.Vect()) / sqrt(mag2);
 }
 
-float Particle::getAcoplanarity() const
+double Particle::getAcoplanarity() const
 {
   // check that we have a decay to two daughters and then two grand daughters each
   if (getNDaughters() != 2) {
     B2ERROR("Cannot calculate acoplanarity of particle 'name' because the number of daughters is not 2"
             << LogVar("name", getName()) << LogVar("# of daughters", getNDaughters()));
-    return std::numeric_limits<float>::quiet_NaN();
+    return std::numeric_limits<double>::quiet_NaN();
   }
   const Particle* daughter0 = getDaughter(0);
   const Particle* daughter1 = getDaughter(1);
@@ -576,7 +576,7 @@ float Particle::getAcoplanarity() const
     B2ERROR("Cannot calculate acoplanarity of particle 'name' because the number of grand daughters is not 2"
             << LogVar("name", getName()) << LogVar("# of grand daughters of first daughter", daughter0->getNDaughters())
             << LogVar("# of grand daughters of second daughter", daughter1->getNDaughters()));
-    return std::numeric_limits<float>::quiet_NaN();
+    return std::numeric_limits<double>::quiet_NaN();
   }
 
   // boost vector to the rest frame of the particle
@@ -599,14 +599,14 @@ float Particle::getAcoplanarity() const
 
 
 /*
-float Particle::getMassError(void) const
+double Particle::getMassError(void) const
 {
-  float result = 0.0;
+  double result = 0.0;
 
   if(m_pValue<0)
     return result;
 
-  float invMass = getMass();
+  double invMass = getMass();
 
   TMatrixFSym covarianceMatrix = getMomentumErrorMatrix();
   TVectorF    jacobian(c_DimMomentum);
@@ -633,7 +633,7 @@ void Particle::updateMass(const int pdgCode)
   m_mass = TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass() ;
 }
 
-float Particle::getPDGMass() const
+double Particle::getPDGMass() const
 {
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr) {
     B2ERROR("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
@@ -642,7 +642,7 @@ float Particle::getPDGMass() const
   return TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass();
 }
 
-float Particle::getCharge() const
+double Particle::getCharge() const
 {
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr) {
     B2ERROR("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
@@ -1023,14 +1023,14 @@ void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
      dE/dpx = px/E etc.
   */
 
-  const float E = getEnergy();
-  const float dEdp[] = {m_px / E, m_py / E, m_pz / E};
+  const double E = getEnergy();
+  const double dEdp[] = {m_px / E, m_py / E, m_pz / E};
   constexpr unsigned compMom[] = {c_Px, c_Py, c_Pz};
   constexpr unsigned compPos[] = {c_X,  c_Y,  c_Z};
 
   // covariances (p,E)
   for (unsigned int i : compMom) {
-    float Cov = 0;
+    double Cov = 0;
     for (int k = 0; k < 3; k++) {
       Cov += errMatrix(i, compMom[k]) * dEdp[k];
     }
@@ -1039,7 +1039,7 @@ void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
 
   // covariances (x,E)
   for (unsigned int comp : compPos) {
-    float Cov = 0;
+    double Cov = 0;
     for (int k = 0; k < 3; k++) {
       Cov += errMatrix(comp, compMom[k]) * dEdp[k];
     }
@@ -1047,7 +1047,7 @@ void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
   }
 
   // variance (E,E)
-  float Cov = 0;
+  double Cov = 0;
   for (int i = 0; i < 3; i++) {
     Cov += errMatrix(compMom[i], compMom[i]) * dEdp[i] * dEdp[i];
   }
@@ -1062,13 +1062,13 @@ void Particle::setMomentumPositionErrorMatrix(const TrackFitResult* trackFit)
 
 void Particle::resetErrorMatrix()
 {
-  for (float& i : m_errMatrix)
+  for (double& i : m_errMatrix)
     i = 0.0;
 }
 
 void Particle::resetJacobiMatrix()
 {
-  for (float& i : m_jacobiMatrix)
+  for (double& i : m_jacobiMatrix)
     i = 0.0;
 }
 
@@ -1254,7 +1254,7 @@ void Particle::removeExtraInfo()
   m_extraInfo.clear();
 }
 
-float Particle::getExtraInfo(const std::string& name) const
+double Particle::getExtraInfo(const std::string& name) const
 {
   if (m_extraInfo.empty())
     throw std::runtime_error(std::string("getExtraInfo: Value '") + name + "' not found in Particle!");
@@ -1273,7 +1273,7 @@ float Particle::getExtraInfo(const std::string& name) const
 
 }
 
-void Particle::writeExtraInfo(const std::string& name, const float value)
+void Particle::writeExtraInfo(const std::string& name, const double value)
 {
   if (this->hasExtraInfo(name)) {
     this->setExtraInfo(name, value);
@@ -1282,7 +1282,7 @@ void Particle::writeExtraInfo(const std::string& name, const float value)
   }
 }
 
-void Particle::setExtraInfo(const std::string& name, float value)
+void Particle::setExtraInfo(const std::string& name, double value)
 {
   if (m_extraInfo.empty())
     throw std::runtime_error(std::string("setExtraInfo: Value '") + name + "' not found in Particle!");
@@ -1301,7 +1301,7 @@ void Particle::setExtraInfo(const std::string& name, float value)
 
 }
 
-void Particle::addExtraInfo(const std::string& name, float value)
+void Particle::addExtraInfo(const std::string& name, double value)
 {
   if (hasExtraInfo(name))
     throw std::runtime_error(std::string("addExtraInfo: Value '") + name + "' already set!");

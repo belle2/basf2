@@ -14,9 +14,7 @@ std::vector <SVDMCFudgeFactorFunction::fudgeFactorFunction> SVDMCFudgeFactorFunc
 
 SVDMCFudgeFactorFunction::SVDMCFudgeFactorFunction(const SVDMCFudgeFactorFunction& a) : TObject(a)
 {
-  for (int i = 0; i < chebyshevPolyOrder; i++) {
-    m_c[i] = a.m_c[i];
-  }
+  m_c = a.m_c;
 
   m_current = a.m_current;
 
@@ -27,9 +25,7 @@ SVDMCFudgeFactorFunction& SVDMCFudgeFactorFunction::operator=(const SVDMCFudgeFa
   if (this == &a)
     return *this;
 
-  for (int i = 0; i < chebyshevPolyOrder; i++) {
-    m_c[i] = a.m_c[i];
-  }
+  m_c = a.m_c;
 
   m_current = a.m_current;
 

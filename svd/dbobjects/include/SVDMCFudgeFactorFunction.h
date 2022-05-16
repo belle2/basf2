@@ -55,13 +55,12 @@ namespace Belle2 {
 
     //SETTERS FOR function ID = 0 (cheby_v0)
     /** set the Chebyshev coefficients*/
-    void set_c(double c_1, double c_2, double c_3, double c_4, double c_5)
+    void set_c(std::vector<double> c)
     {
-      m_c[0] = c_1;
-      m_c[1] = c_2;
-      m_c[2] = c_3;
-      m_c[3] = c_4;
-      m_c[4] = c_5;
+      //for (long unsigned int i=0; i<c.size(); i++){
+      //  m_c.push_back(c[i]);
+      //}
+      m_c = c;
     }
 
     /** copy constructor */
@@ -73,13 +72,13 @@ namespace Belle2 {
   private:
 
     /** order of Chebyshev polynomial */
-    static const int chebyshevPolyOrder = 5;
+    //static const int chebyshevPolyOrder = 5;
 
     /** function parameters & implementations*/
 
-    /** ID = {0}, rel07: fudge factor parametrized with 4th order Chebyshev polynomial
+    /** ID = {0}, rel07: fudge factor parametrized with Chebyshev polynomial
      */
-    double m_c[ chebyshevPolyOrder ] = {1, 0, 0, 0, 0};
+    std::vector<double> m_c;
 
     /** cheby_v0 implementation
      * @param trkAngle track's incident angle
@@ -87,7 +86,7 @@ namespace Belle2 {
      */
     double cheby_v0(double trkAngle) const
     {
-      TF1* f = (TF1*) gROOT->GetFunction(TString::Format("chebyshev%d", chebyshevPolyOrder - 1));
+      TF1* f = (TF1*) gROOT->GetFunction(TString::Format("chebyshev%lu", m_c.size() - 1));
       f->SetParameters(&m_c[0]);
 
       return f->Eval(trkAngle);

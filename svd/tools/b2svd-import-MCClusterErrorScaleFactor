@@ -93,7 +93,7 @@ class jsonSVDMCClusterErrorScaleFactorImporter(b2.Module):
                               " --> " + str(get_sensor_type(layerNumber)) + " " + get_side(side))
 
                         c = param[get_sensor_type(layerNumber) + get_side(side)]
-                        clsParam.set_c(c[0],c[1],c[2],c[3],c[4])
+                        clsParam.set_c(c)
                         print("c = "+str(c))
 
                         clsParam.set_current(int(param["uniqueID"]["INFO"]["current"]))

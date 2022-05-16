@@ -11,6 +11,7 @@
 #include <framework/datastore/RelationsObject.h>
 #include <TH1F.h>
 #include <vector>
+#include <framework/gearbox/Const.h>
 
 namespace Belle2 {
 
@@ -44,6 +45,8 @@ namespace Belle2 {
       m_fineSearch = false;
       m_histograms.clear();
       m_recValid = false;
+      m_minChi2 = 0;
+      m_detector = Const::invalidDetector;
     }
 
     /**
@@ -54,12 +57,12 @@ namespace Belle2 {
      * @param currentOffsetError uncertainty of current offset
      * @param averageOffset average offset
      * @param averageOffsetError uncertainty of average offset
-     * @param fineSearch fine search flag
+     * @param detector a component providing the time seed
      */
     void setReconstructed(int bunchNo, double time,
                           double currentOffset, double currentOffsetError,
                           double averageOffset, double averageOffsetError,
-                          bool fineSearch)
+                          Const::EDetector detector)
     {
       m_recBunchNo = bunchNo;
       m_recTime = time;
@@ -67,8 +70,9 @@ namespace Belle2 {
       m_averageOffset = averageOffset;
       m_currentOffsetError = currentOffsetError;
       m_averageOffsetError = averageOffsetError;
-      m_fineSearch = fineSearch;
+      m_fineSearch = true;
       m_recValid = true;
+      m_detector = detector;
     }
 
     /**
@@ -131,7 +135,9 @@ namespace Belle2 {
      */
     int getAbsoluteBunchNo(int offset) const
     {
-      return (m_recBunchNo + m_revo9Counter * 4 - offset) % 5120;
+      int bn = (m_recBunchNo + m_revo9Counter * 4 - offset) % 5120;
+      if (bn < 0) bn += 5120;
+      return bn;
     }
 
     /**
@@ -231,6 +237,12 @@ namespace Belle2 {
      */
     unsigned short getRevo9Counter() const {return m_revo9Counter;}
 
+    /**
+     * Returns detector component which provided the time seed
+     * @return detector component
+     */
+    Const::EDetector getSeedingDetector() const {return m_detector;}
+
   private:
 
     int m_recBunchNo = 0; /**< reconstructed relative bunch number */
@@ -252,8 +264,9 @@ namespace Belle2 {
 
     unsigned short m_revo9Counter = 0; /**< number of clock ticks since last revo9 flag */
     float m_minChi2 = 0; /**< chi2 value at minimum */
+    Const::EDetector m_detector = Const::invalidDetector; /**< component providing the time seed */
 
-    ClassDef(TOPRecBunch, 4); /**< ClassDef */
+    ClassDef(TOPRecBunch, 5); /**< ClassDef */
 
   };
 

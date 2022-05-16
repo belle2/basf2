@@ -14,7 +14,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(ZMQRxOutput)
+REG_MODULE(ZMQRxOutput);
 
 ZMQRxOutputModule::ZMQRxOutputModule() : Module()
 {

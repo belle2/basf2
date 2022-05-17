@@ -22,9 +22,9 @@ using namespace Belle2;
 //ECL has 16-fold symmetry in phi. Multiply this by 16 to get the total number of crystals at each theta location.
 int const ECLCrystalData::Ring[69] = {
   3, 3, 4, 4, 4, 6, 6, 6, 6, 6, 6, 9, 9,            //forward calorimeter
-  9, 9, 9, 9, 9 , 9, 9, 9, 9, 9 , 9, 9, 9, 9, 9 , 9, 9, 9, 9, 9, //barrel
-  9, 9, 9, 9, 9 , 9, 9, 9, 9, 9 , 9, 9, 9, 9, 9 , 9, 9, 9, 9, 9, //barrel
-  9, 9, 9, 9, 9 , 9,                                //barrel
+  9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,    //barrel
+  9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,    //barrel
+  9, 9, 9, 9, 9, 9,                                 //barrel
   9, 9, 6, 6, 6, 6, 6, 4, 4, 4                      //backward calorimeter
 };
 

@@ -232,8 +232,7 @@ unsigned int ECLUnpackerModule::readNBits(int bitsToRead)
       val += m_bufPtr[m_bufPos] << (32 - m_bitPos);
       m_bitPos += bitsToRead;
       m_bitPos -= 32;
-    }
-  else {
+    } else {
     m_bitPos += bitsToRead;
     if (m_bitPos == 32) {
       m_bufPos++;

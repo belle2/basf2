@@ -981,7 +981,7 @@ void ECLBhabhaTCollectorModule::collect()
   for (int iCharge = 0; iCharge < 2; iCharge++) {
     if (crystalCutsPassed[iCharge]) {
       getObjectPtr<TH2F>("TimevsCrysPrevCrateCalibPrevCrystCalib")->Fill((crystalIDs[iCharge]) + 0.001,
-          times_noPreviousCalibrations[iCharge] - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge] , 1);
+          times_noPreviousCalibrations[iCharge] - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge], 1);
       getObjectPtr<TH2F>("TimevsCratePrevCrateCalibPrevCrystCalib")->Fill((crateIDs[iCharge]) + 0.001,
           times_noPreviousCalibrations[iCharge]  - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge], 1);
       getObjectPtr<TH2F>("TimevsCrysNoCalibrations")->Fill((crystalIDs[iCharge]) + 0.001, times_noPreviousCalibrations[iCharge], 1);
@@ -989,7 +989,7 @@ void ECLBhabhaTCollectorModule::collect()
       getObjectPtr<TH2F>("TimevsCrysPrevCrateCalibNoCrystCalib")->Fill((crystalIDs[iCharge]) + 0.001,
           times_noPreviousCalibrations[iCharge] - tcrate_prevCalib[iCharge], 1);
       getObjectPtr<TH2F>("TimevsCrateNoCrateCalibPrevCrystCalib")->Fill((crateIDs[iCharge]) + 0.001,
-          times_noPreviousCalibrations[iCharge]  - ts_prevCalib[iCharge] , 1);
+          times_noPreviousCalibrations[iCharge]  - ts_prevCalib[iCharge], 1);
 
       // Record number of crystals used from the event.  Should be exactly two.
       numCrystalsPassingCuts++;

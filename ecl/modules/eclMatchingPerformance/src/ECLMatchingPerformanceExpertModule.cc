@@ -163,10 +163,10 @@ void ECLMatchingPerformanceExpertModule::event()
             const short int phiDec = ((phiID - 1 < 0) ? crystalsPerRing + phiID - 1 : phiID - 1);
             const double fractionalPhiDec = static_cast < double >(phiDec) / crystalsPerRing;
             if (m_matchedToDecreasedPhi == 0) {
-              findECLCalDigitMatch(geometry->GetCellID(thetaID , phiDec) + 1, m_matchedToDecreasedPhi);
+              findECLCalDigitMatch(geometry->GetCellID(thetaID, phiDec) + 1, m_matchedToDecreasedPhi);
             }
             if (m_matchedToIncreasedPhi == 0) {
-              findECLCalDigitMatch(geometry->GetCellID(thetaID , phiInc) + 1, m_matchedToIncreasedPhi);
+              findECLCalDigitMatch(geometry->GetCellID(thetaID, phiInc) + 1, m_matchedToIncreasedPhi);
             }
             if (thetaID < 68) {
               if (m_matchedToIncreasedTheta == 0) {

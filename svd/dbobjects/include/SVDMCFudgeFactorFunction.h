@@ -28,10 +28,10 @@ namespace Belle2 {
     typedef double (SVDMCFudgeFactorFunction::*fudgeFactorFunction)(double) const;
 
     /** returns the position error, depending on the track's angle*/
-    double getFudgeFactor(double angle) const
+    double getFudgeFactor(double trkAngle) const
     {
       fudgeFactorFunction f = m_implementations[m_current];
-      return (this->*f)(angle) ;
+      return (this->*f)(trkAngle) ;
     }
 
     /** constructor */
@@ -55,12 +55,12 @@ namespace Belle2 {
 
     //SETTERS FOR function ID = 0 (cheby_v0)
     /** set the Chebyshev coefficients*/
-    void set_c(std::vector<double> c)
+    void set_chebyCoeffs(std::vector<double> c)
     {
       //for (long unsigned int i=0; i<c.size(); i++){
-      //  m_c.push_back(c[i]);
+      //  m_chebyCoeffs.push_back(c[i]);
       //}
-      m_c = c;
+      m_chebyCoeffs = c;
     }
 
     /** copy constructor */
@@ -78,7 +78,7 @@ namespace Belle2 {
 
     /** ID = {0}, rel07: fudge factor parametrized with Chebyshev polynomial
      */
-    std::vector<double> m_c;
+    std::vector<double> m_chebyCoeffs;
 
     /** cheby_v0 implementation
      * @param trkAngle track's incident angle
@@ -86,8 +86,8 @@ namespace Belle2 {
      */
     double cheby_v0(double trkAngle) const
     {
-      TF1* f = (TF1*) gROOT->GetFunction(TString::Format("chebyshev%lu", m_c.size() - 1));
-      f->SetParameters(&m_c[0]);
+      TF1* f = (TF1*) gROOT->GetFunction(TString::Format("chebyshev%lu", m_chebyCoeffs.size() - 1));
+      f->SetParameters(&m_chebyCoeffs[0]);
 
       return f->Eval(trkAngle);
     };

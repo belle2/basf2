@@ -14,7 +14,7 @@ std::vector <SVDMCFudgeFactorFunction::fudgeFactorFunction> SVDMCFudgeFactorFunc
 
 SVDMCFudgeFactorFunction::SVDMCFudgeFactorFunction(const SVDMCFudgeFactorFunction& a) : TObject(a)
 {
-  m_c = a.m_c;
+  m_chebyCoeffs = a.m_chebyCoeffs;
 
   m_current = a.m_current;
 
@@ -25,7 +25,7 @@ SVDMCFudgeFactorFunction& SVDMCFudgeFactorFunction::operator=(const SVDMCFudgeFa
   if (this == &a)
     return *this;
 
-  m_c = a.m_c;
+  m_chebyCoeffs = a.m_chebyCoeffs;
 
   m_current = a.m_current;
 

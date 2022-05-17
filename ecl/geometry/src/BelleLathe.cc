@@ -107,7 +107,7 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
         ++it0; ++it1;
       }
     }
-    const zr_t& s0 = *it0, &s1 = contour[0];
+    const zr_t& s0 = *it0, &s1 = contour[0]; // cppcheck-suppress invalidContainer ; contour should be valid here
     if (abs(s0.z - s1.z) < kCarTolerance && abs(s0.r - s1.r) < kCarTolerance) contour.erase(it0);
   } while (0);
 

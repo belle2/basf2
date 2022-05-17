@@ -14,7 +14,7 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(CheckMergingConsistency)
+  REG_MODULE(CheckMergingConsistency);
 
   //-----------------------------------------------------------------
   //                 Implementation

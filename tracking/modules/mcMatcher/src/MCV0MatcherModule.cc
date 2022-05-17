@@ -69,7 +69,7 @@ void MCV0MatcherModule::beginRun()
 void MCV0MatcherModule::event()
 {
   StoreArray<V0> v0s(m_V0ColName);
-  B2DEBUG(200, (v0s.getEntries() != 0 ? "V0s has entries." : " No V0s."));
+  B2DEBUG(20, (v0s.getEntries() != 0 ? "V0s has entries." : " No V0s."));
 
   for (const auto& v0 : v0s) {
     // Try to match the tracks of each V0 with the MC V0.
@@ -80,7 +80,7 @@ void MCV0MatcherModule::event()
     const MCParticle* mcV0PartMinus = trackPtrs.second->getRelatedTo<MCParticle>(m_MCParticleColName);
 
     if (mcV0PartPlus == nullptr or mcV0PartMinus == nullptr) {
-      B2DEBUG(200, "At least one track of the V0 does not have a MC related particle. It will be skipped for matching.");
+      B2DEBUG(20, "At least one track of the V0 does not have a MC related particle. It will be skipped for matching.");
       continue;
     }
 
@@ -88,24 +88,24 @@ void MCV0MatcherModule::event()
     const MCParticle* mcV0PartMinusMother = mcV0PartMinus->getMother();
 
     if (!mcV0PartPlus->getMother() or !mcV0PartMinusMother) {
-      B2DEBUG(200, "At least one track of the V0 does not have a mother MCParticle, skipping.");
+      B2DEBUG(20, "At least one track of the V0 does not have a mother MCParticle, skipping.");
       continue;
     }
 
     if (mcV0PartPlusMother != mcV0PartMinusMother) {
-      B2DEBUG(200, "The V0 is most likely built up from combinatoric background, thus no MC relation can be set.");
+      B2DEBUG(20, "The V0 is most likely built up from combinatoric background, thus no MC relation can be set.");
       continue;
     }
 
     if (Const::ParticleType(mcV0PartPlusMother->getPDG()) == v0hypothesis) {
-      B2DEBUG(200, "V0 successfully matched.");
+      B2DEBUG(20, "V0 successfully matched.");
       v0.addRelationTo(mcV0PartPlusMother);
     } else {
-      B2DEBUG(200, "V0 did not match anything.");
+      B2DEBUG(20, "V0 did not match anything.");
     }
   }
 
-  B2DEBUG(200, "MC matching finished.");
+  B2DEBUG(20, "MC matching finished.");
 }
 
 void MCV0MatcherModule::endRun()

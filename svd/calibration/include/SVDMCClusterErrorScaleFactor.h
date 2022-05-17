@@ -47,14 +47,14 @@ namespace Belle2 {
      */
     inline double getFudgeFactor(
       const Belle2::VxdID& sensorID,
-      const bool& isU, const unsigned short& strip,
+      const bool& isU,
       const double& trkAngle) const
     {
       return m_aDBObjPtr->getReference(sensorID.getLayerNumber(),
                                        sensorID.getLadderNumber(),
                                        sensorID.getSensorNumber(),
                                        m_aDBObjPtr->sideIndex(isU),
-                                       strip)
+                                       1)
              .getFudgeFactor(trkAngle);
     }
 

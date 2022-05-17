@@ -57,9 +57,6 @@ namespace Belle2 {
     /** set the Chebyshev coefficients*/
     void set_chebyCoeffs(std::vector<double> c)
     {
-      //for (long unsigned int i=0; i<c.size(); i++){
-      //  m_chebyCoeffs.push_back(c[i]);
-      //}
       m_chebyCoeffs = c;
     }
 
@@ -82,7 +79,7 @@ namespace Belle2 {
 
     /** cheby_v0 implementation
      * @param trkAngle track's incident angle
-     * @return final cluster position error, including scale factor
+     * @return fudge factor as a function of the track's angle
      */
     double cheby_v0(double trkAngle) const
     {

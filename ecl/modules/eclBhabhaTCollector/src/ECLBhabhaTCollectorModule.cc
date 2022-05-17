@@ -33,7 +33,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLBhabhaTCollector)
+REG_MODULE(ECLBhabhaTCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation

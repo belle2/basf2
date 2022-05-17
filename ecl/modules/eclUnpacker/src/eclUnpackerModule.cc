@@ -75,7 +75,7 @@ ADC_NUM*SAMPLES_NUM |                                                           
 */
 
 
-REG_MODULE(ECLUnpacker)
+REG_MODULE(ECLUnpacker);
 
 ECLUnpackerModule::ECLUnpackerModule() :
   m_globalEvtNum(0),

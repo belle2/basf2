@@ -29,7 +29,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclHadronTimeCalibrationValidationCollector)
+REG_MODULE(eclHadronTimeCalibrationValidationCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation

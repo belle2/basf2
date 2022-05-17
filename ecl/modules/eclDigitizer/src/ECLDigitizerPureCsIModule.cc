@@ -35,7 +35,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLDigitizerPureCsI)
+REG_MODULE(ECLDigitizerPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation

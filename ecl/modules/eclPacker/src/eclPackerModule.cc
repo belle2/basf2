@@ -26,7 +26,7 @@ using namespace std;
 using namespace Belle2;
 using namespace ECL;
 
-REG_MODULE(ECLPacker)
+REG_MODULE(ECLPacker);
 
 ECLPackerModule::ECLPackerModule() :
   m_bufPos(0),

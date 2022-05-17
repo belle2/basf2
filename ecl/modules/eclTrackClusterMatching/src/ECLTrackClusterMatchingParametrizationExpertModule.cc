@@ -17,7 +17,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(ECLTrackClusterMatchingParametrizationExpert)
+REG_MODULE(ECLTrackClusterMatchingParametrizationExpert);
 
 ECLTrackClusterMatchingParametrizationExpertModule::ECLTrackClusterMatchingParametrizationExpertModule() : Module(),
   m_writeToRoot(1),

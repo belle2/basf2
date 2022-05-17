@@ -19,7 +19,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLMatchingPerformanceExpert)
+REG_MODULE(ECLMatchingPerformanceExpert);
 
 ECLMatchingPerformanceExpertModule::ECLMatchingPerformanceExpertModule() :
   Module(), m_trackProperties()

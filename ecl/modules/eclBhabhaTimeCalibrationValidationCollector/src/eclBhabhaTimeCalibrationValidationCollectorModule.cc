@@ -49,7 +49,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclBhabhaTimeCalibrationValidationCollector)
+REG_MODULE(eclBhabhaTimeCalibrationValidationCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation

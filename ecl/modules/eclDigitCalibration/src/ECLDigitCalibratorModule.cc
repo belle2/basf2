@@ -42,8 +42,8 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Modules
 //-----------------------------------------------------------------
-REG_MODULE(ECLDigitCalibrator)
-REG_MODULE(ECLDigitCalibratorPureCsI)
+REG_MODULE(ECLDigitCalibrator);
+REG_MODULE(ECLDigitCalibratorPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation

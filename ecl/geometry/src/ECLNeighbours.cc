@@ -36,24 +36,24 @@ ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par, 
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n: " << parToInt * 2 + 1 << " x " << parToInt * 2
             + 1);
     if ((parToInt >= 0) and (parToInt < 11)) initializeN(parToInt, sorted);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << LogVar("parameter", parToInt) << "Invalid parameter (must be between 0 and 10)!");
   } else if (neighbourDef == "NC") {
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus corners): " << parToInt * 2 + 1 << " x "
             <<
             parToInt * 2 + 1);
     if ((parToInt >= 0) and (parToInt < 11)) initializeNC(parToInt);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << LogVar("parameter", parToInt) << "Invalid parameter (must be between 0 and 10)!");
   } else if (neighbourDef == "NLegacy") {
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n: " << parToInt * 2 + 1 << " x " << parToInt * 2
             + 1);
     if ((parToInt >= 0) and (parToInt < 11)) initializeNLegacy(parToInt);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << LogVar("parameter", parToInt) << "Invalid parameter (must be between 0 and 10)!");
   } else if (neighbourDef == "NCLegacy") {
     B2DEBUG(150, "ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", n x n (minus corners): " << parToInt * 2 + 1 << " x "
             <<
             parToInt * 2 + 1);
     if ((parToInt >= 0) and (parToInt < 11)) initializeNCLegacy(parToInt, 1);
-    else B2FATAL("ECLNeighbours::ECLNeighbours: " << parToInt << " is an invalid parameter (must be between 0 and 10)!");
+    else B2FATAL("ECLNeighbours::ECLNeighbours: " << LogVar("parameter", parToInt) << "Invalid parameter (must be between 0 and 10)!");
   }
   // or neighbours depend on the distance:
   else if (neighbourDef == "R") {

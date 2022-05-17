@@ -54,6 +54,7 @@ namespace {
   double aNoise;
 
   //Function to minimize in photon template + hadron template fit. (chi2)
+  // cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
   void FCN2h(int&, double* grad, double& f, double* p, int)
   {
     constexpr int N = 31;
@@ -89,6 +90,7 @@ namespace {
   }
 
   //Function to minimize in photon template + hadron template + background photon fit. (chi2)
+  // cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
   void FCN2h2(int&, double* grad, double& f, double* p, int)
   {
     const int N = 31;

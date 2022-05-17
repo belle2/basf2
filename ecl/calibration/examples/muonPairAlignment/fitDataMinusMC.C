@@ -48,6 +48,7 @@ std::vector<int> eclRegion;
 int regionToFit;
 double templateDiff[6][1792];
 std::vector<double> dataMCDiff;
+// cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
 double fitTemplates (double *x, double *par) {
     int ix = x[0];
     double y = 0.;

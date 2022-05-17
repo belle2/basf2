@@ -115,6 +115,7 @@ std::vector<double> eclLeakageFitParameters(TH1F* h, const double& target)
 
 /**-------------------------------------------------------------------------------------*/
 //..Novosibirsk; H. Ikeda et al. / NIM A 441 (2000) 401-426
+// cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
 double eclLeakageNovo(Double_t* x, Double_t* par)
 {
 

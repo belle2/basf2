@@ -325,7 +325,7 @@ namespace Belle2 {
     RooDataHist dh("dh", "ecltrg",   x, h_clusterE);
 
     RooRealVar mean("mean",    "mean", 2000, 1000, 2500);
-    RooRealVar sigma("sigma", "sigma",  150 ,   0,   300);
+    RooRealVar sigma("sigma", "sigma",  150,   0,   300);
     RooRealVar tail("tail",    "tail",  0.45,     0,     1);
     RooNovosibirsk novo("novo", "", x, mean, sigma, tail);
     novo.fitTo(dh, RooFit::Extended(0), RooFit::Range(1500, 2200));

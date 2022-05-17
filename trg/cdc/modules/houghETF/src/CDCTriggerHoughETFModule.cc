@@ -146,7 +146,7 @@ CDCTriggerHoughETFModule::CDCTriggerHoughETFModule() : Module()
 
   addParam("suppressClone", m_suppressClone,
            "Switch to send only the first found track and suppress the "
-           "subsequent clones." , false);
+           "subsequent clones.", false);
 }
 
 void

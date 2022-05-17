@@ -84,7 +84,7 @@ namespace Belle2 {
   }
 
   void*
-  TRGCDCSegmentHit::operator new(size_t size)
+  TRGCDCSegmentHit::operator new (size_t size)
   {
     void* p = malloc(size);
     _all.push_back(static_cast<TRGCDCSegmentHit*>(p));
@@ -97,7 +97,7 @@ namespace Belle2 {
   }
 
   void
-  TRGCDCSegmentHit::operator delete(void* t)
+  TRGCDCSegmentHit::operator delete (void* t)
   {
     for (vector<TRGCDCSegmentHit*>::iterator it = _all.begin();
          it != _all.end();

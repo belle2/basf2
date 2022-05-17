@@ -52,12 +52,11 @@ void TrackIsoCalculatorModule::initialize()
 
   if (m_pListReferenceName.empty()) {
     if (m_pListName.find(':') != std::string::npos)
-      m_pListReference.isRequired(m_pListName.substr(0, m_pListName.find_first_of(':')) + std::string(":all"));
+      m_pListReferenceName = m_pListName.substr(0, m_pListName.find_first_of(':')) + std::string(":all");
     else
-      m_pListReference.isRequired(m_pListName + std::string(":all"));
-  } else {
-    m_pListReference.isRequired(m_pListReferenceName);
+      m_pListReferenceName = m_pListName + std::string(":all");
   }
+  m_pListReference.isRequired(m_pListReferenceName);
 
   B2INFO("TrackIsoCalculator module will calculate isolation variables for the ParticleList: " << m_pListName << ", "
          << "Reference ParticleList: " << m_pListReferenceName << ".");

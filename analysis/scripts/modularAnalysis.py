@@ -3461,7 +3461,7 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     path.add_module(chargedpid)
 
 
-def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, alias=None):
+def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, alias=None, reference_list_name=''):
     """
     Given a list of charged stable particles, compute variables that quantify "isolation" of the associated tracks.
 
@@ -3481,6 +3481,10 @@ def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, 
                                and the detector's name is appended to the alias to distinguish them.
         *detectors: detectors at whose entry surface track isolation variables will be calculated.
                     Choose among: "CDC", "PID", "ECL", "KLM" (NB: 'PID' indicates TOP+ARICH entry surface.)
+        reference_list_name (Optional[str]): name of the input ParticleList for the reference track.
+                                             By default, the :all ParticleList of the same particle with list_name is used.
+                                             It must be a list of charged stable particles, too.
+                                             The charge-conjugate ParticleList will be also processed automatically.
 
     """
 
@@ -3494,7 +3498,8 @@ def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, 
         path.add_module("TrackIsoCalculator",
                         particleList=list_name,
                         detectorInnerSurface=det,
-                        use2DRhoPhiDist=use2DRhoPhiDist)
+                        use2DRhoPhiDist=use2DRhoPhiDist,
+                        particleListReference=reference_list_name)
         if isinstance(alias, str):
             if not use2DRhoPhiDist:
                 variables.addAlias(f"{alias}{det}", f"extraInfo(dist3DToClosestTrkAt{det}Surface)")

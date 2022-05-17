@@ -26,6 +26,11 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
   addParam("particleList",
            m_pListName,
            "The name of the input ParticleList. Must be a charged stable particle as defined in Const::chargedStableSet.");
+  addParam("particleListReference",
+           m_pListReferenceName,
+           "The name of the input ParticleList of reference tracks. By default, the :all list of the same particle type with m_pListName is used. "
+           "Must be a charged stable particle as defined in Const::chargedStableSet.",
+           std::string(""));
   addParam("detectorInnerSurface",
            m_detInnerSurface,
            "The name of the detector at whose innermost layer we extrapolate each helix's polar and azimuthal angle. Allowed values: {CDC, PID(=TOP/ARICH), ECL, KLM}.");
@@ -44,12 +49,18 @@ void TrackIsoCalculatorModule::initialize()
 
   m_event_metadata.isRequired();
   m_pList.isRequired(m_pListName);
-  if (m_pListName.find(':') != std::string::npos)
-    m_pListOfAllTracks.isRequired(m_pListName.substr(0, m_pListName.find_first_of(':')) + std::string(":all"));
-  else
-    m_pListOfAllTracks.isRequired(m_pListName + std::string(":all"));
 
-  B2INFO("TrackIsoCalculator module will calculate isolation variables for the ParticleList: " << m_pListName << ".");
+  if (m_pListReferenceName.empty()) {
+    if (m_pListName.find(':') != std::string::npos)
+      m_pListReference.isRequired(m_pListName.substr(0, m_pListName.find_first_of(':')) + std::string(":all"));
+    else
+      m_pListReference.isRequired(m_pListName + std::string(":all"));
+  } else {
+    m_pListReference.isRequired(m_pListReferenceName);
+  }
+
+  B2INFO("TrackIsoCalculator module will calculate isolation variables for the ParticleList: " << m_pListName << ", "
+         << "Reference ParticleList: " << m_pListReferenceName << ".");
 
   m_extraInfoName = (!m_use2DRhoPhiDist) ? ("dist3DToClosestTrkAt" + m_detInnerSurface + "Surface") : ("dist2DRhoPhiToClosestTrkAt" +
                     m_detInnerSurface + "Surface");
@@ -64,24 +75,24 @@ void TrackIsoCalculatorModule::event()
   }
 
   const auto nParticles = m_pList->getListSize();
-  const auto nParticlesAllTracks = m_pListOfAllTracks->getListSize();
+  const auto nParticlesReference = m_pListReference->getListSize();
 
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n" << "nParticles: " << nParticles << "\n"
-          << "nParticlesAllTracks: " << nParticlesAllTracks);
+          << "nParticlesReference: " << nParticlesReference);
 
   // Store the pair-wise distances in a 2D array.
   // Size is given by the length of the particle list.
-  std::vector<double> defaultDistances(nParticlesAllTracks, 1e9);
+  std::vector<double> defaultDistances(nParticlesReference, 1e9);
   std::vector<std::vector<double>> pairwiseDistances(nParticles, defaultDistances);
 
   B2DEBUG(11, "Array of pair-wise distances between tracks in particle list. Initial values:");
-  this->printDistancesArr(pairwiseDistances, nParticles, nParticlesAllTracks);
+  this->printDistancesArr(pairwiseDistances, nParticles, nParticlesReference);
 
   for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
     Particle* iParticle = m_pList->getParticle(iPart);
 
-    for (unsigned int jPart(0); jPart < nParticlesAllTracks; ++jPart) {
-      Particle* jParticle = m_pListOfAllTracks->getParticle(jPart);
+    for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
+      Particle* jParticle = m_pListReference->getParticle(jPart);
 
       if (iParticle->getTrackFitResult() == jParticle->getTrackFitResult())
         continue;
@@ -103,7 +114,7 @@ void TrackIsoCalculatorModule::event()
   }
 
   B2DEBUG(11, "Array of pair-wise distances between tracks in particle list. Final values:");
-  this->printDistancesArr(pairwiseDistances, nParticles, nParticlesAllTracks);
+  this->printDistancesArr(pairwiseDistances, nParticles, nParticlesReference);
 
   // For each particle index, find the index of the particle w/ minimal distance in the corresponding row of the 2D array.
   for (unsigned int iPart(0); iPart < nParticles; ++iPart) {

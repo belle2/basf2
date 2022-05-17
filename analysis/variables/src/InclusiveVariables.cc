@@ -153,13 +153,16 @@ namespace Belle2 {
                       "Returns the number of K_L0 or neutrons among the final state daughters.");
     REGISTER_VARIABLE("nDaughterCharged(pdg)",   nDaughterCharged,
                       "Returns the number of charged daughters with the provided PDG code or the number "
-                      "of all charged daughters if no argument has been provided.");
+                      "of all charged daughters if no argument has been provided. "
+                      "The variable is flavor agnostic and it returns the sum of the number of particle and anti-particle.");
     REGISTER_VARIABLE("nCompositeDaughters(pdg)",   nCompositeDaughters,
                       "Returns the number of primary composite daughters with the provided PDG code or the number"
-                      "of all primary composite daughters if no argument has been provided.");
+                      "of all primary composite daughters if no argument has been provided. "
+                      "The variable is flavor agnostic and it returns the sum of the number of particle and anti-particle.");
     REGISTER_VARIABLE("nCompositeAllGenerationDaughters(pdg)",   nCompositeAllGenerationDaughters,
-                      "Returns the number of all generation's composite daughters with the provided PDG code or the number"
-                      "of all generation's composite daughters if no argument has been provided.");
+                      "Returns the number of all generations' composite daughters with the provided PDG code or the number"
+                      "of all generations' composite daughters if no argument has been provided. "
+                      "The variable is flavor agnostic and it returns the sum of the number of particle and anti-particle.");
     REGISTER_METAVARIABLE("daughterAverageOf(variable)", daughterAverageOf,
                           "Returns the mean value of a variable over all daughters.", Manager::VariableDataType::c_double)
   }

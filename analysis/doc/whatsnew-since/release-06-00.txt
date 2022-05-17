@@ -64,8 +64,9 @@ Variables
  * Added the variable `trackFitCovariance`, which returns the track fit covariance matrix element corresponding to the two provided
    indices.
  * Changed the `nCompositeDaughters` so that one can specify the PDG code of composite daughters.
-   If no argument is given, it works same as before. Added `nCompositeAllGenerationDaughters` which works similar with
-   `nCompositeDaughters` but it includes all generations of daughters.
+   If no argument is given, it works same as before. Please note that brackets have to appended even if no argument is given i.e.
+   ``nCompositeDaughters()``.
+ * Added `nCompositeAllGenerationDaughters` which works similar with `nCompositeDaughters` but it includes all generations of daughters.
 
 Modules
 +++++++

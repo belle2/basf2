@@ -6,8 +6,8 @@ Import('env')
 env['LIBS'] = [
     'analysis_dataobjects',
     'analysis',
+    'analysis_DecayDescriptor',
     'framework',
-    'mdst_dataobjects',
     '$ROOT_LIBS',
 ]
 

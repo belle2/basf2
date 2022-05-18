@@ -157,12 +157,9 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> m_pListReference;
 
     /**
-     * Check whether input particle list is of a valid charged stable particle.
+     * Check whether input particle list and reference list are of a valid charged stable particle.
      */
-    inline bool isStdChargedList()
-    {
-      return (Const::chargedStableSet.find(abs(m_pList->getPDGCode())) != Const::invalidParticle);
-    };
+    bool isStdChargedList();
 
     /**
      * Print 2D array of pair-wise distances.

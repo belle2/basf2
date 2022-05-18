@@ -7,7 +7,8 @@
  **************************************************************************/
 
 #include <analysis/modules/TrackIsoCalculator/TrackIsoCalculatorModule.h>
-#include <mdst/dataobjects/Track.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 
 #include <cmath>
 #include <iomanip>
@@ -64,15 +65,16 @@ void TrackIsoCalculatorModule::initialize()
 
   m_extraInfoName = (!m_use2DRhoPhiDist) ? ("dist3DToClosestTrkAt" + m_detInnerSurface + "Surface") : ("dist2DRhoPhiToClosestTrkAt" +
                     m_detInnerSurface + "Surface");
+
+  if (!isStdChargedList()) {
+    B2FATAL("ParticleList: " << m_pListName << " and/or ParticleList: " << m_pListReferenceName <<
+            " is not that of a valid particle in Const::chargedStableSet! Aborting...");
+  }
+
 }
 
 void TrackIsoCalculatorModule::event()
 {
-
-  if (!isStdChargedList()) {
-    B2FATAL("PDG: " << m_pList->getPDGCode() << " of ParticleList: " << m_pList->getParticleListName() <<
-            " is not that of a valid particle in Const::chargedStableSet! Aborting...");
-  }
 
   const auto nParticles = m_pList->getListSize();
   const auto nParticlesReference = m_pListReference->getListSize();
@@ -96,7 +98,7 @@ void TrackIsoCalculatorModule::event()
     for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
       Particle* jParticle = m_pListReference->getParticle(jPart);
 
-      if (iParticle->getTrack()->getArrayIndex() == jParticle->getTrack()->getArrayIndex())
+      if (iParticle->getMdstArrayIndex() == jParticle->getMdstArrayIndex())
         continue;
       if (pairwiseDistances[iPart][jPart] != 1e9)
         continue;
@@ -213,6 +215,21 @@ double TrackIsoCalculatorModule::get2DRhoPhiDistAsChordLength(Particle* iParticl
 
   return 2 * rho * sin(std::abs(diffPhi) / 2.0);
 }
+
+bool TrackIsoCalculatorModule::isStdChargedList()
+{
+  DecayDescriptor dd;
+
+  bool checkPList = false;
+  if (dd.init(m_pListName))
+    checkPList = Const::chargedStableSet.find(abs(dd.getMother()->getPDGCode())) != Const::invalidParticle;
+
+  bool checkPListReference = false;
+  if (dd.init(m_pListReferenceName))
+    checkPListReference = Const::chargedStableSet.find(abs(dd.getMother()->getPDGCode())) != Const::invalidParticle;
+
+  return (checkPList and checkPListReference);
+};
 
 void TrackIsoCalculatorModule::printDistancesArr(const std::vector<std::vector<double>>& arr, int size_x, int size_y)
 {

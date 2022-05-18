@@ -100,7 +100,7 @@ namespace Belle2 {
           for (int i = 0; i < 10; i++) {
             int val = calbyte(buf);
             ibyte++;
-            if (i > 0 && i < 6) {
+            if (i > 1 && i < 6) {
               feb_trigno |= (0xff & val) << (5 - i) * 8;
             }
           }

@@ -41,7 +41,7 @@ void FixMergedObjectsModule::event()
 {
   // This is quite easy, it is all just constant offsets (corresponding to length of StoreArray before Merge)
 
-  if (m_tracks.isValid() && m_mergedArrayIndices->hasExtraInfo("Tracks")) {
+  if (m_tracks.isValid() && m_mergedArrayIndices->hasExtraInfo("Tracks") && m_mergedArrayIndices->hasExtraInfo("TrackFitResults")) {
     for (int t_idx = m_mergedArrayIndices->getExtraInfo("Tracks"); t_idx < m_tracks.getEntries(); t_idx++) {
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
         // hypothesis not fitted

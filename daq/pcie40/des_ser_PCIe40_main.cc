@@ -201,7 +201,7 @@ unsigned int crc_err_ch[NUM_SENDER_THREADS][ MAX_PCIE40_CH];
 /////////////////////////////////////////////////////////
 // hostname
 /////////////////////////////////////////////////////////
-std::map< string , unsigned int > host_nodeid;
+std::map< string, unsigned int > host_nodeid;
 char hostnamebuf[50];
 
 
@@ -290,12 +290,12 @@ void crc_calc(unsigned int& crc, const unsigned int& data)
   crc = (((crc) << 8) & 0xff00) ^ CRC16_XMODEM_TABLE[(((crc) >> 8) & 0xff)^byte1] ;
 }
 
-unsigned int get_crc(unsigned int* data , int length , unsigned int initial_value)
+unsigned int get_crc(unsigned int* data, int length, unsigned int initial_value)
 {
   unsigned int result = initial_value ;
   //  printf("get_crc()\n");
   for (int i = 0 ; i < length ; ++i) {
-    crc_calc(result , data[ i ]) ;
+    crc_calc(result, data[ i ]) ;
     //    printf("%.8d %.8x %.8x\n", i, result, data[i]);
   }
   return result ;
@@ -311,7 +311,7 @@ int getEventNumber(unsigned int* data)
 void printHeader(unsigned int* data)
 {
   if (0 != data) {
-    printf("Header  : %8X%8X%8X%8X%8X%8X%8X%8X\n" , data[7], data[6] , data[5] , data[4],
+    printf("Header  : %8X%8X%8X%8X%8X%8X%8X%8X\n", data[7], data[6], data[5], data[4],
            data[3], data[2], data[1], data[0]) ;
   } else printf("No data\n")  ;
 }
@@ -319,7 +319,7 @@ void printHeader(unsigned int* data)
 void printTrailer(unsigned int* data)
 {
   if (0 != data) {
-    printf("Trailer  : %8X%8X%8X%8X%8X%8X%8X%8X\n" , data[7], data[6] , data[5] , data[4],
+    printf("Trailer  : %8X%8X%8X%8X%8X%8X%8X%8X\n", data[7], data[6], data[5], data[4],
            data[3], data[2], data[1], data[0]) ;
   } else printf("No data\n")  ;
 }
@@ -327,12 +327,12 @@ void printTrailer(unsigned int* data)
 void printData(unsigned int* data)
 {
   if (0 != data) {
-    printf("Data  : %8X%8X%8X%8X%8X%8X%8X%8X\n" , data[7], data[6] , data[5] , data[4],
+    printf("Data  : %8X%8X%8X%8X%8X%8X%8X%8X\n", data[7], data[6], data[5], data[4],
            data[3], data[2], data[1], data[0]) ;
   } else printf("No data\n")  ;
 }
 
-void writeToFile(std::ofstream& the_file , unsigned int* data , int size)
+void writeToFile(std::ofstream& the_file, unsigned int* data, int size)
 {
   the_file << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl ; // to separate events
   for (int i = 0 ; i < 8 * (size - 2) ; ++i) {     // Write the data in 32bit values
@@ -391,7 +391,7 @@ void printEventData(unsigned int* data, int size, int sender_id)
 void printFullData(unsigned int* data)
 {
   printf("Header  : %.8x %.8x %.8x %.8x %.8x %.8x %.8x %.8x\n",
-         data[0], data[1] , data[2] , data[3],
+         data[0], data[1], data[2], data[3],
          data[4], data[5], data[6], data[7]) ;
   // printf(   "Header  : %8X%8X%8X%8X%8X%8X%8X%8X\n" , data[7], data[6] ,data[5] ,data[4],
   //           data[3], data[2], data[1], data[0] ) ;
@@ -407,8 +407,8 @@ void printFullData(unsigned int* data)
   //   printf( "data %3d: %8X%8X%8X%8X%8X%8X%8X%8X\n" , i-1 , data[ 8*i+7 ] , data[ 8*i+6 ] , data[ 8*i+5 ] ,
   //           data[ 8*i+4 ], data[ 8*i+3 ], data[ 8*i+2 ], data[ 8*i+1 ], data[ 8*i ] ) ;
   // }
-  printf("\nTrailer : %8X %8X %8X %8X %8X %8X %8X %8X\n" , data[8 * eventSize + 7], data[8 * eventSize + 6] ,
-         data[8 * eventSize + 5] , data[8 * eventSize + 4],
+  printf("\nTrailer : %8X %8X %8X %8X %8X %8X %8X %8X\n", data[8 * eventSize + 7], data[8 * eventSize + 6],
+         data[8 * eventSize + 5], data[8 * eventSize + 4],
          data[8 * eventSize + 3], data[8 * eventSize + 2], data[8 * eventSize + 1], data[8 * eventSize]) ;
   fflush(stdout);
 }
@@ -476,8 +476,8 @@ void printEventNumberError(unsigned int*& data, const unsigned int evtnum, const
       if (linksize <= 0) continue;
       temp_pos = data[ POS_TABLE_POS + i ] + OFFSET_HDR;
       temp_eve = data[ temp_pos +
-                       Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
-                       Belle2::PreRawCOPPERFormat_latest::POS_TT_TAG ];
+                                Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
+                                Belle2::PreRawCOPPERFormat_latest::POS_TT_TAG ];
 
       if (evtnum + eve_diff != temp_eve) {
         sprintf(err_buf + strlen(err_buf),
@@ -509,8 +509,8 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
     char err_buf[500] = {0};
     pthread_mutex_lock(&(mtx_sender_log));
     sprintf(err_buf,
-            "[FATAL] thread %d : ERROR_EVENT : Invalid Magic word in ReadOut Board header( 0x%.8x ) : It must be 0x7f7f???? : eve %d exp %d run %d sub %d : %s %s %d",
-            sender_id, data[ MAGIC_7F7F_POS ],
+            "[FATAL] thread %d : %s : ERROR_EVENT : Invalid Magic word in ReadOut Board header( 0x%.8x ) : It must be 0x7f7f???? : eve %d exp %d run %d sub %d : %s %s %d",
+            sender_id, hostnamebuf, data[ MAGIC_7F7F_POS ],
             new_evtnum,
             (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
             (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -530,8 +530,8 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
   if (!(data[ MAGIC_7F7F_POS ] & 0x00008000)) {
     // reduced
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] thread %d : This function cannot be used for already reduced data. 7f7f header is 0x%.8x : eve %d exp %d run %d sub %d : %s %s %d\n",
-           sender_id, data[ MAGIC_7F7F_POS ],
+    printf("[FATAL] thread %d : %s : This function cannot be used for already reduced data. 7f7f header is 0x%.8x : eve %d exp %d run %d sub %d : %s %s %d\n",
+           sender_id, hostnamebuf, data[ MAGIC_7F7F_POS ],
            new_evtnum,
            (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
            (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -588,13 +588,13 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
                         Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
                         Belle2::PreRawCOPPERFormat_latest::POS_EXP_RUN ];
     temp_ctime_trgtype_footer = data[ temp_pos + linksize +
-                                      - (Belle2::PreRawCOPPERFormat_latest::SIZE_B2LFEE_TRAILER +
-                                         Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_TRAILER) +
-                                      Belle2::PreRawCOPPERFormat_latest::POS_TT_CTIME_B2LFEE ];
+                                               - (Belle2::PreRawCOPPERFormat_latest::SIZE_B2LFEE_TRAILER +
+                                                  Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_TRAILER) +
+                                               Belle2::PreRawCOPPERFormat_latest::POS_TT_CTIME_B2LFEE ];
     temp_eve_footer = data[ temp_pos + linksize +
-                            - (Belle2::PreRawCOPPERFormat_latest::SIZE_B2LFEE_TRAILER +
-                               Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_TRAILER) +
-                            Belle2::PreRawCOPPERFormat_latest::POS_CHKSUM_B2LFEE ];
+                                     - (Belle2::PreRawCOPPERFormat_latest::SIZE_B2LFEE_TRAILER +
+                                        Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_TRAILER) +
+                                     Belle2::PreRawCOPPERFormat_latest::POS_CHKSUM_B2LFEE ];
 
     if (flag == 0) {
       temp_ctime_trgtype = ctime_trgtype[ i ];
@@ -606,8 +606,8 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
 
       if (temp_eve != new_evtnum) {
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[FATAL] thread %d : ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: eve in ROBheader = 0x%.8x , ch %d 's eve = 0x%.8x : exp %d run %d sub %d : %s %s %d\n",
-               sender_id, i,
+        printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: eve in ROBheader = 0x%.8x , ch %d 's eve = 0x%.8x : exp %d run %d sub %d : %s %s %d\n",
+               sender_id, hostnamebuf, i,
                new_evtnum, i, temp_eve,
                (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
                (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -632,8 +632,8 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
     //
     if (temp_ctime_trgtype != temp_ctime_trgtype_footer || (temp_eve & 0xffff) != ((temp_eve_footer >> 16) & 0xffff)) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : ch=%d : ERROR_EVENT : mismatch(finesse %d) between header(ctime 0x%.8x eve 0x%.8x) and footer(ctime 0x%.8x eve_crc16 0x%.8x). Exiting... : exp %d run %d sub %d : %s %s %d\n",
-             sender_id, i, i,
+      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : mismatch(finesse %d) between header(ctime 0x%.8x eve 0x%.8x) and footer(ctime 0x%.8x eve_crc16 0x%.8x). Exiting... : exp %d run %d sub %d : %s %s %d\n",
+             sender_id, hostnamebuf, i, i,
              temp_ctime_trgtype,  temp_eve, temp_ctime_trgtype_footer, temp_eve_footer,
              (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
              (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -652,8 +652,8 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
   if (err_flag == 1) {
     pthread_mutex_lock(&(mtx_sender_log));
     sprintf(err_buf,
-            "[FATAL] thread %d : ch= %d or %d : ERROR_EVENT : mismatch header value over FINESSEs ( between ch %d and ch %d ). Exiting...: ",
-            sender_id, err_ch, first_ch, err_ch, first_ch);
+            "[FATAL] thread %d : %s ch= %d or %d : ERROR_EVENT : mismatch header value over FINESSEs ( between ch %d and ch %d ). Exiting...: ",
+            sender_id, hostnamebuf, err_ch, first_ch, err_ch, first_ch);
     for (int i = 0; i <  MAX_PCIE40_CH; i++) {
       if (used_ch[ i ] == 1) {
         sprintf(err_buf + strlen(err_buf),
@@ -670,13 +670,13 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
 }
 
 
-int checkDMAHeader(unsigned int*& data , unsigned int& size , double& dsize , int& total_pages , int& index_pages)
+int checkDMAHeader(unsigned int*& data, unsigned int& size, double& dsize, int& total_pages, int& index_pages)
 {
   if (data == 0) {
     pthread_mutex_lock(&(mtx_sender_log));
     n_messages[ 0 ] = n_messages[ 0 ] + 1 ;
     if (n_messages[ 0 ] < max_number_of_messages) {
-      printf("No data\n") ;
+      printf("[WARNING] Null pointer to data buffer\n") ;
     }
     dmaerr_no_data++;
     pthread_mutex_unlock(&(mtx_sender_log));
@@ -722,7 +722,7 @@ int checkDMAHeader(unsigned int*& data , unsigned int& size , double& dsize , in
     if (n_messages[ 3 ] < max_number_of_messages) {
       printf("[FATAL] Inconsistent between byte-size( = %u ) and 8words-size( = %u ) in DMA header. ( %.8x %.8x %.8x %.8x %.8x %.8x %.8x %.8x )\n"
              ,
-             (data[ DMA_SIZE_IN_BYTES ] & 0xFFFF0000) >> 16 , fragment_size * 32,
+             (data[ DMA_SIZE_IN_BYTES ] & 0xFFFF0000) >> 16, fragment_size * 32,
              data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]) ;
     }
     dmaerr_bad_word_size++;
@@ -738,7 +738,7 @@ int checkDMAHeader(unsigned int*& data , unsigned int& size , double& dsize , in
       pthread_mutex_lock(&(mtx_sender_log));
       n_messages[ 5 ] = n_messages[ 5 ] + 1 ;
       if (n_messages[ 5 ] < max_number_of_messages) {
-        printf("Bad size in trailer : size %.8x size in hdr %.8x bef %.8x\n" , data[8 * (fragment_size - 1)], fragment_size,
+        printf("Bad size in trailer : size %.8x size in hdr %.8x bef %.8x\n", data[8 * (fragment_size - 1)], fragment_size,
                data[ 8 * (fragment_size - 2) ]) ;
         printLine(data, 8 * (fragment_size - 1));
         printFullData(data);
@@ -785,7 +785,7 @@ double getTimeSec()
   return (t.tv_sec + t.tv_usec * 1.e-6);
 }
 
-void reduceHdrTrl(unsigned int* data , unsigned int& event_nwords)
+void reduceHdrTrl(unsigned int* data, unsigned int& event_nwords)
 {
 
   //  TO CHECK LATER unsigned int event_size = data[ 8 ] ;
@@ -953,7 +953,7 @@ void reduceHdrTrl(unsigned int* data , unsigned int& event_nwords)
 }
 
 
-int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords, unsigned int& exprun ,
+int checkEventData(int sender_id, unsigned int* data, unsigned int event_nwords, unsigned int& exprun,
                    unsigned int& evtnum, unsigned int node_id, std::vector< int > valid_ch)
 {
   int expected_number_of_links = valid_ch.size() ;
@@ -970,8 +970,8 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
   unsigned int event_length = data[ EVENT_LEN_POS ];
   if (event_length > 0x100000) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] thread %d : ERROR_EVENT : Too large event size. : 0x%.8x : %d words. : exp %d run %d sub %d : Exiting...\n",
-           sender_id,
+    printf("[FATAL] thread %d : %s : ERROR_EVENT : Too large event size. : 0x%.8x : %d words. : exp %d run %d sub %d : Exiting...\n",
+           sender_id, hostnamebuf,
            data[ EVENT_LEN_POS ], data[ EVENT_LEN_POS ],
            (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
            (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -983,8 +983,8 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     exit(1);
   } else if (event_length == 0) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] thread %d : ERROR_EVENT : Specified event size is zero. : 0x%.8x : %u words. : exp %d run %d sub %d : Exiting...\n",
-           sender_id,
+    printf("[FATAL] thread %d : %s : ERROR_EVENT : Specified event size is zero. : 0x%.8x : %u words. : exp %d run %d sub %d : Exiting...\n",
+           sender_id, hostnamebuf,
            data[ EVENT_LEN_POS ], event_length,
            (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
            (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -1004,8 +1004,8 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     n_messages[ 7 ] = n_messages[ 7 ] + 1 ;
     if (n_messages[ 7 ] < max_number_of_messages) {
       sprintf(err_buf,
-              "[FATAL] thread %d : ERROR_EVENT :  Invalid Magic word in ReadOut Board header( 0x%.8x ) : It must be 0x7f7f???? : exp %d run %d sub %d",
-              sender_id, data[ MAGIC_7F7F_POS ],
+              "[FATAL] thread %d : %s : ERROR_EVENT :  Invalid Magic word in ReadOut Board header( 0x%.8x ) : It must be 0x7f7f???? : exp %d run %d sub %d",
+              sender_id, hostnamebuf, data[ MAGIC_7F7F_POS ],
               (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
               (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
               (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
@@ -1061,8 +1061,8 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
                         Belle2::PostRawCOPPERFormat_latest::POS_B2LHSLB_TRL_MAGIC;
     if (data[ ERR_POS ] != 0) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : Inconsistency between header(no error found by FPGA) %.8x and errorbit %.8x (error-bit is non-zero) : exp %d run %d sub %d\n",
-             sender_id, data[ MAGIC_7F7F_POS ], data[ ERR_POS ],
+      printf("[FATAL] thread %d : %s : Inconsistency between header(no error found by FPGA) %.8x and errorbit %.8x (error-bit is non-zero) : exp %d run %d sub %d\n",
+             sender_id, hostnamebuf, data[ MAGIC_7F7F_POS ], data[ ERR_POS ],
              (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
              (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
              (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
@@ -1154,7 +1154,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
   unsigned int utime = data[ Belle2::RawHeader_latest::POS_TTUTIME ] ;
 
   unsigned int crc_init = 0xFFFF ;
-  unsigned int f_crc[ 4 ]  = { ctime , new_evtnum , utime , new_exprun } ;
+  unsigned int f_crc[ 4 ]  = { ctime, new_evtnum, utime, new_exprun } ;
   unsigned int first_crc = 0;
 
   // find number of links
@@ -1166,7 +1166,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
   int first_b2lctime_flag = 0;
 
   if (reduced_flag == 1) {
-    first_crc = get_crc(f_crc , 4 , crc_init) ;
+    first_crc = get_crc(f_crc, 4, crc_init) ;
     non_crc_counts = NON_CRC_COUNTS_REDUCED;
   } else {
     err_flag_cnt[sender_id]++;
@@ -1259,19 +1259,19 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
         t_st = localtime(&timer);
         if (first_b2lctime_flag == 0) {
           first_b2lctime = data[ cur_pos +
-                                 Belle2::PostRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
-                                 Belle2::PostRawCOPPERFormat_latest::POS_B2L_CTIME ];
+                                         Belle2::PostRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
+                                         Belle2::PostRawCOPPERFormat_latest::POS_B2L_CTIME ];
           first_b2lctime_flag = 1;
         }
         pthread_mutex_lock(&(mtx_sender_log));
         printf("[DEBUG] thread %d : eve %u ch %3d B2Lctime 0x%.8x diff %.2lf [us] : exp %d run %d sub %d : %s",
                sender_id, new_evtnum, i,
                data[ cur_pos +
-                     Belle2::PostRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
-                     Belle2::PostRawCOPPERFormat_latest::POS_B2L_CTIME ],
+                             Belle2::PostRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
+                             Belle2::PostRawCOPPERFormat_latest::POS_B2L_CTIME ],
                ((int)(data[ cur_pos +
-                            Belle2::PostRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
-                            Belle2::PostRawCOPPERFormat_latest::POS_B2L_CTIME ]
+                                    Belle2::PostRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
+                                    Belle2::PostRawCOPPERFormat_latest::POS_B2L_CTIME ]
                       - first_b2lctime)) / 127.22,
                (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
                (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -1295,7 +1295,6 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
       err_link_eve_jump[sender_id]++;
       if (err_link_eve_jump[sender_id] < max_number_of_messages) {
         char err_buf[500] = {0};
-        //        printf("[FATAL] thread %d : event diff. in ch %d cur_eve %.8x ffaa %.8x\n", sender_id, i, new_evtnum, data[ cur_pos + FFAA_POS ]);
         sprintf(err_buf,
                 "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Invalid event_number (= lower 8bits in ffaa header -> 0x%.2x). Exiting...: eve 0x%.8x ffaa header 0x%.8x : exp %d run %d sub %d : %s %s %d",
                 sender_id,
@@ -1345,7 +1344,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
         printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : The end position ( %d words ) of this channel data exceeds event size( %d words ). Exiting... : exp %d run %d sub %d : %s %s %d\n",
                sender_id,
                hostnamebuf,  i,
-               (cur_pos + linksize) , event_nwords,
+               (cur_pos + linksize), event_nwords,
                (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
                (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
                (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
@@ -1377,7 +1376,6 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
                 (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
                 (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
-        //        printf("[FATAL] thread %d : Bad ff55 %X pos %.8x ch %d\n" , sender_id, data[ cur_pos + linksize - 1  ], cur_pos + linksize - 1  ,   i) ;
         printf("%s\n", err_buf); fflush(stdout);
         printEventData(data, event_length + 16, sender_id);
       }
@@ -1398,22 +1396,19 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     unsigned int value = crc_data;
     unsigned int* data_for_crc = data + cur_pos + CRC_START_POS;
 #ifdef CRC_CHECK
-    if (get_crc(data_for_crc , size , first_crc) != value) {
+    if (get_crc(data_for_crc, size, first_crc) != value) {
       pthread_mutex_lock(&(mtx_sender_log));
       // Currently, zero-torellance for a CRC error.
       //      if (crc_err_ch[sender_id][i] == 0) {
       printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : PRE CRC16 error or POST B2link event CRC16 error. data(%x) calc(%x) : eve %d exp %d run %d sub %d : %s %s %d\n",
              sender_id,
              hostnamebuf, i,
-             value, get_crc(data_for_crc , size , first_crc),
+             value, get_crc(data_for_crc, size, first_crc),
              new_evtnum,
              (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
              (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
              (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      // printf("[FATAL] thread %d : CRC Error calc %.4X data %.8X eve %u ch %d\n" , sender_id,
-      //        get_crc(data_for_crc , size , first_crc) ,
-      //        data[ cur_pos + linksize - 2 ], new_evtnum, i) ;
       printEventData(data, event_length, sender_id);
       //      }
 
@@ -1435,9 +1430,9 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
     if (new_evtnum % 1000000 == 0) {
       //    if (total_crc_good[sdr_id] % (1000000 + sdr_id) == 0) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[DEBUG] thread %d :  CRC Good  calc %.4X data %.4X eve %u ch %d crcOK %u crcNG %d errflag %u : exp %d run %d sub %d\n" ,
+      printf("[DEBUG] thread %d :  CRC Good  calc %.4X data %.4X eve %u ch %d crcOK %u crcNG %d errflag %u : exp %d run %d sub %d\n",
              sender_id,
-             get_crc(data_for_crc , size , first_crc) ,
+             get_crc(data_for_crc, size, first_crc),
              value, new_evtnum, i, total_crc_good[sender_id], total_crc_errors[sender_id], err_flag_cnt[sender_id],
              (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
              (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -1552,7 +1547,7 @@ int checkEventData(int sender_id, unsigned int* data , unsigned int event_nwords
   return ret;
 }
 
-void checkEventGenerator(unsigned int* data , int i , unsigned int size)
+void checkEventGenerator(unsigned int* data, int i, unsigned int size)
 {
   if (data == 0) {
     pthread_mutex_lock(&(mtx_sender_log));
@@ -1563,8 +1558,8 @@ void checkEventGenerator(unsigned int* data , int i , unsigned int size)
 
   if (i != getEventNumber(data)) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("Event number mismatch %d %d\n" ,
-           getEventNumber(data) , i) ;
+    printf("Event number mismatch %d %d\n",
+           getEventNumber(data), i) ;
     pthread_mutex_unlock(&(mtx_sender_log));
   }
   // Check header
@@ -1576,12 +1571,12 @@ void checkEventGenerator(unsigned int* data , int i , unsigned int size)
     pthread_mutex_unlock(&(mtx_sender_log));
   } else if ((data[ 0 ] & 0xFFFF) != size) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("Bad size %d %d\n" , data[0] & 0xFFFF , size) ;
+    printf("Bad size %d %d\n", data[0] & 0xFFFF, size) ;
     printLine(data, EVENT_LEN_POS);
     pthread_mutex_unlock(&(mtx_sender_log));
   } else if (((data[ 2 ] & 0xFFFF0000) >> 16) != (size * 32)) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("Bad word size %d %d\n" , (data[ 2 ] & 0xFFFF0000) >> 16 , size * 32) ;
+    printf("Bad word size %d %d\n", (data[ 2 ] & 0xFFFF0000) >> 16, size * 32) ;
     printHeader(data) ;
     pthread_mutex_unlock(&(mtx_sender_log));
   } else if (((data[ 0 ] & 0xFFFF0000) != 0xEEEE0000) ||
@@ -1596,7 +1591,7 @@ void checkEventGenerator(unsigned int* data , int i , unsigned int size)
   // Check trailer
   if (data[ 8 * (size - 1) ] != size) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("Bad size in trailer %.8x %.8x\n" , data[8 * (size - 1)], size) ;
+    printf("Bad size in trailer %.8x %.8x\n", data[8 * (size - 1)], size) ;
     printLine(data, 8 * (size - 1));
     pthread_mutex_unlock(&(mtx_sender_log));
   } else if ((data[ 8 * (size - 1) + 1 ] != 0) || (data[ 8 * (size - 1) + 2 ] != 0) ||
@@ -1612,7 +1607,7 @@ void checkEventGenerator(unsigned int* data , int i , unsigned int size)
   for (unsigned int j = 1 ; j < (size - 1) ; ++j) {
     if (data[ 8 * j ] != j) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("Bad data number %d %d\n" , data[8 * j] , j) ;
+      printf("Bad data number %d %d\n", data[8 * j], j) ;
       pthread_mutex_unlock(&(mtx_sender_log));
     }  else if (data[8 * j + 1] != 0) {
       pthread_mutex_lock(&(mtx_sender_log));
@@ -1892,8 +1887,8 @@ void* sender(void* arg)
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
     pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] thread %d : Failed to bind(%s). Maybe other programs have already occupied this port(%d). Exiting...\n",
-           sender_id, strerror(errno),
+    printf("[FATAL] thread %d : %s : Failed to bind(%s). Maybe other programs have already occupied this port(%d). Exiting...\n",
+           sender_id, hostnamebuf, strerror(errno),
            port_to); fflush(stdout);
     pthread_mutex_unlock(&(mtx_sender_log));
 
@@ -1925,7 +1920,8 @@ void* sender(void* arg)
   if (listen(fd_listen, backlog) < 0) {
     char err_buf[500];
     pthread_mutex_lock(&(mtx_sender_log));
-    sprintf(err_buf, "[FATAL] thread %d : Failed in listen(%s). Exting...", sender_id,
+    sprintf(err_buf, "[FATAL] thread %d : %s : Failed in listen(%s). Exting...",
+            sender_id, hostnamebuf,
             strerror(errno));
     printf("%s\n", err_buf); fflush(stdout);
     pthread_mutex_unlock(&(mtx_sender_log));
@@ -1947,7 +1943,8 @@ void* sender(void* arg)
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
     char err_buf[500];
     pthread_mutex_lock(&(mtx_sender_log));
-    sprintf(err_buf, "[FATAL] thread %d : Failed to accept(%s). Exiting...", sender_id,
+    sprintf(err_buf, "[FATAL] thread %d : %s : Failed to accept(%s). Exiting...",
+            sender_id, hostnamebuf,
             strerror(errno));
     printf("%s\n", err_buf); fflush(stdout);
     pthread_mutex_unlock(&(mtx_sender_log));
@@ -1967,7 +1964,7 @@ void* sender(void* arg)
     if (ret < 0) {
       pthread_mutex_lock(&(mtx_sender_log));
       char err_buf[500];
-      sprintf(err_buf, "[FATAL] thread %d : Failed to set TIMEOUT. Exiting...", sender_id);
+      sprintf(err_buf, "[FATAL] thread %d : %s : Failed to set TIMEOUT. Exiting...", sender_id, hostnamebuf);
       printf("%s\n", err_buf); fflush(stdout);
       pthread_mutex_unlock(&(mtx_sender_log));
       exit(-1);
@@ -2020,7 +2017,7 @@ void* sender(void* arg)
       }
       {
         pthread_mutex_lock(&(mtx1_ch[sender_id]));
-        memcpy((buff + NW_SEND_HEADER) , data_1[sender_id], copy_nwords[sender_id][0] * sizeof(unsigned int));
+        memcpy((buff + NW_SEND_HEADER), data_1[sender_id], copy_nwords[sender_id][0] * sizeof(unsigned int));
         send_nwords = copy_nwords[sender_id][0];
         buffer_filled[sender_id][0] = 0;
         pthread_mutex_unlock(&(mtx1_ch[sender_id]));
@@ -2047,7 +2044,7 @@ void* sender(void* arg)
     //
     if (buff == NULL) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : buffer in sender is NULL(= %p )\n", sender_id, buff); fflush(stdout);
+      printf("[FATAL] thread %d : %s : buffer in sender is NULL(= %p )\n", sender_id, hostnamebuf, buff); fflush(stdout);
       pthread_mutex_unlock(&(mtx_sender_log));
       exit(1);
     }
@@ -2073,13 +2070,13 @@ void* sender(void* arg)
         int ret = checkEventData(sender_id, buff + NW_SEND_HEADER, event_nwords, exprun, evtnum, node_id, valid_ch);
         if (ret != DATACHECK_OK) {
           pthread_mutex_lock(&(mtx_sender_log));
-          printf("[FATAL] thread %d : checkEventData() detected an error after reduceHdrTrl(). Exiting...\n", sender_id);
+          printf("[FATAL] thread %d : %s : checkEventData() detected an error after reduceHdrTrl(). Exiting...\n", sender_id, hostnamebuf);
           fflush(stdout);
           pthread_mutex_unlock(&(mtx_sender_log));
           exit(1);
         }
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[WARNING] thread %d : Data-check was passed. This event is treated as a normal event.\n", sender_id);
+        printf("[WARNING] thread %d : %s : Data-check was passed. This event is treated as a normal event.\n", sender_id, hostnamebuf);
         //        printf("[FATAL] thread %d : Currently, we will not tolerate a fake-error event. Exiting...\n", sender_id);
         printEventData(buff + NW_SEND_HEADER, event_nwords);
         fflush(stdout);
@@ -2087,7 +2084,7 @@ void* sender(void* arg)
         //        exit(1);
       } else {
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[FATAL] thread %d : checkEventData() detected an error. Exiting...\n", sender_id);
+        printf("[FATAL] thread %d : %s : checkEventData() detected an error. Exiting...\n", sender_id, hostnamebuf);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
         exit(1);
@@ -2117,11 +2114,11 @@ void* sender(void* arg)
     // printEventData( buff, send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER, sender_id);
     // pthread_mutex_unlock(&(mtx_sender_log));
 
-    if (buff[ NW_SEND_HEADER + 1 ] & 0xfffff000 != 0x7f7f0000 ||
+    if ((buff[ NW_SEND_HEADER + 1 ] & 0xfffff000) != 0x7f7f0000 ||
         buff[ NW_SEND_HEADER + send_nwords - 1  ] != 0x7fff0006) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : ERROR_EVENT : Invalid Magic word in header( 0x%.8x ) and/or trailer( 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d",
-             sender_id, buff[ NW_SEND_HEADER + 1 ], buff[ NW_SEND_HEADER + send_nwords - 1  ],
+      printf("[FATAL] thread %d : %s : ERROR_EVENT : Invalid Magic word in header( 0x%.8x ) and/or trailer( 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d",
+             sender_id, hostnamebuf, buff[ NW_SEND_HEADER + 1 ], buff[ NW_SEND_HEADER + send_nwords - 1  ],
              evtnum,
              (exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
              (exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
@@ -2143,7 +2140,7 @@ void* sender(void* arg)
         } else {
           perror("[DEBuG] write() failed");
           pthread_mutex_lock(&(mtx_sender_log));
-          printf("[FATAL] thread %d : write() failed. Return value of write() = %d\n", sender_id, ret);
+          printf("[FATAL] thread %d : %s : write() failed. Return value of write() = %d\n", sender_id, hostnamebuf, ret);
           fflush(stdout);
           pthread_mutex_unlock(&(mtx_sender_log));
           exit(1);
@@ -2156,7 +2153,7 @@ void* sender(void* arg)
       } else if (sent_bytes > (int)((send_nwords + NW_SEND_HEADER + NW_SEND_TRAILER)
                                     * sizeof(unsigned int))) {
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[FATAL] thread %d : Too many bytes are sent\n", sender_id);
+        printf("[FATAL] thread %d : %s : Too many bytes are sent\n", sender_id, hostnamebuf);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
         exit(1);
@@ -2181,9 +2178,9 @@ void* sender(void* arg)
                sender_id,
                cnt, cur_time - init_time,
                NUM_CLIENTS_PER_THREAD * (cnt - prev_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - prev_time),
-               (cnt - prev_cnt) / (cur_time - prev_time) / 1000. ,
+               (cnt - prev_cnt) / (cur_time - prev_time) / 1000.,
                NUM_CLIENTS_PER_THREAD * (cnt - start_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - init_time),
-               (cnt - start_cnt) / (cur_time - init_time) / 1000. , total_words);
+               (cnt - start_cnt) / (cur_time - init_time) / 1000., total_words);
 
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
@@ -2336,7 +2333,7 @@ int main(int argc, char** argv)
   double triggerRate = 400 ; // kHz
   double data_size = 0. ;
   int size = 0x1F ;
-  int res = ecs_open(0 , 0) ;
+  int res = ecs_open(0, 0) ;
 
   if (-1 == res) {
     pthread_mutex_lock(&(mtx_sender_log));
@@ -2348,7 +2345,7 @@ int main(int argc, char** argv)
     pthread_mutex_unlock(&(mtx_sender_log));
   }
 
-  res = ecs_open(0 , 2) ;
+  res = ecs_open(0, 2) ;
   if (-1 == res) {
     pthread_mutex_lock(&(mtx_sender_log));
     printf("ERROR: Could not open device (BAR 2)\n") ;
@@ -2372,8 +2369,8 @@ int main(int argc, char** argv)
 
 
   // Read the active links
-  unsigned int masks0 = ecs_read(0 , 2 , 0x50520) ;
-  unsigned int masks1 = ecs_read(0 , 2 , 0x50540) ;
+  unsigned int masks0 = ecs_read(0, 2, 0x50520) ;
+  unsigned int masks1 = ecs_read(0, 2, 0x50540) ;
   std::vector< int > valid_ch ;
   valid_ch.clear();
   for (int i = 0 ; i < 24 ; i++) {
@@ -2410,12 +2407,12 @@ int main(int argc, char** argv)
   //
   // ulreset to clear FIFOs and rest state machines in userlogic
   //
-  ecs_write(0 , 2 ,  0x00050400 , 0x0);
-  ecs_write(0 , 2 ,  0x00050400 , 0x4);
-  ecs_write(0 , 2 ,  0x00050400 , 0x0);
+  ecs_write(0, 2,  0x00050400, 0x0);
+  ecs_write(0, 2,  0x00050400, 0x4);
+  ecs_write(0, 2,  0x00050400, 0x0);
 
   unsigned int initial_value = pcie40_getNbWordInEvent(0) ;
-  if (initial_value == 0) pcie40_setNbWordInEvent(0 , 0xFF) ;
+  if (initial_value == 0) pcie40_setNbWordInEvent(0, 0xFF) ;
   pcie40_dmaReset(0) ;
   pcie40_dmaStop(0) ;
   if (! isData) {
@@ -2427,15 +2424,15 @@ int main(int argc, char** argv)
   }
   //pcie40_useFreeSignal( 0 ) ;
   int t_rate = 10416.666 / ((double) triggerRate) - 1 ;
-  pcie40_setGeneratorTriggerFrequency(0 , t_rate) ;
-  pcie40_setNbEvents(0 , 0) ;
+  pcie40_setGeneratorTriggerFrequency(0, t_rate) ;
+  pcie40_setNbEvents(0, 0) ;
   // start DAQ
   pcie40_resetSPages(0) ;
   pcie40_dmaSetReadout(0) ;
   pcie40_setSizeFromHeader(0) ;
   if (! isData)
-    pcie40_setNbWordInEvent(0 , size) ;
-  pcie40_setBusyLevel(0 , 0x502) ;
+    pcie40_setNbWordInEvent(0, size) ;
+  pcie40_setBusyLevel(0, 0x502) ;
   dma_initialize(0) ;
 
   pthread_mutex_lock(&(mtx_sender_log));
@@ -2496,7 +2493,6 @@ int main(int argc, char** argv)
   //  auto t1 = std::chrono::high_resolution_clock::now();
   double m_start_time = getTimeSec();
   double m_prev_time = 0.;
-  unsigned int m_prev_nevt = 0;
   unsigned int event_words = 0;
   double total_size_bytes = 0.;
   double prev_total_size_bytes = 0.;
@@ -2527,12 +2523,12 @@ int main(int argc, char** argv)
       //    #pragma omp parallel for
       for (int j = 0 ; j < rv * S_PAGE_SLOT_NMB ; ++j) {
         event_words = 0;
-        data = pcie40_getSuperPageCopy(0 , (get_sp_cnt / S_PAGE_SLOT_NMB) % S_PAGES  , get_sp_cnt % S_PAGE_SLOT_NMB) ;
+        data = pcie40_getSuperPageCopy(0, (get_sp_cnt / S_PAGE_SLOT_NMB) % S_PAGES, get_sp_cnt % S_PAGE_SLOT_NMB) ;
         if (! isData) {
-          checkEventGenerator(data , get_sp_cnt , size);
+          checkEventGenerator(data, get_sp_cnt, size);
         } else {
           // Check DMA header and trailer
-          int ret = checkDMAHeader(data , frag_size , data_size , total_pages , index_pages) ;
+          int ret = checkDMAHeader(data, frag_size, data_size, total_pages, index_pages) ;
 
           if (first_event_flag == 0) {
             pthread_mutex_lock(&(mtx_sender_log));
@@ -2575,7 +2571,7 @@ int main(int argc, char** argv)
                 exit(1);
               }
               // Store a DMA packet in buffer for combined data
-              memcpy(&combined_data[ previous_index ] , data + DMA_HDR_WORDS , 8 * (frag_size - 2) * 4) ;
+              memcpy(&combined_data[ previous_index ], data + DMA_HDR_WORDS, 8 * (frag_size - 2) * 4) ;
               delete [] data ;
               data = NULL;
               previous_index = previous_index + 8 * (frag_size - 2) ;
@@ -2583,7 +2579,7 @@ int main(int argc, char** argv)
               // Get more DMA packets to complete an event
               if (index_pages != (total_pages - 1)) {
                 get_sp_cnt++;
-                if ((get_sp_cnt > 0) && ((get_sp_cnt % S_PAGE_SLOT_NMB) == 0)) pcie40_freeSuperPage(0 , 1) ;
+                if ((get_sp_cnt > 0) && ((get_sp_cnt % S_PAGE_SLOT_NMB) == 0)) pcie40_freeSuperPage(0, 1) ;
                 continue ; //
               }
               // End of an event
@@ -2806,8 +2802,8 @@ int main(int argc, char** argv)
         }
 
         if ((k % 100) == 0)
-          if (writeInFile) writeToFile(the_file , data , esize) ;
-        if ((get_sp_cnt > 0) && ((get_sp_cnt % S_PAGE_SLOT_NMB) == 0)) pcie40_freeSuperPage(0 , 1) ;
+          if (writeInFile) writeToFile(the_file, data, esize) ;
+        if ((get_sp_cnt > 0) && ((get_sp_cnt % S_PAGE_SLOT_NMB) == 0)) pcie40_freeSuperPage(0, 1) ;
       }
     }
 
@@ -2825,9 +2821,9 @@ int main(int argc, char** argv)
                cnt,
                cur_time - init_time,
                NUM_SENDER_THREADS * (cnt - prev_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - prev_time),
-               (cnt - prev_cnt) / (cur_time - prev_time) / 1000. ,
+               (cnt - prev_cnt) / (cur_time - prev_time) / 1000.,
                NUM_SENDER_THREADS * (cnt - start_cnt)*total_words * sizeof(int) / 1000000. / (cur_time - init_time),
-               (cnt - start_cnt) / (cur_time - init_time) / 1000. , total_words);
+               (cnt - start_cnt) / (cur_time - init_time) / 1000., total_words);
         fflush(stdout);
         pthread_mutex_unlock(&(mtx_sender_log));
         prev_time = cur_time;
@@ -2841,8 +2837,8 @@ int main(int argc, char** argv)
   //
   // Close PCIe40
   //
-  ecs_close(0 , 0) ;
-  ecs_close(0 , 2) ;
+  ecs_close(0, 0) ;
+  ecs_close(0, 2) ;
   dma_close(0) ;
   if (writeInFile) the_file.close() ;
 

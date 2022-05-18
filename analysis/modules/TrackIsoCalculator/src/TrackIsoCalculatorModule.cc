@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <analysis/modules/TrackIsoCalculator/TrackIsoCalculatorModule.h>
+#include <mdst/dataobjects/Track.h>
 
 #include <cmath>
 #include <iomanip>
@@ -80,8 +81,10 @@ void TrackIsoCalculatorModule::event()
           << "nParticlesReference: " << nParticlesReference);
 
   // Store the pair-wise distances in a 2D array.
-  // Size is given by the length of the particle list.
+  // Size is given by the length of the reference particle list.
   std::vector<double> defaultDistances(nParticlesReference, 1e9);
+  // Size is given by the length of the particle list. Each vector (= defaultDistances) has nParticlesReference components.
+  // Thus, total size is given by nParticles times nParticlesReference.
   std::vector<std::vector<double>> pairwiseDistances(nParticles, defaultDistances);
 
   B2DEBUG(11, "Array of pair-wise distances between tracks in particle list. Initial values:");
@@ -93,7 +96,7 @@ void TrackIsoCalculatorModule::event()
     for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
       Particle* jParticle = m_pListReference->getParticle(jPart);
 
-      if (iParticle->getTrackFitResult() == jParticle->getTrackFitResult())
+      if (iParticle->getTrack()->getArrayIndex() == jParticle->getTrack()->getArrayIndex())
         continue;
       if (pairwiseDistances[iPart][jPart] != 1e9)
         continue;

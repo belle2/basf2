@@ -66,6 +66,10 @@ Variables
  * Added the variable `nPrimaryMCParticles` which returns the number of primary MC particles.
  * Added the variable `nVirtualPrimaryMCParticles` which returns the number of virtual primary MC particles.
  * Added the variable `nInitialPrimaryMCParticles` which returns the number of initial primary MC particles.
+ * Changed the `nCompositeDaughters` so that one can specify the PDG code of composite daughters.
+   If no argument is given, it works same as before. Please note that brackets have to appended even if no argument is given i.e.
+   ``nCompositeDaughters()``.
+ * Added `nCompositeAllGenerationDaughters` which works similar with `nCompositeDaughters` but it includes all generations of daughters.
 
 Modules
 +++++++

@@ -677,6 +677,14 @@ std::vector<const Belle2::Particle*> Particle::getFinalStateDaughters() const
   return fspDaughters;
 }
 
+std::vector<const Belle2::Particle*> Particle::getAllDaughters() const
+{
+  std::vector<const Particle*> allDaughters;
+  fillAllDaughters(allDaughters);
+
+  return allDaughters;
+}
+
 std::vector<int> Particle::getMdstArrayIndices(EParticleSourceObject source) const
 {
   std::vector<int> mdstIndices;
@@ -1106,6 +1114,19 @@ void Particle::fillFSPDaughters(std::vector<const Belle2::Particle*>& fspDaughte
   // this is not FSP (go one level down)
   for (unsigned i = 0; i < getNDaughters(); i++)
     getDaughter(i)->fillFSPDaughters(fspDaughters);
+}
+
+void Particle::fillAllDaughters(std::vector<const Belle2::Particle*>& allDaughters) const
+{
+  // this is FSP
+  if (getNDaughters() == 0)
+    return;
+
+  // this is not FSP (fill it and go one level down)
+  for (unsigned i = 0; i < getNDaughters(); i++) {
+    allDaughters.push_back(getDaughter(i));
+    getDaughter(i)->fillAllDaughters(allDaughters);
+  }
 }
 
 void Particle::fillDecayChain(std::vector<int>& decayChain) const

@@ -31,13 +31,17 @@ namespace Belle2 {
      */
     int nDaughterCharged(const Particle* particle, const std::vector<double>& argument);
     /**
-     * PDG of the most common mother of daughters
+     * Number of neutral hadron (photon or KL) daughters
      */
     int nDaughterNeutralHadrons(const Particle* particle);
     /**
-     * PDG of the most common mother of daughters
+     * Number of composite daughters (only Primary daughter)
      */
-    int nCompositeDaughters(const Particle* particle);
+    int nCompositeDaughters(const Particle* particle, const std::vector<double>& argument);
+    /**
+     * Number of composite daughters in all generations
+     */
+    int nCompositeAllGenerationDaughters(const Particle* particle, const std::vector<double>& argument);
     /**
      * Average variable values of daughters
      */

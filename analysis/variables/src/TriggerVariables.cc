@@ -376,7 +376,7 @@ namespace Belle2 {
 [Eventbased] Returns the PSNM (Prescale And Mask, after prescale) status of i-th trigger bit.
 
 .. warning::
-  It is recommended to use this variable only for debugging and to use :b2:var:`L1PSNM(name)`
+  It is recommended to use this variable only for debugging and to use :b2:var:`L1PSNM`
   with the explicit trigger bit name for physics analyses or performance studies.
 )DOC");
     REGISTER_VARIABLE("L1FTDLBit(i)", L1FTDLBit,
@@ -384,7 +384,7 @@ namespace Belle2 {
 [Eventbased] Returns the FTDL (Final Trigger Decision Logic, before prescale) status of i-th trigger bit.
 
 .. warning::
-  It is recommended to use this variable only for debugging and to use :b2:var:`L1FTDL(name)`
+  It is recommended to use this variable only for debugging and to use :b2:var:`L1FTDL`
   with the explicit trigger bit name for physics analyses or performance studies.
 )DOC");
     REGISTER_VARIABLE("L1InputBit(i)", L1InputBit,
@@ -392,7 +392,7 @@ namespace Belle2 {
 [Eventbased] Returns the input bit status of the i-th input trigger bit.
 
 .. warning::
-  It is recommended to use this variable only for debugging and to use :b2:var:`L1Input(name)`
+  It is recommended to use this variable only for debugging and to use :b2:var:`L1Input`
   with the explicit trigger bit name for physics analyses or performance studies.
 )DOC");
     REGISTER_VARIABLE("L1PSNMBitPrescale(i)", L1PSNMBitPrescale,
@@ -400,7 +400,7 @@ namespace Belle2 {
 [Eventbased] Returns the PSNM (prescale and mask) prescale of i-th trigger bit.
 
 .. warning::
-  It is recommended to use this variable only for debugging and to use :b2:var:`L1Prescale(name)`
+  It is recommended to use this variable only for debugging and to use :b2:var:`L1Prescale`
   with the explicit trigger bit name for physics analyses or performance studies.
 )DOC");
     REGISTER_VARIABLE("L1TimeType", L1TimeType,

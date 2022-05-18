@@ -5,6 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <svd/calibration/SVDMCClusterErrorScaleFactor.h>
+#include <svd/calibration/SVDMCClusterPositionScaleFactor.h>
 
-std::string Belle2::SVDMCClusterErrorScaleFactor::name = std::string("SVDMCClusterErrorScaleFactor");
+std::string Belle2::SVDMCClusterPositionScaleFactor::name = std::string("SVDMCClusterPositionScaleFactor");

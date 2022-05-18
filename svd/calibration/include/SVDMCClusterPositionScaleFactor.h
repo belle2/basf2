@@ -22,17 +22,17 @@ namespace Belle2 {
    * SVD position error parameters and provide the position error
    * for the CoGOnly algorithm
    */
-  class SVDMCClusterErrorScaleFactor {
+  class SVDMCClusterPositionScaleFactor {
   public:
-    static std::string name; /**< name of the SVDMCClusterErrorScaleFactor payload */
+    static std::string name; /**< name of the SVDMCClusterPositionScaleFactor payload */
     typedef SVDCalibrationsBase<SVDCalibrationsScalar<SVDMCFudgeFactorFunction>>
-        t_payload; /**< typedef for the SVDMCClusterErrorScaleFactor payload of all SVD sensors*/
+        t_payload; /**< typedef for the SVDMCClusterPositionScaleFactor payload of all SVD sensors*/
 
     /** Constructor, no input argument is required */
-    SVDMCClusterErrorScaleFactor() : m_aDBObjPtr(name)
+    SVDMCClusterPositionScaleFactor() : m_aDBObjPtr(name)
     {
       m_aDBObjPtr.addCallback([this](const std::string&) -> void
-      { B2DEBUG(20, "SVDMCClusterErrorScaleFactor: from now on we are using " << this->m_aDBObjPtr->get_uniqueID()); });
+      { B2DEBUG(20, "SVDMCClusterPositionScaleFactor: from now on we are using " << this->m_aDBObjPtr->get_uniqueID()); });
     }
 
     /** Return the MC fudge factor
@@ -40,7 +40,6 @@ namespace Belle2 {
      * Input:
      * @param sensorID: identity of the sensor for which the calibration is required
      * @param isU sensor side, true for p side, false for n side
-     * @param strip strip number - NOT USED
      * @param trkAngle track's incident angle
      *
      * Output: double corresponding to the fudge factor
@@ -65,6 +64,6 @@ namespace Belle2 {
     bool isValid() { return m_aDBObjPtr.isValid(); }
 
   private:
-    DBObjPtr<t_payload> m_aDBObjPtr; /**< SVDMCClusterErrorScaleFactor payload */
+    DBObjPtr<t_payload> m_aDBObjPtr; /**< SVDMCClusterPositionScaleFactor payload */
   };
 }

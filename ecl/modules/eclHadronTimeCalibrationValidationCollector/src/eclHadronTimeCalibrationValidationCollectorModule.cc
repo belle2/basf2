@@ -29,7 +29,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclHadronTimeCalibrationValidationCollector)
+REG_MODULE(eclHadronTimeCalibrationValidationCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -75,31 +75,31 @@ void eclHadronTimeCalibrationValidationCollectorModule::inDefineHisto()
     // Per photon cluster
     m_dbg_tree_photonClusters = new TTree("tree_photonClusters",
                                           "Validating crystal and crate time calibrations using photon clusters in events with lots of tracks and clusters") ;
-    m_dbg_tree_photonClusters->Branch("EventNum"  , &m_tree_evt_num)   ->SetTitle("Event number") ;
-    m_dbg_tree_photonClusters->Branch("cluster_time"    , &m_tree_time)   ->SetTitle("Cluster time t (calibrated), ns") ;
-    m_dbg_tree_photonClusters->Branch("clust_E"    , &m_E_photon_clust)   ->SetTitle("Photon type cluster energy, GeV") ;
-    m_dbg_tree_photonClusters->Branch("Ntracks"  , &m_NtightTracks)     ->SetTitle("Number of tracks") ;
-    m_dbg_tree_photonClusters->Branch("NphotonClusters"  , &m_NphotonClusters)     ->SetTitle("Number of photons") ;
-    m_dbg_tree_photonClusters->Branch("NGoodClusters"  , &m_NGoodClusters)     ->SetTitle("Number of good ECL clusters") ;
-    m_dbg_tree_photonClusters->Branch("t0"      , &m_tree_t0)     ->SetTitle("T0, ns") ;
-    m_dbg_tree_photonClusters->Branch("t0_unc"  , &m_tree_t0_unc)     ->SetTitle("T0 uncertainty, ns") ;
-    m_dbg_tree_photonClusters->Branch("runNum"  , &m_tree_run)     ->SetTitle("Run number") ;
-    m_dbg_tree_photonClusters->Branch("CrystalCellID"     , &m_tree_cid)    ->SetTitle("Cell ID, 1..8736") ;
-    m_dbg_tree_photonClusters->Branch("dt99"    , &m_tree_dt99)   ->SetTitle("Cluster dt99, ns") ;
+    m_dbg_tree_photonClusters->Branch("EventNum", &m_tree_evt_num)   ->SetTitle("Event number") ;
+    m_dbg_tree_photonClusters->Branch("cluster_time", &m_tree_time)   ->SetTitle("Cluster time t (calibrated), ns") ;
+    m_dbg_tree_photonClusters->Branch("clust_E", &m_E_photon_clust)   ->SetTitle("Photon type cluster energy, GeV") ;
+    m_dbg_tree_photonClusters->Branch("Ntracks", &m_NtightTracks)     ->SetTitle("Number of tracks") ;
+    m_dbg_tree_photonClusters->Branch("NphotonClusters", &m_NphotonClusters)     ->SetTitle("Number of photons") ;
+    m_dbg_tree_photonClusters->Branch("NGoodClusters", &m_NGoodClusters)     ->SetTitle("Number of good ECL clusters") ;
+    m_dbg_tree_photonClusters->Branch("t0", &m_tree_t0)     ->SetTitle("T0, ns") ;
+    m_dbg_tree_photonClusters->Branch("t0_unc", &m_tree_t0_unc)     ->SetTitle("T0 uncertainty, ns") ;
+    m_dbg_tree_photonClusters->Branch("runNum", &m_tree_run)     ->SetTitle("Run number") ;
+    m_dbg_tree_photonClusters->Branch("CrystalCellID", &m_tree_cid)    ->SetTitle("Cell ID, 1..8736") ;
+    m_dbg_tree_photonClusters->Branch("dt99", &m_tree_dt99)   ->SetTitle("Cluster dt99, ns") ;
     m_dbg_tree_photonClusters->SetAutoSave(10) ;
 
     // Per event
     m_dbg_tree_event = new TTree("tree_event",
                                  "Validating crystal and crate time calibrations using photon clusters in events with lots of tracks and clusters") ;
-    m_dbg_tree_event->Branch("EventNum"  , &m_tree_evt_num)   ->SetTitle("Event number") ;
-    m_dbg_tree_event->Branch("t0"      , &m_tree_t0)     ->SetTitle("T0, ns") ;
-    m_dbg_tree_event->Branch("t0_unc"  , &m_tree_t0_unc)     ->SetTitle("T0 uncertainty, ns") ;
-    m_dbg_tree_event->Branch("runNum"  , &m_tree_run)     ->SetTitle("Run number") ;
-    m_dbg_tree_event->Branch("Ntracks"  , &m_NtightTracks)     ->SetTitle("Number of tracks") ;
-    m_dbg_tree_event->Branch("NphotonClusters"  , &m_NphotonClusters)     ->SetTitle("Number of photons") ;
-    m_dbg_tree_event->Branch("NGoodClusters"  , &m_NGoodClusters)     ->SetTitle("Number of good ECL clusters") ;
-    m_dbg_tree_event->Branch("E0"  , &m_tree_E0)   ->SetTitle("Highest E cluster E") ;
-    m_dbg_tree_event->Branch("time_E0"  , &m_tree_time_fromE0)   ->SetTitle("Cluster time of highest E cluster") ;
+    m_dbg_tree_event->Branch("EventNum", &m_tree_evt_num)   ->SetTitle("Event number") ;
+    m_dbg_tree_event->Branch("t0", &m_tree_t0)     ->SetTitle("T0, ns") ;
+    m_dbg_tree_event->Branch("t0_unc", &m_tree_t0_unc)     ->SetTitle("T0 uncertainty, ns") ;
+    m_dbg_tree_event->Branch("runNum", &m_tree_run)     ->SetTitle("Run number") ;
+    m_dbg_tree_event->Branch("Ntracks", &m_NtightTracks)     ->SetTitle("Number of tracks") ;
+    m_dbg_tree_event->Branch("NphotonClusters", &m_NphotonClusters)     ->SetTitle("Number of photons") ;
+    m_dbg_tree_event->Branch("NGoodClusters", &m_NGoodClusters)     ->SetTitle("Number of good ECL clusters") ;
+    m_dbg_tree_event->Branch("E0", &m_tree_E0)   ->SetTitle("Highest E cluster E") ;
+    m_dbg_tree_event->Branch("time_E0", &m_tree_time_fromE0)   ->SetTitle("Cluster time of highest E cluster") ;
     m_dbg_tree_event->SetAutoSave(10) ;
   }
 }
@@ -420,8 +420,8 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
   StoreObjPtr<EventMetaData> evtMetaData ;
   for (long unsigned int i = 0 ; i < goodPhotonClusterIdxs.size() ; i++) {
     getObjectPtr<TH1F>("clusterTime")->Fill(goodClustTimes[i]) ;
-    getObjectPtr<TH2F>("clusterTime_cid")->Fill(goodClustMaxEcrys_cid[i] + 0.001, goodClustTimes[i] , 1) ;
-    getObjectPtr<TH2F>("clusterTime_run")->Fill(evtMetaData->getRun() + 0.001, goodClustTimes[i] , 1) ;
+    getObjectPtr<TH2F>("clusterTime_cid")->Fill(goodClustMaxEcrys_cid[i] + 0.001, goodClustTimes[i], 1) ;
+    getObjectPtr<TH2F>("clusterTime_run")->Fill(evtMetaData->getRun() + 0.001, goodClustTimes[i], 1) ;
     getObjectPtr<TH2F>("clusterTimeClusterE")->Fill(goodClustE[i], goodClustTimes[i], 1) ;
     getObjectPtr<TH2F>("dt99_clusterE")->Fill(goodClustE[i], goodClust_dt99[i], 1) ;
 

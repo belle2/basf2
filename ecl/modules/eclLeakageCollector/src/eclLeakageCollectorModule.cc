@@ -37,7 +37,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclLeakageCollector)
+REG_MODULE(eclLeakageCollector);
 
 //-----------------------------------------------------------------
 //                 Implementation

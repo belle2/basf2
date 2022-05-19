@@ -92,9 +92,9 @@ Modules
  * Added an option ``skipNonPrimary`` to ``fillParticleListFromMC`` and ``fillParticleListsFromMC``.
  * Added an argument ``prefix`` to :func:`flavorTagger.flavorTagger` so that one can choose the version of weight files.
  * Added an option ``basketsize`` to :func:`modularAnalysis.variablesToNtuple` to set the size of TBaskets in the output ntuple in bytes.
- * Added an argument ``reference_list_name`` to :func:`modularAnalysis.calculateTrackIsolation`. The reference ParticleList is used to
-   as reference to calculate the distance for the input ParticleList given by ``input_list``. By default, the ``:all`` list of same particle
-   type with ``input_list`` is used.
+ * Added an argument ``reference_list_name`` to :func:`modularAnalysis.calculateTrackIsolation`. The reference ParticleList is used
+   as reference to calculate the distance for the input ParticleList given by ``input_list``. By default, the ``:all`` list of the same particle
+   type as the ``input_list`` is used.
 
 PID Priors
 ++++++++++

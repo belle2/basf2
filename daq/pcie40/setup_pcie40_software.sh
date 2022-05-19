@@ -1,8 +1,6 @@
 #!/bin/sh
 CUR_DIR=`pwd`
-echo $CUR_DIR
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
-echo $SCRIPT_DIR
 if [ -e $SCRIPT_DIR/Pcie40Software ]; then
     echo "$SCRIPT_DIR/Pcie40Software is already there. Exiting..."
     exit
@@ -23,3 +21,4 @@ make
 
 cd $CUR_DIR
 
+echo "Downloading and compiling PCIe40 library were finished."

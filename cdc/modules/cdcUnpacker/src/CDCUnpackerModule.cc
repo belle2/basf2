@@ -131,10 +131,10 @@ void CDCUnpackerModule::event()
       int trigType = m_rawCDCs[i]->GetTRGType(j); // Get event type of L1 trigger.
       int nWords[48];
       int* data32tab[48];
-      int MaxNumOfCh = m_rawCDCs[i]->GetMaxNumOfCh(0);
+      int MaxNumOfCh = m_rawCDCs[i]->GetMaxNumOfCh(j);
       if (MaxNumOfCh != 48 && MaxNumOfCh != 4)
         B2FATAL("CDC UnpackerModule: Invalid value of GetMaxNumOfCh from raw data: " << LogVar("Number of ch: ",
-                m_rawCDCs[i]->GetMaxNumOfCh(0)));
+                m_rawCDCs[i]->GetMaxNumOfCh(j)));
       for (int k = 0; k < MaxNumOfCh; ++k) {
         nWords[k] = m_rawCDCs[i]->GetDetectorNwords(j, k);
         data32tab[k] = (int*)m_rawCDCs[i]->GetDetectorBuffer(j, k);

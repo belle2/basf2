@@ -129,8 +129,8 @@ void EventT0CombinerModule::event()
         //set SVD value, if available (SVD is the one with highest efficiency)
         m_eventT0->setEventT0(svdBestT0);
 
-        B2DEBUG(20, "No sufficient match found between SVD and ECL timing, setting best SVD t0 = " << cdcBestT0.eventT0 << " +- " <<
-                cdcBestT0.eventT0Uncertainty);
+        B2DEBUG(20, "No sufficient match found between SVD and ECL timing, setting best SVD t0 = " << svdBestT0.eventT0 << " +- " <<
+                svdBestT0.eventT0Uncertainty);
       }
     }
   } else {

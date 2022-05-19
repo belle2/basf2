@@ -47,7 +47,8 @@
 #define NUM_SENDER_THREADS 5
 //#define NUM_SENDER_THREADS 1
 //#define NO_ERROR_STOP
-//#define PCIE40_NODE_ID 0x03000001
+
+#define NODE_ID_TEST_BENCH 0x99000001
 /////////////////////////////////////////
 // Parameter for dummy-data
 ////////////////////////////////////////
@@ -2249,8 +2250,9 @@ int main(int argc, char** argv)
   host_nodeid[ "rklm1" ] = 0x07000001;
   host_nodeid[ "rtrg1" ] = 0x10000001;
 
+
   gethostname(hostnamebuf, sizeof(hostnamebuf));
-  if (pcie40_node_id != 0) {
+  if (pcie40_node_id != NODE_ID_TEST_BENCH) {
     std::map<string, unsigned int>::iterator itr;
     itr = host_nodeid.find(hostnamebuf);
     if (itr != host_nodeid.end()) {
@@ -2268,7 +2270,8 @@ int main(int argc, char** argv)
       }
     } else {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] This sever's hostname is not for a PCIe40 ROPC( %s ). Exiting...\n", hostnamebuf);
+      printf("[FATAL] This sever's hostname is not for a PCIe40 ROPC( %s ). Please use 0x%.8x for a test. Exiting...\n", hostnamebuf,
+             NODE_ID_TEST_BENCH);
       pthread_mutex_unlock(&(mtx_sender_log));
       exit(1);
     }

@@ -17,12 +17,12 @@ indep = basf2.Path()
 
 # input (if you're doing signal embedding, this should be the ROE from data)
 input1 = basf2.register_module('RootInput')
-input1.param('inputFileName', '/nfs/dust/belle2/user/glazov/test_embedding/jpsiExp12_skim.root')
+input1.param('inputFileName', basf2.find_file('embedding_jpsi_exp12_skim.root', 'examples'))
 main.add_module(input1).set_name("--input_main--")
 
 # and the other input (if you're doing signal embedding, this should be the signal from MC)
 input2 = basf2.register_module('RootInput')
-input2.param('inputFileName', '/nfs/dust/belle2/user/glazov/test_embedding/mcsig_skim_166.root')
+input2.param('inputFileName', basf2.find_file('embedding_kplusnunu_mcsig_skim.root', 'examples'))
 input2.param('isSecondaryInput', True)  # <- set flag for secondary input module
 indep.add_module(input2).set_name("input_indep")
 

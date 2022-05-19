@@ -359,7 +359,7 @@ def _add_independent_merge_path(
         consistency_check = ""
     if merge_same_file:
         if not event_mixing:
-            pybasf2.B2INFO("add_independent_merge_path: merge_same_file requres event_mixing, setting it to True")
+            pybasf2.B2INFO("add_independent_merge_path: merge_same_file requires event_mixing, setting it to True")
         event_mixing = True
     self._add_independent_merge_path(skim_path, ds_ID, merge_back_event, consistency_check, event_mixing, merge_same_file)
 

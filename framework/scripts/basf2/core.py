@@ -346,10 +346,14 @@ def _add_independent_merge_path(
     Parameters:
       skim_path: independent path to be merged
       ds_ID: can be specified to give a defined ID to the temporary DataStore,
-        otherwise, a random name will be generated.
+        otherwise, a random name will be generated (option for developers).
       merge_back_event: is a list of object/array names (of event durability)
         that will be merged back into the main path.
-      consistency_check: perform additional consistency checks (off by default)
+      consistency_check: perform additional consistency checks on the objects from two paths.
+        If they are not satisfied, the skim_path proceeds to the next event on the path.
+        Currently supported value is "charge" that uses EventExtraInfo "charge" of the two paths,
+        that must be specified by the user, ensuring correct configuration of the combined event.
+        See CheckMergingConsistencyModule for more details.
       event_mixing: apply event mixing (merge each event from first path with each event of second path)
       merge_same_file: merge events from single file (useful for mixing)
     """

@@ -529,7 +529,7 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
 
   // add relation
   TClonesArray& relations = relContainer->elements();
-  new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(fromIndex, toIndex, weight);
+  new (relations.AddrAt(relations.GetLast() + 1)) RelationElement(fromIndex, toIndex, weight);
 
   std::shared_ptr<RelationIndexContainer<TObject, TObject>> relIndex =
                                                            RelationIndexManager::Instance().getIndexIfExists<TObject, TObject>(relationsName, c_Event);
@@ -860,7 +860,8 @@ void DataStore::SwitchableDataStoreContents::copyEntriesTo(const std::string& id
   if (mergeEntries) {
     // Make sure that EventMetaData is always merged
     if (std::find(entrylist.begin(), entrylist.end(), "EventMetaData") == entrylist.end()) {
-      B2ERROR("It is required to merge the 'EventMetaData' for consistency.");
+      entrylist.push_back("EventMetaData");
+      B2INFO("It is required to merge the 'EventMetaData' for consistency. Added.");
     }
   }
 
@@ -1116,7 +1117,7 @@ void DataStore::SwitchableDataStoreContents::mergeContentsTo(const std::string& 
                 for (size_t rel_idx = 0; rel_idx < rel.getSize(); rel_idx++) {
                   unsigned int toIndex = arrayIndices->hasExtraInfo(toName) ? rel.getToIndex(rel_idx) + arrayIndices->getExtraInfo(toName) : -1;
                   float weight = rel.getWeight(rel_idx);
-                  new(relations.AddrAt(relations.GetLast() + 1)) RelationElement(fromIndex, toIndex, weight);
+                  new (relations.AddrAt(relations.GetLast() + 1)) RelationElement(fromIndex, toIndex, weight);
                 }
               }
 

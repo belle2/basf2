@@ -26,7 +26,7 @@ EventT0CombinerModule::EventT0CombinerModule() : Module()
            m_combinationModeCombineSVDandECL + ": In this mode, the SVD t0 value (if available) will be used to "
            "select the ECL t0 information which is closest in time "
            "to the best SVD value and this two values will be combined to one final value.",
-           m_combinationModePreferSVD);
+           m_paramCombinationMode);
 
   setPropertyFlags(c_ParallelProcessingCertified);
 }
@@ -50,7 +50,6 @@ void EventT0CombinerModule::event()
   const auto svdBestT0 = svdHypos.back();
 
   B2DEBUG(20, "Best SVD time hypothesis t0 = " << svdBestT0.eventT0 << " +- " << svdBestT0.eventT0Uncertainty);
-
   if (m_paramCombinationMode == m_combinationModePreferSVD) {
     // we have a SVD value, so set this as new best global value
     B2DEBUG(20, "Setting SVD time hypothesis t0 = " << svdBestT0.eventT0 << " +- " << svdBestT0.eventT0Uncertainty <<

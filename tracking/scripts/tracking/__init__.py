@@ -256,7 +256,7 @@ def add_time_extraction(path, fullGrid=False, components=None):
     :param fullGrid: set true if you want to use the FullGrid module (default: false)
     :param components: the list of geometry components in use or None for all components.
     """
-    if is_svd_used(components) and not fullGrid:
+    if is_svd_used(components):
         path.add_module("SVDEventT0Estimator")
 
     if is_cdc_used(components) and fullGrid:

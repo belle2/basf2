@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <analysis/modules/EventMerging/FixMergedObjectsModule.h>
+#include <mdst/modules/EventMerging/FixMergedObjectsModule.h>
 
 #include <framework/gearbox/Const.h>
 

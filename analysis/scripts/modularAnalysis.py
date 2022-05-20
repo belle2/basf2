@@ -3493,7 +3493,6 @@ def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, 
     from variables import variables
     if not reference_list_name:
         reference_list_name = 'pi-:all'
-        fillParticleList(reference_list_name, '', path=path)
     det_choices = ("CDC", "PID", "ECL", "KLM")
     if any(d not in det_choices for d in detectors):
         B2ERROR("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)

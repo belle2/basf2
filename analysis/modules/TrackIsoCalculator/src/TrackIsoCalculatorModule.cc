@@ -56,6 +56,7 @@ void TrackIsoCalculatorModule::initialize()
   //int nProducts = m_decaydescriptor.getNDaughters();
   m_targetListName = mother->getFullName();
   m_targetList.isRequired(m_targetListName);
+  m_nSelectedDaughters = m_decaydescriptor.getSelectionNames().size();
 
   m_pListReference.isRequired(m_pListReferenceName);
 
@@ -76,24 +77,21 @@ void TrackIsoCalculatorModule::event()
 {
 
   const auto nParticles = m_targetList->getListSize();
-  unsigned short nSelectedDaughters = m_decaydescriptor.getSelectionNames().size();
 
   const auto nParticlesReference = m_pListReference->getListSize();
-  const auto nTargetParticles = (nSelectedDaughters == 0) ? m_targetList->getListSize() : m_targetList->getListSize() *
-                                nSelectedDaughters;
+  const auto nTargetParticles = (m_nSelectedDaughters == 0) ? m_targetList->getListSize() : m_targetList->getListSize() *
+                                m_nSelectedDaughters;
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n" << "nParticles: " << nParticles << "\n"
           << "nParticlesReference: " << nParticlesReference);
-  // Fill temporary vector of particles
+  // Fill temporary vector of particles in case of selected daughters:
   std::vector<const Particle*> targetParticles;
-  for (unsigned int iPart(0); iPart < m_targetList->getListSize(); ++iPart) {
-    auto* iParticle = m_targetList->getParticle(iPart);
-    if (nSelectedDaughters > 0) {
+  if (m_nSelectedDaughters > 0) {
+    for (unsigned int iPart(0); iPart < m_targetList->getListSize(); ++iPart) {
+      auto* iParticle = m_targetList->getParticle(iPart);
       auto daughters = m_decaydescriptor.getSelectionParticles(iParticle);
       for (auto* iDaughter : daughters) {
         targetParticles.push_back(iDaughter);
       }
-    } else {
-      targetParticles.push_back(iParticle);
     }
   }
   // Store the pair-wise distances in a 2D array.
@@ -107,8 +105,7 @@ void TrackIsoCalculatorModule::event()
   this->printDistancesArr(pairwiseDistances, nTargetParticles, nParticlesReference);
 
   for (unsigned int iPart(0); iPart < nTargetParticles; ++iPart) {
-    auto* iParticle = targetParticles[iPart];
-
+    const Particle* iParticle = (m_nSelectedDaughters > 0) ? targetParticles[iPart] : m_targetList->getParticle(iPart);
     for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
       Particle* jParticle = m_pListReference->getParticle(jPart);
 
@@ -122,7 +119,11 @@ void TrackIsoCalculatorModule::event()
                       jParticle) : this->get2DRhoPhiDistAsChordLength(iParticle, jParticle);
 
       pairwiseDistances[iPart][jPart] = ijDist;
-
+      if (m_nSelectedDaughters == 0) {
+        int jPart_in_inputList = m_targetList->getIndex(jParticle);
+        if (jPart_in_inputList != -1)
+          pairwiseDistances[jPart_in_inputList][iPart] = ijDist;
+      }
     }
 
   }
@@ -136,7 +137,7 @@ void TrackIsoCalculatorModule::event()
     auto minDist = std::min_element(std::begin(pairwiseDistances[iPart]), std::end(pairwiseDistances[iPart]));
     auto jPart = std::distance(std::begin(pairwiseDistances[iPart]), minDist);
 
-    const Particle* iParticle = targetParticles[iPart];
+    const Particle* iParticle = (m_nSelectedDaughters > 0) ? targetParticles[iPart] : m_targetList->getParticle(iPart);
     B2DEBUG(10, m_extraInfoName << " = " << *minDist << " [cm] - Particle[" << iPart << "]'s closest partner at innermost " <<
             m_detInnerSurface << " surface is Particle[" << jPart << "]");
 

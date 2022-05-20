@@ -116,9 +116,13 @@ namespace Belle2 {
      */
     std::string m_decayString;
     /**
-     * The name of the input ParticleList of reference tracks.
+     * The name of the input ParticleList.
      */
     std::string m_targetListName;
+    /**
+     * The number of selected daughters in the decay string.
+     */
+    unsigned short m_nSelectedDaughters;
     /**
      * The name of the input ParticleList of reference tracks.
      */

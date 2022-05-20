@@ -39,18 +39,13 @@ namespace Belle2 {
     /// Access to global EventT0 which will be read and updated
     StoreObjPtr<EventT0> m_eventT0;
 
-    /// In this mode, the CDC t0 value (if available) will be set as the final T0 value. Only if no CDC value could be found
-    /// (which is very rare for BBBar events, and around 5% of low multiplicity events), the best ECL value will be set
-    const std::string m_combinationModePreferCDC = "prefer_cdc";
-
     /// In this mode, the SVD t0 value (if available) will be set as the final T0 value. Only if no SVD value could be found
-    /// (which is very rare for BBBar events, and less than 5% of low multiplicity events), the best ECL value will be set
+    /// (which is very rare for BBBar events, and around 5% of low multiplicity events), the best ECL value will be set
     const std::string m_combinationModePreferSVD = "prefer_svd";
 
     /// In this mode, the SVD t0 value (if available) will be used to select the ECL t0 information which is closest in time
-    /// to the best SVD value and SVD, ECL and CDC values will be combined to one final value.
-    const std::string m_combinationModeCombineCDCandECLandSVD = "combine_cdc_and_ecl_and_svd";
-
+    /// to the best SVD value and this two values will be combined to one final value.
+    const std::string m_combinationModeCombineSVDandECL = "combine_svd_and_ecl";
 
     /// Mode to combine the t0 values of the sub-detectors
     std::string m_paramCombinationMode = m_combinationModePreferSVD;

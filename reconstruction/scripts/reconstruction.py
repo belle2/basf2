@@ -552,6 +552,10 @@ def add_cdst_output(
     if additionalBranches is not None:
         branches += additionalBranches
 
+    # By default, the FullGrid module is not used in the reconstruction chain.
+    # It is needed for detectors that perform post-trakcing calibration with respect to CDC EventT0 using cDST
+    path.add_module("FullGridChi2TrackTimeExtractor")
+
     return path.add_module("RootOutput", outputFileName=filename, branchNames=branches,
                            branchNamesPersistent=persistentBranches, additionalDataDescription=dataDescription)
 

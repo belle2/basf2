@@ -16,6 +16,8 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <framework/datastore/StoreArray.h>
 
 
 namespace Belle2 {
@@ -94,7 +96,7 @@ namespace Belle2 {
      * Calculate the 3D distance between the points where the two input
      * extraplolated track helices cross the input detector's inner surface.
      */
-    double get3DDistAtDetSurface(Particle* iParticle, Particle* jParticle);
+    double get3DDistAtDetSurface(const Particle* iParticle, const Particle* jParticle);
 
     /**
      * Calculate the 2D distance between the points where the two input
@@ -102,15 +104,21 @@ namespace Belle2 {
      * on the (rho, phi) plane. Namely, this is the cord length of the arc
      * that subtends deltaPhi.
      */
-    double get2DRhoPhiDistAsChordLength(Particle* iParticle, Particle* jParticle);
+    double get2DRhoPhiDistAsChordLength(const Particle* iParticle, const Particle* jParticle);
 
   private:
-
+    /**
+     * StoreArray of Particles
+     */
+    StoreArray<Particle> m_particles;
     /**
      * The name of the input ParticleList.
      */
-    std::string m_pListName;
-
+    std::string m_decayString;
+    /**
+     * The name of the input ParticleList of reference tracks.
+     */
+    std::string m_targetListName;
     /**
      * The name of the input ParticleList of reference tracks.
      */
@@ -149,8 +157,11 @@ namespace Belle2 {
     /**
      * The input ParticleList object.
      */
-    StoreObjPtr<ParticleList> m_pList;
-
+    StoreObjPtr<ParticleList> m_targetList;
+    /**
+     *< Decay descriptor of decays to look for.
+     */
+    DecayDescriptor m_decaydescriptor;
     /**
      * The input ParticleList object of reference tracks.
      */

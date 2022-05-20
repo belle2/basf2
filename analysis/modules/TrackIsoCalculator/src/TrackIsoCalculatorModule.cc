@@ -7,7 +7,6 @@
  **************************************************************************/
 
 #include <analysis/modules/TrackIsoCalculator/TrackIsoCalculatorModule.h>
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 
 #include <cmath>
@@ -26,8 +25,8 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
 
   // Parameter definitions
   addParam("particleList",
-           m_pListName,
-           "The name of the input ParticleList. Must be a charged stable particle as defined in Const::chargedStableSet.");
+           m_decayString,
+           "A decay string that has a full ParticleList name as mother particle. If no daughters selected, must be a charged stable particle as defined in Const::chargedStableSet.");
   addParam("particleListReference",
            m_pListReferenceName,
            "The name of the input ParticleList of reference tracks. By default, the :all list of the same particle type with m_pListName is used. "
@@ -50,24 +49,24 @@ void TrackIsoCalculatorModule::initialize()
 {
 
   m_event_metadata.isRequired();
-  m_pList.isRequired(m_pListName);
+  bool valid = m_decaydescriptor.init(m_decayString);
+  if (!valid)
+    B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString: " << m_decayString);
+  const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
+  //int nProducts = m_decaydescriptor.getNDaughters();
+  m_targetListName = mother->getFullName();
+  m_targetList.isRequired(m_targetListName);
 
-  if (m_pListReferenceName.empty()) {
-    if (m_pListName.find(':') != std::string::npos)
-      m_pListReferenceName = m_pListName.substr(0, m_pListName.find_first_of(':')) + std::string(":all");
-    else
-      m_pListReferenceName = m_pListName + std::string(":all");
-  }
   m_pListReference.isRequired(m_pListReferenceName);
 
-  B2INFO("TrackIsoCalculator module will calculate isolation variables for the ParticleList: " << m_pListName << ", "
+  B2INFO("TrackIsoCalculator module will calculate isolation variables for the ParticleList: " << m_targetListName << ", "
          << "Reference ParticleList: " << m_pListReferenceName << ".");
 
   m_extraInfoName = (!m_use2DRhoPhiDist) ? ("dist3DToClosestTrkAt" + m_detInnerSurface + "Surface") : ("dist2DRhoPhiToClosestTrkAt" +
                     m_detInnerSurface + "Surface");
 
   if (!isStdChargedList()) {
-    B2FATAL("ParticleList: " << m_pListName << " and/or ParticleList: " << m_pListReferenceName <<
+    B2FATAL("ParticleList: " << m_targetListName << " and/or ParticleList: " << m_pListReferenceName <<
             " is not that of a valid particle in Const::chargedStableSet! Aborting...");
   }
 
@@ -76,24 +75,39 @@ void TrackIsoCalculatorModule::initialize()
 void TrackIsoCalculatorModule::event()
 {
 
-  const auto nParticles = m_pList->getListSize();
-  const auto nParticlesReference = m_pListReference->getListSize();
+  const auto nParticles = m_targetList->getListSize();
+  unsigned short nSelectedDaughters = m_decaydescriptor.getSelectionNames().size();
 
+  const auto nParticlesReference = m_pListReference->getListSize();
+  const auto nTargetParticles = (nSelectedDaughters == 0) ? m_targetList->getListSize() : m_targetList->getListSize() *
+                                nSelectedDaughters;
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n" << "nParticles: " << nParticles << "\n"
           << "nParticlesReference: " << nParticlesReference);
-
+  // Fill temporary vector of particles
+  std::vector<const Particle*> targetParticles;
+  for (unsigned int iPart(0); iPart < m_targetList->getListSize(); ++iPart) {
+    auto* iParticle = m_targetList->getParticle(iPart);
+    if (nSelectedDaughters > 0) {
+      auto daughters = m_decaydescriptor.getSelectionParticles(iParticle);
+      for (auto* iDaughter : daughters) {
+        targetParticles.push_back(iDaughter);
+      }
+    } else {
+      targetParticles.push_back(iParticle);
+    }
+  }
   // Store the pair-wise distances in a 2D array.
   // Size is given by the length of the reference particle list.
   std::vector<double> defaultDistances(nParticlesReference, 1e9);
   // Size is given by the length of the particle list. Each vector (= defaultDistances) has nParticlesReference components.
   // Thus, total size is given by nParticles times nParticlesReference.
-  std::vector<std::vector<double>> pairwiseDistances(nParticles, defaultDistances);
+  std::vector<std::vector<double>> pairwiseDistances(nTargetParticles, defaultDistances);
 
   B2DEBUG(11, "Array of pair-wise distances between tracks in particle list. Initial values:");
-  this->printDistancesArr(pairwiseDistances, nParticles, nParticlesReference);
+  this->printDistancesArr(pairwiseDistances, nTargetParticles, nParticlesReference);
 
-  for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
-    Particle* iParticle = m_pList->getParticle(iPart);
+  for (unsigned int iPart(0); iPart < nTargetParticles; ++iPart) {
+    auto* iParticle = targetParticles[iPart];
 
     for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
       Particle* jParticle = m_pListReference->getParticle(jPart);
@@ -109,10 +123,6 @@ void TrackIsoCalculatorModule::event()
 
       pairwiseDistances[iPart][jPart] = ijDist;
 
-      int jPart_in_inputList = m_pList->getIndex(jParticle);
-      if (jPart_in_inputList != -1)
-        pairwiseDistances[jPart_in_inputList][iPart] = ijDist;
-
     }
 
   }
@@ -121,19 +131,19 @@ void TrackIsoCalculatorModule::event()
   this->printDistancesArr(pairwiseDistances, nParticles, nParticlesReference);
 
   // For each particle index, find the index of the particle w/ minimal distance in the corresponding row of the 2D array.
-  for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
+  for (unsigned int iPart(0); iPart < nTargetParticles; ++iPart) {
 
     auto minDist = std::min_element(std::begin(pairwiseDistances[iPart]), std::end(pairwiseDistances[iPart]));
     auto jPart = std::distance(std::begin(pairwiseDistances[iPart]), minDist);
 
-    Particle* iParticle = m_pList->getParticle(iPart);
-
+    const Particle* iParticle = targetParticles[iPart];
     B2DEBUG(10, m_extraInfoName << " = " << *minDist << " [cm] - Particle[" << iPart << "]'s closest partner at innermost " <<
             m_detInnerSurface << " surface is Particle[" << jPart << "]");
 
     if (!iParticle->hasExtraInfo(m_extraInfoName)) {
       B2DEBUG(10, "\tStoring extraInfo for Particle[" << iPart << "]...");
-      iParticle->writeExtraInfo(m_extraInfoName, *minDist);
+      m_particles[iParticle->getArrayIndex()]->writeExtraInfo(m_extraInfoName, *minDist);
+
     }
   }
 
@@ -143,7 +153,7 @@ void TrackIsoCalculatorModule::terminate()
 {
 }
 
-double TrackIsoCalculatorModule::get3DDistAtDetSurface(Particle* iParticle, Particle* jParticle)
+double TrackIsoCalculatorModule::get3DDistAtDetSurface(const Particle* iParticle, const Particle* jParticle)
 {
 
   // Radius and z boundaries of the cylinder describing this detector's inner surface.
@@ -196,7 +206,7 @@ double TrackIsoCalculatorModule::get3DDistAtDetSurface(Particle* iParticle, Part
 }
 
 
-double TrackIsoCalculatorModule::get2DRhoPhiDistAsChordLength(Particle* iParticle, Particle* jParticle)
+double TrackIsoCalculatorModule::get2DRhoPhiDistAsChordLength(const Particle* iParticle, const Particle* jParticle)
 {
 
   // Radius and z boundaries of the cylinder describing this detector's inner surface.
@@ -218,12 +228,14 @@ double TrackIsoCalculatorModule::get2DRhoPhiDistAsChordLength(Particle* iParticl
 
 bool TrackIsoCalculatorModule::isStdChargedList()
 {
-  DecayDescriptor dd;
 
   bool checkPList = false;
-  if (dd.init(m_pListName))
-    checkPList = Const::chargedStableSet.find(abs(dd.getMother()->getPDGCode())) != Const::invalidParticle;
-
+  unsigned short nSelectedDaughters = m_decaydescriptor.getSelectionNames().size();
+  if (nSelectedDaughters == 0)
+    checkPList = Const::chargedStableSet.find(abs(m_decaydescriptor.getMother()->getPDGCode())) != Const::invalidParticle;
+  else
+    checkPList = true;
+  DecayDescriptor dd;
   bool checkPListReference = false;
   if (dd.init(m_pListReferenceName))
     checkPListReference = Const::chargedStableSet.find(abs(dd.getMother()->getPDGCode())) != Const::invalidParticle;

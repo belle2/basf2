@@ -3469,8 +3469,10 @@ def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, 
     of each particle's track to its closest neighbour at a given detector entry surface.
 
     Parameters:
-        list_name (str): name of the input ParticleList.
-                         It must be a list of charged stable particles as defined in ``Const::chargedStableSet``.
+        list_name (str): name of the input ParticleList or a decay string with selected daughters with full list name,
+                         for example: Lambda0:merged -> ^p+ ^pi-.
+                         If no daughters selected, a list must belong to charged stable particles
+                         as defined in ``Const::chargedStableSet``.
                          The charge-conjugate ParticleList will be also processed automatically.
         path (basf2.Path): the module is added to this path.
         use2DRhoPhiDist (Optional[bool]): if true, will calculate the pair-wise track distance
@@ -3489,7 +3491,9 @@ def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, 
     """
 
     from variables import variables
-
+    if not reference_list_name:
+        reference_list_name = 'pi-:all'
+        fillParticleList(reference_list_name, '', path=path)
     det_choices = ("CDC", "PID", "ECL", "KLM")
     if any(d not in det_choices for d in detectors):
         B2ERROR("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)

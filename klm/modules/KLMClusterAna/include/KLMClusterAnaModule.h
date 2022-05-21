@@ -71,13 +71,6 @@ namespace Belle2 {
 
 }
 
-/* Foward declarations. */
-double expectation(std::vector<double> vec);
-std::vector<double> addition(std::vector<double> vec1, std::vector<double> vec2);
-std::vector<double> product(std::vector<double> vec1, std::vector<double> vec2);
-std::vector<double> covariance_matrix3x3(std::vector<double> xcoord, std::vector<double> ycoord, std::vector<double> zcoord);
-TMatrixT<double> eigenvectors3x3(std::vector<double> matrix);
-TMatrixT<double> spatialVariances(std::vector<double> xcoord, std::vector<double> ycoord, std::vector<double> zcoord);
 
 
 

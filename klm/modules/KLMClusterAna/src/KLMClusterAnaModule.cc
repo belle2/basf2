@@ -30,6 +30,137 @@
 using namespace Belle2;
 
 
+static double expectation(std::vector<double> vec)
+{
+  //Note that this assumes uniform probability
+  //accumulate from <numeric>
+  return accumulate(vec.begin(), vec.end(), 0.0) / vec.size();
+}
+
+static std::vector<double> addition(std::vector<double> vec1, std::vector<double> vec2)
+{
+  std::vector<double> output(vec1.size());
+  if (vec1.size() != vec2.size()) {
+    B2ERROR("Vector lengths don't match so error. (addition)");
+    for (unsigned int i = 0; i < (unsigned int) vec1.size(); ++i) {
+      output[i] = 0.0;
+    }
+    return output;
+  }
+
+  for (unsigned int i = 0; i < (unsigned int) vec1.size(); ++i) {
+    output[i] = vec1[i] + vec2[i];
+  }
+  return output;
+}
+
+
+
+static std::vector<double> product(std::vector<double> vec1, std::vector<double> vec2)
+{
+  std::vector<double> output(vec1.size());
+  if (vec1.size() != vec2.size())  {
+    B2ERROR("Vector lengths don't match so error. (product)");
+    for (unsigned int i = 0; i < (unsigned int) vec1.size(); ++i) {
+      output[i] = 0.0;
+    }
+    return output;
+  }
+
+  for (unsigned int i = 0; i < (unsigned int) vec1.size(); ++i) {
+    output[i] = vec1[i] * vec2[i];
+  }
+  return output;
+}
+
+
+static std::vector<double> covariance_matrix3x3(std::vector<double> xcoord, std::vector<double> ycoord, std::vector<double> zcoord)
+{
+
+  if (xcoord.size() != ycoord.size() || (ycoord.size() != zcoord.size()))  {
+    B2ERROR("Vector lengths don't match so error. (Covariance Matrix)");
+    double array[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    std::vector <double>output(std::begin(array), std::end(array));
+    return output;
+  }
+
+  int length = xcoord.size();
+  double xmean = expectation(xcoord); double ymean = expectation(ycoord); double zmean = expectation(zcoord);
+  //minus sign here is purposeful
+  std::vector<double> xmeanV(length, -1 * xmean);
+  std::vector<double> ymeanV(length, -1 * ymean);
+  std::vector<double> zmeanV(length, -1 * zmean);
+
+  std::vector<double> deltax = addition(xcoord, xmeanV);
+  std::vector<double> deltay = addition(ycoord, ymeanV);
+  std::vector<double> deltaz = addition(zcoord, zmeanV);
+
+  double xxterm = expectation(product(deltax, deltax));
+  double xyterm = expectation(product(deltax, deltay));
+  double xzterm = expectation(product(deltax, deltaz));
+  double yyterm = expectation(product(deltay, deltay));
+  double yzterm = expectation(product(deltay, deltaz));
+  double zzterm = expectation(product(deltaz, deltaz));
+
+  double array[] = {xxterm, xyterm, xzterm, xyterm, yyterm, yzterm, xzterm, yzterm, zzterm};
+  std::vector <double>output(std::begin(array), std::end(array));
+
+  return output;
+}
+
+
+static TMatrixT<double> eigenvectors3x3(std::vector<double> matrix)
+{
+  //[rows][columns]
+  TMatrixT<double> output(4, 3);
+  if (matrix.size() != 9) {
+    B2ERROR("Error! For eigenvalue3x3 calc, invalid matrix size");
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        output[i][j] = 0.0;
+      }
+      output[3][i] = 0.0;
+    }
+    return output;
+  }
+
+  TMatrixDSym covar(3);
+  for (int i = 0; i < 9; i++) {
+    covar[i % 3][i / 3] = matrix[i];
+  }
+  const TMatrixDSymEigen eigen(covar);
+  const TVectorT<double> eigenList = eigen.GetEigenValues();
+  const TMatrixT<double> eigenvecs = eigen.GetEigenVectors();
+
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      output[i][j] = eigenvecs[i][j];
+    }
+    output[3][i] = eigenList[i];
+  }
+  return output;
+}
+
+
+
+
+static TMatrixT<double> spatialVariances(std::vector<double> xcoord, std::vector<double> ycoord, std::vector<double> zcoord)
+{
+  /**
+   Takes lists of x/y/z coordinates (as vectors) and converts that to provide a list of eigenvectors
+   Columns of TMatrix provide eigenvectors were |e_i| = eigenvalue
+   */
+
+  if (xcoord.size() != ycoord.size() || (ycoord.size() != zcoord.size())) {
+    B2FATAL("Vector lengths don't match so error.");
+  }
+  std::vector<double> covar = covariance_matrix3x3(xcoord, ycoord, zcoord);
+
+  TMatrixT<double> output = eigenvectors3x3(covar);
+  return output;
+}
+
+
 //Code for Module
 
 REG_MODULE(KLMClusterAna)
@@ -106,123 +237,3 @@ void KLMClusterAnaModule::event()
 }
 
 
-
-double expectation(std::vector<double> vec)
-{
-  //Note that this assumes uniform probability
-  //accumulate from <numeric>
-  return accumulate(vec.begin(), vec.end(), 0.0) / vec.size();
-}
-
-std::vector<double> addition(std::vector<double> vec1, std::vector<double> vec2)
-{
-
-  if (vec1.size() != vec2.size()) {
-    B2ERROR("Vector lengths don't match so error. (addition)");
-  }
-
-  std::vector<double> output(vec1.size());
-  for (int i = 0; i < (int) vec1.size(); ++i) {
-    output[i] = vec1[i] + vec2[i];
-  }
-  return output;
-}
-
-
-
-std::vector<double> product(std::vector<double> vec1, std::vector<double> vec2)
-{
-
-  if (vec1.size() != vec2.size())  {
-    B2ERROR("Vector lengths don't match so error. (product)");
-  }
-
-  std::vector<double> output(vec1.size());
-  for (int i = 0; i < (int) vec1.size(); ++i) {
-    output[i] = vec1[i] * vec2[i];
-  }
-  return output;
-}
-
-
-std::vector<double> covariance_matrix3x3(std::vector<double> xcoord, std::vector<double> ycoord, std::vector<double> zcoord)
-{
-
-  if (xcoord.size() != ycoord.size() || (ycoord.size() != zcoord.size()))  {
-    B2ERROR("Vector lengths don't match so error. (Covariance Matrix)");
-  }
-
-  int length = xcoord.size();
-  double xmean = expectation(xcoord); double ymean = expectation(ycoord); double zmean = expectation(zcoord);
-  //minus sign here is purposeful
-  std::vector<double> xmeanV(length, -1 * xmean);
-  std::vector<double> ymeanV(length, -1 * ymean);
-  std::vector<double> zmeanV(length, -1 * zmean);
-
-  std::vector<double> deltax = addition(xcoord, xmeanV);
-  std::vector<double> deltay = addition(ycoord, ymeanV);
-  std::vector<double> deltaz = addition(zcoord, zmeanV);
-
-  double xxterm = expectation(product(deltax, deltax));
-  double xyterm = expectation(product(deltax, deltay));
-  double xzterm = expectation(product(deltax, deltaz));
-  double yyterm = expectation(product(deltay, deltay));
-  double yzterm = expectation(product(deltay, deltaz));
-  double zzterm = expectation(product(deltaz, deltaz));
-
-  double array[] = {xxterm, xyterm, xzterm, xyterm, yyterm, yzterm, xzterm, yzterm, zzterm};
-  std::vector <double>output(std::begin(array), std::end(array));
-
-  return output;
-
-
-}
-
-
-TMatrixT<double> eigenvectors3x3(std::vector<double> matrix)
-{
-  if (matrix.size() != 9) {
-    B2ERROR("Error! For eigenvalue3x3 calc, invalid matrix size");
-  }
-
-  TMatrixDSym covar(3);
-  for (int i = 0; i < 9; i++) {
-    covar[i % 3][i / 3] = matrix[i];
-  }
-  const TMatrixDSymEigen eigen(covar);
-  const TVectorT<double> eigenList = eigen.GetEigenValues();
-  const TMatrixT<double> eigenvecs = eigen.GetEigenVectors();
-
-  //[rows][columns]
-  TMatrixT<double> output(4, 3);
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      output[i][j] = eigenvecs[i][j];
-    }
-    output[3][i] = eigenList[i];
-  }
-
-  return output;
-
-}
-
-
-
-
-TMatrixT<double> spatialVariances(std::vector<double> xcoord, std::vector<double> ycoord, std::vector<double> zcoord)
-{
-  /**
-   Takes lists of x/y/z coordinates (as vectors) and converts that to provide a list of eigenvectors
-   Columns of TMatrix provide eigenvectors were |e_i| = eigenvalue
-   */
-
-  if (xcoord.size() != ycoord.size() || (ycoord.size() != zcoord.size())) {
-    B2ERROR("Vector lengths don't match so error.");
-  }
-  std::vector<double> covar = covariance_matrix3x3(xcoord, ycoord, zcoord);
-
-
-  TMatrixT<double> output = eigenvectors3x3(covar);
-  return output;
-
-}

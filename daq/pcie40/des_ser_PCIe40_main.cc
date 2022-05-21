@@ -136,11 +136,13 @@ struct sender_argv {
   std::vector< int > valid_ch;
 };
 
+#ifdef USE_ZMQ
 /////////////////////////////////////////////////////////
 // Handshake by ZMQ
 /////////////////////////////////////////////////////////
 zmq::socket_t* zmq_writer[NUM_SENDER_THREADS];
 zmq::socket_t* zmq_reader[NUM_SENDER_THREADS];
+#endif
 
 /////////////////////////////////////////////////////////
 // From main_pcie40_dmahirate.cpp

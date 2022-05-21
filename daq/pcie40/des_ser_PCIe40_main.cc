@@ -48,7 +48,6 @@
 //#define NUM_SENDER_THREADS 1
 //#define NO_ERROR_STOP
 
-
 #define NODE_ID_TEST_BENCH 0x99000001
 /////////////////////////////////////////
 // Parameter for dummy-data
@@ -58,13 +57,12 @@
 /////////////////////////////////////////
 // Parameter for split ECL and ECLTRG data on recl3
 ////////////////////////////////////////
-#define SPLIT_ECL_ECLTRG
+//#define SPLIT_ECL_ECLTRG
 #ifdef SPLIT_ECL_ECLTRG
 #define NUM_SUB_EVE 2
 #else
 #define NUM_SUB_EVE 1
 #endif // #ifdef SPLIT_ECL_ECLTRG
-
 
 /////////////////////////////////////////
 // Parameter for data-contents
@@ -109,10 +107,8 @@
 using namespace std;
 
 #ifdef SPLIT_ECL_ECLTRG
-#define RECL3_NODEID 0x05000003
 #define ECLTRG_NODE_ID 0x13000001
-const std::vector<int> splitted_ch {17}; // recl3: cpr6001-6008,cpr13001 (0-16,17ch)
-//const std::vector<int> splitted_ch {0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47}; // ch1 and ch23 are splitted(ECLTRG) from main(ECL) data
+const std::vector<int> splitted_ch {16}; // recl3: cpr6001-6008,cpr13001 (0-15,16ch)
 #endif
 
 #ifndef USE_ZMQ
@@ -1354,6 +1350,70 @@ int checkEventData(int sender_id, unsigned int* data, unsigned int event_nwords,
 #endif
     }
 
+
+#ifdef SPLIT_ECL_ECLTRG
+    //
+    // Check ECLTRG FEE is connected to a proper channel
+    //
+    unsigned int ecl_ecltrg_1stword = 0;
+    if (reduced_flag == 0) {
+      ecl_ecltrg_1stword = data[ cur_pos + ffaa_pos +
+                                         Belle2::PreRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
+                                         Belle2::PreRawCOPPERFormat_latest::SIZE_B2LFEE_HEADER ];
+    } else {
+      ecl_ecltrg_1stword = data[ cur_pos + ffaa_pos +
+                                         Belle2::PostRawCOPPERFormat_latest::SIZE_B2LHSLB_HEADER +
+                                         Belle2::PostRawCOPPERFormat_latest::SIZE_B2LFEE_HEADER ];
+    }
+
+    if (((ecl_ecltrg_1stword & 0xffff0000) >> 16) == 0) {
+      // ECL data
+      for (int j = 0; j < splitted_ch.size(); j++) {
+        if (splitted_ch[j] == i) {
+          pthread_mutex_lock(&(mtx_sender_log));
+          printf("[FATAL] thread %d : %s ch=%d : ECL data(1st word = %.8x , eve = %.8x ) are detected in ECLTRG channel. Maybe, fiber connection mismatch. Exiting... : exp %d run %d sub %d : %s %s %d\n",
+                 sender_id,
+                 hostnamebuf,  i,
+                 ecl_ecltrg_1stword,
+                 new_evtnum,
+                 (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+                 (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+                 (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          printEventData(data, event_length, sender_id);
+          pthread_mutex_unlock(&(mtx_sender_log));
+          exit(1);
+        }
+      }
+    } else {
+      // ECLTRG data
+      int ecltrg_flag = 0;
+      for (int j = 0; j < splitted_ch.size(); j++) {
+        if (splitted_ch[j] == i) {
+          ecltrg_flag = 1;
+          break;
+        }
+      }
+
+      if (ecltrg_flag == 0) {
+        pthread_mutex_lock(&(mtx_sender_log));
+        printf("[FATAL] thread %d : %s ch=%d : ECLTRG data(1st word = %.8x , eve = %.8x ) are detected in ECL channel. Maybe, fiber connection mismatch. Exiting... : exp %d run %d sub %d : %s %s %d\n",
+               sender_id,
+               hostnamebuf,  i,
+               ecl_ecltrg_1stword,
+               new_evtnum,
+               (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
+               (new_exprun & Belle2::RawHeader_latest::RUNNO_MASK) >> Belle2::RawHeader_latest::RUNNO_SHIFT,
+               (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK),
+               __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        printEventData(data, event_length, sender_id);
+        pthread_mutex_unlock(&(mtx_sender_log));
+        exit(1);
+      }
+    }
+#endif // SPLIT_ECL_ECLTRG
+
+
     //
     // Check if the current position exceeds the event end
     //
@@ -1388,7 +1448,7 @@ int checkEventData(int sender_id, unsigned int* data, unsigned int event_nwords,
       if (n_messages[ 14 ] < max_number_of_messages) {
         char err_buf[500];
         sprintf(err_buf,
-                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 trailer magic word(0xff55) is invalid. footer %.8x (pos.=0x%.x) : exp %d run %d sub %d : %s %s %d",
+                "[FATAL] thread %d : %s ch=%d : ERROR_EVENT : HSLB or PCIe40 trailer magic word(0xff55) is invalid. foooter %.8x (pos.=0x%.x) : exp %d run %d sub %d : %s %s %d",
                 sender_id,
                 hostnamebuf, i,
                 data[ cur_pos + linksize + ff55_pos_from_end ], cur_pos + linksize + ff55_pos_from_end,
@@ -1548,8 +1608,7 @@ int checkEventData(int sender_id, unsigned int* data, unsigned int event_nwords,
     checkUtimeCtimeTRGType(data, sender_id);
     pthread_mutex_lock(&(mtx_sender_log));
     if (err_not_reduced[sender_id] < max_number_of_messages) {
-      //      printf("[FATAL] thread %d : %s ch=%d : ERROR_EVENT : Error-flag was set by the data-check module in PCIe40 FPGA. : eve %d prev thr eve %d : exp %d run %d sub %d : %s %s %d\n",
-      printf("[WARNING] thread %d : %s ch=%d : Error-flag was set by the data-check module in PCIe40 FPGA. : eve %d prev thr eve %d : exp %d run %d sub %d : %s %s %d\n",
+      printf("[WARNING] thread %d : %s ch=%d : ERROR_EVENT : Error-flag was set by the data-check module in PCIe40 FPGA. : eve %d prev thr eve %d : exp %d run %d sub %d : %s %s %d\n",
              sender_id,
              hostnamebuf, -1, new_evtnum, evtnum,
              (new_exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
@@ -2037,7 +2096,6 @@ void split_Ecltrg(int sender_id, unsigned int* data, std::vector< int > valid_ch
 }
 
 
-
 //int sender_id, int   run_no, int nwords_per_fee, int ncpr, int nhslb, std::vector< int > valid_ch)
 void* sender(void* arg)
 {
@@ -2090,9 +2148,8 @@ void* sender(void* arg)
     pthread_mutex_unlock(&(mtx_sender_log));
     exit(1);
   }
+#endif // SPLIT_ECL_ECLTRG
 
-
-#endif
 
   //
   // network connection
@@ -2273,17 +2330,16 @@ void* sender(void* arg)
     }
 #endif
 
+    //
+    // Check data
+    //
     if (buff == NULL) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : buffer in sender is NULL(= %p )\n", sender_id, buff); fflush(stdout);
+      printf("[FATAL] thread %d : %s : buffer in sender is NULL(= %p )\n", sender_id, hostnamebuf, buff); fflush(stdout);
       pthread_mutex_unlock(&(mtx_sender_log));
       exit(1);
     }
 
-
-    //
-    // Check data
-    //
 #ifdef SPLIT_ECL_ECLTRG
     int event_nwords_main = 0, event_nwords_splitted = 0;
     if (split_main_use == 1 && split_sub_use == 1) {
@@ -2296,17 +2352,20 @@ void* sender(void* arg)
       event_nwords_splitted = tot_event_nwords;
     } else {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : No channels are used for this PCIe40 board (ECL/ECLTRG) in %s. Please mask this readout PC with runcontrol GUI (or exclude sub-system if this is the only readout PC of the sub-system). Exiting..\n",
+      printf("[FATAL] thread %d : %s : No channels are used for this PCIe40 board (ECL/ECLTRG). Please mask this readout PC with runcontrol GUI (or exclude sub-system if this is the only readout PC of the sub-system). Exiting..\n",
              sender_id, hostnamebuf);
       fflush(stdout);
       pthread_mutex_unlock(&(mtx_sender_log));
       exit(1);
     }
+#endif // SPLIT_ECL_ECLTRG
 
-#endif
     unsigned int prev_exprun = exprun;
     unsigned int prev_evtnum = evtnum;
+
+#ifdef SPLIT_ECL_ECLTRG
     for (int k = 0; k < NUM_SUB_EVE ; k++) {
+#endif // SPLIT_ECL_ECLTRG
       unsigned int* eve_buff = NULL;
       unsigned int event_nwords = 0;
       int ret = 0;
@@ -2360,8 +2419,8 @@ void* sender(void* arg)
           exprun = prev_exprun;
           evtnum = prev_evtnum;
 
-#ifdef SPLIT_ECL_ECLTRG
           int ret = 0;
+#ifdef SPLIT_ECL_ECLTRG
           if (k == 0) {
             if (event_nwords_splitted != 0) {
               memcpy(buff_splitted, eve_buff + event_nwords_main, event_nwords_splitted * sizeof(unsigned int));
@@ -2374,17 +2433,18 @@ void* sender(void* arg)
             ret = checkEventData(sender_id, eve_buff, reduced_event_nwords, exprun, evtnum, node_id, valid_splitted_ch);
           }
 #else
-          int ret = checkEventData(sender_id, eve_buff, reduced_event_nwords, exprun, evtnum, node_id, valid_ch);
-#endif
+          ret = checkEventData(sender_id, eve_buff, reduced_event_nwords, exprun, evtnum, node_id, valid_ch);
+#endif //SPLIT_ECL_ECLTRG
+
           if (ret != DATACHECK_OK) {
             pthread_mutex_lock(&(mtx_sender_log));
-            printf("[FATAL] thread %d : checkEventData() detected an error after reduceHdrTrl(). Exiting...\n", sender_id);
+            printf("[FATAL] thread %d : %s : checkEventData() detected an error after reduceHdrTrl(). Exiting...\n", sender_id, hostnamebuf);
             fflush(stdout);
             pthread_mutex_unlock(&(mtx_sender_log));
             exit(1);
           }
           pthread_mutex_lock(&(mtx_sender_log));
-          printf("[WARNING] thread %d : Data-check was passed. This event is treated as a normal event.\n", sender_id);
+          printf("[WARNING] thread %d : %s : Data-check was passed. This event is treated as a normal event.\n", sender_id, hostnamebuf);
           //        printf("[FATAL] thread %d : Currently, we will not tolerate a fake-error event. Exiting...\n", sender_id);
           printEventData(eve_buff, reduced_event_nwords);
           fflush(stdout);
@@ -2392,7 +2452,7 @@ void* sender(void* arg)
           //        exit(1);
         } else {
           pthread_mutex_lock(&(mtx_sender_log));
-          printf("[FATAL] thread %d : %s : checkEventData() detected an error after reduceHdrTrl(). Exiting...\n", sender_id, hostnamebuf);
+          printf("[FATAL] thread %d : %s : checkEventData() detected an error. Exiting...\n", sender_id, hostnamebuf);
           fflush(stdout);
           pthread_mutex_unlock(&(mtx_sender_log));
           exit(1);
@@ -2402,8 +2462,8 @@ void* sender(void* arg)
       if (eve_buff[ 1 ]  & 0xfffff000 != 0x7f7f0000 ||
           eve_buff[ event_nwords - 1  ] != 0x7fff0006) {
         pthread_mutex_lock(&(mtx_sender_log));
-        printf("[FATAL] thread %d : ERROR_EVENT : Invalid Magic word in header( pos=0x%x, %.8x ) and/or trailer( pos=0x%x, 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d\n",
-               sender_id,
+        printf("[FATAL] thread %d : %s : ERROR_EVENT : Invalid Magic word in header( pos=0x%x, %.8x ) and/or trailer( pos=0x%x, 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d\n",
+               sender_id, hostnamebuf,
                1, eve_buff[ 1 ],
                event_nwords - 1, eve_buff[ event_nwords - 1 ],
                evtnum,
@@ -2416,7 +2476,9 @@ void* sender(void* arg)
         pthread_mutex_unlock(&(mtx_sender_log));
         exit(1);
       }
+#ifdef SPLIT_ECL_ECLTRG
     }
+#endif
 
     //
     // Filling SendHeader
@@ -2424,10 +2486,14 @@ void* sender(void* arg)
     buff[ 0 ] = tot_event_nwords + NW_SEND_HEADER + NW_SEND_TRAILER;
     buff[ 1 ] = 6;
 #ifdef SPLIT_ECL_ECLTRG
-    buff[ 2 ] = 0x00010002;
+    if (split_main_use == 1 && split_sub_use == 1) {
+      buff[ 2 ] = 0x00010002; // nevent = 1, nboards = 2
+    } else {
+      buff[ 2 ] = 0x00010001; // nevent = 1, nboards = 1
+    }
 #else
-    buff[ 2 ] = 0x00010001;
-#endif
+    buff[ 2 ] = 0x00010001; // nevent = 1, nboards = 1
+#endif //SPLIT_ECL_ECLTRG
     buff[ 3 ] = buff[ NW_SEND_HEADER + 2 ];
     buff[ 4 ] = buff[ NW_SEND_HEADER + 3 ];
     buff[ 5 ] = buff[ NW_SEND_HEADER + 6 ];
@@ -2445,11 +2511,12 @@ void* sender(void* arg)
     // printEventData( buff, tot_event_nwords + NW_SEND_HEADER + NW_SEND_TRAILER, sender_id);
     // pthread_mutex_unlock(&(mtx_sender_log));
 
-    if (buff[ NW_SEND_HEADER + 1 ] & 0xfffff000 != 0x7f7f0000 ||
+    if ((buff[ NW_SEND_HEADER + 1 ] & 0xfffff000) != 0x7f7f0000 ||
         buff[ NW_SEND_HEADER + tot_event_nwords - 1  ] != 0x7fff0006) {
       pthread_mutex_lock(&(mtx_sender_log));
-      printf("[FATAL] thread %d : ERROR_EVENT : Invalid Magic word in the 1st header( pos=0x%x, 0x%.8x ) and/or the last trailer( pos=0x%x, 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d\n",
-             sender_id, NW_SEND_HEADER + 1, buff[ NW_SEND_HEADER + 1 ],
+
+      printf("[FATAL] thread %d : %s : ERROR_EVENT : Invalid Magic word in the 1st header( pos=0x%x, 0x%.8x ) and/or the last trailer( pos=0x%x, 0x%.8x ) : eve %d exp %d run %d sub %d : %s %s %d\n",
+             sender_id, hostnamebuf, NW_SEND_HEADER + 1, buff[ NW_SEND_HEADER + 1 ],
              NW_SEND_HEADER + tot_event_nwords - 1, buff[ NW_SEND_HEADER + tot_event_nwords - 1 ],
              evtnum,
              (exprun & Belle2::RawHeader_latest::EXP_MASK) >> Belle2::RawHeader_latest::EXP_SHIFT,
@@ -2530,11 +2597,6 @@ void* sender(void* arg)
 #endif
   return (void*)0;
 }
-
-
-
-
-
 
 int main(int argc, char** argv)
 {
@@ -2732,15 +2794,6 @@ int main(int argc, char** argv)
   //   }
   // }
   int num_of_chs = valid_ch.size() ;
-  if (num_of_chs <= 0) {
-    pthread_mutex_lock(&(mtx_sender_log));
-    printf("[FATAL] No channels are used for this PCIe40 board in %s. Please mask this readout PC with runcontrol GUI (or exclude sub-system if this is the only readout PC of the sub-system). Exiting..\n",
-           hostnamebuf);
-    fflush(stdout);
-    pthread_mutex_unlock(&(mtx_sender_log));
-    exit(1);
-  }
-
   pthread_mutex_lock(&(mtx_sender_log));
   printf("[DEBUG] # of used channels = %d\n", num_of_chs); fflush(stdout);
   pthread_mutex_unlock(&(mtx_sender_log));
@@ -3205,5 +3258,3 @@ int main(int argc, char** argv)
   pthread_mutex_destroy(&mtx_sender_log);
   return 0;
 }
-
-

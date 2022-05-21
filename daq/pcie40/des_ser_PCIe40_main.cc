@@ -2797,6 +2797,14 @@ int main(int argc, char** argv)
   pthread_mutex_lock(&(mtx_sender_log));
   printf("[DEBUG] # of used channels = %d\n", num_of_chs); fflush(stdout);
   pthread_mutex_unlock(&(mtx_sender_log));
+  if (num_of_chs <= 0) {
+    pthread_mutex_lock(&(mtx_sender_log));
+    printf("[FATAL] %s : No channels are used for this PCIe40 board. Please mask this readout PC with runcontrol GUI (or exclude sub-system if this is the only readout PC of the sub-system). Exiting..\n",
+           hostnamebuf);
+    fflush(stdout);
+    pthread_mutex_unlock(&(mtx_sender_log));
+    exit(1);
+  }
 
   // initialize sum of error counters;
   for (int i = 0; i < NUM_SENDER_THREADS; i++) {

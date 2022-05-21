@@ -2483,6 +2483,14 @@ void* sender(void* arg)
 #endif
 
     //
+    // For TOP feature extraction function
+    //
+    unsigned int* det_buf =  ;
+
+
+
+
+    //
     // Filling SendHeader
     //
     buff[ 0 ] = tot_event_nwords + NW_SEND_HEADER + NW_SEND_TRAILER;

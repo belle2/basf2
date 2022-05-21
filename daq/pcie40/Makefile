@@ -39,6 +39,6 @@ cleanlink:
 	@ echo "<< clearing linked header files >>"
 	@ rm -rf $(INCDIR) 
 
-${TARGET1}: ${TARGET1}.cc
+${TARGET1}: src/${TARGET1}.cc
 	source $(TOP)/Scripts/setup.sh; \
 	$(CC) $(DES_SER_PCIE40_MAIN_CXXFLAGS) ${LIBFLAG} -L./ $(DES_SER_PCIE40_MAIN_LDFLAGS) $^ -o $@ ${ZMQLIB}

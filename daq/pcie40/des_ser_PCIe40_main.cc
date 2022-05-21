@@ -457,11 +457,11 @@ int get1stChannel(unsigned int*& data)
 void printEventNumberError(unsigned int*& data, const unsigned int evtnum, const unsigned int exprun, const int eve_diff,
                            const int sender_id)
 {
-//
-// event # check ( Since this check is done in a single thread, only differnce in the prev. event came to this thread can be checked.
-// So, if event # from PCIe40 are in order like, 0, 3, 2, 10002, 9746, 5, 8, 7, 10007, 9753, No event jump can be issued.
-// eb0 will check futher check.
-//
+  //
+  // event # check ( Since this check is done in a single thread, only differnce in the prev. event came to this thread can be checked.
+  // So, if event # from PCIe40 are in order like, 0, 3, 2, 10002, 9746, 5, 8, 7, 10007, 9753, No event jump can be issued.
+  // eb0 will check futher check.
+  //
 
   unsigned int event_length = data[ Belle2::RawHeader_latest::POS_NWORDS ];
   char err_buf[2000] = {0};
@@ -1063,16 +1063,16 @@ int checkEventData(int sender_id, unsigned int* data, unsigned int event_nwords,
     //          (new_exprun & Belle2::RawHeader_latest::SUBRUNNO_MASK)
     //         );
 
-//     if (data[ ERR_POS ] == 0) {
-//       pthread_mutex_lock(&(mtx_sender_log));
-//       printf("[FATAL] thread %d : Data error was deteced by PCIe40 FPGA. Header %.8x, Errorbit %.8x\n", sender_id, data[ MAGIC_7F7F_POS ],
-//              data[ ERR_POS ]);
-//       printEventData(data, event_length, sender_id);
-//       pthread_mutex_unlock(&(mtx_sender_log));
-// #ifndef NO_ERROR_STOP
-//       exit(1);
-// #endif
-//    }
+    //     if (data[ ERR_POS ] == 0) {
+    //       pthread_mutex_lock(&(mtx_sender_log));
+    //       printf("[FATAL] thread %d : Data error was deteced by PCIe40 FPGA. Header %.8x, Errorbit %.8x\n", sender_id, data[ MAGIC_7F7F_POS ],
+    //              data[ ERR_POS ]);
+    //       printEventData(data, event_length, sender_id);
+    //       pthread_mutex_unlock(&(mtx_sender_log));
+    // #ifndef NO_ERROR_STOP
+    //       exit(1);
+    // #endif
+    //    }
   } else {
     // reduced
     reduced_flag = 1;

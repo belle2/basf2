@@ -22,12 +22,10 @@ all: clean link ${TARGET1} cleanlink
 
 .PHONY: link
 link:
-	@ echo "<< making smylink $@ >>"
-	@if [ ! -d ${INCDIR} ]; then \
+	@ echo "<< making symlink $@ >>"
 	mkdir -p include/rawdata/dataobjects ; \
 	ln -s ${TEMP_LOCAL_DIR}/rawdata/dataobjects/include/*.h ./include/rawdata/dataobjects/ ; \
 	ln -s ${TEMP_LOCAL_DIR}/rawdata/include/*.h ./include/rawdata/ ; \
-	fi
 
 .PHONY:	clean
 clean:
@@ -37,7 +35,7 @@ clean:
 .PHONY:	cleanlink
 cleanlink:
 	@ echo "<< clearing linked header files >>"
-	@ rm -rf $(INCDIR) 
+	@ rm -rf $(INCDIR)/rawdata 
 
 ${TARGET1}: src/${TARGET1}.cc
 	source $(TOP)/Scripts/setup.sh; \

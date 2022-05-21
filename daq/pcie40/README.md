@@ -1,17 +1,19 @@
 # 1. Compilation
 
 ## 1-1. PCIe40 software
-Download basf2 and checkout this branch.
-`$ git checkout feature/BIIDAQ-174-daq-software-for-pcie40`
-
-Download submodules for PCIe40.( The version of a sub-module is fixed. So it might be old. )
-`$ git submodule update --init`
-
-Compile PCIe40 library( See REAEME.md on https://stash.desy.de/projects/BIDU/repos/software/browse ).
+Download and compile PCIe40 library
+$ cd daq/pcie40
+$ ./start_pcie40_threads.sh
 
 ## 1-2. DAQ software
-If you don't send data to eb0, please define NO_SEND in des_ser_PCIe40_main.cc .
+If you want to use ZMQ for data transfer in a process:
+`#define USE_ZMQ`
+You need to setup b2setup to use zmq libray in external.
 
+If you use readout DAQ in recl3(ECL+ECLTRG):
+`#define SPLIT_ECL_ECLTRG`
+
+If you don't send data to eb0, please define NO_SEND in des_ser_PCIe40_main.cc .
 `#define NOT_SEND`
 
 Compile DAQ software.
@@ -24,7 +26,7 @@ Compile DAQ software.
 ## 2-1. start DAQ program 
 `$ ./des_ser_PCIe40_main <node ID:0x********>`
 
-* If you are not on the PCs below, please just use 0x0 as a node ID.
+* If you are not on the PCs below, please just use 0x99000001 as a node ID.
 ** rtop1    : 0x3000001
 ** rtop2    : 0x3000002
 ** rklm1    : 0x7000001
@@ -64,6 +66,3 @@ If you are running the program on rklm1, the following is fine.
 Run the script together with des_ser_PCIe40_main
 
 `$ basf2 Recv2Root.py `
-
-
-

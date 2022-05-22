@@ -231,11 +231,13 @@ bool TrackIsoCalculatorModule::isStdChargedList()
 {
 
   bool checkPList = false;
-  unsigned short nSelectedDaughters = m_decaydescriptor.getSelectionNames().size();
-  if (nSelectedDaughters == 0)
+  if (m_nSelectedDaughters == 0)
     checkPList = Const::chargedStableSet.find(abs(m_decaydescriptor.getMother()->getPDGCode())) != Const::invalidParticle;
   else
-    checkPList = true;
+    for (int pdgcode : m_decaydescriptor.getSelectionPDGCodes()) {
+      checkPList = Const::chargedStableSet.find(abs(pdgcode)) != Const::invalidParticle;
+      if (!checkPList) break;
+    }
   DecayDescriptor dd;
   bool checkPListReference = false;
   if (dd.init(m_pListReferenceName))

@@ -9,9 +9,14 @@
 #ifndef EVENTACTION_H_
 #define EVENTACTION_H_
 
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <G4UserEventAction.hh>
+
+#include <fstream>
+
 class G4Event;
 
 namespace Belle2 {
@@ -54,11 +59,20 @@ namespace Belle2 {
        */
       void EndOfEventAction(const G4Event* event);
 
+      /**
+       * This method gets the output stream for the event-history steps
+       */
+      std::ofstream* getVREventStream() const { return m_VREventStream; }
 
     protected:
 
       std::string m_mcCollectionName;     /**< The name of the MCParticle collection to which the MCParticles should be written.*/
       MCParticleGraph& m_mcParticleGraph; /**< Reference to the MCParticle graph which is converted to a MCParticle list by this class. */
+
+    private:
+
+      std::ofstream* m_VREventStream;           /**< Output stream for writing each step of event's history. */
+      StoreObjPtr<EventMetaData> m_evtMetaData; /**< Event metadata. */
 
     };
 

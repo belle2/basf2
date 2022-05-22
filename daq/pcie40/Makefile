@@ -18,7 +18,7 @@ DES_SER_PCIE40_MAIN_LDFLAGS = -L$(TOP)/build/Pcie40Libraries/ -L$(TOP)/build/Pci
 
 TARGET1=des_ser_PCIe40_main
 
-all: clean link ${TARGET1} cleanlink
+all: clean cleanlink link ${TARGET1} cleanlink
 
 .PHONY: link
 link:

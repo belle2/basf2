@@ -93,6 +93,12 @@ namespace Belle2 {
     double getTMax() const {return m_tmax;}
 
     /**
+     * Returns peaking time of the signal
+     * @return peaking time [ns]
+     */
+    double getPeakingTime() const;
+
+    /**
      * Returns time constant of the exponential used for the extrapolation of tail
      * @return time constant [ns]
      */
@@ -132,7 +138,10 @@ namespace Belle2 {
     double m_pole2 = 0; /**< noise bandwidth: second pole [GHz] */
 
     /** cache for the interpolator */
-    mutable TSpline5* m_interpolator = 0; //!
+    mutable TSpline5* m_interpolator = 0; //! do not write out
+
+    /** cache for peaking time */
+    mutable double m_peakTime = 0; //! do not write out
 
     ClassDef(TOPSignalShape, 1); /**< ClassDef */
 

@@ -34,7 +34,7 @@ namespace VXDTFfilterTest {
 
 
   /** a small filter illustrating the behavior of a distance3D-filter */
-  class SquaredDistance3D : public SelectionVariable< spacePoint , 2, float > {
+  class SquaredDistance3D : public SelectionVariable< spacePoint, 2, float > {
   public:
     /** return name of the class */
     static const std::string name(void) {return "SquaredDistance3D"; };
@@ -43,15 +43,15 @@ namespace VXDTFfilterTest {
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
       return
-        pow(get<0>(p1) - get<0>(p2) , 2) +
-        pow(get<1>(p1) - get<1>(p2) , 2) +
-        pow(get<2>(p1) - get<2>(p2) , 2) ;
+        pow(get<0>(p1) - get<0>(p2), 2) +
+        pow(get<1>(p1) - get<1>(p2), 2) +
+        pow(get<2>(p1) - get<2>(p2), 2) ;
     }
   };
 
 
   /** a small filter illustrating the behavior of a distance2D-filter in XY */
-  class SquaredDistance2Dxy : public SelectionVariable< spacePoint , 2, float > {
+  class SquaredDistance2Dxy : public SelectionVariable< spacePoint, 2, float > {
   public:
     /** return name of the class */
     static const std::string name(void) {return "SquaredDistance2Dxy"; };
@@ -60,14 +60,14 @@ namespace VXDTFfilterTest {
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
       return
-        pow(get<0>(p1) - get<0>(p2) , 2) +
-        pow(get<1>(p1) - get<1>(p2) , 2) ;
+        pow(get<0>(p1) - get<0>(p2), 2) +
+        pow(get<1>(p1) - get<1>(p2), 2) ;
     }
   };
 
 
   /** a small filter illustrating the behavior of a distance1D-filter in X */
-  class SquaredDistance1Dx : public SelectionVariable< spacePoint , 2, float > {
+  class SquaredDistance1Dx : public SelectionVariable< spacePoint, 2, float > {
   public:
     /** return name of the class */
     static const std::string name(void) {return "SquaredDistance1Dx"; };
@@ -76,13 +76,13 @@ namespace VXDTFfilterTest {
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
       return
-        pow(get<0>(p1) - get<0>(p2) , 2);
+        pow(get<0>(p1) - get<0>(p2), 2);
     }
   };
 
 
   /** a small filter illustrating the behavior of a filter which is compatible with boolean comparisons */
-  class BooleanVariable : public SelectionVariable< spacePoint , 2, bool > {
+  class BooleanVariable : public SelectionVariable< spacePoint, 2, bool > {
   public:
     /** return name of the class */
     static const std::string name(void) {return "BooleanVariable"; };
@@ -144,28 +144,28 @@ namespace VXDTFfilterTest {
   TEST_F(FilterTest, Range)
   {
 
-    Range<double, double> range(0. , 1.);
+    Range<double, double> range(0., 1.);
     EXPECT_TRUE(range.contains(0.5));
     EXPECT_FALSE(range.contains(-1.));
     EXPECT_FALSE(range.contains(0.));
     EXPECT_FALSE(range.contains(1.));
     EXPECT_FALSE(range.contains(2.));
-    EXPECT_EQ(0. , range.getInf());
-    EXPECT_EQ(1. , range.getSup());
+    EXPECT_EQ(0., range.getInf());
+    EXPECT_EQ(1., range.getSup());
   }
 
   /** shows the functionality of the Range */
   TEST_F(FilterTest, ClosedRange)
   {
 
-    ClosedRange<double, double> range(0. , 1.);
+    ClosedRange<double, double> range(0., 1.);
     EXPECT_TRUE(range.contains(0.5));
     EXPECT_FALSE(range.contains(-1.));
     EXPECT_TRUE(range.contains(0.));
     EXPECT_TRUE(range.contains(1.));
     EXPECT_FALSE(range.contains(2.));
-    EXPECT_EQ(0. , range.getInf());
-    EXPECT_EQ(1. , range.getSup());
+    EXPECT_EQ(0., range.getInf());
+    EXPECT_EQ(1., range.getSup());
   }
 
 
@@ -177,7 +177,7 @@ namespace VXDTFfilterTest {
     EXPECT_TRUE(upperBoundedSet.contains(-1.));
     EXPECT_FALSE(upperBoundedSet.contains(0.));
     EXPECT_FALSE(upperBoundedSet.contains(1.));
-    EXPECT_EQ(0. , upperBoundedSet.getSup());
+    EXPECT_EQ(0., upperBoundedSet.getSup());
   }
 
   /** shows the functionality of the ClosedUpperBoundedSet */
@@ -188,7 +188,7 @@ namespace VXDTFfilterTest {
     EXPECT_TRUE(upperBoundedSet.contains(-1.));
     EXPECT_TRUE(upperBoundedSet.contains(0.));
     EXPECT_FALSE(upperBoundedSet.contains(1.));
-    EXPECT_EQ(0. , upperBoundedSet.getSup());
+    EXPECT_EQ(0., upperBoundedSet.getSup());
   }
 
 
@@ -200,7 +200,7 @@ namespace VXDTFfilterTest {
     EXPECT_TRUE(lowerBoundedSet.contains(1.));
     EXPECT_FALSE(lowerBoundedSet.contains(0.));
     EXPECT_FALSE(lowerBoundedSet.contains(-1.));
-    EXPECT_EQ(0. , lowerBoundedSet.getInf());
+    EXPECT_EQ(0., lowerBoundedSet.getInf());
   }
 
   /** shows the functionality of the ClosedLowerBoundedSet */
@@ -211,7 +211,7 @@ namespace VXDTFfilterTest {
     EXPECT_TRUE(lowerBoundedSet.contains(1.));
     EXPECT_TRUE(lowerBoundedSet.contains(0.));
     EXPECT_FALSE(lowerBoundedSet.contains(-1.));
-    EXPECT_EQ(0. , lowerBoundedSet.getInf());
+    EXPECT_EQ(0., lowerBoundedSet.getInf());
   }
 
 
@@ -219,7 +219,7 @@ namespace VXDTFfilterTest {
   TEST_F(FilterTest, SelectionVariableName)
   {
 
-    EXPECT_EQ("SquaredDistance3D" , SquaredDistance3D().name());
+    EXPECT_EQ("SquaredDistance3D", SquaredDistance3D().name());
   }
 
 
@@ -229,9 +229,9 @@ namespace VXDTFfilterTest {
     // Very verbose declaration, see below for convenient shortcuts
     Filter< SquaredDistance3D, Range<double, double>, VoidObserver > filter(Range<double, double>(0., 1.));
 
-    spacePoint x1(0.0f , 0.0f, 0.0f);
-    spacePoint x2(0.5f , 0.0f, 0.0f);
-    spacePoint x3(2.0f , 0.0f, 0.0f);
+    spacePoint x1(0.0f, 0.0f, 0.0f);
+    spacePoint x2(0.5f, 0.0f, 0.0f);
+    spacePoint x3(2.0f, 0.0f, 0.0f);
 
     EXPECT_TRUE(filter.accept(x1, x2));
     EXPECT_FALSE(filter.accept(x1, x3));
@@ -246,14 +246,14 @@ namespace VXDTFfilterTest {
     Filter< SquaredDistance3D, Range<double, double>, VoidObserver > unobservedFilter(Range<double, double>(0., 1.));
 
     Filter< SquaredDistance3D, Range<double, double>, Observer > filter(unobservedFilter);
-    spacePoint x1(0.0f , 0.0f, 0.0f);
-    spacePoint x2(0.5f , 0.0f, 0.0f);
-    spacePoint x3(2.0f , 0.0f, 0.0f);
+    spacePoint x1(0.0f, 0.0f, 0.0f);
+    spacePoint x2(0.5f, 0.0f, 0.0f);
+    spacePoint x3(2.0f, 0.0f, 0.0f);
     counter< SquaredDistance3D >::N = 0;
 
     EXPECT_TRUE(filter.accept(x1, x2));
     EXPECT_FALSE(filter.accept(x1, x3));
-    EXPECT_EQ(2 , counter< SquaredDistance3D >::N);
+    EXPECT_EQ(2, counter< SquaredDistance3D >::N);
   }
 
   /** shows how to switch all observers of a filter of interest */
@@ -263,13 +263,14 @@ namespace VXDTFfilterTest {
     auto dummyFilter = ((-10. <= SquaredDistance3D() <= 10.) &&
                         ((-100. <=  SquaredDistance2Dxy() <= -10.) ||    // put 2nd pair of parentheses to silence warning
                          (-10. <= SquaredDistance1Dx() <= 10.)) &&
+                        // cppcheck-suppress duplicateExpression
                         !(-10. <= SquaredDistance1Dx() <= -10.));
 
     // values are chosen in that way that all sub-filters of dummyFilter have to be called (see comment below)
     // and so that dummyFilter is always true
-    spacePoint x1(0.0f , 0.0f, 0.0f);
-    spacePoint x2(0.5f , 0.0f, 0.0f);
-    spacePoint x3(2.0f , 0.0f, 0.0f);
+    spacePoint x1(0.0f, 0.0f, 0.0f);
+    spacePoint x2(0.5f, 0.0f, 0.0f);
+    spacePoint x3(2.0f, 0.0f, 0.0f);
 
     counter< SquaredDistance3D >::N = 0;
     counter< SquaredDistance1Dx >::N = 0;
@@ -279,9 +280,9 @@ namespace VXDTFfilterTest {
     dummyFilter.accept(x1, x3);
 
     // useless test as it tests if realy unobserved
-    EXPECT_EQ(0 , counter< SquaredDistance3D >::N);
-    EXPECT_EQ(0 , counter< SquaredDistance2Dxy >::N);
-    EXPECT_EQ(0 , counter< SquaredDistance1Dx >::N);
+    EXPECT_EQ(0, counter< SquaredDistance3D >::N);
+    EXPECT_EQ(0, counter< SquaredDistance2Dxy >::N);
+    EXPECT_EQ(0, counter< SquaredDistance1Dx >::N);
 
     // Now switch observer, this is done recursively for each of the underlying filters
     // One cannot switch the observer of an existing filter (as it would mean to switch type) so one has to create a new one!
@@ -290,10 +291,10 @@ namespace VXDTFfilterTest {
     observedDummyFilter.accept(x1, x2);
     observedDummyFilter.accept(x1, x3);
 
-    EXPECT_EQ(2 , counter< SquaredDistance3D >::N);
-    EXPECT_EQ(2 , counter< SquaredDistance2Dxy >::N);
+    EXPECT_EQ(2, counter< SquaredDistance3D >::N);
+    EXPECT_EQ(2, counter< SquaredDistance2Dxy >::N);
     //Note SquaredDistance1D is used twice in the filter so it is evaluated twice!
-    EXPECT_EQ(4 , counter< SquaredDistance1Dx >::N);
+    EXPECT_EQ(4, counter< SquaredDistance1Dx >::N);
   }
 
 
@@ -304,16 +305,16 @@ namespace VXDTFfilterTest {
     // Very verbose declaration, see below for convenient shortcuts
     Filter< SquaredDistance3D, Range<double, double>, Observer > nonBypassableFilter(Range<double, double>(0., 1.));
     auto filter = nonBypassableFilter.bypass(bypassControl);
-    spacePoint x1(0.0f , 0.0f, 0.0f);
-    spacePoint x2(2.0f , 0.0f, 0.0f);
+    spacePoint x1(0.0f, 0.0f, 0.0f);
+    spacePoint x2(2.0f, 0.0f, 0.0f);
     counter< SquaredDistance3D >::N = 0;
 
     EXPECT_FALSE(filter.accept(x1, x2));
-    EXPECT_EQ(1 , counter< SquaredDistance3D >::N);
+    EXPECT_EQ(1, counter< SquaredDistance3D >::N);
 
     bypassControl = true;
     EXPECT_TRUE(filter.accept(x1, x2));
-    EXPECT_EQ(2 , counter< SquaredDistance3D >::N);
+    EXPECT_EQ(2, counter< SquaredDistance3D >::N);
 
   }
 
@@ -322,10 +323,10 @@ namespace VXDTFfilterTest {
   TEST_F(FilterTest, Shortcuts)
   {
 
-    spacePoint x1(0.0f , 0.0f, 0.0f);
-    spacePoint x2(0.5f , 0.0f, 0.0f);
-    spacePoint x3(2.0f , 0.0f, 0.0f);
-    spacePoint x4(1.0f , 0.0f, 0.0f);
+    spacePoint x1(0.0f, 0.0f, 0.0f);
+    spacePoint x2(0.5f, 0.0f, 0.0f);
+    spacePoint x3(2.0f, 0.0f, 0.0f);
+    spacePoint x4(1.0f, 0.0f, 0.0f);
 
     auto filterSup = (SquaredDistance3D() < 1.) ;
     EXPECT_TRUE(filterSup.accept(x1, x2));
@@ -389,9 +390,9 @@ namespace VXDTFfilterTest {
   {
 
 
-    spacePoint x1(0.0f , 0.0f, 0.0f);
-    spacePoint x2(1.0f , 0.0f, 0.0f);
-    spacePoint x3(2.0f , 0.0f, 0.0f);
+    spacePoint x1(0.0f, 0.0f, 0.0f);
+    spacePoint x2(1.0f, 0.0f, 0.0f);
+    spacePoint x3(2.0f, 0.0f, 0.0f);
 
     auto filter = !(SquaredDistance3D() > 1.);
     EXPECT_TRUE(filter.accept(x1, x2));
@@ -427,8 +428,8 @@ namespace VXDTFfilterTest {
       (SquaredDistance3D()   < 1).observeLeaf(Observer())
     );
 
-    spacePoint x1(0.0f , 0.0f, 0.0f);
-    spacePoint x3(2.0f , 0.0f, 0.0f);
+    spacePoint x1(0.0f, 0.0f, 0.0f);
+    spacePoint x3(2.0f, 0.0f, 0.0f);
 
     counter< SquaredDistance3D   >::N = 0;
     counter< SquaredDistance2Dxy >::N = 0;
@@ -436,15 +437,15 @@ namespace VXDTFfilterTest {
     EXPECT_FALSE(filter.accept(x1, x3));
     // since the pair x1, x3 does not satisfy the SquaredDistance2Dxy
     // requirement, we do expect SquaredDistance2Dxy evaluated once:
-    EXPECT_EQ(1 , counter< SquaredDistance2Dxy >::N);
+    EXPECT_EQ(1, counter< SquaredDistance2Dxy >::N);
     // and SquaredDistance3D not evaluated at all
-    EXPECT_EQ(0 , counter< SquaredDistance3D >::N);
+    EXPECT_EQ(0, counter< SquaredDistance3D >::N);
 
     EXPECT_TRUE(filter.accept(x1, x1));
     // in this case Distance2Dxy is satisfied
-    EXPECT_EQ(2 , counter< SquaredDistance2Dxy >::N);
+    EXPECT_EQ(2, counter< SquaredDistance2Dxy >::N);
     // and Distance3D is evaluated
-    EXPECT_EQ(1 , counter< SquaredDistance3D >::N);
+    EXPECT_EQ(1, counter< SquaredDistance3D >::N);
 
   }
 
@@ -454,8 +455,8 @@ namespace VXDTFfilterTest {
   {
     auto filter1(BooleanVariable() == true);
     auto filter2(false == BooleanVariable());
-    spacePoint x1(0.0f , 0.0f, 0.0f);
-    spacePoint x2(1.0f , 0.0f, 0.0f);
+    spacePoint x1(0.0f, 0.0f, 0.0f);
+    spacePoint x2(1.0f, 0.0f, 0.0f);
 
     EXPECT_TRUE(filter1.accept(x1, x1));
     EXPECT_FALSE(filter1.accept(x1, x2));

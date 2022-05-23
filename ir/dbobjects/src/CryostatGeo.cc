@@ -35,4 +35,22 @@ void CryostatGeo::initialize(const GearDir& content)
     straightSections += name;
   }
   addParameter("Straight", straightSections);
+
+  std::string shields;
+  for (const GearDir& shield : content.getNodes("Shield")) {
+    std::string name = shield.getString("@name");
+    addParameters(shield, name);
+    if (!shields.empty()) shields += " ";
+    shields += name;
+  }
+  addParameter("Shield", shields);
+
+  std::string supports;
+  for (const GearDir& support : content.getNodes("Support")) {
+    std::string name = support.getString("@name");
+    addParameters(support, name);
+    if (!supports.empty()) supports += " ";
+    supports += name;
+  }
+  addParameter("Support", supports);
 }

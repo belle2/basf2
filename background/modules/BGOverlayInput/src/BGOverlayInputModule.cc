@@ -34,7 +34,7 @@ using namespace Belle2;
 //                 Register module
 //-----------------------------------------------------------------
 
-REG_MODULE(BGOverlayInput)
+REG_MODULE(BGOverlayInput);
 
 //-----------------------------------------------------------------
 //                 Implementation

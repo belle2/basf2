@@ -112,6 +112,11 @@ namespace Belle2 {
     std::string m_pListName;
 
     /**
+     * The name of the input ParticleList of reference tracks.
+     */
+    std::string m_pListReferenceName;
+
+    /**
      * The name of the detector at whose innermost layer we extrapolate each track's polar and azimuthal angle.
      */
     std::string m_detInnerSurface;
@@ -147,17 +152,19 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> m_pList;
 
     /**
-     * Check whether input particle list is of a valid charged stable particle.
+     * The input ParticleList object of reference tracks.
      */
-    inline bool isStdChargedList()
-    {
-      return (Const::chargedStableSet.find(abs(m_pList->getPDGCode())) != Const::invalidParticle);
-    };
+    StoreObjPtr<ParticleList> m_pListReference;
+
+    /**
+     * Check whether input particle list and reference list are of a valid charged stable particle.
+     */
+    bool isStdChargedList();
 
     /**
      * Print 2D array of pair-wise distances.
      */
-    void printDistancesArr(const std::vector<std::vector<double>>& arr, int size);
+    void printDistancesArr(const std::vector<std::vector<double>>& arr, int size_x, int size_y);
 
   };
 }

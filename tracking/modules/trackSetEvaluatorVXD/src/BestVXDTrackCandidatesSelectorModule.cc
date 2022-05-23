@@ -13,7 +13,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(BestVXDTrackCandidatesSelector)
+REG_MODULE(BestVXDTrackCandidatesSelector);
 
 BestVXDTrackCandidatesSelectorModule::BestVXDTrackCandidatesSelectorModule() : Module()
 {

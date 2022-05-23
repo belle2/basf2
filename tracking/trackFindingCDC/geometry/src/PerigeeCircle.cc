@@ -245,7 +245,7 @@ double PerigeeCircle::arcLengthBetween(const Vector2D& from, const Vector2D& to)
   Vector2D closestAtFrom = closest(from);
   Vector2D closestAtTo = closest(to);
   double secantLength = closestAtFrom.distance(closestAtTo);
-  return lengthSign * arcLengthAtSecantLength(secantLength);
+  return static_cast<double>(lengthSign) * arcLengthAtSecantLength(secantLength);
 }
 
 double PerigeeCircle::arcLengthToCylindricalR(double cylindricalR) const
@@ -330,11 +330,11 @@ void PerigeeCircle::setCenterAndRadius(const Vector2D& center,
                                        double absRadius,
                                        ERotation orientation)
 {
-  m_curvature = orientation / std::fabs(absRadius);
+  m_curvature = static_cast<double>(orientation) / std::fabs(absRadius);
   m_phi0Vec = center.orthogonal(NRotation::reversed(orientation));
   m_phi0Vec.normalize();
   m_phi0 = m_phi0Vec.phi();
-  m_impact = (center.norm() - std::fabs(absRadius)) * orientation;
+  m_impact = (center.norm() - std::fabs(absRadius)) * static_cast<double>(orientation);
 }
 
 void PerigeeCircle::setN(double n0, const Vector2D& n12, double n3)

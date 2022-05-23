@@ -18,7 +18,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisTrackingER)
+REG_MODULE(DQMHistAnalysisTrackingER);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -48,7 +48,7 @@ void DQMHistAnalysisTrackingERModule::initialize()
 void DQMHistAnalysisTrackingERModule::event()
 {
   // Repeat this for all tracks (no suffix) and tracks from IP (_FromIP suffix)
-  for (const string& suffix : {"_FromIP", "_NotFromIP"}) {
+  for (const string suffix : {"_FromIP", "_NotFromIP"}) {
     //compute fraction of tracks with no PXD hits
     TH1* hNoPXDHits = findHist("TrackingERDQM" + suffix + "/NoOfHitsInTrack_PXD");
     if (hNoPXDHits != nullptr) {

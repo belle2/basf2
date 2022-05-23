@@ -49,7 +49,8 @@ namespace {
         if (object != nullptr)
         {
           return object->m_value;
-        } else {
+        } else
+        {
           return std::numeric_limits<double>::quiet_NaN();
         }
       };
@@ -143,7 +144,7 @@ namespace {
     EXPECT_B2FATAL(Belle2::NodeFactory::compile_expression_node<MockVariableManager>(tuple));
 
     // Make Identifier Tuple which should trigger a runtime error
-    tuple = py::make_tuple(static_cast<int>(NodeType::IdentifierNode), "THISDOESNOTEXIST", true);
+    tuple = py::make_tuple(static_cast<int>(NodeType::IdentifierNode), "THISDOESNOTEXIST");
     EXPECT_THROW(Belle2::NodeFactory::compile_expression_node<MockVariableManager>(tuple), std::runtime_error);
 
   }

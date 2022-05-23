@@ -12,11 +12,13 @@
 //#include "trg/ecl/dataobjects/TRGECLDigi.h"
 #include "mdst/dataobjects/MCParticle.h"
 
+#include <Math/Boost.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace ECL;
 
-REG_MODULE(ECLLOM)
+REG_MODULE(ECLLOM);
 
 
 ECLLOMModule::ECLLOMModule()
@@ -156,18 +158,17 @@ void ECLLOMModule::get_MCparticles()
       m_mcph[ind - 2] = MCParticles[ind]->getMomentum().Phi();
     }
 
-    TLorentzVector SummP(MCParticles[0]->get4Vector() + MCParticles[1]->get4Vector());
-    TVector3 Boost_backV;
-    Boost_backV = -SummP.BoostVector();
-    TLorentzVector ComP[2];
+    ROOT::Math::PxPyPzEVector SummP(MCParticles[0]->get4Vector() + MCParticles[1]->get4Vector());
+    ROOT::Math::XYZVector Boost_backV = SummP.BoostToCM();
+    ROOT::Math::PxPyPzEVector ComP[2];
     ComP[0] = MCParticles[2]->get4Vector();
     ComP[1] = MCParticles[3]->get4Vector();
-    ComP[0].Boost(Boost_backV);
-    ComP[1].Boost(Boost_backV);
+    ComP[0] = ROOT::Math::Boost(Boost_backV) * ComP[0];
+    ComP[1] = ROOT::Math::Boost(Boost_backV) * ComP[1];
     for (int ind = 0; ind < 2; ind++) {
       m_com_en[ind] = ComP[ind].E();
-      m_com_th[ind] = ComP[ind].Vect().Theta();
-      m_com_ph[ind] = ComP[ind].Vect().Phi();
+      m_com_th[ind] = ComP[ind].Theta();
+      m_com_ph[ind] = ComP[ind].Phi();
     }
   }
 }

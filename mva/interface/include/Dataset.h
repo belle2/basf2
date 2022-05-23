@@ -431,6 +431,16 @@ namespace Belle2 {
                                     T& variableTargets);
 
       /**
+       * sets the branch address for a vector of VarVariant to a given target
+       * @tparam T target type (std::vector<float>, std::vector<double>)
+       * @param variableType defines {feature, weights, spectator, target}
+       * @param variableName names of the variable, usually defined in general_options
+       * @param varVariantTargets variables, the address is set to
+       */
+      void setVectorVariableAddress(std::string& variableType, std::vector<std::string>& variableName,
+                                    std::vector<Variable::Manager::VarVariant>& varVariantTargets);
+
+      /**
        * Determines the data type of the target variable and sets it to m_target_data_type
        */
       void setTargetRootInputType();
@@ -456,14 +466,15 @@ namespace Belle2 {
 
     protected:
       TChain* m_tree = nullptr; /**< Pointer to the TChain containing the data */
-      bool m_isDoubleInputType = true; /**< Defines the expected datatype in the ROOT file */
-      std::vector<double> m_input_double; /**< Contains all feature values of the currently loaded event */
-      std::vector<double> m_spectators_double; /**< Contains all spectators values of the currently loaded event */
+      bool m_isFloatInputType = true; /**< Defines the expected datatype in the ROOT file */
+      std::vector<Variable::Manager::VarVariant> m_input_variant; /**< Contains all feature values of the currently loaded event */
+      std::vector<Variable::Manager::VarVariant>
+      m_spectators_variant; /**< Contains all spectators values of the currently loaded event */
       double m_weight_double; /**< Contains the weight of the currently loaded event */
       Variable::Manager::VariableDataType m_target_data_type =
         Variable::Manager::VariableDataType::c_double; /**< Data type of target variable */
       double m_target_double; /**< Contains the target value of the currently loaded event */
-      double m_target_int; /**< Contains the target value of the currently loaded event */
+      int m_target_int; /**< Contains the target value of the currently loaded event */
       bool m_target_bool; /**< Contains the target value of the currently loaded event */
     };
 

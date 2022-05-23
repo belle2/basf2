@@ -25,7 +25,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistSnapshots)
+REG_MODULE(DQMHistSnapshots);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -88,7 +88,7 @@ void DQMHistSnapshotsModule::event()
       std::string dirname = s[0];
       std::string hname = s[1];
       std::string canvas_name = dirname + "/c_" + hname;
-      n->canvas = find_canvas(canvas_name);
+      n->canvas = findCanvas(canvas_name);
       n->stale = 0;
 
       m_ssnode.push_back(n);

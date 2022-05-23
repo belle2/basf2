@@ -26,7 +26,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TOPXTalkChargeShareSetter)
+REG_MODULE(TOPXTalkChargeShareSetter);
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -149,7 +149,7 @@ namespace Belle2 {
         m_variables.at(m_prefix + "Fit_PVal") = -1.;
       }
 
-      m_variables.at(m_prefix + "Fit_Successful") = recoTrack.wasFitSuccessful();
+      m_variables.at(m_prefix + "Fit_Successful") = (float)recoTrack.wasFitSuccessful();
 
       if (recoTrack.wasFitSuccessful()) {
         TVector3 linePoint(0., 0., 0.);

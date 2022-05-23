@@ -29,7 +29,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDROIFinderAnalysis)
+REG_MODULE(PXDROIFinderAnalysis);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -596,7 +596,7 @@ void PXDROIFinderAnalysisModule::event()
                   m_h2sigmaVphi->Fill(m_phimc, m_sigmaV);
                   m_h1SigmaU->Fill(m_sigmaU);
                   m_h1SigmaV->Fill(m_sigmaV);
-                  m_h2Mapglob->Fill(globalSensorPos.Perp() , globalSensorPos.Phi());
+                  m_h2Mapglob->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
 
 
                   if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
@@ -653,7 +653,7 @@ void PXDROIFinderAnalysisModule::event()
           m_h2sigmaVphi_out2->Fill(m_phimc, m_sigmaV);
           m_h1SigmaU_out2->Fill(m_sigmaU);
           m_h1SigmaV_out2->Fill(m_sigmaV);
-          m_h2Mapglob_out2->Fill(globalSensorPos.Perp() , globalSensorPos.Phi());
+          m_h2Mapglob_out2->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
           if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
             m_h2MaplocL1_out2->Fill(v2, u2);
           if (VxdID(m_vxdIDmc).getLayerNumber() == 2) //L2
@@ -679,7 +679,7 @@ void PXDROIFinderAnalysisModule::event()
           m_h2sigmaVphi_out3->Fill(m_phimc, m_sigmaV);
           m_h1SigmaU_out3->Fill(m_sigmaU);
           m_h1SigmaV_out3->Fill(m_sigmaV);
-          m_h2Mapglob_out3->Fill(globalSensorPos.Perp() , globalSensorPos.Phi());
+          m_h2Mapglob_out3->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
           if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
             m_h2MaplocL1_out3->Fill(v2, u2);
 
@@ -704,7 +704,7 @@ void PXDROIFinderAnalysisModule::event()
           m_h2sigmaVphi_out4->Fill(m_phimc, m_sigmaV);
           m_h1SigmaU_out4->Fill(m_sigmaU);
           m_h1SigmaV_out4->Fill(m_sigmaV);
-          m_h2Mapglob_out4->Fill(globalSensorPos.Perp() , globalSensorPos.Phi());
+          m_h2Mapglob_out4->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
           if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
             m_h2MaplocL1_out4->Fill(v2, u2);
           if (VxdID(m_vxdIDmc).getLayerNumber() == 2) //L2
@@ -723,7 +723,7 @@ void PXDROIFinderAnalysisModule::event()
           n_notINdigit5 ++;
 
           m_h1GlobalTime_out5->Fill(m_globalTime);
-          m_h2Mapglob_out5->Fill(globalSensorPos.Perp() , globalSensorPos.Phi());
+          m_h2Mapglob_out5->Fill(globalSensorPos.Perp(), globalSensorPos.Phi());
           if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
             m_h2MaplocL1_out5->Fill(v2, u2);
           if (VxdID(m_vxdIDmc).getLayerNumber() == 2) //L2

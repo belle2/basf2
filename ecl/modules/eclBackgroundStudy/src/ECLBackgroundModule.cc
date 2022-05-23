@@ -39,7 +39,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLBackground)
+REG_MODULE(ECLBackground);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -281,7 +281,7 @@ void ECLBackgroundModule::event()
   sort(MCPhotonIDs.begin(), MCPhotonIDs.end());
   vector<int>::iterator it;
   it = std::unique(MCPhotonIDs.begin(), MCPhotonIDs.end());
-  MCPhotonIDs.resize(std::distance(MCPhotonIDs.begin() , it));
+  MCPhotonIDs.resize(std::distance(MCPhotonIDs.begin(), it));
 
 
   //loop over MCParticles to find the photons that caused the simhits
@@ -332,8 +332,8 @@ void ECLBackgroundModule::event()
         h_NeutronFlux->AddBinContent(m_thetaID + 1, weightedFlux / NperRing);
         hDiodeFlux->AddBinContent(m_cellID + 1,  weightedFlux);
 
-        if (m_thetaID == 2)  h_NeutronFluxThetaID2->AddBinContent(m_phiID + 1 , weightedFlux);
-        if (m_thetaID == 67) h_NeutronFluxThetaID67->AddBinContent(m_phiID + 1 , weightedFlux);
+        if (m_thetaID == 2)  h_NeutronFluxThetaID2->AddBinContent(m_phiID + 1, weightedFlux);
+        if (m_thetaID == 67) h_NeutronFluxThetaID67->AddBinContent(m_phiID + 1, weightedFlux);
 
 
       }
@@ -494,7 +494,7 @@ int ECLBackgroundModule::SetPosHistos(TH1F* h, TH2F* hFWD, TH2F* hBAR, TH2F* hBW
       hBWD->Fill(floor(Crystal[i]->GetX()), floor(Crystal[i]->GetY()), value);
 
     } else
-      hBAR->Fill(floor(Crystal[i]->GetZ()), floor(Crystal[i]->GetR() * (Crystal[i]->GetPhi() - 180) * PI / 180)    , value);
+      hBAR->Fill(floor(Crystal[i]->GetZ()), floor(Crystal[i]->GetR() * (Crystal[i]->GetPhi() - 180) * PI / 180), value);
   }
 
   return 1;

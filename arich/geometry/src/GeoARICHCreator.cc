@@ -944,7 +944,7 @@ namespace Belle2 {
       const ARICHGeoDetectorPlane& detGeo =  detectorGeo.getDetectorPlane();
 
       G4Tubs* detTube = new G4Tubs("detTube", detGeo.getRingR(1) - hapdGeo.getSizeX() * 1.4 / 2.,
-                                   detGeo.getRingR(detGeo.getNRings()) + hapdGeo.getSizeX() * 1.4 / 2. , hapdGeo.getModuleSizeZ() / 2., 0, 2 * M_PI);
+                                   detGeo.getRingR(detGeo.getNRings()) + hapdGeo.getSizeX() * 1.4 / 2., hapdGeo.getModuleSizeZ() / 2., 0, 2 * M_PI);
       G4LogicalVolume* detPlaneLV = new G4LogicalVolume(detTube, Materials::get("ARICH_Air"), "ARICH.detectorPlane");
 
       unsigned nSlots = detGeo.getNSlots();

@@ -49,7 +49,8 @@ namespace {
         if (object != nullptr)
         {
           return object->m_value;
-        } else {
+        } else
+        {
           return std::numeric_limits<double>::quiet_NaN();
         }
       };
@@ -121,7 +122,8 @@ namespace {
       } else if (std::holds_alternative<double>(var->function(object)))
       {
         sum += std::get<double>(var->function(object));
-      } else {
+      } else
+      {
         sum += std::get<bool>(var->function(object));
       }
       for (size_t i = 1; i < arguments.size(); i++)
@@ -1195,7 +1197,7 @@ namespace {
     EXPECT_EQ(std::get<double>(node->evaluate(nullptr)), 8.0);
     EXPECT_EQ(node->decompile(), "2 ** 3");
 
-    child2 = py::make_tuple(static_cast<int>(NodeType::IdentifierNode), "mocking_variable", true);
+    child2 = py::make_tuple(static_cast<int>(NodeType::IdentifierNode), "mocking_variable");
     MockObjectType part{10};
     tuple = py::make_tuple(static_cast<int>(NodeType::BinaryExpressionNode), child1, child2,
                            static_cast<int>(ArithmeticOperation::POWER));
@@ -1251,11 +1253,11 @@ namespace {
   {
     Py_Initialize();
     MockObjectType part{4.2};
-    auto tuple = py::make_tuple(static_cast<int>(NodeType::IdentifierNode), "mocking_variable", true);
+    auto tuple = py::make_tuple(static_cast<int>(NodeType::IdentifierNode), "mocking_variable");
     auto node = NodeFactory::compile_expression_node<MockVariableManager>(tuple);
     EXPECT_EQ(std::get<double>(node->evaluate(&part)), 4.2);
 
-    tuple = py::make_tuple(static_cast<int>(NodeType::IdentifierNode), "THISDOESNOTEXIST", true);
+    tuple = py::make_tuple(static_cast<int>(NodeType::IdentifierNode), "THISDOESNOTEXIST");
     EXPECT_THROW(NodeFactory::compile_expression_node<MockVariableManager>(tuple), std::runtime_error);
 
     // Check nested runtime_error
@@ -1271,47 +1273,7 @@ namespace {
     auto tuple = py::make_tuple(
                    static_cast<int>(NodeType::FunctionNode),
                    "sum",
-                   3,
-                   py::make_tuple(
-                     py::make_tuple(
-                       static_cast<int>(NodeType::UnaryRelationalNode),
-                       py::make_tuple(
-                         static_cast<int>(NodeType::UnaryExpressionNode),
-                         py::make_tuple(
-                           static_cast<int>(NodeType::IdentifierNode),
-                           "mocking_variable",
-                           false
-                         ),
-                         false,
-                         false
-                       )
-                     ),
-                     py::make_tuple(
-                       static_cast<int>(NodeType::UnaryRelationalNode),
-                       py::make_tuple(
-                         static_cast<int>(NodeType::UnaryExpressionNode),
-                         py::make_tuple(
-                           static_cast<int>(NodeType::IntegerNode),
-                           2
-                         ),
-                         false,
-                         false
-                       )
-                     ),
-                     py::make_tuple(
-                       static_cast<int>(NodeType::UnaryRelationalNode),
-                       py::make_tuple(
-                         static_cast<int>(NodeType::UnaryExpressionNode),
-                         py::make_tuple(
-                           static_cast<int>(NodeType::IntegerNode),
-                           1
-                         ),
-                         false,
-                         false
-                       )
-                     )
-                   ),
-                   true
+                   "mocking_variable, 2, 1"
                  );
     auto node = NodeFactory::compile_expression_node<MockVariableManager>(tuple);
     EXPECT_EQ(std::get<double>(node->evaluate(&part)), 7);

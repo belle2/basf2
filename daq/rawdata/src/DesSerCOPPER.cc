@@ -21,7 +21,7 @@ using namespace Belle2;
 //                 Implementation
 //----------------------------------------------------------------
 
-DesSerCOPPER::DesSerCOPPER(string host_recv, int port_recv, string host_send, int port_send, int shmflag,
+DesSerCOPPER::DesSerCOPPER(string host_recv, int port_recv, const string& host_send, int port_send, int shmflag,
                            const std::string& nodename, int nodeid, int finesse_bitflag)
 {
   m_finesse_bit_flag = finesse_bitflag;
@@ -57,7 +57,6 @@ DesSerCOPPER::~DesSerCOPPER()
 void DesSerCOPPER::DataAcquisition()
 {
   // For data check
-  unsigned int eve_copper_0 = 0;
   //  B2INFO("initializing...");
   printf("[DEBUG] initializing...\n"); fflush(stdout);
   initialize(false);
@@ -109,11 +108,10 @@ void DesSerCOPPER::DataAcquisition()
       //
       // Receive data from COPPER
       //
-      eve_copper_0 = 0;
-      int delete_flag_from =
-        0; // Delete flag for temp_rawdatablk.It can be set to 1 by setRecvdBuffer if the buffer size is larger than that of pre-allocated buffer.
-      int delete_flag_to =
-        0; // Delete flag for raw_datablk[i]. It can be set to 1 by getNewBuffer if the buffer size is larger than that of pre-allocated buffer.
+      //int delete_flag_from =
+      //0; // Delete flag for temp_rawdatablk.It can be set to 1 by setRecvdBuffer if the buffer size is larger than that of pre-allocated buffer.
+      //int delete_flag_to =
+      //0; // Delete flag for raw_datablk[i]. It can be set to 1 by getNewBuffer if the buffer size is larger than that of pre-allocated buffer.
       RawDataBlockFormat temp_rawdatablk;
       try {
 
@@ -399,7 +397,7 @@ int* DesSerCOPPER::readOneEventFromCOPPERFIFO(const int entry, int* delete_flag,
     if ((int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte) {
       char    err_buf[500];
 
-      sprintf(err_buf, "[FATAL] CORRUPTED DATA: Read less bytes(%d) than expected(%d:%d). Exiting...\n",
+      sprintf(err_buf, "[FATAL] CORRUPTED DATA: Read less bytes(%d) than expected(%lu:%d). Exiting...\n",
               recvd_byte,
               *m_size_word * sizeof(int) - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS * sizeof(int),
               m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH ]);
@@ -408,7 +406,7 @@ int* DesSerCOPPER::readOneEventFromCOPPERFIFO(const int entry, int* delete_flag,
     }
   } else if ((int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte) {
     char    err_buf[500];
-    sprintf(err_buf, "[FATAL] CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n",
+    sprintf(err_buf, "[FATAL] CORRUPTED DATA: Read more than data size. Exiting...: %d %lu %lu %d %d\n",
             recvd_byte, *m_size_word * sizeof(int) , m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS * sizeof(int),
             m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH ],  m_pre_rawcpr.POS_DATA_LENGTH);
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -546,8 +544,8 @@ int DesSerCOPPER::readFD(int fd, char* buf, int data_size_byte, int delete_flag)
 {
 
   int n = 0;
-  int read_size = 0;
   while (1) {
+    int read_size = 0;
     if ((read_size = read(fd, (char*)buf + n, data_size_byte - n)) < 0) {
       if (errno == EINTR) {
         continue;

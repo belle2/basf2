@@ -20,7 +20,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(SPTC2GFTCConverter)
+REG_MODULE(SPTC2GFTCConverter);
 
 SPTC2GFTCConverterModule::SPTC2GFTCConverterModule() :
   Module()

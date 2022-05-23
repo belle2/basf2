@@ -95,8 +95,10 @@ def draw_bklmhists(file_chain):
 
     # Shifter plots
 
+    subdetector_selection = 'KLMHit2ds.m_Subdetector==1'
+
     inRPC = TH1F('InRPC', 'InRPC for KLMHit2ds', 2, -0.5, 1.5)
-    file_chain.Draw('KLMHit2ds.inRPC()>>InRPC', '')
+    file_chain.Draw('KLMHit2ds.inRPC()>>InRPC', subdetector_selection)
     inRPC.GetXaxis().SetTitle('0=scintillator  1=RPC')
     inRPC.GetListOfFunctions().Add(TNamed('Description', 'Flag indicating if a muon hit is in scintillator (0) or RPC (1)'))
     inRPC.GetListOfFunctions().Add(TNamed('Check', 'Mostly in RPC.'))
@@ -106,7 +108,7 @@ def draw_bklmhists(file_chain):
     inRPC.Write()
 
     section = TH1F('Forward', 'Section for KLMHit2ds', 2, -0.5, 1.5)
-    file_chain.Draw('KLMHit2ds.getSection()>>Forward', '')
+    file_chain.Draw('KLMHit2ds.getSection()>>Forward', subdetector_selection)
     section.GetXaxis().SetTitle('0=backward  1=forward')
     section.GetListOfFunctions().Add(TNamed('Description',
                                             'Flag indicating if a muon hit is in backward (0) or forward (1) BKLM'))
@@ -117,7 +119,7 @@ def draw_bklmhists(file_chain):
     section.Write()
 
     isOnTrack = TH1F('IsOnTrack', 'IsOnTrack for KLMHit2ds', 2, -0.5, 1.5)
-    file_chain.Draw('KLMHit2ds.isOnTrack()>>IsOnTrack', '')
+    file_chain.Draw('KLMHit2ds.isOnTrack()>>IsOnTrack', subdetector_selection)
     isOnTrack.GetXaxis().SetTitle('0=not associated with Track  1=associated with Track')
     isOnTrack.GetListOfFunctions().Add(TNamed('Description',
                                               'Flag indicating if a muon hit is associated with a CDC Track by Muid'))
@@ -128,7 +130,7 @@ def draw_bklmhists(file_chain):
     isOnTrack.Write()
 
     sector = TH1F('Sector', 'Sector for KLMHit2ds', 10, -0.5, 9.5)
-    file_chain.Draw('KLMHit2ds.getSector()>>Sector', '')
+    file_chain.Draw('KLMHit2ds.getSector()>>Sector', subdetector_selection)
     sector.GetXaxis().SetTitle('Sector #')
     sector.GetListOfFunctions().Add(TNamed('Description', 'Sector number of muon hit'))
     sector.GetListOfFunctions().Add(TNamed('Check', 'Roughly flat in sectors 1-8.'))
@@ -138,7 +140,7 @@ def draw_bklmhists(file_chain):
     sector.Write()
 
     layer = TH1F('Layer', 'Layer for KLMHit2ds', 17, -0.5, 16.5)
-    file_chain.Draw('KLMHit2ds.getLayer()>>Layer', '')
+    file_chain.Draw('KLMHit2ds.getLayer()>>Layer', subdetector_selection)
     layer.GetXaxis().SetTitle('Layer #')
     layer.GetListOfFunctions().Add(TNamed('Description', 'Layer number of muon hit'))
     layer.GetListOfFunctions().Add(TNamed('Check',
@@ -149,7 +151,8 @@ def draw_bklmhists(file_chain):
     layer.Write()
 
     phistrip = TH1F('PhiStrip', 'PhiStrip for KLMHit2ds', 50, -0.5, 49.5)
-    file_chain.Draw('KLMHit2ds.getPhiStripAve()>>PhiStrip', '')
+    file_chain.Draw('KLMHit2ds.getPhiStripAve()>>PhiStrip',
+                    subdetector_selection)
     phistrip.GetXaxis().SetTitle('Phi strip #')
     phistrip.GetListOfFunctions().Add(TNamed('Description', 'Strip number in phi plane of muon hit'))
     phistrip.GetListOfFunctions().Add(TNamed('Check',
@@ -160,7 +163,7 @@ def draw_bklmhists(file_chain):
     phistrip.Write()
 
     zstrip = TH1F('ZStrip', 'ZStrip for KLMHit2ds', 60, -0.5, 59.5)
-    file_chain.Draw('KLMHit2ds.getZStripAve()>>ZStrip', '')
+    file_chain.Draw('KLMHit2ds.getZStripAve()>>ZStrip', subdetector_selection)
     zstrip.GetXaxis().SetTitle('Z strip #')
     zstrip.GetListOfFunctions().Add(TNamed('Description', 'Strip number in z plane of muon hit'))
     zstrip.GetListOfFunctions().Add(TNamed('Check',
@@ -171,7 +174,8 @@ def draw_bklmhists(file_chain):
     zstrip.Write()
 
     timeRPC = TH1F('TimeRPC', 'Hit time for KLMHit2ds in RPCs', 175, 5, 30)
-    file_chain.Draw('KLMHit2ds.getTime()>>TimeRPC', 'KLMHit2ds.inRPC()==1')
+    file_chain.Draw('KLMHit2ds.getTime()>>TimeRPC',
+                    subdetector_selection + ' && KLMHit2ds.inRPC()==1')
     timeRPC.GetXaxis().SetTitle('t (ns)')
     timeRPC.GetListOfFunctions().Add(TNamed('Description', 'Time of muon hit in RPCs'))
     timeRPC.GetListOfFunctions().Add(TNamed('Check', 'Narrow peak at 0 ns.'))
@@ -180,7 +184,8 @@ def draw_bklmhists(file_chain):
     timeRPC.Write()
 
     timeSci = TH1F('TimeSci', 'Hit time for KLMHit2ds in scintillators', 80, -5, 35)
-    file_chain.Draw('KLMHit2ds.getTime()>>TimeSci', 'KLMHit2ds.inRPC()==0')
+    file_chain.Draw('KLMHit2ds.getTime()>>TimeSci',
+                    subdetector_selection + ' && KLMHit2ds.inRPC()==0')
     timeSci.GetXaxis().SetTitle('t (ns)')
     timeSci.GetListOfFunctions().Add(TNamed('Description', 'Time of muon hit in scintillators'))
     timeSci.GetListOfFunctions().Add(TNamed('Check',
@@ -190,7 +195,8 @@ def draw_bklmhists(file_chain):
     timeSci.Write()
 
     nPE = TH1F('nGenPE', 'Generated PE in BKLM', 200, 0.0, 200)
-    file_chain.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE', 'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() < 3')
+    file_chain.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE',
+                    subdetector_selection + ' && KLMDigits.getLayer() < 3')
     nPE.GetXaxis().SetTitle('# generated PE')
     nPE.GetListOfFunctions().Add(TNamed('Description', 'Number of generated photoelectrons in BKLM'))
     nPE.GetListOfFunctions().Add(TNamed('Check', 'Peak around 50.'))
@@ -201,7 +207,8 @@ def draw_bklmhists(file_chain):
     # Expert plots
 
     edep = TH1F('EnergyDeposit', 'Energy deposition for KLMHit2ds', 260, -1.0, 25.0)
-    file_chain.Draw('KLMHit2ds.getEnergyDeposit()*1000.0>>EnergyDeposit', '')
+    file_chain.Draw('KLMHit2ds.getEnergyDeposit()*1000.0>>EnergyDeposit',
+                    subdetector_selection)
     edep.GetXaxis().SetTitle('E (keV)')
     edep.GetListOfFunctions().Add(TNamed('Description', 'dE/dx energy deposition of muon hit'))
     edep.GetListOfFunctions().Add(TNamed('Check', 'Peak near 3 keV.'))

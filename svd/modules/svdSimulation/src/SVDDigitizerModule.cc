@@ -48,7 +48,7 @@ double tree_signal[20];         // array for 20 samples of 10 ns
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDDigitizer)
+REG_MODULE(SVDDigitizer);
 
 //-----------------------------------------------------------------
 //                 Implementation

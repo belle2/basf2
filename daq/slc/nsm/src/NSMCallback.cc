@@ -67,7 +67,7 @@ void NSMCallback::reply(const NSMMessage& msg)
     NSMNode& node(it->second);
     msg_out.setNodeName(node.getName());
     if (NSMCommunicator::send(msg_out)) {
-      it++;
+      ++it;
     } else {
       m_nodes.erase(it++);
     }
@@ -167,7 +167,7 @@ void NSMCallback::notify(const NSMVar& var)
            inode != node_v.end();) {
         NSMNode& node(inode->second);
         if (NSMCommunicator::send(NSMMessage(node, var_out))) {
-          inode++;
+          ++inode;
         } else {
           node_v.erase(inode++);
         }
@@ -215,13 +215,13 @@ void NSMCallback::vset(NSMCommunicator& com, const NSMVar& var)
     NSMVHandler* handler_p = getHandler_p(var.getNode(), var.getName());
     if (handler_p) {
       NSMVHandler& handler(*handler_p);
-      bool result = false;
       if (var.getName() == handler.getName() &&
           (var.getNode() == handler.getNode() ||
            (var.getNode().size() == 0 && handler.getNode() == getNode().getName()) ||
            (handler.getNode().size() == 0 && var.getNode() == getNode().getName())) &&
           handler.useSet()) {
         NSMNode node(msg.getNodeName());
+        bool result = false;
         if ((result = handler.handleSet(var)) &&
             (var.getNode().size() == 0 || var.getNode() == getNode().getName())) {
           notify(var);
@@ -243,7 +243,7 @@ void NSMCallback::vlistget(NSMCommunicator& com)
   int i = 0;
   int count = 0;
   for (NSMVHandlerList::iterator it = m_handler.begin();
-       it != m_handler.end(); it++) {
+       it != m_handler.end(); ++it) {
     NSMVHandler& handler(*it->second);
     if (handler.getNode().size() == 0) {
       ss << handler.getName() << ":"
@@ -309,7 +309,7 @@ void NSMCallback::alloc_open(NSMCommunicator& com)
     LogFile::warning(e.what());
   }
   for (NSMDataMap::iterator it = m_datas.begin();
-       it != m_datas.end(); it++) {
+       it != m_datas.end(); ++it) {
     NSMData& data(it->second);
     try {
       if (!data.isAvailable() && data.getName().size() > 0 &&

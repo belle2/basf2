@@ -16,7 +16,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDRawHitFilter)
+REG_MODULE(PXDRawHitFilter);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -72,7 +72,7 @@ void PXDRawHitFilterModule::event()
   multimap< VxdID, ROIid > ROIids;
 
   for (auto ROI : ROIids_store_array)
-    ROIids.insert(pair<VxdID, ROIid> (ROI.getSensorID() , ROI));
+    ROIids.insert(pair<VxdID, ROIid> (ROI.getSensorID(), ROI));
 
   m_selectorIN.select([ROIids](const PXDRawHit * thePxdRawHit) {
     auto ROIidsRange = ROIids.equal_range(thePxdRawHit->getSensorID()) ;

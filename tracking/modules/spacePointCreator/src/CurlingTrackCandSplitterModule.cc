@@ -30,7 +30,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(CurlingTrackCandSplitter)
+REG_MODULE(CurlingTrackCandSplitter);
 
 // COULDDO: somehow retrieve the names under which Clusters and TrueHits are stored in the StoreArray (possible?) Or make them a parameter of the module. Otherwise it can happen, that, if more than one StoreArray of XYZCluster is present, all of them get searched, which might be unintended (or even undefined behaviour)
 

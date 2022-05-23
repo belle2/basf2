@@ -26,7 +26,7 @@ using namespace std;
 using namespace Belle2;
 using namespace ECL;
 
-REG_MODULE(ECLPacker)
+REG_MODULE(ECLPacker);
 
 ECLPackerModule::ECLPackerModule() :
   m_bufPos(0),
@@ -50,8 +50,8 @@ ECLPackerModule::ECLPackerModule() :
   addParam("CompressMode", m_compressMode, "compress mode for ADC samples", true);
   addParam("AmpThreshold", m_ampThreshold, "Amplitude threshold", -50);
   addParam("PackWfRareFactor", m_WaveformRareFactor, "Pack ADC samples for one of N events. No waveform is packed if 0", 100);
-
-  m_EvtNum = 0;
+  addParam("Pcie40Data",  m_pcie40Data,
+           "If true: pack data as if sent from PCIe40 boards. Otherwise: pack data as if sent from COPPERs", false);
 }
 
 ECLPackerModule::~ECLPackerModule()
@@ -83,6 +83,11 @@ void ECLPackerModule::beginRun()
 
 void ECLPackerModule::event()
 {
+  if (m_eventMetaData.isValid()) {
+    m_EvtNum = m_eventMetaData->getEvent();
+  } else {
+    m_EvtNum = -1;
+  }
 
   B2DEBUG(50, "EclPacker:: event called ");
   // output data
@@ -185,29 +190,57 @@ void ECLPackerModule::event()
   B2DEBUG(100, "EclPacker:: proceed COPPERs... ");
   B2DEBUG(100, "EclPacker:: ECL_COPPERS = " << ECL_COPPERS);
 
+  //Set the number of nodes
+  int max_nodes;
+  if (m_pcie40Data) {
+    max_nodes = 3;
+  } else {
+    max_nodes = ECL_COPPERS;
+  }
+  const static int max_channels = MAX_PCIE40_CH;
+
   //cycle over all coppers
-  for (iCOPPER = 1; iCOPPER <= ECL_COPPERS; iCOPPER++) {
+  for (iCOPPER = 1; iCOPPER <= max_nodes; iCOPPER++) {
+    std::vector <unsigned int> buff[max_channels];
+    int channels_count;
+    if (m_pcie40Data) {
+      channels_count = iCOPPER < 3 ? 18 : 16;
+    } else {
+      channels_count = 2;
+    }
 
-    std::vector <unsigned int> buff[ECL_FINESSES_IN_COPPER];
-    for (int i = 0; i < ECL_FINESSES_IN_COPPER; i++) buff[i].clear();
+    for (int i = 0; i < max_channels; i++) buff[i].clear();
 
-    int iCOPPERNode = (iCOPPER <= ECL_BARREL_COPPERS) ? BECL_ID + iCOPPER : EECL_ID + iCOPPER - ECL_BARREL_COPPERS;
+    int iCOPPERNode;
+    if (m_pcie40Data) {
+      iCOPPERNode = BECL_ID + iCOPPER;
+    } else {
+      iCOPPERNode = (iCOPPER <= ECL_BARREL_COPPERS) ? BECL_ID + iCOPPER : EECL_ID + iCOPPER - ECL_BARREL_COPPERS;
+    }
+
+    bool skipNode = true;
 
     //check if at least one of FINESSES have hits
-    int icr1 = m_eclMapper.getCrateID(iCOPPERNode, 0);
-    int icr2 = m_eclMapper.getCrateID(iCOPPERNode, 1);
-    B2DEBUG(200, "iCOPPERNode = 0x" << std::hex << iCOPPERNode << std::dec << " nCrate1 = " << icr1 << " nCrate2 = " << icr2);
-    if (!(collectorMaskArray[icr1 - 1] || collectorMaskArray[icr2 - 1])) continue;
+    for (int i = 0; i < channels_count; i++) {
+      int icr = m_eclMapper.getCrateID(iCOPPERNode, i, m_pcie40Data);
+      B2DEBUG(200, "iCOPPERNode = 0x" << std::hex << iCOPPERNode << std::dec << " nCrate = " << icr);
+      if (!collectorMaskArray[icr - 1]) continue;
+      skipNode = false;
+      break;
+    }
+
+    if (skipNode) continue;
 
     rawcprpacker_info.node_id = iCOPPERNode;
+
     // Create RawECL object
 
-    int nwords[2] = {0, 0};
+    int nwords[max_channels] = {0, 0};
     const int finesseHeaderNWords = 3;
 
     //cycle over finesses in copper
-    for (iFINESSE = 0; iFINESSE < ECL_FINESSES_IN_COPPER; iFINESSE++) {
-      iCrate = m_eclMapper.getCrateID(iCOPPERNode, iFINESSE);
+    for (iFINESSE = 0; iFINESSE < channels_count; iFINESSE++) {
+      iCrate = m_eclMapper.getCrateID(iCOPPERNode, iFINESSE, m_pcie40Data);
 
       nShapers = m_eclMapper.getNShapersInCrate(iCrate);
       if (!nShapers) B2ERROR("Ecl packer:: Wrong shapers number " << nShapers);
@@ -282,7 +315,7 @@ void ECLPackerModule::event()
             // pack time
             tim = m_eclDigits[i_digit]->getTimeFit();
           }
-          unsigned int hit_data = ((qua & 3) << 30) & 0xC0000000;
+          unsigned int hit_data = ((unsigned int)(qua & 3) << 30) & 0xC0000000;
           hit_data |= (tim & 0xFFF) << 18;
           hit_data |= ((amp + 128) & 0x3FFFF);
           buff[iFINESSE].push_back(hit_data);
@@ -292,7 +325,7 @@ void ECLPackerModule::event()
 
         for (int i = 0; i < ECL_CHANNELS_IN_SHAPER; i++) adcBuffer_temp[i] = 0;
         resetBuffPosition();
-        setBuffLength(ECL_ADC_SAMPLES_PER_CHANNEL * ECL_CHANNELS_IN_SHAPER);
+        setBuffLength(static_cast<int>(ECL_ADC_SAMPLES_PER_CHANNEL) * static_cast<int>(ECL_CHANNELS_IN_SHAPER));
         for (iChannel = 1; iChannel <= ECL_CHANNELS_IN_SHAPER; iChannel++) {
           int cid = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
           if (cid < 1) continue;
@@ -350,23 +383,37 @@ void ECLPackerModule::event()
 
     RawECL* newRawECL = m_eclRawCOPPERs.appendNew();
 
-    nwords[0] = buff[0].size();
-    nwords[1] = buff[1].size();
+    for (int i = 0; i < channels_count; i++) {
+      nwords[i] = buff[i].size();
 
-    buff[0][0] |= (nwords[0] - finesseHeaderNWords) * 4;
-    buff[1][0] |= (nwords[1] - finesseHeaderNWords) * 4;
+      buff[i][0] |= (nwords[i] - finesseHeaderNWords) * 4;
+    }
 
     B2DEBUG(100, "**** iEvt = " << m_EvtNum << " node= " << iCOPPERNode);
-    for (unsigned int i = 0; i < 2; i++)
+    for (int i = 0; i < channels_count; i++)
       for (unsigned int j = 0; j < buff[i].size(); j++) {
         B2DEBUG(210, ">> " << std::hex << setfill('0') << setw(8) << buff[i][j]);
       }
 
     B2DEBUG(100, "Call PackDetectorBuf");
-    newRawECL->PackDetectorBuf((int*)buff[0].data(), nwords[0], (int*)buff[1].data(), nwords[1],
-                               nullptr, 0, nullptr, 0, rawcprpacker_info);
+    if (m_pcie40Data) {
+      int* pcie40_words[MAX_PCIE40_CH];
+      int pcie40_nwords[MAX_PCIE40_CH] = {};
+
+      for (int i = 0; i < channels_count; i++) {
+        pcie40_nwords[i] = nwords[i];
+        pcie40_words[i] = new int[ nwords[i] ];
+        for (int j = 0; j < nwords[i]; j++) {
+          pcie40_words[i][j] = buff[i][j];
+        }
+      }
+
+      newRawECL->PackDetectorBuf(pcie40_words, pcie40_nwords, rawcprpacker_info);
+    } else { // COPPER data
+      newRawECL->PackDetectorBuf((int*)buff[0].data(), nwords[0], (int*)buff[1].data(), nwords[1],
+                                 nullptr, 0, nullptr, 0, rawcprpacker_info);
+    }
   }
-  m_EvtNum++;
 }
 
 void ECLPackerModule::endRun()
@@ -393,12 +440,12 @@ void ECLPackerModule::writeNBits(unsigned int* buff, unsigned int value, unsigne
 {
   if (!bitsToWrite) return;
 
-  if (value > (unsigned int)(1 << bitsToWrite) - 1) {
+  if (bitsToWrite > sizeof(value) * 8) {
     B2ERROR("Error compressing ADC samples: tying to write too long word");
     throw Write_adc_samples_error();
   }
 
-  if (m_bitPos + bitsToWrite > 32)
+  if (m_bitPos + bitsToWrite > 32) {
     if (m_bufPos == m_bufLength) {
       B2ERROR("Error compressing ADC samples: unexpectedly reach end of buffer");
       throw Write_adc_samples_error();
@@ -411,7 +458,7 @@ void ECLPackerModule::writeNBits(unsigned int* buff, unsigned int value, unsigne
       m_bitPos += bitsToWrite;
       m_bitPos -= 32;
     }
-  else {
+  } else {
     unsigned tmpval = (1 << m_bitPos) - 1;
     buff[m_bufPos] &= tmpval;
     buff[m_bufPos] += value << m_bitPos;

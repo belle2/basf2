@@ -224,6 +224,19 @@ namespace Belle2 {
       return x + (x >> 16);
     }
 
+    /**
+     * Returns the name of the front-end
+     * @param raw raw data
+     * @param finesse finesse number
+     * @return front-end name
+     */
+    std::string getFrontEndName(RawTOP& raw, int finesse) const;
+
+    /**
+     * Error messages suppression logic
+     * @return true to print the error message, false to suppress it
+     */
+    bool printTheError();
 
     /**
      * Unpack raw data given in a tentative production format (will vanish in future)
@@ -268,21 +281,20 @@ namespace Belle2 {
      */
     int unpackProdDebug(const int* buffer, int bufferSize, TOP::RawDataType dataFormat, bool pedestalSubtracted);
 
+    // module steering parameters
+
     std::string m_inputRawDataName;  /**< name of RawTOP store array */
     std::string m_outputDigitsName;  /**< name of TOPDigit store array */
     std::string m_outputRawDigitsName;  /**< name of TOPRawDigit store array */
     std::string m_outputWaveformsName;  /**< name of TOPRawWaveform store array */
     std::string m_templateFitResultName; /**< name of TOPTemplateFitResult store array */
-
-    std::map<int, int> m_channelStatistics; /**<counts how many different channels have been parsed in a given SCROD packet */
-
-    bool m_swapBytes = false;     /**< if true, swap bytes */
-    int m_dataFormat = 0;         /**< data format */
-    bool m_addRelations = false;  /**< switch ON/OFF relations to TOPProductionHitDebugs */
-
-    TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance(); /**< geometry param */
+    bool m_swapBytes;  /**< if true, swap bytes */
+    int m_dataFormat;  /**< data format */
+    bool m_addRelations;  /**< switch ON/OFF relations to TOPProductionHitDebugs */
+    unsigned m_errorSuppressFactor; /**< error messages suppression factor */
 
     // collections
+
     StoreArray<RawTOP> m_rawData;  /**< collection of raw data */
     StoreArray<TOPDigit> m_digits;   /**< collection of digits */
     StoreArray<TOPRawDigit> m_rawDigits;   /**< collection of raw digits */
@@ -292,6 +304,15 @@ namespace Belle2 {
     StoreArray<TOPProductionEventDebug> m_productionEventDebugs;   /**< collection of event debug data */
     StoreArray<TOPProductionHitDebug> m_productionHitDebugs;   /**< collection of hit debug data */
     StoreArray<TOPTemplateFitResult> m_templateFitResults;   /**< collection of template fit results */
+
+    // other
+
+    unsigned m_eventCount = 0;    /**< event count since last printed error message */
+    unsigned m_errorCount = 0;    /**< error messages count within single event */
+    bool m_resetEventCount = false; /**< request for event count reset */
+    unsigned m_numErrors = 0; /**< number of error messages per event */
+    TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance(); /**< geometry param */
+    std::map<int, int> m_channelStatistics; /**<counts how many different channels have been parsed in a given SCROD packet */
 
   };
 

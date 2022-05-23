@@ -21,7 +21,7 @@ using boost::format;
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(TrackDQM)
+REG_MODULE(TrackDQM);
 
 //-----------------------------------------------------------------
 //                 Implementation

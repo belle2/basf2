@@ -16,7 +16,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(VXDQETrainingDataCollector)
+REG_MODULE(VXDQETrainingDataCollector);
 
 VXDQETrainingDataCollectorModule::VXDQETrainingDataCollectorModule() : Module()
 {

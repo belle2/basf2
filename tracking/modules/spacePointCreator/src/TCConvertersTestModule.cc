@@ -18,7 +18,7 @@
 using namespace Belle2;
 using namespace std;
 
-REG_MODULE(TCConvertersTest)
+REG_MODULE(TCConvertersTest);
 
 TCConvertersTestModule::TCConvertersTestModule() :
   Module()

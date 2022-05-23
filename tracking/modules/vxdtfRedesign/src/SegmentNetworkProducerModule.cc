@@ -16,7 +16,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(SegmentNetworkProducer)
+REG_MODULE(SegmentNetworkProducer);
 
 SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
 {
@@ -83,12 +83,12 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            m_PARAMmaxNetworkSize);
 
   addParam("maxConnections",
-           m_PARAMmaxSegmentConnections ,
+           m_PARAMmaxSegmentConnections,
            "Maximal number of Segment connections; if exceeded, the event execution will be skipped.",
            m_PARAMmaxSegmentConnections);
 
   addParam("maxAddedConnections",
-           m_PARAMmaxSegmentAddedConnections ,
+           m_PARAMmaxSegmentAddedConnections,
            "Maximal number of added Segment connections; if exceeded, the event execution will be skipped.",
            m_PARAMmaxSegmentAddedConnections);
 
@@ -205,7 +205,7 @@ std::vector<SegmentNetworkProducerModule::RawSectorData> SegmentNetworkProducerM
 
       // if secID not in collectedData:
       if (iter == collectedData.end()) {
-        collectedData.push_back({ foundSecID , false, nullptr, sectorFound, { & (trackNodes.back())}});
+        collectedData.push_back({ foundSecID, false, nullptr, sectorFound, { & (trackNodes.back())}});
         nCollected++;
       } else {
         iter->hits.push_back(&(trackNodes.back()));

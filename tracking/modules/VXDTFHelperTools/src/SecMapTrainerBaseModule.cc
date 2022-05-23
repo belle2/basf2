@@ -19,7 +19,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SecMapTrainerBase)
+REG_MODULE(SecMapTrainerBase);
 
 //-----------------------------------------------------------------
 //                 Implementation

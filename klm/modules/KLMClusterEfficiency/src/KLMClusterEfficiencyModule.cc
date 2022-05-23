@@ -23,7 +23,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(KLMClusterEfficiency)
+REG_MODULE(KLMClusterEfficiency);
 
 KLMClusterEfficiencyModule::KLMClusterEfficiencyModule() : Module(),
   m_OutputFile(nullptr), m_ClusterTree(nullptr), m_ReconstructionTree(nullptr),

@@ -66,8 +66,8 @@ void AsicBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
     auto asicID = pair<int, int>(board, channel / 8);  // ASIC are groups of 8 channels
     groupedByAsic[asicID].push_back(&wireHit);
   };
-  for (auto& [asicID, asicList] :  groupedByAsic) {
-    applyAsicFilter(asicList);
+  for (auto& asicList :  groupedByAsic) {
+    applyAsicFilter(asicList.second);
   };
 
   return;
@@ -136,7 +136,7 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
   int adcOffMedian = 0;
   for (auto& hit : wireHits) {
     int adc = hit->getHit()->getADCCount();
-    if (abs(hit->getHit()->getTDCCount() - median) < m_deviation_from_median) {
+    if (fabs(hit->getHit()->getTDCCount() - median) < m_deviation_from_median) {
       nbg++;
       if (adc > adcOnMedian) adcOnMedian = adc;
     } else {
@@ -152,7 +152,7 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
 
     // mark hits too close to the median time as background:
     for (auto& hit : wireHits) {
-      if (abs(hit->getHit()->getTDCCount() - median) < m_deviation_from_median) {
+      if (fabs(hit->getHit()->getTDCCount() - median) < m_deviation_from_median) {
         (*hit)->setBackgroundFlag();
         (*hit)->setTakenFlag();
       }

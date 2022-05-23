@@ -148,7 +148,7 @@ namespace Belle2 {
              m_bias[ tb % nTriggerBins ];
     };
     /** implementation of pol1 TB dep error*/
-    double pol1TBdepErr(double , double raw_timeErr, int tb) const
+    double pol1TBdepErr(double, double raw_timeErr, int tb) const
     {
       return raw_timeErr * m_scale[ tb % nTriggerBins];
     };

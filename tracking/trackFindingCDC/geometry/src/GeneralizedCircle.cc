@@ -95,7 +95,7 @@ void GeneralizedCircle::setCenterAndRadius(const Vector2D& center,
                                            const double absRadius,
                                            const ERotation orientation)
 {
-  double curvature = orientation / fabs(absRadius);
+  double curvature = static_cast<double>(orientation) / fabs(absRadius);
   setN0((center.normSquared() - absRadius * absRadius) * curvature / 2.0);
   setN1(-center.x() * curvature);
   setN2(-center.y() * curvature);
@@ -253,7 +253,7 @@ double GeneralizedCircle::arcLengthBetween(const Vector2D& from, const Vector2D&
   Vector2D closestAtTo = closest(to);
   double directDistance = closestAtFrom.distance(closestAtTo);
 
-  return lengthSign * arcLengthFactor(directDistance) * directDistance;
+  return static_cast<double>(lengthSign) * arcLengthFactor(directDistance) * directDistance;
 }
 
 double GeneralizedCircle::arcLengthTo(const Vector2D& to) const
@@ -270,7 +270,7 @@ double GeneralizedCircle::arcLengthTo(const Vector2D& to) const
   Vector2D closestAtTo = closest(to);
   double directDistance = closestAtFrom.distance(closestAtTo);
 
-  return lengthSign * arcLengthFactor(directDistance) * directDistance;
+  return static_cast<double>(lengthSign) * arcLengthFactor(directDistance) * directDistance;
 }
 
 double GeneralizedCircle::arcLengthToCylindricalR(const double cylindricalR) const

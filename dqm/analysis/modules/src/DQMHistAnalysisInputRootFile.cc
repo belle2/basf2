@@ -26,7 +26,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisInputRootFile)
+REG_MODULE(DQMHistAnalysisInputRootFile);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -36,14 +36,14 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  addParam("FileList", m_file_list, "List of input files" , std::vector<std::string> {"input_histo.root"});
+  addParam("FileList", m_file_list, "List of input files", std::vector<std::string> {"input_histo.root"});
   addParam("SelectHistograms", m_histograms, "List of histogram name patterns, empty for all. Support wildcard matching (* and ?).",
            std::vector<std::string>());
-  addParam("Experiment", m_expno, "Experiment Nr" , 7u);
-  addParam("RunList", m_run_list, "Run Number List" , std::vector<unsigned int> {1u});
-  addParam("EventsList", m_events_list, "Number of events for each run" , std::vector<unsigned int> {10u});
-  addParam("EventInterval", m_interval, "Time between events (seconds)" , 20u);
-  addParam("NullHistogramMode", m_null_histo_mode, "Test mode for null histograms" , false);
+  addParam("Experiment", m_expno, "Experiment Nr", 7u);
+  addParam("RunList", m_run_list, "Run Number List", std::vector<unsigned int> {1u});
+  addParam("EventsList", m_events_list, "Number of events for each run", std::vector<unsigned int> {10u});
+  addParam("EventInterval", m_interval, "Time between events (seconds)", 20u);
+  addParam("NullHistogramMode", m_null_histo_mode, "Test mode for null histograms", false);
   addParam("AutoCanvas", m_autocanvas, "Automatic creation of canvas", true);
   B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
 }

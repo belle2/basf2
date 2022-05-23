@@ -15,14 +15,16 @@ namespace Belle2 {
   namespace TOP {
 
     RaytracerBase::BarSegment::BarSegment(const TOPGeoBarSegment& bar, double zLeft):
-      A(bar.getWidth()), B(bar.getThickness()), zL(zLeft), reflectivity(bar.getSurfaceReflectivity(3.0))
+      A(bar.getWidth()), B(bar.getThickness()), zL(zLeft), reflectivity(bar.getSurfaceReflectivity(3.0)),
+      sigmaAlpha(bar.getSigmaAlpha())
     {
       zR = zL + bar.getFullLength();
     }
 
 
     RaytracerBase::BarSegment::BarSegment(const TOPGeoModule& module):
-      A(module.getBarWidth()), B(module.getBarThickness()), reflectivity(module.getSurfaceReflectivity(3.0))
+      A(module.getBarWidth()), B(module.getBarThickness()), reflectivity(module.getSurfaceReflectivity(3.0)),
+      sigmaAlpha(module.getSigmaAlpha())
 
     {
       zL = -module.getBarLength() / 2;

@@ -29,6 +29,7 @@ import copy
 
 
 if __name__ == "__main__":
+
     training_data = basf2_mva.vector("train.root")
     test_data = basf2_mva.vector("test.root")
 
@@ -41,7 +42,7 @@ if __name__ == "__main__":
                  'daughter(0, dz)', 'daughter(1, dz)',
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
                  'daughter(0, kaonID)', 'daughter(0, pionID)',
-                 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
+                 'daughterInvM(0, 1)', 'daughterInvM(0, 2)', 'daughterInvM(1, 2)']
 
     # Train model with default parameters
     general_options = basf2_mva.GeneralOptions()

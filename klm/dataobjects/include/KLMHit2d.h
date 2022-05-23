@@ -37,7 +37,7 @@ namespace Belle2 {
 
     /**
      * Constructor from KLMDigit (EKLM).
-     * @param[in] s1 One of KLMDigits.
+     * @param[in] digit One of KLMDigits.
      */
     explicit KLMHit2d(KLMDigit* digit);
 
@@ -143,7 +143,8 @@ namespace Belle2 {
      */
     bool inRPC() const
     {
-      return m_Layer >= BKLMElementNumbers::c_FirstRPCLayer;
+      return (m_Subdetector == KLMElementNumbers::c_BKLM) &&
+             (m_Layer >= BKLMElementNumbers::c_FirstRPCLayer);
     }
 
     /**
@@ -356,7 +357,7 @@ namespace Belle2 {
 
     /**
      * Determine whether this 2D hit is associated with
-     * a BKLM stand-alone track
+     * a BKLM stand-alone track.
      */
     bool isOnStaTrack() const
     {
@@ -364,7 +365,7 @@ namespace Belle2 {
     }
 
     /**
-     * Set whether this 2D hit is associated with a BKLM stand-alone track
+     * Set whether this 2D hit is associated with a BKLM stand-alone track.
      */
     void isOnStaTrack(bool onStaTrack)
     {

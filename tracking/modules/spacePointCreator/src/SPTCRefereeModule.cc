@@ -24,7 +24,7 @@
 using namespace Belle2;
 using namespace std;
 
-REG_MODULE(SPTCReferee) // register the module
+REG_MODULE(SPTCReferee); // register the module
 
 SPTCRefereeModule::SPTCRefereeModule() : Module()
 {
@@ -597,16 +597,20 @@ bool SPTCRefereeModule::getDirOfFlightTrueHit(const Belle2::SpacePoint* spacePoi
 {
   TrueHitType* trueHit = spacePoint->template getRelatedTo<TrueHitType>("ALL"); // COULDDO: search only certain arrays
 
-  if (trueHit == nullptr) { B2ERROR("Found no TrueHit to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName()); }
+  if (trueHit == nullptr) {B2FATAL("Found no TrueHit to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName()); }
 
   // get SensorId - needed for transforming local to global coordinates
+  // cppcheck-suppress nullPointerRedundantCheck
   VxdID vxdID = trueHit->getSensorID();
 
   const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
+  // cppcheck-suppress nullPointerRedundantCheck
   B2Vector3F position = sensorInfoBase.pointToGlobal(B2Vector3F(trueHit->getU(), trueHit->getV(), 0), true); // global position
+  // cppcheck-suppress nullPointerRedundantCheck
   B2Vector3F momentum = sensorInfoBase.vectorToGlobal(trueHit->getMomentum(), true); // global momentum
 
   B2DEBUG(20, "Getting the direction of flight for SpacePoint " << spacePoint->getArrayIndex() << ", related to TrueHit " <<
+          // cppcheck-suppress nullPointerRedundantCheck
           trueHit->getArrayIndex() << ". Both are on Sensor " << vxdID << ". (TrueHit) Position: (" << position.x() << "," << position.y() <<
           "," << position.z() << "), (TrueHit) Momentum: (" << momentum.x() << "," << momentum.y() << "," << momentum.z() << ")");
 

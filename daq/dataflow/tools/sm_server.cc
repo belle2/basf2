@@ -18,6 +18,11 @@ using namespace Belle2;
 
 int main(int argc, char** argv)
 {
+  if (argc < 2) {
+    printf("Wrong number of arguments\n");
+    return 1;
+  }
+
   // Open socket to accept connection
   SocketRecv recsock((unsigned short)(atoi(argv[1])));
 
@@ -34,12 +39,13 @@ int main(int argc, char** argv)
     } else if (is == 1) {
       int datbuf;
       vector<int>& socklist = sockman.connected_socket_list();
-      printf("no. of connected sockets = %d\n", socklist.size());
+      printf("no. of connected sockets = %lu\n", socklist.size());
       for (vector<int>::iterator it = socklist.begin(); it != socklist.end(); ++it) {
         int fd = *it;
-        int is = read(fd, &datbuf, 4);
-        printf("Data read from sock %d (%d), ret = %d\n", fd, count++, is);
+        int isNow = read(fd, &datbuf, 4);
+        printf("Data read from sock %d (%d), ret = %d\n", fd, count++, isNow);
       }
     }
   }
+  return 0;
 }

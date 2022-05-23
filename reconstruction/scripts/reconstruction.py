@@ -510,7 +510,8 @@ def add_cdst_output(
     filename='cdst.root',
     additionalBranches=None,
     dataDescription=None,
-    ignoreInputModulesCheck=False
+    ignoreInputModulesCheck=False,
+    fullGrid=True
 ):
     """
     This function adds the `RootOutput` module to a path with the settings needed to produce a cDST output.
@@ -552,9 +553,10 @@ def add_cdst_output(
     if additionalBranches is not None:
         branches += additionalBranches
 
-    # By default, the FullGrid module is not used in the reconstruction chain.
-    # It is needed for detectors that perform post-trakcing calibration with respect to CDC EventT0 using cDST
-    path.add_module("FullGridChi2TrackTimeExtractor")
+    if fullGrid:
+        # By default, the FullGrid module is not used in the reconstruction chain.
+        # It is needed for detectors that perform post-trakcing calibration with respect to CDC EventT0 using cDST
+        path.add_module("FullGridChi2TrackTimeExtractor")
 
     return path.add_module("RootOutput", outputFileName=filename, branchNames=branches,
                            branchNamesPersistent=persistentBranches, additionalDataDescription=dataDescription)

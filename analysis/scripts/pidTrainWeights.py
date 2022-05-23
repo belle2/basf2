@@ -371,7 +371,7 @@ def train_model(args, use_tqdm=True):
     print(f"Model saved to {args.output}.")
 
 
-def parse():
+def get_parser():
     """Handles the command-line argument parsing.
 
     Returns:
@@ -386,7 +386,7 @@ def parse():
     ap.add_argument(
         "output",
         type=str,
-        help="Output filename where model will be saved (should be .pt).",
+        help="Output filename where model will be saved (should end in .pt).",
     )
     ap.add_argument(
         "-n",
@@ -397,7 +397,8 @@ def parse():
     )
     ap.add_argument(
         "--p_lims",
-        nargs="2",
+        nargs=2,
+        default=[-float('inf'), +float('inf')],
         help=(
             "Lower and upper limits for momentum in GeV. Lower limit "
             "should be given first. Default values are -inf, +inf."
@@ -405,7 +406,8 @@ def parse():
     )
     ap.add_argument(
         "--theta_lims",
-        nargs="2",
+        nargs=2,
+        default=[-float('inf'), +float('inf')],
         help=(
             "Lower and upper limits for theta in degrees. Lower limit "
             "should be given first. Default values are -inf, +inf."
@@ -455,8 +457,10 @@ def parse():
             "the loss function. Defaults to 0.1."
         ),
     )
-    args = ap.parse_args()
+    return ap
 
+
+def validate_args(args):
     # validate some values
     assert args.n_epochs > 0, "Number of epochs must be larger than 0."
     assert args.p_lims[0] < args.p_lims[1], "p_lims: lower limit must be < upper limit."
@@ -476,7 +480,8 @@ def parse():
 def main():
     """Main network training logic."""
 
-    args = parse()
+    args = get_parser().parse_args()
+    args = validate_args(args)
 
     print("Welcome to the network trainer.")
     print(f"Data will be read from {args.input}.")

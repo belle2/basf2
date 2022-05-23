@@ -132,22 +132,26 @@ void CDCUnpackerModule::event()
       int nWords[48];
       int* data32tab[48];
       int MaxNumOfCh = m_rawCDCs[i]->GetMaxNumOfCh(j);
-      if (MaxNumOfCh != 48 && MaxNumOfCh != 4)
+      string readoutName;
+      if (MaxNumOfCh == 4) readoutName = "COPPER";
+      else if (MaxNumOfCh == 48) readoutName = "PCIe40";
+      else
         B2FATAL("CDC UnpackerModule: Invalid value of GetMaxNumOfCh from raw data: " << LogVar("Number of ch: ",
                 m_rawCDCs[i]->GetMaxNumOfCh(j)));
+
       for (int k = 0; k < MaxNumOfCh; ++k) {
         nWords[k] = m_rawCDCs[i]->GetDetectorNwords(j, k);
         data32tab[k] = (int*)m_rawCDCs[i]->GetDetectorBuffer(j, k);
       }
 
       //
-      // Search Data from Finess 0->MaxNumOfCh (4/48).
+      // Search Data from Finess 0->MaxNumOfCh (4/48 for COPPER/PCIe40).
       //
 
       for (int iFiness = 0; iFiness < MaxNumOfCh; ++iFiness) {
         int* ibuf = data32tab[iFiness];
         const int nWord = nWords[iFiness];
-        B2DEBUG(99, LogVar("nWords (from COPPER header)", nWord));
+        B2DEBUG(99, LogVar("nWords (from " + readoutName + " header)", nWord));
 
         if (m_enablePrintOut == true) {
           B2INFO("CDCUnpacker : Print out CDC data block.");
@@ -178,12 +182,12 @@ void CDCUnpackerModule::event()
 
         if (dataLength != (nWord - c_headearWords)) {
           if (m_dataSizeError == false) {
-            B2ERROR("Inconsistent data size between COPPER and CDC FEE."
+            B2ERROR("Inconsistent data size between " + readoutName + " and CDC FEE."
                     << LogVar("data length", dataLength) << LogVar("nWord", nWord)
                     << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
             m_dataSizeError = true;
           } else {
-            B2WARNING("Inconsistent data size between COPPER and CDC FEE."
+            B2WARNING("Inconsistent data size between " + readoutName + " and CDC FEE."
                       << LogVar("data length", dataLength) << LogVar("nWord", nWord)
                       << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
           }

@@ -173,6 +173,14 @@ namespace Belle2 {
     */
     double getQualityError() const { return m_qualityIndicatorError; }
 
+    /** Set position of the cluster
+    *
+    */
+    void setPosition(const double position)
+    {
+      m_position = position;
+    }
+
     /** Add quality indicator to object.
     *
     */

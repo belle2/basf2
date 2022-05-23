@@ -31,11 +31,12 @@ methods that are provided in the ``pidDataUtils`` module.
    ('cosTheta'), phi ('phi'), and detector log-likelihood data for any particles
    of interest.
 2. For each particle type of interest, identify the tag that serves as a prefix
-   in the column names, and use the ``make_h5()`` file to make a *slim* H5 file
-   containing only the track and log-likelihood information for this particle
-   type. For example, in a D* analysis, the tag for kaons is 'DST_D0_K', and for
-   pions the tags are 'DST_D0_pi' and 'DST_pi'.  There are two nuances here to
-   beware of, however.
+   in the column names, and use the ``make_h5()`` method to make a *slim* H5
+   file containing only the track and log-likelihood information for this
+   particle type. For example, in a D* analysis, the tag for kaons is
+   'DST_D0_K', and for pions the tags are 'DST_D0_pi' and 'DST_pi'.  There are
+   two nuances here to beware of, however.
+
    1. If your DataFrame is from simulation and contains the 'mcPDG' column, you 
       can provide the argument ``pdg=None`` and the 'pdg' column in the HDF5
       file will be filled with the 'mcPDG' data. However, if you'd prefer to use
@@ -49,6 +50,7 @@ methods that are provided in the ``pidDataUtils`` module.
       two arguments: the particle name ('e', 'mu', 'pi', 'K', 'p', 'd') and the
       detector name ('SVD', 'CDC', 'TOP', 'ARICH', 'ECL', 'KLM'). It should
       return the corresponding detector log-likelihood column name as a string.
+
 3. Once slim H5 files are made for each particle type, merge them together using
    the ``merge_h5s()`` method. This method has a ``pdgs`` argument. If
    ``pdgs=None``, the method will simply use the values from the 'pdg' columns
@@ -64,7 +66,9 @@ methods that are provided in the ``pidDataUtils`` module.
    renormalized if not.
 
 Here is an example code snippet which we used to do this for a D* dataset.
+
 .. code-block:: python
+
     import pidDataUtils as pdu
 
     df = pdu.read_root(['dstar_1.root', 'dstar_2.root'])
@@ -79,7 +83,9 @@ Training the Weights
 
 To train the weights, we provide a script: ``pidTrainWeights.py``. It can be run
 using
+
 .. code-block:: bash
+
     python3 pidTrainWeights.py data/ models/net.pt -n 100
 
 In this snippet, we assume that ``split_h5()`` has been run and the output files
@@ -101,6 +107,7 @@ and 1.5 GeV and theta between 15 and 45 degrees, one could add the arguments
 One can also start training from an existing checkpoint with this script by
 using the ``--resume`` argument. There are three cases to consider with this
 argument.
+
 1. Omitting ``--resume`` means that a fresh set of weights will be trained
    and written to the output filepath, overwriting any existing model at that
    location.
@@ -122,6 +129,15 @@ computations, we can specify ``--only 211 321`` to zero and freeze the weights
 for the other hypotheses. Not specifying ``--only`` means that all particle
 types will be used.
 
+Below, you can find the full documentation for this script.
+
+.. argparse::
+    :filename: analysis/scripts/pidTrainWeights.py
+    :func: get_parser
+    :prog: pidTrainWeights.py
+    :nodefault:
+
+
 
 Applying Weights to Data for Performance Analysis
 -------------------------------------------------
@@ -140,6 +156,7 @@ look like.
    likelihood ratios, single-detector and ablation PID, contribution metrics,
    and more. It does, however, have several arguments and features to be aware
    of.
+
    1. The weights are specified with the ``weights`` keyword argument. This 
       argument expects a six-by-six NumPy array (which could be obtained by
       using ``np.load()`` on the ``_wgt.npy`` file produced during training) or

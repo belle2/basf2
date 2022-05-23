@@ -92,7 +92,7 @@ void TrackIsoCalculatorModule::event()
     for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
       Particle* jParticle = m_pListReference->getParticle(jPart);
 
-      // Skip iff same particle.
+      // Skip if same particle.
       if (iParticle->getMdstArrayIndex() == jParticle->getMdstArrayIndex()) {
         continue;
       }
@@ -215,7 +215,7 @@ double TrackIsoCalculatorModule::getDistAtDetSurface(Particle* iParticle, Partic
     if (m_isSurfaceInDet["ECL"] || m_isSurfaceInDet["KLM"]) {
 
       // For ECL and KLM, we require track pairs to be both in the barrel,
-      // both in the FWD endcap, or both in the FWD backward. Otherwise, the distance is undefined.
+      // both in the FWD endcap, or both in the FWD endcap. Otherwise, the distance is undefined.
       if (
         !(iExtInBarrel && jExtInBarrel) &&
         !(iExtInFWDEndcap && jExtInFWDEndcap) &&

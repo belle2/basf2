@@ -1,3 +1,4 @@
+[INFO] Steering file: framework/tests/test_tag_merge.py
 [INFO] Obtaining list of iovs for globaltag main_tag_merge_test_1
   KLMStripEfficiency r2587 (5, 0, 5, 9)
   KLMStripEfficiency r2553 (5, 0, 5, 200)

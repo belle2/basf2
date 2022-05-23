@@ -54,21 +54,18 @@ ROOT::Math::XYZVector KLMClusterShape::getPrimaryVector()
 {
   ROOT::Math::XYZVector output(m_primaryVec[0], m_primaryVec[1], m_primaryVec[2]);
   return output;
-
 }
 
 ROOT::Math::XYZVector KLMClusterShape::getSecondaryVector()
 {
   ROOT::Math::XYZVector output(m_secondaryVec[0], m_secondaryVec[1], m_secondaryVec[2]);
   return output;
-
 }
 
 ROOT::Math::XYZVector KLMClusterShape::getTertiaryVector()
 {
   ROOT::Math::XYZVector output(m_tertiaryVec[0], m_tertiaryVec[1], m_tertiaryVec[2]);
   return output;
-
 }
 
 //setters

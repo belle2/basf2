@@ -3439,11 +3439,13 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
         for name in plSet:
             if not decayDescriptor.init(name):
                 raise ValueError("Invalid paritlceLists")
-
-            pdg = abs(decayDescriptor.getMother().getPDGCode())
-            if pdg not in binaryHypoPDGCodes:
-                B2WARNING("Given ParticleList: ", name, " (", pdg, ") is neither signal (", binaryHypoPDGCodes[0],
-                          ") nor background (", binaryHypoPDGCodes[1], ").")
+            pdgs = [abs(decayDescriptor.getMother().getPDGCode())]
+            if '->' in name:
+                pdgs = decayDescriptor.getSelectionPDGCodes()
+            for pdg in pdgs:
+                if pdg not in binaryHypoPDGCodes:
+                    B2WARNING("Given ParticleList: ", name, " (", pdg, ") is neither signal (", binaryHypoPDGCodes[0],
+                              ") nor background (", binaryHypoPDGCodes[1], ").")
 
         chargedpid = register_module("ChargedPidMVA")
         chargedpid.set_name(f"ChargedPidMVA_{binaryHypoPDGCodes[0]}_vs_{binaryHypoPDGCodes[1]}_{mode}")
@@ -3492,7 +3494,10 @@ def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, 
 
     from variables import variables
     if not reference_list_name:
-        reference_list_name = 'pi-:all'
+        if '->' in list_name:
+            reference_list_name = 'pi-:all'
+        else:
+            reference_list_name = f'{list_name.split(":")[0]}:all'
     det_choices = ("CDC", "PID", "ECL", "KLM")
     if any(d not in det_choices for d in detectors):
         B2ERROR("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)

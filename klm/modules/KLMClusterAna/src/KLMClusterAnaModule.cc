@@ -29,6 +29,8 @@
 
 using namespace Belle2;
 
+REG_MODULE(KLMClusterAna);
+
 
 static double expectation(std::vector<double> vec)
 {
@@ -162,8 +164,6 @@ static TMatrixT<double> spatialVariances(std::vector<double> xcoord, std::vector
 
 
 //Code for Module
-
-REG_MODULE(KLMClusterAna)
 
 KLMClusterAnaModule::KLMClusterAnaModule() : Module()
 {

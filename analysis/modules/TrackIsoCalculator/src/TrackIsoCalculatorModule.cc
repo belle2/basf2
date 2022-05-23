@@ -30,16 +30,10 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
            "The name of the input ParticleList. Must be a charged stable particle as defined in Const::chargedStableSet.");
   addParam("particleListReference",
            m_pListReferenceName,
-           "The name of the input ParticleList of reference tracks. By default, the :all list of the same particle type with m_pListName is used. "
-           "Must be a charged stable particle as defined in Const::chargedStableSet.",
-           std::string(""));
-  addParam("detectorInnerSurface",
-           m_detInnerSurface,
-           "The name of the detector at whose innermost layer we extrapolate each helix's polar and azimuthal angle. Allowed values: {CDC, PID(=TOP/ARICH), ECL, KLM}.");
-  addParam("use2DRhoPhiDist",
-           m_use2DRhoPhiDist,
-           "If true, will calculate the pair-wise track distance as the cord length on the (rho, phi) projection.",
-           bool(false));
+           "The name of the input ParticleList of reference tracks. Must be a charged stable particle as defined in Const::chargedStableSet.");
+  addParam("detectorSurface",
+           m_detSurface,
+           "The name of the detector at whose inner (cylindrical) surface we extrapolate each helix's polar and azimuthal angle. Allowed values: {CDC, TOP, ARICH, ECL, KLM}.");
 }
 
 TrackIsoCalculatorModule::~TrackIsoCalculatorModule()
@@ -51,26 +45,24 @@ void TrackIsoCalculatorModule::initialize()
 
   m_event_metadata.isRequired();
   m_pList.isRequired(m_pListName);
-
-  if (m_pListReferenceName.empty()) {
-    if (m_pListName.find(':') != std::string::npos)
-      m_pListReferenceName = m_pListName.substr(0, m_pListName.find_first_of(':')) + std::string(":all");
-    else
-      m_pListReferenceName = m_pListName + std::string(":all");
-  }
   m_pListReference.isRequired(m_pListReferenceName);
 
   B2INFO("TrackIsoCalculator module will calculate isolation variables for the ParticleList: " << m_pListName << ", "
          << "Reference ParticleList: " << m_pListReferenceName << ".");
-
-  m_extraInfoName = (!m_use2DRhoPhiDist) ? ("dist3DToClosestTrkAt" + m_detInnerSurface + "Surface") : ("dist2DRhoPhiToClosestTrkAt" +
-                    m_detInnerSurface + "Surface");
 
   if (!isStdChargedList()) {
     B2FATAL("ParticleList: " << m_pListName << " and/or ParticleList: " << m_pListReferenceName <<
             " is not that of a valid particle in Const::chargedStableSet! Aborting...");
   }
 
+  // Define the name of the variable to be stored as extraInfo.
+  m_extraInfoName = "distToClosestTrkAt" + m_detSurface + "_VS_" + m_pListReferenceName;
+
+  m_isSurfaceInDet.insert({"CDC", m_detSurface.find("CDC") != std::string::npos});
+  m_isSurfaceInDet.insert({"TOP", m_detSurface.find("TOP") != std::string::npos});
+  m_isSurfaceInDet.insert({"ARICH", m_detSurface.find("ARICH") != std::string::npos});
+  m_isSurfaceInDet.insert({"ECL", m_detSurface.find("ECL") != std::string::npos});
+  m_isSurfaceInDet.insert({"KLM", m_detSurface.find("KLM") != std::string::npos});
 }
 
 void TrackIsoCalculatorModule::event()
@@ -79,12 +71,14 @@ void TrackIsoCalculatorModule::event()
   const auto nParticles = m_pList->getListSize();
   const auto nParticlesReference = m_pListReference->getListSize();
 
-  B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n" << "nParticles: " << nParticles << "\n"
+  B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n"
+          << "Detector surface: " << m_detSurface << "\n"
+          << "nParticles: " << nParticles << "\n"
           << "nParticlesReference: " << nParticlesReference);
 
   // Store the pair-wise distances in a 2D array.
   // Size is given by the length of the reference particle list.
-  std::vector<double> defaultDistances(nParticlesReference, 1e9);
+  std::vector<double> defaultDistances(nParticlesReference, -1.0);
   // Size is given by the length of the particle list. Each vector (= defaultDistances) has nParticlesReference components.
   // Thus, total size is given by nParticles times nParticlesReference.
   std::vector<std::vector<double>> pairwiseDistances(nParticles, defaultDistances);
@@ -98,20 +92,24 @@ void TrackIsoCalculatorModule::event()
     for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
       Particle* jParticle = m_pListReference->getParticle(jPart);
 
-      if (iParticle->getMdstArrayIndex() == jParticle->getMdstArrayIndex())
+      // Skip iff same particle.
+      if (iParticle->getMdstArrayIndex() == jParticle->getMdstArrayIndex()) {
         continue;
-      if (pairwiseDistances[iPart][jPart] != 1e9)
+      }
+      // Skip if this pair already calculated.
+      if (pairwiseDistances[iPart][jPart] > 0) {
         continue;
+      }
 
       // Calculate the pair-wise distance.
-      double ijDist = (!m_use2DRhoPhiDist) ? this->get3DDistAtDetSurface(iParticle,
-                      jParticle) : this->get2DRhoPhiDistAsChordLength(iParticle, jParticle);
+      const auto ijDist = this->getDistAtDetSurface(iParticle, jParticle);
 
       pairwiseDistances[iPart][jPart] = ijDist;
 
       int jPart_in_inputList = m_pList->getIndex(jParticle);
-      if (jPart_in_inputList != -1)
+      if (jPart_in_inputList != -1) {
         pairwiseDistances[jPart_in_inputList][iPart] = ijDist;
+      }
 
     }
 
@@ -123,16 +121,31 @@ void TrackIsoCalculatorModule::event()
   // For each particle index, find the index of the particle w/ minimal distance in the corresponding row of the 2D array.
   for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
 
-    auto minDist = std::min_element(std::begin(pairwiseDistances[iPart]), std::end(pairwiseDistances[iPart]));
-    auto jPart = std::distance(std::begin(pairwiseDistances[iPart]), minDist);
+    // Remove any NaNs and dummy distances from the row to avoid spoiling the search for the minimum value.
+    std::vector<double> iRow;
+    for (const auto& d : pairwiseDistances[iPart]) {
+      if (std::isnan(d) || d < 0) {
+        continue;
+      }
+      iRow.push_back(d);
+    }
+
+    if (!iRow.size()) {
+      continue;
+    }
+
+    auto minDist = std::min_element(std::begin(iRow), std::end(iRow));
+    auto jPart = std::distance(std::begin(iRow), minDist);
 
     Particle* iParticle = m_pList->getParticle(iPart);
+    Particle* jParticle = m_pListReference->getParticle(jPart);
 
-    B2DEBUG(10, m_extraInfoName << " = " << *minDist << " [cm] - Particle[" << iPart << "]'s closest partner at innermost " <<
-            m_detInnerSurface << " surface is Particle[" << jPart << "]");
+    B2DEBUG(10, "Particle[" << iPart << "]'s (PDG=" << iParticle->getPDGCode() << ") closest partner at innermost " <<
+            m_detSurface << " surface is ReferenceParticle[" << jPart << "] (PDG=" << jParticle->getPDGCode() << ") at D = " <<
+            *minDist << " [cm]");
 
     if (!iParticle->hasExtraInfo(m_extraInfoName)) {
-      B2DEBUG(10, "\tStoring extraInfo for Particle[" << iPart << "]...");
+      B2DEBUG(12, "Storing extraInfo(" << m_extraInfoName << ") for Particle[" << iPart << "]");
       iParticle->writeExtraInfo(m_extraInfoName, *minDist);
     }
   }
@@ -143,13 +156,18 @@ void TrackIsoCalculatorModule::terminate()
 {
 }
 
-double TrackIsoCalculatorModule::get3DDistAtDetSurface(Particle* iParticle, Particle* jParticle)
+double TrackIsoCalculatorModule::getDistAtDetSurface(Particle* iParticle, Particle* jParticle)
 {
 
-  // Radius and z boundaries of the cylinder describing this detector's inner surface.
-  const auto rho = m_detSurfBoundaries[m_detInnerSurface].m_rho;
-  const auto zfwd = m_detSurfBoundaries[m_detInnerSurface].m_zfwd;
-  const auto zbwd = m_detSurfBoundaries[m_detInnerSurface].m_zbwd;
+  // Radius and z boundaries of the cylinder describing this detector's surface.
+  const auto rho = m_detSurfBoundaries[m_detSurface].m_rho;
+  const auto zfwd = m_detSurfBoundaries[m_detSurface].m_zfwd;
+  const auto zbwd = m_detSurfBoundaries[m_detSurface].m_zbwd;
+  // Polar angle boundaries between barrel and endcaps.
+  const auto th_fwd = m_detSurfBoundaries[m_detSurface].m_th_fwd;
+  const auto th_fwd_brl = m_detSurfBoundaries[m_detSurface].m_th_fwd_brl;
+  const auto th_bwd_brl = m_detSurfBoundaries[m_detSurface].m_th_bwd_brl;
+  const auto th_bwd = m_detSurfBoundaries[m_detSurface].m_th_bwd;
 
   std::string nameExtTheta = "helixExtTheta(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
   const auto iExtTheta = std::get<double>(Variable::Manager::Instance().getVariable(nameExtTheta)->function(iParticle));
@@ -159,61 +177,75 @@ double TrackIsoCalculatorModule::get3DDistAtDetSurface(Particle* iParticle, Part
   const auto iExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(nameExtPhi)->function(iParticle));
   const auto jExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(nameExtPhi)->function(jParticle));
 
-  // Ok, we know theta and phi.
-  // Let's extract (spherical) R by using the transformation:
-  //
-  // 1. rho = r * sin(theta)
-  // 2. phi = phi
-  // 3. z = r * cos(theta)
-  //
-  // The formula to be inverted depends on where each extrapolated track's theta is found:
-  // if in barrel, use 1. (rho is known), if in fwd/bwd endcap, use 3. (zfwd/zbwd is known).
+  const auto iExtInBarrel = (iExtTheta >= th_fwd_brl && iExtTheta < th_bwd_brl);
+  const auto jExtInBarrel = (jExtTheta >= th_fwd_brl && jExtTheta < th_bwd_brl);
 
-  const auto th_fwd = m_detSurfBoundaries[m_detInnerSurface].m_th_fwd;
-  const auto th_fwd_brl = m_detSurfBoundaries[m_detInnerSurface].m_th_fwd_brl;
-  const auto th_bwd_brl = m_detSurfBoundaries[m_detInnerSurface].m_th_bwd_brl;
+  const auto iExtInFWDEndcap = (iExtTheta >= th_fwd && iExtTheta < th_fwd_brl);
+  const auto jExtInFWDEndcap = (jExtTheta >= th_fwd && jExtTheta < th_fwd_brl);
 
-  const auto iExtR = (iExtTheta >= th_fwd_brl && iExtTheta < th_bwd_brl) ? rho / sin(iExtTheta) : ((iExtTheta >= th_fwd
-                     && iExtTheta < th_fwd_brl) ? zfwd / cos(iExtTheta) : zbwd / cos(iExtTheta));
-  const auto jExtR = (jExtTheta >= th_fwd_brl && jExtTheta < th_bwd_brl) ? rho / sin(jExtTheta) : ((jExtTheta >= th_fwd
-                     && jExtTheta < th_fwd_brl) ? zfwd / cos(jExtTheta) : zbwd / cos(jExtTheta));
+  const auto iExtInBWDEndcap = (iExtTheta >= th_bwd_brl && iExtTheta < th_bwd);
+  const auto jExtInBWDEndcap = (jExtTheta >= th_bwd_brl && jExtTheta < th_bwd);
 
-  // Now convert r, theta, phi to cartesian coordinates.
-  // 1. x = r * sin(theta) * cos(phi)
-  // 2. y = r * sin(theta) * sin(phi)
-  // 3. z = r * cos(theta)
+  if (m_isSurfaceInDet["CDC"] || m_isSurfaceInDet["TOP"]) {
 
-  const auto iExtX = iExtR * sin(iExtTheta) * cos(iExtPhi);
-  const auto iExtY = iExtR * sin(iExtTheta) * sin(iExtPhi);
-  const auto iExtZ = iExtR * cos(iExtTheta);
+    // If any of the two extrapolated tracks is not in the barrel region of the CDC/TOP, the distance is undefined.
+    if (!iExtInBarrel || !jExtInBarrel) {
+      return std::numeric_limits<double>::quiet_NaN();
+    }
 
-  const auto jExtX = jExtR * sin(jExtTheta) * cos(jExtPhi);
-  const auto jExtY = jExtR * sin(jExtTheta) * sin(jExtPhi);
-  const auto jExtZ = jExtR * cos(jExtTheta);
+    // For CDC and TOP, we calculate the distance between the points where the two input
+    // extraplolated track helices cross the input detector's cylindrical surface
+    // on the (rho, phi) plane. Namely, this is the cord length of the arc
+    // that subtends deltaPhi.
+    auto diffPhi = jExtPhi - iExtPhi;
+    if (std::abs(diffPhi) > M_PI) {
+      diffPhi = (diffPhi > M_PI) ? diffPhi - 2 * M_PI :  2 * M_PI + diffPhi;
+    }
 
-  // Get 3D distance via Pythagoras.
-  return sqrt((iExtX - jExtX) * (iExtX - jExtX) + (iExtY - jExtY) * (iExtY - jExtY) + (iExtZ - jExtZ) * (iExtZ - jExtZ));
-}
+    return 2.0 * rho * sin(std::abs(diffPhi) / 2.0);
 
+  } else {
 
-double TrackIsoCalculatorModule::get2DRhoPhiDistAsChordLength(Particle* iParticle, Particle* jParticle)
-{
+    if (m_isSurfaceInDet["ARICH"]) {
+      // If any of the two tracks is not in the ARICH theta acceptance, the distance is undefined.
+      if (!iExtInFWDEndcap || !jExtInFWDEndcap) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+    }
+    if (m_isSurfaceInDet["ECL"] || m_isSurfaceInDet["KLM"]) {
 
-  // Radius and z boundaries of the cylinder describing this detector's inner surface.
-  const auto rho = m_detSurfBoundaries[m_detInnerSurface].m_rho;
-  const auto zfwd = m_detSurfBoundaries[m_detInnerSurface].m_zfwd;
-  const auto zbwd = m_detSurfBoundaries[m_detInnerSurface].m_zbwd;
+      // For ECL and KLM, we require track pairs to be both in the barrel,
+      // both in the FWD endcap, or both in the FWD backward. Otherwise, the distance is undefined.
+      if (
+        !(iExtInBarrel && jExtInBarrel) &&
+        !(iExtInFWDEndcap && jExtInFWDEndcap) &&
+        !(iExtInBWDEndcap && jExtInBWDEndcap)
+      ) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+    }
 
-  std::string nameExtPhi = "helixExtPhi(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
-  const auto iExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(nameExtPhi)->function(iParticle));
-  const auto jExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(nameExtPhi)->function(jParticle));
+    // Ok, we know theta and phi.
+    // Let's extract (spherical) R by using the transformation:
+    //
+    // 1. rho = r * sin(theta)
+    // 2. phi = phi
+    // 3. z = r * cos(theta)
+    //
+    // The formula to be inverted depends on where each extrapolated track's theta is found:
+    // if in barrel, use 1. (rho is known), if in fwd/bwd endcap, use 3. (zfwd/zbwd is known).
 
-  auto diffPhi = jExtPhi - iExtPhi;
-  if (std::abs(diffPhi) > M_PI) {
-    diffPhi = (diffPhi > M_PI) ? diffPhi - 2 * M_PI :  2 * M_PI + diffPhi;
+    const auto iExtR = (iExtTheta >= th_fwd_brl && iExtTheta < th_bwd_brl) ? rho / sin(iExtTheta) : ((iExtTheta >= th_fwd
+                       && iExtTheta < th_fwd_brl) ? zfwd / cos(iExtTheta) : zbwd / cos(iExtTheta));
+    const auto jExtR = (jExtTheta >= th_fwd_brl && jExtTheta < th_bwd_brl) ? rho / sin(jExtTheta) : ((jExtTheta >= th_fwd
+                       && jExtTheta < th_fwd_brl) ? zfwd / cos(jExtTheta) : zbwd / cos(jExtTheta));
+
+    return sqrt((iExtR * iExtR) + (jExtR * jExtR) - 2 * iExtR * jExtR * (sin(iExtTheta) * sin(jExtTheta) * cos(iExtPhi - jExtPhi)
+                + cos(iExtTheta) * cos(jExtTheta)));
+
   }
 
-  return 2 * rho * sin(std::abs(diffPhi) / 2.0);
+  return std::numeric_limits<double>::quiet_NaN();
 }
 
 bool TrackIsoCalculatorModule::isStdChargedList()

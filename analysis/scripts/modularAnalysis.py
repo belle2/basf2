@@ -3461,50 +3461,80 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     path.add_module(chargedpid)
 
 
-def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, alias=None, reference_list_name=''):
+def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=None):
     """
     Given a list of charged stable particles, compute variables that quantify "isolation" of the associated tracks.
 
-    Currently, a proxy for isolation is defined as the 3D distance (or optionally, a 2D distance projecting on r-phi)
-    of each particle's track to its closest neighbour at a given detector entry surface.
+    Note:
+        Currently, a proxy for isolation is defined as the distance
+        of each particle's track to its closest neighbour, defined as the segment connecting the two tracks
+        intersection points on a given cylindrical surface.
+        The calculation relies on the track helix extrapolation.
+
+    The definition of distance and the number of distances that are calculated per sub-detector is based on
+    the following recipe:
+
+    - CDC: as the segmentation is very coarse along z,
+           the distance is defined as the cord length on the (rho=R, phi) plane.
+           A total of 9 distances are caluclated: the cylindrical surfaces are defined at R values
+           that correspond to the positions of the 9 CDC wire superlayers.
+    - TOP: as there is no segmentation along z,
+           the distance is defined as the cord length on the (rho=R, phi) plane.
+           Only one distance at the TOP entry radius is calculated.
+    - ARICH: as there is no segmentation along z,
+             the distance is defined as the distance on the (rho, phi) plane at fixed z=Z.
+             Only one distance at the ARICH Z entry coordinate is calculated.
+    - ECL: the distance is defined on the (rho=R, phi, z) surface in the barrel,
+           on the (rho, phi, z=Z) surface in the endcaps.
+           Only one distance at the ECL entry radius R (barrel), Z (endcaps) is calculated.
+    - KLM: the distance is defined on the (rho=R, phi, z) surface in the barrel,
+           on the (rho, phi, z=Z) surface in the endcaps.
+           Only one distance at the KLM entry radius R (barrel), Z (endcaps) is calculated.
 
     Parameters:
         list_name (str): name of the input ParticleList.
                          It must be a list of charged stable particles as defined in ``Const::chargedStableSet``.
                          The charge-conjugate ParticleList will be also processed automatically.
         path (basf2.Path): the module is added to this path.
-        use2DRhoPhiDist (Optional[bool]): if true, will calculate the pair-wise track distance
-                                          as the cord length on the (rho, phi) projection.
-                                          By default, a 3D distance is calculated.
-        alias (Optional[str]): An alias to the extraInfo variable computed by the `TrackIsoCalculator` module.
-                               Please note, for each input detector a variable is calculated,
-                               and the detector's name is appended to the alias to distinguish them.
-        *detectors: detectors at whose entry surface track isolation variables will be calculated.
-                    Choose among: "CDC", "PID", "ECL", "KLM" (NB: 'PID' indicates TOP+ARICH entry surface.)
+        *detectors: detectors for which track isolation variables will be calculated.
+                    Choose among: "CDC", "TOP", "ARICH", "ECL", "KLM"
         reference_list_name (Optional[str]): name of the input ParticleList for the reference track.
-                                             By default, the :all ParticleList of the same particle with list_name is used.
+                                             By default, the `:all` ParticleList of the same particle type of `list_name` is used.
                                              It must be a list of charged stable particles, too.
                                              The charge-conjugate ParticleList will be also processed automatically.
+    Returns:
+        aliases (list(str)): a list of aliases for the calculated distance variables.
 
     """
 
-    from variables import variables
+    import variables.utils as vu
 
-    det_choices = ("CDC", "PID", "ECL", "KLM")
+    det_choices = ("CDC", "TOP", "ARICH", "ECL", "KLM")
     if any(d not in det_choices for d in detectors):
         B2ERROR("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)
 
+    det_labels = []
     for det in detectors:
-        path.add_module("TrackIsoCalculator",
-                        particleList=list_name,
-                        detectorInnerSurface=det,
-                        use2DRhoPhiDist=use2DRhoPhiDist,
-                        particleListReference=reference_list_name)
-        if isinstance(alias, str):
-            if not use2DRhoPhiDist:
-                variables.addAlias(f"{alias}{det}", f"extraInfo(dist3DToClosestTrkAt{det}Surface)")
-            else:
-                variables.addAlias(f"{alias}{det}", f"extraInfo(dist2DRhoPhiToClosestTrkAt{det}Surface)")
+        if det == "CDC":
+            det_labels.extend([f"{det}{ilayer}" for ilayer in range(9)])
+        else:
+            det_labels.append(f"{det}0")
+
+    if reference_list_name is None:
+        particle = list_name.split(":")[0][:-1]
+        reference_list_name = f"{particle}+:all"
+
+    suffix = f"_VS_{reference_list_name}"
+    for det in det_labels:
+        trackiso = path.add_module("TrackIsoCalculator",
+                                   particleList=list_name,
+                                   detectorSurface=det,
+                                   particleListReference=reference_list_name)
+        trackiso.set_name(f"TrackIsoCalculator{det}{suffix}")
+
+    aliases = vu.create_aliases([f"distToClosestTrkAt{det}{suffix}" for det in det_labels], "extraInfo({variable})")
+
+    return aliases
 
 
 def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):

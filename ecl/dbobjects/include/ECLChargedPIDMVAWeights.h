@@ -29,6 +29,7 @@
 #include <cmath>
 #include <unordered_map>
 #include <tuple>
+#include <algorithm>
 
 namespace Belle2 {
 
@@ -63,16 +64,20 @@ namespace Belle2 {
      */
     int getLinearisedBinIndex(const std::vector<float> values)
     {
-
-      int globalBin = 0;
+      int globalBin;
       std::vector<int> binIndices = getBinIndices(values);
-      for (unsigned int i; i < (binIndices.size() - 1); i++) {
+      for (unsigned int i = 0; i < binIndices.size(); i++) {
         if (binIndices[i] < 0) return -1;
-        globalBin = (globalBin + binIndices[i]) * m_nBins[i];
+        if (i == 0) {
+          globalBin = binIndices[i];
+        } else {
+          globalBin = globalBin * m_nBins[i] + binIndices[i];
+        }
       }
-      globalBin = globalBin + binIndices[binIndices.size() - 1];
       return globalBin;
     }
+
+  private:
 
     /**
      * Maps the vector of input values to their bin index in N dimensions.
@@ -83,23 +88,22 @@ namespace Belle2 {
     {
       std::vector<int> binIndices(m_binEdges.size());
 
-      for (unsigned int i; i < m_binEdges.size(); i++) {
+      for (unsigned int i = 0; i < m_binEdges.size(); i++) {
         std::vector<float> dimBinEdges = m_binEdges[i];
-        auto it = std::lower_bound(dimBinEdges.begin(), dimBinEdges.end(), values[i]);
-        if (it == dimBinEdges.end() || *it != values[i]) {
+        auto it = std::upper_bound(dimBinEdges.begin(), dimBinEdges.end(), values[i]);
+        if (it == dimBinEdges.end()) {
           binIndices[i] = -1;
         } else {
-          int index = std::distance(dimBinEdges.begin(), it);
+          int index = std::distance(dimBinEdges.begin(), it) - 1;
           binIndices[i] = index;
         }
       }
       return binIndices;
     }
 
-  private:
     /**
-     * Vector of bin edges. One per dimension.
-     */
+    * Vector of bin edges. One per dimension.
+    */
     std::vector<std::vector<float>> m_binEdges;
 
     /**
@@ -401,6 +405,11 @@ namespace Belle2 {
      */
     std::vector<std::string> getBinningVariables() const {return m_binningVariables;}
 
+    /**
+     * set string definitions of the variables used in defining the phasespace categories.
+     * @param binningVariables string definitions of the variables used in defining the phasespace categories.
+     */
+    void setBinningVariables(std::vector<std::string>& binningVariables) {m_binningVariables = binningVariables;}
   private:
     /**
      * An N Dimensional binning whose bins define the boundaries of the categories for which the training is performed.

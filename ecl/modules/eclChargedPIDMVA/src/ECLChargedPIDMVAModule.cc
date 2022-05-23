@@ -298,7 +298,7 @@ std::vector<float> ECLChargedPIDMVAModule::decorrTransformation(const std::vecto
   return decor_scores;
 }
 
-float evaluateVariable(const Variable::Manager::Var* varobj, const Particle* particle)
+float ECLChargedPIDMVAModule::evaluateVariable(const Variable::Manager::Var* varobj, const Particle* particle)
 {
   float val = std::numeric_limits<float>::quiet_NaN();
   if (std::holds_alternative<double>(varobj->function(particle))) {

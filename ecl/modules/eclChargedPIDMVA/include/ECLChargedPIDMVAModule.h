@@ -118,6 +118,11 @@ namespace Belle2 {
   private:
 
     /**
+     * evaluate the variable for the particle and convert the return value float.
+     */
+    float evaluateVariable(const Variable::Manager::Var* varobj, const Particle* particle);
+
+    /**
      * The name of the database payload object with the MVA weights.
      */
     std::string m_payload_name;
@@ -143,9 +148,10 @@ namespace Belle2 {
     std::unique_ptr<DBObjPtr<ECLChargedPIDMVAWeights>> m_mvaWeights;
 
     /**
-     * Vector of MVA experts. One per phasespace region.
+     * unordered map of MVA experts.
+     * One per region if the region is covered by the payload.
      */
-    std::vector<std::unique_ptr<MVA::Expert>> m_experts;
+    std::unordered_map<unsigned int, std::unique_ptr<MVA::Expert>> m_experts;
 
     /**
      * Dummy value of log Likelihood for a particle hypothesis.
@@ -155,17 +161,26 @@ namespace Belle2 {
     static constexpr float c_dummyLogL = -std::numeric_limits<float>::max();
 
     /**
-     * Vector of vectors containing the variables objects to be fed to the MVA.
+     * Vector of variables used to define the regions in which the MVAs are trained.
+     */
+    std::vector<const Variable::Manager::Var*> m_binningVariables;
+
+    /**
+     * Vector of evaluated variable values used to find the index of the corresponding MVA.
+     */
+    std::vector<float> m_binningValues;
+
+    /**
+     * Map of vectors containing the variables objects to be fed to the MVA.
      * Each region can have a unique set of variables.
      */
-    std::vector< std::vector<const Variable::Manager::Var*> > m_variables;
-
+    std::unordered_map<unsigned int, std::vector<const Variable::Manager::Var*>> m_variables;
 
     /**
       * MVA dataset to be passed to the expert.
-      * One per region.
+      * One per region if the region is covered by the payload.
       */
-    std::vector<std::unique_ptr<MVA::SingleDataset>> m_datasets;
+    std::unordered_map<unsigned int, std::unique_ptr<MVA::SingleDataset>> m_datasets;
 
     /**
      * Definition of sqrt(2)

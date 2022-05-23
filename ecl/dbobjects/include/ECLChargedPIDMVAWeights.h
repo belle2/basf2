@@ -18,7 +18,7 @@
 
 // ROOT
 #include <TObject.h>
-#include <TH3F.h>
+// #include <TH3F.h>
 #include <TF1.h>
 #include <TParameter.h>
 #include <TFile.h>
@@ -34,7 +34,86 @@
 namespace Belle2 {
 
   /**
-   * Stores all required information for the ECLChargedPIDMVA for a phasespace category - (clusterTheta, p, charge) region.
+   * Stores the N dimensional binning in which to apply the MVAs. For example, 3D in (clusterTheta, p, charge).
+   * Also provides functionality to get the bin index from the binning.
+   */
+  class ECLChargedPIDPhasespaceBinning : public TObject {
+
+  public:
+
+    /**
+     * Constructor.
+     * @param binEdges vector of vectors of bin edges. Bin edges should be floats.
+     */
+    ECLChargedPIDPhasespaceBinning(const std::vector<std::vector<float>> binEdges)
+    {
+      m_binEdges = binEdges;
+      for (auto dimensionBinEdges : binEdges) {
+        m_nBins.push_back(dimensionBinEdges.size() - 1);
+      }
+    }
+
+    /**
+     * Destructor.
+     */
+    ~ECLChargedPIDPhasespaceBinning() {};
+
+    /**
+     * Maps the vector of input values to a global bin index. If any of the values lies outside the binning -1 is returned.
+     * @param values N dimensional vector of values to be mapped to a global linear bin index.
+     */
+    int getLinearisedBinIndex(const std::vector<float> values)
+    {
+
+      int globalBin = 0;
+      std::vector<int> binIndices = getBinIndices(values);
+      for (unsigned int i; i < (binIndices.size() - 1); i++) {
+        if (binIndices[i] < 0) return -1;
+        globalBin = (globalBin + binIndices[i]) * m_nBins[i];
+      }
+      globalBin = globalBin + binIndices[binIndices.size() - 1];
+      return globalBin;
+    }
+
+    /**
+     * Maps the vector of input values to their bin index in N dimensions.
+     * If the values lie outside the covered region -1 is returned.
+     * @param values N dimensional vector of values to be mapped to a global linear bin index.
+     */
+    std::vector<int> getBinIndices(const std::vector<float> values)
+    {
+      std::vector<int> binIndices(m_binEdges.size());
+
+      for (unsigned int i; i < m_binEdges.size(); i++) {
+        std::vector<float> dimBinEdges = m_binEdges[i];
+        auto it = std::lower_bound(dimBinEdges.begin(), dimBinEdges.end(), values[i]);
+        if (it == dimBinEdges.end() || *it != values[i]) {
+          binIndices[i] = -1;
+        } else {
+          int index = std::distance(dimBinEdges.begin(), it);
+          binIndices[i] = index;
+        }
+      }
+      return binIndices;
+    }
+
+  private:
+    /**
+     * Vector of bin edges. One per dimension.
+     */
+    std::vector<std::vector<float>> m_binEdges;
+
+    /**
+     * Vector of number of bins per dimension.
+     */
+    std::vector<int> m_nBins;
+
+    // 1: first class implementation.
+    ClassDef(ECLChargedPIDPhasespaceBinning, 1); /**< ClassDef */
+  };
+
+  /**
+   * Stores all required information for the ECLChargedPIDMVA for a phasespace category.
    * This includes:
    *  - MVA weightfiles for multiclass MVA.
    *  - TF1 p.d.fs for each charged particle hypothesis for each mva output variable.
@@ -43,7 +122,6 @@ namespace Belle2 {
    *  - (Optional) TH1F for each charged particle hypothesis for each mva output variable for gaussianisation.
    *  - (Optional) vector of floats (flattened square matrix) for potential linear decorrelation of the gaussian transformed mva response variables.
    */
-
   class ECLChargedPIDPhasespaceCategory : public TObject {
 
   public:
@@ -251,7 +329,7 @@ namespace Belle2 {
   };
 
   /** Class to contain payload of everything needed for MVA based charged particle identification.
-    * - TH3 object specifying the (clusterTheta, p, charge) boundaries that define the categories (regions) under consideration,
+    * - ECLChargedPIDPhasespaceBinning object specifying the boundaries in N dimensions that define the categories (regions) under consideration,
     * - Vector of ECLChargedPIDPhasespaceCategory objects which contain specific settings for each category.
     */
   class ECLChargedPIDMVAWeights : public TObject {
@@ -259,73 +337,30 @@ namespace Belle2 {
     /**
     * Default constructor, necessary for ROOT to stream the object.
     */
-    ECLChargedPIDMVAWeights():
-      m_energy_unit("energyUnit", Unit::GeV),
-      m_ang_unit("angularUnit", Unit::rad)
-    {};
+    ECLChargedPIDMVAWeights() {};
 
     /**
      * Destructor.
      */
     ~ECLChargedPIDMVAWeights() {};
 
-    /**
-     * Set the energy unit to ensure consistency w/ the one used to define the phasespace category grid.
-     * @param unit: the energy unit.
-     */
-    void setEnergyUnit(const float& unit)
-    {
-      m_energy_unit.SetVal(unit);
-    }
 
     /**
-     * Set the angular unit to ensure consistency w/ the one used to define the phasespace category grid.
-     * @param unit: the angular unit.
-     */
-    void setAngularUnit(const float& unit)
-    {
-      m_ang_unit.SetVal(unit);
-    }
-
-    /**
-     * Set the 3D (clusterTheta, p, charge) grid representing the categories for which weightfiles are defined.
-     * @param h the 3D histogram in (clusterTheta, p, charge).
+     * Set the N dimensional grid representing the categories for which weightfiles are defined.
      * A multiclass MVA is trained for each phases-space region defined by the bin boundaries.
+     * @param h the N dimensional ECLChargedPIDPhasespaceBinning object.
     */
-    void setWeightCategories(TH3F* h)
-    {
-      m_categories = h;
-    }
-
-    /**
-     * checks if the input index is the same as that returned for the given (clusterTheta, p, charge) triplet
-     */
-    void checkIndexConsistency(const unsigned int idx, const float clusterTheta, const float p, const float charge) const
-    {
-      B2FATAL("(clusterTheta = " << clusterTheta << ", p = " << p << ", charge = " << charge << ")");
-      auto h_idx = getLinearisedCategoryIndex(clusterTheta, p, charge);
-      if (idx != h_idx) {
-        B2FATAL("index in input vector:\n" << idx << "\ndoes not correspond to:\n" << h_idx <<
-                "\n, i.e. the linearised index of the 3D category centered in (clusterTheta, p, charge) = (" << clusterTheta << ", " << p << ", " <<
-                charge <<
-                ")\nPlease check how the input vector is being filled.");
-      }
-    }
+    void setWeightCategories(ECLChargedPIDPhasespaceBinning* h) {m_categories = h;}
 
     /**
      * store the ECLChargedPIDPhasespaceCategory objects into the payload.
      * @param phasespaceCategories a vector of ECLChargedPIDPhasespaceCategory objects, one per phasespace region.
               Each object contains all the data required to process tracks in that phasespace.
      */
-    void storeMVAWeights(std::vector<ECLChargedPIDPhasespaceCategory>& phasespaceCategories)
+    void storeMVAWeights(std::unordered_map<unsigned int, ECLChargedPIDPhasespaceCategory>& phasespaceCategories)
     {
       m_phasespaceCategories = phasespaceCategories;
     }
-
-    /**
-     * returns number of phasespace categories.
-     */
-    unsigned int nCategories() const {return m_phasespaceCategories.size();}
 
     /**
      * returns the ith ECLChargedPIDPhasespaceCategory.
@@ -334,78 +369,55 @@ namespace Belle2 {
     const ECLChargedPIDPhasespaceCategory* getPhasespaceCategory(const unsigned int idx)  const {return &m_phasespaceCategories.at(idx);}
 
     /**
-     * returns the vector of phasespaceCategories.
+     * returns the map of phasespaceCategories.
      */
-    const std::vector<ECLChargedPIDPhasespaceCategory>* getPhasespaceCategories() const {return &m_phasespaceCategories;}
+    const std::unordered_map<unsigned int, ECLChargedPIDPhasespaceCategory>* getPhasespaceCategories() const {return &m_phasespaceCategories;}
 
     /**
-    * returns bool whether or not the given p, clusterTheta, charge values are within the phasespace covered by the trainings in the weightfile
-    * @param clusterTheta: clusterTheta of the cluster [rad].
-    * @param p: momentum of the track [GeV].
-    * @param charge: charge of the track.
+    * returns bool whether or not the given values are within the phasespace covered by the trainings in the weightfile
+    * @param linearBinIndex: global bin index.
     */
-    bool isPhasespaceCovered(const float clusterTheta, const float p, const float charge) const
+    bool isPhasespaceCovered(const int linearBinIndex) const
     {
-      if (!m_categories) {
-        B2FATAL("No (clusterTheta, p, charge) TH3 grid was found in the ECLChargedPIDMVA DB payload. This should not happen! Abort...");
-      }
-
-      const float ttheta = clusterTheta  / m_ang_unit.GetVal();
-      const float pp = p / m_energy_unit.GetVal();
-
-      if (ttheta < m_categories->GetXaxis()->GetBinLowEdge(1)) return false;
-      if (ttheta >= m_categories->GetXaxis()->GetBinLowEdge(m_categories->GetXaxis()->GetNbins() + 1)) return false;
-
-      if (pp < m_categories->GetYaxis()->GetBinLowEdge(1)) return false;
-      if (pp >= m_categories->GetYaxis()->GetBinLowEdge(m_categories->GetYaxis()->GetNbins() + 1)) return false;
-
-      if (charge < m_categories->GetZaxis()->GetBinLowEdge(1)) return false;
-      if (charge >= m_categories->GetZaxis()->GetBinLowEdge(m_categories->GetZaxis()->GetNbins() + 1)) return false;
-
+      if (linearBinIndex < 0) return false;
+      if (m_phasespaceCategories.find(linearBinIndex) == m_phasespaceCategories.end()) return false;
       return true;
     }
 
     /**
-    * returns the flattened 1D index of the 3D phasespace category grid.
-    * @param clusterTheta: clusterTheta of the cluster [rad].
-    * @param p: momentum of the track [GeV].
-    * @param charge: charge of the track.
+    * returns the flattened 1D index of the N dimensional phasespace category grid.
+    * @param values: N dimensional input vector of floats to be mapped to a globalBinIndex.
     */
-    unsigned int getLinearisedCategoryIndex(const float clusterTheta, const float p, const float charge) const
+
+    unsigned int getLinearisedCategoryIndex(std::vector<float> values) const
     {
       if (!m_categories) {
-        B2FATAL("No (clusterTheta, p, charge) TH3 grid was found in the ECLChargedPIDMVA DB payload. This should not happen! Abort...");
+        B2FATAL("No N dimensional grid was found in the ECLChargedPIDMVA DB payload. This should not happen! Abort...");
       }
-      // alternatively set these to be just inside the nearest category.
-      if (!isPhasespaceCovered(clusterTheta, p, charge)) {
-        B2FATAL("Attempting to get bin index for event with (clusterTheta = " << clusterTheta << ", p = " << p << ", charge = " << charge <<
-                ") outside the covered phasespace. This should not happen! Abort...");
-      }
-      // This is different to the root FindBin index as that includes under and overflow bins in each dimension.
-      const unsigned int nTheta  = m_categories->GetXaxis()->GetNbins();
-      const unsigned int nP      = m_categories->GetYaxis()->GetNbins();
-
-      const unsigned int iTheta  = m_categories->GetXaxis()->FindBin(clusterTheta / m_ang_unit.GetVal()) - 1;
-      const unsigned int iP      = m_categories->GetYaxis()->FindBin(p / m_energy_unit.GetVal()) - 1;
-      const unsigned int iCharge = m_categories->GetZaxis()->FindBin(charge) - 1;
-
-      return iTheta + nTheta * (iP + nP * iCharge);
+      return m_categories->getLinearisedBinIndex(values);
     }
 
+    /**
+     * returns string definitions of the variables used in defining the phasespace categories.
+     */
+    std::vector<std::string> getBinningVariables() const {return m_binningVariables;}
+
   private:
-    TParameter<float> m_energy_unit; /**< The energy unit used for defining the 3D (clusterTheta, p, charge) category grid. */
-    TParameter<float> m_ang_unit;    /**< The angular unit used for defining the 3D (clusterTheta, p, charge) category grid. */
+    /**
+     * An N Dimensional binning whose bins define the boundaries of the categories for which the training is performed.
+      * It is used to lookup the correct file in the payload, given a reconstructed value tuple.
+     */
+    ECLChargedPIDPhasespaceBinning* m_categories = nullptr;
 
     /**
-     * A 3D (clusterTheta, p, charge) histogram whose bins define the boundaries of the categories for which the training is performed.
-      * It is used to lookup the correct file in the payload, given a reconstructed triplet (clusterTheta, p, charge).
+     * Stores the ECLChargedPIDPhasespaceCategory object for all the N dimensional categories.
      */
-    TH3F* m_categories = nullptr;
+    std::unordered_map<unsigned int, ECLChargedPIDPhasespaceCategory> m_phasespaceCategories;
 
     /**
-     * Stores the ECLChargedPIDPhasespaceCategory object for all the (clusterTheta, p, charge) categories.
+     * Stores the list of variables used to define the phasespace binning.
      */
-    std::vector<ECLChargedPIDPhasespaceCategory> m_phasespaceCategories;
+    std::vector<std::string> m_binningVariables;
 
     // 1: first class implementation.
     ClassDef(ECLChargedPIDMVAWeights, 1); /**< ClassDef  */

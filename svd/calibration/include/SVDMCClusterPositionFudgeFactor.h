@@ -22,17 +22,17 @@ namespace Belle2 {
    * SVD position error parameters and provide the position error
    * for the CoGOnly algorithm
    */
-  class SVDMCClusterPositionScaleFactor {
+  class SVDMCClusterPositionFudgeFactor {
   public:
-    static std::string name; /**< name of the SVDMCClusterPositionScaleFactor payload */
+    static std::string name; /**< name of the SVDMCClusterPositionFudgeFactor payload */
     typedef SVDCalibrationsBase<SVDCalibrationsScalar<SVDMCFudgeFactorFunction>>
-        t_payload; /**< typedef for the SVDMCClusterPositionScaleFactor payload of all SVD sensors*/
+        t_payload; /**< typedef for the SVDMCClusterPositionFudgeFactor payload of all SVD sensors*/
 
     /** Constructor, no input argument is required */
-    SVDMCClusterPositionScaleFactor() : m_aDBObjPtr(name)
+    SVDMCClusterPositionFudgeFactor() : m_aDBObjPtr(name)
     {
       m_aDBObjPtr.addCallback([this](const std::string&) -> void
-      { B2DEBUG(20, "SVDMCClusterPositionScaleFactor: from now on we are using " << this->m_aDBObjPtr->get_uniqueID()); });
+      { B2DEBUG(20, "SVDMCClusterPositionFudgeFactor: from now on we are using " << this->m_aDBObjPtr->get_uniqueID()); });
     }
 
     /** Return the MC fudge factor
@@ -64,6 +64,6 @@ namespace Belle2 {
     bool isValid() { return m_aDBObjPtr.isValid(); }
 
   private:
-    DBObjPtr<t_payload> m_aDBObjPtr; /**< SVDMCClusterPositionScaleFactor payload */
+    DBObjPtr<t_payload> m_aDBObjPtr; /**< SVDMCClusterPositionFudgeFactor payload */
   };
 }

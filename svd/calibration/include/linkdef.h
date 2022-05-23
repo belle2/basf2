@@ -23,7 +23,7 @@
 #pragma link C++ class Belle2::SVDFADCMaskedStrips-; // checksum=0x5c3369a8, version=-1
 #pragma link C++ class Belle2::SVDHotStripsCalibrations-; // checksum=0x94dfda0f, version=-1
 #pragma link C++ class Belle2::SVDChargeSimulationCalibrations-;
-#pragma link C++ class Belle2::SVDMCClusterPositionScaleFactor-;
+#pragma link C++ class Belle2::SVDMCClusterPositionFudgeFactor-;
 
 //calibration importers
 #pragma link C++ class Belle2::SVDDatabaseImporter-;

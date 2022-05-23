@@ -50,7 +50,7 @@ def get_sensor_type(layer):
         return "L456"
 
         
-class jsonSVDMCClusterPositionScaleFactorImporter(b2.Module):
+class jsonSVDMCClusterPositionFudgeFactorImporter(b2.Module):
     """
     Defining the python module to do the import.
     """
@@ -76,7 +76,7 @@ class jsonSVDMCClusterPositionScaleFactorImporter(b2.Module):
         print("              "+str(param["_COMMENT"]))
         print("")
 
-        cls_payload = Belle2.SVDMCClusterPositionScaleFactor.t_payload(clsParam,str(uniqueID))
+        cls_payload = Belle2.SVDMCClusterPositionFudgeFactor.t_payload(clsParam,str(uniqueID))
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -100,7 +100,7 @@ class jsonSVDMCClusterPositionScaleFactorImporter(b2.Module):
 
                         cls_payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, clsParam)
 
-        Belle2.Database.Instance().storeData(Belle2.SVDMCClusterPositionScaleFactor.name, cls_payload, iov)
+        Belle2.Database.Instance().storeData(Belle2.SVDMCClusterPositionFudgeFactor.name, cls_payload, iov)
 
 
 if __name__ == "__main__":
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     main.add_module("Gearbox")
     main.add_module("Geometry")
 
-    jsonImporter = b2.register_module(jsonSVDMCClusterPositionScaleFactorImporter())
+    jsonImporter = b2.register_module(jsonSVDMCClusterPositionFudgeFactorImporter())
     jsonImporter.set_info_uniqueID(param["uniqueID"]["INFO"]["first"],param["uniqueID"]["INFO"]["current"],param["uniqueID"]["INFO"]["tag"])
     main.add_module(jsonImporter)
 

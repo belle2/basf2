@@ -5,6 +5,6 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <svd/calibration/SVDMCClusterPositionScaleFactor.h>
+#include <svd/calibration/SVDMCClusterPositionFudgeFactor.h>
 
-std::string Belle2::SVDMCClusterPositionScaleFactor::name = std::string("SVDMCClusterPositionScaleFactor");
+std::string Belle2::SVDMCClusterPositionFudgeFactor::name = std::string("SVDMCClusterPositionFudgeFactor");

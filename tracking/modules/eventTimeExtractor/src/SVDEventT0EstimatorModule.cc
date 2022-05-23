@@ -79,4 +79,5 @@ void SVDEventT0EstimatorModule::event()
   }
   EventT0::EventT0Component evtT0_comp(evtT0, evtT0_err, Const::SVD, m_algorithm, quality);
   m_eventT0->addTemporaryEventT0(evtT0_comp);
+  m_eventT0->setEventT0(evtT0_comp);
 }

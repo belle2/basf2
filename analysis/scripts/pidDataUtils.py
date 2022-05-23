@@ -1,88 +1,4 @@
-"""
-pidDataUtils.py
-Connor Hainje & Jan Strube -- {connor.hainje, jan.strube}@pnnl.gov
-
-Methods for preparing and using data for PID analyses and weight training.
-
-Two primary workflows:
-1. Prepare data for weight training.
-    1. Use `read_root()` to read in .root datafiles into a DataFrame.
-    2. For each particle type you would like to extract from the DataFrame, use
-       `make_h5()` to make a slim file for that particle type.
-    3. Merge the .h5 files you just made into one with `merge_h5s()`.
-    4. Split the data into train/validation/test sets and stack everything into
-       easy-to-train numpy arrays using `split_h5()`.
-
-2. Reading data to use for analysis (e.g. with the pidplots package).
-    1. Use `read_root()`, `read_h5()`, or `read_npz()` to read datafiles into a
-       DataFrame. The h5 and npz methods are built to work specifically with the
-       h5 and npz files created during workflow 1.
-    2. Use `prepare_df()` to apply weights (if you have them), compute a number
-       of additional columns (required for many pidplots methods), and
-       optionally apply some cuts (e.g. bad particle types, rows with NaNs,
-       etc.).
-
-       Note that most of our methods expect detector log-likelihoods to be in
-       columns named f"{detector}_{particle}" (e.g. "TOP_mu"). If your datafile
-       does not use that convention (particularly if you are reading a .root
-       file), please provide a function to the argument 'column' that takes as
-       input the particle and detector names and returns the corresponding
-       detector log-likelihood column name. In our ROOT files, these columns are
-       f"pidLogLikelyhoodOf{pdg}From{detector}". We provide a function for this
-       case called `root_column()`.
-
-
-EXAMPLE 1:
-
-Preparing D* decay data (in files 'dstar_1.root' and 'dstar_2.root') for training.
-```python
-import pidDataUtils as pdu
-
-df = pdu.read_root(['dstar_1.root', 'dstar_2.root'])
-pdu.make_h5(df, 'DST_D0_K', 'slim_dstar_K.h5', pdg=321)
-pdu.make_h5(df, ['DST_D0_pi', 'DST_pi'], 'slim_dstar_pi.h5', pdg=211)
-pdu.merge_h5s(['slim_dstar_K.h5', 'slim_dstar_pi.h5'], 'slim_dstar.h5')
-pdu.split_h5('slim_dstar.h5', 'slim_dstar/')
-```
-
-This code block will...
- - read the root files into a DataFrame called `df`
- - produce files 'slim_dstar_K.h5' and 'slim_dstar_pi.h5', which contain _only_
-   the track info (p, theta, phi) and detector log-likelihood data for the
-   kinematically tagged kaons and pions
- - produce file 'slim_dstar.h5' which contains the merged kaon and pion datasets
- - make directory 'slim_dstar' (if it doesn't exist), containing three new files
-   'train.npz', 'val.npz', 'test.npz'
-
-
-EXAMPLE 2:
-
-Reading in a test set for analysis and applying weights to it.
-
-```python
-import pidDataUtils as pdu
-import numpy as np
-
-df = pdu.read_npz('slim_dstar/test.npz')
-wgt = np.load('slim_dstar/weights.npy')
-pdu.prepare_df(df, weights=wgt)
-```
-
-
-EXAMPLE 3:
-
-Reading in a ROOT file for analysis and applying weights to it.
-
-```python
-import pidDataUtils as pdu
-import numpy as np
-
-df = pdu.read_root(['dstar_1.root', 'dstar_2.root'])
-wgt = np.load('slim_dstar/weights.npy')
-pdu.prepare_df(df, weights=wgt, column=pdu.root_column)
-```
-
-"""
+#!/usr/bin/env python3
 
 import numpy as np
 import pandas as pd
@@ -128,7 +44,7 @@ def read_root(root_filenames):
 
     Args:
         root_filenames (list(str) or str): If only one filename, can be given as
-        a string. If more than one, should be given as a list or tuple.
+            a string. If more than one, should be given as a list or tuple.
 
     Returns:
         pd.DataFrame: DataFrame containing the data of the ROOT datafile(s).
@@ -156,10 +72,10 @@ def make_h5(df, tags, out_filename, pdg=None, column=root_column):
             more can be given.
         out_filename (str): Output filename for the h5 file that will be
             written.
-        pdg (int or None, optional): The PDG code for the particles being
+        pdg (int or None): The PDG code for the particles being
             extracted. If None, uses the values found in the 'mcPDG' column of
             the DataFrame. Defaults to None.
-        column (function, optional): A function which, given the particle and
+        column: A function which, given the particle and
             detector names, returns the column name for the corresponding
             detector log-likelihood. Defaults to root_column, which assumes
             column names are of the format
@@ -198,7 +114,7 @@ def merge_h5s(filenames, out_filename, pdgs=None):
     Args:
         filenames (list(str)): Filenames of HDF5 files to be merged.
         out_filename (str): Output filename.
-        pdgs (list(int), optional): The PDG tags for the particle types, one per
+        pdgs (list(int)): The PDG tags for the particle types, one per
             filename, to overwrite the 'pdg' columns in those files when
             merging. If None, simply uses the 'pdg' columns from the files.
             Defaults to None.
@@ -243,15 +159,15 @@ def split_h5(
         output_dir (str): Name of output directory, in which the train,
             validation, and test sets will be written. Will be created if it
             does not already exist.
-        train_size (float, optional): Fraction of the dataset to use for
+        train_size (float): Fraction of the dataset to use for
             training. Defaults to 0.8.
-        val_size (float, optional): Fraction of the dataset to use for
+        val_size (float): Fraction of the dataset to use for
             validation. Defaults to 0.1.
-        test_size (float, optional): Fraction of the dataset to use for testing.
+        test_size (float): Fraction of the dataset to use for testing.
             Defaults to 0.1.
-        shuffle (bool, optional): Whether to shuffle the dataset before
+        shuffle (bool): Whether to shuffle the dataset before
             splitting. Defaults to True.
-        random_state (int or None, optional): Random state for the shuffling.
+        random_state (int or None): Random state for the shuffling.
             Defaults to None.
     """
 
@@ -363,12 +279,12 @@ def make_bins(df, p_bins=P_BINS, theta_bins=THETA_BINS, cut_outside=True):
 
     Args:
         df (pd.DataFrame): The DataFrame to add bins columns to.
-        p_bins (np.array, optional): The edges of the momentum bins in GeV.
+        p_bins (np.array): The edges of the momentum bins in GeV.
             Defaults to P_BINS, [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.5] GeV.
-        theta_bins (np.array, optional): The edges of the theta bins in radians.
+        theta_bins (np.array): The edges of the theta bins in radians.
             Defaults to THETA_BINS, [17, 28, 40, 60, 77, 96, 115, 133, 150]
             degrees.
-        cut_outside (bool, optional): Whether to cut particles that lie outside
+        cut_outside (bool): Whether to cut particles that lie outside
             of the bins. Defaults to True.
     """
     df["p_bin"] = np.digitize(df["p"].values, p_bins) - 1
@@ -393,7 +309,7 @@ def make_lrs(df, column=_column):
 
     Args:
         df (pd.DataFrame): DataFrame to which the columns will be added.
-        column (function, optional): A function which given the particle and
+        column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
             column name. Defaults to _column, which gives column names of the
             format f"{detector}_{particle}".
@@ -419,7 +335,7 @@ def make_binary_lrs(df, column=_column):
 
     Args:
         df (pd.DataFrame): DataFrame to which the columns will be added.
-        column (function, optional): A function which given the particle and
+        column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
             column name. Defaults to _column, which gives column names of the
             format f"{detector}_{particle}".
@@ -458,7 +374,7 @@ def compute_det_lrs(d, det, column=_column):
         d (pd.DataFrame): DataFrame containing the detector log-likelihoods.
         det (str): The name of the detector for which the single-detector
             likelihood ratios will be calculated.
-        column (function, optional): A function which given the particle and
+        column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
             column name. Defaults to _column, which gives column names of the
             format f"{detector}_{particle}".
@@ -476,7 +392,7 @@ def make_pid_det(df, column=_column):
 
     Args:
         df (pd.DataFrame): DataFrame to which the columns will be added.
-        column (function, optional): A function which given the particle and
+        column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
             column name. Defaults to _column, which gives column names of the
             format f"{detector}_{particle}".
@@ -495,7 +411,7 @@ def compute_abl_lrs(d, det, column=_column):
     Args:
         d (pd.DataFrame): DataFrame containing the detector log-likelihoods.
         det (str): The name of the detector to be omitted for the ablation.
-        column (function, optional): A function which given the particle and
+        column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
             column name. Defaults to _column, which gives column names of the
             format f"{detector}_{particle}".
@@ -519,7 +435,7 @@ def make_pid_abl(df, column=_column):
 
     Args:
         df (pd.DataFrame): DataFrame to which the columns will be added.
-        column (function, optional): A function which given the particle and
+        column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
             column name. Defaults to _column, which gives column names of the
             format f"{detector}_{particle}".
@@ -535,12 +451,12 @@ def compute_contrib(d, corr=True):
 
     Args:
         d (pd.DataFrame): DataFrame containing the likelihood ratio data.
-        corr (bool, optional): Whether to compute contribution to the likelihood
+        corr (bool): Whether to compute contribution to the likelihood
             ratio of the _correct_ hypothesis (True) or the _chosen_ hypothesis
             (False). Defaults to True.
 
     Returns:
-        dict(str -> np.array): The contributions of each detector.
+        dict[str,np.array]: The contributions of each detector.
     """
     out = dict()
     for det in DETECTORS:
@@ -559,7 +475,7 @@ def make_contrib(df, corr=True):
 
     Args:
         df (pd.DataFrame): DataFrame to which the columns will be added.
-        corr (bool, optional): Whether to compute contribution to the likelihood
+        corr (bool): Whether to compute contribution to the likelihood
             ratio of the _correct_ hypothesis (True) or the _chosen_ hypothesis
             (False). Defaults to True.
     """
@@ -580,17 +496,17 @@ def make_columns(
 
     Args:
         df (pd.DataFrame): DataFrame to which the columns will be added.
-        p_bins (np.array, optional): The edges of the momentum bins in GeV.
+        p_bins (np.array): The edges of the momentum bins in GeV.
             Defaults to P_BINS, [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.5] GeV.
-        theta_bins (np.array, optional): The edges of the theta bins in radians.
+        theta_bins (np.array): The edges of the theta bins in radians.
             Defaults to THETA_BINS, [17, 28, 40, 60, 77, 96, 115, 133, 150]
             degrees.
-        cut_outside (bool, optional): Whether to cut particles that lie outside
+        cut_outside (bool): Whether to cut particles that lie outside
             of the bins. Defaults to True.
-        contrib_corr (bool, optional): Whether to compute contribution to the
+        contrib_corr (bool): Whether to compute contribution to the
             likelihood ratio of the _correct_ hypothesis (True) or the _chosen_
             hypothesis (False). Defaults to True.
-        column (function, optional): A function which given the particle and
+        column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
             column name. Defaults to _column, which gives column names of the
             format f"{detector}_{particle}".
@@ -610,16 +526,16 @@ def apply_weights(df, weights, p_bins=P_BINS, theta_bins=THETA_BINS, column=_col
 
     Args:
         df (pd.DataFrame): DataFrame to which the weights are applied.
-        weights (dict(key -> np.array) or np.array): The calibration weight
+        weights (dict[tuple(int),np.array] or np.array): The calibration weight
             values. If a dict, keys should be a tuple of ints, and each value is
             the six-by-six array of weights for the bin. If a single np.array,
             should be a six-by-six array of weights to be applied globally.
-        p_bins (np.array, optional): The edges of the momentum bins in GeV.
+        p_bins (np.array): The edges of the momentum bins in GeV.
             Defaults to P_BINS, [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.5] GeV.
-        theta_bins (np.array, optional): The edges of the theta bins in radians.
+        theta_bins (np.array): The edges of the theta bins in radians.
             Defaults to THETA_BINS, [17, 28, 40, 60, 77, 96, 115, 133, 150]
             degrees.
-        column (function, optional): A function which given the particle and
+        column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
             column name. Defaults to _column, which gives column names of the
             format f"{detector}_{particle}".
@@ -658,7 +574,7 @@ def cut_particles(df, allowed_particles, column=_column):
         allowed_particles (list(str)): List of allowed particle types. Any
             particle types not present will be cut, unless the list is empty (in
             which case no cuts are applied).
-        column (function, optional): A function which given the particle and
+        column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
             column name. Defaults to _column, which gives column names of the
             format f"{detector}_{particle}".
@@ -727,24 +643,24 @@ def prepare_df(
 
     Args:
         df (pd.DataFrame): DataFrame to prepare for analysis.
-        compute_cols (bool, optional): Whether to compute and add additional
+        compute_cols (bool): Whether to compute and add additional
             columns. Defaults to True.
-        drop_nans (bool, optional): Whether to drop rows that contain NaNs.
+        drop_nans (bool): Whether to drop rows that contain NaNs.
             Defaults to True.
-        drop_outside_bins (bool, optional): Whether to drop rows for particles
+        drop_outside_bins (bool): Whether to drop rows for particles
             outside of the momentum and theta bins. Defaults to True.
-        weights (np.array, optional): Calibration weights to be applied to the
+        weights (np.array): Calibration weights to be applied to the
             detector log-likelihoods. Defaults to None.
-        allowed_particles (list(str), optional): If not empty, specifies the
+        allowed_particles (list(str)): If not empty, specifies the
             allowed particle types. Any not allowed particle types will be
             excluded from the PID calculations. If empty, all particle types are
             considered.  Defaults to [].
-        p_bins (np.array, optional): The edges of the momentum bins in GeV.
+        p_bins (np.array): The edges of the momentum bins in GeV.
             Defaults to P_BINS, [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.5] GeV.
-        theta_bins (np.array, optional): The edges of the theta bins in radians.
+        theta_bins (np.array): The edges of the theta bins in radians.
             Defaults to THETA_BINS, [17, 28, 40, 60, 77, 96, 115, 133, 150]
             degrees.
-        column (function, optional): A function which given the particle and
+        column: A function which given the particle and
             detector names returns the corresponding detector log-likelihood
             column name. Defaults to _column, which gives column names of the
             format f"{detector}_{particle}".

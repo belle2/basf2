@@ -142,6 +142,8 @@ Advanced Topics
 
 .. toctree:: Priors
 
+.. toctree:: PIDCalibrationWeights
+
 .. _analysismodules:
 
 Full list of analysis modules

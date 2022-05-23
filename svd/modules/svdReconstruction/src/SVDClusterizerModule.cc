@@ -23,6 +23,9 @@
 #include <svd/reconstruction/SVDRecoChargeFactory.h>
 #include <svd/reconstruction/SVDRecoPositionFactory.h>
 
+#include <TRandom.h>
+
+#include <math.h>
 
 using namespace std;
 using namespace Belle2;
@@ -398,6 +401,10 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
 
     //..and write relations
     writeClusterRelations(rawCluster);
+
+    //alter cluster position on MC to match resolution measured on data
+    bool isMC = Environment::Instance().isMC();
+    if (isMC) alterClusterPosition();
   }
 }
 
@@ -478,6 +485,36 @@ double SVDClusterizerModule::applyLorentzShiftCorrection(double position, VxdID 
 
   return position;
 }
+
+void SVDClusterizerModule::alterClusterPosition()
+{
+  //alter the position of the last cluster in the array
+  int clsIndex = m_storeClusters.getEntries() - 1;
+
+  //get the necessary information on the cluster
+  float clsPosition = m_storeClusters[clsIndex]->getPosition();
+  VxdID sensorID = m_storeClusters[clsIndex]->getSensorID();
+  bool isU = m_storeClusters[clsIndex]->isUCluster();
+
+  //get the track's incident angle
+  //double trkAngle = 0.; //to be retrieved
+  RelationArray relClusterTrueHit(m_storeClusters, m_storeTrueHits, m_relClusterTrueHitName);
+  SVDTrueHit* trueHit = m_storeTrueHits[relClusterTrueHit[clsIndex].getToIndex(0)];
+  double trkLength = 0.;
+  if (isU) trkLength = trueHit->getExitU() - trueHit->getEntryU();
+  else trkLength = trueHit->getExitV() - trueHit->getEntryV();
+  double trkHeight = trueHit->getExitW() - trueHit->getEntryW();
+  double trkAngle = atan2(trkLength, trkHeight) * (180 / 3.14159265); //radians to degrees
+
+  //get the appropriate sigma to alter the position
+  double sigma_sq = m_mcFudgeFactor.getFudgeFactor(sensorID, isU, trkAngle);
+
+  //do the job
+  TRandom* generator = new TRandom();
+  float fudgeFactor = (float) generator->Gaus(0., sqrt(sigma_sq));
+  m_storeClusters[clsIndex]->setPosition(clsPosition + fudgeFactor);
+}
+
 void SVDClusterizerModule::endRun()
 {
 

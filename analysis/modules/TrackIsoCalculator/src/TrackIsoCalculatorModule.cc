@@ -97,7 +97,7 @@ void TrackIsoCalculatorModule::event()
         continue;
       }
       // Skip if this pair already calculated.
-      if (pairwiseDistances[iPart][jPart] > 0) {
+      if (pairwiseDistances[iPart][jPart] != -1.0) {
         continue;
       }
 

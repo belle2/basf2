@@ -78,7 +78,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
-                       pxd_filtering_offline=False, fullGrid=False):
+                       pxd_filtering_offline=False, use_cdc_full_grid_eventt0=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -117,8 +117,14 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         generated numbers, otherwise are applied using an internal counter.
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
-    :param fullGrid: set true if you want to use the FullGrid module (default: false)
+    :param use_cdc_full_grid_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
+                                      for computing the EventT0.
     """
+
+    # By default, the FullGrid module is not used in the reconstruction chain.
+    # It is needed for detectors that perform post-tracking calibration with respect to CDC EventT0 using cDST
+    if reconstruct_cdst == 'rawFormat':
+        use_cdc_full_grid_eventt0 = True
 
     add_prefilter_reconstruction(path,
                                  components=components,
@@ -133,7 +139,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  event_abort=event_abort,
                                  use_random_numbers_for_hlt_prescale=use_random_numbers_for_hlt_prescale,
                                  pxd_filtering_offline=pxd_filtering_offline,
-                                 fullGrid=fullGrid)
+                                 use_cdc_full_grid_eventt0=use_cdc_full_grid_eventt0)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
     if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
@@ -149,11 +155,21 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         add_skim_software_trigger(path)
 
 
-def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_calculation=True,
-                                 skipGeometryAdding=False, trackFitHypotheses=None, use_second_cdc_hits=False,
-                                 add_muid_hits=False, reconstruct_cdst=None, addClusterExpertModules=True,
-                                 pruneTracks=True, event_abort=default_event_abort,
-                                 use_random_numbers_for_hlt_prescale=True, pxd_filtering_offline=False, fullGrid=False):
+def add_prefilter_reconstruction(
+        path,
+        components=None,
+        add_modules_for_trigger_calculation=True,
+        skipGeometryAdding=False,
+        trackFitHypotheses=None,
+        use_second_cdc_hits=False,
+        add_muid_hits=False,
+        reconstruct_cdst=None,
+        addClusterExpertModules=True,
+        pruneTracks=True,
+        event_abort=default_event_abort,
+        use_random_numbers_for_hlt_prescale=True,
+        pxd_filtering_offline=False,
+        use_cdc_full_grid_eventt0=False):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
@@ -184,7 +200,8 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
         post-filter reconstruction is also run).
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
-    :param fullGrid: set true if you want to use the FullGrid module (default: false)
+    :param use_cdc_full_grid_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
+                                      for computing the EventT0.
     """
 
     # Check components.
@@ -207,7 +224,7 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
                                           trackFitHypotheses=trackFitHypotheses,
                                           use_second_cdc_hits=use_second_cdc_hits,
                                           pxd_filtering_offline=pxd_filtering_offline,
-                                          fullGrid=fullGrid)
+                                          use_cdc_full_grid_eventt0=use_cdc_full_grid_eventt0)
 
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Prefilter_Tracking')
@@ -511,7 +528,6 @@ def add_cdst_output(
     additionalBranches=None,
     dataDescription=None,
     ignoreInputModulesCheck=False,
-    fullGrid=True
 ):
     """
     This function adds the `RootOutput` module to a path with the settings needed to produce a cDST output.
@@ -552,11 +568,6 @@ def add_cdst_output(
 
     if additionalBranches is not None:
         branches += additionalBranches
-
-    if fullGrid:
-        # By default, the FullGrid module is not used in the reconstruction chain.
-        # It is needed for detectors that perform post-trakcing calibration with respect to CDC EventT0 using cDST
-        path.add_module("FullGridChi2TrackTimeExtractor")
 
     return path.add_module("RootOutput", outputFileName=filename, branchNames=branches,
                            branchNamesPersistent=persistentBranches, additionalDataDescription=dataDescription)

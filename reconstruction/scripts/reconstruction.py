@@ -527,7 +527,7 @@ def add_cdst_output(
     filename='cdst.root',
     additionalBranches=None,
     dataDescription=None,
-    ignoreInputModulesCheck=False,
+    ignoreInputModulesCheck=False
 ):
     """
     This function adds the `RootOutput` module to a path with the settings needed to produce a cDST output.

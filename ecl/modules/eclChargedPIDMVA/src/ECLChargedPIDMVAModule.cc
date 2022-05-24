@@ -141,16 +141,17 @@ void ECLChargedPIDMVAModule::event()
     // This internally requires a shower with a photon hypo.
     if (!particle.getECLCluster()) continue;
 
+    // Get global bin index for track corresponding to N dimensional binning.
     std::vector<float> binningVariableValues(m_binningVariables.size());
     for (unsigned int ivar(0); ivar < binningVariableValues.size(); ivar++) {
       auto varobj = m_binningVariables.at(ivar);
       binningVariableValues.at(ivar) = evaluateVariable(varobj, &particle);
     }
+    const int linearCategoryIndex = (*m_mvaWeights.get())->getLinearisedCategoryIndex(binningVariableValues);
 
     // Require we cover the phasespace.
     // Alternatively could take closest covered region but behaviour will not be well understood.
     // After this check the linearCategoryIndex is guaranteed to be positive.
-    const int linearCategoryIndex = (*m_mvaWeights.get())->getLinearisedCategoryIndex(binningVariableValues);
     if (!(*m_mvaWeights.get())->isPhasespaceCovered(linearCategoryIndex)) continue;
 
     // Get the MVA region

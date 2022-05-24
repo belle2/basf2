@@ -9,13 +9,11 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from basf2 import B2INFO, B2FATAL
-import basf2
+from basf2 import B2INFO
 import basf2_mva
 import modularAnalysis as ma
 import variables
 from variables import utils
-import os
 
 
 def add_default_ks_Selector_aliases():
@@ -65,7 +63,7 @@ def add_variable_collection():
         'pip_p', 'pin_p',
         'pip_cosTheta', 'pin_cosTheta',
     ]
-    utils.add_collection(inputVariablesList, 'ks_finder_info')
+    utils.add_collection(inputVariablesList, 'ks_selector_info')
 
 
 def V0Selector_Training(
@@ -148,24 +146,21 @@ def LambdaVeto_Training(
 
 
 def ksSelector(
-    particleListName='K_S0:merged',
+    particleListName,
+    identifier_Ks,
+    identifier_vLambda,
     listtype='all',
-    extraInfoName_V0Selector='KsFinder_V0Selector',
-    extraInfoName_LambdaVeto='KsFinder_LambdaVeto',
-    identifier_Ks="sugiura_KsFinder_V0Selector",
-    identifier_vLambda="sugiura_KsFinder_LambdaVeto",
+    extraInfoName_V0Selector='KsSelector_V0Selector',
+    extraInfoName_LambdaVeto='KsSelector_LambdaVeto',
     useCustomThreshold=False,
     threshold_V0Selector=0.90,
     threshold_LambdaVeto=0.11,
-    useCentralDB=True,
-    centralDB='KsFinder_dev',
-    localDB='',
     path=None
 ):
     """
     Defines the configuration of KsSelector process for the input particle list.
 
-    @param particleLists                reconstructed Ks list with 2 charged daughters.
+    @param particleLists                Reconstructed Ks -> pi+ pi- list.
     @param listtype                     Type of Ks cut. When 'all'(default), no cut is applied on Ks.
                                         When 'standard', 'tight', or 'loose', a cut with Ks efficiency
                                         90%, 95%, and 85% is applied.
@@ -176,26 +171,10 @@ def ksSelector(
     @useCustomThreshold                 Flag whether thresholds are specified from payload.
     @threshold_V0Selector               Threshold for V0Selector.
     @threshold_LambdaVeto               Threshold for LambdaVeto.
-    @param useCentralDB                 Flag whether weight file is taken from globaltag or local.
-                                        If False, weight file is taken from local file specified by localDB.
-    @param centralDB                    CentralDB tag name.
-    @param localDB                      Path for local weight file for MVA.
-                                        Only valid when useCentralDB == False.
     @param path                         Basf2 path to execute.
     """
     add_default_ks_Selector_aliases()
     particleList = [particleListName]
-
-    if useCentralDB:
-        centralDB = "KsFinder_dev"
-        B2INFO('KsSelector: use extra central database:'+centralDB)
-        basf2.conditions.prepend_globaltag(centralDB)
-    else:
-        if os.path.exists(localDB):
-            B2INFO('KsSelector: use local database:'+localDB)
-            basf2.conditions.append_testing_payloads(localDB)
-        else:
-            B2FATAL('KsSelector: No local database is found.')
 
     path.add_module('MVAMultipleExperts',
                     listNames=particleList,

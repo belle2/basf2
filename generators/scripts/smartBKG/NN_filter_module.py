@@ -40,18 +40,20 @@ class NNFilterModule(b2.Module):
     Goals:
        1. Build a graph from an event composed of MCParticles
        2. Apply the well-trained model for reweighting or sampling method to get a score
-       (3. Execute reweighting or sampling process to get a weight)
+       3. Execute reweighting or sampling process to get a weight
 
     Arguments:
        model_file(str): Path to saved model
-       threshold: (float) Threshold for event selection using reweighting method, or
-                  (None) Indicating sampling mehtod
+       model_config(dict): Parameters to build the model
+       preproc_config(dict): Parameters to provide information for preprocessing
+       threshold(float): Threshold for event selection using reweighting method, value *None* indicating sampling mehtod
        extra_info_var(str): Name of eventExtraInfo to save model prediction to
-       custom_objects(str): Dictionary of custom objects to load with saved model (needed for custom layers)
+       global_tag(str): Tag in ConditionDB where the well trained model was stored
+       payload(str): Payload for the well trained model in global tag
 
     Returns:
        score(float): Score after the NN filter, indicating the probability of the event to pass.
-       (label: Pass or rejected according to random sampling or selection with threshold)
+       module.if_value: Pass or rejected according to random sampling or selection with threshold
 
     Setting the extra_info_var saves the output prediction to EventExtraInfo,
     users then need to explicitly add this branch to the mdst output to save this.
@@ -63,7 +65,9 @@ class NNFilterModule(b2.Module):
         model_config=MODEL_CONFIG,
         preproc_config=PREPROC_CONFIG,
         threshold=None,
-        extra_info_var="NN_prediction"
+        extra_info_var="NN_prediction",
+        global_tag="SmartBKG_GATGAP",
+        payload="GATGAPgen.pth"
     ):
         super().__init__()
         self.model_file = model_file
@@ -71,9 +75,10 @@ class NNFilterModule(b2.Module):
         self.preproc_config = preproc_config
         self.threshold = threshold
         self.extra_info_var = extra_info_var
+        self.payload = payload
 
         # set additional database conditions for trained neural network
-        b2.conditions.prepend_globaltag("SmartBKG_GATGAP")
+        b2.conditions.prepend_globaltag(global_tag)
 
     def initialize(self):
         """
@@ -81,8 +86,7 @@ class NNFilterModule(b2.Module):
         """
         # read trained model parameters from
         if not self.model_file:
-            payload = "GATGAPgen.pth"
-            accessor = DBAccessorBase(DBStoreEntry.c_RawFile, payload, True)
+            accessor = DBAccessorBase(DBStoreEntry.c_RawFile, self.payload, True)
             self.model_file = accessor.getFilename()
         trained_parameters = torch.load(self.model_file, map_location=DEVICE)
 
@@ -103,7 +107,7 @@ class NNFilterModule(b2.Module):
 
     def event(self):
         """
-        Return match of event number to input list
+        Collect information from database, build graphs, make predictions and select through sampling or threshold
         """
         # Initialize for every event
         self.gen_vars.clear()

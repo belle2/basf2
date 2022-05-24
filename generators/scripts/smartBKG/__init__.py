@@ -5,7 +5,8 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
-# PDG codes are taken from basf2/decfiles/dec
+# PDG IDs were taken from data/framework/particledb/evt.pdl
+# They will be tokenized to match integers from 1 to the number of different PDG IDs.
 PDG_TOKENS = [
     0,
     329,

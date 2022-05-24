@@ -58,6 +58,25 @@ class GATModule(torch.nn.Module):
 
 
 class GATGAPModel(torch.nn.Module):
+    """
+    Input:
+       dgl graph built from decay event
+
+    Arguments:
+       units(int): Number of units for the output dimension of GAT Convolutional layers
+       as well as the dimension of global features
+       num_features(int): Number of features attached to each node or particle as NN input
+       num_pdg(int): Number of all possible PDG IDs
+       emb_size(int): Dimension of embedded PDG space
+       attention_heads(int): Number of attention heads for GAT Convolutional layers
+       n_layers(int): Number of GAT Convolutional layers
+       use_gap(bool): Whether use Global Attention Pooling or Global Average
+
+    Returns:
+       logits(float): Indicating the probability of an event being able to pass the
+       corresponding skim, need `sigmoid` to be used as a prediction
+    """
+
     def __init__(
         self,
         units=128,

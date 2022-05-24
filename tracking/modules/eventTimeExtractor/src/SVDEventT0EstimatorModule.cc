@@ -46,13 +46,15 @@ void SVDEventT0EstimatorModule::initialize()
   B2DEBUG(20, "RecoTracks: " << m_recoTracksName);
   B2DEBUG(20, "EventT0: " << m_eventT0Name);
 
+  /** Register the data object */
+  m_eventT0.registerInDataStore();
   m_recoTracks.isRequired(m_recoTracksName);
-  m_eventT0.isRequired(m_eventT0Name);
 }
 
 
 void SVDEventT0EstimatorModule::event()
 {
+
   double evtT0 = NAN;
   double evtT0_err = NAN;
   double clsTime_sum = 0;
@@ -78,6 +80,8 @@ void SVDEventT0EstimatorModule::event()
     evtT0_err = std::sqrt(clsTime_err_sum / (N_cls * (N_cls - 1)));
   }
   EventT0::EventT0Component evtT0_comp(evtT0, evtT0_err, Const::SVD, m_algorithm, quality);
-  m_eventT0->addTemporaryEventT0(evtT0_comp);
-  m_eventT0->setEventT0(evtT0_comp);
+  if (m_eventT0.isValid()) {
+    m_eventT0->addTemporaryEventT0(evtT0_comp);
+    m_eventT0->setEventT0(evtT0_comp);
+  }
 }

@@ -44,7 +44,7 @@ REG_MODULE(ECLChargedPIDMVA)
 
 ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module()
 {
-  setDescription("The module implements charged particle identification using ECL-related observables via a multiclass MVA. For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the MVA method which is stored in a conditions database payload. The MVA output variables are then used to construct a likelihood from pdfs also stored in the payload. The likelihood is then stored in the ECLPidLikelihood object.");
+  setDescription("This module implements charged particle identification using ECL-related observables via a multiclass MVA. For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the MVA method which is stored in a conditions database payload. The MVA output variables are then used to construct a likelihood from pdfs also stored in the payload. The likelihood is then stored in the ECLPidLikelihood object.");
 
   addParam("payloadName",
            m_payload_name,
@@ -73,53 +73,41 @@ void ECLChargedPIDMVAModule::checkDBPayloads()
 void ECLChargedPIDMVAModule::initializeMVA()
 {
   B2DEBUG(12, "Run: " << m_eventMetaData->getRun() <<
-          ". Load supported MVA interfaces for multi-class charged particle identification...");
+          ". Loading supported MVA interfaces for multi-class charged particle identification.");
+
+  Variable::Manager& manager = Variable::Manager::Instance();
+  m_binningVariables = manager.getVariables((*m_mvaWeights.get())->getBinningVariables());
 
   MVA::AbstractInterface::initSupportedInterfaces();
   auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
 
-  auto nCategories = (*m_mvaWeights.get())->nCategories();
+  for (const auto& iterator : * (*m_mvaWeights.get())->getPhasespaceCategories()) {
 
-  B2DEBUG(12, " number of categories booked: " << nCategories);
-
-  m_experts.resize(nCategories);
-  m_variables.resize(nCategories);
-  m_datasets.resize(nCategories);
-
-
-  for (unsigned int idx(0); idx < nCategories; idx++) {
-
-    B2DEBUG(12, "\t\tweightfile[" << idx << "]");
+    B2DEBUG(12, "\t\tweightfile[" << iterator.first << "]");
 
     // De-serialize the string into an MVA::Weightfile object.
-    (*m_mvaWeights.get())->getPhasespaceCategory(idx);
-    (*m_mvaWeights.get())->getPhasespaceCategory(idx)->getSerialisedWeight();
-
-    std::stringstream ss((*m_mvaWeights.get())->getPhasespaceCategory(idx)->getSerialisedWeight());
+    std::stringstream ss(iterator.second.getSerialisedWeight());
     auto weightfile = MVA::Weightfile::loadFromStream(ss);
 
     MVA::GeneralOptions general_options;
     weightfile.getOptions(general_options);
 
     // Store an MVA::Expert object.
-    m_experts[idx] = supported_interfaces[general_options.m_method]->getExpert();
-    m_experts.at(idx)->load(weightfile);
+    m_experts[iterator.first] = supported_interfaces[general_options.m_method]->getExpert();
+    m_experts.at(iterator.first)->load(weightfile);
 
-    B2DEBUG(12, "\t\tweightfile  at " << idx << " successfully initialised.");
+    B2DEBUG(12, "\t\tweightfile  at " << iterator.first << " successfully initialised.");
 
-    // Load the variable objects
-    Variable::Manager& manager = Variable::Manager::Instance();
-
-    // get the full version of the variable names.
+    // Get the full version of the variable names.
     // These are stored in the xml as an additional vector.
     const std::string identifier = std::string("de_aliased_clf_vars");
     auto clf_vars = weightfile.getVector<std::string>(identifier);
-    m_variables[idx] = manager.getVariables(clf_vars);
+    m_variables[iterator.first] = manager.getVariables(clf_vars);
 
     std::vector<float> features(general_options.m_variables.size(), 0.0);
     std::vector<float> spectators;
 
-    m_datasets[idx] = std::make_unique<MVA::SingleDataset>(general_options, features, 1.0, spectators);
+    m_datasets[iterator.first] = std::make_unique<MVA::SingleDataset>(general_options, features, 1.0, spectators);
   }
 }
 
@@ -149,55 +137,33 @@ void ECLChargedPIDMVAModule::event()
     // Create a particle object so that we can use the variable manager.
     const Particle particle = Particle(&track, Const::pion);
 
-    // Require a matched cluster for the particle.
-    // This internally requires a shower with a photon hypo.
-    if (!particle.getECLCluster()) continue;
-
-    const double p = fitRes->getMomentum().Mag();
-    const double showerTheta = Belle2::Variable::eclClusterTheta(&particle);
+    // Get global bin index for track corresponding to N dimensional binning.
+    std::vector<float> binningVariableValues(m_binningVariables.size());
+    for (unsigned int ivar(0); ivar < binningVariableValues.size(); ivar++) {
+      auto varobj = m_binningVariables.at(ivar);
+      binningVariableValues.at(ivar) = evaluateVariable(varobj, &particle);
+    }
+    const int linearCategoryIndex = (*m_mvaWeights.get())->getLinearisedCategoryIndex(binningVariableValues);
 
     // Require we cover the phasespace.
     // Alternatively could take closest covered region but behaviour will not be well understood.
-    if (!(*m_mvaWeights.get())->isPhasespaceCovered(showerTheta, p, charge)) continue;
+    // After this check the linearCategoryIndex is guaranteed to be positive.
+    if (!(*m_mvaWeights.get())->isPhasespaceCovered(linearCategoryIndex)) continue;
 
-    // Get the MVA region
-    unsigned int linearCategoryIndex = (*m_mvaWeights.get())->getLinearisedCategoryIndex(showerTheta, p, charge);
-    unsigned int nvars = m_variables.at(linearCategoryIndex).size();
-
-    // get the phasespaceCategory
+    // Get the phasespaceCategory
     const auto phasespaceCategory = (*m_mvaWeights.get())->getPhasespaceCategory(linearCategoryIndex);
 
-    // fill the feature vectors
+    // Fill the feature vectors
+    unsigned int nvars = m_variables.at(linearCategoryIndex).size();
     for (unsigned int ivar(0); ivar < nvars; ++ivar) {
       auto varobj = m_variables.at(linearCategoryIndex).at(ivar);
-
-      float val = std::numeric_limits<float>::quiet_NaN();
-
-      if (std::holds_alternative<double>(varobj->function(&particle))) {
-        val = (float)std::get<double>(varobj->function(&particle));
-      } else if (std::holds_alternative<int>(varobj->function(&particle))) {
-        val = (float)std::get<int>(varobj->function(&particle));
-      } else if (std::holds_alternative<bool>(varobj->function(&particle))) {
-        val = (float)std::get<bool>(varobj->function(&particle));
-      } else {
-        B2ERROR("Variable '" << varobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
-      }
-
-      if (std::isnan(val)) {
-        //NaNs cause crashed if using TMVA MulticlassBDT.
-        //In case other MVA methods are used, NaNs likely should be masked properly also.
-        B2FATAL("Variable '" << varobj->name <<
-                "' has NaN entries. Variable definitions in the MVA payload should include 'ifNaNGiveX(X, DEFAULT)' with a proper default value.");
-      }
-      m_datasets.at(linearCategoryIndex)->m_input[ivar] = val;
+      m_datasets.at(linearCategoryIndex)->m_input[ivar] = evaluateVariable(varobj, &particle);
     }
 
-    // get the mva response and convert to likelihood
-    B2DEBUG(12, "Category index, theta, p, charge: " << linearCategoryIndex << "  " << showerTheta << "  " << p << "  " << charge <<
-            " \n");
+    // Get the mva response to be converted to a likelihood
     std::vector<float> scores = m_experts.at(linearCategoryIndex)->applyMulticlass(*m_datasets.at(linearCategoryIndex))[0];
 
-    // log transform the scores
+    // Log transform the scores
     // This turns the MVA output which, if using the nominal TMVA MulticlassBDT,
     // is heavily peaked at 0 and 1 into a smooth curve.
     // We can then evaluate the likelihoods from this curve directly or further transform the responses.
@@ -213,18 +179,18 @@ void ECLChargedPIDMVAModule::event()
       unsigned int hypo_idx = hypo.getIndex();
       auto absPdgId = abs(hypo.getPDGCode());
 
-      // copy the scores so they aren't transformed in place
+      // Copy the scores so they aren't transformed in place
       std::vector<float> transformed_scores;
       transformed_scores = scores;
 
-      // perform extra transformations if they are booked
+      // Perform extra transformations if they are booked
       if ((phasespaceCategory->getTransformMode() ==
            ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_GaussianTransform)
           or
           (phasespaceCategory->getTransformMode() ==
            ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_DecorrelationTransform)) {
 
-        // gaussian transform
+        // Gaussian transform
         for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
           transformed_scores[iResponse] = gaussTransformation(scores[iResponse], phasespaceCategory->getCDF(absPdgId,  iResponse));
         }
@@ -234,7 +200,7 @@ void ECLChargedPIDMVAModule::event()
         }
       }
 
-      // get the pdf values for each response value
+      // Get the pdf values for each response value
       float logL = 0.0;
       for (unsigned int iResponse = 0; iResponse < transformed_scores.size(); iResponse++) {
 
@@ -244,13 +210,13 @@ void ECLChargedPIDMVAModule::event()
 
         double xmin, xmax;
         phasespaceCategory->getPDF(iResponse, absPdgId)->GetRange(xmin, xmax);
-        // kick the response back into the range of the PDF (alternatively consider logL = std::numeric_limits<float>::min() if outside range)
+        // Kick the response back into the range of the PDF (alternatively consider logL = std::numeric_limits<float>::min() if outside range)
         float transformed_score_copy = transformed_scores[iResponse];
         if (transformed_score_copy < xmin) transformed_score_copy = xmin + 1e-5;
         if (transformed_score_copy > xmax) transformed_score_copy = xmax - 1e-5;
 
         float pdfval = phasespaceCategory->getPDF(iResponse, absPdgId)->Eval(transformed_score_copy);
-        // dont take a log of inf or 0
+        // Don't take a log of inf or 0
         logL += (std::isnormal(pdfval) && pdfval > 0) ? std::log(pdfval) : c_dummyLogL;
         B2DEBUG(12, "MVA response index, MVA score, logL: " << iResponse << "  " << transformed_score_copy << "  " << logL << " \n");
       }
@@ -312,4 +278,27 @@ std::vector<float> ECLChargedPIDMVAModule::decorrTransformation(const std::vecto
     }
   }
   return decor_scores;
+}
+
+float ECLChargedPIDMVAModule::evaluateVariable(const Variable::Manager::Var* varobj, const Particle* particle)
+{
+  float val = std::numeric_limits<float>::quiet_NaN();
+  if (std::holds_alternative<double>(varobj->function(particle))) {
+    val = (float)std::get<double>(varobj->function(particle));
+  } else if (std::holds_alternative<int>(varobj->function(particle))) {
+    val = (float)std::get<int>(varobj->function(particle));
+  } else if (std::holds_alternative<bool>(varobj->function(particle))) {
+    val = (float)std::get<bool>(varobj->function(particle));
+  } else {
+    B2ERROR("Variable '" << varobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
+  }
+  if (std::isnan(val)) {
+    //NaNs cause crashed if using TMVA MulticlassBDT.
+    //In case other MVA methods are used, NaNs likely should be masked properly also.
+    B2FATAL("Variable '" << varobj->name <<
+            "' has NaN entries. Variable definitions in the MVA payload should include 'ifNaNGiveX(X, DEFAULT)'" <<
+            "with a proper default value if it is possible for the variable to evaluate as NaN.");
+  }
+
+  return val;
 }

@@ -3499,17 +3499,18 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
         *detectors: detectors for which track isolation variables will be calculated.
                     Choose among: "CDC", "TOP", "ARICH", "ECL", "KLM"
         reference_list_name (Optional[str]): name of the input ParticleList for the reference track.
-                                             By default, the `:all` ParticleList of the same particle type of `list_name` is used.
+                                             By default, the ``:all`` ParticleList of the same particle type
+                                             of ``list_name`` is used.
                                              It must be a list of charged stable particles, too.
                                              The charge-conjugate ParticleList will be also processed automatically.
     Returns:
-        aliases (list(str)): a list of aliases for the calculated distance variables.
+        list(str): a list of aliases for the calculated distance variables.
 
     """
 
     import variables.utils as vu
 
-    det_choices = ("CDC", "TOP", "ARICH", "ECL", "KLM")
+    det_choices = ["CDC", "TOP", "ARICH", "ECL", "KLM"]
     if any(d not in det_choices for d in detectors):
         B2ERROR("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)
 
@@ -3521,8 +3522,8 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
             det_labels.append(f"{det}0")
 
     if reference_list_name is None:
-        particle = list_name.split(":")[0][:-1]
-        reference_list_name = f"{particle}+:all"
+        particle = list_name.split(":")[0]
+        reference_list_name = f"{particle}:all"
 
     suffix = f"_VS_{reference_list_name}"
     for det in det_labels:

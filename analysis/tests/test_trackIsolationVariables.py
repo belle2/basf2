@@ -5,9 +5,11 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 import basf2 as b2
 import modularAnalysis as ma
-import stdCharged as stdc
+import pdg
+from ROOT import Belle2
 import b2test_utils
 
 path = b2.create_path()
@@ -19,42 +21,35 @@ ma.inputMdstList(filelist=[b2test_utils.require_file("mdst14.root", "validation"
                  entrySequences=["0:1"],
                  path=path)
 
-ntup_vars = []
-for det in ("CDC", "PID", "ECL", "KLM"):
-    ntup_vars.extend([f"dist3DToClosestTrkAtSurface{det}", f"dist2DRhoPhiToClosestTrkAtSurface{det}"])
+detectors = ["CDC", "TOP", "ARICH", "ECL", "KLM"]
 
+# Pdg code of the charged stable particles & antiparticles.
+# Note that this is just to test module behaviour against different user's input:
+# in fact, for any choice of particle list's charge, the charge-conjugated one
+# gets loaded automatically.
 
-for ptype in stdc._chargednames:
+chargedStableList = []
+for idx in range(len(Belle2.Const.chargedStableSet)):
+    pdgId = Belle2.Const.chargedStableSet.at(idx).getPDGCode()
+    chargedStableList.extend([pdgId, -pdgId])
 
-    # Note that this is just to test module behaviour against different user's input:
-    # in fact, for any choice of particle list's charge, the charge-conjugated one
-    # gets loaded automatically.
-    for ch in ("+", "-"):
+for pname in pdg.to_names(chargedStableList):
 
-        # Protons are a bit special...
-        if ptype == "p" and ch == "-":
-            ptype = f"anti-{ptype}"
+    plist = f"{pname}:ref"
 
-        pname = f"{ptype}{ch}:all"
-        ma.fillParticleList(pname, "", path=path)
+    ma.fillParticleList(plist, "[pt > 0.1] and [thetaInCDCAcceptance]", path=path)
 
-        ma.calculateTrackIsolation(pname,
-                                   path,
-                                   "CDC", "PID", "ECL", "KLM",
-                                   alias="dist3DToClosestTrkAtSurface")
-        ma.calculateTrackIsolation(pname,
-                                   path,
-                                   "CDC", "PID", "ECL", "KLM",
-                                   use2DRhoPhiDist=True,
-                                   alias="dist2DRhoPhiToClosestTrkAtSurface")
+    ntup_vars = ma.calculateTrackIsolation(plist,
+                                           path,
+                                           *detectors)
 
-        ma.printList(pname, full=True, path=path)
-        ma.printVariableValues(pname, ntup_vars, path=path)
+    ma.printList(plist, full=True, path=path)
+    ma.printVariableValues(plist, ntup_vars, path=path)
 
-        ma.variablesToNtuple(pname,
-                             ntup_vars,
-                             treename=f"{ptype}{ch}",
-                             filename="TrackIsolationVariables.root", path=path)
+    ma.variablesToNtuple(plist,
+                         ntup_vars,
+                         treename=pname,
+                         filename="TrackIsolationVariables.root", path=path)
 
 with b2test_utils.clean_working_directory():
     with b2test_utils.set_loglevel(b2.LogLevel.INFO):

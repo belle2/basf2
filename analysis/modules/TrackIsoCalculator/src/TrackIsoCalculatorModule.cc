@@ -47,8 +47,8 @@ void TrackIsoCalculatorModule::initialize()
   m_pList.isRequired(m_pListName);
   m_pListReference.isRequired(m_pListReferenceName);
 
-  B2INFO("TrackIsoCalculator module will calculate isolation variables for the ParticleList: " << m_pListName << ", "
-         << "Reference ParticleList: " << m_pListReferenceName << ".");
+  B2INFO("Calculating isolation variables at " << m_detSurface << " surface for ParticleList: "
+         << m_pListName << ", " << "reference ParticleList: " << m_pListReferenceName << ".");
 
   if (!isStdChargedList()) {
     B2FATAL("ParticleList: " << m_pListName << " and/or ParticleList: " << m_pListReferenceName <<
@@ -135,7 +135,7 @@ void TrackIsoCalculatorModule::event()
     }
 
     auto minDist = std::min_element(std::begin(iRow), std::end(iRow));
-    auto jPart = std::distance(std::begin(iRow), minDist);
+    auto jPart = std::distance(std::begin(pairwiseDistances[iPart]), minDist);
 
     Particle* iParticle = m_pList->getParticle(iPart);
     Particle* jParticle = m_pListReference->getParticle(jPart);

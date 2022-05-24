@@ -154,19 +154,17 @@ void ECLChargedPIDMVAModule::event()
     // After this check the linearCategoryIndex is guaranteed to be positive.
     if (!(*m_mvaWeights.get())->isPhasespaceCovered(linearCategoryIndex)) continue;
 
-    // Get the MVA region
-    unsigned int nvars = m_variables.at(linearCategoryIndex).size();
-
     // Get the phasespaceCategory
     const auto phasespaceCategory = (*m_mvaWeights.get())->getPhasespaceCategory(linearCategoryIndex);
 
     // Fill the feature vectors
+    unsigned int nvars = m_variables.at(linearCategoryIndex).size();
     for (unsigned int ivar(0); ivar < nvars; ++ivar) {
       auto varobj = m_variables.at(linearCategoryIndex).at(ivar);
       m_datasets.at(linearCategoryIndex)->m_input[ivar] = evaluateVariable(varobj, &particle);
     }
 
-    // Get the mva response and convert to likelihood
+    // Get the mva response to be converted to a likelihood
     std::vector<float> scores = m_experts.at(linearCategoryIndex)->applyMulticlass(*m_datasets.at(linearCategoryIndex))[0];
 
     // Log transform the scores

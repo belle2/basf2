@@ -34,8 +34,7 @@
 namespace Belle2 {
 
   /**
-   * Stores the N dimensional binning in which to apply the MVAs. For example, 3D in (clusterTheta, p, charge).
-   * Also provides functionality to get the bin index from the binning.
+   * Class to store the N dimensional phasespace binning of the MVA categorical training. For example, 3D in (clusterTheta, p, charge).
    */
   class ECLChargedPIDPhasespaceBinning : public TObject {
 
@@ -116,7 +115,7 @@ namespace Belle2 {
      */
     std::vector<int> m_nBins;
 
-    // 1: first class implementation.
+    // 1: First class implementation.
     ClassDef(ECLChargedPIDPhasespaceBinning, 1); /**< ClassDef */
   };
 
@@ -133,11 +132,11 @@ namespace Belle2 {
   class ECLChargedPIDPhasespaceCategory : public TObject {
 
   public:
-    /** enum of implemented transformations which can be applied to the MVA response */
+    /** Enum of implemented transformations which can be applied to the MVA response */
     enum class MVAResponseTransformMode : unsigned int {
-      /** log transform the mva responses. And take the likelihood as the product of likelihoods from all mva responses. */
+      /** Log transform the mva responses. And take the likelihood as the product of likelihoods from all mva responses. */
       c_LogTransform = 0,
-      /** log transform the mva responses. Take the likelihood from only the mva response for the hypothesis. */
+      /** Log transform the mva responses. Take the likelihood from only the mva response for the hypothesis. */
       c_LogTransformSingle = 1,
       /** Gaussian transform of the log transformed mva response. */
       c_GaussianTransform = 2,
@@ -196,17 +195,17 @@ namespace Belle2 {
     ~ECLChargedPIDPhasespaceCategory() {};
 
     /**
-     * getter for serialised weightfile.
+     * Getter for serialised weightfile.
      */
     const std::string getSerialisedWeight() const {return m_weight;}
 
     /**
-     * getter for the MVA transform mode.
+     * Getter for the MVA transform mode.
      */
     MVAResponseTransformMode getTransformMode() const {return m_mvaResponseTransformMode;}
 
     /**
-     * getter for pdfs.
+     * Getter for pdfs.
      * @param iMVAResponse index of MVA response.
      * @param hypoPDG, hypothesis pdg.
      */
@@ -216,7 +215,7 @@ namespace Belle2 {
     }
 
     /**
-     * gets the cdf for the hypothesis pdg for a given response value.
+     * Gets the cdf for the hypothesis pdg for a given response value.
      * @param iMVAResponse index of MVA response.
      * @param hypoPDG, hypothesis pdg.
      */
@@ -226,7 +225,7 @@ namespace Belle2 {
     }
 
     /**
-     * gets the decorrelation matrix for a given particle hypothesis.
+     * Gets the decorrelation matrix for a given particle hypothesis.
      * @param hypoPDG, hypothesis pdg.
      */
     const std::vector<float>* getDecorrelationMatrix(const int hypoPDG) const
@@ -235,13 +234,13 @@ namespace Belle2 {
     }
 
     /**
-     * set the cdfs.
+     * Set the cdfs.
      * @param cdfs vector of map of cdfs to be stored in the payload.
      */
     void setCDFs(std::vector<std::unordered_map<unsigned int, TH1F>> cdfs) {m_cdfs = cdfs;}
 
     /**
-     * set the decorrelation matrices.
+     * Set the decorrelation matrices.
      * @param decorrelationMatrices map of decorrelation matrices to be stored in the payload.
      */
     void setDecorrelationMatrixMap(std::unordered_map<unsigned int, std::vector<float>> decorrelationMatrices)
@@ -258,7 +257,7 @@ namespace Belle2 {
     }
 
     /**
-     * get the log transform offset
+     * Getter for the log transform offset.
      */
     float getLogTransformOffset() const
     {
@@ -282,7 +281,7 @@ namespace Belle2 {
     }
 
     /**
-     * maps a charged stable pdg code to an index of the MVA response.
+     * Maps a charged stable pdg code to an index of the MVA response.
      * In general this is a one-to-one mapping however in cases where we do not include all six
        stable charged particles in the MVA training we may have a many-to-one mapping.
      * For example if we take the proton response value also for deuterons.
@@ -314,8 +313,8 @@ namespace Belle2 {
     std::vector<std::unordered_map<unsigned int, TF1>> m_pdfs;
 
     /**
-     * unordered map of abs(pdg_code) for the 6 charged stable hypotheses to index of the MVA response vector.
-     * needed if we do not train with all 6 species to map several to the same MVA response value.
+     * Unordered map of abs(pdg_code) for the 6 charged stable hypotheses to index of the MVA response vector.
+     * Needed if we do not train with all 6 species to map several to the same MVA response value.
      */
     std::unordered_map<unsigned int, unsigned int> m_mvaIndexForHypothesis;
 
@@ -332,7 +331,7 @@ namespace Belle2 {
      */
     std::unordered_map<unsigned int, std::vector<float>> m_decorrelationMatrices;
 
-    // 1: first class implementation.
+    // 1: First class implementation.
     ClassDef(ECLChargedPIDPhasespaceCategory, 1); /**< ClassDef */
   };
 
@@ -361,9 +360,10 @@ namespace Belle2 {
     void setWeightCategories(ECLChargedPIDPhasespaceBinning* h) {m_categories = h;}
 
     /**
-     * store the ECLChargedPIDPhasespaceCategory objects into the payload.
-     * @param phasespaceCategories a vector of ECLChargedPIDPhasespaceCategory objects, one per phasespace region.
+     * Store the ECLChargedPIDPhasespaceCategory objects into the payload.
+     * @param phasespaceCategories a map of ECLChargedPIDPhasespaceCategory objects.
               Each object contains all the data required to process tracks in that phasespace.
+              The map does not need to cover all phasespace regions.
      */
     void storeMVAWeights(std::unordered_map<unsigned int, ECLChargedPIDPhasespaceCategory>& phasespaceCategories)
     {
@@ -371,29 +371,31 @@ namespace Belle2 {
     }
 
     /**
-     * returns the ith ECLChargedPIDPhasespaceCategory.
+     * Returns the ith ECLChargedPIDPhasespaceCategory.
      * @param idx, index of ECLChargedPIDPhasespaceCategory.
      */
     const ECLChargedPIDPhasespaceCategory* getPhasespaceCategory(const unsigned int idx)  const {return &m_phasespaceCategories.at(idx);}
 
     /**
-     * returns the map of phasespaceCategories.
+     * Returns the map of phasespaceCategories.
      */
     const std::unordered_map<unsigned int, ECLChargedPIDPhasespaceCategory>* getPhasespaceCategories() const {return &m_phasespaceCategories;}
 
     /**
-    * returns bool whether or not the given values are within the phasespace covered by the trainings in the weightfile
+    * Returns bool whether or not the given values are within the phasespace covered by the trainings in the weightfile
     * @param linearBinIndex: global bin index.
     */
     bool isPhasespaceCovered(const int linearBinIndex) const
     {
+      // if the tuple of values passed falls outside the defined phasespace.
       if (linearBinIndex < 0) return false;
+      // if the tuple is within the defined phasespace but we do not provide an ECLChargedPIDPhasespaceCategory object for this bin.
       if (m_phasespaceCategories.count(linearBinIndex) == 0) return false;
       return true;
     }
 
     /**
-    * returns the flattened 1D index of the N dimensional phasespace category grid.
+    * Returns the flattened 1D index of the N dimensional phasespace category grid.
     * @param values: N dimensional input vector of floats to be mapped to a globalBinIndex.
     */
 
@@ -406,12 +408,12 @@ namespace Belle2 {
     }
 
     /**
-     * returns string definitions of the variables used in defining the phasespace categories.
+     * Returns string definitions of the variables used in defining the phasespace categories.
      */
     std::vector<std::string> getBinningVariables() const {return m_binningVariables;}
 
     /**
-     * set string definitions of the variables used in defining the phasespace categories.
+     * Set string definitions of the variables used in defining the phasespace categories.
      * @param binningVariables string definitions of the variables used in defining the phasespace categories.
      */
     void setBinningVariables(std::vector<std::string>& binningVariables) {m_binningVariables = binningVariables;}
@@ -432,7 +434,7 @@ namespace Belle2 {
      */
     std::vector<std::string> m_binningVariables;
 
-    // 1: first class implementation.
+    // 1: First class implementation.
     ClassDef(ECLChargedPIDMVAWeights, 1); /**< ClassDef  */
 
   }; // class ECLChargedPIDMVAWeights

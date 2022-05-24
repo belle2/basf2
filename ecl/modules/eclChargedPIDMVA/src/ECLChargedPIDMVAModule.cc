@@ -44,7 +44,7 @@ REG_MODULE(ECLChargedPIDMVA)
 
 ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module()
 {
-  setDescription("The module implements charged particle identification using ECL-related observables via a multiclass MVA. For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the MVA method which is stored in a conditions database payload. The MVA output variables are then used to construct a likelihood from pdfs also stored in the payload. The likelihood is then stored in the ECLPidLikelihood object.");
+  setDescription("This module implements charged particle identification using ECL-related observables via a multiclass MVA. For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the MVA method which is stored in a conditions database payload. The MVA output variables are then used to construct a likelihood from pdfs also stored in the payload. The likelihood is then stored in the ECLPidLikelihood object.");
 
   addParam("payloadName",
            m_payload_name,
@@ -77,7 +77,7 @@ void ECLChargedPIDMVAModule::initializeMVA()
 
   Variable::Manager& manager = Variable::Manager::Instance();
   m_binningVariables = manager.getVariables((*m_mvaWeights.get())->getBinningVariables());
-  m_binningValues.resize(m_binningVariables.size());
+  m_binningVariablesValues.resize(m_binningVariables.size());
 
   MVA::AbstractInterface::initSupportedInterfaces();
   auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
@@ -99,7 +99,7 @@ void ECLChargedPIDMVAModule::initializeMVA()
 
     B2DEBUG(12, "\t\tweightfile  at " << iterator.first << " successfully initialised.");
 
-    // get the full version of the variable names.
+    // Get the full version of the variable names.
     // These are stored in the xml as an additional vector.
     const std::string identifier = std::string("de_aliased_clf_vars");
     auto clf_vars = weightfile.getVector<std::string>(identifier);
@@ -142,46 +142,33 @@ void ECLChargedPIDMVAModule::event()
     // This internally requires a shower with a photon hypo.
     if (!particle.getECLCluster()) continue;
 
-    for (unsigned int ivar(0); ivar < m_binningValues.size(); ivar++) {
+    for (unsigned int ivar(0); ivar < m_binningVariablesValues.size(); ivar++) {
       auto varobj = m_binningVariables.at(ivar);
-      float val = evaluateVariable(varobj, &particle);
-      if (std::isnan(val)) {
-        B2FATAL("Variable '" << varobj->name <<
-                "' has NaN entries. Variable definitions in the MVA payload should include 'ifNaNGiveX(X, DEFAULT)'" <<
-                "with a proper default value if it is possible for the variable to evaluate as NaN.");
-      }
-      m_binningValues.at(ivar) = val;
+      m_binningVariablesValues.at(ivar) = evaluateVariable(varobj, &particle);
     }
 
     // Require we cover the phasespace.
     // Alternatively could take closest covered region but behaviour will not be well understood.
     // After this check the linearCategoryIndex is guaranteed to be positive.
-    const int linearCategoryIndex = (*m_mvaWeights.get())->getLinearisedCategoryIndex(m_binningValues);
+    const int linearCategoryIndex = (*m_mvaWeights.get())->getLinearisedCategoryIndex(m_binningVariablesValues);
     if (!(*m_mvaWeights.get())->isPhasespaceCovered(linearCategoryIndex)) continue;
 
     // Get the MVA region
     unsigned int nvars = m_variables.at(linearCategoryIndex).size();
 
-    // get the phasespaceCategory
+    // Get the phasespaceCategory
     const auto phasespaceCategory = (*m_mvaWeights.get())->getPhasespaceCategory(linearCategoryIndex);
 
-    // fill the feature vectors
+    // Fill the feature vectors
     for (unsigned int ivar(0); ivar < nvars; ++ivar) {
       auto varobj = m_variables.at(linearCategoryIndex).at(ivar);
-      float val = evaluateVariable(varobj, &particle);
-      if (std::isnan(val)) {
-        //NaNs cause crashed if using TMVA MulticlassBDT.
-        //In case other MVA methods are used, NaNs likely should be masked properly also.
-        B2FATAL("Variable '" << varobj->name <<
-                "' has NaN entries. Variable definitions in the MVA payload should include 'ifNaNGiveX(X, DEFAULT)' with a proper default value.");
-      }
-      m_datasets.at(linearCategoryIndex)->m_input[ivar] = val;
+      m_datasets.at(linearCategoryIndex)->m_input[ivar] = evaluateVariable(varobj, &particle);
     }
 
-    // get the mva response and convert to likelihood
+    // Get the mva response and convert to likelihood
     std::vector<float> scores = m_experts.at(linearCategoryIndex)->applyMulticlass(*m_datasets.at(linearCategoryIndex))[0];
 
-    // log transform the scores
+    // Log transform the scores
     // This turns the MVA output which, if using the nominal TMVA MulticlassBDT,
     // is heavily peaked at 0 and 1 into a smooth curve.
     // We can then evaluate the likelihoods from this curve directly or further transform the responses.
@@ -197,18 +184,18 @@ void ECLChargedPIDMVAModule::event()
       unsigned int hypo_idx = hypo.getIndex();
       auto absPdgId = abs(hypo.getPDGCode());
 
-      // copy the scores so they aren't transformed in place
+      // Copy the scores so they aren't transformed in place
       std::vector<float> transformed_scores;
       transformed_scores = scores;
 
-      // perform extra transformations if they are booked
+      // Perform extra transformations if they are booked
       if ((phasespaceCategory->getTransformMode() ==
            ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_GaussianTransform)
           or
           (phasespaceCategory->getTransformMode() ==
            ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode::c_DecorrelationTransform)) {
 
-        // gaussian transform
+        // Gaussian transform
         for (unsigned int iResponse = 0; iResponse < scores.size(); iResponse++) {
           transformed_scores[iResponse] = gaussTransformation(scores[iResponse], phasespaceCategory->getCDF(absPdgId,  iResponse));
         }
@@ -218,7 +205,7 @@ void ECLChargedPIDMVAModule::event()
         }
       }
 
-      // get the pdf values for each response value
+      // Get the pdf values for each response value
       float logL = 0.0;
       for (unsigned int iResponse = 0; iResponse < transformed_scores.size(); iResponse++) {
 
@@ -228,13 +215,13 @@ void ECLChargedPIDMVAModule::event()
 
         double xmin, xmax;
         phasespaceCategory->getPDF(iResponse, absPdgId)->GetRange(xmin, xmax);
-        // kick the response back into the range of the PDF (alternatively consider logL = std::numeric_limits<float>::min() if outside range)
+        // Kick the response back into the range of the PDF (alternatively consider logL = std::numeric_limits<float>::min() if outside range)
         float transformed_score_copy = transformed_scores[iResponse];
         if (transformed_score_copy < xmin) transformed_score_copy = xmin + 1e-5;
         if (transformed_score_copy > xmax) transformed_score_copy = xmax - 1e-5;
 
         float pdfval = phasespaceCategory->getPDF(iResponse, absPdgId)->Eval(transformed_score_copy);
-        // dont take a log of inf or 0
+        // Don't take a log of inf or 0
         logL += (std::isnormal(pdfval) && pdfval > 0) ? std::log(pdfval) : c_dummyLogL;
         B2DEBUG(12, "MVA response index, MVA score, logL: " << iResponse << "  " << transformed_score_copy << "  " << logL << " \n");
       }
@@ -310,5 +297,13 @@ float ECLChargedPIDMVAModule::evaluateVariable(const Variable::Manager::Var* var
   } else {
     B2ERROR("Variable '" << varobj->name << "' has wrong data type! It must be one of double, integer, or bool.");
   }
+  if (std::isnan(val)) {
+    //NaNs cause crashed if using TMVA MulticlassBDT.
+    //In case other MVA methods are used, NaNs likely should be masked properly also.
+    B2FATAL("Variable '" << varobj->name <<
+            "' has NaN entries. Variable definitions in the MVA payload should include 'ifNaNGiveX(X, DEFAULT)'" <<
+            "with a proper default value if it is possible for the variable to evaluate as NaN.");
+  }
+
   return val;
 }

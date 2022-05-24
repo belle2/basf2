@@ -168,7 +168,7 @@ namespace Belle2 {
     /**
      * Vector of evaluated variable values used to find the index of the corresponding MVA.
      */
-    std::vector<float> m_binningValues;
+    std::vector<float> m_binningVariablesValues;
 
     /**
      * Map of vectors containing the variables objects to be fed to the MVA.

@@ -307,14 +307,19 @@ basf2 Module documentation can be added to sphinx automatically using
 
     Can be used to filter the modules to be documented by a python
     :py:mod:`regular expression <re>` For example to show all modules in
-    the ``framework`` package which begin with 'Event' or to show all variables in
-    the group "Kinematics" which begin with x
+    the ``framework`` package which begin with 'Event'.
 
     .. code-block:: rst
 
       .. b2-modules::
          :package: framework
          :regex-filter: ^Event
+
+    .. note::  Can be used also for variables (see next section). For example
+       to show all variables in the group "Kinematics" which begin with x
+
+    .. code-block:: rst
+
       .. b2-variables::
          :group: Kinematics
          :regex-filter: ^x.*
@@ -334,6 +339,13 @@ basf2 Module documentation can be added to sphinx automatically using
     the same module is documented multiple times to select which of these
     should show up in the index.
 
+    .. note:: This can be used also with variables (see next
+    section) in that case if present the variables will not be added to the
+    index. This is useful if the same variable is documented multiple times to
+    select which of these should show up in the index.
+
+
+
 
 For this automatic documentation to work all documentation strings passed to
 ``setDescription()`` and ``addParam()`` should be valid reStructuredText_ (see
@@ -352,7 +364,10 @@ We can also add documentation for basf2 variables with a very similar syntax to 
 .. rst:directive:: b2-variables
 
   Allows to automatically document basf2 variables from the VariableManager. It
-  has the following optional parameters
+  has the following optional parameters. 
+
+  .. note:: ``:regex-filter:`` and ``:noindex:`` can be used also for ``b2-variables`` as described in previous section.
+
 
   .. rst:role:: group
 

@@ -137,10 +137,6 @@ void ECLChargedPIDMVAModule::event()
     // Create a particle object so that we can use the variable manager.
     const Particle particle = Particle(&track, Const::pion);
 
-    // Require a matched cluster for the particle.
-    // This internally requires a shower with a photon hypo.
-    if (!particle.getECLCluster()) continue;
-
     // Get global bin index for track corresponding to N dimensional binning.
     std::vector<float> binningVariableValues(m_binningVariables.size());
     for (unsigned int ivar(0); ivar < binningVariableValues.size(); ivar++) {

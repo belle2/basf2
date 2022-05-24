@@ -42,8 +42,13 @@ namespace Belle2 {
   public:
 
     /**
+     * Default Constructor. Needed for ROOT to stream the object.
+     */
+    ECLChargedPIDPhasespaceBinning() {};
+
+    /**
      * Constructor.
-     * @param binEdges vector of vectors of bin edges. Bin edges should be floats.
+     * @param binEdges vector of vectors of bin edges in the N dimensions.
      */
     ECLChargedPIDPhasespaceBinning(const std::vector<std::vector<float>> binEdges)
     {
@@ -383,7 +388,7 @@ namespace Belle2 {
     bool isPhasespaceCovered(const int linearBinIndex) const
     {
       if (linearBinIndex < 0) return false;
-      if (m_phasespaceCategories.find(linearBinIndex) == m_phasespaceCategories.end()) return false;
+      if (m_phasespaceCategories.count(linearBinIndex) == 0) return false;
       return true;
     }
 

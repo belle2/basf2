@@ -340,9 +340,9 @@ basf2 Module documentation can be added to sphinx automatically using
     should show up in the index.
 
     .. note:: This can be used also with variables (see next
-    section) in that case if present the variables will not be added to the
-    index. This is useful if the same variable is documented multiple times to
-    select which of these should show up in the index.
+       section) in that case if present the variables will not be added to the
+       index. This is useful if the same variable is documented multiple times to
+       select which of these should show up in the index.
 
 
 

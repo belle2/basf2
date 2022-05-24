@@ -184,13 +184,12 @@ namespace Belle2 {
       const auto relShowers = cluster->getRelationsWith<ECLShower>();
       if (relShowers.size() == 0) return nullptr;
 
-      ECLShower* shower;
       if (relShowers.size() == 1) {
-        shower = relShowers.object(0);
+        return relShowers.object(0);
       } else {
-        B2ERROR("Somehow found more than 1 ECLShower matched to the ECLCluster. This should not be possible!");
+        B2FATAL("Somehow found more than 1 ECLShower matched to the ECLCluster. This should not be possible!");
+        return nullptr;
       }
-      return shower;
     }
 
     //! @returns variable requested (expert function, only called from this file)

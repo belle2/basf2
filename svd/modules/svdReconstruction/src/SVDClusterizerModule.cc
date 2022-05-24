@@ -584,23 +584,25 @@ void SVDClusterizerModule::alterClusterPosition()
   VxdID sensorID = m_storeClusters[clsIndex]->getSensorID();
   bool isU = m_storeClusters[clsIndex]->isUCluster();
 
+  RelationVector<SVDTrueHit> trueHits = m_storeClusters[clsIndex]->getRelationsTo<SVDTrueHit>(m_storeTrueHitsName);
+
   // get the track's incident angle
   double trkAngle = 0.;
-  RelationArray relClusterTrueHit(m_storeClusters, m_storeTrueHits,
-                                  m_relClusterTrueHitName);
+  //RelationArray relClusterTrueHit(m_storeClusters, m_storeTrueHits, m_relClusterTrueHitName);
 
-  if (relClusterTrueHit[clsIndex].getSize() > 0) { // check if cluster has associated true hits
-    SVDTrueHit* trueHit =
-      m_storeTrueHits[relClusterTrueHit[clsIndex].getToIndex(0)];
+  if (trueHits.size() > 0) { // check if cluster has associated true hits
+    //SVDTrueHit* trueHit = m_storeTrueHits[relClusterTrueHit[clsIndex].getToIndex(0)];
+    SVDTrueHit* trueHit = trueHits[0];
     double trkLength = 0.;
     if (isU)
       trkLength = trueHit->getExitU() - trueHit->getEntryU();
     else
       trkLength = trueHit->getExitV() - trueHit->getEntryV();
     double trkHeight = trueHit->getExitW() - trueHit->getEntryW();
-    trkAngle =
-      atan2(trkLength, trkHeight) * (180 / 3.14159265);  // radians to degrees
+    trkAngle = atan2(trkLength, trkHeight) *
+               (180 / 3.14159265);  // radians to degrees
   }
+
 
   // get the appropriate sigma to alter the position
   double sigma_sq = m_mcFudgeFactor.getFudgeFactor(sensorID, isU, trkAngle);

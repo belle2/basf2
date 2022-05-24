@@ -29,10 +29,8 @@ output_file = 'output.root'
 my_path = b2.create_path()
 
 # load input ROOT file
-filelistSIG = ['']
-ma.inputMdstList(environmentType='default',
-                 filelist=filelistSIG,
-                 path=my_path)
+ma.inputMdst(filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False),
+             path=my_path)
 
 # load V0s and copy it
 stdV0s.stdKshorts(path=my_path)

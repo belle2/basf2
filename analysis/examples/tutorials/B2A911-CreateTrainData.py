@@ -26,13 +26,9 @@ output_file = "KsSelector_train.root"
 # create path
 my_path = b2.create_path()
 
-# input file name
-filelistSIG = ['']
-
 # load input ROOT file
-ma.inputMdstList(environmentType='default',
-                 filelist=filelistSIG,
-                 path=my_path)
+ma.inputMdst(filename=b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False),
+             path=my_path)
 
 # load K_S0 particle list
 stdV0s.stdKshorts(path=my_path)

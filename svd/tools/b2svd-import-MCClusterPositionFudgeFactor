@@ -69,7 +69,7 @@ class jsonSVDMCClusterPositionFudgeFactorImporter(b2.Module):
         # cluster position error
         clsParam = SVDMCFudgeFactorFunction()
 
-        uniqueID = "MCClusterErrorScaleFactor_"+str(self.first)+"_" + str(
+        uniqueID = "MCClusterPositionFudgeFactor_"+str(self.first)+"_" + str(
             now.isoformat()) + "_INFO:_current="+str(self.current)+"_"+str(self.tag)
 
         print("--> json INFO:")

@@ -77,7 +77,6 @@ void ECLChargedPIDMVAModule::initializeMVA()
 
   Variable::Manager& manager = Variable::Manager::Instance();
   m_binningVariables = manager.getVariables((*m_mvaWeights.get())->getBinningVariables());
-  m_binningVariablesValues.resize(m_binningVariables.size());
 
   MVA::AbstractInterface::initSupportedInterfaces();
   auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();

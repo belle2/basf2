@@ -133,19 +133,18 @@ void TrackIsoCalculatorModule::event()
 
   // For each particle index, find the index of the particle w/ minimal distance in the corresponding row of the 2D array.
   for (unsigned int iPart(0); iPart < nTargetParticles; ++iPart) {
+    const Particle* iParticle = (m_nSelectedDaughters > 0) ? targetParticles[iPart] : m_targetList->getParticle(iPart);
+    if (iParticle->hasExtraInfo(m_extraInfoName)) continue;
 
     auto minDist = std::min_element(std::begin(pairwiseDistances[iPart]), std::end(pairwiseDistances[iPart]));
     auto jPart = std::distance(std::begin(pairwiseDistances[iPart]), minDist);
 
-    const Particle* iParticle = (m_nSelectedDaughters > 0) ? targetParticles[iPart] : m_targetList->getParticle(iPart);
     B2DEBUG(10, m_extraInfoName << " = " << *minDist << " [cm] - Particle[" << iPart << "]'s closest partner at innermost " <<
             m_detInnerSurface << " surface is Particle[" << jPart << "]");
 
-    if (!iParticle->hasExtraInfo(m_extraInfoName)) {
-      B2DEBUG(10, "\tStoring extraInfo for Particle[" << iPart << "]...");
-      m_particles[iParticle->getArrayIndex()]->writeExtraInfo(m_extraInfoName, *minDist);
+    B2DEBUG(10, "\tStoring extraInfo for Particle[" << iPart << "]...");
+    m_particles[iParticle->getArrayIndex()]->writeExtraInfo(m_extraInfoName, *minDist);
 
-    }
   }
 
 }

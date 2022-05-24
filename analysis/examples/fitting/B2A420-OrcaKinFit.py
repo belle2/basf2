@@ -59,8 +59,7 @@ muvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.momentum_uncertaint
 z0vars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
     vu.create_aliases_for_selected(muvars, 'Z0 -> ^mu+ ^mu-')
 
-z0uvars = z0vars + \
-    vu.create_aliases(['OrcaKinFitProb', 'OrcaKinFitChi2', 'OrcaKinFitErrorCode'], 'extraInfo({variable})', "")
+z0uvars = z0vars + ['OrcaKinFitProb', 'OrcaKinFitChi2', 'OrcaKinFitErrorCode']
 
 
 # Saving variables to ntuple

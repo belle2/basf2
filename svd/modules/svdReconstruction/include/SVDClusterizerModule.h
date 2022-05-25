@@ -149,7 +149,7 @@ namespace Belle2 {
        * computes charge, position and time of the raw cluster
        * and appends the new SVDCluster to the StoreArray
        */
-      int finalizeCluster(Belle2::SVD::RawCluster& rawCluster);
+      void finalizeCluster(Belle2::SVD::RawCluster& rawCluster);
 
       /**
        * writes the relations of the SVDClusters with the other StoreArrays
@@ -159,7 +159,7 @@ namespace Belle2 {
       /**
        * alter the cluster position (applied on MC to match resolution measured on data)
        */
-      int alterClusterPosition();
+      void alterClusterPosition();
 
     };// end class declarations
 

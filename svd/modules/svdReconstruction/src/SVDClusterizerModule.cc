@@ -313,6 +313,10 @@ void SVDClusterizerModule::initialize()
 
 void SVDClusterizerModule::event()
 {
+
+  int nClsOutside = 0;
+  int nCls = 0;
+
   int nDigits = m_storeDigits.getEntries();
   if (nDigits == 0) return;
 
@@ -377,7 +381,7 @@ void SVDClusterizerModule::event()
     if (!rawCluster.add(thisSensorID, thisSide, aStrip)) {
       // if the strip is not added, write the cluster, if present and good:
       if ((rawCluster.getSize() > 0) && (rawCluster.isGoodRawCluster()))
-        finalizeCluster(rawCluster);
+        nClsOutside += finalizeCluster(rawCluster);
 
       // prepare for the next cluster:
       rawCluster = RawCluster(thisSensorID, thisSide, m_cutSeed, m_cutAdjacent,
@@ -391,12 +395,17 @@ void SVDClusterizerModule::event()
 
   // write the last cluster, if good
   if ((rawCluster.getSize() > 0) && (rawCluster.isGoodRawCluster()))
-    finalizeCluster(rawCluster);
+    nClsOutside += finalizeCluster(rawCluster);
+
+  nCls = m_storeClusters.getEntries();
 
   B2DEBUG(20, "Number of clusters: " << m_storeClusters.getEntries());
+
+  double fracClsOutside = (double) nClsOutside / nCls;
+  //cout << "Fraction of cluster outside fiducial volume after correction: " << fracClsOutside << endl;
 }
 
-void SVDClusterizerModule::finalizeCluster(
+int SVDClusterizerModule::finalizeCluster(
   Belle2::SVD::RawCluster& rawCluster)
 {
   VxdID sensorID = rawCluster.getSensorID();
@@ -477,9 +486,12 @@ void SVDClusterizerModule::finalizeCluster(
     writeClusterRelations(rawCluster);
 
     // alter cluster position on MC to match resolution measured on data
+    int isClsOutside = 0;
     bool isMC = Environment::Instance().isMC();
-    if (isMC) alterClusterPosition();
+    if (isMC) isClsOutside = alterClusterPosition();
+    return isClsOutside;
   }
+  return 0;
 }
 
 void SVDClusterizerModule::writeClusterRelations(
@@ -574,7 +586,7 @@ double SVDClusterizerModule::applyLorentzShiftCorrection(double position,
   return position;
 }
 
-void SVDClusterizerModule::alterClusterPosition()
+int SVDClusterizerModule::alterClusterPosition()
 {
   // alter the position of the last cluster in the array
   int clsIndex = m_storeClusters.getEntries() - 1;
@@ -605,13 +617,22 @@ void SVDClusterizerModule::alterClusterPosition()
 
 
   // get the appropriate sigma to alter the position
-  double sigma_sq = m_mcFudgeFactor.getFudgeFactor(sensorID, isU, trkAngle);
+  double sigma = m_mcFudgeFactor.getFudgeFactor(sensorID, isU, trkAngle);
 
   // do the job
   //TRandom* generator = new TRandom();
   //float fudgeFactor = (float)generator->Gaus(0., sqrt(sigma_sq));
-  float fudgeFactor = (float) gRandom->Gaus(0., sqrt(sigma_sq));
+  float fudgeFactor = (float) gRandom->Gaus(0., sigma) / 10000.;
+  int layerNum = sensorID.getLayerNumber();
+  //cout << "Layer number: " << layerNum << ", IsU: " << isU << ", trk angle: " << trkAngle << ", Sigma: " << sigma << ", position: " << clsPosition << ", fudge factor: " << fudgeFactor << endl;
   m_storeClusters[clsIndex]->setPosition(clsPosition + fudgeFactor);
+
+  const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(sensorID);
+  bool isClsInside = true;
+  if (isU) isClsInside = aSensorInfo->inside(clsPosition + fudgeFactor, 0);
+  else isClsInside = aSensorInfo->inside(0, clsPosition + fudgeFactor);
+  if (!isClsInside) return 1;
+  else return 0;
 }
 
 void SVDClusterizerModule::endRun()

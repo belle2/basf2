@@ -24,8 +24,6 @@ except ModuleNotFoundError:
     light_build = True
 
 if __name__ == "__main__":
-    #: ignore framework description of role warnings (should be fixed)
-    ignoreduplicatedescriptionofrole = 'duplicate description of role'
     #: ignore further warnings in light builds
     #: ignore online_book
     ignoreonlinebook = 'online_book'
@@ -46,7 +44,6 @@ if __name__ == "__main__":
 
     check_error_free("b2code-sphinx-warnings", "sphinx", None,
                      lambda x:
-                     re.findall(ignoreduplicatedescriptionofrole, x) or
                      re.findall(ignoreaddsimulation, x) or
                      re.findall(ignoreaddtriggersimulation, x) or
                      re.findall(ignoreaddreconstruction, x) or
@@ -59,6 +56,4 @@ if __name__ == "__main__":
                      )
     if not light_build:
         check_error_free("b2code-sphinx-warnings", "sphinx", None,
-                         lambda x:
-                         re.findall(ignoreduplicatedescriptionofrole, x)
                          )

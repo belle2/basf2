@@ -70,6 +70,8 @@ Variables
    If no argument is given, it works same as before. Please note that brackets have to appended even if no argument is given i.e.
    ``nCompositeDaughters()``.
  * Added `nCompositeAllGenerationDaughters` which works similar with `nCompositeDaughters` but it includes all generations of daughters.
+ * Added optional argument to `helixExtTheta`, `helixExtPhi` to allow performing the extrapolation using the mass hypothesis that provides
+   the best track fit result, regardless of the particle object's PDG.
 
 Modules
 +++++++

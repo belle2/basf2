@@ -152,7 +152,7 @@ def ksSelector(
     listtype='all',
     extraInfoName_V0Selector='KsSelector_V0Selector',
     extraInfoName_LambdaVeto='KsSelector_LambdaVeto',
-    useCustomThreshold=False,
+    useThreshold=False,
     threshold_V0Selector=0.90,
     threshold_LambdaVeto=0.11,
     path=None
@@ -168,47 +168,57 @@ def ksSelector(
     @param extraInfoName_LambdaVeto     Variable name for LambdaVeto MVA output.
     @param identifier_Ks                Identifier name for V0Selector weight file.
     @param identifier_vLambda           Identifier name for LambdaVeto weight file.
-    @useCustomThreshold                 Flag whether thresholds are specified from payload.
+    @useThreshold                       Flag whether thresholds are specified from payload.
     @threshold_V0Selector               Threshold for V0Selector.
     @threshold_LambdaVeto               Threshold for LambdaVeto.
     @param path                         Basf2 path to execute.
     """
     add_default_ks_Selector_aliases()
-    particleList = [particleListName]
+
+    outputListName = particleListName.split(':')[0] + ':'
+    if listtype == 'all':
+        outputListName += particleListName.split(':')[1]
+    else:
+        if useThreshold:
+            outputListName += 'cut'
+        else:
+            outputListName += listtype
+        ma.copyList(outputListName, particleListName, path=path)
 
     path.add_module('MVAMultipleExperts',
-                    listNames=particleList,
+                    listNames=[outputListName],
                     extraInfoNames=[extraInfoName_V0Selector, extraInfoName_LambdaVeto],
                     identifiers=[identifier_Ks, identifier_vLambda])
 
-    _effnames = ['all', 'standard', 'tight', 'loose']
-    if listtype not in _effnames:
-        B2INFO('Invalid List type! No cut is applied on '+particleListName)
-    elif listtype == 'all' and not useCustomThreshold:
-        B2INFO('No cut is applied on '+particleListName)
-    else:
+    _effnames = ['standard', 'tight', 'loose']
+    if listtype not in _effnames and listtype != 'all':
+        B2INFO('Invalid List type. '+outputListName+' is created.')
+    elif listtype == 'all':
+        B2INFO('KsSelector is applied to '+outputListName+'.')
+    elif listtype in _effnames or useThreshold:
         V0_thr = 0
         Lambda_thr = 0
-        if useCustomThreshold:
-            B2INFO('Cut is applied on '+particleListName+'.')
+        if useThreshold:
+            B2INFO('Cut is applied on '+outputListName+'.')
             V0_thr = threshold_V0Selector
             Lambda_thr = threshold_LambdaVeto
         elif listtype == 'standard':
-            B2INFO('Standard Cut is applied on '+particleListName+'.')
+            B2INFO('Standard Cut is applied on '+outputListName+'.')
             V0_thr = 0.90
             Lambda_thr = 0.11
         elif listtype == 'tight':
-            B2INFO('Tight Cut is applied on '+particleListName+'.')
+            B2INFO('Tight Cut is applied on '+outputListName+'.')
             V0_thr = 0.96
             Lambda_thr = 0.27
         elif listtype == 'loose':
-            B2INFO('Loose Cut is applied on '+particleListName+'.')
+            B2INFO('Loose Cut is applied on '+outputListName+'.')
             V0_thr = 0.49
             Lambda_thr = 0.02
 
+        B2INFO('ParticleList '+outputListName+' is created.')
         B2INFO('Threshold is (' + str(V0_thr) + ', ' + str(Lambda_thr) + ')')
         cut_string = 'extraInfo('+extraInfoName_V0Selector+')>'+str(V0_thr) + \
             ' and extraInfo('+extraInfoName_LambdaVeto+')>'+str(Lambda_thr)
-        ma.applyCuts(list_name=particleListName,
+        ma.applyCuts(list_name=outputListName,
                      cut=cut_string,
                      path=path)

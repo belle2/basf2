@@ -3438,10 +3438,11 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
         decayDescriptor = Belle2.DecayDescriptor()
         for name in plSet:
             if not decayDescriptor.init(name):
-                raise ValueError("Invalid paritlceLists")
+                raise ValueError(f"Invalid particle list {name} in applyChargedPidMVA!")
             pdgs = [abs(decayDescriptor.getMother().getPDGCode())]
-            if '->' in name:
-                pdgs = decayDescriptor.getSelectionPDGCodes()
+            daughter_pdgs = decayDescriptor.getSelectionPDGCodes()
+            if len(daughter_pdgs) > 0:
+                pdgs = daughter_pdgs
             for pdg in pdgs:
                 if pdg not in binaryHypoPDGCodes:
                     B2WARNING("Given ParticleList: ", name, " (", pdg, ") is neither signal (", binaryHypoPDGCodes[0],
@@ -3492,9 +3493,14 @@ def calculateTrackIsolation(list_name, path, *detectors, use2DRhoPhiDist=False, 
 
     """
 
+    from ROOT import Belle2
     from variables import variables
+    decayDescriptor = Belle2.DecayDescriptor()
+    if not decayDescriptor.init(list_name):
+        raise ValueError(f"Invalid particle list {list_name} in calculateTrackIsolation!")
     if not reference_list_name:
-        if '->' in list_name:
+        daughter_pdgs = decayDescriptor.getSelectionPDGCodes()
+        if len(daughter_pdgs) > 0:
             reference_list_name = 'pi-:all'
         else:
             reference_list_name = f'{list_name.split(":")[0]}:all'

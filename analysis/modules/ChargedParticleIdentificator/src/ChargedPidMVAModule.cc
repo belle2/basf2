@@ -136,8 +136,7 @@ void ChargedPidMVAModule::event()
     }
     for (unsigned int ipart(0); ipart < nTargetParticles; ++ipart) {
 
-      const Particle* particle = (m_nSelectedDaughters > 0) ? targetParticles[ipart] : pList->getParticle(ipart);
-
+      const Particle* particle = (m_nSelectedDaughters == 0) ? pList->getParticle(ipart) : targetParticles[ipart];
       B2DEBUG(11, "\tParticle [" << ipart << "]");
 
       // Check that the particle has a valid relation set between track and ECL cluster.

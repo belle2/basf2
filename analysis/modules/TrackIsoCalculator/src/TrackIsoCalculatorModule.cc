@@ -51,9 +51,8 @@ void TrackIsoCalculatorModule::initialize()
   m_event_metadata.isRequired();
   bool valid = m_decaydescriptor.init(m_decayString);
   if (!valid)
-    B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString: " << m_decayString);
+    B2ERROR("TrackIsoCalculatorModule::initialize Invalid input DecayString: " << m_decayString);
   const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
-  //int nProducts = m_decaydescriptor.getNDaughters();
   m_targetListName = mother->getFullName();
   m_targetList.isRequired(m_targetListName);
   m_nSelectedDaughters = m_decaydescriptor.getSelectionNames().size();
@@ -79,14 +78,13 @@ void TrackIsoCalculatorModule::event()
   const auto nParticles = m_targetList->getListSize();
 
   const auto nParticlesReference = m_pListReference->getListSize();
-  const auto nTargetParticles = (m_nSelectedDaughters == 0) ? m_targetList->getListSize() : m_targetList->getListSize() *
-                                m_nSelectedDaughters;
+  const auto nTargetParticles = (m_nSelectedDaughters == 0) ? nParticles : nParticles * m_nSelectedDaughters;
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n" << "nParticles: " << nParticles << "\n"
           << "nParticlesReference: " << nParticlesReference);
   // Fill temporary vector of particles in case of selected daughters:
   std::vector<const Particle*> targetParticles;
   if (m_nSelectedDaughters > 0) {
-    for (unsigned int iPart(0); iPart < m_targetList->getListSize(); ++iPart) {
+    for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
       auto* iParticle = m_targetList->getParticle(iPart);
       auto daughters = m_decaydescriptor.getSelectionParticles(iParticle);
       for (auto* iDaughter : daughters) {
@@ -98,7 +96,7 @@ void TrackIsoCalculatorModule::event()
   // Size is given by the length of the reference particle list.
   std::vector<double> defaultDistances(nParticlesReference, 1e9);
   // Size is given by the length of the particle list. Each vector (= defaultDistances) has nParticlesReference components.
-  // Thus, total size is given by nParticles times nParticlesReference.
+  // Thus, total size is given by nTargetParticles times nParticlesReference.
   std::vector<std::vector<double>> pairwiseDistances(nTargetParticles, defaultDistances);
 
   B2DEBUG(11, "Array of pair-wise distances between tracks in particle list. Initial values:");

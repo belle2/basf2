@@ -312,7 +312,9 @@ def add_cosmics_reconstruction(
         use_second_cdc_hits=False,
         add_muid_hits=False,
         reconstruct_cdst=False,
-        posttracking=True):
+        posttracking=True,
+        eventt0_combiner_mode="prefer_cdc"
+        ):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
     Consists of tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`,
@@ -337,6 +339,7 @@ def add_cosmics_reconstruction(
 
     :param reconstruct_cdst: run only the minimal reconstruction needed to produce the cdsts (raw+tracking+dE/dx)
     :param posttracking: run reconstruction for outer detectors.
+    :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors
     """
 
     # Check components.
@@ -375,7 +378,8 @@ def add_cosmics_reconstruction(
                                                       pruneTracks=pruneTracks,
                                                       addClusterExpertModules=addClusterExpertModules,
                                                       add_muid_hits=add_muid_hits,
-                                                      cosmics=True)
+                                                      cosmics=True,
+                                                      eventt0_combiner_mode=eventt0_combiner_mode)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
@@ -427,7 +431,7 @@ def add_prefilter_pretracking_reconstruction(path, components=None):
 
 def add_prefilter_posttracking_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
                                               add_muid_hits=False, cosmics=False, for_cdst_analysis=False,
-                                              add_eventt0_combiner_for_cdst=False):
+                                              add_eventt0_combiner_for_cdst=False, eventt0_combiner_mode="prefer_svd"):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -445,6 +449,7 @@ def add_prefilter_posttracking_reconstruction(path, components=None, pruneTracks
            for_cdst_analysis is False. This is useful for validation purposes for avoiding to run the full
            add_reconstruction(). Note that, with the default settings (for_cdst_analysis=False and
            add_eventt0_combiner_for_cdst=False), the EventT0Combiner module is added to the path.
+    :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors
     """
 
     # Not add dEdx modules in prepare_cdst_analysis()
@@ -461,7 +466,7 @@ def add_prefilter_posttracking_reconstruction(path, components=None, pruneTracks
     # but be lenient and add it if requested.
     # By default, since for_cdst_analysis is False, the module is added by this function.
     if not for_cdst_analysis or add_eventt0_combiner_for_cdst:
-        path.add_module("EventT0Combiner")
+        path.add_module("EventT0Combiner", combinationLogic=eventt0_combiner_mode)
 
     # only add the OnlineEventT0Creator if not preparing cDST
     if not for_cdst_analysis:

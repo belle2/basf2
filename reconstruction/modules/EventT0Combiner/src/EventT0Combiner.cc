@@ -19,13 +19,14 @@ EventT0CombinerModule::EventT0CombinerModule() : Module()
   setDescription("Module to combine the EventT0 values from multiple sub-detectors");
 
   addParam("combinationLogic", m_paramCombinationMode, "Method of how the final T0 is selected.\n"
-           "Currently '" + m_combinationModePreferSVD + "' and '" + m_combinationModeCombineSVDandECL + "' is available\n" +
+           "Currently '" + m_combinationModePreferSVD + ", " + m_combinationModePreferCDC + "' and '" + m_combinationModeCombineSVDandECL +
+           "' is available\n" +
            m_combinationModePreferSVD + ": the SVD t0 value (if available) will be set as the final T0 value."
            "Only if no SVD value could be found "
            "(which is very rare for BBar events, and around 5% of low multiplicity events), the best ECL value will be set\n" +
            m_combinationModeCombineSVDandECL + ": In this mode, the SVD t0 value (if available) will be used to "
            "select the ECL t0 information which is closest in time "
-           "to the best SVD value and these two values will be combined to one final value.",
+           "to the best SVD value and these two values will be combined to one final value." +
            m_paramCombinationMode);
 
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -50,12 +51,32 @@ void EventT0CombinerModule::event()
   const auto svdBestT0 = svdHypos.back();
 
   B2DEBUG(20, "Best SVD time hypothesis t0 = " << svdBestT0.eventT0 << " +- " << svdBestT0.eventT0Uncertainty);
+
+  // check if a CDC hypothesis exists
+  auto cdcHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
+
+  if (cdcHypos.size() == 0) {
+    B2DEBUG(20, "No CDC time hypothesis available, stopping");
+    // if no CDC value was found, the best t0 has already been set by the ECL t0 module.
+    return;
+  }
+
+  // get the latest CDC hypothesis information, this is also the most accurate t0 value the CDC can provide
+  const auto cdcBestT0 = cdcHypos.back();
+
+  B2DEBUG(20, "Best CDC time hypothesis t0 = " << cdcBestT0.eventT0 << " +- " << cdcBestT0.eventT0Uncertainty);
   if (m_paramCombinationMode == m_combinationModePreferSVD) {
     // we have a SVD value, so set this as new best global value
     B2DEBUG(20, "Setting SVD time hypothesis t0 = " << svdBestT0.eventT0 << " +- " << svdBestT0.eventT0Uncertainty <<
             " as new final value.");
     //set SVD value, if available
     m_eventT0->setEventT0(svdBestT0);
+  } else if (m_paramCombinationMode == m_combinationModePreferCDC) {
+    // we have a CDC value, so set this as new best global value
+    B2DEBUG(20, "Setting CDC time hypothesis t0 = " << cdcBestT0.eventT0 << " +- " << cdcBestT0.eventT0Uncertainty <<
+            " as new final value.");
+    //set CDC value, if available
+    m_eventT0->setEventT0(cdcBestT0);
   } else if (m_paramCombinationMode == m_combinationModeCombineSVDandECL) {
     // start comparing with all available ECL hypothesis
     auto eclHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::ECL);

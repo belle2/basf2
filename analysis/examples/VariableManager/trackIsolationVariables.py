@@ -81,7 +81,8 @@ if __name__ == "__main__":
     trackiso_vars = ma.calculateTrackIsolation("mu+:muons",
                                                path,
                                                *args.detectors,
-                                               reference_list_name=ref)
+                                               reference_list_name=ref,
+                                               highest_prob_mass_for_ref=False)
 
     # Reconstruct the J/psi decay.
 

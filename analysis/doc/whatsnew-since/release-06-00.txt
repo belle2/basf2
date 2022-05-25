@@ -101,6 +101,8 @@ Modules
    type as the ``input_list`` is used.
  * In the CDC volume, the calculation of track-to-closest-neighbour distance in the :b2:mod:`TrackIsoCalculator` module now is done for 9 surface layers (was only at the entry surface).
    Also, the definition of distance has been changed to adapt to each sub-detector's geometrical segmentation.
+ * In the :b2:mod:`TrackIsoCalculator` module, added an option to calculate the distance using the track fit result of the most probable mass hypothesis for the particles in
+   the reference list.
 
 PID Priors
 ++++++++++

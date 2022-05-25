@@ -34,6 +34,10 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
   addParam("detectorSurface",
            m_detSurface,
            "The name of the detector at whose inner (cylindrical) surface we extrapolate each helix's polar and azimuthal angle. Allowed values: {CDC, TOP, ARICH, ECL, KLM}.");
+  addParam("useHighestProbMassForReference",
+           m_useHighestProbMass,
+           "If this option is set, the helix extrapolation for the particles in the reference list will use the track fit result for the most probable mass hypothesis, namely, the one that gives the highest chi2Prob of the fit.",
+           bool(false));
 }
 
 TrackIsoCalculatorModule::~TrackIsoCalculatorModule()
@@ -53,6 +57,10 @@ void TrackIsoCalculatorModule::initialize()
   if (!isStdChargedList()) {
     B2FATAL("ParticleList: " << m_pListName << " and/or ParticleList: " << m_pListReferenceName <<
             " is not that of a valid particle in Const::chargedStableSet! Aborting...");
+  }
+
+  if (m_useHighestProbMass) {
+    B2INFO("Will use track fit result for the most probable mass hypothesis in helix extrapolation of reference particles.");
   }
 
   // Define the name of the variable to be stored as extraInfo.
@@ -173,15 +181,13 @@ double TrackIsoCalculatorModule::getDistAtDetSurface(Particle* iParticle, Partic
   const auto th_bwd_brl = m_detSurfBoundaries[m_detSurface].m_th_bwd_brl;
   const auto th_bwd = m_detSurfBoundaries[m_detSurface].m_th_bwd;
 
-  // std::string nameExtTheta = "helixExtTheta(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
-  std::string nameExtTheta = "helixExtTheta(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(
-                               zbwd) + "," + "1" + ")";
+  std::string nameExtTheta = "helixExtTheta(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd);
+  nameExtTheta += (m_useHighestProbMass) ? ", 1)" : ")";
   const auto iExtTheta = std::get<double>(Variable::Manager::Instance().getVariable(nameExtTheta)->function(iParticle));
   const auto jExtTheta = std::get<double>(Variable::Manager::Instance().getVariable(nameExtTheta)->function(jParticle));
 
-  //std::string nameExtPhi = "helixExtPhi(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
-  std::string nameExtPhi = "helixExtPhi(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(
-                             zbwd) + "," + "1" + ")";
+  std::string nameExtPhi = "helixExtPhi(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd);
+  nameExtPhi += (m_useHighestProbMass) ? ", 1)" : ")";
   const auto iExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(nameExtPhi)->function(iParticle));
   const auto jExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(nameExtPhi)->function(jParticle));
 

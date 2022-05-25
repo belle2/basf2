@@ -299,8 +299,8 @@ namespace Belle2 {
       if (!trackFit) return vecNaN;
 
       // Debug
-      B2INFO("Particle PDG: " << part->getPDGCode() << ", TrackFitResult::getParticleType().getPDGCode(): " <<
-             trackFit->getParticleType().getPDGCode());
+      // B2INFO("Particle PDG: " << part->getPDGCode() << ", TrackFitResult::getParticleType().getPDGCode(): " <<
+      //        trackFit->getParticleType().getPDGCode());
 
       // get helix and parameters
       const double z0 = trackFit->getZ0();

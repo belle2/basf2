@@ -1,7 +1,7 @@
 [INFO] Steering file: analysis/tests/test_trackIsolationVariables.py
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
-[INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst14.root
+[INFO] Added file /project/agkuhr/users/sbilokin/validation-data/mdst14.root
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
 [INFO]    -> MDST source: Tracks
@@ -51,6 +51,37 @@
 [INFO]  o) creating (anti-)ParticleList with name: mu-:all (mu+:all)
 [INFO]    -> MDST source: Tracks
 [INFO] TrackIsoCalculator module will calculate isolation variables for the ParticleList: mu-:all, Reference ParticleList: mu-:all.
+ ... message repeated 7 times
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: Lambda0:V0 (anti-Lambda0:V0)
+[INFO]    -> MDST source: V0
+[INFO] ParticleSelector: Lambda0:V0_MassWindow
+[INFO]    -> With cuts  : 1.10 < M < 1.13
+[INFO] ParticleSelector: Lambda0:V0_MassWindow
+[INFO]    -> With cuts  : extraInfo(highQualityVertex)
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
+[INFO]    -> MDST source: Tracks
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: p+:all (anti-p-:all)
+[INFO]    -> MDST source: Tracks
+[INFO] ParticleSelector: Lambda0:RD
+[INFO]    -> With cuts  : 1.10 < M < 1.13
+[INFO] ParticleSelector: Lambda0:RD
+[INFO]    -> With cuts  : extraInfo(highQualityVertex)
+[INFO] TrackIsoCalculator module will calculate isolation variables for the ParticleList: Lambda0:merged, Reference ParticleList: pi-:all.
+ ... message repeated 7 times
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
+[INFO]    -> MDST source: V0
+[INFO] ParticleSelector: K_S0:V0_MassWindow
+[INFO]    -> With cuts  : 0.450 < M < 0.550
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi+:all (pi-:all)
+[INFO]    -> MDST source: Tracks
+[INFO] ParticleSelector: K_S0:RD
+[INFO]    -> With cuts  : 0.450 < M < 0.550
+[INFO] TrackIsoCalculator module will calculate isolation variables for the ParticleList: K_S0:merged, Reference ParticleList: pi-:all.
  ... message repeated 7 times
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
@@ -4756,6 +4787,407 @@
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 46.0524
 [INFO] [ParticlePrinterModule] END   ------------------------------
 [INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: Lambda0:merged (0+0) + anti-Lambda0:merged (2+0)
+[INFO] collection=Particles
+ PDGCode=-3122 Charge=0 PDGMass=1.116
+ flavorType=1 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=123 identifier=-1 daughterIndices: 47, 1, 
+ daughter PDGCodes: -2212, 211, 
+ mass=1.129
+ momentum=(0.09, 0.29, 0.39) p=0.4942
+ momentum scaling factor=1
+ position=(-0.06, 0.00, -0.02)
+ p-value of fit (if done): 0.2157
+ error matrix (px, py, pz, E, x, y ,z):
+    6.4e-05    0.00014    0.00033    0.00016          0          0          0
+    0.00014    0.00049     0.0011    0.00053          0          0          0
+    0.00033     0.0011     0.0025     0.0012          0          0          0
+    0.00016    0.00053     0.0012     0.0006          0          0          0
+          0          0          0          0    0.00035    8.3e-05    1.4e-05
+          0          0          0          0    8.3e-05    0.00069    1.4e-05
+          0          0          0          0    1.4e-05    1.4e-05    0.00057
+
+ extra info=( chiSquared=1.533 decayModeID=1 failed=0 highQualityVertex=1 modifiedPValue=0.6747 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=-3122 Charge=0 PDGMass=1.116
+ flavorType=1 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=135 identifier=-1 daughterIndices: 35, 12, 
+ daughter PDGCodes: -2212, 211, 
+ mass=1.126
+ momentum=(-0.37, 0.01, 0.36) p=0.5147
+ momentum scaling factor=1
+ position=(-8.78, 1.10, 10.54)
+ p-value of fit (if done): 9.241e-33
+ error matrix (px, py, pz, E, x, y ,z):
+    1.8e-05    6.1e-07    4.9e-06     -3e-06          0          0          0
+    6.1e-07    1.6e-05    1.7e-06      1e-06          0          0          0
+    4.9e-06    1.7e-06    1.6e-05    2.6e-06          0          0          0
+     -3e-06      1e-06    2.6e-06    1.6e-06          0          0          0
+          0          0          0          0       0.15     -0.008      -0.17
+          0          0          0          0     -0.008     0.0049     0.0095
+          0          0          0          0      -0.17     0.0095       0.21
+
+ extra info=( chiSquared=142.1 decayModeID=1 failed=0 highQualityVertex=1 modifiedPValue=1.332e-30 ndf=1 ) 
+
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: Lambda0:merged (0+0) + anti-Lambda0:merged (2+0)
+[INFO]  - 123 = -3122[0]
+[INFO]      o) daughter indices = 47 1
+[INFO]      o) p_dist3DToClosestTrkAtSurfaceCDC = 19.9597
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 0.936817
+[INFO]      o) p_dist3DToClosestTrkAtSurfacePID = 94.4299
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfacePID = 33.2219
+[INFO]      o) p_dist3DToClosestTrkAtSurfaceECL = 93.514
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfaceECL = 49.0502
+[INFO]      o) p_dist3DToClosestTrkAtSurfaceKLM = 31.4202
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 31.0995
+[INFO]      o) pi_dist3DToClosestTrkAtSurfaceCDC = 4.98052
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 1.64702
+[INFO]      o) pi_dist3DToClosestTrkAtSurfacePID = 58.5717
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfacePID = 26.9116
+[INFO]      o) pi_dist3DToClosestTrkAtSurfaceECL = 25.2946
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfaceECL = 12.6154
+[INFO]      o) pi_dist3DToClosestTrkAtSurfaceKLM = 14.4079
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 58.7883
+[INFO]  - 135 = -3122[1]
+[INFO]      o) daughter indices = 35 12
+[INFO]      o) p_dist3DToClosestTrkAtSurfaceCDC = 7.37627
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 0.170809
+[INFO]      o) p_dist3DToClosestTrkAtSurfacePID = 118.996
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfacePID = 5.45275
+[INFO]      o) p_dist3DToClosestTrkAtSurfaceECL = 116.846
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfaceECL = 2.05387
+[INFO]      o) p_dist3DToClosestTrkAtSurfaceKLM = 32.6246
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 13.1724
+[INFO]      o) pi_dist3DToClosestTrkAtSurfaceCDC = 4.69764
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 4.48389
+[INFO]      o) pi_dist3DToClosestTrkAtSurfacePID = 58.5717
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfacePID = 63.6632
+[INFO]      o) pi_dist3DToClosestTrkAtSurfaceECL = 25.2946
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfaceECL = 15.1451
+[INFO]      o) pi_dist3DToClosestTrkAtSurfaceKLM = 51.4419
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 46.0524
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleList : K_S0:merged (0+8)
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=4 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=144 identifier=0 daughterIndices: 142, 143, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.4983
+ momentum=(0.52, -0.56, 0.46) p=0.8961
+ momentum scaling factor=1
+ position=(3.30, -3.58, 2.99)
+ p-value of fit (if done): 2.005e-05
+ error matrix (px, py, pz, E, x, y ,z):
+    1.7e-06   -9.5e-08    9.7e-08    9.3e-07          0          0          0
+   -9.5e-08    1.2e-06    3.9e-08   -7.2e-07          0          0          0
+    9.7e-08    3.9e-08    1.9e-06    8.4e-07          0          0          0
+    9.3e-07   -7.2e-07    8.4e-07    1.5e-06          0          0          0
+          0          0          0          0    6.8e-05   -4.5e-05    3.5e-05
+          0          0          0          0   -4.5e-05    7.3e-05   -3.4e-05
+          0          0          0          0    3.5e-05   -3.4e-05    7.6e-05
+
+ extra info=( chiSquared=18.19 failed=0 modifiedPValue=0.0004028 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=146 identifier=-1 daughterIndices: 7, 2, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.4507
+ momentum=(-0.68, -0.26, 0.52) p=0.8967
+ momentum scaling factor=1
+ position=(-0.06, 0.01, -0.00)
+ p-value of fit (if done): 0.001365
+ error matrix (px, py, pz, E, x, y ,z):
+    2.4e-06   -2.8e-07    1.4e-07   -1.3e-06          0          0          0
+   -2.8e-07    2.1e-06    2.4e-07   -3.4e-07          0          0          0
+    1.4e-07    2.4e-07    2.4e-06      1e-06          0          0          0
+   -1.3e-06   -3.4e-07      1e-06    1.7e-06          0          0          0
+          0          0          0          0    2.5e-05    6.3e-06   -1.5e-05
+          0          0          0          0    6.3e-06    7.4e-06   -4.8e-06
+          0          0          0          0   -1.5e-05   -4.8e-06    1.6e-05
+
+ extra info=( chiSquared=10.25 decayModeID=1 failed=0 modifiedPValue=0.01654 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=148 identifier=-1 daughterIndices: 0, 3, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.486
+ momentum=(0.05, 0.19, 0.45) p=0.4935
+ momentum scaling factor=1
+ position=(-0.05, 0.02, 0.00)
+ p-value of fit (if done): 0.3258
+ error matrix (px, py, pz, E, x, y ,z):
+    2.7e-06   -5.1e-08    2.2e-07   -1.1e-07          0          0          0
+   -5.1e-08      3e-06   -2.1e-07    2.6e-07          0          0          0
+    2.2e-07   -2.1e-07    2.3e-06    8.9e-07          0          0          0
+   -1.1e-07    2.6e-07    8.9e-07    1.1e-06          0          0          0
+          0          0          0          0      4e-05    1.7e-05    2.4e-05
+          0          0          0          0    1.7e-05    3.3e-05    2.3e-05
+          0          0          0          0    2.4e-05    2.3e-05    5.5e-05
+
+ extra info=( chiSquared=0.9654 decayModeID=1 failed=0 modifiedPValue=0.8096 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=153 identifier=-1 daughterIndices: 0, 4, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.4978
+ momentum=(0.18, 0.01, 0.45) p=0.4817
+ momentum scaling factor=1
+ position=(-0.05, 0.02, 0.00)
+ p-value of fit (if done): 0.4562
+ error matrix (px, py, pz, E, x, y ,z):
+    3.4e-06    2.1e-07    2.7e-07    2.5e-07          0          0          0
+    2.1e-07    3.1e-06    7.2e-07   -1.5e-07          0          0          0
+    2.7e-07    7.2e-07    2.7e-06    8.4e-07          0          0          0
+    2.5e-07   -1.5e-07    8.4e-07    1.1e-06          0          0          0
+          0          0          0          0    7.3e-05    4.4e-05    6.4e-05
+          0          0          0          0    4.4e-05    5.8e-05    5.2e-05
+          0          0          0          0    6.4e-05    5.2e-05     0.0001
+
+ extra info=( chiSquared=0.5551 decayModeID=1 failed=0 modifiedPValue=0.9066 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=157 identifier=-1 daughterIndices: 8, 4, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.5357
+ momentum=(0.35, -1.10, 0.41) p=1.221
+ momentum scaling factor=1
+ position=(-0.06, 0.04, -0.02)
+ p-value of fit (if done): 0.6347
+ error matrix (px, py, pz, E, x, y ,z):
+    3.3e-06   -1.8e-06   -6.6e-07    1.1e-06          0          0          0
+   -1.8e-06    4.8e-06    2.9e-07   -3.5e-06          0          0          0
+   -6.6e-07    2.9e-07    2.5e-06    1.2e-06          0          0          0
+    1.1e-06   -3.5e-06    1.2e-06    3.9e-06          0          0          0
+          0          0          0          0    5.1e-05   -0.00012    2.8e-05
+          0          0          0          0   -0.00012     0.0003   -6.9e-05
+          0          0          0          0    2.8e-05   -6.9e-05    1.9e-05
+
+ extra info=( chiSquared=0.2258 decayModeID=1 failed=0 modifiedPValue=0.9733 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=165 identifier=-1 daughterIndices: 0, 11, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.5029
+ momentum=(0.62, -0.05, 0.64) p=0.8895
+ momentum scaling factor=1
+ position=(-1.39, -1.09, -1.51)
+ p-value of fit (if done): 3.898e-19
+ error matrix (px, py, pz, E, x, y ,z):
+    3.3e-06      2e-07   -9.6e-07    1.2e-06          0          0          0
+      2e-07    4.2e-06    1.8e-07   -1.3e-07          0          0          0
+   -9.6e-07    1.8e-07    3.4e-06    1.2e-06          0          0          0
+    1.2e-06   -1.3e-07    1.2e-06    1.8e-06          0          0          0
+          0          0          0          0    0.00038    0.00013    0.00031
+          0          0          0          0    0.00013     0.0002    0.00015
+          0          0          0          0    0.00031    0.00015    0.00048
+
+ extra info=( chiSquared=79.92 decayModeID=1 failed=0 modifiedPValue=3.192e-17 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=185 identifier=-1 daughterIndices: 12, 14, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.5281
+ momentum=(0.26, 0.08, -0.03) p=0.2761
+ momentum scaling factor=1
+ position=(-50.92, 44.96, 41.95)
+ p-value of fit (if done): 0
+ error matrix (px, py, pz, E, x, y ,z):
+    3.4e-06    1.9e-06   -2.1e-06    2.8e-06          0          0          0
+    1.9e-06    8.6e-06   -1.1e-06    4.7e-06          0          0          0
+   -2.1e-06   -1.1e-06    3.5e-06   -2.4e-06          0          0          0
+    2.8e-06    4.7e-06   -2.4e-06    8.3e-06          0          0          0
+          0          0          0          0        0.4      -0.11       0.04
+          0          0          0          0      -0.11       0.52      0.059
+          0          0          0          0       0.04      0.059        0.6
+
+ extra info=( chiSquared=789.7 decayModeID=1 failed=0 modifiedPValue=0 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=310 Charge=0 PDGMass=0.4976
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=191 identifier=-1 daughterIndices: 12, 15, 
+ daughter PDGCodes: 211, -211, 
+ mass=0.451
+ momentum=(-0.11, 0.15, 0.51) p=0.5444
+ momentum scaling factor=1
+ position=(0.57, 1.87, 4.31)
+ p-value of fit (if done): 3.929e-19
+ error matrix (px, py, pz, E, x, y ,z):
+    1.4e-05    2.3e-05    5.4e-05    5.2e-05          0          0          0
+    2.3e-05    7.9e-05    0.00017    0.00017          0          0          0
+    5.4e-05    0.00017    0.00038     0.0004          0          0          0
+    5.2e-05    0.00017     0.0004    0.00042          0          0          0
+          0          0          0          0     0.0016     0.0048      0.011
+          0          0          0          0     0.0048      0.015      0.034
+          0          0          0          0      0.011      0.034      0.078
+
+ extra info=( chiSquared=79.9 decayModeID=1 failed=0 modifiedPValue=3.217e-17 ndf=1 ) 
+
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleList : K_S0:merged (0+8)
+[INFO]  - 144 = 310[0]
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceCDC = 2.14249
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 0.211425
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfacePID = 58.0544
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfacePID = 28.769
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceECL = 65.1545
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceECL = 56.7506
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceKLM = 150.392
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 57.8001
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceCDC = 12.66
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.37161
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfacePID = 70.0486
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfacePID = 0.911075
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceECL = 110.16
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceECL = 34.7721
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceKLM = 196.485
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 116.808
+[INFO]  - 146 = 310[1]
+[INFO]      o) daughter indices = 7 2
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceCDC = 11.6514
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 10.5425
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfacePID = 71.7305
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfacePID = 68.7085
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceECL = 94.4671
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceECL = 15.1451
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceKLM = 14.4079
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 37.2327
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceCDC = 4.69764
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 0.584027
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfacePID = 71.7305
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfacePID = 66.3869
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceECL = 86.2496
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceECL = 56.7281
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceKLM = 150.551
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 39.9209
+[INFO]  - 148 = 310[2]
+[INFO]      o) daughter indices = 0 3
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceCDC = 13.7582
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 3.9898
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfacePID = 69.9578
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfacePID = 40.0708
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceECL = 80.314
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceECL = 50.5107
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceKLM = 52.8071
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 7.39443
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceCDC = 8.30247
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 0.584027
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfacePID = 98.9079
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfacePID = 2.39253
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceECL = 80.314
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceECL = 12.6154
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceKLM = 3.55934
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 58.7883
+[INFO]  - 153 = 310[3]
+[INFO]      o) daughter indices = 0 4
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceCDC = 13.7582
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 3.9898
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfacePID = 69.9578
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfacePID = 40.0708
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceECL = 80.314
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceECL = 50.5107
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceKLM = 52.8071
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 7.39443
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceCDC = 14.5746
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 5.72983
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfacePID = 73.5109
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfacePID = 1.03046
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceECL = 85.9784
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceECL = 35.1769
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceKLM = 3.55934
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 7.39443
+[INFO]  - 157 = 310[4]
+[INFO]      o) daughter indices = 8 4
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceCDC = 2.14251
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 0.211348
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfacePID = 15.2479
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfacePID = 2.39253
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceECL = 19.031
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceECL = 13.8903
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceKLM = 135.563
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 27.7838
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceCDC = 14.5746
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 5.72983
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfacePID = 73.5109
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfacePID = 1.03046
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceECL = 85.9784
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceECL = 35.1769
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceKLM = 3.55934
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 7.39443
+[INFO]  - 165 = 310[5]
+[INFO]      o) daughter indices = 0 11
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceCDC = 13.7582
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 3.9898
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfacePID = 69.9578
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfacePID = 40.0708
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceECL = 80.314
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceECL = 50.5107
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceKLM = 52.8071
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 7.39443
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceCDC = 12.6587
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 7.3701
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfacePID = 69.9578
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfacePID = 1.03046
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceECL = 110.205
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceECL = 34.6308
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceKLM = 197.656
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 115.93
+[INFO]  - 185 = 310[6]
+[INFO]      o) daughter indices = 12 14
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceCDC = 4.69764
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 4.48389
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfacePID = 58.5717
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfacePID = 63.6632
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceECL = 25.2946
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceECL = 15.1451
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceKLM = 51.4419
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 46.0524
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceCDC = 9.14808
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 0.665154
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfacePID = 64.7376
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfacePID = 63.2365
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceECL = 78.0651
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceECL = 73.5367
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceKLM = 197.656
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 46.0524
+[INFO]  - 191 = 310[7]
+[INFO]      o) daughter indices = 12 15
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceCDC = 4.69764
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 4.48389
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfacePID = 58.5717
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfacePID = 63.6632
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceECL = 25.2946
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceECL = 15.1451
+[INFO]      o) pi_0_dist3DToClosestTrkAtSurfaceKLM = 51.4419
+[INFO]      o) pi_0_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 46.0524
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceCDC = 19.5256
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 0.665154
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfacePID = 119.575
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfacePID = 35.6507
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceECL = 110.392
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceECL = 49.7185
+[INFO]      o) pi_1_dist3DToClosestTrkAtSurfaceKLM = 27.5313
+[INFO]      o) pi_1_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 73.2055
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: pi+:all (4+0) + pi-:all (5+0)
 [INFO] collection=Particles
  PDGCode=211 Charge=1 PDGMass=0.1396
@@ -7425,6 +7857,180 @@
 [INFO]      o) dist3DToClosestTrkAtSurfaceKLM = 153.607
 [INFO]      o) dist2DRhoPhiToClosestTrkAtSurfaceKLM = 22.6762
 [INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: Lambda0:merged (1+0) + anti-Lambda0:merged (1+0)
+[INFO] collection=Particles
+ PDGCode=3122 Charge=0 PDGMass=1.116
+ flavorType=1 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=49 identifier=-1 daughterIndices: 21, 4, 
+ daughter PDGCodes: 2212, -211, 
+ mass=1.103
+ momentum=(-0.22, 0.47, 0.06) p=0.5212
+ momentum scaling factor=1
+ position=(-0.04, 0.00, -0.04)
+ p-value of fit (if done): 0.669
+ error matrix (px, py, pz, E, x, y ,z):
+    7.3e-06    1.7e-06    4.8e-07   -5.3e-07          0          0          0
+    1.7e-06    4.9e-06   -4.3e-07    1.3e-06          0          0          0
+    4.8e-07   -4.3e-07    8.3e-06    1.1e-07          0          0          0
+   -5.3e-07    1.3e-06    1.1e-07    6.6e-07          0          0          0
+          0          0          0          0    0.00011   -0.00015   -2.2e-05
+          0          0          0          0   -0.00015    0.00036    4.2e-05
+          0          0          0          0   -2.2e-05    4.2e-05    4.3e-05
+
+ extra info=( chiSquared=0.1828 decayModeID=1 failed=0 highQualityVertex=1 modifiedPValue=0.9803 ndf=1 ) 
+
+[INFO] collection=Particles
+ PDGCode=-3122 Charge=0 PDGMass=1.116
+ flavorType=1 particleSource=6 particleTypeUsedForFit=0
+ mdstIndex=0 arrayIndex=51 identifier=-1 daughterIndices: 18, 1, 
+ daughter PDGCodes: -2212, 211, 
+ mass=1.122
+ momentum=(0.20, -0.43, -0.07) p=0.4776
+ momentum scaling factor=1
+ position=(-0.06, -0.00, -0.06)
+ p-value of fit (if done): 0.8238
+ error matrix (px, py, pz, E, x, y ,z):
+    1.1e-05    2.2e-06    1.5e-07    4.6e-07          0          0          0
+    2.2e-06    5.6e-06     -7e-07   -1.3e-06          0          0          0
+    1.5e-07     -7e-07    9.2e-06   -2.1e-07          0          0          0
+    4.6e-07   -1.3e-06   -2.1e-07    5.3e-07          0          0          0
+          0          0          0          0    0.00026   -0.00032   -6.4e-05
+          0          0          0          0   -0.00032    0.00054    9.9e-05
+          0          0          0          0   -6.4e-05    9.9e-05    7.1e-05
+
+ extra info=( chiSquared=0.0496 decayModeID=1 failed=0 highQualityVertex=1 modifiedPValue=0.9971 ndf=1 ) 
+
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleLists: Lambda0:merged (1+0) + anti-Lambda0:merged (1+0)
+[INFO]  - 49 = 3122[0]
+[INFO]      o) daughter indices = 21 4
+[INFO]      o) p_dist3DToClosestTrkAtSurfaceCDC = 13.2558
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 5.39571
+[INFO]      o) p_dist3DToClosestTrkAtSurfacePID = 80.241
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfacePID = 3.44258
+[INFO]      o) p_dist3DToClosestTrkAtSurfaceECL = 86.1762
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfaceECL = 2.30977
+[INFO]      o) p_dist3DToClosestTrkAtSurfaceKLM = 252.02
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 29.845
+[INFO]      o) pi_dist3DToClosestTrkAtSurfaceCDC = 10.4804
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 8.89359
+[INFO]      o) pi_dist3DToClosestTrkAtSurfacePID = 40.3695
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfacePID = 23.6162
+[INFO]      o) pi_dist3DToClosestTrkAtSurfaceECL = 154.41
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfaceECL = 2.1778
+[INFO]      o) pi_dist3DToClosestTrkAtSurfaceKLM = 84.9573
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 28.668
+[INFO]  - 51 = -3122[1]
+[INFO]      o) daughter indices = 18 1
+[INFO]      o) p_dist3DToClosestTrkAtSurfaceCDC = 3.98499
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 3.97905
+[INFO]      o) p_dist3DToClosestTrkAtSurfacePID = 42.1302
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfacePID = 2.85731
+[INFO]      o) p_dist3DToClosestTrkAtSurfaceECL = 48.6909
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfaceECL = 15.3886
+[INFO]      o) p_dist3DToClosestTrkAtSurfaceKLM = 33.2518
+[INFO]      o) p_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 84.436
+[INFO]      o) pi_dist3DToClosestTrkAtSurfaceCDC = 3.41789
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfaceCDC = 3.41049
+[INFO]      o) pi_dist3DToClosestTrkAtSurfacePID = 40.3695
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfacePID = 23.6162
+[INFO]      o) pi_dist3DToClosestTrkAtSurfaceECL = 133.937
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfaceECL = 67.7422
+[INFO]      o) pi_dist3DToClosestTrkAtSurfaceKLM = 26.0544
+[INFO]      o) pi_dist2DRhoPhiToClosestTrkAtSurfaceKLM = 11.155
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] Writing NTuple K_S0
+[INFO] [1;35m================================================================================[0m
+[INFO] [40;97m            ,.,                                                                 [0m
+[INFO] [40;97m           ;%&M%;_   ,..,                                                       [0m
+[INFO] [40;97m             "_ "__" % M % M %;          , ..., ,                               [0m
+[INFO] [40;97m      , ..., __." --"    , .,     _ - " % &W % WM %;                            [0m
+[INFO] [40;97m     ; % M&$M % "___ "_._   %M%"_."" _ """"""                                   [0m
+[INFO] [40;97m       """""    "" , \_.   "_. ."                                               [0m
+[INFO] [40;97m              , ., _"__ \__./ ."                                                [0m
+[INFO] [40;97m          ___       __ |  y     , ..,     [97;40mThank you for using TreeFitter.       [0m
+[INFO] [40;97m         /)'\    ''''| u  \ %W%W%%;                                             [0m
+[INFO] [40;97m     ___)/   "---\_ \   |____"            [97;40mPlease cite both:                     [0m
+[INFO] [40;97m   ;&&%%;           (|__.|)./  ,..,           [97;40m10.1016/j.nima.2020.164269        [0m
+[INFO] [40;97m             ,.., ___\    |/     &&"       [97;40m   10.1016/j.nima.2005.06.078        [0m
+[INFO] [40;97m           &&%%&    (| Uo /        '"     [97;40mEmail:                                [0m
+[INFO] [40;97m            ''''     \ 7 \                   [97;40mfrancesco.tenchini@desy.de         [0m
+[INFO] [40;97m  ._______________.-'____""-.____.           [97;40mjo-frederik.krohn@desy.de          [0m
+[INFO] [40;97m   \                           /                                                [0m
+[INFO] [40;97m    \       [0m[32;40mTREEFITTER[0m[40;97m        /                                                 [0m
+[INFO] [40;97m     \_______________________/                                                  [0m
+[INFO] [40;97m      (_)                 (_)                                                   [0m
+[INFO] [40;97m                                                                                [0m
+[INFO] [1;35m============= TREEFIT STATISTICS ===============================================[0m
+[INFO] [1;39mCandidates before fit: 59[0m
+[INFO] [1;39mCandidates after fit:  53[0m
+[INFO] [1;39mA total of 6 candidates were removed during the fit.[0m
+[INFO] [1;39m89.8305% of candidates survived the fit.[0m
+[INFO] [1;39m10.1695% of candidates did not.[0m
+[INFO] [1;39mYou choose to drop all candidates with pValue < 0.[0m
+[INFO] [1;35m================================================================================[0m
+[INFO] [1;35m================================================================================[0m
+[INFO] [40;97m            ,.,                                                                 [0m
+[INFO] [40;97m           ;%&M%;_   ,..,                                                       [0m
+[INFO] [40;97m             "_ "__" % M % M %;          , ..., ,                               [0m
+[INFO] [40;97m      , ..., __." --"    , .,     _ - " % &W % WM %;                            [0m
+[INFO] [40;97m     ; % M&$M % "___ "_._   %M%"_."" _ """"""                                   [0m
+[INFO] [40;97m       """""    "" , \_.   "_. ."                                               [0m
+[INFO] [40;97m              , ., _"__ \__./ ."                                                [0m
+[INFO] [40;97m          ___       __ |  y     , ..,     [97;40mThank you for using TreeFitter.       [0m
+[INFO] [40;97m         /)'\    ''''| u  \ %W%W%%;                                             [0m
+[INFO] [40;97m     ___)/   "---\_ \   |____"            [97;40mPlease cite both:                     [0m
+[INFO] [40;97m   ;&&%%;           (|__.|)./  ,..,           [97;40m10.1016/j.nima.2020.164269        [0m
+[INFO] [40;97m             ,.., ___\    |/     &&"       [97;40m   10.1016/j.nima.2005.06.078        [0m
+[INFO] [40;97m           &&%%&    (| Uo /        '"     [97;40mEmail:                                [0m
+[INFO] [40;97m            ''''     \ 7 \                   [97;40mfrancesco.tenchini@desy.de         [0m
+[INFO] [40;97m  ._______________.-'____""-.____.           [97;40mjo-frederik.krohn@desy.de          [0m
+[INFO] [40;97m   \                           /                                                [0m
+[INFO] [40;97m    \       [0m[32;40mTREEFITTER[0m[40;97m        /                                                 [0m
+[INFO] [40;97m     \_______________________/                                                  [0m
+[INFO] [40;97m      (_)                 (_)                                                   [0m
+[INFO] [40;97m                                                                                [0m
+[INFO] [1;35m============= TREEFIT STATISTICS ===============================================[0m
+[INFO] [1;39mCandidates before fit: 1[0m
+[INFO] [1;39mCandidates after fit:  1[0m
+[INFO] [1;39mA total of 0 candidates were removed during the fit.[0m
+[INFO] [1;39m100% of candidates survived the fit.[0m
+[INFO] [1;39m0% of candidates did not.[0m
+[INFO] [1;39mYou choose to drop all candidates with pValue < 0.[0m
+[INFO] [1;35m================================================================================[0m
+[INFO] Writing NTuple Lambda0
+[INFO] [1;35m================================================================================[0m
+[INFO] [40;97m            ,.,                                                                 [0m
+[INFO] [40;97m           ;%&M%;_   ,..,                                                       [0m
+[INFO] [40;97m             "_ "__" % M % M %;          , ..., ,                               [0m
+[INFO] [40;97m      , ..., __." --"    , .,     _ - " % &W % WM %;                            [0m
+[INFO] [40;97m     ; % M&$M % "___ "_._   %M%"_."" _ """"""                                   [0m
+[INFO] [40;97m       """""    "" , \_.   "_. ."                                               [0m
+[INFO] [40;97m              , ., _"__ \__./ ."                                                [0m
+[INFO] [40;97m          ___       __ |  y     , ..,     [97;40mThank you for using TreeFitter.       [0m
+[INFO] [40;97m         /)'\    ''''| u  \ %W%W%%;                                             [0m
+[INFO] [40;97m     ___)/   "---\_ \   |____"            [97;40mPlease cite both:                     [0m
+[INFO] [40;97m   ;&&%%;           (|__.|)./  ,..,           [97;40m10.1016/j.nima.2020.164269        [0m
+[INFO] [40;97m             ,.., ___\    |/     &&"       [97;40m   10.1016/j.nima.2005.06.078        [0m
+[INFO] [40;97m           &&%%&    (| Uo /        '"     [97;40mEmail:                                [0m
+[INFO] [40;97m            ''''     \ 7 \                   [97;40mfrancesco.tenchini@desy.de         [0m
+[INFO] [40;97m  ._______________.-'____""-.____.           [97;40mjo-frederik.krohn@desy.de          [0m
+[INFO] [40;97m   \                           /                                                [0m
+[INFO] [40;97m    \       [0m[32;40mTREEFITTER[0m[40;97m        /                                                 [0m
+[INFO] [40;97m     \_______________________/                                                  [0m
+[INFO] [40;97m      (_)                 (_)                                                   [0m
+[INFO] [40;97m                                                                                [0m
+[INFO] [1;35m============= TREEFIT STATISTICS ===============================================[0m
+[INFO] [1;39mCandidates before fit: 77[0m
+[INFO] [1;39mCandidates after fit:  72[0m
+[INFO] [1;39mA total of 5 candidates were removed during the fit.[0m
+[INFO] [1;39m93.5065% of candidates survived the fit.[0m
+[INFO] [1;39m6.49351% of candidates did not.[0m
+[INFO] [1;39mYou choose to drop all candidates with pValue < 0.[0m
+[INFO] [1;35m================================================================================[0m
+[WARNING] Not a single candidate survived the fit. Candidates before fit: 0 after: 0
 [INFO] Writing NTuple mu-
 [INFO] Writing NTuple mu+
 [INFO] Writing NTuple e-

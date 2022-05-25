@@ -373,13 +373,10 @@ void SVDClusterizerModule::event()
     aStrip.noise = thisNoise;
     aStrip.samples = currentDigit.getSamples();
 
-    //int nClsOutside = 0;
-
     // try to add the strip to the existing cluster
     if (!rawCluster.add(thisSensorID, thisSide, aStrip)) {
       // if the strip is not added, write the cluster, if present and good:
       if ((rawCluster.getSize() > 0) && (rawCluster.isGoodRawCluster()))
-        //nClsOutside += finalizeCluster(rawCluster);
         finalizeCluster(rawCluster);
 
       // prepare for the next cluster:
@@ -394,14 +391,9 @@ void SVDClusterizerModule::event()
 
   // write the last cluster, if good
   if ((rawCluster.getSize() > 0) && (rawCluster.isGoodRawCluster()))
-    //nClsOutside += finalizeCluster(rawCluster);
     finalizeCluster(rawCluster);
 
   B2DEBUG(20, "Number of clusters: " << m_storeClusters.getEntries());
-
-  //int nCls = m_storeClusters.getEntries();
-  //double fracClsOutside = (double) nClsOutside / nCls;
-  //cout << "Fraction of cluster outside fiducial volume after correction: " << fracClsOutside << endl;
 }
 
 void SVDClusterizerModule::finalizeCluster(
@@ -485,13 +477,9 @@ void SVDClusterizerModule::finalizeCluster(
     writeClusterRelations(rawCluster);
 
     // alter cluster position on MC to match resolution measured on data
-    //int isClsOutside = 0;
     bool isMC = Environment::Instance().isMC();
     if (isMC) alterClusterPosition();
-    //if (isMC) isClsOutside = alterClusterPosition();
-    //return isClsOutside;
   }
-  //return 0;
 }
 
 void SVDClusterizerModule::writeClusterRelations(
@@ -601,36 +589,39 @@ void SVDClusterizerModule::alterClusterPosition()
   // get the track's incident angle
   double trkAngle = 0.;
 
-  if (trueHits.size() > 0) { // check if cluster has associated true hits
+  // check if cluster has associated true hits
+  if (trueHits.size() > 0) {
     SVDTrueHit* trueHit = trueHits[0];
     double trkLength = 0.;
-    if (isU)
-      trkLength = trueHit->getExitU() - trueHit->getEntryU();
-    else
-      trkLength = trueHit->getExitV() - trueHit->getEntryV();
+    if (isU) trkLength = trueHit->getExitU() - trueHit->getEntryU();
+    else trkLength = trueHit->getExitV() - trueHit->getEntryV();
     double trkHeight = trueHit->getExitW() - trueHit->getEntryW();
-    trkAngle = atan2(trkLength, trkHeight) *
-               (180 / 3.14159265);  // radians to degrees
+    trkAngle = atan2(trkLength, trkHeight) * (180 / 3.14159265);  // radians to degrees
   }
-
 
   // get the appropriate sigma to alter the position
   double sigma = m_mcFudgeFactor.getFudgeFactor(sensorID, isU, trkAngle);
 
   // do the job
-  //TRandom* generator = new TRandom();
-  //float fudgeFactor = (float)generator->Gaus(0., sqrt(sigma_sq));
-  float fudgeFactor = (float) gRandom->Gaus(0., sigma) / 10000.;
+  float fudgeFactor = 0.;
+  float newPosition = 0.;
+  float newPosition_u = 0.;
+  float newPosition_v = 0.;
+  int nIter = 0;
+  const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(sensorID);
+
+  do {
+    fudgeFactor = (float) gRandom->Gaus(0., sigma) / 10000.;
+    newPosition = clsPosition + fudgeFactor;
+    if (isU) newPosition_u = newPosition;
+    else newPosition_v = newPosition;
+    nIter += 1;
+  } while (!aSensorInfo->inside(newPosition_u, newPosition_v) && nIter < 6);
+
+  m_storeClusters[clsIndex]->setPosition(newPosition);
+
   //int layerNum = sensorID.getLayerNumber();
   //cout << "Layer number: " << layerNum << ", IsU: " << isU << ", trk angle: " << trkAngle << ", Sigma: " << sigma << ", position: " << clsPosition << ", fudge factor: " << fudgeFactor << endl;
-  m_storeClusters[clsIndex]->setPosition(clsPosition + fudgeFactor);
-
-  //const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(sensorID);
-  //bool isClsInside = true;
-  //if (isU) isClsInside = aSensorInfo->inside(clsPosition + fudgeFactor, 0);
-  //else isClsInside = aSensorInfo->inside(0, clsPosition + fudgeFactor);
-  //if (!isClsInside) return 1;
-  //else return 0;
 }
 
 void SVDClusterizerModule::endRun()

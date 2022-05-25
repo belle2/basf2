@@ -84,12 +84,14 @@ void TrackIsoCalculatorModule::event()
   std::vector<std::vector<double>> pairwiseDistances(nParticles, defaultDistances);
 
   B2DEBUG(11, "Array of pair-wise distances between tracks in particle list. Initial values:");
-  this->printDistancesArr(pairwiseDistances, nParticles, nParticlesReference);
+  this->printDistancesArr(pairwiseDistances);
 
   for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
+
     Particle* iParticle = m_pList->getParticle(iPart);
 
     for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
+
       Particle* jParticle = m_pListReference->getParticle(jPart);
 
       // Skip if same particle.
@@ -116,7 +118,7 @@ void TrackIsoCalculatorModule::event()
   }
 
   B2DEBUG(11, "Array of pair-wise distances between tracks in particle list. Final values:");
-  this->printDistancesArr(pairwiseDistances, nParticles, nParticlesReference);
+  this->printDistancesArr(pairwiseDistances);
 
   // For each particle index, find the index of the particle w/ minimal distance in the corresponding row of the 2D array.
   for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
@@ -134,19 +136,21 @@ void TrackIsoCalculatorModule::event()
       continue;
     }
 
-    auto minDist = std::min_element(std::begin(iRow), std::end(iRow));
-    auto jPart = std::distance(std::begin(pairwiseDistances[iPart]), minDist);
+    const auto minDist = *std::min_element(std::begin(iRow), std::end(iRow));
+    // Search corresponding index in the original vector.
+    auto it_minDist = std::find(std::begin(pairwiseDistances[iPart]), std::end(pairwiseDistances[iPart]), minDist);
+    auto jPart = std::distance(std::begin(pairwiseDistances[iPart]), it_minDist);
 
     Particle* iParticle = m_pList->getParticle(iPart);
     Particle* jParticle = m_pListReference->getParticle(jPart);
 
     B2DEBUG(10, "Particle[" << iPart << "]'s (PDG=" << iParticle->getPDGCode() << ") closest partner at innermost " <<
             m_detSurface << " surface is ReferenceParticle[" << jPart << "] (PDG=" << jParticle->getPDGCode() << ") at D = " <<
-            *minDist << " [cm]");
+            minDist << " [cm]");
 
     if (!iParticle->hasExtraInfo(m_extraInfoName)) {
       B2DEBUG(12, "Storing extraInfo(" << m_extraInfoName << ") for Particle[" << iPart << "]");
-      iParticle->addExtraInfo(m_extraInfoName, *minDist);
+      iParticle->addExtraInfo(m_extraInfoName, minDist);
     }
   }
 
@@ -267,19 +271,20 @@ bool TrackIsoCalculatorModule::isStdChargedList()
   return (checkPList and checkPListReference);
 };
 
-void TrackIsoCalculatorModule::printDistancesArr(const std::vector<std::vector<double>>& arr, int size_x, int size_y)
+void TrackIsoCalculatorModule::printDistancesArr(const std::vector<std::vector<double>>& arr)
 {
 
   auto logConfig = this->getLogConfig();
 
   if (logConfig.getLogLevel() == LogConfig::c_Debug && logConfig.getDebugLevel() >= 11) {
     std::cout << "" << std::endl;
-    for (int i(0); i < size_x; ++i) {
-      for (int j(0); j < size_y; ++j) {
+    for (unsigned int i(0); i < arr.size(); ++i) {
+      for (unsigned int j(0); j < arr[i].size(); ++j) {
         std::cout << std::setw(7) << arr[i][j] << " ";
       }
       std::cout << "\n";
     }
+
     std::cout << "" << std::endl;
   }
 }

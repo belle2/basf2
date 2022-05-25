@@ -33,7 +33,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(ECLChargedPIDMVA)
+REG_MODULE(ECLChargedPIDMVA);
 
 ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module()
 {

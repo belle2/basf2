@@ -421,7 +421,9 @@ Decay B0
 #
 #$ forbid_pythia()
 0.000000000   J/psi  K0                                    PHSP;
+#$ forbid_pythia()
 0.000436500   J/psi  K_S0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #[w/CPV - BO 09/2017]
+#$ forbid_pythia()
 0.000436500   J/psi  K_L0                                  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
 #$ forbid_pythia()

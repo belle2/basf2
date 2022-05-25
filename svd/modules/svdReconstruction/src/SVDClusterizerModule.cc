@@ -608,8 +608,9 @@ void SVDClusterizerModule::alterClusterPosition()
   double sigma_sq = m_mcFudgeFactor.getFudgeFactor(sensorID, isU, trkAngle);
 
   // do the job
-  TRandom* generator = new TRandom();
-  float fudgeFactor = (float)generator->Gaus(0., sqrt(sigma_sq));
+  //TRandom* generator = new TRandom();
+  //float fudgeFactor = (float)generator->Gaus(0., sqrt(sigma_sq));
+  float fudgeFactor = (float) gRandom->Gaus(0., sqrt(sigma_sq));
   m_storeClusters[clsIndex]->setPosition(clsPosition + fudgeFactor);
 }
 

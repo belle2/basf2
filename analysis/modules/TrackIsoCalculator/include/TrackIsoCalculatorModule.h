@@ -154,7 +154,7 @@ namespace Belle2 {
 
     /**
      * Calculate the distance between the points where the two input
-     * extraplolated track helices cross the given detector's cylindrical surface.
+     * extrapolated track helices cross the given detector's cylindrical surface.
      */
     double getDistAtDetSurface(Particle* iParticle, Particle* jParticle);
 

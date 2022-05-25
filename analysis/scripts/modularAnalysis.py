@@ -3483,13 +3483,13 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
            Only one distance at the TOP entry radius is calculated.
     - ARICH: as there is no segmentation along z,
              the distance is defined as the distance on the (rho, phi) plane at fixed z=Z.
-             Only one distance at the ARICH Z entry coordinate is calculated.
+             Only one distance at the ARICH photon detector Z entry coordinate is calculated.
     - ECL: the distance is defined on the (rho=R, phi, z) surface in the barrel,
            on the (rho, phi, z=Z) surface in the endcaps.
            Only one distance at the ECL entry radius R (barrel), Z (endcaps) is calculated.
     - KLM: the distance is defined on the (rho=R, phi, z) surface in the barrel,
            on the (rho, phi, z=Z) surface in the endcaps.
-           Only one distance at the KLM entry radius R (barrel), Z (endcaps) is calculated.
+           Only one distance at the KLM first strip entry radius R (barrel), Z (endcaps) is calculated.
 
     Parameters:
         list_name (str): name of the input ParticleList.

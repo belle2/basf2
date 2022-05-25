@@ -9,8 +9,6 @@
 #pragma once
 
 // FRAMEWORK
-#include <framework/gearbox/Const.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 // MVA
@@ -19,16 +17,14 @@
 // ROOT
 #include <TObject.h>
 #include <TF1.h>
+#include <TH1.h>
 #include <TParameter.h>
-#include <TFile.h>
 
 //BOOST
 #include <boost/algorithm/string/predicate.hpp>
 
-// std libraries
-#include <cmath>
+// C++
 #include <unordered_map>
-#include <tuple>
 #include <algorithm>
 
 namespace Belle2 {
@@ -387,9 +383,9 @@ namespace Belle2 {
     */
     bool isPhasespaceCovered(const int linearBinIndex) const
     {
-      // if the tuple of values passed falls outside the defined phasespace.
+      // if the vector of values passed falls outside the defined phasespace.
       if (linearBinIndex < 0) return false;
-      // if the tuple is within the defined phasespace but we do not provide an ECLChargedPIDPhasespaceCategory object for this bin.
+      // if the vector is within the defined phasespace but we do not provide an ECLChargedPIDPhasespaceCategory object for this bin.
       if (m_phasespaceCategories.count(linearBinIndex) == 0) return false;
       return true;
     }
@@ -420,7 +416,7 @@ namespace Belle2 {
   private:
     /**
      * An N Dimensional binning whose bins define the boundaries of the categories for which the training is performed.
-      * It is used to lookup the correct file in the payload, given a reconstructed value tuple.
+      * It is used to lookup the correct file in the payload, given a reconstructed value vector.
      */
     ECLChargedPIDPhasespaceBinning* m_categories = nullptr;
 

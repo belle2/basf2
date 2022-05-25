@@ -6,45 +6,38 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <math.h>
-#include <algorithm>
-#include "TMath.h"
+// THIS MODULE
+#include <ecl/modules/eclChargedPIDMVA/ECLChargedPIDMVAModule.h>
 
-#include <framework/geometry/B2Vector3.h>
+// FRAMEWORK
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/geometry/ECLNeighbours.h>
-
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
-
+// ANALYSIS
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/variables/ECLVariables.h>
 #include <analysis/dataobjects/Particle.h>
 
+// MVA
 #include <mva/interface/Interface.h>
 #include <mva/methods/TMVA.h>
 
+// MVA
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
 
+// C++
 #include <limits>
 #include <string>
-
-#include <ecl/modules/eclChargedPIDMVA/ECLChargedPIDMVAModule.h>
+#include <math.h>
+#include "TMath.h"
 
 using namespace Belle2;
-using namespace ECL;
 
 REG_MODULE(ECLChargedPIDMVA)
 
 ECLChargedPIDMVAModule::ECLChargedPIDMVAModule() : Module()
 {
-  setDescription("This module implements charged particle identification using ECL-related observables via a multiclass MVA. For each track matched with a suitable ECLShower, the relevant ECL variables (shower shape, PSD etc.) are fed to the MVA method which is stored in a conditions database payload. The MVA output variables are then used to construct a likelihood from pdfs also stored in the payload. The likelihood is then stored in the ECLPidLikelihood object.");
+  setDescription("This module implements charged particle identification using ECL-related observables via a multiclass MVA. For each track a set of relevant ECL variables(shower shape, PSD etc.) are fed to the MVA method which is stored in a conditions database payload. The MVA output variables are then used to construct a likelihood from pdfs also stored in the payload. The likelihood is then stored in the ECLPidLikelihood object.");
 
   addParam("payloadName",
            m_payload_name,

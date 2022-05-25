@@ -12,14 +12,10 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/datastore/RelationEntry.h>
+#include <framework/dataobjects/EventMetaData.h>
 
+// MVA
 #include <mva/interface/Expert.h>
 #include <mva/interface/Dataset.h>
 
@@ -27,12 +23,8 @@
 #include <mdst/dataobjects/Track.h>
 
 //ECL
-#include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <ecl/dbobjects/ECLChargedPIDMVAWeights.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
 
 
 namespace Belle2 {

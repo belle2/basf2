@@ -67,23 +67,16 @@ if __name__ == "__main__":
     path = b2.create_path()
 
     # Add input data and ParticleLoader modules to the path.
-    ma.inputMdst(environmentType="default",
-                 filename=b2.find_file("mdst14.root", "validation"),
-                 path=path)
+    ma.inputMdst(filename=b2.find_file("mdst14.root", "validation"), path=path)
 
     # Fill a particle list of muons, with some quality selection.
     base_trk_selection = "[dr < 3] and [abs(dz) < 5] and [thetaInCDCAcceptance] and [pt > 0.1]"
-    ma.fillParticleList("mu+:muons", cut="", path=path)
-    ma.applyCuts(
-        "mu+:muons",
-        cut=f"{base_trk_selection} and [muonID > 0.5]",
-        path=path)
+    ma.fillParticleList("mu+:muons", f"{base_trk_selection} and [muonID > 0.5]", path=path)
 
     # Fill a reference charged stable particle list to calculate the distances against.
     # Generally, this list should have a very loose selection applied (if none at all).
     ref = f"{args.std_charged_ref}+:presel"
-    ma.fillParticleList(ref, cut="", path=path)
-    ma.applyCuts(ref, cut=base_trk_selection, path=path)
+    ma.fillParticleList(ref, f"{base_trk_selection}", path=path)
 
     trackiso_vars = ma.calculateTrackIsolation("mu+:muons",
                                                path,

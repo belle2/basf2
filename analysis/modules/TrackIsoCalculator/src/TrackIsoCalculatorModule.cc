@@ -146,7 +146,7 @@ void TrackIsoCalculatorModule::event()
 
     if (!iParticle->hasExtraInfo(m_extraInfoName)) {
       B2DEBUG(12, "Storing extraInfo(" << m_extraInfoName << ") for Particle[" << iPart << "]");
-      iParticle->writeExtraInfo(m_extraInfoName, *minDist);
+      iParticle->addExtraInfo(m_extraInfoName, *minDist);
     }
   }
 
@@ -198,7 +198,7 @@ double TrackIsoCalculatorModule::getDistAtDetSurface(Particle* iParticle, Partic
     }
 
     // For CDC and TOP, we calculate the distance between the points where the two input
-    // extraplolated track helices cross the input detector's cylindrical surface
+    // extrapolated track helices cross the input detector's cylindrical surface
     // on the (rho, phi) plane. Namely, this is the cord length of the arc
     // that subtends deltaPhi.
     auto diffPhi = jExtPhi - iExtPhi;

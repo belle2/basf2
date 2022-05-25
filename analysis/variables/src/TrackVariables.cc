@@ -280,27 +280,22 @@ namespace Belle2 {
 
       const Track* track = part->getTrack();
 
+      if (!track) return vecNaN;
+
       Const::ChargedStable highestProbMass = Const::ChargedStable(std::abs(part->getPDGCode()));
+
       if (useHighestProbMass) {
-
         // get the track fit for the most probable mass hypothesis.
-        std::vector<double> pValues;
-        for (const auto& massHypo : Const::chargedStableSet) {
-          const TrackFitResult* trackFitRes = track->getTrackFitResult(massHypo);
-          pValues.push_back((trackFitRes) ? trackFitRes->getPValue() : -1.0);
-        }
+        auto trackFitResults = track->getTrackFitResults();
 
-        auto it_maxPValue = std::max_element(std::begin(pValues), std::end(pValues));
-        highestProbMass = Const::chargedStableSet.at(std::distance(std::begin(pValues), it_maxPValue));
+        // Find the track fit with the highest pValue, and its associated mass
+        auto it_maxPValue = std::max_element(std::begin(trackFitResults), std::end(trackFitResults), [](auto tfrAndM1,
+        auto tfrAndM2) {return tfrAndM1.second->getPValue() < tfrAndM2.second->getPValue();});
+
+        highestProbMass = trackFitResults[std::distance(std::begin(trackFitResults), it_maxPValue)].first;
       }
 
-      const TrackFitResult* trackFit = (!useHighestProbMass) ? part->getTrackFitResult() : track->getTrackFitResult(highestProbMass);
-
-      if (!trackFit) return vecNaN;
-
-      // Debug
-      // B2INFO("Particle PDG: " << part->getPDGCode() << ", TrackFitResult::getParticleType().getPDGCode(): " <<
-      //        trackFit->getParticleType().getPDGCode());
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(highestProbMass);
 
       // get helix and parameters
       const double z0 = trackFit->getZ0();
@@ -726,10 +721,10 @@ always 0 or 1 with newer versions of ECL reconstruction.
 Returns NaN if called for something other than a track-based particle.
     )DOC");
     REGISTER_VARIABLE("helixExtTheta(radius [cm], z fwd [cm], z bwd [cm], useHighestProbMass=0)", trackHelixExtTheta,
-                      "Returns theta of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will use the mass hypothesis of the fit with highest pValue",
+                      "Returns theta of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.",
                       "rad");
     REGISTER_VARIABLE("helixExtPhi(radius, z fwd, z bwd, useHighestProbMass=0)", trackHelixExtPhi,
-                      "Returns phi of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will use the mass hypothesis of the fit with highest pValue",
+                      "Returns phi of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will use the track fit result for the mass hypothesis with the highest pValue.",
                       "rad");
 
     REGISTER_VARIABLE("nExtraCDCHits", nExtraCDCHits, R"DOC(

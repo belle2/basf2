@@ -280,13 +280,14 @@ namespace Belle2 {
 
       const Track* track = part->getTrack();
 
-      Const::ChargedStable highestProbMass = Const::ChargedStable(part->getPDGCode());
+      Const::ChargedStable highestProbMass = Const::ChargedStable(std::abs(part->getPDGCode()));
       if (useHighestProbMass) {
 
         // get the track fit for the most probable mass hypothesis.
         std::vector<double> pValues;
         for (const auto& massHypo : Const::chargedStableSet) {
-          pValues.push_back(track->getTrackFitResult(massHypo)->getPValue());
+          const TrackFitResult* trackFitRes = track->getTrackFitResult(massHypo);
+          pValues.push_back((trackFitRes) ? trackFitRes->getPValue() : -1.0);
         }
 
         auto it_maxPValue = std::max_element(std::begin(pValues), std::end(pValues));
@@ -295,11 +296,11 @@ namespace Belle2 {
 
       const TrackFitResult* trackFit = (!useHighestProbMass) ? part->getTrackFitResult() : track->getTrackFitResult(highestProbMass);
 
+      if (!trackFit) return vecNaN;
+
       // Debug
       B2INFO("Particle PDG: " << part->getPDGCode() << ", TrackFitResult::getParticleType().getPDGCode(): " <<
              trackFit->getParticleType().getPDGCode());
-
-      if (!trackFit) return vecNaN;
 
       // get helix and parameters
       const double z0 = trackFit->getZ0();

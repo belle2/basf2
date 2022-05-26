@@ -3461,7 +3461,7 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     path.add_module(chargedpid)
 
 
-def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=None):
+def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=None, highest_prob_mass_for_ref=False):
     """
     Given a list of charged stable particles, compute variables that quantify "isolation" of the associated tracks.
 
@@ -3503,6 +3503,11 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
                                              of ``list_name`` is used.
                                              It must be a list of charged stable particles, too.
                                              The charge-conjugate ParticleList will be also processed automatically.
+        highest_prob_mass_for_ref (Optional[bool]): if this option is set, the helix extrapolation for the particles
+                                                    in the reference list will use the track fit result for the most
+                                                    probable mass hypothesis, namely, the one that gives the highest
+                                                    chi2Prob of the fit.
+
     Returns:
         list(str): a list of aliases for the calculated distance variables.
 
@@ -3530,7 +3535,8 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
         trackiso = path.add_module("TrackIsoCalculator",
                                    particleList=list_name,
                                    detectorSurface=det,
-                                   particleListReference=reference_list_name)
+                                   particleListReference=reference_list_name,
+                                   useHighestProbMassForReference=highest_prob_mass_for_ref)
         trackiso.set_name(f"TrackIsoCalculator{det}{suffix}")
 
     aliases = vu.create_aliases([f"distToClosestTrkAt{det}{suffix}" for det in det_labels], "extraInfo({variable})")

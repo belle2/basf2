@@ -72,6 +72,18 @@ void MetadataService::addRootNtupleFile(const std::string& fileName)
   writeJson();
 }
 
+void MetadataService::addHDF5File(const std::string& fileName)
+{
+  if (m_fileName.empty()) return;
+  if (!FileSystem::isFile(fileName)) return;
+
+  nlohmann::json file_json = {{"type", "HDF5"}, {"filename", fileName}};
+
+  m_json["output_files"].push_back(file_json);
+
+  writeJson();
+}
+
 void MetadataService::addBasf2Status(const std::string& message)
 {
   if (m_fileName.empty()) return;

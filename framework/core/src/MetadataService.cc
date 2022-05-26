@@ -79,6 +79,8 @@ void MetadataService::addHDF5File(const std::string& fileName)
 
   nlohmann::json file_json = {{"type", "HDF5"}, {"filename", fileName}};
 
+  file_json["checksums"]["fletcher32"] = FileSystem::calculateFletcher32(fileName);
+
   m_json["output_files"].push_back(file_json);
 
   writeJson();

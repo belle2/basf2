@@ -111,6 +111,15 @@ std::string FileSystem::calculateAdler32(const std::string& filename)
   return chksum;
 }
 
+std::string FileSystem::calculateFletcher32(const std::string& filename)
+{
+  string chksum;
+  if (not isFile(filename)) return "";
+  fs::path fullPath = fs::absolute(filename);
+
+  return chksum;
+}
+
 std::string FileSystem::findFile(const string& path, const std::vector<std::string>& dirs, bool silent)
 {
   // check given directories

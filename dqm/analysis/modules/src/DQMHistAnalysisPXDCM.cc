@@ -271,13 +271,17 @@ void DQMHistAnalysisPXDCMModule::event()
         if (entries_adhoc > 0) { // ignore 1.3.2
           mean_adhoc /= entries_adhoc; // calculate mean
           // scale <1e-3 == >1000 entries
-          warn_adhoc_flag |= scale < 1e-3 && (fabs(10.0 - mean_adhoc) > m_warnMeanAdhoc || outside_adhoc > m_warnOutsideAdhoc);
-          error_adhoc_flag |= scale < 1e-3 && (fabs(10.0 - mean_adhoc) > m_errorMeanAdhoc || outside_adhoc > m_errorOutsideAdhoc);
+          auto warn_tmp = scale < 1e-3 && (fabs(10.0 - mean_adhoc) > m_warnMeanAdhoc || outside_adhoc > m_warnOutsideAdhoc);
+          warn_adhoc_flag |= warn_tmp;
+          auto err_tmp = scale < 1e-3 && (fabs(10.0 - mean_adhoc) > m_errorMeanAdhoc || outside_adhoc > m_errorOutsideAdhoc);
+          error_adhoc_flag |= err_tmp;
           m_monObj->setVariable(("cm_" + (std::string)m_PXDModules[i]).c_str(), mean_adhoc);
+          if (warn_tmp
+              || err_tmp)  B2INFO(name << " Mean " <<  mean_adhoc << " Outside " << outside_adhoc << " " << entries_adhoc << " " << warn_tmp <<
+                                    err_tmp);
 #ifdef _BELLE2_EPICS
           if (m_useEpics) {
             auto my = mychid_mean[m_PXDModules[i]];
-            // B2ERROR("Mean "<< name << " " << mean_adhoc << " " << outside_adhoc << " " << entries_adhoc << " " <<warn_adhoc_flag <<error_adhoc_flag );
             if (my) SEVCHK(ca_put(DBR_DOUBLE, my, (void*)&mean_adhoc), "ca_set failure");
           }
 #endif

@@ -61,15 +61,15 @@ v0_types = ['Lambda0:merged', 'K_S0:merged']
 v0_functions = [stdv0.stdLambdas, stdv0.stdKshorts]
 v0_decays = [' -> ^p+ ^pi-', ' -> ^pi+ ^pi-']
 
-for v0_type, v0_function, v0_decays in zip(v0_types, v0_functions, v0_decays):
+for v0_type, v0_function, v0_decay in zip(v0_types, v0_functions, v0_decays):
     v0_function(path=path)
     track_vars = vu.create_aliases_for_selected(list_of_variables=ntup_vars,
-                                                decay_string=v0_type+v0_decays)
-    ma.calculateTrackIsolation(v0_type+v0_decays,
+                                                decay_string=v0_type+v0_decay)
+    ma.calculateTrackIsolation(v0_type+v0_decay,
                                path,
                                *detector_tuple,
                                alias="dist3DToClosestTrkAtSurface")
-    ma.calculateTrackIsolation(v0_type+v0_decays,
+    ma.calculateTrackIsolation(v0_type+v0_decay,
                                path,
                                *detector_tuple,
                                use2DRhoPhiDist=True,

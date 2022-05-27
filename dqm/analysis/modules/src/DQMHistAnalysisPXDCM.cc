@@ -187,6 +187,10 @@ void DQMHistAnalysisPXDCMModule::event()
   if (!m_cCommonMode) return;
   m_hCommonMode->Reset(); // dont sum up!!!
 
+  auto leg = new TPaveText(0.1, 0.6, 0.95, 0.95, "NDC");
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     std::string name = "PXDDAQCM_" + (std::string)m_PXDModules[i ];
     // std::replace( name.begin(), name.end(), '.', '_');
@@ -256,10 +260,6 @@ void DQMHistAnalysisPXDCMModule::event()
         Double_t mean_adhoc = 0.;
         Double_t entries_adhoc = 0.;
         Double_t outside_adhoc = 0.;
-
-        auto leg = new TPaveText(0.1, 0.6, 0.95, 0.95, "NDC");
-        leg->SetFillStyle(0);
-        leg->SetBorderSize(0);
 
         // Attention, Bins
         // we do not need to re-scale it as the scale is the same for all bins

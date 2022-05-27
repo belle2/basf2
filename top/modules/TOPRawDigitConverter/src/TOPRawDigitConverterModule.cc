@@ -32,10 +32,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPRawDigitConverter)
+  REG_MODULE(TOPRawDigitConverter);
 
   //-----------------------------------------------------------------
   //                 Implementation

@@ -344,6 +344,7 @@ void ShaperDSP_t::init(const double* s, double unitscale)
                 / (1.2140 - 0.79645 * t02 + 0.63440 * t02 * t02);
   }
 
+  _ccc *= unitscale;
   _cs0 *= unitscale;
   _cc0 *= unitscale;
   _cs1 *= unitscale;
@@ -381,12 +382,12 @@ double ShaperDSP_t::operator()(double* x, double*)
 
 void ShaperDSP_t::settimestride(double dt)
 {
-  _tstride.init(dt , *this);
+  _tstride.init(dt, *this);
 }
 
 void ShaperDSP_t::setseedoffset(double dt)
 {
-  _toffset.init(dt , *this);
+  _toffset.init(dt, *this);
 }
 
 void ShaperDSP_t::settimeseed(double t0)

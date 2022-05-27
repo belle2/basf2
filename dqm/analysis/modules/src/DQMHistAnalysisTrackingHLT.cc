@@ -22,7 +22,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisTrackingHLT)
+REG_MODULE(DQMHistAnalysisTrackingHLT);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -35,9 +35,9 @@ DQMHistAnalysisTrackingHLTModule::DQMHistAnalysisTrackingHLTModule()
   setDescription("DQM Analysis Module of the Tracking HLT Plots.");
 
   addParam("failureRateThreshold", m_failureRateThreshold,
-           "Maximum Fraction of Events in which Tracking Aborts before turning Canvas to Red", double(0.5));
-  addParam("minNoEvents", m_statThreshold, "Minimum Number of Events before scaring CR shifters", int(1000));
-  addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
+           "Maximum Fraction of Events in which Tracking Aborts before turning Canvas to Red", double(m_failureRateThreshold));
+  addParam("minNoEvents", m_statThreshold, "Minimum Number of Events before scaring CR shifters", int(m_statThreshold));
+  addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(m_printCanvas));
 
 }
 

@@ -29,10 +29,10 @@ using namespace std;
 namespace Belle2 {
   using namespace TOP;
   //-----------------------------------------------------------------
-  //                 Register the Module
+  ///                 Register the Module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPPDFDebugger)
+  REG_MODULE(TOPPDFDebugger);
 
 
   //-----------------------------------------------------------------

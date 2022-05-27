@@ -32,7 +32,7 @@ using namespace Belle2::SVD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDClusterizer)
+REG_MODULE(SVDClusterizer);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -401,7 +401,7 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   }
 }
 
-void SVDClusterizerModule::writeClusterRelations(Belle2::SVD::RawCluster& rawCluster)
+void SVDClusterizerModule::writeClusterRelations(const Belle2::SVD::RawCluster& rawCluster)
 {
   RelationArray relClusterDigit(m_storeClusters, m_storeDigits, m_relClusterShaperDigitName);
 

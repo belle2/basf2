@@ -85,7 +85,7 @@ class KLMK0LPlotModule(basf2.Module):
         #: Time resolution histogram.
         self.hist_tres = ROOT.TH1F('k0l_tres',
                                    'KLM K0L decay time resolution',
-                                   100, -20., 10.)
+                                   100, -15., 15.)
         self.hist_tres.SetXTitle('ns')
         self.hist_tres.SetYTitle('Events')
         functions = self.hist_tres.GetListOfFunctions()
@@ -211,14 +211,14 @@ class KLMK0LPlotModule(basf2.Module):
                 self.momentum_av = self.momentum_av + \
                     klm_cluster.getMomentumMag()
                 time_k = klm_cluster.getTime()
-                momentum_k = klm_cluster.getMomentum().Vect()
+                four_momentum_k = klm_cluster.getMomentum()
                 self.hist_xres.Fill(vertex_k.x())
                 self.hist_yres.Fill(vertex_k.y())
                 self.hist_zres.Fill(vertex_k.z())
                 self.hist_tres.Fill(time_k - time)
-                self.hist_pres.Fill(momentum_k.Mag() - momentum.Mag())
-                self.hist_ptres.Fill(momentum_k.Theta() - momentum.Theta())
-                self.hist_ppres.Fill(momentum_k.Phi() - momentum.Phi())
+                self.hist_pres.Fill(four_momentum_k.P() - momentum.Mag())
+                self.hist_ptres.Fill(four_momentum_k.Theta() - momentum.Theta())
+                self.hist_ppres.Fill(four_momentum_k.Phi() - momentum.Phi())
 
     def terminate(self):
         """ Termination function. """

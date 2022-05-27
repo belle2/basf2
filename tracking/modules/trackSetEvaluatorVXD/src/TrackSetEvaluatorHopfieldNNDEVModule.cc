@@ -13,7 +13,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(TrackSetEvaluatorHopfieldNNDEV)
+REG_MODULE(TrackSetEvaluatorHopfieldNNDEV);
 
 TrackSetEvaluatorHopfieldNNDEVModule::TrackSetEvaluatorHopfieldNNDEVModule() : Module()
 {

@@ -89,7 +89,7 @@ int PreRawCOPPERFormat_v1::GetDetectorNwords(int n, int finesse_num)
   int nwords = 0;
   if (GetFINESSENwords(n, finesse_num) > 0) {
     nwords = GetFINESSENwords(n, finesse_num)
-             - (SIZE_B2LHSLB_HEADER + SIZE_B2LHSLB_TRAILER +  SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER);
+             - (static_cast<int>(SIZE_B2LHSLB_HEADER) + SIZE_B2LHSLB_TRAILER +  SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER);
   }
   return nwords;
 
@@ -819,10 +819,10 @@ int PreRawCOPPERFormat_v1::CalcReducedNwords(int n)
       //
       nwords_to +=
         finesse_nwords
-        - (SIZE_B2LHSLB_HEADER -  m_reduced_rawcpr.SIZE_B2LHSLB_HEADER)
-        - (SIZE_B2LFEE_HEADER -   m_reduced_rawcpr.SIZE_B2LFEE_HEADER)
-        - (SIZE_B2LFEE_TRAILER -  m_reduced_rawcpr.SIZE_B2LFEE_TRAILER)
-        - (SIZE_B2LHSLB_TRAILER - m_reduced_rawcpr.SIZE_B2LHSLB_TRAILER);
+        - (static_cast<int>(SIZE_B2LHSLB_HEADER) -  m_reduced_rawcpr.SIZE_B2LHSLB_HEADER)
+        - (static_cast<int>(SIZE_B2LFEE_HEADER) -   m_reduced_rawcpr.SIZE_B2LFEE_HEADER)
+        - (static_cast<int>(SIZE_B2LFEE_TRAILER) -  m_reduced_rawcpr.SIZE_B2LFEE_TRAILER)
+        - (static_cast<int>(SIZE_B2LHSLB_TRAILER) - m_reduced_rawcpr.SIZE_B2LHSLB_TRAILER);
     }
 
   }
@@ -889,7 +889,7 @@ int PreRawCOPPERFormat_v1::CopyReducedBuffer(int n, int* buf_to)
         char err_buf[500];
         sprintf(err_buf,
                 "[ERROR] Finesse buffer size is too small( %d words < %d words). May be the data are corrupted. Exiting...\n %s %s %d\n",
-                finesse_nwords, SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER,
+                finesse_nwords, static_cast<int>(SIZE_B2LHSLB_HEADER) + SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER,
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         printf("%s", err_buf); fflush(stdout);
         B2FATAL(err_buf);
@@ -908,7 +908,7 @@ int PreRawCOPPERFormat_v1::CopyReducedBuffer(int n, int* buf_to)
       //copy B2LFEE trailer(CRC info)
       buf_to[ pos_nwords_to ] =
         finesse_buf[ finesse_nwords - SIZE_B2LHSLB_TRAILER
-                     - (SIZE_B2LFEE_TRAILER - POS_CHKSUM_B2LFEE) ];
+                                    - (SIZE_B2LFEE_TRAILER - POS_CHKSUM_B2LFEE) ];
       pos_nwords_to++;
 
       // check CRC data
@@ -1029,7 +1029,8 @@ int PreRawCOPPERFormat_v1::CheckCRC16(int n, int finesse_num)
   // Calculate CRC16
   //
   int* buf = GetFINESSEBuffer(n, finesse_num) +  SIZE_B2LHSLB_HEADER;
-  int nwords = GetFINESSENwords(n, finesse_num) - (SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER);
+  int nwords = GetFINESSENwords(n, finesse_num) - (static_cast<int>(SIZE_B2LHSLB_HEADER) + SIZE_B2LFEE_TRAILER +
+                                                   SIZE_B2LHSLB_TRAILER);
   unsigned short temp_crc16 = CalcCRC16LittleEndian(0xffff, buf, nwords);
 
   //
@@ -1042,7 +1043,7 @@ int PreRawCOPPERFormat_v1::CheckCRC16(int n, int finesse_num)
 
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
     printf("PRE CRC16 error : B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",
-           *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
+           *buf, temp_crc16, GetFINESSENwords(n, finesse_num));
     int* temp_buf = GetFINESSEBuffer(n, finesse_num);
     for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
       printf("%.8x ", temp_buf[ k ]);
@@ -1076,7 +1077,7 @@ int* PreRawCOPPERFormat_v1::PackDetectorBuf(int* packed_buf_nwords,
 
   int poswords_to = 0;
   int* detector_buf[ 4 ] = { detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th };
-  int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
+  const int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
 
   // calculate the event length
   int length_nwords = tmp_header.GetHdrNwords() + SIZE_COPPER_HEADER + SIZE_COPPER_TRAILER + tmp_trailer.GetTrlNwords();
@@ -1084,7 +1085,7 @@ int* PreRawCOPPERFormat_v1::PackDetectorBuf(int* packed_buf_nwords,
   for (int i = 0; i < 4; i++) {
     if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;    // for an empty FINESSE slot
     length_nwords += nwords[ i ];
-    length_nwords += SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER
+    length_nwords += static_cast<int>(SIZE_B2LHSLB_HEADER) + SIZE_B2LFEE_HEADER
                      + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
   }
 
@@ -1113,7 +1114,7 @@ int* PreRawCOPPERFormat_v1::PackDetectorBuf(int* packed_buf_nwords,
 
 
   // fill the positions of finesse buffers
-  packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ] = tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
+  packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ] = static_cast<int>(tmp_header.RAWHEADER_NWORDS) + SIZE_COPPER_HEADER;
 
   packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ];
   if (nwords[ 0 ] > 0) {
@@ -1139,7 +1140,7 @@ int* PreRawCOPPERFormat_v1::PackDetectorBuf(int* packed_buf_nwords,
   packed_buf[ poswords_to + POS_MAGIC_COPPER_2 ] = COPPER_MAGIC_FPGA_HEADER;
   packed_buf[ poswords_to + POS_EVE_NUM_COPPER ] = rawcpr_info.eve_num;
 
-  int size_b2l_hdrtrl = SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  int size_b2l_hdrtrl = static_cast<int>(SIZE_B2LHSLB_HEADER) + SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
   if (nwords[ 0 ] != 0)  packed_buf[ poswords_to + POS_CH_A_DATA_LENGTH ] = nwords[ 0 ] + size_b2l_hdrtrl;
   if (nwords[ 1 ] != 0)  packed_buf[ poswords_to + POS_CH_B_DATA_LENGTH ] = nwords[ 1 ] + size_b2l_hdrtrl;
   if (nwords[ 2 ] != 0)  packed_buf[ poswords_to + POS_CH_C_DATA_LENGTH ] = nwords[ 2 ] + size_b2l_hdrtrl;
@@ -1150,8 +1151,8 @@ int* PreRawCOPPERFormat_v1::PackDetectorBuf(int* packed_buf_nwords,
     packed_buf[ poswords_to + POS_CH_B_DATA_LENGTH ] +
     packed_buf[ poswords_to + POS_CH_C_DATA_LENGTH ] +
     packed_buf[ poswords_to + POS_CH_D_DATA_LENGTH ] +
-    (SIZE_COPPER_HEADER - SIZE_COPPER_DRIVER_HEADER) +
-    (SIZE_COPPER_TRAILER - SIZE_COPPER_DRIVER_TRAILER);
+    (static_cast<int>(SIZE_COPPER_HEADER) - SIZE_COPPER_DRIVER_HEADER) +
+    (static_cast<int>(SIZE_COPPER_TRAILER) - SIZE_COPPER_DRIVER_TRAILER);
 
   poswords_to += SIZE_COPPER_HEADER;
 
@@ -1194,7 +1195,8 @@ int* PreRawCOPPERFormat_v1::PackDetectorBuf(int* packed_buf_nwords,
   packed_buf[ poswords_to + POS_MAGIC_COPPER_3 ] = COPPER_MAGIC_FPGA_TRAILER;
   packed_buf[ poswords_to + POS_MAGIC_COPPER_4 ] = COPPER_MAGIC_DRIVER_TRAILER;
   unsigned int chksum = 0;
-  for (int i = tmp_header.GetHdrNwords(); i < poswords_to + (SIZE_COPPER_TRAILER - SIZE_COPPER_DRIVER_TRAILER); i++) {
+  for (int i = tmp_header.GetHdrNwords(); i < poswords_to + (static_cast<int>(SIZE_COPPER_TRAILER) - SIZE_COPPER_DRIVER_TRAILER);
+       i++) {
     chksum ^= packed_buf[ i ];
   }
   packed_buf[ poswords_to + POS_CHKSUM_COPPER ] = chksum;

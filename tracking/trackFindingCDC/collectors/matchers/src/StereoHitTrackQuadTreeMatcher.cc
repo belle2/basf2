@@ -160,7 +160,7 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
       const CDCRecoHit3D& recoHit3D = recoHitWithRL.first;
       allHits.push_back(recoHit3D);
     }
-    for (const CDCRecoHitWithRLPointer recoHitWithRL : foundStereoHits) {
+    for (const CDCRecoHitWithRLPointer& recoHitWithRL : foundStereoHits) {
       const CDCRecoHit3D& recoHit3D = recoHitWithRL.first;
       foundHits.push_back(recoHit3D);
     }

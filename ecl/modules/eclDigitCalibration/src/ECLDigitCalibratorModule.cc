@@ -42,8 +42,8 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Modules
 //-----------------------------------------------------------------
-REG_MODULE(ECLDigitCalibrator)
-REG_MODULE(ECLDigitCalibratorPureCsI)
+REG_MODULE(ECLDigitCalibrator);
+REG_MODULE(ECLDigitCalibratorPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -104,7 +104,7 @@ void ECLDigitCalibratorModule::initializeCalibration()
 {
 
   // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency. Same for all crystals:
-  m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::m_rf) * 1e3;
+  m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
   m_pureCsIEnergyCalib = 0.00005; //conversion factor from ADC counts to GeV
   m_pureCsITimeCalib = 0.1; //conversion factor from eclPureCsIDigitizer to ns
   m_pureCsITimeOffset = 0.31; //ad-hoc offset correction for pureCsI timing
@@ -292,7 +292,7 @@ void ECLDigitCalibratorModule::event()
       if (!m_IsMCFlag) {
         double energyTimeShift = ECLTimeUtil->energyDependentTimeOffsetElectronic(amplitude * v_calibrationCrystalElectronics[cellid - 1]) *
                                  m_timeInverseSlope ;
-        B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", corrected amplitude = " << amplitude *
+        B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", corrected amplitude = " << amplitude*
                 v_calibrationCrystalElectronics[cellid - 1] << ", time before t(E) shift = " << calibratedTime << ", t(E) shift = " <<
                 energyTimeShift << " ns") ;
         calibratedTime -= energyTimeShift ;
@@ -319,7 +319,7 @@ void ECLDigitCalibratorModule::event()
         const double calibratedTwoComponentTotalEnergy = aECLDsp->getTwoComponentTotalAmp() * v_calibrationCrystalElectronics[cellid - 1] *
                                                          v_calibrationCrystalEnergy[cellid - 1];
         const double calibratedTwoComponentHadronEnergy = aECLDsp->getTwoComponentHadronAmp() * v_calibrationCrystalElectronics[cellid -
-                                                          1] *
+                                                                 1] *
                                                           v_calibrationCrystalEnergy[cellid - 1];
         const double calibratedTwoComponentDiodeEnergy = aECLDsp->getTwoComponentDiodeAmp() * v_calibrationCrystalElectronics[cellid - 1] *
                                                          v_calibrationCrystalEnergy[cellid - 1];

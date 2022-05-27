@@ -30,8 +30,8 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLCRFinder)
-REG_MODULE(ECLCRFinderPureCsI)
+REG_MODULE(ECLCRFinder);
+REG_MODULE(ECLCRFinderPureCsI);
 
 //-----------------------------------------------------------------
 //                 Implementation

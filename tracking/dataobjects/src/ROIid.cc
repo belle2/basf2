@@ -28,7 +28,7 @@ ROIid::Contains(const PXDRawHit& thePXDRawHit) const
           m_maxUid >= thePXDRawHit.getUCellID() &&
           m_minVid <= thePXDRawHit.getVCellID() &&
           m_maxVid >= thePXDRawHit.getVCellID() &&
-          m_sensorID == thePXDRawHit.getSensorID()
+          m_sensorID == thePXDRawHit.getSensorID().getID()
          );
 }
 
@@ -40,7 +40,7 @@ ROIid::Contains(const PXDDigit& thePXDDigit) const
           m_maxUid >= thePXDDigit.getUCellID() &&
           m_minVid <= thePXDDigit.getVCellID() &&
           m_maxVid >= thePXDDigit.getVCellID() &&
-          m_sensorID == thePXDDigit.getSensorID()
+          m_sensorID == thePXDDigit.getSensorID().getID()
          );
 }
 
@@ -54,6 +54,6 @@ bool ROIid::Contains(const Belle2::SVDShaperDigit& theSVDDigit) const
   else
     inside = (m_minVid <= theSVDDigit.getCellID() && m_maxVid >= theSVDDigit.getCellID());
 
-  return (inside && m_sensorID == theSVDDigit.getSensorID());
+  return (inside && m_sensorID == theSVDDigit.getSensorID().getID());
 
 }

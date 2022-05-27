@@ -957,8 +957,8 @@ namespace Belle2 {
       // parameters of SellMeier equation (Matsuoka-san, 24.11.2018)
       // from the specs of Corning HPFS 7980
       // https://www.corning.com/media/worldwide/csm/documents/5bf092438c5546dfa9b08e423348317b.pdf
-      double b[] = {0.683740494, 0.420323613, 0.585027480};
-      double c[] = {0.00460352869, 0.0133968856, 64.4932732};
+      const double b[] = {0.683740494, 0.420323613, 0.585027480};
+      const double c[] = {0.00460352869, 0.0133968856, 64.4932732};
 
       double x = pow(lambda * 0.001, 2);
       double y = 1;

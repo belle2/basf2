@@ -11,11 +11,14 @@
 #include <framework/core/Module.h>
 #include <string>
 
+#include <Math/Vector4D.h>
 
 // DataStore
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+
+#include <framework/geometry/B2Vector3.h>
 
 // DataObjects
 #include <mdst/dbobjects/BeamSpot.h>
@@ -56,7 +59,7 @@ namespace Belle2 {
     bool m_associateBtubeToBselected; /**< whether to associate the Btube with the selected B*/
     double m_confidenceLevel;     /**< required fit confidence level */
     double m_Bfield;              /**< magnetic field from data base */
-    TVector3 m_BeamSpotCenter;    /**< Beam spot position */
+    B2Vector3D m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
     StoreArray<Btube> m_tubeArray; /**< the (output) array of Btube objects */
@@ -68,7 +71,8 @@ namespace Belle2 {
      * @return true for successful fit and prob(chi^2,ndf) > m_confidenceLevel
      */
     bool doVertexFit(Particle* p);  /**< does the vertex fit with RAVE :  adaptive vertex fitter mode */
-    void addextrainfos(Particle* daughter, Particle* copy, TMatrix mat, TLorentzVector TLV); /**< fills extrainfos to the particle */
+    void addextrainfos(Particle* daughter, Particle* copy, TMatrix mat,
+                       ROOT::Math::PxPyPzEVector TLV); /**< fills extrainfos to the particle */
     bool m_verbose;  /**< run fit with a lot of B2INFOs for debugging */
   };
 }

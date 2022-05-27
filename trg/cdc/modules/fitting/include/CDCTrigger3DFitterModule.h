@@ -32,7 +32,7 @@ namespace Belle2 {
     CDCTrigger3DFitterModule();
 
     /** Destructor */
-    virtual ~CDCTrigger3DFitterModule() {}
+    virtual ~CDCTrigger3DFitterModule();
 
     /** Initialize the module and register DataStore arrays. */
     virtual void initialize() override;

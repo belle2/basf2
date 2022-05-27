@@ -116,7 +116,7 @@ namespace Belle2 {
 
 
     /** returns true, if vector is allowed to grow */
-    bool checkVectorSize(std::deque<DataType>& container)
+    bool checkVectorSize(const std::deque<DataType>& container)
     {
       // want to allow growing with some extra margin to prevent issues
       unsigned newCalcThreshold = unsigned(ceil(float(m_sampleSize) * float(m_quantileCut) + ceil(0.01 * float(m_sampleSize))));

@@ -72,6 +72,8 @@ class VXDHoughTrackingValidation(TrackingValidationRun):
     use_fit_information = True
     #: output file of plots
     output_file_name = VALIDATION_OUTPUT_FILE
+    #: define empty list of non expert parameters so that no shifter plots are created (to revert just remove following line)
+    non_expert_parameters = []
 
 
 def main():

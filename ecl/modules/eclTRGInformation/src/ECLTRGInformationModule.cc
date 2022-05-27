@@ -34,7 +34,7 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLTRGInformation)
+REG_MODULE(ECLTRGInformation);
 
 //-----------------------------------------------------------------
 //                 Implementation

@@ -171,16 +171,19 @@ namespace Belle2 {
       void createMapper(G4LogicalVolume& topVolume);
 
       //! CDC G4 logical volume.
-      G4LogicalVolume* logical_cdc;
+      G4LogicalVolume* m_logicalCDC;
 
       //! CDC G4 physical volume.
-      G4VPhysicalVolume* physical_cdc;
+      G4VPhysicalVolume* m_physicalCDC;
 
       //! Sensitive detector
       CDCSensitiveDetector* m_sensitive = nullptr;
 
       //! Sensitive detector for background studies
       BkgSensitiveDetector* m_bkgsensitive = nullptr;
+
+      //! Sensitive detectors for background studies (rib4).
+      std::vector<BkgSensitiveDetector*> m_BkgSensitiveRib4 = {};
 
       //! Vector of pointers to G4VisAttributes
       std::vector<G4VisAttributes*> m_VisAttributes;

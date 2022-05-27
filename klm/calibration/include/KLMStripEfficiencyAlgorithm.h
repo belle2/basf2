@@ -107,13 +107,13 @@ namespace Belle2 {
        * Get number of new measured planes.
        * @param[in] efficiency Efficiency for other measurement.
        */
-      int newMeasuredPlanes(float* efficiency) const;
+      int newMeasuredPlanes(const float* efficiency) const;
 
       /**
        * Get number of new measured planes with ExtHits.
        * @param[in] extHitsPlane Number of ExtHits for other measurement.
        */
-      int newExtHitsPlanes(int* extHitsPlane) const;
+      int newExtHitsPlanes(const int* extHitsPlane) const;
 
     private:
 

@@ -29,10 +29,10 @@ namespace Belle2 {
   using namespace TOP;
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPModuleT0LLCollector)
+  REG_MODULE(TOPModuleT0LLCollector);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -117,19 +117,19 @@ namespace Belle2 {
     }
 
     auto h1 = new TH2F("tracks_per_slot", "tracks per slot and sample",
-                       c_numModules, 0.5, c_numModules + 0.5, c_numSets, 0, c_numSets);
+                       c_numModules, 0.5, static_cast<float>(c_numModules) + 0.5, c_numSets, 0, c_numSets);
     h1->SetXTitle("slot number");
     h1->SetYTitle("sample number");
     registerObject<TH2F>("tracks_per_slot", h1);
 
     auto h2 = new TH1F("numHits", "Number of photons per slot",
-                       c_numModules, 0.5, c_numModules + 0.5);
+                       c_numModules, 0.5, static_cast<float>(c_numModules) + 0.5);
     h2->SetXTitle("slot number");
     h2->SetYTitle("hits per slot");
     registerObject<TH1F>("numHits", h2);
 
     auto h3 = new TH2F("timeHits", "Photon times vs. boardstacks",
-                       c_numModules * 4, 0.5, c_numModules + 0.5, 200, 0.0, 20.0);
+                       c_numModules * 4, 0.5, static_cast<float>(c_numModules) + 0.5, 200, 0.0, 20.0);
     h3->SetXTitle("slot number");
     h3->SetYTitle("time [ns]");
     registerObject<TH2F>("timeHits", h3);
@@ -201,7 +201,7 @@ namespace Belle2 {
         if (digit.getTime() > timeMax) continue;
         h2->Fill(digit.getModuleID());
         int bs = digit.getBoardstackNumber();
-        h3->Fill((digit.getModuleID() * 4 + bs - 1.5) / 4.0 , digit.getTime());
+        h3->Fill((digit.getModuleID() * 4 + bs - 1.5) / 4.0, digit.getTime());
       }
       ntra++;
     }

@@ -31,7 +31,7 @@ using namespace Belle2;
 using namespace std;
 
 
-REG_MODULE(SpacePoint2TrueHitConnector) // register the modules
+REG_MODULE(SpacePoint2TrueHitConnector); // register the modules
 
 SpacePoint2TrueHitConnectorModule::SpacePoint2TrueHitConnectorModule() :
   Module()

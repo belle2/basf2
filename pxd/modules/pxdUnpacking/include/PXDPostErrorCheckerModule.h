@@ -50,8 +50,10 @@ namespace Belle2 {
       std::string m_PXDRawAdcsName;  /**< The name of the StoreArray of PXDRawAdcs to be modified */
       std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be modified */
 
+      /** Module parameter for setting the critical error mask */
+      int m_criticalErrorMaskParam;
       /** Critical error mask which defines when data should be trashed, whole event only! */
-      PXDError::PXDErrorFlags  m_criticalErrorMask; // TODO this does not work with addParam()
+      PXDError::PXDErrorFlags  m_criticalErrorMask;
       /// TODO another mask for DHE Level if we want to clean ONLY modules?
 
       /** Flag: Ignore different triggergate between DHEs */

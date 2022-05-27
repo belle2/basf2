@@ -24,7 +24,7 @@ using namespace Belle2;
 using namespace CDC;
 
 // register module
-REG_MODULE(CDCDigitizer)
+REG_MODULE(CDCDigitizer);
 CDCDigitizerModule::CDCDigitizerModule() : Module(),
   m_cdcgp(), m_gcp(), m_aCDCSimHit(), m_posFlag(0),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
@@ -50,6 +50,8 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "Name of relation between MCParticles and CDCSimHits used",     string(""));
   addParam("CDCSimHistToCDCHitsName",      m_SimHitsTOCDCHitsName,
            "Name of relation between the CDCSimHits and the CDCHits used", string(""));
+  addParam("OptionalMCParticlesToHitsName",      m_OptionalMCParticlesToHitsName,
+           "Optional name of relation between the MCParticles and CDCHits used", string("MultipleMatchedParticles"));
 
 
   //Parameters for Digitization
@@ -160,6 +162,9 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("ExtraADCSmearing", m_extraADCSmearing, "Switch for extra ADC smearing; true: on; false: off", m_extraADCSmearing);
   //  addParam("SigmaForExtraADCSmearing", m_sigmaForExtraADCSmearing, "Gaussian sigma for extra ADC smearing; specify range [0,1]", m_sigmaForExtraADCSmearing);
 
+  // Switch for optional relations
+  addParam("MatchAllParticles", m_matchAllParticles, "Switch to store all relations instead of only the first", false);
+
 #if defined(CDC_DEBUG)
   cout << " " << endl;
   cout << "CDCDigitizer constructor" << endl;
@@ -175,6 +180,8 @@ void CDCDigitizerModule::initialize()
   m_cdcHits.registerInDataStore(m_outputCDCHitsName);
   m_simHits.registerRelationTo(m_cdcHits);
   m_mcParticles.registerRelationTo(m_cdcHits);
+  m_mcParticles.registerRelationTo(m_cdcHits, DataStore::c_Event, DataStore::c_WriteOut, m_OptionalMCParticlesToHitsName);
+
   // Arrays for trigger.
   m_cdcHits4Trg.registerInDataStore(m_outputCDCHitsName4Trg);
   m_simHits.registerRelationTo(m_cdcHits4Trg);
@@ -273,7 +280,8 @@ void CDCDigitizerModule::initialize()
 #endif
 
   if (m_useDB4EDepToADC) {
-    if (m_cdcgp->getEDepToADCMainFactor(0, 0) == 0.) {
+    ushort firstLayerOffset = m_cdcgp->getOffsetOfFirstLayer();
+    if (m_cdcgp->getEDepToADCMainFactor(firstLayerOffset, 0) == 0.) {
       B2FATAL("CDCEDepToADCConversion payloads are unavailable!");
     }
   }
@@ -335,7 +343,7 @@ void CDCDigitizerModule::event()
     B2DEBUG(m_debugLevel, "tSimMode,trigBin,offs= " << m_tSimMode << " " << trigBin << " " << offs);
 
     //TODO: simplify the following 7 lines and setFEElectronics()
-    for (unsigned short bd = 1; bd < nBoards; ++bd) {
+    for (unsigned short bd = 1; bd < c_nBoards; ++bd) {
       const short tMaxInCount = 32 * (m_shiftOfTimeWindowIn32Count - m_trgDelayInCount[bd]) - offs;
       const short tMinInCount = tMaxInCount - 32 * m_widthOfTimeWindowInCount[bd];
       B2DEBUG(m_debugLevel, bd << " " << tMinInCount << " " << tMaxInCount);
@@ -356,6 +364,9 @@ void CDCDigitizerModule::event()
 
     // Hit geom. info
     m_wireID = m_aCDCSimHit->getWireID();
+    if (m_wireID.getISuperLayer() < m_cdcgp->getOffsetOfFirstSuperLayer()) {
+      B2FATAL("SimHit with wireID " << m_wireID << " is in CDC SuperLayer: " << m_wireID.getISuperLayer() << " which should not happen.");
+    }
     //    B2DEBUG(29, "Encoded wire number of current CDCSimHit: " << m_wireID);
 
     m_posFlag    = m_aCDCSimHit->getLeftRightPassageRaw();
@@ -663,6 +674,44 @@ void CDCDigitizerModule::event()
       mcparticle->addRelationTo(firstHit, weight);
     }
 
+    //set all relations to first hit if requested but dont create additional hits!
+    // relation 1
+    if (m_matchAllParticles > 0) {
+      if (iterSignalMap->second.m_simHitIndex >= 0) {
+        RelationVector<MCParticle> rels1 = m_simHits[iterSignalMap->second.m_simHitIndex]->getRelationsFrom<MCParticle>();
+        if (rels1.size() != 0) {
+          //assumption: only one MCParticle
+          const MCParticle* mcparticle = rels1[0];
+          double weight = rels1.weight(0);
+          mcparticle->addRelationTo(firstHit, weight, m_OptionalMCParticlesToHitsName);
+        }
+      }
+
+      // relation 2
+      if (iterSignalMap->second.m_simHitIndex2 >= 0) {
+        RelationVector<MCParticle> rels2 = m_simHits[iterSignalMap->second.m_simHitIndex2]->getRelationsFrom<MCParticle>();
+        if (rels2.size() != 0) {
+          //assumption: only one MCParticle
+          const MCParticle* mcparticle = rels2[0];
+          double weight = rels2.weight(0);
+          mcparticle->addRelationTo(firstHit, weight, m_OptionalMCParticlesToHitsName);
+        }
+      }
+
+      // relation 3
+      if (iterSignalMap->second.m_simHitIndex3 >= 0) {
+        RelationVector<MCParticle> rels3 = m_simHits[iterSignalMap->second.m_simHitIndex3]->getRelationsFrom<MCParticle>();
+        if (rels3.size() != 0) {
+          //assumption: only one MCParticle
+          const MCParticle* mcparticle = rels3[0];
+          double weight = rels3.weight(0);
+          mcparticle->addRelationTo(firstHit, weight, m_OptionalMCParticlesToHitsName);
+        }
+      }
+
+
+    }
+
     //Set 2nd-hit related things if it exists
     if (m_output2ndHit && iterSignalMap->second.m_simHitIndex2 >= 0) {
       unsigned short tdcCount2 = static_cast<unsigned short>((getPositiveT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime2) *
@@ -815,7 +864,7 @@ double CDCDigitizerModule::smearDriftLength(const double driftLength, const doub
 #endif
 
   // Smear drift length
-  double newDL = gRandom->Gaus(driftLength + mean , resolution);
+  double newDL = gRandom->Gaus(driftLength + mean, resolution);
   while (newDL <= 0.) newDL = gRandom->Gaus(driftLength + mean, resolution);
   //  cout << "totalFugeF in Digi= " << m_totalFudgeFactor << endl;
   return newDL;
@@ -1024,7 +1073,7 @@ void CDCDigitizerModule::setFEElectronics()
   if (!m_fEElectronicsFromDB) B2FATAL("No FEEElectronics dbobject!");
   const CDCFEElectronics& fp = *((*m_fEElectronicsFromDB)[0]);
   int mode = (fp.getBoardID() == -1) ? 1 : 0;
-  int iNBoards = static_cast<int>(nBoards);
+  int iNBoards = static_cast<int>(c_nBoards);
 
   //set typical values for all channels first if mode=1
   if (mode == 1) {
@@ -1072,12 +1121,12 @@ void CDCDigitizerModule::setSemiTotalGain()
   B2DEBUG(m_debugLevel, " ");
 
   //read individual wire gains
-  const int nLyrs = MAX_N_SLAYERS;
+  const int nLyrs = c_maxNSenseLayers;
   B2DEBUG(m_debugLevel, "nLyrs= " << nLyrs);
   int nGoodL[nLyrs] = {};
   float  wgL[nLyrs] = {};
-  int nGoodSL[nSuperLayers] = {};
-  float  wgSL[nSuperLayers] = {};
+  int nGoodSL[c_nSuperLayers] = {};
+  float  wgSL[c_nSuperLayers] = {};
   int nGoodAll = 0;
   float  wgAll = 0;
   int iw = -1;
@@ -1105,7 +1154,7 @@ void CDCDigitizerModule::setSemiTotalGain()
     B2DEBUG(m_debugLevel, "lyr,ngood,gain= " << lyr << " " << nGoodL[lyr] << " " << wgL[lyr]);
   }
   //calculate mean gain per superlayer
-  for (unsigned int sl = 0; sl < nSuperLayers; ++sl) {
+  for (unsigned int sl = 0; sl < c_nSuperLayers; ++sl) {
     if (nGoodSL[sl] > 0) wgSL[sl] /= nGoodSL[sl];
     B2DEBUG(m_debugLevel, "slyr,ngood,gain= " << sl << " " << nGoodSL[sl] << " " << wgSL[sl]);
   }

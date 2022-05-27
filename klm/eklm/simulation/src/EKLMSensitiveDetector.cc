@@ -75,8 +75,8 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   /* Create step hit and store in to DataStore */
   EKLMSimHit* hit = m_SimHits.appendNew();
   CLHEP::Hep3Vector trackMomentum = track.GetMomentum();
-  hit->setMomentum(TLorentzVector(trackMomentum.x(), trackMomentum.y(),
-                                  trackMomentum.z(), track.GetTotalEnergy()));
+  hit->setMomentum(ROOT::Math::PxPyPzEVector(trackMomentum.x(), trackMomentum.y(),
+                                             trackMomentum.z(), track.GetTotalEnergy()));
   hit->setTrackID(track.GetTrackID());
   hit->setParentTrackID(track.GetParentID());
   hit->setLocalPosition(lpos.x() / CLHEP::mm * Unit::mm,

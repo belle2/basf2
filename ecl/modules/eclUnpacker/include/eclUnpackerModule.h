@@ -32,7 +32,7 @@ namespace Belle2 {
     /** constructor */
     ECLUnpackerModule();
     /** destructor */
-    virtual ~ECLUnpackerModule();
+    virtual ~ECLUnpackerModule() {}
 
     /** initialize */
     virtual void initialize() override;
@@ -47,7 +47,7 @@ namespace Belle2 {
 
     /** exeption should be thrown when the unexpected      */
     BELLE2_DEFINE_EXCEPTION(Unexpected_end_of_FINESSE_buffer,
-                            "Unexpected end of the FINESS buffer is reached while reading ShpaerDSP data");
+                            "Unexpected end of the FINESSE buffer is reached while reading ShpaerDSP data");
     /** exeption should be thrown when the Shaepr DSP header is corrupted    */
 
     BELLE2_DEFINE_EXCEPTION(Bad_ShaperDSP_header, "Corrupted Shaper DSP header");
@@ -182,7 +182,7 @@ namespace Belle2 {
 
     /** read nex word from COPPER data, check if the end of data is reached  */
     unsigned int readNextCollectorWord();
-    /** rean N bits from COPPER buffer (needed for reading the compressed ADC data) */
+    /** read N bits from COPPER buffer (needed for reading the compressed ADC data) */
     unsigned int readNBits(int bitsToRead);
     /** read raw data from COPPER and fill output m_eclDigits container */
     void readRawECLData(RawECL* rawCOPPERData, int n);

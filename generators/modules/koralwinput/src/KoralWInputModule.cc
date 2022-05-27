@@ -18,7 +18,7 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(KoralWInput)
+REG_MODULE(KoralWInput);
 
 
 KoralWInputModule::KoralWInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
@@ -61,7 +61,11 @@ void KoralWInputModule::event()
     B2FATAL("BeamParameters have changed within a job, this is not supported for KoralW.");
   m_firstEvent = false;
   const MCInitialParticles& initial = m_initial.generate();
-  TLorentzRotation boost = initial.getCMSToLab();
+
+  // true boost
+  ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
+
+  // vertex
   TVector3 vertex = initial.getVertex();
   m_mcGraph.clear();
   m_generator.generateEvent(m_mcGraph, vertex, boost);

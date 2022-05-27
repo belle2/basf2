@@ -30,7 +30,7 @@ using namespace Belle2::ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLDQMInjection)
+REG_MODULE(ECLDQMInjection);
 
 //-----------------------------------------------------------------
 //                 Implementation

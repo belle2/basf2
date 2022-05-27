@@ -14,7 +14,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(ECLChargedPID)
+REG_MODULE(ECLChargedPID);
 
 
 ECLChargedPIDModule::ECLChargedPIDModule() : Module()

@@ -36,7 +36,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclMuMuECollector)
+REG_MODULE(eclMuMuECollector);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -267,8 +267,8 @@ void eclMuMuECollectorModule::collect()
   if (iTrack[0] == -1 || iTrack[1] == -1) { return; }
 
   /** Quit if the invariant mass of the two tracks is too low */
-  TLorentzVector mu0 = m_trackArray[iTrack[0]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
-  TLorentzVector mu1 = m_trackArray[iTrack[1]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
+  ROOT::Math::PxPyPzEVector mu0 = m_trackArray[iTrack[0]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
+  ROOT::Math::PxPyPzEVector mu1 = m_trackArray[iTrack[1]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
   if ((mu0 + mu1).M() < m_minPairMass) { return; }
 
   //------------------------------------------------------------------------

@@ -9,7 +9,7 @@
 #include <tracking/modules/fitter/KalmanRecoFitterModule.h>
 using namespace Belle2;
 
-REG_MODULE(KalmanRecoFitter)
+REG_MODULE(KalmanRecoFitter);
 
 /** Module for the Kalman Fitter */
 KalmanRecoFitterModule::KalmanRecoFitterModule() : BaseRecoFitterModule()

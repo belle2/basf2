@@ -14,7 +14,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(PlaneTriggerTrackTimeEstimator)
+REG_MODULE(PlaneTriggerTrackTimeEstimator);
 
 PlaneTriggerTrackTimeEstimatorModule::PlaneTriggerTrackTimeEstimatorModule() : BaseTrackTimeEstimatorModule()
 {

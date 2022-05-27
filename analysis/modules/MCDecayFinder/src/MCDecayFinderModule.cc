@@ -19,7 +19,7 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(MCDecayFinder)
+REG_MODULE(MCDecayFinder);
 
 MCDecayFinderModule::MCDecayFinderModule() : Module(), m_isSelfConjugatedParticle(false)
 {

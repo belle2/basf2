@@ -15,9 +15,9 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CombinedPIDPerformance)
+REG_MODULE(CombinedPIDPerformance);
 
-CombinedPIDPerformanceModule::CombinedPIDPerformanceModule() : Module() , m_rootFilePtr(NULL)
+CombinedPIDPerformanceModule::CombinedPIDPerformanceModule() : Module(), m_rootFilePtr(NULL)
 {
   setDescription("This module evaluates the combined PID performance");
 
@@ -185,7 +185,7 @@ void CombinedPIDPerformanceModule::event()
 
     // apply some loose cuts on track quality and production vertex
     if (trackFit->getPValue() < 0.001) continue;
-    if (mcParticle->getProductionVertex().Perp() > 1.0) continue;
+    if (mcParticle->getProductionVertex().Rho() > 1.0) continue;
     if (!(mcParticle->getStatus(MCParticle::c_PrimaryParticle))) continue;
 
     // fill the efficiencies and fake rates

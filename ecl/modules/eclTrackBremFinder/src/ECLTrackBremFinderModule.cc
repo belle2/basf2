@@ -32,7 +32,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(ECLTrackBremFinder)
+REG_MODULE(ECLTrackBremFinder);
 
 ECLTrackBremFinderModule::ECLTrackBremFinderModule() :
   Module()

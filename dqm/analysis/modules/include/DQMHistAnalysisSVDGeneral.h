@@ -29,18 +29,42 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     DQMHistAnalysisSVDGeneralModule();
+
+    /**
+     * Destructor.
+     */
     virtual ~DQMHistAnalysisSVDGeneralModule();
 
-    //! Module functions to be called from main process
+    /**
+     * Initializer.
+     */
     virtual void initialize() override;
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
     virtual void beginRun() override;
+
+    /**
+     * This method is called for each event.
+     */
     virtual void event() override;
+
+    /**
+     * This method is called if the current run ends.
+     */
     virtual void endRun() override;
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     virtual void terminate() override;
+
+  private:
 
     // parameters
     bool m_printCanvas; /**< if true print the pdf of the canvases */
@@ -59,9 +83,6 @@ namespace Belle2 {
 
     //! Parameters accesible from basf2 scripts
     //  protected:
-
-
-  private:
 
     /** Reference Histogram Root file name */
     std::string m_refFileName;

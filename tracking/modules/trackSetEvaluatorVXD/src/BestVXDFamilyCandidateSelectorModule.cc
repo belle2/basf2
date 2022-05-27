@@ -12,7 +12,7 @@
 using namespace Belle2;
 
 
-REG_MODULE(BestVXDFamilyCandidateSelector)
+REG_MODULE(BestVXDFamilyCandidateSelector);
 
 BestVXDFamilyCandidateSelectorModule::BestVXDFamilyCandidateSelectorModule() : Module()
 {

@@ -17,13 +17,13 @@ using namespace Belle2::VXD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDROIDQM)
+REG_MODULE(PXDROIDQM);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDROIDQMModule::PXDROIDQMModule() : HistoModule() , m_vxdGeometry(VXD::GeoCache::getInstance())
+PXDROIDQMModule::PXDROIDQMModule() : HistoModule(), m_vxdGeometry(VXD::GeoCache::getInstance())
 {
   //Set module properties
   setDescription("Monitor ROIs");

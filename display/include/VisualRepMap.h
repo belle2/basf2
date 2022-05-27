@@ -30,7 +30,7 @@ namespace Belle2 {
     void select(const TObject* object) const;
 
     /** Deselect all other objects. */
-    void selectOnly(TEveElement* eveObj) const;
+    void selectOnly(const TEveElement* eveObj) const;
 
     /** Select related objects. */
     void selectRelated(TEveElement* eveObj) const;

@@ -501,7 +501,7 @@ EclNbr::EclNbr() :
 }
 
 EclNbr::EclNbr(const EclNbr& aNbr) :
-  m_nbrs(*new std::vector< Identifier > (aNbr.m_nbrs)) ,
+  m_nbrs(*new std::vector< Identifier > (aNbr.m_nbrs)),
   m_nearSize(aNbr.m_nearSize)
 {
   mNbr_cellID = 0;
@@ -510,15 +510,15 @@ EclNbr::EclNbr(const EclNbr& aNbr) :
 }
 
 EclNbr::EclNbr(
-  const std::vector< Identifier >&           aNbrs     ,
+  const std::vector< Identifier >&           aNbrs,
   const std::vector< Identifier >::size_type aNearSize
 ) :
-  m_nbrs(*new std::vector< Identifier > (aNbrs)) ,
+  m_nbrs(*new std::vector< Identifier > (aNbrs)),
   m_nearSize(aNearSize)
 {
   // sort vector separately for near, nxt-near nbrs
-  std::sort(m_nbrs.begin() , m_nbrs.begin() + aNearSize , std::less< Identifier >()) ;
-  std::sort(m_nbrs.begin() + aNearSize ,   m_nbrs.end() , std::less< Identifier >()) ;
+  std::sort(m_nbrs.begin(), m_nbrs.begin() + aNearSize, std::less< Identifier >()) ;
+  std::sort(m_nbrs.begin() + aNearSize,   m_nbrs.end(), std::less< Identifier >()) ;
 }
 
 EclNbr::~EclNbr()
@@ -672,33 +672,33 @@ EclNbr::getNbr(const Identifier aCellId)
     int fm2 = (phiId + 142) % 144;
     int fp2 = (phiId + 2) % 144;
 
-    vNbr.push_back(GetCellID(t00 , fm1));
-    vNbr.push_back(GetCellID(tp1 , fm1));
-    vNbr.push_back(GetCellID(tp1 , f00));
-    vNbr.push_back(GetCellID(tp1 , fp1));
-    vNbr.push_back(GetCellID(t00 , fp1));
-    vNbr.push_back(GetCellID(tm1 , fp1));
-    vNbr.push_back(GetCellID(tm1 , f00));
-    vNbr.push_back(GetCellID(tm1 , fm1));
+    vNbr.push_back(GetCellID(t00, fm1));
+    vNbr.push_back(GetCellID(tp1, fm1));
+    vNbr.push_back(GetCellID(tp1, f00));
+    vNbr.push_back(GetCellID(tp1, fp1));
+    vNbr.push_back(GetCellID(t00, fp1));
+    vNbr.push_back(GetCellID(tm1, fp1));
+    vNbr.push_back(GetCellID(tm1, f00));
+    vNbr.push_back(GetCellID(tm1, fm1));
 
     nearSize = vNbr.size();
 
-    vNbr.push_back(GetCellID(tm1 , fm2));
-    vNbr.push_back(GetCellID(t00 , fm2));
-    vNbr.push_back(GetCellID(tp1 , fm2));
-    vNbr.push_back(GetCellID(tp2 , fm2));
-    vNbr.push_back(GetCellID(tp2 , fm1));
-    vNbr.push_back(GetCellID(tp2 , f00));
-    vNbr.push_back(GetCellID(tp2 , fp1));
-    vNbr.push_back(GetCellID(tp2 , fp2));
-    vNbr.push_back(GetCellID(tp1 , fp2));
-    vNbr.push_back(GetCellID(t00 , fp2));
-    vNbr.push_back(GetCellID(tm1 , fp2));
-    vNbr.push_back(GetCellID(tm2 , fp2));
-    vNbr.push_back(GetCellID(tm2 , fp1));
-    vNbr.push_back(GetCellID(tm2 , f00));
-    vNbr.push_back(GetCellID(tm2 , fm1));
-    vNbr.push_back(GetCellID(tm2 , fm2));
+    vNbr.push_back(GetCellID(tm1, fm2));
+    vNbr.push_back(GetCellID(t00, fm2));
+    vNbr.push_back(GetCellID(tp1, fm2));
+    vNbr.push_back(GetCellID(tp2, fm2));
+    vNbr.push_back(GetCellID(tp2, fm1));
+    vNbr.push_back(GetCellID(tp2, f00));
+    vNbr.push_back(GetCellID(tp2, fp1));
+    vNbr.push_back(GetCellID(tp2, fp2));
+    vNbr.push_back(GetCellID(tp1, fp2));
+    vNbr.push_back(GetCellID(t00, fp2));
+    vNbr.push_back(GetCellID(tm1, fp2));
+    vNbr.push_back(GetCellID(tm2, fp2));
+    vNbr.push_back(GetCellID(tm2, fp1));
+    vNbr.push_back(GetCellID(tm2, f00));
+    vNbr.push_back(GetCellID(tm2, fm1));
+    vNbr.push_back(GetCellID(tm2, fm2));
   }//if( aCellId > 1152 && aCellId < 7777 )
   else {
     // endcap -- not always 24!
@@ -867,41 +867,41 @@ EclNbr::getNbr(const Identifier aCellId)
     vNbr.push_back(GetCellID(t00, f00m1));
     vNbr.push_back(GetCellID(t00, f00p1));
     if (nm1 < 999) {
-      vNbr.push_back(GetCellID(tm1 , fm100));
+      vNbr.push_back(GetCellID(tm1, fm100));
       if (fm1m1 < 999)
-        vNbr.push_back(GetCellID(tm1 , fm1m1));
+        vNbr.push_back(GetCellID(tm1, fm1m1));
       if (fm1p1 < 999)
-        vNbr.push_back(GetCellID(tm1 , fm1p1));
+        vNbr.push_back(GetCellID(tm1, fm1p1));
     }
     if (np1 < 999) {
-      vNbr.push_back(GetCellID(tp1 , fp100));
+      vNbr.push_back(GetCellID(tp1, fp100));
       if (fp1m1 < 999)
-        vNbr.push_back(GetCellID(tp1 , fp1m1));
+        vNbr.push_back(GetCellID(tp1, fp1m1));
       if (fp1p1 < 999)
-        vNbr.push_back(GetCellID(tp1 , fp1p1));
+        vNbr.push_back(GetCellID(tp1, fp1p1));
     }
     nearSize = vNbr.size() ;
 
     // now on to next-near neighbors
     if (nm2 < 999) {
-      vNbr.push_back(GetCellID(tm2 , fm200));
+      vNbr.push_back(GetCellID(tm2, fm200));
       if (fm2m1 < 999)
-        vNbr.push_back(GetCellID(tm2 , fm2m1));
+        vNbr.push_back(GetCellID(tm2, fm2m1));
       if (fm2p1 < 999)
-        vNbr.push_back(GetCellID(tm2 , fm2p1));
+        vNbr.push_back(GetCellID(tm2, fm2p1));
       if (fm2m2 < 999)
-        vNbr.push_back(GetCellID(tm2 , fm2m2));
+        vNbr.push_back(GetCellID(tm2, fm2m2));
       if (fm2p2 < 999)
-        vNbr.push_back(GetCellID(tm2 , fm2p2));
+        vNbr.push_back(GetCellID(tm2, fm2p2));
     }
     if (nm1 < 999) {
       if (fm1m2 < 999)
-        vNbr.push_back(GetCellID(tm1 , fm1m2));
+        vNbr.push_back(GetCellID(tm1, fm1m2));
       if (fm1p2 < 999)
-        vNbr.push_back(GetCellID(tm1 , fm1p2));
+        vNbr.push_back(GetCellID(tm1, fm1p2));
     }
-    vNbr.push_back(GetCellID(t00 , f00m2));
-    vNbr.push_back(GetCellID(t00 , f00p2));
+    vNbr.push_back(GetCellID(t00, f00m2));
+    vNbr.push_back(GetCellID(t00, f00p2));
     if (np1 < 999) {
       if (fp1m2 < 999)
         vNbr.push_back(GetCellID(tp1, fp1m2));

@@ -17,7 +17,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(EvtGenDecay)
+REG_MODULE(EvtGenDecay);
 
 EvtGenDecayModule::EvtGenDecayModule() : Module()
 {

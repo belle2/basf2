@@ -11,6 +11,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <limits>
+#include <cmath>
 
 using namespace std;
 
@@ -22,15 +23,15 @@ namespace Belle2 {
       double p = momentum.Mag();
       double pT = momentum.Perp();
       double b = -Bz * charge * Const::speedOfLight;
-      if (abs(b / Unit::T) > pT) { // helix for R < 100 m
-        m_R = pT / abs(b);
+      if (std::abs(b / Unit::T) > pT) { // helix for R < 100 m
+        m_R = pT / std::abs(b);
         m_omega = b / p;
         m_kz = momentum.Z() / p;
         m_phi0 = momentum.Phi() - copysign(M_PI / 2, m_omega);
         m_xc = position.X() - m_R * cos(m_phi0);
         m_yc = position.Y() - m_R * sin(m_phi0);
         m_z0 = position.Z();
-        m_T0 = 2 * M_PI / abs(m_omega);
+        m_T0 = 2 * M_PI / std::abs(m_omega);
       } else { // straight line
         m_omega = 0; // distinguisher between straight line and helix
         x0 = position.X();
@@ -91,7 +92,7 @@ namespace Belle2 {
         auto r = point - TVector3(m_xc, m_yc, m_z0);
         double phi = normal.Phi();
         double s = r * normal;
-        if (abs(s) > m_R) return std::numeric_limits<double>::quiet_NaN(); // no solution
+        if (std::abs(s) > m_R) return std::numeric_limits<double>::quiet_NaN(); // no solution
 
         double t = shortestDistance(s / m_R, phi);
         double v = m_kz * normal.Z();
@@ -101,7 +102,7 @@ namespace Belle2 {
         double dt_prev = 0;
         for (int i = 0; i < 100; i++) {
           double cosAlpha = (s - v * t) / m_R;
-          if (abs(cosAlpha) > 1) {
+          if (std::abs(cosAlpha) > 1) {
             return std::numeric_limits<double>::quiet_NaN(); // no solution
           }
           t = shortestDistance(cosAlpha, phi);
@@ -110,7 +111,7 @@ namespace Belle2 {
           t_prev = t;
           dt_prev = dt;
         }
-        if (abs(dt_prev) < 1e-6) {
+        if (std::abs(dt_prev) < 1e-6) {
           B2DEBUG(20, "TOP::HelixSwimmer::getDistanceToPlane: not converged"
                   << LogVar("v", v) << LogVar("dt", dt_prev));
           return t;

@@ -88,8 +88,8 @@ namespace Belle2 {
         \code
         from variables import variables
 
-        from ROOT import TLorentzVector
-        someParticle = Belle2.Particle(TLorentzVector(1.0, 0, 0, 0), 321)
+        from ROOT.Math import PxPyPzEVector
+        someParticle = Belle2.Particle(PxPyPzEVector(1.0, 0, 0, 1.0), 321)
         print(variables.evaluate('E', someParticle))
         \endcode
      *
@@ -221,10 +221,10 @@ namespace Belle2 {
 
       /** Register a variable. */
       void registerVariable(const std::string& name, const Manager::FunctionPtr& f, const std::string& description,
-                            const Manager::VariableDataType& v);
+                            const Manager::VariableDataType& v, const std::string& unit = "");
       /** Register a variable that takes floating-point arguments (see Variable::Manager::ParameterFunctionPtr). */
       void registerVariable(const std::string& name, const Manager::ParameterFunctionPtr& f, const std::string& description,
-                            const Manager::VariableDataType& v);
+                            const Manager::VariableDataType& v, const std::string& unit = "");
       /** Register a meta-variable that takes string arguments and returns a variable(see Variable::Manager::MetaFunctionPtr). */
       void registerVariable(const std::string& name, const Manager::MetaFunctionPtr& f, const std::string& description,
                             const Manager::VariableDataType& v);
@@ -295,14 +295,16 @@ namespace Belle2 {
     class Proxy {
     public:
       /** constructor. */
-      Proxy(const std::string& name, Manager::FunctionPtr f, const std::string& description, Manager::VariableDataType v)
+      Proxy(const std::string& name, Manager::FunctionPtr f, const std::string& description, Manager::VariableDataType v,
+            const std::string& unit = "")
       {
-        Manager::Instance().registerVariable(name, f, description, v);
+        Manager::Instance().registerVariable(name, f, description, v, unit);
       }
       /** constructor. */
-      Proxy(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description, Manager::VariableDataType v)
+      Proxy(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description, Manager::VariableDataType v,
+            const std::string& unit = "")
       {
-        Manager::Instance().registerVariable(name, f, description, v);
+        Manager::Instance().registerVariable(name, f, description, v, unit);
       }
       /** constructor. */
       Proxy(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description, Manager::VariableDataType v)
@@ -366,15 +368,44 @@ namespace Belle2 {
      */
 #define VARMANAGER_MAKE_UNIQUE(x) VARMANAGER_CONCATENATE(x, __LINE__)
 
-    /** \def REGISTER_VARIABLE(name, function, description, variabletype)
+    /** \def REGISTER_VARIABLE_NO_UNIT(name, function, description)
      *
      * Register a variable under the key 'name' with given function and description.
      * \sa Manager
      */
-#define REGISTER_VARIABLE(name, function, description) \
+#define REGISTER_VARIABLE_NO_UNIT(name, function, description) \
   static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description), Belle2::Variable::get_function_type(name,function));
 
-    /** \def REGISTER_VARIABLE(name, function, description, variabletype)
+    /** \def REGISTER_VARIABLE_WITH_UNIT(name, function, description, unit)
+     *
+     * Register a variable under the key 'name' with given function, description, and unit.
+     * \sa Manager
+     */
+#define REGISTER_VARIABLE_WITH_UNIT(name, function, description, unit) \
+  static Proxy VARMANAGER_MAKE_UNIQUE(_variableproxy)(std::string(name), Belle2::Variable::make_function(function), std::string(description), Belle2::Variable::get_function_type(name,function), std::string(unit));
+
+    /** \def PICK_FIFTH_ARG(arg1, arg2, arg3, arg4, arg5, ...)
+     *
+     * Helper macro to determine number of provided arguments.
+     *
+     */
+#define PICK_FIFTH_ARG(arg1, arg2, arg3, arg4, arg5, ...) arg5
+
+    /** \def REGISTER_VARIABLE_MACRO_CHOOSER(...)
+     *
+     * Helper macro to pick REGISTER_VARIABLE function based on number of provided arguments
+     *
+     */
+#define REGISTER_VARIABLE_MACRO_CHOOSER(...) PICK_FIFTH_ARG(__VA_ARGS__, REGISTER_VARIABLE_WITH_UNIT, REGISTER_VARIABLE_NO_UNIT, )
+
+    /** \def REGISTER_VARIABLE(...)
+     *
+     * Generic REGISTER_VARIABLE function
+     *
+     */
+#define REGISTER_VARIABLE(...) REGISTER_VARIABLE_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+
+    /** \def REGISTER_METAVARIABLE(name, function, description, variabledatatype)
      *
      * Register a variable under the key 'name' with given function and description.
      * \sa Manager

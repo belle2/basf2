@@ -29,10 +29,10 @@ using namespace std;
 namespace Belle2 {
 
   //-----------------------------------------------------------------
-  //                 Register module
+  ///                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(TOPMCTrackMaker)
+  REG_MODULE(TOPMCTrackMaker);
 
   //-----------------------------------------------------------------
   //                 Implementation
@@ -102,7 +102,7 @@ namespace Belle2 {
       if (!barHit) continue;
 
       TMatrixDSym cov(6); // infinite precission
-      fitResults.appendNew(mcParticle.getVertex(),
+      fitResults.appendNew(B2Vector3D(mcParticle.getVertex()),
                            mcParticle.getMomentum(),
                            cov,
                            mcParticle.getCharge(),

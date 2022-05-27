@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(DAFRecoFitter)
+REG_MODULE(DAFRecoFitter);
 
 DAFRecoFitterModule::DAFRecoFitterModule() : BaseRecoFitterModule()
 {

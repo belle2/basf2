@@ -76,7 +76,7 @@ int StorageSerializerModule::writeStreamerInfos()
                 << " : Class Name " << entryClass->GetName() << std::endl;
       TVirtualStreamerInfo* vinfo = entryClass->GetStreamerInfo();
       if (!minilist) minilist  =  new TList();
-      minilist->Add((TObject*)vinfo);
+      minilist->Add(reinterpret_cast<TObject*>(vinfo));
     }
   }
   if (minilist) {

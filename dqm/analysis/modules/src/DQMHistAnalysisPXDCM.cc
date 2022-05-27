@@ -377,6 +377,7 @@ void DQMHistAnalysisPXDCMModule::event()
 #endif
     if (m_hCommonModeDelta) {
       m_hCommonModeDelta->Draw("colz");
+      leg->Draw();
       m_line1->Draw();
       m_lineA->Draw();
     }

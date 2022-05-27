@@ -22,7 +22,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PrintCollections)
+REG_MODULE(PrintCollections);
 
 //-----------------------------------------------------------------
 //                 Implementation

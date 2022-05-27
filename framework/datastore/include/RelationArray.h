@@ -277,7 +277,7 @@ namespace Belle2 {
     void add(index_type from, index_type to, weight_type weight = 1.0)
     {
       setModified(true);
-      new(next()) RelationElement(from, to, weight);
+      new (next()) RelationElement(from, to, weight);
     }
 
     /** Add a new element to the relation
@@ -290,7 +290,7 @@ namespace Belle2 {
     {
       setModified(true);
       std::vector<weight_type> weights(to.size(), weight);
-      new(next()) RelationElement(from, to, weights);
+      new (next()) RelationElement(from, to, weights);
     }
 
     /** Add a new element to the relation
@@ -302,7 +302,7 @@ namespace Belle2 {
     void add(index_type from, const std::vector<index_type>& to, const std::vector<weight_type>& weights)
     {
       setModified(true);
-      new(next()) RelationElement(from, to, weights);
+      new (next()) RelationElement(from, to, weights);
     }
 
     /** Add a new element to the relation
@@ -316,7 +316,7 @@ namespace Belle2 {
     template <class InputIterator> void add(index_type from, const InputIterator& begin, const InputIterator& end)
     {
       setModified(true);
-      new(next()) RelationElement(from, begin, end);
+      new (next()) RelationElement(from, begin, end);
     }
 
     /** Consolidate Relation Elements
@@ -357,7 +357,7 @@ namespace Belle2 {
      *  element got removed
      */
     template<class FunctionFrom, class FunctionTo> void consolidate(const
-        FunctionFrom& replaceFrom = FunctionFrom(), const FunctionTo&
+        FunctionFrom& replaceFrom = FunctionFrom(), const FunctionTo &
         replaceTo = FunctionTo(), EConsolidationAction action =
           c_doNothing);
 

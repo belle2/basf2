@@ -11,7 +11,7 @@
 
 using namespace Belle2;
 
-REG_MODULE(ZMQTxWorker)
+REG_MODULE(ZMQTxWorker);
 
 ZMQTxWorkerModule::ZMQTxWorkerModule() : Module()
 {

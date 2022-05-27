@@ -151,7 +151,7 @@ namespace Belle2 {
       EclNbr(const EclNbr& aNbr);
       /** Constructor of EclNbr */
       EclNbr(
-        const std::vector< Identifier >&           aNbrs     ,
+        const std::vector< Identifier >&           aNbrs,
         const std::vector< Identifier >::size_type aNearSize
       ) ;
 

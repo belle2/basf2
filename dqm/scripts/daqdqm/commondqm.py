@@ -324,8 +324,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     if (components is None or 'KLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
         klmdqm2 = b2.register_module("KLMDQM2")
         path.add_module(klmdqm2, MuonListName='mu+:KLMDQM',
-                        MinimalMatchingDigits=14,
-                        MinimalMatchingDigitsOuterLayers=4,
+                        MinimalMatchingDigits=12,
+                        MinimalMatchingDigitsOuterLayers=0,
                         MinimalMomentumNoOuterLayers=4.0)
 
     # We want to see the datasize of all events after removing the raw data

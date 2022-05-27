@@ -88,7 +88,7 @@ namespace Belle2 {
       return G4ThreeVector(cx, cy, v.find(i0)->second.z());
     }
 
-    Point_t centerofgravity(Point_t* b, Point_t* e)
+    Point_t centerofgravity(Point_t* b, const Point_t* e)
     {
       double cx = 0, cy = 0, A = 0;
       int n = e - b;

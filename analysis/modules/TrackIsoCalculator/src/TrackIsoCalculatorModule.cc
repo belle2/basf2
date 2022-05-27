@@ -7,6 +7,8 @@
  **************************************************************************/
 
 #include <analysis/modules/TrackIsoCalculator/TrackIsoCalculatorModule.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 
 #include <cmath>
 #include <iomanip>
@@ -26,6 +28,11 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
   addParam("particleList",
            m_pListName,
            "The name of the input ParticleList. Must be a charged stable particle as defined in Const::chargedStableSet.");
+  addParam("particleListReference",
+           m_pListReferenceName,
+           "The name of the input ParticleList of reference tracks. By default, the :all list of the same particle type with m_pListName is used. "
+           "Must be a charged stable particle as defined in Const::chargedStableSet.",
+           std::string(""));
   addParam("detectorInnerSurface",
            m_detInnerSurface,
            "The name of the detector at whose innermost layer we extrapolate each helix's polar and azimuthal angle. Allowed values: {CDC, PID(=TOP/ARICH), ECL, KLM}.");
@@ -45,53 +52,73 @@ void TrackIsoCalculatorModule::initialize()
   m_event_metadata.isRequired();
   m_pList.isRequired(m_pListName);
 
-  B2INFO("TrackIsoCalculator module will calculate isolation variables for the ParticleList: " << m_pListName << ".");
+  if (m_pListReferenceName.empty()) {
+    if (m_pListName.find(':') != std::string::npos)
+      m_pListReferenceName = m_pListName.substr(0, m_pListName.find_first_of(':')) + std::string(":all");
+    else
+      m_pListReferenceName = m_pListName + std::string(":all");
+  }
+  m_pListReference.isRequired(m_pListReferenceName);
+
+  B2INFO("TrackIsoCalculator module will calculate isolation variables for the ParticleList: " << m_pListName << ", "
+         << "Reference ParticleList: " << m_pListReferenceName << ".");
 
   m_extraInfoName = (!m_use2DRhoPhiDist) ? ("dist3DToClosestTrkAt" + m_detInnerSurface + "Surface") : ("dist2DRhoPhiToClosestTrkAt" +
                     m_detInnerSurface + "Surface");
+
+  if (!isStdChargedList()) {
+    B2FATAL("ParticleList: " << m_pListName << " and/or ParticleList: " << m_pListReferenceName <<
+            " is not that of a valid particle in Const::chargedStableSet! Aborting...");
+  }
+
 }
 
 void TrackIsoCalculatorModule::event()
 {
 
-  if (!isStdChargedList()) {
-    B2FATAL("PDG: " << m_pList->getPDGCode() << " of ParticleList: " << m_pList->getParticleListName() <<
-            " is not that of a valid particle in Const::chargedStableSet! Aborting...");
-  }
-
   const auto nParticles = m_pList->getListSize();
+  const auto nParticlesReference = m_pListReference->getListSize();
 
-  B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n" << "nParticles: " << nParticles);
+  B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n" << "nParticles: " << nParticles << "\n"
+          << "nParticlesReference: " << nParticlesReference);
 
   // Store the pair-wise distances in a 2D array.
-  // Size is given by the length of the particle list.
-  std::vector<double> defaultDistances(nParticles, 1e9);
+  // Size is given by the length of the reference particle list.
+  std::vector<double> defaultDistances(nParticlesReference, 1e9);
+  // Size is given by the length of the particle list. Each vector (= defaultDistances) has nParticlesReference components.
+  // Thus, total size is given by nParticles times nParticlesReference.
   std::vector<std::vector<double>> pairwiseDistances(nParticles, defaultDistances);
 
   B2DEBUG(11, "Array of pair-wise distances between tracks in particle list. Initial values:");
-  this->printDistancesArr(pairwiseDistances, nParticles);
+  this->printDistancesArr(pairwiseDistances, nParticles, nParticlesReference);
 
   for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
-
     Particle* iParticle = m_pList->getParticle(iPart);
 
-    for (unsigned int jPart(iPart + 1); jPart < nParticles; ++jPart) {
+    for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
+      Particle* jParticle = m_pListReference->getParticle(jPart);
 
-      Particle* jParticle = m_pList->getParticle(jPart);
+      if (iParticle->getMdstArrayIndex() == jParticle->getMdstArrayIndex())
+        continue;
+      if (pairwiseDistances[iPart][jPart] != 1e9)
+        continue;
 
       // Calculate the pair-wise distance.
       double ijDist = (!m_use2DRhoPhiDist) ? this->get3DDistAtDetSurface(iParticle,
                       jParticle) : this->get2DRhoPhiDistAsChordLength(iParticle, jParticle);
 
       pairwiseDistances[iPart][jPart] = ijDist;
-      pairwiseDistances[jPart][iPart] = ijDist;
+
+      int jPart_in_inputList = m_pList->getIndex(jParticle);
+      if (jPart_in_inputList != -1)
+        pairwiseDistances[jPart_in_inputList][iPart] = ijDist;
 
     }
 
   }
 
   B2DEBUG(11, "Array of pair-wise distances between tracks in particle list. Final values:");
-  this->printDistancesArr(pairwiseDistances, nParticles);
+  this->printDistancesArr(pairwiseDistances, nParticles, nParticlesReference);
 
   // For each particle index, find the index of the particle w/ minimal distance in the corresponding row of the 2D array.
   for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
@@ -189,15 +216,30 @@ double TrackIsoCalculatorModule::get2DRhoPhiDistAsChordLength(Particle* iParticl
   return 2 * rho * sin(std::abs(diffPhi) / 2.0);
 }
 
-void TrackIsoCalculatorModule::printDistancesArr(const std::vector<std::vector<double>>& arr, int size)
+bool TrackIsoCalculatorModule::isStdChargedList()
+{
+  DecayDescriptor dd;
+
+  bool checkPList = false;
+  if (dd.init(m_pListName))
+    checkPList = Const::chargedStableSet.find(abs(dd.getMother()->getPDGCode())) != Const::invalidParticle;
+
+  bool checkPListReference = false;
+  if (dd.init(m_pListReferenceName))
+    checkPListReference = Const::chargedStableSet.find(abs(dd.getMother()->getPDGCode())) != Const::invalidParticle;
+
+  return (checkPList and checkPListReference);
+};
+
+void TrackIsoCalculatorModule::printDistancesArr(const std::vector<std::vector<double>>& arr, int size_x, int size_y)
 {
 
   auto logConfig = this->getLogConfig();
 
   if (logConfig.getLogLevel() == LogConfig::c_Debug && logConfig.getDebugLevel() >= 11) {
     std::cout << "" << std::endl;
-    for (int i(0); i < size; ++i) {
-      for (int j(0); j < size; ++j) {
+    for (int i(0); i < size_x; ++i) {
+      for (int j(0); j < size_y; ++j) {
         std::cout << std::setw(7) << arr[i][j] << " ";
       }
       std::cout << "\n";

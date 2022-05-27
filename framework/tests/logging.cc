@@ -20,7 +20,6 @@ namespace {
   {
 #ifndef LOG_NO_B2ASSERT
     B2ASSERT("this shouldn't happen", true);
-    // cppcheck-suppress internalAstError ; this confuses cppcheck ...
     EXPECT_B2FATAL(B2ASSERT("This is just a test, ignore this message", false));
 #else
     B2ASSERT("this should be compiled out", true);

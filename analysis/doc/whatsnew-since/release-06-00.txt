@@ -66,6 +66,10 @@ Variables
  * Added the variable `nPrimaryMCParticles` which returns the number of primary MC particles.
  * Added the variable `nVirtualPrimaryMCParticles` which returns the number of virtual primary MC particles.
  * Added the variable `nInitialPrimaryMCParticles` which returns the number of initial primary MC particles.
+ * Changed the `nCompositeDaughters` so that one can specify the PDG code of composite daughters.
+   If no argument is given, it works same as before. Please note that brackets have to appended even if no argument is given i.e.
+   ``nCompositeDaughters()``.
+ * Added `nCompositeAllGenerationDaughters` which works similar with `nCompositeDaughters` but it includes all generations of daughters.
 
 Modules
 +++++++
@@ -92,6 +96,9 @@ Modules
  * Added an option ``skipNonPrimary`` to ``fillParticleListFromMC`` and ``fillParticleListsFromMC``.
  * Added an argument ``prefix`` to :func:`flavorTagger.flavorTagger` so that one can choose the version of weight files.
  * Added an option ``basketsize`` to :func:`modularAnalysis.variablesToNtuple` to set the size of TBaskets in the output ntuple in bytes.
+ * Added an argument ``reference_list_name`` to :func:`modularAnalysis.calculateTrackIsolation`. The reference ParticleList is used
+   as reference to calculate the distance for the input ParticleList given by ``input_list``. By default, the ``:all`` list of the same particle
+   type as the ``input_list`` is used.
 
 PID Priors
 ++++++++++

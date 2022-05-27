@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace TRGGRLUNPACKERSPACE {
 
     /** num of leafs in data_b2l **/
-    const int nLeafs = 123 + 3 + 32 + 7;
+    const int nLeafs = 128 + 3 + 32 + 7;
     /** num of leafs for others **/
     const int nLeafsExtra = 7;
     /** num of clk time window **/
@@ -65,6 +65,11 @@ namespace Belle2 {
       "1GeV_2",
       "1GeV_1",
       "1GeV_0",
+      "wire_tsf0",
+      "wire_tsf2",
+      "wire_tsf4",
+      "wire_tsf1",
+      "wire_tsf3",
       "theta_11",
       "phi_11",
       "t_11",
@@ -233,6 +238,11 @@ namespace Belle2 {
       e_1GeV_2,
       e_1GeV_1,
       e_1GeV_0,
+      e_wire_tsf0,
+      e_wire_tsf2,
+      e_wire_tsf4,
+      e_wire_tsf1,
+      e_wire_tsf3,
       e_theta_11,
       e_phi_11,
       e_t_11,
@@ -404,6 +414,12 @@ namespace Belle2 {
       1994, 0, // 1GeV_2
       1993, 0, // 1GeV_1
       1992, 0, // 1GeV_0
+
+      1584 + 31, 31, // wire counter TSF0
+      1552 + 31, 31, // wire counter TSF2
+      1520 + 31, 31, // wire counter TSF4
+      1488 + 31, 31, // wire counter TSF1
+      1456 + 31, 31, // wire counter TSF3
 
       1671 - 216, 6, // theta_11
       1664 - 216, 7, // phi_11
@@ -592,6 +608,12 @@ namespace Belle2 {
       bitArray[e_1GeV_2    ] = &(store->m_1GeV_ECL[2]);
       bitArray[e_1GeV_1    ] = &(store->m_1GeV_ECL[1]);
       bitArray[e_1GeV_0    ] = &(store->m_1GeV_ECL[0]);
+
+      bitArray[e_wire_tsf0 ] = &(store->m_wire_tsf0);
+      bitArray[e_wire_tsf2 ] = &(store->m_wire_tsf2);
+      bitArray[e_wire_tsf4 ] = &(store->m_wire_tsf4);
+      bitArray[e_wire_tsf1 ] = &(store->m_wire_tsf1);
+      bitArray[e_wire_tsf3 ] = &(store->m_wire_tsf3);
 
       bitArray[e_theta_11    ] = &(store->m_theta_ECL[11]);
       bitArray[e_phi_11    ] = &(store->m_phi_ECL[11]);

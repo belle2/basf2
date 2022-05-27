@@ -34,7 +34,7 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(EclCovMatrixNtuple)
+REG_MODULE(EclCovMatrixNtuple);
 
 //-----------------------------------------------------------------
 //                 Implementation

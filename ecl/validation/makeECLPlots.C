@@ -2129,7 +2129,7 @@ void ECLEvtGen(TTree* genericBB_tree)
   delete output;
 }
 
-
+// cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
 Double_t Novosibirsk(Double_t *xp,Double_t *par) {
 
   Double_t x=xp[0];

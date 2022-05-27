@@ -49,14 +49,14 @@ using namespace std;
 namespace Belle2 {
 
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
-  REG_MODULE(arichBtest)
+  //-----------------------------------------------------------------
+  ///                Register the Module
+  //-----------------------------------------------------------------
+  REG_MODULE(arichBtest);
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
+  //-----------------------------------------------------------------
+  //                 Implementation
+  //-----------------------------------------------------------------
 
 
   arichBtestModule::arichBtestModule() : Module(), m_end(0), m_events(0), m_file(NULL), m_timestart(0), m_mwpc(NULL)
@@ -271,7 +271,7 @@ namespace Belle2 {
     ARICHBtestGeometryPar* _arichbtgp = ARICHBtestGeometryPar::Instance();
     //-----------------------------------------------------
 
-    int bmask = 0xF;
+    unsigned int bmask = 0xF;
 
     for (int module = 0; module < 6; module++) {
       int istart = 19 * module;

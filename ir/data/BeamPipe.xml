@@ -252,7 +252,7 @@
       <sec name="RO4" unit="cm">2.3</sec>
       <sec name="RO5" unit="cm">2.14</sec>
       <sec name="RO6" unit="cm">2.14</sec>
-      <Material desc="SUS">SUS316L</Material>
+      <Material>Ti</Material>
     </Lv1SUSLERUp>
 
     <Lv2VacLERUp>

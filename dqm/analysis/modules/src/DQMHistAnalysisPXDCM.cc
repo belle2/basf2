@@ -14,6 +14,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysisPXDCM.h>
 #include <TROOT.h>
 #include <TLatex.h>
+#include <TPaveText.h>
 #include <vxd/geometry/GeoCache.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
@@ -255,6 +256,11 @@ void DQMHistAnalysisPXDCMModule::event()
         Double_t mean_adhoc = 0.;
         Double_t entries_adhoc = 0.;
         Double_t outside_adhoc = 0.;
+
+        auto leg = new TPaveText(0.1, 0.6, 0.95, 0.95, "NDC");
+        leg->SetFillStyle(0);
+        leg->SetBorderSize(0);
+
         // Attention, Bins
         // we do not need to re-scale it as the scale is the same for all bins
         for (int cm_y = 0; cm_y < m_upperLineAdhoc; cm_y++) {
@@ -268,17 +274,30 @@ void DQMHistAnalysisPXDCMModule::event()
           entries_adhoc += v;
           outside_adhoc += v;
         }
-        if (entries_adhoc > 0) { // ignore 1.3.2
+        if (entries_adhoc > 0 && scale < 1e-3) { // ignore 1.3.2 and minimum events
+          // scale <1e-3 == >1000 events
           mean_adhoc /= entries_adhoc; // calculate mean
-          // scale <1e-3 == >1000 entries
-          auto warn_tmp = scale < 1e-3 && (fabs(10.0 - mean_adhoc) > m_warnMeanAdhoc || outside_adhoc > m_warnOutsideAdhoc);
-          warn_adhoc_flag |= warn_tmp;
-          auto err_tmp = scale < 1e-3 && (fabs(10.0 - mean_adhoc) > m_errorMeanAdhoc || outside_adhoc > m_errorOutsideAdhoc);
-          error_adhoc_flag |= err_tmp;
+          auto warn_tmp_m = fabs(10.0 - mean_adhoc) > m_warnMeanAdhoc;
+          auto err_tmp_m = fabs(10.0 - mean_adhoc) > m_errorMeanAdhoc;
+          auto warn_tmp_os = outside_adhoc / entries_adhoc > m_warnOutsideAdhoc;
+          auto err_tmp_os = outside_adhoc / entries_adhoc > m_errorOutsideAdhoc;
+          warn_adhoc_flag |= warn_tmp_m || warn_tmp_os;
+          error_adhoc_flag |= err_tmp_m || err_tmp_os;
+
+          if (warn_tmp_m || err_tmp_m) {
+            TString tmp;
+            tmp.Form("%s: Mean %f", name.c_str(), mean_adhoc);
+            leg->AddText(tmp);
+            B2INFO(name << " Mean " <<  mean_adhoc << " " << warn_tmp_m << err_tmp_m);
+          }
+          if (warn_tmp_os || err_tmp_os) {
+            TString tmp;
+            tmp.Form("%s: Outside %f (%f/%f)", name.c_str(), outside_adhoc / entries_adhoc, outside_adhoc, entries_adhoc);
+            leg->AddText(tmp);
+            B2INFO(name << " Outside " << outside_adhoc / entries_adhoc << " (" << outside_adhoc << "/" << entries_adhoc << ") " << warn_tmp_os
+                   << err_tmp_os);
+          }
           m_monObj->setVariable(("cm_" + (std::string)m_PXDModules[i]).c_str(), mean_adhoc);
-          if (warn_tmp
-              || err_tmp)  B2INFO(name << " Mean " <<  mean_adhoc << " Outside " << outside_adhoc << " " << entries_adhoc << " " << warn_tmp <<
-                                    err_tmp);
 #ifdef _BELLE2_EPICS
           if (m_useEpics) {
             auto my = mychid_mean[m_PXDModules[i]];

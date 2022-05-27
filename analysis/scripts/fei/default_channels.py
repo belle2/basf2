@@ -364,7 +364,7 @@ def get_default_channels(
     D0.addChannel(['K-', 'K+', 'pi0'])
     D0.addChannel(['K-', 'K+', 'K_S0'])
 
-    if not removeSLD:
+    if not removeSLD and semileptonic:
         D0_SL = Particle('D0:semileptonic',
                          MVAConfiguration(variables=intermediate_vars,
                                           target='isSignalAcceptMissingNeutrino'),
@@ -416,7 +416,7 @@ def get_default_channels(
     DP.addChannel(['K_S0', 'pi+', 'pi+', 'pi-'])
     DP.addChannel(['K+', 'K_S0', 'K_S0'])
 
-    if not removeSLD:
+    if not removeSLD and semileptonic:
         DP_SL = Particle('D+:semileptonic',
                          MVAConfiguration(variables=intermediate_vars,
                                           target='isSignalAcceptMissingNeutrino'),
@@ -470,7 +470,7 @@ def get_default_channels(
     DSP.addChannel(['D+', 'pi0'])
     DSP.addChannel(['D+', 'gamma'])
 
-    if not removeSLD:
+    if not removeSLD and semileptonic:
         DSP_SL = Particle('D*+:semileptonic',
                           MVAConfiguration(variables=intermediate_vars,
                                            target='isSignalAcceptMissingNeutrino'),
@@ -507,7 +507,7 @@ def get_default_channels(
     DS0.addChannel(['D0', 'pi0'])
     DS0.addChannel(['D0', 'gamma'])
 
-    if not removeSLD:
+    if not removeSLD and semileptonic:
         DS0_SL = Particle('D*0:semileptonic',
                           MVAConfiguration(variables=intermediate_vars,
                                            target='isSignalAcceptMissingNeutrino'),
@@ -676,7 +676,7 @@ def get_default_channels(
     BP_SL.addChannel(['D*-', 'pi+', 'e+'])
     BP_SL.addChannel(['D*-', 'pi+', 'mu+'])
 
-    if not removeSLD:
+    if not removeSLD and semileptonic:
         BP_SL.addChannel(['anti-D0:semileptonic', 'pi+'])
         BP_SL.addChannel(['anti-D0:semileptonic', 'pi+', 'pi0'])
         BP_SL.addChannel(['anti-D0:semileptonic', 'pi+', 'pi0', 'pi0'])
@@ -823,7 +823,7 @@ def get_default_channels(
     B0_SL.addChannel(['anti-D*0', 'pi-', 'e+'])
     B0_SL.addChannel(['anti-D*0', 'pi-', 'mu+'])
 
-    if not removeSLD:
+    if not removeSLD and semileptonic:
         B0_SL.addChannel(['D-:semileptonic', 'pi+'])
         B0_SL.addChannel(['D-:semileptonic', 'pi+', 'pi0'])
         B0_SL.addChannel(['D-:semileptonic', 'pi+', 'pi0', 'pi0'])

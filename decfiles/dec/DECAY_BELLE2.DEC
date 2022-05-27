@@ -952,7 +952,8 @@ Decay B0
 0.000019580   K+  pi-                                      PHSP; #[BF update - PG 09/2020]
 0.000000080   K+  K-                                       PHSP; #[BF update - PG 09/2020]
 0.000009930   K0  pi0                                      PHSP; #[BF update - PG 09/2020]
-0.000001210   K0  anti-K0                                  PHSP; #[BF update - PG 09/2020]
+#$ forbid_pythia()
+0.000000000   K0  anti-K0                                  PHSP; #[BF update - PG 09/2020]
 0.000000240   K_S0  K_S0                                   PHSP;
 0.000000240   K_L0  K_L0                                   PHSP;
 0.000000000   K_S0  K_L0                                   PHSP; #K_S0 K_L0 is 0, see http://babar-hn.slac.stanford.edu:5090/HyperNews/get/pubboard14/156.html.
@@ -1065,7 +1066,7 @@ Decay B0
 0.000001000   K0  eta  eta'                                PHSP;
 0.000001000   K0  eta'  eta'                               PHSP;
 #$ forbid_pythia()
-0.000000000   K0  anti-K0  K0                              PHSP; #Assume 8*BF(KsKsKs)~=48 (8 is a guess). # KS/KL combination are in PPP section below
+0.000000000   K0  anti-K0  K0                              PHSP; #Assume 8*BF(KsKsKs)~=48 (8 is a guess).  KS/KL combination are in PPP section below
 
 0.000001000   pi0  pi0  pi0                                PHSP;
 0.000001000   pi0  pi0  eta                                PHSP;
@@ -2777,6 +2778,8 @@ Decay anti-B0
 0.000000000   rho(3S)-  pi+                                SVS;
 0.000000000   rho(3S)+  pi-                                SVS;
 
+#$ forbid_pythia()
+0.000000000   rho0  anti-K0                                PHSP;
 0.000002350   rho0  K_S0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma; #[w/CPV - BO 09/2017]
 0.000002350   rho0  K_L0                                   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 
@@ -2784,7 +2787,7 @@ Decay anti-B0
 
 # rho(1450)
 #$ forbid_pythia()
-0.000000000   rho(2S)0  K0                                 PHSP;
+0.000000000   rho(2S)0  anti-K0                            PHSP;
 0.000000500   rho(2S)0  K_S0                               SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma; #[w/CPV - BO 09/2017]
 0.000000500   rho(2S)0  K_L0                               SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 
@@ -2850,7 +2853,8 @@ Decay anti-B0
 0.000001000   anti-K0  eta  eta                            PHSP;
 0.000001000   anti-K0  eta  eta'                           PHSP;
 0.000001000   anti-K0  eta'  eta'                          PHSP;
-0.000048000   anti-K0  K0  anti-K0                         PHSP; #Assume 8*BF(KsKsKs)~=48 (8 is a guess).
+#$ forbid_pythia()
+0.000000000   anti-K0  K0  anti-K0                         PHSP; #Assume 8*BF(KsKsKs)~=48 (8 is a guess). KS/KL combination are in PPP section below
 
 0.000001000   pi0  pi0  pi0                                PHSP;
 0.000001000   pi0  pi0  eta                                PHSP;

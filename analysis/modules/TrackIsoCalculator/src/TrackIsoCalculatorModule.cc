@@ -46,7 +46,6 @@ TrackIsoCalculatorModule::~TrackIsoCalculatorModule()
 
 void TrackIsoCalculatorModule::initialize()
 {
-
   m_event_metadata.isRequired();
   m_pList.isRequired(m_pListName);
   m_pListReference.isRequired(m_pListReferenceName);
@@ -75,6 +74,7 @@ void TrackIsoCalculatorModule::initialize()
 
 void TrackIsoCalculatorModule::event()
 {
+  B2DEBUG(12, "Start processing EVENT: " << m_event_metadata->getEvent());
 
   const auto nParticles = m_pList->getListSize();
   const auto nParticlesReference = m_pListReference->getListSize();
@@ -157,11 +157,12 @@ void TrackIsoCalculatorModule::event()
             minDist << " [cm]");
 
     if (!iParticle->hasExtraInfo(m_extraInfoName)) {
-      B2DEBUG(12, "Storing extraInfo(" << m_extraInfoName << ") for Particle[" << iPart << "]");
+      B2DEBUG(11, "Storing extraInfo(" << m_extraInfoName << ") for Particle[" << iPart << "]");
       iParticle->addExtraInfo(m_extraInfoName, minDist);
     }
   }
 
+  B2DEBUG(12, "Finished processing EVENT: " << m_event_metadata->getEvent());
 }
 
 void TrackIsoCalculatorModule::terminate()

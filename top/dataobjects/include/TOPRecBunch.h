@@ -262,7 +262,7 @@ namespace Belle2 {
     float m_simTime = 0;  /**< simulated relative bunch time */
     bool m_simValid = false;  /**< status of sim */
 
-    unsigned short m_revo9Counter = 0; /**< number of clock ticks since last revo9 flag */
+    unsigned short m_revo9Counter = 0xFFFF; /**< number of system clocks since last revo9 marker */
     float m_minChi2 = 0; /**< chi2 value at minimum */
     Const::EDetector m_detector = Const::invalidDetector; /**< component providing the time seed */
 

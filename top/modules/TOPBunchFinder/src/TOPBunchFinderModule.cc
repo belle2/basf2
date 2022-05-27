@@ -97,6 +97,8 @@ namespace Belle2 {
              "(only when running in data processing mode).", unsigned(3));
     addParam("useTimeSeed",  m_useTimeSeed, "use SVD or CDC event T0 as a seed "
              "(only when running in data processing mode and autoRange turned off).", true);
+    addParam("useFillPattern", m_useFillPattern, "use known accelerator fill pattern to enhance efficiency "
+             "(only when running in data processing mode).", true);
   }
 
 
@@ -201,12 +203,29 @@ namespace Belle2 {
               << " of experiment " << evtMetaData->getExperiment());
     }
 
+    if (m_HLTmode) return;
+
     if (m_useTimeSeed and not m_eventT0Offset.isValid()) {
       B2WARNING("EventT0Offset not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment()
                 << ": seeding with SVD or CDC eventT0 will not be done.");
     }
+    if (m_useFillPattern) {
+      if (not m_bunchStructure->isSet()) {
+        B2WARNING("BunchStructure not available for run "
+                  << evtMetaData->getRun()
+                  << " of experiment " << evtMetaData->getExperiment()
+                  << ": fill pattern will not be used.");
+      }
+      if (not m_fillPatternOffset.isValid()) {
+        B2WARNING("FillPatternOffset not available for run "
+                  << evtMetaData->getRun()
+                  << " of experiment " << evtMetaData->getExperiment()
+                  << ": fill pattern will not be used.");
+      }
+    }
+
   }
 
 
@@ -221,6 +240,7 @@ namespace Belle2 {
     if (not m_recBunch.isValid()) {
       m_recBunch.create();
     } else {
+      m_revo9Counter = m_recBunch->getRevo9Counter();
       m_recBunch->clearReconstructed();
     }
     m_timeZeros.clear();
@@ -239,7 +259,8 @@ namespace Belle2 {
 
     if (m_topRawDigits.getEntries() > 0) {
       const auto* rawDigit = m_topRawDigits[0];
-      m_recBunch->setRevo9Counter(rawDigit->getRevo9Counter());
+      m_revo9Counter = rawDigit->getRevo9Counter();
+      m_recBunch->setRevo9Counter(m_revo9Counter);
     }
 
     // full time window in which data are taken (smaller time window is used in reconstruction)
@@ -459,6 +480,12 @@ namespace Belle2 {
     double err2 = (1 - a) * error;
     m_runningError = sqrt(err1 * err1 + err2 * err2);
 
+    // check if reconstructed bunch is filled; return if not.
+
+    if (m_useFillPattern and not m_HLTmode) {
+      if (not isBucketFilled(bunchNo)) return;
+    }
+
     // store the results
 
     double bunchTime = bunchNo * m_bunchTimeSep;
@@ -629,5 +656,25 @@ namespace Belle2 {
 
     return timeSeed;
   }
+
+
+  bool TOPBunchFinderModule::isBucketFilled(int bunchNo)
+  {
+    // return true if needed information not available
+
+    if (not m_bunchStructure->isSet()) return true;
+    if (not m_fillPatternOffset.isValid()) return true;
+    if (not m_fillPatternOffset->isCalibrated()) return true;
+    if (m_revo9Counter == 0xFFFF) return true;
+
+    // corresponding bucket number
+
+    auto RFBuckets = m_bunchStructure->getRFBucketsPerRevolution();
+    int bucket = (bunchNo + m_revo9Counter * 4 - m_fillPatternOffset->get()) % RFBuckets;
+    if (bucket < 0) bucket += RFBuckets;
+
+    return m_bunchStructure->getBucket(bucket);
+  }
+
 
 } // end Belle2 namespace

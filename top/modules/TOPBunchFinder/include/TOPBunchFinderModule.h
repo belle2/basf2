@@ -23,6 +23,8 @@
 #include <top/dbobjects/TOPCalCommonT0.h>
 #include <top/dbobjects/TOPFrontEndSetting.h>
 #include <top/dbobjects/TOPCalEventT0Offset.h>
+#include <framework/dbobjects/BunchStructure.h>
+#include <top/dbobjects/TOPCalFillPatternOffset.h>
 
 #include <top/reconstruction_cpp/PDFConstructor.h>
 #include <top/utilities/Chi2MinimumFinder1D.h>
@@ -84,6 +86,13 @@ namespace Belle2 {
     TimeSeed getTimeSeed();
 
     /**
+     * Does reconstructed bunch number correspond to filled bucket
+     * @param bunchNo reconstructed relative bunch number
+     * @return true if filled
+     */
+    bool isBucketFilled(int bunchNo);
+
+    /**
      * Returns most probable charged stable particle according to dEdx
      * and predefined prior probabilities
      * @param track reconstructed track
@@ -125,6 +134,7 @@ namespace Belle2 {
     bool m_usePIDLikelihoods; /**< if true, use PIDLikelihoods (only on cdst files) */
     unsigned m_nTrackLimit; /**< maximum number of tracks (inclusive) to use three particle hypotheses in fine search */
     bool m_useTimeSeed; /**< use CDC or SVD event T0 as seed */
+    bool m_useFillPattern; /**< use know fill pattern to enhance efficiency */
 
     // internal variables shared between events
     double m_bunchTimeSep = 0; /**< time between two bunches */
@@ -135,6 +145,7 @@ namespace Belle2 {
     unsigned m_processed = 0; /**< processed events */
     unsigned m_success = 0; /**< events with reconstructed bunch */
     int m_nodEdxCount = 0; /**< counter of tracks with no dEdx, reset at each event */
+    unsigned short m_revo9Counter = 0xFFFF; /**< number of system clocks since last revo9 marker */
 
     // collections
     StoreArray<TOPDigit> m_topDigits; /**< collection of TOP digits */
@@ -148,7 +159,9 @@ namespace Belle2 {
     // database
     DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */
     DBObjPtr<TOPFrontEndSetting> m_feSetting;  /**< front-end settings */
+    DBObjPtr<BunchStructure> m_bunchStructure;  /**< fill pattern */
     OptionalDBObjPtr<TOPCalEventT0Offset> m_eventT0Offset; /**< detector components offsets w.r.t TOP */
+    OptionalDBObjPtr<TOPCalFillPatternOffset> m_fillPatternOffset; /**< fill pattern offset */
 
   };
 

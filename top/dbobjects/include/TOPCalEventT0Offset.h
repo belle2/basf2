@@ -10,6 +10,7 @@
 
 #include <TObject.h>
 #include <map>
+#include <vector>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
@@ -29,6 +30,7 @@ namespace Belle2 {
     struct OffsetData {
       float offset = 0; /**< offset relative to TOP */
       float sigma = 0;  /**< time resolution of the detector component */
+      Const::EDetector component = Const::invalidDetector; /**< detector component */
 
       /**
        * Default constructor
@@ -40,8 +42,9 @@ namespace Belle2 {
        * Full constructor
        * @param T0 offset relative to TOP
        * @param sig time resolution
+       * @param det detector component
        */
-      OffsetData(double T0, double sig): offset(T0), sigma(sig)
+      OffsetData(double T0, double sig, Const::EDetector det): offset(T0), sigma(sig), component(det)
       {}
     };
 
@@ -60,7 +63,7 @@ namespace Belle2 {
     void set(Const::EDetector detector, double offset, double sigma)
     {
       if (sigma > 0) {
-        m_calibrations[detector] = OffsetData(offset, sigma);
+        m_data.push_back(OffsetData(offset, sigma, detector));
       } else {
         B2ERROR("TOPCalEventT0Offset::set: time resolution must be a positive number. Entry ignored"
                 << LogVar("detector component", detector));
@@ -72,18 +75,36 @@ namespace Belle2 {
      * @param detector detector component
      * @return calibration constants
      */
-    const OffsetData& get(Const::EDetector detector) const {return m_calibrations[detector];}
+    const OffsetData& get(Const::EDetector detector) const
+    {
+      if (m_calibrations.empty()) set();
+      return m_calibrations[detector];
+    }
 
     /**
      * Is calibration available for a given detector component?
      * @param detector detector component
      * @return true if available
      */
-    bool isAvailable(Const::EDetector detector) const {return (m_calibrations[detector].sigma > 0);}
+    bool isAvailable(Const::EDetector detector) const
+    {
+      if (m_calibrations.empty()) set();
+      return (m_calibrations[detector].sigma > 0);
+    }
 
   private:
 
-    mutable std::map<Const::EDetector, OffsetData> m_calibrations; /**< calibration data */
+    /**
+     * Set the cache
+     */
+    void set() const
+    {
+      for (const auto& data : m_data) m_calibrations[data.component] = data;
+    }
+
+    std::vector<OffsetData> m_data; /**< calibration data */
+    /** cache */
+    mutable std::map<Const::EDetector, OffsetData> m_calibrations; //! do not write out
 
     ClassDef(TOPCalEventT0Offset, 1); /**< ClassDef */
 

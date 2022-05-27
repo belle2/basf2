@@ -118,7 +118,7 @@ void TrackIsoCalculatorModule::event()
 
       int jPart_in_inputList = m_pList->getIndex(jParticle);
       if (jPart_in_inputList != -1) {
-        pairwiseDistances[jPart_in_inputList][iPart] = ijDist;
+        pairwiseDistances[jPart_in_inputList][jPart] = ijDist;
       }
 
     }

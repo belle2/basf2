@@ -97,6 +97,7 @@ void TrackIsoCalculatorModule::event()
   for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
 
     Particle* iParticle = m_pList->getParticle(iPart);
+    int iPart_in_referenceList = m_pListReference->getIndex(iParticle);
 
     for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
 
@@ -117,8 +118,13 @@ void TrackIsoCalculatorModule::event()
       pairwiseDistances[iPart][jPart] = ijDist;
 
       int jPart_in_inputList = m_pList->getIndex(jParticle);
-      if (jPart_in_inputList != -1) {
-        pairwiseDistances[jPart_in_inputList][jPart] = ijDist;
+      if (iPart_in_referenceList != -1 and jPart_in_inputList != -1) {
+        if (m_useHighestProbMass) {
+          // mass hypothesis of particleList has to be the most probable
+          if (!iParticle->isMostLikelyTrackFitResult() or !iParticle->isMostLikelyTrackFitResult())
+            continue;
+        }
+        pairwiseDistances[jPart_in_inputList][iPart_in_referenceList] = ijDist;
       }
 
     }

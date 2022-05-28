@@ -8,6 +8,7 @@ Untested method Particle::getAllDaughters
 Untested method Particle::getArrayPointer
 Untested method Particle::isCopyOf
 Untested method Particle::isMostLikely
+Untested method Particle::isMostLikelyTrackFitResult
 Untested method Particle::overlapsWith
 Untested method Particle::removeDaughter
 Untested method Particle::removeExtraInfo

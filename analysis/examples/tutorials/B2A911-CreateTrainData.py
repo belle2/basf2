@@ -12,7 +12,6 @@
 #                                                                        #
 # This tutorial demonstrates how to create data sample for training of   #
 # KsSelector.                                                            #
-# This tutorial demonstrates how to create data sample for  train weight file for KsSelector.    #
 #                                                                        #
 ##########################################################################
 
@@ -27,23 +26,19 @@ output_file = "KsSelector_train.root"
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
+ma.inputMdst(filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
              path=my_path)
 
 # load K_S0 particle list
 stdV0s.stdKshorts(path=my_path)
-ma.applyCuts('K_S0:merged', '0.45 < M < 0.55', path=my_path)
 ma.matchMCTruth(list_name='K_S0:merged', path=my_path)
 
 # apply cuts suitable for V0Selector
 # remove Lambda from particle list
-ma.copyList('K_S0:V0Selector', 'K_S0:merged', path=my_path)
-ma.applyCuts('K_S0:V0Selector', 'mcPDG!=3122', path=my_path)
+ma.cutAndCopyLists('K_S0:V0Selector', 'K_S0:merged', cut='mcPDG!=3122', path=my_path)
 # apply cuts suitable for LambdaVeto
 # only include long lived particle, K_S0 and Lambda
-ma.copyList('K_S0:LambdaVeto', 'K_S0:merged', path=my_path)
-ma.applyCuts('K_S0:LambdaVeto', 'isSignal==1 or abs(mcPDG)==3122', path=my_path)
+ma.cutAndCopyLists('K_S0:LambdaVeto', 'K_S0:merged', cut='isSignal==1 or abs(mcPDG)==3122', path=my_path)
 
 # add variable aliases required for KsSelector training
 ksSelector.add_variable_collection()

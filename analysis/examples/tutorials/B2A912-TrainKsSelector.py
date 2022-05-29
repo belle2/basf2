@@ -30,7 +30,7 @@ ksSelector.V0Selector_Training(
 
 # Train weight file for V0 Selection.
 # name of output file is specified by the argument 'mva_identifier'.
-ksSelector.V0Selector_Training(
+ksSelector.LambdaVeto_Training(
     train_data="KsSelector_train.root",
     tree_name="LambdaVeto",
     mva_identifier="MVAFastBDT_LambdaVeto.root",

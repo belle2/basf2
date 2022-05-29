@@ -29,14 +29,13 @@ output_file = 'output.root'
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdst(environmentType='default',
-             filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
+ma.inputMdst(filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
              path=my_path)
 
 # load V0s and copy it
 stdV0s.stdKshorts(path=my_path)
 ma.copyList('K_S0:standard', 'K_S0:merged', path=my_path)
-ma.matchMCTruth(list_name='K_S0:merged', path=my_path)
+ma.matchMCTruth(list_name='K_S0:standard', path=my_path)
 
 # load globaltag
 useCentralDB = True

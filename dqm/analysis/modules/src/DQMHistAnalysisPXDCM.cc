@@ -187,12 +187,12 @@ void DQMHistAnalysisPXDCMModule::event()
   if (!m_cCommonMode) return;
   m_hCommonMode->Reset(); // dont sum up!!!
 
-  auto leg = new TPaveText(0.1, 0.6, 0.95, 0.95, "NDC");
+  auto leg = new TPaveText(0.1, 0.6, 0.90, 0.95, "NDC");
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    std::string name = "PXDDAQCM_" + (std::string)m_PXDModules[i ];
+    std::string name = "PXDDAQCM_" + (std::string)m_PXDModules[i];
     // std::replace( name.begin(), name.end(), '.', '_');
 
     TH1* hh1 = findHist(name);
@@ -286,13 +286,14 @@ void DQMHistAnalysisPXDCMModule::event()
 
           if (warn_tmp_m || err_tmp_m) {
             TString tmp;
-            tmp.Form("%s: Mean %f", name.c_str(), mean_adhoc);
+            tmp.Form("%s: Mean %f", ((std::string)m_PXDModules[i]).c_str(), mean_adhoc);
             leg->AddText(tmp);
             B2INFO(name << " Mean " <<  mean_adhoc << " " << warn_tmp_m << err_tmp_m);
           }
           if (warn_tmp_os || err_tmp_os) {
             TString tmp;
-            tmp.Form("%s: Outside %f (%f/%f)", name.c_str(), outside_adhoc / entries_adhoc, outside_adhoc, entries_adhoc);
+            tmp.Form("%s: Outside %f (%f/%f)", ((std::string)m_PXDModules[i]).c_str(), outside_adhoc / entries_adhoc, outside_adhoc,
+                     entries_adhoc);
             leg->AddText(tmp);
             B2INFO(name << " Outside " << outside_adhoc / entries_adhoc << " (" << outside_adhoc << "/" << entries_adhoc << ") " << warn_tmp_os
                    << err_tmp_os);

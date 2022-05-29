@@ -88,7 +88,7 @@ Users can choose between basf or B2BII to generate a set of signal MC for one's 
 Generating signal MC with basf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The ``mcproduzh`` package has been used to generate signal MC in Belle for many years.
-This package was developed by "U"shiroda-san, A. "Z"upanc, and "H"orii-san, and
+This package was developed by Ushiroda-san, A. Zupanc, and Horii-san, and
 it consists of generation, simulation, and reconstruction based on ``evtgen`` and
 ``gsim`` scripts (``gsim`` is Belle slang for the simulated detector response
 that results from the use of ``Geant3`` within the Belle analysis software

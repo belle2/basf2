@@ -56,6 +56,16 @@ Using ``eIDBelle>0.9`` as an example:
    reweighter.param('particleList', 'pi+:all')
    my_path.add_module(reweighter)
 
+
+.. note::
+   The leptop ID fake-rate (lepton ID efficiency for pions and kaons) tables are not 
+   prepared at Belle.
+   One way to do it is to study using the :math::D^{*} sample (see the details at
+   /home/belle/nishida6/public/kid/00dstar_nt.txt).
+
+
+
+
 .. rubric:: Kaon/:math:`\pi` ID
 
 Naming scheme for payloads is:
@@ -103,8 +113,8 @@ To append PID correction information for pion efficiency selected as kaons with
    my_path.add_module(reweighter2)
 
 .. note::
-   fit_flag indicates if the fits failed; fit_flag = 0 is for successful fit, while 
-   any non-zero values of fit_flag are for failed fit. Please only use "fit_flag==0"
+   ``fit_flag`` indicates if the fits failed; ``fit_flag = 0`` is for successful fit, while 
+   any non-zero values of fit_flag are for failed fit. Please only use ``fit_flag==0``
    when evaluating PID contributions.
 
 

@@ -29,13 +29,11 @@ output_file = 'output.root'
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdst(filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
+ma.inputMdst(filename=b2.find_file('B02JpsiKs_Jpsi2mumu_Ks2pipi.root', 'examples', False),
              path=my_path)
 
 # load V0s and copy it
 stdV0s.stdKshorts(path=my_path)
-ma.copyList('K_S0:standard', 'K_S0:merged', path=my_path)
-ma.matchMCTruth(list_name='K_S0:standard', path=my_path)
 
 # load globaltag
 useCentralDB = True
@@ -46,18 +44,19 @@ if useCentralDB:
 else:
     b2.conditions.append_testing_payloads(localDB)
 
-
 # apply ksSelector to the K_S0 particle list
 # list type can be 'all', 'standard', 'tight', or 'loose'
 # If 'all', no cut is applied by KsSelector, and mva output become available via extraInfo.
 # if other list type, cut is applied on the original particle list.
-ksSelector.ksSelector(particleListName='K_S0:standard',
+ksSelector.ksSelector(particleListName='K_S0:merged',
                       identifier_Ks="sugiura_KsFinder_V0Selector",
                       identifier_vLambda="sugiura_KsFinder_LambdaVeto",
-                      listtype='all',
+                      output_label_name='standard',
                       extraInfoName_V0Selector='V0_mva',
                       extraInfoName_LambdaVeto='Lam_mva',
                       path=my_path)
+
+ma.matchMCTruth(list_name='K_S0:standard', path=my_path)
 
 # set variables
 vars = vc.kinematics + vc.mc_kinematics + vc.mc_truth

@@ -162,13 +162,16 @@ def ksSelector(
 
     @param particleLists                Reconstructed Ks -> pi+ pi- list.
     @param output_label_name            Label of the returned Ks particleList.
+                                        When empty '', no cut is applied and new particleList is not created.
+                                        When custom name, the custom threshold is used, and useCustomThreshold
+                                        must be True.
                                         When 'standard', 'tight', or 'loose', a cut with Ks efficiency
                                         90%, 95%, and 85% is applied.
     @param extraInfoName_V0Selector     Variable name for V0Selector MVA output.
     @param extraInfoName_LambdaVeto     Variable name for LambdaVeto MVA output.
     @param identifier_Ks                Identifier name for V0Selector weight file.
     @param identifier_vLambda           Identifier name for LambdaVeto weight file.
-    @useCustomThreshold                 Flag whether thresholds are specified from payload.
+    @useCustomThreshold                 Flag whether threshold_V0Selector and threshold_LambdaVeto are used.
     @threshold_V0Selector               Threshold for V0Selector.
     @threshold_LambdaVeto               Threshold for LambdaVeto.
     @param path                         Basf2 path to execute.
@@ -183,43 +186,46 @@ def ksSelector(
     _effnames = ['standard', 'tight', 'loose']
     outputListName = ''
 
-    if output_label_name in _effnames and useCustomThreshold:
-        B2ERROR('KsSelector: Specify label name except for \'standard\', \'tight\', and \'loose\' '
-                'when you use custom threshold.')
-    elif output_label_name in _effnames and not useCustomThreshold:
-        outputListName = particleListName.split(':')[0] + ':' + output_label_name
-        V0_thr = 0
-        Lambda_thr = 0
-        if output_label_name == 'standard':
-            B2INFO('KsSelector: Standard Cut is applied on '+outputListName+'.')
-            V0_thr = 0.90
-            Lambda_thr = 0.11
-        elif output_label_name == 'tight':
-            B2INFO('KsSelector: Tight Cut is applied on '+outputListName+'.')
-            V0_thr = 0.96
-            Lambda_thr = 0.27
-        elif output_label_name == 'loose':
-            B2INFO('KsSelector: Loose Cut is applied on '+outputListName+'.')
-            V0_thr = 0.49
-            Lambda_thr = 0.02
-        B2INFO('KsSelector: Threshold is (' + str(V0_thr) + ', ' + str(Lambda_thr) + ')')
-        cut_string = 'extraInfo('+extraInfoName_V0Selector+')>'+str(V0_thr) + \
-            ' and extraInfo('+extraInfoName_LambdaVeto+')>'+str(Lambda_thr)
-        ma.cutAndCopyLists(outputListName, particleListName, cut=cut_string, path=path)
-    elif output_label_name == '' and useCustomThreshold:
-        B2ERROR('KsSelector: Specify label name when you use custom threshold.')
-    elif output_label_name == '' and not useCustomThreshold:
-        outputListName = particleListName
-    elif useCustomThreshold:
-        outputListName = particleListName.split(':')[0] + ':' + output_label_name
-        B2INFO('KsSelector: Custom Cut is applied on '+outputListName+'.')
-        V0_thr = threshold_V0Selector
-        Lambda_thr = threshold_LambdaVeto
-        B2INFO('KsSelector: Threshold is (' + str(V0_thr) + ', ' + str(Lambda_thr) + ')')
-        cut_string = 'extraInfo('+extraInfoName_V0Selector+')>'+str(V0_thr) + \
-                     ' and extraInfo('+extraInfoName_LambdaVeto+')>'+str(Lambda_thr)
-        ma.cutAndCopyLists(outputListName, particleListName, cut=cut_string, path=path)
-    elif not useCustomThreshold:
-        outputListName = particleListName.split(':')[0] + ':' + output_label_name
+    if useCustomThreshold:
+        if output_label_name in _effnames:
+            B2ERROR('KsSelector: Specify label name except for \'standard\', \'tight\', and \'loose\' '
+                    'when you use custom threshold.')
+        elif output_label_name == '':
+            B2ERROR('KsSelector: Specify label name when you use custom threshold.')
+        else:
+            outputListName = particleListName.split(':')[0] + ':' + output_label_name
+            B2INFO('KsSelector: Custom Cut is applied on '+outputListName+'.')
+            V0_thr = threshold_V0Selector
+            Lambda_thr = threshold_LambdaVeto
+            B2INFO('KsSelector: Threshold is (' + str(V0_thr) + ', ' + str(Lambda_thr) + ')')
+            cut_string = 'extraInfo('+extraInfoName_V0Selector+')>'+str(V0_thr) + \
+                ' and extraInfo('+extraInfoName_LambdaVeto+')>'+str(Lambda_thr)
+            ma.cutAndCopyLists(outputListName, particleListName, cut=cut_string, path=path)
+    else:
+        if output_label_name in _effnames:
+            outputListName = particleListName.split(':')[0] + ':' + output_label_name
+            V0_thr = 0
+            Lambda_thr = 0
+            if output_label_name == 'standard':
+                B2INFO('KsSelector: Standard Cut is applied on '+outputListName+'.')
+                V0_thr = 0.90
+                Lambda_thr = 0.11
+            elif output_label_name == 'tight':
+                B2INFO('KsSelector: Tight Cut is applied on '+outputListName+'.')
+                V0_thr = 0.96
+                Lambda_thr = 0.27
+            elif output_label_name == 'loose':
+                B2INFO('KsSelector: Loose Cut is applied on '+outputListName+'.')
+                V0_thr = 0.49
+                Lambda_thr = 0.02
+            B2INFO('KsSelector: Threshold is (' + str(V0_thr) + ', ' + str(Lambda_thr) + ')')
+            cut_string = 'extraInfo('+extraInfoName_V0Selector+')>'+str(V0_thr) + \
+                ' and extraInfo('+extraInfoName_LambdaVeto+')>'+str(Lambda_thr)
+            ma.cutAndCopyLists(outputListName, particleListName, cut=cut_string, path=path)
+        elif output_label_name == '':
+            outputListName = particleListName
+        else:
+            # B2ERROR('KsSelector: Label should be \'\', \'standard\', \'tight\', or \'loose\'')
+            outputListName = particleListName.split(':')[0] + ':' + output_label_name
 
     B2INFO('KsSelector: ParticleList '+outputListName+' is returned.')

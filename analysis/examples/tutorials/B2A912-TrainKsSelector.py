@@ -16,13 +16,14 @@
 #                                                                        #
 ##########################################################################
 
+import basf2 as b2
 import basf2_mva
 import ksSelector as ksSelector
 
 # Train weight file for V0 Selection.
 # name of output file is specified by the argument 'mva_identifier'.
 ksSelector.V0Selector_Training(
-    train_data="KsSelector_train.root",
+    train_data=b2.findFile('KsSelector_train_V0Selector.root', 'examples', False),
     tree_name="V0Selector",
     mva_identifier="MVAFastBDT_V0Selector.root",
     target_variable="isSignal"
@@ -31,7 +32,7 @@ ksSelector.V0Selector_Training(
 # Train weight file for V0 Selection.
 # name of output file is specified by the argument 'mva_identifier'.
 ksSelector.LambdaVeto_Training(
-    train_data="KsSelector_train.root",
+    train_data=b2.findFile('KsSelector_train_LambdaVeto.root', 'examples', False),
     tree_name="LambdaVeto",
     mva_identifier="MVAFastBDT_LambdaVeto.root",
     target_variable="isSignal"

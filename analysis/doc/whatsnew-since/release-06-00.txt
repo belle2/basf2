@@ -98,3 +98,10 @@ PID Priors
    the effect of outliers on the training.
  * For evaluating priors, ``evalPriors`` module containing the ``Priors`` class has been added to calculate these using
    the trained model. Additionally, posteriors can also be obtained by providing PID's from the detector signals.
+
+MVA-based K_S0 Selector
++++++++++++++++++++++++
+
+ * Added a python script which handles MVA-based K_S0 selection
+ * Implemented a function to apply MVA for K_S0 selection for a given particleList.
+ * Implemented a function to train MVA-based K_S0 selector and sample scripts for K_S0 selector training.

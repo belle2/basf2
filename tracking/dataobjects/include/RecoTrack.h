@@ -16,7 +16,8 @@
 
 #include <tracking/dataobjects/RecoHitInformation.h>
 
-#include <optional>
+#include <boost/optional.hpp>
+
 #include <string>
 #include <vector>
 
@@ -30,7 +31,6 @@ namespace Belle2 {
   class RecoTrackGenfitAccess;
 
   BELLE2_DEFINE_EXCEPTION(NoTrackFitResult, "No track fit result available for this hit (e.g. DAF has removed it).")
-  BELLE2_DEFINE_EXCEPTION(NoStateOnPlaneFound, "No measured state on plane for any track point found.")
 
   /** This is the Reconstruction Event-Data Model Track.
    *
@@ -220,7 +220,7 @@ namespace Belle2 {
      * @return The number of hits copied.
      */
     size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset = 0,
-                                bool reversed = false, std::optional<double> optionalMinimalWeight = std::nullopt);
+                                bool reversed = false, boost::optional<double> optionalMinimalWeight = boost::none);
 
     /**
      * Adds a cdc hit with the given information to the reco track.
@@ -597,6 +597,7 @@ namespace Belle2 {
       * Also, set the flags of the corresponding RecoHitInformation to pruned. Only to be used in the prune module.
       */
     void prune();
+    void prune_all();
 
     /// Return a list of measurements and track points, which can be used e.g. to extrapolate. You are not allowed to modify or delete them!
     const std::vector<genfit::TrackPoint*>& getHitPointsWithMeasurement() const
@@ -733,6 +734,28 @@ namespace Belle2 {
       m_qualityIndicator = qualityIndicator;
     }
 
+    /// Get the quality index attached to this RecoTrack as a reference for flipping.
+    float getFlipQualityIndicator() const
+    {
+      return m_flipqualityIndicator;
+    }
+
+    /// Set the quality index attached to this RecoTrack as a reference for flipping.
+    void setFlipQualityIndicator(const float qualityIndicator)
+    {
+      m_flipqualityIndicator = qualityIndicator;
+    }
+    /// Get the quality index attached to this RecoTrack as a reference for flipping.
+    float get2ndFlipQualityIndicator() const
+    {
+      return m_2ndflipqualityIndicator;
+    }
+
+    /// Set the quality index attached to this RecoTrack as a reference for flipping.
+    void set2ndFlipQualityIndicator(const float qualityIndicator)
+    {
+      m_2ndflipqualityIndicator = qualityIndicator;
+    }
     /**
      * Delete all fitted information for all representations.
      *
@@ -778,6 +801,10 @@ namespace Belle2 {
     MatchingStatus m_matchingStatus = MatchingStatus::c_undefined;
     /// Quality index for classification of fake vs. MC-matched Tracks.
     float m_qualityIndicator = NAN;
+    /// Quality index for flipping.
+    float m_flipqualityIndicator = NAN;
+    /// Quality index for flipping.
+    float m_2ndflipqualityIndicator = NAN;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.
@@ -895,7 +922,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDefOverride(RecoTrack, 9);
+    ClassDefOverride(RecoTrack, 10);
   };
 
   /**

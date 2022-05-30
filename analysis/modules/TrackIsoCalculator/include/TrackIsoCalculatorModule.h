@@ -169,10 +169,5 @@ namespace Belle2 {
      */
     bool isStdChargedList();
 
-    /**
-     * Print 2D array of pair-wise distances.
-     */
-    void printDistancesArr(const std::vector<std::vector<double>>& arr);
-
   };
 }

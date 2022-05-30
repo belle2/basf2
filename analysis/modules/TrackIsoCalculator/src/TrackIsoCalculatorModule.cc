@@ -34,9 +34,9 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
   addParam("detectorSurface",
            m_detSurface,
            "The name of the detector at whose inner (cylindrical) surface we extrapolate each helix's polar and azimuthal angle. Allowed values: {CDC, TOP, ARICH, ECL, KLM}.");
-  addParam("useHighestProbMassForReference",
+  addParam("useHighestProbMassForExt",
            m_useHighestProbMass,
-           "If this option is set, the helix extrapolation for the particles in the reference list will use the track fit result for the most probable mass hypothesis, namely, the one that gives the highest chi2Prob of the fit.",
+           "If this option is set, the helix extrapolation for the particles will use the track fit result for the most probable mass hypothesis, namely, the one that gives the highest chi2Prob of the fit.",
            bool(false));
 }
 
@@ -74,6 +74,7 @@ void TrackIsoCalculatorModule::initialize()
 
 void TrackIsoCalculatorModule::event()
 {
+
   B2DEBUG(12, "Start processing EVENT: " << m_event_metadata->getEvent());
 
   const auto nParticles = m_pList->getListSize();
@@ -84,83 +85,68 @@ void TrackIsoCalculatorModule::event()
           << "nParticles: " << nParticles << "\n"
           << "nParticlesReference: " << nParticlesReference);
 
-  // Store the pair-wise distances in a 2D array.
-  // Size is given by the length of the reference particle list.
-  std::vector<double> defaultDistances(nParticlesReference, -1.0);
-  // Size is given by the length of the particle list. Each vector (= defaultDistances) has nParticlesReference components.
-  // Thus, total size is given by nParticles times nParticlesReference.
-  std::vector<std::vector<double>> pairwiseDistances(nParticles, defaultDistances);
+  double dummyDist(-1.0);
 
-  B2DEBUG(11, "Array of pair-wise distances between tracks in particle list. Initial values:");
-  this->printDistancesArr(pairwiseDistances);
+  // Store the pair-wise distances in a map,
+  // where the keys are pairs of mdst indexes.
+  std::map<std::pair<unsigned int, unsigned int>, double> particleMdstIdxPairsToDist;
 
   for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
 
     Particle* iParticle = m_pList->getParticle(iPart);
-    int iPart_in_referenceList = m_pListReference->getIndex(iParticle);
+
+    auto iMdstIdx = iParticle->getMdstArrayIndex();
 
     for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
 
       Particle* jParticle = m_pListReference->getParticle(jPart);
 
-      // Skip if same particle.
-      if (iParticle->getMdstArrayIndex() == jParticle->getMdstArrayIndex()) {
+      auto jMdstIdx = jParticle->getMdstArrayIndex();
+
+      auto partMdstIdxPair = std::make_pair(iMdstIdx, jMdstIdx);
+
+      // Set dummy distance if same particle.
+      if (iMdstIdx == jMdstIdx) {
+        particleMdstIdxPairsToDist[partMdstIdxPair] = dummyDist;
         continue;
       }
-      // Skip if this pair already calculated.
-      if (pairwiseDistances[iPart][jPart] != -1.0) {
+      // Check if this pair of particles has already been considered,
+      // by searching for a pair of flipped mdst indexes in the map.
+      // This is to avoid calculating the distance twice.
+      if (particleMdstIdxPairsToDist.count({jMdstIdx, iMdstIdx})) {
+        particleMdstIdxPairsToDist[partMdstIdxPair] = particleMdstIdxPairsToDist[ {jMdstIdx, iMdstIdx}];
         continue;
       }
 
       // Calculate the pair-wise distance.
-      const auto ijDist = this->getDistAtDetSurface(iParticle, jParticle);
-
-      pairwiseDistances[iPart][jPart] = ijDist;
-
-      int jPart_in_inputList = m_pList->getIndex(jParticle);
-      if (iPart_in_referenceList != -1 and jPart_in_inputList != -1) {
-        if (m_useHighestProbMass) {
-          // mass hypothesis of particleList has to be the most probable
-          if (!iParticle->isMostLikelyTrackFitResult() or !iParticle->isMostLikelyTrackFitResult())
-            continue;
-        }
-        pairwiseDistances[jPart_in_inputList][iPart_in_referenceList] = ijDist;
-      }
-
+      particleMdstIdxPairsToDist[partMdstIdxPair] = this->getDistAtDetSurface(iParticle, jParticle);
     }
-
   }
 
-  B2DEBUG(11, "Array of pair-wise distances between tracks in particle list. Final values:");
-  this->printDistancesArr(pairwiseDistances);
-
-  // For each particle index, find the index of the particle w/ minimal distance in the corresponding row of the 2D array.
+  // For each particle in the input list, find the minimum among all distances to the reference particles.
   for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
 
-    // Remove any NaNs and dummy distances from the row to avoid spoiling the search for the minimum value.
-    std::vector<double> iRow;
-    for (const auto& d : pairwiseDistances[iPart]) {
-      if (std::isnan(d) || d < 0) {
-        continue;
+    Particle* iParticle = m_pList->getParticle(iPart);
+
+    auto iMdstIdx = iParticle->getMdstArrayIndex();
+
+    std::vector<double> iDistances;
+    for (const auto& [mdstIdxs, dist] : particleMdstIdxPairsToDist) {
+      if (mdstIdxs.first == iMdstIdx) {
+        if (!std::isnan(dist) && dist >= 0) {
+          iDistances.push_back(dist);
+        }
       }
-      iRow.push_back(d);
     }
 
-    if (!iRow.size()) {
+    if (!iDistances.size()) {
       continue;
     }
 
-    const auto minDist = *std::min_element(std::begin(iRow), std::end(iRow));
-    // Search corresponding index in the original vector.
-    auto it_minDist = std::find(std::begin(pairwiseDistances[iPart]), std::end(pairwiseDistances[iPart]), minDist);
-    auto jPart = std::distance(std::begin(pairwiseDistances[iPart]), it_minDist);
-
-    Particle* iParticle = m_pList->getParticle(iPart);
-    Particle* jParticle = m_pListReference->getParticle(jPart);
+    const auto minDist = *std::min_element(std::begin(iDistances), std::end(iDistances));
 
     B2DEBUG(10, "Particle[" << iPart << "]'s (PDG=" << iParticle->getPDGCode() << ") closest partner at innermost " <<
-            m_detSurface << " surface is ReferenceParticle[" << jPart << "] (PDG=" << jParticle->getPDGCode() << ") at D = " <<
-            minDist << " [cm]");
+            m_detSurface << " surface is found at D = " << minDist << " [cm]");
 
     if (!iParticle->hasExtraInfo(m_extraInfoName)) {
       B2DEBUG(11, "Storing extraInfo(" << m_extraInfoName << ") for Particle[" << iPart << "]");
@@ -188,21 +174,19 @@ double TrackIsoCalculatorModule::getDistAtDetSurface(Particle* iParticle, Partic
   const auto th_bwd_brl = m_detSurfBoundaries[m_detSurface].m_th_bwd_brl;
   const auto th_bwd = m_detSurfBoundaries[m_detSurface].m_th_bwd;
 
-  std::string iNameExtTheta = "helixExtTheta(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
-  const auto iExtTheta = std::get<double>(Variable::Manager::Instance().getVariable(iNameExtTheta)->function(iParticle));
-  std::string jNameExtTheta(iNameExtTheta);
+  std::string nameExtTheta = "helixExtTheta(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
   if (m_useHighestProbMass) {
-    jNameExtTheta.replace(jNameExtTheta.size() - 1, 1, ", 1)");
+    nameExtTheta.replace(nameExtTheta.size() - 1, 1, ", 1)");
   }
-  const auto jExtTheta = std::get<double>(Variable::Manager::Instance().getVariable(jNameExtTheta)->function(jParticle));
+  const auto iExtTheta = std::get<double>(Variable::Manager::Instance().getVariable(nameExtTheta)->function(iParticle));
+  const auto jExtTheta = std::get<double>(Variable::Manager::Instance().getVariable(nameExtTheta)->function(jParticle));
 
-  std::string iNameExtPhi = "helixExtPhi(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
-  const auto iExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(iNameExtPhi)->function(iParticle));
-  std::string jNameExtPhi(iNameExtPhi);
+  std::string nameExtPhi = "helixExtPhi(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
   if (m_useHighestProbMass) {
-    jNameExtPhi.replace(jNameExtPhi.size() - 1, 1, ", 1)");
+    nameExtPhi.replace(nameExtPhi.size() - 1, 1, ", 1)");
   }
-  const auto jExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(jNameExtPhi)->function(jParticle));
+  const auto iExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(nameExtPhi)->function(iParticle));
+  const auto jExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(nameExtPhi)->function(jParticle));
 
   const auto iExtInBarrel = (iExtTheta >= th_fwd_brl && iExtTheta < th_bwd_brl);
   const auto jExtInBarrel = (jExtTheta >= th_fwd_brl && jExtTheta < th_bwd_brl);
@@ -289,21 +273,3 @@ bool TrackIsoCalculatorModule::isStdChargedList()
 
   return (checkPList and checkPListReference);
 };
-
-void TrackIsoCalculatorModule::printDistancesArr(const std::vector<std::vector<double>>& arr)
-{
-
-  auto logConfig = this->getLogConfig();
-
-  if (logConfig.getLogLevel() == LogConfig::c_Debug && logConfig.getDebugLevel() >= 11) {
-    std::cout << "" << std::endl;
-    for (unsigned int i(0); i < arr.size(); ++i) {
-      for (unsigned int j(0); j < arr[i].size(); ++j) {
-        std::cout << std::setw(7) << arr[i][j] << " ";
-      }
-      std::cout << "\n";
-    }
-
-    std::cout << "" << std::endl;
-  }
-}

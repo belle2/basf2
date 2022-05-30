@@ -82,7 +82,7 @@ if __name__ == "__main__":
                                                path,
                                                *args.detectors,
                                                reference_list_name=ref,
-                                               highest_prob_mass_for_ref=False)
+                                               highest_prob_mass_for_ext=False)
 
     # Reconstruct the J/psi decay.
 

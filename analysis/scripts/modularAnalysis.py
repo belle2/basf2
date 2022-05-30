@@ -3461,7 +3461,7 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     path.add_module(chargedpid)
 
 
-def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=None, highest_prob_mass_for_ref=False):
+def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=None, highest_prob_mass_for_ext=False):
     """
     Given a list of charged stable particles, compute variables that quantify "isolation" of the associated tracks.
 
@@ -3503,8 +3503,8 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
                                              of ``list_name`` is used.
                                              It must be a list of charged stable particles, too.
                                              The charge-conjugate ParticleList will be also processed automatically.
-        highest_prob_mass_for_ref (Optional[bool]): if this option is set, the helix extrapolation for the particles
-                                                    in the reference list will use the track fit result for the most
+        highest_prob_mass_for_hex (Optional[bool]): if this option is set, the helix extrapolation for the particles
+                                                    will use the track fit result for the most
                                                     probable mass hypothesis, namely, the one that gives the highest
                                                     chi2Prob of the fit.
 
@@ -3536,7 +3536,7 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
                                    particleList=list_name,
                                    detectorSurface=det,
                                    particleListReference=reference_list_name,
-                                   useHighestProbMassForReference=highest_prob_mass_for_ref)
+                                   useHighestProbMassForExt=highest_prob_mass_for_ext)
         trackiso.set_name(f"TrackIsoCalculator{det}{suffix}")
 
     aliases = vu.create_aliases([f"distToClosestTrkAt{det}{suffix}" for det in det_labels], "extraInfo({variable})")

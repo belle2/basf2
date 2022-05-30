@@ -16,7 +16,7 @@
 
 #include <tracking/dataobjects/RecoHitInformation.h>
 
-#include <optional.hpp>
+#include <optional>
 #include <string>
 #include <vector>
 

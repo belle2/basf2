@@ -43,8 +43,6 @@ built with PyTorch is stored in ``generators/smartBKG/model/gatgap.py`` while
 ``generators/smartBKG/NN_filter_module.py`` is a wrapper (`basf2.module`) suited in basf2 
 framework. 
 
-.. autoclass:: smartBKG.models.gatgap.GATGAPModel
-
 .. autoclass:: smartBKG.NN_filter_module.NNFilterModule
 
 An example of using smartBKG in real workflow:

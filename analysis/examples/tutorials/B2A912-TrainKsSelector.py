@@ -23,8 +23,8 @@ import ksSelector as ksSelector
 # Train weight file for V0 Selection.
 # name of output file is specified by the argument 'mva_identifier'.
 ksSelector.V0Selector_Training(
-    train_data=b2.findFile('KsSelector_train_V0Selector.root', 'examples', False),
-    tree_name="V0Selector",
+    train_data=b2.find_file('KsSelector_train_V0Selector.root', 'examples', False),
+    tree_name="tree",
     mva_identifier="MVAFastBDT_V0Selector.root",
     target_variable="isSignal"
 )
@@ -32,8 +32,8 @@ ksSelector.V0Selector_Training(
 # Train weight file for V0 Selection.
 # name of output file is specified by the argument 'mva_identifier'.
 ksSelector.LambdaVeto_Training(
-    train_data=b2.findFile('KsSelector_train_LambdaVeto.root', 'examples', False),
-    tree_name="LambdaVeto",
+    train_data=b2.find_file('KsSelector_train_LambdaVeto.root', 'examples', False),
+    tree_name="tree",
     mva_identifier="MVAFastBDT_LambdaVeto.root",
     target_variable="isSignal"
 )

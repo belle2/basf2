@@ -20,13 +20,11 @@ import modularAnalysis as ma
 import stdV0s as stdV0s
 import ksSelector as ksSelector
 
-output_file = "KsSelector_train.root"
-
 # create path
 my_path = b2.create_path()
 
 # load input ROOT file
-ma.inputMdst(filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False),
+ma.inputMdst(filename=b2.find_file('B02JpsiKs_Jpsi2mumu_Ks2pipi.root', 'examples', False),
              path=my_path)
 
 # load K_S0 particle list
@@ -49,14 +47,14 @@ vars = ['ks_selector_info', 'isNotContinuumEvent', 'isSignal']
 # output
 ma.variablesToNtuple('K_S0:V0Selector',
                      variables=vars,
-                     filename=output_file,
-                     treename='V0Selector',
+                     filename='KsSelector_train_V0Selector.root',
+                     treename='tree',
                      path=my_path)
 
 ma.variablesToNtuple('K_S0:LambdaVeto',
                      variables=vars,
-                     filename=output_file,
-                     treename='LambdaVeto',
+                     filename='KsSelector_train_LambdaVeto.root',
+                     treename='tree',
                      path=my_path)
 
 # Process the events

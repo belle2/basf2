@@ -158,7 +158,10 @@ def ksSelector(
     path=None
 ):
     """
-    Defines the configuration of KsSelector process for the input particle list.
+    This function will apply K_S0 selection MVA on the given particleList.
+    By default this function appends MVA output as a extraInfo for the given particleList.
+    You can apply preset cut or custom cut by giving parameters. In this case, a copy of the
+    original particleList is created, thus the original particleList will not be changed.
 
     @param particleLists                Reconstructed Ks -> pi+ pi- list.
     @param output_label_name            Label of the returned Ks particleList.
@@ -225,7 +228,7 @@ def ksSelector(
         elif output_label_name == '':
             outputListName = particleListName
         else:
-            # B2ERROR('KsSelector: Label should be \'\', \'standard\', \'tight\', or \'loose\'')
-            outputListName = particleListName.split(':')[0] + ':' + output_label_name
+            B2ERROR('KsSelector: Label should be \'\', \'standard\', \'tight\', or \'loose\' if you do'
+                    'not apply custom threshold')
 
     B2INFO('KsSelector: ParticleList '+outputListName+' is returned.')

@@ -44,7 +44,3 @@ built with PyTorch is stored in ``generators/smartBKG/model/gatgap.py`` while
 framework. 
 
 .. autoclass:: smartBKG.NN_filter_module.NNFilterModule
-
-An example of using smartBKG in real workflow:
-
-.. literalinclude:: ../examples/EvtGen_with_NN.py

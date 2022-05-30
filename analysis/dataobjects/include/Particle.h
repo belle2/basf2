@@ -909,6 +909,12 @@ namespace Belle2 {
     bool isMostLikely() const;
 
     /**
+     * For a (track-based) particle, returns the charged stable mass hypothesis associated to the most probable TrackFitResult,
+     * and the TrackFitResult itself.
+     */
+    std::pair<Const::ChargedStable, const TrackFitResult*> getMostLikelyTrackFitResult() const;
+
+    /**
      * Returns true if the (track-based) particle is created with its most likely mass hypothesis
      * based on TrackFitResult.
      */

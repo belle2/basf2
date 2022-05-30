@@ -282,18 +282,8 @@ namespace Belle2 {
 
       if (!track) return vecNaN;
 
-      Const::ChargedStable highestProbMass = Const::ChargedStable(std::abs(part->getPDGCode()));
-
-      if (useHighestProbMass) {
-        // get the track fit for the most probable mass hypothesis.
-        auto trackFitResults = track->getTrackFitResults();
-
-        // Find the track fit with the highest pValue, and its associated mass
-        auto it_maxPValue = std::max_element(std::begin(trackFitResults), std::end(trackFitResults), [](auto tfrAndM1,
-        auto tfrAndM2) {return tfrAndM1.second->getPValue() < tfrAndM2.second->getPValue();});
-
-        highestProbMass = trackFitResults[std::distance(std::begin(trackFitResults), it_maxPValue)].first;
-      }
+      auto highestProbMass = (useHighestProbMass) ? part->getMostLikelyTrackFitResult().first : Const::ChargedStable(std::abs(
+                               part->getPDGCode()));
 
       const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(highestProbMass);
 

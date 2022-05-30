@@ -590,6 +590,7 @@ void SVDClusterizerModule::alterClusterPosition()
   double trkAngle = 0.;
 
   // check if cluster has associated true hits
+  //cout << "True hits size: " << trueHits.size() << endl;
   if (trueHits.size() > 0) {
     SVDTrueHit* trueHit = trueHits[0];
     double trkLength = 0.;
@@ -616,7 +617,8 @@ void SVDClusterizerModule::alterClusterPosition()
     if (isU) newPosition_u = newPosition;
     else newPosition_v = newPosition;
     nIter += 1;
-  } while (!aSensorInfo->inside(newPosition_u, newPosition_v) && nIter < 6);
+  } while (!aSensorInfo->inside(newPosition_u, newPosition_v)
+           && nIter < 6); //move the position if the cluster falls outside the active volume, but 5 times max
 
   m_storeClusters[clsIndex]->setPosition(newPosition);
 

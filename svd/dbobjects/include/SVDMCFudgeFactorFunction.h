@@ -67,10 +67,6 @@ namespace Belle2 {
     SVDMCFudgeFactorFunction& operator=(const Belle2::SVDMCFudgeFactorFunction& a);
 
   private:
-
-    /** order of Chebyshev polynomial */
-    //static const int chebyshevPolyOrder = 5;
-
     /** function parameters & implementations*/
 
     /** ID = {0}, rel07: fudge factor parametrized with Chebyshev polynomial
@@ -86,6 +82,8 @@ namespace Belle2 {
       TF1* f = (TF1*) gROOT->GetFunction(TString::Format("chebyshev%lu", m_chebyCoeffs.size() - 1));
       f->SetParameters(&m_chebyCoeffs[0]);
 
+      //if (abs(trkAngle) <= 30) return f->Eval(trkAngle);
+      //else return f->Eval(0);
       return f->Eval(trkAngle);
     };
 

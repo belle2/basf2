@@ -3486,7 +3486,8 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
              Only one distance at the ARICH photon detector Z entry coordinate is calculated.
     - ECL: the distance is defined on the (rho=R, phi, z) surface in the barrel,
            on the (rho, phi, z=Z) surface in the endcaps.
-           Only one distance at the ECL entry radius R (barrel), Z (endcaps) is calculated.
+           Two distances are calculated: one at the ECL entry radius R (barrel), entry Z (endcaps),
+           and one at R, Z corresponding roughly to the mid-point of the longitudinal size of the crystals.
     - KLM: the distance is defined on the (rho=R, phi, z) surface in the barrel,
            on the (rho, phi, z=Z) surface in the endcaps.
            Only one distance at the KLM first strip entry radius R (barrel), Z (endcaps) is calculated.
@@ -3523,6 +3524,8 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
     for det in detectors:
         if det == "CDC":
             det_labels.extend([f"{det}{ilayer}" for ilayer in range(9)])
+        elif det == "ECL":
+            det_labels.extend([f"{det}{ilayer}" for ilayer in range(2)])
         else:
             det_labels.append(f"{det}0")
 

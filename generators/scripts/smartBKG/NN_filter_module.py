@@ -7,15 +7,14 @@
 ##########################################################################
 import os
 import numpy as np
-
 import pandas as pd
+
 from collections import defaultdict
 import basf2 as b2
 from ROOT import Belle2
 from ROOT.Belle2 import DBAccessorBase, DBStoreEntry
 
 from smartBKG import TOKENIZE_DICT, PREPROC_CONFIG, MODEL_CONFIG
-from smartBKG.models.gatgap import GATGAPModel
 
 
 def check_status_bit(status_bit):
@@ -80,6 +79,8 @@ class NNFilterModule(b2.Module):
         Initialise module before any events are processed
         """
         import torch
+        from smartBKG.models.gatgap import GATGAPModel
+
         DEVICE = torch.device("cpu")
 
         # read trained model parameters from

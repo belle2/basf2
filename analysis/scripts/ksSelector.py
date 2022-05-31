@@ -160,8 +160,8 @@ def ksSelector(
     """
     This function will apply K_S0 selection MVA on the given particleList.
     By default this function appends MVA output as a extraInfo for the given particleList.
-    You can apply preset cut or custom cut by giving parameters. In this case, a copy of the
-    original particleList is created, thus the original particleList will not be changed.
+    You can apply preset cut or custom cut by giving parameters. In this case,
+    a new particleList is created from the original particleList applying cuts on the MVA output.
 
     @param particleLists                Reconstructed Ks -> pi+ pi- list.
     @param output_label_name            Label of the returned Ks particleList.
@@ -174,11 +174,13 @@ def ksSelector(
     @param extraInfoName_LambdaVeto     Variable name for LambdaVeto MVA output.
     @param identifier_Ks                Identifier name for V0Selector weight file.
     @param identifier_vLambda           Identifier name for LambdaVeto weight file.
-    @useCustomThreshold                 Flag whether threshold_V0Selector and threshold_LambdaVeto are used.
-    @threshold_V0Selector               Threshold for V0Selector.
-    @threshold_LambdaVeto               Threshold for LambdaVeto.
+    @param useCustomThreshold           Flag whether threshold_V0Selector and threshold_LambdaVeto are used.
+    @param threshold_V0Selector         Threshold for V0Selector.
+    @param threshold_LambdaVeto         Threshold for LambdaVeto.
     @param path                         Basf2 path to execute.
+
     """
+
     add_default_ks_Selector_aliases()
 
     path.add_module('MVAMultipleExperts',

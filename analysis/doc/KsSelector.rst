@@ -44,6 +44,7 @@ An example tutorial for training dataset is :
 
 ksSelector Functions
 --------------------
+
 .. automodule:: ksSelector
    :members:
    :undoc-members:

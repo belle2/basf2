@@ -99,6 +99,7 @@ PID Priors
  * For evaluating priors, ``evalPriors`` module containing the ``Priors`` class has been added to calculate these using
    the trained model. Additionally, posteriors can also be obtained by providing PID's from the detector signals.
 
+
 MVA-based K_S0 Selector
 +++++++++++++++++++++++
 

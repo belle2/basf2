@@ -142,7 +142,7 @@ Advanced Topics
 
 .. toctree:: Priors
 
-.. toctree:: KsSelectorWrappers
+.. toctree:: KsSelector
 
 .. _analysismodules:
 

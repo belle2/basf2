@@ -9,8 +9,6 @@
 #include <framework/gearbox/GearDir.h>
 #include <ir/dbobjects/BeamPipeGeo.h>
 
-//#include <cmath>
-
 using namespace std;
 using namespace Belle2;
 

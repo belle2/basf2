@@ -10,12 +10,14 @@ Parameters for MVA training are selected not to raise bias in mass of :math:`K^0
 
 V0Selector
 ----------
+
 For V0Selector, mainly kinematics of :math:`K^0_S` and its daughter pions, flight length of :math:`K^0_S` and number of hits in VXD 
 are used for MVA training. The most dominant parameter for V0 selection is cosVertexMomentum, which represents the angle between
 vertex position and momentum of :math:`K^0_S`.
 
 LambdaVeto
 ----------
+
 For LambdaVeto, daughters' protonID, Lambda_mass which is calculated assuming proton mass hypothesis for one of daughter pions, 
 and kinematics of pions are used for MVA training. Two Lambda_mass parameters are dominant for LambdaVeto selection.
 

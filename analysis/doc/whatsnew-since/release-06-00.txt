@@ -102,5 +102,5 @@ PID Priors
 MVA-based K_S0 Selector
 +++++++++++++++++++++++
 
- * Added a new function ``ksSelector``, which applies MVA-based selection of K_S0 particleList
+ * Added a new function :func:`ksSelector.ksSelector`, which applies MVA-based selection of K_S0 particleList
  * Added a example for usage and training of ``ksSelector`` at ``B2A910``, ``B2A911``, and ``B2A912``

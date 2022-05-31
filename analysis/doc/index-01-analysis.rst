@@ -142,6 +142,8 @@ Advanced Topics
 
 .. toctree:: Priors
 
+.. toctree:: KsSelectorWrappers
+
 .. _analysismodules:
 
 Full list of analysis modules

@@ -110,14 +110,19 @@ void TrackIsoCalculatorModule::event()
         particleMdstIdxPairsToDist[partMdstIdxPair] = dummyDist;
         continue;
       }
-      // Check if this pair of particles has already been considered,
-      // by searching for a pair of flipped mdst indexes in the map.
-      // This is to avoid calculating the distance twice.
-      if (particleMdstIdxPairsToDist.count({jMdstIdx, iMdstIdx})) {
-        particleMdstIdxPairsToDist[partMdstIdxPair] = particleMdstIdxPairsToDist[ {jMdstIdx, iMdstIdx}];
-        continue;
+      // If:
+      //
+      // - the mass hypothesis of the best fit is used, OR
+      // - the mass hypothesis of the 'default' fit of the two particles is the same,
+      //
+      // avoid re-doing the calculation,
+      // by searching the existence of a pair with the flipped mdst indexes in the map.
+      if (m_useHighestProbMass || (iParticle->getPDGCodeUsedForFit() == jParticle->getPDGCodeUsedForFit())) {
+        if (particleMdstIdxPairsToDist.count({jMdstIdx, iMdstIdx})) {
+          particleMdstIdxPairsToDist[partMdstIdxPair] = particleMdstIdxPairsToDist[ {jMdstIdx, iMdstIdx}];
+          continue;
+        }
       }
-
       // Calculate the pair-wise distance.
       particleMdstIdxPairsToDist[partMdstIdxPair] = this->getDistAtDetSurface(iParticle, jParticle);
     }

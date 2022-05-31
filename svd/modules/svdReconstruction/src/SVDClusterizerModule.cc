@@ -596,7 +596,7 @@ void SVDClusterizerModule::alterClusterPosition()
     double trkLength = 0.;
     if (isU) trkLength = trueHit->getExitU() - trueHit->getEntryU();
     else trkLength = trueHit->getExitV() - trueHit->getEntryV();
-    double trkHeight = trueHit->getExitW() - trueHit->getEntryW();
+    double trkHeight = abs(trueHit->getExitW() - trueHit->getEntryW());
     trkAngle = atan2(trkLength, trkHeight) * (180 / 3.14159265);  // radians to degrees
   }
 

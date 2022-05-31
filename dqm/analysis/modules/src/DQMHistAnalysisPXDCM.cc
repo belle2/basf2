@@ -270,7 +270,8 @@ void DQMHistAnalysisPXDCMModule::event()
           mean_adhoc += v * (cm_y + 1);
         }
         // Attention, Bins
-        for (int cm_y = m_upperLineAdhoc; cm_y < 64; cm_y++) {
+        // We ignore CM63 in outside and overall count
+        for (int cm_y = m_upperLineAdhoc; cm_y < 63; cm_y++) {
           auto v = m_hCommonModeDelta->GetBinContent(m_hCommonModeDelta->GetBin(i + 1, cm_y + 1));
           entries_adhoc += v;
           outside_adhoc += v;
@@ -326,6 +327,7 @@ void DQMHistAnalysisPXDCMModule::event()
         m_cCommonMode->Pad()->SetFillColor(kYellow);// Yellow
         status = 3;
       } else if (all_outside == 0. /*&& all_cm == 0.*/) {
+        // do not react on all_cm, we better monitor it elsewhere for clearity
         m_cCommonMode->Pad()->SetFillColor(kGreen);// Green
         status = 2;
       } else { // between 0 and 50 ...

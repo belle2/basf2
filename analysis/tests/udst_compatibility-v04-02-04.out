@@ -6,6 +6,7 @@ Untested method Particle::appendDaughter
 Untested method Particle::forEachDaughter
 Untested method Particle::getAllDaughters
 Untested method Particle::getArrayPointer
+Untested method Particle::getMostLikelyTrackFitResult
 Untested method Particle::isCopyOf
 Untested method Particle::isMostLikely
 Untested method Particle::isMostLikelyTrackFitResult

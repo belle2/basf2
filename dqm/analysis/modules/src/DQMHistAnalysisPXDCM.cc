@@ -192,7 +192,8 @@ void DQMHistAnalysisPXDCMModule::event()
   leg->SetBorderSize(0);
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    std::string name = "PXDDAQCM_" + (std::string)m_PXDModules[i];
+    auto modname = (std::string)m_PXDModules[i];
+    std::string name = "PXDDAQCM_" + modname;
     // std::replace( name.begin(), name.end(), '.', '_');
 
     TH1* hh1 = findHist(name);
@@ -286,19 +287,18 @@ void DQMHistAnalysisPXDCMModule::event()
 
           if (warn_tmp_m || err_tmp_m) {
             TString tmp;
-            tmp.Form("%s: Mean %f", ((std::string)m_PXDModules[i]).c_str(), mean_adhoc);
+            tmp.Form("%s: Mean %f", modname.c_str(), mean_adhoc);
             leg->AddText(tmp);
             B2INFO(name << " Mean " <<  mean_adhoc << " " << warn_tmp_m << err_tmp_m);
           }
           if (warn_tmp_os || err_tmp_os) {
             TString tmp;
-            tmp.Form("%s: Outside %f (%f/%f)", ((std::string)m_PXDModules[i]).c_str(), outside_adhoc / entries_adhoc, outside_adhoc,
-                     entries_adhoc);
+            tmp.Form("%s: Outside %f %%", modname.c_str(), 100. * outside_adhoc / entries_adhoc);
             leg->AddText(tmp);
             B2INFO(name << " Outside " << outside_adhoc / entries_adhoc << " (" << outside_adhoc << "/" << entries_adhoc << ") " << warn_tmp_os
                    << err_tmp_os);
           }
-          m_monObj->setVariable(("cm_" + (std::string)m_PXDModules[i]).c_str(), mean_adhoc);
+          m_monObj->setVariable(("cm_" + modname).c_str(), mean_adhoc);
 #ifdef _BELLE2_EPICS
           if (m_useEpics) {
             auto my = mychid_mean[m_PXDModules[i]];

@@ -6,13 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 #include <ir/dbobjects/BeamPipeGeo.h>
 
-#include <cmath>
+//#include <cmath>
 
 using namespace std;
 using namespace Belle2;

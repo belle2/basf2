@@ -16,6 +16,9 @@ SVDMCFudgeFactorFunction::SVDMCFudgeFactorFunction(const SVDMCFudgeFactorFunctio
 {
   m_chebyCoeffs = a.m_chebyCoeffs;
 
+  m_x = a.m_x;
+  m_y = a.m_y;
+
   m_current = a.m_current;
 
 }
@@ -26,6 +29,9 @@ SVDMCFudgeFactorFunction& SVDMCFudgeFactorFunction::operator=(const SVDMCFudgeFa
     return *this;
 
   m_chebyCoeffs = a.m_chebyCoeffs;
+
+  m_x = a.m_x;
+  m_y = a.m_y;
 
   m_current = a.m_current;
 

@@ -622,8 +622,9 @@ void SVDClusterizerModule::alterClusterPosition()
 
   m_storeClusters[clsIndex]->setPosition(newPosition);
 
-  //int layerNum = sensorID.getLayerNumber();
-  //cout << "Layer number: " << layerNum << ", IsU: " << isU << ", trk angle: " << trkAngle << ", Sigma: " << sigma << ", position: " << clsPosition << ", fudge factor: " << fudgeFactor << endl;
+  int layerNum = sensorID.getLayerNumber();
+  cout << "Layer number: " << layerNum << ", IsU: " << isU << ", trk angle: " << trkAngle << ", Sigma: " << sigma << ", position: " <<
+       clsPosition << ", fudge factor: " << fudgeFactor << endl;
 }
 
 void SVDClusterizerModule::endRun()

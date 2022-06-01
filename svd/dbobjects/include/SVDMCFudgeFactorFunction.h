@@ -13,6 +13,7 @@
 #include <TF1.h>
 #include <TString.h>
 #include <TROOT.h>
+#include <TGraph.h>
 
 #include <cmath>
 #include <vector>
@@ -41,6 +42,7 @@ namespace Belle2 {
       // We have to initialize it just once.
       if (m_implementations.size() == 0) {
         m_implementations.push_back(&SVDMCFudgeFactorFunction::cheby_v0);
+        m_implementations.push_back(&SVDMCFudgeFactorFunction::tgraph_v0);
       }
 
       m_current = m_implementations.size() - 1;
@@ -58,6 +60,14 @@ namespace Belle2 {
     void set_chebyCoeffs(std::vector<double> c)
     {
       m_chebyCoeffs = c;
+    }
+
+    //SETTERS FOR function ID = 1 (tgraph_v0)
+    /** set the TGraph points */
+    void set_graphPoints(std::vector<double> x, std::vector<double> y)
+    {
+      m_x = x;
+      m_y = y;
     }
 
     /** copy constructor */
@@ -82,9 +92,23 @@ namespace Belle2 {
       TF1* f = (TF1*) gROOT->GetFunction(TString::Format("chebyshev%lu", m_chebyCoeffs.size() - 1));
       f->SetParameters(&m_chebyCoeffs[0]);
 
-      //if (abs(trkAngle) <= 30) return f->Eval(trkAngle);
-      //else return f->Eval(0);
       return f->Eval(trkAngle);
+    };
+
+    /** ID = {1}, rel07: fudge factor parametrized with linear interpolation between graph points
+     */
+    std::vector<double> m_x;
+    std::vector<double> m_y;
+
+    /** tgraph_v0 implementation
+     * @param trkAngle track's incident angle
+     * @return fudge factor as a function of the track's angle
+     */
+    double tgraph_v0(double trkAngle) const
+    {
+      TGraph* g = new TGraph(m_x.size(), &m_x[0], &m_y[0]);
+
+      return g->Eval(trkAngle);
     };
 
     /** current function ID */

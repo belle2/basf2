@@ -15,7 +15,7 @@ REG_MODULE(FlippedRecoTracksMerger);
 FlippedRecoTracksMergerModule::FlippedRecoTracksMergerModule() :
   Module()
 {
-  setDescription("Copies RecoTracks without their fit information.");
+  setDescription("Replace the original RecoTrack with the flipped one if the 2nd Flip qi passed the selection  ");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("inputStoreArrayName", m_inputStoreArrayName,

@@ -44,17 +44,17 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
-                                pxd_filtering_offline=False):
+                                pxd_filtering_offline=False, flip_recoTrack=False, flip_mva_cut=0.01):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
 
-    #. first we find tracks using the CDC hits only, see :ref:`CDC Track Finding<tracking_trackFindingCDC>`
-    #. CDC tracks are extrapolated to SVD and SVD hits are attached, see :ref:`CDC to SVD CKF<tracking_cdc2svd_ckf>`
-    #. remaining  SVD hits are used to find SVD tracks, see :ref:`SVD Track Finding<tracking_trackFindingSVD>`
-    #. SVD tracks are extrapolated to CDC to attach CDC hits, see :ref:`SVD to CDC CKF<tracking_svd2cdc_ckf>`
-    #. SVD and CDC tracks are merged and fitted, see :ref:`Track Fitting<tracking_trackFitting>`
-    #. merged SVD+CDC tracks are extrapolated to PXD to attach PXD hits, see :ref:`SVD to PXD CKF<tracking_svd2pxd_ckf>`
+    # . first we find tracks using the CDC hits only, see :ref:`CDC Track Finding<tracking_trackFindingCDC>`
+    # . CDC tracks are extrapolated to SVD and SVD hits are attached, see :ref:`CDC to SVD CKF<tracking_cdc2svd_ckf>`
+    # . remaining  SVD hits are used to find SVD tracks, see :ref:`SVD Track Finding<tracking_trackFindingSVD>`
+    # . SVD tracks are extrapolated to CDC to attach CDC hits, see :ref:`SVD to CDC CKF<tracking_svd2cdc_ckf>`
+    # . SVD and CDC tracks are merged and fitted, see :ref:`Track Fitting<tracking_trackFitting>`
+    # . merged SVD+CDC tracks are extrapolated to PXD to attach PXD hits, see :ref:`SVD to PXD CKF<tracking_svd2pxd_ckf>`
 
     .. note::
 
@@ -63,7 +63,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
        the tracks on the PXD sensors and defining regions in which we expect to find the hit.\
        Only fired pixels inside these regions reach Event Builder 2.
 
-    #. after all the tracks from the IP are found, we look for special classes of tracks,\
+    # . after all the tracks from the IP are found, we look for special classes of tracks,\
     in particular we search for displaced vertices to reconstruct K-short, Lambda and\
     photon-conversions, see :ref:`V0 Finding<tracking_v0Finding>`
 
@@ -126,7 +126,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                            pruneTracks=pruneTracks,
                                            fit_tracks=fit_tracks,
                                            reco_tracks=reco_tracks,
-                                           prune_temporary_tracks=prune_temporary_tracks)
+                                           prune_temporary_tracks=prune_temporary_tracks,
+                                           flip_recoTrack=flip_recoTrack, flip_mva_cut=flip_mva_cut)
 
 
 def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdding=False,
@@ -211,11 +212,9 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
+
     add_time_extraction(path, components=components)
-
-    add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
-                   use_second_cdc_hits=use_second_cdc_hits)
-
+    add_mc_matcher(path, components=components, reco_tracks=reco_tracks, use_second_cdc_hits=use_second_cdc_hits)
     if fit_tracks:
         add_prefilter_track_fit_and_track_creator(path,
                                                   trackFitHypotheses=trackFitHypotheses,
@@ -223,8 +222,50 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                                   add_mva_quality_indicator=add_recoTrack_QI)
 
 
+def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", flip_mva_cut=0.05, trackFitHypotheses=None):
+    """
+    This function adds the mva based selections and the flipping of the recoTracks
+
+    :param path: The path to add the tracking reconstruction modules to
+    :param fit_tracks: fit the flipped recotracks or not
+    :param reco_tracks: Name of the StoreArray where the reco tracks should be flipped
+    :param flip_mva_cut: the cut applied to the 1st flip Qi to determine if the recoTrack will be flipped
+    :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    """
+
+    path.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
+                    identifier='/home/belle2/hanyubo/development/mva/examples/basics/localdb/dbstore_Weightfile_rev_999c51.root',
+                    indexOfFlippingMVA=1).set_name("FlipQuality_1stMVA")
+
+    reco_tracks_flipped = "RecoTracks_flipped"
+    path.add_module("RecoTracksReverter", inputStoreArrayName=reco_tracks,
+                    outputStoreArrayName=reco_tracks_flipped, mvaFlipCut=flip_mva_cut)
+    if fit_tracks:
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks_flipped).set_name("Combined_DAFRecoFitter_flipped")
+        path.add_module("IPTrackTimeEstimator",
+                        recoTracksStoreArrayName=reco_tracks_flipped, useFittedInformation=False)
+    path.add_module("TrackCreator", trackColName="Tracks_flipped",
+                    trackFitResultColName="TrackFitResults",
+                    recoTrackColName=reco_tracks_flipped,
+                    pdgCodes=[
+                        211,
+                        321,
+                        2212] if not trackFitHypotheses else trackFitHypotheses).set_name("TrackCreator_flipped")
+    path.add_module("FlipQuality", recoTracksStoreArrayName=reco_tracks,
+                    identifier='/home/belle2/hanyubo/development/mva/examples/basics/localdb/dbstore_Weightfile_rev_19eac1.root',
+                    indexOfFlippingMVA=2).set_name("FlipQuality_2ndMVA")
+    """
+     path.add_module(
+             "RecoTracksReverter",
+             inputStoreArrayName=reco_tracks,
+             outputStoreArrayName="",
+             mvaFlipCut=0.9).set_name("RecoTracksReverter")
+    """
+
+
 def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, fit_tracks=True, reco_tracks="RecoTracks",
-                                           prune_temporary_tracks=True):
+                                           prune_temporary_tracks=True, V0s="V0s", CopiedRecoTracks="CopiedRecoTracks",
+                                           flip_recoTrack=False, flip_mva_cut=0.01):
     """
     This function adds the tracking reconstruction modules not required to calculate HLT filter
     decision to a path.
@@ -239,7 +280,18 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     """
 
     if fit_tracks:
-        add_postfilter_track_fit(path, components=components, pruneTracks=pruneTracks, reco_tracks=reco_tracks)
+        add_postfilter_track_fit(
+            path,
+            components=components,
+            pruneTracks=pruneTracks,
+            reco_tracks=reco_tracks,
+            V0s=V0s,
+            CopiedRecoTracks=CopiedRecoTracks)
+
+    if flip_recoTrack:
+        add_flipping_of_recoTracks(path,
+                                   reco_tracks="RecoTracks",
+                                   flip_mva_cut=flip_mva_cut)
 
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")
@@ -421,7 +473,10 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         temporary_reco_track_list.append(ecl_reco_tracks)
         temporary_reco_track_list.append(combined_ecl_reco_tracks)
         latest_reco_tracks = combined_ecl_reco_tracks
-
+    """
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
+    add_roiFinder_name(path, reco_tracks=svd_cdc_reco_tracks, roiName="ROI_reco_tracks", interceptListName="PXDIntercepts_offline")
+    """
     if is_pxd_used(components):
         if pxd_filtering_offline:
             roiName = "ROIs"
@@ -429,7 +484,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                 path.add_module("DAFRecoFitter", recoTracksStoreArrayName=latest_reco_tracks)
 
                 roiName = "ROIs_offline"
-                add_roiFinder(path, reco_tracks=latest_reco_tracks, roiName=roiName)
+                add_roiFinder(path, reco_tracks=latest_reco_tracks)
 
             pxd_digifilter = b2.register_module('PXDdigiFilter')
             pxd_digifilter.param('ROIidsName', roiName)
@@ -445,6 +500,10 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                               use_mc_truth=use_mc_truth, output_reco_tracks=reco_tracks,
                               temporary_reco_tracks=pxd_reco_tracks,
                               add_both_directions=add_both_directions)
+        """
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks)
+        add_roiFinder_name(path, reco_tracks=reco_tracks, roiName="ROI_reco_tracks", interceptListName="PXDIntercepts_offline")
+        """
         temporary_reco_track_list.append(pxd_reco_tracks)
 
     if prune_temporary_tracks:
@@ -553,7 +612,7 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
     path.add_module(dafRecoFitter)
 
 
-def add_roiFinder(path, reco_tracks="RecoTracks", roiName="ROIs"):
+def add_roiFinder_name(path, reco_tracks="RecoTracks", roiName="ROIs", interceptListName="PXDIntercepts"):
     """
     Add the ROI finding to the path creating ROIs out of reco tracks by extrapolating them to the PXD volume.
     :param path: Where to add the module to.
@@ -564,8 +623,34 @@ def add_roiFinder(path, reco_tracks="RecoTracks", roiName="ROIs"):
     pxdDataRed = b2.register_module('PXDROIFinder')
     param_pxdDataRed = {
         'recoTrackListName': reco_tracks,
-        'PXDInterceptListName': 'PXDIntercepts',
+        'PXDInterceptListName': interceptListName,
         'ROIListName': roiName,
+        'tolerancePhi': 0.15,
+        'toleranceZ': 0.5,
+        'sigmaSystU': 0.02,
+        'sigmaSystV': 0.02,
+        'numSigmaTotU': 10,
+        'numSigmaTotV': 10,
+        'maxWidthU': 0.5,
+        'maxWidthV': 0.5,
+    }
+    pxdDataRed.param(param_pxdDataRed)
+    path.add_module(pxdDataRed)
+
+
+def add_roiFinder(path, reco_tracks):
+    """
+    Add the ROI finding to the path creating ROIs out of reco tracks by extrapolating them to the PXD volume.
+    :param path: Where to add the module to.
+    :param reco_tracks: Which tracks to use in the extrapolation step.
+    :param roiName: Name of the produced/stored ROIs.
+    """
+
+    pxdDataRed = b2.register_module('PXDROIFinder')
+    param_pxdDataRed = {
+        'recoTrackListName': reco_tracks,
+        'PXDInterceptListName': "PXDIntercepts",
+        'ROIListName': "ROIs",
         'tolerancePhi': 0.15,
         'toleranceZ': 0.5,
         'sigmaSystU': 0.02,

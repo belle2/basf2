@@ -14,11 +14,11 @@
 
 namespace Belle2 {
 
-  REG_MODULE(FlipQuality)
+  REG_MODULE(FlipQuality);
 
   FlipQualityModule::FlipQualityModule() : Module()
   {
-    setDescription("Prototype of a module which uses the MVA package");
+    setDescription("Moudle to apply the mva based filter to determine if a recoTracks need to be flipped");
 
     setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -62,7 +62,7 @@ namespace Belle2 {
     // It can happen that for example the database doesn't find the payload
     // and the expert ends up uninitialized.
     if (not m_mvaExpert) {
-      B2ERROR("MVA Expert is not loaded! I will return 0");
+      B2DEBUG(1, "MVA Expert is not loaded! I will return 0");
       return;
     }
 
@@ -80,8 +80,8 @@ namespace Belle2 {
         // for the 2nd MVA
         // first check if the flipped track was created or not.
         // then call the corresponding class and set the 2nd Qi using set2ndFlipQualityIndicator()
-        RecoTrack* RecoTrack_flipped = recoTrack.getRelatedFrom<RecoTrack>("RecoTracks_flipped");
-        if (RecoTrack_flipped) {
+        RecoTrack* RecoTrackflipped = recoTrack.getRelatedFrom<RecoTrack>("RecoTracks_flipped");
+        if (RecoTrackflipped) {
           m_recoTrackExtractor_2nd->extractVariables(recoTrack);
           float probability = m_mvaExpert->predict();
           recoTrack.set2ndFlipQualityIndicator(probability);
@@ -89,7 +89,7 @@ namespace Belle2 {
           recoTrack.set2ndFlipQualityIndicator(-999);
         }
       } else {
-        B2INFO("Nothing will be saved into the flipping qi");
+        B2DEBUG(1, "Nothing will be saved into the flipping qi");
 
       }
 

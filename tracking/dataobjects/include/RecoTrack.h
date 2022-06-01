@@ -733,27 +733,27 @@ namespace Belle2 {
       m_qualityIndicator = qualityIndicator;
     }
 
-    /// Get the quality index attached to this RecoTrack as a reference for flipping.
+    /// Get the quality from 1st flipping MVA attached to this RecoTrack as a reference for flipping.
     float getFlipQualityIndicator() const
     {
-      return m_flipqualityIndicator;
+      return m_flipQualityIndicator;
     }
 
-    /// Set the quality index attached to this RecoTrack as a reference for flipping.
+    /// Set the 1st flipping quality attached to this RecoTrack.
     void setFlipQualityIndicator(const float qualityIndicator)
     {
-      m_flipqualityIndicator = qualityIndicator;
+      m_flipQualityIndicator = qualityIndicator;
     }
-    /// Get the quality index attached to this RecoTrack as a reference for flipping.
+    /// Get the quality from 2nd flipping MVA attached to this RecoTrack as a reference for flipping.
     float get2ndFlipQualityIndicator() const
     {
-      return m_2ndflipqualityIndicator;
+      return m_2ndflipQualityIndicator;
     }
 
-    /// Set the quality index attached to this RecoTrack as a reference for flipping.
+    /// Set the 2nd flipping quality attached to this RecoTrack.
     void set2ndFlipQualityIndicator(const float qualityIndicator)
     {
-      m_2ndflipqualityIndicator = qualityIndicator;
+      m_2ndflipQualityIndicator = qualityIndicator;
     }
     /**
      * Delete all fitted information for all representations.
@@ -801,9 +801,9 @@ namespace Belle2 {
     /// Quality index for classification of fake vs. MC-matched Tracks.
     float m_qualityIndicator = NAN;
     /// Quality index for flipping.
-    float m_flipqualityIndicator = NAN;
+    float m_flipQualityIndicator = NAN;
     /// Quality index for flipping.
-    float m_2ndflipqualityIndicator = NAN;
+    float m_2ndflipQualityIndicator = NAN;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.

@@ -22,11 +22,11 @@
 
 namespace Belle2 {
   /// class to extract results from qualityEstimation
-  class FlipRecoTrackExtractor_2ndmva : public VariableExtractor {
+  class FlipRecoTrackExtractor2nd : public VariableExtractor {
   public:
 
     /// Define names of variables that get extracted
-    explicit FlipRecoTrackExtractor_2ndmva(std::vector<Named<float*>>& variableSet, const std::string& prefix = ""):
+    explicit FlipRecoTrackExtractor2nd(std::vector<Named<float*>>& variableSet, const std::string& prefix = ""):
       VariableExtractor(), m_prefix(prefix)
     {
       /// variables for 2ndMVA of tracks flipping

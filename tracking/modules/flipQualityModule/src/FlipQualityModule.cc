@@ -27,7 +27,7 @@ namespace Belle2 {
 
     addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "Name of the recoTrack StoreArray.", m_recoTracksStoreArrayName);
 
-    addParam("indexOfFlippingMVA", m_flipmva_index, "Index of flipping MVA. (1 or 2).", m_flipmva_index);
+    addParam("indexOfFlippingMVA", m_flipMVAIndex, "Index of flipping MVA. (1 or 2).", m_flipMVAIndex);
   }
 
   void FlipQualityModule::initialize()
@@ -37,10 +37,10 @@ namespace Belle2 {
     B2INFO("init he FlipQualityModule");
     m_recoTracks.isRequired(m_recoTracksStoreArrayName);
 
-    if (m_flipmva_index == 1) {
+    if (m_flipMVAIndex == 1) {
       m_recoTrackExtractor = std::make_unique<FlipRecoTrackExtractor>(m_variableSet);
-    } else if (m_flipmva_index == 2) {
-      m_recoTrackExtractor_2nd = std::make_unique<FlipRecoTrackExtractor_2ndmva>(m_variableSet);
+    } else if (m_flipMVAIndex == 2) {
+      m_recoTrackExtractor2nd = std::make_unique<FlipRecoTrackExtractor2nd>(m_variableSet);
     } else {
       B2INFO("no input value extractor");
     }
@@ -71,18 +71,18 @@ namespace Belle2 {
     for (RecoTrack& recoTrack : m_recoTracks) {
       // for the 1st MVA
       // we call the corresponding class and set the Qi using setFlipQualityIndicator()
-      if (m_flipmva_index == 1) {
+      if (m_flipMVAIndex == 1) {
         m_recoTrackExtractor->extractVariables(recoTrack);
         float probability = m_mvaExpert->predict();
         recoTrack.setFlipQualityIndicator(probability);
 
-      } else if (m_flipmva_index == 2) {
+      } else if (m_flipMVAIndex == 2) {
         // for the 2nd MVA
         // first check if the flipped track was created or not.
         // then call the corresponding class and set the 2nd Qi using set2ndFlipQualityIndicator()
         RecoTrack* RecoTrackflipped = recoTrack.getRelatedFrom<RecoTrack>("RecoTracks_flipped");
         if (RecoTrackflipped) {
-          m_recoTrackExtractor_2nd->extractVariables(recoTrack);
+          m_recoTrackExtractor2nd->extractVariables(recoTrack);
           float probability = m_mvaExpert->predict();
           recoTrack.set2ndFlipQualityIndicator(probability);
         } else {

@@ -187,12 +187,13 @@ void DQMHistAnalysisPXDCMModule::event()
   if (!m_cCommonMode) return;
   m_hCommonMode->Reset(); // dont sum up!!!
 
-  auto leg = new TPaveText(0.1, 0.6, 0.95, 0.95, "NDC");
+  auto leg = new TPaveText(0.1, 0.6, 0.90, 0.95, "NDC");
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    std::string name = "PXDDAQCM_" + (std::string)m_PXDModules[i ];
+    auto modname = (std::string)m_PXDModules[i];
+    std::string name = "PXDDAQCM_" + modname;
     // std::replace( name.begin(), name.end(), '.', '_');
 
     TH1* hh1 = findHist(name);
@@ -269,7 +270,8 @@ void DQMHistAnalysisPXDCMModule::event()
           mean_adhoc += v * (cm_y + 1);
         }
         // Attention, Bins
-        for (int cm_y = m_upperLineAdhoc; cm_y < 64; cm_y++) {
+        // We ignore CM63 in outside and overall count
+        for (int cm_y = m_upperLineAdhoc; cm_y < 63; cm_y++) {
           auto v = m_hCommonModeDelta->GetBinContent(m_hCommonModeDelta->GetBin(i + 1, cm_y + 1));
           entries_adhoc += v;
           outside_adhoc += v;
@@ -286,18 +288,18 @@ void DQMHistAnalysisPXDCMModule::event()
 
           if (warn_tmp_m || err_tmp_m) {
             TString tmp;
-            tmp.Form("%s: Mean %f", name.c_str(), mean_adhoc);
+            tmp.Form("%s: Mean %f", modname.c_str(), mean_adhoc);
             leg->AddText(tmp);
             B2INFO(name << " Mean " <<  mean_adhoc << " " << warn_tmp_m << err_tmp_m);
           }
           if (warn_tmp_os || err_tmp_os) {
             TString tmp;
-            tmp.Form("%s: Outside %f (%f/%f)", name.c_str(), outside_adhoc / entries_adhoc, outside_adhoc, entries_adhoc);
+            tmp.Form("%s: Outside %f %%", modname.c_str(), 100. * outside_adhoc / entries_adhoc);
             leg->AddText(tmp);
             B2INFO(name << " Outside " << outside_adhoc / entries_adhoc << " (" << outside_adhoc << "/" << entries_adhoc << ") " << warn_tmp_os
                    << err_tmp_os);
           }
-          m_monObj->setVariable(("cm_" + (std::string)m_PXDModules[i]).c_str(), mean_adhoc);
+          m_monObj->setVariable(("cm_" + modname).c_str(), mean_adhoc);
 #ifdef _BELLE2_EPICS
           if (m_useEpics) {
             auto my = mychid_mean[m_PXDModules[i]];
@@ -325,6 +327,7 @@ void DQMHistAnalysisPXDCMModule::event()
         m_cCommonMode->Pad()->SetFillColor(kYellow);// Yellow
         status = 3;
       } else if (all_outside == 0. /*&& all_cm == 0.*/) {
+        // do not react on all_cm, we better monitor it elsewhere for clearity
         m_cCommonMode->Pad()->SetFillColor(kGreen);// Green
         status = 2;
       } else { // between 0 and 50 ...

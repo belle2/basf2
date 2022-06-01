@@ -70,6 +70,7 @@ Variables
    If no argument is given, it works same as before. Please note that brackets have to appended even if no argument is given i.e.
    ``nCompositeDaughters()``.
  * Added `nCompositeAllGenerationDaughters` which works similar with `nCompositeDaughters` but it includes all generations of daughters.
+ * Users can clear aliases by using ``variables.clearAliases()``, which is useful when processing several independent ``Path`` objects in a single basf2 session, e.g. b2luigi job submission.
 
 Modules
 +++++++

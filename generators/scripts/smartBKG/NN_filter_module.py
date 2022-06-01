@@ -46,11 +46,14 @@ class NNFilterModule(b2.Module):
        payload(str): Payload for the well trained model in global tag
 
     Returns:
-       score(float): Score after the NN filter, indicating the probability of the event to pass.
-       module.if_value: Pass or rejected according to random sampling or selection with threshold
+       Pass or rejected according to random sampling or selection with the given threshold
 
-    Setting the extra_info_var saves the output prediction to EventExtraInfo,
-    users then need to explicitly add this branch to the mdst output to save this.
+    Note:
+        Score after the NN filter indicating the probability of the event to pass is saved
+        under ``EventExtraInfo.extra_info_var``.
+
+        Use ``eventExtraInfo(extra_info_var)`` in ``modularAnalysis.variablesToNtuple`` or
+        ``additionalBranches=["EventExtraInfo"]`` in ``mdst.add_mdst_output`` to have access to the scores.
     """
 
     def __init__(

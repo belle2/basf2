@@ -266,8 +266,7 @@ def add_flipping_of_recoTracks(path, fit_tracks=True, reco_tracks="RecoTracks", 
 
 
 def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, fit_tracks=True, reco_tracks="RecoTracks",
-                                           prune_temporary_tracks=True, V0s="V0s", CopiedRecoTracks="CopiedRecoTracks",
-                                           flip_recoTrack=False, flip_mva_cut=0.01):
+                                           prune_temporary_tracks=True, flip_recoTrack=False, flip_mva_cut=0.01):
     """
     This function adds the tracking reconstruction modules not required to calculate HLT filter
     decision to a path.
@@ -279,16 +278,15 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
+    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
+    :param flip_mva_cut: the cut applied to the 1st Flipping MVA
     """
 
     if fit_tracks:
-        add_postfilter_track_fit(path, components=components, pruneTracks=pruneTracks, reco_tracks=reco_tracks,
-                                 V0s=V0s, CopiedRecoTracks=CopiedRecoTracks)
+        add_postfilter_track_fit(path, components=components, pruneTracks=pruneTracks, reco_tracks=reco_tracks)
 
     if flip_recoTrack:
-        add_flipping_of_recoTracks(path,
-                                   reco_tracks="RecoTracks",
-                                   flip_mva_cut=flip_mva_cut)
+        add_flipping_of_recoTracks(path, reco_tracks="RecoTracks", flip_mva_cut=flip_mva_cut)
 
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")

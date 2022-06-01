@@ -31,7 +31,7 @@ namespace Belle2 {
     );
     // parameters for saving / loading
     addParam("hitCollectionName", m_hitCollectionName,
-             "Name of the input StoreArray of CDCTriggerSegmentHits.",
+             "Name of the input StoreArray of CDCTriggerSegmentHits. Need to have a relation to inputtracks",
              std::string(""));
     addParam("IDHistFileName", m_idHistFilename,
              "Name of the IDHist file.",
@@ -166,8 +166,8 @@ namespace Belle2 {
     for (int itrack = 0; itrack < m_tracks.getEntries(); ++itrack) {
       // get related MCParticle/RecoTrack for target
       // and retrieve track parameters
-      float phi0Target = 0;
-      float invptTarget = 0;
+      //float phi0Target = 0;
+      //float invptTarget = 0;
       float thetaTarget = 0;
       float zTarget = 0;
       if (m_trainOnRecoTracks) {
@@ -197,8 +197,8 @@ namespace Belle2 {
               state.setChargeSign(-state.getCharge());
             }
             // get track parameters
-            phi0Target = state.getMom().Phi();
-            invptTarget = state.getCharge() / state.getMom().Pt();
+            //phi0Target = state.getMom().Phi();
+            //invptTarget = state.getCharge() / state.getMom().Pt();
             thetaTarget = state.getMom().Theta();
             zTarget = state.getPos().Z();
           } catch (...) {
@@ -218,8 +218,8 @@ namespace Belle2 {
           B2DEBUG(150, "Skipping CDCTriggerTrack without relation to MCParticle.");
           continue;
         }
-        phi0Target = mcTrack->getMomentum().Phi();
-        invptTarget = mcTrack->getCharge() / mcTrack->getMomentum().Pt();
+        //phi0Target = mcTrack->getMomentum().Phi();
+        //invptTarget = mcTrack->getCharge() / mcTrack->getMomentum().Pt();
         thetaTarget = mcTrack->getMomentum().Theta();
         zTarget = mcTrack->getProductionVertex().Z();
       }
@@ -272,7 +272,13 @@ namespace Belle2 {
           B2DEBUG(250, "hitPattern not matching " << (sectorPatternMask & hitPattern));
           continue;
         }
-
+        // check, if enough axials are there. first, we select the axial bits from the
+        // hitpattern (341 = int('101010101',base=2)) and then check if the number of
+        // ones is equal or greater than 4.
+        if (std::popcount(hitPattern & 341) < 4) {
+          B2DEBUG(250, "Not enough axial hits (<4), skipping!");
+          continue;
+        }
         // get training data
         std::vector<unsigned> hitIds;
         if (m_neuroTrackInputMode) {
@@ -303,7 +309,7 @@ namespace Belle2 {
   CDCTriggerNeuroDataModule::terminate()
   {
     std::stringstream ss;
-    for (int i = 0; i < m_trainSet.size(); ++i) {
+    for (unsigned int i = 0; i < m_trainSet.size(); ++i) {
       ss << "expert " << i << " : " << m_trainSet[i].nSamples() << ", ";
     }
     B2DEBUG(10, "Collected events: " << ss.str());

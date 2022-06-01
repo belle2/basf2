@@ -256,6 +256,7 @@ namespace Belle2 {
       std::cout << hset << std::endl;
       outStream << hset << std::endl;
     }
+    m_NeuroTrigger.save(m_idHistName + ".root", "MLPs");
     //TODO: also write the config file to be directly able to start the training
   }
 

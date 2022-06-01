@@ -67,7 +67,7 @@ namespace Belle2 {
       addVariable(prefix + "flipped_x_estimate", variableSet);
       addVariable(prefix + "quality_flip_indicator", variableSet);
     }
-
+    /// extract the actual variables and write into a variable set
     void extractVariables(const RecoTrack& recoTrack)
     {
 
@@ -116,15 +116,13 @@ namespace Belle2 {
                                    4)) / mom.Perp2();
               float pt_resolution = pt_variance / pt_estimate;
 
-              //float flipped_pt_estimate = mom_flipped.Perp();
               float flipped_pt_variance = (pow(mom_flipped.X(), 2) * cov6_flipped(3, 3) + pow(mom_flipped.Y(), 2) * cov6_flipped(4,
                                            4) - 2 * mom_flipped.X() * mom_flipped.Y() * cov6_flipped(3, 4)) / mom_flipped.Perp2();
-              //float flipped_pt_resolution = flipped_pt_variance/flipped_pt_estimate;
 
               m_variables.at(m_prefix + "pt_resolution") = pt_resolution;
               m_variables.at(m_prefix + "px_estimate") = mom.X();
               m_variables.at(m_prefix + "pt_variance") = pt_variance;
-              //m_variables.at(m_prefix + "phi0_estimate")= trackFitResult->getPhi() % (2.0 *  TMath::Pi());
+
               m_variables.at(m_prefix + "phi0_estimate") = trackFitResult->getPhi() > 2.0 *  TMath::Pi() ? trackFitResult->getPhi() - 2.0 *
                                                            TMath::Pi() : trackFitResult->getPhi();
               m_variables.at(m_prefix + "flipped_z_estimate") = pos_flipped.Z();
@@ -146,6 +144,7 @@ namespace Belle2 {
 
     }
   protected:
+    /// prefix for RecoTrack extracted variables
     std::string m_prefix;
   };
 }

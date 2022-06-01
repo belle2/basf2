@@ -84,7 +84,6 @@ namespace Belle2 {
           omega_estimate = trackFitResult->getOmega();
           omega_variance = trackFitResult->getCov()[9];
           phi0_variance = trackFitResult->getCov()[5];
-          //phi0_estimate = trackFitResult->getPhi() % (2.0 * TMath::Pi());
           phi0_estimate = trackFitResult->getPhi() > 2.0 * TMath::Pi() ? trackFitResult->getPhi() - 2.0 * TMath::Pi() :
                           trackFitResult->getPhi();
           tan_lambda_estimate = trackFitResult->getCotTheta();

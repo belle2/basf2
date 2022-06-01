@@ -904,8 +904,21 @@ namespace Belle2 {
 
     /**
      * Returns true if the (track-based) particle is created with its most likely mass hypothesis
+     * based on PID likelihood.
      */
     bool isMostLikely() const;
+
+    /**
+     * For a (track-based) particle, returns the charged stable mass hypothesis associated to the most probable TrackFitResult,
+     * and the TrackFitResult itself.
+     */
+    std::pair<Const::ChargedStable, const TrackFitResult*> getMostLikelyTrackFitResult() const;
+
+    /**
+     * Returns true if the (track-based) particle is created with its most likely mass hypothesis
+     * based on TrackFitResult.
+     */
+    bool isMostLikelyTrackFitResult() const;
 
     /**
     * Returns the ECLCluster EHypothesisBit for this Particle.

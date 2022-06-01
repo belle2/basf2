@@ -15,7 +15,7 @@
 Example script to calculate track isolation variables.
 
 For each particle's track in the input charged stable particle list,
-calculate the minimal distance to the other candidates' tracks at a given detector entry surface.
+calculate the minimal distance to the other candidates' tracks at a given detector surface.
 """
 
 import argparse
@@ -30,19 +30,16 @@ def argparser():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawTextHelpFormatter)
 
-    parser.add_argument("--std_charged",
-                        type=str,
-                        choices=stdc._chargednames,
-                        default="pi",
-                        help="The base name of the standard charged particle list to consider.")
+    parser.add_argument("--std_charged_ref", type=str, choices=stdc._chargednames, default="pi",
+                        help="The base name of the reference standard charged particle list\n"
+                        "against which to calculate the distance.")
     parser.add_argument("--detectors",
                         type=str,
                         nargs="+",
-                        default=["CDC", "PID", "ECL", "KLM"],
-                        choices=["CDC", "PID", "ECL", "KLM"],
+                        default=["CDC", "TOP", "ARICH", "ECL", "KLM"],
+                        choices=["CDC", "TOP", "ARICH", "ECL", "KLM"],
                         help="List of detectors at whose entry surface track isolation variables will be calculated.\n"
-                        "Pass a space-separated list of names.\n"
-                        "NB: 'PID' indicates TOP+ARICH entry surface.")
+                        "Pass a space-separated list of names.")
     parser.add_argument("-d", "--debug",
                         action="store",
                         default=0,
@@ -56,46 +53,91 @@ def argparser():
 if __name__ == "__main__":
 
     # Argparse options.
-    #
     # NB: Command line arguments are parsed before importing basf2, to avoid PyROOT hijacking them
     # in case of overlapping option names.
     args = argparser().parse_args()
 
     import basf2 as b2
     import modularAnalysis as ma
+    from variables import variables
+    import variables.utils as vu
+    import variables.collections as vc
 
     # Create path. Register necessary modules to this path.
     path = b2.create_path()
 
     # Add input data and ParticleLoader modules to the path.
-    ma.inputMdstList(filelist=[b2.find_file("mdst14.root", "validation")], path=path)
+    ma.inputMdst(filename=b2.find_file("mdst14.root", "validation"), path=path)
 
-    # Fill a particle list of charged stable particles.
-    # Apply (optionally) some quality selection.
-    plist_name = f"{args.std_charged}+:my_std_charged"
-    ma.fillParticleList(plist_name, "", path=path)
-    ma.applyCuts(plist_name, "abs(dr) < 2.0 and abs(dz) < 5.0 and p > 0.1", path=path)
+    # Fill a particle list of muons, with some quality selection.
+    base_trk_selection = "[dr < 3] and [abs(dz) < 5] and [thetaInCDCAcceptance] and [pt > 0.1]"
+    ma.fillParticleList("mu+:muons", f"{base_trk_selection} and [muonID > 0.5]", path=path)
 
-    # 3D distance (default).
-    ma.calculateTrackIsolation(plist_name,
-                               path,
-                               *args.detectors,
-                               alias="dist3DToClosestTrkAtSurface")
-    # 2D distance on rho-phi plane (chord length).
-    ma.calculateTrackIsolation(plist_name,
-                               path,
-                               *args.detectors,
-                               use2DRhoPhiDist=True,
-                               alias="dist2DRhoPhiToClosestTrkAtSurface")
+    # Fill a reference charged stable particle list to calculate the distances against.
+    # Generally, this list should have a very loose selection applied (if none at all).
+    ref = f"{args.std_charged_ref}+:presel"
+    ma.fillParticleList(ref, f"{base_trk_selection}", path=path)
 
-    # Aliases for NTuple variables.
-    ntup_vars = [f"dist3DToClosestTrkAtSurface{det}" for det in args.detectors]
-    ntup_vars += [f"dist2DRhoPhiToClosestTrkAtSurface{det}" for det in args.detectors]
+    trackiso_vars = ma.calculateTrackIsolation("mu+:muons",
+                                               path,
+                                               *args.detectors,
+                                               reference_list_name=ref,
+                                               highest_prob_mass_for_ext=False)
 
-    # Dump isolation variables in a ntuple.
-    ma.variablesToNtuple(plist_name,
-                         ntup_vars,
-                         treename=args.std_charged,
+    # Reconstruct the J/psi decay.
+
+    jpsimumu = "J/psi:mumu -> mu+:muons mu-:muons"
+    jpsi_cuts = [
+        "[2.8 < M < 3.3]",
+        "[daughterSumOf(charge) == 0]",
+    ]
+    jpsi_cut = " and ".join(jpsi_cuts)
+
+    ma.reconstructDecay(jpsimumu, jpsi_cut, path=path)
+
+    variables_jpsi = vc.kinematics + ["daughterDiffOfPhi(0, 1)"]
+    variables_jpsi += vu.create_aliases(variables_jpsi, "useCMSFrame({variable})", "CMS")
+    variables_jpsi += vc.inv_mass
+    variables_mu = vc.kinematics + ["theta", "phi", "clusterE"] + trackiso_vars + [
+        "inARICHAcceptance",
+        "inCDCAcceptance",
+        "inECLAcceptance",
+        "inKLMAcceptance",
+        "inTOPAcceptance",
+        "ptInBECLAcceptance",
+        "ptInBKLMAcceptance",
+        "ptInTOPAcceptance",
+        "thetaInARICHAcceptance",
+        "thetaInBECLAcceptance",
+        "thetaInBKLMAcceptance",
+        "thetaInCDCAcceptance",
+        "thetaInECLAcceptance",
+        "thetaInEECLAcceptance",
+        "thetaInEKLMAcceptance",
+        "thetaInKLMAcceptance",
+        "thetaInKLMOverlapAcceptance",
+        "thetaInTOPAcceptance"
+    ]
+
+    aliases_jpsimumu = vu.create_aliases_for_selected(
+        variables_jpsi,
+        "^J/psi:mumu -> mu+:muons mu-:muons",
+        prefix=["jpsi"])
+
+    aliases_mu = vu.create_aliases_for_selected(
+        variables_mu,
+        "J/psi:mumu -> ^mu+:muons ^mu-:muons",
+        use_names=True)
+
+    variables.addAlias("nReferenceTracks", f"nCleanedTracks({base_trk_selection})")
+    aliases_event = ["nReferenceTracks"]
+
+    variables.printAliases()
+
+    # Saving variables to ntuple
+    ma.variablesToNtuple(decayString="J/psi:mumu",
+                         variables=aliases_event+aliases_jpsimumu+aliases_mu,
+                         treename="jpsimumu",
                          filename="TrackIsolationVariables.root",
                          path=path)
 

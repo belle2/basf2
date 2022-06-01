@@ -459,6 +459,10 @@ namespace Belle2 {
     {
       return getHelixParameterPullAtIndex(part, 4);
     }
+    float SVDTrackTime(const Particle* part)
+    {
+      return  part->getTrack()->getTrackTime();
+    }
 
 
     VARIABLE_GROUP("Tracking");
@@ -748,5 +752,10 @@ there was a track in the event missed by the tracking, or the track finding was
 
 Returns NaN if there is no event-level tracking information available.
     )DOC");
+    REGISTER_VARIABLE("SVDTrackTime", SVDTrackTime, R"DOC(
+Returns the SVD Track Time, computed as the difference 
+between the average of the SVD clusters time associated to the track and the SVD event T0.
+Return NaN if SVD eventT0 is NaN, or if no SVD Hits are attached to the track.
+    )DOC", "ns");
   }
 }

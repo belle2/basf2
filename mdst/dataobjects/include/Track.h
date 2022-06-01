@@ -116,6 +116,18 @@ namespace Belle2 {
       return m_qualityIndicator;
     }
 
+    /** Set track time */
+    void setTrackTime(const float track_time)
+    {
+      m_trackTime = track_time;
+    }
+
+    /** Returns track time */
+    float getTrackTime() const
+    {
+      return m_trackTime;
+    }
+
     /** Return a short summary of this object's contents in HTML format. */
     virtual std::string getInfoHTML() const override;
 
@@ -135,6 +147,9 @@ namespace Belle2 {
      *  single precision is enough.
      */
     float const m_qualityIndicator;
+
+    /** Track time, computed as the difference between the average of SVD clusters time and the SVDEvent T0 */
+    float m_trackTime = std::numeric_limits<float>::quiet_NaN();
 
     ClassDefOverride(Track, 4); /**< Class that bundles various TrackFitResults. */
   };

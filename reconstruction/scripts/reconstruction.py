@@ -141,6 +141,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     add_postfilter_reconstruction(path,
                                   pruneTracks=pruneTracks,
                                   components=components)
+    path.add_module('trackTimeWriter')
 
     # Add the modules calculating the software trigger skims
     if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):

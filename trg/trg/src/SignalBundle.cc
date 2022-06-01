@@ -294,7 +294,7 @@ namespace Belle2 {
   }
 
   void
-  TRGSignalBundle::dumpCOE(const string& fnIn, int start , int stop) const
+  TRGSignalBundle::dumpCOE(const string& fnIn, int start, int stop) const
   {
 
     string fn = fnIn;

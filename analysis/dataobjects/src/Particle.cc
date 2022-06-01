@@ -1383,3 +1383,29 @@ bool Particle::isMostLikely() const
   if (likelihood) return likelihood->getMostLikely().getPDGCode() == std::abs(m_pdgCode);
   else return false;
 }
+
+std::pair<Const::ChargedStable, const TrackFitResult*> Particle::getMostLikelyTrackFitResult() const
+{
+
+  const auto track = this->getTrack();
+
+  if (!track) {
+    return std::make_pair(Const::ChargedStable(std::abs(this->getPDGCode())), nullptr);
+  }
+
+  // Find the track fit with the highest pValue
+  auto trackFitResults = track->getTrackFitResults();
+  auto it_maxPValue = std::max_element(std::begin(trackFitResults), std::end(trackFitResults),
+  [](auto tfrAndM1, auto tfrAndM2) {return tfrAndM1.second->getPValue() < tfrAndM2.second->getPValue();});
+
+  return trackFitResults[std::distance(std::begin(trackFitResults), it_maxPValue)];
+
+}
+
+bool Particle::isMostLikelyTrackFitResult() const
+{
+  const auto trackFit = this->getTrackFitResult();
+  if (!trackFit) return false;
+
+  return (trackFit == this->getMostLikelyTrackFitResult().second);
+}

@@ -44,7 +44,7 @@ CalibrationAlgorithm::EResult ARICHChannelMaskMaker::calibrate()
   for (int bin = 1; bin < numChannels; ++bin) {
     int moduleID = (bin - 1) / NumberOfChannelsPerHapd + 1;
     double nsig = hist->GetBinContent(bin, 2) + hist->GetBinContent(bin, 3) - hist->GetBinContent(bin, 1) - hist->GetBinContent(bin, 4);
-    double s2n = nsig  / (hist->GetBinContent(bin, 2) + hist->GetBinContent(bin, 3));
+    // double s2n = nsig  / (hist->GetBinContent(bin, 2) + hist->GetBinContent(bin, 3));
     int ring = getRing(moduleID);
     if (nsig / float(nevt) > 0.02) continue; // skip channels with anomalously high occupancy
     ringChnAvg[ring] += nsig;

@@ -19,7 +19,7 @@ namespace Belle2 {
   public:
     /** default constructor, initializing everything to 0. */
     CDCTriggerTrack(): Helix(), m_chi2D(0.), m_chi3D(0.), m_time(0), m_quadrant(-1), m_foundoldtrack(6, false), m_driftthreshold(9,
-          false), m_valstereobit(false) , m_expert(-1), m_tsvector(9, 0), m_qualityvector(0) { }
+          false), m_valstereobit(false), m_expert(-1), m_tsvector(9, 0), m_qualityvector(0) { }
 
     /** 2D constructor, initializing 3D values to 0.
      *  @param phi0      The angle between the transverse momentum and the x axis and in [-pi, pi].

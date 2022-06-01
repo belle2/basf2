@@ -26,11 +26,11 @@ const PXDDAQDHEStatus* PXDDAQStatus::findDHE(const VxdID& id) const
   return nullptr;
 }
 
-std::map <VxdID , bool> PXDDAQStatus::getUsable() const
+std::map <VxdID, bool> PXDDAQStatus::getUsable() const
 {
   // This function assumes that each DHE is only present ONCE
   // The check for that must be done before!
-  std::map <VxdID , bool> usemap;
+  std::map <VxdID, bool> usemap;
   for (auto& pkt : m_pxdPacket) {
     for (auto it_dhc = pkt.cbegin(); it_dhc != pkt.cend(); ++it_dhc) {
       for (auto it_dhe = it_dhc->cbegin(); it_dhe != it_dhc->cend(); ++it_dhe) {

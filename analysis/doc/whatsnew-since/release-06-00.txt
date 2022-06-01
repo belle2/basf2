@@ -70,12 +70,15 @@ Variables
    If no argument is given, it works same as before. Please note that brackets have to appended even if no argument is given i.e.
    ``nCompositeDaughters()``.
  * Added `nCompositeAllGenerationDaughters` which works similar with `nCompositeDaughters` but it includes all generations of daughters.
+ * Added optional argument to `helixExtTheta`, `helixExtPhi` to allow performing the extrapolation using the mass hypothesis that provides
+   the best track fit result, regardless of the particle object's PDG.
+ * Users can clear aliases by using ``variables.clearAliases()``, which is useful when processing several independent ``Path`` objects in a single basf2 session, e.g. b2luigi job submission.
 
 Modules
 +++++++
 
  * The :b2:mod:`TrackingMomentum` module has been extended. Now the module can scale and smear track momenta based on phase-space dependent
-   scaling and smearing factors which are read from payloads according to parameters ``payloadName``, ``scalingFactorName`` and ``scalingFactorName``. 
+   scaling and smearing factors which are read from payloads according to parameters ``payloadName``, ``scalingFactorName`` and ``scalingFactorName``.
    The corresponding wrapper functions `scaleTrackMomenta` and `smearTrackMomenta` have also been modified accordingly.
  * The :b2:mod:`HelixErrorScaler` has been extended to K_S0 that are reconstructed from V0. A new python function
    `stdV0s.scaleErrorKshorts` provides an alternative to the standard list ``K_S0:merged`` with a correction applied to the
@@ -101,6 +104,10 @@ Modules
    type as the ``input_list`` is used.
  * The :b2:mod:`TrackIsoCalculator` and :b2:mod:`ChargedPidMVA` modules now support decay string grammar, 
    which allows to run these modules on daughter or granddaughter particles.
+ * In the CDC volume, the calculation of track-to-closest-neighbour distance in the :b2:mod:`TrackIsoCalculator` module now is done for 9 surface layers (was only at the entry surface).
+   Also, the definition of distance has been changed to adapt to each sub-detector's geometrical segmentation.
+ * In the :b2:mod:`TrackIsoCalculator` module, added an option to calculate the distance using the track fit result of the most probable mass hypothesis for the particles in
+   the reference list.
 
 PID Priors
 ++++++++++
@@ -116,7 +123,7 @@ MC Truth Information
 ++++++++++++++++++++
 
  * The :b2:mod:`PrintMCParticles` and :b2:mod:`VariablesToNtuple` (:b2:mod:`VariablesToEventBasedTree`) are extended.
-   The MCParticles information printed by the :b2:mod:`PrintMCParticles` module can be stored in TTree via 
+   The MCParticles information printed by the :b2:mod:`PrintMCParticles` module can be stored in TTree via
    :b2:mod:`VariablesToNtuple` and :b2:mod:`VariablesToEventBasedTree`. When the :b2:mod:`PrintMCParticles`
    is called, the branch ``__MCDecayString__`` is automatically created and the same information that is printed
    by the :b2:mod:`PrintMCParticles`.

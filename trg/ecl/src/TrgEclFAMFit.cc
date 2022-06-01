@@ -73,8 +73,8 @@ TrgEclFAMFit::setup(int eventId)
   // prepare coefficient for fitting
   //
 
-  _DataBase -> getCoeffSigPDF(CoeffSigPDF0 ,  CoeffSigPDF1);
-  _DataBase -> getCoeffNoise(0,  CoeffNoise31 , CoeffNoise32, CoeffNoise33);
+  _DataBase -> getCoeffSigPDF(CoeffSigPDF0,  CoeffSigPDF1);
+  _DataBase -> getCoeffNoise(0,  CoeffNoise31, CoeffNoise32, CoeffNoise33);
 
   EventId = eventId;
   //

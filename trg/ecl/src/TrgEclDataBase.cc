@@ -238,7 +238,7 @@ double TrgEclDataBase::GetTCFLatency(int TCId)
 
 
 void
-TrgEclDataBase::getCoeffSigPDF(std::vector<std::vector<double>>& CoeffSigPDF0 , std::vector<std::vector<double>>&  CoeffSigPDF1)
+TrgEclDataBase::getCoeffSigPDF(std::vector<std::vector<double>>& CoeffSigPDF0, std::vector<std::vector<double>>&  CoeffSigPDF1)
 {
   //  double par_f0[20][12] ={
 
@@ -290,7 +290,7 @@ TrgEclDataBase::getCoeffSigPDF(std::vector<std::vector<double>>& CoeffSigPDF0 , 
   };
 }
 void
-TrgEclDataBase::getCoeffNoise(int TCId, std::vector<std::vector<double>>& CoeffNoise31 ,
+TrgEclDataBase::getCoeffNoise(int TCId, std::vector<std::vector<double>>& CoeffNoise31,
                               std::vector<std::vector<double>>&   CoeffNoise32, std::vector<std::vector<double>>&   CoeffNoise33)
 {
 

@@ -26,6 +26,8 @@ REG_MODULE(SVDEventT0Estimator);
 SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
 {
   setDescription("This module estimates the EventT0 as the average of cluster time of SVD clusters associated to tracks. The EventT0 is set to NaN if there are not RecoTracks or there are not SVD clusters associated to tracks or RecoTrack pt < ptMin OR RecoTrack pz < pzMin. The EventT0 estimated is added to the temporaryEventT0s to the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.");
+  setPropertyFlags(c_ParallelProcessingCertified);
+
   //* Definition of input parameters */
   addParam("RecoTracks", m_recoTracksName, "Name of the StoreArray with the input RecoTracks", string(""));
   addParam("EventT0", m_eventT0Name, "Name of the StoreObjPtr with the input EventT0", string(""));
@@ -46,13 +48,15 @@ void SVDEventT0EstimatorModule::initialize()
   B2DEBUG(20, "RecoTracks: " << m_recoTracksName);
   B2DEBUG(20, "EventT0: " << m_eventT0Name);
 
+  /** Register the data object */
+  m_eventT0.registerInDataStore();
   m_recoTracks.isRequired(m_recoTracksName);
-  m_eventT0.isRequired(m_eventT0Name);
 }
 
 
 void SVDEventT0EstimatorModule::event()
 {
+
   double evtT0 = NAN;
   double evtT0_err = NAN;
   double clsTime_sum = 0;
@@ -78,5 +82,8 @@ void SVDEventT0EstimatorModule::event()
     evtT0_err = std::sqrt(clsTime_err_sum / (N_cls * (N_cls - 1)));
   }
   EventT0::EventT0Component evtT0_comp(evtT0, evtT0_err, Const::SVD, m_algorithm, quality);
-  m_eventT0->addTemporaryEventT0(evtT0_comp);
+  if (m_eventT0.isValid()) {
+    m_eventT0->addTemporaryEventT0(evtT0_comp);
+    m_eventT0->setEventT0(evtT0_comp);
+  }
 }

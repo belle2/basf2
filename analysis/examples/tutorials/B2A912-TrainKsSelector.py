@@ -39,7 +39,9 @@ ksSelector.LambdaVeto_Training(
 )
 
 # apply mva to the training data
-basf2_mva.expert(basf2_mva.vector('MVAFastBDT_V0Selector.root'), basf2_mva.vector(
-    "KsSelector_train_V0Selector.root"), 'tree', 'MVAExpert_V0Selector.root')
-basf2_mva.expert(basf2_mva.vector('MVAFastBDT_LambdaVeto.root'), basf2_mva.vector(
-    "KsSelector_train_LambdaVeto.root"), 'tree', 'MVAExpert_LambdaVeto.root')
+basf2_mva.expert(basf2_mva.vector('MVAFastBDT_V0Selector.root'),
+                 basf2_mva.vector(b2.find_file('KsSelector_train_V0Selector.root', 'examples', False)),
+                 'tree', 'MVAExpert_V0Selector.root')
+basf2_mva.expert(basf2_mva.vector('MVAFastBDT_LambdaVeto.root'),
+                 basf2_mva.vector(b2.find_file('KsSelector_train_LambdaVeto.root', 'examples', False)),
+                 'tree', 'MVAExpert_LambdaVeto.root')

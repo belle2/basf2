@@ -182,6 +182,7 @@ def add_prefilter_reconstruction(path, components=None, add_modules_for_trigger_
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     """
 
+    # Always avoid the top-level 'import ROOT'.
     from ROOT import Belle2  # noqa
 
     # Check components.

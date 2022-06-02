@@ -74,6 +74,7 @@ def add_mdst_dump(path, print_untested=False):
             explicitly printed to make sure we don't miss addition of new members
     """
 
+    # Always avoid the top-level 'import ROOT'.
     from ROOT.Belle2 import Const  # noqa
 
     # prepare a list of PID detector sets and charged stable particles

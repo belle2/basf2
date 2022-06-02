@@ -149,6 +149,7 @@ def add_hlt_processing(path,
     Add all modules for processing on HLT filter machines
     """
 
+    # Always avoid the top-level 'import ROOT'.
     import ROOT  # noqa
 
     path.add_module('StatisticsSummary').set_name('Sum_Wait')

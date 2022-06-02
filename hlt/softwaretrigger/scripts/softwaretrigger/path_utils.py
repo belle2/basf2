@@ -240,6 +240,8 @@ def hlt_event_abort(module, condition, error_flag):
     Create a discard path suitable for HLT processing, i.e. set an error flag and
     keep only the metadata.
     """
+
+    # Always avoid the top-level 'import ROOT'.
     import ROOT  # noqa
 
     p = basf2.Path()

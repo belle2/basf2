@@ -10,7 +10,6 @@
 ##########################################################################
 
 from b2test_utils.datastoreprinter import DataStorePrinter, PrintObjectsModule
-from ROOT.Belle2 import Const
 
 
 MDST_OBJECTS = (
@@ -74,6 +73,8 @@ def add_mdst_dump(path, print_untested=False):
         print_untested (bool): If True print the names of all methods which are not
             explicitly printed to make sure we don't miss addition of new members
     """
+
+    from ROOT.Belle2 import Const  # noqa
 
     # prepare a list of PID detector sets and charged stable particles
     pid_detectors = [Const.PIDDetectorSet(Const.PIDDetectors.c_set[index]) for index in range(Const.PIDDetectors.c_size)]

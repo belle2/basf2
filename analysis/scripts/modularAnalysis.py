@@ -3554,7 +3554,6 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
         trackiso.set_name(f"TrackIsoCalculator{det}{suffix}")
 
     aliases = vu.create_aliases([f"distToClosestTrkAt{det}{suffix}" for det in det_labels], "extraInfo({variable})")
-    print(aliases)
     return aliases
 
 

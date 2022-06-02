@@ -175,7 +175,7 @@ void TrackIsoCalculatorModule::event()
 
     if (!iParticle->hasExtraInfo(m_extraInfoName)) {
       B2DEBUG(11, "Storing extraInfo(" << m_extraInfoName << ") for Particle[" << iPart << "]");
-      m_particles[iParticle->getArrayIndex()]->writeExtraInfo(m_extraInfoName, minDist);
+      m_particles[iParticle->getArrayIndex()]->addExtraInfo(m_extraInfoName, minDist);
 
     }
   }

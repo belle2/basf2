@@ -618,7 +618,8 @@ void SVDClusterizerModule::alterClusterPosition()
     else newPosition_v = newPosition;
     nIter += 1;
   } while (!aSensorInfo->inside(newPosition_u, newPosition_v)
-           && nIter < 6); //move the position if the cluster falls outside the active volume, but 5 times max
+           && nIter <
+           6); //move the position if the cluster falls outside the active volume, but 5 times max (probably useless with new payload, to be removed)
 
   m_storeClusters[clsIndex]->setPosition(newPosition);
 

@@ -267,6 +267,7 @@ def initialize(args, device=None):
         if args.random:
             net.random_init()
         net.kill_unused(args.only)
+        net.to(device=device)
         opt = optim.Adam(filter(lambda p: p.requires_grad, net.parameters()), lr=5e-4)
         epochs_0 = 0
         l_t = {"diag": [], "pion": [], "sum": []}

@@ -104,8 +104,9 @@ def make_h5(df, tags, out_filename, pdg=None, column=root_column):
 
         for det in DETECTORS:
             for p in PARTICLES:
-                col_name = column(p, det)
-                f.create_dataset(f"{det}/{p}", data=_get_all(col_name))
+                data = _get_all(column(p, det))
+                data[np.isnan(data)] = 0
+                f.create_dataset(f"{det}/{p}", data=data)
 
 
 def merge_h5s(filenames, out_filename, pdgs=None):
@@ -136,6 +137,8 @@ def merge_h5s(filenames, out_filename, pdgs=None):
                 [np.ones_like(f["pdg"][()]) * pdg for f, pdg in zip(fs, pdgs)]
             ),
         )
+    else:
+        m.create_dataset("pdg", data=np.concatenate([f["pdg"][()] for f in fs]))
 
     for f in fs:
         f.close()
@@ -214,7 +217,7 @@ def split_h5(
     (X_0, X, y_0, y, p_0, p, t_0, t) = train_test_split(
         X, y, p, t, train_size=train_size, **kw
     )
-    np.savez(join(output_dir, "train.npz"), X=X_0, y=y_0, p=p_0, t=t_0)
+    np.savez(join(output_dir, "train.npz"), X=X_0, y=y_0, p=p_0, theta=t_0)
 
     # split again if desired
     if test_size != 0:
@@ -223,11 +226,11 @@ def split_h5(
             X, y, p, t, train_size=size, **kw
         )
 
-        np.savez(join(output_dir, "val.npz"), X=X_1, y=y_1, p=p_1, t=t_1)
-        np.savez(join(output_dir, "test.npz"), X=X_2, y=y_2, p=p_2, t=t_2)
+        np.savez(join(output_dir, "val.npz"), X=X_1, y=y_1, p=p_1, theta=t_1)
+        np.savez(join(output_dir, "test.npz"), X=X_2, y=y_2, p=p_2, theta=t_2)
 
     else:
-        np.savez(join(output_dir, "val.npz"), X=X, y=y, p=p, t=t)
+        np.savez(join(output_dir, "val.npz"), X=X, y=y, p=p, theta=t)
 
 
 def softmax(x):
@@ -270,11 +273,11 @@ def make_labels(df):
     else:
         for i, p in enumerate(PDG_CODES):
             labels[labels == p] = i
-        labels[labels < 6] = -1
+        labels[labels >= 6] = -1
     df["labels"] = labels
 
 
-def make_bins(df, p_bins=P_BINS, theta_bins=THETA_BINS, cut_outside=True):
+def make_bins(df, p_bins=P_BINS, theta_bins=THETA_BINS):
     """Make 'p_bin' and 'theta_bin' column in the given DataFrame.
 
     Args:
@@ -284,23 +287,9 @@ def make_bins(df, p_bins=P_BINS, theta_bins=THETA_BINS, cut_outside=True):
         theta_bins (np.array): The edges of the theta bins in radians.
             Defaults to THETA_BINS, [17, 28, 40, 60, 77, 96, 115, 133, 150]
             degrees.
-        cut_outside (bool): Whether to cut particles that lie outside
-            of the bins. Defaults to True.
     """
     df["p_bin"] = np.digitize(df["p"].values, p_bins) - 1
     df["theta_bin"] = np.digitize(df["theta"].values, theta_bins) - 1
-
-    if cut_outside:
-        df = df.loc[
-            np.logical_and.reduce(
-                [
-                    df["p_bin"].values >= 0,
-                    df["p_bin"].values < len(p_bins),
-                    df["theta_bin"].values >= 0,
-                    df["theta_bin"].values < len(theta_bins),
-                ]
-            )
-        ]
 
 
 def make_lrs(df, column=_column):
@@ -488,7 +477,6 @@ def make_columns(
     df,
     p_bins=P_BINS,
     theta_bins=THETA_BINS,
-    cut_outside=True,
     contrib_corr=True,
     column=_column,
 ):
@@ -501,8 +489,6 @@ def make_columns(
         theta_bins (np.array): The edges of the theta bins in radians.
             Defaults to THETA_BINS, [17, 28, 40, 60, 77, 96, 115, 133, 150]
             degrees.
-        cut_outside (bool): Whether to cut particles that lie outside
-            of the bins. Defaults to True.
         contrib_corr (bool): Whether to compute contribution to the
             likelihood ratio of the _correct_ hypothesis (True) or the _chosen_
             hypothesis (False). Defaults to True.
@@ -512,7 +498,7 @@ def make_columns(
             format f"{detector}_{particle}".
     """
     make_labels(df)
-    make_bins(df, p_bins=p_bins, theta_bins=theta_bins, cut_outside=cut_outside)
+    make_bins(df, p_bins=p_bins, theta_bins=theta_bins)
     make_lrs(df, column=column)
     make_binary_lrs(df, column=column)
     make_pid(df)
@@ -624,6 +610,11 @@ def read_npz(filename):
     df["labels"] = data["y"]
     df["p"] = data["p"]
     df["theta"] = data["theta"]
+
+    df["pdg"] = df["labels"]
+    for i, pdg in enumerate(PDG_CODES):
+        df.loc[df["labels"] == i, "pdg"] = pdg
+
     return df
 
 
@@ -682,10 +673,21 @@ def prepare_df(
             df,
             p_bins=p_bins,
             theta_bins=theta_bins,
-            cut_outside=drop_outside_bins,
             contrib_corr=True,
         )
+        if drop_outside_bins:
+            df = df.loc[
+                np.logical_and.reduce(
+                    [
+                        df["p_bin"].values >= 0,
+                        df["p_bin"].values < len(p_bins) - 1,
+                        df["theta_bin"].values >= 0,
+                        df["theta_bin"].values < len(theta_bins) - 1,
+                    ]
+                )
+            ]
+
     if drop_nans:
-        df.dropna(inplace=True)
+        df = df.dropna()
         df = df[df["labels"] >= 0]
     return df

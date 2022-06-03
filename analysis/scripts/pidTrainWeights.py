@@ -146,8 +146,8 @@ def load_training_data(directory, p_lims=None, theta_lims=None, device=None):
         torch.Tensor: Validation log-likelihood data.
         torch.Tensor: Validation labels.
     """
-    p_lo, p_hi = p_lims if p_lims is not None else -np.inf, +np.inf
-    t_lo, t_hi = theta_lims if theta_lims is not None else -np.inf, +np.inf
+    p_lo, p_hi = p_lims if p_lims is not None else (-np.inf, +np.inf)
+    t_lo, t_hi = theta_lims if theta_lims is not None else (-np.inf, +np.inf)
     t_lo, t_hi = np.radians(t_lo), np.radians(t_hi)
 
     def _load(filename):
@@ -163,11 +163,13 @@ def load_training_data(directory, p_lims=None, theta_lims=None, device=None):
     return X_tr, y_tr, X_va, y_va
 
 
-def load_checkpoint(filename, only=None):
+def load_checkpoint(filename, device=None, only=None):
     """Loads training from a checkpoint.
 
     Args:
         filename (str): Checkpoint filename.
+        device (torch.device, optional): Device to move the data onto. Defaults
+            to None.
         only (list(str), optional): List of allowed particle types. Defaults to
             None.
 
@@ -188,6 +190,7 @@ def load_checkpoint(filename, only=None):
     net = WeightNet()
     net.load_state_dict(checkpoint["model_state_dict"])
     net.kill_unused(only)
+    net.to(device=device)
 
     opt = optim.Adam(filter(lambda p: p.requires_grad, net.parameters()), lr=5e-4)
     opt.load_state_dict(checkpoint["optimizer_state_dict"])
@@ -235,11 +238,13 @@ def save_checkpoint(filename, net, opt, epoch, loss_t, loss_v, accu_t, accu_v):
     )
 
 
-def initialize(args):
+def initialize(args, device=None):
     """Initializes training from the parsed command-line arguments.
 
     Args:
         args (argparse.Namespace): Parsed command-line arguments.
+        device (torch.device, optional): Device to move the data onto. Defaults
+            to None.
 
     Returns:
         WeightNet: The network.
@@ -255,7 +260,7 @@ def initialize(args):
             tenth epoch.
     """
     if args.resume is not None:
-        net, opt, epochs_0, l_t, l_v, a_t, a_v = load_checkpoint(args.resume, args.only)
+        net, opt, epochs_0, l_t, l_v, a_t, a_v = load_checkpoint(args.resume, device=device, only=args.only)
 
     else:
         net = WeightNet()
@@ -293,8 +298,7 @@ def train_model(args, use_tqdm=True):
     print(f"{len(y_tr)} train events, {len(y_va)} val events")
 
     print("Initializing network.")
-    net, opt, epochs_0, loss_t, loss_v, accu_t, accu_v = initialize(args)
-    net.to(device)
+    net, opt, epochs_0, loss_t, loss_v, accu_t, accu_v = initialize(args, device=device)
 
     diag_lfn = nn.CrossEntropyLoss()
     pion_lfn = nn.BCELoss()

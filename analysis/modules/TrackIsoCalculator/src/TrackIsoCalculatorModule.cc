@@ -26,7 +26,7 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
   // Parameter definitions
   addParam("decayString",
            m_decayString,
-           "A decay string with selected standard charged particle lists as daughters, e.g. `D0 -> ^K- pi+`. Alternatively, this can be simply the name of a standard charged particle list, e.g. `mu+`.");
+           "A decay string with selected standard charged particle lists as daughters, e.g. ``D0 -> ^K- pi+``. Alternatively, this can be simply the name of a standard charged particle list, e.g. ``mu+:all``.");
   addParam("particleListReference",
            m_pListReferenceName,
            "The name of the input ParticleList of reference tracks. Must be a charged stable particle as defined in Const::chargedStableSet.");

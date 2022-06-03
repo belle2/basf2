@@ -3464,7 +3464,7 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
     path.add_module(chargedpid)
 
 
-def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=None, highest_prob_mass_for_ext=False):
+def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=None, highest_prob_mass_for_ext=False):
     """
     Given a list of charged stable particles, compute variables that quantify "isolation" of the associated tracks.
 
@@ -3521,14 +3521,14 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
 
     from ROOT import Belle2
     decayDescriptor = Belle2.DecayDescriptor()
-    if not decayDescriptor.init(list_name):
-        raise ValueError(f"Invalid particle list {list_name} in calculateTrackIsolation!")
+    if not decayDescriptor.init(decay_string):
+        raise ValueError(f"Invalid particle list {decay_string} in calculateTrackIsolation!")
     if not reference_list_name:
         daughter_pdgs = decayDescriptor.getSelectionPDGCodes()
         if len(daughter_pdgs) > 0:
             reference_list_name = 'pi-:all'
         else:
-            reference_list_name = f'{list_name.split(":")[0]}:all'
+            reference_list_name = f'{decay_string.split(":")[0]}:all'
     import variables.utils as vu
 
     det_choices = ["CDC", "TOP", "ARICH", "ECL", "KLM"]
@@ -3545,13 +3545,26 @@ def calculateTrackIsolation(list_name, path, *detectors, reference_list_name=Non
             det_labels.append(f"{det}0")
 
     suffix = f"_VS_{reference_list_name}"
-    for det in det_labels:
-        trackiso = path.add_module("TrackIsoCalculator",
-                                   particleList=list_name,
-                                   detectorSurface=det,
-                                   particleListReference=reference_list_name,
-                                   useHighestProbMassForExt=highest_prob_mass_for_ext)
-        trackiso.set_name(f"TrackIsoCalculator{det}{suffix}")
+    # The module allows only one daughter to be selected,
+    # that's why here we preprocess the input decay string:
+    select_symbol = '^'
+    processed_decay_strings = []
+    if select_symbol in decay_string:
+        splitted_ds = decay_string.split(select_symbol)
+        for i in range(decay_string.count(select_symbol)):
+            tmp = list(splitted_ds)
+            tmp.insert(i+1, select_symbol)
+            processed_decay_strings += [''.join(tmp)]
+    else:
+        processed_decay_strings += [decay_string]
+    for processed_dec in processed_decay_strings:
+        for det in det_labels:
+            trackiso = path.add_module("TrackIsoCalculator",
+                                       decayString=processed_dec,
+                                       detectorSurface=det,
+                                       particleListReference=reference_list_name,
+                                       useHighestProbMassForExt=highest_prob_mass_for_ext)
+            trackiso.set_name(f"TrackIsoCalculator{det}{suffix}{processed_dec}")
 
     aliases = vu.create_aliases([f"distToClosestTrkAt{det}{suffix}" for det in det_labels], "extraInfo({variable})")
     return aliases

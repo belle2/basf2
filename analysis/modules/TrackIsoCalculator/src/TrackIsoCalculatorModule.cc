@@ -24,9 +24,9 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
   setDescription(R"DOC(Calculate track isolation variables on the input ParticleList.)DOC");
 
   // Parameter definitions
-  addParam("particleList",
+  addParam("decayString",
            m_decayString,
-           "A decay string that has a full ParticleList name as mother particle. If no daughters selected, must be a charged stable particle as defined in Const::chargedStableSet.");
+           "A decay string with selected standard charged particle lists as daughters, e.g. `D0 -> ^K- pi+`. Alternatively, this can be simply the name of a standard charged particle list, e.g. `mu+`.");
   addParam("particleListReference",
            m_pListReferenceName,
            "The name of the input ParticleList of reference tracks. Must be a charged stable particle as defined in Const::chargedStableSet.");
@@ -53,14 +53,16 @@ void TrackIsoCalculatorModule::initialize()
   m_targetListName = mother->getFullName();
   m_targetList.isRequired(m_targetListName);
   m_nSelectedDaughters = m_decaydescriptor.getSelectionNames().size();
+  if (m_nSelectedDaughters > 1)
+    B2ERROR("TrackIsoCalculatorModule::initialize Only one selected daughter is allows in " << m_decayString);
 
   m_pListReference.isRequired(m_pListReferenceName);
 
-  B2INFO("Calculating isolation variables at " << m_detSurface << " surface for ParticleList: "
-         << m_targetListName << ", " << "reference ParticleList: " << m_pListReferenceName << ".");
+  B2INFO("Calculating isolation variables at " << m_detSurface << " surface for decayString: "
+         << m_decayString << ", " << "reference ParticleList: " << m_pListReferenceName << ".");
 
-  if (!isStdChargedList()) {
-    B2FATAL("ParticleList: " << m_targetListName << " and/or ParticleList: " << m_pListReferenceName <<
+  if (!onlySelectedStdChargedInDecay()) {
+    B2FATAL("ParticleList: " << m_decayString << " and/or ParticleList: " << m_pListReferenceName <<
             " is not that of a valid particle in Const::chargedStableSet! Aborting...");
   }
 
@@ -84,20 +86,22 @@ void TrackIsoCalculatorModule::event()
   B2DEBUG(12, "Start processing EVENT: " << m_event_metadata->getEvent());
 
   const auto nParticles = m_targetList->getListSize();
-
   const auto nParticlesReference = m_pListReference->getListSize();
-  const auto nTargetParticles = (m_nSelectedDaughters == 0) ? nParticles : nParticles * m_nSelectedDaughters;
+
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n" << "nParticles: " << nParticles << "\n"
           << "nParticlesReference: " << nParticlesReference);
   // Fill temporary vector of particles in case of selected daughters:
   std::vector<const Particle*> targetParticles;
-  if (m_nSelectedDaughters > 0) {
-    for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
-      auto* iParticle = m_targetList->getParticle(iPart);
+  targetParticles.reserve(nParticles);
+  for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
+    auto* iParticle = m_targetList->getParticle(iPart);
+    if (m_nSelectedDaughters > 0) {
       auto daughters = m_decaydescriptor.getSelectionParticles(iParticle);
       for (auto* iDaughter : daughters) {
         targetParticles.push_back(iDaughter);
       }
+    } else {
+      targetParticles.push_back(iParticle);
     }
   }
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n"
@@ -111,9 +115,11 @@ void TrackIsoCalculatorModule::event()
   // where the keys are pairs of mdst indexes.
   std::map<std::pair<unsigned int, unsigned int>, double> particleMdstIdxPairsToDist;
 
-  for (unsigned int iPart(0); iPart < nTargetParticles; ++iPart) {
-
-    const Particle* iParticle = (m_nSelectedDaughters > 0) ? targetParticles[iPart] : m_targetList->getParticle(iPart);
+  for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
+    const Particle* iParticle =  targetParticles[iPart];
+    // Check if the extra info has been set already
+    if (iParticle->hasExtraInfo(m_extraInfoName))
+      continue;
 
     auto iMdstIdx = iParticle->getMdstArrayIndex();
 
@@ -149,9 +155,12 @@ void TrackIsoCalculatorModule::event()
   }
 
   // For each particle in the input list, find the minimum among all distances to the reference particles.
-  for (unsigned int iPart(0); iPart < nTargetParticles; ++iPart) {
+  for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
+    const Particle* iParticle = targetParticles[iPart];
+    // Check if the extra info has been set already
+    if (iParticle->hasExtraInfo(m_extraInfoName))
+      continue;
 
-    const Particle* iParticle = (m_nSelectedDaughters > 0) ? targetParticles[iPart] : m_targetList->getParticle(iPart);
 
     auto iMdstIdx = iParticle->getMdstArrayIndex();
 
@@ -173,11 +182,10 @@ void TrackIsoCalculatorModule::event()
     B2DEBUG(10, "Particle[" << iPart << "]'s (PDG=" << iParticle->getPDGCode() << ") closest partner at innermost " <<
             m_detSurface << " surface is found at D = " << minDist << " [cm]");
 
-    if (!iParticle->hasExtraInfo(m_extraInfoName)) {
-      B2DEBUG(11, "Storing extraInfo(" << m_extraInfoName << ") for Particle[" << iPart << "]");
-      m_particles[iParticle->getArrayIndex()]->addExtraInfo(m_extraInfoName, minDist);
+    B2DEBUG(11, "Storing extraInfo(" << m_extraInfoName << ") for Particle[" << iPart << "]");
+    m_particles[iParticle->getArrayIndex()]->addExtraInfo(m_extraInfoName, minDist);
 
-    }
+
   }
 
   B2DEBUG(12, "Finished processing EVENT: " << m_event_metadata->getEvent());
@@ -285,7 +293,7 @@ double TrackIsoCalculatorModule::getDistAtDetSurface(const Particle* iParticle, 
   return std::numeric_limits<double>::quiet_NaN();
 }
 
-bool TrackIsoCalculatorModule::isStdChargedList()
+bool TrackIsoCalculatorModule::onlySelectedStdChargedInDecay()
 {
 
   bool checkPList = false;
@@ -294,7 +302,8 @@ bool TrackIsoCalculatorModule::isStdChargedList()
   else
     for (int pdgcode : m_decaydescriptor.getSelectionPDGCodes()) {
       checkPList = Const::chargedStableSet.find(abs(pdgcode)) != Const::invalidParticle;
-      if (!checkPList) break;
+      if (!checkPList)
+        break;
     }
   DecayDescriptor dd;
   bool checkPListReference = false;

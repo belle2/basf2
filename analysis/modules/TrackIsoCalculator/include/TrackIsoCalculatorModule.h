@@ -102,7 +102,7 @@ namespace Belle2 {
      */
     std::string m_decayString;
     /**
-     * The name of the input ParticleList.
+     * The name of the input charged stable particle list, or composite particle w/ charged stable daughters for which distances are to be calculated.
      */
     std::string m_targetListName;
     /**
@@ -183,7 +183,7 @@ namespace Belle2 {
     /**
      * Check whether input particle list and reference list are of a valid charged stable particle.
      */
-    bool isStdChargedList();
+    bool onlySelectedStdChargedInDecay();
 
   };
 }

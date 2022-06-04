@@ -14,6 +14,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysisPXDCM.h>
 #include <TROOT.h>
 #include <TLatex.h>
+#include <TPaveText.h>
 #include <vxd/geometry/GeoCache.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
@@ -186,8 +187,13 @@ void DQMHistAnalysisPXDCMModule::event()
   if (!m_cCommonMode) return;
   m_hCommonMode->Reset(); // dont sum up!!!
 
+  auto leg = new TPaveText(0.1, 0.6, 0.90, 0.95, "NDC");
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    std::string name = "PXDDAQCM_" + (std::string)m_PXDModules[i ];
+    auto modname = (std::string)m_PXDModules[i];
+    std::string name = "PXDDAQCM_" + modname;
     // std::replace( name.begin(), name.end(), '.', '_');
 
     TH1* hh1 = findHist(name);
@@ -255,6 +261,7 @@ void DQMHistAnalysisPXDCMModule::event()
         Double_t mean_adhoc = 0.;
         Double_t entries_adhoc = 0.;
         Double_t outside_adhoc = 0.;
+
         // Attention, Bins
         // we do not need to re-scale it as the scale is the same for all bins
         for (int cm_y = 0; cm_y < m_upperLineAdhoc; cm_y++) {
@@ -263,21 +270,39 @@ void DQMHistAnalysisPXDCMModule::event()
           mean_adhoc += v * (cm_y + 1);
         }
         // Attention, Bins
-        for (int cm_y = m_upperLineAdhoc; cm_y < 64; cm_y++) {
+        // We ignore CM63 in outside and overall count
+        for (int cm_y = m_upperLineAdhoc; cm_y < 63; cm_y++) {
           auto v = m_hCommonModeDelta->GetBinContent(m_hCommonModeDelta->GetBin(i + 1, cm_y + 1));
           entries_adhoc += v;
           outside_adhoc += v;
         }
-        if (entries_adhoc > 0) { // ignore 1.3.2
+        if (entries_adhoc > 0 && scale < 1e-3) { // ignore 1.3.2 and minimum events
+          // scale <1e-3 == >1000 events
           mean_adhoc /= entries_adhoc; // calculate mean
-          // scale <1e-3 == >1000 entries
-          warn_adhoc_flag |= scale < 1e-3 && (fabs(10.0 - mean_adhoc) > m_warnMeanAdhoc || outside_adhoc > m_warnOutsideAdhoc);
-          error_adhoc_flag |= scale < 1e-3 && (fabs(10.0 - mean_adhoc) > m_errorMeanAdhoc || outside_adhoc > m_errorOutsideAdhoc);
-          m_monObj->setVariable(("cm_" + (std::string)m_PXDModules[i]).c_str(), mean_adhoc);
+          auto warn_tmp_m = fabs(10.0 - mean_adhoc) > m_warnMeanAdhoc;
+          auto err_tmp_m = fabs(10.0 - mean_adhoc) > m_errorMeanAdhoc;
+          auto warn_tmp_os = outside_adhoc / entries_adhoc > m_warnOutsideAdhoc;
+          auto err_tmp_os = outside_adhoc / entries_adhoc > m_errorOutsideAdhoc;
+          warn_adhoc_flag |= warn_tmp_m || warn_tmp_os;
+          error_adhoc_flag |= err_tmp_m || err_tmp_os;
+
+          if (warn_tmp_m || err_tmp_m) {
+            TString tmp;
+            tmp.Form("%s: Mean %f", modname.c_str(), mean_adhoc);
+            leg->AddText(tmp);
+            B2INFO(name << " Mean " <<  mean_adhoc << " " << warn_tmp_m << err_tmp_m);
+          }
+          if (warn_tmp_os || err_tmp_os) {
+            TString tmp;
+            tmp.Form("%s: Outside %f %%", modname.c_str(), 100. * outside_adhoc / entries_adhoc);
+            leg->AddText(tmp);
+            B2INFO(name << " Outside " << outside_adhoc / entries_adhoc << " (" << outside_adhoc << "/" << entries_adhoc << ") " << warn_tmp_os
+                   << err_tmp_os);
+          }
+          m_monObj->setVariable(("cm_" + modname).c_str(), mean_adhoc);
 #ifdef _BELLE2_EPICS
           if (m_useEpics) {
             auto my = mychid_mean[m_PXDModules[i]];
-            // B2ERROR("Mean "<< name << " " << mean_adhoc << " " << outside_adhoc << " " << entries_adhoc << " " <<warn_adhoc_flag <<error_adhoc_flag );
             if (my) SEVCHK(ca_put(DBR_DOUBLE, my, (void*)&mean_adhoc), "ca_set failure");
           }
 #endif
@@ -302,6 +327,7 @@ void DQMHistAnalysisPXDCMModule::event()
         m_cCommonMode->Pad()->SetFillColor(kYellow);// Yellow
         status = 3;
       } else if (all_outside == 0. /*&& all_cm == 0.*/) {
+        // do not react on all_cm, we better monitor it elsewhere for clearity
         m_cCommonMode->Pad()->SetFillColor(kGreen);// Green
         status = 2;
       } else { // between 0 and 50 ...
@@ -354,6 +380,7 @@ void DQMHistAnalysisPXDCMModule::event()
 #endif
     if (m_hCommonModeDelta) {
       m_hCommonModeDelta->Draw("colz");
+      leg->Draw();
       m_line1->Draw();
       m_lineA->Draw();
     }

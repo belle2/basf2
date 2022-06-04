@@ -38,7 +38,7 @@
 #include <cdc/dbobjects/CDCEDepToADCConversions.h>
 #include <cdc/dbobjects/CDCWireHitRequirements.h>
 #include <cdc/dbobjects/CDCCrossTalkLibrary.h>
-
+#include <cdc/dbobjects/CDClayerTimeCut.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <TFile.h>
 #include <TTreeReader.h>
@@ -1113,6 +1113,39 @@ void CDCDatabaseImporter::testCDCCrossTalkLibrary(bool spotChecks) const
   } else {
     B2ERROR("DBObjPtr<CDCCrossTalkLibrary> not valid for the current run.");
   }
+}
+
+
+void CDCDatabaseImporter::importCDClayerTimeCut(const std::string& jsonFileName) const
+{
+  // Create a property tree
+  boost::property_tree::ptree tree;
+  try {
+    // Load the json file in this property tree.
+    B2INFO("Loading json file: " << jsonFileName);
+    boost::property_tree::read_json(jsonFileName, tree);
+  } catch (boost::property_tree::ptree_error& e) {
+    B2FATAL("Error when loading json file: " << e.what());
+  }
+
+  DBImportObjPtr<CDClayerTimeCut> dbCDClayerTimeCut;
+  dbCDClayerTimeCut.construct(tree);
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  dbCDClayerTimeCut.import(iov);
+  B2RESULT("dbCDClayerTimeCut imported to database.");
+}
+
+void CDCDatabaseImporter::printCDClayerTimeCut() const
+{
+  DBObjPtr<CDClayerTimeCut> dbCDClayerTimeCut;
+  if (dbCDClayerTimeCut.isValid()) {
+    dbCDClayerTimeCut->dump();
+  } else {
+    B2WARNING("DBObjPtr<CDClayerTimeCut> not valid for the current run.");
+  }
+
 }
 
 

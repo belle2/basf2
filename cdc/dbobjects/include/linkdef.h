@@ -43,7 +43,7 @@
 
 #pragma link C++ class Belle2::asicChannel+; // checksum=0x7a22a583, implicit, version=-1
 #pragma link C++ class Belle2::adcAsicTuple+; // checksum=0x953c3230, implicit, version=-1
-
+#pragma link C++ class Belle2::CDClayerTimeCut+; // checksum=0x6821631B, version=1
 
 #pragma link C++ class std::map <unsigned short, float>+; // checksum=0x868d8139, version=6
 #pragma link C++ class std::vector<float>+; // checksum=0x55a169b, version=6

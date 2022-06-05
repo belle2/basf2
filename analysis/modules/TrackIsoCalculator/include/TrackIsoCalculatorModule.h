@@ -171,10 +171,10 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> m_pListReference;
 
     /**
-     * If this option is set, the helix extrapolation for the particles in the reference list will use the track fit result
+     * If this option is set, the helix extrapolation for the target and reference particles will use the track fit result
      *  for the most probable mass hypothesis, namely, the one that gives the highest chi2Prob of the fit.
      */
-    bool m_useHighestProbMass;
+    bool m_useHighestProbMassForExt;
 
     /**
      * Calculate the distance between the points where the two input

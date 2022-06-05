@@ -21,7 +21,8 @@ REG_MODULE(TrackIsoCalculator);
 TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
 {
   // Set module properties
-  setDescription(R"DOC(Calculate track isolation variables on the input ParticleList.)DOC");
+  setDescription(
+    R"DOC(Calculate track isolation variables on the charged stable particles, or selected charged daughters, of the input ParticleList.)DOC");
 
   // Parameter definitions
   addParam("decayString",
@@ -32,10 +33,10 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
            "The name of the input ParticleList of reference tracks. Must be a charged stable particle as defined in Const::chargedStableSet.");
   addParam("detectorSurface",
            m_detSurface,
-           "The name of the detector at whose inner (cylindrical) surface we extrapolate each helix's polar and azimuthal angle. Allowed values: {CDC, TOP, ARICH, ECL, KLM}.");
+           "The name of the detector at whose (cylindrical) surface(s) we extrapolate each helix's polar and azimuthal angle. Allowed values: {CDC, TOP, ARICH, ECL, KLM}.");
   addParam("useHighestProbMassForExt",
-           m_useHighestProbMass,
-           "If this option is set, the helix extrapolation for the particles will use the track fit result for the most probable mass hypothesis, namely, the one that gives the highest chi2Prob of the fit.",
+           m_useHighestProbMassForExt,
+           "If this option is set, the helix extrapolation for the target and reference particles will use the track fit result for the most probable mass hypothesis, namely, the one that gives the highest chi2Prob of the fit.",
            bool(false));
 }
 
@@ -58,12 +59,12 @@ void TrackIsoCalculatorModule::initialize()
   m_nSelectedDaughters = m_decaydescriptor.getSelectionNames().size();
 
   if (m_nSelectedDaughters > 1) {
-    B2ERROR("Only one *selected* daughter is allowed in " << m_decayString);
+    B2ERROR("Only one *selected* charged stable daughter is allowed in DecayString: " << m_decayString);
   }
 
   m_pListReference.isRequired(m_pListReferenceName);
 
-  B2INFO("Calculating isolation variables at " << m_detSurface << " surface for decayString: "
+  B2INFO("Calculating track-based isolation variables at " << m_detSurface << " surface for DecayString: "
          << m_decayString << ", " << "reference ParticleList: " << m_pListReferenceName << ".");
 
   if (!onlySelectedStdChargedInDecay()) {
@@ -71,12 +72,15 @@ void TrackIsoCalculatorModule::initialize()
             " is not that of a valid particle in Const::chargedStableSet! Aborting...");
   }
 
-  if (m_useHighestProbMass) {
+  if (m_useHighestProbMassForExt) {
     B2INFO("Will use track fit result for the most probable mass hypothesis in helix extrapolation.");
   }
 
   // Define the name of the variable to be stored as extraInfo.
   m_extraInfoName = "distToClosestTrkAt" + m_detSurface + "_VS_" + m_pListReferenceName;
+  if (m_useHighestProbMassForExt) {
+    m_extraInfoName += "__useHighestProbMassForExt";
+  }
 
   m_isSurfaceInDet.insert({"CDC", m_detSurface.find("CDC") != std::string::npos});
   m_isSurfaceInDet.insert({"TOP", m_detSurface.find("TOP") != std::string::npos});
@@ -87,31 +91,42 @@ void TrackIsoCalculatorModule::initialize()
 
 void TrackIsoCalculatorModule::event()
 {
+  B2DEBUG(11, "Start processing EVENT: " << m_event_metadata->getEvent());
 
-  B2DEBUG(12, "Start processing EVENT: " << m_event_metadata->getEvent());
+  const auto nMotherParticles = m_pListTarget->getListSize();
 
-  const auto nParticles = m_pListTarget->getListSize();
-  const auto nParticlesReference = m_pListReference->getListSize();
+  // Fill transient container of all selected charged particles in the decay
+  // for which the distance to nearest neighbour is to be calculated.
+  // If the input ParticleList is that of standard charged particles, just copy
+  // the whole list over, otherwise loop over the selected charged daughters.
+  std::unordered_map<unsigned int, const Particle*> targetParticles;
+  targetParticles.reserve(nMotherParticles);
 
-  B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n" << "nParticles: " << nParticles << "\n"
-          << "nParticlesReference: " << nParticlesReference);
-  // Fill temporary vector of particles in case of selected daughters:
-  std::vector<const Particle*> targetParticles;
-  targetParticles.reserve(nParticles);
-  for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
-    auto* iParticle = m_pListTarget->getParticle(iPart);
-    if (m_nSelectedDaughters > 0) {
-      auto daughters = m_decaydescriptor.getSelectionParticles(iParticle);
-      for (auto* iDaughter : daughters) {
-        targetParticles.push_back(iDaughter);
+  for (unsigned int iPart(0); iPart < nMotherParticles; ++iPart) {
+
+    auto iParticle = m_pListTarget->getParticle(iPart);
+
+    // Check if the distance for this target particle has been set already,
+    // e.g. by a previous instance of this module.
+    if (iParticle->hasExtraInfo(m_extraInfoName)) {
+      continue;
+    }
+
+    if (m_nSelectedDaughters) {
+      for (auto* iDaughter : m_decaydescriptor.getSelectionParticles(iParticle)) {
+        targetParticles.insert({iDaughter->getMdstArrayIndex(), iDaughter});
       }
     } else {
-      targetParticles.push_back(iParticle);
+      targetParticles.insert({iParticle->getMdstArrayIndex(), iParticle});
     }
   }
-  B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n"
-          << "Detector surface: " << m_detSurface << "\n"
-          << "nParticles: " << nParticles << "\n"
+
+  const auto nParticlesTarget = targetParticles.size();
+  const auto nParticlesReference = m_pListReference->getListSize();
+
+  B2DEBUG(11, "Detector surface: " << m_detSurface << "\n"
+          << "nMotherParticles: " << nMotherParticles << "\n"
+          << "nParticlesTarget: " << nParticlesTarget << "\n"
           << "nParticlesReference: " << nParticlesReference);
 
   double dummyDist(-1.0);
@@ -120,18 +135,11 @@ void TrackIsoCalculatorModule::event()
   // where the keys are pairs of mdst indexes.
   std::map<std::pair<unsigned int, unsigned int>, double> particleMdstIdxPairsToDist;
 
-  for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
-    const Particle* iParticle =  targetParticles[iPart];
-    // Check if the extra info has been set already
-    if (iParticle->hasExtraInfo(m_extraInfoName))
-      continue;
-
-    auto iMdstIdx = iParticle->getMdstArrayIndex();
+  for (const auto& [iMdstIdx, iParticle] : targetParticles) {
 
     for (unsigned int jPart(0); jPart < nParticlesReference; ++jPart) {
 
-      Particle* jParticle = m_pListReference->getParticle(jPart);
-
+      auto jParticle = m_pListReference->getParticle(jPart);
       auto jMdstIdx = jParticle->getMdstArrayIndex();
 
       auto partMdstIdxPair = std::make_pair(iMdstIdx, jMdstIdx);
@@ -146,9 +154,8 @@ void TrackIsoCalculatorModule::event()
       // - the mass hypothesis of the best fit is used, OR
       // - the mass hypothesis of the 'default' fit of the two particles is the same,
       //
-      // avoid re-doing the calculation,
-      // by searching the existence of a pair with the flipped mdst indexes in the map.
-      if (m_useHighestProbMass || (iParticle->getPDGCodeUsedForFit() == jParticle->getPDGCodeUsedForFit())) {
+      // avoid re-doing the calculation if a pair with the flipped mdst indexes in the map already exists.
+      if (m_useHighestProbMassForExt || (iParticle->getPDGCodeUsedForFit() == jParticle->getPDGCodeUsedForFit())) {
         if (particleMdstIdxPairsToDist.count({jMdstIdx, iMdstIdx})) {
           particleMdstIdxPairsToDist[partMdstIdxPair] = particleMdstIdxPairsToDist[ {jMdstIdx, iMdstIdx}];
           continue;
@@ -160,14 +167,7 @@ void TrackIsoCalculatorModule::event()
   }
 
   // For each particle in the input list, find the minimum among all distances to the reference particles.
-  for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
-    const Particle* iParticle = targetParticles[iPart];
-    // Check if the extra info has been set already
-    if (iParticle->hasExtraInfo(m_extraInfoName))
-      continue;
-
-
-    auto iMdstIdx = iParticle->getMdstArrayIndex();
+  for (const auto& [iMdstIdx, iParticle] : targetParticles) {
 
     std::vector<double> iDistances;
     for (const auto& [mdstIdxs, dist] : particleMdstIdxPairsToDist) {
@@ -184,16 +184,17 @@ void TrackIsoCalculatorModule::event()
 
     const auto minDist = *std::min_element(std::begin(iDistances), std::end(iDistances));
 
-    B2DEBUG(10, "Particle[" << iPart << "]'s (PDG=" << iParticle->getPDGCode() << ") closest partner at innermost " <<
-            m_detSurface << " surface is found at D = " << minDist << " [cm]");
+    B2DEBUG(10, "Particle w/ mdstIndex[" << iMdstIdx << "] (PDG = "
+            << iParticle->getPDGCode() << "). Closest charged partner at "
+            << m_detSurface << " surface is found at D = " << minDist << " [cm]"
+            << "\n"
+            << "Storing ExtraInfo w/ name: " << m_extraInfoName);
 
-    B2DEBUG(11, "Storing extraInfo(" << m_extraInfoName << ") for Particle[" << iPart << "]");
     m_particles[iParticle->getArrayIndex()]->addExtraInfo(m_extraInfoName, minDist);
-
 
   }
 
-  B2DEBUG(12, "Finished processing EVENT: " << m_event_metadata->getEvent());
+  B2DEBUG(11, "Finished processing EVENT: " << m_event_metadata->getEvent());
 }
 
 void TrackIsoCalculatorModule::terminate()
@@ -214,14 +215,14 @@ double TrackIsoCalculatorModule::getDistAtDetSurface(const Particle* iParticle, 
   const auto th_bwd = m_detSurfBoundaries[m_detSurface].m_th_bwd;
 
   std::string nameExtTheta = "helixExtTheta(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
-  if (m_useHighestProbMass) {
+  if (m_useHighestProbMassForExt) {
     nameExtTheta.replace(nameExtTheta.size() - 1, 1, ", 1)");
   }
   const auto iExtTheta = std::get<double>(Variable::Manager::Instance().getVariable(nameExtTheta)->function(iParticle));
   const auto jExtTheta = std::get<double>(Variable::Manager::Instance().getVariable(nameExtTheta)->function(jParticle));
 
   std::string nameExtPhi = "helixExtPhi(" + std::to_string(rho) + "," + std::to_string(zfwd) + "," + std::to_string(zbwd) + ")";
-  if (m_useHighestProbMass) {
+  if (m_useHighestProbMassForExt) {
     nameExtPhi.replace(nameExtPhi.size() - 1, 1, ", 1)");
   }
   const auto iExtPhi = std::get<double>(Variable::Manager::Instance().getVariable(nameExtPhi)->function(iParticle));
@@ -302,18 +303,23 @@ bool TrackIsoCalculatorModule::onlySelectedStdChargedInDecay()
 {
 
   bool checkPList = false;
-  if (m_nSelectedDaughters == 0)
+
+  if (!m_nSelectedDaughters) {
     checkPList = Const::chargedStableSet.find(abs(m_decaydescriptor.getMother()->getPDGCode())) != Const::invalidParticle;
-  else
+  } else {
     for (int pdgcode : m_decaydescriptor.getSelectionPDGCodes()) {
       checkPList = Const::chargedStableSet.find(abs(pdgcode)) != Const::invalidParticle;
-      if (!checkPList)
+      if (!checkPList) {
         break;
+      }
     }
+  }
+
   DecayDescriptor dd;
   bool checkPListReference = false;
-  if (dd.init(m_pListReferenceName))
+  if (dd.init(m_pListReferenceName)) {
     checkPListReference = Const::chargedStableSet.find(abs(dd.getMother()->getPDGCode())) != Const::invalidParticle;
+  }
 
   return (checkPList and checkPListReference);
 };

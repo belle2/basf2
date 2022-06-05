@@ -3466,7 +3466,8 @@ def applyChargedPidMVA(particleLists, path, trainingMode, chargeIndependent=Fals
 
 def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=None, highest_prob_mass_for_ext=False):
     """
-    Given a list of charged stable particles, compute variables that quantify "isolation" of the associated tracks.
+    Given an input decay string, compute variables that quantify track-based "isolation" of the charged
+    stable particles in the decay chain.
 
     Note:
         Currently, a proxy for isolation is defined as the distance
@@ -3496,19 +3497,18 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
            Only one distance at the KLM first strip entry radius R (barrel), Z (endcaps) is calculated.
 
     Parameters:
-        list_name (str): name of the input ParticleList or a decay string with selected daughters with full list name,
-                         for example: Lambda0:merged -> ^p+ ^pi-.
-                         If no daughters selected, a list must belong to charged stable particles
-                         as defined in ``Const::chargedStableSet``.
-                         The charge-conjugate ParticleList will be also processed automatically.
-        path (basf2.Path): the module is added to this path.
+        decay_string (str): name of the input decay string with selected charged stable daughters,
+                            for example: ``Lambda0:merged -> ^p+ ^pi-``.
+                            Alternatively, it can be a particle list for charged stable particles
+                            as defined in ``Const::chargedStableSet``, for example: ``mu+:all``.
+                            The charge-conjugate particle list will be also processed automatically.
+        path (basf2.Path): path to which module(s) will be added.
         *detectors: detectors for which track isolation variables will be calculated.
                     Choose among: "CDC", "TOP", "ARICH", "ECL", "KLM"
-        reference_list_name (Optional[str]): name of the input ParticleList for the reference track.
-                                             By default, the ``:all`` ParticleList of the same particle type
-                                             of ``list_name`` is used.
-                                             It must be a list of charged stable particles, too.
-                                             The charge-conjugate ParticleList will be also processed automatically.
+        reference_list_name (Optional[str]): name of the input charged stable particle list for the reference tracks.
+                                             By default, the ``:all`` ParticleList of the same type
+                                             of the selected particle in ``decay_string`` is used.
+                                             The charge-conjugate particle list will be also processed automatically.
         highest_prob_mass_for_hex (Optional[bool]): if this option is set, the helix extrapolation for the particles
                                                     will use the track fit result for the most
                                                     probable mass hypothesis, namely, the one that gives the highest
@@ -3519,21 +3519,22 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
 
     """
 
+    import variables.utils as vu
     from ROOT import Belle2
+
     decayDescriptor = Belle2.DecayDescriptor()
     if not decayDescriptor.init(decay_string):
-        raise ValueError(f"Invalid particle list {decay_string} in calculateTrackIsolation!")
+        B2FATAL(f"Invalid particle list {decay_string} in calculateTrackIsolation!")
     if not reference_list_name:
         daughter_pdgs = decayDescriptor.getSelectionPDGCodes()
         if len(daughter_pdgs) > 0:
             reference_list_name = 'pi-:all'
         else:
             reference_list_name = f'{decay_string.split(":")[0]}:all'
-    import variables.utils as vu
 
     det_choices = ["CDC", "TOP", "ARICH", "ECL", "KLM"]
     if any(d not in det_choices for d in detectors):
-        B2ERROR("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)
+        B2FATAL("Your input detector list: ", detectors, " contains an invalid choice. Please select among: ", det_choices)
 
     det_labels = []
     for det in detectors:
@@ -3545,8 +3546,9 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
             det_labels.append(f"{det}0")
 
     suffix = f"_VS_{reference_list_name}"
-    # The module allows only one daughter to be selected,
-    # that's why here we preprocess the input decay string:
+
+    # The module allows only one daughter to be selected at a time,
+    # that's why here we preprocess the input decay string.
     select_symbol = '^'
     processed_decay_strings = []
     if select_symbol in decay_string:
@@ -3557,6 +3559,7 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
             processed_decay_strings += [''.join(tmp)]
     else:
         processed_decay_strings += [decay_string]
+
     for processed_dec in processed_decay_strings:
         for det in det_labels:
             trackiso = path.add_module("TrackIsoCalculator",
@@ -3564,9 +3567,14 @@ def calculateTrackIsolation(decay_string, path, *detectors, reference_list_name=
                                        detectorSurface=det,
                                        particleListReference=reference_list_name,
                                        useHighestProbMassForExt=highest_prob_mass_for_ext)
-            trackiso.set_name(f"TrackIsoCalculator{det}{suffix}{processed_dec}")
+            trackiso.set_name(f"TrackIsoCalculator{det}_{processed_dec}{suffix}")
 
-    aliases = vu.create_aliases([f"distToClosestTrkAt{det}{suffix}" for det in det_labels], "extraInfo({variable})")
+    # Use a special suffix to identify variables in case the helix extrapolation is done
+    # using the best fit mass hypothesis.
+    extra_suffix = "" if not highest_prob_mass_for_ext else "__useHighestProbMassForExt"
+
+    aliases = vu.create_aliases([f"distToClosestTrkAt{det}{suffix}{extra_suffix}" for det in det_labels], "extraInfo({variable})")
+
     return aliases
 
 

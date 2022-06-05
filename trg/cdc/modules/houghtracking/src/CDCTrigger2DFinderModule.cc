@@ -50,10 +50,10 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
            string(""));
   addParam("nCellsPhi", m_nCellsPhi,
            "Number of Hough cells in phi (limits: [-180, 180]). Must be an even number.",
-           (unsigned)(320));
+           (unsigned)(160));
   addParam("nCellsR", m_nCellsR,
            "Number of Hough cells in 1/r. Must be an even number.",
-           (unsigned)(68));
+           (unsigned)(34));
   addParam("minPt", m_minPt,
            "Minimum Pt [GeV]. "
            "Hough plane limits in 1/r are [-1/r(minPt), 1/r(minPt)]", (double)(0.3));
@@ -64,11 +64,11 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
 
   addParam("minHits", m_minHits,
            "Minimum hits from different super layers required in a peak cell.",
-           (unsigned)(15));
+           (unsigned)(20));
   addParam("minHitsShort", m_minHitsShort,
            "Minimum hits required required in a peak cell for a short track"
            " (must be in the first minHitsShort super layers).",
-           (unsigned)(15));
+           (unsigned)(20));
   addParam("minCells", m_minCells,
            "Peaks with less than minCells connected cells are ignored.",
            (unsigned)(2));
@@ -113,7 +113,7 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
            "subsequent clones.", false);
 
   addParam("usehitpattern", m_usehitpattern,
-           "Switch to use hit pattern inside TSF ", false);
+           "Switch to use hit pattern inside TSF ", true);
 }
 
 void
@@ -137,7 +137,7 @@ CDCTrigger2DFinderModule::initialize()
     TSoffset[iSL + 1] = nTS;
     if (!m_usehitpattern) {
       for (int priority = 0; priority < 2; ++ priority) {
-        radius[iSL][priority] = cdc.senseWireR(layerId + priority - 2);
+        radius[iSL][priority] = cdc.senseWireR(layerId + priority);
       }
     } else {
       for (int priority = 0; priority < 5; ++ priority) {

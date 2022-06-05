@@ -93,22 +93,22 @@ namespace Belle2 {
     void terminate() override;
 
   private:
+
     /**
      * StoreArray of Particles
      */
     StoreArray<Particle> m_particles;
-    /**
-     * The name of the input ParticleList.
-     */
-    std::string m_decayString;
+
     /**
      * The name of the input charged stable particle list, or composite particle w/ charged stable daughters for which distances are to be calculated.
      */
-    std::string m_targetListName;
+    std::string m_decayString;
+
     /**
      * The number of selected daughters in the decay string.
      */
     unsigned short m_nSelectedDaughters;
+
     /**
      * The name of the input ParticleList of reference tracks.
      */
@@ -156,13 +156,15 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_event_metadata;
 
     /**
-     * The input ParticleList object.
+     * The input ParticleList object for which distances are to be calculated.
      */
-    StoreObjPtr<ParticleList> m_targetList;
+    StoreObjPtr<ParticleList> m_pListTarget;
+
     /**
      *< Decay descriptor of decays to look for.
      */
     DecayDescriptor m_decaydescriptor;
+
     /**
      * The input ParticleList object of reference tracks.
      */

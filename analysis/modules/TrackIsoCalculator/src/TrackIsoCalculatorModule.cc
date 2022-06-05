@@ -26,7 +26,7 @@ TrackIsoCalculatorModule::TrackIsoCalculatorModule() : Module()
   // Parameter definitions
   addParam("decayString",
            m_decayString,
-           "A decay string with selected standard charged particle lists as daughters, e.g. ``D0 -> ^K- pi+``. Alternatively, this can be simply the name of a standard charged particle list, e.g. ``mu+:all``.");
+           "The name of the input charged stable particle list, e.g. ``mu+:all``, or a composite particle w/ charged stable daughters for which distances are to be calculated, e.g. ``D0 -> ^K- pi+``. Note that in the latter case we allow only one daughter to be selected in the decay string per module instance.");
   addParam("particleListReference",
            m_pListReferenceName,
            "The name of the input ParticleList of reference tracks. Must be a charged stable particle as defined in Const::chargedStableSet.");
@@ -46,15 +46,20 @@ TrackIsoCalculatorModule::~TrackIsoCalculatorModule()
 void TrackIsoCalculatorModule::initialize()
 {
   m_event_metadata.isRequired();
+
   bool valid = m_decaydescriptor.init(m_decayString);
-  if (!valid)
-    B2ERROR("TrackIsoCalculatorModule::initialize Invalid input DecayString: " << m_decayString);
+  if (!valid) {
+    B2ERROR("Invalid input DecayString: " << m_decayString);
+  }
+
   const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
-  m_targetListName = mother->getFullName();
-  m_targetList.isRequired(m_targetListName);
+
+  m_pListTarget.isRequired(mother->getFullName());
   m_nSelectedDaughters = m_decaydescriptor.getSelectionNames().size();
-  if (m_nSelectedDaughters > 1)
-    B2ERROR("TrackIsoCalculatorModule::initialize Only one selected daughter is allows in " << m_decayString);
+
+  if (m_nSelectedDaughters > 1) {
+    B2ERROR("Only one *selected* daughter is allowed in " << m_decayString);
+  }
 
   m_pListReference.isRequired(m_pListReferenceName);
 
@@ -62,12 +67,12 @@ void TrackIsoCalculatorModule::initialize()
          << m_decayString << ", " << "reference ParticleList: " << m_pListReferenceName << ".");
 
   if (!onlySelectedStdChargedInDecay()) {
-    B2FATAL("ParticleList: " << m_decayString << " and/or ParticleList: " << m_pListReferenceName <<
+    B2FATAL("Selected ParticleList in DecayString: " << m_decayString << " and/or reference ParticleList: " << m_pListReferenceName <<
             " is not that of a valid particle in Const::chargedStableSet! Aborting...");
   }
 
   if (m_useHighestProbMass) {
-    B2INFO("Will use track fit result for the most probable mass hypothesis in helix extrapolation of reference particles.");
+    B2INFO("Will use track fit result for the most probable mass hypothesis in helix extrapolation.");
   }
 
   // Define the name of the variable to be stored as extraInfo.
@@ -85,7 +90,7 @@ void TrackIsoCalculatorModule::event()
 
   B2DEBUG(12, "Start processing EVENT: " << m_event_metadata->getEvent());
 
-  const auto nParticles = m_targetList->getListSize();
+  const auto nParticles = m_pListTarget->getListSize();
   const auto nParticlesReference = m_pListReference->getListSize();
 
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent() << "\n" << "nParticles: " << nParticles << "\n"
@@ -94,7 +99,7 @@ void TrackIsoCalculatorModule::event()
   std::vector<const Particle*> targetParticles;
   targetParticles.reserve(nParticles);
   for (unsigned int iPart(0); iPart < nParticles; ++iPart) {
-    auto* iParticle = m_targetList->getParticle(iPart);
+    auto* iParticle = m_pListTarget->getParticle(iPart);
     if (m_nSelectedDaughters > 0) {
       auto daughters = m_decaydescriptor.getSelectionParticles(iParticle);
       for (auto* iDaughter : daughters) {

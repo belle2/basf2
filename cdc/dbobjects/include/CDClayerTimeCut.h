@@ -36,7 +36,7 @@ namespace Belle2 {
 
           m_maxDriftTimes[iLayer] = value.second.get_value<float>();
           iLayer += 1;
-          if (iLayer == TrackFindingCDC::ISuperLayerUtil::c_N) {
+          if (iLayer > TrackFindingCDC::ISuperLayerUtil::c_N) {
             B2FATAL("Cannot parse CDClayerTimeCut: too many layers");
           }
         }

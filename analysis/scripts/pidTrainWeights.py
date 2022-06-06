@@ -434,7 +434,7 @@ def get_parser():
         default=None,
         help=(
             "Load a pre-existing model and resume training instead of "
-            "starting a new one. If `--resume` is used and no file is "
+            "starting a new one. If '--resume' is used and no file is "
             "specified, the output filepath will be loaded, and the "
             "training will overwrite that file. Alternatively, if a "
             "filepath is given, training will begin from the state "
